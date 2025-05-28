@@ -1,4 +1,4 @@
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
 import fs from 'node:fs'
 

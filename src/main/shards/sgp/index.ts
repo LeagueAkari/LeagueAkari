@@ -2,7 +2,7 @@ import { IntervalTask } from '@main/utils/timer'
 import builtinSgpServersJson from '@resources/builtin-config/sgp/league-servers.json?commonjs-external&asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
-import { GithubFile } from '@shared/types/github'
+import { GithubApiFile } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
@@ -35,7 +35,7 @@ export class SgpMain implements IAkariShardInitDispose {
   static LEAGUE_SGP_SERVERS_JSON = 'league-servers.json'
   static CONFIG_SCHEMA_VERSION = 1
   static SGP_SERVERS_CONFIG_GITHUB_URL =
-    '/repos/Hanxven/LeagueAkari-Config/contents/configs/sgp/league-servers.json?ref=main'
+    '/repos/Hanxven/LeagueAkari-Config/contents/config/sgp/league-servers.json?ref=main'
 
   public readonly state: SgpState
 
@@ -160,7 +160,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._log.info('检查远程 SGP 服务器配置文件')
 
     try {
-      const { data } = await this._http.get<GithubFile>(SgpMain.SGP_SERVERS_CONFIG_GITHUB_URL)
+      const { data } = await this._http.get<GithubApiFile>(SgpMain.SGP_SERVERS_CONFIG_GITHUB_URL)
 
       const { content, encoding } = data
 

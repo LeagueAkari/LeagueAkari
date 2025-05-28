@@ -1,4 +1,4 @@
-import { input } from '@hanxven/league-akari-addons'
+import { input } from '@leagueakari/league-akari-addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'

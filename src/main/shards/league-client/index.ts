@@ -1,4 +1,4 @@
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'

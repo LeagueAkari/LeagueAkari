@@ -1255,6 +1255,7 @@ Spectate:
 
 MatchHistoryTabs:
   disconnected: 未连接到客户端
+  queueing: 正在进行登录排队
   noActiveTab: 当前没有活跃的战绩页面
   copiedToClipboard: 已复制到剪贴板
   dropZoneRosterMember: 投放以转到该玩家

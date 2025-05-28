@@ -1,7 +1,6 @@
 <template>
   <div class="tasks">
     <div class="task-title">{{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}</div>
-    <div class="divider"></div>
     <div
       class="task"
       :class="{
@@ -17,7 +16,7 @@
         v-if="task.progress !== null"
         class="task-progress"
         type="line"
-        :border-radius="2"
+        :border-radius="0"
         :percentage="task.progress * 100"
         :status="task.status"
       >
@@ -63,6 +62,9 @@ const renderText = (node: string | (() => VNodeChild)) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 8px;
+  border: solid 1px #fff2;
+  border-radius: 4px;
 }
 
 .actions {
@@ -74,8 +76,10 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 
 .task-title {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
+  padding: 0 8px;
+  margin-bottom: 4px;
 }
 
 .divider {
@@ -86,7 +90,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 .task {
   background-color: #fff1;
   border-radius: 2px;
-  padding: 8px 16px;
+  padding: 8px 8px;
   width: 320px;
 
   &.error {
@@ -95,7 +99,6 @@ const renderText = (node: string | (() => VNodeChild)) => {
 
   .task-name {
     font-size: 14px;
-    font-weight: bold;
   }
 
   .task-progress {

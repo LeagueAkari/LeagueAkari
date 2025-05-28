@@ -1,5 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'

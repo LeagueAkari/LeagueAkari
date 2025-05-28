@@ -1,0 +1,56 @@
+import { SgpServersConfig } from '@shared/data-sources/sgp'
+import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
+import { makeAutoObservable, observable } from 'mobx'
+
+export class RemoteConfigState {
+  sgpLeagueServers: SgpServersConfig
+
+  latestRelease: GithubApiLatestRelease | null = null
+
+  announcement: GithubApiFile | null = null
+
+  setSgpLeagueServers(sgpLeagueServers: SgpServersConfig) {
+    this.sgpLeagueServers = sgpLeagueServers
+  }
+
+  setLatestRelease(latestRelease: GithubApiLatestRelease) {
+    this.latestRelease = latestRelease
+  }
+
+  setAnnouncement(announcement: GithubApiFile) {
+    this.announcement = announcement
+  }
+
+  setEmptySgpLeagueServers() {
+    this.sgpLeagueServers = {
+      version: 0,
+      lastUpdate: 0,
+      servers: {},
+      serverNames: {},
+      tencentServerMatchHistoryInteroperability: [],
+      tencentServerSpectatorInteroperability: [],
+      tencentServerSummonerInteroperability: []
+    }
+  }
+
+  constructor() {
+    this.setEmptySgpLeagueServers()
+
+    makeAutoObservable(this, {
+      sgpLeagueServers: observable.ref,
+      latestRelease: observable.ref
+    })
+  }
+}
+
+export class RemoteConfigSettings {
+  preferredSource: 'github' | 'gitee' = 'github'
+
+  setPreferredSource(source: 'github' | 'gitee') {
+    this.preferredSource = source
+  }
+
+  constructor() {
+    makeAutoObservable(this)
+  }
+}

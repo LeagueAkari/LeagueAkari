@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdate": 1745477200000,
+  "lastUpdate": 1748412177935,
   "from": "builtin",
   "servers": {
     "TENCENT_HN1": {
@@ -39,6 +39,10 @@
       "matchHistory": "https://pbe-sgp.lol.qq.com:21019",
       "common": "https://pbe-sgp.lol.qq.com:21019"
     },
+    "TENCENT_PREPBE": {
+      "matchHistory": "https://prepbe-sgp.lol.qq.com:21019",
+      "common": "https://prepbe-sgp.lol.qq.com:21019"
+    },
     "TW2": {
       "common": "https://tw2-red.lol.sgp.pvp.net",
       "matchHistory": "https://apse1-red.pp.sgp.pvp.net"
@@ -73,7 +77,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "tencentServerSpectatorInteroperability": [
     "TENCENT_HN1",
@@ -84,7 +89,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "tencentServerSummonerInteroperability": [
     "TENCENT_HN1",
@@ -95,7 +101,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "serverNames": {
     "en": {
@@ -108,6 +115,7 @@
       "TENCENT_CQ100": "League 3",
       "TENCENT_BGP2": "Rift's Summit",
       "TENCENT_PBE": "PBE (Tencent)",
+      "TENCENT_PREPBE": "PBE (Tencent) (Temporary)",
       "TW2": "Taiwan",
       "SG2": "Singapore",
       "PH2": "Philippines",
@@ -125,6 +133,7 @@
       "TENCENT_CQ100": "联盟三区",
       "TENCENT_BGP2": "峡谷之巅",
       "TENCENT_PBE": "PBE (腾讯)",
+      "TENCENT_PREPBE": "PBE (腾讯) (临时)",
       "TW2": "台湾",
       "SG2": "新加坡",
       "PH2": "菲律宾",

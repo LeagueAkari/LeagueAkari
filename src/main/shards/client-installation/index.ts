@@ -1,4 +1,4 @@
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import cp from 'node:child_process'

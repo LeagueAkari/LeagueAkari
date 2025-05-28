@@ -73,7 +73,7 @@ interface Links {
   html: string
 }
 
-export interface GithubFile {
+export interface GithubApiFile {
   name: string
   path: string
   sha: string

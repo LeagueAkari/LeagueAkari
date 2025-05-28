@@ -23,7 +23,9 @@
             v-if="mhs.settings.matchHistoryUseSgpApi && lcs.connectionState === 'connected'"
           >
             <div
-              v-if="sgps.availability.sgpServerId"
+              v-if="
+                sgps.availability.sgpServerId && sgps.availability.serversSupported.matchHistory
+              "
               class="sgp-server-hint-ok"
               style="font-weight: bold; user-select: text"
             >
@@ -71,7 +73,7 @@ const lcs = useLeagueClientStore()
   }
 
   .sgp-server-hint-not-ok {
-    color: rgb(209, 170, 124);
+    color: rgb(230, 114, 41);
   }
 }
 

@@ -1,4 +1,5 @@
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -6,6 +7,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
 import { CSSProperties, VNodeChild, computed, h, inject, ref, watch } from 'vue'
@@ -236,11 +238,48 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleQueueingProgress() {
+    const lcs = useLeagueClientStore()
+    const bts = useBackgroundTasksStore()
+    const { t } = useTranslation()
+
+    const taskId = `${SimpleNotificationsRenderer.id}/queueing`
+
+    watch(
+      () => lcs.login.loginQueueState,
+      (state) => {
+        if (!state) {
+          bts.removeTask(taskId)
+          return
+        }
+
+        if (!bts.hasTask(taskId)) {
+          bts.createTask(taskId, {
+            name: () => '登录排队'
+          })
+        }
+
+        bts.updateTask(taskId, {
+          description: () =>
+            `正在排队: ${state.estimatedPositionInQueue} / ${state.maxDisplayedPosition} (预计 ${formatSeconds(state.approximateWaitTimeSeconds)})`,
+          progress:
+            1 -
+            (state.maxDisplayedPosition - state.estimatedPositionInQueue) /
+              state.maxDisplayedPosition
+        })
+      },
+      {
+        immediate: true
+      }
+    )
+  }
+
   private _setupSimpleNotifications() {
     this._setupStreamerModeNotifications()
   }
 
   async onInit() {
     this._setup.addSetupFn(() => this._setupSimpleNotifications())
+    this._setup.addSetupFn(() => this._handleQueueingProgress())
   }
 }
