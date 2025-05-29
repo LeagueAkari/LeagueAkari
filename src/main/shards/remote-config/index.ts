@@ -12,6 +12,8 @@ import { RemoteConfigSettings, RemoteConfigState } from './state'
 
 /**
  * 从远程服务器拉取配置
+ *
+ * TODO NEED MIGRATION
  */
 @Shard(RemoteConfigMain.id)
 export class RemoteConfigMain implements IAkariShardInitDispose {
@@ -51,7 +53,16 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       RemoteConfigMain.id,
       {
-        preferredSource: { default: this.settings.preferredSource }
+        // China mainland use gitee for better performance
+        // due to Great Food Wallet
+        preferredSource: {
+          default: Intl.DateTimeFormat()
+            .resolvedOptions()
+            .locale.toLocaleLowerCase()
+            .includes('zh-cn')
+            ? 'gitee'
+            : 'github'
+        }
       },
       this.settings
     )
@@ -59,6 +70,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private async _updateSgpLeagueServers() {
     try {
+      this._log.info('Updating Sgp League Servers', this._repo.config.source)
       const { data } = await this._repo.getSgpLeagueServersConfig()
       this.state.setSgpLeagueServers(data)
     } catch (error) {
@@ -68,6 +80,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private async _updateAnnouncement() {
     try {
+      this._log.info('Updating Announcement', this._repo.config.source)
       const { data } = await this._repo.getAnnouncementContent()
       this.state.setAnnouncement(data)
     } catch (error) {
@@ -77,6 +90,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private async _updateLatestRelease() {
     try {
+      this._log.info('Updating Latest Release', this._repo.config.source)
       const { data } = await this._repo.getLatestRelease()
       this.state.setLatestRelease(data)
     } catch (error) {

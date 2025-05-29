@@ -237,7 +237,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onInit() {
     if (this._app.state.isAdministrator) {
-      this._log.info('监听键盘事件')
+      this._log.info('Listening to native keyboard events')
       input.instance.install()
       input.instance.on('keyEvent', (key) => {
         this._handleNativeKeyEvent(key)
@@ -279,7 +279,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     cb: (details: ShortcutDetails) => void
   ) {
     if (!this._app.state.isAdministrator) {
-      this._log.info(`当前位于普通权限, 忽略快捷键注册: ${shortcutId} (${type})`)
+      this._log.info(
+        `Current in normal permission, ignoring shortcut registration: ${shortcutId} (${type})`
+      )
       return
     }
 
@@ -351,7 +353,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onDispose() {
     if (this._app.state.isAdministrator) {
-      this._log.info('停止监听键盘事件')
+      this._log.info('Stop listening to native keyboard events')
       input.instance.uninstall()
     }
     this.events.removeAllListeners()

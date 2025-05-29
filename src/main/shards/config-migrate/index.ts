@@ -50,7 +50,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_126)
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_126)
 
     await this._do(manager, 'auxiliary-window/opacity', 'window-manager-main/auxWindowOpacity')
     await this._do(manager, 'auxiliary-window/enabled', 'window-manager-main/auxWindowEnabled')
@@ -203,7 +203,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_126, ConfigMigrateMain.MIGRATION_FROM_126)
     )
 
-    this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_126}`)
+    this._log.info(`Migration completed, to ${ConfigMigrateMain.MIGRATION_FROM_126}`)
   }
 
   private async _migrateFrom134(manager: EntityManager) {
@@ -215,7 +215,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_134)
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_134)
 
     await manager.save(Setting, Setting.create('app-common-main/showFreeSoftwareDeclaration', true))
 
@@ -286,7 +286,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_134, ConfigMigrateMain.MIGRATION_FROM_134)
     )
 
-    this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_134}`)
+    this._log.info(`Migration completed, to ${ConfigMigrateMain.MIGRATION_FROM_134}`)
   }
 
   private async _migrateFrom135(manager: EntityManager) {
@@ -298,7 +298,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_135)
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_135)
 
     await this._do(manager, 'app-common-renderer/streamerMode', 'app-common-main/streamerMode')
     await this._do(
@@ -320,7 +320,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
         await this._migrateFrom135(manager)
       })
     } catch (error) {
-      this._log.error('迁移设置项失败', error)
+      this._log.error('Failed to migrate settings', error)
     }
   }
 }

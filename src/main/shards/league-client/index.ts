@@ -256,7 +256,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       })
       this._rendererSubMap.set(newId, dispose)
 
-      this._log.debug(`渲染进程订阅 LCU 事件 ${uri}，ID: ${newId}`)
+      this._log.debug(`Renderer subscribed to LCU event ${uri}, ID: ${newId}`)
 
       return newId
     })
@@ -267,7 +267,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         dispose()
         this._rendererSubMap.delete(subId)
 
-        this._log.debug(`渲染进程取消订阅 LCU 事件，ID: ${subId}`)
+        this._log.debug(`Renderer unsubscribed from LCU event, ID: ${subId}`)
 
         return true
       }
@@ -340,9 +340,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ([a, s]) => {
         if (a) {
           const { certificate, ...rest } = a
-          this._log.debug(`LCU 状态发生变化: ${s}`, rest)
+          this._log.debug(`LCU state changed: ${s}`, rest)
         } else {
-          this._log.debug(`LCU 状态发生变化: ${s}`, a)
+          this._log.debug(`LCU state changed: ${s}`, a)
         }
       },
       { equals: comparer.shallow }
@@ -383,7 +383,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       } catch (error) {
         if ((error as any).code !== 'ECONNREFUSED') {
           this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._log.warn(`尝试连接到 LC 时发生错误`, error)
+          this._log.warn(`Error connecting to LC`, error)
           break
         }
       }
@@ -443,7 +443,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
     const { certificate, ...rest } = cmd
 
-    this._log.info('目标客户端', rest)
+    this._log.info('Target client', rest)
 
     this.state.setConnecting()
 
@@ -523,7 +523,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       this._api = new LeagueClientHttpApiAxiosHelper(this._http)
     } catch (error) {
       if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-        this._log.warn(`无法执行 PING 操作`, error)
+        this._log.warn(`Failed to execute PING operation`, error)
         throw error
       }
     }
@@ -586,12 +586,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         const fileName = `${itemSet.uid}.json`
         const filePath = path.join(targetPath, fileName)
 
-        this._log.info(`写入物品集到文件 ${filePath}`)
+        this._log.info(`Write item set to disk: ${filePath}`)
 
         fs.writeFileSync(filePath, JSON.stringify(itemSet), { encoding: 'utf-8' })
       }
     } catch (error) {
-      this._log.error(`写入物品集到本地文件失败`, error)
+      this._log.error(`Failed to write item set to local file`, error)
       throw error
     }
   }

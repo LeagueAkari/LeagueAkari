@@ -117,7 +117,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
           }
         }
 
-        this._log.warn(`RiotClient HTTP 客户端错误`, error)
+        this._log.warn(`RiotClient HTTP client error`, error)
 
         throw error
       }

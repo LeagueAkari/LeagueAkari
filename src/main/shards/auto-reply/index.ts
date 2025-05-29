@@ -70,12 +70,12 @@ export class AutoReplyMain implements IAkariShardInitDispose {
 
           try {
             await this._lc.api.chat.chatSend(fromId, this.settings.text)
-            this._log.info(`已自动回复给 ${fromId}, 内容: ${this.settings.text}`)
+            this._log.info(`Auto-replied to ${fromId}, content: ${this.settings.text}`)
           } catch (error) {
             this._ipc.sendEvent(AutoReplyMain.id, 'error-send-failed', {
               error: formatError(error)
             })
-            this._log.warn(`尝试自动回复时出现错误`, formatError(error))
+            this._log.warn(`Failed to auto-reply`, formatError(error))
           }
         }
       }
@@ -89,9 +89,9 @@ export class AutoReplyMain implements IAkariShardInitDispose {
         }
 
         if (prev === 'offline' && (availability === 'away' || availability === 'chat')) {
-          this._log.debug('纠正为离线状态')
+          this._log.debug('Correcting to offline status')
           this._lc.api.chat.changeAvailability('offline').catch((error) => {
-            this._log.warn(`尝试修改状态时出现错误`, error)
+            this._log.warn(`Failed to change status`, error)
           })
         }
       }

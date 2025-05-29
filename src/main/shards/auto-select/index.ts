@@ -107,7 +107,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private async _pick(championId: number, actionId: number, completed = true) {
     try {
       this._log.info(
-        `现在选择：${this._lc.data.gameData.champions[championId]?.name || championId}, ${this.settings.pickStrategy}, actionId=${actionId}, 锁定=${completed}`
+        `Now picking: ${this._lc.data.gameData.champions[championId]?.name || championId}, ${this.settings.pickStrategy}, actionId=${actionId}, locked=${completed}`
       )
 
       await this._lc.api.champSelect.pickOrBan(championId, completed, 'pick', actionId)
@@ -120,7 +120,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         })}`
       )
 
-      this._log.warn(`尝试执行 pick 时失败, 目标英雄: ${championId}`, error)
+      this._log.warn(`Failed to pick, target champion: ${championId}`, error)
     }
   }
 
@@ -136,13 +136,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         })}`
       )
 
-      this._log.warn(`尝试执行 ban 时失败, 目标英雄: ${championId}`, error)
+      this._log.warn(`Failed to ban, target champion: ${championId}`, error)
     }
   }
 
   private async _prePick(championId: number, actionId: number) {
     try {
-      this._log.info(`现在预选：${championId}, actionId=${actionId}`)
+      this._log.info(`Now pre-picking: ${championId}, actionId=${actionId}`)
 
       await this._lc.api.champSelect.action(actionId, { championId })
     } catch (error) {
@@ -154,7 +154,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         })}`
       )
 
-      this._log.warn(`尝试执行预选时失败, 目标英雄: ${championId}`, error)
+      this._log.warn(`Failed to pre-pick, target champion: ${championId}`, error)
     }
   }
 
@@ -187,7 +187,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
 
       this._log.info(
-        `取消即将进行的选择自动选择: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
+        `Cancelled upcoming auto-pick: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
       )
       this._sendInChat(
         `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
@@ -208,7 +208,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
 
       this._log.info(
-        `取消即将进行的自动禁用: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
+        `Cancelled upcoming auto-ban: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
       )
       this.state.setUpcomingPick(null)
       this._sendInChat(
@@ -254,7 +254,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
 
             this._log.info(
-              `添加延迟选定任务：${delay * 1e3} (修正后：${delayMs}), 目标英雄：${this._lc.data.gameData.champions[pick.championId]?.name || pick.championId}`
+              `Added delayed pick task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[pick.championId]?.name || pick.championId}`
             )
 
             this._sendInChat(
@@ -319,7 +319,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
           const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
           this._log.info(
-            `添加延迟禁用任务：${delay * 1e3} (修正后：${delayMs}), 目标英雄：${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
+            `Added delayed ban task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
           )
           this._sendInChat(
             `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-ban', {
@@ -366,7 +366,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.state.upcomingGrab,
       (grab) => {
-        this._log.info(`Upcoming Grab - 即将进行的交换`, grab)
+        this._log.info(`Upcoming Grab - swap scheduled`, grab)
       }
     )
 
@@ -400,7 +400,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       (info) => {
         if (info) {
           this._log.info(
-            `当前分配到位置: ${info.position || '<空>'}, 预设选用英雄: ${JSON.stringify(info.pick)}, 预设禁用英雄: ${JSON.stringify(info.ban)}`
+            `Assigned position: ${info.position || '<empty>'}, preset pick: ${JSON.stringify(info.pick)}, preset ban: ${JSON.stringify(info.ban)}`
           )
         }
       }
@@ -517,7 +517,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (!enabled) {
           if (this.state.upcomingGrab) {
             this._log.info(
-              `关闭了该功能, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+              `Closed this feature, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
             )
             this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             clearTimeout(this._grabTimerId!)
@@ -541,7 +541,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (this.state.upcomingGrab) {
           if (pickableChampionsOnBench.length === 0) {
             this._log.info(
-              `已无可选英雄, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+              `No available champions, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
             )
             this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             clearTimeout(this._grabTimerId!)
@@ -556,7 +556,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               return
             } else {
               this._log.info(
-                `已非首选英雄, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+                `Not preferred champion, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
               )
               this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
               clearTimeout(this._grabTimerId!)
@@ -569,7 +569,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               return
             } else {
               this._log.info(
-                `已不在期望列表中, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+                `Not in expected list, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
               )
               this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
               clearTimeout(this._grabTimerId!)
@@ -618,7 +618,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           0
         )
 
-        this._log.info(`目标交换英雄: ${newTarget}`)
+        this._log.info(`Target swap champion: ${newTarget}`)
         this.state.setUpcomingGrab(newTarget, Date.now() + waitTime)
         this._notifyInChat('select', this.state.upcomingGrab!.championId, waitTime).catch(() => {})
         this._grabTimerId = setTimeout(() => this._trySwap(), waitTime)
@@ -661,7 +661,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        this._log.info(`收到交换请求: ${from.championId} -> ${self.championId}`)
+        this._log.info(`Received swap request: ${from.championId} -> ${self.championId}`)
 
         const requesterChampionId = from.championId
         const hasExpected = this.settings.benchExpectedChampions.includes(self.championId)
@@ -683,23 +683,23 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                     })}`
                   )
                   this._log.info(
-                    `忽略交换请求: ${from.championId} -> ${self.championId}, 对方为物主`
+                    `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
                   )
                 } else {
                   this._log.info(
-                    `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
+                    `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
                   )
                   this._acceptOrDeclineTrade(id, false)
                 }
               } else {
                 this._log.info(
-                  `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
+                  `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
                 )
                 this._acceptOrDeclineTrade(id, false)
               }
             } else {
               this._log.info(
-                `接受交换请求: ${from.championId} -> ${self.championId}, 目标具有更高优先级`
+                `Accepted swap request: ${from.championId} -> ${self.championId}, target has higher priority`
               )
               this._acceptOrDeclineTrade(id, true)
             }
@@ -714,7 +714,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                     to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
                   })}`
                 )
-                this._log.info(`忽略交换请求: ${from.championId} -> ${self.championId}, 对方为物主`)
+                this._log.info(
+                  `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
+                )
               } else {
                 this._acceptOrDeclineTrade(id, false)
               }
@@ -725,7 +727,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         } else {
           if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {
             this._log.info(
-              `接受交换请求: ${from.championId} -> ${self.championId}, 对方英雄为期望英雄`
+              `Accepted swap request: ${from.championId} -> ${self.championId}, target champion is expected`
             )
             this._acceptOrDeclineTrade(id, true)
           } else {
@@ -757,14 +759,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         await this._lc.api.champSelect.acceptTrade(tradeId)
       } catch (error) {
         this._ipc.sendEvent(AutoSelectMain.id, 'error-accept-trade', tradeId)
-        this._log.warn(`接受交换请求时发生错误`, error)
+        this._log.warn(`Failed to accept swap request`, error)
       }
     } else {
       try {
         await this._lc.api.champSelect.declineTrade(tradeId)
       } catch (error) {
         this._ipc.sendEvent(AutoSelectMain.id, 'error-decline-trade', tradeId)
-        this._log.warn(`拒绝交换请求时发生错误`, error)
+        this._log.warn(`Failed to decline swap request`, error)
       }
     }
   }
@@ -789,7 +791,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(AutoSelectMain.id, 'error-chat-send', formatError(error))
-      this._log.warn(`无法发送信息`, error)
+      this._log.warn(`Failed to send message`, error)
     }
   }
 
@@ -802,7 +804,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     try {
       await this._lc.api.champSelect.benchSwap(championId)
-      this._log.info(`已交换英雄: ${championId}`)
+      this._log.info(`Swapped champion: ${championId}`)
     } catch (error) {
       this._ipc.sendEvent(AutoSelectMain.id, 'error-bench-swap', championId)
       this._sendInChat(
@@ -811,7 +813,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           reason: formatErrorMessage(error)
         })}`
       )
-      this._log.warn(`在尝试交换英雄时发生错误`, error)
+      this._log.warn(`Failed to swap champion`, error)
     } finally {
       // TODO 使用新代码
       this._grabTimerId = null

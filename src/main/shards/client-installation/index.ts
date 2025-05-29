@@ -114,11 +114,14 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         try {
           await fs.promises.access(p.value as string)
         } catch {
-          this._log.info('注册表检测到腾讯服英雄联盟安装位置但无法访问, 可能并不存在', p.value)
+          this._log.info(
+            'Registry detected Tencent League of Legends installation but cannot access, possibly not exists',
+            p.value
+          )
           return
         }
 
-        this._log.info('注册表检测到腾讯服英雄联盟安装位置', p.value)
+        this._log.info('Registry detected Tencent League of Legends installation', p.value)
         this.state.setTencentInstallationPath(p.value as string)
 
         try {
@@ -126,7 +129,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           await fs.promises.access(tclsPath)
           this.state.setHasTcls(true)
         } catch {
-          this._log.info('TCLS 无法访问, 可能并不存在', p.value)
+          this._log.info('TCLS cannot access, possibly not exists', p.value)
           return
         }
 
@@ -135,7 +138,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           await fs.promises.access(weGamePath)
           this.state.setHasWeGameLauncher(true)
         } catch {
-          this._log.info('WeGame 启动器无法访问, 可能并不存在', p.value)
+          this._log.info('WeGame launcher cannot access, possibly not exists', p.value)
           return
         }
       }
@@ -148,16 +151,19 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           try {
             await fs.promises.access(match[1])
           } catch {
-            this._log.info('检测到 WeGame 但无法访问, 可能并不存在', match[1])
+            this._log.info(
+              'Registry detected WeGame installation but cannot access, possibly not exists',
+              match[1]
+            )
             return
           }
 
-          this._log.info('注册表检测到 WeGame 安装位置', match[1])
+          this._log.info('Registry detected WeGame installation', match[1])
           this.state.setWeGameExecutablePath(match[1])
         }
       }
     } catch (error) {
-      this._log.warn(`使用注册表信息读取安装目录时发生错误`, error)
+      this._log.warn(`Failed to read installation directory using registry information`, error)
     }
   }
 
@@ -169,7 +175,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         .map((line) => line.trim())
         .filter((line) => /^[A-Z]:$/.test(line))
     } catch (error) {
-      this._log.warn('尝试获取逻辑磁盘时出现错误', error)
+      this._log.warn('Failed to get logical drives', error)
       return []
     }
   }
@@ -184,7 +190,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
     const drives = await this._getDrives()
 
-    this._log.info('当前的逻辑磁盘', drives)
+    this._log.info('Current logical drives', drives)
 
     for (const drive of drives) {
       const installation = path.join(
@@ -196,7 +202,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       try {
         await fs.promises.access(installation)
 
-        this._log.info('通过文件检测到腾讯服英雄联盟安装位置', installation)
+        this._log.info('Detected Tencent League of Legends installation by file', installation)
 
         this.state.setTencentInstallationPath(installation)
 
@@ -206,13 +212,13 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         try {
           await fs.promises.access(tcls)
           this.state.setHasTcls(true)
-          this._log.info('通过文件检测到腾讯服 TCLS 安装位置', tcls)
+          this._log.info('Detected Tencent TCLS installation by file', tcls)
         } catch {}
 
         try {
           await fs.promises.access(weGameLauncher)
           this.state.setHasWeGameLauncher(true)
-          this._log.info('通过文件检测到腾讯服 WeGameLauncher 安装位置', weGameLauncher)
+          this._log.info('Detected Tencent WeGameLauncher installation by file', weGameLauncher)
         } catch {}
 
         // 如果都找到了，则直接退出
@@ -231,7 +237,9 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
   private async _updateLeagueClientInstallationByFile() {
     if (!process.env['ProgramData']) {
-      this._log.warn('无法获取 ProgramData 环境变量, 无法检测 LeagueClient 安装情况')
+      this._log.warn(
+        'Failed to get ProgramData environment variable, cannot detect LeagueClient installation'
+      )
       return
     }
 
@@ -265,7 +273,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
             await fs.promises.access(ins)
             result.push(ins)
           } catch (error) {
-            this._log.info('检测到 LeagueClient 安装位置但无法访问, 可能并不存在', installation)
+            this._log.info(
+              'Detected LeagueClient installation but cannot access, possibly not exists',
+              installation
+            )
           }
         }
 
@@ -276,13 +287,13 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         for (const p of riotInstallations) {
           if (await this._maybeOfficialRiotClient(p)) {
             this.state.setOfficialRiotClientExecutablePath(p)
-            this._log.info('检测到直营服 RiotClient 安装位置', p)
+            this._log.info('Detected official RiotClient installation', p)
             break
           }
         }
       }
     } catch (error) {
-      this._log.warn('尝试读取时出现错误', error)
+      this._log.warn('Failed to read LeagueClient installation', error)
     }
   }
 

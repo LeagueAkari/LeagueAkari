@@ -107,7 +107,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
-      this._log.error(`获取 Ux 命令行信息时失败`, error)
+      this._log.error(`Failed to get Ux command line`, error)
     }
   }
 

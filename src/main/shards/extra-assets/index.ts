@@ -40,11 +40,11 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   private async _updateGtimgHeroList() {
     try {
+      this._log.info('Gtimg: updating "hero_list"')
       const heroList = await this._gtimgApi.getHeroList()
       this.gtimg.setHeroList(heroList)
-      this._log.info('Gtimg: 更新了英雄列表')
     } catch (error) {
-      this._log.warn(`Gtimg: 更新英雄列表失败，将再次尝试`, error)
+      this._log.warn(`Gtimg: failed to update hero list, will retry`, error)
     } finally {
       this._gtimgTimerTask.start(ExtraAssetsMain.GTIMG_HERO_LIST_UPDATE_INTERVAL)
     }
@@ -52,11 +52,11 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   private async _updateFandomBalance() {
     try {
+      this._log.info('Fandom: updating balance data')
       const balance = await this._fandomApi.getBalance()
       this.fandom.setBalance(balance)
-      this._log.info('Fandom: 更新了平衡数据')
     } catch (error) {
-      this._log.warn('Fandom: 更新平衡数据失败', error)
+      this._log.warn('Fandom: failed to update balance data', error)
     } finally {
       this._fandomTimerTask.start(ExtraAssetsMain.FANDOM_BALANCE_UPDATE_INTERVAL)
     }

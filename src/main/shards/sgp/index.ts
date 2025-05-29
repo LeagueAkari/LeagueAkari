@@ -93,7 +93,9 @@ export class SgpMain implements IAkariShardInitDispose {
       const exists = await this._setting.jsonConfigFileExists(SgpMain.LEAGUE_SGP_SERVERS_JSON)
 
       if (!exists) {
-        this._log.info('无已保存的配置文件，将使用内置的 SGP 服务器配置文件')
+        this._log.info(
+          'No saved configuration file found, will use built-in SGP server configuration file'
+        )
 
         if (ofs.existsSync(builtinSgpServersJson)) {
           const data = await ofs.promises.readFile(builtinSgpServersJson, 'utf-8')
@@ -102,7 +104,7 @@ export class SgpMain implements IAkariShardInitDispose {
             JSON.parse(data)
           )
         } else {
-          this._log.warn('未找到内置的 SGP 服务器配置文件')
+          this._log.warn('Built-in SGP server configuration file not found')
           return
         }
       }
@@ -112,12 +114,14 @@ export class SgpMain implements IAkariShardInitDispose {
       if (this._validateConfig(json)) {
         this.state.setSgpServerConfig(json)
         this._log.info(
-          '加载本地 SGP 服务器配置文件',
+          'Loaded local SGP server configuration file',
           dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
         )
       }
     } catch (error) {
-      this._log.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
+      this._log.warn(
+        `Error occurred while loading SGP server configuration file: ${formatError(error)}`
+      )
     }
   }
 
@@ -128,14 +132,16 @@ export class SgpMain implements IAkariShardInitDispose {
     const { valid, errors } = validateSchema(json)
 
     if (!valid) {
-      this._log.warn(`SGP 服务器配置文件格式错误: ${errors?.map((e) => formatError(e))}`)
+      this._log.warn(
+        `SGP server configuration file format error: ${errors?.map((e) => formatError(e))}`
+      )
       return false
     }
 
     // support only the exact version
     if (json.version !== SgpMain.CONFIG_SCHEMA_VERSION) {
       this._log.warn(
-        `SGP 服务器配置文件版本不匹配, 当前版本: ${SgpMain.CONFIG_SCHEMA_VERSION}, 远程版本: ${json.version}`
+        `SGP server configuration file version mismatch, current version: ${SgpMain.CONFIG_SCHEMA_VERSION}, remote version: ${json.version}`
       )
       return false
     }
@@ -157,7 +163,7 @@ export class SgpMain implements IAkariShardInitDispose {
    * 如果远程的配置文件比应用内置的配置文件新, 则立即覆盖本地配置区的配置文件
    */
   private async _fetchAndUpdateSgpServers() {
-    this._log.info('检查远程 SGP 服务器配置文件')
+    this._log.info('Checking remote SGP server configuration file')
 
     try {
       const { data } = await this._http.get<GithubApiFile>(SgpMain.SGP_SERVERS_CONFIG_GITHUB_URL)
@@ -165,7 +171,10 @@ export class SgpMain implements IAkariShardInitDispose {
       const { content, encoding } = data
 
       if (encoding !== 'base64') {
-        this._log.warn('检查远程 SGP 配置文件时, 遇到不支持的编码格式:', encoding)
+        this._log.warn(
+          'Encountered unsupported encoding format while checking remote SGP configuration file:',
+          encoding
+        )
         return
       }
 
@@ -177,18 +186,18 @@ export class SgpMain implements IAkariShardInitDispose {
           this.state.setSgpServerConfig(json)
           await this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, json)
           this._log.info(
-            '更新本地 SGP 服务器配置文件',
+            'Updated local SGP server configuration file',
             dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
           )
         } else {
           this._log.info(
-            '远程 SGP 服务器配置文件没有更新',
+            'Remote SGP server configuration file has no updates',
             dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
           )
         }
       }
     } catch (error) {
-      this._log.warn(`更新 SGP 服务器配置文件时发生错误:`, error)
+      this._log.warn(`Error occurred while updating SGP server configuration file:`, error)
     }
   }
 
@@ -266,7 +275,9 @@ export class SgpMain implements IAkariShardInitDispose {
     try {
       return mapSgpMatchHistoryToLcu0Format(result, start, count)
     } catch (error) {
-      this._log.warn(`转换战绩数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`)
+      this._log.warn(
+        `Error converting SGP match history to LCU: ${formatError(error)}, ${playerPuuid}`
+      )
       throw error
     }
   }
@@ -277,7 +288,7 @@ export class SgpMain implements IAkariShardInitDispose {
     try {
       return mapSgpGameSummaryToLcu0Format(result)
     } catch (error) {
-      this._log.warn(`转换对局数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${gameId}`)
+      this._log.warn(`Error converting SGP game summary to LCU: ${formatError(error)}, ${gameId}`)
       throw error
     }
   }
@@ -291,7 +302,7 @@ export class SgpMain implements IAkariShardInitDispose {
     try {
       return mapSgpSummonerToLcu0Format(result)
     } catch (error) {
-      this._log.warn(`转换召唤师数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`)
+      this._log.warn(`Error converting SGP summoner to LCU: ${formatError(error)}, ${playerPuuid}`)
       throw error
     }
   }
@@ -302,7 +313,7 @@ export class SgpMain implements IAkariShardInitDispose {
     try {
       return mapSgpGameDetailsToLcu0Format(result)
     } catch (error) {
-      this._log.warn(`转换时间线数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${gameId}`)
+      this._log.warn(`Error converting SGP timeline to LCU: ${formatError(error)}, ${gameId}`)
       throw error
     }
   }
@@ -316,7 +327,7 @@ export class SgpMain implements IAkariShardInitDispose {
       const { data } = await this._api.getRankedStats(sgpServerId, puuid)
       return data
     } catch (error) {
-      this._log.warn(`获取排位信息失败: ${formatError(error)}`)
+      this._log.warn(`Failed to get ranked stats: ${formatError(error)}`)
       throw error
     }
   }
@@ -430,7 +441,7 @@ export class SgpMain implements IAkariShardInitDispose {
         copiedToken.accessToken = copiedToken.accessToken?.slice(0, 24) + '...'
         copiedToken.token = copiedToken.token?.slice(0, 24) + '...'
 
-        this._log.info(`更新 Entitlements Token: ${JSON.stringify(copiedToken)}`)
+        this._log.info(`Update Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
         this._api.setEntitlementsToken(token.accessToken)
         this.state.setEntitlementsTokenSet(true)
@@ -451,7 +462,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
         const copied = token.slice(0, 24) + '...'
 
-        this._log.info(`更新 Lol League Session Token: ${copied}`)
+        this._log.info(`Update Lol League Session Token: ${copied}`)
 
         this._api.setLeagueSessionToken(token)
         this.state.setLeagueSessionTokenSet(true)

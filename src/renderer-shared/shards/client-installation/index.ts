@@ -24,22 +24,22 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
   }
 
   launchTencentTcls() {
-    this._log.info(ClientInstallationRenderer.id, '启动 TCLS 客户端')
+    this._log.info(ClientInstallationRenderer.id, 'Launch TCLS client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchTencentTcls')
   }
 
   launchWeGameLeagueOfLegends() {
-    this._log.info(ClientInstallationRenderer.id, '启动 WeGame 客户端')
+    this._log.info(ClientInstallationRenderer.id, 'Launch WeGame client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGameLeagueOfLegends')
   }
 
   launchWeGame() {
-    this._log.info(ClientInstallationRenderer.id, '启动 WeGame 客户端')
+    this._log.info(ClientInstallationRenderer.id, 'Launch WeGame client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGame')
   }
 
   launchDefaultRiotClient() {
-    this._log.info(ClientInstallationRenderer.id, '启动默认 RiotClient 客户端')
+    this._log.info(ClientInstallationRenderer.id, 'Launch default RiotClient client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchDefaultRiotClient')
   }
 }

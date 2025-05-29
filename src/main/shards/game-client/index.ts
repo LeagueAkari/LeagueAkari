@@ -109,7 +109,7 @@ export class GameClientMain implements IAkariShardInitDispose {
           }
         )
       } catch (error) {
-        this._log.warn('初始化注册快捷键失败', this.settings.terminateShortcut)
+        this._log.warn('Failed to initialize register shortcut', this.settings.terminateShortcut)
       }
     }
 
@@ -124,7 +124,7 @@ export class GameClientMain implements IAkariShardInitDispose {
             }
           })
         } catch (error) {
-          this._log.warn('注册快捷键失败', value)
+          this._log.warn('Failed to register shortcut', value)
           await setter(null)
         }
       }
@@ -156,15 +156,15 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   private _terminateGameClient() {
-    this._log.info('尝试终止游戏客户端进程')
+    this._log.info('Try to terminate game client process')
     tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
-      this._log.info('存在进程', pid)
+      this._log.info('Process exists', pid)
       if (!tools.isProcessForeground(pid)) {
-        this._log.info('进程非在前台', pid)
+        this._log.info('Process is not in foreground', pid)
         return
       }
 
-      this._log.info(`终止游戏客户端进程 ${pid}`)
+      this._log.info(`Terminate game client process ${pid}`)
       tools.terminateProcess(pid)
     })
   }
@@ -348,7 +348,7 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {
     const settingsPath = path.join(await this._getConfigPathByLcuApi(), 'PersistedSettings.json')
-    this._log.info(`设置文件 ${settingsPath} 为 ${mode}`)
+    this._log.info(`Set file ${settingsPath} to ${mode}`)
 
     if (mode === 'readonly') {
       await ofs.promises.chmod(settingsPath, 0o444)
