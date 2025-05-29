@@ -2105,7 +2105,7 @@ simple-notifications-renderer:
 
   login-queue-task:
     name: 登录排队
-    description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}} 秒)'
+    description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}})'
 
 league-client-renderer:
   initialization-task:

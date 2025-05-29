@@ -58,6 +58,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   static REQUEST_TIMEOUT_MS = 12500
   static FIXED_ITEM_SET_PREFIX = 'akari1'
 
+  static PROCESS_NAME = 'LeagueClient.exe'
+
   public readonly settings = new LeagueClientSettings()
   public readonly state = new LeagueClientState()
 
@@ -77,6 +79,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   private _assetLimiter = new PQueue({ concurrency: 8 })
 
+  // 处理仅关闭 UX 而 LeagueClient 未关闭的情况
+  private _shouldHaveOneAttempt = false
   private _manuallyDisconnected = false
 
   get http() {
@@ -143,6 +147,29 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._disconnect()
     this.events.clear()
     this._protocol.unregisterDomain('league-client')
+  }
+
+  /**
+   * 有的时候可能只会关闭 UX，但命令行是通过 UX 获取的
+   *
+   * 我们先缓存一次已经连接的信息。如果软件启动时没找到 UX 但客户端存在，则尝试连接一次
+   */
+  private async _tryResumeConnection() {
+    const lastConnectedClient = await this._setting._getFromStorage('lastConnectedClient')
+
+    if (lastConnectedClient !== null) {
+      const p1 = tools.getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const p2 = tools.getPidsByName(LeagueClientMain.PROCESS_NAME)
+
+      if (p1.length === 0 && p2.length === 1) {
+        this._log.info('Try to resume connection', lastConnectedClient)
+
+        this._shouldHaveOneAttempt = true
+        this.state.setConnectingClient(lastConnectedClient)
+      } else {
+        await this._setting._removeFromStorage('lastConnectedClient').catch(() => {})
+      }
+    }
   }
 
   private _handleProtocol() {
@@ -218,7 +245,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           return { ...rest, config: { data: c.data, url: c.url } }
         }
 
-        this._log.warn('LeagueClient HTTP 客户端错误', error)
+        this._log.warn('LeagueClient HTTP Client Error', error)
         throw error
       }
     })
@@ -303,6 +330,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
     )
 
+    await this._tryResumeConnection()
+
     // 当客户端唯一时，自动连接到该 LeagueClient
     this._mobx.reaction(
       () =>
@@ -371,7 +400,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
 
       // 目标连接对象已不在当前启动列表中，停止连接
-      if (!this._ux.state.launchedClients.find((c) => c.pid === this.state.connectingClient?.pid)) {
+      if (
+        !this._shouldHaveOneAttempt &&
+        !this._ux.state.launchedClients.find((c) => c.pid === this.state.connectingClient?.pid)
+      ) {
         this.state.setConnectingClient(null)
         break
       }
@@ -386,6 +418,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           this._log.warn(`Error connecting to LC`, error)
           break
         }
+      }
+
+      if (this._shouldHaveOneAttempt) {
+        this._shouldHaveOneAttempt = false
+        this.state.setConnectingClient(null)
+        break
       }
 
       await sleep(LeagueClientMain.CONNECT_TO_LC_RETRY_INTERVAL)
@@ -480,6 +518,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       await initWs()
       await this._initHttpInstance(cmd)
       this.state.setConnected(cmd)
+      this._setting._saveToStorage('lastConnectedClient', cmd).catch(() => {})
     } catch (error) {
       this.state.setDisconnected()
       this._cleanup()

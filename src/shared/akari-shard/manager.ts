@@ -83,7 +83,7 @@ export class AkariManager {
     for (const id of reversed) {
       const instance = this._instances.get(id)
       if (instance && instance.onDispose) {
-        instance.onDispose()
+        await instance.onDispose()
       }
     }
 

@@ -2103,7 +2103,7 @@ simple-notifications-renderer:
 
   login-queue-task:
     name: Login Queue
-    description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}} seconds)'
+    description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}})'
 
 league-client-renderer:
   initialization-task:
