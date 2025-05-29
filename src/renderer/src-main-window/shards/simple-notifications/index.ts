@@ -255,17 +255,18 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         if (!bts.hasTask(taskId)) {
           bts.createTask(taskId, {
-            name: () => 'Login Queue'
+            name: () => t('simple-notifications-renderer.login-queue-task.name')
           })
         }
 
         bts.updateTask(taskId, {
           description: () =>
-            `Queueing: ${state.estimatedPositionInQueue} / ${state.maxDisplayedPosition} (estimated ${formatSeconds(state.approximateWaitTimeSeconds)})`,
-          progress:
-            1 -
-            (state.maxDisplayedPosition - state.estimatedPositionInQueue) /
-              state.maxDisplayedPosition
+            t('simple-notifications-renderer.login-queue-task.description', {
+              position: state.estimatedPositionInQueue,
+              maxPosition: state.maxDisplayedPosition,
+              waitTime: formatSeconds(state.approximateWaitTimeSeconds)
+            }),
+          progress: Math.max(1 - state.estimatedPositionInQueue / state.maxDisplayedPosition, 0)
         })
       },
       {

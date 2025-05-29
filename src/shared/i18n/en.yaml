@@ -2022,6 +2022,7 @@ SummonerSpellsCdTimer:
 
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{countV}})
+  emptyPlaceholder: No background tasks
 
 TemplateEdit:
   newButton: New Template
@@ -2099,6 +2100,10 @@ simple-notifications-renderer:
       title: Are you live streaming?
       liveTools: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
       bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
+
+  login-queue-task:
+    name: Login Queue
+    description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}} seconds)'
 
 league-client-renderer:
   initialization-task:

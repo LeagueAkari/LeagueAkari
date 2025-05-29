@@ -2024,6 +2024,7 @@ SummonerSpellsCdTimer:
 
 BackgroundTasks:
   taskTitle: 正在进行 ({{countV}})
+  emptyPlaceholder: 无后台任务
 
 TemplateEdit:
   newButton: 新模板
@@ -2101,6 +2102,10 @@ simple-notifications-renderer:
       title: 在直播吗？
       liveTools: League Akari 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
       bySettings: League Akari 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
+
+  login-queue-task:
+    name: 登录排队
+    description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}} 秒)'
 
 league-client-renderer:
   initialization-task:

@@ -333,7 +333,7 @@ export function bootstrap() {
 
     app.on('quit', () => {
       console.log(
-        `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] 应用退出\x1b[0m`
+        `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] Application exited\x1b[0m`
       )
     })
   } catch (error) {

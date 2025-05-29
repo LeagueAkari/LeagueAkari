@@ -1,40 +1,47 @@
 <template>
   <div class="tasks">
     <div class="task-title">{{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}</div>
-    <div
-      class="task"
-      :class="{
-        error: task.status === 'error'
-      }"
-      v-for="task of bts.tasks"
-      :key="task.id"
-    >
-      <div class="task-name">
-        <component :is="renderText(task.name)" />
-      </div>
-      <NProgress
-        v-if="task.progress !== null"
-        class="task-progress"
-        type="line"
-        :border-radius="0"
-        :percentage="task.progress * 100"
-        :status="task.status"
-      >
-        {{ (task.progress * 100).toFixed(2) }}%
-      </NProgress>
-      <div class="task-description">
-        <component :is="renderText(task.description)" />
-      </div>
-      <div class="actions" v-if="task.actions.length">
-        <NButton
-          size="tiny"
-          v-for="action of task.actions"
-          @click="action.callback"
-          v-bind="action.buttonProps"
+    <template v-if="bts.tasks.length > 0">
+      <NScrollbar style="max-height: calc(100vh - 80px)">
+        <div
+          class="task"
+          :class="{
+            error: task.status === 'error'
+          }"
+          v-for="task of bts.tasks"
+          :key="task.id"
         >
-          <component :is="renderText(action.label)" />
-        </NButton>
-      </div>
+          <div class="task-name">
+            <component :is="renderText(task.name)" />
+          </div>
+          <NProgress
+            v-if="task.progress !== null"
+            class="task-progress"
+            type="line"
+            :border-radius="0"
+            :percentage="task.progress * 100"
+            :status="task.status"
+          >
+            {{ (task.progress * 100).toFixed(2) }}%
+          </NProgress>
+          <div class="task-description">
+            <component :is="renderText(task.description)" />
+          </div>
+          <div class="actions" v-if="task.actions.length">
+            <NButton
+              size="tiny"
+              v-for="action of task.actions"
+              @click="action.callback"
+              v-bind="action.buttonProps"
+            >
+              <component :is="renderText(action.label)" />
+            </NButton>
+          </div>
+        </div>
+      </NScrollbar>
+    </template>
+    <div class="empty-placeholder" v-if="bts.tasks.length === 0">
+      {{ t('BackgroundTasks.emptyPlaceholder') }}
     </div>
   </div>
 </template>
@@ -42,7 +49,7 @@
 <script setup lang="ts">
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NProgress } from 'naive-ui'
+import { NButton, NProgress, NScrollbar } from 'naive-ui'
 import { VNodeChild, h } from 'vue'
 
 const { t } = useTranslation()
@@ -110,5 +117,12 @@ const renderText = (node: string | (() => VNodeChild)) => {
     margin-top: 8px;
     color: #fffc;
   }
+}
+
+.empty-placeholder {
+  font-size: 12px;
+  color: #fffc;
+  text-align: center;
+  padding: 8px;
 }
 </style>
