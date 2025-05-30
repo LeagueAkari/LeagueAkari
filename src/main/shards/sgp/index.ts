@@ -1,5 +1,5 @@
 import { IntervalTask } from '@main/utils/timer'
-import builtinSgpServersJson from '@resources/builtin-config/sgp/league-servers.json?commonjs-external&asset'
+import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
 import { GithubApiFile } from '@shared/types/github'
@@ -7,6 +7,7 @@ import { formatError } from '@shared/utils/errors'
 import axios, { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
 import ofs from 'node:original-fs'
+import path from 'node:path'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
@@ -97,8 +98,16 @@ export class SgpMain implements IAkariShardInitDispose {
           'No saved configuration file found, will use built-in SGP server configuration file'
         )
 
-        if (ofs.existsSync(builtinSgpServersJson)) {
-          const data = await ofs.promises.readFile(builtinSgpServersJson, 'utf-8')
+        const localConfigPath = path.join(
+          RES_POSITIONER,
+          '..',
+          'builtin-config',
+          'sgp',
+          'league-servers.json'
+        )
+
+        if (ofs.existsSync(localConfigPath)) {
+          const data = await ofs.promises.readFile(localConfigPath, 'utf-8')
           await this._setting.writeToJsonConfigFile(
             SgpMain.LEAGUE_SGP_SERVERS_JSON,
             JSON.parse(data)

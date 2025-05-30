@@ -6,6 +6,7 @@ import path from 'node:path'
 import { Like } from 'typeorm'
 
 import { AkariIpcError, AkariIpcMain } from '../ipc'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
 import { type WindowManagerMain } from '../window-manager'
@@ -44,13 +45,18 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = 'setting-factory-main'
 
+  private readonly _log: AkariLogger
+
   private readonly _settings: Map<string, SetterSettingService> = new Map()
 
   constructor(
     private readonly _ipc: AkariIpcMain,
     private readonly _storage: StorageMain,
-    private readonly _shared: SharedGlobalShard
-  ) {}
+    private readonly _shared: SharedGlobalShard,
+    _loggerFactory: LoggerFactoryMain
+  ) {
+    this._log = _loggerFactory.create(SettingFactoryMain.id)
+  }
 
   register<T extends object = any>(namespace: string, schema: SettingSchema<T>, obj: T) {
     if (this._settings.has(namespace)) {
