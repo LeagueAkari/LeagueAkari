@@ -28,6 +28,7 @@ import { SavedPlayerMain } from '@main/shards/saved-player'
 import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
 import { SgpMain } from '@main/shards/sgp'
+import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
@@ -267,6 +268,7 @@ export function bootstrap() {
     manager.use(RespawnTimerMain)
     manager.use(SavedPlayerMain)
     manager.use(SgpMain)
+    manager.use(StatisticsMain)
 
     // other
     manager.use(ExtraAssetsMain)
