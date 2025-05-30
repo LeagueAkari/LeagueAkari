@@ -77,8 +77,7 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE",
-    "TENCENT_PREPBE"
+    "TENCENT_PBE"
   ],
   "tencentServerSpectatorInteroperability": [
     "TENCENT_HN1",
@@ -89,8 +88,7 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE",
-    "TENCENT_PREPBE"
+    "TENCENT_PBE"
   ],
   "tencentServerSummonerInteroperability": [
     "TENCENT_HN1",
@@ -101,8 +99,7 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE",
-    "TENCENT_PREPBE"
+    "TENCENT_PBE"
   ],
   "serverNames": {
     "en": {
@@ -115,7 +112,7 @@
       "TENCENT_CQ100": "League 3",
       "TENCENT_BGP2": "Rift's Summit",
       "TENCENT_PBE": "PBE (Tencent)",
-      "TENCENT_PREPBE": "PBE (Tencent) (Temporary)",
+      "TENCENT_PREPBE": "PREPBE (Tencent)",
       "TW2": "Taiwan",
       "SG2": "Singapore",
       "PH2": "Philippines",
@@ -133,7 +130,7 @@
       "TENCENT_CQ100": "联盟三区",
       "TENCENT_BGP2": "峡谷之巅",
       "TENCENT_PBE": "PBE (腾讯)",
-      "TENCENT_PREPBE": "PBE (腾讯) (临时)",
+      "TENCENT_PREPBE": "PREPBE (腾讯)",
       "TW2": "台湾",
       "SG2": "新加坡",
       "PH2": "菲律宾",

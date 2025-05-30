@@ -250,14 +250,22 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(LeagueClientMain.id, 'connect', async (_, auth: UxCommandLine) => {
-      if (this.state.connectionState === 'connected') {
-        this._disconnect()
-      }
+    this._ipc.onCall(
+      LeagueClientMain.id,
+      'connect',
+      async (_, auth: UxCommandLine & { force?: boolean }) => {
+        if (this.state.connectionState === 'connected') {
+          this._disconnect()
+        }
 
-      await this._ux.update()
-      this.state.setConnectingClient(auth)
-    })
+        if (auth.force) {
+          this._shouldHaveOneAttempt = true
+        }
+
+        await this._ux.update()
+        this.state.setConnectingClient(auth)
+      }
+    )
 
     this._ipc.onCall(LeagueClientMain.id, 'disconnect', async () => {
       this._manuallyDisconnected = true
