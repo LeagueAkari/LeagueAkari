@@ -1,5 +1,6 @@
 import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { isAxiosError } from 'axios'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
@@ -68,12 +69,30 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     )
   }
 
+  private _checkIfReachRateLimit(error: unknown) {
+    if (
+      isAxiosError(error) &&
+      error.status === 403 &&
+      typeof error.response?.data === 'string' &&
+      error.response?.data.toLowerCase().includes('rate limit exceeded')
+    ) {
+      this._log.warn('Rate limit exceeded', error.config?.url, error.config?.method)
+      return true
+    }
+
+    return false
+  }
+
   private async _updateSgpLeagueServers() {
     try {
       this._log.info('Updating Sgp League Servers', this._repo.config.source)
-      const { data } = await this._repo.getSgpLeagueServersConfig()
-      this.state.setSgpLeagueServers(data)
+      const config = await this._repo.getSgpLeagueServersConfig()
+      this.state.setSgpLeagueServers(config)
     } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
       this._log.warn('Update Sgp League Servers failed', error)
     }
   }
@@ -81,9 +100,13 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private async _updateAnnouncement() {
     try {
       this._log.info('Updating Announcement', this._repo.config.source)
-      const { data } = await this._repo.getAnnouncementContent()
-      this.state.setAnnouncement(data)
+      const content = await this._repo.getAnnouncementContent()
+      this.state.setAnnouncement(content)
     } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
       this._log.warn('Update Announcement failed', error)
     }
   }
@@ -94,6 +117,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const { data } = await this._repo.getLatestRelease()
       this.state.setLatestRelease(data)
     } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
       this._log.warn('Update Latest Release failed', error)
     }
   }

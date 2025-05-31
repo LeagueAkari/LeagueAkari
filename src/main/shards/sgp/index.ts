@@ -1,10 +1,8 @@
-import { IntervalTask } from '@main/utils/timer'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
-import { GithubApiFile } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
-import axios, { isAxiosError } from 'axios'
+import { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
 import ofs from 'node:original-fs'
 import path from 'node:path'
@@ -14,6 +12,7 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { validateSchema } from './config-validation'
@@ -35,32 +34,22 @@ export class SgpMain implements IAkariShardInitDispose {
 
   static LEAGUE_SGP_SERVERS_JSON = 'league-servers.json'
   static CONFIG_SCHEMA_VERSION = 1
-  static SGP_SERVERS_CONFIG_GITHUB_URL =
-    '/repos/Hanxven/LeagueAkari-Config/contents/config/sgp/league-servers.json?ref=main'
 
   public readonly state: SgpState
 
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  private readonly _http = axios.create({
-    baseURL: 'https://api.github.com'
-  })
-
   private readonly _api = new LeagueSgpApi()
-
-  private _updateConfigTask = new IntervalTask(
-    () => this._fetchAndUpdateSgpServers(),
-    1000 * 60 * 20
-  )
 
   constructor(
     private readonly _app: AppCommonMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _lc: LeagueClientMain,
-    private readonly _ipc: AkariIpcMain
+    private readonly _ipc: AkariIpcMain,
+    private readonly _remoteConfig: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(SgpMain.id)
     this._setting = _settingFactory.register(SgpMain.id, {}, {})
@@ -82,8 +71,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._handleUpdateConfig()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
-
-    this._updateConfigTask.start(true)
+    this._handleUpdateSgpServerConfig()
   }
 
   /**
@@ -166,48 +154,6 @@ export class SgpMain implements IAkariShardInitDispose {
       },
       { fireImmediately: true }
     )
-  }
-
-  /**
-   * 如果远程的配置文件比应用内置的配置文件新, 则立即覆盖本地配置区的配置文件
-   */
-  private async _fetchAndUpdateSgpServers() {
-    this._log.info('Checking remote SGP server configuration file')
-
-    try {
-      const { data } = await this._http.get<GithubApiFile>(SgpMain.SGP_SERVERS_CONFIG_GITHUB_URL)
-
-      const { content, encoding } = data
-
-      if (encoding !== 'base64') {
-        this._log.warn(
-          'Encountered unsupported encoding format while checking remote SGP configuration file:',
-          encoding
-        )
-        return
-      }
-
-      const raw = Buffer.from(content, 'base64').toString('utf-8')
-      const json = JSON.parse(raw)
-
-      if (this._validateConfig(json)) {
-        if (json.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
-          this.state.setSgpServerConfig(json)
-          await this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, json)
-          this._log.info(
-            'Updated local SGP server configuration file',
-            dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-          )
-        } else {
-          this._log.info(
-            'Remote SGP server configuration file has no updates',
-            dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-          )
-        }
-      }
-    } catch (error) {
-      this._log.warn(`Error occurred while updating SGP server configuration file:`, error)
-    }
   }
 
   async getSummoner(puuid: string, sgpServerId?: string) {
@@ -499,7 +445,28 @@ export class SgpMain implements IAkariShardInitDispose {
     )
   }
 
-  async onDispose() {
-    this._updateConfigTask.cancel()
+  private _handleUpdateSgpServerConfig() {
+    this._mobx.reaction(
+      () => this._remoteConfig.state.sgpLeagueServers,
+      async (config) => {
+        if (this._validateConfig(config)) {
+          if (config.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
+            this.state.setSgpServerConfig(config)
+            await this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, config)
+            this._log.info(
+              'Updated local SGP server configuration file',
+              dayjs(config.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+            )
+          } else {
+            this._log.info(
+              'Remote SGP server configuration file has no updates',
+              dayjs(config.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+            )
+          }
+        }
+      }
+    )
   }
+
+  async onDispose() {}
 }

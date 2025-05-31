@@ -7,7 +7,7 @@ export class RemoteConfigState {
 
   latestRelease: GithubApiLatestRelease | null = null
 
-  announcement: GithubApiFile | null = null
+  announcement: string | null = null
 
   setSgpLeagueServers(sgpLeagueServers: SgpServersConfig) {
     this.sgpLeagueServers = sgpLeagueServers
@@ -17,7 +17,7 @@ export class RemoteConfigState {
     this.latestRelease = latestRelease
   }
 
-  setAnnouncement(announcement: GithubApiFile) {
+  setAnnouncement(announcement: string) {
     this.announcement = announcement
   }
 

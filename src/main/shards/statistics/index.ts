@@ -14,7 +14,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
   static readonly id = 'statistics-main'
 
   private _http = axios.create({
-    baseURL: 'https://akari-statistics-worker.hanxven.workers.dev',
+    baseURL: 'https://akari-statistics.hanxven.cc',
     headers: {
       'User-Agent': `LeagueAkari/${app.getVersion()}`
     }
@@ -28,6 +28,10 @@ export class StatisticsMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(StatisticsMain.id, {}, {})
   }
 
+  /**
+   * 统计 LeagueAkari 的版本使用量
+   * @returns
+   */
   private async _counterIncrIfFirstTime() {
     try {
       const version = app.getVersion()
@@ -42,14 +46,14 @@ export class StatisticsMain implements IAkariShardInitDispose {
           return
         }
 
-        const { data: d1 } = await this._http.post(`count/league-akari-visitors-${version}`)
+        const { data } = await this._http.post(`count/league-akari-visitors-${version}`)
         await this._setting._saveToStorage('alreadyCounted', [...countedVersions, version])
-        this._log.info('Counter increment success', d1)
+        this._log.info('Counter increment success', data)
       } else {
-        const { data: d1 } = await this._http.post(`count/league-akari-visitors-all`)
-        const { data: d2 } = await this._http.post(`count/league-akari-visitors-${version}`)
+        const { data: aka } = await this._http.post(`count/league-akari-visitors-all`)
+        const { data: ri } = await this._http.post(`count/league-akari-visitors-${version}`)
         await this._setting._saveToStorage('alreadyCounted', [version])
-        this._log.info('Counter increment success', d1, d2)
+        this._log.info('Counter increment success', aka, ri)
       }
     } catch (error) {
       this._log.error('Counter increment failed', error)
