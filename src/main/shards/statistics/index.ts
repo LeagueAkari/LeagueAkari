@@ -29,18 +29,30 @@ export class StatisticsMain implements IAkariShardInitDispose {
   }
 
   private async _counterIncrIfFirstTime() {
-    const flag = await this._setting._getFromStorage('alreadyCounted')
-
-    if (flag) {
-      return
-    }
-
     try {
-      const { data } = await this._http.post('count/league-akari-visitors-test')
-      await this._setting._saveToStorage('alreadyCounted', true)
-      this._log.info('Counter incr success', data)
+      const version = app.getVersion()
+      let countedVersions = await this._setting._getFromStorage('alreadyCounted')
+
+      if (!Array.isArray(countedVersions)) {
+        countedVersions = null
+      }
+
+      if (countedVersions) {
+        if (countedVersions.includes(version)) {
+          return
+        }
+
+        const { data: d1 } = await this._http.post(`count/league-akari-visitors-${version}`)
+        await this._setting._saveToStorage('alreadyCounted', [...countedVersions, version])
+        this._log.info('Counter increment success', d1)
+      } else {
+        const { data: d1 } = await this._http.post(`count/league-akari-visitors-all`)
+        const { data: d2 } = await this._http.post(`count/league-akari-visitors-${version}`)
+        await this._setting._saveToStorage('alreadyCounted', [version])
+        this._log.info('Counter increment success', d1, d2)
+      }
     } catch (error) {
-      this._log.error('Counter incr failed', error)
+      this._log.error('Counter increment failed', error)
     }
   }
 

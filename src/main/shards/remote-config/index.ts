@@ -1,6 +1,5 @@
 import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import axios from 'axios'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
