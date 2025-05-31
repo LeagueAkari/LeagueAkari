@@ -1,10 +1,11 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { effectScope, markRaw, watch } from 'vue'
+import { markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useMatchHistoryTabsStore } from './store'
@@ -33,22 +34,21 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
 
-  private readonly _scope = effectScope()
-
   private readonly _events = createEventBus()
 
-  constructor(@Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer) {}
+  constructor(
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
+  ) {}
 
   async onInit() {
     await this._handleSettings()
-    this._scope.run(() => {
+    this._setupInAppScope.addSetupFn(() => {
       this._handleMatchHistoryTabs()
     })
   }
 
-  async onDispose() {
-    this._scope.stop()
-  }
+  async onDispose() {}
 
   private _handleMatchHistoryTabs() {
     const mhs = useMatchHistoryTabsStore()

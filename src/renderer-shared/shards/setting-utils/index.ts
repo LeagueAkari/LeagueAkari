@@ -48,6 +48,9 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     this._stopHandles.add(stopHandle)
   }
 
+  /**
+   * synced in ONE renderer process
+   */
   async savedPropVue<T extends object>(
     namespace: string,
     object: T,

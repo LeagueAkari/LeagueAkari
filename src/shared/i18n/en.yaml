@@ -5,6 +5,10 @@ AnnouncementModal:
   title: Announcement
   close: Close
   read: I have read
+  noAnnouncementMd: |
+    ***No announcement***
+
+    or check [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
 
 DeclarationModal:
   title: Declaration

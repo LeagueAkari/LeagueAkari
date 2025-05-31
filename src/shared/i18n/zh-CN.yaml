@@ -7,6 +7,10 @@ AnnouncementModal:
   title: 公告
   close: 关闭
   read: 已读
+  noAnnouncementMd: |
+    ***暂无公告***
+
+    或查询 [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
 
 DeclarationModal:
   title: 声明

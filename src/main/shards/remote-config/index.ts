@@ -100,7 +100,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private async _updateAnnouncement() {
     try {
       this._log.info('Updating Announcement', this._repo.config.source)
-      const content = await this._repo.getAnnouncementContent()
+      const content = await this._repo.getAnnouncement()
       this.state.setAnnouncement(content)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
@@ -127,6 +127,9 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._setting.applyToState()
+
+    this._mobx.propSync(RemoteConfigMain.id, 'state', this.state, ['announcement', 'latestRelease'])
+    this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, ['preferredSource'])
 
     this._repo.setConfig({
       locale: this._app.settings.locale as 'zh-CN' | 'en',

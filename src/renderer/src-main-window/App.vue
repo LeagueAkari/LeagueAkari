@@ -7,11 +7,6 @@
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <UpdateModal v-model:show="isShowingNewUpdateModal" />
-    <AnnouncementModal v-model:show="isShowingAnnouncementModal" />
-    <DeclarationModal
-      v-model:show="isShowingFreeSoftwareDeclaration"
-      @confirm="handleConfirmation"
-    />
     <SetupInAppScope />
     <Transition name="bg-fade">
       <div
@@ -48,8 +43,6 @@ import { useMessage, useNotification } from 'naive-ui'
 import { provide, ref, watchEffect } from 'vue'
 import { h } from 'vue'
 
-import AnnouncementModal from './components/AnnouncementModal.vue'
-import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
@@ -76,9 +69,6 @@ const appProvide = {
   },
   openUpdateModal: () => {
     isShowingNewUpdateModal.value = true
-  },
-  openAnnouncementModal: () => {
-    isShowingAnnouncementModal.value = true
   }
 }
 
@@ -90,21 +80,6 @@ const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
 const isShowingNewUpdateModal = ref(false)
 const isShowingNewUpdate = ref(false)
-const isShowingFreeSoftwareDeclaration = ref(false)
-const isShowingAnnouncementModal = ref(false)
-
-watchEffect(() => {
-  if (as.settings.showFreeSoftwareDeclaration) {
-    isShowingFreeSoftwareDeclaration.value = true
-  }
-})
-
-watchEffect(() => {
-  if (sus.currentAnnouncement && !sus.currentAnnouncement.isRead) {
-    console.log(sus.currentAnnouncement)
-    isShowingAnnouncementModal.value = true
-  }
-})
 
 watchEffect(() => {
   if (sus.currentRelease && sus.currentRelease.isNew) {
@@ -143,11 +118,6 @@ watchEffect(() => {
     }
   }
 })
-
-const handleConfirmation = (notShowAgain: boolean) => {
-  app.setShowFreeSoftwareDeclaration(notShowAgain)
-  isShowingFreeSoftwareDeclaration.value = false
-}
 
 app.onSecondInstance(() => {
   notification.info({

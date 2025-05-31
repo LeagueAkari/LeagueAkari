@@ -22,12 +22,13 @@ import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SelfUpdateSettings, SelfUpdateState } from './state'
 
 /**
- * GitHub / Gitee 内容
+ * 用于完成应用更新
  */
 @Shard(SelfUpdateMain.id)
 export class SelfUpdateMain implements IAkariShardInitDispose {
@@ -82,6 +83,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     private readonly _app: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
+    private readonly _rc: RemoteConfigMain,
     _loggerFactory: LoggerFactoryMain,
     _settingFactory: SettingFactoryMain
   ) {

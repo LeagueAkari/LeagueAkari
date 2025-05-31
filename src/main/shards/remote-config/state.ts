@@ -1,13 +1,18 @@
 import { SgpServersConfig } from '@shared/data-sources/sgp'
-import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
+import { GithubApiLatestRelease } from '@shared/types/github'
 import { makeAutoObservable, observable } from 'mobx'
+
+interface Announcement {
+  content: string
+  sha: string
+}
 
 export class RemoteConfigState {
   sgpLeagueServers: SgpServersConfig
 
   latestRelease: GithubApiLatestRelease | null = null
 
-  announcement: string | null = null
+  announcement: Announcement | null = null
 
   setSgpLeagueServers(sgpLeagueServers: SgpServersConfig) {
     this.sgpLeagueServers = sgpLeagueServers
@@ -17,7 +22,7 @@ export class RemoteConfigState {
     this.latestRelease = latestRelease
   }
 
-  setAnnouncement(announcement: string) {
+  setAnnouncement(announcement: Announcement | null) {
     this.announcement = announcement
   }
 

@@ -2,7 +2,7 @@
   <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
-        <div class="common-button-outer" @click="openAnnouncementModal">
+        <div class="common-button-outer" @click="sn.showAnnouncementModal()">
           <div class="common-button-inner">
             <NIcon><NotificationIcon /></NIcon>
           </div>
@@ -77,7 +77,9 @@ import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed, inject } from 'vue'
+import { computed } from 'vue'
+
+import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
 import BackgroundTasks from '../BackgroundTasks.vue'
 
@@ -87,6 +89,7 @@ const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const wm = useInstance(WindowManagerRenderer)
+const sn = useInstance(SimpleNotificationsRenderer)
 
 const bts = useBackgroundTasksStore()
 
@@ -102,8 +105,6 @@ const overallProgress = computed(() => {
 
   return Math.min(total / bts.tasks.length, 0.9)
 })
-
-const { openAnnouncementModal } = inject('app') as any
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 

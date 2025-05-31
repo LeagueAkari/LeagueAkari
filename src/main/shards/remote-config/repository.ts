@@ -48,19 +48,24 @@ export class RemoteGitRepository {
   private static _getGitHubApiFileBase64Content(data: GithubApiFile) {
     const { content, encoding } = data
 
-    if (encoding !== 'base64') {
+    if (encoding !== 'base64' || !content) {
       throw new Error('Unsupported encoding format')
     }
 
     return Buffer.from(content, 'base64').toString('utf-8')
   }
 
-  async getAnnouncementContent() {
+  async getAnnouncement() {
     const { data } = await this._http.get<GithubApiFile>(
       `/repos/LeagueAkari/LeagueAkari-Config/contents/announcement/${this._config.locale}.md`
     )
 
-    return RemoteGitRepository._getGitHubApiFileBase64Content(data)
+    const content = RemoteGitRepository._getGitHubApiFileBase64Content(data)
+
+    return {
+      content,
+      sha: data.sha
+    }
   }
 
   async getSgpLeagueServersConfig() {

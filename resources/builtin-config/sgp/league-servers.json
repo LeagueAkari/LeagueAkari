@@ -77,7 +77,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "tencentServerSpectatorInteroperability": [
     "TENCENT_HN1",
@@ -88,7 +89,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "tencentServerSummonerInteroperability": [
     "TENCENT_HN1",
@@ -99,7 +101,8 @@
     "TENCENT_TJ100",
     "TENCENT_TJ101",
     "TENCENT_BGP2",
-    "TENCENT_PBE"
+    "TENCENT_PBE",
+    "TENCENT_PREPBE"
   ],
   "serverNames": {
     "en": {

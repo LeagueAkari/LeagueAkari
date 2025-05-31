@@ -2,8 +2,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { computed, effectScope, watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { router } from '@main-window/routes'
@@ -15,26 +16,23 @@ import { useMainWindowUiStore } from './store'
 export class MainWindowUiRenderer implements IAkariShardInitDispose {
   static id = 'main-window-ui-renderer'
 
-  private readonly _scope = effectScope()
-
   private readonly _urlCache = new Map<number, string>()
 
   constructor(
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
-    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer
+    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   async onInit() {
     await this._handleSettings()
-    this._scope.run(() => {
+    this._setupInAppScope.addSetupFn(() => {
       this._handleSyncProfileSkinUrl()
     })
   }
 
-  async onDispose() {
-    this._scope.stop()
-  }
+  async onDispose() {}
 
   private _handleSyncProfileSkinUrl() {
     const lcs = useLeagueClientStore()

@@ -1,19 +1,38 @@
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
-import { CSSProperties, VNodeChild, computed, h, inject, ref, watch } from 'vue'
+import {
+  CSSProperties,
+  VNodeChild,
+  computed,
+  defineComponent,
+  h,
+  inject,
+  ref,
+  watch,
+  watchEffect
+} from 'vue'
+
+import AnnouncementModal from './AnnouncementModal.vue'
+import DeclarationModal from './DeclarationModal.vue'
+import { useSimpleNotificationsStore } from './store'
 
 /**
- * 偶尔会出现在主窗口的周期性通知
+ * 一些全局性的周期性通知
+ *
+ * 足够 simple (存疑)
  */
 @Shard(SimpleNotificationsRenderer.id)
 export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
@@ -23,12 +42,16 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   static LAST_DISMISS_SETTING_KEY = 'lastDismissLiveStreamingStreamerMode'
 
   constructor(
-    @Dep(ClientInstallationRenderer) private readonly _installation: ClientInstallationRenderer,
+    @Dep(ClientInstallationRenderer) private readonly _inst: ClientInstallationRenderer,
+    @Dep(AppCommonRenderer) private readonly _app: AppCommonRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
   ) {}
 
+  /**
+   * 猜你正在直播
+   */
   _setupStreamerModeNotifications() {
     const { t } = useTranslation()
     const notification = useNotification()
@@ -275,12 +298,84 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
-  private _setupSimpleNotifications() {
+  private _handleNotifications() {
     this._setupStreamerModeNotifications()
   }
 
+  private _setupDeclarationModal() {
+    const comp = defineComponent({
+      setup() {
+        const showModal = ref(false)
+        const as = useAppCommonStore()
+        const app = useInstance(AppCommonRenderer)
+
+        watchEffect(() => {
+          if (as.settings.showFreeSoftwareDeclaration) {
+            showModal.value = true
+          }
+        })
+
+        return () =>
+          h(DeclarationModal, {
+            show: showModal.value,
+            'onUpdate:show': (v) => (showModal.value = v),
+            onConfirm: (notShowAgain) => {
+              app.setShowFreeSoftwareDeclaration(notShowAgain)
+              showModal.value = false
+            }
+          })
+      }
+    })
+
+    this._setup.addRenderVNode(() => h(comp))
+  }
+
+  private _setupAnnouncementModal() {
+    const comp = defineComponent({
+      setup() {
+        const rcs = useRemoteConfigStore()
+        const sns = useSimpleNotificationsStore()
+
+        watch(
+          () => rcs.announcement,
+          (a) => {
+            if (a && a.sha !== sns.lastAnnouncementSha) {
+              sns.showAnnouncementModal = true
+            }
+          },
+          { immediate: true }
+        )
+
+        return () =>
+          h(AnnouncementModal, {
+            announcement: rcs.announcement,
+            show: sns.showAnnouncementModal,
+            'onUpdate:show': (v) => (sns.showAnnouncementModal = v),
+            hasRead: sns.lastAnnouncementSha === rcs.announcement?.sha,
+            onRead: (sha) => {
+              sns.lastAnnouncementSha = sha
+              sns.showAnnouncementModal = false
+            }
+          })
+      }
+    })
+
+    this._setup.addRenderVNode(() => h(comp))
+  }
+
   async onInit() {
-    this._setup.addSetupFn(() => this._setupSimpleNotifications())
+    const sns = useSimpleNotificationsStore()
+
+    await this._setting.savedPropVue(SimpleNotificationsRenderer.id, sns, 'lastAnnouncementSha')
+
+    this._setupDeclarationModal()
+    this._setupAnnouncementModal()
+    this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
+  }
+
+  showAnnouncementModal() {
+    const sn = useSimpleNotificationsStore()
+    sn.showAnnouncementModal = true
   }
 }
