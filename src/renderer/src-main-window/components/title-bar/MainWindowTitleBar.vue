@@ -68,18 +68,6 @@ const shouldShowDivider = computed(() => {
   background-color: #0001;
 }
 
-[data-theme='dark'] {
-  #app-title-bar {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-}
-
-[data-theme='light'] {
-  #app-title-bar {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-}
-
 .shard-area {
   height: 100%;
   width: 0;
