@@ -64,8 +64,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="远程数据源"
-        label-description="通过 GitHub / Gitee 获取或更新数据"
+        :label="t('AppSettings.basic.dataSource.label')"
+        :label-description="t('AppSettings.basic.dataSource.description')"
         :label-width="400"
       >
         <NFlex align="center">
@@ -73,7 +73,7 @@
             style="width: 160px"
             size="small"
             :value="rcs.settings.preferredSource"
-            @update:value="(val) => rc.setRemoteConfigSource(val)"
+            @update:value="(val) => rc.setPreferredSource(val)"
             :options="remoteConfigSource"
           />
           <NTooltip>

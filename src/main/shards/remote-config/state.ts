@@ -41,15 +41,15 @@ export class RemoteConfigState {
     this.announcement = announcement
   }
 
-  setIsUpdatingLatestRelease(isUpdatingLatestRelease: boolean) {
+  setUpdatingLatestRelease(isUpdatingLatestRelease: boolean) {
     this.isUpdatingLatestRelease = isUpdatingLatestRelease
   }
 
-  setIsUpdatingAnnouncement(isUpdatingAnnouncement: boolean) {
+  setUpdatingAnnouncement(isUpdatingAnnouncement: boolean) {
     this.isUpdatingAnnouncement = isUpdatingAnnouncement
   }
 
-  setIsUpdatingSgpLeagueServers(isUpdatingSgpLeagueServers: boolean) {
+  setUpdatingSgpLeagueServers(isUpdatingSgpLeagueServers: boolean) {
     this.isUpdatingSgpLeagueServers = isUpdatingSgpLeagueServers
   }
 

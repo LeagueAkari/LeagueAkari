@@ -64,7 +64,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
             .resolvedOptions()
             .locale.toLocaleLowerCase()
             .includes('zh-cn')
-            ? 'github' // TODO!! for debugging. should be gitee in production
+            ? 'gitee'
             : 'github'
         }
       },
@@ -112,7 +112,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private async _updateSgpLeagueServers() {
     try {
-      this.state.setIsUpdatingSgpLeagueServers(true)
+      this.state.setUpdatingSgpLeagueServers(true)
       this._log.info('Updating Sgp League Servers', this._repo.config.source)
       const config = await this._repo.getSgpLeagueServersConfig()
       this.state.setSgpServerConfig(config)
@@ -123,13 +123,13 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
       this._log.warn('Update Sgp League Servers failed', error)
     } finally {
-      this.state.setIsUpdatingSgpLeagueServers(false)
+      this.state.setUpdatingSgpLeagueServers(false)
     }
   }
 
   private async _updateAnnouncement() {
     try {
-      this.state.setIsUpdatingAnnouncement(true)
+      this.state.setUpdatingAnnouncement(true)
       this._log.info('Updating Announcement', this._repo.config.source)
       const content = await this._repo.getAnnouncement()
       this.state.setAnnouncement(content)
@@ -140,13 +140,13 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
       this._log.warn('Update Announcement failed', error)
     } finally {
-      this.state.setIsUpdatingAnnouncement(false)
+      this.state.setUpdatingAnnouncement(false)
     }
   }
 
   private async _updateLatestRelease() {
     try {
-      this.state.setIsUpdatingLatestRelease(true)
+      this.state.setUpdatingLatestRelease(true)
       this._log.info('Updating Latest Release', this._repo.config.source)
       const { data } = await this._repo.getLatestRelease()
       this.state.setLatestRelease(this._addMoreInfoToRelease(data))
@@ -157,7 +157,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
       this._log.warn('Update Latest Release failed', error)
     } finally {
-      this.state.setIsUpdatingLatestRelease(false)
+      this.state.setUpdatingLatestRelease(false)
     }
   }
 
@@ -165,7 +165,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     this._updateLatestReleaseTask.cancel()
 
     try {
-      this.state.setIsUpdatingLatestRelease(true)
+      this.state.setUpdatingLatestRelease(true)
       this._log.info('Updating Latest Release.. Manually', this._repo.config.source)
       const { data } = await this._repo.getLatestRelease()
       const release = this._addMoreInfoToRelease(data)
@@ -175,7 +175,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     } catch (error) {
       throw error
     } finally {
-      this.state.setIsUpdatingLatestRelease(false)
+      this.state.setUpdatingLatestRelease(false)
       this._updateLatestReleaseTask.start() // restart the task
     }
   }

@@ -21,10 +21,11 @@ export class RemoteConfigRenderer {
     const store = useRemoteConfigStore()
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
-  setRemoteConfigSource(source: 'gitee' | 'github') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'settings.preferredSource', source)
+  setPreferredSource(source: 'gitee' | 'github') {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'preferredSource', source)
   }
 
   async testLatency(): Promise<{ githubLatency: number; giteeLatency: number }> {
