@@ -6,7 +6,6 @@
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
-    <UpdateModal v-model:show="isShowingNewUpdateModal" />
     <SetupInAppScope />
     <Transition name="bg-fade">
       <div
@@ -33,27 +32,21 @@ import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
-import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
-import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { provide, ref, watchEffect } from 'vue'
+import { provide, ref } from 'vue'
 import { h } from 'vue'
 
-import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
 
-const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
 
-const og = useInstance(OngoingGameRenderer)
 const app = useInstance(AppCommonRenderer)
 
 const { t } = useTranslation()
@@ -66,9 +59,6 @@ const appProvide = {
     if (tabName) {
       settingModelTab.value = tabName
     }
-  },
-  openUpdateModal: () => {
-    isShowingNewUpdateModal.value = true
   }
 }
 
@@ -78,46 +68,6 @@ const notification = useNotification()
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
-const isShowingNewUpdateModal = ref(false)
-const isShowingNewUpdate = ref(false)
-
-watchEffect(() => {
-  if (sus.currentRelease && sus.currentRelease.isNew) {
-    isShowingNewUpdateModal.value = true
-    isShowingNewUpdate.value = true
-  } else {
-    isShowingNewUpdateModal.value = false
-    isShowingNewUpdate.value = false
-  }
-})
-
-watchEffect(() => {
-  if (sus.lastUpdateResult) {
-    if (sus.lastUpdateResult.success) {
-      notification.success({
-        title: () => t('self-update-main.title'),
-        content: () =>
-          t('self-update-main.lastUpdateSuccess', {
-            version: as.version
-          }),
-        duration: 4000,
-        closable: true
-      })
-    } else {
-      notification.warning({
-        title: () => t('self-update-main.title'),
-        content: () =>
-          h('div', {
-            innerHTML: t('self-update-main.lastUpdateFailed', {
-              url: sus.lastUpdateResult?.newVersionPageUrl || LEAGUE_AKARI_GITHUB
-            })
-          }),
-        duration: 1e10,
-        closable: true
-      })
-    }
-  }
-})
 
 app.onSecondInstance(() => {
   notification.info({
@@ -139,8 +89,6 @@ useKeyboardCombo('AKARI', {
 })
 
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
-
-og.setupAutoRouteWhenGameStarts()
 </script>
 
 <style lang="less">

@@ -1,33 +1,60 @@
 import { SgpServersConfig } from '@shared/data-sources/sgp'
-import { GithubApiLatestRelease } from '@shared/types/github'
+import { GithubApiAsset, GithubApiLatestRelease } from '@shared/types/github'
 import { makeAutoObservable, observable } from 'mobx'
 
 interface Announcement {
   content: string
-  sha: string
+  uniqueId: string
+}
+
+export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
+  isNew: boolean
+  currentVersion: string
+  archiveFile: GithubApiAsset | null
 }
 
 export class RemoteConfigState {
-  sgpLeagueServers: SgpServersConfig
-
-  latestRelease: GithubApiLatestRelease | null = null
-
+  sgpServerConfig: SgpServersConfig
+  latestReleaseValue = observable.box<LatestReleaseWithMetadata | null>(null, {
+    equals: RemoteConfigState.versionEquals
+  })
   announcement: Announcement | null = null
 
-  setSgpLeagueServers(sgpLeagueServers: SgpServersConfig) {
-    this.sgpLeagueServers = sgpLeagueServers
+  get latestRelease() {
+    return this.latestReleaseValue.get()
   }
 
-  setLatestRelease(latestRelease: GithubApiLatestRelease) {
-    this.latestRelease = latestRelease
+  // loading state
+  isUpdatingLatestRelease: boolean = false
+  isUpdatingAnnouncement: boolean = false
+  isUpdatingSgpLeagueServers: boolean = false
+
+  setSgpServerConfig(sgpServerConfig: SgpServersConfig) {
+    this.sgpServerConfig = sgpServerConfig
+  }
+
+  setLatestRelease(latestRelease: LatestReleaseWithMetadata | null) {
+    this.latestReleaseValue.set(latestRelease)
   }
 
   setAnnouncement(announcement: Announcement | null) {
     this.announcement = announcement
   }
 
+  setIsUpdatingLatestRelease(isUpdatingLatestRelease: boolean) {
+    this.isUpdatingLatestRelease = isUpdatingLatestRelease
+  }
+
+  setIsUpdatingAnnouncement(isUpdatingAnnouncement: boolean) {
+    this.isUpdatingAnnouncement = isUpdatingAnnouncement
+  }
+
+  setIsUpdatingSgpLeagueServers(isUpdatingSgpLeagueServers: boolean) {
+    this.isUpdatingSgpLeagueServers = isUpdatingSgpLeagueServers
+  }
+
   setEmptySgpLeagueServers() {
-    this.sgpLeagueServers = {
+    this.sgpServerConfig = {
       version: 0,
       lastUpdate: 0,
       servers: {},
@@ -42,9 +69,24 @@ export class RemoteConfigState {
     this.setEmptySgpLeagueServers()
 
     makeAutoObservable(this, {
-      sgpLeagueServers: observable.ref,
-      latestRelease: observable.ref
+      sgpServerConfig: observable.ref
     })
+  }
+
+  static versionEquals(a: LatestReleaseWithMetadata | null, b: LatestReleaseWithMetadata | null) {
+    if (a === null && b === null) {
+      return true
+    }
+
+    if (a === null || b === null) {
+      return false
+    }
+
+    if (a.isNew !== b.isNew) {
+      return false
+    }
+
+    return a.currentVersion === b.currentVersion && a.tag_name === b.tag_name
   }
 }
 

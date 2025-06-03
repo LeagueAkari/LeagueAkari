@@ -447,7 +447,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
   private _handleUpdateSgpServerConfig() {
     this._mobx.reaction(
-      () => this._remoteConfig.state.sgpLeagueServers,
+      () => this._remoteConfig.state.sgpServerConfig,
       async (config) => {
         if (this._validateConfig(config)) {
           if (config.lastUpdate > this.state.sgpServerConfig.lastUpdate) {

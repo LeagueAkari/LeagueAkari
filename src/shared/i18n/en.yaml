@@ -73,16 +73,22 @@ AppSettings:
         none: Default
         mica: Mica
 
-    logLevel:
-      label: Log Level
-      description: Set the log level of the application
+    dataSource:
+      label: Remote Data Source
+      description: Set the remote config source of the application, get or update data from GitHub / Gitee
+      options:
+        gitee: Gitee
+        github: GitHub
+      howToChoose: How to choose?
+      testingSpeed: Testing speed...
+      timeout: Timeout
+      testButton: Re-test
+      tip:
+        gitee: 'Better response speed in mainland China'
+        github: 'Better response speed outside mainland China'
 
   selfUpdate:
     title: Application Update
-    tip:
-      title: How to choose?
-      gitee: '- Better response speed in mainland China'
-      github: '- Better response speed outside mainland China'
 
     autoCheckUpdates:
       label: Auto Check Updates
@@ -90,13 +96,9 @@ AppSettings:
 
     autoDownloadUpdates:
       label: Auto Download Updates
-      description: Automatically download the update package when a new version is detected
+      description: Automatically start the update process when a new release is detected
 
-    downloadSource:
-      label: Download Source
-      description: Choose the update package download source
-
-    checkFrom: Check updates from download source ({{source}})
+    checkFrom: Check updates from data source ({{source}})
     checkUpdates: Check Updates
     currentRelease: Current Release
     downloadRelease: Download Release
@@ -150,6 +152,10 @@ AppSettings:
 
   misc:
     title: Misc
+
+    logLevel:
+      label: Log Level
+      description: Set the log level of the application
 
     disableHardwareAcceleration:
       label: Disable Hardware Acceleration
@@ -883,6 +889,7 @@ UpdateModal:
   currentVersion: 'Current Version: {{version}}'
   releasePage: Release Page
   download: Download
+  noUpdateMd: No release notes
 
 Client:
   leagueClient:

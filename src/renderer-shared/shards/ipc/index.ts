@@ -1,5 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { Dep, IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { formatError } from '@shared/utils/errors'
 import { IpcRendererEvent } from 'electron'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
@@ -89,7 +90,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
       if (import.meta.env.DEV) {
         // for lazy loading
         const logger = this._shared.manager.getInstance(LOGGER_SHARD_NAMESPACE) as LoggerRenderer
-        logger?.warn(`ipc call: ${namespace}`, fnName, args, result.error)
+        logger?.warn(`ipc call: ${namespace}`, fnName, args, formatError(result.error))
       }
 
       throw result.error

@@ -1,11 +1,15 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatBytes, formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
-import { watch } from 'vue'
+import { useNotification } from 'naive-ui'
+import { computed, h, watch, watchEffect } from 'vue'
 
+import { useAppCommonStore } from '../app-common/store'
 import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { RemoteConfigRenderer } from '../remote-config'
+import { useRemoteConfigStore } from '../remote-config/store'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { useSelfUpdateStore } from './store'
@@ -20,7 +24,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
+    @Dep(RemoteConfigRenderer) private readonly _rc: RemoteConfigRenderer
   ) {
     // @ts-ignore
     window.selfUpdateShard = this
@@ -106,6 +111,51 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleLastUpdateResult() {
+    const as = useAppCommonStore()
+    const s = useSelfUpdateStore()
+    const rcs = useRemoteConfigStore()
+    const { t } = useTranslation()
+    const notification = useNotification()
+
+    // hardcoded for now
+    const releasePageUrl = computed(() => {
+      if (rcs.settings.preferredSource === 'gitee') {
+        return 'https://gitee.com/LeagueAkari/LeagueAkari/releases/latest'
+      }
+
+      return 'https://github.com/LeagueAkari/LeagueAkari/releases/latest'
+    })
+
+    watchEffect(() => {
+      if (s.lastUpdateResult) {
+        if (s.lastUpdateResult.success) {
+          notification.success({
+            title: () => t('self-update-main.title'),
+            content: () =>
+              t('self-update-main.lastUpdateSuccess', {
+                version: as.version
+              }),
+            duration: 4000,
+            closable: true
+          })
+        } else {
+          notification.warning({
+            title: () => t('self-update-main.title'),
+            content: () =>
+              h('div', {
+                innerHTML: t('self-update-main.lastUpdateFailed', {
+                  url: releasePageUrl.value
+                })
+              }),
+            duration: 1e10,
+            closable: true
+          })
+        }
+      }
+    })
+  }
+
   checkUpdates() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'checkUpdates')
   }
@@ -118,12 +168,12 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'startUpdate')
   }
 
-  cancelUpdate() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelUpdate')
+  forceStartUpdate() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'forceStartUpdate')
   }
 
-  setAnnouncementRead(md5: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setAnnouncementRead', md5)
+  cancelUpdate() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelUpdate')
   }
 
   openNewUpdatesDir() {
@@ -138,10 +188,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
   }
 
-  setDownloadSource(source: 'gitee' | 'github') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'downloadSource', source)
-  }
-
   onStartUpdate(cb: () => void) {
     this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'start-update', cb)
   }
@@ -153,5 +199,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     this._setup.addSetupFn(() => this._handleUpdateProgressShow())
+    this._setup.addSetupFn(() => this._handleLastUpdateResult())
   }
 }

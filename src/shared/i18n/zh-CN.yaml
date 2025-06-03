@@ -75,16 +75,22 @@ AppSettings:
         none: 默认
         mica: Mica
 
-    logLevel:
-      label: 日志级别
-      description: 设置应用的日志级别
+    dataSource:
+      label: 远程数据源
+      description: 设置应用的远程配置源，通过 GitHub / Gitee 获取或更新数据
+      options:
+        gitee: Gitee
+        github: GitHub
+      howToChoose: 如何选择？
+      testingSpeed: 测速中...
+      timeout: 超时
+      testButton: 重新测速
+      tip:
+        gitee: '在中国大陆内拥有较好的响应速度'
+        github: '在中国大陆外拥有较好的响应速度'
 
   selfUpdate:
     title: 应用更新
-    tip:
-      title: 如何选择？
-      gitee: '- 在中国大陆内拥有较好的响应速度'
-      github: '- 在中国大陆外拥有较好的响应速度'
 
     autoCheckUpdates:
       label: 自动检查更新
@@ -92,13 +98,9 @@ AppSettings:
 
     autoDownloadUpdates:
       label: 自动下载更新
-      description: 在检查到新版本时，自动下载更新包
+      description: 检测到有新版本可用时，自动开始更新流程
 
-    downloadSource:
-      label: 下载源
-      description: 选择更新包下载源
-
-    checkFrom: 从下载源中 ({{ source }}) 检查更新
+    checkFrom: 从数据源中 ({{ source }}) 检查更新
     checkUpdates: 检查更新
     currentRelease: 当前版本内容
     downloadRelease: 下载更新包
@@ -153,6 +155,10 @@ AppSettings:
 
   misc:
     title: 其他
+
+    logLevel:
+      label: 日志级别
+      description: 设置应用的日志级别
 
     disableHardwareAcceleration:
       label: 禁用硬件加速
@@ -886,6 +892,7 @@ UpdateModal:
   currentVersion: 当前版本：{{version}}
   releasePage: 发布页面
   download: 下载
+  noUpdateMd: 无发布说明
 
 Client:
   leagueClient:

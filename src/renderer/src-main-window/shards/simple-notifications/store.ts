@@ -6,11 +6,13 @@ export const useSimpleNotificationsStore = defineStore(
   () => {
     // need globally shared
     const showAnnouncementModal = ref(false)
-    const lastAnnouncementSha = ref<string | null>(null)
+    const showNewReleaseModal = ref(false)
+    const lastAnnouncementUniqueId = ref<string | null>(null)
 
     return {
       showAnnouncementModal,
-      lastAnnouncementSha
+      showNewReleaseModal,
+      lastAnnouncementUniqueId
     }
   }
 )

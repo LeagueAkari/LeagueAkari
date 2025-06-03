@@ -21,7 +21,7 @@
         <NButton type="primary" v-if="hasRead" @click="show = false" size="small">{{
           t('AnnouncementModal.close')
         }}</NButton>
-        <NButton type="primary" v-else @click="emits('read', announcement.sha)" size="small">{{
+        <NButton type="primary" v-else @click="emits('read', announcement.uniqueId)" size="small">{{
           t('AnnouncementModal.read')
         }}</NButton>
       </div>

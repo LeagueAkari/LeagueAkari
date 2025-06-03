@@ -1,6 +1,7 @@
 import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
 import axios from 'axios'
+import crypto from 'crypto'
 
 export interface RemoteConfigRepositoryConfig {
   locale: 'zh-CN' | 'en'
@@ -64,7 +65,7 @@ export class RemoteGitRepository {
 
     return {
       content,
-      sha: data.sha
+      uniqueId: crypto.createHash('md5').update(content, 'utf8').digest('hex')
     }
   }
 
@@ -90,5 +91,33 @@ export class RemoteGitRepository {
 
   getLatestRelease() {
     return this._http.get<GithubApiLatestRelease>(`/repos/LeagueAkari/LeagueAkari/releases/latest`)
+  }
+
+  async testGitHubLatency() {
+    try {
+      const start = Date.now()
+      await this._http.head(RemoteGitRepository.GITHUB_API_BASE_URL, {
+        timeout: 2000,
+        validateStatus: () => true
+      })
+
+      return Date.now() - start
+    } catch (error) {
+      return -1
+    }
+  }
+
+  async testGiteeLatency() {
+    try {
+      const start = Date.now()
+      await this._http.head(RemoteGitRepository.GITEE_API_BASE_URL, {
+        timeout: 2000,
+        validateStatus: () => true
+      })
+
+      return Date.now() - start
+    } catch (error) {
+      return -1
+    }
   }
 }

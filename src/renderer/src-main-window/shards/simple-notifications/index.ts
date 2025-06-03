@@ -27,6 +27,7 @@ import {
 
 import AnnouncementModal from './AnnouncementModal.vue'
 import DeclarationModal from './DeclarationModal.vue'
+import UpdateModal from './UpdateModal.vue'
 import { useSimpleNotificationsStore } from './store'
 
 /**
@@ -338,8 +339,18 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         watch(
           () => rcs.announcement,
-          (a) => {
-            if (a && a.sha !== sns.lastAnnouncementSha) {
+          (a, p) => {
+            if (!a) {
+              return
+            }
+
+            // unchanged
+            if (p && a.uniqueId === p.uniqueId) {
+              return
+            }
+
+            // new announcement
+            if (a.uniqueId !== sns.lastAnnouncementUniqueId) {
               sns.showAnnouncementModal = true
             }
           },
@@ -351,11 +362,49 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
             announcement: rcs.announcement,
             show: sns.showAnnouncementModal,
             'onUpdate:show': (v) => (sns.showAnnouncementModal = v),
-            hasRead: sns.lastAnnouncementSha === rcs.announcement?.sha,
-            onRead: (sha) => {
-              sns.lastAnnouncementSha = sha
+            hasRead: sns.lastAnnouncementUniqueId === rcs.announcement?.uniqueId,
+            onRead: (uniqueId) => {
+              sns.lastAnnouncementUniqueId = uniqueId
               sns.showAnnouncementModal = false
             }
+          })
+      }
+    })
+
+    this._setup.addRenderVNode(() => h(comp))
+  }
+
+  private _setupNewReleaseModal() {
+    const comp = defineComponent({
+      setup() {
+        const rcs = useRemoteConfigStore()
+        const sns = useSimpleNotificationsStore()
+
+        watch(
+          () => rcs.latestRelease,
+          (release, p) => {
+            if (!release) {
+              return
+            }
+
+            // unchanged
+            if (p && p.tag_name === release.tag_name) {
+              return
+            }
+
+            // new release
+            if (release.isNew) {
+              sns.showNewReleaseModal = true
+            }
+          },
+          { immediate: true }
+        )
+
+        return () =>
+          h(UpdateModal, {
+            release: rcs.latestRelease,
+            show: sns.showNewReleaseModal,
+            'onUpdate:show': (v) => (sns.showNewReleaseModal = v)
           })
       }
     })
@@ -366,10 +415,15 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
-    await this._setting.savedPropVue(SimpleNotificationsRenderer.id, sns, 'lastAnnouncementSha')
+    await this._setting.savedPropVue(
+      SimpleNotificationsRenderer.id,
+      sns,
+      'lastAnnouncementUniqueId'
+    )
 
     this._setupDeclarationModal()
     this._setupAnnouncementModal()
+    this._setupNewReleaseModal()
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
   }
@@ -377,5 +431,10 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   showAnnouncementModal() {
     const sn = useSimpleNotificationsStore()
     sn.showAnnouncementModal = true
+  }
+
+  showNewReleaseModal() {
+    const sn = useSimpleNotificationsStore()
+    sn.showNewReleaseModal = true
   }
 }

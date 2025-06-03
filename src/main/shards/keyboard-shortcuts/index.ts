@@ -237,7 +237,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onInit() {
     if (this._app.state.isAdministrator) {
-      this._log.info('Listening to native keyboard events')
+      this._log.info('Listening for key events')
       input.instance.install()
       input.instance.on('keyEvent', (key) => {
         this._handleNativeKeyEvent(key)
@@ -299,7 +299,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     this._registrationMap.set(shortcutId, { type, targetId, cb })
     this._targetIdMap.set(targetId, shortcutId)
-    this._log.info(`注册快捷键 ${shortcutId} ${targetId} (${type})`)
+    this._log.info(`Register shortcut ${shortcutId} for target ${targetId} (${type})`)
   }
 
   unregister(shortcutId: string) {
@@ -307,7 +307,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (options) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(options.targetId)
-      this._log.info(`注销快捷键 ${shortcutId} ${options.targetId}`)
+      this._log.info(`Unregister shortcut ${shortcutId} for target ${options.targetId}`)
       return true
     }
     return false
@@ -318,7 +318,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (shortcutId) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(targetId)
-      this._log.info(`注销快捷键 ${shortcutId} ${targetId}`)
+      this._log.info(`Unregister shortcut ${shortcutId} for target ${targetId}`)
       return true
     }
     return false
@@ -353,7 +353,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onDispose() {
     if (this._app.state.isAdministrator) {
-      this._log.info('Stop listening to native keyboard events')
+      this._log.info('Stop listening for key events')
       input.instance.uninstall()
     }
     this.events.removeAllListeners()

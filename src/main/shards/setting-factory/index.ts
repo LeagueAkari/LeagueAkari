@@ -164,7 +164,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     const key2 = `${namespace}/${key}`
 
     if (!key2 || value === undefined) {
-      throw new Error('key or value cannot be empty')
+      throw new Error(`key or value cannot be empty: ${key2} ${value}`)
     }
 
     await this._storage.dataSource.manager.save(Setting.create(key2, value))
