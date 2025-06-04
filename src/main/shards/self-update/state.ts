@@ -48,6 +48,11 @@ export class SelfUpdateSettings {
    */
   autoDownloadUpdates: boolean = true
 
+  /**
+   * 忽略的版本号
+   */
+  ignoreVersion: string | null = null
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -58,6 +63,10 @@ export class SelfUpdateSettings {
 
   setAutoDownloadUpdates(autoDownloadUpdates: boolean) {
     this.autoDownloadUpdates = autoDownloadUpdates
+  }
+
+  setIgnoreVersion(version: string | null) {
+    this.ignoreVersion = version
   }
 }
 

@@ -888,8 +888,10 @@ UpdateModal:
   newVersionAvailable: 'New version available: {{version}} (Current version: {{currentVersion}})'
   currentVersion: 'Current Version: {{version}}'
   releasePage: Release Page
-  download: Download
+  startUpdate: Start Update
+  externalDownload: Download from GitHub / Gitee
   noUpdateMd: No release notes
+  ignoreThisVersion: Ignore This Version
 
 Client:
   leagueClient:

@@ -69,7 +69,8 @@ const show = defineModel<boolean>('show', { default: false })
 <style lang="less" module>
 .ann-modal {
   width: 90%;
-  max-width: 1024px;
+  min-width: 720px;
+  max-width: 1106px;
 }
 
 .markdown-text-scroll-wrapper {

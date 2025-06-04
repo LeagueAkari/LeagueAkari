@@ -25,7 +25,8 @@ interface LastUpdateResult {
 export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () => {
   const settings = shallowReactive({
     autoCheckUpdates: true,
-    autoDownloadUpdates: true
+    autoDownloadUpdates: true,
+    ignoreVersion: null as string | null
   })
 
   const lastCheckAt = ref<Date | null>(null)

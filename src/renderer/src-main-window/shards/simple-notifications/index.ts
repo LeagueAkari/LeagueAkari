@@ -7,6 +7,8 @@ import { useClientInstallationStore } from '@renderer-shared/shards/client-insta
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -379,11 +381,13 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
       setup() {
         const rcs = useRemoteConfigStore()
         const sns = useSimpleNotificationsStore()
+        const sus = useSelfUpdateStore()
+        const su = useInstance(SelfUpdateRenderer)
 
         watch(
           () => rcs.latestRelease,
           (release, p) => {
-            if (!release) {
+            if (!release || sus.settings.ignoreVersion === release.tag_name) {
               return
             }
 
@@ -404,7 +408,20 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           h(UpdateModal, {
             release: rcs.latestRelease,
             show: sns.showNewReleaseModal,
-            'onUpdate:show': (v) => (sns.showNewReleaseModal = v)
+            ignoreVersion: sus.settings.ignoreVersion,
+            isUpdating: sus.updateProgressInfo !== null,
+            'onUpdate:show': (v) => (sns.showNewReleaseModal = v),
+            onIgnoreVersion: (version, ignore) => {
+              su.setIgnoreVersion(ignore ? version : null)
+            },
+            onStartDownload: () => {
+              sns.showNewReleaseModal = false
+              if (import.meta.env.DEV) {
+                su.forceStartUpdate()
+              } else {
+                su.startUpdate()
+              }
+            }
           })
       }
     })

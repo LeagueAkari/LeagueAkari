@@ -192,6 +192,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'start-update', cb)
   }
 
+  setIgnoreVersion(version: string | null) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'ignoreVersion', version)
+  }
+
   async onInit() {
     const store = useSelfUpdateStore()
 

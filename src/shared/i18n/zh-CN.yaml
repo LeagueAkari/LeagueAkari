@@ -891,8 +891,10 @@ UpdateModal:
   newVersionAvailable: 新版本可用：{{version}} (当前版本：{{currentVersion}})
   currentVersion: 当前版本：{{version}}
   releasePage: 发布页面
-  download: 下载
+  externalDownload: 从 GitHub / Gitee 下载
+  startUpdate: 立即更新
   noUpdateMd: 无发布说明
+  ignoreThisVersion: 忽略此版本
 
 Client:
   leagueClient:
