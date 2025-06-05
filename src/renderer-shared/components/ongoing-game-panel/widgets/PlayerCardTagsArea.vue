@@ -207,11 +207,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        ogs.frontendSettings.playerCardTags.showPrivacyTag &&
-        summoner?.privacy === 'PRIVATE' &&
-        !isSelf
-      "
+      v-if="ogs.frontendSettings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
       :delay="50"
     >
       <template #trigger>
