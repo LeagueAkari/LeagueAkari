@@ -24,7 +24,7 @@
         s)
       </div>
     </NPopover>
-    <NPopover placement="right" ref="popover-connection">
+    <NPopover placement="right-end" ref="popover-connection">
       <template #trigger>
         <div class="menu-item">
           <div class="menu-item-inner">
@@ -47,88 +47,14 @@
               v-else
               dot
               processing
-              :show="!lcs.isInConnectionLoop && clients.others.length > 0"
+              :show="!lcs.isInConnectionLoop && otherClients.length > 0"
             >
               <NIcon class="menu-item-icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
           </div>
         </div>
       </template>
-      <div class="menu-item-popover" ref="popover-connection-body">
-        <StreamerModeMaskedText>
-          <template #masked>
-            <div class="summoner-name" v-if="lcs.summoner.me">
-              <span class="game-name-line">{{ t('common.summoner') }}</span>
-            </div>
-          </template>
-          <div class="summoner-name" v-if="lcs.summoner.me">
-            <span class="game-name-line">{{ lcs.summoner.me.gameName }}</span>
-            <span class="tag-line">#{{ lcs.summoner.me.tagLine }}</span>
-          </div>
-        </StreamerModeMaskedText>
-        <template v-if="clients.current">
-          <div class="separator" v-if="lcs.summoner.me"></div>
-          <div class="title-label">
-            <NIcon class="icon"><BareMetalServerIcon /></NIcon>
-            <span>{{ t('SideBarFixed.currentConnected') }}</span>
-          </div>
-          <div class="client">
-            <StreamerModeMaskedText>
-              <template #masked>
-                <div class="region-name">{{ t('SideBarFixed.connectedClient') }}</div>
-              </template>
-              <div class="region-name">
-                {{ clients.current.name }}
-              </div>
-            </StreamerModeMaskedText>
-            <div class="pid">(PID: {{ clients.current.pid }})</div>
-          </div>
-        </template>
-        <template v-if="clients.others.length !== 0">
-          <div class="separator" v-if="clients.current"></div>
-          <div class="launched-clients">
-            <div class="title-label">
-              <NIcon class="icon"><BareMetalServerIcon /></NIcon>
-              <span>{{ t('SideBarFixed.launchedClients') }}</span>
-            </div>
-            <NScrollbar style="max-height: 180px">
-              <div
-                v-for="(client, index) of clients.others"
-                class="client"
-                :class="{
-                  connectable: !client.isConnecting
-                }"
-                @click="handleConnectToLeagueClient(client)"
-              >
-                <StreamerModeMaskedText>
-                  <template #masked>
-                    <div class="region-name">
-                      {{
-                        t('SideBarFixed.launchedClientPlaceholder', {
-                          index: index + 1
-                        })
-                      }}
-                    </div>
-                  </template>
-                  <div class="region-name">
-                    {{ client.name }}
-                  </div>
-
-                  <div class="pid">(PID: {{ client.pid }})</div>
-                </StreamerModeMaskedText>
-                <NSpin v-if="client.isConnecting" class="loading" :size="12" />
-              </div>
-            </NScrollbar>
-          </div>
-        </template>
-        <template v-if="!clients.current && clients.others.length === 0">
-          <div class="title-label">
-            <NIcon class="icon"><PlugDisconnected24FilledIcon /></NIcon>
-            <span>{{ t('SideBarFixed.noClientTitle') }}</span>
-          </div>
-          <div class="no-client">{{ t('SideBarFixed.noClient') }}</div>
-        </template>
-      </div>
+      <ClientConnection ref="client-connection-body" />
     </NPopover>
     <NTooltip placement="right">
       <template #trigger>
@@ -147,40 +73,32 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
-import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { BareMetalServer as BareMetalServerIcon } from '@vicons/carbon'
 import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
-  PlugDisconnected24Filled as PlugDisconnected24FilledIcon,
   Settings28Filled as Settings28FilledIcon
 } from '@vicons/fluent'
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
+import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
 import { computed, inject, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+
+import ClientConnection from './ClientConnection.vue'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
-const sgps = useSgpStore()
-const as = useAppCommonStore()
 
-const lc = useInstance(LeagueClientRenderer)
 const mh = useInstance(MatchHistoryTabsRenderer)
 
 const formattedCountdown = computed(() => {
@@ -199,49 +117,14 @@ const handleOpenSettingsModal = () => {
   openSettingsModal()
 }
 
-const clients = computed(() => {
-  let current: (UxCommandLine & { name: string }) | null = null
-  if (lcs.auth) {
-    const sgpServerId = getSgpServerId(lcs.auth.region, lcs.auth.rsoPlatformId)
-    current = {
-      ...lcs.auth,
-      name: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
-    }
-  }
-
-  const others = lcuxs.launchedClients
-    .filter((c) => c.pid !== current?.pid)
-    .map((c) => {
-      const sgpServerId = getSgpServerId(c.region, c.rsoPlatformId)
-      return {
-        ...c,
-        isConnecting: c.pid === lcs.connectingClient?.pid,
-        name: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
-      }
-    })
-
-  return {
-    current,
-    others
-  }
+const otherClients = computed(() => {
+  return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
 })
 
-const handleConnectToLeagueClient = (auth: UxCommandLine) => {
-  if (lcs.isConnecting) {
-    return
-  }
-
-  if (lcs.isConnected && lcs.auth?.pid === auth.pid) {
-    return
-  }
-
-  lc.connect(auth)
-}
-
 const popoverEl = useTemplateRef('popover-connection')
-const popoverBodyEl = useTemplateRef('popover-connection-body')
+const clientConnectionBody = useTemplateRef('client-connection-body')
 
-const { height } = useElementSize(popoverBodyEl)
+const { height } = useElementSize(() => clientConnectionBody.value?.$el)
 watch(
   () => height.value,
   () => {

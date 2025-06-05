@@ -4,6 +4,7 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { AxiosRetry } from 'axios-retry'
@@ -309,6 +310,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
       return false
     })
+
+    this._ipc.onCall(LeagueClientMain.id, 'peekClient', async (_, auth: UxCommandLine) => {
+      return await this._peekClient(auth)
+    })
   }
 
   /**
@@ -495,6 +500,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
     const initWs = async () => {
       try {
+        // in case of connection is not closed properly
+        if (this._ws) {
+          this._ws.close()
+          this._ws = null
+        }
+
         this._ws = await this._wsPromisified(`wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`, {
           headers: {
             Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
@@ -541,15 +552,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-        keepAlive: true,
-        maxCachedSessions: 2048,
-        maxFreeSockets: 1024
+        rejectUnauthorized: false
       }),
-      httpAgent: new https.Agent({
-        keepAlive: true,
-        maxFreeSockets: 1024
-      }),
+      httpAgent: new https.Agent(),
       timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
       proxy: false
     })
@@ -640,6 +645,42 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     } catch (error) {
       this._log.error(`Failed to write item set to local file`, error)
       throw error
+    }
+  }
+
+  /**
+   * 在连接之前, 先尝试获取一些召唤师信息
+   */
+  private async _peekClient(auth: UxCommandLine) {
+    const c = axios.create({
+      baseURL: `https://127.0.0.1:${auth.port}`,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      }),
+      httpAgent: new https.Agent(),
+      timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
+      proxy: false
+    })
+
+    try {
+      const { data: summoner } = await c.get<SummonerInfo>('/lol-summoner/v1/current-summoner')
+      const { data: profileIcon, headers } = await c.get(
+        `/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`,
+        { responseType: 'arraybuffer' }
+      )
+
+      const contentType = headers['content-type'] || 'image/jpeg'
+
+      return {
+        summoner,
+        profileIcon: `data:${contentType};base64,${Buffer.from(profileIcon).toString('base64')}`
+      }
+    } catch (error) {
+      this._log.warn(`Failed to peek client`, auth.pid, error)
+      return null
     }
   }
 

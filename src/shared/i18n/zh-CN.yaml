@@ -781,6 +781,21 @@ SideBarFixed:
   respawnTimer:
     timeLeft: 距离重生还有 {{seconds}} s
 
+ClientConnection:
+  noClientGroup: 无可用客户端
+  noClient: 当前无可用客户端，请启动游戏
+  connectedGroup: 已连接
+  launchedClientsGroup: 已启动的客户端
+  launchedOtherClientsGroup: 其他已启动的客户端
+  noData: 暂无数据
+  connecting: 连接中...
+  restartUx: 重启 UX
+  killUx: 结束 UX
+  launchUx: 启动 UX
+  quitClient: 退出客户端进程
+  disconnect: 断开
+  more: 更多
+
 OrderedChampionList:
   searchForChampion: 搜索英雄
   edit: 编辑

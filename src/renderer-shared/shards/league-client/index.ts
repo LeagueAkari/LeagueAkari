@@ -3,6 +3,7 @@ import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { LcuEvent } from '@shared/types/league-client/event'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { useTranslation } from 'i18next-vue'
@@ -265,5 +266,9 @@ export class LeagueClientRenderer {
 
   fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'fixWindowMethodA', config)
+  }
+
+  peekClient(auth: UxCommandLine): Promise<{ summoner: SummonerInfo; profileIcon: string } | null> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'peekClient', auth)
   }
 }
