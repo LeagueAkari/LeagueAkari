@@ -343,7 +343,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
     )
 
-    await this._tryResumeConnection()
+    if (this.settings.autoConnect) {
+      await this._tryResumeConnection()
+    }
 
     // 当客户端唯一时，自动连接到该 LeagueClient
     this._mobx.reaction(

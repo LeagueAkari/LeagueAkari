@@ -24,7 +24,7 @@
         s)
       </div>
     </NPopover>
-    <NPopover placement="right-end" ref="popover-connection">
+    <NPopover placement="right-end" ref="popover-connection" :duration="250">
       <template #trigger>
         <div class="menu-item">
           <div class="menu-item-inner">
