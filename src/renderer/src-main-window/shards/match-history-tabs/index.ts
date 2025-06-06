@@ -22,6 +22,8 @@ export interface SearchHistoryItem {
     gameName: string
     tagLine: string
   }
+
+  isPinned: boolean
 }
 
 /**
@@ -135,28 +137,49 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   /**
-   * 使用全量替换的方式更新搜索历史
+   * 使用全量替换的方式更新搜索历史。
+   * 置顶区的条目始终不会变动相对位置，同时保证在非置顶项目的前面。
+   * 非置顶项目在保存时会移动到非置顶区的最前面。
+   * 超过上限时会删除最后一个非置顶项目，若无非置顶项目无法添加。
    * @param item
    */
   async saveSearchHistory(item: SearchHistoryItem) {
-    const items = await this.getSearchHistory()
+    const list = await this.getSearchHistory()
+    const max = MatchHistoryTabsRenderer.SEARCH_HISTORY_MAX_LENGTH
 
-    // 先查重, 若存在, 则将其放到第一位
-    const index = items.findIndex((i) => i.puuid === item.puuid)
-    if (index !== -1) {
-      items.splice(index, 1)
+    const oldIdx = list.findIndex((i) => i.puuid === item.puuid)
+    const existed = oldIdx !== -1
+    const wasPinned = existed ? list[oldIdx].isPinned : false
+
+    if (existed && wasPinned && item.isPinned) {
+      list[oldIdx] = item
+      return this._setting.set(
+        MatchHistoryTabsRenderer.id,
+        MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
+        list
+      )
     }
 
-    items.unshift(item)
+    if (existed) list.splice(oldIdx, 1)
 
-    if (items.length > MatchHistoryTabsRenderer.SEARCH_HISTORY_MAX_LENGTH) {
-      items.pop()
+    const firstUnpinned = list.findIndex((i) => !i.isPinned)
+    const pos = firstUnpinned === -1 ? list.length : firstUnpinned
+    list.splice(pos, 0, item)
+
+    if (list.length > max) {
+      const lastUnpinnedIdx = [...list].reverse().findIndex((i) => !i.isPinned)
+
+      if (lastUnpinnedIdx !== -1) {
+        list.splice(list.length - 1 - lastUnpinnedIdx, 1)
+      } else if (!existed) {
+        list.pop()
+      }
     }
 
     return this._setting.set(
       MatchHistoryTabsRenderer.id,
       MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-      items
+      list
     )
   }
 
@@ -167,6 +190,31 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
     if (index !== -1) {
       items.splice(index, 1)
     }
+
+    return this._setting.set(
+      MatchHistoryTabsRenderer.id,
+      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
+      items
+    )
+  }
+
+  async pinSearchHistory(puuid: string) {
+    const items = await this.getSearchHistory()
+    const index = items.findIndex((i) => i.puuid === puuid)
+
+    if (index !== -1) {
+      items[index].isPinned = !items[index].isPinned
+    }
+
+    items.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) {
+        return -1
+      }
+      if (!a.isPinned && b.isPinned) {
+        return 1
+      }
+      return 0
+    })
 
     return this._setting.set(
       MatchHistoryTabsRenderer.id,

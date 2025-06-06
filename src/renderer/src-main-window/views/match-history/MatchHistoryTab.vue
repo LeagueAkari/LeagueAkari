@@ -729,7 +729,8 @@ const loadSummoner = async () => {
             summoner: {
               gameName: data.gameName,
               tagLine: data.tagLine
-            }
+            },
+            isPinned: false
           })
         }
       }
@@ -744,7 +745,8 @@ const loadSummoner = async () => {
           summoner: {
             gameName: data.gameName,
             tagLine: data.tagLine
-          }
+          },
+          isPinned: false
         })
       }
     }

@@ -415,7 +415,11 @@ watch(
   }
 )
 
-const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true) => {
+const handleToSummoner = (puuid: string, sgpServerId: string | null, setCurrent = true) => {
+  if (!sgpServerId) {
+    sgpServerId = sgps.availability.sgpServerId
+  }
+
   if (setCurrent) {
     searchSummonerModalShow.value = false
     navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)

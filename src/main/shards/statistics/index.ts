@@ -33,7 +33,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
    * 统计 LeagueAkari 的版本使用量
    * @returns
    */
-  private async _counterIncrIfFirstTime() {
+  private async _recordVersionUsageOnce() {
     try {
       const version = app.getVersion()
       let countedVersions = await this._setting._getFromStorage('alreadyCounted')
@@ -62,7 +62,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._counterIncrIfFirstTime().catch((e) => {
+    this._recordVersionUsageOnce().catch((e) => {
       // normally it should not happen
       this._log.error('Oops... Something went wrong when counting visitors', e)
     })

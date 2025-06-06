@@ -859,6 +859,7 @@ SearchSummonerModal:
   cancel: Cancel
   search: Search Player
   result: Search Results
+  friends: Friends
   history: Recent Visit
   validating: Validating players ({{current}} / {{total}})
   validated: Validated {{countV}} possible player records, no matching results found
@@ -870,6 +871,9 @@ SearchSummonerModal:
   puuidSearch: 'Performing exact search: Searching by specified PUUID'
   exactSearch: 'Performing exact search: Searching for summoner with specified name and tag'
   fuzzySearch: 'Performing fuzzy search: Searching for summoners with specified name'
+  getFriendsFailed: Failed to get friend list
+  showAll: Show All
+  clear: Clear
 
   placeholders:
     - 'For exact search: AkazaAkari#akari'

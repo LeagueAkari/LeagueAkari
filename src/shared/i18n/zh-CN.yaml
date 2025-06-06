@@ -862,6 +862,7 @@ SearchSummonerModal:
   cancel: 取消
   search: 搜索玩家
   result: 搜索结果
+  friends: 好友
   history: 近期访问
   validating: 正在验证玩家 ({{current}} / {{total}})
   validated: 验证了 {{countV}} 条可能的玩家记录，无搜索结果符合
@@ -873,6 +874,9 @@ SearchSummonerModal:
   puuidSearch: 当前为精确搜索：搜索指定 PUUID
   exactSearch: 当前为精确搜索：搜索指定名称和标签的召唤师
   fuzzySearch: 当前为模糊搜索：搜索指定名称的召唤师
+  getFriendsFailed: 获取好友列表失败
+  showAll: 显示所有
+  clear: 清空
 
   placeholders:
     - '如完整查询：赤座灯里#akari'
