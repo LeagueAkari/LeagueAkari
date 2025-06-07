@@ -247,6 +247,7 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Friend } from '@shared/types/league-client/chat'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { Pin16Filled as Pin16FilledIcon } from '@vicons/fluent'
+import { useIntervalFn } from '@vueuse/core'
 import { isAxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -303,8 +304,16 @@ const placeholderTexts = computed(() => {
   ]
 })
 
-const placeholderText =
-  placeholderTexts.value[Math.floor(Math.random() * placeholderTexts.value.length)]
+const placeholderText = ref('')
+
+let round = 0
+useIntervalFn(
+  () => {
+    placeholderText.value = placeholderTexts.value[round++ % placeholderTexts.value.length]
+  },
+  5000,
+  { immediate: true, immediateCallback: true }
+)
 
 /**
  * 识别 {gameName}#{tagLIne} 或 {fuzzyGameName} 的输入
