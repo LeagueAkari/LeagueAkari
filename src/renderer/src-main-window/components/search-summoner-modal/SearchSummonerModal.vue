@@ -98,6 +98,17 @@
           }}
         </NProgress>
       </NCollapseTransition>
+      <NCollapseTransition class="section" :show="isEmpty">
+        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
+        <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
+          {{ t('SearchSummonerModal.validated', { countV: searchProgress.finish }) }}
+          <span style="font-weight: bold">{{ searchText }}</span>
+        </div>
+        <div class="empty-result" v-else>
+          {{ t('SearchSummonerModal.noResult') }}
+          <span style="font-weight: bold">{{ searchText }}</span>
+        </div>
+      </NCollapseTransition>
       <NCollapseTransition
         class="section"
         :show="filteredSearchHistory.length > 0 && searchResult.length === 0"
@@ -219,17 +230,6 @@
             </div>
           </TransitionGroup>
         </NScrollbar>
-      </NCollapseTransition>
-      <NCollapseTransition class="section" :show="isEmpty">
-        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
-        <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
-          {{ t('SearchSummonerModal.validated', { countV: searchProgress.finish }) }}
-          <span style="font-weight: bold">{{ searchText }}</span>
-        </div>
-        <div class="empty-result" v-else>
-          {{ t('SearchSummonerModal.noResult') }}
-          <span style="font-weight: bold">{{ searchText }}</span>
-        </div>
       </NCollapseTransition>
     </NCard>
   </NModal>
@@ -831,6 +831,7 @@ const handleFriendMouseUp = (event: MouseEvent, friend: Friend) => {
 
 const handleClearInput = () => {
   inputText.value = ''
+  isEmpty.value = false
   searchResult.value = []
 }
 
