@@ -263,17 +263,7 @@ import {
   NSelect,
   useMessage
 } from 'naive-ui'
-import {
-  computed,
-  markRaw,
-  nextTick,
-  reactive,
-  ref,
-  shallowRef,
-  useTemplateRef,
-  watch,
-  watchEffect
-} from 'vue'
+import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
@@ -816,11 +806,6 @@ const sortedFriends = computed(() => {
 const onlineFriendCount = computed(() => {
   return sortedFriends.value.filter((f) => f.availability === 'chat' || f.availability === 'dnd')
     .length
-})
-
-// TODO
-watchEffect(() => {
-  console.log(sortedFriends.value)
 })
 
 const updateFriends = async () => {

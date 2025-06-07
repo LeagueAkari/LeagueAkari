@@ -100,6 +100,14 @@ export interface TabState {
 
   summonerProfile: SummonerProfile | null
 
+  /** 最近遇到过的对局 */
+  encounteredGamesPage: {
+    data: EncounteredGame[]
+    page: number
+    pageSize: number
+    total: number
+  } | null
+
   /** 标记信息 */
   tags: PlayerTagDto[]
 
@@ -111,6 +119,7 @@ export interface TabState {
   isLoadingTags: boolean
   isLoadingSavedInfo: boolean
   isLoadingSummonerProfile: boolean
+  isLoadingEncounteredGames: boolean
 
   isTakingScreenshot: boolean
 }

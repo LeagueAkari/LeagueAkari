@@ -23,7 +23,7 @@ export interface SearchHistoryItem {
     tagLine: string
   }
 
-  isPinned: boolean
+  isPinned?: boolean
 }
 
 /**
@@ -151,8 +151,17 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
     const existed = oldIdx !== -1
     const wasPinned = existed ? list[oldIdx].isPinned : false
 
-    if (existed && wasPinned && item.isPinned) {
-      list[oldIdx] = item
+    const finalPinned = item.isPinned !== undefined ? item.isPinned : existed ? wasPinned : false
+
+    const base = existed ? list[oldIdx] : ({} as Partial<SearchHistoryItem>)
+    const newItem: SearchHistoryItem = {
+      ...base,
+      ...item,
+      isPinned: finalPinned
+    } as SearchHistoryItem
+
+    if (existed && wasPinned && finalPinned) {
+      list[oldIdx] = newItem
       return this._setting.set(
         MatchHistoryTabsRenderer.id,
         MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
@@ -164,7 +173,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
 
     const firstUnpinned = list.findIndex((i) => !i.isPinned)
     const pos = firstUnpinned === -1 ? list.length : firstUnpinned
-    list.splice(pos, 0, item)
+    list.splice(pos, 0, newItem)
 
     if (list.length > max) {
       const lastUnpinnedIdx = [...list].reverse().findIndex((i) => !i.isPinned)
@@ -298,6 +307,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         summoner: null,
         spectatorData: null,
         summonerProfile: null,
+        encounteredGamesPage: null,
         tags: markRaw([]),
         isLoadingTags: false,
         isLoadingSavedInfo: false,
@@ -306,7 +316,8 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         isLoadingSummoner: false,
         isLoadingSpectatorData: false,
         isLoadingSummonerProfile: false,
-        isTakingScreenshot: false
+        isTakingScreenshot: false,
+        isLoadingEncounteredGames: false
       },
       setCurrent
     )

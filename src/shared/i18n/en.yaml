@@ -1339,6 +1339,7 @@ MatchHistoryTab:
   failedToLoadSummonerProfile: 'Unable to load summoner profile: {{reason}}'
   failedToLoadRankedStats: 'Unable to load ranked stats: {{reason}}'
   failedToLoadMatchHistory: 'Unable to load match history: {{reason}}'
+  failedToLoadEncounteredGames: 'Unable to load encountered games: {{reason}}'
   failedToLoadMatchHistoryHN1: |
     Unable to load match history: {{reason}}
     The current region on this page is Ionia. Please note that during certain times (especially in the evening), match history data may not be returned properly.
@@ -1354,6 +1355,10 @@ MatchHistoryTab:
   failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
   failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
   copiedToClipboard: Copied to clipboard
+
+EncounteredGames:
+  title: History Games
+  pageInfo: '{{page}} / {{totalPage}}'
 
 MatchHistoryCard:
   kprTitle: 'Kill participation in team: {{rate}}%'

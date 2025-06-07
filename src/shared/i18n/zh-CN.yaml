@@ -1344,6 +1344,7 @@ MatchHistoryTab:
   failedToLoadSummonerProfile: 无法加载召唤师信息：{{reason}}
   failedToLoadRankedStats: 无法加载排位信息：{{reason}}
   failedToLoadMatchHistory: 无法加载战绩：{{reason}}
+  failedToLoadEncounteredGames: 无法加载最近遇到过的对局：{{reason}}
   failedToLoadMatchHistoryHN1: |
     无法加载战绩：{{reason}}
     注意：当前页面的大区为艾欧尼亚。该大区在某些时间段（尤其是晚间）可能无法正常返回战绩数据
@@ -1359,6 +1360,10 @@ MatchHistoryTab:
   failedToTakeScreenshotNoData: 尝试截图失败，未获取到图片信息
   failedToTakeScreenshot: 尝试截图失败：{{reason}}
   copiedToClipboard: 已复制到剪贴板
+
+EncounteredGames:
+  title: 历史对局
+  pageInfo: '{{page}} / {{totalPage}}'
 
 MatchHistoryCard:
   kprTitle: 在队伍中参与了击杀的程度 {{rate}}%
