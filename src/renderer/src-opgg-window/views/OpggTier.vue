@@ -17,7 +17,14 @@
       :row-props="rowProps"
       :loading="loading"
       size="small"
-    />
+    >
+      <template #loading>
+        <div class="loading-description">
+          <NSpin size="small" />
+          <NButton size="tiny" secondary @click="emits('cancel')">{{ t('Opgg.cancel') }}</NButton>
+        </div>
+      </template>
+    </NDataTable>
   </div>
 </template>
 
@@ -33,8 +40,10 @@ import {
   DataTableColumn,
   DataTableColumns,
   DataTableCreateRowProps,
+  NButton,
   NDataTable,
-  NInput
+  NInput,
+  NSpin
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
 
@@ -51,6 +60,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: 'toChampion', championId: number): void
+  (e: 'cancel'): void
 }>()
 
 const { t } = useTranslation()
@@ -490,6 +500,13 @@ const data = computed(() => {
 
   .tier-table {
     flex: 1;
+  }
+
+  .loading-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 }
 

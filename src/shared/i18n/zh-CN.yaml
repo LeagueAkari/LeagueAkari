@@ -1790,6 +1790,7 @@ Opgg:
   replace: 提供
   create: 创建
   notConnected: 未连接到客户端，部分资源无法加载
+  cancel: 取消
 
   settings:
     button: 设置

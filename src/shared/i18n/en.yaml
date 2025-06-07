@@ -1784,6 +1784,7 @@ Opgg:
   replace: Provide
   create: Create
   notConnected: Not connected to the client, some resources may not be loaded
+  cancel: Cancel
 
   settings:
     button: Settings

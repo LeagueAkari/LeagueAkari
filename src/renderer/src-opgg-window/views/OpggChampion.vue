@@ -1,7 +1,13 @@
 <template>
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
-    <NSpin description="Loading ..." v-if="loading" class="spin-mask"></NSpin>
+    <NSpin v-if="loading" class="spin-mask">
+      <template #description>
+        <div class="loading-description">
+          <NButton size="tiny" secondary @click="emits('cancel')">{{ t('Opgg.cancel') }}</NButton>
+        </div>
+      </template>
+    </NSpin>
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
@@ -745,17 +751,7 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCheckbox,
-  NIcon,
-  NScrollbar,
-  NSpin,
-  NSwitch,
-  NTabPane,
-  NTabs,
-  useMessage
-} from 'naive-ui'
+import { NButton, NCheckbox, NIcon, NScrollbar, NSpin, NSwitch, NTabPane, NTabs } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -783,6 +779,7 @@ const emits = defineEmits<{
     }
   ]
   addToItemSet: []
+  cancel: []
 }>()
 
 const { t } = useTranslation()
@@ -927,6 +924,17 @@ if (import.meta.env.DEV) {
     bottom: 0;
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .loading-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .cancel-button {
+      margin-top: 8px;
+    }
   }
 }
 

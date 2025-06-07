@@ -107,6 +107,7 @@
         :loading="isLoading"
         :version="version || undefined"
         @to-champion="(id) => handleToChampion(id, false)"
+        @cancel="cancelAll"
       />
       <OpggChampion
         v-show="currentTab === 'champion'"
@@ -124,6 +125,7 @@
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
         @add-to-item-set="handleAddToItemSet"
+        @cancel="cancelAll"
       />
     </div>
     <Transition name="fade">
@@ -496,17 +498,33 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
   }
 }
 
+let shouldStopLoading = false
 const loadAll = async () => {
   try {
     champion.value = null
     tierData.value = null
     versions.value = []
-    await loadVersionsData()
-    await loadTierData()
-    await loadChampionData(false)
+    shouldStopLoading = false
+
+    if (!shouldStopLoading) {
+      await loadVersionsData()
+    }
+    if (!shouldStopLoading) {
+      await loadTierData()
+    }
+    if (!shouldStopLoading) {
+      await loadChampionData(false)
+    }
   } catch {
   } finally {
   }
+}
+
+const cancelAll = () => {
+  shouldStopLoading = true
+  loadVersionsController?.abort()
+  loadTierController?.abort()
+  loadChampionController?.abort()
 }
 
 const handleVersionChange = async (v: string) => {
