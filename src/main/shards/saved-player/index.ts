@@ -63,7 +63,20 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       skip
     })
 
-    return encounteredGames
+    const total = await this._storage.dataSource.manager.count(EncounteredGame, {
+      where: {
+        selfPuuid: Equal(query.selfPuuid),
+        puuid: Equal(query.puuid),
+        queueType: query.queueType ? Equal(query.queueType) : undefined
+      }
+    })
+
+    return {
+      data: encounteredGames,
+      page,
+      pageSize,
+      total
+    }
   }
 
   async saveEncounteredGame(dto: EncounteredGameSaveDto) {

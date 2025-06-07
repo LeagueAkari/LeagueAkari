@@ -812,7 +812,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
 
     this._loadAdditionalGame(
-      res.encounteredGames.map((c) => c.gameId),
+      res.encounteredGames.data.map((c) => c.gameId),
       {
         force,
         signal,

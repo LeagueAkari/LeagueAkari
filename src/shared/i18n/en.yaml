@@ -1570,7 +1570,7 @@ PlayerInfoCard:
   visionScore: Vision Score {{countV}}
   visionScorePopover: This player's average vision score is {{countV}}
   metPopover:
-    title: Previously encountered this player in {{date}}, a total of {{countV}} times.
+    title: Last encountered this player on {{date}}. Met a total of {{countV}} times. Shows only the last {{countV2}} games.
     gameId: Game ID
     inspectByGameId: Inspect {{gameId}}
     date: Game Date
