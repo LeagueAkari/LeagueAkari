@@ -1,6 +1,30 @@
 import { Constructor, Shard } from './decorators'
 import { AkariSharedGlobal } from './interface'
 
+export interface ShardMetadata {
+  id: string | symbol
+
+  /**
+   * 数值越高, 优先级越高
+   */
+  priority: number
+
+  /**
+   * 其中一个参数可以被标记为配置项, 只能有一个配置项参数
+   */
+  configParamIndex?: number
+
+  /**
+   * 一些参数可以被强覆盖为其他模块, 而不是按照 TypeScript 的类型反射
+   */
+  depOverrides?: Map<number, string | Constructor>
+
+  /**
+   * 基于 TypeScript 反射获取的构造函数参数依赖 ID 列表. 若不是某个模块则为 null (它必须在 depOverrides 中被覆盖)
+   */
+  ctorParamDepIds: (string | symbol | null)[]
+}
+
 export class AkariManager {
   private _registry: Map<
     string | symbol,
@@ -9,6 +33,7 @@ export class AkariManager {
       config?: object
     }
   > = new Map()
+
   private _instances: Map<string | symbol, any> = new Map()
 
   private _isSetup = false
@@ -197,12 +222,7 @@ export class AkariManager {
     return instance
   }
 
-  private _getMetadata(target: Constructor): {
-    id: string | symbol
-    priority: number
-    configParamIndex?: number
-    depOverrides?: Map<number, string | Constructor>
-  } {
+  private _getMetadata(target: Constructor): ShardMetadata {
     const id = Reflect.getMetadata('akari:id', target)
     const priority = Reflect.getMetadata('akari:priority', target)
     const configParamIndex = Reflect.getMetadata('akari:configParamIndex', target)
@@ -210,11 +230,20 @@ export class AkariManager {
       | Map<number, string | Constructor>
       | undefined
 
+    const paramTypes = Reflect.getMetadata('design:paramtypes', target) || []
+    const ctorParamDepIds = paramTypes.map((p: Function) => {
+      if (this._isShard(p)) {
+        return Reflect.getMetadata('akari:id', p)
+      }
+
+      return null
+    })
+
     if (!id || priority === undefined) {
       throw new Error(`Shard metadata not found on ${target.name}`)
     }
 
-    return { id, priority, configParamIndex, depOverrides }
+    return { id, priority, configParamIndex, depOverrides, ctorParamDepIds }
   }
 
   private _isShard(target: any): target is Constructor {
