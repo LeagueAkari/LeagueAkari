@@ -346,10 +346,13 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
     // 检查字段类型
     if (
-      !Array.isArray(content.data) &&
-      content.data.every((v: any) => {
-        typeof v !== 'object' || typeof v.key !== 'string' || v.value !== 'string'
-      })
+      !Array.isArray(content.data) ||
+      !content.data.every(
+        (v: any) =>
+          typeof v === 'object' &&
+          typeof v.key === 'string' &&
+          typeof v.value === 'string'
+      )
     ) {
       throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsData')
     }
