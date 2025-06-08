@@ -114,7 +114,14 @@
           @positive-click="emits('deleteRecord', recordId)"
         >
           <template #trigger>
-            <NButton class="game-item-delete" size="tiny" quaternary :focusable="false">
+            <NButton
+              class="game-item-delete"
+              size="tiny"
+              quaternary
+              :focusable="false"
+              @click.stop
+              @mouseup.stop
+            >
               <template #icon>
                 <NIcon><DeleteIcon /></NIcon>
               </template>
