@@ -212,6 +212,7 @@
 
 <script lang="ts" setup>
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
+import { restoreRecipe } from '@opgg-window/utils/recipe-restore'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
@@ -892,7 +893,6 @@ const toItemSetsUid = (traits: {
   return `akari1-${traits.championId}-${traits.mode || '_'}-${traits.region || '_'}-${traits.tier || '_'}-${traits.position || '_'}-${traits.version || '_'}`
 }
 
-// TODO
 const handleAddToItemSet = async () => {
   if (!champion.value || !isAbleToAddToItemSet.value) {
     return
@@ -979,7 +979,7 @@ const handleAddToItemSet = async () => {
         blocks: itemGroups.map((g) => ({
           type: g.title,
           items: g.items.map((i) => ({
-            id: i.toString(),
+            id: restoreRecipe(i).toString(),
             count: 1
           }))
         })),

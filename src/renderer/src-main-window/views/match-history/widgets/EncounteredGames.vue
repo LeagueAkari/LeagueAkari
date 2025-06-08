@@ -363,11 +363,11 @@ const emits = defineEmits<{
     font-weight: bold;
 
     &.enemy {
-      color: hsl(0, 100%, 70%);
+      color: rgba(255, 159, 159, 0.8);
     }
 
     &.ally {
-      color: hsl(120, 80%, 45%);
+      color: rgba(184, 255, 188, 0.8);
     }
   }
 
