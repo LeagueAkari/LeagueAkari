@@ -19,8 +19,9 @@
       t('OrderedChampionList.edit')
     }}</NButton>
     <div class="champions">
-      <LcuImage
-        :src="championIconUri(c)"
+      <ChampionIcon
+        :champion-id="c"
+        :stretched="false"
         class="champion"
         :title="lcs.gameData.champions[c]?.name"
         :class="{
@@ -42,9 +43,8 @@
 </template>
 
 <script lang="ts" setup>
-import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -82,10 +82,26 @@ const styles = useCssModule()
 const lcs = useLeagueClientStore()
 
 const championOptions = computed(() => {
-  const sorted = Object.values(lcs.gameData.champions).toSorted((a, b) => {
-    // 以防有人看不到, 决定将空英雄放在最前面
-    if (a.id === -1 || b.id === -1) {
+  const mapped = Object.values(lcs.gameData.champions).map((c) => ({
+    id: c.id,
+    name: c.name
+  }))
+
+  if (type === 'pick') {
+    mapped.push({ id: -3, name: t('champions.bravery') })
+  }
+
+  const sorted = mapped.toSorted((a, b) => {
+    if (a.id < 0 && b.id < 0) {
+      return a.id - b.id
+    }
+
+    if (a.id < 0 && b.id >= 0) {
       return -1
+    }
+
+    if (a.id >= 0 && b.id < 0) {
+      return 1
     }
 
     // 只要是 PVE 英雄，直接放在最后面以防止失误选择
@@ -136,8 +152,9 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
       }
     },
     [
-      h(LcuImage, {
-        src: championIconUri(option.value as number),
+      h(ChampionIcon, {
+        championId: option.value as number,
+        stretched: false,
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label)
@@ -172,8 +189,9 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
       onDrop: () => handleDrop(option.value as number)
     },
     [
-      h(LcuImage, {
-        src: championIconUri(option.value as number),
+      h(ChampionIcon, {
+        championId: option.value as number,
+        stretched: false,
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label),
