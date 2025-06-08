@@ -41,7 +41,9 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
+import fs from 'node:fs'
 import os from 'node:os'
+import path from 'node:path'
 import { Logger } from 'winston'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
@@ -273,6 +275,23 @@ export function bootstrap() {
     // other
     manager.use(ExtraAssetsMain)
     manager.use(RendererDebugMain)
+
+    // external shards
+    const shardsDir = path.join(app.getPath('exe'), '..', 'shards')
+    if (fs.existsSync(shardsDir)) {
+      const files = fs.readdirSync(shardsDir)
+      for (const file of files) {
+        if (file.endsWith('.js')) {
+          const shard = require(path.join(shardsDir, file))
+          manager.useExternal(shard)
+
+          logger.info({
+            message: `Loaded external shard ${file}`,
+            namespace: 'akari-shard-manager'
+          })
+        }
+      }
+    }
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)

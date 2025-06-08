@@ -1,6 +1,13 @@
 import { Constructor, Shard } from './decorators'
 import { AkariSharedGlobal } from './interface'
 
+export type ExternalShardConstructor = {
+  new (...args: any[]): any
+  id: string | symbol
+  priority: number
+  dependencies: (string | symbol)[]
+}
+
 export interface ShardMetadata {
   id: string | symbol
 
@@ -70,6 +77,32 @@ export class AkariManager {
     const arr = this._getCtorParamTypeList(shard)
 
     this._registry.set(id, { id, priority, ctorParamArr: arr, ctor: shard, config })
+  }
+
+  /**
+   * for external shards
+   */
+  useExternal(shard: ExternalShardConstructor, config?: object) {
+    const id = shard.id
+    const deps = shard.dependencies || []
+
+    if (!id) {
+      throw new Error('External shard id is required')
+    }
+
+    if (this._registry.has(id)) {
+      throw new Error(`Shard with id "${id.toString()}" already exists`)
+    }
+
+    const priority = shard.priority || 0
+
+    this._registry.set(shard.id, {
+      id,
+      priority,
+      ctorParamArr: deps.map((dep) => ({ type: 'depId', depId: dep })),
+      ctor: shard,
+      config
+    })
   }
 
   /**
