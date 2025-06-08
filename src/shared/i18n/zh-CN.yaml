@@ -1614,9 +1614,9 @@ PlayerInfoCard:
     tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
   akariLoved:
     good: 优异
-    great: 极好
+    great: 通天代
     goodPopover: 该玩家在近期对局中表现优异
-    greatPopover: 该玩家展现了极好的表现
+    greatPopover: 该玩家的水平远远超过当前段位
   champion:
     winRate: 近期 {{countV}} 场，胜率为 {{winRate}}%
     level: '{{level}} 级'
