@@ -163,7 +163,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       const p2 = tools.getPidsByName(LeagueClientMain.PROCESS_NAME)
 
       if (p1.length === 0 && p2.length === 1) {
-        this._log.info('Try to resume connection', lastConnectedClient)
+        const { certificate, ...rest } = lastConnectedClient
+        this._log.info('Trying to resume connection', rest)
 
         this._shouldHaveOneAttempt = true
         this.state.setConnectingClient(lastConnectedClient)

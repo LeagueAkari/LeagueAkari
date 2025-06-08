@@ -25,10 +25,25 @@ export interface ShardMetadata {
   ctorParamDepIds: (string | symbol | null)[]
 }
 
+export type CtorParamType =
+  | {
+      type: 'depId'
+      depId: string | symbol
+    }
+  | {
+      type: 'config'
+    }
+  | {
+      type: 'empty'
+    }
+
 export class AkariManager {
   private _registry: Map<
     string | symbol,
     {
+      id: string | symbol
+      priority: number
+      ctorParamArr: CtorParamType[]
       ctor: Constructor
       config?: object
     }
@@ -46,13 +61,15 @@ export class AkariManager {
   public static readonly INTERNAL_RUNNER_ID = Symbol('<akari-shard-runner~(∠・ω<)⌒★>')
 
   use(shard: Constructor, config?: object) {
-    const id = this._getMetadata(shard).id
+    const { id, priority } = this._extractMetadata(shard)
 
     if (this._registry.has(id)) {
       throw new Error(`Shard with id "${id.toString()}" already exists`)
     }
 
-    this._registry.set(id, { ctor: shard, config })
+    const arr = this._getCtorParamTypeList(shard)
+
+    this._registry.set(id, { id, priority, ctorParamArr: arr, ctor: shard, config })
   }
 
   /**
@@ -63,16 +80,24 @@ export class AkariManager {
       throw new Error('Already setup')
     }
 
-    if (!this._registry.has(AkariManager.SHARED_GLOBAL_ID)) {
-      this._registry.set(AkariManager.SHARED_GLOBAL_ID, {
-        ctor: SharedGlobalShard
-      })
-    }
+    this._registry.set(AkariManager.SHARED_GLOBAL_ID, {
+      id: AkariManager.SHARED_GLOBAL_ID,
+      priority: -Infinity,
+      ctorParamArr: [],
+      ctor: SharedGlobalShard
+    })
 
+    // internal runner references all shards except itself
     this._registry.set(AkariManager.INTERNAL_RUNNER_ID, {
+      id: AkariManager.INTERNAL_RUNNER_ID,
+      priority: -Infinity,
+      ctorParamArr: Array.from(this._registry.values())
+        .filter((d) => d.id !== AkariManager.INTERNAL_RUNNER_ID)
+        .map((r) => ({ type: 'depId', depId: r.id })),
       ctor: __InternalRunner
     })
 
+    // shared global shard is a singleton
     this._instances.set(AkariManager.SHARED_GLOBAL_ID, new SharedGlobalShard(this))
 
     this._initializationOrder = []
@@ -129,7 +154,7 @@ export class AkariManager {
       return this._instances.get(idOrCtor)
     }
 
-    return this.getInstance(this._getMetadata(idOrCtor).id)
+    return this.getInstance(this._extractMetadata(idOrCtor).id)
   }
 
   /**
@@ -150,50 +175,23 @@ export class AkariManager {
       throw new Error(`Shard not registered: "${id.toString()}"`)
     }
 
-    const metadata = this._getMetadata(c.ctor)
-    const ctorParameters = this._getCtorParams(c.ctor)
-
-    const maxDepOverridesIndex = metadata.depOverrides
-      ? Math.max(...Array.from(metadata.depOverrides.keys()))
-      : -1
-    const configParamIndex = metadata.configParamIndex ?? -1
-    const paramsLength = Math.max(
-      maxDepOverridesIndex + 1,
-      configParamIndex + 1,
-      ctorParameters.length
-    )
-
-    const extended = [...ctorParameters, ...Array(paramsLength - ctorParameters.length).fill(null)]
-    const mappedDepIds = extended.map((p, index) => {
-      if (metadata.configParamIndex === index) {
-        return null
+    const depCtorParamArr = c.ctorParamArr.filter((p) => p.type === 'depId')
+    for (const dep of depCtorParamArr) {
+      if (!this._registry.has(dep.depId)) {
+        throw new Error(`Shard not registered: "${dep.depId.toString()}"`)
       }
-
-      if (metadata.depOverrides && metadata.depOverrides.has(index)) {
-        const dep = metadata.depOverrides.get(index)!
-        return typeof dep === 'string' ? dep : this._getMetadata(dep).id
-      }
-
-      return this._isShard(p) ? this._getMetadata(p).id : null
-    })
-
-    const depIds = mappedDepIds.filter((p) => p !== null)
-    if (depIds.some((depId) => !this._registry.has(depId))) {
-      throw new Error(
-        `Shard not registered: ${depIds.filter((depId) => !this._registry.has(depId)).join(', ')}`
-      )
     }
 
     const instances = new Map<string | symbol, any>()
 
-    if (depIds.length) {
-      const sortedDepIds = depIds.toSorted((a, b) => {
-        const aM = this._getMetadata(this._registry.get(a)!.ctor)
-        const bM = this._getMetadata(this._registry.get(b)!.ctor)
+    if (depCtorParamArr.length) {
+      const sortedDepIds = depCtorParamArr.toSorted((a, b) => {
+        const aM = this._registry.get(a.depId)!
+        const bM = this._registry.get(b.depId)!
         return bM.priority - aM.priority
       })
 
-      for (const depId of sortedDepIds) {
+      for (const { depId } of sortedDepIds) {
         if (visited.has(depId)) {
           throw new Error(`Circular dependency detected: ${[...visited, depId].join(' -> ')}`)
         }
@@ -210,27 +208,36 @@ export class AkariManager {
 
     order.push(id)
 
-    const shardParams = mappedDepIds.map((p) => (p ? instances.get(p) : undefined))
+    const params = c.ctorParamArr.map((p) => {
+      if (p.type === 'depId') {
+        return instances.get(p.depId)
+      } else if (p.type === 'config') {
+        return c.config
+      } else {
+        return undefined
+      }
+    })
 
-    if (metadata.configParamIndex !== undefined) {
-      shardParams[metadata.configParamIndex] = c.config
-    }
-
-    const instance = new c.ctor(...shardParams)
+    const instance = new c.ctor(...params)
     this._instances.set(id, instance)
 
     return instance
   }
 
-  private _getMetadata(target: Constructor): ShardMetadata {
+  private _extractMetadata(target: Constructor): ShardMetadata {
     const id = Reflect.getMetadata('akari:id', target)
     const priority = Reflect.getMetadata('akari:priority', target)
-    const configParamIndex = Reflect.getMetadata('akari:configParamIndex', target)
+
+    if (!id || priority === undefined) {
+      throw new Error(`Shard metadata not found on ${target.name}`)
+    }
+
+    const configParamIndex = Reflect.getMetadata('akari:configParamIndex', target) || -1
     const depOverrides = Reflect.getMetadata('akari:depOverrides', target) as
       | Map<number, string | Constructor>
       | undefined
 
-    const paramTypes = Reflect.getMetadata('design:paramtypes', target) || []
+    const paramTypes: any[] = Reflect.getMetadata('design:paramtypes', target) || []
     const ctorParamDepIds = paramTypes.map((p: Function) => {
       if (this._isShard(p)) {
         return Reflect.getMetadata('akari:id', p)
@@ -239,11 +246,35 @@ export class AkariManager {
       return null
     })
 
-    if (!id || priority === undefined) {
-      throw new Error(`Shard metadata not found on ${target.name}`)
+    return { id, priority, configParamIndex, depOverrides, ctorParamDepIds }
+  }
+
+  private _getCtorParamTypeList(target: Constructor): CtorParamType[] {
+    const { depOverrides, configParamIndex = -1, ctorParamDepIds } = this._extractMetadata(target)
+
+    const maxDepOverridesIndex = depOverrides ? Math.max(...Array.from(depOverrides.keys())) : -1
+    const length = Math.max(ctorParamDepIds.length, configParamIndex + 1, maxDepOverridesIndex + 1)
+    const ctorParamArr: CtorParamType[] = []
+
+    for (let i = 0; i < length; i++) {
+      if (depOverrides && depOverrides.has(i)) {
+        const dep = depOverrides.get(i)!
+
+        if (typeof dep === 'function') {
+          ctorParamArr.push({ type: 'depId', depId: this._extractMetadata(dep).id })
+        } else {
+          ctorParamArr.push({ type: 'depId', depId: dep })
+        }
+      } else if (i === configParamIndex) {
+        ctorParamArr.push({ type: 'config' })
+      } else if (ctorParamDepIds[i]) {
+        ctorParamArr.push({ type: 'depId', depId: ctorParamDepIds[i]! })
+      } else {
+        ctorParamArr.push({ type: 'empty' })
+      }
     }
 
-    return { id, priority, configParamIndex, depOverrides, ctorParamDepIds }
+    return ctorParamArr
   }
 
   private _isShard(target: any): target is Constructor {
@@ -252,16 +283,6 @@ export class AkariManager {
     }
 
     return Reflect.hasMetadata('akari:id', target)
-  }
-
-  private _getCtorParams(target: Constructor): Function[] {
-    if (this._getMetadata(target).id === AkariManager.INTERNAL_RUNNER_ID) {
-      return Array.from(this._registry.values())
-        .map((r) => r.ctor)
-        .filter((r) => r !== target)
-    }
-
-    return Reflect.getMetadata('design:paramtypes', target) || []
   }
 }
 
