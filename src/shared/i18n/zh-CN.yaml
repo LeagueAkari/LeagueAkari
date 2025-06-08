@@ -1364,6 +1364,13 @@ MatchHistoryTab:
 EncounteredGames:
   title: 历史对局
   pageInfo: '{{page}} / {{totalPage}}'
+  noData: 暂无数据
+  deletePopconfirm: 确认删除该对局记录？
+  loading: 加载中...
+  opponent: 对手
+  teammate: 队友
+  win: 胜
+  lose: 败
 
 MatchHistoryCard:
   kprTitle: 在队伍中参与了击杀的程度 {{rate}}%

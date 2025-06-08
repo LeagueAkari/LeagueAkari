@@ -241,7 +241,7 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   }
 
   /** 避免太多的加载, 在所有的页面中可以共享 */
-  const detailedGameLruMap = new QuickLRU<number, Game>({ maxSize: 568 })
+  const detailedGameLruMap = new QuickLRU<string, Game>({ maxSize: 568 })
 
   return {
     settings,

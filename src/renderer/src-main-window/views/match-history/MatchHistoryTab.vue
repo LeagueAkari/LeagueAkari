@@ -20,6 +20,7 @@
         <RankedTable v-if="tab.rankedStats" :ranked-stats="tab.rankedStats" />
       </div>
     </NModal>
+    <GamePreviewer ref="game-previewer" />
 
     <!-- Floating header -->
     <Transition name="bi-fade">
@@ -340,6 +341,13 @@
                 </span>
                 <NPopconfirm
                   type="warning"
+                  :positive-button-props="{
+                    type: 'warning',
+                    size: 'tiny'
+                  }"
+                  :negative-button-props="{
+                    size: 'tiny'
+                  }"
                   @positive-click="handleRemoveTag(tagInfo.puuid, tagInfo.selfPuuid)"
                 >
                   <template #trigger>
@@ -576,14 +584,23 @@
             </div>
 
             <!-- Encountered games -->
-            <div class="left-content-item" v-if="!isSelfTab && tab.encounteredGamesPage?.total">
+            <div
+              class="left-content-item"
+              v-if="
+                !isSelfTab &&
+                tab.sgpServerId === sgps.availability.sgpServerId &&
+                tab.encounteredGamesPage?.total
+              "
+            >
               <EncounteredGames
                 :data="tab.encounteredGamesPage?.data"
                 :page="tab.encounteredGamesPage?.page"
                 :page-size="tab.encounteredGamesPage?.pageSize"
                 :total="tab.encounteredGamesPage?.total"
                 :loading="tab.isLoadingEncounteredGames"
-                @page-change="loadEncounteredGames"
+                @update:page="loadEncounteredGames"
+                @delete-record="handleDeleteEncounteredGame"
+                @preview-game="handlePreviewGame"
               />
             </div>
           </div>
@@ -602,6 +619,7 @@
               :game="g.game"
               v-for="g of tab.matchHistoryPage?.games"
               :key="g.game.gameId"
+              :data-game-id="g.game.gameId"
             />
             <div
               class="match-history-empty-placeholder"
@@ -619,6 +637,7 @@
 
 <script setup lang="ts">
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
+import GamePreviewer from '@renderer-shared/components/GamePreviewer.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
@@ -638,6 +657,7 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { Game } from '@shared/types/league-client/match-history'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
@@ -719,6 +739,7 @@ const mainContentScrollTop = ref(0)
 const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
 const innerContainerEl = useTemplateRef('inner-container')
+const gamePreviewer = useTemplateRef('game-previewer')
 
 // ==================== Composables ====================
 const isSmallScreen = useMediaQuery(`(max-width: 1100px)`)
@@ -846,7 +867,7 @@ const recentlyPlayers = computed(() => {
 const VIEW_NAMESPACE = 'view:MatchHistoryTab'
 const SHOW_TINY_HEADER_THRESHOLD = 160
 const UPDATE_SPECTATOR_DATA_INTERVAL = 60 * 1000 // 1 分钟
-const ENCOUNTERED_GAMES_PAGE_SIZE = 20
+const ENCOUNTERED_GAMES_PAGE_SIZE = 10
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
 
@@ -1124,6 +1145,10 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
           game: markRaw(g)
         }))
       }
+
+      data.games.games.forEach((g) => {
+        mhs.detailedGameLruMap.set(`sgp:${g.gameId}`, g)
+      })
     } else {
       // 若否, 则使用 LCU API, 仅限当前登录大区
       if (sgps.availability.sgpServerId === tab.sgpServerId) {
@@ -1148,7 +1173,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         }
 
         const tasks = tab.matchHistoryPage.games.map(async (g) => {
-          const cached = mhs.detailedGameLruMap.get(g.game.gameId)
+          const cached = mhs.detailedGameLruMap.get(`lcu:${g.game.gameId}`)
           if (cached) {
             g.game = markRaw(cached)
             g.isDetailed = true
@@ -1160,7 +1185,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
             const { data: game } = await lc.api.matchHistory.getGame(g.game.gameId)
             g.game = markRaw(game)
             g.isDetailed = true
-            mhs.detailedGameLruMap.set(g.game.gameId, game)
+            mhs.detailedGameLruMap.set(`lcu:${g.game.gameId}`, game)
           } catch (error) {
             g.hasError = true
             log.warn(VIEW_NAMESPACE, '拉取详细战绩信息失败', error)
@@ -1196,22 +1221,35 @@ const loadDetailedGame = async (dataState: GameDataState) => {
   dataState.isLoading = true
 
   try {
-    const cached = mhs.detailedGameLruMap.get(dataState.game.gameId)
-    if (cached) {
-      dataState.game = markRaw(cached)
-      dataState.isDetailed = true
-      return
-    }
-
     if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+      const cached = mhs.detailedGameLruMap.get(`sgp:${dataState.game.gameId}`)
+
+      if (cached) {
+        dataState.game = markRaw(cached)
+        dataState.isDetailed = true
+        return
+      }
+
       const data = await sgp.getGameSummaryLcuFormat(dataState.game.gameId, tab.sgpServerId)
       dataState.game = markRaw(data)
       dataState.isDetailed = true
+
+      mhs.detailedGameLruMap.set(`sgp:${dataState.game.gameId}`, data)
     } else {
       if (sgps.availability.sgpServerId === tab.sgpServerId) {
+        const cached = mhs.detailedGameLruMap.get(`lcu:${dataState.game.gameId}`)
+
+        if (cached) {
+          dataState.game = markRaw(cached)
+          dataState.isDetailed = true
+          return
+        }
+
         const { data } = await lc.api.matchHistory.getGame(dataState.game.gameId)
         dataState.game = markRaw(data)
         dataState.isDetailed = true
+
+        mhs.detailedGameLruMap.set(`lcu:${dataState.game.gameId}`, data)
       }
     }
   } catch (error: any) {
@@ -1259,8 +1297,13 @@ const loadTags = async () => {
   }
 }
 
-const loadEncounteredGames = async (page = 1) => {
+const loadEncounteredGames = async (page: number) => {
   if (tab.isLoadingEncounteredGames) {
+    return
+  }
+
+  // support only on self sgp server
+  if (isSelfTab.value && tab.sgpServerId !== sgps.availability.sgpServerId) {
     return
   }
 
@@ -1297,14 +1340,26 @@ const loadEncounteredGames = async (page = 1) => {
   }
 }
 
-const scrollToRightElTop = () => {
+const scrollToRightElTop = (gameId?: number) => {
   if (rightEl.value && innerContainerEl.value) {
     const top = rightEl.value.offsetTop
-    const padding = parseInt(window.getComputedStyle(innerContainerEl.value).paddingTop, 10)
-    const relativeTop = top - padding
 
-    if (relativeTop && relativeTop < mainContentScrollTop.value) {
-      scrollEl.value?.scrollTo({ top: relativeTop })
+    if (typeof gameId === 'number') {
+      const thatGameEl: HTMLElement | null = rightEl.value.querySelector(
+        `[data-game-id="${gameId}"]`
+      )
+
+      if (thatGameEl) {
+        const relativeTop = thatGameEl.offsetTop - 64 // floating header
+        scrollEl.value?.scrollTo({ top: relativeTop, behavior: 'smooth' })
+      }
+    } else {
+      const padding = parseInt(window.getComputedStyle(innerContainerEl.value).paddingTop, 10)
+      const relativeTop = top - padding
+
+      if (relativeTop && relativeTop < mainContentScrollTop.value) {
+        scrollEl.value?.scrollTo({ top: relativeTop })
+      }
     }
   }
 }
@@ -1459,7 +1514,7 @@ const handleRefresh = async () => {
       mhFn(),
       loadTags(),
       updateSpectatorData(),
-      loadEncounteredGames()
+      loadEncounteredGames(1)
     ])
   } catch {}
 }
@@ -1511,6 +1566,26 @@ const handleToSummoner = (puuid: string, setCurrent = true) => {
     navigateToTabByPuuidAndSgpServerId(puuid, tab.sgpServerId)
   } else {
     mh.createTab(puuid, tab.sgpServerId, false)
+  }
+}
+
+const handleDeleteEncounteredGame = async (recordId: number) => {
+  await sp.deleteEncounteredGame(recordId)
+  await loadEncounteredGames(tab.encounteredGamesPage?.page || 1)
+}
+
+const handlePreviewGame = (game: Game | number, forceModal?: boolean) => {
+  if (forceModal) {
+    gamePreviewer.value?.showGame(game, tab.puuid)
+  } else {
+    const id = typeof game === 'number' ? game : game.gameId
+    const thatGame = tab.matchHistoryPage?.games.find((g) => g.game.gameId === id)
+    if (thatGame) {
+      thatGame.isExpanded = true
+      nextTick(() => scrollToRightElTop(id))
+    } else {
+      gamePreviewer.value?.showGame(game, tab.puuid)
+    }
   }
 }
 

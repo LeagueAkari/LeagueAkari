@@ -86,6 +86,10 @@ export class SavedPlayerRenderer {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryEncounteredGames', dto)
   }
 
+  deleteEncounteredGame(recordId: number) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteEncounteredGame', recordId)
+  }
+
   updatePlayerTag<T extends UpdateTagDto>(dto: T) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePlayerTag', dto)
   }

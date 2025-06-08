@@ -1359,6 +1359,13 @@ MatchHistoryTab:
 EncounteredGames:
   title: History Games
   pageInfo: '{{page}} / {{totalPage}}'
+  noData: No data available.
+  deletePopconfirm: Confirm to delete this game record?
+  loading: Loading...
+  opponent: Enemy
+  teammate: Ally
+  win: Win
+  lose: Lose
 
 MatchHistoryCard:
   kprTitle: 'Kill participation in team: {{rate}}%'

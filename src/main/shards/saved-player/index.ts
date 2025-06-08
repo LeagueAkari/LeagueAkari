@@ -79,6 +79,10 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     }
   }
 
+  async deleteEncounteredGame(recordId: number) {
+    return this._storage.dataSource.manager.delete(EncounteredGame, { id: recordId })
+  }
+
   async saveEncounteredGame(dto: EncounteredGameSaveDto) {
     const g = new EncounteredGame()
     g.gameId = dto.gameId
@@ -390,6 +394,10 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
         return this.queryEncounteredGames(query)
       }
     )
+
+    this._ipc.onCall(SavedPlayerMain.id, 'deleteEncounteredGame', (_, recordId: number) => {
+      return this.deleteEncounteredGame(recordId)
+    })
 
     this._ipc.onCall(
       SavedPlayerMain.id,

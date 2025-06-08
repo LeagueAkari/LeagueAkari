@@ -795,8 +795,8 @@ const friends = shallowRef<Friend[]>([])
 const sortedFriends = computed(() => {
   return friends.value
     .toSorted((a, b) => {
-      const av = PRIORITY[a.availability] || 1
-      const bv = PRIORITY[b.availability] || 1
+      const av = PRIORITY[a.availability] || 0
+      const bv = PRIORITY[b.availability] || 0
 
       return bv - av
     })
