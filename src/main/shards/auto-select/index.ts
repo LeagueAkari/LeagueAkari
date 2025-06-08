@@ -31,8 +31,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private _aramTracker = new AramTracker()
 
   constructor(
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain
@@ -303,7 +303,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.structural }
     )
 
     this._mobx.reaction(
@@ -329,16 +329,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           )
           this.state.setUpcomingBan(ban.championId, Date.now() + delayMs)
           this._banTask.setTask(
-            () =>
-              this._ban(ban.championId, ban.action.id).finally(() =>
-                this.state.setUpcomingBan(null)
-              ),
+            () => {
+              this._ban(ban.championId, ban.action.id)
+              this.state.setUpcomingBan(null)
+            },
             true,
             delayMs
           )
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.structural }
     )
 
     // 用于校正时间

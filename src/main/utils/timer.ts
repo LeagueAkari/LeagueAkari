@@ -47,12 +47,14 @@ export class TimeoutTask {
       return
     }
 
+    let cb = this._callback
+
     // 先取消已存在的定时器，避免重复
     this.cancel()
 
     this._isStarted = true
     this._timerId = setTimeout(() => {
-      this._callback?.()
+      cb()
       this._isStarted = false
       this._timerId = null
     }, this._delay)
