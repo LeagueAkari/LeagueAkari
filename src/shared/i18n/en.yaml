@@ -2095,6 +2095,7 @@ SendableItemEdit:
   saveButton: Save
   deleteButton: Delete
   errorTemplateInvalid: Invalid template used
+  errorTemplateExecutionFailed: An error occurred when executing the template last time
   plaintextPlaceholder: |
     Provide the text split by lines here, like:
     First line
@@ -2105,7 +2106,7 @@ SendableItemEdit:
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   saveSuccess: Saved {{name}}
   dryRunEmpty: Dry run result is empty
-  dryRunError: 'Dry run failed: {{reason}}'
+  dryRunError: 'Dry run failed'
 
   contentType:
     label: Content Type

@@ -90,7 +90,25 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeTemplate', id)
   }
 
-  getDryRunResult(templateId: string, target: 'ally' | 'enemy' | 'all'): Promise<string[]> {
+  getDryRunResult(
+    templateId: string,
+    target: 'ally' | 'enemy' | 'all'
+  ): Promise<{
+    messages: string[]
+    error: string | null
+  }> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getDryRunResult', templateId, target)
+  }
+
+  onTemplateExecutionFailed(callback: (data: { templateId: string; error: string }) => void) {
+    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'error-template-execution-failed', callback)
+  }
+
+  onTemplateExecutionSucceeded(callback: (data: { templateId: string }) => void) {
+    return this._ipc.onEventVue(
+      MAIN_SHARD_NAMESPACE,
+      'success-template-execution-succeeded',
+      callback
+    )
   }
 }

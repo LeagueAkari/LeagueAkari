@@ -2097,6 +2097,7 @@ SendableItemEdit:
   saveButton: 保存
   deleteButton: 删除
   errorTemplateInvalid: 使用了无效的模板
+  errorTemplateExecutionFailed: 上一次执行次模板时出现错误
   plaintextPlaceholder: |
     在这里提供按行分割的文本，比如：
     第一行
@@ -2106,7 +2107,7 @@ SendableItemEdit:
   deleteSuccess: 已删除 {{name}}
   deletePopconfirm: 这将执行删除操作，且不可恢复
   saveSuccess: 已保存 {{name}}
-  dryRunError: 试运行失败：{{reason}}
+  dryRunError: 试运行失败
   dryRunEmpty: 试运行结果为空
 
   enabled:

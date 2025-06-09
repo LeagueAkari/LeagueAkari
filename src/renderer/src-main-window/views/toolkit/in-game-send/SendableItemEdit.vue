@@ -63,6 +63,20 @@
                     {{ t('SendableItemEdit.errorTemplateInvalid') }}
                   </div>
                 </NPopover>
+                <NPopover v-else-if="executionErrors[item.id]" placement="right">
+                  <template #trigger>
+                    <NIcon class="invalid-icon">
+                      <Warning20FilledIcon />
+                    </NIcon>
+                  </template>
+                  <div :class="$style['error-message']">
+                    <div :class="$style['error-title']">
+                      {{ t('SendableItemEdit.errorTemplateExecutionFailed') }}
+                    </div>
+                    <div :class="$style['error-divider']"></div>
+                    <div :class="$style['error-content']">{{ executionErrors[item.id] }}</div>
+                  </div>
+                </NPopover>
                 <NPopover v-else-if="item.enabled" placement="right">
                   <template #trigger>
                     <NIcon class="enabled-icon">
@@ -236,7 +250,7 @@
                   :disabled="!currentItem.content.templateId"
                   secondary
                   size="tiny"
-                  @click="handleDryRun(currentItem.content.templateId!, 'all')"
+                  @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'all')"
                 >
                   {{ t('SendableItemEdit.dryRun.all') }}
                 </NButton>
@@ -244,7 +258,7 @@
                   :disabled="!currentItem.content.templateId"
                   secondary
                   size="tiny"
-                  @click="handleDryRun(currentItem.content.templateId!, 'ally')"
+                  @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'ally')"
                 >
                   {{ t('SendableItemEdit.dryRun.ally') }}
                 </NButton>
@@ -252,7 +266,7 @@
                   :disabled="!currentItem.content.templateId"
                   secondary
                   size="tiny"
-                  @click="handleDryRun(currentItem.content.templateId!, 'enemy')"
+                  @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'enemy')"
                 >
                   {{ t('SendableItemEdit.dryRun.enemy') }}
                 </NButton>
@@ -349,7 +363,7 @@ import {
   useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, h, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, ref, shallowReactive, shallowRef, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -548,45 +562,65 @@ watch(
 const dialog = useDialog()
 const dialogRef = shallowRef<DialogReactive>()
 
-const handleDryRun = async (templateId: string, target: 'ally' | 'enemy' | 'all') => {
-  try {
-    const result = await igs.getDryRunResult(templateId, target)
+const executionErrors = shallowReactive<Record<string, string>>({})
 
-    dialogRef.value?.destroy()
-    dialogRef.value = dialog.create({
-      type: 'info',
-      title: 'Dry Run',
-      content: () =>
-        h(
-          NScrollbar,
-          {
-            style: { maxHeight: '80vh' }
-          },
-          () =>
-            result.length > 0
-              ? h(
-                  'div',
-                  { style: { userSelect: 'text' } },
-                  result.map((line) => h('div', line))
-                )
-              : h(
-                  'div',
-                  {
-                    style: {
-                      color: '#fff8'
-                    }
-                  },
-                  '(' + t('SendableItemEdit.dryRunEmpty') + ')'
-                )
-        )
-    })
-  } catch (error: any) {
-    message.error(() =>
-      t('SendableItemEdit.dryRunError', {
-        reason: error.message
-      })
-    )
+igs.onTemplateExecutionFailed(({ templateId, error }) => {
+  executionErrors[templateId] = error
+
+  // 不会堆积太多
+  for (const id of Object.keys(executionErrors)) {
+    if (!sendableItems.value.find((item) => item.id === id)) {
+      delete executionErrors[id]
+    }
   }
+})
+
+igs.onTemplateExecutionSucceeded(({ templateId }) => {
+  delete executionErrors[templateId]
+})
+
+const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'enemy' | 'all') => {
+  const result = await igs.getDryRunResult(templateId, target)
+
+  if (result.error) {
+    message.error(() => t('SendableItemEdit.dryRunError'))
+    executionErrors[id] = result.error
+
+    return
+  } else {
+    delete executionErrors[id]
+  }
+
+  dialogRef.value?.destroy()
+  dialogRef.value = dialog.create({
+    type: 'info',
+    title: 'Dry Run',
+    content: () =>
+      h(
+        NScrollbar,
+        {
+          style: { maxHeight: '80vh' }
+        },
+        () =>
+          result.messages.length > 0
+            ? h(
+                'div',
+                {
+                  style: { userSelect: 'text' }
+                },
+                result.messages.map((line) => h('div', line))
+              )
+            : h(
+                'div',
+                {
+                  style: {
+                    color: '#fff8'
+                  }
+                },
+                '(' + t('SendableItemEdit.dryRunEmpty') + ')'
+              )
+      )
+  })
 }
 </script>
 
@@ -766,6 +800,25 @@ const handleDryRun = async (templateId: string, target: 'ally' | 'enemy' | 'all'
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+}
+</style>
+
+<style lang="less" module>
+.error-message {
+  .error-title {
+    font-size: 12px;
+  }
+
+  .error-divider {
+    height: 1px;
+    background-color: #fff2;
+    margin: 8px 0;
+  }
+
+  .error-content {
+    font-size: 12px;
+    white-space: pre-wrap;
   }
 }
 </style>

@@ -6,7 +6,6 @@ import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
-import { comparer } from 'mobx'
 import fs from 'node:fs'
 import vm from 'node:vm'
 
@@ -165,6 +164,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
         if (ctx) {
           const lines = ctx.getMessages(this._createTemplateEnv({ target }))
           this._sendTextToChatOrInGame(lines, this._currentSendController.signal)
+          this._ipc.sendEvent(InGameSendMain.id, 'success-template-execution-succeeded', {
+            templateId: s.content.templateId
+          })
         } else {
           this._log.warn('Template context not found', s.content.templateId)
         }
@@ -185,10 +187,23 @@ export class InGameSendMain implements IAkariShardInitDispose {
     const ctx = this._vmContexts[templateId] as JSContextV1
     if (!ctx) {
       this._log.warn('Template context not found', templateId)
-      return null
+      return {
+        messages: [],
+        error: 'Template context not found'
+      }
     }
 
-    return ctx.getMessages(this._createTemplateEnv({ target }))
+    try {
+      return {
+        messages: ctx.getMessages(this._createTemplateEnv({ target })),
+        error: null
+      }
+    } catch (error) {
+      return {
+        messages: [],
+        error: formatError(error)
+      }
+    }
   }
 
   /**

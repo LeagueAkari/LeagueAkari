@@ -58,7 +58,11 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     this._log = _loggerFactory.create(SettingFactoryMain.id)
   }
 
-  register<T extends object = any>(namespace: string, schema: SettingSchema<T>, obj: T) {
+  register<T extends object = any>(
+    namespace: string,
+    schema: SettingSchema<T> = {},
+    obj: T = {} as T
+  ) {
     if (this._settings.has(namespace)) {
       throw new Error(`namespace ${namespace} already created`)
     }
