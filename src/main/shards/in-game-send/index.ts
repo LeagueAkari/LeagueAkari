@@ -199,6 +199,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
         error: null
       }
     } catch (error) {
+      this._log.warn('Template execution failed', templateId, error)
       return {
         messages: [],
         error: formatError(error)
