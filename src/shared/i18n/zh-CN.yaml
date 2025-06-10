@@ -1219,6 +1219,11 @@ SummonerProfile:
       title: 卸下所有勋章
       description: 卸下所有勋章失败 {{reason}}
 
+  emotes:
+    label: 卸下所有表情
+    description: 卸下所有表情，包括表情轮盘以及事件回应
+    button: 执行
+
 GameView:
   title: 查看游戏
 

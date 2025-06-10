@@ -25,8 +25,9 @@
           @click="handleApplyToProfile"
           :disabled="!currentSkinId"
           :loading="isProceeding"
-          >{{ t('SummonerProfile.skinSelectModal.button') }}</NButton
         >
+          {{ t('SummonerProfile.skinSelectModal.button') }}
+        </NButton>
       </div>
       <NSelect
         filterable
@@ -57,8 +58,9 @@
         type="primary"
         @click="isModalShow = true"
         :disabled="lcs.connectionState !== 'connected'"
-        >{{ t('SummonerProfile.profileBackground.button') }}</NButton
       >
+        {{ t('SummonerProfile.profileBackground.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -71,8 +73,9 @@
         @click="handleUpdatePr"
         :loading="isUpdating"
         size="small"
-        >{{ t('SummonerProfile.bannerAccent.button') }}</NButton
       >
+        {{ t('SummonerProfile.bannerAccent.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -92,8 +95,9 @@
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
         size="small"
-        >{{ t('SummonerProfile.prestigeCrest.button') }}</NButton
       >
+        {{ t('SummonerProfile.prestigeCrest.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -106,8 +110,24 @@
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
         size="small"
-        >{{ t('SummonerProfile.token.button') }}</NButton
       >
+        {{ t('SummonerProfile.token.button') }}
+      </NButton>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      :label-description="t('SummonerProfile.emotes.description')"
+      :label="t('SummonerProfile.emotes.label')"
+      :label-width="260"
+    >
+      <NButton
+        :disabled="lcs.connectionState !== 'connected'"
+        @click="handleClearEmotes"
+        :loading="isClearingEmotes"
+        size="small"
+      >
+        {{ t('SummonerProfile.emotes.button') }}
+      </NButton>
     </ControlItem>
   </NCard>
 </template>
@@ -329,10 +349,10 @@ const handleApplyToProfile = async () => {
     if (currentAugmentId.value !== undefined) {
       await lc.api.summoner.setSummonerBackgroundAugments(currentAugmentId.value)
     }
-    message.success(t('SummonerProfile.commonSuccess'), { duration: 1000 })
+    message.success(() => t('SummonerProfile.commonSuccess'), { duration: 1000 })
   } catch (error) {
     console.warn(error)
-    message.warning(t('SummonerProfile.commonFailed'), { duration: 1000 })
+    message.warning(() => t('SummonerProfile.commonFailed'), { duration: 1000 })
   } finally {
     isProceeding.value = false
   }
@@ -349,9 +369,9 @@ const handleUpdatePr = async () => {
   try {
     isUpdating.value = true
     await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isUpdating.value = false
@@ -375,9 +395,9 @@ const handleRemovePrestigeCrest = async () => {
       preferredBannerType: current.data.bannerType,
       selectedPrestigeCrest: FIXED_PRESTIGE_CREST
     })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingPrestigeCrest.value = false
@@ -397,12 +417,55 @@ const handleRemoveTokens = async () => {
       challengeIds: [],
       bannerAccent: (await lc.api.chat.getMe()).data.lol?.bannerIdSelected
     })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingTokens.value = false
+  }
+}
+
+const isClearingEmotes = ref(false)
+const handleClearEmotes = async () => {
+  if (isClearingEmotes.value) {
+    return
+  }
+
+  try {
+    isClearingEmotes.value = true
+
+    const { data } = await lc.api.loadouts.getAccountScopeLoadouts()
+
+    if (!data.length) {
+      message.warning(() => t('SummonerProfile.commonFailed'))
+      return
+    }
+
+    const loadoutId = data[0].id
+
+    await lc.api.loadouts.setEmotes(loadoutId, {
+      EMOTES_ACE: -1,
+      EMOTES_FIRST_BLOOD: -1,
+      EMOTES_VICTORY: -1,
+      EMOTES_WHEEL_CENTER: -1,
+      EMOTES_WHEEL_UPPER: -1,
+      EMOTES_WHEEL_RIGHT: -1,
+      EMOTES_WHEEL_UPPER_RIGHT: -1,
+      EMOTES_WHEEL_UPPER_LEFT: -1,
+      EMOTES_WHEEL_LOWER: -1,
+      EMOTES_START: -1,
+      EMOTES_WHEEL_LEFT: -1,
+      EMOTES_WHEEL_LOWER_RIGHT: -1,
+      EMOTES_WHEEL_LOWER_LEFT: -1
+    })
+
+    message.success(() => t('SummonerProfile.commonSuccess'))
+  } catch (error) {
+    message.warning(() => t('SummonerProfile.commonFailed'))
+    console.warn(error)
+  } finally {
+    isClearingEmotes.value = false
   }
 }
 </script>

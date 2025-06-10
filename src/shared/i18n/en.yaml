@@ -1217,6 +1217,11 @@ SummonerProfile:
       title: Remove All Tokens
       description: 'Failed to remove all tokens: {{reason}}'
 
+  emotes:
+    label: Remove All Emotes
+    description: Remove all emotes, including emote wheel and event responses.
+    button: Execute
+
 GameView:
   title: View Game
 
