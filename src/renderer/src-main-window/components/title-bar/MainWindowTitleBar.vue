@@ -76,6 +76,7 @@ const shouldShowDivider = computed(() => {
 
 .app-name {
   padding: 0 4px;
+  font-family: 'Comfortaa', sans-serif;
   font-weight: bold;
   margin-left: 8px;
 }
