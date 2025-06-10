@@ -529,7 +529,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     template: TemplateDef
   ): [boolean, any | null, JS_TEMPLATE_CHECK_RESULT | Error | null] {
     this._vmContexts[template.id] = vm.createContext({
-      ...this._getAkariContext(),
+      ...this._getAkariContext(template.id),
       template
     })
 
@@ -663,7 +663,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    * 在提供完全的控制权的同时, 危险程度也相应提高
    * @returns
    */
-  private _getAkariContext() {
+  private _getAkariContext(templateId: string) {
     return {
       MAX_VERSION_SUPPORTED: 10,
       require,
@@ -671,6 +671,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       akariManager: this._shared.manager,
       console,
       module,
+      templateId,
       __filename,
       __dirname,
       mainGlobal: global,
