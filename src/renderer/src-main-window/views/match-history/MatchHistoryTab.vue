@@ -1575,8 +1575,12 @@ const handleDeleteEncounteredGame = async (recordId: number) => {
 }
 
 const handlePreviewGame = (game: Game | number, forceModal?: boolean) => {
+  if (!lcs.summoner.me) {
+    return
+  }
+
   if (forceModal) {
-    gamePreviewer.value?.showGame(game, tab.puuid)
+    gamePreviewer.value?.showGame(game, lcs.summoner.me.puuid)
   } else {
     const id = typeof game === 'number' ? game : game.gameId
     const thatGame = tab.matchHistoryPage?.games.find((g) => g.game.gameId === id)
@@ -1584,7 +1588,7 @@ const handlePreviewGame = (game: Game | number, forceModal?: boolean) => {
       thatGame.isExpanded = true
       nextTick(() => scrollToRightElTop(id))
     } else {
-      gamePreviewer.value?.showGame(game, tab.puuid)
+      gamePreviewer.value?.showGame(game, lcs.summoner.me.puuid)
     }
   }
 }
