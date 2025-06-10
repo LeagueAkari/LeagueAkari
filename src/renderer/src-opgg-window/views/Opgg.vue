@@ -977,6 +977,19 @@ const handleAddToItemSet = async () => {
       })
     }
 
+    function itemBugHotfix(id: number): number {
+      switch (id) {
+        case 3121:
+          return 3119;
+        case 3042:
+          return 3004;
+        case 3040:
+          return 3003;
+        default:
+          return id;
+      }
+    }
+
     await lc.writeItemSetsToDisk([
       {
         uid: newUid,
@@ -988,7 +1001,7 @@ const handleAddToItemSet = async () => {
         blocks: itemGroups.map((g) => ({
           type: g.title,
           items: g.items.map((i) => ({
-            id: i.toString(),
+            id: itemBugHotfix(i).toString(),
             count: 1
           }))
         })),
