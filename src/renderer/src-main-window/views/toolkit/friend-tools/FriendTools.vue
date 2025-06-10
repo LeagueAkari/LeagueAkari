@@ -100,6 +100,8 @@ import {
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
@@ -108,6 +110,10 @@ const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
 const sgp = useInstance(SgpRenderer)
+
+const mh = useInstance(MatchHistoryTabsRenderer)
+
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
 
 const message = useMessage()
 
@@ -167,8 +173,10 @@ const renderGroupName = (row: any) => {
         display: 'inline-flex',
         gap: '4px',
         fontSize: '14px',
-        alignItems: 'center'
-      }
+        alignItems: 'center',
+        cursor: 'pointer'
+      },
+      onClick: () => navigateToTabByPuuid(row.puuid)
     },
     [
       h(LcuImage, {
