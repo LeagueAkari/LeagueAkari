@@ -133,7 +133,12 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
         queueType: query.queueType
       })
 
-      return { ...savedPlayer, encounteredGames }
+      const tags = await this.getPlayerTags({
+        puuid: query.puuid,
+        selfPuuid: query.selfPuuid
+      })
+
+      return { ...savedPlayer, encounteredGames, tags }
     }
 
     return null
@@ -230,7 +235,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
    * 不可跨区服查询
    * @param query
    */
-  async getPlayerTags(query: SavedPlayerQueryDto) {
+  async getPlayerTags(query: Partial<SavedPlayerQueryDto>) {
     if (!query.puuid || !query.selfPuuid) {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
