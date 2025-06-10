@@ -393,6 +393,10 @@ MultiWindowSettings:
         countdown: Countdown Mode
         countup: Count-Up Mode
 
+    reverseAdjustmentDirection:
+      label: Reverse Adjustment Direction
+      description: Reverse the direction of the timer adjustment. When the wheel is moved up, the time increases, and when the wheel is moved down, the time decreases. This only takes effect when the timer type is count-up mode.
+
 MiscSettings:
   title: Misc
 

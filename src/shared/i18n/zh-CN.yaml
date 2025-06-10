@@ -396,6 +396,10 @@ MultiWindowSettings:
         countdown: 倒计时模式
         countup: 计时模式
 
+    reverseAdjustmentDirection:
+      label: 反转时间调整方向
+      description: 调整计时器时间时，反转方向。滑轮上移增加，下移减少
+
 MiscSettings:
   title: 其他
 

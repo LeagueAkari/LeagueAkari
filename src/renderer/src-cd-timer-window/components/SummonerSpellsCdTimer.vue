@@ -170,7 +170,7 @@ const adjustTimer = (id: string, deltaY: number) => {
     return
   }
 
-  const timeDelta = deltaY * 50 // 50 is a suitable value, up -> negative, down -> positive
+  const timeDelta = ctws.settings.reverseAdjustmentDirection ? -deltaY * 50 : deltaY * 50 // 50 is a suitable value, up -> negative, down -> positive
   const currentBaseTime = record[1]
 
   // 对于countup，不允许调整时间导致其小于基准时间

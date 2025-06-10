@@ -111,7 +111,8 @@ export const useCdTimerWindowStore = defineStore(
       opacity: 1,
       pinned: true,
       showShortcut: null as string | null,
-      timerType: 'countdown' as 'countdown' | 'countup'
+      timerType: 'countdown' as 'countdown' | 'countup',
+      reverseAdjustmentDirection: false
     })
 
     const basicWindowState = useBasicWindowStates()
