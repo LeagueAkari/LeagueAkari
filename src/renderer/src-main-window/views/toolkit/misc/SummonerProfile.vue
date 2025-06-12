@@ -197,10 +197,12 @@ const skinOptions = computed(() => {
     const augOptions1: any[] = []
     if (v.skinAugments && v.skinAugments.augments) {
       for (const au of v.skinAugments.augments) {
-        augOptions1.push({
-          label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-          value: au.contentId
-        })
+        if (au.overlays) {
+          augOptions1.push({
+            label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+            value: au.contentId
+          })
+        }
       }
     }
 
@@ -224,10 +226,12 @@ const skinOptions = computed(() => {
           const augOptions2: any[] = []
           if (ti.skinAugments && ti.skinAugments.augments) {
             for (const au of ti.skinAugments.augments) {
-              augOptions2.push({
-                label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-                value: au.contentId
-              })
+              if (au.overlays) {
+                augOptions2.push({
+                  label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+                  value: au.contentId
+                })
+              }
             }
           }
 
