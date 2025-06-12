@@ -308,6 +308,7 @@
       @show-game="(game, puuid) => emits('showGame', game, puuid)"
       @show-game-by-id="(gameId, puuid) => emits('showGameById', gameId, puuid)"
       @highlight="(premadeTeamId, hovering) => emits('highlight', premadeTeamId, hovering)"
+      @to-summoner="emits('toSummoner', $event)"
     />
     <div class="frequent-used-champions" v-if="championUsage.length">
       <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :delay="50">

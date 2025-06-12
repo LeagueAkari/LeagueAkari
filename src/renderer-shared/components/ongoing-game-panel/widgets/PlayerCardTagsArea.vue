@@ -24,7 +24,11 @@
           </div>
           <div class="tag-source" v-else>
             <span class="tagged-by-other-text">{{ t('PlayerInfoCard.taggedByOther') }}</span>
-            <span v-if="ogs.summoner[tag.selfPuuid]" class="tagged-by-other-name">
+            <span
+              v-if="ogs.summoner[tag.selfPuuid]"
+              class="tagged-by-other-name"
+              @click="emits('toSummoner', tag.selfPuuid)"
+            >
               {{ riotId(ogs.summoner[tag.selfPuuid].data) }}
             </span>
             <span v-else class="tagged-by-other-name unknown">
@@ -608,6 +612,7 @@ const emits = defineEmits<{
   showGame: [game: Game, selfPuuid: string]
   showGameById: [gameId: number, selfPuuid: string]
   highlight: [premadeTeamId: string, boolean]
+  toSummoner: [puuid: string]
 }>()
 
 const { t } = useTranslation()
@@ -939,7 +944,9 @@ onDeactivated(() => {
     }
 
     .tagged-by-other-name {
+      font-weight: bold;
       color: #ffffff;
+      cursor: pointer;
 
       &.unknown {
         color: #ffffff80;

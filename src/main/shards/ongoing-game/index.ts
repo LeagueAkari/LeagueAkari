@@ -824,7 +824,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     )
 
     res.tags.forEach((t) => {
-      this._loadPlayerSummoner(t.puuid, {
+      this._loadPlayerSummoner(t.selfPuuid, {
         signal,
         force,
         priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_SUMMONER
