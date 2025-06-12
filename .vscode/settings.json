@@ -58,5 +58,6 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "compile-hero.disable-compile-files-on-did-save-code": false
 }

@@ -1,4 +1,4 @@
-import { input } from '@leagueakari/league-akari-addons'
+import { input, tools } from '@leagueakari/league-akari-addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
@@ -10,6 +10,7 @@ import fs from 'node:fs'
 import vm from 'node:vm'
 
 import { AppCommonMain } from '../app-common'
+import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
@@ -137,6 +138,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
         'Current phase does not support sending messages',
         this._og.state.queryStage.phase
       )
+      return
+    }
+
+    if (this._og.state.queryStage.phase === 'in-game' && !GameClientMain.isGameClientForeground()) {
+      this._log.warn('Game client is not foreground')
       return
     }
 
@@ -700,7 +706,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     let mutated = false
     if (item.sendAllShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(all)) {
+      const r = this._kbd.getRegistrationByTargetId(all)
+
+      if (!r || (r && r.shortcutId !== item.sendAllShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(all)
+        }
+
         try {
           this._kbd.register(all, item.sendAllShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'all')
@@ -716,7 +728,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     if (item.sendAllyShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(ally)) {
+      const r = this._kbd.getRegistrationByTargetId(ally)
+
+      if (!r || (r && r.shortcutId !== item.sendAllyShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(ally)
+        }
+
         try {
           this._kbd.register(ally, item.sendAllyShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'ally')
@@ -732,7 +750,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     if (item.sendEnemyShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(enemy)) {
+      const r = this._kbd.getRegistrationByTargetId(enemy)
+
+      if (!r || (r && r.shortcutId !== item.sendEnemyShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(enemy)
+        }
+
         try {
           this._kbd.register(enemy, item.sendEnemyShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'enemy')

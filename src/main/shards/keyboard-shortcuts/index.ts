@@ -84,6 +84,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     {
       type: 'last-active' | 'normal' | 'stateful'
       targetId: string
+      shortcutId: string
       cb: (details: ShortcutDetails) => void
     }
   >()
@@ -297,7 +298,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       }
     }
 
-    this._registrationMap.set(shortcutId, { type, targetId, cb })
+    this._registrationMap.set(shortcutId, { type, targetId, shortcutId, cb })
     this._targetIdMap.set(targetId, shortcutId)
     this._log.info(`Register shortcut ${shortcutId} for target ${targetId} (${type})`)
   }
@@ -330,6 +331,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       return {
         type: 'normal',
         targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
+        shortcutId,
         cb: () => {}
       }
     }
@@ -341,6 +343,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       return {
         type: 'normal',
         targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
+        shortcutId: '',
         cb: () => {}
       }
     }
