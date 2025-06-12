@@ -5033,6 +5033,7 @@ __metadata:
     quick-lru: "npm:^7.0.1"
     reflect-metadata: "npm:^0.2.2"
     regedit: "npm:^5.1.4"
+    safe-stable-stringify: "npm:^2.5.0"
     semver: "npm:^7.7.2"
     sqlite3: "npm:5.1.7"
     typeorm: "npm:^0.3.24"
@@ -6712,7 +6713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-stable-stringify@npm:^2.3.1":
+"safe-stable-stringify@npm:^2.3.1, safe-stable-stringify@npm:^2.5.0":
   version: 2.5.0
   resolution: "safe-stable-stringify@npm:2.5.0"
   checksum: 10c0/baea14971858cadd65df23894a40588ed791769db21bafb7fd7608397dbdce9c5aac60748abae9995e0fc37e15f2061980501e012cd48859740796bea2987f49

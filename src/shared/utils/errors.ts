@@ -1,8 +1,9 @@
 import { AxiosError } from 'axios'
+import { stringify } from 'safe-stable-stringify'
 
 export function formatError(e: any) {
   if (e instanceof AxiosError) {
-    return `AxiosError: ${e.message} url: ${e.config?.url}, method: ${e.config?.method},\n code: ${e.code},\n data: ${JSON.stringify(e.config?.data)},\n response: ${JSON.stringify(e.response?.data)},\n stack: ${e.stack}`
+    return `AxiosError: ${e.message} url: ${e.config?.url}, method: ${e.config?.method},\n code: ${e.code},\n data: ${stringify(e.config?.data)},\n response: ${stringify(e.response?.data)},\n stack: ${e.stack}`
   }
 
   if (e instanceof Error) {

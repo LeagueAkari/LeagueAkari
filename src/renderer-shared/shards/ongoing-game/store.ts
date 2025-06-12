@@ -79,6 +79,18 @@ export interface SavedInfo {
 
   lastMetAt: Date | null
 
+  // copied from main shard
+  tags: {
+    markedBySelf: boolean
+    puuid: string
+    selfPuuid: string
+    region: string
+    rsoPlatformId: string
+    tag: string | null
+    updateAt: Date
+    lastMetAt: Date | null
+  }[]
+
   encounteredGames: {
     data: EncounteredGame[]
     page: number

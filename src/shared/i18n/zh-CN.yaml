@@ -1640,12 +1640,15 @@ PlayerInfoCard:
 
   self: 自己
   tagged: 已标记
+  taggedBySelf: 已标记
+  taggedByOther: 来自
   premade: 小队 {{team}}
   highWinRate: 极高胜率
   met: 遇到过
   private: 生涯隐藏
   winningStreak: '{{countV}} 连胜'
   losingStreak: '{{countV}} 连败'
+  unknown: 未知
 
 TeamTagsArea:
   winRateTeam: 胜率队

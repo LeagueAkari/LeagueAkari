@@ -1633,6 +1633,9 @@ PlayerInfoCard:
 
   self: Self
   tagged: Tagged
+  taggedBySelf: Tagged
+  taggedByOther: Tagged by
+  unknown: Unknown
   premade: Team {{team}}
   highWinRate: High Win Rate
   met: Met
