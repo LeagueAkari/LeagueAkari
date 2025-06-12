@@ -151,7 +151,7 @@ import {
   SelectOption,
   useMessage
 } from 'naive-ui'
-import { VNode, VNodeChild, computed, h, ref, watch } from 'vue'
+import { VNode, computed, h, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 
