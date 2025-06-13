@@ -37,15 +37,16 @@
         v-model:value="currentSkinId"
         size="small"
         :filter="(a, b) => isNameMatch(a, b.label as string)"
-      ></NSelect>
+      />
       <NSelect
         filterable
         style="width: 340px"
+        :render-option="renderOption"
         v-if="currentAugmentOptions.length >= 1"
         :options="currentAugmentOptions"
         v-model:value="currentAugmentId"
         size="small"
-      ></NSelect>
+      />
     </NModal>
     <ControlItem
       class="control-item-margin"
@@ -139,7 +140,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
-import { ChampSkin } from '@shared/types/league-client/game-data'
+import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -188,32 +189,44 @@ const skinOptions = computed(() => {
   const arr: {
     label: string
     value: number
-    url: string
-    augments?: { label: string; value: string }[]
+    imgUrl: string
+    augments?: { label: string; value: string; imgUrl: string; overlays: AugmentOverlay[] }[]
   }[] = []
 
   const skinSet = new Set<number>()
   skinList.value.forEach((v) => {
-    const augOptions1: any[] = []
+    const augOptions1: {
+      label: string
+      value: string
+      imgUrl: string
+      overlays: AugmentOverlay[]
+    }[] = []
     if (v.skinAugments && v.skinAugments.augments) {
       for (const au of v.skinAugments.augments) {
         if (au.overlays) {
           augOptions1.push({
             label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-            value: au.contentId
+            imgUrl: v.uncenteredSplashPath,
+            value: au.contentId,
+            overlays: au.overlays
           })
         }
       }
     }
 
     if (augOptions1.length) {
-      augOptions1.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
+      augOptions1.unshift({
+        label: t('SummonerProfile.skinSelectModal.unset'),
+        value: '',
+        imgUrl: '',
+        overlays: []
+      })
     }
 
     arr.push({
       label: v.name,
       value: v.id,
-      url: v.uncenteredSplashPath || v.splashPath,
+      imgUrl: v.uncenteredSplashPath,
       augments: augOptions1
     })
 
@@ -223,26 +236,38 @@ const skinOptions = computed(() => {
     if (v.questSkinInfo && v.questSkinInfo.tiers) {
       v.questSkinInfo.tiers.forEach((ti) => {
         if (!skinSet.has(ti.id)) {
-          const augOptions2: any[] = []
+          const augOptions2: {
+            label: string
+            value: string
+            imgUrl: string
+            overlays: AugmentOverlay[]
+          }[] = []
           if (ti.skinAugments && ti.skinAugments.augments) {
             for (const au of ti.skinAugments.augments) {
               if (au.overlays) {
                 augOptions2.push({
                   label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-                  value: au.contentId
+                  value: au.contentId,
+                  imgUrl: ti.uncenteredSplashPath,
+                  overlays: au.overlays
                 })
               }
             }
           }
 
           if (augOptions2.length) {
-            augOptions2.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
+            augOptions2.unshift({
+              label: t('SummonerProfile.skinSelectModal.unset'),
+              value: '',
+              imgUrl: '',
+              overlays: []
+            })
           }
 
           arr.push({
             label: ti.name,
             value: ti.id,
-            url: ti.uncenteredSplashPath || ti.splashPath,
+            imgUrl: ti.uncenteredSplashPath,
             augments: augOptions2
           })
           skinSet.add(ti.id)
@@ -287,7 +312,7 @@ const renderLabel = (option: SelectOption) => {
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
   return h(
     NTooltip,
-    { placement: 'right', delay: 300, animated: true, raw: true },
+    { placement: 'right', delay: 300, animated: true, raw: true, disabled: !option.imgUrl },
     {
       trigger: () => node,
       default: () =>
@@ -295,23 +320,45 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
           'div',
           {
             style: {
+              position: 'relative',
               height: '160px',
+              minWidth: '280px',
               overflow: 'hidden',
               borderRadius: '4px',
               boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
               backgroundColor: 'rgba(0, 0, 0, 0.3)'
             }
           },
-          h(LcuImage, {
-            src: option.url as string,
-            cache: false,
-            style: {
-              height: '100%',
-              minWidth: '280px',
-              objectFit: 'cover',
-              overflow: 'hidden'
-            }
-          })
+          [
+            h(LcuImage, {
+              src: option.imgUrl as string,
+              cache: false,
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                overflow: 'hidden'
+              }
+            }),
+            ((option.overlays as AugmentOverlay[]) || []).map((o) =>
+              h(LcuImage, {
+                src: o.uncenteredLCOverlayPath,
+                cache: false,
+                style: {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  overflow: 'hidden'
+                }
+              })
+            )
+          ]
         )
     }
   )
