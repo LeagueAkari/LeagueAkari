@@ -91,8 +91,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
-    this._setup.addSetupFn(() => this._setupAutoRouteWhenGameStarts())
-
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
       store.summoner = {}
       store.matchHistory = {}
@@ -181,25 +179,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
         savePropKey: 'frontend/playerCard',
         watchOptions: { deep: true }
       }
-    )
-  }
-
-  private _setupAutoRouteWhenGameStarts() {
-    const router = useRouter()
-    const store = useOngoingGameStore()
-
-    const shouldRoute = computed(() => {
-      return store.queryStage.phase !== 'unavailable'
-    })
-
-    watch(
-      () => shouldRoute.value,
-      (value) => {
-        if (value && store.frontendSettings.autoRouteWhenGameStarts) {
-          router.replace({ name: 'ongoing-game' })
-        }
-      },
-      { immediate: true }
     )
   }
 

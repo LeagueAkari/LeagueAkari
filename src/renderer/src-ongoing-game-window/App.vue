@@ -7,6 +7,7 @@
         :self-puuid="showingGame.selfPuuid"
         v-model:show="isStandaloneMatchHistoryCardShow"
       />
+      <SetupInAppScope />
       <OngoingGamePanel
         class="ongoing-game-app-wrapper"
         :show-easy-to-launch="false"
@@ -21,6 +22,7 @@
 import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/compositions/useHideNotAppTag'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { reactive, ref, watch } from 'vue'
