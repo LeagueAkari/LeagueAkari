@@ -16,8 +16,8 @@
             :label-description="t('InGameSend.settings.cancelShortcut.description')"
           >
             <ShortcutSelector
-              :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
+              :target-id="InGameSendRenderer.CANCEL_SHORTCUT_TARGET_ID"
               @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
             />
           </ControlItem>

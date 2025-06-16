@@ -2150,6 +2150,15 @@ SendableItemEdit:
     ally: 友方
     enemy: 敌方
 
+RemoteTemplatesModal:
+  title: 云端模板
+  downloadButton: 下载
+  downloadSuccess: 下载成功 {{name}}
+  downloadFailed: 下载失败 {{name}}：{{reason}}
+  loadTemplatesFailed: 加载远程模板失败
+  noTemplates: 暂无模板
+  noTemplateDescription: 暂无描述
+
 simple-notifications-renderer:
   liveStreamingHints:
     dismiss: 关闭
@@ -2294,6 +2303,7 @@ in-game-send-main:
   templatePresets:
     empty: 空白模板
     ongoing-game: 默认对局模板
+    remote: 云端模板
 
   sendableItemPresets:
     plaintext: 纯文本

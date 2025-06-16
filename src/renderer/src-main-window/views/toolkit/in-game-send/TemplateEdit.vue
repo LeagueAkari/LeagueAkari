@@ -3,6 +3,10 @@
     <template #header>
       <span class="card-header-title">{{ t('TemplateEdit.title') }}</span>
     </template>
+
+    <!-- 此 Modal 内部自行处理逻辑 -->
+    <RemoteTemplatesModal v-model:show="showRemoteTemplatesModal" />
+
     <div class="template-hint" v-html="t('TemplateEdit.hint')" />
     <div class="template-edit">
       <div class="left-list">
@@ -209,6 +213,7 @@ import {
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
+import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
 import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 const { t } = useTranslation()
@@ -225,11 +230,15 @@ const dropdownOptions = computed(() => [
     key: 'empty'
   },
   {
+    label: t('in-game-send-main.templatePresets.ongoing-game'),
+    key: 'ongoing-game-default'
+  },
+  {
     type: 'divider'
   },
   {
-    label: t('in-game-send-main.templatePresets.ongoing-game'),
-    key: 'ongoing-game-default'
+    label: t('in-game-send-main.templatePresets.remote'),
+    key: 'remote'
   }
 ])
 
@@ -243,11 +252,19 @@ const handleDropdownSelect = async (key: string) => {
     return
   }
 
-  const item = await igs.createPresetTemplate(key)
-  if (item) {
-    updateActiveItem(item.id)
+  if (key === 'ongoing-game-default') {
+    const item = await igs.createPresetTemplate(key)
+    if (item) {
+      updateActiveItem(item.id)
+    }
+  }
+
+  if (key === 'remote') {
+    showRemoteTemplatesModal.value = true
   }
 }
+
+const showRemoteTemplatesModal = ref(false)
 
 const isEditingName = ref(false)
 const tempName = ref('')

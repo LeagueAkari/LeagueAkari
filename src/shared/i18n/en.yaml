@@ -2148,6 +2148,15 @@ SendableItemEdit:
     ally: Allies
     enemy: Enemies
 
+RemoteTemplatesModal:
+  title: Remote Templates
+  downloadButton: Download
+  downloadSuccess: Downloaded {{name}}
+  downloadFailed: 'Failed to download {{name}}: {{reason}}'
+  loadTemplatesFailed: Failed to load remote templates
+  noTemplates: No templates
+  noTemplateDescription: No description
+
 simple-notifications-renderer:
   liveStreamingHints:
     dismiss: Dismiss
@@ -2292,6 +2301,7 @@ in-game-send-main:
   templatePresets:
     empty: Empty Template
     ongoing-game: Default Ongoing Game Template
+    remote: Remote Template
 
   sendableItemPresets:
     plaintext: Plain Text

@@ -28,6 +28,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private _repo = new RemoteGitRepository()
 
+  get repo() {
+    return this._repo
+  }
+
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
@@ -202,13 +206,11 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     ])
     this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, ['preferredSource'])
 
+    this._handleIpcCall()
+
     this._repo.setConfig({
       locale: this._app.settings.locale as 'zh-CN' | 'en',
       source: this.settings.preferredSource
-    })
-
-    this._ipc.onCall(RemoteConfigMain.id, 'testLatency', async () => {
-      return await this.testLatency()
     })
 
     this._updateAnnouncementTask.start(true)
@@ -237,5 +239,11 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       },
       { delay: 1000 }
     )
+  }
+
+  private _handleIpcCall() {
+    this._ipc.onCall(RemoteConfigMain.id, 'testLatency', async () => {
+      return await this.testLatency()
+    })
   }
 }

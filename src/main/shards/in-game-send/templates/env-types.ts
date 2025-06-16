@@ -132,7 +132,7 @@ export interface TemplateEnv {
   championSelections: OngoingGameState['championSelections']
 
   /**
-   * 一个 map，key 为 puuid。记录了自动计算后的玩家数据统计
+   * 一个 map，key 为 puuid。记录了自动计算后的玩家数据统计，由 OngoingGameState['matchHistory'] 计算而来
    */
   playerStats: OngoingGameState['playerStats']
 
