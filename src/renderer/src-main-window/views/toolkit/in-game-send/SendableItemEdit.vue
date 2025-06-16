@@ -385,9 +385,6 @@ const dropdownOptions = computed(() => [
     key: 'plaintext'
   },
   {
-    type: 'divider'
-  },
-  {
     label: t('in-game-send-main.sendableItemPresets.template'),
     key: 'template'
   }

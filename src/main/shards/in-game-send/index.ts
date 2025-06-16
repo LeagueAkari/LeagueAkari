@@ -17,6 +17,7 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { OngoingGameMain } from '../ongoing-game'
+import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
@@ -57,15 +58,16 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private _currentSendController: AbortController | null = null
 
   constructor(
-    private readonly _settingFactory: SettingFactoryMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _kbd: KeyboardShortcutsMain,
     private readonly _og: OngoingGameMain,
     private readonly _lc: LeagueClientMain,
     private readonly _shared: SharedGlobalShard,
-    private readonly _app: AppCommonMain
+    private readonly _app: AppCommonMain,
+    private readonly _rc: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(InGameSendMain.id)
     this._setting = _settingFactory.register(
@@ -418,6 +420,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
         return this._getDryRunResult(templateId, target)
       }
     )
+
+    this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
+      return this._rc.repo.getInGameSendTemplateCatalog()
+    })
+
+    this._ipc.onCall(InGameSendMain.id, 'downloadTemplateFromRemote', (_, id: string) => {
+      return this._downloadTemplateFromRemote(id)
+    })
   }
 
   private _handleTemplateAutoDeprecation() {
@@ -593,6 +603,25 @@ export class InGameSendMain implements IAkariShardInitDispose {
       default:
         return null
     }
+  }
+
+  private async _downloadTemplateFromRemote(id: string) {
+    const catalog = await this._rc.repo.getInGameSendTemplateCatalog()
+    const template = catalog.templates.find((t) => t.id === id)
+
+    if (!template) {
+      throw new Error(`Template ${id} not found`)
+    }
+
+    const { data: code } = await this._rc.repo.getRawContent(template.path)
+
+    this._createTemplate({
+      name: template.name,
+      code,
+      type: template.type
+    })
+
+    return template
   }
 
   private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }): TemplateEnv {

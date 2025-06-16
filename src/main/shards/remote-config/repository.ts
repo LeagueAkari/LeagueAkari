@@ -8,10 +8,21 @@ export interface RemoteConfigRepositoryConfig {
   source: 'github' | 'gitee'
 }
 
-export class RemoteGitRepository {
-  static readonly GITHUB_API_BASE_URL = 'https://api.github.com'
-  static readonly GITEE_API_BASE_URL = 'https://gitee.com/api/v5'
+export interface InGameSendTemplateCatalog {
+  templates: Array<{
+    id: string
+    name: string
+    type: string
+    description: string
+    version: number
+    path: string
+  }>
+}
 
+/**
+ * 连接到 LeagueAkari/LeagueAkari-Config 或 LeagueAkari/LeagueAkari 仓库
+ */
+export class RemoteGitRepository {
   private _config = {
     locale: 'zh-CN',
     source: 'github'
@@ -28,17 +39,45 @@ export class RemoteGitRepository {
     this.setConfig(config)
   }
 
+  /**
+   * 获取 API 地址
+   */
+  private _apiUrl(uri: string, repo: 'akari-config' | 'akari' = 'akari-config') {
+    if (uri.startsWith('/')) {
+      uri = uri.slice(1)
+    }
+
+    const r = repo === 'akari-config' ? 'LeagueAkari-Config' : 'LeagueAkari'
+
+    if (this._config.source === 'github') {
+      return `https://api.github.com/repos/LeagueAkari/${r}/${uri}`
+    }
+
+    return `https://gitee.com/api/v5/repos/LeagueAkari/${r}/${uri}`
+  }
+
+  private _rawContentUrl(
+    uri: string,
+    repo: 'akari-config' | 'akari' = 'akari-config',
+    branch = 'main'
+  ) {
+    if (uri.startsWith('/')) {
+      uri = uri.slice(1)
+    }
+
+    const r = repo === 'akari-config' ? 'LeagueAkari-Config' : 'LeagueAkari'
+
+    if (this._config.source === 'github') {
+      return `https://raw.githubusercontent.com/LeagueAkari/${r}/refs/heads/${branch}/${uri}`
+    }
+
+    return `https://gitee.com/LeagueAkari/${r}/raw/${branch}/${uri}`
+  }
+
   setConfig(config: Partial<RemoteConfigRepositoryConfig>) {
     this._config = {
       ...this._config,
       ...config
-    }
-
-    if (config.source !== undefined) {
-      this._http.defaults.baseURL =
-        config.source === 'github'
-          ? RemoteGitRepository.GITHUB_API_BASE_URL
-          : RemoteGitRepository.GITEE_API_BASE_URL
     }
   }
 
@@ -46,7 +85,7 @@ export class RemoteGitRepository {
     return this._config
   }
 
-  private static _getGitHubApiFileBase64Content(data: GithubApiFile) {
+  static getGitHubApiFileBase64Content(data: GithubApiFile) {
     const { content, encoding } = data
 
     if (encoding !== 'base64' || !content) {
@@ -57,31 +96,45 @@ export class RemoteGitRepository {
   }
 
   async getAnnouncement() {
-    const { data } = await this._http.get<GithubApiFile>(
-      `/repos/LeagueAkari/LeagueAkari-Config/contents/announcement/${this._config.locale}.md`
+    const { data } = await this._http.get<string>(
+      this._rawContentUrl(`/announcement/${this._config.locale}.md`)
     )
 
-    const content = RemoteGitRepository._getGitHubApiFileBase64Content(data)
-
     return {
-      content,
-      uniqueId: crypto.createHash('md5').update(content, 'utf8').digest('hex')
+      content: data,
+      uniqueId: crypto.createHash('md5').update(data, 'utf8').digest('hex')
     }
   }
 
   async getSgpLeagueServersConfig() {
-    const { data } = await this._http.get<GithubApiFile>(
-      `/repos/LeagueAkari/LeagueAkari-Config/contents/config/sgp/league-servers.json`
+    const { data } = await this._http.get<SgpServersConfig>(
+      this._rawContentUrl(`/config/sgp/league-servers.json`)
     )
 
-    const raw = RemoteGitRepository._getGitHubApiFileBase64Content(data)
-    const json = JSON.parse(raw)
+    return data
+  }
 
-    return json as SgpServersConfig
+  async getInGameSendTemplateCatalog() {
+    const { data } = await this._http.get<InGameSendTemplateCatalog>(
+      this._rawContentUrl(`/config/in-game-send/templates/catalog.json`)
+    )
+
+    return data
+  }
+
+  /**
+   *
+   * @param uri
+   * @param repo default is akari-config
+   * @param branch default is main
+   * @returns
+   */
+  getRawContent(uri: string, repo: 'akari-config' | 'akari' = 'akari-config', branch = 'main') {
+    return this._http.get(this._rawContentUrl(uri, repo, branch))
   }
 
   getReleases(page = 1, perPage = 20) {
-    return this._http.get<GithubApiLatestRelease[]>(`/repos/LeagueAkari/LeagueAkari/releases`, {
+    return this._http.get<GithubApiLatestRelease[]>(this._apiUrl(`/releases`, 'akari'), {
       params: {
         page,
         per_page: perPage
@@ -90,13 +143,13 @@ export class RemoteGitRepository {
   }
 
   getLatestRelease() {
-    return this._http.get<GithubApiLatestRelease>(`/repos/LeagueAkari/LeagueAkari/releases/latest`)
+    return this._http.get<GithubApiLatestRelease>(this._apiUrl(`/releases/latest`, 'akari'))
   }
 
   async testGitHubLatency() {
     try {
       const start = Date.now()
-      await this._http.head(RemoteGitRepository.GITHUB_API_BASE_URL, {
+      await this._http.head('https://api.github.com', {
         timeout: 2000,
         validateStatus: () => true
       })
@@ -110,7 +163,7 @@ export class RemoteGitRepository {
   async testGiteeLatency() {
     try {
       const start = Date.now()
-      await this._http.head(RemoteGitRepository.GITEE_API_BASE_URL, {
+      await this._http.head('https://gitee.com/api/v5', {
         timeout: 2000,
         validateStatus: () => true
       })

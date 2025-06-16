@@ -7,17 +7,21 @@ import { SendableItem, TemplateDef, useInGameSendStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
 
-// copied from main
+// copied from main/shards/remote-config/repository.ts
+export interface InGameSendTemplateCatalog {
+  templates: Array<{
+    id: string
+    name: string
+    type: string
+    description: string
+  }>
+}
 
 @Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {
   static id = 'in-game-send-renderer'
 
-  static SHORTCUT_ID_SEND_ALLY = `${MAIN_SHARD_NAMESPACE}/send-ally`
-  static SHORTCUT_ID_SEND_ENEMY = `${MAIN_SHARD_NAMESPACE}/send-enemy`
-  static SHORTCUT_ID_SEND_ALL_ALLIES = `${MAIN_SHARD_NAMESPACE}/send-all-allies`
-  static SHORTCUT_ID_SEND_ALL_ENEMIES = `${MAIN_SHARD_NAMESPACE}/send-all-enemies`
-  static SHORTCUT_ID_CANCEL = `${MAIN_SHARD_NAMESPACE}/cancel`
+  static CANCEL_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE}/cancel`
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
@@ -110,5 +114,13 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
       'success-template-execution-succeeded',
       callback
     )
+  }
+
+  async getInGameSendTemplateCatalog(): Promise<InGameSendTemplateCatalog> {
+    return await this._ipc.call(MAIN_SHARD_NAMESPACE, 'getInGameSendTemplateCatalog')
+  }
+
+  downloadTemplateFromRemote(id: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'downloadTemplateFromRemote', id)
   }
 }

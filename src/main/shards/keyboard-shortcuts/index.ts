@@ -281,7 +281,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   ) {
     if (!this._app.state.isAdministrator) {
       this._log.info(
-        `Current in normal permission, ignoring shortcut registration: ${shortcutId} (${type})`
+        `Current in normal privilege, ignoring shortcut registration: ${shortcutId} (${type})`
       )
       return
     }
