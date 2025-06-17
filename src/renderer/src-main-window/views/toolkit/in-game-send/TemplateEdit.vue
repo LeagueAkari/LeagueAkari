@@ -167,7 +167,7 @@
             :autofocus="true"
             :indent-with-tab="true"
             :tab-size="2"
-            :extensions="[javascript(), oneDark]"
+            :extensions="[vscodeDark, javascript()]"
             @change="handleChange"
           />
         </template>
@@ -187,6 +187,7 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
+import { vscodeDark } from '@uiw/codemirror-theme-vscode'
 import {
   Add as AddIcon,
   Delete as DeleteIcon,

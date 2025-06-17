@@ -1792,6 +1792,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@uiw/codemirror-theme-vscode@npm:^4.23.13":
+  version: 4.23.13
+  resolution: "@uiw/codemirror-theme-vscode@npm:4.23.13"
+  dependencies:
+    "@uiw/codemirror-themes": "npm:4.23.13"
+  checksum: 10c0/a494d9043fb34d299cae2839a828e40695c22fad4a10122b5cc6163d742e6c42494275f91c537a349ddb938ef5afa60636c049e501afd8af032386dc69c4fa9f
+  languageName: node
+  linkType: hard
+
+"@uiw/codemirror-themes@npm:4.23.13":
+  version: 4.23.13
+  resolution: "@uiw/codemirror-themes@npm:4.23.13"
+  dependencies:
+    "@codemirror/language": "npm:^6.0.0"
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.0.0"
+  peerDependencies:
+    "@codemirror/language": ">=6.0.0"
+    "@codemirror/state": ">=6.0.0"
+    "@codemirror/view": ">=6.0.0"
+  checksum: 10c0/4e3bc3f12681727d41ae3c60c17fab5be267cb2675ace8ce6c56c66d6453715bf6d00c9b356d27df70f2104b0eaeda8c734faf2f05b38af05e7c5b2306f2a182
+  languageName: node
+  linkType: hard
+
 "@vicons/carbon@npm:^0.13.0":
   version: 0.13.0
   resolution: "@vicons/carbon@npm:0.13.0"
@@ -5003,6 +5027,7 @@ __metadata:
     "@types/node-7z": "npm:^2.1.10"
     "@types/semver": "npm:^7.7.0"
     "@types/ws": "npm:^8.18.1"
+    "@uiw/codemirror-theme-vscode": "npm:^4.23.13"
     "@vicons/carbon": "npm:^0.13.0"
     "@vicons/fa": "npm:^0.13.0"
     "@vicons/fluent": "npm:^0.13.0"
