@@ -314,7 +314,7 @@
               :indent-with-tab="true"
               :placeholder="t('SendableItemEdit.plaintextPlaceholder')"
               :tab-size="2"
-              :extensions="[oneDark]"
+              :extensions="[vscodeDark]"
               @change="handleChange"
             />
           </template>
@@ -335,6 +335,7 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
+import { vscodeDark } from '@uiw/codemirror-theme-vscode'
 import {
   Add as AddIcon,
   Checkmark as CheckmarkIcon,

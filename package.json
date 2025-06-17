@@ -54,6 +54,7 @@
     "@types/node-7z": "^2.1.10",
     "@types/semver": "^7.7.0",
     "@types/ws": "^8.18.1",
+    "@uiw/codemirror-theme-vscode": "^4.23.13",
     "@vicons/carbon": "^0.13.0",
     "@vicons/fa": "^0.13.0",
     "@vicons/fluent": "^0.13.0",
