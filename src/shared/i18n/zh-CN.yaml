@@ -398,7 +398,7 @@ MultiWindowSettings:
 
     reverseAdjustmentDirection:
       label: 反转时间调整方向
-      description: 调整计时器时间时，反转方向。滑轮上移增加，下移减少
+      description: 调整计时器时间时，反转方向。滑轮上移减少，下移增加
 
 MiscSettings:
   title: 其他
@@ -944,7 +944,7 @@ Client:
 
     terminateGameClientWithShortcut:
       labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
-      label: 使用结束游戏端
+      label: 启用结束游戏端快捷键
       description: 当游戏端正在运行且在前台时，使用快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用
 
     terminateShortcut:
