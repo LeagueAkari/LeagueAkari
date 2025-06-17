@@ -395,7 +395,7 @@ MultiWindowSettings:
 
     reverseAdjustmentDirection:
       label: Reverse Adjustment Direction
-      description: Reverse the direction of the timer adjustment. When the wheel is moved up, the time increases, and when the wheel is moved down, the time decreases. This only takes effect when the timer type is count-up mode.
+      description: Reverse the direction of the timer adjustment. When the wheel is moved up, the time decreases, and when the wheel is moved down, the time increases. This only takes effect when the timer type is count-up mode.
 
 MiscSettings:
   title: Misc
@@ -941,7 +941,7 @@ Client:
 
     terminateGameClientWithShortcut:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
-      label: Terminate Game Client with shortcut
+      label: Enable Terminate Game Client Shortcut
       description: When the game client is running and in the foreground, using the shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
 
     terminateShortcut:

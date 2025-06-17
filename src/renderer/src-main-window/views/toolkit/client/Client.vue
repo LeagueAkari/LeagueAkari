@@ -2,41 +2,6 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('Client.leagueClient.title') }}</span>
-          </template>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('Client.leagueClient.disconnect.label')"
-            :label-description="t('Client.leagueClient.disconnect.description')"
-            :label-width="320"
-          >
-            <NButton
-              :disabled="lcs.connectionState !== 'connected'"
-              size="small"
-              secondary
-              type="warning"
-              @click="handleDisconnect"
-              >{{ t('Client.leagueClient.disconnect.button') }}</NButton
-            >
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('Client.leagueClient.quitClient.label')"
-            :label-description="t('Client.leagueClient.quitClient.description')"
-            :label-width="320"
-          >
-            <NButton
-              :disabled="lcs.connectionState !== 'connected'"
-              size="small"
-              secondary
-              type="warning"
-              @click="handleQuitClient"
-              >{{ t('Client.leagueClient.quitClient.button') }}</NButton
-            >
-          </ControlItem>
-        </NCard>
         <NCard size="small" style="margin-top: 8px">
           <template #header>
             <span class="card-header-title">{{ t('Client.gameClient.title') }}</span>
@@ -154,51 +119,6 @@
               >
             </div>
           </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('Client.leagueClientUx.restartUx.label')"
-            :label-description="t('Client.leagueClientUx.restartUx.description')"
-            :label-width="320"
-          >
-            <NButton
-              :disabled="lcs.connectionState !== 'connected'"
-              size="small"
-              secondary
-              type="warning"
-              @click="handleRestartUx"
-              >{{ t('Client.leagueClientUx.restartUx.button') }}</NButton
-            >
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('Client.leagueClientUx.killUx.label')"
-            :label-description="t('Client.leagueClientUx.killUx.description')"
-            :label-width="320"
-          >
-            <NButton
-              :disabled="lcs.connectionState !== 'connected'"
-              type="warning"
-              secondary
-              size="small"
-              @click="handleKillUx"
-              >{{ t('Client.leagueClientUx.killUx.button') }}</NButton
-            >
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('Client.leagueClientUx.launchUx.label')"
-            :label-description="t('Client.leagueClientUx.launchUx.description')"
-            :label-width="320"
-          >
-            <NButton
-              :disabled="lcs.connectionState !== 'connected'"
-              type="warning"
-              secondary
-              size="small"
-              @click="handleLaunchUx"
-              >{{ t('Client.leagueClientUx.launchUx.button') }}</NButton
-            >
-          </ControlItem>
         </NCard>
       </div>
     </NScrollbar>
@@ -229,74 +149,6 @@ const lc = useInstance(LeagueClientRenderer)
 const gc = useInstance(GameClientRenderer)
 
 const dialog = useDialog()
-
-const handleQuitClient = async () => {
-  dialog.warning({
-    title: t('Client.leagueClient.quitClient.dialog.title'),
-    content: t('Client.leagueClient.quitClient.dialog.content'),
-    positiveText: t('Client.leagueClient.quitClient.dialog.positiveText'),
-    negativeText: t('Client.leagueClient.quitClient.dialog.negativeText'),
-    onPositiveClick: async () => {
-      try {
-        await lc.api.processControl.quit()
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  })
-}
-
-const handleDisconnect = async () => {
-  await lc.disconnect()
-}
-
-const handleRestartUx = async () => {
-  dialog.warning({
-    title: t('Client.leagueClientUx.restartUx.dialog.title'),
-    content: t('Client.leagueClientUx.restartUx.dialog.content'),
-    positiveText: t('Client.leagueClientUx.restartUx.dialog.positiveText'),
-    negativeText: t('Client.leagueClientUx.restartUx.dialog.negativeText'),
-    onPositiveClick: async () => {
-      try {
-        await lc.api.riotclient.restartUx()
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  })
-}
-
-const handleKillUx = async () => {
-  dialog.warning({
-    title: t('Client.leagueClientUx.killUx.dialog.title'),
-    content: t('Client.leagueClientUx.killUx.dialog.content'),
-    positiveText: t('Client.leagueClientUx.killUx.dialog.positiveText'),
-    negativeText: t('Client.leagueClientUx.killUx.dialog.negativeText'),
-    onPositiveClick: async () => {
-      try {
-        await lc.api.riotclient.killUx()
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  })
-}
-
-const handleLaunchUx = async () => {
-  dialog.warning({
-    title: t('Client.leagueClientUx.launchUx.dialog.title'),
-    content: t('Client.leagueClientUx.launchUx.dialog.content'),
-    positiveText: t('Client.leagueClientUx.launchUx.dialog.positiveText'),
-    negativeText: t('Client.leagueClientUx.launchUx.dialog.negativeText'),
-    onPositiveClick: async () => {
-      try {
-        await lc.api.riotclient.launchUx()
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  })
-}
 
 const fixWindowInputButton2 = useTemplateRef('input-2')
 
