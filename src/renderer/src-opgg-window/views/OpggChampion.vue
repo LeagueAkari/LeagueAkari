@@ -21,7 +21,6 @@
         </div>
       </template>
     </NSpin>
-
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
