@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdate": 1748412177935,
+  "lastUpdate": 1750232342633,
   "from": "builtin",
   "servers": {
     "TENCENT_HN1": {
@@ -66,6 +66,46 @@
     "EUW": {
       "matchHistory": "https://euc1-red.pp.sgp.pvp.net",
       "common": "https://euw-red.lol.sgp.pvp.net"
+    },
+    "JP1": {
+      "matchHistory": "https://apne1-red.pp.sgp.pvp.net",
+      "common": "https://jp-red.lol.sgp.pvp.net"
+    },
+    "RU": {
+      "matchHistory": "https://euc1-red.pp.sgp.pvp.net",
+      "common": "https://ru-red.lol.sgp.pvp.net"
+    },
+    "BR1": {
+      "matchHistory": "https://usw2-red.pp.sgp.pvp.net",
+      "common": "https://br-red.lol.sgp.pvp.net"
+    },
+    "OC1": {
+      "matchHistory": "https://apse1-red.pp.sgp.pvp.net",
+      "common": "https://oce-red.lol.sgp.pvp.net"
+    },
+    "TR1": {
+      "matchHistory": "https://euc1-red.pp.sgp.pvp.net",
+      "common": "https://tr-red.lol.sgp.pvp.net"
+    },
+    "LA1": {
+      "matchHistory": "https://usw2-red.pp.sgp.pvp.net",
+      "common": "https://lan-red.lol.sgp.pvp.net"
+    },
+    "LA2": {
+      "matchHistory": "https://usw2-red.pp.sgp.pvp.net",
+      "common": "https://las-red.lol.sgp.pvp.net"
+    },
+    "NA1": {
+      "matchHistory": "https://usw2-red.pp.sgp.pvp.net",
+      "common": "https://na-red.lol.sgp.pvp.net"
+    },
+    "TH2": {
+      "matchHistory": "https://apse1-red.pp.sgp.pvp.net",
+      "common": "https://th2-red.lol.sgp.pvp.net"
+    },
+    "KR": {
+      "matchHistory": "https://apne1-red.pp.sgp.pvp.net",
+      "common": "https://kr-red.lol.sgp.pvp.net"
     }
   },
   "tencentServerMatchHistoryInteroperability": [
@@ -121,7 +161,17 @@
       "PH2": "Philippines",
       "VN2": "Vietnam",
       "PBE": "PBE",
-      "EUW": "EUW"
+      "EUW": "EUW",
+      "JP1": "Japan",
+      "RU": "Russia",
+      "BR1": "Brazil",
+      "OC1": "Oceania",
+      "TR1": "Turkey",
+      "LA1": "Latin America North",
+      "LA2": "Latin America South",
+      "NA1": "North America",
+      "TH2": "Thailand",
+      "KR": "Korea"
     },
     "zh-CN": {
       "TENCENT_HN1": "艾欧尼亚",
@@ -139,7 +189,17 @@
       "PH2": "菲律宾",
       "VN2": "越南",
       "PBE": "PBE",
-      "EUW": "EUW"
+      "EUW": "EUW",
+      "JP1": "日本",
+      "RU": "俄罗斯",
+      "BR1": "巴西",
+      "OC1": "大洋洲",
+      "TR1": "土耳其",
+      "LA1": "拉丁美洲北部",
+      "LA2": "拉丁美洲南部",
+      "NA1": "北美",
+      "TH2": "泰国",
+      "KR": "韩国"
     }
   }
 }
