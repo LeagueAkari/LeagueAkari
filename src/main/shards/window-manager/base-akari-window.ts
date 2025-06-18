@@ -450,7 +450,7 @@ export abstract class BaseAkariWindow<
       }
     }
 
-    this._log.info(`创建 ${this._namespace} 窗口`)
+    this._log.info(`Create ${this._namespace} window`)
   }
 
   setOpacity(opacity: number) {
@@ -519,7 +519,7 @@ export abstract class BaseAkariWindow<
       this._window.center()
     }
 
-    this._log.info(`重置 ${this._namespace} 位置到主显示器中心`)
+    this._log.info(`Reset ${this._namespace} position to main display center`)
   }
 
   toggleDevtools() {

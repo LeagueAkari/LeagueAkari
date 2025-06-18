@@ -1,5 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
@@ -20,6 +20,7 @@ import { LeagueClientUxMain } from '@main/shards/league-client-ux'
 import { LoggerFactoryMain } from '@main/shards/logger-factory'
 import { MobxUtilsMain } from '@main/shards/mobx-utils'
 import { OngoingGameMain } from '@main/shards/ongoing-game'
+import { RemoteConfigMain } from '@main/shards/remote-config'
 import { RendererDebugMain } from '@main/shards/renderer-debug'
 import { RespawnTimerMain } from '@main/shards/respawn-timer'
 import { RiotClientMain } from '@main/shards/riot-client'
@@ -27,6 +28,7 @@ import { SavedPlayerMain } from '@main/shards/saved-player'
 import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
 import { SgpMain } from '@main/shards/sgp'
+import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
@@ -39,7 +41,9 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
+import fs from 'node:fs'
 import os from 'node:os'
+import path from 'node:path'
 import { Logger } from 'winston'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
@@ -114,7 +118,7 @@ declare module '@shared/akari-shard' {
 function handleUnhandledErrors(logger: Logger) {
   process.on('uncaughtException', (error) => {
     logger.error({
-      message: `意料之外的未处理错误 ${formatError(error)}`,
+      message: `Unexpected unhandled error ${formatError(error)}`,
       namespace: 'error-handling'
     })
     dialog.showErrorBox('Uncaught Exception', formatError(error))
@@ -123,7 +127,7 @@ function handleUnhandledErrors(logger: Logger) {
 
   process.on('unhandledRejection', (error) => {
     logger.warn({
-      message: `意料之外的 Rejection ${formatError(error)}`,
+      message: `Unexpected Rejection ${formatError(error)}`,
       namespace: 'error-handling'
     })
   })
@@ -226,7 +230,7 @@ export function bootstrap() {
 
     if (isAdministrator) {
       logger.info({
-        message: `应用以管理员权限启动`,
+        message: `Application started with administrator privileges`,
         namespace: 'app'
       })
     }
@@ -262,18 +266,37 @@ export function bootstrap() {
     manager.use(AutoSelectMain)
     manager.use(InGameSendMain)
     manager.use(OngoingGameMain)
+    manager.use(RemoteConfigMain)
     manager.use(RespawnTimerMain)
     manager.use(SavedPlayerMain)
     manager.use(SgpMain)
+    manager.use(StatisticsMain)
 
     // other
     manager.use(ExtraAssetsMain)
     manager.use(RendererDebugMain)
 
+    // external shards
+    const shardsDir = path.join(app.getPath('exe'), '..', 'shards')
+    if (fs.existsSync(shardsDir)) {
+      const files = fs.readdirSync(shardsDir)
+      for (const file of files) {
+        if (file.endsWith('.js')) {
+          const shard = require(path.join(shardsDir, file))
+          manager.useExternal(shard)
+
+          logger.info({
+            message: `Loaded external shard ${file}`,
+            namespace: 'akari-shard-manager'
+          })
+        }
+      }
+    }
+
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
       logger.warn({
-        message: `用户尝试启动第二个实例, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
+        message: `User attempted to start a second instance, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
         namespace: 'electron'
       })
     })
@@ -288,10 +311,10 @@ export function bootstrap() {
         await manager.setup()
       } catch (error) {
         logger.error({
-          message: `[10002] 功能初始化时出现错误 ${formatError(error)}`,
+          message: `[10002] Error occurred during feature initialization ${formatError(error)}`,
           namespace: 'akari-shard-manager'
         })
-        dialog.showErrorBox('功能初始化时出现错误', formatError(error))
+        dialog.showErrorBox('Error occurred during feature initialization', formatError(error))
         logger.on('finish', () => app.exit(10002))
         logger.end()
       }
@@ -313,7 +336,7 @@ export function bootstrap() {
         .dispose()
         .catch((error) => {
           logger.error({
-            message: `应用退出时出现错误 ${formatError(error)}`,
+            message: `Error occurred during application exit ${formatError(error)}`,
             namespace: 'akari-shard-manager'
           })
         })
@@ -321,7 +344,7 @@ export function bootstrap() {
           shardDisposed = true
           events.removeAllListeners()
           logger.info({
-            message: `应用即将退出`,
+            message: `Application is about to exit`,
             namespace: 'app'
           })
           logger.on('finish', () => app.exit()) // 不知为何, 使用 app.quit() 在这里不会生效. 除非包裹 setImmediate 或 setTimeout
@@ -331,15 +354,15 @@ export function bootstrap() {
 
     app.on('quit', () => {
       console.log(
-        `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] 应用退出\x1b[0m`
+        `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] Application exited\x1b[0m`
       )
     })
   } catch (error) {
     logger.error({
-      message: `[10001] 应用启动时出现错误 ${formatError(error)}`,
+      message: `[10001] Error occurred during application startup ${formatError(error)}`,
       namespace: 'app'
     })
-    dialog.showErrorBox('应用启动时出现错误', formatError(error))
+    dialog.showErrorBox('Error occurred during application startup', formatError(error))
     logger.on('finish', () => app.exit(10001))
     logger.end()
   }

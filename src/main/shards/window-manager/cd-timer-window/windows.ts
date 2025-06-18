@@ -1,4 +1,4 @@
-import { input } from '@hanxven/league-akari-addons'
+import { input } from '@leagueakari/league-akari-addons'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -76,7 +76,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
     this._setting.onChange('pinned', (value: boolean) => {
       if (!value) {
-        throw new AkariIpcError('cd-timer 窗口必须置顶', 'UnsupportedActionNotTopmost')
+        throw new AkariIpcError('cd-timer window must be topmost', 'UnsupportedActionNotTopmost')
       }
     })
 
@@ -113,11 +113,11 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
               }
             })
           } catch {
-            this._log.warn('无法注册 cd-timer 窗口快捷键')
+            this._log.warn('Failed to register cd-timer window shortcut')
             this._setting.set('showShortcut', null)
           }
         } else {
-          this._log.debug('注销 cd-timer 窗口快捷键')
+          this._log.debug('Unregister cd-timer window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
         }
       },
@@ -160,7 +160,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       () => shouldUseCdTimer.get(),
       (should) => {
         if (should) {
-          this._log.info('轮询游戏对局信息开始')
+          this._log.info('Game stats polling started')
           this._updateGameStats()
           this._gameStatsPollTimer = setInterval(
             () => this._updateGameStats(),
@@ -168,7 +168,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           )
         } else {
           if (this._gameStatsPollTimer) {
-            this._log.info('轮询游戏对局信息结束')
+            this._log.info('Game stats polling stopped')
             clearInterval(this._gameStatsPollTimer)
             this._gameStatsPollTimer = null
           }
@@ -205,7 +205,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       this.state.setGameTime(data.gameTime)
     } catch (error) {
       this.state.setGameTime(null)
-      this._log.warn('获取游戏数据失败', error)
+      this._log.warn('Failed to get game data', error)
     }
   }
 

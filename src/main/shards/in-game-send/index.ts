@@ -1,4 +1,4 @@
-import { input } from '@hanxven/league-akari-addons'
+import { input } from '@leagueakari/league-akari-addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
@@ -6,7 +6,6 @@ import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
-import { comparer } from 'mobx'
 import fs from 'node:fs'
 import vm from 'node:vm'
 
@@ -116,7 +115,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
             })
           } catch (error) {
             this.settings.setCancelShortcut(null)
-            this._log.error('注册快捷键失败', error)
+            this._log.error('Register shortcut failed', error)
           }
         }
       },
@@ -126,7 +125,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
   private _performSendableItemSend(id: string, target: 'all' | 'ally' | 'enemy') {
     if (this._currentSendController) {
-      this._log.info('存在正在发生的任务, 取消')
+      this._log.info('Existing task in progress, cancelling')
       this._currentSendController.abort()
     }
 
@@ -134,14 +133,17 @@ export class InGameSendMain implements IAkariShardInitDispose {
       this._og.state.queryStage.phase !== 'champ-select' &&
       this._og.state.queryStage.phase !== 'in-game'
     ) {
-      this._log.warn('当前阶段不支持发送消息', this._og.state.queryStage.phase)
+      this._log.warn(
+        'Current phase does not support sending messages',
+        this._og.state.queryStage.phase
+      )
       return
     }
 
     const s = this.settings.sendableItems.find((item) => item.id === id)
 
     if (!s) {
-      this._log.warn('未找到发送项', id)
+      this._log.warn('Send item not found', id)
       return
     }
 
@@ -162,11 +164,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
         if (ctx) {
           const lines = ctx.getMessages(this._createTemplateEnv({ target }))
           this._sendTextToChatOrInGame(lines, this._currentSendController.signal)
+          this._ipc.sendEvent(InGameSendMain.id, 'success-template-execution-succeeded', {
+            templateId: s.content.templateId
+          })
         } else {
-          this._log.warn('未找到模板上下文', s.content.templateId)
+          this._log.warn('Template context not found', s.content.templateId)
         }
       } catch (error) {
-        this._log.warn('模板执行失败', s.content.templateId, error)
+        this._log.warn('Template execution failed', s.content.templateId, error)
         this._currentSendController = null
         this._ipc.sendEvent(InGameSendMain.id, 'error-template-execution-failed', {
           templateId: s.content.templateId,
@@ -174,18 +179,32 @@ export class InGameSendMain implements IAkariShardInitDispose {
         })
       }
     } else {
-      this._log.warn('未知的模板类型', s.content)
+      this._log.warn('Unknown template type', s.content)
     }
   }
 
   private _getDryRunResult(templateId: string, target: 'ally' | 'enemy' | 'all') {
     const ctx = this._vmContexts[templateId] as JSContextV1
     if (!ctx) {
-      this._log.warn('未找到模板上下文', templateId)
-      return null
+      this._log.warn('Template context not found', templateId)
+      return {
+        messages: [],
+        error: 'Template context not found'
+      }
     }
 
-    return ctx.getMessages(this._createTemplateEnv({ target }))
+    try {
+      return {
+        messages: ctx.getMessages(this._createTemplateEnv({ target })),
+        error: null
+      }
+    } catch (error) {
+      this._log.warn('Template execution failed', templateId, error)
+      return {
+        messages: [],
+        error: formatError(error)
+      }
+    }
   }
 
   /**
@@ -206,11 +225,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
       const cv = this._lc.data.chat.conversations.championSelect
 
       if (!cv) {
-        this._log.warn('未找到英雄选择阶段的聊天室信息')
+        this._log.warn('Champion select chat not found')
         return
       }
 
-      this._log.info('在英雄选择阶段发送消息', strs)
+      this._log.info('Sending message during champion select', strs)
 
       for (let i = 0; i < strs.length; i++) {
         tasks.push(() => this._lc.api.chat.chatSend(cv.id, strs[i]).catch(() => {}))
@@ -220,7 +239,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
         }
       }
     } else if (this._og.state.queryStage.phase === 'in-game') {
-      this._log.info('在游戏中发送消息', strs)
+      this._log.info('Sending message in-game', strs)
 
       for (let i = 0; i < strs.length; i++) {
         tasks.push(async () => {
@@ -522,7 +541,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
         return [false, null, checkResult]
       }
     } catch (error: any) {
-      this._log.warn('脚本验证失败', template.id, error)
+      this._log.warn('Script validation failed', template.id, error)
       return [false, null, error]
     }
 
@@ -686,7 +705,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
             this._performSendableItemSend(item.id, 'all')
           })
         } catch (error) {
-          this._log.error(`添加快捷键 ${all} 失败`, error)
+          this._log.error(`Add shortcut ${all} failed`, error)
           item.sendAllShortcut = null
           mutated = true
         }
@@ -702,7 +721,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
             this._performSendableItemSend(item.id, 'ally')
           })
         } catch (error) {
-          this._log.error(`添加快捷键 ${ally} 失败`, error)
+          this._log.error(`Add shortcut ${ally} failed`, error)
           item.sendAllyShortcut = null
           mutated = true
         }
@@ -718,7 +737,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
             this._performSendableItemSend(item.id, 'enemy')
           })
         } catch (error) {
-          this._log.error(`添加快捷键 ${enemy} 失败`, error)
+          this._log.error(`Add shortcut ${enemy} failed`, error)
           item.sendEnemyShortcut = null
           mutated = true
         }

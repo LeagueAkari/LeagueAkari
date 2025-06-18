@@ -145,7 +145,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-lobby')
-        this._context.log.warn(`获取房间信息失败`, error)
+        this._context.log.warn(`Failed to get lobby`, error)
       }
     }
 
@@ -164,7 +164,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-received-invitations'
         )
-        this._context.log.warn(`获取房间邀请失败`, error)
+        this._context.log.warn(`Failed to get received invitations`, error)
       }
     }
 
@@ -203,7 +203,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-login-queue-state'
         )
-        this._context.log.warn(`获取登录队列信息失败`, error)
+        this._context.log.warn(`Failed to get login queue state`, error)
       }
     }
 
@@ -247,7 +247,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-summoner')
-        this._context.log.warn(`获取召唤师信息失败`, error)
+        this._context.log.warn(`Failed to get summoner`, error)
       }
     }
 
@@ -274,7 +274,7 @@ export class LeagueClientData {
               'error-sync-data',
               'get-summoner-profile'
             )
-            this._context.log.warn(`获取召唤师 profile 信息失败`, error)
+            this._context.log.warn(`Failed to get summoner profile`, error)
           }
         }
       }
@@ -303,7 +303,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-entitlements-token'
         )
-        this._context.log.warn(`获取 entitlements token 失败`, error)
+        this._context.log.warn(`Failed to get entitlements token`, error)
       }
     }
 
@@ -336,7 +336,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-league-session-token'
         )
-        this._context.log.warn(`获取 League Session 失败`, error)
+        this._context.log.warn(`Failed to get league session token`, error)
       }
     }
 
@@ -391,7 +391,7 @@ export class LeagueClientData {
         this.chat.setMe(me)
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-me')
-        this._context.log.warn(`获取聊天状态失败`, error)
+        this._context.log.warn(`Failed to get me`, error)
       }
     }
 
@@ -440,7 +440,7 @@ export class LeagueClientData {
             'error-sync-data',
             'get-conversations'
           )
-          this._context.log.warn(`无法获取当前的对话`, error)
+          this._context.log.warn(`Failed to get conversations`, error)
         }
       }
     }
@@ -595,7 +595,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-champ-select-session'
         )
-        this._context.log.warn(`获取 champ-select 会话失败`, error)
+        this._context.log.warn(`Failed to get champ-select session`, error)
       }
     }
 
@@ -603,7 +603,7 @@ export class LeagueClientData {
       try {
         const pickables = (await this._context.lc.api.champSelect.getPickableChampIds()).data
         this.champSelect.setCurrentPickableChampionArray(pickables)
-        this._context.log.debug(`加载可选用英雄列表, 共 ${pickables.length} 个`)
+        this._context.log.debug(`Load pickable champion list, ${pickables.length} champions`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentPickableChampionArray([])
@@ -615,7 +615,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-pickable-champ-ids'
         )
-        this._context.log.warn(`获取可选英雄失败`, error)
+        this._context.log.warn(`Failed to get pickable champion list`, error)
       }
     }
 
@@ -623,7 +623,7 @@ export class LeagueClientData {
       try {
         const bannables = (await this._context.lc.api.champSelect.getBannableChampIds()).data
         this.champSelect.setCurrentBannableChampionArray(bannables)
-        this._context.log.debug(`加载可禁用英雄列表, 共 ${bannables.length} 个`)
+        this._context.log.debug(`Load bannable champion list, ${bannables.length} champions`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentBannableChampionArray([])
@@ -635,7 +635,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-bannable-champ-ids'
         )
-        this._context.log.warn(`获取可禁用英雄失败`, error)
+        this._context.log.warn(`Failed to get bannable champion list`, error)
       }
     }
 
@@ -661,7 +661,7 @@ export class LeagueClientData {
                 'error-sync-data',
                 'get-self-summoner'
               )
-              this._context.log.warn(`获取当前英雄选择召唤师状态失败`, error)
+              this._context.log.warn(`Failed to get self summoner`, error)
             }
           }
         }
@@ -701,11 +701,13 @@ export class LeagueClientData {
       try {
         const c = (await this._context.lc.api.champSelect.getCurrentChamp()).data
         this.champSelect.setCurrentChampion(c)
-        this._context.log.debug(`当前选择的英雄: ${this.gameData.champions[c]?.name || c}`)
+        this._context.log.debug(
+          `Current selected champion: ${this.gameData.champions[c]?.name || c}`
+        )
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentChampion(null)
-          this._context.log.debug(`当前选择的英雄: 无`)
+          this._context.log.debug(`Current selected champion: none`)
           return
         }
 
@@ -714,7 +716,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-current-champion'
         )
-        this._context.log.warn(`获取当前选择的英雄失败`, error)
+        this._context.log.warn(`Failed to get current selected champion`, error)
       }
     }
 
@@ -723,11 +725,11 @@ export class LeagueClientData {
       try {
         const c = (await this._context.lc.api.champSelect.getDisabledChampions()).data
         this.champSelect.setDisabledChampionIds(c)
-        this._context.log.debug(`已被禁用的英雄: ${c}`)
+        this._context.log.debug(`Disabled champions: ${c}`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setDisabledChampionIds([])
-          this._context.log.debug(`已被禁用的英雄: 无`)
+          this._context.log.debug(`Disabled champions: none`)
           return
         }
 
@@ -736,7 +738,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-disabled-champions'
         )
-        this._context.log.warn(`获取已被禁用的英雄失败`, error)
+        this._context.log.warn(`Failed to get disabled champions`, error)
       }
     }
 
@@ -751,7 +753,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-ongoing-trade')
-        this._context.log.warn(`获取进行中的交易失败`, error)
+        this._context.log.warn(`Failed to get ongoing trade`, error)
       }
     }
 
@@ -810,7 +812,7 @@ export class LeagueClientData {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentBannableChampionArray([])
         } else {
-          this._context.log.debug(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
+          this._context.log.debug(`Update bannable champion list, ${event.data?.length} champions`)
           this.champSelect.setCurrentBannableChampionArray(event.data)
         }
       }
@@ -841,7 +843,7 @@ export class LeagueClientData {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentPickableChampionArray([])
         } else {
-          this._context.log.debug(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
+          this._context.log.debug(`Update pickable champion list, ${event.data?.length} champions`)
           this.champSelect.setCurrentPickableChampionArray(event.data)
         }
       }
@@ -851,7 +853,7 @@ export class LeagueClientData {
       '/lol-champ-select/v1/current-champion',
       (event) => {
         this._context.log.debug(
-          `当前选择的英雄: ${this.gameData.champions[event.data]?.name || event.data}`
+          `Current selected champion: ${this.gameData.champions[event.data]?.name || event.data}`
         )
 
         if (event.eventType === 'Delete') {
@@ -864,7 +866,7 @@ export class LeagueClientData {
 
     this._context.lc.events.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
       if (event.data?.length !== 0) {
-        this._context.log.debug(`被禁用的英雄: ${event.data?.length}`)
+        this._context.log.debug(`Disabled champions: ${event.data?.length}`)
       }
 
       if (event.eventType === 'Delete') {
@@ -900,7 +902,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-honor-ballot')
-        this._context.log.warn(`获取 honor ballot 失败`, error)
+        this._context.log.warn(`Failed to get honor ballot`, error)
       }
     }
 
@@ -946,7 +948,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-summoner-spells'
         )
-        this._context.log.warn(`获取召唤师技能失败`, error)
+        this._context.log.warn(`Failed to get summoner spells`, error)
       }
     }
 
@@ -961,7 +963,7 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-items')
-        this._context.log.warn(`获取物品列表失败`)
+        this._context.log.warn(`Failed to get items`)
       }
     }
 
@@ -984,7 +986,7 @@ export class LeagueClientData {
         }
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-queues')
-        this._context.log.warn(`获取可用队列失败`)
+        this._context.log.warn(`Failed to get queues`)
       }
     }
 
@@ -999,7 +1001,7 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-perks')
-        this._context.log.warn(`获取 perks 失败`, error)
+        this._context.log.warn(`Failed to get perks`, error)
       }
     }
 
@@ -1015,7 +1017,7 @@ export class LeagueClientData {
         })
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-perkstyles')
-        this._context.log.warn(`获取 perkstyles 失败`, error)
+        this._context.log.warn(`Failed to get perkstyles`, error)
       }
     }
 
@@ -1030,7 +1032,7 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-augments')
-        this._context.log.warn(`获取 augments 失败`, error)
+        this._context.log.warn(`Failed to get augments`, error)
       }
     }
 
@@ -1045,7 +1047,7 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-champions')
-        this._context.log.warn(`获取英雄列表失败`, error)
+        this._context.log.warn(`Failed to get champions`, error)
       }
     }
 

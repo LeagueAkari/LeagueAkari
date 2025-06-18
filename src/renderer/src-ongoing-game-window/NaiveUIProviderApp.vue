@@ -50,6 +50,9 @@ const themeOverrides: GlobalThemeOverrides = {
   },
   Popover: {
     color: '#1f1f1ffa'
+  },
+  Checkbox: {
+    fontSizeSmall: '13px'
   }
 }
 

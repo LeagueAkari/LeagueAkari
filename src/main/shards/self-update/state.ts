@@ -1,23 +1,5 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-interface CurrentRelease {
-  isNew: boolean
-  source: 'gitee' | 'github'
-  currentVersion: string
-  releaseVersion: string
-  releaseNotesUrl: string
-  downloadUrl: string
-  filename: string
-  releaseNotes: string
-}
-
-interface CurrentAnnouncement {
-  content: string
-  updateAt: Date
-  isRead: boolean
-  md5: string
-}
-
 interface UpdateProgressInfo {
   /**
    * 当前更新阶段
@@ -53,7 +35,6 @@ interface UpdateProgressInfo {
 interface LastUpdateResult {
   success: boolean
   reason: string
-  newVersionPageUrl: string
 }
 
 export class SelfUpdateSettings {
@@ -68,9 +49,9 @@ export class SelfUpdateSettings {
   autoDownloadUpdates: boolean = true
 
   /**
-   * 下载源
+   * 忽略的版本号
    */
-  downloadSource: 'gitee' | 'github' = 'gitee'
+  ignoreVersion: string | null = null
 
   constructor() {
     makeAutoObservable(this)
@@ -84,79 +65,24 @@ export class SelfUpdateSettings {
     this.autoDownloadUpdates = autoDownloadUpdates
   }
 
-  setDownloadSource(downloadSource: 'gitee' | 'github') {
-    this.downloadSource = downloadSource
+  setIgnoreVersion(version: string | null) {
+    this.ignoreVersion = version
   }
 }
 
 export class SelfUpdateState {
-  isCheckingUpdates: boolean = false
-  lastCheckAt: Date | null = null
-  currentReleaseV = observable.box<CurrentRelease | null>(null, {
-    equals: SelfUpdateState._versionCompare
-  })
-
-  get currentRelease() {
-    return this.currentReleaseV.get()
-  }
-
   updateProgressInfo: UpdateProgressInfo | null = null
-
-  currentAnnouncement: CurrentAnnouncement | null
-
   lastUpdateResult: LastUpdateResult | null = null
-
-  private static _versionCompare(a: CurrentRelease, b: CurrentRelease) {
-    if (a === null && b === null) {
-      return true
-    }
-
-    if (a === null || b === null) {
-      return false
-    }
-
-    if (a.isNew !== b.isNew) {
-      return false
-    }
-
-    return a.currentVersion === b.currentVersion && a.releaseVersion === b.releaseVersion
-  }
 
   constructor() {
     makeAutoObservable(this, {
       updateProgressInfo: observable.ref,
-      currentAnnouncement: observable.ref,
       lastUpdateResult: observable.ref
     })
   }
 
-  setCheckingUpdates(isCheckingUpdates: boolean) {
-    this.isCheckingUpdates = isCheckingUpdates
-  }
-
-  setCurrentRelease(updates: CurrentRelease | null) {
-    this.currentReleaseV.set(updates)
-  }
-
-  setCurrentAnnouncement(announcement: CurrentAnnouncement | null) {
-    this.currentAnnouncement = announcement
-  }
-
-  setAnnouncementRead(isRead: boolean) {
-    if (this.currentAnnouncement) {
-      this.currentAnnouncement = {
-        ...this.currentAnnouncement,
-        isRead
-      }
-    }
-  }
-
   setUpdateProgressInfo(info: UpdateProgressInfo | null) {
     this.updateProgressInfo = info
-  }
-
-  setLastCheckAt(date: Date) {
-    this.lastCheckAt = date
   }
 
   setLastUpdateResult(result: LastUpdateResult) {

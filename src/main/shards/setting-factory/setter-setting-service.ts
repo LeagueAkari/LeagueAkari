@@ -28,6 +28,10 @@ export class SetterSettingService {
     return this._ins._saveToStorage(this._namespace, key, value)
   }
 
+  _removeFromStorage(key: string) {
+    return this._ins._removeFromStorage(this._namespace, key)
+  }
+
   _getValuesFromStorage(key: string) {
     return this._ins._getValuesFromStorage(this._namespace, key)
   }

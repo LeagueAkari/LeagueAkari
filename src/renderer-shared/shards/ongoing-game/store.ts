@@ -79,7 +79,12 @@ export interface SavedInfo {
 
   lastMetAt: Date | null
 
-  encounteredGames: EncounteredGame[]
+  encounteredGames: {
+    data: EncounteredGame[]
+    page: number
+    pageSize: number
+    total: number
+  }
 }
 
 // copied from main shard

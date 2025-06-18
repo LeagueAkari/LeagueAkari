@@ -71,7 +71,10 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
 
     this._setting.onChange('pinned', (value: boolean) => {
       if (!value) {
-        throw new AkariIpcError('ongoing-game 窗口必须置顶', 'UnsupportedActionNotTopmost')
+        throw new AkariIpcError(
+          'ongoing-game window must be topmost',
+          'UnsupportedActionNotTopmost'
+        )
       }
     })
 
@@ -147,11 +150,11 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
               }
             )
           } catch {
-            this._log.warn('无法注册 ongoing-game 窗口快捷键')
+            this._log.warn('Failed to register ongoing-game window shortcut')
             this._setting.set('showShortcut', null)
           }
         } else {
-          this._log.debug('注销 ongoing-game 窗口快捷键')
+          this._log.debug('Unregister ongoing-game window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
         }
       },

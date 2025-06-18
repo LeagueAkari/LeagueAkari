@@ -1081,34 +1081,8 @@ export function calculateAkariScore(analyses: {
     goldScore,
     participationScore,
     total,
-    good: total >= 26.0,
-    great: total >= 30.0
-  }
-}
-
-export function calculateGameAkariScore(analysis: MatchHistoryGamesAnalysis): AkariScore {
-  const kdaScore = Math.sqrt(analysis.kda) * 1.44
-  const winRateScore = (analysis.win ? 1 : 0 - 0.5) * 4
-  const dmgScore = analysis.damageDealtToChampionShareToTop * 10.0
-  const dmgTakenScore = analysis.damageTakenShareToTop * 8.0
-  const csScore = analysis.csPerMinute * Math.max(Math.min(0.04 * analysis.csPerMinute, 0.4), 0.1)
-  const goldScore = analysis.goldShareToTop * 4.0
-  const participationScore = analysis.killParticipationRate * 4
-
-  const total =
-    kdaScore + winRateScore + dmgScore + dmgTakenScore + csScore + goldScore + participationScore
-
-  return {
-    kdaScore,
-    winRateScore,
-    dmgScore,
-    dmgTakenScore,
-    csScore,
-    goldScore,
-    participationScore,
-    total,
-    good: total >= 26.0,
-    great: total >= 30.0
+    good: total >= 26.0 && analyses.summary.count >= 5,
+    great: total >= 30.0 && analyses.summary.count >= 10
   }
 }
 

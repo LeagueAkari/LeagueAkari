@@ -1,62 +1,42 @@
 import { i18next } from '@main/i18n'
-import { IntervalTask } from '@main/utils/timer'
 import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL } from '@shared/constants/common'
-import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
+import { GithubApiAsset } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
 import { Notification, app, shell } from 'electron'
 import { comparer } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
-import crypto from 'node:crypto'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
-import { gte, lt, valid } from 'semver'
+import { gte, valid } from 'semver'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { RemoteConfigMain } from '../remote-config'
+import { LatestReleaseWithMetadata } from '../remote-config/state'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SelfUpdateSettings, SelfUpdateState } from './state'
 
 /**
- * GitHub / Gitee 内容
+ * 负责更新包的下载与解压工作
  */
 @Shard(SelfUpdateMain.id)
 export class SelfUpdateMain implements IAkariShardInitDispose {
   static id = 'self-update-main'
 
-  static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
-  static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_EXECUTABLE_NAME = 'akari-updater.exe'
   static NEW_VERSION_FLAG = 'NEW_VERSION_FLAG'
   static EXECUTABLE_NAME = 'LeagueAkari.exe'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
-  static USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
-
-  static UPDATE_SOURCE = {
-    gitee: 'https://gitee.com/api/v5/repos/Hanxven/LeagueAkari/releases/latest',
-    github: 'https://api.github.com/repos/Hanxven/LeagueAkari/releases/latest'
-  }
-
-  static RELEASE_PAGE_SOURCE = {
-    github: 'https://github.com/Hanxven/LeagueAkari/releases/latest',
-    gitee: 'https://gitee.com/Hanxven/LeagueAkari/releases'
-  }
-
-  static ANNOUNCEMENT_SOURCE = {
-    'zh-CN':
-      'https://api.github.com/repos/Hanxven/LeagueAkari-Config/contents/announcements/zh-CN.md?ref=main',
-    en: 'https://api.github.com/repos/Hanxven/LeagueAkari-Config/contents/announcements/en.md?ref=main'
-  }
 
   public readonly settings = new SelfUpdateSettings()
   public readonly state = new SelfUpdateState()
@@ -64,16 +44,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  private readonly _checkUpdateTask = new IntervalTask(
-    () => this._updateReleaseUpdatesInfo(),
-    7.2e6
-  )
-
-  private _http = axios.create({
-    headers: { 'User-Agent': SelfUpdateMain.USER_AGENT }
+  private readonly _http = axios.create({
+    headers: {
+      'User-Agent': `LeagueAkari/${app.getVersion()} `
+    }
   })
-
-  private _checkAnnouncementTimerId: NodeJS.Timeout | null = null
 
   private _updateOnQuitFn: (() => void) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
@@ -82,6 +57,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     private readonly _app: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
+    private readonly _rc: RemoteConfigMain,
     _loggerFactory: LoggerFactoryMain,
     _settingFactory: SettingFactoryMain
   ) {
@@ -90,8 +66,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       SelfUpdateMain.id,
       {
         autoCheckUpdates: { default: this.settings.autoCheckUpdates },
-        autoDownloadUpdates: { default: this.settings.autoDownloadUpdates },
-        downloadSource: { default: this.settings.downloadSource }
+        autoDownloadUpdates: { default: this.settings.autoDownloadUpdates }
       },
       this.settings
     )
@@ -101,161 +76,29 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     await this._setting.applyToState()
 
     this._mobx.propSync(SelfUpdateMain.id, 'state', this.state, [
-      'isCheckingUpdates',
-      'currentRelease',
       'updateProgressInfo',
-      'lastCheckAt',
-      'currentAnnouncement',
       'lastUpdateResult'
     ])
 
     this._mobx.propSync(SelfUpdateMain.id, 'settings', this.settings, [
       'autoCheckUpdates',
       'autoDownloadUpdates',
-      'downloadSource'
+      'ignoreVersion'
     ])
   }
 
   private _handlePeriodicCheck() {
     this._mobx.reaction(
-      () => this.settings.autoCheckUpdates,
-      (sure) => {
-        if (sure) {
-          this._checkUpdateTask.start(true)
-        } else {
-          this._checkUpdateTask.cancel()
-        }
-      },
-      { fireImmediately: true, delay: 3500 }
-    )
-
-    this._mobx.reaction(
-      () => [this.settings.autoDownloadUpdates, this.state.currentRelease] as const,
-      ([yes, currentRelease]) => {
-        if (yes && currentRelease && currentRelease.isNew) {
-          this._startUpdateProcess(currentRelease.downloadUrl, currentRelease.filename)
+      () => [this.settings.autoDownloadUpdates, this._rc.state.latestRelease] as const,
+      ([yes, release]) => {
+        if (yes && release && release.isNew && release.archiveFile) {
+          this._startUpdateProcess(
+            release as LatestReleaseWithMetadata & { archiveFile: GithubApiAsset }
+          )
         }
       },
       { equals: comparer.shallow }
     )
-
-    this._updateAnnouncement()
-    this._checkAnnouncementTimerId = setInterval(() => {
-      this._updateAnnouncement()
-    }, SelfUpdateMain.ANNOUNCEMENT_CHECK_INTERVAL)
-  }
-
-  private async _updateAnnouncement() {
-    this._log.info(`正在拉取最新公告: ${LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL}`)
-
-    try {
-      const { data } = await this._http.get<FileInfo>(LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL)
-
-      const { data: announcement } = await this._http.get<string>(data.download_url, {
-        headers: { 'Cache-Control': 'no-cache' }
-      })
-
-      const md5 = crypto.createHash('md5').update(announcement).digest('hex')
-
-      const lastReadSha = await this._setting._getFromStorage('lastReadAnnouncementMd5', '')
-
-      this.state.setCurrentAnnouncement({
-        content: announcement,
-        updateAt: new Date(),
-        isRead: md5 === lastReadSha,
-        md5
-      })
-    } catch (error) {
-      this._log.warn(`尝试拉取公告失败`, error)
-    }
-  }
-
-  private async _fetchLatestReleaseInfo(gitLikeUrl: string, debug = false) {
-    const { data } = await this._http.get<GithubApiLatestRelease>(gitLikeUrl)
-    const currentVersion = app.getVersion()
-    const versionString = data.tag_name
-
-    const isNewVersion = lt(currentVersion, versionString) || debug
-
-    let archiveFile = data.assets.find((a) => {
-      return a.content_type === 'application/x-compressed'
-    })
-
-    if (archiveFile) {
-      return { ...data, archiveFile, isNew: isNewVersion }
-    }
-
-    archiveFile = data.assets.find((a) => {
-      // 你要知道 Gitee 现在没有 content_type 字段
-      return a.browser_download_url.endsWith('win.7z') || a.browser_download_url.endsWith('win.zip')
-    })
-
-    if (archiveFile) {
-      this._log.info(
-        `当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
-      )
-      return { ...data, archiveFile, isNew: isNewVersion }
-    }
-
-    this._log.warn(
-      `版本不附带可下载文件, 当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
-    )
-
-    return null
-  }
-
-  /**
-   * 尝试加载更新信息
-   */
-  private async _updateReleaseUpdatesInfo(debug = false) {
-    if (this.state.isCheckingUpdates) {
-      return {
-        result: 'is-checking-updates'
-      }
-    }
-
-    this.state.setCheckingUpdates(true)
-
-    const sourceUrl = SelfUpdateMain.UPDATE_SOURCE[this.settings.downloadSource]
-
-    try {
-      const release = await this._fetchLatestReleaseInfo(sourceUrl, debug)
-
-      this.state.setLastCheckAt(new Date())
-
-      if (!release) {
-        return {
-          result: 'no-updates'
-        }
-      }
-
-      this.state.setCurrentRelease({
-        isNew: debug || release.isNew,
-        source: this.settings.downloadSource,
-        currentVersion: app.getVersion(),
-        releaseNotes: release.body,
-        downloadUrl: release.archiveFile.browser_download_url,
-        releaseVersion: release.tag_name,
-        releaseNotesUrl: release.html_url,
-        filename: release.archiveFile.name
-      })
-
-      this._checkUpdateTask.start()
-
-      if (debug || release.isNew) {
-        return { result: 'new-updates' }
-      } else {
-        return { result: 'no-updates' }
-      }
-    } catch (error: any) {
-      this._log.warn(`尝试检查时更新失败`, error)
-      return {
-        result: 'failed',
-        reason: error.message
-      }
-    } finally {
-      this.state.setCheckingUpdates(false)
-    }
   }
 
   private async _downloadUpdate(downloadUrl: string, filename: string) {
@@ -273,10 +116,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       resp = await this._http.get<Readable>(downloadUrl, {
         responseType: 'stream'
       })
-      this._log.info(`已连接，正在下载更新包 from: ${downloadUrl}, 文件名${filename}`)
+      this._log.info(`Connected, downloading update from: ${downloadUrl}, filename: ${filename}`)
     } catch (error) {
       this.state.setUpdateProgressInfo(null)
-      this._log.warn(`下载更新包失败`, error)
+      this._log.warn(`Failed to download update`, error)
       this._ipc.sendEvent(SelfUpdateMain.id, 'error-download-update', formatError(error))
       throw error
     }
@@ -312,7 +155,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         error.name = 'Canceled'
         resp.data.destroy(error)
         writer.close()
-        this._log.info(`取消下载更新包 ${downloadPath}`)
+        this._log.info(`Cancelled downloading update ${downloadPath}`)
       }
 
       const _updateProgress = (nowTime: number) => {
@@ -358,7 +201,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
               unpackingProgress: 0
             })
             this._ipc.sendEvent(SelfUpdateMain.id, 'error-download-update', formatError(error))
-            this._log.warn(`下载或写入更新包文件失败 ${formatError(error)}`)
+            this._log.warn(`Failed to download or write update file ${formatError(error)}`)
           }
 
           if (ofs.existsSync(downloadPath)) {
@@ -367,7 +210,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
           reject(error)
         } else {
-          this._log.info(`完成下载并写入：${downloadPath}`)
+          this._log.info(`Downloaded and wrote to: ${downloadPath}`)
           resolve(downloadPath)
         }
 
@@ -388,7 +231,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         fileSize: 0,
         unpackingProgress: 0
       })
-      this._log.error(`更新包不存在 ${filepath}`)
+      this._log.error(`Update package does not exist ${filepath}`)
       throw new Error(`No such file ${filepath}`)
     }
 
@@ -404,12 +247,14 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     if (ofs.existsSync(extractedTo)) {
-      this._log.info(`存在旧的更新目录，删除旧的更新目录 ${extractedTo}`)
+      this._log.info(`Old update directory exists, deleting old update directory ${extractedTo}`)
       ofs.rmSync(extractedTo, { recursive: true, force: true })
     }
 
     const asyncTask = new Promise<string>((resolve, reject) => {
-      this._log.info(`开始解压更新包 ${filepath} 到 ${extractedTo}, 使用 ${sevenBinPath}`)
+      this._log.info(
+        `Starting to unpack update package ${filepath} to ${extractedTo}, using ${sevenBinPath}`
+      )
 
       const seven = extractFull(filepath, extractedTo, {
         $bin: sevenBinPath.replace('app.asar', 'app.asar.unpacked'),
@@ -420,7 +265,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         const error = new Error('Unpacking canceled')
         error.name = 'Canceled'
         seven.destroy(error)
-        this._log.info(`取消解压更新包 ${filepath}`)
+        this._log.info(`Cancelled unpacking update package ${filepath}`)
       }
 
       seven.on('progress', (progress) => {
@@ -462,7 +307,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         if (error.name === 'Canceled') {
           this.state.setUpdateProgressInfo(null)
           this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-unpack-update')
-          this._log.info(`取消解压更新包 ${filepath}`)
+          this._log.info(`Cancelled unpacking update package ${filepath}`)
         } else {
           this.state.setUpdateProgressInfo({
             phase: 'unpack-failed',
@@ -473,7 +318,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
             unpackingProgress: 0
           })
           this._ipc.sendEvent(SelfUpdateMain.id, 'error-unpack-update', formatError(error))
-          this._log.error(`解压更新包失败`, error)
+          this._log.error(`Failed to unpack update package`, error)
         }
 
         if (ofs.existsSync(filepath)) {
@@ -487,13 +332,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private async _applyUpdatesOnNextStartup(
-    newUpdateDir: string,
-    _shouldStartNewApp: boolean = true
-  ) {
+  private async _applyUpdatesOnNextStartup(newUpdateDir: string, newVersion: string) {
     if (!ofs.existsSync(newUpdateDir)) {
       this.state.setUpdateProgressInfo(null)
-      this._log.error(`更新目录不存在 ${newUpdateDir}`)
+      this._log.error(`Update directory does not exist ${newUpdateDir}`)
       throw new Error(`No such directory ${newUpdateDir}`)
     }
 
@@ -503,7 +345,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     )
 
     this._log.info(
-      '写入更新可执行文件',
+      'Writing update executable',
       updateExecutablePath.replace('app.asar', 'app.asar.unpacked'),
       copiedExecutablePath
     )
@@ -517,11 +359,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const appDir = path.dirname(appExePath)
 
     if (this._updateOnQuitFn) {
-      this._log.info(`存在上一个退出更新任务，移除上一个退出任务`)
+      this._log.info(`Previous update task exists, removing previous task`)
     }
 
     this._log.info(
-      `添加退出任务: 更新流程 ${copiedExecutablePath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
+      `Adding exit task: update process ${copiedExecutablePath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
     )
 
     this._createNotification(
@@ -545,7 +387,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
       ofs.writeFileSync(
         path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG),
-        JSON.stringify(this.state.currentRelease?.releaseVersion || '')
+        JSON.stringify(newVersion)
       )
     }
 
@@ -577,14 +419,16 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       this.state.setUpdateProgressInfo(null)
 
       this._log.info(
-        `取消退出更新任务`,
-        `删除更新脚本 ${copiedExecutablePath}`,
-        `删除更新目录 ${newUpdateDir}`
+        `Cancelling exit update task`,
+        `Deleting update script ${copiedExecutablePath}`,
+        `Deleting update directory ${newUpdateDir}`
       )
     }
   }
 
-  private async _startUpdateProcess(archiveFileUrl: string, filename: string) {
+  private async _startUpdateProcess(
+    release: LatestReleaseWithMetadata & { archiveFile: GithubApiAsset }
+  ) {
     if (
       this.state.updateProgressInfo &&
       (this.state.updateProgressInfo.phase === 'downloading' ||
@@ -598,7 +442,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     let downloadPath: string
     try {
-      downloadPath = await this._downloadUpdate(archiveFileUrl, filename)
+      downloadPath = await this._downloadUpdate(
+        release.archiveFile.browser_download_url,
+        release.archiveFile.name
+      )
     } catch {
       return
     }
@@ -611,7 +458,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
 
     try {
-      await this._applyUpdatesOnNextStartup(unpackedPath, true)
+      await this._applyUpdatesOnNextStartup(unpackedPath, release.tag_name)
     } catch {}
   }
 
@@ -621,39 +468,62 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         this._currentUpdateTaskCanceler()
       } catch (error) {
         this._ipc.sendEvent(SelfUpdateMain.id, 'error-cancel-update', formatError(error))
-        this._log.warn(`尝试取消更新任务时发生错误`, error)
+        this._log.warn(`Failed to cancel update task`, error)
       }
     }
 
     this.state.setUpdateProgressInfo(null)
-    this.state.setCurrentRelease(null)
+  }
+
+  private async _checkUpdates() {
+    try {
+      const release = await this._rc.updateLatestReleaseManually()
+
+      if (release && release.isNew && release.archiveFile) {
+        return { result: 'new-updates' }
+      } else {
+        return { result: 'no-updates' }
+      }
+    } catch (error) {
+      return { result: 'failed', reason: error }
+    }
   }
 
   private _handleIpcCall() {
     this._ipc.onCall(SelfUpdateMain.id, 'checkUpdates', async () => {
-      return await this._updateReleaseUpdatesInfo()
-    })
-
-    this._ipc.onCall(SelfUpdateMain.id, 'checkUpdatesDebug', async () => {
-      return await this._updateReleaseUpdatesInfo(true)
+      return await this._checkUpdates()
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'startUpdate', async () => {
-      if (this.state.currentRelease && this.state.currentRelease.isNew) {
+      if (
+        this._rc.state.latestRelease &&
+        this._rc.state.latestRelease.isNew &&
+        this._rc.state.latestRelease.archiveFile
+      ) {
         await this._startUpdateProcess(
-          this.state.currentRelease.downloadUrl,
-          this.state.currentRelease.filename
+          this._rc.state.latestRelease as LatestReleaseWithMetadata & {
+            archiveFile: GithubApiAsset
+          }
         )
       }
     })
 
-    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (_, md5: string) => {
-      if (this.state.currentAnnouncement) {
-        this.state.setAnnouncementRead(true)
-        await this._setting._saveToStorage('lastReadAnnouncementMd5', md5)
+    // 仅仅用于 debug
+    this._ipc.onCall(SelfUpdateMain.id, 'forceStartUpdate', async () => {
+      if (this._rc.state.latestRelease && this._rc.state.latestRelease.archiveFile) {
+        this._log.info(
+          'Force start update, target:',
+          this._rc.state.latestRelease.tag_name,
+          this._rc.state.latestRelease.archiveFile.name
+        )
+        await this._startUpdateProcess(
+          this._rc.state.latestRelease as LatestReleaseWithMetadata & {
+            archiveFile: GithubApiAsset
+          }
+        )
+      } else {
+        this._log.warn('No latest release found, cannot force start update')
       }
-
-      return
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'cancelUpdate', () => {
@@ -680,9 +550,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     if (this.state.updateProgressInfo?.phase !== 'waiting-for-restart') {
       this._cancelUpdateProcess()
     }
-
-    this._checkUpdateTask.cancel()
-    this._checkAnnouncementTimerId && clearInterval(this._checkAnnouncementTimerId)
   }
 
   private _createNotification(title = 'League Akari', text: string) {
@@ -698,7 +565,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private async _checkLastFailedUpdate() {
     const newVersionFlagPath = path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG)
 
-    this._log.info(`检查自动更新结果`, newVersionFlagPath)
+    this._log.info(`Checking auto-update result`, newVersionFlagPath)
 
     try {
       await ofs.promises.access(newVersionFlagPath)
@@ -714,32 +581,30 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       )
 
       if (valid(targetVersion)) {
-        const pageUrl =
-          SelfUpdateMain.RELEASE_PAGE_SOURCE[this.settings.downloadSource] ||
-          SelfUpdateMain.RELEASE_PAGE_SOURCE.github
-
         if (gte(app.getVersion(), targetVersion)) {
-          this._log.info(`看来已经成功更新`, targetVersion, newVersionFlagPath)
+          this._log.info(
+            `Looks like it has been successfully updated`,
+            targetVersion,
+            newVersionFlagPath
+          )
           this.state.setLastUpdateResult({
             success: true,
-            reason: 'Successfully updated',
-            newVersionPageUrl: pageUrl
+            reason: 'Successfully updated'
           })
         } else {
-          this._log.info(`上次的自动更新似乎失败了`, targetVersion, newVersionFlagPath)
+          this._log.info(`Last auto-update seems to have failed`, targetVersion, newVersionFlagPath)
           this.state.setLastUpdateResult({
             success: false,
-            reason: 'Something wrong...',
-            newVersionPageUrl: pageUrl
+            reason: 'Something wrong...'
           })
         }
       } else {
-        this._log.warn('更新标志非正常版本号', targetVersion)
+        this._log.warn('Update flag is not a normal version number', targetVersion)
       }
 
       await ofs.promises.unlink(newVersionFlagPath)
     } catch (error) {
-      this._log.warn('检查更新标志时出现错误', error)
+      this._log.warn('Error checking update flag', error)
     }
   }
 

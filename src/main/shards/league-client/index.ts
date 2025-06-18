@@ -1,9 +1,10 @@
-import { tools } from '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { AxiosRetry } from 'axios-retry'
@@ -58,6 +59,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   static REQUEST_TIMEOUT_MS = 12500
   static FIXED_ITEM_SET_PREFIX = 'akari1'
 
+  static PROCESS_NAME = 'LeagueClient.exe'
+
   public readonly settings = new LeagueClientSettings()
   public readonly state = new LeagueClientState()
 
@@ -77,6 +80,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   private _assetLimiter = new PQueue({ concurrency: 8 })
 
+  // 处理仅关闭 UX 而 LeagueClient 未关闭的情况
+  private _shouldHaveOneAttempt = false
   private _manuallyDisconnected = false
 
   get http() {
@@ -143,6 +148,30 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._disconnect()
     this.events.clear()
     this._protocol.unregisterDomain('league-client')
+  }
+
+  /**
+   * 有的时候可能只会关闭 UX，但命令行是通过 UX 获取的
+   *
+   * 我们先缓存一次已经连接的信息。如果软件启动时没找到 UX 但客户端存在，则尝试连接一次
+   */
+  private async _tryResumeConnection() {
+    const lastConnectedClient = await this._setting._getFromStorage('lastConnectedClient')
+
+    if (lastConnectedClient !== null) {
+      const p1 = tools.getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const p2 = tools.getPidsByName(LeagueClientMain.PROCESS_NAME)
+
+      if (p1.length === 0 && p2.length === 1) {
+        const { certificate, ...rest } = lastConnectedClient
+        this._log.info('Trying to resume connection', rest)
+
+        this._shouldHaveOneAttempt = true
+        this.state.setConnectingClient(lastConnectedClient)
+      } else {
+        await this._setting._removeFromStorage('lastConnectedClient').catch(() => {})
+      }
+    }
   }
 
   private _handleProtocol() {
@@ -218,19 +247,27 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           return { ...rest, config: { data: c.data, url: c.url } }
         }
 
-        this._log.warn('LeagueClient HTTP 客户端错误', error)
+        this._log.warn('LeagueClient HTTP Client Error', error)
         throw error
       }
     })
 
-    this._ipc.onCall(LeagueClientMain.id, 'connect', async (_, auth: UxCommandLine) => {
-      if (this.state.connectionState === 'connected') {
-        this._disconnect()
-      }
+    this._ipc.onCall(
+      LeagueClientMain.id,
+      'connect',
+      async (_, auth: UxCommandLine & { force?: boolean }) => {
+        if (this.state.connectionState === 'connected') {
+          this._disconnect()
+        }
 
-      await this._ux.update()
-      this.state.setConnectingClient(auth)
-    })
+        if (auth.force) {
+          this._shouldHaveOneAttempt = true
+        }
+
+        await this._ux.update()
+        this.state.setConnectingClient(auth)
+      }
+    )
 
     this._ipc.onCall(LeagueClientMain.id, 'disconnect', async () => {
       this._manuallyDisconnected = true
@@ -256,7 +293,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       })
       this._rendererSubMap.set(newId, dispose)
 
-      this._log.debug(`渲染进程订阅 LCU 事件 ${uri}，ID: ${newId}`)
+      this._log.debug(`Renderer subscribed to LCU event ${uri}, ID: ${newId}`)
 
       return newId
     })
@@ -267,12 +304,16 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         dispose()
         this._rendererSubMap.delete(subId)
 
-        this._log.debug(`渲染进程取消订阅 LCU 事件，ID: ${subId}`)
+        this._log.debug(`Renderer unsubscribed from LCU event, ID: ${subId}`)
 
         return true
       }
 
       return false
+    })
+
+    this._ipc.onCall(LeagueClientMain.id, 'peekClient', async (_, auth: UxCommandLine) => {
+      return await this._peekClient(auth)
     })
   }
 
@@ -302,6 +343,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         this._doConnectingLoop()
       }
     )
+
+    if (this.settings.autoConnect) {
+      await this._tryResumeConnection()
+    }
 
     // 当客户端唯一时，自动连接到该 LeagueClient
     this._mobx.reaction(
@@ -340,9 +385,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ([a, s]) => {
         if (a) {
           const { certificate, ...rest } = a
-          this._log.debug(`LCU 状态发生变化: ${s}`, rest)
+          this._log.debug(`LCU state changed: ${s}`, rest)
         } else {
-          this._log.debug(`LCU 状态发生变化: ${s}`, a)
+          this._log.debug(`LCU state changed: ${s}`, a)
         }
       },
       { equals: comparer.shallow }
@@ -371,7 +416,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
 
       // 目标连接对象已不在当前启动列表中，停止连接
-      if (!this._ux.state.launchedClients.find((c) => c.pid === this.state.connectingClient?.pid)) {
+      if (
+        !this._shouldHaveOneAttempt &&
+        !this._ux.state.launchedClients.find((c) => c.pid === this.state.connectingClient?.pid)
+      ) {
         this.state.setConnectingClient(null)
         break
       }
@@ -383,9 +431,15 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       } catch (error) {
         if ((error as any).code !== 'ECONNREFUSED') {
           this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._log.warn(`尝试连接到 LC 时发生错误`, error)
+          this._log.warn(`Error connecting to LC`, error)
           break
         }
+      }
+
+      if (this._shouldHaveOneAttempt) {
+        this._shouldHaveOneAttempt = false
+        this.state.setConnectingClient(null)
+        break
       }
 
       await sleep(LeagueClientMain.CONNECT_TO_LC_RETRY_INTERVAL)
@@ -443,12 +497,18 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
     const { certificate, ...rest } = cmd
 
-    this._log.info('目标客户端', rest)
+    this._log.info('Target client', rest)
 
     this.state.setConnecting()
 
     const initWs = async () => {
       try {
+        // in case of connection is not closed properly
+        if (this._ws) {
+          this._ws.close()
+          this._ws = null
+        }
+
         this._ws = await this._wsPromisified(`wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`, {
           headers: {
             Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
@@ -480,6 +540,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       await initWs()
       await this._initHttpInstance(cmd)
       this.state.setConnected(cmd)
+      this._setting._saveToStorage('lastConnectedClient', cmd).catch(() => {})
     } catch (error) {
       this.state.setDisconnected()
       this._cleanup()
@@ -494,15 +555,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-        keepAlive: true,
-        maxCachedSessions: 2048,
-        maxFreeSockets: 1024
+        rejectUnauthorized: false
       }),
-      httpAgent: new https.Agent({
-        keepAlive: true,
-        maxFreeSockets: 1024
-      }),
+      httpAgent: new https.Agent(),
       timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
       proxy: false
     })
@@ -523,7 +578,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       this._api = new LeagueClientHttpApiAxiosHelper(this._http)
     } catch (error) {
       if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-        this._log.warn(`无法执行 PING 操作`, error)
+        this._log.warn(`Failed to execute PING operation`, error)
         throw error
       }
     }
@@ -586,13 +641,49 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         const fileName = `${itemSet.uid}.json`
         const filePath = path.join(targetPath, fileName)
 
-        this._log.info(`写入物品集到文件 ${filePath}`)
+        this._log.info(`Write item set to disk: ${filePath}`)
 
         fs.writeFileSync(filePath, JSON.stringify(itemSet), { encoding: 'utf-8' })
       }
     } catch (error) {
-      this._log.error(`写入物品集到本地文件失败`, error)
+      this._log.error(`Failed to write item set to local file`, error)
       throw error
+    }
+  }
+
+  /**
+   * 在连接之前, 先尝试获取一些召唤师信息
+   */
+  private async _peekClient(auth: UxCommandLine) {
+    const c = axios.create({
+      baseURL: `https://127.0.0.1:${auth.port}`,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      }),
+      httpAgent: new https.Agent(),
+      timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
+      proxy: false
+    })
+
+    try {
+      const { data: summoner } = await c.get<SummonerInfo>('/lol-summoner/v1/current-summoner')
+      const { data: profileIcon, headers } = await c.get(
+        `/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`,
+        { responseType: 'arraybuffer' }
+      )
+
+      const contentType = headers['content-type'] || 'image/jpeg'
+
+      return {
+        summoner,
+        profileIcon: `data:${contentType};base64,${Buffer.from(profileIcon).toString('base64')}`
+      }
+    } catch (error) {
+      this._log.warn(`Failed to peek client`, auth.pid, error)
+      return null
     }
   }
 

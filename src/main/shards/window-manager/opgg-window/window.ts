@@ -116,11 +116,11 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
               }
             })
           } catch {
-            this._log.warn('无法注册 opgg 窗口快捷键')
+            this._log.warn('Failed to register opgg window shortcut')
             this._setting.set('showShortcut', null)
           }
         } else {
-          this._log.debug('注销 opgg 窗口快捷键')
+          this._log.debug('Unregister opgg window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
         }
       },

@@ -33,21 +33,6 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="isDev && as.settings.isInKyokoMode"
-        class="control-item-margin"
-        :label="t('AppSettings.basic.logLevel.label')"
-        :label-description="t('AppSettings.basic.logLevel.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="ls.logLevel"
-          @update:value="(val) => lg.setLogLevel(val)"
-          :options="logLevels"
-        />
-      </ControlItem>
-      <ControlItem
         v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         label="Theme Color (experimental)"
@@ -77,23 +62,86 @@
           :options="backgroundMaterials"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.basic.dataSource.label')"
+        :label-description="t('AppSettings.basic.dataSource.description')"
+        :label-width="400"
+      >
+        <NFlex align="center">
+          <NSelect
+            style="width: 160px"
+            size="small"
+            :value="rcs.settings.preferredSource"
+            @update:value="(val) => rc.setPreferredSource(val)"
+            :options="remoteConfigSource"
+          />
+          <NTooltip>
+            <template #trigger>
+              <div class="hover-text">
+                {{ t('AppSettings.basic.dataSource.howToChoose') }}
+              </div>
+            </template>
+            <div>
+              <div style="display: flex; align-items: center; height: 22px">
+                <NIcon style="margin-right: 8px; font-size: 16px">
+                  <GiteeSvg />
+                </NIcon>
+                <span style="font-weight: bold; font-size: 12px">Gitee</span>
+                <span style="margin-left: 4px">
+                  <template v-if="isTestingLatency">
+                    {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                  </template>
+                  <template v-else-if="latency">
+                    ({{
+                      latency.giteeLatency === -1
+                        ? t('AppSettings.basic.dataSource.timeout')
+                        : `${latency.giteeLatency} ms`
+                    }})
+                  </template>
+                </span>
+              </div>
+              <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
+            </div>
+            <div style="margin-top: 8px">
+              <div style="display: flex; align-items: center; height: 22px">
+                <NIcon style="margin-right: 8px">
+                  <GithubIcon />
+                </NIcon>
+                <span style="font-size: 12px; font-weight: bold">GitHub</span>
+                <span style="margin-left: 4px">
+                  <template v-if="isTestingLatency">
+                    {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                  </template>
+                  <template v-else-if="latency">
+                    ({{
+                      latency.githubLatency === -1
+                        ? t('AppSettings.basic.dataSource.timeout')
+                        : `${latency.githubLatency} ms`
+                    }})
+                  </template>
+                </span>
+              </div>
+              <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
+            </div>
+            <div style="margin-top: 8px; display: flex; justify-content: center">
+              <NButton
+                size="tiny"
+                secondary
+                @click="() => handleTestLatency()"
+                :loading="isTestingLatency"
+              >
+                {{ t('AppSettings.basic.dataSource.testButton') }}
+              </NButton>
+            </div>
+          </NTooltip>
+        </NFlex>
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
       </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.autoCheckUpdates.label')"
-        :label-description="t('AppSettings.selfUpdate.autoCheckUpdates.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="sus.settings.autoCheckUpdates"
-          @update:value="(val: boolean) => su.setAutoCheckUpdates(val)"
-        />
-      </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
@@ -108,41 +156,10 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.downloadSource.label')"
-        :label-description="t('AppSettings.selfUpdate.downloadSource.description')"
-        :label-width="400"
-      >
-        <NFlex align="center">
-          <NSelect
-            style="width: 160px"
-            size="small"
-            :value="sus.settings.downloadSource"
-            @update:value="(val) => su.setDownloadSource(val)"
-            :options="updateDownloadSource"
-          />
-          <NTooltip>
-            <template #trigger
-              ><div class="hover-text">
-                {{ t('AppSettings.selfUpdate.tip.title') }}
-              </div></template
-            >
-            <div style="font-size: 12px">
-              <span style="display: inline-block; width: 44px; font-weight: bold">Gitee</span>
-              {{ t('AppSettings.selfUpdate.tip.gitee') }}
-            </div>
-            <div style="font-size: 12px">
-              <span style="display: inline-block; width: 44px; font-weight: bold">GitHub</span>
-              {{ t('AppSettings.selfUpdate.tip.github') }}
-            </div>
-          </NTooltip>
-        </NFlex>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         :label="t('AppSettings.selfUpdate.checkUpdates')"
         :label-description="
           t('AppSettings.selfUpdate.checkFrom', {
-            source: UPDATE_SOURCE_MAP[sus.settings.downloadSource]
+            source: UPDATE_SOURCE_MAP[rcs.settings.preferredSource]
           })
         "
         :label-width="400"
@@ -150,7 +167,7 @@
         <NFlex align="center">
           <NButton
             size="small"
-            :loading="sus.isCheckingUpdates"
+            :loading="rcs.isUpdatingLatestRelease"
             secondary
             type="primary"
             @click="() => handleCheckUpdates()"
@@ -158,11 +175,11 @@
           >
           <NButton
             size="small"
-            v-if="sus.currentRelease"
+            v-if="rcs.latestRelease"
             secondary
             @click="() => handleShowUpdateModal()"
           >
-            <template v-if="sus.currentRelease.isNew">
+            <template v-if="rcs.latestRelease.isNew">
               {{ t('AppSettings.selfUpdate.newRelease') }}
             </template>
             <template v-else>
@@ -171,7 +188,7 @@
           </NButton>
           <NButton
             size="small"
-            v-if="sus.currentRelease && sus.currentRelease.isNew"
+            v-if="rcs.latestRelease && rcs.latestRelease.isNew"
             :disabled="sus.updateProgressInfo !== null"
             secondary
             @click="() => su.startUpdate()"
@@ -184,8 +201,9 @@
             secondary
             type="warning"
             @click="() => su.cancelUpdate()"
-            >{{ t('AppSettings.selfUpdate.cancelUpdate') }}</NButton
           >
+            {{ t('AppSettings.selfUpdate.cancelUpdate') }}
+          </NButton>
           <span v-if="sus.lastCheckAt" style="font-size: 12px"
             >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
             {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
@@ -336,6 +354,20 @@
       </template>
       <ControlItem
         class="control-item-margin"
+        :label="t('AppSettings.misc.logLevel.label')"
+        :label-description="t('AppSettings.misc.logLevel.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="ls.logLevel"
+          @update:value="(val) => lg.setLogLevel(val)"
+          :options="logLevels"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('AppSettings.misc.httpProxy.strategy.label')"
         :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
         :label-width="400"
@@ -402,6 +434,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import GiteeSvg from '@renderer-shared/components/icons/GiteeSvg.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { HttpProxySetting, useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -411,6 +444,8 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useLoggerStore } from '@renderer-shared/shards/logger/store'
+import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
+import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -419,6 +454,7 @@ import {
   useWindowManagerStore
 } from '@renderer-shared/shards/window-manager/store'
 import { formatSeconds } from '@shared/utils/format'
+import { Github as GithubIcon } from '@vicons/fa'
 import { useMediaQuery } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -427,6 +463,7 @@ import {
   NCard,
   NCollapseTransition,
   NFlex,
+  NIcon,
   NInput,
   NInputNumber,
   NScrollbar,
@@ -438,10 +475,11 @@ import {
   useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, inject } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
+import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
 const { t } = useTranslation()
 
@@ -455,6 +493,7 @@ const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 const ls = useLoggerStore()
+const rcs = useRemoteConfigStore()
 
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
@@ -462,6 +501,8 @@ const app = useInstance(AppCommonRenderer)
 const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
 const lg = useInstance(LoggerRenderer)
+const rc = useInstance(RemoteConfigRenderer)
+const sn = useInstance(SimpleNotificationsRenderer)
 
 const preferMica = useMicaAvailability()
 
@@ -476,7 +517,7 @@ const closeActions = computed(() => {
   ]
 })
 
-const updateDownloadSource = [
+const remoteConfigSource = [
   { label: 'Gitee', value: 'gitee' },
   { label: 'GitHub', value: 'github' }
 ]
@@ -565,10 +606,8 @@ const handleCheckUpdates = async () => {
   }
 }
 
-const appInject = inject('app') as any
-
-const handleShowUpdateModal = async () => {
-  appInject.openUpdateModal()
+const handleShowUpdateModal = () => {
+  sn.showNewReleaseModal()
 }
 
 const processStatus = computed(() => {
@@ -612,6 +651,17 @@ const processStatus = computed(() => {
       }
   }
 })
+
+const isTestingLatency = ref(false)
+const latency = ref<{ githubLatency: number; giteeLatency: number } | null>(null)
+
+const handleTestLatency = async () => {
+  isTestingLatency.value = true
+  latency.value = await rc.testLatency()
+  isTestingLatency.value = false
+}
+
+handleTestLatency()
 
 const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>

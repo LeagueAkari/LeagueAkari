@@ -100,6 +100,14 @@ export interface TabState {
 
   summonerProfile: SummonerProfile | null
 
+  /** 最近遇到过的对局 */
+  encounteredGamesPage: {
+    data: EncounteredGame[]
+    page: number
+    pageSize: number
+    total: number
+  } | null
+
   /** 标记信息 */
   tags: PlayerTagDto[]
 
@@ -111,6 +119,7 @@ export interface TabState {
   isLoadingTags: boolean
   isLoadingSavedInfo: boolean
   isLoadingSummonerProfile: boolean
+  isLoadingEncounteredGames: boolean
 
   isTakingScreenshot: boolean
 }
@@ -232,7 +241,7 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   }
 
   /** 避免太多的加载, 在所有的页面中可以共享 */
-  const detailedGameLruMap = new QuickLRU<number, Game>({ maxSize: 568 })
+  const detailedGameLruMap = new QuickLRU<string, Game>({ maxSize: 568 })
 
   return {
     settings,

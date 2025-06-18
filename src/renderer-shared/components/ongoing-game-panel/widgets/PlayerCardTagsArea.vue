@@ -87,7 +87,8 @@
               date: dayjs(savedInfo.lastMetAt)
                 .locale(as.settings.locale.toLowerCase())
                 .format('YYYY-MM-DD HH:mm:ss'),
-              countV: savedInfo.encounteredGames.length
+              countV: savedInfo.encounteredGames.total,
+              countV2: savedInfo.encounteredGames.data.length
             })
           }}
         </div>
@@ -207,11 +208,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        ogs.frontendSettings.playerCardTags.showPrivacyTag &&
-        summoner?.privacy === 'PRIVATE' &&
-        !isSelf
-      "
+      v-if="ogs.frontendSettings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
       :delay="50"
     >
       <template #trigger>
@@ -684,7 +681,7 @@ const encounteredGames = computed(() => {
     return []
   }
 
-  const mapped = savedInfo.encounteredGames.map((record) => {
+  const mapped = savedInfo.encounteredGames.data.map((record) => {
     const game = ogs.cachedGames[record.gameId]
 
     if (!game) {

@@ -1,12 +1,13 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LcuEvent } from '@shared/types/league-client/event'
-import { effectScope, watch } from 'vue'
+import { watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { useRendererDebugStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
@@ -16,13 +17,13 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   static id = 'renderer-debug-renderer'
 
   private readonly _matcher = new RadixEventEmitter()
-  private readonly _scope = effectScope()
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   async onInit() {
@@ -42,7 +43,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
       this._matcher.emit(data.uri, data)
     })
 
-    this._scope.run(() => {
+    this._setupInAppScope.addSetupFn(() => {
       watch(
         () => store.rules.length,
         (len) => {
@@ -142,9 +143,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     store.rules.splice(i, 1)
   }
 
-  async onDispose() {
-    this._scope.stop()
-  }
+  async onDispose() {}
 
   setSendAllNativeLcuEvents(value: boolean) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setSendAllNativeLcuEvents', value)

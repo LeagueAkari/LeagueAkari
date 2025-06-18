@@ -46,8 +46,10 @@ import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
       background-color: rgba(167, 37, 37, 0.518);
     }
 
-    .left-side-content {
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    .right-side-content {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-top-left-radius: 2px;
     }
   }
 }
@@ -56,10 +58,6 @@ import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
   .panel {
     .fixed-buttons {
       background-color: rgba(167, 37, 37, 0.518);
-    }
-
-    .left-side-content {
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
 }

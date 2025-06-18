@@ -63,7 +63,24 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       skip
     })
 
-    return encounteredGames
+    const total = await this._storage.dataSource.manager.count(EncounteredGame, {
+      where: {
+        selfPuuid: Equal(query.selfPuuid),
+        puuid: Equal(query.puuid),
+        queueType: query.queueType ? Equal(query.queueType) : undefined
+      }
+    })
+
+    return {
+      data: encounteredGames,
+      page,
+      pageSize,
+      total
+    }
+  }
+
+  async deleteEncounteredGame(recordId: number) {
+    return this._storage.dataSource.manager.delete(EncounteredGame, { id: recordId })
   }
 
   async saveEncounteredGame(dto: EncounteredGameSaveDto) {
@@ -377,6 +394,10 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
         return this.queryEncounteredGames(query)
       }
     )
+
+    this._ipc.onCall(SavedPlayerMain.id, 'deleteEncounteredGame', (_, recordId: number) => {
+      return this.deleteEncounteredGame(recordId)
+    })
 
     this._ipc.onCall(
       SavedPlayerMain.id,

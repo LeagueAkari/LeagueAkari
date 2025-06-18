@@ -18,6 +18,9 @@
           <span class="disconnected">{{ t('MatchHistoryTabs.disconnected') }}</span>
           <EasyToLaunch />
         </template>
+        <template v-if="lcs.login.loginQueueState">
+          <span class="disconnected">{{ t('MatchHistoryTabs.queueing') }}</span>
+        </template>
         <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
           <div class="no-tab">{{ t('MatchHistoryTabs.noActiveTab') }}</div>
           <div class="shortcut" @click="handleOpenSelfTab">

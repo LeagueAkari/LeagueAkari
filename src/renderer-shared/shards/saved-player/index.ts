@@ -2,6 +2,8 @@ import { Dep, Shard } from '@shared/akari-shard'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import LRUMap from 'quick-lru'
 
+import { EncounteredGame } from '@main-window/shards/match-history-tabs/store'
+
 import { AkariIpcRenderer } from '../ipc'
 
 const MAIN_SHARD_NAMESPACE = 'saved-player-main'
@@ -41,6 +43,18 @@ interface UpdateTagDto {
   tag: string | null
 }
 
+// copied from main shard
+export interface EncounteredGameQueryDto {
+  selfPuuid: string
+  puuid: string
+  region?: string
+  rsoPlatformId?: string
+  queueType?: string
+  pageSize?: number
+  page?: number
+  timeOrder?: 'desc' | 'asc'
+}
+
 @Shard(SavedPlayerRenderer.id)
 export class SavedPlayerRenderer {
   static id = 'saved-player-renderer'
@@ -61,6 +75,19 @@ export class SavedPlayerRenderer {
 
   getPlayerTags(dto: SavedPlayerQueryDto): Promise<PlayerTagDto[]> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getPlayerTags', dto)
+  }
+
+  queryEncounteredGames(dto: EncounteredGameQueryDto): Promise<{
+    data: EncounteredGame[]
+    page: number
+    pageSize: number
+    total: number
+  }> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryEncounteredGames', dto)
+  }
+
+  deleteEncounteredGame(recordId: number) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteEncounteredGame', recordId)
   }
 
   updatePlayerTag<T extends UpdateTagDto>(dto: T) {

@@ -99,7 +99,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this._lc.data.gameflow.phase,
       (phase) => {
-        this._log.info(`游戏流阶段变化: ${phase}`)
+        this._log.info(`Gameflow phase changed: ${phase}`)
       }
     )
   }
@@ -119,11 +119,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             this.settings.autoAcceptDelaySeconds * 1e3
           )
 
-          this._log.info(`ReadyCheck! 即将在 ${this.settings.autoAcceptDelaySeconds} 秒后接受对局`)
+          this._log.info(
+            `ReadyCheck! Will accept in ${this.settings.autoAcceptDelaySeconds} seconds`
+          )
         } else {
           if (this._autoAcceptTimerId) {
             if (this.state.willAccept) {
-              this._log.info(`取消了即将进行的接受操作 - 不在游戏 ReadyCheck 过程中`)
+              this._log.info(`Cancelled upcoming auto-accept - not in ReadyCheck phase`)
             }
 
             clearTimeout(this._autoAcceptTimerId)
@@ -170,7 +172,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         // 如果停留在结算页面时间过长，将考虑返回
         if (phase === 'WaitingForStats' && enabled) {
           this._log.info(
-            `位于 WaitingForStats，等待 ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
+            `In WaitingForStats, waiting for ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
           )
           this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
           return
@@ -178,13 +180,15 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
         // 在某些模式中，可能会出现仅有 PreEndOfGame 的情况，需要做一个计时器
         if (phase === 'PreEndOfGame' && enabled) {
-          this._log.info(`等待点赞事件 ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`)
+          this._log.info(
+            `Waiting for ballot event ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`
+          )
           this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
           return
         }
 
         if (phase === 'EndOfGame' && enabled) {
-          this._log.info(`将在 ${AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT} ms 后回到房间`)
+          this._log.info(`Will return to lobby in ${AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT} ms`)
           this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT)
           return
         }
@@ -198,7 +202,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       () => [this._lc.data.gameflow.phase, this.settings.autoReconnectEnabled] as const,
       ([phase, enabled]) => {
         if (phase === 'Reconnect' && enabled) {
-          this._log.info('将在短暂延迟后尝试重新连接')
+          this._log.info('Will attempt to reconnect in a short delay')
           this._reconnectTask.start(1000)
         } else {
           this._reconnectTask.cancel()
@@ -223,11 +227,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         if (rejectWhenAway && availability === 'away') {
-          this._log.info('拒绝邀请：当前状态为离开')
+          this._log.info('Rejecting invitation: current status is away')
           return
         }
 
-        this._log.info(`处理邀请: ${JSON.stringify(invitations)}, ${JSON.stringify(strategies)}`)
+        this._log.info(
+          `Handling invitations: ${JSON.stringify(invitations)}, ${JSON.stringify(strategies)}`
+        )
 
         const availableInvitations = invitations.filter(
           (i) => i.state === 'Pending' && i.canAcceptInvitation
@@ -279,15 +285,15 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         try {
           if (candidate.strategy === 'accept') {
             await this._lc.api.lobby.acceptReceivedInvitation(candidate.id)
-            this._log.info(`自动处理邀请: ${candidate.id}, ${candidate.strategy}`)
+            this._log.info(`Auto-handling invitation: ${candidate.id}, ${candidate.strategy}`)
           } else if (candidate.strategy === 'decline') {
             await this._lc.api.lobby.declineReceivedInvitation(candidate.id)
-            this._log.info(`自动处理邀请: ${candidate.id}, ${candidate.strategy}`)
+            this._log.info(`Auto-handling invitation: ${candidate.id}, ${candidate.strategy}`)
           } else {
-            this._log.info(`忽略这个邀请: ${candidate.id}, ${candidate.strategy}`)
+            this._log.info(`Ignoring invitation: ${candidate.id}, ${candidate.strategy}`)
           }
         } catch (error) {
-          this._log.warn(`自动处理失败: ${formatError(error)}`)
+          this._log.warn(`Auto-handling invitation failed: ${formatError(error)}`)
         }
       }
     )
@@ -335,7 +341,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         const fromMembers = info.readyMembers.length ? info.readyMembers : info.notReadyMembers
         const target = fromMembers[randomInt(0, fromMembers.length - 1)]
 
-        this._log.info('更换房间领导者', target)
+        this._log.info('Changing room leader', target)
 
         if (this._lc.data.chat.conversations.customGame) {
           this._lc.api.chat.chatSend(
@@ -346,7 +352,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         this._lc.api.lobby.promote(target).catch((e) => {
-          this._log.warn('尝试更换房间领导者时失败', e)
+          this._log.warn('Failed to change room leader', e)
         })
       },
       { fireImmediately: true }
@@ -358,7 +364,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
    */
   private _adjustDodgeTimer(msLeft: number, threshold: number) {
     const dodgeIn = Math.max(msLeft - threshold * 1e3, 0)
-    this._log.info(`时间校正：将在 ${dodgeIn} ms 后秒退`)
+    this._log.info(`Time correction: will dodge in ${dodgeIn} ms`)
     this._dodgeTask.start(dodgeIn)
     this.state.setDodgeAt(Date.now() + dodgeIn)
   }
@@ -369,7 +375,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       ([hasSession, enabled]) => {
         if (!hasSession || !enabled) {
           if (this._dodgeTask.cancel()) {
-            this._log.info('预定秒退已取消')
+            this._log.info('Dodge timer cancelled')
           }
           this.state.setDodgeAt(-1)
           this.state.setWillDodgeAtLastSecond(false)
@@ -487,7 +493,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             }
 
             await this._lc.api.honor.ballot()
-            this._log.info(`自动点赞：给玩家 ${candidates.join(', ')} 点赞, 对局 ID: ${h.gameId}`)
+            this._log.info(`Auto-honor: voting for ${candidates.join(', ')}, game ID: ${h.gameId}`)
           } catch (error) {
             this._ipc.sendEvent(AutoGameflowMain.id, 'error-auto-honor', formatError(error))
             this._lc.api.playerNotifications
@@ -498,7 +504,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
                 })
               )
               .catch(() => {})
-            this._log.warn(`自动点赞出现错误 ${formatError(error)}`)
+            this._log.warn(`Auto-honor error: ${formatError(error)}`)
           }
         }
       },
@@ -529,7 +535,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         if (s === 'can-start-activity') {
-          this._log.info(`现在将在 ${this.settings.autoMatchmakingDelaySeconds} 秒后开始匹配`)
+          this._log.info(
+            `Now will start matchmaking in ${this.settings.autoMatchmakingDelaySeconds} seconds`
+          )
           this.state.setSearchMatchAt(Date.now() + this.settings.autoMatchmakingDelaySeconds * 1e3)
           this._autoSearchMatchTimerId = setTimeout(
             () => this._startMatchmaking(),
@@ -596,14 +604,14 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         if (st === 'fixed-duration') {
           if (s.timeInQueue - penaltyTime >= d) {
             this._lc.api.lobby.deleteSearchMatch().catch((e) => {
-              this._log.warn(`尝试取消匹配时失败 ${formatError(e)}`)
+              this._log.warn(`Failed to cancel matchmaking: ${formatError(e)}`)
             })
             return
           }
         } else if (st === 'estimated-duration') {
           if (s.timeInQueue - penaltyTime >= s.estimatedQueueTime) {
             this._lc.api.lobby.deleteSearchMatch().catch((e) => {
-              this._log.warn(`尝试取消匹配时失败 ${formatError(e)}`)
+              this._log.warn(`Failed to cancel matchmaking: ${formatError(e)}`)
             })
           }
         }
@@ -617,11 +625,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       if (event.data) {
         // TODO: 暂时将 missions-celebration 合并到 play-again 逻辑设置下
         if (this.settings.playAgainEnabled && event.data.name === 'missions-celebration') {
-          this._log.info('PreEndOfGame currentSequenceEvent: missions-celebration，尝试完成')
+          this._log.info(
+            'PreEndOfGame currentSequenceEvent: missions-celebration, attempting to complete'
+          )
           try {
             await this._lc.api.preEndOfGame.complete('missions-celebration')
           } catch (error) {
-            this._log.warn(`无法完成 missions-celebration: ${formatError(error)}`)
+            this._log.warn(`Failed to complete missions-celebration: ${formatError(error)}`)
           }
         }
       }
@@ -641,7 +651,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           })
         )
         .catch(() => {})
-      this._log.warn(`无法接受对局`, error)
+      this._log.warn(`Failed to accept match`, error)
     }
     this.state.clearAutoAccept()
     this._autoSearchMatchTimerId = null
@@ -666,25 +676,25 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           })
         )
         .catch(() => {})
-      this._log.warn(`无法开始匹配`, error)
+      this._log.warn(`Failed to start matchmaking`, error)
     }
   }
 
   private async _playAgainFn() {
     try {
-      this._log.info('Play again, 返回房间')
+      this._log.info('Play again, returning to lobby')
       await this._lc.api.lobby.playAgain()
     } catch (error) {
-      this._log.warn(`尝试 Play again 时失败`, error)
+      this._log.warn(`Failed to play again`, error)
     }
   }
 
   private async _dodgeFn() {
     try {
-      this._log.info('Dodge, 秒退')
+      this._log.info('Dodge, dodging')
       await this._lc.api.login.dodge()
     } catch (error) {
-      this._log.warn(`尝试秒退时失败`, error)
+      this._log.warn(`Failed to dodge`, error)
     } finally {
       this.state.setDodgeAt(-1)
     }
@@ -692,11 +702,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
   private async _reconnectFn() {
     try {
-      this._log.info('Reconnect! 尝试重新连接')
+      this._log.info('Reconnect! Attempting to reconnect')
       await this._lc.api.gameflow.reconnect()
-    } catch (error) {
-      this._log.warn(`尝试重新连接失败`, error)
-    }
+    } catch (error) {}
   }
 
   private async _handleState() {
@@ -758,11 +766,11 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         clearTimeout(this._autoAcceptTimerId)
         this._autoAcceptTimerId = null
         if (reason === 'accepted') {
-          this._log.info(`取消了即将进行的接受 - 已经被接受`)
+          this._log.info(`Auto-accept cancelled - already accepted`)
         } else if (reason === 'declined') {
-          this._log.info(`取消了即将进行的接受 - 已经被拒绝`)
+          this._log.info(`Auto-accept cancelled - already declined`)
         } else {
-          this._log.info(`取消了即将进行的接受`)
+          this._log.info(`Auto-accept cancelled - ${reason || 'unknown reason'}`)
         }
       }
       this.state.clearAutoAccept()
@@ -782,7 +790,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       }
 
       this.state.clearAutoSearchMatch()
-      this._log.info(`即将进行的自动匹配对局已取消，${reason || '未知'}`)
+      this._log.info(`Auto-matchmaking cancelled - ${reason || 'unknown reason'}`)
     }
   }
 

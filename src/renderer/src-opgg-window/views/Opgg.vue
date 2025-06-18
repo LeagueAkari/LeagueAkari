@@ -117,6 +117,7 @@
         :loading="isLoading"
         :version="version || undefined"
         @to-champion="(id) => handleToChampion(id, false)"
+        @cancel="cancelAll"
       />
       <OpggChampion
         v-show="currentTab === 'champion'"
@@ -134,6 +135,7 @@
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
         @add-to-item-set="handleAddToItemSet"
+        @cancel="cancelAll"
       />
     </div>
     <Transition name="fade">
@@ -220,6 +222,7 @@
 
 <script lang="ts" setup>
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
+import { restoreRecipe } from '@opgg-window/utils/recipe-restore'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import { ArrowBack as ArrowBackIcon } from '@vicons/ionicons5';
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
@@ -507,17 +510,33 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
   }
 }
 
+let shouldStopLoading = false
 const loadAll = async () => {
   try {
     champion.value = null
     tierData.value = null
     versions.value = []
-    await loadVersionsData()
-    await loadTierData()
-    await loadChampionData(false)
+    shouldStopLoading = false
+
+    if (!shouldStopLoading) {
+      await loadVersionsData()
+    }
+    if (!shouldStopLoading) {
+      await loadTierData()
+    }
+    if (!shouldStopLoading) {
+      await loadChampionData(false)
+    }
   } catch {
   } finally {
   }
+}
+
+const cancelAll = () => {
+  shouldStopLoading = true
+  loadVersionsController?.abort()
+  loadTierController?.abort()
+  loadChampionController?.abort()
 }
 
 const handleVersionChange = async (v: string) => {
@@ -901,7 +920,6 @@ const toItemSetsUid = (traits: {
   return `akari1-${traits.championId}-${traits.mode || '_'}-${traits.region || '_'}-${traits.tier || '_'}-${traits.position || '_'}-${traits.version || '_'}`
 }
 
-// TODO
 const handleAddToItemSet = async () => {
   if (!champion.value || !isAbleToAddToItemSet.value) {
     return
@@ -977,19 +995,6 @@ const handleAddToItemSet = async () => {
       })
     }
 
-    function itemBugHotfix(id: number): number {
-      switch (id) {
-        case 3121:
-          return 3119;
-        case 3042:
-          return 3004;
-        case 3040:
-          return 3003;
-        default:
-          return id;
-      }
-    }
-
     await lc.writeItemSetsToDisk([
       {
         uid: newUid,
@@ -1001,7 +1006,7 @@ const handleAddToItemSet = async () => {
         blocks: itemGroups.map((g) => ({
           type: g.title,
           items: g.items.map((i) => ({
-            id: itemBugHotfix(i).toString(),
+            id: restoreRecipe(i).toString(),
             count: 1
           }))
         })),

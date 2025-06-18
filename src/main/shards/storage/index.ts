@@ -62,27 +62,27 @@ export class StorageMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info(`当前数据库文件位于 ${dbPath}`)
+    this._log.info(`Current database file located at ${dbPath}`)
 
     const { needToRecreateDatabase, needToPerformUpgrade, currentVersion } =
       await this._checkDatabaseVersion(dataSource)
 
-    this._log.info(`当前版本 ${currentVersion}`)
+    this._log.info(`Current version ${currentVersion}`)
 
     let cv = currentVersion
 
     if (!needToPerformUpgrade && !needToPerformUpgrade) {
-      this._log.info(`当前版本数据库无需迁移`)
+      this._log.info(`Current version database does not need to be migrated`)
     }
 
     if (needToRecreateDatabase) {
-      this._log.warn(`错误的数据库格式，需要重建数据库`)
+      this._log.warn(`Invalid database format, need to recreate database`)
       await this._recreateDatabase(dataSource, dbPath)
       cv = 0
     }
 
     if (needToPerformUpgrade) {
-      this._log.info(`数据库需要从 ${cv} 版本升级`)
+      this._log.info(`Database needs to be upgraded from ${cv} version`)
       const queryRunner = dataSource.createQueryRunner()
       await queryRunner.startTransaction()
 
@@ -107,14 +107,14 @@ export class StorageMain implements IAkariShardInitDispose {
       .filter(([v]) => Number(v) > currentVersion)
       .toSorted(([v1], [v2]) => Number(v1) - Number(v2))
 
-    this._log.info(`即将进行的数据库升级数量: ${pendingUpgrades.length}`)
+    this._log.info(`Number of database upgrades to be performed: ${pendingUpgrades.length}`)
 
     for (const [v, fn] of pendingUpgrades) {
-      this._log.info(`正在执行 => 版本 ${v} 的迁移`)
+      this._log.info(`Executing => version ${v} migration`)
       await fn(r)
     }
 
-    this._log.info(`已完成所有数据库迁移`)
+    this._log.info(`All database migrations completed`)
   }
 
   private async _initializeDatabase(dataSource: DataSource) {
@@ -128,7 +128,7 @@ export class StorageMain implements IAkariShardInitDispose {
       const backupPath = join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
 
       renameSync(dbPath, backupPath)
-      this._log.info(`原数据库无法使用, 已备份至 ${backupPath}`)
+      this._log.info(`Original database cannot be used, backed up to ${backupPath}`)
     }
 
     await dataSource.initialize()

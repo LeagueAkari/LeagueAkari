@@ -98,11 +98,11 @@
           <div>{{ t('OngoingGameSettings.matchHistoryUseSgpApi.description') }}</div>
           <div
             class="unsupported-sgp-server"
-            v-if="sgps.availability.region && !sgps.availability.serversSupported.matchHistory"
+            v-if="sgps.availability.sgpServerId && !sgps.availability.serversSupported.matchHistory"
           >
             {{
               t('OngoingGameSettings.matchHistoryUseSgpApi.unsupported', {
-                server: sgps.availability.region
+                server: sgps.availability.sgpServerId
               })
             }}
           </div>

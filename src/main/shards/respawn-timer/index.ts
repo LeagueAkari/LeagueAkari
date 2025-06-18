@@ -88,7 +88,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
 
   private async _queryRespawnTime() {
     if (!this._lc.data.summoner.me) {
-      this._log.warn('当前不存在召唤师信息, 可能是未加载')
+      this._log.warn('Seems like summoner info is not loaded')
       return
     }
 
@@ -127,7 +127,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('轮询开始')
+    this._log.info('Respawn timer polling started')
 
     this._isStarted = true
     this._queryRespawnTime()
@@ -139,7 +139,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('轮询结束')
+    this._log.info('Respawn timer polling stopped')
 
     this._isStarted = false
     clearInterval(this._timer)

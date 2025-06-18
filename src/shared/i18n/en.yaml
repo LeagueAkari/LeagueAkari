@@ -5,6 +5,10 @@ AnnouncementModal:
   title: Announcement
   close: Close
   read: I have read
+  noAnnouncementMd: |
+    ***No announcement***
+
+    or check [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
 
 DeclarationModal:
   title: Declaration
@@ -69,16 +73,22 @@ AppSettings:
         none: Default
         mica: Mica
 
-    logLevel:
-      label: Log Level
-      description: Set the log level of the application
+    dataSource:
+      label: Remote Data Source
+      description: Set the remote config source of the application, get or update data from GitHub / Gitee
+      options:
+        gitee: Gitee
+        github: GitHub
+      howToChoose: How to choose?
+      testingSpeed: Testing speed...
+      timeout: Timeout
+      testButton: Re-test
+      tip:
+        gitee: 'Better response speed in mainland China'
+        github: 'Better response speed outside mainland China'
 
   selfUpdate:
     title: Application Update
-    tip:
-      title: How to choose?
-      gitee: '- Better response speed in mainland China'
-      github: '- Better response speed outside mainland China'
 
     autoCheckUpdates:
       label: Auto Check Updates
@@ -86,13 +96,9 @@ AppSettings:
 
     autoDownloadUpdates:
       label: Auto Download Updates
-      description: Automatically download the update package when a new version is detected
+      description: Automatically start the update process when a new release is detected
 
-    downloadSource:
-      label: Download Source
-      description: Choose the update package download source
-
-    checkFrom: Check updates from download source ({{source}})
+    checkFrom: Check updates from data source ({{source}})
     checkUpdates: Check Updates
     currentRelease: Current Release
     downloadRelease: Download Release
@@ -146,6 +152,10 @@ AppSettings:
 
   misc:
     title: Misc
+
+    logLevel:
+      label: Log Level
+      description: Set the log level of the application
 
     disableHardwareAcceleration:
       label: Disable Hardware Acceleration
@@ -768,6 +778,21 @@ SideBarFixed:
   respawnTimer:
     timeLeft: Respawn in {{seconds}} s
 
+ClientConnection:
+  noData: No Data
+  connectedGroup: Connected
+  launchedClientsGroup: Launched Clients
+  launchedOtherClientsGroup: Other Launched Clients
+  noClientGroup: No Available Client
+  noClient: No available client, please start the client
+  connecting: Connecting...
+  restartUx: Restart UX
+  killUx: Kill UX
+  launchUx: Launch UX
+  quitClient: Quit Client Process
+  disconnect: Disconnect
+  more: More
+
 OrderedChampionList:
   searchForChampion: Search for Champion
   edit: Edit
@@ -834,6 +859,7 @@ SearchSummonerModal:
   cancel: Cancel
   search: Search Player
   result: Search Results
+  friends: Friends
   history: Recent Visit
   validating: Validating players ({{current}} / {{total}})
   validated: Validated {{countV}} possible player records, no matching results found
@@ -845,6 +871,9 @@ SearchSummonerModal:
   puuidSearch: 'Performing exact search: Searching by specified PUUID'
   exactSearch: 'Performing exact search: Searching for summoner with specified name and tag'
   fuzzySearch: 'Performing fuzzy search: Searching for summoners with specified name'
+  getFriendsFailed: Failed to get friend list
+  showAll: Show All
+  clear: Clear
 
   placeholders:
     - 'For exact search: AkazaAkari#akari'
@@ -878,7 +907,10 @@ UpdateModal:
   newVersionAvailable: 'New version available: {{version}} (Current version: {{currentVersion}})'
   currentVersion: 'Current Version: {{version}}'
   releasePage: Release Page
-  download: Download
+  startUpdate: Start Update
+  externalDownload: Download from GitHub / Gitee
+  noUpdateMd: No release notes
+  ignoreThisVersion: Ignore This Version
 
 Client:
   leagueClient:
@@ -1250,6 +1282,7 @@ Spectate:
 
 MatchHistoryTabs:
   disconnected: Not connected to the client
+  queueing: Logging in...
   noActiveTab: No active match history tab
   copiedToClipboard: Copied to clipboard
   dropZoneRosterMember: Drop here to navigate to the player's profile
@@ -1306,6 +1339,7 @@ MatchHistoryTab:
   failedToLoadSummonerProfile: 'Unable to load summoner profile: {{reason}}'
   failedToLoadRankedStats: 'Unable to load ranked stats: {{reason}}'
   failedToLoadMatchHistory: 'Unable to load match history: {{reason}}'
+  failedToLoadEncounteredGames: 'Unable to load encountered games: {{reason}}'
   failedToLoadMatchHistoryHN1: |
     Unable to load match history: {{reason}}
     The current region on this page is Ionia. Please note that during certain times (especially in the evening), match history data may not be returned properly.
@@ -1321,6 +1355,17 @@ MatchHistoryTab:
   failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
   failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
   copiedToClipboard: Copied to clipboard
+
+EncounteredGames:
+  title: History Games
+  pageInfo: '{{page}} / {{totalPage}}'
+  noData: No data available.
+  deletePopconfirm: Confirm to delete this game record?
+  loading: Loading...
+  opponent: Enemy
+  teammate: Ally
+  win: Win
+  lose: Lose
 
 MatchHistoryCard:
   kprTitle: 'Kill participation in team: {{rate}}%'
@@ -1537,7 +1582,7 @@ PlayerInfoCard:
   visionScore: Vision Score {{countV}}
   visionScorePopover: This player's average vision score is {{countV}}
   metPopover:
-    title: Previously encountered this player in {{date}}, a total of {{countV}} times.
+    title: Last encountered this player on {{date}}. Met a total of {{countV}} times. Shows only the last {{countV2}} games.
     gameId: Game ID
     inspectByGameId: Inspect {{gameId}}
     date: Game Date
@@ -1751,6 +1796,7 @@ Opgg:
   replace: Provide
   create: Create
   notConnected: Not connected to the client, some resources may not be loaded
+  cancel: Cancel
 
   settings:
     button: Settings
@@ -2021,6 +2067,7 @@ SummonerSpellsCdTimer:
 
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{countV}})
+  emptyPlaceholder: No background tasks
 
 TemplateEdit:
   newButton: New Template
@@ -2048,6 +2095,7 @@ SendableItemEdit:
   saveButton: Save
   deleteButton: Delete
   errorTemplateInvalid: Invalid template used
+  errorTemplateExecutionFailed: An error occurred when executing the template last time
   plaintextPlaceholder: |
     Provide the text split by lines here, like:
     First line
@@ -2058,7 +2106,7 @@ SendableItemEdit:
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   saveSuccess: Saved {{name}}
   dryRunEmpty: Dry run result is empty
-  dryRunError: 'Dry run failed: {{reason}}'
+  dryRunError: 'Dry run failed'
 
   contentType:
     label: Content Type
@@ -2098,6 +2146,10 @@ simple-notifications-renderer:
       title: Are you live streaming?
       liveTools: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
       bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
+
+  login-queue-task:
+    name: Login Queue
+    description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}})'
 
 league-client-renderer:
   initialization-task:

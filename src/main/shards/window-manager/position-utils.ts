@@ -1,5 +1,5 @@
-import { tools } from '@hanxven/league-akari-addons'
-import '@hanxven/league-akari-addons'
+import { tools } from '@leagueakari/league-akari-addons'
+import '@leagueakari/league-akari-addons'
 import { BrowserWindow, Display, Rectangle, screen } from 'electron'
 
 export function rectsIntersect(rect1: Rectangle, rect2: Rectangle) {

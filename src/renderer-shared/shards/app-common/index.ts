@@ -1,10 +1,11 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import i18next from 'i18next'
-import { effectScope, watch } from 'vue'
+import { watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { HttpProxySetting, useAppCommonStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'app-common-main'
@@ -13,14 +14,13 @@ const MAIN_SHARD_NAMESPACE = 'app-common-main'
 export class AppCommonRenderer implements IAkariShardInitDispose {
   static id = 'app-common-renderer'
 
-  private readonly _scope = effectScope()
-
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {
-    this._scope.run(() => {
+    this._setupInAppScope.addSetupFn(() => {
       const store = useAppCommonStore()
 
       watch(
@@ -104,7 +104,5 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRuntimeInfo') as Promise<any>
   }
 
-  async onDispose() {
-    this._scope.stop()
-  }
+  async onDispose() {}
 }

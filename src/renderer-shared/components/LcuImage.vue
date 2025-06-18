@@ -5,7 +5,6 @@
 
 <script lang="ts" setup>
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { addLeadingSlash } from '@shared/utils/uri'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -16,8 +15,18 @@ const url = ref<string | null>(null)
 const lcs = useLeagueClientStore()
 
 watchEffect(() => {
-  if (lcs.connectionState === 'connected' && typeof props.src !== 'undefined' && props.src) {
-    url.value = `akari://league-client${addLeadingSlash(props.src)}`
+  if (typeof props.src !== 'undefined' && props.src) {
+    const resolvedUrl = new URL(props.src, 'akari://league-client').href
+
+    if (resolvedUrl.startsWith('akari://')) {
+      if (lcs.connectionState === 'connected') {
+        url.value = resolvedUrl
+      } else {
+        url.value = null
+      }
+    } else {
+      url.value = props.src
+    }
   } else {
     url.value = null
   }

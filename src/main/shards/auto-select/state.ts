@@ -110,7 +110,11 @@ export class AutoSelectSettings {
 
 export class AutoSelectState {
   get champSelectActionInfo() {
-    if (!this._lcData.champSelect.session || !this._lcData.champSelect.selfSummoner) {
+    if (
+      !this._lcData.champSelect.session ||
+      !this._lcData.champSelect.selfSummoner ||
+      !this._lcData.gameflow.session
+    ) {
       return null
     }
 
@@ -150,6 +154,7 @@ export class AutoSelectState {
       pick: pickArr,
       ban: banArr,
       session: this._lcData.champSelect.session,
+      gameMode: this._lcData.gameflow.session.gameData.queue.gameMode,
       memberMe,
       isActingNow: this._lcData.champSelect.selfSummoner.isActingNow,
       currentPickables: this._lcData.champSelect.currentPickableChampionIds,
@@ -234,6 +239,11 @@ export class AutoSelectState {
     ;[...a.session.bans.myTeamBans, ...a.session.bans.theirTeamBans].forEach((c) =>
       unpickables.add(c)
     )
+
+    // 非斗魂竞技场禁止选用勇敢举动
+    if (a.gameMode !== 'CHERRY') {
+      unpickables.add(-3)
+    }
 
     let expectedChampions: number[]
     if (a.memberMe.assignedPosition) {

@@ -19,6 +19,22 @@ export interface Author {
   site_admin: boolean
 }
 
+export interface GithubApiAsset {
+  url: string
+  id: number
+  node_id: string
+  name: string
+  label?: any
+  uploader: Author
+  content_type: string
+  state: string
+  size: number
+  download_count: number
+  created_at: string
+  updated_at: string
+  browser_download_url: string
+}
+
 export interface GithubApiLatestRelease {
   url: string
   assets_url: string
@@ -34,21 +50,7 @@ export interface GithubApiLatestRelease {
   prerelease: boolean
   created_at: string
   published_at: string
-  assets: {
-    url: string
-    id: number
-    node_id: string
-    name: string
-    label?: any
-    uploader: Author
-    content_type: string
-    state: string
-    size: number
-    download_count: number
-    created_at: string
-    updated_at: string
-    browser_download_url: string
-  }[]
+  assets: GithubApiAsset[]
   tarball_url: string
   zipball_url: string
   body: string
@@ -73,7 +75,7 @@ interface Links {
   html: string
 }
 
-export interface GithubFile {
+export interface GithubApiFile {
   name: string
   path: string
   sha: string

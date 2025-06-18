@@ -24,6 +24,7 @@
           :placeholder="placeholderText"
           :disabled="searchProgress.isProcessing"
           @keyup.enter="handelSearch"
+          @clear="handleClearInput"
           clearable
           ref="input"
         />
@@ -97,34 +98,106 @@
           }}
         </NProgress>
       </NCollapseTransition>
-      <NCollapseTransition
-        class="section"
-        :show="filteredSearchHistory.length > 0 && inputText.length === 0"
-      >
-        <div class="section-title">{{ t('SearchSummonerModal.history') }}</div>
-        <div class="recent-searches">
-          <div
-            class="record"
-            v-for="s of filteredSearchHistory"
-            :key="s.puuid"
-            @click="emits('toSummoner', s.puuid, s.sgpServerId, true)"
-            @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
-          >
-            <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
-              {{
-                sgps.sgpServerConfig.serverNames[as.settings.locale][s.sgpServerId] || s.sgpServerId
-              }}
-            </div>
-            <div class="game-name-line">{{ s.summoner.gameName }}</div>
-            <div class="tag-line">#{{ s.summoner.tagLine }}</div>
-            <NIcon class="close-icon" @click.stop="handleDeleteSearchHistory(s.puuid)"
-              ><CloseIcon
-            /></NIcon>
-          </div>
+      <NCollapseTransition class="section" :show="isEmpty">
+        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
+        <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
+          {{ t('SearchSummonerModal.validated', { countV: searchProgress.finish }) }}
+          <span style="font-weight: bold">{{ searchText }}</span>
+        </div>
+        <div class="empty-result" v-else>
+          {{ t('SearchSummonerModal.noResult') }}
+          <span style="font-weight: bold">{{ searchText }}</span>
         </div>
       </NCollapseTransition>
+      <NCollapseTransition
+        class="section"
+        :show="filteredSearchHistory.length > 0 && searchResult.length === 0"
+      >
+        <div class="section-title">{{ t('SearchSummonerModal.history') }}</div>
+        <NScrollbar :class="$style['player-items-scroll']">
+          <div class="player-items">
+            <div
+              class="player-item"
+              v-for="s of filteredSearchHistory"
+              :key="s.puuid"
+              :class="{ pinned: s.isPinned }"
+              @click="emits('toSummoner', s.puuid, s.sgpServerId, true)"
+              @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
+            >
+              <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
+                {{
+                  sgps.sgpServerConfig.serverNames[as.settings.locale][s.sgpServerId] ||
+                  s.sgpServerId
+                }}
+              </div>
+              <div class="game-name-line">{{ s.summoner.gameName }}</div>
+              <div class="tag-line">#{{ s.summoner.tagLine }}</div>
+              <NIcon class="pin-icon" @click.stop="handlePinSearchHistory(s.puuid)">
+                <Pin16FilledIcon />
+              </NIcon>
+              <NIcon class="close-icon" @click.stop="handleDeleteSearchHistory(s.puuid)">
+                <CloseIcon />
+              </NIcon>
+            </div>
+          </div>
+        </NScrollbar>
+      </NCollapseTransition>
+      <NCollapseTransition
+        class="section"
+        :show="sortedFriends.length > 0 && searchResult.length === 0"
+      >
+        <div class="section-title">
+          <span>
+            {{ t('SearchSummonerModal.friends') }} ({{ onlineFriendCount }}/{{ friends.length }})
+          </span>
+          <NCheckbox
+            v-if="friends.length > MAX_FRIENDS_SHOW_COUNT"
+            v-model:checked="showAllFriends"
+            size="small"
+            class="show-all-friends-checkbox"
+            :theme-overrides="{
+              sizeSmall: '12px',
+              fontSizeSmall: '12px'
+            }"
+          >
+            {{ t('SearchSummonerModal.showAll') }}
+          </NCheckbox>
+        </div>
+        <NScrollbar :class="$style['player-items-scroll']">
+          <div class="player-items">
+            <div
+              class="player-item"
+              v-for="f of sortedFriends"
+              :key="f.puuid"
+              @click="emits('toSummoner', f.puuid, null, true)"
+              @mouseup.prevent="handleFriendMouseUp($event, f)"
+            >
+              <div class="availability-indicator in-game" v-if="f.availability === 'dnd'"></div>
+              <div class="availability-indicator chat" v-else-if="f.availability === 'chat'"></div>
+              <div class="availability-indicator away" v-else-if="f.availability === 'away'"></div>
+              <div class="game-name-line">{{ f.gameName }}</div>
+              <div class="tag-line">#{{ f.gameTag }}</div>
+            </div>
+          </div>
+        </NScrollbar>
+      </NCollapseTransition>
       <NCollapseTransition class="section" :show="searchResult.length > 0">
-        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
+        <div class="section-title">
+          <span>{{ t('SearchSummonerModal.result') }}</span>
+          <NButton
+            class="clear-button"
+            secondary
+            type="warning"
+            size="tiny"
+            @click="handleClearInput"
+            v-if="!searchProgress.isProcessing"
+          >
+            <template #icon>
+              <CloseIcon />
+            </template>
+            {{ t('SearchSummonerModal.clear') }}
+          </NButton>
+        </div>
         <NScrollbar :class="$style['search-result-scroll']">
           <TransitionGroup tag="div" class="search-result-items" name="fade">
             <div
@@ -158,17 +231,6 @@
           </TransitionGroup>
         </NScrollbar>
       </NCollapseTransition>
-      <NCollapseTransition class="section" :show="isEmpty">
-        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
-        <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
-          {{ t('SearchSummonerModal.validated', { countV: searchProgress.finish }) }}
-          <span style="font-weight: bold">{{ searchText }}</span>
-        </div>
-        <div class="empty-result" v-else>
-          {{ t('SearchSummonerModal.noResult') }}
-          <span style="font-weight: bold">{{ searchText }}</span>
-        </div>
-      </NCollapseTransition>
     </NCard>
   </NModal>
 </template>
@@ -182,12 +244,16 @@ import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { Friend } from '@shared/types/league-client/chat'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
+import { Pin16Filled as Pin16FilledIcon } from '@vicons/fluent'
+import { useIntervalFn } from '@vueuse/core'
 import { isAxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCard,
+  NCheckbox,
   NCollapseTransition,
   NIcon,
   NInput,
@@ -217,7 +283,7 @@ const sgps = useSgpStore()
 const message = useMessage()
 
 const emits = defineEmits<{
-  toSummoner: [puuid: string, sgpServerId: string, setCurrent?: boolean]
+  toSummoner: [puuid: string, sgpServerId: string | null, setCurrent?: boolean]
 }>()
 
 const placeholderTexts = computed(() => {
@@ -228,8 +294,16 @@ const placeholderTexts = computed(() => {
   ]
 })
 
-const placeholderText =
-  placeholderTexts.value[Math.floor(Math.random() * placeholderTexts.value.length)]
+const placeholderText = ref('')
+
+let round = 0
+useIntervalFn(
+  () => {
+    placeholderText.value = placeholderTexts.value[round++ % placeholderTexts.value.length]
+  },
+  5000,
+  { immediate: true, immediateCallback: true }
+)
 
 /**
  * 识别 {gameName}#{tagLIne} 或 {fuzzyGameName} 的输入
@@ -667,7 +741,8 @@ const handleSaveSearchHistory = async (result: SearchResult) => {
   await mh.saveSearchHistory({
     puuid: result.puuid,
     sgpServerId: result.sgpServerId,
-    summoner: { gameName: result.gameName, tagLine: result.tagLine }
+    summoner: { gameName: result.gameName, tagLine: result.tagLine },
+    isPinned: false
   })
   searchHistory.value = await mh.getSearchHistory()
 }
@@ -677,11 +752,12 @@ const handleDeleteSearchHistory = async (puuid: string) => {
   searchHistory.value = await mh.getSearchHistory()
 }
 
-const handleSearchHistoryMouseUp = (
-  event: MouseEvent,
+const handlePinSearchHistory = async (puuid: string) => {
+  await mh.pinSearchHistory(puuid)
+  searchHistory.value = await mh.getSearchHistory()
+}
 
-  item: SearchHistoryItem
-) => {
+const handleSearchHistoryMouseUp = (event: MouseEvent, item: SearchHistoryItem) => {
   if (event.button === 1) {
     emits('toSummoner', item.puuid, item.sgpServerId, false)
   }
@@ -703,6 +779,73 @@ const handleSearchResultMouseUp = (
     handleSaveSearchHistory(result)
   }
 }
+
+const PRIORITY = {
+  chat: 2,
+  dnd: 3,
+  away: 1,
+  offline: 0
+}
+
+const MAX_FRIENDS_SHOW_COUNT = 100
+
+const showAllFriends = ref(false)
+
+const friends = shallowRef<Friend[]>([])
+const sortedFriends = computed(() => {
+  return friends.value
+    .toSorted((a, b) => {
+      const av = PRIORITY[a.availability] || 0
+      const bv = PRIORITY[b.availability] || 0
+
+      return bv - av
+    })
+    .slice(0, showAllFriends.value ? Infinity : MAX_FRIENDS_SHOW_COUNT) // 避免社交达人卡界面
+})
+
+const onlineFriendCount = computed(() => {
+  return sortedFriends.value.filter((f) => f.availability === 'chat' || f.availability === 'dnd')
+    .length
+})
+
+const updateFriends = async () => {
+  try {
+    const { data } = await lc.api.chat.getFriends()
+    friends.value = data
+  } catch (error) {
+    message.error(() => t('SearchSummonerModal.getFriendsFailed'))
+  }
+}
+
+const handleFriendMouseUp = (event: MouseEvent, friend: Friend) => {
+  if (event.button === 1) {
+    emits('toSummoner', friend.puuid, null, true)
+  }
+}
+
+const handleClearInput = () => {
+  inputText.value = ''
+  isEmpty.value = false
+  searchResult.value = []
+}
+
+lc.onLcuEventVue<Friend[]>('/lol-chat/v1/friends', ({ eventType, data }) => {
+  if (eventType === 'Update') {
+    friends.value = data
+  } else if (eventType === 'Delete') {
+    friends.value = []
+  }
+})
+
+watch(
+  () => show.value,
+  (show) => {
+    if (show) {
+      updateFriends()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>
@@ -721,25 +864,47 @@ const handleSearchResultMouseUp = (
   }
 }
 
-.recent-searches {
+.player-items {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
   row-gap: 4px;
   column-gap: 4px;
 
-  .record {
+  .player-item {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     display: flex;
     align-items: center;
     padding: 2px 8px;
     gap: 4px;
-    transition: background-color 0.2s;
     cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .availability-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+
+    .in-game {
+      background-color: hsl(175, 100%, 45%);
+    }
+
+    .chat {
+      background-color: hsl(120, 100%, 45%);
+    }
+
+    .away {
+      background-color: hsl(0, 100%, 40%);
     }
 
     .sgp-server {
@@ -760,7 +925,8 @@ const handleSearchResultMouseUp = (
       color: rgba(255, 255, 255, 0.6);
     }
 
-    .close-icon {
+    .close-icon,
+    .pin-icon {
       transition: background-color 0.2s;
       cursor: pointer;
       border-radius: 2px;
@@ -768,6 +934,14 @@ const handleSearchResultMouseUp = (
       &:hover {
         background-color: rgba(255, 255, 255, 0.2);
       }
+    }
+
+    &.pinned {
+      .pin-icon {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
   }
 }
@@ -782,6 +956,10 @@ const handleSearchResultMouseUp = (
   font-size: 12px;
 }
 
+.show-all-friends-checkbox {
+  margin-left: auto;
+}
+
 .search-result-scroll {
   .content {
     background-color: red;
@@ -794,11 +972,18 @@ const handleSearchResultMouseUp = (
   margin-top: 8px;
 
   .section-title {
-    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
     font-weight: bold;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 4px;
   }
+}
+
+.clear-button {
+  margin-left: auto;
 }
 
 .empty-result {
@@ -897,5 +1082,9 @@ const handleSearchResultMouseUp = (
     height: 600px;
     width: 100%;
   }
+}
+
+.player-items-scroll {
+  max-height: 20vh;
 }
 </style>

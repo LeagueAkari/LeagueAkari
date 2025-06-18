@@ -5,6 +5,7 @@
       <div style="margin-bottom: 12px">
         This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
       </div>
+      <ExternalLink href="https://www.google.com">Google</ExternalLink>
       <div style="width: 100%; height: 1px; background: #fff4"></div>
       <!-- Horizontal Collapse Transition -->
       <HorizontalExpand :show>
@@ -40,6 +41,7 @@
 
 <script setup lang="ts">
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
+import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useInstance } from '@renderer-shared/shards'

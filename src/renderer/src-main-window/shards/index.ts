@@ -15,6 +15,7 @@ import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { PiniaMobxUtilsRenderer } from '@renderer-shared/shards/pinia-mobx-utils'
+import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { RendererDebugRenderer } from '@renderer-shared/shards/renderer-debug'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
@@ -50,6 +51,7 @@ manager.use(MatchHistoryTabsRenderer)
 manager.use(OngoingGameRenderer)
 manager.use(PiniaMobxUtilsRenderer)
 manager.use(RendererDebugRenderer)
+manager.use(RemoteConfigRenderer)
 manager.use(RespawnTimerRenderer)
 manager.use(RiotClientRenderer)
 manager.use(SavedPlayerRenderer)

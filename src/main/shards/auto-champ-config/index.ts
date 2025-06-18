@@ -369,10 +369,10 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       }
 
       await this._sendInChat(message)
-      this._log.info(`符文页已更新`, config, meta)
+      this._log.info(`Runes page updated`, config, meta)
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-runes-update', formatError(error))
-      this._log.warn(`无法更新符文页`, error)
+      this._log.warn(`Unable to update runes page`, error)
       await this._sendInChat(errorMessage)
     }
   }
@@ -395,7 +395,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       await this._sendInChat(message)
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-spells-update', formatError(error))
-      this._log.warn(`无法更新召唤师技能`, error)
+      this._log.warn(`Unable to update summoner spells`, error)
       await this._sendInChat(errorMessage)
     }
   }
@@ -413,7 +413,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-chat-send', formatError(error))
-      this._log.warn(`无法发送信息`, error)
+      this._log.warn(`Unable to send message`, error)
     }
   }
 

@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import {
   ChampionMasteryPlayer,
   MatchHistoryPlayer,
@@ -23,7 +24,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
   ) {}
 
   setConcurrency(value: number) {
@@ -88,6 +90,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+
+    this._setup.addSetupFn(() => this._setupAutoRouteWhenGameStarts())
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
       store.summoner = {}
@@ -180,7 +184,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     )
   }
 
-  setupAutoRouteWhenGameStarts() {
+  private _setupAutoRouteWhenGameStarts() {
     const router = useRouter()
     const store = useOngoingGameStore()
 

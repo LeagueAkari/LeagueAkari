@@ -26,8 +26,6 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
   static CLIENT_CMD_LONG_POLL_INTERVAL = 8000
 
-  private _pollInterval = LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
-
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
@@ -71,7 +69,6 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   setPollInterval(interval: number, immediate = false) {
-    this._pollInterval = interval
     if (this._pollTimerId) {
       clearInterval(this._pollTimerId)
 
@@ -107,7 +104,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
-      this._log.error(`获取 Ux 命令行信息时失败`, error)
+      this._log.error(`Failed to get Ux command line`, error)
     }
   }
 

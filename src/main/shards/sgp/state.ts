@@ -1,4 +1,4 @@
-import { LeagueSgpApi, SgpServersConfig } from '@shared/data-sources/sgp'
+import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { makeAutoObservable, observable } from 'mobx'
 
