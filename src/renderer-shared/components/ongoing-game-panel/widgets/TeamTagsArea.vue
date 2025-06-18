@@ -96,7 +96,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAMS, PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
 const WIN_RATE_TEAM_MIN_MATCHES = 13
@@ -145,11 +145,10 @@ const winRateTeams = computed(() => {
     return {}
   }
 
-  let index = 0
   const result: WinRateTeamInfo[] = []
 
-  Object.values(premadeInfo.groups).forEach((players) => {
-    if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length > LOST_RATE_TEAM_MIN_SIZE) {
+  Object.entries(premadeInfo.groups).forEach(([premadeId, players]) => {
+    if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length < LOST_RATE_TEAM_MIN_SIZE) {
       return
     }
 
@@ -179,7 +178,7 @@ const winRateTeams = computed(() => {
       otherMembersWinTotalStreak / (players.length - 1) >= WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK
     ) {
       result.push({
-        premadeId: PREMADE_TEAMS[index++],
+        premadeId,
         players,
         type: 'win-rate-team'
       })
@@ -209,7 +208,7 @@ const winRateTeams = computed(() => {
 
     if (loseRateTeamQualified) {
       result.push({
-        premadeId: PREMADE_TEAMS[index++],
+        premadeId,
         players,
         type: 'lose-rate-team'
       })
