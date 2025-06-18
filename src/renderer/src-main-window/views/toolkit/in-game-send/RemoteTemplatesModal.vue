@@ -4,40 +4,42 @@
       <span class="header-title">{{ t('RemoteTemplatesModal.title') }}</span>
     </template>
     <NSpin :show="isLoadingTemplates">
-      <div class="templates" v-if="templates.length > 0">
-        <div class="template" v-for="template in templates" :key="template.id">
-          <div class="template-name">
-            <NEllipsis style="flex: 1; width: 0">
-              <span class="title">{{ template.name }}</span>
+      <NScrollbar style="max-height: 680px">
+        <div class="templates" v-if="templates.length > 0">
+          <div class="template" v-for="template in templates" :key="template.id">
+            <div class="template-name">
+              <NEllipsis style="flex: 1; width: 0">
+                <span class="title">{{ template.name }}</span>
+              </NEllipsis>
+              <NButton
+                class="download-button"
+                tertiary
+                size="tiny"
+                @click="downloadTemplate(template.id)"
+                :disabled="currentDownloading !== null && currentDownloading !== template.id"
+                :loading="currentDownloading === template.id"
+              >
+                <template #icon>
+                  <NIcon class="download-icon">
+                    <DownloadIcon />
+                  </NIcon>
+                </template>
+              </NButton>
+            </div>
+            <NEllipsis :line-clamp="3" :tooltip="{ delay: 1000 }">
+              <span v-if="template.description" class="template-description">{{
+                template.description
+              }}</span>
+              <span v-else class="template-description empty">{{
+                t('RemoteTemplatesModal.noTemplateDescription')
+              }}</span>
             </NEllipsis>
-            <NButton
-              class="download-button"
-              tertiary
-              size="tiny"
-              @click="downloadTemplate(template.id)"
-              :disabled="currentDownloading !== null && currentDownloading !== template.id"
-              :loading="currentDownloading === template.id"
-            >
-              <template #icon>
-                <NIcon class="download-icon">
-                  <DownloadIcon />
-                </NIcon>
-              </template>
-            </NButton>
           </div>
-          <NEllipsis :line-clamp="3" :tooltip="{ delay: 1000 }">
-            <span v-if="template.description" class="template-description">{{
-              template.description
-            }}</span>
-            <span v-else class="template-description empty">{{
-              t('RemoteTemplatesModal.noTemplateDescription')
-            }}</span>
-          </NEllipsis>
         </div>
-      </div>
-      <div class="templates-placeholder" v-else>
-        <span class="placeholder-text">{{ t('RemoteTemplatesModal.noTemplates') }}</span>
-      </div>
+        <div class="templates-placeholder" v-else>
+          <span class="placeholder-text">{{ t('RemoteTemplatesModal.noTemplates') }}</span>
+        </div>
+      </NScrollbar>
     </NSpin>
   </NModal>
 </template>
@@ -48,7 +50,7 @@ import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { InGameSendTemplateCatalog } from '@renderer-shared/shards/remote-config'
 import { Download as DownloadIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NEllipsis, NIcon, NModal, NSpin, useMessage } from 'naive-ui'
+import { NButton, NEllipsis, NIcon, NModal, NScrollbar, NSpin, useMessage } from 'naive-ui'
 import { ref, watch } from 'vue'
 
 const { t } = useTranslation()
