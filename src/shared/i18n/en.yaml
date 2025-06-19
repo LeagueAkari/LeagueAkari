@@ -12,12 +12,67 @@ AnnouncementModal:
 
 DeclarationModal:
   title: Declaration
-  close: Close
   ok: Got it
-  showAgain: Show again
-  line1: (联盟阿卡林) is open-source software designed to provide additional auxiliary features. You should not obtain this software through any paid channels.
-  line2: Please be aware that this software takes no responsibility for any consequences that may arise from its use, including but not limited to game account bans, data corruption, or any other negative impact on your gaming experience.
-  line3: League Akari no longer supports Tencent servers. Please do not use it on Tencent servers. Using this software may violate the relevant rules of Tencent games, and you will be responsible for any possible consequences.
+  quit: Quit
+
+  newContent: |
+    <div class="akari-disclaimer">
+
+    <style>
+    .akari-disclaimer{
+      background-color:#1e1e1e;
+      color:#e6e6e6;
+      line-height:1.65;
+      padding:1.75rem 2rem;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+    }
+    .akari-disclaimer h1,
+    .akari-disclaimer h2{
+      color:#ffd866;
+      margin-top:1.5rem;
+      margin-bottom:.75rem;
+      line-height:1.25;
+    }
+    .akari-disclaimer h1{font-size:1.6rem;}
+    .akari-disclaimer h2{font-size:1.25rem;}
+    .akari-disclaimer ul{margin-left:1.5rem;}
+    .akari-disclaimer li{margin-bottom:.65rem;}
+    .akari-disclaimer a{color:#8ab4f8;text-decoration:none;}
+    .akari-disclaimer a:hover{text-decoration:underline;}
+    </style>
+
+    # League **Akari** User Guide & Disclaimer
+
+    > **Before downloading, installing, or using this software, please read and fully understand this guide and disclaimer.**
+    > Once you start using it, you are deemed to have fully understood and agreed to all the following terms.
+
+    ---
+
+    ## I. Nature of the Software & Acquisition
+    - **League Akari** is entirely open-source and free; all features are provided “as-is.”
+    - This software may not be released, distributed, or obtained in any paid, bundled, or profit-making form. Always download it through the official public repository or its mirrors to avoid financial loss and security risks.
+
+    ## II. Risk Notice & Limitation of Liability
+    - Using this software **may** result in (including but not limited to):
+      1. Your game account being suspended or permanently banned;
+      2. Loss, corruption, or inconsistency of game data with server data;
+      3. Client crashes, performance degradation, or other poor game experiences.
+    - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **League Akari** development team and all contributors assume no liability; all related risks are borne by the user.
+
+    ## III. Server Compatibility Statement
+    - **Effective from the release of this statement, League Akari will no longer provide any form of support for Tencent Game servers.**
+    - Using this software in Tencent server environments is highly likely to violate Tencent Games’ user agreements, management regulations, or technical protection measures; any account bans, data loss, or other adverse consequences are solely the user’s responsibility.
+
+    ## IV. Information Collection & Privacy Protection
+    - To improve product quality, analyze errors, and conduct security statistics, the software collects **necessary and limited** system information and crash logs during operation.
+    - The collected information **does not** contain personally identifiable data, will not be uploaded to any third-party server, and will not be used for commercial purposes.
+
+    ---
+
+    > **If you have any questions about this guide and disclaimer, or need further information about the software, please visit**
+    > <https://github.com/LeagueAkari/LeagueAkari> .
+
+    </div>
 
 CommonButtons:
   announcement: Announcement

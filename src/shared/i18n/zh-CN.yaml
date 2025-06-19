@@ -14,12 +14,66 @@ AnnouncementModal:
 
 DeclarationModal:
   title: 声明
-  close: 关闭
   ok: 我已阅读
-  showAgain: 再次提醒
-  line1: (联盟阿卡林) 是开源软件，旨在提供额外的辅助功能。您不应从任何付费渠道获取此软件。
-  line2: 同时告知，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件不承担任何责任。
-  line3: League Akari 不再支持腾讯服务器，请勿将其用于腾讯服务器。使用本软件可能会违反腾讯游戏的相关规定，您需承担任何可能的后果。
+  quit: 退出
+  newContent: |
+    <div class="akari-disclaimer">
+
+    <style>
+    .akari-disclaimer{
+      background-color:#1e1e1e;
+      color:#e6e6e6;
+      line-height:1.65;
+      padding:1.75rem 2rem;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+    }
+    .akari-disclaimer h1,
+    .akari-disclaimer h2{
+      color:#ffd866;
+      margin-top:1.5rem;
+      margin-bottom:.75rem;
+      line-height:1.25;
+    }
+    .akari-disclaimer h1{font-size:1.6rem;}
+    .akari-disclaimer h2{font-size:1.25rem;}
+    .akari-disclaimer ul{margin-left:1.5rem;}
+    .akari-disclaimer li{margin-bottom:.65rem;}
+    .akari-disclaimer a{color:#8ab4f8;text-decoration:none;}
+    .akari-disclaimer a:hover{text-decoration:underline;}
+    </style>
+
+    # League **Akari** 用户须知与免责声明
+
+    > **请在下载、安装或使用本软件之前，务必仔细阅读并充分理解本须知与免责声明。**
+    > 一旦您开始使用，即视为已充分理解并同意下列全部条款。
+
+    ---
+
+    ## 一、软件性质与获取途径
+    - **League Akari** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
+    - 本软件不得以任何付费、捆绑销售或其他牟利形式发布、传播或获取。请务必通过官方公开仓库或其镜像下载，防止经济损失及安全隐患。
+
+    ## 二、风险提示与责任限制
+    - 使用本软件**可能**导致（包括但不限于）：
+      1. 游戏账户被暂停或永久封禁；
+      2. 游戏数据丢失、损坏或与服务器数据不一致；
+      3. 客户端异常、性能下降或其他不良游戏体验。
+    - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**League Akari** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
+
+    ## 三、服务器兼容性声明
+    - **自本声明发布之日起，League Akari 不再对腾讯游戏服务器提供任何形式的支持。**
+    - 在腾讯服务器环境中使用本软件**极有可能**违反腾讯游戏相关用户协议、管理规范或技术保护措施；由此产生的封号、数据丢失或其他不利后果，概由用户自行负责。
+
+    ## 四、信息收集与隐私保护
+    - 为改进产品质量、分析错误及进行安全统计，软件运行时将收集**必要且有限**的系统信息与崩溃日志。
+    - 所收集信息**不含**可识别个人身份之数据，不会上传至任何第三方服务器，亦不会用于商业用途。
+
+    ---
+
+    > **如您对本须知与免责声明存在任何疑问，或需要进一步了解软件详情，请访问**
+    > <https://github.com/LeagueAkari/LeagueAkari> 。
+
+    </div>
 
 CommonButtons:
   announcement: 公告

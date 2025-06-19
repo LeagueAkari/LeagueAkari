@@ -39,7 +39,7 @@
         <a target="_blank" :href="LEAGUE_AKARI_GITHUB">
           <img
             alt="GitHub Repo stars"
-            src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
+            src="https://img.shields.io/github/stars/LeagueAkari/LeagueAkari"
         /></a>
       </div>
     </NScrollbar>

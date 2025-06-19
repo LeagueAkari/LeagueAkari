@@ -300,6 +300,8 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_135)
 
+    await manager.save(Setting.create('app-common-main/showFreeSoftwareDeclaration', true))
+
     await this._do(manager, 'app-common-renderer/streamerMode', 'app-common-main/streamerMode')
     await this._do(
       manager,

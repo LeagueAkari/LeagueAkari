@@ -66,6 +66,7 @@ const shouldShowDivider = computed(() => {
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
   background-color: #0001;
+  z-index: 1000000;
 }
 
 .shard-area {

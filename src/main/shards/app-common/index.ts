@@ -200,5 +200,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {
       return this.getRuntimeInfo()
     })
+
+    this._ipc.onCall(AppCommonMain.id, 'quit', () => {
+      app.quit()
+    })
   }
 }
