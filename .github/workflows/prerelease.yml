@@ -2,10 +2,10 @@ name: Prerelease Rabi on Tag
 
 on:
   push:
-    branches:
-      - deft-rabi
     tags:
       - 'v*-rabi.*'
+
+  workflow_dispatch:
 
 jobs:
   build-and-release:
