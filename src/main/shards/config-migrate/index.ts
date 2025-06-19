@@ -319,12 +319,12 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     if (oldPlaintextSend) {
       try {
-        const old = JSON.parse(oldPlaintextSend.value)
+        const old = oldPlaintextSend.value
         const current = await manager.findOneBy(Setting, {
           key: Equal('in-game-send-main/sendableItems')
         })
 
-        const newArr = current ? JSON.parse(current.value) : []
+        const newArr = current ? current.value : []
 
         await manager.save(
           Setting.create('in-game-send-main/sendableItems', [
