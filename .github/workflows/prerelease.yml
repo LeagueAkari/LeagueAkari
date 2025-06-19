@@ -11,7 +11,7 @@ jobs:
   build-and-release:
     runs-on: windows-2022
     env:
-      GITHUB_TOKEN: ${{ secrets.FULL_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
     steps:
