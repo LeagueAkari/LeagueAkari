@@ -322,9 +322,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           h(DeclarationModal, {
             show: showModal.value,
             'onUpdate:show': (v) => (showModal.value = v),
-            onConfirm: (notShowAgain) => {
-              app.setShowFreeSoftwareDeclaration(notShowAgain)
+            onConfirm: () => {
+              app.setShowFreeSoftwareDeclaration(false)
               showModal.value = false
+            },
+            onQuit: () => {
+              app.quit()
             }
           })
       }
