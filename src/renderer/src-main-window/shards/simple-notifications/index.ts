@@ -387,6 +387,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
         const sns = useSimpleNotificationsStore()
         const sus = useSelfUpdateStore()
         const su = useInstance(SelfUpdateRenderer)
+        const app = useInstance(AppCommonRenderer)
 
         watch(
           () => rcs.latestRelease,
@@ -407,6 +408,15 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           },
           { immediate: true }
         )
+
+        app.onRendererLink((url) => {
+          const u = new URL(url)
+
+          if (u.pathname === '/overlays/release-modal') {
+            sns.showAnnouncementModal = false
+            sns.showNewReleaseModal = true
+          }
+        })
 
         return () =>
           h(UpdateModal, {

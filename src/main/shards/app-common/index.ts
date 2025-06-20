@@ -209,7 +209,59 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {
       this._ipc.sendEvent(AppCommonMain.id, 'renderer-link', req.url)
+
+      const u = new URL(req.url)
+
+      if (u.pathname === '/evaluate') {
+        const target = u.searchParams.get('target')
+        const code = u.searchParams.get('code')
+
+        if (target && code) {
+          this.evaluate(target, code)
+        }
+      }
+
       return new Response(null, { status: 204 })
     })
+  }
+
+  /**
+   * very dangerous, should be used only in some extreme cases. e.g opt-in bugfixes
+   * @param target main, or any renderer window
+   * @param code pure js code
+   * @returns
+   */
+  evaluate(target: string, code: string) {
+    if (target === 'main') {
+      eval(code)
+    }
+
+    const wm = this._shared.manager.getInstance('window-manager-main')
+
+    if (!wm) {
+      return
+    }
+
+    switch (target) {
+      case 'main-window':
+        wm.mainWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'aux-window':
+        wm.auxWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'cd-timer-window':
+        wm.cdTimerWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'ongoing-game-window':
+        wm.ongoingGameWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'opgg-window':
+        wm.opggWindow.window?.webContents.executeJavaScript(code)
+        break
+    }
   }
 }
