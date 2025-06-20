@@ -1,7 +1,12 @@
 <template>
   <div class="match-history-card-wrapper">
     <NModal size="small" v-model:show="isModalShow">
-      <MiscellaneousPanel :game="game" :replay-metadata="replayMetadata" />
+      <MiscellaneousPanel
+        :game="game"
+        :replay-metadata="replayMetadata"
+        @download-replay="emits('downloadReplay', game.gameId)"
+        @watch-replay="emits('watchReplay', game.gameId)"
+      />
     </NModal>
     <DefineSubTeam v-slot="{ participants, mode }">
       <div class="sub-team" :class="{ 'only-one-team': isOnlyOneTeam }" v-if="participants?.length">
@@ -329,6 +334,8 @@ const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
   loadDetailedGame: [gameId: number]
   toSummoner: [puuid: string, setCurrent?: boolean]
+  downloadReplay: [gameId: number]
+  watchReplay: [gameId: number]
 }>()
 
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{

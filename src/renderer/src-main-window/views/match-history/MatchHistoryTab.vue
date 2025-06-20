@@ -614,10 +614,13 @@
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(_) => loadDetailedGame(g)"
               @to-summoner="(puuid, setCurrent) => handleToSummoner(puuid, setCurrent)"
+              @download-replay="handleDownloadReplay"
+              @watch-replay="handleLaunchReplay"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
               :is-expanded="g.isExpanded"
+              :replay-metadata="tab.matchHistoryPage?.replayMetadata[g.game.gameId]"
               :game="g.game"
               v-for="g of tab.matchHistoryPage?.games"
               :key="g.game.gameId"
@@ -660,6 +663,7 @@ import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Game } from '@shared/types/league-client/match-history'
+import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
@@ -920,68 +924,6 @@ const { resume: resumeSpectator, pause: pauseSpectator } = useIntervalFn(
   { immediateCallback: false }
 )
 
-// ==================== Watchers ====================
-// 对于使用到 SGP API 的接口, 在 token 准备好后, 再次加载数据
-// 仅作为 workaround
-watch(
-  () => sgps.isTokenReady,
-  async (current, prev) => {
-    if (current && !prev) {
-      const fn1 = async () => {
-        if (tab.summoner === null) {
-          await loadSummoner()
-        }
-      }
-
-      const fn2 = async () => {
-        if (tab.matchHistoryPage === null) {
-          await loadMatchHistory()
-        }
-      }
-
-      const fn3 = async () => {
-        if (tab.spectatorData === null) {
-          await updateSpectatorData()
-        }
-      }
-
-      await Promise.all([fn1(), fn2(), fn3()])
-    }
-  }
-)
-
-watch(
-  () => tab.matchHistoryPage?.page,
-  (page) => {
-    inputtingPage.value = page
-  }
-)
-
-watch(
-  () => sgps.availability.serversSupported.common,
-  (ya) => {
-    if (ya) {
-      resumeSpectator()
-    } else {
-      pauseSpectator()
-    }
-  },
-  { immediate: true }
-)
-
-// workaround: KeepAlive 下 Naive UI 滚动条复位问题; 远古遗留, 未测试移除后是否会有问题
-watch(
-  () => mhs.currentTabId,
-  (tabId) => {
-    if (tabId === tab.id) {
-      nextTick(() => {
-        scrollEl.value?.scrollTo({ top: mainContentScrollTop.value })
-      })
-    }
-  },
-  { immediate: true }
-)
-
 // ==================== Functions ====================
 const loadSummoner = async () => {
   if (tab.isLoadingSummoner) {
@@ -1150,6 +1092,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         pageSize,
         tag: tag || 'all',
         source: 'sgp',
+        replayMetadata: {},
         games: data.games.games.map((g) => ({
           isDetailed: true,
           isLoading: false,
@@ -1176,6 +1119,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
           pageSize,
           tag: 'all',
           source: 'lcu',
+          replayMetadata: {},
           games: data.games.games.map((g) => ({
             isDetailed: false,
             isLoading: false,
@@ -1234,7 +1178,10 @@ const loadDetailedGame = async (dataState: GameDataState) => {
   dataState.isLoading = true
 
   try {
-    if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+    if (
+      (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) ||
+      mustUseSgpApiBecauseCrossTencentServer.value
+    ) {
       const cached = mhs.detailedGameLruMap.get(`sgp:${dataState.game.gameId}`)
 
       if (cached) {
@@ -1277,6 +1224,27 @@ const loadDetailedGame = async (dataState: GameDataState) => {
   } finally {
     dataState.isLoading = false
   }
+}
+
+const loadReplayMetadata = async (games: Game[]) => {
+  const { data: conf } = await lc.api.replays.getConfiguration()
+
+  const task = async (game: Game) => {
+    await lc.api.replays.createMetadata(game.gameId, {
+      gameVersion: conf.gameVersion,
+      gameType: game.gameType,
+      queueId: game.queueId,
+      gameEnd: game.gameCreation + game.gameDuration * 1000
+    })
+
+    const { data } = await lc.api.replays.getMetadata(game.gameId)
+
+    if (tab.matchHistoryPage) {
+      tab.matchHistoryPage.replayMetadata[game.gameId] = markRaw(data)
+    }
+  }
+
+  await Promise.all(games.map(task))
 }
 
 const loadTags = async () => {
@@ -1605,6 +1573,108 @@ const handlePreviewGame = (game: Game | number, forceModal?: boolean) => {
     }
   }
 }
+
+const handleDownloadReplay = async (gameId: number) => {
+  try {
+    await lc.api.replays.downloadRofl(gameId)
+  } catch (error: any) {
+    message.error(() => t('MatchHistoryTab.failedToDownloadReplay', { reason: error.message }))
+  }
+}
+
+const handleLaunchReplay = async (gameId: number) => {
+  try {
+    await lc.api.replays.watchRofl(gameId)
+
+    message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
+  } catch (error: any) {
+    message.error(() => t('MatchHistoryTab.failedToLaunchReplay', { reason: error.message }))
+  }
+}
+
+// ==================== Watchers ====================
+// 对于使用到 SGP API 的接口, 在 token 准备好后, 再次加载数据
+// 仅作为 workaround
+watch(
+  () => sgps.isTokenReady,
+  async (current, prev) => {
+    if (current && !prev) {
+      const fn1 = async () => {
+        if (tab.summoner === null) {
+          await loadSummoner()
+        }
+      }
+
+      const fn2 = async () => {
+        if (tab.matchHistoryPage === null) {
+          await loadMatchHistory()
+        }
+      }
+
+      const fn3 = async () => {
+        if (tab.spectatorData === null) {
+          await updateSpectatorData()
+        }
+      }
+
+      await Promise.all([fn1(), fn2(), fn3()])
+    }
+  }
+)
+
+watch(
+  () => tab.matchHistoryPage?.page,
+  (page) => {
+    inputtingPage.value = page
+  }
+)
+
+watch(
+  () => sgps.availability.serversSupported.common,
+  (ya) => {
+    if (ya) {
+      resumeSpectator()
+    } else {
+      pauseSpectator()
+    }
+  },
+  { immediate: true }
+)
+
+// workaround: KeepAlive 下 Naive UI 滚动条复位问题; 远古遗留, 未测试移除后是否会有问题
+watch(
+  () => mhs.currentTabId,
+  (tabId) => {
+    if (tabId === tab.id) {
+      nextTick(() => {
+        scrollEl.value?.scrollTo({ top: mainContentScrollTop.value })
+      })
+    }
+  },
+  { immediate: true }
+)
+
+// currently only supports on the same server
+watch(
+  () => tab.matchHistoryPage,
+  (page) => {
+    if (page) {
+      if (tab.sgpServerId !== sgps.availability.sgpServerId) {
+        return
+      }
+
+      loadReplayMetadata(page.games.map((g) => g.game)).catch((error) => {
+        log.warn(VIEW_NAMESPACE, 'Failed to load replay metadata', error)
+      })
+    }
+  }
+)
+
+lc.onLcuEventVue<ReplayDownloadProgress>('/lol-replays/v1/metadata/:gameId', (data) => {
+  if (data.eventType === 'Update' && tab.matchHistoryPage) {
+    tab.matchHistoryPage.replayMetadata[data.data.gameId] = data.data
+  }
+})
 
 // ==================== Initialization ====================
 if (mhs.settings.matchHistoryUseSgpApi) {

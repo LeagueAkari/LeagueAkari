@@ -1423,6 +1423,8 @@ MatchHistoryTab:
   failedToTakeScreenshotNoData: 尝试截图失败，未获取到图片信息
   failedToTakeScreenshot: 尝试截图失败：{{reason}}
   copiedToClipboard: 已复制到剪贴板
+  failedToLaunchReplay: 无法拉起回放：{{reason}}
+  failedToDownloadReplay: 无法下载回放：{{reason}}
 
 EncounteredGames:
   title: 历史对局
@@ -1471,6 +1473,11 @@ MiscellaneousPanel:
   gameDate: 对局日期 {{date}}
   server: '区服：{{server}}'
   bans: 禁用：
+  replay:
+    download: 下载回放
+    watch: 观看回放
+    incompatible: 回放不可用
+    downloading: 回放下载中
 
   stats:
     championId: 英雄

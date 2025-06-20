@@ -537,7 +537,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupNewReleaseModal()
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
-    this._setup.addSetupFn(() => this._handleReplayDownloadProgress())
+    // this._setup.addSetupFn(() => this._handleReplayDownloadProgress()) // unused
   }
 
   showAnnouncementModal() {

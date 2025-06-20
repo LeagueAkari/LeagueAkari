@@ -1419,6 +1419,8 @@ MatchHistoryTab:
   failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
   failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
   copiedToClipboard: Copied to clipboard
+  failedToLaunchReplay: 'Failed to launch replay: {{reason}}'
+  failedToDownloadReplay: 'Failed to download replay: {{reason}}'
 
 EncounteredGames:
   title: History Games
@@ -1467,6 +1469,11 @@ MiscellaneousPanel:
   gameDate: Game Date {{date}}
   server: 'Server: {{server}}'
   bans: 'Bans:'
+  replay:
+    download: Download Replay
+    watch: Watch Replay
+    incompatible: Replay Incompatible
+    downloading: Downloading Replay
 
   stats:
     championId: Champion
