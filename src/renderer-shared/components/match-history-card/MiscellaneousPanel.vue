@@ -76,6 +76,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStre
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, Participant, Player } from '@shared/types/league-client/match-history'
+import { ReplayMetadata } from '@shared/types/league-client/replays'
 import { summonerName } from '@shared/utils/name'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import dayjs from 'dayjs'
@@ -88,6 +89,7 @@ import StreamerModeMaskedText from '../StreamerModeMaskedText.vue'
 
 const props = defineProps<{
   game: Game
+  replayMetadata?: ReplayMetadata
 }>()
 
 const { t } = useTranslation()

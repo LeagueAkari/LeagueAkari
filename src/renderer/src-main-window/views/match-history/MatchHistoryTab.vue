@@ -301,7 +301,9 @@
                 </div>
                 <NSelect
                   v-if="
-                    currentSgpServerSupported.matchHistory && mhs.settings.matchHistoryUseSgpApi
+                    (currentSgpServerSupported.matchHistory &&
+                      mhs.settings.matchHistoryUseSgpApi) ||
+                    mustUseSgpApiBecauseCrossTencentServer
                   "
                   size="small"
                   :value="tab.matchHistoryPage?.tag"
@@ -752,6 +754,13 @@ const currentSgpServerSupported = computed(() => {
   return sgps.sgpServerConfig.servers[tab.sgpServerId] || { common: false, matchHistory: false }
 })
 
+const mustUseSgpApiBecauseCrossTencentServer = computed(() => {
+  return (
+    sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.includes(tab.sgpServerId) &&
+    sgps.availability.sgpServerId !== tab.sgpServerId
+  )
+})
+
 const isOnSelfSgpServer = computed(() => {
   return sgps.availability.sgpServerId === tab.sgpServerId
 })
@@ -874,7 +883,7 @@ const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
 // ==================== Interval ====================
 const updateSpectatorData = async () => {
   // 仅仅在当前大区支持 SGP API 时才更新
-  if (!sgps.availability.serversSupported.common) {
+  if (!sgps.sgpServerConfig.servers[tab.sgpServerId]?.common) {
     return
   }
 
@@ -1120,7 +1129,11 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     tab.isLoadingMatchHistory = true
 
     // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
-    if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+    // 或在跨区时, 强制使用 SGP API
+    if (
+      (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) ||
+      mustUseSgpApiBecauseCrossTencentServer.value
+    ) {
       if (!sgps.isTokenReady) {
         return
       }
@@ -1188,7 +1201,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
             mhs.detailedGameLruMap.set(`lcu:${g.game.gameId}`, game)
           } catch (error) {
             g.hasError = true
-            log.warn(VIEW_NAMESPACE, '拉取详细战绩信息失败', error)
+            log.warn(VIEW_NAMESPACE, 'Oooops! Failed to get some results!', error)
           } finally {
             g.isLoading = false
           }
