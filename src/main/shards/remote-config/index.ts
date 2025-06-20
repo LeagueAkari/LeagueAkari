@@ -35,16 +35,19 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
+  // only source changed will trigger this task
   private _updateSgpLeagueServersTask = new IntervalTask(
     () => this._updateSgpLeagueServers(),
     2 * 60 * 60 * 1000 // 2 hours
   )
 
+  // locale / source changed will trigger this task
   private _updateAnnouncementTask = new IntervalTask(
     () => this._updateAnnouncement(),
     4 * 60 * 60 * 1000 // 4 hours
   )
 
+  // locale / source changed will trigger this task
   private _updateLatestReleaseTask = new IntervalTask(
     () => this._updateLatestRelease(),
     4 * 60 * 60 * 1000 // 4 hours
@@ -76,16 +79,29 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     )
   }
 
-  private _addMoreInfoToRelease(release: GithubApiLatestRelease): LatestReleaseWithMetadata {
+  private async _addMoreInfoToRelease(
+    release: GithubApiLatestRelease
+  ): Promise<LatestReleaseWithMetadata> {
     const isNew = gt(release.tag_name, app.getVersion())
     const currentVersion = app.getVersion()
+
+    let detailedChangelog: string | null = null
+    try {
+      const { data } = await this.repo.getRawContent(
+        `/releases/${release.tag_name}/${this._app.settings.locale}.md`
+      )
+
+      detailedChangelog = data
+    } catch (error) {
+      this._log.warn('Failed to get changelog', error)
+    }
 
     let archiveFile = release.assets.find((a) => {
       return a.content_type === 'application/x-compressed'
     })
 
     if (archiveFile) {
-      return { ...release, archiveFile, isNew, currentVersion }
+      return { ...release, archiveFile, isNew, currentVersion, detailedChangelog }
     }
 
     // compatibility with gitee
@@ -94,10 +110,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     })
 
     if (archiveFile) {
-      return { ...release, archiveFile, isNew, currentVersion }
+      return { ...release, archiveFile, isNew, currentVersion, detailedChangelog }
     }
 
-    return { ...release, isNew, archiveFile: null, currentVersion }
+    return { ...release, isNew, archiveFile: null, currentVersion, detailedChangelog }
   }
 
   private _checkIfReachRateLimit(error: unknown) {
@@ -153,7 +169,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       this.state.setUpdatingLatestRelease(true)
       this._log.info('Updating Latest Release', this._repo.config.source)
       const { data } = await this._repo.getLatestRelease()
-      this.state.setLatestRelease(this._addMoreInfoToRelease(data))
+      this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
         return
@@ -172,7 +188,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       this.state.setUpdatingLatestRelease(true)
       this._log.info('Updating Latest Release.. Manually', this._repo.config.source)
       const { data } = await this._repo.getLatestRelease()
-      const release = this._addMoreInfoToRelease(data)
+      const release = await this._addMoreInfoToRelease(data)
       this.state.setLatestRelease(release)
 
       return release
@@ -223,6 +239,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         this._repo.setConfig({ locale: locale as 'zh-CN' | 'en' })
         this.state.setAnnouncement(null)
         this._updateAnnouncementTask.start(true)
+        this._updateLatestReleaseTask.start(true)
       },
       { delay: 1000 }
     )
