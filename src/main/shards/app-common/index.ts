@@ -4,6 +4,7 @@ import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 import os from 'node:os'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
@@ -26,7 +27,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _settingFactory: SettingFactoryMain
+    _settingFactory: SettingFactoryMain,
+    private readonly _protocol: AkariProtocolMain
   ) {
     this._setting = _settingFactory.register(
       AppCommonMain.id,
@@ -203,6 +205,11 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(AppCommonMain.id, 'quit', () => {
       app.quit()
+    })
+
+    this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {
+      this._ipc.sendEvent(AppCommonMain.id, 'renderer-link', req.url)
+      return new Response(null, { status: 204 })
     })
   }
 }

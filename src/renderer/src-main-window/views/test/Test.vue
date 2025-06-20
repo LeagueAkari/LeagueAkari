@@ -22,18 +22,37 @@
           <div class="info">borderColor: {{ team.borderColor }}</div>
         </div>
       </div>
+      <div class="markdown-body" v-html="html"></div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
-import { NScrollbar } from 'naive-ui'
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { markdownIt } from '@renderer-shared/utils/markdown'
+import { NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'
 
+const app = useInstance(AppCommonRenderer)
 const teams = reactive(PREMADE_TEAM_COLORS)
+const dialog = useDialog()
 
 const show = ref(true)
+
+const markdown = ref(`
+Some thing
+[XX](akari://renderer-link/i-should-do-something)
+`)
+const html = markdownIt.render(markdown.value)
+
+app.onRendererLink((url) => {
+  dialog.info({
+    title: 'Renderer Link',
+    content: url
+  })
+})
 </script>
 
 <style lang="less" scoped>

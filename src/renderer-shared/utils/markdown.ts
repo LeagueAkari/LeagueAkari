@@ -11,7 +11,12 @@ const defaultRender =
   }
 
 markdownIt.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-  tokens[idx].attrPush(['target', '_blank'])
+  const hrefIdx = tokens[idx].attrIndex('href')
+  const href = hrefIdx >= 0 ? tokens[idx].attrs![hrefIdx][1] : ''
+
+  if (!href.startsWith('akari://')) {
+    tokens[idx].attrSet('target', '_blank')
+  }
 
   return defaultRender(tokens, idx, options, env, self)
 }
