@@ -12,6 +12,7 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
@@ -432,6 +433,96 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addRenderVNode(() => h(comp))
   }
 
+  private _handleReplayDownloadProgress() {
+    const bts = useBackgroundTasksStore()
+    const { t } = useTranslation()
+
+    this._client.onLcuEventVue<ReplayDownloadProgress>(
+      '/lol-replays/v1/metadata/:gameId',
+      (data) => {
+        if (data.eventType !== 'Update') {
+          return
+        }
+
+        const { gameId, state, downloadProgress } = data.data
+
+        const taskId = `${SimpleNotificationsRenderer.id}/replay-download-progress-${gameId}`
+
+        if (!bts.hasTask(taskId)) {
+          bts.createTask(taskId, {
+            name: () => t('simple-notifications-renderer.replay-download-progress-task.name')
+          })
+        }
+
+        switch (state) {
+          case 'checking':
+          case 'found': {
+            bts.updateTask(taskId, {
+              description: () =>
+                t('simple-notifications-renderer.replay-download-progress-task.checking')
+            })
+            break
+          }
+
+          case 'downloading': {
+            bts.updateTask(taskId, {
+              description: () =>
+                t('simple-notifications-renderer.replay-download-progress-task.downloading'),
+              progress: downloadProgress / 100
+            })
+            break
+          }
+          case 'watch': {
+            bts.updateTask(taskId, {
+              inProgress: false,
+              description: () =>
+                t('simple-notifications-renderer.replay-download-progress-task.watch'),
+              actions: [
+                {
+                  label: () =>
+                    t('simple-notifications-renderer.replay-download-progress-task.watchButton'),
+                  callback: () => {
+                    this._client.api.replays.watchRofl(gameId)
+                  },
+                  buttonProps: { type: 'primary' }
+                },
+                {
+                  label: () =>
+                    t('simple-notifications-renderer.replay-download-progress-task.closeButton'),
+                  callback: () => {
+                    bts.removeTask(taskId)
+                  }
+                }
+              ]
+            })
+            break
+          }
+          case 'incompatible': {
+            bts.updateTask(taskId, {
+              description: () =>
+                t('simple-notifications-renderer.replay-download-progress-task.incompatible'),
+              inProgress: false,
+              actions: [
+                {
+                  label: () =>
+                    t('simple-notifications-renderer.replay-download-progress-task.closeButton'),
+                  callback: () => {
+                    bts.removeTask(taskId)
+                  }
+                }
+              ]
+            })
+            break
+          }
+          default: {
+            bts.removeTask(taskId)
+            break
+          }
+        }
+      }
+    )
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -446,6 +537,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupNewReleaseModal()
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
+    this._setup.addSetupFn(() => this._handleReplayDownloadProgress())
   }
 
   showAnnouncementModal() {

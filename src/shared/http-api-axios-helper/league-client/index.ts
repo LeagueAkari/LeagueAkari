@@ -25,6 +25,7 @@ import { ProcessControlHttpApi } from './process-control'
 import { RankedHttpApi } from './ranked'
 import { RegaliaHttpApi } from './regalia'
 import { RemedyHttpApi } from './remedy'
+import { ReplaysHttpApi } from './replays'
 import { RewardTrackHttpApi } from './reward-track'
 import { RewardsHttpApi } from './rewards'
 import { RiotClientHttpApi } from './riotclient'
@@ -67,6 +68,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly rewards: RewardsHttpApi
   public readonly rewardTrack: RewardTrackHttpApi
   public readonly store: StoreHttpApi
+  public readonly replays: ReplaysHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -100,5 +102,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.rewards = new RewardsHttpApi(this._http)
     this.rewardTrack = new RewardTrackHttpApi(this._http)
     this.store = new StoreHttpApi(this._http)
+    this.replays = new ReplaysHttpApi(this._http)
   }
 }

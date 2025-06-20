@@ -2227,6 +2227,16 @@ simple-notifications-renderer:
     name: Login Queue
     description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}})'
 
+  replay-download-progress-task:
+    name: Replay Download
+    checking: Checking replay metadata...
+    found: Found replay metadata
+    downloading: Downloading replay...
+    watch: Replay downloaded
+    incompatible: Replay incompatible
+    closeButton: Close
+    watchButton: Watch Replay
+
 league-client-renderer:
   initialization-task:
     name: LCU Initialization

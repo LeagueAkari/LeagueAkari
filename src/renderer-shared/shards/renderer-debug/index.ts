@@ -45,19 +45,25 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
     this._setupInAppScope.addSetupFn(() => {
       watch(
-        () => store.rules.length,
-        (len) => {
-          if (len) {
+        () => store.rules.filter((r) => r.enabled).length,
+        (length) => {
+          if (length) {
+            this._log.info(RendererDebugRenderer.id, 'send all native lcu events')
             this.setSendAllNativeLcuEvents(true)
           } else {
+            this._log.info(RendererDebugRenderer.id, 'do not send all native lcu events')
             this.setSendAllNativeLcuEvents(false)
           }
+        },
+        { immediate: true }
+      )
+    })
 
-          this._setting.set(
-            RendererDebugRenderer.id,
-            'savedRules',
-            store.rules.map((r) => r.rule)
-          )
+    this._setupInAppScope.addSetupFn(() => {
+      watch(
+        () => store.rules.map((r) => r.rule),
+        (rules) => {
+          this._setting.set(RendererDebugRenderer.id, 'savedRules', rules)
         }
       )
     })

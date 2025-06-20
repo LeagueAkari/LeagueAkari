@@ -2228,6 +2228,16 @@ simple-notifications-renderer:
     name: 登录排队
     description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}})'
 
+  replay-download-progress-task:
+    name: 录像下载
+    checking: 正在检查对局 ID {{gameId}} 的录像...
+    found: 已找到对局 ID {{gameId}} 的录像
+    downloading: 正在下载对局 ID {{gameId}} 的录像...
+    watch: 对局 ID {{gameId}} 的录像已下载完成
+    incompatible: 对局 ID {{gameId}} 的录像不兼容当前版本
+    closeButton: 关闭
+    watchButton: 观看录像
+
 league-client-renderer:
   initialization-task:
     name: LCU 初始化

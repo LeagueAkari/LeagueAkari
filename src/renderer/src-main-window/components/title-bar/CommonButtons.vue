@@ -95,7 +95,12 @@ const bts = useBackgroundTasksStore()
 
 const overallProgress = computed(() => {
   let total = 0
+  let hasInProgressTask = false
   for (const task of bts.tasks) {
+    if (task.inProgress) {
+      hasInProgressTask = true
+    }
+
     if (task.progress !== null) {
       total += task.progress
     } else {
@@ -103,7 +108,11 @@ const overallProgress = computed(() => {
     }
   }
 
-  return Math.min(total / bts.tasks.length, 0.9)
+  if (hasInProgressTask) {
+    return Math.min(total / bts.tasks.length, 0.9)
+  } else {
+    return 1
+  }
 })
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
