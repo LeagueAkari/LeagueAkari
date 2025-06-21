@@ -38,9 +38,7 @@ const teams = reactive(PREMADE_TEAM_COLORS)
 const show = ref(true)
 
 const markdown = ref(`
-Some thing
 [打开更新页面](akari://renderer-link/overlays/release-modal)
-[点击这里修复无限加载](akari://renderer-link/evaluate?target=main-window&code=alert('已修复'))
 `)
 const html = markdownIt.render(markdown.value)
 </script>

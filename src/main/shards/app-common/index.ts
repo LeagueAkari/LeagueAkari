@@ -227,14 +227,15 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   /**
    * very dangerous, should be used only in some extreme cases. e.g opt-in bugfixes
-   * @param target main, or any renderer window
+   * @param target ~~main~~, or any renderer window
    * @param code pure js code
    * @returns
    */
   evaluate(target: string, code: string) {
-    if (target === 'main') {
-      eval(code)
-    }
+    // dangerous so disabled
+    // if (target === 'main') {
+    //   eval(code)
+    // }
 
     const wm = this._shared.manager.getInstance('window-manager-main')
 
