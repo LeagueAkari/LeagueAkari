@@ -1,0 +1,61 @@
+name: Manual Windows Build & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to release (e.g. v1.2.3 or v1.2.3-rabi.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write # allow creating / updating Release
+
+jobs:
+  build-release:
+    runs-on: windows-latest # Windows Server 2022 runner
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout ${{ github.event.inputs.tag }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag }}
+          fetch-depth: 0 # fetch full history, avoid missing files when tag points to old commits
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+
+      - name: Enable Corepack / Yarn
+        run: |
+          corepack enable
+          yarn --version
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Windows package
+        run: yarn build:win
+
+      - name: Locate 7z artifact
+        id: locate
+        shell: powershell
+        run: |
+          $file = Get-ChildItem -Path . -Filter *.7z -Recurse | Select-Object -First 1
+          if (-not $file) { Write-Error "*.7z not found"; exit 1 }
+          "file=$($file.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}
+          files: ${{ steps.locate.outputs.file }}
+          prerelease: ${{ contains(github.event.inputs.tag, '-rabi.') }}
+          body: |
+            Please refer to [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag }}/CHANGELOG.md) for details.
