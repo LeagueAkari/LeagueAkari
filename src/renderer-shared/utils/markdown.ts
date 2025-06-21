@@ -1,4 +1,4 @@
-import MarkdownIt from 'markdown-it'
+import MarkdownIt, { Token } from 'markdown-it'
 
 export const markdownIt = new MarkdownIt({
   html: true
