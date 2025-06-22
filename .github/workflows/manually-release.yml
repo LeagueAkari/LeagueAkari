@@ -73,3 +73,4 @@ jobs:
           gitee_release_body: |
             Please refer to [CHANGELOG.md](https://gitee.com/${{ github.repository }}/blob/${{ github.event.inputs.tag }}/CHANGELOG.md) for details.
           gitee_files: ${{ steps.locate.outputs.file }}
+          gitee_target_commitish: main
