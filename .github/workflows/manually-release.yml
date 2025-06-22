@@ -59,3 +59,17 @@ jobs:
           prerelease: ${{ contains(github.event.inputs.tag, '-rabi.') }}
           body: |
             Please refer to [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag }}/CHANGELOG.md) for details.
+
+      - name: Create Gitee Release
+        if: ${{ !contains(github.event.inputs.tag, '-rabi.') }}
+        uses: nicennnnnnnlee/action-gitee-release@master
+        with:
+          gitee_action: create_release
+          gitee_owner: ${{ github.repository_owner }}
+          gitee_repo: ${{ github.event.repository.name }}
+          gitee_token: ${{ secrets.GITEE_FULL_ACCESS_TOKEN }}
+          gitee_tag_name: ${{ github.event.inputs.tag }}
+          gitee_release_name: ${{ github.event.inputs.tag }}
+          gitee_release_body: |
+            Please refer to [CHANGELOG.md](https://gitee.com/${{ github.repository }}/blob/${{ github.event.inputs.tag }}/CHANGELOG.md) for details.
+          gitee_files: ${{ steps.locate.outputs.file }}
