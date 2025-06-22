@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest # Windows Server 2022 runner
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-    timeout-minutes: 30
+    timeout-minutes: 180
 
     steps:
       - name: Checkout ${{ github.event.inputs.tag }}
@@ -60,6 +60,7 @@ jobs:
           body: |
             Please refer to [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag }}/CHANGELOG.md) for details.
 
+        # takes a very long time
       - name: Create Gitee Release
         if: ${{ !contains(github.event.inputs.tag, '-rabi.') }}
         uses: nicennnnnnnlee/action-gitee-release@master
