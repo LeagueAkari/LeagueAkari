@@ -330,7 +330,6 @@
 </template>
 
 <script lang="ts" setup>
-import { oneDark } from '@codemirror/theme-one-dark'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
