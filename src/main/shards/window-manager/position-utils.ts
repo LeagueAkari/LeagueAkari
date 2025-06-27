@@ -30,6 +30,9 @@ export function rectDistance(rect1: Rectangle, rect2: Rectangle) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
+// 由于 chromium 的限制, 设置 bounds 并不会在最小化时生效。所以需要使用监听器来处理
+const pendingRepositionWindows = new WeakSet<BrowserWindow>()
+
 export function repositionWindowIfInvisible(win: BrowserWindow) {
   if (!win || win.isDestroyed()) return
 
@@ -81,7 +84,17 @@ export function repositionWindowIfInvisible(win: BrowserWindow) {
     newY = workArea.y
   }
 
-  win.setBounds({ x: newX, y: newY, width: newWidth, height: newHeight })
+  if (win.isMinimized()) {
+    if (!pendingRepositionWindows.has(win)) {
+      pendingRepositionWindows.add(win)
+      win.once('restore', () => {
+        pendingRepositionWindows.delete(win)
+        win.setBounds({ x: newX, y: newY, width: newWidth, height: newHeight })
+      })
+    }
+  } else {
+    win.setBounds({ x: newX, y: newY, width: newWidth, height: newHeight })
+  }
 }
 
 export function intersectionArea(rect1: Rectangle, rect2: Rectangle) {

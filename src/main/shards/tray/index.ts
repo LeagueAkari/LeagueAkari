@@ -25,6 +25,7 @@ export class TrayMain implements IAkariShardInitDispose {
   private _cdTimerWindowDevTrayItem: MenuItem
   private _quitTrayItem: MenuItem
   private _contextMenu: Menu
+  private _adjustAllWindowPositionsTrayItem: MenuItem
 
   constructor(
     private readonly _wm: WindowManagerMain,
@@ -78,6 +79,18 @@ export class TrayMain implements IAkariShardInitDispose {
       click: () => this._wm.cdTimerWindow.toggleDevtools()
     })
 
+    this._adjustAllWindowPositionsTrayItem = new MenuItem({
+      label: i18next.t('tray.adjustAllWindowPositions'),
+      type: 'normal',
+      click: () => {
+        this._wm.mainWindow.repositionWindowIfInvisible()
+        this._wm.auxWindow.repositionWindowIfInvisible()
+        this._wm.opggWindow.repositionWindowIfInvisible()
+        this._wm.ongoingGameWindow.repositionWindowIfInvisible()
+        this._wm.cdTimerWindow.repositionWindowIfInvisible()
+      }
+    })
+
     this._quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
@@ -101,7 +114,11 @@ export class TrayMain implements IAkariShardInitDispose {
           this._auxWindowDevTrayItem,
           this._opggWindowDevTrayItem,
           this._ongoingGameWindowDevTrayItem,
-          this._cdTimerWindowDevTrayItem
+          this._cdTimerWindowDevTrayItem,
+          {
+            type: 'separator'
+          },
+          this._adjustAllWindowPositionsTrayItem
         ])
       },
       {

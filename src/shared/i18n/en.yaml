@@ -2277,6 +2277,7 @@ tray:
     toggleOpggWindowDevtools: Toggle DevTools - OP.GG Window
     toggleOngoingGameWindowDevtools: Toggle DevTools - Ongoing Game Window
     toggleCdTimerWindowDevtools: Toggle DevTools - Cooldown Timer Window
+  adjustAllWindowPositions: Adjust All Window Positions
 
 windowOpenHandler:
   toAkari: To League Akari GitHub ❤️

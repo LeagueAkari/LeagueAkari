@@ -2278,6 +2278,7 @@ tray:
     toggleOpggWindowDevtools: Toggle DevTools - OP.GG 窗口
     toggleOngoingGameWindowDevtools: Toggle DevTools - 对局窗口
     toggleCdTimerWindowDevtools: Toggle DevTools - 计时器窗口
+  adjustAllWindowPositions: 调整所有窗口的位置
 
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️

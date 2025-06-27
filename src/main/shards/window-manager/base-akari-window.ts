@@ -238,6 +238,10 @@ export abstract class BaseAkariWindow<
       this.resetPosition()
     })
 
+    this._context.ipc.onCall(this._namespace, 'repositionWindowIfInvisible', () => {
+      this.repositionWindowIfInvisible()
+    })
+
     this._context.ipc.onCall(
       this._namespace,
       'setIgnoreMouseEvents',
@@ -520,6 +524,14 @@ export abstract class BaseAkariWindow<
     }
 
     this._log.info(`Reset ${this._namespace} position to main display center`)
+  }
+
+  repositionWindowIfInvisible() {
+    if (this._window) {
+      repositionWindowIfInvisible(this._window)
+    }
+
+    this._log.info(`Reposition ${this._namespace} window if invisible`)
   }
 
   toggleDevtools() {
