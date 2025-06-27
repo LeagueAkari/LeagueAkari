@@ -1757,6 +1757,7 @@ BenchChampionsMini:
     attack-speed: Attack Speed
     movement-speed: Movement Speed
     tenacity: Tenacity
+    energy-regen: Energy Regen
 
 BenchModeAutoGrab:
   grabbing: Selecting in {{seconds}}s

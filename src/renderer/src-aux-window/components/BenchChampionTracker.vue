@@ -275,6 +275,14 @@ const translatedEvents = computed(() => {
   }
 })
 
+// TODO DEBUG
+watch(
+  () => as2.aramTracker.recordedEvents,
+  (events) => {
+    console.log(events)
+  }
+)
+
 const scrollbarEl = useTemplateRef('scrollbar')
 const shouldFollow = ref(true)
 const { arrivedState, y } = useScroll(() => scrollbarEl.value?.scrollbarInstRef?.containerRef)

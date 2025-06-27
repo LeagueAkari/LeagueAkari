@@ -1758,10 +1758,11 @@ BenchChampionsMini:
     shielding: 护盾效果
     ability-haste: 技能急速
     mana-regen: 法力回复
-    health-regen: 能量回复
+    health-regen: 生命回复
     attack-speed: 攻击速度
     movement-speed: 移动速度
     tenacity: 韧性
+    energy-regen: 能量回复
 
 BenchModeAutoGrab:
   grabbing: 即将选择 {{seconds}} s
