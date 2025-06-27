@@ -34,6 +34,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       htmlEntry: AkariOngoingGameWindow.HTML_ENTRY,
       rememberPosition: false,
       rememberSize: false,
+      repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut }

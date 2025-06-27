@@ -31,6 +31,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       htmlEntry: AkariAuxWindow.HTML_ENTRY,
       rememberPosition: true,
       rememberSize: true,
+      repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled },
         autoShow: { default: settings.autoShow },
