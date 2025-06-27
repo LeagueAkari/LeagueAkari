@@ -60,6 +60,7 @@ import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { Mission } from '@shared/types/league-client/missions'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { useTranslation } from 'i18next-vue'
@@ -75,7 +76,10 @@ const TARGET_MISSION_STATUS = 'SELECT_REWARDS'
 const { t } = useTranslation()
 
 const lc = useInstance(LeagueClientRenderer)
+const log = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
+
+const COMP_NAMESPACE = 'comp:MissionClaimTool'
 
 const message = useMessage()
 
@@ -165,6 +169,8 @@ const claim = async () => {
         await lc.api.missions.putPlayerMission(mission.id, {
           rewardGroups: chosen.map((c) => c.rewardGroup)
         })
+
+        log.info(COMP_NAMESPACE, `claimed ${chosen.map((c) => c.description).join(', ')}`)
 
         message.success(() =>
           t('RewardClaimTool.claimed', {
