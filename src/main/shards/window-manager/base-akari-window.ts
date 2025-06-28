@@ -25,7 +25,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { getCenteredRectangle, repositionWindowIfInvisible } from './position-utils'
+import { repositionWindowIfInvisible } from './position-utils'
 
 /**
  * 具备的一些基础属性
@@ -335,13 +335,8 @@ export abstract class BaseAkariWindow<
       } else if (this._config.rememberPosition) {
         this._window.setPosition(this.state.bounds.x, this.state.bounds.y)
       } else if (this._config.rememberSize) {
-        const p = getCenteredRectangle(this.state.bounds.width, this.state.bounds.height)
-        this._window.setBounds({
-          x: p.x,
-          y: p.y,
-          width: this.state.bounds.width,
-          height: this.state.bounds.height
-        })
+        this._window.setSize(this.state.bounds.width, this.state.bounds.height)
+        this._window.center()
       }
     }
 

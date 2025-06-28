@@ -15,6 +15,7 @@ import { GameflowState } from './gameflow'
 import { HonorState } from './honor'
 import { LeagueSessionState } from './league-session'
 import { LobbyState } from './lobby'
+import { LobbyTeamBuilderState } from './lobby-team-builder'
 import { LoginState } from './login'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
@@ -55,6 +56,7 @@ export class LeagueClientData {
   public gameData = new GameDataState()
   public entitlements = new EntitlementsState()
   public leagueSession = new LeagueSessionState()
+  public lobbyTeamBuilder = new LobbyTeamBuilderState()
 
   constructor(private readonly _context: LeagueClientMainContext) {
     this._initStateInitializer()
@@ -1066,6 +1068,49 @@ export class LeagueClientData {
     })
   }
 
+  private _syncLcuLobbyTeamBuilder() {
+    this._context.mobx.propSync(
+      this._context.namespace,
+      'lobbyTeamBuilder',
+      this.lobbyTeamBuilder,
+      ['champSelect.subsetChampionList']
+    )
+
+    const loadSubsetChampionList = async () => {
+      try {
+        const { data } =
+          await this._context.lc.api.lobbyTeamBuilder.getChampSelectSubsetChampionList()
+        this.lobbyTeamBuilder.champSelect.subsetChampionList = data
+      } catch (error) {
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-subset-champion-list'
+        )
+      }
+    }
+
+    this._stateInitializer.register(
+      'lobby-team-builder-champ-select-subset-champion-list',
+      loadSubsetChampionList
+    )
+
+    this._onLcuNotConnected(() => {
+      this.lobbyTeamBuilder.champSelect.setSubsetChampionList([])
+    })
+
+    this._context.lc.events.on<LcuEvent<number[]>>(
+      '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
+      (event) => {
+        if (event.eventType === 'Delete') {
+          this.lobbyTeamBuilder.champSelect.setSubsetChampionList([])
+        } else {
+          this.lobbyTeamBuilder.champSelect.setSubsetChampionList(event.data)
+        }
+      }
+    )
+  }
+
   init() {
     this._context.mobx.propSync(this._context.namespace, 'initialization', this.initialization, [
       'progress'
@@ -1082,6 +1127,7 @@ export class LeagueClientData {
     this._syncLcuSummoner()
     this._syncLcuEntitlements()
     this._syncLcuLeagueSession()
+    this._syncLcuLobbyTeamBuilder()
 
     this._handleLcuConnectionStateChange()
   }

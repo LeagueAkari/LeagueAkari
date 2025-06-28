@@ -13,6 +13,7 @@ import { HonorHttpApi } from './honor'
 import { LeagueSessionHttpApi } from './league-session'
 import { LoadoutsHttpApi } from './loadouts'
 import { LobbyHttpApi } from './lobby'
+import { LobbyTeamBuilderHttpApi } from './lobby-team-builder'
 import { LoginHttpApi } from './login'
 import { LootHttpApi } from './loot'
 import { MatchHistoryHttpApi } from './match-history'
@@ -69,6 +70,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly rewardTrack: RewardTrackHttpApi
   public readonly store: StoreHttpApi
   public readonly replays: ReplaysHttpApi
+  public readonly lobbyTeamBuilder: LobbyTeamBuilderHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -103,5 +105,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.rewardTrack = new RewardTrackHttpApi(this._http)
     this.store = new StoreHttpApi(this._http)
     this.replays = new ReplaysHttpApi(this._http)
+    this.lobbyTeamBuilder = new LobbyTeamBuilderHttpApi(this._http)
   }
 }

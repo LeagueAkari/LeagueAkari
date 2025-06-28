@@ -18,6 +18,7 @@ export interface ChampSelectSessionBase {
   allowBattleBoost: boolean
   allowRerolling: boolean
   allowSkinSelection: boolean
+  allowSubsetChampionPicks: boolean
   bans: Bans
   chatDetails: ChatDetails
   hasSimultaneousBans: boolean
@@ -93,14 +94,6 @@ export interface Trade {
   state: string
 }
 
-export interface Timer {
-  adjustedTimeLeftInPhase: number
-  internalNowInEpochMs: number
-  isInfinite: boolean
-  phase: string
-  totalTimeInPhase: number
-}
-
 export interface ChampSelectTeam {
   assignedPosition: string
   cellId: number
@@ -166,11 +159,13 @@ export interface SelectionStatus {
   selectedByMe: boolean
 }
 
+export type TimerPhase = 'PLANNING' | 'BAN_PICK' | 'FINALIZATION' | 'GAME_STARTING' | (string & {})
+
 export interface Timer {
   adjustedTimeLeftInPhase: number
   internalNowInEpochMs: number
   isInfinite: boolean
-  phase: string
+  phase: TimerPhase
   totalTimeInPhase: number
 }
 

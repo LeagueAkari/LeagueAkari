@@ -248,12 +248,18 @@ export class OngoingGameState {
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
+        // sometimes teamOne and teamTwo will have fake players, need to filter out
+        const realPlayers = this._lcData.gameflow.session.gameData.playerChampionSelections.map(
+          (c) => c.puuid
+        )
+
         return {
           all: [
             ...this._lcData.gameflow.session.gameData.teamOne,
             ...this._lcData.gameflow.session.gameData.teamTwo
           ]
             .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+            .filter((p) => realPlayers.includes(p.puuid))
             .map((p) => p.puuid)
         }
       }
