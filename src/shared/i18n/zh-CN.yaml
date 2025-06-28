@@ -1884,7 +1884,7 @@ Opgg:
 
     flashPosition:
       label: 闪现位置偏好
-      description: 设置召唤师技能时，若存在闪现技能，优先选择的位置"
+      description: 设置召唤师技能时，若存在闪现技能，优先选择的位置
       auto: 当前闪现的位置
       options:
         d: 闪现位置默认在 D

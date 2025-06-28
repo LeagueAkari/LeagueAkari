@@ -331,12 +331,16 @@ const mapPremadePlayers = (team: string) => {
   const thisTeamGroups: Record<string, string[]> = {}
   const thisTeamPremadeIds: Record<string, string> = {}
   Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, puuids]) => {
-    if (puuids.every((p) => t.includes(p))) {
-      thisTeamGroups[premadeId] = puuids
-      puuids.forEach((p) => {
-        thisTeamPremadeIds[p] = premadeId
-      })
+    const realPuuids = puuids.filter((p) => t.includes(p))
+
+    if (realPuuids.length < 2) {
+      return
     }
+
+    thisTeamGroups[premadeId] = realPuuids
+    realPuuids.forEach((p) => {
+      thisTeamPremadeIds[p] = premadeId
+    })
   })
 
   return {
