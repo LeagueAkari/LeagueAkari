@@ -30,8 +30,11 @@
             <div class="balance-data-source-name">{{ SOURCE_NAME[source] }}</div>
           </div>
         </NTooltip>
+
+        <!-- 新版大乱斗将不再有 Reroll 机制 -->
         <div class="btns">
           <NButton
+            v-if="shouldShowRerollButton"
             @click="() => handleReroll()"
             :disabled="rerollsRemaining === 0 || isRerolling"
             size="tiny"
@@ -48,6 +51,7 @@
             </template>
           </NButton>
           <NButton
+            v-if="shouldShowRerollButton"
             :disabled="rerollsRemaining === 0 || isRerolling"
             @click="() => handleReroll(true)"
             :title="
@@ -80,9 +84,7 @@
             <LcuImage
               class="champion-image"
               :class="{
-                'champion-image-invalid': !lcs.champSelect.currentPickableChampionIds.has(
-                  c.championId
-                ),
+                'champion-image-invalid': !isChampionSwappable(c.championId) || !canUseBench,
                 [championAdjustment(c.championId)?.overallEffect || 'neutral']: true
               }"
               :src="championIconUri(c.championId)"
@@ -117,7 +119,6 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
-import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -265,8 +266,28 @@ const hasChampionAdjustment = (championId: number) => {
   return modeAdjustment.adjustments.length > 0
 }
 
+// lcux 中按照如下逻辑隐藏 bench. 在隐藏 bench 的时候, 通常也不能继续进行选择
+const canUseBench = computed(() => {
+  if (!lcs.champSelect.session) {
+    return false
+  }
+
+  if (!lcs.champSelect.session.benchEnabled) {
+    return false
+  }
+
+  const isInFinalizationPhase = lcs.champSelect.session.timer.phase === 'FINALIZATION'
+  const isInBanPickPhase = lcs.champSelect.session.timer.phase === 'BAN_PICK'
+
+  if (lcs.champSelect.session.allowSubsetChampionPicks) {
+    return isInFinalizationPhase || isInBanPickPhase
+  }
+
+  return isInFinalizationPhase
+})
+
 const benchChampions = computed(() => {
-  if (!isBenchEnabledSession(lcs.champSelect.session)) {
+  if (!lcs.champSelect.session?.benchEnabled) {
     return null
   }
 
@@ -274,11 +295,38 @@ const benchChampions = computed(() => {
 })
 
 const rerollsRemaining = computed(() => {
-  if (!isBenchEnabledSession(lcs.champSelect.session)) {
+  if (!canUseBench.value) {
     return 0
   }
 
-  return lcs.champSelect.session.rerollsRemaining
+  return lcs.champSelect.session!.rerollsRemaining
+})
+
+// logic copied from lcux
+const isChampionSwappable = (championId: number) => {
+  if (!championId || !lcs.champSelect.session) {
+    return false
+  }
+
+  const canPlay = lcs.champSelect.currentPickableChampionIds.has(championId)
+  const waitingOnFinalizationPhase =
+    lcs.champSelect.session.timer.phase === 'BAN_PICK' &&
+    !lcs.lobbyTeamBuilder.champSelect.subsetChampionList.includes(championId)
+
+  return canPlay && !waitingOnFinalizationPhase
+}
+
+// logic copied from lcux
+const shouldShowRerollButton = computed(() => {
+  if (!lcs.champSelect.session) {
+    return false
+  }
+
+  return (
+    lcs.champSelect.session.allowRerolling &&
+    lcs.champSelect.session.timer.phase === 'FINALIZATION' &&
+    !lcs.champSelect.session.allowSubsetChampionPicks
+  )
 })
 
 const message = useMessage()
@@ -291,7 +339,7 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
-  if (!lcs.champSelect.currentPickableChampionIds.has(championId)) {
+  if (!isChampionSwappable(championId)) {
     return
   }
 
@@ -301,7 +349,7 @@ const handleBenchSwap = async (championId: number) => {
   } catch (error: any) {
     console.error(error)
     message.warning(
-      t('BenchChampionsMini.rerollFailed', {
+      t('BenchChampionsMini.swapFailed', {
         reason: error.message
       })
     )

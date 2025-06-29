@@ -1745,6 +1745,7 @@ BenchChampionsMini:
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
   rerollFailed: Failed to reroll {{reason}}
+  swapFailed: Failed to swap {{reason}}
 
   balanceTypes:
     damage-dealt: Damage Dealt
