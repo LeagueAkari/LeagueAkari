@@ -24,7 +24,6 @@ export class AutoSelectSettings {
   benchModeEnabled: boolean = false
   benchSelectFirstAvailableChampion: boolean = false
   benchHandleTradeEnabled: boolean = false
-  benchHandleTradeIgnoreChampionOwner: boolean = true
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 2.9
   banEnabled: boolean = false

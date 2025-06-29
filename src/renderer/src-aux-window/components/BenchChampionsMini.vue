@@ -424,7 +424,7 @@ const handleReroll = async (grabBack = false) => {
   border-width: 1px;
   border-color: rgb(72, 72, 72);
 }
-// user/v1/
+
 .champion-image.buffed {
   border-width: 1px;
   border-color: rgb(0, 161, 67);

@@ -2066,22 +2066,6 @@ AutoChampConfig:
   configure:
     label: Configure
 
-BenchChampionTracker:
-  position_ordinal_one: '{{count}}st'
-  position_ordinal_two: '{{count}}nd'
-  position_ordinal_three: '{{count}}rd'
-  position_ordinal_other: '{{count}}th'
-  reroll: Reroll
-  trade: Trade
-  swap: Swap
-  useReroll: '{{player}} used a reroll'
-  tradeWithPlayer: '{{player1}} traded with {{player2}}'
-  swapFromBench: '{{player}} swapped from the bench'
-  sendDiceUsageToChat: Send Dice Usage to Chat
-  sendButton: Send
-  diceUsageTitle: 'Dice Usage:'
-  diceUsage: '{{player}} used {{countV}} dice ({{champions}})'
-
 RewardClaimTool: &CommonClaimTool
   title: Rewards
 

@@ -10,7 +10,6 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AramTracker } from './aram-tracker'
 import { AutoSelectSettings, AutoSelectState } from './state'
 
 @Shard(AutoSelectMain.id)
@@ -27,8 +26,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _pickTask = new TimeoutTask()
   private _banTask = new TimeoutTask()
-
-  private _aramTracker = new AramTracker()
 
   constructor(
     _loggerFactory: LoggerFactoryMain,
@@ -58,10 +55,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         banDelaySeconds: { default: this.settings.banDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
         banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
-        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled },
-        benchHandleTradeIgnoreChampionOwner: {
-          default: this.settings.benchHandleTradeIgnoreChampionOwner
-        }
+        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
       },
       this.settings
     )
@@ -85,8 +79,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'benchExpectedChampions',
       'expectedChampions',
       'bannedChampions',
-      'benchHandleTradeEnabled',
-      'benchHandleTradeIgnoreChampionOwner'
+      'benchHandleTradeEnabled'
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
@@ -96,11 +89,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'upcomingGrab',
       'upcomingPick',
       'upcomingBan'
-    ])
-
-    this._mobx.propSync(AutoSelectMain.id, 'aramTracker', this._aramTracker.state, [
-      'recordedEvents',
-      'isJoinAfterSession'
     ])
   }
 
@@ -476,10 +464,15 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      const { benchEnabled, localPlayerCellId, benchChampions, myTeam } =
-        this._lc.data.champSelect.session
+      const {
+        benchEnabled,
+        localPlayerCellId,
+        benchChampions,
+        myTeam,
+        timer: { phase }
+      } = this._lc.data.champSelect.session
 
-      return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
+      return { benchEnabled, localPlayerCellId, benchChampions, myTeam, timer: { phase } }
     })
 
     this._mobx.reaction(
@@ -496,15 +489,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           if (prevSession) {
             benchChampions.clear()
           }
-          this._aramTracker.reset()
           return
         }
 
         if (!session.benchEnabled) {
           return
         }
-
-        this._aramTracker.track(session)
 
         // Diff
         const now = Date.now()
@@ -648,7 +638,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        const { id, otherSummonerIndex } = trade
+        const { id } = trade
         const t = session.trades.find((t) => t.id === id)
 
         if (!t) {
@@ -672,31 +662,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             const indexHim = this.settings.benchExpectedChampions.indexOf(requesterChampionId)
 
             if (indexHim === -1 || indexInHand < indexHim) {
-              if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-                const origin = this._aramTracker.getOrigin(self.championId)
-                if (origin && origin.cellId === otherSummonerIndex) {
-                  this._sendInChat(
-                    `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
-                      from:
-                        this._lc.data.gameData.champions[from.championId]?.name || from.championId,
-                      to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
-                    })}`
-                  )
-                  this._log.info(
-                    `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
-                  )
-                } else {
-                  this._log.info(
-                    `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
-                  )
-                  this._acceptOrDeclineTrade(id, false)
-                }
-              } else {
-                this._log.info(
-                  `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
-                )
-                this._acceptOrDeclineTrade(id, false)
-              }
+              this._log.info(
+                `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
+              )
+              this._acceptOrDeclineTrade(id, false)
             } else {
               this._log.info(
                 `Accepted swap request: ${from.championId} -> ${self.championId}, target has higher priority`
@@ -704,25 +673,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               this._acceptOrDeclineTrade(id, true)
             }
           } else {
-            if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-              const origin = this._aramTracker.getOrigin(self.championId)
-              if (origin && origin.cellId === otherSummonerIndex) {
-                this._sendInChat(
-                  `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
-                    from:
-                      this._lc.data.gameData.champions[from.championId]?.name || from.championId,
-                    to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
-                  })}`
-                )
-                this._log.info(
-                  `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
-                )
-              } else {
-                this._acceptOrDeclineTrade(id, false)
-              }
-            } else {
-              this._acceptOrDeclineTrade(id, false)
-            }
+            this._acceptOrDeclineTrade(id, false)
           }
         } else {
           if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {

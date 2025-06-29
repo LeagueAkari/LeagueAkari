@@ -14,10 +14,7 @@
     "src/renderer/src-cd-timer-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
-    "src/renderer-shared/**/*",
-    "examples/legacy/ongoing-game-utils.ts",
-    "examples/legacy/PlayerInfoCard.vue",
-    "examples/legacy/OngoingGame1.vue"
+    "src/renderer-shared/**/*"
   ],
   "compilerOptions": {
     "target": "ESNext",
