@@ -69,6 +69,7 @@
     "electron": "^34.5.8",
     "electron-builder": "26.0.12",
     "electron-vite": "^3.1.0",
+    "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
     "i18next": "^25.2.1",
     "i18next-vue": "^5.3.0",

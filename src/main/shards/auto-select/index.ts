@@ -464,15 +464,17 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      const {
+      const { benchEnabled, localPlayerCellId, benchChampions, myTeam } =
+        this._lc.data.champSelect.session
+
+      return {
         benchEnabled,
         localPlayerCellId,
         benchChampions,
         myTeam,
-        timer: { phase }
-      } = this._lc.data.champSelect.session
-
-      return { benchEnabled, localPlayerCellId, benchChampions, myTeam, timer: { phase } }
+        timerPhase: this._lc.data.champSelect.session.timer.phase,
+        subsetChampionList: this._lc.data.lobbyTeamBuilder.champSelect.subsetChampionList
+      }
     })
 
     this._mobx.reaction(
@@ -521,7 +523,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         const availableExpectedChampions = expected.filter(
           (c) =>
             this._lc.data.champSelect.currentPickableChampionIds.has(c) &&
-            !this._lc.data.champSelect.disabledChampionIds.has(c)
+            !this._lc.data.champSelect.disabledChampionIds.has(c) &&
+            !(session.timerPhase === 'BAN_PICK' && !session.subsetChampionList.includes(c)) // waitingOnFinalizationPhase
         )
         const pickableChampionsOnBench = availableExpectedChampions.filter((c) =>
           benchChampions.has(c)
@@ -731,7 +734,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       await this._lc.api.chat.chatSend(
         this._lc.data.chat.conversations.championSelect.id,
         type === 'select'
-          ? `[League Akari] - ${i18next.t('grab-soon', {
+          ? `[League Akari] - ${i18next.t('auto-select-main.grab-soon', {
               seconds: (time / 1000).toFixed(1),
               champion: this._lc.data.gameData.champions[championId]?.name || championId
             })}`
