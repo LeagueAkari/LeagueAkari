@@ -355,11 +355,32 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
             }
 
             // new announcement
-            if (a.uniqueId !== sns.lastAnnouncementUniqueId) {
+            if (
+              a.frontMatter.alertLevel === 'high' &&
+              a.uniqueId !== sns.lastAnnouncementUniqueId
+            ) {
               sns.showAnnouncementModal = true
             }
           },
           { immediate: true }
+        )
+
+        // medium 和 low 会自动已读
+        watch(
+          () => sns.showAnnouncementModal,
+          (v) => {
+            if (!v) {
+              return
+            }
+
+            if (
+              rcs.announcement &&
+              (rcs.announcement.frontMatter.alertLevel === 'medium' ||
+                rcs.announcement.frontMatter.alertLevel === 'low')
+            ) {
+              sns.lastAnnouncementUniqueId = rcs.announcement.uniqueId
+            }
+          }
         )
 
         return () =>
