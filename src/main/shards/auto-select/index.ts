@@ -545,7 +545,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             if (pickableOnSubset.length > 0) {
               this._lc.api.champSelect.pickOrBan(
                 pickableOnSubset[0],
-                false,
+                true,
                 'pick',
                 session.firstPickActionId
               )

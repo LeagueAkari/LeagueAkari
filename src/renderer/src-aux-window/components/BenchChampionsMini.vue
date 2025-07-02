@@ -1,5 +1,5 @@
 <template>
-  <NCard size="small" v-if="benchChampions && lcs.champSelect.currentChampion && gameMode">
+  <NCard size="small" v-if="combinedChampions && gameMode">
     <div class="outer">
       <div class="operations">
         <NTooltip
@@ -8,20 +8,21 @@
           :duration="100"
           :delay="300"
           :keep-alive-on-hover="false"
-          :disabled="!hasChampionAdjustment(lcs.champSelect.currentChampion)"
+          :disabled="!hasChampionAdjustment(lcs.champSelect.currentChampion || -1)"
         >
           <template #trigger>
             <LcuImage
               class="champion-image"
               style="border-radius: 50%; cursor: default"
-              :class="championAdjustment(lcs.champSelect.currentChampion)?.overallEffect"
+              :class="championAdjustment(lcs.champSelect.currentChampion || -1)?.overallEffect"
               :src="championIconUri(lcs.champSelect.currentChampion || -1)"
             />
           </template>
           <div class="raw-popover">
             <div
               class="balance-item"
-              v-for="b of championAdjustment(lcs.champSelect.currentChampion)?.sortedAdjustments"
+              v-for="b of championAdjustment(lcs.champSelect.currentChampion || -1)
+                ?.sortedAdjustments"
               :key="b.type"
             >
               <span class="balance-item-name">{{ balanceTypes[b.type]?.name || b.type }}</span>
@@ -75,7 +76,7 @@
           :show-arrow="false"
           :duration="100"
           :delay="300"
-          v-for="c of benchChampions"
+          v-for="c of combinedChampions"
           :key="c.championId"
           :keep-alive-on-hover="false"
           :disabled="!hasChampionAdjustment(c.championId)"
@@ -88,7 +89,8 @@
                 [championAdjustment(c.championId)?.overallEffect || 'neutral']: true
               }"
               :src="championIconUri(c.championId)"
-              @click="() => handleBenchSwap(c.championId)"
+              @click="() => handleBenchSwapOrPick(c.championId)"
+              @click.right="handleBenchSwapOrPick(c.championId, false)"
             />
           </template>
           <div class="raw-popover">
@@ -104,7 +106,7 @@
           </div>
         </NTooltip>
         <div
-          v-for="_i of Math.max(10 - benchChampions.length, 0)"
+          v-for="_i of Math.max(10 - combinedChampions.length, 0)"
           class="champion-image-placeholder"
         />
       </div>
@@ -286,12 +288,28 @@ const canUseBench = computed(() => {
   return isInFinalizationPhase
 })
 
-const benchChampions = computed(() => {
+// when in ban pick phase, the bench champions are the subset champions
+const combinedChampions = computed(() => {
   if (!lcs.champSelect.session?.benchEnabled) {
     return null
   }
 
-  return lcs.champSelect.session.benchChampions
+  const originalBenchChampions = lcs.champSelect.session.benchChampions || []
+
+  if (lcs.champSelect.session.timer.phase === 'BAN_PICK') {
+    const subsetChampionList = lcs.lobbyTeamBuilder.champSelect.subsetChampionList
+
+    const newChampions = subsetChampionList
+      .filter((championId) => !originalBenchChampions.some((c) => c.championId === championId))
+      .map((championId) => ({
+        championId,
+        isPriority: false
+      }))
+
+    return [...newChampions, ...originalBenchChampions]
+  }
+
+  return originalBenchChampions
 })
 
 const rerollsRemaining = computed(() => {
@@ -332,20 +350,37 @@ const shouldShowRerollButton = computed(() => {
 const message = useMessage()
 
 const isRerolling = ref(false)
-const isSwapping = ref(false)
+const isSwappingOrPicking = ref(false)
 
-const handleBenchSwap = async (championId: number) => {
-  if (isSwapping.value) {
+// complete takes effect only when in ban-pick phase
+const handleBenchSwapOrPick = async (championId: number, complete = true) => {
+  if (isSwappingOrPicking.value) {
     return
   }
 
+  // isChampionSwappable makes sure lcs.champSelect.session is not null
   if (!isChampionSwappable(championId)) {
     return
   }
 
-  isSwapping.value = true
+  isSwappingOrPicking.value = true
   try {
-    await lc.api.champSelect.benchSwap(championId)
+    if (lcs.champSelect.session!.timer.phase === 'BAN_PICK') {
+      const firstPickAction = lcs.champSelect
+        .session!.actions.flat()
+        .find(
+          (a) =>
+            a.type === 'pick' &&
+            !a.completed &&
+            a.actorCellId === lcs.champSelect.session!.localPlayerCellId
+        )
+
+      if (firstPickAction) {
+        await lc.api.champSelect.pickOrBan(championId, complete, 'pick', firstPickAction.id)
+      }
+    } else {
+      await lc.api.champSelect.benchSwap(championId)
+    }
   } catch (error: any) {
     console.error(error)
     message.warning(
@@ -354,7 +389,7 @@ const handleBenchSwap = async (championId: number) => {
       })
     )
   } finally {
-    isSwapping.value = false
+    isSwappingOrPicking.value = false
   }
 }
 
@@ -372,8 +407,8 @@ const handleReroll = async (grabBack = false) => {
     // 使用一个简短的延时来实现，simple workaround
     if (grabBack && prevId !== null) {
       window.setTimeout(async () => {
-        if (benchChampions.value) {
-          await handleBenchSwap(prevId)
+        if (combinedChampions.value) {
+          await handleBenchSwapOrPick(prevId)
         }
       }, 25)
     }
