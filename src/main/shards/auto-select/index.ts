@@ -464,14 +464,19 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      const { benchEnabled, localPlayerCellId, benchChampions, myTeam } =
+      const { benchEnabled, localPlayerCellId, benchChampions, myTeam, actions } =
         this._lc.data.champSelect.session
+
+      const firstPickActionForMe = actions.flat().find((a) => {
+        return a.type === 'pick' && !a.completed && a.actorCellId === localPlayerCellId
+      })
 
       return {
         benchEnabled,
         localPlayerCellId,
         benchChampions,
         myTeam,
+        firstPickActionId: firstPickActionForMe?.id,
         timerPhase: this._lc.data.champSelect.session.timer.phase,
         subsetChampionList: this._lc.data.lobbyTeamBuilder.champSelect.subsetChampionList
       }
@@ -509,7 +514,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (!enabled) {
           if (this.state.upcomingGrab) {
             this._log.info(
-              `Closed this feature, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
+              `Auto grab disabled, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
             )
             this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             clearTimeout(this._grabTimerId!)
@@ -517,6 +522,35 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             this.state.setUpcomingGrab(null)
           }
           return
+        }
+
+        // TODO: REFACTOR THIS
+        // 临时应对新版 ARAM 的策略
+        // BAN_PICK 阶段可以先直接选上
+        if (session.timerPhase === 'BAN_PICK' && session.firstPickActionId !== undefined) {
+          const selfChampionId = session.myTeam.find(
+            (v) => v.cellId === session.localPlayerCellId
+          )?.championId
+
+          // 0 = 未选
+          if (selfChampionId === 0) {
+            const availableChampions = session.subsetChampionList.filter(
+              (c) =>
+                this._lc.data.champSelect.currentPickableChampionIds.has(c) &&
+                !this._lc.data.champSelect.disabledChampionIds.has(c)
+            )
+
+            const pickableOnSubset = expected.filter((c) => availableChampions.includes(c))
+
+            if (pickableOnSubset.length > 0) {
+              this._lc.api.champSelect.pickOrBan(
+                pickableOnSubset[0],
+                false,
+                'pick',
+                session.firstPickActionId
+              )
+            }
+          }
         }
 
         // 当前会话中可选的英雄

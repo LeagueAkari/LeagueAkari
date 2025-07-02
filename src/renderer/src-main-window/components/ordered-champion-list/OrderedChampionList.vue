@@ -66,12 +66,14 @@ const { t } = useTranslation()
 const {
   maxShow = 6,
   allowEmpty = false,
+  allowBravery = false,
   type = 'pick'
 } = defineProps<{
   maxShow?: number
   maxCount?: number
   type?: 'pick' | 'ban'
   allowEmpty?: boolean
+  allowBravery?: boolean
 }>()
 
 const show = defineModel<boolean>('show', { default: false })
@@ -88,7 +90,9 @@ const championOptions = computed(() => {
   }))
 
   if (type === 'pick') {
-    mapped.push({ id: -3, name: t('champions.bravery') })
+    if (allowBravery) {
+      mapped.push({ id: -3, name: t('champions.bravery') })
+    }
   }
 
   const sorted = mapped.toSorted((a, b) => {

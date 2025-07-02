@@ -96,6 +96,7 @@
                   <td>
                     <OrderedChampionList
                       type="pick"
+                      allow-bravery
                       :champions="store.settings.expectedChampions[role.key]"
                       @update:champions="
                         (list) =>

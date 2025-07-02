@@ -5,6 +5,7 @@ import { LeagueClientData } from '../league-client/lc-state'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 
+export const RANDOM_CHAMPION_ID = -2
 export const ARENA_RANDOM_CHAMPION_ID = -3
 
 export class AutoSelectSettings {
@@ -177,7 +178,17 @@ export class AutoSelectState {
 
     const a = this.champSelectActionInfo
 
-    if (!a || !a.pick.length) {
+    if (!a) {
+      return null
+    }
+
+    // in bench mode,  handle it in another way
+    // so we don't need to do anything here
+    if (a.session.benchEnabled) {
+      return null
+    }
+
+    if (!a.pick.length) {
       return null
     }
 
@@ -278,7 +289,17 @@ export class AutoSelectState {
 
     const a = this.champSelectActionInfo
 
-    if (!a || !a.ban.length) {
+    if (!a) {
+      return null
+    }
+
+    // in bench mode, we handle it in another way
+    // same as targetPick
+    if (a.session.benchEnabled) {
+      return null
+    }
+
+    if (!a.ban.length) {
       return null
     }
 
@@ -420,7 +441,6 @@ export class AutoSelectState {
     private readonly _settings: AutoSelectSettings
   ) {
     makeAutoObservable(this, {
-      champSelectActionInfo: computed.struct,
       targetBan: computed.struct,
       targetPick: computed.struct,
       memberMe: computed.struct,
