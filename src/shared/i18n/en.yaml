@@ -2206,6 +2206,12 @@ RemoteTemplatesModal:
   noTemplateDescription: No description
 
 simple-notifications-renderer:
+  newReleaseHints:
+    title: New Version Available
+    content: New version {{version}} is available
+    takeALook: Take a Look
+    dismiss: Dismiss
+
   liveStreamingHints:
     dismiss: Dismiss
     neverShowAgain: Never Show Again

@@ -14,22 +14,13 @@ import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-sc
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NotificationReactive, useNotification } from 'naive-ui'
-import {
-  CSSProperties,
-  VNodeChild,
-  computed,
-  defineComponent,
-  h,
-  inject,
-  ref,
-  watch,
-  watchEffect
-} from 'vue'
+import { NotificationReactive, useNotification } from 'naive-ui'
+import { computed, defineComponent, h, inject, ref, watch, watchEffect } from 'vue'
 
-import AnnouncementModal from './AnnouncementModal.vue'
-import DeclarationModal from './DeclarationModal.vue'
-import UpdateModal from './UpdateModal.vue'
+import AnnouncementModal from './modals/AnnouncementModal.vue'
+import DeclarationModal from './modals/DeclarationModal.vue'
+import UpdateModal from './modals/UpdateModal.vue'
+import WithActions from './parts/WithActions.vue'
 import { useSimpleNotificationsStore } from './store'
 
 /**
@@ -56,104 +47,14 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
    * 猜你正在直播
    */
   _setupStreamerModeNotifications() {
-    const { t } = useTranslation()
     const notification = useNotification()
     const installation = useClientInstallationStore()
     const app = useAppCommonStore()
     const appInject = inject('app') as any
     const lcs = useLeagueClientStore()
-
-    const createNotification = (title: () => VNodeChild, reason: () => VNodeChild) => {
-      return notification.info({
-        title,
-        content: () => {
-          return h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
-              } as CSSProperties
-            },
-            [
-              reason(),
-              h(
-                'div',
-                {
-                  style: {
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: '4px',
-                    flexWrap: 'wrap'
-                  } as CSSProperties
-                },
-                [
-                  h(
-                    NButton,
-                    {
-                      size: 'tiny',
-                      secondary: true,
-                      onClick: () => {
-                        close()
-                        this._setting.set(
-                          SimpleNotificationsRenderer.id,
-                          SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
-                          Date.now()
-                        )
-                      }
-                    },
-                    () => t('simple-notifications-renderer.liveStreamingHints.dismiss')
-                  ),
-                  h(
-                    NButton,
-                    {
-                      size: 'tiny',
-                      type: 'warning',
-                      secondary: true,
-                      onClick: () => {
-                        close()
-                        this._setting.set(
-                          SimpleNotificationsRenderer.id,
-                          SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
-                          true
-                        )
-                      }
-                    },
-                    () => t('simple-notifications-renderer.liveStreamingHints.neverShowAgain')
-                  ),
-                  h(
-                    NButton,
-                    {
-                      size: 'tiny',
-                      type: 'primary',
-                      onClick: () => {
-                        close()
-
-                        appInject.openSettingsModal('misc')
-                        this._setting.set(
-                          SimpleNotificationsRenderer.id,
-                          SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
-                          true
-                        )
-                      }
-                    },
-                    () => t('simple-notifications-renderer.liveStreamingHints.toSettings')
-                  )
-                ]
-              )
-            ]
-          )
-        },
-        onClose: () => {
-          this._setting.set(
-            SimpleNotificationsRenderer.id,
-            SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
-            Date.now()
-          )
-        }
-      })
-    }
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.liveStreamingHints'
+    })
 
     let inst: NotificationReactive | null = null
 
@@ -244,19 +145,64 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           return
         }
 
-        if (should === 'live-tools') {
-          inst = createNotification(
-            () => t('simple-notifications-renderer.liveStreamingHints.detected.title'),
-            () =>
-              h('span', t('simple-notifications-renderer.liveStreamingHints.detected.liveTools'))
-          )
-        } else {
-          inst = createNotification(
-            () => t('simple-notifications-renderer.liveStreamingHints.detected.title'),
-            () =>
-              h('span', t('simple-notifications-renderer.liveStreamingHints.detected.bySettings'))
+        const dismiss = () => {
+          this._setting.set(
+            SimpleNotificationsRenderer.id,
+            SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+            Date.now()
           )
         }
+
+        const neverShowAgain = () => {
+          this._setting.set(
+            SimpleNotificationsRenderer.id,
+            SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+            true
+          )
+        }
+
+        inst = notification.info({
+          title: () => t('detected.title'),
+          content: () =>
+            h(
+              WithActions,
+              {
+                buttons: [
+                  {
+                    label: () => t('dismiss'),
+                    secondary: true,
+                    onClick: () => {
+                      close()
+                      dismiss()
+                    }
+                  },
+                  {
+                    label: () => t('neverShowAgain'),
+                    type: 'warning',
+                    secondary: true,
+                    onClick: () => {
+                      close()
+                      neverShowAgain()
+                    }
+                  },
+                  {
+                    label: () => t('toSettings'),
+                    type: 'primary',
+                    onClick: () => {
+                      close()
+                      appInject.openSettingsModal('misc')
+                      neverShowAgain()
+                    }
+                  }
+                ]
+              },
+              () =>
+                should === 'live-tools'
+                  ? h('span', t('detected.liveTools'))
+                  : h('span', t('detected.bySettings'))
+            ),
+          onClose: dismiss
+        })
       },
       {
         immediate: true
@@ -267,7 +213,9 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   private _handleQueueingProgress() {
     const lcs = useLeagueClientStore()
     const bts = useBackgroundTasksStore()
-    const { t } = useTranslation()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.login-queue-task'
+    })
 
     const taskId = `${SimpleNotificationsRenderer.id}/queueing`
 
@@ -281,13 +229,13 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         if (!bts.hasTask(taskId)) {
           bts.createTask(taskId, {
-            name: () => t('simple-notifications-renderer.login-queue-task.name')
+            name: () => t('name')
           })
         }
 
         bts.updateTask(taskId, {
           description: () =>
-            t('simple-notifications-renderer.login-queue-task.description', {
+            t('description', {
               position: state.estimatedPositionInQueue,
               maxPosition: state.maxDisplayedPosition,
               waitTime: formatSeconds(state.approximateWaitTimeSeconds)
@@ -408,6 +356,11 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
         const sus = useSelfUpdateStore()
         const su = useInstance(SelfUpdateRenderer)
         const app = useInstance(AppCommonRenderer)
+        const notification = useNotification()
+
+        const { t } = useTranslation(undefined, {
+          keyPrefix: 'simple-notifications-renderer.newReleaseHints'
+        })
 
         watch(
           () => rcs.latestRelease,
@@ -423,7 +376,34 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
             // new release
             if (release.isNew) {
-              sns.showNewReleaseModal = true
+              const inst = notification.info({
+                title: () => t('title'),
+                content: () =>
+                  h(
+                    WithActions,
+                    {
+                      buttons: [
+                        {
+                          label: () => t('dismiss'),
+                          secondary: true,
+                          onClick: () => {
+                            inst.destroy()
+                          }
+                        },
+                        {
+                          label: () => t('takeALook'),
+                          type: 'primary',
+                          onClick: () => {
+                            sns.showNewReleaseModal = true
+                            inst.destroy()
+                          }
+                        }
+                      ]
+                    },
+                    () => h('span', t('content', { version: release.tag_name }))
+                  ),
+                duration: 0
+              })
             }
           },
           { immediate: true }

@@ -2210,6 +2210,12 @@ RemoteTemplatesModal:
   noTemplateDescription: 暂无描述
 
 simple-notifications-renderer:
+  newReleaseHints:
+    title: 新版本可用
+    content: 新版本 {{version}} 已经发布
+    takeALook: 查看
+    dismiss: 关闭
+
   liveStreamingHints:
     dismiss: 关闭
     neverShowAgain: 不再显示
