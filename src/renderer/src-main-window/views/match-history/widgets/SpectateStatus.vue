@@ -247,7 +247,7 @@ const teams = computed(() => {
     return {
       team1: {
         id: 0,
-        name: t('common.teams.all'),
+        name: t('teams.all', { ns: 'common' }),
         players: data.game.teamOne
       }
     }
@@ -264,13 +264,13 @@ const teams = computed(() => {
   return {
     team1: {
       id: 100,
-      name: t('common.teams.100'),
+      name: t('teams.100', { ns: 'common' }),
       players: data.game.teamOne,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 100)
     },
     team2: {
       id: 200,
-      name: t('common.teams.200'),
+      name: t('teams.200', { ns: 'common' }),
       players: data.game.teamTwo,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 200)
     }

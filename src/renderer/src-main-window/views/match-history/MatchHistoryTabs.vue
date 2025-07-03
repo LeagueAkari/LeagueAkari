@@ -30,7 +30,7 @@
             />
             <StreamerModeMaskedText>
               <template #masked>
-                <span class="shortcut-game-name">{{ t('common.summoner') }}</span>
+                <span class="shortcut-game-name">{{ t('summoner', { ns: 'common' }) }}</span>
                 <span class="shortcut-tag-line">#####</span>
               </template>
               <span class="shortcut-game-name">{{ lcs.summoner.me.gameName }}</span>

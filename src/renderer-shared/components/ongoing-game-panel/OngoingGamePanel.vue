@@ -240,17 +240,19 @@ const formatTeamText = (team: string): TeamMeta => {
   if (ogs.gameInfo?.queueType === 'CHERRY') {
     if (lcs.gameflow.phase === 'ChampSelect') {
       return {
-        name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`)
+        name: team.startsWith('our')
+          ? t(`teams.our`, { ns: 'common' })
+          : t(`teams.their`, { ns: 'common' })
       }
     } else {
       if (team === 'all') {
-        return { name: t(`common.teams.all`) }
+        return { name: t(`teams.all`, { ns: 'common' }) }
       }
 
-      return { name: t(`common.teams.unknown`) }
+      return { name: t(`teams.unknown`, { ns: 'common' }) }
     }
   } else {
-    return { name: t(`common.teams.${team}`, team) }
+    return { name: t(`teams.${team}`, { ns: 'common', defaultValue: team }) }
   }
 }
 

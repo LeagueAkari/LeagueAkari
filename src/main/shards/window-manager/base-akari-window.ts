@@ -348,9 +348,9 @@ export abstract class BaseAkariWindow<
       dialog
         .showMessageBox(this._window!, {
           type: 'question',
-          buttons: [i18next.t('common.yes'), i18next.t('common.no')],
+          buttons: [i18next.t('yes', { ns: 'common' }), i18next.t('no', { ns: 'common' })],
           defaultId: 0,
-          title: i18next.t('common.confirm'),
+          title: i18next.t('confirm', { ns: 'common' }),
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
             ? i18next.t('windowOpenHandler.toAkari')
             : i18next.t('windowOpenHandler.toExternalLink', {

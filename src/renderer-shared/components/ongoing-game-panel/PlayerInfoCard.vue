@@ -73,13 +73,13 @@
                   v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
                 >
                   <span class="text"
-                    >{{ t('common.queueTypes.CHERRY') }}
+                    >{{ t('queueTypes.CHERRY', { ns: 'common' }) }}
                     <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
                     Pt</span
                   >
                 </div>
                 <div class="ranked-item unranked cherry" v-else>
-                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
+                  <span class="text">{{ t('shortTiers.UNRANKED', { ns: 'common' }) }}</span>
                 </div>
               </template>
               <template v-else>
@@ -93,7 +93,11 @@
                   <span class="text">{{ rankedSoloFlex.solo.text }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
-                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
+                  <span class="text">{{
+                    t('shortTiers.UNRANKED', {
+                      ns: 'common'
+                    })
+                  }}</span>
                 </div>
                 <div
                   class="ranked-item"
@@ -105,7 +109,11 @@
                   <span class="text">{{ rankedSoloFlex.flex.text }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
-                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
+                  <span class="text">{{
+                    t('shortTiers.UNRANKED', {
+                      ns: 'common'
+                    })
+                  }}</span>
                 </div>
               </template>
             </div>
@@ -257,7 +265,9 @@
               :position="positionInfo.current || 'ALL'"
             />
             <span class="position-name">{{
-              t(`common.lanes.${positionInfo.current || 'ALL'}`)
+              t(`lanes.${positionInfo.current || 'ALL'}`, {
+                ns: 'common'
+              })
             }}</span>
             <div
               class="assignment-reason"
@@ -613,8 +623,12 @@ const rankedSoloFlex = computed(() => {
   if (solo) {
     const soloText =
       solo.division && solo.division !== 'NA'
-        ? `${t(`common.shortTiers.${solo.tier || 'UNRANKED'}`)} ${solo.division}`
-        : `${t(`common.shortTiers.${solo.tier || 'UNRANKED'}`)}`
+        ? `${t(`shortTiers.${solo.tier || 'UNRANKED'}`, {
+            ns: 'common'
+          })} ${solo.division}`
+        : `${t(`shortTiers.${solo.tier || 'UNRANKED'}`, {
+            ns: 'common'
+          })}`
 
     result.solo = {
       text: soloText,
@@ -627,8 +641,12 @@ const rankedSoloFlex = computed(() => {
   if (flex) {
     const flexText =
       flex.division && flex.division !== 'NA'
-        ? `${t(`common.shortTiers.${flex.tier || 'UNRANKED'}`)} ${flex.division}`
-        : `${t(`common.shortTiers.${flex.tier || 'UNRANKED'}`)}`
+        ? `${t(`shortTiers.${flex.tier || 'UNRANKED'}`, {
+            ns: 'common'
+          })} ${flex.division}`
+        : `${t(`shortTiers.${flex.tier || 'UNRANKED'}`, {
+            ns: 'common'
+          })}`
 
     result.flex = {
       text: flexText,
@@ -668,32 +686,32 @@ const MILESTONE_ORDER = [
 const positionAssignmentReason = computed(() => {
   return {
     FILL_SECONDARY: {
-      name: t('common.positionAssignmentReason.FILL_SECONDARY'),
+      name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
       color: '#82613b',
       foregroundColor: '#ffffff'
     },
     FILL_PRIMARY: {
-      name: t('common.positionAssignmentReason.FILL_PRIMARY'),
+      name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
       color: '#5b4694',
       foregroundColor: '#ffffff'
     },
     PRIMARY: {
-      name: t('common.positionAssignmentReason.PRIMARY'),
+      name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
       color: '#5b4694',
       foregroundColor: '#ffffff'
     },
     SECONDARY: {
-      name: t('common.positionAssignmentReason.SECONDARY'),
+      name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
       color: '#5b4694',
       foregroundColor: '#ffffff'
     },
     AUTOFILL: {
-      name: t('common.positionAssignmentReason.AUTOFILL'),
+      name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
       color: '#944646',
       foregroundColor: '#ffffff'
     },
     AUTOFILL_SHORT: {
-      name: t('common.positionAssignmentReason.AUTOFILL_SHORT'),
+      name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
       color: '#944646',
       foregroundColor: '#ffffff'
     }

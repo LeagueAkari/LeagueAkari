@@ -238,7 +238,7 @@
                 <NRadioButton value="top">
                   <div class="radio-button-inner">
                     <PositionIcon position="top" />
-                    <span>{{ t('common.lanes.top') }}</span>
+                    <span>{{ t('lanes.top', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -254,7 +254,7 @@
                 <NRadioButton value="middle">
                   <div class="radio-button-inner">
                     <PositionIcon position="middle" />
-                    <span>{{ t('common.lanes.middle') }}</span>
+                    <span>{{ t('lanes.middle', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -270,7 +270,7 @@
                 <NRadioButton value="jungle">
                   <div class="radio-button-inner">
                     <PositionIcon position="jungle" />
-                    <span>{{ t('common.lanes.jungle') }}</span>
+                    <span>{{ t('lanes.jungle', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -286,7 +286,7 @@
                 <NRadioButton value="bottom">
                   <div class="radio-button-inner">
                     <PositionIcon position="bottom" />
-                    <span>{{ t('common.lanes.bottom') }}</span>
+                    <span>{{ t('lanes.bottom', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -302,7 +302,7 @@
                 <NRadioButton value="utility">
                   <div class="radio-button-inner">
                     <PositionIcon position="utility" />
-                    <span>{{ t('common.lanes.utility') }}</span>
+                    <span>{{ t('lanes.utility', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'

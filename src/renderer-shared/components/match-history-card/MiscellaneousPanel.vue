@@ -220,9 +220,9 @@ const maskedTextDisplay = (text: string) => {
 
 const formatTeam = (id: number) => {
   if (id === 100) {
-    return t('common.teams.100')
+    return t('teams.100', { ns: 'common' })
   } else if (id === 200) {
-    return t('common.teams.200')
+    return t('teams.200', { ns: 'common' })
   } else {
     return id.toString()
   }
@@ -454,14 +454,14 @@ const columns = computed(() => {
           statsConfigMap.value[propKey]?.render ||
           ((content: any) => {
             if (typeof content === 'boolean') {
-              return content ? t('common.yes') : t('common.no')
+              return content ? t('yes', { ns: 'common' }) : t('no', { ns: 'common' })
             } else if (typeof content === 'number') {
               return content.toLocaleString()
             } else if (typeof content === 'string') {
               return content
             }
 
-            return t('common.na')
+            return t('na', { ns: 'common' })
           })
         return renderer(data[p.participantId], participantStatsMap.value[p.participantId])
       }

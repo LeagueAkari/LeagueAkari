@@ -265,40 +265,15 @@ const difficultyOptions = computed(() => {
   ]
 })
 
-const positionOptions = computed(() => {
-  return [
-    {
-      value: 'TOP',
-      label: t('common.lanes.TOP')
-    },
-    {
-      value: 'JUNGLE',
-      label: t('common.lanes.JUNGLE')
-    },
-    {
-      value: 'MIDDLE',
-      label: t('common.lanes.MIDDLE')
-    },
-    {
-      value: 'BOTTOM',
-      label: t('common.lanes.BOTTOM')
-    },
-    {
-      value: 'UTILITY',
-      label: t('common.lanes.UTILITY')
-    }
-  ]
-})
-
 const teamOptions = computed(() => {
   return [
     {
       value: '100',
-      label: t('common.teams.100')
+      label: t('teams.100', { ns: 'common' })
     },
     {
       value: '200',
-      label: t('common.teams.200')
+      label: t('teams.200', { ns: 'common' })
     }
   ]
 })

@@ -111,7 +111,10 @@ const QUEUE_TYPE_ORDER: Record<string, number> = {
 }
 
 const formatQueueName = (queueType: string) => {
-  return t(`common.queueTypes.${queueType}`, queueType)
+  return t(`queueTypes.${queueType}`, {
+    ns: 'common',
+    defaultValue: queueType
+  })
 }
 
 const formatWins = (entry: RankedEntry) => {
@@ -172,10 +175,16 @@ const formatTierDivision = (entry: RankedEntry, type: string) => {
   }
 
   if (!division || division === 'NA') {
-    return t(`common.tiers.${tier}`, tier)
+    return t(`tiers.${tier}`, {
+      ns: 'common',
+      defaultValue: tier
+    })
   }
 
-  return `${t(`common.tiers.${tier}`, tier)} ${division}`
+  return `${t(`tiers.${tier}`, {
+    ns: 'common',
+    defaultValue: tier
+  })} ${division}`
 }
 
 const formatLosses = (losses: number) => {

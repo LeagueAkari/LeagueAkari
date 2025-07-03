@@ -178,10 +178,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         `Cancelled upcoming auto-pick: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
       )
       this._sendInChat(
-        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
+        `[${i18next.t('appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
           champion:
             this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name ||
-            this.state.upcomingPick.championId
+            this.state.upcomingPick.championId,
+          ns: 'common'
         })}`
       )
       this.state.setUpcomingPick(null)
@@ -200,10 +201,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       )
       this.state.setUpcomingPick(null)
       this._sendInChat(
-        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
+        `[${i18next.t('appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
           champion:
             this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name ||
-            this.state.upcomingBan.championId
+            this.state.upcomingBan.championId,
+          ns: 'common'
         })}`
       )
     }
@@ -246,10 +248,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             )
 
             this._sendInChat(
-              `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-lock-in', {
+              `[${i18next.t('appName')}] ${i18next.t('auto-select-main.delayed-lock-in', {
                 champion:
                   this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
-                seconds: (delayMs / 1e3).toFixed(1)
+                seconds: (delayMs / 1e3).toFixed(1),
+                ns: 'common'
               })}`
             )
 
@@ -310,9 +313,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             `Added delayed ban task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
           )
           this._sendInChat(
-            `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-ban', {
+            `[${i18next.t('appName')}] ${i18next.t('auto-select-main.delayed-ban', {
               champion: this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
-              seconds: (delayMs / 1e3).toFixed(1)
+              seconds: (delayMs / 1e3).toFixed(1),
+              ns: 'common'
             })}`
           )
           this.state.setUpcomingBan(ban.championId, Date.now() + delayMs)
