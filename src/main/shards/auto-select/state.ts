@@ -182,7 +182,7 @@ export class AutoSelectState {
       return null
     }
 
-    // in bench mode,  handle it in another way
+    // in bench mode, handle it in another way
     // so we don't need to do anything here
     if (a.session.benchEnabled) {
       return null
@@ -199,10 +199,16 @@ export class AutoSelectState {
       return null
     }
 
+    const mandatoryPickables: number[] = []
     const unpickables = new Set<number>()
+
+    if (a.gameMode === 'CHERRY') {
+      mandatoryPickables.push(ARENA_RANDOM_CHAMPION_ID)
+    }
 
     // 不能选择队友亮出的英雄, 以及自己已选定的英雄
     ;[...a.session.myTeam, ...a.session.theirTeam].forEach((t) => {
+      // bravery in arena mode could be picked multiple times
       if (!t.championId) {
         return
       }
@@ -250,11 +256,6 @@ export class AutoSelectState {
       unpickables.add(c)
     )
 
-    // 非斗魂竞技场禁止选用勇敢举动
-    if (a.gameMode !== 'CHERRY') {
-      unpickables.add(-3)
-    }
-
     let expectedChampions: number[]
     if (a.memberMe.assignedPosition) {
       const preset = this._settings.expectedChampions[a.memberMe.assignedPosition] || []
@@ -264,7 +265,9 @@ export class AutoSelectState {
     }
 
     const pickables = expectedChampions.filter(
-      (c) => !unpickables.has(c) && a.currentPickables.has(c) && !a.disabledChampions.has(c)
+      (c) =>
+        (!unpickables.has(c) && a.currentPickables.has(c) && !a.disabledChampions.has(c)) ||
+        mandatoryPickables.includes(c)
     )
 
     if (!pickables.length) {
