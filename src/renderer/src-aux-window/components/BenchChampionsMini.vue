@@ -301,6 +301,7 @@ const combinedChampions = computed(() => {
 
     const newChampions = subsetChampionList
       .filter((championId) => !originalBenchChampions.some((c) => c.championId === championId))
+      .filter((championId) => lcs.champSelect.currentChampion !== championId)
       .map((championId) => ({
         championId,
         isPriority: false
