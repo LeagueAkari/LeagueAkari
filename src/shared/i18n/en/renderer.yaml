@@ -2144,6 +2144,15 @@ TemplateEdit:
   hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
   title: Template Definitions
 
+  templateTypes:
+    ongoing-game: Ongoing Game Template
+    unknown: Unknown Type
+
+  templatePresets:
+    empty: Empty Template
+    ongoing-game: Default Ongoing Game Template
+    remote: Remote Template
+
 SendableItemEdit:
   title: Sendable Item
   newButton: New Sendable Item
@@ -2195,6 +2204,10 @@ SendableItemEdit:
     all: All
     ally: Allies
     enemy: Enemies
+
+  sendableItemPresets:
+    plaintext: Plain Text
+    template: Template
 
 RemoteTemplatesModal:
   title: Remote Templates

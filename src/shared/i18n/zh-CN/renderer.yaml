@@ -2148,6 +2148,15 @@ TemplateEdit:
   title: 模板定义
   hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有完全的系统权限，请<span style="font-weight: bold">始终</span>确认其安全性'
 
+  templateTypes:
+    ongoing-game: 对局模板
+    unknown: 未知类型
+
+  templatePresets:
+    empty: 空白模板
+    ongoing-game: 默认对局模板
+    remote: 云端模板
+
 SendableItemEdit:
   title: 发送项
   newButton: 新发送项
@@ -2199,6 +2208,10 @@ SendableItemEdit:
     all: 全部
     ally: 友方
     enemy: 敌方
+
+  sendableItemPresets:
+    plaintext: 纯文本
+    template: 动态模板
 
 RemoteTemplatesModal:
   title: 云端模板

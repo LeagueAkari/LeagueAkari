@@ -1,13 +1,13 @@
 <template>
   <NCard size="small">
     <template #header>
-      <span class="card-header-title">{{ t('TemplateEdit.title') }}</span>
+      <span class="card-header-title">{{ t('title') }}</span>
     </template>
 
     <!-- 此 Modal 内部自行处理逻辑 -->
     <RemoteTemplatesModal v-model:show="showRemoteTemplatesModal" />
 
-    <div class="template-hint" v-html="t('TemplateEdit.hint')" />
+    <div class="template-hint" v-html="t('hint')" />
     <div class="template-edit">
       <div class="left-list">
         <NDropdown
@@ -24,13 +24,13 @@
                 <AddIcon />
               </NIcon>
             </template>
-            {{ t('TemplateEdit.newButton') }}
+            {{ t('newButton') }}
           </NButton>
         </NDropdown>
         <NInput
           v-if="igs2.settings.templates.length > 0"
           v-model:value="filterText"
-          :placeholder="t('TemplateEdit.filterPlaceholder')"
+          :placeholder="t('filterPlaceholder')"
           class="filter-input"
           size="small"
           clearable
@@ -65,7 +65,7 @@
                 </template>
                 <div :class="$style['error-message']">
                   <div :class="$style['error-title']">
-                    {{ t('TemplateEdit.errorTitle') }}
+                    {{ t('errorTitle') }}
                   </div>
                   <div :class="$style['error-divider']"></div>
                   <div :class="$style['error-content']">{{ item.error }}</div>
@@ -76,7 +76,7 @@
         </NVirtualList>
         <div v-else class="empty">
           <div class="empty-text">
-            {{ t('TemplateEdit.noTemplate') }}
+            {{ t('noTemplate') }}
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@
               :type="currentItem.type !== 'unknown' ? 'info' : 'error'"
               :bordered="false"
             >
-              {{ t(`in-game-send-main.templateTypes.${currentItem.type}`) }}
+              {{ t(`templateTypes.${currentItem.type}`) }}
             </NTag>
             <NInput
               size="small"
@@ -117,7 +117,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('TemplateEdit.revertButton') }}</div>
+                <div>{{ t('revertButton') }}</div>
               </NPopover>
               <NPopover>
                 <template #trigger>
@@ -135,7 +135,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('TemplateEdit.saveButton') }}</div>
+                <div>{{ t('saveButton') }}</div>
               </NPopover>
               <NPopconfirm
                 @positive-click="handleDelete"
@@ -156,7 +156,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div style="max-width: 260px">{{ t('TemplateEdit.deletePopconfirm') }}</div>
+                <div style="max-width: 260px">{{ t('deletePopconfirm') }}</div>
               </NPopconfirm>
             </div>
           </div>
@@ -173,7 +173,7 @@
         </template>
         <template v-else>
           <div class="empty">
-            <div class="empty-text">{{ t('TemplateEdit.noTemplateSelected') }}</div>
+            <div class="empty-text">{{ t('noTemplateSelected') }}</div>
           </div>
         </template>
       </div>
@@ -216,7 +216,7 @@ import { Codemirror } from 'vue-codemirror'
 import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
 import { DROPDOWN_OVERRIDES } from './style-overrides'
 
-const { t } = useTranslation()
+const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
@@ -226,18 +226,18 @@ const activeItemId = ref<string | null>(null)
 
 const dropdownOptions = computed(() => [
   {
-    label: t('in-game-send-main.templatePresets.empty'),
+    label: t('templatePresets.empty'),
     key: 'empty'
   },
   {
-    label: t('in-game-send-main.templatePresets.ongoing-game'),
+    label: t('templatePresets.ongoing-game'),
     key: 'ongoing-game-default'
   },
   {
     type: 'divider'
   },
   {
-    label: t('in-game-send-main.templatePresets.remote'),
+    label: t('templatePresets.remote'),
     key: 'remote'
   }
 ])
@@ -326,7 +326,7 @@ const handleRevert = () => {
 const handleSave = () => {
   if (currentItem.value) {
     igs.updateTemplate(currentItem.value.id, { code: tempCode.value })
-    message.success(() => t('TemplateEdit.saveSuccess', { name: currentItem.value!.name }))
+    message.success(() => t('saveSuccess', { name: currentItem.value!.name }))
   }
 }
 
@@ -338,7 +338,7 @@ const handleDelete = () => {
   if (currentItem.value) {
     let name = currentItem.value.name
     igs.removeTemplate(currentItem.value.id)
-    message.success(() => t('TemplateEdit.deleteSuccess', { name }))
+    message.success(() => t('deleteSuccess', { name }))
   }
 }
 
