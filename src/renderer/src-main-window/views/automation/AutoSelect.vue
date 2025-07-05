@@ -96,6 +96,7 @@
                   <td>
                     <OrderedChampionList
                       type="pick"
+                      allow-bravery
                       :champions="store.settings.expectedChampions[role.key]"
                       @update:champions="
                         (list) =>
@@ -174,20 +175,6 @@
             <NSwitch
               @update:value="(v) => as.setBenchHandleTradeEnabled(v)"
               :value="store.settings.benchHandleTradeEnabled"
-              size="small"
-            ></NSwitch>
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('AutoSelect.benchHandleTradeIgnoreChampionOwner.label')"
-            :label-width="260"
-          >
-            <template #labelDescription>
-              <div v-html="t('AutoSelect.benchHandleTradeIgnoreChampionOwner.description')"></div>
-            </template>
-            <NSwitch
-              @update:value="(v) => as.setBenchHandleTradeIgnoreChampionOwner(v)"
-              :value="store.settings.benchHandleTradeIgnoreChampionOwner"
               size="small"
             ></NSwitch>
           </ControlItem>
@@ -305,12 +292,12 @@ const as = useInstance(AutoSelectRenderer)
 
 const roles = computed(() => {
   return [
-    { key: 'top', label: t('common.lanes.top') },
-    { key: 'middle', label: t('common.lanes.middle') },
-    { key: 'jungle', label: t('common.lanes.jungle') },
-    { key: 'bottom', label: t('common.lanes.bottom') },
-    { key: 'utility', label: t('common.lanes.utility') },
-    { key: 'default', label: t('common.default') }
+    { key: 'top', label: t('lanes.top', { ns: 'common' }) },
+    { key: 'middle', label: t('lanes.middle', { ns: 'common' }) },
+    { key: 'jungle', label: t('lanes.jungle', { ns: 'common' }) },
+    { key: 'bottom', label: t('lanes.bottom', { ns: 'common' }) },
+    { key: 'utility', label: t('lanes.utility', { ns: 'common' }) },
+    { key: 'default', label: t('default', { ns: 'common' }) }
   ]
 })
 </script>

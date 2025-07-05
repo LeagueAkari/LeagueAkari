@@ -9,7 +9,7 @@
         <span class="name">{{
           masked(
             summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid),
-            t('common.summoner')
+            t('summoner', { ns: 'common' })
           )
         }}</span>
       </div>
@@ -24,7 +24,7 @@
           t('PlayerTagEditModal.placeholder', {
             name: masked(
               summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid),
-              t('common.summoner')
+              t('summoner', { ns: 'common' })
             )
           })
         "

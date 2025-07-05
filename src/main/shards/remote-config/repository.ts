@@ -2,6 +2,7 @@ import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
 import axios from 'axios'
 import crypto from 'crypto'
+import matter from 'gray-matter'
 
 export interface RemoteConfigRepositoryConfig {
   locale: 'zh-CN' | 'en'
@@ -96,13 +97,16 @@ export class RemoteGitRepository {
   }
 
   async getAnnouncement() {
-    const { data } = await this._http.get<string>(
+    const { data: rawData } = await this._http.get<string>(
       this._rawContentUrl(`/announcement/${this._config.locale}.md`)
     )
 
+    const { data, content } = matter(rawData)
+
     return {
-      content: data,
-      uniqueId: crypto.createHash('md5').update(data, 'utf8').digest('hex')
+      content,
+      frontMatter: data,
+      uniqueId: crypto.createHash('md5').update(rawData, 'utf8').digest('hex')
     }
   }
 

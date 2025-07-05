@@ -39,6 +39,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       htmlEntry: AkariCdTimerWindow.HTML_ENTRY,
       rememberPosition: true,
       rememberSize: false,
+      repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut },

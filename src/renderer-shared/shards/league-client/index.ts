@@ -29,6 +29,7 @@ export interface LeagueClientRendererConfig {
     lobby?: boolean
     login?: boolean
     summoner?: boolean
+    lobbyTeamBuilder?: boolean
   }
 }
 
@@ -54,7 +55,8 @@ export class LeagueClientRenderer {
       gameflow = true,
       lobby = true,
       login = true,
-      summoner = true
+      summoner = true,
+      lobbyTeamBuilder = true
     } = this._config?.subscribeState || {}
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
@@ -96,6 +98,10 @@ export class LeagueClientRenderer {
 
     if (summoner) {
       await this._pm.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
+    }
+
+    if (lobbyTeamBuilder) {
+      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'lobbyTeamBuilder', store.lobbyTeamBuilder)
     }
 
     this._handleSubscribedLcuEventDispatch()

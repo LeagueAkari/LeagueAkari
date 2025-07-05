@@ -95,43 +95,43 @@ const handleSet = async () => {
 const tierOptions = computed(() => {
   return [
     {
-      label: t('common.tiers.IRON'),
+      label: t('tiers.IRON', { ns: 'common' }),
       value: 'IRON'
     },
     {
-      label: t('common.tiers.BRONZE'),
+      label: t('tiers.BRONZE', { ns: 'common' }),
       value: 'BRONZE'
     },
     {
-      label: t('common.tiers.SILVER'),
+      label: t('tiers.SILVER', { ns: 'common' }),
       value: 'SILVER'
     },
     {
-      label: t('common.tiers.GOLD'),
+      label: t('tiers.GOLD', { ns: 'common' }),
       value: 'GOLD'
     },
     {
-      label: t('common.tiers.PLATINUM'),
+      label: t('tiers.PLATINUM', { ns: 'common' }),
       value: 'PLATINUM'
     },
     {
-      label: t('common.tiers.EMERALD'),
+      label: t('tiers.EMERALD', { ns: 'common' }),
       value: 'EMERALD'
     },
     {
-      label: t('common.tiers.DIAMOND'),
+      label: t('tiers.DIAMOND', { ns: 'common' }),
       value: 'DIAMOND'
     },
     {
-      label: t('common.tiers.MASTER'),
+      label: t('tiers.MASTER', { ns: 'common' }),
       value: 'MASTER'
     },
     {
-      label: t('common.tiers.GRANDMASTER'),
+      label: t('tiers.GRANDMASTER', { ns: 'common' }),
       value: 'GRANDMASTER'
     },
     {
-      label: t('common.tiers.CHALLENGER'),
+      label: t('tiers.CHALLENGER', { ns: 'common' }),
       value: 'CHALLENGER'
     }
   ]
@@ -159,31 +159,31 @@ const divisionOptions = [
 const queueOptions = computed(() => {
   return [
     {
-      label: t('common.queueTypes.RANKED_SOLO_5x5'),
+      label: t('queueTypes.RANKED_SOLO_5x5', { ns: 'common' }),
       value: 'RANKED_SOLO_5x5'
     },
     {
-      label: t('common.queueTypes.RANKED_FLEX_SR'),
+      label: t('queueTypes.RANKED_FLEX_SR', { ns: 'common' }),
       value: 'RANKED_FLEX_SR'
     },
     {
-      label: t('common.queueTypes.RANKED_TFT'),
+      label: t('queueTypes.RANKED_TFT', { ns: 'common' }),
       value: 'RANKED_TFT'
     },
     {
-      label: t('common.queueTypes.RANKED_FLEX_TT'),
+      label: t('queueTypes.RANKED_FLEX_TT', { ns: 'common' }),
       value: 'RANKED_FLEX_TT'
     },
     {
-      label: t('common.queueTypes.CHERRY'),
+      label: t('queueTypes.CHERRY', { ns: 'common' }),
       value: 'CHERRY'
     },
     {
-      label: t('common.queueTypes.RANKED_TFT_TURBO'),
+      label: t('queueTypes.RANKED_TFT_TURBO', { ns: 'common' }),
       value: 'RANKED_TFT_TURBO'
     },
     {
-      label: t('common.queueTypes.RANKED_TFT_DOUBLE_UP'),
+      label: t('queueTypes.RANKED_TFT_DOUBLE_UP', { ns: 'common' }),
       value: 'RANKED_TFT_DOUBLE_UP'
     }
   ]

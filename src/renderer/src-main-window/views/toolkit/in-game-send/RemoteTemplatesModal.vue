@@ -1,7 +1,7 @@
 <template>
   <NModal v-model:show="show" preset="card" :class="$style.modal">
     <template #header>
-      <span class="header-title">{{ t('RemoteTemplatesModal.title') }}</span>
+      <span class="header-title">{{ t('title') }}</span>
     </template>
     <NSpin :show="isLoadingTemplates">
       <NScrollbar style="max-height: 680px">
@@ -31,13 +31,13 @@
                 template.description
               }}</span>
               <span v-else class="template-description empty">{{
-                t('RemoteTemplatesModal.noTemplateDescription')
+                t('noTemplateDescription')
               }}</span>
             </NEllipsis>
           </div>
         </div>
         <div class="templates-placeholder" v-else>
-          <span class="placeholder-text">{{ t('RemoteTemplatesModal.noTemplates') }}</span>
+          <span class="placeholder-text">{{ t('noTemplates') }}</span>
         </div>
       </NScrollbar>
     </NSpin>
@@ -53,7 +53,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NEllipsis, NIcon, NModal, NScrollbar, NSpin, useMessage } from 'naive-ui'
 import { ref, watch } from 'vue'
 
-const { t } = useTranslation()
+const { t } = useTranslation('renderer', { keyPrefix: 'RemoteTemplatesModal' })
 
 const igs = useInstance(InGameSendRenderer)
 
@@ -70,13 +70,13 @@ const downloadTemplate = async (id: string) => {
     currentDownloading.value = id
     const downloaded = await igs.downloadTemplateFromRemote(id)
     message.success(() =>
-      t('RemoteTemplatesModal.downloadSuccess', {
+      t('downloadSuccess', {
         name: downloaded.name
       })
     )
   } catch (error: any) {
     message.error(() =>
-      t('RemoteTemplatesModal.downloadFailed', {
+      t('downloadFailed', {
         name: id,
         reason: error.message
       })
@@ -92,7 +92,7 @@ const updateTemplates = async () => {
     const catalog = await igs.getInGameSendTemplateCatalog()
     templates.value = catalog.templates
   } catch (error: any) {
-    message.error(() => t('RemoteTemplatesModal.loadTemplatesFailed', { reason: error.message }))
+    message.error(() => t('loadTemplatesFailed', { reason: error.message }))
   } finally {
     isLoadingTemplates.value = false
   }

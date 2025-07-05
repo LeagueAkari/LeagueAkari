@@ -5,6 +5,7 @@ import { LeagueClientData } from '../league-client/lc-state'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 
+export const RANDOM_CHAMPION_ID = -2
 export const ARENA_RANDOM_CHAMPION_ID = -3
 
 export class AutoSelectSettings {
@@ -24,7 +25,6 @@ export class AutoSelectSettings {
   benchModeEnabled: boolean = false
   benchSelectFirstAvailableChampion: boolean = false
   benchHandleTradeEnabled: boolean = false
-  benchHandleTradeIgnoreChampionOwner: boolean = true
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 2.9
   banEnabled: boolean = false
@@ -178,7 +178,17 @@ export class AutoSelectState {
 
     const a = this.champSelectActionInfo
 
-    if (!a || !a.pick.length) {
+    if (!a) {
+      return null
+    }
+
+    // in bench mode, handle it in another way
+    // so we don't need to do anything here
+    if (a.session.benchEnabled) {
+      return null
+    }
+
+    if (!a.pick.length) {
       return null
     }
 
@@ -189,10 +199,16 @@ export class AutoSelectState {
       return null
     }
 
+    const mandatoryPickables: number[] = []
     const unpickables = new Set<number>()
+
+    if (a.gameMode === 'CHERRY') {
+      mandatoryPickables.push(ARENA_RANDOM_CHAMPION_ID)
+    }
 
     // 不能选择队友亮出的英雄, 以及自己已选定的英雄
     ;[...a.session.myTeam, ...a.session.theirTeam].forEach((t) => {
+      // bravery in arena mode could be picked multiple times
       if (!t.championId) {
         return
       }
@@ -240,11 +256,6 @@ export class AutoSelectState {
       unpickables.add(c)
     )
 
-    // 非斗魂竞技场禁止选用勇敢举动
-    if (a.gameMode !== 'CHERRY') {
-      unpickables.add(-3)
-    }
-
     let expectedChampions: number[]
     if (a.memberMe.assignedPosition) {
       const preset = this._settings.expectedChampions[a.memberMe.assignedPosition] || []
@@ -254,7 +265,9 @@ export class AutoSelectState {
     }
 
     const pickables = expectedChampions.filter(
-      (c) => !unpickables.has(c) && a.currentPickables.has(c) && !a.disabledChampions.has(c)
+      (c) =>
+        (!unpickables.has(c) && a.currentPickables.has(c) && !a.disabledChampions.has(c)) ||
+        mandatoryPickables.includes(c)
     )
 
     if (!pickables.length) {
@@ -279,7 +292,17 @@ export class AutoSelectState {
 
     const a = this.champSelectActionInfo
 
-    if (!a || !a.ban.length) {
+    if (!a) {
+      return null
+    }
+
+    // in bench mode, we handle it in another way
+    // same as targetPick
+    if (a.session.benchEnabled) {
+      return null
+    }
+
+    if (!a.ban.length) {
       return null
     }
 
@@ -421,7 +444,6 @@ export class AutoSelectState {
     private readonly _settings: AutoSelectSettings
   ) {
     makeAutoObservable(this, {
-      champSelectActionInfo: computed.struct,
       targetBan: computed.struct,
       targetPick: computed.struct,
       memberMe: computed.struct,

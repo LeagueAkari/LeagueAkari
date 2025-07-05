@@ -835,8 +835,8 @@ const { name } = useChampionInfo()
 }
 
 .win {
-  border-left: 6px solid rgb(0, 105, 203);
-  background-color: rgba(30, 39, 58, 0.9);
+  border-left: 6px solid #5383e8;
+  background-color: #212b41e0;
 
   .game {
     .mode {
@@ -859,7 +859,7 @@ const { name } = useChampionInfo()
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: rgba(65, 39, 43, 0.9);
+  background-color: #4b2c31e0;
 
   .game {
     .mode {

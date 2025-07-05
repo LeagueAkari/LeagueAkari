@@ -240,17 +240,19 @@ const formatTeamText = (team: string): TeamMeta => {
   if (ogs.gameInfo?.queueType === 'CHERRY') {
     if (lcs.gameflow.phase === 'ChampSelect') {
       return {
-        name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`)
+        name: team.startsWith('our')
+          ? t(`teams.our`, { ns: 'common' })
+          : t(`teams.their`, { ns: 'common' })
       }
     } else {
       if (team === 'all') {
-        return { name: t(`common.teams.all`) }
+        return { name: t(`teams.all`, { ns: 'common' }) }
       }
 
-      return { name: t(`common.teams.unknown`) }
+      return { name: t(`teams.unknown`, { ns: 'common' }) }
     }
   } else {
-    return { name: t(`common.teams.${team}`, team) }
+    return { name: t(`teams.${team}`, { ns: 'common', defaultValue: team }) }
   }
 }
 
@@ -331,12 +333,16 @@ const mapPremadePlayers = (team: string) => {
   const thisTeamGroups: Record<string, string[]> = {}
   const thisTeamPremadeIds: Record<string, string> = {}
   Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, puuids]) => {
-    if (puuids.every((p) => t.includes(p))) {
-      thisTeamGroups[premadeId] = puuids
-      puuids.forEach((p) => {
-        thisTeamPremadeIds[p] = premadeId
-      })
+    const realPuuids = puuids.filter((p) => t.includes(p))
+
+    if (realPuuids.length < 2) {
+      return
     }
+
+    thisTeamGroups[premadeId] = realPuuids
+    realPuuids.forEach((p) => {
+      thisTeamPremadeIds[p] = premadeId
+    })
   })
 
   return {

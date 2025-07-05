@@ -1745,6 +1745,7 @@ BenchChampionsMini:
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
   rerollFailed: Failed to reroll {{reason}}
+  swapFailed: Failed to swap {{reason}}
 
   balanceTypes:
     damage-dealt: Damage Dealt
@@ -1757,6 +1758,7 @@ BenchChampionsMini:
     attack-speed: Attack Speed
     movement-speed: Movement Speed
     tenacity: Tenacity
+    energy-regen: Energy Regen
 
 BenchModeAutoGrab:
   grabbing: Selecting in {{seconds}}s
@@ -2064,22 +2066,6 @@ AutoChampConfig:
   configure:
     label: Configure
 
-BenchChampionTracker:
-  position_ordinal_one: '{{count}}st'
-  position_ordinal_two: '{{count}}nd'
-  position_ordinal_three: '{{count}}rd'
-  position_ordinal_other: '{{count}}th'
-  reroll: Reroll
-  trade: Trade
-  swap: Swap
-  useReroll: '{{player}} used a reroll'
-  tradeWithPlayer: '{{player1}} traded with {{player2}}'
-  swapFromBench: '{{player}} swapped from the bench'
-  sendDiceUsageToChat: Send Dice Usage to Chat
-  sendButton: Send
-  diceUsageTitle: 'Dice Usage:'
-  diceUsage: '{{player}} used {{countV}} dice ({{champions}})'
-
 RewardClaimTool: &CommonClaimTool
   title: Rewards
 
@@ -2158,6 +2144,15 @@ TemplateEdit:
   hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
   title: Template Definitions
 
+  templateTypes:
+    ongoing-game: Ongoing Game Template
+    unknown: Unknown Type
+
+  templatePresets:
+    empty: Empty Template
+    ongoing-game: Default Ongoing Game Template
+    remote: Remote Template
+
 SendableItemEdit:
   title: Sendable Item
   newButton: New Sendable Item
@@ -2210,6 +2205,10 @@ SendableItemEdit:
     ally: Allies
     enemy: Enemies
 
+  sendableItemPresets:
+    plaintext: Plain Text
+    template: Template
+
 RemoteTemplatesModal:
   title: Remote Templates
   downloadButton: Download
@@ -2220,6 +2219,12 @@ RemoteTemplatesModal:
   noTemplateDescription: No description
 
 simple-notifications-renderer:
+  newReleaseHints:
+    title: New Version Available
+    content: New version {{version}} is available
+    takeALook: Take a Look
+    dismiss: Dismiss
+
   liveStreamingHints:
     dismiss: Dismiss
     neverShowAgain: Never Show Again
@@ -2262,261 +2267,3 @@ self-update-renderer:
     unpack-failed: Failed to unpack the archive file
     waiting-for-restart: Updated applied. Restart the application to apply the update
     cancelButton: Cancel
-
-champions:
-  bravery: Bravery
-
-tray:
-  quit: Quit
-  auxWindow: Aux Window
-  opggWindow: OP.GG Window
-  dev:
-    toggleMainWindowDevtools: Toggle DevTools - Main Window
-    toggleAuxWindowDevtools: Toggle DevTools - Aux Window
-    toggleOpggWindowDevtools: Toggle DevTools - OP.GG Window
-    toggleOngoingGameWindowDevtools: Toggle DevTools - Ongoing Game Window
-    toggleCdTimerWindowDevtools: Toggle DevTools - Cooldown Timer Window
-
-windowOpenHandler:
-  toAkari: To League Akari GitHub ❤️
-  toExternalLink: To external site {{target}}
-
-auto-gameflow-main:
-  error-auto-honor: 'Auto honor failed: {{reason}}'
-  error-accept-match: 'Auto accept match failed: {{reason}}'
-  error-matchmaking: 'Auto matchmaking could not start: {{reason}}'
-  auto-matchmaking-canceled: Auto matchmaking canceled
-  auto-matchmaking-canceled-wait-for-invitees: Auto matchmaking canceled, waiting for invitees
-  auto-matchmaking-canceled-not-leader: Auto matchmaking canceled, you are not the room leader
-  auto-matchmaking-canceled-wait-for-penalty: Auto matchmaking canceled, waiting for penalty timer
-  auto-matchmaking-in: Auto matchmaking in {{seconds}} seconds
-  skip-leader: Attempting to skip becoming the leader
-
-auto-select-main:
-  error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'
-  error-pre-pick: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
-  error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
-  error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
-  cancel-grab: Selection of {{champion}} has been canceled
-  grab-soon: Will swap {{champion}} in {{seconds}} seconds
-  ignore-trade: Trade request not auto-processed ({{from}} -> {{to}})
-  ignore-trade-owner: Trade request not auto-processed since the trader is the champion owner ({{from}} -> {{to}})
-  auto-pick-normal-mode: Auto-select in Normal Mode
-  auto-grab-bench-mode: Auto-select in Bench Mode
-  auto-ban: Auto Ban
-  enabled: Enabled
-  delayed-lock-in: Will lock in champion {{champion}} in {{seconds}} seconds
-  delayed-ban: Will ban champion {{champion}} in {{seconds}} seconds
-  cancel-delayed-lock-in: Lock-in of champion {{champion}} has been canceled
-  cancel-delayed-ban: Ban of champion {{champion}} has been canceled
-
-self-update-main:
-  title: Self Update
-  start-update: Starting update League Akari
-  updateOnNextStartup: Updated Applied. Restart the application to apply the update
-  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
-  lastUpdateSuccess: Updated to {{version}}
-
-auto-champ-config-main:
-  summonerSpells:
-    applied: '{{name}} summoner spells have been updated to [{{spell1}}] [{{spell2}}]'
-    appliedWithPosition: '{{name}} - {{position}} summoner spells have been updated to [{{spell1}}] [{{spell2}}]'
-    errorApplied: 'Failed to update summoner spells for {{name}}'
-    errorAppliedWithPosition: 'Failed to update summoner spells for {{name}} - {{position}}'
-
-  runes:
-    pageName: '{{name}}'
-    pageNameWithPosition: '{{name}} - {{position}}'
-    applied: '{{name}} rune setup has been updated to {{primary}} / {{sub}} ({{all}})'
-    appliedWithPosition: '{{name}} - {{position}} rune setup has been updated to {{primary}} / {{sub}} ({{all}})'
-    errorApplied: 'Failed to update rune setup for {{name}}'
-    errorAppliedWithPosition: 'Failed to update rune setup for {{name}} - {{position}}'
-
-  auto-config-enabled-no-champion: Auto configuration enabled, but no champion has been configured
-  auto-config-enabled: 'Auto configuration enabled, configured champions: {{names}}'
-
-window-manager-main:
-  aux-window:
-    quickClose:
-      title: Don't want mini window?
-      body: You can permanently disable the mini window in the settings (Settings > Multi-window)
-
-ongoing-game-main:
-  taggedPlayer: Tagged Player
-
-in-game-send-main:
-  newTemplate: New Template {{index}}
-  exampleTemplate: |
-    // Define the metadata of the template
-    function getMetadata() {
-      return {
-        version: 10,
-        type: 'ongoing-game'
-      }
-    }
-
-    // Define the messages of the template
-    function getMessages(env) {
-      return [
-        'Message 1',
-        'Message 2',
-        'Message 3',
-        'Message 4',
-        'Message 5'
-      ]
-    }
-
-  templateTypes:
-    ongoing-game: Ongoing Game Template
-    unknown: Unknown Type
-
-  templatePresets:
-    empty: Empty Template
-    ongoing-game: Default Ongoing Game Template
-    remote: Remote Template
-
-  sendableItemPresets:
-    plaintext: Plain Text
-    template: Template
-
-  newSendableItem: New Sendable Item {{index}}
-
-app:
-  singleton: Because Akari is unique, there can only be ONE Akari at a time
-
-common:
-  appName: League Akari
-  default: Default
-
-  yes: yes
-  no: no
-  confirm: Confirm
-  na: N/A
-
-  summonerPlaceholder: Summoner {{index}}
-  summoner: Summoner
-
-  lanes:
-    all: None
-    ALL: None
-    top: Top
-    jungle: Jungle
-    mid: Middle
-    middle: Middle
-    bot: Bottom
-    bottom: Bottom
-    support: Support
-    utility: Support
-    TOP: Top
-    JUNGLE: Jungle
-    MID: Middle
-    BOT: Bottom
-    MIDDLE: Middle
-    BOTTOM: Bottom
-    SUPPORT: Support
-    UTILITY: Support
-
-  positionAssignmentReason:
-    FILL_SECONDARY: Fill Primary
-    FILL_PRIMARY: Fill Secondary
-    PRIMARY: Primary
-    SECONDARY: Secondary
-    AUTOFILL: Autofill
-    AUTOFILL_SHORT: Fill
-
-  teams:
-    all: All
-    100: Blue Team
-    200: Red Team
-    unknown: Unknown
-    our: Our
-    their: Their
-    our-1: Our (Blue Team)
-    our-2: Our (Red Team)
-    their-1: Their (Blue Team)
-    their-2: Their (Red Team)
-
-  queueTypes:
-    RANKED_SOLO_5x5: Ranked Solo/Duo
-    RANKED_FLEX_SR: Ranked Flex
-    NORMAL: Normal SR
-    ARAM_UNRANKED_5x5: ARAM
-    CHERRY: Arena
-    URF: URF
-    RANKED_FLEX_TT: Ranked Flex TT
-    NORMAL_TFT: TFT
-    RANKED_TFT: TFT Ranked
-    RANKED_TFT_TURBO: TFT Turbo
-    RANKED_TFT_DOUBLE_UP: TFT Double Up
-
-  gameModes:
-    CLASSIC: Classic
-    ARAM: ARAM
-    URF: URF
-    TFT: TFT
-
-  sgpMatchHistoryTags:
-    all: All Modes
-    current: Current Mode
-    q_420: Ranked Solo/Duo
-    q_430: Normal SR
-    q_440: Ranked Flex
-    q_450: ARAM
-    q_480: Swiftplay
-    q_490: Quickplay
-    q_900: ARURF
-    q_1700: Arena
-    q_1900: URF
-    q_2300: Brawl
-
-  tiers:
-    UNRANKED: UNRANKED
-    IRON: IRON
-    BRONZE: BRONZE
-    SILVER: SILVER
-    GOLD: GOLD
-    PLATINUM: PLATINUM
-    EMERALD: EMERALD
-    DIAMOND: DIAMOND
-    MASTER: MASTER
-    GRANDMASTER: GRANDMASTER
-    CHALLENGER: CHALLENGER
-
-  shortTiers:
-    UNRANKED: N/A
-    IRON: IRON
-    BRONZE: BRON
-    SILVER: SILV
-    GOLD: GOLD
-    PLATINUM: PLAT
-    EMERALD: EMERD
-    DIAMOND: DIAMD
-    MASTER: MASTR
-    GRANDMASTER: GM
-    CHALLENGER: CHALL
-
-sgpServers:
-  TENCENT_HN10: Black Rose
-  TENCENT_HN1: Ionia
-  TENCENT_NJ100: League 1
-  TENCENT_GZ100: League 2
-  TENCENT_CQ100: League 3
-  TENCENT_TJ100: League 4
-  TENCENT_TJ101: League 5
-  TENCENT_BGP2: Summit
-  TENCENT_PBE: Tencent PBE
-  TW2: Taiwan
-  SG2: Singapore
-  PH2: Philippines
-  VN2: Vietnam
-  PBE: PBE
-  EUN: Europe NE
-  EUW: Europe West
-  KR: Korea
-  BR1: Brazil
-  LA1: Latin America
-  LA2: Latin America
-  OC1: Oceania
-  TR1: Turkey
-  RU: Russia
-  JP1: Japan

@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
     <template #header>
-      <span class="card-header-title">{{ t('SendableItemEdit.title') }}</span>
+      <span class="card-header-title">{{ t('title') }}</span>
     </template>
     <div class="template-edit">
       <div class="left-list">
@@ -19,13 +19,13 @@
                 <AddIcon />
               </NIcon>
             </template>
-            {{ t('SendableItemEdit.newButton') }}
+            {{ t('newButton') }}
           </NButton>
         </NDropdown>
         <NInput
           v-if="igs2.settings.sendableItems.length > 0"
           v-model:value="filterText"
-          :placeholder="t('SendableItemEdit.filterPlaceholder')"
+          :placeholder="t('filterPlaceholder')"
           class="filter-input"
           size="small"
           clearable
@@ -60,7 +60,7 @@
                     </NIcon>
                   </template>
                   <div>
-                    {{ t('SendableItemEdit.errorTemplateInvalid') }}
+                    {{ t('errorTemplateInvalid') }}
                   </div>
                 </NPopover>
                 <NPopover v-else-if="executionErrors[item.id]" placement="right">
@@ -71,7 +71,7 @@
                   </template>
                   <div :class="$style['error-message']">
                     <div :class="$style['error-title']">
-                      {{ t('SendableItemEdit.errorTemplateExecutionFailed') }}
+                      {{ t('errorTemplateExecutionFailed') }}
                     </div>
                     <div :class="$style['error-divider']"></div>
                     <div :class="$style['error-content']">{{ executionErrors[item.id] }}</div>
@@ -84,7 +84,7 @@
                     </NIcon>
                   </template>
                   <div>
-                    {{ t('SendableItemEdit.itemEnabled') }}
+                    {{ t('itemEnabled') }}
                   </div>
                 </NPopover>
               </div>
@@ -93,7 +93,7 @@
         </NVirtualList>
         <div v-else class="empty">
           <div class="empty-text">
-            {{ t('SendableItemEdit.noSendableItem') }}
+            {{ t('noSendableItem') }}
           </div>
         </div>
       </div>
@@ -136,12 +136,12 @@
                     </template>
                   </NButton>
                 </template>
-                <div style="max-width: 260px">{{ t('SendableItemEdit.deletePopconfirm') }}</div>
+                <div style="max-width: 260px">{{ t('deletePopconfirm') }}</div>
               </NPopconfirm>
             </div>
           </div>
           <div class="control-items">
-            <ControlItem :label="t('SendableItemEdit.enabled.label')" :label-width="200">
+            <ControlItem :label="t('enabled.label')" :label-width="200">
               <NSwitch
                 :value="currentItem.enabled"
                 size="small"
@@ -151,11 +151,9 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.contentType.label')"
+              :label="t('contentType.label')"
               :label-width="200"
-              :label-description="
-                t(`SendableItemEdit.contentType.description.${currentItem.content.type}`)
-              "
+              :label-description="t(`contentType.description.${currentItem.content.type}`)"
             >
               <NSelect
                 style="width: 200px"
@@ -167,9 +165,9 @@
             </ControlItem>
             <ControlItem
               v-if="currentItem.content.type === 'template'"
-              :label="t('SendableItemEdit.template.label')"
+              :label="t('template.label')"
               :label-width="200"
-              :label-description="t('SendableItemEdit.template.description')"
+              :label-description="t('template.description')"
             >
               <NSelect
                 size="small"
@@ -185,7 +183,7 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.sendShortcut.label')"
+              :label="t('sendShortcut.label')"
               :label-width="200"
               v-if="currentItem.content.type === 'plaintext'"
             >
@@ -198,9 +196,9 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.sendAllShortcut.label')"
+              :label="t('sendAllShortcut.label')"
               :label-width="200"
-              :label-description="t('SendableItemEdit.sendAllShortcut.description')"
+              :label-description="t('sendAllShortcut.description')"
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
@@ -212,9 +210,9 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.sendAllyShortcut.label')"
+              :label="t('sendAllyShortcut.label')"
               :label-width="200"
-              :label-description="t('SendableItemEdit.sendAllyShortcut.description')"
+              :label-description="t('sendAllyShortcut.description')"
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
@@ -226,9 +224,9 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.sendEnemyShortcut.label')"
+              :label="t('sendEnemyShortcut.label')"
               :label-width="200"
-              :label-description="t('SendableItemEdit.sendEnemyShortcut.description')"
+              :label-description="t('sendEnemyShortcut.description')"
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
@@ -240,9 +238,9 @@
               />
             </ControlItem>
             <ControlItem
-              :label="t('SendableItemEdit.dryRun.label')"
+              :label="t('dryRun.label')"
               :label-width="200"
-              :label-description="t('SendableItemEdit.dryRun.description')"
+              :label-description="t('dryRun.description')"
               v-if="currentItem.content.type === 'template'"
             >
               <div class="button-group">
@@ -252,7 +250,7 @@
                   size="tiny"
                   @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'all')"
                 >
-                  {{ t('SendableItemEdit.dryRun.all') }}
+                  {{ t('dryRun.all') }}
                 </NButton>
                 <NButton
                   :disabled="!currentItem.content.templateId"
@@ -260,7 +258,7 @@
                   size="tiny"
                   @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'ally')"
                 >
-                  {{ t('SendableItemEdit.dryRun.ally') }}
+                  {{ t('dryRun.ally') }}
                 </NButton>
                 <NButton
                   :disabled="!currentItem.content.templateId"
@@ -268,7 +266,7 @@
                   size="tiny"
                   @click="handleDryRun(currentItem.id, currentItem.content.templateId!, 'enemy')"
                 >
-                  {{ t('SendableItemEdit.dryRun.enemy') }}
+                  {{ t('dryRun.enemy') }}
                 </NButton>
               </div>
             </ControlItem>
@@ -285,7 +283,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('SendableItemEdit.revertButton') }}</div>
+                <div>{{ t('revertButton') }}</div>
               </NPopover>
               <NPopover>
                 <template #trigger>
@@ -303,7 +301,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('SendableItemEdit.saveButton') }}</div>
+                <div>{{ t('saveButton') }}</div>
               </NPopover>
             </div>
             <Codemirror
@@ -312,7 +310,7 @@
               :style="{ flex: 1, height: 0, borderRadius: '2px', overflow: 'hidden' }"
               :autofocus="true"
               :indent-with-tab="true"
-              :placeholder="t('SendableItemEdit.plaintextPlaceholder')"
+              :placeholder="t('plaintextPlaceholder')"
               :tab-size="2"
               :extensions="[vscodeDark]"
               @change="handleChange"
@@ -321,7 +319,7 @@
         </template>
         <template v-else>
           <div class="empty">
-            <div class="empty-text">{{ t('SendableItemEdit.noSendableItemSelected') }}</div>
+            <div class="empty-text">{{ t('noSendableItemSelected') }}</div>
           </div>
         </template>
       </div>
@@ -330,7 +328,6 @@
 </template>
 
 <script lang="ts" setup>
-import { oneDark } from '@codemirror/theme-one-dark'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
@@ -372,7 +369,7 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 // 还是直接复制一份组件好用
-const { t } = useTranslation()
+const { t } = useTranslation('renderer', { keyPrefix: 'SendableItemEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
@@ -382,22 +379,22 @@ const activeItemId = ref<string | null>(null)
 
 const dropdownOptions = computed(() => [
   {
-    label: t('in-game-send-main.sendableItemPresets.plaintext'),
+    label: t('sendableItemPresets.plaintext'),
     key: 'plaintext'
   },
   {
-    label: t('in-game-send-main.sendableItemPresets.template'),
+    label: t('sendableItemPresets.template'),
     key: 'template'
   }
 ])
 
 const sendableItemTypeOptions = computed(() => [
   {
-    label: t('in-game-send-main.sendableItemPresets.plaintext'),
+    label: t('sendableItemPresets.plaintext'),
     value: 'plaintext'
   },
   {
-    label: t('in-game-send-main.sendableItemPresets.template'),
+    label: t('sendableItemPresets.template'),
     value: 'template'
   }
 ])
@@ -529,7 +526,7 @@ const handleSave = () => {
     igs.updateSendableItem(currentItem.value.id, {
       content: { type: 'plaintext', content: tempText.value }
     })
-    message.success(() => t('SendableItemEdit.saveSuccess', { name: currentItem.value!.name }))
+    message.success(() => t('saveSuccess', { name: currentItem.value!.name }))
   }
 }
 
@@ -541,7 +538,7 @@ const handleDelete = () => {
   if (currentItem.value) {
     let name = currentItem.value.name
     igs.removeSendableItem(currentItem.value.id)
-    message.success(() => t('SendableItemEdit.deleteSuccess', { name }))
+    message.success(() => t('deleteSuccess', { name }))
   }
 }
 
@@ -581,7 +578,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
   const result = await igs.getDryRunResult(templateId, target)
 
   if (result.error) {
-    message.error(() => t('SendableItemEdit.dryRunError'))
+    message.error(() => t('dryRunError'))
     executionErrors[id] = result.error
 
     return
@@ -615,7 +612,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
                     color: '#fff8'
                   }
                 },
-                '(' + t('SendableItemEdit.dryRunEmpty') + ')'
+                '(' + t('dryRunEmpty') + ')'
               )
       )
   })

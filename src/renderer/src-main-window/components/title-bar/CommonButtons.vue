@@ -3,9 +3,11 @@
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer" @click="sn.showAnnouncementModal()">
-          <div class="common-button-inner">
-            <NIcon><NotificationIcon /></NIcon>
-          </div>
+          <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]" processing>
+            <div class="common-button-inner">
+              <NIcon><NotificationIcon /></NIcon>
+            </div>
+          </NBadge>
         </div>
       </template>
       {{ t('CommonButtons.announcement') }}
@@ -65,6 +67,7 @@ import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
+import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -76,10 +79,11 @@ import { Notification as NotificationIcon } from '@vicons/carbon'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NTooltip } from 'naive-ui'
+import { NBadge, NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
+import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifications/store'
 
 import BackgroundTasks from '../BackgroundTasks.vue'
 
@@ -88,6 +92,9 @@ const { t } = useTranslation()
 const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
+const rcs = useRemoteConfigStore()
+const sns = useSimpleNotificationsStore()
+
 const wm = useInstance(WindowManagerRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
 
@@ -128,6 +135,15 @@ const handleShowOpggWindow = () => {
 const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
+
+const shouldShowAnnouncementBadge = computed(() => {
+  return (
+    rcs.announcement !== null && // announcement exists
+    (rcs.announcement.frontMatter.alertLevel === 'medium' ||
+      rcs.announcement.frontMatter.alertLevel === 'high') && // medium or high announcement
+    sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId // unread
+  )
+})
 </script>
 
 <style lang="less" scoped>
