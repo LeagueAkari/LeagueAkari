@@ -32,7 +32,11 @@ Supports most of the riot servers (not including Tencent).
 
 Fun places for casual chats, party setups, bug reports, and suggestions.
 
-QQ Group: [301157623](https://qm.qq.com/q/F1Xv85etlm) (Passcode: akari)
+QQ Group: [301157623](https://qm.qq.com/q/F1Xv85etlm) or [543703181](https://qm.qq.com/q/jotnhHpG70) (Passcode: akari)
+
+| 一群   | 二群 |
+| :--------: | :------: |
+| ![301157623](https://github.com/user-attachments/assets/2642c6a8-6162-459f-9faf-cb83b959c2c5) | ![543703181](https://github.com/user-attachments/assets/f418b2cd-f5e0-4613-93c5-f3e17cf00652) |
 
 Telegram Group: [@LeagueAkari](https://t.me/leagueakari)
 
