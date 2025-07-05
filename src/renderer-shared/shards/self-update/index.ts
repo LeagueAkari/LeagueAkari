@@ -131,9 +131,9 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
       if (s.lastUpdateResult) {
         if (s.lastUpdateResult.success) {
           notification.success({
-            title: () => t('self-update-main.title'),
+            title: () => t('self-update-renderer.title'),
             content: () =>
-              t('self-update-main.lastUpdateSuccess', {
+              t('self-update-renderer.lastUpdateSuccess', {
                 version: as.version
               }),
             duration: 4000,
@@ -141,10 +141,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
           })
         } else {
           notification.warning({
-            title: () => t('self-update-main.title'),
+            title: () => t('self-update-renderer.title'),
             content: () =>
               h('div', {
-                innerHTML: t('self-update-main.lastUpdateFailed', {
+                innerHTML: t('self-update-renderer.lastUpdateFailed', {
                   url: releasePageUrl.value
                 })
               }),

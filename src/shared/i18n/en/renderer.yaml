@@ -2267,3 +2267,9 @@ self-update-renderer:
     unpack-failed: Failed to unpack the archive file
     waiting-for-restart: Updated applied. Restart the application to apply the update
     cancelButton: Cancel
+
+  title: Self Update
+  start-update: Starting update League Akari
+  updateOnNextStartup: Updated Applied. Restart the application to apply the update
+  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
+  lastUpdateSuccess: Updated to {{version}}
