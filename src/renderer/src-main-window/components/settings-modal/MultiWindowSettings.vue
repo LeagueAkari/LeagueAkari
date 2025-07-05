@@ -267,6 +267,20 @@
           }}</NRadio>
         </NRadioGroup>
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.cdTimerWindow.reverseAdjustmentDirection.label')"
+        :label-description="
+          t('MultiWindowSettings.cdTimerWindow.reverseAdjustmentDirection.description')
+        "
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="ctws.settings.reverseAdjustmentDirection"
+          @update:value="(val) => wm.cdTimerWindow.setReverseAdjustmentDirection(val)"
+        />
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>

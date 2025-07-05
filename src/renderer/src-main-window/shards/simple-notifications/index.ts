@@ -322,9 +322,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           h(DeclarationModal, {
             show: showModal.value,
             'onUpdate:show': (v) => (showModal.value = v),
-            onConfirm: (notShowAgain) => {
-              app.setShowFreeSoftwareDeclaration(notShowAgain)
+            onConfirm: () => {
+              app.setShowFreeSoftwareDeclaration(false)
               showModal.value = false
+            },
+            onQuit: () => {
+              app.quit()
             }
           })
       }
@@ -383,6 +386,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
         const sns = useSimpleNotificationsStore()
         const sus = useSelfUpdateStore()
         const su = useInstance(SelfUpdateRenderer)
+        const app = useInstance(AppCommonRenderer)
 
         watch(
           () => rcs.latestRelease,
@@ -403,6 +407,15 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
           },
           { immediate: true }
         )
+
+        app.onRendererLink((url) => {
+          const u = new URL(url)
+
+          if (u.pathname === '/overlays/release-modal') {
+            sns.showAnnouncementModal = false
+            sns.showNewReleaseModal = true
+          }
+        })
 
         return () =>
           h(UpdateModal, {

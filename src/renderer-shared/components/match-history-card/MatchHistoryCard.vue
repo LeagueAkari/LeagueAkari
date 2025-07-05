@@ -1,7 +1,12 @@
 <template>
   <div class="match-history-card-wrapper">
     <NModal size="small" v-model:show="isModalShow">
-      <MiscellaneousPanel :game="game" />
+      <MiscellaneousPanel
+        :game="game"
+        :replay-metadata="replayMetadata"
+        @download-replay="emits('downloadReplay', game.gameId)"
+        @watch-replay="emits('watchReplay', game.gameId)"
+      />
     </NModal>
     <DefineSubTeam v-slot="{ participants, mode }">
       <div class="sub-team" :class="{ 'only-one-team': isOnlyOneTeam }" v-if="participants?.length">
@@ -234,8 +239,9 @@
           class="icon"
           @click.stop="() => handleShowMiscellaneous()"
           :title="t('MatchHistoryCard.misc')"
-          ><ListIcon
-        /></NIcon>
+        >
+          <ListIcon />
+        </NIcon>
         <NIcon
           class="icon"
           :class="{ rotated: isExpanded }"
@@ -250,8 +256,9 @@
         class="icon standalone-misc-btn-icon"
         @click.stop="() => handleShowMiscellaneous()"
         :title="t('MatchHistoryCard.misc')"
-        ><ListIcon
-      /></NIcon>
+      >
+        <ListIcon />
+      </NIcon>
     </div>
     <template v-if="isExpanded">
       <template v-if="isDetailed">
@@ -298,6 +305,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
+import { ReplayMetadata } from '@shared/types/league-client/replays'
 import { summonerName } from '@shared/utils/name'
 import { ChevronDown as ChevronDownIcon, List as ListIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
@@ -316,6 +324,7 @@ const props = defineProps<{
   isLoading: boolean
   isExpanded: boolean
   isDetailed: boolean
+  replayMetadata?: ReplayMetadata
   game: Game
 }>()
 
@@ -325,6 +334,8 @@ const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
   loadDetailedGame: [gameId: number]
   toSummoner: [puuid: string, setCurrent?: boolean]
+  downloadReplay: [gameId: number]
+  watchReplay: [gameId: number]
 }>()
 
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{

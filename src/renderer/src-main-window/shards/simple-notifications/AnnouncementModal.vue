@@ -55,11 +55,6 @@ const show = defineModel<boolean>('show', { default: false })
 </script>
 
 <style lang="less" scoped>
-.para,
-.small-link {
-  font-size: 13px;
-}
-
 .markdown-container {
   user-select: text;
   border-radius: 4px;

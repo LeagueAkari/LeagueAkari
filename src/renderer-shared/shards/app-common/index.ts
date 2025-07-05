@@ -104,5 +104,13 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRuntimeInfo') as Promise<any>
   }
 
+  quit() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'quit')
+  }
+
+  onRendererLink(fn: (url: string) => void) {
+    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'renderer-link', fn)
+  }
+
   async onDispose() {}
 }

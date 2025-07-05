@@ -1,6 +1,6 @@
 import { ButtonProps } from 'naive-ui'
 import { defineStore } from 'pinia'
-import { VNodeChild, h, ref } from 'vue'
+import { VNodeChild, ref } from 'vue'
 
 export interface BackgroundTaskAction {
   /**
@@ -41,6 +41,8 @@ export interface BackgroundTask {
 
   progress: number | null
 
+  inProgress: boolean
+
   actions: BackgroundTaskAction[]
 }
 
@@ -78,6 +80,7 @@ export const useBackgroundTasksStore = defineStore('shard:background-tasks-rende
       id,
       createAt: Date.now(),
       name: '',
+      inProgress: true,
       status: 'default',
       description: '',
       progress: null,

@@ -10,6 +10,7 @@ interface Announcement {
 export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
   isNew: boolean
   currentVersion: string
+  detailedChangelog: string | null
   archiveFile: GithubApiAsset | null
 }
 

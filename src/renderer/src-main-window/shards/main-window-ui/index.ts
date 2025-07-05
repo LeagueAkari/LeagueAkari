@@ -1,10 +1,12 @@
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { router } from '@main-window/routes'
@@ -29,10 +31,30 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     await this._handleSettings()
     this._setupInAppScope.addSetupFn(() => {
       this._handleSyncProfileSkinUrl()
+      this._setupAutoRouteWhenGameStarts()
     })
   }
 
   async onDispose() {}
+
+  private _setupAutoRouteWhenGameStarts() {
+    const router = useRouter()
+    const store = useOngoingGameStore()
+
+    const shouldRoute = computed(() => {
+      return store.queryStage.phase !== 'unavailable'
+    })
+
+    watch(
+      () => shouldRoute.value,
+      (value) => {
+        if (value && store.frontendSettings.autoRouteWhenGameStarts) {
+          router.replace({ name: 'ongoing-game' })
+        }
+      },
+      { immediate: true }
+    )
+  }
 
   private _handleSyncProfileSkinUrl() {
     const lcs = useLeagueClientStore()

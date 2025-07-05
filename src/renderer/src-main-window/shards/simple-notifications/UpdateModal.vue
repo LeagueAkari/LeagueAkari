@@ -86,7 +86,11 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(props.release?.body || t('UpdateModal.noUpdateMd'))
+  return markdownIt.render(
+    props.release
+      ? props.release.detailedChangelog || props.release.body || t('UpdateModal.noUpdateMd')
+      : t('UpdateModal.noUpdateMd')
+  )
 })
 
 const show = defineModel<boolean>('show', { default: false })

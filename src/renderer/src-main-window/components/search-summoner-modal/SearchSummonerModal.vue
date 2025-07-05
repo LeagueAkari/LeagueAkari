@@ -163,7 +163,7 @@
             {{ t('SearchSummonerModal.showAll') }}
           </NCheckbox>
         </div>
-        <NScrollbar :class="$style['player-items-scroll']">
+        <NScrollbar :class="$style['friends-items-scroll']">
           <div class="player-items">
             <div
               class="player-item"
@@ -1086,5 +1086,9 @@ watch(
 
 .player-items-scroll {
   max-height: 20vh;
+}
+
+.friends-items-scroll {
+  max-height: 84px;
 }
 </style>

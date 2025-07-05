@@ -300,6 +300,8 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_135)
 
+    await manager.save(Setting.create('app-common-main/showFreeSoftwareDeclaration', true))
+
     await this._do(manager, 'app-common-renderer/streamerMode', 'app-common-main/streamerMode')
     await this._do(
       manager,
@@ -310,6 +312,39 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await manager.save(
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_135, ConfigMigrateMain.MIGRATION_FROM_135)
     )
+
+    const oldPlaintextSend = await manager.findOneBy(Setting, {
+      key: Equal('in-game-send-main/customSend')
+    })
+
+    if (oldPlaintextSend) {
+      try {
+        const old = oldPlaintextSend.value
+        const current = await manager.findOneBy(Setting, {
+          key: Equal('in-game-send-main/sendableItems')
+        })
+
+        const newArr = current ? current.value : []
+
+        await manager.save(
+          Setting.create('in-game-send-main/sendableItems', [
+            ...newArr,
+            ...old.map((item: any) => ({
+              id: item.id,
+              name: item.name,
+              content: {
+                type: 'plaintext',
+                content: item.message
+              }
+            }))
+          ])
+        )
+      } catch (error) {
+        this._log.error('Failed to migrate former sendable items', error)
+      }
+    }
+
+    await this._do(manager, 'self-update-main/downloadSource', 'remote-config-main/preferredSource')
   }
 
   async onInit() {
