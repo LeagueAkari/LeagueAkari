@@ -2,9 +2,20 @@ import { GithubApiAsset, GithubApiLatestRelease } from '@shared/types/github'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 
+// pre-defined
+interface AnnouncementFrontMatter {
+  /**
+   * low: 不会提醒
+   * medium: 只会提示
+   * high: 会弹窗提醒
+   */
+  alertLevel?: 'low' | 'medium' | 'high'
+}
+
 // copied from main
 export interface Announcement {
   content: string
+  frontMatter: AnnouncementFrontMatter
   uniqueId: string
 }
 
@@ -12,6 +23,7 @@ export interface Announcement {
 export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
   isNew: boolean
   currentVersion: string
+  detailedChangelog: string | null
   archiveFile: GithubApiAsset | null
 }
 

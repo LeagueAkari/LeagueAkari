@@ -33,6 +33,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   static id = 'ongoing-game-main'
 
   static LOADING_PRIORITY = {
+    ADDITIONAL_SUMMONER: -1,
     SUMMONER: 6,
     MATCH_HISTORY: 5,
     SAVED_INFO: 4,
@@ -617,6 +618,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       count?: number
       force?: boolean
       useSgpApi?: boolean
+      priority?: number
     } = {}
   ) {
     let { count = 20, signal, mhSignal, tag, force, useSgpApi } = options
@@ -654,7 +656,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const data = await this._mhQueue
         .add(() => this._sgp.getMatchHistoryLcuFormat(puuid, 0, count, tag), {
           signal: mhSignal,
-          priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
+          priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })
         .catch((error) => this._handleMatchHistoryError(error, puuid))
 
@@ -686,7 +688,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const res = await this._queue
         .add(() => this._lc.api.matchHistory.getMatchHistory(puuid, 0, count - 1), {
           signal: mhSignal,
-          priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
+          priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })
         .catch((error) => this._handleMatchHistoryError(error, puuid))
 
@@ -745,6 +747,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     options: {
       signal?: AbortSignal
       force?: boolean
+      priority?: number
     } = {}
   ) {
     const { signal, force } = options
@@ -758,7 +761,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const res = await this._queue
       .add(() => this._lc.api.summoner.getSummonerByPuuid(puuid), {
         signal,
-        priority: OngoingGameMain.LOADING_PRIORITY.SUMMONER
+        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.SUMMONER
       })
       .catch((error) => this._handleError(error, 'summoner', puuid))
 
@@ -820,6 +823,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
     )
 
+    res.tags.forEach((t) => {
+      this._loadPlayerSummoner(t.selfPuuid, {
+        signal,
+        force,
+        priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_SUMMONER
+      })
+    })
+
     runInAction(() => (this.state.savedInfo[puuid] = res))
     this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, res)
   }
@@ -829,6 +840,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     options: {
       signal?: AbortSignal
       force?: boolean
+      priority?: number
     } = {}
   ) {
     const { signal, force } = options
@@ -841,7 +853,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const res = await this._mhQueue
       .add(() => this._lc.api.ranked.getRankedStats(puuid), {
         signal,
-        priority: OngoingGameMain.LOADING_PRIORITY.RANKED_STATS
+        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.RANKED_STATS
       })
       .catch((error) => this._handleError(error, 'ranked-stats', puuid))
 
@@ -862,6 +874,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     options: {
       signal?: AbortSignal
       force?: boolean
+      priority?: number
     } = {}
   ) {
     const { signal, force } = options
@@ -874,7 +887,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const res = await this._mhQueue
       .add(() => this._lc.api.championMastery.getPlayerChampionMastery(puuid), {
         signal,
-        priority: OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY
+        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY
       })
       .catch((error) => this._handleError(error, 'champion-mastery', puuid))
 

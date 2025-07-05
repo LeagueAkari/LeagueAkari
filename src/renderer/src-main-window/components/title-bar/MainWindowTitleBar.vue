@@ -1,7 +1,7 @@
 <template>
   <div id="app-title-bar">
-    <span class="app-name" v-if="as.isAdministrator">League Akari X</span>
-    <span class="app-name" v-else>League Akari</span>
+    <span class="app-name" v-if="as.isAdministrator">{{ t('appName') }} X</span>
+    <span class="app-name" v-else>{{ t('appName') }}</span>
     <div class="divider" :class="{ invisible: !shouldShowDivider }" />
     <div class="shard-area">
       <Transition name="fade">
@@ -22,6 +22,7 @@
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -38,6 +39,8 @@ const route = useRoute()
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const mhs = useMatchHistoryTabsStore()
+
+const { t } = useTranslation('common')
 
 const shouldShowDivider = computed(() => {
   switch (route.name) {
@@ -66,6 +69,7 @@ const shouldShowDivider = computed(() => {
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
   background-color: #0001;
+  z-index: 1000000;
 }
 
 .shard-area {
@@ -76,6 +80,7 @@ const shouldShowDivider = computed(() => {
 
 .app-name {
   padding: 0 4px;
+  font-family: 'Comfortaa', sans-serif;
   font-weight: bold;
   margin-left: 8px;
 }

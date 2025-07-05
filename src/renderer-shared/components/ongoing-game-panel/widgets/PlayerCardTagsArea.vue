@@ -5,16 +5,40 @@
     </div>
     <NPopover
       v-if="
-        ogs.frontendSettings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tag
+        ogs.frontendSettings.playerCardTags.showTaggedTag &&
+        savedInfo &&
+        !isSelf &&
+        savedInfo.tags.length
       "
       :delay="50"
       style="max-height: 240px"
+      scrollable
     >
       <template #trigger>
         <div class="tag tagged">{{ t('PlayerInfoCard.tagged') }}</div>
       </template>
-      <div class="tagged-text" style="max-width: 260px">
-        {{ savedInfo.tag }}
+      <div class="tagged-text-list">
+        <div class="tagged-item" v-for="tag in sortedTags" :key="tag.selfPuuid">
+          <div class="tag-source" v-if="tag.markedBySelf">
+            {{ t('PlayerInfoCard.taggedBySelf') }}
+          </div>
+          <div class="tag-source" v-else>
+            <span class="tagged-by-other-text">{{ t('PlayerInfoCard.taggedByOther') }}</span>
+            <span
+              v-if="ogs.summoner[tag.selfPuuid]"
+              class="tagged-by-other-name"
+              @click="emits('toSummoner', tag.selfPuuid)"
+            >
+              {{ riotId(ogs.summoner[tag.selfPuuid].data) }}
+            </span>
+            <span v-else class="tagged-by-other-name unknown">
+              {{ t('PlayerInfoCard.unknown') }}
+            </span>
+          </div>
+          <div class="tagged-text">
+            {{ tag.tag }}
+          </div>
+        </div>
       </div>
     </NPopover>
     <NPopover
@@ -564,6 +588,7 @@ import { formatI18nOrdinal } from '@shared/i18n'
 import { Game } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { MatchHistoryGameWithState, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
+import { riotId } from '@shared/utils/name'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -587,6 +612,7 @@ const emits = defineEmits<{
   showGame: [game: Game, selfPuuid: string]
   showGameById: [gameId: number, selfPuuid: string]
   highlight: [premadeTeamId: string, boolean]
+  toSummoner: [puuid: string]
 }>()
 
 const { t } = useTranslation()
@@ -762,6 +788,21 @@ const encounteredGames = computed(() => {
   return mapped
 })
 
+const sortedTags = computed(() => {
+  if (!savedInfo) {
+    return []
+  }
+
+  // make sure self-tagged tags are at the top
+  return savedInfo.tags.sort((a, b) => {
+    if (a.markedBySelf && !b.markedBySelf) {
+      return -1
+    }
+
+    return 0
+  })
+})
+
 const truncateTailingZeros = (num: number, precision = 1) => {
   const str = num.toFixed(precision)
   const trimmed = str.replace(/\.?0+$/, '')
@@ -882,10 +923,42 @@ onDeactivated(() => {
   width: min-content;
 }
 
-.tagged-text {
-  font-size: 12px;
-  white-space: pre-wrap;
-  max-width: 260px;
+.tagged-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .tagged-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tag-source {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+
+    .tagged-by-other-text {
+      color: #ffffff80;
+    }
+
+    .tagged-by-other-name {
+      font-weight: bold;
+      color: #ffffff;
+      cursor: pointer;
+
+      &.unknown {
+        color: #ffffff80;
+      }
+    }
+  }
+
+  .tagged-text {
+    font-size: 12px;
+    white-space: pre-wrap;
+    max-width: 260px;
+  }
 }
 
 .encountered-game-table {

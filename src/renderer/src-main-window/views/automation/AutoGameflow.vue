@@ -333,43 +333,43 @@ const queueTypes = computed(() => {
       order: 0
     },
     RANKED_SOLO_5x5: {
-      label: t('common.queueTypes.RANKED_SOLO_5x5'),
+      label: t('queueTypes.RANKED_SOLO_5x5', { ns: 'common' }),
       order: 100
     },
     RANKED_FLEX_SR: {
-      label: t('common.queueTypes.RANKED_FLEX_SR'),
+      label: t('queueTypes.RANKED_FLEX_SR', { ns: 'common' }),
       order: 110
     },
     NORMAL: {
-      label: t('common.queueTypes.NORMAL'),
+      label: t('queueTypes.NORMAL', { ns: 'common' }),
       order: 200
     },
     ARAM_UNRANKED_5x5: {
-      label: t('common.queueTypes.ARAM_UNRANKED_5x5'),
+      label: t('queueTypes.ARAM_UNRANKED_5x5', { ns: 'common' }),
       order: 300
     },
     CHERRY: {
-      label: t('common.queueTypes.CHERRY'),
+      label: t('queueTypes.CHERRY', { ns: 'common' }),
       order: 400
     },
     URF: {
-      label: t('common.queueTypes.URF'),
+      label: t('queueTypes.URF', { ns: 'common' }),
       order: 500
     },
     NORMAL_TFT: {
-      label: t('common.queueTypes.NORMAL_TFT'),
+      label: t('queueTypes.NORMAL_TFT', { ns: 'common' }),
       order: 600
     },
     RANKED_TFT: {
-      label: t('common.queueTypes.RANKED_TFT'),
+      label: t('queueTypes.RANKED_TFT', { ns: 'common' }),
       order: 610
     },
     RANKED_TFT_TURBO: {
-      label: t('common.queueTypes.RANKED_TFT_TURBO'),
+      label: t('queueTypes.RANKED_TFT_TURBO', { ns: 'common' }),
       order: 620
     },
     RANKED_TFT_DOUBLE_UP: {
-      label: t('common.queueTypes.RANKED_TFT_DOUBLE_UP'),
+      label: t('queueTypes.RANKED_TFT_DOUBLE_UP', { ns: 'common' }),
       order: 630
     }
   }

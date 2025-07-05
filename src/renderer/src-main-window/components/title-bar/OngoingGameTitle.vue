@@ -111,12 +111,12 @@ const orderOptions = computed(() => {
 const sgpTagOptions = useSgpTagOptions()
 
 const teamNameMap = computed(() => ({
-  100: t('common.teams.100'),
-  200: t('common.teams.200'),
-  'our-1': t('common.teams.100'),
-  'our-2': t('common.teams.200'),
-  'their-1': t('common.teams.100'),
-  'their-2': t('common.teams.200'),
+  100: t('teams.100', { ns: 'common' }),
+  200: t('teams.200', { ns: 'common' }),
+  'our-1': t('teams.100', { ns: 'common' }),
+  'our-2': t('teams.200', { ns: 'common' }),
+  'their-1': t('teams.100', { ns: 'common' }),
+  'their-2': t('teams.200', { ns: 'common' }),
   spectating: t('OngoingGameTitle.spectating')
 }))
 

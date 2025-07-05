@@ -10,7 +10,6 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AramTracker } from './aram-tracker'
 import { AutoSelectSettings, AutoSelectState } from './state'
 
 @Shard(AutoSelectMain.id)
@@ -27,8 +26,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _pickTask = new TimeoutTask()
   private _banTask = new TimeoutTask()
-
-  private _aramTracker = new AramTracker()
 
   constructor(
     _loggerFactory: LoggerFactoryMain,
@@ -58,10 +55,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         banDelaySeconds: { default: this.settings.banDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
         banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
-        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled },
-        benchHandleTradeIgnoreChampionOwner: {
-          default: this.settings.benchHandleTradeIgnoreChampionOwner
-        }
+        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
       },
       this.settings
     )
@@ -85,8 +79,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'benchExpectedChampions',
       'expectedChampions',
       'bannedChampions',
-      'benchHandleTradeEnabled',
-      'benchHandleTradeIgnoreChampionOwner'
+      'benchHandleTradeEnabled'
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
@@ -96,11 +89,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'upcomingGrab',
       'upcomingPick',
       'upcomingBan'
-    ])
-
-    this._mobx.propSync(AutoSelectMain.id, 'aramTracker', this._aramTracker.state, [
-      'recordedEvents',
-      'isJoinAfterSession'
     ])
   }
 
@@ -190,10 +178,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         `Cancelled upcoming auto-pick: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
       )
       this._sendInChat(
-        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
+        `[${i18next.t('appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
           champion:
             this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name ||
-            this.state.upcomingPick.championId
+            this.state.upcomingPick.championId,
+          ns: 'common'
         })}`
       )
       this.state.setUpcomingPick(null)
@@ -212,10 +201,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       )
       this.state.setUpcomingPick(null)
       this._sendInChat(
-        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
+        `[${i18next.t('appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
           champion:
             this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name ||
-            this.state.upcomingBan.championId
+            this.state.upcomingBan.championId,
+          ns: 'common'
         })}`
       )
     }
@@ -258,10 +248,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             )
 
             this._sendInChat(
-              `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-lock-in', {
+              `[${i18next.t('appName')}] ${i18next.t('auto-select-main.delayed-lock-in', {
                 champion:
                   this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
-                seconds: (delayMs / 1e3).toFixed(1)
+                seconds: (delayMs / 1e3).toFixed(1),
+                ns: 'common'
               })}`
             )
 
@@ -322,9 +313,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             `Added delayed ban task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
           )
           this._sendInChat(
-            `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-ban', {
+            `[${i18next.t('appName')}] ${i18next.t('auto-select-main.delayed-ban', {
               champion: this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
-              seconds: (delayMs / 1e3).toFixed(1)
+              seconds: (delayMs / 1e3).toFixed(1),
+              ns: 'common'
             })}`
           )
           this.state.setUpcomingBan(ban.championId, Date.now() + delayMs)
@@ -476,10 +468,22 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      const { benchEnabled, localPlayerCellId, benchChampions, myTeam } =
+      const { benchEnabled, localPlayerCellId, benchChampions, myTeam, actions } =
         this._lc.data.champSelect.session
 
-      return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
+      const firstPickActionForMe = actions.flat().find((a) => {
+        return a.type === 'pick' && !a.completed && a.actorCellId === localPlayerCellId
+      })
+
+      return {
+        benchEnabled,
+        localPlayerCellId,
+        benchChampions,
+        myTeam,
+        firstPickActionId: firstPickActionForMe?.id,
+        timerPhase: this._lc.data.champSelect.session.timer.phase,
+        subsetChampionList: this._lc.data.lobbyTeamBuilder.champSelect.subsetChampionList
+      }
     })
 
     this._mobx.reaction(
@@ -496,15 +500,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           if (prevSession) {
             benchChampions.clear()
           }
-          this._aramTracker.reset()
           return
         }
 
         if (!session.benchEnabled) {
           return
         }
-
-        this._aramTracker.track(session)
 
         // Diff
         const now = Date.now()
@@ -517,7 +518,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (!enabled) {
           if (this.state.upcomingGrab) {
             this._log.info(
-              `Closed this feature, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
+              `Auto grab disabled, canceling upcoming swap: ID: ${this.state.upcomingGrab.championId}`
             )
             this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             clearTimeout(this._grabTimerId!)
@@ -527,11 +528,41 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
+        // TODO: REFACTOR THIS
+        // 临时应对新版 ARAM 的策略
+        // BAN_PICK 阶段可以先直接选上
+        if (session.timerPhase === 'BAN_PICK' && session.firstPickActionId !== undefined) {
+          const selfChampionId = session.myTeam.find(
+            (v) => v.cellId === session.localPlayerCellId
+          )?.championId
+
+          // 0 = 未选
+          if (selfChampionId === 0) {
+            const availableChampions = session.subsetChampionList.filter(
+              (c) =>
+                this._lc.data.champSelect.currentPickableChampionIds.has(c) &&
+                !this._lc.data.champSelect.disabledChampionIds.has(c)
+            )
+
+            const pickableOnSubset = expected.filter((c) => availableChampions.includes(c))
+
+            if (pickableOnSubset.length > 0) {
+              this._lc.api.champSelect.pickOrBan(
+                pickableOnSubset[0],
+                true,
+                'pick',
+                session.firstPickActionId
+              )
+            }
+          }
+        }
+
         // 当前会话中可选的英雄
         const availableExpectedChampions = expected.filter(
           (c) =>
             this._lc.data.champSelect.currentPickableChampionIds.has(c) &&
-            !this._lc.data.champSelect.disabledChampionIds.has(c)
+            !this._lc.data.champSelect.disabledChampionIds.has(c) &&
+            !(session.timerPhase === 'BAN_PICK' && !session.subsetChampionList.includes(c)) // waitingOnFinalizationPhase
         )
         const pickableChampionsOnBench = availableExpectedChampions.filter((c) =>
           benchChampions.has(c)
@@ -648,7 +679,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        const { id, otherSummonerIndex } = trade
+        const { id } = trade
         const t = session.trades.find((t) => t.id === id)
 
         if (!t) {
@@ -672,31 +703,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             const indexHim = this.settings.benchExpectedChampions.indexOf(requesterChampionId)
 
             if (indexHim === -1 || indexInHand < indexHim) {
-              if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-                const origin = this._aramTracker.getOrigin(self.championId)
-                if (origin && origin.cellId === otherSummonerIndex) {
-                  this._sendInChat(
-                    `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
-                      from:
-                        this._lc.data.gameData.champions[from.championId]?.name || from.championId,
-                      to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
-                    })}`
-                  )
-                  this._log.info(
-                    `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
-                  )
-                } else {
-                  this._log.info(
-                    `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
-                  )
-                  this._acceptOrDeclineTrade(id, false)
-                }
-              } else {
-                this._log.info(
-                  `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
-                )
-                this._acceptOrDeclineTrade(id, false)
-              }
+              this._log.info(
+                `Declined swap request: ${from.championId} -> ${self.championId}, because target is lower priority`
+              )
+              this._acceptOrDeclineTrade(id, false)
             } else {
               this._log.info(
                 `Accepted swap request: ${from.championId} -> ${self.championId}, target has higher priority`
@@ -704,25 +714,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               this._acceptOrDeclineTrade(id, true)
             }
           } else {
-            if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-              const origin = this._aramTracker.getOrigin(self.championId)
-              if (origin && origin.cellId === otherSummonerIndex) {
-                this._sendInChat(
-                  `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
-                    from:
-                      this._lc.data.gameData.champions[from.championId]?.name || from.championId,
-                    to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
-                  })}`
-                )
-                this._log.info(
-                  `Ignored swap request: ${from.championId} -> ${self.championId}, target is owner`
-                )
-              } else {
-                this._acceptOrDeclineTrade(id, false)
-              }
-            } else {
-              this._acceptOrDeclineTrade(id, false)
-            }
+            this._acceptOrDeclineTrade(id, false)
           }
         } else {
           if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {
@@ -780,7 +772,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       await this._lc.api.chat.chatSend(
         this._lc.data.chat.conversations.championSelect.id,
         type === 'select'
-          ? `[League Akari] - ${i18next.t('grab-soon', {
+          ? `[League Akari] - ${i18next.t('auto-select-main.grab-soon', {
               seconds: (time / 1000).toFixed(1),
               champion: this._lc.data.gameData.champions[championId]?.name || championId
             })}`

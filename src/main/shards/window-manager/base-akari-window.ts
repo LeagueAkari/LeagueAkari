@@ -25,7 +25,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { getCenteredRectangle, repositionWindowIfInvisible } from './position-utils'
+import { repositionWindowIfInvisible } from './position-utils'
 
 /**
  * 具备的一些基础属性
@@ -238,6 +238,10 @@ export abstract class BaseAkariWindow<
       this.resetPosition()
     })
 
+    this._context.ipc.onCall(this._namespace, 'repositionWindowIfInvisible', () => {
+      this.repositionWindowIfInvisible()
+    })
+
     this._context.ipc.onCall(
       this._namespace,
       'setIgnoreMouseEvents',
@@ -331,13 +335,8 @@ export abstract class BaseAkariWindow<
       } else if (this._config.rememberPosition) {
         this._window.setPosition(this.state.bounds.x, this.state.bounds.y)
       } else if (this._config.rememberSize) {
-        const p = getCenteredRectangle(this.state.bounds.width, this.state.bounds.height)
-        this._window.setBounds({
-          x: p.x,
-          y: p.y,
-          width: this.state.bounds.width,
-          height: this.state.bounds.height
-        })
+        this._window.setSize(this.state.bounds.width, this.state.bounds.height)
+        this._window.center()
       }
     }
 
@@ -349,9 +348,9 @@ export abstract class BaseAkariWindow<
       dialog
         .showMessageBox(this._window!, {
           type: 'question',
-          buttons: [i18next.t('common.yes'), i18next.t('common.no')],
+          buttons: [i18next.t('yes', { ns: 'common' }), i18next.t('no', { ns: 'common' })],
           defaultId: 0,
-          title: i18next.t('common.confirm'),
+          title: i18next.t('confirm', { ns: 'common' }),
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
             ? i18next.t('windowOpenHandler.toAkari')
             : i18next.t('windowOpenHandler.toExternalLink', {
@@ -520,6 +519,14 @@ export abstract class BaseAkariWindow<
     }
 
     this._log.info(`Reset ${this._namespace} position to main display center`)
+  }
+
+  repositionWindowIfInvisible() {
+    if (this._window) {
+      repositionWindowIfInvisible(this._window)
+    }
+
+    this._log.info(`Reposition ${this._namespace} window if invisible`)
   }
 
   toggleDevtools() {

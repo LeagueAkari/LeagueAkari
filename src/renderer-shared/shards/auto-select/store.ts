@@ -22,15 +22,23 @@ export type PlaceInfo =
       puuid: string
       cellId: number
     }
-
-export type AdditionalPlaceInfo =
-  | { place: 'unknown' } // 凭空出现
-  | { place: 'reroll' } // reroll
-  | { place: 'initial' } // 初始分配
+  | {
+      place: 'candidate-cards'
+      puuid: string
+      cellId: number
+    }
+  | {
+      place: 'uncertain'
+    }
+  | {
+      place: 'candidate-cards-or-bench'
+      puuid: string
+      cellId: number
+    }
 
 export interface TrackEvent {
   championId: number
-  from: PlaceInfo | AdditionalPlaceInfo
+  from: PlaceInfo
   to: PlaceInfo
   timestamp: number
 }
@@ -53,7 +61,6 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     benchModeEnabled: false,
     benchSelectFirstAvailableChampion: false,
     benchHandleTradeEnabled: false,
-    benchHandleTradeIgnoreChampionOwner: false,
     benchExpectedChampions: [],
     grabDelaySeconds: 1,
     banEnabled: false,
@@ -76,11 +83,6 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
   const upcomingPick = shallowRef<{ championId: number; willPickAt: number } | null>(null)
   const upcomingBan = shallowRef<{ championId: number; willBanAt: number } | null>(null)
 
-  const aramTracker = shallowReactive({
-    recordedEvents: [] as TrackEvent[],
-    isJoinAfterSession: false
-  })
-
   return {
     settings,
 
@@ -89,8 +91,6 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     upcomingGrab,
     memberMe,
     upcomingPick,
-    upcomingBan,
-
-    aramTracker
+    upcomingBan
   }
 })

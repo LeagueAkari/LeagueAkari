@@ -7,6 +7,16 @@ import { useRemoteConfigStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'remote-config-main'
 
+// copied from main/shards/remote-config/repository.ts
+export interface InGameSendTemplateCatalog {
+  templates: Array<{
+    id: string
+    name: string
+    type: string
+    description: string
+  }>
+}
+
 @Shard(RemoteConfigRenderer.id)
 export class RemoteConfigRenderer {
   static readonly id = 'remote-config-renderer'

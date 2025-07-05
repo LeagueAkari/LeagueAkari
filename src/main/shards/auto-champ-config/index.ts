@@ -232,7 +232,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     const { championId, position } = meta
 
     const championName = this._lc.data.gameData.champions[championId]?.name || championId
-    const positionName = position ? i18next.t(`common.lanes.${position}`) : null
+    const positionName = position ? i18next.t(`lanes.${position}`, { ns: 'common' }) : null
 
     const primaryStyleName =
       this._lc.data.gameData.perkstyles.styles[config.primaryStyleId]?.name || config.primaryStyleId
@@ -288,7 +288,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     const { championId, position } = meta
 
     const championName = this._lc.data.gameData.champions[championId]?.name || championId
-    const positionName = position ? i18next.t(`common.lanes.${position}`) : null
+    const positionName = position ? i18next.t(`lanes.${position}`, { ns: 'common' }) : null
 
     const spell1Name =
       this._lc.data.gameData.summonerSpells[config.spell1Id]?.name || config.spell1Id

@@ -1,9 +1,13 @@
 <template>
   <NCard size="small">
     <template #header>
-      <span class="card-header-title">{{ t('TemplateEdit.title') }}</span>
+      <span class="card-header-title">{{ t('title') }}</span>
     </template>
-    <div class="template-hint" v-html="t('TemplateEdit.hint')" />
+
+    <!-- 此 Modal 内部自行处理逻辑 -->
+    <RemoteTemplatesModal v-model:show="showRemoteTemplatesModal" />
+
+    <div class="template-hint" v-html="t('hint')" />
     <div class="template-edit">
       <div class="left-list">
         <NDropdown
@@ -20,13 +24,13 @@
                 <AddIcon />
               </NIcon>
             </template>
-            {{ t('TemplateEdit.newButton') }}
+            {{ t('newButton') }}
           </NButton>
         </NDropdown>
         <NInput
           v-if="igs2.settings.templates.length > 0"
           v-model:value="filterText"
-          :placeholder="t('TemplateEdit.filterPlaceholder')"
+          :placeholder="t('filterPlaceholder')"
           class="filter-input"
           size="small"
           clearable
@@ -61,7 +65,7 @@
                 </template>
                 <div :class="$style['error-message']">
                   <div :class="$style['error-title']">
-                    {{ t('TemplateEdit.errorTitle') }}
+                    {{ t('errorTitle') }}
                   </div>
                   <div :class="$style['error-divider']"></div>
                   <div :class="$style['error-content']">{{ item.error }}</div>
@@ -72,7 +76,7 @@
         </NVirtualList>
         <div v-else class="empty">
           <div class="empty-text">
-            {{ t('TemplateEdit.noTemplate') }}
+            {{ t('noTemplate') }}
           </div>
         </div>
       </div>
@@ -84,7 +88,7 @@
               :type="currentItem.type !== 'unknown' ? 'info' : 'error'"
               :bordered="false"
             >
-              {{ t(`in-game-send-main.templateTypes.${currentItem.type}`) }}
+              {{ t(`templateTypes.${currentItem.type}`) }}
             </NTag>
             <NInput
               size="small"
@@ -113,7 +117,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('TemplateEdit.revertButton') }}</div>
+                <div>{{ t('revertButton') }}</div>
               </NPopover>
               <NPopover>
                 <template #trigger>
@@ -131,7 +135,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div>{{ t('TemplateEdit.saveButton') }}</div>
+                <div>{{ t('saveButton') }}</div>
               </NPopover>
               <NPopconfirm
                 @positive-click="handleDelete"
@@ -152,7 +156,7 @@
                     </template>
                   </NButton>
                 </template>
-                <div style="max-width: 260px">{{ t('TemplateEdit.deletePopconfirm') }}</div>
+                <div style="max-width: 260px">{{ t('deletePopconfirm') }}</div>
               </NPopconfirm>
             </div>
           </div>
@@ -163,13 +167,13 @@
             :autofocus="true"
             :indent-with-tab="true"
             :tab-size="2"
-            :extensions="[javascript(), oneDark]"
+            :extensions="[vscodeDark, javascript()]"
             @change="handleChange"
           />
         </template>
         <template v-else>
           <div class="empty">
-            <div class="empty-text">{{ t('TemplateEdit.noTemplateSelected') }}</div>
+            <div class="empty-text">{{ t('noTemplateSelected') }}</div>
           </div>
         </template>
       </div>
@@ -179,10 +183,10 @@
 
 <script lang="ts" setup>
 import { javascript } from '@codemirror/lang-javascript'
-import { oneDark } from '@codemirror/theme-one-dark'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
+import { vscodeDark } from '@uiw/codemirror-theme-vscode'
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -209,9 +213,10 @@ import {
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
+import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
 import { DROPDOWN_OVERRIDES } from './style-overrides'
 
-const { t } = useTranslation()
+const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
@@ -221,15 +226,19 @@ const activeItemId = ref<string | null>(null)
 
 const dropdownOptions = computed(() => [
   {
-    label: t('in-game-send-main.templatePresets.empty'),
+    label: t('templatePresets.empty'),
     key: 'empty'
+  },
+  {
+    label: t('templatePresets.ongoing-game'),
+    key: 'ongoing-game-default'
   },
   {
     type: 'divider'
   },
   {
-    label: t('in-game-send-main.templatePresets.ongoing-game'),
-    key: 'ongoing-game-default'
+    label: t('templatePresets.remote'),
+    key: 'remote'
   }
 ])
 
@@ -243,11 +252,19 @@ const handleDropdownSelect = async (key: string) => {
     return
   }
 
-  const item = await igs.createPresetTemplate(key)
-  if (item) {
-    updateActiveItem(item.id)
+  if (key === 'ongoing-game-default') {
+    const item = await igs.createPresetTemplate(key)
+    if (item) {
+      updateActiveItem(item.id)
+    }
+  }
+
+  if (key === 'remote') {
+    showRemoteTemplatesModal.value = true
   }
 }
+
+const showRemoteTemplatesModal = ref(false)
 
 const isEditingName = ref(false)
 const tempName = ref('')
@@ -309,7 +326,7 @@ const handleRevert = () => {
 const handleSave = () => {
   if (currentItem.value) {
     igs.updateTemplate(currentItem.value.id, { code: tempCode.value })
-    message.success(() => t('TemplateEdit.saveSuccess', { name: currentItem.value!.name }))
+    message.success(() => t('saveSuccess', { name: currentItem.value!.name }))
   }
 }
 
@@ -321,7 +338,7 @@ const handleDelete = () => {
   if (currentItem.value) {
     let name = currentItem.value.name
     igs.removeTemplate(currentItem.value.id)
-    message.success(() => t('TemplateEdit.deleteSuccess', { name }))
+    message.success(() => t('deleteSuccess', { name }))
   }
 }
 

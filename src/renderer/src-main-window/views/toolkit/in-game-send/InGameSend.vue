@@ -6,26 +6,26 @@
         <TemplateEdit style="margin-top: 8px" />
         <NCard size="small" style="margin-top: 8px">
           <template #header>
-            <span class="card-header-title">{{ t('InGameSend.settings.title') }}</span>
+            <span class="card-header-title">{{ t('settings.title') }}</span>
           </template>
           <ControlItem
             :label-width="260"
             :disabled="!as.isAdministrator"
             class="control-item-margin"
-            :label="t('InGameSend.settings.cancelShortcut.label')"
-            :label-description="t('InGameSend.settings.cancelShortcut.description')"
+            :label="t('settings.cancelShortcut.label')"
+            :label-description="t('settings.cancelShortcut.description')"
           >
             <ShortcutSelector
-              :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
+              :target-id="InGameSendRenderer.CANCEL_SHORTCUT_TARGET_ID"
               @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
             />
           </ControlItem>
           <ControlItem
             :label-width="260"
             class="control-item-margin"
-            :label="t('InGameSend.settings.sendInterval.label')"
-            :label-description="t('InGameSend.settings.sendInterval.description')"
+            :label="t('settings.sendInterval.label')"
+            :label-description="t('settings.sendInterval.description')"
           >
             <NInputNumber
               @update:value="(val) => ig.setSendInterval(val || 65)"
@@ -60,7 +60,7 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import SendableItemEdit from './SendableItemEdit.vue'
 import TemplateEdit from './TemplateEdit.vue'
 
-const { t } = useTranslation()
+const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend' })
 
 const as = useAppCommonStore()
 const igs = useInGameSendStore()

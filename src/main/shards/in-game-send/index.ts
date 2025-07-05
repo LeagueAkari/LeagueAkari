@@ -1,4 +1,4 @@
-import { input } from '@leagueakari/league-akari-addons'
+import { input, tools } from '@leagueakari/league-akari-addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
@@ -10,12 +10,14 @@ import fs from 'node:fs'
 import vm from 'node:vm'
 
 import { AppCommonMain } from '../app-common'
+import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { OngoingGameMain } from '../ongoing-game'
+import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
@@ -56,15 +58,16 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private _currentSendController: AbortController | null = null
 
   constructor(
-    private readonly _settingFactory: SettingFactoryMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _kbd: KeyboardShortcutsMain,
     private readonly _og: OngoingGameMain,
     private readonly _lc: LeagueClientMain,
     private readonly _shared: SharedGlobalShard,
-    private readonly _app: AppCommonMain
+    private readonly _app: AppCommonMain,
+    private readonly _rc: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(InGameSendMain.id)
     this._setting = _settingFactory.register(
@@ -137,6 +140,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
         'Current phase does not support sending messages',
         this._og.state.queryStage.phase
       )
+      return
+    }
+
+    if (this._og.state.queryStage.phase === 'in-game' && !GameClientMain.isGameClientForeground()) {
+      this._log.warn('Game client is not foreground')
       return
     }
 
@@ -412,6 +420,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
         return this._getDryRunResult(templateId, target)
       }
     )
+
+    this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
+      return this._rc.repo.getInGameSendTemplateCatalog()
+    })
+
+    this._ipc.onCall(InGameSendMain.id, 'downloadTemplateFromRemote', (_, id: string) => {
+      return this._downloadTemplateFromRemote(id)
+    })
   }
 
   private _handleTemplateAutoDeprecation() {
@@ -529,7 +545,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     template: TemplateDef
   ): [boolean, any | null, JS_TEMPLATE_CHECK_RESULT | Error | null] {
     this._vmContexts[template.id] = vm.createContext({
-      ...this._getAkariContext(),
+      ...this._getAkariContext(template.id),
       template
     })
 
@@ -587,6 +603,25 @@ export class InGameSendMain implements IAkariShardInitDispose {
       default:
         return null
     }
+  }
+
+  private async _downloadTemplateFromRemote(id: string) {
+    const catalog = await this._rc.repo.getInGameSendTemplateCatalog()
+    const template = catalog.templates.find((t) => t.id === id)
+
+    if (!template) {
+      throw new Error(`Template ${id} not found`)
+    }
+
+    const { data: code } = await this._rc.repo.getRawContent(template.path)
+
+    this._createTemplate({
+      name: template.name,
+      code,
+      type: template.type
+    })
+
+    return template
   }
 
   private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }): TemplateEnv {
@@ -663,7 +698,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    * 在提供完全的控制权的同时, 危险程度也相应提高
    * @returns
    */
-  private _getAkariContext() {
+  private _getAkariContext(templateId: string) {
     return {
       MAX_VERSION_SUPPORTED: 10,
       require,
@@ -671,6 +706,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       akariManager: this._shared.manager,
       console,
       module,
+      templateId,
       __filename,
       __dirname,
       mainGlobal: global,
@@ -699,7 +735,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     let mutated = false
     if (item.sendAllShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(all)) {
+      const r = this._kbd.getRegistrationByTargetId(all)
+
+      if (!r || (r && r.shortcutId !== item.sendAllShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(all)
+        }
+
         try {
           this._kbd.register(all, item.sendAllShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'all')
@@ -715,7 +757,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     if (item.sendAllyShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(ally)) {
+      const r = this._kbd.getRegistrationByTargetId(ally)
+
+      if (!r || (r && r.shortcutId !== item.sendAllyShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(ally)
+        }
+
         try {
           this._kbd.register(ally, item.sendAllyShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'ally')
@@ -731,7 +779,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     if (item.sendEnemyShortcut) {
-      if (!this._kbd.getRegistrationByTargetId(enemy)) {
+      const r = this._kbd.getRegistrationByTargetId(enemy)
+
+      if (!r || (r && r.shortcutId !== item.sendEnemyShortcut)) {
+        if (r) {
+          this._kbd.unregisterByTargetId(enemy)
+        }
+
         try {
           this._kbd.register(enemy, item.sendEnemyShortcut, 'last-active', () => {
             this._performSendableItemSend(item.id, 'enemy')

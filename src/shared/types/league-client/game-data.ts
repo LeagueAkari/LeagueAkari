@@ -414,7 +414,7 @@ export interface Augment2 {
   overlays: Overlay[]
 }
 
-interface Overlay {
+export interface AugmentOverlay {
   centeredLCOverlayPath: string
   uncenteredLCOverlayPath: string
   socialCardLCOverlayPath: string

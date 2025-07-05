@@ -286,9 +286,18 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
         for (const p of riotInstallations) {
           if (await this._maybeOfficialRiotClient(p)) {
-            this.state.setOfficialRiotClientExecutablePath(p)
-            this._log.info('Detected official RiotClient installation', p)
-            break
+            try {
+              await fs.promises.access(p)
+              this.state.setOfficialRiotClientExecutablePath(p)
+              this._log.info('Detected official RiotClient installation', p)
+              break // only one official RiotClient installation is allowed
+            } catch (error) {
+              this._log.info(
+                'Detected RiotClient installation but cannot access, possibly not exists',
+                p
+              )
+              continue
+            }
           }
         }
       }

@@ -18,6 +18,8 @@ export class CdTimerWindowSettings {
    */
   timerType: 'countdown' | 'countup' = 'countdown'
 
+  reverseAdjustmentDirection: boolean = false
+
   setPinned(pinned: boolean) {
     this.pinned = pinned
   }
@@ -36,6 +38,10 @@ export class CdTimerWindowSettings {
 
   setTimerType(timerType: 'countdown' | 'countup') {
     this.timerType = timerType
+  }
+
+  setReverseAdjustmentDirection(reverseAdjustmentDirection: boolean) {
+    this.reverseAdjustmentDirection = reverseAdjustmentDirection
   }
 
   constructor() {

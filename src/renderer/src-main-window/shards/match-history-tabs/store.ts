@@ -2,6 +2,7 @@ import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
+import { ReplayMetadata } from '@shared/types/league-client/replays'
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
@@ -34,6 +35,8 @@ export interface GameDataState {
 
 export interface MatchHistoryPage {
   games: GameDataState[]
+
+  replayMetadata: Record<number, ReplayMetadata>
 
   /** 上次拉取战绩的时间 */
   lastUpdate?: number

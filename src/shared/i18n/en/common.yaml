@@ -1,0 +1,138 @@
+appName: League Akari
+default: Default
+
+yes: yes
+no: no
+confirm: Confirm
+na: N/A
+
+summonerPlaceholder: Summoner {{index}}
+summoner: Summoner
+
+lanes:
+  all: None
+  ALL: None
+  top: Top
+  jungle: Jungle
+  mid: Middle
+  middle: Middle
+  bot: Bottom
+  bottom: Bottom
+  support: Support
+  utility: Support
+  TOP: Top
+  JUNGLE: Jungle
+  MID: Middle
+  BOT: Bottom
+  MIDDLE: Middle
+  BOTTOM: Bottom
+  SUPPORT: Support
+  UTILITY: Support
+
+positionAssignmentReason:
+  FILL_SECONDARY: Fill Primary
+  FILL_PRIMARY: Fill Secondary
+  PRIMARY: Primary
+  SECONDARY: Secondary
+  AUTOFILL: Autofill
+  AUTOFILL_SHORT: Fill
+
+teams:
+  all: All
+  100: Blue Team
+  200: Red Team
+  unknown: Unknown
+  our: Our
+  their: Their
+  our-1: Our (Blue Team)
+  our-2: Our (Red Team)
+  their-1: Their (Blue Team)
+  their-2: Their (Red Team)
+
+queueTypes:
+  RANKED_SOLO_5x5: Ranked Solo/Duo
+  RANKED_FLEX_SR: Ranked Flex
+  NORMAL: Normal SR
+  ARAM_UNRANKED_5x5: ARAM
+  CHERRY: Arena
+  URF: URF
+  RANKED_FLEX_TT: Ranked Flex TT
+  NORMAL_TFT: TFT
+  RANKED_TFT: TFT Ranked
+  RANKED_TFT_TURBO: TFT Turbo
+  RANKED_TFT_DOUBLE_UP: TFT Double Up
+
+gameModes:
+  CLASSIC: Classic
+  ARAM: ARAM
+  URF: URF
+  TFT: TFT
+
+sgpMatchHistoryTags:
+  all: All Modes
+  current: Current Mode
+  q_420: Ranked Solo/Duo
+  q_430: Normal SR
+  q_440: Ranked Flex
+  q_450: ARAM
+  q_480: Swiftplay
+  q_490: Quickplay
+  q_900: ARURF
+  q_1700: Arena
+  q_1900: URF
+  q_2300: Brawl
+
+tiers:
+  UNRANKED: UNRANKED
+  IRON: IRON
+  BRONZE: BRONZE
+  SILVER: SILVER
+  GOLD: GOLD
+  PLATINUM: PLATINUM
+  EMERALD: EMERALD
+  DIAMOND: DIAMOND
+  MASTER: MASTER
+  GRANDMASTER: GRANDMASTER
+  CHALLENGER: CHALLENGER
+
+shortTiers:
+  UNRANKED: N/A
+  IRON: IRON
+  BRONZE: BRON
+  SILVER: SILV
+  GOLD: GOLD
+  PLATINUM: PLAT
+  EMERALD: EMERD
+  DIAMOND: DIAMD
+  MASTER: MASTR
+  GRANDMASTER: GM
+  CHALLENGER: CHALL
+
+sgpServers:
+  TENCENT_HN10: Black Rose
+  TENCENT_HN1: Ionia
+  TENCENT_NJ100: League 1
+  TENCENT_GZ100: League 2
+  TENCENT_CQ100: League 3
+  TENCENT_TJ100: League 4
+  TENCENT_TJ101: League 5
+  TENCENT_BGP2: Summit
+  TENCENT_PBE: Tencent PBE
+  TW2: Taiwan
+  SG2: Singapore
+  PH2: Philippines
+  VN2: Vietnam
+  PBE: PBE
+  EUN: Europe NE
+  EUW: Europe West
+  KR: Korea
+  BR1: Brazil
+  LA1: Latin America
+  LA2: Latin America
+  OC1: Oceania
+  TR1: Turkey
+  RU: Russia
+  JP1: Japan
+
+champions:
+  bravery: Bravery

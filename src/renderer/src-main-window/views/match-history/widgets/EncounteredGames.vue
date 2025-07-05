@@ -3,15 +3,14 @@
     <div class="header">
       <span class="title">{{ t('EncounteredGames.title') }} ({{ total }})</span>
       <div class="pagination" v-if="total > pageSize">
-        <NButton secondary circle size="tiny" :disabled="page === 1 || loading" @click="page--">
+        <NButton quaternary size="tiny" :disabled="page === 1 || loading" @click="page--">
           <template #icon>
             <NIcon><ArrowLeftIcon /></NIcon>
           </template>
         </NButton>
         <span class="page-info"> {{ page }} / {{ Math.ceil(total / pageSize) }} </span>
         <NButton
-          secondary
-          circle
+          quaternary
           size="tiny"
           :disabled="page === Math.ceil(total / pageSize) || loading"
           @click="page++"

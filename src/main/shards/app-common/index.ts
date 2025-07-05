@@ -4,6 +4,7 @@ import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 import os from 'node:os'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
@@ -26,7 +27,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _settingFactory: SettingFactoryMain
+    _settingFactory: SettingFactoryMain,
+    private readonly _protocol: AkariProtocolMain
   ) {
     this._setting = _settingFactory.register(
       AppCommonMain.id,
@@ -200,5 +202,63 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {
       return this.getRuntimeInfo()
     })
+
+    this._ipc.onCall(AppCommonMain.id, 'quit', () => {
+      app.quit()
+    })
+
+    this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {
+      this._ipc.sendEvent(AppCommonMain.id, 'renderer-link', req.url)
+
+      const u = new URL(req.url)
+
+      if (u.pathname === '/evaluate') {
+        const target = u.searchParams.get('target')
+        const code = u.searchParams.get('code')
+
+        if (target && code) {
+          this.evaluate(target, code)
+        }
+      }
+
+      return new Response(null, { status: 204 })
+    })
+  }
+
+  /**
+   * execute code in certain renderer window
+   * very dangerous, should be used only in some extreme cases. e.g opt-in bugfixes
+   * @param target certain renderer window
+   * @param code pure js code
+   * @returns
+   */
+  evaluate(target: string, code: string) {
+    const wm = this._shared.manager.getInstance('window-manager-main')
+
+    if (!wm) {
+      return
+    }
+
+    switch (target) {
+      case 'main-window':
+        wm.mainWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'aux-window':
+        wm.auxWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'cd-timer-window':
+        wm.cdTimerWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'ongoing-game-window':
+        wm.ongoingGameWindow.window?.webContents.executeJavaScript(code)
+        break
+
+      case 'opgg-window':
+        wm.opggWindow.window?.webContents.executeJavaScript(code)
+        break
+    }
   }
 }

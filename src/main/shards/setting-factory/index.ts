@@ -353,9 +353,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       !Array.isArray(content.data) ||
       !content.data.every(
         (v: any) =>
-          typeof v === 'object' &&
-          typeof v.key === 'string' &&
-          typeof v.value === 'string'
+          typeof v === 'object' && typeof v.key === 'string' && typeof v.value !== 'undefined'
       )
     ) {
       throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsData')

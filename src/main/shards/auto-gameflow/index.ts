@@ -498,7 +498,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             this._ipc.sendEvent(AutoGameflowMain.id, 'error-auto-honor', formatError(error))
             this._lc.api.playerNotifications
               .createTitleDetailsNotification(
-                i18next.t('common.appName'),
+                i18next.t('appName', { ns: 'common' }),
                 i18next.t('auto-gameflow-main.error-auto-honor', {
                   reason: formatErrorMessage(error)
                 })
@@ -645,7 +645,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-accept-match', formatError(error))
       this._lc.api.playerNotifications
         .createTitleDetailsNotification(
-          i18next.t('common.appName'),
+          i18next.t('appName', { ns: 'common' }),
           i18next.t('auto-gameflow-main.error-accept-match', {
             reason: formatErrorMessage(error)
           })
@@ -670,7 +670,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-matchmaking', formatError(error))
       this._lc.api.playerNotifications
         .createTitleDetailsNotification(
-          i18next.t('common.appName'),
+          i18next.t('appName', { ns: 'common' }),
           i18next.t('auto-gameflow-main.error-matchmaking', {
             reason: formatErrorMessage(error)
           })

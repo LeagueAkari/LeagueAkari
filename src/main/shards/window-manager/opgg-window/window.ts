@@ -30,6 +30,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       htmlEntry: AkariOpggWindow.HTML_ENTRY,
       rememberPosition: true,
       rememberSize: true,
+      repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled },
         autoShow: { default: settings.autoShow },

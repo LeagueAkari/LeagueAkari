@@ -128,6 +128,12 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     progress: null as InitializationProgress | null
   }
 
+  const lobbyTeamBuilder = {
+    champSelect: {
+      subsetChampionList: shallowRef<number[]>([])
+    }
+  } as const
+
   return {
     gameData,
     champSelect,
@@ -138,9 +144,9 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     summoner,
     login,
     matchmaking,
+    lobbyTeamBuilder,
 
     initialization,
-
     settings,
 
     connectionState,

@@ -11,7 +11,7 @@ export function useStreamerModeMaskedText() {
       return getNameFromYuriyuri(seed, app.settings.locale)
     }
 
-    return t('common.summonerPlaceholder', { index: index + 1 })
+    return t('summonerPlaceholder', { index: index + 1, ns: 'common' })
   }
 
   /**

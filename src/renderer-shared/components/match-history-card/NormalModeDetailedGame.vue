@@ -15,7 +15,9 @@
           <tr>
             <th class="header-info">
               {{ participants[0].stats.win ? t('DetailedGame.win') : t('DetailedGame.lose') }} ({{
-                teamId === 100 ? t('common.teams.100') : t('common.teams.200')
+                teamId === 100
+                  ? t('teams.100', { ns: 'common' })
+                  : t('teams.200', { ns: 'common' })
               }})
             </th>
             <th class="header-kda">{{ t('DetailedGame.header.kda') }}</th>

@@ -60,6 +60,7 @@ import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RewardsGrant } from '@shared/types/league-client/rewards'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { useTranslation } from 'i18next-vue'
@@ -73,7 +74,10 @@ const TARGET_REWARD_GRANT_STATUS = 'PENDING_SELECTION'
 const { t } = useTranslation()
 
 const lc = useInstance(LeagueClientRenderer)
+const log = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
+
+const COMP_NAMESPACE = 'comp:RewardClaimTool'
 
 const message = useMessage()
 
@@ -163,6 +167,8 @@ const claim = async () => {
           rewardGroupId: grant.rewardGroup.id,
           selections: chosen.map((c) => c.id)
         })
+
+        log.info(COMP_NAMESPACE, `claimed ${chosen.map((c) => c.localizations.title).join(', ')}`)
 
         message.success(() =>
           t('RewardClaimTool.claimed', {

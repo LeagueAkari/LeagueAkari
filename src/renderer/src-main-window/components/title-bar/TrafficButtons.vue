@@ -134,9 +134,9 @@ watch(
 
 <style lang="less" scoped>
 .traffic-buttons {
+  position: relative;
   height: 100%;
   display: flex;
-  z-index: 10000000;
   -webkit-app-region: no-drag;
 
   &.blurred {

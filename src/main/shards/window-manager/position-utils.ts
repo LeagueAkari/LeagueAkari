@@ -30,20 +30,18 @@ export function rectDistance(rect1: Rectangle, rect2: Rectangle) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
+// 由于 chromium 的限制, 设置 bounds 并不会在最小化时生效。所以需要使用监听器来处理
+const pendingRepositionWindows = new WeakSet<BrowserWindow>()
+
 export function repositionWindowIfInvisible(win: BrowserWindow) {
   if (!win || win.isDestroyed()) return
 
   const winBounds = win.getBounds()
-  // 如果窗口至少部分可见，则不做处理
-  if (isWindowPartiallyVisible(win)) {
-    return
-  }
 
   const displays = screen.getAllDisplays()
   let nearestDisplay: Display | null = null
   let minDistance = Infinity
 
-  // 找到与窗口矩形距离最近的显示器工作区
   for (const display of displays) {
     const distance = rectDistance(winBounds, display.workArea)
     if (distance < minDistance) {
@@ -51,39 +49,52 @@ export function repositionWindowIfInvisible(win: BrowserWindow) {
       nearestDisplay = display
     }
   }
-
   if (!nearestDisplay) return
 
   const workArea = nearestDisplay.workArea
-  let newX = winBounds.x
-  let newY = winBounds.y
 
-  // 调整 x 坐标：
-  // 如果窗口宽度小于显示区域宽度，则保证窗口水平完整显示
-  if (winBounds.width <= workArea.width) {
-    // 如果窗口左侧在显示区域左边之外，则移动到 workArea.x
-    // 如果窗口右侧超出显示区域，则将 x 移动到 workArea.x + workArea.width - winBounds.width
-    newX = Math.min(
-      Math.max(winBounds.x, workArea.x),
-      workArea.x + workArea.width - winBounds.width
-    )
+  const fitsHorizontally = winBounds.width <= workArea.width
+  const fitsVertically = winBounds.height <= workArea.height
+  const sizeOK = fitsHorizontally && fitsVertically
+  const visibleEnough = isWindowPartiallyVisible(win)
+
+  if (visibleEnough && sizeOK) {
+    return
+  }
+
+  const newWidth = Math.min(winBounds.width, workArea.width)
+  const newHeight = Math.min(winBounds.height, workArea.height)
+
+  let newX: number
+  let newY: number
+
+  // Horizontal adjustment
+  if (newWidth < workArea.width) {
+    newX = Math.min(Math.max(winBounds.x, workArea.x), workArea.x + workArea.width - newWidth)
   } else {
-    // 如果窗口比工作区宽，则直接左对齐
+    // Window is as wide as the workArea → left‑align it.
     newX = workArea.x
   }
 
-  // 同理调整 y 坐标
-  if (winBounds.height <= workArea.height) {
-    newY = Math.min(
-      Math.max(winBounds.y, workArea.y),
-      workArea.y + workArea.height - winBounds.height
-    )
+  // Vertical adjustment
+  if (newHeight < workArea.height) {
+    newY = Math.min(Math.max(winBounds.y, workArea.y), workArea.y + workArea.height - newHeight)
   } else {
+    // Window is as tall as the workArea → top‑align it.
     newY = workArea.y
   }
 
-  // 移动窗口到新的位置
-  win.setPosition(newX, newY)
+  if (win.isMinimized()) {
+    if (!pendingRepositionWindows.has(win)) {
+      pendingRepositionWindows.add(win)
+      win.once('restore', () => {
+        pendingRepositionWindows.delete(win)
+        win.setBounds({ x: newX, y: newY, width: newWidth, height: newHeight })
+      })
+    }
+  } else {
+    win.setBounds({ x: newX, y: newY, width: newWidth, height: newHeight })
+  }
 }
 
 export function intersectionArea(rect1: Rectangle, rect2: Rectangle) {

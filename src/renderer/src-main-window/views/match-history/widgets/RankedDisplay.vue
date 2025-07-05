@@ -1,7 +1,12 @@
 <template>
   <div v-if="rankedEntry" class="ranked-wrapper" :class="{ small: small }">
     <div class="ranked-type">
-      {{ t(`common.queueTypes.${rankedEntry.queueType}`, rankedEntry.queueType) }}
+      {{
+        t(`queueTypes.${rankedEntry.queueType}`, {
+          defaultValue: rankedEntry.queueType,
+          ns: 'common'
+        })
+      }}
     </div>
     <div class="ranked-display">
       <div class="ranked-image-container" v-if="!small">
@@ -113,7 +118,10 @@ const formatTier = computed(() => {
   }
 
   const tier = props.rankedEntry.tier
-    ? t(`common.tiers.${props.rankedEntry.tier}`)
+    ? t(`tiers.${props.rankedEntry.tier}`, {
+        defaultValue: props.rankedEntry.tier,
+        ns: 'common'
+      })
     : props.rankedEntry.tier
 
   if (tier === '' || tier === 'NA') {
@@ -135,7 +143,10 @@ const formatPreviousTier = computed(() => {
   }
 
   const tier = props.rankedEntry.previousSeasonHighestTier
-    ? t(`common.tiers.${props.rankedEntry.previousSeasonHighestTier}`)
+    ? t(`tiers.${props.rankedEntry.previousSeasonHighestTier}`, {
+        defaultValue: props.rankedEntry.previousSeasonHighestTier,
+        ns: 'common'
+      })
     : props.rankedEntry.previousSeasonHighestTier
 
   if (tier === '' || tier === 'NA') {

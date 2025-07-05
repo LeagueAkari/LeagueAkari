@@ -367,7 +367,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     )
 
     this._createNotification(
-      i18next.t('common.appName'),
+      i18next.t('appName', { ns: 'common' }),
       i18next.t('self-update-main.updateOnNextStartup')
     )
 

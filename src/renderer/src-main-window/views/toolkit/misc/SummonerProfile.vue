@@ -25,8 +25,9 @@
           @click="handleApplyToProfile"
           :disabled="!currentSkinId"
           :loading="isProceeding"
-          >{{ t('SummonerProfile.skinSelectModal.button') }}</NButton
         >
+          {{ t('SummonerProfile.skinSelectModal.button') }}
+        </NButton>
       </div>
       <NSelect
         filterable
@@ -36,15 +37,16 @@
         v-model:value="currentSkinId"
         size="small"
         :filter="(a, b) => isNameMatch(a, b.label as string)"
-      ></NSelect>
+      />
       <NSelect
         filterable
         style="width: 340px"
+        :render-option="renderOption"
         v-if="currentAugmentOptions.length >= 1"
         :options="currentAugmentOptions"
         v-model:value="currentAugmentId"
         size="small"
-      ></NSelect>
+      />
     </NModal>
     <ControlItem
       class="control-item-margin"
@@ -57,8 +59,9 @@
         type="primary"
         @click="isModalShow = true"
         :disabled="lcs.connectionState !== 'connected'"
-        >{{ t('SummonerProfile.profileBackground.button') }}</NButton
       >
+        {{ t('SummonerProfile.profileBackground.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -71,8 +74,9 @@
         @click="handleUpdatePr"
         :loading="isUpdating"
         size="small"
-        >{{ t('SummonerProfile.bannerAccent.button') }}</NButton
       >
+        {{ t('SummonerProfile.bannerAccent.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -92,8 +96,9 @@
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
         size="small"
-        >{{ t('SummonerProfile.prestigeCrest.button') }}</NButton
       >
+        {{ t('SummonerProfile.prestigeCrest.button') }}
+      </NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
@@ -106,8 +111,24 @@
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
         size="small"
-        >{{ t('SummonerProfile.token.button') }}</NButton
       >
+        {{ t('SummonerProfile.token.button') }}
+      </NButton>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      :label-description="t('SummonerProfile.emotes.description')"
+      :label="t('SummonerProfile.emotes.label')"
+      :label-width="260"
+    >
+      <NButton
+        :disabled="lcs.connectionState !== 'connected'"
+        @click="handleClearEmotes"
+        :loading="isClearingEmotes"
+        size="small"
+      >
+        {{ t('SummonerProfile.emotes.button') }}
+      </NButton>
     </ControlItem>
   </NCard>
 </template>
@@ -119,7 +140,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
-import { ChampSkin } from '@shared/types/league-client/game-data'
+import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -131,7 +152,7 @@ import {
   SelectOption,
   useMessage
 } from 'naive-ui'
-import { VNode, VNodeChild, computed, h, ref, watch } from 'vue'
+import { VNode, computed, h, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 
@@ -168,30 +189,44 @@ const skinOptions = computed(() => {
   const arr: {
     label: string
     value: number
-    url: string
-    augments?: { label: string; value: string }[]
+    imgUrl: string
+    augments?: { label: string; value: string; imgUrl: string; overlays: AugmentOverlay[] }[]
   }[] = []
 
   const skinSet = new Set<number>()
   skinList.value.forEach((v) => {
-    const augOptions1: any[] = []
+    const augOptions1: {
+      label: string
+      value: string
+      imgUrl: string
+      overlays: AugmentOverlay[]
+    }[] = []
     if (v.skinAugments && v.skinAugments.augments) {
       for (const au of v.skinAugments.augments) {
-        augOptions1.push({
-          label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-          value: au.contentId
-        })
+        if (au.overlays) {
+          augOptions1.push({
+            label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+            imgUrl: v.uncenteredSplashPath,
+            value: au.contentId,
+            overlays: au.overlays
+          })
+        }
       }
     }
 
     if (augOptions1.length) {
-      augOptions1.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
+      augOptions1.unshift({
+        label: t('SummonerProfile.skinSelectModal.unset'),
+        value: '',
+        imgUrl: '',
+        overlays: []
+      })
     }
 
     arr.push({
       label: v.name,
       value: v.id,
-      url: v.uncenteredSplashPath || v.splashPath,
+      imgUrl: v.uncenteredSplashPath,
       augments: augOptions1
     })
 
@@ -201,24 +236,38 @@ const skinOptions = computed(() => {
     if (v.questSkinInfo && v.questSkinInfo.tiers) {
       v.questSkinInfo.tiers.forEach((ti) => {
         if (!skinSet.has(ti.id)) {
-          const augOptions2: any[] = []
+          const augOptions2: {
+            label: string
+            value: string
+            imgUrl: string
+            overlays: AugmentOverlay[]
+          }[] = []
           if (ti.skinAugments && ti.skinAugments.augments) {
             for (const au of ti.skinAugments.augments) {
-              augOptions2.push({
-                label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
-                value: au.contentId
-              })
+              if (au.overlays) {
+                augOptions2.push({
+                  label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+                  value: au.contentId,
+                  imgUrl: ti.uncenteredSplashPath,
+                  overlays: au.overlays
+                })
+              }
             }
           }
 
           if (augOptions2.length) {
-            augOptions2.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
+            augOptions2.unshift({
+              label: t('SummonerProfile.skinSelectModal.unset'),
+              value: '',
+              imgUrl: '',
+              overlays: []
+            })
           }
 
           arr.push({
             label: ti.name,
             value: ti.id,
-            url: ti.uncenteredSplashPath || ti.splashPath,
+            imgUrl: ti.uncenteredSplashPath,
             augments: augOptions2
           })
           skinSet.add(ti.id)
@@ -263,7 +312,7 @@ const renderLabel = (option: SelectOption) => {
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
   return h(
     NTooltip,
-    { placement: 'right', delay: 300, animated: true, raw: true },
+    { placement: 'right', delay: 300, animated: true, raw: true, disabled: !option.imgUrl },
     {
       trigger: () => node,
       default: () =>
@@ -271,23 +320,45 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
           'div',
           {
             style: {
+              position: 'relative',
               height: '160px',
+              minWidth: '280px',
               overflow: 'hidden',
               borderRadius: '4px',
               boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
               backgroundColor: 'rgba(0, 0, 0, 0.3)'
             }
           },
-          h(LcuImage, {
-            src: option.url as string,
-            cache: false,
-            style: {
-              height: '100%',
-              minWidth: '280px',
-              objectFit: 'cover',
-              overflow: 'hidden'
-            }
-          })
+          [
+            h(LcuImage, {
+              src: option.imgUrl as string,
+              cache: false,
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                overflow: 'hidden'
+              }
+            }),
+            ((option.overlays as AugmentOverlay[]) || []).map((o) =>
+              h(LcuImage, {
+                src: o.uncenteredLCOverlayPath,
+                cache: false,
+                style: {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  overflow: 'hidden'
+                }
+              })
+            )
+          ]
         )
     }
   )
@@ -329,10 +400,10 @@ const handleApplyToProfile = async () => {
     if (currentAugmentId.value !== undefined) {
       await lc.api.summoner.setSummonerBackgroundAugments(currentAugmentId.value)
     }
-    message.success(t('SummonerProfile.commonSuccess'), { duration: 1000 })
+    message.success(() => t('SummonerProfile.commonSuccess'), { duration: 1000 })
   } catch (error) {
     console.warn(error)
-    message.warning(t('SummonerProfile.commonFailed'), { duration: 1000 })
+    message.warning(() => t('SummonerProfile.commonFailed'), { duration: 1000 })
   } finally {
     isProceeding.value = false
   }
@@ -349,9 +420,9 @@ const handleUpdatePr = async () => {
   try {
     isUpdating.value = true
     await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isUpdating.value = false
@@ -375,9 +446,9 @@ const handleRemovePrestigeCrest = async () => {
       preferredBannerType: current.data.bannerType,
       selectedPrestigeCrest: FIXED_PRESTIGE_CREST
     })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingPrestigeCrest.value = false
@@ -397,12 +468,55 @@ const handleRemoveTokens = async () => {
       challengeIds: [],
       bannerAccent: (await lc.api.chat.getMe()).data.lol?.bannerIdSelected
     })
-    message.success(t('SummonerProfile.commonSuccess'))
+    message.success(() => t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(t('SummonerProfile.commonFailed'))
+    message.warning(() => t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingTokens.value = false
+  }
+}
+
+const isClearingEmotes = ref(false)
+const handleClearEmotes = async () => {
+  if (isClearingEmotes.value) {
+    return
+  }
+
+  try {
+    isClearingEmotes.value = true
+
+    const { data } = await lc.api.loadouts.getAccountScopeLoadouts()
+
+    if (!data.length) {
+      message.warning(() => t('SummonerProfile.commonFailed'))
+      return
+    }
+
+    const loadoutId = data[0].id
+
+    await lc.api.loadouts.setEmotes(loadoutId, {
+      EMOTES_ACE: -1,
+      EMOTES_FIRST_BLOOD: -1,
+      EMOTES_VICTORY: -1,
+      EMOTES_WHEEL_CENTER: -1,
+      EMOTES_WHEEL_UPPER: -1,
+      EMOTES_WHEEL_RIGHT: -1,
+      EMOTES_WHEEL_UPPER_RIGHT: -1,
+      EMOTES_WHEEL_UPPER_LEFT: -1,
+      EMOTES_WHEEL_LOWER: -1,
+      EMOTES_START: -1,
+      EMOTES_WHEEL_LEFT: -1,
+      EMOTES_WHEEL_LOWER_RIGHT: -1,
+      EMOTES_WHEEL_LOWER_LEFT: -1
+    })
+
+    message.success(() => t('SummonerProfile.commonSuccess'))
+  } catch (error) {
+    message.warning(() => t('SummonerProfile.commonFailed'))
+    console.warn(error)
+  } finally {
+    isClearingEmotes.value = false
   }
 }
 </script>

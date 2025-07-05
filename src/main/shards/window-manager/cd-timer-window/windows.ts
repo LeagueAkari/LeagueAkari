@@ -39,10 +39,12 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       htmlEntry: AkariCdTimerWindow.HTML_ENTRY,
       rememberPosition: true,
       rememberSize: false,
+      repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut },
-        timerType: { default: settings.timerType }
+        timerType: { default: settings.timerType },
+        reverseAdjustmentDirection: { default: settings.reverseAdjustmentDirection }
       },
       browserWindowOptions: {
         title: AkariCdTimerWindow.TITLE,
@@ -226,6 +228,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'showShortcut', 'timerType'] as const
+    return ['enabled', 'showShortcut', 'timerType', 'reverseAdjustmentDirection'] as const
   }
 }

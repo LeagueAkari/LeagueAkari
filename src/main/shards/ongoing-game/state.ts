@@ -248,12 +248,18 @@ export class OngoingGameState {
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
+        // sometimes teamOne and teamTwo will have fake players, need to filter out
+        const realPlayers = this._lcData.gameflow.session.gameData.playerChampionSelections.map(
+          (c) => c.puuid
+        )
+
         return {
           all: [
             ...this._lcData.gameflow.session.gameData.teamOne,
             ...this._lcData.gameflow.session.gameData.teamTwo
           ]
             .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+            .filter((p) => realPlayers.includes(p.puuid))
             .map((p) => p.puuid)
         }
       }
@@ -398,7 +404,7 @@ export class OngoingGameState {
   /**
    * 战绩列表的 tag, 用于 SGP API
    */
-  matchHistoryTag: string
+  matchHistoryTag: string = 'all'
 
   setMatchHistoryTag(value: string) {
     this.matchHistoryTag = value
@@ -495,6 +501,7 @@ export class OngoingGameState {
    */
   championMasteryLoadingState: Record<string, string> = {}
 
+  /** 已经被记录在本地数据库中的信息 */
   savedInfo: Record<string, SavedPlayer> = {}
 
   /**
@@ -502,6 +509,7 @@ export class OngoingGameState {
    */
   savedInfoLoadingState: Record<string, string> = {}
 
+  /** 或者说是 game 的 details，区分 summary (常见的战绩其实是 summary) */
   gameTimeline: Record<
     number,
     {
@@ -521,6 +529,7 @@ export class OngoingGameState {
     }
   > = {}
 
+  // unused
   gameTimelineLoadingState: Record<number, string> = {}
 
   clear() {

@@ -35,6 +35,69 @@
           })
         }}</span>
       </StreamerModeMaskedText>
+
+      <template v-if="replayMetadata">
+        <div
+          v-if="replayMetadata.state === 'download'"
+          class="meta-group"
+          @click="emits('downloadReplay', game.gameId)"
+        >
+          <span>
+            {{
+              t('MiscellaneousPanel.replay.download', {
+                state: replayMetadata.state
+              })
+            }}
+          </span>
+          <NIcon class="icon">
+            <DownloadIcon />
+          </NIcon>
+        </div>
+
+        <div
+          v-else-if="replayMetadata.state === 'watch'"
+          class="meta-group"
+          @click="emits('watchReplay', game.gameId)"
+        >
+          <span>
+            {{
+              t('MiscellaneousPanel.replay.watch', {
+                state: replayMetadata.state
+              })
+            }}
+          </span>
+          <NIcon class="icon">
+            <Replay20FilledIcon />
+          </NIcon>
+        </div>
+
+        <div v-else-if="replayMetadata.state === 'incompatible'" class="meta-group">
+          <span>
+            {{
+              t('MiscellaneousPanel.replay.incompatible', {
+                state: replayMetadata.state
+              })
+            }}
+          </span>
+          <NIcon class="icon">
+            <Warning16FilledIcon />
+          </NIcon>
+        </div>
+
+        <div
+          v-else-if="replayMetadata.state === 'downloading' || replayMetadata.state === 'checking'"
+          class="meta-group"
+        >
+          <span>
+            {{
+              t('MiscellaneousPanel.replay.downloading', {
+                state: replayMetadata.state
+              })
+            }}
+          </span>
+          <NSpin :size="14" />
+        </div>
+      </template>
     </div>
     <div v-if="hasBan" class="bans">
       <span style="margin-right: 12px; font-weight: bold; columns: #fff">{{
@@ -76,11 +139,17 @@ import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStre
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, Participant, Player } from '@shared/types/league-client/match-history'
+import { ReplayMetadata } from '@shared/types/league-client/replays'
 import { summonerName } from '@shared/utils/name'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
+import { Download as DownloadIcon } from '@vicons/carbon'
+import {
+  Replay20Filled as Replay20FilledIcon,
+  Warning16Filled as Warning16FilledIcon
+} from '@vicons/fluent'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { DataTableColumns, NDataTable } from 'naive-ui'
+import { DataTableColumns, NDataTable, NIcon, NSpin } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
 
@@ -88,6 +157,12 @@ import StreamerModeMaskedText from '../StreamerModeMaskedText.vue'
 
 const props = defineProps<{
   game: Game
+  replayMetadata?: ReplayMetadata
+}>()
+
+const emits = defineEmits<{
+  downloadReplay: [gameId: number]
+  watchReplay: [gameId: number]
 }>()
 
 const { t } = useTranslation()
@@ -145,9 +220,9 @@ const maskedTextDisplay = (text: string) => {
 
 const formatTeam = (id: number) => {
   if (id === 100) {
-    return t('common.teams.100')
+    return t('teams.100', { ns: 'common' })
   } else if (id === 200) {
-    return t('common.teams.200')
+    return t('teams.200', { ns: 'common' })
   } else {
     return id.toString()
   }
@@ -379,14 +454,14 @@ const columns = computed(() => {
           statsConfigMap.value[propKey]?.render ||
           ((content: any) => {
             if (typeof content === 'boolean') {
-              return content ? t('common.yes') : t('common.no')
+              return content ? t('yes', { ns: 'common' }) : t('no', { ns: 'common' })
             } else if (typeof content === 'number') {
               return content.toLocaleString()
             } else if (typeof content === 'string') {
               return content
             }
 
-            return t('common.na')
+            return t('na', { ns: 'common' })
           })
         return renderer(data[p.participantId], participantStatsMap.value[p.participantId])
       }
@@ -477,6 +552,22 @@ const tableData = computed(() => {
   margin-bottom: 4px;
   display: flex;
   gap: 8px;
+
+  .meta-group {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+
+    .icon {
+      font-size: 14px;
+    }
+  }
 }
 
 .bans {
