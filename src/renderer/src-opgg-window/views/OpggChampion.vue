@@ -4,7 +4,7 @@
     <div class="sorting-controls">
         <NRadioGroup size="small" v-model:value="opggChampionSortBy">
           <NFlex style="gap: 4px">
-            <NRadio value="default" :title="t('common.default')">{{ t('common.default') }}</NRadio>
+            <NRadio value="default" :title="t('default', { ns: 'common' })">{{ t('default', { ns: 'common' }) }}</NRadio>
             <NRadio value="pickRate" :title="t('OpggChampion.pickRate')">{{
                 t('OpggChampion.pickRate')
               }}</NRadio>
