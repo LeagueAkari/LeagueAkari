@@ -67,7 +67,7 @@
     "@vueuse/router": "^13.5.0",
     "codemirror": "^6.0.2",
     "electron": "^34.5.8",
-    "electron-builder": "26.0.17",
+    "electron-builder": "26.0.12",
     "electron-vite": "^3.1.0",
     "gray-matter": "^4.0.3",
     "html-to-image": "^1.11.13",
