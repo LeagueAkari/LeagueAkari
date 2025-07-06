@@ -3,7 +3,7 @@
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer" @click="sn.showAnnouncementModal()">
-          <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]" processing>
+          <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]">
             <div class="common-button-inner">
               <NIcon><NotificationIcon /></NIcon>
             </div>
