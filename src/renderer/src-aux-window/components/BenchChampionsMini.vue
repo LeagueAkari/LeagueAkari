@@ -366,7 +366,7 @@ const handleBenchSwapOrPick = async (championId: number, complete = true) => {
 
   isSwappingOrPicking.value = true
   try {
-    if (lcs.champSelect.session!.timer.phase === 'BAN_PICK') {
+    if (lcs.champSelect.session!.timer.phase === 'BAN_PICK' && !lcs.champSelect.currentChampion) {
       const firstPickAction = lcs.champSelect
         .session!.actions.flat()
         .find(
