@@ -342,9 +342,10 @@ const shouldShowRerollButton = computed(() => {
   }
 
   return (
-    lcs.champSelect.session.allowRerolling &&
-    lcs.champSelect.session.timer.phase === 'FINALIZATION' &&
-    !lcs.champSelect.session.allowSubsetChampionPicks
+    lcs.champSelect.session.rerollsRemaining > 0 /* 特殊 hacky 情况 */ ||
+    (lcs.champSelect.session.allowRerolling &&
+      lcs.champSelect.session.timer.phase === 'FINALIZATION' &&
+      !lcs.champSelect.session.allowSubsetChampionPicks)
   )
 })
 
