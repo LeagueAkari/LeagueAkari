@@ -8,6 +8,14 @@ export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 export const RANDOM_CHAMPION_ID = -2
 export const ARENA_RANDOM_CHAMPION_ID = -3
 
+export interface ModeTargetBanPickChampion {
+  // key: mode, value: { key: position, value: championId[] }
+  [key: string]: {
+    [key: string]: number[]
+    default: number[] // must have a default list in case of no position is specified or no position is available
+  }
+}
+
 export class AutoSelectSettings {
   normalModeEnabled: boolean = false
   expectedChampions: Record<string, number[]> = {
@@ -38,6 +46,10 @@ export class AutoSelectSettings {
     default: []
   }
   banTeammateIntendedChampion: boolean = false
+
+  // --- new ---
+  targetPickChampions: ModeTargetBanPickChampion = {}
+  targetBanChampions: ModeTargetBanPickChampion = {}
 
   setNormalModeEnabled(value: boolean) {
     this.normalModeEnabled = value
@@ -99,11 +111,33 @@ export class AutoSelectSettings {
     this.pickStrategy = value
   }
 
+  setTargetPickChampions(mode: string, position: (string & {}) | 'default', champions: number[]) {
+    this.targetPickChampions = {
+      ...this.targetPickChampions,
+      [mode]: {
+        ...this.targetPickChampions[mode],
+        [position]: champions
+      }
+    }
+  }
+
+  setTargetBanChampions(mode: string, position: (string & {}) | 'default', champions: number[]) {
+    this.targetBanChampions = {
+      ...this.targetBanChampions,
+      [mode]: {
+        ...this.targetBanChampions[mode],
+        [position]: champions
+      }
+    }
+  }
+
   constructor() {
     makeAutoObservable(this, {
       benchExpectedChampions: observable.struct,
       expectedChampions: observable.struct,
-      bannedChampions: observable.struct
+      bannedChampions: observable.struct,
+      targetBanChampions: observable.ref,
+      targetPickChampions: observable.ref
     })
   }
 }
@@ -437,6 +471,38 @@ export class AutoSelectState {
         timer.totalTimeInPhase - timer.adjustedTimeLeftInPhase
       )
     }
+  }
+
+  get myActions() {
+    const session = this._lcData.champSelect.session
+
+    if (!session) {
+      return null
+    }
+
+    return session.actions.flat().filter((a) => a.actorCellId === session.localPlayerCellId)
+  }
+
+  /**
+   * 即将到来的选择流程，包括 vote 和 pick 两种
+   */
+  get nextPickAction() {
+    if (!this.myActions) {
+      return null
+    }
+
+    return this.myActions.filter((a) => a.type === 'pick')
+  }
+
+  /**
+   * 即将到来的禁用流程
+   */
+  get nextBanAction() {
+    if (!this.myActions) {
+      return null
+    }
+
+    return this.myActions.filter((a) => a.type === 'ban')
   }
 
   constructor(

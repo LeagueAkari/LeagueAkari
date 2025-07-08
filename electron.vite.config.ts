@@ -4,7 +4,7 @@ import { bytecodePlugin, defineConfig, externalizeDepsPlugin, swcPlugin } from '
 import { resolve } from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const SHOULD_COMPILE_TO_BYTECODE = false
+const SHOULD_COMPILE_TO_BYTECODE = true
 
 const minify = process.env.NODE_ENV === 'production'
 

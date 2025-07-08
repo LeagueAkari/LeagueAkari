@@ -31,9 +31,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
-  private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
-  private _dodgeTask = new TimeoutTask(() => this._dodgeFn())
-  private _reconnectTask = new TimeoutTask(() => this._reconnectFn())
+  private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
+  private _dodgeTask = new TimeoutTask(this._dodgeFn.bind(this))
+  private _reconnectTask = new TimeoutTask(this._reconnectFn.bind(this))
 
   static HONOR_CATEGORY = ['HEART'] as const
 
@@ -794,7 +794,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     }
   }
 
-  private _sendAutoSearchMatchInfoInChat = async (cancel?: string) => {
+  private async _sendAutoSearchMatchInfoInChat(cancel?: string) {
     if (this._lc.data.chat.conversations.customGame && this.state.willSearchMatch) {
       if (cancel === 'normal') {
         this._lc.api.chat

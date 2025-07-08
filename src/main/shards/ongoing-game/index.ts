@@ -97,7 +97,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private readonly _queue = new PQueue()
   private _controller: AbortController | null = null
 
-  private _debouncedUpdateMatchHistoryFn = _.debounce(() => this._updateMatchHistory(), 250)
+  private _debouncedUpdateMatchHistoryFn = _.debounce(this._updateMatchHistory.bind(this), 250)
 
   constructor(
     private readonly _loggerFactory: LoggerFactoryMain,

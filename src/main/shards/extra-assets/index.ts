@@ -35,8 +35,8 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   static FANDOM_BALANCE_UPDATE_INTERVAL = 3.6e6 // 2 hour
 
-  private _gtimgTimerTask = new TimeoutTask(() => this._updateGtimgHeroList())
-  private _fandomTimerTask = new TimeoutTask(() => this._updateFandomBalance())
+  private _gtimgTimerTask = new TimeoutTask(this._updateGtimgHeroList.bind(this))
+  private _fandomTimerTask = new TimeoutTask(this._updateFandomBalance.bind(this))
 
   private async _updateGtimgHeroList() {
     try {

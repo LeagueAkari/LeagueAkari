@@ -37,19 +37,19 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   // only source changed will trigger this task
   private _updateSgpLeagueServersTask = new IntervalTask(
-    () => this._updateSgpLeagueServers(),
+    this._updateSgpLeagueServers.bind(this),
     2 * 60 * 60 * 1000 // 2 hours
   )
 
   // locale / source changed will trigger this task
   private _updateAnnouncementTask = new IntervalTask(
-    () => this._updateAnnouncement(),
+    this._updateAnnouncement.bind(this),
     4 * 60 * 60 * 1000 // 4 hours
   )
 
   // locale / source changed will trigger this task
   private _updateLatestReleaseTask = new IntervalTask(
-    () => this._updateLatestRelease(),
+    this._updateLatestRelease.bind(this),
     4 * 60 * 60 * 1000 // 4 hours
   )
 
