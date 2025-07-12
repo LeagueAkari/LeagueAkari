@@ -1782,6 +1782,12 @@ ChampSelectActions:
   tenBansRevealing: 系统 · 禁用展示
   inProgress: 进行中
   completed: 已完成
+  ceremonies:
+    ten_bans_reveal: '禁用展示'
+    TEN_BANS_REVEAL: '禁用展示'
+    phase_transition: '阶段过渡'
+    vote_transition: '投票过渡'
+    team_vote_reveal: '团队投票展示'
 
 ChampSelectOperations:
   dodge:
@@ -2256,7 +2262,7 @@ simple-notifications-renderer:
 league-client-renderer:
   initialization-task:
     name: LCU 初始化
-    current: 加载 {{endpoint}} ({{finishedCount}}/{{allCount}})
+    current: 已完成  {{finishedCount}}/{{allCount}}
 
   connection-task:
     name: 连接到 LCU

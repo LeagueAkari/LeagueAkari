@@ -1777,6 +1777,12 @@ ChampSelectActions:
   tenBansRevealing: bans Revealing
   inProgress: In Progress
   completed: Completed
+  ceremonies:
+    ten_bans_reveal: 10 Bans Reveal
+    TEN_BANS_REVEAL: 10 Bans Reveal
+    phase_transition: Phase Transition
+    vote_transition: Vote Transition
+    team_vote_reveal: Team Vote Reveal
 
 ChampSelectOperations:
   dodge:
@@ -2252,7 +2258,7 @@ simple-notifications-renderer:
 league-client-renderer:
   initialization-task:
     name: LCU Initialization
-    current: Loading {{endpoint}} ({{finishedCount}}/{{allCount}})
+    current: Completed {{finishedCount}}/{{allCount}}
 
   connection-task:
     name: Connect to LCU

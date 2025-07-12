@@ -1,9 +1,14 @@
-import { ChampSelectSummoner, OngoingTrade } from '@shared/types/league-client/champ-select'
+import {
+  ChampSelectSummoner,
+  GridChamp,
+  OngoingTrade
+} from '@shared/types/league-client/champ-select'
 import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { Ballot } from '@shared/types/league-client/honorV2'
 import { isAxiosError } from 'axios'
 import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
+import PQueue from 'p-queue'
 
 import type { LeagueClientMainContext } from '..'
 import { TaskRunner } from '../utils/task-runner'
@@ -333,6 +338,11 @@ export class LeagueClientData {
         const token = (await this._context.lc.api.leagueSession.getLeagueSessionToken()).data
         this.leagueSession.setToken(token)
       } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          this.leagueSession.setToken(null)
+          return
+        }
+
         this._context.ipc.sendEvent(
           this._context.namespace,
           'error-sync-data',
@@ -582,6 +592,14 @@ export class LeagueClientData {
       'ongoingTrade'
     ])
 
+    this._context.mobx.propSync(
+      this._context.namespace,
+      'champSelect',
+      this.champSelect,
+      'gridChampions',
+      { raw: false }
+    )
+
     const loadSession = async () => {
       try {
         const session = (await this._context.lc.api.champSelect.getSession()).data
@@ -694,9 +712,12 @@ export class LeagueClientData {
       { equals: comparer.structural }
     )
 
+    const gridChampionsQueue = new PQueue({ concurrency: 6 })
+
     this._onLcuNotConnected(() => {
       this.champSelect.setSelfSummoner(null)
       isCellSummonerUpdated = false
+      gridChampionsQueue.clear()
     })
 
     const loadCurrentChampion = async () => {
@@ -759,12 +780,48 @@ export class LeagueClientData {
       }
     }
 
+    const fillGridChampions = async (champs: GridChamp[]) => {
+      for (const champ of champs) {
+        gridChampionsQueue.add(async () => {
+          try {
+            const { data } = await this._context.lc.api.champSelect.getGridChamp(champ.id)
+            this.champSelect.setGridChampion(data)
+            this._context.mobx.notifyStatePropChange(
+              this._context.namespace,
+              'champSelect',
+              `gridChampions[${champ.id}]`,
+              data,
+              { action: 'update', raw: true }
+            )
+          } catch (error) {
+            // just skip
+            this._context.log.warn(`Failed to load grid champions: ${champ.id}`, error)
+          }
+        })
+      }
+
+      await gridChampionsQueue.onIdle()
+    }
+
+    const loadAllGridChampionsAndFillGridChampions = async () => {
+      try {
+        const champs = (await this._context.lc.api.champSelect.getAllGridChamps()).data
+        await fillGridChampions(champs)
+      } catch (error) {
+        this._context.log.warn(`Failed to get all grid champions`, error)
+      }
+    }
+
     this._stateInitializer.register('champ-select-session', loadSession)
     this._stateInitializer.register('champ-select-current-champion', loadCurrentChampion)
     this._stateInitializer.register('champ-select-disabled-champions', loadDisabledChampions)
     this._stateInitializer.register('champ-select-ongoing-trade', loadOngoingTrade)
     this._stateInitializer.register('champ-select-pickable-champ-ids', loadPickables)
     this._stateInitializer.register('champ-select-bannable-champ-ids', loadBannables)
+    this._stateInitializer.register(
+      'champ-select-all-grid-champions',
+      loadAllGridChampionsAndFillGridChampions
+    )
 
     this._onLcuNotConnected(() => {
       this.champSelect.setCurrentBannableChampionArray([])
@@ -887,6 +944,20 @@ export class LeagueClientData {
         }
 
         this.champSelect.setOngoingTrade(event.data)
+      }
+    )
+
+    this._context.lc.events.on<LcuEvent<GridChamp>>(
+      '/lol-champ-select/v1/grid-champions/*',
+      (event) => {
+        this.champSelect.setGridChampion(event.data)
+        this._context.mobx.notifyStatePropChange(
+          this._context.namespace,
+          'champSelect',
+          `gridChampions[${event.data.id}]`,
+          event.data,
+          { action: 'update', raw: true }
+        )
       }
     )
   }

@@ -1,6 +1,7 @@
 import {
   ChampSelectSession,
   ChampSelectSummoner,
+  GridChamp,
   OngoingTrade
 } from '@shared/types/league-client/champ-select'
 import { makeAutoObservable, observable } from 'mobx'
@@ -20,6 +21,16 @@ export class ChampSelectState {
 
   ongoingTrade: OngoingTrade | null = null
 
+  /**
+   * 客户端会先推送所有 /grid-champions/* 事件 (Create), 之后才会推送 /all-grid-champions 事件
+   * 因此, gridChampions 已经可以充分表达信息, 就不在这里再维护一个无关状态了
+   *
+   * P.S. 一旦在非英雄选择阶段的 grid-champions 存在更新, 那么也会推送 /grid-champions/* (Update), 之后是 /all-grid-champions (Create)
+   */
+  // allGridChampionArray: GridChamp[] = []
+
+  gridChampions: Record<number, GridChamp> = {}
+
   constructor() {
     makeAutoObservable(this, {
       session: observable.struct,
@@ -27,26 +38,21 @@ export class ChampSelectState {
       currentBannableChampionIdArray: observable.struct,
       disabledChampionIdArray: observable.struct,
       selfSummoner: observable.struct,
-      ongoingTrade: observable.struct
+      ongoingTrade: observable.struct,
+      gridChampions: observable.shallow
     })
   }
 
   get currentPickableChampionIds() {
-    const set = new Set<number>()
-    this.currentPickableChampionIdArray.forEach((c) => set.add(c))
-    return set
+    return new Set<number>(this.currentPickableChampionIdArray)
   }
 
   get currentBannableChampionIds() {
-    const set = new Set<number>()
-    this.currentBannableChampionIdArray.forEach((c) => set.add(c))
-    return set
+    return new Set<number>(this.currentBannableChampionIdArray)
   }
 
   get disabledChampionIds() {
-    const set = new Set<number>()
-    this.disabledChampionIdArray.forEach((c) => set.add(c))
-    return set
+    return new Set<number>(this.disabledChampionIdArray)
   }
 
   setSession(s: ChampSelectSession | null) {
@@ -75,5 +81,13 @@ export class ChampSelectState {
 
   setOngoingTrade(trade: OngoingTrade | null) {
     this.ongoingTrade = trade
+  }
+
+  setGridChampion(champ: GridChamp) {
+    this.gridChampions[champ.id] = champ
+  }
+
+  resetGridChampions() {
+    this.gridChampions = {}
   }
 }

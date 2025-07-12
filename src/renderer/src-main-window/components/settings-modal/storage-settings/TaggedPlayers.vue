@@ -233,7 +233,11 @@ const renderSgpServerTag = (sgpServerId: string) => {
       bordered: false,
       type: isTencentServer(sgpServerId) ? 'success' : 'info'
     },
-    () => t(`sgpServers.${sgpServerId}`, sgpServerId)
+    () =>
+      t(`sgpServers.${sgpServerId}`, {
+        defaultValue: sgpServerId,
+        ns: 'common'
+      })
   )
 }
 

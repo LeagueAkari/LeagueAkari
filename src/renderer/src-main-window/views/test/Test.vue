@@ -29,9 +29,19 @@
 
 <script setup lang="ts">
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NScrollbar } from 'naive-ui'
-import { reactive, ref } from 'vue'
+import {
+  isProxy,
+  isReactive,
+  isShallow,
+  reactive,
+  ref,
+  shallowReactive,
+  watch,
+  watchEffect
+} from 'vue'
 
 const teams = reactive(PREMADE_TEAM_COLORS)
 
@@ -41,6 +51,12 @@ const markdown = ref(`
 [打开更新页面](akari://renderer-link/overlays/release-modal)
 `)
 const html = markdownIt.render(markdown.value)
+
+const lcs = useLeagueClientStore()
+
+watchEffect(() => {
+  console.log(lcs.champSelect.gridChampions)
+})
 </script>
 
 <style lang="less" scoped>

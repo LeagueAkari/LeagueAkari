@@ -150,6 +150,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     await this._handleState()
     this._handleAutoPickBan()
     this._handleBenchMode()
+
+    this._handleBanPickEx()
   }
 
   /**
@@ -749,6 +751,23 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state.setUpcomingGrab(null)
           this._grabTimerId = null
         }
+      }
+    )
+  }
+
+  // testing only
+  private _handleBanPickEx() {
+    this._mobx.reaction(
+      () => this.state.myPickActions,
+      (actions) => {
+        console.log('pickActions', actions)
+      }
+    )
+
+    this._mobx.reaction(
+      () => this.state.myBanActions,
+      (actions) => {
+        console.log('banActions', actions)
       }
     )
   }

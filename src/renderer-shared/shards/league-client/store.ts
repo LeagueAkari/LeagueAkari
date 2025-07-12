@@ -1,4 +1,8 @@
-import { ChampSelectSession, OngoingTrade } from '@shared/types/league-client/champ-select'
+import {
+  ChampSelectSession,
+  GridChamp,
+  OngoingTrade
+} from '@shared/types/league-client/champ-select'
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
   Augment,
@@ -16,7 +20,7 @@ import { LoginQueueState } from '@shared/types/league-client/login'
 import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
-import { computed, shallowReactive, shallowRef } from 'vue'
+import { computed, ref, shallowReactive, shallowRef } from 'vue'
 
 // copied
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
@@ -79,7 +83,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     currentPickableChampionIds: shallowRef<Set<number>>(new Set()),
     currentBannableChampionIds: shallowRef<Set<number>>(new Set()),
     disabledChampionIds: shallowRef<Set<number>>(new Set()),
-    ongoingTrade: shallowRef<OngoingTrade | null>(null)
+    ongoingTrade: shallowRef<OngoingTrade | null>(null),
+    gridChampions: {} as Record<number, GridChamp>
   } as const
 
   const chat = {

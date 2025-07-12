@@ -178,7 +178,6 @@ export class LeagueClientRenderer {
         taskStore.updateTask(initTaskId, {
           description: () =>
             t('league-client-renderer.initialization-task.current', {
-              endpoint: progress.currentId,
               finishedCount: progress.finished.length,
               allCount: progress.all.length
             }),

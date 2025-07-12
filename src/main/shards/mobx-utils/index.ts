@@ -5,14 +5,18 @@ import { IReactionOptions, IReactionPublic, isObservable, reaction, toJS } from 
 
 import { AkariIpcMain } from '../ipc'
 
+interface PropConfig {
+  /**
+   * 用于指示渲染进程此 key 是否应该被 markRaw, 默认情况下为 true
+   *
+   * **在 `update-state-prop` 事件中, 如果 `raw` 为 true, 则需要将值 markRaw**
+   */
+  raw: boolean
+}
+
 interface RegisteredState {
   object: object
-  props: Map<
-    string,
-    {
-      /* 留空, 方便未来的封装 */
-    }
-  >
+  props: Map<string, PropConfig>
 }
 
 /**
@@ -34,44 +38,6 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
   constructor(private readonly _ipc: AkariIpcMain) {}
 
   async onInit() {
-    // 用于渲染进程获取初始定义的状态列表
-    this._ipc.onCall(MobxUtilsMain.id, 'getStateProps', (_, namespace: string, stateId: string) => {
-      const key = `${namespace}:${stateId}`
-      if (!this._registeredStates.has(key)) {
-        throw new Error(`State ${key} not found`)
-      }
-
-      const props = Array.from(this._registeredStates.get(key)!.props.entries()).map(
-        ([path, config]) => ({
-          path,
-          config
-        })
-      )
-
-      return props
-    })
-
-    // 用于渲染进程获取状态的属性值
-    this._ipc.onCall(
-      MobxUtilsMain.id,
-      'getStatePropValue',
-      (__, namespace: string, stateId: string, propPath: string) => {
-        const key = `${namespace}:${stateId}`
-        if (!this._registeredStates.has(key)) {
-          throw new Error(`State ${key} not found`)
-        }
-
-        if (!this._registeredStates.get(key)!.props.has(propPath)) {
-          throw new Error(`No registered prop path ${propPath} for ${key}`)
-        }
-
-        const item = this._registeredStates.get(key)!
-        const _value = _.get(item.object, propPath)
-
-        return isObservable(_value) ? toJS(_value) : _.get(item.object, propPath)
-      }
-    )
-
     this._ipc.onCall(
       MobxUtilsMain.id,
       'subscribeAndGetInitialState',
@@ -87,19 +53,22 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
           event.sender.on('destroyed', () => subs.delete(event.sender.id))
         }
 
-        const config = this._registeredStates.get(key)!
-        const props = Array.from(config.props.entries()).map(([path, config]) => ({
+        const state = this._registeredStates.get(key)!
+        const props = Array.from(state.props.entries()).map(([path, config]) => ({
           path,
           config
         }))
 
         const statePlainObject = props.reduce(
-          (acc, { path }) => {
-            const _value = _.get(config.object, path)
-            acc[path] = isObservable(_value) ? toJS(_value) : _value
+          (acc, { path, config }) => {
+            const _value = _.get(state.object, path)
+            acc[path] = {
+              value: isObservable(_value) ? toJS(_value) : _value,
+              config
+            }
             return acc
           },
-          {} as Record<string, any>
+          {} as Record<string, { value: any; config: PropConfig }>
         )
 
         return statePlainObject
@@ -125,7 +94,8 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
     namespace: string,
     stateId: string,
     obj: T,
-    propPath: Paths<T> | Paths<T>[]
+    propPath: Paths<T> | Paths<T>[],
+    config: Partial<PropConfig> = {}
   ) {
     const key = `${namespace}:${stateId}`
 
@@ -140,20 +110,21 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
       })
     }
 
-    const config = this._registeredStates.get(key)!
+    const state = this._registeredStates.get(key)!
 
-    if (config.object !== obj) {
+    if (state.object !== obj) {
       throw new Error(`State ${key} already registered with different object`)
     }
 
+    const { raw = true } = config
     const paths = Array.isArray(propPath) ? propPath : [propPath]
 
     for (const path of paths) {
-      if (config.props.has(path)) {
+      if (state.props.has(path)) {
         throw new Error(`Prop path ${path} already registered for ${stateId}`)
       }
 
-      config.props.set(path, {})
+      state.props.set(path, { raw })
 
       const fn = reaction(
         () => _.get(obj, path),
@@ -165,7 +136,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
               `update-state-prop/${key}`,
               path,
               isObservable(newValue) ? toJS(newValue) : newValue,
-              { action: 'update' }
+              { action: 'update', raw }
             )
           })
         }
@@ -173,6 +144,40 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
 
       this._disposables.add(fn)
     }
+  }
+
+  /**
+   * 手动推送子层级的状态更新, 必须被用在深层属性上
+   */
+  notifyStatePropChange(
+    namespace: string,
+    stateId: string,
+    propPath: string,
+    newValue: any,
+    config: Partial<PropConfig & { action: 'update' | 'delete' }> = {}
+  ) {
+    const key = `${namespace}:${stateId}`
+
+    if (!this._rendererSubscription.has(key)) {
+      return
+    }
+
+    if (!this._registeredStates.has(key)) {
+      throw new Error(`State ${key} not found`)
+    }
+
+    const { action = 'update', raw = true } = config
+
+    this._rendererSubscription.get(key)?.forEach((wcId) => {
+      this._ipc.sendEventToWebContents(
+        wcId,
+        MobxUtilsMain.id,
+        `update-state-prop/${key}`,
+        propPath,
+        isObservable(newValue) ? toJS(newValue) : newValue,
+        { action, raw }
+      )
+    })
   }
 
   /**

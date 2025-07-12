@@ -143,6 +143,10 @@ export class AutoSelectSettings {
 }
 
 export class AutoSelectState {
+  get csSession() {
+    return this._lcData.champSelect.session
+  }
+
   get champSelectActionInfo() {
     if (
       !this._lcData.champSelect.session ||
@@ -458,7 +462,7 @@ export class AutoSelectState {
   }
 
   get currentPhaseTimerInfo() {
-    const timer = this._lcData.champSelect.session?.timer
+    const timer = this.csSession?.timer
 
     if (!timer) {
       return null
@@ -473,36 +477,128 @@ export class AutoSelectState {
     }
   }
 
+  // --- new
+
+  get inBanPickPhase() {
+    if (!this.csSession) {
+      return false
+    }
+
+    return this.csSession.timer.phase === 'BAN_PICK'
+  }
+
+  /**
+   * 意味着现在可以选了
+   */
+  get isActingNow() {
+    return this._lcData.champSelect.selfSummoner?.isActingNow ?? false
+  }
+
   get myActions() {
-    const session = this._lcData.champSelect.session
+    const session = this.csSession
 
     if (!session) {
-      return null
+      return []
     }
 
     return session.actions.flat().filter((a) => a.actorCellId === session.localPlayerCellId)
   }
 
   /**
-   * 即将到来的选择流程，包括 vote 和 pick 两种
+   * 在英雄选择阶段, 自动选择得以可用
    */
-  get nextPickAction() {
+  get myActiveActions() {
+    if (!this.myActions || !this.inBanPickPhase) {
+      return []
+    }
+
+    return this.myActions.filter((a) => !a.completed)
+  }
+
+  /**
+   * 即将到来的选择流程
+   *
+   * 目前已知在 rcp 里面, 写死只有一个 pick action, 但不知道未来会不会有多个
+   */
+  get myPickActions() {
     if (!this.myActions) {
-      return null
+      return []
     }
 
     return this.myActions.filter((a) => a.type === 'pick')
   }
 
+  get myActivePickActions() {
+    if (!this.myActiveActions) {
+      return []
+    }
+
+    return this.myActiveActions.filter((a) => a.type === 'pick')
+  }
+
+  get myVoteActions() {
+    if (!this.myActions) {
+      return []
+    }
+
+    return this.myActions.filter((a) => a.type === 'vote')
+  }
+
+  get myActiveVoteActions() {
+    if (!this.myActiveActions) {
+      return []
+    }
+
+    return this.myActiveActions.filter((a) => a.type === 'vote')
+  }
+
   /**
    * 即将到来的禁用流程
+   *
+   * 可能有多个 ban action
    */
-  get nextBanAction() {
+  get myBanActions() {
     if (!this.myActions) {
-      return null
+      return []
     }
 
     return this.myActions.filter((a) => a.type === 'ban')
+  }
+
+  get myActiveBanActions() {
+    if (!this.myActiveActions) {
+      return []
+    }
+
+    return this.myActiveActions.filter((a) => a.type === 'ban')
+  }
+
+  get isPickIntenting() {
+    if (!this.csSession) {
+      return false
+    }
+
+    return (
+      this.csSession.timer.phase === 'PLANNING' &&
+      this.myPickActions &&
+      !this.myPickActions.some((a) => a.completed) // 满足条件: 在预选择阶段, 且没有完成任何 pick action
+    )
+  }
+
+  /**
+   * 英雄选择时, 所位于的阶段
+   *
+   * - pick-intenting 预选择阶段
+   * - picking 选择阶段
+   * - banning 禁用阶段
+   * - other 其他不关心的阶段
+   */
+  get champSelectStage() {
+    if (!this.csSession) {
+      return null
+    }
+
+    return null
   }
 
   constructor(
@@ -516,7 +612,11 @@ export class AutoSelectState {
       currentPhaseTimerInfo: computed.struct,
       upcomingGrab: observable.struct,
       upcomingPick: observable.struct,
-      upcomingBan: observable.struct
+      upcomingBan: observable.struct,
+
+      myPickActions: computed.struct,
+      myVoteActions: computed.struct,
+      myBanActions: computed.struct
     })
   }
 }

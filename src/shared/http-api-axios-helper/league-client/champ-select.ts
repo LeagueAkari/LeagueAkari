@@ -19,6 +19,10 @@ export class ChampSelectHttpApi {
     return this._http.get<GridChamp[]>('/lol-champ-select/v1/all-grid-champions')
   }
 
+  getGridChamp(champId: number) {
+    return this._http.get<GridChamp>(`/lol-champ-select/v1/grid-champions/${champId}`)
+  }
+
   action(actionId: string | number, data: any) {
     return this._http.patch(`/lol-champ-select/v1/session/actions/${actionId}`, data)
   }
