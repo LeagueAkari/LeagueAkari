@@ -145,9 +145,9 @@ AppSettings:
   selfUpdate:
     title: Application Update
 
-    autoCheckUpdates:
+    updateLatestRelease:
       label: Auto Check Updates
-      description: Automatically pull the latest version information from the update source when the application starts
+      description: Periodically check for new versions
 
     autoDownloadUpdates:
       label: Auto Download Updates

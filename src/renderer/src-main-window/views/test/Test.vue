@@ -32,16 +32,7 @@ import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-pa
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NScrollbar } from 'naive-ui'
-import {
-  isProxy,
-  isReactive,
-  isShallow,
-  reactive,
-  ref,
-  shallowReactive,
-  watch,
-  watchEffect
-} from 'vue'
+import { reactive, ref, watchEffect } from 'vue'
 
 const teams = reactive(PREMADE_TEAM_COLORS)
 

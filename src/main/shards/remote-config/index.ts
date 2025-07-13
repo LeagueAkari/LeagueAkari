@@ -200,13 +200,32 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     }
   }
 
+  /**
+   * 三次平均值
+   */
   async testLatency() {
-    const [githubLatency, giteeLatency] = await Promise.all([
-      this._repo.testGitHubLatency(),
-      this._repo.testGiteeLatency()
-    ])
+    const githubLatencies: number[] = []
+    const giteeLatencies: number[] = []
 
-    return { githubLatency, giteeLatency }
+    for (let i = 0; i < 3; i++) {
+      const [gh, gi] = await Promise.all([
+        this._repo.testGitHubLatency().catch(() => -1),
+        this._repo.testGiteeLatency().catch(() => -1)
+      ])
+
+      if (gh !== -1) {
+        githubLatencies.push(gh)
+      }
+
+      if (gi !== -1) {
+        giteeLatencies.push(gi)
+      }
+    }
+
+    return {
+      githubLatency: githubLatencies.reduce((a, b) => a + b, 0) / githubLatencies.length,
+      giteeLatency: giteeLatencies.reduce((a, b) => a + b, 0) / giteeLatencies.length
+    }
   }
 
   async onInit() {
@@ -220,7 +239,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       'isUpdatingAnnouncement',
       'isUpdatingSgpLeagueServers'
     ])
-    this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, ['preferredSource'])
+    this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, [
+      'preferredSource',
+      'updateLatestRelease'
+    ])
 
     this._handleIpcCall()
 
@@ -231,7 +253,18 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
     this._updateAnnouncementTask.start(true)
     this._updateSgpLeagueServersTask.start(true)
-    this._updateLatestReleaseTask.start(true)
+
+    this._mobx.reaction(
+      () => this.settings.updateLatestRelease,
+      (updateLatestRelease) => {
+        if (updateLatestRelease) {
+          this._updateLatestReleaseTask.start(true)
+        } else {
+          this._updateLatestReleaseTask.cancel()
+        }
+      },
+      { fireImmediately: true }
+    )
 
     this._mobx.reaction(
       () => this._app.settings.locale,
@@ -239,7 +272,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         this._repo.setConfig({ locale: locale as 'zh-CN' | 'en' })
         this.state.setAnnouncement(null)
         this._updateAnnouncementTask.start(true)
-        this._updateLatestReleaseTask.start(true)
+
+        if (this.settings.updateLatestRelease) {
+          this._updateLatestReleaseTask.start(true)
+        }
       },
       { delay: 1000 }
     )
@@ -252,7 +288,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         this.state.setAnnouncement(null)
         this._updateAnnouncementTask.start(true)
         this._updateSgpLeagueServersTask.start(true)
-        this._updateLatestReleaseTask.start(true)
+
+        if (this.settings.updateLatestRelease) {
+          this._updateLatestReleaseTask.start(true)
+        }
       },
       { delay: 1000 }
     )

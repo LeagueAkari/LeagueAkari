@@ -96,7 +96,7 @@
                     ({{
                       latency.giteeLatency === -1
                         ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.giteeLatency} ms`
+                        : `${latency.giteeLatency.toFixed(1)} ms`
                     }})
                   </template>
                 </span>
@@ -117,7 +117,7 @@
                     ({{
                       latency.githubLatency === -1
                         ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.githubLatency} ms`
+                        : `${latency.githubLatency.toFixed(1)} ms`
                     }})
                   </template>
                 </span>
@@ -142,6 +142,18 @@
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
       </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.selfUpdate.updateLatestRelease.label')"
+        :label-description="t('AppSettings.selfUpdate.updateLatestRelease.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="rcs.settings.updateLatestRelease"
+          @update:value="(val: boolean) => rc.setUpdateLatestRelease(val)"
+        />
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"

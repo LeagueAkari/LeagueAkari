@@ -180,10 +180,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openNewUpdatesDir')
   }
 
-  setAutoCheckUpdates(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoCheckUpdates', enabled)
-  }
-
   setAutoDownloadUpdates(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
   }

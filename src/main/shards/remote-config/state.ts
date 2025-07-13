@@ -94,8 +94,14 @@ export class RemoteConfigState {
 export class RemoteConfigSettings {
   preferredSource: 'github' | 'gitee' = 'github'
 
+  updateLatestRelease: boolean = true
+
   setPreferredSource(source: 'github' | 'gitee') {
     this.preferredSource = source
+  }
+
+  setUpdateLatestRelease(updateLatestRelease: boolean) {
+    this.updateLatestRelease = updateLatestRelease
   }
 
   constructor() {

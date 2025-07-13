@@ -36,7 +36,8 @@ export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', 
   const isUpdatingSgpLeagueServers = ref(false)
 
   const settings = shallowReactive({
-    preferredSource: 'gitee' as 'gitee' | 'github'
+    preferredSource: 'gitee' as 'gitee' | 'github',
+    updateLatestRelease: true
   })
 
   return {

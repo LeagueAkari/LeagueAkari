@@ -65,7 +65,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       SelfUpdateMain.id,
       {
-        autoCheckUpdates: { default: this.settings.autoCheckUpdates },
         autoDownloadUpdates: { default: this.settings.autoDownloadUpdates }
       },
       this.settings
@@ -81,7 +80,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     ])
 
     this._mobx.propSync(SelfUpdateMain.id, 'settings', this.settings, [
-      'autoCheckUpdates',
       'autoDownloadUpdates',
       'ignoreVersion'
     ])

@@ -146,9 +146,9 @@ AppSettings:
   selfUpdate:
     title: 应用更新
 
-    autoCheckUpdates:
+    updateLatestRelease:
       label: 自动检查更新
-      description: 在应用启动时，自动从更新源拉取最新版本信息
+      description: 周期性检查是否有新版本
 
     autoDownloadUpdates:
       label: 自动下载更新
