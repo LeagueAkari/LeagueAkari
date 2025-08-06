@@ -95,4 +95,10 @@ Additionally, **this application is not officially supported or endorsed by Riot
 
 This disclaimer is intended to provide transparency and enable users to make informed decisions. Thank you for your understanding, and please ensure fair play in the gaming environment.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=LeagueAkari/LeagueAkari&type=Date)](https://star-history.com/#LeagueAkari/LeagueAkari&Date)
+<a href="https://www.star-history.com/#LeagueAkari/LeagueAkari&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=LeagueAkari/LeagueAkari&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=LeagueAkari/LeagueAkari&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=LeagueAkari/LeagueAkari&type=Date" />
+ </picture>
+</a>
