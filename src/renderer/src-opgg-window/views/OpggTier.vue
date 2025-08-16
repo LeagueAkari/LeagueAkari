@@ -237,7 +237,7 @@ const columns: DataTableColumns<any> = [
           return '-'
         }
 
-        return `${(position.stats?.win_rate * 100 || 0).toFixed(2)} %`
+        return `${(position.stats?.win_rate * 100 || 0).toFixed(2)}%`
       }
 
       if (!row.average_stats) {
@@ -245,11 +245,11 @@ const columns: DataTableColumns<any> = [
       }
 
       if (row.average_stats.win_rate) {
-        return `${(row.average_stats.win_rate * 100).toFixed(2)} %`
+        return `${(row.average_stats.win_rate * 100).toFixed(2)}%`
       }
 
       if (props.mode === 'arena' && row.average_stats.win && row.average_stats.play) {
-        return `${((row.average_stats.win / row.average_stats.play) * 100).toFixed(2)} %`
+        return `${((row.average_stats.win / row.average_stats.play) * 100).toFixed(2)}%`
       }
 
       return '-'
@@ -291,14 +291,14 @@ const columns: DataTableColumns<any> = [
           return '-'
         }
 
-        return `${(position.stats?.pick_rate * 100 || 0).toFixed(2)} %`
+        return `${(position.stats?.pick_rate * 100 || 0).toFixed(2)}%`
       }
 
       if (!row.average_stats) {
         return '-'
       }
 
-      return `${(row.average_stats.pick_rate * 100).toFixed(2)} %`
+      return `${(row.average_stats.pick_rate * 100).toFixed(2)}%`
     }
   }
 ]
@@ -378,14 +378,14 @@ const banRateColumn: DataTableColumn<any> = {
         return '-'
       }
 
-      return `${(position.stats?.ban_rate * 100 || 0).toFixed(2)} %`
+      return `${(position.stats?.ban_rate * 100 || 0).toFixed(2)}%`
     }
 
     if (!row.average_stats || row.average_stats.ban_rate === null) {
       return '-'
     }
 
-    return `${(row.average_stats.ban_rate * 100).toFixed(2)} %`
+    return `${(row.average_stats.ban_rate * 100).toFixed(2)}%`
   }
 }
 

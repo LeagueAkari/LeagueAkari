@@ -2,6 +2,7 @@ import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
+import { DeepPartialObject } from '@shared/utils/types'
 import { comparer, computed } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
@@ -10,7 +11,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AutoSelectSettings, AutoSelectState } from './state'
+import { AutoSelectSettings, AutoSelectState, BanChampionConfig } from './state'
 
 @Shard(AutoSelectMain.id)
 export class AutoSelectMain implements IAkariShardInitDispose {
@@ -55,7 +56,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         banDelaySeconds: { default: this.settings.banDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
         banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
-        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
+        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled },
+
+        pickConfig: { default: this.settings.pickConfig },
+        banConfig: { default: this.settings.banConfig }
       },
       this.settings
     )
@@ -79,7 +83,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'benchExpectedChampions',
       'expectedChampions',
       'bannedChampions',
-      'benchHandleTradeEnabled'
+      'benchHandleTradeEnabled',
+
+      'pickConfig',
+      'banConfig'
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
@@ -88,7 +95,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'memberMe',
       'upcomingGrab',
       'upcomingPick',
-      'upcomingBan'
+      'upcomingBan',
+
+      'groups',
+      'isTemporaryDisabled'
     ])
   }
 
@@ -148,6 +158,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._handleState()
+    this._handleIpcCall()
     this._handleAutoPickBan()
     this._handleBenchMode()
 
@@ -757,18 +768,53 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   // testing only
   private _handleBanPickEx() {
+    // 预选阶段
     this._mobx.reaction(
-      () => this.state.myPickActions,
-      (actions) => {
-        console.log('pickActions', actions)
-      }
+      () => [this.state.isPickIntenting, this.state.myPickActions] as const,
+      ([isPickIntenting, myPickActions]) => {
+        this._log.debug(`Now pick intenting: ${isPickIntenting}`, myPickActions)
+      },
+      { equals: comparer.shallow }
     )
 
+    // 在禁用或选择阶段
     this._mobx.reaction(
-      () => this.state.myBanActions,
-      (actions) => {
-        console.log('banActions', actions)
-      }
+      () =>
+        [
+          this.state.inBanPickPhase,
+          this.state.isActingNow,
+          this.state.myActivePickActions,
+          this.state.myActiveVoteActions,
+          this.state.myActiveBanActions
+        ] as const,
+      ([
+        inBanPickPhase,
+        isActingNow,
+        myActivePickActions,
+        myActiveVoteActions,
+        myActiveBanActions
+      ]) => {
+        if (!inBanPickPhase) {
+          this._log.debug(`Now not in ban pick phase: ${inBanPickPhase}`)
+          return
+        }
+
+        if (!isActingNow) {
+          this._log.debug(`Now in ban pick phase: ${inBanPickPhase}, but not acting`)
+          return
+        }
+
+        this._log.debug(
+          `Now in ban pick phase: ${inBanPickPhase}, acting now`,
+          'myActivePickActions',
+          myActivePickActions,
+          'myActiveVoteActions',
+          myActiveVoteActions,
+          'myActiveBanActions',
+          myActiveBanActions
+        )
+      },
+      { equals: comparer.shallow }
     )
   }
 
@@ -848,5 +894,25 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._lc.api.chat
       .chatSend(this._lc.data.chat.conversations.championSelect.id, message, 'celebration')
       .catch(() => {})
+  }
+
+  private _handleIpcCall() {
+    this._ipc.onCall(
+      AutoSelectMain.id,
+      'setPickConfig',
+      async (_, type: string, config: DeepPartialObject<BanChampionConfig>) => {
+        this.settings.setPickConfig(type, config)
+        await this._setting.set('pickConfig', this.settings.pickConfig)
+      }
+    )
+
+    this._ipc.onCall(
+      AutoSelectMain.id,
+      'setBanConfig',
+      async (_, type: string, config: DeepPartialObject<BanChampionConfig>) => {
+        this.settings.setBanConfig(type, config)
+        await this._setting.set('banConfig', this.settings.banConfig)
+      }
+    )
   }
 }

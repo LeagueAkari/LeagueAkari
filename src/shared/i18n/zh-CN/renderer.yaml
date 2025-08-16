@@ -858,6 +858,8 @@ OrderedChampionList:
   searchForChampion: 搜索英雄
   edit: 编辑
   unselected: 未选择
+  moveUp: 上移
+  moveDown: 下移
 
 RankedTable:
   queueType: 队列

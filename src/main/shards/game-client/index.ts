@@ -313,6 +313,10 @@ export class GameClientMain implements IAkariShardInitDispose {
         reject(err)
       })
 
+      p.on('error', (err) => {
+        reject(err)
+      })
+
       setImmediate(() => {
         if (hasError) {
           return

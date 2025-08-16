@@ -4,6 +4,21 @@
       <div class="inner-wrapper">
         <NCard size="small">
           <template #header>
+            <span class="card-header-title">[自动英雄选择与禁用]</span>
+          </template>
+          <ControlItem
+            class="control-item-margin"
+            :label="`[总开关]`"
+            :label-description="`[在英雄选择阶段的自动选用和自动禁用]`"
+            :label-width="260"
+          >
+            <NSwitch size="small" v-model:value="testDisabled" />
+          </ControlItem>
+          <div class="divider"></div>
+          <AutoSelectEditor class="auto-select-editor" :class="{ disabled: !testDisabled }" />
+        </NCard>
+        <NCard size="small" style="margin-top: 8px">
+          <template #header>
             <span class="card-header-title">{{ t('AutoSelect.normalModeTitle') }}</span>
           </template>
           <ControlItem
@@ -281,9 +296,11 @@ import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import OrderedChampionList from '@main-window/components/ordered-champion-list/OrderedChampionList.vue'
+
+import AutoSelectEditor from './auto-select-editor/AutoSelectEditor.vue'
 
 const { t } = useTranslation()
 
@@ -300,13 +317,24 @@ const roles = computed(() => {
     { key: 'default', label: t('default', { ns: 'common' }) }
   ]
 })
+
+const testDisabled = ref(false)
 </script>
 
 <style lang="less" scoped>
 @import './automation-styles.less';
 
+.auto-select-editor {
+  margin-top: 8px;
+  transition: opacity 0.2s;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
 .divider {
-  margin-top: 12px;
+  margin-top: 8px;
   margin-bottom: 12px;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.084);

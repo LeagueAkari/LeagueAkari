@@ -12,18 +12,18 @@ summoner: 召唤师
 lanes:
   all: 无
   ALL: 无
-  top: 上单
+  top: 上路
   jungle: 打野
-  mid: 中单
-  middle: 中单
+  mid: 中路
+  middle: 中路
   bot: 下路
   bottom: 下路
   support: 辅助
   utility: 辅助
-  TOP: 上单
+  TOP: 上路
   JUNGLE: 打野
-  MID: 中单
-  MIDDLE: 中单
+  MID: 中路
+  MIDDLE: 中路
   BOTTOM: 下路
   BOT: 下路
   SUPPORT: 辅助
@@ -133,3 +133,7 @@ sgpServers:
   TR1: 土耳其
   RU: 俄罗斯
   JP1: 日本
+
+champions:
+  bravery: 勇敢举动
+  dummy: 占位

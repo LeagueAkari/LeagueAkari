@@ -90,8 +90,7 @@
                       ((p.stats.kills + p.stats.assists) / (aggregateTeamStats.kills || 1)) *
                       100
                     ).toFixed(0)
-                  }}
-                  %)
+                  }}%)
                 </div>
                 <div class="kda-ratio">
                   {{ ((p.stats.kills + p.stats.assists) / (p.stats.deaths || 1)).toFixed(2) }}

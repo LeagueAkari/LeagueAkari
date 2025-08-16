@@ -27,8 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -37,7 +35,6 @@ import { greeting } from '@renderer-shared/utils/greeting'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
 import { provide, ref } from 'vue'
-import { h } from 'vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
@@ -78,15 +75,6 @@ app.onSecondInstance(() => {
 })
 
 const message = useMessage()
-
-useKeyboardCombo('AKARI', {
-  onFinish: () => {
-    message.info(() => h(LeagueAkariSpan))
-  },
-  requireSameEl: true,
-  caseSensitive: false,
-  timeout: 250
-})
 
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 </script>

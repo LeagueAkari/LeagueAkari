@@ -1,19 +1,46 @@
 import { Action } from '@shared/types/league-client/champ-select'
+import { DeepPartialObject } from '@shared/utils/types'
+import _ from 'lodash'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientData } from '../league-client/lc-state'
+import { GROUPS } from './groups'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 
 export const RANDOM_CHAMPION_ID = -2
 export const ARENA_RANDOM_CHAMPION_ID = -3
 
-export interface ModeTargetBanPickChampion {
-  // key: mode, value: { key: position, value: championId[] }
-  [key: string]: {
-    [key: string]: number[]
-    default: number[] // must have a default list in case of no position is specified or no position is available
-  }
+interface PositionChampion {
+  // non-ranked queues
+  default: number[]
+
+  // ranked queues
+  top: number[]
+  jungle: number[]
+  middle: number[]
+  bottom: number[]
+  utility: number[]
+}
+
+export interface PickChampionConfig {
+  enabled: boolean
+  champions: PositionChampion
+  delaySeconds: number
+  pickTeammateIntendedChampion: boolean
+  pickStrategy: AutoPickStrategy
+
+  // bench mode only
+  benchSelectFirstAvailableChampion: boolean
+  benchSwapAccumulatedDelaySeconds: number
+  benchHandleTradeEnabled: boolean
+}
+
+export interface BanChampionConfig {
+  enabled: boolean
+  champions: PositionChampion
+  delaySeconds: number
+  banTeammateIntendedChampion: boolean
 }
 
 export class AutoSelectSettings {
@@ -48,8 +75,9 @@ export class AutoSelectSettings {
   banTeammateIntendedChampion: boolean = false
 
   // --- new ---
-  targetPickChampions: ModeTargetBanPickChampion = {}
-  targetBanChampions: ModeTargetBanPickChampion = {}
+  // modeTypeKey, configObject
+  pickConfig: Record<string, PickChampionConfig> = {}
+  banConfig: Record<string, BanChampionConfig> = {}
 
   setNormalModeEnabled(value: boolean) {
     this.normalModeEnabled = value
@@ -111,23 +139,59 @@ export class AutoSelectSettings {
     this.pickStrategy = value
   }
 
-  setTargetPickChampions(mode: string, position: (string & {}) | 'default', champions: number[]) {
-    this.targetPickChampions = {
-      ...this.targetPickChampions,
-      [mode]: {
-        ...this.targetPickChampions[mode],
-        [position]: champions
-      }
+  createNewEmptyPickConfig(): PickChampionConfig {
+    return {
+      enabled: false,
+      champions: {
+        top: [],
+        jungle: [],
+        middle: [],
+        bottom: [],
+        utility: [],
+        default: []
+      },
+      delaySeconds: 0,
+      pickTeammateIntendedChampion: false,
+      pickStrategy: 'lock-in',
+      benchHandleTradeEnabled: false,
+      benchSelectFirstAvailableChampion: false,
+      benchSwapAccumulatedDelaySeconds: 0
     }
   }
 
-  setTargetBanChampions(mode: string, position: (string & {}) | 'default', champions: number[]) {
-    this.targetBanChampions = {
-      ...this.targetBanChampions,
-      [mode]: {
-        ...this.targetBanChampions[mode],
-        [position]: champions
-      }
+  createNewEmptyBanConfig(): BanChampionConfig {
+    return {
+      enabled: false,
+      champions: {
+        top: [],
+        jungle: [],
+        middle: [],
+        bottom: [],
+        utility: [],
+        default: []
+      },
+      banTeammateIntendedChampion: false,
+      delaySeconds: 0
+    }
+  }
+
+  setPickConfig(type: string, config: DeepPartialObject<PickChampionConfig>) {
+    const base = this.pickConfig?.[type] ?? this.createNewEmptyPickConfig()
+    const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
+
+    this.pickConfig = {
+      ...this.pickConfig,
+      [type]: nextType
+    }
+  }
+
+  setBanConfig(type: string, config: DeepPartialObject<BanChampionConfig>) {
+    const base = this.banConfig?.[type] ?? this.createNewEmptyBanConfig()
+    const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
+
+    this.banConfig = {
+      ...this.banConfig,
+      [type]: nextType
     }
   }
 
@@ -136,13 +200,17 @@ export class AutoSelectSettings {
       benchExpectedChampions: observable.struct,
       expectedChampions: observable.struct,
       bannedChampions: observable.struct,
-      targetBanChampions: observable.ref,
-      targetPickChampions: observable.ref
+      pickConfig: observable.ref,
+      banConfig: observable.ref
     })
   }
 }
 
 export class AutoSelectState {
+  groups = GROUPS
+
+  isTemporaryDisabled = false
+
   get csSession() {
     return this._lcData.champSelect.session
   }
@@ -573,6 +641,11 @@ export class AutoSelectState {
     return this.myActiveActions.filter((a) => a.type === 'ban')
   }
 
+  /**
+   * 当此为真时, 位于显式的预选阶段
+   *
+   * 但不仅于此, 在未完成任何英雄选择, 且不是正在 pick 或 ban 的时候, 预选仍然有效 (rcp)
+   */
   get isPickIntenting() {
     if (!this.csSession) {
       return false
@@ -601,6 +674,10 @@ export class AutoSelectState {
     return null
   }
 
+  setTemporaryDisabled(value: boolean) {
+    this.isTemporaryDisabled = value
+  }
+
   constructor(
     private readonly _lcData: LeagueClientData,
     private readonly _settings: AutoSelectSettings
@@ -616,7 +693,12 @@ export class AutoSelectState {
 
       myPickActions: computed.struct,
       myVoteActions: computed.struct,
-      myBanActions: computed.struct
+      myBanActions: computed.struct,
+      myActivePickActions: computed.struct,
+      myActiveVoteActions: computed.struct,
+      myActiveBanActions: computed.struct,
+
+      groups: observable.ref
     })
   }
 }

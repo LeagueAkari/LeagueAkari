@@ -140,38 +140,6 @@ watchEffect(() => {
     )
   }
 })
-
-/**
- * @deprecated
- * used to ban -3 (bravery)
- */
-const _handleBan_3 = async () => {
-  if (!lcs.champSelect.session) {
-    return
-  }
-
-  try {
-    const actions = lcs.champSelect.session.actions.flat()
-
-    const thatAction = actions.find((action) => {
-      return (
-        action.actorCellId === lcs.champSelect.session?.localPlayerCellId &&
-        action.type === 'ban' &&
-        action.completed === false
-      )
-    })
-
-    if (!thatAction) {
-      message.error('No ban action found')
-      return
-    }
-
-    await lc.api.champSelect.pickOrBan(-3, true, 'ban', thatAction.id)
-  } catch (error: any) {
-    console.error(error)
-    message.error(error.message)
-  }
-}
 </script>
 
 <style scoped lang="less">

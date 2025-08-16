@@ -7,7 +7,7 @@ export function useChampionInfo() {
 
   const name = (id: number) => {
     if (id === -3) {
-      return t('champions.bravery')
+      return t('champions.bravery', { ns: 'common' })
     }
 
     return lcs.gameData.champions[id]?.name || lcs.gameData.champions[-1]?.name

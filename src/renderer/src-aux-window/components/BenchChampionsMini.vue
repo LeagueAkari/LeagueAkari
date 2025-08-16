@@ -200,7 +200,7 @@ const STATUS_SORT_ORDER = {
 
 const formatValue = (item: BalanceAdjustment) => {
   if (item.display === 'percentage') {
-    return `${(100 * item.value).toFixed()} %`
+    return `${(100 * item.value).toFixed()}%`
   } else {
     return item.value > 0 ? `+${item.value}` : item.value
   }

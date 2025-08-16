@@ -856,6 +856,8 @@ OrderedChampionList:
   searchForChampion: Search for Champion
   edit: Edit
   unselected: Unselected
+  moveUp: Move Up
+  moveDown: Move Down
 
 RankedTable:
   queueType: Queue Type
@@ -2039,7 +2041,7 @@ ChampionConfig:
   aram: ARAM
   urf: URF
   nexusblitz: Nexus Blitz
-  ultbook: Ultimate Spellbook
+  ultbook: Ult Book
   runes: Runes
   configure: Configure
   spells: Spells

@@ -1,8 +1,10 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { DeepPartialObject } from '@shared/utils/types'
 
+import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAutoSelectStore } from './store'
+import { BanChampionConfig, PickChampionConfig, useAutoSelectStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-select-main'
 
@@ -11,6 +13,7 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
   static id = 'auto-select-renderer'
 
   constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
   ) {}
@@ -77,6 +80,14 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
 
   setBenchHandleTradeIgnoreChampionOwner(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeIgnoreChampionOwner', enabled)
+  }
+
+  setPickConfig(type: string, config: DeepPartialObject<PickChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPickConfig', type, config)
+  }
+
+  setBanConfig(type: string, config: DeepPartialObject<BanChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', type, config)
   }
 
   async onInit() {

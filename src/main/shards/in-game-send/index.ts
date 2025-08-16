@@ -421,6 +421,49 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
     )
 
+    // 适用于在 dry run 中手动触发的消息发送
+    this._ipc.onCall(
+      InGameSendMain.id,
+      'sendTemplateInChampSelectChat',
+      (_, templateId: string, target: 'ally' | 'enemy' | 'all') => {
+        const { messages, error } = this._getDryRunResult(templateId, target)
+
+        if (error) {
+          return { error }
+        }
+
+        const cv = this._lc.data.chat.conversations.championSelect
+
+        if (!cv) {
+          this._log.warn('Champion select chat not found')
+          return { error: 'Champion select chat not found' }
+        }
+
+        this._log.info('Sending message during champion select, manually', messages)
+
+        const interval = this.settings.sendInterval
+        const tasks: (() => Promise<any>)[] = []
+
+        for (let i = 0; i < messages.length; i++) {
+          tasks.push(() => this._lc.api.chat.chatSend(cv.id, messages[i]).catch(() => {}))
+
+          if (i !== messages.length - 1) {
+            tasks.push(() => sleep(interval))
+          }
+        }
+
+        const runTasks = async () => {
+          for (const task of tasks) {
+            await task()
+          }
+        }
+
+        runTasks()
+
+        return { error: null }
+      }
+    )
+
     this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
       return this._rc.repo.getInGameSendTemplateCatalog()
     })

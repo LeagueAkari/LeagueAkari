@@ -137,7 +137,7 @@
               </NRadioButton>
               <NRadioButton value="urf">
                 <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['URF']" />
                   <span>{{ t('ChampionConfig.urf') }}</span>
                   <NIcon
                     v-if="
@@ -251,22 +251,6 @@
                     </NIcon>
                   </div>
                 </NRadioButton>
-                <NRadioButton value="middle">
-                  <div class="radio-button-inner">
-                    <PositionIcon position="middle" />
-                    <span>{{ t('lanes.middle', { ns: 'common' }) }}</span>
-                    <NIcon
-                      v-if="
-                        currentConfig === 'runes'
-                          ? configExistence.runes.includes(`${currentType}-middle`)
-                          : configExistence.spells.includes(`${currentType}-middle`)
-                      "
-                      class="check-icon"
-                    >
-                      <CheckmarkCircle16RegularIcon />
-                    </NIcon>
-                  </div>
-                </NRadioButton>
                 <NRadioButton value="jungle">
                   <div class="radio-button-inner">
                     <PositionIcon position="jungle" />
@@ -276,6 +260,22 @@
                         currentConfig === 'runes'
                           ? configExistence.runes.includes(`${currentType}-jungle`)
                           : configExistence.spells.includes(`${currentType}-jungle`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="middle">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="middle" />
+                    <span>{{ t('lanes.middle', { ns: 'common' }) }}</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-middle`)
+                          : configExistence.spells.includes(`${currentType}-middle`)
                       "
                       class="check-icon"
                     >

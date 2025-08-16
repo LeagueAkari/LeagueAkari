@@ -13,34 +13,48 @@ interface UpcomingBanPick {
   }
 }
 
-export type PlaceInfo =
-  | {
-      place: 'bench'
-    }
-  | {
-      place: 'player'
-      puuid: string
-      cellId: number
-    }
-  | {
-      place: 'candidate-cards'
-      puuid: string
-      cellId: number
-    }
-  | {
-      place: 'uncertain'
-    }
-  | {
-      place: 'candidate-cards-or-bench'
-      puuid: string
-      cellId: number
-    }
+interface PositionChampion {
+  // non-ranked queues
+  default: number[]
 
-export interface TrackEvent {
-  championId: number
-  from: PlaceInfo
-  to: PlaceInfo
-  timestamp: number
+  // ranked queues
+  top: number[]
+  jungle: number[]
+  middle: number[]
+  bottom: number[]
+  utility: number[]
+}
+
+// copied from main shard
+export interface PickChampionConfig {
+  enabled: boolean
+  champions: PositionChampion
+  delaySeconds: number
+  pickTeammateIntendedChampion: boolean
+  pickStrategy: string
+
+  // bench mode only
+  benchSelectFirstAvailableChampion: boolean
+  benchSwapAccumulatedDelaySeconds: number
+  benchHandleTradeEnabled: boolean
+}
+
+export interface BanChampionConfig {
+  enabled: boolean
+  champions: PositionChampion
+  delaySeconds: number
+  banTeammateIntendedChampion: boolean
+}
+
+export interface AutoSelectGroup {
+  groupId: string
+  targetGameMode: string
+  targetQueueTypes: string[] | null
+  positions: string[]
+  additionalPicks: number[]
+  additionalBans: number[]
+  excludedPicks: number[]
+  excludedBans: number[]
 }
 
 export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () => {
@@ -73,7 +87,10 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
       utility: [],
       default: []
     },
-    banTeammateIntendedChampion: false
+    banTeammateIntendedChampion: false,
+
+    pickConfig: {} as Record<string, PickChampionConfig>,
+    banConfig: {} as Record<string, BanChampionConfig>
   })
 
   const targetPick = shallowRef<UpcomingBanPick | null>(null)
@@ -82,6 +99,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
   const upcomingGrab = shallowRef<{ championId: number; willGrabAt: number } | null>(null)
   const upcomingPick = shallowRef<{ championId: number; willPickAt: number } | null>(null)
   const upcomingBan = shallowRef<{ championId: number; willBanAt: number } | null>(null)
+  const groups = shallowRef<AutoSelectGroup[]>([])
 
   return {
     settings,
@@ -91,6 +109,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     upcomingGrab,
     memberMe,
     upcomingPick,
-    upcomingBan
+    upcomingBan,
+    groups
   }
 })

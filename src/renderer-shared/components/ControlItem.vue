@@ -50,7 +50,6 @@ defineOptions({
 <style lang="less" scoped>
 .control-item {
   display: flex;
-  width: fit-content;
   width: 100%;
   transition: background-color 0.3s ease;
 

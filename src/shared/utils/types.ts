@@ -15,3 +15,28 @@ export type Paths<T, D extends number = 3, TK extends number | string = string> 
         [K in keyof T]-?: K extends TK ? `${K}` | Join<K, Paths<T[K], Previous[D]>> : never
       }[keyof T]
     : ''
+
+type IsPlainObject<T> = T extends object
+  ? T extends Function
+    ? false
+    : T extends readonly any[]
+      ? false
+      : T extends Map<any, any>
+        ? false
+        : T extends Set<any>
+          ? false
+          : T extends WeakMap<any, any>
+            ? false
+            : T extends WeakSet<any>
+              ? false
+              : T extends Date
+                ? false
+                : T extends RegExp
+                  ? false
+                  : T extends Promise<any>
+                    ? false
+                    : true
+  : false
+
+export type DeepPartialObject<T> =
+  IsPlainObject<T> extends true ? { [K in keyof T]?: DeepPartialObject<T[K]> } : T

@@ -30,8 +30,13 @@
             class="small-profile-icon"
             :src="tab.summoner ? profileIconUri(tab.summoner.profileIconId) : undefined"
           />
-          <span class="small-game-name">{{ tab.summoner?.gameName }}</span>
-          <span class="small-tag-line">#{{ tab.summoner?.tagLine }}</span>
+          <StreamerModeMaskedText>
+            <template #masked>
+              <span class="small-game-name">{{ maskedSummonerName(tab.puuid, index) }}</span>
+            </template>
+            <span class="small-game-name">{{ tab.summoner?.gameName }}</span>
+            <span class="small-tag-line">#{{ tab.summoner?.tagLine }}</span>
+          </StreamerModeMaskedText>
           <div class="header-simplified-actions">
             <NButton
               round
@@ -411,8 +416,7 @@
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageKillParticipationRate * 100).toFixed()
-                    }}
-                    %</span
+                    }}%</span
                   >
                 </div>
                 <div class="stat-item">
@@ -422,8 +426,7 @@
                       (
                         analysis.matchHistory.summary.averageDamageDealtToChampionShareOfTeam * 100
                       ).toFixed()
-                    }}
-                    %</span
+                    }}%</span
                   >
                 </div>
                 <div class="stat-item">
@@ -431,8 +434,7 @@
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageDamageTakenShareOfTeam * 100).toFixed()
-                    }}
-                    %</span
+                    }}%</span
                   >
                 </div>
                 <div class="stat-item">
@@ -440,8 +442,7 @@
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageGoldShareOfTeam * 100).toFixed()
-                    }}
-                    %</span
+                    }}%</span
                   >
                 </div>
                 <div class="stat-item">
@@ -449,8 +450,7 @@
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageCsShareOfTeam * 100).toFixed()
-                    }}
-                    %</span
+                    }}%</span
                   >
                 </div>
                 <div class="stat-item">
@@ -460,8 +460,7 @@
                     {{ analysis.matchHistory.summary.lose }}
                     {{ t('MatchHistoryTab.stats.lose') }} ({{
                       (analysis.matchHistory.summary.winRate * 100).toFixed()
-                    }}
-                    %)
+                    }}%)
                   </span>
                 </div>
                 <div class="stat-item" v-if="frequentlyUsedChampions.length">
@@ -494,7 +493,7 @@
                           >
                           <span
                             >({{ t('MatchHistoryTab.stats.wr') }}
-                            {{ (c.winRate * 100).toFixed() }} %)</span
+                            {{ (c.winRate * 100).toFixed() }}%)</span
                           >
                         </div>
                       </div>

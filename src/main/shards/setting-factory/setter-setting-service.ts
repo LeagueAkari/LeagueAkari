@@ -3,6 +3,17 @@ import { runInAction } from 'mobx'
 
 import { OnChangeCallback, SettingFactoryMain } from '.'
 
+export interface SetterSettingServiceSetConfig {
+  /**
+   * 短期内的防抖措施
+   *
+   * 当设置为 true 开启, 默认为 500ms, 当设置为 false 时, 会立即写入
+   *
+   * 当设置为数字时, 表示延迟时间, 单位为毫秒
+   */
+  delay?: boolean | number
+}
+
 /**
  * 在更新设置时同时更改状态, 状态同步的设置项服务
  * 耦合了状态和设置项读写的功能, 顺便还能读写 JSON 文件
@@ -104,6 +115,8 @@ export class SetterSettingService {
 
   /**
    * 设置设置项的新值, 并**更新状态**
+   *
+   * 会被延迟写入
    * @param key
    * @param newValue
    */
@@ -120,17 +133,25 @@ export class SetterSettingService {
             runInAction(() => _.set(this._obj, key, newValue))
 
             if (newValue === null) {
-              await this._ins._removeFromStorage(this._namespace, key)
+              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+                this._ins._removeFromStorage(this._namespace, key)
+              )
             } else {
-              await this._ins._saveToStorage(this._namespace, key as any, newValue)
+              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+                this._ins._saveToStorage(this._namespace, key as any, newValue)
+              )
             }
           } else {
             runInAction(() => _.set(this._obj, key, v))
 
             if (v === null) {
-              await this._ins._removeFromStorage(this._namespace, key)
+              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+                this._ins._removeFromStorage(this._namespace, key)
+              )
             } else {
-              await this._ins._saveToStorage(this._namespace, key as any, v)
+              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+                this._ins._saveToStorage(this._namespace, key as any, v)
+              )
             }
           }
         }
@@ -139,9 +160,13 @@ export class SetterSettingService {
       runInAction(() => _.set(this._obj, key, newValue))
 
       if (newValue === null) {
-        await this._ins._removeFromStorage(this._namespace, key)
+        this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+          this._ins._removeFromStorage(this._namespace, key)
+        )
       } else {
-        await this._ins._saveToStorage(this._namespace, key, newValue)
+        this._ins._delayed.add(`${this._namespace}/${key}`, () =>
+          this._ins._saveToStorage(this._namespace, key, newValue)
+        )
       }
     }
   }

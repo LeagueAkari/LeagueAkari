@@ -71,6 +71,10 @@ function runCommand(
       stderr += data.toString()
     })
 
+    child.on('error', (error) => {
+      reject(error)
+    })
+
     child.on('close', (code) => {
       if (code === 0) {
         resolve(stdout)

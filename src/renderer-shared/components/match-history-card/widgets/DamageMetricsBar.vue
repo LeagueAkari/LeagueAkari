@@ -38,7 +38,7 @@
           />
         </svg>
         <div style="margin-left: 8px">
-          {{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }} %
+          {{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }}%
         </div>
       </div>
       <div class="divider"></div>
@@ -59,8 +59,7 @@
           <div style="font-size: 11px; font-weight: bold">
             {{ t('DamageMetricsBar.physical') }} ({{
               ((physicalDamage / (totalDamage || 1)) * 100).toFixed()
-            }}
-            %)
+            }}%)
           </div>
           <div>{{ physicalDamage.toLocaleString() }}</div>
         </div>
@@ -68,8 +67,7 @@
           <div style="font-size: 11px; font-weight: bold">
             {{ t('DamageMetricsBar.magic') }} ({{
               ((magicDamage / (totalDamage || 1)) * 100).toFixed()
-            }}
-            %)
+            }}%)
           </div>
           <div>{{ magicDamage.toLocaleString() }}</div>
         </div>
@@ -77,8 +75,7 @@
           <div style="font-size: 11px; font-weight: bold">
             {{ t('DamageMetricsBar.true') }} ({{
               ((trueDamage / (totalDamage || 1)) * 100).toFixed()
-            }}
-            %)
+            }}%)
           </div>
           <div>{{ trueDamage.toLocaleString() }}</div>
         </div>

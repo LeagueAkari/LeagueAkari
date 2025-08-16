@@ -47,7 +47,7 @@
           :min="0.3"
           :max="1"
           :step="0.01"
-          :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
+          :format-tooltip="(v) => `${(v * 100).toFixed()}%`"
           @update:value="(val) => wm.auxWindow.setOpacity(val)"
           :value="aws.settings.opacity"
         ></NSlider>
@@ -140,7 +140,7 @@
           :min="0.3"
           :max="1"
           :step="0.01"
-          :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
+          :format-tooltip="(v) => `${(v * 100).toFixed()}%`"
           @update:value="(val) => wm.opggWindow.setOpacity(val)"
           :value="ows.settings.opacity"
         ></NSlider>

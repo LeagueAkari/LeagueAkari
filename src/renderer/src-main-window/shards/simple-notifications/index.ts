@@ -1,3 +1,5 @@
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -14,7 +16,7 @@ import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-sc
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
-import { NotificationReactive, useNotification } from 'naive-ui'
+import { NotificationReactive, useMessage, useNotification } from 'naive-ui'
 import { computed, defineComponent, h, inject, ref, watch, watchEffect } from 'vue'
 
 import AnnouncementModal from './modals/AnnouncementModal.vue'
@@ -256,23 +258,24 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   private _setupDeclarationModal() {
     const comp = defineComponent({
       setup() {
-        const showModal = ref(false)
         const as = useAppCommonStore()
         const app = useInstance(AppCommonRenderer)
+        const sns = useSimpleNotificationsStore()
+        const message = useMessage()
 
         watchEffect(() => {
           if (as.settings.showFreeSoftwareDeclaration) {
-            showModal.value = true
+            sns.showDeclarationModal = true
           }
         })
 
         return () =>
           h(DeclarationModal, {
-            show: showModal.value,
-            'onUpdate:show': (v) => (showModal.value = v),
+            show: sns.showDeclarationModal,
+            'onUpdate:show': (v) => (sns.showDeclarationModal = v),
             onConfirm: () => {
               app.setShowFreeSoftwareDeclaration(false)
-              showModal.value = false
+              sns.showDeclarationModal = false
             },
             onQuit: () => {
               app.quit()
@@ -443,6 +446,24 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addRenderVNode(() => h(comp))
   }
 
+  private _setupSpecialKeyboardCombo() {
+    const message = useMessage()
+    const sns = useSimpleNotificationsStore()
+
+    useKeyboardCombo('AKARI', {
+      onFinish: () => {
+        if (sns.showDeclarationModal) {
+          sns.showDeclarationModal = false
+        } else {
+          message.success(() => h(LeagueAkariSpan, { bold: true }))
+        }
+      },
+      requireSameEl: true,
+      caseSensitive: false,
+      timeout: 250
+    })
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -455,6 +476,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupDeclarationModal()
     this._setupAnnouncementModal()
     this._setupNewReleaseModal()
+    this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
   }

@@ -14,8 +14,8 @@ import { SavedPlayer } from '../storage/entities/SavedPlayers'
 
 export class OngoingGameSettings {
   enabled: boolean = true
-  premadeTeamThreshold: number = 6
-  matchHistoryLoadCount: number = 20
+  premadeTeamThreshold: number = 10
+  matchHistoryLoadCount: number = 50
 
   /**
    * 会拉取战绩中前 n 局的时间线数量

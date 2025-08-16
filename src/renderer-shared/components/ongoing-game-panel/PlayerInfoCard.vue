@@ -137,7 +137,7 @@
               :title="`${t('PlayerInfoCard.top4Rate')} & ${t('PlayerInfoCard.1stRate')}`"
               v-if="analysis"
             >
-              {{ (analysis.summary.winRate * 100).toFixed() }} %
+              {{ (analysis.summary.winRate * 100).toFixed() }}%
               <span class="top1-rate"
                 >/
                 {{

@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { useIntervalFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
