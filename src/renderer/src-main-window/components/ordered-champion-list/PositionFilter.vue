@@ -28,7 +28,7 @@ const handleClick = (position: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .position-filter {
   display: flex;
   gap: 4px;

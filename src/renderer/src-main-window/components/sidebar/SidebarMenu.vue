@@ -87,7 +87,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .sidebar-menu {
   position: relative;
   display: flex;
@@ -111,7 +111,7 @@ watch(
       top: var(--indicator-top);
       border-radius: 2px;
 
-      // now for dark only
+      /*  now for dark only */
       background-color: #26dd0e;
     }
 
@@ -130,7 +130,7 @@ watch(
     }
   }
 
-  // dedicated for test page
+  /*  dedicated for test page */
   &.test-page .indicator-rail {
     &::before,
     &::after {

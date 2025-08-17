@@ -411,8 +411,8 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
 }
 </script>
 
-<style lang="less" scoped>
-@import './automation-styles.less';
+<style scoped>
+@import './automation-styles.css';
 
 .divider {
   margin-top: 12px;

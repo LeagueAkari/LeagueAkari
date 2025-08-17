@@ -50,7 +50,7 @@ watchEffect(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .single-root {
   height: 100%;
 }

@@ -146,7 +146,7 @@ const shouldShowAnnouncementBadge = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .common-buttons {
   height: 100%;
   display: flex;

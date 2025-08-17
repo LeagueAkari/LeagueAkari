@@ -14,7 +14,7 @@
   </svg>
 </template>
 
-<style lang="less" scoped>
+<style scoped>
 .svg-icon {
   width: 1em;
   height: 1em;

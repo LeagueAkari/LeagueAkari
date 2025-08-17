@@ -1,18 +1,26 @@
-@import '@renderer-shared/assets/css/reset.less';
+@import '@renderer-shared/assets/css/reset.css';
+@import '@renderer-shared/assets/fonts/comfortaa/stylesheet.css';
 
 ::selection {
-  background: #c0c0c0;
+  background: #c0c0c050;
   text-shadow: none;
 }
 
 :root {
-  color-scheme: dark;
-  --background-color-primary: #1a1a1d;
-  --app-min-height: 200px;
-  --app-min-width: 200px;
-  --title-bar-height: 28px;
+  --app-min-height: 520px;
+  --app-min-width: 670px;
+  --title-bar-height: 36px;
   --scroll-bar-height: 6px;
-  --scroll-bar-width: 6px;
+  --scroll-bar-width: 8px;
+  --n-option-padding: 0 4px;
+}
+
+[data-theme='dark'] {
+  --background-color-primary: #1a1a1d;
+}
+
+[data-theme='light'] {
+  --background-color-primary: #f9f9f9;
 }
 
 ::-webkit-scrollbar {
@@ -22,7 +30,7 @@
 
 ::-webkit-scrollbar-thumb {
   background-color: #4c4c4c;
-  border-radius: 2px;
+  border-radius: 0px;
 
   &:hover {
     background-color: #626262;
@@ -41,21 +49,33 @@ body,
 }
 
 body {
+  /* 防止一些使用绝对布局的元素溢出，产生多余的滚动条 */
   overflow: hidden;
 }
 
 body {
   user-select: none;
-  background-color: var(--background-color-primary);
   line-height: normal;
 }
 
-a {
-  color: rgb(144, 198, 166);
+[data-theme='dark'] {
+  a {
+    color: rgb(144, 198, 166);
+  }
+
+  a:visited {
+    color: rgb(144, 198, 166);
+  }
 }
 
-a:visited {
-  color: rgb(144, 198, 166);
+[data-theme='light'] {
+  a {
+    color: rgb(88, 124, 102);
+  }
+
+  a:visited {
+    color: rgb(88, 124, 102);
+  }
 }
 
 .n-radio {
@@ -83,73 +103,44 @@ a:visited {
   width: calc(100% - 30px);
 }
 
+/* adjust for app title bar height */
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--title-bar-height)) !important;
 }
 
-.n-timeline .n-timeline-item .n-timeline-item-content .n-timeline-item-content__meta {
-  margin-bottom: 0px;
-}
-
-.n-message {
-  background-color: #4141413e;
-  backdrop-filter: blur(4px);
-}
-
-.n-popover.n-popconfirm {
-  background-color: #2a2a2ad5;
-}
-
-.n-base-select-menu {
-  background-color: #3e3e3ef0;
-}
-
-.n-base-select-menu .n-scrollbar {
-  max-height: 50vh;
-
-  .n-virtual-list.v-vl {
-    max-height: 50vh;
-  }
+[data-theme='dark'] .n-base-select-menu {
+  background-color: #383838f8;
 }
 
 .n-popover-shared.popover-transition-enter-from,
 .n-popover-shared.popover-transition-leave-to {
-  transform: none;
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 .n-popover-shared.popover-transition-enter-to,
 .n-popover-shared.popover-transition-leave-from {
-  transform: none;
+  opacity: 1;
+  transform: scale(1);
 }
+
+/*  当前无需覆盖 */
+/*  .n-popover-shared.popover-transition-enter-active {
+   transition:
+     box-shadow 0.3s var(--n-bezier),
+     background-color 0.3s var(--n-bezier),
+     color 0.3s var(--n-bezier),
+     opacity 0.15s var(--n-bezier-ease-out);
+ } */
 
 .n-modal.fade-in-scale-up-transition-enter-from,
 .n-modal.fade-in-scale-up-transition-leave-to {
   opacity: 0;
-  transform: none;
+  transform: scale(0.98);
 }
 
 .n-modal.fade-in-scale-up-transition-leave-from,
 .n-modal.fade-in-scale-up-transition-enter-to {
   opacity: 1;
-  transform: none;
-}
-
-.n-base-select-menu {
-  background-color: #383838f8;
-}
-
-.n-message {
-  background-color: #2c2c2c;
-}
-
-.n-checkbox.n-checkbox--show-label {
-  align-items: center;
-}
-
-.n-popover .n-popover-arrow-wrapper .n-popover-arrow {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.n-popover {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: scale(1);
 }

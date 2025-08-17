@@ -163,7 +163,7 @@ const formatPreviousTier = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .ranked-wrapper {
   display: flex;
   position: relative;
@@ -222,8 +222,9 @@ const formatPreviousTier = computed(() => {
 .ranked-info {
   display: flex;
   flex-direction: column;
-  min-width: 64px; // 让它看起来更加居中
+  min-width: 64px;
 
+  /* 让它看起来更加居中 */
   &.small {
     width: unset;
   }

@@ -24,7 +24,7 @@ const handleClose = () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .title-bar {
   display: flex;
   height: 20px;

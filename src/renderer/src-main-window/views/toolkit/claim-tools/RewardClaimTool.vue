@@ -207,7 +207,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .button-group {
   display: flex;
   gap: 4px;

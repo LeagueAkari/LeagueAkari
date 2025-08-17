@@ -50,7 +50,7 @@ const imageSource = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .champion-icon-container {
   position: relative;
   overflow: hidden;
@@ -61,7 +61,7 @@ const imageSource = computed(() => {
     height: 100%;
   }
 
-  // default size
+  /*  default size */
   width: 64px;
   height: 64px;
 

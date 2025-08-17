@@ -326,7 +326,7 @@ const { masked } = useStreamerModeMaskedText()
 const { name } = useChampionInfo()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .detailed-game-card {
   border-radius: 4px;
   overflow: hidden;

@@ -66,7 +66,7 @@ const handleRepositionToAlignLeagueClientUx = () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .title-bar {
   display: flex;
   position: relative;

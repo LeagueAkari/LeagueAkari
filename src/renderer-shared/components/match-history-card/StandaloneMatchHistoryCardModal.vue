@@ -155,7 +155,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .standalone-card-wrapper {
   position: relative;
   overflow: auto;

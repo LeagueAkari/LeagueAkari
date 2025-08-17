@@ -54,14 +54,14 @@ const markdownHtmlText = computed(() => {
 const show = defineModel<boolean>('show', { default: false })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .markdown-container {
   user-select: text;
   border-radius: 4px;
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .ann-modal {
   width: 90%;
   min-width: 720px;

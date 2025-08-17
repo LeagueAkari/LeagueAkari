@@ -17,7 +17,7 @@ import SkinSelectionMini from '@aux-window/components/SkinSelectionMini.vue'
 import { NScrollbar } from 'naive-ui'
 </script>
 
-<style lang="less">
+<style>
 .champ-select-wrapper {
   padding: 8px 12px;
   box-sizing: border-box;

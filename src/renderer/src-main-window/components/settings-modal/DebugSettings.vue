@@ -461,7 +461,7 @@ useIntervalFn(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .operations {
   display: flex;
   align-items: center;
@@ -489,7 +489,7 @@ useIntervalFn(
 }
 </style>
 
-<style module lang="less">
+<style module>
 .table :global(.n-data-table-empty) {
   --n-empty-padding: 12px;
 }

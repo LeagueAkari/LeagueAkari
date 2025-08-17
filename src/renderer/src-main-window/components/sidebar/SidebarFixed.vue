@@ -133,7 +133,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .sidebar-fixed {
   display: flex;
   flex-direction: column;

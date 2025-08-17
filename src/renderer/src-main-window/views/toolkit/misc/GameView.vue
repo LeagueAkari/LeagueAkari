@@ -50,4 +50,4 @@ const mh = useInstance(MatchHistoryTabsRenderer)
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

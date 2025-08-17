@@ -136,7 +136,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .about-para {
   text-indent: 2em;
   font-size: 13px;
@@ -184,7 +184,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .settings-modal {
   width: 90%;
   min-width: 720px;

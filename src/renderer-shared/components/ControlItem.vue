@@ -47,7 +47,7 @@ defineOptions({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .control-item {
   display: flex;
   width: 100%;

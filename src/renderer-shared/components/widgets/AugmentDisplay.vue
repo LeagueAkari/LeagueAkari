@@ -69,7 +69,7 @@ const formatRarity = (r: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .augment,
 .empty {
   border-radius: 2px;
@@ -126,7 +126,7 @@ const formatRarity = (r: string) => {
   height: 10px;
   border-radius: 50%;
   margin-right: 2px;
-  background-color: rgb(0, 0, 0); // default color
+  background-color: rgb(0, 0, 0);
 }
 
 .rarity-indicator.silver {

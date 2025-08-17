@@ -438,7 +438,7 @@ const handleShowSearchSummonerModalInPopconfirm = () => {
 const { summonerName } = useStreamerModeMaskedText()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .match-history-tabs-title {
   display: flex;
   align-items: center;
@@ -548,7 +548,7 @@ const { summonerName } = useStreamerModeMaskedText()
   -webkit-app-region: no-drag;
   padding: 0px 12px 0px 10px;
   border-radius: 2px;
-  height: 24px; // same as tab height
+  height: 24px; /* same as tab height */
   box-sizing: border-box;
   cursor: pointer;
   line-height: 1;
@@ -714,7 +714,7 @@ const { summonerName } = useStreamerModeMaskedText()
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .scroll-bar {
   height: 100%;
   display: flex;

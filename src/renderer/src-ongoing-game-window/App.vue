@@ -67,7 +67,7 @@ watch(
 useHideNotAppTag(() => ogws.fakeShow)
 </script>
 
-<style lang="less">
+<style>
 .ongoing-game-wrapper {
   background-color: #1a1a1da0;
   border-radius: 8px;

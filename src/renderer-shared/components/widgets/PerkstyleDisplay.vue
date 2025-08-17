@@ -38,7 +38,7 @@ const { size = 20 } = defineProps<{
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .perkstyle,
 .empty {
   border-radius: 2px;

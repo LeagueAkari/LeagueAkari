@@ -908,7 +908,7 @@ if (import.meta.env.DEV) {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .opgg-champion-wrapper {
   position: relative;
   height: 100%;

@@ -335,4 +335,4 @@ const handleLoadAvailableBots = async (show: boolean) => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

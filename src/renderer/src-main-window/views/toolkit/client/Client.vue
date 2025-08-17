@@ -212,8 +212,8 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
 }
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 
 .outer-wrapper {
   position: relative;

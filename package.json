@@ -74,7 +74,6 @@
     "html-to-image": "^1.11.13",
     "i18next": "^25.3.0",
     "i18next-vue": "^5.3.0",
-    "less": "^4.3.0",
     "markdown-it": "^14.1.0",
     "mime-types": "^3.0.1",
     "naive-ui": "^2.42.0",

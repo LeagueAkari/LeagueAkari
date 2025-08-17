@@ -247,7 +247,7 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .lounge-wrapper {
   display: flex;
   position: relative;

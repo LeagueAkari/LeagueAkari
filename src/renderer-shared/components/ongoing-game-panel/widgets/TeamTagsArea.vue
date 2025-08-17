@@ -254,7 +254,7 @@ const hasTags = computed(() => {
 })
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .team-tags {
   display: flex;
   align-items: flex-end;

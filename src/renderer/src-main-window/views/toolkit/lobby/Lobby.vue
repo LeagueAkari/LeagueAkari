@@ -16,6 +16,6 @@ import LobbyTool from './LobbyTool.vue'
 import StrawberryTool from './StrawberryTool.vue'
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 </style>

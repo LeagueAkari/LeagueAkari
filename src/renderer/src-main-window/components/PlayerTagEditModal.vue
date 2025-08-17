@@ -92,7 +92,7 @@ const handleSaveTag = async () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .summoner-info {
   display: flex;
   align-items: center;

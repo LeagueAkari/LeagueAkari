@@ -60,7 +60,7 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .cooldown,
 .description,
 .level {

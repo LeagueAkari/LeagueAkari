@@ -18,7 +18,7 @@ import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp
 import OpggWindowTitleBar from './components/OpggWindowTitleBar.vue'
 </script>
 
-<style lang="less">
+<style>
 #opgg-window-frame {
   height: 100%;
   display: flex;

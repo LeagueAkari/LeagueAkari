@@ -79,14 +79,14 @@ const handle = watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .markdown-container {
   user-select: text;
   border-radius: 4px;
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .declaration-modal {
   min-width: 720px;
   max-width: 1106px;

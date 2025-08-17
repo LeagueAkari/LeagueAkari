@@ -226,7 +226,7 @@ const { isOverDropZone } = useDropZone(tabsWrapperEl, {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .tabs-wrapper {
   position: relative;
   height: 100%;

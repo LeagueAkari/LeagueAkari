@@ -21,7 +21,7 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .la-placeholder {
   display: flex;
   position: relative;

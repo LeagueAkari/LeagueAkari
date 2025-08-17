@@ -35,14 +35,14 @@ import TaggedPlayers from './TaggedPlayers.vue'
 const { t } = useTranslation()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .operations {
   display: flex;
   margin-bottom: 8px;
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .row-base {
   font-size: 12px;
 }

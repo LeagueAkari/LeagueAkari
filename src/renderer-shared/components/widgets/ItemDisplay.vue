@@ -87,7 +87,7 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .info {
   margin-bottom: 8px;
   display: flex;

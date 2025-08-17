@@ -848,7 +848,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .input-line {
   width: 100%;
   display: flex;
@@ -1006,7 +1006,9 @@ watch(
     cursor: pointer;
     transition:
       background-color 0.2s,
-      opacity 0.2s; // opacity here to match TransitionGroup#fade
+      opacity 0.2s;
+
+    /*  opacity here to match TransitionGroup#fade */
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.4);
@@ -1069,7 +1071,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .search-summoner-modal {
   max-width: 600px;
 }

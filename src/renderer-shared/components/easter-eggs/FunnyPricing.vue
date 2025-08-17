@@ -258,7 +258,7 @@ const formatCredit = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .pricing-wrapper {
   padding: 24px;
   background-color: var(--background-color-primary);

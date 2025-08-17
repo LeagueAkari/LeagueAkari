@@ -79,7 +79,7 @@ const message = useMessage()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 </script>
 
-<style lang="less">
+<style>
 #app-frame {
   position: relative;
   height: 100%;

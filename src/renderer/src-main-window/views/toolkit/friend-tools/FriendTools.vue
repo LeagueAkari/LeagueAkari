@@ -418,8 +418,8 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 
 .button-group {
   display: flex;

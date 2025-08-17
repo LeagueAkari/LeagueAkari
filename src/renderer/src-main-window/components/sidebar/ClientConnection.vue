@@ -289,7 +289,7 @@ const handleActionSelect = async (key: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .client-connection {
   display: flex;
   flex-direction: column;

@@ -422,7 +422,7 @@ const premadeInfo = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .queue {
   display: flex;
   align-items: center;

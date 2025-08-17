@@ -37,7 +37,7 @@ const handleError = () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .lcu-image {
   display: block;
 }

@@ -2,7 +2,7 @@
   <div class="ongoing-indicator"></div>
 </template>
 
-<style lang="less" scoped>
+<style scoped>
 .ongoing-indicator {
   width: 8px;
   height: 8px;

@@ -167,7 +167,7 @@ const { pressed: spell2Pressed } = useMousePressed({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .player {
   display: flex;
   align-items: center;

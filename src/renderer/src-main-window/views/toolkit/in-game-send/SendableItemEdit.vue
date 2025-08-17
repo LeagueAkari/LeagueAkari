@@ -619,7 +619,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .template-edit {
   display: flex;
   height: 600px;
@@ -708,6 +708,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
     display: flex;
     gap: 8px;
     align-items: center;
+    margin-bottom: 16px;
 
     .title {
       font-size: 16px;
@@ -738,8 +739,6 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
       gap: 8px;
       align-items: center;
     }
-
-    margin-bottom: 16px; // here 16px
   }
 
   .control-items {
@@ -799,7 +798,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .error-message {
   .error-title {
     font-size: 12px;

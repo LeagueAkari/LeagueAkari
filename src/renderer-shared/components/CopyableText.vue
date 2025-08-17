@@ -69,7 +69,7 @@ const handleCopy = async () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .copyable-text {
   margin-right: 4px;
 }

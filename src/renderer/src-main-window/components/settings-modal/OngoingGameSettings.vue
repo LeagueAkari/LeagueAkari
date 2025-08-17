@@ -284,7 +284,7 @@ const og = useInstance(OngoingGameRenderer)
 const sgps = useSgpStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .unsupported-sgp-server {
   color: rgb(230, 114, 41);
   font-weight: bold;

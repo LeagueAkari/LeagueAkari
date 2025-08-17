@@ -111,7 +111,7 @@ const formatDelayText = (d: number) => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .label {
   font-size: 12px;
   color: rgb(178, 178, 178);

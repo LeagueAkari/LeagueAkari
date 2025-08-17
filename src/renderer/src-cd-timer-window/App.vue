@@ -32,7 +32,7 @@ watch(
 )
 </script>
 
-<style lang="less">
+<style>
 html,
 body,
 #app {

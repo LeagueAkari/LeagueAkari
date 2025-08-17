@@ -192,8 +192,8 @@ const formatLosses = (losses: number) => {
 }
 </script>
 
-<style lang="less" scoped>
-// 轻度边框
+<style scoped>
+/* 轻度边框 */
 .ranked-stats-table {
   border-collapse: collapse;
   border-spacing: 0;

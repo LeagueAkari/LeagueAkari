@@ -187,7 +187,7 @@ onDeactivated(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .shortcut-selector-wrapper {
   display: flex;
   align-items: center;
@@ -251,7 +251,7 @@ onDeactivated(() => {
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .modal-content {
   width: fit-content;
 }

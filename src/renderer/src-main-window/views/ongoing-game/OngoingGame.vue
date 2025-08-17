@@ -54,7 +54,7 @@ const handleShowGameById = (id: number, selfPuuid: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .og-page {
   height: 100%;
 }

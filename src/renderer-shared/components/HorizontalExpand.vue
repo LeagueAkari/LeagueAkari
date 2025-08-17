@@ -45,7 +45,7 @@ const clearMaxWidth = (el: Element) => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .horizontal-tran-wrapper {
   display: inline-block;
   overflow: hidden;

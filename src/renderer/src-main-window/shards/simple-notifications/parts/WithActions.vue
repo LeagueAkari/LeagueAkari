@@ -28,7 +28,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .with-actions {
   display: flex;
   flex-direction: column;

@@ -15,7 +15,7 @@ const show = defineModel('showMask', {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .masked-component {
   position: relative;
   overflow: hidden;

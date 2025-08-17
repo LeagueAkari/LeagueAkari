@@ -128,7 +128,7 @@ const getTimelineTypeByAction = (action: Action) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .action {
   font-size: 11px;
   color: rgb(146, 146, 146);

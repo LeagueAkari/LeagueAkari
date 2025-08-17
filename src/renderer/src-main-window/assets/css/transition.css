@@ -15,7 +15,7 @@
   position: relative;
   transition:
     opacity 0.2s ease,
-    top 0.3s cubic-bezier(0.19, 1, 0.22, 1); // cubic copied from OpenAI
+    /* cubic copied from OpenAI */ top 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .move-fade-enter-from {

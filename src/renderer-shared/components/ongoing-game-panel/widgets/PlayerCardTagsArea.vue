@@ -818,7 +818,7 @@ onDeactivated(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .tags {
   display: flex;
   flex-wrap: wrap;

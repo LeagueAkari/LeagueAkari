@@ -118,7 +118,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .automation-page {
   display: flex;
   flex-direction: column;

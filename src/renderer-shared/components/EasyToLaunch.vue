@@ -78,7 +78,7 @@ const launchItem = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .easy-to-launch-wrapper {
   display: flex;
   flex-direction: column;

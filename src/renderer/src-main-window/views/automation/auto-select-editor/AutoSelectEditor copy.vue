@@ -195,7 +195,7 @@ const typeToGameMode = (type: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .selector {
   display: flex;
   flex-direction: column;

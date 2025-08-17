@@ -815,7 +815,7 @@ const { masked } = useStreamerModeMaskedText()
 const { name } = useChampionInfo()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .player-card {
   position: relative;
   display: flex;
@@ -898,7 +898,7 @@ const { name } = useChampionInfo()
       transition: filter 0.3s;
       cursor: pointer;
 
-      // 内部容器用于平衡 popover 的位置
+      /* 内部容器用于平衡 popover 的位置 */
       .name-tag-inner {
         max-width: 100%;
         width: fit-content;
@@ -1079,7 +1079,9 @@ const { name } = useChampionInfo()
   width: 100%;
   height: 0;
   gap: 2px;
-  margin-top: 4px; // 再补一点间距, 合计 8px
+  margin-top: 4px;
+
+  /* 再补一点间距, 合计 8px */
 
   .match-item {
     position: relative;

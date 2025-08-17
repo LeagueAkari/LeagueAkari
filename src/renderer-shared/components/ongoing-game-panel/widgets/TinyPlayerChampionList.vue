@@ -30,7 +30,7 @@ const mh = useInstance(MatchHistoryTabsRenderer)
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .tiny-list {
   display: flex;
   flex-direction: column;

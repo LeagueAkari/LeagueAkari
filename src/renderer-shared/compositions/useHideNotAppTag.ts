@@ -1,4 +1,4 @@
-import '@renderer-shared/assets/css/hide-not-app.less'
+import '@renderer-shared/assets/css/hide-not-app.css'
 import { MaybeRefOrGetter, toValue, watchEffect } from 'vue'
 
 export function useHideNotAppTag(hide: MaybeRefOrGetter<boolean>) {

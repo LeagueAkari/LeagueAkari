@@ -521,4 +521,4 @@ const handleClearEmotes = async () => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

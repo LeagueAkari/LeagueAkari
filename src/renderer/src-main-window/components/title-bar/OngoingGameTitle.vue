@@ -140,7 +140,7 @@ const intelligence = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .ongoing-game-title {
   height: 100%;
   align-items: center;

@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 
-import '@renderer-shared/assets/css/base-styles.less'
-import '@renderer-shared/assets/css/github-markdown.less'
-import '@renderer-shared/assets/css/lol-view.less'
+import '@renderer-shared/assets/css/base-styles.css'
+import '@renderer-shared/assets/css/github-markdown.css'
+import '@renderer-shared/assets/css/lol-view.css'
 import { i18next } from '@renderer-shared/i18n'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -13,8 +13,8 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
-import './assets/css/styles.less'
-import './assets/css/transition.less'
+import './assets/css/styles.css'
+import './assets/css/transition.css'
 import { router } from './routes'
 import { manager } from './shards'
 

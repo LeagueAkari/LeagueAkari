@@ -35,7 +35,7 @@ const { name = '' } = defineProps<{
 }>()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .reward-item {
   display: flex;
   flex-direction: column;

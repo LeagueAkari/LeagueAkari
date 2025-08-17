@@ -551,7 +551,7 @@ const handleToggleShowDetailedGame = () => {
 const { name } = useChampionInfo()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .match-history-card {
   display: flex;
   padding: 0px 0px 0px 12px;

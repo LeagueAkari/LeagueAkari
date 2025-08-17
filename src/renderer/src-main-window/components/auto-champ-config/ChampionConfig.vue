@@ -880,7 +880,7 @@ const configExistence = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .header {
   display: flex;
   align-items: center;
@@ -1062,7 +1062,7 @@ const configExistence = computed(() => {
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .champion-config-wrapper {
   height: 580px;
   width: fit-content;

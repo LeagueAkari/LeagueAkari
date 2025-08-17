@@ -9,7 +9,7 @@ defineProps<{
 }>()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .beautiful-akari {
   background-clip: text;
   color: transparent;

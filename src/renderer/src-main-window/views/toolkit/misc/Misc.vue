@@ -24,6 +24,6 @@ import Spectate from './Spectate.vue'
 import SummonerProfile from './SummonerProfile.vue'
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 </style>

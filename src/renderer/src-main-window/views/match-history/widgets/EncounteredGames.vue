@@ -307,7 +307,7 @@ const emits = defineEmits<{
 }>()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .header {
   display: flex;
   align-items: center;

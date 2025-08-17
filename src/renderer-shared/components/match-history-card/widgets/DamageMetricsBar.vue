@@ -138,7 +138,7 @@ const orderedInner = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .physical-damage {
   fill: rgb(223, 77, 67);
 }

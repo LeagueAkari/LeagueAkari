@@ -18,7 +18,7 @@ import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
 </script>
 
-<style lang="less">
+<style>
 #aux-window-frame {
   height: 100%;
   display: flex;

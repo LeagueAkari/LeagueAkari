@@ -319,7 +319,7 @@ const ctws = useCdTimerWindowStore()
 const wm = useInstance(WindowManagerRenderer)
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .inline-icon {
   width: 16px;
   height: 16px;

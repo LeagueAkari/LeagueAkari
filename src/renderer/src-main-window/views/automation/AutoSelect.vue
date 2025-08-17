@@ -321,8 +321,8 @@ const roles = computed(() => {
 const testDisabled = ref(false)
 </script>
 
-<style lang="less" scoped>
-@import './automation-styles.less';
+<style scoped>
+@import './automation-styles.css';
 
 .auto-select-editor {
   margin-top: 8px;

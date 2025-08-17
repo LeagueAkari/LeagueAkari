@@ -57,7 +57,7 @@ watch(
 )
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .label {
   font-size: 12px;
   color: rgb(146, 146, 146);

@@ -547,7 +547,7 @@ const handleImportTaggedPlayers = async () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .operations {
   display: flex;
   gap: 8px;
@@ -572,7 +572,7 @@ const handleImportTaggedPlayers = async () => {
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .row-base {
   font-size: 12px;
 }

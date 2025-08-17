@@ -211,7 +211,7 @@ const handleSetSkin = async () => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .outer {
   display: flex;
   align-items: center;

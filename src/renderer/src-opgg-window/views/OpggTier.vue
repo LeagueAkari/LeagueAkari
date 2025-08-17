@@ -492,7 +492,7 @@ const data = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .standalone-card-wrapper {
   height: 100%;
   display: flex;
@@ -649,7 +649,7 @@ const data = computed(() => {
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .column-title {
   font-size: 13px;
   color: #c9c9c9;

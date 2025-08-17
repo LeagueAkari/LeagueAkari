@@ -1066,7 +1066,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .opgg-panel {
   position: relative;
   display: flex;

@@ -75,4 +75,4 @@ const handleSetChatStatusMessage = async () => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

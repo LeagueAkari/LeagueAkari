@@ -316,7 +316,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .selector {
   display: flex;
   flex-direction: column;
@@ -362,7 +362,7 @@ watch(
 .group-list-title {
   color: #fff8;
   font-size: 12px;
-  margin-left: 8px; // align with the first item
+  margin-left: 8px;
   margin-bottom: 4px;
 }
 

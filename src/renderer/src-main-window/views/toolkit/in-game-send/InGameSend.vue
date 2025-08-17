@@ -67,8 +67,8 @@ const igs = useInGameSendStore()
 const ig = useInstance(InGameSendRenderer)
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 
 .padding {
   padding: 8px 12px;

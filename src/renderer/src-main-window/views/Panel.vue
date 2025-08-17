@@ -19,7 +19,7 @@
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .panel {
   display: flex;
   width: 100%;

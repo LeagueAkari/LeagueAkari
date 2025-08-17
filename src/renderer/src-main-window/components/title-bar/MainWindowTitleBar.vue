@@ -60,7 +60,7 @@ const shouldShowDivider = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 #app-title-bar {
   display: flex;
   position: relative;

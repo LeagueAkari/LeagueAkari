@@ -329,7 +329,7 @@ const sendInGameText = (
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .spells-cd-timer {
   position: relative;
   padding: 8px;

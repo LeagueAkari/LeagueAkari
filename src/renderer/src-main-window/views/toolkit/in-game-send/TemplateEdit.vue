@@ -355,7 +355,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .template-edit {
   display: flex;
   height: 600px;
@@ -506,7 +506,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .error-message {
   .error-title {
     font-size: 12px;

@@ -132,7 +132,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .traffic-buttons {
   position: relative;
   height: 100%;
@@ -152,7 +152,7 @@ watch(
     font-size: 14px;
     transition: all 0.3s;
 
-    // special case for close button
+    /*  special case for close button */
     &.close {
       font-size: 16px;
     }

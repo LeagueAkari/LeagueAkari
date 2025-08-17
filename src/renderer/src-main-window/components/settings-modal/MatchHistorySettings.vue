@@ -66,7 +66,7 @@ const sgps = useSgpStore()
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 [data-theme='dark'] {
   .sgp-server-hint-ok {
     color: #63e2b7;

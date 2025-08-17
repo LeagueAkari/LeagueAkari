@@ -1,5 +1,4 @@
-@import '@renderer-shared/assets/css/reset.less';
-@import '@renderer-shared/assets/fonts/comfortaa/stylesheet.less';
+@import '@renderer-shared/assets/css/reset.css';
 
 ::selection {
   background: #c0c0c050;
@@ -49,7 +48,7 @@ body,
 }
 
 body {
-  // 防止一些使用绝对布局的元素溢出，产生多余的滚动条
+  /* 防止一些使用绝对布局的元素溢出，产生多余的滚动条 */
   overflow: hidden;
 }
 
@@ -103,7 +102,7 @@ body {
   width: calc(100% - 30px);
 }
 
-// adjust for app title bar height
+/* adjust for app title bar height */
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--title-bar-height)) !important;
 }
@@ -123,15 +122,6 @@ body {
   opacity: 1;
   transform: scale(1);
 }
-
-// 当前无需覆盖
-// .n-popover-shared.popover-transition-enter-active {
-//   transition:
-//     box-shadow 0.3s var(--n-bezier),
-//     background-color 0.3s var(--n-bezier),
-//     color 0.3s var(--n-bezier),
-//     opacity 0.15s var(--n-bezier-ease-out);
-// }
 
 .n-modal.fade-in-scale-up-transition-enter-from,
 .n-modal.fade-in-scale-up-transition-leave-to {

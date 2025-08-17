@@ -1693,12 +1693,12 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
-@container-width: 1064px;
-
+<style scoped>
 .player-page {
   position: relative;
   height: 100%;
+
+  --la-player-page-container-width: 1064px;
 }
 
 .ranked-modal {
@@ -1743,7 +1743,7 @@ defineExpose({
     display: flex;
     align-items: center;
     height: 100%;
-    width: @container-width;
+    width: var(--la-player-page-container-width);
     padding: 0 16px;
     box-sizing: border-box;
     margin: 0 auto;
@@ -1781,7 +1781,7 @@ defineExpose({
 
 .inner-container {
   height: 100%;
-  width: @container-width;
+  width: var(--la-player-page-container-width);
   margin: 0 auto;
   padding: 28px 0 0 0;
 

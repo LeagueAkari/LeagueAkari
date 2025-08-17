@@ -121,7 +121,7 @@ watchEffect(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .app-sidebar {
   display: flex;
   flex-direction: column;

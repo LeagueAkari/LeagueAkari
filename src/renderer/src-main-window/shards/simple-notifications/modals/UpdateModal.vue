@@ -96,7 +96,7 @@ const markdownHtmlText = computed(() => {
 const show = defineModel<boolean>('show', { default: false })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .para,
 .small-link {
   font-size: 13px;
@@ -116,7 +116,7 @@ const show = defineModel<boolean>('show', { default: false })
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .update-modal {
   width: 90%;
   min-width: 720px;

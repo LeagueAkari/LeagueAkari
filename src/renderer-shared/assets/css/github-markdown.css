@@ -24,7 +24,7 @@
     --fgColor-attention: #d29922;
     --fgColor-danger: #f85149;
     --fgColor-done: #ab7df8;
-    // --bgColor-default: #0d1117;
+    /* --bgColor-default: #0d1117; */
     --bgColor-default: #0000;
     --bgColor-muted: #151b23;
     --bgColor-neutral-muted: #656c7633;
@@ -82,7 +82,7 @@
     --fgColor-attention: #9a6700;
     --fgColor-danger: #d1242f;
     --fgColor-done: #8250df;
-    // --bgColor-default: #ffffff;
+    /* --bgColor-default: #ffffff; */
     --bgColor-default: #0000;
     --bgColor-muted: #f6f8fa;
     --bgColor-neutral-muted: #818b981f;

@@ -90,7 +90,7 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .menu-list {
   display: flex;
   flex-direction: column;

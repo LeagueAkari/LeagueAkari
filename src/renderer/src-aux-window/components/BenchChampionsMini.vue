@@ -426,7 +426,7 @@ const handleReroll = async (grabBack = false) => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .outer {
   display: flex;
   align-items: center;

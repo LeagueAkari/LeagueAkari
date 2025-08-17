@@ -532,7 +532,7 @@ const tableData = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .standalone-card-wrapper {
   padding: 12px;
   max-height: 85vh;

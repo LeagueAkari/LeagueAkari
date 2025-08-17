@@ -131,8 +131,8 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
-@import './toolkit-styles.less';
+<style scoped>
+@import './toolkit-styles.css';
 
 .toolkit-page {
   display: flex;

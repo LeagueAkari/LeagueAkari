@@ -187,7 +187,7 @@ watch(
 )
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .summoner-spells {
   display: flex;
   gap: 8px;

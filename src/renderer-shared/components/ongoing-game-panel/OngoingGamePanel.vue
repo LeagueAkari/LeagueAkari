@@ -381,7 +381,7 @@ const columnsNeed = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .ongoing-game-view {
   height: 100%;
 }

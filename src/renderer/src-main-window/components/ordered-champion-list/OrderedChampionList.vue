@@ -309,7 +309,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .ordered-champion-list-wrapper {
   display: flex;
   align-items: center;
@@ -340,7 +340,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .target-item .move-btn {
   opacity: 0;
   transition: opacity 0.2s;

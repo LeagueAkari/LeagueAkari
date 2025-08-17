@@ -678,7 +678,7 @@ handleTestLatency()
 const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .hover-text {
   font-size: 12px;
   color: #aaa;

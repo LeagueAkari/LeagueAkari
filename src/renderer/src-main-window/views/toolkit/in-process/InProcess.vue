@@ -16,6 +16,6 @@ import ChampionBench from './ChampionBench.vue'
 import GameflowInProcess from './GameflowInProcess.vue'
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 </style>
