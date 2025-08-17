@@ -137,3 +137,6 @@ sgpServers:
 champions:
   bravery: 勇敢举动
   dummy: 占位
+
+app:
+  singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

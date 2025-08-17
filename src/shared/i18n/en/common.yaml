@@ -137,3 +137,6 @@ sgpServers:
 champions:
   bravery: Bravery
   dummy: Dummy
+
+app:
+  singleton: Because Akari is unique, there can only be ONE Akari at a time

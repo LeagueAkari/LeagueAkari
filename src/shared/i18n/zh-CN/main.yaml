@@ -113,6 +113,3 @@ in-game-send-main:
     template: 基于模板
 
   newSendableItem: 新发送项 {{index}}
-
-app:
-  singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

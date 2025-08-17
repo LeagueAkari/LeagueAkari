@@ -113,6 +113,3 @@ in-game-send-main:
     template: Template
 
   newSendableItem: New Sendable Item {{index}}
-
-app:
-  singleton: Because Akari is unique, there can only be ONE Akari at a time

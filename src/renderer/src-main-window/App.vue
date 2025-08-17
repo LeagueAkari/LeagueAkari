@@ -69,7 +69,7 @@ const settingModelTab = ref('basic')
 app.onSecondInstance(() => {
   notification.info({
     title: 'League Akari',
-    content: () => t('app.singleton'),
+    content: () => t('app.singleton', { ns: 'common' }),
     duration: 10000
   })
 })
