@@ -123,13 +123,6 @@ AppSettings:
         quit: Quit
         ask: Ask every time
 
-    backgroundMaterial:
-      label: Background Material
-      description: Set the background material of the application interface, requires specific system version support
-      options:
-        none: Default
-        mica: Mica
-
     dataSource:
       label: Remote Data Source
       description: Set the remote config source of the application, get or update data from GitHub / Gitee
@@ -187,9 +180,17 @@ AppSettings:
 
   mainWindowUi:
     title: Main Window UI
+
     useProfileSkinAsBackground:
       label: Use Profile Skin as Background
       description: League Akari will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+
+    backgroundMaterial:
+      label: Background Material
+      description: Set the background material of the application interface, requires specific system version support
+      options:
+        none: Default
+        mica: Mica
 
   lcConnection:
     title: LCU Connection

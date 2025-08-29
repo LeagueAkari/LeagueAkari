@@ -174,13 +174,8 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
   usePreferredBackgroundImageUrl() {
     const store = useMainWindowUiStore()
-    const preferMica = useMicaAvailability()
 
     const backgroundImageUrl = computed(() => {
-      if (preferMica.value) {
-        return null
-      }
-
       if (store.frontendSettings.useProfileSkinAsBackground) {
         if (store.tabBackgroundSkinUrl) {
           return LeagueClientRenderer.url(store.tabBackgroundSkinUrl)

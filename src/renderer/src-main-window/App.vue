@@ -2,7 +2,7 @@
   <div
     id="app-frame"
     :class="{
-      'use-plain-bg': !backgroundImageUrl
+      'use-plain-bg': !backgroundImageUrl && !preferMica
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
@@ -38,6 +38,7 @@ import { provide, ref } from 'vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import { useMicaAvailability } from './compositions/useMicaAvailability'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
@@ -76,6 +77,7 @@ app.onSecondInstance(() => {
 
 const message = useMessage()
 
+const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 </script>
 

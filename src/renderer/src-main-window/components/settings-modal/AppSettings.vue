@@ -48,21 +48,6 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="isDev && as.settings.isInKyokoMode"
-        class="control-item-margin"
-        :label="t('AppSettings.basic.backgroundMaterial.label')"
-        :label-description="t('AppSettings.basic.backgroundMaterial.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="wms.settings.backgroundMaterial"
-          @update:value="(val) => wm.setBackgroundMaterial(val)"
-          :options="backgroundMaterials"
-        />
-      </ControlItem>
-      <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.basic.dataSource.label')"
         :label-description="t('AppSettings.basic.dataSource.description')"
@@ -307,6 +292,20 @@
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span>
       </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.mainWindowUi.backgroundMaterial.label')"
+        :label-description="t('AppSettings.mainWindowUi.backgroundMaterial.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="wms.settings.backgroundMaterial"
+          @update:value="(val) => wm.setBackgroundMaterial(val)"
+          :options="backgroundMaterials"
+        />
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
