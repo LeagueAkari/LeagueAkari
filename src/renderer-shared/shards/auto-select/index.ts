@@ -82,12 +82,12 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeIgnoreChampionOwner', enabled)
   }
 
-  setPickConfig(type: string, config: DeepPartialObject<PickChampionConfig>) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPickConfig', type, config)
+  setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPickConfig', groupId, config)
   }
 
-  setBanConfig(type: string, config: DeepPartialObject<BanChampionConfig>) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', type, config)
+  setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', groupId, config)
   }
 
   async onInit() {

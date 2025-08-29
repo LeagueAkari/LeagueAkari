@@ -210,6 +210,7 @@ export type GameMode =
   | 'BRAWL' // 神木之门
   | 'CHERRY' // 斗魂竞技场 (Arena)
   | 'STRAWBERRY' // 无尽狂潮 (Swarm)
+  | 'RUBY' // 末日人机 (维嘉) (queueType: "NIGHTMARE_BOT")
 
 export interface GameMap {
   id: number

@@ -238,7 +238,7 @@
                 <NRadioButton value="top">
                   <div class="radio-button-inner">
                     <PositionIcon position="top" />
-                    <span>{{ t('lanes.top', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.top', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -254,7 +254,7 @@
                 <NRadioButton value="jungle">
                   <div class="radio-button-inner">
                     <PositionIcon position="jungle" />
-                    <span>{{ t('lanes.jungle', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.jungle', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -270,7 +270,7 @@
                 <NRadioButton value="middle">
                   <div class="radio-button-inner">
                     <PositionIcon position="middle" />
-                    <span>{{ t('lanes.middle', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.middle', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -286,7 +286,7 @@
                 <NRadioButton value="bottom">
                   <div class="radio-button-inner">
                     <PositionIcon position="bottom" />
-                    <span>{{ t('lanes.bottom', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.bottom', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -302,7 +302,7 @@
                 <NRadioButton value="utility">
                   <div class="radio-button-inner">
                     <PositionIcon position="utility" />
-                    <span>{{ t('lanes.utility', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.utility', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'

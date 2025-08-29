@@ -9,7 +9,7 @@ na: N/A
 summonerPlaceholder: Summoner {{index}}
 summoner: Summoner
 
-lanes:
+positions:
   all: None
   ALL: None
   top: Top

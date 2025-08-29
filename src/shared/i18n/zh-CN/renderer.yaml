@@ -60,6 +60,8 @@ DeclarationModal:
       3. 客户端异常、性能下降或其他不良游戏体验。
     - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**League Akari** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
 
+    > 请参考 [Patch 25.17 更新说明](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/) 中的 **Game Info Tracking Improvements** 一节。
+
     ## 三、服务器兼容性声明
     - **自本声明发布之日起，League Akari 不再对腾讯游戏服务器提供任何形式的支持。**
     - 在腾讯服务器环境中使用本软件**极有可能**违反腾讯游戏相关用户协议、管理规范或技术保护措施；由此产生的封号、数据丢失或其他不利后果，概由用户自行负责。

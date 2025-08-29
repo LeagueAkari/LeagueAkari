@@ -51,7 +51,6 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
             this._log.info(RendererDebugRenderer.id, 'send all native lcu events')
             this.setSendAllNativeLcuEvents(true)
           } else {
-            this._log.info(RendererDebugRenderer.id, 'do not send all native lcu events')
             this.setSendAllNativeLcuEvents(false)
           }
         },

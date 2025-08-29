@@ -6,15 +6,6 @@
           <template #header>
             <span class="card-header-title">[自动英雄选择与禁用]</span>
           </template>
-          <ControlItem
-            class="control-item-margin"
-            :label="`[总开关]`"
-            :label-description="`[在英雄选择阶段的自动选用和自动禁用]`"
-            :label-width="260"
-          >
-            <NSwitch size="small" v-model:value="testDisabled" />
-          </ControlItem>
-          <div class="divider"></div>
           <AutoSelectEditor class="auto-select-editor" :class="{ disabled: !testDisabled }" />
         </NCard>
         <NCard size="small" style="margin-top: 8px">
@@ -309,16 +300,16 @@ const as = useInstance(AutoSelectRenderer)
 
 const roles = computed(() => {
   return [
-    { key: 'top', label: t('lanes.top', { ns: 'common' }) },
-    { key: 'middle', label: t('lanes.middle', { ns: 'common' }) },
-    { key: 'jungle', label: t('lanes.jungle', { ns: 'common' }) },
-    { key: 'bottom', label: t('lanes.bottom', { ns: 'common' }) },
-    { key: 'utility', label: t('lanes.utility', { ns: 'common' }) },
+    { key: 'top', label: t('positions.top', { ns: 'common' }) },
+    { key: 'middle', label: t('positions.middle', { ns: 'common' }) },
+    { key: 'jungle', label: t('positions.jungle', { ns: 'common' }) },
+    { key: 'bottom', label: t('positions.bottom', { ns: 'common' }) },
+    { key: 'utility', label: t('positions.utility', { ns: 'common' }) },
     { key: 'default', label: t('default', { ns: 'common' }) }
   ]
 })
 
-const testDisabled = ref(false)
+const testDisabled = ref(true)
 </script>
 
 <style scoped>

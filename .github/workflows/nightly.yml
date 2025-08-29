@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    if: ${{ github.repository == 'LeagueAkari/LeagueAkari' }}
     runs-on: windows-2022
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

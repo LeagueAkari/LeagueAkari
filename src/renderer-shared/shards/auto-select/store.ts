@@ -25,13 +25,16 @@ interface PositionChampion {
   utility: number[]
 }
 
+export type AutoPickBanStrategy = 'just-show' | 'lock-in' | 'show-and-lock-in'
+
 // copied from main shard
 export interface PickChampionConfig {
   enabled: boolean
   champions: PositionChampion
   delaySeconds: number
-  pickTeammateIntendedChampion: boolean
-  pickStrategy: string
+  ignoreIntent: boolean
+  strategy: AutoPickBanStrategy
+  showIntent: boolean
 
   // bench mode only
   benchSelectFirstAvailableChampion: boolean
@@ -43,7 +46,8 @@ export interface BanChampionConfig {
   enabled: boolean
   champions: PositionChampion
   delaySeconds: number
-  banTeammateIntendedChampion: boolean
+  strategy: AutoPickBanStrategy
+  ignoreIntent: boolean
 }
 
 export interface AutoSelectGroup {

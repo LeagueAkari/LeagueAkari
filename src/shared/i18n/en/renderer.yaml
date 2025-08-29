@@ -59,6 +59,8 @@ DeclarationModal:
       3. Client crashes, performance degradation, or other poor game experiences.
     - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **League Akari** development team and all contributors assume no liability; all related risks are borne by the user.
 
+    > Please refer to the **Game Info Tracking Improvements** section in [Patch 25.17 Notes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/).
+
     ## III. Server Compatibility Statement
     - **Effective from the release of this statement, League Akari will no longer provide any form of support for Tencent Game servers.**
     - Using this software in Tencent server environments is highly likely to violate Tencent Games’ user agreements, management regulations, or technical protection measures; any account bans, data loss, or other adverse consequences are solely the user’s responsibility.

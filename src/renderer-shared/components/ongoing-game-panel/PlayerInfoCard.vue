@@ -265,7 +265,7 @@
               :position="positionInfo.current || 'ALL'"
             />
             <span class="position-name">{{
-              t(`lanes.${positionInfo.current || 'ALL'}`, {
+              t(`positions.${positionInfo.current || 'ALL'}`, {
                 ns: 'common'
               })
             }}</span>

@@ -9,7 +9,7 @@ export const GROUPS = [
     positions: ['top', 'jungle', 'middle', 'bottom', 'utility'], // 可以根据什么位置选择
     additionalPicks: [], // 可以额外选用的英雄
     additionalBans: [], // 可以额外禁用的英雄
-    excludedPicks: [-1], // 禁止选用的英雄
+    excludedPicks: [], // 禁止选用的英雄
     excludedBans: [] // 禁止 Ban 的英雄
   },
   {
@@ -19,7 +19,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -29,7 +29,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -39,7 +39,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [-3],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -49,7 +49,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -59,7 +59,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -69,7 +69,7 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
@@ -79,17 +79,27 @@ export const GROUPS = [
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
     excludedBans: []
   },
   {
-    groupId: 'practice',
+    groupId: 'custom',
     targetGameMode: 'CLASSIC',
     targetQueueTypes: ['PRACTICE_GAME'],
     positions: ['default'],
     additionalPicks: [],
     additionalBans: [],
-    excludedPicks: [-1],
+    excludedPicks: [],
+    excludedBans: []
+  },
+  {
+    groupId: 'practice',
+    targetGameMode: 'PRACTICETOOL',
+    targetQueueTypes: ['PRACTICE_GAME'],
+    positions: ['default'],
+    additionalPicks: [],
+    additionalBans: [],
+    excludedPicks: [],
     excludedBans: []
   }
 ]

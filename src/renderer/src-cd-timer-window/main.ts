@@ -12,7 +12,7 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
-import './assets/css/styles.less'
+import './assets/css/styles.css'
 import { manager } from './shards'
 
 try {

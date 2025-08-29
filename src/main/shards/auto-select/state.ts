@@ -6,10 +6,12 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 import { LeagueClientData } from '../league-client/lc-state'
 import { GROUPS } from './groups'
 
-export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
+export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in' // deprecated
+export type AutoPickBanStrategy = 'just-show' | 'lock-in' | 'show-and-lock-in'
 
+export const NONE_CHAMPION_ID = -1
 export const RANDOM_CHAMPION_ID = -2
-export const ARENA_RANDOM_CHAMPION_ID = -3
+export const CHEERY_BRAVERY_ID = -3
 
 interface PositionChampion {
   // non-ranked queues
@@ -21,14 +23,17 @@ interface PositionChampion {
   middle: number[]
   bottom: number[]
   utility: number[]
+
+  [key: string]: number[]
 }
 
 export interface PickChampionConfig {
   enabled: boolean
   champions: PositionChampion
   delaySeconds: number
-  pickTeammateIntendedChampion: boolean
-  pickStrategy: AutoPickStrategy
+  ignoreIntent: boolean
+  strategy: AutoPickBanStrategy
+  showIntent: boolean
 
   // bench mode only
   benchSelectFirstAvailableChampion: boolean
@@ -39,8 +44,18 @@ export interface PickChampionConfig {
 export interface BanChampionConfig {
   enabled: boolean
   champions: PositionChampion
+  strategy: AutoPickBanStrategy
   delaySeconds: number
-  banTeammateIntendedChampion: boolean
+  ignoreIntent: boolean
+}
+
+export interface DelayedBanPick {
+  completed: boolean
+  championId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+  timerId: NodeJS.Timeout
 }
 
 export class AutoSelectSettings {
@@ -150,12 +165,13 @@ export class AutoSelectSettings {
         utility: [],
         default: []
       },
+      showIntent: false,
       delaySeconds: 0,
-      pickTeammateIntendedChampion: false,
-      pickStrategy: 'lock-in',
+      ignoreIntent: false,
+      strategy: 'lock-in',
       benchHandleTradeEnabled: false,
       benchSelectFirstAvailableChampion: false,
-      benchSwapAccumulatedDelaySeconds: 0
+      benchSwapAccumulatedDelaySeconds: 1
     }
   }
 
@@ -170,28 +186,29 @@ export class AutoSelectSettings {
         utility: [],
         default: []
       },
-      banTeammateIntendedChampion: false,
-      delaySeconds: 0
+      ignoreIntent: false,
+      delaySeconds: 0,
+      strategy: 'lock-in'
     }
   }
 
-  setPickConfig(type: string, config: DeepPartialObject<PickChampionConfig>) {
-    const base = this.pickConfig?.[type] ?? this.createNewEmptyPickConfig()
+  setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
+    const base = this.pickConfig?.[groupId] ?? this.createNewEmptyPickConfig()
     const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
 
     this.pickConfig = {
       ...this.pickConfig,
-      [type]: nextType
+      [groupId]: nextType
     }
   }
 
-  setBanConfig(type: string, config: DeepPartialObject<BanChampionConfig>) {
-    const base = this.banConfig?.[type] ?? this.createNewEmptyBanConfig()
+  setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
+    const base = this.banConfig?.[groupId] ?? this.createNewEmptyBanConfig()
     const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
 
     this.banConfig = {
       ...this.banConfig,
-      [type]: nextType
+      [groupId]: nextType
     }
   }
 
@@ -209,7 +226,7 @@ export class AutoSelectSettings {
 export class AutoSelectState {
   groups = GROUPS
 
-  isTemporaryDisabled = false
+  temporaryDisabled = false
 
   get csSession() {
     return this._lcData.champSelect.session
@@ -309,7 +326,7 @@ export class AutoSelectState {
     const unpickables = new Set<number>()
 
     if (a.gameMode === 'CHERRY') {
-      mandatoryPickables.push(ARENA_RANDOM_CHAMPION_ID)
+      mandatoryPickables.push(CHEERY_BRAVERY_ID)
     }
 
     // 不能选择队友亮出的英雄, 以及自己已选定的英雄
@@ -529,122 +546,109 @@ export class AutoSelectState {
     }
   }
 
-  get currentPhaseTimerInfo() {
-    const timer = this.csSession?.timer
-
-    if (!timer) {
-      return null
-    }
-
-    return {
-      ...timer,
-      adjustedTimeElapsedInPhase: Math.max(
-        0,
-        timer.totalTimeInPhase - timer.adjustedTimeLeftInPhase
-      )
-    }
-  }
-
   // --- new
 
+  // champ-select session computed
   get inBanPickPhase() {
-    if (!this.csSession) {
-      return false
-    }
+    return this.csSession?.timer.phase === 'BAN_PICK'
+  }
 
-    return this.csSession.timer.phase === 'BAN_PICK'
+  get inFinalizationPhase() {
+    return this.csSession?.timer.phase === 'FINALIZATION'
+  }
+
+  get benchEnabled() {
+    return this.csSession?.benchEnabled
+  }
+
+  get allowSubsetChampionPicks() {
+    return this.csSession?.allowSubsetChampionPicks
+  }
+
+  get allowDuplicatePicks() {
+    return this.csSession?.allowDuplicatePicks
+  }
+
+  get isCustomGame() {
+    return this.csSession?.isCustomGame || false
+  }
+
+  get timer() {
+    return this.csSession?.timer || null
   }
 
   /**
-   * 意味着现在可以选了
+   * 当前正在进行的且属于该玩家的动作集合
    */
-  get isActingNow() {
-    return this._lcData.champSelect.selfSummoner?.isActingNow ?? false
+  get currentActions() {
+    const session = this.csSession
+
+    if (!session || !session.actions.length) {
+      return []
+    }
+
+    const notAllCompletedActionsIndex = session.actions.findIndex((arr) => {
+      return !arr.every((a) => a.completed)
+    })
+
+    if (notAllCompletedActionsIndex === -1) {
+      return []
+    }
+
+    return session.actions[notAllCompletedActionsIndex].filter(
+      (a) => a.actorCellId === session.localPlayerCellId
+    )
   }
 
-  get myActions() {
+  /**
+   * 当前正在进行的 action (理论来说只有 1 个)
+   */
+  get activeAction() {
+    return this.currentActions.find((a) => !a.completed) || null
+  }
+
+  get isPickingNow() {
+    return this.activeAction?.type === 'pick'
+  }
+
+  get isBanningNow() {
+    return this.activeAction?.type === 'ban'
+  }
+
+  get isVotingNow() {
+    return this.activeAction?.type === 'vote'
+  }
+
+  get member() {
+    return (
+      this.csSession?.myTeam.find((m) => m.cellId === this.csSession?.localPlayerCellId) || null
+    )
+  }
+
+  get assignedPosition() {
+    return this.member?.assignedPosition || null
+  }
+
+  /**
+   * 是否存在还没有完成的 pick，用于指示是否可以进行预选
+   */
+  get hasUnfinishedPickAction() {
     const session = this.csSession
 
     if (!session) {
       return []
     }
 
-    return session.actions.flat().filter((a) => a.actorCellId === session.localPlayerCellId)
-  }
-
-  /**
-   * 在英雄选择阶段, 自动选择得以可用
-   */
-  get myActiveActions() {
-    if (!this.myActions || !this.inBanPickPhase) {
-      return []
-    }
-
-    return this.myActions.filter((a) => !a.completed)
-  }
-
-  /**
-   * 即将到来的选择流程
-   *
-   * 目前已知在 rcp 里面, 写死只有一个 pick action, 但不知道未来会不会有多个
-   */
-  get myPickActions() {
-    if (!this.myActions) {
-      return []
-    }
-
-    return this.myActions.filter((a) => a.type === 'pick')
-  }
-
-  get myActivePickActions() {
-    if (!this.myActiveActions) {
-      return []
-    }
-
-    return this.myActiveActions.filter((a) => a.type === 'pick')
-  }
-
-  get myVoteActions() {
-    if (!this.myActions) {
-      return []
-    }
-
-    return this.myActions.filter((a) => a.type === 'vote')
-  }
-
-  get myActiveVoteActions() {
-    if (!this.myActiveActions) {
-      return []
-    }
-
-    return this.myActiveActions.filter((a) => a.type === 'vote')
-  }
-
-  /**
-   * 即将到来的禁用流程
-   *
-   * 可能有多个 ban action
-   */
-  get myBanActions() {
-    if (!this.myActions) {
-      return []
-    }
-
-    return this.myActions.filter((a) => a.type === 'ban')
-  }
-
-  get myActiveBanActions() {
-    if (!this.myActiveActions) {
-      return []
-    }
-
-    return this.myActiveActions.filter((a) => a.type === 'ban')
+    return session.actions
+      .flat()
+      .filter((a) => a.actorCellId === session.localPlayerCellId)
+      .some((a) => a.type === 'pick' && !a.completed)
   }
 
   /**
    * 当此为真时, 位于显式的预选阶段
    *
-   * 但不仅于此, 在未完成任何英雄选择, 且不是正在 pick 或 ban 的时候, 预选仍然有效 (rcp)
+   * 但不仅于此, 在未完成任何英雄选择, 且不是正在 pick 或 ban 的时候, 预选操作仍然有效
    */
   get isPickIntenting() {
     if (!this.csSession) {
@@ -652,30 +656,270 @@ export class AutoSelectState {
     }
 
     return (
-      this.csSession.timer.phase === 'PLANNING' &&
-      this.myPickActions &&
-      !this.myPickActions.some((a) => a.completed) // 满足条件: 在预选择阶段, 且没有完成任何 pick action
+      this.csSession.timer.phase === 'PLANNING' ||
+      (this.hasUnfinishedPickAction && !this.isPickingNow && !this.isBanningNow)
     )
   }
 
+  get subsetChampionList() {
+    return this._lcData.lobbyTeamBuilder.champSelect.subsetChampionList
+  }
+
+  get currentBannableChampionIds() {
+    return this._lcData.champSelect.currentBannableChampionIds
+  }
+
+  get currentPickableChampionIds() {
+    return this._lcData.champSelect.currentPickableChampionIds
+  }
+
+  get gameMode() {
+    return this._lcData.gameflow.session?.gameData.queue.gameMode || null
+  }
+
+  get queueType() {
+    return this._lcData.gameflow.session?.gameData.queue.type || null
+  }
+
   /**
-   * 英雄选择时, 所位于的阶段
-   *
-   * - pick-intenting 预选择阶段
-   * - picking 选择阶段
-   * - banning 禁用阶段
-   * - other 其他不关心的阶段
+   * 当前模式下正在激活的配置组
    */
-  get champSelectStage() {
-    if (!this.csSession) {
+  get activeGroupConfig() {
+    if (!this.gameMode || !this.queueType) {
+      return
+    }
+
+    const suitableGameModeGroups = this.groups.filter((g) => g.targetGameMode === this.gameMode)
+
+    if (suitableGameModeGroups.length === 0) {
       return null
+    } else if (suitableGameModeGroups.length === 1) {
+      const thatGroup = suitableGameModeGroups[0].groupId
+
+      return {
+        groupId: thatGroup,
+        temporaryDisabled: this.temporaryDisabled,
+        pick: this._settings.pickConfig[thatGroup] || this._settings.createNewEmptyPickConfig(),
+        ban: this._settings.banConfig[thatGroup] || this._settings.createNewEmptyBanConfig()
+      }
+    }
+
+    // 为了未来可用性 (虽然... 可能不会用到)
+    const scores: Record<string, number> = {}
+    for (const group of suitableGameModeGroups) {
+      if (!scores[group.groupId]) {
+        scores[group.groupId] = 0
+      }
+
+      if (group.targetQueueTypes === null) {
+        scores[group.groupId] += 10
+      } else if (group.targetQueueTypes.includes(this.queueType)) {
+        scores[group.groupId] += 100
+      }
+    }
+
+    const winner = Object.entries(scores).toSorted(([_cia, a], [_llo, b]) => b - a)[0][0]
+
+    return {
+      groupId: winner,
+      temporaryDisabled: this.temporaryDisabled,
+      pick: this._settings.pickConfig[winner] || this._settings.createNewEmptyPickConfig(),
+      ban: this._settings.banConfig[winner] || this._settings.createNewEmptyBanConfig
+    }
+  }
+
+  /**
+   * 目前阶段**可以**进行的操作集合
+   *
+   *
+   * - pick-intent: 可以进行预选
+   *
+   * **常规模式相关 - 选用**
+   * - draft-pick: 亮出当前要 pick 的英雄
+   * - complete-pick: 锁定当前要 pick 的英雄
+   *
+   * **常规模式相关 - 禁用**
+   * - draft-ban: 亮出当前要 ban 的英雄
+   * - complete-ban: 锁定当前要 ban 的英雄
+   *
+   * **克隆作战模式相关 - 投票 (需要进一步信息)**
+   * - vote: 可以进行投票
+   *
+   * **乱斗 / 任何带备战席的模式 - 新版选卡机制**
+   * - subset-pick: 可以进行 subset 中的选择
+   * - complete-subset-pick: 锁定当前 subset 中的选择 (仅可通过 API 实现此状态)
+   * - subset-bench-swap: 可以进行 subset 中的 swap
+   * - bench-swap: 可以进行 swap
+   */
+  get move() {
+    if (this.isPickIntenting) {
+      return 'pick-intent'
+    }
+
+    const championShown = Boolean(this.activeAction?.championId)
+
+    if (this.isPickingNow) {
+      // 区分是抽卡型选人，还是正常选择选人
+      // 两种不同情况，可以选择的卡池不同。前者只运行在 subset 中选择 (1 ~ 3 个英雄)
+      if (this.allowSubsetChampionPicks) {
+        return championShown ? 'complete-subset-pick' : 'subset-pick'
+      } else {
+        return championShown ? 'complete-pick' : 'draft-pick'
+      }
+    }
+
+    if (this.isBanningNow) {
+      return championShown ? 'complete-ban' : 'draft-ban'
+    }
+
+    if (this.isVotingNow) {
+      return 'vote'
+    }
+
+    // 带有备战席的模式，在选用英雄后可以 swap
+    // 但在 subset pick 阶段，只能 swap 位于自己 subset 中的英雄
+    // 只有自己有英雄的时候才能 swap，毕竟是 swap
+    // 如果是抽卡模式的选用，则区分仅仅可 swap subset 中的情况
+    if (this.benchEnabled && this._lcData.champSelect.currentChampion) {
+      if (this.allowSubsetChampionPicks && this.timer?.phase === 'BAN_PICK') {
+        return 'subset-bench-swap'
+      }
+
+      return 'bench-swap'
     }
 
     return null
   }
 
+  /**
+   * 在预期英雄候选列表中的英雄
+   *
+   * 包括其可选用性
+   */
+  get expectedPicks() {
+    if (!this.activeGroupConfig) {
+      return null
+    }
+
+    const config = this.activeGroupConfig
+    const pick = config.pick.champions[this.assignedPosition || 'default'] || []
+
+    return pick.map((c) => {
+      // 特别地，勇敢举动作为不存在的英雄，需要硬编码处理 (正如 rcp 中一样)
+      if (c === CHEERY_BRAVERY_ID && this.gameMode === 'CHERRY') {
+        return { id: c, status: 'pickable' }
+      }
+
+      const grid = this._lcData.champSelect.gridChampions[c]
+
+      // 高度依赖此状态，因此为空会不采用此英雄
+      if (!grid) {
+        return { id: c, status: 'unknown' }
+      }
+
+      // 服务器硬性规定
+      if (!this.currentPickableChampionIds.has(c)) {
+        // 细分情况 - 未拥有
+        if (!grid.owned) {
+          return { id: c, status: 'not-owned' }
+        }
+
+        return { id: c, status: 'unpickable' }
+      }
+
+      // 被禁用，无条件不可选
+      if (grid.selectionStatus.isBanned) {
+        return { id: c, status: 'banned' }
+      }
+
+      // 仅在不可重复选择时考虑多种冲突情况
+      if (!this.allowDuplicatePicks) {
+        // 被预选的时候，需要特别标明
+        if (grid.selectionStatus.pickIntented && !grid.selectionStatus.pickIntentedByMe) {
+          return { id: c, status: 'pick-intented' }
+        }
+
+        // 被他人选择的情况，在之前已经排除了 banned 的情况，所以此处一定是 picked
+        if (grid.selectionStatus.pickedByOtherOrBanned && !grid.selectionStatus.selectedByMe) {
+          return { id: c, status: 'picked' }
+        }
+      }
+
+      if (this.allowSubsetChampionPicks) {
+        if (this.subsetChampionList.includes(c)) {
+          return { id: c, status: 'subset-pickable' }
+        } else {
+          return { id: c, status: 'unpickable' }
+        }
+      }
+
+      return { id: c, status: 'pickable' }
+    })
+  }
+
+  /**
+   * 在预期英雄候选列表中的英雄
+   *
+   * 包括其可禁用性
+   */
+  get expectedBans() {
+    if (!this.activeGroupConfig) {
+      return null
+    }
+
+    const config = this.activeGroupConfig
+    const ban = config.ban.champions[this.assignedPosition || 'default'] || []
+
+    return ban.map((c) => {
+      const grid = this._lcData.champSelect.gridChampions[c]
+
+      // 高度依赖此状态，因此为空会不会考虑此英雄
+      if (!grid) {
+        return { id: c, status: 'unknown' }
+      }
+
+      // 服务器硬性规定，注意这个集合也包括 -1 (空 ban)，决定是否可以空 ban
+      if (!this.currentBannableChampionIds.has(c)) {
+        return { id: c, status: 'unbannable' }
+      }
+
+      // 被禁用，已经被 ban 了不能再 ban。但对于空 ban 来说，可以重复
+      if (grid.selectionStatus.isBanned && c !== NONE_CHAMPION_ID) {
+        return { id: c, status: 'banned' }
+      }
+
+      // 被预选的时候，需要特别标明
+      if (grid.selectionStatus.pickIntented && !grid.selectionStatus.pickIntentedByMe) {
+        return { id: c, status: 'pick-intented' }
+      }
+      return { id: c, status: 'bannable' }
+    })
+  }
+
+  /**
+   * 表示当前存在一个延迟的 ban 操作
+   *
+   * 被读取，或仅被自动禁用相关的 reaction 写入
+   */
+  delayedBan: DelayedBanPick | null = null
+
+  /**
+   * 表示当前存在一个延迟的 pick 操作
+   *
+   * 被读取，或仅被自动禁用相关的 reaction 写入
+   */
+  delayedPick: DelayedBanPick | null = null
+
   setTemporaryDisabled(value: boolean) {
-    this.isTemporaryDisabled = value
+    this.temporaryDisabled = value
+  }
+
+  setDelayedBan(config: DelayedBanPick | null) {
+    this.delayedBan = config
+  }
+
+  setDelayedPick(config: DelayedBanPick | null) {
+    this.delayedPick = config
   }
 
   constructor(
@@ -686,17 +930,20 @@ export class AutoSelectState {
       targetBan: computed.struct,
       targetPick: computed.struct,
       memberMe: computed.struct,
-      currentPhaseTimerInfo: computed.struct,
       upcomingGrab: observable.struct,
       upcomingPick: observable.struct,
       upcomingBan: observable.struct,
 
-      myPickActions: computed.struct,
-      myVoteActions: computed.struct,
-      myBanActions: computed.struct,
-      myActivePickActions: computed.struct,
-      myActiveVoteActions: computed.struct,
-      myActiveBanActions: computed.struct,
+      activeGroupConfig: computed.struct,
+      activeAction: computed.struct,
+      currentActions: computed.struct,
+      expectedPicks: computed.struct,
+      expectedBans: computed.struct,
+
+      timer: computed.struct,
+
+      delayedBan: observable.struct,
+      delayedPick: observable.struct,
 
       groups: observable.ref
     })

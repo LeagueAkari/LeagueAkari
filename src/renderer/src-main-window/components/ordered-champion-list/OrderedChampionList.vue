@@ -173,7 +173,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
   return h(
     'div',
     {
-      style: { display: 'flex', 'align-items': 'center', gap: '4px' },
+      style: { display: 'flex', 'align-items': 'center', gap: '4px', cursor: 'grab' },
       class: {
         [styles['target-item']]: true,
         [styles['not-pickable']]: !pickable
@@ -313,6 +313,7 @@ watch(
 .ordered-champion-list-wrapper {
   display: flex;
   align-items: center;
+  height: 24px;
 }
 
 .champions {

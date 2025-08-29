@@ -3,7 +3,8 @@ import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { DeepPartialObject } from '@shared/utils/types'
-import { comparer, computed } from 'mobx'
+import { t } from 'i18next'
+import { comparer, computed, runInAction } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -11,6 +12,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { GROUPS } from './groups'
 import { AutoSelectSettings, AutoSelectState, BanChampionConfig } from './state'
 
 @Shard(AutoSelectMain.id)
@@ -65,6 +67,29 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     )
   }
 
+  private async _fillAutoBanPickConfig() {
+    let modified = false
+
+    runInAction(() => {
+      for (const group of GROUPS) {
+        if (!this.settings.pickConfig[group.groupId]) {
+          modified = true
+          this.settings.setPickConfig(group.groupId, this.settings.createNewEmptyPickConfig())
+        }
+
+        if (!this.settings.banConfig[group.groupId]) {
+          modified = true
+          this.settings.setBanConfig(group.groupId, this.settings.createNewEmptyBanConfig())
+        }
+      }
+    })
+
+    if (modified) {
+      await this._setting.set('pickConfig', this.settings.pickConfig)
+      await this._setting.set('banConfig', this.settings.banConfig)
+    }
+  }
+
   private async _handleState() {
     await this._setting.applyToState()
 
@@ -98,8 +123,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'upcomingBan',
 
       'groups',
-      'isTemporaryDisabled'
+      'temporaryDisabled'
     ])
+
+    await this._fillAutoBanPickConfig()
   }
 
   private async _pick(championId: number, actionId: number, completed = true) {
@@ -166,19 +193,28 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 确保用户设置时间的合理性
+   * 计算距离当前时间点，还需要等待多久
+   *
+   * margin: 自动选择会在真正时间点前最晚多久开始执行
+   *
+   * counterCompensation: 抵消客户端的时间空余，但可能造成不及时
+   *
    */
-  private _calculateAppropriateDelayMs(delayMs: number, margin: number = 1200) {
-    const info = this.state.currentPhaseTimerInfo
-    if (!info || info.isInfinite) {
-      return delayMs
+  private _calcShouldWaitFor(offset: number, margin = 0, counterCompensation = 3000) {
+    const t = this.state.timer
+
+    if (!t || t.isInfinite || !t.phase) {
+      return offset
     }
 
-    const maxAllowedDelayMs = info.totalTimeInPhase - margin
-    const desiredDelayMs = Math.min(delayMs, maxAllowedDelayMs)
-    const adjustedDelayMs = desiredDelayMs - info.adjustedTimeElapsedInPhase
+    // 达到预期的时间点还有多久
+    const target = Math.max(
+      offset -
+        Math.max(t.totalTimeInPhase - margin - t.adjustedTimeLeftInPhase - counterCompensation, 0),
+      0
+    )
 
-    return Math.max(0, adjustedDelayMs)
+    return target
   }
 
   private _cancelPrevScheduledPickIfExists() {
@@ -258,7 +294,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
             this._cancelPrevScheduledPickIfExists()
 
-            const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
+            const delayMs = this._calcShouldWaitFor(delay * 1e3)
 
             this._log.info(
               `Added delayed pick task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[pick.championId]?.name || pick.championId}`
@@ -327,7 +363,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (ban.action.isInProgress && ban.isActingNow) {
           this._cancelPrevScheduledBanIfExists()
 
-          const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
+          const delayMs = this._calcShouldWaitFor(delay * 1e3)
           this._log.info(
             `Added delayed ban task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
           )
@@ -356,20 +392,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     // 用于校正时间
     this._mobx.reaction(
-      () => this.state.currentPhaseTimerInfo,
+      () => this.state.timer,
       (_timer) => {
         if (this.state.upcomingPick) {
-          const adjustedDelayMs = this._calculateAppropriateDelayMs(
-            this.settings.lockInDelaySeconds * 1e3
-          )
+          const adjustedDelayMs = this._calcShouldWaitFor(this.settings.lockInDelaySeconds * 1e3)
 
           this._pickTask.updateTime(adjustedDelayMs)
         }
 
         if (this.state.upcomingBan) {
-          const adjustedDelayMs = this._calculateAppropriateDelayMs(
-            this.settings.banDelaySeconds * 1e3
-          )
+          const adjustedDelayMs = this._calcShouldWaitFor(this.settings.banDelaySeconds * 1e3)
 
           this._banTask.updateTime(adjustedDelayMs)
         }
@@ -766,56 +798,175 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     )
   }
 
+  private _sendCelebration(message: string) {
+    if (!this._lc.data.chat.conversations.championSelect) {
+      return
+    }
+
+    this._lc.api.chat
+      .chatSend(
+        this._lc.data.chat.conversations.championSelect.id,
+        `[${i18next.t('appName', { ns: 'common' })}] ${message}`,
+        'celebration'
+      )
+      .catch(() => {})
+  }
+
   // testing only
   private _handleBanPickEx() {
-    // 预选阶段
+    // this._mobx.reaction(
+    //   () => this.state.expectedPicks,
+    //   (picks) => {
+    //     this._log.warn(
+    //       'picks',
+    //       picks?.map((c) => `${this._lc.data.gameData.championName(c.id)} (${c.status})`).join(', ')
+    //     )
+    //   },
+    //   { fireImmediately: true }
+    // )
+
     this._mobx.reaction(
-      () => [this.state.isPickIntenting, this.state.myPickActions] as const,
-      ([isPickIntenting, myPickActions]) => {
-        this._log.debug(`Now pick intenting: ${isPickIntenting}`, myPickActions)
+      () => this.state.activeGroupConfig,
+      (config) => {
+        this._log.warn('activeGroupConfig', config)
       },
-      { equals: comparer.shallow }
+      { fireImmediately: true }
     )
 
-    // 在禁用或选择阶段
-    this._mobx.reaction(
-      () =>
-        [
-          this.state.inBanPickPhase,
-          this.state.isActingNow,
-          this.state.myActivePickActions,
-          this.state.myActiveVoteActions,
-          this.state.myActiveBanActions
-        ] as const,
-      ([
-        inBanPickPhase,
-        isActingNow,
-        myActivePickActions,
-        myActiveVoteActions,
-        myActiveBanActions
-      ]) => {
-        if (!inBanPickPhase) {
-          this._log.debug(`Now not in ban pick phase: ${inBanPickPhase}`)
+    const banContext = computed(
+      () => {
+        const banConfig = this.state.activeGroupConfig
+        const expected = this.state.expectedBans
+
+        if (!banConfig || !expected) {
+          return null
+        }
+
+        if (!banConfig.ban.enabled || banConfig.temporaryDisabled) {
           return
         }
 
-        if (!isActingNow) {
-          this._log.debug(`Now in ban pick phase: ${inBanPickPhase}, but not acting`)
-          return
+        // 非 ban 环节，或者没有 activeAction，则不生效
+        if (
+          (this.state.move !== 'complete-ban' && this.state.move !== 'draft-ban') ||
+          !this.state.activeAction
+        ) {
+          return null
         }
 
-        this._log.debug(
-          `Now in ban pick phase: ${inBanPickPhase}, acting now`,
-          'myActivePickActions',
-          myActivePickActions,
-          'myActiveVoteActions',
-          myActiveVoteActions,
-          'myActiveBanActions',
-          myActiveBanActions
+        const expectedBan = expected.find(
+          (c) =>
+            c.status === 'bannable' || (banConfig.ban.ignoreIntent && c.status === 'pick-intented')
         )
+
+        if (!expectedBan) {
+          return null
+        }
+
+        return {
+          move: this.state.move,
+          activeAction: this.state.activeAction,
+          expectedBan: expectedBan,
+          niceDelayMs: this._calcShouldWaitFor(banConfig.ban.delaySeconds * 1e3),
+          strategy: banConfig.ban.strategy
+        } as const
       },
       { equals: comparer.shallow }
     )
+
+    this._mobx.reaction(
+      () => banContext.get(),
+      (ctx) => {
+        if (!ctx) {
+          // 不生效的场合，将立即尝试取消之前设置的任何计时器，并清除状态
+          if (this.state.delayedBan) {
+            clearTimeout(this.state.delayedBan.timerId)
+            this.state.setDelayedBan(null)
+          }
+
+          return
+        }
+
+        const { move, activeAction, expectedBan, niceDelayMs, strategy } = ctx
+
+        const ban = async (championId: number, completed: boolean) => {
+          try {
+            this._log.info(`Banning ${this._debugChampionName(championId)} completed=${completed}`)
+
+            await this._lc.api.champSelect.action(activeAction.id, {
+              type: 'ban',
+              championId,
+              completed
+            })
+          } catch (error) {
+            this._log.warn(
+              `Failed to ban champion ${this._debugChampionName(championId)} completed=${completed}`,
+              error
+            )
+          } finally {
+            this.state.setDelayedBan(null)
+          }
+        }
+
+        const completed =
+          strategy === 'lock-in' || (strategy !== 'just-show' && move === 'complete-ban')
+
+        if (move === 'draft-ban') {
+          if (activeAction.championId === expectedBan.id) {
+            if (this.state.delayedBan) {
+              clearTimeout(this.state.delayedBan.timerId)
+              this.state.setDelayedBan(null)
+              this._log.info(
+                `Already picked, canceling delayed ban ${this._debugChampionName(expectedBan.id)}`
+              )
+            }
+          } else {
+            // 若是更新，清除计时器
+            if (this.state.delayedBan) {
+              clearTimeout(this.state.delayedBan.timerId)
+            }
+          }
+        } else if (move === 'complete-ban') {
+          if (this.state.delayedBan) {
+            clearTimeout(this.state.delayedBan.timerId)
+          }
+        } else {
+          return
+        }
+
+        if (
+          !this.state.delayedBan ||
+          this.state.delayedBan.championId !== expectedBan.id ||
+          this.state.delayedBan.completed !== completed
+        ) {
+          this._log.warn(
+            `Target ban updated: ${this._debugChampionName(expectedBan.id)}, completed=${completed}`
+          )
+        }
+
+        this.state.setDelayedBan({
+          completed,
+          championId: expectedBan.id,
+          delayMs: niceDelayMs,
+          startAt: Date.now(),
+          finishAt: Date.now() + niceDelayMs,
+          timerId: setTimeout(() => ban(expectedBan.id, completed), niceDelayMs)
+        })
+      }
+    )
+
+    this._mobx.reaction(
+      () => this.state.delayedBan,
+      (ban, prev) => {
+        if ((ban && !prev) || (prev && ban && prev.championId !== ban.championId)) {
+          this._sendCelebration(`Updated, ${this._debugChampionName(ban.championId)}`)
+        }
+      }
+    )
+  }
+
+  private _debugChampionName(id: number) {
+    return `${this._lc.data.gameData.championName(id)} (${id})`
   }
 
   private async _acceptOrDeclineTrade(tradeId: number, accept: boolean) {

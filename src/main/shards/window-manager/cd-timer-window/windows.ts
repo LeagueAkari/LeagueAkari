@@ -83,6 +83,18 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     })
 
     this._mobx.reaction(
+      () => this.state.ready,
+      (ready) => {
+        if (ready) {
+          this._window?.on('system-context-menu', (event) => {
+            event.preventDefault()
+          })
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit],
       ([enabled, finishedInit]) => {
         if (!finishedInit) {

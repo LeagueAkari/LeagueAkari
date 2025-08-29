@@ -1151,7 +1151,7 @@ export class LeagueClientData {
       try {
         const { data } =
           await this._context.lc.api.lobbyTeamBuilder.getChampSelectSubsetChampionList()
-        this.lobbyTeamBuilder.champSelect.subsetChampionList = data
+        this.lobbyTeamBuilder.champSelect.setSubsetChampionList(data)
       } catch (error) {
         this._context.ipc.sendEvent(
           this._context.namespace,

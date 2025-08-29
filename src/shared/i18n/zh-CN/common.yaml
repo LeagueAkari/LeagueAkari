@@ -9,7 +9,7 @@ na: N/A
 summonerPlaceholder: 召唤师 {{index}}
 summoner: 召唤师
 
-lanes:
+positions:
   all: 无
   ALL: 无
   top: 上路
