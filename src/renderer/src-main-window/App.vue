@@ -2,14 +2,15 @@
   <div
     id="app-frame"
     :class="{
-      'use-plain-bg': !backgroundImageUrl && !preferMica
+      mica: preferMica,
+      'use-plain-bg': !backgroundImageUrl
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <SetupInAppScope />
     <Transition name="bg-fade">
       <div
-        v-if="backgroundImageUrl"
+        v-if="backgroundImageUrl && !preferMica"
         :key="backgroundImageUrl"
         class="background-wallpaper"
         :class="{
@@ -90,7 +91,7 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
   min-width: var(--app-min-width);
   min-height: var(--app-min-height);
 
-  &.use-plain-bg {
+  &.use-plain-bg:not(.mica) {
     background-color: var(--background-color-primary);
   }
 

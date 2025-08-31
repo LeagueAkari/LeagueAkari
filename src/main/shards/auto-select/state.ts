@@ -193,7 +193,7 @@ export class AutoSelectSettings {
   }
 
   setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
-    const base = this.pickConfig?.[groupId] ?? this.createNewEmptyPickConfig()
+    const base = this.createNewEmptyPickConfig()
     const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
 
     this.pickConfig = {
@@ -203,7 +203,7 @@ export class AutoSelectSettings {
   }
 
   setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
-    const base = this.banConfig?.[groupId] ?? this.createNewEmptyBanConfig()
+    const base = this.createNewEmptyBanConfig()
     const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
 
     this.banConfig = {
@@ -762,7 +762,7 @@ export class AutoSelectState {
       // 区分是抽卡型选人，还是正常选择选人
       // 两种不同情况，可以选择的卡池不同。前者只运行在 subset 中选择 (1 ~ 3 个英雄)
       if (this.allowSubsetChampionPicks) {
-        return championShown ? 'complete-subset-pick' : 'subset-pick'
+        return championShown ? 'complete-subset-pick' : 'draft-subset-pick'
       } else {
         return championShown ? 'complete-pick' : 'draft-pick'
       }
@@ -892,6 +892,7 @@ export class AutoSelectState {
       if (grid.selectionStatus.pickIntented && !grid.selectionStatus.pickIntentedByMe) {
         return { id: c, status: 'pick-intented' }
       }
+
       return { id: c, status: 'bannable' }
     })
   }
@@ -934,7 +935,7 @@ export class AutoSelectState {
       upcomingPick: observable.struct,
       upcomingBan: observable.struct,
 
-      activeGroupConfig: computed.struct,
+      // activeGroupConfig: computed.struct, // no need to set it structurally equals
       activeAction: computed.struct,
       currentActions: computed.struct,
       expectedPicks: computed.struct,

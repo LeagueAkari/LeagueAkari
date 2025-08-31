@@ -67,9 +67,13 @@ const shouldShowDivider = computed(() => {
   height: var(--title-bar-height);
   align-items: center;
   -webkit-app-region: drag;
-  backdrop-filter: blur(8px);
   background-color: #0001;
+  backdrop-filter: blur(8px);
   z-index: 1000000;
+
+  .mica & {
+    backdrop-filter: none;
+  }
 }
 
 .shard-area {

@@ -146,10 +146,13 @@
           :label-description="`[自动选择将根据预设的延时等分时间，依次执行预选、亮出和选用锁定步骤。每个阶段都不会超过系统限时]`"
           :label-width="260"
         >
-          <NSwitch
+          <NInputNumber
             size="small"
             :value="currentPickConfig.delaySeconds"
-            @update:value="(val) => as.setPickConfig(currentGroup!.groupId, { delaySeconds: val })"
+            style="width: 120px"
+            @update:value="
+              (val) => as.setPickConfig(currentGroup!.groupId, { delaySeconds: val || 0 })
+            "
           />
         </ControlItem>
 
@@ -352,10 +355,8 @@ import {
   NFlex,
   NInputNumber,
   NRadio,
-  NRadioButton,
   NRadioGroup,
   NSwitch,
-  NTab,
   NTabPane,
   NTabs,
   NTooltip
@@ -372,7 +373,6 @@ const as2 = useAutoSelectStore()
 
 const currentGroupId = ref('ranked')
 const banPick = ref('pick')
-const position = ref('default')
 
 const currentPickConfig = computed(() => {
   return as2.settings.pickConfig[currentGroupId.value]

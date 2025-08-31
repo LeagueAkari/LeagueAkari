@@ -57,7 +57,7 @@ export class LoggerRenderer {
     const scheme = this._getColorScheme()
 
     fn[level]?.(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[${level}]`,
+      `%c[${dayjs().format('HH:mm:ss:SSS')}] %c[%c${namespace}%c] %c[${level}]`,
       scheme[level].timestamp,
       'color: inherit;',
       scheme[level].namespace,
