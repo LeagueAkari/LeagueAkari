@@ -1,0 +1,24 @@
+name: NoMore Spam
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  models: read
+
+jobs:
+  spam-detection:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Detect and close spam
+        uses: JohnsonRan/nomore-spam@main
+        with:
+          github-token: ${{ github.token }}
+          labels: 'bug,enhancement,question'
