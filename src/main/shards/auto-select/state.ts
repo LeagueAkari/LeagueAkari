@@ -7,7 +7,7 @@ import { LeagueClientData } from '../league-client/lc-state'
 import { GROUPS } from './groups'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in' // deprecated
-export type AutoPickBanStrategy = 'just-show' | 'lock-in' | 'show-and-lock-in'
+export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in'
 
 export const NONE_CHAMPION_ID = -1
 export const RANDOM_CHAMPION_ID = -2
@@ -50,7 +50,17 @@ export interface BanChampionConfig {
 }
 
 export interface DelayedBanPick {
+  type?: 'complete' | 'show' | 'intent'
+  isPickIntent: boolean
   completed: boolean
+  championId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+  timerId: NodeJS.Timeout
+}
+
+export interface DelayedSwap {
   championId: number
   delayMs: number
   startAt: number
@@ -168,7 +178,7 @@ export class AutoSelectSettings {
       showIntent: false,
       delaySeconds: 0,
       ignoreIntent: false,
-      strategy: 'lock-in',
+      strategy: 'show-and-lock-in',
       benchHandleTradeEnabled: false,
       benchSelectFirstAvailableChampion: false,
       benchSwapAccumulatedDelaySeconds: 1
@@ -188,28 +198,22 @@ export class AutoSelectSettings {
       },
       ignoreIntent: false,
       delaySeconds: 0,
-      strategy: 'lock-in'
+      strategy: 'show-and-lock-in'
     }
   }
 
   setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
-    const base = this.createNewEmptyPickConfig()
-    const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
-
-    this.pickConfig = {
-      ...this.pickConfig,
-      [groupId]: nextType
-    }
+    const nextAll = _.cloneDeep(this.pickConfig)
+    const prevGroup = nextAll[groupId] ?? this.createNewEmptyPickConfig()
+    nextAll[groupId] = _.mergeWith(prevGroup, config, (a, b) => (Array.isArray(a) ? b : undefined))
+    this.pickConfig = nextAll
   }
 
   setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
-    const base = this.createNewEmptyBanConfig()
-    const nextType = _.mergeWith(base, config, (a, b) => (Array.isArray(a) ? b : undefined))
-
-    this.banConfig = {
-      ...this.banConfig,
-      [groupId]: nextType
-    }
+    const nextAll = _.cloneDeep(this.banConfig)
+    const prevGroup = nextAll[groupId] ?? this.createNewEmptyBanConfig()
+    nextAll[groupId] = _.mergeWith(prevGroup, config, (a, b) => (Array.isArray(a) ? b : undefined))
+    this.banConfig = nextAll
   }
 
   constructor() {
@@ -557,6 +561,10 @@ export class AutoSelectState {
     return this.csSession?.timer.phase === 'FINALIZATION'
   }
 
+  get isPlanningPhase() {
+    return this.csSession?.timer.phase === 'PLANNING'
+  }
+
   get benchEnabled() {
     return this.csSession?.benchEnabled
   }
@@ -575,6 +583,10 @@ export class AutoSelectState {
 
   get timer() {
     return this.csSession?.timer || null
+  }
+
+  get benchChampions() {
+    return this.csSession?.benchChampions || []
   }
 
   /**
@@ -632,17 +644,19 @@ export class AutoSelectState {
   /**
    * 是否存在还没有完成的 pick，用于指示是否可以进行预选
    */
-  get hasUnfinishedPickAction() {
+  get firstUnfinishedPickAction() {
     const session = this.csSession
 
     if (!session) {
-      return []
+      return null
     }
 
-    return session.actions
-      .flat()
-      .filter((a) => a.actorCellId === session.localPlayerCellId)
-      .some((a) => a.type === 'pick' && !a.completed)
+    return (
+      session.actions
+        .flat()
+        .filter((a) => a.actorCellId === session.localPlayerCellId)
+        .find((a) => a.type === 'pick' && !a.completed) || null
+    )
   }
 
   /**
@@ -651,13 +665,9 @@ export class AutoSelectState {
    * 但不仅于此, 在未完成任何英雄选择, 且不是正在 pick 或 ban 的时候, 预选操作仍然有效
    */
   get isPickIntenting() {
-    if (!this.csSession) {
-      return false
-    }
-
     return (
-      this.csSession.timer.phase === 'PLANNING' ||
-      (this.hasUnfinishedPickAction && !this.isPickingNow && !this.isBanningNow)
+      this.isPlanningPhase ||
+      (this.firstUnfinishedPickAction && !this.isPickingNow && !this.isBanningNow)
     )
   }
 
@@ -679,6 +689,10 @@ export class AutoSelectState {
 
   get queueType() {
     return this._lcData.gameflow.session?.gameData.queue.type || null
+  }
+
+  get currentChampionId() {
+    return this._lcData.champSelect.currentChampion
   }
 
   /**
@@ -735,11 +749,11 @@ export class AutoSelectState {
    * - pick-intent: 可以进行预选
    *
    * **常规模式相关 - 选用**
-   * - draft-pick: 亮出当前要 pick 的英雄
+   * - show-pick: 亮出当前要 pick 的英雄
    * - complete-pick: 锁定当前要 pick 的英雄
    *
    * **常规模式相关 - 禁用**
-   * - draft-ban: 亮出当前要 ban 的英雄
+   * - show-ban: 亮出当前要 ban 的英雄
    * - complete-ban: 锁定当前要 ban 的英雄
    *
    * **克隆作战模式相关 - 投票 (需要进一步信息)**
@@ -762,14 +776,14 @@ export class AutoSelectState {
       // 区分是抽卡型选人，还是正常选择选人
       // 两种不同情况，可以选择的卡池不同。前者只运行在 subset 中选择 (1 ~ 3 个英雄)
       if (this.allowSubsetChampionPicks) {
-        return championShown ? 'complete-subset-pick' : 'draft-subset-pick'
+        return championShown ? 'complete-subset-pick' : 'show-subset-pick'
       } else {
-        return championShown ? 'complete-pick' : 'draft-pick'
+        return championShown ? 'complete-pick' : 'show-pick'
       }
     }
 
     if (this.isBanningNow) {
-      return championShown ? 'complete-ban' : 'draft-ban'
+      return championShown ? 'complete-ban' : 'show-ban'
     }
 
     if (this.isVotingNow) {
@@ -858,6 +872,34 @@ export class AutoSelectState {
   }
 
   /**
+   * 当前可以 swap 的英雄
+   */
+  get expectedSwaps() {
+    if (!this.activeGroupConfig || !this.benchEnabled || !this.benchChampions) {
+      return null
+    }
+
+    const config = this.activeGroupConfig
+    const pick = config.pick.champions[this.assignedPosition || 'default'] || []
+
+    return pick.map((c) => {
+      if (!this.benchChampions.some((bc) => bc.championId === c)) {
+        return { id: c, status: 'unswappable' }
+      }
+
+      if (this.allowSubsetChampionPicks && this.inBanPickPhase) {
+        if (this.subsetChampionList.includes(c)) {
+          return { id: c, status: 'subset-swappable' }
+        } else {
+          return { id: c, status: 'waiting-on-finalization' }
+        }
+      } else {
+        return { id: c, status: 'swappable' }
+      }
+    })
+  }
+
+  /**
    * 在预期英雄候选列表中的英雄
    *
    * 包括其可禁用性
@@ -911,6 +953,11 @@ export class AutoSelectState {
    */
   delayedPick: DelayedBanPick | null = null
 
+  /**
+   * 准备 swap 哪个英雄
+   */
+  delayedSwap: DelayedSwap | null = null
+
   setTemporaryDisabled(value: boolean) {
     this.temporaryDisabled = value
   }
@@ -921,6 +968,10 @@ export class AutoSelectState {
 
   setDelayedPick(config: DelayedBanPick | null) {
     this.delayedPick = config
+  }
+
+  setDelayedSwap(config: DelayedSwap | null) {
+    this.delayedSwap = config
   }
 
   constructor(
@@ -942,6 +993,7 @@ export class AutoSelectState {
       expectedBans: computed.struct,
 
       timer: computed.struct,
+      benchChampions: computed.struct,
 
       delayedBan: observable.struct,
       delayedPick: observable.struct,

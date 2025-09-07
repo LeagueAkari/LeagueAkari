@@ -3,13 +3,24 @@
     <template v-if="ogs.queryStage.phase !== 'unavailable' && !isCsSpectateWait">
       <div class="labels" ref="labels" :style="{ opacity: horizontalOverflow ? 0 : 1 }">
         <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
-        <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
-          intelligence.modeName
-        }}</span>
-        <span class="dot-separator" v-if="intelligence.modeName && intelligence.mapName">·</span>
-        <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
-          intelligence.mapName
-        }}</span>
+        <template
+          v-if="
+            intelligence.modeName &&
+            intelligence.mapName &&
+            intelligence.modeName === intelligence.mapName
+          "
+        >
+          <span class="ongoing-title-map-name">{{ intelligence.modeName }}</span>
+        </template>
+        <template v-else>
+          <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
+            intelligence.modeName
+          }}</span>
+          <span class="dot-separator" v-if="intelligence.modeName && intelligence.mapName">·</span>
+          <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
+            intelligence.mapName
+          }}</span>
+        </template>
         <span class="dot-separator" v-if="intelligence.mapName && intelligence.teamName">·</span>
         <span class="ongoing-title-side" v-if="intelligence.teamName">
           {{ intelligence.teamName }}</span

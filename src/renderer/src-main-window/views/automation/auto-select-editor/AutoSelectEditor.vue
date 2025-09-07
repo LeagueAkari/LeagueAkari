@@ -134,7 +134,6 @@
           >
             <NFlex vertical :size="2">
               <NRadio value="just-show">仅亮出</NRadio>
-              <NRadio value="lock-in">仅锁定</NRadio>
               <NRadio value="show-and-lock-in">亮出并锁定</NRadio>
             </NFlex>
           </NRadioGroup>
@@ -310,7 +309,6 @@
           >
             <NFlex vertical :size="2">
               <NRadio value="just-show">仅亮出</NRadio>
-              <NRadio value="lock-in">仅锁定</NRadio>
               <NRadio value="show-and-lock-in">亮出并锁定</NRadio>
             </NFlex>
           </NRadioGroup>

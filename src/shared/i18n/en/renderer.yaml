@@ -654,7 +654,7 @@ AutoGameflow:
     description: Delay in seconds before accepting the match after it becomes available.
   autoHonorEnabled:
     label: Auto-Honor Enabled
-    description: Automatically gives honors at the end of a match. External tools cannot skip the honor phase, so all votes will be used to complete the phase.
+    description: Automatically gives all the votes at the end of a match.
   autoHonorStrategy:
     label: Honor Selection Strategy
     description: Determines which players will receive honors.

@@ -4,7 +4,7 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
-import { comparer, computed, runInAction } from 'mobx'
+import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -200,7 +200,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
    * counterCompensation: 抵消客户端的时间空余，但可能造成不及时
    *
    */
-  private _calcShouldWaitFor(offset: number, margin = 0, fill = 3000) {
+  private _calcShouldWait(offset: number, margin = 0, fill = 3000) {
     const t = this.state.timer
 
     if (!t || t.isInfinite || !t.phase) {
@@ -293,7 +293,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
             this._cancelPrevScheduledPickIfExists()
 
-            const delayMs = this._calcShouldWaitFor(delay * 1e3)
+            const delayMs = this._calcShouldWait(delay * 1e3)
 
             this._log.info(
               `Added delayed pick task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[pick.championId]?.name || pick.championId}`
@@ -362,7 +362,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (ban.action.isInProgress && ban.isActingNow) {
           this._cancelPrevScheduledBanIfExists()
 
-          const delayMs = this._calcShouldWaitFor(delay * 1e3)
+          const delayMs = this._calcShouldWait(delay * 1e3)
           this._log.info(
             `Added delayed ban task: ${delay * 1e3} (adjusted: ${delayMs}), target champion: ${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
           )
@@ -394,13 +394,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       () => this.state.timer,
       (_timer) => {
         if (this.state.upcomingPick) {
-          const adjustedDelayMs = this._calcShouldWaitFor(this.settings.lockInDelaySeconds * 1e3)
+          const adjustedDelayMs = this._calcShouldWait(this.settings.lockInDelaySeconds * 1e3)
 
           this._pickTask.updateTime(adjustedDelayMs)
         }
 
         if (this.state.upcomingBan) {
-          const adjustedDelayMs = this._calcShouldWaitFor(this.settings.banDelaySeconds * 1e3)
+          const adjustedDelayMs = this._calcShouldWait(this.settings.banDelaySeconds * 1e3)
 
           this._banTask.updateTime(adjustedDelayMs)
         }
@@ -839,7 +839,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         // 非 ban 环节，或者没有 activeAction，则不生效
         if (
-          (this.state.move !== 'complete-ban' && this.state.move !== 'draft-ban') ||
+          (this.state.move !== 'complete-ban' && this.state.move !== 'show-ban') ||
           !this.state.activeAction
         ) {
           return null
@@ -863,12 +863,29 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           move: this.state.move,
           activeAction: this.state.activeAction,
           expectedBan: expectedBan,
-          niceDelayMs: this._calcShouldWaitFor(stageOffset),
+          niceDelayMs: this._calcShouldWait(stageOffset),
           strategy: banConfig.ban.strategy
         } as const
       },
       { equals: comparer.shallow }
     )
+
+    const ban = async (championId: number, actionId: number, completed: boolean) => {
+      try {
+        this._log.info(`Banning ${this._debugChampionName(championId)} completed=${completed}`)
+
+        await this._lc.api.champSelect.action(actionId, {
+          type: 'ban',
+          championId,
+          completed
+        })
+      } catch (error) {
+        this._log.warn(
+          `Failed to ban champion ${this._debugChampionName(championId)} completed=${completed}`,
+          error
+        )
+      }
+    }
 
     this._mobx.reaction(
       () => banContext.get(),
@@ -885,29 +902,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         const { move, activeAction, expectedBan, niceDelayMs, strategy } = ctx
 
-        const ban = async (championId: number, completed: boolean) => {
-          try {
-            this._log.info(`Banning ${this._debugChampionName(championId)} completed=${completed}`)
+        const completed = strategy !== 'just-show' && move === 'complete-ban'
 
-            await this._lc.api.champSelect.action(activeAction.id, {
-              type: 'ban',
-              championId,
-              completed
-            })
-          } catch (error) {
-            this._log.warn(
-              `Failed to ban champion ${this._debugChampionName(championId)} completed=${completed}`,
-              error
-            )
-          } finally {
-            this.state.setDelayedBan(null)
-          }
-        }
-
-        const completed =
-          strategy === 'lock-in' || (strategy !== 'just-show' && move === 'complete-ban')
-
-        if (move === 'draft-ban') {
+        if (move === 'show-ban') {
           if (activeAction.championId === expectedBan.id) {
             if (this.state.delayedBan) {
               clearTimeout(this.state.delayedBan.timerId)
@@ -916,18 +913,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                 `Already picked, canceling delayed ban ${this._debugChampionName(expectedBan.id)}`
               )
             }
-          } else {
-            // 若是更新，清除计时器
-            if (this.state.delayedBan) {
-              clearTimeout(this.state.delayedBan.timerId)
-            }
+
+            return
           }
-        } else if (move === 'complete-ban') {
-          if (this.state.delayedBan) {
-            clearTimeout(this.state.delayedBan.timerId)
-          }
-        } else {
-          return
+        }
+
+        if (this.state.delayedBan) {
+          clearTimeout(this.state.delayedBan.timerId)
         }
 
         if (
@@ -941,12 +933,19 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
 
         this.state.setDelayedBan({
+          isPickIntent: false,
           completed,
           championId: expectedBan.id,
           delayMs: niceDelayMs,
           startAt: Date.now(),
           finishAt: Date.now() + niceDelayMs,
-          timerId: setTimeout(() => ban(expectedBan.id, completed), niceDelayMs)
+          timerId: setTimeout(
+            () =>
+              ban(expectedBan.id, activeAction.id, completed).finally(() =>
+                this.state.setDelayedBan(null)
+              ),
+            niceDelayMs
+          )
         })
       }
     )
@@ -967,10 +966,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         // 非 pick 环节，或者没有 activeAction，则不生效
         if (
-          (this.state.move !== 'complete-pick' &&
+          (this.state.move !== 'pick-intent' &&
+            this.state.move !== 'complete-pick' &&
             this.state.move !== 'complete-subset-pick' &&
-            this.state.move !== 'draft-pick' &&
-            this.state.move !== 'draft-subset-pick') ||
+            this.state.move !== 'show-pick' &&
+            this.state.move !== 'show-subset-pick') ||
           !this.state.activeAction
         ) {
           return null
@@ -983,8 +983,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             (pickConfig.pick.ignoreIntent && c.status === 'pick-intented')
         )
 
-        console.log('expected pick', expectedPick)
-
         if (!expectedPick) {
           return null
         }
@@ -992,89 +990,102 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         const stageOffset =
           pickConfig.pick.strategy === 'show-and-lock-in' && this.state.move === 'complete-pick'
             ? pickConfig.pick.delaySeconds * 2e3
-            : pickConfig.pick.delaySeconds * 1e3
+            : pickConfig.pick.delaySeconds * 1e3 // 包括 show-pick 和 pick-intent
 
         return {
           move: this.state.move,
+          firstUnfinishedPickAction: this.state.firstUnfinishedPickAction,
           activeAction: this.state.activeAction,
           expectedPick: expectedPick,
-          niceDelayMs: this._calcShouldWaitFor(stageOffset),
+          niceDelayMs: this._calcShouldWait(stageOffset),
           strategy: pickConfig.pick.strategy
         } as const
       },
       { equals: comparer.shallow }
     )
 
+    const pick = async (championId: number, actionId: number, completed?: boolean) => {
+      try {
+        this._log.info(`Picking ${this._debugChampionName(championId)} completed=${completed}`)
+
+        await this._lc.api.champSelect.action(actionId, {
+          type: 'pick',
+          championId,
+          completed
+        })
+      } catch (error) {
+        this._log.warn(
+          `Failed to pick champion ${this._debugChampionName(championId)} completed=${completed}`,
+          error
+        )
+      }
+    }
+
+    const intent = async (championId: number, actionId: number) => {
+      try {
+        this._log.info(`Intenting ${this._debugChampionName(championId)}`)
+        await this._lc.api.champSelect.action(actionId, { championId })
+      } catch (error) {
+        this._log.warn(`Failed to intent champion ${this._debugChampionName(championId)}`, error)
+      }
+    }
+
+    let shouldIgnoreNextComplete = false
+
     /**
      * // 适用于大乱斗抽卡阶段
-     * draft-subset-pick / complete-subset-pick -> 直接 complete=true
+     * show-subset-pick / complete-subset-pick -> 直接 complete=true
      *
-     * draft-pick，在 strategy=show-and-lock-in的时候
+     * show-pick，在 strategy=show-and-lock-in的时候
      */
     this._mobx.reaction(
       () => pickContext.get(),
       (ctx) => {
         if (!ctx) {
           // 不生效的场合，将立即尝试取消之前设置的任何计时器，并清除状态
-          if (this.state.delayedBan) {
-            clearTimeout(this.state.delayedBan.timerId)
+          if (this.state.delayedPick) {
+            clearTimeout(this.state.delayedPick.timerId)
             this.state.setDelayedBan(null)
           }
 
           return
         }
 
-        const { move, activeAction, expectedPick, niceDelayMs, strategy } = ctx
+        const {
+          move,
+          firstUnfinishedPickAction,
+          activeAction,
+          expectedPick,
+          niceDelayMs,
+          strategy
+        } = ctx
 
-        const pick = async (championId: number, completed: boolean) => {
-          try {
-            this._log.info(
-              `Picking ${this._debugChampionName(championId)} completed=${completed} move=${move}`
-            )
-
-            await this._lc.api.champSelect.action(activeAction.id, {
-              type: 'pick',
-              championId,
-              completed
-            })
-          } catch (error) {
-            this._log.warn(
-              `Failed to pick champion ${this._debugChampionName(championId)} completed=${completed} move=${move}`,
-              error
-            )
-          } finally {
-            this.state.setDelayedPick(null)
-          }
-        }
-
-        const completed =
-          move === 'draft-subset-pick' || // subset pick should complete immediately
-          move === 'complete-subset-pick' ||
-          strategy === 'lock-in' ||
-          (strategy !== 'just-show' && move === 'complete-pick')
-
-        if (move === 'draft-pick') {
-          if (activeAction.championId === expectedPick.id) {
+        // 接下来针对几种特殊情况取消操作
+        if (move === 'complete-pick') {
+          // 1. 在 just-show 策略下，对于手上已经存在预期英雄时，取消计时器并返回
+          if (strategy === 'just-show' && activeAction.championId === expectedPick.id) {
             if (this.state.delayedPick) {
+              this._log.error('canceled just-show')
+
               clearTimeout(this.state.delayedPick.timerId)
               this.state.setDelayedPick(null)
               this._log.warn(
-                `Already picked, canceling delayed ban ${this._debugChampionName(expectedPick.id)} move=${move}`
+                `Already picked, canceling delayed pick ${this._debugChampionName(expectedPick.id)} move=${move}`
               )
             }
-          } else {
-            // 若是更新，清除计时器
-            if (this.state.delayedPick) {
-              clearTimeout(this.state.delayedPick.timerId)
-            }
+
+            return
           }
-        } else if (move === 'complete-pick') {
-          if (this.state.delayedPick) {
-            clearTimeout(this.state.delayedPick.timerId)
-          }
-        } else {
-          return
         }
+
+        if (this.state.delayedPick) {
+          clearTimeout(this.state.delayedPick.timerId)
+        }
+
+        const completed =
+          move === 'show-subset-pick' || // subset pick should complete immediately
+          move === 'complete-subset-pick' ||
+          (strategy !== 'just-show' && move === 'complete-pick')
 
         if (
           !this.state.delayedPick ||
@@ -1086,16 +1097,211 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           )
         }
 
-        this.state.setDelayedPick({
-          completed,
-          championId: expectedPick.id,
-          delayMs: niceDelayMs,
-          startAt: Date.now(),
-          finishAt: Date.now() + niceDelayMs,
-          timerId: setTimeout(() => pick(expectedPick.id, completed), niceDelayMs)
+        if (move === 'pick-intent') {
+          this.state.setDelayedPick({
+            isPickIntent: true,
+            completed: false,
+            championId: expectedPick.id,
+            delayMs: niceDelayMs,
+            startAt: Date.now(),
+            finishAt: Date.now() + niceDelayMs,
+            timerId: setTimeout(
+              () =>
+                intent(expectedPick.id, activeAction.id).finally(() =>
+                  this.state.setDelayedPick(null)
+                ),
+              niceDelayMs
+            )
+          })
+        } else {
+          this.state.setDelayedPick({
+            isPickIntent: false,
+            completed,
+            championId: expectedPick.id,
+            delayMs: niceDelayMs,
+            startAt: Date.now(),
+            finishAt: Date.now() + niceDelayMs,
+            timerId: setTimeout(
+              () =>
+                pick(expectedPick.id, activeAction.id, completed).finally(() =>
+                  this.state.setDelayedPick(null)
+                ),
+              niceDelayMs
+            )
+          })
+        }
+      }
+    )
+
+    const swapContext = computed(() => {
+      const pickConfig = this.state.activeGroupConfig
+      const expected = this.state.expectedSwaps
+
+      if (!pickConfig || !expected) {
+        return null
+      }
+
+      if (!pickConfig.pick.enabled || pickConfig.temporaryDisabled) {
+        return null
+      }
+
+      if (this.state.move !== 'bench-swap' && this.state.move !== 'subset-bench-swap') {
+        return null
+      }
+
+      const expectedSwapIndex = expected.findIndex(
+        (c) => c.status === 'subset-swappable' || c.status === 'swappable'
+      )
+
+      if (expectedSwapIndex === -1) {
+        return null
+      }
+
+      const currentChampionIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
+
+      // 当手上没有任何合适的英雄，直接锁定第一个预选
+      // 对于手上存在合适的英雄，根据情况是否选择更换
+      // 如果策略是找到更高优先级的可选英雄，锁定为更高优先级的，否则什么也不做
+      if (currentChampionIndex === -1) {
+        return {
+          expectedSwap: expected[expectedSwapIndex],
+          delaySeconds: pickConfig.pick.benchSwapAccumulatedDelaySeconds
+        }
+      }
+
+      if (
+        pickConfig.pick.benchSelectFirstAvailableChampion &&
+        expectedSwapIndex < currentChampionIndex
+      ) {
+        return {
+          expectedSwap: expected[expectedSwapIndex],
+          delaySeconds: pickConfig.pick.benchSwapAccumulatedDelaySeconds
+        }
+      }
+
+      return null
+    })
+
+    /** 记录英雄变动的时间现成 */
+    const benchChampionCooldown = observable.box<Record<number, number> | null>(null)
+
+    const trackCd = (prev: Record<number, number> | null, cur: number[]) => {
+      const newObj: Record<number, number> = {}
+
+      cur.forEach((c) => {
+        if (!prev || !prev[c]) {
+          newObj[c] = Date.now()
+        }
+      })
+
+      return newObj
+    }
+
+    // diff
+    this._mobx.reaction(
+      () => this.state.benchChampions,
+      (bench) => {
+        if (!bench) {
+          benchChampionCooldown.set(null)
+          return
+        }
+
+        const newCd = trackCd(
+          benchChampionCooldown.get(),
+          bench.map((c) => c.championId)
+        )
+        benchChampionCooldown.set(newCd)
+      }
+    )
+
+    this._mobx.reaction(
+      () => ({
+        ctx: swapContext.get(),
+        bench: benchChampionCooldown.get()
+      }),
+      ({ ctx, bench }) => {
+        if (!ctx || !bench) {
+          if (this.state.delayedSwap) {
+            clearTimeout(this.state.delayedSwap.timerId)
+            this.state.setDelayedSwap(null)
+          }
+
+          return
+        }
+
+        // 该英雄出现在备战席上的时间戳
+        const axis = bench[ctx.expectedSwap.id]
+
+        if (!axis) {
+          if (this.state.delayedSwap) {
+            clearTimeout(this.state.delayedSwap.timerId)
+            this.state.setDelayedSwap(null)
+          }
+
+          return
+        }
+
+        const {
+          delaySeconds,
+          expectedSwap: { id }
+        } = ctx
+
+        const swap = async (championId: number) => {
+          try {
+            this._log.info(`Swapped champion: ${championId}`)
+            await this._lc.api.champSelect.benchSwap(championId)
+          } catch (error) {
+            this._log.warn(`Failed to swap champion`, error)
+          }
+        }
+
+        // 若存在，则移除
+        if (this.state.delayedSwap) {
+          clearTimeout(this.state.delayedSwap.timerId)
+        }
+
+        const now = Date.now()
+        const delayMs = delaySeconds * 1e3 - (now - axis)
+
+        if (!this.state.delayedSwap || id !== this.state.delayedSwap.championId) {
+          this._sendCelebration(`Will swap ${this._debugChampionName(id)} in ${delayMs}ms`)
+        }
+
+        this.state.setDelayedSwap({
+          championId: id,
+          delayMs,
+          finishAt: now + delayMs,
+          startAt: now,
+          timerId: setTimeout(
+            () => swap(id).finally(() => this.state.setDelayedSwap(null)),
+            delayMs
+          )
         })
       }
     )
+
+    // for debugging
+    // this._mobx.reaction(
+    //   () => this.state.move,
+    //   (move) => {
+    //     this._log.warn(`Move: ${move}`)
+    //   }
+    // )
+
+    this._mobx.reaction(
+      () => this.state.delayedPick,
+      (delayedPick) => {
+        this._log.warn(`delayedPick: ${!!delayedPick}`)
+      }
+    )
+
+    // this._mobx.reaction(
+    //   () => this.state.activeGroupConfig,
+    //   (move) => {
+    //     this._log.warn(`activeGroupConfig: ${move}`)
+    //   },
+    //   { fireImmediately: true }
+    // )
   }
 
   private _debugChampionName(id: number) {

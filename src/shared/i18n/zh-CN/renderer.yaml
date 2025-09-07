@@ -655,7 +655,7 @@ AutoGameflow:
     description: 在可接受时延迟执行接受操作的时间，单位为秒
   autoHonorEnabled:
     label: 自动点赞开启
-    description: 在游戏结束时，自动点赞。外部工具无法跳过点赞阶段，因此将会尝试用尽票数以完成点赞阶段
+    description: 在游戏结束时，自动用尽票数点赞。
   autoHonorStrategy:
     label: 点赞选择策略
     description: 这将决定具体给哪位玩家点赞
@@ -901,11 +901,11 @@ SpectateStatus:
     button: LCU API 观战
 
   tokenSpectate:
-    label: 复制观战口令
-    description: 可以在另一个 League Akari 中调起观战进程
+    label: 分享观战信息
+    description: 可以在另一个 League Akari 或其他应用中调起观战进程
     button: 复制
-    copied: 已复制观战口令
-    copyFailed: 复制观战口令失败
+    copied: 对局密钥已复制
+    copyFailed: 复制观战信息失败
 
 MatchHistoryTabsTitle:
   loading: 加载中...

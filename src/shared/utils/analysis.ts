@@ -1,3 +1,4 @@
+import { EMPTY_PUUID } from '@shared/constants/common'
 import {
   Game,
   GameTimeline,
@@ -1173,6 +1174,10 @@ export function analyzeMatchHistoryPlayers(games: MatchHistoryGameWithState[], s
 
     const participantIdentityMap = game.game.participantIdentities.reduce(
       (acc, p) => {
+        if (p.player.puuid === EMPTY_PUUID) {
+          return acc
+        }
+
         acc[p.participantId] = p
         return acc
       },

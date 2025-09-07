@@ -101,5 +101,15 @@ export const GROUPS = [
     additionalBans: [],
     excludedPicks: [-1],
     excludedBans: []
+  },
+  {
+    groupId: 'ruby',
+    targetGameMode: 'RUBY',
+    targetQueueTypes: null,
+    positions: ['default'],
+    additionalPicks: [],
+    additionalBans: [],
+    excludedPicks: [-1],
+    excludedBans: []
   }
 ]
