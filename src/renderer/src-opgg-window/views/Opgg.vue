@@ -140,6 +140,19 @@
           <ControlItem
             class="control-item-margin"
             style="justify-content: space-between"
+            :label="t('Opgg.settings.enabled.label')"
+            :label-description="t('Opgg.settings.enabled.description')"
+            :label-width="300"
+          >
+            <NSwitch
+              @update:value="(val) => wm.opggWindow.setEnabled(val)"
+              :value="ows.settings.enabled"
+              size="small"
+            />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
             :label="t('Opgg.settings.flashPosition.label')"
             :label-description="t('Opgg.settings.flashPosition.description')"
             :label-width="300"
@@ -222,7 +235,11 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import {
+  useOpggWindowStore,
+  useWindowManagerStore
+} from '@renderer-shared/shards/window-manager/store'
 import { OpggDataApi } from '@shared/data-sources/opgg'
 import {
   ModeType,
@@ -270,6 +287,7 @@ const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
 const log = useInstance(LoggerRenderer)
+const wm = useInstance(WindowManagerRenderer)
 
 const as = useAppCommonStore()
 

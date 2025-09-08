@@ -1098,6 +1098,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
 
         if (move === 'pick-intent') {
+          if (!firstUnfinishedPickAction) {
+            this.state.setDelayedPick(null)
+            return
+          }
+
           this.state.setDelayedPick({
             isPickIntent: true,
             completed: false,
@@ -1107,7 +1112,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             finishAt: Date.now() + niceDelayMs,
             timerId: setTimeout(
               () =>
-                intent(expectedPick.id, activeAction.id).finally(() =>
+                intent(expectedPick.id, firstUnfinishedPickAction.id).finally(() =>
                   this.state.setDelayedPick(null)
                 ),
               niceDelayMs

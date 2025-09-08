@@ -358,7 +358,7 @@ OngoingGameSettings:
         label: Akari Score
 
 MultiWindowSettings:
-  title: 多窗口
+  title: 窗口管理
 
   auxWindow:
     title: 小窗口
@@ -1892,6 +1892,10 @@ Opgg:
   settings:
     button: 设置
     title: OP.GG 设置
+
+    enabled:
+      label: 开启
+      description: 启用 OP.GG 窗口。关闭后，可在主菜单重新启用它
 
     flashPosition:
       label: 闪现位置偏好

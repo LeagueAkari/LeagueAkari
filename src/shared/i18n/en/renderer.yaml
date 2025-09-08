@@ -1889,6 +1889,10 @@ Opgg:
     button: Settings
     title: OP.GG Settings
 
+    enabled:
+      label: Enable
+      description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+
     flashPosition:
       label: Flash Position Preference
       description: When setting summoner spells, prioritize the position for Flash if it is selected
