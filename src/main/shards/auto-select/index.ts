@@ -200,7 +200,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
    * counterCompensation: 抵消客户端的时间空余，但可能造成不及时
    *
    */
-  private _calcShouldWait(offset: number, margin = 0, fill = 3000) {
+  private _calcShouldWait(offset: number, margin = 0, fill = 0) {
     const t = this.state.timer
 
     if (!t || t.isInfinite || !t.phase) {
@@ -976,6 +976,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
+        if (
+          this.state.move === 'pick-intent' &&
+          (!this.state.firstUnfinishedPickAction || !pickConfig.pick.showIntent)
+        ) {
+          return null
+        }
+
         const expectedPick = expected.find(
           (c) =>
             c.status === 'pickable' ||
@@ -1072,6 +1079,19 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               this._log.warn(
                 `Already picked, canceling delayed pick ${this._debugChampionName(expectedPick.id)} move=${move}`
               )
+            }
+
+            return
+          }
+        } else if (move === 'pick-intent') {
+          // 不存在可预选的 action / 已经预选了该英雄
+          if (
+            !firstUnfinishedPickAction ||
+            firstUnfinishedPickAction.championId === expectedPick.id
+          ) {
+            if (this.state.delayedPick) {
+              clearTimeout(this.state.delayedPick.timerId)
+              this.state.setDelayedPick(null)
             }
 
             return

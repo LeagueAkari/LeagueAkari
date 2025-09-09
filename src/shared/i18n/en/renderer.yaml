@@ -1796,6 +1796,7 @@ ChampSelectOperations:
     popconfirm: This will exit the champion select phase.
     positiveText: Exit
     negativeText: Cancel
+    cancel: Cancel
 
   dodgeAtLastSecond:
     label: Last-Second Dodge Threshold

@@ -1800,6 +1800,7 @@ ChampSelectOperations:
     popconfirm: 这将退出英雄选择阶段
     positiveText: 退出
     negativeText: 取消
+    cancel: 取消
 
   dodgeAtLastSecond:
     label: 最后一秒秒退阈值
