@@ -13,6 +13,7 @@
       <NFlex justify="flex-end" align="center">
         <NButton
           @click="() => emits('confirm')"
+          @click.right="handleRightClick"
           size="small"
           type="primary"
           :disabled="countdown > 0"
@@ -42,9 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { useIntervalFn } from '@vueuse/core'
+import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NFlex, NModal, NScrollbar } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
@@ -77,6 +77,25 @@ const handle = watch(
     }
   }
 )
+
+let rightClickCount = 0
+const { start, stop } = useTimeoutFn(() => {
+  rightClickCount = 0
+}, 500)
+
+const handleRightClick = (e: MouseEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+
+  rightClickCount++
+
+  if (rightClickCount >= 3) {
+    emits('confirm')
+    stop()
+  } else {
+    start()
+  }
+}
 </script>
 
 <style scoped>

@@ -69,6 +69,9 @@ DeclarationModal:
     - To improve product quality, analyze errors, and conduct security statistics, the software collects **necessary and limited** system information and crash logs during operation.
     - The collected information **does not** contain personally identifiable data, will not be uploaded to any third-party server, and will not be used for commercial purposes.
 
+    ## V. Other
+    - Typing "AKARI" quickly in any location, or clicking the "Got it" button three times in a row, can quickly close this modal.
+
     ---
 
     > **If you have any questions about this guide and disclaimer, or need further information about the software, please visit**
