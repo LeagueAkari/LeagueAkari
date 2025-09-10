@@ -34,7 +34,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useTranslation } from 'i18next-vue'
-import { useMessage, useNotification } from 'naive-ui'
+import { useNotification } from 'naive-ui'
 import { provide, ref } from 'vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
@@ -75,8 +75,6 @@ app.onSecondInstance(() => {
     duration: 10000
   })
 })
-
-const message = useMessage()
 
 const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()

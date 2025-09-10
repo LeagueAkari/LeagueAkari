@@ -1,6 +1,6 @@
 <template>
   <NCard v-if="isCustomGame !== null" size="small">
-    <NFlex align="center" v-if="aps.settings.isInKyokoMode && !isCustomGame" class="control-item">
+    <NFlex align="center" v-if="!isCustomGame" class="control-item">
       <span class="label" style="flex: 1">{{ t('ChampSelectOperations.dodge.label') }}</span>
       <NButton size="tiny" type="primary" secondary @click="dodgeLoop" :disabled="isLoopingDodge">
         {{ t('ChampSelectOperations.dodge.button') }}

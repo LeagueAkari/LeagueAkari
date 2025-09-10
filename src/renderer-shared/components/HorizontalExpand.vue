@@ -1,6 +1,7 @@
 <template>
   <Transition
     name="tran"
+    :appear="appear"
     @enter="handleEnter"
     @leave="handleLeave"
     @after-enter="clearMaxWidth"
@@ -15,6 +16,7 @@
 <script setup lang="ts">
 const { show = true } = defineProps<{
   show?: boolean
+  appear?: boolean
 }>()
 
 const handleEnter = (el: Element) => {
@@ -64,7 +66,7 @@ const clearMaxWidth = (el: Element) => {
 .tran-enter-from,
 .tran-leave-to {
   opacity: 0;
-  transform: scale(0.7);
+  transform: scale(0.8);
 }
 
 .tran-enter-to,
