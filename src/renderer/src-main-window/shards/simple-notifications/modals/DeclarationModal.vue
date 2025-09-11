@@ -44,6 +44,7 @@
 
 <script setup lang="ts">
 import { markdownIt } from '@renderer-shared/utils/markdown'
+import { randomTruncatedNormal } from '@shared/utils/random'
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NFlex, NModal, NScrollbar } from 'naive-ui'
@@ -62,7 +63,7 @@ const markdownHtmlText = computed(() => {
 
 const show = defineModel<boolean>('show', { default: false })
 
-const countdown = ref(25)
+const countdown = ref(Math.floor(randomTruncatedNormal(10, 35)))
 
 const { pause } = useIntervalFn(() => {
   countdown.value--
