@@ -203,8 +203,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
       return this.getRuntimeInfo()
     })
 
-    this._ipc.onCall(AppCommonMain.id, 'quit', () => {
-      app.quit()
+    this._ipc.onCall(AppCommonMain.id, 'exit', () => {
+      app.exit()
     })
 
     this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {

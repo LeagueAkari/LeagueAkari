@@ -25,7 +25,7 @@
             {{ t('DeclarationModal.ok') }}
           </template>
         </NButton>
-        <NButton @click="() => emits('quit')" size="small">
+        <NButton @click="() => emits('exit')" size="small">
           {{ t('DeclarationModal.quit') }}
         </NButton>
       </NFlex>
@@ -54,7 +54,7 @@ const { t } = useTranslation()
 
 const emits = defineEmits<{
   (e: 'confirm'): void
-  (e: 'quit'): void
+  (e: 'exit'): void
 }>()
 
 const markdownHtmlText = computed(() => {

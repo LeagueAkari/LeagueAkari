@@ -219,7 +219,7 @@ export function bootstrap() {
     manager.global.quit = () => app.quit()
     manager.global.restart = () => {
       app.relaunch()
-      app.quit()
+      app.exit()
     }
     manager.global.getLogLevel = getLevel
     manager.global.setLogLevel = (level: string) => {
@@ -352,7 +352,7 @@ export function bootstrap() {
         })
     })
 
-    app.on('quit', () => {
+    app.on('exit', () => {
       console.log(
         `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] Application exited\x1b[0m`
       )

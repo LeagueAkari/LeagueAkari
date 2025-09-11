@@ -277,8 +277,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
               app.setShowFreeSoftwareDeclaration(false)
               sns.showDeclarationModal = false
             },
-            onQuit: () => {
-              app.quit()
+            onExit: () => {
+              app.exit()
             }
           })
       }
