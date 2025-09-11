@@ -8,6 +8,8 @@
     "src/main/shards/game-client"
   ],
   "compilerOptions": {
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "target": "ESNext",
     "lib": ["ESNext"],
     "composite": true,

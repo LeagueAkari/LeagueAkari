@@ -47,7 +47,9 @@ const mainPlugins = [swcPlugin(), yaml(), externalizeDepsPlugin()]
 
 export default defineConfig({
   main: {
-    plugins: SHOULD_COMPILE_TO_BYTECODE ? [bytecodePlugin(), ...mainPlugins] : mainPlugins,
+    plugins: SHOULD_COMPILE_TO_BYTECODE
+      ? [bytecodePlugin({ transformArrowFunctions: false }), ...mainPlugins]
+      : mainPlugins,
     build: {
       minify
     },
