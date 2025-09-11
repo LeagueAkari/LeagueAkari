@@ -1,4 +1,5 @@
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import FunnyPricing from '@renderer-shared/components/easter-eggs/FunnyPricing.vue'
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
@@ -261,7 +262,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
         const as = useAppCommonStore()
         const app = useInstance(AppCommonRenderer)
         const sns = useSimpleNotificationsStore()
-        const message = useMessage()
 
         watchEffect(() => {
           if (as.settings.showFreeSoftwareDeclaration) {
@@ -446,6 +446,37 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addRenderVNode(() => h(comp))
   }
 
+  private _setupFunnyPricingModal() {
+    const comp = defineComponent({
+      setup() {
+        const show = ref(false)
+        const balance = ref(0)
+
+        useKeyboardCombo('SUBSCRIBE', {
+          onFinish: () => {
+            show.value = true
+          }
+        })
+
+        useKeyboardCombo('GIVEMEAKARI', {
+          onFinish: () => {
+            balance.value += 1000000
+          }
+        })
+
+        return () =>
+          h(FunnyPricing, {
+            show: show.value,
+            balance: balance.value,
+            'onUpdate:show': (val) => (show.value = val),
+            'onUpdate:balance': (val) => (balance.value = val)
+          })
+      }
+    })
+
+    this._setup.addRenderVNode(() => h(comp))
+  }
+
   private _setupSpecialKeyboardCombo() {
     const message = useMessage()
     const sns = useSimpleNotificationsStore()
@@ -476,6 +507,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupDeclarationModal()
     this._setupAnnouncementModal()
     this._setupNewReleaseModal()
+    this._setupFunnyPricingModal()
     this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())

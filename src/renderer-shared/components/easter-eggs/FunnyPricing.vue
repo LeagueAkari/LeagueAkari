@@ -62,7 +62,7 @@ import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 const show = defineModel('show', { default: false })
-const balance = ref(0) // 单位是厘
+const balance = defineModel('balance', { default: 0 })
 
 // 很遗憾, 没有 i18n
 //
