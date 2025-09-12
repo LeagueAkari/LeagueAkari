@@ -33,9 +33,12 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
 
   const isTokenReady = ref(false)
 
+  const supportedQueues = ref<number[]>([])
+
   return {
     availability,
     isTokenReady,
-    sgpServerConfig
+    sgpServerConfig,
+    supportedQueues
   }
 })

@@ -43,31 +43,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     GAME_TIMELINE: 1
   }
 
-  /**
-   * 目前已知的可用队列, 这是为了避免查询不支持队列时返回为空的情况
-   */
-  static SAFE_TAGS = new Set([
-    `q_420`,
-    `q_430`,
-    `q_440`,
-    `q_450`, // ARAM
-    `q_480`, // SWIFTPLAY
-    `q_490`,
-    `q_900`, // URF
-    `q_1400`, // ULTBOOK
-    `q_1700`,
-    `q_1900`,
-    `q_2300`, // BRAWL
-    `q_4210`, // RUBY
-    `q_4220`, // RUBY - HARD
-    `q_4250` // VEIGAR
-  ])
-
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
   public readonly settings = new OngoingGameSettings()
   public readonly state: OngoingGameState
+
+  private _safeTags: Set<string>
 
   private _gameLruMap = new LRUMap<
     number,
@@ -126,6 +108,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this.settings
     )
     this.state = new OngoingGameState(this._lc.data)
+    this._safeTags = new Set(this._sgp.state.supportedQueues.map((q) => `q_${q}`))
   }
 
   private async _handleState() {
@@ -305,7 +288,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return 'all'
     }
 
-    if (OngoingGameMain.SAFE_TAGS.has(`q_${this.state.queryStage.gameInfo.queueId}`)) {
+    if (this._safeTags.has(`q_${this.state.queryStage.gameInfo.queueId}`)) {
       return `q_${this.state.queryStage.gameInfo.queueId}`
     }
 
@@ -647,7 +630,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this._log.info('Load player match history: SGP API', puuid)
 
       if (tag) {
-        if (tag === 'all' || !OngoingGameMain.SAFE_TAGS.has(tag)) {
+        if (tag === 'all' || !this._safeTags.has(tag)) {
           tag = undefined
           this.state.setMatchHistoryTag('all')
         } else {
@@ -941,7 +924,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(OngoingGameMain.id, 'setMatchHistoryTag', (_, tag: string) => {
-      if (OngoingGameMain.SAFE_TAGS.has(tag) || tag === 'all') {
+      if (this._safeTags.has(tag) || tag === 'all') {
         this.state.setMatchHistoryTag(tag)
         this._debouncedUpdateMatchHistoryFn()
       }

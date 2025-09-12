@@ -1,5 +1,5 @@
 import { useResizeObserver } from '@vueuse/core'
-import { MaybeRefOrGetter, computed, readonly, ref, toRef, toValue, watchEffect } from 'vue'
+import { MaybeRefOrGetter, computed, readonly, ref, toRef, toValue } from 'vue'
 
 function getRect(element: HTMLElement) {
   return element.getBoundingClientRect()

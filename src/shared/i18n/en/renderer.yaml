@@ -1768,11 +1768,6 @@ BenchChampionsMini:
     tenacity: Tenacity
     energy-regen: Energy Regen
 
-BenchModeAutoGrab:
-  grabbing: Selecting in {{seconds}}s
-  noExpectedChampions: No expected champion list set for auto-selection
-  noCandidate: No available champions for auto-selection
-
 ChampSelectActions:
   picked: Picked
   voted: Voted

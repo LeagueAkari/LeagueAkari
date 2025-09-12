@@ -1,7 +1,7 @@
 <template>
-  <NCard size="small" v-if="selfActions">
+  <NCard size="small" v-if="false">
     <NTimeline>
-      <NTimelineItem v-for="a of selfActions" :type="getTimelineTypeByAction(a[0])">
+      <!-- <NTimelineItem v-for="a of selfActions" :type="getTimelineTypeByAction(a[0])">
         <template #header>
           <span
             class="action"
@@ -41,7 +41,7 @@
             <span class="label">{{ t('ChampSelectActions.autoBan') }}</span>
           </div>
         </template>
-      </NTimelineItem>
+      </NTimelineItem> -->
     </NTimeline>
   </NCard>
 </template>
@@ -59,31 +59,6 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
-
-const selfActions = computed(() => {
-  if (!lcs.champSelect.session) {
-    return null
-  }
-
-  // 乱斗类模式没有
-  if (lcs.champSelect.session.benchEnabled) {
-    return
-  }
-
-  const memberMe = as2.memberMe
-
-  if (!memberMe) {
-    return null
-  }
-
-  const result = lcs.champSelect.session.actions
-    .map((arr) => {
-      return arr.filter((a) => a.actorCellId === memberMe.cellId || a.actorCellId === -1)
-    })
-    .filter((arr) => arr.length)
-
-  return result
-})
 
 const formatActionTypeText = (action: Action) => {
   let actionName: string

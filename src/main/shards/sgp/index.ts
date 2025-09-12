@@ -63,7 +63,8 @@ export class SgpMain implements IAkariShardInitDispose {
     this._mobx.propSync(SgpMain.id, 'state', this.state, [
       'availability',
       'isTokenReady',
-      'sgpServerConfig'
+      'sgpServerConfig',
+      'supportedQueues'
     ])
 
     this._handleIpcCall()

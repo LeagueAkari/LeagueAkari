@@ -3,6 +3,7 @@ import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientState } from '../league-client/state'
+import { SUPPORTED_QUEUES } from './supported-queues'
 
 export class SgpState {
   sgpServerConfig: SgpServersConfig = {
@@ -48,6 +49,8 @@ export class SgpState {
   // 用一个标记位来延迟更新
   isEntitlementsTokenSet = false
   isLeagueSessionTokenSet = false
+
+  supportedQueues = SUPPORTED_QUEUES
 
   setEntitlementsTokenSet(value: boolean) {
     this.isEntitlementsTokenSet = value

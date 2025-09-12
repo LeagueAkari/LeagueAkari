@@ -625,8 +625,8 @@ const rankedSoloFlex = computed(() => {
       solo.division && solo.division !== 'NA'
         ? `${t(`shortTiers.${solo.tier || 'UNRANKED'}`, {
             ns: 'common'
-          })} ${solo.division}  ${solo.leaguePoints}`
-        : `${t(`shortTiers.${solo.tier || 'UNRANKED'} `, {
+          })} ${solo.division} ${solo.leaguePoints}`
+        : `${t(`shortTiers.${solo.tier || 'UNRANKED'}`, {
             ns: 'common'
           })} ${solo.leaguePoints}`
 
@@ -643,10 +643,10 @@ const rankedSoloFlex = computed(() => {
       flex.division && flex.division !== 'NA'
         ? `${t(`shortTiers.${flex.tier || 'UNRANKED'}`, {
             ns: 'common'
-          })} ${flex.division}  ${flex.leaguePoints}`
+          })} ${flex.division} ${flex.leaguePoints}`
         : `${t(`shortTiers.${flex.tier || 'UNRANKED'}`, {
             ns: 'common'
-          })} ${flex.leaguePoints}  `
+          })} ${flex.leaguePoints}`
 
     result.flex = {
       text: flexText,
@@ -960,6 +960,8 @@ const { name } = useChampionInfo()
         .text {
           color: #999;
         }
+
+        justify-content: center;
       }
 
       &.cherry {

@@ -1772,11 +1772,6 @@ BenchChampionsMini:
     tenacity: 韧性
     energy-regen: 能量回复
 
-BenchModeAutoGrab:
-  grabbing: 即将选择 {{seconds}} s
-  noExpectedChampions: 自动选择没有设置期望英雄列表
-  noCandidate: 自动选择无可用英雄
-
 ChampSelectActions:
   picked: 已选择
   voted: 已投票

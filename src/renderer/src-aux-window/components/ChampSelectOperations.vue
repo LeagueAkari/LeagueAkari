@@ -16,30 +16,6 @@
         {{ t('ChampSelectOperations.dodge.cancel') }}
       </NButton>
     </NFlex>
-    <NFlex align="center" v-if="!isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoPick') }}</span>
-      <NSwitch
-        size="small"
-        :value="as2.settings.normalModeEnabled"
-        @update:value="(val) => as.setNormalModeEnabled(val)"
-      />
-    </NFlex>
-    <NFlex align="center" v-if="!isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoBan') }}</span>
-      <NSwitch
-        size="small"
-        :value="as2.settings.banEnabled"
-        @update:value="(val) => as.setBanEnabled(val)"
-      />
-    </NFlex>
-    <NFlex align="center" v-if="isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoGrab') }}</span>
-      <NSwitch
-        size="small"
-        :value="as2.settings.benchModeEnabled"
-        @update:value="(val) => as.setBenchModeEnabled(val)"
-      />
-    </NFlex>
   </NCard>
 </template>
 

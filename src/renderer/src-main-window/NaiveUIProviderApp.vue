@@ -62,6 +62,9 @@ const themeOverrides = computed(() => {
       },
       Menu: {
         padding: '1px'
+      },
+      Scrollbar: {
+        width: '6px'
       }
     } as GlobalThemeOverrides
   } else {
