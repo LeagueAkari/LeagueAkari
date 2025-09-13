@@ -25,10 +25,6 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelAutoMatchmaking')
   }
 
-  setWillDodgeAtLastSecond(enabled: number) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setWillDodgeAtLastSecond', enabled)
-  }
-
   setAutoHonorEnabled(enabled: boolean) {
     this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHonorEnabled', enabled)
   }

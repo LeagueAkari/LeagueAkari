@@ -30,7 +30,6 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoHandleInvitationsEnabled: false,
     autoSkipLeaderEnabled: false,
     invitationHandlingStrategies: {} as Record<string, string>,
-    dodgeAtLastSecondThreshold: 2,
     rejectInvitationWhenAway: false
   })
 
@@ -38,8 +37,6 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
   const willAcceptAt = ref(-1)
   const willSearchMatch = ref(false)
   const willSearchMatchAt = ref(-1)
-  const willDodgeAt = ref(-1)
-  const willDodgeAtLastSecond = ref(false)
   const activityStartStatus = ref('unavailable')
 
   return {
@@ -49,8 +46,6 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     willAcceptAt,
     willSearchMatch,
     willSearchMatchAt,
-    willDodgeAt,
-    willDodgeAtLastSecond,
     activityStartStatus
   }
 })

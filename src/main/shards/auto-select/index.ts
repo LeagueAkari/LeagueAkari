@@ -1,10 +1,9 @@
 import { i18next } from '@main/i18n'
-import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { formatError, formatErrorMessage } from '@shared/utils/errors'
+import { formatError } from '@shared/utils/errors'
 import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
-import { comparer, computed, observable, runInAction, toJS } from 'mobx'
+import { comparer, computed, observable, runInAction } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -37,24 +36,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       AutoSelectMain.id,
       {
-        benchExpectedChampions: { default: this.settings.benchExpectedChampions },
-        expectedChampions: { default: this.settings.expectedChampions },
-        bannedChampions: { default: this.settings.bannedChampions },
-        normalModeEnabled: { default: this.settings.normalModeEnabled },
-        pickStrategy: { default: this.settings.pickStrategy },
-        selectTeammateIntendedChampion: { default: this.settings.selectTeammateIntendedChampion },
-        showIntent: { default: this.settings.showIntent },
-        lockInDelaySeconds: { default: this.settings.lockInDelaySeconds },
-        benchModeEnabled: { default: this.settings.benchModeEnabled },
-        benchSelectFirstAvailableChampion: {
-          default: this.settings.benchSelectFirstAvailableChampion
-        },
-        grabDelaySeconds: { default: this.settings.grabDelaySeconds },
-        banDelaySeconds: { default: this.settings.banDelaySeconds },
-        banEnabled: { default: this.settings.banEnabled },
-        banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
-        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled },
-
         pickConfig: { default: this.settings.pickConfig },
         banConfig: { default: this.settings.banConfig }
       },
@@ -88,28 +69,18 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private async _handleState() {
     await this._setting.applyToState()
 
-    this._mobx.propSync(AutoSelectMain.id, 'settings', this.settings, [
-      'normalModeEnabled',
-      'selectTeammateIntendedChampion',
-      'showIntent',
-      'pickStrategy',
-      'lockInDelaySeconds',
-      'benchModeEnabled',
-      'benchSelectFirstAvailableChampion',
-      'grabDelaySeconds',
-      'banEnabled',
-      'banDelaySeconds',
-      'banTeammateIntendedChampion',
-      'benchExpectedChampions',
-      'expectedChampions',
-      'bannedChampions',
-      'benchHandleTradeEnabled',
+    this._mobx.propSync(AutoSelectMain.id, 'settings', this.settings, ['pickConfig', 'banConfig'])
 
-      'pickConfig',
-      'banConfig'
+    this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
+      'groups',
+      'temporaryDisabled',
+      'delayedBan',
+      'delayedPick',
+      'delayedSwap',
+      'expectedPicks',
+      'expectedBans',
+      'expectedSwaps'
     ])
-
-    this._mobx.propSync(AutoSelectMain.id, 'state', this.state, ['groups', 'temporaryDisabled'])
 
     await this._fillAutoBanPickConfig()
   }
@@ -267,8 +238,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       (ctx) => {
         if (!ctx) {
           // 不生效的场合，将立即尝试取消之前设置的任何计时器，并清除状态
-          if (this.state.delayedBan) {
-            clearTimeout(this.state.delayedBan.timerId)
+          if (this.state._delayedBan) {
+            clearTimeout(this.state._delayedBan.timerId)
             this.state.setDelayedBan(null)
           }
 
@@ -281,8 +252,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         if (move === 'show-ban') {
           if (activeAction.championId === expectedBan.id) {
-            if (this.state.delayedBan) {
-              clearTimeout(this.state.delayedBan.timerId)
+            if (this.state._delayedBan) {
+              clearTimeout(this.state._delayedBan.timerId)
               this.state.setDelayedBan(null)
               this._log.warn(
                 `Already picked, canceling delayed ban ${this._debugChampionName(expectedBan.id)}`
@@ -293,14 +264,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           }
         }
 
-        if (this.state.delayedBan) {
-          clearTimeout(this.state.delayedBan.timerId)
+        if (this.state._delayedBan) {
+          clearTimeout(this.state._delayedBan.timerId)
         }
 
         if (
-          !this.state.delayedBan ||
-          this.state.delayedBan.championId !== expectedBan.id ||
-          this.state.delayedBan.completed !== completed
+          !this.state._delayedBan ||
+          this.state._delayedBan.championId !== expectedBan.id ||
+          this.state._delayedBan.completed !== completed
         ) {
           this._sendCelebration(
             `Updated, Ban (complete=${completed}) ${this._debugChampionName(expectedBan.id)} in ${niceDelayMs}ms`
@@ -423,9 +394,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       (ctx) => {
         if (!ctx) {
           // 不生效的场合，将立即尝试取消之前设置的任何计时器，并清除状态
-          if (this.state.delayedPick) {
-            clearTimeout(this.state.delayedPick.timerId)
-            this.state.setDelayedBan(null)
+          if (this.state._delayedPick) {
+            clearTimeout(this.state._delayedPick.timerId)
+            this.state.setDelayedPick(null)
           }
 
           return
@@ -444,10 +415,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (move === 'complete-pick') {
           // 1. 在 just-show 策略下，对于手上已经存在预期英雄时，取消计时器并返回
           if (strategy === 'just-show' && activeAction.championId === expectedPick.id) {
-            if (this.state.delayedPick) {
+            if (this.state._delayedPick) {
               this._log.error('canceled just-show')
 
-              clearTimeout(this.state.delayedPick.timerId)
+              clearTimeout(this.state._delayedPick.timerId)
               this.state.setDelayedPick(null)
               this._log.warn(
                 `Already picked, canceling delayed pick ${this._debugChampionName(expectedPick.id)} move=${move}`
@@ -462,8 +433,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             !firstUnfinishedPickAction ||
             firstUnfinishedPickAction.championId === expectedPick.id
           ) {
-            if (this.state.delayedPick) {
-              clearTimeout(this.state.delayedPick.timerId)
+            if (this.state._delayedPick) {
+              clearTimeout(this.state._delayedPick.timerId)
               this.state.setDelayedPick(null)
             }
 
@@ -471,8 +442,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           }
         }
 
-        if (this.state.delayedPick) {
-          clearTimeout(this.state.delayedPick.timerId)
+        if (this.state._delayedPick) {
+          clearTimeout(this.state._delayedPick.timerId)
         }
 
         const completed =
@@ -481,9 +452,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           (strategy !== 'just-show' && move === 'complete-pick')
 
         if (
-          !this.state.delayedPick ||
-          this.state.delayedPick.championId !== expectedPick.id ||
-          this.state.delayedPick.completed !== completed
+          !this.state._delayedPick ||
+          this.state._delayedPick.championId !== expectedPick.id ||
+          this.state._delayedPick.completed !== completed
         ) {
           this._sendCelebration(
             `Updated, Pick (complete=${completed}) ${this._debugChampionName(expectedPick.id)} in ${niceDelayMs}ms move=${move}`
@@ -619,8 +590,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }),
       ({ ctx, bench }) => {
         if (!ctx || !bench) {
-          if (this.state.delayedSwap) {
-            clearTimeout(this.state.delayedSwap.timerId)
+          if (this.state._delayedSwap) {
+            clearTimeout(this.state._delayedSwap.timerId)
             this.state.setDelayedSwap(null)
           }
 
@@ -631,8 +602,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         const axis = bench[ctx.expectedSwap.id]
 
         if (!axis) {
-          if (this.state.delayedSwap) {
-            clearTimeout(this.state.delayedSwap.timerId)
+          if (this.state._delayedSwap) {
+            clearTimeout(this.state._delayedSwap.timerId)
             this.state.setDelayedSwap(null)
           }
 
@@ -654,14 +625,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
 
         // 若存在，则移除
-        if (this.state.delayedSwap) {
-          clearTimeout(this.state.delayedSwap.timerId)
+        if (this.state._delayedSwap) {
+          clearTimeout(this.state._delayedSwap.timerId)
         }
 
         const now = Date.now()
         const delayMs = delaySeconds * 1e3 - (now - axis)
 
-        if (!this.state.delayedSwap || id !== this.state.delayedSwap.championId) {
+        if (!this.state._delayedSwap || id !== this.state._delayedSwap.championId) {
           this._sendCelebration(`Will swap ${this._debugChampionName(id)} in ${delayMs}ms`)
         }
 
@@ -704,48 +675,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _debugChampionName(id: number) {
     return `${this._lc.data.gameData.championName(id)} (${id})`
-  }
-
-  private async _acceptOrDeclineTrade(tradeId: number, accept: boolean) {
-    if (accept) {
-      try {
-        await this._lc.api.champSelect.acceptTrade(tradeId)
-      } catch (error) {
-        this._ipc.sendEvent(AutoSelectMain.id, 'error-accept-trade', tradeId)
-        this._log.warn(`Failed to accept swap request`, error)
-      }
-    } else {
-      try {
-        await this._lc.api.champSelect.declineTrade(tradeId)
-      } catch (error) {
-        this._ipc.sendEvent(AutoSelectMain.id, 'error-decline-trade', tradeId)
-        this._log.warn(`Failed to decline swap request`, error)
-      }
-    }
-  }
-
-  private async _notifyInChat(type: 'cancel' | 'select', championId: number, time = 0) {
-    if (!this._lc.data.chat.conversations.championSelect) {
-      return
-    }
-
-    try {
-      await this._lc.api.chat.chatSend(
-        this._lc.data.chat.conversations.championSelect.id,
-        type === 'select'
-          ? `[League Akari] - ${i18next.t('auto-select-main.grab-soon', {
-              seconds: (time / 1000).toFixed(1),
-              champion: this._lc.data.gameData.champions[championId]?.name || championId
-            })}`
-          : `[League Akari] - ${i18next.t('auto-select-main.cancel-grab', {
-              champion: this._lc.data.gameData.champions[championId]?.name || championId
-            })}`,
-        'celebration'
-      )
-    } catch (error) {
-      this._ipc.sendEvent(AutoSelectMain.id, 'error-chat-send', formatError(error))
-      this._log.warn(`Failed to send message`, error)
-    }
   }
 
   private _handleIpcCall() {

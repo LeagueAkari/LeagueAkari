@@ -30,6 +30,7 @@ export interface PickChampionConfig {
   benchHandleTradeEnabled: boolean
 }
 
+// copied from main shard
 export interface BanChampionConfig {
   enabled: boolean
   champions: PositionChampion
@@ -38,6 +39,7 @@ export interface BanChampionConfig {
   ignoreIntent: boolean
 }
 
+// copied from main shard
 export interface AutoSelectGroup {
   groupId: string
   targetGameMode: string
@@ -49,6 +51,29 @@ export interface AutoSelectGroup {
   excludedBans: number[]
 }
 
+// copied from main shard
+export interface DelayedBanPick {
+  isPickIntent: boolean
+  completed: boolean
+  championId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+}
+
+// copied from main shard
+export interface DelayedSwap {
+  championId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+}
+
+export interface ExpectedChampionStatus {
+  id: number
+  status: string
+}
+
 export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () => {
   const settings = shallowReactive({
     pickConfig: {} as Record<string, PickChampionConfig>,
@@ -57,9 +82,25 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
 
   const groups = shallowRef<AutoSelectGroup[]>([])
 
+  const delayedBan = shallowRef<DelayedBanPick | null>(null)
+  const delayedPick = shallowRef<DelayedBanPick | null>(null)
+  const delayedSwap = shallowRef<DelayedSwap | null>(null)
+
+  const expectedPicks = shallowRef<ExpectedChampionStatus[] | null>(null)
+  const expectedBans = shallowRef<ExpectedChampionStatus[] | null>(null)
+  const expectedSwaps = shallowRef<ExpectedChampionStatus[] | null>(null)
+
   return {
     settings,
 
-    groups
+    groups,
+
+    delayedBan,
+    delayedPick,
+    delayedSwap,
+
+    expectedPicks,
+    expectedBans,
+    expectedSwaps
   }
 })

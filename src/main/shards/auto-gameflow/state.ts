@@ -37,8 +37,6 @@ export class AutoGameflowSettings {
 
   invitationHandlingStrategies: Record<string, string> = {}
 
-  dodgeAtLastSecondThreshold: number = 2
-
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
   }
@@ -95,10 +93,6 @@ export class AutoGameflowSettings {
     this.rejectInvitationWhenAway = yes
   }
 
-  setDodgeAtLastSecondThreshold(threshold: number) {
-    this.dodgeAtLastSecondThreshold = threshold
-  }
-
   setInvitationHandlingStrategies(strategies: Record<string, string>) {
     this.invitationHandlingStrategies = strategies
   }
@@ -132,17 +126,6 @@ export class AutoGameflowState {
    * 即将进行的匹配开始的时间
    */
   willSearchMatchAt: number = -1
-
-  /**
-   * 即将进行的秒退操作将在指定时间执行
-   */
-  willDodgeAt: number = -1
-
-  /**
-   * 是否在最后一秒秒退
-   * @deprecated 将使用 willDodgeAt 的值来判断是否进行自动秒退操作
-   */
-  willDodgeAtLastSecond: boolean = false
 
   get activityStartStatus() {
     if (!this._lcData.lobby.lobby) {
@@ -205,14 +188,6 @@ export class AutoGameflowState {
   setSearchMatchAt(at: number) {
     this.willSearchMatch = true
     this.willSearchMatchAt = at
-  }
-
-  setWillDodgeAtLastSecond(yes: boolean) {
-    this.willDodgeAtLastSecond = yes
-  }
-
-  setDodgeAt(at: number) {
-    this.willDodgeAt = at
   }
 
   clearAutoAccept() {

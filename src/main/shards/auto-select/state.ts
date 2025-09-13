@@ -1,4 +1,3 @@
-import { Action } from '@shared/types/league-client/champ-select'
 import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
 import { computed, makeAutoObservable, observable } from 'mobx'
@@ -6,7 +5,6 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 import { LeagueClientData } from '../league-client/lc-state'
 import { GROUPS } from './groups'
 
-export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in' // deprecated
 export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in'
 
 export const NONE_CHAMPION_ID = -1
@@ -50,7 +48,6 @@ export interface BanChampionConfig {
 }
 
 export interface DelayedBanPick {
-  type?: 'complete' | 'show' | 'intent'
   isPickIntent: boolean
   completed: boolean
   championId: number
@@ -69,100 +66,9 @@ export interface DelayedSwap {
 }
 
 export class AutoSelectSettings {
-  normalModeEnabled: boolean = false
-  expectedChampions: Record<string, number[]> = {
-    top: [],
-    jungle: [],
-    middle: [],
-    bottom: [],
-    utility: [],
-    default: []
-  }
-  selectTeammateIntendedChampion: boolean = false
-  showIntent: boolean = false
-  pickStrategy: AutoPickStrategy = 'lock-in'
-  lockInDelaySeconds: number = 0
-  benchModeEnabled: boolean = false
-  benchSelectFirstAvailableChampion: boolean = false
-  benchHandleTradeEnabled: boolean = false
-  benchExpectedChampions: number[] = []
-  grabDelaySeconds: number = 2.9
-  banEnabled: boolean = false
-  banDelaySeconds: number = 0
-  bannedChampions: Record<string, number[]> = {
-    top: [],
-    jungle: [],
-    middle: [],
-    bottom: [],
-    utility: [],
-    default: []
-  }
-  banTeammateIntendedChampion: boolean = false
-
-  // --- new ---
   // modeTypeKey, configObject
   pickConfig: Record<string, PickChampionConfig> = {}
   banConfig: Record<string, BanChampionConfig> = {}
-
-  setNormalModeEnabled(value: boolean) {
-    this.normalModeEnabled = value
-  }
-
-  setExpectedChampions(value: Record<string, number[]>) {
-    this.expectedChampions = value
-  }
-
-  setSelectTeammateIntendedChampion(value: boolean) {
-    this.selectTeammateIntendedChampion = value
-  }
-
-  setShowIntent(value: boolean) {
-    this.showIntent = value
-  }
-
-  setLockInDelaySeconds(value: number) {
-    this.lockInDelaySeconds = value
-  }
-
-  setBenchModeEnabled(value: boolean) {
-    this.benchModeEnabled = value
-  }
-
-  setBenchExpectedChampions(value: number[]) {
-    this.benchExpectedChampions = value
-  }
-
-  setGrabDelaySeconds(value: number) {
-    this.grabDelaySeconds = value
-  }
-
-  setBenchSelectFirstAvailableChampion(value: boolean) {
-    this.benchSelectFirstAvailableChampion = value
-  }
-
-  setBanEnabled(value: boolean) {
-    this.banEnabled = value
-  }
-
-  setBanDelaySeconds(value: number) {
-    this.banDelaySeconds = value
-  }
-
-  setBannedChampions(value: Record<string, number[]>) {
-    this.bannedChampions = value
-  }
-
-  setBanTeammateIntendedChampion(value: boolean) {
-    this.banTeammateIntendedChampion = value
-  }
-
-  setBenchHandleTradeEnabled(value: boolean) {
-    this.benchHandleTradeEnabled = value
-  }
-
-  setPickStrategy(value: AutoPickStrategy) {
-    this.pickStrategy = value
-  }
 
   createNewEmptyPickConfig(): PickChampionConfig {
     return {
@@ -218,9 +124,6 @@ export class AutoSelectSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      benchExpectedChampions: observable.struct,
-      expectedChampions: observable.struct,
-      bannedChampions: observable.struct,
       pickConfig: observable.ref,
       banConfig: observable.ref
     })
@@ -635,34 +538,64 @@ export class AutoSelectState {
    *
    * 被读取，或仅被自动禁用相关的 reaction 写入
    */
-  delayedBan: DelayedBanPick | null = null
+  _delayedBan: DelayedBanPick | null = null
+
+  /** 仅被读取的副本 */
+  get delayedBan() {
+    if (this._delayedBan) {
+      const { timerId, ...rest } = this._delayedBan
+      return rest
+    }
+
+    return null
+  }
 
   /**
    * 表示当前存在一个延迟的 pick 操作
    *
    * 被读取，或仅被自动禁用相关的 reaction 写入
    */
-  delayedPick: DelayedBanPick | null = null
+  _delayedPick: DelayedBanPick | null = null
+
+  /** 仅被读取的副本 */
+  get delayedPick() {
+    if (this._delayedPick) {
+      const { timerId, ...rest } = this._delayedPick
+      return rest
+    }
+
+    return null
+  }
 
   /**
    * 准备 swap 哪个英雄
    */
-  delayedSwap: DelayedSwap | null = null
+  _delayedSwap: DelayedSwap | null = null
+
+  /** 仅被读取的副本 */
+  get delayedSwap() {
+    if (this._delayedSwap) {
+      const { timerId, ...rest } = this._delayedSwap
+      return rest
+    }
+
+    return null
+  }
 
   setTemporaryDisabled(value: boolean) {
     this.temporaryDisabled = value
   }
 
   setDelayedBan(config: DelayedBanPick | null) {
-    this.delayedBan = config
+    this._delayedBan = config
   }
 
   setDelayedPick(config: DelayedBanPick | null) {
-    this.delayedPick = config
+    this._delayedPick = config
   }
 
   setDelayedSwap(config: DelayedSwap | null) {
-    this.delayedSwap = config
+    this._delayedSwap = config
   }
 
   constructor(
@@ -679,8 +612,9 @@ export class AutoSelectState {
       timer: computed.struct,
       benchChampions: computed.struct,
 
-      delayedBan: observable.struct,
-      delayedPick: observable.struct,
+      _delayedBan: observable.struct,
+      _delayedPick: observable.struct,
+      _delayedSwap: observable.struct,
 
       groups: observable.ref
     })

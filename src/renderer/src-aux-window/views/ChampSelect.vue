@@ -2,12 +2,14 @@
   <NScrollbar class="champ-select-wrapper">
     <BenchChampionsMini style="margin-bottom: 4px" />
     <ChampSelectActions style="margin-bottom: 4px" />
+    <AutomationInfo style="margin-bottom: 4px" />
     <SkinSelectionMini style="margin-bottom: 4px" />
     <ChampSelectOperations />
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
+import AutomationInfo from '@aux-window/components/AutomationInfo.vue'
 import BenchChampionsMini from '@aux-window/components/BenchChampionsMini.vue'
 import ChampSelectActions from '@aux-window/components/ChampSelectActions.vue'
 import ChampSelectOperations from '@aux-window/components/ChampSelectOperations.vue'

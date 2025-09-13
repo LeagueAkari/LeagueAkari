@@ -32,7 +32,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
   private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
-  private _dodgeTask = new TimeoutTask(this._dodgeFn.bind(this))
   private _reconnectTask = new TimeoutTask(this._reconnectFn.bind(this))
 
   static HONOR_CATEGORY = ['HEART'] as const
@@ -74,7 +73,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         autoMatchmakingRematchStrategy: { default: this.settings.autoMatchmakingRematchStrategy },
         autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
         autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
-        dodgeAtLastSecondThreshold: { default: this.settings.dodgeAtLastSecondThreshold },
         invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies },
         rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway }
       },
@@ -88,9 +86,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     })
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoMatchmaking', () => {
       this.cancelAutoMatchmaking('normal')
-    })
-    this._ipc.onCall(AutoGameflowMain.id, 'setWillDodgeAtLastSecond', (_, enabled: boolean) => {
-      this.state.setWillDodgeAtLastSecond(enabled)
     })
   }
 
@@ -356,50 +351,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         })
       },
       { fireImmediately: true }
-    )
-  }
-
-  /**
-   * @deprecated 已无法使用
-   */
-  private _adjustDodgeTimer(msLeft: number, threshold: number) {
-    const dodgeIn = Math.max(msLeft - threshold * 1e3, 0)
-    this._log.info(`Time correction: will dodge in ${dodgeIn} ms`)
-    this._dodgeTask.start(dodgeIn)
-    this.state.setDodgeAt(Date.now() + dodgeIn)
-  }
-
-  private _handleLastSecondDodge() {
-    this._mobx.reaction(
-      () => [Boolean(this._lc.data.champSelect.session), this.state.willDodgeAtLastSecond] as const,
-      ([hasSession, enabled]) => {
-        if (!hasSession || !enabled) {
-          if (this._dodgeTask.cancel()) {
-            this._log.info('Dodge timer cancelled')
-          }
-          this.state.setDodgeAt(-1)
-          this.state.setWillDodgeAtLastSecond(false)
-          return
-        }
-      },
-      { equals: comparer.shallow }
-    )
-
-    this._mobx.reaction(
-      () =>
-        [
-          this._lc.data.champSelect.session?.timer,
-          this.state.willDodgeAtLastSecond,
-          this.settings.dodgeAtLastSecondThreshold
-        ] as const,
-      ([timer, enabled, threshold]) => {
-        if (timer && enabled) {
-          if (timer.phase === 'FINALIZATION') {
-            this._adjustDodgeTimer(timer.adjustedTimeLeftInPhase, threshold)
-          }
-        }
-      },
-      { equals: comparer.shallow }
     )
   }
 
@@ -689,17 +640,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _dodgeFn() {
-    try {
-      this._log.info('Dodge, dodging')
-      await this._lc.api.login.dodge()
-    } catch (error) {
-      this._log.warn(`Failed to dodge`, error)
-    } finally {
-      this.state.setDodgeAt(-1)
-    }
-  }
-
   private async _reconnectFn() {
     try {
       this._log.info('Reconnect! Attempting to reconnect')
@@ -709,15 +649,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
   private async _handleState() {
     await this._setting.applyToState()
-
-    this._setting.onChange('dodgeAtLastSecondThreshold', async (v, { setter }) => {
-      if (v < 0) {
-        v = 0
-      }
-
-      this.settings.setDodgeAtLastSecondThreshold(v)
-      await setter()
-    })
 
     this._setting.onChange('autoAcceptEnabled', async (v, { setter }) => {
       if (!v) {
@@ -741,7 +672,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoMatchmakingWaitForInvitees',
       'autoSkipLeaderEnabled',
       'playAgainEnabled',
-      'dodgeAtLastSecondThreshold',
       'autoHandleInvitationsEnabled',
       'autoReconnectEnabled',
       'autoMatchmakingMaximumMatchDuration',
@@ -754,9 +684,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'willAcceptAt',
       'willSearchMatch',
       'willSearchMatchAt',
-      'activityStartStatus',
-      'willDodgeAt',
-      'willDodgeAtLastSecond'
+      'activityStartStatus'
     ])
   }
 
@@ -855,7 +783,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoHandleInvitation()
     this._handleAutoSkipLeader()
     this._handleLogging()
-    this._handleLastSecondDodge()
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
   }

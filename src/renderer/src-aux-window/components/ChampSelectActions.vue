@@ -1,47 +1,27 @@
 <template>
-  <NCard size="small" v-if="false">
+  <NCard size="small" v-if="myActions && myActions.length">
     <NTimeline>
-      <!-- <NTimelineItem v-for="a of selfActions" :type="getTimelineTypeByAction(a[0])">
+      <NTimelineItem v-for="a of myActions" :type="getTimelineTypeByAction(a)">
         <template #header>
-          <span
-            class="action"
-            :class="{ completed: a[0].completed, 'in-progress': a[0].isInProgress }"
-            >{{ formatActionTypeText(a[0]) }}</span
-          >
+          <span class="action" :class="{ completed: a.completed, 'in-progress': a.isInProgress }">{{
+            formatActionTypeText(a)
+          }}</span>
         </template>
-        <template v-if="a[0].completed">
-          <div class="solution completed" v-if="a[0].type === 'pick'">
-            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
+        <template v-if="a.completed">
+          <div class="solution completed" v-if="a.type === 'pick'">
+            <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
             <span class="label">{{ t('ChampSelectActions.picked') }}</span>
           </div>
-          <div class="solution completed" v-else-if="a[0].type === 'vote'">
-            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
+          <div class="solution completed" v-else-if="a.type === 'vote'">
+            <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
             <span class="label">{{ t('ChampSelectActions.voted') }}</span>
           </div>
-          <div class="solution completed" v-else-if="a[0].type === 'ban'">
-            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
+          <div class="solution completed" v-else-if="a.type === 'ban'">
+            <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
             <span class="label">{{ t('ChampSelectActions.banned') }}</span>
           </div>
         </template>
-        <template v-else>
-          <div class="solution" v-if="as2.targetPick && as2.targetPick.action.id === a[0].id">
-            <ChampionIcon
-              class="image"
-              :stretched="false"
-              :champion-id="as2.targetPick.championId"
-            />
-            <span class="label">{{ t('ChampSelectActions.autoPick') }}</span>
-          </div>
-          <div class="solution" v-if="as2.targetBan && as2.targetBan.action.id === a[0].id">
-            <ChampionIcon
-              class="image"
-              :stretched="false"
-              :champion-id="as2.targetBan.championId"
-            />
-            <span class="label">{{ t('ChampSelectActions.autoBan') }}</span>
-          </div>
-        </template>
-      </NTimelineItem> -->
+      </NTimelineItem>
     </NTimeline>
   </NCard>
 </template>
@@ -73,7 +53,10 @@ const formatActionTypeText = (action: Action) => {
       actionName = t('ChampSelectActions.voting')
       break
     case 'ten_bans_reveal':
-      actionName = t('ChampSelectActions.tenBansRevealing')
+    case 'phase_transition':
+    case 'vote_transition':
+    case 'team_vote_reveal':
+      actionName = t(`ChampSelectActions.ceremonies.${action.type}`)
       break
 
     default:
@@ -101,6 +84,18 @@ const getTimelineTypeByAction = (action: Action) => {
 
   return 'default'
 }
+
+// 基于假设，每个 action group 中只有一个属于自己
+const myActions = computed(() => {
+  if (!lcs.champSelect.session) {
+    return null
+  }
+
+  return lcs.champSelect.session.actions
+    .map((arr) => arr.filter((a) => a.actorCellId === lcs.champSelect.session!.localPlayerCellId))
+    .filter((arr) => arr.length)
+    .map((arr) => arr[0])
+})
 </script>
 
 <style scoped>
