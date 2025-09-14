@@ -2266,6 +2266,20 @@ simple-notifications-renderer:
     closeButton: 关闭
     watchButton: 观看录像
 
+  wmiRequiresAdministrator:
+    title: 需要管理员权限
+    content: 当前使用 WMI 方式获取 League Client 命令行信息，需要以管理员权限运行此应用
+    positiveText: 以管理员权限重新启动
+    negativeText: 取消
+
+  cannotGetUxCommandLine:
+    title: 无法获取客户端命令行信息
+    noAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请尝试以管理员权限重新启动此应用，之后在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+    withAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+    extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，League Akari 可能无法正常工作
+    withAdminPositiveText: 确认
+    noAdminPositiveText: 以管理员权限重新启动
+
 league-client-renderer:
   initialization-task:
     name: LCU 初始化

@@ -9,9 +9,11 @@ export const useLeagueClientUxStore = defineStore('shard:league-client-ux-render
   })
 
   const launchedClients = shallowRef<UxCommandLine[]>([])
+  const hasClientButNoCommandLine = shallowRef(false)
 
   return {
     settings,
-    launchedClients
+    launchedClients,
+    hasClientButNoCommandLine
   }
 })

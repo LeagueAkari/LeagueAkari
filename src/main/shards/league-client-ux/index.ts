@@ -1,4 +1,10 @@
-import { queryUxCommandLine, queryUxCommandLineNative } from '@main/utils/ux-cmd'
+import { tools } from '@leagueakari/league-akari-addons'
+import {
+  UxCommandLine,
+  getProcessPidByName,
+  parseCommandLine,
+  queryUxCommandLine
+} from '@main/utils/ux-cmd'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -37,8 +43,8 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   constructor(
     private readonly _ipc: AkariIpcMain,
     private readonly _common: AppCommonMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _mobx: MobxUtilsMain
   ) {
     this._log = _loggerFactory.create(LeagueClientUxMain.id)
@@ -57,7 +63,10 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     this._handlePollExistingUx()
 
     this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
-    this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, ['launchedClients'])
+    this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, [
+      'launchedClients',
+      'hasClientButNoCommandLine'
+    ])
 
     this._ipc.onCall(LeagueClientUxMain.id, 'rebuildWmi', () => this._rebuildWmi())
   }
@@ -94,7 +103,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
    */
   async update() {
     try {
-      this.state.setLaunchedClients(await this._queryUxCommandLine())
+      this.state.setLaunchedClients(await this._updateUxCommandLine())
 
       if (this._pollTimerId) {
         clearInterval(this._pollTimerId)
@@ -109,16 +118,36 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
-  private _queryUxCommandLine() {
+  private async _updateUxCommandLine() {
     if (this.settings.useWmi) {
       if (!this._common.state.isAdministrator) {
         return []
       }
 
-      return queryUxCommandLine(LeagueClientUxMain.UX_PROCESS_NAME)
-    }
+      const pids = await getProcessPidByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const cmds = await queryUxCommandLine(LeagueClientUxMain.UX_PROCESS_NAME)
 
-    return queryUxCommandLineNative(LeagueClientUxMain.UX_PROCESS_NAME)
+      this.state.setHasClientButNoCommandLine(pids.length !== 0 && cmds.length === 0)
+
+      return cmds
+    } else {
+      const pids = tools.getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const auths: UxCommandLine[] = []
+
+      for (const p of pids) {
+        try {
+          const cmd = tools.getCommandLine1(p)
+          const parsed = parseCommandLine(cmd)
+          if (parsed) {
+            auths.push(parsed)
+          }
+        } catch {}
+      }
+
+      this.state.setHasClientButNoCommandLine(pids.length !== 0 && auths.length === 0)
+
+      return auths
+    }
   }
 
   private async _rebuildWmi() {

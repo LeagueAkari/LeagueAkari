@@ -2263,6 +2263,20 @@ simple-notifications-renderer:
     closeButton: Close
     watchButton: Watch Replay
 
+  wmiRequiresAdministrator:
+    title: Requires Administrator
+    content: Current use WMI to get league client command line, requires running this application with administrator privileges
+    positiveText: Restart with Administrator privileges
+    negativeText: Cancel
+
+  cannotGetUxCommandLine:
+    title: Cannot Get League Client UX Command Line
+    noAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to restart this application with administrator privileges, then enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
+    withAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
+    extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, League Akari may not work properly'
+    withAdminPositiveText: Confirm
+    noAdminPositiveText: Restart with Administrator privileges
+
 league-client-renderer:
   initialization-task:
     name: LCU Initialization

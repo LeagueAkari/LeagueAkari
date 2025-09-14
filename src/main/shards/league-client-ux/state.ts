@@ -16,6 +16,9 @@ export class LeagueClientUxSettings {
 export class LeagueClientUxState {
   launchedClients: UxCommandLine[] = []
 
+  /** 无法查询到 cmd 的情况，给出警告 */
+  hasClientButNoCommandLine: boolean = false
+
   constructor() {
     makeAutoObservable(this, {
       launchedClients: observable.struct
@@ -24,5 +27,9 @@ export class LeagueClientUxState {
 
   setLaunchedClients(c: UxCommandLine[]) {
     this.launchedClients = c
+  }
+
+  setHasClientButNoCommandLine(has: boolean) {
+    this.hasClientButNoCommandLine = has
   }
 }

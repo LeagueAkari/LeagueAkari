@@ -9,6 +9,7 @@ import { ClientInstallationRenderer } from '@renderer-shared/shards/client-insta
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
+import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
@@ -18,7 +19,7 @@ import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-sc
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
-import { NotificationReactive, useMessage, useNotification } from 'naive-ui'
+import { NotificationReactive, useDialog, useMessage, useNotification } from 'naive-ui'
 import { computed, defineComponent, h, inject, ref, watch, watchEffect } from 'vue'
 
 import AnnouncementModal from './modals/AnnouncementModal.vue'
@@ -30,7 +31,7 @@ import { useSimpleNotificationsStore } from './store'
 /**
  * 一些全局性的周期性通知
  *
- * 足够 simple (存疑)
+ * 和 simple 毫无关联
  */
 @Shard(SimpleNotificationsRenderer.id)
 export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
@@ -497,6 +498,84 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     })
   }
 
+  /**
+   * 提醒需要以管理员权限运行
+   */
+  private _handleAskUserToRunAsAdministrator() {
+    const lcuxs = useLeagueClientUxStore()
+    const as = useAppCommonStore()
+    const dialog = useDialog()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.wmiRequiresAdministrator'
+    })
+
+    const app = useInstance(AppCommonRenderer)
+
+    const shouldAsk = computed(() => {
+      return lcuxs.settings.useWmi && !as.isAdministrator
+    })
+
+    watch(
+      () => shouldAsk.value,
+      (v) => {
+        if (v) {
+          const dl = dialog.warning({
+            title: () => t('title'),
+            content: () => t('content'),
+            positiveText: t('positiveText'),
+            negativeText: t('negativeText'),
+            onNegativeClick: () => {
+              dl.destroy()
+            },
+            onPositiveClick: () => {
+              app.relaunchAsAdministrator()
+            }
+          })
+        }
+      },
+      { immediate: true }
+    )
+  }
+
+  private _handleCannotGetUxCommandLine() {
+    const lcuxs = useLeagueClientUxStore()
+    const as = useAppCommonStore()
+    const dialog = useDialog()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.cannotGetUxCommandLine'
+    })
+
+    const app = useInstance(AppCommonRenderer)
+
+    watch(
+      () => lcuxs.hasClientButNoCommandLine,
+      (v) => {
+        if (v) {
+          const dl = dialog.warning({
+            style: { width: '600px' },
+            title: () => t('title'),
+            content: () =>
+              h('div', [
+                h('div', as.isAdministrator ? t('withAdminContent') : t('noAdminContent')),
+                h('div', { style: { marginTop: '8px', fontWeight: 'bold' } }, t('extraContent'))
+              ]),
+            positiveText: as.isAdministrator
+              ? t('withAdminPositiveText')
+              : t('noAdminPositiveText'),
+            onPositiveClick: () => {
+              if (as.isAdministrator) {
+                app.relaunchAsAdministrator()
+              } else {
+                dl.destroy()
+              }
+            }
+          })
+        }
+      },
+      { immediate: true }
+    )
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -513,6 +592,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
+    this._setup.addSetupFn(() => this._handleAskUserToRunAsAdministrator())
+    this._setup.addSetupFn(() => this._handleCannotGetUxCommandLine())
   }
 
   showAnnouncementModal() {

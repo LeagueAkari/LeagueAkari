@@ -1,4 +1,3 @@
-import { tools } from '@leagueakari/league-akari-addons'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
 
 /**
@@ -80,22 +79,11 @@ function runCommand(
   })
 }
 
-export async function isProcessExists(clientName: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    runCommand(POWERSHELL_PATH, [
-      '-Command',
-      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${clientName}%' " | Select-Object Name | Format-List`
-    ])
-      .then((out) => resolve(out.includes(clientName)))
-      .catch((error) => reject(error))
-  })
-}
-
 export async function getProcessPidByName(name: string): Promise<number[]> {
   return new Promise((resolve, reject) => {
     runCommand(POWERSHELL_PATH, [
       '-Command',
-      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${name}%' " | Select-Object ProcessId | Format-List`
+      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${name}%' " | Select-Object -ExpandProperty ProcessId`
     ])
       .then((out) => {
         const pids = out
@@ -117,7 +105,7 @@ const regionRegex = /--region=([\w-_]+)/
 const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
 const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
 
-function parseCommandLine(s: string): UxCommandLine | null {
+export function parseCommandLine(s: string): UxCommandLine | null {
   const [, port] = s.match(portRegex) || []
   const [, password] = s.match(remotingAuth) || []
   const [, pid] = s.match(pidRegex) || []
@@ -165,7 +153,7 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
         const authObjects = out
           .split('\n')
           .map((s) => s.trim())
-          .filter((s) => Boolean(s) && s.toUpperCase() !== 'COMMANDLINE')
+          .filter(Boolean)
           .map(parseCommandLine)
           .filter(Boolean) as UxCommandLine[]
 
@@ -173,20 +161,4 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
       })
       .catch((error) => reject(error))
   })
-}
-export function queryUxCommandLineNative(clientName: string): UxCommandLine[] {
-  const pids = tools.getPidsByName(clientName)
-
-  const auths: UxCommandLine[] = []
-  for (const p of pids) {
-    try {
-      const cmd = tools.getCommandLine1(p)
-      const parsed = parseCommandLine(cmd)
-      if (parsed) {
-        auths.push(parsed)
-      }
-    } catch {}
-  }
-
-  return auths
 }
