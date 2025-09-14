@@ -48,7 +48,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     watch(
       () => shouldRoute.value,
       (value) => {
-        if (value && store.frontendSettings.autoRouteWhenGameStarts) {
+        if (value && store.settings.autoRouteWhenGameStarts) {
           router.replace({ name: 'ongoing-game' })
         }
       },

@@ -120,8 +120,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'premadeTeamThreshold',
       'matchHistoryUseSgpApi',
       'matchHistoryTagPreference',
-      'gameTimelineLoadCount'
+      'gameTimelineLoadCount',
+      'orderPlayerBy',
+      'showChampionUsage',
+      'showMatchHistoryItemBorder',
+      'autoRouteWhenGameStarts',
+      'playerCardTags'
     ])
+
     this._mobx.propSync(OngoingGameMain.id, 'state', this.state, [
       'championSelections',
       'gameInfo',
@@ -274,6 +280,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     puuids.forEach((puuid) => {
       this._loadPlayerMatchHistory(puuid, {
+        signal: this._controller?.signal,
         mhSignal: controller.signal,
         count: this.settings.matchHistoryLoadCount,
         tag: this.state.matchHistoryTag,

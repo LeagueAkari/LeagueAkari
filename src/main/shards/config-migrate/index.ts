@@ -19,6 +19,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
   static MIGRATION_FROM_135 = 'akari-migration-from-1.3.5_patch1'
+  static MIGRATION_FROM_140 = 'akari-migration-from-1.4.0_patch1'
 
   private readonly _log: AkariLogger
 
@@ -29,7 +30,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     this._log = _loggerFactory.create(ConfigMigrateMain.id)
   }
 
-  private async _do(manager: EntityManager, from: string, to: string) {
+  private async _do(manager: EntityManager, from: string, to: string, remove = true) {
     const s = await manager.findOneBy(Setting, { key: Equal(from) })
 
     if (!s) {
@@ -37,7 +38,10 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     }
 
     await manager.save(Setting.create(to, s.value))
-    await manager.remove(s)
+
+    if (remove) {
+      await manager.remove(s)
+    }
   }
 
   // NOTE: drop support before League Akari 1.1.x
@@ -347,12 +351,55 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(manager, 'self-update-main/downloadSource', 'remote-config-main/preferredSource')
   }
 
+  private async _migrateFrom140(manager: EntityManager) {
+    const hasMigratedSymbol = await manager.findOneBy(Setting, {
+      key: Equal(ConfigMigrateMain.MIGRATION_FROM_140)
+    })
+
+    if (hasMigratedSymbol) {
+      return
+    }
+
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_140)
+
+    await this._do(
+      manager,
+      'ongoing-game-renderer/autoRouteWhenGameStarts',
+      'ongoing-game-main/autoRouteWhenGameStarts'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/showChampionUsage',
+      'ongoing-game-main/showChampionUsage'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/showMatchHistoryItemBorder',
+      'ongoing-game-main/showMatchHistoryItemBorder'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/orderPlayerBy',
+      'ongoing-game-main/orderPlayerBy'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/playerCard',
+      'ongoing-game-main/playerCardTags'
+    )
+
+    await manager.save(
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_140, ConfigMigrateMain.MIGRATION_FROM_140)
+    )
+  }
+
   async onInit() {
     try {
       await this._st.dataSource.transaction(async (manager) => {
         await this._migrateFrom126(manager)
         await this._migrateFrom134(manager)
         await this._migrateFrom135(manager)
+        await this._migrateFrom140(manager)
       })
     } catch (error) {
       this._log.error('Failed to migrate settings', error)

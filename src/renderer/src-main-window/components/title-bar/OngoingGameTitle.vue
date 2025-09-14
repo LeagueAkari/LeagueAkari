@@ -32,7 +32,8 @@
           size="tiny"
           :consistent-menu-width="false"
           :options="orderOptions"
-          v-model:value="ogs.settings.orderPlayerBy"
+          :value="ogs.settings.orderPlayerBy"
+          @update:value="(val) => og.setOrderPlayerBy(val)"
         />
         <NSelect
           class="queue-tag-select"

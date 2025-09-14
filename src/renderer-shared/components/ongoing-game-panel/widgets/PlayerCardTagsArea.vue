@@ -1,14 +1,11 @@
 <template>
   <div class="tags">
-    <div class="tag self" v-if="isSelf && ogs.frontendSettings.playerCardTags.showSelfTag">
+    <div class="tag self" v-if="isSelf && ogs.settings.playerCardTags.showSelfTag">
       {{ t('PlayerInfoCard.self') }}
     </div>
     <NPopover
       v-if="
-        ogs.frontendSettings.playerCardTags.showTaggedTag &&
-        savedInfo &&
-        !isSelf &&
-        savedInfo.tags.length
+        ogs.settings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tags.length
       "
       :delay="50"
       style="max-height: 240px"
@@ -42,7 +39,7 @@
       </div>
     </NPopover>
     <NPopover
-      v-if="ogs.frontendSettings.playerCardTags.showPremadeTeamTag && premadeTeamId"
+      v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
       :delay="50"
       style="max-height: 240px"
     >
@@ -72,7 +69,7 @@
       :keep-alive-on-hover="false"
       :delay="50"
       v-if="
-        ogs.frontendSettings.playerCardTags.showWinRateTeamTag &&
+        ogs.settings.playerCardTags.showWinRateTeamTag &&
         analysis &&
         analysis.summary.count >= 16 &&
         analysis.summary.winRate >= 0.85
@@ -91,12 +88,7 @@
       </div>
     </NPopover>
     <NPopover
-      v-if="
-        ogs.frontendSettings.playerCardTags.showMetTag &&
-        savedInfo &&
-        savedInfo.lastMetAt &&
-        !isSelf
-      "
+      v-if="ogs.settings.playerCardTags.showMetTag && savedInfo && savedInfo.lastMetAt && !isSelf"
       :delay="50"
       scrollable
       style="max-height: 240px"
@@ -232,7 +224,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
+      v-if="ogs.settings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
       :delay="50"
     >
       <template #trigger>
@@ -245,7 +237,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showWinningStreakTag &&
+        ogs.settings.playerCardTags.showWinningStreakTag &&
         analysis &&
         analysis.summary.winningStreak >= 3
       "
@@ -271,7 +263,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showLosingStreakTag &&
+        ogs.settings.playerCardTags.showLosingStreakTag &&
         analysis &&
         analysis.summary.losingStreak >= 3
       "
@@ -297,7 +289,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showGreatPerformanceTag &&
+        ogs.settings.playerCardTags.showGreatPerformanceTag &&
         analysis &&
         (analysis.akariScore.good || analysis.akariScore.great)
       "
@@ -321,7 +313,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showSuspiciousFlashPositionTag &&
+        ogs.settings.playerCardTags.showSuspiciousFlashPositionTag &&
         isSuspiciousFlashPosition &&
         isSuspiciousFlashPosition.isSuspicious
       "
@@ -344,7 +336,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showSoloDeathsTag &&
+        ogs.settings.playerCardTags.showSoloDeathsTag &&
         soloKills &&
         soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
         soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD
@@ -374,7 +366,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
+        ogs.settings.playerCardTags.showSoloKillsTag &&
         soloKills &&
         soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
         soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD
@@ -403,7 +395,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -426,7 +418,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -449,7 +441,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -472,7 +464,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -496,7 +488,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showAverageEnemyMissingPingsTag &&
+        ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag &&
         analysis &&
         analysis.summary.averageEnemyMissingPings !== null
       "
@@ -521,7 +513,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageVisionScoreTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageVisionScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -543,11 +535,7 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        as.settings.isInKyokoMode &&
-        ogs.frontendSettings.playerCardTags.showAkariScoreTag &&
-        analysis
-      "
+      v-if="as.settings.isInKyokoMode && ogs.settings.playerCardTags.showAkariScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -640,8 +628,8 @@ const soloKills = computed(() => {
   }
 
   if (
-    !ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
-    !ogs.frontendSettings.playerCardTags.showSoloDeathsTag
+    !ogs.settings.playerCardTags.showSoloKillsTag &&
+    !ogs.settings.playerCardTags.showSoloDeathsTag
   ) {
     return null
   }

@@ -22,7 +22,11 @@
         :label-description="t('OngoingGameSettings.autoRouteWhenGameStarts.description')"
         :label-width="400"
       >
-        <NSwitch size="small" v-model:value="ogs.frontendSettings.autoRouteWhenGameStarts" />
+        <NSwitch
+          size="small"
+          :value="ogs.settings.autoRouteWhenGameStarts"
+          @update:value="(val) => og.setAutoRouteWhenGameStarts(val)"
+        />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
@@ -143,7 +147,10 @@
         :label="t('OngoingGameSettings.showChampionUsage.label')"
         :label-description="t('OngoingGameSettings.showChampionUsage.description')"
       >
-        <NRadioGroup v-model:value="ogs.frontendSettings.showChampionUsage">
+        <NRadioGroup
+          :value="ogs.settings.showChampionUsage"
+          @update:value="(val) => og.setShowChampionUsage(val)"
+        >
           <NRadio value="none">
             {{ t('OngoingGameSettings.showChampionUsage.options.none') }}</NRadio
           >
@@ -161,7 +168,11 @@
         :label="t('OngoingGameSettings.showMatchHistoryItemBorder.label')"
         :label-description="t('OngoingGameSettings.showMatchHistoryItemBorder.description')"
       >
-        <NSwitch size="small" v-model:value="ogs.frontendSettings.showMatchHistoryItemBorder" />
+        <NSwitch
+          size="small"
+          :value="ogs.settings.showMatchHistoryItemBorder"
+          @update:value="(val) => og.setShowMatchHistoryItemBorder(val)"
+        />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
@@ -171,83 +182,205 @@
         :label-description="t('OngoingGameSettings.playerCardTags.description')"
       >
         <NFlex vertical align="start">
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showPremadeTeamTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showPremadeTeamTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showPremadeTeamTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showPremadeTeamTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showWinningStreakTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showWinningStreakTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showWinningStreakTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showWinningStreakTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showLosingStreakTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showLosingStreakTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showLosingStreakTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showLosingStreakTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSoloKillsTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showSoloKillsTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSoloKillsTag: val })
+            "
+          >
             {{
               t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label', {
                 countV: ogs.settings.gameTimelineLoadCount
               })
             }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSoloDeathsTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showSoloDeathsTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSoloDeathsTag: val })
+            "
+          >
             {{
               t('OngoingGameSettings.playerCardTags.tags.showSoloDeathsTag.label', {
                 countV: ogs.settings.gameTimelineLoadCount
               })
             }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showAverageTeamDamageTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageTeamDamageTag: val
+                })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTag.label') }}
           </NCheckbox>
           <NCheckbox
-            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTakenTag"
+            :checked="ogs.settings.playerCardTags.showAverageTeamDamageTakenTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageTeamDamageTakenTag: val
+                })
+            "
           >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTakenTag.label') }}
           </NCheckbox>
           <NCheckbox
-            v-model:checked="ogs.frontendSettings.playerCardTags.showSuspiciousFlashPositionTag"
+            :checked="ogs.settings.playerCardTags.showSuspiciousFlashPositionTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showSuspiciousFlashPositionTag: val
+                })
+            "
           >
             {{ t('OngoingGameSettings.playerCardTags.tags.showSuspiciousFlashPositionTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamGoldTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showAverageTeamGoldTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageTeamGoldTag: val
+                })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamGoldTag.label') }}
           </NCheckbox>
           <NCheckbox
-            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag"
+            :checked="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageDamageGoldEfficiencyTag: val
+                })
+            "
           >
             {{
               t('OngoingGameSettings.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label')
             }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showGreatPerformanceTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showGreatPerformanceTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showGreatPerformanceTag: val
+                })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showGreatPerformanceTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showMetTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showMetTag"
+            @update:checked="
+              (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showMetTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showMetTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showTaggedTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showTaggedTag"
+            @update:checked="
+              (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showTaggedTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showTaggedTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSelfTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showSelfTag"
+            @update:checked="
+              (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSelfTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showSelfTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showWinRateTeamTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showWinRateTeamTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showWinRateTeamTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showWinRateTeamTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showPrivacyTag">
+          <NCheckbox
+            :checked="ogs.settings.playerCardTags.showPrivacyTag"
+            @update:checked="
+              (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showPrivacyTag: val })
+            "
+          >
             {{ t('OngoingGameSettings.playerCardTags.tags.showPrivacyTag.label') }}
           </NCheckbox>
           <NCheckbox
-            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageEnemyMissingPingsTag"
+            :checked="ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageEnemyMissingPingsTag: val
+                })
+            "
           >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageEnemyMissingPingsTag.label') }}
           </NCheckbox>
           <NCheckbox
-            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageVisionScoreTag"
+            :checked="ogs.settings.playerCardTags.showAverageVisionScoreTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({
+                  ...ogs.settings.playerCardTags,
+                  showAverageVisionScoreTag: val
+                })
+            "
           >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageVisionScoreTag.label') }}
           </NCheckbox>
           <NCheckbox
             v-if="as.settings.isInKyokoMode"
-            v-model:checked="ogs.frontendSettings.playerCardTags.showAkariScoreTag"
+            :checked="ogs.settings.playerCardTags.showAkariScoreTag"
+            @update:checked="
+              (val) =>
+                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showAkariScoreTag: val })
+            "
           >
             {{ t('OngoingGameSettings.playerCardTags.tags.showAkariScoreTag.label') }}
           </NCheckbox>

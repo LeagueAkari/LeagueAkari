@@ -33,6 +33,65 @@ export class OngoingGameSettings {
    */
   matchHistoryTagPreference: 'current' | 'all' = 'current'
 
+  orderPlayerBy = 'default' as
+    | 'win-rate'
+    | 'kda'
+    | 'default'
+    | 'akari-score'
+    | 'position'
+    | 'premade-team'
+
+  showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
+  showMatchHistoryItemBorder = false
+  autoRouteWhenGameStarts = false
+  playerCardTags = {
+    showPremadeTeamTag: true,
+    showSuspiciousFlashPositionTag: true,
+    showWinningStreakTag: true,
+    showLosingStreakTag: true,
+    showSoloKillsTag: true,
+    showSoloDeathsTag: true,
+    showGreatPerformanceTag: true,
+    showAverageTeamDamageTag: false,
+    showAverageTeamDamageTakenTag: false,
+    showAverageTeamGoldTag: false,
+    showAverageDamageGoldEfficiencyTag: false,
+    showAverageEnemyMissingPingsTag: false,
+    showAverageVisionScoreTag: false,
+    showSelfTag: true,
+    showMetTag: true,
+    showTaggedTag: true,
+    showWinRateTeamTag: true,
+    showPrivacyTag: true,
+    showAkariScoreTag: false
+  }
+
+  setOrderPlayerBy(
+    value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
+  ) {
+    this.orderPlayerBy = value
+  }
+
+  setMatchHistoryTagPreference(value: 'current' | 'all') {
+    this.matchHistoryTagPreference = value
+  }
+
+  setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
+    this.showChampionUsage = value
+  }
+
+  setShowMatchHistoryItemBorder(value: boolean) {
+    this.showMatchHistoryItemBorder = value
+  }
+
+  setAutoRouteWhenGameStarts(value: boolean) {
+    this.autoRouteWhenGameStarts = value
+  }
+
+  setPlayerCardTags(value: typeof this.playerCardTags) {
+    this.playerCardTags = value
+  }
+
   setEnabled(value: boolean) {
     this.enabled = value
   }
@@ -58,7 +117,9 @@ export class OngoingGameSettings {
   }
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      playerCardTags: observable.ref
+    })
   }
 }
 

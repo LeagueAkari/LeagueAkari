@@ -125,17 +125,14 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     matchHistoryTagPreference: 'current' as 'current' | 'all',
     gameTimelineLoadCount: 0,
 
-    // renderer only
     orderPlayerBy: 'default' as
       | 'win-rate'
       | 'kda'
       | 'default'
       | 'akari-score'
       | 'position'
-      | 'premade-team'
-  })
+      | 'premade-team',
 
-  const frontendSettings = reactive({
     showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
     showMatchHistoryItemBorder: false,
     autoRouteWhenGameStarts: false,
@@ -158,7 +155,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showTaggedTag: true,
       showWinRateTeamTag: true,
       showPrivacyTag: true,
-      showAkariScoreTag: true
+      showAkariScoreTag: false
     }
   })
 
@@ -206,7 +203,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
   return {
     settings,
-    frontendSettings,
 
     gameInfo,
     championSelections,

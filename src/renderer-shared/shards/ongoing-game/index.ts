@@ -60,6 +60,28 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameTimelineLoadCount', value)
   }
 
+  setOrderPlayerBy(
+    value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
+  ) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'orderPlayerBy', value)
+  }
+
+  setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
+  }
+
+  setShowMatchHistoryItemBorder(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
+  }
+
+  setAutoRouteWhenGameStarts(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoRouteWhenGameStarts', value)
+  }
+
+  setPlayerCardTags(value: object) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
+  }
+
   reload() {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
   }
@@ -143,43 +165,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     Object.values(additionalGames).forEach((data) => {
       store.cachedGames[data.data.gameId] = markRaw(data.data)
     })
-
-    // 出于历史原因, 此设置项仍位于 settings/ 下而非 frontendSettings/
-    await this._setting.savedPropVue(OngoingGameRenderer.id, store.settings, 'orderPlayerBy')
-
-    await this._setting.savedPropVue(
-      OngoingGameRenderer.id,
-      store.frontendSettings,
-      'autoRouteWhenGameStarts'
-    )
-
-    await this._setting.savedPropVue(
-      OngoingGameRenderer.id,
-      store.frontendSettings,
-      'showChampionUsage',
-      {
-        savePropKey: 'frontend/showChampionUsage'
-      }
-    )
-
-    await this._setting.savedPropVue(
-      OngoingGameRenderer.id,
-      store.frontendSettings,
-      'showMatchHistoryItemBorder',
-      {
-        savePropKey: 'frontend/showMatchHistoryItemBorder'
-      }
-    )
-
-    await this._setting.savedPropVue(
-      OngoingGameRenderer.id,
-      store.frontendSettings,
-      'playerCardTags',
-      {
-        savePropKey: 'frontend/playerCard',
-        watchOptions: { deep: true }
-      }
-    )
   }
 
   async onDispose() {}

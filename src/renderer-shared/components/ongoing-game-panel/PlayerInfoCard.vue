@@ -566,7 +566,7 @@ const positionInfo = computed(() => {
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const championUsage = computed(() => {
-  if (ogs.frontendSettings.showChampionUsage === 'recent') {
+  if (ogs.settings.showChampionUsage === 'recent') {
     if (!analysis) {
       return []
     }
@@ -583,7 +583,7 @@ const championUsage = computed(() => {
       }))
 
     return truncated
-  } else if (ogs.frontendSettings.showChampionUsage === 'mastery') {
+  } else if (ogs.settings.showChampionUsage === 'mastery') {
     if (!championMastery) {
       return []
     }
@@ -746,7 +746,7 @@ const toSortedMilestoneGrades = (arr: string[]) => {
 const getWinLoseClassName = (match: SelfParticipantGame) => {
   const classes: string[] = []
 
-  if (ogs.frontendSettings.showMatchHistoryItemBorder) {
+  if (ogs.settings.showMatchHistoryItemBorder) {
     classes.push('bordered')
   }
 
