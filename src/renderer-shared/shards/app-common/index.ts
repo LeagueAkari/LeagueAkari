@@ -112,5 +112,9 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'renderer-link', fn)
   }
 
+  relaunchAsAdministrator() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'relaunchAsAdministrator')
+  }
+
   async onDispose() {}
 }

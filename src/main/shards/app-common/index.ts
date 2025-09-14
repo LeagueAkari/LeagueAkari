@@ -1,8 +1,11 @@
 import { i18next } from '@main/i18n'
+import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
+import { exec } from 'node:child_process'
 import os from 'node:os'
+import { promisify } from 'node:util'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
@@ -10,6 +13,8 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AppCommonSettings, AppCommonState } from './state'
+
+const execAsync = promisify(exec)
 
 /**
  * 一些不知道如何分类的通用功能, 可以放到这里
@@ -88,6 +93,16 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   openUserDataDir() {
     return shell.openPath(app.getPath('userData'))
+  }
+
+  async relaunchAsAdministrator() {
+    const appPath = process.execPath
+
+    await execAsync(`"${elevateExecutablePath}" "${appPath}"`, {
+      shell: 'cmd'
+    })
+
+    app.exit()
   }
 
   async getRuntimeInfo() {
@@ -179,6 +194,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (_, s: boolean) => {
       this._setDisableHardwareAccelerationAndRelaunch(s)
+    })
+
+    this._ipc.onCall(AppCommonMain.id, 'relaunchAsAdministrator', () => {
+      return this.relaunchAsAdministrator()
     })
 
     this._ipc.onCall(AppCommonMain.id, 'getVersion', () => {
