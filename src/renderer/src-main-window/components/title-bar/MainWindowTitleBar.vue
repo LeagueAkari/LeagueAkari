@@ -1,7 +1,6 @@
 <template>
   <div id="app-title-bar">
-    <span class="app-name" v-if="as.isAdministrator">{{ t('appName') }} X</span>
-    <span class="app-name" v-else>{{ t('appName') }}</span>
+    <span class="app-name">{{ as.appTitle }}</span>
     <div class="divider" :class="{ invisible: !shouldShowDivider }" />
     <div class="shard-area">
       <Transition name="fade">

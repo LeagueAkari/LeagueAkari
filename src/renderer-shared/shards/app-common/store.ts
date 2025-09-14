@@ -1,4 +1,5 @@
 import { usePreferredColorScheme } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { defineStore } from 'pinia'
 import { computed, ref, shallowReactive, shallowRef } from 'vue'
 
@@ -28,9 +29,19 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     streamerModeUseAkariStyledName: false
   })
 
+  const { t } = useTranslation()
+
   const version = ref('0.0.0')
   const isRabiVersion = computed(() => version.value.includes('-rabi'))
   const isAdministrator = ref(false)
+  const overrideAppTitle = ref('') // 可以覆盖掉
+  const appTitle = computed(
+    () =>
+      overrideAppTitle.value ||
+      (isAdministrator.value
+        ? `${t('appName', { ns: 'common' })} X`
+        : t('appName', { ns: 'common' }))
+  )
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
 
@@ -52,6 +63,8 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   return {
     settings,
+    appTitle,
+    overrideAppTitle,
     isAdministrator,
     disableHardwareAcceleration,
     version,

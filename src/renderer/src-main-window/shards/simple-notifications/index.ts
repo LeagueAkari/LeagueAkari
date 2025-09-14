@@ -452,8 +452,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   private _setupFunnyPricingModal() {
     const comp = defineComponent({
       setup() {
+        const { t } = useTranslation()
+        const as = useAppCommonStore()
+
         const show = ref(false)
         const balance = ref(0)
+        const current = ref('basic')
 
         useKeyboardCombo('SUBSCRIBE', {
           onFinish: () => {
@@ -469,10 +473,19 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         return () =>
           h(FunnyPricing, {
+            ref: (el) => {},
             show: show.value,
             balance: balance.value,
+            current: current.value,
             'onUpdate:show': (val) => (show.value = val),
-            'onUpdate:balance': (val) => (balance.value = val)
+            'onUpdate:balance': (val) => (balance.value = val),
+            onPurchase: (item) => {
+              balance.value -= item.price
+              current.value = item.id
+
+              // 彩蛋环节
+              as.overrideAppTitle = `${t('appName', { ns: 'common' })} ${item.title} ${as.isAdministrator ? 'X' : ''}`
+            }
           })
       }
     })
