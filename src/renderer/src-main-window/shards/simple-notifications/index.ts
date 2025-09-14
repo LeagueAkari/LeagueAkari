@@ -8,6 +8,7 @@ import { useBackgroundTasksStore } from '@renderer-shared/shards/background-task
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
@@ -43,7 +44,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     @Dep(AppCommonRenderer) private readonly _app: AppCommonRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
+    @Dep(LeagueClientUxRenderer) private readonly _lcux: LeagueClientUxRenderer
   ) {}
 
   /**

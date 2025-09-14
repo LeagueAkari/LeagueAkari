@@ -294,6 +294,7 @@ export abstract class BaseAkariWindow<
         spellcheck: false,
         partition: this._partition,
         backgroundThrottling: false,
+        additionalArguments: [`--akari-window-type=${this._namespaceSuffix}`],
         ...webPreferences
       },
       ...rest
