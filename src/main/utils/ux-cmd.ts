@@ -44,15 +44,6 @@ export interface UxCommandLine {
 
 const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
 
-export function checkWmicAvailability() {
-  const isExists = fs.existsSync(WMIC_PATH)
-  if (!isExists) {
-    throw new Error(
-      'WMIC unavailable, League Akari relies on this tool to obtain process information'
-    )
-  }
-}
-
 function runCommand(
   command: string,
   args: string[] = [],

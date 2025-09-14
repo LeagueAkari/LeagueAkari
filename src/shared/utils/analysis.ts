@@ -373,9 +373,9 @@ export function analyzeMatchHistory(
 
     let flashSlot: 'D' | 'F' | null = null
     if (watashi.spell1Id === SUMMONER_SPELL_FLASH_ID) {
-      flashSlot = 'F'
-    } else if (watashi.spell2Id === SUMMONER_SPELL_FLASH_ID) {
       flashSlot = 'D'
+    } else if (watashi.spell2Id === SUMMONER_SPELL_FLASH_ID) {
+      flashSlot = 'F'
     }
 
     const gameAnalysis: MatchHistoryGamesAnalysis = {

@@ -85,8 +85,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _debouncedUpdateMatchHistoryFn = _.debounce(this._updateMatchHistory.bind(this), 250)
 
   constructor(
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain,
@@ -103,7 +103,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         premadeTeamThreshold: { default: this.settings.premadeTeamThreshold },
         matchHistoryUseSgpApi: { default: this.settings.matchHistoryUseSgpApi },
         matchHistoryTagPreference: { default: this.settings.matchHistoryTagPreference },
-        gameTimelineLoadCount: { default: this.settings.matchHistoryLoadCount }
+        gameTimelineLoadCount: { default: this.settings.matchHistoryLoadCount },
+        orderPlayerBy: { default: this.settings.orderPlayerBy },
+        showChampionUsage: { default: this.settings.showChampionUsage },
+        showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
+        autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
+        playerCardTags: { default: this.settings.playerCardTags }
       },
       this.settings
     )
