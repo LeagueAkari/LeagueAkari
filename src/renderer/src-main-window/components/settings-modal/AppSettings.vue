@@ -338,14 +338,14 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AppSettings.lcConnection.useWmic.label')"
-        :label-description="t('AppSettings.lcConnection.useWmic.description')"
+        :label="t('AppSettings.lcConnection.useWmi.label')"
+        :label-description="t('AppSettings.lcConnection.useWmi.description')"
         :label-width="400"
       >
         <NSwitch
           size="small"
-          :value="lcus.settings.useWmic"
-          @update:value="(val: boolean) => lcu.setUseWmic(val)"
+          :value="lcus.settings.useWmi"
+          @update:value="(val: boolean) => lcu.setUseWmi(val)"
         />
       </ControlItem>
       <ControlItem

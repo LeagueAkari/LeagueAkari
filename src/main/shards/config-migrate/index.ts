@@ -387,6 +387,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       'ongoing-game-renderer/frontend/playerCard',
       'ongoing-game-main/playerCardTags'
     )
+    await this._do(manager, 'league-client-ux-main/useWmic', 'league-client-ux-main/useWmi')
 
     await manager.save(
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_140, ConfigMigrateMain.MIGRATION_FROM_140)

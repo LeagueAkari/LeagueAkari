@@ -169,7 +169,9 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
   private async _getDrives() {
     try {
-      const { stdout } = await execAsync('wmic logicaldisk get name')
+      const { stdout } = await execAsync(
+        'powershell -Command "Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object {$_.DriveType -eq 3} | Select-Object -ExpandProperty DeviceID"'
+      )
       return stdout
         .split('\n')
         .map((line) => line.trim())

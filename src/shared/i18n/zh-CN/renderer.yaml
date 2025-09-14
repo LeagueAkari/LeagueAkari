@@ -203,13 +203,13 @@ AppSettings:
       label: 自动连接
       description: 存在唯一的客户端时，则自动连接该客户端
 
-    useWmic:
-      label: 使用 WMIC
-      description: 使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限
+    useWmi:
+      label: 使用 WMI 查询命令行
+      description: 使用 WMI 获取客户端命令行信息，而不是默认的 Win32 API 方式。使用 WMI 方式需要管理员权限
 
     rebuildWmi:
       label: 重建 WMI
-      description: 如果 WMIC 无法正常使用，可尝试此修复选项
+      description: 如果 WMI 无法正常使用，可尝试此修复选项
       rebuildButton: 重建 WMI
 
   misc:

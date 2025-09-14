@@ -17,8 +17,8 @@ export class LeagueClientUxRenderer {
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
   ) {}
 
-  setUseWmic(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'useWmic', enabled)
+  setUseWmi(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'useWmi', enabled)
   }
 
   rebuildWmi() {

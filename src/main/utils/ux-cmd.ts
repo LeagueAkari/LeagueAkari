@@ -1,6 +1,5 @@
 import { tools } from '@leagueakari/league-akari-addons'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
-import fs from 'node:fs'
 
 /**
  * 来自 Riot 的证书文件
@@ -42,7 +41,7 @@ export interface UxCommandLine {
   riotClientAuthToken: string
 }
 
-const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
+const POWERSHELL_PATH = 'powershell'
 
 function runCommand(
   command: string,
@@ -83,17 +82,21 @@ function runCommand(
 
 export async function isProcessExists(clientName: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    runCommand(WMIC_PATH, ['process', 'where', `name like '%${clientName}%'`, 'get', 'name'])
+    runCommand(POWERSHELL_PATH, [
+      '-Command',
+      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${clientName}%' " | Select-Object Name | Format-List`
+    ])
       .then((out) => resolve(out.includes(clientName)))
-      .catch((error) => {
-        reject(error)
-      })
+      .catch((error) => reject(error))
   })
 }
 
 export async function getProcessPidByName(name: string): Promise<number[]> {
   return new Promise((resolve, reject) => {
-    runCommand(WMIC_PATH, ['process', 'where', `name like '%${name}%'`, 'get', 'processid'])
+    runCommand(POWERSHELL_PATH, [
+      '-Command',
+      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${name}%' " | Select-Object ProcessId | Format-List`
+    ])
       .then((out) => {
         const pids = out
           .split('\n')
@@ -146,15 +149,14 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
     let task: Promise<string>
 
     if (typeof arg === 'number') {
-      task = runCommand(WMIC_PATH, ['process', 'where', `processid=${arg}`, 'get', 'CommandLine'])
+      task = runCommand(POWERSHELL_PATH, [
+        '-Command',
+        `Get-CimInstance -ClassName Win32_Process -Filter "ProcessId=${arg}" | Select-Object -ExpandProperty CommandLine`
+      ])
     } else {
-      // arg is string
-      task = runCommand(WMIC_PATH, [
-        'process',
-        'where',
-        `name like '%${arg}%'`,
-        'get',
-        'CommandLine'
+      task = runCommand(POWERSHELL_PATH, [
+        '-Command',
+        `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${arg}%' " | Select-Object -ExpandProperty CommandLine`
       ])
     }
 
@@ -172,7 +174,6 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
       .catch((error) => reject(error))
   })
 }
-
 export function queryUxCommandLineNative(clientName: string): UxCommandLine[] {
   const pids = tools.getPidsByName(clientName)
 

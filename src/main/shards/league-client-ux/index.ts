@@ -45,17 +45,18 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       LeagueClientUxMain.id,
       {
-        useWmic: { default: this.settings.useWmic }
+        useWmi: { default: this.settings.useWmi }
       },
       this.settings
     )
   }
 
   async onInit() {
+    await this._setting.applyToState()
+
     this._handlePollExistingUx()
 
-    await this._setting.applyToState()
-    this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmic'])
+    this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
     this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, ['launchedClients'])
 
     this._ipc.onCall(LeagueClientUxMain.id, 'rebuildWmi', () => this._rebuildWmi())
@@ -109,7 +110,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   private _queryUxCommandLine() {
-    if (this.settings.useWmic) {
+    if (this.settings.useWmi) {
       if (!this._common.state.isAdministrator) {
         return []
       }

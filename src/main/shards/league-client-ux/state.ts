@@ -2,14 +2,14 @@ import { UxCommandLine } from '@main/utils/ux-cmd'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class LeagueClientUxSettings {
-  useWmic = false
+  useWmi = false
 
   constructor() {
     makeAutoObservable(this)
   }
 
-  setUseWmic(s: boolean) {
-    this.useWmic = s
+  setUseWmi(s: boolean) {
+    this.useWmi = s
   }
 }
 

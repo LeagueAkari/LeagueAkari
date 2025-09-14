@@ -202,7 +202,7 @@ AppSettings:
       label: Auto Connect
       description: Automatically connect to the client when there is a unique client
 
-    useWmic:
+    useWmi:
       label: Use WMIC
       description: Use WMIC to get client command line information instead of the default Win32 API method. Requires administrator privileges
 
