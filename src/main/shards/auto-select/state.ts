@@ -65,6 +65,16 @@ export interface DelayedSwap {
   timerId: NodeJS.Timeout
 }
 
+export interface DelayedTrade {
+  action: 'accept' | 'decline'
+  tradeId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+  requesterChampionId: number
+  timerId: NodeJS.Timeout
+}
+
 export class AutoSelectSettings {
   // modeTypeKey, configObject
   pickConfig: Record<string, PickChampionConfig> = {}
@@ -181,6 +191,27 @@ export class AutoSelectState {
 
   get benchChampions() {
     return this.csSession?.benchChampions || []
+  }
+
+  get ongoingTrade() {
+    return this._lcData.champSelect.ongoingTrade
+  }
+
+  get myTeam() {
+    if (!this.csSession) {
+      return null
+    }
+
+    return this.csSession.myTeam
+  }
+
+  get myTeamSlotChampions() {
+    return (
+      this.myTeam?.map((m) => ({
+        cellId: m.cellId,
+        championId: m.championId
+      })) || []
+    )
   }
 
   /**
@@ -582,6 +613,27 @@ export class AutoSelectState {
     return null
   }
 
+  _delayedTrade: DelayedTrade | null = null
+
+  /** 仅被读取的副本 */
+  get delayedTrade() {
+    if (this._delayedTrade) {
+      const { timerId, ...rest } = this._delayedTrade
+      return rest
+    }
+
+    return null
+  }
+
+  /**
+   * trade 创建的时间
+   *
+   * trade 的创建没有基准时间的获取方法，因此需要进行手动记录
+   *
+   * P.S. 客户端 ux 实现是 15000ms 固定值 + 200ms / 700ms 的动画延迟
+   */
+  ongoingTradeCreatedAt: number | null = null
+
   setTemporaryDisabled(value: boolean) {
     this.temporaryDisabled = value
   }
@@ -596,6 +648,14 @@ export class AutoSelectState {
 
   setDelayedSwap(config: DelayedSwap | null) {
     this._delayedSwap = config
+  }
+
+  setDelayedTrade(config: DelayedTrade | null) {
+    this._delayedTrade = config
+  }
+
+  setOngoingTradeCreatedAt(value: number | null) {
+    this.ongoingTradeCreatedAt = value
   }
 
   constructor(
@@ -615,6 +675,7 @@ export class AutoSelectState {
       _delayedBan: observable.struct,
       _delayedPick: observable.struct,
       _delayedSwap: observable.struct,
+      _delayedTrade: observable.struct,
 
       groups: observable.ref
     })

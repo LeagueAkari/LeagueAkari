@@ -9,6 +9,7 @@ import { promisify } from 'node:util'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
@@ -27,14 +28,17 @@ export class AppCommonMain implements IAkariShardInitDispose {
   public readonly settings = new AppCommonSettings()
 
   private readonly _setting: SetterSettingService
+  private readonly _log: AkariLogger
 
   constructor(
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
+    private readonly _protocol: AkariProtocolMain,
     _settingFactory: SettingFactoryMain,
-    private readonly _protocol: AkariProtocolMain
+    _loggerFactory: LoggerFactoryMain
   ) {
+    this._log = _loggerFactory.create(AppCommonMain.id)
     this._setting = _settingFactory.register(
       AppCommonMain.id,
       {
@@ -242,6 +246,24 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
       return new Response(null, { status: 204 })
     })
+
+    this._logInstantiatedShards()
+  }
+
+  private _logInstantiatedShards() {
+    // @ts-ignore
+    const loadedShards = this._shared.manager._instances.keys()
+
+    const shards: string[] = []
+    for (const shard of loadedShards) {
+      if (typeof shard === 'symbol') {
+        shards.push(shard.description || '[unknown]')
+      } else {
+        shards.push(shard)
+      }
+    }
+
+    this._log.info('instantiated shards', shards)
   }
 
   /**

@@ -26,6 +26,10 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', groupId, config)
   }
 
+  setTemporaryDisabled(temporaryDisabled: boolean) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setTemporaryDisabled', temporaryDisabled)
+  }
+
   async onInit() {
     const store = useAutoSelectStore()
 

@@ -137,4 +137,8 @@ export class LobbyHttpApi {
   setStrawberryMapId(data: { contentId: string; itemId: number }) {
     return this._http.put<void>('/lol-lobby/v2/lobby/strawberryMapId', data)
   }
+
+  postInvitation(summonerId: number) {
+    return this._http.post(`/lol-lobby/v1/lobby/invitations`, { toSummonerId: summonerId })
+  }
 }

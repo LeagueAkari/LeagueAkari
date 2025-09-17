@@ -208,7 +208,7 @@ export interface OngoingTrade {
   requesterChampionSplashPath: string
   responderChampionName: string
   responderIndex: number
-  state: string | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
+  state: (string & {}) | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
 }
 
 export interface CarouselSkins {

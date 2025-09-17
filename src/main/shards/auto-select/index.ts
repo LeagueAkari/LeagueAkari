@@ -233,6 +233,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     }
 
+    // --- ban ---
     this._mobx.reaction(
       () => banContext.get(),
       (ctx) => {
@@ -296,7 +297,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
-    // --- pick ---
     const pickContext = computed(
       () => {
         const pickConfig = this.state.activeGroupConfig
@@ -383,12 +383,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     }
 
-    /**
-     * // 适用于大乱斗抽卡阶段
-     * show-subset-pick / complete-subset-pick -> 直接 complete=true
-     *
-     * show-pick，在 strategy=show-and-lock-in的时候
-     */
+    // --- pick ---
     this._mobx.reaction(
       () => pickContext.get(),
       (ctx) => {
@@ -583,6 +578,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
+    // --- swap ---
     this._mobx.reaction(
       () => ({
         ctx: swapContext.get(),
@@ -649,6 +645,147 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
+    /** 记录其可用的时间，在没有基准的时候手动提供基准 */
+    this._mobx.reaction(
+      () => this.state.ongoingTrade,
+      (trade, prev) => {
+        if (!trade) {
+          this.state.setOngoingTradeCreatedAt(null)
+          return
+        }
+
+        // 仅在第一次**收到** trade 时，记录其可用的时间
+        if (!prev && trade.state === 'RECEIVED') {
+          this.state.setOngoingTradeCreatedAt(Date.now())
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    const tradeContext = computed(
+      () => {
+        if (!this.state.ongoingTradeCreatedAt || !this.state.myTeamSlotChampions.length) {
+          return null
+        }
+
+        const pickConfig = this.state.activeGroupConfig
+        const expected = this.state.expectedSwaps
+
+        if (!pickConfig || !expected || !this.state.ongoingTradeCreatedAt) {
+          return null
+        }
+
+        const trade = this.state.ongoingTrade
+
+        if (!trade) {
+          return null
+        }
+
+        const delayMs =
+          pickConfig.pick.delaySeconds * 1e3 -
+          Math.max(0, Date.now() - this.state.ongoingTradeCreatedAt)
+
+        const her = this.state.myTeamSlotChampions.find(
+          (m) => m.cellId === trade.otherSummonerIndex
+        )
+
+        if (!her) {
+          return {
+            action: 'decline',
+            delayMs: delayMs,
+            requesterChampionId: 0,
+            tradeId: trade.id
+          }
+        }
+
+        const herIndex = expected.findIndex((c) => c.id === her.championId)
+
+        if (herIndex === -1) {
+          return {
+            action: 'decline',
+            delayMs: delayMs,
+            requesterChampionId: her.championId,
+            tradeId: trade.id
+          }
+        }
+
+        const handIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
+
+        if (handIndex === -1 || herIndex < handIndex) {
+          return {
+            action: 'accept',
+            delayMs: delayMs,
+            requesterChampionId: her.championId,
+            tradeId: trade.id
+          }
+        }
+
+        return {
+          action: 'decline',
+          delayMs: delayMs,
+          requesterChampionId: her.championId,
+          tradeId: trade.id
+        }
+      },
+      { equals: comparer.structural }
+    )
+
+    const acceptTrade = async (tradeId: number) => {
+      try {
+        await this._lc.api.champSelect.acceptTrade(tradeId)
+      } catch (error) {
+        this._log.warn(`Failed to accept trade`, error)
+      }
+    }
+
+    // --- trade ---
+    this._mobx.reaction(
+      () => tradeContext.get(),
+      (ctx) => {
+        if (!ctx) {
+          if (this.state._delayedTrade) {
+            clearTimeout(this.state._delayedTrade.timerId)
+            this.state.setDelayedTrade(null)
+          }
+
+          return
+        }
+
+        if (this.state._delayedTrade) {
+          clearTimeout(this.state._delayedTrade.timerId)
+        }
+
+        const { action, delayMs, requesterChampionId, tradeId } = ctx
+
+        if (action === 'accept') {
+          if (
+            !this.state._delayedTrade ||
+            this.state._delayedTrade.tradeId !== tradeId ||
+            this.state._delayedTrade.requesterChampionId !== requesterChampionId ||
+            this.state._delayedTrade.action !== action
+          ) {
+            this._sendCelebration(`Will accept trade in ${delayMs}ms`)
+          }
+
+          this.state.setDelayedTrade({
+            action,
+            tradeId: tradeId,
+            delayMs,
+            finishAt: Date.now() + delayMs,
+            startAt: Date.now(),
+            requesterChampionId: requesterChampionId,
+            timerId: setTimeout(
+              () => acceptTrade(tradeId).finally(() => this.state.setDelayedTrade(null)),
+              delayMs
+            )
+          })
+        } else {
+          this.state.setDelayedTrade(null)
+        }
+      },
+      { fireImmediately: true }
+    )
+
     // for debugging
     // this._mobx.reaction(
     //   () => this.state.move,
@@ -693,6 +830,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       async (_, type: string, config: DeepPartialObject<BanChampionConfig>) => {
         this.settings.setBanConfig(type, config)
         await this._setting.set('banConfig', this.settings.banConfig)
+      }
+    )
+
+    this._ipc.onCall(
+      AutoSelectMain.id,
+      'setTemporaryDisabled',
+      async (_, temporaryDisabled: boolean) => {
+        this.state.setTemporaryDisabled(temporaryDisabled)
       }
     )
   }
