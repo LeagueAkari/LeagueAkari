@@ -205,6 +205,14 @@ export class AutoSelectState {
     return this.csSession.myTeam
   }
 
+  get trades() {
+    if (!this.csSession) {
+      return null
+    }
+
+    return this.csSession.trades
+  }
+
   get myTeamSlotChampions() {
     return (
       this.myTeam?.map((m) => ({

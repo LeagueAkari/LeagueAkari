@@ -209,7 +209,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           move: this.state.move,
           activeAction: this.state.activeAction,
           expectedBan: expectedBan,
-          niceDelayMs: this._calcShouldWait(stageOffset),
+          delayMs: this._calcShouldWait(stageOffset),
           strategy: banConfig.ban.strategy
         } as const
       },
@@ -247,7 +247,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        const { move, activeAction, expectedBan, niceDelayMs, strategy } = ctx
+        const { move, activeAction, expectedBan, delayMs, strategy } = ctx
 
         const completed = strategy !== 'just-show' && move === 'complete-ban'
 
@@ -275,7 +275,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedBan.completed !== completed
         ) {
           this._sendCelebration(
-            `Updated, Ban (complete=${completed}) ${this._debugChampionName(expectedBan.id)} in ${niceDelayMs}ms`
+            `Updated, Ban (complete=${completed}) ${this._debugChampionName(expectedBan.id)} in ${delayMs}ms`
           )
         }
 
@@ -283,15 +283,15 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           isPickIntent: false,
           completed,
           championId: expectedBan.id,
-          delayMs: niceDelayMs,
+          delayMs,
           startAt: Date.now(),
-          finishAt: Date.now() + niceDelayMs,
+          finishAt: Date.now() + delayMs,
           timerId: setTimeout(
             () =>
               ban(expectedBan.id, activeAction.id, completed).finally(() =>
                 this.state.setDelayedBan(null)
               ),
-            niceDelayMs
+            delayMs
           )
         })
       }
@@ -350,7 +350,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           firstUnfinishedPickAction: this.state.firstUnfinishedPickAction,
           activeAction: this.state.activeAction,
           expectedPick: expectedPick,
-          niceDelayMs: this._calcShouldWait(stageOffset),
+          delayMs: this._calcShouldWait(stageOffset),
           strategy: pickConfig.pick.strategy
         } as const
       },
@@ -397,14 +397,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        const {
-          move,
-          firstUnfinishedPickAction,
-          activeAction,
-          expectedPick,
-          niceDelayMs,
-          strategy
-        } = ctx
+        const { move, firstUnfinishedPickAction, activeAction, expectedPick, delayMs, strategy } =
+          ctx
 
         // 接下来针对几种特殊情况取消操作
         if (move === 'complete-pick') {
@@ -452,7 +446,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedPick.completed !== completed
         ) {
           this._sendCelebration(
-            `Updated, Pick (complete=${completed}) ${this._debugChampionName(expectedPick.id)} in ${niceDelayMs}ms move=${move}`
+            `Updated, Pick (complete=${completed}) ${this._debugChampionName(expectedPick.id)} in ${delayMs}ms move=${move}`
           )
         }
 
@@ -466,15 +460,15 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             isPickIntent: true,
             completed: false,
             championId: expectedPick.id,
-            delayMs: niceDelayMs,
+            delayMs: delayMs,
             startAt: Date.now(),
-            finishAt: Date.now() + niceDelayMs,
+            finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
                 intent(expectedPick.id, firstUnfinishedPickAction.id).finally(() =>
                   this.state.setDelayedPick(null)
                 ),
-              niceDelayMs
+              delayMs
             )
           })
         } else {
@@ -482,69 +476,20 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             isPickIntent: false,
             completed,
             championId: expectedPick.id,
-            delayMs: niceDelayMs,
+            delayMs: delayMs,
             startAt: Date.now(),
-            finishAt: Date.now() + niceDelayMs,
+            finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
                 pick(expectedPick.id, activeAction.id, completed).finally(() =>
                   this.state.setDelayedPick(null)
                 ),
-              niceDelayMs
+              delayMs
             )
           })
         }
       }
     )
-
-    const swapContext = computed(() => {
-      const pickConfig = this.state.activeGroupConfig
-      const expected = this.state.expectedSwaps
-
-      if (!pickConfig || !expected) {
-        return null
-      }
-
-      if (!pickConfig.pick.enabled || pickConfig.temporaryDisabled) {
-        return null
-      }
-
-      if (this.state.move !== 'bench-swap' && this.state.move !== 'subset-bench-swap') {
-        return null
-      }
-
-      const expectedSwapIndex = expected.findIndex(
-        (c) => c.status === 'subset-swappable' || c.status === 'swappable'
-      )
-
-      if (expectedSwapIndex === -1) {
-        return null
-      }
-
-      const currentChampionIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
-
-      // 当手上没有任何合适的英雄，直接锁定第一个预选
-      // 对于手上存在合适的英雄，根据情况是否选择更换
-      // 如果策略是找到更高优先级的可选英雄，锁定为更高优先级的，否则什么也不做
-      if (currentChampionIndex === -1) {
-        return {
-          expectedSwap: expected[expectedSwapIndex],
-          delaySeconds: pickConfig.pick.benchSwapAccumulatedDelaySeconds
-        }
-      }
-
-      if (
-        pickConfig.pick.benchSelectFirstAvailableChampion &&
-        expectedSwapIndex < currentChampionIndex
-      ) {
-        return {
-          expectedSwap: expected[expectedSwapIndex],
-          delaySeconds: pickConfig.pick.benchSwapAccumulatedDelaySeconds
-        }
-      }
-
-      return null
-    })
 
     /** 记录英雄变动的时间现成 */
     const benchChampionCooldown = observable.box<Record<number, number> | null>(null)
@@ -578,26 +523,77 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
-    // --- swap ---
-    this._mobx.reaction(
-      () => ({
-        ctx: swapContext.get(),
-        bench: benchChampionCooldown.get()
-      }),
-      ({ ctx, bench }) => {
-        if (!ctx || !bench) {
-          if (this.state._delayedSwap) {
-            clearTimeout(this.state._delayedSwap.timerId)
-            this.state.setDelayedSwap(null)
-          }
+    const swapContext = computed(() => {
+      const bench = benchChampionCooldown.get()
+      if (!bench) {
+        return null
+      }
 
-          return
-        }
+      const pickConfig = this.state.activeGroupConfig
+      const expected = this.state.expectedSwaps
 
-        // 该英雄出现在备战席上的时间戳
-        const axis = bench[ctx.expectedSwap.id]
+      if (!pickConfig || !expected) {
+        return null
+      }
+
+      if (!pickConfig.pick.enabled || pickConfig.temporaryDisabled) {
+        return null
+      }
+
+      if (this.state.move !== 'bench-swap' && this.state.move !== 'subset-bench-swap') {
+        return null
+      }
+
+      const expectedSwapIndex = expected.findIndex(
+        (c) => c.status === 'subset-swappable' || c.status === 'swappable'
+      )
+
+      if (expectedSwapIndex === -1) {
+        return null
+      }
+
+      const currentChampionIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
+
+      // 当手上没有任何合适的英雄，直接锁定第一个预选
+      // 对于手上存在合适的英雄，根据情况是否选择更换
+      // 如果策略是找到更高优先级的可选英雄，锁定为更高优先级的，否则什么也不做
+      if (
+        currentChampionIndex === -1 ||
+        (pickConfig.pick.benchSelectFirstAvailableChampion &&
+          expectedSwapIndex < currentChampionIndex)
+      ) {
+        const champion = expected[expectedSwapIndex]
+        const axis = bench[champion.id]
 
         if (!axis) {
+          return null
+        }
+
+        const delayMs = pickConfig.pick.benchSwapAccumulatedDelaySeconds * 1e3 - (Date.now() - axis)
+
+        return {
+          expectedSwap: champion,
+          delayMs: Math.max(0, delayMs)
+        }
+      }
+
+      return null
+    })
+
+    const swap = async (championId: number) => {
+      try {
+        this._log.info(`Swapped champion: ${championId}`)
+        await this._lc.api.champSelect.benchSwap(championId)
+      } catch (error) {
+        this._log.warn(`Failed to swap champion`, error)
+      }
+    }
+
+    // --- swap ---
+    this._mobx.reaction(
+      () => swapContext.get(),
+      (ctx) => {
+        if (!ctx) {
           if (this.state._delayedSwap) {
             clearTimeout(this.state._delayedSwap.timerId)
             this.state.setDelayedSwap(null)
@@ -607,26 +603,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
 
         const {
-          delaySeconds,
+          delayMs,
           expectedSwap: { id }
         } = ctx
 
-        const swap = async (championId: number) => {
-          try {
-            this._log.info(`Swapped champion: ${championId}`)
-            await this._lc.api.champSelect.benchSwap(championId)
-          } catch (error) {
-            this._log.warn(`Failed to swap champion`, error)
-          }
-        }
-
-        // 若存在，则移除
         if (this.state._delayedSwap) {
           clearTimeout(this.state._delayedSwap.timerId)
         }
-
-        const now = Date.now()
-        const delayMs = delaySeconds * 1e3 - (now - axis)
 
         if (!this.state._delayedSwap || id !== this.state._delayedSwap.championId) {
           this._sendCelebration(`Will swap ${this._debugChampionName(id)} in ${delayMs}ms`)
@@ -635,8 +618,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         this.state.setDelayedSwap({
           championId: id,
           delayMs,
-          finishAt: now + delayMs,
-          startAt: now,
+          finishAt: Date.now() + delayMs,
+          startAt: Date.now(),
           timerId: setTimeout(
             () => swap(id).finally(() => this.state.setDelayedSwap(null)),
             delayMs
@@ -675,26 +658,28 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
-        const trade = this.state.ongoingTrade
+        const thatTrade = this.state.trades?.find((t) => t.id === this.state.ongoingTrade?.id)
 
-        if (!trade) {
+        if (!thatTrade) {
           return null
         }
 
         const delayMs =
-          pickConfig.pick.delaySeconds * 1e3 -
-          Math.max(0, Date.now() - this.state.ongoingTradeCreatedAt)
+          pickConfig.pick.delaySeconds * 1e3 - (Date.now() - this.state.ongoingTradeCreatedAt)
 
-        const her = this.state.myTeamSlotChampions.find(
-          (m) => m.cellId === trade.otherSummonerIndex
-        )
+        const timeLeft =
+          this.state.inFinalizationPhase && this.state.timer
+            ? this.state.timer.adjustedTimeLeftInPhase - 2000
+            : 0.114514 * 1e7 // 很大的值
+
+        const her = this.state.myTeamSlotChampions.find((m) => m.cellId === thatTrade.cellId)
 
         if (!her) {
           return {
             action: 'decline',
-            delayMs: delayMs,
+            delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
             requesterChampionId: 0,
-            tradeId: trade.id
+            tradeId: thatTrade.id
           }
         }
 
@@ -703,28 +688,31 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         if (herIndex === -1) {
           return {
             action: 'decline',
-            delayMs: delayMs,
+            delayMs: Math.min(timeLeft, delayMs),
             requesterChampionId: her.championId,
-            tradeId: trade.id
+            tradeId: thatTrade.id
           }
         }
 
         const handIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
 
-        if (handIndex === -1 || herIndex < handIndex) {
+        if (
+          handIndex === -1 ||
+          (pickConfig.pick.benchSelectFirstAvailableChampion && herIndex < handIndex)
+        ) {
           return {
             action: 'accept',
-            delayMs: delayMs,
+            delayMs: Math.min(timeLeft, delayMs),
             requesterChampionId: her.championId,
-            tradeId: trade.id
+            tradeId: thatTrade.id
           }
         }
 
         return {
           action: 'decline',
-          delayMs: delayMs,
+          delayMs: Math.min(timeLeft, delayMs),
           requesterChampionId: her.championId,
-          tradeId: trade.id
+          tradeId: thatTrade.id
         }
       },
       { equals: comparer.structural }
@@ -733,6 +721,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     const acceptTrade = async (tradeId: number) => {
       try {
         await this._lc.api.champSelect.acceptTrade(tradeId)
+      } catch (error) {
+        this._log.warn(`Failed to accept trade`, error)
+      }
+    }
+
+    const declineTrade = async (tradeId: number) => {
+      try {
+        await this._lc.api.champSelect.declineTrade(tradeId)
       } catch (error) {
         this._log.warn(`Failed to accept trade`, error)
       }
@@ -757,16 +753,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         const { action, delayMs, requesterChampionId, tradeId } = ctx
 
-        if (action === 'accept') {
-          if (
-            !this.state._delayedTrade ||
-            this.state._delayedTrade.tradeId !== tradeId ||
-            this.state._delayedTrade.requesterChampionId !== requesterChampionId ||
-            this.state._delayedTrade.action !== action
-          ) {
-            this._sendCelebration(`Will accept trade in ${delayMs}ms`)
-          }
+        if (
+          !this.state._delayedTrade ||
+          this.state._delayedTrade.action !== action ||
+          this.state._delayedTrade.tradeId !== tradeId ||
+          this.state._delayedTrade.requesterChampionId !== requesterChampionId
+        ) {
+          this._sendCelebration(`Will accept trade in ${delayMs}ms`)
+        }
 
+        if (action === 'accept') {
           this.state.setDelayedTrade({
             action,
             tradeId: tradeId,
@@ -776,6 +772,19 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
               () => acceptTrade(tradeId).finally(() => this.state.setDelayedTrade(null)),
+              delayMs
+            )
+          })
+        } else if (action === 'decline') {
+          this.state.setDelayedTrade({
+            action,
+            tradeId: tradeId,
+            delayMs,
+            finishAt: Date.now() + delayMs,
+            startAt: Date.now(),
+            requesterChampionId: requesterChampionId,
+            timerId: setTimeout(
+              () => declineTrade(tradeId).finally(() => this.state.setDelayedTrade(null)),
               delayMs
             )
           })
