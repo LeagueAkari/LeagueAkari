@@ -23,7 +23,6 @@ import AutoSelectEditor from './auto-select-editor/AutoSelectEditor.vue'
 @import './automation-styles.css';
 
 .auto-select-editor {
-  margin-top: 8px;
   transition: opacity 0.2s;
 }
 </style>

@@ -23,6 +23,7 @@ function stringifyAxiosResponseData(input: any, maxLen = 2000): string {
         return `[File name=${input.name}, size=${input.size}, type=${input.type}]`
       }
       if (typeof FormData !== 'undefined' && input instanceof FormData) {
+        // @ts-ignore
         return `[FormData entries=${Array.from(input.keys()).length}]`
       }
     }

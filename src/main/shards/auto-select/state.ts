@@ -143,7 +143,7 @@ export class AutoSelectSettings {
 export class AutoSelectState {
   groups = GROUPS
 
-  temporaryDisabled = false
+  temporarilyDisabled = false
 
   get csSession() {
     return this._lcData.champSelect.session
@@ -345,7 +345,7 @@ export class AutoSelectState {
 
       return {
         groupId: thatGroup,
-        temporaryDisabled: this.temporaryDisabled,
+        temporarilyDisabled: this.temporarilyDisabled,
         pick: this._settings.pickConfig[thatGroup] || this._settings.createNewEmptyPickConfig(),
         ban: this._settings.banConfig[thatGroup] || this._settings.createNewEmptyBanConfig()
       }
@@ -369,7 +369,7 @@ export class AutoSelectState {
 
     return {
       groupId: winner,
-      temporaryDisabled: this.temporaryDisabled,
+      temporarilyDisabled: this.temporarilyDisabled,
       pick: this._settings.pickConfig[winner] || this._settings.createNewEmptyPickConfig(),
       ban: this._settings.banConfig[winner] || this._settings.createNewEmptyBanConfig
     }
@@ -642,8 +642,8 @@ export class AutoSelectState {
    */
   ongoingTradeCreatedAt: number | null = null
 
-  setTemporaryDisabled(value: boolean) {
-    this.temporaryDisabled = value
+  setTemporarilyDisabled(value: boolean) {
+    this.temporarilyDisabled = value
   }
 
   setDelayedBan(config: DelayedBanPick | null) {

@@ -73,7 +73,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
       'groups',
-      'temporaryDisabled',
+      'temporarilyDisabled',
       'delayedBan',
       'delayedPick',
       'delayedSwap',
@@ -164,7 +164,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       (hasCsSession) => {
         if (!hasCsSession) {
           this._backloggedMessages = []
-          this.state.setTemporaryDisabled(false)
+          this.state.setTemporarilyDisabled(false)
           return
         }
       }
@@ -179,7 +179,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
-        if (!banConfig.ban.enabled || banConfig.temporaryDisabled) {
+        if (!banConfig.ban.enabled || banConfig.temporarilyDisabled) {
           return
         }
 
@@ -306,7 +306,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
-        if (!pickConfig.pick.enabled || pickConfig.temporaryDisabled) {
+        if (!pickConfig.pick.enabled || pickConfig.temporarilyDisabled) {
           return
         }
 
@@ -536,7 +536,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      if (!pickConfig.pick.enabled || pickConfig.temporaryDisabled) {
+      if (!pickConfig.pick.enabled || pickConfig.temporarilyDisabled) {
         return null
       }
 
@@ -844,9 +844,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(
       AutoSelectMain.id,
-      'setTemporaryDisabled',
-      async (_, temporaryDisabled: boolean) => {
-        this.state.setTemporaryDisabled(temporaryDisabled)
+      'setTemporarilyDisabled',
+      async (_, temporarilyDisabled: boolean) => {
+        this.state.setTemporarilyDisabled(temporarilyDisabled)
       }
     )
   }
