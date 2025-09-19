@@ -1,7 +1,7 @@
 import {
   ChampSelectSession,
   GridChamp,
-  OngoingTrade
+  OngoingChampionSwap
 } from '@shared/types/league-client/champ-select'
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
@@ -83,7 +83,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     currentPickableChampionIds: shallowRef<Set<number>>(new Set()),
     currentBannableChampionIds: shallowRef<Set<number>>(new Set()),
     disabledChampionIds: shallowRef<Set<number>>(new Set()),
-    ongoingTrade: shallowRef<OngoingTrade | null>(null),
+    ongoingChampionSwap: shallowRef<OngoingChampionSwap | null>(null),
     gridChampions: {} as Record<number, GridChamp>
   } as const
 

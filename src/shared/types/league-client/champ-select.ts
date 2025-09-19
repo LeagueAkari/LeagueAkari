@@ -211,6 +211,19 @@ export interface OngoingTrade {
   state: (string & {}) | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
 }
 
+export interface OngoingChampionSwap {
+  id: number
+  initiatedByLocalPlayer: boolean
+  otherSummonerIndex: number
+  requesterChampionId: number
+  requesterChampionName: string
+  requesterChampionSplashPath: string
+  responderChampionName: string
+  responderIndex: number
+  state: (string & {}) | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
+  type: 'CHAMPION'
+}
+
 export interface CarouselSkins {
   championId: number
   childSkins: ChildSkin[]

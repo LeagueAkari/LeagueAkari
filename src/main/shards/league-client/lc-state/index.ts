@@ -1,7 +1,7 @@
 import {
   ChampSelectSummoner,
   GridChamp,
-  OngoingTrade
+  OngoingChampionSwap
 } from '@shared/types/league-client/champ-select'
 import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
@@ -589,7 +589,7 @@ export class LeagueClientData {
       'currentBannableChampionIds',
       'disabledChampionIds',
       'currentChampion',
-      'ongoingTrade'
+      'ongoingChampionSwap'
     ])
 
     this._context.mobx.propSync(
@@ -765,18 +765,22 @@ export class LeagueClientData {
       }
     }
 
-    const loadOngoingTrade = async () => {
+    const loadOngoingChampionSwap = async () => {
       try {
-        const trade = (await this._context.lc.api.champSelect.getOngoingTrade()).data
-        this.champSelect.setOngoingTrade(trade)
+        const trade = (await this._context.lc.api.champSelect.getOngoingChampionSwap()).data
+        this.champSelect.setOngoingChampionSwap(trade)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
-          this.champSelect.setOngoingTrade(null)
+          this.champSelect.setOngoingChampionSwap(null)
           return
         }
 
-        this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-ongoing-trade')
-        this._context.log.warn(`Failed to get ongoing trade`, error)
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-ongoing-champion-swap'
+        )
+        this._context.log.warn(`Failed to get ongoing champion swap`, error)
       }
     }
 
@@ -815,7 +819,7 @@ export class LeagueClientData {
     this._stateInitializer.register('champ-select-session', loadSession)
     this._stateInitializer.register('champ-select-current-champion', loadCurrentChampion)
     this._stateInitializer.register('champ-select-disabled-champions', loadDisabledChampions)
-    this._stateInitializer.register('champ-select-ongoing-trade', loadOngoingTrade)
+    this._stateInitializer.register('champ-select-ongoing-champion-swap', loadOngoingChampionSwap)
     this._stateInitializer.register('champ-select-pickable-champ-ids', loadPickables)
     this._stateInitializer.register('champ-select-bannable-champ-ids', loadBannables)
     this._stateInitializer.register(
@@ -828,7 +832,7 @@ export class LeagueClientData {
       this.champSelect.setCurrentChampion(null)
       this.champSelect.setCurrentPickableChampionArray([])
       this.champSelect.setDisabledChampionIds([])
-      this.champSelect.setOngoingTrade(null)
+      this.champSelect.setOngoingChampionSwap(null)
       this.champSelect.setSelfSummoner(null)
       this.champSelect.setSession(null)
     })
@@ -935,15 +939,15 @@ export class LeagueClientData {
       }
     })
 
-    this._context.lc.events.on<LcuEvent<OngoingTrade>>(
-      '/lol-champ-select/v1/ongoing-trade',
+    this._context.lc.events.on<LcuEvent<OngoingChampionSwap>>(
+      '/lol-champ-select/v1/ongoing-champion-swap',
       (event) => {
         if (event.eventType === 'Delete') {
-          this.champSelect.setOngoingTrade(null)
+          this.champSelect.setOngoingChampionSwap(null)
           return
         }
 
-        this.champSelect.setOngoingTrade(event.data)
+        this.champSelect.setOngoingChampionSwap(event.data)
       }
     )
 

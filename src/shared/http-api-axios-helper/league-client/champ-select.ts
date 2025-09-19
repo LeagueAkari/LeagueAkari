@@ -4,7 +4,7 @@ import {
   ChampSelectSummoner,
   GridChamp,
   MySelection,
-  OngoingTrade
+  OngoingChampionSwap
 } from '@shared/types/league-client/champ-select'
 import { AxiosInstance } from 'axios'
 
@@ -46,20 +46,20 @@ export class ChampSelectHttpApi {
     return this._http.post<void>(`/lol-champ-select/v1/session/bench/swap/${champId}`)
   }
 
-  declineTrade(tradeId: number) {
-    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/decline`)
+  declineChampionSwap(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/champion-swaps/${tradeId}/decline`)
   }
 
-  acceptTrade(tradeId: number) {
-    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/accept`)
+  acceptChampionSwap(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/champion-swaps/${tradeId}/accept`)
   }
 
-  cancelTrade(tradeId: number) {
-    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/cancel`)
+  cancelChampionSwap(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/champion-swaps/${tradeId}/cancel`)
   }
 
-  requestTrade(tradeId: number) {
-    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/request`)
+  requestChampionSwap(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/champion-swaps/${tradeId}/request`)
   }
 
   acceptSwap(id: number) {
@@ -78,8 +78,8 @@ export class ChampSelectHttpApi {
     return this._http.post(`/lol-champ-select/v1/session/swaps/${id}/request`)
   }
 
-  getOngoingTrade() {
-    return this._http.get<OngoingTrade>('/lol-champ-select/v1/ongoing-trade')
+  getOngoingChampionSwap() {
+    return this._http.get<OngoingChampionSwap>('/lol-champ-select/v1/ongoing-champion-swap')
   }
 
   getPickableChampIds() {

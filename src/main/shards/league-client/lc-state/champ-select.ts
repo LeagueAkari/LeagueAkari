@@ -2,7 +2,7 @@ import {
   ChampSelectSession,
   ChampSelectSummoner,
   GridChamp,
-  OngoingTrade
+  OngoingChampionSwap
 } from '@shared/types/league-client/champ-select'
 import { makeAutoObservable, observable } from 'mobx'
 
@@ -19,7 +19,7 @@ export class ChampSelectState {
 
   selfSummoner: ChampSelectSummoner | null = null
 
-  ongoingTrade: OngoingTrade | null = null
+  ongoingChampionSwap: OngoingChampionSwap | null = null
 
   /**
    * 客户端会先推送所有 /grid-champions/* 事件 (Create), 之后才会推送 /all-grid-champions 事件
@@ -38,7 +38,7 @@ export class ChampSelectState {
       currentBannableChampionIdArray: observable.struct,
       disabledChampionIdArray: observable.struct,
       selfSummoner: observable.struct,
-      ongoingTrade: observable.struct,
+      ongoingChampionSwap: observable.struct,
       gridChampions: observable.shallow
     })
   }
@@ -79,8 +79,8 @@ export class ChampSelectState {
     this.disabledChampionIdArray = ids
   }
 
-  setOngoingTrade(trade: OngoingTrade | null) {
-    this.ongoingTrade = trade
+  setOngoingChampionSwap(trade: OngoingChampionSwap | null) {
+    this.ongoingChampionSwap = trade
   }
 
   setGridChampion(champ: GridChamp) {

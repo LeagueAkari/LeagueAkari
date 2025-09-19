@@ -630,67 +630,63 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     /** 记录其可用的时间，在没有基准的时候手动提供基准 */
     this._mobx.reaction(
-      () => this.state.ongoingTrade,
+      () => this.state.ongoingChampionSwap,
       (trade, prev) => {
-        if (!trade) {
-          this.state.setOngoingTradeCreatedAt(null)
+        if (!trade || trade.state !== 'RECEIVED') {
+          this.state.setOngoingChampionSwapCreatedAt(null)
           return
         }
 
         // 仅在第一次**收到** trade 时，记录其可用的时间
         if (!prev && trade.state === 'RECEIVED') {
-          this.state.setOngoingTradeCreatedAt(Date.now())
+          this.state.setOngoingChampionSwapCreatedAt(Date.now())
         }
       },
       { fireImmediately: true }
     )
 
-    const tradeContext = computed(
+    const championSwapContext = computed(
       () => {
-        if (!this.state.ongoingTradeCreatedAt || !this.state.myTeamSlotChampions.length) {
+        if (!this.state.ongoingChampionSwapCreatedAt || !this.state.myTeamSlotChampions.length) {
           return null
         }
 
         const pickConfig = this.state.activeGroupConfig
         const expected = this.state.expectedSwaps
 
-        if (!pickConfig || !expected || !this.state.ongoingTradeCreatedAt) {
+        if (
+          !pickConfig ||
+          !pickConfig.pick.enabled ||
+          !expected ||
+          !this.state.ongoingChampionSwapCreatedAt
+        ) {
           return null
         }
 
-        const thatTrade = this.state.trades?.find((t) => t.id === this.state.ongoingTrade?.id)
-
-        if (!thatTrade) {
+        if (!this.state.ongoingChampionSwap) {
           return null
         }
+
+        const tradeId = this.state.ongoingChampionSwap.id
+        const herChampionId = this.state.ongoingChampionSwap.requesterChampionId
 
         const delayMs =
-          pickConfig.pick.delaySeconds * 1e3 - (Date.now() - this.state.ongoingTradeCreatedAt)
+          pickConfig.pick.delaySeconds * 1e3 -
+          (Date.now() - this.state.ongoingChampionSwapCreatedAt)
 
         const timeLeft =
           this.state.inFinalizationPhase && this.state.timer
             ? this.state.timer.adjustedTimeLeftInPhase - 2000
             : 0.114514 * 1e7 // 很大的值
 
-        const her = this.state.myTeamSlotChampions.find((m) => m.cellId === thatTrade.cellId)
-
-        if (!her) {
-          return {
-            action: 'decline',
-            delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
-            requesterChampionId: 0,
-            tradeId: thatTrade.id
-          }
-        }
-
-        const herIndex = expected.findIndex((c) => c.id === her.championId)
+        const herIndex = expected.findIndex((c) => c.id === herChampionId)
 
         if (herIndex === -1) {
           return {
             action: 'decline',
-            delayMs: Math.min(timeLeft, delayMs),
-            requesterChampionId: her.championId,
-            tradeId: thatTrade.id
+            delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
+            requesterChampionId: herChampionId,
+            tradeId: tradeId
           }
         }
 
@@ -702,68 +698,69 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         ) {
           return {
             action: 'accept',
-            delayMs: Math.min(timeLeft, delayMs),
-            requesterChampionId: her.championId,
-            tradeId: thatTrade.id
+            delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
+            requesterChampionId: herChampionId,
+            tradeId: tradeId
           }
         }
 
         return {
           action: 'decline',
-          delayMs: Math.min(timeLeft, delayMs),
-          requesterChampionId: her.championId,
-          tradeId: thatTrade.id
+          delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
+          requesterChampionId: herChampionId,
+          tradeId: tradeId
         }
       },
       { equals: comparer.structural }
     )
 
-    const acceptTrade = async (tradeId: number) => {
+    const acceptChampionSwap = async (tradeId: number) => {
       try {
-        await this._lc.api.champSelect.acceptTrade(tradeId)
+        await this._lc.api.champSelect.acceptChampionSwap(tradeId)
       } catch (error) {
-        this._log.warn(`Failed to accept trade`, error)
+        this._log.warn(`Failed to accept champion swap`, error)
       }
     }
 
-    const declineTrade = async (tradeId: number) => {
+    const declineChampionSwap = async (tradeId: number) => {
       try {
-        await this._lc.api.champSelect.declineTrade(tradeId)
+        await this._lc.api.champSelect.declineChampionSwap(tradeId)
       } catch (error) {
-        this._log.warn(`Failed to accept trade`, error)
+        this._log.warn(`Failed to decline champion swap`, error)
       }
     }
 
-    // --- trade ---
+    // --- trade: champion swap ---
     this._mobx.reaction(
-      () => tradeContext.get(),
+      () => championSwapContext.get(),
       (ctx) => {
         if (!ctx) {
-          if (this.state._delayedTrade) {
-            clearTimeout(this.state._delayedTrade.timerId)
-            this.state.setDelayedTrade(null)
+          if (this.state._delayedChampionSwap) {
+            clearTimeout(this.state._delayedChampionSwap.timerId)
+            this.state.setDelayedChampionSwap(null)
           }
 
           return
         }
 
-        if (this.state._delayedTrade) {
-          clearTimeout(this.state._delayedTrade.timerId)
+        if (this.state._delayedChampionSwap) {
+          clearTimeout(this.state._delayedChampionSwap.timerId)
         }
 
         const { action, delayMs, requesterChampionId, tradeId } = ctx
 
         if (
-          !this.state._delayedTrade ||
-          this.state._delayedTrade.action !== action ||
-          this.state._delayedTrade.tradeId !== tradeId ||
-          this.state._delayedTrade.requesterChampionId !== requesterChampionId
+          !this.state._delayedChampionSwap ||
+          this.state._delayedChampionSwap.action !== action ||
+          this.state._delayedChampionSwap.tradeId !== tradeId ||
+          this.state._delayedChampionSwap.requesterChampionId !== requesterChampionId
         ) {
-          this._sendCelebration(`Will accept trade in ${delayMs}ms`)
+          this._log.warn(this.state._delayedChampionSwap, action, tradeId, requesterChampionId)
+          this._sendCelebration(`Will ${action} trade in ${delayMs}ms`)
         }
 
         if (action === 'accept') {
-          this.state.setDelayedTrade({
+          this.state.setDelayedChampionSwap({
             action,
             tradeId: tradeId,
             delayMs,
@@ -771,12 +768,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             startAt: Date.now(),
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
-              () => acceptTrade(tradeId).finally(() => this.state.setDelayedTrade(null)),
+              () =>
+                acceptChampionSwap(tradeId).finally(() => this.state.setDelayedChampionSwap(null)),
               delayMs
             )
           })
         } else if (action === 'decline') {
-          this.state.setDelayedTrade({
+          this.state.setDelayedChampionSwap({
             action,
             tradeId: tradeId,
             delayMs,
@@ -784,12 +782,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             startAt: Date.now(),
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
-              () => declineTrade(tradeId).finally(() => this.state.setDelayedTrade(null)),
+              () =>
+                declineChampionSwap(tradeId).finally(() => this.state.setDelayedChampionSwap(null)),
               delayMs
             )
           })
         } else {
-          this.state.setDelayedTrade(null)
+          this.state.setDelayedChampionSwap(null)
         }
       },
       { fireImmediately: true }

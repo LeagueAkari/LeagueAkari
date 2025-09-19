@@ -65,7 +65,7 @@ export interface DelayedSwap {
   timerId: NodeJS.Timeout
 }
 
-export interface DelayedTrade {
+export interface DelayedChampionSwap {
   action: 'accept' | 'decline'
   tradeId: number
   delayMs: number
@@ -193,8 +193,8 @@ export class AutoSelectState {
     return this.csSession?.benchChampions || []
   }
 
-  get ongoingTrade() {
-    return this._lcData.champSelect.ongoingTrade
+  get ongoingChampionSwap() {
+    return this._lcData.champSelect.ongoingChampionSwap
   }
 
   get myTeam() {
@@ -621,12 +621,15 @@ export class AutoSelectState {
     return null
   }
 
-  _delayedTrade: DelayedTrade | null = null
+  /**
+   * 交易 trade 的 champion swap
+   */
+  _delayedChampionSwap: DelayedChampionSwap | null = null
 
   /** 仅被读取的副本 */
-  get delayedTrade() {
-    if (this._delayedTrade) {
-      const { timerId, ...rest } = this._delayedTrade
+  get delayedChampionSwap() {
+    if (this._delayedChampionSwap) {
+      const { timerId, ...rest } = this._delayedChampionSwap
       return rest
     }
 
@@ -640,7 +643,7 @@ export class AutoSelectState {
    *
    * P.S. 客户端 ux 实现是 15000ms 固定值 + 200ms / 700ms 的动画延迟
    */
-  ongoingTradeCreatedAt: number | null = null
+  ongoingChampionSwapCreatedAt: number | null = null
 
   setTemporarilyDisabled(value: boolean) {
     this.temporarilyDisabled = value
@@ -658,12 +661,12 @@ export class AutoSelectState {
     this._delayedSwap = config
   }
 
-  setDelayedTrade(config: DelayedTrade | null) {
-    this._delayedTrade = config
+  setDelayedChampionSwap(config: DelayedChampionSwap | null) {
+    this._delayedChampionSwap = config
   }
 
-  setOngoingTradeCreatedAt(value: number | null) {
-    this.ongoingTradeCreatedAt = value
+  setOngoingChampionSwapCreatedAt(value: number | null) {
+    this.ongoingChampionSwapCreatedAt = value
   }
 
   constructor(
@@ -683,7 +686,7 @@ export class AutoSelectState {
       _delayedBan: observable.struct,
       _delayedPick: observable.struct,
       _delayedSwap: observable.struct,
-      _delayedTrade: observable.struct,
+      _delayedChampionSwap: observable.struct,
 
       groups: observable.ref
     })
