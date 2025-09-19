@@ -86,6 +86,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
   }
 
+  reloadPlayer(puuid: string) {
+    this._ipc.call(MAIN_SHARD_NAMESPACE, 'reloadPlayer', puuid)
+  }
+
   getAll() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<{
       matchHistory: Record<string, MatchHistoryPlayer>
@@ -120,6 +124,14 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.championMastery = {}
       store.savedInfo = {}
       store.cachedGames = {}
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {
+      delete store.summoner[puuid]
+      delete store.matchHistory[puuid]
+      delete store.rankedStats[puuid]
+      delete store.championMastery[puuid]
+      delete store.savedInfo[puuid]
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {

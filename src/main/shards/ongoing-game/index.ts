@@ -74,13 +74,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   /** 为**加载战绩**设置的特例 */
   private readonly _mhQueue = new PQueue()
   /** 为**加载战绩**设置的特例 */
-  private _mhController: AbortController | null = null
 
   /**
    * 其他 API 的并发控制
    */
   private readonly _queue = new PQueue()
-  private _controller: AbortController | null = null
+
+  private _mhControllers = new Map<string, AbortController>()
+  private _controllers = new Map<string, AbortController>()
 
   private _debouncedUpdateMatchHistoryFn = _.debounce(this._updateMatchHistory.bind(this), 250)
 
@@ -196,6 +197,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
   }
 
+  private _clearControllers() {
+    this._mhControllers.forEach((controller) => controller.abort())
+    this._mhControllers.clear()
+    this._controllers.forEach((controller) => controller.abort())
+    this._controllers.clear()
+  }
+
   private _handlePQueue() {
     this._mobx.reaction(
       () => this.settings.concurrency,
@@ -224,15 +232,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           `tokenReady=${this._sgp.state.isTokenReady}`
         )
 
-        if (this._controller) {
-          this._controller.abort()
-          this._controller = null
-        }
-
-        if (this._mhController) {
-          this._mhController.abort()
-          this._mhController = null
-        }
+        this._clearControllers()
 
         this._debouncedUpdateMatchHistoryFn.cancel()
 
@@ -243,21 +243,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           return
         }
 
-        this._controller = new AbortController()
-        this._mhController = new AbortController()
-
         if (this.state.queryStage.phase === 'champ-select') {
-          this._champSelect({
-            mhSignal: this._mhController.signal,
-            signal: this._controller.signal,
-            force: false
-          })
+          this._champSelect({ force: false })
         } else if (this.state.queryStage.phase === 'in-game') {
-          this._inGame({
-            mhSignal: this._mhController.signal,
-            signal: this._controller.signal,
-            force: false
-          })
+          this._inGame({ force: false })
         }
       },
       { equals: comparer.shallow, fireImmediately: true }
@@ -273,20 +262,18 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    if (this._mhController) {
-      this._mhController.abort()
-      this._mhController = null
-    }
-
-    const controller = new AbortController()
-    this._mhController = controller
+    this._mhControllers.forEach((controller) => controller.abort())
+    this._mhControllers.clear()
 
     const puuids = this.getPuuidsToLoadForPlayers()
 
     puuids.forEach((puuid) => {
+      const mhController = new AbortController()
+      this._mhControllers.set(puuid, mhController)
+
       this._loadPlayerMatchHistory(puuid, {
-        signal: this._controller?.signal,
-        mhSignal: controller.signal,
+        signal: this._controllers.get(puuid)?.signal,
+        mhSignal: mhController.signal,
         count: this.settings.matchHistoryLoadCount,
         tag: this.state.matchHistoryTag,
         force: false,
@@ -311,14 +298,20 @@ export class OngoingGameMain implements IAkariShardInitDispose {
    *
    * @param options 其中的 force, 用于标识是否强制刷新. 若为 false, 在查询条件未发生变动时不会重新加载
    */
-  private _champSelect(options: { mhSignal: AbortSignal; signal: AbortSignal; force: boolean }) {
-    const { mhSignal, signal, force } = options
+  private _champSelect(options: { force: boolean }) {
+    const { force } = options
 
     const puuids = this.getPuuidsToLoadForPlayers()
+
     puuids.forEach((puuid) => {
+      const mhController = new AbortController()
+      const controller = new AbortController()
+      this._mhControllers.set(puuid, mhController)
+      this._controllers.set(puuid, controller)
+
       this._loadPlayerMatchHistory(puuid, {
-        signal,
-        mhSignal,
+        signal: controller.signal,
+        mhSignal: mhController.signal,
         force,
         tag:
           this.settings.matchHistoryTagPreference === 'current'
@@ -327,26 +320,32 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         count: this.settings.matchHistoryLoadCount,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
-      this._loadPlayerSummoner(puuid, { signal, force })
-      this._loadPlayerRankedStats(puuid, { signal, force })
+      this._loadPlayerSummoner(puuid, { signal: controller.signal, force })
+      this._loadPlayerRankedStats(puuid, { signal: controller.signal, force })
       this._loadPlayerSavedInfo(puuid, {
-        signal,
+        signal: controller.signal,
         force,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
-      this._loadPlayerChampionMasteries(puuid, { signal, force })
+      this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force })
     })
   }
 
   /** 目前实现同 #._champSelect */
-  private _inGame(options: { mhSignal: AbortSignal; signal: AbortSignal; force: boolean }) {
-    const { mhSignal, signal, force } = options
+  private _inGame(options: { force: boolean }) {
+    const { force } = options
 
     const puuids = this.getPuuidsToLoadForPlayers()
+
     puuids.forEach((puuid) => {
+      const mhController = new AbortController()
+      const controller = new AbortController()
+      this._mhControllers.set(puuid, mhController)
+      this._controllers.set(puuid, controller)
+
       this._loadPlayerMatchHistory(puuid, {
-        signal,
-        mhSignal,
+        signal: controller.signal,
+        mhSignal: mhController.signal,
         force,
         tag:
           this.settings.matchHistoryTagPreference === 'current'
@@ -355,47 +354,73 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         count: this.settings.matchHistoryLoadCount,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
-      this._loadPlayerSummoner(puuid, { signal, force })
-      this._loadPlayerRankedStats(puuid, { signal, force })
+      this._loadPlayerSummoner(puuid, { signal: controller.signal, force })
+      this._loadPlayerRankedStats(puuid, { signal: controller.signal, force })
       this._loadPlayerSavedInfo(puuid, {
-        signal,
+        signal: controller.signal,
         force,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
-      this._loadPlayerChampionMasteries(puuid, { signal, force })
+      this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force })
     })
   }
 
-  private _clearAndReload() {
-    if (this._controller) {
-      this._controller.abort()
-      this._controller = null
-    }
-
-    if (this._mhController) {
-      this._mhController.abort()
-      this._mhController = null
-    }
+  private _clearAndReloadAllPlayers() {
+    this._clearControllers()
 
     this.state.clear()
     this._ipc.sendEvent(OngoingGameMain.id, 'clear')
 
-    this._controller = new AbortController()
-    this._mhController = new AbortController()
-
     if (this.state.queryStage.phase === 'champ-select') {
-      this._champSelect({
-        mhSignal: this._mhController.signal,
-        signal: this._controller.signal,
-        force: true
-      })
+      this._champSelect({ force: true })
     } else if (this.state.queryStage.phase === 'in-game') {
-      this._inGame({
-        mhSignal: this._mhController.signal,
-        signal: this._controller.signal,
-        force: true
-      })
+      this._inGame({ force: true })
     }
+  }
+
+  /**
+   * 临时的方法
+   *
+   * TODO: Refactor
+   *
+   * @param puuid
+   */
+  private _reloadPlayer(puuid: string) {
+    if (this._mhControllers.has(puuid)) {
+      this._mhControllers.get(puuid)?.abort()
+      this._mhControllers.delete(puuid)
+    }
+
+    if (this._controllers.has(puuid)) {
+      this._controllers.get(puuid)?.abort()
+      this._controllers.delete(puuid)
+      return
+    }
+
+    const mhController = new AbortController()
+    const controller = new AbortController()
+    this._mhControllers.set(puuid, mhController)
+    this._controllers.set(puuid, controller)
+
+    this._loadPlayerMatchHistory(puuid, {
+      signal: controller.signal,
+      mhSignal: mhController.signal,
+      force: true,
+      tag:
+        this.settings.matchHistoryTagPreference === 'current'
+          ? this._getCurrentGameMatchHistoryTag()
+          : 'all',
+      count: this.settings.matchHistoryLoadCount,
+      useSgpApi: this.settings.matchHistoryUseSgpApi
+    })
+    this._loadPlayerSummoner(puuid, { signal: controller.signal, force: true })
+    this._loadPlayerRankedStats(puuid, { signal: controller.signal, force: true })
+    this._loadPlayerSavedInfo(puuid, {
+      signal: controller.signal,
+      force: true,
+      useSgpApi: this.settings.matchHistoryUseSgpApi
+    })
+    this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force: true })
   }
 
   private getPuuidsToLoadForPlayers() {
@@ -943,7 +968,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(OngoingGameMain.id, 'reload', () => {
-      this._clearAndReload()
+      this._clearAndReloadAllPlayers()
+    })
+
+    this._ipc.onCall(OngoingGameMain.id, 'reloadPlayer', (_, puuid: string) => {
+      this._reloadPlayer(puuid)
     })
   }
 
