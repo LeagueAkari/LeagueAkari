@@ -694,9 +694,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         clearTimeout(this._autoAcceptTimerId)
         this._autoAcceptTimerId = null
         if (reason === 'accepted') {
-          this._log.info(`Auto-accept cancelled - already accepted`)
+          this._log.info(`Already accepted match`)
         } else if (reason === 'declined') {
-          this._log.info(`Auto-accept cancelled - already declined`)
+          this._log.info(`Already declined match`)
         } else {
           this._log.info(`Auto-accept cancelled - ${reason || 'unknown reason'}`)
         }

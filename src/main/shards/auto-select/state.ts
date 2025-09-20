@@ -57,7 +57,7 @@ export interface DelayedBanPick {
   timerId: NodeJS.Timeout
 }
 
-export interface DelayedSwap {
+export interface DelayedBenchSwap {
   championId: number
   delayMs: number
   startAt: number
@@ -427,7 +427,7 @@ export class AutoSelectState {
     // 但在 subset pick 阶段，只能 swap 位于自己 subset 中的英雄
     // 只有自己有英雄的时候才能 swap，毕竟是 swap
     // 如果是抽卡模式的选用，则区分仅仅可 swap subset 中的情况
-    if (this.benchEnabled && this._lcData.champSelect.currentChampion) {
+    if (this.benchEnabled && this.currentChampionId) {
       if (this.allowSubsetChampionPicks && this.timer?.phase === 'BAN_PICK') {
         return 'subset-bench-swap'
       }
@@ -609,12 +609,12 @@ export class AutoSelectState {
   /**
    * 准备 swap 哪个英雄
    */
-  _delayedSwap: DelayedSwap | null = null
+  _delayedBenchSwap: DelayedBenchSwap | null = null
 
   /** 仅被读取的副本 */
-  get delayedSwap() {
-    if (this._delayedSwap) {
-      const { timerId, ...rest } = this._delayedSwap
+  get delayedBenchSwap() {
+    if (this._delayedBenchSwap) {
+      const { timerId, ...rest } = this._delayedBenchSwap
       return rest
     }
 
@@ -657,8 +657,8 @@ export class AutoSelectState {
     this._delayedPick = config
   }
 
-  setDelayedSwap(config: DelayedSwap | null) {
-    this._delayedSwap = config
+  setDelayedBenchSwap(config: DelayedBenchSwap | null) {
+    this._delayedBenchSwap = config
   }
 
   setDelayedChampionSwap(config: DelayedChampionSwap | null) {
@@ -679,13 +679,14 @@ export class AutoSelectState {
       currentActions: computed.struct,
       expectedPicks: computed.struct,
       expectedBans: computed.struct,
+      expectedSwaps: computed.struct,
 
       timer: computed.struct,
       benchChampions: computed.struct,
 
       _delayedBan: observable.struct,
       _delayedPick: observable.struct,
-      _delayedSwap: observable.struct,
+      _delayedBenchSwap: observable.struct,
       _delayedChampionSwap: observable.struct,
 
       groups: observable.ref

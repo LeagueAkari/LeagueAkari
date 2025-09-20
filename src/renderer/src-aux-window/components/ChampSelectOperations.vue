@@ -1,6 +1,6 @@
 <template>
-  <NCard v-if="isCustomGame !== null" size="small">
-    <NFlex align="center" v-if="!isCustomGame" class="control-item">
+  <NCard v-if="!isCustomGame" size="small">
+    <NFlex align="center" v-if="!isCustomGame" class="tiny-control-item">
       <span class="label" style="flex: 1">{{ t('ChampSelectOperations.dodge.label') }}</span>
       <NButton size="tiny" type="primary" secondary @click="dodgeLoop" :disabled="isLoopingDodge">
         {{ t('ChampSelectOperations.dodge.button') }}
@@ -15,6 +15,14 @@
       >
         {{ t('ChampSelectOperations.dodge.cancel') }}
       </NButton>
+    </NFlex>
+    <NFlex align="center" v-if="!isCustomGame" class="tiny-control-item">
+      <span class="label" style="flex: 1">[关闭自动选择和自动禁用（仅本次生效）]</span>
+      <NSwitch
+        :value="as2.temporarilyDisabled"
+        @update:value="(val) => as.setTemporarilyDisabled(val)"
+        size="small"
+      />
     </NFlex>
   </NCard>
 </template>
@@ -44,7 +52,7 @@ const isBenchMode = computed(() => isBenchEnabledSession(lcs.champSelect.session
 
 const isCustomGame = computed(() => {
   if (!lcs.gameflow.session) {
-    return null
+    return false
   }
 
   return lcs.gameflow.session.gameData.isCustomGame
@@ -83,7 +91,7 @@ const dodgeLoop = async () => {
   color: rgb(178, 178, 178);
 }
 
-.control-item {
+.tiny-control-item {
   height: 24px;
 
   &:not(:last-child) {

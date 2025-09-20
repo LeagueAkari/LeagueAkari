@@ -232,7 +232,7 @@
           <ControlItem
             class="control-item-margin"
             :label="`处理交换请求`"
-            :label-description="`[当收到交换请求时，若满足预期英雄设置，则接收交换请求。否则会拒绝交换请求]`"
+            :label-description="`[当收到交换请求时，若满足预期英雄设置，则接受交换请求。否则会拒绝交换请求]`"
             :label-width="260"
           >
             <NSwitch

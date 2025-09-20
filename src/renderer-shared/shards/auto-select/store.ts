@@ -62,11 +62,21 @@ export interface DelayedBanPick {
 }
 
 // copied from main shard
-export interface DelayedSwap {
+export interface DelayedBenchSwap {
   championId: number
   delayMs: number
   startAt: number
   finishAt: number
+}
+
+// copied from main shard
+export interface DelayedChampionSwap {
+  action: 'accept' | 'decline'
+  tradeId: number
+  delayMs: number
+  startAt: number
+  finishAt: number
+  requesterChampionId: number
 }
 
 export interface ExpectedChampionStatus {
@@ -84,7 +94,8 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
 
   const delayedBan = shallowRef<DelayedBanPick | null>(null)
   const delayedPick = shallowRef<DelayedBanPick | null>(null)
-  const delayedSwap = shallowRef<DelayedSwap | null>(null)
+  const delayedBenchSwap = shallowRef<DelayedBenchSwap | null>(null)
+  const delayedChampionSwap = shallowRef<DelayedChampionSwap | null>(null)
 
   const expectedPicks = shallowRef<ExpectedChampionStatus[] | null>(null)
   const expectedBans = shallowRef<ExpectedChampionStatus[] | null>(null)
@@ -99,8 +110,8 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
 
     delayedBan,
     delayedPick,
-    delayedSwap,
-
+    delayedBenchSwap,
+    delayedChampionSwap,
     expectedPicks,
     expectedBans,
     expectedSwaps,

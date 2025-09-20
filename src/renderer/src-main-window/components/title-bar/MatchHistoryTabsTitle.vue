@@ -15,9 +15,9 @@
     />
     <template v-if="lcs.isConnected">
       <NScrollbar
-        :class="$style['scroll-bar']"
+        :class="$style['scrollbar']"
         x-scrollable
-        :content-class="$style['scroll-bar-content']"
+        :content-class="$style['scrollbar-content']"
         @wheel="handleWheel"
         ref="scrollbar"
       >
@@ -715,7 +715,7 @@ const { summonerName } = useStreamerModeMaskedText()
 </style>
 
 <style module>
-.scroll-bar {
+.scrollbar {
   height: 100%;
   display: flex;
   align-items: center;
@@ -736,7 +736,7 @@ const { summonerName } = useStreamerModeMaskedText()
   }
 }
 
-.scroll-bar-content {
+.scrollbar-content {
   height: 100%;
   min-width: 0 !important;
 }

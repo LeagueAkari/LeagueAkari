@@ -33,7 +33,7 @@ export interface AutoFollowReturn {
   stop: () => void
 }
 
-export function useAutoFollowScroll(
+export function useScrollFollow(
   elRef: MaybeRefOrGetter<HTMLElement | null | undefined>,
   options: AutoFollowOptions = {}
 ): AutoFollowReturn {

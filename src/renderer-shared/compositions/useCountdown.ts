@@ -1,5 +1,5 @@
 import { MaybeRefOrGetter, toRef, useIntervalFn } from '@vueuse/core'
-import { ref, watch } from 'vue'
+import { readonly, ref, watch } from 'vue'
 
 const INTERVAL_CONSTANT = 92
 
@@ -32,5 +32,5 @@ export function useCountdownSeconds(
     { immediate: true }
   )
 
-  return { countdownTime: _countdownTime }
+  return readonly(_countdownTime)
 }

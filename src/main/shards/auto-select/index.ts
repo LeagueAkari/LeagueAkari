@@ -76,7 +76,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'temporarilyDisabled',
       'delayedBan',
       'delayedPick',
-      'delayedSwap',
+      'delayedBenchSwap',
+      'delayedChampionSwap',
       'expectedPicks',
       'expectedBans',
       'expectedSwaps'
@@ -284,7 +285,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           completed,
           championId: expectedBan.id,
           delayMs,
-          startAt: Date.now(),
+          startAt: this.state.delayedBan?.startAt ?? Date.now(),
           finishAt: Date.now() + delayMs,
           timerId: setTimeout(
             () =>
@@ -461,7 +462,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             completed: false,
             championId: expectedPick.id,
             delayMs: delayMs,
-            startAt: Date.now(),
+            startAt: this.state.delayedPick?.startAt ?? Date.now(),
             finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
@@ -477,7 +478,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             completed,
             championId: expectedPick.id,
             delayMs: delayMs,
-            startAt: Date.now(),
+            startAt: this.state.delayedPick?.startAt ?? Date.now(),
             finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
@@ -500,6 +501,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       cur.forEach((c) => {
         if (!prev || !prev[c]) {
           newObj[c] = Date.now()
+        } else {
+          newObj[c] = prev[c]
         }
       })
 
@@ -523,7 +526,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
-    const swapContext = computed(() => {
+    const benchSwapContext = computed(() => {
       const bench = benchChampionCooldown.get()
       if (!bench) {
         return null
@@ -591,12 +594,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     // --- swap ---
     this._mobx.reaction(
-      () => swapContext.get(),
+      () => benchSwapContext.get(),
       (ctx) => {
         if (!ctx) {
-          if (this.state._delayedSwap) {
-            clearTimeout(this.state._delayedSwap.timerId)
-            this.state.setDelayedSwap(null)
+          if (this.state._delayedBenchSwap) {
+            clearTimeout(this.state._delayedBenchSwap.timerId)
+            this.state.setDelayedBenchSwap(null)
           }
 
           return
@@ -607,21 +610,21 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           expectedSwap: { id }
         } = ctx
 
-        if (this.state._delayedSwap) {
-          clearTimeout(this.state._delayedSwap.timerId)
+        if (this.state._delayedBenchSwap) {
+          clearTimeout(this.state._delayedBenchSwap.timerId)
         }
 
-        if (!this.state._delayedSwap || id !== this.state._delayedSwap.championId) {
+        if (!this.state._delayedBenchSwap || id !== this.state._delayedBenchSwap.championId) {
           this._sendCelebration(`Will swap ${this._debugChampionName(id)} in ${delayMs}ms`)
         }
 
-        this.state.setDelayedSwap({
+        this.state.setDelayedBenchSwap({
           championId: id,
           delayMs,
           finishAt: Date.now() + delayMs,
-          startAt: Date.now(),
+          startAt: this.state.delayedBenchSwap?.startAt ?? Date.now(),
           timerId: setTimeout(
-            () => swap(id).finally(() => this.state.setDelayedSwap(null)),
+            () => swap(id).finally(() => this.state.setDelayedBenchSwap(null)),
             delayMs
           )
         })
@@ -755,7 +758,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedChampionSwap.tradeId !== tradeId ||
           this.state._delayedChampionSwap.requesterChampionId !== requesterChampionId
         ) {
-          this._log.warn(this.state._delayedChampionSwap, action, tradeId, requesterChampionId)
           this._sendCelebration(`Will ${action} trade in ${delayMs}ms`)
         }
 
@@ -765,7 +767,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             tradeId: tradeId,
             delayMs,
             finishAt: Date.now() + delayMs,
-            startAt: Date.now(),
+            startAt: this.state.delayedChampionSwap?.startAt ?? Date.now(),
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
               () =>
@@ -779,7 +781,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             tradeId: tradeId,
             delayMs,
             finishAt: Date.now() + delayMs,
-            startAt: Date.now(),
+            startAt: this.state.delayedChampionSwap?.startAt ?? Date.now(),
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
               () =>
@@ -803,16 +805,34 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     // )
 
     // this._mobx.reaction(
-    //   () => this.state.delayedPick,
-    //   (delayedPick) => {
-    //     this._log.warn(`delayedPick: ${!!delayedPick}`)
-    //   }
+    //   () => benchSwapContext.get(),
+    //   (ctx) => {
+    //     this._log.warn(`benchSwapContext:`, ctx)
+    //   },
+    //   { fireImmediately: true }
     // )
 
     // this._mobx.reaction(
     //   () => this.state.activeGroupConfig,
-    //   (move) => {
-    //     this._log.warn(`activeGroupConfig: ${move}`)
+    //   (groups) => {
+    //     this._log.warn(
+    //       `activeGroupConfig`,
+    //       groups?.pick.champions.default.map((c) => this._lc.data.gameData.championName(c))
+    //     )
+    //   },
+    //   { fireImmediately: true }
+    // )
+
+    // this._mobx.reaction(
+    //   () => this.state.expectedSwaps,
+    //   (swaps) => {
+    //     this._log.warn(
+    //       `expectedSwaps`,
+    //       swaps?.map((c) => ({
+    //         name: this._lc.data.gameData.championName(c.id),
+    //         status: c.status
+    //       }))
+    //     )
     //   },
     //   { fireImmediately: true }
     // )
