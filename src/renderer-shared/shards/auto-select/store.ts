@@ -102,6 +102,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
   const expectedSwaps = shallowRef<ExpectedChampionStatus[] | null>(null)
 
   const temporarilyDisabled = shallowRef(false)
+  const activeGroupConfigId = shallowRef<string | null>(null)
 
   return {
     settings,
@@ -116,6 +117,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     expectedBans,
     expectedSwaps,
 
-    temporarilyDisabled
+    temporarilyDisabled,
+    activeGroupConfigId
   }
 })

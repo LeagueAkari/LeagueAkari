@@ -858,6 +858,7 @@ ClientConnection:
   quitClient: 退出客户端进程
   disconnect: 断开
   more: 更多
+  playAgain: 回到房间
 
 OrderedChampionList:
   searchForChampion: 搜索英雄

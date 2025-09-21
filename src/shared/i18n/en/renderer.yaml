@@ -857,6 +857,7 @@ ClientConnection:
   quitClient: Quit Client Process
   disconnect: Disconnect
   more: More
+  playAgain: Play Again
 
 OrderedChampionList:
   searchForChampion: Search for Champion

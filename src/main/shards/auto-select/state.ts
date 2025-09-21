@@ -324,8 +324,13 @@ export class AutoSelectState {
     return this._lcData.gameflow.session?.gameData.queue.type || null
   }
 
-  get currentChampionId() {
-    return this._lcData.champSelect.currentChampion
+  get currentSessionChampionId() {
+    if (!this.csSession) {
+      return null
+    }
+
+    const session = this.csSession
+    return session.myTeam.find((m) => m.cellId === session.localPlayerCellId)?.championId || null
   }
 
   /**
@@ -373,6 +378,10 @@ export class AutoSelectState {
       pick: this._settings.pickConfig[winner] || this._settings.createNewEmptyPickConfig(),
       ban: this._settings.banConfig[winner] || this._settings.createNewEmptyBanConfig
     }
+  }
+
+  get activeGroupConfigId() {
+    return this.activeGroupConfig?.groupId || null
   }
 
   /**
@@ -427,7 +436,7 @@ export class AutoSelectState {
     // 但在 subset pick 阶段，只能 swap 位于自己 subset 中的英雄
     // 只有自己有英雄的时候才能 swap，毕竟是 swap
     // 如果是抽卡模式的选用，则区分仅仅可 swap subset 中的情况
-    if (this.benchEnabled && this.currentChampionId) {
+    if (this.benchEnabled && this.currentSessionChampionId) {
       if (this.allowSubsetChampionPicks && this.timer?.phase === 'BAN_PICK') {
         return 'subset-bench-swap'
       }

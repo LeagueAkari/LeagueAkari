@@ -80,7 +80,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'delayedChampionSwap',
       'expectedPicks',
       'expectedBans',
-      'expectedSwaps'
+      'expectedSwaps',
+      'activeGroupConfigId'
     ])
 
     await this._fillAutoBanPickConfig()
@@ -539,7 +540,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      if (!pickConfig.pick.enabled || pickConfig.temporarilyDisabled) {
+      if (
+        !pickConfig.pick.enabled ||
+        pickConfig.temporarilyDisabled ||
+        !this.state.currentSessionChampionId
+      ) {
         return null
       }
 
@@ -555,7 +560,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         return null
       }
 
-      const currentChampionIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
+      const currentChampionIndex = expected.findIndex(
+        (c) => c.id === this.state.currentSessionChampionId
+      )
 
       // 当手上没有任何合适的英雄，直接锁定第一个预选
       // 对于手上存在合适的英雄，根据情况是否选择更换
@@ -693,7 +700,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           }
         }
 
-        const handIndex = expected.findIndex((c) => c.id === this.state.currentChampionId)
+        const handIndex = expected.findIndex((c) => c.id === this.state.currentSessionChampionId)
 
         if (
           handIndex === -1 ||

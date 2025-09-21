@@ -1,12 +1,7 @@
 <template>
   <NCard size="small" v-if="hasDelayedItems">
     <div v-if="as2.delayedPick" class="delayed-item">
-      <NProgress
-        class="delayed-item__progress"
-        :percentage="
-          (1 - as2.delayedPick.delayMs / (as2.delayedPick.finishAt - as2.delayedPick.startAt)) * 100
-        "
-      />
+      <div class="delayed-item__title">[自动选择]</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
           <span class="delayed-item__action">[将自动选择]</span>
@@ -15,39 +10,93 @@
               class="delayed-item__champion-icon"
               :champion-id="as2.delayedPick.championId"
             />
-            <span class="delayed-item__champion-name">{{
-              championName(as2.delayedPick.championId)
-            }}</span>
+            <div class="delayed-item__champion-name">
+              {{ championName(as2.delayedPick.championId) }}
+            </div>
+            <div class="delayed-item__delay">{{ formatMsToSeconds(pickCountdown) }}s</div>
           </div>
         </div>
-        <div class="delayed-item__delay">{{ pickCountdown }}s</div>
       </div>
-    </div>
-    <div v-if="as2.delayedBenchSwap" class="delayed-item">
       <NProgress
         class="delayed-item__progress"
-        :percentage="
-          (1 -
-            as2.delayedBenchSwap.delayMs /
-              (as2.delayedBenchSwap.finishAt - as2.delayedBenchSwap.startAt)) *
-          100
-        "
+        :height="2"
+        :show-indicator="false"
+        :percentage="pickProgress * 100"
       />
+    </div>
+    <div v-if="as2.delayedBan" class="delayed-item">
+      <div class="delayed-item__title">[自动禁用]</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
-          <span class="delayed-item__action">[将自动选择]</span>
+          <span class="delayed-item__action">[将自动禁用]</span>
+          <div class="delayed-item__champion">
+            <ChampionIcon
+              class="delayed-item__champion-icon"
+              :champion-id="as2.delayedBan.championId"
+            />
+            <div class="delayed-item__champion-name">
+              {{ championName(as2.delayedBan.championId) }}
+            </div>
+            <div class="delayed-item__delay">{{ formatMsToSeconds(banCountdown) }}s</div>
+          </div>
+        </div>
+      </div>
+      <NProgress
+        class="delayed-item__progress"
+        :height="2"
+        :show-indicator="false"
+        :percentage="banProgress * 100"
+      />
+    </div>
+    <div v-if="as2.delayedBenchSwap" class="delayed-item">
+      <div class="delayed-item__title">[自动交换]</div>
+      <div class="delayed-item__detail">
+        <div class="delayed-item__label">
+          <span class="delayed-item__action">[将自动交换]</span>
           <div class="delayed-item__champion">
             <ChampionIcon
               class="delayed-item__champion-icon"
               :champion-id="as2.delayedBenchSwap.championId"
             />
-            <span class="delayed-item__champion-name">{{
-              championName(as2.delayedBenchSwap.championId)
-            }}</span>
+            <div class="delayed-item__champion-name">
+              {{ championName(as2.delayedBenchSwap.championId) }}
+            </div>
+            <div class="delayed-item__delay">{{ formatMsToSeconds(benchSwapCountdown) }}s</div>
           </div>
         </div>
-        <div class="delayed-item__delay">{{ benchSwapCountdown }}s</div>
       </div>
+      <NProgress
+        :height="2"
+        :border-radius="0"
+        class="delayed-item__progress"
+        :show-indicator="false"
+        :percentage="benchSwapProgress * 100"
+      />
+    </div>
+    <div v-if="as2.delayedChampionSwap" class="delayed-item">
+      <div class="delayed-item__title">[自动 trade]</div>
+      <div class="delayed-item__detail">
+        <div class="delayed-item__label">
+          <span class="delayed-item__action">[将自动 trade]</span>
+          <div class="delayed-item__champion">
+            <ChampionIcon
+              class="delayed-item__champion-icon"
+              :champion-id="as2.delayedChampionSwap.requesterChampionId"
+            />
+            <div class="delayed-item__champion-name">
+              {{ championName(as2.delayedChampionSwap.requesterChampionId) }}
+            </div>
+            <div class="delayed-item__delay">{{ formatMsToSeconds(championSwapCountdown) }}s</div>
+          </div>
+        </div>
+      </div>
+      <NProgress
+        :height="2"
+        :border-radius="0"
+        class="delayed-item__progress"
+        :show-indicator="false"
+        :percentage="championSwapProgress * 100"
+      />
     </div>
   </NCard>
 </template>
@@ -55,12 +104,11 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
-import { useCountdownSeconds } from '@renderer-shared/compositions/useCountdown'
+import { useTimeLeft } from '@renderer-shared/compositions/useTimeLeft'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { Action } from '@shared/types/league-client/champ-select'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NProgress, NTimeline, NTimelineItem } from 'naive-ui'
+import { NCard, NProgress } from 'naive-ui'
 import { computed } from 'vue'
 
 const { t } = useTranslation()
@@ -70,33 +118,52 @@ const as2 = useAutoSelectStore()
 
 const { name: championName } = useChampionInfo()
 
-const pickCountdown = useCountdownSeconds(
-  () => Boolean(as2.delayedPick),
-  () => as2.delayedPick?.finishAt ?? 0
+const { timeLeft: pickCountdown, progress: pickProgress } = useTimeLeft(
+  () => as2.delayedPick?.finishAt ?? 0,
+  () => as2.delayedPick?.startAt ?? 0
 )
 
-const benchSwapCountdown = useCountdownSeconds(
-  () => Boolean(as2.delayedBenchSwap),
-  () => as2.delayedBenchSwap?.finishAt ?? 0
+const { timeLeft: banCountdown, progress: banProgress } = useTimeLeft(
+  () => as2.delayedBan?.finishAt ?? 0,
+  () => as2.delayedBan?.startAt ?? 0
+)
+
+const { timeLeft: benchSwapCountdown, progress: benchSwapProgress } = useTimeLeft(
+  () => as2.delayedBenchSwap?.finishAt ?? 0,
+  () => as2.delayedBenchSwap?.startAt ?? 0
+)
+
+const { timeLeft: championSwapCountdown, progress: championSwapProgress } = useTimeLeft(
+  () => as2.delayedChampionSwap?.finishAt ?? 0,
+  () => as2.delayedChampionSwap?.startAt ?? 0
 )
 
 const hasDelayedItems = computed(() =>
-  Boolean(as2.delayedPick || as2.delayedBan || as2.delayedBenchSwap || as2.delayedChampionSwap)
+  Boolean(
+    true || as2.delayedPick || as2.delayedBan || as2.delayedBenchSwap || as2.delayedChampionSwap
+  )
 )
+
+const formatMsToSeconds = (ms: number) => {
+  const seconds = (ms / 1000).toFixed(1)
+  return seconds
+}
 </script>
 
 <style scoped>
 .delayed-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 4px;
 
   &:not(:last-child) {
     margin-bottom: 4px;
   }
 
-  .delayed-item__progress {
-    width: 48px;
+  .delayed-item__title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000a;
   }
 
   .delayed-item__detail {
@@ -111,12 +178,13 @@ const hasDelayedItems = computed(() =>
   }
 
   .delayed-item__action {
+    font-size: 12px;
     color: #000a;
   }
 
   .delayed-item__champion-icon {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
   }
 
   .delayed-item__champion-name {
@@ -131,6 +199,10 @@ const hasDelayedItems = computed(() =>
   }
 
   [data-theme='dark'] & {
+    .delayed-item__title {
+      color: #fff;
+    }
+
     .delayed-item__action {
       color: #fff;
     }
@@ -140,7 +212,7 @@ const hasDelayedItems = computed(() =>
     }
 
     .delayed-item__delay {
-      color: #fffa;
+      color: #fff;
     }
   }
 }

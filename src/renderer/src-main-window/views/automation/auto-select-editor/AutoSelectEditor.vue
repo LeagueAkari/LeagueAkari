@@ -460,6 +460,16 @@ watch(
   },
   { immediate: true }
 )
+
+watch(
+  () => as2.activeGroupConfigId,
+  (value) => {
+    if (value) {
+      currentGroupId.value = value
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>

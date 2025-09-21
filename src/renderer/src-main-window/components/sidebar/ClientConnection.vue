@@ -33,6 +33,14 @@
               </template>
               {{ $t('ClientConnection.restartUx') }}
             </NButton>
+            <NButton size="tiny" secondary @click="handlePlayAgain" v-if="isInEndgamePhase">
+              <template #icon>
+                <NIcon>
+                  <RefreshIcon />
+                </NIcon>
+              </template>
+              {{ $t('ClientConnection.playAgain') }}
+            </NButton>
             <NButton size="tiny" secondary @click="() => lc.disconnect()">
               <template #icon>
                 <NIcon>
@@ -285,6 +293,22 @@ const handleActionSelect = async (key: string) => {
     case 'quit-client':
       await handleQuitClient()
       break
+  }
+}
+
+const isInEndgamePhase = computed(() => {
+  return (
+    lcs.gameflow.phase === 'WaitingForStats' ||
+    lcs.gameflow.phase === 'PreEndOfGame' ||
+    lcs.gameflow.phase === 'EndOfGame'
+  )
+})
+
+const handlePlayAgain = async () => {
+  try {
+    await lc.api.lobby.playAgain()
+  } catch (error) {
+    console.error(error)
   }
 }
 </script>
