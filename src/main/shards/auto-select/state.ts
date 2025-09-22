@@ -341,12 +341,14 @@ export class AutoSelectState {
       return
     }
 
-    const suitableGameModeGroups = this.groups.filter((g) => g.targetGameMode === this.gameMode)
+    const firstGroup = this.groups.find((g) =>
+      g.targetGameModes.some((gm) => {
+        return gm.gameMode === this.gameMode && gm.queueTypes.includes(this.queueType || '*')
+      })
+    )
 
-    if (suitableGameModeGroups.length === 0) {
-      return null
-    } else if (suitableGameModeGroups.length === 1) {
-      const thatGroup = suitableGameModeGroups[0].groupId
+    if (firstGroup) {
+      const thatGroup = firstGroup.groupId
 
       return {
         groupId: thatGroup,
@@ -354,29 +356,8 @@ export class AutoSelectState {
         pick: this._settings.pickConfig[thatGroup] || this._settings.createNewEmptyPickConfig(),
         ban: this._settings.banConfig[thatGroup] || this._settings.createNewEmptyBanConfig()
       }
-    }
-
-    // 为了未来可用性 (虽然... 可能不会用到)
-    const scores: Record<string, number> = {}
-    for (const group of suitableGameModeGroups) {
-      if (!scores[group.groupId]) {
-        scores[group.groupId] = 0
-      }
-
-      if (group.targetQueueTypes === null) {
-        scores[group.groupId] += 10
-      } else if (group.targetQueueTypes.includes(this.queueType)) {
-        scores[group.groupId] += 100
-      }
-    }
-
-    const winner = Object.entries(scores).toSorted(([_cia, a], [_llo, b]) => b - a)[0][0]
-
-    return {
-      groupId: winner,
-      temporarilyDisabled: this.temporarilyDisabled,
-      pick: this._settings.pickConfig[winner] || this._settings.createNewEmptyPickConfig(),
-      ban: this._settings.banConfig[winner] || this._settings.createNewEmptyBanConfig
+    } else {
+      return null
     }
   }
 

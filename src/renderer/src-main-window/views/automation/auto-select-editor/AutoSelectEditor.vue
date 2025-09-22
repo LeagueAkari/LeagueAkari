@@ -23,7 +23,10 @@
             :key="group.groupId"
             @click="currentGroupId = group.groupId"
           >
-            <LcuImage class="as-editor__group-icon" :src="gameModeIconUri[group.targetGameMode]" />
+            <LcuImage
+              class="as-editor__group-icon"
+              :src="gameModeIconUri[group.targetGameModes[0].gameMode]"
+            />
             <span class="as-editor__group-label">{{ group.groupId }}</span>
             <div class="as-editor__group-enabled-icon-wrapper">
               <NIcon

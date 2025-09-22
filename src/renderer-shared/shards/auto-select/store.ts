@@ -42,8 +42,10 @@ export interface BanChampionConfig {
 // copied from main shard
 export interface AutoSelectGroup {
   groupId: string
-  targetGameMode: string
-  targetQueueTypes: string[] | null
+  targetGameModes: {
+    gameMode: string
+    queueTypes: string[]
+  }[]
   positions: string[]
   additionalPicks: number[]
   additionalBans: number[]
