@@ -27,21 +27,18 @@ auto-gameflow-main:
 
 auto-select-main:
   error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}
-  error-pre-pick: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
+  error-itent: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
   error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
-  cancel-grab: 已取消选择 {{champion}}
-  grab-soon: 即将在 {{seconds}} 秒后选择 {{champion}}
-  ignore-trade: 不自动处理交换请求 ({{from}} -> {{to}})
-  ignore-trade-owner: 不自动处理交换请求，对方为物主 ({{from}} -> {{to}})
-  auto-pick-normal-mode: 普通模式自动选择
-  auto-grab-bench-mode: 随机模式自动选择
-  auto-ban: 自动英雄禁用
-  enabled: 已启用
-  delayed-lock-in: 将在 {{seconds}} 秒后锁定英雄 {{champion}}
-  delayed-ban: 将在 {{seconds}} 秒后禁用英雄 {{champion}}
-  cancel-delayed-lock-in: 已取消锁定英雄 {{champion}}
-  cancel-delayed-ban: 已取消禁用英雄 {{champion}}
+  cancel-bench-swap: 已取消选择 {{champion}}
+  bench-swap: 即将在 {{seconds}} 秒后交换 {{champion}}
+  accept-champion-swap: 将在 {{seconds}} 秒后接受交换请求 {{champion}}
+  decline-champion-swap: 将在 {{seconds}} 秒后拒绝交换请求 {{champion}}
+  show-ban: 将在 {{seconds}} 秒后预禁用 {{champion}}
+  complete-ban: 将在 {{seconds}} 秒后完成禁用 {{champion}}
+  show-pick: 将在 {{seconds}} 秒后亮出 {{champion}}
+  complete-pick: 将在 {{seconds}} 秒后锁定 {{champion}}
+  intent-pick: 将在 {{seconds}} 秒后预选 {{champion}}
 
 self-update-main:
   title: 自动更新

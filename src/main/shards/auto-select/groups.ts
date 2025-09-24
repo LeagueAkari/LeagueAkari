@@ -4,6 +4,9 @@
 export const GROUPS = [
   {
     groupId: 'ranked', // 独一无二的标注
+    // 匹配自定义对局
+    isCumstom: false,
+    // 适用的游戏模式，* 表示所有
     targetGameModes: [
       {
         gameMode: 'CLASSIC',
@@ -18,6 +21,7 @@ export const GROUPS = [
   },
   {
     groupId: 'normal',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'CLASSIC',
@@ -32,6 +36,7 @@ export const GROUPS = [
   },
   {
     groupId: 'aram',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'ARAM',
@@ -46,6 +51,7 @@ export const GROUPS = [
   },
   {
     groupId: 'cherry',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'CHERRY',
@@ -60,6 +66,7 @@ export const GROUPS = [
   },
   {
     groupId: 'urf',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'URF',
@@ -74,6 +81,7 @@ export const GROUPS = [
   },
   {
     groupId: 'oneforall',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'ONEFORALL',
@@ -88,6 +96,7 @@ export const GROUPS = [
   },
   {
     groupId: 'ultbook',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'ULTBOOK',
@@ -102,6 +111,7 @@ export const GROUPS = [
   },
   {
     groupId: 'bot',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'SWIFTPLAY',
@@ -116,6 +126,7 @@ export const GROUPS = [
   },
   {
     groupId: 'custom',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'CLASSIC',
@@ -129,25 +140,24 @@ export const GROUPS = [
     excludedBans: []
   },
   {
-    groupId: 'practice',
-    targetGameModes: [
-      {
-        gameMode: 'PRACTICETOOL',
-        queueTypes: ['PRACTICE_GAME']
-      }
-    ],
-    positions: ['default'],
-    additionalPicks: [],
-    additionalBans: [],
-    excludedPicks: [-1],
-    excludedBans: []
-  },
-  {
     groupId: 'ruby',
+    isCumstom: false,
     targetGameModes: [
       {
         gameMode: 'RUBY',
-        queueTypes: ['*']
+        queueTypes: ['NIGHTMARE_BOT']
+      },
+      {
+        gameMode: 'RUBY_TRIAL_1',
+        queueTypes: ['NIGHTMARE_BOT']
+      },
+      {
+        gameMode: 'RUBY_TRIAL_2',
+        queueTypes: ['NIGHTMARE_BOT']
+      },
+      {
+        gameMode: 'RUBY_TRIAL_3',
+        queueTypes: ['NIGHTMARE_BOT']
       }
     ],
     positions: ['default'],

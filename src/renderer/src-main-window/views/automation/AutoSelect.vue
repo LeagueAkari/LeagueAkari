@@ -4,7 +4,7 @@
       <div class="inner-wrapper">
         <NCard size="small">
           <template #header>
-            <span class="card-header-title">[自动英雄选择与禁用]</span>
+            <span class="card-header-title">{{ $t('AutoSelect.title') }}</span>
           </template>
           <AutoSelectEditor class="auto-select-editor" />
         </NCard>

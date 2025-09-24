@@ -722,92 +722,103 @@ AutoGameflow:
     description: 当游戏状态为离开时，将拒绝所有房间邀请
 
 AutoSelect:
-  normalModeTitle: 自动英雄选择 · 普通模式
-  benchModeTitle: 自动英雄选择 · 随机模式
-  banTitle: 自动禁用
+  title: 自动英雄选择和禁用
 
-  normalModeEnabled:
-    label: 开启
-    description: 在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式
+  temporarilyDisabled:
+    label: 临时禁用
+    button: 重新启用
+    description: 在本次英雄选择中，相关功能已被临时禁用。
 
-  showIntent:
-    label: 提前预选
-    description: 预选即将自动选用的英雄
+  groupTitle: 生效模式
+  groupEmpty: 暂无分组
 
-  selectTeammateIntendedChampion:
-    label: 无视队友预选
-    description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
+  groups:
+    ranked: 排位模式
+    normal: 普通模式
+    aram: 极地大乱斗
+    cherry: 斗魂竞技场
+    urf: 无限火力
+    oneforall: 克隆模式
+    ultbook: 终极魔典
+    bot: 人机模式
+    custom: 自定义对局
+    ruby: 末日人工智能
 
-  pickStrategy:
-    label: 锁定策略
-    description: 立即锁定或只是亮出
-    options:
-      lock-in: 立即锁定
-      show: 仅亮出
-      show-and-delay-lock-in: 亮出后延迟锁定
+  pick:
+    title: 英雄选择
 
-  lockInDelaySeconds:
-    label: 自动锁定延迟 (s)
-    description: 在亮出英雄后，执行锁定操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
+    enabled:
+      label: 启用
+      description: 启用该模式的自动选择
 
-  expectedChampions:
-    label: 意向英雄
-    button: 配置
-    description: |
-      <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
-      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
-      <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+    expectedChampions:
+      label: 意向英雄
+      description: 自动选择将选择这些英雄，优先选择列表靠前的英雄
+      fragment1: 当分配到
+      fragment2: 位置时
 
-  benchModeEnabled:
-    label: 开启
-    description: 在随机英雄的模式中启用。如极地大乱斗等随机英雄的模式
+    showIntent:
+      label: 提前预选
+      description: 提前预选目标英雄
 
-  grabDelaySeconds:
-    label: 选用最低累积时间 (s)
-    description:
-      part1: 目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
-      part2: 当英雄出现在英雄选择台上时，会针对该英雄进行计时。仅当其在英雄选择台上的累计时间满足设定值时，自动交换才会执行，避免过早选择英雄，即 “秒抢”
+    ignoreIntent:
+      label: 无视队友预选
+      description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
 
-  benchSelectFirstAvailableChampion:
-    label: 优先选择首位
-    description: 开启此项后，将始终选用期望列表中第一个可用的英雄
+    strategy:
+      label: 锁定策略
+      description: 按照预设的策略执行自动选择流程
+      options:
+        just-show: 仅亮出
+        show-and-lock-in: 亮出后延迟锁定
 
-  benchHandleTradeEnabled:
-    label: 自动处理交换请求
-    description: |
-      <div>启用后，将接管即将到来的英雄交换请求</div>
-      <div>若已经启用“优先选择首位”，则接受优先级位更高的期望英雄，拒绝其他英雄</div>
-      <div>未启用“优先选择首位”同时未持有期望英雄时，若目标英雄为期望英雄，则接受</div>
-      <div>未启用“优先选择首位”同时持有期望英雄时，若目标英雄为期望英雄，则忽略</div>
+    delaySeconds:
+      label: 延时 (s)
+      description: 自动选择相关功能将根据预设的延时规划时间，包括预选、亮出、锁定或处理交换等。每个阶段都不会超过系统限时
 
-  benchHandleTradeIgnoreChampionOwner:
-    label: 忽略英雄物主
-    description: |
-      <div>处理英雄交换请求时，将考虑英雄所有者</div>
-      <div>若对方为该英雄的所有者，则不接管交换请求</div>
-      <div style="font-weight:bold">注意：无法处理追踪中途加入的英雄选择阶段</div>
+    benchMode:
+      title: 英雄备战席模式特定 (如果有)
+      tooltip: 如极地大乱斗、无限乱斗等拥有英雄备战席的模式
 
-  benchExpectedChampions:
-    label: 期望英雄
+    benchSwapAccumulatedDelaySeconds:
+      label: 选用最低累积时间 (s)
+      description: 仅当目标英雄出现在备战席上的累计时长超过此值时，才会执行交换操作
 
-  banEnabled:
-    label: 开启
-    description: 自动执行英雄的禁用操作
+    benchSelectFirstAvailableChampion:
+      label: 优先选择首位
+      description: 在目标英雄存在于备战席时，优先选择列表靠前的英雄
 
-  banDelaySeconds:
-    label: 自动禁用延时 (s)
-    description: 执行禁用操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
+    benchHandleTradeEnabled:
+      label: 自动处理交换请求
+      description: 当收到交换请求时，若满足预期英雄设置，则接受交换请求。否则会拒绝交换请求
 
-  banTeammateIntendedChampion:
-    label: 无视队友预选
-    description: 开启后将不会考虑队友的预选英雄
+  ban:
+    title: 英雄禁用
 
-  bannedChampions:
-    label: 禁用英雄
-    description: |
-      <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
-      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
-      <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
+    enabled:
+      label: 启用
+      description: 启用该模式的自动禁用
+
+    expectedChampions:
+      label: 意向英雄
+      description: 自动禁用将选择这些英雄，优先选择列表靠前的英雄
+      fragment1: 当分配到
+      fragment2: 位置时
+
+    ignoreIntent:
+      label: 无视队友预选
+      description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
+
+    strategy:
+      label: 锁定策略
+      description: 按照预设的策略执行自动禁用流程
+      options:
+        just-show: 仅亮出
+        show-and-lock-in: 亮出后延迟锁定
+
+    delaySeconds:
+      label: 延时 (s)
+      description: 自动禁用相关功能将根据预设的延时规划时间，包括亮出、锁定或处理交换等。每个阶段都不会超过系统限时
 
 AutoMisc:
   autoReply:
@@ -2235,6 +2246,24 @@ RemoteTemplatesModal:
   loadTemplatesFailed: 加载远程模板失败
   noTemplates: 暂无模板
   noTemplateDescription: 暂无描述
+
+AutomationPlan:
+  autoPick:
+    title: 自动选择
+    willPick: 将自动选择
+
+  autoBan:
+    title: 自动禁用
+    willBan: 将自动禁用
+
+  autoBenchSwap:
+    title: 自动交换
+    willSwap: 将自动交换
+
+  autoChampionSwap:
+    title: 自动交换
+    willAccept: 将自动接受交换
+    willDecline: 将自动拒绝交换
 
 simple-notifications-renderer:
   newReleaseHints:

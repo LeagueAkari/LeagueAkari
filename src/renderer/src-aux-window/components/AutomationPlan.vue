@@ -1,10 +1,10 @@
 <template>
   <NCard size="small" v-if="hasDelayedItems">
     <div v-if="as2.delayedPick" class="delayed-item">
-      <div class="delayed-item__title">[自动选择]</div>
+      <div class="delayed-item__title">{{ t('AutomationPlan.autoPick.title') }}</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
-          <span class="delayed-item__action">[将自动选择]</span>
+          <span class="delayed-item__action">{{ t('AutomationPlan.autoPick.willPick') }}</span>
           <div class="delayed-item__champion">
             <ChampionIcon
               class="delayed-item__champion-icon"
@@ -25,10 +25,10 @@
       />
     </div>
     <div v-if="as2.delayedBan" class="delayed-item">
-      <div class="delayed-item__title">[自动禁用]</div>
+      <div class="delayed-item__title">{{ t('AutomationPlan.autoBan.title') }}</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
-          <span class="delayed-item__action">[将自动禁用]</span>
+          <span class="delayed-item__action">{{ t('AutomationPlan.autoBan.willBan') }}</span>
           <div class="delayed-item__champion">
             <ChampionIcon
               class="delayed-item__champion-icon"
@@ -49,10 +49,10 @@
       />
     </div>
     <div v-if="as2.delayedBenchSwap" class="delayed-item">
-      <div class="delayed-item__title">[自动交换]</div>
+      <div class="delayed-item__title">{{ t('AutomationPlan.autoBenchSwap.title') }}</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
-          <span class="delayed-item__action">[将自动交换]</span>
+          <span class="delayed-item__action">{{ t('AutomationPlan.autoBenchSwap.willSwap') }}</span>
           <div class="delayed-item__champion">
             <ChampionIcon
               class="delayed-item__champion-icon"
@@ -74,10 +74,12 @@
       />
     </div>
     <div v-if="as2.delayedChampionSwap" class="delayed-item">
-      <div class="delayed-item__title">[自动 trade]</div>
+      <div class="delayed-item__title">{{ t('AutomationPlan.autoChampionSwap.title') }}</div>
       <div class="delayed-item__detail">
         <div class="delayed-item__label">
-          <span class="delayed-item__action">[将自动 trade]</span>
+          <span class="delayed-item__action">{{
+            t('AutomationPlan.autoChampionSwap.willAccept')
+          }}</span>
           <div class="delayed-item__champion">
             <ChampionIcon
               class="delayed-item__champion-icon"
@@ -106,14 +108,12 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 import { useTimeLeft } from '@renderer-shared/compositions/useTimeLeft'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NProgress } from 'naive-ui'
 import { computed } from 'vue'
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
 
 const { name: championName } = useChampionInfo()
@@ -139,9 +139,7 @@ const { timeLeft: championSwapCountdown, progress: championSwapProgress } = useT
 )
 
 const hasDelayedItems = computed(() =>
-  Boolean(
-    true || as2.delayedPick || as2.delayedBan || as2.delayedBenchSwap || as2.delayedChampionSwap
-  )
+  Boolean(as2.delayedPick || as2.delayedBan || as2.delayedBenchSwap || as2.delayedChampionSwap)
 )
 
 const formatMsToSeconds = (ms: number) => {

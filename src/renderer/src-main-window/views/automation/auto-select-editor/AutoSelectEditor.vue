@@ -3,10 +3,10 @@
     <NCollapseTransition :show="as2.temporarilyDisabled" class="as-editor__temporary-disabled">
       <NAlert type="warning">
         <div class="as-editor__temporary-disabled-description">
-          [在本次英雄选择中，相关功能已被临时禁用。]
+          {{ t('AutoSelect.temporarilyDisabled.description') }}
         </div>
         <NButton size="small" type="primary" @click="as.setTemporarilyDisabled(false)">
-          重新启用
+          {{ t('AutoSelect.temporarilyDisabled.button') }}
         </NButton>
       </NAlert>
     </NCollapseTransition>
@@ -14,7 +14,7 @@
     <!-- 可选分组列表 -->
     <div class="as-editor__groups-container">
       <div class="as-editor__groups" v-if="as2.groups.length > 0">
-        <div class="as-editor__groups-title">[生效模式]</div>
+        <div class="as-editor__groups-title">{{ t('AutoSelect.groupTitle') }}</div>
         <div class="as-editor__groups-list">
           <div
             class="as-editor__group-item"
@@ -27,7 +27,9 @@
               class="as-editor__group-icon"
               :src="gameModeIconUri[group.targetGameModes[0].gameMode]"
             />
-            <span class="as-editor__group-label">{{ group.groupId }}</span>
+            <span class="as-editor__group-label">{{
+              t(`AutoSelect.groups.${group.groupId}`, { defaultValue: group.groupId })
+            }}</span>
             <div class="as-editor__group-enabled-icon-wrapper">
               <NIcon
                 class="as-editor__group-enabled-icon as-editor__group-enabled-icon--pick"
@@ -48,7 +50,7 @@
 
       <!-- 一般来说这里不会抵达 -->
       <div class="as-editor__empty-group" v-else>
-        <div class="as-editor__empty-group-title">[暂无分组]</div>
+        <div class="as-editor__empty-group-title">{{ t('AutoSelect.groupEmpty') }}</div>
       </div>
 
       <!-- 右侧配置区域 -->
@@ -60,11 +62,11 @@
         v-if="currentGroup && currentPickConfig"
         v-model:value="banPick"
       >
-        <NTabPane name="pick" tab="[英雄选择]">
+        <NTabPane name="pick" :tab="t('AutoSelect.pick.title')">
           <ControlItem
             class="control-item-margin"
-            :label="`[启用]`"
-            :label-description="`[启用该模式的自动选择]`"
+            :label="t('AutoSelect.pick.enabled.label')"
+            :label-description="t('AutoSelect.pick.enabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -76,8 +78,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[意向英雄]`"
-            :label-description="`[自动选择将选择这些英雄，优先选择列表靠前的英雄]`"
+            :label="t('AutoSelect.pick.expectedChampions.label')"
+            :label-description="t('AutoSelect.pick.expectedChampions.description')"
             :label-width="260"
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
@@ -91,7 +93,9 @@
                     <PositionIcon :position="position" class="as-editor__position-icon" />
                   </template>
                   <span
-                    >当分配到 <span style="font-weight: bold">{{ position }}</span> 位置时</span
+                    >{{ t('AutoSelect.pick.expectedChampions.fragment1') }}
+                    <span style="font-weight: bold">{{ position }}</span>
+                    {{ t('AutoSelect.pick.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>
                 <OrderedChampionList
@@ -127,8 +131,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[预选目标英雄]`"
-            :label-description="`[自动选择时，将提前预选目标英雄]`"
+            :label="t('AutoSelect.pick.showIntent.label')"
+            :label-description="t('AutoSelect.pick.showIntent.description')"
             :label-width="260"
           >
             <NSwitch
@@ -140,8 +144,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[无视队友预选]`"
-            :label-description="`[开启后，自动选择将不再考虑队友的预选英雄]`"
+            :label="t('AutoSelect.pick.ignoreIntent.label')"
+            :label-description="t('AutoSelect.pick.ignoreIntent.description')"
             :label-width="260"
           >
             <NSwitch
@@ -155,8 +159,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[锁定策略]`"
-            :label-description="`[按照预设的策略，锁定与亮出目标英雄]`"
+            :label="t('AutoSelect.pick.strategy.label')"
+            :label-description="t('AutoSelect.pick.strategy.description')"
             :label-width="260"
           >
             <NRadioGroup
@@ -165,16 +169,20 @@
               @update:value="(val) => as.setPickConfig(currentGroup!.groupId, { strategy: val })"
             >
               <NFlex vertical :size="2">
-                <NRadio value="just-show">仅亮出</NRadio>
-                <NRadio value="show-and-lock-in">亮出并锁定</NRadio>
+                <NRadio value="just-show">{{
+                  t('AutoSelect.pick.strategy.options.just-show')
+                }}</NRadio>
+                <NRadio value="show-and-lock-in">{{
+                  t('AutoSelect.pick.strategy.options.show-and-lock-in')
+                }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </ControlItem>
 
           <ControlItem
             class="control-item-margin"
-            :label="`延时 (s)`"
-            :label-description="`[自动选择将根据预设的延时等分时间，依次执行预选、亮出和选用锁定步骤。每个阶段都不会超过系统限时]`"
+            :label="t('AutoSelect.pick.delaySeconds.label')"
+            :label-description="t('AutoSelect.pick.delaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -190,15 +198,15 @@
           <div class="as-editor__bench-options-divider"></div>
           <TooltipWithIcon
             class="as-editor__subtitle"
-            tooltip="[如极地大乱斗、无限乱斗等拥有英雄备战席的模式]"
+            :tooltip="t('AutoSelect.pick.benchMode.tooltip')"
           >
-            <div>[英雄备战席选项]</div>
+            <div>{{ t('AutoSelect.pick.benchMode.title') }}</div>
           </TooltipWithIcon>
 
           <ControlItem
             class="control-item-margin"
-            :label="`备战席选用最低累积时间 (s)`"
-            :label-description="`[仅当目标英雄出现在备战席上的累计时长超过此值时，才会执行交换操作]`"
+            :label="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.label')"
+            :label-description="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -216,8 +224,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`优先选择首位`"
-            :label-description="`[在目标英雄存在于备战席时，优先选择列表靠前的英雄]`"
+            :label="t('AutoSelect.pick.benchSelectFirstAvailableChampion.label')"
+            :label-description="t('AutoSelect.pick.benchSelectFirstAvailableChampion.description')"
             :label-width="260"
           >
             <NSwitch
@@ -234,8 +242,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`处理交换请求`"
-            :label-description="`[当收到交换请求时，若满足预期英雄设置，则接受交换请求。否则会拒绝交换请求]`"
+            :label="t('AutoSelect.pick.benchHandleTradeEnabled.label')"
+            :label-description="t('AutoSelect.pick.benchHandleTradeEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -248,11 +256,11 @@
           </ControlItem>
         </NTabPane>
 
-        <NTabPane name="ban" tab="[英雄禁用]">
+        <NTabPane name="ban" :tab="t('AutoSelect.ban.title')">
           <ControlItem
             class="control-item-margin"
-            :label="`[启用]`"
-            :label-description="`[启用该模式的自动禁用]`"
+            :label="t('AutoSelect.ban.enabled.label')"
+            :label-description="t('AutoSelect.ban.enabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -264,8 +272,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[意向英雄]`"
-            :label-description="`[自动禁用将选择这些英雄，优先选择列表靠前的英雄。按照位置选择]`"
+            :label="t('AutoSelect.ban.expectedChampions.label')"
+            :label-description="t('AutoSelect.ban.expectedChampions.description')"
             :label-width="260"
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
@@ -279,11 +287,11 @@
                     <PositionIcon :position="position" class="as-editor__position-icon" />
                   </template>
                   <span
-                    >当分配到
+                    >{{ t('AutoSelect.ban.expectedChampions.fragment1') }}
                     <span style="font-weight: bold">{{
                       t(`positions.${position}`, { ns: 'common' })
                     }}</span>
-                    位置时</span
+                    {{ t('AutoSelect.ban.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>
                 <OrderedChampionList
@@ -319,8 +327,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[无视队友预选]`"
-            :label-description="`[开启后，自动禁用将不再考虑队友的预选英雄]`"
+            :label="t('AutoSelect.ban.ignoreIntent.label')"
+            :label-description="t('AutoSelect.ban.ignoreIntent.description')"
             :label-width="260"
           >
             <NSwitch
@@ -332,8 +340,8 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="`[锁定策略]`"
-            :label-description="`[按照预设的策略，锁定策略占位]`"
+            :label="t('AutoSelect.ban.strategy.label')"
+            :label-description="t('AutoSelect.ban.strategy.description')"
             :label-width="260"
           >
             <NRadioGroup
@@ -342,16 +350,20 @@
               @update:value="(val) => as.setBanConfig(currentGroup!.groupId, { strategy: val })"
             >
               <NFlex vertical :size="2">
-                <NRadio value="just-show">仅亮出</NRadio>
-                <NRadio value="show-and-lock-in">亮出并锁定</NRadio>
+                <NRadio value="just-show">{{
+                  t('AutoSelect.ban.strategy.options.just-show')
+                }}</NRadio>
+                <NRadio value="show-and-lock-in">{{
+                  t('AutoSelect.ban.strategy.options.show-and-lock-in')
+                }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </ControlItem>
 
           <ControlItem
             class="control-item-margin"
-            :label="`延时 (s)`"
-            :label-description="`[自动禁用将根据预设的延时等分时间，依次执行亮出和禁用锁定步骤。每个阶段都不会超过系统限时]`"
+            :label="t('AutoSelect.ban.delaySeconds.label')"
+            :label-description="t('AutoSelect.ban.delaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -368,7 +380,7 @@
 
       <!-- 一般来说这里不会抵达 -->
       <div class="as-editor__empty-selected-group" v-else>
-        <div class="as-editor__empty-selected-group-title">[暂无分组]</div>
+        <div class="as-editor__empty-selected-group-title">{{ t('AutoSelect.groupEmpty') }}</div>
       </div>
     </div>
   </div>
@@ -376,7 +388,6 @@
 
 <script lang="ts" setup>
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'

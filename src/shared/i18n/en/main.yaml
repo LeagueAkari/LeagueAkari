@@ -27,21 +27,18 @@ auto-gameflow-main:
 
 auto-select-main:
   error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'
-  error-pre-pick: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
+  error-itent: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
   error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
   error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
-  cancel-grab: Selection of {{champion}} has been canceled
-  grab-soon: Will swap {{champion}} in {{seconds}} seconds
-  ignore-trade: Trade request not auto-processed ({{from}} -> {{to}})
-  ignore-trade-owner: Trade request not auto-processed since the trader is the champion owner ({{from}} -> {{to}})
-  auto-pick-normal-mode: Auto-select in Normal Mode
-  auto-grab-bench-mode: Auto-select in Bench Mode
-  auto-ban: Auto Ban
-  enabled: Enabled
-  delayed-lock-in: Will lock in champion {{champion}} in {{seconds}} seconds
-  delayed-ban: Will ban champion {{champion}} in {{seconds}} seconds
-  cancel-delayed-lock-in: Lock-in of champion {{champion}} has been canceled
-  cancel-delayed-ban: Ban of champion {{champion}} has been canceled
+  cancel-bench-swap: Selection of {{champion}} has been canceled
+  bench-swap: Will swap {{champion}} in {{seconds}} seconds
+  accept-champion-swap: Will accept swap request for {{champion}} in {{seconds}} seconds
+  decline-champion-swap: Will decline swap request for {{champion}} in {{seconds}} seconds
+  show-ban: Will show ban {{champion}} in {{seconds}} seconds
+  complete-ban: Will complete ban {{champion}} in {{seconds}} seconds
+  show-pick: Will show pick {{champion}} in {{seconds}} seconds
+  complete-pick: Will complete pick {{champion}} in {{seconds}} seconds
+  intent-pick: Will intent pick {{champion}} in {{seconds}} seconds
 
 self-update-main:
   title: Self Update

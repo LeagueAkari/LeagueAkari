@@ -1,6 +1,5 @@
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { formatError } from '@shared/utils/errors'
 import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
 import { comparer, computed, observable, runInAction } from 'mobx'
@@ -220,17 +219,23 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     const ban = async (championId: number, actionId: number, completed: boolean) => {
       try {
-        this._log.info(`Banning ${this._debugChampionName(championId)} completed=${completed}`)
+        this._log.info(`Banning ${this._championNameWithId(championId)} completed=${completed}`)
 
         await this._lc.api.champSelect.action(actionId, {
           type: 'ban',
           championId,
           completed
         })
-      } catch (error) {
+      } catch (error: any) {
         this._log.warn(
-          `Failed to ban champion ${this._debugChampionName(championId)} completed=${completed}`,
+          `Failed to ban champion ${this._championNameWithId(championId)} completed=${completed}`,
           error
+        )
+        this._sendCelebration(
+          i18next.t('auto-select-main.error-ban', {
+            champion: this._championNameWithId(championId),
+            reason: error.message
+          })
         )
       }
     }
@@ -259,7 +264,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               clearTimeout(this.state._delayedBan.timerId)
               this.state.setDelayedBan(null)
               this._log.warn(
-                `Already picked, canceling delayed ban ${this._debugChampionName(expectedBan.id)}`
+                `Already picked, canceling delayed ban ${this._championNameWithId(expectedBan.id)}`
               )
             }
 
@@ -277,7 +282,15 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedBan.completed !== completed
         ) {
           this._sendCelebration(
-            `Updated, Ban (complete=${completed}) ${this._debugChampionName(expectedBan.id)} in ${delayMs}ms`
+            completed
+              ? i18next.t('auto-select-main.complete-ban', {
+                  seconds: (delayMs / 1e3).toFixed(1),
+                  champion: this._championNameWithId(expectedBan.id)
+                })
+              : i18next.t('auto-select-main.show-ban', {
+                  seconds: (delayMs / 1e3).toFixed(1),
+                  champion: this._championNameWithId(expectedBan.id)
+                })
           )
         }
 
@@ -361,27 +374,39 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
     const pick = async (championId: number, actionId: number, completed?: boolean) => {
       try {
-        this._log.info(`Picking ${this._debugChampionName(championId)} completed=${completed}`)
+        this._log.info(`Picking ${this._championNameWithId(championId)} completed=${completed}`)
 
         await this._lc.api.champSelect.action(actionId, {
           type: 'pick',
           championId,
           completed
         })
-      } catch (error) {
+      } catch (error: any) {
         this._log.warn(
-          `Failed to pick champion ${this._debugChampionName(championId)} completed=${completed}`,
+          `Failed to pick champion ${this._championNameWithId(championId)} completed=${completed}`,
           error
+        )
+        this._sendCelebration(
+          i18next.t('auto-select-main.error-pick', {
+            champion: this._championNameWithId(championId),
+            reason: error.message
+          })
         )
       }
     }
 
     const intent = async (championId: number, actionId: number) => {
       try {
-        this._log.info(`Intenting ${this._debugChampionName(championId)}`)
+        this._log.info(`Intenting ${this._championNameWithId(championId)}`)
         await this._lc.api.champSelect.action(actionId, { championId })
-      } catch (error) {
-        this._log.warn(`Failed to intent champion ${this._debugChampionName(championId)}`, error)
+      } catch (error: any) {
+        this._log.warn(`Failed to intent champion ${this._championNameWithId(championId)}`, error)
+        this._sendCelebration(
+          i18next.t('auto-select-main.error-intent', {
+            champion: this._championNameWithId(championId),
+            reason: error.message
+          })
+        )
       }
     }
 
@@ -412,7 +437,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               clearTimeout(this.state._delayedPick.timerId)
               this.state.setDelayedPick(null)
               this._log.warn(
-                `Already picked, canceling delayed pick ${this._debugChampionName(expectedPick.id)} move=${move}`
+                `Already picked, canceling delayed pick ${this._championNameWithId(expectedPick.id)} move=${move}`
               )
             }
 
@@ -447,9 +472,26 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedPick.championId !== expectedPick.id ||
           this.state._delayedPick.completed !== completed
         ) {
-          this._sendCelebration(
-            `Updated, Pick (complete=${completed}) ${this._debugChampionName(expectedPick.id)} in ${delayMs}ms move=${move}`
-          )
+          if (move === 'pick-intent') {
+            this._sendCelebration(
+              i18next.t('auto-select-main.intent-pick', {
+                seconds: (delayMs / 1e3).toFixed(1),
+                champion: this._championNameWithId(expectedPick.id)
+              })
+            )
+          } else {
+            this._sendCelebration(
+              completed
+                ? i18next.t('auto-select-main.complete-pick', {
+                    seconds: (delayMs / 1e3).toFixed(1),
+                    champion: this._championNameWithId(expectedPick.id)
+                  })
+                : i18next.t('auto-select-main.show-pick', {
+                    seconds: (delayMs / 1e3).toFixed(1),
+                    champion: this._championNameWithId(expectedPick.id)
+                  })
+            )
+          }
         }
 
         if (move === 'pick-intent') {
@@ -622,7 +664,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
 
         if (!this.state._delayedBenchSwap || id !== this.state._delayedBenchSwap.championId) {
-          this._sendCelebration(`Will swap ${this._debugChampionName(id)} in ${delayMs}ms`)
+          this._sendCelebration(
+            i18next.t('auto-select-main.bench-swap', {
+              seconds: (delayMs / 1e3).toFixed(1),
+              champion: this._championNameWithId(id)
+            })
+          )
         }
 
         this.state.setDelayedBenchSwap({
@@ -765,7 +812,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedChampionSwap.tradeId !== tradeId ||
           this.state._delayedChampionSwap.requesterChampionId !== requesterChampionId
         ) {
-          this._sendCelebration(`Will ${action} trade in ${delayMs}ms`)
+          this._sendCelebration(
+            i18next.t(`auto-select-main.${action}-champion-swap`, {
+              seconds: (delayMs / 1e3).toFixed(1),
+              champion: this._championNameWithId(requesterChampionId)
+            })
+          )
         }
 
         if (action === 'accept') {
@@ -819,16 +871,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     //   { fireImmediately: true }
     // )
 
-    // this._mobx.reaction(
-    //   () => this.state.activeGroupConfig,
-    //   (groups) => {
-    //     this._log.warn(
-    //       `activeGroupConfig`,
-    //       groups?.pick.champions.default.map((c) => this._lc.data.gameData.championName(c))
-    //     )
-    //   },
-    //   { fireImmediately: true }
-    // )
+    this._mobx.reaction(
+      () => this.state.activeGroupConfig,
+      (groups) => {
+        this._log.warn(`activeGroupConfig`, groups)
+      },
+      { fireImmediately: true }
+    )
 
     // this._mobx.reaction(
     //   () => this.state.expectedSwaps,
@@ -845,7 +894,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     // )
   }
 
-  private _debugChampionName(id: number) {
+  private _championNameWithId(id: number) {
     return `${this._lc.data.gameData.championName(id)} (${id})`
   }
 

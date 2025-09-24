@@ -341,11 +341,17 @@ export class AutoSelectState {
       return
     }
 
-    const firstGroup = this.groups.find((g) =>
-      g.targetGameModes.some((gm) => {
-        return gm.gameMode === this.gameMode && gm.queueTypes.includes(this.queueType || '*')
-      })
-    )
+    const firstGroup = this.groups.find((g) => {
+      return (
+        g.isCumstom === this.isCustomGame &&
+        g.targetGameModes.some((gm) => {
+          return (
+            gm.gameMode === this.gameMode! &&
+            gm.queueTypes.some((qt) => qt === '*' || qt === this.queueType!)
+          )
+        })
+      )
+    })
 
     if (firstGroup) {
       const thatGroup = firstGroup.groupId
@@ -506,7 +512,10 @@ export class AutoSelectState {
     const pick = config.pick.champions[this.assignedPosition || 'default'] || []
 
     return pick.map((c) => {
-      if (!this.benchChampions.some((bc) => bc.championId === c)) {
+      if (
+        !this.benchChampions.some((bc) => bc.championId === c) ||
+        !this.currentPickableChampionIds.has(c)
+      ) {
         return { id: c, status: 'unswappable' }
       }
 
