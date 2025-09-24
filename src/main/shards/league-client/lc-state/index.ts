@@ -1007,7 +1007,8 @@ export class LeagueClientData {
       'perkstyles',
       'queues',
       'summonerSpells',
-      'augments'
+      'augments',
+      'gameModeMutators'
     ])
 
     const loadSummonerSpells = async () => {
@@ -1128,6 +1129,25 @@ export class LeagueClientData {
       }
     }
 
+    const loadGameModeMutators = async () => {
+      try {
+        const gameModeMutators = (await this._context.lc.api.gameData.getGameModeMutators()).data
+        this.gameData.setGameModeMutators(
+          gameModeMutators.reduce((prev, cur) => {
+            prev[cur.MapId] = cur
+            return prev
+          }, {})
+        )
+      } catch (error) {
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-game-mode-mutators'
+        )
+        this._context.log.warn(`Failed to get game mode mutators`, error)
+      }
+    }
+
     this._stateInitializer.register('game-data-summoner-spells', loadSummonerSpells, {
       group: 'game-data'
     })
@@ -1137,6 +1157,9 @@ export class LeagueClientData {
     this._stateInitializer.register('game-data-perkstyles', loadPerkstyles, { group: 'game-data' })
     this._stateInitializer.register('game-data-augments', loadAugments, { group: 'game-data' })
     this._stateInitializer.register('game-data-champions', loadChampions, { group: 'game-data' })
+    this._stateInitializer.register('game-data-game-mode-mutators', loadGameModeMutators, {
+      group: 'game-data'
+    })
 
     this._onLcuNotConnected(() => {
       // NO NEED TO CLEAR

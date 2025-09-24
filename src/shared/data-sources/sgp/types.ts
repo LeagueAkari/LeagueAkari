@@ -12,6 +12,7 @@ export interface SgpGameSummaryJsonLol {
   gameCreation: number
   gameDuration: number
   gameEndTimestamp: number
+  gameModeMutators: string[]
   gameId: number
   gameMode: string
   gameName: string

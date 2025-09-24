@@ -765,6 +765,21 @@ interface COMPANIONSLOT {
   itemId: number
 }
 
+export interface GameModeMutator {
+  MapId: number
+  Mutators: GameModeMutatorMutator[]
+  MapNameBase: string
+}
+
+interface GameModeMutatorMutator {
+  Mutator: GameModeMutatorMutatorMutator
+  MapNameOverride: string
+}
+
+interface GameModeMutatorMutatorMutator {
+  ExpandedMutator: string
+}
+
 /**
  * 曾经用于判断是否是无限狂潮 (Swarm) 模式的英雄
  * @param id

@@ -4,6 +4,7 @@ import {
   ChampionSimple,
   GameMap,
   GameMapAsset,
+  GameModeMutator,
   Item,
   Perk,
   Perkstyles,
@@ -30,6 +31,10 @@ export class GameDataHttpApi {
 
   getChampionSummary() {
     return this._http.get<ChampionSimple[]>('/lol-game-data/assets/v1/champion-summary.json')
+  }
+
+  getGameModeMutators() {
+    return this._http.get<GameModeMutator[]>('/lol-game-data/assets/v1/game-mode-mutators.json')
   }
 
   getMaps() {

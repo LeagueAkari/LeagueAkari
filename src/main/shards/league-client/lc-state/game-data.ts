@@ -1,6 +1,7 @@
 import {
   Augment,
   ChampionSimple,
+  GameModeMutator,
   Item,
   Perk,
   Perkstyles,
@@ -23,6 +24,7 @@ export class GameDataState {
   }
   augments: Record<number, Augment> = {}
   champions: Record<number, ChampionSimple> = {}
+  gameModeMutators: Record<number, GameModeMutator> = {}
 
   championName(id: number) {
     return this.champions[id]?.name || id.toString()
@@ -36,7 +38,8 @@ export class GameDataState {
       items: observable.ref,
       perks: observable.ref,
       perkstyles: observable.ref,
-      queues: observable.ref
+      queues: observable.ref,
+      gameModeMutators: observable.ref
     })
   }
 
@@ -69,5 +72,9 @@ export class GameDataState {
 
   setChampions(value: Record<number, ChampionSimple>) {
     this.champions = value
+  }
+
+  setGameModeMutators(value: Record<number, GameModeMutator>) {
+    this.gameModeMutators = value
   }
 }

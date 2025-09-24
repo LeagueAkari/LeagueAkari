@@ -7,6 +7,7 @@ import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
   Augment,
   ChampionSimple,
+  GameModeMutator,
   Item,
   Perk,
   Queue,
@@ -20,7 +21,7 @@ import { LoginQueueState } from '@shared/types/league-client/login'
 import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowReactive, shallowRef } from 'vue'
+import { computed, shallowReactive, shallowRef } from 'vue'
 
 // copied
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
@@ -74,7 +75,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     }),
     queues: shallowRef<Record<number, Queue>>({}),
     items: shallowRef<Record<number, Item>>({}),
-    summonerSpells: shallowRef<Record<number, SummonerSpell>>({})
+    summonerSpells: shallowRef<Record<number, SummonerSpell>>({}),
+    gameModeMutators: shallowRef<Record<number, GameModeMutator>>({})
   } as const
 
   const champSelect = {
