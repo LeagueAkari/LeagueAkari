@@ -6,6 +6,7 @@ import {
   GameMapAsset,
   GameModeMutator,
   Item,
+  LootMap,
   Perk,
   Perkstyles,
   Queue,
@@ -63,5 +64,9 @@ export class GameDataHttpApi {
 
   getStrawberryHub() {
     return this._http.get<StrawberryHub[]>('/lol-game-data/assets/v1/strawberry-hub.json')
+  }
+
+  getLoots() {
+    return this._http.get<LootMap>('/lol-game-data/assets/v1/loots.json')
   }
 }

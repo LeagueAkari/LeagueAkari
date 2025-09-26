@@ -17,7 +17,9 @@
       </NButton>
     </NFlex>
     <NFlex align="center" v-if="!isCustomGame" class="tiny-control-item">
-      <span class="label" style="flex: 1">[关闭自动选择和自动禁用（仅本次生效）]</span>
+      <span class="label" style="flex: 1">{{
+        t('ChampSelectOperations.temporarilyDisabled.label')
+      }}</span>
       <NSwitch
         :value="as2.temporarilyDisabled"
         @update:value="(val) => as.setTemporarilyDisabled(val)"

@@ -1089,6 +1089,7 @@ Toolkit:
   misc: 百宝箱
   claim-tools: 领取工具
   friend-tools: 好友工具
+  loot-tools: 战利品工具
 
 ChampionBench:
   title: 英雄选择台
@@ -1812,17 +1813,8 @@ ChampSelectOperations:
     negativeText: 取消
     cancel: 取消
 
-  dodgeAtLastSecond:
-    label: 最后一秒秒退阈值
-    waitingForTiming: 最后一秒秒退 (等待时机)
-    waiting: 最后一秒秒退 ({{seconds}} s)
-    text: '最后一秒秒退'
-    thresholdWarning: 过低的阈值 ({{seconds}} s) 可能会导致秒退失败
-
-  autos:
-    autoPick: 自动选择
-    autoBan: 自动禁用
-    autoGrab: 自动选择
+  temporarilyDisabled:
+    label: 临时取消自动选择/禁用
 
 LoungeOperations:
   immediately: 立即

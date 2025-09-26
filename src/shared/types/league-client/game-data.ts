@@ -780,6 +780,94 @@ interface GameModeMutatorMutatorMutator {
   ExpandedMutator: string
 }
 
+export interface LootMap {
+  LootItems: LootItem[]
+  LootRecipes: LootRecipe[]
+  LootTables: LootTable[]
+  LootBundles: LootBundle[]
+  LootTokenBankCards: LootTokenBankCard[]
+}
+
+interface LootTokenBankCard {
+  lootItemName: string
+  backsplashImagePath: string
+  buttonText: string
+  nonPremiumCapCurrencyId: string
+  premiumCapCurrencyId: string
+  titleText: string
+  tokenIconPath: string
+  tooltipDescriptionText: string
+  tooltipSplashPath: string
+  tooltipTitleText: string
+  unlockItemId: string
+  unlockItemType: string
+  activationDate: string
+  deactivationDate: string
+  storeLinkItem: string
+  storeLinkType: string
+}
+
+interface LootBundle {
+  id: string
+  description: string
+  descriptionLong: string
+  image: string
+  contents: Content[]
+}
+
+interface Content {
+  query: Query
+  quantityExpression: string
+  localizedDescription: string
+}
+
+interface Query {
+  lootId: string
+}
+
+interface LootTable {
+  id: string
+  description: string
+  descriptionLong: string
+  image: string
+  dropChance: Output[]
+}
+
+interface LootRecipe {
+  id: string
+  description: string
+  contextMenuText: string
+  requirementText: string
+  imagePath: string
+  introVideoPath: string
+  loopVideoPath: string
+  outroVideoPath: string
+  hasVisibleLootOdds: boolean
+  outputs: Output[]
+}
+
+interface Output {
+  lootId: string
+  localizedDescription: string
+}
+
+interface LootItem {
+  id: string
+  name: string
+  description: string
+  image: string
+  startDate: string
+  endDate: string
+  mappedStoreId: number
+  lifetimeMax: number
+  autoRedeem: boolean
+  rarity: string
+  type: string
+  recipeMenuActive?: string
+  recipeMenuTitle?: string
+  recipeMenuSubtitle?: string
+}
+
 /**
  * 曾经用于判断是否是无限狂潮 (Swarm) 模式的英雄
  * @param id

@@ -1088,6 +1088,7 @@ Toolkit:
   misc: Misc
   claim-tools: Claim Tools
   friend-tools: Friend Tools
+  loot-tools: Loot Tools
 
 ChampionBench:
   title: Champion Bench
@@ -1808,17 +1809,8 @@ ChampSelectOperations:
     negativeText: Cancel
     cancel: Cancel
 
-  dodgeAtLastSecond:
-    label: Last-Second Dodge Threshold
-    waitingForTiming: Last-Second Dodge (Waiting)
-    waiting: Dodge in {{seconds}} s
-    text: 'Last-Second Dodge'
-    thresholdWarning: A threshold that is too low ({{seconds}} s) may result in dodge failure
-
-  autos:
-    autoPick: Auto Pick
-    autoBan: Auto Ban
-    autoGrab: Auto Grab
+  temporarilyDisabled:
+    label: Temporarily Disable Auto Ban/Pick
 
 LoungeOperations:
   immediately: Immediately

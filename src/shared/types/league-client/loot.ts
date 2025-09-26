@@ -1,4 +1,4 @@
-export interface LootMap {
+export interface PlayerLootMap {
   [key: string]: Loot
 }
 

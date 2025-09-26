@@ -563,14 +563,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     })
 
     axiosRetry(this._http, {
-      retries: 2,
-      retryCondition: (error) => {
-        if (error.response === undefined) {
-          return true
-        }
-
-        return !(error.response.status >= 400 && error.response.status < 500)
-      }
+      retries: 2
     })
 
     try {

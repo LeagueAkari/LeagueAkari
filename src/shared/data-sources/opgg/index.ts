@@ -39,11 +39,7 @@ export class OpggDataApi {
 
   constructor() {
     _axiosRetry(this._http, {
-      retries: 2, // set it to 2 in order to fast fail
-      retryDelay: () => 0,
-      retryCondition: (error) => {
-        return Boolean(error.response)
-      }
+      retries: 2
     })
   }
 

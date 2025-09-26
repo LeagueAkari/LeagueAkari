@@ -45,11 +45,7 @@ export class LolFandomWikiApi {
 
   constructor() {
     axiosRetry(this._http, {
-      retries: 3,
-      retryDelay: () => 0,
-      retryCondition: (error) => {
-        return Boolean(error.response)
-      }
+      retries: 3
     })
   }
 

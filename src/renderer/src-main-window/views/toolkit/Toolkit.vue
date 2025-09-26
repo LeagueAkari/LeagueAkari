@@ -24,6 +24,7 @@
           <Lobby v-else-if="currentTab === 'lobby'" />
           <Misc v-else-if="currentTab === 'misc'" />
           <ClaimTools v-else-if="currentTab === 'claim-tools'" />
+          <LootTools v-else-if="currentTab === 'loot-tools'" />
           <FriendTools v-else-if="currentTab === 'friend-tools'" />
         </KeepAlive>
       </Transition>
@@ -44,6 +45,7 @@ import FriendTools from './friend-tools/FriendTools.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
+import LootTools from './loot-tools/LootTools.vue'
 import Misc from './misc/Misc.vue'
 
 const { t } = useTranslation()
@@ -75,6 +77,14 @@ const tabs = computed(() => [
     key: 'claim-tools',
     name: t('Toolkit.claim-tools')
   },
+  ...(import.meta.env.DEV
+    ? [
+        {
+          key: 'loot-tools',
+          name: t('Toolkit.loot-tools')
+        }
+      ]
+    : []),
   {
     key: 'friend-tools',
     name: t('Toolkit.friend-tools')

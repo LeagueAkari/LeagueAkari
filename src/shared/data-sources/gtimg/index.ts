@@ -53,11 +53,7 @@ export class GtimgApi {
 
   constructor() {
     axiosRetry(this._http, {
-      retries: 2,
-      retryDelay: () => 0,
-      retryCondition: (error) => {
-        return Boolean(error.response)
-      }
+      retries: 2
     })
   }
 
