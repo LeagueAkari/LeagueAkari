@@ -568,7 +568,7 @@
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'

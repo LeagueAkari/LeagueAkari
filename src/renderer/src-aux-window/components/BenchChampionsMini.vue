@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { BalanceAdjustment, useChampionBalanceData } from '@aux-window/compositions/useBalanceData'
+import { BalanceAdjustment, useChampionBalanceData } from '@aux-window/composables/useBalanceData'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'

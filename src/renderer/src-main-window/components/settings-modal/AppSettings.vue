@@ -488,7 +488,7 @@ import {
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
+import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 

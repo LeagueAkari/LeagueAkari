@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // @ts-ignore
-import { useColorThemeAttr } from '@renderer-shared/compositions/useColorThemeAttr'
+import { useColorThemeAttr } from '@renderer-shared/composables/useColorThemeAttr'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,

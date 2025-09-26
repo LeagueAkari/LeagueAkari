@@ -105,8 +105,8 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
-import { useTimeLeft } from '@renderer-shared/compositions/useTimeLeft'
+import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
+import { useTimeLeft } from '@renderer-shared/composables/useTimeLeft'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NProgress } from 'naive-ui'

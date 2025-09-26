@@ -419,8 +419,8 @@ import {
 } from 'naive-ui'
 import { computed, ref, toRaw, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-import { useMapAssets } from '@main-window/compositions/useMapAssets'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { useMapAssets } from '@main-window/composables/useMapAssets'
 
 import RuneV2Edit from './RuneV2Edit.vue'
 import SummonerSpellEdit from './SummonerSpellEdit.vue'

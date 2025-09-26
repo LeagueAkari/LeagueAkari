@@ -61,8 +61,8 @@ import {
 } from 'naive-ui'
 import { computed, h, ref, useCssModule, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-import { useRecommendedChampionPositions } from '@main-window/compositions/useRecommendedChampionPositions'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { useRecommendedChampionPositions } from '@main-window/composables/useRecommendedChampionPositions'
 
 import PositionFilter from './PositionFilter.vue'
 

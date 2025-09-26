@@ -15,7 +15,9 @@ export function useTimeLeft(
   const tick = () => {
     const finishAtRaw = toValue(finishAt)
     const finishAtValue =
-      typeof finishAtRaw === 'number' && Number.isFinite(finishAtRaw) && finishAtRaw > 0 ? finishAtRaw : null
+      typeof finishAtRaw === 'number' && Number.isFinite(finishAtRaw) && finishAtRaw > 0
+        ? finishAtRaw
+        : null
 
     if (!finishAtValue) {
       _msLeft.value = 0
@@ -31,7 +33,10 @@ export function useTimeLeft(
 
     const startAtRaw = toValue(startAt)
     const hasValidStart =
-      typeof startAtRaw === 'number' && Number.isFinite(startAtRaw) && startAtRaw > 0 && finishAtValue > startAtRaw
+      typeof startAtRaw === 'number' &&
+      Number.isFinite(startAtRaw) &&
+      startAtRaw > 0 &&
+      finishAtValue > startAtRaw
 
     if (hasRemaining) {
       if (hasValidStart) {

@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { useColorThemeAttr } from '@renderer-shared/compositions/useColorThemeAttr'
+import { useColorThemeAttr } from '@renderer-shared/composables/useColorThemeAttr'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,

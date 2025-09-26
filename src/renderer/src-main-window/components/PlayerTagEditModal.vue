@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SummonerInfo } from '@shared/types/league-client/summoner'

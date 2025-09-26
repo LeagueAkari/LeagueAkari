@@ -8,7 +8,7 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
+import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
 import { router } from '@main-window/routes'
 
 import { useMatchHistoryTabsStore } from '../match-history-tabs/store'

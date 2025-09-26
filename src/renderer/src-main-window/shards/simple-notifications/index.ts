@@ -1,6 +1,6 @@
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import FunnyPricing from '@renderer-shared/components/easter-eggs/FunnyPricing.vue'
-import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
+import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'

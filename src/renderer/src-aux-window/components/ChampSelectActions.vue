@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useScrollFollow } from '@renderer-shared/compositions/useScrollFollow'
+import { useScrollFollow } from '@renderer-shared/composables/useScrollFollow'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Action } from '@shared/types/league-client/champ-select'
 import { useTranslation } from 'i18next-vue'

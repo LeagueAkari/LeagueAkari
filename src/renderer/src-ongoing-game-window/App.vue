@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
-import { useHideNotAppTag } from '@renderer-shared/compositions/useHideNotAppTag'
+import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { Game } from '@shared/types/league-client/match-history'

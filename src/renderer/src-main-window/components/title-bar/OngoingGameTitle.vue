@@ -61,8 +61,8 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useOverflow } from '@renderer-shared/compositions/useOverflowDetection'
-import { useSgpTagOptions } from '@renderer-shared/compositions/useSgpTagOptions'
+import { useOverflow } from '@renderer-shared/composables/useOverflowDetection'
+import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'

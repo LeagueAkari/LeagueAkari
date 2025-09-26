@@ -433,8 +433,8 @@
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {

@@ -79,7 +79,7 @@
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
-import { useInteroperableSgpServers } from '@renderer-shared/compositions/useInteroperableSgpServers'
+import { useInteroperableSgpServers } from '@renderer-shared/composables/useInteroperableSgpServers'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'

@@ -154,7 +154,7 @@ import {
 } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
 const { t } = useTranslation()
 

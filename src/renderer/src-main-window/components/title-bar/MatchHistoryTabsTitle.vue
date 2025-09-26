@@ -137,7 +137,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'

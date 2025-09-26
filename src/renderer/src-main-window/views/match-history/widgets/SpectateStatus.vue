@@ -180,7 +180,7 @@ import {
   PREMADE_TEAMS,
   PREMADE_TEAM_COLORS
 } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'

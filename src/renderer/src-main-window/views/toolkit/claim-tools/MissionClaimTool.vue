@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { useActivated } from '@renderer-shared/compositions/useActivated'
+import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'

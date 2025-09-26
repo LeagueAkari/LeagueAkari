@@ -39,7 +39,7 @@ import { provide, ref } from 'vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
-import { useMicaAvailability } from './compositions/useMicaAvailability'
+import { useMicaAvailability } from './composables/useMicaAvailability'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
