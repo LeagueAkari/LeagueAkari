@@ -195,6 +195,7 @@ AppSettings:
       options:
         none: 默认
         mica: Mica
+        micaUnsupported: 'Mica (不支持)'
 
   lcConnection:
     title: LCU 连接
@@ -2141,6 +2142,11 @@ FriendTools:
     groupName: 好友分组
     lastGameDate: 最后对局日期
     friendSince: 成为好友时间
+
+LootTools:
+  title: 战利品工具
+  refreshSuccess: 已刷新
+  refreshFailed: 拉取失败 {{reason}}
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'

@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { ButtonProps, NButton } from 'naive-ui'
-import { VNodeChild, h } from 'vue'
+import { VNodeChild, createTextVNode } from 'vue'
 
 const { buttons = [] } = defineProps<{
   buttons?: (ButtonProps & {
@@ -21,7 +21,7 @@ const { buttons = [] } = defineProps<{
 
 const renderText = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return h('span', node)
+    return createTextVNode(node)
   }
 
   return { render: node }

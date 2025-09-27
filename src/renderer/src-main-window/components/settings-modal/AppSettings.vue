@@ -553,10 +553,17 @@ const logLevels = [
 
 const backgroundMaterials = computed(() => {
   return [
-    { label: '默认', value: 'none' },
-    { label: 'Mica', value: 'mica', disabled: !wms.supportsMica }
+    { label: t('AppSettings.mainWindowUi.backgroundMaterial.options.none'), value: 'none' },
+    {
+      label: wms.supportsMica
+        ? t('AppSettings.mainWindowUi.backgroundMaterial.options.mica')
+        : t('AppSettings.mainWindowUi.backgroundMaterial.options.micaUnsupported'),
+      value: 'mica',
+      disabled: !wms.supportsMica
+    }
   ]
 })
+
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({

@@ -24,7 +24,7 @@ const { tooltip } = defineProps<{
 
 <style scoped>
 .i-tooltip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
 

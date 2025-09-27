@@ -871,13 +871,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     //   { fireImmediately: true }
     // )
 
-    this._mobx.reaction(
-      () => this.state.activeGroupConfig,
-      (groups) => {
-        this._log.warn(`activeGroupConfig`, groups)
-      },
-      { fireImmediately: true }
-    )
+    // this._mobx.reaction(
+    //   () => this.state.activeGroupConfig,
+    //   (groups) => {
+    //     this._log.warn(`activeGroupConfig`, groups)
+    //   },
+    //   { fireImmediately: true }
+    // )
 
     // this._mobx.reaction(
     //   () => this.state.expectedSwaps,

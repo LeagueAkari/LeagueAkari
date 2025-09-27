@@ -194,6 +194,7 @@ AppSettings:
       options:
         none: Default
         mica: Mica
+        micaUnsupported: 'Mica (Unsupported)'
 
   lcConnection:
     title: LCU Connection
@@ -2138,6 +2139,11 @@ FriendTools:
     groupName: Friend Group
     lastGameDate: Last Game Date
     friendSince: Friend Since
+
+LootTools:
+  title: Loot Tools
+  refreshSuccess: Refreshed
+  refreshFailed: Failed to fetch {{reason}}
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
