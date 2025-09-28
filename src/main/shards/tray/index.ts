@@ -39,14 +39,16 @@ export class TrayMain implements IAkariShardInitDispose {
     this._auxWindowTrayItem = new MenuItem({
       label: i18next.t('tray.auxWindow'),
       type: 'normal',
-      click: () => this._wm.auxWindow.showOrRestore()
+      click: () => this._wm.auxWindow.showOrRestore(),
+      enabled: this._wm.auxWindow.settings.enabled
     })
 
     this._auxWindowDevTrayItem = new MenuItem({
       id: 'aux-window-dev',
       label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.auxWindow.toggleDevtools()
+      click: () => this._wm.auxWindow.toggleDevtools(),
+      enabled: this._wm.auxWindow.settings.enabled
     })
 
     this._mainWindowDevTrayItem = new MenuItem({
@@ -58,25 +60,29 @@ export class TrayMain implements IAkariShardInitDispose {
     this._opggWindowTrayItem = new MenuItem({
       label: i18next.t('tray.opggWindow'),
       type: 'normal',
-      click: () => this._wm.opggWindow.showOrRestore()
+      click: () => this._wm.opggWindow.showOrRestore(),
+      enabled: this._wm.opggWindow.settings.enabled
     })
 
     this._opggWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOpggWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.opggWindow.toggleDevtools()
+      click: () => this._wm.opggWindow.toggleDevtools(),
+      enabled: this._wm.opggWindow.settings.enabled
     })
 
     this._ongoingGameWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOngoingGameWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.ongoingGameWindow?.toggleDevtools()
+      click: () => this._wm.ongoingGameWindow?.toggleDevtools(),
+      enabled: this._wm.ongoingGameWindow.settings.enabled
     })
 
     this._cdTimerWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleCdTimerWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.cdTimerWindow.toggleDevtools()
+      click: () => this._wm.cdTimerWindow.toggleDevtools(),
+      enabled: this._wm.cdTimerWindow.settings.enabled
     })
 
     this._adjustAllWindowPositionsTrayItem = new MenuItem({
