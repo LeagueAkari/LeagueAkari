@@ -11,17 +11,30 @@
             />
             <div class="client-info">
               <NEllipsis class="summoner-name" v-if="lcs.summoner.me">
-                <span class="summoner-name-text">{{ lcs.summoner.me.gameName }}</span>
-                <span class="summoner-name-tag">#{{ lcs.summoner.me.tagLine }}</span>
+                <StreamerModeMaskedText>
+                  <template #masked>
+                    <span class="summoner-name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                  </template>
+                  <span class="summoner-name-text">{{ lcs.summoner.me.gameName }}</span>
+                  <span class="summoner-name-tag">#{{ lcs.summoner.me.tagLine }}</span>
+                </StreamerModeMaskedText>
               </NEllipsis>
               <div class="summoner-name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
-              <div class="client-region">
-                {{
-                  sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
-                    sgps.availability.sgpServerId
-                  ] || sgps.availability.sgpServerId
-                }}
-              </div>
+
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <div class="client-region">
+                    {{ t('region', { ns: 'common' }) }}
+                  </div>
+                </template>
+                <div class="client-region">
+                  {{
+                    sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
+                      sgps.availability.sgpServerId
+                    ] || sgps.availability.sgpServerId
+                  }}
+                </div>
+              </StreamerModeMaskedText>
             </div>
           </div>
           <div class="client-actions">
@@ -96,12 +109,17 @@
               />
               <div class="client-info">
                 <NEllipsis class="summoner-name" v-if="clientExtraInfo[cmd.pid]">
-                  <span class="summoner-name-text">{{
-                    clientExtraInfo[cmd.pid].summoner.gameName
-                  }}</span>
-                  <span class="summoner-name-tag"
-                    >#{{ clientExtraInfo[cmd.pid].summoner.tagLine }}</span
-                  >
+                  <StreamerModeMaskedText>
+                    <template #masked>
+                      <span class="summoner-name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                    </template>
+                    <span class="summoner-name-text">{{
+                      clientExtraInfo[cmd.pid].summoner.gameName
+                    }}</span>
+                    <span class="summoner-name-tag"
+                      >#{{ clientExtraInfo[cmd.pid].summoner.tagLine }}</span
+                    >
+                  </StreamerModeMaskedText>
                 </NEllipsis>
                 <div class="summoner-name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
                 <div class="client-region">
@@ -133,6 +151,8 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -147,7 +167,6 @@ import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
   CloseFilled as CloseFilledIcon,
   MoreHorizFilled as MoreHorizFilledIcon,
-  MoveDownFilled as MoveDownFilledIcon,
   RocketLaunchRound as RocketLaunchRoundIcon
 } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'

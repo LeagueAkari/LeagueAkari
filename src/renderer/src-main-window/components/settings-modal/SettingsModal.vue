@@ -65,7 +65,7 @@
       <NTabPane name="misc" :tab="t('MiscSettings.title')">
         <template #tab>
           <div class="tab-icon-title">
-            <NIcon class="icon"><ToolkitIcon /> </NIcon>
+            <NIcon class="icon"><ToolFilledIcon /> </NIcon>
             <span>{{ t('MiscSettings.title') }}</span>
           </div>
         </template>
@@ -95,7 +95,8 @@
 
 <script setup lang="ts">
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { Debug as DebugIcon, Layers as LayersIcon, ToolKit as ToolkitIcon } from '@vicons/carbon'
+import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
+import { Debug as DebugIcon, Layers as LayersIcon } from '@vicons/carbon'
 import {
   Games24Filled as Games24FilledIcon,
   Settings16Filled as Settings16FilledIcon,

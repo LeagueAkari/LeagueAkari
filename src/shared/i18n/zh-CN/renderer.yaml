@@ -852,6 +852,8 @@ SideBarFixed:
   noClient: 当前无可用客户端，请启动游戏
   settings: 设置
   notConnected: 未连接
+  unknown: 未知
+  inConnectionLoop: 连接中...
   connectedClient: 已连接的客户端
 
   respawnTimer:

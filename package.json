@@ -53,6 +53,7 @@
     "@types/semver": "^7.7.1",
     "@types/ws": "^8.18.1",
     "@uiw/codemirror-theme-vscode": "^4.25.2",
+    "@vicons/antd": "^0.13.0",
     "@vicons/carbon": "^0.13.0",
     "@vicons/fa": "^0.13.0",
     "@vicons/fluent": "^0.13.0",

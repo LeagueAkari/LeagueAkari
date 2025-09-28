@@ -9,7 +9,7 @@
       <template #trigger>
         <div class="menu-item menu-item-no-click">
           <div class="menu-item__inner">
-            <div class="menu-item__icon">
+            <div class="menu-item__custom-icon">
               <NProgress
                 class="menu-item__icon-n-progress"
                 type="circle"
@@ -43,15 +43,17 @@
     <NPopover placement="right-end" ref="popover-connection" :duration="250">
       <template #trigger>
         <div class="menu-item menu-item-no-click">
-          <div class="menu-item__inner">
-            <div class="menu-item__icon" v-if="lcs.summoner.me">
+          <div
+            class="menu-item__inner"
+            @click="lcs.summoner.me ? handleSummonerClick(lcs.summoner.me) : undefined"
+          >
+            <div class="menu-item__custom-icon" v-if="lcs.summoner.me">
               <NProgress
                 class="menu-item__icon-n-progress"
-                @click="handleSummonerClick(lcs.summoner.me)"
                 type="circle"
                 :stroke-width="4"
                 :percentage="
-                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
+                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100 + 60
                 "
                 :gap-degree="45"
               >
@@ -69,7 +71,24 @@
             >
               <NIcon class="menu-item__icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
-            <div class="menu-item__label">{{ t('SideBarFixed.notConnected') }}</div>
+            <template v-if="lcs.isConnected">
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <div class="menu-item__label">{{ t('summoner', { ns: 'common' }) }}</div>
+                </template>
+                <div class="menu-item__label" v-if="lcs.summoner.me">
+                  <span>{{ lcs.summoner.me.gameName }}</span>
+                  <span class="menu-item__label-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+                </div>
+                <div class="menu-item__label" v-else>{{ t('SideBarFixed.unknown') }}</div>
+              </StreamerModeMaskedText>
+            </template>
+            <template v-else-if="lcs.isInConnectionLoop">
+              <div class="menu-item__label">{{ t('SideBarFixed.inConnectionLoop') }}</div>
+            </template>
+            <template v-else>
+              <div class="menu-item__label">{{ t('SideBarFixed.notConnected') }}</div>
+            </template>
           </div>
         </div>
       </template>
@@ -93,6 +112,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -181,34 +201,54 @@ watch(
     /* overflow: hidden; */
     padding: 0 4px;
     box-sizing: border-box;
-
-    .summoner-profile-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
   }
 
-  .menu-item__icon {
+  .menu-item__icon,
+  .menu-item__custom-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 36px;
     width: 36px;
+    flex-shrink: 0;
+  }
+
+  .menu-item__icon {
     font-size: 16px;
     transition:
       color 0.2s,
       font-size 0.2s;
-    flex-shrink: 0;
 
     .collapsed & {
-      font-size: 18px;
+      font-size: 20px;
     }
   }
 
   .menu-item__icon-n-progress {
     width: 24px;
     height: 24px;
+    transition:
+      width 0.2s,
+      height 0.2s;
+
+    .collapsed & {
+      width: 28px;
+      height: 28px;
+    }
+
+    .summoner-profile-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      transition:
+        width 0.2s,
+        height 0.2s;
+
+      .collapsed & {
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 
   .menu-item__label {
@@ -223,29 +263,55 @@ watch(
     .collapsed & {
       opacity: 0;
     }
+
+    .menu-item__label-tag-line {
+      font-size: 12px;
+      margin-left: 4px;
+      color: rgba(0, 0, 0, 0.6);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
   }
 
   &:hover {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(255, 255, 255, 1);
+      color: rgba(0, 0, 0, 1);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
+      }
     }
 
     .menu-item__inner {
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(0, 0, 0, 0.05);
+
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
     }
   }
 
   &:not(.menu-item-no-click):active {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(0, 0, 0, 0.8);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.8);
+      }
     }
   }
 
   .menu-item__icon,
   .menu-item__label {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.8);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 

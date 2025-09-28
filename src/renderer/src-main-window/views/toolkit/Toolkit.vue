@@ -2,7 +2,7 @@
   <div class="toolkit-page">
     <div class="sections">
       <div class="section-icon-container">
-        <NIcon class="section-icon"><ToolkitIcon /></NIcon>
+        <NIcon class="section-icon"><ToolFilledIcon /></NIcon>
         <span class="session-label">{{ t('Toolkit.title') }}</span>
       </div>
       <NTabs
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ToolKit as ToolkitIcon } from '@vicons/carbon'
+import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { computed, onActivated, ref, watch } from 'vue'

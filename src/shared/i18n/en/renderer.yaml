@@ -850,6 +850,8 @@ SideBarFixed:
   noClient: No available client, please start the game
   settings: Settings
   notConnected: Not Connected
+  inConnectionLoop: Connecting...
+  unknown: Unknown
   connectedClient: Connected Client
   launchedClientPlaceholder: Launched Client {{index}}
 

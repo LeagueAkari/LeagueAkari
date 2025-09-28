@@ -119,8 +119,12 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
   }
 
   .app-frame__left {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(189, 189, 189, 0.2);
     z-index: 5;
+
+    [data-theme='dark'] & {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
   }
 
   .app-frame__right {
@@ -166,6 +170,26 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
     left: 0;
     width: 100%;
     height: 100%;
+
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.95) 75%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+
+  &.no-image::before {
+    background: none;
+  }
+
+  [data-theme='dark'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.85) 75%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
   }
 }
 
@@ -178,36 +202,6 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 
   &.use-plain-bg:not(.mica) {
     background-color: var(--la-background-color-primary);
-  }
-}
-
-[data-theme='dark'] {
-  .background-wallpaper::before {
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.85) 75%,
-      rgba(0, 0, 0, 0.85) 100%
-    );
-  }
-
-  .background-wallpaper.no-image::before {
-    background: none;
-  }
-}
-
-[data-theme='light'] {
-  .background-wallpaper::before {
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.95) 75%,
-      rgba(255, 255, 255, 0.95) 100%
-    );
-  }
-
-  .background-wallpaper.no-image::before {
-    background: none;
   }
 }
 

@@ -1,26 +1,33 @@
 <template>
-  <div class="app-sidebar" :class="{ collapsed: isCollapsed }">
+  <div class="app-sidebar" :class="{ collapsed: mui.frontendSettings.sidebarCollapsed }">
     <div class="app-sidebar__head">
       <div class="app-sidebar__logo" @click="toggleCollapse">
         <NIcon class="app-sidebar__logo-icon">
           <AkariLogo />
         </NIcon>
         <NIcon class="app-sidebar__logo-toggle">
-          <SidebarCollapseRight v-if="isCollapsed" />
-          <SidebarCollapseLeft v-else />
+          <Transition name="fade">
+            <SidebarCollapseRight v-if="mui.frontendSettings.sidebarCollapsed" />
+            <SidebarCollapseLeft v-else />
+          </Transition>
         </NIcon>
       </div>
-      <div class="app-sidebar__logo-text">{{ t('appName', { ns: 'common' }) }}</div>
+      <div class="app-sidebar__logo-text">
+        {{ t('appName', { ns: 'common' }) }}{{ as.isAdministrator ? ' X' : '' }}
+      </div>
     </div>
     <SidebarMenu
       class="app-sidebar__menu"
       :items="menu"
       :current="currentMenu"
       @update:current="(key) => handleMenuChange(key)"
-      :is-collapsed="isCollapsed"
+      :is-collapsed="mui.frontendSettings.sidebarCollapsed"
     />
     <div class="app-sidebar__padding"></div>
-    <SidebarFixed class="app-sidebar__fixed" :is-collapsed="isCollapsed" />
+    <SidebarFixed
+      class="app-sidebar__fixed"
+      :is-collapsed="mui.frontendSettings.sidebarCollapsed"
+    />
   </div>
 </template>
 
@@ -32,8 +39,8 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
-import { Tools as ToolsIcon } from '@vicons/fa'
 import {
   AnimalRabbit28Filled as AnimalRabbit28FilledIcon,
   Games24Filled as Games24FilledIcon
@@ -41,9 +48,10 @@ import {
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { NTooltip } from 'naive-ui'
 import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
 import SidebarFixed from './SidebarFixed.vue'
 import SidebarMenu from './SidebarMenu.vue'
@@ -52,16 +60,10 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
+const mui = useMainWindowUiStore()
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
-}
-
-const isCollapsed = ref(false)
-
-// @ts-ignore
-window.cp = () => {
-  isCollapsed.value = !isCollapsed.value
 }
 
 const router = useRouter()
@@ -73,7 +75,7 @@ const isInOngoingStage = computed(() => {
 })
 
 const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
+  mui.frontendSettings.sidebarCollapsed = !mui.frontendSettings.sidebarCollapsed
 }
 
 watch(
@@ -108,7 +110,7 @@ const menu = computed(() => {
     },
     {
       key: 'toolkit',
-      icon: renderIcon(ToolsIcon),
+      icon: renderIcon(ToolFilledIcon),
       name: t('SideBarMenu.toolkit')
     },
     {
@@ -152,7 +154,7 @@ watchEffect(() => {
 <style scoped>
 .app-sidebar {
   --la-sidebar-width-collapsed: 52px;
-  --la-sidebar-width-expanded: 200px;
+  --la-sidebar-width-expanded: 186px;
 
   display: flex;
   flex-direction: column;
@@ -189,8 +191,17 @@ watchEffect(() => {
     -webkit-app-region: no-drag;
 
     &:hover {
+      .app-sidebar__logo-icon {
+        opacity: 0;
+      }
+
       .app-sidebar__logo-toggle {
-        color: rgba(255, 255, 255, 1);
+        color: rgba(0, 0, 0, 1);
+        opacity: 1;
+
+        [data-theme='dark'] & {
+          color: rgba(255, 255, 255, 1);
+        }
       }
     }
   }
@@ -204,8 +215,6 @@ watchEffect(() => {
   }
 
   .app-sidebar__logo-text {
-    position: relative;
-    top: 1px; /* 微调位置符合视觉中心 */
     font-size: 14px;
     font-weight: bold;
     font-family: 'Comfortaa', sans-serif;
@@ -217,37 +226,16 @@ watchEffect(() => {
     }
   }
 
-  .app-sidebar__collapse {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    width: 36px;
-    color: rgba(255, 255, 255, 0.6);
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: rgba(255, 255, 255, 1);
-    }
-  }
-
   .app-sidebar__logo-toggle {
     position: absolute;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.8);
     transition:
       opacity 0.2s ease,
       color 0.2s ease;
     opacity: 0;
-  }
 
-  &:hover {
-    .app-sidebar__logo-icon {
-      opacity: 0;
-    }
-
-    .app-sidebar__logo-toggle {
-      opacity: 1;
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
     }
   }
 

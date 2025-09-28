@@ -170,6 +170,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
       store.frontendSettings,
       'useProfileSkinAsBackground'
     )
+
+    await this._setting.savedPropVue(
+      MainWindowUiRenderer.id,
+      store.frontendSettings,
+      'sidebarCollapsed'
+    )
   }
 
   usePreferredBackgroundImageUrl() {

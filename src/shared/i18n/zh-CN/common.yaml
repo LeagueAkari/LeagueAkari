@@ -8,6 +8,7 @@ na: N/A
 
 summonerPlaceholder: 召唤师 {{index}}
 summoner: 召唤师
+region: 大区
 
 positions:
   all: 无

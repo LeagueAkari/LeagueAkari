@@ -8,6 +8,7 @@ na: N/A
 
 summonerPlaceholder: Summoner {{index}}
 summoner: Summoner
+region: Region
 
 positions:
   all: None

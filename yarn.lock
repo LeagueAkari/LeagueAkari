@@ -1984,6 +1984,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vicons/antd@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@vicons/antd@npm:0.13.0"
+  checksum: 10c0/6ca10300d07f8d3245a50b7e476c6307697969a7bec3983ff146758a23375ed396b05ac2aab536b14d506d0a9d5b4bc3195d837f1080107053e4a4a1baa44228
+  languageName: node
+  linkType: hard
+
 "@vicons/carbon@npm:^0.13.0":
   version: 0.13.0
   resolution: "@vicons/carbon@npm:0.13.0"
@@ -5386,6 +5393,7 @@ __metadata:
     "@types/semver": "npm:^7.7.1"
     "@types/ws": "npm:^8.18.1"
     "@uiw/codemirror-theme-vscode": "npm:^4.25.2"
+    "@vicons/antd": "npm:^0.13.0"
     "@vicons/carbon": "npm:^0.13.0"
     "@vicons/fa": "npm:^0.13.0"
     "@vicons/fluent": "npm:^0.13.0"

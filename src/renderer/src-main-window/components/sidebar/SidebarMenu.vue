@@ -116,8 +116,11 @@ watch(
       height: var(--indicator-rail-height);
       top: var(--indicator-top);
       border-radius: 2px;
+      background-color: #157708;
+    }
 
-      /*  now for dark only */
+    [data-theme='dark'] &::before,
+    [data-theme='dark'] &::after {
       background-color: #26dd0e;
     }
 
@@ -178,7 +181,7 @@ watch(
     flex-shrink: 0;
 
     .collapsed & {
-      font-size: 18px;
+      font-size: 20px;
     }
   }
 
@@ -199,34 +202,58 @@ watch(
   &:hover {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(255, 255, 255, 1);
+      color: rgba(0, 0, 0, 1);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
+      }
     }
 
     .menu-item__inner {
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(0, 0, 0, 0.05);
+
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
     }
   }
 
   &:active {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(0, 0, 0, 0.8);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.8);
+      }
     }
   }
 
   .menu-item__icon,
   .menu-item__label {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(0, 0, 0, 0.6);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.6);
+    }
   }
 
   &.active {
     .menu-item__icon,
     .menu-item__label {
-      color: #fff;
+      color: rgba(0, 0, 0, 1);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
+      }
     }
 
     .menu-item__inner {
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(0, 0, 0, 0.05);
+
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
     }
   }
 }
