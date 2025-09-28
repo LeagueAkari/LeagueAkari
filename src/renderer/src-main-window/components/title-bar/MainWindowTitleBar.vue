@@ -1,5 +1,5 @@
 <template>
-  <div class="app-title-bar">
+  <div class="app-title-bar" :class="{ 'should-show-bottom-border': shouldShowBottomBorder }">
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
@@ -37,8 +37,6 @@ const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const mhs = useMatchHistoryTabsStore()
 
-const { t } = useTranslation('common')
-
 const shouldShowDivider = computed(() => {
   switch (route.name) {
     case 'match-history':
@@ -55,6 +53,17 @@ const shouldShowDivider = computed(() => {
       return false
   }
 })
+
+const shouldShowBottomBorder = computed(() => {
+  switch (route.name) {
+    case 'match-history':
+      return lcs.isConnected && mhs.tabs.length
+    case 'ongoing-game':
+      return ogs.queryStage.phase !== 'unavailable'
+    default:
+      return false
+  }
+})
 </script>
 
 <style scoped>
@@ -66,6 +75,14 @@ const shouldShowDivider = computed(() => {
   -webkit-app-region: drag;
   z-index: 1000000;
   padding-left: 8px;
+
+  &.should-show-bottom-border {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    [data-theme='dark'] & {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
 
   .mica & {
     backdrop-filter: none;

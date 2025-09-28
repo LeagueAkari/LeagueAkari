@@ -17,7 +17,7 @@
           :class="{ active: currentActiveItem === item.key }"
         >
           <div class="menu-item__inner">
-            <NBadge :show="!!item.inProgress" dot>
+            <NBadge :show="!!item.inProgress" dot :offset="[-6, 8]">
               <component :is="item.icon" class="menu-item__icon" />
             </NBadge>
             <div class="menu-item__label">{{ item.name }}</div>
@@ -163,7 +163,6 @@ watch(
     align-items: center;
     border-radius: 8px;
     transition: background-color 0.2s;
-    overflow: hidden;
     padding: 0 4px;
     box-sizing: border-box;
   }

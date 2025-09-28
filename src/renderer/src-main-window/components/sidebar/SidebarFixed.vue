@@ -67,6 +67,7 @@
               v-else
               dot
               processing
+              :offset="[-6, 8]"
               :show="!lcs.isInConnectionLoop && otherClients.length > 0"
             >
               <NIcon class="menu-item__icon"><PlugDisconnected20FilledIcon /></NIcon>
@@ -198,7 +199,6 @@ watch(
     align-items: center;
     border-radius: 8px;
     transition: background-color 0.2s;
-    /* overflow: hidden; */
     padding: 0 4px;
     box-sizing: border-box;
   }

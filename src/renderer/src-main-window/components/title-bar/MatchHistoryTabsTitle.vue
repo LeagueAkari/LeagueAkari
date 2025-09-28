@@ -464,6 +464,8 @@ const { summonerName } = useStreamerModeMaskedText()
   padding: 0 4px 0 8px;
   box-sizing: border-box;
   border-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   cursor: pointer;
   user-select: none;
   transition:
