@@ -839,7 +839,7 @@ AutoMisc:
 
 SideBarMenu:
   match-history: 战绩
-  ongoing-game: 对局分析
+  ongoing-game: 对局
   automation: 自动操作
   toolkit: 工具集
   test: 测试

@@ -240,7 +240,7 @@ watch(
   &.active {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(0, 0, 0, 1);
+      color: rgba(0, 0, 0, 0.8);
 
       [data-theme='dark'] & {
         color: rgba(255, 255, 255, 1);

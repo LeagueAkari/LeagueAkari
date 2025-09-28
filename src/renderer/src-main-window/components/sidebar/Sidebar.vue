@@ -196,12 +196,7 @@ watchEffect(() => {
       }
 
       .app-sidebar__logo-toggle {
-        color: rgba(0, 0, 0, 1);
         opacity: 1;
-
-        [data-theme='dark'] & {
-          color: rgba(255, 255, 255, 1);
-        }
       }
     }
   }
@@ -228,14 +223,19 @@ watchEffect(() => {
 
   .app-sidebar__logo-toggle {
     position: absolute;
-    color: rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 1);
     transition:
       opacity 0.2s ease,
-      color 0.2s ease;
+      color 0.2s ease,
+      transform 0.2s ease;
     opacity: 0;
 
+    &:active {
+      transform: scale(0.9);
+    }
+
     [data-theme='dark'] & {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 1);
     }
   }
 

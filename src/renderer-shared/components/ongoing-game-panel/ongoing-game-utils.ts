@@ -42,10 +42,6 @@ export function useIdleState() {
   })
 }
 
-export interface TeamMeta {
-  name: string
-}
-
 export const CHINESE_NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
 
 export const PREMADE_TEAMS = [
@@ -86,9 +82,9 @@ export const PREMADE_TEAM_COLORS = {
   F: { foregroundColor: '#da4e2e', color: '#fff', borderColor: '#da4e2ed0' },
   G: { foregroundColor: '#bc2ebc', color: '#fff', borderColor: '#bc2ebcd0' },
   H: { foregroundColor: '#fa4e80', color: '#000', borderColor: '#fa4e80d0' },
-  I: { foregroundColor: '#0B3D91', color: '#fff', borderColor: '#0B3D91d0' },
-  J: { foregroundColor: '#7F0000', color: '#fff', borderColor: '#7F0000d0' },
-  K: { foregroundColor: '#8B4513', color: '#fff', borderColor: '#8B4513d0' },
+  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#0b3d91d0' },
+  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#7f0000d0' },
+  K: { foregroundColor: '#8b4513', color: '#fff', borderColor: '#8b4513d0' },
   L: { foregroundColor: '#555555', color: '#fff', borderColor: '#555555d0' }
 }
 

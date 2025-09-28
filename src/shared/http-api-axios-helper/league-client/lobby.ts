@@ -41,7 +41,7 @@ export class LobbyHttpApi {
     return this._http.post('/lol-lobby/v2/lobby', { queueId })
   }
 
-  createPractice5x5(name = 'League Stalker Room', password = '') {
+  createPractice5x5(name = 'League Akari Room', password = '') {
     return this.createCustomLobby('PRACTICETOOL', 11, 'AllAllowed', name, password, true)
   }
 

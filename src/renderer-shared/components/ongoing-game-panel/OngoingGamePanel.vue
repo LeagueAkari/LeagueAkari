@@ -456,11 +456,7 @@ const columnsNeed = computed(() => {
   .team-header__title {
     font-size: 16px;
     font-weight: bold;
-    margin-right: 8px;
-  }
-
-  .team-header__team-tags {
-    margin-left: 8px;
+    margin-right: 16px;
   }
 
   .analysis {

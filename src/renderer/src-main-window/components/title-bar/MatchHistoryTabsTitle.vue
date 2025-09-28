@@ -473,7 +473,6 @@ const { summonerName } = useStreamerModeMaskedText()
     filter 0.2s;
   line-height: 1;
   filter: brightness(0.7);
-  box-sizing: border-box;
   border: 1px solid rgba(0, 0, 0, 0);
 
   &:hover {
