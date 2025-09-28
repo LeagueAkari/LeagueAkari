@@ -837,7 +837,7 @@ AutoMisc:
       description: The content to be used as the auto-reply message.
 
 SideBarMenu:
-  match-history: Match History Tabs
+  match-history: Match History
   ongoing-game: Ongoing Game
   automation: Automation
   toolkit: Toolkit

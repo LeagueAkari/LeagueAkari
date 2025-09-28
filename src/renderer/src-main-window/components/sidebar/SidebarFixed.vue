@@ -78,7 +78,7 @@
                   <div class="menu-item__label">{{ t('summoner', { ns: 'common' }) }}</div>
                 </template>
                 <div class="menu-item__label" v-if="lcs.summoner.me">
-                  <span>{{ lcs.summoner.me.gameName }}</span>
+                  <span class="menu-item__label-game-name">{{ lcs.summoner.me.gameName }}</span>
                   <span class="menu-item__label-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
                 </div>
                 <div class="menu-item__label" v-else>{{ t('SideBarFixed.unknown') }}</div>
@@ -262,6 +262,10 @@ watch(
 
     .collapsed & {
       opacity: 0;
+    }
+
+    .menu-item__label-game-name {
+      font-weight: bold;
     }
 
     .menu-item__label-tag-line {

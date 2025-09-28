@@ -1,10 +1,12 @@
 <template>
   <div class="ongoing-game-view" ref="og-view-container">
-    <DefineOngoingTeam v-slot="{ players, team }">
+    <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
       <div class="team-wrapper">
-        <div class="team-stats-header">
-          <span class="title">{{ formatTeamText(team).name }}</span>
+        <div class="team-header">
+          <div class="team-header__team-color" :class="teamColor" v-if="teamColor"></div>
+          <span class="team-header__title">{{ teamName }}</span>
           <TeamTagsArea
+            class="team-header__team-tags"
             v-if="players.length >= 1"
             :side-id="team"
             :analysis="mapAnalysisTeamData(team)"
@@ -50,6 +52,8 @@
           :team="team"
           :key="team"
           :players="players"
+          :teamColor="mapTeamColor(team)"
+          :teamName="formatTeamText(team)"
         />
       </div>
     </NScrollbar>
@@ -92,7 +96,6 @@ import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   FIXED_CARD_WIDTH_PX_NUMBER,
   PREMADE_TEAMS,
-  TeamMeta,
   useIdleState
 } from './ongoing-game-utils'
 import TeamTagsArea from './widgets/TeamTagsArea.vue'
@@ -236,29 +239,46 @@ const premadeTeamInfo = computed(() => {
   return playerMap
 })
 
-const formatTeamText = (team: string): TeamMeta => {
+const formatTeamText = (team: string) => {
   if (ogs.gameInfo?.queueType === 'CHERRY') {
     if (lcs.gameflow.phase === 'ChampSelect') {
-      return {
-        name: team.startsWith('our')
-          ? t(`teams.our`, { ns: 'common' })
-          : t(`teams.their`, { ns: 'common' })
-      }
+      return team.startsWith('our')
+        ? t(`teams.our`, { ns: 'common' })
+        : t(`teams.their`, { ns: 'common' })
     } else {
       if (team === 'all') {
-        return { name: t(`teams.all`, { ns: 'common' }) }
+        return t(`teams.all`, { ns: 'common' })
       }
 
-      return { name: t(`teams.unknown`, { ns: 'common' }) }
+      return t(`teams.unknown`, { ns: 'common' })
     }
   } else {
-    return { name: t(`teams.${team}`, { ns: 'common', defaultValue: team }) }
+    return t(`teams.${team}`, { ns: 'common', defaultValue: team })
+  }
+}
+
+const mapTeamColor = (team: string) => {
+  switch (team) {
+    case '100':
+    case 'our-1':
+    case 'their-1':
+      return 'blue'
+
+    case '200':
+    case 'our-2':
+    case 'their-2':
+      return 'red'
+
+    default:
+      return null
   }
 }
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
   players: string[]
   team: string
+  teamColor: string | null
+  teamName: string
 }>({ inheritAttrs: false })
 
 const currentHighlightingPremadeTeamId = ref<string | null>(null)
@@ -412,15 +432,35 @@ const columnsNeed = computed(() => {
   height: 16px;
 }
 
-.team-stats-header {
+.team-header {
   display: flex;
   margin-bottom: 8px;
   align-items: flex-end;
 
-  .title {
+  .team-header__team-color {
+    align-self: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+
+    &.red {
+      background-color: #ff3333;
+    }
+
+    &.blue {
+      background-color: #40c1ff;
+    }
+  }
+
+  .team-header__title {
     font-size: 16px;
     font-weight: bold;
     margin-right: 8px;
+  }
+
+  .team-header__team-tags {
+    margin-left: 8px;
   }
 
   .analysis {
@@ -473,7 +513,7 @@ const columnsNeed = computed(() => {
 }
 
 [data-theme='dark'] {
-  .team-stats-header {
+  .team-header {
     .win-rate.gte-50 {
       color: #4cc69d;
     }
@@ -491,7 +531,7 @@ const columnsNeed = computed(() => {
 }
 
 [data-theme='light'] {
-  .team-stats-header {
+  .team-header {
     .win-rate.gte-50 {
       color: rgb(44, 140, 108);
     }

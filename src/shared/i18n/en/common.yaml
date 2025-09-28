@@ -31,8 +31,8 @@ positions:
   UTILITY: Support
 
 positionAssignmentReason:
-  FILL_SECONDARY: Fill Primary
-  FILL_PRIMARY: Fill Secondary
+  FILL_SECONDARY: Fill Secondary
+  FILL_PRIMARY: Fill Primary
   PRIMARY: Primary
   SECONDARY: Secondary
   AUTOFILL: Autofill
