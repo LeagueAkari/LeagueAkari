@@ -70,7 +70,7 @@ const handleRepositionToAlignLeagueClientUx = () => {
 .title-bar {
   display: flex;
   position: relative;
-  height: var(--title-bar-height);
+  height: var(--la-title-bar-height);
   align-items: center;
   z-index: 10000000;
   -webkit-app-region: drag;

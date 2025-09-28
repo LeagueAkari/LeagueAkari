@@ -1,14 +1,14 @@
 <template>
   <div
     class="sidebar-menu"
-    :class="{ 'test-page': currentActiveItem === 'test' }"
+    :class="{ 'rabi-test': currentActiveItem === 'test' }"
     ref="sidebar-menu"
     :style="{
       '--indicator-top': `${indicatorPosition.top}px`,
       '--indicator-rail-height': `${indicatorPosition.height}px`
     }"
   >
-    <NTooltip v-for="item of showItems" :key="item.key" placement="right">
+    <NTooltip v-for="item of showItems" :key="item.key" placement="right" :disabled="!isCollapsed">
       <template #trigger>
         <div
           class="menu-item"
@@ -16,10 +16,11 @@
           @click="handleMenuChange(item.key)"
           :class="{ active: currentActiveItem === item.key }"
         >
-          <div class="menu-item-inner">
+          <div class="menu-item__inner">
             <NBadge :show="!!item.inProgress" dot>
-              <component :is="item.icon" class="menu-item-icon" />
+              <component :is="item.icon" class="menu-item__icon" />
             </NBadge>
+            <div class="menu-item__label">{{ item.name }}</div>
           </div>
         </div>
       </template>
@@ -41,8 +42,13 @@ import {
   watchEffect
 } from 'vue'
 
-const { defaultValue, items = [] } = defineProps<{
+const {
+  defaultValue,
+  items = [],
+  isCollapsed = false
+} = defineProps<{
   defaultValue?: string
+  isCollapsed?: boolean
   items?: { key: string; icon: ComponentC; name: string; show?: boolean; inProgress?: boolean }[]
 }>()
 
@@ -92,7 +98,6 @@ watch(
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
 
   .indicator-rail {
     position: absolute;
@@ -131,7 +136,7 @@ watch(
   }
 
   /*  dedicated for test page */
-  &.test-page .indicator-rail {
+  &.rabi-test .indicator-rail {
     &::before,
     &::after {
       background-color: #f94395;
@@ -140,88 +145,87 @@ watch(
 }
 
 .menu-item {
+  width: 100%;
   position: relative;
-  height: 52px;
-  width: 52px;
   padding: 4px;
   box-sizing: border-box;
   cursor: pointer;
 
-  .menu-item-inner {
-    position: relative;
+  .menu-item__inner {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+    gap: 4px;
     width: 100%;
+    position: relative;
+    align-items: center;
     border-radius: 8px;
     transition: background-color 0.2s;
     overflow: hidden;
+    padding: 0 4px;
+    box-sizing: border-box;
   }
 
-  .menu-item-icon {
-    font-size: 20px;
-    transition: color 0.2s;
-    left: 0px;
-  }
-}
+  .menu-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    font-size: 16px;
+    transition:
+      color 0.2s,
+      font-size 0.2s;
+    flex-shrink: 0;
 
-[data-theme='dark'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #fff;
-      }
-
-      .menu-item-inner {
-        background-color: #fff1;
-      }
-    }
-
-    &:active {
-      .menu-item-icon {
-        color: #fff8;
-      }
-    }
-
-    .menu-item-icon {
-      color: rgba(255, 255, 255, 0.45);
-    }
-
-    &.active {
-      .menu-item-icon {
-        color: #fff;
-      }
-
-      .menu-item-inner {
-        background-color: #fff1;
-      }
+    .collapsed & {
+      font-size: 18px;
     }
   }
-}
 
-[data-theme='light'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #000;
-      }
+  .menu-item__label {
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transition:
+      color 0.2s,
+      opacity 0.2s;
+
+    .collapsed & {
+      opacity: 0;
+    }
+  }
+
+  &:hover {
+    .menu-item__icon,
+    .menu-item__label {
+      color: #fff;
     }
 
-    &:active {
-      .menu-item-icon {
-        color: #0008;
-      }
+    .menu-item__inner {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &:active {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .menu-item__icon,
+  .menu-item__label {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  &.active {
+    .menu-item__icon,
+    .menu-item__label {
+      color: #fff;
     }
 
-    .menu-item-icon {
-      color: rgba(0, 0, 0, 0.45);
-    }
-
-    &.active {
-      .menu-item-icon {
-        color: #000;
-      }
+    .menu-item__inner {
+      background-color: rgba(255, 255, 255, 0.05);
     }
   }
 }

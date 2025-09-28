@@ -259,7 +259,7 @@ const formatCredit = computed(() => {
 <style scoped>
 .pricing-wrapper {
   padding: 24px;
-  background-color: var(--background-color-primary);
+  background-color: var(--la-background-color-primary);
 }
 
 .huge-title {

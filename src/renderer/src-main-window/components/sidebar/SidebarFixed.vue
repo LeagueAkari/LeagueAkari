@@ -1,19 +1,33 @@
 <template>
   <div class="sidebar-fixed">
-    <NPopover placement="right" v-if="rts.settings.enabled && rts.info.isDead">
+    <!-- respawn timer -->
+    <NPopover
+      placement="right"
+      v-if="rts.settings.enabled && rts.info.isDead"
+      :disabled="!isCollapsed"
+    >
       <template #trigger>
-        <div class="menu-item">
-          <div class="menu-item-inner">
-            <NProgress
-              type="circle"
-              :gap-offset-degree="180"
-              :stroke-width="4"
-              :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
-              status="success"
-            >
-              <span class="respawn-timer-countdown">{{ formattedCountdown }}</span>
-            </NProgress>
-            <NIcon class="respawn-timer-hourglass"><HourglassIcon /></NIcon>
+        <div class="menu-item menu-item-no-click">
+          <div class="menu-item__inner">
+            <div class="menu-item__icon">
+              <NProgress
+                class="menu-item__icon-n-progress"
+                type="circle"
+                :gap-offset-degree="180"
+                :stroke-width="4"
+                :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
+                status="success"
+              >
+                <span class="font-size-12px">{{ formattedCountdown }}</span>
+              </NProgress>
+            </div>
+            <div class="menu-item__label">
+              {{
+                t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) })
+              }}
+              ({{ rts.info.totalTime.toFixed(0) }}
+              s)
+            </div>
           </div>
         </div>
       </template>
@@ -24,48 +38,54 @@
         s)
       </div>
     </NPopover>
+
+    <!-- connection hub -->
     <NPopover placement="right-end" ref="popover-connection" :duration="250">
       <template #trigger>
-        <div class="menu-item">
-          <div class="menu-item-inner">
-            <NProgress
-              v-if="lcs.summoner.me"
-              @click="handleSummonerClick(lcs.summoner.me)"
-              type="circle"
-              :stroke-width="4"
-              :percentage="
-                (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
-              "
-              :gap-degree="45"
-            >
-              <LcuImage
-                class="summoner-profile-icon"
-                :src="profileIconUri(lcs.summoner.me.profileIconId)"
-              />
-            </NProgress>
+        <div class="menu-item menu-item-no-click">
+          <div class="menu-item__inner">
+            <div class="menu-item__icon" v-if="lcs.summoner.me">
+              <NProgress
+                class="menu-item__icon-n-progress"
+                @click="handleSummonerClick(lcs.summoner.me)"
+                type="circle"
+                :stroke-width="4"
+                :percentage="
+                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
+                "
+                :gap-degree="45"
+              >
+                <LcuImage
+                  class="summoner-profile-icon"
+                  :src="profileIconUri(lcs.summoner.me.profileIconId)"
+                />
+              </NProgress>
+            </div>
             <NBadge
               v-else
               dot
               processing
               :show="!lcs.isInConnectionLoop && otherClients.length > 0"
             >
-              <NIcon class="menu-item-icon"><PlugDisconnected20FilledIcon /></NIcon>
+              <NIcon class="menu-item__icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
+            <div class="menu-item__label">{{ t('SideBarFixed.notConnected') }}</div>
           </div>
         </div>
       </template>
       <ClientConnection ref="client-connection-body" />
     </NPopover>
-    <NTooltip placement="right">
+    <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
         <div class="menu-item" @click="handleOpenSettingsModal">
-          <div class="menu-item-inner">
-            <NIcon class="menu-item-icon"><Settings28FilledIcon /></NIcon>
+          <div class="menu-item__inner">
+            <NIcon class="menu-item__icon"><Settings28FilledIcon /></NIcon>
+            <div class="menu-item__label">{{ t('SideBarFixed.settings') }}</div>
           </div>
         </div>
       </template>
-      <span class="simple-popover">
-        <div class="title">{{ t('SideBarFixed.settings') }}</div>
+      <span class="menu-item-popover">
+        {{ t('SideBarFixed.settings') }}
       </span>
     </NTooltip>
   </div>
@@ -83,7 +103,6 @@ import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
   Settings28Filled as Settings28FilledIcon
 } from '@vicons/fluent'
-import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
@@ -92,6 +111,10 @@ import { computed, inject, useTemplateRef, watch } from 'vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 import ClientConnection from './ClientConnection.vue'
+
+const { isCollapsed = false } = defineProps<{
+  isCollapsed?: boolean
+}>()
 
 const { t } = useTranslation()
 
@@ -140,24 +163,23 @@ watch(
 }
 
 .menu-item {
-  display: flex;
+  width: 100%;
   position: relative;
-  justify-content: center;
-  align-items: center;
-  height: 52px;
-  width: 52px;
-  padding: 2px;
+  padding: 4px;
   box-sizing: border-box;
   cursor: pointer;
 
-  .menu-item-inner {
-    position: relative;
+  .menu-item__inner {
     display: flex;
-    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    position: relative;
     align-items: center;
-    height: 72%;
-    width: 72%;
-    border-radius: 2px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    /* overflow: hidden; */
+    padding: 0 4px;
+    box-sizing: border-box;
 
     .summoner-profile-icon {
       width: 28px;
@@ -166,32 +188,69 @@ watch(
     }
   }
 
-  .menu-item-icon {
-    font-size: 24px;
-    transition: color 0.2s;
+  .menu-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    font-size: 16px;
+    transition:
+      color 0.2s,
+      font-size 0.2s;
+    flex-shrink: 0;
+
+    .collapsed & {
+      font-size: 18px;
+    }
   }
 
-  .menu-item-indicator {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 5px;
-    height: 64%;
-    border-radius: 4px;
+  .menu-item__icon-n-progress {
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu-item__label {
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transition:
+      color 0.2s,
+      opacity 0.2s;
+
+    .collapsed & {
+      opacity: 0;
+    }
+  }
+
+  &:hover {
+    .menu-item__icon,
+    .menu-item__label {
+      color: #fff;
+    }
+
+    .menu-item__inner {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &:not(.menu-item-no-click):active {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .menu-item__icon,
+  .menu-item__label {
+    color: rgba(255, 255, 255, 0.8);
   }
 }
 
-.simple-popover {
-  .title {
-    font-weight: bold;
-    font-size: 14px;
-  }
-
-  .content {
-    margin-top: 8px;
-    font-size: 12px;
-  }
+.menu-item-popover {
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .summoner-name {
@@ -263,178 +322,7 @@ watch(
   }
 }
 
-.no-client {
+.font-size-12px {
   font-size: 12px;
-}
-
-.respawn-timer-countdown {
-  font-size: 12px;
-}
-
-.respawn-timer-hourglass {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 16px;
-  transform: translate(25%, 25%);
-  animation: hourglass-rotate 6s ease infinite;
-}
-
-[data-theme='dark'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #fff;
-      }
-    }
-
-    .menu-item-icon {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .summoner-name {
-    .tag-line {
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  .region {
-    .region-name {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .separator {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .title-label {
-    color: rgba(255, 255, 255, 1);
-
-    .icon {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .client {
-    background-color: rgba(255, 255, 255, 0.03);
-
-    &.connectable {
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-
-      &:active {
-        background-color: rgba(255, 255, 255, 0.08);
-      }
-    }
-
-    .region-name {
-      color: #fff;
-    }
-
-    .pid {
-      color: #6a6a6ae3;
-    }
-  }
-
-  .respawn-timer-hourglass {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .no-client {
-    color: rgba(255, 255, 255, 1);
-  }
-
-  .respawn-timer-countdown {
-    color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-[data-theme='light'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #000;
-      }
-    }
-
-    .menu-item-icon {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .summoner-name {
-    .tag-line {
-      color: rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  .region {
-    .region-name {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .separator {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  .title-label {
-    color: rgba(0, 0, 0, 1);
-
-    .icon {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .client {
-    background-color: rgba(0, 0, 0, 0.03);
-
-    &.connectable {
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-
-      &:active {
-        background-color: rgba(0, 0, 0, 0.08);
-      }
-    }
-
-    .region-name {
-      color: #000;
-    }
-
-    .pid {
-      color: #3e3e3ee3;
-    }
-  }
-
-  .respawn-timer-hourglass {
-    color: rgba(0, 0, 0, 0.4);
-  }
-
-  .no-client {
-    color: rgba(0, 0, 0, 1);
-  }
-
-  .respawn-timer-countdown {
-    color: rgba(0, 0, 0, 0.8);
-  }
-}
-
-@keyframes hourglass-rotate {
-  0%,
-  40% {
-    transform: translate(25%, 25%) rotate(0deg); /* 保持静止 */
-  }
-  50%,
-  90% {
-    transform: translate(25%, 25%) rotate(180deg); /* 保持静止 */
-  }
-  100% {
-    transform: translate(25%, 25%) rotate(360deg); /* 快速复原 */
-  }
 }
 </style>

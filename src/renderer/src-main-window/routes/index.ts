@@ -10,36 +10,29 @@ const router = createRouter({
       redirect: { name: 'match-history' }
     },
     {
-      name: 'panel',
-      path: '/panel',
-      component: () => import('@main-window/views/Panel.vue'),
-      children: [
-        {
-          name: 'match-history',
-          path: '/match-history/:sgpServerId?/:puuid?',
-          component: () => import('@main-window/views/match-history/MatchHistoryTabs.vue')
-        },
-        {
-          name: 'ongoing-game',
-          path: '/ongoing-game',
-          component: () => import('@main-window/views/ongoing-game/OngoingGame.vue')
-        },
-        {
-          name: 'toolkit',
-          path: '/toolkit/:section?',
-          component: () => import('@main-window/views/toolkit/Toolkit.vue')
-        },
-        {
-          name: 'automation',
-          path: '/automation/:section?',
-          component: () => import('@main-window/views/automation/Automation.vue')
-        },
-        {
-          name: 'test',
-          path: 'test',
-          component: () => import('@main-window/views/test/Test.vue')
-        }
-      ]
+      name: 'match-history',
+      path: '/match-history/:sgpServerId?/:puuid?',
+      component: () => import('@main-window/views/match-history/MatchHistoryTabs.vue')
+    },
+    {
+      name: 'ongoing-game',
+      path: '/ongoing-game',
+      component: () => import('@main-window/views/ongoing-game/OngoingGame.vue')
+    },
+    {
+      name: 'toolkit',
+      path: '/toolkit/:section?',
+      component: () => import('@main-window/views/toolkit/Toolkit.vue')
+    },
+    {
+      name: 'automation',
+      path: '/automation/:section?',
+      component: () => import('@main-window/views/automation/Automation.vue')
+    },
+    {
+      name: 'test',
+      path: '/test',
+      component: () => import('@main-window/views/test/Test.vue')
     }
   ]
 })

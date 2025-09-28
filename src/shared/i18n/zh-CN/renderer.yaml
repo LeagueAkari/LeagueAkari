@@ -851,10 +851,11 @@ SideBarFixed:
   noClientTitle: 无可用客户端
   noClient: 当前无可用客户端，请启动游戏
   settings: 设置
+  notConnected: 未连接
   connectedClient: 已连接的客户端
 
   respawnTimer:
-    timeLeft: 距离重生还有 {{seconds}} s
+    timeLeft: 距离重生 {{seconds}} s
 
 ClientConnection:
   noClientGroup: 无可用客户端

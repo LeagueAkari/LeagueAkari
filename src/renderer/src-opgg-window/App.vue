@@ -23,8 +23,8 @@ import OpggWindowTitleBar from './components/OpggWindowTitleBar.vue'
   height: 100%;
   display: flex;
   flex-direction: column;
-  min-width: var(--app-min-width);
-  min-height: var(--app-min-height);
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
 
   > .content {
     height: 0;

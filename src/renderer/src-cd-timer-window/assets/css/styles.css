@@ -7,17 +7,17 @@
 
 :root {
   color-scheme: dark;
-  --background-color-primary: #1a1a1d;
-  --app-min-height: 200px;
-  --app-min-width: 200px;
-  --title-bar-height: 28px;
-  --scroll-bar-height: 6px;
-  --scroll-bar-width: 6px;
+  --la-background-color-primary: #1a1a1d;
+  --la-app-min-height: 200px;
+  --la-app-min-width: 200px;
+  --la-title-bar-height: 28px;
+  --la-scroll-bar-height: 6px;
+  --la-scroll-bar-width: 6px;
 }
 
 ::-webkit-scrollbar {
-  width: var(--scroll-bar-width);
-  height: var(--scroll-bar-height);
+  width: var(--la-scroll-bar-width);
+  height: var(--la-scroll-bar-height);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -37,7 +37,7 @@ body,
 }
 
 #v-binder-view-measurer {
-  top: var(--title-bar-height) !important;
+  top: var(--la-title-bar-height) !important;
 }
 
 body {
@@ -83,7 +83,7 @@ a:visited {
 }
 
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
-  max-height: calc(100vh - var(--title-bar-height)) !important;
+  max-height: calc(100vh - var(--la-title-bar-height)) !important;
 }
 
 .n-timeline .n-timeline-item .n-timeline-item-content .n-timeline-item-content__meta {

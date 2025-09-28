@@ -26,7 +26,7 @@ const lcs = useLeagueClientStore()
   display: flex;
   position: relative;
   flex-direction: column;
-  top: calc(var(--title-bar-height) * -0.5);
+  top: calc(var(--la-title-bar-height) * -0.5);
   color: #8d8d8d;
   font-size: 18px;
   font-weight: bold;

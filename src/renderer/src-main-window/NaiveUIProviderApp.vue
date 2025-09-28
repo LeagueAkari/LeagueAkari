@@ -8,7 +8,7 @@
     inline-theme-disabled
   >
     <NMessageProvider
-      :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }"
+      :container-style="{ top: 'calc(var(--la-title-bar-height) + 12px)' }"
       placement="top-right"
     >
       <NNotificationProvider placement="bottom-right">

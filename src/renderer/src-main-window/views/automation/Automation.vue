@@ -126,7 +126,6 @@ watch(
 
   .sections {
     display: flex;
-    height: 52px;
     padding: 0 24px;
     align-items: flex-end;
   }

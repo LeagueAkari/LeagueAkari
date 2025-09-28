@@ -849,6 +849,7 @@ SideBarFixed:
   noClientTitle: No Available Client
   noClient: No available client, please start the game
   settings: Settings
+  notConnected: Not Connected
   connectedClient: Connected Client
   launchedClientPlaceholder: Launched Client {{index}}
 

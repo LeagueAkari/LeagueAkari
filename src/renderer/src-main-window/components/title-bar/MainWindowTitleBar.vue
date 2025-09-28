@@ -1,7 +1,5 @@
 <template>
-  <div id="app-title-bar">
-    <span class="app-name">{{ as.appTitle }}</span>
-    <div class="divider" :class="{ invisible: !shouldShowDivider }" />
+  <div class="app-title-bar">
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
@@ -60,15 +58,14 @@ const shouldShowDivider = computed(() => {
 </script>
 
 <style scoped>
-#app-title-bar {
+.app-title-bar {
   display: flex;
   position: relative;
-  height: var(--title-bar-height);
+  height: var(--la-title-bar-height);
   align-items: center;
   -webkit-app-region: drag;
-  background-color: #0001;
-  backdrop-filter: blur(8px);
   z-index: 1000000;
+  padding-left: 8px;
 
   .mica & {
     backdrop-filter: none;

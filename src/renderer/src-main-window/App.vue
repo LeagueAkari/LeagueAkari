@@ -1,6 +1,6 @@
 <template>
   <div
-    id="app-frame"
+    class="app-frame"
     :class="{
       mica: preferMica,
       'use-plain-bg': !backgroundImageUrl
@@ -8,6 +8,26 @@
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <SetupInAppScope />
+
+    <div class="app-frame__left">
+      <Sidebar />
+    </div>
+
+    <div class="app-frame__right">
+      <MainWindowTitleBar />
+
+      <div class="app-frame__right-content">
+        <RouterView v-slot="{ Component }">
+          <Transition name="fade">
+            <KeepAlive>
+              <component :is="Component" />
+            </KeepAlive>
+          </Transition>
+        </RouterView>
+      </div>
+    </div>
+
+    <!--transition background profile skin -->
     <Transition name="bg-fade">
       <div
         v-if="backgroundImageUrl && !preferMica"
@@ -21,21 +41,27 @@
         }"
       ></div>
     </Transition>
-    <MainWindowTitleBar />
-    <div id="app-content"><RouterView /></div>
-    <div v-if="as.isRabiVersion" id="version-watermark">League Akari {{ as.version }}</div>
+
+    <!-- watermark -->
+    <div v-if="as.isRabiVersion" class="version-watermark">
+      {{ t('appName', { ns: 'common' }) }} {{ as.version }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { electronAPI } from '@electron-toolkit/preload'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
+import { ProcessControlHttpApi } from '@shared/http-api-axios-helper/league-client/process-control'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import { provide, ref } from 'vue'
+
+import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
@@ -80,27 +106,39 @@ const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 </script>
 
-<style>
-#app-frame {
+<style scoped>
+.app-frame {
   position: relative;
   height: 100%;
   display: flex;
-  flex-direction: column;
-  min-width: var(--app-min-width);
-  min-height: var(--app-min-height);
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
 
   &.use-plain-bg:not(.mica) {
-    background-color: var(--background-color-primary);
+    background-color: var(--la-background-color-primary);
   }
 
-  > #app-content {
+  .app-frame__left {
+    background-color: rgba(0, 0, 0, 0.2);
     z-index: 5;
-    height: 0;
+  }
+
+  .app-frame__right {
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+    width: 0;
     flex: 1;
     overflow: hidden;
+
+    .app-frame__right-content {
+      height: 0;
+      flex: 1;
+      overflow: hidden;
+    }
   }
 
-  > #version-watermark {
+  .version-watermark {
     position: absolute;
     bottom: 8px;
     right: 16px;
@@ -128,6 +166,18 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
     left: 0;
     width: 100%;
     height: 100%;
+  }
+}
+
+.app-background {
+  position: relative;
+  height: 100%;
+  display: flex;
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
+
+  &.use-plain-bg:not(.mica) {
+    background-color: var(--la-background-color-primary);
   }
 }
 

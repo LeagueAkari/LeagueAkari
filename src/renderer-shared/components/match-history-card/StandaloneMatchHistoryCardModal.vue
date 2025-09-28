@@ -159,7 +159,7 @@ watch(
 .standalone-card-wrapper {
   position: relative;
   overflow: auto;
-  top: calc(var(--title-bar-height) / 2);
+  top: calc(var(--la-title-bar-height) / 2);
 
   :deep(.v-binder-follower-container) {
     position: fixed;

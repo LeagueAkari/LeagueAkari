@@ -274,7 +274,7 @@ const handleContextMenu = (event: MouseEvent, id: string) => {
   // 但不加 nextTick 似乎也没问题
   nextTick(() => {
     const height =
-      getComputedStyle(document.documentElement).getPropertyValue('--title-bar-height') || '0'
+      getComputedStyle(document.documentElement).getPropertyValue('--la-title-bar-height') || '0'
     contextMenuState.x = event.clientX
     contextMenuState.y = event.clientY - parseInt(height)
     contextMenuState.show = true
@@ -453,7 +453,7 @@ const { summonerName } = useStreamerModeMaskedText()
   height: 100%;
   align-items: center;
   width: max-content;
-  gap: 1px;
+  gap: 2px;
 }
 
 .tab {
@@ -463,8 +463,7 @@ const { summonerName } = useStreamerModeMaskedText()
   flex-shrink: 0;
   padding: 0 4px 0 8px;
   box-sizing: border-box;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+  border-radius: 4px;
   cursor: pointer;
   user-select: none;
   transition:
@@ -526,8 +525,6 @@ const { summonerName } = useStreamerModeMaskedText()
   }
 
   &.active {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
     filter: brightness(1);
   }
 
