@@ -78,7 +78,7 @@ const updateIndicatorPosition = () => {
     const { top: itemTop, height } = activeItem.getBoundingClientRect()
     const { top: sidebarTop } = sidebarMenu.value.getBoundingClientRect()
 
-    const thatHeight = 0.4 * height
+    const thatHeight = 0.5 * height
     indicatorPosition.value.top = itemTop - sidebarTop + (height - thatHeight) / 2
     indicatorPosition.value.height = thatHeight
   }
@@ -98,6 +98,7 @@ watch(
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 
   .indicator-rail {
     position: absolute;
@@ -147,7 +148,7 @@ watch(
 .menu-item {
   width: 100%;
   position: relative;
-  padding: 4px;
+  padding: 0 4px;
   box-sizing: border-box;
   cursor: pointer;
 
@@ -198,7 +199,7 @@ watch(
   &:hover {
     .menu-item__icon,
     .menu-item__label {
-      color: #fff;
+      color: rgba(255, 255, 255, 1);
     }
 
     .menu-item__inner {

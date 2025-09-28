@@ -160,12 +160,13 @@ watch(
 .sidebar-fixed {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .menu-item {
   width: 100%;
   position: relative;
-  padding: 4px;
+  padding: 0 4px;
   box-sizing: border-box;
   cursor: pointer;
 
@@ -227,7 +228,7 @@ watch(
   &:hover {
     .menu-item__icon,
     .menu-item__label {
-      color: #fff;
+      color: rgba(255, 255, 255, 1);
     }
 
     .menu-item__inner {

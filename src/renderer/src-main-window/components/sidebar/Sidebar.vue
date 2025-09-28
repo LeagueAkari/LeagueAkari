@@ -20,7 +20,7 @@
       :is-collapsed="isCollapsed"
     />
     <div class="app-sidebar__padding"></div>
-    <SidebarFixed :is-collapsed="isCollapsed" />
+    <SidebarFixed class="app-sidebar__fixed" :is-collapsed="isCollapsed" />
   </div>
 </template>
 
@@ -172,6 +172,8 @@ watchEffect(() => {
     gap: 4px;
     height: 48px;
     overflow: hidden;
+
+    -webkit-app-region: drag;
   }
 
   .app-sidebar__logo {
@@ -184,6 +186,7 @@ watchEffect(() => {
     font-size: 20px;
     flex-shrink: 0;
     cursor: pointer;
+    -webkit-app-region: no-drag;
 
     &:hover {
       .app-sidebar__logo-toggle {
@@ -250,6 +253,10 @@ watchEffect(() => {
 
   .app-sidebar__padding {
     flex: 1;
+  }
+
+  .app-sidebar__fixed {
+    margin-bottom: 4px;
   }
 }
 </style>
