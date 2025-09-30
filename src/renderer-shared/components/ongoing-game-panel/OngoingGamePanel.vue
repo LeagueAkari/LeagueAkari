@@ -443,6 +443,7 @@ const columnsNeed = computed(() => {
     height: 12px;
     border-radius: 50%;
     margin-right: 8px;
+    border: 1px solid rgb(255, 255, 255, 0.4);
 
     &.red {
       background-color: #ff3333;

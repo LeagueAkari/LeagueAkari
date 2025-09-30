@@ -95,6 +95,8 @@
       </template>
       <ClientConnection ref="client-connection-body" />
     </NPopover>
+
+    <!-- settings -->
     <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
         <div class="menu-item" @click="handleOpenSettingsModal">

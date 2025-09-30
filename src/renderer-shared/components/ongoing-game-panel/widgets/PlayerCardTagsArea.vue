@@ -296,18 +296,18 @@
       :delay="50"
     >
       <template #trigger>
-        <div class="tag akari-loved" v-if="analysis.akariScore.good">
-          {{ t('PlayerInfoCard.akariLoved.good') }}
-        </div>
-        <div class="tag akari-loved" v-else-if="analysis.akariScore.great">
+        <div class="tag akari-loved" v-if="analysis.akariScore.great">
           {{ t('PlayerInfoCard.akariLoved.great') }}
         </div>
+        <div class="tag akari-loved" v-else-if="analysis.akariScore.good">
+          {{ t('PlayerInfoCard.akariLoved.good') }}
+        </div>
       </template>
-      <div class="popover-text" v-if="analysis.akariScore.good">
-        {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
-      </div>
-      <div class="popover-text" v-else-if="analysis.akariScore.great">
+      <div class="popover-text" v-if="analysis.akariScore.great">
         {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
+      </div>
+      <div class="popover-text" v-else-if="analysis.akariScore.good">
+        {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
       </div>
     </NPopover>
     <NPopover

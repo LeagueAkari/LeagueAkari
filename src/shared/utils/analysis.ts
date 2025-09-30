@@ -1083,7 +1083,7 @@ export function calculateAkariScore(analyses: {
     participationScore,
     total,
     good: total >= 26.0 && analyses.summary.count >= 5,
-    great: total >= 30.0 && analyses.summary.count >= 10
+    great: total >= 30.0 && analyses.summary.count >= 8
   }
 }
 
