@@ -1,33 +1,33 @@
 <template>
-  <div class="client-connection">
-    <div class="client-group" v-if="lcs.auth">
-      <div class="group-name">{{ $t('ClientConnection.connectedGroup') }}</div>
-      <div class="clients">
-        <div class="client connected">
-          <div class="client-wrapper">
+  <div class="cc">
+    <div class="cc__group" v-if="lcs.auth">
+      <div class="cc__group-name">{{ $t('ClientConnection.connectedGroup') }}</div>
+      <div class="cc__list">
+        <div class="cc__item cc__item--connected">
+          <div class="cc__wrap">
             <LcuImage
-              class="client-icon"
+              class="cc__icon"
               :src="lcs.summoner.me ? profileIconUri(lcs.summoner.me.profileIconId) : undefined"
             />
-            <div class="client-info">
-              <NEllipsis class="summoner-name" v-if="lcs.summoner.me">
+            <div class="cc__info">
+              <NEllipsis class="cc__name" v-if="lcs.summoner.me">
                 <StreamerModeMaskedText>
                   <template #masked>
-                    <span class="summoner-name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                    <span class="cc__name-text">{{ t('summoner', { ns: 'common' }) }}</span>
                   </template>
-                  <span class="summoner-name-text">{{ lcs.summoner.me.gameName }}</span>
-                  <span class="summoner-name-tag">#{{ lcs.summoner.me.tagLine }}</span>
+                  <span class="cc__name-text">{{ lcs.summoner.me.gameName }}</span>
+                  <span class="cc__name-tag">#{{ lcs.summoner.me.tagLine }}</span>
                 </StreamerModeMaskedText>
               </NEllipsis>
-              <div class="summoner-name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
+              <div class="cc__name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
 
               <StreamerModeMaskedText>
                 <template #masked>
-                  <div class="client-region">
+                  <div class="cc__region">
                     {{ t('region', { ns: 'common' }) }}
                   </div>
                 </template>
-                <div class="client-region">
+                <div class="cc__region">
                   {{
                     sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
                       sgps.availability.sgpServerId
@@ -37,7 +37,7 @@
               </StreamerModeMaskedText>
             </div>
           </div>
-          <div class="client-actions">
+          <div class="cc__actions">
             <NButton size="tiny" secondary @click="handleRestartUx">
               <template #icon>
                 <NIcon>
@@ -87,42 +87,42 @@
         </div>
       </div>
     </div>
-    <div class="client-group" v-if="otherClients.length > 0">
-      <div class="group-name" v-if="lcs.auth">
+    <div class="cc__group" v-if="otherClients.length > 0">
+      <div class="cc__group-name" v-if="lcs.auth">
         {{ $t('ClientConnection.launchedOtherClientsGroup') }}
       </div>
-      <div class="group-name" v-else>
+      <div class="cc__group-name" v-else>
         {{ $t('ClientConnection.launchedClientsGroup') }}
       </div>
       <NScrollbar style="max-height: 240px">
-        <div class="clients">
+        <div class="cc__list">
           <div
-            class="client"
+            class="cc__item"
             v-for="cmd of otherClients"
             :key="cmd.pid"
             @click="handleConnect(cmd)"
           >
-            <div class="client-wrapper">
+            <div class="cc__wrap">
               <LcuImage
-                class="client-icon"
+                class="cc__icon"
                 :src="clientExtraInfo[cmd.pid] ? clientExtraInfo[cmd.pid].profileIcon : undefined"
               />
-              <div class="client-info">
-                <NEllipsis class="summoner-name" v-if="clientExtraInfo[cmd.pid]">
+              <div class="cc__info">
+                <NEllipsis class="cc__name" v-if="clientExtraInfo[cmd.pid]">
                   <StreamerModeMaskedText>
                     <template #masked>
-                      <span class="summoner-name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                      <span class="cc__name-text">{{ t('summoner', { ns: 'common' }) }}</span>
                     </template>
-                    <span class="summoner-name-text">{{
+                    <span class="cc__name-text">{{
                       clientExtraInfo[cmd.pid].summoner.gameName
                     }}</span>
-                    <span class="summoner-name-tag"
+                    <span class="cc__name-tag"
                       >#{{ clientExtraInfo[cmd.pid].summoner.tagLine }}</span
                     >
                   </StreamerModeMaskedText>
                 </NEllipsis>
-                <div class="summoner-name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
-                <div class="client-region">
+                <div class="cc__name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
+                <div class="cc__region">
                   {{
                     sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
                       getSgpServerId(cmd.region, cmd.rsoPlatformId)
@@ -131,20 +131,18 @@
                   (PID: {{ cmd.pid }})
                 </div>
               </div>
-              <div class="connecting-indicator" v-if="lcs.connectingClient?.pid === cmd.pid">
+              <div class="cc__connecting" v-if="lcs.connectingClient?.pid === cmd.pid">
                 <NSpin :size="10" />
-                <span class="connecting-indicator-text">{{
-                  $t('ClientConnection.connecting')
-                }}</span>
+                <span class="cc__connecting-text">{{ $t('ClientConnection.connecting') }}</span>
               </div>
             </div>
           </div>
         </div>
       </NScrollbar>
     </div>
-    <div class="client-group" v-if="!lcs.auth && otherClients.length === 0">
-      <div class="group-name">{{ $t('ClientConnection.noClientGroup') }}</div>
-      <div class="no-client">{{ $t('ClientConnection.noClient') }}</div>
+    <div class="cc__group" v-if="!lcs.auth && otherClients.length === 0">
+      <div class="cc__group-name">{{ $t('ClientConnection.noClientGroup') }}</div>
+      <div class="cc__no-client">{{ $t('ClientConnection.noClient') }}</div>
     </div>
   </div>
 </template>
@@ -152,7 +150,6 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -333,13 +330,13 @@ const handlePlayAgain = async () => {
 </script>
 
 <style scoped>
-.client-connection {
+.cc {
   display: flex;
   flex-direction: column;
 }
 
-.client-group {
-  .group-name {
+.cc__group {
+  .cc__group-name {
     margin-bottom: 8px;
     color: #fffb;
     font-weight: bold;
@@ -350,13 +347,13 @@ const handlePlayAgain = async () => {
   }
 }
 
-.clients {
+.cc__list {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.client {
+.cc__item {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -367,35 +364,35 @@ const handlePlayAgain = async () => {
   box-shadow: 0 0 2px 2px #0002;
   width: 200px;
 
-  &:not(.connected):hover {
+  &:not(.cc__item--connected):hover {
     background-color: #fff1;
     cursor: pointer;
   }
 
-  .connecting-indicator {
+  .cc__connecting {
     position: absolute;
     bottom: 8px;
     right: 8px;
     display: flex;
     gap: 4px;
 
-    .connecting-indicator-text {
+    .cc__connecting-text {
       font-size: 10px;
     }
   }
 }
 
-.client .client-wrapper {
+.cc__item .cc__wrap {
   display: flex;
 
-  .client-icon {
+  .cc__icon {
     width: 36px;
     height: 36px;
     margin-right: 8px;
     border-radius: 50%;
   }
 
-  .client-info {
+  .cc__info {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -404,36 +401,36 @@ const handlePlayAgain = async () => {
     flex: 1;
     width: 0;
 
-    .summoner-name {
+    .cc__name {
       width: 100%;
 
-      .summoner-name-text {
+      .cc__name-text {
         color: #fff;
         font-size: 14px;
         font-weight: bold;
       }
 
-      .summoner-name-tag {
+      .cc__name-tag {
         margin-left: 4px;
         color: #fffa;
         font-size: 12px;
       }
     }
 
-    .summoner-name-none {
+    .cc__name-none {
       color: #fffa;
       font-size: 12px;
       font-style: italic;
     }
 
-    .client-region {
+    .cc__region {
       font-size: 10px;
       color: #fffa;
     }
   }
 }
 
-.client .client-actions {
+.cc__item .cc__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

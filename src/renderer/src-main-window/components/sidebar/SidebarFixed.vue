@@ -88,7 +88,9 @@
               <div class="menu-item__label">{{ t('SideBarFixed.inConnectionLoop') }}</div>
             </template>
             <template v-else>
-              <div class="menu-item__label">{{ t('SideBarFixed.notConnected') }}</div>
+              <div class="menu-item__label menu-item__label--not-connected">
+                {{ t('SideBarFixed.notConnected') }}
+              </div>
             </template>
           </div>
         </div>
@@ -273,6 +275,14 @@ watch(
     .menu-item__label-tag-line {
       font-size: 12px;
       margin-left: 4px;
+      color: rgba(0, 0, 0, 0.6);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &.menu-item__label--not-connected {
       color: rgba(0, 0, 0, 0.6);
 
       [data-theme='dark'] & {
