@@ -11,7 +11,7 @@ tray:
   adjustAllWindowPositions: Adjust All Window Positions
 
 windowOpenHandler:
-  toAkari: To League Akari GitHub ❤️
+  toAkari: To $t(common:appName) GitHub ❤️
   toExternalLink: To external site {{target}}
 
 auto-gameflow-main:
@@ -42,7 +42,7 @@ auto-select-main:
 
 self-update-main:
   title: Self Update
-  start-update: Starting update League Akari
+  start-update: Starting update $t(common:appName)
   updateOnNextStartup: Updated Applied. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}

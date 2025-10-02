@@ -41,7 +41,7 @@ DeclarationModal:
     .akari-disclaimer a:hover{text-decoration:underline;}
     </style>
 
-    # League **Akari** User Guide & Disclaimer
+    # $t(common:appName) User Guide & Disclaimer
 
     > **Before downloading, installing, or using this software, please read and fully understand this guide and disclaimer.**
     > Once you start using it, you are deemed to have fully understood and agreed to all the following terms.
@@ -49,7 +49,7 @@ DeclarationModal:
     ---
 
     ## I. Nature of the Software & Acquisition
-    - **League Akari** is entirely open-source and free; all features are provided “as-is.”
+    - **$t(common:appName)i** is entirely open-source and free; all features are provided “as-is.”
     - This software may not be released, distributed, or obtained in any paid, bundled, or profit-making form. Always download it through the official public repository or its mirrors to avoid financial loss and security risks.
 
     ## II. Risk Notice & Limitation of Liability
@@ -57,12 +57,12 @@ DeclarationModal:
       1. Your game account being suspended or permanently banned;
       2. Loss, corruption, or inconsistency of game data with server data;
       3. Client crashes, performance degradation, or other poor game experiences.
-    - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **League Akari** development team and all contributors assume no liability; all related risks are borne by the user.
+    - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **$t(common:appName)** development team and all contributors assume no liability; all related risks are borne by the user.
 
     > Please refer to the **Game Info Tracking Improvements** section in [Patch 25.17 Notes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/).
 
     ## III. Server Compatibility Statement
-    - **Effective from the release of this statement, League Akari will no longer provide any form of support for Tencent Game servers.**
+    - **Effective from the release of this statement, $t(common:appName) will no longer provide any form of support for Tencent Game servers.**
     - Using this software in Tencent server environments is highly likely to violate Tencent Games’ user agreements, management regulations, or technical protection measures; any account bans, data loss, or other adverse consequences are solely the user’s responsibility.
 
     ## IV. Information Collection & Privacy Protection
@@ -93,7 +93,7 @@ TrafficButtons:
   close: Close
 
   modal:
-    title: Quit League Akari
+    title: Quit $t(common:appName)
     options:
       minimize-to-tray: Minimize to tray
       quit: Quit
@@ -186,7 +186,7 @@ AppSettings:
 
     useProfileSkinAsBackground:
       label: Use Profile Skin as Background
-      description: League Akari will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+      description: $t(common:appName) will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
 
     backgroundMaterial:
       label: Background Material
@@ -497,7 +497,7 @@ DebugSettings:
 
     reload:
       label: Reload Page
-      description: Refresh the League Akari user interface.
+      description: Refresh the $t(common:appName) user interface.
       button: Reload Page
 
   files:
@@ -513,7 +513,7 @@ DebugSettings:
       popoverTrigger: Details
       button: Open Directory
       description:
-        part1: Open the League Akari application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
+        part1: Open the $t(common:appName) application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
         part2: Contains user settings, marked players, and other information.
         part3: Temporary files for upcoming automatic updates.
         part4: Configurable setting files.
@@ -562,7 +562,7 @@ DebugSettings:
     TerminatedInError: 'Terminated in Error'
 
   inAdministrator:
-    description: League Akari is currently running with administrator privileges. Now, it is League Akari X.
+    description: $t(common:appName) is currently running with administrator privileges. Now, it is $t(common:appName) X.
 
   kyokoMode:
     label: Kyoko Mode
@@ -924,7 +924,7 @@ SpectateStatus:
 
   tokenSpectate:
     label: Copy Token
-    description: Can be used to start the spectate process in another instance of League Akari.
+    description: Can be used to start the spectate process in another instance of $t(common:appName).
     button: Copy
     copied: Spectate token copied
     copyFailed: Failed to copy spectate token
@@ -1005,7 +1005,7 @@ Client:
 
     disconnect:
       label: Disconnect
-      description: Disconnect League Akari from the League Client.
+      description: Disconnect $t(common:appName) from the League Client.
       button: Disconnect
 
     quitClient:
@@ -1755,7 +1755,7 @@ AuxWindowTitleBar:
   close: Close
   minimize: Minimize
   indicator: Aux Win.
-  indicatorTitle: Auxiliary Window of League Akari
+  indicatorTitle: Auxiliary Window of $t(common:appName)
   pin: Pin
   unpin: Unpin
   repositionToAlignLeagueClientUx: Align with League Client UX
@@ -2026,7 +2026,7 @@ OpggChampion:
   augmentPrism: Prism
   synergies: Synergies
 
-  writeToDisk: '[League Akari] Written to item build: {{name}}'
+  writeToDisk: '[$t(common:appName)] Written to item build: {{name}}'
   writtenToDisk: Successfully written to file
   writeFileFailedMessage: Failed to write file {{reason}}
   bootsDesc: Boots (sorted by pick rate)
@@ -2281,8 +2281,8 @@ simple-notifications-renderer:
 
     detected:
       title: Are you live streaming?
-      liveTools: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
-      bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
+      liveTools: $t(common:appName) has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+      bySettings: $t(common:appName) has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
 
   login-queue-task:
     name: Login Queue
@@ -2306,10 +2306,10 @@ simple-notifications-renderer:
 
   cannotGetUxCommandLine:
     title: Cannot Get League Client UX Command Line
-    alreadyUseWmi: Detected League Client UX is running, but cannot get its command line information. It may be that League Akari cannot be used on this computer
+    alreadyUseWmi: Detected League Client UX is running, but cannot get its command line information. It may be that $t(common:appName) cannot be used on this computer
     noAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to restart this application with administrator privileges, then enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
     withAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
-    extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, League Akari may not work properly'
+    extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, $t(common:appName) may not work properly'
     withAdminPositiveText: Confirm
     noAdminPositiveText: Restart with Administrator privileges
 
@@ -2324,7 +2324,7 @@ league-client-renderer:
 
 self-update-renderer:
   self-update-task:
-    name: League Akari Update
+    name: $t(common:appName) Update
     downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
     download-failed: Failed to download archive
     unpacking: Unpacking archive {{progress}}%
@@ -2333,7 +2333,7 @@ self-update-renderer:
     cancelButton: Cancel
 
   title: Self Update
-  start-update: Starting update League Akari
+  start-update: Starting update $t(common:appName)
   updateOnNextStartup: Updated Applied. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}

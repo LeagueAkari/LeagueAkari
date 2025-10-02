@@ -42,7 +42,7 @@ DeclarationModal:
     .akari-disclaimer a:hover{text-decoration:underline;}
     </style>
 
-    # League **Akari** 用户须知与免责声明
+    # $t(common:appName) 用户须知与免责声明
 
     > **请在下载、安装或使用本软件之前，务必仔细阅读并充分理解本须知与免责声明。**
     > 一旦您开始使用，即视为已充分理解并同意下列全部条款。
@@ -50,7 +50,7 @@ DeclarationModal:
     ---
 
     ## 一、软件性质与获取途径
-    - **League Akari** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
+    - **$t(common:appName)** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
     - 本软件不得以任何付费、捆绑销售或其他牟利形式发布、传播或获取。请务必通过官方公开仓库或其镜像下载，防止经济损失及安全隐患。
 
     ## 二、风险提示与责任限制
@@ -58,12 +58,12 @@ DeclarationModal:
       1. 游戏账户被暂停或永久封禁；
       2. 游戏数据丢失、损坏或与服务器数据不一致；
       3. 客户端异常、性能下降或其他不良游戏体验。
-    - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**League Akari** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
+    - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**$t(common:appName)** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
 
     > 请参考 [Patch 25.17 更新说明](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/) 中的 **Game Info Tracking Improvements** 一节。
 
     ## 三、服务器兼容性声明
-    - **自本声明发布之日起，League Akari 不再对腾讯游戏服务器提供任何形式的支持。**
+    - **自本声明发布之日起，$t(common:appName) 不再对腾讯游戏服务器提供任何形式的支持。**
     - 在腾讯服务器环境中使用本软件**极有可能**违反腾讯游戏相关用户协议、管理规范或技术保护措施；由此产生的封号、数据丢失或其他不利后果，概由用户自行负责。
 
     ## 四、信息收集与隐私保护
@@ -94,7 +94,7 @@ TrafficButtons:
   close: 关闭
 
   modal:
-    title: 退出 League Akari
+    title: 退出 $t(common:appName)
     options:
       minimize-to-tray: 最小化到托盘区
       quit: 退出应用
@@ -187,7 +187,7 @@ AppSettings:
 
     useProfileSkinAsBackground:
       label: 使用生涯皮肤背景
-      description: League Akari 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
+      description: $t(common:appName) 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
 
     backgroundMaterial:
       label: 背景材质
@@ -498,7 +498,7 @@ DebugSettings:
 
     reload:
       label: 页面重载
-      description: 刷新 League Akari 用户界面
+      description: 刷新 $t(common:appName) 用户界面
       button: 重新加载页面
 
   files:
@@ -514,7 +514,7 @@ DebugSettings:
       popoverTrigger: 详情
       button: 应用目录
       description:
-        part1: 打开 League Akari 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+        part1: 打开 $t(common:appName) 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
         part2: 存储用户设置、已标记的玩家等信息
         part3: 即将进行的自动更新临时文件
         part4: 一些可以替换的设置项文件
@@ -563,7 +563,7 @@ DebugSettings:
     TerminatedInError: '错误终止'
 
   inAdministrator:
-    description: League Akari 目前以管理员权限运行。现在，它是 League Akari X。
+    description: $t(common:appName) 目前以管理员权限运行。现在，它是 $t(common:appName) X
 
   kyokoMode:
     label: Kyoko 模式
@@ -925,7 +925,7 @@ SpectateStatus:
 
   tokenSpectate:
     label: 分享观战信息
-    description: 可以在另一个 League Akari 或其他应用中调起观战进程
+    description: 可以在另一个 $t(common:appName) 或其他应用中调起观战进程
     button: 复制
     copied: 对局密钥已复制
     copyFailed: 复制观战信息失败
@@ -1006,7 +1006,7 @@ Client:
 
     disconnect:
       label: 断开连接
-      description: 断开 League Akari 与 League Client 的连接
+      description: 断开 $t(common:appName) 与 League Client 的连接
       button: 断开
 
     quitClient:
@@ -1760,7 +1760,7 @@ AuxWindowTitleBar:
   close: 关闭
   minimize: 最小化
   indicator: 小窗
-  indicatorTitle: League Akari 的小型辅助功能窗口
+  indicatorTitle: $t(common:appName) 的小型辅助功能窗口
   pin: 置顶
   unpin: 取消置顶
   repositionToAlignLeagueClientUx: 贴附到客户端
@@ -1937,8 +1937,8 @@ Opgg:
   loadChampionFailedMessage: 获取英雄数据失败：{{reason}}
   setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
   setRunesFailedMessage: 设置符文配法失败：{{reason}}
-  spellsSet: '[League Akari] 已设置召唤师技能: {{spell1}} | {{spell2}}'
-  runesSet: '[League Akari] 已{{action}}符文配法: {{name}}'
+  spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
+  runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
 
   modes:
     ranked: '排位'
@@ -2030,7 +2030,7 @@ OpggChampion:
   augmentPrism: 棱彩阶
   synergies: 搭配
 
-  writeToDisk: '[League Akari] 已写入到装备方案：{{name}}'
+  writeToDisk: '[$t(common:appName)] 已写入到装备方案：{{name}}'
   writtenToDisk: 已写入到文件中
   writeFileFailedMessage: 写入文件失败 {{reason}}
   bootsDesc: 鞋子 (按出场率排序)
@@ -2284,8 +2284,8 @@ simple-notifications-renderer:
 
     detected:
       title: 在直播吗？
-      liveTools: League Akari 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
-      bySettings: League Akari 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
+      liveTools: $t(common:appName) 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
+      bySettings: $t(common:appName) 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
 
   login-queue-task:
     name: 登录排队
@@ -2309,10 +2309,10 @@ simple-notifications-renderer:
 
   cannotGetUxCommandLine:
     title: 无法获取客户端命令行信息
-    alreadyUseWmi: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。可能在此计算机上无法使用 League Akari
+    alreadyUseWmi: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。可能在此计算机上无法使用 $t(common:appName)
     noAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请尝试以管理员权限重新启动此应用，之后在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
     withAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
-    extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，League Akari 可能无法正常工作
+    extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，$t(common:appName) 可能无法正常工作
     withAdminPositiveText: 确认
     noAdminPositiveText: 以管理员权限重新启动
 
@@ -2327,7 +2327,7 @@ league-client-renderer:
 
 self-update-renderer:
   self-update-task:
-    name: League Akari 更新
+    name: $t(common:appName) 更新
     downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
     download-failed: 下载更新包失败
     unpacking: 正在解压更新包 {{progress}}%
@@ -2336,7 +2336,7 @@ self-update-renderer:
     cancelButton: 取消
 
   title: 自动更新
-  start-update: League Akari 更新已开始
+  start-update: $t(common:appName) 更新已开始
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
   lastUpdateSuccess: 已成功更新到 {{version}}
