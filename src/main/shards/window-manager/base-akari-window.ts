@@ -277,6 +277,14 @@ export abstract class BaseAkariWindow<
       },
       { delay: 100, equals: comparer.shallow }
     )
+
+    this._context.mobx.reaction(
+      () => this._windowManager.settings.contentProtection,
+      (enabled) => {
+        this._window?.setContentProtection(enabled)
+      },
+      { fireImmediately: true }
+    )
   }
 
   protected _createWindow() {
@@ -325,6 +333,7 @@ export abstract class BaseAkariWindow<
       }
     })
 
+    this._window.setContentProtection(this._windowManager.settings.contentProtection)
     this._window.setOpacity(this.settings.opacity)
     this._window.setAlwaysOnTop(this.settings.pinned, 'screen-saver')
 

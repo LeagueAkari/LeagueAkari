@@ -473,13 +473,17 @@ MiscSettings:
   streamerMode:
     title: 直播模式
 
-    enabled:
-      label: 启用
-      description: 启用直播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
+    streamerMode:
+      label: 隐藏敏感信息
+      description: 隐藏所有敏感信息 (玩家 ID，区服等)
 
     useAkariStyledName:
       label: 使用 Akari 风格的名字
       description: 使用 Akari 风格的占位名字
+
+    contentProtection:
+      label: 内容保护
+      description: 启用内容保护，将禁止其他应用捕获窗口内容。注意，这可能会影响一些屏幕录制工具的正常使用
 
 DebugSettings:
   title: 调试

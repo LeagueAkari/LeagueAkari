@@ -23,8 +23,8 @@
       </template>
       <ControlItem
         class="control-item-margin"
-        :label="t('MiscSettings.streamerMode.enabled.label')"
-        :label-description="t('MiscSettings.streamerMode.enabled.description')"
+        :label="t('MiscSettings.streamerMode.streamerMode.label')"
+        :label-description="t('MiscSettings.streamerMode.streamerMode.description')"
         :label-width="400"
       >
         <NSwitch
@@ -47,6 +47,18 @@
           />
         </ControlItem>
       </NCollapseTransition>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MiscSettings.streamerMode.contentProtection.label')"
+        :label-description="t('MiscSettings.streamerMode.contentProtection.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="wms.settings.contentProtection"
+          @update:value="(val) => wm.setContentProtection(val)"
+        />
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -58,6 +70,8 @@ import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NCollapseTransition, NScrollbar, NSwitch } from 'naive-ui'
 
@@ -67,6 +81,9 @@ const a = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
 const rts = useRespawnTimerStore()
 const rt = useInstance(RespawnTimerRenderer)
+
+const wm = useInstance(WindowManagerRenderer)
+const wms = useWindowManagerStore()
 </script>
 
 <style scoped>

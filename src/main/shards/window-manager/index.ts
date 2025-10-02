@@ -70,7 +70,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       WindowManagerMain.id,
       {
-        backgroundMaterial: { default: this.settings.backgroundMaterial }
+        backgroundMaterial: { default: this.settings.backgroundMaterial },
+        contentProtection: { default: this.settings.contentProtection }
       },
       this.settings
     )
@@ -111,7 +112,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     }
 
     this._mobx.propSync(WindowManagerMain.id, 'state', this.state, ['supportsMica'])
-    this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, ['backgroundMaterial'])
+    this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, [
+      'backgroundMaterial',
+      'contentProtection'
+    ])
 
     this.mainWindow.on('force-close', () => {
       this.auxWindow.close(true)

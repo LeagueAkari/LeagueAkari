@@ -472,13 +472,17 @@ MiscSettings:
   streamerMode:
     title: Streamer Mode
 
-    enabled:
-      label: Enable
+    streamerMode:
+      label: Hide Sensitive Information
       description: Hide sensitive information, such as the player's name, in the application interface.
 
     useAkariStyledName:
       label: Use Akari-Styled Name
       description: Use the Akari-styled names in summoner placeholder.
+
+    contentProtection:
+      label: Content Protection
+      description: Enable content protection, which will prevent other applications from capturing the window content. Note that this may affect the normal use of some screen recording tools.
 
 DebugSettings:
   title: Debug

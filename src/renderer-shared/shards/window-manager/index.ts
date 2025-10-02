@@ -238,4 +238,8 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
   setBackgroundMaterial(value: string) {
     return this.context.setting.set(MAIN_SHARD_NAMESPACE, 'backgroundMaterial', value)
   }
+
+  setContentProtection(value: boolean) {
+    return this.context.setting.set(MAIN_SHARD_NAMESPACE, 'contentProtection', value)
+  }
 }
