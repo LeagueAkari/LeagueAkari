@@ -45,10 +45,10 @@ teams:
   200: 红队
   our: 我方
   their: 敌方
-  our-1: 我方 (蓝队)
-  our-2: 我方 (红队)
-  their-1: 敌方 (蓝队)
-  their-2: 敌方 (红队)
+  our-1: 蓝队
+  our-2: 红队
+  their-1: 蓝队
+  their-2: 红队
 
 queueTypes:
   RANKED_SOLO_5x5: 单双排位

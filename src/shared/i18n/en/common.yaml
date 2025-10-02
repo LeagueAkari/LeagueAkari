@@ -45,10 +45,10 @@ teams:
   unknown: Unknown
   our: Our
   their: Their
-  our-1: Our (Blue Team)
-  our-2: Our (Red Team)
-  their-1: Their (Blue Team)
-  their-2: Their (Red Team)
+  our-1: Blue Team
+  our-2: Red Team
+  their-1: Blue Team
+  their-2: Red Team
 
 queueTypes:
   RANKED_SOLO_5x5: Ranked Solo/Duo
