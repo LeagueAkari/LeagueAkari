@@ -39,7 +39,7 @@ export interface BaseAkariWindowBasicState {
 
   show: boolean
 
-  bounds: Electron.Rectangle | null
+  normalBounds: Electron.Rectangle | null
 }
 
 export interface AkariBaseWindowConfig<TSettings extends BaseAkariWindowBasicSetting> {
@@ -269,13 +269,13 @@ export abstract class BaseAkariWindow<
     )
 
     this._context.mobx.reaction(
-      () => this.state.bounds,
+      () => this.state.normalBounds,
       (bounds) => {
         if (bounds) {
-          this._setting._saveToStorage('bounds', bounds)
+          this._setting._saveToStorage('normalBounds', bounds)
         }
       },
-      { delay: 250, equals: comparer.shallow }
+      { delay: 100, equals: comparer.shallow }
     )
   }
 
@@ -330,13 +330,13 @@ export abstract class BaseAkariWindow<
 
     runInAction(() => (this.state.focus = this._window!.isFocused() ? 'focused' : 'blurred'))
 
-    if (this.state.bounds) {
+    if (this.state.normalBounds) {
       if (this._config.rememberPosition && this._config.rememberSize) {
-        this._window.setBounds(this.state.bounds)
+        this._window.setBounds(this.state.normalBounds)
       } else if (this._config.rememberPosition) {
-        this._window.setPosition(this.state.bounds.x, this.state.bounds.y)
+        this._window.setPosition(this.state.normalBounds.x, this.state.normalBounds.y)
       } else if (this._config.rememberSize) {
-        this._window.setSize(this.state.bounds.width, this.state.bounds.height)
+        this._window.setSize(this.state.normalBounds.width, this.state.normalBounds.height)
         this._window.center()
       }
     }
@@ -414,15 +414,15 @@ export abstract class BaseAkariWindow<
 
     this._window.on('move', () => {
       if (this._window) {
-        const bounds = this._window.getBounds()
-        runInAction(() => (this.state.bounds = bounds))
+        const bounds = this._window.getNormalBounds()
+        runInAction(() => (this.state.normalBounds = bounds))
       }
     })
 
     this._window.on('resize', () => {
       if (this._window) {
-        const bounds = this._window.getBounds()
-        runInAction(() => (this.state.bounds = bounds))
+        const bounds = this._window.getNormalBounds()
+        runInAction(() => (this.state.normalBounds = bounds))
       }
     })
 
@@ -582,7 +582,7 @@ export abstract class BaseAkariWindow<
       'ready',
       'status',
       'show',
-      'bounds',
+      'normalBounds',
       ...this.getStatePropKeys()
     ])
 
@@ -593,11 +593,9 @@ export abstract class BaseAkariWindow<
       ...this.getSettingPropKeys()
     ])
 
-    const bounds = await this._setting._getFromStorage('bounds')
+    const bounds = await this._setting._getFromStorage('normalBounds')
     if (bounds) {
-      runInAction(() => {
-        this.state.bounds = bounds
-      })
+      runInAction(() => (this.state.normalBounds = bounds))
     }
 
     this._baseWindowIpcCall()

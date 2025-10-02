@@ -58,7 +58,7 @@ export class CdTimerWindowState {
 
   show: boolean = true
 
-  bounds: Rectangle | null
+  normalBounds: Rectangle | null
 
   /**
    * 支持的游戏模式, 基准时间被硬编码
@@ -90,8 +90,8 @@ export class CdTimerWindowState {
     this.show = show
   }
 
-  setBounds(bounds: Rectangle | null) {
-    this.bounds = bounds
+  setNormalBounds(bounds: Rectangle | null) {
+    this.normalBounds = bounds
   }
 
   setSupportedGameModes(
@@ -109,7 +109,7 @@ export class CdTimerWindowState {
 
   constructor() {
     makeAutoObservable(this, {
-      bounds: observable.ref,
+      normalBounds: observable.ref,
       supportedGameModes: observable.ref
     })
   }

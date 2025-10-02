@@ -387,7 +387,36 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       'ongoing-game-renderer/frontend/playerCard',
       'ongoing-game-main/playerCardTags'
     )
+
     await this._do(manager, 'league-client-ux-main/useWmic', 'league-client-ux-main/useWmi')
+
+    await this._do(
+      manager,
+      'window-manager-main/main-window/bounds',
+      'window-manager-main/main-window/normalBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/opgg-window/bounds',
+      'window-manager-main/opgg-window/normalBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/aux-window/bounds',
+      'window-manager-main/aux-window/normalBounds'
+    )
+
+    await this._do(
+      manager,
+      'window-manager-main/ongoing-game-window/bounds',
+      'window-manager-main/ongoing-game-window/normalBounds'
+    )
+
+    await this._do(
+      manager,
+      'window-manager-main/cd-timer-window/bounds',
+      'window-manager-main/cd-timer-window/normalBounds'
+    )
 
     await manager.save(
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_140, ConfigMigrateMain.MIGRATION_FROM_140)
