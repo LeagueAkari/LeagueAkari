@@ -2306,6 +2306,7 @@ simple-notifications-renderer:
 
   cannotGetUxCommandLine:
     title: Cannot Get League Client UX Command Line
+    alreadyUseWmi: Detected League Client UX is running, but cannot get its command line information. It may be that League Akari cannot be used on this computer
     noAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to restart this application with administrator privileges, then enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
     withAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
     extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, League Akari may not work properly'

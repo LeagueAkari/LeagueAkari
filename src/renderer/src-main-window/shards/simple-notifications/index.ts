@@ -551,6 +551,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   }
 
   private _handleCannotGetUxCommandLine() {
+    const lcux = useInstance(LeagueClientUxRenderer)
     const lcuxs = useLeagueClientUxStore()
     const as = useAppCommonStore()
     const dialog = useDialog()
@@ -564,6 +565,18 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
       () => lcuxs.hasClientButNoCommandLine,
       (v) => {
         if (v) {
+          if (lcuxs.settings.useWmi) {
+            const dl = dialog.warning({
+              style: { width: '600px' },
+              title: () => t('title'),
+              content: () => t('alreadyUseWmi'),
+              positiveText: t('withAdminPositiveText'),
+              onPositiveClick: () => dl.destroy()
+            })
+
+            return
+          }
+
           const dl = dialog.warning({
             style: { width: '600px' },
             title: () => t('title'),
@@ -577,7 +590,9 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
               : t('noAdminPositiveText'),
             onPositiveClick: () => {
               if (as.isAdministrator) {
-                app.relaunchAsAdministrator()
+                lcux.setUseWmi(true).then(() => {
+                  app.relaunchAsAdministrator()
+                })
               } else {
                 dl.destroy()
               }
