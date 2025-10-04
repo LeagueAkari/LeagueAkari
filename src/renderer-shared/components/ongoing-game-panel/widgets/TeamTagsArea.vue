@@ -15,9 +15,11 @@
         </template>
         {{
           t('TeamTagsArea.winRate', {
-            rate: (analysis.team.averageWinRate * 100).toFixed(4)
+            rate: (analysis.team.averageWinRate * 100).toFixed(2)
           })
         }}
+        ({{ analysis.team.totalWins.toLocaleString() }} /
+        {{ analysis.team.totalGames.toLocaleString() }})
       </NPopover>
       <div class="divider"></div>
       <NPopover>
@@ -31,6 +33,9 @@
             kda: analysis.team.averageKda.toFixed(4)
           })
         }}
+        (K {{ analysis.team.totalKills.toLocaleString() }} / D
+        {{ analysis.team.totalDeaths.toLocaleString() }} / A
+        {{ analysis.team.totalAssists.toLocaleString() }})
       </NPopover>
     </template>
     <div class="divider" v-if="hasTags"></div>

@@ -1002,6 +1002,12 @@ export function analyzeMatchHistory(
 
 export interface MatchHistoryGamesAnalysisTeamSide {
   averageWinRate: number
+  totalWins: number
+  totalLoses: number
+  totalGames: number
+  totalKills: number
+  totalDeaths: number
+  totalAssists: number
   averageKda: number
   averageAkariScore: number
   standardizedAkariScoreCv: number
@@ -1016,24 +1022,34 @@ export function analyzeTeamMatchHistory(
     return null
   }
 
-  let totalWinRate = 0
   let totalKills = 0
   let totalDeaths = 0
   let totalAssists = 0
   let totalAkariScore = 0
+  let totalWins = 0
+  let totalLoses = 0
+  let totalGames = 0
 
   for (const analysis of analyses) {
-    totalWinRate += analysis.summary.winRate
     totalKills += analysis.summary.totalKills
     totalDeaths += analysis.summary.totalDeaths
     totalAssists += analysis.summary.totalAssists
     totalAkariScore += analysis.akariScore.total
+    totalWins += analysis.summary.win
+    totalLoses += analysis.summary.lose
+    totalGames += analysis.summary.count
   }
 
   const sc = calculateCoefficientOfVariation(standardize(analyses.map((a) => a.akariScore.total)))
 
   return {
-    averageWinRate: totalWinRate / analyses.length,
+    averageWinRate: totalWins / (totalGames || 1),
+    totalWins,
+    totalLoses,
+    totalGames,
+    totalKills,
+    totalDeaths,
+    totalAssists,
     averageKda: (totalKills + totalAssists) / (totalDeaths || 1),
     averageAkariScore: totalAkariScore / analyses.length,
     standardizedAkariScoreCv: sc,

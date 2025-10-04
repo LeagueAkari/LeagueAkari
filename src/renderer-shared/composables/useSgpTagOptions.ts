@@ -2,9 +2,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
 import { SelectMixedOption } from 'naive-ui/es/select/src/interface'
-import { computed } from 'vue'
+import { MaybeRefOrGetter, computed, toValue } from 'vue'
 
-export function useSgpTagOptions() {
+export function useSgpTagOptions(allowTagQuery?: MaybeRefOrGetter<boolean>) {
   const { t } = useTranslation()
   const lcs = useLeagueClientStore()
   const sgps = useSgpStore()
@@ -17,7 +17,8 @@ export function useSgpTagOptions() {
       },
       ...sgps.supportedQueues.map((id) => ({
         label: lcs.gameData.queues[id]?.name || id,
-        value: `q_${id}`
+        value: `q_${id}`,
+        disabled: allowTagQuery && !toValue(allowTagQuery)
       }))
     ] as SelectMixedOption[]
   })

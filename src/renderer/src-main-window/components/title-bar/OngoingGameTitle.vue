@@ -120,7 +120,7 @@ const orderOptions = computed(() => {
   ]
 })
 
-const sgpTagOptions = useSgpTagOptions()
+const sgpTagOptions = useSgpTagOptions(ogs.settings.matchHistoryUseSgpApi)
 
 const teamNameMap = computed(() => ({
   100: t('teams.100', { ns: 'common' }),

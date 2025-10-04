@@ -27,7 +27,7 @@ auto-gameflow-main:
 
 auto-select-main:
   error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}
-  error-itent: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
+  error-intent: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
   error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
   cancel-bench-swap: 已取消选择 {{champion}}

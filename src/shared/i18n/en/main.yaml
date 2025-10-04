@@ -26,8 +26,8 @@ auto-gameflow-main:
   skip-leader: Attempting to skip becoming the leader
 
 auto-select-main:
-  error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'
-  error-itent: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
+  error-pick: 'Failed to auto pick champion, target champion {{champion}}: {{reason}}'
+  error-intent: 'Failed to auto intent champion, target champion {{champion}}: {{reason}}'
   error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
   error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
   cancel-bench-swap: Selection of {{champion}} has been canceled
