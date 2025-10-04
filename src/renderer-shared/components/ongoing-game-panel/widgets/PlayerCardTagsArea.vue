@@ -291,23 +291,23 @@
       v-if="
         ogs.settings.playerCardTags.showGreatPerformanceTag &&
         analysis &&
-        (analysis.akariScore.good || analysis.akariScore.great)
+        (analysis.akariScore.outstanding || analysis.akariScore.extraordinary)
       "
       :delay="50"
     >
       <template #trigger>
-        <div class="tag akari-loved" v-if="analysis.akariScore.great">
-          {{ t('PlayerInfoCard.akariLoved.great') }}
+        <div class="tag akari-loved" v-if="analysis.akariScore.extraordinary">
+          {{ t('PlayerInfoCard.akariLoved.extraordinary') }}
         </div>
-        <div class="tag akari-loved" v-else-if="analysis.akariScore.good">
-          {{ t('PlayerInfoCard.akariLoved.good') }}
+        <div class="tag akari-loved" v-else-if="analysis.akariScore.outstanding">
+          {{ t('PlayerInfoCard.akariLoved.outstanding') }}
         </div>
       </template>
-      <div class="popover-text" v-if="analysis.akariScore.great">
-        {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
+      <div class="popover-text" v-if="analysis.akariScore.extraordinary">
+        {{ t('PlayerInfoCard.akariLoved.extraordinaryPopover') }}
       </div>
-      <div class="popover-text" v-else-if="analysis.akariScore.good">
-        {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
+      <div class="popover-text" v-else-if="analysis.akariScore.outstanding">
+        {{ t('PlayerInfoCard.akariLoved.outstandingPopover') }}
       </div>
     </NPopover>
     <NPopover

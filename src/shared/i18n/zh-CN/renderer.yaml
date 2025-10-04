@@ -1711,10 +1711,10 @@ PlayerInfoCard:
     tooManySoloKillsInEarlyGame: '{{times}} 单杀'
     tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
   akariLoved:
-    good: 优异
-    great: 通天代
-    goodPopover: 该玩家在近期对局中表现优异
-    greatPopover: 该玩家的水平远远超过当前段位
+    outstanding: 优异
+    extraordinary: 通天代
+    outstandingPopover: 该玩家在近期对局中表现优异
+    extraordinaryPopover: 该玩家的水平远远超过当前段位
   champion:
     winRate: 近期 {{countV}} 场，胜率为 {{winRate}}%
     level: '{{level}} 级'

@@ -439,11 +439,11 @@ const columnsNeed = computed(() => {
 
   .team-header__team-color {
     align-self: center;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     margin-right: 8px;
-    border: 1px solid rgb(255, 255, 255, 0.4);
+    border: 1px solid rgb(255, 255, 255, 0.2);
 
     &.red {
       background-color: #ff3333;

@@ -1706,10 +1706,10 @@ PlayerInfoCard:
     tooManySoloKillsInEarlyGame: '{{times}} Solo Kills'
     tooManySoloKillsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player get solo kills {{times}} times on average
   akariLoved:
-    good: Good
-    great: Excellent
-    goodPopover: This player has performed well in recent games.
-    greatPopover: This player has shown exceptional performance in recent games.
+    outstanding: Outstanding
+    extraordinary: Extraordinary
+    outstandingPopover: This player has performed well in recent games.
+    extraordinaryPopover: This player has shown exceptional performance in recent games.
   champion:
     winRate: 'Recent {{countV}} games, win rate {{winRate}}%'
     level: 'Level {{level}}'
@@ -1728,7 +1728,7 @@ PlayerInfoCard:
   taggedByOther: Tagged by
   unknown: Unknown
   premade: Team {{team}}
-  highWinRate: High Win Rate
+  highWinRate: High W/R
   met: Met
   private: Private
   winningStreak: '{{countV}} Wins'

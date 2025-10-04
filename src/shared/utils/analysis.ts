@@ -1066,8 +1066,8 @@ export interface AkariScore {
   goldScore: number
   participationScore: number
   total: number
-  good: boolean
-  great: boolean
+  outstanding: boolean
+  extraordinary: boolean
 }
 
 // 非卖品, 仅限内部评判使用
@@ -1098,8 +1098,8 @@ export function calculateAkariScore(analyses: {
     goldScore,
     participationScore,
     total,
-    good: total >= 26.0 && analyses.summary.count >= 5,
-    great: total >= 30.0 && analyses.summary.count >= 8
+    outstanding: total >= 26.0 && analyses.summary.count >= 5,
+    extraordinary: total >= 30.0 && analyses.summary.count >= 8
   }
 }
 
