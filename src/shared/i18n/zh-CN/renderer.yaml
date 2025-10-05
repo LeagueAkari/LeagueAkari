@@ -2291,6 +2291,11 @@ simple-notifications-renderer:
     name: 登录排队
     description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}})'
 
+  higherVersionDb:
+    title: 检测到降级版本
+    content: 当前已有的数据库版本高于此应用支持的版本。请更新 $t(common:appName) 到最新版本以获得最佳兼容性
+    positiveText: 查看更新
+
   replay-download-progress-task:
     name: 录像下载
     checking: 正在检查对局 ID {{gameId}} 的录像...

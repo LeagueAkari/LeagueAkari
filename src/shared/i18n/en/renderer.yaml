@@ -2288,6 +2288,11 @@ simple-notifications-renderer:
     name: Login Queue
     description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}})'
 
+  higherVersionDb:
+    title: Detected higher version database
+    content: The database version in use is higher than this application supports. Please update $t(common:appName) to the latest version for best compatibility
+    positiveText: View Update
+
   replay-download-progress-task:
     name: Replay Download
     checking: Checking replay metadata...

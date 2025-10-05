@@ -11,11 +11,13 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
+import { useStorageStore } from '@renderer-shared/shards/storage/store'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
@@ -46,7 +48,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(LeagueClientUxRenderer) private readonly _lcux: LeagueClientUxRenderer
+    @Dep(LeagueClientUxRenderer) private readonly _lcux: LeagueClientUxRenderer,
+    @Dep(RemoteConfigRenderer) private readonly _rc: RemoteConfigRenderer
   ) {}
 
   /**
@@ -604,6 +607,55 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  /**
+   * 使用新版本数据库时，提醒用户更新
+   */
+  private _handleHigherVersionDbWarning() {
+    const storage = useStorageStore()
+    const rcs = useRemoteConfigStore()
+    const dialog = useDialog()
+    const sns = useSimpleNotificationsStore()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.higherVersionDb'
+    })
+
+    const hasNewRelease = computed(() => !!rcs.latestRelease && rcs.latestRelease.isNew === true)
+
+    let inst: ReturnType<typeof dialog.warning> | null = null
+
+    watch(
+      () => hasNewRelease.value,
+      () => {
+        if (hasNewRelease.value && inst) {
+          inst.positiveButtonProps = { disabled: false }
+        }
+      }
+    )
+
+    watch(
+      () => storage.usingHigherVersionDb,
+      (v) => {
+        if (v) {
+          inst = dialog.warning({
+            style: { width: '600px' },
+            closable: true,
+            title: () => t('title'),
+            content: () => t('content'),
+            positiveText: t('positiveText'),
+            positiveButtonProps: { disabled: !hasNewRelease.value },
+            onPositiveClick: () => {
+              if (hasNewRelease.value) {
+                sns.showNewReleaseModal = true
+              }
+              inst?.destroy()
+            }
+          })
+        }
+      },
+      { immediate: true }
+    )
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -622,6 +674,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._handleQueueingProgress())
     this._setup.addSetupFn(() => this._handleAskUserToRunAsAdministrator())
     this._setup.addSetupFn(() => this._handleCannotGetUxCommandLine())
+    this._setup.addSetupFn(() => this._handleHigherVersionDbWarning())
   }
 
   showAnnouncementModal() {
