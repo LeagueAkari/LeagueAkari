@@ -193,7 +193,10 @@ const gameMap = reactive<Record<number, Game>>({})
 const loadPageGames = async (games: EncounteredGame[]) => {
   const task = async (gameId: number) => {
     try {
-      if (mhs.settings.matchHistoryUseSgpApi && sgps.availability.serversSupported.matchHistory) {
+      if (
+        mhs.frontendSettings.matchHistoryUseSgpApi &&
+        sgps.availability.serversSupported.matchHistory
+      ) {
         // use SGP API
         const cached = mhs.detailedGameLruMap.get(`sgp:${gameId}`)
 

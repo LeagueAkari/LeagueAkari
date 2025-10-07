@@ -260,6 +260,10 @@ MatchHistorySettings:
     current: '当前 SGP Server: {{server}}'
     unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
 
+  loadCount:
+    label: 加载数量
+    description: 每个战绩页面加载的战绩数量
+
 OngoingGameSettings:
   title: 对局分析
   titleCommon: 对局分析
@@ -1389,7 +1393,7 @@ MatchHistoryTab:
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家
-  itemPerPage: '{{countV}} 项'
+  itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
 
   private:

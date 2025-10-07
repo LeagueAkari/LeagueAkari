@@ -259,6 +259,10 @@ MatchHistorySettings:
     current: 'Current SGP Server: {{server}}'
     unsupported: 'Unsupported SGP API: {{server}}'
 
+  loadCount:
+    label: Load Count
+    description: Number of matches to load for each match history tab.
+
 OngoingGameSettings:
   title: Ongoing Game
   titleCommon: Ongoing Game
@@ -1386,7 +1390,8 @@ MatchHistoryTab:
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
-  itemPerPage: '{{countV}}'
+  itemPerPage_one: '{{count}} item'
+  itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'
 
   private:

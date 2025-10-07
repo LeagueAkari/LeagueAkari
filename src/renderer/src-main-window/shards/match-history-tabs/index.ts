@@ -5,7 +5,8 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { markRaw, watch } from 'vue'
+import { useTranslation } from 'i18next-vue'
+import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useMatchHistoryTabsStore } from './store'
@@ -104,7 +105,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
 
     // 在切换数据源后清除一些状态
     watch(
-      () => mhs.settings.matchHistoryUseSgpApi,
+      () => mhs.frontendSettings.matchHistoryUseSgpApi,
       (y) => {
         if (!y) {
           mhs.tabs.forEach((t) => {
@@ -337,18 +338,60 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMatchHistoryTabsStore()
 
-    await this._setting.savedGetterVue(
+    await this._setting.savedPropVue(
       MatchHistoryTabsRenderer.id,
-      'refreshTabsAfterGameEnds',
-      () => store.settings.refreshTabsAfterGameEnds,
-      (v) => (store.settings.refreshTabsAfterGameEnds = v)
+      store.frontendSettings,
+      'matchHistoryUseSgpApi'
     )
 
-    await this._setting.savedGetterVue(
+    await this._setting.savedPropVue(
       MatchHistoryTabsRenderer.id,
-      'matchHistoryUseSgpApi',
-      () => store.settings.matchHistoryUseSgpApi,
-      (v) => (store.settings.matchHistoryUseSgpApi = v)
+      store.frontendSettings,
+      'refreshTabsAfterGameEnds'
+    )
+
+    await this._setting.savedPropVue(
+      MatchHistoryTabsRenderer.id,
+      store.frontendSettings,
+      'loadCount'
     )
   }
+}
+
+/** 暂时抽离到此处 */
+export function usePageSizeOptions() {
+  const { t } = useTranslation()
+
+  const pageSizeOptions = computed(() => [
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 10 }),
+      value: 10
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 20 }),
+      value: 20
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 30 }),
+      value: 30
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 40 }),
+      value: 40
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 50 }),
+      value: 50
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 100 }),
+      value: 100
+    },
+    {
+      label: t('MatchHistoryTab.itemPerPage', { count: 200 }),
+      value: 200
+    }
+  ])
+
+  return pageSizeOptions
 }

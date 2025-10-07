@@ -244,7 +244,9 @@
             :consistent-menu-width="false"
           ></NSelect>
           <NSelect
-            v-if="mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.matchHistory"
+            v-if="
+              mhs.frontendSettings.matchHistoryUseSgpApi && currentSgpServerSupported.matchHistory
+            "
             size="small"
             :value="tab.matchHistoryPage?.tag || 'all'"
             style="width: 160px"
@@ -307,7 +309,7 @@
                 <NSelect
                   v-if="
                     (currentSgpServerSupported.matchHistory &&
-                      mhs.settings.matchHistoryUseSgpApi) ||
+                      mhs.frontendSettings.matchHistoryUseSgpApi) ||
                     mustUseSgpApiBecauseCrossTencentServer
                   "
                   size="small"
@@ -697,7 +699,10 @@ import {
 import { computed, markRaw, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import {
+  MatchHistoryTabsRenderer,
+  usePageSizeOptions
+} from '@main-window/shards/match-history-tabs'
 import {
   GameDataState,
   TabState,
@@ -795,36 +800,7 @@ const isSomethingLoading = computed(() => {
   )
 })
 
-const pageSizeOptions = computed(() => [
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 10 }),
-    value: 10
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 20 }),
-    value: 20
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 30 }),
-    value: 30
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 40 }),
-    value: 40
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 50 }),
-    value: 50
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 100 }),
-    value: 100
-  },
-  {
-    label: t('MatchHistoryTab.itemPerPage', { countV: 200 }),
-    value: 200
-  }
-])
+const pageSizeOptions = usePageSizeOptions()
 
 const shouldShowTinyHeader = computed(() => mainContentScrollTop.value > SHOW_TINY_HEADER_THRESHOLD)
 
@@ -1063,7 +1039,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
   }
 
   page = page || 1
-  pageSize = pageSize || tab.matchHistoryPage?.pageSize || 20
+  pageSize = pageSize || tab.matchHistoryPage?.pageSize || mhs.frontendSettings.loadCount
   tag = tag || tab.matchHistoryPage?.tag || 'all'
 
   try {
@@ -1072,7 +1048,8 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
     // 或在跨区时, 强制使用 SGP API
     if (
-      (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) ||
+      (mhs.frontendSettings.matchHistoryUseSgpApi &&
+        currentSgpServerSupported.value.matchHistory) ||
       mustUseSgpApiBecauseCrossTencentServer.value
     ) {
       if (!sgps.isTokenReady) {
@@ -1178,7 +1155,8 @@ const loadDetailedGame = async (dataState: GameDataState) => {
 
   try {
     if (
-      (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) ||
+      (mhs.frontendSettings.matchHistoryUseSgpApi &&
+        currentSgpServerSupported.value.matchHistory) ||
       mustUseSgpApiBecauseCrossTencentServer.value
     ) {
       const cached = mhs.detailedGameLruMap.get(`sgp:${dataState.game.gameId}`)
@@ -1676,7 +1654,7 @@ lc.onLcuEventVue<ReplayDownloadProgress>('/lol-replays/v1/metadata/:gameId', (da
 })
 
 // ==================== Initialization ====================
-if (mhs.settings.matchHistoryUseSgpApi) {
+if (mhs.frontendSettings.matchHistoryUseSgpApi) {
   if (sgps.isTokenReady) {
     handleRefresh()
   }

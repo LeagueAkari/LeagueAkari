@@ -129,7 +129,8 @@ export interface TabState {
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
 export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-renderer', () => {
-  const settings = shallowReactive({
+  // 这里应该是 frontendSettings，但为了保持兼容性，暂时保留
+  const frontendSettings = shallowReactive({
     /**
      *  游戏结束后刷新涉及到的页面卡
      */
@@ -138,7 +139,12 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
     /**
      * 优先使用 SGP API 查询战绩
      */
-    matchHistoryUseSgpApi: true
+    matchHistoryUseSgpApi: true,
+
+    /**
+     * 加载战绩数量
+     */
+    loadCount: 20
   })
 
   const tabs = ref<TabState[]>([])
@@ -247,7 +253,7 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   const detailedGameLruMap = new QuickLRU<string, Game>({ maxSize: 568 })
 
   return {
-    settings,
+    frontendSettings,
 
     detailedGameLruMap,
 

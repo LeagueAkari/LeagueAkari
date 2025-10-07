@@ -10,7 +10,7 @@
         :label-description="t('MatchHistorySettings.refreshTabsAfterGameEnds.description')"
         :label-width="400"
       >
-        <NSwitch size="small" v-model:value="mhs.settings.refreshTabsAfterGameEnds" />
+        <NSwitch size="small" v-model:value="mhs.frontendSettings.refreshTabsAfterGameEnds" />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
@@ -20,7 +20,7 @@
         <template #labelDescription>
           <div>{{ t('MatchHistorySettings.matchHistoryUseSgpApi.description') }}</div>
           <template
-            v-if="mhs.settings.matchHistoryUseSgpApi && lcs.connectionState === 'connected'"
+            v-if="mhs.frontendSettings.matchHistoryUseSgpApi && lcs.connectionState === 'connected'"
           >
             <div
               v-if="
@@ -44,7 +44,20 @@
             </div>
           </template>
         </template>
-        <NSwitch size="small" v-model:value="mhs.settings.matchHistoryUseSgpApi" />
+        <NSwitch size="small" v-model:value="mhs.frontendSettings.matchHistoryUseSgpApi" />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MatchHistorySettings.loadCount.label')"
+        :label-description="t('MatchHistorySettings.loadCount.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 120px"
+          size="small"
+          v-model:value="mhs.frontendSettings.loadCount"
+          :options="pageSizeOptions"
+        />
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -55,8 +68,9 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
+import { usePageSizeOptions } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 const { t } = useTranslation()
@@ -64,6 +78,8 @@ const { t } = useTranslation()
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()
 const lcs = useLeagueClientStore()
+
+const pageSizeOptions = usePageSizeOptions()
 </script>
 
 <style scoped>

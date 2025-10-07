@@ -150,7 +150,7 @@ const isEndOfGame = computed(
 watch(
   () => isEndOfGame.value,
   (is, _prevP) => {
-    if (mhs.settings.refreshTabsAfterGameEnds && is) {
+    if (mhs.frontendSettings.refreshTabsAfterGameEnds && is) {
       if (!ogs.teams || !tabsRef.value) {
         return
       }
