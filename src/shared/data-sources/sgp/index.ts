@@ -284,6 +284,27 @@ export class LeagueSgpApi {
     })
   }
 
+  getGsmLedgeRegionPlayerByPuuid(sgpServerId: string, puuid: string) {
+    if (!this._leagueSessionToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
+
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get<any>(`/gsm/v1/ledge/region/${subId}/puuid/${puuid}`, {
+      baseURL: sgpServer.common,
+      headers: {
+        Authorization: `Bearer ${this._leagueSessionToken}`
+      }
+    })
+  }
+
   getMatchHistoryReplayStream(sgpServerId: string, gameId: number) {
     if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')

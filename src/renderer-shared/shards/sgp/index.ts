@@ -67,6 +67,15 @@ export class SgpRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getSummoner', puuid, sgpServerId)
   }
 
+  getGsmLedgeRegionPlayerByPuuid(puuid: string, sgpServerId?: string) {
+    return this._ipc.call(
+      MAIN_SHARD_NAMESPACE,
+      'getGsmLedgeRegionPlayerByPuuid',
+      puuid,
+      sgpServerId
+    )
+  }
+
   async onInit() {
     const store = useSgpStore()
 

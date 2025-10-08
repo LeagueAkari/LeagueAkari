@@ -306,6 +306,15 @@ export class SgpMain implements IAkariShardInitDispose {
     }
   }
 
+  async getGsmLedgeRegionPlayerByPuuid(puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this.state.availability.sgpServerId
+    }
+
+    const { data } = await this._api.getGsmLedgeRegionPlayerByPuuid(sgpServerId, puuid)
+    return data
+  }
+
   private _handleIpcCall() {
     this._ipc.onCall(
       SgpMain.id,
@@ -378,6 +387,14 @@ export class SgpMain implements IAkariShardInitDispose {
       'getSpectatorGameflow',
       async (_, puuid: string, sgpServerId?: string) => {
         return this.getSpectatorGameflow(puuid, sgpServerId)
+      }
+    )
+
+    this._ipc.onCall(
+      SgpMain.id,
+      'getGsmLedgeRegionPlayerByPuuid',
+      async (_, puuid: string, sgpServerId?: string) => {
+        return this.getGsmLedgeRegionPlayerByPuuid(puuid, sgpServerId)
       }
     )
   }
