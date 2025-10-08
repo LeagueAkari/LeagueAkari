@@ -41,6 +41,10 @@ export const GROUPS = [
       {
         gameMode: 'ARAM',
         queueTypes: ['*']
+      },
+      {
+        gameMode: 'KIWI',
+        queueTypes: ['*']
       }
     ],
     positions: ['default'],

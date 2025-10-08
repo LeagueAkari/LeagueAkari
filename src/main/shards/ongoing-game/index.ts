@@ -1167,6 +1167,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             return
           }
 
+          // 在未来的某个时间，可能出现无法获取 gameId 的情况
+          if (!this.state.queryStage.gameInfo.gameId) {
+            return
+          }
+
           const players = Object.values(this.state.teams || {}).flat()
 
           if (!players.includes(this._lc.data.summoner.me.puuid)) {
