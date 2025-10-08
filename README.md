@@ -36,7 +36,7 @@ QQ Group: [301157623](https://qm.qq.com/q/F1Xv85etlm) (Passcode: akari)
 
 QQ Group: [543703181](https://qm.qq.com/q/3V9pqYEspq) (Passcode: akari)
 
-Telegram Group: [@LeagueAkari](https://t.me/+wDgI3bYL2MI3NjA9)
+Telegram Group: [@KawaiiAkari](https://t.me/KawaiiAkari)
 
 ## 1.4 Beta Versions (.rabi)
 
