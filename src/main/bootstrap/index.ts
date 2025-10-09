@@ -352,7 +352,7 @@ export function bootstrap() {
         })
     })
 
-    app.on('exit', () => {
+    process.on('exit', () => {
       console.log(
         `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] Application exited\x1b[0m`
       )

@@ -1,4 +1,5 @@
 import { SgpServersConfig } from '@shared/data-sources/sgp'
+import { SgpGsmLedgeRegion } from '@shared/data-sources/sgp/types'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { makeAutoObservable, observable } from 'mobx'
 
@@ -71,6 +72,21 @@ export class SgpState {
   constructor(private _lcState: LeagueClientState) {
     makeAutoObservable(this, {
       sgpServerConfig: observable.ref
+    })
+  }
+}
+
+/** 临时 workaround */
+export class SgpData {
+  gsmGame: SgpGsmLedgeRegion | null = null
+
+  setGsmGame(gsmGame: SgpGsmLedgeRegion | null) {
+    this.gsmGame = gsmGame
+  }
+
+  constructor() {
+    makeAutoObservable(this, {
+      gsmGame: observable.ref
     })
   }
 }

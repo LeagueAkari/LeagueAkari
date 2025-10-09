@@ -19,6 +19,7 @@ export interface ChampSelectSessionBase {
   allowRerolling: boolean
   allowSkinSelection: boolean
   allowSubsetChampionPicks: boolean
+  gameId: number
   bans: Bans
   chatDetails: ChatDetails
   hasSimultaneousBans: boolean

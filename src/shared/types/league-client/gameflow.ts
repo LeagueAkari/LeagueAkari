@@ -233,3 +233,19 @@ export interface GameClient {
   serverPort: number
   visible: boolean
 }
+
+/**
+ * 位于活跃的游戏状态中
+ */
+export function isInActiveGame(phase: string | null) {
+  if (!phase) {
+    return false
+  }
+
+  return (
+    phase === 'InProgress' ||
+    phase === 'WatchInProgress' ||
+    phase === 'Reconnect' ||
+    phase === 'GameStart'
+  )
+}

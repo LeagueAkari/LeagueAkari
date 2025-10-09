@@ -240,7 +240,7 @@ const premadeTeamInfo = computed(() => {
 })
 
 const formatTeamText = (team: string) => {
-  if (ogs.gameInfo?.queueType === 'CHERRY') {
+  if (ogs.queryStage.gameInfo?.queueType === 'CHERRY') {
     if (lcs.gameflow.phase === 'ChampSelect') {
       return team.startsWith('our')
         ? t(`teams.our`, { ns: 'common' })

@@ -124,19 +124,6 @@ export class OngoingGameSettings {
 }
 
 export class OngoingGameState {
-  get gameInfo() {
-    if (!this._lcData.gameflow.session) {
-      return null
-    }
-
-    return {
-      queueId: this._lcData.gameflow.session.gameData.queue.id,
-      queueType: this._lcData.gameflow.session.gameData.queue.type,
-      gameId: this._lcData.gameflow.session.gameData.gameId,
-      gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
-    }
-  }
-
   /**
    * 当前进行的英雄选择
    */
@@ -631,7 +618,6 @@ export class OngoingGameState {
 
       // structured data
       championSelections: computed.struct,
-      gameInfo: computed.struct,
       positionAssignments: computed.struct,
       teams: computed.struct,
       inferredPremadeTeams: observable.struct,

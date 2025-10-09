@@ -136,7 +136,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     this._mobx.propSync(OngoingGameMain.id, 'state', this.state, [
       'championSelections',
-      'gameInfo',
       'positionAssignments',
       'playerStats',
       'inferredPremadeTeams',

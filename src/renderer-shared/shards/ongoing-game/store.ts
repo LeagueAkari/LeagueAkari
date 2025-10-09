@@ -159,7 +159,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     }
   })
 
-  const gameInfo = shallowRef<OngoingGameInfo | null>(null)
   const championSelections = shallowRef<Record<string, number>>({})
   const positionAssignments = shallowRef<
     Record<
@@ -204,7 +203,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   return {
     settings,
 
-    gameInfo,
     championSelections,
     positionAssignments,
     teams,

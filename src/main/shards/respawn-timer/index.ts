@@ -40,7 +40,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this.state = new RespawnTimerState(this._lc.data)
+    this.state = new RespawnTimerState()
   }
 
   async onInit() {

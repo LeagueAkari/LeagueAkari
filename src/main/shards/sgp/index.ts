@@ -1,9 +1,11 @@
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
+import { isInActiveGame } from '@shared/types/league-client/gameflow'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
+import { comparer, computed } from 'mobx'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 
@@ -22,7 +24,7 @@ import {
   mapSgpMatchHistoryToLcu0Format,
   mapSgpSummonerToLcu0Format
 } from './data-mapper'
-import { SgpState } from './state'
+import { SgpData, SgpState } from './state'
 
 /**
  * Service Gateway Proxy
@@ -36,6 +38,7 @@ export class SgpMain implements IAkariShardInitDispose {
   static CONFIG_SCHEMA_VERSION = 1
 
   public readonly state: SgpState
+  public readonly data = new SgpData()
 
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
@@ -67,12 +70,15 @@ export class SgpMain implements IAkariShardInitDispose {
       'supportedQueues'
     ])
 
+    this._mobx.propSync(SgpMain.id, 'data', this.data, ['gsmGame'])
+
     this._handleIpcCall()
     this._handleUpdateHttpProxy()
     this._handleUpdateConfig()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
     this._handleUpdateSgpServerConfig()
+    this._handleAdditionalSgpDate()
   }
 
   /**
@@ -483,6 +489,66 @@ export class SgpMain implements IAkariShardInitDispose {
           }
         }
       }
+    )
+  }
+
+  private _handleAdditionalSgpDate() {
+    const isActive = computed(() => {
+      return isInActiveGame(this._lc.data.gameflow.phase)
+    })
+
+    const needToClean = computed(() => {
+      const phase = this._lc.data.gameflow.phase
+
+      return phase === 'None' || phase === 'Lobby'
+    })
+
+    this._mobx.reaction(
+      () => ({
+        ready: this.state.isTokenReady,
+        puuid: this._lc.data.summoner.me?.puuid,
+        isActive
+      }),
+      async ({ ready, isActive, puuid }) => {
+        if (!isActive || !ready || !puuid) {
+          return
+        }
+
+        const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
+        if (gsmGame) {
+          this.data.setGsmGame(gsmGame)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => ({
+        ready: this.state.isTokenReady,
+        puuid: this._lc.data.summoner.me?.puuid,
+        isActive: isActive.get()
+      }),
+      async ({ ready, isActive, puuid }) => {
+        if (!isActive || !ready || !puuid) {
+          return
+        }
+
+        const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
+        if (gsmGame) {
+          this.data.setGsmGame(gsmGame)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => needToClean.get(),
+      async (needToClean) => {
+        if (needToClean) {
+          this.data.setGsmGame(null)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
     )
   }
 
