@@ -773,3 +773,74 @@ interface SpectatorGameflowSessionTeam {
   summonerName: string
   summonerInternalName: string
 }
+
+export interface SgpGsmLedgeRegion {
+  reconnectDelay: number
+  gameName: string
+  game: SgpGsmLedgeRegionGame
+  playerCredentials: SgpGsmLedgeRegionPlayerCredentials
+}
+
+interface SgpGsmLedgeRegionPlayerCredentials {
+  gameId: number
+  queueId: number
+  playerId: number
+  puuid: string
+  serverIp: string
+  serverPort: number
+  encryptionKey: string
+  championId: number
+  lastSelectedSkinIndex: number
+  summonerId: number
+  observer: boolean
+  gameVersion: string
+  gameMode: string
+  observerEncryptionKey: string
+  observerServerIp: string
+  observerServerPort: number
+  queueType: string
+  gameCreateDate: number
+  packetCopMetadata: string
+}
+
+interface SgpGsmLedgeRegionGame {
+  id: number
+  gameState: string
+  queueTypeName: string
+  name: string
+  pickTurn: number
+  mapId: number
+  gameMode: string
+  maxNumPlayers: number
+  gameType: string
+  gameQueueConfigId: number
+  spectatorDelay: number
+  gameVersion: string
+  teamOne: SgpGsmLedgeRegionTeamOne[]
+  teamTwo: any[]
+  playerChampionSelections: SgpGsmLedgeRegionPlayerChampionSelection[]
+  bannedChampions: any[]
+  observers: any[]
+}
+
+interface SgpGsmLedgeRegionPlayerChampionSelection {
+  puuid: string
+  championId: number
+  selectedSkinIndex: number
+  spell1Id: number
+  spell2Id: number
+}
+
+interface SgpGsmLedgeRegionTeamOne {
+  puuid: string
+  summonerId: number
+  lastSelectedSkinIndex: number
+  teamOwner: boolean
+  profileIconId: number
+  teamParticipantId: number
+  championId: number
+  selectedRole: string
+  selectedPosition: string
+  summonerName: string
+  summonerInternalName: string
+}

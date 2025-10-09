@@ -5,6 +5,7 @@ import { Readable } from 'stream'
 import {
   SgpGameDetailsLol,
   SgpGameSummaryLol,
+  SgpGsmLedgeRegion,
   SgpMatchHistoryLol,
   SgpRankedStats,
   SgpSummoner,
@@ -297,7 +298,7 @@ export class LeagueSgpApi {
 
     const subId = this._getSubId(sgpServerId)
 
-    return this._http.get<any>(`/gsm/v1/ledge/region/${subId}/puuid/${puuid}`, {
+    return this._http.get<SgpGsmLedgeRegion>(`/gsm/v1/ledge/region/${subId}/puuid/${puuid}`, {
       baseURL: sgpServer.common,
       headers: {
         Authorization: `Bearer ${this._leagueSessionToken}`
