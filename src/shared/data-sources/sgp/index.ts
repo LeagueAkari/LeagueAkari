@@ -6,8 +6,10 @@ import {
   SgpGameDetailsLol,
   SgpGameSummaryLol,
   SgpGsmLedgeRegion,
+  SgpGsmLedgeRegionGame,
   SgpMatchHistoryLol,
   SgpRankedStats,
+  SgpStatsEndOfGameGame,
   SgpSummoner,
   SpectatorData
 } from './types'
@@ -142,9 +144,12 @@ export class LeagueSgpApi {
   async getMatchHistory(
     sgpServerId: string,
     playerPuuid: string,
-    start: number,
-    count: number,
-    tag?: string
+    query: {
+      start?: number
+      count?: number
+      tag?: string
+      tagsQueryType?: 'AND' | 'OR' | (string & {})
+    }
   ) {
     if (!this._entitlementToken) {
       throw new Error('jwt token is not set')
@@ -164,9 +169,10 @@ export class LeagueSgpApi {
           Authorization: `Bearer ${this._entitlementToken}`
         },
         params: {
-          startIndex: start,
-          count,
-          tag
+          startIndex: query.start,
+          count: query.count,
+          tag: query.tag,
+          tagsQueryType: query.tagsQueryType
         }
       }
     )
@@ -306,6 +312,51 @@ export class LeagueSgpApi {
     })
   }
 
+  getGsmLedgeRegionPlayerByGameId(sgpServerId: string, gameId: number) {
+    if (!this._leagueSessionToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
+
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get<SgpGsmLedgeRegionGame>(`/gsm/v1/ledge/region/${subId}/gameId/${gameId}`, {
+      baseURL: sgpServer.common,
+      headers: {
+        Authorization: `Bearer ${this._leagueSessionToken}`
+      }
+    })
+  }
+
+  getStatsEndOfGameGameByGameIdAndPuuid(sgpServerId: string, gameId: number, puuid: string) {
+    if (!this._leagueSessionToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
+
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get<SgpStatsEndOfGameGame>(
+      `/stats/endOfGame/region/${subId}/gameId/${gameId}/puuid/${puuid}`,
+      {
+        baseURL: sgpServer.common,
+        headers: {
+          Authorization: `Bearer ${this._leagueSessionToken}`
+        }
+      }
+    )
+  }
+
   getMatchHistoryReplayStream(sgpServerId: string, gameId: number) {
     if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')
@@ -331,7 +382,6 @@ export class LeagueSgpApi {
     )
   }
 
-  // /stats/endOfGame/region/SG2/gameId/58550669/puuid/18ed240b-db4b-5a90-a69b-f943e4187e5e
   getEndOfGameStats(sgpServerId: string, gameId: number, puuid: string) {
     if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')

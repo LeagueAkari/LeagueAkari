@@ -1058,9 +1058,11 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
 
       const data = await sgp.getMatchHistoryLcuFormat(
         tab.puuid,
-        (page - 1) * pageSize,
-        pageSize,
-        tag === 'all' ? undefined : tag,
+        {
+          start: (page - 1) * pageSize,
+          count: pageSize,
+          tag: tag === 'all' ? undefined : tag
+        },
         tab.sgpServerId
       )
       tab.matchHistoryPage = {

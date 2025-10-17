@@ -79,14 +79,20 @@ export class SgpState {
 /** 临时 workaround */
 export class SgpData {
   gsmGame: SgpGsmLedgeRegion | null = null
+  eogGame: any | null = null
 
   setGsmGame(gsmGame: SgpGsmLedgeRegion | null) {
     this.gsmGame = gsmGame
   }
 
+  setEogGame(eogGame: any | null) {
+    this.eogGame = eogGame
+  }
+
   constructor() {
     makeAutoObservable(this, {
-      gsmGame: observable.ref
+      gsmGame: observable.ref,
+      eogGame: observable.ref
     })
   }
 }

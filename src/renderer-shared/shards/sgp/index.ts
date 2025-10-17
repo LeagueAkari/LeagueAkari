@@ -20,18 +20,19 @@ export class SgpRenderer implements IAkariShardInitDispose {
 
   getMatchHistoryLcuFormat(
     playerPuuid: string,
-    start: number,
-    count: number,
-    tag?: string,
+    query: {
+      start?: number
+      count?: number
+      tag?: string
+      tagsQueryType?: 'AND' | 'OR' | (string & {})
+    },
     sgpServerId?: string
   ) {
     return this._ipc.call<MatchHistory>(
       MAIN_SHARD_NAMESPACE,
       'getMatchHistoryLcuFormat',
       playerPuuid,
-      start,
-      count,
-      tag,
+      query,
       sgpServerId
     )
   }
@@ -72,6 +73,25 @@ export class SgpRenderer implements IAkariShardInitDispose {
       MAIN_SHARD_NAMESPACE,
       'getGsmLedgeRegionPlayerByPuuid',
       puuid,
+      sgpServerId
+    )
+  }
+
+  getStatsEndOfGameGameByGameIdAndPuuid(gameId: number, puuid: string, sgpServerId?: string) {
+    return this._ipc.call(
+      MAIN_SHARD_NAMESPACE,
+      'getStatsEndOfGameGameByGameIdAndPuuid',
+      gameId,
+      puuid,
+      sgpServerId
+    )
+  }
+
+  getGsmLedgeRegionPlayerByGameId(gameId: number, sgpServerId?: string) {
+    return this._ipc.call(
+      MAIN_SHARD_NAMESPACE,
+      'getGsmLedgeRegionPlayerByGameId',
+      gameId,
       sgpServerId
     )
   }

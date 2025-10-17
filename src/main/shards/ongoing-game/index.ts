@@ -676,7 +676,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       this.state.setMatchHistoryLoadingState(puuid, 'loading')
       const data = await this._mhQueue
-        .add(() => this._sgp.getMatchHistoryLcuFormat(puuid, 0, count, tag), {
+        .add(() => this._sgp.getMatchHistoryLcuFormat(puuid, { start: 0, count, tag }), {
           signal: mhSignal,
           priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })

@@ -187,21 +187,19 @@ export class SgpMain implements IAkariShardInitDispose {
    */
   async getMatchHistory(
     playerPuuid: string,
-    start: number,
-    count: number,
-    tag?: string | null,
+    query: {
+      start?: number
+      count?: number
+      tag?: string
+      tagsQueryType?: 'AND' | 'OR' | (string & {})
+    },
     sgpServerId?: string
   ) {
     if (!sgpServerId) {
       sgpServerId = this.state.availability.sgpServerId
     }
 
-    if (tag) {
-      const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
-      return data
-    }
-
-    const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, start, count)
+    const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, query)
     return data
   }
 
@@ -227,15 +225,18 @@ export class SgpMain implements IAkariShardInitDispose {
 
   async getMatchHistoryLcuFormat(
     playerPuuid: string,
-    start: number,
-    count: number,
-    tag?: string | null,
+    query: {
+      start?: number
+      count?: number
+      tag?: string
+      tagsQueryType?: 'AND' | 'OR' | (string & {})
+    },
     sgpServerId?: string
   ) {
-    const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
+    const result = await this.getMatchHistory(playerPuuid, query, sgpServerId)
 
     try {
-      return mapSgpMatchHistoryToLcu0Format(result, start, count)
+      return mapSgpMatchHistoryToLcu0Format(result, query.start, query.count)
     } catch (error) {
       this._log.warn(
         `Error converting SGP match history to LCU: ${formatError(error)}, ${playerPuuid}`
@@ -321,6 +322,26 @@ export class SgpMain implements IAkariShardInitDispose {
     return data
   }
 
+  async getStatsEndOfGameGameByGameIdAndPuuid(gameId: number, puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this.state.availability.sgpServerId
+    }
+    const { data } = await this._api.getStatsEndOfGameGameByGameIdAndPuuid(
+      sgpServerId,
+      gameId,
+      puuid
+    )
+    return data
+  }
+
+  async getGsmLedgeRegionPlayerByGameId(gameId: number, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this.state.availability.sgpServerId
+    }
+    const { data } = await this._api.getGsmLedgeRegionPlayerByGameId(sgpServerId, gameId)
+    return data
+  }
+
   private _handleIpcCall() {
     this._ipc.onCall(
       SgpMain.id,
@@ -328,12 +349,15 @@ export class SgpMain implements IAkariShardInitDispose {
       async (
         _,
         playerPuuid: string,
-        start: number,
-        count: number,
-        tag?: string,
+        query: {
+          start?: number
+          count?: number
+          tag?: string
+          tagsQueryType?: 'AND' | 'OR' | (string & {})
+        },
         sgpServerId?: string
       ) => {
-        return this.getMatchHistoryLcuFormat(playerPuuid, start, count, tag, sgpServerId)
+        return this.getMatchHistoryLcuFormat(playerPuuid, query, sgpServerId)
       }
     )
 
@@ -343,12 +367,15 @@ export class SgpMain implements IAkariShardInitDispose {
       async (
         _,
         playerPuuid: string,
-        start: number,
-        count: number,
-        tag?: string,
+        query: {
+          start?: number
+          count?: number
+          tag?: string
+          tagsQueryType?: 'AND' | 'OR' | (string & {})
+        },
         sgpServerId?: string
       ) => {
-        return await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
+        return await this.getMatchHistory(playerPuuid, query, sgpServerId)
       }
     )
 
@@ -401,6 +428,22 @@ export class SgpMain implements IAkariShardInitDispose {
       'getGsmLedgeRegionPlayerByPuuid',
       async (_, puuid: string, sgpServerId?: string) => {
         return this.getGsmLedgeRegionPlayerByPuuid(puuid, sgpServerId)
+      }
+    )
+
+    this._ipc.onCall(
+      SgpMain.id,
+      'getStatsEndOfGameGameByGameIdAndPuuid',
+      async (_, gameId: number, puuid: string, sgpServerId?: string) => {
+        return this.getStatsEndOfGameGameByGameIdAndPuuid(gameId, puuid, sgpServerId)
+      }
+    )
+
+    this._ipc.onCall(
+      SgpMain.id,
+      'getGsmLedgeRegionPlayerByGameId',
+      async (_, gameId: number, sgpServerId?: string) => {
+        return this.getGsmLedgeRegionPlayerByGameId(gameId, sgpServerId)
       }
     )
   }
@@ -514,9 +557,17 @@ export class SgpMain implements IAkariShardInitDispose {
           return
         }
 
-        const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
-        if (gsmGame) {
-          this.data.setGsmGame(gsmGame)
+        try {
+          const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
+          if (gsmGame) {
+            this.data.setGsmGame(gsmGame)
+          }
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            return
+          }
+
+          this._log.warn(`Failed to get GSM game:`, error)
         }
       },
       { fireImmediately: true, equals: comparer.shallow }
