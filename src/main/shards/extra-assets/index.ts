@@ -25,7 +25,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _app: AppCommonMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain
   ) {
     this._log = _loggerFactory.create(ExtraAssetsMain.id)

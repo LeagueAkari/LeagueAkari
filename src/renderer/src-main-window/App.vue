@@ -55,7 +55,6 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useTranslation } from 'i18next-vue'
-import { useNotification } from 'naive-ui'
 import { provide, ref } from 'vue'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
@@ -83,8 +82,6 @@ const appProvide = {
 }
 
 provide('app', appProvide)
-
-const notification = useNotification()
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')

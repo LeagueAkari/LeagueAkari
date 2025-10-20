@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, shallowReactive, shallowRef } from 'vue'
+import { shallowReactive } from 'vue'
 
 // copied from main shard
 export interface ChampionRunesConfig {

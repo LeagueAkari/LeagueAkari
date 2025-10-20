@@ -1,3 +1,4 @@
+// @ts-ignore
 const MAP_SPEC = {
   1: {
     min: { x: -650, y: -83 },
@@ -43,7 +44,7 @@ const MAP_SPEC = {
  * @param x
  * @param y
  */
-export function getArea(mapId: number, x: number, y: number) {
+export function getArea(_mapId: number, _x: number, _y: number) {
   throw new Error('Not implemented')
 }
 
@@ -53,6 +54,7 @@ export function getArea(mapId: number, x: number, y: number) {
  * @param x
  * @param y
  */
+// @ts-ignore
 function isInside(polygon: readonly [x: number, y: number][], x: number, y: number) {
   let count = 0
   for (let i = 0; i < polygon.length; i++) {

@@ -31,12 +31,10 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NSwitch } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -45,12 +43,9 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
-const aps = useAppCommonStore()
 
 const as = useInstance(AutoSelectRenderer)
 const lc = useInstance(LeagueClientRenderer)
-
-const isBenchMode = computed(() => isBenchEnabledSession(lcs.champSelect.session))
 
 const isCustomGame = computed(() => {
   if (!lcs.gameflow.session) {

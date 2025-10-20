@@ -1,7 +1,6 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Game } from '@shared/types/league-client/match-history'
-import { computed, markRaw, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { markRaw } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -25,7 +24,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
+    @Dep(SetupInAppScopeRenderer) readonly _setup: SetupInAppScopeRenderer
   ) {}
 
   setConcurrency(value: number) {

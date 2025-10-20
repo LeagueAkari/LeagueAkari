@@ -12,7 +12,7 @@ export class AutoReplyRenderer implements IAkariShardInitDispose {
   static id = 'auto-reply-renderer'
 
   constructor(
-    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(AkariIpcRenderer) readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
   ) {}

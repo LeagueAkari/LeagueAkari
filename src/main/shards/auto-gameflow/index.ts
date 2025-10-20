@@ -41,8 +41,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
 
   constructor(
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain

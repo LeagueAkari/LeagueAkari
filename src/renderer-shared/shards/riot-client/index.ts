@@ -19,5 +19,5 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
     // await this._pm.sync('league-client-main')
   }
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
+  constructor(@Dep(PiniaMobxUtilsRenderer) readonly _pm: PiniaMobxUtilsRenderer) {}
 }

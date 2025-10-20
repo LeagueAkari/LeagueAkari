@@ -236,10 +236,7 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import {
-  useOpggWindowStore,
-  useWindowManagerStore
-} from '@renderer-shared/shards/window-manager/store'
+import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { OpggDataApi } from '@shared/data-sources/opgg'
 import {
   ModeType,

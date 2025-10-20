@@ -407,7 +407,6 @@ import { useTranslation } from 'i18next-vue'
 import _ from 'lodash'
 import {
   NButton,
-  NCard,
   NIcon,
   NInput,
   NModal,

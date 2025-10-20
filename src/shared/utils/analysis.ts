@@ -73,11 +73,6 @@ export interface AnalysisResult {
   maybeWinRateTeam: boolean
 }
 
-interface PlayerWithKda {
-  id: number
-  kda: number
-}
-
 interface SoloKillInfo {
   time: number
   position: {

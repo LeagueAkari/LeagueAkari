@@ -23,7 +23,7 @@ export class SetterSettingService {
 
   constructor(
     private readonly _ins: SettingFactoryMain,
-    private readonly _C: typeof SettingFactoryMain,
+    readonly _C: typeof SettingFactoryMain,
     private readonly _namespace: string,
     // for accessibility
     public readonly _schema: Record<string, any>,

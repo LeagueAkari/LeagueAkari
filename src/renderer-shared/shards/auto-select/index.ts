@@ -15,7 +15,7 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) readonly _setting: SettingUtilsRenderer
   ) {}
 
   setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {

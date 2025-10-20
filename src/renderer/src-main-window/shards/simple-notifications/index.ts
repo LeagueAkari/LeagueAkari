@@ -43,13 +43,13 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   static LAST_DISMISS_SETTING_KEY = 'lastDismissLiveStreamingStreamerMode'
 
   constructor(
-    @Dep(ClientInstallationRenderer) private readonly _inst: ClientInstallationRenderer,
-    @Dep(AppCommonRenderer) private readonly _app: AppCommonRenderer,
+    @Dep(ClientInstallationRenderer) readonly _inst: ClientInstallationRenderer,
+    @Dep(AppCommonRenderer) readonly _app: AppCommonRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(LeagueClientUxRenderer) private readonly _lcux: LeagueClientUxRenderer,
-    @Dep(RemoteConfigRenderer) private readonly _rc: RemoteConfigRenderer
+    @Dep(LeagueClientUxRenderer) readonly _lcux: LeagueClientUxRenderer,
+    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer
   ) {}
 
   /**
@@ -476,7 +476,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         return () =>
           h(FunnyPricing, {
-            ref: (el) => {},
             show: show.value,
             balance: balance.value,
             current: current.value,

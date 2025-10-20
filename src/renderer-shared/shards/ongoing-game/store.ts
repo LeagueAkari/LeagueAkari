@@ -8,15 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowReactive, shallowRef } from 'vue'
-
-// copied from main shard
-interface OngoingGameInfo {
-  queueId: number
-  queueType: string
-  gameId: number
-  gameMode: string
-}
+import { ref, shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 export interface MatchHistoryPlayer {

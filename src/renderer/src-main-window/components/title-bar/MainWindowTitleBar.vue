@@ -16,10 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -30,7 +28,6 @@ import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
 
-const as = useAppCommonStore()
 const route = useRoute()
 
 const lcs = useLeagueClientStore()

@@ -494,8 +494,6 @@ import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifica
 
 const { t } = useTranslation()
 
-const isDev = import.meta.env.DEV
-
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
 const sus = useSelfUpdateStore()

@@ -208,7 +208,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer
+    @Dep(LoggerRenderer) readonly _logger: LoggerRenderer
   ) {
     this.context = {
       setting: this._setting,

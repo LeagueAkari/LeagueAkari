@@ -51,7 +51,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain
   ) {
     this._log = _loggerFactory.create(ClientInstallationMain.id)

@@ -257,7 +257,6 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RendererDebugRenderer } from '@renderer-shared/shards/renderer-debug'
 import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/store'
-import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { useIntervalFn } from '@vueuse/core'
@@ -279,7 +278,7 @@ import {
   NSwitch,
   NTable
 } from 'naive-ui'
-import { computed, h, nextTick, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { LCU_ENDPOINTS } from './lcu-endpoints'
 
@@ -289,7 +288,6 @@ const lc = useLeagueClientStore()
 const rds = useRendererDebugStore()
 const as = useAppCommonStore()
 
-const wm = useInstance(WindowManagerRenderer)
 const log = useInstance(LoggerRenderer)
 const app = useInstance(AppCommonRenderer)
 const rd = useInstance(RendererDebugRenderer)
@@ -434,9 +432,6 @@ const handleAddRule = async () => {
 const handleRemoveEditRule = async (rule: string) => {
   rd.removeRule(rule)
 }
-const handleToggleDevtools = async () => {
-  await wm.mainWindow.toggleDevtools()
-}
 
 const handleShowLogsDir = async () => {
   await log.openLogsDir()
@@ -444,10 +439,6 @@ const handleShowLogsDir = async () => {
 
 const handleShowUserDataDir = async () => {
   await app.openUserDataDir()
-}
-
-const handleReload = () => {
-  location.reload()
 }
 
 const runtimeInfo = shallowRef<any>(null)

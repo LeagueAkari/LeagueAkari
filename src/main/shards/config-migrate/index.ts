@@ -25,7 +25,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _st: StorageMain,
-    private readonly _loggerFactory: LoggerFactoryMain
+    readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(ConfigMigrateMain.id)
   }

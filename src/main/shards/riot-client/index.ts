@@ -35,7 +35,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _lc: LeagueClientMain,
     private readonly _protocol: AkariProtocolMain

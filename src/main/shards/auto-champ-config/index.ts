@@ -28,8 +28,8 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
 
   constructor(
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _setting: SetterSettingService,
     private readonly _mobx: MobxUtilsMain,

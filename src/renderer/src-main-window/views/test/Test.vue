@@ -36,8 +36,6 @@ import { reactive, ref, watchEffect } from 'vue'
 
 const teams = reactive(PREMADE_TEAM_COLORS)
 
-const show = ref(true)
-
 const markdown = ref(`
 [打开更新页面](akari://renderer-link/overlays/release-modal)
 `)

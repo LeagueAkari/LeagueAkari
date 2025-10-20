@@ -50,21 +50,18 @@
 </template>
 
 <script setup lang="ts">
-import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { PlayerLootMap } from '@shared/types/league-client/loot'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NDataTable, NRadio, NRadioGroup, NScrollbar, useMessage } from 'naive-ui'
+import { NButton, NCard, NRadio, NRadioGroup, NScrollbar, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
 
 const lc = useInstance(LeagueClientRenderer)
-const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
 const message = useMessage()
@@ -81,18 +78,18 @@ const shouldReload = computed(() => {
 })
 
 // 对于一个可以分解的物品，如果这些标签存在，则不进行分解
-const isDisenchantableTag = (tags: string) => {
-  const NO_DISENCHANT_TAGS = ['prestige', 'nodisenchant']
-  return !tags.split(',').some((tag) => NO_DISENCHANT_TAGS.includes(tag))
-}
+// const isDisenchantableTag = (tags: string) => {
+//   const NO_DISENCHANT_TAGS = ['prestige', 'nodisenchant']
+//   return !tags.split(',').some((tag) => NO_DISENCHANT_TAGS.includes(tag))
+// }
 
-const chests = computed(() => {
-  return Object.values(lootMap.value).filter((value) => value.type === 'CHEST')
-})
+// const chests = computed(() => {
+//   return Object.values(lootMap.value).filter((value) => value.type === 'CHEST')
+// })
 
-const championRentals = computed(() => {
-  return Object.values(lootMap.value).filter((value) => value.type === 'CHAMPION_RENTAL')
-})
+// const championRentals = computed(() => {
+//   return Object.values(lootMap.value).filter((value) => value.type === 'CHAMPION_RENTAL')
+// })
 
 const updatePlayerLootMap = async (manually = false) => {
   if (isLoading.value) {

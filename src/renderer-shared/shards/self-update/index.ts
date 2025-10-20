@@ -25,7 +25,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(RemoteConfigRenderer) private readonly _rc: RemoteConfigRenderer
+    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer
   ) {
     // @ts-ignore
     window.selfUpdateShard = this
