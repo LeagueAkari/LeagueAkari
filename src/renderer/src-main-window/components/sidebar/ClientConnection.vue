@@ -363,6 +363,11 @@ const handlePlayAgain = async () => {
   transition: background-color 0.2s ease-in-out;
   box-shadow: 0 0 2px 2px #0002;
   width: 200px;
+  background-color: rgba(0, 0, 0, 0.05);
+
+  [data-theme='dark'] & {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 
   &:not(.cc__item--connected):hover {
     background-color: #fff1;

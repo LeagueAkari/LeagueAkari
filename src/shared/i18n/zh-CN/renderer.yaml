@@ -1754,7 +1754,7 @@ OngoingGame:
   disconnected: 未连接到客户端
   waitingForSpectate: 等待观战延迟
   noOngoingGame: 没有正在进行中的游戏
-  disabled: 对局分析已禁用
+  disabled: 对局分析已禁用，可在设置中重新启用
   avgTeamWinRate: 队伍平均胜率
   avgTeamKda: 队伍平均 KDA
 

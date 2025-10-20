@@ -45,7 +45,7 @@
       </NTooltip>
     </HorizontalExpand>
     <HorizontalExpand :show="bts.tasks.length !== 0">
-      <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw trigger="click">
+      <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
         <template #trigger>
           <div class="common-button-outer">
             <SpinningIcon

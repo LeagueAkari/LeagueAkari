@@ -135,7 +135,7 @@ const teamNameMap = computed(() => ({
 const intelligence = computed(() => {
   const mapName = lcs.gameflow.session?.map.name
   const modeName =
-    lcs.gameflow.session?.map.gameModeName || lcs.gameflow.session?.map.gameModeShortName
+    lcs.gameflow.session?.gameData.queue.name || lcs.gameflow.session?.map.gameModeShortName
 
   const selfPuuid = lcs.summoner.me?.puuid
   const team = Object.entries(ogs.teams).find(([_teamId, puuids]) =>

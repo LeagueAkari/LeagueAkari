@@ -77,7 +77,7 @@
       <template v-else>
         <span
           class="main-text-2"
-          :title="`${lcs.gameflow.session?.map.gameModeName || t('Lounge.gameMode')} · ${lcs.gameflow.session?.map.name || t('Lounge.map')}`"
+          :title="`${lcs.gameflow.session?.gameData.queue.name || t('Lounge.gameMode')} · ${lcs.gameflow.session?.map.name || t('Lounge.map')}`"
           >{{ formatMapModeText() }}</span
         >
         <template v-if="agfs.settings.autoMatchmakingEnabled">
@@ -218,7 +218,7 @@ watch(
 )
 
 const formatMapModeText = () => {
-  const gameModeName = lcs.gameflow.session?.map.gameModeName || t('Lounge.gameMode')
+  const gameModeName = lcs.gameflow.session?.gameData.queue.name || t('Lounge.gameMode')
   const mapName = lcs.gameflow.session?.map.name || t('Lounge.map')
 
   if (gameModeName === mapName) {

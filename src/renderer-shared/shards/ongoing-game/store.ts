@@ -117,7 +117,7 @@ export type QueryStage =
 
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
-    enabled: false,
+    enabled: true,
     premadeTeamThreshold: 3,
     matchHistoryLoadCount: 20,
     concurrency: 3,
