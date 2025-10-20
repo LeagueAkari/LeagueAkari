@@ -72,7 +72,7 @@ export class AppCommonSettings {
     port: number
     host: string
   } = {
-    strategy: 'auto',
+    strategy: 'disable',
     port: 7890,
     host: '127.0.0.1'
   }

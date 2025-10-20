@@ -20,7 +20,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     locale: 'zh-CN',
     theme: 'default' as 'default' | 'dark' | 'light',
     httpProxy: {
-      strategy: 'auto' as 'auto' | 'force' | 'disable',
+      strategy: 'disable' as 'auto' | 'force' | 'disable',
       port: 0,
       host: ''
     } as HttpProxySetting,
