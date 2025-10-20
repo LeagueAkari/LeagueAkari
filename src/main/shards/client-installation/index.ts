@@ -348,7 +348,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     }
 
     const location = path.resolve(this.state.tencentInstallationPath, 'Launcher', 'Client.exe')
-    return execAsync(`"${location}"`, { shell: 'cmd' })
+    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore' })
+    child.unref()
   }
 
   private _launchWeGameLeagueOfLegends() {
@@ -360,7 +361,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    return execAsync(`"${location}"`, { shell: 'cmd' })
+    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore' })
+    child.unref()
   }
 
   private _launchWeGame() {
@@ -368,7 +370,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return execAsync(`"${this.state.weGameExecutablePath}"`, { shell: 'cmd' })
+    const child = cp.spawn(this.state.weGameExecutablePath, [], { detached: true, stdio: 'ignore' })
+    child.unref()
   }
 
   private _launchDefaultRiotClient() {
@@ -376,10 +379,12 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return execAsync(
-      `"${this.state.officialRiotClientExecutablePath}" --launch-product=league_of_legends --launch-patchline=live`,
-      { shell: 'cmd' }
+    const child = cp.spawn(
+      this.state.officialRiotClientExecutablePath,
+      ['--launch-product=league_of_legends', '--launch-patchline=live'],
+      { detached: true, stdio: 'ignore' }
     )
+    child.unref()
   }
 
   async onDispose() {
