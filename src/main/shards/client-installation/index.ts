@@ -1,12 +1,17 @@
 import { tools } from '@leagueakari/league-akari-addons'
+import { i18next } from '@main/i18n'
+import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
-import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { JumpListItem, app } from 'electron'
+import { comparer } from 'mobx'
 import cp from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import util from 'node:util'
 import regedit from 'regedit'
 
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -50,9 +55,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   private _liveStreamingTimer: NodeJS.Timeout | null = null
 
   constructor(
-    private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _mobx: MobxUtilsMain
+    private readonly _app: AppCommonMain,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _shared: SharedGlobalShard
   ) {
     this._log = _loggerFactory.create(ClientInstallationMain.id)
   }
@@ -63,6 +70,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._updateTencentPathsByReg()
     this._updateTencentPathsByFile()
     this._updateLeagueClientInstallationByFile()
+    this._handleJumpList()
 
     this._updateLiveStreamingClientsRunningInfo()
     this._liveStreamingTimer = setInterval(
@@ -348,8 +356,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     }
 
     const location = path.resolve(this.state.tencentInstallationPath, 'Launcher', 'Client.exe')
-    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore' })
+    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: 'cmd' })
     child.unref()
+    child.on('error', () => {
+      this._log.error('Failed to launch TCLS client', location)
+    })
   }
 
   private _launchWeGameLeagueOfLegends() {
@@ -361,8 +372,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore' })
+    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: 'cmd' })
     child.unref()
+    child.on('error', () => {
+      this._log.warn('Failed to launch WeGame client', location)
+    })
   }
 
   private _launchWeGame() {
@@ -370,8 +384,15 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    const child = cp.spawn(this.state.weGameExecutablePath, [], { detached: true, stdio: 'ignore' })
+    const child = cp.spawn(this.state.weGameExecutablePath, [], {
+      detached: true,
+      stdio: 'ignore',
+      shell: 'cmd'
+    })
     child.unref()
+    child.on('error', () => {
+      this._log.warn('Failed to launch WeGame client', this.state.weGameExecutablePath)
+    })
   }
 
   private _launchDefaultRiotClient() {
@@ -382,9 +403,127 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     const child = cp.spawn(
       this.state.officialRiotClientExecutablePath,
       ['--launch-product=league_of_legends', '--launch-patchline=live'],
-      { detached: true, stdio: 'ignore' }
+      { detached: true, stdio: 'ignore', shell: 'cmd' }
     )
     child.unref()
+    child.on('error', () => {
+      this._log.warn(
+        'Failed to launch default RiotClient client',
+        this.state.officialRiotClientExecutablePath
+      )
+    })
+  }
+
+  private _buildJumpList() {
+    const jumpListItems: JumpListItem[] = []
+    const t = i18next.getFixedT(null, 'main', 'client-installation-main.jumpList')
+
+    if (this.state.hasTcls) {
+      jumpListItems.push({
+        type: 'task',
+        title: t('launchTcls.title'),
+        program: 'explorer.exe',
+        args: `${DEEP_LINK_PROTOCOL}://shards/${ClientInstallationMain.id}/launch-tcls-client`,
+        iconPath: process.execPath,
+        iconIndex: 0,
+        description: t('launchTcls.description')
+      })
+    }
+
+    if (this.state.hasWeGameLauncher) {
+      jumpListItems.push({
+        type: 'task',
+        title: t('launchWeGame.title'),
+        program: 'explorer.exe',
+        args: `${DEEP_LINK_PROTOCOL}://shards/${ClientInstallationMain.id}/launch-we-game-lol`,
+        iconPath: process.execPath,
+        iconIndex: 0,
+        description: t('launchWeGame.description')
+      })
+    }
+
+    if (this.state.officialRiotClientExecutablePath) {
+      jumpListItems.push({
+        type: 'task',
+        title: t('launchRiot.title'),
+        program: 'explorer.exe',
+        args: `"${DEEP_LINK_PROTOCOL}://shards/${ClientInstallationMain.id}/launch-riot-client-lol"`,
+        iconPath: process.execPath,
+        iconIndex: 0,
+        description: t('launchRiot.description')
+      })
+    }
+
+    if (jumpListItems.length) {
+      app.setJumpList([
+        {
+          type: 'tasks',
+          items: jumpListItems
+        }
+      ])
+    } else {
+      app.setJumpList(null)
+    }
+  }
+
+  private _handleJumpList() {
+    let startupLaunch = false
+
+    const handleDeepLink = (url: string, triggedBySecondInstance = false) => {
+      const parsed = new URL(url, `${DEEP_LINK_PROTOCOL}://shards`)
+
+      switch (parsed.pathname) {
+        case `/${ClientInstallationMain.id}/launch-tcls-client`:
+          if (!this.state.hasTcls) {
+            return
+          }
+
+          this._launchTencentTcls()
+          break
+        case `/${ClientInstallationMain.id}/launch-riot-client-lol`:
+          if (!this.state.officialRiotClientExecutablePath) {
+            return
+          }
+
+          this._launchDefaultRiotClient()
+          break
+        case `/${ClientInstallationMain.id}/launch-we-game-lol`:
+          if (!this.state.hasWeGameLauncher) {
+            return
+          }
+
+          this._launchWeGameLeagueOfLegends()
+          break
+        default:
+          this._log.warn('Unknown deep link', parsed.pathname)
+          return
+      }
+
+      if (!triggedBySecondInstance) {
+        startupLaunch = true
+      }
+    }
+
+    this._mobx.reaction(
+      () => [
+        this._app.settings.locale,
+        this.state.hasTcls,
+        this.state.hasWeGameLauncher,
+        this.state.officialRiotClientExecutablePath
+      ],
+      () => {
+        this._buildJumpList()
+
+        if (this._shared.global.startupDeepLink && !startupLaunch) {
+          handleDeepLink(this._shared.global.startupDeepLink, false)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow, delay: 500 }
+    )
+
+    this._shared.global.events.on('second-instance-deep-link', (url) => {
+      handleDeepLink(url, true)
+    })
   }
 
   async onDispose() {

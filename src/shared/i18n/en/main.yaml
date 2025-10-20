@@ -110,3 +110,15 @@ in-game-send-main:
     template: Template
 
   newSendableItem: New Sendable Item {{index}}
+
+client-installation-main:
+  jumpList:
+    launchTcls:
+      title: Launch TCLS Client
+      description: Open League Akari and launch TCLS client
+    launchRiot:
+      title: Launch Riot Client
+      description: Open League Akari launch Riot client
+    launchWeGame:
+      title: Launch WeGame
+      description: Open League Akari and launch WeGame

@@ -110,3 +110,15 @@ in-game-send-main:
     template: 基于模板
 
   newSendableItem: 新发送项 {{index}}
+
+client-installation-main:
+  jumpList:
+    launchTcls:
+      title: 启动 TCLS 客户端
+      description: 启动 League Akari 并启动 TCLS 客户端
+    launchRiot:
+      title: 启动 Riot 客户端
+      description: 启动 League Akari 并启动 Riot 客户端
+    launchWeGame:
+      title: 启动 WeGame
+      description: 启动 League Akari 并启动 WeGame

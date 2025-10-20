@@ -1,4 +1,4 @@
-import { is, optimizer } from '@electron-toolkit/utils'
+import { optimizer } from '@electron-toolkit/utils'
 import { tools } from '@leagueakari/league-akari-addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
@@ -32,6 +32,7 @@ import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
+import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { AkariManager } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
@@ -156,9 +157,6 @@ export function isWindows11_22H2_OrHigher() {
 }
 
 export const isAdministrator = tools.isElevated()
-
-const AKARI_DEEP_LINK_PROTOCOL = 'league-akari'
-const AKARI_DEEP_LINK_PROTOCOL_DEV = 'league-akari-dev'
 
 /**
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
@@ -304,11 +302,16 @@ export function bootstrap() {
       }
     }
 
-    app.setAsDefaultProtocolClient(is.dev ? AKARI_DEEP_LINK_PROTOCOL_DEV : AKARI_DEEP_LINK_PROTOCOL)
+    if (process.defaultApp) {
+      const appPath = path.resolve(process.argv[1])
+      app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL, process.execPath, [appPath])
+    } else {
+      app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL)
+    }
 
     const getDeepLinkArg = (argv: string[]) => {
       const urlArg = argv.find(
-        (a) => typeof a === 'string' && a.startsWith(`${AKARI_DEEP_LINK_PROTOCOL}://`)
+        (a) => typeof a === 'string' && a.startsWith(`${DEEP_LINK_PROTOCOL}://`)
       )
 
       return urlArg || null
@@ -321,6 +324,11 @@ export function bootstrap() {
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
+
+      logger.info({
+        message: `Second instance detected with command line: ${commandLine.join(' ')}`,
+        namespace: 'app'
+      })
 
       const deepLinkArg = getDeepLinkArg(commandLine)
       if (deepLinkArg) {
