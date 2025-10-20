@@ -846,6 +846,7 @@ ClientConnection:
   noClient: No available client, please start the client
   connecting: Connecting...
   restartUx: Restart UX
+  playAgain: Return to Lobby
   killUx: Kill UX
   launchUx: Launch UX
   quitClient: Quit Client Process
@@ -2112,6 +2113,7 @@ FriendTools:
   refreshSuccess: Refreshed
   neverPlayed: No match data
   unknown: Unknown
+  searchPlaceholder: Search friends...
 
   groupNames:
     '**Default': General

@@ -848,6 +848,7 @@ ClientConnection:
   noData: 暂无数据
   connecting: 连接中...
   restartUx: 重启 UX
+  playAgain: 回到房间
   killUx: 结束 UX
   launchUx: 启动 UX
   quitClient: 退出客户端进程
@@ -2116,6 +2117,7 @@ FriendTools:
   refreshSuccess: 已刷新
   neverPlayed: 无对局数据
   unknown: 未知
+  searchPlaceholder: 搜索好友...
 
   groupNames:
     '**Default': 综合

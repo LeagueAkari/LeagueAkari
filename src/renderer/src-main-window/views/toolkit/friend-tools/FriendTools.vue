@@ -7,6 +7,17 @@
             <span class="card-header-title">{{ t('FriendTools.title') }}</span>
           </template>
           <div class="button-group">
+            <NInput
+              v-model:value="searchQuery"
+              :placeholder="t('FriendTools.searchPlaceholder')"
+              clearable
+              size="small"
+              style="width: 200px;"
+            >
+              <template #prefix>
+                <NIcon><SearchIcon /></NIcon>
+              </template>
+            </NInput>
             <NPopconfirm
               @positive-click="deleteSelectedFriends"
               :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
@@ -94,11 +105,14 @@ import {
   NCard,
   NDataTable,
   NEllipsis,
+  NIcon,
+  NInput,
   NPopconfirm,
   NScrollbar,
   useMessage
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
+import { Search as SearchIcon } from '@vicons/ionicons5'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
@@ -119,6 +133,7 @@ const message = useMessage()
 
 const selectedItems = ref<string[]>([])
 const expandedRowKeys = ref<number[]>([])
+const searchQuery = ref('')
 
 const isLoading = ref(false)
 const isDeleting = ref(false)
@@ -210,35 +225,80 @@ const columns = computed<DataTableColumns<any>>(() => [
 ])
 
 const tableData = computed(() => {
-  return combinedGroups.value.map((group) => {
+  const filteredGroups = combinedGroups.value.map((group) => {
+    if (!searchQuery.value.trim()) {
+      return {
+        id: group.id,
+        name: t(`FriendTools.groupNames.${group.name}`, group.name),
+        children: group.friends
+          .map((friend) => {
+            return {
+              id: friend.id,
+              puuid: friend.puuid,
+              icon: friend.icon,
+              name: `${friend.gameName}#${friend.gameTag}`
+            }
+          })
+          .toSorted((a, b) => {
+            const aSince = extraInfoMap.value[a.puuid]?.friendsSince
+            const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+
+            if (aSince && bSince) {
+              return aSince - bSince
+            } else if (aSince) {
+              return -1
+            } else if (bSince) {
+              return 1
+            } else {
+              return 0
+            }
+          })
+      }
+    }
+
+    // 过滤好友
+    const filteredFriends = group.friends
+      .filter((friend) => {
+        const searchLower = searchQuery.value.toLowerCase()
+        const gameName = friend.gameName.toLowerCase()
+        const gameTag = friend.gameTag.toLowerCase()
+        const fullName = `${friend.gameName}#${friend.gameTag}`.toLowerCase()
+        
+        return gameName.includes(searchLower) || 
+               gameTag.includes(searchLower) || 
+               fullName.includes(searchLower)
+      })
+      .map((friend) => {
+        return {
+          id: friend.id,
+          puuid: friend.puuid,
+          icon: friend.icon,
+          name: `${friend.gameName}#${friend.gameTag}`
+        }
+      })
+      .toSorted((a, b) => {
+        const aSince = extraInfoMap.value[a.puuid]?.friendsSince
+        const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+
+        if (aSince && bSince) {
+          return aSince - bSince
+        } else if (aSince) {
+          return -1
+        } else if (bSince) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+
     return {
       id: group.id,
       name: t(`FriendTools.groupNames.${group.name}`, group.name),
-      children: group.friends
-        .map((friend) => {
-          return {
-            id: friend.id,
-            puuid: friend.puuid,
-            icon: friend.icon,
-            name: `${friend.gameName}#${friend.gameTag}`
-          }
-        })
-        .toSorted((a, b) => {
-          const aSince = extraInfoMap.value[a.puuid]?.friendsSince
-          const bSince = extraInfoMap.value[b.puuid]?.friendsSince
-
-          if (aSince && bSince) {
-            return aSince - bSince
-          } else if (aSince) {
-            return -1
-          } else if (bSince) {
-            return 1
-          } else {
-            return 0
-          }
-        })
+      children: filteredFriends
     }
   })
+
+  return filteredGroups.filter(group => group.children.length > 0)
 })
 
 const selectedFriendCount = computed(() => {

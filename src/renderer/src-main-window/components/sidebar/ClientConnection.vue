@@ -33,6 +33,14 @@
               </template>
               {{ $t('ClientConnection.restartUx') }}
             </NButton>
+            <NButton 
+              size="tiny" 
+              secondary 
+              :disabled="!isInEndgamePhase" 
+              @click="handlePlayAgain"
+            >
+              {{ $t('ClientConnection.playAgain') }}
+            </NButton>
             <NButton size="tiny" secondary @click="() => lc.disconnect()">
               <template #icon>
                 <NIcon>
@@ -144,7 +152,7 @@ import {
 } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NDropdown, NEllipsis, NIcon, NScrollbar, NSpin } from 'naive-ui'
+import { NButton, NDropdown, NEllipsis, NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
 import { computed, h, ref, watch } from 'vue'
 
 const { t } = useTranslation()
@@ -156,6 +164,8 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 
 const sgps = useSgpStore()
+
+const notification = useNotification()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
@@ -242,11 +252,33 @@ const handleConnect = (cmd: UxCommandLine) => {
   lc.connect(cmd)
 }
 
+const isInEndgamePhase = computed(() => {
+  return (
+    lcs.gameflow.phase === 'WaitingForStats' ||
+    lcs.gameflow.phase === 'PreEndOfGame' ||
+    lcs.gameflow.phase === 'EndOfGame'
+  )
+})
+
 const handleRestartUx = async () => {
   try {
     await lc.api.riotclient.restartUx()
   } catch (error) {
     console.error(error)
+  }
+}
+
+const handlePlayAgain = async () => {
+  try {
+    await lc.api.lobby.playAgain()
+  } catch (error) {
+    notification.warning({
+      title: () => t('GameflowInProgress.playAgain.failedNotification.title'),
+      content: () =>
+        t('GameflowInProgress.playAgain.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 
