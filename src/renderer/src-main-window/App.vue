@@ -50,13 +50,10 @@
 </template>
 
 <script setup lang="ts">
-import { electronAPI } from '@electron-toolkit/preload'
 import { useInstance } from '@renderer-shared/shards'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
-import { ProcessControlHttpApi } from '@shared/http-api-axios-helper/league-client/process-control'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import { provide, ref } from 'vue'
@@ -71,8 +68,6 @@ import { MainWindowUiRenderer } from './shards/main-window-ui'
 const mui = useInstance(MainWindowUiRenderer)
 
 const as = useAppCommonStore()
-
-const app = useInstance(AppCommonRenderer)
 
 const { t } = useTranslation()
 
@@ -93,14 +88,6 @@ const notification = useNotification()
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
-
-app.onSecondInstance(() => {
-  notification.info({
-    title: 'League Akari',
-    content: () => t('app.singleton', { ns: 'common' }),
-    duration: 10000
-  })
-})
 
 const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()

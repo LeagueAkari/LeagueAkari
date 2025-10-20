@@ -13,6 +13,15 @@ export class AppCommonState {
 
   shouldUseDarkColors: boolean = false
 
+  /**
+   * 跟随本次启动而来的 deep link
+   */
+  startupDeepLink: string | null = null
+
+  setStartupDeepLink(s: string | null) {
+    this.startupDeepLink = s
+  }
+
   setAdministrator(s: boolean) {
     this.isAdministrator = s
   }

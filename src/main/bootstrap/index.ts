@@ -1,4 +1,4 @@
-import { optimizer } from '@electron-toolkit/utils'
+import { is, optimizer } from '@electron-toolkit/utils'
 import { tools } from '@leagueakari/league-akari-addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
@@ -51,6 +51,9 @@ import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
   'log-level-changed': [level: string]
+
+  /** 当其他实例附带参数时 */
+  'second-instance-deep-link': [url: string]
 }
 
 declare module '@shared/akari-shard' {
@@ -87,6 +90,11 @@ declare module '@shared/akari-shard' {
       value: BaseConfig | null
       write: (config: Partial<BaseConfig>) => void
     }
+
+    /**
+     * 跟随本次启动而来的 deep link
+     */
+    startupDeepLink: string | null
 
     version: string
 
@@ -148,6 +156,9 @@ export function isWindows11_22H2_OrHigher() {
 }
 
 export const isAdministrator = tools.isElevated()
+
+const AKARI_DEEP_LINK_PROTOCOL = 'league-akari'
+const AKARI_DEEP_LINK_PROTOCOL_DEV = 'league-akari-dev'
 
 /**
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
@@ -293,12 +304,28 @@ export function bootstrap() {
       }
     }
 
+    app.setAsDefaultProtocolClient(is.dev ? AKARI_DEEP_LINK_PROTOCOL_DEV : AKARI_DEEP_LINK_PROTOCOL)
+
+    const getDeepLinkArg = (argv: string[]) => {
+      const urlArg = argv.find(
+        (a) => typeof a === 'string' && a.startsWith(`${AKARI_DEEP_LINK_PROTOCOL}://`)
+      )
+
+      return urlArg || null
+    }
+
+    const deepLinkArg = getDeepLinkArg(process.argv)
+    if (deepLinkArg) {
+      manager.global.startupDeepLink = deepLinkArg
+    }
+
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
-      logger.warn({
-        message: `User attempted to start a second instance, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
-        namespace: 'electron'
-      })
+
+      const deepLinkArg = getDeepLinkArg(commandLine)
+      if (deepLinkArg) {
+        events.emit('second-instance-deep-link', deepLinkArg)
+      }
     })
 
     app.on('window-all-closed', () => {

@@ -54,10 +54,14 @@ export class AppCommonMain implements IAkariShardInitDispose {
     )
 
     this.state.setAdministrator(this._shared.global.isAdministrator)
+    this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
 
-    // 通知第二实例事件
     this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {
       this._ipc.sendEvent(AppCommonMain.id, 'second-instance', commandLine, workingDirectory)
+    })
+
+    this._shared.global.events.on('second-instance-deep-link', (url) => {
+      this._ipc.sendEvent(AppCommonMain.id, 'second-instance-deep-link', url)
     })
 
     this.state.setBaseConfig(this._shared.global.baseConfig.value)
@@ -158,7 +162,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',
       'disableHardwareAcceleration',
-      'baseConfig'
+      'baseConfig',
+      'startupDeepLink'
     ])
 
     // 状态指示, 是否禁用硬件加速

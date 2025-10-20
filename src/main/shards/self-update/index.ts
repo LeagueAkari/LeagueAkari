@@ -634,7 +634,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       [
         `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
         'uninstall',
-        `--app-id="akari"`,
+        `--app-id="league-akari"`,
         `--dirs-to-remove="${appPath}"`,
         `--dirs-to-remove="${dataPath}"`
       ],
