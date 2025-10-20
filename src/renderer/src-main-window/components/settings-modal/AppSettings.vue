@@ -439,6 +439,16 @@
           @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.misc.uninstallApp.label')"
+        :label-description="t('AppSettings.misc.uninstallApp.description')"
+        :label-width="400"
+      >
+        <NButton size="small" type="error" @click="() => handleUninstallApp()">
+          {{ t('AppSettings.misc.uninstallApp.button') }}
+        </NButton>
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -575,6 +585,20 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
     negativeText: t('AppSettings.misc.disableHardwareAccelerationDialog.negativeText'),
     onPositiveClick: async () => {
       await app.setDisableHardwareAcceleration(val)
+    }
+  })
+}
+
+const handleUninstallApp = () => {
+  dialog.warning({
+    title: t('AppSettings.misc.uninstallApp.title'),
+    content: t('AppSettings.misc.uninstallApp.content'),
+    positiveText: t('AppSettings.misc.uninstallApp.positiveText'),
+    negativeText: t('AppSettings.misc.uninstallApp.negativeText'),
+    onPositiveClick: async () => {
+      if (!import.meta.env.DEV) {
+        await su.uninstallApp()
+      }
     }
   })
 }

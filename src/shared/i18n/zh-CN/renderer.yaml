@@ -247,6 +247,15 @@ AppSettings:
         label: 代理端口
         description: 代理服务器的端口
 
+    uninstallApp:
+      label: 卸载应用
+      description: 卸载应用，将删除所有数据和配置
+      button: 卸载应用
+      title: 卸载应用
+      content: 确定要卸载 $t(common:appName) 吗？将同时移除所有应用数据。
+      positiveText: 卸载
+      negativeText: 取消
+
 MatchHistorySettings:
   title: 战绩页面
 

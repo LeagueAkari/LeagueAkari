@@ -246,6 +246,15 @@ AppSettings:
         label: Proxy Port
         description: The port of the proxy server
 
+    uninstallApp:
+      label: Uninstall Application
+      description: Uninstall the application, which will delete all data and configurations
+      button: Uninstall Application
+      title: Uninstall Application
+      content: Are you sure you want to uninstall $t(common:appName)? This will also remove all application data.
+      positiveText: Uninstall
+      negativeText: Cancel
+
 MatchHistorySettings:
   title: Match History Tabs
 
