@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { DEEP_LINK_PROTOCOL_DEV, DEEP_LINK_PROTOCOL_PROD } from '@main/utils/deep-link'
 import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
@@ -634,7 +635,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       [
         `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
         'uninstall',
-        `--app-id="league-akari"`,
+        `--app-id="${DEEP_LINK_PROTOCOL_PROD}"`,
+        `--app-id="${DEEP_LINK_PROTOCOL_DEV}"`,
         `--dirs-to-remove="${appPath}"`,
         `--dirs-to-remove="${dataPath}"`
       ],
