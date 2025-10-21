@@ -356,10 +356,33 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     }
 
     const location = path.resolve(this.state.tencentInstallationPath, 'Launcher', 'Client.exe')
-    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: 'cmd' })
-    child.unref()
-    child.on('error', () => {
-      this._log.error('Failed to launch TCLS client', location)
+
+    return new Promise<void>((resolve, reject) => {
+      const p = cp.spawn(location, [], {
+        detached: true,
+        stdio: 'ignore',
+        shell: 'cmd'
+      })
+
+      let hasError = false
+      p.on('rejected', (err) => {
+        reject(err)
+      })
+
+      p.on('error', (err) => {
+        hasError = true
+        this._log.error('Failed to launch TCLS client', location, err)
+        reject(err)
+      })
+
+      setImmediate(() => {
+        if (hasError) {
+          return
+        }
+
+        p.unref()
+        resolve()
+      })
     })
   }
 
@@ -375,7 +398,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: 'cmd' })
     child.unref()
     child.on('error', () => {
-      this._log.warn('Failed to launch WeGame client', location)
+      this._log.warn('Failed to launch WeGame (LoL) client', location)
     })
   }
 
@@ -384,14 +407,34 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    const child = cp.spawn(this.state.weGameExecutablePath, [], {
-      detached: true,
-      stdio: 'ignore',
-      shell: 'cmd'
-    })
-    child.unref()
-    child.on('error', () => {
-      this._log.warn('Failed to launch WeGame client', this.state.weGameExecutablePath)
+    const executablePath = this.state.weGameExecutablePath
+
+    return new Promise<void>((resolve, reject) => {
+      const p = cp.spawn(executablePath, [], {
+        detached: true,
+        stdio: 'ignore',
+        shell: 'cmd'
+      })
+
+      let hasError = false
+      p.on('rejected', (err) => {
+        reject(err)
+      })
+
+      p.on('error', (err) => {
+        hasError = true
+        this._log.warn('Failed to launch WeGame client', executablePath, err)
+        reject(err)
+      })
+
+      setImmediate(() => {
+        if (hasError) {
+          return
+        }
+
+        p.unref()
+        resolve()
+      })
     })
   }
 
@@ -400,17 +443,34 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    const child = cp.spawn(
-      this.state.officialRiotClientExecutablePath,
-      ['--launch-product=league_of_legends', '--launch-patchline=live'],
-      { detached: true, stdio: 'ignore', shell: 'cmd' }
-    )
-    child.unref()
-    child.on('error', () => {
-      this._log.warn(
-        'Failed to launch default RiotClient client',
-        this.state.officialRiotClientExecutablePath
+    const executablePath = this.state.officialRiotClientExecutablePath
+
+    return new Promise<void>((resolve, reject) => {
+      const p = cp.spawn(
+        executablePath,
+        ['--launch-product=league_of_legends', '--launch-patchline=live'],
+        {
+          detached: true
+        }
       )
+
+      let hasError = false
+      p.on('rejected', (err) => {
+        reject(err)
+      })
+
+      p.on('error', (err) => {
+        reject(err)
+      })
+
+      setImmediate(() => {
+        if (hasError) {
+          return
+        }
+
+        p.unref()
+        resolve()
+      })
     })
   }
 
