@@ -72,7 +72,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       () => showTiming.get(),
       (timing) => {
         if (timing === 'show') {
-          this.showOrRestore()
+          this.showOrRestore(true)
         }
       }
     )

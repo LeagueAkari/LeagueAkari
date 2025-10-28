@@ -690,12 +690,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       () => this.state.ongoingChampionSwap,
       (trade, prev) => {
         if (!trade || trade.state !== 'RECEIVED') {
+          this._log.error('[DEBUG]', trade, '=>', null)
           this.state.setOngoingChampionSwapCreatedAt(null)
           return
         }
 
         // 仅在第一次**收到** trade 时，记录其可用的时间
         if (!prev && trade.state === 'RECEIVED') {
+          this._log.error('[DEBUG]', trade, '=>', Date.now())
           this.state.setOngoingChampionSwapCreatedAt(Date.now())
         }
       },
@@ -812,6 +814,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedChampionSwap.tradeId !== tradeId ||
           this.state._delayedChampionSwap.requesterChampionId !== requesterChampionId
         ) {
+          this._log.error('[DEBUG]', this.state._delayedChampionSwap, '=>', {
+            action,
+            tradeId,
+            requesterChampionId
+          })
+
           this._sendCelebration(
             i18next.t(`auto-select-main.${action}-champion-swap`, {
               seconds: (delayMs / 1e3).toFixed(1),

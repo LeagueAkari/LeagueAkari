@@ -1718,6 +1718,8 @@ defineExpose({
   background-color: rgba(0, 0, 0, 0.6);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
+  background-image: radial-gradient(transparent 1px, var(--la-background-color-primary) 4px);
+  background-size: 4px 4px;
 
   .header-simplified-inner {
     display: flex;

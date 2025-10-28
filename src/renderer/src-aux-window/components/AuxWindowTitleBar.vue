@@ -5,13 +5,6 @@
     </div>
     <div class="traffic">
       <div
-        :title="t('AuxWindowTitleBar.repositionToAlignLeagueClientUx')"
-        class="traffic-button align"
-        @click="handleRepositionToAlignLeagueClientUx"
-      >
-        <NIcon><ArrowBarToLeftIcon /></NIcon>
-      </div>
-      <div
         :title="aws.settings.pinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')"
         class="traffic-button pin"
         :class="{ pinned: aws.settings.pinned }"
@@ -40,7 +33,6 @@ import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
-import { ArrowBarToLeft as ArrowBarToLeftIcon } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 
@@ -59,10 +51,6 @@ const handleMinimize = () => {
 
 const handlePin = (b: boolean) => {
   return wm.auxWindow.setPinned(b)
-}
-
-const handleRepositionToAlignLeagueClientUx = () => {
-  wm.auxWindow.repositionToAlignLeagueClientUx()
 }
 </script>
 

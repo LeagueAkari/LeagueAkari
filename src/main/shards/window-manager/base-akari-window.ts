@@ -495,7 +495,10 @@ export abstract class BaseAkariWindow<
       if (this._window.isMinimized()) {
         this._window.restore()
       }
-      this._window.focus()
+
+      if (!inactive) {
+        this._window.focus()
+      }
     }
   }
 
