@@ -323,7 +323,7 @@ const match = computed(() => {
   }
 })
 
-// Check if the game has augments (KIWI mode - ARAM: Mayhem, queueId 1700)
+// Check if the game has augments (KIWI mode - ARAM: Mayhem)
 const hasAugments = computed(() => {
   // Check if any participant has augments
   return props.game.participants.some((p) => p.stats.playerAugment1 > 0)
