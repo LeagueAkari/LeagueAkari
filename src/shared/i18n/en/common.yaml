@@ -55,6 +55,7 @@ queueTypes:
   RANKED_FLEX_SR: Ranked Flex
   NORMAL: Normal SR
   ARAM_UNRANKED_5x5: ARAM
+  KIWI: 'ARAM: Mayhem'
   CHERRY: Arena
   URF: URF
   RANKED_FLEX_TT: Ranked Flex TT

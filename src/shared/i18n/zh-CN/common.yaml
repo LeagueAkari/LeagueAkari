@@ -55,6 +55,7 @@ queueTypes:
   RANKED_FLEX_SR: 灵活排位
   NORMAL: 匹配模式
   ARAM_UNRANKED_5x5: 极地大乱斗
+  KIWI: 海克斯大乱斗
   CHERRY: 斗魂竞技场
   URF: 无限火力 / 无限乱斗
   RANKED_FLEX_TT: 灵活排位 3v3

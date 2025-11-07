@@ -21,6 +21,7 @@ import { MatchmakingHttpApi } from './matchmaking'
 import { MissionsHttpApi } from './missions'
 import { PerksHttpApi } from './perks'
 import { PlayerNotificationsHttpApi } from './player-notifications'
+import { PlayerReportSenderHttpApi } from './player-report-sender'
 import { PreEndOfGameHttpApi } from './pre-end-of-game'
 import { ProcessControlHttpApi } from './process-control'
 import { RankedHttpApi } from './ranked'
@@ -71,6 +72,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly store: StoreHttpApi
   public readonly replays: ReplaysHttpApi
   public readonly lobbyTeamBuilder: LobbyTeamBuilderHttpApi
+  public readonly playerReportSender: PlayerReportSenderHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -106,5 +108,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.store = new StoreHttpApi(this._http)
     this.replays = new ReplaysHttpApi(this._http)
     this.lobbyTeamBuilder = new LobbyTeamBuilderHttpApi(this._http)
+    this.playerReportSender = new PlayerReportSenderHttpApi(this._http)
   }
 }

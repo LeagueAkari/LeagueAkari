@@ -83,6 +83,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Friend, FriendGroup } from '@shared/types/league-client/chat'
@@ -110,6 +111,7 @@ const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
 const sgp = useInstance(SgpRenderer)
+const log = useInstance(LoggerRenderer)
 
 const mh = useInstance(MatchHistoryTabsRenderer)
 
@@ -385,6 +387,7 @@ const deleteSelectedFriends = async () => {
       }
 
       await lc.api.chat.deleteFriend(friendId)
+      log.infoRenderer('comp:FriendTools', 'deleted', friendId)
     }
 
     message.success(() => t('FriendTools.deleteSuccess', { countV: filtered.length }))

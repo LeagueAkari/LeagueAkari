@@ -21,7 +21,7 @@ export class RiotClientRcuUninitializedError extends Error {
 export class RiotClientMain implements IAkariShardInitDispose {
   static id = 'riot-client-main'
 
-  static REQUEST_TIMEOUT_MS = 12500
+  static REQUEST_TIMEOUT_MS = 17500
 
   private readonly _log: AkariLogger
 

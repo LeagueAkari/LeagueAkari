@@ -60,7 +60,7 @@ export interface SgpServersConfig {
 
 export class LeagueSgpApi {
   static USER_AGENT = 'LeagueOfLegendsClient/14.13.596.7996 (rcp-be-lol-match-history)'
-  static REQUEST_TIMEOUT = 12500
+  static REQUEST_TIMEOUT = 17500
 
   // default
   private _sgpServerConfig: SgpServersConfig = {

@@ -348,6 +348,10 @@ const queueTypes = computed(() => {
       label: t('queueTypes.ARAM_UNRANKED_5x5', { ns: 'common' }),
       order: 300
     },
+    KIWI: {
+      label: t('queueTypes.KIWI', { ns: 'common' }),
+      order: 310
+    },
     CHERRY: {
       label: t('queueTypes.CHERRY', { ns: 'common' }),
       order: 400
