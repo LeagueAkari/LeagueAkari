@@ -21,6 +21,7 @@
               }})
             </th>
             <th class="header-kda">{{ t('DetailedGame.header.kda') }}</th>
+            <th class="header-augments" v-if="hasAugments">{{ t('DetailedGame.header.augment') }}</th>
             <th class="header-damage">{{ t('DetailedGame.header.dmg') }}</th>
             <th class="header-wards">{{ t('DetailedGame.header.ward') }}</th>
             <th class="header-cs">{{ t('DetailedGame.header.cs') }}</th>
@@ -100,6 +101,16 @@
                 <div class="kda-ratio">
                   {{ ((p.stats.kills + p.stats.assists) / (p.stats.deaths || 1)).toFixed(2) }}
                 </div>
+              </div>
+            </td>
+            <td style="width: 120px" v-if="hasAugments">
+              <div class="augments">
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment1" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment2" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment3" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment4" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment5" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment6" />
               </div>
             </td>
             <td style="width: 124px">
@@ -212,6 +223,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
@@ -309,6 +321,12 @@ const match = computed(() => {
     aggregateStats: teamStats,
     recordStats: recordStats
   }
+})
+
+// Check if the game has augments (KIWI mode - ARAM: Mayhem, queueId 1700)
+const hasAugments = computed(() => {
+  // Check if any participant has augments
+  return props.game.participants.some((p) => p.stats.playerAugment1 > 0)
 })
 
 const handleMouseDown = (event: MouseEvent) => {
@@ -464,6 +482,39 @@ table {
   .kda-ratio {
     font-size: 11px;
     font-weight: bold;
+  }
+}
+
+.augments {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+
+  .augment {
+    height: 20px;
+    width: 20px;
+    box-sizing: border-box;
+    background-color: rgb(34, 34, 34);
+    border-radius: 2px;
+  }
+
+  .augment.prismatic {
+    border: 1px solid rgb(175, 141, 255);
+  }
+
+  .augment.gold {
+    border: 1px solid rgb(255, 183, 0);
+  }
+
+  .augment.silver {
+    border: 1px solid rgb(247, 247, 247);
+  }
+
+  .augment-empty {
+    height: 20px;
+    width: 20px;
+    border-radius: 2px;
+    background-color: rgb(34, 34, 34);
   }
 }
 
