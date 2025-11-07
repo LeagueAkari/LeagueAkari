@@ -97,7 +97,7 @@
             ></ChampionIcon>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
-          <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY'">
+          <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY' || game.gameMode === 'KIWI'">
             <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
