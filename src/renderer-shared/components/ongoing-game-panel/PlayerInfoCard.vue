@@ -1015,9 +1015,16 @@ const { name } = useChampionInfo()
 
   .win-rate,
   .win-rate-cherry {
+    [data-theme='dark'] .game-count {
+      color: #fffa;
+    }
+
+    [data-theme='light'] .game-count {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
     .game-count {
       margin-left: 4px;
-      color: #fffa;
       font-weight: normal;
       font-size: 9px;
     }
@@ -1027,8 +1034,12 @@ const { name } = useChampionInfo()
     color: #4cc69d;
   }
 
-  .normal {
+  [data-theme='dark'] .normal {
     color: #dcdcdc;
+  }
+
+  [data-theme='light'] .normal {
+    color: #4a4a4a;
   }
 
   .bad {
@@ -1088,7 +1099,6 @@ const { name } = useChampionInfo()
     height: 30px;
     padding: 2px;
     box-sizing: border-box;
-    background-color: #ffffff10;
     border-radius: 2px;
     padding-left: 8px;
     transition: filter 0.3s;
@@ -1096,11 +1106,26 @@ const { name } = useChampionInfo()
     margin-bottom: 2px;
     box-sizing: border-box;
 
+    [data-theme='dark'] & {
+      background-color: #ffffff10;
+    }
+
+    [data-theme='light'] & {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme='dark'] .ordinal {
+      color: #ffffff40;
+    }
+
+    [data-theme='light'] .ordinal {
+      color: rgba(0, 0, 0, 0.35);
+    }
+
     .ordinal {
       opacity: 0;
       position: absolute;
       font-size: 10px;
-      color: #ffffff40;
       bottom: 0;
       right: 0;
     }
@@ -1197,8 +1222,15 @@ const { name } = useChampionInfo()
     width: 100%;
     height: 100%;
     font-size: 12px;
-    color: #ffffffa0;
     gap: 4px;
+
+    [data-theme='dark'] & {
+      color: #ffffffa0;
+    }
+
+    [data-theme='light'] & {
+      color: rgba(0, 0, 0, 0.6);
+    }
 
     .loading {
       display: flex;
@@ -1234,9 +1266,16 @@ const { name } = useChampionInfo()
       height: 22px;
     }
 
+    [data-theme='dark'] .champion-name {
+      color: #e8e8e8;
+    }
+
+    [data-theme='light'] .champion-name {
+      color: #2d2d2d;
+    }
+
     .champion-name {
       font-size: 12px;
-      color: #e8e8e8;
       font-weight: bold;
     }
   }
@@ -1278,11 +1317,18 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .assignment-reason {
+  color: #ffffff;
+}
+
+[data-theme='light'] .assignment-reason {
+  color: #1f2328;
+}
+
 .assignment-reason {
   white-space: nowrap;
   font-size: 11px;
   line-height: 11px;
-  color: #ffffff;
   padding: 2px 4px;
   border-radius: 2px;
 }

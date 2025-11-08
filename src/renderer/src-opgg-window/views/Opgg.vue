@@ -1150,11 +1150,18 @@ watch(
     margin-bottom: 4px;
   }
 
+  [data-theme='dark'] .opgg-icon {
+    color: #fff;
+  }
+
+  [data-theme='light'] .opgg-icon {
+    color: #1f2328;
+  }
+
   .opgg-icon {
     display: block;
     height: 32px;
     width: 32px;
-    color: #fff;
   }
 
   .square-button {
@@ -1174,13 +1181,20 @@ watch(
     overflow: auto;
   }
 
+  [data-theme='dark'] .settings-overlay {
+    background-color: #202020d8;
+  }
+
+  [data-theme='light'] .settings-overlay {
+    background-color: #f5f5f5f5;
+  }
+
   .settings-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #202020d8;
     backdrop-filter: blur(8px);
     z-index: 100;
     padding: 24px 36px;
@@ -1193,7 +1207,14 @@ watch(
       .title {
         font-size: 24px;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .title {
         color: white;
+      }
+
+      [data-theme='light'] .title {
+        color: #1f2328;
       }
 
       .close-btn {
@@ -1237,11 +1258,18 @@ watch(
   color: #62deb4;
 }
 
+[data-theme='dark'] .ongoing-champions {
+  background-color: #202020a0;
+}
+
+[data-theme='light'] .ongoing-champions {
+  background-color: #f5f5f5e0;
+}
+
 .ongoing-champions {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  background-color: #202020a0;
   backdrop-filter: blur(8px);
   border-radius: 8px;
   padding: 12px;

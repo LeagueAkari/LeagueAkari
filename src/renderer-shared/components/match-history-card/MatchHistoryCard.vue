@@ -566,12 +566,19 @@ const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] .match-history-card {
+  background-color: #28344e;
+}
+
+[data-theme='light'] .match-history-card {
+  background-color: #e8ecf4;
+}
+
 .match-history-card {
   display: flex;
   padding: 0px 0px 0px 12px;
   border-radius: 4px;
   box-sizing: border-box;
-  background-color: #28344e;
   width: 740px;
   height: 96px;
   overflow: hidden;
@@ -591,6 +598,14 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .game {
+  color: rgb(159, 159, 159);
+}
+
+[data-theme='light'] .game {
+  color: rgb(75, 75, 75);
+}
+
 .game {
   display: flex;
   flex-direction: column;
@@ -599,7 +614,6 @@ const { name } = useChampionInfo()
   flex-shrink: 0;
   box-sizing: border-box;
   font-size: 12px;
-  color: rgb(159, 159, 159);
   gap: 2px;
 
   .mode {
@@ -613,11 +627,18 @@ const { name } = useChampionInfo()
     font-weight: bold;
   }
 
+  [data-theme='dark'] .divider {
+    background-color: rgb(91, 91, 91);
+  }
+
+  [data-theme='light'] .divider {
+    background-color: rgb(180, 180, 180);
+  }
+
   .divider {
     margin: 2px 0;
     height: 1px;
     width: 60%;
-    background-color: rgb(91, 91, 91);
   }
 }
 
@@ -693,8 +714,15 @@ const { name } = useChampionInfo()
       font-size: 14px;
     }
 
-    .divider {
+    [data-theme='dark'] .divider {
       color: rgb(159, 159, 159);
+    }
+
+    [data-theme='light'] .divider {
+      color: rgb(100, 100, 100);
+    }
+
+    .divider {
       font-size: 14px;
       margin: 0 4px;
     }
@@ -707,14 +735,25 @@ const { name } = useChampionInfo()
       color: rgb(200, 81, 30);
     }
 
-    .a {
+    [data-theme='dark'] .a {
       color: rgb(159, 159, 159);
     }
+
+    [data-theme='light'] .a {
+      color: rgb(100, 100, 100);
+    }
+  }
+
+  [data-theme='dark'] .kda-ratio {
+    color: rgb(159, 159, 159);
+  }
+
+  [data-theme='light'] .kda-ratio {
+    color: rgb(85, 85, 85);
   }
 
   .kda-ratio {
     font-size: 12px;
-    color: rgb(159, 159, 159);
   }
 
   .kda-radio.perfect-kda {
@@ -795,6 +834,14 @@ const { name } = useChampionInfo()
       margin-right: 4px;
     }
 
+    [data-theme='dark'] .name {
+      color: rgb(187, 187, 187);
+    }
+
+    [data-theme='light'] .name {
+      color: rgb(68, 68, 68);
+    }
+
     .name {
       flex: 1;
       width: 0;
@@ -802,7 +849,6 @@ const { name } = useChampionInfo()
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 12px;
-      color: rgb(187, 187, 187);
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -811,10 +857,17 @@ const { name } = useChampionInfo()
       }
     }
 
+    [data-theme='dark'] .name.self {
+      color: white;
+    }
+
+    [data-theme='light'] .name.self {
+      color: #1f2328;
+    }
+
     .name.self {
       cursor: default;
       font-weight: bold;
-      color: white;
     }
   }
 }
@@ -830,10 +883,17 @@ const { name } = useChampionInfo()
   cursor: pointer;
 }
 
+[data-theme='dark'] .icon {
+  color: rgb(214, 214, 214);
+}
+
+[data-theme='light'] .icon {
+  color: rgb(68, 68, 68);
+}
+
 .icon {
   padding: 2px;
   font-size: 16px;
-  color: rgb(214, 214, 214);
   font-weight: bold;
   transition: background-color 0.3s ease;
   background-color: transparent;
@@ -844,13 +904,24 @@ const { name } = useChampionInfo()
   }
 }
 
-.icon:hover {
+[data-theme='dark'] .icon:hover {
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='light'] .icon:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .win {
+  background-color: #212b41e0;
+}
+
+[data-theme='light'] .win {
+  background-color: #dce4f4e0;
 }
 
 .win {
   border-left: 6px solid #5383e8;
-  background-color: #212b41e0;
 
   .game {
     .mode {
@@ -866,14 +937,25 @@ const { name } = useChampionInfo()
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: #2f436e;
   }
+
+  [data-theme='light'] .show-more {
+    background-color: #c5d1e8;
+  }
+}
+
+[data-theme='dark'] .lose {
+  background-color: #4b2c31e0;
+}
+
+[data-theme='light'] .lose {
+  background-color: #f4dcdce0;
 }
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: #4b2c31e0;
 
   .game {
     .mode {
@@ -917,13 +999,20 @@ const { name } = useChampionInfo()
   margin-top: 4px;
 }
 
+[data-theme='dark'] .loading {
+  background-color: #343434;
+}
+
+[data-theme='light'] .loading {
+  background-color: #e5e5e5;
+}
+
 .loading {
   display: flex;
   height: 100px;
   justify-content: center;
   align-items: center;
   margin-top: 4px;
-  background-color: #343434;
   border-radius: 4px;
   font-size: 12px;
 }
