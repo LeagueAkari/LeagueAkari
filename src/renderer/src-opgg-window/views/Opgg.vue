@@ -741,6 +741,10 @@ watchDebounced(
     isModeMatch.value = true
     isAramMayhem.value = false
 
+    // Check for ARAM: Mayhem mode
+    // Note: If Riot uses a specific queueId for Mayhem (e.g., different from 450),
+    // we can add additional detection here: if (atm.gameMode === 'ARAM' && atm.queueId === MAYHEM_QUEUE_ID)
+    
     switch (atm.gameMode) {
       case 'CLASSIC':
         mode.value = 'ranked'
