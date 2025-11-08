@@ -598,6 +598,14 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .game {
+  color: rgb(159, 159, 159);
+}
+
+[data-theme='light'] .game {
+  color: rgb(75, 75, 75);
+}
+
 .game {
   display: flex;
   flex-direction: column;
@@ -606,7 +614,6 @@ const { name } = useChampionInfo()
   flex-shrink: 0;
   box-sizing: border-box;
   font-size: 12px;
-  color: rgb(159, 159, 159);
   gap: 2px;
 
   .mode {
@@ -620,11 +627,18 @@ const { name } = useChampionInfo()
     font-weight: bold;
   }
 
+  [data-theme='dark'] .divider {
+    background-color: rgb(91, 91, 91);
+  }
+
+  [data-theme='light'] .divider {
+    background-color: rgb(180, 180, 180);
+  }
+
   .divider {
     margin: 2px 0;
     height: 1px;
     width: 60%;
-    background-color: rgb(91, 91, 91);
   }
 }
 
@@ -700,8 +714,15 @@ const { name } = useChampionInfo()
       font-size: 14px;
     }
 
-    .divider {
+    [data-theme='dark'] .divider {
       color: rgb(159, 159, 159);
+    }
+
+    [data-theme='light'] .divider {
+      color: rgb(100, 100, 100);
+    }
+
+    .divider {
       font-size: 14px;
       margin: 0 4px;
     }
@@ -714,14 +735,25 @@ const { name } = useChampionInfo()
       color: rgb(200, 81, 30);
     }
 
-    .a {
+    [data-theme='dark'] .a {
       color: rgb(159, 159, 159);
     }
+
+    [data-theme='light'] .a {
+      color: rgb(100, 100, 100);
+    }
+  }
+
+  [data-theme='dark'] .kda-ratio {
+    color: rgb(159, 159, 159);
+  }
+
+  [data-theme='light'] .kda-ratio {
+    color: rgb(85, 85, 85);
   }
 
   .kda-ratio {
     font-size: 12px;
-    color: rgb(159, 159, 159);
   }
 
   .kda-radio.perfect-kda {
@@ -802,6 +834,14 @@ const { name } = useChampionInfo()
       margin-right: 4px;
     }
 
+    [data-theme='dark'] .name {
+      color: rgb(187, 187, 187);
+    }
+
+    [data-theme='light'] .name {
+      color: rgb(68, 68, 68);
+    }
+
     .name {
       flex: 1;
       width: 0;
@@ -809,7 +849,6 @@ const { name } = useChampionInfo()
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 12px;
-      color: rgb(187, 187, 187);
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -818,10 +857,17 @@ const { name } = useChampionInfo()
       }
     }
 
+    [data-theme='dark'] .name.self {
+      color: white;
+    }
+
+    [data-theme='light'] .name.self {
+      color: #1f2328;
+    }
+
     .name.self {
       cursor: default;
       font-weight: bold;
-      color: white;
     }
   }
 }
@@ -837,10 +883,17 @@ const { name } = useChampionInfo()
   cursor: pointer;
 }
 
+[data-theme='dark'] .icon {
+  color: rgb(214, 214, 214);
+}
+
+[data-theme='light'] .icon {
+  color: rgb(68, 68, 68);
+}
+
 .icon {
   padding: 2px;
   font-size: 16px;
-  color: rgb(214, 214, 214);
   font-weight: bold;
   transition: background-color 0.3s ease;
   background-color: transparent;
@@ -851,8 +904,12 @@ const { name } = useChampionInfo()
   }
 }
 
-.icon:hover {
+[data-theme='dark'] .icon:hover {
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='light'] .icon:hover {
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 [data-theme='dark'] .win {

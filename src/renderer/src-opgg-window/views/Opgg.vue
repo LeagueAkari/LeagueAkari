@@ -1150,11 +1150,18 @@ watch(
     margin-bottom: 4px;
   }
 
+  [data-theme='dark'] .opgg-icon {
+    color: #fff;
+  }
+
+  [data-theme='light'] .opgg-icon {
+    color: #1f2328;
+  }
+
   .opgg-icon {
     display: block;
     height: 32px;
     width: 32px;
-    color: #fff;
   }
 
   .square-button {
