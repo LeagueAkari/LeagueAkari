@@ -753,7 +753,7 @@ watchDebounced(
         mode.value = 'aram'
         position.value = 'none'
         break
-      case 'MAYHEM':
+      case 'KIWI':
         // ARAM: Mayhem - combination of ARAM with Arena augments
         mode.value = 'aram'
         position.value = 'none'
