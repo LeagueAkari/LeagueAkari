@@ -131,6 +131,8 @@
         :mode="mode"
         :version="version || undefined"
         :is-able-to-add-to-item-set="isAbleToAddToItemSet"
+        :is-aram-mayhem="isAramMayhem"
+        :arena-augments-data="arenaAugmentsData"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
@@ -321,6 +323,9 @@ const region = ref<RegionType>(savedPreferences.value.region as RegionType)
 const tier = ref<TierType>(savedPreferences.value.tier as TierType)
 const version = ref<string | null>(null)
 
+// Track if we're in ARAM: Mayhem mode (ARAM with augments)
+const isAramMayhem = ref(false)
+
 const versions = shallowRef<string[]>([])
 
 const api = new OpggDataApi()
@@ -350,6 +355,8 @@ const tierData = shallowRef<
   OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | null
 >(null)
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
+// Store Arena augments data separately for ARAM: Mayhem mode
+const arenaAugmentsData = shallowRef<OpggArenaModeChampion | null>(null)
 
 const message = useMessage()
 
@@ -469,6 +476,27 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       position: position.value,
       signal: loadChampionController.signal
     })
+
+    // If in ARAM: Mayhem mode, also fetch Arena augments data
+    if (isAramMayhem.value && championId.value) {
+      try {
+        arenaAugmentsData.value = await api.getChampion({
+          region: region.value,
+          mode: 'arena',
+          tier: 'all', // Arena mode always uses 'all' tier
+          version: version.value ?? undefined,
+          id: championId.value,
+          position: position.value,
+          signal: loadChampionController.signal
+        }) as OpggArenaModeChampion
+      } catch (augmentError) {
+        log.warn('view:Opgg', `获取 Arena augments 数据失败: ${(augmentError as any).message}`, augmentError)
+        // Don't fail the whole load if augments fail
+        arenaAugmentsData.value = null
+      }
+    } else {
+      arenaAugmentsData.value = null
+    }
 
     // 这段逻辑先耦合在这里, 以后可能会被移除
     if (
@@ -677,7 +705,8 @@ const automation = useStableComputed(() => {
   return {
     championId: self?.championId || selfActionChampionId,
     assignedPosition: self?.assignedPosition,
-    gameMode: lcs.gameflow.session.gameData.queue.gameMode
+    gameMode: lcs.gameflow.session.gameData.queue.gameMode,
+    queueId: lcs.gameflow.session.gameData.queue.id
   }
 })
 
@@ -710,6 +739,7 @@ watchDebounced(
     }
 
     isModeMatch.value = true
+    isAramMayhem.value = false
 
     switch (atm.gameMode) {
       case 'CLASSIC':
@@ -718,6 +748,12 @@ watchDebounced(
       case 'ARAM':
         mode.value = 'aram'
         position.value = 'none'
+        break
+      case 'MAYHEM':
+        // ARAM: Mayhem - combination of ARAM with Arena augments
+        mode.value = 'aram'
+        position.value = 'none'
+        isAramMayhem.value = true
         break
       case 'CHERRY':
         mode.value = 'arena'

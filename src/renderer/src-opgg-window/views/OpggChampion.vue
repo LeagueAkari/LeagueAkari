@@ -772,6 +772,8 @@ const props = defineProps<{
   champion?: any
   data?: any
   isAbleToAddToItemSet?: boolean
+  isAramMayhem?: boolean
+  arenaAugmentsData?: any
 }>()
 
 const emits = defineEmits<{
@@ -830,6 +832,19 @@ const info = computed(() => {
 // OP.GG 使用 rarity 来表示三种不同的 augment 等级
 // 1 - silver, 4 - gold, 8 - prism
 const augments = computed(() => {
+  // For ARAM: Mayhem mode, use Arena augments data
+  if (props.isAramMayhem && props.arenaAugmentsData) {
+    if (!props.arenaAugmentsData.data.augment_group) {
+      return null
+    }
+    
+    return props.arenaAugmentsData.data.augment_group.reduce((acc: any, cur: any) => {
+      acc[cur.rarity] = cur
+      return acc
+    }, {})
+  }
+  
+  // Regular mode: use augments from the main data
   if (!props.data) {
     return null
   }
