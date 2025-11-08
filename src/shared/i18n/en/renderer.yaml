@@ -1998,6 +1998,7 @@ OpggChampion:
   augmentGold: Gold
   augmentSilver: Silver
   augmentPrism: Prism
+  aramMayhemAugments: Augments (from Arena)
   synergies: Synergies
 
   writeToDisk: '[League Akari] Written to item build: {{name}}'
