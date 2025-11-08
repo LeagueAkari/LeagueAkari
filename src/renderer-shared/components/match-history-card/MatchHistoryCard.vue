@@ -97,7 +97,7 @@
             ></ChampionIcon>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
-          <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY' || game.gameMode === 'KIWI'">
+          <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY'">
             <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
@@ -109,6 +109,20 @@
             <div class="summoner-spells" v-if="game.gameMode === 'STRAWBERRY'">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment5" :size="22" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment6" :size="22" />
+            </div>
+          </template>
+          <template v-else-if="game.gameMode === 'KIWI'">
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
+            </div>
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="22" />
+            </div>
+            <div class="summoner-spells">
+              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="22" />
             </div>
           </template>
           <template v-else>
