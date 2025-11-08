@@ -113,16 +113,16 @@
           </template>
           <template v-else-if="game.gameMode === 'KIWI'">
             <div class="summoner-spells">
+              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="22" />
+            </div>
+            <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
             </div>
             <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="22" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="22" />
-            </div>
-            <div class="summoner-spells">
-              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
-              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="22" />
             </div>
           </template>
           <template v-else>
