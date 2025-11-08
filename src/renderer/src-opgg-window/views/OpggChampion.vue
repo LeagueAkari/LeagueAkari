@@ -320,6 +320,9 @@
         </div>
       </div>
       <div class="card-area" v-if="augments && Object.keys(augments).length">
+        <div class="card-title" v-if="props.isAramMayhem">
+          {{ t('OpggChampion.aramMayhemAugments') }}
+        </div>
         <NTabs v-model:value="augmentTab" size="small" :animated="false">
           <template #suffix>
             <NCheckbox size="small" v-model:checked="isAugmentsExpanded"
