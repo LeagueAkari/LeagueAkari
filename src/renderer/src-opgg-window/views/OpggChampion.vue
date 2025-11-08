@@ -1,3 +1,4 @@
+
 <template>
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
@@ -1206,7 +1207,7 @@ if (import.meta.env.DEV) {
     }
 
     [data-theme='light'] .pick-rate {
-      color: #2d2d2d;
+      color: #758592;
     }
 
     .pick-rate {
@@ -1367,7 +1368,7 @@ if (import.meta.env.DEV) {
       }
 
       [data-theme='light'] .pick-rate {
-        color: #2d2d2d;
+        color: #758592;
       }
 
       .pick-rate {
@@ -1448,7 +1449,7 @@ if (import.meta.env.DEV) {
       }
 
       [data-theme='light'] .pick-rate {
-        color: #2d2d2d;
+        color: #758592;
       }
 
       .pick-rate {
@@ -1527,7 +1528,7 @@ if (import.meta.env.DEV) {
       }
 
       [data-theme='light'] .pick-rate {
-        color: #2d2d2d;
+        color: #758592;
       }
 
       .pick-rate {
@@ -1706,23 +1707,44 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .pick-rate {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .pick-rate {
+        color: #758592;
+      }
+
       .pick-rate {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .pick-play {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .pick-play {
+        color: #5a5a5a;
       }
 
       .pick-play {
         font-size: 12px;
-        color: #bebebe;
         text-align: center;
       }
+    }
+
+    [data-theme='dark'] .win-rate {
+      color: #a0c6f8;
+    }
+
+    [data-theme='light'] .win-rate {
+      color: #0969da;
     }
 
     .win-rate {
       min-width: 76px;
       font-size: 12px;
-      color: #a0c6f8;
       font-weight: bold;
       text-align: center;
     }
