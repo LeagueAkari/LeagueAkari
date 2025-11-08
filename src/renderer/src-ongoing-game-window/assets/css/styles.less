@@ -27,12 +27,21 @@
   height: var(--scroll-bar-height);
 }
 
-::-webkit-scrollbar-thumb {
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
   background-color: #4c4c4c;
   border-radius: 0px;
 
   &:hover {
     background-color: #626262;
+  }
+}
+
+[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 0px;
+
+  &:hover {
+    background-color: #a8a8a8;
   }
 }
 
@@ -109,6 +118,10 @@ body {
 
 [data-theme='dark'] .n-base-select-menu {
   background-color: #383838f8;
+}
+
+[data-theme='light'] .n-base-select-menu {
+  background-color: #fefefef8;
 }
 
 .n-popover-shared.popover-transition-enter-from,
