@@ -566,12 +566,19 @@ const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] .match-history-card {
+  background-color: #28344e;
+}
+
+[data-theme='light'] .match-history-card {
+  background-color: #e8ecf4;
+}
+
 .match-history-card {
   display: flex;
   padding: 0px 0px 0px 12px;
   border-radius: 4px;
   box-sizing: border-box;
-  background-color: #28344e;
   width: 740px;
   height: 96px;
   overflow: hidden;
@@ -848,9 +855,16 @@ const { name } = useChampionInfo()
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+[data-theme='dark'] .win {
+  background-color: #212b41e0;
+}
+
+[data-theme='light'] .win {
+  background-color: #dce4f4e0;
+}
+
 .win {
   border-left: 6px solid #5383e8;
-  background-color: #212b41e0;
 
   .game {
     .mode {
@@ -866,14 +880,25 @@ const { name } = useChampionInfo()
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: #2f436e;
   }
+
+  [data-theme='light'] .show-more {
+    background-color: #c5d1e8;
+  }
+}
+
+[data-theme='dark'] .lose {
+  background-color: #4b2c31e0;
+}
+
+[data-theme='light'] .lose {
+  background-color: #f4dcdce0;
 }
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: #4b2c31e0;
 
   .game {
     .mode {
@@ -917,13 +942,20 @@ const { name } = useChampionInfo()
   margin-top: 4px;
 }
 
+[data-theme='dark'] .loading {
+  background-color: #343434;
+}
+
+[data-theme='light'] .loading {
+  background-color: #e5e5e5;
+}
+
 .loading {
   display: flex;
   height: 100px;
   justify-content: center;
   align-items: center;
   margin-top: 4px;
-  background-color: #343434;
   border-radius: 4px;
   font-size: 12px;
 }
