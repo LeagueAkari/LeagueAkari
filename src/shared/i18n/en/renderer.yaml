@@ -128,6 +128,14 @@ AppSettings:
         none: Default
         mica: Mica
 
+    theme:
+      label: Theme Color
+      description: Set the theme color of the application. The light theme provides a white interface, just like WeGame
+      options:
+        default: Follow System
+        light: Light
+        dark: Dark
+
     dataSource:
       label: Remote Data Source
       description: Set the remote config source of the application, get or update data from GitHub / Gitee

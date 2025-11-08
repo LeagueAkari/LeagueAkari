@@ -129,6 +129,14 @@ AppSettings:
         none: 默认
         mica: Mica
 
+    theme:
+      label: 主题颜色
+      description: 设置应用的主题颜色。亮色主题提供白色界面，就像 WeGame 一样
+      options:
+        default: 跟随系统
+        light: 亮色
+        dark: 暗色
+
     dataSource:
       label: 远程数据源
       description: 设置应用的远程配置源，通过 GitHub / Gitee 获取或更新数据
