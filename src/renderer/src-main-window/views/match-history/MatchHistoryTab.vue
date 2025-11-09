@@ -2487,7 +2487,7 @@ defineExpose({
   }
 
   .ranked {
-    background-color: #000f;
+    background-color: #00000004;
   }
 }
 
