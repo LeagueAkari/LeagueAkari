@@ -186,6 +186,7 @@ const formatRarity = (r: string) => {
   .image {
     border-radius: 4px;
     height: 28px;
+    background-color: rgb(0, 0, 0);
   }
 
   .right-side {
