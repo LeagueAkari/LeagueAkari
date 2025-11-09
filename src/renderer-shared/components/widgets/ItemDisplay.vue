@@ -249,7 +249,7 @@ const lcs = useLeagueClientStore()
 }
 
 .empty {
-  background-color: rgb(221, 221, 221);
+  background-color: rgb(240, 240, 240);
 }
 
 }

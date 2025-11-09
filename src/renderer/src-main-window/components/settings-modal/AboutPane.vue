@@ -112,8 +112,4 @@ const handleClickEasterEgg = () => {
   height: 1px;
   margin: 12px 0px;
 }
-
-[data-theme='dark'] {
-  }
-}
 </style>

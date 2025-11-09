@@ -685,11 +685,11 @@ table {
   width: 100%;
 
   &.win {
-    background-color: rgba(30, 39, 58, 0.9);
+    background-color: rgba(220, 230, 245, 0.9);
   }
 
   &.lose {
-    background-color: rgba(65, 39, 43, 0.9);
+    background-color: rgba(245, 220, 225, 0.9);
   }
 }
 
@@ -697,16 +697,16 @@ table {
   height: 40px;
 
   .win &.self {
-    background-color: rgb(44, 57, 86);
+    background-color: rgb(200, 215, 240);
   }
 
   .lose &.self {
-    background-color: rgb(90, 53, 59);
+    background-color: rgb(240, 210, 215);
   }
 }
 
 .divider {
-  background-color: rgb(76, 76, 76);
+  background-color: rgb(200, 200, 200);
   height: 1px;
 }
 
