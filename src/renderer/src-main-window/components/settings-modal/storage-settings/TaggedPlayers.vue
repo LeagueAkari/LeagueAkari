@@ -602,8 +602,15 @@ const handleImportTaggedPlayers = async () => {
   font-size: 12px;
 }
 
-.empty {
+[data-theme='dark'] .empty {
   color: #ffffffa0;
+}
+
+[data-theme='light'] .empty {
+  color: #000000a0;
+}
+
+.empty {
   font-size: 12px;
 }
 

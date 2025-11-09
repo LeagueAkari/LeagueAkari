@@ -58,7 +58,15 @@ const { t } = useTranslation()
   font-size: 12px;
 }
 
-.empty {
+[data-theme='dark'] .empty {
   color: #ffffff80;
+}
+
+[data-theme='light'] .empty {
+  color: #00000080;
+}
+
+.empty {
+  font-size: inherit;
 }
 </style>

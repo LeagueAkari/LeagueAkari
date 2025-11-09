@@ -1302,8 +1302,15 @@ watch(
 .search-result-scroll {
   max-height: 30vh;
 
-  .content {
+  [data-theme='dark'] .content {
     background-color: red;
+  }
+
+  [data-theme='light'] .content {
+    background-color: red;
+  }
+
+  .content {
     height: 600px;
     width: 100%;
   }

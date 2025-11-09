@@ -811,9 +811,24 @@ const data = computed(() => {
 </style>
 
 <style lang="less" module>
+[data-theme='dark'] .column-title {
+  color: #c9c9c9;
+}
+
+[data-theme='light'] .column-title {
+  color: #363636;
+}
+
 .column-title {
   font-size: 13px;
+}
+
+[data-theme='dark'] .image-name .name {
   color: #c9c9c9;
+}
+
+[data-theme='light'] .image-name .name {
+  color: #363636;
 }
 
 .image-name {
@@ -832,7 +847,6 @@ const data = computed(() => {
     text-align: left;
     margin-left: 8px;
     font-size: 13px;
-    color: #c9c9c9;
     width: 100px;
     text-overflow: ellipsis;
     white-space: nowrap;

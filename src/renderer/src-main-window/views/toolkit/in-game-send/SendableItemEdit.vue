@@ -989,9 +989,16 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
     font-size: 12px;
   }
 
+  [data-theme='dark'] .error-divider {
+    background-color: #fff2;
+  }
+
+  [data-theme='light'] .error-divider {
+    background-color: #0002;
+  }
+
   .error-divider {
     height: 1px;
-    background-color: #fff2;
     margin: 8px 0;
   }
 
