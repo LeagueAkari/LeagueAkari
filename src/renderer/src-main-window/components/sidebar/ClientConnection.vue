@@ -290,6 +290,7 @@ const handleActionSelect = async (key: string) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .client-connection {
   display: flex;
   flex-direction: column;
@@ -396,5 +397,118 @@ const handleActionSelect = async (key: string) => {
   align-items: center;
   gap: 4px;
   margin-top: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.client-connection {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-group {
+  .group-name {
+    margin-bottom: 8px;
+    color: #000b;
+    font-weight: bold;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+}
+
+.clients {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.client {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  border: 1px solid #0002;
+  padding: 8px 12px;
+  transition: background-color 0.2s ease-in-out;
+  box-shadow: 0 0 2px 2px #0002;
+  width: 200px;
+
+  &:not(.connected):hover {
+    background-color: #0001;
+    cursor: pointer;
+  }
+
+  .connecting-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+
+    .connecting-indicator-text {
+      font-size: 10px;
+    }
+  }
+}
+
+.client .client-wrapper {
+  display: flex;
+
+  .client-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 8px;
+    border-radius: 50%;
+  }
+
+  .client-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    margin-right: 12px;
+    flex: 1;
+    width: 0;
+
+    .summoner-name {
+      width: 100%;
+
+      .summoner-name-text {
+        color: #000;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .summoner-name-tag {
+        margin-left: 4px;
+        color: #000a;
+        font-size: 12px;
+      }
+    }
+
+    .summoner-name-none {
+      color: #000a;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .client-region {
+      font-size: 10px;
+      color: #000a;
+    }
+  }
+}
+
+.client .client-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
 }
 </style>

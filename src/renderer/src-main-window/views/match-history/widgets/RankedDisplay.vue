@@ -164,6 +164,7 @@ const formatPreviousTier = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .ranked-wrapper {
   display: flex;
   position: relative;
@@ -276,5 +277,124 @@ const formatPreviousTier = computed(() => {
   &.highest-unranked {
     color: rgb(119, 119, 119);
   }
+}
+
+}
+
+[data-theme='light'] {
+.ranked-wrapper {
+  display: flex;
+  position: relative;
+  height: 108px;
+  width: 240px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+
+  &.small {
+    width: 120px;
+    height: 96px;
+  }
+}
+
+.ranked-display {
+  position: relative;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ranked-type {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: rgb(50, 50, 50);
+}
+
+.ranked-image,
+.ranked-info {
+  position: relative;
+}
+
+.ranked-image-container {
+  position: relative;
+  width: 64px;
+  height: 48px;
+}
+
+.ranked-image {
+  width: 144%;
+  height: 144%;
+  position: absolute;
+  object-fit: contain;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ranked-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 64px; // 让它看起来更加居中
+
+  &.small {
+    width: unset;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: rgb(65, 65, 65);
+  }
+}
+
+.ranked-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.ranked-wins-lp {
+  font-size: 12px;
+  color: rgb(73, 73, 73);
+}
+
+.ranked-display-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: rgb(65, 65, 65);
+  width: 240px;
+  height: 108px;
+  border: 1px solid #00000010;
+  border-radius: 4px;
+}
+
+.ranked-highest {
+  display: flex;
+  font-size: 10px;
+  color: rgb(50, 50, 50);
+  align-items: center;
+
+  .label {
+    margin-right: 2px;
+  }
+
+  .ranked-medal {
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+
+  &.highest-unranked {
+    color: rgb(59, 59, 59);
+  }
+}
+
 }
 </style>

@@ -70,6 +70,7 @@ const formatRarity = (r: string) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .augment,
 .empty {
   border-radius: 2px;
@@ -143,5 +144,85 @@ const formatRarity = (r: string) => {
 
 .rarity-indicator.bronze {
   background-color: rgb(139, 69, 19);
+}
+
+}
+
+[data-theme='light'] {
+.augment,
+.empty {
+  border-radius: 2px;
+}
+
+.augment {
+  box-sizing: border-box;
+}
+
+.augment.prismatic {
+  border: 1px solid transparent;
+  border-image: linear-gradient(135deg, #e78fff, #8b05b0) 1;
+  background-color: rgb(245, 240, 255);
+}
+
+.augment.gold {
+  border: 1px solid rgb(255, 183, 0);
+  background-color: rgb(255, 250, 220);
+}
+
+.augment.silver {
+  border: 1px solid rgb(180, 180, 180);
+  background-color: rgb(245, 245, 244);
+}
+
+.augment.bronze {
+  border: 1px solid rgb(139, 69, 19);
+  background-color: rgb(245, 240, 235);
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  .image {
+    border-radius: 4px;
+    height: 28px;
+  }
+
+  .right-side {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+.empty {
+  background-color: rgb(221, 221, 221);
+}
+
+.rarity-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 2px;
+  background-color: rgb(255, 255, 255); // default color
+}
+
+.rarity-indicator.silver {
+  background-color: rgb(61, 61, 61);
+}
+
+.rarity-indicator.gold {
+  background-color: rgb(255, 183, 0);
+}
+
+.rarity-indicator.prismatic {
+  background-image: linear-gradient(135deg, #f6d7ff, #b453cf);
+}
+
+.rarity-indicator.bronze {
+  background-color: rgb(139, 69, 19);
+}
+
 }
 </style>

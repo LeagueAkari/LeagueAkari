@@ -881,6 +881,7 @@ const configExistence = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .header {
   display: flex;
   align-items: center;
@@ -1059,6 +1060,191 @@ const configExistence = computed(() => {
   display: flex;
   justify-content: flex-end;
   gap: 4px;
+}
+
+}
+
+[data-theme='light'] {
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .header-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.tabs {
+  height: 100%;
+}
+
+.content {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+
+  .filter-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 200px;
+    height: 100%;
+
+    .champion-list {
+      flex-grow: 1;
+      height: 0;
+    }
+  }
+
+  .divider {
+    width: 1px;
+    height: 100%;
+    background-color: #0001;
+  }
+
+  .config-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 540px;
+
+    .tabs-sections {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tabs-section {
+      margin-bottom: 8px;
+
+      .tab-title {
+        font-size: 11px;
+        color: #0008;
+        margin-bottom: 4px;
+      }
+
+      &:last-child {
+        margin-bottom: 16px;
+      }
+    }
+
+    .spells,
+    .runes {
+      flex: 1;
+      padding: 16px;
+      margin-bottom: 8px;
+      background-color: #0001;
+      border-radius: 2px;
+    }
+
+    .runes,
+    .spells {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .empty-placeholder {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: #0008;
+    }
+  }
+
+  .config-area-empty-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-width: 540px;
+    color: #0008;
+  }
+}
+
+.champion-item {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+  margin-bottom: 2px;
+  border-radius: 2px;
+  color: #0008;
+
+  &:hover {
+    background-color: #0001;
+  }
+
+  &.selected {
+    color: #000f;
+    background-color: #0001;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    background-color: #0001;
+    margin-right: 8px;
+  }
+
+  .champion-name {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    margin-right: 8px;
+  }
+
+  .configure-status {
+    font-size: 20px;
+
+    &:not(:last-child) {
+      margin-right: 4px;
+    }
+
+    &.configured {
+      color: #fff2;
+    }
+
+    &.not-configured {
+      color: #fff4;
+    }
+  }
+}
+
+.radio-button-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 4px;
+
+  .mode-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .check-icon {
+    font-size: 14px;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
 }
 </style>
 

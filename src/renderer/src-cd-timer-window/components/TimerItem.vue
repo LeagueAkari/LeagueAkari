@@ -168,6 +168,7 @@ const { pressed: spell2Pressed } = useMousePressed({
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .player {
   display: flex;
   align-items: center;
@@ -262,5 +263,106 @@ const { pressed: spell2Pressed } = useMousePressed({
       background-color: #560053a0;
     }
   }
+}
+
+}
+
+[data-theme='light'] {
+.player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .arrow-icon {
+    margin: 0 4px;
+    color: #0008;
+  }
+
+  .timer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 32px;
+    font-size: 24px;
+  }
+
+  .timer-icon.placeholder {
+    border: 1px solid rgba(112, 208, 217, 0.4);
+    border-radius: 4px;
+    color: rgba(112, 208, 217, 0.4);
+  }
+
+  .timer-icon.timer {
+    color: #000;
+  }
+
+  .champion-icon {
+    height: 32px;
+    width: 32px;
+    border-radius: 4px;
+  }
+
+  .spacer {
+    width: 4px;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .summoner-spell {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #0004;
+    box-sizing: border-box;
+    border-radius: 4px;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+
+    .click-indicator {
+      transition:
+        background-color 0.3s,
+        transform 0.1s;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    .click-indicator.highlight {
+      transform: scale(1.15);
+      background-color: #000b;
+    }
+
+    .mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-family: sans-serif;
+      line-height: 12px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .mask.timeout {
+      background-color: #fff0;
+    }
+  }
+}
+
 }
 </style>

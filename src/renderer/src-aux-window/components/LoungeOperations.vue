@@ -112,6 +112,7 @@ const formatDelayText = (d: number) => {
 </script>
 
 <style scoped lang="less">
+[data-theme='dark'] {
 .label {
   font-size: 12px;
   color: rgb(178, 178, 178);
@@ -134,5 +135,34 @@ const formatDelayText = (d: number) => {
   &:not(:last-child) {
     margin-bottom: 2px;
   }
+}
+
+}
+
+[data-theme='light'] {
+.label {
+  font-size: 12px;
+  color: rgb(44, 44, 44);
+}
+
+.icon {
+  font-size: 18px;
+  color: rgb(44, 44, 44);
+  margin-left: 4px;
+}
+
+.more {
+  font-size: 11px;
+  width: 82vw;
+}
+
+.control-item {
+  height: 24px;
+
+  &:not(:last-child) {
+    margin-bottom: 2px;
+  }
+}
+
 }
 </style>

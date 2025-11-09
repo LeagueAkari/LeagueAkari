@@ -88,6 +88,7 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .info {
   margin-bottom: 8px;
   display: flex;
@@ -166,5 +167,90 @@ const lcs = useLeagueClientStore()
 
 .empty {
   background-color: rgb(34, 34, 34);
+}
+
+}
+
+[data-theme='light'] {
+.info {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+
+  .image {
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+  }
+
+  .right-side {
+    margin-left: 8px;
+
+    .name {
+      font-size: 12px;
+      line-height: 12px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .price {
+      font-size: 12px;
+      line-height: 12px;
+    }
+  }
+}
+
+.from {
+  margin-bottom: 4px;
+
+  &::before {
+    content: '=';
+  }
+}
+
+.to {
+  margin-bottom: 8px;
+
+  &::before {
+    content: '⇒';
+  }
+}
+
+.from,
+.to {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  max-width: 460px;
+  flex-wrap: wrap;
+
+  .image {
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+  }
+
+  &::before {
+    font-size: 12px;
+    font-style: italic;
+    color: rgb(42, 42, 42);
+    margin-right: 4px;
+  }
+}
+
+.item.trinket,
+.trinket.empty {
+  border-radius: 50%;
+}
+
+.item,
+.item.empty {
+  border-radius: 2px;
+}
+
+.empty {
+  background-color: rgb(240, 240, 240);
+}
+
 }
 </style>

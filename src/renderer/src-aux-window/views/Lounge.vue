@@ -248,6 +248,7 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .lounge-wrapper {
   display: flex;
   position: relative;
@@ -303,5 +304,67 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
 .btn-group {
   display: flex;
   gap: 4px;
+}
+
+}
+
+[data-theme='light'] {
+.lounge-wrapper {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+
+  .indications {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+  }
+
+  .bottom-actions {
+    width: 100%;
+  }
+}
+
+.mode-image {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.main-text {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.main-text-2 {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  max-width: 280px;
+}
+
+.sub-text {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: rgb(73, 73, 73);
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
 }
 </style>

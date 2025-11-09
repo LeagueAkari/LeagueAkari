@@ -1,4 +1,4 @@
-[lol-view] {
+[data-theme='dark'] [lol-view] {
   font-size: 12px;
 
   attention {
@@ -129,11 +129,11 @@
   }
 
   flavortext::before {
-    content: '“';
+    content: '"';
   }
 
   flavortext:after {
-    content: '”';
+    content: '"';
   }
 
   gold {
@@ -157,5 +157,216 @@
     height: 1px;
     margin: 8px 0;
     background-color: rgb(96, 96, 96);
+  }
+}
+
+[data-theme='light'] [lol-view] {
+  font-size: 12px;
+
+  attention {
+    color: rgb(204, 102, 0);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  stats {
+    display: block;
+  }
+
+  maintext {
+    display: block;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  truedamage {
+    color: rgb(0, 150, 150);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  physicaldamage {
+    color: rgb(204, 102, 0);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  festeal {
+    color: rgb(204, 0, 0);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  buffedstat,
+  ornnbonus {
+    color: rgb(0, 153, 0);
+    font-weight: bold;
+    margin: 0 2px;
+
+    &::after {
+      content: '↑';
+      margin-left: 2px;
+    }
+  }
+
+  nerfedstat {
+    color: rgb(204, 0, 0);
+    font-weight: bold;
+    margin: 0 2px;
+
+    &::after {
+      content: '↓';
+      margin-left: 2px;
+    }
+  }
+
+  passive,
+  active {
+    color: rgb(51, 51, 51);
+    font-weight: bold;
+    font-style: italic;
+    margin: 0 2px;
+  }
+
+  status {
+    color: rgb(204, 0, 153);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  stats + br,
+  status + br,
+  maintext + br,
+  passive + br,
+  scalemr + br,
+  scalemana + br,
+  truedamage + br,
+  scaleap + br,
+  speed + br {
+    display: none;
+  }
+
+  raritymythic {
+    font-weight: bold;
+    color: rgb(204, 153, 0);
+  }
+
+  raritylegendary {
+    color: rgb(153, 153, 0);
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  scalemr {
+    font-weight: bold;
+    color: rgb(0, 102, 204);
+    margin: 0 2px;
+  }
+
+  scalead {
+    font-weight: bold;
+    color: rgb(153, 102, 0);
+    margin: 0 2px;
+  }
+
+  scaleap,
+  magicdamage,
+  scalemana {
+    font-weight: bold;
+    color: rgb(0, 153, 204);
+    margin: 0 2px;
+  }
+
+  speed {
+    font-weight: bold;
+    color: rgb(51, 153, 0);
+    margin: 0 2px;
+  }
+
+  flavortext,
+  rules {
+    font-style: italic;
+  }
+
+  flavortext::before {
+    content: '"';
+  }
+
+  flavortext:after {
+    content: '"';
+  }
+
+  gold {
+    font-weight: bold;
+    color: rgb(204, 153, 0);
+    margin: 0 2px;
+  }
+
+  scalelevel {
+    font-weight: bold;
+    color: rgb(102, 102, 102);
+    margin: 0 2px;
+  }
+
+  lol-uikit-tooltipped-keyword {
+    display: inline;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    margin: 8px 0;
+    background-color: rgb(180, 180, 180);
+  }
+}
+
+[lol-view] {
+  stats {
+    display: block;
+  }
+
+  maintext {
+    display: block;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  stats + br,
+  status + br,
+  maintext + br,
+  passive + br,
+  scalemr + br,
+  scalemana + br,
+  truedamage + br,
+  scaleap + br,
+  speed + br {
+    display: none;
+  }
+
+  flavortext,
+  rules {
+    font-style: italic;
+  }
+
+  flavortext::before {
+    content: '"';
+  }
+
+  flavortext:after {
+    content: '"';
+  }
+
+  lol-uikit-tooltipped-keyword {
+    display: inline;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    margin: 8px 0;
   }
 }

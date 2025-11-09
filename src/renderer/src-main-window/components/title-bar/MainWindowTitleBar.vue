@@ -61,6 +61,14 @@ const shouldShowDivider = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] #app-title-bar {
+  background-color: #0001;
+}
+
+[data-theme='light'] #app-title-bar {
+  background-color: #fff1;
+}
+
 #app-title-bar {
   display: flex;
   position: relative;
@@ -68,7 +76,6 @@ const shouldShowDivider = computed(() => {
   align-items: center;
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
-  background-color: #0001;
   z-index: 1000000;
 }
 

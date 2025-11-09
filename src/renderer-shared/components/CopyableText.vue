@@ -79,15 +79,29 @@ const handleCopy = async () => {
   align-items: center;
 }
 
+[data-theme='dark'] .copyable-icon {
+  color: rgb(212, 212, 212);
+}
+
+[data-theme='dark'] .copyable-icon:hover {
+  color: rgb(162, 162, 162);
+}
+
+[data-theme='light'] .copyable-icon {
+  color: rgb(51, 51, 51);
+}
+
+[data-theme='light'] .copyable-icon:hover {
+  color: rgb(82, 82, 82);
+}
+
 .copyable-icon {
   cursor: pointer;
   font-size: 12px;
-  color: rgb(212, 212, 212);
   transition: all 0.3s ease;
 }
 
 .copyable-icon:hover {
   cursor: pointer;
-  color: rgb(162, 162, 162);
 }
 </style>

@@ -36,9 +36,20 @@ const { t } = useTranslation()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .operations {
   display: flex;
   margin-bottom: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.operations {
+  display: flex;
+  margin-bottom: 8px;
+}
+
 }
 </style>
 
@@ -47,7 +58,15 @@ const { t } = useTranslation()
   font-size: 12px;
 }
 
-.empty {
+[data-theme='dark'] .empty {
   color: #ffffff80;
+}
+
+[data-theme='light'] .empty {
+  color: #00000080;
+}
+
+.empty {
+  font-size: inherit;
 }
 </style>

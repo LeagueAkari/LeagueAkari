@@ -308,6 +308,7 @@ const emits = defineEmits<{
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .header {
   display: flex;
   align-items: center;
@@ -427,5 +428,131 @@ const emits = defineEmits<{
   height: 80px;
   font-size: 12px;
   color: #fffb;
+}
+
+}
+
+[data-theme='light'] {
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .page-info {
+      font-size: 11px;
+      color: #000b;
+    }
+  }
+}
+
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.game-item {
+  display: flex;
+  align-items: center;
+  border-radius: 2px;
+  cursor: pointer;
+  gap: 4px;
+
+  .game-item-line1 {
+    height: 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .game-item-line2 {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .game-item-type {
+    font-size: 12px;
+    font-weight: bold;
+
+    &.enemy {
+      color: rgba(255, 159, 159, 0.8);
+    }
+
+    &.ally {
+      color: rgba(184, 255, 188, 0.8);
+    }
+  }
+
+  .game-item-title {
+    flex: 1;
+    width: 0;
+    font-size: 12px;
+    color: #000f;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .game-item-date {
+    font-size: 11px;
+    color: #000b;
+    margin-left: auto;
+  }
+
+  .game-item-delete {
+    margin-left: auto;
+  }
+
+  .space {
+    flex: 1;
+  }
+
+  .champion-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .game-result {
+    font-size: 11px;
+    color: #000b;
+    font-weight: bold;
+
+    &.win {
+      color: hsl(100, 80%, 45%);
+    }
+
+    &.lose {
+      color: hsl(0, 80%, 70%);
+    }
+  }
+
+  .kda {
+    font-size: 11px;
+    color: #000b;
+  }
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  font-size: 12px;
+  color: #000b;
+}
+
 }
 </style>

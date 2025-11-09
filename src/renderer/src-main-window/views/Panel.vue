@@ -29,11 +29,6 @@ import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
     flex: 1;
   }
 
-  .fixed-buttons {
-    height: 96px;
-    background-color: rgba(167, 37, 37, 0.518);
-  }
-
   .right-side-content {
     flex: 1;
     width: 0;
@@ -43,6 +38,7 @@ import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 [data-theme='dark'] {
   .panel {
     .fixed-buttons {
+      height: 96px;
       background-color: rgba(167, 37, 37, 0.518);
     }
 

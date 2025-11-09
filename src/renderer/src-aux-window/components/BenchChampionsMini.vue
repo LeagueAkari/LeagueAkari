@@ -426,6 +426,7 @@ const handleReroll = async (grabBack = false) => {
 </script>
 
 <style scoped lang="less">
+[data-theme='dark'] {
 .outer {
   display: flex;
   align-items: center;
@@ -520,5 +521,106 @@ const handleReroll = async (grabBack = false) => {
   margin-top: 4px;
   font-size: 10px;
   color: rgb(145, 145, 145);
+}
+
+}
+
+[data-theme='light'] {
+.outer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.operations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.btns {
+  display: flex;
+  gap: 4px;
+}
+
+.champions {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 4px;
+}
+
+.champion-image {
+  width: 36px;
+  height: 36px;
+  border-radius: 2px;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgb(72, 72, 72);
+}
+
+.champion-image.buffed {
+  border-width: 1px;
+  border-color: rgb(0, 161, 67);
+}
+
+.champion-image.nerfed {
+  border-width: 1px;
+  border-color: rgb(181, 75, 0);
+}
+
+.champion-image.mixed {
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(to bottom right, rgb(0, 161, 67) 50%, rgb(181, 75, 0) 50%) 1;
+}
+
+.champion-image-invalid {
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.champion-image-placeholder {
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid rgb(72, 72, 72);
+  border-radius: 2px;
+}
+
+.raw-popover {
+  background-color: rgba(255, 255, 255, 0.866);
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+.balance-item {
+  font-size: 11px;
+  color: rgb(51, 51, 51);
+
+  .balance-item-value {
+    display: inline-block;
+    text-align: end;
+    min-width: 36px;
+    white-space: nowrap;
+  }
+
+  .balance-item-value.buffed {
+    color: rgb(0, 219, 91);
+  }
+
+  .balance-item-value.nerfed {
+    color: rgb(255, 106, 0);
+  }
+}
+
+.balance-data-source-name {
+  margin-top: 4px;
+  font-size: 10px;
+  color: rgb(72, 72, 72);
+}
+
 }
 </style>

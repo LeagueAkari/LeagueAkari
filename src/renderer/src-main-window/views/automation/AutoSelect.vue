@@ -303,6 +303,7 @@ const roles = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 @import './automation-styles.less';
 
 .divider {
@@ -334,5 +335,43 @@ const roles = computed(() => {
   .label.current {
     color: #88f6d1;
   }
+}
+
+}
+
+[data-theme='light'] {
+@import './automation-styles.less';
+
+.divider {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.084);
+}
+
+.expected-champion-groups {
+  border-collapse: separate;
+  border-spacing: 8px 8px;
+
+  .group {
+    display: flex;
+    align-items: center;
+    height: 24px;
+  }
+
+  .group:not(:last-child) {
+    margin-bottom: 12px;
+  }
+
+  .label {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .label.current {
+    color: #88f6d1;
+  }
+}
+
 }
 </style>

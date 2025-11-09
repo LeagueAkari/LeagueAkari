@@ -412,6 +412,7 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 @import './automation-styles.less';
 
 .divider {
@@ -419,5 +420,19 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
   margin-bottom: 12px;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.084);
+}
+
+}
+
+[data-theme='light'] {
+@import './automation-styles.less';
+
+.divider {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.084);
+}
+
 }
 </style>

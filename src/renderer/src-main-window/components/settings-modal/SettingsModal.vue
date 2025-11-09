@@ -137,6 +137,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .about-para {
   text-indent: 2em;
   font-size: 13px;
@@ -181,6 +182,57 @@ watch(
     width: 16px;
     height: 16px;
   }
+}
+
+}
+
+[data-theme='light'] {
+.about-para {
+  text-indent: 2em;
+  font-size: 13px;
+}
+
+.about-para-2 {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  text-indent: 2em;
+  font-size: 13px;
+
+  img {
+    display: block;
+  }
+}
+
+.copyright {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgb(87, 87, 87);
+}
+
+.divider {
+  height: 1px;
+  background-color: rgb(201, 201, 201);
+  margin: 12px 24px;
+}
+
+.tab-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 4px;
+  vertical-align: middle;
+
+  .icon {
+    font-size: 18px;
+  }
+
+  .opgg-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 }
 </style>
 

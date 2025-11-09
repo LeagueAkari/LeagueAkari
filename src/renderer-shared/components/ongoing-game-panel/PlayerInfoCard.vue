@@ -825,13 +825,21 @@ const { name } = useChampionInfo()
   height: 360px;
   border-radius: 4px;
   box-sizing: border-box;
-  border: 1px solid #ffffff60;
-  background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
   overflow: hidden;
   backdrop-filter: blur(4px);
 
   transition: filter 0.2s;
+
+  [data-theme='dark']& {
+    border: 1px solid #ffffff60;
+    background-color: #11111180;
+  }
+
+  [data-theme='light']& {
+    border: 1px solid #00000060;
+    background-color: #eeeeee80;
+  }
 
   &.dimming {
     filter: brightness(0.3);
@@ -867,22 +875,36 @@ const { name } = useChampionInfo()
     height: 42px;
   }
 
+  [data-theme='dark'] .level {
+    background-color: #00000080;
+  }
+
+  [data-theme='light'] .level {
+    background-color: #ffffff80;
+  }
+
   .level {
     position: absolute;
     bottom: 0;
     right: 0;
     transform: translateX(35%);
-    background-color: #00000080;
     font-size: 10px;
     border-radius: 4px;
     padding: 0 4px;
+  }
+
+  [data-theme='dark'] .position-icon {
+    background-color: #00000080;
+  }
+
+  [data-theme='light'] .position-icon {
+    background-color: #ffffff80;
   }
 
   .position-icon {
     position: absolute;
     bottom: 0;
     right: 0;
-    background-color: #00000080;
     font-size: 16px;
   }
 
@@ -912,15 +934,29 @@ const { name } = useChampionInfo()
       }
     }
 
+    [data-theme='dark'] .name {
+      color: #e8e8e8;
+    }
+
+    [data-theme='light'] .name {
+      color: #282828;
+    }
+
     .name {
       font-weight: bold;
       font-size: 13px;
-      color: #e8e8e8;
+    }
+
+    [data-theme='dark'] .tag-line {
+      color: #999;
+    }
+
+    [data-theme='light'] .tag-line {
+      color: #666;
     }
 
     .tag-line {
       font-size: 12px;
-      color: #999;
       margin-left: 4px;
     }
   }
@@ -942,10 +978,19 @@ const { name } = useChampionInfo()
         margin-right: 4px;
       }
 
+      [data-theme='dark'] .text,
+      [data-theme='dark'] .lp {
+        color: #dfdfdf;
+      }
+
+      [data-theme='light'] .text,
+      [data-theme='light'] .lp {
+        color: #2f2f2f;
+      }
+
       .text,
       .lp {
         font-size: 11px;
-        color: #dfdfdf;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -957,8 +1002,12 @@ const { name } = useChampionInfo()
       }
 
       &.unranked {
-        .text {
+        [data-theme='dark'] .text {
           color: #999;
+        }
+
+        [data-theme='light'] .text {
+          color: #666;
         }
       }
 
@@ -986,11 +1035,18 @@ const { name } = useChampionInfo()
       margin-left: 16px;
     }
 
+    [data-theme='dark'] .divider {
+      background-color: #ffffff40;
+    }
+
+    [data-theme='light'] .divider {
+      background-color: #00000040;
+    }
+
     .divider {
       margin: 0 2px;
       width: 1px;
       height: 12px;
-      background-color: #ffffff40;
     }
   }
 
@@ -1073,13 +1129,20 @@ const { name } = useChampionInfo()
       border-radius: 2px;
     }
 
+    [data-theme='dark'] .star-icon {
+      color: #fff838;
+    }
+
+    [data-theme='light'] .star-icon {
+      color: #a69500;
+    }
+
     .star-icon {
       position: absolute;
       bottom: -2px;
       right: -2px;
       width: 12px;
       height: 12px;
-      color: #fff838;
     }
   }
 }
@@ -1207,11 +1270,20 @@ const { name } = useChampionInfo()
     }
   }
 
+  [data-theme='dark'] .champion-icon,
+  [data-theme='dark'] .frequent-champion-icon {
+    background-color: #4b5b7d;
+  }
+
+  [data-theme='light'] .champion-icon,
+  [data-theme='light'] .frequent-champion-icon {
+    background-color: #e4e4ff;
+  }
+
   .champion-icon,
   .frequent-champion-icon {
     width: 24px;
     height: 24px;
-    background-color: #4b5b7d;
     border-radius: 2px;
   }
 
@@ -1290,9 +1362,16 @@ const { name } = useChampionInfo()
     align-items: center;
     margin-top: 4px;
 
+    [data-theme='dark'] .level {
+      background-color: #b94ecf;
+    }
+
+    [data-theme='light'] .level {
+      background-color: #b94ecf;
+    }
+
     .level {
       border-radius: 2px;
-      background-color: #b94ecf;
       font-size: 11px;
       padding: 0 4px;
     }
@@ -1308,9 +1387,16 @@ const { name } = useChampionInfo()
     flex-wrap: wrap;
     margin-top: 4px;
 
+    [data-theme='dark'] .milestone {
+      background-color: #4e82cf;
+    }
+
+    [data-theme='light'] .milestone {
+      background-color: #4e82cf;
+    }
+
     .milestone {
       border-radius: 2px;
-      background-color: #4e82cf;
       font-size: 11px;
       padding: 0 4px;
     }
