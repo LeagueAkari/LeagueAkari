@@ -514,7 +514,8 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       let spellToApply = spells?.[0]
       let runesToApply = runes?.[0]
 
-      if (os.frontendSettings.autoApplyRunes && runesToApply) {
+      // KIWI mode (ARAM: Mayhem) doesn't have runes, so skip auto-applying runes
+      if (os.frontendSettings.autoApplyRunes && runesToApply && !isAramMayhem.value) {
         await setRunes(runesToApply)
       }
 
