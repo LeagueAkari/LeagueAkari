@@ -667,6 +667,14 @@ const { name } = useChampionInfo()
     border-radius: 50%;
   }
 
+  [data-theme='dark'] .champion-level {
+    background-color: rgba(0, 0, 0, 0.621);
+  }
+
+  [data-theme='light'] .champion-level {
+    background-color: rgba(255, 255, 255, 0.621);
+  }
+
   .champion-level {
     position: absolute;
     bottom: 0;
@@ -677,7 +685,6 @@ const { name } = useChampionInfo()
     text-align: center;
     font-size: 12px;
     border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.621);
   }
 
   .summoner-spells,
@@ -767,6 +774,14 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .summary {
+  color: #9f9f9f;
+}
+
+[data-theme='light'] .summary {
+  color: #5f5f5f;
+}
+
 .summary {
   display: flex;
   flex-direction: column;
@@ -776,10 +791,16 @@ const { name } = useChampionInfo()
   line-height: 14px;
   align-items: flex-start;
   gap: 2px;
-  color: #9f9f9f;
+
+  [data-theme='dark'] .kpr {
+    color: #e84057;
+  }
+
+  [data-theme='light'] .kpr {
+    color: #e84057;
+  }
 
   .kpr {
-    color: #e84057;
     font-size: 12px;
   }
 }
@@ -810,12 +831,19 @@ const { name } = useChampionInfo()
     width: 200px;
   }
 
+  [data-theme='dark'] .placement {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  [data-theme='light'] .placement {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
   .placement {
     position: absolute;
     bottom: -4px;
     left: -4px;
     font-size: 10px;
-    background-color: rgba(0, 0, 0, 0.35);
     border-radius: 50%;
     width: 14px;
     height: 14px;
@@ -967,27 +995,50 @@ const { name } = useChampionInfo()
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: rgb(112, 60, 71);
   }
+
+  [data-theme='light'] .show-more {
+    background-color: rgb(255, 220, 230);
+  }
+}
+
+[data-theme='dark'] .remake {
+  background-color: rgba(54, 54, 54, 0.8);
+}
+
+[data-theme='light'] .remake {
+  background-color: rgba(240, 240, 240, 0.8);
 }
 
 .remake {
   border-left: 6px solid rgb(139, 139, 139);
-  background-color: rgba(54, 54, 54, 0.8);
+
+  [data-theme='dark'] .game .mode,
+  [data-theme='dark'] .game .result {
+    color: rgb(209, 209, 209);
+  }
+
+  [data-theme='light'] .game .mode,
+  [data-theme='light'] .game .result {
+    color: rgb(70, 70, 70);
+  }
 
   .game {
     .mode {
-      color: rgb(209, 209, 209);
     }
 
     .result {
-      color: rgb(209, 209, 209);
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: rgb(121, 121, 121);
+  }
+
+  [data-theme='light'] .show-more {
+    background-color: rgb(200, 200, 200);
   }
 }
 
