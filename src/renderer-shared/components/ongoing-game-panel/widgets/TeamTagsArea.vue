@@ -276,19 +276,34 @@ const hasTags = computed(() => {
   }
 }
 
+[data-theme='dark'] .tag {
+  color: #ffffff;
+}
+
+[data-theme='light'] .tag {
+  color: #000000;
+}
+
 .tag {
   font-size: 12px;
   line-height: 12px;
-  color: #ffffff;
   padding: 2px 4px;
   border-radius: 2px;
 
-  &.win-rate-team {
+  [data-theme='dark']&.win-rate-team {
     background-color: #7e2c85;
   }
 
-  &.lose-rate-team {
+  [data-theme='light']&.win-rate-team {
+    background-color: #e6d1ec;
+  }
+
+  [data-theme='dark']&.lose-rate-team {
     background-color: #893b3b;
+  }
+
+  [data-theme='light']&.lose-rate-team {
+    background-color: #ffd4d4;
   }
 }
 
