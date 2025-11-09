@@ -612,7 +612,7 @@ table {
     overflow: hidden;
 
     &:hover {
-      color: #fff2;
+      color: #18a058;
     }
   }
 
