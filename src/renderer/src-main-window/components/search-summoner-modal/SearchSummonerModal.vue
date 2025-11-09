@@ -6,7 +6,7 @@
     size="small"
     :class="$style['search-summoner-modal']"
   >
-    <NCard size="small" :bordered="false" :theme-overrides="{ colorModal: '#232329f4' }">
+    <NCard size="small" :bordered="false" :theme-overrides="cardThemeOverrides">
       <div class="input-line">
         <NSelect
           v-if="sgps.availability.region === 'TENCENT'"
@@ -281,6 +281,13 @@ const as = useAppCommonStore()
 const sgps = useSgpStore()
 
 const message = useMessage()
+
+const cardThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    colorModal: isLight ? '#eeeef4f4' : '#232329f4'
+  }
+})
 
 const emits = defineEmits<{
   toSummoner: [puuid: string, sgpServerId: string | null, setCurrent?: boolean]

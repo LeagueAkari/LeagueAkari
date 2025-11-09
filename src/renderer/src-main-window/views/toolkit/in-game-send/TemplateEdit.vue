@@ -15,7 +15,7 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="dropdownThemeOverrides"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -184,6 +184,7 @@
 <script lang="ts" setup>
 import { javascript } from '@codemirror/lang-javascript'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { vscodeDark } from '@uiw/codemirror-theme-vscode'
@@ -214,15 +215,20 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
-import { DROPDOWN_OVERRIDES } from './style-overrides'
+import { getDropdownOverrides } from './style-overrides'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 
+const as = useAppCommonStore()
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
+
+const dropdownThemeOverrides = computed(() => {
+  return getDropdownOverrides(as.settings.theme === 'light')
+})
 
 const dropdownOptions = computed(() => [
   {

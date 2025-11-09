@@ -40,10 +40,7 @@
       </NButton>
     </div>
     <NDataTable
-      :theme-overrides="{
-        thColor: '#0005',
-        tdColor: '#0004'
-      }"
+      :theme-overrides="dataTableThemeOverrides"
       :loading="isLoading"
       size="small"
       :columns="columns"
@@ -58,6 +55,7 @@
 <script lang="ts" setup>
 import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -76,10 +74,19 @@ const { t } = useTranslation()
 const lc = useInstance(LeagueClientRenderer)
 const log = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
 
 const COMP_NAMESPACE = 'comp:RewardClaimTool'
 
 const message = useMessage()
+
+const dataTableThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    thColor: isLight ? '#fff5' : '#0005',
+    tdColor: isLight ? '#fff4' : '#0004'
+  }
+})
 
 const isLoading = ref(false)
 const isClaiming = ref(false)

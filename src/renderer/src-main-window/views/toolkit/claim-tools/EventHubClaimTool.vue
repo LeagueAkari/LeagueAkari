@@ -40,10 +40,7 @@
       </NButton>
     </div>
     <NDataTable
-      :theme-overrides="{
-        thColor: '#0005',
-        tdColor: '#0004'
-      }"
+      :theme-overrides="dataTableThemeOverrides"
       :loading="isLoading"
       size="small"
       :columns="columns"
@@ -57,6 +54,7 @@
 
 <script lang="ts" setup>
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EventHubEvents } from '@shared/types/league-client/event-hub'
@@ -73,8 +71,17 @@ const { t } = useTranslation()
 
 const lc = useInstance(LeagueClientRenderer)
 const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
 
 const message = useMessage()
+
+const dataTableThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    thColor: isLight ? '#fff5' : '#0005',
+    tdColor: isLight ? '#fff4' : '#0004'
+  }
+})
 
 const isClaiming = ref(false)
 const isLoading = ref(false)
