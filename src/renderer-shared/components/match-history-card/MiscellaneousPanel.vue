@@ -541,6 +541,7 @@ const tableData = computed(() => {
   min-width: 640px;
   position: relative;
   top: calc(var(--title-bar-height) / 2);
+  background-color: rgba(57, 57, 62, 1);
 
   :deep(.n-data-table) {
     font-size: 12px;
@@ -553,6 +554,7 @@ const tableData = computed(() => {
   margin-bottom: 4px;
   display: flex;
   gap: 8px;
+  color: #fff;
 
   .meta-group {
     cursor: pointer;
@@ -562,7 +564,7 @@ const tableData = computed(() => {
     transition: color 0.2s ease;
 
     &:hover {
-      color: #fff;
+      color: #36ad6a;
     }
 
     .icon {
@@ -597,6 +599,7 @@ const tableData = computed(() => {
   min-width: 640px;
   position: relative;
   top: calc(var(--title-bar-height) / 2);
+  background-color: rgba(240, 240, 245, 1);
 
   :deep(.n-data-table) {
     font-size: 12px;
@@ -609,6 +612,7 @@ const tableData = computed(() => {
   margin-bottom: 4px;
   display: flex;
   gap: 8px;
+  color: #000;
 
   .meta-group {
     cursor: pointer;
@@ -618,7 +622,7 @@ const tableData = computed(() => {
     transition: color 0.2s ease;
 
     &:hover {
-      color: #000;
+      color: #36ad6a;
     }
 
     .icon {
