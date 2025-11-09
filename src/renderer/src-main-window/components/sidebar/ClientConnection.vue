@@ -42,11 +42,7 @@
               {{ $t('ClientConnection.disconnect') }}
             </NButton>
             <NDropdown
-              :theme-overrides="{
-                color: '#222e',
-                fontSizeSmall: '12px',
-                optionHeightSmall: '24px'
-              }"
+              :theme-overrides="dropdownThemeOverrides"
               trigger="click"
               placement="top-start"
               size="small"
@@ -159,6 +155,15 @@ const sgps = useSgpStore()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
+})
+
+const dropdownThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    color: isLight ? '#eeeef4' : '#222e',
+    fontSizeSmall: '12px',
+    optionHeightSmall: '24px'
+  }
 })
 
 const actions = computed(() => {

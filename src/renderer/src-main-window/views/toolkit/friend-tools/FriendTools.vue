@@ -55,10 +55,7 @@
             </NButton>
           </div>
           <NDataTable
-            :theme-overrides="{
-              thColor: '#0005',
-              tdColor: '#0004'
-            }"
+            :theme-overrides="dataTableThemeOverrides"
             :loading="isLoading"
             :columns="columns"
             :data="tableData"
@@ -122,6 +119,14 @@ const expandedRowKeys = ref<number[]>([])
 
 const isLoading = ref(false)
 const isDeleting = ref(false)
+
+const dataTableThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    thColor: isLight ? '#fff5' : '#0005',
+    tdColor: isLight ? '#fff4' : '#0004'
+  }
+})
 
 // puuid -> info
 const extraInfoMap = ref<
