@@ -1012,9 +1012,18 @@ if (import.meta.env.DEV) {
   text-align: right;
 }
 
+[data-theme='dark'] .card-area {
+  border: 1px solid #37373c;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='light'] .card-area {
+  border: 1px solid #d0d0d0;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
 .card-area {
   border-radius: 2px;
-  border: 1px solid #37373c;
   padding: 8px 8px;
 
   .card-title {
