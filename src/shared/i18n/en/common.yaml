@@ -81,6 +81,7 @@ sgpMatchHistoryTags:
   q_1700: Arena
   q_1900: URF
   q_2300: Brawl
+  q_2400: ARAM Mayhem
 
 tiers:
   UNRANKED: UNRANKED
