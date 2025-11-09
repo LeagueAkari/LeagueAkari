@@ -704,7 +704,7 @@ table {
       transition: color 0.3s ease;
 
       &:not(.is-bot):hover {
-        color: #fff2;
+        color: #18a058;
       }
     }
   }
