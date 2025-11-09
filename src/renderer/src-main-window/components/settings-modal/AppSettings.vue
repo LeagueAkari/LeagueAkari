@@ -668,6 +668,7 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .hover-text {
   font-size: 12px;
   color: #aaa;
@@ -685,5 +686,29 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 
 .step-description {
   font-size: 11px;
+}
+
+}
+
+[data-theme='light'] {
+.hover-text {
+  font-size: 12px;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.step-title {
+  font-size: 12px;
+}
+
+.step-description {
+  font-size: 11px;
+}
+
 }
 </style>

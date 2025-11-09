@@ -39,6 +39,7 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .perkstyle,
 .empty {
   border-radius: 2px;
@@ -63,5 +64,36 @@ const lcs = useLeagueClientStore()
 
 .empty {
   background-color: rgb(34, 34, 34);
+}
+
+}
+
+[data-theme='light'] {
+.perkstyle,
+.empty {
+  border-radius: 2px;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .image {
+    border-radius: 2px;
+    height: 28px;
+  }
+
+  .right-side {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+.empty {
+  background-color: rgb(221, 221, 221);
+}
+
 }
 </style>

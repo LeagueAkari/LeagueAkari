@@ -27,6 +27,7 @@ watchEffect(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .lcu-video {
   display: block;
 }
@@ -35,5 +36,20 @@ watchEffect(() => {
   color: rgb(103, 103, 103);
   background-color: rgb(56, 56, 56);
   border-radius: 4px;
+}
+
+}
+
+[data-theme='light'] {
+.lcu-video {
+  display: block;
+}
+
+.lcu-video-placeholder {
+  color: rgb(51, 51, 51);
+  background-color: rgb(199, 199, 199);
+  border-radius: 4px;
+}
+
 }
 </style>

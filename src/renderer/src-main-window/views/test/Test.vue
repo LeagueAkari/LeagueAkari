@@ -44,6 +44,7 @@ const html = markdownIt.render(markdown.value)
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .single-root {
   height: 100%;
 }
@@ -94,5 +95,62 @@ const html = markdownIt.render(markdown.value)
     font-size: 12px;
     font-weight: bold;
   }
+}
+
+}
+
+[data-theme='light'] {
+.single-root {
+  height: 100%;
+}
+
+.markdown-text {
+  user-select: text;
+
+  max-width: 800px;
+}
+
+.colors-container {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+
+  .card {
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .info {
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+}
+
+.section-icon-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+  color: #000a;
+  padding: 0 4px;
+
+  .section-icon {
+    font-size: 16px;
+  }
+
+  .session-label {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
 }
 </style>

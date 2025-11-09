@@ -78,4 +78,10 @@ const naiveUiTheme = computed(() => {
 useColorThemeAttr(() => as.colorTheme)
 </script>
 
-<style></style>
+<style>
+[data-theme='dark'] {
+}
+
+[data-theme='light'] {
+}
+</style>

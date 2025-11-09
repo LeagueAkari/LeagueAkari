@@ -423,6 +423,7 @@ const premadeInfo = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .queue {
   display: flex;
   align-items: center;
@@ -582,5 +583,171 @@ const premadeInfo = computed(() => {
 
 .warn-text {
   color: yellow;
+}
+
+}
+
+[data-theme='light'] {
+.queue {
+  display: flex;
+  align-items: center;
+
+  .queue-name {
+    font-size: 14px;
+    font-weight: bold;
+    flex: 1;
+    width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.divider {
+  height: 1px;
+  background-color: #00000010;
+  margin: 8px 0;
+}
+
+.time {
+  color: #d2d2d2;
+  font-size: 12px;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.team {
+  .team-name {
+    display: flex;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
+
+    .bans {
+      margin-left: auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+
+      .bans-hint {
+        margin-right: 2px;
+        font-weight: normal;
+        font-size: 10px;
+        color: #d6d6d6;
+      }
+    }
+  }
+
+  .team-players {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 2px;
+
+    &.blue {
+      background-color: #fff3;
+    }
+
+    &.red {
+      background-color: #fff0;
+    }
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+}
+
+.team-player {
+  display: flex;
+  align-items: center;
+
+  .premade-team-name {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 11px;
+    padding: 2px;
+    border-radius: 2px;
+    background-color: #00000020;
+    min-width: 12px;
+    text-align: center;
+    margin-left: 4px;
+  }
+
+  .position-icon {
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.8);
+    margin-right: 2px;
+  }
+
+  .player-name {
+    margin-left: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    padding: 0 2px;
+    border-radius: 2px;
+
+    .tag-line {
+      font-size: 11px;
+      margin-left: 2px;
+    }
+
+    .name {
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: #00000020;
+    }
+  }
+}
+
+.champion-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.cherry-bans {
+  display: flex;
+
+  .bans-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    flex-wrap: wrap;
+    max-width: 160px;
+  }
+
+  .bans-hint {
+    margin-right: 2px;
+    font-weight: normal;
+    font-size: 10px;
+    color: #d6d6d6;
+  }
+}
+
+.operations {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #d6d6d6;
+  margin-top: 8px;
+}
+
+.placeholder {
+  font-size: 12px;
+  color: #d6d6d6;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.warn-text {
+  color: yellow;
+}
+
 }
 </style>

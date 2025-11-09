@@ -849,6 +849,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .input-line {
   width: 100%;
   display: flex;
@@ -1066,6 +1067,230 @@ watch(
       }
     }
   }
+}
+
+}
+
+[data-theme='light'] {
+.input-line {
+  width: 100%;
+  display: flex;
+  gap: 4px;
+
+  .select {
+    width: 102px;
+    flex-shrink: 0;
+  }
+
+  .input {
+    font-family: unset;
+  }
+}
+
+.player-items {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  row-gap: 4px;
+  column-gap: 4px;
+
+  .player-item {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    padding: 2px 8px;
+    gap: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .availability-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+
+    .in-game {
+      background-color: hsl(175, 100%, 45%);
+    }
+
+    .chat {
+      background-color: hsl(120, 100%, 45%);
+    }
+
+    .away {
+      background-color: hsl(0, 100%, 40%);
+    }
+
+    .sgp-server {
+      font-size: 10px;
+      font-weight: bold;
+      color: rgba(174, 245, 219, 0.8);
+      border-radius: 2px;
+    }
+
+    .game-name-line {
+      font-size: 12px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 1);
+    }
+
+    .tag-line {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .close-icon,
+    .pin-icon {
+      transition: background-color 0.2s;
+      cursor: pointer;
+      border-radius: 2px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    &.pinned {
+      .pin-icon {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.warning-text {
+  font-size: 12px;
+  color: #f2c97d;
+}
+
+.hint-text {
+  color: #fff2;
+  font-size: 12px;
+}
+
+.show-all-friends-checkbox {
+  margin-left: auto;
+}
+
+.search-result-scroll {
+  .content {
+    background-color: red;
+    height: 600px;
+    width: 100%;
+  }
+}
+
+.section {
+  margin-top: 8px;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 4px;
+  }
+}
+
+.clear-button {
+  margin-left: auto;
+}
+
+.empty-result {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.search-result-items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    height: 42px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      opacity 0.2s; // opacity here to match TransitionGroup#fade
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .profile-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .right-side {
+      display: flex;
+      flex-direction: column;
+      margin-left: 8px;
+      width: 0;
+      flex: 1;
+
+      .game-name-line {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .game-name {
+          font-size: 12px;
+          font-weight: bold;
+          color: rgba(0, 0, 0, 1);
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        .small-tag {
+          border-radius: 2px;
+          padding: 0 4px;
+          font-size: 10px;
+          color: rgba(0, 0, 0, 0.8);
+          flex-shrink: 0;
+        }
+
+        .current-route {
+          background-color: rgba(0, 237, 59, 0.4);
+        }
+
+        .level {
+          background-color: rgba(0, 166, 237, 0.4);
+        }
+
+        .private {
+          background-color: rgba(255, 0, 0, 0.3);
+        }
+      }
+
+      .tag-line {
+        font-size: 10px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+}
+
 }
 </style>
 

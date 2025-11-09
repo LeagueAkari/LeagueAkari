@@ -288,6 +288,7 @@ const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .detailed-game-card {
   border-radius: 4px;
   width: 740px;
@@ -495,5 +496,219 @@ table {
 .divider {
   background-color: rgb(76, 76, 76);
   height: 1px;
+}
+
+}
+
+[data-theme='light'] {
+.detailed-game-card {
+  border-radius: 4px;
+  width: 740px;
+  overflow: hidden;
+}
+
+table,
+th,
+td {
+  border: none;
+}
+
+td:first-child {
+  padding-left: 8px;
+}
+
+td:last-child {
+  padding-right: 8px;
+}
+
+table {
+  border-spacing: 0;
+}
+
+.team-header {
+  font-size: 11px;
+  height: 30px;
+
+  th {
+    font-weight: normal;
+  }
+
+  .header-info {
+    text-align: left;
+    padding-left: 24px;
+  }
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.champion {
+  position: relative;
+  height: 32px;
+  width: 32px;
+}
+
+.champion-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.champion-level {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  font-size: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.621);
+}
+
+.summoner-spells {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 34px;
+  width: 16px;
+  gap: 2px;
+}
+
+.items {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.kda,
+.cs,
+.wards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.name-and-rank {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 4px;
+  flex-grow: 1;
+  width: 0;
+
+  .name {
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &:hover {
+      color: #fff2;
+    }
+  }
+
+  .rank {
+    font-size: 10px;
+    color: rgb(39, 39, 39);
+  }
+}
+
+.augments {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+
+  .augment {
+    height: 20px;
+    width: 20px;
+    box-sizing: border-box;
+    background-color: rgb(221, 221, 221);
+    border-radius: 2px;
+  }
+
+  .augment.prismatic {
+    border: 1px solid rgb(175, 141, 255);
+  }
+
+  .augment.gold {
+    border: 1px solid rgb(255, 183, 0);
+  }
+
+  .augment.silver {
+    border: 1px solid rgb(247, 247, 247);
+  }
+
+  .augment-empty {
+    height: 20px;
+    width: 20px;
+    border-radius: 2px;
+    background-color: rgb(221, 221, 221);
+  }
+}
+
+.kda {
+  color: rgb(53, 53, 53);
+
+  .kda-text {
+    font-size: 11px;
+  }
+
+  .kda-ratio {
+    font-size: 11px;
+    font-weight: bold;
+  }
+}
+
+.damage {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  color: rgb(53, 53, 53);
+  font-size: 11px;
+}
+
+.gold {
+  text-align: center;
+  font-size: 11px;
+}
+
+.team {
+  width: 100%;
+
+  &.win {
+    background-color: rgba(30, 39, 58, 0.9);
+  }
+
+  &.lose {
+    background-color: rgba(65, 39, 43, 0.9);
+  }
+}
+
+.participant {
+  height: 40px;
+
+  .win &.self {
+    background-color: rgb(44, 57, 86);
+  }
+
+  .lose &.self {
+    background-color: rgb(90, 53, 59);
+  }
+}
+
+.divider {
+  background-color: rgb(76, 76, 76);
+  height: 1px;
+}
+
 }
 </style>

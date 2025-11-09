@@ -156,6 +156,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .standalone-card-wrapper {
   position: relative;
   overflow: auto;
@@ -184,5 +185,40 @@ watch(
   justify-content: center;
   font-size: 13px;
   margin: auto;
+}
+
+}
+
+[data-theme='light'] {
+.standalone-card-wrapper {
+  position: relative;
+  overflow: auto;
+  top: calc(var(--title-bar-height) / 2);
+
+  :deep(.v-binder-follower-container) {
+    position: fixed;
+  }
+}
+
+.card {
+  max-height: 90vh;
+  min-height: 30vh;
+  margin: auto;
+}
+
+.placeholder {
+  background-color: rgb(203, 203, 203);
+  border-radius: 4px;
+  max-width: 840px;
+  min-width: 760px;
+  height: 96px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin: auto;
+}
+
 }
 </style>

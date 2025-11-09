@@ -533,6 +533,7 @@ const tableData = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .standalone-card-wrapper {
   padding: 12px;
   max-height: 85vh;
@@ -584,5 +585,63 @@ const tableData = computed(() => {
   align-items: center;
   gap: 2px;
   margin-right: 12px;
+}
+
+}
+
+[data-theme='light'] {
+.standalone-card-wrapper {
+  padding: 12px;
+  max-height: 85vh;
+  max-width: 80vw;
+  min-width: 640px;
+  position: relative;
+  top: calc(var(--title-bar-height) / 2);
+
+  :deep(.n-data-table) {
+    font-size: 12px;
+  }
+}
+
+.meta {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+
+  .meta-group {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #000;
+    }
+
+    .icon {
+      font-size: 14px;
+    }
+  }
+}
+
+.bans {
+  display: flex;
+  border-radius: 4px;
+  background-color: rgba(240, 240, 245, 1);
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.team-bans {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 12px;
+}
+
 }
 </style>

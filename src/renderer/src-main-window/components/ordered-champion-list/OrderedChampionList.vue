@@ -316,6 +316,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .ordered-champion-list-wrapper {
   display: flex;
   align-items: center;
@@ -342,6 +343,39 @@ watch(
   width: 600px;
   height: 65vh;
   background-color: rgba(24, 24, 24, 0.98);
+}
+
+}
+
+[data-theme='light'] {
+.ordered-champion-list-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.champions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  .champion {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.transfer {
+  width: 600px;
+  height: 65vh;
+  background-color: rgba(24, 24, 24, 0.98);
+}
+
 }
 </style>
 

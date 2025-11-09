@@ -36,9 +36,20 @@ const { t } = useTranslation()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .operations {
   display: flex;
   margin-bottom: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.operations {
+  display: flex;
+  margin-bottom: 8px;
+}
+
 }
 </style>
 

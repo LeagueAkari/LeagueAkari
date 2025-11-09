@@ -544,6 +544,7 @@ const handleImportTaggedPlayers = async () => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .operations {
   display: flex;
   gap: 8px;
@@ -565,6 +566,34 @@ const handleImportTaggedPlayers = async () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+}
+
+[data-theme='light'] {
+.operations {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.flex-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.streamer-mode-mask {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 }
 </style>
 

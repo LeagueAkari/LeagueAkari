@@ -210,6 +210,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .button-group {
   display: flex;
   gap: 4px;
@@ -221,5 +222,23 @@ watch(
   font-style: italic;
   font-size: 13px;
   margin-bottom: 12px;
+}
+
+}
+
+[data-theme='light'] {
+.button-group {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.hint {
+  color: #0008;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
 }
 </style>

@@ -188,6 +188,7 @@ onDeactivated(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .shortcut-selector-wrapper {
   display: flex;
   align-items: center;
@@ -248,6 +249,73 @@ onDeactivated(() => {
   display: flex;
   justify-content: flex-end;
   gap: 4px;
+}
+
+}
+
+[data-theme='light'] {
+.shortcut-selector-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keys-outline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  min-height: 28px;
+  width: 400px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  gap: 4px;
+}
+
+.keys-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.key {
+  color: rgb(51, 51, 51);
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
+  line-height: 1;
+}
+
+.empty {
+  line-height: 1;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.warn-text {
+  font-size: 12px;
+  color: rgba(243, 207, 31, 0.8);
+  margin-top: 4px;
+}
+
+.plus {
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
 }
 </style>
 

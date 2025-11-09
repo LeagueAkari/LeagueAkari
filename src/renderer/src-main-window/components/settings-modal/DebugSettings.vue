@@ -462,6 +462,7 @@ useIntervalFn(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .operations {
   display: flex;
   align-items: center;
@@ -486,6 +487,37 @@ useIntervalFn(
 
 .text {
   font-size: 13px;
+}
+
+}
+
+[data-theme='light'] {
+.operations {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.check-box {
+  font-size: 13px;
+}
+
+.right-side {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.text {
+  font-size: 13px;
+}
+
 }
 </style>
 

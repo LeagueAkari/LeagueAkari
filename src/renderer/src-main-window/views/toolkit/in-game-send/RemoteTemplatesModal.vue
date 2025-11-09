@@ -110,6 +110,7 @@ watch(
 </script>
 
 <style scoped lang="less">
+[data-theme='dark'] {
 .templates {
   display: grid;
   gap: 4px;
@@ -169,6 +170,72 @@ watch(
       font-style: italic;
     }
   }
+}
+
+}
+
+[data-theme='light'] {
+.templates {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.templates-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  border: 1px solid #0001;
+  border-radius: 4px;
+  color: #000a;
+}
+
+.templates .template {
+  display: flex;
+  gap: 4px;
+  border: 1px solid #0002;
+  border-radius: 4px;
+  flex-direction: column;
+  padding: 8px;
+  height: 112px;
+  transition: border-color 0.2s ease-in-out;
+
+  &:hover {
+    border-color: #0004;
+  }
+
+  .template-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .download-button {
+      margin-left: auto;
+    }
+
+    .download-icon {
+      color: #000a;
+    }
+  }
+
+  .template-description {
+    font-size: 12px;
+    color: #000d;
+
+    &.empty {
+      color: #000a;
+      font-style: italic;
+    }
+  }
+}
+
 }
 </style>
 

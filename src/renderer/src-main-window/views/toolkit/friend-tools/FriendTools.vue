@@ -419,11 +419,25 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 @import '../toolkit-styles.less';
 
 .button-group {
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
+}
+
+}
+
+[data-theme='light'] {
+@import '../toolkit-styles.less';
+
+.button-group {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
 }
 </style>

@@ -58,6 +58,7 @@ watch(
 </script>
 
 <style scoped lang="less">
+[data-theme='dark'] {
 .label {
   font-size: 12px;
   color: rgb(146, 146, 146);
@@ -71,5 +72,25 @@ watch(
   width: 16px;
   height: 16px;
   border-radius: 2px;
+}
+
+}
+
+[data-theme='light'] {
+.label {
+  font-size: 12px;
+  color: rgb(73, 73, 73);
+}
+
+.min-height-container {
+  height: 18px;
+}
+
+.image {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
 }
 </style>

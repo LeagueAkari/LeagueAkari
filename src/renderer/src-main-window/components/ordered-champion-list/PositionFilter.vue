@@ -29,6 +29,7 @@ const handleClick = (position: string) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .position-filter {
   display: flex;
   gap: 4px;
@@ -61,5 +62,44 @@ const handleClick = (position: string) => {
     background-color: #fff2;
     border: 1px solid #fff4;
   }
+}
+
+}
+
+[data-theme='light'] {
+.position-filter {
+  display: flex;
+  gap: 4px;
+  padding: 2px;
+  box-sizing: border-box;
+  height: 22px;
+
+  .position {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #0001;
+    border-radius: 2px;
+    aspect-ratio: 1;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+    color: #0008;
+  }
+
+  .position:hover {
+    background-color: #0002;
+    color: #000;
+
+    cursor: pointer;
+  }
+
+  .position.active {
+    color: #000;
+    background-color: #0002;
+    border: 1px solid #0004;
+  }
+}
+
 }
 </style>

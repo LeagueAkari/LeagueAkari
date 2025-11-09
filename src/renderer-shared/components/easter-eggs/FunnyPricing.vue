@@ -259,6 +259,7 @@ const formatCredit = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .pricing-wrapper {
   padding: 24px;
   background-color: var(--background-color-primary);
@@ -440,5 +441,193 @@ const formatCredit = computed(() => {
   100% {
     background-position: 0% 50%;
   }
+}
+
+}
+
+[data-theme='light'] {
+.pricing-wrapper {
+  padding: 24px;
+  background-color: var(--background-color-primary);
+}
+
+.huge-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 1);
+  margin-bottom: 24px;
+}
+
+.credit {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.8);
+
+  .credit-amount {
+    font-weight: bold;
+    color: rgba(0, 0, 0, 1);
+    width: 128px;
+  }
+
+  .akari {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .button {
+    position: relative;
+    transition: left 0.3s;
+  }
+}
+
+.pricing-items {
+  display: flex;
+  justify-content: center;
+  height: 500px;
+  border-radius: 2px;
+  gap: 12px;
+  margin-top: 16px;
+
+  .pricing-item {
+    display: flex;
+    flex-direction: column;
+    width: 260px;
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+
+    .title {
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .price {
+      display: flex;
+      position: relative;
+      font-size: 18px;
+      margin-top: 16px;
+
+      .big {
+        position: relative;
+        line-height: 1;
+        font-size: 36px;
+        color: rgba(0, 0, 0, 1);
+      }
+
+      .monthly {
+        position: relative;
+        bottom: 4px;
+        font-size: 12px;
+        margin-left: 4px;
+        color: rgba(0, 0, 0, 0.6);
+        align-self: flex-end;
+      }
+    }
+
+    .description {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 1);
+      margin-top: 8px;
+    }
+
+    .divider {
+      margin-top: 16px;
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .privileges {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+
+      .privilege {
+        display: flex;
+        gap: 8px;
+
+        .icon {
+          position: relative;
+          top: 2px;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.6);
+        }
+
+        .text {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.8);
+        }
+
+        &.level-2 {
+          .text {
+            color: rgba(0, 0, 0, 1);
+            font-weight: bold;
+          }
+        }
+
+        &.level-3 {
+          .text {
+            color: rgb(188, 255, 143);
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    .subscribe {
+      height: 36px;
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+
+      &:not(.current):hover {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+
+      &:not(.current):active {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+
+      &:not(.current) {
+        cursor: pointer;
+      }
+
+      &.current {
+        color: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}
+
+.beautiful-akari {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  background-clip: text;
+  background-image: linear-gradient(90deg, #91dcff, #91dcff 10%, #ff59cb 55%, #ffc1eb 100%);
+  color: transparent;
+  background-size: 200% 200%;
+  animation: gradient-flow 10s linear infinite;
+}
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 }
 </style>

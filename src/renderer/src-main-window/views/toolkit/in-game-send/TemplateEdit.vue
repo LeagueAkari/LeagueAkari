@@ -356,6 +356,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .template-edit {
   display: flex;
   height: 600px;
@@ -503,6 +504,160 @@ watch(
   font-style: italic;
   font-size: 13px;
   margin-bottom: 12px;
+}
+
+}
+
+[data-theme='light'] {
+.template-edit {
+  display: flex;
+  height: 600px;
+  border: 1px solid #0001;
+}
+
+.left-list {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+  border-right: 1px solid #fff1;
+  flex-shrink: 0;
+
+  .button-new {
+    margin-bottom: 8px;
+    align-self: flex-start;
+  }
+
+  .filter-input {
+    margin-bottom: 8px;
+  }
+
+  .list {
+    flex-grow: 1;
+    border: 1px solid #0001;
+    border-radius: 2px;
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      border-radius: 2px;
+      height: 28px;
+      padding: 0 8px;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin: 0 4px 2px 4px;
+      font-size: 12px;
+
+      &:hover {
+        background-color: #0001;
+      }
+
+      &.active {
+        background-color: #0002;
+      }
+
+      .name {
+        flex-grow: 1;
+      }
+
+      .invalid-icon {
+        font-size: 14px;
+        color: #0009;
+        margin-left: auto;
+      }
+    }
+  }
+
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      font-size: 16px;
+      color: #0001;
+    }
+  }
+}
+
+.right-content {
+  flex: 1;
+  width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      flex-grow: 1;
+      width: 0;
+
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:hover {
+        color: #000;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    margin-bottom: 8px;
+  }
+
+  .editor {
+    flex: 1;
+    border: 1px solid #0001;
+    border-radius: 2px;
+  }
+
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      font-size: 16px;
+      color: #0001;
+    }
+  }
+}
+
+.left-list,
+.right-content {
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.template-hint {
+  color: #0008;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
 }
 </style>
 

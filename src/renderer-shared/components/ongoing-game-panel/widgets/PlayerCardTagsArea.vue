@@ -819,6 +819,7 @@ onDeactivated(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -1059,5 +1060,252 @@ onDeactivated(() => {
       background-color: #ffffff40;
     }
   }
+}
+
+}
+
+[data-theme='light'] {
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+
+  .tag {
+    font-size: 11px;
+    line-height: 11px;
+    color: #000000;
+    padding: 2px 4px;
+    border-radius: 2px;
+
+    &.tagged {
+      background-color: #fff1;
+    }
+
+    &.primary {
+      background-color: #fff6;
+    }
+
+    &.win-rate-team {
+      background-color: #fffc;
+    }
+
+    &.have-met {
+      background-color: #5cacea;
+      color: #fff;
+    }
+
+    &.privacy-private {
+      background-color: #fff8;
+    }
+
+    &.winning-streak {
+      background-color: #fff7;
+      color: #000;
+    }
+
+    &.losing-streak {
+      background-color: #fffb;
+    }
+
+    &.akari-loved {
+      color: #000000;
+      background-color: #fffb;
+    }
+
+    &.sus-flash {
+      color: #000000;
+      background-color: #fffb;
+    }
+
+    &.too-many-solo-deaths {
+      color: #000000;
+      background-color: #fff9;
+    }
+
+    &.too-many-solo-kills {
+      color: #000000;
+      background-color: #fff9;
+    }
+
+    &.self {
+      background-color: #fff4;
+    }
+
+    &.team-damage-share {
+      background-color: #fff7;
+    }
+
+    &.team-damage-taken-share {
+      background-color: #fff2;
+    }
+
+    &.team-gold-share {
+      background-color: #fffd;
+    }
+
+    &.damage-gold-efficiency {
+      background-color: #8f411e;
+    }
+
+    &.enemy-missing-pings {
+      background-color: #e7da30;
+      color: #fff;
+    }
+
+    &.vision-score {
+      background-color: #fff1;
+    }
+  }
+}
+
+.popover-text {
+  font-size: 12px;
+  max-width: 240px;
+}
+
+.popover-text.have-met-popover {
+  max-width: unset;
+  width: min-content;
+}
+
+.tagged-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .tagged-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tag-source {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+
+    .tagged-by-other-text {
+      color: #000f;
+    }
+
+    .tagged-by-other-name {
+      font-weight: bold;
+      color: #000000;
+      cursor: pointer;
+
+      &.unknown {
+        color: #000f;
+      }
+    }
+  }
+
+  .tagged-text {
+    font-size: 12px;
+    white-space: pre-wrap;
+    max-width: 260px;
+  }
+}
+
+.encountered-game-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #00000040;
+  font-size: 12px;
+  color: #d4d4d4;
+
+  th,
+  td {
+    border: 1px solid #00000040;
+    padding: 2px 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .game-id-col {
+    width: 120px;
+  }
+
+  .game-id-td:hover {
+    color: #000000;
+  }
+
+  .game-id-td {
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+
+  .game-id-tag {
+    padding: 2px 4px;
+    line-height: 12px;
+    font-size: 12px;
+    background-color: #00000020;
+    border-radius: 2px;
+  }
+
+  .game-stats {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    .champion-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .position-icon {
+      font-size: 16px;
+    }
+
+    .team,
+    .win-result {
+      font-size: 12px;
+      line-height: 12px;
+      font-weight: bold;
+    }
+
+    .team {
+      margin-right: 8px;
+
+      &.teammate {
+        color: #4cc69d;
+      }
+
+      &.opponent {
+        color: #ff6161;
+      }
+    }
+
+    .win-result {
+      &.win {
+        color: #4cc69d;
+      }
+
+      &.lose {
+        color: #ff6161;
+      }
+
+      &.abort,
+      &.remake {
+        color: #c0c0c0;
+      }
+    }
+
+    .kda {
+      color: #000b;
+      font-size: 11px;
+      display: flex;
+      gap: 2px;
+    }
+
+    .divider {
+      margin: 0 4px;
+      width: 1px;
+      height: 12px;
+      background-color: #00000040;
+    }
+  }
+}
+
 }
 </style>
