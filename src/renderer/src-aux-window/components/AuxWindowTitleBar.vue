@@ -215,7 +215,7 @@ const handleRepositionToAlignLeagueClientUx = () => {
     }
 
     &:hover {
-      background-color: rgb(51, 51, 51);
+      background-color: rgb(220, 220, 220);
       color: #000;
     }
   }
