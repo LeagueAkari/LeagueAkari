@@ -161,22 +161,22 @@ const formatRarity = (r: string) => {
 .augment.prismatic {
   border: 1px solid transparent;
   border-image: linear-gradient(135deg, #e78fff, #8b05b0) 1;
-  background-color: rgb(230, 215, 255);
+  background-color: rgb(0, 0, 0);
 }
 
 .augment.gold {
   border: 1px solid rgb(255, 183, 0);
-  background-color: rgb(255, 240, 180);
+  background-color: rgb(0, 0, 0);
 }
 
 .augment.silver {
   border: 1px solid rgb(180, 180, 180);
-  background-color: rgb(220, 220, 220);
+  background-color: rgb(0, 0, 0);
 }
 
 .augment.bronze {
   border: 1px solid rgb(139, 69, 19);
-  background-color: rgb(235, 220, 205);
+  background-color: rgb(0, 0, 0);
 }
 
 .info {
