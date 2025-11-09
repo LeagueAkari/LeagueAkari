@@ -2406,7 +2406,7 @@ defineExpose({
     align-items: center;
     height: 200px;
     width: 740px;
-    background-color: #000f;
+    background-color: #ffffff05;
     color: rgb(83, 83, 83);
   }
 
