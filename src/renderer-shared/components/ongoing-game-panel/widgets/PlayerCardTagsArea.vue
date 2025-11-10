@@ -1212,7 +1212,7 @@ onDeactivated(() => {
   border-spacing: 0;
   border: 1px solid #00000040;
   font-size: 12px;
-  color: #d4d4d4;
+  color: #000;
 
   th,
   td {
