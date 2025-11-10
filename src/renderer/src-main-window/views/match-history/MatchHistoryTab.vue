@@ -2503,7 +2503,7 @@ defineExpose({
 
   .stat-item-label {
     font-size: 12px;
-    color: #fff2;
+    color: #222222;
   }
 
   .stat-item-content {
@@ -2555,7 +2555,7 @@ defineExpose({
   .win-or-lose {
     margin-left: auto;
     font-size: 12px;
-    color: #acacac;
+    color: #000;
   }
 }
 
