@@ -1080,23 +1080,27 @@ onDeactivated(() => {
 
     &.tagged {
       background-color: #49914d;
+      color: #fff;
     }
 
     &.primary {
       background-color: #5b4694;
+      color: #fff;
     }
 
     &.win-rate-team {
       background-color: #7e2c85;
+      color: #fff;
     }
 
     &.have-met {
       background-color: #5cacea;
-      color: #000;
+      color: #fff;
     }
 
     &.privacy-private {
       background-color: #870808;
+      color: #fff;
     }
 
     &.winning-streak {
@@ -1130,22 +1134,27 @@ onDeactivated(() => {
 
     &.self {
       background-color: #37246c;
+      color: #fff;
     }
 
     &.team-damage-share {
       background-color: #692723;
+      color: #fff;
     }
 
     &.team-damage-taken-share {
       background-color: #135225;
+      color: #fff;
     }
 
     &.team-gold-share {
       background-color: #a73d2a;
+      color: #fff;
     }
 
     &.damage-gold-efficiency {
       background-color: #8f411e;
+      color: #fff;
     }
 
     &.enemy-missing-pings {
@@ -1155,6 +1164,7 @@ onDeactivated(() => {
 
     &.vision-score {
       background-color: #2451a6;
+      color: #fff;
     }
   }
 }
