@@ -685,36 +685,73 @@ const MILESTONE_ORDER = [
 ]
 
 const positionAssignmentReason = computed(() => {
-  return {
-    FILL_SECONDARY: {
-      name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
-      color: '#82613b',
-      foregroundColor: '#ffffff'
-    },
-    FILL_PRIMARY: {
-      name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    PRIMARY: {
-      name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    SECONDARY: {
-      name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    AUTOFILL: {
-      name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
-      color: '#944646',
-      foregroundColor: '#ffffff'
-    },
-    AUTOFILL_SHORT: {
-      name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
-      color: '#944646',
-      foregroundColor: '#ffffff'
+  const isDark = as.settings.theme !== 'light'
+  
+  if (isDark) {
+    return {
+      FILL_SECONDARY: {
+        name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
+        color: '#82613b',
+        foregroundColor: '#ffffff'
+      },
+      FILL_PRIMARY: {
+        name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      PRIMARY: {
+        name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      SECONDARY: {
+        name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL: {
+        name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
+        color: '#944646',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL_SHORT: {
+        name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
+        color: '#944646',
+        foregroundColor: '#ffffff'
+      }
+    }
+  } else {
+    return {
+      FILL_SECONDARY: {
+        name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
+        color: '#6d4e2e',
+        foregroundColor: '#ffffff'
+      },
+      FILL_PRIMARY: {
+        name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      PRIMARY: {
+        name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      SECONDARY: {
+        name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL: {
+        name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
+        color: '#7d3333',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL_SHORT: {
+        name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
+        color: '#7d3333',
+        foregroundColor: '#ffffff'
+      }
     }
   }
 })
