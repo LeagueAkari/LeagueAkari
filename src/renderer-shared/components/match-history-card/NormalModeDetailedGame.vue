@@ -825,7 +825,7 @@ table {
 
 .best {
   font-weight: bold;
-  color: rgb(167, 167, 255);
+  color: rgb(0, 147, 255);
 }
 
 }
