@@ -8,14 +8,14 @@
         currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
-      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff60'
+      borderColor: premadeTeamId ? premadeTeamColors[premadeTeamId]?.borderColor : '#ffffff60'
     }"
   >
     <div
       class="premade-deco"
       :style="{
         backgroundColor: premadeTeamId
-          ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+          ? premadeTeamColors[premadeTeamId]?.foregroundColor
           : undefined
       }"
     ></div>
@@ -44,7 +44,7 @@
                   class="name"
                   :style="{
                     color: premadeTeamId
-                      ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+                      ? premadeTeamColors[premadeTeamId]?.foregroundColor
                       : undefined
                   }"
                   >{{
@@ -465,7 +465,8 @@ import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
-  RANKED_MEDAL_MAP
+  RANKED_MEDAL_MAP,
+  usePremadeTeamColors
 } from './ongoing-game-utils'
 import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
 
@@ -813,6 +814,7 @@ const matches = computed(() => {
 
 const { masked } = useStreamerModeMaskedText()
 const { name } = useChampionInfo()
+const premadeTeamColors = usePremadeTeamColors()
 </script>
 
 <style lang="less" scoped>
