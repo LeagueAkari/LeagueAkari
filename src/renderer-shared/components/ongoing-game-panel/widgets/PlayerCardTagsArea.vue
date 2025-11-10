@@ -1079,69 +1079,69 @@ onDeactivated(() => {
     border-radius: 2px;
 
     &.tagged {
-      background-color: #fff1;
+      background-color: #49914d;
     }
 
     &.primary {
-      background-color: #fff6;
+      background-color: #5b4694;
     }
 
     &.win-rate-team {
-      background-color: #fffc;
+      background-color: #7e2c85;
     }
 
     &.have-met {
       background-color: #5cacea;
-      color: #fff;
-    }
-
-    &.privacy-private {
-      background-color: #fff8;
-    }
-
-    &.winning-streak {
-      background-color: #fff7;
       color: #000;
     }
 
+    &.privacy-private {
+      background-color: #870808;
+    }
+
+    &.winning-streak {
+      background-color: #18571c;
+      color: #fff;
+    }
+
     &.losing-streak {
-      background-color: #fffb;
+      background-color: #ff8080;
     }
 
     &.akari-loved {
-      color: #000000;
-      background-color: #fffb;
+      color: #ffffff;
+      background-color: #b81b86;
     }
 
     &.sus-flash {
-      color: #000000;
-      background-color: #fffb;
+      color: #ffffff;
+      background-color: #3a1bb8;
     }
 
     &.too-many-solo-deaths {
-      color: #000000;
-      background-color: #fff9;
+      color: #ffffff;
+      background-color: #a81919;
     }
 
     &.too-many-solo-kills {
-      color: #000000;
-      background-color: #fff9;
+      color: #ffffff;
+      background-color: #9019a8;
     }
 
     &.self {
-      background-color: #fff4;
+      background-color: #37246c;
     }
 
     &.team-damage-share {
-      background-color: #fff7;
+      background-color: #692723;
     }
 
     &.team-damage-taken-share {
-      background-color: #fff2;
+      background-color: #135225;
     }
 
     &.team-gold-share {
-      background-color: #fffd;
+      background-color: #a73d2a;
     }
 
     &.damage-gold-efficiency {
@@ -1150,11 +1150,11 @@ onDeactivated(() => {
 
     &.enemy-missing-pings {
       background-color: #e7da30;
-      color: #fff;
+      color: #000;
     }
 
     &.vision-score {
-      background-color: #fff1;
+      background-color: #2451a6;
     }
   }
 }

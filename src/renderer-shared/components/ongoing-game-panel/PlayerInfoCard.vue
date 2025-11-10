@@ -1235,7 +1235,13 @@ const { name } = useChampionInfo()
       border-left-color: #c0c0c030;
 
       .win-lose {
-        color: #c0c0c0;
+        [data-theme='dark'] .ordinal {
+          color: #c0c0c0;
+        }
+	    
+        [data-theme='light'] .ordinal {
+          color: #000;
+        }
       }
     }
 
@@ -1257,12 +1263,26 @@ const { name } = useChampionInfo()
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      color: #e8e8e8;
+      
+      [data-theme='dark'] .ordinal {
+        color: #e8e8e8;
+      }
+	  
+      [data-theme='light'] .ordinal {
+        color: #000;
+      }
     }
 
     .line2 {
       font-size: 10px;
-      color: #d6d6d6;
+      
+      [data-theme='dark'] .ordinal {
+        color: #d6d6d6;
+      }
+	  
+      [data-theme='light'] .ordinal {
+        color: #000;
+      }
     }
 
     .kda {
