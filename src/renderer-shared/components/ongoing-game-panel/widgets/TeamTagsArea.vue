@@ -43,9 +43,9 @@
                 class="tag"
                 :style="{
                   backgroundColor: p.premadeId
-                    ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                    ? premadeTeamColors[p.premadeId]?.foregroundColor
                     : '#ffffff40',
-                  color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                  color: premadeTeamColors[p.premadeId]?.color || '#fff'
                 }"
               >
                 {{
@@ -67,9 +67,9 @@
               class="tag"
               :style="{
                 backgroundColor: p.premadeId
-                  ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                  ? premadeTeamColors[p.premadeId]?.foregroundColor
                   : '#ffffff40',
-                color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                color: premadeTeamColors[p.premadeId]?.color || '#fff'
               }"
             >
               {{
@@ -96,7 +96,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, usePremadeTeamColors } from '../ongoing-game-utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
 const WIN_RATE_TEAM_MIN_MATCHES = 13
@@ -132,6 +132,8 @@ interface WinRateTeamInfo {
 }
 
 const { t } = useTranslation()
+
+const premadeTeamColors = usePremadeTeamColors()
 
 // ## 胜率队
 // 1. 3 人以上的预组队队伍

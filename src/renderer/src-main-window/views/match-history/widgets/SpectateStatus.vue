@@ -178,7 +178,8 @@ import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMask
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import {
   PREMADE_TEAMS,
-  PREMADE_TEAM_COLORS
+  PREMADE_TEAM_COLORS,
+  usePremadeTeamColors
 } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
@@ -384,6 +385,8 @@ const handleCopyToken = () => {
 
 const { summonerName } = useStreamerModeMaskedText()
 
+const premadeTeamColors = usePremadeTeamColors()
+
 const premadeInfo = computed(() => {
   if (!data) {
     return {}
@@ -407,7 +410,7 @@ const premadeInfo = computed(() => {
       }
 
       const teamName = PREMADE_TEAMS[index++]
-      const color = PREMADE_TEAM_COLORS[teamName]
+      const color = premadeTeamColors.value[teamName]
       puuids.forEach((puuid) => {
         prev[puuid] = {
           color,

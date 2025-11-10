@@ -51,9 +51,9 @@
           class="tag"
           :style="{
             backgroundColor: premadeTeamId
-              ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+              ? premadeTeamColors[premadeTeamId]?.foregroundColor
               : '#ffffff40',
-            color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#fff'
+            color: premadeTeamColors[premadeTeamId]?.color || '#fff'
           }"
           ref="premade-tag-el"
         >
@@ -595,7 +595,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, usePremadeTeamColors } from '../ongoing-game-utils'
 
 const { puuid, analysis, matchHistory, premadeTeamId, summoner, savedInfo } = defineProps<{
   puuid: string
@@ -619,6 +619,8 @@ const { t } = useTranslation()
 
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
+
+const premadeTeamColors = usePremadeTeamColors()
 
 const SOLO_DEATHS_THRESHOLD = 2
 const SOLO_KILLS_THRESHOLD = 2
