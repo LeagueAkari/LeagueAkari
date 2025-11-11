@@ -4,7 +4,8 @@ printWidth: 100
 trailingComma: none
 endOfLine: lf
 arrowParens: always
-importOrder: ['reflect-metadata', '<THIRD_PARTY_MODULES>', '^@main-window/(.*)$', '^[./]']
+importOrder:
+  ['reflect-metadata', 'virtual:uno.css', '<THIRD_PARTY_MODULES>', '^@main-window/(.*)$', '^[./]']
 importOrderSeparation: true
 importOrderSortSpecifiers: true
 importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy']

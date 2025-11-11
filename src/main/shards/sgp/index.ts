@@ -1,14 +1,20 @@
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
+import {
+  AKARI_HEADER_SGP_SERVER_ID,
+  AKARI_HEADER_TOKEN_TYPE,
+  URL_PLACEHOLDER_SUB_ID
+} from '@shared/http-api-axios-helper/sgp'
 import { isInActiveGame } from '@shared/types/league-client/gameflow'
 import { formatError } from '@shared/utils/errors'
-import { isAxiosError } from 'axios'
+import axios, { AxiosRequestConfig, isAxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { comparer, computed } from 'mobx'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -45,10 +51,16 @@ export class SgpMain implements IAkariShardInitDispose {
 
   private readonly _api = new LeagueSgpApi()
 
+  private readonly _http = axios.create({
+    validateStatus: () => true,
+    responseType: 'stream'
+  })
+
   constructor(
     private readonly _app: AppCommonMain,
     _loggerFactory: LoggerFactoryMain,
     _settingFactory: SettingFactoryMain,
+    private readonly _protocol: AkariProtocolMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _lc: LeagueClientMain,
     private readonly _ipc: AkariIpcMain,
@@ -79,6 +91,8 @@ export class SgpMain implements IAkariShardInitDispose {
     this._maintainLeagueSessionToken()
     this._handleUpdateSgpServerConfig()
     this._handleAdditionalSgpDate()
+    this._initHttpInstance()
+    this._handleProtocol()
   }
 
   /**
@@ -601,6 +615,107 @@ export class SgpMain implements IAkariShardInitDispose {
       },
       { fireImmediately: true, equals: comparer.shallow }
     )
+  }
+
+  private _initHttpInstance() {
+    this._http.interceptors.request.use((config) => {
+      const preferredSgpServerId =
+        config.headers[AKARI_HEADER_SGP_SERVER_ID] || this.state.availability.sgpServerId
+
+      if (config.url) {
+        config.url = config.url.replace(
+          URL_PLACEHOLDER_SUB_ID,
+          this._getSubId(preferredSgpServerId)
+        )
+      }
+
+      const requiredTokenType = config.headers[AKARI_HEADER_TOKEN_TYPE]
+
+      if (requiredTokenType) {
+        const token = this._getToken(requiredTokenType)
+
+        if (!token) {
+          throw new Error(`Token not found for type: ${requiredTokenType}`)
+        }
+
+        config.headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const serverConfig = this.state.sgpServerConfig.servers[preferredSgpServerId]
+
+      if (!serverConfig) {
+        throw new Error(`Server config not found for sgp server ID: ${preferredSgpServerId}`)
+      }
+
+      const baseUrl =
+        requiredTokenType === 'entitlements' ? serverConfig.matchHistory : serverConfig.common
+
+      if (!baseUrl) {
+        throw new Error(
+          `Base URL not found for sgp server ID: ${preferredSgpServerId}, requiredTokenType: ${requiredTokenType}`
+        )
+      }
+
+      config.baseURL = baseUrl
+
+      return config
+    })
+  }
+
+  private _getSubId(sgpServerId: string) {
+    if (sgpServerId.startsWith('TENCENT')) {
+      const [_, rsoPlatformId] = sgpServerId.split('_')
+      return rsoPlatformId
+    }
+
+    return sgpServerId
+  }
+
+  private _getToken(tokenType: string) {
+    if (tokenType === 'entitlements') {
+      return this._lc.data.entitlements.token?.accessToken ?? null
+    } else if (tokenType === 'league-session') {
+      return this._lc.data.leagueSession.token ?? null
+    }
+    return null
+  }
+
+  private _handleProtocol() {
+    this._protocol.registerDomain('sgp', async (uri, req) => {
+      const reqHeaders: Record<string, string> = {}
+
+      req.headers.forEach((value, key) => {
+        reqHeaders[key] = value
+      })
+
+      try {
+        const config: AxiosRequestConfig = {
+          method: req.method,
+          url: uri,
+          data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
+          headers: reqHeaders
+        }
+
+        const res = await this._http.request(config)
+
+        const resHeaders = Object.fromEntries(
+          Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
+        )
+
+        return new Response(AkariProtocolMain.shouldNotHaveBody(res.status) ? null : res.data, {
+          statusText: res.statusText,
+          headers: resHeaders,
+          status: res.status
+        })
+      } catch (error) {
+        this._log.warn(`Failed to proxy SGP request`, error)
+
+        return new Response(formatError(error), {
+          headers: { 'Content-Type': 'text/plain' },
+          status: 500
+        })
+      }
+    })
   }
 
   async onDispose() {}

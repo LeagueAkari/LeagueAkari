@@ -175,6 +175,10 @@ export class AkariProtocolMain {
     this._domainRegistry.delete(domain)
   }
 
+  static shouldNotHaveBody(code: number) {
+    return (code >= 100 && code < 200) || code === 204 || code === 205 || code === 304
+  }
+
   static register() {
     protocol.registerSchemesAsPrivileged([
       {

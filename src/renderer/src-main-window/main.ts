@@ -1,5 +1,7 @@
 import 'reflect-metadata'
 
+import 'virtual:uno.css'
+
 import '@renderer-shared/assets/css/base-styles.css'
 import '@renderer-shared/assets/css/github-markdown.css'
 import '@renderer-shared/assets/css/lol-view.css'

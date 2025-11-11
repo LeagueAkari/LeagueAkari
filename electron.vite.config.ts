@@ -2,6 +2,7 @@ import yaml from '@modyfi/vite-plugin-yaml'
 import vue from '@vitejs/plugin-vue'
 import { bytecodePlugin, defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
+import unoCSS from 'unocss/vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 const SHOULD_COMPILE_TO_BYTECODE = true
@@ -90,6 +91,7 @@ export default defineConfig({
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       }),
+      unoCSS(),
       vueDevTools()
     ],
     build: {

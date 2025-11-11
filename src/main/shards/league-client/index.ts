@@ -196,7 +196,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
         )
 
-        return new Response(res.status === 204 || res.status === 304 ? null : res.data, {
+        return new Response(AkariProtocolMain.shouldNotHaveBody(res.status) ? null : res.data, {
           statusText: res.statusText,
           headers: resHeaders,
           status: res.status

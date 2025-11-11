@@ -86,6 +86,7 @@
     "safe-stable-stringify": "^2.5.0",
     "semver": "^7.7.3",
     "typescript": "~5.9.3",
+    "unocss": "^66.5.5",
     "vfonts": "^0.0.3",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3",
