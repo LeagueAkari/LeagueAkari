@@ -661,11 +661,11 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="data && data.data.starter_items && data.data.core_items.length">
+      <div class="card-area" v-if="data && data.data.starter_items && coreItems.length">
         <div class="card-title">
           {{ t('OpggChampion.coreItemText') }}
           <NCheckbox
-            v-if="data.data.core_items.length > 4"
+            v-if="coreItems.length > 4"
             size="small"
             v-model:checked="isCoreItemsExpanded"
           >{{ t('OpggChampion.showAll') }}</NCheckbox>
@@ -673,7 +673,7 @@
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 5)"
+            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 5, coreItems)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
@@ -861,6 +861,25 @@ const augments = computed(() => {
     acc[cur.rarity] = cur
     return acc
   }, {})
+})
+
+// Combine Arena core_items with ARAM core_items in ARAM: Mayhem mode
+const coreItems = computed(() => {
+  // For ARAM: Mayhem mode, combine Arena and ARAM core_items
+  if (props.isAramMayhem && props.arenaAugmentsData && props.data) {
+    const aramCoreItems = props.data.data.core_items || []
+    const arenaCoreItems = props.arenaAugmentsData.data.core_items || []
+    
+    // Combine both arrays, Arena items first, then ARAM items
+    return [...arenaCoreItems, ...aramCoreItems]
+  }
+  
+  // Regular mode: use core_items from the main data
+  if (!props.data) {
+    return []
+  }
+  
+  return props.data.data.core_items || []
 })
 
 const augmentTab = ref<string | undefined>('gold')
