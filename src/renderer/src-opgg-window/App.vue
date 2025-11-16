@@ -4,9 +4,7 @@
     <OpggWindowTitleBar />
     <div class="content">
       <RouterView v-slot="{ Component }">
-        <KeepAlive>
-          <component :is="Component" />
-        </KeepAlive>
+        <component :is="Component" />
       </RouterView>
     </div>
   </div>

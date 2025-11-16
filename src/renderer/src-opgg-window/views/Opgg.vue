@@ -270,7 +270,7 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -625,6 +625,11 @@ const goToPreviousChampion = async () => {
 
 onMounted(() => {
   loadAll()
+})
+
+onUnmounted(() => {
+  // Clean up any ongoing requests on unmount to prevent memory leaks
+  cancelAll()
 })
 
 const championItem = computed(() => {

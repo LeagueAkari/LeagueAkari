@@ -42,7 +42,10 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
         show: false,
         fullscreenable: false,
         frame: false,
-        maximizable: false
+        maximizable: false,
+        webPreferences: {
+          backgroundThrottling: true // Reduce CPU usage when window is in background
+        }
       }
     })
 

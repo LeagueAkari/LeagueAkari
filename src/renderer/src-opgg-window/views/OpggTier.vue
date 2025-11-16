@@ -34,7 +34,7 @@ import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
-import { useMediaQuery } from '@vueuse/core'
+import { refDebounced, useMediaQuery } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumn,
@@ -405,6 +405,7 @@ const combinedColumns = computed(() => {
 })
 
 const filterText = ref('')
+const debouncedFilterText = refDebounced(filterText, 300) // Debounce filter input by 300ms
 
 const isNameMatch = (pattern: string, label: string, value?: number) => {
   try {
@@ -467,11 +468,11 @@ const data = computed(() => {
         return aRank - bRank
       })
       .filter((value) => {
-        if (filterText.value === '') {
+        if (debouncedFilterText.value === '') {
           return true
         }
 
-        return isNameMatch(filterText.value, lcs.gameData.champions[value.id]?.name, value.id)
+        return isNameMatch(debouncedFilterText.value, lcs.gameData.champions[value.id]?.name, value.id)
       })
   }
 
@@ -483,11 +484,11 @@ const data = computed(() => {
       return aRank - bRank
     })
     .filter((value: any) => {
-      if (filterText.value === '') {
+      if (debouncedFilterText.value === '') {
         return true
       }
 
-      return isNameMatch(filterText.value, lcs.gameData.champions[value.id]?.name, value.id)
+      return isNameMatch(debouncedFilterText.value, lcs.gameData.champions[value.id]?.name, value.id)
     })
 })
 </script>
