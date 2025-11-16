@@ -270,7 +270,7 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -373,15 +373,14 @@ const isLoading = computed(
 )
 
 // 一些模式没有位置相关的数据，所以添加一个视觉上的效果以保证其不可选
+// Combine mode-related watchers for better performance
 watchEffect(() => {
   if (mode.value !== 'ranked') {
     position.value = 'none'
   } else {
     position.value = savedPreferences.value.position as PositionType
   }
-})
 
-watchEffect(() => {
   if (mode.value === 'arena') {
     tier.value = 'all'
   } else {
@@ -625,6 +624,11 @@ const goToPreviousChampion = async () => {
 
 onMounted(() => {
   loadAll()
+})
+
+onUnmounted(() => {
+  // Clean up any ongoing requests on unmount to prevent memory leaks
+  cancelAll()
 })
 
 const championItem = computed(() => {
