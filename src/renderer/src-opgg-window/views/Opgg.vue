@@ -108,7 +108,7 @@
     </div>
     <div class="content">
       <OpggTier
-        v-if="currentTab === 'tier'"
+        v-show="currentTab === 'tier'"
         :data="tierData"
         :mode="mode"
         :position="position"
@@ -120,7 +120,7 @@
         @cancel="cancelAll"
       />
       <OpggChampion
-        v-if="currentTab === 'champion'"
+        v-show="currentTab === 'champion'"
         @show-champion="(id) => handleToChampion(id, false)"
         :data="champion"
         :champion="championItem"
@@ -270,11 +270,10 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, defineAsyncComponent, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
-// Lazy load heavy components to reduce initial bundle size and improve loading performance
-const OpggChampion = defineAsyncComponent(() => import('./OpggChampion.vue'))
-const OpggTier = defineAsyncComponent(() => import('./OpggTier.vue'))
+import OpggChampion from './OpggChampion.vue'
+import OpggTier from './OpggTier.vue'
 
 const { t } = useTranslation()
 
