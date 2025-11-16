@@ -108,7 +108,7 @@
     </div>
     <div class="content">
       <OpggTier
-        v-show="currentTab === 'tier'"
+        v-if="currentTab === 'tier'"
         :data="tierData"
         :mode="mode"
         :position="position"
@@ -120,7 +120,7 @@
         @cancel="cancelAll"
       />
       <OpggChampion
-        v-show="currentTab === 'champion'"
+        v-if="currentTab === 'champion'"
         @show-champion="(id) => handleToChampion(id, false)"
         :data="champion"
         :champion="championItem"
@@ -270,10 +270,11 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, defineAsyncComponent, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
-import OpggChampion from './OpggChampion.vue'
-import OpggTier from './OpggTier.vue'
+// Lazy load heavy components to reduce initial bundle size and improve loading performance
+const OpggChampion = defineAsyncComponent(() => import('./OpggChampion.vue'))
+const OpggTier = defineAsyncComponent(() => import('./OpggTier.vue'))
 
 const { t } = useTranslation()
 
@@ -373,15 +374,14 @@ const isLoading = computed(
 )
 
 // 一些模式没有位置相关的数据，所以添加一个视觉上的效果以保证其不可选
+// Combine mode-related watchers for better performance
 watchEffect(() => {
   if (mode.value !== 'ranked') {
     position.value = 'none'
   } else {
     position.value = savedPreferences.value.position as PositionType
   }
-})
 
-watchEffect(() => {
   if (mode.value === 'arena') {
     tier.value = 'all'
   } else {
