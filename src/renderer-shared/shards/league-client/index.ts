@@ -40,7 +40,11 @@ export class LeagueClientRenderer {
   /** 这里只用于当作一个普通的静态事件分发器 */
   private readonly _emitter = new RadixEventEmitter()
 
-  public readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
+  public readonly _http = axios.create({
+    baseURL: 'akari://league-client',
+    adapter: 'fetch',
+    paramsSerializer: { indexes: null }
+  })
   public readonly api: LeagueClientHttpApiAxiosHelper
 
   async onInit() {

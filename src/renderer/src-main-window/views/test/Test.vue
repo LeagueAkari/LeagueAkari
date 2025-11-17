@@ -1,50 +1,143 @@
 <template>
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
-      <div style="margin-bottom: 12px">此页面被用于测试功能，仅在开发环境或 .rabi 版本中可见。</div>
-      <div style="margin-bottom: 12px">
-        This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
+      <MatchCard
+        :width="selectedOption"
+        :summary="mockData2.summary"
+        :details="mockData2.details"
+        :puuid="mockData2.puuid"
+        :theme="as.colorTheme"
+      />
+
+      <!-- Radio Group dev -->
+      <div
+        :style="{ width: `${selectedOption}px` }"
+        class="mt-1 p-4 rounded dark:bg-white/5 bg-black/5 box-border transition-[width]"
+      >
+        <div class="dark:text-white/80 text-black/80 text-sm font-semibold mb-2">宽度</div>
+        <NRadioGroup v-model:value="selectedOption">
+          <div class="flex gap-2 flex-wrap">
+            <NRadio :value="680" label="680px" />
+            <NRadio :value="720" label="720px" />
+            <NRadio :value="760" label="760px" />
+            <NRadio :value="800" label="800px" />
+            <NRadio :value="840" label="840px" />
+            <NRadio :value="880" label="880px" />
+            <NRadio :value="920" label="920px" />
+            <NRadio :value="960" label="960px" />
+            <NRadio :value="1000" label="1000px" />
+          </div>
+        </NRadioGroup>
       </div>
-      <div class="colors-container">
-        <div
-          class="card"
-          v-for="(team, key) in teams"
-          :key="key"
-          :style="{
-            backgroundColor: team.foregroundColor,
-            color: team.color,
-            border: '4px solid ' + team.borderColor
-          }"
-        >
-          <div class="title">Team {{ key }}</div>
-          <div class="info">foregroundColor: {{ team.foregroundColor }}</div>
-          <div class="info">text color: {{ team.color }}</div>
-          <div class="info">borderColor: {{ team.borderColor }}</div>
-        </div>
+
+      <div
+        :style="{ width: `${selectedOption}px` }"
+        class="mt-1 p-4 rounded dark:bg-white/5 bg-black/5 box-border transition-[width]"
+      >
+        <div class="dark:text-white/80 text-black/80 text-sm font-semibold mb-2">数据类型</div>
+        <NRadioGroup v-model:value="selectedDataType">
+          <div class="flex gap-2 flex-wrap">
+            <NRadio value="lcu" label="lcu" />
+            <NRadio value="sgp" label="sgp" />
+          </div>
+        </NRadioGroup>
       </div>
-      <div class="markdown-body" v-html="html"></div>
+
+      <div
+        :style="{ width: `${selectedOption}px` }"
+        class="mt-1 p-4 rounded dark:bg-white/5 bg-black/5 box-border transition-[width]"
+      >
+        <div class="dark:text-white/80 text-black/80 text-sm font-semibold mb-2">主题</div>
+        <NRadioGroup :value="as.colorTheme" @update:value="app.setTheme($event)">
+          <div class="flex gap-2 flex-wrap">
+            <NRadio value="dark" label="dark" />
+            <NRadio value="light" label="light" />
+          </div>
+        </NRadioGroup>
+      </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { markdownIt } from '@renderer-shared/utils/markdown'
-import { NScrollbar } from 'naive-ui'
-import { reactive, ref, watchEffect } from 'vue'
+import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { Game, GameTimeline } from '@shared/types/league-client/match-history'
+import { SgpGameDetailsLol, SgpGameSummaryLol } from '@shared/types/sgp/match-history'
+import { NRadio, NRadioGroup, NScrollbar } from 'naive-ui'
+import { computed, ref } from 'vue'
 
-const teams = reactive(PREMADE_TEAM_COLORS)
+import lcuGameData from './lcu/kiwi-game_10358513149.json'
+import lcuTimeline from './lcu/kiwi-gameline_10358513149.json'
+import lcuRankSummary from './lcu/rank-game_summary_8457979403.json'
+import lcuRankTimeline from './lcu/rank-gameline_details_8457979403.json'
+import sgpTimeline from './sgp/kiwi-game-details_10358513149.json'
+import sgpGameData from './sgp/kiwi-game-summary_10358513149.json'
+import sgpRankTimeline from './sgp/rank-game-details_8457979403.json'
+import sgpRankSummary from './sgp/rank-game-summary_8457979403.json'
 
-const markdown = ref(`
-[打开更新页面](akari://renderer-link/overlays/release-modal)
-`)
-const html = markdownIt.render(markdown.value)
+const as = useAppCommonStore()
+const app = useInstance(AppCommonRenderer)
 
-const lcs = useLeagueClientStore()
+const selectedOption = ref(800)
+const selectedDataType = ref('sgp')
 
-watchEffect(() => {
-  console.log(lcs.champSelect.gridChampions)
+const mockData = computed(() => {
+  if (selectedDataType.value === 'lcu') {
+    return {
+      summary: {
+        source: 'lcu',
+        data: lcuGameData as unknown as Game
+      } as const,
+      details: {
+        source: 'lcu',
+        data: lcuTimeline as unknown as GameTimeline
+      } as const,
+      puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
+    }
+  }
+
+  return {
+    summary: {
+      source: 'sgp',
+      data: sgpGameData as unknown as SgpGameSummaryLol
+    } as const,
+    details: {
+      source: 'sgp',
+      data: sgpTimeline as unknown as SgpGameDetailsLol
+    } as const,
+    puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
+  }
+})
+
+const mockData2 = computed(() => {
+  if (selectedDataType.value === 'lcu') {
+    return {
+      summary: {
+        source: 'lcu',
+        data: lcuRankSummary as unknown as Game
+      } as const,
+      details: {
+        source: 'lcu',
+        data: lcuRankTimeline as unknown as GameTimeline
+      } as const,
+      puuid: 'ac39ac3a-b873-5667-b70f-096bf1b28241'
+    }
+  }
+
+  return {
+    summary: {
+      source: 'sgp',
+      data: sgpRankSummary as unknown as SgpGameSummaryLol
+    } as const,
+    details: {
+      source: 'sgp',
+      data: sgpRankTimeline as unknown as SgpGameDetailsLol
+    } as const,
+    puuid: 'ac39ac3a-b873-5667-b70f-096bf1b28241'
+  }
 })
 </script>
 

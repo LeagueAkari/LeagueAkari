@@ -417,7 +417,7 @@
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKp') }}</span>
                   <span class="stat-item-content"
                     >{{
-                      (analysis.matchHistory.summary.averageKillParticipationRate * 100).toFixed()
+                      (analysis.matchHistory.summary.averageKillParticipation * 100).toFixed()
                     }}%</span
                   >
                 </div>

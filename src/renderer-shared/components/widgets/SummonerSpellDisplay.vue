@@ -61,33 +61,34 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style scoped>
-.cooldown,
-.description,
-.level {
-  font-size: 12px;
-}
+@layer shortcuts {
+  .cooldown,
+  .description,
+  .level {
+    font-size: 12px;
+  }
 
-.cooldown,
-.level {
-  font-style: italic;
-}
+  .cooldown,
+  .level {
+    font-style: italic;
+  }
 
-.level {
-  margin-bottom: 2px;
-}
+  .level {
+    margin-bottom: 2px;
+  }
 
-.name {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 2px;
-}
+  .name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
 
-.spell {
-  border-radius: 2px;
-}
+  .spell {
+    border-radius: 2px;
+  }
 
-.empty {
-  border-radius: 2px;
-  background-color: rgb(34, 34, 34);
+  .empty {
+    --at-apply: 'dark:bg-black/20 bg-gray/40 rounded-xs';
+  }
 }
 </style>

@@ -125,7 +125,7 @@ export interface MatchHistoryGamesAnalysis {
   towerDamageShareOfTeam: number
 
   // KDA 系列
-  killParticipationRate: number
+  killParticipation: number
   kda: number
   kd: number
 
@@ -197,7 +197,7 @@ export interface MatchHistoryGamesAnalysisSummary {
   averageMagicDamageTakenShareOfTeam: number
   averageTrueDamageTakenShareOfTeam: number
 
-  averageKillParticipationRate: number
+  averageKillParticipation: number
   averageKda: number
   averageKd: number
   kdaCv: number
@@ -415,7 +415,7 @@ export function analyzeMatchHistory(
       healingShareOfTeam: 0,
 
       // KDA 系列
-      killParticipationRate: 0,
+      killParticipation: 0,
 
       kda: (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1),
       kd: watashi.stats.kills / (watashi.stats.deaths || 1),
@@ -624,8 +624,7 @@ export function analyzeMatchHistory(
     gameAnalysis.healingShareToTop = watashi.stats.totalHeal / (maxHealing || 1)
     gameAnalysis.healingShareOfTeam = watashi.stats.totalHeal / (totalHealing || 1)
 
-    gameAnalysis.killParticipationRate =
-      (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
+    gameAnalysis.killParticipation = (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
 
     gameAnalysis.csShareToTop =
       (watashi.stats.totalMinionsKilled + watashi.stats.neutralMinionsKilled) / (maxCs || 1)
@@ -747,7 +746,7 @@ export function analyzeMatchHistory(
     averageMagicDamageTakenShareOfTeam: 0,
     averageTrueDamageTakenShareOfTeam: 0,
 
-    averageKillParticipationRate: 0,
+    averageKillParticipation: 0,
     averageKda: 0,
     averageKd: 0,
     kdaCv: 0,
@@ -869,7 +868,7 @@ export function analyzeMatchHistory(
     totalMagicDamageTakenOfTeam += analysis.magicDamageTakenShareOfTeam
     totalTrueDamageTakenOfTeam += analysis.trueDamageTakenShareOfTeam
 
-    totalKillParticipationRate += analysis.killParticipationRate
+    totalKillParticipationRate += analysis.killParticipation
 
     summary.totalKills += analysis.kills
     summary.totalDeaths += analysis.deaths
@@ -956,7 +955,7 @@ export function analyzeMatchHistory(
   summary.averageTrueDamageTakenShareOfTeam =
     totalTrueDamageTakenOfTeam / (gameAnalyses.length || 1)
 
-  summary.averageKillParticipationRate = totalKillParticipationRate / (gameAnalyses.length || 1)
+  summary.averageKillParticipation = totalKillParticipationRate / (gameAnalyses.length || 1)
 
   summary.averageKda = (summary.totalKills + summary.totalAssists) / (summary.totalDeaths || 1)
   summary.averageKd = summary.totalKills / (summary.totalDeaths || 1)
@@ -1079,7 +1078,7 @@ export function calculateAkariScore(analyses: {
     analyses.summary.averageCsPerMinute *
     Math.max(Math.min(0.04 * analyses.summary.averageCsPerMinute, 0.4), 0.1)
   const goldScore = analyses.summary.averageGoldShareToTop * 4.0
-  const participationScore = analyses.summary.averageKillParticipationRate * 4
+  const participationScore = analyses.summary.averageKillParticipation * 4
 
   const total =
     kdaScore + winRateScore + dmgScore + dmgTakenScore + csScore + goldScore + participationScore

@@ -1008,7 +1008,8 @@ export class LeagueClientData {
       'queues',
       'summonerSpells',
       'augments',
-      'gameModeMutators'
+      'gameModeMutators',
+      'maps'
     ])
 
     const loadSummonerSpells = async () => {
@@ -1129,6 +1130,21 @@ export class LeagueClientData {
       }
     }
 
+    const loadMaps = async () => {
+      try {
+        const maps = (await this._context.lc.api.gameData.getMaps()).data
+        this.gameData.setMaps(
+          maps.reduce((prev, cur) => {
+            prev[cur.id] = cur
+            return prev
+          }, {})
+        )
+      } catch (error) {
+        this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-maps')
+        this._context.log.warn(`Failed to get maps`, error)
+      }
+    }
+
     const loadGameModeMutators = async () => {
       try {
         const gameModeMutators = (await this._context.lc.api.gameData.getGameModeMutators()).data
@@ -1160,6 +1176,7 @@ export class LeagueClientData {
     this._stateInitializer.register('game-data-game-mode-mutators', loadGameModeMutators, {
       group: 'game-data'
     })
+    this._stateInitializer.register('game-data-maps', loadMaps, { group: 'game-data' })
 
     this._onLcuNotConnected(() => {
       // NO NEED TO CLEAR

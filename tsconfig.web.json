@@ -14,7 +14,8 @@
     "src/renderer/src-cd-timer-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
-    "src/renderer-shared/**/*"
+    "src/renderer-shared/**/*",
+    "uno.config.*"
   ],
   "compilerOptions": {
     "target": "ESNext",

@@ -88,83 +88,86 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style scoped>
-.info {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
+@layer shortcuts {
+  .info {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
 
-  .image {
-    width: 28px;
-    height: 28px;
+    .image {
+      width: 28px;
+      height: 28px;
+      border-radius: 2px;
+    }
+
+    .right-side {
+      margin-left: 8px;
+
+      .name {
+        font-size: 12px;
+        line-height: 12px;
+        font-weight: bold;
+        margin-bottom: 2px;
+      }
+
+      .price {
+        font-size: 12px;
+        line-height: 12px;
+      }
+    }
+  }
+
+  .from {
+    margin-bottom: 4px;
+
+    &::before {
+      content: '=';
+    }
+  }
+
+  .to {
+    margin-bottom: 8px;
+
+    &::before {
+      content: '⇒';
+    }
+  }
+
+  .from,
+  .to {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    max-width: 460px;
+    flex-wrap: wrap;
+
+    .image {
+      width: 20px;
+      height: 20px;
+      border-radius: 2px;
+    }
+
+    &::before {
+      font-size: 12px;
+      font-style: italic;
+      color: rgb(168, 168, 168);
+      margin-right: 4px;
+    }
+  }
+
+  .item.trinket,
+  .trinket.empty {
+    border-radius: 50%;
+  }
+
+  .item,
+  .item.empty {
+    flex-shrink: 0;
     border-radius: 2px;
   }
 
-  .right-side {
-    margin-left: 8px;
-
-    .name {
-      font-size: 12px;
-      line-height: 12px;
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-
-    .price {
-      font-size: 12px;
-      line-height: 12px;
-    }
+  .empty {
+    --at-apply: 'dark:bg-black/20 bg-gray/40';
   }
-}
-
-.from {
-  margin-bottom: 4px;
-
-  &::before {
-    content: '=';
-  }
-}
-
-.to {
-  margin-bottom: 8px;
-
-  &::before {
-    content: '⇒';
-  }
-}
-
-.from,
-.to {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  max-width: 460px;
-  flex-wrap: wrap;
-
-  .image {
-    width: 20px;
-    height: 20px;
-    border-radius: 2px;
-  }
-
-  &::before {
-    font-size: 12px;
-    font-style: italic;
-    color: rgb(168, 168, 168);
-    margin-right: 4px;
-  }
-}
-
-.item.trinket,
-.trinket.empty {
-  border-radius: 50%;
-}
-
-.item,
-.item.empty {
-  border-radius: 2px;
-}
-
-.empty {
-  background-color: rgb(34, 34, 34);
 }
 </style>

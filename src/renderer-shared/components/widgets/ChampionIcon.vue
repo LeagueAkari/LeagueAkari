@@ -9,7 +9,7 @@
     />
     <div
       v-if="ring"
-      class="ring"
+      class="champion-icon-ring"
       :class="{ round: round }"
       :style="{
         borderColor: ringColor || '#2a947d',
@@ -51,49 +51,52 @@ const imageSource = computed(() => {
 </script>
 
 <style scoped>
-.champion-icon-container {
-  position: relative;
-  overflow: hidden;
+@layer shortcuts {
+  .champion-icon-container {
+    position: relative;
+    overflow: hidden;
 
-  .plain-img {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+    .plain-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
-  /*  default size */
-  width: 64px;
-  height: 64px;
-
-  &.round {
-    border-radius: 50%;
-  }
-
-  .champion-icon {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .champion-icon-stretched {
-    width: 112%;
-    height: 112%;
-  }
-
-  .ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-style: solid;
-    box-sizing: border-box;
+    /*  default size */
+    width: 64px;
+    height: 64px;
 
     &.round {
       border-radius: 50%;
+    }
+
+    .champion-icon {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: none;
+    }
+
+    .champion-icon-stretched {
+      width: 112%;
+      height: 112%;
+    }
+
+    .champion-icon-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-style: solid;
+      box-sizing: border-box;
+
+      &.round {
+        border-radius: 50%;
+      }
     }
   }
 }

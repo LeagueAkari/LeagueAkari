@@ -7,6 +7,7 @@ import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
   Augment,
   ChampionSimple,
+  GameMap,
   GameModeMutator,
   Item,
   Perk,
@@ -63,6 +64,17 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   })
 
   const gameData = {
+    // utils
+    championName: (id: number) => {
+      return gameData.champions.value[id]?.name || id.toString()
+    },
+    queueName: (id: number) => {
+      return gameData.queues.value[id]?.name || id.toString()
+    },
+    mapName: (id: number) => {
+      return gameData.maps.value[id]?.name || id.toString()
+    },
+
     champions: shallowRef<Record<number, ChampionSimple>>({}),
     augments: shallowRef<Record<number, Augment>>({}),
     perks: shallowRef<Record<number, Perk>>({}),
@@ -76,7 +88,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     queues: shallowRef<Record<number, Queue>>({}),
     items: shallowRef<Record<number, Item>>({}),
     summonerSpells: shallowRef<Record<number, SummonerSpell>>({}),
-    gameModeMutators: shallowRef<Record<number, GameModeMutator>>({})
+    gameModeMutators: shallowRef<Record<number, GameModeMutator>>({}),
+    maps: shallowRef<Record<number, GameMap>>({})
   } as const
 
   const champSelect = {

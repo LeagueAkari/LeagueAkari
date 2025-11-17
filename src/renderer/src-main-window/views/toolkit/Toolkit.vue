@@ -1,6 +1,6 @@
 <template>
   <div class="toolkit-page">
-    <div class="sections">
+    <div class="page-sections">
       <div class="section-icon-container">
         <NIcon class="section-icon"><ToolFilledIcon /></NIcon>
         <span class="session-label">{{ t('Toolkit.title') }}</span>
@@ -15,7 +15,7 @@
         </NTab>
       </NTabs>
     </div>
-    <div class="contents">
+    <div class="page-contents">
       <Transition :name="transitionType">
         <KeepAlive>
           <Client v-if="currentTab === 'client'" />
@@ -149,13 +149,13 @@ watch(
   flex-direction: column;
   height: 100%;
 
-  .sections {
+  .page-sections {
     display: flex;
     padding: 0 24px;
     align-items: flex-end;
   }
 
-  .contents {
+  .page-contents {
     position: relative;
     flex: 1;
     height: 0;
@@ -186,7 +186,7 @@ watch(
 
 [data-theme='dark'] {
   .toolkit-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
   }
@@ -198,7 +198,7 @@ watch(
 
 [data-theme='light'] {
   .toolkit-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
   }

@@ -7,6 +7,7 @@ import { AxiosInstance } from 'axios'
 import { Readable } from 'stream'
 
 import { SgpRegionParam } from './dto'
+import { URL_PLACEHOLDER_SUB_ID } from './patterns'
 
 export interface MatchHistoryQueryParams extends SgpRegionParam {
   startIndex?: number
@@ -38,7 +39,7 @@ export class MatchHistoryQueryHttpApi {
 
   getGameSummaryByGameId(gameId: number, options: SgpRegionParam) {
     return this._http.get<SgpGameSummaryLol>(
-      `/match-history-query/v1/products/lol/{akari:sgpServerSubId}_${gameId}/SUMMARY`,
+      `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/SUMMARY`,
       {
         headers: {
           'X-Akari-Sgp-Server-Id': options.__sgpServerId,
@@ -50,7 +51,7 @@ export class MatchHistoryQueryHttpApi {
 
   getGameDetailsByGameId(gameId: number, options: SgpRegionParam) {
     return this._http.get<SgpGameDetailsLol>(
-      `/match-history-query/v1/products/lol/{akari:sgpServerSubId}_${gameId}/DETAILS`,
+      `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/DETAILS`,
       {
         headers: {
           'X-Akari-Sgp-Server-Id': options.__sgpServerId,
@@ -62,7 +63,7 @@ export class MatchHistoryQueryHttpApi {
 
   getMatchHistoryReplayStreamByGameId(gameId: number, options: SgpRegionParam) {
     return this._http.get<Readable>(
-      `/match-history-query/v3/product/lol/matchId/{akari:sgpServerSubId}_${gameId}/infoType/replay`,
+      `/match-history-query/v3/product/lol/matchId/${URL_PLACEHOLDER_SUB_ID}_${gameId}/infoType/replay`,
       {
         headers: {
           'X-Akari-Sgp-Server-Id': options.__sgpServerId,

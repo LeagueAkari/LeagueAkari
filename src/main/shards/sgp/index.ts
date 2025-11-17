@@ -5,7 +5,7 @@ import {
   AKARI_HEADER_SGP_SERVER_ID,
   AKARI_HEADER_TOKEN_TYPE,
   URL_PLACEHOLDER_SUB_ID
-} from '@shared/http-api-axios-helper/sgp'
+} from '@shared/http-api-axios-helper/sgp/patterns'
 import { isInActiveGame } from '@shared/types/league-client/gameflow'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosRequestConfig, isAxiosError } from 'axios'
@@ -620,7 +620,8 @@ export class SgpMain implements IAkariShardInitDispose {
   private _initHttpInstance() {
     this._http.interceptors.request.use((config) => {
       const preferredSgpServerId =
-        config.headers[AKARI_HEADER_SGP_SERVER_ID] || this.state.availability.sgpServerId
+        (config.headers.get(AKARI_HEADER_SGP_SERVER_ID) as string | null) ||
+        this.state.availability.sgpServerId
 
       if (config.url) {
         config.url = config.url.replace(
@@ -629,7 +630,7 @@ export class SgpMain implements IAkariShardInitDispose {
         )
       }
 
-      const requiredTokenType = config.headers[AKARI_HEADER_TOKEN_TYPE]
+      const requiredTokenType = config.headers.get(AKARI_HEADER_TOKEN_TYPE) as string | null
 
       if (requiredTokenType) {
         const token = this._getToken(requiredTokenType)
@@ -638,7 +639,7 @@ export class SgpMain implements IAkariShardInitDispose {
           throw new Error(`Token not found for type: ${requiredTokenType}`)
         }
 
-        config.headers['Authorization'] = `Bearer ${token}`
+        config.headers.setAuthorization(`Bearer ${token}`)
       }
 
       const serverConfig = this.state.sgpServerConfig.servers[preferredSgpServerId]
@@ -657,6 +658,8 @@ export class SgpMain implements IAkariShardInitDispose {
       }
 
       config.baseURL = baseUrl
+      config.headers.delete(AKARI_HEADER_SGP_SERVER_ID)
+      config.headers.delete(AKARI_HEADER_TOKEN_TYPE)
 
       return config
     })

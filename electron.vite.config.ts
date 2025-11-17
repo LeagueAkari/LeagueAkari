@@ -1,5 +1,6 @@
 import yaml from '@modyfi/vite-plugin-yaml'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import { bytecodePlugin, defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import unoCSS from 'unocss/vite'
@@ -92,7 +93,8 @@ export default defineConfig({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       }),
       unoCSS(),
-      vueDevTools()
+      vueDevTools(),
+      vueJsx({})
     ],
     build: {
       minify,

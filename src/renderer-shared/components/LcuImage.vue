@@ -38,14 +38,13 @@ const handleError = () => {
 </script>
 
 <style scoped>
-.lcu-image {
-  display: block;
-}
+@layer shortcuts {
+  .lcu-image {
+    display: block;
+  }
 
-.lcu-image-placeholder {
-  border: 1px solid #fff2;
-  background-color: #0006;
-  border-radius: 4px;
-  box-sizing: border-box;
+  .lcu-image-placeholder {
+    --at-apply: 'dark:bg-black/20 bg-gray/40 box-border rounded';
+  }
 }
 </style>

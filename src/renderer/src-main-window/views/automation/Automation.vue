@@ -1,6 +1,6 @@
 <template>
   <div class="automation-page">
-    <div class="sections">
+    <div class="page-sections">
       <div class="section-icon-container">
         <NIcon class="section-icon"><AiStatusIcon /></NIcon>
         <span class="session-label">{{ t('Automation.title') }}</span>
@@ -15,7 +15,7 @@
         </NTab>
       </NTabs>
     </div>
-    <div class="contents">
+    <div class="page-contents">
       <Transition :name="transitionType">
         <KeepAlive>
           <AutoGameflow v-if="currentTab === 'auto-gameflow'" />
@@ -119,18 +119,20 @@ watch(
 </script>
 
 <style scoped>
+@import './automation-styles.css';
+
 .automation-page {
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  .sections {
+  .page-sections {
     display: flex;
     padding: 0 24px;
     align-items: flex-end;
   }
 
-  .contents {
+  .page-contents {
     position: relative;
     flex: 1;
     height: 0;
@@ -161,7 +163,7 @@ watch(
 
 [data-theme='dark'] {
   .automation-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
   }
@@ -173,7 +175,7 @@ watch(
 
 [data-theme='light'] {
   .automation-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
   }

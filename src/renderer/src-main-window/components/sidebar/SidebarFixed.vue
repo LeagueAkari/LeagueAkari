@@ -247,6 +247,7 @@ watch(
       transition:
         width 0.2s,
         height 0.2s;
+      max-width: none;
 
       .collapsed & {
         width: 24px;

@@ -1,5 +1,3 @@
-@import '@renderer-shared/assets/css/reset.css';
-
 ::selection {
   background: #c0c0c050;
   text-shadow: none;

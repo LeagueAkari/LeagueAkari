@@ -362,7 +362,7 @@ const handlePlayAgain = async () => {
   padding: 8px 12px;
   transition: background-color 0.2s ease-in-out;
   box-shadow: 0 0 2px 2px #0002;
-  width: 200px;
+  width: 222px;
   background-color: rgba(0, 0, 0, 0.05);
 
   [data-theme='dark'] & {

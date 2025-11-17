@@ -7,7 +7,7 @@ import { StatsHttpApi } from './stats'
 import { SummonerLedgeHttpApi } from './summoner-ledge'
 
 /**
- * 注意：可以注意到部分 API 使用占位符 `{akari:sgpServerSubId}` 来表示所属子区，这实际上专属于 League Akari 的抽象层
+ * 注意：可以注意到部分 API 使用占位符 `@akari:sgpServerSubId@` 来表示所属子区，这实际上专属于 League Akari 的抽象层
  *
  * 它用于处理一个区域服务器包含若干子服务器，且 SGP API 又要求传入子区 ID 的情况
  *
@@ -28,7 +28,3 @@ export class SgpHttpApiAxiosHelper {
     this.summonerLedge = new SummonerLedgeHttpApi(this._http)
   }
 }
-
-export const URL_PLACEHOLDER_SUB_ID = '{akari:sgpServerSubId}'
-export const AKARI_HEADER_SGP_SERVER_ID = 'X-Akari-Sgp-Server-Id'
-export const AKARI_HEADER_TOKEN_TYPE = 'X-Akari-Token-Type'

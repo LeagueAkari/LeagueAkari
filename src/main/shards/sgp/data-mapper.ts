@@ -65,38 +65,61 @@ export function mapSgpGameDetailsToLcu0Format(bData: SgpGameDetailsLol): GameTim
   return {
     frames: bData.json.frames.map((frame) => ({
       timestamp: frame.timestamp,
-      events: frame.events.map((event) => ({
-        // A 的 Event 字段：
-        assistingParticipantIds: event.assistingParticipantIds ?? [],
-        buildingType: event.buildingType ?? '',
-        itemId: event.itemId ?? 0,
-        killerId: event.killerId ?? 0,
-        laneType: event.laneType ?? '',
-        monsterSubType: event.monsterSubType ?? '',
-        monsterType: event.monsterType ?? '',
-        participantId: event.participantId ?? 0,
-        position: event.position ?? { x: 0, y: 0 },
-        skillSlot: event.skillSlot ?? 0,
-        teamId: event.teamId ?? 0,
-        timestamp: event.timestamp,
-        towerType: event.towerType ?? '',
-        type: event.type ?? '',
-        victimId: event.victimId ?? 0
-      })),
+      events: frame.events
+        .filter((event) => event.type === 'CHAMPION_KILL' || event.type === 'BUILDING_KILL')
+        .map((event) => {
+          if (event.type === 'CHAMPION_KILL') {
+            return {
+              type: 'CHAMPION_KILL' as const,
+              timestamp: event.timestamp,
+              position: event.position,
+              participantId: 0,
+              killerId: event.killerId,
+              victimId: event.victimId,
+              assistingParticipantIds: event.assistingParticipantIds,
+              skillSlot: 0,
+              teamId: 0,
+              itemId: 0,
+              buildingType: '',
+              towerType: '',
+              laneType: '',
+              monsterType: '',
+              monsterSubType: ''
+            }
+          } else {
+            return {
+              type: 'BUILDING_KILL' as const,
+              timestamp: event.timestamp,
+              position: event.position,
+              participantId: 0,
+              killerId: event.killerId,
+              victimId: 0,
+              assistingParticipantIds: event.assistingParticipantIds,
+              buildingType: event.buildingType,
+              towerType: event.towerType ?? '',
+              laneType: event.laneType ?? '',
+              teamId: event.teamId,
+              skillSlot: 0,
+              itemId: 0,
+              monsterType: '',
+              monsterSubType: ''
+            }
+          }
+        }),
       participantFrames: Object.fromEntries(
         Object.values(frame.participantFrames).map((pf) => [
           pf.participantId,
           {
-            currentGold: pf.currentGold ?? 0,
-            dominionScore: 0, // B 中无对应数据，设为默认值
-            jungleMinionsKilled: pf.jungleMinionsKilled ?? 0,
-            level: pf.level ?? 0,
-            minionsKilled: pf.minionsKilled ?? 0,
             participantId: pf.participantId,
-            position: pf.position ?? { x: 0, y: 0 },
-            teamScore: 0, // B 中无对应数据，设为默认值
+            currentGold: pf.currentGold ?? 0,
             totalGold: pf.totalGold ?? 0,
-            xp: pf.xp ?? 0
+            level: pf.level ?? 0,
+            xp: pf.xp ?? 0,
+            minionsKilled: pf.minionsKilled ?? 0,
+            jungleMinionsKilled: pf.jungleMinionsKilled ?? 0,
+            dominionScore: 0,
+            teamScore: 0,
+            position: pf.position ?? { x: 0, y: 0 }
           }
         ])
       )

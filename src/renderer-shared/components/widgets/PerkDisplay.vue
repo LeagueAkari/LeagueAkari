@@ -43,29 +43,31 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style scoped>
-.perk,
-.empty {
-  border-radius: 2px;
-}
-
-.info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-
-  .image {
+@layer shortcuts {
+  .perk,
+  .empty {
     border-radius: 2px;
-    height: 28px;
   }
 
-  .right-side {
-    margin-left: 8px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-}
+  .info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
 
-.empty {
-  background-color: rgb(34, 34, 34);
+    .image {
+      border-radius: 2px;
+      height: 28px;
+    }
+
+    .right-side {
+      margin-left: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+
+  .empty {
+    --at-apply: 'dark:bg-black/20 bg-gray/40';
+  }
 }
 </style>

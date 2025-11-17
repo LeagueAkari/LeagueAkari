@@ -29,13 +29,18 @@ export interface Game {
   queueId: number
   seasonId: number
   teams: Team[]
+  gameModeMutators: string[]
 }
 
 export interface Team {
-  bans: any[]
+  bans: {
+    championId: number
+    pickTurn: number
+  }[]
   baronKills: number
   dominionVictoryScore: number
   dragonKills: number
+  hordeKills: number
   firstBaron: boolean
   firstBlood: boolean
   firstDargon: boolean // LCU 接口中就是如此拼写，不知道是不是笔误
@@ -55,7 +60,7 @@ export interface Participant {
   participantId: number
   spell1Id: number
   spell2Id: number
-  stats: Stats & SgpFields
+  stats: Stats
   teamId: number
   timeline: Timeline
 }
@@ -110,12 +115,6 @@ export interface Stats {
   item4: number
   item5: number
   item6: number
-  playerAugment1: number
-  playerAugment2: number
-  playerAugment3: number
-  playerAugment4: number
-  playerAugment5: number
-  playerAugment6: number
   killingSprees: number
   kills: number
   largestCriticalStrike: number
@@ -160,6 +159,12 @@ export interface Stats {
   physicalDamageDealt: number
   physicalDamageDealtToChampions: number
   physicalDamageTaken: number
+  playerAugment1: number
+  playerAugment2: number
+  playerAugment3: number
+  playerAugment4: number
+  playerAugment5: number
+  playerAugment6: number
   playerScore0: number
   playerScore1: number
   playerScore2: number
@@ -170,6 +175,7 @@ export interface Stats {
   playerScore7: number
   playerScore8: number
   playerScore9: number
+  playerSubteamId: number
   quadraKills: number
   sightWardsBoughtInGame: number
   subteamPlacement: number
@@ -195,27 +201,6 @@ export interface Stats {
   wardsKilled: number
   wardsPlaced: number
   win: boolean
-  playerSubteamId: number
-}
-
-// 如果当前的战绩数据是从 SGP 转换得到的, 那么会有这些字段
-interface SgpFields {
-  individualPosition: string // "Invalid" or "TOP" or "JUNGLE" or "MIDDLE" or "BOTTOM" or "UTILITY"
-  lane: string
-  teamPosition: string
-  pushPings: number
-  visionClearedPings: number
-  allInPings: number
-  assistMePings: number
-  basicPings: number
-  commandPings: number
-  dangerPings: number
-  enemyMissingPings: number
-  enemyVisionPings: number
-  getBackPings: number
-  holdPings: number
-  needVisionPings: number
-  onMyWayPings: number
 }
 
 export interface ParticipantIdentity {
@@ -264,48 +249,74 @@ export function isPveQueue(queueId: number) {
   return pveQueues.has(queueId)
 }
 
-export interface GameTimeline {
-  frames: GameTimelineFrame[]
-}
-
-interface GameTimelineFrame {
-  events: Event[]
-  participantFrames: Record<number, ParticipantFrame>
-  timestamp: number
-}
-
-interface ParticipantFrame {
-  currentGold: number
-  dominionScore: number
-  jungleMinionsKilled: number
-  level: number
-  minionsKilled: number
-  participantId: number
-  position: Position
-  teamScore: number
-  totalGold: number
-  xp: number
-}
-
-interface Event {
-  assistingParticipantIds: number[]
-  buildingType: string
-  itemId: number
-  killerId: number
-  laneType: string
-  monsterSubType: string
-  monsterType: string
-  participantId: number
-  position: Position
-  skillSlot: number
-  teamId: number
-  timestamp: number
-  towerType: string
-  type: string
-  victimId: number
-}
-
-interface Position {
+export interface Position {
   x: number
   y: number
+}
+
+export type GameEventType = 'CHAMPION_KILL' | 'BUILDING_KILL'
+
+export interface BaseGameEvent {
+  type: GameEventType
+  timestamp: number
+  position: Position
+}
+
+export interface ChampionKillEvent extends BaseGameEvent {
+  type: 'CHAMPION_KILL'
+  participantId: number
+  killerId: number
+  victimId: number
+  assistingParticipantIds: number[]
+  skillSlot: number
+  teamId: number
+  itemId: number
+  buildingType: string
+  towerType: string
+  laneType: string
+  monsterType: string
+  monsterSubType: string
+}
+
+export interface BuildingKillEvent extends BaseGameEvent {
+  type: 'BUILDING_KILL'
+  participantId: number
+  killerId: number
+  victimId: number
+  assistingParticipantIds: number[]
+  buildingType: string
+  towerType: string
+  laneType: string
+  teamId: number
+  skillSlot: number
+  itemId: number
+  monsterType: string
+  monsterSubType: string
+}
+
+export type GameEvent = ChampionKillEvent | BuildingKillEvent
+
+export interface ParticipantFrame {
+  participantId: number
+  currentGold: number
+  totalGold: number
+  level: number
+  xp: number
+  minionsKilled: number
+  jungleMinionsKilled: number
+  dominionScore: number
+  teamScore: number
+  position: Position
+}
+
+export type ParticipantFrames = Record<string, ParticipantFrame>
+
+export interface TimelineFrame {
+  timestamp: number
+  events: GameEvent[]
+  participantFrames: ParticipantFrames
+}
+
+export interface GameTimeline {
+  frames: TimelineFrame[]
 }

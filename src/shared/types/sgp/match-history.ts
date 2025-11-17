@@ -37,7 +37,7 @@ export interface Team {
   win: boolean
 }
 
-interface Objectives {
+export interface Objectives {
   baron: Baron
   champion: Baron
   dragon: Baron
@@ -45,6 +45,7 @@ interface Objectives {
   inhibitor: Baron
   riftHerald: Baron
   tower: Baron
+  atakhan: Baron
 }
 
 interface Baron {
@@ -52,52 +53,109 @@ interface Baron {
   kills: number
 }
 
-interface Ban {
+export interface Ban {
   championId: number
   pickTurn: number
 }
 
 export interface SgpParticipantLol {
+  PlayerScore0: number
+  PlayerScore1: number
+  PlayerScore2: number
+  PlayerScore3: number
+  PlayerScore4: number
+  PlayerScore5: number
+  PlayerScore6: number
+  PlayerScore7: number
+  PlayerScore8: number
+  PlayerScore9: number
+  PlayerScore10: number
+  PlayerScore11: number
+
+  // Ping 数据
   allInPings: number
   assistMePings: number
+  basicPings: number
+  commandPings: number
+  dangerPings: number
+  enemyMissingPings: number
+  enemyVisionPings: number
+  getBackPings: number
+  holdPings: number
+  needVisionPings: number
+  onMyWayPings: number
+  pushPings: number
+  retreatPings: number
+  visionClearedPings: number
+
+  // 基础统计
   assists: number
   baronKills: number
-  basicPings: number
-  bountyLevel: number
-  challenges: Challenges
   champExperience: number
   champLevel: number
   championId: number
   championName: string
   championTransform: number
-  commandPings: number
   consumablesPurchased: number
-  damageDealtToBuildings: number
-  damageDealtToObjectives: number
-  damageDealtToTurrets: number
-  damageSelfMitigated: number
-  dangerPings: number
   deaths: number
   detectorWardsPlaced: number
   doubleKills: number
   dragonKills: number
   eligibleForProgression: boolean
-  enemyMissingPings: number
-  enemyVisionPings: number
+
+  // 布尔值字段
   firstBloodAssist: boolean
   firstBloodKill: boolean
   firstTowerAssist: boolean
   firstTowerKill: boolean
   gameEndedInEarlySurrender: boolean
   gameEndedInSurrender: boolean
-  getBackPings: number
+  teamEarlySurrendered: boolean
+  win: boolean
+
+  // 金币相关
   goldEarned: number
   goldSpent: number
-  holdPings: number
-  individualPosition: string
+
+  // 伤害统计
+  damageDealtToBuildings: number
+  damageDealtToEpicMonsters: number
+  damageDealtToObjectives: number
+  damageDealtToTurrets: number
+  damageSelfMitigated: number
+  largestCriticalStrike: number
+  magicDamageDealt: number
+  magicDamageDealtToChampions: number
+  magicDamageTaken: number
+  physicalDamageDealt: number
+  physicalDamageDealtToChampions: number
+  physicalDamageTaken: number
+  totalDamageDealt: number
+  totalDamageDealtToChampions: number
+  totalDamageShieldedOnTeammates: number
+  totalDamageTaken: number
+  trueDamageDealt: number
+  trueDamageDealtToChampions: number
+  trueDamageTaken: number
+
+  // 建筑相关
   inhibitorKills: number
   inhibitorTakedowns: number
   inhibitorsLost: number
+  nexusKills: number
+  nexusLost: number
+  nexusTakedowns: number
+  turretKills: number
+  turretTakedowns: number
+  turretsLost: number
+
+  // 位置和角色
+  individualPosition: string
+  lane: string
+  role: string
+  teamPosition: string
+
+  // 装备
   item0: number
   item1: number
   item2: number
@@ -106,93 +164,85 @@ export interface SgpParticipantLol {
   item5: number
   item6: number
   itemsPurchased: number
-  killingSprees: number
+
+  // 击杀统计
   kills: number
-  lane: string
-  largestCriticalStrike: number
+  killingSprees: number
   largestKillingSpree: number
   largestMultiKill: number
-  longestTimeSpentLiving: number
-  magicDamageDealt: number
-  magicDamageDealtToChampions: number
-  magicDamageTaken: number
-  missions: SgpMissions
-  needVisionPings: number
+  pentaKills: number
+  quadraKills: number
+  tripleKills: number
+  unrealKills: number
+
+  // 小兵和野怪
   neutralMinionsKilled: number
-  nexusKills: number
-  nexusLost: number
-  nexusTakedowns: number
+  totalAllyJungleMinionsKilled: number
+  totalEnemyJungleMinionsKilled: number
+  totalMinionsKilled: number
+
+  // 目标相关
   objectivesStolen: number
   objectivesStolenAssists: number
-  onMyWayPings: number
+
+  // 玩家信息
   participantId: number
-  pentaKills: number
-  perks: Perks
-  physicalDamageDealt: number
-  physicalDamageDealtToChampions: number
-  physicalDamageTaken: number
   placement: number
+  playerSubteamId: number
+  profileIcon: number
+  puuid: string
+  riotIdGameName: string
+  riotIdTagline: string
+  subteamPlacement: number
+  summonerId: number
+  summonerLevel: number
+  summonerName: string
+  teamId: number
+
+  // 强化符文（特殊模式）
   playerAugment1: number
   playerAugment2: number
   playerAugment3: number
   playerAugment4: number
   playerAugment5: number
   playerAugment6: number
-  playerSubteamId: number
-  profileIcon: number
-  pushPings: number
-  puuid: string
-  quadraKills: number
-  riotIdGameName: string
-  riotIdTagline: string
-  role: string
+
+  // 守卫相关
   sightWardsBoughtInGame: number
+  visionScore: number
+  visionWardsBoughtInGame: number
+  wardsKilled: number
+  wardsPlaced: number
+
+  // 召唤师技能
   spell1Casts: number
   spell1Id: number
   spell2Casts: number
   spell2Id: number
   spell3Casts: number
   spell4Casts: number
-  subteamPlacement: number
   summoner1Casts: number
   summoner2Casts: number
-  summonerId: number
-  summonerLevel: number
-  summonerName: string
-  teamEarlySurrendered: boolean
-  teamId: number
-  teamPosition: string
+
+  // 时间相关
+  longestTimeSpentLiving: number
   timeCCingOthers: number
   timePlayed: number
-  totalAllyJungleMinionsKilled: number
-  totalDamageDealt: number
-  totalDamageDealtToChampions: number
-  totalDamageShieldedOnTeammates: number
-  totalDamageTaken: number
-  totalEnemyJungleMinionsKilled: number
-  totalHeal: number
-  totalHealsOnTeammates: number
-  totalMinionsKilled: number
   totalTimeCCDealt: number
   totalTimeSpentDead: number
+
+  // 治疗相关
+  totalHeal: number
+  totalHealsOnTeammates: number
   totalUnitsHealed: number
-  tripleKills: number
-  trueDamageDealt: number
-  trueDamageDealtToChampions: number
-  trueDamageTaken: number
-  turretKills: number
-  turretTakedowns: number
-  turretsLost: number
-  unrealKills: number
-  visionClearedPings: number
-  visionScore: number
-  visionWardsBoughtInGame: number
-  wardsKilled: number
-  wardsPlaced: number
-  win: boolean
+
+  // 复杂对象
+  challenges: Challenges
+  missions: SgpMissions
+  perks: Perks
 }
 
-interface Perks {
+export interface Perks {
   statPerks: SgpStatPerks
   styles: Style[]
 }
@@ -239,138 +289,135 @@ export interface SgpMissions {
 }
 
 interface Challenges {
-  '12AssistStreakCount': number
-  InfernalScalePickup: number
-  abilityUses: number
-  acesBefore15Minutes: number
-  alliedJungleMonsterKills: number
-  baronTakedowns: number
-  blastConeOppositeOpponentCount: number
-  bountyGold: number
-  buffsStolen: number
-  completeSupportQuestInTime: number
-  controlWardsPlaced: number
-  damagePerMinute: number
-  damageTakenOnTeamPercentage: number
-  dancedWithRiftHerald: number
-  deathsByEnemyChamps: number
-  dodgeSkillShotsSmallWindow: number
-  doubleAces: number
-  dragonTakedowns: number
+  '12AssistStreakCount'?: number
+  HealFromMapSources?: number
+  InfernalScalePickup?: number
+  SWARM_DefeatAatrox?: number
+  SWARM_DefeatBriar?: number
+  SWARM_DefeatMiniBosses?: number
+  SWARM_EvolveWeapon?: number
+  SWARM_Have3Passives?: number
+  SWARM_KillEnemy?: number
+  SWARM_PickupGold?: number
+  SWARM_ReachLevel50?: number
+  SWARM_Survive15Min?: number
+  SWARM_WinWith5EvolvedWeapons?: number
+  abilityUses?: number
+  acesBefore15Minutes?: number
+  alliedJungleMonsterKills?: number
+  baronTakedowns?: number
+  blastConeOppositeOpponentCount?: number
+  bountyGold?: number
+  buffsStolen?: number
+  completeSupportQuestInTime?: number
+  controlWardsPlaced?: number
+  damagePerMinute?: number
+  damageTakenOnTeamPercentage?: number
+  dancedWithRiftHerald?: number
+  deathsByEnemyChamps?: number
+  dodgeSkillShotsSmallWindow?: number
+  doubleAces?: number
+  dragonTakedowns?: number
   earlyLaningPhaseGoldExpAdvantage?: number
-  effectiveHealAndShielding: number
-  elderDragonKillsWithOpposingSoul: number
-  elderDragonMultikills: number
-  enemyChampionImmobilizations: number
-  enemyJungleMonsterKills: number
-  epicMonsterKillsNearEnemyJungler: number
-  epicMonsterKillsWithin30SecondsOfSpawn: number
-  epicMonsterSteals: number
-  epicMonsterStolenWithoutSmite: number
-  firstTurretKilled: number
-  fistBumpParticipation: number
-  flawlessAces: number
-  fullTeamTakedown: number
-  gameLength: number
-  getTakedownsInAllLanesEarlyJungleAsLaner?: number
-  goldPerMinute: number
-  hadOpenNexus: number
-  immobilizeAndKillWithAlly: number
-  initialBuffCount: number
-  initialCrabCount: number
-  jungleCsBefore10Minutes: number
-  junglerTakedownsNearDamagedEpicMonster: number
-  kTurretsDestroyedBeforePlatesFall: number
-  kda: number
-  killAfterHiddenWithAlly: number
-  killParticipation: number
-  killedChampTookFullTeamDamageSurvived: number
-  killingSprees: number
-  killsNearEnemyTurret: number
-  killsOnOtherLanesEarlyJungleAsLaner?: number
-  killsOnRecentlyHealedByAramPack: number
-  killsUnderOwnTurret: number
-  killsWithHelpFromEpicMonster: number
-  knockEnemyIntoTeamAndKill: number
-  landSkillShotsEarlyGame: number
-  laneMinionsFirst10Minutes: number
-  laningPhaseGoldExpAdvantage?: number
-  legendaryCount: number
-  legendaryItemUsed: (number | number)[]
-  lostAnInhibitor: number
-  maxCsAdvantageOnLaneOpponent?: number
-  maxKillDeficit: number
-  maxLevelLeadLaneOpponent?: number
-  mejaisFullStackInTime: number
-  moreEnemyJungleThanOpponent: number
-  multiKillOneSpell: number
-  multiTurretRiftHeraldCount: number
-  multikills: number
-  multikillsAfterAggressiveFlash: number
-  outerTurretExecutesBefore10Minutes: number
-  outnumberedKills: number
-  outnumberedNexusKill: number
-  perfectDragonSoulsTaken: number
-  perfectGame: number
-  pickKillWithAlly: number
-  playedChampSelectPosition?: number
-  poroExplosions: number
-  quickCleanse: number
-  quickFirstTurret: number
-  quickSoloKills: number
-  riftHeraldTakedowns: number
-  saveAllyFromDeath: number
-  scuttleCrabKills: number
-  skillshotsDodged: number
-  skillshotsHit: number
-  snowballsHit: number
-  soloBaronKills: number
-  soloKills: number
-  stealthWardsPlaced: number
-  survivedSingleDigitHpCount: number
-  survivedThreeImmobilizesInFight: number
-  takedownOnFirstTurret: number
-  takedowns: number
-  takedownsAfterGainingLevelAdvantage: number
-  takedownsBeforeJungleMinionSpawn: number
-  takedownsFirstXMinutes: number
-  takedownsInAlcove: number
-  takedownsInEnemyFountain: number
-  teamBaronKills: number
-  teamDamagePercentage: number
-  teamElderDragonKills: number
-  teamRiftHeraldKills: number
-  tookLargeDamageSurvived: number
-  turretPlatesTaken: number
-  turretTakedowns: number
-  turretsTakenWithRiftHerald: number
-  twentyMinionsIn3SecondsCount: number
-  twoWardsOneSweeperCount: number
-  unseenRecalls: number
-  visionScoreAdvantageLaneOpponent?: number
-  visionScorePerMinute: number
-  voidMonsterKill: number
-  wardTakedowns: number
-  wardTakedownsBefore20M: number
-  wardsGuarded: number
-  junglerKillsEarlyJungle?: number
-  killsOnLanersEarlyJungleAsJungler?: number
-  soloTurretsLategame?: number
-  controlWardTimeCoverageInRiverOrEnemyHalf?: number
-  fasterSupportQuestCompletion?: number
-  highestWardKills?: number
+  effectiveHealAndShielding?: number
+  elderDragonKillsWithOpposingSoul?: number
+  elderDragonMultikills?: number
+  enemyChampionImmobilizations?: number
+  enemyJungleMonsterKills?: number
+  epicMonsterKillsNearEnemyJungler?: number
+  epicMonsterKillsWithin30SecondsOfSpawn?: number
+  epicMonsterSteals?: number
+  epicMonsterStolenWithoutSmite?: number
+  firstTurretKilled?: number
   firstTurretKilledTime?: number
+  fistBumpParticipation?: number
+  flawlessAces?: number
+  fullTeamTakedown?: number
+  gameLength?: number
+  getTakedownsInAllLanesEarlyJungleAsLaner?: number
+  goldPerMinute?: number
+  hadOpenNexus?: number
   highestChampionDamage?: number
-  shortestTimeToAceFromFirstTakedown?: number
-  earliestDragonTakedown?: number
   highestCrowdControlScore?: number
-  baronBuffGoldAdvantageOverThreshold?: number
-  earliestBaron?: number
-  earliestElderDragon?: number
-  fastestLegendary?: number
-  thirdInhibitorDestroyedTime?: number
-  teleportTakedowns?: number
-  hadAfkTeammate?: number
+  immobilizeAndKillWithAlly?: number
+  initialBuffCount?: number
+  initialCrabCount?: number
+  jungleCsBefore10Minutes?: number
+  junglerTakedownsNearDamagedEpicMonster?: number
+  kTurretsDestroyedBeforePlatesFall?: number
+  kda?: number
+  killAfterHiddenWithAlly?: number
+  killParticipation?: number
+  killedChampTookFullTeamDamageSurvived?: number
+  killingSprees?: number
+  killsNearEnemyTurret?: number
+  killsOnOtherLanesEarlyJungleAsLaner?: number
+  killsOnRecentlyHealedByAramPack?: number
+  killsUnderOwnTurret?: number
+  killsWithHelpFromEpicMonster?: number
+  knockEnemyIntoTeamAndKill?: number
+  landSkillShotsEarlyGame?: number
+  laneMinionsFirst10Minutes?: number
+  laningPhaseGoldExpAdvantage?: number
+  legendaryCount?: number
+  legendaryItemUsed?: number
+  lostAnInhibitor?: number
+  maxCsAdvantageOnLaneOpponent?: number
+  maxKillDeficit?: number
+  maxLevelLeadLaneOpponent?: number
+  mejaisFullStackInTime?: number
+  moreEnemyJungleThanOpponent?: number
+  multiKillOneSpell?: number
+  multiTurretRiftHeraldCount?: number
+  multikills?: number
+  multikillsAfterAggressiveFlash?: number
+  outerTurretExecutesBefore10Minutes?: number
+  outnumberedKills?: number
+  outnumberedNexusKill?: number
+  perfectDragonSoulsTaken?: number
+  perfectGame?: number
+  pickKillWithAlly?: number
+  playedChampSelectPosition?: number
+  poroExplosions?: number
+  quickCleanse?: number
+  quickFirstTurret?: number
+  quickSoloKills?: number
+  riftHeraldTakedowns?: number
+  saveAllyFromDeath?: number
+  scuttleCrabKills?: number
+  shortestTimeToAceFromFirstTakedown?: number
+  skillshotsDodged?: number
+  skillshotsHit?: number
+  snowballsHit?: number
+  soloBaronKills?: number
+  soloKills?: number
+  stealthWardsPlaced?: number
+  survivedSingleDigitHpCount?: number
+  survivedThreeImmobilizesInFight?: number
+  takedownOnFirstTurret?: number
+  takedowns?: number
+  takedownsAfterGainingLevelAdvantage?: number
+  takedownsBeforeJungleMinionSpawn?: number
+  takedownsFirstXMinutes?: number
+  takedownsInAlcove?: number
+  takedownsInEnemyFountain?: number
+  teamBaronKills?: number
+  teamDamagePercentage?: number
+  teamElderDragonKills?: number
+  teamRiftHeraldKills?: number
+  tookLargeDamageSurvived?: number
+  turretPlatesTaken?: number
+  turretTakedowns?: number
+  turretsTakenWithRiftHerald?: number
+  twentyMinionsIn3SecondsCount?: number
+  twoWardsOneSweeperCount?: number
+  unseenRecalls?: number
+  visionScoreAdvantageLaneOpponent?: number
+  visionScorePerMinute?: number
+  voidMonsterKill?: number
+  wardTakedowns?: number
+  wardTakedownsBefore20M?: number
+  wardsGuarded?: number
 }
 
 export interface SgpGameMetadataLol {
@@ -386,65 +433,23 @@ export interface SgpGameMetadataLol {
 
 // Game Details
 
-export interface SgpGameDetailsLol {
-  metadata: SgpGameMetadataLol
-  json: SgpGameJsonDetailsLol
+interface Position {
+  x: number
+  y: number
 }
 
-interface SgpGameJsonDetailsLol {
-  endOfGameResult: string
-  frameInterval: number
-  frames: Frame[]
-  gameId: number
-  participants: Participant[]
+interface Metadata {
+  product: string
+  tags: string[]
+  participants: string[]
+  timestamp: string
+  data_version: string
+  info_type: string
+  match_id: string
+  private: boolean
 }
 
-interface Participant {
-  participantId: number
-  puuid: string
-}
-
-interface Frame {
-  events: Event[]
-  participantFrames: ParticipantFrames
-  timestamp: number
-}
-
-interface ParticipantFrames {
-  [key: string]: ParticipantFrame
-}
-
-interface ParticipantFrame {
-  championStats: ChampionStats
-  currentGold: number
-  damageStats: DamageStats
-  goldPerSecond: number
-  jungleMinionsKilled: number
-  level: number
-  minionsKilled: number
-  participantId: number
-  position: Position
-  timeEnemySpentControlled: number
-  totalGold: number
-  xp: number
-}
-
-interface DamageStats {
-  magicDamageDone: number
-  magicDamageDoneToChampions: number
-  magicDamageTaken: number
-  physicalDamageDone: number
-  physicalDamageDoneToChampions: number
-  physicalDamageTaken: number
-  totalDamageDone: number
-  totalDamageDoneToChampions: number
-  totalDamageTaken: number
-  trueDamageDone: number
-  trueDamageDoneToChampions: number
-  trueDamageTaken: number
-}
-
-interface ChampionStats {
+export interface ChampionStats {
   abilityHaste: number
   abilityPower: number
   armor: number
@@ -472,43 +477,24 @@ interface ChampionStats {
   spellVamp: number
 }
 
-interface Event {
-  realTimestamp?: number
-  timestamp: number
-  type: string
-  levelUpType?: string
-  participantId?: number
-  skillSlot?: number
-  itemId?: number
-  creatorId?: number
-  wardType?: string
-  level?: number
-  bounty?: number
-  killStreakLength?: number
-  killerId?: number
-  position?: Position
-  shutdownBounty?: number
-  victimDamageReceived?: VictimDamageReceived[]
-  victimId?: number
-  killType?: string
-  afterId?: number
-  beforeId?: number
-  goldGain?: number
-  laneType?: string
-  teamId?: number
-  victimDamageDealt?: VictimDamageReceived[]
-  assistingParticipantIds?: number[]
-  killerTeamId?: number
-  monsterType?: string
-  monsterSubType?: string
-  multiKillLength?: number
-  buildingType?: string
-  towerType?: string
-  gameId?: number
-  winningTeam?: number
+export interface DamageStats {
+  magicDamageDone: number
+  magicDamageDoneToChampions: number
+  magicDamageTaken: number
+  physicalDamageDone: number
+  physicalDamageDoneToChampions: number
+  physicalDamageTaken: number
+  totalDamageDone: number
+  totalDamageDoneToChampions: number
+  totalDamageTaken: number
+  trueDamageDone: number
+  trueDamageDoneToChampions: number
+  trueDamageTaken: number
 }
 
-interface VictimDamageReceived {
+export type DamageDetailType = 'OTHER' | 'TOWER' | 'MINION'
+
+export interface DamageDetail {
   basic: boolean
   magicDamage: number
   name: string
@@ -517,12 +503,179 @@ interface VictimDamageReceived {
   spellName: string
   spellSlot: number
   trueDamage: number
-  type: string
+  type: DamageDetailType
 }
 
-interface Position {
-  x: number
-  y: number
+export interface DetailedParticipantFrame {
+  participantId: number
+  currentGold: number
+  totalGold: number
+  goldPerSecond: number
+  level: number
+  xp: number
+  minionsKilled: number
+  jungleMinionsKilled: number
+  position: Position
+  timeEnemySpentControlled: number
+  championStats: ChampionStats
+  damageStats: DamageStats
+}
+
+export type DetailedParticipantFrames = Record<string, DetailedParticipantFrame>
+
+export type DetailedGameEventType =
+  | 'PAUSE_END'
+  | 'LEVEL_UP'
+  | 'SKILL_LEVEL_UP'
+  | 'ITEM_PURCHASED'
+  | 'ITEM_SOLD'
+  | 'ITEM_DESTROYED'
+  | 'ITEM_UNDO'
+  | 'CHAMPION_KILL'
+  | 'CHAMPION_SPECIAL_KILL'
+  | 'BUILDING_KILL'
+  | 'GAME_END'
+  | 'TURRET_PLATE_DESTROYED'
+
+export interface BaseDetailedGameEvent {
+  type: DetailedGameEventType
+  timestamp: number
+  realTimestamp?: number
+}
+
+export interface PauseEndEvent extends BaseDetailedGameEvent {
+  type: 'PAUSE_END'
+  realTimestamp: number
+}
+
+export interface DetailedLevelUpEvent extends BaseDetailedGameEvent {
+  type: 'LEVEL_UP'
+  participantId: number
+  level: number
+}
+
+export type LevelUpType = 'NORMAL'
+
+export interface DetailedSkillLevelUpEvent extends BaseDetailedGameEvent {
+  type: 'SKILL_LEVEL_UP'
+  participantId: number
+  skillSlot: number
+  levelUpType: LevelUpType
+}
+
+export interface DetailedItemPurchasedEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_PURCHASED'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemSoldEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_SOLD'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemDestroyedEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_DESTROYED'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemUndoEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_UNDO'
+  participantId: number
+  beforeId: number
+  afterId: number
+  goldGain: number
+}
+
+export interface DetailedChampionKillEvent extends BaseDetailedGameEvent {
+  type: 'CHAMPION_KILL'
+  killerId: number
+  victimId: number
+  assistingParticipantIds: number[]
+  position: Position
+  bounty: number
+  shutdownBounty: number
+  killStreakLength: number
+  victimDamageDealt: DamageDetail[]
+  victimDamageReceived: DamageDetail[]
+}
+
+export type SpecialKillType = 'KILL_FIRST_BLOOD' | 'KILL_MULTI' | 'KILL_ACE'
+
+export interface ChampionSpecialKillEvent extends BaseDetailedGameEvent {
+  type: 'CHAMPION_SPECIAL_KILL'
+  killerId: number
+  position: Position
+  killType: SpecialKillType
+  multiKillLength?: number
+}
+
+export type BuildingType = 'TOWER_BUILDING' | 'INHIBITOR_BUILDING'
+
+export type TowerType = 'OUTER_TURRET' | 'INNER_TURRET' | 'NEXUS_TURRET'
+
+export type LaneType = 'MID_LANE'
+
+export interface DetailedBuildingKillEvent extends BaseDetailedGameEvent {
+  type: 'BUILDING_KILL'
+  killerId: number
+  assistingParticipantIds: number[]
+  position: Position
+  bounty: number
+  buildingType: BuildingType
+  towerType?: TowerType
+  laneType?: LaneType
+  teamId: number
+}
+
+export interface GameEndEvent extends BaseDetailedGameEvent {
+  type: 'GAME_END'
+  gameId: number
+  winningTeam: number
+  realTimestamp: number
+}
+
+export interface DetailedTurretPlateDestroyedEvent extends BaseDetailedGameEvent {
+  type: 'TURRET_PLATE_DESTROYED'
+  killerId: number
+  laneType: LaneType
+  position: Position
+  teamId: number
+}
+
+export type DetailedGameEvent =
+  | PauseEndEvent
+  | DetailedLevelUpEvent
+  | DetailedSkillLevelUpEvent
+  | DetailedItemPurchasedEvent
+  | DetailedItemSoldEvent
+  | DetailedItemDestroyedEvent
+  | DetailedItemUndoEvent
+  | DetailedChampionKillEvent
+  | ChampionSpecialKillEvent
+  | DetailedBuildingKillEvent
+  | GameEndEvent
+  | DetailedTurretPlateDestroyedEvent
+
+export interface DetailedTimelineFrame {
+  timestamp: number
+  events: DetailedGameEvent[]
+  participantFrames: DetailedParticipantFrames
+}
+
+export type EndOfGameResult = string
+
+export interface GameDetailsJson {
+  endOfGameResult: EndOfGameResult
+  frameInterval: number
+  frames: DetailedTimelineFrame[]
+}
+
+export interface SgpGameDetailsLol {
+  metadata: Metadata
+  json: GameDetailsJson
 }
 
 // TFT Match History Types

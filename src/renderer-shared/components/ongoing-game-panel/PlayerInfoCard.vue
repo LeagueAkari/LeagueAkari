@@ -824,7 +824,6 @@ const { name } = useChampionInfo()
   padding: 8px;
   height: 360px;
   border-radius: 4px;
-  box-sizing: border-box;
   border: 1px solid #ffffff60;
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
@@ -857,7 +856,6 @@ const { name } = useChampionInfo()
   margin-bottom: 4px;
 
   .profile-icon {
-    position: relative;
     position: relative;
     margin-right: 8px;
   }
@@ -1091,7 +1089,6 @@ const { name } = useChampionInfo()
     align-items: center;
     height: 30px;
     padding: 2px;
-    box-sizing: border-box;
     background-color: #ffffff10;
     border-radius: 2px;
     padding-left: 8px;

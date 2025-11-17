@@ -35,7 +35,7 @@ export interface Team {
   win: boolean
 }
 
-interface Objectives {
+export interface Objectives {
   baron: Baron
   champion: Baron
   dragon: Baron
@@ -50,7 +50,7 @@ interface Baron {
   kills: number
 }
 
-interface Ban {
+export interface Ban {
   championId: number
   pickTurn: number
 }
@@ -190,7 +190,7 @@ export interface SgpParticipantLol {
   win: boolean
 }
 
-interface Perks {
+export interface Perks {
   statPerks: SgpStatPerks
   styles: Style[]
 }
@@ -498,65 +498,12 @@ interface Companion {
   species: string
 }
 
-export interface SgpGameDetailsLol {
-  metadata: SgpGameMetadataLol
-  json: SgpGameJsonDetailsLol
+interface Position {
+  x: number
+  y: number
 }
 
-interface SgpGameJsonDetailsLol {
-  endOfGameResult: string
-  frameInterval: number
-  frames: Frame[]
-  gameId: number
-  participants: Participant[]
-}
-
-interface Participant {
-  participantId: number
-  puuid: string
-}
-
-interface Frame {
-  events: Event[]
-  participantFrames: ParticipantFrames
-  timestamp: number
-}
-
-interface ParticipantFrames {
-  [key: string]: ParticipantFrame
-}
-
-interface ParticipantFrame {
-  championStats: ChampionStats
-  currentGold: number
-  damageStats: DamageStats
-  goldPerSecond: number
-  jungleMinionsKilled: number
-  level: number
-  minionsKilled: number
-  participantId: number
-  position: Position
-  timeEnemySpentControlled: number
-  totalGold: number
-  xp: number
-}
-
-interface DamageStats {
-  magicDamageDone: number
-  magicDamageDoneToChampions: number
-  magicDamageTaken: number
-  physicalDamageDone: number
-  physicalDamageDoneToChampions: number
-  physicalDamageTaken: number
-  totalDamageDone: number
-  totalDamageDoneToChampions: number
-  totalDamageTaken: number
-  trueDamageDone: number
-  trueDamageDoneToChampions: number
-  trueDamageTaken: number
-}
-
-interface ChampionStats {
+export interface ChampionStats {
   abilityHaste: number
   abilityPower: number
   armor: number
@@ -584,43 +531,24 @@ interface ChampionStats {
   spellVamp: number
 }
 
-interface Event {
-  realTimestamp?: number
-  timestamp: number
-  type: string
-  levelUpType?: string
-  participantId?: number
-  skillSlot?: number
-  itemId?: number
-  creatorId?: number
-  wardType?: string
-  level?: number
-  bounty?: number
-  killStreakLength?: number
-  killerId?: number
-  position?: Position
-  shutdownBounty?: number
-  victimDamageReceived?: VictimDamageReceived[]
-  victimId?: number
-  killType?: string
-  afterId?: number
-  beforeId?: number
-  goldGain?: number
-  laneType?: string
-  teamId?: number
-  victimDamageDealt?: VictimDamageReceived[]
-  assistingParticipantIds?: number[]
-  killerTeamId?: number
-  monsterType?: string
-  monsterSubType?: string
-  multiKillLength?: number
-  buildingType?: string
-  towerType?: string
-  gameId?: number
-  winningTeam?: number
+export interface DamageStats {
+  magicDamageDone: number
+  magicDamageDoneToChampions: number
+  magicDamageTaken: number
+  physicalDamageDone: number
+  physicalDamageDoneToChampions: number
+  physicalDamageTaken: number
+  totalDamageDone: number
+  totalDamageDoneToChampions: number
+  totalDamageTaken: number
+  trueDamageDone: number
+  trueDamageDoneToChampions: number
+  trueDamageTaken: number
 }
 
-interface VictimDamageReceived {
+export type DamageDetailType = 'OTHER' | 'TOWER' | 'MINION'
+
+export interface DamageDetail {
   basic: boolean
   magicDamage: number
   name: string
@@ -629,12 +557,178 @@ interface VictimDamageReceived {
   spellName: string
   spellSlot: number
   trueDamage: number
-  type: string
+  type: DamageDetailType
 }
 
-interface Position {
-  x: number
-  y: number
+export interface DetailedParticipantFrame {
+  participantId: number
+  currentGold: number
+  totalGold: number
+  goldPerSecond: number
+  level: number
+  xp: number
+  minionsKilled: number
+  jungleMinionsKilled: number
+  position: Position
+  timeEnemySpentControlled: number
+  championStats: ChampionStats
+  damageStats: DamageStats
+}
+
+export type DetailedParticipantFrames = Record<string, DetailedParticipantFrame>
+
+export type DetailedGameEventType =
+  | 'PAUSE_END'
+  | 'LEVEL_UP'
+  | 'SKILL_LEVEL_UP'
+  | 'ITEM_PURCHASED'
+  | 'ITEM_SOLD'
+  | 'ITEM_DESTROYED'
+  | 'ITEM_UNDO'
+  | 'CHAMPION_KILL'
+  | 'CHAMPION_SPECIAL_KILL'
+  | 'BUILDING_KILL'
+  | 'GAME_END'
+  | 'TURRET_PLATE_DESTROYED'
+
+export interface BaseDetailedGameEvent {
+  type: DetailedGameEventType
+  timestamp: number
+  realTimestamp?: number
+}
+
+export interface PauseEndEvent extends BaseDetailedGameEvent {
+  type: 'PAUSE_END'
+  realTimestamp: number
+}
+
+export interface DetailedLevelUpEvent extends BaseDetailedGameEvent {
+  type: 'LEVEL_UP'
+  participantId: number
+  level: number
+}
+
+export type LevelUpType = 'NORMAL'
+
+export interface DetailedSkillLevelUpEvent extends BaseDetailedGameEvent {
+  type: 'SKILL_LEVEL_UP'
+  participantId: number
+  skillSlot: number
+  levelUpType: LevelUpType
+}
+
+export interface DetailedItemPurchasedEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_PURCHASED'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemSoldEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_SOLD'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemDestroyedEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_DESTROYED'
+  participantId: number
+  itemId: number
+}
+
+export interface DetailedItemUndoEvent extends BaseDetailedGameEvent {
+  type: 'ITEM_UNDO'
+  participantId: number
+  beforeId: number
+  afterId: number
+  goldGain: number
+}
+
+export interface DetailedChampionKillEvent extends BaseDetailedGameEvent {
+  type: 'CHAMPION_KILL'
+  killerId: number
+  victimId: number
+  assistingParticipantIds: number[]
+  position: Position
+  bounty: number
+  shutdownBounty: number
+  killStreakLength: number
+  victimDamageDealt: DamageDetail[]
+  victimDamageReceived: DamageDetail[]
+}
+
+export type SpecialKillType = 'KILL_FIRST_BLOOD' | 'KILL_MULTI' | 'KILL_ACE'
+
+export interface ChampionSpecialKillEvent extends BaseDetailedGameEvent {
+  type: 'CHAMPION_SPECIAL_KILL'
+  killerId: number
+  position: Position
+  killType: SpecialKillType
+  multiKillLength?: number
+}
+
+export type BuildingType = 'TOWER_BUILDING' | 'INHIBITOR_BUILDING'
+
+export type TowerType = 'OUTER_TURRET' | 'INNER_TURRET' | 'NEXUS_TURRET'
+
+export type LaneType = 'MID_LANE'
+
+export interface DetailedBuildingKillEvent extends BaseDetailedGameEvent {
+  type: 'BUILDING_KILL'
+  killerId: number
+  assistingParticipantIds: number[]
+  position: Position
+  bounty: number
+  buildingType: BuildingType
+  towerType?: TowerType
+  laneType?: LaneType
+  teamId: number
+}
+
+export interface GameEndEvent extends BaseDetailedGameEvent {
+  type: 'GAME_END'
+  gameId: number
+  winningTeam: number
+  realTimestamp: number
+}
+
+export interface DetailedTurretPlateDestroyedEvent extends BaseDetailedGameEvent {
+  type: 'TURRET_PLATE_DESTROYED'
+  killerId: number
+  laneType: LaneType
+  position: Position
+  teamId: number
+}
+
+export type DetailedGameEvent =
+  | PauseEndEvent
+  | DetailedLevelUpEvent
+  | DetailedSkillLevelUpEvent
+  | DetailedItemPurchasedEvent
+  | DetailedItemSoldEvent
+  | DetailedItemDestroyedEvent
+  | DetailedItemUndoEvent
+  | DetailedChampionKillEvent
+  | ChampionSpecialKillEvent
+  | DetailedBuildingKillEvent
+  | GameEndEvent
+
+export interface Frame {
+  timestamp: number
+  events: DetailedGameEvent[]
+  participantFrames: DetailedParticipantFrames
+}
+
+export type EndOfGameResult = string
+
+interface SgpGameJsonDetailsLol {
+  endOfGameResult: EndOfGameResult
+  frameInterval: number
+  frames: Frame[]
+}
+
+export interface SgpGameDetailsLol {
+  metadata: SgpGameMetadataLol
+  json: SgpGameJsonDetailsLol
 }
 
 export interface SgpRankedStats {

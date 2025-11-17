@@ -1,5 +1,8 @@
 <template>
-  <div class="control-item" :class="{ [`align-${align}`]: align, highlight: isHighlighting }">
+  <div
+    class="control-item control-item-margin"
+    :class="{ [`align-${align}`]: align, highlight: isHighlighting }"
+  >
     <div class="label-area" :style="{ width: labelWidth ? `${labelWidth}px` : 'unset' }">
       <div v-if="$slots.label" class="label">
         <slot name="label" :disabled="disabled"></slot>
@@ -126,6 +129,12 @@ defineOptions({
   .control-item.highlight {
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
+  }
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
   }
 }
 </style>
