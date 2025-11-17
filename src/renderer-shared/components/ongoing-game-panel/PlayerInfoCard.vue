@@ -21,12 +21,16 @@
     ></div>
     <div class="player-info">
       <div class="profile-icon">
-        <ChampionIcon
+        <ChampionIcon v-if="queryStage.phase!=='lobby'"
           :champion-id="championId || -1"
           round
           ring
           ring-color="#ffffff50"
           class="champion"
+        />
+        <LcuImage v-else
+          class="champion"
+          :src="summoner ? profileIconUri(summoner.profileIconId) : undefined"
         />
         <div class="level" v-if="summoner">{{ summoner.summonerLevel }}</div>
       </div>
@@ -468,6 +472,8 @@ import {
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
+import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 
 const {
   puuid,
