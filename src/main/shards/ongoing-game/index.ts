@@ -217,7 +217,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           this.state.queryStage,
           this.settings.enabled,
           this._sgp.state.isTokenReady,
-          this.settings.matchHistoryUseSgpApi
+          this.settings.matchHistoryUseSgpApi,
+          this._lc.data.lobby.lobby?.members
         ] as const,
       ([stage, enabled, tokenReady, useSgpApi]) => {
         this._log.info(
@@ -257,6 +258,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           })
         } else if (this.state.queryStage.phase === 'in-game') {
           this._inGame({
+            mhSignal: this._mhController.signal,
+            signal: this._controller.signal,
+            force: false
+          })
+        } else if (this.state.queryStage.phase === 'lobby') {
+          this._champSelect({
             mhSignal: this._mhController.signal,
             signal: this._controller.signal,
             force: false
@@ -397,6 +404,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal: this._controller.signal,
         force: true
       })
+    } else if (this.state.queryStage.phase === 'lobby') {
+      this._champSelect({
+        mhSignal: this._mhController.signal,
+        signal: this._controller.signal,
+        force: true
+      })
     }
   }
 
@@ -434,6 +447,18 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         .map((t) => t.puuid)
 
       return [...m, ...t]
+    } else if (this.state.queryStage.phase === 'lobby') {
+      const lobbyState = this._lc.data.lobby
+
+      if(!lobbyState.lobby?.members) {
+        return []
+      }
+
+      const m = lobbyState.lobby.members
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+        .map((t) => t.puuid)
+
+      return [...m]
     }
 
     return []

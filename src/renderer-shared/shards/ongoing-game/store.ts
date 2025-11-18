@@ -102,7 +102,7 @@ export interface SavedInfo {
 // copied from main shard
 export type QueryStage =
   | {
-      phase: 'champ-select' | 'in-game'
+      phase: 'champ-select' | 'in-game' | 'lobby'
       gameInfo: {
         queueId: number
         queueType: string

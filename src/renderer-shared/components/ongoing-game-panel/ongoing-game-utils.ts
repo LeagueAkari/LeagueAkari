@@ -29,10 +29,10 @@ export function useIdleState() {
 
   return computed(() => {
     return (
-      lc.gameflow.phase === 'Lobby' ||
+      //lc.gameflow.phase === 'Lobby' ||
       lc.gameflow.phase === 'None' ||
-      lc.gameflow.phase === 'Matchmaking' ||
-      lc.gameflow.phase === 'ReadyCheck' ||
+      //lc.gameflow.phase === 'Matchmaking' ||
+      //lc.gameflow.phase === 'ReadyCheck' ||
       lc.gameflow.phase === 'WatchInProgress' ||
       (lc.gameflow.phase !== 'InProgress' &&
         lc.champSelect.session &&
