@@ -282,6 +282,26 @@ export class OngoingGameState {
         })
 
       return teams
+    } else if (this.queryStage.phase === 'lobby') {
+
+      const lobbyState = this._lcData.lobby
+
+      if (!lobbyState.lobby?.members) {
+        return {}
+      }
+
+      const teams: Record<string, string[]> = {
+        'all': []
+      }
+
+      lobbyState.lobby.members
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+        .map((t) => t.puuid)
+        .forEach(p => {
+          teams['all'].push(p)
+        })
+
+      return teams
     }
 
     return {}
@@ -295,6 +315,8 @@ export class OngoingGameState {
    * champ-select - 正在英雄选择阶段
    *
    * in-game - 在游戏中或游戏结算中
+   *
+   * lobby - 大厅中、匹配中、等待接受准备阶段
    */
   get queryStage() {
     if (
@@ -324,6 +346,22 @@ export class OngoingGameState {
     ) {
       return {
         phase: 'in-game' as 'champ-select' | 'in-game',
+        gameInfo: {
+          queueId: this._lcData.gameflow.session.gameData.queue.id,
+          queueType: this._lcData.gameflow.session.gameData.queue.type,
+          gameId: this._lcData.gameflow.session.gameData.gameId,
+          gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
+        }
+      }
+    }
+
+    if (this._lcData.gameflow.session &&
+      (this._lcData.gameflow.session.phase === 'Lobby' ||
+      this._lcData.gameflow.session.phase === 'Matchmaking' ||
+      this._lcData.gameflow.session.phase === 'ReadyCheck')
+    ) {
+      return {
+        phase: 'lobby' as 'lobby' | 'matchmaking' | 'readyCheck',
         gameInfo: {
           queueId: this._lcData.gameflow.session.gameData.queue.id,
           queueType: this._lcData.gameflow.session.gameData.queue.type,
