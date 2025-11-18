@@ -278,6 +278,31 @@
               </NPopselect>
             </NFlex>
           </ControlItem>
+          <div class="divider"></div>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoGameflow.autoSendARAMTeamSideEnabled.label')"
+            :label-description="t('AutoGameflow.autoSendARAMTeamSideEnabled.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.autoSendARAMTeamSideEnabled"
+              @update:value="(val) => shard.setAutoSendARAMTeamSideEnabled(val)"
+              size="small"
+            />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoGameflow.autoSendARAMTeamSideVisibleToTeam.label')"
+            :label-description="t('AutoGameflow.autoSendARAMTeamSideVisibleToTeam.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.autoSendARAMTeamSideVisibleToTeam"
+              @update:value="(val) => shard.setAutoSendARAMTeamSideVisibleToTeam(val)"
+              size="small"
+            />
+          </ControlItem>
         </NCard>
       </div>
     </NScrollbar>

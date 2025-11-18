@@ -74,7 +74,11 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
         autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
         invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies },
-        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway }
+        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway },
+        autoSendARAMTeamSideEnabled: { default: this.settings.autoSendARAMTeamSideEnabled },
+        autoSendARAMTeamSideVisibleToTeam: {
+          default: this.settings.autoSendARAMTeamSideVisibleToTeam
+        }
       },
       this.settings
     )
@@ -589,6 +593,60 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     })
   }
 
+  private _handleSendARAMTeamSide() {
+    this._mobx.reaction(
+      () =>
+        [
+          this._lc.data.chat.conversations.championSelect?.id,
+          this.settings.autoSendARAMTeamSideEnabled
+        ] as const,
+      ([id, enabled]) => {
+        if (!enabled) {
+          return
+        }
+
+        if (!id) {
+          return
+        }
+
+        const localPlayerCellId = this._lc.data.champSelect.session?.localPlayerCellId
+        const myTeam = this._lc.data.champSelect.session?.myTeam
+        const gameData = this._lc.data.gameflow.session?.gameData
+
+        if (!gameData || !myTeam || !localPlayerCellId) {
+          return
+        }
+
+        // 这些模式, ARAM / 海克斯大乱斗 等，使用 AllRandomPickStrategy 模式，需告知所属方
+        if (
+          gameData.queue.mapId === 12 &&
+          gameData.queue.gameTypeConfig.pickMode === 'AllRandomPickStrategy'
+        ) {
+          const me = myTeam.find((p) => p.cellId === localPlayerCellId)
+
+          if (!me) {
+            return
+          }
+
+          if (me.team !== 1 && me.team !== 2) {
+            return
+          }
+
+          this._lc.api.chat
+            .chatSend(
+              id,
+              `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(`auto-gameflow-main.aram-team-side-${me.team}`)}`,
+              this.settings.autoSendARAMTeamSideVisibleToTeam ? undefined : 'celebration'
+            )
+            .catch((error) => {
+              this._log.warn(`Failed to send ARAM team side`, error)
+            })
+        }
+      },
+      { equals: comparer.shallow, fireImmediately: true }
+    )
+  }
+
   private async _acceptMatch() {
     try {
       await this._lc.api.matchmaking.accept()
@@ -676,7 +734,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoReconnectEnabled',
       'autoMatchmakingMaximumMatchDuration',
       'invitationHandlingStrategies',
-      'rejectInvitationWhenAway'
+      'rejectInvitationWhenAway',
+      'autoSendARAMTeamSideEnabled',
+      'autoSendARAMTeamSideVisibleToTeam'
     ])
 
     this._mobx.propSync(AutoGameflowMain.id, 'state', this.state, [
@@ -785,6 +845,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleLogging()
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
+    this._handleSendARAMTeamSide()
   }
 
   async onDispose() {}

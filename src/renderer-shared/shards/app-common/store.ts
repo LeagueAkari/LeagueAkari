@@ -26,7 +26,8 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     } as HttpProxySetting,
     forceDisableProxy: false,
     streamerMode: false,
-    streamerModeUseAkariStyledName: false
+    streamerModeUseAkariStyledName: false,
+    dataSource: 'sgp' as 'sgp' | 'lcu'
   })
 
   const { t } = useTranslation()

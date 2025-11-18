@@ -97,6 +97,14 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'invitationHandlingStrategies', strategies)
   }
 
+  setAutoSendARAMTeamSideEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideEnabled', enabled)
+  }
+
+  setAutoSendARAMTeamSideVisibleToTeam(visible: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideVisibleToTeam', visible)
+  }
+
   async onInit() {
     const store = useAutoGameflowStore()
 

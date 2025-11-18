@@ -127,8 +127,8 @@ AppSettings:
         ask: Ask every time
 
     dataSource:
-      label: Remote Data Source
-      description: Set the remote config source of the application, get or update data from GitHub / Gitee
+      label: Git Repository Source
+      description: Set the Git repository source of the application, get or update data from GitHub / Gitee
       options:
         gitee: Gitee
         github: GitHub
@@ -737,6 +737,12 @@ AutoGameflow:
   rejectInvitationWhenAway:
     label: Reject When Away
     description: Automatically rejects lobby invitations when the game status is set to Away.
+  autoSendARAMTeamSideEnabled:
+    label: Send Team Side Information
+    description: 'In modes like ARAM or ARAM: Mayhem, when entering champion select, the current team side (blue or red) will be notified.'
+  autoSendARAMTeamSideVisibleToTeam:
+    label: Send Team Side Information Visible to Team
+    description: The content of "Send Team Side Information" will be visible to team.
 
 AutoSelect:
   title: Auto Pick Ban

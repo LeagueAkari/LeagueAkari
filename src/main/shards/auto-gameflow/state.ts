@@ -37,6 +37,9 @@ export class AutoGameflowSettings {
 
   invitationHandlingStrategies: Record<string, string> = {}
 
+  autoSendARAMTeamSideEnabled: boolean = false
+  autoSendARAMTeamSideVisibleToTeam: boolean = true
+
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
   }
@@ -99,6 +102,14 @@ export class AutoGameflowSettings {
 
   setAutoSkipLeaderEnabled(enabled: boolean) {
     this.autoSkipLeaderEnabled = enabled
+  }
+
+  setAutoSendARAMTeamSideEnabled(enabled: boolean) {
+    this.autoSendARAMTeamSideEnabled = enabled
+  }
+
+  setAutoSendARAMTeamSideVisibleToTeam(visible: boolean) {
+    this.autoSendARAMTeamSideVisibleToTeam = visible
   }
 
   constructor() {

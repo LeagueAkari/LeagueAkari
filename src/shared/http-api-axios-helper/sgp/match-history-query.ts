@@ -19,7 +19,7 @@ export interface MatchHistoryQueryParams extends SgpRegionParam {
 export class MatchHistoryQueryHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  getMatchHistorySummaryByPlayerPuuid(puuid: string, options: MatchHistoryQueryParams) {
+  getMatchHistorySummaryByPlayerPuuid(puuid: string, options: MatchHistoryQueryParams = {}) {
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${puuid}/SUMMARY`,
       {
@@ -37,7 +37,7 @@ export class MatchHistoryQueryHttpApi {
     )
   }
 
-  getGameSummaryByGameId(gameId: number, options: SgpRegionParam) {
+  getGameSummaryByGameId(gameId: number, options: SgpRegionParam = {}) {
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/SUMMARY`,
       {
@@ -49,7 +49,7 @@ export class MatchHistoryQueryHttpApi {
     )
   }
 
-  getGameDetailsByGameId(gameId: number, options: SgpRegionParam) {
+  getGameDetailsByGameId(gameId: number, options: SgpRegionParam = {}) {
     return this._http.get<SgpGameDetailsLol>(
       `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/DETAILS`,
       {
@@ -61,7 +61,7 @@ export class MatchHistoryQueryHttpApi {
     )
   }
 
-  getMatchHistoryReplayStreamByGameId(gameId: number, options: SgpRegionParam) {
+  getMatchHistoryReplayStreamByGameId(gameId: number, options: SgpRegionParam = {}) {
     return this._http.get<Readable>(
       `/match-history-query/v3/product/lol/matchId/${URL_PLACEHOLDER_SUB_ID}_${gameId}/infoType/replay`,
       {

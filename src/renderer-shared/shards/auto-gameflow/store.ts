@@ -30,7 +30,9 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoHandleInvitationsEnabled: false,
     autoSkipLeaderEnabled: false,
     invitationHandlingStrategies: {} as Record<string, string>,
-    rejectInvitationWhenAway: false
+    rejectInvitationWhenAway: false,
+    autoSendARAMTeamSideEnabled: false,
+    autoSendARAMTeamSideVisibleToTeam: true
   })
 
   const willAccept = ref(false)

@@ -128,8 +128,8 @@ AppSettings:
         ask: 每次询问
 
     dataSource:
-      label: 远程数据源
-      description: 设置应用的远程配置源，通过 GitHub / Gitee 获取或更新数据
+      label: Git 仓库源
+      description: 设置应用的 Git 仓库源，通过 GitHub / Gitee 获取或更新数据
       options:
         gitee: Gitee
         github: GitHub
@@ -738,6 +738,12 @@ AutoGameflow:
   rejectInvitationWhenAway:
     label: 离开时拒绝邀请
     description: 当游戏状态为离开时，将拒绝所有房间邀请
+  autoSendARAMTeamSideEnabled:
+    label: 发送地图位置信息
+    description: 在如极地大乱斗、海克斯大乱斗等模式中，进入英雄选择时，将告知当前阵营所处地图的位置（蓝色方或红色方）。
+  autoSendARAMTeamSideVisibleToTeam:
+    label: 发送地图位置信息队友可见
+    description: “发送地图位置信息”的内容将对队伍内成员可见。
 
 AutoSelect:
   title: 自动英雄选择和禁用

@@ -24,6 +24,8 @@ auto-gameflow-main:
   auto-matchmaking-canceled-wait-for-penalty: Auto matchmaking canceled, waiting for penalty timer
   auto-matchmaking-in: Auto matchmaking in {{seconds}} seconds
   skip-leader: Attempting to skip becoming the leader
+  aram-team-side-1: Your team is in 🟦blue (↙️ left bottom)
+  aram-team-side-2: Your team is in 🟥red (↗️ right top)
 
 auto-select-main:
   error-pick: 'Failed to auto pick champion, target champion {{champion}}: {{reason}}'

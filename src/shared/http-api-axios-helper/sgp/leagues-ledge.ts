@@ -9,7 +9,7 @@ export class LeaguesLedgeHttpApi {
   /**
    * 注：此 API 无法跨区
    */
-  getRankedStatsByPuuid(puuid: string, options: SgpRegionParam) {
+  getRankedStatsByPuuid(puuid: string, options: SgpRegionParam = {}) {
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
       headers: {
         'X-Akari-Sgp-Server-Id': options.__sgpServerId,
