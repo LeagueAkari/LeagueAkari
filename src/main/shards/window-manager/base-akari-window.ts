@@ -293,7 +293,7 @@ export abstract class BaseAkariWindow<
         sandbox: false,
         spellcheck: false,
         partition: this._partition,
-        backgroundThrottling: false,
+        backgroundThrottling: true,
         ...webPreferences
       },
       ...rest
