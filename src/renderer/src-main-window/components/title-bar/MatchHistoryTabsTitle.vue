@@ -11,7 +11,7 @@
       @clickoutside="contextMenuState.show = false"
       size="small"
       @select="handleContextMenuSelect"
-      :theme-overrides="{ color: '#222e', fontSizeSmall: '13px', optionHeightSmall: '26px' }"
+      :theme-overrides="dropdownThemeOverrides"
     />
     <template v-if="lcs.isConnected">
       <NScrollbar
@@ -174,6 +174,15 @@ const handleWheel = (e: WheelEvent) => {
 }
 
 const searchSummonerModalShow = ref(false)
+
+const dropdownThemeOverrides = computed(() => {
+  const isLight = as.settings.theme === 'light'
+  return {
+    color: isLight ? '#eeeef4' : '#222e',
+    fontSizeSmall: '13px',
+    optionHeightSmall: '26px'
+  }
+})
 
 const handleMouseUp = (event: MouseEvent, unionId: string) => {
   if (event.button === 1) {

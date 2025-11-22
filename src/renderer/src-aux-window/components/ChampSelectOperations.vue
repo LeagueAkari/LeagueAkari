@@ -175,6 +175,7 @@ const _handleBan_3 = async () => {
 </script>
 
 <style scoped lang="less">
+[data-theme='dark'] {
 .label {
   font-size: 12px;
   color: rgb(178, 178, 178);
@@ -186,5 +187,23 @@ const _handleBan_3 = async () => {
   &:not(:last-child) {
     margin-bottom: 2px;
   }
+}
+
+}
+
+[data-theme='light'] {
+.label {
+  font-size: 12px;
+  color: rgb(44, 44, 44);
+}
+
+.control-item {
+  height: 24px;
+
+  &:not(:last-child) {
+    margin-bottom: 2px;
+  }
+}
+
 }
 </style>

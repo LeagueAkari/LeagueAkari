@@ -250,32 +250,57 @@ const { isOverDropZone } = useDropZone(tabsWrapperEl, {
     font-size: 22px;
   }
 
+  [data-theme='dark'] .disconnected {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  [data-theme='light'] .disconnected {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
   .disconnected {
     font-size: 14px;
     font-weight: normal;
+  }
+
+  [data-theme='dark'] .no-tab {
     color: rgba(255, 255, 255, 0.4);
+  }
+
+  [data-theme='light'] .no-tab {
+    color: rgba(0, 0, 0, 0.4);
   }
 
   .no-tab {
     font-size: 14px;
     font-weight: normal;
-    color: rgba(255, 255, 255, 0.4);
     margin-top: 8px;
+  }
+
+  [data-theme='dark'] .shortcut {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  [data-theme='light'] .shortcut {
+    background-color: rgba(0, 0, 0, 0.06);
   }
 
   .shortcut {
     display: flex;
     align-items: center;
     margin-top: 16px;
-    background-color: rgba(255, 255, 255, 0.06);
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s ease;
     backdrop-filter: blur(4px);
 
-    &:hover {
+    [data-theme='dark']&:hover {
       background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    [data-theme='light']&:hover {
+      background-color: rgba(0, 0, 0, 0.12);
     }
 
     .shortcut-profile-icon {
@@ -284,17 +309,31 @@ const { isOverDropZone } = useDropZone(tabsWrapperEl, {
       border-radius: 50%;
     }
 
+    [data-theme='dark'] .shortcut-game-name {
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    [data-theme='light'] .shortcut-game-name {
+      color: rgba(0, 0, 0, 0.95);
+    }
+
     .shortcut-game-name {
       margin-left: 8px;
       font-size: 14px;
       font-weight: bold;
-      color: rgba(255, 255, 255, 0.95);
+    }
+
+    [data-theme='dark'] .shortcut-tag-line {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    [data-theme='light'] .shortcut-tag-line {
+      color: rgba(0, 0, 0, 0.4);
     }
 
     .shortcut-tag-line {
       margin-left: 4px;
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.4);
     }
   }
 }

@@ -129,6 +129,7 @@ const getTimelineTypeByAction = (action: Action) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .action {
   font-size: 11px;
   color: rgb(146, 146, 146);
@@ -158,5 +159,41 @@ const getTimelineTypeByAction = (action: Action) => {
     height: 16px;
     border-radius: 2px;
   }
+}
+
+}
+
+[data-theme='light'] {
+.action {
+  font-size: 11px;
+  color: rgb(73, 73, 73);
+}
+
+.action.completed,
+.solution.completed {
+  filter: brightness(0.8);
+}
+
+.action.in-progress {
+  color: #000000;
+}
+
+.solution {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .label {
+    font-size: 10px;
+    color: rgb(73, 73, 73);
+  }
+
+  .image {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+  }
+}
+
 }
 </style>

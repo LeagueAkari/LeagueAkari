@@ -33,10 +33,9 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
-        label="Theme Color (experimental)"
-        label-description="Theme color for League Akari (!!DEBUG ONLY!!)"
+        :label="t('AppSettings.basic.theme.label')"
+        :label-description="t('AppSettings.basic.theme.description')"
         :label-width="400"
       >
         <NSelect
@@ -527,11 +526,13 @@ const locales = [
   { label: 'English', value: 'en' }
 ]
 
-const themes = [
-  { label: '跟随系统', value: 'default' },
-  { label: '亮色', value: 'light' },
-  { label: '暗色', value: 'dark' }
-]
+const themes = computed(() => {
+  return [
+    { label: t('AppSettings.basic.theme.options.default'), value: 'default' },
+    { label: t('AppSettings.basic.theme.options.light'), value: 'light' },
+    { label: t('AppSettings.basic.theme.options.dark'), value: 'dark' }
+  ]
+})
 
 const logLevels = [
   { label: 'Info', value: 'info' },
@@ -667,6 +668,7 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .hover-text {
   font-size: 12px;
   color: #aaa;
@@ -684,5 +686,29 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 
 .step-description {
   font-size: 11px;
+}
+
+}
+
+[data-theme='light'] {
+.hover-text {
+  font-size: 12px;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.step-title {
+  font-size: 12px;
+}
+
+.step-description {
+  font-size: 11px;
+}
+
 }
 </style>

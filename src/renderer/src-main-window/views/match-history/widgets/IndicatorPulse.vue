@@ -3,6 +3,7 @@
 </template>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .ongoing-indicator {
   width: 8px;
   height: 8px;
@@ -21,5 +22,30 @@
   100% {
     box-shadow: 0 0 0 0 #00ff0000;
   }
+}
+
+}
+
+[data-theme='light'] {
+.ongoing-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #ffff;
+  border-radius: 50%;
+  animation: indicator-pulse 4s infinite;
+}
+
+@keyframes indicator-pulse {
+  0% {
+    box-shadow: 0 0 0 0 #00ff0066;
+  }
+  20% {
+    box-shadow: 0 0 0 10px #00ff0000;
+  }
+  100% {
+    box-shadow: 0 0 0 0 #00ff0000;
+  }
+}
+
 }
 </style>

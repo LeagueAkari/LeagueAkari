@@ -142,6 +142,7 @@ const orderedInner = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .physical-damage {
   fill: rgb(223, 77, 67);
 }
@@ -172,5 +173,42 @@ const orderedInner = computed(() => {
   height: 1px;
   background-color: rgb(107, 107, 107);
   margin: 4px 0;
+}
+
+}
+
+[data-theme='light'] {
+.physical-damage {
+  fill: rgb(223, 77, 67);
+}
+
+.magic-damage {
+  fill: rgb(114, 190, 226);
+}
+
+.true-damage {
+  fill: rgb(188, 188, 188);
+}
+
+.bg {
+  fill: rgb(83, 83, 83);
+}
+
+.best {
+  font-weight: bold;
+  color: rgb(167, 167, 255);
+}
+
+.details {
+  font-size: 11px;
+  width: 204px;
+}
+
+.divider {
+  height: 1px;
+  background-color: rgb(53, 53, 53);
+  margin: 4px 0;
+}
+
 }
 </style>

@@ -111,6 +111,20 @@
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment6" :size="22" />
             </div>
           </template>
+          <template v-else-if="game.gameMode === 'KIWI'">
+            <div class="summoner-spells">
+              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="22" />
+            </div>
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
+            </div>
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="22" />
+            </div>
+          </template>
           <template v-else>
             <div class="summoner-spells">
               <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
@@ -552,12 +566,19 @@ const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] .match-history-card {
+  background-color: #28344e;
+}
+
+[data-theme='light'] .match-history-card {
+  background-color: #e8ecf4;
+}
+
 .match-history-card {
   display: flex;
   padding: 0px 0px 0px 12px;
   border-radius: 4px;
   box-sizing: border-box;
-  background-color: #28344e;
   width: 740px;
   height: 96px;
   overflow: hidden;
@@ -577,6 +598,14 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .game {
+  color: rgb(159, 159, 159);
+}
+
+[data-theme='light'] .game {
+  color: rgb(75, 75, 75);
+}
+
 .game {
   display: flex;
   flex-direction: column;
@@ -585,7 +614,6 @@ const { name } = useChampionInfo()
   flex-shrink: 0;
   box-sizing: border-box;
   font-size: 12px;
-  color: rgb(159, 159, 159);
   gap: 2px;
 
   .mode {
@@ -599,11 +627,18 @@ const { name } = useChampionInfo()
     font-weight: bold;
   }
 
+  [data-theme='dark'] .divider {
+    background-color: rgb(91, 91, 91);
+  }
+
+  [data-theme='light'] .divider {
+    background-color: rgb(180, 180, 180);
+  }
+
   .divider {
     margin: 2px 0;
     height: 1px;
     width: 60%;
-    background-color: rgb(91, 91, 91);
   }
 }
 
@@ -632,6 +667,14 @@ const { name } = useChampionInfo()
     border-radius: 50%;
   }
 
+  [data-theme='dark'] .champion-level {
+    background-color: rgba(0, 0, 0, 0.621);
+  }
+
+  [data-theme='light'] .champion-level {
+    background-color: rgba(255, 255, 255, 0.621);
+  }
+
   .champion-level {
     position: absolute;
     bottom: 0;
@@ -642,7 +685,6 @@ const { name } = useChampionInfo()
     text-align: center;
     font-size: 12px;
     border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.621);
   }
 
   .summoner-spells,
@@ -679,8 +721,15 @@ const { name } = useChampionInfo()
       font-size: 14px;
     }
 
-    .divider {
+    [data-theme='dark'] .divider {
       color: rgb(159, 159, 159);
+    }
+
+    [data-theme='light'] .divider {
+      color: rgb(100, 100, 100);
+    }
+
+    .divider {
       font-size: 14px;
       margin: 0 4px;
     }
@@ -693,14 +742,25 @@ const { name } = useChampionInfo()
       color: rgb(200, 81, 30);
     }
 
-    .a {
+    [data-theme='dark'] .a {
       color: rgb(159, 159, 159);
     }
+
+    [data-theme='light'] .a {
+      color: rgb(100, 100, 100);
+    }
+  }
+
+  [data-theme='dark'] .kda-ratio {
+    color: rgb(159, 159, 159);
+  }
+
+  [data-theme='light'] .kda-ratio {
+    color: rgb(85, 85, 85);
   }
 
   .kda-ratio {
     font-size: 12px;
-    color: rgb(159, 159, 159);
   }
 
   .kda-radio.perfect-kda {
@@ -714,6 +774,14 @@ const { name } = useChampionInfo()
   }
 }
 
+[data-theme='dark'] .summary {
+  color: #9f9f9f;
+}
+
+[data-theme='light'] .summary {
+  color: #5f5f5f;
+}
+
 .summary {
   display: flex;
   flex-direction: column;
@@ -723,10 +791,16 @@ const { name } = useChampionInfo()
   line-height: 14px;
   align-items: flex-start;
   gap: 2px;
-  color: #9f9f9f;
+
+  [data-theme='dark'] .kpr {
+    color: #e84057;
+  }
+
+  [data-theme='light'] .kpr {
+    color: #e84057;
+  }
 
   .kpr {
-    color: #e84057;
     font-size: 12px;
   }
 }
@@ -757,12 +831,19 @@ const { name } = useChampionInfo()
     width: 200px;
   }
 
+  [data-theme='dark'] .placement {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  [data-theme='light'] .placement {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
   .placement {
     position: absolute;
     bottom: -4px;
     left: -4px;
     font-size: 10px;
-    background-color: rgba(0, 0, 0, 0.35);
     border-radius: 50%;
     width: 14px;
     height: 14px;
@@ -781,6 +862,14 @@ const { name } = useChampionInfo()
       margin-right: 4px;
     }
 
+    [data-theme='dark'] .name {
+      color: rgb(187, 187, 187);
+    }
+
+    [data-theme='light'] .name {
+      color: rgb(68, 68, 68);
+    }
+
     .name {
       flex: 1;
       width: 0;
@@ -788,7 +877,6 @@ const { name } = useChampionInfo()
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 12px;
-      color: rgb(187, 187, 187);
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -797,10 +885,17 @@ const { name } = useChampionInfo()
       }
     }
 
+    [data-theme='dark'] .name.self {
+      color: white;
+    }
+
+    [data-theme='light'] .name.self {
+      color: #1f2328;
+    }
+
     .name.self {
       cursor: default;
       font-weight: bold;
-      color: white;
     }
   }
 }
@@ -816,10 +911,17 @@ const { name } = useChampionInfo()
   cursor: pointer;
 }
 
+[data-theme='dark'] .icon {
+  color: rgb(214, 214, 214);
+}
+
+[data-theme='light'] .icon {
+  color: rgb(68, 68, 68);
+}
+
 .icon {
   padding: 2px;
   font-size: 16px;
-  color: rgb(214, 214, 214);
   font-weight: bold;
   transition: background-color 0.3s ease;
   background-color: transparent;
@@ -830,13 +932,24 @@ const { name } = useChampionInfo()
   }
 }
 
-.icon:hover {
+[data-theme='dark'] .icon:hover {
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='light'] .icon:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .win {
+  background-color: #212b41e0;
+}
+
+[data-theme='light'] .win {
+  background-color: #dce4f4e0;
 }
 
 .win {
   border-left: 6px solid #5383e8;
-  background-color: #212b41e0;
 
   .game {
     .mode {
@@ -852,14 +965,25 @@ const { name } = useChampionInfo()
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: #2f436e;
   }
+
+  [data-theme='light'] .show-more {
+    background-color: #c5d1e8;
+  }
+}
+
+[data-theme='dark'] .lose {
+  background-color: #4b2c31e0;
+}
+
+[data-theme='light'] .lose {
+  background-color: #f4dcdce0;
 }
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: #4b2c31e0;
 
   .game {
     .mode {
@@ -871,27 +995,50 @@ const { name } = useChampionInfo()
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: rgb(112, 60, 71);
   }
+
+  [data-theme='light'] .show-more {
+    background-color: rgb(255, 220, 230);
+  }
+}
+
+[data-theme='dark'] .remake {
+  background-color: rgba(54, 54, 54, 0.8);
+}
+
+[data-theme='light'] .remake {
+  background-color: rgba(240, 240, 240, 0.8);
 }
 
 .remake {
   border-left: 6px solid rgb(139, 139, 139);
-  background-color: rgba(54, 54, 54, 0.8);
+
+  [data-theme='dark'] .game .mode,
+  [data-theme='dark'] .game .result {
+    color: rgb(209, 209, 209);
+  }
+
+  [data-theme='light'] .game .mode,
+  [data-theme='light'] .game .result {
+    color: rgb(70, 70, 70);
+  }
 
   .game {
     .mode {
-      color: rgb(209, 209, 209);
     }
 
     .result {
-      color: rgb(209, 209, 209);
     }
   }
 
-  .show-more {
+  [data-theme='dark'] .show-more {
     background-color: rgb(121, 121, 121);
+  }
+
+  [data-theme='light'] .show-more {
+    background-color: rgb(200, 200, 200);
   }
 }
 
@@ -903,13 +1050,20 @@ const { name } = useChampionInfo()
   margin-top: 4px;
 }
 
+[data-theme='dark'] .loading {
+  background-color: #343434;
+}
+
+[data-theme='light'] .loading {
+  background-color: #e5e5e5;
+}
+
 .loading {
   display: flex;
   height: 100px;
   justify-content: center;
   align-items: center;
   margin-top: 4px;
-  background-color: #343434;
   border-radius: 4px;
   font-size: 12px;
 }

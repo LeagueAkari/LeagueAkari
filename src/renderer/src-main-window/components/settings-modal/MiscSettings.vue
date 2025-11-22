@@ -70,7 +70,17 @@ const rt = useInstance(RespawnTimerRenderer)
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .card-header-title.disabled {
   color: rgba(255, 255, 255, 0.35);
+}
+
+}
+
+[data-theme='light'] {
+.card-header-title.disabled {
+  color: rgba(0, 0, 0, 0.35);
+}
+
 }
 </style>

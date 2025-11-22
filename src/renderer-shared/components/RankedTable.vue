@@ -194,16 +194,33 @@ const formatLosses = (losses: number) => {
 
 <style lang="less" scoped>
 // 轻度边框
-.ranked-stats-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+[data-theme='dark'] .ranked-stats-table {
   border: 1px solid #ffffff40;
-  font-size: 12px;
   color: #d4d4d4;
 
   th,
   td {
     border: 1px solid #ffffff40;
+  }
+}
+
+[data-theme='light'] .ranked-stats-table {
+  border: 1px solid #00000040;
+  color: #333333;
+
+  th,
+  td {
+    border: 1px solid #00000040;
+  }
+}
+
+.ranked-stats-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 12px;
+
+  th,
+  td {
     padding: 0 4px;
     text-align: center;
   }

@@ -8,14 +8,14 @@
         currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
-      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff60'
+      borderColor: premadeTeamId ? premadeTeamColors[premadeTeamId]?.borderColor : '#ffffff60'
     }"
   >
     <div
       class="premade-deco"
       :style="{
         backgroundColor: premadeTeamId
-          ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+          ? premadeTeamColors[premadeTeamId]?.foregroundColor
           : undefined
       }"
     ></div>
@@ -48,7 +48,7 @@
                   class="name"
                   :style="{
                     color: premadeTeamId
-                      ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+                      ? premadeTeamColors[premadeTeamId]?.foregroundColor
                       : undefined
                   }"
                   >{{
@@ -469,7 +469,8 @@ import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
-  RANKED_MEDAL_MAP
+  RANKED_MEDAL_MAP,
+  usePremadeTeamColors
 } from './ongoing-game-utils'
 import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -690,36 +691,73 @@ const MILESTONE_ORDER = [
 ]
 
 const positionAssignmentReason = computed(() => {
-  return {
-    FILL_SECONDARY: {
-      name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
-      color: '#82613b',
-      foregroundColor: '#ffffff'
-    },
-    FILL_PRIMARY: {
-      name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    PRIMARY: {
-      name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    SECONDARY: {
-      name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
-      color: '#5b4694',
-      foregroundColor: '#ffffff'
-    },
-    AUTOFILL: {
-      name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
-      color: '#944646',
-      foregroundColor: '#ffffff'
-    },
-    AUTOFILL_SHORT: {
-      name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
-      color: '#944646',
-      foregroundColor: '#ffffff'
+  const isDark = as.settings.theme !== 'light'
+  
+  if (isDark) {
+    return {
+      FILL_SECONDARY: {
+        name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
+        color: '#82613b',
+        foregroundColor: '#ffffff'
+      },
+      FILL_PRIMARY: {
+        name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      PRIMARY: {
+        name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      SECONDARY: {
+        name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
+        color: '#5b4694',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL: {
+        name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
+        color: '#944646',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL_SHORT: {
+        name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
+        color: '#944646',
+        foregroundColor: '#ffffff'
+      }
+    }
+  } else {
+    return {
+      FILL_SECONDARY: {
+        name: t('positionAssignmentReason.FILL_SECONDARY', { ns: 'common' }),
+        color: '#6d4e2e',
+        foregroundColor: '#ffffff'
+      },
+      FILL_PRIMARY: {
+        name: t('positionAssignmentReason.FILL_PRIMARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      PRIMARY: {
+        name: t('positionAssignmentReason.PRIMARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      SECONDARY: {
+        name: t('positionAssignmentReason.SECONDARY', { ns: 'common' }),
+        color: '#4a3679',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL: {
+        name: t('positionAssignmentReason.AUTOFILL', { ns: 'common' }),
+        color: '#7d3333',
+        foregroundColor: '#ffffff'
+      },
+      AUTOFILL_SHORT: {
+        name: t('positionAssignmentReason.AUTOFILL_SHORT', { ns: 'common' }),
+        color: '#7d3333',
+        foregroundColor: '#ffffff'
+      }
     }
   }
 })
@@ -819,6 +857,7 @@ const matches = computed(() => {
 
 const { masked } = useStreamerModeMaskedText()
 const { name } = useChampionInfo()
+const premadeTeamColors = usePremadeTeamColors()
 </script>
 
 <style lang="less" scoped>
@@ -831,13 +870,21 @@ const { name } = useChampionInfo()
   height: 360px;
   border-radius: 4px;
   box-sizing: border-box;
-  border: 1px solid #ffffff60;
-  background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
   overflow: hidden;
   backdrop-filter: blur(4px);
 
   transition: filter 0.2s;
+
+  [data-theme='dark']& {
+    border: 1px solid #ffffff60;
+    background-color: #11111180;
+  }
+
+  [data-theme='light']& {
+    border: 1px solid #00000060;
+    background-color: #eeeeee80;
+  }
 
   &.dimming {
     filter: brightness(0.3);
@@ -873,22 +920,36 @@ const { name } = useChampionInfo()
     height: 42px;
   }
 
+  [data-theme='dark'] .level {
+    background-color: #00000080;
+  }
+
+  [data-theme='light'] .level {
+    background-color: #ffffff80;
+  }
+
   .level {
     position: absolute;
     bottom: 0;
     right: 0;
     transform: translateX(35%);
-    background-color: #00000080;
     font-size: 10px;
     border-radius: 4px;
     padding: 0 4px;
+  }
+
+  [data-theme='dark'] .position-icon {
+    background-color: #00000080;
+  }
+
+  [data-theme='light'] .position-icon {
+    background-color: #ffffff80;
   }
 
   .position-icon {
     position: absolute;
     bottom: 0;
     right: 0;
-    background-color: #00000080;
     font-size: 16px;
   }
 
@@ -918,15 +979,29 @@ const { name } = useChampionInfo()
       }
     }
 
+    [data-theme='dark'] .name {
+      color: #e8e8e8;
+    }
+
+    [data-theme='light'] .name {
+      color: #282828;
+    }
+
     .name {
       font-weight: bold;
       font-size: 13px;
-      color: #e8e8e8;
+    }
+
+    [data-theme='dark'] .tag-line {
+      color: #999;
+    }
+
+    [data-theme='light'] .tag-line {
+      color: #666;
     }
 
     .tag-line {
       font-size: 12px;
-      color: #999;
       margin-left: 4px;
     }
   }
@@ -948,10 +1023,19 @@ const { name } = useChampionInfo()
         margin-right: 4px;
       }
 
+      [data-theme='dark'] .text,
+      [data-theme='dark'] .lp {
+        color: #dfdfdf;
+      }
+
+      [data-theme='light'] .text,
+      [data-theme='light'] .lp {
+        color: #2f2f2f;
+      }
+
       .text,
       .lp {
         font-size: 11px;
-        color: #dfdfdf;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -963,8 +1047,12 @@ const { name } = useChampionInfo()
       }
 
       &.unranked {
-        .text {
+        [data-theme='dark'] .text {
           color: #999;
+        }
+
+        [data-theme='light'] .text {
+          color: #666;
         }
       }
 
@@ -992,11 +1080,18 @@ const { name } = useChampionInfo()
       margin-left: 16px;
     }
 
+    [data-theme='dark'] .divider {
+      background-color: #ffffff40;
+    }
+
+    [data-theme='light'] .divider {
+      background-color: #00000040;
+    }
+
     .divider {
       margin: 0 2px;
       width: 1px;
       height: 12px;
-      background-color: #ffffff40;
     }
   }
 
@@ -1021,9 +1116,16 @@ const { name } = useChampionInfo()
 
   .win-rate,
   .win-rate-cherry {
+    [data-theme='dark'] .game-count {
+      color: #fffa;
+    }
+
+    [data-theme='light'] .game-count {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
     .game-count {
       margin-left: 4px;
-      color: #fffa;
       font-weight: normal;
       font-size: 9px;
     }
@@ -1033,8 +1135,12 @@ const { name } = useChampionInfo()
     color: #4cc69d;
   }
 
-  .normal {
+  [data-theme='dark'] .normal {
     color: #dcdcdc;
+  }
+
+  [data-theme='light'] .normal {
+    color: #4a4a4a;
   }
 
   .bad {
@@ -1068,13 +1174,20 @@ const { name } = useChampionInfo()
       border-radius: 2px;
     }
 
+    [data-theme='dark'] .star-icon {
+      color: #fff838;
+    }
+
+    [data-theme='light'] .star-icon {
+      color: #a69500;
+    }
+
     .star-icon {
       position: absolute;
       bottom: -2px;
       right: -2px;
       width: 12px;
       height: 12px;
-      color: #fff838;
     }
   }
 }
@@ -1094,7 +1207,6 @@ const { name } = useChampionInfo()
     height: 30px;
     padding: 2px;
     box-sizing: border-box;
-    background-color: #ffffff10;
     border-radius: 2px;
     padding-left: 8px;
     transition: filter 0.3s;
@@ -1102,11 +1214,26 @@ const { name } = useChampionInfo()
     margin-bottom: 2px;
     box-sizing: border-box;
 
+    [data-theme='dark'] & {
+      background-color: #ffffff10;
+    }
+
+    [data-theme='light'] & {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme='dark'] .ordinal {
+      color: #ffffff40;
+    }
+
+    [data-theme='light'] .ordinal {
+      color: rgba(0, 0, 0, 0.35);
+    }
+
     .ordinal {
       opacity: 0;
       position: absolute;
       font-size: 10px;
-      color: #ffffff40;
       bottom: 0;
       right: 0;
     }
@@ -1153,7 +1280,13 @@ const { name } = useChampionInfo()
       border-left-color: #c0c0c030;
 
       .win-lose {
-        color: #c0c0c0;
+        [data-theme='dark'] .ordinal {
+          color: #c0c0c0;
+        }
+	    
+        [data-theme='light'] .ordinal {
+          color: #000;
+        }
       }
     }
 
@@ -1175,12 +1308,26 @@ const { name } = useChampionInfo()
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      color: #e8e8e8;
+      
+      [data-theme='dark'] .ordinal {
+        color: #e8e8e8;
+      }
+	  
+      [data-theme='light'] .ordinal {
+        color: #000;
+      }
     }
 
     .line2 {
       font-size: 10px;
-      color: #d6d6d6;
+      
+      [data-theme='dark'] .ordinal {
+        color: #d6d6d6;
+      }
+	  
+      [data-theme='light'] .ordinal {
+        color: #000;
+      }
     }
 
     .kda {
@@ -1188,11 +1335,20 @@ const { name } = useChampionInfo()
     }
   }
 
+  [data-theme='dark'] .champion-icon,
+  [data-theme='dark'] .frequent-champion-icon {
+    background-color: #4b5b7d;
+  }
+
+  [data-theme='light'] .champion-icon,
+  [data-theme='light'] .frequent-champion-icon {
+    background-color: #e4e4ff;
+  }
+
   .champion-icon,
   .frequent-champion-icon {
     width: 24px;
     height: 24px;
-    background-color: #4b5b7d;
     border-radius: 2px;
   }
 
@@ -1203,8 +1359,15 @@ const { name } = useChampionInfo()
     width: 100%;
     height: 100%;
     font-size: 12px;
-    color: #ffffffa0;
     gap: 4px;
+
+    [data-theme='dark'] & {
+      color: #ffffffa0;
+    }
+
+    [data-theme='light'] & {
+      color: rgba(0, 0, 0, 0.6);
+    }
 
     .loading {
       display: flex;
@@ -1240,9 +1403,16 @@ const { name } = useChampionInfo()
       height: 22px;
     }
 
+    [data-theme='dark'] .champion-name {
+      color: #e8e8e8;
+    }
+
+    [data-theme='light'] .champion-name {
+      color: #2d2d2d;
+    }
+
     .champion-name {
       font-size: 12px;
-      color: #e8e8e8;
       font-weight: bold;
     }
   }
@@ -1257,9 +1427,16 @@ const { name } = useChampionInfo()
     align-items: center;
     margin-top: 4px;
 
+    [data-theme='dark'] .level {
+      background-color: #b94ecf;
+    }
+
+    [data-theme='light'] .level {
+      background-color: #b94ecf;
+    }
+
     .level {
       border-radius: 2px;
-      background-color: #b94ecf;
       font-size: 11px;
       padding: 0 4px;
     }
@@ -1275,20 +1452,34 @@ const { name } = useChampionInfo()
     flex-wrap: wrap;
     margin-top: 4px;
 
+    [data-theme='dark'] .milestone {
+      background-color: #4e82cf;
+    }
+
+    [data-theme='light'] .milestone {
+      background-color: #4e82cf;
+    }
+
     .milestone {
       border-radius: 2px;
-      background-color: #4e82cf;
       font-size: 11px;
       padding: 0 4px;
     }
   }
 }
 
+[data-theme='dark'] .assignment-reason {
+  color: #ffffff;
+}
+
+[data-theme='light'] .assignment-reason {
+  color: #1f2328;
+}
+
 .assignment-reason {
   white-space: nowrap;
   font-size: 11px;
   line-height: 11px;
-  color: #ffffff;
   padding: 2px 4px;
   border-radius: 2px;
 }

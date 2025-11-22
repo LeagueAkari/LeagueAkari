@@ -18,6 +18,16 @@
       <NButton
         secondary
         class="square-button"
+        :title="t('MatchHistoryTab.prevPage')"
+        @click="goToPreviousChampion"
+      >
+        <template #icon>
+          <NIcon><ArrowBackIcon /></NIcon>
+        </template>
+      </NButton>
+      <NButton
+        secondary
+        class="square-button"
         :title="t('Opgg.settings.button')"
         @click="isSettingsLayerShow = true"
       >
@@ -121,6 +131,8 @@
         :mode="mode"
         :version="version || undefined"
         :is-able-to-add-to-item-set="isAbleToAddToItemSet"
+        :is-aram-mayhem="isAramMayhem"
+        :arena-augments-data="arenaAugmentsData"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
@@ -214,6 +226,7 @@
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import { restoreRecipe } from '@opgg-window/utils/recipe-restore'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
+import { ArrowBack as ArrowBackIcon } from '@vicons/ionicons5';
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
@@ -257,7 +270,7 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, onErrorCaptured, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -310,6 +323,9 @@ const region = ref<RegionType>(savedPreferences.value.region as RegionType)
 const tier = ref<TierType>(savedPreferences.value.tier as TierType)
 const version = ref<string | null>(null)
 
+// Track if we're in ARAM: Mayhem mode (ARAM with augments)
+const isAramMayhem = ref(false)
+
 const versions = shallowRef<string[]>([])
 
 const api = new OpggDataApi()
@@ -339,6 +355,8 @@ const tierData = shallowRef<
   OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | null
 >(null)
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
+// Store Arena augments data separately for ARAM: Mayhem mode
+const arenaAugmentsData = shallowRef<OpggArenaModeChampion | null>(null)
 
 const message = useMessage()
 
@@ -355,15 +373,14 @@ const isLoading = computed(
 )
 
 // 一些模式没有位置相关的数据，所以添加一个视觉上的效果以保证其不可选
+// Combine mode-related watchers for better performance
 watchEffect(() => {
   if (mode.value !== 'ranked') {
     position.value = 'none'
   } else {
     position.value = savedPreferences.value.position as PositionType
   }
-})
 
-watchEffect(() => {
   if (mode.value === 'arena') {
     tier.value = 'all'
   } else {
@@ -459,6 +476,27 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       signal: loadChampionController.signal
     })
 
+    // If in ARAM: Mayhem mode, also fetch Arena augments data
+    if (isAramMayhem.value && championId.value) {
+      try {
+        arenaAugmentsData.value = await api.getChampion({
+          region: region.value,
+          mode: 'arena',
+          tier: 'all', // Arena mode always uses 'all' tier
+          version: version.value ?? undefined,
+          id: championId.value,
+          position: position.value,
+          signal: loadChampionController.signal
+        }) as OpggArenaModeChampion
+      } catch (augmentError) {
+        log.warn('view:Opgg', `获取 Arena augments 数据失败: ${(augmentError as any).message}`, augmentError)
+        // Don't fail the whole load if augments fail
+        arenaAugmentsData.value = null
+      }
+    } else {
+      arenaAugmentsData.value = null
+    }
+
     // 这段逻辑先耦合在这里, 以后可能会被移除
     if (
       shouldAutoApply &&
@@ -475,7 +513,8 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       let spellToApply = spells?.[0]
       let runesToApply = runes?.[0]
 
-      if (os.frontendSettings.autoApplyRunes && runesToApply) {
+      // KIWI mode (ARAM: Mayhem) doesn't have runes, so skip auto-applying runes
+      if (os.frontendSettings.autoApplyRunes && runesToApply && !isAramMayhem.value) {
         await setRunes(runesToApply)
       }
 
@@ -560,15 +599,36 @@ const handlePositionChange = async (p: PositionType) => {
   await loadChampionData(false)
 }
 
+const previousChampionId = ref<number | null>(null); // 保存上一个英雄 ID
+const currentChampionId = ref<number | null>(null); // 当前英雄 ID
+
+// 原有方法 handleToChampion
 const handleToChampion = async (id: number, shouldAutoApply: boolean) => {
-  currentTab.value = 'champion'
-  championId.value = id
-  champion.value = null
-  await loadChampionData(shouldAutoApply)
-}
+  if (currentChampionId.value !== null) {
+    previousChampionId.value = currentChampionId.value; // 保存当前 ID 为上一个 ID
+  }
+  currentChampionId.value = id; // 更新当前 ID
+
+  currentTab.value = 'champion';
+  championId.value = id;
+  champion.value = null;
+  await loadChampionData(shouldAutoApply);
+};
+
+// 返回上一个英雄的方法
+const goToPreviousChampion = async () => {
+  if (previousChampionId.value !== null) {
+    await handleToChampion(previousChampionId.value, false);
+  }
+};
 
 onMounted(() => {
   loadAll()
+})
+
+onUnmounted(() => {
+  // Clean up any ongoing requests on unmount to prevent memory leaks
+  cancelAll()
 })
 
 const championItem = computed(() => {
@@ -650,7 +710,8 @@ const automation = useStableComputed(() => {
   return {
     championId: self?.championId || selfActionChampionId,
     assignedPosition: self?.assignedPosition,
-    gameMode: lcs.gameflow.session.gameData.queue.gameMode
+    gameMode: lcs.gameflow.session.gameData.queue.gameMode,
+    queueId: lcs.gameflow.session.gameData.queue.id
   }
 })
 
@@ -683,7 +744,12 @@ watchDebounced(
     }
 
     isModeMatch.value = true
+    isAramMayhem.value = false
 
+    // Check for ARAM: Mayhem mode
+    // Note: If Riot uses a specific queueId for Mayhem (e.g., different from 450),
+    // we can add additional detection here: if (atm.gameMode === 'ARAM' && atm.queueId === MAYHEM_QUEUE_ID)
+    
     switch (atm.gameMode) {
       case 'CLASSIC':
         mode.value = 'ranked'
@@ -691,6 +757,12 @@ watchDebounced(
       case 'ARAM':
         mode.value = 'aram'
         position.value = 'none'
+        break
+      case 'KIWI':
+        // ARAM: Mayhem - combination of ARAM with Arena augments
+        mode.value = 'aram'
+        position.value = 'none'
+        isAramMayhem.value = true
         break
       case 'CHERRY':
         mode.value = 'arena'
@@ -1083,11 +1155,18 @@ watch(
     margin-bottom: 4px;
   }
 
+  [data-theme='dark'] .opgg-icon {
+    color: #fff;
+  }
+
+  [data-theme='light'] .opgg-icon {
+    color: #1f2328;
+  }
+
   .opgg-icon {
     display: block;
     height: 32px;
     width: 32px;
-    color: #fff;
   }
 
   .square-button {
@@ -1107,13 +1186,20 @@ watch(
     overflow: auto;
   }
 
+  [data-theme='dark'] .settings-overlay {
+    background-color: #202020d8;
+  }
+
+  [data-theme='light'] .settings-overlay {
+    background-color: #f5f5f5f5;
+  }
+
   .settings-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #202020d8;
     backdrop-filter: blur(8px);
     z-index: 100;
     padding: 24px 36px;
@@ -1126,7 +1212,14 @@ watch(
       .title {
         font-size: 24px;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .title {
         color: white;
+      }
+
+      [data-theme='light'] .title {
+        color: #1f2328;
       }
 
       .close-btn {
@@ -1170,11 +1263,18 @@ watch(
   color: #62deb4;
 }
 
+[data-theme='dark'] .ongoing-champions {
+  background-color: #202020a0;
+}
+
+[data-theme='light'] .ongoing-champions {
+  background-color: #f5f5f5e0;
+}
+
 .ongoing-champions {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  background-color: #202020a0;
   backdrop-filter: blur(8px);
   border-radius: 8px;
   padding: 12px;

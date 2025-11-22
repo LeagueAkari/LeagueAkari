@@ -38,6 +38,7 @@ const handleError = () => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .lcu-image {
   display: block;
 }
@@ -47,5 +48,21 @@ const handleError = () => {
   background-color: #0006;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+}
+
+[data-theme='light'] {
+.lcu-image {
+  display: block;
+}
+
+.lcu-image-placeholder {
+  border: 1px solid #0002;
+  background-color: #fff6;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
 }
 </style>

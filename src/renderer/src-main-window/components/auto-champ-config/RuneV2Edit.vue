@@ -344,6 +344,7 @@ const subPerksSelectedTwo = computed(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .rune-edit-wrapper {
   display: flex;
   align-items: center;
@@ -417,6 +418,86 @@ const subPerksSelectedTwo = computed(() => {
   width: 1px;
   background-color: #ffffff10;
   margin: 0 16px;
+}
+
+}
+
+[data-theme='light'] {
+.rune-edit-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.main-body {
+  display: flex;
+  width: 440px;
+
+  .header-styles {
+    display: flex;
+    margin-bottom: 16px;
+    gap: 4px;
+  }
+
+  .slots {
+    display: flex;
+    gap: 8px;
+
+    &.key {
+      margin-bottom: 12px;
+    }
+
+    &.sparse {
+      gap: 16px;
+    }
+  }
+
+  .primary {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .right-side-column {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+
+    .sub {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      flex-direction: column;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .stat-mod {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.divider {
+  width: 1px;
+  background-color: #00000010;
+  margin: 0 16px;
+}
+
 }
 </style>
 

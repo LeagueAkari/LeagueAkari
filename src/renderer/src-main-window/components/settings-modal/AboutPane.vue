@@ -87,27 +87,29 @@ const handleClickEasterEgg = () => {
   }
 }
 
+[data-theme='dark'] .copyright {
+  color: rgb(168, 168, 168);
+}
+
+[data-theme='light'] .copyright {
+  color: rgb(87, 87, 87);
+}
+
 .copyright {
   margin-top: 8px;
   font-size: 12px;
-  color: rgb(87, 87, 87);
+}
+
+[data-theme='dark'] .divider {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='light'] .divider {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .divider {
   height: 1px;
-  background-color: rgb(54, 54, 54);
   margin: 12px 0px;
-}
-
-[data-theme='dark'] {
-  .divider {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
-[data-theme='light'] {
-  .divider {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
 }
 </style>

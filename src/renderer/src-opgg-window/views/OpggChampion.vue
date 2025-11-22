@@ -1,6 +1,20 @@
+
 <template>
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
+    <div class="sorting-controls">
+        <NRadioGroup size="small" v-model:value="opggChampionSortBy">
+          <NFlex style="gap: 4px">
+            <NRadio value="default" :title="t('default', { ns: 'common' })">{{ t('default', { ns: 'common' }) }}</NRadio>
+            <NRadio value="pickRate" :title="t('OpggChampion.pickRate')">{{
+                t('OpggChampion.pickRate')
+              }}</NRadio>
+            <NRadio value="winRate" :title="t('OpggChampion.winRate')">
+              {{ t('OpggChampion.winRate') }}
+            </NRadio>
+          </NFlex>
+        </NRadioGroup>
+    </div>
     <NSpin v-if="loading" class="spin-mask">
       <template #description>
         <div class="loading-description">
@@ -139,16 +153,13 @@
         <div class="card-title">
           {{ t('OpggChampion.spells') }}
           <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">
-            {{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+            {{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="summoner-spells-group"
-            v-for="(s, i) of data.data.summoner_spells.slice(
-              0,
-              isSummonerSpellsExpanded ? Infinity : 2
-            )"
+            v-for="(s, i) in sortedData('summoner_spells', isSummonerSpellsExpanded, 2)"
+            :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
             <div class="spells">
@@ -157,7 +168,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -178,8 +189,8 @@
                   secondary
                   :disabled="lcs.gameflow.phase !== 'ChampSelect'"
                 >
-                  {{ t('OpggChampion.apply') }}</NButton
-                >
+                  {{ t('OpggChampion.apply') }}
+                </NButton>
               </div>
             </div>
           </div>
@@ -187,15 +198,15 @@
       </div>
       <div class="card-area" v-if="data && data.data.runes && data.data.runes.length">
         <div class="card-title">
-          {{ t('OpggChampion.runes')
-          }}<NCheckbox size="small" v-model:checked="isRunesExpanded">
-            {{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          {{ t('OpggChampion.runes') }}
+          <NCheckbox size="small" v-model:checked="isRunesExpanded">
+            {{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="runes-group"
-            v-for="(r, i) of data.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
+            v-for="(r, i) in sortedData('runes', isRunesExpanded, 2)"
+            :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
             <div>
@@ -207,7 +218,7 @@
                 />
                 <PerkDisplay
                   :max-width="280"
-                  :size="18"
+                  :size="28"
                   v-for="p of r.primary_rune_ids"
                   :perk-id="p"
                 />
@@ -232,7 +243,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (r.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (r.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -252,8 +263,8 @@
                   type="primary"
                   :disabled="lcs.connectionState !== 'connected'"
                   secondary
-                  >{{ t('OpggChampion.apply') }}</NButton
-                >
+                >{{ t('OpggChampion.apply') }}
+                </NButton>
               </div>
             </div>
           </div>
@@ -261,20 +272,20 @@
       </div>
       <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
         <div class="card-title">
-          {{ t('OpggChampion.synergies')
-          }}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
-            t('OpggChampion.showAll')
-          }}</NCheckbox>
+          {{ t('OpggChampion.synergies') }}
+          <NCheckbox size="small" v-model:checked="isSynergiesExpanded"
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="synergies-group"
-            v-for="(s, i) of data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
+            v-for="(s, i) in sortedData('synergies', isSynergiesExpanded, 4)"
+            :key="i"
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div class="image-name" @click="() => emits('showChampion', s.champion_id)">
               <LcuImage class="image" :src="championIconUri(s.champion_id)" />
-              <span>{{ lcs.gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
+              <span class="name">{{ lcs.gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
             </div>
             <div class="desc">
               <div class="value-text">
@@ -287,7 +298,7 @@
               </div>
               <div class="value-text">
                 <span class="value" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="text" :title="t('OpggChampion.plays')">
                   {{
@@ -299,22 +310,24 @@
               </div>
               <div class="value-text">
                 <span class="value" :title="t('OpggChampion.winRate')"
-                  >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
+                >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
                 >
                 <span class="text" :title="t('OpggChampion.winRate')">{{
-                  t('OpggChampion.winRate')
-                }}</span>
+                    t('OpggChampion.winRate')
+                  }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="card-area" v-if="augments && Object.keys(augments).length">
+        <div class="card-title" v-if="props.isAramMayhem">
+          {{ t('OpggChampion.aramMayhemAugments') }}
+        </div>
         <NTabs v-model:value="augmentTab" size="small" :animated="false">
           <template #suffix>
-            <NCheckbox size="small" v-model:checked="isAugmentsExpanded">{{
-              t('OpggChampion.showAll')
-            }}</NCheckbox>
+            <NCheckbox size="small" v-model:checked="isAugmentsExpanded"
+            >{{ t('OpggChampion.showAll') }}</NCheckbox>
           </template>
           <NTabPane name="silver" v-if="augments && augments[1]">
             <template #tab>
@@ -322,7 +335,8 @@
             </template>
             <div
               class="augments-group"
-              v-for="(a, i) of augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[1].augments)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
@@ -332,7 +346,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -354,7 +368,8 @@
             </template>
             <div
               class="augments-group"
-              v-for="(a, i) of augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[4].augments)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
@@ -364,7 +379,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -384,10 +399,10 @@
             <template #tab>
               <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
             </template>
-
             <div
               class="augments-group"
-              v-for="(a, i) of augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[8].augments)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
@@ -397,7 +412,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -420,21 +435,18 @@
         v-if="data && data.data.skill_masteries && data.data.skill_masteries.length"
       >
         <div class="card-title">
-          {{ t('OpggChampion.abilityBuild')
-          }}<NCheckbox
+          {{ t('OpggChampion.abilityBuild') }}
+          <NCheckbox
             v-if="data.data.skill_masteries.length > 2"
             size="small"
             v-model:checked="isSkillMasteriesExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="skills-group"
-            v-for="(m, i) of data.data.skill_masteries.slice(
-              0,
-              isSkillMasteriesExpanded ? Infinity : 2
-            )"
+            v-for="(m, i) in sortedData('skill_masteries', isSkillMasteriesExpanded, 2)"
+            :key="i"
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div>
@@ -475,7 +487,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (m.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (m.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -507,8 +519,8 @@
                 secondary
                 @click="emits('addToItemSet')"
                 :disabled="lcs.connectionState !== 'connected'"
-                >{{ t('OpggChampion.apply') }}</NButton
-              >
+              >{{ t('OpggChampion.apply') }}
+              </NButton>
             </div>
           </div>
         </div>
@@ -518,33 +530,31 @@
         v-if="data && data.data.starter_items && data.data.starter_items.length"
       >
         <div class="card-title">
-          {{ t('OpggChampion.starterItemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.starterItemText') }}
+          <NCheckbox
             v-if="data.data.starter_items.length > 4"
             size="small"
             v-model:checked="isStarterItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) of data.data.starter_items.slice(
-              0,
-              isStarterItemsExpanded ? Infinity : 4
-            )"
+            v-for="(s, i) in sortedData('starter_items', isStarterItemsExpanded, 4)"
+            :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
-              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
               <NIcon v-if="i < s.ids.length - 1" class="separator">
                 <ArrowForwardIosOutlinedIcon />
               </NIcon>
+              <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
             </template>
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -563,30 +573,32 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.boots.length">
         <div class="card-title">
-          鞋子<NCheckbox
+          鞋子
+          <NCheckbox
             v-if="data.data.boots.length > 4"
             size="small"
             v-model:checked="isBootsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) of data.data.boots.slice(0, isBootsExpanded ? Infinity : 4)"
+              v-for="(s, i) in sortedData('boots', isBootsExpanded, 4)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -606,31 +618,32 @@
       </div>
       <div class="card-area" v-if="data && data.data.prism_items && data.data.prism_items.length">
         <div class="card-title">
-          {{ t('OpggChampion.prismItemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.prismItemText') }}
+          <NCheckbox
             v-if="data.data.prism_items.length > 4"
             size="small"
             v-model:checked="isPrismItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) of data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4)"
+              v-for="(s, i) in sortedData('prism_items', isPrismItemsExpanded, 4)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -648,24 +661,24 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="data && data.data.starter_items && data.data.core_items.length">
+      <div class="card-area" v-if="data && data.data.starter_items && coreItems.length">
         <div class="card-title">
-          {{ t('OpggChampion.coreItemText')
-          }}<NCheckbox
-            v-if="data.data.core_items.length > 4"
+          {{ t('OpggChampion.coreItemText') }}
+          <NCheckbox
+            v-if="coreItems.length > 4"
             size="small"
             v-model:checked="isCoreItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) of data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4)"
+            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 5, coreItems)"
+            :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
-              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
               <NIcon v-if="i < s.ids.length - 1" class="separator">
                 <ArrowForwardIosOutlinedIcon />
               </NIcon>
@@ -673,13 +686,13 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">{{
-                  t('OpggChampion.times', {
-                    times: s.play.toLocaleString()
-                  })
-                }}</span>
+                    t('OpggChampion.times', {
+                      times: s.play.toLocaleString()
+                    })
+                  }}</span>
               </div>
               <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -690,34 +703,35 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
         <div class="card-title">
-          {{ t('OpggChampion.itemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.itemText') }}
+          <NCheckbox
             v-if="data.data.last_items.length > 8"
             size="small"
             v-model:checked="isLastItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) of data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8)"
+              v-for="(s, i) in sortedData('last_items', isLastItemsExpanded, 8)"
+              :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')"
-                    >{{
+                  >{{
                       t('OpggChampion.times', {
                         times: s.play.toLocaleString()
                       })
@@ -747,8 +761,9 @@ import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSp
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
+import { useLocalStorage } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCheckbox, NIcon, NScrollbar, NSpin, NSwitch, NTabPane, NTabs } from 'naive-ui'
+import { NButton, NCheckbox, NFlex, NIcon, NRadio, NRadioGroup, NScrollbar, NSpin, NSwitch, NTabPane, NTabs } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -761,6 +776,8 @@ const props = defineProps<{
   champion?: any
   data?: any
   isAbleToAddToItemSet?: boolean
+  isAramMayhem?: boolean
+  arenaAugmentsData?: any
 }>()
 
 const emits = defineEmits<{
@@ -819,6 +836,19 @@ const info = computed(() => {
 // OP.GG 使用 rarity 来表示三种不同的 augment 等级
 // 1 - silver, 4 - gold, 8 - prism
 const augments = computed(() => {
+  // For ARAM: Mayhem mode, use Arena augments data
+  if (props.isAramMayhem && props.arenaAugmentsData) {
+    if (!props.arenaAugmentsData.data.augment_group) {
+      return null
+    }
+    
+    return props.arenaAugmentsData.data.augment_group.reduce((acc: any, cur: any) => {
+      acc[cur.rarity] = cur
+      return acc
+    }, {})
+  }
+  
+  // Regular mode: use augments from the main data
   if (!props.data) {
     return null
   }
@@ -833,17 +863,37 @@ const augments = computed(() => {
   }, {})
 })
 
-const augmentTab = ref<string | undefined>('silver')
+// Combine Arena core_items with ARAM core_items in ARAM: Mayhem mode
+const coreItems = computed(() => {
+  // For ARAM: Mayhem mode, combine Arena and ARAM core_items
+  if (props.isAramMayhem && props.arenaAugmentsData && props.data) {
+    const aramCoreItems = props.data.data.core_items || []
+    const arenaCoreItems = props.arenaAugmentsData.data.core_items || []
+    
+    // Combine both arrays, Arena items first, then ARAM items
+    return [...arenaCoreItems, ...aramCoreItems]
+  }
+  
+  // Regular mode: use core_items from the main data
+  if (!props.data) {
+    return []
+  }
+  
+  return props.data.data.core_items || []
+})
+
+const augmentTab = ref<string | undefined>('gold')
 watchEffect(() => {
   if (!augments.value) {
     augmentTab.value = undefined
     return
   }
 
-  if (augments.value[1]) {
-    augmentTab.value = 'silver'
-  } else if (augments.value[4]) {
+  if (augments.value[4]) {
     augmentTab.value = 'gold'
+  }
+  else if (augments.value[1]) {
+    augmentTab.value = 'silver'
   } else if (augments.value[8]) {
     augmentTab.value = 'prism'
   } else {
@@ -863,21 +913,54 @@ const isPrismItemsExpanded = ref(false)
 const isCoreItemsExpanded = ref(false)
 const isLastItemsExpanded = ref(false)
 
+const opggChampionSortBy = useLocalStorage('opgg-sort-by', 'default')
+
 watchEffect(() => {
   if (!props.data) {
     isSummonerSpellsExpanded.value = false
     isRunesExpanded.value = false
     isSynergiesExpanded.value = false
-    isAugmentsExpanded.value = false
+    isAugmentsExpanded.value = true
     isSkillMasteriesExpanded.value = false
     isStarterItemsExpanded.value = false
     isBootsExpanded.value = false
-    isPrismItemsExpanded.value = false
+    isPrismItemsExpanded.value = true
     isCoreItemsExpanded.value = false
-    isLastItemsExpanded.value = false
+    isLastItemsExpanded.value = true
     isCountersExpanded.value = false
   }
 })
+
+// Helper function to sort and slice the data without modifying original data
+const sortedData = (key: string, isExpanded: boolean, limit: number, customData: any[] = []) => {
+  const data = customData.length ? customData : props.data.data[key]
+
+  // Create a shallow copy of the data to preserve the original array
+  let sortedItems = [...data]
+
+  // Apply sorting based on a selected criterion
+  if (opggChampionSortBy.value !== 'default') {
+    sortedItems.sort((a: any, b: any) => {
+      switch (opggChampionSortBy.value) {
+        case 'pickRate': {
+          const pickRateA = a.pick_rate || 0
+          const pickRateB = b.pick_rate || 0
+          return pickRateB - pickRateA // Sort by pick rate in descending order
+        }
+        case 'winRate': {
+          const winRateA = a.win / (a.play || 1)
+          const winRateB = b.win / (b.play || 1)
+          return winRateB - winRateA // Sort by win rate in descending order
+        }
+        default:
+          return 0
+      }
+    })
+  }
+
+  // Slice the sorted array to get the first `limit` elements (or all if expanded)
+  return sortedItems.slice(0, isExpanded ? Infinity : limit)
+}
 
 const tierText = computed(() => {
   if (!info.value) {
@@ -910,8 +993,18 @@ if (import.meta.env.DEV) {
 
 <style lang="less" scoped>
 .opgg-champion-wrapper {
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
+
+  [data-theme='dark'] .spin-mask {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme='light'] .spin-mask {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
 
   .spin-mask {
     position: absolute;
@@ -920,7 +1013,6 @@ if (import.meta.env.DEV) {
     right: 0;
     bottom: 0;
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.5);
   }
 
   .loading-description {
@@ -935,9 +1027,22 @@ if (import.meta.env.DEV) {
   }
 }
 
+.sorting-controls {
+  text-align: right;
+}
+
+[data-theme='dark'] .card-area {
+  border: 1px solid #37373c;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='light'] .card-area {
+  border: 1px solid #d0d0d0;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
 .card-area {
   border-radius: 2px;
-  border: 1px solid #37373c;
   padding: 8px 8px;
 
   .card-title {
@@ -953,8 +1058,15 @@ if (import.meta.env.DEV) {
     margin-bottom: 4px;
   }
 
-  &.toggle-to-current {
+  [data-theme='dark']&.toggle-to-current {
     background-color: #1b4e71;
+  }
+
+  [data-theme='light']&.toggle-to-current {
+    background-color: #e4f4ff;
+  }
+
+  &.toggle-to-current {
     cursor: pointer;
   }
 }
@@ -979,9 +1091,16 @@ if (import.meta.env.DEV) {
     box-sizing: border-box;
   }
 
+  [data-theme='dark'] .separator {
+    color: #909090;
+  }
+
+  [data-theme='light'] .separator {
+    color: #6a6a6a;
+  }
+
   .separator {
     font-size: 10px;
-    color: #909090;
   }
 }
 
@@ -1004,24 +1123,44 @@ if (import.meta.env.DEV) {
   }
 }
 
-.skill.w {
+[data-theme='dark'] .skill.w {
   color: #00d7b0;
   background-color: #3f3f46;
 }
 
-.skill.q {
+[data-theme='light'] .skill.w {
+  color: #00d7b0;
+  background-color: #e0e0e7;
+}
+
+[data-theme='dark'] .skill.q {
   color: #01a8fb;
   background-color: #3f3f46;
 }
 
-.skill.e {
+[data-theme='light'] .skill.q {
+  color: #01a8fb;
+  background-color: #e0e0e7;
+}
+
+[data-theme='dark'] .skill.e {
   color: #ff8200;
   background-color: #3f3f46;
 }
 
-.skill.r {
+[data-theme='light'] .skill.e {
+  color: #ff8200;
+  background-color: #e0e0e7;
+}
+
+[data-theme='dark'] .skill.r {
   color: white;
   background-color: #5f32e6;
+}
+
+[data-theme='light'] .skill.r {
+  color: white;
+  background-color: #8a5df6;
 }
 
 .first-line {
@@ -1052,22 +1191,43 @@ if (import.meta.env.DEV) {
     font-weight: bold;
   }
 
+  [data-theme='dark'] .position {
+    color: #c9c9c9;
+  }
+
+  [data-theme='light'] .position {
+    color: #5a5a5a;
+  }
+
   .position {
     font-size: 13px;
-    color: #c9c9c9;
   }
 
   .prop-field {
     width: 50px;
   }
 
-  .tier {
-    font-size: 14px;
+  [data-theme='dark'] .tier {
     color: #c9c9c9;
   }
 
-  .prop {
+  [data-theme='light'] .tier {
+    color: #5a5a5a;
+  }
+
+  .tier {
+    font-size: 14px;
+  }
+
+  [data-theme='dark'] .prop {
     color: #b2b2b2;
+  }
+
+  [data-theme='light'] .prop {
+    color: #6a6a6a;
+  }
+
+  .prop {
     font-size: 11px;
   }
 
@@ -1104,23 +1264,44 @@ if (import.meta.env.DEV) {
     align-items: center;
     min-width: 76px;
 
+    [data-theme='dark'] .pick-rate {
+      color: #ebebeb;
+    }
+
+    [data-theme='light'] .pick-rate {
+      color: #758592;
+    }
+
     .pick-rate {
       font-size: 12px;
-      color: #ebebeb;
       font-weight: bold;
+    }
+
+    [data-theme='dark'] .pick-play {
+      color: #bebebe;
+    }
+
+    [data-theme='light'] .pick-play {
+      color: #5a5a5a;
     }
 
     .pick-play {
       font-size: 12px;
-      color: #bebebe;
       text-align: center;
     }
+  }
+
+  [data-theme='dark'] .win-rate {
+    color: #a0c6f8;
+  }
+
+  [data-theme='light'] .win-rate {
+    color: #0969da;
   }
 
   .win-rate {
     min-width: 76px;
     font-size: 12px;
-    color: #a0c6f8;
     font-weight: bold;
     text-align: center;
   }
@@ -1166,13 +1347,20 @@ if (import.meta.env.DEV) {
 }
 
 .card-content {
+  [data-theme='dark'] .counter-empty {
+    color: #a4a4a4;
+  }
+
+  [data-theme='light'] .counter-empty {
+    color: #5c5c5c;
+  }
+
   .counter-empty {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 20px;
     font-size: 12px;
-    color: #a4a4a4;
   }
 }
 
@@ -1209,9 +1397,16 @@ if (import.meta.env.DEV) {
       color: #a0c6f8;
     }
 
+    [data-theme='dark'] .play {
+      color: #a4a4a4;
+    }
+
+    [data-theme='light'] .play {
+      color: #6a6a6a;
+    }
+
     .play {
       font-size: 10px;
-      color: #a4a4a4;
       text-align: center;
     }
   }
@@ -1237,23 +1432,44 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .pick-rate {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .pick-rate {
+        color: #758592;
+      }
+
       .pick-rate {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .pick-play {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .pick-play {
+        color: #5a5a5a;
       }
 
       .pick-play {
         font-size: 12px;
-        color: #bebebe;
         text-align: center;
       }
+    }
+
+    [data-theme='dark'] .win-rate {
+      color: #a0c6f8;
+    }
+
+    [data-theme='light'] .win-rate {
+      color: #0969da;
     }
 
     .win-rate {
       min-width: 76px;
       font-size: 12px;
-      color: #a0c6f8;
       font-weight: bold;
       text-align: center;
     }
@@ -1297,23 +1513,44 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .pick-rate {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .pick-rate {
+        color: #758592;
+      }
+
       .pick-rate {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .pick-play {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .pick-play {
+        color: #5a5a5a;
       }
 
       .pick-play {
         font-size: 12px;
-        color: #bebebe;
         text-align: center;
       }
+    }
+
+    [data-theme='dark'] .win-rate {
+      color: #a0c6f8;
+    }
+
+    [data-theme='light'] .win-rate {
+      color: #0969da;
     }
 
     .win-rate {
       min-width: 76px;
       font-size: 12px;
-      color: #a0c6f8;
       font-weight: bold;
       text-align: center;
     }
@@ -1332,9 +1569,16 @@ if (import.meta.env.DEV) {
   align-items: center;
   margin-bottom: 4px;
 
+  [data-theme='dark'] .separator {
+    color: #909090;
+  }
+
+  [data-theme='light'] .separator {
+    color: #6a6a6a;
+  }
+
   .separator {
     font-size: 10px;
-    color: #909090;
   }
 
   .desc {
@@ -1348,23 +1592,44 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .pick-rate {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .pick-rate {
+        color: #758592;
+      }
+
       .pick-rate {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .pick-play {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .pick-play {
+        color: #5a5a5a;
       }
 
       .pick-play {
         font-size: 12px;
-        color: #bebebe;
         text-align: center;
       }
+    }
+
+    [data-theme='dark'] .win-rate {
+      color: #a0c6f8;
+    }
+
+    [data-theme='light'] .win-rate {
+      color: #0969da;
     }
 
     .win-rate {
       min-width: 76px;
       font-size: 12px;
-      color: #a0c6f8;
       font-weight: bold;
       text-align: center;
     }
@@ -1396,6 +1661,13 @@ if (import.meta.env.DEV) {
       width: 24px;
       height: 24px;
     }
+
+    .name {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--gray-light);
+      margin-left: 0.5rem;
+    }
   }
 
   .desc {
@@ -1409,15 +1681,29 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .value {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .value {
+        color: #2d2d2d;
+      }
+
       .value {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .text {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .text {
+        color: #5a5a5a;
       }
 
       .text {
         font-size: 12px;
-        color: #bebebe;
       }
     }
   }
@@ -1426,18 +1712,38 @@ if (import.meta.env.DEV) {
 .double-columns {
   display: grid;
   column-gap: 12px;
-  grid-template-columns: 1fr 1fr;
+  row-gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 600px) {
+  .double-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme='dark'] .index {
+  color: #b2b2b2;
+}
+
+[data-theme='light'] .index {
+  color: #6a6a6a;
 }
 
 .index {
   min-width: 16px;
   font-size: 10px;
-  color: #b2b2b2;
 }
 
 .augments-tab-title {
   font-size: 12px;
   font-weight: bold;
+}
+
+.items-title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--gray-light);
+  margin-left: 0.5rem;
 }
 
 .augments-group {
@@ -1452,7 +1758,10 @@ if (import.meta.env.DEV) {
     gap: 4px;
 
     .name {
-      font-size: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--gray-light);
+      margin-left: 0.5rem;
     }
   }
 
@@ -1467,23 +1776,44 @@ if (import.meta.env.DEV) {
       align-items: center;
       min-width: 76px;
 
+      [data-theme='dark'] .pick-rate {
+        color: #ebebeb;
+      }
+
+      [data-theme='light'] .pick-rate {
+        color: #758592;
+      }
+
       .pick-rate {
         font-size: 12px;
-        color: #ebebeb;
         font-weight: bold;
+      }
+
+      [data-theme='dark'] .pick-play {
+        color: #bebebe;
+      }
+
+      [data-theme='light'] .pick-play {
+        color: #5a5a5a;
       }
 
       .pick-play {
         font-size: 12px;
-        color: #bebebe;
         text-align: center;
       }
+    }
+
+    [data-theme='dark'] .win-rate {
+      color: #a0c6f8;
+    }
+
+    [data-theme='light'] .win-rate {
+      color: #0969da;
     }
 
     .win-rate {
       min-width: 76px;
       font-size: 12px;
-      color: #a0c6f8;
       font-weight: bold;
       text-align: center;
     }

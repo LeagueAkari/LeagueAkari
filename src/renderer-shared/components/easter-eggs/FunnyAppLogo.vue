@@ -65,6 +65,7 @@ const handleNotEnough = (item: any) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .funny-app-logo {
   height: 100%;
   display: flex;
@@ -93,5 +94,40 @@ const handleNotEnough = (item: any) => {
     cursor: pointer;
     color: #ffff;
   }
+}
+
+}
+
+[data-theme='light'] {
+.funny-app-logo {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-left: 8px;
+  box-sizing: border-box;
+  -webkit-app-region: drag;
+}
+
+.in-front-of-you {
+  color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  font-weight: bold;
+}
+
+.behind-you {
+  font-size: 12px;
+  font-weight: normal;
+  color: #000a;
+  margin-left: 4px;
+  -webkit-app-region: no-drag;
+  transition: color 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    color: #000f;
+  }
+}
+
 }
 </style>

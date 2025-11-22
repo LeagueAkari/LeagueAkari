@@ -22,6 +22,7 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .la-placeholder {
   display: flex;
   position: relative;
@@ -40,5 +41,30 @@ const lcs = useLeagueClientStore()
   font-size: 14px;
   font-weight: normal;
   margin-top: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.la-placeholder {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  top: calc(var(--title-bar-height) * -0.5);
+  color: #8d8d8d;
+  font-size: 18px;
+  font-weight: bold;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.sub {
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 8px;
+}
+
 }
 </style>

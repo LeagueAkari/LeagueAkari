@@ -61,6 +61,7 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .cooldown,
 .description,
 .level {
@@ -89,5 +90,40 @@ const lcs = useLeagueClientStore()
 .empty {
   border-radius: 2px;
   background-color: rgb(34, 34, 34);
+}
+
+}
+
+[data-theme='light'] {
+.cooldown,
+.description,
+.level {
+  font-size: 12px;
+}
+
+.cooldown,
+.level {
+  font-style: italic;
+}
+
+.level {
+  margin-bottom: 2px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.spell {
+  border-radius: 2px;
+}
+
+.empty {
+  border-radius: 2px;
+  background-color: rgb(221, 221, 221);
+}
+
 }
 </style>

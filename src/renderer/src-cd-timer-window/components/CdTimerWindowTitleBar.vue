@@ -25,6 +25,7 @@ const handleClose = () => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .title-bar {
   display: flex;
   height: 20px;
@@ -74,5 +75,61 @@ const handleClose = () => {
       color: #fff;
     }
   }
+}
+
+}
+
+[data-theme='light'] {
+.title-bar {
+  display: flex;
+  height: 20px;
+  background-color: #fc82eaa0;
+  -webkit-app-region: drag;
+}
+
+.title-area {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+  transition: all 0.3s;
+  padding: 4px 4px 2px 8px;
+  box-sizing: border-box;
+
+  .title {
+    font-size: 12px;
+    color: #000d;
+  }
+}
+
+.traffic {
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  transition: all 0.3s ease;
+
+  .traffic-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 36px;
+    font-size: 12px;
+    transition: all 0.3s;
+    -webkit-app-region: no-drag;
+
+    &:active {
+      filter: brightness(0.8);
+    }
+  }
+
+  .traffic-button.close {
+    &:hover {
+      background-color: rgb(194, 0, 0);
+      color: #000;
+    }
+  }
+}
+
 }
 </style>

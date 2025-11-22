@@ -199,6 +199,7 @@ export type GameMode =
   | 'TUTORIAL' // 新手教程
   | 'CLASSIC' // 经典
   | 'ARAM' // 极地大乱斗
+  | 'KIWI' // 海克斯大乱斗 (ARAM: Mayhem)
   | 'DOOMBOTSTEEMO' // 末日人机 - 提莫
   | 'ULTBOOK' // 终极魔典
   | 'ONEFORALL' // 克隆大作战

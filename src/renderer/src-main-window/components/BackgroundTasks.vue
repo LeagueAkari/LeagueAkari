@@ -65,6 +65,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .tasks {
   display: flex;
   flex-direction: column;
@@ -125,5 +126,72 @@ const renderText = (node: string | (() => VNodeChild)) => {
   color: #fffc;
   text-align: center;
   padding: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: solid 1px #0002;
+  border-radius: 4px;
+  background-color: var(--background-color-primary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.task-title {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0 8px;
+  margin-bottom: 4px;
+}
+
+.divider {
+  height: 1px;
+  background-color: #0001;
+}
+
+.task {
+  background-color: #0001;
+  border-radius: 2px;
+  padding: 8px 8px;
+  width: 320px;
+
+  &.error {
+    background-color: #ff4d4f20;
+  }
+
+  .task-name {
+    font-size: 14px;
+  }
+
+  .task-progress {
+    margin-top: 8px;
+  }
+
+  .task-description {
+    font-size: 12px;
+    margin-top: 8px;
+    color: #000c;
+  }
+}
+
+.empty-placeholder {
+  font-size: 12px;
+  color: #000c;
+  text-align: center;
+  padding: 8px;
+}
+
 }
 </style>

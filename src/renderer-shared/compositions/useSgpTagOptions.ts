@@ -51,6 +51,10 @@ export function useSgpTagOptions() {
       {
         label: lcs.gameData.queues[2300]?.name || t('sgpMatchHistoryTags.q_2300', { ns: 'common' }),
         value: `q_2300`
+      },
+      {
+        label: lcs.gameData.queues[2400]?.name || t('sgpMatchHistoryTags.q_2400', { ns: 'common' }),
+        value: `q_2400`
       }
     ]
   })

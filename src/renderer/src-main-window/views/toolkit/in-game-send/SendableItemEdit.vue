@@ -10,7 +10,7 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="dropdownThemeOverrides"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -330,6 +330,7 @@
 <script lang="ts" setup>
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { vscodeDark } from '@uiw/codemirror-theme-vscode'
@@ -366,16 +367,21 @@ import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
-import { DROPDOWN_OVERRIDES } from './style-overrides'
+import { getDropdownOverrides } from './style-overrides'
 
 // 还是直接复制一份组件好用
 const { t } = useTranslation('renderer', { keyPrefix: 'SendableItemEdit' })
 
+const as = useAppCommonStore()
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
+
+const dropdownThemeOverrides = computed(() => {
+  return getDropdownOverrides(as.settings.theme === 'light')
+})
 
 const dropdownOptions = computed(() => [
   {
@@ -620,6 +626,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .template-edit {
   display: flex;
   height: 600px;
@@ -797,6 +804,189 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
     gap: 8px;
   }
 }
+
+}
+
+[data-theme='light'] {
+.template-edit {
+  display: flex;
+  height: 600px;
+  border: 1px solid #0001;
+}
+
+.left-list {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+  border-right: 1px solid #fff1;
+  flex-shrink: 0;
+
+  .button-new {
+    margin-bottom: 8px;
+    align-self: flex-start;
+  }
+
+  .filter-input {
+    margin-bottom: 8px;
+  }
+
+  .list {
+    flex-grow: 1;
+    border: 1px solid #0001;
+    border-radius: 2px;
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      border-radius: 2px;
+      height: 28px;
+      padding: 0 8px;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin: 0 4px 2px 4px;
+      font-size: 12px;
+
+      &:hover {
+        background-color: #0001;
+      }
+
+      &.active {
+        background-color: #0002;
+      }
+
+      .status-icons {
+        margin-left: auto;
+      }
+
+      .enabled-icon {
+        font-size: 14px;
+        color: #ffff;
+      }
+
+      .invalid-icon {
+        font-size: 14px;
+        color: #0009;
+      }
+    }
+  }
+
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      font-size: 16px;
+      color: #0001;
+    }
+  }
+}
+
+.right-content {
+  flex: 1;
+  width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      flex-grow: 1;
+      height: 28px;
+      width: 0;
+
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:hover {
+        color: #000;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    margin-bottom: 16px; // here 16px
+  }
+
+  .control-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .editor-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 4px;
+  }
+
+  .editor {
+    flex: 1;
+    border: 1px solid #0001;
+    border-radius: 2px;
+  }
+
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      font-size: 16px;
+      color: #0001;
+    }
+  }
+}
+
+.left-list,
+.right-content {
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.one-time-player-filter {
+  margin-bottom: 16px;
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+}
 </style>
 
 <style lang="less" module>
@@ -805,9 +995,16 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
     font-size: 12px;
   }
 
+  [data-theme='dark'] .error-divider {
+    background-color: #fff2;
+  }
+
+  [data-theme='light'] .error-divider {
+    background-color: #0002;
+  }
+
   .error-divider {
     height: 1px;
-    background-color: #fff2;
     margin: 8px 0;
   }
 

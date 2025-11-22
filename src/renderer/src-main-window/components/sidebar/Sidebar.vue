@@ -122,6 +122,7 @@ watchEffect(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .app-sidebar {
   display: flex;
   flex-direction: column;
@@ -131,5 +132,21 @@ watchEffect(() => {
   .padding-zone {
     flex: 1;
   }
+}
+
+}
+
+[data-theme='light'] {
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fff1;
+
+  .padding-zone {
+    flex: 1;
+  }
+}
+
 }
 </style>

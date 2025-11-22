@@ -91,6 +91,7 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .menu-list {
   display: flex;
   flex-direction: column;
@@ -172,5 +173,93 @@ onMounted(() => {
 
 .menu-list-header {
   margin-bottom: 8px;
+}
+
+}
+
+[data-theme='light'] {
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px;
+
+  .menu-body {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.menu-list-item {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  border-radius: 4px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+  color: #000a;
+
+  &:not(.active) {
+    cursor: pointer;
+  }
+
+  &.active {
+    color: #000;
+  }
+
+  &:hover:not(.active) {
+    background-color: #0001;
+  }
+
+  &:hover:not(.active) {
+    color: #000;
+  }
+
+  .menu-list-item-label {
+    margin-left: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+.menu-list-item-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  border-radius: 4px;
+  background-color: #0002;
+  z-index: -1;
+  transition:
+    top 0.2s cubic-bezier(0, 1, 0.1, 0.96),
+    height 0.2s;
+}
+
+.menu-list-item-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  :deep(.n-icon) {
+    display: block;
+  }
+}
+
+.menu-list-item-icon-gm {
+  width: 18px;
+  height: 18px;
+}
+
+.menu-list-header {
+  margin-bottom: 8px;
+}
+
 }
 </style>

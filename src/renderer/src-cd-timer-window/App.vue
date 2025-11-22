@@ -40,11 +40,18 @@ body,
   height: fit-content;
 }
 
+[data-theme='dark'] .cd-timer-wrapper {
+  background-color: #1a1a1da0;
+}
+
+[data-theme='light'] .cd-timer-wrapper {
+  background-color: #f9f9f9e0;
+}
+
 .cd-timer-wrapper {
   width: fit-content;
   display: flex;
   flex-direction: column;
-  background-color: #1a1a1da0;
   border-radius: 4px;
   box-sizing: border-box;
   overflow: hidden;

@@ -285,8 +285,19 @@ const sgps = useSgpStore()
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .unsupported-sgp-server {
   color: rgb(230, 114, 41);
   font-weight: bold;
+}
+
+}
+
+[data-theme='light'] {
+.unsupported-sgp-server {
+  color: rgb(230, 114, 41);
+  font-weight: bold;
+}
+
 }
 </style>

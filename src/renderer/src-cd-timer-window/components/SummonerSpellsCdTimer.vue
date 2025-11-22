@@ -330,6 +330,7 @@ const sendInGameText = (
 </script>
 
 <style lang="less" scoped>
+[data-theme='dark'] {
 .spells-cd-timer {
   position: relative;
   padding: 8px;
@@ -366,5 +367,48 @@ const sendInGameText = (
 
 .item-margin:not(:last-child) {
   margin-bottom: 4px;
+}
+
+}
+
+[data-theme='light'] {
+.spells-cd-timer {
+  position: relative;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.adjustment-indicator {
+  position: absolute;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  transition: opacity 0.2s;
+  opacity: 0;
+
+  &.opacity-show {
+    opacity: 1;
+  }
+}
+
+.item-margin:not(:last-child) {
+  margin-bottom: 4px;
+}
+
 }
 </style>
