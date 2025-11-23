@@ -3087,6 +3087,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@zumer/snapdom@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@zumer/snapdom@npm:2.0.0"
+  checksum: 10c0/0fe82ffbed72ab544503cb5cd90f519a6959d18510ff5a5cedc57d614ab516802b14a108462763ade33809ca8c6adc7939e7e59d8fbbf8fc0cc4b1de9413abaf
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1, abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -6050,6 +6057,7 @@ __metadata:
     "@vueuse/core": "npm:^13.9.0"
     "@vueuse/motion": "npm:^3.0.3"
     "@vueuse/router": "npm:14.0.0-beta.1"
+    "@zumer/snapdom": "npm:^2.0.0"
     ajv: "npm:^8.17.1"
     axios: "npm:^1.12.2"
     axios-retry: "npm:^4.5.0"

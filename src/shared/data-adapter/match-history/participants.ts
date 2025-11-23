@@ -1,7 +1,9 @@
 import { Participant } from '@shared/types/league-client/match-history'
 
+import { noZero } from '../utils'
 import { LcuOrSgpGameSummary } from '../wrapper'
 import { MatchBasicInfo, MatchParticipant, MatchParticipantPerks } from './types'
+import { computeWinResult } from './win-result'
 
 // 以 SGP 的格式为参照，将 LCU 数据映射为抽象格式
 function mapLcuDataToPerks(participant: Participant): MatchParticipantPerks {
@@ -84,14 +86,18 @@ export function toParticipants(
         ? `CHERRY-${p.playerSubteamId}`
         : `TEAM-${p.teamId}`
 
+      const { isSurrender, result } = computeWinResult(basicInfo.endOfGameResult, p)
+
       return {
         puuid: p.puuid,
         participantId: p.participantId,
         gameName: p.riotIdGameName,
         tagLine: p.riotIdTagline,
+        profileIconId: p.profileIcon,
         championId: p.championId,
         position: p.individualPosition,
         teamId: p.teamId,
+        playerSubteamId: p.playerSubteamId,
         teamIdentifier,
         items: [p.item0, p.item1, p.item2, p.item3, p.item4, p.item5, p.item6],
         augments: [
@@ -108,8 +114,8 @@ export function toParticipants(
         kills: p.kills,
         deaths: p.deaths,
         assists: p.assists,
-        kda: (p.kills + p.assists) / (p.deaths || 1),
-        killParticipation: (p.kills + p.assists) / totalKills[teamIdentifier],
+        kda: (p.kills + p.assists) / noZero(p.deaths),
+        killParticipation: (p.kills + p.assists) / noZero(totalKills[teamIdentifier]),
         totalDamageDealtToChampions: p.totalDamageDealtToChampions,
         physicalDamageDealtToChampions: p.physicalDamageDealtToChampions,
         magicDamageDealtToChampions: p.magicDamageDealtToChampions,
@@ -124,14 +130,17 @@ export function toParticipants(
         totalMinionsKilled: p.totalMinionsKilled,
         cs: p.neutralMinionsKilled + p.totalMinionsKilled,
         win: p.win,
+        isSurrender,
+        winResult: result,
         subteamPlacement: p.subteamPlacement,
         gameEndedInEarlySurrender: p.gameEndedInEarlySurrender,
         gameEndedInSurrender: p.gameEndedInSurrender,
         teamEarlySurrendered: p.teamEarlySurrendered,
         totalDamageToTowers: p.damageDealtToTurrets,
         totalHeal: p.totalHeal,
-        soloKills: p.challenges.soloKills ?? null,
-        effectiveHealAndShielding: p.challenges.effectiveHealAndShielding ?? null,
+        visionScore: p.visionScore,
+        soloKills: p.challenges?.soloKills ?? null,
+        effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
 
         pings: {
           allInPings: p.allInPings,
@@ -177,14 +186,18 @@ export function toParticipants(
         ? `CHERRY-${participant.stats.playerSubteamId}`
         : `TEAM-${participant.teamId}`
 
+      const { isSurrender, result } = computeWinResult(basicInfo.endOfGameResult, participant.stats)
+
       return {
         puuid: identity.player.puuid,
         participantId: participant.participantId,
         gameName: identity.player.gameName,
         tagLine: identity.player.tagLine,
+        profileIconId: identity.player.profileIcon,
         championId: participant.championId,
         position: null, // lcu has no position record
         teamId: participant.teamId,
+        playerSubteamId: participant.stats.playerSubteamId,
         teamIdentifier,
         items: [
           participant.stats.item0,
@@ -210,9 +223,10 @@ export function toParticipants(
         deaths: participant.stats.deaths,
         assists: participant.stats.assists,
         kda:
-          (participant.stats.kills + participant.stats.assists) / (participant.stats.deaths || 1),
+          (participant.stats.kills + participant.stats.assists) / noZero(participant.stats.deaths),
         killParticipation:
-          (participant.stats.kills + participant.stats.assists) / totalKills[teamIdentifier],
+          (participant.stats.kills + participant.stats.assists) /
+          noZero(totalKills[teamIdentifier]),
         totalDamageDealtToChampions: participant.stats.totalDamageDealtToChampions,
         physicalDamageDealtToChampions: participant.stats.physicalDamageDealtToChampions,
         magicDamageDealtToChampions: participant.stats.magicDamageDealtToChampions,
@@ -227,12 +241,15 @@ export function toParticipants(
         totalMinionsKilled: participant.stats.totalMinionsKilled,
         cs: participant.stats.neutralMinionsKilled + participant.stats.totalMinionsKilled,
         win: participant.stats.win,
+        isSurrender,
+        winResult: result,
         subteamPlacement: participant.stats.subteamPlacement,
         gameEndedInEarlySurrender: participant.stats.gameEndedInEarlySurrender,
         gameEndedInSurrender: participant.stats.gameEndedInSurrender,
         teamEarlySurrendered: participant.stats.teamEarlySurrendered,
         totalDamageToTowers: participant.stats.damageDealtToTurrets,
         totalHeal: participant.stats.totalHeal,
+        visionScore: participant.stats.visionScore,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record
         soloKills: null, // lcu has no solo kills record

@@ -58,7 +58,11 @@
           </NCheckbox>
           <NCheckboxGroup v-model:value="selectedPlayers">
             <div class="flex flex-col gap-1.5">
-              <NCheckbox v-for="player in playerOptions" :key="player.value" :value="player.value">
+              <NCheckbox
+                v-for="player in sortedPlayerOptions"
+                :key="player.value"
+                :value="player.value"
+              >
                 <template #default>
                   <div class="flex items-center gap-2 w-48">
                     <!-- 颜色方块 -->
@@ -78,54 +82,52 @@
   </div>
   <div
     v-else
-    class="h-142 w-full flex items-center justify-center dark:text-white/60 text-black/60 text-base"
+    class="h-142 w-full flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
   >
-    暂无数据
+    <template v-if="loadingDetails">
+      <div class="flex gap-2 items-center">
+        <NSpin :size="16" />
+        <span>加载中...</span>
+      </div>
+    </template>
+    <template v-else>
+      <div class="flex gap-2 items-center">
+        <span>暂无数据</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip
-} from 'chart.js'
-import { NCheckbox, NCheckboxGroup, NRadio, NRadioGroup, NScrollbar } from 'naive-ui'
+  NButton,
+  NCheckbox,
+  NCheckboxGroup,
+  NRadio,
+  NRadioGroup,
+  NScrollbar,
+  NSpin
+} from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 import { Line } from 'vue-chartjs'
 
 import { useMatchCard } from '../context'
-import { playerColors } from '../utils/theme'
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+import { useTeamName } from '../utils/text'
+import { getTeamColor, playerColors } from '../utils/theme'
 
 const lcs = useLeagueClientStore()
 
-const { frames, participants, teams } = useMatchCard()
+const teamName = useTeamName()
+
+const { basicInfo, details, frames, participants, teams, theme, loadingDetails, onLoadDetails } =
+  useMatchCard()
 
 const selectedMetric = ref<'gold' | 'cs' | 'exp'>('gold')
 
 // 检测当前主题（响应式）
-const currentTheme = ref(document.documentElement.getAttribute('data-theme') || 'dark')
-const isDark = computed(() => currentTheme.value === 'dark')
-
-// 监听主题变化
-watchEffect(() => {
-  const observer = new MutationObserver(() => {
-    currentTheme.value = document.documentElement.getAttribute('data-theme') || 'dark'
-  })
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme']
-  })
-  return () => observer.disconnect()
-})
+const isDark = computed(() => theme.value === 'dark')
 
 const selectedTeams = ref<string[]>([])
 const selectedPlayers = ref<number[]>([])
@@ -133,6 +135,10 @@ const selectedPlayers = ref<number[]>([])
 watchEffect(() => {
   selectedTeams.value = teams.value.teamStatsArr.map((team) => team.teamIdentifier)
 })
+
+if (!details.value && !loadingDetails.value) {
+  onLoadDetails(basicInfo.value.gameId)
+}
 
 const metricConfigs = {
   gold: {
@@ -220,44 +226,38 @@ const timeLabels = computed(() => {
   })
 })
 
-const TEAM_NAMES = {
-  'TEAM-100': '蓝队',
-  'TEAM-200': '红队',
-  'CHERRY-0': '?',
-  'CHERRY-1': '一队',
-  'CHERRY-2': '二队',
-  'CHERRY-3': '三队',
-  'CHERRY-4': '四队',
-  'CHERRY-5': '五队',
-  'CHERRY-6': '六队',
-  'CHERRY-7': '七队',
-  'CHERRY-8': '八队'
-}
-
 // 队伍选项
-const teamOptions = teams.value.teamStatsArr.map((team) => {
-  return {
-    value: team.teamIdentifier,
-    label: TEAM_NAMES[team.teamIdentifier as keyof typeof TEAM_NAMES] + '平均',
-    color: team.win ? '#3B82F6' : '#EF4444'
-  }
+const teamOptions = computed(() => {
+  return teams.value.teamStatsArr.map((team) => {
+    const name = teamName(team.teamIdentifier)
+    return {
+      value: team.teamIdentifier,
+      label: name + '平均',
+      color: getTeamColor(team.teamIdentifier)
+    }
+  })
 })
 
-// 玩家选项
-const playerOptions = Array.from({ length: participants.value.length }, (_, i) => {
-  const participantId = i + 1
-  const participant = participants.value.find((p) => p.participantId === participantId)
-  return {
-    value: participantId,
-    label: participant
-      ? `${lcs.gameData.championName(participant.championId)}`
-      : `玩家 ${participantId}`,
-    color: playerColors[i % playerColors.length]
-  }
+const sortedPlayerOptions = computed(() => {
+  return participants.value
+    .toSorted((a, b) => {
+      if (basicInfo.value.isCherrySubteam) {
+        return a.subteamPlacement - b.subteamPlacement
+      }
+
+      return a.teamIdentifier.localeCompare(b.teamIdentifier)
+    })
+    .map((p) => {
+      return {
+        value: p.participantId + 1,
+        label: `${lcs.gameData.championName(p.championId)}`,
+        color: playerColors[p.participantId % playerColors.length]
+      }
+    })
 })
 
 // 玩家全选 / 半选 / 全不选状态
-const allPlayerValues = computed(() => playerOptions.map((p) => p.value))
+const allPlayerValues = computed(() => sortedPlayerOptions.value.map((p) => p.value))
 const allPlayersChecked = computed(
   () =>
     selectedPlayers.value.length > 0 &&
@@ -301,12 +301,14 @@ const chartData = computed(() => {
 
   // 队伍平均数据
   const teamAverageDatasets = teams.value.teamStatsArr.map((team) => {
-    const isBlueTeam = team.teamIdentifier === 'TEAM-100'
+    const name = teamName(team.teamIdentifier)
+    const color = getTeamColor(team.teamIdentifier)
+
     return {
-      label: isBlueTeam ? '蓝队平均' : '红队平均',
+      label: `${name}平均`,
       data: extractTeamAverageData(team.teamIdentifier, selectedMetric.value),
-      borderColor: isBlueTeam ? '#3B82F6' : '#EF4444', // 蓝色 / 红色
-      backgroundColor: isBlueTeam ? '#3B82F640' : '#EF444440',
+      borderColor: color,
+      backgroundColor: color + '40',
       borderWidth: 3,
       borderDash: [10, 2, 2, 2], // 点划线样式（长线-短间隔-点-短间隔）
       tension: 0,

@@ -5,15 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LineElement,
-  PointElement,
-  RadialLinearScale,
-  Tooltip
-} from 'chart.js'
+import { noZero } from '@shared/data-adapter/utils'
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js'
 import { computed } from 'vue'
 import { Radar } from 'vue-chartjs'
@@ -23,8 +15,6 @@ import { useMatchCard } from '../context'
 const { puuid } = defineProps<{
   puuid?: string
 }>()
-
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
 const { teams, participants, theme } = useMatchCard()
 
@@ -122,33 +112,35 @@ const percentage = computed(() => {
 
   const damageDealtToChampionsRatioToMax =
     participant.value.totalDamageDealtToChampions /
-    teams.value.allTeamStats.maxDamageDealtToChampions
+    noZero(teams.value.allTeamStats.maxDamageDealtToChampions)
   const damageTakenRatioToMax =
-    participant.value.totalDamageTaken / teams.value.allTeamStats.maxDamageTaken
-  const goldEarnedRatioToMax = participant.value.goldEarned / teams.value.allTeamStats.maxGoldEarned
-  const csRatioToMax = participant.value.cs / teams.value.allTeamStats.maxCs
-  const kdaRatioToMax = participant.value.kda / teams.value.allTeamStats.maxKda
+    participant.value.totalDamageTaken / noZero(teams.value.allTeamStats.maxDamageTaken)
+  const goldEarnedRatioToMax =
+    participant.value.goldEarned / noZero(teams.value.allTeamStats.maxGoldEarned)
+  const csRatioToMax = participant.value.cs / noZero(teams.value.allTeamStats.maxCs)
+  const kdaRatioToMax = participant.value.kda / noZero(teams.value.allTeamStats.maxKda)
   const killParticipationRatioToMax =
-    participant.value.killParticipation / teams.value.allTeamStats.maxKillParticipation
-  const totalHealRatioToMax = participant.value.totalHeal / teams.value.allTeamStats.maxTotalHeal
+    participant.value.killParticipation / noZero(teams.value.allTeamStats.maxKillParticipation)
+  const totalHealRatioToMax =
+    participant.value.totalHeal / noZero(teams.value.allTeamStats.maxTotalHeal)
 
   const teamAvgDamageDealtToChampionsRatioToMax =
     team.value.totalDamageDealtToChampions /
     teamSize.value /
-    teams.value.allTeamStats.maxDamageDealtToChampions
+    noZero(teams.value.allTeamStats.maxDamageDealtToChampions)
   const teamAvgDamageTakenRatioToMax =
-    team.value.totalDamageTaken / teamSize.value / teams.value.allTeamStats.maxDamageTaken
+    team.value.totalDamageTaken / teamSize.value / noZero(teams.value.allTeamStats.maxDamageTaken)
   const teamAvgGoldEarnedRatioToMax =
-    team.value.totalGoldEarned / teamSize.value / teams.value.allTeamStats.maxGoldEarned
+    team.value.totalGoldEarned / teamSize.value / noZero(teams.value.allTeamStats.maxGoldEarned)
   const teamAvgCsRatioToMax = team.value.totalCs / teamSize.value / teams.value.allTeamStats.maxCs
   const teamAvgKdaRatioToMax =
-    team.value.totalKda / teamSize.value / teams.value.allTeamStats.maxKda
+    team.value.totalKda / teamSize.value / noZero(teams.value.allTeamStats.maxKda)
   const teamAvgKillParticipationRatioToMax =
     team.value.totalKillParticipation /
     teamSize.value /
-    teams.value.allTeamStats.maxKillParticipation
+    noZero(teams.value.allTeamStats.maxKillParticipation)
   const teamAvgTotalHealRatioToMax =
-    team.value.totalHeal / teamSize.value / teams.value.allTeamStats.maxTotalHeal
+    team.value.totalHeal / teamSize.value / noZero(teams.value.allTeamStats.maxTotalHeal)
 
   return {
     damageDealtToChampions: participant.value.totalDamageDealtToChampions,
@@ -182,7 +174,7 @@ const data = computed<ChartData<'radar'>>(() => {
     labels: [
       `伤害 (${percentage.value.damageDealtToChampions.toLocaleString()})`,
       `承伤 (${percentage.value.damageTaken.toLocaleString()})`,
-      `经济 (${percentage.value.goldEarned.toLocaleString()})`,
+      `金币 (${percentage.value.goldEarned.toLocaleString()})`,
       `补兵 (${percentage.value.cs.toLocaleString()})`,
       `KDA (${percentage.value.kda.toFixed(2)})`,
       `击杀参与率 (${(percentage.value.killParticipation * 100).toFixed(0)}%)`,

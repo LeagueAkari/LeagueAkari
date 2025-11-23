@@ -1,10 +1,17 @@
 <template>
-  <div class="tiny-list">
-    <div class="list-item" v-for="p of list" :key="p.puuid">
-      <ChampionIcon class="champion-icon" round :champion-id="p.championId" />
-      <div class="name-line" v-if="p.gameName" @click="navigateToTabByPuuid(p.puuid)">
-        <div class="game-name">{{ p.gameName }}</div>
-        <div class="tag-line" v-if="p.tagLine">#{{ p.tagLine }}</div>
+  <div class="flex gap-2 flex-col">
+    <div class="flex gap-2 items-center" v-for="p of list" :key="p.puuid">
+      <ChampionIcon class="size-6" round :champion-id="p.championId" />
+      <div
+        class="flex gap-0.5 items-end cursor-pointer"
+        v-if="p.gameName"
+        @click="navigateToTabByPuuid(p.puuid)"
+      >
+        <div
+          class="text-[13px] font-bold transition-colors dark:text-white/80 dark:hover:text-white text-black/90 hover:text-black"
+        >
+          {{ p.gameName }} <span v-if="p.tagLine" class="text-xs">#{{ p.tagLine }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -29,72 +36,3 @@ const mh = useInstance(MatchHistoryTabsRenderer)
 
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 </script>
-
-<style scoped>
-.tiny-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  .list-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .champion-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .name-line {
-    display: flex;
-    gap: 2px;
-    align-items: flex-end;
-    cursor: pointer;
-  }
-
-  .game-name {
-    font-size: 13px;
-    font-weight: bold;
-    transition: color 0.2s ease-in-out;
-  }
-
-  .tag-line {
-    font-size: 12px;
-    transition: color 0.2s ease-in-out;
-  }
-}
-
-[data-theme='light'] {
-  .name-line:hover {
-    .tag-line {
-      color: #000a;
-    }
-
-    .game-name {
-      color: #000;
-    }
-  }
-
-  .tag-line {
-    color: #0008;
-  }
-}
-
-[data-theme='dark'] {
-  .name-line:hover {
-    .tag-line {
-      color: #fffa;
-    }
-
-    .game-name {
-      color: #fff;
-    }
-  }
-
-  .tag-line {
-    color: #fff8;
-  }
-}
-</style>

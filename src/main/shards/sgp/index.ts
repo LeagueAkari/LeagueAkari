@@ -1,6 +1,7 @@
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LeagueSgpApi } from '@shared/data-sources/sgp'
+import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
 import {
   AKARI_HEADER_SGP_SERVER_ID,
   AKARI_HEADER_TOKEN_TYPE,
@@ -51,10 +52,13 @@ export class SgpMain implements IAkariShardInitDispose {
 
   private readonly _api = new LeagueSgpApi()
 
-  private readonly _http = axios.create({
-    validateStatus: () => true,
-    responseType: 'stream'
-  })
+  private readonly _api2: SgpHttpApiAxiosHelper
+
+  private readonly _http = axios.create()
+
+  get api() {
+    return this._api2
+  }
 
   constructor(
     private readonly _app: AppCommonMain,
@@ -70,6 +74,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
     this.state = new SgpState(this._lc.state)
+    this._api2 = new SgpHttpApiAxiosHelper(this._http)
   }
 
   async onInit() {
@@ -696,7 +701,9 @@ export class SgpMain implements IAkariShardInitDispose {
           method: req.method,
           url: uri,
           data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
-          headers: reqHeaders
+          headers: reqHeaders,
+          validateStatus: () => true,
+          responseType: 'stream'
         }
 
         const res = await this._http.request(config)

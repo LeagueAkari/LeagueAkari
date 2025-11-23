@@ -8,6 +8,7 @@ export type MatchBasicInfo = {
   endOfGameResult: string
   gameCreation: number
   gameDuration: number
+  gameType: string
   queueId: number
   gameMode: string
   mapId: number
@@ -60,9 +61,11 @@ export type MatchParticipant = {
   participantId: number
   gameName: string
   tagLine: string
+  profileIconId: number
   championId: number
   position: string | null
   teamId: number
+  playerSubteamId: number
   teamIdentifier: string
   items: number[]
   augments: number[]
@@ -88,12 +91,15 @@ export type MatchParticipant = {
   totalMinionsKilled: number
   cs: number
   win: boolean
-  subteamPlacement: number | null
+  isSurrender: boolean
+  winResult: WinResult
+  subteamPlacement: number
   gameEndedInEarlySurrender: boolean
   gameEndedInSurrender: boolean
   teamEarlySurrendered: boolean
   totalDamageToTowers: number
   totalHeal: number
+  visionScore: number
   soloKills: number | null
   effectiveHealAndShielding: number | null
   pings: MatchParticipantPings | null
@@ -127,18 +133,20 @@ export type MatchTeamInfo = {
   objectives: MatchTeamObjectives
 }
 
-export type TeamWinResult = {
+export type WinResult = 'win' | 'lose' | 'remake' | 'abort'
+
+export type WinResultInfo = {
   isSurrender: boolean
-  result: 'win' | 'lose' | 'remake' | 'abort'
+  result: WinResult
 }
 
 export type MatchTeamStats = {
   teamIdentifier: string
-  teamInfo: MatchTeamInfo
-  winResult: TeamWinResult['result']
+  teamInfo: MatchTeamInfo | null // 如 CHERRY 模式，teamInfo 则没有必要
+  winResult: WinResult
   isSurrender: boolean
   win: boolean
-  subteamPlacement: number | null
+  subteamPlacement: number
   maxDamageDealtToChampions: number
   totalDamageDealtToChampions: number
   maxDamageTaken: number

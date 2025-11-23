@@ -580,7 +580,7 @@ DebugSettings:
 
   kyokoMode:
     label: Kyoko 模式
-    description: 启用被废弃或实验性的功能
+    description: League Akari 不为人知的一面，启用更多的功能！
 
 StorageSettings:
   title: 存储
@@ -1440,6 +1440,7 @@ MatchHistoryTab:
     wr: 胜率
     champions: 英雄使用
     times: 场
+    teamSides: 阵营分布
 
   recentPlayers:
     teammatesTitle: 最近队友
@@ -1724,11 +1725,8 @@ PlayerInfoCard:
   losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
   suspiciousFlashPosition: 闪现异位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
-  soloKills:
-    tooManySoloDeathsInEarlyGame: 被单杀 {{times}} 次
-    tooManySoloDeathsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家被单杀平均 {{times}} 次
-    tooManySoloKillsInEarlyGame: '{{times}} 单杀'
-    tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
+  soloKills: '{{times}} 单杀'
+  soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家获得单杀 {{times}} 次平均
   akariLoved:
     outstanding: 优异
     extraordinary: 通天代

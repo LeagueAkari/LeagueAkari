@@ -20,7 +20,14 @@
         <RankedTable v-if="tab.rankedStats" :ranked-stats="tab.rankedStats" />
       </div>
     </NModal>
-    <GamePreviewer ref="game-previewer" />
+
+    <MatchPreviewer
+      v-model:show="showPreviewModal"
+      :game-id="previewingGame.gameId"
+      :source="previewingGame.source"
+      :puuid="previewingGame.puuid"
+      :summary="previewingGame.summary"
+    />
 
     <!-- Floating header -->
     <Transition name="bi-fade">
@@ -262,11 +269,11 @@
             <!-- Pagination -->
             <div class="left-content-item">
               <div class="left-content-item-content">
-                <div style="display: flex; gap: 4px">
+                <div class="flex gap-1">
                   <NInputNumber
                     size="small"
                     placeholder=""
-                    style="flex: 1"
+                    class="flex-1"
                     v-model:value="inputtingPage"
                     @blur="handleInputBlur"
                     @keyup.enter="() => handleLoadMatchHistoryPage(inputtingPage || 1)"
@@ -405,19 +412,19 @@
                   <NPopover>
                     <template #trigger>
                       <span class="stat-item-content">{{
-                        analysis.matchHistory.summary.averageKda.toFixed(2)
+                        analysis.matchHistory.summary.avgKda.toFixed(2)
                       }}</span>
                     </template>
-                    {{ analysis.matchHistory.summary.totalKills }} /
-                    {{ analysis.matchHistory.summary.totalDeaths }} /
-                    {{ analysis.matchHistory.summary.totalAssists }}
+                    {{ analysis.matchHistory.summary.kills }} /
+                    {{ analysis.matchHistory.summary.deaths }} /
+                    {{ analysis.matchHistory.summary.assists }}
                   </NPopover>
                 </div>
                 <div class="stat-item">
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKp') }}</span>
                   <span class="stat-item-content"
                     >{{
-                      (analysis.matchHistory.summary.averageKillParticipation * 100).toFixed()
+                      (analysis.matchHistory.summary.avgKillParticipation * 100).toFixed()
                     }}%</span
                   >
                 </div>
@@ -426,7 +433,7 @@
                   <span class="stat-item-content"
                     >{{
                       (
-                        analysis.matchHistory.summary.averageDamageDealtToChampionShareOfTeam * 100
+                        analysis.matchHistory.summary.avgChampionDamagePercentageOfTeam * 100
                       ).toFixed()
                     }}%</span
                   >
@@ -435,7 +442,9 @@
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgDmgTaken') }}</span>
                   <span class="stat-item-content"
                     >{{
-                      (analysis.matchHistory.summary.averageDamageTakenShareOfTeam * 100).toFixed()
+                      (
+                        analysis.matchHistory.summary.avgDamageTakenPercentageOfTeam * 100
+                      ).toFixed()
                     }}%</span
                   >
                 </div>
@@ -443,7 +452,7 @@
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgGold') }}</span>
                   <span class="stat-item-content"
                     >{{
-                      (analysis.matchHistory.summary.averageGoldShareOfTeam * 100).toFixed()
+                      (analysis.matchHistory.summary.avgGoldPercentageOfTeam * 100).toFixed()
                     }}%</span
                   >
                 </div>
@@ -451,19 +460,37 @@
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgCs') }}</span>
                   <span class="stat-item-content"
                     >{{
-                      (analysis.matchHistory.summary.averageCsShareOfTeam * 100).toFixed()
+                      (analysis.matchHistory.summary.avgCsPercentageOfTeam * 100).toFixed()
                     }}%</span
                   >
                 </div>
                 <div class="stat-item">
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.winLose') }}</span>
                   <span class="stat-item-content"
-                    >{{ analysis.matchHistory.summary.win }} {{ t('MatchHistoryTab.stats.win') }}
-                    {{ analysis.matchHistory.summary.lose }}
+                    >{{ analysis.matchHistory.summary.wins }} {{ t('MatchHistoryTab.stats.win') }}
+                    {{ analysis.matchHistory.summary.losses }}
                     {{ t('MatchHistoryTab.stats.lose') }} ({{
                       (analysis.matchHistory.summary.winRate * 100).toFixed()
                     }}%)
                   </span>
+                </div>
+                <div
+                  class="stat-item"
+                  v-if="
+                    analysis.matchHistory.summary.blueSideCount > 0 ||
+                    analysis.matchHistory.summary.redSideCount > 0
+                  "
+                >
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.teamSides') }}</span>
+                  <div class="stat-item-content">
+                    <div class="flex items-center">
+                      <div class="size-3 rounded-full bg-blue-500 mr-1"></div>
+                      <span>{{ analysis.matchHistory.summary.blueSideCount }}</span>
+                      <span class="dark:text-white/60 text-black/80 text-xs mx-2">/</span>
+                      <div class="size-3 rounded-full bg-red-400 mr-1"></div>
+                      <span>{{ analysis.matchHistory.summary.redSideCount }}</span>
+                    </div>
+                  </div>
                 </div>
                 <div class="stat-item" v-if="frequentlyUsedChampions.length">
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.champions') }}</span>
@@ -489,9 +516,9 @@
                           {{ t('MatchHistoryTab.stats.times') }}
                         </div>
                         <div class="win-lose-box">
-                          <span class="win">{{ c.win }} {{ t('MatchHistoryTab.stats.win') }}</span>
+                          <span class="win">{{ c.wins }} {{ t('MatchHistoryTab.stats.win') }}</span>
                           <span class="lose"
-                            >{{ c.lose }} {{ t('MatchHistoryTab.stats.lose') }}</span
+                            >{{ c.losses }} {{ t('MatchHistoryTab.stats.lose') }}</span
                           >
                           <span
                             >({{ t('MatchHistoryTab.stats.wr') }}
@@ -610,22 +637,22 @@
 
           <!-- Right part -->
           <div class="right" ref="right">
-            <MatchHistoryCard
+            <MatchCard
               class="match-history-card-item"
-              @set-show-detailed-game="handleToggleShowDetailedGame"
-              @load-detailed-game="(_) => loadDetailedGame(g)"
-              @to-summoner="(puuid, setCurrent) => handleToSummoner(puuid, setCurrent)"
-              @download-replay="handleDownloadReplay"
-              @watch-replay="handleLaunchReplay"
-              :self-puuid="tab.puuid"
-              :is-detailed="g.isDetailed"
-              :is-loading="g.isLoading"
-              :is-expanded="g.isExpanded"
-              :replay-metadata="tab.matchHistoryPage?.replayMetadata[g.game.gameId]"
-              :game="g.game"
               v-for="g of tab.matchHistoryPage?.games"
-              :key="g.game.gameId"
-              :data-game-id="g.game.gameId"
+              :summary="g"
+              :puuid="tab.puuid"
+              :key="`${g.source}${g.gameId}`"
+              :theme="as.colorTheme"
+              @navigate-to-summoner-by-puuid="
+                (puuid, setCurrent) => handleToSummoner(puuid, setCurrent)
+              "
+              @download-replay="handleDownloadReplay(g.gameId)"
+              @watch-replay="handleLaunchReplay(g.gameId)"
+              @load-details="handleLoadDetails(g.gameId)"
+              :replay-state="tab.matchHistoryPage?.replayMetadata[g.gameId]?.state"
+              :details="tab.matchHistoryPage?.details[g.gameId]"
+              :loading-details="tab.matchHistoryPage?.detailsLoading[g.gameId]"
             />
             <div
               class="match-history-empty-placeholder"
@@ -643,12 +670,12 @@
 
 <script setup lang="ts">
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
-import GamePreviewer from '@renderer-shared/components/GamePreviewer.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
-import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
+import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
@@ -663,13 +690,11 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { Game } from '@shared/types/league-client/match-history'
+import { analyzeMatchHistory, calculateAkariScore } from '@shared/data-adapter/analysis/players'
+import { analyzeRelationship } from '@shared/data-adapter/analysis/relationship'
+import { toLcuSummoner } from '@shared/data-adapter/summoner'
+import { LcuGameSummary, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
-import {
-  analyzeMatchHistory,
-  analyzeMatchHistoryPlayers,
-  calculateAkariScore
-} from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { Delete as DeleteIcon } from '@vicons/carbon'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
@@ -680,6 +705,7 @@ import {
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
 import { useIntervalFn, useMediaQuery } from '@vueuse/core'
+import { isAxiosError } from 'axios'
 import { toBlob } from 'html-to-image'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -696,18 +722,15 @@ import {
   useMessage,
   useNotification
 } from 'naive-ui'
-import { computed, markRaw, nextTick, ref, useTemplateRef, watch } from 'vue'
+import PQueue from 'p-queue'
+import { computed, markRaw, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import {
   MatchHistoryTabsRenderer,
   usePageSizeOptions
 } from '@main-window/shards/match-history-tabs'
-import {
-  GameDataState,
-  TabState,
-  useMatchHistoryTabsStore
-} from '@main-window/shards/match-history-tabs/store'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import EncounteredGames from './widgets/EncounteredGames.vue'
 import IndicatorPulse from './widgets/IndicatorPulse.vue'
@@ -749,7 +772,6 @@ const mainContentScrollTop = ref(0)
 const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
 const innerContainerEl = useTemplateRef('inner-container')
-const gamePreviewer = useTemplateRef('game-previewer')
 
 // ==================== Composables ====================
 const isSmallScreen = useMediaQuery(`(max-width: 1100px)`)
@@ -779,11 +801,11 @@ const isSelfTab = computed(() => {
 
 const analysis = computed(() => {
   const matchHistory = analyzeMatchHistory(tab.matchHistoryPage?.games || [], tab.puuid)
-  const players = analyzeMatchHistoryPlayers(tab.matchHistoryPage?.games || [], tab.puuid)
+  const relationship = analyzeRelationship(tab.matchHistoryPage?.games || [], tab.puuid)
 
   return {
-    matchHistory: matchHistory,
-    playerRelationship: players,
+    matchHistory,
+    relationship,
     akariScore: matchHistory ? calculateAkariScore(matchHistory) : null
   }
 })
@@ -806,6 +828,7 @@ const shouldShowTinyHeader = computed(() => mainContentScrollTop.value > SHOW_TI
 
 const frequentlyUsedChampions = computed(() => {
   const a = analysis.value.matchHistory
+
   if (!a) {
     return []
   }
@@ -817,12 +840,12 @@ const frequentlyUsedChampions = computed(() => {
         return b.count - a.count
       }
 
-      return b.win - a.win
+      return b.wins - a.wins
     })
 })
 
 const recentlyPlayers = computed(() => {
-  const relationship = analysis.value.playerRelationship
+  const relationship = analysis.value.relationship
 
   const processPlayers = (isOpponent: boolean) => {
     return Object.values(relationship)
@@ -871,16 +894,16 @@ const updateSpectatorData = async () => {
   }
 
   try {
-    const data = await sgp.getSpectatorGameflow(tab.puuid, tab.sgpServerId)
-
-    if (data === null) {
-      tab.spectatorData = null
-      return
-    }
+    const { data } = await sgp.api.gsm.getSpectatorByPuuid(tab.puuid, {
+      __sgpServerId: tab.sgpServerId
+    })
 
     tab.spectatorData = markRaw(data)
-  } catch (error) {
-    if (
+  } catch (error: any) {
+    if (isAxiosError(error) && error.response?.status === 404) {
+      tab.spectatorData = null
+      return
+    } else if (
       (error as Error).name === 'AxiosError' &&
       ((error as any).response?.status === 404 || (error as any).response?.status === 400)
     ) {
@@ -916,10 +939,14 @@ const loadSummoner = async () => {
 
       // 需要 SGP API 支持
       if (currentSgpServerSupported.value.common) {
-        const data = await sgp.getSummonerLcuFormat(tab.puuid, tab.sgpServerId)
+        const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids([tab.puuid], {
+          __sgpServerId: tab.sgpServerId
+        })
 
-        if (!data) {
-          return
+        const summoner = summoners[0]
+
+        if (!summoner) {
+          throw new Error(t('MatchHistoryTab.summoner404'))
         }
 
         const { data: ns } = await rc.api.playerAccount.getPlayerAccountNameset([tab.puuid])
@@ -928,17 +955,17 @@ const loadSummoner = async () => {
           throw new Error(t('MatchHistoryTab.summoner404'))
         }
 
-        data.gameName = ns.namesets[0].gnt.gameName
-        data.tagLine = ns.namesets[0].gnt.tagLine
-        tab.summoner = markRaw(data)
+        tab.summoner = markRaw(
+          toLcuSummoner(summoner, ns.namesets[0].gnt.gameName, ns.namesets[0].gnt.tagLine)
+        )
 
         if (!isSelfTab.value) {
           mh.saveSearchHistory({
             puuid: tab.puuid,
             sgpServerId: tab.sgpServerId,
             summoner: {
-              gameName: data.gameName,
-              tagLine: data.tagLine
+              gameName: tab.summoner.gameName,
+              tagLine: tab.summoner.tagLine
             }
           })
         }
@@ -1033,6 +1060,9 @@ const loadSummonerProfile = async () => {
   }
 }
 
+// 加载 game 考虑并发量，太大并发 lc 会拒绝请求
+const lcuLoadDetailedGameQueue = new PQueue({ concurrency: 10 })
+
 const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) => {
   if (tab.isLoadingMatchHistory) {
     return
@@ -1045,6 +1075,8 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
   try {
     tab.isLoadingMatchHistory = true
 
+    lcuLoadDetailedGameQueue.clear()
+
     // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
     // 或在跨区时, 强制使用 SGP API
     if (
@@ -1056,32 +1088,34 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         return
       }
 
-      const data = await sgp.getMatchHistoryLcuFormat(
+      const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
         tab.puuid,
         {
-          start: (page - 1) * pageSize,
+          startIndex: (page - 1) * pageSize,
           count: pageSize,
-          tag: tag === 'all' ? undefined : tag
-        },
-        tab.sgpServerId
+          tag: tag === 'all' ? undefined : tag,
+          __sgpServerId: tab.sgpServerId
+        }
       )
+
+      // 在较小概率下，有些战绩记录甚至没有 json 字段
+      const filtered = data.games.filter((g) => g.json)
+
       tab.matchHistoryPage = {
         page,
         pageSize,
         tag: tag || 'all',
-        source: 'sgp',
         replayMetadata: {},
-        games: data.games.games.map((g) => ({
-          isDetailed: true,
-          isLoading: false,
-          isExpanded: false,
-          hasError: false,
-          game: markRaw(g)
-        }))
+        details: {},
+        detailsLoading: {},
+        games: filtered.map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }))
       }
 
-      data.games.games.forEach((g) => {
-        mhs.detailedGameLruMap.set(`sgp:${g.gameId}`, g)
+      filtered.forEach((g) => {
+        mhs.detailedGameLruMap.set(
+          `sgp:${g.json.gameId}`,
+          markRaw({ source: 'sgp', gameId: g.json.gameId, data: g })
+        )
       })
     } else {
       // 若否, 则使用 LCU API, 仅限当前登录大区
@@ -1092,44 +1126,37 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
           page * pageSize - 1
         )
 
+        const tasks = data.games.games.map(async (g) => {
+          const cached = mhs.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
+          if (cached) {
+            return cached
+          }
+
+          try {
+            const { data } = await lcuLoadDetailedGameQueue.add(() =>
+              lc.api.matchHistory.getGame(g.gameId)
+            )
+            return { source: 'lcu', data: data, gameId: g.gameId } as LcuGameSummary
+          } catch (error) {
+            return { source: 'lcu', data: g, gameId: g.gameId } as LcuGameSummary
+          }
+        })
+
+        const games = await Promise.all(tasks)
+
         tab.matchHistoryPage = {
           page,
           pageSize,
           tag: 'all',
-          source: 'lcu',
           replayMetadata: {},
-          games: data.games.games.map((g) => ({
-            isDetailed: false,
-            isLoading: false,
-            isExpanded: false,
-            hasError: false,
-            game: markRaw(g)
-          }))
+          details: {},
+          detailsLoading: {},
+          games: markRaw(games)
         }
 
-        const tasks = tab.matchHistoryPage.games.map(async (g) => {
-          const cached = mhs.detailedGameLruMap.get(`lcu:${g.game.gameId}`)
-          if (cached) {
-            g.game = markRaw(cached)
-            g.isDetailed = true
-            return
-          }
-
-          try {
-            g.isLoading = true
-            const { data: game } = await lc.api.matchHistory.getGame(g.game.gameId)
-            g.game = markRaw(game)
-            g.isDetailed = true
-            mhs.detailedGameLruMap.set(`lcu:${g.game.gameId}`, game)
-          } catch (error) {
-            g.hasError = true
-            log.warn(VIEW_NAMESPACE, 'Oooops! Failed to get some results!', error)
-          } finally {
-            g.isLoading = false
-          }
+        games.forEach((g) => {
+          mhs.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
         })
-
-        await Promise.all(tasks)
       }
     }
   } catch (error: any) {
@@ -1148,82 +1175,48 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
   }
 }
 
-const loadDetailedGame = async (dataState: GameDataState) => {
-  if (dataState.isDetailed || dataState.isLoading) {
-    return
-  }
+const replayMetadataPQueue = new PQueue({ concurrency: 10 })
 
-  dataState.isLoading = true
-
-  try {
-    if (
-      (mhs.frontendSettings.matchHistoryUseSgpApi &&
-        currentSgpServerSupported.value.matchHistory) ||
-      mustUseSgpApiBecauseCrossTencentServer.value
-    ) {
-      const cached = mhs.detailedGameLruMap.get(`sgp:${dataState.game.gameId}`)
-
-      if (cached) {
-        dataState.game = markRaw(cached)
-        dataState.isDetailed = true
-        return
-      }
-
-      const data = await sgp.getGameSummaryLcuFormat(dataState.game.gameId, tab.sgpServerId)
-      dataState.game = markRaw(data)
-      dataState.isDetailed = true
-
-      mhs.detailedGameLruMap.set(`sgp:${dataState.game.gameId}`, data)
-    } else {
-      if (sgps.availability.sgpServerId === tab.sgpServerId) {
-        const cached = mhs.detailedGameLruMap.get(`lcu:${dataState.game.gameId}`)
-
-        if (cached) {
-          dataState.game = markRaw(cached)
-          dataState.isDetailed = true
-          return
-        }
-
-        const { data } = await lc.api.matchHistory.getGame(dataState.game.gameId)
-        dataState.game = markRaw(data)
-        dataState.isDetailed = true
-
-        mhs.detailedGameLruMap.set(`lcu:${dataState.game.gameId}`, data)
-      }
-    }
-  } catch (error: any) {
-    notification.warning({
-      title: () => t('MatchHistoryTab.failedToLoadTitle'),
-      content: () =>
-        t('MatchHistoryTab.failedToLoadMatchHistoryGame', {
-          reason: error.message
-        }),
-      duration: 4000
-    })
-  } finally {
-    dataState.isLoading = false
-  }
-}
-
-const loadReplayMetadata = async (games: Game[]) => {
+const loadReplayMetadata = async (games: LcuOrSgpGameSummary[]) => {
   const { data: conf } = await lc.api.replays.getConfiguration()
 
-  const task = async (game: Game) => {
-    await lc.api.replays.createMetadata(game.gameId, {
-      gameVersion: conf.gameVersion,
-      gameType: game.gameType,
-      queueId: game.queueId,
-      gameEnd: game.gameCreation + game.gameDuration * 1000
-    })
+  const task = async (game: LcuOrSgpGameSummary) => {
+    let gameId = 0
+    let gameMeta = {
+      gameVersion: '',
+      gameType: '',
+      queueId: 0,
+      gameEnd: 0
+    }
 
-    const { data } = await lc.api.replays.getMetadata(game.gameId)
+    if (game.source === 'sgp') {
+      gameId = game.data.json.gameId
+      gameMeta = {
+        gameVersion: game.data.json.gameVersion,
+        gameType: game.data.json.gameType,
+        queueId: game.data.json.queueId,
+        gameEnd: game.data.json.gameEndTimestamp
+      }
+    } else {
+      gameId = game.data.gameId
+      gameMeta = {
+        gameVersion: conf.gameVersion,
+        gameType: game.data.gameType,
+        queueId: game.data.queueId,
+        gameEnd: game.data.gameCreation + game.data.gameDuration * 1000
+      }
+    }
+
+    await lc.api.replays.createMetadata(gameId, gameMeta)
+
+    const { data } = await lc.api.replays.getMetadata(gameId)
 
     if (tab.matchHistoryPage) {
-      tab.matchHistoryPage.replayMetadata[game.gameId] = markRaw(data)
+      tab.matchHistoryPage.replayMetadata[gameId] = markRaw(data)
     }
   }
 
-  await Promise.all(games.map(task))
+  await Promise.all(games.map((g) => replayMetadataPQueue.add(() => task(g))))
 }
 
 const loadTags = async () => {
@@ -1399,13 +1392,6 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
   }
 }
 
-const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  const thatGame = tab.matchHistoryPage?.games.find((g) => g.game.gameId === gameId)
-  if (thatGame) {
-    thatGame.isExpanded = expand
-  }
-}
-
 const handleMouseDown = (event: MouseEvent) => {
   if (event.button === 1) {
     event.preventDefault()
@@ -1534,23 +1520,32 @@ const handleDeleteEncounteredGame = async (recordId: number) => {
   await loadEncounteredGames(tab.encounteredGamesPage?.page || 1)
 }
 
-const handlePreviewGame = (game: Game | number, forceModal?: boolean) => {
+const showPreviewModal = ref(false)
+const previewingGame = shallowRef({
+  gameId: 0,
+  summary: undefined as LcuOrSgpGameSummary | undefined,
+  puuid: undefined as string | undefined,
+  source: 'sgp' as 'sgp' | 'lcu'
+})
+
+const handlePreviewGame = (summary: LcuOrSgpGameSummary | number) => {
   if (!lcs.summoner.me) {
     return
   }
 
-  if (forceModal) {
-    gamePreviewer.value?.showGame(game, lcs.summoner.me.puuid)
-  } else {
-    const id = typeof game === 'number' ? game : game.gameId
-    const thatGame = tab.matchHistoryPage?.games.find((g) => g.game.gameId === id)
-    if (thatGame) {
-      thatGame.isExpanded = true
-      nextTick(() => scrollToRightElTop(id))
-    } else {
-      gamePreviewer.value?.showGame(game, lcs.summoner.me.puuid)
-    }
+  previewingGame.value = {
+    gameId: typeof summary === 'object' ? summary.gameId : summary,
+    summary: typeof summary === 'object' ? summary : undefined,
+    puuid: lcs.summoner.me.puuid,
+    source:
+      typeof summary === 'object'
+        ? summary.source
+        : mhs.frontendSettings.matchHistoryUseSgpApi
+          ? 'sgp'
+          : 'lcu'
   }
+
+  showPreviewModal.value = true
 }
 
 const handleDownloadReplay = async (gameId: number) => {
@@ -1568,6 +1563,72 @@ const handleLaunchReplay = async (gameId: number) => {
     message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
   } catch (error: any) {
     message.error(() => t('MatchHistoryTab.failedToLaunchReplay', { reason: error.message }))
+  }
+}
+
+const handleLoadDetails = async (gameId: number) => {
+  if (!tab.matchHistoryPage) {
+    return
+  }
+
+  try {
+    tab.matchHistoryPage.detailsLoading[gameId] = true
+
+    if (
+      (mhs.frontendSettings.matchHistoryUseSgpApi &&
+        currentSgpServerSupported.value.matchHistory) ||
+      mustUseSgpApiBecauseCrossTencentServer.value
+    ) {
+      if (!sgps.isTokenReady) {
+        return
+      }
+
+      const thatGame = tab.matchHistoryPage.games.find((g) => g.gameId === gameId)
+
+      if (!thatGame || thatGame.source !== 'sgp') {
+        return
+      }
+
+      const { data } = await sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId, {
+        __sgpServerId: tab.sgpServerId
+      })
+
+      tab.matchHistoryPage.details[gameId] = {
+        gameId,
+        source: 'sgp',
+        data
+      }
+    } else {
+      if (sgps.availability.sgpServerId === tab.sgpServerId) {
+        const thatGame = tab.matchHistoryPage.games.find((g) => g.gameId === gameId)
+
+        if (!thatGame || thatGame.source !== 'lcu') {
+          return
+        }
+
+        const { data } = await lc.api.matchHistory.getTimeline(gameId)
+
+        tab.matchHistoryPage.details[gameId] = {
+          gameId,
+          source: 'lcu',
+          data: data
+        }
+      }
+    }
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () => {
+        return t('MatchHistoryTab.failedToLoadMatchHistory', {
+          reason: error.message
+        })
+      },
+      duration: 6000
+    })
+
+    log.warn(VIEW_NAMESPACE, '拉取战绩信息失败', error)
+  } finally {
+    tab.matchHistoryPage.detailsLoading[gameId] = false
   }
 }
 
@@ -1642,7 +1703,7 @@ watch(
         return
       }
 
-      loadReplayMetadata(page.games.map((g) => g.game)).catch((error) => {
+      loadReplayMetadata(page.games).catch((error) => {
         log.warn(VIEW_NAMESPACE, 'Failed to load replay metadata', error)
       })
     }
@@ -1678,7 +1739,11 @@ defineExpose({
   position: relative;
   height: 100%;
 
-  --la-player-page-container-width: 1064px;
+  --la-player-page-container-width: 1140px;
+
+  @media (max-width: 1400px) {
+    --la-player-page-container-width: 1064px;
+  }
 }
 
 .ranked-modal {
@@ -1714,7 +1779,7 @@ defineExpose({
   left: 0;
   right: 0;
   height: 64px;
-  z-index: 1;
+  z-index: 15;
   background-color: rgba(0, 0, 0, 0.6);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
@@ -1789,8 +1854,8 @@ defineExpose({
 
 .content .left {
   position: relative;
-  flex: 1;
   padding: 12px 0 12px 12px;
+  width: 300px;
 
   @media (max-width: 1100px) {
     display: none;
@@ -1911,6 +1976,7 @@ defineExpose({
 
 .content .right {
   padding: 12px 12px;
+  flex: 1;
 
   .right-content-title {
     display: flex;

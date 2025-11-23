@@ -579,7 +579,7 @@ DebugSettings:
 
   kyokoMode:
     label: Kyoko Mode
-    description: Enabled features that are deprecated or experimental. Use with caution.
+    description: The hidden side of League Akari, enable more features!
 
 StorageSettings:
   title: Storage
@@ -1438,6 +1438,7 @@ MatchHistoryTab:
     wr: Win Rate
     champions: Champion Usage
     times: Games
+    teamSides: Team Sides
 
   recentPlayers:
     teammatesTitle: Recent Teammates
@@ -1720,11 +1721,8 @@ PlayerInfoCard:
   losingStreakPopover: Currently on a losing streak of {{countV}} games.
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
-  soloKills:
-    tooManySoloDeathsInEarlyGame: '{{times}} Solo Deaths'
-    tooManySoloDeathsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player was solo killed {{times}} times on average
-    tooManySoloKillsInEarlyGame: '{{times}} Solo Kills'
-    tooManySoloKillsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player get solo kills {{times}} times on average
+  soloKills: '{{times}} Solo Kills'
+  soloKillsPopover: In the recent {{countV}} games, this player get solo kills {{times}} times on average
   akariLoved:
     outstanding: Outstanding
     extraordinary: Extraordinary

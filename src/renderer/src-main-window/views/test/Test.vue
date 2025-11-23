@@ -117,10 +117,12 @@ const mockData2 = computed(() => {
     return {
       summary: {
         source: 'lcu',
+        gameId: lcuRankSummary.gameId,
         data: lcuRankSummary as unknown as Game
       } as const,
       details: {
         source: 'lcu',
+        gameId: lcuRankSummary.gameId,
         data: lcuRankTimeline as unknown as GameTimeline
       } as const,
       puuid: 'ac39ac3a-b873-5667-b70f-096bf1b28241'
@@ -130,10 +132,12 @@ const mockData2 = computed(() => {
   return {
     summary: {
       source: 'sgp',
+      gameId: sgpRankSummary.json.gameId,
       data: sgpRankSummary as unknown as SgpGameSummaryLol
     } as const,
     details: {
       source: 'sgp',
+      gameId: sgpRankTimeline.json.gameId,
       data: sgpRankTimeline as unknown as SgpGameDetailsLol
     } as const,
     puuid: 'ac39ac3a-b873-5667-b70f-096bf1b28241'

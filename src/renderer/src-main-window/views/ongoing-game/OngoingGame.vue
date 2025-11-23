@@ -1,11 +1,12 @@
 <template>
   <div class="og-page">
-    <StandaloneMatchHistoryCardModal
-      :game="showingGame.game"
-      :game-id="showingGame.gameId"
-      :self-puuid="showingGame.selfPuuid"
-      @to-summoner="navigateToTabByPuuid"
-      v-model:show="isStandaloneMatchHistoryCardShow"
+    <MatchPreviewer
+      v-model:show="showPreviewModal"
+      :game-id="previewingGame.gameId"
+      :source="previewingGame.source"
+      :puuid="previewingGame.puuid"
+      :summary="previewingGame.summary"
+      @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <OngoingGamePanel
       @to-summoner="navigateToTabByPuuid"
@@ -16,41 +17,47 @@
 </template>
 
 <script lang="ts" setup>
-import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
+import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { Game } from '@shared/types/league-client/match-history'
-import { reactive, ref } from 'vue'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { ref, shallowRef } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const mh = useInstance(MatchHistoryTabsRenderer)
 
+const ogs = useOngoingGameStore()
+
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 
-const showingGame = reactive<{
-  gameId: number
-  game: Game | null
-  selfPuuid: string
-}>({
+const showPreviewModal = ref(false)
+const previewingGame = shallowRef({
   gameId: 0,
-  game: null,
-  selfPuuid: ''
+  summary: undefined as LcuOrSgpGameSummary | undefined,
+  puuid: undefined as string | undefined,
+  source: 'sgp' as 'sgp' | 'lcu'
 })
 
-const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (game: Game, puuid: string) => {
-  showingGame.gameId = 0
-  showingGame.game = game
-  showingGame.selfPuuid = puuid
-  isStandaloneMatchHistoryCardShow.value = true
+const handleShowGame = (summary: LcuOrSgpGameSummary, puuid: string) => {
+  showPreviewModal.value = true
+  previewingGame.value = {
+    gameId: summary.gameId,
+    summary,
+    puuid,
+    source: summary.source
+  }
 }
 
-const handleShowGameById = (id: number, selfPuuid: string) => {
-  showingGame.game = null
-  showingGame.gameId = id
-  showingGame.selfPuuid = selfPuuid
-  isStandaloneMatchHistoryCardShow.value = true
+const handleShowGameById = (id: number, puuid: string) => {
+  showPreviewModal.value = true
+  previewingGame.value = {
+    gameId: id,
+    summary: undefined,
+    puuid,
+    source: ogs.settings.matchHistoryUseSgpApi ? 'sgp' : 'lcu'
+  }
 }
 </script>
 

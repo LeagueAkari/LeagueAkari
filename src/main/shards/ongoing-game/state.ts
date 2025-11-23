@@ -1,11 +1,9 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { Game, GameTimeline } from '@shared/types/league-client/match-history'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
+import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -424,15 +422,6 @@ export class OngoingGameState {
   }
 
   /**
-   * 计算出来的预设队伍
-   */
-  inferredPremadeTeams: Record<string, string[][]> = {}
-
-  setInferredPremadeTeams(value: Record<string, string[][]>) {
-    this.inferredPremadeTeams = value
-  }
-
-  /**
    * 根据目前所有战绩计算出来的玩家分析数据
    */
   playerStats: {
@@ -465,17 +454,17 @@ export class OngoingGameState {
   matchHistory: Record<
     string,
     {
-      /** 战绩源, lc 为通过 LC 代理查询服务器, SGP 为直接查询服务器. 前者高可用 */
+      /** 记录本次查询是用了哪一个数据源 */
       source: 'lcu' | 'sgp'
 
-      /** 适用于 SGP 的 tag string, 当设置为 lcu 时, 该选项会被忽略 */
+      /** 指示当前查询的 tag 参数，lcu 会无视此字段 */
       tag?: string
 
-      /** 目标加载数量, 非实际数量 */
+      /** 指示当前查询的目标加载数量, 并不一定是实际数量 */
       targetCount: number
 
-      /** 大概不用说明 */
-      data: Game[]
+      /** 战绩列表，LCU 和 SGP 格式各不相同 */
+      data: LcuOrSgpGameSummary[]
     }
   > = {}
 
@@ -492,16 +481,9 @@ export class OngoingGameState {
   }
 
   /**
-   * 每名玩家的召唤师信息
-   * 手动同步
+   * 每名玩家的召唤师信息。目前一定是 LCU 格式
    */
-  summoner: Record<
-    string,
-    {
-      source: 'lcu' | 'sgp'
-      data: SummonerInfo
-    }
-  > = {}
+  summoner: Record<string, SummonerInfo> = {}
 
   /**
    * 玩家召唤师信息加载情况, 可为 'loaded' | 'loading' | 'error'
@@ -509,16 +491,9 @@ export class OngoingGameState {
   summonerLoadingState: Record<string, string> = {}
 
   /**
-   * 每名玩家的段位
-   * 手动同步
+   * 每名玩家的段位。目前一定是 LCU 格式
    */
-  rankedStats: Record<
-    string,
-    {
-      source: 'lcu' | 'sgp'
-      data: RankedStats
-    }
-  > = {}
+  rankedStats: Record<string, RankedStats> = {}
 
   /**
    * 玩家段位加载情况, 可为 'loaded' | 'loading' | 'error'
@@ -531,17 +506,14 @@ export class OngoingGameState {
    */
   championMastery: Record<
     string,
-    {
-      source: 'lcu' | 'sgp'
-      data: Record<
-        number,
-        {
-          championId: number
-          championLevel: number
-          championPoints: number
-        }
-      >
-    }
+    Record<
+      number,
+      {
+        championId: number
+        championLevel: number
+        championPoints: number
+      }
+    >
   > = {}
 
   /**
@@ -558,31 +530,18 @@ export class OngoingGameState {
   savedInfoLoadingState: Record<string, string> = {}
 
   /** 或者说是 game 的 details，区分 summary (常见的战绩其实是 summary) */
-  gameTimeline: Record<
-    number,
-    {
-      source: 'lcu' | 'sgp'
-      data: GameTimeline
-    }
-  > = {}
+  gameTimeline: Record<number, LcuOrSgpGameDetails> = {}
 
   /**
    * 除了战绩中的对局外, 额外被加载的对局信息
    */
-  additionalGame: Record<
-    number,
-    {
-      source: 'lcu' | 'sgp'
-      data: Game
-    }
-  > = {}
+  additionalGame: Record<number, LcuOrSgpGameSummary> = {}
 
   // unused
   gameTimelineLoadingState: Record<number, string> = {}
 
   clear() {
     this.playerStats = null
-    this.inferredPremadeTeams = {}
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
@@ -620,7 +579,6 @@ export class OngoingGameState {
       championSelections: computed.struct,
       positionAssignments: computed.struct,
       teams: computed.struct,
-      inferredPremadeTeams: observable.struct,
       playerStats: observable.struct,
       queryStage: computed.struct,
       teamParticipantGroups: computed.struct

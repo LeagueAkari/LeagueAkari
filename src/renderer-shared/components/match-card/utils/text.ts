@@ -1,3 +1,5 @@
+import { formatI18nOrdinal } from '@shared/i18n'
+
 // will be replaced by i18n
 const GAME_RESULT_MAP = {
   abort: '被终止',
@@ -7,8 +9,12 @@ const GAME_RESULT_MAP = {
 }
 
 export function useGameResultName() {
-  return (result: string, isSurrender = false) => {
-    if (isSurrender) {
+  return (subteamPlacement: number | null, result: string, isSurrender = false, locale: string) => {
+    if (subteamPlacement !== null && subteamPlacement !== 0) {
+      return formatI18nOrdinal(subteamPlacement, locale)
+    }
+
+    if (isSurrender && result !== 'remake') {
       return '投降'
     }
 
@@ -20,14 +26,14 @@ const TEAM_NAME_MAP = {
   'TEAM-100': '蓝队',
   'TEAM-200': '红队',
   'CHERRY-0': '?',
-  'CHERRY-1': '一队',
-  'CHERRY-2': '二队',
-  'CHERRY-3': '三队',
-  'CHERRY-4': '四队',
-  'CHERRY-5': '五队',
-  'CHERRY-6': '六队',
-  'CHERRY-7': '七队',
-  'CHERRY-8': '八队'
+  'CHERRY-1': '魄罗',
+  'CHERRY-2': '小兵',
+  'CHERRY-3': '迅捷蟹',
+  'CHERRY-4': '石甲虫',
+  'CHERRY-5': '锋喙鸟',
+  'CHERRY-6': '哨卫',
+  'CHERRY-7': '狼',
+  'CHERRY-8': '魔沼蛙'
 }
 
 export function useTeamName() {
@@ -51,7 +57,7 @@ export function useFrameEventType() {
 
 const BUILDING_TYPE_MAP = {
   TOWER_BUILDING: '防御塔',
-  INHIBITOR_BUILDING: '兵营水晶'
+  INHIBITOR_BUILDING: '抑制水晶'
 }
 
 export const TOWER_TYPE_MAP = {

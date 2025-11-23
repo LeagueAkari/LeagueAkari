@@ -1,27 +1,33 @@
 <template>
-  <NScrollbar x-scrollable class="max-h-142">
+  <NScrollbar x-scrollable class="max-h-142" v-if="details">
     <!-- Players -->
     <div
-      v-for="p of participants"
+      v-for="p of sortedParticipants"
       :key="p.puuid"
       class="dark:bg-white/3 bg-black/3 rounded-lg p-3 not-last:mb-2"
     >
       <!-- Player Header -->
       <div class="flex items-center gap-2 mb-3">
-        <ChampionIcon :champion-id="p.championId" class="!size-7 shrink-0" round />
-        <div class="text-sm font-medium truncate min-w-0">
-          {{ lcs.gameData.championName(p.championId) }}
-        </div>
+        <ChampionIcon
+          :champion-id="p.championId"
+          class="!size-7 shrink-0 b-2 b-solid"
+          :style="{
+            borderColor: getTeamColor(p.teamIdentifier)
+          }"
+          round
+        />
+        <div class="text-sm font-medium truncate min-w-0">{{ p.gameName }} #{{ p.tagLine }}</div>
         <div v-if="p.position && p.position.toLowerCase() !== 'invalid'" :class="tagTheme">
           {{ position(p.position) }}
         </div>
 
         <!-- anvil -->
-        <!-- <div
+        <div
+          v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
           class="text-xs text-black/50 py-0.5 px-1 dark:bg-white/10 dark:text-white text-black/50 text-xs bg-black/20 rounded"
         >
-          34 锻
-        </div> -->
+          {{ collected.anvils[p.participantId] }} 锻
+        </div>
       </div>
 
       <!-- Skills Section -->
@@ -47,6 +53,14 @@
             >
               {{ idx + 1 }}
             </div>
+          </div>
+
+          <!-- Empty state -->
+          <div
+            v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
+            class="text-xs dark:text-white/30 text-black/30 italic py-1"
+          >
+            无技能升级
           </div>
         </div>
       </div>
@@ -95,27 +109,43 @@
       </div>
     </div>
   </NScrollbar>
+  <div
+    v-else
+    class="h-142 w-full flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
+  >
+    <template v-if="loadingDetails">
+      <div class="flex gap-2 items-center">
+        <NSpin :size="16" />
+        <span>加载中...</span>
+      </div>
+    </template>
+    <template v-else>
+      <div class="flex gap-2 items-center">
+        <span>暂无数据</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   DetailedItemPurchasedEvent,
   DetailedSkillLevelUpEvent
 } from '@shared/types/sgp/match-history'
-import { NScrollbar } from 'naive-ui'
+import { NButton, NScrollbar, NSpin } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
+import { getTeamColor } from '../utils/theme'
 import { useWinResultTagTheme } from '../utils/theme'
 import { formatMilliseconds } from '../utils/time'
 
-const { frames, participants, team } = useMatchCard()
-
-const lcs = useLeagueClientStore()
+const { basicInfo, frames, participants, team, details, loadingDetails, onLoadDetails } =
+  useMatchCard()
 
 type LASpacerEvent = {
   type: 'LEAGUE_AKARI_ITEM_SPACER'
@@ -130,11 +160,26 @@ const SKILL_SLOT_TRANSLATIONS = {
   4: 'R'
 }
 
+const sortedParticipants = computed(() => {
+  if (basicInfo.value.isCherrySubteam) {
+    return participants.value.toSorted((a, b) => {
+      return a.subteamPlacement - b.subteamPlacement
+    })
+  }
+
+  return participants.value.toSorted((a, b) => {
+    return a.teamIdentifier.localeCompare(b.teamIdentifier)
+  })
+})
+
+const ANVIL_ITEM_IDS = [6032, 220000]
+
 const collected = computed(() => {
   const flatten = frames.value.map((frame) => frame.events).flat()
 
   const skillLevelUpEvents: Record<number, DetailedSkillLevelUpEvent[]> = {}
   const itemPurchaseEvents: Record<number, ItemPurchaseEvent[]> = {}
+  const anvils: Record<number, number> = {}
 
   const lastPurchaseTimestamp: Record<number, number> = {}
 
@@ -164,11 +209,16 @@ const collected = computed(() => {
 
         lastPurchaseTimestamp[event.participantId] = event.timestamp
         itemPurchaseEvents[event.participantId].push(event)
+
+        if (ANVIL_ITEM_IDS.includes(event.itemId)) {
+          anvils[event.participantId] = (anvils[event.participantId] ?? 0) + 1
+        }
         break
     }
   }
 
   return {
+    anvils,
     skillLevelUpEvents,
     itemPurchaseEvents
   }
@@ -187,6 +237,10 @@ const getSkillClass = (skillSlot: number) => {
 
 const position = usePosition()
 const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
+
+if (!details.value && !loadingDetails.value) {
+  onLoadDetails(basicInfo.value.gameId)
+}
 </script>
 
 <style scoped>

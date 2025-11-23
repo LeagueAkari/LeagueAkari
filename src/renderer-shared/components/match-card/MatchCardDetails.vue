@@ -1,49 +1,60 @@
 <template>
   <!-- expanded details -->
-  <VerticalExpand :show="isExpanded">
-    <div
-      :style="{ width: `${width}px` }"
-      class="@container p-2 rounded dark:border-white/20 border-black/20 border border-solid relative overflow-hidden mt-1 box-border transition-[width]"
-    >
-      <!-- header -->
-      <div class="flex gap-1 items-center mb-2">
-        <TabSwitch
-          class="flex-1"
-          v-model:selected-tab="selectedTab"
-          :tabs="tabs"
-          :win-result="team?.winResult"
-        />
+  <div
+    class="@container w-full p-2 rounded dark:border-white/20 border-black/20 b b-solid relative overflow-hidden mt-1 box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
+  >
+    <!-- header -->
+    <div class="flex gap-1 items-center mb-2">
+      <TabSwitch
+        class="flex-1"
+        v-model:selected-tab="selectedTab"
+        :tabs="tabs"
+        :win-result="team?.winResult"
+      />
 
-        <!-- btns (download replay + share game) -->
-        <div class="flex gap-1">
-          <NButton
-            :theme-overrides="{
-              heightMedium: '32px'
-            }"
-            secondary
-          >
-            DL
-          </NButton>
-        </div>
+      <!-- btns (download replay) -->
+      <div class="flex gap-1">
+        <NButton
+          :theme-overrides="{
+            heightMedium: '32px',
+            paddingMedium: '0 8px'
+          }"
+          secondary
+          :disabled="
+            replayState !== 'download' && replayState !== 'watch' && replayState !== 'downloading'
+          "
+          :loading="replayState === 'downloading'"
+          @click="
+            replayState === 'watch'
+              ? onWatchReplay(basicInfo.gameId)
+              : onLoadReplay(basicInfo.gameId)
+          "
+          :title="replayButtonTitle"
+        >
+          <template #icon>
+            <NIcon v-if="replayState === 'watch'"><Replay20Filled /></NIcon>
+            <NIcon v-else><Replay20Regular /></NIcon>
+          </template>
+        </NButton>
       </div>
-
-      <!-- tab content -->
-      <KeepAlive>
-        <MatchCardSummaryTab v-if="selectedTab === 'summary'" />
-        <MatchCardDetailsTab v-else-if="selectedTab === 'details'" />
-        <MatchCardEventsTab v-else-if="selectedTab === 'events'" />
-        <MatchCardLineChartTab v-else-if="selectedTab === 'line-chart'" />
-        <MatchCardBuildsTab v-else-if="selectedTab === 'builds'" />
-      </KeepAlive>
     </div>
-  </VerticalExpand>
+
+    <!-- tab content -->
+    <KeepAlive>
+      <MatchCardSummaryTab v-if="selectedTab === 'summary'" />
+      <MatchCardDetailsTab v-else-if="selectedTab === 'details'" />
+      <MatchCardEventsTab v-else-if="selectedTab === 'events'" />
+      <MatchCardLineChartTab v-else-if="selectedTab === 'line-chart'" />
+      <MatchCardBuildsTab v-else-if="selectedTab === 'builds'" />
+    </KeepAlive>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { NButton } from 'naive-ui'
+import { Replay20Filled, Replay20Regular } from '@vicons/fluent'
+import { NButton, NIcon } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import VerticalExpand from '../VerticalExpand.vue'
 import { useMatchCard } from './context'
 import MatchCardBuildsTab from './tabs/MatchCardBuildsTab.vue'
 import MatchCardDetailsTab from './tabs/MatchCardDetailsTab.vue'
@@ -52,12 +63,8 @@ import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
 import TabSwitch from './widgets/TabSwitch.vue'
 
-const { width = 720, isExpanded = false } = defineProps<{
-  width?: number
-  isExpanded?: boolean
-}>()
-
-const { basicInfo, teams, participants, puuid } = useMatchCard()
+const { basicInfo, teams, participants, puuid, replayState, onLoadReplay, onWatchReplay } =
+  useMatchCard()
 
 const selfStats = computed(() => {
   return participants.value.find((s) => s.puuid === puuid.value)
@@ -69,7 +76,7 @@ const team = computed(() => {
   return teams.value.teamStatMap[selfStats.value.teamIdentifier]
 })
 
-const selectedTab = ref('builds')
+const selectedTab = ref('summary')
 const tabs = computed(() => {
   return [
     {
@@ -99,6 +106,19 @@ const tabs = computed(() => {
 watchEffect(() => {
   if (basicInfo.value.dataSource !== 'sgp' && selectedTab.value === 'builds') {
     selectedTab.value = 'summary'
+  }
+})
+
+const replayButtonTitle = computed(() => {
+  switch (replayState.value) {
+    case 'download':
+      return '下载回放'
+    case 'watch':
+      return '观看回放'
+    case 'incompatible':
+      return '回放不可用'
+    default:
+      return '回放'
   }
 })
 </script>

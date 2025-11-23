@@ -1,17 +1,7 @@
 <template>
   <NModal size="small" v-model:show="show">
     <div class="standalone-card-wrapper" @click.self="handleHideModal">
-      <MatchHistoryCard
-        class="card"
-        v-if="showingGame"
-        :game="showingGame"
-        :self-puuid="selfPuuid"
-        :is-detailed="true"
-        :is-loading="!game && isLoading"
-        :is-expanded="selfPuuid ? isExpanded : true"
-        @set-show-detailed-game="(_, expand) => (isExpanded = expand)"
-        @to-summoner="emits('toSummoner', $event)"
-      />
+      <MatchCard v-if="showingGame" :summary="showingGame" :puuid="puuid" />
       <div class="placeholder" v-else>
         <span>{{
           isFailedToLoad
@@ -34,12 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
+import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
@@ -47,15 +38,13 @@ import { NButton, NModal, useNotification } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 const {
-  source = 'lcu',
-  game,
+  summary,
   gameId: propGameId,
-  selfPuuid
+  puuid
 } = defineProps<{
-  game?: Game | null
+  summary?: LcuOrSgpGameSummary | null
   gameId?: number
-  selfPuuid?: string
-  source?: 'lcu' | 'sgp'
+  puuid?: string
 }>()
 
 const emits = defineEmits<{
@@ -84,7 +73,7 @@ const isAbleToUseSgpApi = computed(() => {
 })
 
 const showingGame = computed(() => {
-  return game || uncontrolledData.value || null
+  return summary || uncontrolledData.value || null
 })
 
 const fetchGame = async (gameId: number, useSgpApi = false) => {
@@ -131,14 +120,14 @@ const handleHideModal = () => {
 }
 
 const handleReload = async () => {
-  if (!propGameId || game) {
+  if (!propGameId || summary) {
     return
   }
   await fetchGame(propGameId, isAbleToUseSgpApi.value)
 }
 
 watch(
-  [() => game, () => propGameId, () => selfPuuid, () => isAbleToUseSgpApi.value, () => show.value],
+  [() => summary, () => propGameId, () => puuid, () => isAbleToUseSgpApi.value, () => show.value],
   ([game, gameId, _selfId, useSgpApi, show]) => {
     if (game) {
       return

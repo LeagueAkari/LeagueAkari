@@ -731,7 +731,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
       positionAssignments: this._og.state.positionAssignments,
       playerStats: this._og.state.playerStats,
       gameTimeline: this._og.state.gameTimeline,
-      inferredPremadeTeams: this._og.state.inferredPremadeTeams,
       teamParticipantGroups: this._og.state.teamParticipantGroups,
       additionalGame: this._og.state.additionalGame
     }
@@ -743,7 +742,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private _getAkariContext(templateId: string) {
     return {
-      MAX_VERSION_SUPPORTED: 10,
+      MAX_VERSION_SUPPORTED: 20,
+      MIN_VERSION_SUPPORTED: 20,
       require,
       process,
       akariManager: this._shared.manager,

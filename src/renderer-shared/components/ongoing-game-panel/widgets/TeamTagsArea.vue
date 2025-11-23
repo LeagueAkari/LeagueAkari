@@ -6,36 +6,35 @@
           <div
             class="normal-text win-rate"
             :class="{
-              'gte-50': analysis.team.averageWinRate >= 0.5,
-              'lt-50': analysis.team.averageWinRate < 0.5
+              'gte-50': analysis.team.avgWinRate >= 0.5,
+              'lt-50': analysis.team.avgWinRate < 0.5
             }"
           >
-            {{ (analysis.team.averageWinRate * 100).toFixed() }}%
+            {{ (analysis.team.avgWinRate * 100).toFixed() }}%
           </div>
         </template>
         {{
           t('TeamTagsArea.winRate', {
-            rate: (analysis.team.averageWinRate * 100).toFixed(2)
+            rate: (analysis.team.avgWinRate * 100).toFixed(2)
           })
         }}
-        ({{ analysis.team.totalWins.toLocaleString() }} /
-        {{ analysis.team.totalGames.toLocaleString() }})
+        ({{ analysis.team.wins.toLocaleString() }} / {{ analysis.team.games.toLocaleString() }})
       </NPopover>
       <div class="divider"></div>
       <NPopover>
         <template #trigger>
           <div class="normal-text">
-            {{ analysis.team.averageKda.toFixed(2) }}
+            {{ analysis.team.avgKda.toFixed(2) }}
           </div>
         </template>
         {{
           t('TeamTagsArea.kda', {
-            kda: analysis.team.averageKda.toFixed(4)
+            kda: analysis.team.avgKda.toFixed(4)
           })
         }}
-        (K {{ analysis.team.totalKills.toLocaleString() }} / D
-        {{ analysis.team.totalDeaths.toLocaleString() }} / A
-        {{ analysis.team.totalAssists.toLocaleString() }})
+        (K {{ analysis.team.kills.toLocaleString() }} / D
+        {{ analysis.team.deaths.toLocaleString() }} / A
+        {{ analysis.team.assists.toLocaleString() }})
       </NPopover>
     </template>
     <div class="divider" v-if="hasTags"></div>
@@ -92,11 +91,9 @@
 </template>
 
 <script setup lang="ts">
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'

@@ -289,16 +289,17 @@ const shouldUseVirtualScroll = computed(() => {
 
 const updateLastGameDate = async (puuid: string) => {
   if (sgps.availability.serversSupported.matchHistory && sgps.isTokenReady) {
-    const data = await sgp.getMatchHistoryLcuFormat(puuid, {
-      start: 0,
+    const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(puuid, {
+      startIndex: 0,
       count: 1
     })
-    if (data.games.games.length) {
+
+    if (data.games.length) {
       if (!extraInfoMap.value[puuid]) {
         extraInfoMap.value[puuid] = {}
       }
 
-      extraInfoMap.value[puuid].lastGameDate = data.games.games[0].gameCreation
+      extraInfoMap.value[puuid].lastGameDate = data.games[0].json.gameCreation
     }
   } else {
     const { data } = await lc.api.matchHistory.getMatchHistory(puuid, 0, 0)

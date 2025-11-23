@@ -1,5 +1,5 @@
+import { SgpParticipantLol } from '@shared/data-sources/sgp/types'
 import { Participant } from '@shared/types/league-client/match-history'
-import { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { type VNodeChild, computed, toValue } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -248,6 +248,8 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   HealFromMapSources: '地图资源治疗',
   gameLength: '游戏总时长',
   playedChampSelectPosition: '选择的英雄位置',
+  hadAfkTeammate: '队友挂机',
+  highestChampionDamage: '最高英雄伤害',
 
   // Game State - 游戏状态
   gameEndedInEarlySurrender: '重开投降',
@@ -280,7 +282,11 @@ export const GROUP_TRANSLATIONS: Record<string, string> = {
 }
 
 export type RenderGroupOptions = {
-  key: keyof SgpParticipantLol | keyof Participant['stats'] | keyof SgpParticipantLol['challenges']
+  key:
+    | keyof SgpParticipantLol
+    | keyof Participant['stats']
+    | keyof SgpParticipantLol['challenges']
+    | (string & {})
 
   /** 是否忽略这个字段 */
   hide?: boolean
@@ -609,6 +615,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'mejaisFullStackInTime', render: 'integer' }, // sgp challenges
       { key: 'HealFromMapSources', render: 'k2' }, // sgp challenges
       { key: 'gameLength', render: 'game-time' }, // sgp challenges
+      { key: 'hadAfkTeammate', render: 'boolean' }, // sgp challenges
+      { key: 'highestChampionDamage', render: 'boolean' }, // sgp challenges
       { key: 'playedChampSelectPosition', render: 'integer', hide: true } // sgp challenges (metadata)
     ]
   },
@@ -758,21 +766,29 @@ export function useRawDetails() {
     if (source === 'sgp') {
       const isCherryMode = data.json.gameMode === 'CHERRY'
 
-      return data.json.participants.map((p) => {
-        const { challenges, missions, ...rest } = p
-
-        return {
-          ...rest,
-          ...challenges,
-          championId: p.championId,
-          identity: {
-            puuid: p.puuid,
-            gameName: p.riotIdGameName,
-            tagLine: p.riotIdTagline,
-            teamIdentifier: isCherryMode ? `CHERRY-${p.teamId}` : `TEAM-${p.teamId}`
+      return data.json.participants
+        .toSorted((a, b) => {
+          if (isCherryMode) {
+            return a.subteamPlacement - b.subteamPlacement
           }
-        }
-      })
+
+          return a.teamId - b.teamId
+        })
+        .map((p) => {
+          const { challenges, missions, ...rest } = p
+
+          return {
+            ...rest,
+            ...challenges,
+            championId: p.championId,
+            identity: {
+              puuid: p.puuid,
+              gameName: p.riotIdGameName,
+              tagLine: p.riotIdTagline,
+              teamIdentifier: isCherryMode ? `CHERRY-${p.playerSubteamId}` : `TEAM-${p.teamId}`
+            }
+          }
+        })
     }
 
     const isCherryMode = data.gameMode === 'CHERRY'

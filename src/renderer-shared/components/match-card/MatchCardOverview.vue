@@ -2,20 +2,19 @@
   <!-- summary card -->
   <div
     v-if="participant && team"
-    :style="{ width: `${width}px` }"
-    class="@container h-27 flex rounded dark:border-white/20 border-black/20 border border-solid select-none box-border transition-[width]"
+    class="@container w-full h-27 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
   >
     <!-- main content -->
-    <div class="relative flex gap-2 px-3 py-2 flex-1">
+    <div class="relative flex gap-2 px-4 py-1 flex-1">
       <!-- stats content -->
-      <div class="flex flex-col flex-1 justify-between">
+      <div class="flex flex-col flex-1 justify-between mt-1 z-2">
         <!-- 上半部分：英雄头像 + stats line -->
         <div class="flex gap-2 h-12">
           <!-- champion icon -->
-          <div class="w-16 shrink-0">
+          <div class="w-16 shrink-0 flex items-center">
             <ChampionIcon
               :champion-id="participant.championId"
-              class="size-12 rounded-lg b-2 b-solid box-border"
+              class="size-10 rounded-lg b-2 b-solid box-border"
               :class="{
                 'dark:b-green-300 b-green-700': team.winResult === 'win',
                 'dark:b-red-300 b-red-600': team.winResult === 'lose',
@@ -30,25 +29,25 @@
             <!-- KDA -->
             <div class="w-20">
               <div class="flex gap-0.5 justify-center items-center">
-                <div class="dark:text-white text-black font-bold text-base">
+                <div class="dark:text-white text-black font-bold text-sm">
                   {{ participant.kills }}
                 </div>
-                <div class="dark:text-white/60 text-black/60 text-xs mx-0.5">/</div>
-                <div class="dark:text-red-300 text-red-600 font-bold text-base">
+                <div class="dark:text-white/60 text-black/60 text-xs mx-0.25">/</div>
+                <div class="dark:text-red-300 text-red-600 font-bold text-sm">
                   {{ participant.deaths }}
                 </div>
-                <div class="dark:text-white/60 text-black/60 text-xs mx-0.5">/</div>
-                <div class="dark:text-white text-black font-bold text-base">
+                <div class="dark:text-white/60 text-black/60 text-xs mx-0.25">/</div>
+                <div class="dark:text-white text-black font-bold text-sm">
                   {{ participant.assists }}
                 </div>
               </div>
 
               <!-- KDA value -->
               <div
-                class="flex justify-center dark:text-yellow-200 text-yellow-500 text-xs"
+                class="flex justify-center dark:text-yellow-200 text-yellow-700 text-xs"
                 v-if="participant.deaths === 0"
               >
-                Perfect
+                完美
               </div>
 
               <div class="flex justify-center gap-1" v-else>
@@ -63,12 +62,12 @@
             <NPopover>
               <template #trigger>
                 <div class="w-20">
-                  <div class="text-center font-bold text-base">
+                  <div class="text-center font-bold text-sm">
                     {{
                       (
                         (participant.totalDamageDealtToChampions /
-                          teams.teamStatMap[participant.teamIdentifier]
-                            .totalDamageDealtToChampions) *
+                          (teams.teamStatMap[participant.teamIdentifier]
+                            .totalDamageDealtToChampions || 1)) *
                         100
                       ).toFixed(0)
                     }}%
@@ -86,7 +85,7 @@
             </NPopover>
 
             <!-- spacer -->
-            <div class="w-2"></div>
+            <div class="w-0"></div>
 
             <!-- spells + runes -->
             <div v-if="displayParts.spells || displayParts.runes" class="flex gap-0.5">
@@ -107,7 +106,7 @@
             </div>
 
             <!-- augments -->
-            <div v-if="displayParts.augments" class="hidden @[700px]:grid gap-0.5 grid-cols-3">
+            <div v-if="displayParts.augments" class="hidden @[680px]:grid gap-0.5 grid-cols-3">
               <AugmentDisplay
                 v-for="augment of participant.augments"
                 :key="augment"
@@ -150,7 +149,14 @@
               }"
               class="font-bold leading-none text-sm"
             >
-              {{ gameResultName(team.winResult, team.isSurrender) }}
+              {{
+                gameResultName(
+                  team.subteamPlacement,
+                  team.winResult,
+                  team.isSurrender,
+                  as.settings.locale
+                )
+              }}
             </div>
           </div>
 
@@ -163,35 +169,38 @@
         <!-- info line -->
         <div class="flex">
           <!-- queue name -->
-          <div class="dark:text-white/80 text-black/80 text-xs">
+          <div class="dark:text-white/60 text-black/80 text-[11px]">
             {{ lcs.gameData.queueName(basicInfo.queueId) }}
           </div>
-          <div class="dark:text-white/40 text-black/40 text-xs mx-1">·</div>
+          <div class="dark:text-white/40 text-black/40 text-[11px] mx-1">·</div>
 
           <!-- duration hh:mm:ss (pad 0) -->
           <!-- advanced: from -> to -->
-          <div class="dark:text-white/60 text-black/80 text-xs">
+          <div class="dark:text-white/60 text-black/80 text-[11px]">
             {{ formatSeconds(basicInfo.gameDuration) }}
           </div>
-          <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
+          <div class="dark:text-white/40 text-black/60 text-[11px] mx-1">·</div>
 
           <!-- should show the specific time if hover -->
-          <div class="dark:text-white/60 text-black/80 text-xs">
+          <div
+            class="dark:text-white/60 text-black/80 text-xs"
+            :title="dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss')"
+          >
             {{ formattedRelativeTime }}
           </div>
-          <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
-          <div class="dark:text-white/60 text-black/80 text-xs truncate flex-1">
+          <div class="dark:text-white/40 text-black/60 text-[11px] mx-1">·</div>
+          <div class="dark:text-white/60 text-black/80 text-[11px] truncate flex-1">
             {{ mapName }}
           </div>
         </div>
       </div>
 
       <!-- player list (5x5 team only) -->
-      <div v-if="basicInfo.isTwoTeam" class="flex gap-2 max-w-42">
+      <div v-if="basicInfo.isTwoTeam" class="flex gap-2 max-w-42 w-42 z-2">
         <!-- teams -->
         <div
           v-for="team of twoTeams"
-          :key="team[0].teamId"
+          :key="team[0].teamIdentifier"
           class="flex flex-col gap-0.5 flex-1 min-w-0 justify-between"
         >
           <!-- team players -->
@@ -203,14 +212,67 @@
             <!-- player champion avatar -->
             <ChampionIcon :champion-id="player.championId" class="size-4 shrink-0 rounded" />
 
-            <NTooltip>
+            <NTooltip :keep-alive-on-hover="false">
               <template #trigger>
                 <div
                   class="text-xs truncate dark:group-hover:text-white group-hover:text-black transition-colors"
                   :class="{
-                    'font-bold dark:text-white/80 text-black/80': player.puuid === puuid,
-                    'dark:text-white/60 text-black/60': player.puuid !== puuid
+                    'font-bold dark:text-white/90 text-black/90': player.puuid === puuid,
+                    'dark:text-white/80 text-black/80': player.puuid !== puuid
                   }"
+                  @click="onNavigateToSummonerByPuuid(player.puuid)"
+                  @mousedown="handleMouseDown"
+                  @mouseup="handleMouseUp($event, player.puuid)"
+                >
+                  {{ player.gameName }}
+                </div>
+              </template>
+              <div class="flex items-center gap-1 text-xs">
+                <span class="font-bold">{{ player.gameName }}</span>
+                <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+              </div>
+            </NTooltip>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else-if="basicInfo.isCherrySubteam"
+        class="grid grid-cols-2 grid-rows-2 gap-x-2 max-w-42 w-42 z-2"
+      >
+        <!-- teams -->
+        <div
+          v-for="team of cherryTop4Teams"
+          :key="team[0].teamIdentifier"
+          class="flex flex-col gap-1 justify-center min-w-0"
+        >
+          <!-- team players -->
+          <div
+            v-for="player in team"
+            :key="player.puuid"
+            class="flex gap-1 items-center group cursor-pointer"
+          >
+            <!-- placement -->
+            <div
+              class="shrink-0 dark:text-white/80 text-black/80 text-[11px] bg-black/10 dark:bg-white/10 rounded-full size-4 leading-4 text-center"
+            >
+              {{ player.subteamPlacement }}
+            </div>
+
+            <!-- player champion avatar -->
+            <ChampionIcon :champion-id="player.championId" class="size-4 shrink-0 rounded" />
+
+            <NTooltip :keep-alive-on-hover="false">
+              <template #trigger>
+                <div
+                  class="text-xs truncate dark:group-hover:text-white group-hover:text-black transition-colors"
+                  :class="{
+                    'font-bold dark:text-white/90 text-black/90': player.puuid === puuid,
+                    'dark:text-white/80 text-black/80': player.puuid !== puuid
+                  }"
+                  @click="onNavigateToSummonerByPuuid(player.puuid)"
+                  @mousedown="handleMouseDown"
+                  @mouseup="handleMouseUp($event, player.puuid)"
                 >
                   {{ player.gameName }}
                 </div>
@@ -226,7 +288,7 @@
 
       <!-- shadow for win / lose -->
       <div
-        class="absolute top-0 left-0 h-full w-full z-[-1]"
+        class="absolute top-0 left-0 h-full w-full z-1"
         :class="{
           'shadow-win': team.winResult === 'win',
           'shadow-lose': team.winResult === 'lose',
@@ -240,7 +302,11 @@
       @click="$emit('toggle-expand')"
       class="b-l b-l-solid dark:b-l-white/10 b-l-black/10 w-8 transition-colors dark:bg-white/5 bg-black/5 hover:dark:bg-white/10 hover:bg-black/10 active:dark:bg-white/5 active:bg-black/5 cursor-pointer [writing-mode:vertical-rl] flex items-center justify-center"
     >
-      Expand+
+      <NIcon
+        class="dark:text-white/60 text-black/60 text-base"
+        :class="{ 'rotate-180': !isExpanded }"
+        ><Triangle12Filled
+      /></NIcon>
     </div>
   </div>
 </template>
@@ -248,9 +314,10 @@
 <script lang="ts" setup>
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { Triangle12Filled } from '@vicons/fluent'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NPopover, NTooltip } from 'naive-ui'
+import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import AugmentDisplay from '../widgets/AugmentDisplay.vue'
@@ -265,15 +332,12 @@ import { formatSeconds } from './utils/time'
 import ManyTags from './widgets/ManyTags.vue'
 import RadarChart from './widgets/RadarChart.vue'
 
-const { width = 720 } = defineProps<{
-  width?: number
-}>()
-
 defineEmits<{
   'toggle-expand': []
 }>()
 
-const { puuid, basicInfo, teams, participants } = useMatchCard()
+const { puuid, basicInfo, teams, participants, isExpanded, onNavigateToSummonerByPuuid } =
+  useMatchCard()
 
 const gameResultName = useGameResultName()
 
@@ -282,14 +346,27 @@ const lcs = useLeagueClientStore()
 
 // 典型的 100 / 200 红蓝队方法
 const twoTeams = computed(() => {
-  if (basicInfo.value.isTwoTeam) {
-    const teamIdentifiers = Object.keys(teams.value.teamStatMap)
-    return teamIdentifiers.map((i) => {
-      return participants.value.filter((s) => s.teamIdentifier === i).slice(0, 5) // 5 是战绩卡片的最大容纳量
-    })
-  }
+  if (!basicInfo.value.isTwoTeam) return []
 
-  return []
+  const teamIdentifiers = teams.value.teamStatsArr.map((t) => t.teamIdentifier).slice(0, 2)
+  return teamIdentifiers.map((i) => {
+    return participants.value.filter((s) => s.teamIdentifier === i).slice(0, 5) // 5 是战绩卡片的最大容纳量
+  })
+})
+
+const cherryTop4Teams = computed(() => {
+  if (!basicInfo.value.isCherrySubteam) return []
+
+  const teamIdentifiers = teams.value.teamStatsArr
+    .filter((t) => t.subteamPlacement <= 4)
+    .toSorted((a, b) => a.subteamPlacement - b.subteamPlacement)
+    .map((t) => t.teamIdentifier)
+
+    .slice(0, 4)
+
+  return teamIdentifiers.map((i) => {
+    return participants.value.filter((s) => s.teamIdentifier === i).slice(0, 2)
+  })
 })
 
 // 自己相关的数据
@@ -344,10 +421,10 @@ const mapName = computed(() => {
   )
 
   if (mutator) {
-    return `${mutators.MapNameBase} (${mutator.MapNameOverride})`
+    return `${lcs.gameData.mapName(basicInfo.value.mapId)} (${mutator.MapNameOverride})`
   }
 
-  return lcs.gameData.mapName(basicInfo.value.mapId)
+  return mutators.MapNameBase
 })
 
 const formattedRelativeTime = ref('')
@@ -361,6 +438,18 @@ useIntervalFn(
   60000,
   { immediateCallback: true, immediate: true }
 )
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    onNavigateToSummonerByPuuid(puuid, false)
+  }
+}
 </script>
 
 <style scoped>

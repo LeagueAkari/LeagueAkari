@@ -184,8 +184,8 @@
               t('PlayerInfoCard.winRatePopover', {
                 countV: analysis.summary.count,
                 winRate: (analysis.summary.winRate * 100).toFixed(),
-                wins: analysis.summary.win,
-                losses: analysis.summary.lose
+                wins: analysis.summary.wins,
+                losses: analysis.summary.losses
               })
             }}
           </div>
@@ -201,17 +201,17 @@
               bad: kdaIqr === 'below'
             }"
           >
-            {{ analysis?.summary.averageKda.toFixed(2) || '—' }}
+            {{ analysis?.summary.avgKda.toFixed(2) || '—' }}
           </div>
         </template>
         <div class="popover-text" v-if="analysis">
           {{
             t('PlayerInfoCard.kdaPopover', {
               countV: analysis.summary.count,
-              kda: analysis.summary.averageKda.toFixed(2),
-              kills: (analysis.summary.totalKills / analysis.summary.count || 1).toFixed(2),
-              deaths: (analysis.summary.totalDeaths / analysis.summary.count || 1).toFixed(2),
-              assists: (analysis.summary.totalAssists / analysis.summary.count || 1).toFixed(2)
+              kda: analysis.summary.avgKda.toFixed(2),
+              kills: (analysis.summary.kills / analysis.summary.count || 1).toFixed(2),
+              deaths: (analysis.summary.deaths / analysis.summary.count || 1).toFixed(2),
+              assists: (analysis.summary.assists / analysis.summary.count || 1).toFixed(2)
             })
           }}
           (KDA CV: {{ analysis.summary.kdaCv.toFixed(2) }})
@@ -310,7 +310,6 @@
       :analysis="analysis"
       :puuid="puuid"
       :is-self="isSelf"
-      :match-history="matchHistory"
       :premade-team-id="premadeTeamId"
       :current-highlighting-premade-team-id="currentHighlightingPremadeTeamId"
       :saved-info="savedInfo"
@@ -388,28 +387,23 @@
           <div
             class="match-item"
             :class="getWinLoseClassName(item)"
-            :key="item.game.gameId"
-            @click="
-              () =>
-                item.isDetailed
-                  ? emits('showGame', item.game, puuid)
-                  : emits('showGameById', item.game.gameId, puuid)
-            "
+            :key="item.gameId"
+            @click="emits('showGame', item.game, puuid)"
           >
             <div class="ordinal">#{{ index + 1 }}</div>
-            <ChampionIcon :champion-id="item.selfParticipant.championId" class="champion-icon" />
+            <ChampionIcon :champion-id="item.participant.championId" class="champion-icon" />
             <div class="queue-name-date">
               <div class="queue-name">
-                {{ lcs.gameData.queues[item.game.queueId]?.name || item.game.queueId }}
+                {{ lcs.gameData.queues[item.basicInfo.queueId]?.name || item.basicInfo.queueId }}
               </div>
               <div class="line2">
-                {{ dayjs(item.game.gameCreation).format('MM-DD HH:mm') }}
+                {{ dayjs(item.basicInfo.gameCreation).format('MM-DD HH:mm') }}
                 <span class="win-lose">{{ getWinResultText(item) }}</span>
               </div>
             </div>
             <div class="kda">
-              {{ item.selfParticipant.stats.kills }} / {{ item.selfParticipant.stats.deaths }} /
-              {{ item.selfParticipant.stats.assists }}
+              {{ item.participant.kills }} / {{ item.participant.deaths }} /
+              {{ item.participant.assists }}
             </div>
           </div>
         </template>
@@ -442,17 +436,15 @@ import {
   SavedInfo,
   useOngoingGameStore
 } from '@renderer-shared/shards/ongoing-game/store'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { MatchBasicInfo, MatchParticipant } from '@shared/data-adapter/match-history/types'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
-import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGameWithState,
-  MatchHistoryGamesAnalysisAll,
-  SelfParticipantGame,
-  withSelfParticipantMatchHistory
-} from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { Warning as WarningIcon } from '@vicons/ionicons5'
 import { StarRound as StarRoundIcon } from '@vicons/material'
@@ -496,7 +488,7 @@ const {
   summoner?: SummonerInfo
   rankedStats?: RankedStats
   championMastery?: Record<number, Mastery>
-  matchHistory?: MatchHistoryGameWithState[]
+  matchHistory?: LcuOrSgpGameSummary[]
   matchHistoryLoading?: string
   analysis?: MatchHistoryGamesAnalysisAll
   savedInfo?: SavedInfo
@@ -505,8 +497,8 @@ const {
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
-  showGame: [game: Game, selfPuuid: string]
-  showGameById: [gameId: number, selfPuuid: string]
+  showGame: [game: LcuOrSgpGameSummary, puuid: string]
+  showGameById: [gameId: number, puuid: string]
   showSavedInfo: [puuid: string]
   highlight: [premadeTeamId: string, boolean]
 }>()
@@ -552,7 +544,7 @@ const positionInfo = computed(() => {
   info.role = position.role
 
   if (analysis?.positions) {
-    const recentPositions = Object.entries(analysis.positions.positions)
+    const recentPositions = Object.entries(analysis.positions)
       .map(([position, count]) => ({ position, count }))
       .filter((p) => p.position !== 'NONE' && p.count > 0)
       .toSorted((a, b) => b.count - a.count)
@@ -743,29 +735,27 @@ const toSortedMilestoneGrades = (arr: string[]) => {
   return newArr
 }
 
-const getWinLoseClassName = (match: SelfParticipantGame) => {
+const getWinLoseClassName = (match: {
+  basicInfo: MatchBasicInfo
+  participant: MatchParticipant
+}) => {
   const classes: string[] = []
 
   if (ogs.settings.showMatchHistoryItemBorder) {
     classes.push('bordered')
   }
 
-  if (match.game.gameMode === 'PRACTICETOOL') {
+  if (match.basicInfo.gameMode === 'PRACTICETOOL') {
     classes.push('na')
     return classes
   }
 
-  if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
+  if (match.participant.winResult === 'abort' || match.participant.winResult === 'remake') {
     classes.push('na')
     return classes
   }
 
-  if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
-    classes.push('na')
-    return classes
-  }
-
-  if (match.selfParticipant.stats.win) {
+  if (match.participant.winResult === 'win') {
     classes.push('win')
   } else {
     classes.push('lose')
@@ -774,28 +764,28 @@ const getWinLoseClassName = (match: SelfParticipantGame) => {
   return classes
 }
 
-const getWinResultText = (match: SelfParticipantGame) => {
-  if (match.game.gameMode === 'PRACTICETOOL') {
+const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: MatchParticipant }) => {
+  if (match.basicInfo.gameMode === 'PRACTICETOOL') {
     return t('PlayerInfoCard.matchHistory.winResult.na')
   }
 
-  if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
+  if (match.participant.winResult === 'abort') {
     return t('PlayerInfoCard.matchHistory.winResult.abort')
   }
 
-  if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
+  if (match.participant.winResult === 'remake') {
     return t('PlayerInfoCard.matchHistory.winResult.remake')
   }
 
-  if (match.game.gameMode === 'CHERRY') {
-    if (match.selfParticipant.stats.subteamPlacement === 0) {
+  if (match.basicInfo.gameMode === 'CHERRY') {
+    if (match.participant.subteamPlacement === 0) {
       return '?'
     }
 
-    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement, as.settings.locale)
+    return formatI18nOrdinal(match.participant.subteamPlacement, as.settings.locale)
   }
 
-  return match.selfParticipant.stats.win
+  return match.participant.winResult === 'win'
     ? t('PlayerInfoCard.matchHistory.winResult.win')
     : t('PlayerInfoCard.matchHistory.winResult.lose')
 }
@@ -805,10 +795,17 @@ const matches = computed(() => {
     return []
   }
 
-  return withSelfParticipantMatchHistory(matchHistory, puuid).map((game) => ({
-    ...game,
-    gameId: game.game.gameId
-  }))
+  return matchHistory.map((game) => {
+    const basicInfo = toBasicInfo(game)
+    const participant = toParticipants(game, basicInfo).find((p) => p.puuid === puuid)
+
+    return {
+      gameId: game.gameId,
+      basicInfo,
+      participant,
+      game
+    }
+  })
 })
 
 const { masked } = useStreamerModeMaskedText()

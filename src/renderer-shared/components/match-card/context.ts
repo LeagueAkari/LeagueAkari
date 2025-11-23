@@ -3,6 +3,7 @@ import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { toTeams } from '@shared/data-adapter/match-history/teams'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
 import {
   type InjectionKey,
   type MaybeRefOrGetter,
@@ -10,28 +11,19 @@ import {
   computed,
   inject,
   provide,
-  ref,
   toRef,
   toValue
 } from 'vue'
 
 export type MatchCardContext = {
-  width: Readonly<Ref<number>>
   theme: Readonly<Ref<'light' | 'dark'>>
   isExpanded: Readonly<Ref<boolean>>
   puuid: Readonly<Ref<string | undefined>>
   details: Readonly<Ref<LcuOrSgpGameDetails | null | undefined>>
   summary: Readonly<Ref<LcuOrSgpGameSummary>>
 
-  isDetailsLoading: Readonly<Ref<boolean>>
-  loadDetailsError: Readonly<Ref<Error | null>>
-  setDetailsLoading: (loading: boolean) => void
-  loadDetails: () => Promise<void>
-
-  isDownloadingReplays: Readonly<Ref<boolean>>
-  downloadReplaysError: Readonly<Ref<Error | null>>
-  setDownloadingReplays: (downloading: boolean) => void
-  downloadReplays: () => Promise<void>
+  loadingDetails: Readonly<Ref<boolean>>
+  replayState: Readonly<Ref<ReplayDownloadProgress['state']>>
 
   basicInfo: Readonly<Ref<ReturnType<typeof toBasicInfo>>>
   participants: Readonly<Ref<ReturnType<typeof toParticipants>>>
@@ -40,6 +32,12 @@ export type MatchCardContext = {
 
   participant: Readonly<Ref<ReturnType<typeof toParticipants>[number] | null>>
   team: Readonly<Ref<ReturnType<typeof toTeams>['teamStatMap'][string] | null>>
+
+  // events
+  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
+  onLoadReplay: (gameId: number) => void
+  onWatchReplay: (gameId: number) => void
+  onLoadDetails: (gameId: number) => void
 }
 
 export const MatchCardContextKey: InjectionKey<MatchCardContext> = Symbol('MatchCardContext')
@@ -54,42 +52,23 @@ export function useMatchCard(): MatchCardContext {
   return context
 }
 
-export function provideMatchCard(props: {
-  width: MaybeRefOrGetter<number>
-  theme: MaybeRefOrGetter<'light' | 'dark'>
-  isExpanded: MaybeRefOrGetter<boolean>
-  summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
-  details: MaybeRefOrGetter<LcuOrSgpGameDetails | null | undefined>
-  puuid: MaybeRefOrGetter<string | undefined>
-}) {
-  const isDetailsLoading = ref(false)
-  const loadDetailsError = ref<Error | null>(null)
-  const setDetailsLoading = (loading: boolean) => {
-    isDetailsLoading.value = loading
+export function provideMatchCard(
+  props: {
+    theme: MaybeRefOrGetter<'light' | 'dark'>
+    isExpanded: MaybeRefOrGetter<boolean>
+    summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
+    puuid: MaybeRefOrGetter<string | undefined>
+    details: MaybeRefOrGetter<LcuOrSgpGameDetails | null>
+    loadingDetails: MaybeRefOrGetter<boolean>
+    replayState: MaybeRefOrGetter<ReplayDownloadProgress['state']>
+  },
+  events: {
+    onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
+    onLoadReplay: (gameId: number) => void
+    onWatchReplay: (gameId: number) => void
+    onLoadDetails: (gameId: number) => void
   }
-
-  const loadDetails = async () => {
-    if (isDetailsLoading.value) {
-      return
-    }
-
-    setDetailsLoading(true)
-    // TODO
-    try {
-    } catch {
-    } finally {
-      setDetailsLoading(false)
-    }
-  }
-
-  const isDownloadingReplays = ref(false)
-  const downloadReplaysError = ref<Error | null>(null)
-  const setDownloadingReplays = (downloading: boolean) => {
-    isDownloadingReplays.value = downloading
-  }
-
-  const downloadReplays = async () => {}
-
+) {
   const basicInfo = computed(() => toBasicInfo(toValue(props.summary)))
   const participants = computed(() => toParticipants(toValue(props.summary), basicInfo.value))
   const teams = computed(() => toTeams(toValue(props.summary), basicInfo.value, participants.value))
@@ -113,23 +92,13 @@ export function provideMatchCard(props: {
 
   provide(MatchCardContextKey, {
     // props pass-through
-    width: toRef(props.width),
     theme: toRef(props.theme),
     isExpanded: toRef(props.isExpanded),
     summary: toRef(props.summary),
     details: toRef(props.details),
     puuid: toRef(props.puuid),
-
-    // global loading state
-    isDetailsLoading: toRef(isDetailsLoading),
-    loadDetailsError: toRef(loadDetailsError),
-    setDetailsLoading,
-    loadDetails,
-
-    isDownloadingReplays: toRef(isDownloadingReplays),
-    downloadReplaysError: toRef(downloadReplaysError),
-    setDownloadingReplays,
-    downloadReplays,
+    loadingDetails: toRef(props.loadingDetails),
+    replayState: toRef(props.replayState),
 
     // computed states
     basicInfo,
@@ -138,6 +107,20 @@ export function provideMatchCard(props: {
     frames,
 
     participant,
-    team
+    team,
+
+    // events
+    onNavigateToSummonerByPuuid: (puuid, setCurrent) => {
+      events.onNavigateToSummonerByPuuid(puuid, setCurrent)
+    },
+    onLoadReplay: (gameId) => {
+      events.onLoadReplay(gameId)
+    },
+    onWatchReplay: (gameId) => {
+      events.onWatchReplay(gameId)
+    },
+    onLoadDetails: (gameId) => {
+      events.onLoadDetails(gameId)
+    }
   })
 }

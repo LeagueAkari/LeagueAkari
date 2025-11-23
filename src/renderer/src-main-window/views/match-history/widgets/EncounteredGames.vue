@@ -27,12 +27,9 @@
         class="game-item"
         v-for="{ game, gameId, recordId } in games"
         :key="gameId"
-        @click="emits('previewGame', gameMap[gameId] || gameId)"
-        @mousedown="handleMouseDown"
-        @mouseup.prevent="handleMouseUp($event, gameMap[gameId] || gameId)"
+        @click="emits('previewGame', gameMap[gameId])"
       >
-        <!-- flex flex-1 gap-1 flex-col -->
-        <div style="display: flex; flex: 1; gap: 4px; flex-direction: column">
+        <div class="flex flex-1 gap-1 flex-col">
           <div class="game-item-line1" v-if="game">
             <div
               class="game-item-type"
@@ -146,8 +143,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { LcuGameSummary, LcuOrSgpGameSummary, SgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
-import { Game } from '@shared/types/league-client/match-history'
 import { ArrowLeft as ArrowLeftIcon, ArrowRight as ArrowRightIcon } from '@vicons/carbon'
 import { Delete as DeleteIcon } from '@vicons/carbon'
 import dayjs from 'dayjs'
@@ -188,7 +187,7 @@ const {
 
 const page = defineModel<number>('page', { default: 1 })
 
-const gameMap = reactive<Record<number, Game>>({})
+const gameMap = reactive<Record<number, LcuOrSgpGameSummary>>({})
 
 const loadPageGames = async (games: EncounteredGame[]) => {
   const task = async (gameId: number) => {
@@ -198,20 +197,26 @@ const loadPageGames = async (games: EncounteredGame[]) => {
         sgps.availability.serversSupported.matchHistory
       ) {
         // use SGP API
-        const cached = mhs.detailedGameLruMap.get(`sgp:${gameId}`)
+        const cached = mhs.detailedGameLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
 
         if (cached) {
           gameMap[cached.gameId] = markRaw(cached)
           return
         }
 
-        const data = await sgp.getGameSummaryLcuFormat(gameId, sgps.availability.sgpServerId)
-        gameMap[gameId] = markRaw(data)
+        const { data } = await sgp.api.matchHistoryQuery.getGameSummaryByGameId(gameId, {
+          __sgpServerId: sgps.availability.sgpServerId
+        })
 
-        mhs.detailedGameLruMap.set(`sgp:${gameId}`, markRaw(data))
+        gameMap[gameId] = markRaw({ source: 'sgp', gameId: data.json.gameId, data: data })
+
+        mhs.detailedGameLruMap.set(
+          `sgp:${gameId}`,
+          markRaw({ source: 'sgp', gameId: data.json.gameId, data })
+        )
       } else {
         // use LCU API
-        const cached = mhs.detailedGameLruMap.get(`lcu:${gameId}`)
+        const cached = mhs.detailedGameLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
 
         if (cached) {
           gameMap[cached.gameId] = markRaw(cached)
@@ -219,9 +224,12 @@ const loadPageGames = async (games: EncounteredGame[]) => {
         }
 
         const { data } = await lc.api.matchHistory.getGame(gameId)
-        gameMap[gameId] = markRaw(data)
+        gameMap[gameId] = markRaw({ source: 'lcu', gameId: data.gameId, data: data })
 
-        mhs.detailedGameLruMap.set(`lcu:${gameId}`, markRaw(data))
+        mhs.detailedGameLruMap.set(
+          `lcu:${gameId}`,
+          markRaw({ source: 'lcu', gameId: data.gameId, data: data })
+        )
       }
     } catch (error) {
       log.error(NAMESPACE, error)
@@ -243,15 +251,16 @@ const games = computed(() => {
       }
     }
 
-    const p1 = game.participantIdentities.find((p) => p.player.puuid === g.selfPuuid)
-    const p2 = game.participantIdentities.find((p) => p.player.puuid === g.puuid)
+    const basicInfo = toBasicInfo(game)
+    const participants = toParticipants(game, basicInfo)
 
-    const d1 = game.participants.find((p) => p.participantId === p1?.participantId)
-    const d2 = game.participants.find((p) => p.participantId === p2?.participantId)
+    const d1 = participants.find((p) => p.puuid === g.selfPuuid)
+    const d2 = participants.find((p) => p.puuid === g.puuid)
 
     let type = 'ally'
-    if (game.gameMode === 'CHERRY') {
-      type = d1?.stats.subteamPlacement === d2?.stats.subteamPlacement ? 'ally' : 'enemy'
+
+    if (basicInfo.gameMode === 'CHERRY') {
+      type = d1?.subteamPlacement === d2?.subteamPlacement ? 'ally' : 'enemy'
     } else {
       type = d1?.teamId === d2?.teamId ? 'ally' : 'enemy'
     }
@@ -260,23 +269,23 @@ const games = computed(() => {
       recordId: g.id,
       gameId: g.gameId,
       game: {
-        queueName: lcs.gameData.queues[game.queueId]?.name || game.queueId,
-        date: game.gameCreation,
+        queueName: lcs.gameData.queues[basicInfo.queueId]?.name || basicInfo.queueId,
+        date: basicInfo.gameCreation,
         type: type,
         p1: d1
           ? {
               championId: d1.championId,
-              kda: [d1.stats.kills, d1.stats.deaths, d1.stats.assists] as const,
-              placement: d1.stats.subteamPlacement, // if not cherry it was 0
-              win: d1.stats.win
+              kda: [d1.kills, d1.deaths, d1.assists] as const,
+              placement: d1.subteamPlacement, // if not cherry it was 0
+              win: d1.win
             }
           : null,
         p2: d2
           ? {
               championId: d2.championId,
-              kda: [d2.stats.kills, d2.stats.deaths, d2.stats.assists] as const,
-              placement: d2.stats.subteamPlacement,
-              win: d2.stats.win
+              kda: [d2.kills, d2.deaths, d2.assists] as const,
+              placement: d2.subteamPlacement,
+              win: d2.win
             }
           : null
       }
@@ -292,21 +301,9 @@ watch(
   { immediate: true }
 )
 
-const handleMouseDown = (event: MouseEvent) => {
-  if (event.button === 1) {
-    event.preventDefault()
-  }
-}
-
-const handleMouseUp = (event: MouseEvent, game: Game | number) => {
-  if (event.button === 1) {
-    emits('previewGame', game, true)
-  }
-}
-
 const emits = defineEmits<{
   deleteRecord: [recordId: number]
-  previewGame: [game: Game | number, forceModal?: boolean]
+  previewGame: [summary: LcuOrSgpGameSummary | number]
 }>()
 </script>
 

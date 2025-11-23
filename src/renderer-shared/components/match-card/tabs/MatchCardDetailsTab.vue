@@ -1,5 +1,11 @@
 <template>
   <NScrollbar x-scrollable class="max-h-142 rounded b-solid dark:b-white/5 b-black/5 b-1 b-b-0">
+    <div class="flex items-center gap-2 px-2 py-1 dark:bg-white/5 bg-black/5 mb-1">
+      <div class="text-xs dark:text-white/60 text-black/80">
+        ID: <span class="select-text">{{ basicInfo.gameId }}</span> ({{ basicInfo.dataSource }})
+      </div>
+    </div>
+
     <table class="[border-collapse:separate] [border-spacing:0] w-full">
       <thead>
         <tr>
@@ -20,7 +26,15 @@
               class="flex items-center justify-center"
               :title="`${p.identity.gameName} #${p.identity.tagLine}`"
             >
-              <ChampionIcon :champion-id="p.championId" class="size-6" round />
+              <ChampionIcon
+                :data-participant-id="p.participantId"
+                :champion-id="p.championId"
+                class="size-6 b-2 b-solid"
+                :style="{
+                  borderColor: getTeamColor(p.identity.teamIdentifier)
+                }"
+                round
+              />
             </div>
           </th>
         </tr>
@@ -72,6 +86,7 @@ import { refDebounced } from '@vueuse/core'
 import { NInput, NScrollbar } from 'naive-ui'
 import { type VNodeChild, computed, createTextVNode, shallowRef } from 'vue'
 
+import { useMatchCard } from '../context'
 import {
   MAPPED_RENDER_GROUP_OPTIONS,
   RENDER_GROUPS,
@@ -80,10 +95,12 @@ import {
   useRawDetails,
   useValueRenderer
 } from '../utils/details-table'
+import { getTeamColor } from '../utils/theme'
+
+const { basicInfo } = useMatchCard()
 
 const rawStats = useRawDetails()
 const valueRenderer = useValueRenderer()
-
 const filterText = shallowRef('')
 const filterTextDebounced = refDebounced(filterText, 250)
 

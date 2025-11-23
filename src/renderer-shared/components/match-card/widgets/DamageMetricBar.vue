@@ -15,14 +15,14 @@
             :class="{
               'magic-damage': dmg.type === 'magic',
               'physical-damage': dmg.type === 'physical',
-              'true-damage': dmg.type === 'true',
+              'true-damage': dmg.type === 'true'
             }"
           />
         </svg>
       </div>
     </template>
-    <div class="details">
-      <div style="display: flex; align-items: center">
+    <div class="text-[11px] w-[204px]">
+      <div class="flex items-center">
         <svg :width="INNER_WIDTH" :height="height" class="damage-bar-svg">
           <rect x="0" y="0" :width="INNER_WIDTH" :height="height" class="bg" />
           <rect
@@ -35,43 +35,39 @@
             :class="{
               'magic-damage': dmg.type === 'magic',
               'physical-damage': dmg.type === 'physical',
-              'true-damage': dmg.type === 'true',
+              'true-damage': dmg.type === 'true'
             }"
           />
         </svg>
-        <div style="margin-left: 8px">
-          {{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }}%
-        </div>
+        <div class="ml-2">{{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }}%</div>
       </div>
-      <div class="divider"></div>
-      <div
-        style="
-          display: grid;
-          grid-template-rows: 1fr 1fr;
-          grid-template-columns: 1fr 1fr;
-          row-gap: 2px;
-          column-gap: 6px;
-        "
-      >
+      <div class="h-[1px] bg-gray-300 dark:bg-gray-700 my-1"></div>
+      <div class="grid grid-rows-1 grid-cols-2 gap-1">
         <div>
-          <div style="font-size: 11px; font-weight: bold">Total</div>
+          <div class="font-bold text-[11px]">{{ t('DamageMetricsBar.total') }}</div>
           <div>{{ totalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: bold">
-            Physical ({{ ((physicalDamage / (totalDamage || 1)) * 100).toFixed() }}%)
+          <div class="font-bold text-[11px]">
+            {{ t('DamageMetricsBar.physical') }} ({{
+              ((physicalDamage / (totalDamage || 1)) * 100).toFixed()
+            }}%)
           </div>
           <div>{{ physicalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: bold">
-            Magic ({{ ((magicDamage / (totalDamage || 1)) * 100).toFixed() }}%)
+          <div class="font-bold text-[11px]">
+            {{ t('DamageMetricsBar.magic') }} ({{
+              ((magicDamage / (totalDamage || 1)) * 100).toFixed()
+            }}%)
           </div>
           <div>{{ magicDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: bold">
-            True ({{ ((trueDamage / (totalDamage || 1)) * 100).toFixed() }}%)
+          <div class="font-bold text-[11px]">
+            {{ t('DamageMetricsBar.true') }} ({{
+              ((trueDamage / (totalDamage || 1)) * 100).toFixed()
+            }}%)
           </div>
           <div>{{ trueDamage.toLocaleString() }}</div>
         </div>
@@ -81,8 +77,11 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
+
+const { t } = useTranslation()
 
 const {
   baselineDamage = 1,
@@ -91,7 +90,7 @@ const {
   totalDamage = 1,
   trueDamage = 0,
   width = 52,
-  height = 6,
+  height = 6
 } = defineProps<{
   physicalDamage?: number
   magicDamage?: number
@@ -109,10 +108,10 @@ const calcMetricBar = (baseWidth: number) => {
     {
       type: 'physical',
       x: 0,
-      width: (physicalDamage / (baselineDamage || 1)) * baseWidth,
+      width: (physicalDamage / (baselineDamage || 1)) * baseWidth
     },
     { type: 'magic', x: 0, width: (magicDamage / (baselineDamage || 1)) * baseWidth },
-    { type: 'true', x: 0, width: (trueDamage / (baselineDamage || 1)) * baseWidth },
+    { type: 'true', x: 0, width: (trueDamage / (baselineDamage || 1)) * baseWidth }
   ].sort((d1, d2) => d2.width - d1.width)
 
   for (let i = 1; i < list.length; i++) {
@@ -155,11 +154,6 @@ const orderedInner = computed(() => {
 
 [data-theme='dark'] .bg {
   fill: #3a3a3a;
-}
-
-.details {
-  font-size: 11px;
-  width: 204px;
 }
 
 .divider {

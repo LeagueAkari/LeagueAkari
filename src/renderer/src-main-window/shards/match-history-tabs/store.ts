@@ -1,6 +1,6 @@
 import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
+import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
-import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { ReplayMetadata } from '@shared/types/league-client/replays'
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
@@ -12,31 +12,13 @@ import { computed, ref, shallowReactive } from 'vue'
  * 通用带状态的战绩数据
  */
 
-/**
- * 仅用于适合标签页中带有展开属性的卡片
- */
-export interface GameDataState {
-  isLoading: boolean
-
-  /** 是否是加载后的详细对局信息 */
-  isDetailed: boolean
-
-  /**
-   * 是否加载出错
-   */
-  hasError: boolean
-
-  /** 游戏对局信息本体, should be marked raw */
-  game: Game
-
-  /** 是否已经展开 */
-  isExpanded: boolean
-}
-
 export interface MatchHistoryPage {
-  games: GameDataState[]
+  games: LcuOrSgpGameSummary[]
 
   replayMetadata: Record<number, ReplayMetadata>
+
+  details: Record<number, LcuOrSgpGameDetails>
+  detailsLoading: Record<number, boolean>
 
   /** 上次拉取战绩的时间 */
   lastUpdate?: number
@@ -46,8 +28,6 @@ export interface MatchHistoryPage {
 
   /** 不得超过 200, 不得低于 1 */
   pageSize: number
-
-  source: 'sgp' | 'lcu'
 
   /** 'all' 为所有队列, 如果战机源为 LCU, 则一定为 all */
   tag: string
@@ -250,7 +230,7 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   }
 
   /** 避免太多的加载, 在所有的页面中可以共享 */
-  const detailedGameLruMap = new QuickLRU<string, Game>({ maxSize: 568 })
+  const detailedGameLruMap = new QuickLRU<string, LcuOrSgpGameSummary>({ maxSize: 128 })
 
   return {
     frontendSettings,

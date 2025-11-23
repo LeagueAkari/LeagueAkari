@@ -6,7 +6,7 @@
       class="absolute rounded-full bg-blue-300 size-1.5 z-20 -translate-x-1/2 -translate-y-1/2"
       :style="{
         left: `${point.left}px`,
-        top: `${point.top}px`,
+        top: `${point.top}px`
       }"
     ></div>
 
@@ -19,22 +19,27 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import map11 from '../map-images/11.png'
 import map12 from '../map-images/12.png'
 import map21 from '../map-images/21.png'
-import { mapToImagePosition, type MapId } from '../utils/game-map'
-import type { Coordinate } from '../types'
-import { computed } from 'vue'
+import { type MapId, mapToImagePosition } from '../utils/game-map'
 
 const {
   mapId = 11,
   points = [],
-  size = 200,
+  size = 200
 } = defineProps<{
   size?: number
   mapId?: number
   points?: Coordinate[]
 }>()
+
+type Coordinate = {
+  x: number
+  y: number
+}
 
 const mappedPoints = computed(() => {
   return points.map((point) => {

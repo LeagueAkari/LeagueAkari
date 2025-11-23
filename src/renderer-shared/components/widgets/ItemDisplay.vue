@@ -17,7 +17,7 @@
     <div class="info">
       <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
-        <div class="name">{{ lcs.gameData.items[itemId].name }}</div>
+        <div class="name">{{ lcs.gameData.items[itemId].name }} ({{ itemId }})</div>
         <div class="price">
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{

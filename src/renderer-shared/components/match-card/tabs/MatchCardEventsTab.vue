@@ -19,11 +19,11 @@
                 <template #header>
                   <div class="flex items-center gap-2">
                     <div>{{ frameEventType(e.type) }}</div>
-                    <NPopover :show-arrow="false" placement="right">
+                    <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
                       <template #trigger>
                         <div :class="tagTheme">查看位置</div>
                       </template>
-                      <MapPosition :mapId="12" :points="[e.position]" />
+                      <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
                   </div>
                 </template>
@@ -66,11 +66,11 @@
                     <div v-if="e.killType === 'KILL_FIRST_BLOOD'">第一滴血</div>
                     <div v-else-if="e.killType === 'KILL_MULTI'">{{ e.multiKillLength }} 杀</div>
                     <div v-else-if="e.killType === 'KILL_ACE'">团灭敌队</div>
-                    <NPopover :show-arrow="false" placement="right">
+                    <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
                       <template #trigger>
                         <div :class="tagTheme">查看位置</div>
                       </template>
-                      <MapPosition :mapId="12" :points="[e.position]" />
+                      <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
                   </div>
                 </template>
@@ -182,9 +182,20 @@
   </div>
   <div
     v-else
-    class="w-full h-142 flex items-center justify-center dark:text-white/60 text-black/60 text-base"
+    class="w-full h-142 flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
   >
-    暂无数据
+    <template v-if="loadingDetails">
+      <div class="flex gap-2 items-center">
+        <NSpin :size="16" />
+        <span>加载中...</span>
+      </div>
+    </template>
+    <template v-else>
+      <div class="flex gap-2 items-center">
+        <span>暂无数据</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -192,7 +203,16 @@
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import dayjs from 'dayjs'
-import { NCheckbox, NCheckboxGroup, NPopover, NScrollbar, NTimeline, NTimelineItem } from 'naive-ui'
+import {
+  NButton,
+  NCheckbox,
+  NCheckboxGroup,
+  NPopover,
+  NScrollbar,
+  NSpin,
+  NTimeline,
+  NTimelineItem
+} from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -203,7 +223,8 @@ import { useWinResultTagTheme } from '../utils/theme'
 import MapPosition from '../widgets/MapPosition.vue'
 
 // 获取 timeline 数据
-const { participants, details, basicInfo, frames, team } = useMatchCard()
+const { participants, details, basicInfo, frames, team, loadingDetails, onLoadDetails } =
+  useMatchCard()
 
 const lcs = useLeagueClientStore()
 
@@ -217,6 +238,14 @@ const selectedFilters = ref<(typeof SUPPORTED_EVENT_TYPES)[number][]>([
   'CHAMPION_KILL',
   'BUILDING_KILL'
 ])
+
+if (!details.value && !loadingDetails.value) {
+  onLoadDetails(basicInfo.value.gameId)
+}
+
+const canViewPosition = computed(() => {
+  return [12, 11, 21].includes(basicInfo.value.mapId)
+})
 
 const eventTypes = computed(() => {
   return [

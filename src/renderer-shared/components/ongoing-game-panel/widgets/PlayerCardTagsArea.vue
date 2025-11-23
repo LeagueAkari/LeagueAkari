@@ -26,7 +26,7 @@
               class="tagged-by-other-name"
               @click="emits('toSummoner', tag.selfPuuid)"
             >
-              {{ riotId(ogs.summoner[tag.selfPuuid].data) }}
+              {{ riotId(ogs.summoner[tag.selfPuuid]) }}
             </span>
             <span v-else class="tagged-by-other-name unknown">
               {{ t('PlayerInfoCard.unknown') }}
@@ -82,7 +82,7 @@
         {{
           t('PlayerInfoCard.highWinRatePopover', {
             countV: analysis.summary.count,
-            winCount: analysis.summary.win
+            winCount: analysis.summary.wins
           })
         }}
       </div>
@@ -162,23 +162,23 @@
                     <span
                       class="team"
                       :class="{
-                        teammate: item.gameStats.sameTeam,
-                        opponent: !item.gameStats.sameTeam
+                        teammate: item.gameStats.isSameTeam,
+                        opponent: !item.gameStats.isSameTeam
                       }"
                       >{{
-                        item.gameStats.sameTeam
+                        item.gameStats.isSameTeam
                           ? t(`PlayerInfoCard.metPopover.team.teammate`)
                           : t(`PlayerInfoCard.metPopover.team.opponent`)
                       }}</span
                     >
                     <PositionIcon
                       class="position-icon"
-                      v-if="item.gameStats.selfPosition"
-                      :position="item.gameStats.selfPosition"
+                      v-if="item.gameStats.myPosition"
+                      :position="item.gameStats.myPosition"
                     />
                     <LcuImage
                       class="champion-icon"
-                      :src="championIconUri(item.gameStats.selfChampionId)"
+                      :src="championIconUri(item.gameStats.myChampionId)"
                     />
                     <div class="kda">
                       <span>{{ item.gameStats.selfKda.k }}</span>
@@ -335,62 +335,25 @@
     </NPopover>
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        ogs.settings.playerCardTags.showSoloDeathsTag &&
-        soloKills &&
-        soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
-        soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD
-      "
-      :delay="50"
-    >
-      <template #trigger>
-        <div class="tag too-many-solo-deaths">
-          {{
-            t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGame', {
-              times: soloKills.avgSoloDeathsInEarlyGame.toFixed(0)
-            })
-          }}
-        </div>
-      </template>
-      <div class="popover-text">
-        {{
-          t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGamePopover', {
-            times: soloKills.avgSoloDeathsInEarlyGame.toFixed(2),
-            countV: soloKills.count,
-            minutes: EARLY_GAME_THRESHOLD_MINUTES
-          })
-        }}
-        ({{ soloKills.details.map((d) => d.soloDeathsBefore.length).join(', ') }})
-      </div>
-    </NPopover>
-    <NPopover
-      :keep-alive-on-hover="false"
-      v-if="
-        ogs.settings.playerCardTags.showSoloKillsTag &&
-        soloKills &&
-        soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
-        soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD
-      "
+      v-if="ogs.settings.playerCardTags.showSoloKillsTag && analysis?.summary.avgSoloKills"
       :delay="50"
     >
       <template #trigger>
         <div class="tag too-many-solo-kills">
           {{
-            t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGame', {
-              times: soloKills.avgSoloKillsInEarlyGame.toFixed(0)
+            t('PlayerInfoCard.soloKills', {
+              times: analysis.summary.avgSoloKills.toFixed(0)
             })
           }}
         </div>
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGamePopover', {
-            times: soloKills.avgSoloKillsInEarlyGame.toFixed(2),
-            countV: soloKills.count,
-            minutes: EARLY_GAME_THRESHOLD_MINUTES
+          t('PlayerInfoCard.soloKillsPopover', {
+            times: analysis.summary.avgSoloKills.toFixed(2),
+            countV: analysis.summary.count
           })
         }}
-        ({{ soloKills.details.map((d) => d.soloKillsBefore.length).join(', ') }})
       </div>
     </NPopover>
     <NPopover
@@ -402,7 +365,7 @@
         <div class="tag team-damage-share">
           {{
             t('PlayerInfoCard.teamDamageShare', {
-              rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -410,7 +373,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamDamageSharePopover', {
-            rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
@@ -425,7 +388,7 @@
         <div class="tag team-damage-taken-share">
           {{
             t('PlayerInfoCard.teamDamageTakenShare', {
-              rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -433,7 +396,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamDamageTakenSharePopover', {
-            rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
@@ -448,7 +411,7 @@
         <div class="tag team-gold-share">
           {{
             t('PlayerInfoCard.teamGoldShare', {
-              rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -456,7 +419,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamGoldSharePopover', {
-            rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
@@ -471,7 +434,7 @@
         <div class="tag damage-gold-efficiency">
           {{
             t('PlayerInfoCard.damageGoldEfficiency', {
-              rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(0)
+              rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(0)
             })
           }}
         </div>
@@ -479,7 +442,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.damageGoldEfficiencyPopover', {
-            rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(2),
+            rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
@@ -490,7 +453,7 @@
       v-if="
         ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag &&
         analysis &&
-        analysis.summary.averageEnemyMissingPings !== null
+        analysis.summary.avgEnemyMissingPings !== null
       "
       :delay="50"
     >
@@ -498,7 +461,7 @@
         <div class="tag enemy-missing-pings">
           {{
             t('PlayerInfoCard.enemyMissingPings', {
-              countV: truncateTailingZeros(analysis.summary.averageEnemyMissingPings)
+              countV: truncateTailingZeros(analysis.summary.avgEnemyMissingPings)
             })
           }}
         </div>
@@ -506,7 +469,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.enemyMissingPingsPopover', {
-            countV: analysis.summary.averageEnemyMissingPings.toFixed(3)
+            countV: analysis.summary.avgEnemyMissingPings.toFixed(3)
           })
         }}
       </div>
@@ -520,7 +483,7 @@
         <div class="tag vision-score">
           {{
             t('PlayerInfoCard.visionScore', {
-              countV: truncateTailingZeros(analysis.summary.averageVisionScore)
+              countV: truncateTailingZeros(analysis.summary.avgVisionScore)
             })
           }}
         </div>
@@ -528,7 +491,7 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.visionScorePopover', {
-            countV: analysis.summary.averageVisionScore.toFixed(3)
+            countV: analysis.summary.avgVisionScore.toFixed(3)
           })
         }}
       </div>
@@ -572,10 +535,12 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
-import { Game } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { MatchHistoryGameWithState, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { riotId } from '@shared/utils/name'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -585,20 +550,19 @@ import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 
-const { puuid, analysis, matchHistory, premadeTeamId, summoner, savedInfo } = defineProps<{
+const { puuid, analysis, premadeTeamId, summoner, savedInfo } = defineProps<{
   puuid: string
   isSelf?: boolean
   premadeTeamId?: string
   currentHighlightingPremadeTeamId?: string | null
   summoner?: SummonerInfo
-  matchHistory?: MatchHistoryGameWithState[]
   analysis?: MatchHistoryGamesAnalysisAll
   savedInfo?: SavedInfo
 }>()
 
 const emits = defineEmits<{
-  showGame: [game: Game, selfPuuid: string]
-  showGameById: [gameId: number, selfPuuid: string]
+  showGame: [game: LcuOrSgpGameSummary, puuid: string]
+  showGameById: [gameId: number, puuid: string]
   highlight: [premadeTeamId: string, boolean]
   toSummoner: [puuid: string]
 }>()
@@ -607,10 +571,6 @@ const { t } = useTranslation()
 
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
-
-const SOLO_DEATHS_THRESHOLD = 2
-const SOLO_KILLS_THRESHOLD = 2
-const EARLY_GAME_THRESHOLD_MINUTES = 14
 
 const premadeTagElHovering = useElementHover(useTemplateRef('premade-tag-el'))
 watch(
@@ -621,62 +581,6 @@ watch(
     }
   }
 )
-
-const soloKills = computed(() => {
-  if (!analysis || !matchHistory) {
-    return null
-  }
-
-  if (
-    !ogs.settings.playerCardTags.showSoloKillsTag &&
-    !ogs.settings.playerCardTags.showSoloDeathsTag
-  ) {
-    return null
-  }
-
-  const sl = matchHistory
-    .map(({ game }) => {
-      const gameId = game.gameId
-      const a = analysis.games[gameId]
-
-      if (a && a.soloKills !== null && a.soloDeaths !== null) {
-        return {
-          gameId,
-          soloKills: a.soloKills,
-          soloDeaths: a.soloDeaths,
-          soloKillsBefore: a.soloKills.filter(
-            (k) => k.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
-          ),
-          soloDeathsBefore: a.soloDeaths.filter(
-            (d) => d.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
-          )
-        }
-      }
-
-      return null
-    })
-    .filter((a) => a !== null)
-
-  if (sl.length === 0) {
-    return null
-  }
-
-  const avgSoloKills = sl.reduce((acc, cur) => acc + cur.soloKills.length, 0) / sl.length
-  const avgSoloDeaths = sl.reduce((acc, cur) => acc + cur.soloDeaths.length, 0) / sl.length
-  const avgSoloKillsInEarlyGame =
-    sl.reduce((acc, cur) => acc + cur.soloKillsBefore.length, 0) / sl.length
-  const avgSoloDeathsInEarlyGame =
-    sl.reduce((acc, cur) => acc + cur.soloDeathsBefore.length, 0) / sl.length
-
-  return {
-    avgSoloKills,
-    avgSoloDeaths,
-    avgSoloKillsInEarlyGame,
-    avgSoloDeathsInEarlyGame,
-    count: sl.length,
-    details: sl
-  }
-})
 
 const isSuspiciousFlashPosition = computed(() => {
   if (!analysis) {
@@ -702,72 +606,37 @@ const encounteredGames = computed(() => {
       return { gameStats: null, ...record }
     }
 
-    const sI = game.participantIdentities.find((p) => p.player.puuid === record.selfPuuid)
-    const hI = game.participantIdentities.find((p) => p.player.puuid === record.puuid)
+    const basicInfo = toBasicInfo(game)
+    const participants = toParticipants(game, basicInfo)
 
-    if (!sI || !hI) {
-      return { gameStats: null, ...record }
-    }
-
-    const s = game.participants.find((par) => par.participantId === sI.participantId)
-    const h = game.participants.find((par) => par.participantId === hI.participantId)
+    const s = participants.find((p) => p.puuid === record.selfPuuid)
+    const h = participants.find((p) => p.puuid === record.puuid)
 
     if (!s || !h) {
       return { gameStats: null, ...record }
     }
 
     // for cherry mode, all players are placed in the same team
-    const sameTeam =
-      game.gameMode === 'CHERRY'
-        ? s.stats.playerSubteamId === h.stats.playerSubteamId
-        : s.teamId === h.teamId
-
-    let selfWinResult: string
-    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
-      selfWinResult = 'abort'
-    } else if (s.stats.gameEndedInEarlySurrender) {
-      selfWinResult = 'remake'
-    } else {
-      selfWinResult = s.stats.win ? 'win' : 'lose'
-    }
-
-    let opponentWinResult: string
-    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
-      opponentWinResult = 'abort'
-    } else if (h.stats.gameEndedInEarlySurrender) {
-      opponentWinResult = 'remake'
-    } else {
-      opponentWinResult = h.stats.win ? 'win' : 'lose'
-    }
-
-    const selfChampionId = s.championId
-    const opponentChampionId = h.championId
-
-    const date = game.gameCreation
-
-    const selfKda = { k: s.stats.kills, d: s.stats.deaths, a: s.stats.assists }
-    const opponentKda = { k: h.stats.kills, d: h.stats.deaths, a: h.stats.assists }
-
-    // FOR SGP ONLY
-    const selfPosition = s.stats.teamPosition || null
-    const opponentPosition = h.stats.teamPosition || null
+    const isSameTeam = basicInfo.isCherrySubteam
+      ? s.playerSubteamId === h.playerSubteamId
+      : s.teamId === h.teamId
 
     return {
       gameStats: {
         gameId: game.gameId,
-        selfChampionId,
-        opponentChampionId,
-        selfPosition,
-        opponentPosition,
-        selfWinResult,
-        opponentWinResult,
-        selfKda,
-        opponentKda,
-        sameTeam,
-        date,
-        mode: game.gameMode,
-        myPlacement: s.stats.subteamPlacement,
-        opponentPlacement: h.stats.subteamPlacement
+        myChampionId: s.championId,
+        opponentChampionId: h.championId,
+        myPosition: s.position,
+        opponentPosition: h.position,
+        selfWinResult: s.winResult,
+        opponentWinResult: h.winResult,
+        selfKda: { k: s.kills, d: s.deaths, a: s.assists },
+        opponentKda: { k: h.kills, d: h.deaths, a: h.assists },
+        isSameTeam,
+        date: basicInfo.gameCreation,
+        mode: basicInfo.gameMode,
+        myPlacement: s.subteamPlacement,
+        opponentPlacement: h.subteamPlacement
       },
       ...record
     }

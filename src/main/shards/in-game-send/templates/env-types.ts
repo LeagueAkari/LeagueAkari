@@ -142,11 +142,6 @@ export interface TemplateEnv {
   gameTimeline: OngoingGameState['gameTimeline']
 
   /**
-   * 一个 map，key 为 teamId。记录了基于推断的预组队信息，不是很准
-   */
-  inferredPremadeTeams: OngoingGameState['inferredPremadeTeams']
-
-  /**
    * 一个 map，key 为 teamParticipantId。由 LCU 标记了每个阵营的组队情况，可以精准判断预组队情况
    */
   teamParticipantGroups: OngoingGameState['teamParticipantGroups']

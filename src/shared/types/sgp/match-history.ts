@@ -237,7 +237,7 @@ export interface SgpParticipantLol {
   totalUnitsHealed: number
 
   // 复杂对象
-  challenges: Challenges
+  challenges?: Challenges
   missions: SgpMissions
   perks: Perks
 }

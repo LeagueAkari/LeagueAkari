@@ -1,11 +1,9 @@
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
-import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
@@ -15,25 +13,7 @@ export interface MatchHistoryPlayer {
   source: 'lcu' | 'sgp'
   tag?: string
   targetCount: number
-  data: Game[]
-}
-
-// copied from main shard
-export interface SummonerPlayer {
-  source: 'lcu' | 'sgp'
-  data: SummonerInfo
-}
-
-// copied from main shard
-export interface RankedStatsPlayer {
-  source: 'lcu' | 'sgp'
-  data: RankedStats
-}
-
-// copied from main shard
-export interface ChampionMasteryPlayer {
-  source: 'lcu' | 'sgp'
-  data: Record<number, Mastery>
+  data: LcuOrSgpGameSummary[]
 }
 
 // copied from main shard
@@ -134,7 +114,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showWinningStreakTag: true,
       showLosingStreakTag: true,
       showSoloKillsTag: true,
-      showSoloDeathsTag: true,
       showGreatPerformanceTag: true,
       showAverageTeamDamageTag: false,
       showAverageTeamDamageTakenTag: false,
@@ -166,7 +145,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   // untyped
   const queryStage = shallowRef<QueryStage>({ phase: 'unavailable', gameInfo: null })
   const isInEog = shallowRef(false)
-  const inferredPremadeTeams = shallowRef<Record<string, string[][]>>({})
 
   const playerStats = shallowRef<{
     players: Record<string, MatchHistoryGamesAnalysisAll>
@@ -176,12 +154,12 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const matchHistoryTag = shallowRef<string | null>(null)
 
   const matchHistory = ref<Record<string, MatchHistoryPlayer>>({})
-  const summoner = ref<Record<string, SummonerPlayer>>({})
-  const rankedStats = ref<Record<string, RankedStatsPlayer>>({})
-  const championMastery = ref<Record<string, ChampionMasteryPlayer>>({})
+  const summoner = ref<Record<string, SummonerInfo>>({})
+  const rankedStats = ref<Record<string, RankedStats>>({})
+  const championMastery = ref<Record<string, Record<number, Mastery>>>({})
   const savedInfo = ref<Record<string, SavedInfo>>({})
 
-  const cachedGames = ref<Record<number, Game>>({})
+  const cachedGames = ref<Record<number, LcuOrSgpGameSummary>>({})
 
   const matchHistoryLoadingState = ref<Record<string, string>>({})
 
@@ -200,7 +178,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     teams,
     queryStage,
     isInEog,
-    inferredPremadeTeams,
     playerStats,
     matchHistoryTag,
 

@@ -7,9 +7,9 @@ import {
   MatchParticipant,
   MatchTeamInfo,
   MatchTeamStats,
-  TeamWinResult,
   TeamsAdapterResult
 } from './types'
+import { computeWinResult } from './win-result'
 
 // 截至至 2025-11-08 部分数据映射关系
 function mapLcuToObjectives(team: Team): MatchTeamInfo {
@@ -65,34 +65,6 @@ function getTeamInfo(summary: LcuOrSgpGameSummary): MatchTeamInfo[] {
   return summary.data.teams.map(mapLcuToObjectives)
 }
 
-function getTeamWinResult(
-  endOfGameResult: string,
-  participant: {
-    gameEndedInEarlySurrender: boolean
-    gameEndedInSurrender: boolean
-    teamEarlySurrendered: boolean
-    win: boolean
-  }
-): TeamWinResult {
-  if (endOfGameResult === 'Abort_AntiCheatExit') {
-    return { isSurrender: false, result: 'abort' }
-  }
-
-  if (participant.gameEndedInEarlySurrender) {
-    return { isSurrender: true, result: 'remake' }
-  }
-
-  if (participant.teamEarlySurrendered) {
-    return { isSurrender: true, result: 'lose' }
-  }
-
-  if (participant.win) {
-    return { isSurrender: false, result: 'win' }
-  } else {
-    return { isSurrender: participant.gameEndedInSurrender, result: 'lose' }
-  }
-}
-
 export function toTeams(
   summary: LcuOrSgpGameSummary,
   basicInfo: MatchBasicInfo,
@@ -110,23 +82,23 @@ export function toTeams(
     {} as Record<string, MatchParticipant[]>
   )
 
-  const teamInfoMap = teamsInfo.reduce<Record<string, MatchTeamInfo>>((acc, teamInfo) => {
-    acc[basicInfo.isCherrySubteam ? `CHERRY-${teamInfo.teamId}` : `TEAM-${teamInfo.teamId}`] =
-      teamInfo
+  // 不计算 cherry team
+  const primitiveTeamInfoMap = teamsInfo.reduce<Record<string, MatchTeamInfo>>((acc, teamInfo) => {
+    acc[`TEAM-${teamInfo.teamId}`] = teamInfo
     return acc
   }, {})
 
   // 计算每个团队的统计数据
   const teamStatsArr: MatchTeamStats[] = Object.entries(grouped).map(
     ([teamIdentifier, teamParticipants]) => {
-      const { isSurrender, result } = getTeamWinResult(
+      const { isSurrender, result } = computeWinResult(
         basicInfo.endOfGameResult,
         teamParticipants[0]
       )
 
       return {
         teamIdentifier,
-        teamInfo: teamInfoMap[teamIdentifier],
+        teamInfo: primitiveTeamInfoMap[teamIdentifier] ?? (null as MatchTeamInfo | null),
         winResult: result,
         isSurrender,
         win: teamParticipants[0].win,
@@ -162,9 +134,7 @@ export function toTeams(
 
   const allTeamStats: AggregateTeamStats = {
     teamIdentifier: 'ALL',
-    bans: Object.values(teamInfoMap)
-      .filter(isMatchTeamInfo)
-      .flatMap((team) => team.bans),
+    bans: Object.values(primitiveTeamInfoMap).flatMap((team) => team.bans),
     maxDamageDealtToChampions: Math.max(...teamStatsArr.map((t) => t.maxDamageDealtToChampions)),
     totalDamageDealtToChampions: teamStatsArr.reduce(
       (acc, t) => acc + t.totalDamageDealtToChampions,
@@ -201,8 +171,4 @@ export function toTeams(
     teamStatsArr,
     allTeamStats
   }
-}
-
-function isMatchTeamInfo(value: MatchTeamInfo | undefined | null): value is MatchTeamInfo {
-  return value != null
 }

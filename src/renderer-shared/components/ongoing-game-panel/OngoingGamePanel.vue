@@ -22,14 +22,12 @@
             :key="player"
             :is-self="player === lcs.summoner.me?.puuid"
             :champion-id="ogs.championSelections?.[player]"
-            :match-history="
-              ogs.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
-            "
+            :match-history="ogs.matchHistory[player]?.data"
             :match-history-loading="ogs.matchHistoryLoadingState[player]"
-            :summoner="ogs.summoner[player]?.data"
-            :ranked-stats="ogs.rankedStats[player]?.data"
+            :summoner="ogs.summoner[player]"
+            :ranked-stats="ogs.rankedStats[player]"
             :saved-info="ogs.savedInfo[player]"
-            :champion-mastery="ogs.championMastery[player]?.data"
+            :champion-mastery="ogs.championMastery[player]"
             :analysis="ogs.playerStats?.players[player]"
             :position="ogs.positionAssignments?.[player]"
             :premade-team-id="premadeTeamInfo.premadeTeamIdMap[player]"
@@ -83,9 +81,10 @@ import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { Game } from '@shared/types/league-client/match-history'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { findOutliersByIqr } from '@shared/data-adapter/utils'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { MatchHistoryGamesAnalysisAll, findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
@@ -106,7 +105,7 @@ const { showEasyToLaunch = true } = defineProps<{
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
-  showGame: [game: Game, puuid: string]
+  showGame: [game: LcuOrSgpGameSummary, puuid: string]
   showGameById: [id: number, selfPuuid: string]
 }>()
 
@@ -184,7 +183,7 @@ const sortedTeams = computed(() => {
       }
 
       if (ogs.settings.orderPlayerBy === 'kda') {
-        return (statsB?.summary.averageKda || 0) - (statsA?.summary.averageKda || 0)
+        return (statsB?.summary.avgKda || 0) - (statsA?.summary.avgKda || 0)
       }
 
       if (ogs.settings.orderPlayerBy === 'win-rate') {
@@ -217,22 +216,6 @@ const premadeTeamInfo = computed(() => {
     playerMap.groups[groupId] = groups
     groups.forEach((p) => {
       playerMap.premadeTeamIdMap[p] = groupId
-    })
-  })
-
-  // 组队信息以 teamParticipantGroups 为准, 推断性的信息则仅仅作补充
-  Object.entries(ogs.inferredPremadeTeams).forEach(([_, groups]) => {
-    groups.forEach((g) => {
-      if (g.some((p) => playerMap.premadeTeamIdMap[p])) {
-        return
-      }
-
-      const groupId = PREMADE_TEAMS[groupIndex++]
-      playerMap.groups[groupId] = g
-
-      g.forEach((p) => {
-        playerMap.premadeTeamIdMap[p] = groupId
-      })
     })
   })
 
@@ -303,7 +286,7 @@ const kdaOutliers = computed(() => {
 
   const kdaList = Object.entries(ogs.playerStats.players).map(([puuid, p]) => ({
     puuid,
-    kda: p.summary.averageKda
+    kda: p.summary.avgKda
   }))
 
   const iqr = findOutliersByIqr(kdaList, (a) => a.kda, IQR_THRESHOLD)
@@ -380,7 +363,7 @@ const mapSummoners = (team: string) => {
   const thisTeamSummoners: Record<string, SummonerInfo> = {}
   Object.entries(ogs.summoner).forEach(([puuid, summoner]) => {
     if (t.includes(puuid)) {
-      thisTeamSummoners[puuid] = summoner.data
+      thisTeamSummoners[puuid] = summoner
     }
   })
 

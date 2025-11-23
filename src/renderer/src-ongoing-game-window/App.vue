@@ -2,9 +2,9 @@
   <Transition name="one-way-fade">
     <div v-show="ogws.fakeShow" class="ongoing-game-wrapper">
       <StandaloneMatchHistoryCardModal
-        :game="showingGame.game"
+        :summary="showingGame.game"
         :game-id="showingGame.gameId"
-        :self-puuid="showingGame.selfPuuid"
+        :puuid="showingGame.selfPuuid"
         v-model:show="isStandaloneMatchHistoryCardShow"
       />
       <SetupInAppScope />

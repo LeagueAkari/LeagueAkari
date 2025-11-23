@@ -1,5 +1,5 @@
+import { calculateCoefficientOfVariation, noZero, standardize } from '../utils'
 import { MatchHistoryGamesAnalysisAll } from './players'
-import { calculateCoefficientOfVariation, noZero, standardize } from './utils'
 
 export interface MatchHistoryGamesAnalysisTeamSide {
   avgWinRate: number
@@ -27,7 +27,7 @@ export function analyzeTeamMatchHistory(
   const assists = analysisList.reduce((acc, a) => acc + a.summary.assists, 0)
   const akariScore = analysisList.reduce((acc, a) => acc + a.akariScore.total, 0)
   const wins = analysisList.reduce((acc, a) => acc + a.summary.wins, 0)
-  const loses = analysisList.reduce((acc, a) => acc + a.summary.loses, 0)
+  const loses = analysisList.reduce((acc, a) => acc + a.summary.losses, 0)
   const games = analysisList.reduce((acc, a) => acc + a.summary.count, 0)
 
   const sc = calculateCoefficientOfVariation(

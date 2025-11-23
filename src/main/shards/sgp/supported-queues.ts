@@ -1,8 +1,8 @@
 // https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/queues.json
 export const SUPPORTED_QUEUES = [
   420,
-  430,
   440,
+  430,
   450, // ARAM
   480,
   1700,

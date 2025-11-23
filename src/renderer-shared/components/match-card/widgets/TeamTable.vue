@@ -13,7 +13,14 @@
               team.winResult === 'remake' || team.winResult === 'abort'
           }"
         >
-          {{ gameResultName(team.winResult, team.isSurrender) }}
+          {{
+            gameResultName(
+              team.subteamPlacement,
+              team.winResult,
+              team.isSurrender,
+              as.settings.locale
+            )
+          }}
         </div>
         <div>{{ teamName(teamIdentifier) }}</div>
       </div>
@@ -28,7 +35,7 @@
       </div>
 
       <!-- objective -->
-      <div class="flex gap-2">
+      <div v-if="team.teamInfo" class="flex gap-2">
         <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="防御塔">
           <Tower class="size-3.5" />
           <span>{{ team.teamInfo.objectives.tower.kills }}</span>
@@ -146,6 +153,9 @@
             <template #trigger>
               <div
                 class="text-xs truncate cursor-pointer"
+                @click="onNavigateToSummonerByPuuid(participant.puuid)"
+                @mousedown="handleMouseDown"
+                @mouseup="handleMouseUp($event, participant.puuid)"
                 :class="{ 'font-bold dark:text-white text-black': participant.puuid === puuid }"
               >
                 {{ participant.gameName }} #{{ participant.tagLine }}
@@ -172,7 +182,7 @@
         <div v-if="column.name === 'kda'" :class="column.class">
           <div class="text-xs">
             {{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }} ({{
-              (((participant.kills + participant.assists) / team.totalKills) * 100).toFixed(0)
+              (participant.killParticipation * 100).toFixed(0)
             }}%)
           </div>
           <div class="dark:text-white/60 text-black/60 text-[11px]">
@@ -246,6 +256,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { NPopover, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -297,6 +308,8 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   }
 })
 
+const as = useAppCommonStore()
+
 const tone = computed(() => {
   const k = team.value.winResult
   const borderClass = {
@@ -320,7 +333,7 @@ const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
 
-const { basicInfo, teams, participants, puuid } = useMatchCard()
+const { basicInfo, teams, participants, puuid, onNavigateToSummonerByPuuid } = useMatchCard()
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]
@@ -329,6 +342,18 @@ const team = computed(() => {
 const teamParticipants = computed(() => {
   return participants.value.filter((p) => p.teamIdentifier === teamIdentifier)
 })
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    onNavigateToSummonerByPuuid(puuid, false)
+  }
+}
 
 const teamName = useTeamName()
 const gameResultName = useGameResultName()

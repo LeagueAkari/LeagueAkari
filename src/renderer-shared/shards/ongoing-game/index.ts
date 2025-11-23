@@ -1,18 +1,15 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { Game } from '@shared/types/league-client/match-history'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { Mastery } from '@shared/types/league-client/champion-mastery'
+import { RankedStats } from '@shared/types/league-client/ranked'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { markRaw } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
-import {
-  ChampionMasteryPlayer,
-  MatchHistoryPlayer,
-  RankedStatsPlayer,
-  SummonerPlayer,
-  useOngoingGameStore
-} from './store'
+import { MatchHistoryPlayer, useOngoingGameStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
 
@@ -92,9 +89,9 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   getAll() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<{
       matchHistory: Record<string, MatchHistoryPlayer>
-      summoner: Record<string, SummonerPlayer>
-      rankedStats: Record<string, RankedStatsPlayer>
-      championMastery: Record<string, ChampionMasteryPlayer>
+      summoner: Record<string, SummonerInfo>
+      rankedStats: Record<string, RankedStats>
+      championMastery: Record<string, Record<number, Mastery>>
       additionalGames: Record<number, any>
       savedInfo: any
     }>
@@ -136,12 +133,12 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
       store.matchHistory[puuid] = markRaw(data)
 
-      const games = data.data as Game[]
+      const games = data.data as LcuOrSgpGameSummary[]
       games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'additional-game-loaded', (gameId: number, data) => {
-      store.cachedGames[gameId] = markRaw(data.data)
+      store.cachedGames[gameId] = markRaw(data)
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
@@ -169,7 +166,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     store.summoner = this._toShallowedMarkRaw(summoner)
 
     Object.values(matchHistory).forEach((data) => {
-      const games = data.data as Game[]
+      const games = data.data as LcuOrSgpGameSummary[]
       games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
     })
 

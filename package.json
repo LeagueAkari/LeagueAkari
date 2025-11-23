@@ -66,6 +66,7 @@
     "@vueuse/core": "^13.9.0",
     "@vueuse/motion": "^3.0.3",
     "@vueuse/router": "14.0.0-beta.1",
+    "@zumer/snapdom": "^2.0.0",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
     "codemirror": "^6.0.2",

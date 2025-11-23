@@ -1,8 +1,8 @@
 <template>
   <StandaloneMatchHistoryCardModal
-    :game="showingGame.game"
+    :summary="showingGame.game"
     :game-id="showingGame.gameId"
-    :self-puuid="showingGame.selfPuuid"
+    :puuid="showingGame.puuid"
     @to-summoner="emits('toSummoner', $event)"
     v-model:show="isStandaloneMatchHistoryCardShow"
   />
@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
-import { Game } from '@shared/types/league-client/match-history'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { reactive, ref } from 'vue'
 
 const emits = defineEmits<{
@@ -19,24 +19,24 @@ const emits = defineEmits<{
 
 const showingGame = reactive<{
   gameId: number
-  game: Game | null
-  selfPuuid?: string
+  game: LcuOrSgpGameSummary | null
+  puuid?: string
 }>({
   gameId: 0,
   game: null
 })
 
 const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (game: Game | number, selfPuuid?: string) => {
+const handleShowGame = (game: LcuOrSgpGameSummary | number, puuid?: string) => {
   if (typeof game === 'number') {
     showingGame.game = null
     showingGame.gameId = game
-    showingGame.selfPuuid = selfPuuid
+    showingGame.puuid = puuid
     isStandaloneMatchHistoryCardShow.value = true
   } else {
     showingGame.gameId = 0
     showingGame.game = game
-    showingGame.selfPuuid = selfPuuid
+    showingGame.puuid = puuid
     isStandaloneMatchHistoryCardShow.value = true
   }
 }
