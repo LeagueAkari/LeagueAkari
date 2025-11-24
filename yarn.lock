@@ -5424,13 +5424,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-to-image@npm:^1.11.13":
-  version: 1.11.13
-  resolution: "html-to-image@npm:1.11.13"
-  checksum: 10c0/03bd7192d87b99499e37ff12a8e2b41ddce4cf8e33a93dfadff18df0f213434c7f1ba8328db2158f4805da07b7aec3c90aec3152908281153217e86784218b10
-  languageName: node
-  linkType: hard
-
 "http-cache-semantics@npm:^4.0.0, http-cache-semantics@npm:^4.1.0, http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0"
@@ -6079,7 +6072,6 @@ __metadata:
     electron-vite: "npm:^4.0.1"
     fast-csv: "npm:^5.0.5"
     gray-matter: "npm:^4.0.3"
-    html-to-image: "npm:^1.11.13"
     i18next: "npm:^25.6.0"
     i18next-vue: "npm:^5.3.0"
     lodash: "npm:^4.17.21"

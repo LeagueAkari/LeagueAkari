@@ -69,12 +69,12 @@ import { SgpGameDetailsLol, SgpGameSummaryLol } from '@shared/types/sgp/match-hi
 import { NRadio, NRadioGroup, NScrollbar } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import lcuGameData from './lcu/kiwi-game_10358513149.json'
-import lcuTimeline from './lcu/kiwi-gameline_10358513149.json'
+// import lcuGameData from './lcu/kiwi-game_10358513149.json'
+// import lcuTimeline from './lcu/kiwi-gameline_10358513149.json'
 import lcuRankSummary from './lcu/rank-game_summary_8457979403.json'
 import lcuRankTimeline from './lcu/rank-gameline_details_8457979403.json'
-import sgpTimeline from './sgp/kiwi-game-details_10358513149.json'
-import sgpGameData from './sgp/kiwi-game-summary_10358513149.json'
+// import sgpTimeline from './sgp/kiwi-game-details_10358513149.json'
+// import sgpGameData from './sgp/kiwi-game-summary_10358513149.json'
 import sgpRankTimeline from './sgp/rank-game-details_8457979403.json'
 import sgpRankSummary from './sgp/rank-game-summary_8457979403.json'
 
@@ -84,33 +84,33 @@ const app = useInstance(AppCommonRenderer)
 const selectedOption = ref(800)
 const selectedDataType = ref('sgp')
 
-const mockData = computed(() => {
-  if (selectedDataType.value === 'lcu') {
-    return {
-      summary: {
-        source: 'lcu',
-        data: lcuGameData as unknown as Game
-      } as const,
-      details: {
-        source: 'lcu',
-        data: lcuTimeline as unknown as GameTimeline
-      } as const,
-      puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
-    }
-  }
+// const mockData = computed(() => {
+//   if (selectedDataType.value === 'lcu') {
+//     return {
+//       summary: {
+//         source: 'lcu',
+//         data: lcuGameData as unknown as Game
+//       } as const,
+//       details: {
+//         source: 'lcu',
+//         data: lcuTimeline as unknown as GameTimeline
+//       } as const,
+//       puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
+//     }
+//   }
 
-  return {
-    summary: {
-      source: 'sgp',
-      data: sgpGameData as unknown as SgpGameSummaryLol
-    } as const,
-    details: {
-      source: 'sgp',
-      data: sgpTimeline as unknown as SgpGameDetailsLol
-    } as const,
-    puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
-  }
-})
+//   return {
+//     summary: {
+//       source: 'sgp',
+//       data: sgpGameData as unknown as SgpGameSummaryLol
+//     } as const,
+//     details: {
+//       source: 'sgp',
+//       data: sgpTimeline as unknown as SgpGameDetailsLol
+//     } as const,
+//     puuid: 'd7d4997b-2e3e-5c9e-a57e-487d83564a16'
+//   }
+// })
 
 const mockData2 = computed(() => {
   if (selectedDataType.value === 'lcu') {

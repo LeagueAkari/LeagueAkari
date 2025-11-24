@@ -335,6 +335,9 @@ const chartOptions = computed(() => {
       duration: 300 // 动画时长（毫秒），默认为 1000
     },
     plugins: {
+      datalabels: {
+        display: false
+      },
       legend: {
         display: false // 禁用内置图例，使用外部控制器
       },

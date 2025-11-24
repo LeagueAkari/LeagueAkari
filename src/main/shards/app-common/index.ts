@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { app, nativeImage, nativeTheme, shell } from 'electron'
+import { app, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 import { exec } from 'node:child_process'
 import os from 'node:os'
@@ -219,12 +219,6 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(AppCommonMain.id, 'readClipboardText', () => {
       return clipboard.readText()
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'writeClipboardImage', (_, buffer: ArrayBuffer) => {
-      const buf = Buffer.from(buffer)
-      const image = nativeImage.createFromBuffer(buf)
-      clipboard.writeImage(image)
     })
 
     this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {

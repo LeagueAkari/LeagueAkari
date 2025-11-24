@@ -145,7 +145,6 @@ import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
-import { Screenshot20Regular as Screenshot20RegularIcon } from '@vicons/fluent'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NDropdown, NIcon, NPopconfirm, NPopover, NScrollbar, NSpin } from 'naive-ui'
@@ -321,23 +320,6 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     label: computed(() => t('MatchHistoryTabsTitle.closeToTheRight')),
     key: 'close-to-the-right',
     disabled: computed(() => !mhs.canCloseTabsToTheRight(contextMenuState.id))
-  },
-  {
-    type: 'divider',
-    key: 'divider-2'
-  },
-  {
-    label: computed(() => t('MatchHistoryTabsTitle.screenshot')),
-    key: 'screenshot',
-    disabled: computed(() => {
-      const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
-      if (tab) {
-        return tab.isTakingScreenshot || tab.id !== mhs.currentTabId
-      }
-
-      return true
-    }),
-    icon: () => h(NIcon, null, { default: () => h(Screenshot20RegularIcon) })
   }
 ])
 
@@ -355,8 +337,6 @@ const handleContextMenuSelect = (key: string) => {
     case 'close-to-the-right':
       mhs.closeToTheRight(contextMenuState.id)
       break
-    case 'screenshot':
-      mh.events.emit('screenshot-tab', contextMenuState.id)
   }
 
   contextMenuState.show = false

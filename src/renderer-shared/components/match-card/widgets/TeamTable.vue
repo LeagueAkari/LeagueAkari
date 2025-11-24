@@ -63,7 +63,7 @@
         <div
           class="flex items-center gap-1 dark:text-white/60 text-black/60"
           title="厄塔汗"
-          v-if="team.teamInfo.objectives.atakhan !== null"
+          v-if="team.teamInfo.objectives.atakhan"
         >
           <Atakhan class="size-3.5" />
           <span>{{ team.teamInfo.objectives.atakhan.kills }}</span>
@@ -158,7 +158,8 @@
                 @mouseup="handleMouseUp($event, participant.puuid)"
                 :class="{ 'font-bold dark:text-white text-black': participant.puuid === puuid }"
               >
-                {{ participant.gameName }} #{{ participant.tagLine }}
+                {{ participant.gameName }}
+                <template v-if="participant.tagLine"> #{{ participant.tagLine }}</template>
               </div>
             </template>
             <div class="flex items-center gap-1 text-xs">

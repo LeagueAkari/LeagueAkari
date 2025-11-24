@@ -101,10 +101,15 @@ export type MatchParticipant = {
   totalDamageToTowers: number
   totalHeal: number
   visionScore: number
+  totalTimeCCDealt: number
   soloKills: number | null
   effectiveHealAndShielding: number | null
   totalDamageShieldedOnTeammates: number | null
   pings: MatchParticipantPings | null
+  knockEnemyIntoTeamAndKill: number | null
+  killsNearEnemyTurret: number | null
+  killsUnderOwnTurret: number | null
+  maxCsAdvantageOnLaneOpponent: number | null
   doubleKills: number
   tripleKills: number
   quadraKills: number
@@ -173,6 +178,7 @@ export type MatchTeamStats = {
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
+  maxTimeCCDealt: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }
@@ -200,6 +206,7 @@ export type AggregateTeamStats = {
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
+  maxTimeCCDealt: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }

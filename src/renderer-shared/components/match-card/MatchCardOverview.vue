@@ -2,42 +2,54 @@
   <!-- summary card -->
   <div
     v-if="participant && team"
-    class="@container w-full h-27 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
+    class="@container w-full h-29 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
   >
     <!-- main content -->
     <div class="relative flex gap-2 px-4 py-1 flex-1">
       <!-- stats content -->
-      <div class="flex flex-col flex-1 justify-between mt-1 z-2">
+      <div class="flex flex-col flex-1 justify-between my-1 z-2">
         <!-- 上半部分：英雄头像 + stats line -->
         <div class="flex gap-2 h-12">
           <!-- champion icon -->
           <div class="w-16 shrink-0 flex items-center">
-            <ChampionIcon
-              :champion-id="participant.championId"
-              class="size-10 rounded-lg b-2 b-solid box-border"
-              :class="{
-                'dark:b-green-300 b-green-700': team.winResult === 'win',
-                'dark:b-red-300 b-red-600': team.winResult === 'lose',
-                'dark:b-white/80 b-black/80':
-                  team.winResult === 'remake' || team.winResult === 'abort'
-              }"
-            />
+            <div class="relative" :class="{ contents: !shouldShowCrown }">
+              <ChampionIcon
+                :champion-id="participant.championId"
+                class="size-11 rounded-lg b-2 b-solid box-border"
+                :class="{
+                  'dark:b-green-300 b-green-700': team.winResult === 'win',
+                  'dark:b-red-300 b-red-600': team.winResult === 'lose',
+                  'dark:b-white/80 b-black/80':
+                    team.winResult === 'remake' || team.winResult === 'abort'
+                }"
+              />
+
+              <!-- top1 头顶上方的皇冠 -->
+              <div
+                v-if="shouldShowCrown"
+                class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              >
+                <NIcon class="dark:text-yellow-500 text-orange-600">
+                  <Crown />
+                </NIcon>
+              </div>
+            </div>
           </div>
 
           <!-- stats line -->
           <div class="flex items-center gap-2 flex-1">
             <!-- KDA -->
-            <div class="w-20">
+            <div class="min-w-20">
               <div class="flex gap-0.5 justify-center items-center">
-                <div class="dark:text-white text-black font-bold text-sm">
+                <div class="dark:text-white text-black font-bold text-base">
                   {{ participant.kills }}
                 </div>
                 <div class="dark:text-white/60 text-black/60 text-xs mx-0.25">/</div>
-                <div class="dark:text-red-300 text-red-600 font-bold text-sm">
+                <div class="dark:text-red-300 text-red-600 font-bold text-base">
                   {{ participant.deaths }}
                 </div>
                 <div class="dark:text-white/60 text-black/60 text-xs mx-0.25">/</div>
-                <div class="dark:text-white text-black font-bold text-sm">
+                <div class="dark:text-white text-black font-bold text-base">
                   {{ participant.assists }}
                 </div>
               </div>
@@ -45,7 +57,9 @@
               <!-- KDA value -->
               <div
                 class="flex justify-center dark:text-yellow-200 text-yellow-700 text-xs"
-                v-if="participant.deaths === 0"
+                v-if="
+                  participant.deaths === 0 && (participant.kills > 0 || participant.assists > 0)
+                "
               >
                 完美
               </div>
@@ -61,8 +75,8 @@
             <!-- DMG -->
             <NPopover>
               <template #trigger>
-                <div class="w-20">
-                  <div class="text-center font-bold text-sm">
+                <div class="min-w-20">
+                  <div class="text-center font-bold text-base">
                     {{
                       (
                         (participant.totalDamageDealtToChampions /
@@ -196,7 +210,7 @@
       </div>
 
       <!-- player list (5x5 team only) -->
-      <div v-if="basicInfo.isTwoTeam" class="flex gap-2 max-w-42 w-42 z-2">
+      <div v-if="basicInfo.isTwoTeam" class="flex gap-2 max-w-42 w-42 z-2 my-1">
         <!-- teams -->
         <div
           v-for="team of twoTeams"
@@ -238,7 +252,7 @@
 
       <div
         v-else-if="basicInfo.isCherrySubteam"
-        class="grid grid-cols-2 grid-rows-2 gap-x-2 max-w-42 w-42 z-2"
+        class="grid grid-cols-2 grid-rows-2 gap-x-2 max-w-42 w-42 z-2 my-1"
       >
         <!-- teams -->
         <div
@@ -314,6 +328,7 @@
 <script lang="ts" setup>
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { Crown } from '@vicons/fa'
 import { Triangle12Filled } from '@vicons/fluent'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -367,6 +382,10 @@ const cherryTop4Teams = computed(() => {
   return teamIdentifiers.map((i) => {
     return participants.value.filter((s) => s.teamIdentifier === i).slice(0, 2)
   })
+})
+
+const shouldShowCrown = computed(() => {
+  return participant.value?.subteamPlacement === 1
 })
 
 // 自己相关的数据

@@ -679,7 +679,6 @@ import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -706,7 +705,6 @@ import {
 } from '@vicons/material'
 import { useIntervalFn, useMediaQuery } from '@vueuse/core'
 import { isAxiosError } from 'axios'
-import { toBlob } from 'html-to-image'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -752,7 +750,6 @@ const mh = useInstance(MatchHistoryTabsRenderer)
 const log = useInstance(LoggerRenderer)
 const sp = useInstance(SavedPlayerRenderer)
 const gc = useInstance(GameClientRenderer)
-const app = useInstance(AppCommonRenderer)
 
 const lcs = useLeagueClientStore()
 const mhs = useMatchHistoryTabsStore()
@@ -1465,48 +1462,6 @@ const handleRefresh = async () => {
   } catch {}
 }
 
-const handleScreenshot = async () => {
-  if (!innerContainerEl.value) {
-    return
-  }
-
-  try {
-    tab.isTakingScreenshot = true
-
-    // 经过测试, 性能非常差
-    const blob = await toBlob(innerContainerEl.value, {
-      style: {
-        margin: '0',
-        background: 'linear-gradient(135deg, #151522, #2b0a2e, #4a223d)'
-      }
-    })
-
-    if (!blob) {
-      message.warning(() => t('MatchHistoryTab.failedToTakeScreenshotNoData'))
-      return
-    }
-
-    await app.writeClipboardImage(await blob.arrayBuffer())
-    message.success(() => t('MatchHistoryTab.copiedToClipboard'))
-  } catch (error: any) {
-    if (error instanceof Error) {
-      message.error(() =>
-        t('MatchHistoryTab.failedToTakeScreenshot', {
-          reason: error.message
-        })
-      )
-    } else {
-      message.error(() =>
-        t('MatchHistoryTab.failedToTakeScreenshot', {
-          reason: ''
-        })
-      )
-    }
-  } finally {
-    tab.isTakingScreenshot = false
-  }
-}
-
 const handleToSummoner = (puuid: string, setCurrent = true) => {
   if (setCurrent) {
     navigateToTabByPuuidAndSgpServerId(puuid, tab.sgpServerId)
@@ -1729,8 +1684,7 @@ defineExpose({
   id: tab.id,
   puuid: tab.puuid,
   sgpServerId: tab.sgpServerId,
-  refresh: handleRefresh,
-  screenshot: handleScreenshot
+  refresh: handleRefresh
 })
 </script>
 

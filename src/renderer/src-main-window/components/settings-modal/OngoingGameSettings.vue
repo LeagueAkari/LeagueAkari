@@ -223,19 +223,6 @@
             }}
           </NCheckbox>
           <NCheckbox
-            :checked="ogs.settings.playerCardTags.showSoloDeathsTag"
-            @update:checked="
-              (val) =>
-                og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSoloDeathsTag: val })
-            "
-          >
-            {{
-              t('OngoingGameSettings.playerCardTags.tags.showSoloDeathsTag.label', {
-                countV: ogs.settings.gameTimelineLoadCount
-              })
-            }}
-          </NCheckbox>
-          <NCheckbox
             :checked="ogs.settings.playerCardTags.showAverageTeamDamageTag"
             @update:checked="
               (val) =>

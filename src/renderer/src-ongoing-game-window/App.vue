@@ -1,11 +1,12 @@
 <template>
   <Transition name="one-way-fade">
     <div v-show="ogws.fakeShow" class="ongoing-game-wrapper">
-      <StandaloneMatchHistoryCardModal
+      <MatchPreviewer
         :summary="showingGame.game"
         :game-id="showingGame.gameId"
-        :puuid="showingGame.selfPuuid"
-        v-model:show="isStandaloneMatchHistoryCardShow"
+        :puuid="showingGame.puuid"
+        :source="showingGame.source"
+        v-model:show="showPreviewModal"
       />
       <SetupInAppScope />
       <OngoingGamePanel
@@ -19,39 +20,47 @@
 </template>
 
 <script setup lang="ts">
-import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
+import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
-import { Game } from '@shared/types/league-client/match-history'
-import { reactive, ref, watch } from 'vue'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { ref, shallowRef, watch } from 'vue'
 
 const ogws = useOngoingGameWindowStore()
 
-const showingGame = reactive<{
+const showingGame = shallowRef<{
   gameId: number
-  game: Game | null
-  selfPuuid: string
+  game: LcuOrSgpGameSummary | undefined
+  puuid: string
+  source: 'lcu' | 'sgp'
 }>({
   gameId: 0,
-  game: null,
-  selfPuuid: ''
+  game: undefined,
+  puuid: '',
+  source: 'lcu'
 })
 
-const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (game: Game, puuid: string) => {
-  showingGame.gameId = 0
-  showingGame.game = game
-  showingGame.selfPuuid = puuid
-  isStandaloneMatchHistoryCardShow.value = true
+const showPreviewModal = ref(false)
+const handleShowGame = (game: LcuOrSgpGameSummary, puuid: string) => {
+  showingGame.value = {
+    gameId: game.gameId,
+    game,
+    puuid,
+    source: game.source
+  }
+  showPreviewModal.value = true
 }
 
 const handleShowGameById = (id: number, selfPuuid: string) => {
-  showingGame.game = null
-  showingGame.gameId = id
-  showingGame.selfPuuid = selfPuuid
-  isStandaloneMatchHistoryCardShow.value = true
+  showingGame.value = {
+    gameId: id,
+    game: undefined,
+    puuid: selfPuuid,
+    source: 'lcu'
+  }
+  showPreviewModal.value = true
 }
 
 watch(
@@ -59,7 +68,7 @@ watch(
   (show) => {
     if (show) {
     } else {
-      isStandaloneMatchHistoryCardShow.value = false
+      showPreviewModal.value = false
     }
   }
 )

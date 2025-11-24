@@ -91,7 +91,7 @@ export function toParticipants(
       return {
         puuid: p.puuid,
         participantId: p.participantId,
-        gameName: p.riotIdGameName,
+        gameName: p.riotIdGameName || p.summonerName,
         tagLine: p.riotIdTagline,
         profileIconId: p.profileIcon,
         championId: p.championId,
@@ -140,9 +140,14 @@ export function toParticipants(
         totalDamageToTowers: p.damageDealtToTurrets,
         totalHeal: p.totalHeal,
         visionScore: p.visionScore,
+        totalTimeCCDealt: p.totalTimeCCDealt,
         soloKills: p.challenges?.soloKills ?? null,
         effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
         totalDamageShieldedOnTeammates: p.totalDamageShieldedOnTeammates,
+        knockEnemyIntoTeamAndKill: p.challenges?.knockEnemyIntoTeamAndKill ?? null,
+        killsNearEnemyTurret: p.challenges?.killsNearEnemyTurret ?? null,
+        killsUnderOwnTurret: p.challenges?.killsUnderOwnTurret ?? null,
+        maxCsAdvantageOnLaneOpponent: p.challenges?.maxCsAdvantageOnLaneOpponent ?? null,
 
         pings: {
           allInPings: p.allInPings,
@@ -198,7 +203,7 @@ export function toParticipants(
       return {
         puuid: identity.player.puuid,
         participantId: participant.participantId,
-        gameName: identity.player.gameName,
+        gameName: identity.player.gameName || identity.player.summonerName,
         tagLine: identity.player.tagLine,
         profileIconId: identity.player.profileIcon,
         championId: participant.championId,
@@ -257,11 +262,16 @@ export function toParticipants(
         totalDamageToTowers: participant.stats.damageDealtToTurrets,
         totalHeal: participant.stats.totalHeal,
         visionScore: participant.stats.visionScore,
+        totalTimeCCDealt: participant.stats.totalTimeCrowdControlDealt,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record
         totalDamageShieldedOnTeammates: null, // lcu has no total damage shielded on teammates record
         soloKills: null, // lcu has no solo kills record
         pings: null, // lcu has no pings record
+        knockEnemyIntoTeamAndKill: null, // lcu has no knock enemy into team and kill record
+        killsNearEnemyTurret: null, // lcu has no kills near enemy turret record
+        killsUnderOwnTurret: null, // lcu has no kills under own turret record
+        maxCsAdvantageOnLaneOpponent: null, // lcu has no max cs advantage on lane opponent record
 
         doubleKills: participant.stats.doubleKills,
         tripleKills: participant.stats.tripleKills,

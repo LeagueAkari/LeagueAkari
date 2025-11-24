@@ -103,8 +103,6 @@ export interface TabState {
   isLoadingSavedInfo: boolean
   isLoadingSummonerProfile: boolean
   isLoadingEncounteredGames: boolean
-
-  isTakingScreenshot: boolean
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */

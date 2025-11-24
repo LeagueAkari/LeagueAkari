@@ -7,8 +7,10 @@
         :details="details"
         :puuid="puuid"
         :theme="as.colorTheme"
+        :loading-details="isLoadingDetails"
         is-expanded
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
+        @load-details="loadDetails(summary?.source || 'lcu')"
       />
       <div v-else>没有数据</div>
     </div>
@@ -78,20 +80,19 @@ const summary = computed(() => {
 })
 
 const isLoadingGameSummary = ref(false)
-
-let controller = null as AbortController | null
+const summaryController = shallowRef<AbortController | null>(null)
 
 const loadGameSummary = async (source: 'sgp' | 'lcu') => {
   if (_summary.value && _summary.value.gameId === gameId && _summary.value.source === source) {
     return
   }
 
-  if (controller) {
-    controller.abort()
+  if (summaryController.value) {
+    summaryController.value.abort()
   }
 
-  controller = new AbortController()
-  const signal = controller.signal
+  summaryController.value = new AbortController()
+  const signal = summaryController.value.signal
 
   try {
     isLoadingGameSummary.value = true
@@ -128,6 +129,42 @@ const details = computed(() => {
   return _details.value
 })
 
+const isLoadingDetails = ref(false)
+const detailsController = shallowRef<AbortController | null>(null)
+
+const loadDetails = async (source: 'sgp' | 'lcu') => {
+  if (_details.value && _details.value.gameId === gameId && _details.value.source === source) {
+    return
+  }
+
+  if (detailsController.value) {
+    detailsController.value.abort()
+  }
+
+  detailsController.value = new AbortController()
+  const signal = detailsController.value.signal
+
+  try {
+    isLoadingDetails.value = true
+
+    if (source === 'sgp') {
+      const { data } = await sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId)
+      _details.value = { gameId, source: 'sgp', data }
+    } else {
+      const { data } = await lc.api.matchHistory.getTimeline(gameId)
+      _details.value = { gameId, source: 'lcu', data }
+    }
+  } catch (error) {
+    if (signal.aborted) {
+      return
+    }
+
+    log.warn(componentName, error)
+  } finally {
+    isLoadingDetails.value = false
+  }
+}
+
 watch([() => show.value, () => sourceShouldUse.value], ([show, source]) => {
   if (!show) {
     return
@@ -139,8 +176,10 @@ watch([() => show.value, () => sourceShouldUse.value], ([show, source]) => {
     return
   }
 
-  controller?.abort()
+  summaryController.value?.abort()
+  detailsController.value?.abort()
   _summary.value = null
+  _details.value = null
 })
 
 // 保证 details 严格对应 summary

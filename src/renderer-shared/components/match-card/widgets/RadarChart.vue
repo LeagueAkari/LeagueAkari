@@ -244,6 +244,9 @@ const options = computed<ChartOptions<'radar'>>(() => ({
     }
   },
   plugins: {
+    datalabels: {
+      display: false
+    },
     legend: {
       labels: {
         color: chartColors.value.legend

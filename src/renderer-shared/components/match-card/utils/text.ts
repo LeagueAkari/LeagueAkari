@@ -92,9 +92,9 @@ export function useLaneType() {
 }
 
 const POSITION_MAP = {
-  TOP: '上单',
+  TOP: '上路',
   JUNGLE: '打野',
-  MIDDLE: '中单',
+  MIDDLE: '中路',
   BOTTOM: '下路',
   UTILITY: '辅助'
 }

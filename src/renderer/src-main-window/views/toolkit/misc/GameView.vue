@@ -3,10 +3,13 @@
     <template #header>
       <span class="card-header-title">{{ t('GameView.title') }}</span>
     </template>
-    <StandaloneMatchHistoryCardModal
-      v-model:show="show"
-      :game-id="viewingGameId"
-      @to-summoner="navigateToTabByPuuid"
+
+    <!-- 年久失修，暂时用这个凑合着用 -->
+    <MatchPreviewer
+      v-model:show="showPreviewModal"
+      :game-id="previewingGameId || 0"
+      source="lcu"
+      @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <ControlItem
       class="control-item-margin"
@@ -26,7 +29,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
+import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
@@ -37,12 +40,12 @@ import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs
 const { t } = useTranslation()
 
 const gameId = ref<number>()
-const viewingGameId = ref<number>()
-const show = ref(false)
+const previewingGameId = ref<number>()
+const showPreviewModal = ref(false)
 
 const handleInspect = () => {
-  show.value = true
-  viewingGameId.value = gameId.value
+  showPreviewModal.value = true
+  previewingGameId.value = gameId.value
 }
 
 const mh = useInstance(MatchHistoryTabsRenderer)

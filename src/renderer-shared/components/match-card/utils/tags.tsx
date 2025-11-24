@@ -8,7 +8,7 @@ function times(thing: string, count: number) {
     return `${thing}`
   }
 
-  return `${thing} × ${count}`
+  return `${thing}×${count.toFixed(0)}`
 }
 
 export interface PlayerTag {
@@ -23,6 +23,7 @@ interface TagContext {
   participant: NonNullable<ReturnType<typeof useMatchCard>['participant']['value']>
   team: NonNullable<ReturnType<typeof useMatchCard>['team']['value']>
   teams: ReturnType<typeof useMatchCard>['teams']['value']
+  basicInfo: ReturnType<typeof useMatchCard>['basicInfo']['value']
 }
 
 function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
@@ -49,7 +50,7 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
       label: `${times('五杀', streakKills.penta)}`,
       color: theme.bg,
       textColor: theme.text,
-      priority: 2000
+      priority: 20000
     })
   }
 
@@ -279,6 +280,21 @@ function computeCsTags({ participant, teams }: TagContext): PlayerTag[] {
   return []
 }
 
+function computeCsAdvantageTags({ participant }: TagContext): PlayerTag[] {
+  if (participant.maxCsAdvantageOnLaneOpponent && participant.maxCsAdvantageOnLaneOpponent >= 40) {
+    return [
+      {
+        label: times('压刀', participant.maxCsAdvantageOnLaneOpponent),
+        color: 'bg-amber-600 dark:bg-amber-700',
+        textColor: 'text-white',
+        content: `同路补刀压制对手最多 ${participant.maxCsAdvantageOnLaneOpponent.toLocaleString()} 个`,
+        priority: 750 + participant.maxCsAdvantageOnLaneOpponent * 10
+      }
+    ]
+  }
+  return []
+}
+
 function computeKillsTags({ participant, team, teams }: TagContext): PlayerTag[] {
   if (!participant.kills) return []
 
@@ -333,8 +349,92 @@ function computeKpTags({ participant, team, teams }: TagContext): PlayerTag[] {
   return []
 }
 
+function computedKnockUpTags({ participant }: TagContext): PlayerTag[] {
+  if (!participant.knockEnemyIntoTeamAndKill) return []
+
+  if (participant.knockEnemyIntoTeamAndKill >= 6) {
+    return [
+      {
+        label: times('好钩', participant.knockEnemyIntoTeamAndKill),
+        color: 'bg-purple-700 dark:bg-purple-800',
+        textColor: 'text-white',
+        content: `将敌方英雄击飞或拉入我方并击杀 ${participant.knockEnemyIntoTeamAndKill.toLocaleString()} 次`,
+        priority: 1650
+      }
+    ]
+  }
+  return []
+}
+
+function computeCcTags({ participant, team, teams }: TagContext): PlayerTag[] {
+  if (!participant.totalTimeCCDealt) return []
+
+  if (participant.totalTimeCCDealt === teams.allTeamStats.maxTimeCCDealt) {
+    return [
+      {
+        label: '★ 控制',
+        color: 'bg-fuchsia-700 dark:bg-fuchsia-800',
+        textColor: 'text-white',
+        content: `全场最久控制，控制了敌方英雄 ${participant.totalTimeCCDealt.toLocaleString()} 秒`,
+        priority: 1750
+      }
+    ]
+  } else if (participant.totalTimeCCDealt === team.maxTimeCCDealt) {
+    return [
+      {
+        label: '控制',
+        color: 'bg-fuchsia-600 dark:bg-fuchsia-700',
+        textColor: 'text-white',
+        content: `队伍最久控制，控制了敌方英雄 ${participant.totalTimeCCDealt.toLocaleString()} 秒`,
+        priority: 1700
+      }
+    ]
+  }
+
+  return []
+}
+
+function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag[] {
+  const tags: PlayerTag[] = []
+  const durationMinutes = basicInfo.gameDuration / 60
+
+  if (basicInfo.mapId !== 11 && basicInfo.mapId !== 12) return []
+
+  // 11 召唤师峡谷，12 嚎哭深渊
+  const nearEnemyTurretThreshold = basicInfo.mapId === 11 ? 5 : 1.5
+  const underOwnTurretThreshold = basicInfo.mapId === 11 ? 6 : 1.5
+
+  if (
+    participant.killsNearEnemyTurret &&
+    participant.killsNearEnemyTurret >= durationMinutes / nearEnemyTurretThreshold
+  ) {
+    tags.push({
+      label: times('越塔王', participant.killsNearEnemyTurret),
+      color: 'bg-rose-600 dark:bg-rose-700',
+      textColor: 'text-white',
+      content: `在敌方塔下击杀 ${participant.killsNearEnemyTurret.toLocaleString()} 次`,
+      priority: 1660
+    })
+  }
+
+  if (
+    participant.killsUnderOwnTurret &&
+    participant.killsUnderOwnTurret >= durationMinutes / underOwnTurretThreshold
+  ) {
+    tags.push({
+      label: times('塔之子', participant.killsUnderOwnTurret),
+      color: 'bg-stone-500 dark:bg-stone-600',
+      textColor: 'text-white',
+      content: `在己方塔下击杀 ${participant.killsUnderOwnTurret.toLocaleString()} 次`,
+      priority: 1640
+    })
+  }
+
+  return tags
+}
+
 export function usePlayerTags() {
-  const { participant, teams, team } = useMatchCard()
+  const { participant, teams, team, basicInfo } = useMatchCard()
 
   return computed(() => {
     if (!participant.value || !team.value) return []
@@ -342,11 +442,13 @@ export function usePlayerTags() {
     const context: TagContext = {
       participant: participant.value,
       team: team.value,
-      teams: teams.value
+      teams: teams.value,
+      basicInfo: basicInfo.value
     }
 
     const tags: PlayerTag[] = [
       ...computeMultikillTags(context),
+      ...computeTowerKillTags(context),
       ...computeDamageTags(context),
       ...computeTakenTags(context),
       ...computeHealTags(context),
@@ -355,9 +457,22 @@ export function usePlayerTags() {
       ...computeSoloTags(context),
       ...computeGoldTags(context),
       ...computeCsTags(context),
+      ...computeCsAdvantageTags(context),
       ...computeKillsTags(context),
-      ...computeKpTags(context)
+      ...computeKpTags(context),
+      ...computedKnockUpTags(context),
+      ...computeCcTags(context)
     ]
+
+    if (tags.length === 0) {
+      tags.push({
+        label: '平平无奇',
+        color: 'bg-zinc-500 dark:bg-zinc-600',
+        textColor: 'text-white',
+        content: '本局没有出彩的地方',
+        priority: 0
+      })
+    }
 
     return tags.sort((a, b) => (b.priority || 0) - (a.priority || 0))
   })

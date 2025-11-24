@@ -1726,7 +1726,7 @@ PlayerInfoCard:
   suspiciousFlashPosition: 闪现异位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
   soloKills: '{{times}} 单杀'
-  soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家获得单杀 {{times}} 次平均
+  soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家场均单杀 {{times}} 次
   akariLoved:
     outstanding: 优异
     extraordinary: 通天代

@@ -201,14 +201,6 @@ mh.events.on('refresh-tab', (tabId: string) => {
   }
 })
 
-mh.events.on('screenshot-tab', (tabId: string) => {
-  const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
-  if (tab) {
-    log.info(VIEW_NAMESPACE, `截图战绩页面`, tabId)
-    tab.screenshot()
-  }
-})
-
 const tabsWrapperEl = useTemplateRef('tabs-wrapper')
 const { isOverDropZone } = useDropZone(tabsWrapperEl, {
   dataTypes: ['application/riot.roster-member+json'],
