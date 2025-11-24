@@ -1,8 +1,16 @@
 <template>
   <NScrollbar x-scrollable class="max-h-142 rounded b-solid dark:b-white/5 b-black/5 b-1 b-b-0">
-    <div class="flex items-center gap-2 px-2 py-1 dark:bg-white/5 bg-black/5 mb-1">
-      <div class="text-xs dark:text-white/60 text-black/80">
-        ID: <span class="select-text">{{ basicInfo.gameId }}</span> ({{ basicInfo.dataSource }})
+    <div class="flex items-center gap-4 px-2 py-1 dark:bg-white/5 bg-black/5 mb-1">
+      <div class="text-[11px] dark:text-white/60 text-black/80">
+        游戏 ID: <span class="select-text">{{ basicInfo.gameId }}</span> ({{
+          basicInfo.dataSource
+        }})
+      </div>
+      <div class="text-[11px] dark:text-white/60 text-black/80">
+        {{ dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}
+      </div>
+      <div class="text-[11px] dark:text-white/60 text-black/80">
+        游戏版本: <span class="select-text">{{ basicInfo.gameVersion }}</span>
       </div>
     </div>
 
@@ -19,7 +27,7 @@
           <!-- players from 1 to 10 -->
           <th
             v-for="p of rawStats"
-            :key="p.identity.puuid"
+            :key="p.participantId"
             class="sticky top-0 z-1 b-b b-b-solid dark:b-b-white/5 b-b-black/5 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2"
           >
             <div
@@ -27,7 +35,6 @@
               :title="`${p.identity.gameName} #${p.identity.tagLine}`"
             >
               <ChampionIcon
-                :data-participant-id="p.participantId"
                 :champion-id="p.championId"
                 class="size-6 b-2 b-solid"
                 :style="{
@@ -60,7 +67,18 @@
         </tr>
 
         <tr v-for="row of group.rows" :key="row.key">
+          <NPopover placement="right" v-if="row.chartData" :delay="200">
+            <template #trigger>
+              <td
+                class="sticky left-0 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2 font-bold b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs truncate w-38 max-w-38"
+              >
+                {{ STAT_KEY_TRANSLATIONS[row.key] || row.key }}
+              </td>
+            </template>
+            <StatsBarChart :chartData="row.chartData" :title="row.name" />
+          </NPopover>
           <td
+            v-else
             :title="STAT_KEY_TRANSLATIONS[row.key] || row.key"
             class="sticky left-0 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2 font-bold b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs truncate w-38 max-w-38"
           >
@@ -83,7 +101,8 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { refDebounced } from '@vueuse/core'
-import { NInput, NScrollbar } from 'naive-ui'
+import dayjs from 'dayjs'
+import { NInput, NPopover, NScrollbar } from 'naive-ui'
 import { type VNodeChild, computed, createTextVNode, shallowRef } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -96,6 +115,7 @@ import {
   useValueRenderer
 } from '../utils/details-table'
 import { getTeamColor } from '../utils/theme'
+import StatsBarChart from '../widgets/StatsBarChart.vue'
 
 const { basicInfo } = useMatchCard()
 
@@ -117,9 +137,11 @@ const groups = computed(() => {
     return []
   }
 
-  const sortedByTeam = rawStats.value.toSorted((a, b) => {
-    return a.identity.teamIdentifier.localeCompare(b.identity.teamIdentifier)
-  })
+  const sortedByTeam = rawStats.value.toSorted(
+    (a: { identity: { teamIdentifier: string } }, b: { identity: { teamIdentifier: string } }) => {
+      return a.identity.teamIdentifier.localeCompare(b.identity.teamIdentifier)
+    }
+  )
 
   const undocumentedKeys = Object.keys(sortedByTeam[0]).filter(
     (key) => !MAPPED_RENDER_GROUP_OPTIONS[key]
@@ -162,9 +184,31 @@ const groups = computed(() => {
               return null
             }
 
-            const render = item.render || valueRenderer.text
-
+            const render = item.render || 'text'
             const rowCells = sortedByTeam.map((p: Record<string, any>) => p[item.key])
+
+            // 支持 chart 展示的类型
+            if (
+              item.render === 'k2' ||
+              item.render === 'integer' ||
+              item.render === 'float' ||
+              item.render === 'percentage'
+            ) {
+              const chartData = rowCells.map((cell, index) => {
+                return {
+                  participantId: sortedByTeam[index].participantId,
+                  value: cell
+                }
+              })
+
+              return {
+                key: item.key as string,
+                name,
+                cells: rowCells,
+                render: typeof render === 'function' ? render : valueRenderer[render],
+                chartData
+              }
+            }
 
             return {
               key: item.key as string,

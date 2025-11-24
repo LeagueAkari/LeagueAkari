@@ -121,8 +121,7 @@ const percentage = computed(() => {
   const kdaRatioToMax = participant.value.kda / noZero(teams.value.allTeamStats.maxKda)
   const killParticipationRatioToMax =
     participant.value.killParticipation / noZero(teams.value.allTeamStats.maxKillParticipation)
-  const totalHealRatioToMax =
-    participant.value.totalHeal / noZero(teams.value.allTeamStats.maxTotalHeal)
+  const totalHealRatioToMax = participant.value.totalHeal / noZero(teams.value.allTeamStats.maxHeal)
 
   const teamAvgDamageDealtToChampionsRatioToMax =
     team.value.totalDamageDealtToChampions /
@@ -140,7 +139,7 @@ const percentage = computed(() => {
     teamSize.value /
     noZero(teams.value.allTeamStats.maxKillParticipation)
   const teamAvgTotalHealRatioToMax =
-    team.value.totalHeal / teamSize.value / noZero(teams.value.allTeamStats.maxTotalHeal)
+    team.value.totalHeal / teamSize.value / noZero(teams.value.allTeamStats.maxHeal)
 
   return {
     damageDealtToChampions: participant.value.totalDamageDealtToChampions,

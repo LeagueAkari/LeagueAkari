@@ -618,10 +618,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         // 这些模式, ARAM / 海克斯大乱斗 等，使用 AllRandomPickStrategy 模式，需告知所属方
-        if (
-          gameData.queue.mapId === 12 &&
-          gameData.queue.gameTypeConfig.pickMode === 'AllRandomPickStrategy'
-        ) {
+        if (gameData.queue.gameTypeConfig.pickMode === 'AllRandomPickStrategy') {
           const me = myTeam.find((p) => p.cellId === localPlayerCellId)
 
           if (!me) {

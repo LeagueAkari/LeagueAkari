@@ -122,12 +122,20 @@ export function toTeams(
         totalCs: teamParticipants.reduce((acc, p) => acc + p.cs, 0),
         maxDamageToTowers: Math.max(...teamParticipants.map((p) => p.totalDamageToTowers)),
         totalDamageToTowers: teamParticipants.reduce((acc, p) => acc + p.totalDamageToTowers, 0),
-        maxTotalHeal: Math.max(...teamParticipants.map((p) => p.totalHeal)),
+        maxHeal: Math.max(...teamParticipants.map((p) => p.totalHeal)),
         totalHeal: teamParticipants.reduce((acc, p) => acc + p.totalHeal, 0),
         maxKda: Math.max(...teamParticipants.map((p) => p.kda)),
         totalKda: teamParticipants.reduce((acc, p) => acc + p.kda, 0),
         maxKillParticipation: Math.max(...teamParticipants.map((p) => p.killParticipation)),
-        totalKillParticipation: teamParticipants.reduce((acc, p) => acc + p.killParticipation, 0)
+        totalKillParticipation: teamParticipants.reduce((acc, p) => acc + p.killParticipation, 0),
+        maxDamageShieldedOnTeammates:
+          teamParticipants[0].totalDamageShieldedOnTeammates !== null
+            ? Math.max(...teamParticipants.map((p) => p.totalDamageShieldedOnTeammates ?? 0))
+            : null,
+        totalDamageShieldedOnTeammates:
+          teamParticipants[0].totalDamageShieldedOnTeammates !== null
+            ? teamParticipants.reduce((acc, p) => acc + (p.totalDamageShieldedOnTeammates ?? 0), 0)
+            : null
       }
     }
   )
@@ -152,12 +160,20 @@ export function toTeams(
     totalCs: teamStatsArr.reduce((acc, t) => acc + t.totalCs, 0),
     maxDamageToTowers: Math.max(...teamStatsArr.map((t) => t.maxDamageToTowers)),
     totalDamageToTowers: teamStatsArr.reduce((acc, t) => acc + t.totalDamageToTowers, 0),
-    maxTotalHeal: Math.max(...teamStatsArr.map((t) => t.maxTotalHeal)),
+    maxHeal: Math.max(...teamStatsArr.map((t) => t.maxHeal)),
     totalHeal: teamStatsArr.reduce((acc, t) => acc + t.totalHeal, 0),
     maxKda: Math.max(...teamStatsArr.map((t) => t.maxKda)),
     totalKda: teamStatsArr.reduce((acc, t) => acc + t.totalKda, 0),
     maxKillParticipation: Math.max(...teamStatsArr.map((t) => t.maxKillParticipation)),
-    totalKillParticipation: teamStatsArr.reduce((acc, t) => acc + t.totalKillParticipation, 0)
+    totalKillParticipation: teamStatsArr.reduce((acc, t) => acc + t.totalKillParticipation, 0),
+    maxDamageShieldedOnTeammates:
+      teamStatsArr[0].maxDamageShieldedOnTeammates !== null
+        ? Math.max(...teamStatsArr.map((t) => t.maxDamageShieldedOnTeammates ?? 0))
+        : null,
+    totalDamageShieldedOnTeammates:
+      teamStatsArr[0].totalDamageShieldedOnTeammates !== null
+        ? teamStatsArr.reduce((acc, t) => acc + (t.totalDamageShieldedOnTeammates ?? 0), 0)
+        : null
   }
 
   // 转换为 Map 结构便于查询

@@ -95,7 +95,8 @@ export function toParticipants(
         tagLine: p.riotIdTagline,
         profileIconId: p.profileIcon,
         championId: p.championId,
-        position: p.individualPosition,
+        position:
+          p.individualPosition.toLocaleLowerCase() === 'invalid' ? null : p.individualPosition,
         teamId: p.teamId,
         playerSubteamId: p.playerSubteamId,
         teamIdentifier,
@@ -141,6 +142,7 @@ export function toParticipants(
         visionScore: p.visionScore,
         soloKills: p.challenges?.soloKills ?? null,
         effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
+        totalDamageShieldedOnTeammates: p.totalDamageShieldedOnTeammates,
 
         pings: {
           allInPings: p.allInPings,
@@ -157,7 +159,12 @@ export function toParticipants(
           pushPings: p.pushPings,
           retreatPings: p.retreatPings,
           visionClearedPings: p.visionClearedPings
-        }
+        },
+
+        doubleKills: p.doubleKills,
+        tripleKills: p.tripleKills,
+        quadraKills: p.quadraKills,
+        pentaKills: p.pentaKills
       }
     })
 
@@ -252,8 +259,14 @@ export function toParticipants(
         visionScore: participant.stats.visionScore,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record
+        totalDamageShieldedOnTeammates: null, // lcu has no total damage shielded on teammates record
         soloKills: null, // lcu has no solo kills record
-        pings: null // lcu has no pings record
+        pings: null, // lcu has no pings record
+
+        doubleKills: participant.stats.doubleKills,
+        tripleKills: participant.stats.tripleKills,
+        quadraKills: participant.stats.quadraKills,
+        pentaKills: participant.stats.pentaKills
       }
     })
     .filter(isNotNull)

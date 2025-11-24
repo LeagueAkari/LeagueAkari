@@ -67,8 +67,6 @@ export function getTeamColor(teamIdentifier: string) {
   if (teamIdentifier === 'TEAM-100') return '#3B82F6'
   if (teamIdentifier === 'TEAM-200') return '#EF4444'
 
-  console.log(teamIdentifier)
-
   if (teamIdentifier.startsWith('CHERRY-')) {
     const id = Number(teamIdentifier.split('-')[1])
     if (!isNaN(id)) {

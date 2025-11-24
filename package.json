@@ -69,6 +69,7 @@
     "@zumer/snapdom": "^2.0.0",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "codemirror": "^6.0.2",
     "dayjs": "^1.11.18",
     "electron": "37.7.0",

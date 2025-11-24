@@ -2,6 +2,7 @@ import type { LcuOrSgpGameSummary } from '../wrapper'
 
 export type MatchBasicInfo = {
   dataSource: LcuOrSgpGameSummary['source']
+  gameVersion: string
   gameId: number
   isTwoTeam: boolean
   isCherrySubteam: boolean
@@ -102,7 +103,12 @@ export type MatchParticipant = {
   visionScore: number
   soloKills: number | null
   effectiveHealAndShielding: number | null
+  totalDamageShieldedOnTeammates: number | null
   pings: MatchParticipantPings | null
+  doubleKills: number
+  tripleKills: number
+  quadraKills: number
+  pentaKills: number
 }
 
 export type MatchTeamBan = {
@@ -161,12 +167,14 @@ export type MatchTeamStats = {
   totalCs: number
   maxDamageToTowers: number
   totalDamageToTowers: number
-  maxTotalHeal: number
+  maxHeal: number
   totalHeal: number
   maxKda: number
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
+  maxDamageShieldedOnTeammates: number | null // sgp only
+  totalDamageShieldedOnTeammates: number | null // sgp only
 }
 
 export type AggregateTeamStats = {
@@ -186,12 +194,14 @@ export type AggregateTeamStats = {
   totalCs: number
   maxDamageToTowers: number
   totalDamageToTowers: number
-  maxTotalHeal: number
+  maxHeal: number
   totalHeal: number
   maxKda: number
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
+  maxDamageShieldedOnTeammates: number | null // sgp only
+  totalDamageShieldedOnTeammates: number | null // sgp only
 }
 
 export type TeamsAdapterResult = {

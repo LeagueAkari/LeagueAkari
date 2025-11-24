@@ -3790,6 +3790,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chartjs-plugin-datalabels@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "chartjs-plugin-datalabels@npm:2.2.0"
+  peerDependencies:
+    chart.js: ">=3.0.0"
+  checksum: 10c0/de4855a795e4eef34869a16db1a8a0f905b6dfed0258c733338f472625361eb56fb899214b18651c1c1064cd343a78285ba576576693a40ec51285a84f022ea0
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:^3.6.0":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
@@ -6062,6 +6071,7 @@ __metadata:
     axios: "npm:^1.12.2"
     axios-retry: "npm:^4.5.0"
     chart.js: "npm:^4.5.1"
+    chartjs-plugin-datalabels: "npm:^2.2.0"
     codemirror: "npm:^6.0.2"
     dayjs: "npm:^1.11.18"
     electron: "npm:37.7.0"

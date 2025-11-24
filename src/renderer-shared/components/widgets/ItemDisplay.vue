@@ -17,7 +17,7 @@
     <div class="info">
       <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
-        <div class="name">{{ lcs.gameData.items[itemId].name }} ({{ itemId }})</div>
+        <div class="name">{{ lcs.gameData.items[itemId].name }} (ID: {{ itemId }})</div>
         <div class="price">
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
@@ -107,7 +107,7 @@ const lcs = useLeagueClientStore()
         font-size: 12px;
         line-height: 12px;
         font-weight: bold;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
       }
 
       .price {

@@ -29,6 +29,9 @@ export interface MatchHistoryGamesAnalysis {
   towerDamageRatioToTeamMax: number
   towerDamageRatioToMax: number
   towerDamagePercentageOfTeam: number
+  totalDamageShieldedOnTeammatesRatioToTeamMax: number | null
+  totalDamageShieldedOnTeammatesRatioToMax: number | null
+  totalDamageShieldedOnTeammatesPercentageOfTeam: number | null
 
   visionScore: number
 
@@ -243,22 +246,43 @@ export function analyzeMatchHistory(
       participant.totalDamageDealtToChampions / noZero(teams.allTeamStats.maxDamageDealtToChampions)
     const championDamagePercentageOfTeam =
       participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)
+
     const damageTakenRatioToTeamMax = participant.totalDamageTaken / noZero(team.maxDamageTaken)
     const damageTakenRatioToMax =
       participant.totalDamageTaken / noZero(teams.allTeamStats.maxDamageTaken)
     const damageTakenPercentageOfTeam = participant.totalDamageTaken / noZero(team.totalDamageTaken)
+
     const goldRatioToTeamMax = participant.goldEarned / noZero(team.maxGoldEarned)
     const goldRatioToMax = participant.goldEarned / noZero(teams.allTeamStats.maxGoldEarned)
     const goldPercentageOfTeam = participant.goldEarned / noZero(team.totalGoldEarned)
+
     const csRatioToTeamMax = participant.cs / noZero(team.maxCs)
     const csRatioToMax = participant.cs / noZero(teams.allTeamStats.maxCs)
     const csPercentageOfTeam = participant.cs / noZero(team.totalCs)
+
     const towerDamageRatioToTeamMax =
       participant.totalDamageToTowers / noZero(team.maxDamageToTowers)
     const towerDamageRatioToMax =
       participant.totalDamageToTowers / noZero(teams.allTeamStats.maxDamageToTowers)
     const towerDamagePercentageOfTeam =
       participant.totalDamageToTowers / noZero(team.totalDamageToTowers)
+
+    // sgp only
+    const totalDamageShieldedOnTeammatesRatioToTeamMax =
+      participant.totalDamageShieldedOnTeammates !== null
+        ? participant.totalDamageShieldedOnTeammates /
+          noZero(team.maxDamageShieldedOnTeammates ?? 0)
+        : null
+    const totalDamageShieldedOnTeammatesRatioToMax =
+      participant.totalDamageShieldedOnTeammates !== null
+        ? participant.totalDamageShieldedOnTeammates /
+          noZero(teams.allTeamStats.maxDamageShieldedOnTeammates ?? 0)
+        : null
+    const totalDamageShieldedOnTeammatesPercentageOfTeam =
+      participant.totalDamageShieldedOnTeammates !== null
+        ? participant.totalDamageShieldedOnTeammates /
+          noZero(team.totalDamageShieldedOnTeammates ?? 0)
+        : null
 
     gamesAnalysis.push({
       gameId,
@@ -282,6 +306,10 @@ export function analyzeMatchHistory(
       towerDamageRatioToTeamMax,
       towerDamagePercentageOfTeam,
       towerDamageRatioToMax,
+
+      totalDamageShieldedOnTeammatesRatioToTeamMax,
+      totalDamageShieldedOnTeammatesRatioToMax,
+      totalDamageShieldedOnTeammatesPercentageOfTeam,
 
       visionScore: participant.visionScore,
 

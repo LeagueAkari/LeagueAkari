@@ -1,4 +1,5 @@
 import {
+  BarElement,
   CategoryScale,
   Chart as ChartJS,
   Filler,
@@ -10,6 +11,7 @@ import {
   Title,
   Tooltip
 } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 let registered = false
 
@@ -24,7 +26,9 @@ export function registerChartJS() {
       Legend,
       CategoryScale,
       LinearScale,
-      Title
+      Title,
+      BarElement,
+      ChartDataLabels
     )
 
     registered = true

@@ -205,11 +205,11 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   tookLargeDamageSurvived: '承受大量伤害存活',
   killedChampTookFullTeamDamageSurvived: '击杀后承受全队伤害存活',
   saveAllyFromDeath: '救队友于死亡',
-  skillshotsDodged: '躲避技能',
-  skillshotsHit: '命中技能',
+  skillshotsDodged: '躲避技巧技能',
+  skillshotsHit: '命中技巧技能',
   snowballsHit: '命中雪球',
-  dodgeSkillShotsSmallWindow: '短时间内躲避技能',
-  landSkillShotsEarlyGame: '早期命中技能',
+  dodgeSkillShotsSmallWindow: '短时间内躲避技巧技能',
+  landSkillShotsEarlyGame: '早期命中技巧技能',
   blastConeOppositeOpponentCount: '爆炸果实击退敌人',
   quickCleanse: '控制秒解',
   dancedWithRiftHerald: '与先锋共舞',
@@ -222,6 +222,7 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   fullTeamTakedown: '全队参与击杀',
   shortestTimeToAceFromFirstTakedown: '首杀到团灭最短时间',
   '12AssistStreakCount': '12连助攻',
+  teleportTakedowns: '传送参与击杀',
 
   // Misc - 其他
   champLevel: '英雄等级',
@@ -576,7 +577,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'acesBefore15Minutes', render: 'integer' }, // sgp challenges
       { key: 'fullTeamTakedown', render: 'integer' }, // sgp challenges
       { key: 'shortestTimeToAceFromFirstTakedown', render: 'integer' }, // sgp challenges
-      { key: '12AssistStreakCount', render: 'integer' } // sgp challenges
+      { key: '12AssistStreakCount', render: 'integer' }, // sgp challenges
+      { key: 'teleportTakedowns', render: 'integer' } // sgp challenges
     ]
   },
   {

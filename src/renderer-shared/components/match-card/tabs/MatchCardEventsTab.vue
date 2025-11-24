@@ -222,7 +222,6 @@ import { useBuildingType, useFrameEventType, useLaneType, useTowerType } from '.
 import { useWinResultTagTheme } from '../utils/theme'
 import MapPosition from '../widgets/MapPosition.vue'
 
-// 获取 timeline 数据
 const { participants, details, basicInfo, frames, team, loadingDetails, onLoadDetails } =
   useMatchCard()
 

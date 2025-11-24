@@ -7,6 +7,7 @@ export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
   if (source === 'sgp') {
     return {
       dataSource: source,
+      gameVersion: data.json.gameVersion,
       gameId: data.json.gameId,
       isTwoTeam: data.json.gameMode !== 'CHERRY',
       isCherrySubteam: data.json.gameMode === 'CHERRY',
@@ -23,6 +24,7 @@ export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
 
   return {
     dataSource: source,
+    gameVersion: data.gameVersion,
     gameId: data.gameId,
     isTwoTeam: data.gameMode !== 'CHERRY',
     isCherrySubteam: data.gameMode === 'CHERRY',

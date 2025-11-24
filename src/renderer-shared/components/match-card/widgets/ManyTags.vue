@@ -12,33 +12,63 @@
             index >
             (tagOverflowInfo.isOverflow
               ? tagOverflowInfo.lastVisibleTagIndex - 1
-              : tagOverflowInfo.lastVisibleTagIndex),
-        },
+              : tagOverflowInfo.lastVisibleTagIndex)
+        }
       ]"
-      class="shrink-0 text-xs py-0.5 px-2 rounded-xl"
+      class="tag"
+      :data-tag-index="index"
     >
+      <NPopover v-if="tag.content" :keep-alive-on-hover="false">
+        <template #trigger>
+          <div class="absolute inset-0 rounded-xl"></div>
+        </template>
+        <component :is="renderChild(tag.content)" />
+      </NPopover>
       {{ tag.label }}
     </div>
-    <div
-      v-if="tagOverflowInfo.isOverflow"
-      class="shrink-0 dark:bg-white/10 bg-black/10 hover:dark:bg-white/20 hover:bg-black/20 transition-colors text-xs py-0.5 px-2 rounded-xl absolute left-0"
-      :style="{ left: tagOverflowInfo.lastVisibleTagOffsetLeft + 'px' }"
-      :title="
-        tags
-          .slice(tagOverflowInfo.lastVisibleTagIndex)
-          .map((tag) => tag.label)
-          .join(', ')
-      "
-    >
-      +{{ tags.length - tagOverflowInfo.lastVisibleTagIndex }}
-    </div>
+    <NPopover v-if="tagOverflowInfo.isOverflow">
+      <template #trigger>
+        <div
+          class="shrink-0 dark:bg-white/10 bg-black/10 hover:dark:bg-white/20 hover:bg-black/20 transition-colors text-xs py-0.5 px-2 rounded-xl absolute left-0"
+          :style="{ left: tagOverflowInfo.lastVisibleTagOffsetLeft + 'px' }"
+        >
+          +{{ tags.length - tagOverflowInfo.lastVisibleTagIndex }}
+        </div>
+      </template>
+      <div class="flex gap-1">
+        <div
+          v-for="tag in tags.slice(tagOverflowInfo.lastVisibleTagIndex)"
+          :key="tag.label"
+          :class="[tag.color, tag.textColor]"
+          class="tag"
+        >
+          <NPopover v-if="tag.content" :keep-alive-on-hover="false">
+            <template #trigger>
+              <div class="absolute inset-0 rounded-xl"></div>
+            </template>
+            <component :is="renderChild(tag.content)" />
+          </NPopover>
+          {{ tag.label }}
+        </div>
+      </div>
+    </NPopover>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, useTemplateRef } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
+import { NPopover } from 'naive-ui'
+import { VNodeChild, createTextVNode, shallowRef, useTemplateRef } from 'vue'
+
 import { usePlayerTags } from '../utils/tags'
+
+const renderChild = (node: string | (() => VNodeChild)) => {
+  if (typeof node === 'string') {
+    return createTextVNode(node)
+  }
+
+  return { render: node }
+}
 
 const containerEl = useTemplateRef('container')
 const tagsEl = useTemplateRef('tagsEl')
@@ -52,7 +82,7 @@ const updateOverflowTagInfo = () => {
     return {
       isOverflow: false,
       lastVisibleTagIndex: -1,
-      lastVisibleTagOffsetLeft: 0,
+      lastVisibleTagOffsetLeft: 0
     }
   }
 
@@ -78,14 +108,14 @@ const updateOverflowTagInfo = () => {
     isOverflow: lastVisibleTagIndex !== tagsEl.value.length - 1,
     lastVisibleTagIndex,
     lastVisibleTagOffsetLeft:
-      lastVisibleTagIndex === -1 ? 0 : tagsEl.value[lastVisibleTagIndex].offsetLeft,
+      lastVisibleTagIndex === -1 ? 0 : tagsEl.value[lastVisibleTagIndex].offsetLeft
   }
 }
 
 const tagOverflowInfo = shallowRef({
   isOverflow: false,
   lastVisibleTagIndex: -1,
-  lastVisibleTagOffsetLeft: 0,
+  lastVisibleTagOffsetLeft: 0
 })
 
 const recalcOverflow = () => {
@@ -96,4 +126,10 @@ useResizeObserver(() => containerEl.value, recalcOverflow)
 useResizeObserver(() => tagsEl.value || [], recalcOverflow)
 </script>
 
-<style scoped></style>
+<style scoped>
+@layer shortcuts {
+  .tag {
+    --at-apply: 'relative shrink-0 text-xs py-0.5 px-2 rounded-xl';
+  }
+}
+</style>

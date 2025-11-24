@@ -169,27 +169,27 @@
         <!-- info line -->
         <div class="flex">
           <!-- queue name -->
-          <div class="dark:text-white/60 text-black/80 text-[11px]">
+          <div class="dark:text-white/80 text-black text-xs">
             {{ lcs.gameData.queueName(basicInfo.queueId) }}
           </div>
-          <div class="dark:text-white/40 text-black/40 text-[11px] mx-1">·</div>
+          <div class="dark:text-white/40 text-black/40 text-xs mx-1">·</div>
 
           <!-- duration hh:mm:ss (pad 0) -->
           <!-- advanced: from -> to -->
-          <div class="dark:text-white/60 text-black/80 text-[11px]">
+          <div class="dark:text-white/60 text-black/80 text-xs">
             {{ formatSeconds(basicInfo.gameDuration) }}
           </div>
-          <div class="dark:text-white/40 text-black/60 text-[11px] mx-1">·</div>
+          <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
 
           <!-- should show the specific time if hover -->
           <div
             class="dark:text-white/60 text-black/80 text-xs"
-            :title="dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss')"
+            :title="dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss:SSS')"
           >
             {{ formattedRelativeTime }}
           </div>
-          <div class="dark:text-white/40 text-black/60 text-[11px] mx-1">·</div>
-          <div class="dark:text-white/60 text-black/80 text-[11px] truncate flex-1">
+          <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
+          <div class="dark:text-white/60 text-black/80 text-xs truncate flex-1">
             {{ mapName }}
           </div>
         </div>
@@ -431,9 +431,12 @@ const formattedRelativeTime = ref('')
 
 useIntervalFn(
   () => {
-    formattedRelativeTime.value = dayjs(basicInfo.value.gameCreation)
-      .locale(as.settings.locale.toLowerCase())
-      .fromNow()
+    const date = dayjs(basicInfo.value.gameCreation).locale(as.settings.locale.toLowerCase())
+    if (dayjs().diff(date, 'day', true) > 3) {
+      formattedRelativeTime.value = date.format('YYYY-MM-DD HH:mm')
+    } else {
+      formattedRelativeTime.value = date.fromNow()
+    }
   },
   60000,
   { immediateCallback: true, immediate: true }
