@@ -1,4 +1,4 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
+import { SgpServersConfig } from '@shared/types/shards/sgp'
 import Ajv from 'ajv'
 
 export const LEAGUE_SGP_SERVERS_CONFIG_SCHEMA = {

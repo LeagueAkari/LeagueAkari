@@ -30,7 +30,7 @@ export class MatchHistoryQueryHttpApi {
           tagsQueryType: options.tagsQueryType
         },
         headers: {
-          'X-Akari-Region': options.__sgpServerId,
+          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
           'X-Akari-Token-Type': 'entitlements'
         }
       }

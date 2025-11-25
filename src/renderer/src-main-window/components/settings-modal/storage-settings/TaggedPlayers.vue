@@ -89,8 +89,9 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { getSgpServerId, isTencentServer } from '@shared/data-sources/sgp/utils'
+import { toLcuSummoner } from '@shared/data-adapter/summoner'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { getSgpServerId, isTencentServer } from '@shared/utils/sgp'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
@@ -417,15 +418,23 @@ const updateCachedSummoners = async (
         summonerShallowMap[player.puuid] = summoner.data
       })
     } else {
-      sgp.getSummonerLcuFormat(player.puuid, player.sgpServerId).then((summoner) => {
-        if (summoner) {
-          rc.api.playerAccount.getPlayerAccountNameset([player.puuid]).then((nameset) => {
-            summoner.gameName = nameset.data.namesets[0]?.gnt.gameName || summoner.displayName
-            summoner.tagLine = nameset.data.namesets[0]?.gnt.tagLine || '?????'
-            summonerShallowMap[player.puuid] = summoner
-          })
-        }
-      })
+      sgp.api.summonerLedge
+        .postSummonersByPuuids([player.puuid], {
+          __sgpServerId: player.sgpServerId
+        })
+        .then(({ data: summoners }) => {
+          if (summoners.length) {
+            rc.api.playerAccount.getPlayerAccountNameset([player.puuid]).then((nameset) => {
+              const summoner = toLcuSummoner(
+                summoners[0],
+                nameset.data.namesets[0]?.gnt.gameName || '',
+                nameset.data.namesets[0]?.gnt.tagLine || ''
+              )
+
+              summonerShallowMap[player.puuid] = summoner
+            })
+          }
+        })
     }
   }
 }

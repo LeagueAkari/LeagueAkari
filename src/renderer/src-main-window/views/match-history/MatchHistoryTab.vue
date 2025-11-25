@@ -1405,10 +1405,10 @@ const handleMainContentScroll = (e: Event) => {
   mainContentScrollTop.value = (e.target as HTMLElement).scrollTop
 }
 
-const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
+const handleLaunchSpectator = async (_: string, spectatorKey: string, useLcuApi: boolean) => {
   try {
     if (useLcuApi) {
-      await lc.api.spectator.launchSpectator(tab.puuid)
+      await lc.api.spectator.launchSpectator(tab.puuid, spectatorKey)
       notification.success({
         title: () => t('MatchHistoryTab.operationSuccessTitle'),
         content: () => t('MatchHistoryTab.spectatorCalledUp'),

@@ -306,6 +306,7 @@ interface Challenges {
   acesBefore15Minutes?: number
   alliedJungleMonsterKills?: number
   baronTakedowns?: number
+  baronBuffGoldAdvantageOverThreshold?: number
   blastConeOppositeOpponentCount?: number
   bountyGold?: number
   buffsStolen?: number
@@ -318,6 +319,7 @@ interface Challenges {
   dodgeSkillShotsSmallWindow?: number
   doubleAces?: number
   dragonTakedowns?: number
+  earliestBaron?: number
   earlyLaningPhaseGoldExpAdvantage?: number
   effectiveHealAndShielding?: number
   elderDragonKillsWithOpposingSoul?: number
@@ -391,6 +393,7 @@ interface Challenges {
   snowballsHit?: number
   soloBaronKills?: number
   soloKills?: number
+  soloTurretsLategame?: number
   stealthWardsPlaced?: number
   survivedSingleDigitHpCount?: number
   survivedThreeImmobilizesInFight?: number

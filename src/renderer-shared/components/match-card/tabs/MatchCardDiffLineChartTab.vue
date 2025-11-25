@@ -249,9 +249,9 @@ const sortedPlayerOptions = computed(() => {
     })
     .map((p) => {
       return {
-        value: p.participantId + 1,
+        value: p.participantId,
         label: `${lcs.gameData.championName(p.championId)}`,
-        color: playerColors[p.participantId % playerColors.length]
+        color: playerColors[(p.participantId - 1) % playerColors.length]
       }
     })
 })

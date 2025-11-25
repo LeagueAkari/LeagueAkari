@@ -1,6 +1,6 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
-import { SgpGsmLedgeRegion } from '@shared/data-sources/sgp/types'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
+import { SgpGsmLedgeRegion } from '@shared/types/sgp/gsm'
+import { SgpServersConfig } from '@shared/types/shards/sgp'
+import { getSgpServerId } from '@shared/utils/sgp'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientState } from '../league-client/state'

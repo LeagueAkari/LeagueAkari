@@ -5,9 +5,9 @@
     class="@container w-full h-29 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
   >
     <!-- main content -->
-    <div class="relative flex gap-2 px-4 py-1 flex-1">
+    <div class="relative flex gap-2 px-4 py-1 flex-1 min-w-0">
       <!-- stats content -->
-      <div class="flex flex-col flex-1 justify-between my-1 z-2">
+      <div class="flex flex-col flex-1 justify-between my-1 z-2 min-w-0">
         <!-- 上半部分：英雄头像 + stats line -->
         <div class="flex gap-2 h-12">
           <!-- champion icon -->
@@ -37,7 +37,7 @@
           </div>
 
           <!-- stats line -->
-          <div class="flex items-center gap-2 flex-1">
+          <div class="flex items-center gap-2 flex-1 min-w-0">
             <!-- KDA -->
             <div class="min-w-20">
               <div class="flex gap-0.5 justify-center items-center">
@@ -175,7 +175,7 @@
           </div>
 
           <!-- tags line -->
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <ManyTags />
           </div>
         </div>

@@ -1,5 +1,5 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
-import { SgpGsmLedgeRegion } from '@shared/data-sources/sgp/types'
+import { SgpGsmLedgeRegion } from '@shared/types/sgp/gsm'
+import { SgpServersConfig } from '@shared/types/shards/sgp'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 

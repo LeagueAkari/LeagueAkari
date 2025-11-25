@@ -181,9 +181,7 @@ const { stop, start } = useKeyboardCombo('PUUID', {
   requireSameEl: true,
   onFinish: () => {
     if (mhs.currentTab) {
-      navigator.clipboard.writeText(
-        `${mhs.currentTab.sgpServerId}\nPUUID: ${mhs.currentTab.puuid}\nSummoner ID: ${mhs.currentTab.summoner?.summonerId}\n${mhs.currentTab.summoner?.gameName}#${mhs.currentTab.summoner?.tagLine}`
-      )
+      navigator.clipboard.writeText(mhs.currentTab.puuid)
       message.success(t('MatchHistoryTabs.copiedToClipboard'))
     }
   },

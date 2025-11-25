@@ -22,6 +22,7 @@ interface SpectatorPlayerCredentials {
   observerServerPort: number
   queueType: string
   gameCreateDate: number
+  spectatorKey: string
 }
 
 interface SpectatorGameflowSession {

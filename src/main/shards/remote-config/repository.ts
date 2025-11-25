@@ -1,5 +1,5 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
+import { SgpServersConfig } from '@shared/types/shards/sgp'
 import axios from 'axios'
 import crypto from 'crypto'
 import matter from 'gray-matter'

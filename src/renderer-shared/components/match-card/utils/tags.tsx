@@ -409,7 +409,7 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag
     participant.killsNearEnemyTurret >= durationMinutes / nearEnemyTurretThreshold
   ) {
     tags.push({
-      label: times('越塔王', participant.killsNearEnemyTurret),
+      label: times('越塔', participant.killsNearEnemyTurret),
       color: 'bg-rose-600 dark:bg-rose-700',
       textColor: 'text-white',
       content: `在敌方塔下击杀 ${participant.killsNearEnemyTurret.toLocaleString()} 次`,

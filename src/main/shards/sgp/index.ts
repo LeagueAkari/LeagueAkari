@@ -1,6 +1,5 @@
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LeagueSgpApi } from '@shared/data-sources/sgp'
 import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
 import {
   AKARI_HEADER_SGP_SERVER_ID,
@@ -17,7 +16,6 @@ import path from 'node:path'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
-import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -25,12 +23,6 @@ import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { validateSchema } from './config-validation'
-import {
-  mapSgpGameDetailsToLcu0Format,
-  mapSgpGameSummaryToLcu0Format,
-  mapSgpMatchHistoryToLcu0Format,
-  mapSgpSummonerToLcu0Format
-} from './data-mapper'
 import { SgpData, SgpState } from './state'
 
 /**
@@ -50,14 +42,12 @@ export class SgpMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  private readonly _api = new LeagueSgpApi()
-
-  private readonly _api2: SgpHttpApiAxiosHelper
+  private readonly _api: SgpHttpApiAxiosHelper
 
   private readonly _http = axios.create()
 
   get api() {
-    return this._api2
+    return this._api
   }
 
   constructor(
@@ -67,14 +57,13 @@ export class SgpMain implements IAkariShardInitDispose {
     private readonly _protocol: AkariProtocolMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _lc: LeagueClientMain,
-    private readonly _ipc: AkariIpcMain,
     private readonly _remoteConfig: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(SgpMain.id)
     this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
     this.state = new SgpState(this._lc.state)
-    this._api2 = new SgpHttpApiAxiosHelper(this._http)
+    this._api = new SgpHttpApiAxiosHelper(this._http)
   }
 
   async onInit() {
@@ -91,7 +80,6 @@ export class SgpMain implements IAkariShardInitDispose {
 
     this._handleIpcCall()
     this._handleUpdateHttpProxy()
-    this._handleUpdateConfig()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
     this._handleUpdateSgpServerConfig()
@@ -172,307 +160,13 @@ export class SgpMain implements IAkariShardInitDispose {
     return true
   }
 
-  private _handleUpdateConfig() {
-    this._mobx.reaction(
-      () => this.state.sgpServerConfig,
-      (config) => {
-        this._api.setSgpServerConfig(config)
-      },
-      { fireImmediately: true }
-    )
-  }
-
-  async getSummoner(puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    const { data } = await this._api.getSummonerByPuuid(sgpServerId, puuid)
-
-    if (!data || data.length === 0) {
-      return null
-    }
-
-    return data[0]
-  }
-
-  /**
-   * 获取玩家的战绩记录
-   * @param playerPuuid 玩家的 PUUID
-   * @param start 起始索引
-   * @param count 获取数量
-   * @param sgpServerId 目标 SGP 服务器 ID，如果不提供则使用当前登录 LCU 的服务器 ID
-   * @returns
-   */
-  async getMatchHistory(
-    playerPuuid: string,
-    query: {
-      start?: number
-      count?: number
-      tag?: string
-      tagsQueryType?: 'AND' | 'OR' | (string & {})
-    },
-    sgpServerId?: string
-  ) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, query)
-    return data
-  }
-
-  async getGameSummary(gameId: number, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    const { data } = await this._api.getGameSummary(sgpServerId, gameId)
-
-    return data
-  }
-
-  async getGameDetails(gameId: number, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    const { data } = await this._api.getGameDetails(sgpServerId, gameId)
-
-    return data
-  }
-
-  async getMatchHistoryLcuFormat(
-    playerPuuid: string,
-    query: {
-      start?: number
-      count?: number
-      tag?: string
-      tagsQueryType?: 'AND' | 'OR' | (string & {})
-    },
-    sgpServerId?: string
-  ) {
-    const result = await this.getMatchHistory(playerPuuid, query, sgpServerId)
-
-    try {
-      return mapSgpMatchHistoryToLcu0Format(result, query.start, query.count)
-    } catch (error) {
-      this._log.warn(
-        `Error converting SGP match history to LCU: ${formatError(error)}, ${playerPuuid}`
-      )
-      throw error
-    }
-  }
-
-  async getGameSummaryLcuFormat(gameId: number, sgpServerId?: string) {
-    const result = await this.getGameSummary(gameId, sgpServerId)
-
-    try {
-      return mapSgpGameSummaryToLcu0Format(result)
-    } catch (error) {
-      this._log.warn(`Error converting SGP game summary to LCU: ${formatError(error)}, ${gameId}`)
-      throw error
-    }
-  }
-
-  async getSummonerLcuFormat(playerPuuid: string, sgpServerId?: string) {
-    const result = await this.getSummoner(playerPuuid, sgpServerId)
-    if (!result) {
-      return null
-    }
-
-    try {
-      return mapSgpSummonerToLcu0Format(result)
-    } catch (error) {
-      this._log.warn(`Error converting SGP summoner to LCU: ${formatError(error)}, ${playerPuuid}`)
-      throw error
-    }
-  }
-
-  async getTimelineLcuFormat(gameId: number, sgpServerId?: string) {
-    const result = await this.getGameDetails(gameId, sgpServerId)
-
-    try {
-      return mapSgpGameDetailsToLcu0Format(result)
-    } catch (error) {
-      this._log.warn(`Error converting SGP timeline to LCU: ${formatError(error)}, ${gameId}`)
-      throw error
-    }
-  }
-
-  async getRankedStats(puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    try {
-      const { data } = await this._api.getRankedStats(sgpServerId, puuid)
-      return data
-    } catch (error) {
-      this._log.warn(`Failed to get ranked stats: ${formatError(error)}`)
-      throw error
-    }
-  }
-
-  async getSpectatorGameflow(puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    try {
-      const { data } = await this._api.getSpectatorGameflowByPuuid(sgpServerId, puuid)
-
-      return data
-    } catch (error) {
-      if (isAxiosError(error) && error.response?.status === 404) {
-        return null
-      }
-
-      throw error
-    }
-  }
-
-  async getGsmLedgeRegionPlayerByPuuid(puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-
-    const { data } = await this._api.getGsmLedgeRegionPlayerByPuuid(sgpServerId, puuid)
-    return data
-  }
-
-  async getStatsEndOfGameGameByGameIdAndPuuid(gameId: number, puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-    const { data } = await this._api.getStatsEndOfGameGameByGameIdAndPuuid(
-      sgpServerId,
-      gameId,
-      puuid
-    )
-    return data
-  }
-
-  async getGsmLedgeRegionPlayerByGameId(gameId: number, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this.state.availability.sgpServerId
-    }
-    const { data } = await this._api.getGsmLedgeRegionPlayerByGameId(sgpServerId, gameId)
-    return data
-  }
-
-  private _handleIpcCall() {
-    this._ipc.onCall(
-      SgpMain.id,
-      'getMatchHistoryLcuFormat',
-      async (
-        _,
-        playerPuuid: string,
-        query: {
-          start?: number
-          count?: number
-          tag?: string
-          tagsQueryType?: 'AND' | 'OR' | (string & {})
-        },
-        sgpServerId?: string
-      ) => {
-        return this.getMatchHistoryLcuFormat(playerPuuid, query, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getMatchHistory',
-      async (
-        _,
-        playerPuuid: string,
-        query: {
-          start?: number
-          count?: number
-          tag?: string
-          tagsQueryType?: 'AND' | 'OR' | (string & {})
-        },
-        sgpServerId?: string
-      ) => {
-        return await this.getMatchHistory(playerPuuid, query, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(SgpMain.id, 'getSummoner', async (_, puuid: string, sgpServerId?: string) => {
-      return this.getSummoner(puuid, sgpServerId)
-    })
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getSummonerLcuFormat',
-      async (_, puuid: string, sgpServerId?: string) => {
-        return this.getSummonerLcuFormat(puuid, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getGameSummary',
-      async (_, gameId: number, sgpServerId?: string) => {
-        return this.getGameSummary(gameId, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getGameSummaryLcuFormat',
-      async (_, gameId: number, sgpServerId?: string) => {
-        return this.getGameSummaryLcuFormat(gameId, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getRankedStats',
-      async (_, puuid: string, sgpServerId?: string) => {
-        return this.getRankedStats(puuid, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getSpectatorGameflow',
-      async (_, puuid: string, sgpServerId?: string) => {
-        return this.getSpectatorGameflow(puuid, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getGsmLedgeRegionPlayerByPuuid',
-      async (_, puuid: string, sgpServerId?: string) => {
-        return this.getGsmLedgeRegionPlayerByPuuid(puuid, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getStatsEndOfGameGameByGameIdAndPuuid',
-      async (_, gameId: number, puuid: string, sgpServerId?: string) => {
-        return this.getStatsEndOfGameGameByGameIdAndPuuid(gameId, puuid, sgpServerId)
-      }
-    )
-
-    this._ipc.onCall(
-      SgpMain.id,
-      'getGsmLedgeRegionPlayerByGameId',
-      async (_, gameId: number, sgpServerId?: string) => {
-        return this.getGsmLedgeRegionPlayerByGameId(gameId, sgpServerId)
-      }
-    )
-  }
+  private _handleIpcCall() {}
 
   private _maintainEntitlementsToken() {
     this._mobx.reaction(
       () => this._lc.data.entitlements.token,
       (token) => {
         if (!token) {
-          this._api.setEntitlementsToken(null)
           this.state.setEntitlementsTokenSet(false)
           return
         }
@@ -484,7 +178,6 @@ export class SgpMain implements IAkariShardInitDispose {
 
         this._log.info(`Update Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
-        this._api.setEntitlementsToken(token.accessToken)
         this.state.setEntitlementsTokenSet(true)
       },
       { fireImmediately: true }
@@ -496,7 +189,6 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._lc.data.leagueSession.token,
       (token) => {
         if (!token) {
-          this._api.setLeagueSessionToken(null)
           this.state.setLeagueSessionTokenSet(false)
           return
         }
@@ -505,7 +197,6 @@ export class SgpMain implements IAkariShardInitDispose {
 
         this._log.info(`Update Lol League Session Token: ${copied}`)
 
-        this._api.setLeagueSessionToken(token)
         this.state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }
@@ -517,14 +208,12 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._app.settings.httpProxy,
       (httpProxy) => {
         if (httpProxy.strategy === 'force') {
-          this._api.http.defaults.proxy = {
+          this._http.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
-        } else if (httpProxy.strategy === 'auto') {
-          this._api.http.defaults.proxy = undefined
         } else if (httpProxy.strategy === 'disable') {
-          this._api.http.defaults.proxy = false
+          this._http.defaults.proxy = false
         }
       },
       { fireImmediately: true }
@@ -577,9 +266,9 @@ export class SgpMain implements IAkariShardInitDispose {
         }
 
         try {
-          const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
-          if (gsmGame) {
-            this.data.setGsmGame(gsmGame)
+          const { data } = await this._api.gsm.getByPuuid(puuid)
+          if (data) {
+            this.data.setGsmGame(data)
           }
         } catch (error) {
           if (isAxiosError(error) && error.response?.status === 404) {
@@ -603,9 +292,9 @@ export class SgpMain implements IAkariShardInitDispose {
           return
         }
 
-        const gsmGame = await this.getGsmLedgeRegionPlayerByPuuid(puuid)
-        if (gsmGame) {
-          this.data.setGsmGame(gsmGame)
+        const { data } = await this._api.gsm.getByPuuid(puuid)
+        if (data) {
+          this.data.setGsmGame(data)
         }
       },
       { fireImmediately: true, equals: comparer.shallow }

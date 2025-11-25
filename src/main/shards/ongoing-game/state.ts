@@ -443,6 +443,14 @@ export class OngoingGameState {
    */
   matchHistoryTag: string = 'all'
 
+  // new
+  matchHistoryQueryParams: {
+    startIndex: number
+    count: number
+    tag?: string
+    tagsQueryType?: 'AND' | 'OR' | (string & {})
+  } | null = null
+
   setMatchHistoryTag(value: string) {
     this.matchHistoryTag = value
   }

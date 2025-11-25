@@ -317,7 +317,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         isLoadingSummoner: false,
         isLoadingSpectatorData: false,
         isLoadingSummonerProfile: false,
-        isTakingScreenshot: false,
         isLoadingEncounteredGames: false
       },
       setCurrent

@@ -294,8 +294,8 @@ const extraColumns = computed<ColumnConfig[]>(() => {
         { name: 'kda', class: 'w-26 text-center' },
         { name: 'augments', class: 'w-30 flex gap-0.5 justify-center' },
         { name: 'damage', class: 'w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[800px]:block w-18 text-center' },
-        { name: 'gold', class: 'hidden @[740px]:block w-18 text-xs text-center' },
+        { name: 'cs', class: 'hidden @[740px]:block w-18 text-center' },
+        { name: 'gold', class: 'hidden @[700px]:block w-18 text-xs text-center' },
         { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
       ]
     default:

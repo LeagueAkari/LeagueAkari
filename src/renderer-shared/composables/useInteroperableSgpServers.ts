@@ -1,5 +1,5 @@
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { isTencentServer } from '@shared/data-sources/sgp/utils'
+import { isTencentServer } from '@shared/utils/sgp'
 import { MaybeRefOrGetter, computed, toValue } from 'vue'
 
 /**

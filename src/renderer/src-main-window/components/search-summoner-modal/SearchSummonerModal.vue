@@ -244,6 +244,7 @@ import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { toLcuSummoner } from '@shared/data-adapter/summoner'
 import { Friend } from '@shared/types/league-client/chat'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { Pin16Filled as Pin16FilledIcon } from '@vicons/fluent'
@@ -537,12 +538,19 @@ const handelSearch = async () => {
       try {
         searchProgress.isProcessing = true
 
-        const summoner = await sgp.getSummonerLcuFormat(searchText.value, sgpServerId.value)
+        const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids(
+          [searchText.value],
+          {
+            __sgpServerId: sgpServerId.value
+          }
+        )
 
-        if (!summoner) {
+        if (!summoners.length) {
           isEmpty.value = true
           return
         }
+
+        const summoner = toLcuSummoner(summoners[0], '', '')
 
         // 尝试补全名称, 失败了也不影响
         try {
@@ -636,11 +644,22 @@ const handelSearch = async () => {
           }
 
           try {
-            const summoner = await sgp.getSummonerLcuFormat(alias.puuid, sgpServerId.value)
+            const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids(
+              [alias.puuid],
+              {
+                __sgpServerId: sgpServerId.value
+              }
+            )
 
-            if (!summoner) {
+            if (!summoners.length) {
               continue
             }
+
+            const summoner = toLcuSummoner(
+              summoners[0],
+              alias.alias.game_name,
+              alias.alias.tag_line
+            )
 
             searchResult.value.push(
               markRaw({
@@ -702,12 +721,19 @@ const handelSearch = async () => {
           })
         )
       } else {
-        const summoner = await sgp.getSummonerLcuFormat(alias.puuid, sgpServerId.value)
+        const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids(
+          [alias.puuid],
+          {
+            __sgpServerId: sgpServerId.value
+          }
+        )
 
-        if (!summoner) {
+        if (!summoners.length) {
           isEmpty.value = true
           return
         }
+
+        const summoner = toLcuSummoner(summoners[0], alias.alias.game_name, alias.alias.tag_line)
 
         searchResult.value.push(
           markRaw({

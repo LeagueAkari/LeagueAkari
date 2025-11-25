@@ -157,8 +157,8 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { getSgpServerId } from '@shared/utils/sgp'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {

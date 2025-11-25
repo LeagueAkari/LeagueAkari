@@ -1,5 +1,5 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { GithubApiAsset, GithubApiLatestRelease } from '@shared/types/github'
+import { SgpServersConfig } from '@shared/types/shards/sgp'
 import { makeAutoObservable, observable } from 'mobx'
 
 interface Announcement {

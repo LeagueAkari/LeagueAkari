@@ -1,5 +1,5 @@
-import { SgpParticipantLol } from '@shared/data-sources/sgp/types'
 import { Participant } from '@shared/types/league-client/match-history'
+import { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { type VNodeChild, computed, toValue } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -74,6 +74,7 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   // Buildings - 建筑
   turretKills: '防御塔击杀',
   turretTakedowns: '防御塔摧毁',
+  soloTurretsLategame: '后期单带拆塔',
   turretsLost: '失去防御塔',
   firstTowerKill: '首个防御塔摧毁',
   firstTowerAssist: '首个防御塔助攻',
@@ -164,6 +165,8 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   teamElderDragonKills: '团队远古龙击杀',
   teamRiftHeraldKills: '团队先锋击杀',
   soloBaronKills: '单杀大龙',
+  baronBuffGoldAdvantageOverThreshold: '大龙Buff金币优势',
+  earliestBaron: '最早大龙时间',
   elderDragonKillsWithOpposingSoul: '敌方有龙魂时的远古龙',
   elderDragonMultikills: '远古龙增益多杀',
   perfectDragonSoulsTaken: '完美龙魂',
@@ -396,6 +399,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       // Turrets
       { key: 'turretKills', render: 'integer' }, // lcu + sgp
       { key: 'turretTakedowns', render: 'integer' }, // sgp only
+      { key: 'soloTurretsLategame', render: 'integer' }, // sgp challenges
       { key: 'turretsLost', render: 'integer' }, // sgp only
       { key: 'firstTowerKill', render: 'boolean' }, // lcu + sgp
       { key: 'firstTowerAssist', render: 'boolean' }, // lcu + sgp
@@ -499,6 +503,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
     items: [
       // Epic Monsters
       { key: 'baronTakedowns', render: 'integer' }, // sgp challenges
+      { key: 'baronBuffGoldAdvantageOverThreshold', render: 'integer' }, // sgp challenges
+      { key: 'earliestBaron', render: 'game-time' }, // sgp challenges
       { key: 'dragonTakedowns', render: 'integer' }, // sgp challenges
       { key: 'riftHeraldTakedowns', render: 'integer' }, // sgp challenges
       { key: 'teamBaronKills', render: 'integer' }, // sgp challenges

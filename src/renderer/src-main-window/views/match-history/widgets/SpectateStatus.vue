@@ -186,7 +186,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
-import { SpectatorData } from '@shared/data-sources/sgp/types'
+import { SpectatorData } from '@shared/types/sgp/gsm'
 import {
   CopyAllFilled as CopyAllFilledIcon,
   PlayCircleFilled as PlayCircleFilledIcon
@@ -204,7 +204,7 @@ const as = useAppCommonStore()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string, setCurrent?: boolean]
-  launchSpectator: [puuid: string, byLcuApi: boolean]
+  launchSpectator: [puuid: string, spectatorKey: string, byLcuApi: boolean]
 }>()
 
 const [DefineTeamSide, TeamSide] = createReusableTemplate<{
@@ -354,7 +354,7 @@ const isSpectatorAvailable = ref(true)
 const handleSpectate = (byLcuApi: boolean) => {
   isSpectatorAvailable.value = false
   start()
-  emits('launchSpectator', puuid, byLcuApi)
+  emits('launchSpectator', puuid, data.playerCredentials.spectatorKey, byLcuApi)
 }
 
 const message = useMessage()
