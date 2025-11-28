@@ -17,12 +17,12 @@ import {
   SgpGameDetails,
   SgpGameSummary
 } from '@shared/data-adapter/wrapper'
-import { isAxiosError } from 'axios'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
-import PQueue from 'p-queue'
 import LRUMap from 'quick-lru'
 
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -31,6 +31,8 @@ import { SavedPlayerMain } from '../saved-player'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SgpMain } from '../sgp'
+import { memberMerge } from './member-merge'
+import { QueueKeeper, isAbortError } from './queue-keeper'
 import { OngoingGameSettings, OngoingGameState } from './state'
 
 /**
@@ -48,7 +50,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     RANKED_STATS: 3,
     CHAMPION_MASTERY: 2,
     ADDITIONAL_GAME: 2,
-    GAME_TIMELINE: 1
+    GAME_DETAILS: 1
   }
 
   private readonly _log: AkariLogger
@@ -57,29 +59,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   public readonly settings = new OngoingGameSettings()
   public readonly state: OngoingGameState
 
-  private _safeTags: Set<string>
+  private readonly _queueKeeper = new QueueKeeper([{ id: 'match-history' }, { id: 'misc' }])
 
-  private _gameLruMap = new LRUMap<string, LcuOrSgpGameSummary>({
-    maxSize: 400
+  private _gameSummaryLruMap = new LRUMap<string, LcuOrSgpGameSummary>({
+    maxSize: 256
   })
 
-  private _gameTimelineLruMap = new LRUMap<string, LcuOrSgpGameDetails>({
-    maxSize: 400
+  private _gameDetailsLruMap = new LRUMap<string, LcuOrSgpGameDetails>({
+    maxSize: 256
   })
-
-  /** 为**加载战绩**设置的特例 */
-  private readonly _mhQueue = new PQueue()
-  /** 为**加载战绩**设置的特例 */
-
-  /**
-   * 其他 API 的并发控制
-   */
-  private readonly _queue = new PQueue()
-
-  private _mhControllers = new Map<string, AbortController>()
-  private _controllers = new Map<string, AbortController>()
-
-  private _debouncedUpdateMatchHistoryFn = _.debounce(this._updateMatchHistory.bind(this), 250)
 
   constructor(
     readonly _loggerFactory: LoggerFactoryMain,
@@ -88,7 +76,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _sgp: SgpMain,
-    private readonly _saved: SavedPlayerMain
+    private readonly _saved: SavedPlayerMain,
+    private readonly _appCommon: AppCommonMain
   ) {
     this._log = _loggerFactory.create(OngoingGameMain.id)
     this._setting = _settingFactory.register(
@@ -97,10 +86,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         concurrency: { default: this.settings.concurrency },
         enabled: { default: this.settings.enabled },
         matchHistoryLoadCount: { default: this.settings.matchHistoryLoadCount },
-        premadeTeamThreshold: { default: this.settings.premadeTeamThreshold },
-        matchHistoryUseSgpApi: { default: this.settings.matchHistoryUseSgpApi },
         matchHistoryTagPreference: { default: this.settings.matchHistoryTagPreference },
-        gameTimelineLoadCount: { default: this.settings.matchHistoryLoadCount },
+        gameDetailsLoadCount: { default: this.settings.matchHistoryLoadCount },
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
@@ -109,8 +96,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this.state = new OngoingGameState(this._lc.data)
-    this._safeTags = new Set(this._sgp.state.supportedQueues.map((q) => `q_${q}`))
+    this.state = new OngoingGameState(this._lc.data, this._appCommon, this._sgp)
   }
 
   private async _handleState() {
@@ -119,10 +105,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'concurrency',
       'enabled',
       'matchHistoryLoadCount',
-      'premadeTeamThreshold',
-      'matchHistoryUseSgpApi',
       'matchHistoryTagPreference',
-      'gameTimelineLoadCount',
+      'gameDetailsLoadCount',
       'orderPlayerBy',
       'showChampionUsage',
       'showMatchHistoryItemBorder',
@@ -142,46 +126,33 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'savedInfoLoadingState',
       'rankedStatsLoadingState',
       'championMasteryLoadingState',
-      'teamParticipantGroups'
+      'teamParticipantGroups',
+      'matchHistoryTagParams',
+      'draft',
+      'additionalMembers'
     ])
   }
 
   async onInit() {
     await this._handleState()
 
-    this._handlePQueue()
+    this._handleConcurrencyChange()
     this._handleIpcCall()
     this._handleCalculation()
     this._handleEndOfGameSave()
     this._handleRemindTaggedPlayers()
-
     this._handleLoad()
+    this._handleInformationCompletion()
 
-    // for better control
     this._setting.onChange('matchHistoryLoadCount', async (value, { setter }) => {
       if (value >= 1 && value <= 200) {
         await setter(value)
-        this._debouncedUpdateMatchHistoryFn()
       }
 
-      this._setting.set(
-        'gameTimelineLoadCount',
-        Math.min(value, this.settings.gameTimelineLoadCount)
-      )
+      this._setting.set('gameDetailsLoadCount', Math.min(value, this.settings.gameDetailsLoadCount))
     })
 
-    this._setting.onChange('matchHistoryUseSgpApi', async (value, { setter }) => {
-      await setter(value)
-      this._debouncedUpdateMatchHistoryFn()
-    })
-
-    this._setting.onChange('premadeTeamThreshold', async (value, { setter }) => {
-      if (value >= 2) {
-        await setter(value)
-      }
-    })
-
-    this._setting.onChange('gameTimelineLoadCount', async (value, { setter }) => {
+    this._setting.onChange('gameDetailsLoadCount', async (value, { setter }) => {
       if (value >= 0 && value <= this.settings.matchHistoryLoadCount) {
         await setter(value)
         return
@@ -191,19 +162,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
   }
 
-  private _clearControllers() {
-    this._mhControllers.forEach((controller) => controller.abort())
-    this._mhControllers.clear()
-    this._controllers.forEach((controller) => controller.abort())
-    this._controllers.clear()
-  }
-
-  private _handlePQueue() {
+  private _handleConcurrencyChange() {
     this._mobx.reaction(
       () => this.settings.concurrency,
       (concurrency) => {
-        this._mhQueue.concurrency = concurrency
-        this._queue.concurrency = concurrency
+        this._queueKeeper.setConcurrency('match-history', concurrency)
+        this._queueKeeper.setConcurrency('misc', concurrency)
       },
       { fireImmediately: true }
     )
@@ -212,406 +176,371 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handleLoad() {
     this._mobx.reaction(
       () =>
-        [
-          this.state.queryStage,
-          this.settings.enabled,
-          this._sgp.state.isTokenReady,
-          this.settings.matchHistoryUseSgpApi
-        ] as const,
-      ([stage, enabled, tokenReady, useSgpApi]) => {
-        this._log.info(
-          'Handle auto match history loading',
-          `queryStage=${JSON.stringify(this.state.queryStage, null, 2)}`,
-          `enabled=${this.settings.enabled}`,
-          `tokenReady=${this._sgp.state.isTokenReady}`
-        )
-
-        this._clearControllers()
-
-        this._debouncedUpdateMatchHistoryFn.cancel()
-
-        if (stage.phase === 'unavailable' || !enabled || (useSgpApi && !tokenReady)) {
+        ({
+          apiShouldUse: this.state.apiShouldUse,
+          sgpTokenReady: this._sgp.state.isTokenReady,
+          teams: this.state.teams,
+          queryStagePhase: this.state.queryStage.phase
+        }) as const,
+      ({ apiShouldUse, sgpTokenReady, teams, queryStagePhase }) => {
+        if (queryStagePhase === 'unavailable') {
+          this._queueKeeper.cancelAll()
           this.state.clear()
-          this.state.setMatchHistoryTag('all')
-          this._ipc.sendEvent(OngoingGameMain.id, 'clear')
           return
         }
 
-        if (this.state.queryStage.phase === 'champ-select') {
-          this._champSelect({ force: false })
-        } else if (this.state.queryStage.phase === 'in-game') {
-          this._inGame({ force: false })
+        // 决定使用 sgp api 时，等待 sgp token 就绪
+        if (apiShouldUse === 'sgp' && !sgpTokenReady) {
+          return
         }
+
+        const puuids = Object.values(teams).flat()
+
+        this._updateSummoners(puuids)
+        this._updateRankedStats(puuids)
+        this._updateSavedInfo(puuids)
+        this._updateChampionMasteries(puuids)
+        this._updateMatchHistories(
+          puuids,
+          {
+            startIndex: 0,
+            count: this.settings.matchHistoryLoadCount,
+            ...this.state.matchHistoryTagParams
+          },
+          apiShouldUse
+        )
       },
       { equals: comparer.shallow, fireImmediately: true }
     )
-  }
 
-  private _updateMatchHistory() {
-    if (!this.settings.enabled) {
-      return
-    }
-
-    if (this.state.queryStage.phase === 'unavailable') {
-      return
-    }
-
-    this._mhControllers.forEach((controller) => controller.abort())
-    this._mhControllers.clear()
-
-    const puuids = this.getPuuidsToLoadForPlayers()
-
-    puuids.forEach((puuid) => {
-      const mhController = new AbortController()
-      this._mhControllers.set(puuid, mhController)
-
-      this._loadPlayerMatchHistory(puuid, {
-        signal: this._controllers.get(puuid)?.signal,
-        mhSignal: mhController.signal,
-        count: this.settings.matchHistoryLoadCount,
-        tag: this.state.matchHistoryTag,
-        force: false,
-        useSgpApi: this.settings.matchHistoryUseSgpApi
-      })
-    })
-  }
-
-  private _getCurrentGameMatchHistoryTag() {
-    if (!this.state.queryStage.gameInfo) {
-      return 'all'
-    }
-
-    if (this._safeTags.has(`q_${this.state.queryStage.gameInfo.queueId}`)) {
-      return `q_${this.state.queryStage.gameInfo.queueId}`
-    }
-
-    return 'all'
-  }
-
-  /**
-   *
-   * @param options 其中的 force, 用于标识是否强制刷新. 若为 false, 在查询条件未发生变动时不会重新加载
-   */
-  private _champSelect(options: { force: boolean }) {
-    const { force } = options
-
-    const puuids = this.getPuuidsToLoadForPlayers()
-
-    puuids.forEach((puuid) => {
-      const mhController = new AbortController()
-      const controller = new AbortController()
-      this._mhControllers.set(puuid, mhController)
-      this._controllers.set(puuid, controller)
-
-      this._loadPlayerMatchHistory(puuid, {
-        signal: controller.signal,
-        mhSignal: mhController.signal,
-        force,
-        tag:
-          this.settings.matchHistoryTagPreference === 'current'
-            ? this._getCurrentGameMatchHistoryTag()
-            : 'all',
-        count: this.settings.matchHistoryLoadCount,
-        useSgpApi: this.settings.matchHistoryUseSgpApi
-      })
-      this._loadPlayerSummoner(puuid, { signal: controller.signal, force })
-      this._loadPlayerRankedStats(puuid, { signal: controller.signal, force })
-      this._loadPlayerSavedInfo(puuid, {
-        signal: controller.signal,
-        force,
-        useSgpApi: this.settings.matchHistoryUseSgpApi
-      })
-      this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force })
-    })
-  }
-
-  /** 目前实现同 #._champSelect */
-  private _inGame(options: { force: boolean }) {
-    const { force } = options
-
-    const puuids = this.getPuuidsToLoadForPlayers()
-
-    puuids.forEach((puuid) => {
-      const mhController = new AbortController()
-      const controller = new AbortController()
-      this._mhControllers.set(puuid, mhController)
-      this._controllers.set(puuid, controller)
-
-      this._loadPlayerMatchHistory(puuid, {
-        signal: controller.signal,
-        mhSignal: mhController.signal,
-        force,
-        tag:
-          this.settings.matchHistoryTagPreference === 'current'
-            ? this._getCurrentGameMatchHistoryTag()
-            : 'all',
-        count: this.settings.matchHistoryLoadCount,
-        useSgpApi: this.settings.matchHistoryUseSgpApi
-      })
-      this._loadPlayerSummoner(puuid, { signal: controller.signal, force })
-      this._loadPlayerRankedStats(puuid, { signal: controller.signal, force })
-      this._loadPlayerSavedInfo(puuid, {
-        signal: controller.signal,
-        force,
-        useSgpApi: this.settings.matchHistoryUseSgpApi
-      })
-      this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force })
-    })
-  }
-
-  private _clearAndReloadAllPlayers() {
-    this._clearControllers()
-
-    this.state.clear()
-    this._ipc.sendEvent(OngoingGameMain.id, 'clear')
-
-    if (this.state.queryStage.phase === 'champ-select') {
-      this._champSelect({ force: true })
-    } else if (this.state.queryStage.phase === 'in-game') {
-      this._inGame({ force: true })
-    }
-  }
-
-  /**
-   * 临时的方法
-   *
-   * TODO: Refactor
-   *
-   * @param puuid
-   */
-  private _reloadPlayer(puuid: string) {
-    if (this._mhControllers.has(puuid)) {
-      this._mhControllers.get(puuid)?.abort()
-      this._mhControllers.delete(puuid)
-    }
-
-    if (this._controllers.has(puuid)) {
-      this._controllers.get(puuid)?.abort()
-      this._controllers.delete(puuid)
-      return
-    }
-
-    const mhController = new AbortController()
-    const controller = new AbortController()
-    this._mhControllers.set(puuid, mhController)
-    this._controllers.set(puuid, controller)
-
-    this._loadPlayerMatchHistory(puuid, {
-      signal: controller.signal,
-      mhSignal: mhController.signal,
-      force: true,
-      tag:
-        this.settings.matchHistoryTagPreference === 'current'
-          ? this._getCurrentGameMatchHistoryTag()
-          : 'all',
-      count: this.settings.matchHistoryLoadCount,
-      useSgpApi: this.settings.matchHistoryUseSgpApi
-    })
-    this._loadPlayerSummoner(puuid, { signal: controller.signal, force: true })
-    this._loadPlayerRankedStats(puuid, { signal: controller.signal, force: true })
-    this._loadPlayerSavedInfo(puuid, {
-      signal: controller.signal,
-      force: true,
-      useSgpApi: this.settings.matchHistoryUseSgpApi
-    })
-    this._loadPlayerChampionMasteries(puuid, { signal: controller.signal, force: true })
-  }
-
-  private getPuuidsToLoadForPlayers() {
-    if (this.state.queryStage.phase === 'unavailable') {
-      return []
-    }
-
-    if (this.state.queryStage.phase === 'champ-select') {
-      const session = this._lc.data.champSelect.session
-      if (!session) {
-        return []
-      }
-
-      const m = session.myTeam.filter((p) => p.puuid && p.puuid !== EMPTY_PUUID).map((t) => t.puuid)
-
-      const t = session.theirTeam
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .map((t) => t.puuid)
-
-      return [...m, ...t]
-    } else if (this.state.queryStage.phase === 'in-game') {
+    const currentQueueId = computed(() => {
       const session = this._lc.data.gameflow.session
 
       if (!session) {
-        return []
+        return null
       }
 
-      const m = session.gameData.teamOne
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .map((t) => t.puuid)
+      return session.gameData.queue.id
+    })
 
-      const t = session.gameData.teamTwo
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .map((t) => t.puuid)
+    this._mobx.reaction(
+      () => currentQueueId.get(),
+      (queueId) => {
+        if (!queueId) {
+          this.state.setMatchHistoryTagParams({})
+          return
+        }
 
-      return [...m, ...t]
-    }
+        this.state.setMatchHistoryTagParams({ tag: `q_${queueId}` })
+      }
+    )
 
-    return []
+    this._mobx.reaction(
+      () =>
+        ({
+          count: this.settings.matchHistoryLoadCount,
+          params: this.state.matchHistoryTagParams,
+          apiShouldUse: this.state.apiShouldUse
+        }) as const,
+      ({ count, params, apiShouldUse }) => {
+        this._updateMatchHistories(
+          Object.values(this.state.teams).flat(),
+          { startIndex: 0, count, ...params },
+          apiShouldUse
+        )
+      },
+      { delay: 500 }
+    )
   }
 
-  private async _loadGameTimeline(
+  /**
+   * 更新所有涉及到的玩家的数据
+   */
+  private _updateSummoners(puuids: string[], force = false) {
+    for (const puuid of Object.keys(this.state.summoner)) {
+      if (!puuids.includes(puuid)) {
+        delete this.state.summoner[puuid]
+        delete this.state.summonerLoadingState[puuid]
+
+        this._ipc.sendEvent(OngoingGameMain.id, 'summoner-removed', puuid)
+      }
+    }
+
+    for (const puuid of puuids) {
+      this._queueKeeper.cancelByTags([puuid, 'summoner'], 'and')
+      this._loadSummoner(puuid, { force })
+    }
+  }
+
+  private _updateRankedStats(puuids: string[], force = false) {
+    for (const puuid of Object.keys(this.state.rankedStats)) {
+      if (!puuids.includes(puuid)) {
+        delete this.state.rankedStats[puuid]
+        delete this.state.rankedStatsLoadingState[puuid]
+
+        this._ipc.sendEvent(OngoingGameMain.id, 'ranked-stats-removed', puuid)
+      }
+    }
+
+    for (const puuid of puuids) {
+      this._queueKeeper.cancelByTags([puuid, 'ranked-stats'], 'and')
+      this._loadRankedStats(puuid, { force })
+    }
+  }
+
+  private _updateSavedInfo(puuids: string[], force = false) {
+    for (const puuid of Object.keys(this.state.savedInfo)) {
+      if (!puuids.includes(puuid)) {
+        delete this.state.savedInfo[puuid]
+
+        this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-removed', puuid)
+      }
+    }
+
+    for (const puuid of puuids) {
+      this._queueKeeper.cancelByTags([puuid, 'saved-info'], 'and')
+      this._loadSavedInfo(puuid, { force })
+    }
+  }
+
+  private _updateChampionMasteries(puuids: string[], force = false) {
+    for (const puuid of Object.keys(this.state.championMastery)) {
+      if (!puuids.includes(puuid)) {
+        delete this.state.championMastery[puuid]
+        delete this.state.championMasteryLoadingState[puuid]
+
+        this._ipc.sendEvent(OngoingGameMain.id, 'champion-mastery-removed', puuid)
+      }
+    }
+
+    for (const puuid of puuids) {
+      this._queueKeeper.cancelByTags([puuid, 'champion-mastery'], 'and')
+      this._loadChampionMastery(puuid, { force })
+    }
+  }
+
+  private _updateMatchHistories(
+    puuids: string[],
+    params: MatchHistoryQueryParams,
+    apiSource: 'sgp' | 'lcu',
+    force = false
+  ) {
+    for (const puuid of Object.keys(this.state.matchHistory)) {
+      if (!puuids.includes(puuid)) {
+        delete this.state.matchHistory[puuid]
+        delete this.state.matchHistoryLoadingState[puuid]
+
+        this._ipc.sendEvent(OngoingGameMain.id, 'match-history-removed', puuid)
+      }
+    }
+
+    for (const puuid of puuids) {
+      this._queueKeeper.cancelByTags([puuid, 'match-history'], 'and')
+      this._loadMatchHistory(puuid, { params, force, apiSource })
+    }
+  }
+
+  private async _loadGameDetails(
     gameIds: number[],
     options: {
       force?: boolean
-      useSgpApi?: boolean
-      signal?: AbortSignal
-    } = {}
+      apiSource: 'sgp' | 'lcu'
+    } = { apiSource: 'lcu' }
   ) {
-    const { force, signal, useSgpApi } = options
+    const { force, apiSource } = options
 
-    const isAbleToUseSgpApi =
-      useSgpApi && this._sgp.state.availability.serversSupported.matchHistory
+    const loadGameDetails = async (gameId: number) => {
+      const current = this.state.gameDetails[gameId]
 
-    const loadGameTimeline = async (gameId: number) => {
-      const current = this.state.gameTimeline[gameId]
-
-      if (!force && current && current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
+      if (current && !force && current.source === apiSource) {
         this._log.debug('Game timeline query condition not changed, skip', gameId)
         return
       }
 
-      if (isAbleToUseSgpApi) {
-        const cached = this._gameTimelineLruMap.get(`sgp:${gameId}`)
+      if (apiSource === 'sgp') {
+        const cached = this._gameDetailsLruMap.get(`sgp:${gameId}`)
 
         if (cached) {
-          this._log.info('Game timeline hit cache', 'sgp', gameId)
-          runInAction(() => (this.state.gameTimeline[gameId] = cached))
-          this._ipc.sendEvent(OngoingGameMain.id, 'game-timeline-loaded', gameId, cached)
+          this._log.info('Game details hit cache', 'sgp', gameId)
+          runInAction(() => (this.state.gameDetails[gameId] = cached))
+          this._ipc.sendEvent(OngoingGameMain.id, 'game-details-loaded', gameId, cached)
           return
         }
 
-        this._log.debug('Load game timeline: SGP API', gameId)
+        if (this._queueKeeper.hasTask(`sgp-game-details:${gameId}`)) {
+          this._log.debug('Game details already in queue', 'sgp', gameId)
+          return
+        }
 
-        const res = await this._queue
-          .add(() => this._sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId), {
-            signal,
-            priority: OngoingGameMain.LOADING_PRIORITY.GAME_TIMELINE
-          })
-          .catch((error) => this._handleError(error, 'game-timeline', gameId))
+        try {
+          const { data } = await this._queueKeeper.add(
+            'match-history',
+            `sgp-game-details:${gameId}`,
+            () => this._sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId),
+            {
+              priority: OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
+              tags: [gameId.toString(), 'game-details', 'sgp']
+            }
+          )
 
-        if (res) {
-          this._log.debug('Game timeline loaded: SGP', gameId)
+          this._log.info('Game details loaded: SGP', gameId)
 
-          const toBeLoaded = { data: res.data, source: 'sgp', gameId } satisfies SgpGameDetails
+          const toBeLoaded = { data, source: 'sgp', gameId } satisfies SgpGameDetails
 
-          this._gameTimelineLruMap.set(`sgp:${gameId}`, toBeLoaded)
-          runInAction(() => (this.state.gameTimeline[gameId] = toBeLoaded))
-          this._ipc.sendEvent(OngoingGameMain.id, 'game-timeline-loaded', gameId, toBeLoaded)
+          this._gameDetailsLruMap.set(`sgp:${gameId}`, toBeLoaded)
+          runInAction(() => (this.state.gameDetails[gameId] = toBeLoaded))
+          this._ipc.sendEvent(OngoingGameMain.id, 'game-details-loaded', gameId, toBeLoaded)
+        } catch (error) {
+          if (isAbortError(error)) {
+            this._log.info('Game details loading aborted', gameId)
+            return
+          }
+
+          this._log.warn('Error loading game details', error, gameId)
         }
       } else {
-        const cached = this._gameTimelineLruMap.get(`lcu:${gameId}`)
+        const cached = this._gameDetailsLruMap.get(`lcu:${gameId}`)
         if (cached) {
-          this._log.info('Game timeline hit cache', 'lcu', gameId)
-          runInAction(() => (this.state.gameTimeline[gameId] = cached))
-          this._ipc.sendEvent(OngoingGameMain.id, 'game-timeline-loaded', gameId, cached)
+          this._log.info('Game details hit cache', 'lcu', gameId)
+          runInAction(() => (this.state.gameDetails[gameId] = cached))
+          this._ipc.sendEvent(OngoingGameMain.id, 'game-details-loaded', gameId, cached)
           return
         }
 
-        this._log.debug('Load game timeline: LCU API', gameId)
+        try {
+          const { data } = await this._queueKeeper.add(
+            'misc',
+            `lcu-game-details:${gameId}`,
+            () => this._lc.api.matchHistory.getTimeline(gameId),
+            {
+              priority: OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
+              tags: [gameId.toString(), 'game-details', 'lcu']
+            }
+          )
 
-        const res = await this._queue
-          .add(() => this._lc.api.matchHistory.getTimeline(gameId), {
-            signal,
-            priority: OngoingGameMain.LOADING_PRIORITY.GAME_TIMELINE
-          })
-          .catch((error) => this._handleError(error, 'game-timeline', gameId))
+          this._log.info('Game details loaded: LCU', gameId)
 
-        if (res) {
-          this._log.debug('Game timeline loaded: LCU', gameId)
+          const toBeLoaded = { data, source: 'lcu', gameId } satisfies LcuGameTimeline
 
-          const toBeLoaded = { data: res.data, source: 'lcu', gameId } satisfies LcuGameTimeline
+          this._gameDetailsLruMap.set(`lcu:${gameId}`, toBeLoaded)
+          runInAction(() => (this.state.gameDetails[gameId] = toBeLoaded))
+          this._ipc.sendEvent(OngoingGameMain.id, 'game-details-loaded', gameId, toBeLoaded)
+        } catch (error) {
+          if (isAbortError(error)) {
+            this._log.info('Game details loading aborted', gameId)
+            return
+          }
 
-          this._gameTimelineLruMap.set(`lcu:${gameId}`, toBeLoaded)
-          runInAction(() => (this.state.gameTimeline[gameId] = toBeLoaded))
-          this._ipc.sendEvent(OngoingGameMain.id, 'game-timeline-loaded', gameId, toBeLoaded)
+          this._log.warn('Error loading game details', error, gameId)
         }
       }
     }
 
-    await Promise.allSettled(gameIds.map((g) => loadGameTimeline(g)))
+    await Promise.allSettled(gameIds.map((g) => loadGameDetails(g)))
   }
 
   private async _loadAdditionalGame(
     gameIds: number[],
     options: {
       force?: boolean
-      useSgpApi?: boolean
-      signal?: AbortSignal
-    } = {}
+      apiSource: 'sgp' | 'lcu'
+    } = { apiSource: 'lcu' }
   ) {
-    const { force, signal, useSgpApi } = options
-
-    const isAbleToUseSgpApi =
-      useSgpApi && this._sgp.state.availability.serversSupported.matchHistory
+    const { force, apiSource } = options
 
     const loadGame = async (gameId: number) => {
       const current = this.state.additionalGame[gameId]
 
-      if (!force && current && current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
-        this._log.debug('Game timeline query condition not changed, skip', gameId)
+      if (current && !force && current.source === apiSource) {
+        this._log.debug('Additional game query condition not changed, skip', gameId)
         return
       }
 
-      if (isAbleToUseSgpApi) {
-        const cached = this._gameLruMap.get(`sgp:${gameId}`)
+      if (apiSource === 'sgp') {
+        const cached = this._gameSummaryLruMap.get(`sgp:${gameId}`)
+
         if (cached) {
-          this._log.info('Additional game info hit cache', 'sgp', gameId)
+          this._log.info('Game details hit cache', 'sgp', gameId)
           runInAction(() => (this.state.additionalGame[gameId] = cached))
           this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, cached)
           return
         }
 
-        this._log.info('Load additional game info: SGP API', gameId)
+        if (this._queueKeeper.hasTask(`sgp-additional-game-summary:${gameId}`)) {
+          this._log.debug('Additional game already in queue', 'sgp', gameId)
+          return
+        }
 
-        const res = await this._queue
-          .add(() => this._sgp.api.matchHistoryQuery.getGameSummaryByGameId(gameId), {
-            signal,
-            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_GAME
-          })
-          .catch((error) => this._handleError(error, 'additional-game', gameId))
+        try {
+          this._log.debug('Load additional game: SGP API', gameId)
 
-        if (res) {
-          this._log.debug('Additional game info loaded: SGP', gameId)
+          const { data } = await this._queueKeeper.add(
+            'misc',
+            `sgp-additional-game-summary:${gameId}`,
+            () => this._sgp.api.matchHistoryQuery.getGameSummaryByGameId(gameId),
+            {
+              priority: Infinity,
+              tags: [gameId.toString(), 'additional-game-summary', 'sgp']
+            }
+          )
 
-          const toBeLoaded = { data: res.data, source: 'sgp', gameId } satisfies SgpGameSummary
+          this._log.debug('Additional game loaded: SGP', gameId)
 
-          this._gameLruMap.set(`sgp:${gameId}`, toBeLoaded)
+          const toBeLoaded = { data, source: 'sgp', gameId } satisfies SgpGameSummary
+
+          this._gameSummaryLruMap.set(`sgp:${gameId}`, toBeLoaded)
           runInAction(() => (this.state.additionalGame[gameId] = toBeLoaded))
           this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, toBeLoaded)
+        } catch (error) {
+          if (isAbortError(error)) {
+            this._log.info('Additional game loading aborted', gameId)
+            return
+          }
+
+          this._log.warn('Error loading additional game', error, gameId)
         }
       } else {
-        const cached = this._gameLruMap.get(`lcu:${gameId}`)
+        const cached = this._gameSummaryLruMap.get(`lcu:${gameId}`)
+
         if (cached) {
-          this._log.info('Additional game info hit cache', 'lcu', gameId)
+          this._log.info('Additional game hit cache', 'lcu', gameId)
           runInAction(() => (this.state.additionalGame[gameId] = cached))
           this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, cached)
           return
         }
 
-        this._log.info('Load additional game info: LCU API', gameId)
+        if (this._queueKeeper.hasTask(`lcu-additional-game-summary:${gameId}`)) {
+          this._log.debug('Additional game already in queue', 'lcu', gameId)
+          return
+        }
 
-        const res = await this._queue
-          .add(() => this._lc.api.matchHistory.getGame(gameId), {
-            signal,
-            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_GAME
-          })
-          .catch((error) => this._handleError(error, 'additional-game', gameId))
+        try {
+          this._log.debug('Load additional game: LCU API', gameId)
 
-        if (res) {
-          this._log.debug('Additional game info loaded: LCU', gameId)
+          const { data } = await this._queueKeeper.add(
+            'misc',
+            `lcu-additional-game-summary:${gameId}`,
+            () => this._lc.api.matchHistory.getGame(gameId),
+            {
+              priority: Infinity,
+              tags: [gameId.toString(), 'additional-game-summary', 'lcu']
+            }
+          )
 
-          const toBeLoaded = { data: res.data, source: 'lcu', gameId } satisfies LcuGameSummary
+          this._log.debug('Additional game loaded: LCU', gameId)
 
-          this._gameLruMap.set(`lcu:${gameId}`, toBeLoaded)
+          const toBeLoaded = { data, source: 'lcu', gameId } satisfies LcuGameSummary
+
+          this._gameSummaryLruMap.set(`lcu:${gameId}`, toBeLoaded)
           runInAction(() => (this.state.additionalGame[gameId] = toBeLoaded))
           this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, toBeLoaded)
+        } catch (error) {
+          if (isAbortError(error)) {
+            this._log.info('Additional game loading aborted', gameId)
+            return
+          }
+
+          this._log.warn('Error loading additional game', error, gameId)
         }
       }
     }
@@ -619,196 +548,234 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     await Promise.allSettled(gameIds.map((g) => loadGame(g)))
   }
 
-  private async _loadPlayerMatchHistory(
+  private async _loadMatchHistory(
     puuid: string,
     options: {
-      signal?: AbortSignal
-      mhSignal?: AbortSignal
-      tag?: string
-      count?: number
+      params: MatchHistoryQueryParams
       force?: boolean
-      useSgpApi?: boolean
-      priority?: number
-    } = {}
+      apiSource: 'sgp' | 'lcu'
+    } = { params: { startIndex: 0, count: 20 }, apiSource: 'lcu' }
   ) {
-    let { count = 20, signal, mhSignal, tag, force, useSgpApi } = options
-
-    const isAbleToUseSgpApi =
-      useSgpApi && this._sgp.state.availability.serversSupported.matchHistory
+    const { params, force, apiSource } = options
 
     const current = this.state.matchHistory[puuid]
-    if (
-      !force && // 在不强制更新的情况下
-      current && // 在存在值的情况下
-      current.targetCount === count && // 必要条件之一: 加载数量没有变化
-      current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu') && // 必要条件之一: 数据来源没有变化
-      (!isAbleToUseSgpApi || (tag === 'all' ? undefined : tag) === current.tag) // 必要条件之一: SGP API 时, tag 也必须一致 (LCU API 将忽略 tag, 本来也没用)
-    ) {
-      // 以上不需要重新加载的前提, 是假设在一个对局期间, 这些数据都不会发生变化
-      // ) 事实上在一个对局期间, 大部分情况是不会发生变化的
-      this._log.debug('Player match history query condition not changed, skip', puuid)
-      return
+
+    if (current && !force) {
+      const sameSgpQuery = () =>
+        apiSource === 'sgp' &&
+        current.source === 'sgp' &&
+        current.params.tag === params.tag &&
+        current.params.tagsQueryType === params.tagsQueryType &&
+        current.params.startIndex === params.startIndex &&
+        current.params.count === params.count
+
+      const sameLcuQuery = () =>
+        apiSource === 'lcu' &&
+        current.source === 'lcu' &&
+        current.params.startIndex === params.startIndex &&
+        current.params.count === params.count
+
+      if (sameSgpQuery()) {
+        this._log.debug('Player match history query condition not changed, skip (SGP)', puuid)
+        return
+      }
+
+      if (sameLcuQuery()) {
+        this._log.debug('Player match history query condition not changed, skip (LCU)', puuid)
+        return
+      }
     }
 
-    if (isAbleToUseSgpApi) {
-      this._log.info('Load player match history: SGP API', puuid)
-
-      if (tag) {
-        if (tag === 'all' || !this._safeTags.has(tag)) {
-          tag = undefined
-          this.state.setMatchHistoryTag('all')
-        } else {
-          this.state.setMatchHistoryTag(tag)
-        }
-      }
-
-      this.state.setMatchHistoryLoadingState(puuid, 'loading')
-
-      const data = await this._mhQueue
-        .add(
-          () =>
-            this._sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(puuid, {
-              startIndex: 0,
-              count,
-              tag
-            }),
-          {
-            signal: mhSignal,
-            priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
-          }
-        )
-        .catch((error) => this._handleMatchHistoryError(error, puuid))
-
-      if (!data) {
-        return
-      }
-
-      const filtered = data.data.games.filter((g) => g.json)
-
-      this._log.debug('Load player match history completed: SGP API', puuid)
-
-      this._loadGameTimeline(
-        filtered.map((g) => g.json.gameId).slice(0, this.settings.gameTimelineLoadCount),
-        { signal, force, useSgpApi }
-      )
-
-      const toBeLoaded = {
-        data: filtered.map(
-          (g) => ({ source: 'sgp', data: g, gameId: g.json.gameId }) satisfies SgpGameSummary
-        ),
-        targetCount: count,
-        source: 'sgp' as const,
-        tag
-      }
-
-      runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
-      this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
-      this.state.setMatchHistoryLoadingState(puuid, 'loaded')
-    } else {
-      this._log.info('Load player match history: LCU API', puuid)
-
-      this.state.setMatchHistoryLoadingState(puuid, 'loading')
-      const res = await this._queue
-        .add(() => this._lc.api.matchHistory.getMatchHistory(puuid, 0, count - 1), {
-          signal: mhSignal,
-          priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
-        })
-        .catch((error) => this._handleMatchHistoryError(error, puuid))
-
-      if (!res) {
-        return
-      }
-
-      const detailedGameMap: Record<number, LcuGameSummary> = {}
-      const loadGame = async (gameId: number) => {
-        const cached = this._gameLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
-
-        if (cached) {
-          detailedGameMap[gameId] = cached
+    if (apiSource === 'sgp') {
+      try {
+        if (this._queueKeeper.hasTask(`sgp-match-history:${puuid}`)) {
+          this._log.debug('Player match history already in queue', 'sgp', puuid)
           return
         }
 
-        const res = await this._queue
-          .add(() => this._lc.api.matchHistory.getGame(gameId), {
-            signal, // 使用公用的 signal
-            priority: Infinity // 容易成功的将被优先加载
-          })
-          .catch((error) => this._handleMatchHistoryError(error, puuid))
+        this.state.setMatchHistoryLoadingState(puuid, 'loading')
 
-        if (res) {
-          this._gameLruMap.set(`lcu:${gameId}`, {
-            gameId,
-            source: 'lcu',
-            data: res.data
-          } satisfies LcuGameSummary)
-          detailedGameMap[gameId] = { gameId, source: 'lcu', data: res.data }
+        const { data } = await this._queueKeeper.add(
+          'match-history',
+          `sgp-match-history:${puuid}`,
+          () => this._sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(puuid, params),
+          {
+            priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY,
+            tags: [puuid, 'match-history', 'sgp']
+          }
+        )
+
+        const filtered = data.games.filter((g) => g.json)
+
+        this._loadGameDetails(
+          filtered.map((g) => g.json.gameId).slice(0, this.settings.gameDetailsLoadCount),
+          { force, apiSource }
+        )
+
+        const toBeLoaded = {
+          data: filtered.map(
+            (g) => ({ source: 'sgp', data: g, gameId: g.json.gameId }) satisfies SgpGameSummary
+          ),
+          params,
+          source: 'sgp' as const
         }
+
+        runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
+        this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+        this.state.setMatchHistoryLoadingState(puuid, 'loaded')
+
+        this._log.info('Load player match history completed: SGP API', puuid)
+      } catch (error) {
+        if (isAbortError(error)) {
+          this._log.info('Player match history loading aborted', puuid)
+          return
+        }
+
+        this._log.warn('Error loading player match history', error, puuid)
+        this.state.setMatchHistoryLoadingState(puuid, 'error')
       }
+    } else {
+      try {
+        if (this._queueKeeper.hasTask(`lcu-match-history:${puuid}`)) {
+          this._log.debug('Player match history already in queue', 'lcu', puuid)
+          return
+        }
 
-      this._loadGameTimeline(
-        res.data.games.games.map((g) => g.gameId).slice(0, this.settings.gameTimelineLoadCount),
-        { signal, force, useSgpApi }
-      )
+        this.state.setMatchHistoryLoadingState(puuid, 'loading')
 
-      await Promise.allSettled(res.data.games.games.map((g) => loadGame(g.gameId)))
+        const { data } = await this._queueKeeper.add(
+          'match-history',
+          `lcu-match-history:${puuid}`,
+          () =>
+            this._lc.api.matchHistory.getMatchHistory(
+              puuid,
+              params.startIndex ?? 0,
+              (params.count ?? 20) - 1
+            ),
+          {
+            priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY,
+            tags: [puuid, 'match-history', 'lcu']
+          }
+        )
 
-      this._log.debug('Load player match history completed: LCU API', puuid)
+        const detailedGameMap: Record<number, LcuGameSummary> = {}
+        const loadGame = async (gameId: number) => {
+          const cached = this._gameSummaryLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
 
-      const games = res.data.games.games.map((g) => detailedGameMap[g.gameId] || g)
+          if (cached) {
+            detailedGameMap[gameId] = cached
+            return
+          }
 
-      const toBeLoaded = {
-        data: games,
-        targetCount: count,
-        source: 'lcu' as 'sgp' | 'lcu'
+          try {
+            const { data } = await this._queueKeeper.add(
+              'misc',
+              `lcu-game-summary:${gameId}`,
+              () => this._lc.api.matchHistory.getGame(gameId),
+              {
+                priority: Infinity, // 完整 game summary 实际上走的是 LC 的缓存。因此可以优先加载容易成功的请求
+                tags: [puuid, 'game-summary', 'lcu', `part-of:${gameId}`]
+              }
+            )
+
+            this._gameSummaryLruMap.set(`lcu:${gameId}`, {
+              gameId,
+              source: 'lcu',
+              data
+            } satisfies LcuGameSummary)
+
+            detailedGameMap[gameId] = { gameId, source: 'lcu', data }
+          } catch (error) {
+            if (isAbortError(error)) {
+              this._log.info('Game summary loading aborted', puuid, gameId)
+              return
+            }
+
+            this._log.warn('Error loading game summary', error, puuid, gameId)
+          }
+        }
+
+        this._loadGameDetails(
+          data.games.games.map((g) => g.gameId).slice(0, this.settings.gameDetailsLoadCount),
+          { force, apiSource }
+        )
+
+        await Promise.allSettled(data.games.games.map((g) => loadGame(g.gameId)))
+
+        const games = data.games.games.map((g) => detailedGameMap[g.gameId] || g)
+
+        const toBeLoaded = {
+          data: games,
+          params,
+          source: 'lcu' as 'sgp' | 'lcu'
+        }
+
+        runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
+        this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+        this.state.setMatchHistoryLoadingState(puuid, 'loaded')
+
+        this._log.info('Load player match history completed: LCU API', puuid)
+      } catch (error) {
+        if (isAbortError(error)) {
+          this._log.info('Player match history loading aborted', puuid)
+          return
+        }
+
+        this._log.warn('Error loading player match history', error, puuid)
+        this.state.setMatchHistoryLoadingState(puuid, 'error')
       }
-
-      runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
-      this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
-      this.state.setMatchHistoryLoadingState(puuid, 'loaded')
     }
   }
 
-  private async _loadPlayerSummoner(
+  private async _loadSummoner(
     puuid: string,
-    options: {
-      signal?: AbortSignal
-      force?: boolean
-      priority?: number
-    } = {}
+    options: { force?: boolean; isAdditional?: boolean } = {}
   ) {
-    const { signal, force } = options
+    const { force, isAdditional } = options
 
     // 如果不是强制更新, 并且已经有数据, 那么就不再加载
     if (!force && this.state.summoner[puuid]) {
-      this._log.debug('Summoner info already exists', puuid)
+      this._log.info('Summoner info already exists', puuid)
       return
     }
 
-    const res = await this._queue
-      .add(() => this._lc.api.summoner.getSummonerByPuuid(puuid), {
-        signal,
-        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.SUMMONER
-      })
-      .catch((error) => this._handleError(error, 'summoner', puuid))
-
-    if (!res) {
+    if (this._queueKeeper.hasTask(`summoner:${puuid}`)) {
+      this._log.debug('Summoner already in queue', puuid)
       return
     }
 
-    this._log.debug('Load summoner info completed', puuid)
+    const tags = [puuid, 'summoner']
 
-    runInAction(() => (this.state.summoner[puuid] = res.data))
-    this._ipc.sendEvent(OngoingGameMain.id, 'summoner-loaded', puuid, res.data)
+    if (isAdditional) {
+      tags.push('additional-summoner')
+    }
+
+    try {
+      const { data } = await this._queueKeeper.add(
+        'misc',
+        `summoner:${puuid}`,
+        () => this._lc.api.summoner.getSummonerByPuuid(puuid),
+        {
+          priority: OngoingGameMain.LOADING_PRIORITY.SUMMONER,
+          tags
+        }
+      )
+
+      runInAction(() => (this.state.summoner[puuid] = data))
+      this._ipc.sendEvent(OngoingGameMain.id, 'summoner-loaded', puuid, data)
+
+      this._log.info('Load summoner info completed', puuid)
+    } catch (error) {
+      if (isAbortError(error)) {
+        this._log.info('Summoner info loading aborted', puuid)
+        return
+      }
+
+      this._log.warn('Error loading summoner info', error, puuid)
+    }
   }
 
-  private async _loadPlayerSavedInfo(
-    puuid: string,
-    options: {
-      signal?: AbortSignal
-      force?: boolean
-      useSgpApi?: boolean
-    } = {}
-  ) {
+  private async _loadSavedInfo(puuid: string, options: { force?: boolean } = {}) {
     // just used to suppress ts error
     if (!this._lc.state.auth || !this._lc.data.summoner.me) {
       return
@@ -821,123 +788,195 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       rsoPlatformId: this._lc.state.auth.rsoPlatformId
     }
 
-    const { signal, force, useSgpApi } = options
+    const { force } = options
 
     if (!force && this.state.savedInfo[puuid]) {
       return
     }
 
-    const res = await this._queue
-      .add(() => this._saved.querySavedPlayerWithGames(query), {
-        signal,
-        priority: OngoingGameMain.LOADING_PRIORITY.SAVED_INFO
-      })
-      .catch((error) => this._handleError(error, 'saved-info', puuid))
-
-    if (!res) {
+    if (this._queueKeeper.hasTask(`saved-info:${puuid}`)) {
+      this._log.debug('Saved info already in queue', puuid)
       return
     }
 
-    this._loadAdditionalGame(
-      res.encounteredGames.data.map((c) => c.gameId),
-      {
-        force,
-        signal,
-        useSgpApi
+    try {
+      const data = await this._queueKeeper.add(
+        'misc',
+        `saved-info:${puuid}`,
+        () => this._saved.querySavedPlayerWithGames(query),
+        {
+          priority: OngoingGameMain.LOADING_PRIORITY.SAVED_INFO,
+          tags: [puuid, 'saved-info']
+        }
+      )
+
+      if (!data) {
+        return
       }
-    )
 
-    res.tags.forEach((t) => {
-      this._loadPlayerSummoner(t.selfPuuid, {
-        signal,
-        force,
-        priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_SUMMONER
+      this._loadAdditionalGame(
+        data.encounteredGames.data.map((c) => c.gameId),
+        {
+          force,
+          apiSource: this.state.apiShouldUse
+        }
+      )
+
+      data.tags.forEach((t) => {
+        this._loadSummoner(t.selfPuuid, { force })
       })
-    })
 
-    runInAction(() => (this.state.savedInfo[puuid] = res))
-    this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, res)
+      runInAction(() => (this.state.savedInfo[puuid] = data))
+      this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, data)
+
+      this._log.info('Load saved info completed', puuid)
+    } catch (error) {
+      if (isAbortError(error)) {
+        this._log.info('Saved info loading aborted', puuid)
+        return
+      }
+
+      this._log.warn('Error loading saved info', error, puuid)
+    }
   }
 
-  private async _loadPlayerRankedStats(
-    puuid: string,
-    options: {
-      signal?: AbortSignal
-      force?: boolean
-      priority?: number
-    } = {}
-  ) {
-    const { signal, force } = options
+  private async _loadRankedStats(puuid: string, options: { force?: boolean } = {}) {
+    const { force } = options
 
     if (!force && this.state.rankedStats[puuid]) {
       this._log.debug('Ranked stats already exists', puuid)
       return
     }
 
-    const res = await this._mhQueue
-      .add(() => this._lc.api.ranked.getRankedStats(puuid), {
-        signal,
-        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.RANKED_STATS
-      })
-      .catch((error) => this._handleError(error, 'ranked-stats', puuid))
-
-    if (!res) {
+    if (this._queueKeeper.hasTask(`ranked-stats:${puuid}`)) {
+      this._log.debug('Ranked stats already in queue', puuid)
       return
     }
 
-    this._log.debug('Load ranked stats completed', puuid)
+    try {
+      const { data } = await this._queueKeeper.add(
+        'misc',
+        `ranked-stats:${puuid}`,
+        () => this._lc.api.ranked.getRankedStats(puuid),
+        {
+          priority: OngoingGameMain.LOADING_PRIORITY.RANKED_STATS,
+          tags: [puuid, 'ranked-stats']
+        }
+      )
 
-    runInAction(() => (this.state.rankedStats[puuid] = res.data))
-    this._ipc.sendEvent(OngoingGameMain.id, 'ranked-stats-loaded', puuid, res.data)
+      runInAction(() => (this.state.rankedStats[puuid] = data))
+      this._ipc.sendEvent(OngoingGameMain.id, 'ranked-stats-loaded', puuid, data)
+
+      this._log.info('Load ranked stats completed', puuid)
+    } catch (error) {
+      if (isAbortError(error)) {
+        this._log.info('Ranked stats loading aborted', puuid)
+        return
+      }
+
+      this._log.warn('Error loading ranked stats', error, puuid)
+    }
   }
 
-  private async _loadPlayerChampionMasteries(
-    puuid: string,
-    options: {
-      signal?: AbortSignal
-      force?: boolean
-      priority?: number
-    } = {}
-  ) {
-    const { signal, force } = options
+  private async _loadChampionMastery(puuid: string, options: { force?: boolean } = {}) {
+    const { force } = options
 
     if (!force && this.state.championMastery[puuid]) {
       this._log.debug('Champion mastery already exists', puuid)
       return
     }
 
-    const res = await this._mhQueue
-      .add(() => this._lc.api.championMastery.getPlayerChampionMastery(puuid), {
-        signal,
-        priority: options.priority ?? OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY
-      })
-      .catch((error) => this._handleError(error, 'champion-mastery', puuid))
-
-    if (!res) {
+    if (this._queueKeeper.hasTask(`champion-mastery:${puuid}`)) {
+      this._log.debug('Champion mastery already in queue', puuid)
       return
     }
 
-    this._log.debug('Load champion mastery completed', puuid)
-
-    const data = res.data
-
-    const simplifiedMastery = data
-      .map((m) => ({
-        championId: m.championId,
-        championLevel: m.championLevel,
-        championPoints: m.championPoints,
-        milestoneGrades: m.milestoneGrades
-      }))
-      .reduce(
-        (obj, cur) => {
-          obj[cur.championId] = cur
-          return obj
-        },
-        {} as Record<number, { championId: number; championLevel: number; championPoints: number }>
+    try {
+      const { data } = await this._queueKeeper.add(
+        'misc',
+        `champion-mastery:${puuid}`,
+        () => this._lc.api.championMastery.getPlayerChampionMastery(puuid),
+        {
+          priority: OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY,
+          tags: [puuid, 'champion-mastery']
+        }
       )
 
-    runInAction(() => (this.state.championMastery[puuid] = simplifiedMastery))
-    this._ipc.sendEvent(OngoingGameMain.id, 'champion-mastery-loaded', puuid, simplifiedMastery)
+      const simplifiedMastery = data
+        .map((m) => ({
+          championId: m.championId,
+          championLevel: m.championLevel,
+          championPoints: m.championPoints,
+          milestoneGrades: m.milestoneGrades
+        }))
+        .reduce(
+          (obj, cur) => {
+            obj[cur.championId] = cur
+            return obj
+          },
+          {} as Record<
+            number,
+            { championId: number; championLevel: number; championPoints: number }
+          >
+        )
+
+      runInAction(() => (this.state.championMastery[puuid] = simplifiedMastery))
+      this._ipc.sendEvent(OngoingGameMain.id, 'champion-mastery-loaded', puuid, simplifiedMastery)
+
+      this._log.info('Load champion mastery completed', puuid)
+    } catch (error) {
+      if (isAbortError(error)) {
+        this._log.info('Champion mastery loading aborted', puuid)
+        return
+      }
+
+      this._log.warn('Error loading champion mastery', error, puuid)
+    }
+  }
+
+  private _clearAndReloadAll() {
+    this.state.clear()
+    this._ipc.sendEvent(OngoingGameMain.id, 'clear')
+
+    const puuids = Object.keys(this.state.teams).flat()
+
+    this._updateSummoners(puuids, true)
+    this._updateRankedStats(puuids, true)
+    this._updateSavedInfo(puuids, true)
+    this._updateChampionMasteries(puuids, true)
+    this._updateMatchHistories(
+      puuids,
+      {
+        startIndex: 0,
+        count: this.settings.matchHistoryLoadCount,
+        ...this.state.matchHistoryTagParams
+      },
+      this.state.apiShouldUse,
+      true
+    )
+  }
+
+  private _reloadPlayer(puuid: string) {
+    this._queueKeeper.cancelByTags([puuid, 'match-history'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'summoner'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'ranked-stats'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'saved-info'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'champion-mastery'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'game-details'], 'and')
+    this._queueKeeper.cancelByTags([puuid, 'additional-game-summary'], 'and')
+
+    this._loadMatchHistory(puuid, {
+      params: {
+        startIndex: 0,
+        count: this.settings.matchHistoryLoadCount
+      },
+      force: true,
+      apiSource: this.state.apiShouldUse
+    })
+    this._loadSummoner(puuid, { force: true })
+    this._loadRankedStats(puuid, { force: true })
+    this._loadSavedInfo(puuid, { force: true })
+    this._loadChampionMastery(puuid, { force: true })
   }
 
   private _handleIpcCall() {
@@ -947,7 +986,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const rankedStats = toJS(this.state.rankedStats)
       const savedInfo = toJS(this.state.savedInfo)
       const championMastery = toJS(this.state.championMastery)
-      const gameTimeline = toJS(this.state.additionalGame)
+      const gameDetails = toJS(this.state.gameDetails)
       const additionalGames = toJS(this.state.additionalGame)
 
       return {
@@ -956,20 +995,21 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         rankedStats,
         savedInfo,
         championMastery,
-        gameTimeline,
+        gameDetails,
         additionalGames
       }
     })
 
-    this._ipc.onCall(OngoingGameMain.id, 'setMatchHistoryTag', (_, tag: string) => {
-      if (this._safeTags.has(tag) || tag === 'all') {
-        this.state.setMatchHistoryTag(tag)
-        this._debouncedUpdateMatchHistoryFn()
+    this._ipc.onCall(
+      OngoingGameMain.id,
+      'setMatchHistoryTagParams',
+      (_, params: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) => {
+        this.state.setMatchHistoryTagParams(params)
       }
-    })
+    )
 
     this._ipc.onCall(OngoingGameMain.id, 'reload', () => {
-      this._clearAndReloadAllPlayers()
+      this._clearAndReloadAll()
     })
 
     this._ipc.onCall(OngoingGameMain.id, 'reloadPlayer', (_, puuid: string) => {
@@ -1168,29 +1208,107 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     )
   }
 
-  private _handleError(e: any, type = '', info?: any) {
-    if (e instanceof Error && e.name === 'AbortError') {
-      this._log.info('Task aborted', type)
-      return
-    }
+  /**
+   * 临时修补逻辑
+   */
+  private _handleInformationCompletion() {
+    this._mobx.reaction(
+      () => this.state.queryStage,
+      (stage) => {
+        if (!stage || stage.phase !== 'in-game') {
+          return
+        }
 
-    if (isAxiosError(e) && e.response?.status === 404) {
-      this._log.info('Target not found', type, info)
-      return
-    }
+        const getGsmGameMemebers = async (puuid: string) => {
+          try {
+            const {
+              data: {
+                game: { teamOne, teamTwo, gameMode }
+              }
+            } = await this._sgp.api.gsm.getByPuuid(puuid)
 
-    this._log.warn('Error loading', e, type)
-    return
-  }
+            return { teamOne, teamTwo, gameMode }
+          } catch (error) {
+            this._log.warn('Error getting game members', error)
+            return null
+          }
+        }
 
-  private _handleMatchHistoryError(e: any, puuid: string) {
-    if (e instanceof Error && e.name === 'AbortError') {
-      this.state.setMatchHistoryLoadingState(puuid, 'aborted')
-      return
-    }
+        const getSpectator = async (puuid: string) => {
+          try {
+            const {
+              data: {
+                game: { teamOne, teamTwo, gameMode }
+              }
+            } = await this._sgp.api.gsm.getSpectatorByPuuid(puuid)
+            return { teamOne, teamTwo, gameMode }
+          } catch (error) {
+            this._log.warn('Error getting spectator', error)
+            return null
+          }
+        }
 
-    this._log.warn('Error loading match history', e, puuid)
-    this.state.setMatchHistoryLoadingState(puuid, 'error')
-    return
+        if (this._lc.data.summoner.me?.puuid) {
+          const gsmGameMembers = getGsmGameMemebers(this._lc.data.summoner.me.puuid)
+          const spectator = getSpectator(this._lc.data.summoner.me.puuid)
+
+          Promise.allSettled([gsmGameMembers, spectator]).then(([gsmGameMembers, spectator]) => {
+            if (this.state.queryStage.phase !== 'in-game') {
+              return
+            }
+
+            const extractTeamMembers = (
+              gameMode: string,
+              teamOne: { puuid: string }[],
+              teamTwo: { puuid: string }[]
+            ): Record<string, string[]> => {
+              if (gameMode === 'CHERRY') {
+                return {
+                  'TEAM-ALL': [
+                    ...teamOne.map((p) => p.puuid),
+                    ...teamTwo.map((p) => p.puuid)
+                  ].filter((p) => p && p !== EMPTY_PUUID)
+                }
+              }
+
+              return {
+                'TEAM-100': teamOne.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID),
+                'TEAM-200': teamTwo.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID)
+              }
+            }
+
+            const mergedTeams = {} as Record<string, string[]>
+
+            if (gsmGameMembers.status === 'fulfilled' && gsmGameMembers.value) {
+              const { teamOne, teamTwo } = gsmGameMembers.value
+              const members = extractTeamMembers(gsmGameMembers.value.gameMode, teamOne, teamTwo)
+
+              for (const [tI, m] of Object.entries(members)) {
+                if (mergedTeams[tI]) {
+                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+                } else {
+                  mergedTeams[tI] = m
+                }
+              }
+            }
+
+            if (spectator.status === 'fulfilled' && spectator.value) {
+              const { teamOne, teamTwo } = spectator.value
+              const members = extractTeamMembers(spectator.value.gameMode, teamOne, teamTwo)
+
+              for (const [tI, m] of Object.entries(members)) {
+                if (mergedTeams[tI]) {
+                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+                } else {
+                  mergedTeams[tI] = m
+                }
+              }
+            }
+
+            this.state.setAdditionalMembers(mergedTeams)
+          })
+        }
+      }
+    )
   }
 }

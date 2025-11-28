@@ -1,6 +1,7 @@
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -11,8 +12,7 @@ import { ref, shallowReactive, shallowRef } from 'vue'
 // copied from main shard
 export interface MatchHistoryPlayer {
   source: 'lcu' | 'sgp'
-  tag?: string
-  targetCount: number
+  params: MatchHistoryQueryParams
   data: LcuOrSgpGameSummary[]
 }
 
@@ -90,12 +90,10 @@ export type QueryStage =
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
     enabled: true,
-    premadeTeamThreshold: 3,
     matchHistoryLoadCount: 20,
     concurrency: 3,
-    matchHistoryUseSgpApi: true,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
-    gameTimelineLoadCount: 0,
+    gameDetailsLoadCount: 0,
 
     orderPlayerBy: 'default' as
       | 'win-rate'
@@ -151,7 +149,10 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
   } | null>(null)
 
-  const matchHistoryTag = shallowRef<string | null>(null)
+  const matchHistoryTagParams = shallowRef<Pick<
+    MatchHistoryQueryParams,
+    'tag' | 'tagsQueryType'
+  > | null>(null)
 
   const matchHistory = ref<Record<string, MatchHistoryPlayer>>({})
   const summoner = ref<Record<string, SummonerInfo>>({})
@@ -170,6 +171,11 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
   const teamParticipantGroups = shallowRef<Record<string, string[]>>({})
 
+  const draft = shallowRef<{
+    teams: Record<string, string[]>
+  } | null>(null)
+  const additionalMembers = shallowRef<Record<string, string[]>>({})
+
   return {
     settings,
 
@@ -179,7 +185,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     queryStage,
     isInEog,
     playerStats,
-    matchHistoryTag,
+    matchHistoryTagParams,
 
     matchHistory,
     summoner,
@@ -194,6 +200,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     savedInfoLoadingState,
     rankedStatsLoadingState,
     championMasteryLoadingState,
-    teamParticipantGroups
+    teamParticipantGroups,
+    additionalMembers,
+    draft
   }
 })

@@ -45,24 +45,6 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('OngoingGameSettings.premadeTeamThreshold.label')"
-        :label-description="
-          t('OngoingGameSettings.premadeTeamThreshold.description', {
-            threshold: ogs.settings.premadeTeamThreshold
-          })
-        "
-        :label-width="400"
-      >
-        <NInputNumber
-          style="width: 100px"
-          size="small"
-          :min="2"
-          :value="ogs.settings.premadeTeamThreshold"
-          @update:value="(val) => og.setPremadeTeamThreshold(val || 3)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         :label="t('OngoingGameSettings.concurrency.label')"
         :label-description="t('OngoingGameSettings.concurrency.description')"
         :label-width="400"
@@ -77,10 +59,10 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('OngoingGameSettings.gameTimelineLoadCount.label')"
+        :label="t('OngoingGameSettings.gameDetailsLoadCount.label')"
         :label-description="
-          t('OngoingGameSettings.gameTimelineLoadCount.description', {
-            countV: ogs.settings.gameTimelineLoadCount
+          t('OngoingGameSettings.gameDetailsLoadCount.description', {
+            countV: ogs.settings.gameDetailsLoadCount
           })
         "
         :label-width="400"
@@ -89,33 +71,8 @@
           style="width: 100px"
           size="small"
           :min="0"
-          :value="ogs.settings.gameTimelineLoadCount"
-          @update:value="(val) => og.setGameTimelineLoadCount(val || 0)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('OngoingGameSettings.matchHistoryUseSgpApi.label')"
-        :label-width="400"
-      >
-        <template #labelDescription>
-          <div>{{ t('OngoingGameSettings.matchHistoryUseSgpApi.description') }}</div>
-          <div
-            class="unsupported-sgp-server"
-            v-if="sgps.availability.sgpServerId && !sgps.availability.serversSupported.matchHistory"
-          >
-            {{
-              t('OngoingGameSettings.matchHistoryUseSgpApi.unsupported', {
-                server: sgps.availability.sgpServerId
-              })
-            }}
-          </div>
-        </template>
-        <NSwitch
-          size="small"
-          :min="1"
-          :value="ogs.settings.matchHistoryUseSgpApi"
-          @update:value="(val) => og.setMatchHistoryUseSgpApi(val)"
+          :value="ogs.settings.gameDetailsLoadCount"
+          @update:value="(val) => og.setGameDetailsLoadCount(val || 0)"
         />
       </ControlItem>
       <ControlItem
@@ -218,7 +175,7 @@
           >
             {{
               t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label', {
-                countV: ogs.settings.gameTimelineLoadCount
+                countV: ogs.settings.gameDetailsLoadCount
               })
             }}
           </NCheckbox>
@@ -383,7 +340,6 @@ import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
 import {
   NCard,
@@ -401,7 +357,6 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)
-const sgps = useSgpStore()
 </script>
 
 <style scoped>

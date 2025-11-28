@@ -1,10 +1,7 @@
 {
   "metadata": {
     "product": "LoL",
-    "tags": [
-      "ranked",
-      "q_420"
-    ],
+    "tags": ["ranked", "q_420"],
     "participants": [
       "4fdb892c-cc56-505c-95cd-0d3548eceb6c",
       "b72cca61-dbdb-5f85-bfc9-67f68436b780",
@@ -123,11 +120,7 @@
           "laneMinionsFirst10Minutes": 50,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            3071,
-            6631,
-            3053
-          ],
+          "legendaryItemUsed": [3071, 6631, 3053],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 5,
           "maxKillDeficit": 0,
@@ -579,11 +572,7 @@
           "laneMinionsFirst10Minutes": 5,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            2503,
-            3116,
-            6653
-          ],
+          "legendaryItemUsed": [2503, 3116, 6653],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 36.15000009536743,
           "maxKillDeficit": 0,
@@ -1035,9 +1024,7 @@
           "laneMinionsFirst10Minutes": 68,
           "laningPhaseGoldExpAdvantage": 1,
           "legendaryCount": 1,
-          "legendaryItemUsed": [
-            6653
-          ],
+          "legendaryItemUsed": [6653],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 61,
           "maxKillDeficit": 0,
@@ -1488,11 +1475,7 @@
           "laneMinionsFirst10Minutes": 48,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            6672,
-            3085,
-            3031
-          ],
+          "legendaryItemUsed": [6672, 3085, 3031],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 2,
           "maxKillDeficit": 0,
@@ -1945,11 +1928,7 @@
           "laneMinionsFirst10Minutes": 22,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            3190,
-            3869,
-            3107
-          ],
+          "legendaryItemUsed": [3190, 3869, 3107],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 10,
           "maxKillDeficit": 0,
@@ -2404,12 +2383,7 @@
           "laneMinionsFirst10Minutes": 67,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            3161,
-            3071,
-            6610,
-            6665
-          ],
+          "legendaryItemUsed": [3161, 3071, 6610, 6665],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 38,
           "maxKillDeficit": 2,
@@ -2866,11 +2840,7 @@
           "laneMinionsFirst10Minutes": 5,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            3100,
-            3152,
-            3157
-          ],
+          "legendaryItemUsed": [3100, 3152, 3157],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 8,
           "maxKillDeficit": 2,
@@ -3327,11 +3297,7 @@
           "laneMinionsFirst10Minutes": 72,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            6664,
-            3075,
-            2502
-          ],
+          "legendaryItemUsed": [6664, 3075, 2502],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 15,
           "maxKillDeficit": 2,
@@ -3790,13 +3756,7 @@
           "laneMinionsFirst10Minutes": 69,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 2,
-          "legendaryItemUsed": [
-            3094,
-            2504,
-            3033,
-            3031,
-            3031
-          ],
+          "legendaryItemUsed": [3094, 2504, 3033, 3031, 3031],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 55,
           "maxKillDeficit": 2,
@@ -4254,11 +4214,7 @@
           "laneMinionsFirst10Minutes": 15,
           "laningPhaseGoldExpAdvantage": 0,
           "legendaryCount": 0,
-          "legendaryItemUsed": [
-            3871,
-            3116,
-            3165
-          ],
+          "legendaryItemUsed": [3871, 3116, 3165],
           "lostAnInhibitor": 0,
           "maxCsAdvantageOnLaneOpponent": 18,
           "maxKillDeficit": 2,

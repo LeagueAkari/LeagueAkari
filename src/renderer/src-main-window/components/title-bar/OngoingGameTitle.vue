@@ -37,11 +37,14 @@
         />
         <NSelect
           class="queue-tag-select"
-          v-if="ogs.settings.matchHistoryUseSgpApi"
+          v-if="
+            appCommon.settings.preferredLolSource === 'sgp' &&
+            sgp.availability.serversSupported.matchHistory
+          "
           size="tiny"
-          :value="ogs.matchHistoryTag"
+          :value="ogs.matchHistoryTagParams?.tag || ALL_SGPTAG_VALUE"
           :consistent-menu-width="false"
-          @update:value="(val) => og.setMatchHistoryTag(val)"
+          @update:value="handleSgpTagChange"
           :options="sgpTagOptions"
         />
         <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
@@ -62,11 +65,13 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useOverflow } from '@renderer-shared/composables/useOverflowDetection'
-import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
+import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
@@ -79,6 +84,8 @@ const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
+const appCommon = useAppCommonStore()
+const sgp = useSgpStore()
 
 const labelsEl = useTemplateRef('labels')
 const { horizontal: horizontalOverflow } = useOverflow(labelsEl)
@@ -120,15 +127,24 @@ const orderOptions = computed(() => {
   ]
 })
 
-const sgpTagOptions = useSgpTagOptions(ogs.settings.matchHistoryUseSgpApi)
+const sgpTagOptions = useSgpTagOptions()
+
+const handleSgpTagChange = (val: string) => {
+  if (!val || val === ALL_SGPTAG_VALUE) {
+    og.setMatchHistoryTagParams({})
+    return
+  }
+
+  og.setMatchHistoryTagParams({
+    tag: val,
+    tagsQueryType: 'AND'
+  })
+}
 
 const teamNameMap = computed(() => ({
-  100: t('teams.100', { ns: 'common' }),
-  200: t('teams.200', { ns: 'common' }),
-  'our-1': t('teams.100', { ns: 'common' }),
-  'our-2': t('teams.200', { ns: 'common' }),
-  'their-1': t('teams.100', { ns: 'common' }),
-  'their-2': t('teams.200', { ns: 'common' }),
+  'TEAM-100': t('teams.TEAM-100', { ns: 'common' }),
+  'TEAM-200': t('teams.TEAM-200', { ns: 'common' }),
+  'TEAM-ALL': t('teams.TEAM-ALL', { ns: 'common' }),
   spectating: t('OngoingGameTitle.spectating')
 }))
 

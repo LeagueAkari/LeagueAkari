@@ -39,16 +39,10 @@ positionAssignmentReason:
   AUTOFILL_SHORT: Fill
 
 teams:
-  all: All
-  100: Blue Team
-  200: Red Team
+  TEAM-ALL: All
+  TEAM-100: Blue Team
+  TEAM-200: Red Team
   unknown: Unknown
-  our: Our
-  their: Their
-  our-1: Blue Team
-  our-2: Red Team
-  their-1: Blue Team
-  their-2: Red Team
 
 queueTypes:
   RANKED_SOLO_5x5: Ranked Solo/Duo

@@ -18,10 +18,6 @@ export class AppCommonState {
    */
   startupDeepLink: string | null = null
 
-  setStartupDeepLink(s: string | null) {
-    this.startupDeepLink = s
-  }
-
   setAdministrator(s: boolean) {
     this.isAdministrator = s
   }
@@ -36,6 +32,10 @@ export class AppCommonState {
 
   setShouldUseDarkColors(s: boolean) {
     this.shouldUseDarkColors = s
+  }
+
+  setStartupDeepLink(s: string | null) {
+    this.startupDeepLink = s
   }
 
   constructor() {
@@ -81,6 +81,16 @@ export class AppCommonSettings {
 
   streamerModeUseAkariStyledName: boolean = false
 
+  /**
+   * 这里用来记录应用偏向的数据源
+   *
+   * - 当部分数据可以走 sgp 和 lcu 时，优先走 sgp
+   * - 强制全部走 lcu
+   *
+   * 它同时要被多个地方使用，所以就提升到此模块中
+   */
+  preferredLolSource: 'sgp' | 'lcu' = 'sgp'
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
@@ -97,7 +107,7 @@ export class AppCommonSettings {
     this.theme = s
   }
 
-  setHttpProxy(s: { strategy: 'force' | 'auto' | 'disable'; port: number; host: string }) {
+  setHttpProxy(s: { strategy: 'force' | 'disable'; port: number; host: string }) {
     this.httpProxy = s
   }
 
@@ -107,6 +117,10 @@ export class AppCommonSettings {
 
   setStreamerModeUseAkariStyledName(s: boolean) {
     this.streamerModeUseAkariStyledName = s
+  }
+
+  setPreferredLolSource(s: 'sgp' | 'lcu') {
+    this.preferredLolSource = s
   }
 
   constructor() {

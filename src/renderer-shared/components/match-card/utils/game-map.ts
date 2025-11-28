@@ -8,7 +8,7 @@ export const LOL_MAP_DOMAINS = {
   12: { minX: -28, minY: -19, maxX: 12849, maxY: 12858 },
   14: { minX: -28, minY: -19, maxX: 12849, maxY: 12858 },
   21: { minX: 0, minY: 0, maxX: 15e3, maxY: 15e3 },
-  90: { minX: 0, minY: 0, maxX: 14820, maxY: 14881 },
+  90: { minX: 0, minY: 0, maxX: 14820, maxY: 14881 }
 }
 
 export type MapId = keyof typeof LOL_MAP_DOMAINS
@@ -23,7 +23,7 @@ export function mapToImagePosition(
   imageWidth: number,
   imageHeight: number,
   mapId: MapId = 11,
-  options?: { invertY?: boolean; clamp?: boolean },
+  options?: { invertY?: boolean; clamp?: boolean }
 ) {
   const { invertY = true, clamp = true } = options || {}
   const domain = getMapDomain(mapId)

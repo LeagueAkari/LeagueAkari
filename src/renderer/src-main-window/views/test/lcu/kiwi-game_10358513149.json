@@ -5,9 +5,7 @@
   "gameDuration": 998,
   "gameId": 10358513149,
   "gameMode": "KIWI",
-  "gameModeMutators": [
-    "mapskin_map12_bloom"
-  ],
+  "gameModeMutators": ["mapskin_map12_bloom"],
   "gameType": "MATCHED_GAME",
   "gameVersion": "15.21.720.5118",
   "mapId": 12,

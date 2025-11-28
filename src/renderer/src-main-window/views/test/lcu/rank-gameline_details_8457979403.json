@@ -315,11 +315,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [7, 9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -339,12 +335,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            2,
-            3,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 3, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -364,11 +355,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            2,
-            3,
-            5
-          ],
+          "assistingParticipantIds": [2, 3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -388,11 +375,7 @@
           "victimId": 6
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -412,9 +395,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            6
-          ],
+          "assistingParticipantIds": [6],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -434,10 +415,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            4,
-            5
-          ],
+          "assistingParticipantIds": [4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -1007,10 +985,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            9,
-            10
-          ],
+          "assistingParticipantIds": [9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -1050,9 +1025,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -1385,9 +1358,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            5
-          ],
+          "assistingParticipantIds": [5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -1407,9 +1378,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            10
-          ],
+          "assistingParticipantIds": [10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -1429,9 +1398,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            5
-          ],
+          "assistingParticipantIds": [5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -1785,9 +1752,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            6
-          ],
+          "assistingParticipantIds": [6],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -1807,9 +1772,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -1829,9 +1792,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            5
-          ],
+          "assistingParticipantIds": [5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -1851,9 +1812,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -1893,9 +1852,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            10
-          ],
+          "assistingParticipantIds": [10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -1915,9 +1872,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            10
-          ],
+          "assistingParticipantIds": [10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -1937,9 +1892,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            2
-          ],
+          "assistingParticipantIds": [2],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -2136,9 +2089,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 2,
@@ -2178,9 +2129,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            10
-          ],
+          "assistingParticipantIds": [10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -2357,9 +2306,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -2379,9 +2326,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            10
-          ],
+          "assistingParticipantIds": [10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -2558,11 +2503,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -2582,10 +2523,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            3,
-            4
-          ],
+          "assistingParticipantIds": [3, 4],
           "buildingType": "",
           "itemId": 0,
           "killerId": 5,
@@ -2605,11 +2543,7 @@
           "victimId": 9
         },
         {
-          "assistingParticipantIds": [
-            2,
-            3,
-            5
-          ],
+          "assistingParticipantIds": [2, 3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -2629,11 +2563,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            9
-          ],
+          "assistingParticipantIds": [7, 8, 9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 10,
@@ -2653,11 +2583,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -2677,10 +2603,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            3,
-            5
-          ],
+          "assistingParticipantIds": [3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -3034,9 +2957,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            5
-          ],
+          "assistingParticipantIds": [5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -3056,10 +2977,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            9,
-            10
-          ],
+          "assistingParticipantIds": [9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -3079,10 +2997,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            7,
-            10
-          ],
+          "assistingParticipantIds": [7, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -3142,9 +3057,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            9
-          ],
+          "assistingParticipantIds": [9],
           "buildingType": "TOWER_BUILDING",
           "itemId": 0,
           "killerId": 10,
@@ -3477,10 +3390,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            2,
-            3
-          ],
+          "assistingParticipantIds": [2, 3],
           "buildingType": "",
           "itemId": 0,
           "killerId": 5,
@@ -3500,9 +3410,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            9
-          ],
+          "assistingParticipantIds": [9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 10,
@@ -3522,9 +3430,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            8
-          ],
+          "assistingParticipantIds": [8],
           "buildingType": "TOWER_BUILDING",
           "itemId": 0,
           "killerId": 9,
@@ -3721,9 +3627,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            2
-          ],
+          "assistingParticipantIds": [2],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -3743,11 +3647,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            8
-          ],
+          "assistingParticipantIds": [6, 7, 8],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -3767,9 +3667,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            5
-          ],
+          "assistingParticipantIds": [5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -3789,9 +3687,7 @@
           "victimId": 9
         },
         {
-          "assistingParticipantIds": [
-            1
-          ],
+          "assistingParticipantIds": [1],
           "buildingType": "",
           "itemId": 0,
           "killerId": 2,
@@ -3811,10 +3707,7 @@
           "victimId": 6
         },
         {
-          "assistingParticipantIds": [
-            3,
-            5
-          ],
+          "assistingParticipantIds": [3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 2,
@@ -3991,9 +3884,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7
-          ],
+          "assistingParticipantIds": [7],
           "buildingType": "",
           "itemId": 0,
           "killerId": 10,
@@ -4013,10 +3904,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            8,
-            10
-          ],
+          "assistingParticipantIds": [8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -4253,10 +4141,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            3,
-            5
-          ],
+          "assistingParticipantIds": [3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 2,
@@ -4650,10 +4535,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            8,
-            9
-          ],
+          "assistingParticipantIds": [8, 9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 10,
@@ -4673,9 +4555,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            2
-          ],
+          "assistingParticipantIds": [2],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -4695,10 +4575,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            9,
-            10
-          ],
+          "assistingParticipantIds": [9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 8,
@@ -4718,10 +4595,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            8,
-            10
-          ],
+          "assistingParticipantIds": [8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -4741,10 +4615,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            3,
-            6
-          ],
+          "assistingParticipantIds": [3, 6],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -4764,9 +4635,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            3
-          ],
+          "assistingParticipantIds": [3],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -4786,9 +4655,7 @@
           "victimId": 6
         },
         {
-          "assistingParticipantIds": [
-            6
-          ],
+          "assistingParticipantIds": [6],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -4808,9 +4675,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            1
-          ],
+          "assistingParticipantIds": [1],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -5007,11 +4872,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5188,11 +5049,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -5212,12 +5069,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            2,
-            3,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 3, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 1,
@@ -5237,12 +5089,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5439,9 +5286,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            6
-          ],
+          "assistingParticipantIds": [6],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -5461,10 +5306,7 @@
           "victimId": 2
         },
         {
-          "assistingParticipantIds": [
-            7,
-            9
-          ],
+          "assistingParticipantIds": [7, 9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -5484,12 +5326,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5509,11 +5346,7 @@
           "victimId": 3
         },
         {
-          "assistingParticipantIds": [
-            8,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [8, 9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -5533,11 +5366,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            6,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5557,10 +5386,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            6,
-            9
-          ],
+          "assistingParticipantIds": [6, 9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -5737,11 +5563,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -5918,10 +5740,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            8,
-            10
-          ],
+          "assistingParticipantIds": [8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5941,11 +5760,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -5965,12 +5780,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -5990,11 +5800,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            8,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [8, 9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -6014,11 +5820,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -6195,11 +5997,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            8,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [8, 9, 10],
           "buildingType": "TOWER_BUILDING",
           "itemId": 0,
           "killerId": 6,
@@ -6219,11 +6017,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            6,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 8, 10],
           "buildingType": "INHIBITOR_BUILDING",
           "itemId": 0,
           "killerId": 9,
@@ -6400,10 +6194,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            7,
-            8
-          ],
+          "assistingParticipantIds": [7, 8],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -6423,11 +6214,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -6447,11 +6234,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -6471,10 +6254,7 @@
           "victimId": 8
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8
-          ],
+          "assistingParticipantIds": [7, 8],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -6514,11 +6294,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            2,
-            4,
-            5
-          ],
+          "assistingParticipantIds": [2, 4, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -6538,11 +6314,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -6562,9 +6334,7 @@
           "victimId": 3
         },
         {
-          "assistingParticipantIds": [
-            8
-          ],
+          "assistingParticipantIds": [8],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -6938,11 +6708,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            6,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [6, 9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 7,
@@ -6962,10 +6728,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            3,
-            5
-          ],
+          "assistingParticipantIds": [3, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 4,
@@ -6985,11 +6748,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7009,11 +6768,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7033,11 +6788,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            6,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7214,11 +6965,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            6,
-            8,
-            10
-          ],
+          "assistingParticipantIds": [6, 8, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7395,11 +7142,7 @@
     {
       "events": [
         {
-          "assistingParticipantIds": [
-            6,
-            8,
-            9
-          ],
+          "assistingParticipantIds": [6, 8, 9],
           "buildingType": "INHIBITOR_BUILDING",
           "itemId": 0,
           "killerId": 10,
@@ -7419,11 +7162,7 @@
           "victimId": 0
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7443,12 +7182,7 @@
           "victimId": 1
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            9,
-            10
-          ],
+          "assistingParticipantIds": [7, 8, 9, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -7468,10 +7202,7 @@
           "victimId": 5
         },
         {
-          "assistingParticipantIds": [
-            1,
-            5
-          ],
+          "assistingParticipantIds": [1, 5],
           "buildingType": "",
           "itemId": 0,
           "killerId": 3,
@@ -7491,11 +7222,7 @@
           "victimId": 10
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            9
-          ],
+          "assistingParticipantIds": [7, 8, 9],
           "buildingType": "",
           "itemId": 0,
           "killerId": 6,
@@ -7515,11 +7242,7 @@
           "victimId": 4
         },
         {
-          "assistingParticipantIds": [
-            6,
-            7,
-            10
-          ],
+          "assistingParticipantIds": [6, 7, 10],
           "buildingType": "",
           "itemId": 0,
           "killerId": 9,
@@ -7756,11 +7479,7 @@
           "victimId": 7
         },
         {
-          "assistingParticipantIds": [
-            7,
-            8,
-            9
-          ],
+          "assistingParticipantIds": [7, 8, 9],
           "buildingType": "TOWER_BUILDING",
           "itemId": 0,
           "killerId": 6,

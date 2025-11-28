@@ -222,34 +222,16 @@ const premadeTeamInfo = computed(() => {
   return playerMap
 })
 
-const formatTeamText = (team: string) => {
-  if (ogs.queryStage.gameInfo?.queueType === 'CHERRY') {
-    if (lcs.gameflow.phase === 'ChampSelect') {
-      return team.startsWith('our')
-        ? t(`teams.our`, { ns: 'common' })
-        : t(`teams.their`, { ns: 'common' })
-    } else {
-      if (team === 'all') {
-        return t(`teams.all`, { ns: 'common' })
-      }
-
-      return t(`teams.unknown`, { ns: 'common' })
-    }
-  } else {
-    return t(`teams.${team}`, { ns: 'common', defaultValue: team })
-  }
+const formatTeamText = (teamIdentifier: string) => {
+  return t(`teams.${teamIdentifier}`, { ns: 'common', defaultValue: teamIdentifier })
 }
 
 const mapTeamColor = (team: string) => {
   switch (team) {
-    case '100':
-    case 'our-1':
-    case 'their-1':
+    case 'TEAM-100':
       return 'blue'
 
-    case '200':
-    case 'our-2':
-    case 'their-2':
+    case 'TEAM-200':
       return 'red'
 
     default:

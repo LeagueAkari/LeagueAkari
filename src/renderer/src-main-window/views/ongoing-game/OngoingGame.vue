@@ -20,7 +20,7 @@
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ref, shallowRef } from 'vue'
 
@@ -28,7 +28,7 @@ import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs
 
 const mh = useInstance(MatchHistoryTabsRenderer)
 
-const ogs = useOngoingGameStore()
+const as = useAppCommonStore()
 
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 
@@ -56,7 +56,7 @@ const handleShowGameById = (id: number, puuid: string) => {
     gameId: id,
     summary: undefined,
     puuid,
-    source: ogs.settings.matchHistoryUseSgpApi ? 'sgp' : 'lcu'
+    source: as.settings.preferredLolSource
   }
 }
 </script>

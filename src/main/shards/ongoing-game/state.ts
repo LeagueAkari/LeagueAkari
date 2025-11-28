@@ -2,29 +2,28 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
+import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
+import { SgpMain } from '../sgp'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
+import { memberMerge } from './member-merge'
 
 export class OngoingGameSettings {
   enabled: boolean = true
-  premadeTeamThreshold: number = 10
   matchHistoryLoadCount: number = 50
 
   /**
    * 会拉取战绩中前 n 局的时间线数量
    */
-  gameTimelineLoadCount: number = 8
+  gameDetailsLoadCount: number = 8
   concurrency: number = 4
-
-  /**
-   * 查询战绩时是否优先使用 SGP API
-   */
-  matchHistoryUseSgpApi: boolean = true
 
   /**
    * 战绩查询时, 优先查询当前模式还是全部模式, 仅当 SGP API 启用时有效
@@ -94,10 +93,6 @@ export class OngoingGameSettings {
     this.enabled = value
   }
 
-  setPreMadeTeamThreshold(value: number) {
-    this.premadeTeamThreshold = value
-  }
-
   setMatchHistoryLoadCount(value: number) {
     this.matchHistoryLoadCount = value
   }
@@ -106,12 +101,8 @@ export class OngoingGameSettings {
     this.concurrency = limit
   }
 
-  setMatchHistoryUseSgpApi(value: boolean) {
-    this.matchHistoryUseSgpApi = value
-  }
-
-  setGameTimelineLoadCount(value: number) {
-    this.gameTimelineLoadCount = value
+  setGameDetailsLoadCount(value: number) {
+    this.gameDetailsLoadCount = value
   }
 
   constructor() {
@@ -256,7 +247,7 @@ export class OngoingGameState {
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
         return {
-          all: [
+          'TEAM-ALL': [
             ...this._lcData.champSelect.session.myTeam,
             ...this._lcData.champSelect.session.theirTeam
           ]
@@ -267,25 +258,21 @@ export class OngoingGameState {
 
       const teams: Record<string, string[]> = {}
 
-      this._lcData.champSelect.session.myTeam
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          const key = p.team ? `our-${p.team}` : 'our'
-          if (!teams[key]) {
-            teams[key] = []
-          }
-          teams[key].push(p.puuid)
-        })
+      const processMember = (p: ChampSelectTeam) => {
+        if (!p.puuid || p.puuid === EMPTY_PUUID) {
+          return
+        }
 
-      this._lcData.champSelect.session.theirTeam
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          const key = p.team ? `their-${p.team}` : 'their'
-          if (!teams[key]) {
-            teams[key] = []
-          }
-          teams[key].push(p.puuid)
-        })
+        const teamIdentifier = p.team === 100 || p.team === 1 ? 'TEAM-100' : 'TEAM-200'
+
+        if (!teams[teamIdentifier]) {
+          teams[teamIdentifier] = []
+        }
+        teams[teamIdentifier].push(p.puuid)
+      }
+
+      this._lcData.champSelect.session.myTeam.forEach(processMember)
+      this._lcData.champSelect.session.theirTeam.forEach(processMember)
 
       return teams
     } else if (this.queryStage.phase === 'in-game') {
@@ -300,7 +287,7 @@ export class OngoingGameState {
         )
 
         return {
-          all: [
+          'TEAM-ALL': [
             ...this._lcData.gameflow.session.gameData.teamOne,
             ...this._lcData.gameflow.session.gameData.teamTwo
           ]
@@ -311,21 +298,30 @@ export class OngoingGameState {
       }
 
       const teams: Record<string, string[]> = {
-        100: [],
-        200: []
+        'TEAM-100': [],
+        'TEAM-200': []
       }
 
       this._lcData.gameflow.session.gameData.teamOne
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['100'].push(p.puuid)
+          teams['TEAM-100'].push(p.puuid)
         })
 
       this._lcData.gameflow.session.gameData.teamTwo
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['200'].push(p.puuid)
+          teams['TEAM-200'].push(p.puuid)
         })
+
+      // experimental 特性
+      for (const [tI, m] of Object.entries(this.additionalMembers)) {
+        if (teams[tI]) {
+          teams[tI] = memberMerge(teams[tI], m)
+        } else {
+          teams[tI] = m
+        }
+      }
 
       return teams
     }
@@ -438,21 +434,10 @@ export class OngoingGameState {
     this.playerStats = value
   }
 
-  /**
-   * 战绩列表的 tag, 用于 SGP API
-   */
-  matchHistoryTag: string = 'all'
+  matchHistoryTagParams: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'> = {}
 
-  // new
-  matchHistoryQueryParams: {
-    startIndex: number
-    count: number
-    tag?: string
-    tagsQueryType?: 'AND' | 'OR' | (string & {})
-  } | null = null
-
-  setMatchHistoryTag(value: string) {
-    this.matchHistoryTag = value
+  setMatchHistoryTagParams(value: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) {
+    this.matchHistoryTagParams = value
   }
 
   /**
@@ -462,16 +447,8 @@ export class OngoingGameState {
   matchHistory: Record<
     string,
     {
-      /** 记录本次查询是用了哪一个数据源 */
       source: 'lcu' | 'sgp'
-
-      /** 指示当前查询的 tag 参数，lcu 会无视此字段 */
-      tag?: string
-
-      /** 指示当前查询的目标加载数量, 并不一定是实际数量 */
-      targetCount: number
-
-      /** 战绩列表，LCU 和 SGP 格式各不相同 */
+      params: MatchHistoryQueryParams
       data: LcuOrSgpGameSummary[]
     }
   > = {}
@@ -538,7 +515,7 @@ export class OngoingGameState {
   savedInfoLoadingState: Record<string, string> = {}
 
   /** 或者说是 game 的 details，区分 summary (常见的战绩其实是 summary) */
-  gameTimeline: Record<number, LcuOrSgpGameDetails> = {}
+  gameDetails: Record<number, LcuOrSgpGameDetails> = {}
 
   /**
    * 除了战绩中的对局外, 额外被加载的对局信息
@@ -546,7 +523,7 @@ export class OngoingGameState {
   additionalGame: Record<number, LcuOrSgpGameSummary> = {}
 
   // unused
-  gameTimelineLoadingState: Record<number, string> = {}
+  gameDetailsLoadingState: Record<number, string> = {}
 
   clear() {
     this.playerStats = null
@@ -555,17 +532,56 @@ export class OngoingGameState {
     this.savedInfo = {}
     this.rankedStats = {}
     this.championMastery = {}
-    this.matchHistoryTag = 'all'
+    this.matchHistoryTagParams = {}
     this.matchHistoryLoadingState = {}
     this.summonerLoadingState = {}
     this.savedInfoLoadingState = {}
     this.rankedStatsLoadingState = {}
     this.championMasteryLoadingState = {}
-    this.gameTimeline = {}
+    this.gameDetailsLoadingState = {}
+    this.gameDetails = {}
     this.additionalGame = {}
+    this.additionalMembers = {}
   }
 
-  constructor(private readonly _lcData: LeagueClientData) {
+  /**
+   * 置于一个草稿模式。草稿模式可在 unavailable 阶段被设置，用于自定义加载任何玩家战绩
+   */
+  draft: {
+    teams: Record<string, string[]>
+  } | null = null
+
+  setDraft(
+    value: {
+      teams: Record<string, string[]>
+    } | null
+  ) {
+    this.draft = value
+  }
+
+  get apiShouldUse() {
+    if (
+      this._appCommon.settings.preferredLolSource === 'sgp' &&
+      this._sgp.state.availability.serversSupported.matchHistory
+    ) {
+      return 'sgp'
+    }
+
+    return 'lcu'
+  }
+
+  /** 结构同 teams  */
+  additionalMembers: Record<string, string[]> = {}
+
+  setAdditionalMembers(value: Record<string, string[]>) {
+    this.additionalMembers = value
+  }
+
+  constructor(
+    private readonly _lcData: LeagueClientData,
+    private readonly _appCommon: AppCommonMain,
+    private readonly _sgp: SgpMain
+  ) {
     makeAutoObservable(this, {
       // shallow object
       matchHistory: observable.shallow,
@@ -573,7 +589,7 @@ export class OngoingGameState {
       rankedStats: observable.shallow,
       savedInfo: observable.shallow,
       championMastery: observable.shallow,
-      gameTimeline: observable.shallow,
+      gameDetails: observable.shallow,
       additionalGame: observable.shallow,
 
       // ref object, override only, no modification
@@ -581,7 +597,7 @@ export class OngoingGameState {
       summonerLoadingState: observable.ref,
       rankedStatsLoadingState: observable.ref,
       savedInfoLoadingState: observable.ref,
-      gameTimelineLoadingState: observable.ref,
+      gameDetailsLoadingState: observable.ref,
 
       // structured data
       championSelections: computed.struct,
@@ -589,7 +605,10 @@ export class OngoingGameState {
       teams: computed.struct,
       playerStats: observable.struct,
       queryStage: computed.struct,
-      teamParticipantGroups: computed.struct
+      teamParticipantGroups: computed.struct,
+      draft: observable.struct,
+      matchHistoryTagParams: observable.struct,
+      additionalMembers: observable.struct
     })
   }
 }

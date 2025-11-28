@@ -1,4 +1,3 @@
-import { SgpGsmLedgeRegion } from '@shared/types/sgp/gsm'
 import { SgpServersConfig } from '@shared/types/shards/sgp'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
@@ -36,15 +35,10 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
 
   const supportedQueues = ref<number[]>([])
 
-  const data = shallowRef({
-    gsmGame: null as SgpGsmLedgeRegion | null
-  })
-
   return {
     availability,
     isTokenReady,
     sgpServerConfig,
-    supportedQueues,
-    data
+    supportedQueues
   }
 })

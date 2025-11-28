@@ -1,10 +1,7 @@
 {
   "metadata": {
     "product": "LoL",
-    "tags": [
-      "ranked",
-      "q_420"
-    ],
+    "tags": ["ranked", "q_420"],
     "participants": [
       "4fdb892c-cc56-505c-95cd-0d3548eceb6c",
       "b72cca61-dbdb-5f85-bfc9-67f68436b780",
@@ -1419,11 +1416,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [7, 9, 10],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 6,
@@ -1629,12 +1622,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              2,
-              3,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 3, 4, 5],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 1,
@@ -1813,11 +1801,7 @@
             "type": "FEAT_UPDATE"
           },
           {
-            "assistingParticipantIds": [
-              2,
-              3,
-              5
-            ],
+            "assistingParticipantIds": [2, 3, 5],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 4,
@@ -2073,11 +2057,7 @@
             "type": "FEAT_UPDATE"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 10],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 9,
@@ -2324,9 +2304,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              6
-            ],
+            "assistingParticipantIds": [6],
             "bounty": 300,
             "killStreakLength": 1,
             "killerId": 9,
@@ -2545,10 +2523,7 @@
             "type": "FEAT_UPDATE"
           },
           {
-            "assistingParticipantIds": [
-              4,
-              5
-            ],
+            "assistingParticipantIds": [4, 5],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 3,
@@ -5625,10 +5600,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              9,
-              10
-            ],
+            "assistingParticipantIds": [9, 10],
             "bounty": 253,
             "killStreakLength": 0,
             "killerId": 7,
@@ -6202,9 +6174,7 @@
             "victimId": 8
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 300,
             "killStreakLength": 2,
             "killerId": 9,
@@ -7763,9 +7733,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              5
-            ],
+            "assistingParticipantIds": [5],
             "bounty": 277,
             "killStreakLength": 1,
             "killerId": 3,
@@ -8079,9 +8047,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              10
-            ],
+            "assistingParticipantIds": [10],
             "bounty": 284,
             "killStreakLength": 3,
             "killerId": 9,
@@ -8292,9 +8258,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              5
-            ],
+            "assistingParticipantIds": [5],
             "bounty": 300,
             "killStreakLength": 2,
             "killerId": 3,
@@ -10205,9 +10169,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              6
-            ],
+            "assistingParticipantIds": [6],
             "bounty": 0,
             "killerId": 7,
             "killerTeamId": 200,
@@ -10264,9 +10226,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 0,
             "killerId": 6,
             "killerTeamId": 200,
@@ -10285,9 +10245,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              5
-            ],
+            "assistingParticipantIds": [5],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 4,
@@ -10525,9 +10483,7 @@
             "victimId": 10
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 279,
             "killStreakLength": 2,
             "killerId": 6,
@@ -10909,9 +10865,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              10
-            ],
+            "assistingParticipantIds": [10],
             "bounty": 282,
             "killStreakLength": 4,
             "killerId": 9,
@@ -11182,9 +11136,7 @@
             "victimId": 4
           },
           {
-            "assistingParticipantIds": [
-              10
-            ],
+            "assistingParticipantIds": [10],
             "bounty": 289,
             "killStreakLength": 5,
             "killerId": 9,
@@ -11585,9 +11537,7 @@
             "type": "FEAT_UPDATE"
           },
           {
-            "assistingParticipantIds": [
-              2
-            ],
+            "assistingParticipantIds": [2],
             "bounty": 320,
             "killStreakLength": 1,
             "killerId": 1,
@@ -12730,9 +12680,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 0,
             "killerId": 2,
             "killerTeamId": 100,
@@ -13053,9 +13001,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              10
-            ],
+            "assistingParticipantIds": [10],
             "bounty": 213,
             "killStreakLength": 6,
             "killerId": 9,
@@ -13887,9 +13833,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 256,
             "killStreakLength": 0,
             "killerId": 6,
@@ -14155,9 +14099,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              10
-            ],
+            "assistingParticipantIds": [10],
             "bounty": 211,
             "killStreakLength": 7,
             "killerId": 9,
@@ -15169,11 +15111,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 10],
             "bounty": 193,
             "killStreakLength": 8,
             "killerId": 9,
@@ -15516,10 +15454,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              4
-            ],
+            "assistingParticipantIds": [3, 4],
             "bounty": 320,
             "killStreakLength": 0,
             "killerId": 5,
@@ -15790,11 +15725,7 @@
             "victimId": 9
           },
           {
-            "assistingParticipantIds": [
-              2,
-              3,
-              5
-            ],
+            "assistingParticipantIds": [2, 3, 5],
             "bounty": 175,
             "killStreakLength": 0,
             "killerId": 4,
@@ -16177,11 +16108,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              9
-            ],
+            "assistingParticipantIds": [7, 8, 9],
             "bounty": 300,
             "killStreakLength": 0,
             "killerId": 10,
@@ -16540,11 +16467,7 @@
             "victimId": 5
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 310,
             "killStreakLength": 6,
             "killerId": 3,
@@ -16953,10 +16876,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              5
-            ],
+            "assistingParticipantIds": [3, 5],
             "bounty": 310,
             "killStreakLength": 1,
             "killerId": 4,
@@ -18803,9 +18723,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              5
-            ],
+            "assistingParticipantIds": [5],
             "bounty": 141,
             "killStreakLength": 7,
             "killerId": 3,
@@ -19098,10 +19016,7 @@
             "victimId": 8
           },
           {
-            "assistingParticipantIds": [
-              9,
-              10
-            ],
+            "assistingParticipantIds": [9, 10],
             "bounty": 320,
             "killStreakLength": 0,
             "killerId": 7,
@@ -19340,10 +19255,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              10
-            ],
+            "assistingParticipantIds": [7, 10],
             "bounty": 181,
             "killStreakLength": 0,
             "killerId": 9,
@@ -20097,9 +20009,7 @@
             "type": "TURRET_PLATE_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              9
-            ],
+            "assistingParticipantIds": [9],
             "bounty": 0,
             "buildingType": "TOWER_BUILDING",
             "killerId": 10,
@@ -21508,10 +21418,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              2,
-              3
-            ],
+            "assistingParticipantIds": [2, 3],
             "bounty": 320,
             "killStreakLength": 0,
             "killerId": 5,
@@ -21815,9 +21722,7 @@
             "victimId": 10
           },
           {
-            "assistingParticipantIds": [
-              9
-            ],
+            "assistingParticipantIds": [9],
             "bounty": 320,
             "killStreakLength": 0,
             "killerId": 10,
@@ -22064,9 +21969,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              8
-            ],
+            "assistingParticipantIds": [8],
             "bounty": 0,
             "buildingType": "TOWER_BUILDING",
             "killerId": 9,
@@ -22882,9 +22785,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              2
-            ],
+            "assistingParticipantIds": [2],
             "bounty": 163,
             "killStreakLength": 1,
             "killerId": 1,
@@ -23135,11 +23036,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              8
-            ],
+            "assistingParticipantIds": [6, 7, 8],
             "bounty": 350,
             "killStreakLength": 1,
             "killerId": 9,
@@ -23604,9 +23501,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              5
-            ],
+            "assistingParticipantIds": [5],
             "bounty": 340,
             "killStreakLength": 9,
             "killerId": 3,
@@ -23839,9 +23734,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              1
-            ],
+            "assistingParticipantIds": [1],
             "bounty": 360,
             "killStreakLength": 0,
             "killerId": 2,
@@ -24156,10 +24049,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              5
-            ],
+            "assistingParticipantIds": [3, 5],
             "bounty": 0,
             "killerId": 2,
             "killerTeamId": 100,
@@ -24808,9 +24698,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              7
-            ],
+            "assistingParticipantIds": [7],
             "bounty": 272,
             "killStreakLength": 1,
             "killerId": 10,
@@ -25164,10 +25052,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              10
-            ],
+            "assistingParticipantIds": [8, 10],
             "bounty": 0,
             "killerId": 7,
             "killerTeamId": 200,
@@ -25963,10 +25848,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              5
-            ],
+            "assistingParticipantIds": [3, 5],
             "bounty": 163,
             "killStreakLength": 1,
             "killerId": 2,
@@ -27992,10 +27874,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              9
-            ],
+            "assistingParticipantIds": [8, 9],
             "bounty": 360,
             "killStreakLength": 0,
             "killerId": 10,
@@ -28277,9 +28156,7 @@
             "victimId": 2
           },
           {
-            "assistingParticipantIds": [
-              2
-            ],
+            "assistingParticipantIds": [2],
             "bounty": 340,
             "killStreakLength": 0,
             "killerId": 4,
@@ -28616,10 +28493,7 @@
             "victimId": 10
           },
           {
-            "assistingParticipantIds": [
-              9,
-              10
-            ],
+            "assistingParticipantIds": [9, 10],
             "bounty": 350,
             "killStreakLength": 0,
             "killerId": 8,
@@ -29044,10 +28918,7 @@
             "victimId": 4
           },
           {
-            "assistingParticipantIds": [
-              8,
-              10
-            ],
+            "assistingParticipantIds": [8, 10],
             "bounty": 167,
             "killStreakLength": 1,
             "killerId": 9,
@@ -29390,10 +29261,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              6
-            ],
+            "assistingParticipantIds": [3, 6],
             "bounty": 0,
             "killerId": 1,
             "killerTeamId": 100,
@@ -29418,9 +29286,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              3
-            ],
+            "assistingParticipantIds": [3],
             "bounty": 370,
             "killStreakLength": 0,
             "killerId": 1,
@@ -29712,9 +29578,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              6
-            ],
+            "assistingParticipantIds": [6],
             "bounty": 380,
             "killStreakLength": 0,
             "killerId": 7,
@@ -30013,9 +29877,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              1
-            ],
+            "assistingParticipantIds": [1],
             "bounty": 350,
             "killStreakLength": 11,
             "killerId": 3,
@@ -31032,11 +30894,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 10],
             "bounty": 127,
             "killStreakLength": 2,
             "killerId": 9,
@@ -31933,11 +31791,7 @@
       {
         "events": [
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 250,
             "killStreakLength": 12,
             "killerId": 3,
@@ -32417,12 +32271,7 @@
             "victimId": 8
           },
           {
-            "assistingParticipantIds": [
-              2,
-              3,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 3, 4, 5],
             "bounty": 329,
             "killStreakLength": 0,
             "killerId": 1,
@@ -32759,12 +32608,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 8, 10],
             "bounty": 380,
             "killStreakLength": 3,
             "killerId": 9,
@@ -33865,9 +33709,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              6
-            ],
+            "assistingParticipantIds": [6],
             "bounty": 370,
             "killStreakLength": 0,
             "killerId": 7,
@@ -34019,10 +33861,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              9
-            ],
+            "assistingParticipantIds": [7, 9],
             "bounty": 116,
             "killStreakLength": 0,
             "killerId": 6,
@@ -34249,12 +34088,7 @@
             "victimId": 5
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 8, 10],
             "bounty": 390,
             "killStreakLength": 4,
             "killerId": 9,
@@ -34663,11 +34497,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [8, 9, 10],
             "bounty": 350,
             "killStreakLength": 1,
             "killerId": 6,
@@ -34977,11 +34807,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 8, 10],
             "bounty": 380,
             "killStreakLength": 5,
             "killerId": 9,
@@ -35402,10 +35228,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              9
-            ],
+            "assistingParticipantIds": [6, 9],
             "bounty": 0,
             "killerId": 7,
             "killerTeamId": 200,
@@ -36106,11 +35929,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 390,
             "killStreakLength": 0,
             "killerId": 3,
@@ -37329,10 +37148,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              10
-            ],
+            "assistingParticipantIds": [8, 10],
             "bounty": 371,
             "killStreakLength": 6,
             "killerId": 9,
@@ -37592,11 +37408,7 @@
             "victimId": 1
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 370,
             "killStreakLength": 1,
             "killerId": 3,
@@ -37911,12 +37723,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 8, 10],
             "bounty": 135,
             "killStreakLength": 7,
             "killerId": 9,
@@ -38121,11 +37928,7 @@
             "type": "CHAMPION_SPECIAL_KILL"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [8, 9, 10],
             "bounty": 297,
             "killStreakLength": 0,
             "killerId": 6,
@@ -38451,11 +38254,7 @@
             "victimId": 4
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 10],
             "bounty": 400,
             "killStreakLength": 8,
             "killerId": 9,
@@ -39300,11 +39099,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              8,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [8, 9, 10],
             "bounty": 0,
             "buildingType": "TOWER_BUILDING",
             "killerId": 6,
@@ -39337,11 +39132,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 8, 10],
             "bounty": 0,
             "buildingType": "INHIBITOR_BUILDING",
             "killerId": 9,
@@ -40121,10 +39912,7 @@
             "type": "ITEM_DESTROYED"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8
-            ],
+            "assistingParticipantIds": [7, 8],
             "bounty": 101,
             "killStreakLength": 9,
             "killerId": 9,
@@ -40505,11 +40293,7 @@
             "victimId": 5
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 294,
             "killStreakLength": 0,
             "killerId": 3,
@@ -40923,11 +40707,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 310,
             "killStreakLength": 1,
             "killerId": 3,
@@ -41363,10 +41143,7 @@
             "type": "CHAMPION_SPECIAL_KILL"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8
-            ],
+            "assistingParticipantIds": [7, 8],
             "bounty": 254,
             "killStreakLength": 10,
             "killerId": 9,
@@ -42139,11 +41916,7 @@
             "victimId": 1
           },
           {
-            "assistingParticipantIds": [
-              2,
-              4,
-              5
-            ],
+            "assistingParticipantIds": [2, 4, 5],
             "bounty": 370,
             "killStreakLength": 2,
             "killerId": 3,
@@ -42376,11 +42149,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 10],
             "bounty": 400,
             "killStreakLength": 11,
             "killerId": 9,
@@ -42805,9 +42574,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              8
-            ],
+            "assistingParticipantIds": [8],
             "bounty": 390,
             "killStreakLength": 12,
             "killerId": 9,
@@ -44614,11 +44381,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [6, 9, 10],
             "bounty": 0,
             "killerId": 7,
             "killerTeamId": 200,
@@ -44693,10 +44456,7 @@
             "wardType": "YELLOW_TRINKET"
           },
           {
-            "assistingParticipantIds": [
-              3,
-              5
-            ],
+            "assistingParticipantIds": [3, 5],
             "bounty": 262,
             "killStreakLength": 0,
             "killerId": 4,
@@ -44967,11 +44727,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 10],
             "bounty": 157,
             "killStreakLength": 13,
             "killerId": 9,
@@ -45220,11 +44976,7 @@
             "victimId": 5
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 10],
             "bounty": 285,
             "killStreakLength": 14,
             "killerId": 9,
@@ -45770,11 +45522,7 @@
             "type": "CHAMPION_SPECIAL_KILL"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 8, 10],
             "bounty": 284,
             "killStreakLength": 15,
             "killerId": 9,
@@ -46596,11 +46344,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              8,
-              10
-            ],
+            "assistingParticipantIds": [6, 8, 10],
             "bounty": 0,
             "killerId": 9,
             "killerTeamId": 200,
@@ -47472,11 +47216,7 @@
             "wardType": "SIGHT_WARD"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              8,
-              9
-            ],
+            "assistingParticipantIds": [6, 8, 9],
             "bounty": 0,
             "buildingType": "INHIBITOR_BUILDING",
             "killerId": 10,
@@ -47496,11 +47236,7 @@
             "type": "ITEM_PURCHASED"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 10],
             "bounty": 318,
             "killStreakLength": 16,
             "killerId": 9,
@@ -47876,12 +47612,7 @@
             "type": "LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              9,
-              10
-            ],
+            "assistingParticipantIds": [7, 8, 9, 10],
             "bounty": 119,
             "killStreakLength": 2,
             "killerId": 6,
@@ -48240,10 +47971,7 @@
             "victimId": 5
           },
           {
-            "assistingParticipantIds": [
-              1,
-              5
-            ],
+            "assistingParticipantIds": [1, 5],
             "bounty": 380,
             "killStreakLength": 0,
             "killerId": 3,
@@ -48492,11 +48220,7 @@
             "victimId": 10
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              9
-            ],
+            "assistingParticipantIds": [7, 8, 9],
             "bounty": 215,
             "killStreakLength": 3,
             "killerId": 6,
@@ -48939,11 +48663,7 @@
             "type": "SKILL_LEVEL_UP"
           },
           {
-            "assistingParticipantIds": [
-              6,
-              7,
-              10
-            ],
+            "assistingParticipantIds": [6, 7, 10],
             "bounty": 410,
             "killStreakLength": 17,
             "killerId": 9,
@@ -50524,11 +50244,7 @@
             "victimId": 7
           },
           {
-            "assistingParticipantIds": [
-              7,
-              8,
-              9
-            ],
+            "assistingParticipantIds": [7, 8, 9],
             "bounty": 0,
             "buildingType": "TOWER_BUILDING",
             "killerId": 6,

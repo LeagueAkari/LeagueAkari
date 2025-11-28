@@ -33,6 +33,34 @@
         />
       </ControlItem>
       <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.basic.preferredLolSource.label')"
+        :label-description="t('AppSettings.basic.preferredLolSource.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="as.settings.preferredLolSource"
+          @update:value="(val) => app.setPreferredLolSource(val)"
+          :options="lolSourceOptions"
+        />
+        <div
+          v-if="
+            sgps.availability.sgpServerId &&
+            as.settings.preferredLolSource === 'sgp' &&
+            !sgps.availability.serversSupported.matchHistory
+          "
+          class="mt-2 font-bold text-sm dark:text-orange-300 text-orange-500"
+        >
+          {{
+            t('AppSettings.basic.preferredLolSource.unsupported', {
+              server: sgps.availability.sgpServerId
+            })
+          }}
+        </div>
+      </ControlItem>
+      <ControlItem
         v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         label="Theme Color (experimental)"
@@ -469,6 +497,7 @@ import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useMainWindowStore,
@@ -507,6 +536,7 @@ const { t } = useTranslation()
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
 const sus = useSelfUpdateStore()
+const sgps = useSgpStore()
 const wms = useWindowManagerStore()
 const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
@@ -544,6 +574,11 @@ const remoteConfigSource = [
 const locales = [
   { label: '中文', value: 'zh-CN' },
   { label: 'English', value: 'en' }
+]
+
+const lolSourceOptions = [
+  { label: 'SGP', value: 'sgp' },
+  { label: 'LCU', value: 'lcu' }
 ]
 
 const themes = [

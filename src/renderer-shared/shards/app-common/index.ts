@@ -77,6 +77,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
   }
 
+  setPreferredLolSource(s: 'sgp' | 'lcu') {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'preferredLolSource', s)
+  }
+
   readClipboardText() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }

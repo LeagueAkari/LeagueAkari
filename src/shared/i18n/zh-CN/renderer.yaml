@@ -127,6 +127,14 @@ AppSettings:
         quit: 退出应用
         ask: 每次询问
 
+    preferredLolSource:
+      label: 首选数据源
+      description: 选择英雄联盟 API 数据源
+      unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
+      options:
+        sgp: SGP API
+        lcu: LCU API
+
     dataSource:
       label: Git 仓库源
       description: 设置应用的 Git 仓库源，通过 GitHub / Gitee 获取或更新数据
@@ -263,12 +271,6 @@ MatchHistorySettings:
     label: 更新页面战绩
     description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
 
-  matchHistoryUseSgpApi:
-    label: 使用 SGP API
-    description: 战绩页面使用 SGP API 作为数据源
-    current: '当前 SGP Server: {{server}}'
-    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
-
   loadCount:
     label: 加载数量
     description: 每个战绩页面加载的战绩数量
@@ -290,18 +292,9 @@ OngoingGameSettings:
     label: 对局战绩分析数量
     description: 在对局页面中，用于分析每名玩家的战绩拉取对局数量
 
-  premadeTeamThreshold:
-    label: 预组队判定阈值
-    description: 当需要进行推测时，如果目标玩家群体出现在同一阵营超过 {{threshold}} 次时，则判定为预组队
-
   concurrency:
     label: 并发请求数量
     description: 在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数
-
-  matchHistoryUseSgpApi:
-    label: 使用 SGP API
-    description: 对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API
-    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
 
   matchHistoryTagPreference:
     label: 队列筛选偏好
@@ -310,9 +303,9 @@ OngoingGameSettings:
       all: 所有模式
       current: 当前模式
 
-  gameTimelineLoadCount:
-    label: 时间线信息加载数量
-    description: 会额外加载前 {{countV}} 场对局的时间线信息，用于对局分析
+  gameDetailsLoadCount:
+    label: 对局详情加载数量
+    description: 会额外加载前 {{countV}} 场对局的详细信息，用于对局分析
 
   showRecentlyUsedChampions:
     label: 显示最近使用的英雄

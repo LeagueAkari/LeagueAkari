@@ -126,6 +126,14 @@ AppSettings:
         quit: Quit
         ask: Ask every time
 
+    preferredLolSource:
+      label: Preferred Data Source
+      description: Select the preferred League of Legends API data source
+      unsupported: 'Unsupported SGP API: {{server}}'
+      options:
+        sgp: SGP API (Official Match History)
+        lcu: LCU API (Client Local)
+
     dataSource:
       label: Git Repository Source
       description: Set the Git repository source of the application, get or update data from GitHub / Gitee
@@ -262,12 +270,6 @@ MatchHistorySettings:
     label: Refresh Tabs After Game Ends
     description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
 
-  matchHistoryUseSgpApi:
-    label: Use SGP API
-    description: Use SGP API as the data source for the match history page
-    current: 'Current SGP Server: {{server}}'
-    unsupported: 'Unsupported SGP API: {{server}}'
-
   loadCount:
     label: Load Count
     description: Number of matches to load for each match history tab.
@@ -289,18 +291,9 @@ OngoingGameSettings:
     label: Match History Load Count
     description: Number of matches to fetch for analyzing each player's performance on the match page.
 
-  premadeTeamThreshold:
-    label: Premade Team Detection Threshold
-    description: A group of players will be considered a premade team if they appear on the same side more than {{threshold}} times.
-
   concurrency:
     label: Concurrent Request Limit
     description: Limits the total number of concurrent network requests during match analysis. This does not affect the concurrency limits of other modules.
-
-  matchHistoryUseSgpApi:
-    label: Use SGP API
-    description: Prioritizes using the SGP API for match analysis. If the SGP API is unavailable, the LCU API will be used instead.
-    unsupported: 'SGP API is not supported for the current server: {{server}}'
 
   matchHistoryTagPreference:
     label: Queue Filter Preference
@@ -309,9 +302,9 @@ OngoingGameSettings:
       all: All Modes
       current: Current Mode
 
-  gameTimelineLoadCount:
-    label: Game Timeline Load Count
-    description: Will additionally load the timeline information for the first {{countV}} matches for game analysis.
+  gameDetailsLoadCount:
+    label: Game Details Load Count
+    description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
 
   showRecentlyUsedChampions:
     label: Show Recently Used Champions

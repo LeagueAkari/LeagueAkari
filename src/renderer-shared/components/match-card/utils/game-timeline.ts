@@ -9,7 +9,7 @@ export const SPELL_SLOT_TYPE = {
   63: 'passive',
   64: 'basic-attack',
   65: 'basic-attack-2',
-  32764: 'unknown', // 未知特殊类型
+  32764: 'unknown' // 未知特殊类型
 }
 
 // Cherry_Shopkeeper -> 火圈伤害
@@ -25,7 +25,7 @@ export function isItemUsage(spellName: string): {
   const match = spellName.match(/^(\d+)active$/)
   if (match) {
     return {
-      itemId: parseInt(match[1]),
+      itemId: parseInt(match[1])
     }
   }
   return null

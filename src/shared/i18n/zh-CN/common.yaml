@@ -39,16 +39,10 @@ positionAssignmentReason:
   AUTOFILL_SHORT: 补
 
 teams:
-  all: 所有
+  TEAM-ALL: 所有
+  TEAM-100: 蓝队
+  TEAM-200: 红队
   unknown: 未知
-  100: 蓝队
-  200: 红队
-  our: 我方
-  their: 敌方
-  our-1: 蓝队
-  our-2: 红队
-  their-1: 蓝队
-  their-2: 红队
 
 queueTypes:
   RANKED_SOLO_5x5: 单双排位

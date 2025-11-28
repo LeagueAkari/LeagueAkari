@@ -26,7 +26,6 @@ export class SgpRenderer implements IAkariShardInitDispose {
     const store = useSgpStore()
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'data', store.data)
 
     // @ts-ignore
     window.sgpApi = this.api

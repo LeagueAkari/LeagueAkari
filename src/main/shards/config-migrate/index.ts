@@ -351,7 +351,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(manager, 'self-update-main/downloadSource', 'remote-config-main/preferredSource')
   }
 
-  private async _migrateFrom140(manager: EntityManager) {
+  private async _migrateFrom137(manager: EntityManager) {
     const hasMigratedSymbol = await manager.findOneBy(Setting, {
       key: Equal(ConfigMigrateMain.MIGRATION_FROM_140)
     })
@@ -361,6 +361,41 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     }
 
     this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_140)
+
+    // Migrate preferredLolSource
+    try {
+      const ongoingSgpSetting = await manager.findOneBy(Setting, {
+        key: Equal('ongoing-game-main/matchHistoryUseSgpApi')
+      })
+
+      const tabsFrontendSetting = await manager.findOneBy(Setting, {
+        key: Equal('match-history-tabs-renderer/frontendSettings')
+      })
+
+      let ongoingSgp = true
+      if (ongoingSgpSetting) {
+        ongoingSgp = ongoingSgpSetting.value
+      }
+
+      let tabsSgp = true
+      if (
+        tabsFrontendSetting &&
+        tabsFrontendSetting.value &&
+        typeof tabsFrontendSetting.value.matchHistoryUseSgpApi === 'boolean'
+      ) {
+        tabsSgp = tabsFrontendSetting.value.matchHistoryUseSgpApi
+      }
+
+      const preferredLolSource = ongoingSgp || tabsSgp ? 'sgp' : 'lcu'
+
+      await manager.save(Setting.create('app-common-main/preferredLolSource', preferredLolSource))
+
+      if (ongoingSgpSetting) {
+        await manager.remove(ongoingSgpSetting)
+      }
+    } catch (error) {
+      this._log.error('Failed to migrate preferredLolSource', error)
+    }
 
     await this._do(
       manager,
@@ -386,6 +421,11 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       manager,
       'ongoing-game-renderer/frontend/playerCard',
       'ongoing-game-main/playerCardTags'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-main/gameTimelineLoadCount',
+      'ongoing-game-main/gameDetailsLoadCount'
     )
 
     await this._do(manager, 'league-client-ux-main/useWmic', 'league-client-ux-main/useWmi')
@@ -429,7 +469,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
         await this._migrateFrom126(manager)
         await this._migrateFrom134(manager)
         await this._migrateFrom135(manager)
-        await this._migrateFrom140(manager)
+        await this._migrateFrom137(manager)
       })
     } catch (error) {
       this._log.error('Failed to migrate settings', error)

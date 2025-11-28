@@ -1,5 +1,6 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -36,24 +37,16 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryLoadCount', value)
   }
 
-  setPremadeTeamThreshold(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'premadeTeamThreshold', value)
-  }
-
-  setMatchHistoryUseSgpApi(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryUseSgpApi', value)
-  }
-
-  setMatchHistoryTag(value: string) {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'setMatchHistoryTag', value)
+  setMatchHistoryTagParams(value: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) {
+    this._ipc.call(MAIN_SHARD_NAMESPACE, 'setMatchHistoryTagParams', value)
   }
 
   setMatchHistoryTagPreference(value: 'current' | 'all') {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
-  setGameTimelineLoadCount(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameTimelineLoadCount', value)
+  setGameDetailsLoadCount(value: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
   }
 
   setOrderPlayerBy(
@@ -127,6 +120,26 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       delete store.matchHistory[puuid]
       delete store.rankedStats[puuid]
       delete store.championMastery[puuid]
+      delete store.savedInfo[puuid]
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-removed', (puuid: string) => {
+      delete store.summoner[puuid]
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-removed', (puuid: string) => {
+      delete store.rankedStats[puuid]
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-removed', (puuid: string) => {
+      delete store.championMastery[puuid]
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-removed', (puuid: string) => {
+      delete store.matchHistory[puuid]
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-removed', (puuid: string) => {
       delete store.savedInfo[puuid]
     })
 

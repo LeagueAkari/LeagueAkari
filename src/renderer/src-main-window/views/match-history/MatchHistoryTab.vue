@@ -249,18 +249,18 @@
             style="width: 108px"
             :options="pageSizeOptions"
             :consistent-menu-width="false"
-          ></NSelect>
+          />
           <NSelect
             v-if="
-              mhs.frontendSettings.matchHistoryUseSgpApi && currentSgpServerSupported.matchHistory
+              as.settings.preferredLolSource === 'sgp' && currentSgpServerSupported.matchHistory
             "
             size="small"
-            :value="tab.matchHistoryPage?.tag || 'all'"
+            :value="tab.matchHistoryPage?.tag || ALL_SGPTAG_VALUE"
             style="width: 160px"
             @update:value="handleChangeSgpTag"
             :disabled="tab.isLoadingMatchHistory"
             :options="sgpTagOptions"
-          ></NSelect>
+          />
         </div>
 
         <!-- Main content -->
@@ -316,7 +316,7 @@
                 <NSelect
                   v-if="
                     (currentSgpServerSupported.matchHistory &&
-                      mhs.frontendSettings.matchHistoryUseSgpApi) ||
+                      as.settings.preferredLolSource === 'sgp') ||
                     mustUseSgpApiBecauseCrossTencentServer
                   "
                   size="small"
@@ -677,6 +677,7 @@ import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
+import { ALL_SGPTAG_VALUE } from '@renderer-shared/composables/useSgpTagOptions'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -1067,7 +1068,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
 
   page = page || 1
   pageSize = pageSize || tab.matchHistoryPage?.pageSize || mhs.frontendSettings.loadCount
-  tag = tag || tab.matchHistoryPage?.tag || 'all'
+  tag = tag || tab.matchHistoryPage?.tag || ALL_SGPTAG_VALUE
 
   try {
     tab.isLoadingMatchHistory = true
@@ -1077,8 +1078,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
     // 或在跨区时, 强制使用 SGP API
     if (
-      (mhs.frontendSettings.matchHistoryUseSgpApi &&
-        currentSgpServerSupported.value.matchHistory) ||
+      (as.settings.preferredLolSource === 'sgp' && currentSgpServerSupported.value.matchHistory) ||
       mustUseSgpApiBecauseCrossTencentServer.value
     ) {
       if (!sgps.isTokenReady) {
@@ -1090,7 +1090,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         {
           startIndex: (page - 1) * pageSize,
           count: pageSize,
-          tag: tag === 'all' ? undefined : tag,
+          tag: tag === ALL_SGPTAG_VALUE ? undefined : tag,
           __sgpServerId: tab.sgpServerId
         }
       )
@@ -1101,7 +1101,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
       tab.matchHistoryPage = {
         page,
         pageSize,
-        tag: tag || 'all',
+        tag: tag || ALL_SGPTAG_VALUE,
         replayMetadata: {},
         details: {},
         detailsLoading: {},
@@ -1144,7 +1144,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         tab.matchHistoryPage = {
           page,
           pageSize,
-          tag: 'all',
+          tag: ALL_SGPTAG_VALUE,
           replayMetadata: {},
           details: {},
           detailsLoading: {},
@@ -1495,7 +1495,7 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number) => {
     source:
       typeof summary === 'object'
         ? summary.source
-        : mhs.frontendSettings.matchHistoryUseSgpApi
+        : as.settings.preferredLolSource === 'sgp'
           ? 'sgp'
           : 'lcu'
   }
@@ -1530,8 +1530,7 @@ const handleLoadDetails = async (gameId: number) => {
     tab.matchHistoryPage.detailsLoading[gameId] = true
 
     if (
-      (mhs.frontendSettings.matchHistoryUseSgpApi &&
-        currentSgpServerSupported.value.matchHistory) ||
+      (as.settings.preferredLolSource === 'sgp' && currentSgpServerSupported.value.matchHistory) ||
       mustUseSgpApiBecauseCrossTencentServer.value
     ) {
       if (!sgps.isTokenReady) {
@@ -1672,7 +1671,7 @@ lc.onLcuEventVue<ReplayDownloadProgress>('/lol-replays/v1/metadata/:gameId', (da
 })
 
 // ==================== Initialization ====================
-if (mhs.frontendSettings.matchHistoryUseSgpApi) {
+if (as.settings.preferredLolSource === 'sgp') {
   if (sgps.isTokenReady) {
     handleRefresh()
   }

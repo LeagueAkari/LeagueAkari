@@ -139,7 +139,7 @@ export interface TemplateEnv {
   /**
    * 一个 map，key 为 puuid。记录了部分对局的游戏时间线信息（是前 N 场，具体设置项可在 OngoingGameSettings 中找到）
    */
-  gameTimeline: OngoingGameState['gameTimeline']
+  gameDetails: OngoingGameState['gameDetails']
 
   /**
    * 一个 map，key 为 teamParticipantId。由 LCU 标记了每个阵营的组队情况，可以精准判断预组队情况

@@ -110,7 +110,7 @@ interface SgpGsmLedgeRegionGameInfo {
   spectatorDelay: number
   gameVersion: string
   teamOne: SgpGsmLedgeRegionTeam[]
-  teamTwo: any[]
+  teamTwo: SgpGsmLedgeRegionTeam[]
   playerChampionSelections: SgpGsmLedgeRegionPlayerChampionSelection[]
   bannedChampions: any[]
   observers: any[]
