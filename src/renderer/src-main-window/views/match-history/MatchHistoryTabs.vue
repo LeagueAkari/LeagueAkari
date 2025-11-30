@@ -53,6 +53,7 @@ import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -77,7 +78,7 @@ const lcs = useLeagueClientStore()
 const route = useRoute()
 const router = useRouter()
 
-const VIEW_NAMESPACE = 'view:MatchHistoryTabs'
+const componentName = useComponentName()
 
 const mhs = useMatchHistoryTabsStore()
 const ogs = useOngoingGameStore()
@@ -162,7 +163,7 @@ watch(
         }
       })
 
-      log.info(VIEW_NAMESPACE, `战绩页面刷新`, allPlayerPuuids)
+      log.info(componentName, `战绩页面刷新`, allPlayerPuuids)
     }
   }
 )
@@ -194,7 +195,7 @@ onDeactivated(() => stop())
 mh.events.on('refresh-tab', (tabId: string) => {
   const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
   if (tab) {
-    log.info(VIEW_NAMESPACE, `刷新战绩页面`, tabId)
+    log.info(componentName, `刷新战绩页面`, tabId)
     tab.refresh()
   }
 })

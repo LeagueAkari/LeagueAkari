@@ -149,9 +149,9 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   })
 
   const lobbyTeamBuilder = shallowReactive({
-    champSelect: {
+    champSelect: shallowReactive({
       subsetChampionList: [] as number[]
-    }
+    })
   })
 
   return {

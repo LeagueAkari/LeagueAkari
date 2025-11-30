@@ -5,6 +5,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
@@ -174,7 +175,10 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const draft = shallowRef<{
     teams: Record<string, string[]>
   } | null>(null)
-  const additionalMembers = shallowRef<Record<string, string[]>>({})
+  const additionalMembers = shallowRef<AdditionalTeamMembersResult>({
+    teams: {},
+    selections: {}
+  })
 
   return {
     settings,

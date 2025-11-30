@@ -53,6 +53,8 @@ export function memberMerge(origin: string[], extra: string[]): string[] {
     }
   }
 
+  // 目前局部的合并顺序是先 origin 后 extra，而不是依次拼接
+  // e.g. A,B,T + C,D,T -> A,B,C,D,T
   const result: string[] = []
   i = 0
   j = 0

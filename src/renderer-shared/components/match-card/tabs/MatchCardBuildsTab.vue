@@ -40,18 +40,35 @@
             class="relative"
           >
             <div
-              class="skill-slot size-6 flex items-center justify-center text-xs font-bold rounded cursor-default"
+              v-if="sk.levelUpType === 'EVOLVE'"
+              class="size-6 flex items-center justify-center text-xs font-bold rounded cursor-default relative bg-rose-500/60 b-rose-500 dark:bg-rose-400/60 dark:b-rose-400/60 b b-solid rounded-full"
+              :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (Evolved) - ${formatMilliseconds(sk.timestamp)}`"
+            >
+              {{
+                SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
+              }}
+              <div
+                class="absolute -top-1 -right-1 size-3 bg-amber-400 dark:bg-amber-500 text-black rounded-full flex items-center justify-center shadow-sm b b-solid b-white dark:b-neutral-900"
+              >
+                <NIcon size="10"><ArrowUp /></NIcon>
+              </div>
+            </div>
+            <div
+              v-else
+              class="size-6 flex items-center justify-center text-xs font-bold rounded cursor-default"
               :class="getSkillClass(sk.skillSlot)"
-              :title="`${idx + 1} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
+              :title="`${sk.displayLevel} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
             >
               {{
                 SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
               }}
             </div>
+
             <div
+              v-if="sk.displayLevel"
               class="absolute z-1 -bottom-1 -right-1 text-[8px] leading-none py-0.5 bg-black/60 rounded text-white min-w-3 text-center"
             >
-              {{ idx + 1 }}
+              {{ sk.displayLevel }}
             </div>
           </div>
 
@@ -135,7 +152,8 @@ import {
   DetailedItemPurchasedEvent,
   DetailedSkillLevelUpEvent
 } from '@shared/types/sgp/match-history'
-import { NButton, NScrollbar, NSpin } from 'naive-ui'
+import { ArrowUp } from '@vicons/ionicons5'
+import { NButton, NIcon, NScrollbar, NSpin } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -177,7 +195,10 @@ const ANVIL_ITEM_IDS = [6032, 220000]
 const collected = computed(() => {
   const flatten = frames.value.map((frame) => frame.events).flat()
 
-  const skillLevelUpEvents: Record<number, DetailedSkillLevelUpEvent[]> = {}
+  const skillLevelUpEvents: Record<
+    number,
+    (DetailedSkillLevelUpEvent & { displayLevel?: number })[]
+  > = {}
   const itemPurchaseEvents: Record<number, ItemPurchaseEvent[]> = {}
   const anvils: Record<number, number> = {}
 
@@ -215,6 +236,17 @@ const collected = computed(() => {
         }
         break
     }
+  }
+
+  for (const pid in skillLevelUpEvents) {
+    let level = 0
+    skillLevelUpEvents[pid] = skillLevelUpEvents[pid].map((evt) => {
+      if (evt.levelUpType === 'EVOLVE') {
+        return { ...evt }
+      }
+      level++
+      return { ...evt, displayLevel: level }
+    })
   }
 
   return {

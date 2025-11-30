@@ -39,6 +39,7 @@
           size="small"
           :min="2"
           :max="200"
+          :step="5"
           :value="ogs.settings.matchHistoryLoadCount"
           @update:value="(val) => og.setMatchHistoryLoadCount(val || 20)"
         />

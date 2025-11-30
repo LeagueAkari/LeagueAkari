@@ -30,7 +30,7 @@ export class QueueKeeper {
     }
   }
 
-  add<T>(
+  async add<T>(
     queueId: string,
     taskId: string,
     task: (options: Omit<TaskOptions, 'signal'>) => PromiseLike<T>,
@@ -67,15 +67,26 @@ export class QueueKeeper {
 
     this._tasks.set(taskId, taskRecord)
 
-    const promise = queue.add<T>((o) => task(o), enqueueOptions)
-
-    return promise.finally(() => {
+    try {
+      return await queue.add<T>((o) => task(o), enqueueOptions)
+    } finally {
       this._tasks.delete(taskId)
+      this._removeTags(tags, taskId)
+    }
+  }
 
-      for (const tag of tags) {
-        this._tags.get(tag)?.delete(taskId)
+  private _removeTags(tags: (string | symbol)[], taskId: string) {
+    for (const tag of tags) {
+      const set = this._tags.get(tag)
+
+      if (set) {
+        set.delete(taskId)
+
+        if (set.size === 0) {
+          this._tags.delete(tag)
+        }
       }
-    })
+    }
   }
 
   hasTask(taskId: string): boolean {
@@ -83,7 +94,7 @@ export class QueueKeeper {
   }
 
   /**
-   * 取消某 task，同时清除其关联的 tags
+   * 取消某 task
    * @param taskId
    * @returns 是否成功取消
    */
@@ -98,18 +109,7 @@ export class QueueKeeper {
     controller.abort()
 
     this._tasks.delete(taskId)
-
-    for (const tag of tags) {
-      const set = this._tags.get(tag)
-
-      if (set) {
-        set.delete(taskId)
-
-        if (set.size === 0) {
-          this._tags.delete(tag)
-        }
-      }
-    }
+    this._removeTags(tags, taskId)
 
     return true
   }

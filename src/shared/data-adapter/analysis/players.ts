@@ -1,3 +1,5 @@
+import { isPveQueue } from '@shared/types/league-client/match-history'
+
 import { toBasicInfo } from '../match-history/match-basic'
 import { toParticipants } from '../match-history/participants'
 import { toTeams } from '../match-history/teams'
@@ -224,7 +226,15 @@ export function analyzeMatchHistory(
   const unified = toUnifiedGames(games, puuid)
 
   // 过滤异常数据和重开数据，后面可以直接断言非空
-  const filteredGames = unified.filter(({ participant }) => {
+  const filteredGames = unified.filter(({ participant, basicInfo }) => {
+    if (isPveQueue(basicInfo.queueId)) {
+      return false
+    }
+
+    if (basicInfo.gameType !== 'MATCHED_GAME') {
+      return false
+    }
+
     return participant.winResult !== 'remake' && participant.winResult !== 'abort'
   })
 

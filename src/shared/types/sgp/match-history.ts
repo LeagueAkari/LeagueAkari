@@ -557,7 +557,7 @@ export interface DetailedLevelUpEvent extends BaseDetailedGameEvent {
   level: number
 }
 
-export type LevelUpType = 'NORMAL'
+export type LevelUpType = 'NORMAL' | 'EVOLVE'
 
 export interface DetailedSkillLevelUpEvent extends BaseDetailedGameEvent {
   type: 'SKILL_LEVEL_UP'

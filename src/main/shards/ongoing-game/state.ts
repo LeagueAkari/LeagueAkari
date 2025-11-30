@@ -6,6 +6,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -160,6 +161,8 @@ export class OngoingGameState {
         }
       })
 
+      Object.assign(selections, this.additionalMembers.selections)
+
       return selections
     }
 
@@ -276,7 +279,8 @@ export class OngoingGameState {
 
       return teams
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      // hack for 避免数据残留
+      if (!this._lcData.gameflow.session || this._lcData.gameflow.session.phase === 'GameStart') {
         return {}
       }
 
@@ -315,7 +319,7 @@ export class OngoingGameState {
         })
 
       // experimental 特性
-      for (const [tI, m] of Object.entries(this.additionalMembers)) {
+      for (const [tI, m] of Object.entries(this.additionalMembers.teams)) {
         if (teams[tI]) {
           teams[tI] = memberMerge(teams[tI], m)
         } else {
@@ -541,7 +545,10 @@ export class OngoingGameState {
     this.gameDetailsLoadingState = {}
     this.gameDetails = {}
     this.additionalGame = {}
-    this.additionalMembers = {}
+    this.additionalMembers = {
+      teams: {},
+      selections: {}
+    }
   }
 
   /**
@@ -571,9 +578,12 @@ export class OngoingGameState {
   }
 
   /** 结构同 teams  */
-  additionalMembers: Record<string, string[]> = {}
+  additionalMembers: AdditionalTeamMembersResult = {
+    teams: {},
+    selections: {}
+  }
 
-  setAdditionalMembers(value: Record<string, string[]>) {
+  setAdditionalMembers(value: AdditionalTeamMembersResult) {
     this.additionalMembers = value
   }
 

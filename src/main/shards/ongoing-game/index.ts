@@ -18,6 +18,8 @@ import {
   SgpGameSummary
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
 import LRUMap from 'quick-lru'
@@ -174,43 +176,56 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   private _handleLoad() {
+    // summoner / ranked stats / saved info / champion mastery
     this._mobx.reaction(
-      () =>
-        ({
-          apiShouldUse: this.state.apiShouldUse,
-          sgpTokenReady: this._sgp.state.isTokenReady,
-          teams: this.state.teams,
-          queryStagePhase: this.state.queryStage.phase
-        }) as const,
-      ({ apiShouldUse, sgpTokenReady, teams, queryStagePhase }) => {
-        if (queryStagePhase === 'unavailable') {
-          this._queueKeeper.cancelAll()
-          this.state.clear()
-          return
-        }
-
-        // 决定使用 sgp api 时，等待 sgp token 就绪
-        if (apiShouldUse === 'sgp' && !sgpTokenReady) {
-          return
-        }
-
+      () => this.state.teams,
+      (teams) => {
         const puuids = Object.values(teams).flat()
 
         this._updateSummoners(puuids)
         this._updateRankedStats(puuids)
         this._updateSavedInfo(puuids)
         this._updateChampionMasteries(puuids)
+      },
+      { delay: 500 } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
+    )
+
+    // match history
+    this._mobx.reaction(
+      () => ({
+        teams: this.state.teams,
+        apiShouldUse: this.state.apiShouldUse,
+        sgpTokenReady: this._sgp.state.isTokenReady,
+        count: this.settings.matchHistoryLoadCount,
+        params: this.state.matchHistoryTagParams
+      }),
+      ({ count, params, apiShouldUse, sgpTokenReady }) => {
+        // wait for sgp token ready if needed
+        if (apiShouldUse === 'sgp' && !sgpTokenReady) {
+          return
+        }
+
+        const puuids = Object.values(this.state.teams).flat()
+
         this._updateMatchHistories(
           puuids,
-          {
-            startIndex: 0,
-            count: this.settings.matchHistoryLoadCount,
-            ...this.state.matchHistoryTagParams
-          },
-          apiShouldUse
+          { startIndex: 0, count, ...params },
+          apiShouldUse as 'sgp' | 'lcu'
         )
       },
-      { equals: comparer.shallow, fireImmediately: true }
+      { delay: 500 }
+    )
+
+    this._mobx.reaction(
+      () => this.state.queryStage.phase === 'unavailable',
+      (shouldClean) => {
+        if (shouldClean) {
+          this._log.info('Query stage is unavailable, clearing ongoing game state')
+          this._queueKeeper.cancelAll()
+          this.state.clear()
+          return
+        }
+      }
     )
 
     const currentQueueId = computed(() => {
@@ -224,32 +239,26 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
 
     this._mobx.reaction(
-      () => currentQueueId.get(),
-      (queueId) => {
-        if (!queueId) {
+      () => ({
+        isReadyCheck: this._lc.data.gameflow.session?.phase === 'ReadyCheck',
+        currentQueueId: currentQueueId.get()
+      }),
+      ({ currentQueueId, isReadyCheck }) => {
+        // 接受对局的时候立即刷新队列查询
+        if (!isReadyCheck) {
+          return
+        }
+
+        if (!currentQueueId) {
           this.state.setMatchHistoryTagParams({})
           return
         }
 
-        this.state.setMatchHistoryTagParams({ tag: `q_${queueId}` })
-      }
-    )
+        this._log.warn('DEBUG -> Queue ID changed', currentQueueId)
 
-    this._mobx.reaction(
-      () =>
-        ({
-          count: this.settings.matchHistoryLoadCount,
-          params: this.state.matchHistoryTagParams,
-          apiShouldUse: this.state.apiShouldUse
-        }) as const,
-      ({ count, params, apiShouldUse }) => {
-        this._updateMatchHistories(
-          Object.values(this.state.teams).flat(),
-          { startIndex: 0, count, ...params },
-          apiShouldUse
-        )
+        this.state.setMatchHistoryTagParams({ tag: `q_${currentQueueId}` })
       },
-      { delay: 500 }
+      { equals: comparer.shallow }
     )
   }
 
@@ -257,6 +266,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
    * 更新所有涉及到的玩家的数据
    */
   private _updateSummoners(puuids: string[], force = false) {
+    this._log.warn('DEBUG -> Update summoners', puuids)
+
     for (const puuid of Object.keys(this.state.summoner)) {
       if (!puuids.includes(puuid)) {
         delete this.state.summoner[puuid]
@@ -957,18 +968,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   private _reloadPlayer(puuid: string) {
-    this._queueKeeper.cancelByTags([puuid, 'match-history'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'summoner'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'ranked-stats'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'saved-info'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'champion-mastery'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'game-details'], 'and')
-    this._queueKeeper.cancelByTags([puuid, 'additional-game-summary'], 'and')
+    this._queueKeeper.cancelByTags(puuid)
 
     this._loadMatchHistory(puuid, {
       params: {
         startIndex: 0,
-        count: this.settings.matchHistoryLoadCount
+        count: this.settings.matchHistoryLoadCount,
+        ...this.state.matchHistoryTagParams
       },
       force: true,
       apiSource: this.state.apiShouldUse
@@ -1209,105 +1215,153 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 临时修补逻辑
+   * 聊胜于无的信息补全功能
    */
   private _handleInformationCompletion() {
+    const getGsmGameMembers = async (puuid: string) => {
+      try {
+        const {
+          data: {
+            game: { teamOne, teamTwo, gameMode }
+          }
+        } = await this._sgp.api.gsm.getByPuuid(puuid)
+
+        this._log.info('additional team info by gsm game')
+
+        return { teamOne, teamTwo, gameMode }
+      } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          return null
+        }
+
+        this._log.warn('Error getting game members', error)
+        return null
+      }
+    }
+
+    const getSpectator = async (puuid: string) => {
+      try {
+        const {
+          data: {
+            game: { teamOne, teamTwo, gameMode }
+          }
+        } = await this._sgp.api.gsm.getSpectatorByPuuid(puuid)
+
+        this._log.info('additional team info by spectator data')
+
+        return { teamOne, teamTwo, gameMode }
+      } catch (error) {
+        // 忽略 404 和 409 (disabled spectator APIs)
+        if (
+          isAxiosError(error) &&
+          (error.response?.status === 404 || error.response?.status === 409)
+        ) {
+          return null
+        }
+
+        this._log.warn('Error getting spectator', error)
+        return null
+      }
+    }
+
+    const extractTeamMembers = (
+      gameMode: string,
+      teamOne: { puuid: string; championId: number }[],
+      teamTwo: { puuid: string; championId: number }[]
+    ): AdditionalTeamMembersResult => {
+      const all = [...teamOne, ...teamTwo].filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+
+      if (gameMode === 'CHERRY') {
+        return {
+          teams: {
+            'TEAM-ALL': all.map((p) => p.puuid)
+          },
+          selections: all.reduce(
+            (acc, p) => {
+              acc[p.puuid] = p.championId
+              return acc
+            },
+            {} as Record<string, number>
+          )
+        }
+      }
+
+      return {
+        teams: {
+          'TEAM-100': teamOne.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID),
+          'TEAM-200': teamTwo.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID)
+        },
+        selections: all.reduce(
+          (acc, p) => {
+            acc[p.puuid] = p.championId
+            return acc
+          },
+          {} as Record<string, number>
+        )
+      } as AdditionalTeamMembersResult
+    }
+
     this._mobx.reaction(
       () => this.state.queryStage,
       (stage) => {
-        if (!stage || stage.phase !== 'in-game') {
+        if (!stage || stage.phase !== 'in-game' || !this._lc.data.summoner.me?.puuid) {
           return
         }
 
-        const getGsmGameMemebers = async (puuid: string) => {
-          try {
-            const {
-              data: {
-                game: { teamOne, teamTwo, gameMode }
-              }
-            } = await this._sgp.api.gsm.getByPuuid(puuid)
+        const spectator = getSpectator(this._lc.data.summoner.me.puuid)
+        const gsmGameMembers1 = getGsmGameMembers(this._lc.data.summoner.me.puuid)
 
-            return { teamOne, teamTwo, gameMode }
-          } catch (error) {
-            this._log.warn('Error getting game members', error)
-            return null
+        Promise.allSettled([spectator, gsmGameMembers1]).then(([spectator, gsmGameMembers1]) => {
+          if (this.state.queryStage.phase !== 'in-game') {
+            return
           }
-        }
 
-        const getSpectator = async (puuid: string) => {
-          try {
-            const {
-              data: {
-                game: { teamOne, teamTwo, gameMode }
+          const mergedTeams = {} as Record<string, string[]>
+          const mergedSelections = {} as Record<string, number>
+
+          if (gsmGameMembers1.status === 'fulfilled' && gsmGameMembers1.value) {
+            const { teamOne, teamTwo } = gsmGameMembers1.value
+            const { teams, selections } = extractTeamMembers(
+              gsmGameMembers1.value.gameMode,
+              teamOne,
+              teamTwo
+            )
+
+            for (const [tI, m] of Object.entries(teams)) {
+              if (mergedTeams[tI]) {
+                mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+              } else {
+                mergedTeams[tI] = m
               }
-            } = await this._sgp.api.gsm.getSpectatorByPuuid(puuid)
-            return { teamOne, teamTwo, gameMode }
-          } catch (error) {
-            this._log.warn('Error getting spectator', error)
-            return null
+            }
+
+            Object.assign(mergedSelections, selections)
           }
-        }
 
-        if (this._lc.data.summoner.me?.puuid) {
-          const gsmGameMembers = getGsmGameMemebers(this._lc.data.summoner.me.puuid)
-          const spectator = getSpectator(this._lc.data.summoner.me.puuid)
+          if (spectator.status === 'fulfilled' && spectator.value) {
+            const { teamOne, teamTwo } = spectator.value
+            const { teams, selections } = extractTeamMembers(
+              spectator.value.gameMode,
+              teamOne,
+              teamTwo
+            )
 
-          Promise.allSettled([gsmGameMembers, spectator]).then(([gsmGameMembers, spectator]) => {
-            if (this.state.queryStage.phase !== 'in-game') {
-              return
-            }
-
-            const extractTeamMembers = (
-              gameMode: string,
-              teamOne: { puuid: string }[],
-              teamTwo: { puuid: string }[]
-            ): Record<string, string[]> => {
-              if (gameMode === 'CHERRY') {
-                return {
-                  'TEAM-ALL': [
-                    ...teamOne.map((p) => p.puuid),
-                    ...teamTwo.map((p) => p.puuid)
-                  ].filter((p) => p && p !== EMPTY_PUUID)
-                }
-              }
-
-              return {
-                'TEAM-100': teamOne.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID),
-                'TEAM-200': teamTwo.map((p) => p.puuid).filter((p) => p && p !== EMPTY_PUUID)
+            for (const [tI, m] of Object.entries(teams)) {
+              if (mergedTeams[tI]) {
+                mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+              } else {
+                mergedTeams[tI] = m
               }
             }
 
-            const mergedTeams = {} as Record<string, string[]>
+            Object.assign(mergedSelections, selections)
+          }
 
-            if (gsmGameMembers.status === 'fulfilled' && gsmGameMembers.value) {
-              const { teamOne, teamTwo } = gsmGameMembers.value
-              const members = extractTeamMembers(gsmGameMembers.value.gameMode, teamOne, teamTwo)
-
-              for (const [tI, m] of Object.entries(members)) {
-                if (mergedTeams[tI]) {
-                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
-                } else {
-                  mergedTeams[tI] = m
-                }
-              }
-            }
-
-            if (spectator.status === 'fulfilled' && spectator.value) {
-              const { teamOne, teamTwo } = spectator.value
-              const members = extractTeamMembers(spectator.value.gameMode, teamOne, teamTwo)
-
-              for (const [tI, m] of Object.entries(members)) {
-                if (mergedTeams[tI]) {
-                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
-                } else {
-                  mergedTeams[tI] = m
-                }
-              }
-            }
-
-            this.state.setAdditionalMembers(mergedTeams)
+          this.state.setAdditionalMembers({
+            teams: mergedTeams,
+            selections: mergedSelections
           })
-        }
+        })
       }
     )
   }

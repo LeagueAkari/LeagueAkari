@@ -39,7 +39,7 @@
           <!-- stats line -->
           <div class="flex items-center gap-2 flex-1 min-w-0">
             <!-- KDA -->
-            <div class="min-w-20">
+            <div class="min-w-22">
               <div class="flex gap-0.5 justify-center items-center">
                 <div class="dark:text-white text-black font-bold text-base">
                   {{ participant.kills }}
@@ -61,7 +61,7 @@
                   participant.deaths === 0 && (participant.kills > 0 || participant.assists > 0)
                 "
               >
-                完美
+                完美 ({{ (participant.killParticipation * 100).toFixed(0) }}%)
               </div>
 
               <div class="flex justify-center gap-1" v-else>
@@ -69,13 +69,16 @@
                   {{ participant.kda.toFixed(2) }}
                 </div>
                 <div class="dark:text-white/60 text-black/60 text-xs">KDA</div>
+                <div class="dark:text-white/80 text-black/80 text-xs">
+                  ({{ (participant.killParticipation * 100).toFixed(0) }}%)
+                </div>
               </div>
             </div>
 
             <!-- DMG -->
             <NPopover>
               <template #trigger>
-                <div class="min-w-20">
+                <div class="min-w-22">
                   <div class="text-center font-bold text-base">
                     {{
                       (
@@ -440,7 +443,7 @@ const mapName = computed(() => {
   )
 
   if (mutator) {
-    return `${lcs.gameData.mapName(basicInfo.value.mapId)} (${mutator.MapNameOverride})`
+    return mutator.MapNameOverride
   }
 
   return mutators.MapNameBase

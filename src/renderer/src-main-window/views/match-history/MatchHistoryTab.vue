@@ -676,6 +676,7 @@ import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { ALL_SGPTAG_VALUE } from '@renderer-shared/composables/useSgpTagOptions'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
@@ -873,7 +874,8 @@ const recentlyPlayers = computed(() => {
 })
 
 // ==================== Constants ====================
-const VIEW_NAMESPACE = 'view:MatchHistoryTab'
+const componentName = useComponentName()
+
 const SHOW_TINY_HEADER_THRESHOLD = 160
 const UPDATE_SPECTATOR_DATA_INTERVAL = 60 * 1000 // 1 分钟
 const ENCOUNTERED_GAMES_PAGE_SIZE = 10
@@ -908,9 +910,6 @@ const updateSpectatorData = async () => {
       tab.spectatorData = null
       return
     }
-
-    // 静默失败, 打印日志
-    log.warn(VIEW_NAMESPACE, `获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`, error)
   }
 }
 
@@ -992,7 +991,7 @@ const loadSummoner = async () => {
         }),
       duration: 4000
     })
-    log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
+    log.warn(componentName, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummoner = false
   }
@@ -1023,7 +1022,7 @@ const loadRankedStats = async () => {
         }),
       duration: 4000
     })
-    log.warn(VIEW_NAMESPACE, '拉取排位信息失败', error)
+    log.warn(componentName, '拉取排位信息失败', error)
   } finally {
     tab.isLoadingRankedStats = false
   }
@@ -1052,7 +1051,7 @@ const loadSummonerProfile = async () => {
         }),
       duration: 4000
     })
-    log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
+    log.warn(componentName, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummonerProfile = false
   }
@@ -1166,7 +1165,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
       },
       duration: 6000
     })
-    log.warn(VIEW_NAMESPACE, '拉取战绩信息失败', error)
+    log.warn(componentName, '拉取战绩信息失败', error)
   } finally {
     tab.isLoadingMatchHistory = false
   }
@@ -1361,7 +1360,7 @@ const handleTagEdited = async (tag: string | null) => {
         }),
       duration: 4000
     })
-    log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
+    log.warn(componentName, '标记玩家失败', error)
   }
 }
 
@@ -1385,7 +1384,7 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
         }),
       duration: 4000
     })
-    log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
+    log.warn(componentName, '标记玩家失败', error)
   }
 }
 
@@ -1439,7 +1438,7 @@ const handleLaunchSpectator = async (_: string, spectatorKey: string, useLcuApi:
       duration: 4000
     })
 
-    log.warn(VIEW_NAMESPACE, `无法调起客户端进程: ${(error as Error).message}`, error)
+    log.warn(componentName, `无法调起客户端进程: ${(error as Error).message}`, error)
   }
 }
 
@@ -1580,7 +1579,7 @@ const handleLoadDetails = async (gameId: number) => {
       duration: 6000
     })
 
-    log.warn(VIEW_NAMESPACE, '拉取战绩信息失败', error)
+    log.warn(componentName, '拉取战绩信息失败', error)
   } finally {
     tab.matchHistoryPage.detailsLoading[gameId] = false
   }
@@ -1658,7 +1657,7 @@ watch(
       }
 
       loadReplayMetadata(page.games).catch((error) => {
-        log.warn(VIEW_NAMESPACE, 'Failed to load replay metadata', error)
+        log.warn(componentName, 'Failed to load replay metadata', error)
       })
     }
   }
