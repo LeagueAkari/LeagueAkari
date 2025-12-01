@@ -16,7 +16,12 @@
           }"
           round
         />
-        <div class="text-sm font-medium truncate min-w-0">{{ p.gameName }} #{{ p.tagLine }}</div>
+        <div class="text-sm font-medium truncate min-w-0 text-black dark:text-white">
+          <template v-if="hidePrivacy">
+            {{ lcs.gameData.championName(p.championId) }}
+          </template>
+          <template v-else> {{ p.gameName }} #{{ p.tagLine }} </template>
+        </div>
         <div v-if="p.position && p.position.toLowerCase() !== 'invalid'" :class="tagTheme">
           {{ position(p.position) }}
         </div>
@@ -148,6 +153,7 @@
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   DetailedItemPurchasedEvent,
   DetailedSkillLevelUpEvent
@@ -162,8 +168,18 @@ import { getTeamColor } from '../utils/theme'
 import { useWinResultTagTheme } from '../utils/theme'
 import { formatMilliseconds } from '../utils/time'
 
-const { basicInfo, frames, participants, team, details, loadingDetails, onLoadDetails } =
-  useMatchCard()
+const {
+  basicInfo,
+  frames,
+  participants,
+  team,
+  details,
+  hidePrivacy,
+  loadingDetails,
+  onLoadDetails
+} = useMatchCard()
+
+const lcs = useLeagueClientStore()
 
 type LASpacerEvent = {
   type: 'LEAGUE_AKARI_ITEM_SPACER'
@@ -274,7 +290,3 @@ if (!details.value && !loadingDetails.value) {
   onLoadDetails(basicInfo.value.gameId)
 }
 </script>
-
-<style scoped>
-@import '../match-card.css';
-</style>

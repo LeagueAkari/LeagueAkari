@@ -118,12 +118,13 @@ export class QueueKeeper {
    * 取消某 tags 关联的所有 task
    * @param tags
    * @param mode 'and' | 'or' default 'or'
+   * @returns 取消的 task 数量
    */
-  cancelByTags(tags: string | string[], mode: 'and' | 'or' = 'or') {
+  cancelByTags(tags: string | string[], mode: 'and' | 'or' = 'or'): number {
     const tagList = Array.isArray(tags) ? tags : [tags]
 
     if (tagList.length === 0) {
-      return
+      return 0
     }
 
     const maps = tagList.map((tag) => this._tags.get(tag) || new Set<string>())
@@ -133,9 +134,14 @@ export class QueueKeeper {
         ? maps.reduce((acc, set) => acc.union(set))
         : maps.reduce((acc, set) => acc.intersection(set))
 
+    let cancelled = 0
     for (const taskId of toCancel) {
-      this.cancelById(taskId)
+      if (this.cancelById(taskId)) {
+        cancelled++
+      }
     }
+
+    return cancelled
   }
 
   cancelAll() {

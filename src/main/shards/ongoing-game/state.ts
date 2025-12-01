@@ -418,6 +418,19 @@ export class OngoingGameState {
       groups[p.teamParticipantId].push(p.puuid)
     }
 
+    for (const [puuid, teamParticipantId] of Object.entries(
+      this.additionalMembers.teamParticipantGroups
+    )) {
+      if (!groups[teamParticipantId]) {
+        groups[teamParticipantId] = [puuid]
+        continue
+      }
+
+      if (!groups[teamParticipantId].includes(puuid)) {
+        groups[teamParticipantId].push(puuid)
+      }
+    }
+
     return groups
   }
 
@@ -547,7 +560,8 @@ export class OngoingGameState {
     this.additionalGame = {}
     this.additionalMembers = {
       teams: {},
-      selections: {}
+      selections: {},
+      teamParticipantGroups: {}
     }
   }
 
@@ -580,7 +594,8 @@ export class OngoingGameState {
   /** 结构同 teams  */
   additionalMembers: AdditionalTeamMembersResult = {
     teams: {},
-    selections: {}
+    selections: {},
+    teamParticipantGroups: {}
   }
 
   setAdditionalMembers(value: AdditionalTeamMembersResult) {

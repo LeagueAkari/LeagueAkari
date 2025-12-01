@@ -12,6 +12,8 @@ export function Shard(id: string | symbol, priority = -Infinity): ClassDecorator
   return (target) => {
     Reflect.defineMetadata('akari:id', id, target)
     Reflect.defineMetadata('akari:priority', priority, target)
+    ;(target as any).shardId = id
+    target.prototype.shardId = id
   }
 }
 

@@ -28,7 +28,7 @@ const { title = '', chartData = [] } = defineProps<{
   }[]
 }>()
 
-const { participants, theme } = useMatchCard()
+const { participants, theme, hidePrivacy } = useMatchCard()
 
 const height = computed(() => {
   return chartData.length * 28
@@ -85,7 +85,11 @@ const options = computed<ChartOptions<'bar'>>(() => ({
       callbacks: {
         label: (item) => {
           const d = sortedData.value[item.dataIndex]
-          return `${participantMap.value[d.participantId].gameName}#${participantMap.value[d.participantId].tagLine}: ${d.value}`
+          const p = participantMap.value[d.participantId]
+          const name = hidePrivacy.value
+            ? lcs.gameData.championName(p.championId)
+            : `${p.gameName}#${p.tagLine}`
+          return `${name}: ${d.value}`
         }
       }
     },

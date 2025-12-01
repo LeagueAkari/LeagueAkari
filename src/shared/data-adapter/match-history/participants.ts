@@ -11,7 +11,7 @@ function mapLcuDataToPerks(participant: Participant): MatchParticipantPerks {
     statPerks: null, // lcu has no stat perks record
     styles: [
       {
-        description: null,
+        description: 'primaryStyle',
         selections: [
           {
             perk: participant.stats.perk0,
@@ -41,7 +41,7 @@ function mapLcuDataToPerks(participant: Participant): MatchParticipantPerks {
         style: participant.stats.perkPrimaryStyle
       },
       {
-        description: null,
+        description: 'subStyle',
         selections: [
           {
             perk: participant.stats.perk4,
@@ -147,6 +147,7 @@ export function toParticipants(
         knockEnemyIntoTeamAndKill: p.challenges?.knockEnemyIntoTeamAndKill ?? null,
         killsNearEnemyTurret: p.challenges?.killsNearEnemyTurret ?? null,
         killsUnderOwnTurret: p.challenges?.killsUnderOwnTurret ?? null,
+        earliestDragonTakedown: p.challenges?.earliestDragonTakedown ?? null,
         maxCsAdvantageOnLaneOpponent: p.challenges?.maxCsAdvantageOnLaneOpponent ?? null,
 
         pings: {
@@ -271,6 +272,7 @@ export function toParticipants(
         knockEnemyIntoTeamAndKill: null, // lcu has no knock enemy into team and kill record
         killsNearEnemyTurret: null, // lcu has no kills near enemy turret record
         killsUnderOwnTurret: null, // lcu has no kills under own turret record
+        earliestDragonTakedown: null, // lcu has no earliest dragon takedown record
         maxCsAdvantageOnLaneOpponent: null, // lcu has no max cs advantage on lane opponent record
 
         doubleKills: participant.stats.doubleKills,

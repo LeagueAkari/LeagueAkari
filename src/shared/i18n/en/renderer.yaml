@@ -1756,7 +1756,7 @@ OngoingGame:
   disconnected: Not connected to the client
   waitingForSpectate: Waiting for spectate delay
   noOngoingGame: No ongoing game
-  disabled: Game analysis disabled, can be re-enabled in settings
+  disabled: Game analysis disabled, please re-enable this feature in settings
   avgTeamWinRate: Average Team Win Rate
   avgTeamKda: Average Team KDA
 

@@ -177,7 +177,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   } | null>(null)
   const additionalMembers = shallowRef<AdditionalTeamMembersResult>({
     teams: {},
-    selections: {}
+    selections: {},
+    teamParticipantGroups: {}
   })
 
   return {

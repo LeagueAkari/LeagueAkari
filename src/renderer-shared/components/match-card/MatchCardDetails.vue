@@ -43,6 +43,7 @@
     <KeepAlive>
       <MatchCardSummaryTab v-if="selectedTab === 'summary'" />
       <MatchCardDetailsTab v-else-if="selectedTab === 'details'" />
+      <MatchCardRunesTab v-else-if="selectedTab === 'runes'" />
       <MatchCardEventsTab v-else-if="selectedTab === 'events'" />
       <MatchCardLineChartTab v-else-if="selectedTab === 'line-chart'" />
       <MatchCardBuildsTab v-else-if="selectedTab === 'builds'" />
@@ -60,6 +61,7 @@ import MatchCardBuildsTab from './tabs/MatchCardBuildsTab.vue'
 import MatchCardDetailsTab from './tabs/MatchCardDetailsTab.vue'
 import MatchCardLineChartTab from './tabs/MatchCardDiffLineChartTab.vue'
 import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
+import MatchCardRunesTab from './tabs/MatchCardRunesTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
 import TabSwitch from './widgets/TabSwitch.vue'
 
@@ -76,6 +78,12 @@ const team = computed(() => {
   return teams.value.teamStatMap[selfStats.value.teamIdentifier]
 })
 
+const perksAvailable = computed(() => {
+  return participants.value.some((p) =>
+    p.perks.styles.some((s) => s.selections.some((s) => s.perk !== 0))
+  )
+})
+
 const selectedTab = ref('summary')
 const tabs = computed(() => {
   return [
@@ -86,6 +94,11 @@ const tabs = computed(() => {
     {
       label: '详细数据',
       value: 'details'
+    },
+    {
+      label: '符文',
+      value: 'runes',
+      show: perksAvailable.value
     },
     {
       label: '事件',

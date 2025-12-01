@@ -23,6 +23,7 @@ const {
   summary,
   puuid,
   details = null,
+  hidePrivacy = false,
   loadingDetails = false,
   replayState = 'checking'
 } = defineProps<{
@@ -30,6 +31,7 @@ const {
   details?: LcuOrSgpGameDetails | null
   theme?: 'light' | 'dark'
   puuid?: string
+  hidePrivacy?: boolean
 
   loadingDetails?: boolean
   replayState?: ReplayDownloadProgress['state']
@@ -51,6 +53,7 @@ provideMatchCard(
     summary: () => summary,
     puuid: () => puuid,
     details: () => details,
+    hidePrivacy: () => hidePrivacy,
     loadingDetails: () => loadingDetails,
     replayState: () => replayState
   },

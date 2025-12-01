@@ -320,6 +320,7 @@ interface Challenges {
   doubleAces?: number
   dragonTakedowns?: number
   earliestBaron?: number
+  earliestDragonTakedown?: number
   earlyLaningPhaseGoldExpAdvantage?: number
   effectiveHealAndShielding?: number
   elderDragonKillsWithOpposingSoul?: number

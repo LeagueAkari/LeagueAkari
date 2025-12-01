@@ -115,6 +115,7 @@
           <template #trigger>
             <div class="relative size-8 cursor-pointer">
               <ChampionIcon :champion-id="participant.championId" class="!size-full" round />
+
               <div
                 class="absolute -bottom-1 right-0 text-[10px] leading-none p-0.5 text-white/80 dark:bg-black/50 bg-black/70 rounded-full"
               >
@@ -152,29 +153,46 @@
           <NTooltip>
             <template #trigger>
               <div
-                class="text-xs truncate cursor-pointer"
+                class="text-xs cursor-pointer flex items-center gap-1"
                 @click="onNavigateToSummonerByPuuid(participant.puuid)"
                 @mousedown="handleMouseDown"
                 @mouseup="handleMouseUp($event, participant.puuid)"
                 :class="{ 'font-bold dark:text-white text-black': participant.puuid === puuid }"
               >
-                {{ participant.gameName }}
-                <template v-if="participant.tagLine"> #{{ participant.tagLine }}</template>
+                <NIcon
+                  class="dark:text-white/80 text-black/80"
+                  v-if="!participant.puuid || participant.puuid === EMPTY_PUUID"
+                >
+                  <Robot />
+                </NIcon>
+
+                <div class="truncate">
+                  <template v-if="hidePrivacy">
+                    {{ lcs.gameData.championName(participant.championId) }}
+                  </template>
+                  <template v-else>
+                    {{ participant.gameName }}
+                    <template v-if="participant.tagLine">#{{ participant.tagLine }}</template>
+                  </template>
+                </div>
               </div>
             </template>
-            <div class="flex items-center gap-1 text-xs">
+            <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
               <span class="font-bold">{{ participant.gameName }}</span>
               <span v-if="participant.tagLine" class="text-white/80"
                 >#{{ participant.tagLine }}</span
               >
             </div>
+            <div class="flex items-center gap-1 text-xs" v-else>
+              <span class="font-bold">{{ lcs.gameData.championName(participant.championId) }}</span>
+            </div>
           </NTooltip>
-          <div
-            v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
-            class="text-[11px] dark:text-white/60 text-black/60"
-          >
-            {{ position(participant.position) }}
-          </div>
+        </div>
+        <div
+          v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
+          class="text-[11px] dark:text-white/60 text-black/60"
+        >
+          {{ position(participant.position) }}
         </div>
       </div>
 
@@ -258,7 +276,10 @@ import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { NPopover, NTooltip } from 'naive-ui'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { EMPTY_PUUID } from '@shared/constants/common'
+import { Robot } from '@vicons/fa'
+import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -334,7 +355,10 @@ const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
 
-const { basicInfo, teams, participants, puuid, onNavigateToSummonerByPuuid } = useMatchCard()
+const { basicInfo, teams, participants, puuid, hidePrivacy, onNavigateToSummonerByPuuid } =
+  useMatchCard()
+
+const lcs = useLeagueClientStore()
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]

@@ -553,6 +553,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   }
 
   private _handleCannotGetUxCommandLine() {
+    const lcs = useLeagueClientStore()
     const lcux = useInstance(LeagueClientUxRenderer)
     const lcuxs = useLeagueClientUxStore()
     const as = useAppCommonStore()
@@ -564,9 +565,13 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     const app = useInstance(AppCommonRenderer)
 
     watch(
-      () => lcuxs.hasClientButNoCommandLine,
-      (v) => {
-        if (v) {
+      [
+        () => lcuxs.hasClientButNoCommandLine,
+        () =>
+          lcs.isDisconnected /* 在退出 lcux 后，lc 仍然会短暂停留并处理善后工作，考虑仅限未连接才会触发此提示 */
+      ],
+      ([hasClientButNoCommandLine, isDisconnected]) => {
+        if (hasClientButNoCommandLine && isDisconnected) {
           if (lcuxs.settings.useWmi) {
             const dl = dialog.warning({
               style: { width: '600px' },

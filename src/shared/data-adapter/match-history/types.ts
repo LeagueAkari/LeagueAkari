@@ -24,7 +24,7 @@ export type MatchParticipantPerkSelection = {
 }
 
 export type MatchParticipantPerkStyle = {
-  description: string | null
+  description: string
   selections: MatchParticipantPerkSelection[]
   style: number
 }
@@ -109,6 +109,7 @@ export type MatchParticipant = {
   knockEnemyIntoTeamAndKill: number | null
   killsNearEnemyTurret: number | null
   killsUnderOwnTurret: number | null
+  earliestDragonTakedown: number | null
   maxCsAdvantageOnLaneOpponent: number | null
   doubleKills: number
   tripleKills: number

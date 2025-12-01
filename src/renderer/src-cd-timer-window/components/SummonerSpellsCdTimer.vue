@@ -63,7 +63,6 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useCdTimerWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
@@ -77,7 +76,6 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const ctws = useCdTimerWindowStore()
-const sgps = useSgpStore()
 
 const wm = useInstance(WindowManagerRenderer)
 
@@ -205,7 +203,7 @@ const items = computed(() => {
   // 注意到, playerChampionSelections 中提供的列表的顺序是按照阵营排序好的
   // 因此在目前缺少必要的字段以区分阵营时, 只能通过这些数据来实现阵营判断
   // 期待日后 playerChampionSelections 能提供必要的 puuid 字段
-  const game = sgps.data.gsmGame?.game || lcs.gameflow.session.gameData
+  const game = lcs.gameflow.session.gameData
 
   const selections = game.playerChampionSelections
   const teamOne = game.teamOne

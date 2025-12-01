@@ -229,6 +229,14 @@
             <!-- player champion avatar -->
             <ChampionIcon :champion-id="player.championId" class="size-4 shrink-0 rounded" />
 
+            <!-- maybe a bot player -->
+            <NIcon
+              class="dark:text-white/80 text-black/80"
+              v-if="!player.puuid || player.puuid === EMPTY_PUUID"
+            >
+              <Robot />
+            </NIcon>
+
             <NTooltip :keep-alive-on-hover="false">
               <template #trigger>
                 <div
@@ -241,12 +249,15 @@
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
-                  {{ player.gameName }}
+                  {{ hidePrivacy ? lcs.gameData.championName(player.championId) : player.gameName }}
                 </div>
               </template>
-              <div class="flex items-center gap-1 text-xs">
+              <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+              </div>
+              <div class="flex items-center gap-1 text-xs" v-else>
+                <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
               </div>
             </NTooltip>
           </div>
@@ -279,6 +290,13 @@
             <!-- player champion avatar -->
             <ChampionIcon :champion-id="player.championId" class="size-4 shrink-0 rounded" />
 
+            <NIcon
+              class="dark:text-white/80 text-black/80"
+              v-if="!player.puuid || player.puuid === EMPTY_PUUID"
+            >
+              <Robot />
+            </NIcon>
+
             <NTooltip :keep-alive-on-hover="false">
               <template #trigger>
                 <div
@@ -291,12 +309,15 @@
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
-                  {{ player.gameName }}
+                  {{ hidePrivacy ? lcs.gameData.championName(player.championId) : player.gameName }}
                 </div>
               </template>
-              <div class="flex items-center gap-1 text-xs">
+              <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+              </div>
+              <div class="flex items-center gap-1 text-xs" v-else>
+                <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
               </div>
             </NTooltip>
           </div>
@@ -331,7 +352,8 @@
 <script lang="ts" setup>
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { Crown } from '@vicons/fa'
+import { EMPTY_PUUID } from '@shared/constants/common'
+import { Crown, Robot } from '@vicons/fa'
 import { Triangle12Filled } from '@vicons/fluent'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -354,8 +376,15 @@ defineEmits<{
   'toggle-expand': []
 }>()
 
-const { puuid, basicInfo, teams, participants, isExpanded, onNavigateToSummonerByPuuid } =
-  useMatchCard()
+const {
+  puuid,
+  basicInfo,
+  teams,
+  participants,
+  isExpanded,
+  hidePrivacy,
+  onNavigateToSummonerByPuuid
+} = useMatchCard()
 
 const gameResultName = useGameResultName()
 

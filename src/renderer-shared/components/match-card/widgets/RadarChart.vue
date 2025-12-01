@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { noZero } from '@shared/data-adapter/utils'
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js'
 import { computed } from 'vue'
@@ -16,7 +17,9 @@ const { puuid } = defineProps<{
   puuid?: string
 }>()
 
-const { teams, participants, theme } = useMatchCard()
+const { teams, participants, theme, hidePrivacy } = useMatchCard()
+
+const lcs = useLeagueClientStore()
 
 // 可被替换
 const isDark = computed(() => theme.value === 'dark')
@@ -69,6 +72,14 @@ const chartColors = computed(() => {
 
 const participant = computed(() => {
   return participants.value.find((p) => p.puuid === puuid)
+})
+
+const selfName = computed(() => {
+  if (!participant.value) return null
+
+  if (hidePrivacy.value) return lcs.gameData.championName(participant.value.championId)
+
+  return `${participant.value.gameName} #${participant.value.tagLine}`
 })
 
 const team = computed(() => {
@@ -181,9 +192,7 @@ const data = computed<ChartData<'radar'>>(() => {
     ],
     datasets: [
       {
-        label: participant.value
-          ? `${participant.value?.gameName} #${participant.value?.tagLine}`
-          : puuid,
+        label: selfName.value ?? puuid,
         backgroundColor: chartColors.value.player.background,
         borderColor: chartColors.value.player.border,
         borderWidth: 2,

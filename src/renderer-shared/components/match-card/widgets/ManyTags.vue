@@ -58,13 +58,13 @@
 <script lang="ts" setup>
 import { useResizeObserver } from '@vueuse/core'
 import { NPopover } from 'naive-ui'
-import { VNodeChild, createTextVNode, shallowRef, useTemplateRef } from 'vue'
+import { VNodeChild, h, shallowRef, useTemplateRef } from 'vue'
 
 import { usePlayerTags } from '../utils/tags'
 
 const renderChild = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return createTextVNode(node)
+    return h('span', { class: 'text-xs' }, node)
   }
 
   return { render: node }

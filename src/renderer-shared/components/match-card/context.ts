@@ -21,6 +21,7 @@ export type MatchCardContext = {
   puuid: Readonly<Ref<string | undefined>>
   details: Readonly<Ref<LcuOrSgpGameDetails | null | undefined>>
   summary: Readonly<Ref<LcuOrSgpGameSummary>>
+  hidePrivacy: Readonly<Ref<boolean>>
 
   loadingDetails: Readonly<Ref<boolean>>
   replayState: Readonly<Ref<ReplayDownloadProgress['state']>>
@@ -59,6 +60,7 @@ export function provideMatchCard(
     summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
     puuid: MaybeRefOrGetter<string | undefined>
     details: MaybeRefOrGetter<LcuOrSgpGameDetails | null>
+    hidePrivacy: MaybeRefOrGetter<boolean>
     loadingDetails: MaybeRefOrGetter<boolean>
     replayState: MaybeRefOrGetter<ReplayDownloadProgress['state']>
   },
@@ -99,6 +101,7 @@ export function provideMatchCard(
     puuid: toRef(props.puuid),
     loadingDetails: toRef(props.loadingDetails),
     replayState: toRef(props.replayState),
+    hidePrivacy: toRef(props.hidePrivacy),
 
     // computed states
     basicInfo,

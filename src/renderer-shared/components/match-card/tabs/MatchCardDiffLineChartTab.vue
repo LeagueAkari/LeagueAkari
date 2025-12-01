@@ -101,6 +101,7 @@
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { MatchParticipant } from '@shared/data-adapter/match-history/types'
 import {
   NButton,
   NCheckbox,
@@ -121,8 +122,17 @@ const lcs = useLeagueClientStore()
 
 const teamName = useTeamName()
 
-const { basicInfo, details, frames, participants, teams, theme, loadingDetails, onLoadDetails } =
-  useMatchCard()
+const {
+  basicInfo,
+  details,
+  frames,
+  participants,
+  teams,
+  theme,
+  loadingDetails,
+  onLoadDetails,
+  hidePrivacy
+} = useMatchCard()
 
 const selectedMetric = ref<'gold' | 'cs' | 'exp'>('gold')
 
@@ -281,13 +291,25 @@ const chartData = computed(() => {
     }
   }
 
+  const getName = (
+    participantId: number,
+    participant?: MatchParticipant,
+    hidePrivacy: boolean = false
+  ) => {
+    if (!participant) return `玩家 ${participantId}`
+
+    if (hidePrivacy) return lcs.gameData.championName(participant.championId)
+
+    return `${participant.gameName} #${participant.tagLine}`
+  }
+
   // 玩家个人数据
   const playerDatasets = Array.from({ length: participants.value.length }, (_, i) => {
     const participantId = i + 1 // participantId 从 1 开始
     const participant = participants.value.find((p) => p.participantId === participantId)
 
     return {
-      label: participant?.gameName || `玩家 ${participantId}`,
+      label: getName(participantId, participant, hidePrivacy.value),
       data: extractMetricData(participantId, selectedMetric.value),
       borderColor: playerColors[i % playerColors.length],
       backgroundColor: playerColors[i % playerColors.length] + '40', // 添加透明度

@@ -178,8 +178,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handleLoad() {
     // summoner / ranked stats / saved info / champion mastery
     this._mobx.reaction(
-      () => this.state.teams,
-      (teams) => {
+      () => ({
+        enabled: this.settings.enabled,
+        teams: this.state.teams
+      }),
+      ({ enabled, teams }) => {
+        if (!enabled) {
+          return
+        }
+
         const puuids = Object.values(teams).flat()
 
         this._updateSummoners(puuids)
@@ -187,19 +194,24 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         this._updateSavedInfo(puuids)
         this._updateChampionMasteries(puuids)
       },
-      { delay: 500 } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
+      { delay: 500, fireImmediately: true } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
     )
 
     // match history
     this._mobx.reaction(
       () => ({
+        enabled: this.settings.enabled,
         teams: this.state.teams,
         apiShouldUse: this.state.apiShouldUse,
         sgpTokenReady: this._sgp.state.isTokenReady,
         count: this.settings.matchHistoryLoadCount,
         params: this.state.matchHistoryTagParams
       }),
-      ({ count, params, apiShouldUse, sgpTokenReady }) => {
+      ({ enabled, count, params, apiShouldUse, sgpTokenReady }) => {
+        if (!enabled) {
+          return
+        }
+
         // wait for sgp token ready if needed
         if (apiShouldUse === 'sgp' && !sgpTokenReady) {
           return
@@ -213,19 +225,23 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           apiShouldUse as 'sgp' | 'lcu'
         )
       },
-      { delay: 500 }
+      { delay: 500, fireImmediately: true }
     )
 
     this._mobx.reaction(
-      () => this.state.queryStage.phase === 'unavailable',
-      (shouldClean) => {
-        if (shouldClean) {
-          this._log.info('Query stage is unavailable, clearing ongoing game state')
+      () => ({
+        isDisabled: !this.settings.enabled,
+        isUnavailable: this.state.queryStage.phase === 'unavailable'
+      }),
+      ({ isDisabled, isUnavailable }) => {
+        if (isUnavailable || isDisabled) {
+          this._log.info('Clearing ongoing game state')
           this._queueKeeper.cancelAll()
           this.state.clear()
           return
         }
-      }
+      },
+      { equals: comparer.shallow }
     )
 
     const currentQueueId = computed(() => {
@@ -949,7 +965,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this.state.clear()
     this._ipc.sendEvent(OngoingGameMain.id, 'clear')
 
-    const puuids = Object.keys(this.state.teams).flat()
+    const puuids = Object.values(this.state.teams).flat()
 
     this._updateSummoners(puuids, true)
     this._updateRankedStats(puuids, true)
@@ -1266,8 +1282,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     const extractTeamMembers = (
       gameMode: string,
-      teamOne: { puuid: string; championId: number }[],
-      teamTwo: { puuid: string; championId: number }[]
+      teamOne: { puuid: string; championId: number; teamParticipantId: number }[],
+      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
     ): AdditionalTeamMembersResult => {
       const all = [...teamOne, ...teamTwo].filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
 
@@ -1279,6 +1295,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           selections: all.reduce(
             (acc, p) => {
               acc[p.puuid] = p.championId
+              return acc
+            },
+            {} as Record<string, number>
+          ),
+          teamParticipantGroups: all.reduce(
+            (acc, p) => {
+              acc[p.puuid] = p.teamParticipantId
               return acc
             },
             {} as Record<string, number>
@@ -1294,6 +1317,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         selections: all.reduce(
           (acc, p) => {
             acc[p.puuid] = p.championId
+            return acc
+          },
+          {} as Record<string, number>
+        ),
+        teamParticipantGroups: all.reduce(
+          (acc, p) => {
+            acc[p.puuid] = p.teamParticipantId
             return acc
           },
           {} as Record<string, number>
@@ -1318,10 +1348,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
           const mergedTeams = {} as Record<string, string[]>
           const mergedSelections = {} as Record<string, number>
+          const mergedTeamParticipantGroups = {} as Record<string, number>
 
           if (gsmGameMembers1.status === 'fulfilled' && gsmGameMembers1.value) {
             const { teamOne, teamTwo } = gsmGameMembers1.value
-            const { teams, selections } = extractTeamMembers(
+            const { teams, selections, teamParticipantGroups } = extractTeamMembers(
               gsmGameMembers1.value.gameMode,
               teamOne,
               teamTwo
@@ -1336,11 +1367,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             }
 
             Object.assign(mergedSelections, selections)
+            Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
           }
 
           if (spectator.status === 'fulfilled' && spectator.value) {
             const { teamOne, teamTwo } = spectator.value
-            const { teams, selections } = extractTeamMembers(
+            const { teams, selections, teamParticipantGroups } = extractTeamMembers(
               spectator.value.gameMode,
               teamOne,
               teamTwo
@@ -1355,14 +1387,17 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             }
 
             Object.assign(mergedSelections, selections)
+            Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
           }
 
           this.state.setAdditionalMembers({
             teams: mergedTeams,
-            selections: mergedSelections
+            selections: mergedSelections,
+            teamParticipantGroups: mergedTeamParticipantGroups
           })
         })
-      }
+      },
+      { delay: 500, fireImmediately: true }
     )
   }
 }

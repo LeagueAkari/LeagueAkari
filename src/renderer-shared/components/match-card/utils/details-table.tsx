@@ -167,6 +167,7 @@ export const STAT_KEY_TRANSLATIONS: Record<string, string> = {
   soloBaronKills: '单杀大龙',
   baronBuffGoldAdvantageOverThreshold: '大龙Buff金币优势',
   earliestBaron: '最早大龙时间',
+  earliestDragonTakedown: '最早小龙时间',
   elderDragonKillsWithOpposingSoul: '敌方有龙魂时的远古龙',
   elderDragonMultikills: '远古龙增益多杀',
   perfectDragonSoulsTaken: '完美龙魂',
@@ -505,6 +506,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'baronTakedowns', render: 'integer' }, // sgp challenges
       { key: 'baronBuffGoldAdvantageOverThreshold', render: 'integer' }, // sgp challenges
       { key: 'earliestBaron', render: 'game-time' }, // sgp challenges
+      { key: 'earliestDragonTakedown', render: 'game-time' }, // sgp challenges
       { key: 'dragonTakedowns', render: 'integer' }, // sgp challenges
       { key: 'riftHeraldTakedowns', render: 'integer' }, // sgp challenges
       { key: 'teamBaronKills', render: 'integer' }, // sgp challenges
