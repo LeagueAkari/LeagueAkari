@@ -1,15 +1,103 @@
 import { Team } from '@shared/types/league-client/match-history'
 
 import { LcuOrSgpGameSummary } from '../wrapper'
-import {
-  AggregateTeamStats,
-  MatchBasicInfo,
-  MatchParticipant,
-  MatchTeamInfo,
-  MatchTeamStats,
-  TeamsAdapterResult
-} from './types'
-import { computeWinResult } from './win-result'
+import { MatchBasicInfo } from './match-basic'
+import { MatchParticipant } from './participants'
+import { WinResult, computeWinResult } from './win-result'
+
+export type MatchTeamBan = {
+  championId: number
+  pickTurn: number
+}
+
+export type MatchTeamObjectiveStats = {
+  first: boolean | null
+  kills: number | null
+}
+
+export type MatchTeamObjectives = {
+  atakhan: MatchTeamObjectiveStats | null
+  baron: MatchTeamObjectiveStats
+  champion: MatchTeamObjectiveStats | null
+  dragon: MatchTeamObjectiveStats
+  horde: MatchTeamObjectiveStats
+  inhibitor: MatchTeamObjectiveStats
+  riftHerald: MatchTeamObjectiveStats
+  tower: MatchTeamObjectiveStats
+}
+
+export type MatchTeamInfo = {
+  bans: MatchTeamBan[]
+  win: boolean | string
+  teamId: number
+  objectives: MatchTeamObjectives
+}
+
+export type MatchTeamStats = {
+  teamIdentifier: string
+  teamInfo: MatchTeamInfo | null // 如 CHERRY 模式，teamInfo 则没有必要
+  winResult: WinResult
+  isSurrender: boolean
+  win: boolean
+  subteamPlacement: number
+  maxDamageDealtToChampions: number
+  totalDamageDealtToChampions: number
+  maxDamageTaken: number
+  totalDamageTaken: number
+  maxGoldEarned: number
+  totalGoldEarned: number
+  maxKills: number
+  totalKills: number
+  totalDeaths: number
+  totalAssists: number
+  maxCs: number
+  totalCs: number
+  maxDamageToTowers: number
+  totalDamageToTowers: number
+  maxHeal: number
+  totalHeal: number
+  maxKda: number
+  totalKda: number
+  maxKillParticipation: number
+  totalKillParticipation: number
+  maxTimeCCDealt: number
+  maxDamageShieldedOnTeammates: number | null // sgp only
+  totalDamageShieldedOnTeammates: number | null // sgp only
+}
+
+export type AggregateTeamStats = {
+  teamIdentifier: string
+  bans: MatchTeamBan[]
+  maxDamageDealtToChampions: number
+  totalDamageDealtToChampions: number
+  maxDamageTaken: number
+  totalDamageTaken: number
+  maxGoldEarned: number
+  totalGoldEarned: number
+  maxKills: number
+  totalKills: number
+  totalDeaths: number
+  totalAssists: number
+  maxCs: number
+  totalCs: number
+  maxDamageToTowers: number
+  totalDamageToTowers: number
+  maxHeal: number
+  totalHeal: number
+  maxKda: number
+  totalKda: number
+  maxKillParticipation: number
+  totalKillParticipation: number
+  maxTimeCCDealt: number
+  maxDamageShieldedOnTeammates: number | null // sgp only
+  totalDamageShieldedOnTeammates: number | null // sgp only
+}
+
+export type TeamsAdapterResult = {
+  teamStatMap: Record<string, MatchTeamStats>
+  teamStatsArr: MatchTeamStats[]
+  allTeamStats: AggregateTeamStats
+}
 
 // 截至至 2025-11-08 部分数据映射关系
 function mapLcuToObjectives(team: Team): MatchTeamInfo {
@@ -130,11 +218,11 @@ export function toTeams(
         totalKillParticipation: teamParticipants.reduce((acc, p) => acc + p.killParticipation, 0),
         maxTimeCCDealt: Math.max(...teamParticipants.map((p) => p.totalTimeCCDealt)),
         maxDamageShieldedOnTeammates:
-          teamParticipants[0].totalDamageShieldedOnTeammates !== null
+          teamParticipants[0]?.totalDamageShieldedOnTeammates !== null
             ? Math.max(...teamParticipants.map((p) => p.totalDamageShieldedOnTeammates ?? 0))
             : null,
         totalDamageShieldedOnTeammates:
-          teamParticipants[0].totalDamageShieldedOnTeammates !== null
+          teamParticipants[0]?.totalDamageShieldedOnTeammates !== null
             ? teamParticipants.reduce((acc, p) => acc + (p.totalDamageShieldedOnTeammates ?? 0), 0)
             : null
       }
@@ -169,11 +257,11 @@ export function toTeams(
     totalKillParticipation: teamStatsArr.reduce((acc, t) => acc + t.totalKillParticipation, 0),
     maxTimeCCDealt: Math.max(...teamStatsArr.map((t) => t.maxTimeCCDealt)),
     maxDamageShieldedOnTeammates:
-      teamStatsArr[0].maxDamageShieldedOnTeammates !== null
+      teamStatsArr[0]?.maxDamageShieldedOnTeammates !== null
         ? Math.max(...teamStatsArr.map((t) => t.maxDamageShieldedOnTeammates ?? 0))
         : null,
     totalDamageShieldedOnTeammates:
-      teamStatsArr[0].totalDamageShieldedOnTeammates !== null
+      teamStatsArr[0]?.totalDamageShieldedOnTeammates !== null
         ? teamStatsArr.reduce((acc, t) => acc + (t.totalDamageShieldedOnTeammates ?? 0), 0)
         : null
   }

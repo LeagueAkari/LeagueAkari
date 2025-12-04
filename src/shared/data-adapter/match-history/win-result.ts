@@ -1,4 +1,9 @@
-import { WinResultInfo } from './types'
+export type WinResult = 'win' | 'lose' | 'remake' | 'abort'
+
+export type WinResultInfo = {
+  isSurrender: boolean
+  result: WinResult
+}
 
 export function computeWinResult(
   endOfGameResult: string,

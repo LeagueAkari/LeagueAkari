@@ -238,6 +238,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           this._log.info('Clearing ongoing game state')
           this._queueKeeper.cancelAll()
           this.state.clear()
+          this._ipc.sendEvent(OngoingGameMain.id, 'clear')
           return
         }
       },
@@ -431,6 +432,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           this._log.info('Game details hit cache', 'lcu', gameId)
           runInAction(() => (this.state.gameDetails[gameId] = cached))
           this._ipc.sendEvent(OngoingGameMain.id, 'game-details-loaded', gameId, cached)
+          return
+        }
+
+        if (this._queueKeeper.hasTask(`lcu-game-details:${gameId}`)) {
+          this._log.debug('Game details already in queue', 'lcu', gameId)
           return
         }
 
@@ -694,6 +700,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             return
           }
 
+          if (this._queueKeeper.hasTask(`lcu-game-summary:${gameId}`)) {
+            this._log.debug('Game summary already in queue', 'lcu', gameId)
+            return
+          }
+
           try {
             const { data } = await this._queueKeeper.add(
               'misc',
@@ -729,7 +740,9 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
         await Promise.allSettled(data.games.games.map((g) => loadGame(g.gameId)))
 
-        const games = data.games.games.map((g) => detailedGameMap[g.gameId] || g)
+        const games = data.games.games.map(
+          (g) => detailedGameMap[g.gameId] || { gameId: g.gameId, source: 'lcu', data: g }
+        )
 
         const toBeLoaded = {
           data: games,

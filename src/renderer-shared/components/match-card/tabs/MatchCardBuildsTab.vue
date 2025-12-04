@@ -71,7 +71,7 @@
 
             <div
               v-if="sk.displayLevel"
-              class="absolute z-1 -bottom-1 -right-1 text-[8px] leading-none py-0.5 bg-black/60 rounded text-white min-w-3 text-center"
+              class="absolute z-1 -bottom-1 -right-1 text-8px leading-none py-0.5 bg-black/60 rounded text-white min-w-3 text-center"
             >
               {{ sk.displayLevel }}
             </div>
@@ -103,7 +103,7 @@
               <ItemDisplay :item-id="item.itemId" :size="28" />
 
               <!-- Timestamp -->
-              <div class="text-[9px] dark:text-white/50 text-black/80 whitespace-nowrap">
+              <div class="text-9px dark:text-white/50 text-black/80 whitespace-nowrap">
                 {{ formatMilliseconds(item.timestamp) }}
               </div>
             </template>

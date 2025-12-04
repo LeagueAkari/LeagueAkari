@@ -1,9 +1,11 @@
 import { Game, GameTimeline, MatchHistory } from '@shared/types/league-client/match-history'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   SgpGameDetailsLol,
   SgpGameSummaryLol,
   SgpMatchHistoryLol
 } from '@shared/types/sgp/match-history'
+import { SgpSummonerLol } from '@shared/types/sgp/summoner'
 
 export type LcuGameSummary = {
   gameId: number
@@ -44,3 +46,16 @@ export type SgpMatchHistory = {
 }
 
 export type LcuOrSgpMatchHistory = LcuMatchHistory | SgpMatchHistory
+
+export type LcuSummoner = {
+  source: 'lcu'
+  puuid: string
+  data: SummonerInfo
+}
+
+export type SgpSummoner = {
+  source: 'sgp'
+  puuid: string
+  data: SgpSummonerLol
+}
+export type SgpOrLcuSummoner = SgpSummoner | LcuSummoner

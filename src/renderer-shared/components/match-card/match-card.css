@@ -1,38 +1,38 @@
 [data-theme='dark'] .shadow-win {
   background: radial-gradient(
-    80% 140% at 0% 0%,
-    rgba(16, 185, 171, 0.14) 0%,
+    96% 168% at 0% 0%,
+    rgba(16, 185, 137, 0.2) 0%,
     rgba(16, 185, 129, 0) 100%
   );
 }
 
 .shadow-win {
   background: radial-gradient(
-    80% 140% at 0% 0%,
-    rgba(16, 185, 171, 0.34) 0%,
+    96% 168% at 0% 0%,
+    rgba(16, 185, 171, 0.5) 0%,
     rgba(16, 185, 129, 0) 100%
   );
 }
 
 [data-theme='dark'] .shadow-lose {
   background: radial-gradient(
-    80% 140% at 0% 0%,
-    rgba(239, 68, 68, 0.14) 0%,
+    96% 168% at 0% 0%,
+    rgba(239, 68, 68, 0.2) 0%,
     rgba(239, 68, 68, 0) 100%
   );
 }
 
 .shadow-lose {
   background: radial-gradient(
-    80% 140% at 0% 0%,
-    rgba(239, 68, 68, 0.34) 0%,
+    96% 168% at 0% 0%,
+    rgba(239, 68, 68, 0.5) 0%,
     rgba(239, 68, 68, 0) 100%
   );
 }
 
 [data-theme='dark'] .shadow-remake {
   background: radial-gradient(
-    80% 140% at 0% 0%,
+    96% 168% at 0% 0%,
     rgba(255, 255, 255, 0.14) 0%,
     rgba(255, 255, 255, 0) 100%
   );
@@ -40,8 +40,8 @@
 
 .shadow-remake {
   background: radial-gradient(
-    80% 140% at 0% 0%,
-    rgba(255, 255, 255, 0.24) 0%,
+    96% 168% at 0% 0%,
+    rgba(255, 255, 255, 0.2) 0%,
     rgba(255, 255, 255, 0) 100%
   );
 }

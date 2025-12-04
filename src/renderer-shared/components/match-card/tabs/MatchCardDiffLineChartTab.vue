@@ -101,7 +101,7 @@
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { MatchParticipant } from '@shared/data-adapter/match-history/types'
+import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import {
   NButton,
   NCheckbox,

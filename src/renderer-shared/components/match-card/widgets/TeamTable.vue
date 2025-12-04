@@ -117,7 +117,7 @@
               <ChampionIcon :champion-id="participant.championId" class="!size-full" round />
 
               <div
-                class="absolute -bottom-1 right-0 text-[10px] leading-none p-0.5 text-white/80 dark:bg-black/50 bg-black/70 rounded-full"
+                class="absolute -bottom-1 right-0 text-10px leading-none p-0.5 text-white/80 dark:bg-black/50 bg-black/70 rounded-full"
               >
                 {{ participant.level }}
               </div>
@@ -149,7 +149,7 @@
         </div>
 
         <!-- name & position -->
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-0 flex flex-col">
           <NTooltip>
             <template #trigger>
               <div
@@ -187,12 +187,12 @@
               <span class="font-bold">{{ lcs.gameData.championName(participant.championId) }}</span>
             </div>
           </NTooltip>
-        </div>
-        <div
-          v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
-          class="text-[11px] dark:text-white/60 text-black/60"
-        >
-          {{ position(participant.position) }}
+          <div
+            v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
+            class="text-11px dark:text-white/60 text-black/60"
+          >
+            {{ position(participant.position) }}
+          </div>
         </div>
       </div>
 
@@ -204,7 +204,7 @@
               (participant.killParticipation * 100).toFixed(0)
             }}%)
           </div>
-          <div class="dark:text-white/60 text-black/60 text-[11px]">
+          <div class="dark:text-white/60 text-black/60 text-11px">
             {{ participant.kda.toFixed(2) }} KDA
           </div>
         </div>
@@ -215,6 +215,13 @@
             v-for="aug in participant.augments.slice(0, 5)"
             :key="aug"
             :augment-id="aug"
+            :size="20"
+          />
+          <!-- in rare case, show the 6th augment if it exists -->
+          <AugmentDisplay
+            v-if="participant.augments[5]"
+            :key="participant.augments[5]"
+            :augment-id="participant.augments[5]"
             :size="20"
           />
         </div>
@@ -240,16 +247,16 @@
         <!-- cs -->
         <div v-else-if="column.name === 'cs'" :class="column.class">
           <div class="text-xs">{{ participant.cs }} CS</div>
-          <div class="dark:text-white/60 text-black/60 text-[11px]">
-            {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }} / Min
+          <div class="dark:text-white/60 text-black/60 text-11px">
+            {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }} / 分钟
           </div>
         </div>
 
         <!-- gold -->
         <div v-else-if="column.name === 'gold'" :class="column.class">
           <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }} K</div>
-          <div class="dark:text-white/60 text-black/60 text-[11px]">
-            {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }} / Min
+          <div class="dark:text-white/60 text-black/60 text-11px">
+            {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }} / 分钟
           </div>
         </div>
 
@@ -303,29 +310,29 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   switch (basicInfo.value.gameMode) {
     case 'CHERRY':
       return [
-        { name: 'kda', class: 'w-26 text-center' },
-        { name: 'augments', class: 'w-30 flex gap-0.5 justify-center' },
-        { name: 'damage', class: 'w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[800px]:block w-18 text-center' },
-        { name: 'gold', class: 'hidden @[740px]:block w-18 text-xs text-center' },
+        { name: 'kda', class: 'min-w-26 text-center' },
+        { name: 'augments', class: 'min-w-30 flex gap-0.5 justify-center' },
+        { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[800px]:block min-w-18 text-center' },
+        { name: 'gold', class: 'hidden @[740px]:block min-w-18 text-xs text-center' },
         { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
       ]
     case 'KIWI':
       return [
-        { name: 'kda', class: 'w-26 text-center' },
-        { name: 'augments', class: 'w-30 flex gap-0.5 justify-center' },
-        { name: 'damage', class: 'w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[740px]:block w-18 text-center' },
-        { name: 'gold', class: 'hidden @[700px]:block w-18 text-xs text-center' },
-        { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
+        { name: 'kda', class: 'min-w-26 text-center' },
+        { name: 'augments', class: 'min-w-29 flex gap-0.5 justify-center' },
+        { name: 'damage', class: 'min-w-30 flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[740px]:block min-w-18 text-center' },
+        { name: 'gold', class: 'hidden @[700px]:block min-w-18 text-xs text-center' },
+        { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
       ]
     default:
       return [
-        { name: 'kda', class: 'w-26 text-center' },
-        { name: 'damage', class: 'w-32 flex gap-2 justify-center' },
+        { name: 'kda', class: 'min-w-26 text-center' },
+        { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
         { name: 'cs', class: 'hidden @[700px]:block w-18 text-center' },
-        { name: 'gold', class: ' w-18 text-xs text-center' },
-        { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
+        { name: 'gold', class: 'min-w-18 text-xs text-center' },
+        { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
       ]
   }
 })

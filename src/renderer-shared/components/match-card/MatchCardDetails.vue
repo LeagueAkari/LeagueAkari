@@ -1,7 +1,7 @@
 <template>
   <!-- expanded details -->
   <div
-    class="@container w-full p-2 rounded dark:border-white/20 border-black/20 b b-solid relative overflow-hidden mt-1 box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
+    class="@container w-full p-2 rounded dark:border-white/20 border-black/20 b b-solid relative overflow-hidden mt-1 box-border transition-width dark:bg-neutral-900/95 bg-neutral-100/95"
   >
     <!-- header -->
     <div class="flex gap-1 items-center mb-2">

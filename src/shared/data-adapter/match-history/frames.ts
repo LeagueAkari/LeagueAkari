@@ -1,7 +1,13 @@
 import { TimelineFrame } from '@shared/types/league-client/match-history'
-import { DetailedTimelineFrame } from '@shared/types/sgp/match-history'
+import { DetailedChampionKillEvent, DetailedTimelineFrame } from '@shared/types/sgp/match-history'
 
 import { LcuOrSgpGameDetails } from '../wrapper'
+
+export function isSgpChampionKillEvent(event: any): event is DetailedChampionKillEvent {
+  if (typeof event !== 'object') return false
+
+  return Array.isArray(event.victimDamageDealt) && Array.isArray(event.victimDamageReceived)
+}
 
 export function toFrames(details: LcuOrSgpGameDetails): (DetailedTimelineFrame | TimelineFrame)[] {
   const { source, data } = details

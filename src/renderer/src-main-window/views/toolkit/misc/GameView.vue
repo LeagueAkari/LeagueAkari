@@ -8,7 +8,7 @@
     <MatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGameId || 0"
-      source="lcu"
+      :source="as.settings.preferredLolSource"
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <ControlItem
@@ -31,6 +31,7 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
@@ -38,6 +39,8 @@ import { ref } from 'vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const { t } = useTranslation()
+
+const as = useAppCommonStore()
 
 const gameId = ref<number>()
 const previewingGameId = ref<number>()

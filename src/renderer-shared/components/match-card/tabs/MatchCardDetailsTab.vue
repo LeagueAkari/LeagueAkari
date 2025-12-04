@@ -1,15 +1,15 @@
 <template>
   <NScrollbar x-scrollable class="max-h-142 rounded b-solid dark:b-white/5 b-black/5 b-1 b-b-0">
     <div class="flex items-center gap-4 px-2 py-1 dark:bg-white/5 bg-black/5 mb-1">
-      <div class="text-[11px] dark:text-white/60 text-black/80" v-if="!hidePrivacy">
+      <div class="text-11px dark:text-white/60 text-black/80" v-if="!hidePrivacy">
         游戏 ID: <span class="select-text">{{ basicInfo.gameId }}</span> ({{
           basicInfo.dataSource
         }})
       </div>
-      <div class="text-[11px] dark:text-white/60 text-black/80">
+      <div class="text-11px dark:text-white/60 text-black/80">
         {{ dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}
       </div>
-      <div class="text-[11px] dark:text-white/60 text-black/80">
+      <div class="text-11px dark:text-white/60 text-black/80">
         游戏版本: <span class="select-text">{{ basicInfo.gameVersion }}</span>
       </div>
     </div>

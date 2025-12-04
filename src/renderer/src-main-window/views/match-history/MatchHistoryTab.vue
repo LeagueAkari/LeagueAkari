@@ -653,6 +653,7 @@
               :replay-state="tab.matchHistoryPage?.replayMetadata[g.gameId]?.state"
               :details="tab.matchHistoryPage?.details[g.gameId]"
               :loading-details="tab.matchHistoryPage?.detailsLoading[g.gameId]"
+              :hide-privacy="as.settings.streamerMode"
             />
             <div
               class="match-history-empty-placeholder"
@@ -1979,7 +1980,7 @@ defineExpose({
     position: absolute;
     bottom: -4px;
     right: -4px;
-    background-color: #00000060;
+    background-color: rgba(0, 0, 0, 0.376);
     padding: 2px 4px;
     border-radius: 4px;
   }

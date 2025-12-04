@@ -2,8 +2,109 @@ import { Participant } from '@shared/types/league-client/match-history'
 
 import { noZero } from '../utils'
 import { LcuOrSgpGameSummary } from '../wrapper'
-import { MatchBasicInfo, MatchParticipant, MatchParticipantPerks } from './types'
-import { computeWinResult } from './win-result'
+import { MatchBasicInfo } from './match-basic'
+import { WinResult, computeWinResult } from './win-result'
+
+export type MatchParticipantPerkSelection = {
+  perk: number
+  var1: number
+  var2: number
+  var3: number
+}
+
+export type MatchParticipantPerkStyle = {
+  description: string
+  selections: MatchParticipantPerkSelection[]
+  style: number
+}
+
+export type MatchParticipantStatPerks = {
+  offense: number
+  flex: number
+  defense: number
+}
+
+export type MatchParticipantPerks = {
+  statPerks: MatchParticipantStatPerks | null
+  styles: MatchParticipantPerkStyle[]
+}
+
+export type MatchParticipantPings = {
+  allInPings: number
+  assistMePings: number
+  basicPings: number
+  commandPings: number
+  dangerPings: number
+  enemyMissingPings: number
+  enemyVisionPings: number
+  getBackPings: number
+  holdPings: number
+  needVisionPings: number
+  onMyWayPings: number
+  pushPings: number
+  retreatPings: number
+  visionClearedPings: number
+}
+
+export type MatchParticipant = {
+  puuid: string
+  participantId: number
+  gameName: string
+  tagLine: string
+  profileIconId: number
+  championId: number
+  position: string | null
+  teamId: number
+  playerSubteamId: number
+  teamIdentifier: string
+  items: number[]
+  augments: number[]
+  spells: number[]
+  perks: MatchParticipantPerks
+  level: number
+  kills: number
+  deaths: number
+  assists: number
+  kda: number
+  killParticipation: number
+  totalDamageDealtToChampions: number
+  physicalDamageDealtToChampions: number
+  magicDamageDealtToChampions: number
+  trueDamageDealtToChampions: number
+  totalDamageTaken: number
+  physicalDamageTaken: number
+  magicDamageTaken: number
+  trueDamageTaken: number
+  goldEarned: number
+  goldSpent: number
+  neutralMinionsKilled: number
+  totalMinionsKilled: number
+  cs: number
+  win: boolean
+  isSurrender: boolean
+  winResult: WinResult
+  subteamPlacement: number
+  gameEndedInEarlySurrender: boolean
+  gameEndedInSurrender: boolean
+  teamEarlySurrendered: boolean
+  totalDamageToTowers: number
+  totalHeal: number
+  visionScore: number
+  totalTimeCCDealt: number
+  soloKills: number | null
+  effectiveHealAndShielding: number | null
+  totalDamageShieldedOnTeammates: number | null
+  pings: MatchParticipantPings | null
+  knockEnemyIntoTeamAndKill: number | null
+  killsNearEnemyTurret: number | null
+  killsUnderOwnTurret: number | null
+  earliestDragonTakedown: number | null
+  maxCsAdvantageOnLaneOpponent: number | null
+  doubleKills: number
+  tripleKills: number
+  quadraKills: number
+  pentaKills: number
+}
 
 // 以 SGP 的格式为参照，将 LCU 数据映射为抽象格式
 function mapLcuDataToPerks(participant: Participant): MatchParticipantPerks {

@@ -437,9 +437,8 @@ import {
   useOngoingGameStore
 } from '@renderer-shared/shards/ongoing-game/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { toParticipants } from '@shared/data-adapter/match-history/participants'
-import { MatchBasicInfo, MatchParticipant } from '@shared/data-adapter/match-history/types'
+import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'

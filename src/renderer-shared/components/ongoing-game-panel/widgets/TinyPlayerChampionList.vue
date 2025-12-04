@@ -8,7 +8,7 @@
         @click="navigateToTabByPuuid(p.puuid)"
       >
         <div
-          class="text-[13px] font-bold transition-colors dark:text-white/80 dark:hover:text-white text-black/90 hover:text-black"
+          class="text-13px font-bold transition-colors dark:text-white/80 dark:hover:text-white text-black/90 hover:text-black"
         >
           {{ p.gameName }} <span v-if="p.tagLine" class="text-xs">#{{ p.tagLine }}</span>
         </div>

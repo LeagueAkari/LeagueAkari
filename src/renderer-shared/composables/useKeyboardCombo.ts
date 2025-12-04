@@ -1,5 +1,6 @@
-import { type Fn, type MaybeRefOrGetter, noop, tryOnScopeDispose } from '@vueuse/core'
+import { type Fn, noop, tryOnScopeDispose } from '@vueuse/core'
 import { useEventListener } from '@vueuse/core'
+import { MaybeRefOrGetter } from 'vue'
 
 const DEFAULT_TIMEOUT = 500
 

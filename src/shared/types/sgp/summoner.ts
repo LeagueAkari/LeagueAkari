@@ -1,4 +1,4 @@
-export interface SgpSummoner {
+export interface SgpSummonerLol {
   id: number
   puuid: string
   accountId: number

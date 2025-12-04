@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { MatchParticipant } from '@shared/data-adapter/match-history/types'
+import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'

@@ -1,4 +1,4 @@
-import { SgpSummoner } from '@shared/types/sgp/summoner'
+import { SgpSummonerLol } from '@shared/types/sgp/summoner'
 import { AxiosInstance } from 'axios'
 
 import { SgpRegionParam } from './dto'
@@ -8,7 +8,7 @@ export class SummonerLedgeHttpApi {
   constructor(private _http: AxiosInstance) {}
 
   postSummonersByPuuids(puuids: string[], options: SgpRegionParam = {}) {
-    return this._http.post<SgpSummoner[]>(
+    return this._http.post<SgpSummonerLol[]>(
       `/summoner-ledge/v1/regions/${URL_PLACEHOLDER_SUB_ID}/summoners/puuids`,
       puuids,
       {

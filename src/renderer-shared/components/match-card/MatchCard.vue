@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full min-w-[700px]">
+  <div class="relative w-full min-w-700px">
     <MatchCardOverview @toggle-expand="isExpanded = !isExpanded" />
 
     <KeepAlive>
@@ -46,32 +46,29 @@ const emits = defineEmits<{
 
 const isExpanded = defineModel<boolean>('isExpanded', { required: false, default: false })
 
-provideMatchCard(
-  {
-    theme: () => theme,
-    isExpanded: () => isExpanded.value,
-    summary: () => summary,
-    puuid: () => puuid,
-    details: () => details,
-    hidePrivacy: () => hidePrivacy,
-    loadingDetails: () => loadingDetails,
-    replayState: () => replayState
+provideMatchCard({
+  theme: () => theme,
+  isExpanded: () => isExpanded.value,
+  summary: () => summary,
+  puuid: () => puuid,
+  details: () => details,
+  hidePrivacy: () => hidePrivacy,
+  loadingDetails: () => loadingDetails,
+  replayState: () => replayState,
+
+  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
+    emits('navigateToSummonerByPuuid', puuid, setCurrent)
   },
-  {
-    onNavigateToSummonerByPuuid: (puuid: string, setCurrent = true) => {
-      emits('navigateToSummonerByPuuid', puuid, setCurrent)
-    },
-    onLoadReplay: (gameId: number) => {
-      emits('downloadReplay', gameId)
-    },
-    onWatchReplay: (gameId: number) => {
-      emits('watchReplay', gameId)
-    },
-    onLoadDetails: (gameId: number) => {
-      emits('loadDetails', gameId)
-    }
+  onLoadReplay: (gameId: number) => {
+    emits('downloadReplay', gameId)
+  },
+  onWatchReplay: (gameId: number) => {
+    emits('watchReplay', gameId)
+  },
+  onLoadDetails: (gameId: number) => {
+    emits('loadDetails', gameId)
   }
-)
+})
 
 onErrorCaptured((error) => {
   console.error(error)

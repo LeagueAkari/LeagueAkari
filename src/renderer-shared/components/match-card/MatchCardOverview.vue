@@ -2,7 +2,7 @@
   <!-- summary card -->
   <div
     v-if="participant && team"
-    class="@container w-full h-29 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-[width] dark:bg-neutral-900/95 bg-neutral-100/95"
+    class="@container w-full h-29 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-width dark:bg-neutral-900/95 bg-neutral-100/95"
   >
     <!-- main content -->
     <div class="relative flex gap-2 px-4 py-1 flex-1 min-w-0">
@@ -282,7 +282,7 @@
           >
             <!-- placement -->
             <div
-              class="shrink-0 dark:text-white/80 text-black/80 text-[11px] bg-black/10 dark:bg-white/10 rounded-full size-4 leading-4 text-center"
+              class="shrink-0 dark:text-white/80 text-black/80 text-11px bg-black/10 dark:bg-white/10 rounded-full size-4 leading-4 text-center"
             >
               {{ player.subteamPlacement }}
             </div>
@@ -342,9 +342,10 @@
     >
       <NIcon
         class="dark:text-white/60 text-black/60 text-base"
-        :class="{ 'rotate-180': !isExpanded }"
-        ><Triangle12Filled
-      /></NIcon>
+        :class="{ '-rotate-90': !isExpanded, 'rotate-90': isExpanded }"
+      >
+        <ArrowBackIosFilled />
+      </NIcon>
     </div>
   </div>
 </template>
@@ -354,7 +355,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Crown, Robot } from '@vicons/fa'
-import { Triangle12Filled } from '@vicons/fluent'
+import { ArrowBackIosFilled } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'

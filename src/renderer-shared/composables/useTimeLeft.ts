@@ -1,5 +1,5 @@
-import { MaybeRefOrGetter, useIntervalFn } from '@vueuse/core'
-import { readonly, ref, toValue, watch } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
+import { MaybeRefOrGetter, readonly, ref, toValue, watch } from 'vue'
 
 const INTERVAL_CONSTANT = 50
 

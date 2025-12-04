@@ -53,24 +53,21 @@ export function useMatchCard(): MatchCardContext {
   return context
 }
 
-export function provideMatchCard(
-  props: {
-    theme: MaybeRefOrGetter<'light' | 'dark'>
-    isExpanded: MaybeRefOrGetter<boolean>
-    summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
-    puuid: MaybeRefOrGetter<string | undefined>
-    details: MaybeRefOrGetter<LcuOrSgpGameDetails | null>
-    hidePrivacy: MaybeRefOrGetter<boolean>
-    loadingDetails: MaybeRefOrGetter<boolean>
-    replayState: MaybeRefOrGetter<ReplayDownloadProgress['state']>
-  },
-  events: {
-    onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
-    onLoadReplay: (gameId: number) => void
-    onWatchReplay: (gameId: number) => void
-    onLoadDetails: (gameId: number) => void
-  }
-) {
+export function provideMatchCard(props: {
+  theme: MaybeRefOrGetter<'light' | 'dark'>
+  isExpanded: MaybeRefOrGetter<boolean>
+  summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
+  puuid: MaybeRefOrGetter<string | undefined>
+  details: MaybeRefOrGetter<LcuOrSgpGameDetails | null>
+  hidePrivacy: MaybeRefOrGetter<boolean>
+  loadingDetails: MaybeRefOrGetter<boolean>
+  replayState: MaybeRefOrGetter<ReplayDownloadProgress['state']>
+
+  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
+  onLoadReplay: (gameId: number) => void
+  onWatchReplay: (gameId: number) => void
+  onLoadDetails: (gameId: number) => void
+}) {
   const basicInfo = computed(() => toBasicInfo(toValue(props.summary)))
   const participants = computed(() => toParticipants(toValue(props.summary), basicInfo.value))
   const teams = computed(() => toTeams(toValue(props.summary), basicInfo.value, participants.value))
@@ -113,17 +110,9 @@ export function provideMatchCard(
     team,
 
     // events
-    onNavigateToSummonerByPuuid: (puuid, setCurrent) => {
-      events.onNavigateToSummonerByPuuid(puuid, setCurrent)
-    },
-    onLoadReplay: (gameId) => {
-      events.onLoadReplay(gameId)
-    },
-    onWatchReplay: (gameId) => {
-      events.onWatchReplay(gameId)
-    },
-    onLoadDetails: (gameId) => {
-      events.onLoadDetails(gameId)
-    }
+    onNavigateToSummonerByPuuid: props.onNavigateToSummonerByPuuid,
+    onLoadReplay: props.onLoadReplay,
+    onWatchReplay: props.onWatchReplay,
+    onLoadDetails: props.onLoadDetails
   })
 }

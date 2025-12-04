@@ -1,10 +1,29 @@
 import { LcuOrSgpGameSummary } from '../wrapper'
-import { MatchBasicInfo } from './types'
+
+export type MatchBasicInfo = {
+  dataSource: LcuOrSgpGameSummary['source']
+  gameVersion: string
+  gameId: number
+  isTwoTeam: boolean
+  isCherrySubteam: boolean
+  endOfGameResult: string
+  gameCreation: number
+  gameDuration: number
+  gameType: string
+  queueId: number
+  gameMode: string
+  mapId: number
+  gameModeMutators: string[]
+}
 
 export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
   const { source, data } = summary
 
   if (source === 'sgp') {
+    if (!data.json) {
+      throw new Error(`SGP game summary data is not valid: ${summary.gameId}`)
+    }
+
     return {
       dataSource: source,
       gameVersion: data.json.gameVersion,
