@@ -7,6 +7,7 @@ import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -123,18 +124,20 @@ export class OngoingGameState {
         return {}
       }
 
-      const selections: Record<string, number> = {}
-      this._lcData.champSelect.session.myTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          selections[p.puuid] = p.championId || p.championPickIntent
+      const processMember = (p: ChampSelectTeam) => {
+        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+          const puuid = decryptUuid(p.obfuscatedPuuid)
+          selections[puuid] = p.championId || p.championPickIntent
         }
-      })
 
-      this._lcData.champSelect.session.theirTeam.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
-      })
+      }
+
+      const selections: Record<string, number> = {}
+      this._lcData.champSelect.session.myTeam.forEach(processMember)
+      this._lcData.champSelect.session.theirTeam.forEach(processMember)
 
       return selections
     } else if (this.queryStage.phase === 'in-game') {
@@ -175,6 +178,23 @@ export class OngoingGameState {
         return {}
       }
 
+      const processMember = (p: ChampSelectTeam) => {
+        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+          const puuid = decryptUuid(p.obfuscatedPuuid)
+          assignments[puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
+
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
+      }
+
       const assignments: Record<
         string,
         {
@@ -183,23 +203,8 @@ export class OngoingGameState {
         }
       > = {}
 
-      this._lcData.champSelect.session.myTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-      })
-
-      this._lcData.champSelect.session.theirTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-      })
+      this._lcData.champSelect.session.myTeam.forEach(processMember)
+      this._lcData.champSelect.session.theirTeam.forEach(processMember)
 
       return assignments
     } else if (this.queryStage.phase === 'in-game') {
@@ -254,14 +259,28 @@ export class OngoingGameState {
             ...this._lcData.champSelect.session.myTeam,
             ...this._lcData.champSelect.session.theirTeam
           ]
-            .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-            .map((p) => p.puuid)
+            .map((p) => {
+              if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+                return decryptUuid(p.obfuscatedPuuid)
+              }
+
+              if (!p.puuid || p.puuid === EMPTY_PUUID) {
+                return null
+              }
+
+              return p.puuid
+            })
+            .filter((p) => p !== null)
         }
       }
 
       const teams: Record<string, string[]> = {}
 
       const processMember = (p: ChampSelectTeam) => {
+        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+          p.puuid = decryptUuid(p.obfuscatedPuuid)
+        }
+
         if (!p.puuid || p.puuid === EMPTY_PUUID) {
           return
         }
