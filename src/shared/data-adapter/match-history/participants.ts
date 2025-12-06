@@ -90,7 +90,7 @@ export type MatchParticipant = {
   totalDamageToTowers: number
   totalHeal: number
   visionScore: number
-  totalTimeCCDealt: number
+  timeCCingOthers: number
   soloKills: number | null
   effectiveHealAndShielding: number | null
   totalDamageShieldedOnTeammates: number | null
@@ -241,7 +241,7 @@ export function toParticipants(
         totalDamageToTowers: p.damageDealtToTurrets,
         totalHeal: p.totalHeal,
         visionScore: p.visionScore,
-        totalTimeCCDealt: p.totalTimeCCDealt,
+        timeCCingOthers: p.timeCCingOthers,
         soloKills: p.challenges?.soloKills ?? null,
         effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
         totalDamageShieldedOnTeammates: p.totalDamageShieldedOnTeammates,
@@ -364,7 +364,7 @@ export function toParticipants(
         totalDamageToTowers: participant.stats.damageDealtToTurrets,
         totalHeal: participant.stats.totalHeal,
         visionScore: participant.stats.visionScore,
-        totalTimeCCDealt: participant.stats.totalTimeCrowdControlDealt,
+        timeCCingOthers: participant.stats.timeCCingOthers,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record
         totalDamageShieldedOnTeammates: null, // lcu has no total damage shielded on teammates record

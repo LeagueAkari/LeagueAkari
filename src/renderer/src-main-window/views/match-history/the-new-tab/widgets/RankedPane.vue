@@ -3,21 +3,23 @@
     <!-- Cross Region Unsupported Card -->
     <div
       v-if="isCrossRegion"
-      class="relative flex h-108px w-60 flex-col items-center justify-center rounded border border-white/10 text-xs text-[#414141] dark:text-[#828282]"
+      class="relative h-27 flex flex-col items-center justify-center rounded border border-gray-300 dark:border-white/10 text-xs text-gray-700 dark:text-gray-400"
+      :class="isSmallSize ? 'w-30' : 'w-60'"
     >
-      <div>{{ t('RankedDisplay.crossRegion', '当前为跨区环境') }}</div>
-      <div>{{ t('RankedDisplay.unavailable', '无法获取排位队列信息') }}</div>
+      <div>{{ t('RankedPane.crossRegion', 'Cross Region') }}</div>
+      <div>{{ t('RankedPane.unavailable', 'Unavailable') }}</div>
     </div>
 
     <!-- Ranked Cards -->
     <template v-else>
       <div
-        v-for="entry in mockData"
+        v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative flex h-108px w-60 items-center justify-center rounded dark:bg-white/5 bg-black/5"
+        class="relative h-27 flex items-center justify-center rounded dark:bg-white/5 bg-black/5"
+        :class="isSmallSize ? 'w-30' : 'w-60'"
       >
         <!-- Queue Type Label -->
-        <div class="absolute left-0 top-0 px-2 py-1 text-xs text-[#c8c8c8]">
+        <div class="absolute left-0 top-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
           {{
             t(`queueTypes.${entry.queueType}`, {
               defaultValue: entry.queueType,
@@ -29,7 +31,7 @@
         <!-- Main Content -->
         <div class="relative top-1 flex w-full items-center justify-center gap-2">
           <!-- Image Container -->
-          <div class="relative h-12 w-16">
+          <div v-if="!isSmallSize" class="relative h-12 w-16">
             <img
               class="absolute left-1/2 top-1/2 h-144% w-144% -translate-x-1/2 -translate-y-1/2 object-contain"
               :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
@@ -38,24 +40,26 @@
 
           <!-- Info -->
           <div class="flex min-w-16 flex-col">
-            <span class="text-base font-bold">{{ formatTier(entry) }}</span>
-            <span v-if="entry.ratedRating" class="text-xs text-[#929292]">
-              {{ entry.wins }} {{ t('RankedDisplay.win') }} {{ entry.ratedRating }}
-              {{ t('RankedDisplay.point') }}
+            <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
+              formatTier(entry)
+            }}</span>
+            <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
+              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
+              {{ t('RankedPane.point') }}
             </span>
-            <span v-else class="text-xs text-[#929292]">
-              {{ entry.wins }} {{ t('RankedDisplay.win') }} {{ entry.leaguePoints }} LP
+            <span v-else class="text-xs text-gray-500 dark:text-gray-400">
+              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
             </span>
 
             <!-- Highest Previous Season -->
             <div
-              class="flex items-center text-10px text-[#c8c8c8]"
+              class="flex items-center text-10px text-gray-500 dark:text-gray-300"
               :class="{
-                'text-[#777777]':
+                'text-gray-400 dark:text-gray-500':
                   !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
               }"
             >
-              <span class="mr-0.5">{{ t('RankedDisplay.highest') }}</span>
+              <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
               <div class="flex items-center">
                 <img
                   v-if="
@@ -93,12 +97,12 @@
     <div class="flex flex-col items-center rounded bg-[rgba(25,25,28,0.98)] p-4">
       <div class="mb-4 grid grid-cols-2 gap-4">
         <div
-          v-for="entry in mockData"
+          v-for="entry in displayedRankedEntries"
           :key="entry.queueType"
           class="relative flex h-108px w-60 items-center justify-center rounded dark:bg-white/5 bg-black/5"
         >
           <!-- Queue Type Label -->
-          <div class="absolute left-0 top-0 px-2 py-1 text-xs text-[#c8c8c8]">
+          <div class="absolute left-0 top-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
             {{
               t(`queueTypes.${entry.queueType}`, {
                 defaultValue: entry.queueType,
@@ -119,24 +123,26 @@
 
             <!-- Info -->
             <div class="flex min-w-16 flex-col">
-              <span class="text-base font-bold">{{ formatTier(entry) }}</span>
-              <span v-if="entry.ratedRating" class="text-xs text-[#929292]">
-                {{ entry.wins }} {{ t('RankedDisplay.win') }} {{ entry.ratedRating }}
-                {{ t('RankedDisplay.point') }}
+              <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
+                formatTier(entry)
+              }}</span>
+              <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
+                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
+                {{ t('RankedPane.point') }}
               </span>
-              <span v-else class="text-xs text-[#929292]">
-                {{ entry.wins }} {{ t('RankedDisplay.win') }} {{ entry.leaguePoints }} LP
+              <span v-else class="text-xs text-gray-500 dark:text-gray-400">
+                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
               </span>
 
               <!-- Highest Previous Season -->
               <div
-                class="flex items-center text-10px text-[#c8c8c8]"
+                class="flex items-center text-10px text-gray-500 dark:text-gray-300"
                 :class="{
-                  'text-#777777':
+                  'text-gray-400 dark:text-gray-500':
                     !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
                 }"
               >
-                <span class="mr-0.5">{{ t('RankedDisplay.highest') }}</span>
+                <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
                 <div class="flex items-center">
                   <img
                     v-if="
@@ -153,7 +159,8 @@
           </div>
         </div>
       </div>
-      <RankedTable :ranked-stats="mockRankedStats" />
+
+      <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" />
     </div>
   </NModal>
 </template>
@@ -181,17 +188,30 @@ import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
-import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
+import { RankedEntry } from '@shared/types/league-client/ranked'
 import { MoreHorizFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useMatchHistoryTab } from '../context'
+import { usePlayerTab } from '../context'
+import { useRankedStats } from '../data/ranked-stats'
 
-const { isCrossRegion } = useMatchHistoryTab()
+const { isCrossRegion, isSmallSize } = usePlayerTab()
+
 const { t } = useTranslation()
 const isShowingRankedModal = ref(false)
+
+const { rankedStats, isLoading } = useRankedStats()
+
+// 只显示单双排和灵活组排
+const DISPLAY_QUEUE_TYPES = ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR']
+
+const displayedRankedEntries = computed(() => {
+  if (!rankedStats.value?.queues) return []
+
+  return rankedStats.value.queues.filter((entry) => DISPLAY_QUEUE_TYPES.includes(entry.queueType))
+})
 
 const rankedImageMap: Record<string, string> = {
   UNRANKED: RankedNone,
@@ -220,50 +240,11 @@ const rankedMedalMap: Record<string, string> = {
   CHALLENGER: ChallengerMedal
 }
 
-const mockData: Partial<RankedEntry>[] = [
-  {
-    queueType: 'RANKED_SOLO_5x5',
-    tier: 'DIAMOND',
-    division: 'I',
-    leaguePoints: 75,
-    wins: 120,
-    losses: 100,
-    previousSeasonEndTier: 'PLATINUM',
-    previousSeasonEndDivision: 'I',
-    previousSeasonHighestTier: 'PLATINUM',
-    previousSeasonHighestDivision: 'I',
-    highestTier: 'DIAMOND',
-    highestDivision: 'I',
-    ratedTier: 'NONE',
-    ratedRating: 0
-  },
-  {
-    queueType: 'RANKED_FLEX_SR',
-    tier: 'GOLD',
-    division: 'IV',
-    leaguePoints: 20,
-    wins: 45,
-    losses: 40,
-    previousSeasonEndTier: 'GOLD',
-    previousSeasonEndDivision: 'IV',
-    previousSeasonHighestTier: 'GOLD',
-    previousSeasonHighestDivision: 'IV',
-    highestTier: 'GOLD',
-    highestDivision: 'IV',
-    ratedTier: 'NONE',
-    ratedRating: 0
-  }
-]
-
-const mockRankedStats = {
-  queues: mockData as any[]
-} as RankedStats
-
 const shouldRender = computed(() => {
   if (isCrossRegion.value) {
     return true
   }
-  return mockData.length > 0
+  return displayedRankedEntries.value.length > 0 || isLoading.value
 })
 
 const formatTier = (entry: Partial<RankedEntry>) => {
@@ -277,7 +258,7 @@ const formatTier = (entry: Partial<RankedEntry>) => {
     : entry.tier
 
   if (tier === '' || tier === 'NA') {
-    return t('RankedDisplay.unranked', '未定级')
+    return t('RankedPane.unranked', 'unranked')
   }
 
   const division = entry.division
@@ -300,7 +281,7 @@ const formatPreviousTier = (entry: Partial<RankedEntry>) => {
     : entry.previousSeasonHighestTier
 
   if (tier === '' || tier === 'NA') {
-    return t('RankedDisplay.unranked', '未定级')
+    return t('RankedPane.unranked', 'unranked')
   }
 
   const division = entry.previousSeasonHighestDivision

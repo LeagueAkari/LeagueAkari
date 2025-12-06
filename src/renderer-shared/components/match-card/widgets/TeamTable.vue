@@ -212,16 +212,9 @@
         <!-- augments (5) -->
         <div v-else-if="column.name === 'augments' && participant.augments" :class="column.class">
           <AugmentDisplay
-            v-for="aug in participant.augments.slice(0, 5)"
+            v-for="aug in participant.augments.slice(0, someoneHas6Augments ? 6 : 5)"
             :key="aug"
             :augment-id="aug"
-            :size="20"
-          />
-          <!-- in rare case, show the 6th augment if it exists -->
-          <AugmentDisplay
-            v-if="participant.augments[5]"
-            :key="participant.augments[5]"
-            :augment-id="participant.augments[5]"
             :size="20"
           />
         </div>
@@ -373,6 +366,11 @@ const team = computed(() => {
 
 const teamParticipants = computed(() => {
   return participants.value.filter((p) => p.teamIdentifier === teamIdentifier)
+})
+
+const someoneHas6Augments = computed(() => {
+  // 0 或 undefined 都算没有
+  return teamParticipants.value.some((p) => p.augments[5])
 })
 
 const handleMouseDown = (event: MouseEvent) => {

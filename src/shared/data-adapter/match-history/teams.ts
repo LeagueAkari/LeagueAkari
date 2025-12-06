@@ -60,7 +60,7 @@ export type MatchTeamStats = {
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
-  maxTimeCCDealt: number
+  maxTimeCCingOthers: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }
@@ -88,7 +88,7 @@ export type AggregateTeamStats = {
   totalKda: number
   maxKillParticipation: number
   totalKillParticipation: number
-  maxTimeCCDealt: number
+  maxTimeCCingOthers: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }
@@ -216,7 +216,7 @@ export function toTeams(
         totalKda: teamParticipants.reduce((acc, p) => acc + p.kda, 0),
         maxKillParticipation: Math.max(...teamParticipants.map((p) => p.killParticipation)),
         totalKillParticipation: teamParticipants.reduce((acc, p) => acc + p.killParticipation, 0),
-        maxTimeCCDealt: Math.max(...teamParticipants.map((p) => p.totalTimeCCDealt)),
+        maxTimeCCingOthers: Math.max(...teamParticipants.map((p) => p.timeCCingOthers)),
         maxDamageShieldedOnTeammates:
           teamParticipants[0]?.totalDamageShieldedOnTeammates !== null
             ? Math.max(...teamParticipants.map((p) => p.totalDamageShieldedOnTeammates ?? 0))
@@ -255,7 +255,7 @@ export function toTeams(
     totalKda: teamStatsArr.reduce((acc, t) => acc + t.totalKda, 0),
     maxKillParticipation: Math.max(...teamStatsArr.map((t) => t.maxKillParticipation)),
     totalKillParticipation: teamStatsArr.reduce((acc, t) => acc + t.totalKillParticipation, 0),
-    maxTimeCCDealt: Math.max(...teamStatsArr.map((t) => t.maxTimeCCDealt)),
+    maxTimeCCingOthers: Math.max(...teamStatsArr.map((t) => t.maxTimeCCingOthers)),
     maxDamageShieldedOnTeammates:
       teamStatsArr[0]?.maxDamageShieldedOnTeammates !== null
         ? Math.max(...teamStatsArr.map((t) => t.maxDamageShieldedOnTeammates ?? 0))

@@ -257,12 +257,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     this._mobx.reaction(
       () => ({
-        isReadyCheck: this._lc.data.gameflow.session?.phase === 'ReadyCheck',
+        isChampSelect: this._lc.data.gameflow.session?.phase === 'ChampSelect',
         currentQueueId: currentQueueId.get()
       }),
-      ({ currentQueueId, isReadyCheck }) => {
+      ({ currentQueueId, isChampSelect }) => {
         // 接受对局的时候立即刷新队列查询
-        if (!isReadyCheck) {
+        if (!isChampSelect) {
           return
         }
 
@@ -271,11 +271,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           return
         }
 
-        this._log.warn('DEBUG -> Queue ID changed', currentQueueId)
+        this._log.info('Queue ID changed', currentQueueId)
 
         this.state.setMatchHistoryTagParams({ tag: `q_${currentQueueId}` })
       },
-      { equals: comparer.shallow }
+      { equals: comparer.shallow, fireImmediately: true }
     )
   }
 

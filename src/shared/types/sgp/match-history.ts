@@ -228,7 +228,6 @@ export interface SgpParticipantLol {
   longestTimeSpentLiving: number
   timeCCingOthers: number
   timePlayed: number
-  totalTimeCCDealt: number
   totalTimeSpentDead: number
 
   // 治疗相关

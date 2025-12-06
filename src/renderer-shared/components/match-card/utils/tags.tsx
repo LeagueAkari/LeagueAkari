@@ -367,25 +367,25 @@ function computedKnockUpTags({ participant }: TagContext): PlayerTag[] {
 }
 
 function computeCcTags({ participant, team, teams }: TagContext): PlayerTag[] {
-  if (!participant.totalTimeCCDealt) return []
+  if (!participant.timeCCingOthers) return []
 
-  if (participant.totalTimeCCDealt === teams.allTeamStats.maxTimeCCDealt) {
+  if (participant.timeCCingOthers === teams.allTeamStats.maxTimeCCingOthers) {
     return [
       {
         label: '★ 控制',
         color: 'bg-fuchsia-700 dark:bg-fuchsia-800',
         textColor: 'text-white',
-        content: `全场最久控制，控制了敌方英雄 ${participant.totalTimeCCDealt.toLocaleString()} 秒`,
+        content: `全场最久控制，控制了敌方英雄 ${participant.timeCCingOthers.toLocaleString()} 秒`,
         priority: 1750
       }
     ]
-  } else if (participant.totalTimeCCDealt === team.maxTimeCCDealt) {
+  } else if (participant.timeCCingOthers === team.maxTimeCCingOthers) {
     return [
       {
         label: '控制',
         color: 'bg-fuchsia-600 dark:bg-fuchsia-700',
         textColor: 'text-white',
-        content: `队伍最久控制，控制了敌方英雄 ${participant.totalTimeCCDealt.toLocaleString()} 秒`,
+        content: `队伍最久控制，控制了敌方英雄 ${participant.timeCCingOthers.toLocaleString()} 秒`,
         priority: 1700
       }
     ]

@@ -1,9 +1,13 @@
 <template>
-  <div class="size-full p-4 box-border">
-    <MatchHistoryTab puuid="123" sgpServerId="TENCENT_HN10" prefer-source="lcu" />
+  <div class="size-full box-border">
+    <PlayerTab
+      puuid="56a9f81c-741b-519f-9ce9-85368504cbd5"
+      sgpServerId="TW2"
+      preferred-source="sgp"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import MatchHistoryTab from '../match-history/the-new-tab/MatchHistoryTab.vue'
+import PlayerTab from '../match-history/the-new-tab/PlayerTab.vue'
 </script>

@@ -92,7 +92,7 @@ const tabs = computed(() => {
       value: 'summary'
     },
     {
-      label: '详细数据',
+      label: '详尽表格',
       value: 'details'
     },
     {

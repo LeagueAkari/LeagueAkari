@@ -917,6 +917,17 @@ RankedDisplay:
   highest: Highest
   empty: No Content
 
+RankedPane:
+  unranked: Unranked
+  win: W
+  lose: L
+  point: P
+  leaguePoint: LP
+  highest: Highest
+  empty: No Content
+  crossRegion: Cross Region
+  unavailable: Unavailable
+
 DamageMetricsBar:
   total: Total
   physical: Physical

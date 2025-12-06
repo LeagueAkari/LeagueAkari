@@ -918,6 +918,17 @@ RankedDisplay:
   highest: 最高
   empty: 无内容
 
+RankedPane:
+  unranked: 未定级
+  win: 胜
+  lose: 负
+  point: 分
+  leaguePoint: 胜点
+  highest: 最高
+  empty: 无内容
+  crossRegion: 跨区环境
+  unavailable: 无法获取排位队列信息
+
 DamageMetricsBar:
   total: 伤害总计
   physical: 物理伤害

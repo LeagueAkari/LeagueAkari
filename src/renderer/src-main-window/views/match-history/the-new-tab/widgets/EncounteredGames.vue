@@ -1,28 +1,36 @@
 <template>
-  <div class="px-4 py-2 dark:bg-white/5 rounded">
+  <div class="px-4 py-2 dark:bg-white/5 rounded bg-black/5" v-if="pagedGames && !isSelfTab">
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-3">
       <span class="text-base font-bold text-gray-900 dark:text-white"
-        >{{ t('EncounteredGames.title') }} ({{ total }})</span
+        >{{ t('EncounteredGames.title') }} ({{ pagedGames.total }})</span
       >
 
       <!-- Pagination Controls -->
-      <div class="flex items-center gap-1" v-if="total > pageSize">
-        <NButton quaternary size="tiny" :disabled="page === 1 || loading" @click="page--">
+      <div class="flex items-center gap-1" v-if="pagedGames.total > pagedGames.pageSize">
+        <NButton
+          quaternary
+          size="tiny"
+          :disabled="pagedGames.page === 1 || isLoading"
+          @click="loadGames(pagedGames.page - 1)"
+        >
           <template #icon>
             <NIcon><ArrowLeftIcon /></NIcon>
           </template>
         </NButton>
 
         <span class="text-11px text-gray-500 dark:text-white/70">
-          {{ page }} / {{ Math.ceil(total / pageSize) }}
+          {{ pagedGames.page }} /
+          {{ Math.ceil(pagedGames.total / pagedGames.pageSize) }}
         </span>
 
         <NButton
           quaternary
           size="tiny"
-          :disabled="page === Math.ceil(total / pageSize) || loading"
-          @click="page++"
+          :disabled="
+            pagedGames.page === Math.ceil(pagedGames.total / pagedGames.pageSize) || isLoading
+          "
+          @click="loadGames(pagedGames.page + 1)"
         >
           <template #icon>
             <NIcon><ArrowRightIcon /></NIcon>
@@ -37,7 +45,7 @@
         class="flex items-center rounded-sm cursor-pointer gap-2"
         v-for="{ game, gameId, recordId } in games"
         :key="gameId"
-        @click="handleGameClick(gameId)"
+        @click="onPreviewGame(gameMap[gameId] || gameId)"
       >
         <div class="flex flex-1 gap-1 flex-col">
           <!-- Game Info Line 1: Type, Queue, Date -->
@@ -85,7 +93,7 @@
               >
                 {{
                   game.p1.placement
-                    ? formatPlacement(game.p1.placement)
+                    ? formatI18nOrdinal(game.p1.placement, as.settings.locale, true)
                     : game.p1.win
                       ? t('EncounteredGames.win')
                       : t('EncounteredGames.lose')
@@ -111,7 +119,7 @@
               >
                 {{
                   game.p2.placement
-                    ? formatPlacement(game.p2.placement)
+                    ? formatI18nOrdinal(game.p2.placement, as.settings.locale, true)
                     : game.p2.win
                       ? t('EncounteredGames.win')
                       : t('EncounteredGames.lose')
@@ -129,7 +137,7 @@
         <NPopconfirm
           :positive-button-props="{ type: 'warning', size: 'tiny' }"
           :negative-button-props="{ size: 'tiny' }"
-          @positive-click="handleDelete(recordId)"
+          @positive-click="deleteGame(recordId)"
         >
           <template #trigger>
             <NButton size="tiny" quaternary :focusable="false" @click.stop>
@@ -155,6 +163,11 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
+import { formatI18nOrdinal } from '@shared/i18n'
 import {
   ArrowLeft as ArrowLeftIcon,
   ArrowRight as ArrowRightIcon,
@@ -163,65 +176,60 @@ import {
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopconfirm, NSkeleton } from 'naive-ui'
-import { ref } from 'vue'
+import { computed } from 'vue'
+
+import { usePlayerTab } from '../context'
+import { useEncounteredGames } from '../data/encountered-games'
 
 const { t } = useTranslation()
+const { previewGame: onPreviewGame, isSelfTab } = usePlayerTab()
+const { pagedGames, gameMap, isLoading, loadGames, deleteGame } = useEncounteredGames()
 
-// Mock Props for now
-withDefaults(
-  defineProps<{
-    pageSize?: number
-    loading?: boolean
-  }>(),
-  {
-    pageSize: 5,
-    loading: false
-  }
-)
+const as = useAppCommonStore()
+const lcs = useLeagueClientStore()
 
-const page = ref(1)
-const total = ref(15)
-
-// Mock Data Generation
-const generateMockGame = (id: number) => ({
-  recordId: id,
-  gameId: 10000 + id,
-  game: {
-    queueName: 'Ranked Solo/Duo',
-    date: new Date(Date.now() - id * 86400000), // days ago
-    type: id % 2 === 0 ? 'ally' : 'enemy',
-    p1: {
-      championId: 1, // Annie
-      kda: [5, 2, 10],
-      placement: 0,
-      win: true
-    },
-    p2: {
-      championId: 2, // Olaf
-      kda: [3, 5, 2],
-      placement: 0,
-      win: false
-    }
-  }
+const toPlayerStats = (p: MatchParticipant) => ({
+  championId: p.championId,
+  kda: [p.kills, p.deaths, p.assists] as const,
+  placement: p.subteamPlacement, // 0 if not cherry
+  win: p.win
 })
 
-const games = ref(Array.from({ length: 5 }, (_, i) => generateMockGame(i)))
+const games = computed(() => {
+  if (!pagedGames.value) {
+    return []
+  }
 
-// Methods
-const handleGameClick = (gameId: number) => {
-  console.log('Game clicked:', gameId)
-}
+  return pagedGames.value.data
+    .map((g) => {
+      const game = gameMap[g.gameId]
 
-const handleDelete = (recordId: number) => {
-  console.log('Delete record:', recordId)
-  games.value = games.value.filter((g) => g.recordId !== recordId)
-}
+      if (!game) {
+        return { recordId: g.id, gameId: g.gameId, game: null }
+      }
 
-const formatPlacement = (placement: number) => {
-  return `#${placement}`
-}
+      const basicInfo = toBasicInfo(game)
+      const participants = toParticipants(game, basicInfo)
+
+      const p1 = participants.find((p) => p.puuid === g.selfPuuid)
+      const p2 = participants.find((p) => p.puuid === g.puuid)
+
+      if (!p1 || !p2) {
+        return null
+      }
+
+      return {
+        recordId: g.id,
+        gameId: g.gameId,
+        game: {
+          queueName: lcs.gameData.queueName(basicInfo.queueId),
+          date: basicInfo.gameCreation,
+          type: p1.teamIdentifier === p2.teamIdentifier ? 'ally' : 'enemy',
+          p1: toPlayerStats(p1),
+          p2: toPlayerStats(p2)
+        }
+      }
+    })
+    .filter((g) => g !== null)
+})
 </script>
-
-<style scoped>
-/* UnoCSS handles most styles, minimal custom CSS needed */
-</style>
