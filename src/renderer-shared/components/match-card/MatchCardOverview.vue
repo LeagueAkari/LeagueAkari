@@ -1,5 +1,4 @@
 <template>
-  <!-- summary card -->
   <div
     v-if="participant && team"
     class="@container w-full h-29 flex rounded dark:border-white/20 border-black/20 b b-solid overflow-hidden select-none box-border transition-width dark:bg-neutral-900/95 bg-neutral-100/95"
@@ -467,7 +466,7 @@ const mapName = computed(() => {
   if (!mutators) return lcs.gameData.mapName(basicInfo.value.mapId)
 
   const mutator = mutators.Mutators.find((m) =>
-    basicInfo.value.gameModeMutators.some(
+    basicInfo.value.gameModeMutators?.some(
       (g) => m.Mutator.ExpandedMutator.toLowerCase() === g.toLowerCase()
     )
   )

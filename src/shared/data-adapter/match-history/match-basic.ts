@@ -13,7 +13,7 @@ export type MatchBasicInfo = {
   queueId: number
   gameMode: string
   mapId: number
-  gameModeMutators: string[]
+  gameModeMutators: string[] | null
 }
 
 export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
@@ -37,7 +37,7 @@ export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
       queueId: data.json.queueId,
       gameMode: data.json.gameMode,
       mapId: data.json.mapId,
-      gameModeMutators: data.json.gameModeMutators
+      gameModeMutators: data.json.gameModeMutators ?? null
     }
   }
 
@@ -54,6 +54,6 @@ export function toBasicInfo(summary: LcuOrSgpGameSummary): MatchBasicInfo {
     queueId: data.queueId,
     gameMode: data.gameMode,
     mapId: data.mapId,
-    gameModeMutators: data.gameModeMutators
+    gameModeMutators: data.gameModeMutators ?? null
   }
 }

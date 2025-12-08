@@ -197,6 +197,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       { delay: 500, fireImmediately: true } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
     )
 
+    const currentQueueId = computed(() => {
+      const session = this._lc.data.gameflow.session
+
+      if (!session) {
+        return null
+      }
+
+      return session.gameData.queue.id
+    })
+
     // match history
     this._mobx.reaction(
       () => ({
@@ -205,9 +215,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         apiShouldUse: this.state.apiShouldUse,
         sgpTokenReady: this._sgp.state.isTokenReady,
         count: this.settings.matchHistoryLoadCount,
-        params: this.state.matchHistoryTagParams
+        params: this.state.matchHistoryTagParams,
+        currentQueueId: currentQueueId.get()
       }),
-      ({ enabled, count, params, apiShouldUse, sgpTokenReady }) => {
+      ({ enabled, count, params, apiShouldUse, sgpTokenReady, currentQueueId }) => {
         if (!enabled) {
           return
         }
@@ -215,6 +226,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         // wait for sgp token ready if needed
         if (apiShouldUse === 'sgp' && !sgpTokenReady) {
           return
+        }
+
+        if (currentQueueId) {
+          this.state.setMatchHistoryTagParams({ ...params, tag: `q_${currentQueueId}` })
+        } else {
+          this.state.setMatchHistoryTagParams({ ...params, tag: undefined })
         }
 
         const puuids = Object.values(this.state.teams).flat()
@@ -243,39 +260,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         }
       },
       { equals: comparer.shallow }
-    )
-
-    const currentQueueId = computed(() => {
-      const session = this._lc.data.gameflow.session
-
-      if (!session) {
-        return null
-      }
-
-      return session.gameData.queue.id
-    })
-
-    this._mobx.reaction(
-      () => ({
-        isChampSelect: this._lc.data.gameflow.session?.phase === 'ChampSelect',
-        currentQueueId: currentQueueId.get()
-      }),
-      ({ currentQueueId, isChampSelect }) => {
-        // 接受对局的时候立即刷新队列查询
-        if (!isChampSelect) {
-          return
-        }
-
-        if (!currentQueueId) {
-          this.state.setMatchHistoryTagParams({})
-          return
-        }
-
-        this._log.info('Queue ID changed', currentQueueId)
-
-        this.state.setMatchHistoryTagParams({ tag: `q_${currentQueueId}` })
-      },
-      { equals: comparer.shallow, fireImmediately: true }
     )
   }
 

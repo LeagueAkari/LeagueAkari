@@ -1,5 +1,8 @@
 <template>
-  <div class="px-4 py-2 dark:bg-white/5 rounded bg-black/5" v-if="pagedGames && !isSelfTab">
+  <div
+    class="px-4 py-2 dark:bg-white/5 rounded bg-black/5"
+    v-if="pagedGames && pagedGames.total > 0 && !isSelfTab"
+  >
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-3">
       <span class="text-base font-bold text-gray-900 dark:text-white"

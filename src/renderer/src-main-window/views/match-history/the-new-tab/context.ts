@@ -19,9 +19,14 @@ import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
 import { provideRankedStats } from './data/ranked-stats'
+import { provideSpectator } from './data/spectator'
 import { provideSummoner } from './data/summoner'
+import { provideSummonerProfile } from './data/summoner-profile'
+import { provideTags } from './data/tags'
 
 export type PlayerTabContext = {
+  id: Readonly<Ref<string>>
+
   puuid: Readonly<Ref<string>>
 
   /** 整个页面会使用哪个数据源
@@ -63,12 +68,11 @@ export function usePlayerTab(): PlayerTabContext {
 }
 
 export function providePlayerTab(props: {
+  id: MaybeRefOrGetter<string>
   puuid: MaybeRefOrGetter<string>
   sgpServerId: MaybeRefOrGetter<string>
   isSmallSize: MaybeRefOrGetter<boolean>
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
-
-  onCreateTab: (puuid: string, sgpServerId: string) => void
 }) {
   const sgps = useSgpStore()
   const lcs = useLeagueClientStore()
@@ -78,6 +82,7 @@ export function providePlayerTab(props: {
 
   const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
 
+  const id = toRef(props.id)
   const puuid = toRef(props.puuid)
   const preferredSource = computed(() => as.settings.preferredLolSource)
   const sgpServerId = toRef(props.sgpServerId)
@@ -91,6 +96,7 @@ export function providePlayerTab(props: {
   })
 
   provide(PlayerTabContextKey, {
+    id,
     puuid,
     preferredSource,
     sgpServerId,
@@ -100,11 +106,11 @@ export function providePlayerTab(props: {
     isCrossRegion: toRef(isCrossRegion),
     isSelfTab: toRef(isSelfTab),
 
-    navigateToSummonerByPuuid: (puuid, setCurrent) => {
+    navigateToSummonerByPuuid: (puuid, setCurrent = true) => {
       if (setCurrent) {
         navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId.value)
       } else {
-        props.onCreateTab(puuid, sgpServerId.value)
+        mh.createTab(puuid, sgpServerId.value, false)
       }
     },
     previewGame: props.previewGame
@@ -133,6 +139,20 @@ export function providePlayerTab(props: {
     puuid,
     preferredSource,
     isSelfTab,
+    isCrossRegion
+  })
+
+  provideTags({
+    puuid
+  })
+
+  provideSpectator({
+    puuid,
+    sgpServerId
+  })
+
+  provideSummonerProfile({
+    puuid,
     isCrossRegion
   })
 }

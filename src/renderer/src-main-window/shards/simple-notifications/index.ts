@@ -22,7 +22,9 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { NotificationReactive, useDialog, useMessage, useNotification } from 'naive-ui'
-import { computed, defineComponent, h, inject, ref, watch, watchEffect } from 'vue'
+import { computed, defineComponent, h, ref, watch, watchEffect } from 'vue'
+
+import { useAppContext } from '@main-window/context'
 
 import AnnouncementModal from './modals/AnnouncementModal.vue'
 import DeclarationModal from './modals/DeclarationModal.vue'
@@ -59,7 +61,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     const notification = useNotification()
     const installation = useClientInstallationStore()
     const app = useAppCommonStore()
-    const appInject = inject('app') as any
+    const { openSettingsModal } = useAppContext()
     const lcs = useLeagueClientStore()
     const { t } = useTranslation(undefined, {
       keyPrefix: 'simple-notifications-renderer.liveStreamingHints'
@@ -199,7 +201,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                     type: 'primary',
                     onClick: () => {
                       close()
-                      appInject.openSettingsModal('misc')
+                      openSettingsModal('misc')
                       neverShowAgain()
                     }
                   }

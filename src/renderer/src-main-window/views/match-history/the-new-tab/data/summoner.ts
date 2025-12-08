@@ -1,15 +1,18 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Summoner, toSummoner } from '@shared/data-adapter/summoner'
 import { useNotification } from 'naive-ui'
 import {
   InjectionKey,
   MaybeRefOrGetter,
   Ref,
+  computed,
   inject,
   provide,
   ref,
@@ -24,9 +27,7 @@ export type SummonerContext = {
   loadSummoner: () => Promise<void>
 }
 
-export const SummonerContextKey: InjectionKey<SummonerContext> = Symbol(
-  'MatchHistoryTabSummonerContext'
-)
+export const SummonerContextKey: InjectionKey<SummonerContext> = Symbol('PlayerTabSummonerContext')
 
 /**
  * 加载 summoner 信息
@@ -47,14 +48,21 @@ export function provideSummoner(props: {
   const componentName = useComponentName()
 
   const sgp = useInstance(SgpRenderer)
+  const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
   const rc = useInstance(RiotClientRenderer)
   const log = useInstance(LoggerRenderer)
+
+  const lcs = useLeagueClientStore()
 
   const isLoading = ref(false)
   const summoner = shallowRef<Summoner | null>(null)
 
   const notification = useNotification()
+
+  const sgpApiAvailable = computed(() => {
+    return sgps.isTokenReady && (sgps.sgpServerConfig.servers[sgpServerId.value]?.common ?? false)
+  })
 
   const loadSummoner = async () => {
     if (isLoading.value) return
@@ -62,7 +70,13 @@ export function provideSummoner(props: {
     isLoading.value = true
 
     try {
-      if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+      // 仅在跨区时考虑 sgp 数据源
+      if (isCrossRegion.value) {
+        // 需要可用
+        if (!sgpApiAvailable.value) {
+          return
+        }
+
         const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids(
           [puuid.value],
           {
@@ -114,12 +128,28 @@ export function provideSummoner(props: {
     }
   }
 
+  // 主要监听器：参数变化时加载
   watch(
-    [preferredSource, puuid, sgpServerId, isCrossRegion],
-    () => {
+    [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
+    ([available]) => {
+      // 如果需要 SGP 但 token 未就绪，等待 token 就绪后再加载
+      if ((preferredSource.value === 'sgp' || isCrossRegion.value) && !available) {
+        return
+      }
+
       loadSummoner()
     },
     { immediate: true }
+  )
+
+  // 当自己的召唤师信息更新的时候，立即更新相关页面
+  watch(
+    () => lcs.summoner.me,
+    (me) => {
+      if (me && me.puuid === puuid.value) {
+        summoner.value = toSummoner({ source: 'lcu', data: me, puuid: me.puuid })
+      }
+    }
   )
 
   provide(SummonerContextKey, {
@@ -127,6 +157,8 @@ export function provideSummoner(props: {
     isLoading,
     loadSummoner
   })
+
+  return { summoner, isLoading, loadSummoner }
 }
 
 export function useSummoner() {

@@ -1,50 +1,70 @@
 <template>
-  <div class="tabs-wrapper" ref="tabs-wrapper">
+  <div class="h-full max-w-full" ref="tabs-wrapper">
+    <!-- tab show -->
     <template v-if="mhs.currentTabId">
-      <MatchHistoryTab
-        v-for="(tab, index0) of mhs.tabs"
-        :key="tab.id"
-        :tab="tab"
-        :index="index0"
+      <PlayerTab
+        v-for="tab of mhs.tabs"
+        :id="tab.id"
+        :puuid="tab.puuid"
         :sgpServerId="tab.sgpServerId"
-        v-show="tab.id === mhs.currentTab?.id"
-        ref="tabs-ref"
+        :key="tab.id"
+        v-show="tab.id === mhs.currentTabId"
       />
     </template>
-    <div v-else class="tabs-placeholder">
-      <div class="centered">
-        <LeagueAkariSpan bold class="akari-text" />
+
+    <!-- if no tab... -->
+    <div v-else class="h-full flex relative">
+      <div
+        class="flex flex-col items-center absolute top-48% left-50% -translate-x-1/2 -translate-y-1/2 gap-4"
+      >
+        <LeagueAkariSpan bold class="text-22px" />
+
+        <!-- disconnect -->
         <template v-if="lcs.connectionState !== 'connected'">
-          <span class="disconnected">{{ t('MatchHistoryTabs.disconnected') }}</span>
+          <span class="text-sm dark:text-white/40 text-black/40">{{
+            t('MatchHistoryTabs.disconnected')
+          }}</span>
           <EasyToLaunch />
         </template>
+
+        <!-- queueing -->
         <template v-if="lcs.login.loginQueueState">
-          <span class="disconnected">{{ t('MatchHistoryTabs.queueing') }}</span>
+          <span class="text-sm dark:text-white/40 text-black/40">{{
+            t('MatchHistoryTabs.queueing')
+          }}</span>
         </template>
+
+        <!-- no active tab -->
         <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
-          <div class="no-tab">{{ t('MatchHistoryTabs.noActiveTab') }}</div>
-          <div class="shortcut" @click="handleOpenSelfTab">
+          <div class="text-sm dark:text-white/40 text-black/40 mt-2">
+            {{ t('MatchHistoryTabs.noActiveTab') }}
+          </div>
+          <div
+            class="flex items-center mt-4 bg-white/6 dark:bg-black/6 py-2 px-4 rounded cursor-pointer transition-colors backdrop-blur-xs hover:bg-black/12 dark:hover:bg-white/12"
+            @click="handleOpenSelfTab"
+          >
             <LcuImage
-              class="shortcut-profile-icon"
+              class="size-8 rounded-full"
               :src="profileIconUri(lcs.summoner.me.profileIconId)"
             />
             <StreamerModeMaskedText>
               <template #masked>
-                <span class="shortcut-game-name">{{ t('summoner', { ns: 'common' }) }}</span>
-                <span class="shortcut-tag-line">#####</span>
+                <span class="text-sm font-bold text-dark/95 dark:text-white/95">{{
+                  t('summoner', { ns: 'common' })
+                }}</span>
+                <span class="ml-1 text-sm dark:text-white/40 text-black/40">#####</span>
               </template>
-              <span class="shortcut-game-name">{{ lcs.summoner.me.gameName }}</span>
-              <span class="shortcut-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+              <span class="text-sm font-bold text-dark/95 dark:text-white/95">{{
+                lcs.summoner.me.gameName
+              }}</span>
+              <span class="ml-1 text-sm dark:text-white/40 text-black/40"
+                >#{{ lcs.summoner.me.tagLine }}</span
+              >
             </StreamerModeMaskedText>
           </div>
         </template>
       </div>
     </div>
-    <Transition name="bi-fade">
-      <div class="drop-overlay" v-if="isOverDropZone">
-        <span class="centered-hint">{{ t('MatchHistoryTabs.dropZoneRosterMember') }}</span>
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -60,16 +80,15 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { useDropZone } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
-import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
+import { computed, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
-import MatchHistoryTab from './MatchHistoryTab.vue'
+import PlayerTab from './the-new-tab/PlayerTab.vue'
 
 const { t } = useTranslation()
 
@@ -84,8 +103,6 @@ const mhs = useMatchHistoryTabsStore()
 const ogs = useOngoingGameStore()
 const log = useInstance(LoggerRenderer)
 const mh = useInstance(MatchHistoryTabsRenderer)
-
-const tabsRef = useTemplateRef('tabs-ref')
 
 const matchHistoryRoute = computed(() => {
   if (route.name !== 'match-history') {
@@ -152,18 +169,19 @@ watch(
   () => isEndOfGame.value,
   (is, _prevP) => {
     if (mhs.frontendSettings.refreshTabsAfterGameEnds && is) {
-      if (!ogs.teams || !tabsRef.value) {
+      if (!ogs.teams) {
         return
       }
 
       const allPlayerPuuids = Object.values(ogs.teams).flat()
-      tabsRef.value.forEach((tab) => {
-        if (tab && allPlayerPuuids.includes(tab.puuid)) {
+
+      mhs.tabs.forEach((tab) => {
+        if (allPlayerPuuids.includes(tab.puuid) && tab.refresh) {
           tab.refresh()
         }
       })
 
-      log.info(componentName, `战绩页面刷新`, allPlayerPuuids)
+      log.info(componentName, `eog refresh`, allPlayerPuuids)
     }
   }
 )
@@ -191,204 +209,4 @@ const { stop, start } = useKeyboardCombo('PUUID', {
 
 onActivated(() => start())
 onDeactivated(() => stop())
-
-mh.events.on('refresh-tab', (tabId: string) => {
-  const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
-  if (tab) {
-    log.info(componentName, `刷新战绩页面`, tabId)
-    tab.refresh()
-  }
-})
-
-const tabsWrapperEl = useTemplateRef('tabs-wrapper')
-const { isOverDropZone } = useDropZone(tabsWrapperEl, {
-  dataTypes: ['application/riot.roster-member+json'],
-  onDrop: (_, event) => {
-    const socialMemberData = event.dataTransfer?.getData('application/riot.roster-member+json')
-
-    if (socialMemberData) {
-      try {
-        const json = JSON.parse(socialMemberData)
-        const puuid = json.id.split('@')[0]
-        navigateToTabByPuuid(puuid)
-      } catch {}
-    }
-  }
-})
 </script>
-
-<style scoped>
-.tabs-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.content {
-  position: relative;
-  flex: 1;
-  height: 0;
-}
-
-.tabs-placeholder {
-  height: 100%;
-  display: flex;
-  position: relative;
-
-  .akari-text {
-    font-size: 22px;
-  }
-
-  .disconnected {
-    font-size: 14px;
-    font-weight: normal;
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .no-tab {
-    font-size: 14px;
-    font-weight: normal;
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: 8px;
-  }
-
-  .shortcut {
-    display: flex;
-    align-items: center;
-    margin-top: 16px;
-    background-color: rgba(255, 255, 255, 0.06);
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    backdrop-filter: blur(4px);
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.12);
-    }
-
-    .shortcut-profile-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-
-    .shortcut-game-name {
-      margin-left: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      color: rgba(255, 255, 255, 0.95);
-    }
-
-    .shortcut-tag-line {
-      margin-left: 4px;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.4);
-    }
-  }
-}
-
-.drop-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  backdrop-filter: blur(4px);
-
-  .centered-hint {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    font-weight: bold;
-  }
-}
-
-[data-theme='dark'] {
-  .tabs-placeholder {
-    .disconnected {
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .no-tab {
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .shortcut {
-      background-color: rgba(255, 255, 255, 0.06);
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.12);
-      }
-
-      .shortcut-game-name {
-        color: rgba(255, 255, 255, 0.95);
-      }
-
-      .shortcut-tag-line {
-        color: rgba(255, 255, 255, 0.4);
-      }
-    }
-  }
-
-  .drop-overlay {
-    background-color: rgba(0, 0, 0, 0.4);
-
-    .centered-hint {
-      color: rgba(255, 255, 255, 0.95);
-    }
-  }
-}
-
-[data-theme='light'] {
-  .tabs-placeholder {
-    .disconnected {
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    .no-tab {
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    .shortcut {
-      background-color: rgba(0, 0, 0, 0.06);
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.12);
-      }
-
-      .shortcut-game-name {
-        color: rgba(0, 0, 0, 0.95);
-      }
-
-      .shortcut-tag-line {
-        color: rgba(0, 0, 0, 0.4);
-      }
-    }
-  }
-
-  .drop-overlay {
-    background-color: rgba(255, 255, 255, 0.4);
-
-    .centered-hint {
-      color: rgba(0, 0, 0, 0.95);
-    }
-  }
-}
-
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  gap: 16px;
-}
-</style>

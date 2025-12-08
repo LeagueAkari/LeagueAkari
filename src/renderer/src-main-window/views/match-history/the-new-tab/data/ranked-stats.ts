@@ -23,7 +23,7 @@ export type RankedStatsContext = {
 }
 
 export const RankedStatsContextKey: InjectionKey<RankedStatsContext> = Symbol(
-  'MatchHistoryTabRankedStatsContext'
+  'PlayerTabRankedStatsContext'
 )
 
 /**
@@ -86,6 +86,8 @@ export function provideRankedStats(props: {
     isLoading,
     loadRankedStats
   })
+
+  return { rankedStats, isLoading, loadRankedStats }
 }
 
 export function useRankedStats() {

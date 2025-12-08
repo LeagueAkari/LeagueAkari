@@ -154,10 +154,9 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopconfirm, NSkeleton } from 'naive-ui'
 import { computed, markRaw, reactive, watch } from 'vue'
 
-import {
-  EncounteredGame,
-  useMatchHistoryTabsStore
-} from '@main-window/shards/match-history-tabs/store'
+import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+
+import { EncounteredGame } from '../the-new-tab/data/encountered-games'
 
 const { t } = useTranslation()
 

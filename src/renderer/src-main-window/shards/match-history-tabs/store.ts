@@ -1,61 +1,10 @@
-import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
-import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { ReplayMetadata } from '@shared/types/league-client/replays'
-import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
+import { Summoner } from '@shared/data-adapter/summoner'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { SummonerProfile } from '@shared/types/league-client/summoner'
 import { SpectatorData } from '@shared/types/sgp/gsm'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
-
-/**
- * 通用带状态的战绩数据
- */
-
-export interface MatchHistoryPage {
-  games: LcuOrSgpGameSummary[]
-
-  replayMetadata: Record<number, ReplayMetadata>
-
-  details: Record<number, LcuOrSgpGameDetails>
-  detailsLoading: Record<number, boolean>
-
-  /** 上次拉取战绩的时间 */
-  lastUpdate?: number
-
-  /** 从 1 开始 */
-  page: number
-
-  /** 不得超过 200, 不得低于 1 */
-  pageSize: number
-
-  /** 'all' 为所有队列, 如果战机源为 LCU, 则一定为 all */
-  tag: string
-}
-
-// copied from main shard
-export interface SavedPlayer {
-  encounteredGames: EncounteredGame[]
-  puuid: string
-  selfPuuid: string
-  region: string
-  rsoPlatformId: string
-  tag: string | null
-  updateAt: Date
-  lastMetAt: Date | null
-}
-
-// copied from main shard
-export interface EncounteredGame {
-  id: number
-  gameId: number
-  puuid: string
-  selfPuuid: string
-  region: string
-  rsoPlatformId: string
-  updateAt: Date
-  queueType: string
-}
 
 export interface TabState {
   id: string
@@ -63,46 +12,24 @@ export interface TabState {
   /** 页面的 puuid */
   puuid: string
 
-  /** 该玩家数据来源自哪个大区或 RSO */
+  /** 该玩家数据来源自哪个服务器 */
   sgpServerId: string
 
-  /** 召唤师信息需要加载 */
-  summoner: SummonerInfo | null
+  // --- 以下数据通过 tab component -> store 同步
 
-  /** 召唤师段位信息 */
-  rankedStats: RankedStats | null
+  /** 是否位于加载状态，这个状态由 tab 本身控制 */
+  isLoading: boolean
 
-  /** 保存的召唤师信息 */
-  savedInfo: SavedPlayer | null
+  /** 玩家信息 */
+  summoner: Summoner | null
 
-  /** 当前战绩页 */
-  matchHistoryPage: MatchHistoryPage | null
-
-  /** 观战信息 */
-  spectatorData: SpectatorData | null
-
+  /** 玩家 profile 信息 */
   summonerProfile: SummonerProfile | null
 
-  /** 最近遇到过的对局 */
-  encounteredGamesPage: {
-    data: EncounteredGame[]
-    page: number
-    pageSize: number
-    total: number
-  } | null
+  /** 玩家 spectator 信息 */
+  spectatorData: SpectatorData | null
 
-  /** 标记信息 */
-  tags: PlayerTagDto[]
-
-  // 加载状态
-  isLoadingSummoner: boolean
-  isLoadingRankedStats: boolean
-  isLoadingMatchHistory: boolean
-  isLoadingSpectatorData: boolean
-  isLoadingTags: boolean
-  isLoadingSavedInfo: boolean
-  isLoadingSummonerProfile: boolean
-  isLoadingEncounteredGames: boolean
+  refresh: (() => void) | null
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
@@ -230,6 +157,16 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   /** 避免太多的加载, 在所有的页面中可以共享 */
   const detailedGameLruMap = new QuickLRU<string, LcuOrSgpGameSummary>({ maxSize: 128 })
 
+  const updateTabData = (
+    id: string,
+    data: Partial<Exclude<TabState, 'id' | 'puuid' | 'sgpServerId'>>
+  ) => {
+    const tab = tabs.value.find((t) => t.id === id)
+    if (tab) {
+      Object.assign(tab, data)
+    }
+  }
+
   return {
     frontendSettings,
 
@@ -249,6 +186,8 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
     closeToTheRight: closeTabsToTheRight,
     canCloseOtherTabs,
     canCloseTabsToTheRight,
-    moveTabBefore
+    moveTabBefore,
+
+    updateTabData
   }
 })

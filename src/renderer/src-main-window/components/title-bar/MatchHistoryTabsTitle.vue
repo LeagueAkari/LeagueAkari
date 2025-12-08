@@ -1,6 +1,9 @@
 <template>
   <div class="match-history-tabs-title">
+    <!-- search -->
     <SearchSummonerModal v-model:show="searchSummonerModalShow" @to-summoner="handleToSummoner" />
+
+    <!-- context menu -->
     <NDropdown
       placement="bottom-start"
       trigger="manual"
@@ -13,6 +16,7 @@
       @select="handleContextMenuSelect"
       :theme-overrides="{ color: '#222e', fontSizeSmall: '13px', optionHeightSmall: '26px' }"
     />
+
     <template v-if="lcs.isConnected">
       <NScrollbar
         :class="$style['scrollbar']"
@@ -152,7 +156,7 @@ import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
 
@@ -180,21 +184,10 @@ const handleMouseUp = (event: MouseEvent, unionId: string) => {
   }
 }
 
-const isTabLoading = (tab: TabState) => {
-  return (
-    tab.isLoadingMatchHistory ||
-    tab.isLoadingRankedStats ||
-    tab.isLoadingSavedInfo ||
-    tab.isLoadingSpectatorData ||
-    tab.isLoadingSummoner ||
-    tab.isLoadingSummonerProfile
-  )
-}
-
 const tabLoadingStateMap = computed(() => {
   const map: Record<string, boolean> = {}
   for (const tab of mhs.tabs) {
-    map[tab.id] = isTabLoading(tab)
+    map[tab.id] = tab.isLoading
   }
 
   return map
@@ -295,7 +288,7 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     disabled: computed(() => {
       const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
       if (tab) {
-        return isTabLoading(tab)
+        return tab.isLoading
       }
 
       return true
@@ -326,7 +319,7 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
 const handleContextMenuSelect = (key: string) => {
   switch (key) {
     case 'refresh':
-      mh.events.emit('refresh-tab', contextMenuState.id)
+      mhs.getTab(contextMenuState.id)?.refresh?.()
       break
     case 'close':
       mhs.closeTab(contextMenuState.id)
@@ -454,9 +447,19 @@ const { summonerName } = useStreamerModeMaskedText()
   line-height: 1;
   filter: brightness(0.7);
   border: 1px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.1);
+
+  [data-theme='dark'] & {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 
   &:hover {
     filter: brightness(0.8);
+    background-color: rgba(0, 0, 0, 0.1);
+
+    [data-theme='dark'] & {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
   }
 
   .tab-icon {
@@ -470,6 +473,11 @@ const { summonerName } = useStreamerModeMaskedText()
 
   .tab-icon-placeholder {
     border-radius: 2px;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    [data-theme='dark'] & {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
   }
 
   .close-icon {
@@ -478,12 +486,30 @@ const { summonerName } = useStreamerModeMaskedText()
     cursor: pointer;
     border-radius: 2px;
     transition: background-color 0.2s;
+    color: rgba(0, 0, 0, 0.8);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
   }
 
   .sgp-server {
     font-size: 11px;
     font-weight: bold;
     margin-right: 4px;
+    color: rgba(111, 151, 136, 0.9);
+
+    [data-theme='dark'] & {
+      color: rgba(174, 245, 219, 0.8);
+    }
   }
 
   .summoner-name {
@@ -493,24 +519,55 @@ const { summonerName } = useStreamerModeMaskedText()
 
   .empty-placeholder-text {
     font-size: 12px;
+    color: rgba(0, 0, 0, 0.8);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 
   .game-name-line {
     font-size: 12px;
     font-weight: bold;
     margin-right: 4px;
+    color: rgba(0, 0, 0, 1);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 1);
+    }
   }
 
   .tag-line {
     font-size: 11px;
+    color: rgba(0, 0, 0, 0.8);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 
   &.active {
     filter: brightness(1);
+    background-color: rgba(0, 0, 0, 0);
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+
+    [data-theme='dark'] & {
+      background-color: rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(0, 0, 0, 0);
+      border-left: 1px solid rgba(0, 0, 0, 0);
+      border-right: 1px solid rgba(0, 0, 0, 0);
+    }
   }
 
   &.drag-hover {
     filter: brightness(0.8);
+    background-color: rgba(0, 0, 0, 0.4);
+
+    [data-theme='dark'] & {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
   }
 }
 
@@ -534,6 +591,33 @@ const { summonerName } = useStreamerModeMaskedText()
     border-color 0.2s,
     background-color 0.2s,
     color 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.8);
+
+  [data-theme='dark'] & {
+    border: 1px solid rgba(255, 255, 255, 0);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.4);
+    color: rgba(0, 0, 0, 1);
+
+    [data-theme='dark'] & {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 1);
+    }
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.05);
+
+    [data-theme='dark'] & {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
 
   .search-icon {
     font-size: 12px;
@@ -552,142 +636,10 @@ const { summonerName } = useStreamerModeMaskedText()
   height: 40%;
   box-sizing: border-box;
   margin: 0 8px;
-}
+  background-color: rgba(0, 0, 0, 0.15);
 
-[data-theme='dark'] {
-  .tab {
-    background-color: rgba(255, 255, 255, 0.05);
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .tab-icon-placeholder {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .close-icon {
-      color: rgba(255, 255, 255, 0.8);
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-    }
-
-    .sgp-server {
-      color: rgba(174, 245, 219, 0.8);
-    }
-
-    .empty-placeholder-text {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .game-name-line {
-      color: rgba(255, 255, 255, 1);
-    }
-
-    .tag-line {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    &.active {
-      background-color: rgba(255, 255, 255, 0.12);
-    }
-
-    &.drag-hover {
-      background-color: rgba(255, 255, 255, 0.4);
-    }
-  }
-
-  .search-area {
-    padding: 0px 12px 0px 10px;
-    border: 1px solid rgba(255, 255, 255, 0);
-
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      color: rgba(255, 255, 255, 1);
-    }
-
-    &:active {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
-  }
-
-  .divider {
+  [data-theme='dark'] & {
     background-color: rgba(255, 255, 255, 0.15);
-  }
-}
-
-[data-theme='light'] {
-  .tab {
-    background-color: rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .tab-icon-placeholder {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .close-icon {
-      color: rgba(0, 0, 0, 0.8);
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.2);
-      }
-    }
-
-    .sgp-server {
-      color: rgba(111, 151, 136, 0.9);
-    }
-
-    .empty-placeholder-text {
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    .game-name-line {
-      color: rgba(0, 0, 0, 1);
-    }
-
-    .tag-line {
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    &.active {
-      background-color: rgba(0, 0, 0, 0);
-      border-top: 1px solid rgba(0, 0, 0, 0.2);
-      border-left: 1px solid rgba(0, 0, 0, 0.2);
-      border-right: 1px solid rgba(0, 0, 0, 0.2);
-    }
-
-    &.drag-hover {
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-  }
-
-  .search-area {
-    padding: 0px 12px 0px 10px;
-    border: 1px solid rgba(0, 0, 0, 0);
-
-    background-color: rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 0.8);
-
-    &:hover {
-      border-color: rgba(0, 0, 0, 0.4);
-      color: rgba(0, 0, 0, 1);
-    }
-
-    &:active {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  .divider {
-    background-color: rgba(0, 0, 0, 0.15);
   }
 }
 </style>

@@ -12,7 +12,8 @@ import {
   provide,
   ref,
   shallowRef,
-  toRef
+  toRef,
+  watch
 } from 'vue'
 
 export type TagsContext = {
@@ -35,7 +36,7 @@ export type TagsContext = {
   editTag: (tag: string) => Promise<boolean>
 }
 
-export const TagsContextKey: InjectionKey<TagsContext> = Symbol('MatchHistoryTabTagsContext')
+export const TagsContextKey: InjectionKey<TagsContext> = Symbol('PlayerTabTagsContext')
 
 export function provideTags(props: { puuid: MaybeRefOrGetter<string> }) {
   const puuid = toRef(props.puuid)
@@ -69,19 +70,13 @@ export function provideTags(props: { puuid: MaybeRefOrGetter<string> }) {
     }
   }
 
-  const removeTag = async (markerPuuid?: string): Promise<boolean> => {
-    const markerPuuid0 = markerPuuid || lcs.summoner.me?.puuid
-
-    if (!markerPuuid0) {
-      return false
-    }
-
+  const removeTag = async (puuid: string, selfPuuid: string): Promise<boolean> => {
     isLoading.value = true
 
     try {
       await sp.updatePlayerTag({
-        puuid: puuid.value,
-        selfPuuid: markerPuuid0,
+        puuid,
+        selfPuuid,
         tag: null
       })
 
@@ -119,6 +114,14 @@ export function provideTags(props: { puuid: MaybeRefOrGetter<string> }) {
     }
   }
 
+  watch(
+    [puuid, () => lcs.summoner.me?.puuid],
+    () => {
+      loadTags()
+    },
+    { immediate: true }
+  )
+
   provide(TagsContextKey, {
     tags,
     isLoading,
@@ -126,6 +129,8 @@ export function provideTags(props: { puuid: MaybeRefOrGetter<string> }) {
     removeTag,
     editTag
   })
+
+  return { tags, isLoading, loadTags, removeTag, editTag }
 }
 
 export function useTags() {

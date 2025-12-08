@@ -2,11 +2,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { createEventBus } from '@renderer-shared/utils/events'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
-import { computed, markRaw, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useMatchHistoryTabsStore } from './store'
@@ -37,8 +36,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
 
-  private readonly _events = createEventBus()
-
   constructor(
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
@@ -58,31 +55,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
     const lcs = useLeagueClientStore()
     const sgps = useSgpStore()
 
-    watch(
-      () => lcs.summoner.me,
-      (summoner) => {
-        if (summoner) {
-          const tab = mhs.getTabByPuuid(summoner.puuid)
-          if (tab) {
-            tab.summoner = markRaw(summoner)
-          }
-        }
-      }
-    )
-
-    watch(
-      () => lcs.summoner.profile,
-      (profile) => {
-        if (profile && lcs.summoner.me) {
-          const tab = mhs.getTabByPuuid(lcs.summoner.me.puuid)
-          if (tab) {
-            tab.summonerProfile = markRaw(profile)
-          }
-        }
-      }
-    )
-
-    // 当前召唤师登录时，立即创建一个页面
+    // 在玩家登录时立即创建一个页面
     watch(
       [() => lcs.summoner.me, () => sgps.availability.sgpServerId],
       ([me, sgpServerId]) => {
@@ -102,28 +75,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         }
       }
     )
-
-    // 在切换数据源后清除一些状态
-    watch(
-      () => mhs.frontendSettings.matchHistoryUseSgpApi,
-      (y) => {
-        if (!y) {
-          mhs.tabs.forEach((t) => {
-            if (t.matchHistoryPage) {
-              t.matchHistoryPage.tag = 'all'
-            }
-          })
-        }
-      }
-    )
-  }
-
-  get events() {
-    if (!this._events) {
-      throw new Error('event emitter is not ready')
-    }
-
-    return this._events
   }
 
   /**
@@ -302,22 +253,11 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         id: this.toUnionId(sgpServerId, puuid),
         puuid,
         sgpServerId,
-        matchHistoryPage: null,
-        rankedStats: null,
-        savedInfo: null,
+        isLoading: false,
         summoner: null,
-        spectatorData: null,
         summonerProfile: null,
-        encounteredGamesPage: null,
-        tags: markRaw([]),
-        isLoadingTags: false,
-        isLoadingSavedInfo: false,
-        isLoadingMatchHistory: false,
-        isLoadingRankedStats: false,
-        isLoadingSummoner: false,
-        isLoadingSpectatorData: false,
-        isLoadingSummonerProfile: false,
-        isLoadingEncounteredGames: false
+        spectatorData: null,
+        refresh: null
       },
       setCurrent
     )
@@ -357,7 +297,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 }
 
-/** 暂时抽离到此处 */
 export function usePageSizeOptions() {
   const { t } = useTranslation()
 

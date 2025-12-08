@@ -2,7 +2,7 @@ import { Dep, Shard } from '@shared/akari-shard'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import LRUMap from 'quick-lru'
 
-import { EncounteredGame } from '@main-window/shards/match-history-tabs/store'
+import { EncounteredGame } from '@main-window/views/match-history/the-new-tab/data/encountered-games'
 
 import { AkariIpcRenderer } from '../ipc'
 

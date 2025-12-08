@@ -5,6 +5,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuGameSummary, LcuOrSgpGameSummary, SgpGameSummary } from '@shared/data-adapter/wrapper'
 import {
   InjectionKey,
@@ -44,7 +45,7 @@ export type EncounteredGameContext = {
 }
 
 export const EncounteredGameContextKey: InjectionKey<EncounteredGameContext> = Symbol(
-  'MatchHistoryTabEncounteredGameContext'
+  'PlayerTabEncounteredGameContext'
 )
 
 export interface PagedEncounteredGames {
@@ -72,6 +73,7 @@ export function provideEncounteredGames(props: {
 
   const lcs = useLeagueClientStore()
   const mhs = useMatchHistoryTabsStore()
+  const sgps = useSgpStore()
 
   const lc = useInstance(LeagueClientRenderer)
   const sgp = useInstance(SgpRenderer)
@@ -88,6 +90,11 @@ export function provideEncounteredGames(props: {
     const task = async (gameId: number) => {
       try {
         if (preferredSource.value === 'sgp') {
+          // SGP API 需要 token 就绪
+          if (!sgps.isTokenReady) {
+            return
+          }
+
           // use SGP API
           const cached = mhs.detailedGameLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
 
@@ -161,6 +168,7 @@ export function provideEncounteredGames(props: {
     await loadGames(pagedGames.value?.page ?? 1)
   }
 
+  // 主要监听器
   watch(
     [isSelfTab, preferredSource, puuid, isCrossRegion],
     ([isSelfTab, _preferredSource, _puuid, isCrossRegion]) => {
@@ -176,6 +184,21 @@ export function provideEncounteredGames(props: {
     { immediate: true }
   )
 
+  // 监听 SGP token 就绪状态（仅在使用 SGP 加载游戏详情时需要）
+  watch(
+    () => sgps.isTokenReady,
+    (ready) => {
+      // 当 token 就绪且使用 SGP 源时，重新加载游戏详情
+      if (ready && preferredSource.value === 'sgp' && pagedGames.value) {
+        const gameIds = pagedGames.value.data.map((g) => g.gameId).filter((id) => !gameMap[id])
+
+        if (gameIds.length > 0) {
+          loadPageGames(gameIds)
+        }
+      }
+    }
+  )
+
   provide(EncounteredGameContextKey, {
     pagedGames,
     gameMap,
@@ -183,6 +206,8 @@ export function provideEncounteredGames(props: {
     loadGames,
     deleteGame
   })
+
+  return { pagedGames, gameMap, isLoading, loadGames, deleteGame }
 }
 
 export function useEncounteredGames() {

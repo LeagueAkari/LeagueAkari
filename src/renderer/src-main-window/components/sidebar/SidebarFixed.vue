@@ -101,7 +101,7 @@
     <!-- settings -->
     <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
-        <div class="menu-item" @click="handleOpenSettingsModal">
+        <div class="menu-item" @click="() => openSettingsModal()">
           <div class="menu-item__inner">
             <NIcon class="menu-item__icon"><Settings28FilledIcon /></NIcon>
             <div class="menu-item__label">{{ t('SideBarFixed.settings') }}</div>
@@ -131,8 +131,9 @@ import {
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
-import { computed, inject, useTemplateRef, watch } from 'vue'
+import { computed, useTemplateRef, watch } from 'vue'
 
+import { useAppContext } from '@main-window/context'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 import ClientConnection from './ClientConnection.vue'
@@ -160,10 +161,7 @@ const handleSummonerClick = (summoner: SummonerInfo) => {
   navigateToTabByPuuid(summoner.puuid)
 }
 
-const { openSettingsModal } = inject('app') as any
-const handleOpenSettingsModal = () => {
-  openSettingsModal()
-}
+const { openSettingsModal } = useAppContext()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)

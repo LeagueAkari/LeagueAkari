@@ -1,21 +1,42 @@
 <template>
-  <div ref="containerEl" class="relative h-full">
-    <NScrollbar x-scrollable>
+  <div class="h-full">
+    <NScrollbar x-scrollable :theme-overrides="{ width: '8px' }">
       <div
-        class="mx-auto"
+        class="mx-auto pt-10 pb-4"
         :class="{
           'w-1064px': !isSmallSize,
           'w-764px': isSmallSize
         }"
       >
         <!-- head -->
-        <PlayerTabHeader class="mt-10 mb-6 px-4 h-28" />
+        <PlayerTabHeader class="mb-6 px-4 h-28" />
 
-        <!-- main content -->
-        <div class="flex gap-3 items-start">
+        <!-- main content: thin size -->
+        <div class="flex flex-col" v-if="isSmallSize">
+          <div ref="stickySentinelRightSideEl" class="h-0 w-full"></div>
+          <MatchHistoryPagination
+            horizontal
+            :is-floating="!isSentinelVisibleRightSide"
+            class="sticky top-2 z-10 self-end mb-2"
+          />
+
+          <MatchHistoryList />
+        </div>
+
+        <!-- main content: wide size -->
+        <div class="flex gap-3" v-else>
           <!-- side -->
-          <div class="space-y-2 w-300px" v-if="!isSmallSize">
+          <div class="space-y-2 w-300px">
+            <div ref="stickySentinelLeftSideEl" class="h-0 w-full"></div>
+            <MatchHistoryPagination
+              :is-floating="!isSentinelVisibleLeftSide"
+              class="sticky top-2 z-10 -mt-2"
+            />
             <NormalTagBlock />
+            <SpectatorPane />
+            <SummaryPane />
+            <RecentlyPlayers side="ally" />
+            <RecentlyPlayers side="opponent" />
             <EncounteredGames />
           </div>
 
@@ -33,7 +54,8 @@
       :summary="previewingGame.summary"
     />
 
-    <LoadingStateTracker />
+    <!-- 这个组件不会生成 DOM，但用来保证全局状态同步 -->
+    <GlobalStateTracker />
   </div>
 </template>
 
@@ -42,35 +64,45 @@ import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { useElementSize } from '@vueuse/core'
+import { useElementVisibility } from '@vueuse/core'
 import { NScrollbar } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef } from 'vue'
 
+import { useAppContext } from '@main-window/context'
+
+import GlobalStateTracker from './GlobalStateTracker.vue'
 import MatchHistoryList from './MatchHistoryList.vue'
 import PlayerTabHeader from './PlayerTabHeader.vue'
 import { providePlayerTab } from './context'
 import { SMALL_SIZE_THRESHOLD } from './data/constants'
 import EncounteredGames from './widgets/EncounteredGames.vue'
-import LoadingStateTracker from './widgets/LoadingStateTracker.vue'
+import MatchHistoryPagination from './widgets/MatchHistoryPagination.vue'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'
+import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
+import SpectatorPane from './widgets/SpectatorPane.vue'
+import SummaryPane from './widgets/SummaryPane.vue'
 
-const { puuid, sgpServerId } = defineProps<{
+const { id, puuid, sgpServerId } = defineProps<{
+  id: string
   puuid: string
   sgpServerId: string
-}>()
-
-const emits = defineEmits<{
-  createTab: [puuid: string, sgpServerId: string]
 }>()
 
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
 
-const containerEl = useTemplateRef('containerEl')
+const { contentWidth } = useAppContext()
 
-const { width } = useElementSize(containerEl)
+const isSmallSize = computed(() => contentWidth.value < SMALL_SIZE_THRESHOLD)
 
-const isSmallSize = computed(() => width.value < SMALL_SIZE_THRESHOLD)
+const stickySentinelLeftSideEl = useTemplateRef('stickySentinelLeftSideEl')
+const stickySentinelRightSideEl = useTemplateRef('stickySentinelRightSideEl')
+const isSentinelVisibleLeftSide = useElementVisibility(stickySentinelLeftSideEl, {
+  initialValue: true
+})
+const isSentinelVisibleRightSide = useElementVisibility(stickySentinelRightSideEl, {
+  initialValue: true
+})
 
 const showPreviewModal = ref(false)
 const previewingGame = shallowRef({
@@ -96,13 +128,10 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string
 }
 
 providePlayerTab({
+  id: () => id,
   puuid: () => puuid,
   sgpServerId: () => sgpServerId,
   isSmallSize,
-  previewGame: handlePreviewGame,
-
-  onCreateTab: (puuid: string, sgpServerId: string) => {
-    emits('createTab', puuid, sgpServerId)
-  }
+  previewGame: handlePreviewGame
 })
 </script>

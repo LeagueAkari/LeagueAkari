@@ -16,7 +16,7 @@
     <div class="app-frame__right">
       <MainWindowTitleBar />
 
-      <div class="app-frame__right-content">
+      <div class="app-frame__right-content" ref="contentEl">
         <RouterView v-slot="{ Component }">
           <Transition name="fade">
             <KeepAlive>
@@ -54,14 +54,16 @@ import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
+import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { provide, ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { useMicaAvailability } from './composables/useMicaAvailability'
+import { provideAppContext } from './context'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
@@ -72,16 +74,18 @@ const { t } = useTranslation()
 
 greeting(as.version)
 
-const appProvide = {
+const contentEl = useTemplateRef('contentEl')
+const { width } = useElementSize(contentEl)
+
+provideAppContext({
+  contentWidth: width,
   openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
     if (tabName) {
       settingModelTab.value = tabName
     }
   }
-}
-
-provide('app', appProvide)
+})
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')

@@ -3,6 +3,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
@@ -17,6 +18,7 @@ import {
   InjectionKey,
   MaybeRefOrGetter,
   Ref,
+  computed,
   inject,
   markRaw,
   provide,
@@ -78,6 +80,7 @@ export function provideMatchHistory(props: {
   const componentName = useComponentName()
 
   const sgp = useInstance(SgpRenderer)
+  const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
   const mhs = useMatchHistoryTabsStore()
   const log = useInstance(LoggerRenderer)
@@ -91,6 +94,12 @@ export function provideMatchHistory(props: {
 
   const lcuLoadDetailedGameQueue = new PQueue({ concurrency: 10 })
   const lcuReplayMetadataQueue = new PQueue({ concurrency: 10 })
+
+  const sgpApiAvailable = computed(() => {
+    return (
+      sgps.isTokenReady && (sgps.sgpServerConfig.servers[sgpServerId.value]?.matchHistory ?? false)
+    )
+  })
 
   const loadReplayMetadata = async (games: LcuOrSgpGameSummary[]) => {
     const { data: conf } = await lc.api.replays.getConfiguration()
@@ -147,6 +156,16 @@ export function provideMatchHistory(props: {
 
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+        // SGP API 需要 token 就绪
+        if (!sgps.isTokenReady) {
+          return
+        }
+
+        // 检查 SGP 服务器支持
+        if (!sgps.sgpServerConfig.servers[sgpServerId.value]?.matchHistory) {
+          return
+        }
+
         const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
           puuid.value,
           {
@@ -223,6 +242,11 @@ export function provideMatchHistory(props: {
 
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+        // SGP API 需要 token 就绪
+        if (!sgps.isTokenReady) {
+          return
+        }
+
         const { data } = await sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId, {
           __sgpServerId: sgpServerId.value
         })
@@ -268,11 +292,17 @@ export function provideMatchHistory(props: {
     }
   })
 
+  // 主要监听器：参数变化时加载
   watch(
-    [preferredSource, puuid, sgpServerId, isCrossRegion],
-    () => {
+    [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
+    ([available]) => {
       lcuLoadDetailedGameQueue.clear()
       lcuReplayMetadataQueue.clear()
+
+      // 如果需要 SGP 但 token 未就绪，等待 token 就绪后再加载
+      if ((preferredSource.value === 'sgp' || isCrossRegion.value) && !available) {
+        return
+      }
 
       loadMatchHistory({
         count: mhs.frontendSettings.loadCount
@@ -289,6 +319,15 @@ export function provideMatchHistory(props: {
     downloadReplay,
     launchRelay
   })
+
+  return {
+    pagedMatchHistory,
+    isLoading,
+    loadMatchHistory,
+    loadDetails,
+    downloadReplay,
+    launchRelay
+  }
 }
 
 export function useMatchHistory() {
