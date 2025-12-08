@@ -137,7 +137,7 @@ export function useTags() {
   const context = inject(TagsContextKey)
 
   if (!context) {
-    throw new Error('useTags must be used within a MatchHistoryTab')
+    throw new Error('useTags must be used within a PlayerTab')
   }
 
   return context

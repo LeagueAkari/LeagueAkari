@@ -7,6 +7,7 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Summoner, toSummoner } from '@shared/data-adapter/summoner'
+import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import {
   InjectionKey,
@@ -58,6 +59,7 @@ export function provideSummoner(props: {
   const isLoading = ref(false)
   const summoner = shallowRef<Summoner | null>(null)
 
+  const { t } = useTranslation()
   const notification = useNotification()
 
   const sgpApiAvailable = computed(() => {
@@ -86,8 +88,8 @@ export function provideSummoner(props: {
 
         if (summoners.length === 0) {
           notification.error({
-            title: 'Summoner not found' + puuid.value,
-            content: 'The summoner you are looking for is not found.'
+            title: () => t('PlayerTab.summonerNotFoundTitle', { puuid: puuid.value }),
+            content: () => t('PlayerTab.summonerNotFoundContent')
           })
           return
         }
@@ -98,8 +100,8 @@ export function provideSummoner(props: {
 
         if (namesets.namesets.length === 0) {
           notification.error({
-            title: 'Summoner not found' + puuid.value,
-            content: 'The summoner you are looking for is not found.'
+            title: () => t('PlayerTab.summonerNotFoundTitle', { puuid: puuid.value }),
+            content: () => t('PlayerTab.summonerNotFoundContent')
           })
           return
         }
@@ -117,10 +119,10 @@ export function provideSummoner(props: {
         const { data } = await lc.api.summoner.getSummonerByPuuid(puuid.value)
         summoner.value = toSummoner({ source: 'lcu', data, puuid: data.puuid })
       }
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
-        title: 'Failed to load summoner',
-        content: 'Failed to load summoner'
+        title: () => t('PlayerTab.failedToLoadSummonerTitle'),
+        content: () => t('PlayerTab.failedToLoadSummonerContent', { reason: error.message })
       })
       log.error(componentName, error)
     } finally {
@@ -165,7 +167,7 @@ export function useSummoner() {
   const context = inject(SummonerContextKey)
 
   if (!context) {
-    throw new Error('useSummoner must be used within a MatchHistoryTab')
+    throw new Error('useSummoner must be used within a PlayerTab')
   }
 
   return context

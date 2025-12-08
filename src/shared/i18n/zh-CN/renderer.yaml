@@ -953,7 +953,7 @@ SpectateStatus:
     copied: 对局密钥已复制
     copyFailed: 复制观战信息失败
 
-MatchHistoryTabsTitle:
+PlayerTabsTitle:
   loading: 加载中...
   search: 搜索玩家
   refresh: 刷新
@@ -1399,14 +1399,14 @@ Spectate:
 
   failedToLoadFriends: 无法加载好友列表
 
-MatchHistoryTabs:
+PlayerTabs:
   disconnected: 未连接到客户端
   queueing: 正在进行登录排队
   noActiveTab: 当前没有活跃的战绩页面
   copiedToClipboard: 已复制到剪贴板
   dropZoneRosterMember: 投放以转到该玩家
 
-MatchHistoryTab:
+PlayerTab:
   prevPage: 上一页
   nextPage: 下一页
   refreshPage: 刷新页面
@@ -1414,6 +1414,15 @@ MatchHistoryTab:
   tagPlayer: 标记玩家
   itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
+
+  summonerNotFoundTitle: 找不到召唤师 {{puuid}}
+  summonerNotFoundContent: 您正在寻找的召唤师不存在
+  failedToLoadSummonerTitle: 加载召唤师失败
+  failedToLoadSummonerContent: 无法加载召唤师信息：{{reason}}
+  failedToLoadMatchHistoryTitle: 加载战绩失败
+  failedToLoadMatchHistoryContent: 无法加载战绩：{{reason}}
+  failedToLoadRankedStatsTitle: 加载排位统计失败
+  failedToLoadRankedStatsContent: 无法加载排位统计：{{reason}}
 
   private:
     title: 生涯隐藏

@@ -14,7 +14,7 @@ import {
   toValue
 } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
@@ -55,7 +55,7 @@ export type PlayerTabContext = {
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
-export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('MatchHistoryTabContext')
+export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('PlayerTabContext')
 
 export function usePlayerTab(): PlayerTabContext {
   const context = inject(PlayerTabContextKey)
@@ -78,9 +78,9 @@ export function providePlayerTab(props: {
   const lcs = useLeagueClientStore()
   const as = useAppCommonStore()
 
-  const mh = useInstance(MatchHistoryTabsRenderer)
+  const pt = useInstance(PlayerTabsRenderer)
 
-  const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
+  const { navigateToTabByPuuidAndSgpServerId } = pt.useNavigateToTab()
 
   const id = toRef(props.id)
   const puuid = toRef(props.puuid)
@@ -110,7 +110,7 @@ export function providePlayerTab(props: {
       if (setCurrent) {
         navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId.value)
       } else {
-        mh.createTab(puuid, sgpServerId.value, false)
+        pt.createTab(puuid, sgpServerId.value, false)
       }
     },
     previewGame: props.previewGame

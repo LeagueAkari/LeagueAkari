@@ -134,7 +134,7 @@ import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
 import { computed, useTemplateRef, watch } from 'vue'
 
 import { useAppContext } from '@main-window/context'
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import ClientConnection from './ClientConnection.vue'
 
@@ -148,14 +148,14 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
 const formattedCountdown = computed(() => {
   const seconds = rts.info.timeLeft
   return seconds > 99 ? '99+' : `${seconds.toFixed(0)}`
 })
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const handleSummonerClick = (summoner: SummonerInfo) => {
   navigateToTabByPuuid(summoner.puuid)

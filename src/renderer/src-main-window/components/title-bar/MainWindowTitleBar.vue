@@ -3,7 +3,7 @@
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
-          <MatchHistoryTabsTitle v-if="$route.name === 'match-history'" />
+          <PlayerTabsTitle v-if="$route.name === 'player-tabs'" />
           <OngoingGameTitle v-else-if="$route.name === 'ongoing-game'" />
         </KeepAlive>
       </Transition>
@@ -21,23 +21,23 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import CommonButtons from './CommonButtons.vue'
-import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
+import PlayerTabsTitle from './PlayerTabsTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
 
 const route = useRoute()
 
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 
 const shouldShowDivider = computed(() => {
   switch (route.name) {
-    case 'match-history':
-      return lcs.isConnected && mhs.tabs.length
+    case 'player-tabs':
+      return lcs.isConnected && pts.tabs.length
 
     case 'ongoing-game':
       const isCsSpectateWait =
@@ -53,8 +53,8 @@ const shouldShowDivider = computed(() => {
 
 const shouldShowBottomBorder = computed(() => {
   switch (route.name) {
-    case 'match-history':
-      return lcs.isConnected && mhs.tabs.length
+    case 'player-tabs':
+      return lcs.isConnected && pts.tabs.length
     case 'ongoing-game':
       return ogs.queryStage.phase !== 'unavailable'
     default:

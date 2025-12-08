@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 import Automation from '@main-window/views/automation/Automation.vue'
-import MatchHistoryTabs from '@main-window/views/match-history/MatchHistoryTabs.vue'
 import OngoingGame from '@main-window/views/ongoing-game/OngoingGame.vue'
+import PlayerTabs from '@main-window/views/player-tabs/PlayerTabs.vue'
 import Test from '@main-window/views/test/Test.vue'
 import Toolkit from '@main-window/views/toolkit/Toolkit.vue'
 
@@ -13,12 +13,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      redirect: { name: 'match-history' }
+      redirect: { name: 'player-tabs' }
     },
     {
-      name: 'match-history',
-      path: '/match-history/:sgpServerId?/:puuid?',
-      component: MatchHistoryTabs
+      name: 'player-tabs',
+      path: '/player-tabs/:sgpServerId?/:puuid?',
+      component: PlayerTabs
     },
     {
       name: 'ongoing-game',

@@ -3,7 +3,7 @@
 <script setup lang="ts">
 import { markRaw, watch } from 'vue'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from './context'
 import { useSpectator } from './data/spectator'
@@ -16,14 +16,14 @@ const { summoner } = useSummoner()
 const { spectatorData } = useSpectator()
 const { profile } = useSummonerProfile()
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 
 const { refresh, isSomethingLoading } = useRefresh()
 
 watch(
   [id, isSomethingLoading],
   ([id, isSomethingLoading]) => {
-    mhs.updateTabData(id, { isLoading: isSomethingLoading })
+    pts.updateTabData(id, { isLoading: isSomethingLoading })
   },
   { immediate: true }
 )
@@ -31,7 +31,7 @@ watch(
 watch(
   [id, summoner],
   ([id, summoner]) => {
-    mhs.updateTabData(id, { summoner: summoner ? markRaw(summoner) : null })
+    pts.updateTabData(id, { summoner: summoner ? markRaw(summoner) : null })
   },
   { immediate: true }
 )
@@ -39,7 +39,7 @@ watch(
 watch(
   [id, spectatorData],
   ([id, spectatorData]) => {
-    mhs.updateTabData(id, { spectatorData: spectatorData ? markRaw(spectatorData) : null })
+    pts.updateTabData(id, { spectatorData: spectatorData ? markRaw(spectatorData) : null })
   },
   { immediate: true }
 )
@@ -47,7 +47,7 @@ watch(
 watch(
   [id, profile],
   ([id, summonerProfile]) => {
-    mhs.updateTabData(id, { summonerProfile: summonerProfile ? markRaw(summonerProfile) : null })
+    pts.updateTabData(id, { summonerProfile: summonerProfile ? markRaw(summonerProfile) : null })
   },
   { immediate: true }
 )
@@ -55,7 +55,7 @@ watch(
 watch(
   id,
   (id) => {
-    mhs.updateTabData(id, { refresh: refresh })
+    pts.updateTabData(id, { refresh: refresh })
   },
   { immediate: true }
 )

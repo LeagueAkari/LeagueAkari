@@ -140,8 +140,8 @@ export function provideSpectator(props: {
           spectatorData.value.playerCredentials.spectatorKey
         )
         notification.success({
-          title: () => t('MatchHistoryTab.operationSuccessTitle'),
-          content: () => t('MatchHistoryTab.spectatorCalledUp'),
+          title: () => t('PlayerTab.operationSuccessTitle'),
+          content: () => t('PlayerTab.spectatorCalledUp'),
           duration: 4000
         })
       } else {
@@ -155,15 +155,15 @@ export function provideSpectator(props: {
           sgpServerId: sgpServerId.value
         })
         notification.success({
-          title: () => t('MatchHistoryTab.operationSuccessTitle'),
-          content: () => t('MatchHistoryTab.spectatorCalledUpByCmd'),
+          title: () => t('PlayerTab.operationSuccessTitle'),
+          content: () => t('PlayerTab.spectatorCalledUpByCmd'),
           duration: 4000
         })
       }
     } catch (error: any) {
       notification.warning({
-        title: () => t('MatchHistoryTab.operationFailedTitle'),
-        content: () => t('MatchHistoryTab.failedToCallUpSpectator', { reason: error.message }),
+        title: () => t('PlayerTab.operationFailedTitle'),
+        content: () => t('PlayerTab.failedToCallUpSpectator', { reason: error.message }),
         duration: 4000
       })
 

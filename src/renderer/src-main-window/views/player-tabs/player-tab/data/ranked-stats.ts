@@ -3,6 +3,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RankedStats } from '@shared/types/league-client/ranked'
+import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import {
   InjectionKey,
@@ -46,6 +47,7 @@ export function provideRankedStats(props: {
   const isLoading = ref(false)
   const rankedStats = shallowRef<RankedStats | null>(null)
 
+  const { t } = useTranslation()
   const notification = useNotification()
 
   const loadRankedStats = async () => {
@@ -59,8 +61,8 @@ export function provideRankedStats(props: {
       rankedStats.value = data
     } catch (error: any) {
       notification.error({
-        title: 'Failed to load ranked stats',
-        content: error.message
+        title: () => t('PlayerTab.failedToLoadRankedStatsTitle'),
+        content: () => t('PlayerTab.failedToLoadRankedStatsContent', { reason: error.message })
       })
       log.error(componentName, error)
     } finally {

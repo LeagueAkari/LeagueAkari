@@ -10,7 +10,7 @@
         :label-description="t('MatchHistorySettings.refreshTabsAfterGameEnds.description')"
         :label-width="400"
       >
-        <NSwitch size="small" v-model:value="mhs.frontendSettings.refreshTabsAfterGameEnds" />
+        <NSwitch size="small" v-model:value="pts.frontendSettings.refreshTabsAfterGameEnds" />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
@@ -21,7 +21,7 @@
         <NSelect
           style="width: 120px"
           size="small"
-          v-model:value="mhs.frontendSettings.loadCount"
+          v-model:value="pts.frontendSettings.loadCount"
           :options="pageSizeOptions"
         />
       </ControlItem>
@@ -34,12 +34,12 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
-import { usePageSizeOptions } from '@main-window/shards/match-history-tabs'
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePageSizeOptions } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 const { t } = useTranslation()
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 
 const pageSizeOptions = usePageSizeOptions()
 </script>

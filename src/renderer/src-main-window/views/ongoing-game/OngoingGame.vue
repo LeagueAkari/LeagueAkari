@@ -24,13 +24,13 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ref, shallowRef } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
 const as = useAppCommonStore()
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const showPreviewModal = ref(false)
 const previewingGame = shallowRef({

@@ -121,7 +121,7 @@ import {
   watch
 } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 interface RecordType {
   selfPuuid: string
@@ -139,14 +139,14 @@ interface MappedRecordType extends RecordType {
 const { t } = useTranslation()
 const sp = useInstance(SavedPlayerRenderer)
 const lc = useInstance(LeagueClientRenderer)
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 const sgp = useInstance(SgpRenderer)
 const rc = useInstance(RiotClientRenderer)
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
-const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
+const { navigateToTabByPuuidAndSgpServerId } = pt.useNavigateToTab()
 
 const sgps = useSgpStore()
 

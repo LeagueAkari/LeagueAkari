@@ -3,8 +3,8 @@
     <div class="text-base font-bold mb-3 dark:text-white text-gray-900">
       {{
         side === 'ally'
-          ? t('MatchHistoryTab.recentPlayers.teammatesTitle')
-          : t('MatchHistoryTab.recentPlayers.opponentsTitle')
+          ? t('PlayerTab.recentPlayers.teammatesTitle')
+          : t('PlayerTab.recentPlayers.opponentsTitle')
       }}
     </div>
     <div class="flex flex-col gap-1">
@@ -37,8 +37,8 @@
           </StreamerModeMaskedText>
         </div>
         <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">
-          {{ p.win }} {{ t('MatchHistoryTab.recentPlayers.win') }} {{ p.lose }}
-          {{ t('MatchHistoryTab.recentPlayers.lose') }}
+          {{ p.win }} {{ t('PlayerTab.recentPlayers.win') }} {{ p.lose }}
+          {{ t('PlayerTab.recentPlayers.lose') }}
         </span>
       </div>
     </div>

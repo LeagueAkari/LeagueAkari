@@ -23,7 +23,7 @@
     <!-- 每页条数 -->
     <NSelect
       :disabled="isLoading"
-      :value="pagedMatchHistory?.queryParams.count ?? mhs.frontendSettings.loadCount"
+      :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
       @update:value="loadMatchHistory({ count: $event })"
       size="small"
       :options="pageSizeOptions"
@@ -39,8 +39,8 @@
         :disabled="isFirstPage || isLoading"
         @click="
           loadMatchHistory({
-            startIndex: (computedCurrentPage - 2) * mhs.frontendSettings.loadCount,
-            count: mhs.frontendSettings.loadCount
+            startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
+            count: pts.frontendSettings.loadCount
           })
         "
       >
@@ -57,8 +57,8 @@
         circle
         @click="
           loadMatchHistory({
-            startIndex: computedCurrentPage * mhs.frontendSettings.loadCount,
-            count: mhs.frontendSettings.loadCount
+            startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
+            count: pts.frontendSettings.loadCount
           })
         "
         :disabled="isLoading"
@@ -94,7 +94,7 @@
     <div class="flex items-center justify-between">
       <NSelect
         :disabled="isLoading"
-        :value="pagedMatchHistory?.queryParams.count ?? mhs.frontendSettings.loadCount"
+        :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
         @update:value="loadMatchHistory({ count: $event })"
         size="small"
         :options="pageSizeOptions"
@@ -110,8 +110,8 @@
           :disabled="isFirstPage || isLoading"
           @click="
             loadMatchHistory({
-              startIndex: (computedCurrentPage - 2) * mhs.frontendSettings.loadCount,
-              count: mhs.frontendSettings.loadCount
+              startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
+              count: pts.frontendSettings.loadCount
             })
           "
         >
@@ -128,8 +128,8 @@
           circle
           @click="
             loadMatchHistory({
-              startIndex: computedCurrentPage * mhs.frontendSettings.loadCount,
-              count: mhs.frontendSettings.loadCount
+              startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
+              count: pts.frontendSettings.loadCount
             })
           "
           :disabled="isLoading"
@@ -149,8 +149,8 @@ import { ChevronLeft20Regular, ChevronRight20Regular } from '@vicons/fluent'
 import { NButton, NIcon, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
-import { usePageSizeOptions } from '@main-window/shards/match-history-tabs'
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePageSizeOptions } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
@@ -160,7 +160,7 @@ const { isFloating = false, horizontal = false } = defineProps<{
   isFloating?: boolean
 }>()
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 const sgpTagOptions = useSgpTagOptions()
 const pageSizeOptions = usePageSizeOptions()
 
@@ -171,7 +171,7 @@ const computedCurrentPage = computed(() => {
   if (!pagedMatchHistory.value) return 1
 
   const {
-    queryParams: { startIndex = 0, count = mhs.frontendSettings.loadCount }
+    queryParams: { startIndex = 0, count = pts.frontendSettings.loadCount }
   } = pagedMatchHistory.value
 
   return Math.floor(startIndex / count) + 1

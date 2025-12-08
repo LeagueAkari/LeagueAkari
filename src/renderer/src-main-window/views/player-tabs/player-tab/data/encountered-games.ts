@@ -21,7 +21,7 @@ import {
 } from 'vue'
 import { MaybeRefOrGetter } from 'vue'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { ENCOUNTERED_GAMES_PAGE_SIZE } from './constants'
 
@@ -72,7 +72,7 @@ export function provideEncounteredGames(props: {
   const isCrossRegion = toRef(props.isCrossRegion)
 
   const lcs = useLeagueClientStore()
-  const mhs = useMatchHistoryTabsStore()
+  const pts = usePlayerTabsStore()
   const sgps = useSgpStore()
 
   const lc = useInstance(LeagueClientRenderer)
@@ -96,7 +96,7 @@ export function provideEncounteredGames(props: {
           }
 
           // use SGP API
-          const cached = mhs.detailedGameLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
+          const cached = pts.detailedGameLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
 
           if (cached) {
             gameMap[cached.gameId] = markRaw(cached)
@@ -111,13 +111,13 @@ export function provideEncounteredGames(props: {
             data: data
           })
 
-          mhs.detailedGameLruMap.set(
+          pts.detailedGameLruMap.set(
             `sgp:${gameId}`,
             markRaw({ source: 'sgp', gameId: data.json.gameId, data })
           )
         } else {
           // use LCU API
-          const cached = mhs.detailedGameLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
+          const cached = pts.detailedGameLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
 
           if (cached) {
             gameMap[cached.gameId] = markRaw(cached)
@@ -127,7 +127,7 @@ export function provideEncounteredGames(props: {
           const { data } = await lc.api.matchHistory.getGame(gameId)
           gameMap[gameId] = markRaw({ source: 'lcu', gameId: data.gameId, data: data })
 
-          mhs.detailedGameLruMap.set(
+          pts.detailedGameLruMap.set(
             `lcu:${gameId}`,
             markRaw({ source: 'lcu', gameId: data.gameId, data: data })
           )

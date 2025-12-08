@@ -267,7 +267,7 @@ import {
 import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer, SearchHistoryItem } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
 
@@ -276,7 +276,7 @@ const lc = useInstance(LeagueClientRenderer)
 const rc = useInstance(RiotClientRenderer)
 const sgp = useInstance(SgpRenderer)
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
 const as = useAppCommonStore()
 const sgps = useSgpStore()
@@ -422,7 +422,7 @@ watch(
       isEmpty.value = false
       searchProgress.isProcessing = false
       sgpServerId.value = sgps.availability.sgpServerId
-      mh.getSearchHistory().then((history) => {
+      pt.getSearchHistory().then((history) => {
         searchHistory.value = history
       })
       nextTick(() => inputEl.value?.focus())
@@ -764,23 +764,23 @@ const handleMouseDown = (event: MouseEvent) => {
 }
 
 const handleSaveSearchHistory = async (result: SearchResult) => {
-  await mh.saveSearchHistory({
+  await pt.saveSearchHistory({
     puuid: result.puuid,
     sgpServerId: result.sgpServerId,
     summoner: { gameName: result.gameName, tagLine: result.tagLine },
     isPinned: false
   })
-  searchHistory.value = await mh.getSearchHistory()
+  searchHistory.value = await pt.getSearchHistory()
 }
 
 const handleDeleteSearchHistory = async (puuid: string) => {
-  await mh.deleteSearchHistory(puuid)
-  searchHistory.value = await mh.getSearchHistory()
+  await pt.deleteSearchHistory(puuid)
+  searchHistory.value = await pt.getSearchHistory()
 }
 
 const handlePinSearchHistory = async (puuid: string) => {
-  await mh.pinSearchHistory(puuid)
-  searchHistory.value = await mh.getSearchHistory()
+  await pt.pinSearchHistory(puuid)
+  searchHistory.value = await pt.getSearchHistory()
 }
 
 const handleSearchHistoryMouseUp = (event: MouseEvent, item: SearchHistoryItem) => {

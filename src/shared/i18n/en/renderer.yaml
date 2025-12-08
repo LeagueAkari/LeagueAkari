@@ -952,7 +952,7 @@ SpectateStatus:
     copied: Spectate token copied
     copyFailed: Failed to copy spectate token
 
-MatchHistoryTabsTitle:
+PlayerTabsTitle:
   loading: Loading...
   search: Search
   refresh: Refresh
@@ -1396,14 +1396,14 @@ Spectate:
     failedNotification:
       title:
 
-MatchHistoryTabs:
+PlayerTabs:
   disconnected: Not connected to the client
   queueing: Logging in...
   noActiveTab: No active match history tab
   copiedToClipboard: Copied to clipboard
   dropZoneRosterMember: Drop here to navigate to the player's profile
 
-MatchHistoryTab:
+PlayerTab:
   prevPage: Previous
   nextPage: Next
   refreshPage: Refresh Page
@@ -1412,6 +1412,15 @@ MatchHistoryTab:
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'
+
+  summonerNotFoundTitle: Summoner Not Found {{puuid}}
+  summonerNotFoundContent: The summoner you are looking for does not exist
+  failedToLoadSummonerTitle: Failed to Load Summoner
+  failedToLoadSummonerContent: 'Unable to load summoner information: {{reason}}'
+  failedToLoadMatchHistoryTitle: Failed to Load Match History
+  failedToLoadMatchHistoryContent: 'Unable to load match history: {{reason}}'
+  failedToLoadRankedStatsTitle: Failed to Load Ranked Stats
+  failedToLoadRankedStatsContent: 'Unable to load ranked stats: {{reason}}'
 
   private:
     title: Profile Hidden

@@ -36,7 +36,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
 
@@ -51,9 +51,9 @@ const handleInspect = () => {
   previewingGameId.value = gameId.value
 }
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 </script>
 
 <style scoped></style>

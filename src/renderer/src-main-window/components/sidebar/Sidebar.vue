@@ -93,7 +93,7 @@ const currentMenu = ref('match-history')
 const menu = computed(() => {
   return [
     {
-      key: 'match-history',
+      key: 'player-tabs',
       icon: renderIcon(AnalyticsRoundIcon),
       name: t('SideBarMenu.match-history')
     },

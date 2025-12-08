@@ -33,7 +33,7 @@ export interface TabState {
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
-export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-renderer', () => {
+export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () => {
   // 这里应该是 frontendSettings，但为了保持兼容性，暂时保留
   const frontendSettings = shallowReactive({
     /**

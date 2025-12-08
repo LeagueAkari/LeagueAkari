@@ -80,7 +80,7 @@
       <div class="absolute -bottom-1.5 -right-2">
         <NButton
           :focusable="false"
-          :title="t('MatchHistoryTab.rankedMore', '更多排位信息')"
+          :title="t('PlayerTab.rankedMore', '更多排位信息')"
           size="small"
           secondary
           @click="isShowingRankedModal = true"

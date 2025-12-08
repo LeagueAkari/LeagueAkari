@@ -27,7 +27,7 @@ import {
   watch
 } from 'vue'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 export interface PagedMatchHistory {
   /** 战绩概览，应该是 raw */
@@ -82,7 +82,7 @@ export function provideMatchHistory(props: {
   const sgp = useInstance(SgpRenderer)
   const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
-  const mhs = useMatchHistoryTabsStore()
+  const pts = usePlayerTabsStore()
   const log = useInstance(LoggerRenderer)
 
   const { t } = useTranslation()
@@ -187,11 +187,11 @@ export function provideMatchHistory(props: {
         const { data } = await lc.api.matchHistory.getMatchHistory(
           puuid.value,
           params.startIndex ?? 0,
-          (params.startIndex ?? 0) + (params.count ?? mhs.frontendSettings.loadCount) - 1
+          (params.startIndex ?? 0) + (params.count ?? pts.frontendSettings.loadCount) - 1
         )
 
         const loadCompleteGameTasks = data.games.games.map(async (g) => {
-          const cached = mhs.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
+          const cached = pts.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
           if (cached) {
             return cached
           }
@@ -209,7 +209,7 @@ export function provideMatchHistory(props: {
         const games = await Promise.all(loadCompleteGameTasks)
 
         games.forEach((g) => {
-          mhs.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
+          pts.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
         })
 
         pagedMatchHistory.value = {
@@ -224,10 +224,10 @@ export function provideMatchHistory(props: {
       if (!isCrossRegion.value) {
         loadReplayMetadata(pagedMatchHistory.value.games)
       }
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
-        title: 'Failed to load match history',
-        content: 'Failed to load match history'
+        title: () => t('PlayerTab.failedToLoadMatchHistoryTitle'),
+        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message })
       })
       log.error(componentName, error)
     } finally {
@@ -271,7 +271,7 @@ export function provideMatchHistory(props: {
     try {
       await lc.api.replays.downloadRofl(gameId)
     } catch (error: any) {
-      message.error(() => t('MatchHistoryTab.failedToDownloadReplay', { reason: error.message }))
+      message.error(() => t('PlayerTab.failedToDownloadReplay', { reason: error.message }))
     }
   }
 
@@ -279,9 +279,9 @@ export function provideMatchHistory(props: {
     try {
       await lc.api.replays.watchRofl(gameId)
 
-      message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
+      message.success(() => t('PlayerTab.operationSuccessTitle'))
     } catch (error: any) {
-      message.error(() => t('MatchHistoryTab.failedToLaunchReplay', { reason: error.message }))
+      message.error(() => t('PlayerTab.failedToLaunchReplay', { reason: error.message }))
     }
   }
 
@@ -305,7 +305,7 @@ export function provideMatchHistory(props: {
       }
 
       loadMatchHistory({
-        count: mhs.frontendSettings.loadCount
+        count: pts.frontendSettings.loadCount
       })
     },
     { immediate: true }

@@ -118,9 +118,9 @@ const handleSaveTag = async () => {
     : await removeTag(puuid.value, lcs.summoner.me.puuid)
 
   if (success) {
-    message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
+    message.success(() => t('PlayerTab.operationSuccessTitle'))
   } else {
-    message.warning(() => t('MatchHistoryTab.failedToLoadTitle'))
+    message.warning(() => t('PlayerTab.failedToLoadTitle'))
   }
 
   show.value = false

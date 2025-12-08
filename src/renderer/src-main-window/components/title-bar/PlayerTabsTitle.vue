@@ -1,5 +1,5 @@
 <template>
-  <div class="match-history-tabs-title">
+  <div class="player-tabs-title">
     <!-- search -->
     <SearchSummonerModal v-model:show="searchSummonerModalShow" @to-summoner="handleToSummoner" />
 
@@ -28,7 +28,7 @@
         <div class="mh-tabs">
           <NPopover
             :disabled="true || contextMenuState.show"
-            v-for="(tab, index) of mhs.tabs"
+            v-for="(tab, index) of pts.tabs"
             :key="tab.id"
             ref="tabs-ref"
             :delay="1000"
@@ -39,7 +39,7 @@
                 :data-id="tab.id"
                 draggable="true"
                 :class="{
-                  active: mhs.currentTabId === tab.id,
+                  active: pts.currentTabId === tab.id,
                   'drag-hover': currentDragHoverTabId === tab.id
                 }"
                 @contextmenu="handleContextMenu($event, tab.id)"
@@ -95,14 +95,12 @@
                   </StreamerModeMaskedText>
                 </template>
                 <template v-else-if="tabLoadingStateMap[tab.id]">
-                  <span class="empty-placeholder-text"
-                    >{{ t('MatchHistoryTabsTitle.loading') }}.</span
-                  >
+                  <span class="empty-placeholder-text">{{ t('PlayerTabsTitle.loading') }}.</span>
                 </template>
                 <template v-else>
                   <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
                 </template>
-                <NIcon @click.stop="mhs.closeTab(tab.id)" class="close-icon"><CloseIcon /></NIcon>
+                <NIcon @click.stop="pts.closeTab(tab.id)" class="close-icon"><CloseIcon /></NIcon>
               </div>
             </template>
             <!-- TODO 提供一个悬停查看 -->
@@ -128,10 +126,10 @@
             @click="(!as.settings.streamerMode || warningShown) && (searchSummonerModalShow = true)"
           >
             <NIcon class="search-icon"><SearchIcon /></NIcon>
-            <span class="search-label">{{ t('MatchHistoryTabsTitle.search') }}</span>
+            <span class="search-label">{{ t('PlayerTabsTitle.search') }}</span>
           </div>
         </template>
-        {{ t('MatchHistoryTabsTitle.searchButtonStreamerModeWarning') }}
+        {{ t('PlayerTabsTitle.searchButtonStreamerModeWarning') }}
       </NPopconfirm>
     </template>
   </div>
@@ -155,18 +153,18 @@ import { NBadge, NDropdown, NIcon, NPopconfirm, NPopover, NScrollbar, NSpin } fr
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
 
 const { t } = useTranslation()
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 const sgps = useSgpStore()
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 const as = useAppCommonStore()
 
 const scrollBarEl = useTemplateRef('scrollbar')
@@ -180,20 +178,20 @@ const searchSummonerModalShow = ref(false)
 
 const handleMouseUp = (event: MouseEvent, unionId: string) => {
   if (event.button === 1) {
-    mhs.closeTab(unionId)
+    pts.closeTab(unionId)
   }
 }
 
 const tabLoadingStateMap = computed(() => {
   const map: Record<string, boolean> = {}
-  for (const tab of mhs.tabs) {
+  for (const tab of pts.tabs) {
     map[tab.id] = tab.isLoading
   }
 
   return map
 })
 
-const { navigateToTab, navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
+const { navigateToTab, navigateToTabByPuuidAndSgpServerId } = pt.useNavigateToTab()
 
 const handleTabChange = async (unionId: string) => {
   navigateToTab(unionId)
@@ -250,8 +248,8 @@ const handleTagDragLeave = (_event: DragEvent, _id: string) => {
 const handleTabDrop = (event: DragEvent, id: string) => {
   const fromId = event.dataTransfer?.getData(AKARI_MIME_TYPE)
   if (fromId) {
-    mhs.moveTabBefore(fromId, id)
-    nextTick(() => mhs.currentTabId && alignTabToVisibleArea(mhs.currentTabId))
+    pts.moveTabBefore(fromId, id)
+    nextTick(() => pts.currentTabId && alignTabToVisibleArea(pts.currentTabId))
   }
 
   currentDragHoverTabId.value = null
@@ -283,10 +281,10 @@ const contextMenuState = reactive({
 
 const contextMenuOptions: DropdownMixedOption[] = reactive([
   {
-    label: computed(() => t('MatchHistoryTabsTitle.refresh')),
+    label: computed(() => t('PlayerTabsTitle.refresh')),
     key: 'refresh',
     disabled: computed(() => {
-      const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
+      const tab = pts.tabs.find((t) => t.id === contextMenuState.id)
       if (tab) {
         return tab.isLoading
       }
@@ -300,35 +298,35 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     key: 'divider-1'
   },
   {
-    label: computed(() => t('MatchHistoryTabsTitle.close')),
+    label: computed(() => t('PlayerTabsTitle.close')),
     key: 'close',
     icon: () => h(NIcon, null, { default: () => h(CloseRoundIcon) })
   },
   {
-    label: computed(() => t('MatchHistoryTabsTitle.closeOthers')),
+    label: computed(() => t('PlayerTabsTitle.closeOthers')),
     key: 'close-others',
-    disabled: computed(() => !mhs.canCloseOtherTabs(contextMenuState.id))
+    disabled: computed(() => !pts.canCloseOtherTabs(contextMenuState.id))
   },
   {
-    label: computed(() => t('MatchHistoryTabsTitle.closeToTheRight')),
+    label: computed(() => t('PlayerTabsTitle.closeToTheRight')),
     key: 'close-to-the-right',
-    disabled: computed(() => !mhs.canCloseTabsToTheRight(contextMenuState.id))
+    disabled: computed(() => !pts.canCloseTabsToTheRight(contextMenuState.id))
   }
 ])
 
 const handleContextMenuSelect = (key: string) => {
   switch (key) {
     case 'refresh':
-      mhs.getTab(contextMenuState.id)?.refresh?.()
+      pts.getTab(contextMenuState.id)?.refresh?.()
       break
     case 'close':
-      mhs.closeTab(contextMenuState.id)
+      pts.closeTab(contextMenuState.id)
       break
     case 'close-others':
-      mhs.closeOtherTabs(contextMenuState.id)
+      pts.closeOtherTabs(contextMenuState.id)
       break
     case 'close-to-the-right':
-      mhs.closeToTheRight(contextMenuState.id)
+      pts.closeToTheRight(contextMenuState.id)
       break
   }
 
@@ -340,7 +338,7 @@ const handleContextMenuSelect = (key: string) => {
 // - 仅剩的服务器不是当前服务器
 const isNeedToShowSgpServer = computed(() => {
   const count: Record<string, number> = {}
-  for (const tab of mhs.tabs) {
+  for (const tab of pts.tabs) {
     if (count[tab.sgpServerId]) {
       count[tab.sgpServerId]++
     } else {
@@ -355,7 +353,7 @@ const isNeedToShowSgpServer = computed(() => {
 watch(
   () => contextMenuState.id,
   (id) => {
-    if (!id || !mhs.tabs.some((t) => t.id === id)) {
+    if (!id || !pts.tabs.some((t) => t.id === id)) {
       contextMenuState.show = false
     }
   }
@@ -363,7 +361,7 @@ watch(
 
 // 保证活动页面始终在可视区域内
 watch(
-  () => mhs.currentTabId,
+  () => pts.currentTabId,
   (current) => {
     if (!current) {
       return
@@ -375,7 +373,7 @@ watch(
 )
 
 const currentTabSummoner = computed(() => {
-  return mhs.tabs.find((t) => t.id === mhs.currentTabId)?.summoner
+  return pts.tabs.find((t) => t.id === pts.currentTabId)?.summoner
 })
 
 // 保证更新后的活动页面也在可视区域内
@@ -383,7 +381,7 @@ watch(
   () => currentTabSummoner.value,
   (summoner) => {
     if (summoner) {
-      nextTick(() => mhs.currentTabId && alignTabToVisibleArea(mhs.currentTabId))
+      nextTick(() => pts.currentTabId && alignTabToVisibleArea(pts.currentTabId))
     }
   }
 )
@@ -398,7 +396,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string | null, setCurrent 
     navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
   } else {
     // 先路由
-    mh.createTab(puuid, sgpServerId, false)
+    pt.createTab(puuid, sgpServerId, false)
   }
 }
 
@@ -412,7 +410,7 @@ const { summonerName } = useStreamerModeMaskedText()
 </script>
 
 <style scoped>
-.match-history-tabs-title {
+.player-tabs-title {
   display: flex;
   align-items: center;
   height: 100%;

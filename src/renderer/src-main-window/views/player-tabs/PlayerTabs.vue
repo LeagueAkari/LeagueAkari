@@ -1,14 +1,14 @@
 <template>
   <div class="h-full max-w-full" ref="tabs-wrapper">
     <!-- tab show -->
-    <template v-if="mhs.currentTabId">
+    <template v-if="pts.currentTabId">
       <PlayerTab
-        v-for="tab of mhs.tabs"
+        v-for="tab of pts.tabs"
         :id="tab.id"
         :puuid="tab.puuid"
         :sgpServerId="tab.sgpServerId"
         :key="tab.id"
-        v-show="tab.id === mhs.currentTabId"
+        v-show="tab.id === pts.currentTabId"
       />
     </template>
 
@@ -22,7 +22,7 @@
         <!-- disconnect -->
         <template v-if="lcs.connectionState !== 'connected'">
           <span class="text-sm dark:text-white/40 text-black/40">{{
-            t('MatchHistoryTabs.disconnected')
+            t('PlayerTabs.disconnected')
           }}</span>
           <EasyToLaunch />
         </template>
@@ -30,14 +30,14 @@
         <!-- queueing -->
         <template v-if="lcs.login.loginQueueState">
           <span class="text-sm dark:text-white/40 text-black/40">{{
-            t('MatchHistoryTabs.queueing')
+            t('PlayerTabs.queueing')
           }}</span>
         </template>
 
         <!-- no active tab -->
-        <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
+        <template v-if="lcs.summoner.me && pts.tabs.length === 0">
           <div class="text-sm dark:text-white/40 text-black/40 mt-2">
-            {{ t('MatchHistoryTabs.noActiveTab') }}
+            {{ t('PlayerTabs.noActiveTab') }}
           </div>
           <div
             class="flex items-center mt-4 bg-white/6 dark:bg-black/6 py-2 px-4 rounded cursor-pointer transition-colors backdrop-blur-xs hover:bg-black/12 dark:hover:bg-white/12"
@@ -85,10 +85,10 @@ import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import PlayerTab from './the-new-tab/PlayerTab.vue'
+import PlayerTab from './player-tab/PlayerTab.vue'
 
 const { t } = useTranslation()
 
@@ -99,13 +99,13 @@ const router = useRouter()
 
 const componentName = useComponentName()
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 const ogs = useOngoingGameStore()
 const log = useInstance(LoggerRenderer)
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
-const matchHistoryRoute = computed(() => {
-  if (route.name !== 'match-history') {
+const playerTabRoute = computed(() => {
+  if (route.name !== 'player-tabs') {
     return null
   }
 
@@ -121,38 +121,38 @@ const matchHistoryRoute = computed(() => {
 
 // 路由 ==> 页面
 watch(
-  () => matchHistoryRoute.value,
+  () => playerTabRoute.value,
   (route) => {
     if (!route) {
       return
     }
 
-    mh.setCurrentOrCreateTab(route.puuid, route.sgpServerId)
+    pt.setCurrentOrCreateTab(route.puuid, route.sgpServerId)
   },
   { immediate: true }
 )
 
 // 路由 <== 页面
 watch(
-  () => mhs.currentTabId,
+  () => pts.currentTabId,
   (id) => {
     if (!id) {
-      router.replace({ name: 'match-history' })
+      router.replace({ name: 'player-tabs' })
       return
     }
 
-    const { sgpServerId, puuid } = mh.parseUnionId(id)
+    const { sgpServerId, puuid } = pt.parseUnionId(id)
 
     if (
-      matchHistoryRoute.value &&
-      matchHistoryRoute.value.puuid === puuid &&
-      matchHistoryRoute.value.sgpServerId === sgpServerId
+      playerTabRoute.value &&
+      playerTabRoute.value.puuid === puuid &&
+      playerTabRoute.value.sgpServerId === sgpServerId
     ) {
       return
     }
 
     router.replace({
-      name: 'match-history',
+      name: 'player-tabs',
       params: { puuid, sgpServerId }
     })
   },
@@ -168,14 +168,14 @@ const isEndOfGame = computed(
 watch(
   () => isEndOfGame.value,
   (is, _prevP) => {
-    if (mhs.frontendSettings.refreshTabsAfterGameEnds && is) {
+    if (pts.frontendSettings.refreshTabsAfterGameEnds && is) {
       if (!ogs.teams) {
         return
       }
 
       const allPlayerPuuids = Object.values(ogs.teams).flat()
 
-      mhs.tabs.forEach((tab) => {
+      pts.tabs.forEach((tab) => {
         if (allPlayerPuuids.includes(tab.puuid) && tab.refresh) {
           tab.refresh()
         }
@@ -186,7 +186,7 @@ watch(
   }
 )
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const handleOpenSelfTab = () => {
   if (lcs.summoner.me) {
@@ -199,9 +199,9 @@ const message = useMessage()
 const { stop, start } = useKeyboardCombo('PUUID', {
   requireSameEl: true,
   onFinish: () => {
-    if (mhs.currentTab) {
-      navigator.clipboard.writeText(mhs.currentTab.puuid)
-      message.success(t('MatchHistoryTabs.copiedToClipboard'))
+    if (pts.currentTab) {
+      navigator.clipboard.writeText(pts.currentTab.puuid)
+      message.success(t('PlayerTabs.copiedToClipboard'))
     }
   },
   immediate: false

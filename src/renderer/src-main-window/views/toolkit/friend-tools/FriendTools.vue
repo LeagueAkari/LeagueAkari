@@ -101,7 +101,7 @@ import {
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
 
@@ -113,9 +113,9 @@ const lc = useInstance(LeagueClientRenderer)
 const sgp = useInstance(SgpRenderer)
 const log = useInstance(LoggerRenderer)
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const message = useMessage()
 

@@ -26,7 +26,7 @@
         </template>
         <AppSettings />
       </NTabPane>
-      <NTabPane name="match-history-tabs">
+      <NTabPane name="player-tabs">
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><LayersIcon /> </NIcon>

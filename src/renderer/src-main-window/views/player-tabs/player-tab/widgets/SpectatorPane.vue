@@ -262,9 +262,9 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import IndicatorPulse from '../../widgets/IndicatorPulse.vue'
 import { usePlayerTab } from '../context'
 import { useSpectator } from '../data/spectator'
+import IndicatorPulse from './IndicatorPulse.vue'
 
 const { t } = useTranslation()
 

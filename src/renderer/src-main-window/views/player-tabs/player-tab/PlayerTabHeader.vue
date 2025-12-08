@@ -62,7 +62,7 @@ import { RefreshSharp } from '@vicons/ionicons5'
 import { NButton, NIcon } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from './context'
 import { useEncounteredGames } from './data/encountered-games'
@@ -96,9 +96,9 @@ const refresh = () => {
 
 const isTagEditModalShowing = ref(false)
 
-const mhs = useMatchHistoryTabsStore()
+const pts = usePlayerTabsStore()
 
 const somethingLoading = computed(() => {
-  return mhs.getTab(id.value)?.isLoading ?? false
+  return pts.getTab(id.value)?.isLoading ?? false
 })
 </script>

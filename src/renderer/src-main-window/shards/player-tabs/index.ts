@@ -8,7 +8,7 @@ import { useTranslation } from 'i18next-vue'
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useMatchHistoryTabsStore } from './store'
+import { usePlayerTabsStore } from './store'
 
 export interface SearchHistoryItem {
   // 目标的 puuid, 当作主键
@@ -29,9 +29,9 @@ export interface SearchHistoryItem {
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
  */
-@Shard(MatchHistoryTabsRenderer.id)
-export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
-  static id = 'match-history-tabs-renderer'
+@Shard(PlayerTabsRenderer.id)
+export class PlayerTabsRenderer implements IAkariShardInitDispose {
+  static id = 'player-tabs-renderer'
 
   static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
@@ -44,14 +44,14 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   async onInit() {
     await this._handleSettings()
     this._setupInAppScope.addSetupFn(() => {
-      this._handleMatchHistoryTabs()
+      this._handlePlayerTabs()
     })
   }
 
   async onDispose() {}
 
-  private _handleMatchHistoryTabs() {
-    const mhs = useMatchHistoryTabsStore()
+  private _handlePlayerTabs() {
+    const pts = usePlayerTabsStore()
     const lcs = useLeagueClientStore()
     const sgps = useSgpStore()
 
@@ -71,7 +71,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       () => lcs.connectionState,
       (s) => {
         if (s === 'disconnected') {
-          mhs.closeAllTabs()
+          pts.closeAllTabs()
         }
       }
     )
@@ -81,11 +81,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
    * 获取搜索历史, 有数量限制
    */
   async getSearchHistory(): Promise<SearchHistoryItem[]> {
-    return this._setting.get(
-      MatchHistoryTabsRenderer.id,
-      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-      []
-    )
+    return this._setting.get(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, [])
   }
 
   /**
@@ -97,7 +93,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
    */
   async saveSearchHistory(item: SearchHistoryItem) {
     const list = await this.getSearchHistory()
-    const max = MatchHistoryTabsRenderer.SEARCH_HISTORY_MAX_LENGTH
+    const max = PlayerTabsRenderer.SEARCH_HISTORY_MAX_LENGTH
 
     const oldIdx = list.findIndex((i) => i.puuid === item.puuid)
     const existed = oldIdx !== -1
@@ -114,11 +110,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
 
     if (existed && wasPinned && finalPinned) {
       list[oldIdx] = newItem
-      return this._setting.set(
-        MatchHistoryTabsRenderer.id,
-        MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-        list
-      )
+      return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, list)
     }
 
     if (existed) list.splice(oldIdx, 1)
@@ -137,11 +129,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       }
     }
 
-    return this._setting.set(
-      MatchHistoryTabsRenderer.id,
-      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-      list
-    )
+    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, list)
   }
 
   async deleteSearchHistory(puuid: string) {
@@ -152,11 +140,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       items.splice(index, 1)
     }
 
-    return this._setting.set(
-      MatchHistoryTabsRenderer.id,
-      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-      items
-    )
+    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, items)
   }
 
   async pinSearchHistory(puuid: string) {
@@ -177,11 +161,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       return 0
     })
 
-    return this._setting.set(
-      MatchHistoryTabsRenderer.id,
-      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
-      items
-    )
+    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, items)
   }
 
   // 如果直接引用 router, 在热更新的时候会失效
@@ -197,7 +177,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       }
 
       return router.replace({
-        name: 'match-history',
+        name: 'player-tabs',
         params: { puuid, sgpServerId }
       })
     }
@@ -208,7 +188,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       }
 
       return router.replace({
-        name: 'match-history',
+        name: 'player-tabs',
         params: { puuid, sgpServerId }
       })
     }
@@ -222,7 +202,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
       }
 
       return router.replace({
-        name: 'match-history',
+        name: 'player-tabs',
         params: { puuid, sgpServerId: sgps.availability.sgpServerId }
       })
     }
@@ -242,13 +222,13 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
 
   /** 创建一个新的 Tab, 并设置一些初始值 */
   createTab(puuid: string, sgpServerId: string, setCurrent = true) {
-    const mhs = useMatchHistoryTabsStore()
+    const pts = usePlayerTabsStore()
 
-    if (mhs.getTab(this.toUnionId(sgpServerId, puuid))) {
+    if (pts.getTab(this.toUnionId(sgpServerId, puuid))) {
       return
     }
 
-    mhs.createTab(
+    pts.createTab(
       {
         id: this.toUnionId(sgpServerId, puuid),
         puuid,
@@ -264,36 +244,32 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   setCurrentOrCreateTab(puuid: string, sgpServerId: string) {
-    const mhs = useMatchHistoryTabsStore()
-    const tab = mhs.getTab(this.toUnionId(sgpServerId, puuid))
+    const pts = usePlayerTabsStore()
+    const tab = pts.getTab(this.toUnionId(sgpServerId, puuid))
 
     if (tab) {
-      mhs.setCurrentTab(tab.id)
+      pts.setCurrentTab(tab.id)
     } else {
       this.createTab(puuid, sgpServerId)
     }
   }
 
   private async _handleSettings() {
-    const store = useMatchHistoryTabsStore()
+    const store = usePlayerTabsStore()
 
     await this._setting.savedPropVue(
-      MatchHistoryTabsRenderer.id,
+      PlayerTabsRenderer.id,
       store.frontendSettings,
       'matchHistoryUseSgpApi'
     )
 
     await this._setting.savedPropVue(
-      MatchHistoryTabsRenderer.id,
+      PlayerTabsRenderer.id,
       store.frontendSettings,
       'refreshTabsAfterGameEnds'
     )
 
-    await this._setting.savedPropVue(
-      MatchHistoryTabsRenderer.id,
-      store.frontendSettings,
-      'loadCount'
-    )
+    await this._setting.savedPropVue(PlayerTabsRenderer.id, store.frontendSettings, 'loadCount')
   }
 }
 
@@ -302,31 +278,31 @@ export function usePageSizeOptions() {
 
   const pageSizeOptions = computed(() => [
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 10 }),
+      label: t('PlayerTab.itemPerPage', { count: 10 }),
       value: 10
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 20 }),
+      label: t('PlayerTab.itemPerPage', { count: 20 }),
       value: 20
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 30 }),
+      label: t('PlayerTab.itemPerPage', { count: 30 }),
       value: 30
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 40 }),
+      label: t('PlayerTab.itemPerPage', { count: 40 }),
       value: 40
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 50 }),
+      label: t('PlayerTab.itemPerPage', { count: 50 }),
       value: 50
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 100 }),
+      label: t('PlayerTab.itemPerPage', { count: 100 }),
       value: 100
     },
     {
-      label: t('MatchHistoryTab.itemPerPage', { count: 200 }),
+      label: t('PlayerTab.itemPerPage', { count: 200 }),
       value: 200
     }
   ])

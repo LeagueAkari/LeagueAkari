@@ -100,7 +100,7 @@ export function useSummonerProfile() {
   const context = inject(SummonerProfileContextKey)
 
   if (!context) {
-    throw new Error('useSummonerProfile must be used within a MatchHistoryTab')
+    throw new Error('useSummonerProfile must be used within a PlayerTab')
   }
 
   return context

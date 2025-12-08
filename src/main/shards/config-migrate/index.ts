@@ -150,7 +150,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(
       manager,
       'core-functionality/fetchAfterGame',
-      'match-history-tabs-renderer/refreshTabsAfterGameEnds'
+      'player-tabs-renderer/refreshTabsAfterGameEnds'
     )
     await this._do(
       manager,
@@ -456,6 +456,18 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       manager,
       'window-manager-main/cd-timer-window/bounds',
       'window-manager-main/cd-timer-window/normalBounds'
+    )
+
+    // Migrate match-history-tabs-renderer to player-tabs-renderer
+    await this._do(
+      manager,
+      'match-history-tabs-renderer/frontendSettings',
+      'player-tabs-renderer/frontendSettings'
+    )
+    await this._do(
+      manager,
+      'match-history-tabs-renderer/searchHistory',
+      'player-tabs-renderer/searchHistory'
     )
 
     await manager.save(
