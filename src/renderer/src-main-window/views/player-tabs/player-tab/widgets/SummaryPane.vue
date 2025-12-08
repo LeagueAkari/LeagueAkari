@@ -10,7 +10,7 @@
         v-if="as.settings.isInKyokoMode"
         title="Akari's insight"
       >
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.akariScore')
         }}</span>
         <span
@@ -26,7 +26,7 @@
 
       <!-- Average KDA -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgKda')
         }}</span>
         <NPopover>
@@ -42,7 +42,7 @@
 
       <!-- Average Kill Participation -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgKp')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -52,7 +52,7 @@
 
       <!-- Average Damage -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmg')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -62,7 +62,7 @@
 
       <!-- Average Damage Taken -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmgTaken')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -72,7 +72,7 @@
 
       <!-- Average Gold -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgGold')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -82,7 +82,7 @@
 
       <!-- Average CS -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgCs')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -90,9 +90,30 @@
         </span>
       </div>
 
+      <!-- Active Session -->
+      <div
+        class="flex w-full items-center gap-2"
+        v-if="pagedMatchHistory?.queryParams.startIndex === 0"
+      >
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
+          t('PlayerTab.stats.activeSession', 'active')
+        }}</span>
+        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+          {{ analysis.summary.activeSessionWins }} {{ t('PlayerTab.stats.win') }}
+          {{ analysis.summary.activeSessionLosses }}
+          {{ t('PlayerTab.stats.lose') }} ({{
+            (
+              (analysis.summary.activeSessionWins /
+                (analysis.summary.activeSessionWins + analysis.summary.activeSessionLosses)) *
+              100
+            ).toFixed()
+          }}%)
+        </span>
+      </div>
+
       <!-- Win/Lose -->
       <div class="flex w-full items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.winLose')
         }}</span>
         <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
@@ -106,14 +127,14 @@
         class="flex w-full items-center gap-2"
         v-if="analysis.summary.blueSideCount > 0 || analysis.summary.redSideCount > 0"
       >
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.teamSides')
         }}</span>
         <div class="ml-auto text-13px text-right text-gray-900 dark:text-white">
           <div class="flex items-center">
             <div class="size-3 rounded-full bg-blue-500 mr-1"></div>
             <span>{{ analysis.summary.blueSideCount }}</span>
-            <span class="text-gray-500 dark:text-gray-400 text-xs mx-2">/</span>
+            <span class="text-gray-700 dark:text-gray-400 text-xs mx-2">/</span>
             <div class="size-3 rounded-full bg-red-400 mr-1"></div>
             <span>{{ analysis.summary.redSideCount }}</span>
           </div>
@@ -122,7 +143,7 @@
 
       <!-- Frequently Used Champions -->
       <div class="flex w-full items-center gap-2" v-if="frequentlyUsedChampions.length">
-        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+        <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.champions')
         }}</span>
         <div class="max-w-110px ml-auto flex flex-wrap gap-0.5 justify-end">

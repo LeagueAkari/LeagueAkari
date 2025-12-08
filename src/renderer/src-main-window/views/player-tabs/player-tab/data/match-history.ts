@@ -227,7 +227,8 @@ export function provideMatchHistory(props: {
     } catch (error: any) {
       notification.error({
         title: () => t('PlayerTab.failedToLoadMatchHistoryTitle'),
-        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message })
+        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message }),
+        duration: 4000
       })
       log.error(componentName, error)
     } finally {

@@ -123,6 +123,7 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
+import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
@@ -130,7 +131,7 @@ import {
 } from '@vicons/fluent'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
+import { NBadge, NIcon, NPopover, NProgress, NTooltip, useNotification } from 'naive-ui'
 import { computed, useTemplateRef, watch } from 'vue'
 
 import { useAppContext } from '@main-window/context'
@@ -147,6 +148,7 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
+const mws = useMainWindowStore()
 
 const pt = useInstance(PlayerTabsRenderer)
 
@@ -154,6 +156,21 @@ const formattedCountdown = computed(() => {
   const seconds = rts.info.timeLeft
   return seconds > 99 ? '99+' : `${seconds.toFixed(0)}`
 })
+
+const notification = useNotification()
+
+watch(
+  () => rts.info.isDead,
+  (isDead, prevIsDead) => {
+    if (!isDead && prevIsDead && mws.focus === 'focused') {
+      notification.success({
+        title: t('SideBarFixed.respawned'),
+        content: t('SideBarFixed.respawnedContent'),
+        duration: 4000
+      })
+    }
+  }
+)
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 

@@ -62,7 +62,8 @@ export function provideRankedStats(props: {
     } catch (error: any) {
       notification.error({
         title: () => t('PlayerTab.failedToLoadRankedStatsTitle'),
-        content: () => t('PlayerTab.failedToLoadRankedStatsContent', { reason: error.message })
+        content: () => t('PlayerTab.failedToLoadRankedStatsContent', { reason: error.message }),
+        duration: 4000
       })
       log.error(componentName, error)
     } finally {

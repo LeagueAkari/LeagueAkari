@@ -860,6 +860,8 @@ SideBarMenu:
   test: Test
 
 SideBarFixed:
+  respawned: Respawned
+  respawnedContent: You have respawned in the game, have fun!
   currentConnected: Connected
   launchedClients: Launched Clients
   noClientTitle: No Available Client
@@ -1452,6 +1454,7 @@ PlayerTab:
     champions: Champion Usage
     times: Games
     teamSides: Team Sides
+    activeSession: Active Session Win/Lose
 
   recentPlayers:
     teammatesTitle: Recent Teammates

@@ -4,7 +4,7 @@
     v-if="horizontal"
     class="flex items-center gap-2 px-2 py-1 transition-colors rounded"
     :class="{
-      'dark:bg-neutral-800 rounded bg-neutral-200 shadow-xl shadow-neutral-300 dark:shadow-neutral-800/60':
+      'dark:bg-neutral-800 rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60':
         isFloating,
       'dark:bg-white/5 bg-black/5': !isFloating
     }"
@@ -74,7 +74,7 @@
   <div
     v-else
     :class="{
-      'dark:bg-neutral-800 rounded bg-neutral-200 shadow-xl shadow-neutral-300 dark:shadow-neutral-800/60':
+      'dark:bg-neutral-800 rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60':
         isFloating,
       'dark:bg-white/5 bg-black/5': !isFloating
     }"

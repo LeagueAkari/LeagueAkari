@@ -81,6 +81,9 @@ export interface MatchHistoryChampionAnalysis {
 }
 
 export interface MatchHistoryGamesAnalysisSummary {
+  activeSessionWins: number
+  activeSessionLosses: number
+
   redSideCount: number
   blueSideCount: number
   count: number
@@ -424,6 +427,32 @@ export function analyzeMatchHistory(
     losingStreak += 1
   }
 
+  // 活跃时段 (间隔不超过 1.5h 的胜负)
+  const {
+    participant: { winResult: latestWinResult },
+    basicInfo: { gameCreation: latestCreation, gameDuration: latestDuration }
+  } = filteredGames[0]
+  let activeSessionWins = latestWinResult === 'win' ? 1 : 0
+  let activeSessionLosses = latestWinResult === 'lose' ? 1 : 0
+  let lastGameEndedAt = latestCreation + latestDuration * 1000
+
+  for (let i = 1; i < filteredGames.length; i++) {
+    const { participant, basicInfo } = filteredGames[i]
+
+    // within 1.5 hours
+    if (lastGameEndedAt - basicInfo.gameCreation > 1.5 * 60 * 60 * 1000) {
+      break
+    }
+
+    if (participant.winResult === 'win') {
+      activeSessionWins += 1
+    } else {
+      activeSessionLosses += 1
+    }
+
+    lastGameEndedAt = basicInfo.gameCreation + basicInfo.gameDuration * 1000
+  }
+
   // --- positions sgp only ---
 
   let positions: {
@@ -470,6 +499,9 @@ export function analyzeMatchHistory(
   )
 
   const summary: MatchHistoryGamesAnalysisSummary = {
+    activeSessionWins,
+    activeSessionLosses,
+
     count: gamesAnalysis.length,
 
     redSideCount: filteredGames.reduce(

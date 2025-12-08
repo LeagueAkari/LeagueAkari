@@ -861,6 +861,8 @@ SideBarMenu:
   test: 测试
 
 SideBarFixed:
+  respawned: 已复活
+  respawnedContent: 你在游戏内已复活，祝你游戏愉快！
   currentConnected: 当前已连接
   launchedClients: 已启动的客户端
   launchedClientPlaceholder: 已启动的客户端 {{index}}
@@ -1454,6 +1456,7 @@ PlayerTab:
     champions: 英雄使用
     times: 场
     teamSides: 阵营分布
+    activeSession: 活跃时段胜负
 
   recentPlayers:
     teammatesTitle: 最近队友
