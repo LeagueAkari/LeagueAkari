@@ -432,25 +432,32 @@ export function analyzeMatchHistory(
     participant: { winResult: latestWinResult },
     basicInfo: { gameCreation: latestCreation, gameDuration: latestDuration }
   } = filteredGames[0]
-  let activeSessionWins = latestWinResult === 'win' ? 1 : 0
-  let activeSessionLosses = latestWinResult === 'lose' ? 1 : 0
+
+  let activeSessionWins = 0
+  let activeSessionLosses = 0
   let lastGameEndedAt = latestCreation + latestDuration * 1000
 
-  for (let i = 1; i < filteredGames.length; i++) {
-    const { participant, basicInfo } = filteredGames[i]
+  if (Date.now() - lastGameEndedAt < 8 * 60 * 60 * 1000) {
+    activeSessionWins = latestWinResult === 'win' ? 1 : 0
+    activeSessionLosses = latestWinResult === 'lose' ? 1 : 0
+    lastGameEndedAt = latestCreation + latestDuration * 1000
 
-    // within 1.5 hours
-    if (lastGameEndedAt - basicInfo.gameCreation > 1.5 * 60 * 60 * 1000) {
-      break
+    for (let i = 1; i < filteredGames.length; i++) {
+      const { participant, basicInfo } = filteredGames[i]
+
+      // within 1.5 hours
+      if (lastGameEndedAt - basicInfo.gameCreation > 1.5 * 60 * 60 * 1000) {
+        break
+      }
+
+      if (participant.winResult === 'win') {
+        activeSessionWins += 1
+      } else {
+        activeSessionLosses += 1
+      }
+
+      lastGameEndedAt = basicInfo.gameCreation + basicInfo.gameDuration * 1000
     }
-
-    if (participant.winResult === 'win') {
-      activeSessionWins += 1
-    } else {
-      activeSessionLosses += 1
-    }
-
-    lastGameEndedAt = basicInfo.gameCreation + basicInfo.gameDuration * 1000
   }
 
   // --- positions sgp only ---

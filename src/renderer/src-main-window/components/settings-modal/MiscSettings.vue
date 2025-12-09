@@ -33,7 +33,7 @@
           @update:value="(val) => a.setStreamerMode(val)"
         />
       </ControlItem>
-      <NCollapseTransition :show="as.settings.streamerMode">
+      <NCollapseTransition :show="as.settings.streamerMode" class="mb-2">
         <ControlItem
           class="control-item-margin"
           :label="t('MiscSettings.streamerMode.useAkariStyledName.label')"

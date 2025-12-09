@@ -24,7 +24,7 @@ export interface Balance {
 export class LolFandomWikiApi {
   static BASE_URL = 'https://leagueoflegends.fandom.com'
   static USER_AGENT =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0'
   static GAME_MODES = ['aram', 'ar', 'nb', 'ofa', 'urf', 'usb'] as const
   static BALANCE_TYPES = [
     'dmg_dealt',
@@ -45,7 +45,7 @@ export class LolFandomWikiApi {
 
   constructor() {
     axiosRetry(this._http, {
-      retries: 3
+      retries: 2
     })
   }
 
@@ -95,7 +95,7 @@ export class LolFandomWikiApi {
 
     const match = res.data.match(regex)
     if (!match) {
-      throw new Error('未找到符合条件的 <pre> 标签')
+      throw new Error(`未找到符合条件的 <pre> 标签: ${res.data.slice(0, 256)}...`)
     }
 
     const raw = match[1]

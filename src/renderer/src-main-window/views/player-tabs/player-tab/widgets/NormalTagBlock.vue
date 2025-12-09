@@ -12,7 +12,7 @@
 
   <!-- Tagged player blocks -->
   <div
-    v-for="tagInfo of tags"
+    v-for="(tagInfo, index) of tags"
     :key="tagInfo.selfPuuid"
     class="px-4 py-2 dark:bg-blue-800/30 bg-blue-800/90 rounded"
   >
@@ -30,13 +30,22 @@
             :width="16"
             :height="16"
           />
-          <div
-            class="text-13px text-white/80 dark:text-gray-300 hover:text-gray-200 transition-colors max-w-160px truncate"
-          >
-            {{ cachedSummoners[tagInfo.selfPuuid].gameName }} #{{
-              cachedSummoners[tagInfo.selfPuuid].tagLine
-            }}
-          </div>
+          <StreamerModeMaskedText>
+            <template #masked>
+              <div
+                class="text-13px text-white/80 dark:text-gray-300 hover:text-gray-200 transition-colors max-w-160px truncate"
+              >
+                {{ maskedMarkerName(tagInfo.selfPuuid, index) }}
+              </div>
+            </template>
+            <div
+              class="text-13px text-white/80 dark:text-gray-300 hover:text-gray-200 transition-colors max-w-160px truncate"
+            >
+              {{ cachedSummoners[tagInfo.selfPuuid].gameName }} #{{
+                cachedSummoners[tagInfo.selfPuuid].tagLine
+              }}
+            </div>
+          </StreamerModeMaskedText>
         </div>
       </div>
       <NPopconfirm
@@ -55,7 +64,7 @@
     </div>
     <NScrollbar class="max-h-100px">
       <div class="text-13px dark:text-gray-200 text-white whitespace-pre-wrap">
-        {{ tagInfo.tag }}
+        {{ masked(tagInfo.tag || '') }}
       </div>
     </NScrollbar>
   </div>
@@ -63,7 +72,9 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -92,6 +103,7 @@ const { preferredSource } = usePlayerTab()
 const { summoner } = useSummoner()
 const { tags, removeTag, loadTags } = useTags()
 const { navigateToSummonerByPuuid } = usePlayerTab()
+const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const handleToSummoner = (puuid: string) => {
   navigateToSummonerByPuuid(puuid, true)
@@ -111,6 +123,8 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
 const { getSummoners } = useSummonerFetch()
 
 const cachedSummoners = ref<Record<string, Summoner>>({})
+
+const maskedMarkerName = (puuid: string, index: number) => streamerSummonerName(puuid, index)
 
 watch(
   tags,

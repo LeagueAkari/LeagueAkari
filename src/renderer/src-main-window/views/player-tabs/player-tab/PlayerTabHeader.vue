@@ -17,17 +17,51 @@
       </div>
 
       <!-- name & tag -->
-      <div class="flex flex-col gap-1 self-center ml-3">
-        <div
-          class="font-bold dark:text-white text-black"
-          :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
-        >
-          {{ summoner?.gameName || '—' }}
+      <StreamerModeMaskedText>
+        <template #masked>
+          <div class="flex flex-col gap-1 self-center ml-3">
+            <div class="flex items-center gap-1 font-bold dark:text-white text-black">
+              <span>{{ maskedName }}</span>
+              <NPopover
+                v-if="showSpectatorIndicator"
+                trigger="hover"
+                placement="bottom-start"
+                :style="{ width: '300px' }"
+              >
+                <template #trigger>
+                  <IndicatorPulse class="text-green-500" />
+                </template>
+                <SpectatorPane />
+              </NPopover>
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              {{ maskedTagLine }}
+            </div>
+          </div>
+        </template>
+        <div class="flex flex-col gap-1 self-center ml-3">
+          <div
+            class="flex items-center gap-1 font-bold dark:text-white text-black"
+            :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
+          >
+            <span>{{ summoner?.gameName || '—' }}</span>
+            <NPopover
+              v-if="showSpectatorIndicator"
+              trigger="hover"
+              placement="bottom-start"
+              :style="{ width: '300px' }"
+            >
+              <template #trigger>
+                <IndicatorPulse class="ml-1 text-green-500" />
+              </template>
+              <SpectatorPane />
+            </NPopover>
+          </div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            {{ summoner ? `#${summoner.tagLine}` : '—' }}
+          </div>
         </div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
-          {{ summoner ? `#${summoner.tagLine}` : '—' }}
-        </div>
-      </div>
+      </StreamerModeMaskedText>
     </div>
 
     <!-- ranked -->
@@ -56,10 +90,12 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Edit20Filled } from '@vicons/fluent'
 import { RefreshSharp } from '@vicons/ionicons5'
-import { NButton, NIcon } from 'naive-ui'
+import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
@@ -72,17 +108,21 @@ import { useSpectator } from './data/spectator'
 import { useSummoner } from './data/summoner'
 import { useSummonerProfile } from './data/summoner-profile'
 import { useTags } from './data/tags'
+import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import PlayerTagEditModal from './widgets/PlayerTagEditModal.vue'
 import RankedPane from './widgets/RankedPane.vue'
+import SpectatorPane from './widgets/SpectatorPane.vue'
 
-const { id } = usePlayerTab()
+const { id, puuid, isSmallSize } = usePlayerTab()
 const { summoner, loadSummoner } = useSummoner()
 const { loadGames } = useEncounteredGames()
 const { loadMatchHistory } = useMatchHistory()
 const { loadRankedStats } = useRankedStats()
 const { loadTags } = useTags()
-const { loadSpectatorData } = useSpectator()
+const { loadSpectatorData, spectatorData } = useSpectator()
 const { loadSummonerProfile } = useSummonerProfile()
+
+const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const refresh = () => {
   loadSummoner()
@@ -101,4 +141,13 @@ const pts = usePlayerTabsStore()
 const somethingLoading = computed(() => {
   return pts.getTab(id.value)?.isLoading ?? false
 })
+
+const maskedName = computed(() => {
+  const seed = summoner.value?.gameName || summoner.value?.puuid || puuid.value
+  return streamerSummonerName(seed, 0)
+})
+
+const maskedTagLine = computed(() => masked(summoner.value?.tagLine || '—', '#•••'))
+
+const showSpectatorIndicator = computed(() => isSmallSize.value && !!spectatorData.value)
 </script>

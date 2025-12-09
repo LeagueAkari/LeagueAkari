@@ -44,9 +44,6 @@ export type PlayerTabContext = {
   /** 该玩家数据来源自哪个服务器 */
   sgpServerId: Readonly<Ref<string>>
 
-  /** 隐藏敏感信息 */
-  hidePrivacy: Readonly<Ref<boolean>>
-
   /** 是否小尺寸 */
   isSmallSize: Readonly<Ref<boolean>>
 
@@ -100,7 +97,6 @@ export function providePlayerTab(props: {
     puuid,
     preferredSource,
     sgpServerId,
-    hidePrivacy: computed(() => as.settings.streamerMode),
 
     isSmallSize: toRef(props.isSmallSize),
     isCrossRegion: toRef(isCrossRegion),

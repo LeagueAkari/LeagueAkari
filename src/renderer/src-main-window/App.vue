@@ -161,9 +161,9 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.95) 75%,
-      rgba(255, 255, 255, 0.95) 100%
+      oklch(98.5% 0.002 247.839 / 0.9) 0%,
+      oklch(98.5% 0.002 247.839 / 0.95) 75%,
+      oklch(98.5% 0.002 247.839 / 0.95) 100%
     );
   }
 

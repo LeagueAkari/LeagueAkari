@@ -164,8 +164,8 @@ watch(
   (isDead, prevIsDead) => {
     if (!isDead && prevIsDead && mws.focus === 'focused') {
       notification.success({
-        title: t('SideBarFixed.respawned'),
-        content: t('SideBarFixed.respawnedContent'),
+        title: () => t('SideBarFixed.respawned'),
+        content: () => t('SideBarFixed.respawnedContent'),
         duration: 4000
       })
     }

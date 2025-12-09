@@ -93,7 +93,12 @@
       <!-- Active Session -->
       <div
         class="flex w-full items-center gap-2"
-        v-if="pagedMatchHistory?.queryParams.startIndex === 0"
+        v-if="
+          (analysis.summary.activeSessionWins > 0 || analysis.summary.activeSessionLosses > 0) &&
+          pagedMatchHistory &&
+          (pagedMatchHistory.queryParams.startIndex === 0 ||
+            pagedMatchHistory.queryParams.startIndex === undefined)
+        "
       >
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.activeSession', 'active')

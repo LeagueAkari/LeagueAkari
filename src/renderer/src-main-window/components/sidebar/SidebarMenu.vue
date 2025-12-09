@@ -116,7 +116,7 @@ watch(
       height: var(--indicator-rail-height);
       top: var(--indicator-top);
       border-radius: 2px;
-      background-color: #157708;
+      background-color: #1ea90c;
     }
 
     [data-theme='dark'] &::before,
@@ -230,7 +230,7 @@ watch(
 
   .menu-item__icon,
   .menu-item__label {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.5);
 
     [data-theme='dark'] & {
       color: rgba(255, 255, 255, 0.6);
@@ -240,7 +240,7 @@ watch(
   &.active {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(0, 0, 0, 0.8);
+      color: rgba(0, 0, 0, 1);
 
       [data-theme='dark'] & {
         color: rgba(255, 255, 255, 1);
@@ -248,7 +248,7 @@ watch(
     }
 
     .menu-item__inner {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: rgba(0, 0, 0, 0.08);
 
       [data-theme='dark'] & {
         background-color: rgba(255, 255, 255, 0.05);

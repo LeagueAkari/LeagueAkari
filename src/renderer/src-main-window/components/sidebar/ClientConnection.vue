@@ -338,8 +338,22 @@ const handlePlayAgain = async () => {
 .cc__group {
   .cc__group-name {
     margin-bottom: 8px;
-    color: #fffb;
+    color: #000b;
     font-weight: bold;
+
+    & [data-theme='dark'] {
+      color: #fffb;
+    }
+  }
+
+  .cc__no-client {
+    color: #000b;
+    font-size: 12px;
+    font-style: italic;
+
+    & [data-theme='dark'] {
+      color: #fffb;
+    }
   }
 
   &:not(:last-child) {

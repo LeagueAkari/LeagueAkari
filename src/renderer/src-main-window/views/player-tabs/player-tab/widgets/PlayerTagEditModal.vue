@@ -7,11 +7,16 @@
     <template v-if="summoner">
       <div class="flex items-center">
         <LcuImage class="size-6 rounded" :src="profileIconUri(summoner.profileIconId)" />
-        <span class="ml-2 text-sm font-bold max-w-300px truncate">{{
-          hidePrivacy
-            ? t('summoner', { ns: 'common' })
-            : `${summoner.gameName} #${summoner.tagLine}`
-        }}</span>
+        <StreamerModeMaskedText>
+          <template #masked>
+            <span class="ml-2 text-sm font-bold max-w-300px truncate">
+              {{ maskedSummonerName }}
+            </span>
+          </template>
+          <span class="ml-2 text-sm font-bold max-w-300px truncate">
+            {{ `${summoner.gameName} #${summoner.tagLine}` }}
+          </span>
+        </StreamerModeMaskedText>
       </div>
     </template>
 
@@ -25,10 +30,7 @@
         v-model:value="text"
         :placeholder="
           t('PlayerTagEditModal.placeholder', {
-            name:
-              hidePrivacy || !summoner
-                ? t('summoner', { ns: 'common' })
-                : `${summoner.gameName} #${summoner.tagLine}`
+            name: masked(displayName, t('summoner', { ns: 'common' }))
           })
         "
         type="textarea"
@@ -49,7 +51,9 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -70,7 +74,7 @@ const show = defineModel<boolean>('show', { default: false })
 
 const inputEl = useTemplateRef('input')
 
-const { hidePrivacy, puuid, preferredSource, isCrossRegion, sgpServerId } = usePlayerTab()
+const { puuid, preferredSource, isCrossRegion, sgpServerId } = usePlayerTab()
 const { tags, loadTags, editTag, removeTag } = useTags()
 
 const selfTagged = computed(() => {
@@ -87,6 +91,20 @@ const log = useInstance(LoggerRenderer)
 const summoner = shallowRef<Summoner | null>(null)
 
 const { getSummoners } = useSummonerFetch()
+
+const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
+
+const displayName = computed(() => {
+  if (!summoner.value) {
+    return t('summoner', { ns: 'common' })
+  }
+  return `${summoner.value.gameName} #${summoner.value.tagLine}`
+})
+
+const maskedSummonerName = computed(() => {
+  const seed = summoner.value?.gameName || summoner.value?.puuid || puuid.value
+  return streamerSummonerName(seed, 0)
+})
 
 const loadSummoner = async () => {
   try {
