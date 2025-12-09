@@ -31,13 +31,15 @@
           v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
           class="text-xs text-black/50 py-0.5 px-1 dark:bg-white/10 dark:text-white text-black/50 text-xs bg-black/20 rounded"
         >
-          {{ collected.anvils[p.participantId] }} 锻
+          {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
         </div>
       </div>
 
       <!-- Skills Section -->
       <div class="mb-3">
-        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">技能构建</div>
+        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">
+          {{ t('MatchCard.buildsTab.skillBuild') }}
+        </div>
         <div class="flex items-center gap-1 flex-wrap">
           <div
             v-for="(sk, idx) of collected.skillLevelUpEvents[p.participantId]"
@@ -82,14 +84,16 @@
             v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
             class="text-xs dark:text-white/30 text-black/30 italic py-1"
           >
-            无技能升级
+            {{ t('MatchCard.buildsTab.noSkillUpgrades') }}
           </div>
         </div>
       </div>
 
       <!-- Items Section -->
       <div>
-        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">装备购买</div>
+        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">
+          {{ t('MatchCard.buildsTab.itemPurchases') }}
+        </div>
         <div class="flex items-start gap-1 flex-wrap">
           <div
             v-for="(item, idx) of collected.itemPurchaseEvents[p.participantId]?.filter(
@@ -125,7 +129,7 @@
             "
             class="text-xs dark:text-white/30 text-black/30 italic py-1"
           >
-            无装备购买
+            {{ t('MatchCard.buildsTab.noItemPurchases') }}
           </div>
         </div>
       </div>
@@ -138,13 +142,15 @@
     <template v-if="loadingDetails">
       <div class="flex gap-2 items-center">
         <NSpin :size="16" />
-        <span>加载中...</span>
+        <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex gap-2 items-center">
-        <span>暂无数据</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+        <span>{{ t('MatchCard.common.noData') }}</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
+          {{ t('MatchCard.common.refresh') }}
+        </NButton>
       </div>
     </template>
   </div>
@@ -159,6 +165,7 @@ import {
   DetailedSkillLevelUpEvent
 } from '@shared/types/sgp/match-history'
 import { ArrowUp } from '@vicons/ionicons5'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NScrollbar, NSpin } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -180,6 +187,7 @@ const {
 } = useMatchCard()
 
 const lcs = useLeagueClientStore()
+const { t } = useTranslation()
 
 type LASpacerEvent = {
   type: 'LEAGUE_AKARI_ITEM_SPACER'

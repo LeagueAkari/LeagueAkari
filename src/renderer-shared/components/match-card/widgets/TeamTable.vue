@@ -36,33 +36,51 @@
 
       <!-- objective -->
       <div v-if="team.teamInfo" class="flex gap-2">
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="防御塔">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.tower')"
+        >
           <Tower class="size-3.5" />
           <span>{{ team.teamInfo.objectives.tower.kills }}</span>
         </div>
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="水晶">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.inhibitor')"
+        >
           <Inhibitor class="size-3.5" />
           <span>{{ team.teamInfo.objectives.inhibitor.kills }}</span>
         </div>
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="巨龙">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.dragon')"
+        >
           <Dragon class="size-3.5" />
           <span>{{ team.teamInfo.objectives.dragon.kills }}</span>
         </div>
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="纳什男爵">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.baron')"
+        >
           <Baron class="size-3.5" />
           <span>{{ team.teamInfo.objectives.baron.kills }}</span>
         </div>
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="虚空巢虫">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.voidGrub')"
+        >
           <VoidGrub class="size-3.5" />
           <span>{{ team.teamInfo.objectives.horde.kills }}</span>
         </div>
-        <div class="flex items-center gap-1 dark:text-white/60 text-black/60" title="峡谷先锋">
+        <div
+          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          :title="t('MatchCard.teamTable.objectives.riftHerald')"
+        >
           <RiftHerald class="size-3.5" />
           <span>{{ team.teamInfo.objectives.riftHerald.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 dark:text-white/60 text-black/60"
-          title="厄塔汗"
+          :title="t('MatchCard.teamTable.objectives.atakhan')"
           v-if="team.teamInfo.objectives.atakhan"
         >
           <Atakhan class="size-3.5" />
@@ -72,7 +90,9 @@
 
       <!-- bans -->
       <div class="mla flex" v-if="team.teamInfo && team.teamInfo.bans.length > 0">
-        <div class="text-xs dark:text-white/60 text-black/60 mr-1">禁用</div>
+        <div class="text-xs dark:text-white/60 text-black/60 mr-1">
+          {{ t('MatchCard.teamTable.bans') }}
+        </div>
         <div class="flex gap-0.5">
           <ChampionIcon
             v-for="ban in team.teamInfo.bans.slice(0, 5)"
@@ -241,15 +261,17 @@
         <div v-else-if="column.name === 'cs'" :class="column.class">
           <div class="text-xs">{{ participant.cs }} CS</div>
           <div class="dark:text-white/60 text-black/60 text-11px">
-            {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }} / 分钟
+            {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
+            {{ t('MatchCard.teamTable.perMinuteSuffix') }}
           </div>
         </div>
 
         <!-- gold -->
         <div v-else-if="column.name === 'gold'" :class="column.class">
-          <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }} K</div>
+          <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }} k</div>
           <div class="dark:text-white/60 text-black/60 text-11px">
-            {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }} / 分钟
+            {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }}
+            {{ t('MatchCard.teamTable.perMinuteSuffix') }}
           </div>
         </div>
 
@@ -278,6 +300,7 @@ import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSp
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { useTranslation } from 'i18next-vue'
 import { Robot } from '@vicons/fa'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
@@ -331,6 +354,7 @@ const extraColumns = computed<ColumnConfig[]>(() => {
 })
 
 const as = useAppCommonStore()
+const { t } = useTranslation()
 
 const tone = computed(() => {
   const k = team.value.winResult

@@ -53,6 +53,7 @@
 
 <script lang="ts" setup>
 import { Replay20Filled, Replay20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
@@ -67,6 +68,7 @@ import TabSwitch from './widgets/TabSwitch.vue'
 
 const { basicInfo, teams, participants, puuid, replayState, onLoadReplay, onWatchReplay } =
   useMatchCard()
+const { t } = useTranslation()
 
 const selfStats = computed(() => {
   return participants.value.find((s) => s.puuid === puuid.value)
@@ -88,29 +90,29 @@ const selectedTab = ref('summary')
 const tabs = computed(() => {
   return [
     {
-      label: '总览',
+      label: t('MatchCard.tabs.summary'),
       value: 'summary'
     },
     {
-      label: '详尽表格',
+      label: t('MatchCard.tabs.details'),
       value: 'details'
     },
     {
-      label: '符文',
+      label: t('MatchCard.tabs.runes'),
       value: 'runes',
       show: perksAvailable.value
     },
     {
-      label: '事件',
+      label: t('MatchCard.tabs.events'),
       value: 'events'
     },
     {
-      label: '构建',
+      label: t('MatchCard.tabs.builds'),
       value: 'builds',
       show: basicInfo.value.dataSource === 'sgp'
     },
     {
-      label: '线图',
+      label: t('MatchCard.tabs.lineChart'),
       value: 'line-chart'
     }
   ].filter((tab) => tab.show ?? true)
@@ -125,13 +127,13 @@ watchEffect(() => {
 const replayButtonTitle = computed(() => {
   switch (replayState.value) {
     case 'download':
-      return '下载回放'
+      return t('MatchCard.replay.download')
     case 'watch':
-      return '观看回放'
+      return t('MatchCard.replay.watch')
     case 'incompatible':
-      return '回放不可用'
+      return t('MatchCard.replay.unavailable')
     default:
-      return '回放'
+      return t('MatchCard.replay.label')
   }
 })
 </script>

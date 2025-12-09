@@ -4,7 +4,7 @@
       <!-- title -->
       <div class="flex items-center gap-1">
         <NIcon class="text-sm"><Filter20Regular /></NIcon>
-        <span class="font-bold text-sm">页内筛选</span>
+        <span class="font-bold text-sm">{{ t('PlayerTab.filter.title') }}</span>
       </div>
 
       <!-- clear button -->
@@ -18,23 +18,27 @@
         <template #icon>
           <NIcon class="text-11px"><Delete20Regular /></NIcon>
         </template>
-        <span class="text-11px">重置条件</span>
+        <span class="text-11px">{{ t('PlayerTab.filter.reset') }}</span>
       </NButton>
     </div>
 
     <!-- conditions -->
     <div class="space-y-2">
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">胜负</div>
+        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+          {{ t('PlayerTab.filter.winLoss') }}
+        </div>
         <NRadioGroup size="small" v-model:value="winLoss">
-          <NRadio value="all" label="全部" />
-          <NRadio value="win" label="胜利" />
-          <NRadio value="loss" label="失败" />
+          <NRadio value="all" :label="t('PlayerTab.filter.all')" />
+          <NRadio value="win" :label="t('PlayerTab.filter.win')" />
+          <NRadio value="loss" :label="t('PlayerTab.filter.loss')" />
         </NRadioGroup>
       </div>
 
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">涉及召唤师</div>
+        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+          {{ t('PlayerTab.filter.summoners') }}
+        </div>
         <NSelect
           size="tiny"
           multiple
@@ -52,7 +56,9 @@
       </div>
 
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">涉及英雄</div>
+        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+          {{ t('PlayerTab.filter.champions') }}
+        </div>
         <NSelect
           clearable
           filterable
@@ -75,6 +81,7 @@ import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-
 import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
 import { Delete20Regular, Filter20Regular } from '@vicons/fluent'
 import { useDebounceFn } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NRadio, NRadioGroup, NSelect, NTag, SelectOption } from 'naive-ui'
 import { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -85,6 +92,7 @@ import { useMatchHistoryFilters } from '../data/match-history-filters'
 import { useSummonerFetch } from '../utils/summoner-fetch'
 
 const lcs = useLeagueClientStore()
+const { t } = useTranslation()
 
 const { isCrossRegion, sgpServerId } = usePlayerTab()
 const { searchSummonerByAlias } = useSummonerFetch()

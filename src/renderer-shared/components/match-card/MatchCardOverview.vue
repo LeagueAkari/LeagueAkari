@@ -60,7 +60,8 @@
                   participant.deaths === 0 && (participant.kills > 0 || participant.assists > 0)
                 "
               >
-                完美 ({{ (participant.killParticipation * 100).toFixed(0) }}%)
+                {{ t('MatchCard.overview.perfect') }}
+                ({{ (participant.killParticipation * 100).toFixed(0) }}%)
               </div>
 
               <div class="flex justify-center gap-1" v-else>
@@ -93,7 +94,9 @@
                     <div class="dark:text-white/80 text-black/80 text-xs">
                       {{ participant.totalDamageDealtToChampions.toLocaleString() }}
                     </div>
-                    <div class="dark:text-white/60 text-black/60 text-xs">伤害</div>
+                    <div class="dark:text-white/60 text-black/60 text-xs">
+                      {{ t('MatchCard.overview.damage') }}
+                    </div>
                   </div>
                 </div>
               </template>
@@ -198,10 +201,7 @@
           <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
 
           <!-- should show the specific time if hover -->
-          <div
-            class="dark:text-white/60 text-black/80 text-xs"
-            :title="dayjs(basicInfo.gameCreation).format('YYYY-MM-DD HH:mm:ss:SSS')"
-          >
+          <div class="dark:text-white/60 text-black/80 text-xs" :title="gameCreationTitle">
             {{ formattedRelativeTime }}
           </div>
           <div class="dark:text-white/40 text-black/60 text-xs mx-1">·</div>
@@ -357,6 +357,7 @@ import { Crown, Robot } from '@vicons/fa'
 import { ArrowBackIosFilled } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
 
@@ -390,6 +391,7 @@ const gameResultName = useGameResultName()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
+const { t } = useTranslation()
 
 // 典型的 100 / 200 红蓝队方法
 const twoTeams = computed(() => {
@@ -479,6 +481,9 @@ const mapName = computed(() => {
 })
 
 const formattedRelativeTime = ref('')
+const gameCreationTitle = computed(() => {
+  return dayjs(basicInfo.value.gameCreation).format('YYYY-MM-DD HH:mm:ss:SSS')
+})
 
 useIntervalFn(
   () => {

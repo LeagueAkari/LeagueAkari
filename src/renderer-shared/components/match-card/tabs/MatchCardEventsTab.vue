@@ -6,22 +6,22 @@
         <div class="pl-4 pt-2">
           <NTimeline>
             <NTimelineItem
-              title="开始游戏"
-              :time="dayjs.duration(firstAndEndTime.firstTime).format('mm:ss:SSS')"
+              :title="t('MatchCard.eventsTab.start')"
+              :time="formatDuration(firstAndEndTime.firstTime)"
             />
 
             <template v-for="e of events">
               <NTimelineItem
                 v-if="e.type === 'CHAMPION_KILL' && selectedFilters.includes('CHAMPION_KILL')"
                 type="success"
-                :time="dayjs.duration(e.timestamp).format('mm:ss:SSS')"
+                :time="formatDuration(e.timestamp)"
               >
                 <template #header>
                   <div class="flex items-center gap-2">
                     <div>{{ frameEventType(e.type) }}</div>
                     <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
                       <template #trigger>
-                        <div :class="tagTheme">查看位置</div>
+                        <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
                       </template>
                       <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
@@ -40,7 +40,9 @@
                       class="size-3.5 rounded not-last:mr-0.5"
                     />
                   </div>
-                  <div class="dark:text-white/80 text-black/80 text-sm">击杀</div>
+                  <div class="dark:text-white/80 text-black/80 text-sm">
+                    {{ t('MatchCard.eventsTab.kill') }}
+                  </div>
                   <ChampionIcon
                     :champion-id="participantMap[e.victimId].championId"
                     class="size-5 rounded"
@@ -55,7 +57,7 @@
                 "
                 :title="`${e.killType}`"
                 type="success"
-                :time="dayjs.duration(e.timestamp).format('mm:ss:SSS')"
+                :time="formatDuration(e.timestamp)"
               >
                 <template #header>
                   <div class="flex gap-2 items-center w-fit cursor-pointer">
@@ -63,12 +65,18 @@
                       :champion-id="participantMap[e.killerId]?.championId"
                       class="size-5 rounded"
                     />
-                    <div v-if="e.killType === 'KILL_FIRST_BLOOD'">第一滴血</div>
-                    <div v-else-if="e.killType === 'KILL_MULTI'">{{ e.multiKillLength }} 杀</div>
-                    <div v-else-if="e.killType === 'KILL_ACE'">团灭敌队</div>
+                    <div v-if="e.killType === 'KILL_FIRST_BLOOD'">
+                      {{ t('MatchCard.eventsTab.firstBlood') }}
+                    </div>
+                    <div v-else-if="e.killType === 'KILL_MULTI'">
+                      {{ t('MatchCard.eventsTab.multiKill', { count: e.multiKillLength }) }}
+                    </div>
+                    <div v-else-if="e.killType === 'KILL_ACE'">
+                      {{ t('MatchCard.eventsTab.ace') }}
+                    </div>
                     <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
                       <template #trigger>
-                        <div :class="tagTheme">查看位置</div>
+                        <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
                       </template>
                       <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
@@ -78,9 +86,9 @@
 
               <NTimelineItem
                 v-if="e.type === 'BUILDING_KILL' && selectedFilters.includes('BUILDING_KILL')"
-                title="摧毁建筑"
+                :title="t('MatchCard.eventsTab.destroyBuilding')"
                 type="warning"
-                :time="dayjs.duration(e.timestamp).format('mm:ss:SSS')"
+                :time="formatDuration(e.timestamp)"
               >
                 <NPopover :show-arrow="false" placement="right">
                   <template #trigger>
@@ -89,7 +97,9 @@
                         :champion-id="participantMap[e.killerId]?.championId"
                         class="size-5 rounded"
                       />
-                      <div class="dark:text-white/60 text-black/60">摧毁了</div>
+                      <div class="dark:text-white/60 text-black/60">
+                        {{ t('MatchCard.eventsTab.destroyed') }}
+                      </div>
                       <template v-if="e.buildingType === 'TOWER_BUILDING'">
                         <Tower class="size-4" />
                         <div class="font-bold">
@@ -115,26 +125,32 @@
                   e.killerId !== 0 &&
                   selectedFilters.includes('TURRET_PLATE_DESTROYED')
                 "
-                title="摧毁防御塔镀层"
+                :title="t('MatchCard.eventsTab.destroyPlateTitle')"
                 type="warning"
-                :time="dayjs.duration(e.timestamp).format('mm:ss:SSS')"
+                :time="formatDuration(e.timestamp)"
               >
                 <div class="flex gap-2 items-center w-fit cursor-pointer">
                   <ChampionIcon
                     :champion-id="participantMap[e.killerId]?.championId"
                     class="size-5 rounded"
                   />
-                  <div class="dark:text-white/60 text-black/60">摧毁</div>
+                  <div class="dark:text-white/60 text-black/60">
+                    {{ t('MatchCard.eventsTab.destroyed') }}
+                  </div>
                   <div class="font-bold">
-                    {{ e.laneType ? laneType(e.laneType) : '' }} 防御塔镀层
+                    {{
+                      e.laneType
+                        ? t('MatchCard.eventsTab.plateLane', { lane: laneType(e.laneType) })
+                        : t('MatchCard.eventsTab.plate')
+                    }}
                   </div>
                 </div>
               </NTimelineItem>
             </template>
 
             <NTimelineItem
-              title="结束游戏"
-              :time="dayjs.duration(firstAndEndTime.endTime).format('mm:ss:SSS')"
+              :title="t('MatchCard.eventsTab.end')"
+              :time="formatDuration(firstAndEndTime.endTime)"
             />
           </NTimeline>
         </div>
@@ -146,7 +162,9 @@
       <div class="flex flex-col gap-3">
         <!-- 筛选器 -->
         <div class="flex flex-col gap-2 w-full">
-          <div class="text-xs dark:text-white/60 text-black/60 font-semibold">筛选</div>
+          <div class="text-xs dark:text-white/60 text-black/60 font-semibold">
+            {{ t('MatchCard.eventsTab.filters') }}
+          </div>
           <NCheckboxGroup v-model:value="selectedFilters">
             <div class="flex flex-col gap-1.5">
               <NCheckbox
@@ -163,7 +181,9 @@
         <template v-if="platesTakeParticipants">
           <div class="h-px dark:bg-white/10 bg-black/10"></div>
 
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">防御塔镀层统计</div>
+          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+            {{ t('MatchCard.eventsTab.plateStats') }}
+          </div>
 
           <div class="flex flex-col gap-1">
             <div v-for="k of platesTakeParticipants">
@@ -172,7 +192,9 @@
                 <div class="dark:text-white/80 text-black/80 text-sm">
                   {{ lcs.gameData.championName(k.championId) }}
                 </div>
-                <div :class="tagTheme">{{ k.platesTake }} 层</div>
+                <div :class="tagTheme">
+                  {{ t('MatchCard.eventsTab.plateCount', { count: k.platesTake }) }}
+                </div>
               </div>
             </div>
           </div>
@@ -187,13 +209,15 @@
     <template v-if="loadingDetails">
       <div class="flex gap-2 items-center">
         <NSpin :size="16" />
-        <span>加载中...</span>
+        <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex gap-2 items-center">
-        <span>暂无数据</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+        <span>{{ t('MatchCard.common.noData') }}</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
+          {{ t('MatchCard.common.refresh') }}
+        </NButton>
       </div>
     </template>
   </div>
@@ -203,6 +227,7 @@
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCheckbox,
@@ -226,6 +251,7 @@ const { participants, details, basicInfo, frames, team, loadingDetails, onLoadDe
   useMatchCard()
 
 const lcs = useLeagueClientStore()
+const { t } = useTranslation()
 
 const SUPPORTED_EVENT_TYPES = [
   'CHAMPION_KILL',
@@ -237,6 +263,8 @@ const selectedFilters = ref<(typeof SUPPORTED_EVENT_TYPES)[number][]>([
   'CHAMPION_KILL',
   'BUILDING_KILL'
 ])
+
+const formatDuration = (timestamp: number) => dayjs.duration(timestamp).format('mm:ss:SSS')
 
 if (!details.value && !loadingDetails.value) {
   onLoadDetails(basicInfo.value.gameId)

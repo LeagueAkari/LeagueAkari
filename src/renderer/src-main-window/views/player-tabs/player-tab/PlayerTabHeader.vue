@@ -70,7 +70,7 @@
     <!-- buttons -->
     <div class="flex gap-2 ml-8 justify-end">
       <!-- tag edit -->
-      <NButton secondary class="!size-42px" @click="isTagEditModalShowing = true">
+      <NButton secondary class="!size-42px" @click="isTagEditModalShowing = true" v-if="!isSelfTab">
         <template #icon>
           <NIcon><Edit20Filled /></NIcon>
         </template>
@@ -113,7 +113,7 @@ import PlayerTagEditModal from './widgets/PlayerTagEditModal.vue'
 import RankedPane from './widgets/RankedPane.vue'
 import SpectatorPane from './widgets/SpectatorPane.vue'
 
-const { id, puuid, isSmallSize } = usePlayerTab()
+const { id, puuid, isSmallSize, isSelfTab } = usePlayerTab()
 const { summoner, loadSummoner } = useSummoner()
 const { loadGames } = useEncounteredGames()
 const { loadMatchHistory } = useMatchHistory()

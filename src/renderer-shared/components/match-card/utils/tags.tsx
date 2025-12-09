@@ -1,14 +1,16 @@
 import { noZero } from '@shared/data-adapter/utils'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'i18next-vue'
 import { VNodeChild, computed } from 'vue'
 
 import { useMatchCard } from '../context'
 
-function times(thing: string, count: number) {
+function times(label: string, count: number, t: TFunction) {
   if (count === 1) {
-    return `${thing}`
+    return `${label}`
   }
 
-  return `${thing}×${count.toFixed(0)}`
+  return t('MatchCard.tags.times', { label, count })
 }
 
 export interface PlayerTag {
@@ -26,7 +28,7 @@ interface TagContext {
   basicInfo: ReturnType<typeof useMatchCard>['basicInfo']['value']
 }
 
-function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
+function computeMultikillTags({ participant }: TagContext, t: TFunction): PlayerTag[] {
   const tags: PlayerTag[] = []
   const streakKills = {
     double: participant.doubleKills,
@@ -47,7 +49,7 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
 
   if (streakKills.penta) {
     tags.push({
-      label: `${times('五杀', streakKills.penta)}`,
+      label: `${times(t('MatchCard.tags.multiKill.penta'), streakKills.penta, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 20000
@@ -56,7 +58,7 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
 
   if (streakKills.quadra) {
     tags.push({
-      label: `${times('四杀', streakKills.quadra)}`,
+      label: `${times(t('MatchCard.tags.multiKill.quadra'), streakKills.quadra, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 1300
@@ -65,7 +67,7 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
 
   if (streakKills.triple) {
     tags.push({
-      label: `${times('三杀', streakKills.triple)}`,
+      label: `${times(t('MatchCard.tags.multiKill.triple'), streakKills.triple, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 300 + streakKills.triple * 15
@@ -74,7 +76,7 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
 
   if (streakKills.double) {
     tags.push({
-      label: `${times('双杀', streakKills.double)}`,
+      label: `${times(t('MatchCard.tags.multiKill.double'), streakKills.double, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 100 + streakKills.double * 10
@@ -84,26 +86,38 @@ function computeMultikillTags({ participant }: TagContext): PlayerTag[] {
   return tags
 }
 
-function computeDamageTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeDamageTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.totalDamageDealtToChampions) return []
 
   if (participant.totalDamageDealtToChampions === teams.allTeamStats.maxDamageDealtToChampions) {
     return [
       {
-        label: '★ 伤害',
+        label: t('MatchCard.tags.damage.bestLabel'),
         color: 'bg-red-800 dark:bg-red-800',
         textColor: 'text-white',
-        content: `全场最高伤害：${participant.totalDamageDealtToChampions.toLocaleString()}，占队伍伤害的 ${((participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.damage.bestContent', {
+          value: participant.totalDamageDealtToChampions.toLocaleString(),
+          rate: (
+            (participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 1800
       }
     ]
   } else if (participant.totalDamageDealtToChampions === team.maxDamageDealtToChampions) {
     return [
       {
-        label: '伤害',
+        label: t('MatchCard.tags.damage.teamLabel'),
         color: 'bg-red-700 dark:bg-red-700',
         textColor: 'text-white',
-        content: `队伍最高伤害：${participant.totalDamageDealtToChampions.toLocaleString()}，占队伍伤害的 ${((participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.damage.teamContent', {
+          value: participant.totalDamageDealtToChampions.toLocaleString(),
+          rate: (
+            (participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 1750
       }
     ]
@@ -112,26 +126,32 @@ function computeDamageTags({ participant, team, teams }: TagContext): PlayerTag[
   return []
 }
 
-function computeTakenTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeTakenTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.totalDamageTaken) return []
 
   if (participant.totalDamageTaken === teams.allTeamStats.maxDamageTaken) {
     return [
       {
-        label: '★ 承伤',
+        label: t('MatchCard.tags.taken.bestLabel'),
         color: 'bg-slate-700 dark:bg-slate-700',
         textColor: 'text-white',
-        content: `全场最高承伤：${participant.totalDamageTaken.toLocaleString()}，占队伍承伤的 ${((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.taken.bestContent', {
+          value: participant.totalDamageTaken.toLocaleString(),
+          rate: ((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)
+        }),
         priority: 1400
       }
     ]
   } else if (participant.totalDamageTaken === team.maxDamageTaken) {
     return [
       {
-        label: '承伤',
+        label: t('MatchCard.tags.taken.teamLabel'),
         color: 'bg-slate-600 dark:bg-slate-600',
         textColor: 'text-white',
-        content: `队伍最高承伤：${participant.totalDamageTaken.toLocaleString()}，占队伍承伤的 ${((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.taken.teamContent', {
+          value: participant.totalDamageTaken.toLocaleString(),
+          rate: ((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)
+        }),
         priority: 1350
       }
     ]
@@ -140,26 +160,32 @@ function computeTakenTags({ participant, team, teams }: TagContext): PlayerTag[]
   return []
 }
 
-function computeHealTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeHealTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.totalHeal) return []
 
   if (participant.totalHeal === teams.allTeamStats.maxHeal) {
     return [
       {
-        label: '★ 治疗',
+        label: t('MatchCard.tags.heal.bestLabel'),
         color: 'bg-emerald-700 dark:bg-emerald-800',
         textColor: 'text-white',
-        content: `全场最高治疗：${participant.totalHeal.toLocaleString()}，占队伍治疗的 ${((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.heal.bestContent', {
+          value: participant.totalHeal.toLocaleString(),
+          rate: ((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)
+        }),
         priority: 1600
       }
     ]
   } else if (participant.totalHeal === team.maxHeal) {
     return [
       {
-        label: '治疗',
+        label: t('MatchCard.tags.heal.teamLabel'),
         color: 'bg-emerald-600 dark:bg-emerald-700',
         textColor: 'text-white',
-        content: `队伍最高治疗：${participant.totalHeal.toLocaleString()}，占队伍治疗的 ${((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.heal.teamContent', {
+          value: participant.totalHeal.toLocaleString(),
+          rate: ((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)
+        }),
         priority: 1550
       }
     ]
@@ -167,26 +193,38 @@ function computeHealTags({ participant, team, teams }: TagContext): PlayerTag[] 
   return []
 }
 
-function computeTowerTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeTowerTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.totalDamageToTowers) return []
 
   if (participant.totalDamageToTowers === teams.allTeamStats.maxDamageToTowers) {
     return [
       {
-        label: '★ 拆塔',
+        label: t('MatchCard.tags.tower.bestLabel'),
         color: 'bg-stone-700 dark:bg-stone-600',
         textColor: 'text-white',
-        content: `全场最高对塔伤害：${participant.totalDamageToTowers.toLocaleString()}，占队伍对塔伤害的 ${((participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.tower.bestContent', {
+          value: participant.totalDamageToTowers.toLocaleString(),
+          rate: (
+            (participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 900
       }
     ]
   } else if (participant.totalDamageToTowers === team.maxDamageToTowers) {
     return [
       {
-        label: '拆塔',
+        label: t('MatchCard.tags.tower.teamLabel'),
         color: 'bg-stone-600 dark:bg-stone-500',
         textColor: 'text-white',
-        content: `队伍最高对塔伤害：${participant.totalDamageToTowers.toLocaleString()}，占队伍对塔伤害的 ${((participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.tower.teamContent', {
+          value: participant.totalDamageToTowers.toLocaleString(),
+          rate: (
+            (participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 850
       }
     ]
@@ -194,7 +232,7 @@ function computeTowerTags({ participant, team, teams }: TagContext): PlayerTag[]
   return []
 }
 
-function computeShieldTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeShieldTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.totalDamageShieldedOnTeammates) return []
 
   if (
@@ -202,20 +240,34 @@ function computeShieldTags({ participant, team, teams }: TagContext): PlayerTag[
   ) {
     return [
       {
-        label: '★ 护盾',
+        label: t('MatchCard.tags.shield.bestLabel'),
         color: 'bg-sky-700 dark:bg-sky-800',
         textColor: 'text-white',
-        content: `全场最高护盾：${participant.totalDamageShieldedOnTeammates.toLocaleString()}，占队伍护盾的 ${((participant.totalDamageShieldedOnTeammates / noZero(team.totalDamageShieldedOnTeammates ?? 0)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.shield.bestContent', {
+          value: participant.totalDamageShieldedOnTeammates.toLocaleString(),
+          rate: (
+            (participant.totalDamageShieldedOnTeammates /
+              noZero(team.totalDamageShieldedOnTeammates ?? 0)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 1500
       }
     ]
   } else if (participant.totalDamageShieldedOnTeammates === team.maxDamageShieldedOnTeammates) {
     return [
       {
-        label: '护盾',
+        label: t('MatchCard.tags.shield.teamLabel'),
         color: 'bg-sky-600 dark:bg-sky-700',
         textColor: 'text-white',
-        content: `队伍最高护盾：${participant.totalDamageShieldedOnTeammates.toLocaleString()}，占队伍护盾的 ${((participant.totalDamageShieldedOnTeammates / noZero(team.totalDamageShieldedOnTeammates ?? 0)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.shield.teamContent', {
+          value: participant.totalDamageShieldedOnTeammates.toLocaleString(),
+          rate: (
+            (participant.totalDamageShieldedOnTeammates /
+              noZero(team.totalDamageShieldedOnTeammates ?? 0)) *
+            100
+          ).toFixed(2)
+        }),
         priority: 1450
       }
     ]
@@ -223,14 +275,16 @@ function computeShieldTags({ participant, team, teams }: TagContext): PlayerTag[
   return []
 }
 
-function computeSoloTags({ participant }: TagContext): PlayerTag[] {
+function computeSoloTags({ participant }: TagContext, t: TFunction): PlayerTag[] {
   if (participant.soloKills && participant.soloKills >= 2) {
     return [
       {
-        label: `${times('单杀', participant.soloKills)}`,
+        label: `${times(t('MatchCard.tags.solo.label'), participant.soloKills, t)}`,
         color: 'bg-indigo-700 dark:bg-indigo-800',
         textColor: 'text-white',
-        content: `造成了 ${participant.soloKills.toLocaleString()} 次单杀`,
+        content: t('MatchCard.tags.solo.content', {
+          value: participant.soloKills.toLocaleString()
+        }),
         priority: 1700
       }
     ]
@@ -238,26 +292,32 @@ function computeSoloTags({ participant }: TagContext): PlayerTag[] {
   return []
 }
 
-function computeGoldTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeGoldTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.goldEarned) return []
 
   if (participant.goldEarned === teams.allTeamStats.maxGoldEarned) {
     return [
       {
-        label: '★ 金币',
+        label: t('MatchCard.tags.gold.bestLabel'),
         color: 'bg-amber-700 dark:bg-amber-800',
         textColor: 'text-white',
-        content: `全场最高经济：${participant.goldEarned.toLocaleString()}，占队伍经济的 ${((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.gold.bestContent', {
+          value: participant.goldEarned.toLocaleString(),
+          rate: ((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)
+        }),
         priority: 700
       }
     ]
   } else if (participant.goldEarned === team.maxGoldEarned) {
     return [
       {
-        label: '金币',
+        label: t('MatchCard.tags.gold.teamLabel'),
         color: 'bg-amber-600 dark:bg-amber-700',
         textColor: 'text-white',
-        content: `队伍最高经济：${participant.goldEarned.toLocaleString()}，占队伍经济的 ${((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.gold.teamContent', {
+          value: participant.goldEarned.toLocaleString(),
+          rate: ((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)
+        }),
         priority: 650
       }
     ]
@@ -265,14 +325,16 @@ function computeGoldTags({ participant, team, teams }: TagContext): PlayerTag[] 
   return []
 }
 
-function computeCsTags({ participant, teams }: TagContext): PlayerTag[] {
+function computeCsTags({ participant, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (participant.cs && participant.cs === teams.allTeamStats.maxCs) {
     return [
       {
-        label: '★ 补兵',
+        label: t('MatchCard.tags.cs.bestLabel'),
         color: 'bg-orange-700 dark:bg-orange-800',
         textColor: 'text-white',
-        content: `全场最高补兵：${participant.cs.toLocaleString()}`,
+        content: t('MatchCard.tags.cs.bestContent', {
+          value: participant.cs.toLocaleString()
+        }),
         priority: 600
       }
     ]
@@ -280,14 +342,20 @@ function computeCsTags({ participant, teams }: TagContext): PlayerTag[] {
   return []
 }
 
-function computeCsAdvantageTags({ participant }: TagContext): PlayerTag[] {
+function computeCsAdvantageTags({ participant }: TagContext, t: TFunction): PlayerTag[] {
   if (participant.maxCsAdvantageOnLaneOpponent && participant.maxCsAdvantageOnLaneOpponent >= 40) {
     return [
       {
-        label: times('压刀', participant.maxCsAdvantageOnLaneOpponent),
+        label: times(
+          t('MatchCard.tags.csAdvantage.label'),
+          participant.maxCsAdvantageOnLaneOpponent,
+          t
+        ),
         color: 'bg-amber-600 dark:bg-amber-700',
         textColor: 'text-white',
-        content: `同路补刀压制对手最多 ${participant.maxCsAdvantageOnLaneOpponent.toLocaleString()} 个`,
+        content: t('MatchCard.tags.csAdvantage.content', {
+          value: participant.maxCsAdvantageOnLaneOpponent.toLocaleString()
+        }),
         priority: 750 + participant.maxCsAdvantageOnLaneOpponent * 10
       }
     ]
@@ -295,26 +363,30 @@ function computeCsAdvantageTags({ participant }: TagContext): PlayerTag[] {
   return []
 }
 
-function computeKillsTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeKillsTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.kills) return []
 
   if (participant.kills === teams.allTeamStats.maxKills) {
     return [
       {
-        label: '★ 击杀',
+        label: t('MatchCard.tags.kills.bestLabel'),
         color: 'bg-violet-700 dark:bg-violet-800',
         textColor: 'text-white',
-        content: `全场最多击杀：${participant.kills.toLocaleString()}`,
+        content: t('MatchCard.tags.kills.bestContent', {
+          value: participant.kills.toLocaleString()
+        }),
         priority: 1200
       }
     ]
   } else if (participant.kills === team.maxKills) {
     return [
       {
-        label: '击杀',
+        label: t('MatchCard.tags.kills.teamLabel'),
         color: 'bg-violet-600 dark:bg-violet-700',
         textColor: 'text-white',
-        content: `队伍最多击杀：${participant.kills.toLocaleString()}`,
+        content: t('MatchCard.tags.kills.teamContent', {
+          value: participant.kills.toLocaleString()
+        }),
         priority: 1150
       }
     ]
@@ -322,26 +394,30 @@ function computeKillsTags({ participant, team, teams }: TagContext): PlayerTag[]
   return []
 }
 
-function computeKpTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeKpTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.killParticipation) return []
 
   if (participant.killParticipation === teams.allTeamStats.maxKillParticipation) {
     return [
       {
-        label: '★ 参团',
+        label: t('MatchCard.tags.kp.bestLabel'),
         color: 'bg-cyan-700 dark:bg-cyan-800',
         textColor: 'text-white',
-        content: `全场最高参团率：${(participant.killParticipation * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.kp.bestContent', {
+          value: (participant.killParticipation * 100).toFixed(2)
+        }),
         priority: 1100
       }
     ]
   } else if (participant.killParticipation === team.maxKillParticipation) {
     return [
       {
-        label: '参团',
+        label: t('MatchCard.tags.kp.teamLabel'),
         color: 'bg-cyan-600 dark:bg-cyan-700',
         textColor: 'text-white',
-        content: `队伍最高参团率：${(participant.killParticipation * 100).toFixed(2)}%`,
+        content: t('MatchCard.tags.kp.teamContent', {
+          value: (participant.killParticipation * 100).toFixed(2)
+        }),
         priority: 1050
       }
     ]
@@ -349,16 +425,18 @@ function computeKpTags({ participant, team, teams }: TagContext): PlayerTag[] {
   return []
 }
 
-function computedKnockUpTags({ participant }: TagContext): PlayerTag[] {
+function computedKnockUpTags({ participant }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.knockEnemyIntoTeamAndKill) return []
 
   if (participant.knockEnemyIntoTeamAndKill >= 6) {
     return [
       {
-        label: times('好钩', participant.knockEnemyIntoTeamAndKill),
+        label: times(t('MatchCard.tags.knockUp.label'), participant.knockEnemyIntoTeamAndKill, t),
         color: 'bg-purple-700 dark:bg-purple-800',
         textColor: 'text-white',
-        content: `将敌方英雄击飞或拉入我方并击杀 ${participant.knockEnemyIntoTeamAndKill.toLocaleString()} 次`,
+        content: t('MatchCard.tags.knockUp.content', {
+          value: participant.knockEnemyIntoTeamAndKill.toLocaleString()
+        }),
         priority: 1650
       }
     ]
@@ -366,26 +444,30 @@ function computedKnockUpTags({ participant }: TagContext): PlayerTag[] {
   return []
 }
 
-function computeCcTags({ participant, team, teams }: TagContext): PlayerTag[] {
+function computeCcTags({ participant, team, teams }: TagContext, t: TFunction): PlayerTag[] {
   if (!participant.timeCCingOthers) return []
 
   if (participant.timeCCingOthers === teams.allTeamStats.maxTimeCCingOthers) {
     return [
       {
-        label: '★ 控制',
+        label: t('MatchCard.tags.cc.bestLabel'),
         color: 'bg-fuchsia-700 dark:bg-fuchsia-800',
         textColor: 'text-white',
-        content: `全场最久控制，控制了敌方英雄 ${participant.timeCCingOthers.toLocaleString()} 秒`,
+        content: t('MatchCard.tags.cc.bestContent', {
+          value: participant.timeCCingOthers.toLocaleString()
+        }),
         priority: 1750
       }
     ]
   } else if (participant.timeCCingOthers === team.maxTimeCCingOthers) {
     return [
       {
-        label: '控制',
+        label: t('MatchCard.tags.cc.teamLabel'),
         color: 'bg-fuchsia-600 dark:bg-fuchsia-700',
         textColor: 'text-white',
-        content: `队伍最久控制，控制了敌方英雄 ${participant.timeCCingOthers.toLocaleString()} 秒`,
+        content: t('MatchCard.tags.cc.teamContent', {
+          value: participant.timeCCingOthers.toLocaleString()
+        }),
         priority: 1700
       }
     ]
@@ -394,7 +476,7 @@ function computeCcTags({ participant, team, teams }: TagContext): PlayerTag[] {
   return []
 }
 
-function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag[] {
+function computeTowerKillTags({ participant, basicInfo }: TagContext, t: TFunction): PlayerTag[] {
   const tags: PlayerTag[] = []
   const durationMinutes = basicInfo.gameDuration / 60
 
@@ -409,10 +491,12 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag
     participant.killsNearEnemyTurret >= durationMinutes / nearEnemyTurretThreshold
   ) {
     tags.push({
-      label: times('越塔', participant.killsNearEnemyTurret),
+      label: times(t('MatchCard.tags.towerKill.diveLabel'), participant.killsNearEnemyTurret, t),
       color: 'bg-rose-600 dark:bg-rose-700',
       textColor: 'text-white',
-      content: `在敌方塔下击杀 ${participant.killsNearEnemyTurret.toLocaleString()} 次`,
+      content: t('MatchCard.tags.towerKill.diveContent', {
+        value: participant.killsNearEnemyTurret.toLocaleString()
+      }),
       priority: 1660
     })
   }
@@ -422,10 +506,12 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag
     participant.killsUnderOwnTurret >= durationMinutes / underOwnTurretThreshold
   ) {
     tags.push({
-      label: times('塔之子', participant.killsUnderOwnTurret),
+      label: times(t('MatchCard.tags.towerKill.underLabel'), participant.killsUnderOwnTurret, t),
       color: 'bg-stone-500 dark:bg-stone-600',
       textColor: 'text-white',
-      content: `在己方塔下击杀 ${participant.killsUnderOwnTurret.toLocaleString()} 次`,
+      content: t('MatchCard.tags.towerKill.underContent', {
+        value: participant.killsUnderOwnTurret.toLocaleString()
+      }),
       priority: 1640
     })
   }
@@ -435,6 +521,7 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext): PlayerTag
 
 export function usePlayerTags() {
   const { participant, teams, team, basicInfo } = useMatchCard()
+  const { t } = useTranslation()
 
   return computed(() => {
     if (!participant.value || !team.value) return []
@@ -447,29 +534,29 @@ export function usePlayerTags() {
     }
 
     const tags: PlayerTag[] = [
-      ...computeMultikillTags(context),
-      ...computeTowerKillTags(context),
-      ...computeDamageTags(context),
-      ...computeTakenTags(context),
-      ...computeHealTags(context),
-      ...computeTowerTags(context),
-      ...computeShieldTags(context),
-      ...computeSoloTags(context),
-      ...computeGoldTags(context),
-      ...computeCsTags(context),
-      ...computeCsAdvantageTags(context),
-      ...computeKillsTags(context),
-      ...computeKpTags(context),
-      ...computedKnockUpTags(context),
-      ...computeCcTags(context)
+      ...computeMultikillTags(context, t),
+      ...computeTowerKillTags(context, t),
+      ...computeDamageTags(context, t),
+      ...computeTakenTags(context, t),
+      ...computeHealTags(context, t),
+      ...computeTowerTags(context, t),
+      ...computeShieldTags(context, t),
+      ...computeSoloTags(context, t),
+      ...computeGoldTags(context, t),
+      ...computeCsTags(context, t),
+      ...computeCsAdvantageTags(context, t),
+      ...computeKillsTags(context, t),
+      ...computeKpTags(context, t),
+      ...computedKnockUpTags(context, t),
+      ...computeCcTags(context, t)
     ]
 
     if (tags.length === 0) {
       tags.push({
-        label: '平平无奇',
+        label: t('MatchCard.tags.none.label'),
         color: 'bg-zinc-500 dark:bg-zinc-600',
         textColor: 'text-white',
-        content: '本局没有出彩的地方',
+        content: t('MatchCard.tags.none.content'),
         priority: 0
       })
     }

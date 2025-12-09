@@ -8,6 +8,7 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { noZero } from '@shared/data-adapter/utils'
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 import { Radar } from 'vue-chartjs'
 
@@ -18,6 +19,7 @@ const { puuid } = defineProps<{
 }>()
 
 const { teams, participants, theme, hidePrivacy } = useMatchCard()
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 
@@ -182,13 +184,15 @@ const percentage = computed(() => {
 const data = computed<ChartData<'radar'>>(() => {
   return {
     labels: [
-      `伤害 (${percentage.value.damageDealtToChampions.toLocaleString()})`,
-      `承伤 (${percentage.value.damageTaken.toLocaleString()})`,
-      `金币 (${percentage.value.goldEarned.toLocaleString()})`,
-      `补兵 (${percentage.value.cs.toLocaleString()})`,
-      `KDA (${percentage.value.kda.toFixed(2)})`,
-      `击杀参与率 (${(percentage.value.killParticipation * 100).toFixed(0)}%)`,
-      `治疗 (${percentage.value.totalHeal.toLocaleString()})`
+      t('MatchCard.radar.damage', {
+        value: percentage.value.damageDealtToChampions.toLocaleString()
+      }),
+      t('MatchCard.radar.taken', { value: percentage.value.damageTaken.toLocaleString() }),
+      t('MatchCard.radar.gold', { value: percentage.value.goldEarned.toLocaleString() }),
+      t('MatchCard.radar.cs', { value: percentage.value.cs.toLocaleString() }),
+      t('MatchCard.radar.kda', { value: percentage.value.kda.toFixed(2) }),
+      t('MatchCard.radar.kp', { value: (percentage.value.killParticipation * 100).toFixed(0) }),
+      t('MatchCard.radar.heal', { value: percentage.value.totalHeal.toLocaleString() })
     ],
     datasets: [
       {
@@ -211,7 +215,7 @@ const data = computed<ChartData<'radar'>>(() => {
         ]
       },
       {
-        label: '队伍平均',
+        label: t('MatchCard.radar.teamAvg'),
         backgroundColor: chartColors.value.team.background,
         borderColor: chartColors.value.team.border,
         borderWidth: 2,

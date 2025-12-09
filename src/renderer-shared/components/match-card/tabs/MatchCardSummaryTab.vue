@@ -5,7 +5,9 @@
       v-if="basicInfo.isCherrySubteam"
     >
       <div class="flex gap-0.5">
-        <div class="text-xs dark:text-white/60 text-black/60 mr-1">禁用</div>
+        <div class="text-xs dark:text-white/60 text-black/60 mr-1">
+          {{ t('MatchCard.teamTable.bans') }}
+        </div>
         <ChampionIcon
           v-for="ban in teams.allTeamStats.bans.slice(0, 32)"
           :key="ban.championId"
@@ -25,12 +27,14 @@
 
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
 import TeamTable from '../widgets/TeamTable.vue'
 
 const { teams, basicInfo } = useMatchCard()
+const { t } = useTranslation()
 
 const sortedTeams = computed(() => {
   if (basicInfo.value.isCherrySubteam) {

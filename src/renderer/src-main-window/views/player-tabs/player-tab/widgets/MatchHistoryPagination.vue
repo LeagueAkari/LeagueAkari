@@ -43,6 +43,7 @@
           :tertiary="!hasFilters"
           circle
           :type="hasFilters ? 'primary' : 'default'"
+          :title="t('PlayerTab.filter.title')"
         >
           <template #icon>
             <NIcon size="16"><Filter20Regular /></NIcon>
@@ -59,6 +60,7 @@
         tertiary
         circle
         :disabled="isFirstPage || isLoading"
+        :title="t('PlayerTab.prevPage')"
         @click="
           loadMatchHistory({
             startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
@@ -70,13 +72,14 @@
           <NIcon size="16"><ChevronLeft20Regular /></NIcon>
         </template>
       </NButton>
-      <span class="text-sm text-black dark:text-white/80 min-w-32px text-center">
+      <span class="text-sm text-black dark:text-white/80 min-w-24px text-center">
         {{ computedCurrentPage }}
       </span>
       <NButton
         size="small"
         tertiary
         circle
+        :title="t('PlayerTab.nextPage')"
         @click="
           loadMatchHistory({
             startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
@@ -135,6 +138,7 @@
             :tertiary="!hasFilters"
             circle
             :type="hasFilters ? 'primary' : 'default'"
+            :title="t('PlayerTab.filter.title')"
           >
             <template #icon>
               <NIcon size="16"><Filter20Regular /></NIcon>
@@ -151,6 +155,7 @@
           tertiary
           circle
           :disabled="isFirstPage || isLoading"
+          :title="t('PlayerTab.prevPage')"
           @click="
             loadMatchHistory({
               startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
@@ -162,13 +167,14 @@
             <NIcon size="16"><ChevronLeft20Regular /></NIcon>
           </template>
         </NButton>
-        <span class="text-sm text-black dark:text-white/80 min-w-32px text-center">
+        <span class="text-sm text-black dark:text-white/80 min-w-24px text-center">
           {{ computedCurrentPage }}
         </span>
         <NButton
           size="small"
           tertiary
           circle
+          :title="t('PlayerTab.nextPage')"
           @click="
             loadMatchHistory({
               startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
@@ -189,6 +195,7 @@
 <script setup lang="ts">
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { ChevronLeft20Regular, ChevronRight20Regular, Filter20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -205,6 +212,7 @@ const { isFloating = false, horizontal = false } = defineProps<{
   isFloating?: boolean
 }>()
 
+const { t } = useTranslation()
 const pts = usePlayerTabsStore()
 const sgpTagOptions = useSgpTagOptions()
 const pageSizeOptions = usePageSizeOptions()

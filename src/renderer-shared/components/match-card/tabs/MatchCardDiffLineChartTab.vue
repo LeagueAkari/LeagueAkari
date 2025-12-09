@@ -10,12 +10,14 @@
       <div class="flex flex-col gap-3">
         <!-- 数据类型选择器 -->
         <div class="flex flex-col gap-2">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">数据类型</div>
+          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+            {{ t('MatchCard.diffLineChart.dataType') }}
+          </div>
           <NRadioGroup v-model:value="selectedMetric">
             <div class="flex flex-col gap-1.5">
-              <NRadio value="gold" label="金币" />
-              <NRadio value="cs" label="补刀" />
-              <NRadio value="exp" label="经验" />
+              <NRadio value="gold" :label="t('MatchCard.diffLineChart.gold')" />
+              <NRadio value="cs" :label="t('MatchCard.diffLineChart.cs')" />
+              <NRadio value="exp" :label="t('MatchCard.diffLineChart.exp')" />
             </div>
           </NRadioGroup>
         </div>
@@ -25,7 +27,9 @@
 
         <!-- 队伍平均选择 -->
         <div class="flex flex-col gap-2">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">队伍平均</div>
+          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+            {{ t('MatchCard.diffLineChart.teamAverage') }}
+          </div>
           <NCheckboxGroup v-model:value="selectedTeams">
             <div class="flex flex-col gap-1.5">
               <NCheckbox
@@ -43,7 +47,9 @@
 
         <!-- 玩家选择 -->
         <div class="flex flex-col gap-2 w-full">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">玩家</div>
+          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+            {{ t('MatchCard.diffLineChart.players') }}
+          </div>
           <!-- 全选 / 半选 / 全不选 -->
           <NCheckbox
             :checked="allPlayersChecked"
@@ -52,7 +58,7 @@
           >
             <template #default>
               <div class="flex items-center gap-2">
-                <span>全选</span>
+                <span>{{ t('MatchCard.diffLineChart.selectAll') }}</span>
               </div>
             </template>
           </NCheckbox>
@@ -87,13 +93,15 @@
     <template v-if="loadingDetails">
       <div class="flex gap-2 items-center">
         <NSpin :size="16" />
-        <span>加载中...</span>
+        <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex gap-2 items-center">
-        <span>暂无数据</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">刷新</NButton>
+        <span>{{ t('MatchCard.common.noData') }}</span>
+        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
+          {{ t('MatchCard.common.refresh') }}
+        </NButton>
       </div>
     </template>
   </div>
@@ -102,6 +110,7 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCheckbox,
@@ -119,6 +128,7 @@ import { useTeamName } from '../utils/text'
 import { getTeamColor, playerColors } from '../utils/theme'
 
 const lcs = useLeagueClientStore()
+const { t } = useTranslation()
 
 const teamName = useTeamName()
 
@@ -150,23 +160,23 @@ if (!details.value && !loadingDetails.value) {
   onLoadDetails(basicInfo.value.gameId)
 }
 
-const metricConfigs = {
+const metricConfigs = computed(() => ({
   gold: {
-    title: '玩家经济增长曲线',
-    yAxisLabel: '金币',
-    unit: '金币'
+    title: t('MatchCard.diffLineChart.metric.gold.title'),
+    yAxisLabel: t('MatchCard.diffLineChart.metric.gold.yAxis'),
+    unit: t('MatchCard.diffLineChart.metric.gold.unit')
   },
   cs: {
-    title: '玩家补刀数增长曲线',
-    yAxisLabel: '补刀数',
-    unit: '个'
+    title: t('MatchCard.diffLineChart.metric.cs.title'),
+    yAxisLabel: t('MatchCard.diffLineChart.metric.cs.yAxis'),
+    unit: t('MatchCard.diffLineChart.metric.cs.unit')
   },
   exp: {
-    title: '玩家经验增长曲线',
-    yAxisLabel: '经验值',
-    unit: '经验'
+    title: t('MatchCard.diffLineChart.metric.exp.title'),
+    yAxisLabel: t('MatchCard.diffLineChart.metric.exp.yAxis'),
+    unit: t('MatchCard.diffLineChart.metric.exp.unit')
   }
-}
+}))
 
 // 从 timeline 中提取玩家数据
 const extractMetricData = (participantId: number, metric: 'gold' | 'cs' | 'exp') => {
@@ -242,7 +252,7 @@ const teamOptions = computed(() => {
     const name = teamName(team.teamIdentifier)
     return {
       value: team.teamIdentifier,
-      label: name + '平均',
+      label: t('MatchCard.diffLineChart.teamAverageSuffix', { name }),
       color: getTeamColor(team.teamIdentifier)
     }
   })
@@ -296,7 +306,7 @@ const chartData = computed(() => {
     participant?: MatchParticipant,
     hidePrivacy: boolean = false
   ) => {
-    if (!participant) return `玩家 ${participantId}`
+    if (!participant) return t('MatchCard.diffLineChart.playerLabel', { id: participantId })
 
     if (hidePrivacy) return lcs.gameData.championName(participant.championId)
 
@@ -327,7 +337,7 @@ const chartData = computed(() => {
     const color = getTeamColor(team.teamIdentifier)
 
     return {
-      label: `${name}平均`,
+      label: t('MatchCard.diffLineChart.teamAverageSuffix', { name }),
       data: extractTeamAverageData(team.teamIdentifier, selectedMetric.value),
       borderColor: color,
       backgroundColor: color + '40',
@@ -348,7 +358,7 @@ const chartData = computed(() => {
 
 // 图表配置选项（响应式）
 const chartOptions = computed(() => {
-  const config = metricConfigs[selectedMetric.value]
+  const config = metricConfigs.value[selectedMetric.value]
 
   return {
     responsive: true,
@@ -381,7 +391,7 @@ const chartOptions = computed(() => {
         display: true,
         title: {
           display: true,
-          text: '游戏时间'
+          text: t('MatchCard.diffLineChart.gameTime')
         },
         ticks: {
           maxTicksLimit: 10
