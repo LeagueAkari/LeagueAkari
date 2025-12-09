@@ -892,7 +892,7 @@ onDeactivated(() => {
         color: #4cc69d;
       }
 
-      &.lose {
+      &.loss {
         color: #ff6161;
       }
 

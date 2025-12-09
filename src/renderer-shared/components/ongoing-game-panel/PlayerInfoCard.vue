@@ -757,7 +757,7 @@ const getWinLoseClassName = (match: {
   if (match.participant.winResult === 'win') {
     classes.push('win')
   } else {
-    classes.push('lose')
+    classes.push('loss')
   }
 
   return classes
@@ -786,7 +786,7 @@ const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: Match
 
   return match.participant.winResult === 'win'
     ? t('PlayerInfoCard.matchHistory.winResult.win')
-    : t('PlayerInfoCard.matchHistory.winResult.lose')
+    : t('PlayerInfoCard.matchHistory.winResult.loss')
 }
 
 const matches = computed(() => {
@@ -1116,7 +1116,7 @@ const { name } = useChampionInfo()
       border: #2369cab0 1px solid;
     }
 
-    &.bordered.lose {
+    &.bordered.loss {
       border: #c94f4fb0 1px solid;
     }
 
@@ -1132,7 +1132,7 @@ const { name } = useChampionInfo()
       }
     }
 
-    &.lose {
+    &.loss {
       background-color: #c94f4f30;
 
       .win-lose {

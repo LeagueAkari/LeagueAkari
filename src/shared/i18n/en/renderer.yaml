@@ -1726,7 +1726,7 @@ PlayerInfoCard:
     gameStats: Game Stats
     winResult:
       abort: Abort
-      lose: Lose
+      loss: Loss
       remake: Remake
       win: Win
     team:
@@ -1752,7 +1752,7 @@ PlayerInfoCard:
     winResult:
       na: '-'
       win: W
-      lose: L
+      loss: L
       remake: R
       abort: Abrt
 

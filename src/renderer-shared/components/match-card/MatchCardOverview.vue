@@ -17,7 +17,7 @@
                 class="size-11 rounded-lg b-2 b-solid box-border"
                 :class="{
                   'dark:b-green-300 b-green-700': team.winResult === 'win',
-                  'dark:b-red-300 b-red-600': team.winResult === 'lose',
+                  'dark:b-red-300 b-red-600': team.winResult === 'loss',
                   'dark:b-white/80 b-black/80':
                     team.winResult === 'remake' || team.winResult === 'abort'
                 }"
@@ -159,7 +159,7 @@
             <div
               :class="{
                 'dark:text-green-300 text-green-700': team.winResult === 'win',
-                'dark:text-red-300 text-red-700': team.winResult === 'lose',
+                'dark:text-red-300 text-red-700': team.winResult === 'loss',
                 'dark:text-white text-black/80':
                   team.winResult === 'remake' || team.winResult === 'abort'
               }"
@@ -323,12 +323,12 @@
         </div>
       </div>
 
-      <!-- shadow for win / lose -->
+      <!-- shadow for win / loss -->
       <div
         class="absolute top-0 left-0 h-full w-full z-1"
         :class="{
           'shadow-win': team.winResult === 'win',
-          'shadow-lose': team.winResult === 'lose',
+          'shadow-loss': team.winResult === 'loss',
           'shadow-remake': team.winResult === 'remake' || team.winResult === 'abort'
         }"
       ></div>

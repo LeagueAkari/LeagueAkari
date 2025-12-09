@@ -380,7 +380,7 @@ export function analyzeMatchHistory(
 
       if (participant.winResult === 'win') {
         championAnalysis[participant.championId].normal.wins++
-      } else if (participant.winResult === 'lose') {
+      } else if (participant.winResult === 'loss') {
         championAnalysis[participant.championId].normal.losses++
       }
     }
@@ -439,7 +439,7 @@ export function analyzeMatchHistory(
 
   if (Date.now() - lastGameEndedAt < 8 * 60 * 60 * 1000) {
     activeSessionWins = latestWinResult === 'win' ? 1 : 0
-    activeSessionLosses = latestWinResult === 'lose' ? 1 : 0
+    activeSessionLosses = latestWinResult === 'loss' ? 1 : 0
     lastGameEndedAt = latestCreation + latestDuration * 1000
 
     for (let i = 1; i < filteredGames.length; i++) {

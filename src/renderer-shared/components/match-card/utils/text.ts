@@ -5,7 +5,7 @@ const GAME_RESULT_MAP = {
   abort: '被终止',
   remake: '重开',
   win: '胜利',
-  lose: '失败'
+  loss: '失败'
 }
 
 export function useGameResultName() {

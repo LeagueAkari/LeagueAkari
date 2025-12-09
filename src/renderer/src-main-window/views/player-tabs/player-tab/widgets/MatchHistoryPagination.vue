@@ -30,6 +30,28 @@
       class="!w-28"
     />
 
+    <NPopover
+      display-directive="show"
+      trigger="click"
+      placement="bottom"
+      :theme-overrides="{ padding: '0px' }"
+    >
+      <template #trigger>
+        <NButton
+          size="small"
+          :secondary="hasFilters"
+          :tertiary="!hasFilters"
+          circle
+          :type="hasFilters ? 'primary' : 'default'"
+        >
+          <template #icon>
+            <NIcon size="16"><Filter20Regular /></NIcon>
+          </template>
+        </NButton>
+      </template>
+      <MatchHistoryFilter class="w-300px" />
+    </NPopover>
+
     <!-- 翻页 -->
     <div class="flex items-center gap-1">
       <NButton
@@ -91,15 +113,36 @@
     />
 
     <!-- 更多筛选 + 翻页 -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-1">
       <NSelect
         :disabled="isLoading"
         :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
         @update:value="loadMatchHistory({ count: $event })"
         size="small"
         :options="pageSizeOptions"
-        class="!w-34"
       />
+
+      <NPopover
+        display-directive="show"
+        trigger="click"
+        placement="bottom"
+        :theme-overrides="{ padding: '0px' }"
+      >
+        <template #trigger>
+          <NButton
+            size="small"
+            :secondary="hasFilters"
+            :tertiary="!hasFilters"
+            circle
+            :type="hasFilters ? 'primary' : 'default'"
+          >
+            <template #icon>
+              <NIcon size="16"><Filter20Regular /></NIcon>
+            </template>
+          </NButton>
+        </template>
+        <MatchHistoryFilter class="w-300px" />
+      </NPopover>
 
       <!-- 翻页 -->
       <div class="flex items-center gap-1">
@@ -145,8 +188,8 @@
 
 <script setup lang="ts">
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
-import { ChevronLeft20Regular, ChevronRight20Regular } from '@vicons/fluent'
-import { NButton, NIcon, NSelect } from 'naive-ui'
+import { ChevronLeft20Regular, ChevronRight20Regular, Filter20Regular } from '@vicons/fluent'
+import { NButton, NIcon, NPopover, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
@@ -154,6 +197,8 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
+import MatchHistoryFilter from './MatchHistoryFilter.vue'
 
 const { isFloating = false, horizontal = false } = defineProps<{
   horizontal?: boolean
@@ -188,4 +233,6 @@ const selectedQueue = computed(() => {
 })
 
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
+
+const { hasFilters } = useMatchHistoryFilters()
 </script>

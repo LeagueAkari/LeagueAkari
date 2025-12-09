@@ -32,7 +32,7 @@ export function useWinResultTagTheme(result: MaybeRefOrGetter<string | undefined
 
     if (r === 'win') {
       return `dark:bg-white/20 bg-green-700/80 dark:text-white text-white ${commonPart}`
-    } else if (r === 'lose') {
+    } else if (r === 'loss') {
       return `dark:bg-white/20 bg-red-700/80 dark:text-white text-white ${commonPart}`
     }
 
@@ -49,7 +49,7 @@ export function useWinResultTabSwitchTheme(result: MaybeRefOrGetter<string | und
         selected: 'dark:bg-white/20 bg-green-700/80 dark:text-white text-white',
         unselected: 'dark:text-white/60 text-black/80 hover:dark:bg-white/10 hover:bg-green-700/20'
       }
-    } else if (r === 'lose' || r === 'surrender') {
+    } else if (r === 'loss' || r === 'surrender') {
       return {
         selected: 'dark:bg-white/20 bg-red-700/80 dark:text-white text-white',
         unselected: 'dark:text-white/60 text-black/80 hover:dark:bg-white/10 hover:bg-red-700/20'

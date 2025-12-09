@@ -9,6 +9,43 @@ export function useSummonerFetch() {
   const rc = useInstance(RiotClientRenderer)
   const sgp = useInstance(SgpRenderer)
 
+  const searchSummonerByAlias = async (
+    gameName: string,
+    tagLine: string,
+    source: 'lcu' | 'sgp',
+    sgpServerId?: string
+  ) => {
+    const { data } = await rc.api.playerAccount.getPlayerAccountAlias(gameName, tagLine)
+
+    if (data.length === 0) {
+      return null
+    }
+
+    const alias = data[0]
+
+    if (source === 'sgp') {
+      const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids([alias.puuid], {
+        __sgpServerId: sgpServerId
+      })
+
+      if (summoners.length === 0) {
+        return null
+      }
+
+      return toSummoner(
+        { source: 'sgp', data: summoners[0], puuid: summoners[0].puuid },
+        {
+          gameName: alias.alias.game_name,
+          tagLine: alias.alias.tag_line
+        }
+      )
+    } else {
+      const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(alias.puuid)
+
+      return toSummoner({ source: 'lcu', data: summoner, puuid: summoner.puuid })
+    }
+  }
+
   const getSummoners = async (puuids: string[], source: 'lcu' | 'sgp', sgpServerId?: string) => {
     if (source === 'sgp') {
       const getSgpSummoners = async () => {
@@ -52,6 +89,7 @@ export function useSummonerFetch() {
   }
 
   return {
-    getSummoners
+    getSummoners,
+    searchSummonerByAlias
   }
 }

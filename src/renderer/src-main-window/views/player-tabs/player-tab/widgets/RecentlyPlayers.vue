@@ -60,7 +60,7 @@ import { useMatchHistory } from '../data/match-history'
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
 
 const props = defineProps<{
-  side?: 'opponent' | 'ally'
+  side?: 'enemy' | 'ally'
 }>()
 
 const { t } = useTranslation()
@@ -77,7 +77,7 @@ const relationship = computed(() => {
 })
 
 const players = computed(() => {
-  const isOpponent = props.side === 'opponent'
+  const isOpponent = props.side === 'enemy'
 
   return Object.values(relationship.value)
     .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)

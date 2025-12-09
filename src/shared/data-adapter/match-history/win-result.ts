@@ -1,4 +1,4 @@
-export type WinResult = 'win' | 'lose' | 'remake' | 'abort'
+export type WinResult = 'win' | 'loss' | 'remake' | 'abort'
 
 export type WinResultInfo = {
   isSurrender: boolean
@@ -23,12 +23,12 @@ export function computeWinResult(
   }
 
   if (participant.teamEarlySurrendered) {
-    return { isSurrender: true, result: 'lose' }
+    return { isSurrender: true, result: 'loss' }
   }
 
   if (participant.win) {
     return { isSurrender: false, result: 'win' }
   } else {
-    return { isSurrender: participant.gameEndedInSurrender, result: 'lose' }
+    return { isSurrender: participant.gameEndedInSurrender, result: 'loss' }
   }
 }

@@ -15,7 +15,7 @@
       <div
         v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative h-27 flex items-center justify-center rounded dark:bg-white/5 bg-black/5"
+        class="relative h-27 flex items-center justify-center rounded-lg dark:bg-white/5 bg-black/5"
         :class="isSmallSize ? 'w-30' : 'w-60'"
       >
         <!-- Queue Type Label -->

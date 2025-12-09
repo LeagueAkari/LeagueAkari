@@ -36,7 +36,7 @@
             <SpectatorPane />
             <SummaryPane />
             <RecentlyPlayers side="ally" />
-            <RecentlyPlayers side="opponent" />
+            <RecentlyPlayers side="enemy" />
             <EncounteredGames />
           </div>
 

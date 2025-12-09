@@ -1730,7 +1730,7 @@ PlayerInfoCard:
     gameStats: 对局详情
     winResult:
       abort: 终止
-      lose: 失败
+      loss: 失败
       remake: 重开
       win: 胜利
     team:
@@ -1756,7 +1756,7 @@ PlayerInfoCard:
     winResult:
       na: '-'
       win: 胜
-      lose: 负
+      loss: 负
       remake: 重
       abort: 终
 

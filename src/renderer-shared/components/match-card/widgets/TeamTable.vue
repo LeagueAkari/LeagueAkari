@@ -8,7 +8,7 @@
           class="text-xs font-bold"
           :class="{
             'dark:text-green-300 text-green-700': team.winResult === 'win',
-            'dark:text-red-300 text-red-700': team.winResult === 'lose',
+            'dark:text-red-300 text-red-700': team.winResult === 'loss',
             'dark:text-white/80 text-black/80':
               team.winResult === 'remake' || team.winResult === 'abort'
           }"
@@ -336,14 +336,14 @@ const tone = computed(() => {
   const k = team.value.winResult
   const borderClass = {
     win: 'dark:b-green-300/10 b-green-700/10',
-    lose: 'dark:b-red-300/10 b-red-700/10',
+    loss: 'dark:b-red-300/10 b-red-700/10',
     remake: 'dark:b-white/10 b-black/10',
     abort: 'dark:b-white/10 b-black/10'
   }[k]
 
   const headerClass = {
     win: 'dark:bg-green-300/10 bg-green-700/10',
-    lose: 'dark:bg-red-300/10 bg-red-700/10',
+    loss: 'dark:bg-red-300/10 bg-red-700/10',
     remake: 'dark:bg-white/10 b-black/10',
     abort: 'dark:bg-white/10 b-black/10'
   }[k]

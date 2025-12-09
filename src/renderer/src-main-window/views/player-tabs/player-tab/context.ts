@@ -18,6 +18,7 @@ import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
+import { provideMatchHistoryFilters } from './data/match-history-filters'
 import { provideRankedStats } from './data/ranked-stats'
 import { provideSpectator } from './data/spectator'
 import { provideSummoner } from './data/summoner'
@@ -151,4 +152,6 @@ export function providePlayerTab(props: {
     puuid,
     isCrossRegion
   })
+
+  provideMatchHistoryFilters()
 }
