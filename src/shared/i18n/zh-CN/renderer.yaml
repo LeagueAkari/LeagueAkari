@@ -1919,6 +1919,10 @@ PlayerTab:
   failedToLoadRankedStatsTitle: 加载排位统计失败
   failedToLoadRankedStatsContent: 无法加载排位统计：{{reason}}
 
+  noMatchHistory: 暂无战绩
+  noFilteredMatchHistory: 暂无符合条件的战绩
+  loading: 加载中...
+
   private:
     title: 生涯隐藏
     content: 该玩家设置了生涯不可见

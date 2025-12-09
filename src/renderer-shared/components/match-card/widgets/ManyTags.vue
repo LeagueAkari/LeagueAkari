@@ -56,9 +56,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useResizeObserver } from '@vueuse/core'
 import { NPopover } from 'naive-ui'
-import { VNodeChild, h, shallowRef, useTemplateRef } from 'vue'
+import { VNodeChild, h, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { usePlayerTags } from '../utils/tags'
 
@@ -75,6 +76,7 @@ const tagsEl = useTemplateRef('tagsEl')
 
 // bg-blue-800 bg-pink-700 bg-gray-700 bg-orange-800 bg-purple-800 bg-green-800 bg-violet-600
 
+const as = useAppCommonStore()
 const tags = usePlayerTags()
 
 const updateOverflowTagInfo = () => {
@@ -124,6 +126,8 @@ const recalcOverflow = () => {
 
 useResizeObserver(() => containerEl.value, recalcOverflow)
 useResizeObserver(() => tagsEl.value || [], recalcOverflow)
+
+watch(() => as.settings.locale, recalcOverflow)
 </script>
 
 <style scoped>

@@ -1142,7 +1142,7 @@ MatchCard:
       bestContent: 'Highest kill participation: {{value}}%'
       teamContent: 'Team-high kill participation: {{value}}%'
     knockUp:
-      label: Great Hook
+      label: Knock Up
       content: 'Knocked or pulled enemies into team {{value}} times'
     cc:
       bestLabel: '★ CC'
@@ -1916,6 +1916,10 @@ PlayerTab:
   failedToLoadMatchHistoryContent: 'Unable to load match history: {{reason}}'
   failedToLoadRankedStatsTitle: Failed to Load Ranked Stats
   failedToLoadRankedStatsContent: 'Unable to load ranked stats: {{reason}}'
+
+  noMatchHistory: No match history
+  noFilteredMatchHistory: No filtered match history
+  loading: Loading...
 
   private:
     title: Profile Hidden

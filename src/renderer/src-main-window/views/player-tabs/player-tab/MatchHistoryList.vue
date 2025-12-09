@@ -6,7 +6,7 @@
   >
     <div class="flex items-center gap-2">
       <NSpin :size="16" />
-      <span class="text-sm dark:text-white/60 text-black/80">正在加载中</span>
+      <span class="text-sm dark:text-white/60 text-black/80">{{ t('PlayerTab.loading') }}</span>
     </div>
   </div>
 
@@ -15,7 +15,9 @@
     v-else-if="pagedMatchHistory && pagedMatchHistory.games.length === 0"
     class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
   >
-    <span class="text-sm dark:text-white/60 text-black/80">暂无战绩</span>
+    <span class="text-sm dark:text-white/60 text-black/80">{{
+      t('PlayerTab.noMatchHistory')
+    }}</span>
   </div>
 
   <!-- empty filtered games -->
@@ -23,7 +25,9 @@
     v-else-if="pagedMatchHistory && hasFilters && filteredGames.length === 0"
     class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
   >
-    <span class="text-sm dark:text-white/60 text-black/80">暂无符合条件的战绩</span>
+    <span class="text-sm dark:text-white/60 text-black/80">{{
+      t('PlayerTab.noFilteredMatchHistory')
+    }}</span>
   </div>
 
   <!-- match history list -->
@@ -52,6 +56,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -60,6 +65,7 @@ import { useMatchHistory } from './data/match-history'
 import { useMatchHistoryFilters } from './data/match-history-filters'
 
 const as = useAppCommonStore()
+const { t } = useTranslation()
 const { masked } = useStreamerModeMaskedText()
 
 const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
