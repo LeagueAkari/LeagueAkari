@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center">
     <!-- logo placeholder -->
-    <NIcon class="text-96px dark:text-white/40 text-black/40 mb-4 relative -left-8px">
+    <NIcon class="startup-logo text-96px mb-4 relative -left-8px">
       <AkariLogo />
     </NIcon>
 
@@ -25,8 +25,13 @@
       <LcuImage :src="profileIconUri(lcs.summoner.me.profileIconId)" class="size-5" />
 
       <div class="min-w-0">
-        <div class="text-xs dark:text-white/80 text-black/80 font-bold">
-          {{ lcs.summoner.me.gameName }}
+        <div class="truncate">
+          <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
+            {{ t(`sgpServers.${sgps.availability.sgpServerId}`, { ns: 'common' }) }}
+          </span>
+          <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
+            lcs.summoner.me.gameName
+          }}</span>
         </div>
         <span class="text-xs dark:text-white/40 text-black/40">#{{ lcs.summoner.me.tagLine }}</span>
       </div>
@@ -80,6 +85,7 @@ import { ClientInstallationRenderer } from '@renderer-shared/shards/client-insta
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { ChevronRight20Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NEllipsis, NIcon, useMessage } from 'naive-ui'
@@ -91,6 +97,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
+const sgps = useSgpStore()
 
 const ci = useInstance(ClientInstallationRenderer)
 const cis = useClientInstallationStore()
@@ -154,3 +161,15 @@ const launchItems = computed(() => {
   return arr
 })
 </script>
+
+<style scoped>
+.startup-logo {
+  color: rgba(220, 50, 100, 1);
+  filter: drop-shadow(0 4px 12px rgba(220, 50, 100, 0.12));
+
+  [data-theme='dark'] & {
+    color: rgba(248, 63, 111, 1);
+    filter: drop-shadow(0 4px 12px rgba(248, 63, 111, 0.15));
+  }
+}
+</style>

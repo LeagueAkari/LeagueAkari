@@ -1,57 +1,64 @@
 <template>
-  <!-- loading state -->
-  <div
-    v-if="isLoading && !pagedMatchHistory"
-    class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
-  >
-    <div class="flex items-center gap-2">
-      <NSpin :size="16" />
-      <span class="text-sm dark:text-white/60 text-black/80">{{ t('PlayerTab.loading') }}</span>
+  <div>
+    <!-- loading state -->
+    <div
+      v-if="
+        isLoading &&
+        (!pagedMatchHistory ||
+          pagedMatchHistory.games.length === 0 ||
+          gamesShouldHide.size === pagedMatchHistory.games.length)
+      "
+      class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+    >
+      <div class="flex items-center gap-2">
+        <NSpin :size="16" />
+        <span class="text-sm dark:text-white/60 text-black/80">{{ t('PlayerTab.loading') }}</span>
+      </div>
     </div>
-  </div>
 
-  <!-- empty placeholder -->
-  <div
-    v-else-if="pagedMatchHistory && pagedMatchHistory.games.length === 0"
-    class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
-  >
-    <span class="text-sm dark:text-white/60 text-black/80">{{
-      t('PlayerTab.noMatchHistory')
-    }}</span>
-  </div>
+    <template v-else-if="pagedMatchHistory">
+      <!-- empty placeholder -->
+      <div
+        v-if="pagedMatchHistory.games.length === 0"
+        class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+      >
+        <span class="text-sm dark:text-white/60 text-black/80">{{
+          t('PlayerTab.noMatchHistory')
+        }}</span>
+      </div>
 
-  <!-- empty filtered games -->
-  <div
-    v-else-if="
-      pagedMatchHistory && hasFilters && gamesShouldHide.size === pagedMatchHistory.games.length
-    "
-    class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
-  >
-    <span class="text-sm dark:text-white/60 text-black/80">{{
-      t('PlayerTab.noFilteredMatchHistory')
-    }}</span>
-  </div>
+      <!-- empty filtered games -->
+      <div
+        v-else-if="hasFilters && gamesShouldHide.size === pagedMatchHistory.games.length"
+        class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+      >
+        <span class="text-sm dark:text-white/60 text-black/80">{{
+          t('PlayerTab.noFilteredMatchHistory')
+        }}</span>
+      </div>
+    </template>
 
-  <!-- match history list -->
-  <div v-else-if="pagedMatchHistory" class="space-y-1">
-    <MatchCard
-      :class="{
-        '!hidden': gamesShouldHide.has(g.gameId)
-      }"
-      v-for="g of pagedMatchHistory.games"
-      :summary="g"
-      :puuid="puuid"
-      :key="`${g.source}${g.gameId}`"
-      :theme="as.colorTheme"
-      @navigate-to-summoner-by-puuid="navigateToSummonerByPuuid"
-      @load-details="loadDetails(g.gameId)"
-      @download-replay="downloadReplay(g.gameId)"
-      @watch-replay="launchRelay(g.gameId)"
-      :details="pagedMatchHistory.details[g.gameId]"
-      :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
-      :hide-privacy="hidePrivacy"
-      :replay-state="pagedMatchHistory.replayMetadata[g.gameId]?.state"
-    />
+    <!-- match history list -->
+    <div v-if="pagedMatchHistory && pagedMatchHistory.games.length > 0" class="space-y-1">
+      <MatchCard
+        :class="{
+          '!hidden': gamesShouldHide.has(g.gameId)
+        }"
+        v-for="g of pagedMatchHistory.games"
+        :summary="g"
+        :puuid="puuid"
+        :key="`${g.source}${g.gameId}`"
+        :theme="as.colorTheme"
+        @navigate-to-summoner-by-puuid="navigateToSummonerByPuuid"
+        @load-details="loadDetails(g.gameId)"
+        @download-replay="downloadReplay(g.gameId)"
+        @watch-replay="launchRelay(g.gameId)"
+        :details="pagedMatchHistory.details[g.gameId]"
+        :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
+        :hide-privacy="hidePrivacy"
+        :replay-state="pagedMatchHistory.replayMetadata[g.gameId]?.state"
+      />
+    </div>
   </div>
 </template>
 

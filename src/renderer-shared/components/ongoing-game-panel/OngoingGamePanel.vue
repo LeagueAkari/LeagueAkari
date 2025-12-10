@@ -1,12 +1,18 @@
 <template>
-  <div class="ongoing-game-view" ref="og-view-container">
+  <div class="h-full" ref="og-view-container">
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
-      <div class="team-wrapper">
-        <div class="team-header">
-          <div class="team-header__team-color" :class="teamColor" v-if="teamColor"></div>
-          <span class="team-header__title">{{ teamName }}</span>
+      <div class="mb-4 last:mb-0">
+        <div class="flex items-end mb-2">
+          <div
+            v-if="teamColor"
+            :class="[
+              'self-center w-10px h-10px mr-2 rounded-full border border-white/20',
+              teamColor === 'red' ? 'bg-#ff3333' : '',
+              teamColor === 'blue' ? 'bg-#40c1ff' : ''
+            ]"
+          ></div>
+          <span class="text-base font-bold mr-4">{{ teamName }}</span>
           <TeamTagsArea
-            class="team-header__team-tags"
             v-if="players.length >= 1"
             :side-id="team"
             :analysis="mapAnalysisTeamData(team)"
@@ -15,7 +21,10 @@
             :champion-selections="ogs.championSelections"
           />
         </div>
-        <div class="team-members">
+        <div
+          class="grid mt-1 gap-y-2 gap-x-1"
+          :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
+        >
           <PlayerInfoCard
             v-for="player of players"
             :puuid="player"
@@ -44,7 +53,7 @@
       </div>
     </DefineOngoingTeam>
     <NScrollbar v-if="!isInIdleState && ogs.settings.enabled" x-scrollable>
-      <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
+      <div class="relative h-full m-auto p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
           :team="team"
@@ -55,22 +64,31 @@
         />
       </div>
     </NScrollbar>
-    <div v-else class="no-ongoing-game">
-      <div class="centered">
-        <LeagueAkariSpan bold class="akari-text" />
+    <div v-else class="relative flex h-full">
+      <div
+        class="absolute left-1/2 top-45% -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4"
+      >
         <template v-if="ogs.settings.enabled">
           <template v-if="lcs.connectionState !== 'connected'">
-            <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
+            <span class="text-base font-normal text-black/60 dark:text-white/80">{{
+              t('OngoingGame.disconnected')
+            }}</span>
             <EasyToLaunch v-if="showEasyToLaunch" />
           </template>
           <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
-            <span class="no-ongoing-game-text"> {{ t('OngoingGame.waitingForSpectate') }}</span>
+            <span class="text-base font-normal text-black/60 dark:text-white/80">
+              {{ t('OngoingGame.waitingForSpectate') }}</span
+            >
           </template>
           <template v-else>
-            <span class="no-ongoing-game-text"> {{ t('OngoingGame.noOngoingGame') }}</span>
+            <span class="text-base font-normal text-black/60 dark:text-white/80">
+              {{ t('OngoingGame.noOngoingGame') }}</span
+            >
           </template>
         </template>
-        <span v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</span>
+        <span v-else class="text-base font-normal text-black/60 dark:text-white/80">{{
+          t('OngoingGame.disabled')
+        }}</span>
       </div>
     </div>
   </div>
@@ -78,7 +96,6 @@
 
 <script setup lang="ts">
 import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
@@ -365,148 +382,3 @@ const columnsNeed = computed(() => {
   return Math.min(maxAllowed || 2, teamColumns)
 })
 </script>
-
-<style scoped>
-.ongoing-game-view {
-  height: 100%;
-}
-
-.inner-container {
-  position: relative;
-  height: 100%;
-  margin: 0 auto;
-  padding: 16px;
-
-  .content {
-    display: flex;
-  }
-
-  &.fit-content {
-    width: fit-content;
-  }
-}
-
-.team-members {
-  display: grid;
-  margin-top: 4px;
-  grid-template-columns: repeat(v-bind(columnsNeed), v-bind(FIXED_CARD_WIDTH_PX_LITERAL));
-  gap: 8px 4px;
-}
-
-.sora {
-  height: 16px;
-}
-
-.team-header {
-  display: flex;
-  margin-bottom: 8px;
-  align-items: flex-end;
-
-  .team-header__team-color {
-    align-self: center;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
-    border: 1px solid rgb(255, 255, 255, 0.2);
-
-    &.red {
-      background-color: #ff3333;
-    }
-
-    &.blue {
-      background-color: #40c1ff;
-    }
-  }
-
-  .team-header__title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 16px;
-  }
-
-  .analysis {
-    display: flex;
-    gap: 8px;
-  }
-
-  .win-rate {
-    font-weight: bold;
-  }
-}
-
-.team-wrapper {
-  &:not(:last-child) {
-    margin-bottom: 16px;
-  }
-}
-
-.team-side-analysis-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.no-ongoing-game {
-  height: 100%;
-  display: flex;
-  position: relative;
-
-  .akari-text {
-    font-size: 22px;
-  }
-
-  .no-ongoing-game-text {
-    font-size: 14px;
-    font-weight: normal;
-  }
-}
-
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  gap: 16px;
-}
-
-[data-theme='dark'] {
-  .team-header {
-    .win-rate.gte-50 {
-      color: #4cc69d;
-    }
-
-    .win-rate.lt-50 {
-      color: #ff6161;
-    }
-  }
-
-  .no-ongoing-game {
-    .no-ongoing-game-text {
-      color: rgba(255, 255, 255, 0.4);
-    }
-  }
-}
-
-[data-theme='light'] {
-  .team-header {
-    .win-rate.gte-50 {
-      color: rgb(44, 140, 108);
-    }
-
-    .win-rate.lt-50 {
-      color: rgb(204, 0, 0);
-    }
-  }
-
-  .no-ongoing-game {
-    .no-ongoing-game-text {
-      color: rgba(0, 0, 0, 0.4);
-    }
-  }
-}
-</style>

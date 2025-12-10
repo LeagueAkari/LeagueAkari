@@ -1,6 +1,6 @@
 <template>
-  <div class="h-full">
-    <NScrollbar x-scrollable :theme-overrides="{ width: '8px' }">
+  <div class="relative h-full">
+    <NScrollbar x-scrollable :theme-overrides="{ width: '8px' }" ref="scrollbarEl">
       <div
         class="mx-auto pt-10 pb-4"
         :class="{
@@ -46,6 +46,20 @@
       </div>
     </NScrollbar>
 
+    <div
+      :class="{
+        'opacity-80 hover:opacity-100 pointer-events-auto': shouldShowScrollToTopButton,
+        'opacity-0 pointer-events-none': !shouldShowScrollToTopButton
+      }"
+      class="!absolute bottom-8 right-8 transition-opacity"
+    >
+      <NButton size="large" type="primary" circle :focusable="false" @click="scrollToTop">
+        <NIcon>
+          <ArrowUp20Regular />
+        </NIcon>
+      </NButton>
+    </div>
+
     <MatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGame.gameId"
@@ -64,8 +78,9 @@ import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { ArrowUp20Regular } from '@vicons/fluent'
 import { useElementVisibility } from '@vueuse/core'
-import { NScrollbar } from 'naive-ui'
+import { NButton, NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { useAppContext } from '@main-window/context'
@@ -95,6 +110,7 @@ const { contentWidth } = useAppContext()
 
 const isSmallSize = computed(() => contentWidth.value < SMALL_SIZE_THRESHOLD)
 
+const scrollbarEl = useTemplateRef('scrollbarEl')
 const stickySentinelLeftSideEl = useTemplateRef('stickySentinelLeftSideEl')
 const stickySentinelRightSideEl = useTemplateRef('stickySentinelRightSideEl')
 const isSentinelVisibleLeftSide = useElementVisibility(stickySentinelLeftSideEl, {
@@ -102,6 +118,10 @@ const isSentinelVisibleLeftSide = useElementVisibility(stickySentinelLeftSideEl,
 })
 const isSentinelVisibleRightSide = useElementVisibility(stickySentinelRightSideEl, {
   initialValue: true
+})
+
+const shouldShowScrollToTopButton = computed(() => {
+  return !isSentinelVisibleLeftSide.value || !isSentinelVisibleRightSide.value
 })
 
 const showPreviewModal = ref(false)
@@ -125,6 +145,10 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string
   }
 
   showPreviewModal.value = true
+}
+
+const scrollToTop = () => {
+  scrollbarEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 providePlayerTab({
