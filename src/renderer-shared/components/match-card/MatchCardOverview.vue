@@ -14,7 +14,7 @@
             <div class="relative" :class="{ contents: !shouldShowCrown }">
               <ChampionIcon
                 :champion-id="participant.championId"
-                class="size-11 rounded-lg b-2 b-solid box-border"
+                class="size-11 rounded-lg b-2 b-solid box-border relative -left-2px"
                 :class="{
                   'dark:b-green-300 b-green-700': team.winResult === 'win',
                   'dark:b-red-300 b-red-600': team.winResult === 'loss',

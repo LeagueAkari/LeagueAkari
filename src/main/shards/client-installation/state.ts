@@ -11,11 +11,9 @@ export class ClientInstallationState {
    */
   tencentInstallationPath: string | null = null
 
-  /**
-   * 如果有英雄联盟的安装位置, 同时检测两者是否存在
-   */
-  hasTcls: boolean = false
-  hasWeGameLauncher: boolean = false
+  tclsExecutablePath: string | null = null
+
+  weGameLauncherExecutablePath: string | null = null
 
   /**
    * 额外检测 WeGame 的安装情况
@@ -45,12 +43,12 @@ export class ClientInstallationState {
     this.officialRiotClientExecutablePath = path
   }
 
-  setHasTcls(has: boolean) {
-    this.hasTcls = has
+  setTclsExecutablePath(path: string) {
+    this.tclsExecutablePath = path
   }
 
-  setHasWeGameLauncher(has: boolean) {
-    this.hasWeGameLauncher = has
+  setWeGameLauncherExecutablePath(path: string) {
+    this.weGameLauncherExecutablePath = path
   }
 
   setDetectedLiveStreamingClients(clients: string[]) {

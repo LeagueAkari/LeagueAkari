@@ -13,8 +13,8 @@
         <div
           class="menu-item"
           :data-key="item.key"
-          @click="handleMenuChange(item.key)"
-          :class="{ active: currentActiveItem === item.key }"
+          @click="item.isDisabled ? undefined : handleMenuChange(item.key)"
+          :class="{ active: currentActiveItem === item.key, disabled: item.isDisabled }"
         >
           <div class="menu-item__inner">
             <NBadge :show="!!item.inProgress" dot :offset="[-6, 8]">
@@ -49,7 +49,14 @@ const {
 } = defineProps<{
   defaultValue?: string
   isCollapsed?: boolean
-  items?: { key: string; icon: ComponentC; name: string; show?: boolean; inProgress?: boolean }[]
+  items?: {
+    key: string
+    icon: ComponentC
+    name: string
+    show?: boolean
+    inProgress?: boolean
+    isDisabled?: boolean
+  }[]
 }>()
 
 const showItems = computed(() => items.filter((item) => item.show !== false))
@@ -198,7 +205,11 @@ watch(
     }
   }
 
-  &:hover {
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  &:hover:not(.disabled) {
     .menu-item__icon,
     .menu-item__label {
       color: rgba(0, 0, 0, 1);
@@ -217,7 +228,7 @@ watch(
     }
   }
 
-  &:active {
+  &:active:not(.disabled) {
     .menu-item__icon,
     .menu-item__label {
       color: rgba(0, 0, 0, 0.8);
@@ -230,10 +241,21 @@ watch(
 
   .menu-item__icon,
   .menu-item__label {
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(0, 0, 0, 0.6);
 
     [data-theme='dark'] & {
       color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  &.disabled {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 0.3);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.3);
+      }
     }
   }
 

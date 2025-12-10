@@ -13,71 +13,15 @@
     </template>
 
     <!-- if no tab... -->
-    <div v-else class="h-full flex relative">
-      <div
-        class="flex flex-col items-center absolute top-48% left-50% -translate-x-1/2 -translate-y-1/2 gap-4"
-      >
-        <LeagueAkariSpan bold class="text-22px" />
-
-        <!-- disconnect -->
-        <template v-if="lcs.connectionState !== 'connected'">
-          <span class="text-sm dark:text-white/40 text-black/40">{{
-            t('PlayerTabs.disconnected')
-          }}</span>
-          <EasyToLaunch />
-        </template>
-
-        <!-- queueing -->
-        <template v-if="lcs.login.loginQueueState">
-          <span class="text-sm dark:text-white/40 text-black/40">{{
-            t('PlayerTabs.queueing')
-          }}</span>
-        </template>
-
-        <!-- no active tab -->
-        <template v-if="lcs.summoner.me && pts.tabs.length === 0">
-          <div class="text-sm dark:text-white/40 text-black/40 mt-2">
-            {{ t('PlayerTabs.noActiveTab') }}
-          </div>
-          <div
-            class="flex items-center mt-4 bg-white/6 dark:bg-black/6 py-2 px-4 rounded cursor-pointer transition-colors backdrop-blur-xs hover:bg-black/12 dark:hover:bg-white/12"
-            @click="handleOpenSelfTab"
-          >
-            <LcuImage
-              class="size-8 rounded-full"
-              :src="profileIconUri(lcs.summoner.me.profileIconId)"
-            />
-            <StreamerModeMaskedText>
-              <template #masked>
-                <span class="text-sm font-bold text-dark/95 dark:text-white/95">{{
-                  t('summoner', { ns: 'common' })
-                }}</span>
-                <span class="ml-1 text-sm dark:text-white/40 text-black/40">#####</span>
-              </template>
-              <span class="text-sm font-bold text-dark/95 dark:text-white/95">{{
-                lcs.summoner.me.gameName
-              }}</span>
-              <span class="ml-1 text-sm dark:text-white/40 text-black/40"
-                >#{{ lcs.summoner.me.tagLine }}</span
-              >
-            </StreamerModeMaskedText>
-          </div>
-        </template>
-      </div>
-    </div>
+    <StartupPane v-else class="h-full" />
   </div>
 </template>
 
 <script setup lang="ts">
-import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
-import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
@@ -88,6 +32,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
+import StartupPane from './StartupPane.vue'
 import PlayerTab from './player-tab/PlayerTab.vue'
 
 const { t } = useTranslation()
@@ -185,14 +130,6 @@ watch(
     }
   }
 )
-
-const { navigateToTabByPuuid } = pt.useNavigateToTab()
-
-const handleOpenSelfTab = () => {
-  if (lcs.summoner.me) {
-    navigateToTabByPuuid(lcs.summoner.me.puuid)
-  }
-}
 
 const message = useMessage()
 

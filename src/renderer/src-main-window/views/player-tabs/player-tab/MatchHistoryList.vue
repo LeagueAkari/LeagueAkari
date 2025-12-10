@@ -22,7 +22,9 @@
 
   <!-- empty filtered games -->
   <div
-    v-else-if="pagedMatchHistory && hasFilters && filteredGames.length === 0"
+    v-else-if="
+      pagedMatchHistory && hasFilters && gamesShouldHide.size === pagedMatchHistory.games.length
+    "
     class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
   >
     <span class="text-sm dark:text-white/60 text-black/80">{{
@@ -33,7 +35,10 @@
   <!-- match history list -->
   <div v-else-if="pagedMatchHistory" class="space-y-1">
     <MatchCard
-      v-for="g of filteredGames"
+      :class="{
+        '!hidden': gamesShouldHide.has(g.gameId)
+      }"
+      v-for="g of pagedMatchHistory.games"
       :summary="g"
       :puuid="puuid"
       :key="`${g.source}${g.gameId}`"
@@ -56,6 +61,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
 import { computed } from 'vue'
@@ -86,18 +92,18 @@ const isSubset = <T = string | number,>(a: Set<T>, b: Set<T>) => {
   return true
 }
 
-const filteredGames = computed(() => {
+const gamesShouldHide = computed(() => {
   if (!pagedMatchHistory.value) {
-    return []
+    return new Set<number>()
   }
 
   if (!hasFilters.value) {
-    return pagedMatchHistory.value.games
+    return new Set<number>()
   }
 
   const { winLoss, selectedChampions, selectedSummoners } = filters.value
 
-  return pagedMatchHistory.value.games.filter((g) => {
+  const shouldShow = (g: LcuOrSgpGameSummary) => {
     const basicInfo = toBasicInfo(g)
     const participants = toParticipants(g, basicInfo)
     const participant = participants.find((p) => p.puuid === puuid.value)
@@ -129,7 +135,12 @@ const filteredGames = computed(() => {
     }
 
     return true
-  })
+  }
+
+  return pagedMatchHistory.value.games.reduce(
+    (acc, g) => (shouldShow(g) ? acc : acc.add(g.gameId)),
+    new Set<number>()
+  )
 })
 
 // trick

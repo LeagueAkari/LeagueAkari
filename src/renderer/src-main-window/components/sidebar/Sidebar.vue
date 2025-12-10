@@ -61,6 +61,10 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const mui = useMainWindowUiStore()
+const lcs = useLeagueClientStore()
+const lcuxs = useLeagueClientUxStore()
+
+const isClientsPreviewShow = ref(false)
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -101,7 +105,8 @@ const menu = computed(() => {
       key: 'ongoing-game',
       icon: renderIcon(Games24FilledIcon),
       name: t('SideBarMenu.ongoing-game'),
-      inProgress: shouldShowOngoingGameBadge.value
+      inProgress: shouldShowOngoingGameBadge.value,
+      isDisabled: !lcs.isConnected
     },
     {
       key: 'automation',
@@ -138,10 +143,14 @@ watchEffect(() => {
   }
 })
 
-const lcs = useLeagueClientStore()
-const lcuxs = useLeagueClientUxStore()
-
-const isClientsPreviewShow = ref(false)
+watch(
+  () => lcs.isConnected,
+  (isConnected) => {
+    if (!isConnected && route.name === 'ongoing-game') {
+      router.replace({ name: 'player-tabs' })
+    }
+  }
+)
 
 // 善意的提醒，以防用户一直在等
 watchEffect(() => {

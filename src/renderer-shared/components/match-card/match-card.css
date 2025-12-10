@@ -1,7 +1,7 @@
 [data-theme='dark'] .shadow-win {
   background: radial-gradient(
     96% 168% at 0% 0%,
-    rgba(16, 185, 137, 0.2) 0%,
+    rgba(16, 185, 137, 0.3) 0%,
     rgba(16, 185, 129, 0) 100%
   );
 }
@@ -17,7 +17,7 @@
 [data-theme='dark'] .shadow-loss {
   background: radial-gradient(
     96% 168% at 0% 0%,
-    rgba(239, 68, 68, 0.2) 0%,
+    rgba(239, 68, 68, 0.3) 0%,
     rgba(239, 68, 68, 0) 100%
   );
 }
@@ -33,7 +33,7 @@
 [data-theme='dark'] .shadow-remake {
   background: radial-gradient(
     96% 168% at 0% 0%,
-    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.18) 0%,
     rgba(255, 255, 255, 0) 100%
   );
 }

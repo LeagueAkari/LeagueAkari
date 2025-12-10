@@ -341,7 +341,7 @@ const handlePlayAgain = async () => {
     color: #000b;
     font-weight: bold;
 
-    & [data-theme='dark'] {
+    [data-theme='dark'] & {
       color: #fffb;
     }
   }

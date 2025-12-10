@@ -85,8 +85,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'tencentInstallationPath',
       'weGameExecutablePath',
       'officialRiotClientExecutablePath',
-      'hasTcls',
-      'hasWeGameLauncher',
+      'tclsExecutablePath',
+      'weGameLauncherExecutablePath',
       'detectedLiveStreamingClients'
     ])
   }
@@ -130,12 +130,12 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         }
 
         this._log.info('Registry detected Tencent League of Legends installation', p.value)
-        this.state.setTencentInstallationPath(p.value as string)
+        this.state.setTencentInstallationPath(path.normalize(p.value as string))
 
         try {
           const tclsPath = path.resolve(p.value as string, 'Launcher', 'Client.exe')
           await fs.promises.access(tclsPath)
-          this.state.setHasTcls(true)
+          this.state.setTclsExecutablePath(path.normalize(tclsPath))
         } catch {
           this._log.info('TCLS cannot access, possibly not exists', p.value)
           return
@@ -144,7 +144,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         try {
           const weGamePath = path.resolve(p.value as string, 'WeGameLauncher', 'launcher.exe')
           await fs.promises.access(weGamePath)
-          this.state.setHasWeGameLauncher(true)
+          this.state.setWeGameLauncherExecutablePath(path.normalize(weGamePath))
         } catch {
           this._log.info('WeGame launcher cannot access, possibly not exists', p.value)
           return
@@ -167,7 +167,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           }
 
           this._log.info('Registry detected WeGame installation', match[1])
-          this.state.setWeGameExecutablePath(match[1])
+          this.state.setWeGameExecutablePath(path.normalize(match[1]))
         }
       }
     } catch (error) {
@@ -214,25 +214,25 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
         this._log.info('Detected Tencent League of Legends installation by file', installation)
 
-        this.state.setTencentInstallationPath(installation)
+        this.state.setTencentInstallationPath(path.normalize(installation))
 
         const tcls = path.resolve(installation, 'Launcher', 'Client.exe')
         const weGameLauncher = path.resolve(installation, 'WeGameLauncher', 'launcher.exe')
 
         try {
           await fs.promises.access(tcls)
-          this.state.setHasTcls(true)
+          this.state.setTclsExecutablePath(path.normalize(tcls))
           this._log.info('Detected Tencent TCLS installation by file', tcls)
         } catch {}
 
         try {
           await fs.promises.access(weGameLauncher)
-          this.state.setHasWeGameLauncher(true)
+          this.state.setWeGameLauncherExecutablePath(path.normalize(weGameLauncher))
           this._log.info('Detected Tencent WeGameLauncher installation by file', weGameLauncher)
         } catch {}
 
         // 如果都找到了，则直接退出
-        if (this.state.hasTcls && this.state.hasWeGameLauncher) {
+        if (this.state.tclsExecutablePath && this.state.weGameLauncherExecutablePath) {
           return
         }
       } catch (error) {
@@ -290,7 +290,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           }
         }
 
-        this.state.setLeagueClientExecutablePaths(result)
+        this.state.setLeagueClientExecutablePaths(result.map((p) => path.normalize(p)))
 
         const riotInstallations = Object.values(json.associated_client as Record<string, string>)
 
@@ -298,7 +298,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           if (await this._maybeOfficialRiotClient(p)) {
             try {
               await fs.promises.access(p)
-              this.state.setOfficialRiotClientExecutablePath(p)
+              this.state.setOfficialRiotClientExecutablePath(path.normalize(p))
               this._log.info('Detected official RiotClient installation', p)
               break // only one official RiotClient installation is allowed
             } catch (error) {
@@ -478,7 +478,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     const jumpListItems: JumpListItem[] = []
     const t = i18next.getFixedT(null, 'main', 'client-installation-main.jumpList')
 
-    if (this.state.hasTcls) {
+    if (this.state.tclsExecutablePath) {
       jumpListItems.push({
         type: 'task',
         title: t('launchTcls.title'),
@@ -490,7 +490,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       })
     }
 
-    if (this.state.hasWeGameLauncher) {
+    if (this.state.weGameLauncherExecutablePath) {
       jumpListItems.push({
         type: 'task',
         title: t('launchWeGame.title'),
@@ -534,7 +534,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
       switch (parsed.pathname) {
         case `/${ClientInstallationMain.id}/launch-tcls-client`:
-          if (!this.state.hasTcls) {
+          if (!this.state.tclsExecutablePath) {
             return
           }
 
@@ -548,7 +548,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           this._launchDefaultRiotClient()
           break
         case `/${ClientInstallationMain.id}/launch-we-game-lol`:
-          if (!this.state.hasWeGameLauncher) {
+          if (!this.state.weGameLauncherExecutablePath) {
             return
           }
 
@@ -567,8 +567,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => [
         this._app.settings.locale,
-        this.state.hasTcls,
-        this.state.hasWeGameLauncher,
+        this.state.tclsExecutablePath,
+        this.state.weGameLauncherExecutablePath,
         this.state.officialRiotClientExecutablePath
       ],
       () => {
