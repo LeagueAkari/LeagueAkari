@@ -1031,7 +1031,8 @@ MatchCard:
     label: Replay
 
   buildsTab:
-    anvils: '{{count}} anvils'
+    anvils_one: '{{count}} anvil'
+    anvils_other: '{{count}} anvils'
     skillBuild: Skill Build
     noSkillUpgrades: No skill upgrades
     itemPurchases: Item Purchases
@@ -1083,7 +1084,8 @@ MatchCard:
     plate: Turret Plate
     filters: Filters
     plateStats: Plate Stats
-    plateCount: '{{count}} plate(s)'
+    plateCount_one: '{{count}} plate'
+    plateCount_other: '{{count}} plates'
 
   tags:
     times: '{{label}}×{{count}}'
@@ -2566,7 +2568,7 @@ OpggChampion:
   coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
   starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
 
-EasyToLaunch:
+StartupPane:
   tcls: TCLS Client
   weGame: WeGame
   riotClient: Riot Client

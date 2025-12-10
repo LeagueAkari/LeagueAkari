@@ -11,7 +11,6 @@
       <SetupInAppScope />
       <OngoingGamePanel
         class="ongoing-game-app-wrapper"
-        :show-easy-to-launch="false"
         @show-game="handleShowGame"
         @show-game-by-id="handleShowGameById"
       />

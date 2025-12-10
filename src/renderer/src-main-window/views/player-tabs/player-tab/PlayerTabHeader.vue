@@ -44,7 +44,9 @@
             class="flex items-center gap-1 font-bold dark:text-white text-black"
             :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
           >
-            <span>{{ summoner?.gameName || '—' }}</span>
+            <CopyableText :text="summoner ? `${summoner.gameName}#${summoner.tagLine}` : '—'">
+              {{ summoner?.gameName || '—' }}
+            </CopyableText>
             <NPopover
               v-if="showSpectatorIndicator"
               trigger="hover"
@@ -89,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'

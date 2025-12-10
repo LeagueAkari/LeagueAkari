@@ -20,7 +20,7 @@
     <div
       v-if="lcs.summoner.me"
       @click="handleOpenSelfTab"
-      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/5 hover:bg-black/5 rounded p-2 w-56 cursor-pointer transition-colors"
+      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 w-56 cursor-pointer transition-colors"
     >
       <LcuImage :src="profileIconUri(lcs.summoner.me.profileIconId)" class="size-5" />
 
@@ -46,7 +46,7 @@
     <!-- shortcuts -->
     <div
       v-for="item of launchItems"
-      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/5 hover:bg-black/5 rounded p-2 w-56 cursor-pointer transition-colors"
+      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 w-56 cursor-pointer transition-colors"
       @click="item.launch"
     >
       <img :src="item.imgUrl" class="size-5" />
@@ -96,12 +96,11 @@ import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
+const cis = useClientInstallationStore()
 const lcs = useLeagueClientStore()
 const sgps = useSgpStore()
 
 const ci = useInstance(ClientInstallationRenderer)
-const cis = useClientInstallationStore()
-
 const pt = useInstance(PlayerTabsRenderer)
 
 const message = useMessage()
@@ -117,9 +116,9 @@ const handleOpenSelfTab = () => {
 const launch = async (fn: () => Promise<any>, name: string) => {
   try {
     await fn()
-    message.success(t('EasyToLaunch.successMessage', { name }))
+    message.success(t('StartupPane.successMessage', { name }))
   } catch (error) {
-    message.error(t('EasyToLaunch.failedMessage', { name, reason: (error as any).message }))
+    message.error(t('StartupPane.failedMessage', { name, reason: (error as any).message }))
   }
 }
 
@@ -133,28 +132,28 @@ const launchItems = computed(() => {
 
   if (cis.tclsExecutablePath) {
     arr.push({
-      name: t('EasyToLaunch.tcls'),
+      name: t('StartupPane.tcls'),
       imgUrl: leagueIco,
       path: cis.tclsExecutablePath,
-      launch: () => launch(ci.launchTencentTcls.bind(ci), t('EasyToLaunch.tcls'))
+      launch: () => launch(ci.launchTencentTcls.bind(ci), t('StartupPane.tcls'))
     })
   }
 
   if (cis.weGameLauncherExecutablePath) {
     arr.push({
-      name: t('EasyToLaunch.weGame'),
+      name: t('StartupPane.weGame'),
       imgUrl: weGameIco,
       path: cis.weGameLauncherExecutablePath,
-      launch: () => launch(ci.launchWeGameLeagueOfLegends.bind(ci), t('EasyToLaunch.weGame'))
+      launch: () => launch(ci.launchWeGameLeagueOfLegends.bind(ci), t('StartupPane.weGame'))
     })
   }
 
   if (cis.officialRiotClientExecutablePath) {
     arr.push({
-      name: t('EasyToLaunch.riotClient'),
+      name: t('StartupPane.riotClient'),
       imgUrl: riotClient,
       path: cis.officialRiotClientExecutablePath,
-      launch: () => launch(ci.launchDefaultRiotClient.bind(ci), t('EasyToLaunch.riotClient'))
+      launch: () => launch(ci.launchDefaultRiotClient.bind(ci), t('StartupPane.riotClient'))
     })
   }
 

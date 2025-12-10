@@ -2569,7 +2569,7 @@ OpggChampion:
   coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
   starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
 
-EasyToLaunch:
+StartupPane:
   tcls: TCLS 客户端
   weGame: WeGame
   riotClient: Riot 客户端

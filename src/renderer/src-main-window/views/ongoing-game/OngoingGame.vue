@@ -1,5 +1,5 @@
 <template>
-  <div class="og-page">
+  <div class="h-full">
     <MatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGame.gameId"
@@ -60,9 +60,3 @@ const handleShowGameById = (id: number, puuid: string) => {
   }
 }
 </script>
-
-<style scoped>
-.og-page {
-  height: 100%;
-}
-</style>

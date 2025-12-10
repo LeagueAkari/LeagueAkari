@@ -1,7 +1,9 @@
 <template>
   <div class="h-full" ref="og-view-container">
+    <!-- teams template -->
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
-      <div class="mb-4 last:mb-0">
+      <div class="not-last:mb-4">
+        <!-- header + tags -->
         <div class="flex items-end mb-2">
           <div
             v-if="teamColor"
@@ -21,6 +23,8 @@
             :champion-selections="ogs.championSelections"
           />
         </div>
+
+        <!-- players -->
         <div
           class="grid mt-1 gap-y-2 gap-x-1"
           :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
@@ -52,6 +56,7 @@
         </div>
       </div>
     </DefineOngoingTeam>
+
     <NScrollbar v-if="!isInIdleState && ogs.settings.enabled" x-scrollable>
       <div class="relative h-full m-auto p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
         <OngoingTeam
@@ -64,38 +69,40 @@
         />
       </div>
     </NScrollbar>
+
     <div v-else class="relative flex h-full">
       <div
         class="absolute left-1/2 top-45% -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4"
       >
         <template v-if="ogs.settings.enabled">
-          <template v-if="lcs.connectionState !== 'connected'">
-            <span class="text-base font-normal text-black/60 dark:text-white/80">{{
-              t('OngoingGame.disconnected')
-            }}</span>
-            <EasyToLaunch v-if="showEasyToLaunch" />
-          </template>
-          <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
-            <span class="text-base font-normal text-black/60 dark:text-white/80">
-              {{ t('OngoingGame.waitingForSpectate') }}</span
-            >
-          </template>
-          <template v-else>
-            <span class="text-base font-normal text-black/60 dark:text-white/80">
-              {{ t('OngoingGame.noOngoingGame') }}</span
-            >
-          </template>
+          <div
+            v-if="lcs.connectionState !== 'connected'"
+            class="text-base font-normal text-black/60 dark:text-white/80"
+          >
+            {{ t('OngoingGame.disconnected') }}
+          </div>
+
+          <div
+            v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating"
+            class="text-base font-normal text-black/60 dark:text-white/80"
+          >
+            {{ t('OngoingGame.waitingForSpectate') }}
+          </div>
+
+          <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
+            {{ t('OngoingGame.noOngoingGame') }}
+          </div>
         </template>
-        <span v-else class="text-base font-normal text-black/60 dark:text-white/80">{{
-          t('OngoingGame.disabled')
-        }}</span>
+
+        <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
+          {{ t('OngoingGame.disabled') }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
@@ -115,10 +122,6 @@ import {
   useIdleState
 } from './ongoing-game-utils'
 import TeamTagsArea from './widgets/TeamTagsArea.vue'
-
-const { showEasyToLaunch = true } = defineProps<{
-  showEasyToLaunch?: boolean
-}>()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
