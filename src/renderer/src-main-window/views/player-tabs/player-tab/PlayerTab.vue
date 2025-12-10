@@ -48,10 +48,10 @@
 
     <div
       :class="{
-        'opacity-80 hover:opacity-100 pointer-events-auto': shouldShowScrollToTopButton,
+        'opacity-80  pointer-events-auto': shouldShowScrollToTopButton,
         'opacity-0 pointer-events-none': !shouldShowScrollToTopButton
       }"
-      class="!absolute bottom-8 right-8 transition-opacity"
+      class="!absolute bottom-8 right-8 transition-opacity hover:opacity-100"
     >
       <NButton size="large" type="primary" circle :focusable="false" @click="scrollToTop">
         <NIcon>

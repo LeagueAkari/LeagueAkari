@@ -300,8 +300,8 @@ import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSp
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { useTranslation } from 'i18next-vue'
 import { Robot } from '@vicons/fa'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 

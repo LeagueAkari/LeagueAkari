@@ -58,9 +58,9 @@
           class="text-11px dark:text-white/40 text-black/40"
         >
           <template #tooltip>
-            <span class="text-sm">{{ item.path }}</span>
+            <span class="text-sm font-mono">{{ item.path }}</span>
           </template>
-          {{ item.path }}
+          <span class="font-mono">{{ item.path }}</span>
         </NEllipsis>
       </div>
 

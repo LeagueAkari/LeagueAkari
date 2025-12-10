@@ -174,7 +174,7 @@ watch(
 const isValidated = computed(() => {
   return Boolean(
     availableSpells.value.find((s) => s.id === modelData.value.spell1Id) &&
-      availableSpells.value.find((s) => s.id === modelData.value.spell2Id)
+    availableSpells.value.find((s) => s.id === modelData.value.spell2Id)
   )
 })
 
