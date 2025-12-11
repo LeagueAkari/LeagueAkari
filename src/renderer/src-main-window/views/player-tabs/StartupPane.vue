@@ -16,60 +16,103 @@
     <!-- spacer -->
     <div class="h-12"></div>
 
-    <!-- summoner -->
-    <div
-      v-if="lcs.summoner.me"
-      @click="handleOpenSelfTab"
-      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 w-56 cursor-pointer transition-colors"
-    >
-      <LcuImage :src="profileIconUri(lcs.summoner.me.profileIconId)" class="size-5" />
+    <NScrollbar class="max-h-232px !h-fit !w-58">
+      <!-- summoner -->
+      <div
+        v-if="lcs.summoner.me"
+        @click="handleOpenSelfTab"
+        class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+      >
+        <LcuImage :src="profileIconUri(lcs.summoner.me.profileIconId)" class="size-5" />
 
-      <div class="min-w-0">
-        <div class="truncate">
-          <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
-            {{ t(`sgpServers.${sgps.availability.sgpServerId}`, { ns: 'common' }) }}
-          </span>
-          <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
-            lcs.summoner.me.gameName
-          }}</span>
+        <div class="min-w-0">
+          <div class="truncate">
+            <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
+              {{ t(`sgpServers.${sgps.availability.sgpServerId}`, { ns: 'common' }) }}
+            </span>
+            <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
+              lcs.summoner.me.gameName
+            }}</span>
+          </div>
+          <span class="text-xs dark:text-white/40 text-black/40"
+            >#{{ lcs.summoner.me.tagLine }}</span
+          >
         </div>
-        <span class="text-xs dark:text-white/40 text-black/40">#{{ lcs.summoner.me.tagLine }}</span>
-      </div>
 
-      <NIcon
-        class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <ChevronRight20Filled />
-      </NIcon>
-    </div>
-
-    <!-- shortcuts -->
-    <div
-      v-for="item of launchItems"
-      class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 w-56 cursor-pointer transition-colors"
-      @click="item.launch"
-    >
-      <img :src="item.imgUrl" class="size-5" />
-
-      <div class="min-w-0">
-        <div class="text-xs dark:text-white/80 text-black/80 font-bold">{{ item.name }}</div>
-        <NEllipsis
-          :tooltip="{ placement: 'right' }"
-          class="text-11px dark:text-white/40 text-black/40"
+        <NIcon
+          class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <template #tooltip>
-            <span class="text-sm font-mono">{{ item.path }}</span>
-          </template>
-          <span class="font-mono">{{ item.path }}</span>
-        </NEllipsis>
+          <ChevronRight20Filled />
+        </NIcon>
       </div>
 
-      <NIcon
-        class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+      <template v-if="!lcs.isConnected">
+        <!-- other clients -->
+        <div
+          v-for="(client, index) of otherClients"
+          :key="client.pid"
+          class="not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+          @click="handleConnect(client)"
+        >
+          <LcuImage
+            :src="lcps.connectableClientExtraInfo[client.pid]?.profileIcon"
+            class="size-5"
+          />
+
+          <div class="min-w-0">
+            <div class="truncate">
+              <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
+                ({{ client.pid }})
+                {{
+                  t(`sgpServers.${getSgpServerId(client.region, client.rsoPlatformId)}`, {
+                    ns: 'common'
+                  })
+                }}
+              </span>
+              <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
+                otherClientName(client, index)
+              }}</span>
+            </div>
+            <span class="text-xs dark:text-white/40 text-black/40">{{
+              otherClientTagLine(client)
+            }}</span>
+          </div>
+
+          <NSpin class="mla" :size="12" v-if="lcs.connectingClient?.pid === client.pid" />
+          <NIcon v-else class="mla text-sm dark:text-white/60 text-black/60">
+            <PlugConnected24Filled />
+          </NIcon>
+        </div>
+      </template>
+
+      <!-- shortcuts -->
+      <div
+        v-for="item of launchItems"
+        class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+        @click="item.launch"
       >
-        <ChevronRight20Filled />
-      </NIcon>
-    </div>
+        <img :src="item.imgUrl" class="size-5" />
+
+        <div class="min-w-0">
+          <div class="text-xs dark:text-white/80 text-black/80 font-bold">{{ item.name }}</div>
+          <NEllipsis
+            :tooltip="{ placement: 'right' }"
+            class="text-11px dark:text-white/40 text-black/40"
+          >
+            <template #tooltip>
+              <span class="text-sm font-mono">{{ item.path }}</span>
+            </template>
+            <span class="font-mono">{{ item.path }}</span>
+          </NEllipsis>
+        </div>
+
+        <NIcon
+          class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <ChevronRight20Filled />
+        </NIcon>
+      </div>
+    </NScrollbar>
   </div>
 </template>
 
@@ -79,18 +122,23 @@ import riotClient from '@renderer-shared/assets/ico/riotclient.ico'
 import weGameIco from '@renderer-shared/assets/ico/wegame.ico'
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
+import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { ChevronRight20Filled } from '@vicons/fluent'
+import { getSgpServerId } from '@shared/utils/sgp'
+import { ChevronRight20Filled, PlugConnected24Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NEllipsis, NIcon, useMessage } from 'naive-ui'
+import { NEllipsis, NIcon, NScrollbar, NSpin, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 
+import { useLeagueClientPeekStore } from '@main-window/shards/league-client-peek/store'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
@@ -98,12 +146,16 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const cis = useClientInstallationStore()
 const lcs = useLeagueClientStore()
+const lcuxs = useLeagueClientUxStore()
+const lcps = useLeagueClientPeekStore()
 const sgps = useSgpStore()
 
+const lc = useInstance(LeagueClientRenderer)
 const ci = useInstance(ClientInstallationRenderer)
 const pt = useInstance(PlayerTabsRenderer)
 
 const message = useMessage()
+const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
@@ -159,6 +211,31 @@ const launchItems = computed(() => {
 
   return arr
 })
+
+const otherClients = computed(() => {
+  return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
+})
+
+const otherClientName = (client: UxCommandLine, index: number) => {
+  const summoner = lcps.connectableClientExtraInfo[client.pid]?.summoner
+  const name = summoner?.gameName || summoner?.displayName || '—'
+  const seed = summoner?.gameName || summoner?.puuid || String(client.pid)
+  return masked(name, () => streamerSummonerName(seed, index))
+}
+
+const otherClientTagLine = (client: UxCommandLine) => {
+  const summoner = lcps.connectableClientExtraInfo[client.pid]?.summoner
+  return masked(summoner ? `#${summoner.tagLine}` : '—', '#####')
+}
+
+const handleConnect = (cmd: UxCommandLine) => {
+  if (lcs.connectingClient?.pid === cmd.pid) {
+    lc.disconnect()
+    return
+  }
+
+  lc.connect(cmd)
+}
 </script>
 
 <style scoped>

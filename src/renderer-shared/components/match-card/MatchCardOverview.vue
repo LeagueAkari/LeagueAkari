@@ -16,10 +16,9 @@
                 :champion-id="participant.championId"
                 class="size-11 rounded-lg b-2 b-solid box-border relative -left-2px"
                 :class="{
-                  'dark:b-green-300 b-green-700': team.winResult === 'win',
-                  'dark:b-red-300 b-red-600': team.winResult === 'loss',
-                  'dark:b-white/80 b-black/80':
-                    team.winResult === 'remake' || team.winResult === 'abort'
+                  'dark:b-green-300 b-green-700': winStyleType === 'win',
+                  'dark:b-red-300 b-red-600': winStyleType === 'loss',
+                  'dark:b-white/80 b-black/80': winStyleType === 'neutral'
                 }"
               />
 
@@ -161,10 +160,9 @@
           <div class="min-w-16 shrink-0">
             <div
               :class="{
-                'dark:text-green-300 text-green-700': team.winResult === 'win',
-                'dark:text-red-300 text-red-700': team.winResult === 'loss',
-                'dark:text-white text-black/80':
-                  team.winResult === 'remake' || team.winResult === 'abort'
+                'dark:text-green-300 text-green-700': winStyleType === 'win',
+                'dark:text-red-300 text-red-700': winStyleType === 'loss',
+                'dark:text-white text-black/80': winStyleType === 'neutral'
               }"
               class="font-bold leading-none text-sm"
             >
@@ -327,9 +325,9 @@
       <div
         class="absolute top-0 left-0 h-full w-full z-1"
         :class="{
-          'shadow-win': team.winResult === 'win',
-          'shadow-loss': team.winResult === 'loss',
-          'shadow-remake': team.winResult === 'remake' || team.winResult === 'abort'
+          'shadow-win': winStyleType === 'win',
+          'shadow-loss': winStyleType === 'loss',
+          'shadow-remake': winStyleType === 'neutral'
         }"
       ></div>
     </div>
@@ -478,6 +476,26 @@ const mapName = computed(() => {
   }
 
   return mutators.MapNameBase
+})
+
+const winStyleType = computed(() => {
+  if (!team.value) {
+    return 'neutral'
+  }
+
+  if (
+    basicInfo.value.gameMode === 'PRACTICETOOL' ||
+    team.value.winResult === 'remake' ||
+    team.value.winResult === 'abort'
+  ) {
+    return 'neutral'
+  }
+
+  if (team.value.winResult === 'win') {
+    return 'win'
+  }
+
+  return 'loss'
 })
 
 const formattedRelativeTime = ref('')

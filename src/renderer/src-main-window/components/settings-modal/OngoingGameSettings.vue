@@ -4,6 +4,8 @@
       <template #header>
         <span class="card-header-title">{{ t('OngoingGameSettings.titleCommon') }}</span>
       </template>
+
+      <!-- enabled -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.enabled.label')"
@@ -16,6 +18,8 @@
           @update:value="(val) => og.setEnabled(val)"
         />
       </ControlItem>
+
+      <!-- auto route when game starts -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.autoRouteWhenGameStarts.label')"
@@ -28,6 +32,8 @@
           @update:value="(val) => og.setAutoRouteWhenGameStarts(val)"
         />
       </ControlItem>
+
+      <!-- match history load count -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryLoadCount.label')"
@@ -44,6 +50,8 @@
           @update:value="(val) => og.setMatchHistoryLoadCount(val || 20)"
         />
       </ControlItem>
+
+      <!-- concurrency -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.concurrency.label')"
@@ -58,6 +66,8 @@
           @update:value="(val) => og.setConcurrency(val || 10)"
         />
       </ControlItem>
+
+      <!-- game details load count -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.gameDetailsLoadCount.label')"
@@ -76,6 +86,8 @@
           @update:value="(val) => og.setGameDetailsLoadCount(val || 0)"
         />
       </ControlItem>
+
+      <!-- match history tag preference -->
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryTagPreference.label')"
@@ -94,11 +106,29 @@
           }}</NRadio>
         </NRadioGroup>
       </ControlItem>
+
+      <!-- query in lobby phase -->
+      <ControlItem
+        class="control-item-margin"
+        :label="t('OngoingGameSettings.queryInLobbyPhase.label')"
+        :label-description="t('OngoingGameSettings.queryInLobbyPhase.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="ogs.settings.queryInLobbyPhase"
+          @update:value="(val) => og.setQueryInLobbyPhase(val)"
+        />
+      </ControlItem>
     </NCard>
+
+    <!-- player card -->
     <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{ t('OngoingGameSettings.titlePlayerCard') }}</span>
       </template>
+
+      <!-- show champion usage -->
       <ControlItem
         class="control-item-margin"
         :label-width="400"
@@ -120,6 +150,8 @@
           }}</NRadio>
         </NRadioGroup>
       </ControlItem>
+
+      <!-- show match history item border -->
       <ControlItem
         class="control-item-margin"
         :label-width="400"
@@ -132,6 +164,8 @@
           @update:value="(val) => og.setShowMatchHistoryItemBorder(val)"
         />
       </ControlItem>
+
+      <!-- player card tags -->
       <ControlItem
         class="control-item-margin"
         :label-width="400"
@@ -174,11 +208,7 @@
                 og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSoloKillsTag: val })
             "
           >
-            {{
-              t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label', {
-                countV: ogs.settings.gameDetailsLoadCount
-              })
-            }}
+            {{ t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label') }}
           </NCheckbox>
           <NCheckbox
             :checked="ogs.settings.playerCardTags.showAverageTeamDamageTag"

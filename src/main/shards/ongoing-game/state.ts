@@ -6,7 +6,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { AdditionalTeamMembersResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
@@ -65,6 +65,11 @@ export class OngoingGameSettings {
     showAkariScoreTag: false
   }
 
+  /**
+   * 是否在 lobby 阶段查询战绩
+   */
+  queryInLobbyPhase = false
+
   setOrderPlayerBy(
     value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
   ) {
@@ -107,6 +112,10 @@ export class OngoingGameSettings {
     this.gameDetailsLoadCount = value
   }
 
+  setQueryInLobbyPhase(value: boolean) {
+    this.queryInLobbyPhase = value
+  }
+
   constructor() {
     makeAutoObservable(this, {
       playerCardTags: observable.ref
@@ -120,7 +129,7 @@ export class OngoingGameState {
    */
   get championSelections() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
       }
 
@@ -136,29 +145,29 @@ export class OngoingGameState {
       }
 
       const selections: Record<string, number> = {}
-      this._lcData.champSelect.session.myTeam.forEach(processMember)
-      this._lcData.champSelect.session.theirTeam.forEach(processMember)
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return selections
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      if (!this._data.gameflow.session) {
         return {}
       }
 
       const selections: Record<string, number> = {}
-      this._lcData.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
+      this._data.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamOne.forEach((p) => {
+      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamTwo.forEach((p) => {
+      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
@@ -174,7 +183,7 @@ export class OngoingGameState {
 
   get positionAssignments() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
       }
 
@@ -203,12 +212,12 @@ export class OngoingGameState {
         }
       > = {}
 
-      this._lcData.champSelect.session.myTeam.forEach(processMember)
-      this._lcData.champSelect.session.theirTeam.forEach(processMember)
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return assignments
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      if (!this._data.gameflow.session) {
         return {}
       }
 
@@ -220,7 +229,7 @@ export class OngoingGameState {
         }
       > = {}
 
-      this._lcData.gameflow.session.gameData.teamOne.forEach((p) => {
+      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           assignments[p.puuid] = {
             position: p.selectedPosition,
@@ -229,7 +238,7 @@ export class OngoingGameState {
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamTwo.forEach((p) => {
+      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           assignments[p.puuid] = {
             position: p.selectedPosition,
@@ -249,15 +258,15 @@ export class OngoingGameState {
    */
   get teams() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
         return {
           'TEAM-ALL': [
-            ...this._lcData.champSelect.session.myTeam,
-            ...this._lcData.champSelect.session.theirTeam
+            ...this._data.champSelect.session.myTeam,
+            ...this._data.champSelect.session.theirTeam
           ]
             .map((p) => {
               if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
@@ -293,26 +302,26 @@ export class OngoingGameState {
         teams[teamIdentifier].push(p.puuid)
       }
 
-      this._lcData.champSelect.session.myTeam.forEach(processMember)
-      this._lcData.champSelect.session.theirTeam.forEach(processMember)
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return teams
     } else if (this.queryStage.phase === 'in-game') {
       // hack for 避免数据残留
-      if (!this._lcData.gameflow.session || this._lcData.gameflow.session.phase === 'GameStart') {
+      if (!this._data.gameflow.session || this._data.gameflow.session.phase === 'GameStart') {
         return {}
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
         // sometimes teamOne and teamTwo will have fake players, need to filter out
-        const realPlayers = this._lcData.gameflow.session.gameData.playerChampionSelections.map(
+        const realPlayers = this._data.gameflow.session.gameData.playerChampionSelections.map(
           (c) => c.puuid
         )
 
         return {
           'TEAM-ALL': [
-            ...this._lcData.gameflow.session.gameData.teamOne,
-            ...this._lcData.gameflow.session.gameData.teamTwo
+            ...this._data.gameflow.session.gameData.teamOne,
+            ...this._data.gameflow.session.gameData.teamTwo
           ]
             .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
             .filter((p) => realPlayers.includes(p.puuid))
@@ -325,13 +334,13 @@ export class OngoingGameState {
         'TEAM-200': []
       }
 
-      this._lcData.gameflow.session.gameData.teamOne
+      this._data.gameflow.session.gameData.teamOne
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['TEAM-100'].push(p.puuid)
         })
 
-      this._lcData.gameflow.session.gameData.teamTwo
+      this._data.gameflow.session.gameData.teamTwo
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['TEAM-200'].push(p.puuid)
@@ -345,6 +354,16 @@ export class OngoingGameState {
           teams[tI] = m
         }
       }
+
+      return teams
+    } else if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
+      const teams: Record<string, string[]> = { LOBBY: [] }
+
+      this._data.lobby.lobby.members.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          teams['LOBBY'].push(p.puuid)
+        }
+      })
 
       return teams
     }
@@ -362,46 +381,63 @@ export class OngoingGameState {
    * in-game - 在游戏中或游戏结算中
    */
   get queryStage() {
-    if (
-      this._lcData.gameflow.session &&
-      this._lcData.gameflow.session.phase === 'ChampSelect' &&
-      this._lcData.champSelect.session
-    ) {
+    if (!this._settings.enabled) {
       return {
-        phase: 'champ-select' as 'champ-select' | 'in-game',
-        gameInfo: {
-          queueId: this._lcData.gameflow.session.gameData.queue.id,
-          queueType: this._lcData.gameflow.session.gameData.queue.type,
-          gameId: this._lcData.gameflow.session.gameData.gameId,
-          gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
-        }
-      }
+        phase: 'unavailable',
+        gameInfo: null
+      } as QueryStage
     }
 
     if (
-      this._lcData.gameflow.session &&
-      (this._lcData.gameflow.session.phase === 'GameStart' ||
-        this._lcData.gameflow.session.phase === 'InProgress' ||
-        this._lcData.gameflow.session.phase === 'WaitingForStats' ||
-        this._lcData.gameflow.session.phase === 'PreEndOfGame' ||
-        this._lcData.gameflow.session.phase === 'EndOfGame' ||
-        this._lcData.gameflow.session.phase === 'Reconnect')
+      this._data.gameflow.session &&
+      this._data.gameflow.session.phase === 'ChampSelect' &&
+      this._data.champSelect.session
     ) {
       return {
-        phase: 'in-game' as 'champ-select' | 'in-game',
+        phase: 'champ-select',
         gameInfo: {
-          queueId: this._lcData.gameflow.session.gameData.queue.id,
-          queueType: this._lcData.gameflow.session.gameData.queue.type,
-          gameId: this._lcData.gameflow.session.gameData.gameId,
-          gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
+          queueId: this._data.gameflow.session.gameData.queue.id,
+          queueType: this._data.gameflow.session.gameData.queue.type,
+          gameId: this._data.gameflow.session.gameData.gameId,
+          gameMode: this._data.gameflow.session.gameData.queue.gameMode
         }
-      }
+      } as QueryStage
+    }
+
+    if (
+      this._data.gameflow.session &&
+      (this._data.gameflow.session.phase === 'GameStart' ||
+        this._data.gameflow.session.phase === 'InProgress' ||
+        this._data.gameflow.session.phase === 'WaitingForStats' ||
+        this._data.gameflow.session.phase === 'PreEndOfGame' ||
+        this._data.gameflow.session.phase === 'EndOfGame' ||
+        this._data.gameflow.session.phase === 'Reconnect')
+    ) {
+      return {
+        phase: 'in-game',
+        gameInfo: {
+          queueId: this._data.gameflow.session.gameData.queue.id,
+          queueType: this._data.gameflow.session.gameData.queue.type,
+          gameId: this._data.gameflow.session.gameData.gameId,
+          gameMode: this._data.gameflow.session.gameData.queue.gameMode
+        }
+      } as QueryStage
+    }
+
+    if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
+      return {
+        phase: 'lobby',
+        gameInfo: {
+          queueId: this._data.lobby.lobby.gameConfig.queueId,
+          queueType: this._data.lobby.lobby.gameConfig.gameMode
+        }
+      } as QueryStage
     }
 
     return {
-      phase: 'unavailable' as const,
+      phase: 'unavailable',
       gameInfo: null
-    }
+    } as QueryStage
   }
 
   /**
@@ -409,9 +445,9 @@ export class OngoingGameState {
    */
   get isInEog() {
     return (
-      this._lcData.gameflow.phase === 'WaitingForStats' ||
-      this._lcData.gameflow.phase === 'PreEndOfGame' ||
-      this._lcData.gameflow.phase === 'EndOfGame'
+      this._data.gameflow.phase === 'WaitingForStats' ||
+      this._data.gameflow.phase === 'PreEndOfGame' ||
+      this._data.gameflow.phase === 'EndOfGame'
     )
   }
 
@@ -421,14 +457,14 @@ export class OngoingGameState {
    * 更加精准的队伍预测
    */
   get teamParticipantGroups() {
-    if (!this._lcData.gameflow.session) {
+    if (!this._data.gameflow.session) {
       return {}
     }
 
     const groups: Record<string, string[]> = {}
     for (const p of [
-      ...this._lcData.gameflow.session.gameData.teamOne,
-      ...this._lcData.gameflow.session.gameData.teamTwo
+      ...this._data.gameflow.session.gameData.teamOne,
+      ...this._data.gameflow.session.gameData.teamTwo
     ]) {
       if (!groups[p.teamParticipantId]) {
         groups[p.teamParticipantId] = []
@@ -601,7 +637,7 @@ export class OngoingGameState {
 
   get apiShouldUse() {
     if (
-      this._appCommon.settings.preferredLolSource === 'sgp' &&
+      this._app.settings.preferredLolSource === 'sgp' &&
       this._sgp.state.availability.serversSupported.matchHistory
     ) {
       return 'sgp'
@@ -622,9 +658,10 @@ export class OngoingGameState {
   }
 
   constructor(
-    private readonly _lcData: LeagueClientData,
-    private readonly _appCommon: AppCommonMain,
-    private readonly _sgp: SgpMain
+    private readonly _data: LeagueClientData,
+    private readonly _app: AppCommonMain,
+    private readonly _sgp: SgpMain,
+    private readonly _settings: OngoingGameSettings
   ) {
     makeAutoObservable(this, {
       // shallow object

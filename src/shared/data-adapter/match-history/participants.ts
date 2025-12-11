@@ -68,6 +68,7 @@ export type MatchParticipant = {
   kda: number
   killParticipation: number
   totalDamageDealtToChampions: number
+  damageGoldEfficiency: number
   physicalDamageDealtToChampions: number
   magicDamageDealtToChampions: number
   trueDamageDealtToChampions: number
@@ -219,6 +220,7 @@ export function toParticipants(
         kda: (p.kills + p.assists) / noZero(p.deaths),
         killParticipation: (p.kills + p.assists) / noZero(totalKills[teamIdentifier]),
         totalDamageDealtToChampions: p.totalDamageDealtToChampions,
+        damageGoldEfficiency: p.totalDamageDealtToChampions / noZero(p.goldEarned),
         physicalDamageDealtToChampions: p.physicalDamageDealtToChampions,
         magicDamageDealtToChampions: p.magicDamageDealtToChampions,
         trueDamageDealtToChampions: p.trueDamageDealtToChampions,
@@ -342,6 +344,8 @@ export function toParticipants(
           (participant.stats.kills + participant.stats.assists) /
           noZero(totalKills[teamIdentifier]),
         totalDamageDealtToChampions: participant.stats.totalDamageDealtToChampions,
+        damageGoldEfficiency:
+          participant.stats.totalDamageDealtToChampions / noZero(participant.stats.goldEarned),
         physicalDamageDealtToChampions: participant.stats.physicalDamageDealtToChampions,
         magicDamageDealtToChampions: participant.stats.magicDamageDealtToChampions,
         trueDamageDealtToChampions: participant.stats.trueDamageDealtToChampions,

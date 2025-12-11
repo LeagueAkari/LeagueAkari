@@ -51,7 +51,7 @@
         'opacity-80  pointer-events-auto': shouldShowScrollToTopButton,
         'opacity-0 pointer-events-none': !shouldShowScrollToTopButton
       }"
-      class="!absolute bottom-8 right-8 transition-opacity hover:opacity-100"
+      class="!absolute bottom-8 right-8 transition-opacity hover:opacity-100 z-10"
     >
       <NButton size="large" type="primary" circle :focusable="false" @click="scrollToTop">
         <NIcon>
@@ -121,7 +121,11 @@ const isSentinelVisibleRightSide = useElementVisibility(stickySentinelRightSideE
 })
 
 const shouldShowScrollToTopButton = computed(() => {
-  return !isSentinelVisibleLeftSide.value || !isSentinelVisibleRightSide.value
+  if (isSmallSize.value) {
+    return !isSentinelVisibleRightSide.value
+  }
+
+  return !isSentinelVisibleLeftSide.value
 })
 
 const showPreviewModal = ref(false)

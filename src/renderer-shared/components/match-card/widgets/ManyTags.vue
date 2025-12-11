@@ -3,7 +3,7 @@
     <div
       v-for="(tag, index) in tags"
       ref="tagsEl"
-      :key="tag.label"
+      :key="index"
       :class="[
         tag.color,
         tag.textColor,
@@ -32,13 +32,13 @@
           class="shrink-0 dark:bg-white/10 bg-black/10 hover:dark:bg-white/20 hover:bg-black/20 transition-colors text-xs py-0.5 px-2 rounded-xl absolute left-0"
           :style="{ left: tagOverflowInfo.lastVisibleTagOffsetLeft + 'px' }"
         >
-          +{{ tags.length - tagOverflowInfo.lastVisibleTagIndex }}
+          +{{ Math.min(tags.length - tagOverflowInfo.lastVisibleTagIndex, 99) }}
         </div>
       </template>
       <div class="flex gap-1">
         <div
-          v-for="tag in tags.slice(tagOverflowInfo.lastVisibleTagIndex)"
-          :key="tag.label"
+          v-for="(tag, idx) in tags.slice(tagOverflowInfo.lastVisibleTagIndex)"
+          :key="tagOverflowInfo.lastVisibleTagIndex + idx"
           :class="[tag.color, tag.textColor]"
           class="tag"
         >
@@ -56,10 +56,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useResizeObserver } from '@vueuse/core'
 import { NPopover } from 'naive-ui'
-import { VNodeChild, h, shallowRef, useTemplateRef, watch } from 'vue'
+import { VNodeChild, h, shallowRef, useTemplateRef } from 'vue'
 
 import { usePlayerTags } from '../utils/tags'
 
@@ -74,10 +73,9 @@ const renderChild = (node: string | (() => VNodeChild)) => {
 const containerEl = useTemplateRef('container')
 const tagsEl = useTemplateRef('tagsEl')
 
-// bg-blue-800 bg-pink-700 bg-gray-700 bg-orange-800 bg-purple-800 bg-green-800 bg-violet-600
-
-const as = useAppCommonStore()
 const tags = usePlayerTags()
+
+const RESERVED_WIDTH = 40 // for +xx tags
 
 const updateOverflowTagInfo = () => {
   if (!containerEl.value || !tagsEl.value) {
@@ -96,10 +94,10 @@ const updateOverflowTagInfo = () => {
   for (let i = 0; i < tagsEl.value.length; i++) {
     const tag = tagsEl.value[i]
 
-    let toAdd = tag.getBoundingClientRect().width + (i !== tagsEl.value.length - 1 ? gapSize : 0)
+    let toAdd = tag.getBoundingClientRect().width + (i !== 0 ? gapSize : 0)
 
-    if (acc + toAdd > containerWidth) {
-      lastVisibleTagIndex = i - 1
+    if (acc + toAdd + RESERVED_WIDTH + gapSize > containerWidth) {
+      lastVisibleTagIndex = i
       break
     }
 
@@ -124,10 +122,7 @@ const recalcOverflow = () => {
   tagOverflowInfo.value = updateOverflowTagInfo()
 }
 
-useResizeObserver(() => containerEl.value, recalcOverflow)
-useResizeObserver(() => tagsEl.value || [], recalcOverflow)
-
-watch(() => as.settings.locale, recalcOverflow)
+useResizeObserver(() => [containerEl.value, ...(tagsEl.value || [])], recalcOverflow)
 </script>
 
 <style scoped>

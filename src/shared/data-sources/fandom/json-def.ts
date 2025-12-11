@@ -1,47 +1,36 @@
-export const FANDOM_BALANCE_SCHEMA = {
-  $schema: 'http://json-schema.org/draft-07/schema#',
-  type: ['object', 'null'],
-  additionalProperties: {
-    $ref: '#/definitions/info'
-  },
-  definitions: {
-    info: {
-      type: 'object',
-      required: ['id', 'balance'],
-      properties: {
-        id: {
-          type: 'number'
-        },
-        balance: {
-          type: 'object',
-          properties: {
-            ar: { $ref: '#/definitions/modeInfo' },
-            aram: { $ref: '#/definitions/modeInfo' },
-            nb: { $ref: '#/definitions/modeInfo' },
-            ofa: { $ref: '#/definitions/modeInfo' },
-            urf: { $ref: '#/definitions/modeInfo' },
-            usb: { $ref: '#/definitions/modeInfo' }
-          },
-          additionalProperties: false
-        }
-      },
-      additionalProperties: false
-    },
-    modeInfo: {
-      type: ['object', 'null'],
-      properties: {
-        dmg_dealt: { type: 'number' },
-        dmg_taken: { type: 'number' },
-        healing: { type: 'number' },
-        shielding: { type: 'number' },
-        ability_haste: { type: 'number' },
-        mana_regen: { type: 'number' },
-        energy_regen: { type: 'number' },
-        attack_speed: { type: 'number' },
-        movement_speed: { type: 'number' },
-        tenacity: { type: 'number' }
-      },
-      additionalProperties: false
-    }
-  }
-} as const
+import z from 'zod'
+
+const modeInfoSchema = z
+  .object({
+    dmg_dealt: z.number().optional(),
+    dmg_taken: z.number().optional(),
+    healing: z.number().optional(),
+    shielding: z.number().optional(),
+    ability_haste: z.number().optional(),
+    mana_regen: z.number().optional(),
+    energy_regen: z.number().optional(),
+    attack_speed: z.number().optional(),
+    movement_speed: z.number().optional(),
+    tenacity: z.number().optional()
+  })
+  .nullable()
+
+const balanceSchema = z
+  .object({
+    ar: modeInfoSchema,
+    aram: modeInfoSchema,
+    nb: modeInfoSchema,
+    ofa: modeInfoSchema,
+    urf: modeInfoSchema,
+    usb: modeInfoSchema
+  })
+  .partial()
+
+const infoSchema = z.object({
+  id: z.number(),
+  balance: balanceSchema
+})
+
+export const fandomBalanceSchema = z.record(z.string(), infoSchema)
+
+export type FandomBalance = z.infer<typeof fandomBalanceSchema>

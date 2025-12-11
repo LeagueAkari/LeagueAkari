@@ -41,6 +41,13 @@ export interface UxCommandLine {
 }
 
 const POWERSHELL_PATH = 'powershell'
+const POWERSHELL_BASE_ARGS = [
+  '-NoProfile',
+  '-NonInteractive',
+  '-ExecutionPolicy',
+  'Bypass',
+  '-Command'
+]
 
 function runCommand(
   command: string,
@@ -79,24 +86,6 @@ function runCommand(
   })
 }
 
-export async function getProcessPidByName(name: string): Promise<number[]> {
-  return new Promise((resolve, reject) => {
-    runCommand(POWERSHELL_PATH, [
-      '-Command',
-      `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${name}%' " | Select-Object -ExpandProperty ProcessId`
-    ])
-      .then((out) => {
-        const pids = out
-          .split('\n')
-          .map((i) => i.trim())
-          .map(Number)
-          .filter(Boolean)
-        resolve(pids)
-      })
-      .catch((error) => reject(error))
-  })
-}
-
 const portRegex = /--app-port=([0-9]+)/
 const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
@@ -130,23 +119,12 @@ export function parseCommandLine(s: string): UxCommandLine | null {
   }
 }
 
-export async function queryUxCommandLine(pid: number): Promise<UxCommandLine[]>
-export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]>
-export async function queryUxCommandLine(arg: string | number): Promise<UxCommandLine[]> {
+export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]> {
   return new Promise((resolve, reject) => {
-    let task: Promise<string>
-
-    if (typeof arg === 'number') {
-      task = runCommand(POWERSHELL_PATH, [
-        '-Command',
-        `Get-CimInstance -ClassName Win32_Process -Filter "ProcessId=${arg}" | Select-Object -ExpandProperty CommandLine`
-      ])
-    } else {
-      task = runCommand(POWERSHELL_PATH, [
-        '-Command',
-        `Get-CimInstance -ClassName Win32_Process -Filter "Name LIKE '%${arg}%' " | Select-Object -ExpandProperty CommandLine`
-      ])
-    }
+    const task = runCommand(POWERSHELL_PATH, [
+      ...POWERSHELL_BASE_ARGS,
+      `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
+    ])
 
     task
       .then((out) => {

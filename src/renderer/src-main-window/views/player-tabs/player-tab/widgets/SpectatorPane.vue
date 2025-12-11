@@ -61,7 +61,7 @@
     </div>
 
     <!-- Time Info -->
-    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-1">
+    <div class="text-xs text-gray-600 dark:text-gray-300 mt-0.5 mb-1">
       {{
         t('SpectateStatus.startFrom', {
           date: dayjs(spectatorData.playerCredentials.gameCreateDate).format('MM-DD HH:mm:ss'),

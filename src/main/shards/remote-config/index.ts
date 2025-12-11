@@ -14,6 +14,25 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { RemoteGitRepository } from './repository'
 import { LatestReleaseWithMetadata, RemoteConfigSettings, RemoteConfigState } from './state'
 
+export interface RemoteTaskConfig {
+  /** 间隔毫秒数 */
+  interval: number
+
+  /**
+   * 当 persist 为 true 是，此选项有效
+   */
+  updateOnStartup: boolean
+
+  /** 是否需要持久化 */
+  persist: boolean
+
+  /** 当数据更新时进行同步 */
+  onUpdate: (value: unknown) => void
+
+  /** 更新时发生错误回调 */
+  onError: (error: unknown) => void
+}
+
 /**
  * 从 GitHub / Gitee 获取数据, 并提供给其他模块使用
  *
@@ -84,11 +103,18 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   ): Promise<LatestReleaseWithMetadata> {
     const isNew = gt(release.tag_name, app.getVersion())
     const currentVersion = app.getVersion()
+    const locale = this._app.settings.locale as 'zh-CN' | 'en'
+    const configRepoRequest = {
+      source: this.settings.preferredSource,
+      repo: 'akari-config' as const,
+      branch: 'main'
+    }
 
     let detailedChangelog: string | null = null
     try {
       const { data } = await this.repo.getRawContent(
-        `/releases/${release.tag_name}/${this._app.settings.locale}.md`
+        `/releases/${release.tag_name}/${locale}.md`,
+        configRepoRequest
       )
 
       detailedChangelog = data
@@ -133,8 +159,13 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private async _updateSgpLeagueServers() {
     try {
       this.state.setUpdatingSgpLeagueServers(true)
-      this._log.info('Updating Sgp League Servers', this._repo.config.source)
-      const config = await this._repo.getSgpLeagueServersConfig()
+      const source = this.settings.preferredSource
+      this._log.info('Updating Sgp League Servers', source)
+      const config = await this._repo.getSgpLeagueServersConfig({
+        source,
+        repo: 'akari-config',
+        branch: 'main'
+      })
       this.state.setSgpServerConfig(config)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
@@ -150,8 +181,15 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private async _updateAnnouncement() {
     try {
       this.state.setUpdatingAnnouncement(true)
-      this._log.info('Updating Announcement', this._repo.config.source)
-      const content = await this._repo.getAnnouncement()
+      const source = this.settings.preferredSource
+      const locale = this._app.settings.locale as 'zh-CN' | 'en'
+      this._log.info('Updating Announcement', source)
+      const content = await this._repo.getAnnouncement({
+        source,
+        repo: 'akari-config',
+        branch: 'main',
+        locale
+      })
       this.state.setAnnouncement(content)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
@@ -167,8 +205,9 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private async _updateLatestRelease() {
     try {
       this.state.setUpdatingLatestRelease(true)
-      this._log.info('Updating Latest Release', this._repo.config.source)
-      const { data } = await this._repo.getLatestRelease()
+      const source = this.settings.preferredSource
+      this._log.info('Updating Latest Release', source)
+      const { data } = await this._repo.getLatestRelease({ source, repo: 'akari' })
       this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
@@ -186,8 +225,9 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
     try {
       this.state.setUpdatingLatestRelease(true)
-      this._log.info('Updating Latest Release.. Manually', this._repo.config.source)
-      const { data } = await this._repo.getLatestRelease()
+      const source = this.settings.preferredSource
+      this._log.info('Updating Latest Release.. Manually', source)
+      const { data } = await this._repo.getLatestRelease({ source, repo: 'akari' })
       const release = await this._addMoreInfoToRelease(data)
       this.state.setLatestRelease(release)
 
@@ -246,11 +286,6 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
     this._handleIpcCall()
 
-    this._repo.setConfig({
-      locale: this._app.settings.locale as 'zh-CN' | 'en',
-      source: this.settings.preferredSource
-    })
-
     this._updateAnnouncementTask.start(true)
     this._updateSgpLeagueServersTask.start(true)
 
@@ -269,7 +304,6 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this._app.settings.locale,
       (locale) => {
-        this._repo.setConfig({ locale: locale as 'zh-CN' | 'en' })
         this.state.setAnnouncement(null)
         this._updateAnnouncementTask.start(true)
 
@@ -283,7 +317,6 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.settings.preferredSource,
       (source) => {
-        this._repo.setConfig({ source })
         this.state.setLatestRelease(null)
         this.state.setAnnouncement(null)
         this._updateAnnouncementTask.start(true)

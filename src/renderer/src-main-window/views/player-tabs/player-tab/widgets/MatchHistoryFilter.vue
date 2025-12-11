@@ -66,6 +66,7 @@
           :options="championOptions"
           size="tiny"
           v-model:value="selectedChampions"
+          :filter="filterChampion"
           :render-tag="renderChampionTag"
           :render-label="renderChampionOption"
         />
@@ -85,6 +86,8 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NRadio, NRadioGroup, NSelect, NTag, SelectOption } from 'naive-ui'
 import { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 import { computed, h, ref, watchEffect } from 'vue'
+
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
@@ -109,6 +112,12 @@ const championOptions = computed(() => {
     }
   })
 })
+
+const { match: isChampionNameMatch } = useChampionNameMatch()
+
+const filterChampion = (pattern: string, option: SelectOption) => {
+  return isChampionNameMatch(pattern, option.label as string, option.value as number)
+}
 
 const renderChampionTag = (props: { option: SelectOption; handleClose: () => void }) => {
   return h(NTag, { size: 'tiny' }, () =>
@@ -172,7 +181,11 @@ const handleSearchSummoner = async (value: string) => {
     )
 
     if (summoner) {
-      searchResult.value.push(summoner)
+      searchResult.value.unshift(summoner)
+
+      if (searchResult.value.length >= 10) {
+        searchResult.value.pop()
+      }
     }
   } catch {
   } finally {

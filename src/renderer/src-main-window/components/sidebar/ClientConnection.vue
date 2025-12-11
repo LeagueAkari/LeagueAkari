@@ -157,7 +157,6 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { getSgpServerId } from '@shared/utils/sgp'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
@@ -166,10 +165,11 @@ import {
   MoreHorizFilled as MoreHorizFilledIcon,
   RocketLaunchRound as RocketLaunchRoundIcon
 } from '@vicons/material'
-import { useIntervalFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NEllipsis, NIcon, NScrollbar, NSpin } from 'naive-ui'
-import { computed, h, ref, watch } from 'vue'
+import { computed, h } from 'vue'
+
+import { useLeagueClientPeekStore } from '../../shards/league-client-peek/store'
 
 const { t } = useTranslation()
 
@@ -178,12 +178,15 @@ const lc = useInstance(LeagueClientRenderer)
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
+const lcps = useLeagueClientPeekStore()
 
 const sgps = useSgpStore()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
 })
+
+const clientExtraInfo = lcps.connectableClientExtraInfo
 
 const actions = computed(() => {
   return [
@@ -207,55 +210,6 @@ const actions = computed(() => {
     }
   ]
 })
-
-const clientExtraInfo = ref<
-  Record<string, { summoner: SummonerInfo; profileIcon: string; lastUpdate: number }>
->({})
-
-const updateConnectableClientExtraInfo = async () => {
-  const peekFn = async (cmd: UxCommandLine) => {
-    const prev = clientExtraInfo.value[cmd.pid]
-    const data = await lc.peekClient(cmd)
-
-    if (prev) {
-      if (!data) {
-        delete clientExtraInfo.value[cmd.pid]
-        return
-      }
-
-      if (Date.now() - prev.lastUpdate > 2 * 60 * 1000) {
-        clientExtraInfo.value[cmd.pid] = { ...data, lastUpdate: Date.now() }
-      }
-    } else {
-      if (data) {
-        clientExtraInfo.value[cmd.pid] = { ...data, lastUpdate: Date.now() }
-      }
-    }
-  }
-
-  for (const pid of Object.keys(clientExtraInfo.value)) {
-    if (!otherClients.value.find((cmd) => cmd?.pid.toString() === pid)) {
-      delete clientExtraInfo.value[pid]
-    }
-  }
-
-  for (const cmd of otherClients.value) {
-    peekFn(cmd)
-  }
-}
-
-const { resume } = useIntervalFn(updateConnectableClientExtraInfo, 1 * 60 * 1000, {
-  immediate: false,
-  immediateCallback: true
-})
-
-watch(
-  () => otherClients.value,
-  () => {
-    resume()
-  },
-  { immediate: true }
-)
 
 const handleConnect = (cmd: UxCommandLine) => {
   if (lcs.connectingClient?.pid === cmd.pid) {

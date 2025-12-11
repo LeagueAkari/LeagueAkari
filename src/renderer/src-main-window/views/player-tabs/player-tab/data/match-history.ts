@@ -104,6 +104,10 @@ export function provideMatchHistory(props: {
   const loadReplayMetadata = async (games: LcuOrSgpGameSummary[]) => {
     const { data: conf } = await lc.api.replays.getConfiguration()
 
+    if (!conf.isReplaysEnabled) {
+      return
+    }
+
     const task = async (game: LcuOrSgpGameSummary) => {
       let gameId = 0
       let gameMeta = {

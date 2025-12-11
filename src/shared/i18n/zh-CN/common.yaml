@@ -42,6 +42,7 @@ teams:
   TEAM-ALL: 所有
   TEAM-100: 蓝队
   TEAM-200: 红队
+  LOBBY: 房间
   unknown: 未知
 
 queueTypes:

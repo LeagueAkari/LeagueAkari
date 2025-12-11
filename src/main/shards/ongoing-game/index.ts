@@ -58,7 +58,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  public readonly settings = new OngoingGameSettings()
+  public readonly settings: OngoingGameSettings
   public readonly state: OngoingGameState
 
   private readonly _queueKeeper = new QueueKeeper([{ id: 'match-history' }, { id: 'misc' }])
@@ -81,6 +81,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     private readonly _saved: SavedPlayerMain,
     private readonly _appCommon: AppCommonMain
   ) {
+    this.settings = new OngoingGameSettings()
     this._log = _loggerFactory.create(OngoingGameMain.id)
     this._setting = _settingFactory.register(
       OngoingGameMain.id,
@@ -94,11 +95,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         showChampionUsage: { default: this.settings.showChampionUsage },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
-        playerCardTags: { default: this.settings.playerCardTags }
+        playerCardTags: { default: this.settings.playerCardTags },
+        queryInLobbyPhase: { default: this.settings.queryInLobbyPhase }
       },
       this.settings
     )
-    this.state = new OngoingGameState(this._lc.data, this._appCommon, this._sgp)
+    this.state = new OngoingGameState(this._lc.data, this._appCommon, this._sgp, this.settings)
   }
 
   private async _handleState() {
@@ -113,7 +115,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'showChampionUsage',
       'showMatchHistoryItemBorder',
       'autoRouteWhenGameStarts',
-      'playerCardTags'
+      'playerCardTags',
+      'queryInLobbyPhase'
     ])
 
     this._mobx.propSync(OngoingGameMain.id, 'state', this.state, [
@@ -178,15 +181,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handleLoad() {
     // summoner / ranked stats / saved info / champion mastery
     this._mobx.reaction(
-      () => ({
-        enabled: this.settings.enabled,
-        teams: this.state.teams
-      }),
-      ({ enabled, teams }) => {
-        if (!enabled) {
-          return
-        }
-
+      () => this.state.teams,
+      (teams) => {
         const puuids = Object.values(teams).flat()
 
         this._updateSummoners(puuids)
@@ -210,28 +206,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     // match history
     this._mobx.reaction(
       () => ({
-        enabled: this.settings.enabled,
         teams: this.state.teams,
         apiShouldUse: this.state.apiShouldUse,
         sgpTokenReady: this._sgp.state.isTokenReady,
         count: this.settings.matchHistoryLoadCount,
-        params: this.state.matchHistoryTagParams,
-        currentQueueId: currentQueueId.get()
+        params: this.state.matchHistoryTagParams
       }),
-      ({ enabled, count, params, apiShouldUse, sgpTokenReady, currentQueueId }) => {
-        if (!enabled) {
-          return
-        }
-
+      ({ count, params, apiShouldUse, sgpTokenReady }) => {
         // wait for sgp token ready if needed
         if (apiShouldUse === 'sgp' && !sgpTokenReady) {
           return
-        }
-
-        if (currentQueueId) {
-          this.state.setMatchHistoryTagParams({ ...params, tag: `q_${currentQueueId}` })
-        } else {
-          this.state.setMatchHistoryTagParams({ ...params, tag: undefined })
         }
 
         const puuids = Object.values(this.state.teams).flat()
@@ -242,16 +226,34 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           apiShouldUse as 'sgp' | 'lcu'
         )
       },
-      { delay: 500, fireImmediately: true }
+      { delay: 500 /* important! */, equals: comparer.structural, fireImmediately: true }
     )
 
     this._mobx.reaction(
       () => ({
-        isDisabled: !this.settings.enabled,
-        isUnavailable: this.state.queryStage.phase === 'unavailable'
+        currentQueueId: currentQueueId.get(),
+        matchHistoryTagPreference: this.settings.matchHistoryTagPreference
       }),
-      ({ isDisabled, isUnavailable }) => {
-        if (isUnavailable || isDisabled) {
+      ({ currentQueueId, matchHistoryTagPreference }) => {
+        if (!currentQueueId) {
+          this.state.setMatchHistoryTagParams({ tag: undefined })
+          return
+        }
+
+        this.state.setMatchHistoryTagParams({
+          tag:
+            currentQueueId && matchHistoryTagPreference === 'current'
+              ? `q_${currentQueueId}`
+              : undefined
+        })
+      },
+      { fireImmediately: true }
+    )
+
+    this._mobx.reaction(
+      () => this.state.queryStage.phase === 'unavailable',
+      (isUnavailable) => {
+        if (isUnavailable) {
           this._log.info('Clearing ongoing game state')
           this._queueKeeper.cancelAll()
           this.state.clear()
@@ -1110,7 +1112,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           }
 
           // 在未来的某个时间，可能出现无法获取 gameId 的情况
-          if (!this.state.queryStage.gameInfo.gameId) {
+          if (this.state.queryStage.phase !== 'in-game' || !this.state.queryStage.gameInfo.gameId) {
             return
           }
 

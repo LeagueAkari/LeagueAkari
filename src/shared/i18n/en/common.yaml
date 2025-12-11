@@ -42,6 +42,7 @@ teams:
   TEAM-ALL: All
   TEAM-100: Blue Team
   TEAM-200: Red Team
+  LOBBY: Lobby
   unknown: Unknown
 
 queueTypes:

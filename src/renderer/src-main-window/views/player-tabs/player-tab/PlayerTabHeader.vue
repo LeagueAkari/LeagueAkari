@@ -20,8 +20,8 @@
       <StreamerModeMaskedText>
         <template #masked>
           <div class="flex flex-col gap-1 self-center ml-3">
-            <div class="flex items-center gap-1 font-bold dark:text-white text-black">
-              <span>{{ maskedName }}</span>
+            <div class="flex items-center gap-1">
+              <span class="text-xl font-bold dark:text-white text-black">{{ maskedName }}</span>
               <NPopover
                 v-if="showSpectatorIndicator"
                 trigger="hover"
@@ -40,11 +40,12 @@
           </div>
         </template>
         <div class="flex flex-col gap-1 self-center ml-3">
-          <div
-            class="flex items-center gap-1 font-bold dark:text-white text-black"
-            :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
-          >
-            <CopyableText :text="summoner ? `${summoner.gameName}#${summoner.tagLine}` : '—'">
+          <div class="flex items-center gap-1">
+            <CopyableText
+              class="font-bold dark:text-white text-black"
+              :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
+              :text="summoner ? `${summoner.gameName}#${summoner.tagLine}` : '—'"
+            >
               {{ summoner?.gameName || '—' }}
             </CopyableText>
             <NPopover
@@ -72,7 +73,12 @@
     <!-- buttons -->
     <div class="flex gap-2 ml-8 justify-end">
       <!-- tag edit -->
-      <NButton secondary class="!size-42px" @click="isTagEditModalShowing = true" v-if="!isSelfTab">
+      <NButton
+        secondary
+        class="!size-42px"
+        @click="isTagEditModalShowing = true"
+        v-if="!isSelfTab && !isCrossRegion"
+      >
         <template #icon>
           <NIcon><Edit20Filled /></NIcon>
         </template>
@@ -116,7 +122,7 @@ import PlayerTagEditModal from './widgets/PlayerTagEditModal.vue'
 import RankedPane from './widgets/RankedPane.vue'
 import SpectatorPane from './widgets/SpectatorPane.vue'
 
-const { id, puuid, isSmallSize, isSelfTab } = usePlayerTab()
+const { id, puuid, isSmallSize, isSelfTab, isCrossRegion } = usePlayerTab()
 const { summoner, loadSummoner } = useSummoner()
 const { loadGames } = useEncounteredGames()
 const { loadMatchHistory } = useMatchHistory()
@@ -150,7 +156,7 @@ const maskedName = computed(() => {
   return streamerSummonerName(seed, 0)
 })
 
-const maskedTagLine = computed(() => masked(summoner.value?.tagLine || '—', '#•••'))
+const maskedTagLine = computed(() => masked(summoner.value?.tagLine || '—', '#####'))
 
 const showSpectatorIndicator = computed(() => isSmallSize.value && !!spectatorData.value)
 </script>

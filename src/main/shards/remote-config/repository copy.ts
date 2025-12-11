@@ -32,9 +32,7 @@ export interface ReleaseRequest extends RepositoryRequest {
  */
 export class RemoteGitRepository {
   private _http = axios.create({
-    headers: {
-      'User-Agent': USER_AGENT
-    }
+    headers: { 'User-Agent': USER_AGENT }
   })
 
   /**

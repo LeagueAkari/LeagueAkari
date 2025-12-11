@@ -303,6 +303,10 @@ OngoingGameSettings:
       all: 所有模式
       current: 当前模式
 
+  queryInLobbyPhase:
+    label: 在房间阶段生效
+    description: 位于房间时，查询房间内所有玩家的数据
+
   gameDetailsLoadCount:
     label: 对局详情加载数量
     description: 会额外加载前 {{countV}} 场对局的详细信息，用于对局分析
@@ -335,9 +339,9 @@ OngoingGameSettings:
       showLosingStreakTag:
         label: 连败场次
       showSoloKillsTag:
-        label: 场均单杀次数 (近 {{countV}} 场)
+        label: 场均单杀次数
       showSoloDeathsTag:
-        label: 场均被单杀次数 (近 {{countV}} 场)
+        label: 场均被单杀次数
       showAverageTeamDamageTag:
         label: 场均队伍伤害
       showAverageTeamDamageTakenTag:
@@ -1126,6 +1130,11 @@ MatchCard:
       teamLabel: 金币
       bestContent: '全场最高经济：{{value}}，占队伍经济的 {{rate}}%'
       teamContent: '队伍最高经济：{{value}}，占队伍经济的 {{rate}}%'
+    damageGoldEfficiency:
+      bestLabel: '★ 伤转率'
+      teamLabel: 伤转率
+      bestContent: '最高伤转率：{{rate}}%'
+      teamContent: '队内最高伤转率：{{rate}}%'
     cs:
       bestLabel: '★ 补兵'
       bestContent: '全场最高补兵：{{value}}'

@@ -5,7 +5,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { AdditionalTeamMembersResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
@@ -72,22 +72,6 @@ export interface SavedInfo {
   }
 }
 
-// copied from main shard
-export type QueryStage =
-  | {
-      phase: 'champ-select' | 'in-game'
-      gameInfo: {
-        queueId: number
-        queueType: string
-        gameId: number
-        gameMode: string
-      }
-    }
-  | {
-      phase: 'unavailable'
-      gameInfo: null
-    }
-
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
     enabled: true,
@@ -126,7 +110,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showWinRateTeamTag: true,
       showPrivacyTag: true,
       showAkariScoreTag: false
-    }
+    },
+    queryInLobbyPhase: false
   })
 
   const championSelections = shallowRef<Record<string, number>>({})

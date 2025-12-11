@@ -1,5 +1,6 @@
 import { Team } from '@shared/types/league-client/match-history'
 
+import { noZero } from '../utils'
 import { LcuOrSgpGameSummary } from '../wrapper'
 import { MatchBasicInfo } from './match-basic'
 import { MatchParticipant } from './participants'
@@ -61,6 +62,7 @@ export type MatchTeamStats = {
   maxKillParticipation: number
   totalKillParticipation: number
   maxTimeCCingOthers: number
+  maxDamageGoldEfficiency: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }
@@ -89,6 +91,7 @@ export type AggregateTeamStats = {
   maxKillParticipation: number
   totalKillParticipation: number
   maxTimeCCingOthers: number
+  maxDamageGoldEfficiency: number
   maxDamageShieldedOnTeammates: number | null // sgp only
   totalDamageShieldedOnTeammates: number | null // sgp only
 }
@@ -217,6 +220,9 @@ export function toTeams(
         maxKillParticipation: Math.max(...teamParticipants.map((p) => p.killParticipation)),
         totalKillParticipation: teamParticipants.reduce((acc, p) => acc + p.killParticipation, 0),
         maxTimeCCingOthers: Math.max(...teamParticipants.map((p) => p.timeCCingOthers)),
+        maxDamageGoldEfficiency: Math.max(
+          ...teamParticipants.map((p) => p.totalDamageDealtToChampions / noZero(p.goldEarned))
+        ),
         maxDamageShieldedOnTeammates:
           teamParticipants[0]?.totalDamageShieldedOnTeammates !== null
             ? Math.max(...teamParticipants.map((p) => p.totalDamageShieldedOnTeammates ?? 0))
@@ -256,6 +262,7 @@ export function toTeams(
     maxKillParticipation: Math.max(...teamStatsArr.map((t) => t.maxKillParticipation)),
     totalKillParticipation: teamStatsArr.reduce((acc, t) => acc + t.totalKillParticipation, 0),
     maxTimeCCingOthers: Math.max(...teamStatsArr.map((t) => t.maxTimeCCingOthers)),
+    maxDamageGoldEfficiency: Math.max(...teamStatsArr.map((t) => t.maxDamageGoldEfficiency)),
     maxDamageShieldedOnTeammates:
       teamStatsArr[0]?.maxDamageShieldedOnTeammates !== null
         ? Math.max(...teamStatsArr.map((t) => t.maxDamageShieldedOnTeammates ?? 0))

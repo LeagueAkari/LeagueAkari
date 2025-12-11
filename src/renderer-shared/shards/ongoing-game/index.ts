@@ -71,6 +71,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
   }
 
+  setQueryInLobbyPhase(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'queryInLobbyPhase', value)
+  }
+
   reload() {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
   }

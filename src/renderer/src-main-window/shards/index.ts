@@ -27,6 +27,7 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { StorageRenderer } from '@renderer-shared/shards/storage'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
+import { LeagueClientPeekRenderer } from './league-client-peek'
 import { MainWindowUiRenderer } from './main-window-ui'
 import { PlayerTabsRenderer } from './player-tabs'
 import { SimpleNotificationsRenderer } from './simple-notifications'
@@ -44,6 +45,7 @@ manager.use(ExtraAssetsRenderer)
 manager.use(GameClientRenderer)
 manager.use(InGameSendRenderer)
 manager.use(KeyboardShortcutsRenderer)
+manager.use(LeagueClientPeekRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LeagueClientUxRenderer)
 manager.use(LoggerRenderer)

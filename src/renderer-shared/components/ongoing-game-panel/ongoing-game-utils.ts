@@ -8,7 +8,7 @@ import IronMedal from '@renderer-shared/assets/ranked-icons/iron.png'
 import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
 
 export const RANKED_MEDAL_MAP: Record<string, string> = {
@@ -25,21 +25,9 @@ export const RANKED_MEDAL_MAP: Record<string, string> = {
 }
 
 export function useIdleState() {
-  const lc = useLeagueClientStore()
+  const ogs = useOngoingGameStore()
 
-  return computed(() => {
-    return (
-      lc.gameflow.phase === 'Lobby' ||
-      lc.gameflow.phase === 'None' ||
-      lc.gameflow.phase === 'Matchmaking' ||
-      lc.gameflow.phase === 'ReadyCheck' ||
-      lc.gameflow.phase === 'WatchInProgress' ||
-      (lc.gameflow.phase !== 'InProgress' &&
-        lc.champSelect.session &&
-        lc.champSelect.session.isSpectating) ||
-      lc.connectionState !== 'connected'
-    )
-  })
+  return computed(() => ogs.queryStage.phase === 'unavailable')
 }
 
 export const CHINESE_NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']

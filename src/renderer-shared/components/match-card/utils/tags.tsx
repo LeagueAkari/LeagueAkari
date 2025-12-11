@@ -476,6 +476,41 @@ function computeCcTags({ participant, team, teams }: TagContext, t: TFunction): 
   return []
 }
 
+function computeDamageGoldEfficiencyTags(
+  { participant, team, teams }: TagContext,
+  t: TFunction
+): PlayerTag[] {
+  if (!participant.damageGoldEfficiency) return []
+
+  const rate = (participant.damageGoldEfficiency * 100).toFixed(2)
+
+  if (participant.damageGoldEfficiency === teams.allTeamStats.maxDamageGoldEfficiency) {
+    return [
+      {
+        label: t('MatchCard.tags.damageGoldEfficiency.bestLabel'),
+        color: 'bg-lime-700 dark:bg-lime-800',
+        textColor: 'text-white',
+        content: t('MatchCard.tags.damageGoldEfficiency.bestContent', { rate }),
+        priority: 980
+      }
+    ]
+  }
+
+  if (participant.damageGoldEfficiency === team.maxDamageGoldEfficiency) {
+    return [
+      {
+        label: t('MatchCard.tags.damageGoldEfficiency.teamLabel'),
+        color: 'bg-lime-600 dark:bg-lime-700',
+        textColor: 'text-white',
+        content: t('MatchCard.tags.damageGoldEfficiency.teamContent', { rate }),
+        priority: 930
+      }
+    ]
+  }
+
+  return []
+}
+
 function computeTowerKillTags({ participant, basicInfo }: TagContext, t: TFunction): PlayerTag[] {
   const tags: PlayerTag[] = []
   const durationMinutes = basicInfo.gameDuration / 60
@@ -543,6 +578,7 @@ export function usePlayerTags() {
       ...computeShieldTags(context, t),
       ...computeSoloTags(context, t),
       ...computeGoldTags(context, t),
+      ...computeDamageGoldEfficiencyTags(context, t),
       ...computeCsTags(context, t),
       ...computeCsAdvantageTags(context, t),
       ...computeKillsTags(context, t),

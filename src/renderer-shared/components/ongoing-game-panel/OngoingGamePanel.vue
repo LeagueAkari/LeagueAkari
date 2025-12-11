@@ -10,7 +10,8 @@
             :class="[
               'self-center w-10px h-10px mr-2 rounded-full border border-white/20',
               teamColor === 'red' ? 'bg-#ff3333' : '',
-              teamColor === 'blue' ? 'bg-#40c1ff' : ''
+              teamColor === 'blue' ? 'bg-#40c1ff' : '',
+              teamColor === 'white' ? 'bg-neutral-200' : ''
             ]"
           ></div>
           <span class="text-base font-bold mr-4">{{ teamName }}</span>
@@ -57,7 +58,7 @@
       </div>
     </DefineOngoingTeam>
 
-    <NScrollbar v-if="!isInIdleState && ogs.settings.enabled" x-scrollable>
+    <NScrollbar v-if="!isInIdleState" x-scrollable>
       <div class="relative h-full m-auto p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
@@ -253,6 +254,9 @@ const mapTeamColor = (team: string) => {
 
     case 'TEAM-200':
       return 'red'
+
+    case 'LOBBY':
+      return 'white'
 
     default:
       return null

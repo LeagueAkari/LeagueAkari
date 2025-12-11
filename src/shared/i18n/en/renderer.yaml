@@ -302,6 +302,10 @@ OngoingGameSettings:
       all: All Modes
       current: Current Mode
 
+  queryInLobbyPhase:
+    label: Query in Lobby Phase
+    description: When enabled, the player stats will be queried when in the lobby.
+
   gameDetailsLoadCount:
     label: Game Details Load Count
     description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
@@ -334,9 +338,9 @@ OngoingGameSettings:
       showLosingStreakTag:
         label: Losing Streak
       showSoloKillsTag:
-        label: Average Solo Kills Per Game (Last {{countV}} games)
+        label: Average Solo Kills Per Game
       showSoloDeathsTag:
-        label: Average Solo Deaths Per Game (Last {{countV}} games)
+        label: Average Solo Deaths Per Game
       showAverageTeamDamageTag:
         label: Average Team Damage
       showAverageTeamDamageTakenTag:
@@ -1004,7 +1008,7 @@ MatchCard:
 
   overview:
     perfect: Perfect
-    damage: Damage
+    damage: Dmg.
 
   radar:
     damage: Damage ({{value}})
@@ -1127,6 +1131,11 @@ MatchCard:
       teamLabel: Gold
       bestContent: 'Highest gold: {{value}}, {{rate}}% of team'
       teamContent: 'Team-most gold: {{value}}, {{rate}}% of team'
+    damageGoldEfficiency:
+      bestLabel: '★ Dmg-Gold'
+      teamLabel: Dmg-Gold
+      bestContent: 'Best damage-gold efficiency: {{rate}}%'
+      teamContent: 'Team-best damage-gold efficiency: {{rate}}%'
     cs:
       bestLabel: '★ CS'
       bestContent: 'Highest CS: {{value}}'

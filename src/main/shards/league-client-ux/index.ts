@@ -1,10 +1,5 @@
 import { tools } from '@leagueakari/league-akari-addons'
-import {
-  UxCommandLine,
-  getProcessPidByName,
-  parseCommandLine,
-  queryUxCommandLine
-} from '@main/utils/ux-cmd'
+import { UxCommandLine, parseCommandLine, queryUxCommandLine } from '@main/utils/ux-cmd'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -30,7 +25,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
-  static CLIENT_CMD_LONG_POLL_INTERVAL = 8000
+  static CLIENT_CMD_LONG_POLL_INTERVAL = 15000
 
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
@@ -68,6 +63,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       'hasClientButNoCommandLine'
     ])
 
+    this._ipc.onCall(LeagueClientUxMain.id, 'update', () => this.update())
     this._ipc.onCall(LeagueClientUxMain.id, 'rebuildWmi', () => this._rebuildWmi())
   }
 
@@ -124,10 +120,9 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
         return []
       }
 
-      const pids = await getProcessPidByName(LeagueClientUxMain.UX_PROCESS_NAME)
       const cmds = await queryUxCommandLine(LeagueClientUxMain.UX_PROCESS_NAME)
 
-      this.state.setHasClientButNoCommandLine(pids.length !== 0 && cmds.length === 0)
+      this.state.setHasClientButNoCommandLine(false)
 
       return cmds
     } else {
