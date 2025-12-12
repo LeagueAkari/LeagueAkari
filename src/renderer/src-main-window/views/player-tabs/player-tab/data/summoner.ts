@@ -63,7 +63,7 @@ export function provideSummoner(props: {
   const notification = useNotification()
 
   const sgpApiAvailable = computed(() => {
-    return sgps.isTokenReady && (sgps.sgpServerConfig.servers[sgpServerId.value]?.common ?? false)
+    return sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.common ?? false)
   })
 
   const loadSummoner = async () => {

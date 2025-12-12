@@ -78,8 +78,8 @@ export class RemoteConfigState {
   isUpdatingSupportedQueues: boolean = false
   isUpdatingOngoingGameConfig: boolean = false
 
-  setSgpServerConfig(sgpServerConfig: LeagueServersConfig) {
-    this.leagueServers = sgpServerConfig
+  setLeagueServers(leagueServers: LeagueServersConfig) {
+    this.leagueServers = leagueServers
   }
 
   setLatestRelease(latestRelease: LatestReleaseWithMetadata | null) {

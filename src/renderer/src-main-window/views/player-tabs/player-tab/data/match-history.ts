@@ -97,7 +97,7 @@ export function provideMatchHistory(props: {
 
   const sgpApiAvailable = computed(() => {
     return (
-      sgps.isTokenReady && (sgps.sgpServerConfig.servers[sgpServerId.value]?.matchHistory ?? false)
+      sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.matchHistory ?? false)
     )
   })
 
@@ -166,7 +166,7 @@ export function provideMatchHistory(props: {
         }
 
         // 检查 SGP 服务器支持
-        if (!sgps.sgpServerConfig.servers[sgpServerId.value]?.matchHistory) {
+        if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
           return
         }
 

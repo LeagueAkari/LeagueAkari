@@ -29,7 +29,7 @@
                 </template>
                 <div class="cc__region">
                   {{
-                    sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
+                    sgps.leagueServers.serverNames[as.settings.locale]?.[
                       sgps.availability.sgpServerId
                     ] || sgps.availability.sgpServerId
                   }}
@@ -124,7 +124,7 @@
                 <div class="cc__name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
                 <div class="cc__region">
                   {{
-                    sgps.sgpServerConfig.serverNames[as.settings.locale]?.[
+                    sgps.leagueServers.serverNames[as.settings.locale]?.[
                       getSgpServerId(cmd.region, cmd.rsoPlatformId)
                     ] || getSgpServerId(cmd.region, cmd.rsoPlatformId)
                   }}

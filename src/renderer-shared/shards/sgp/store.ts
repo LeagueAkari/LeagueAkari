@@ -1,4 +1,4 @@
-import { SgpServersConfig } from '@shared/types/shards/sgp'
+import { LeagueServersConfig } from '@shared/validators/remote-config'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 
@@ -21,7 +21,7 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
     }
   })
 
-  const sgpServerConfig = shallowRef<SgpServersConfig>({
+  const leagueServers = shallowRef<LeagueServersConfig>({
     version: 0,
     lastUpdate: 0,
     servers: {},
@@ -38,7 +38,7 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
   return {
     availability,
     isTokenReady,
-    sgpServerConfig,
+    leagueServers,
     supportedQueues
   }
 })

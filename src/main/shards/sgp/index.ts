@@ -54,7 +54,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._mobx.propSync(SgpMain.id, 'state', this.state, [
       'availability',
       'isTokenReady',
-      'sgpServerConfig',
+      'leagueServers',
       'supportedQueues'
     ])
 
@@ -148,7 +148,7 @@ export class SgpMain implements IAkariShardInitDispose {
         config.headers.setAuthorization(`Bearer ${token}`)
       }
 
-      const serverConfig = this.state.sgpServerConfig.servers[preferredSgpServerId]
+      const serverConfig = this.state.leagueServers.servers[preferredSgpServerId]
 
       if (!serverConfig) {
         throw new Error(`Server config not found for sgp server ID: ${preferredSgpServerId}`)

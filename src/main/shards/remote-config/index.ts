@@ -243,7 +243,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const { success, data, error } = leagueServersConfigV1Schema.safeParse(rawJson)
 
       if (success) {
-        this.state.setSgpServerConfig(data)
+        this.state.setLeagueServers(data)
       } else {
         this._log.warn('Invalid sgp league servers json', error)
       }
@@ -417,7 +417,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
       if (success) {
         if (data.lastUpdate > this.state.leagueServers.lastUpdate) {
-          this.state.setSgpServerConfig(data)
+          this.state.setLeagueServers(data)
           await this._setting.writeToJsonConfigFile(
             RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH,
             data

@@ -1,4 +1,3 @@
-import { SgpServersConfig } from '@shared/types/shards/sgp'
 import { getSgpServerId } from '@shared/utils/sgp'
 import { makeAutoObservable, observable } from 'mobx'
 
@@ -6,14 +5,8 @@ import { LeagueClientState } from '../league-client/state'
 import { RemoteConfigMain } from '../remote-config'
 
 export class SgpState {
-  sgpServerConfig: SgpServersConfig = {
-    version: 0,
-    lastUpdate: 0,
-    servers: {},
-    serverNames: {},
-    tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
-    tencentServerSummonerInteroperability: []
+  get leagueServers() {
+    return this._remoteConfig.state.leagueServers
   }
 
   get availability() {
@@ -30,7 +23,7 @@ export class SgpState {
     }
 
     const sgpServerId = getSgpServerId(this._lcState.auth.region, this._lcState.auth.rsoPlatformId)
-    const supported = this.sgpServerConfig.servers[sgpServerId.toUpperCase()] || {
+    const supported = this.leagueServers.servers[sgpServerId.toUpperCase()] || {
       matchHistory: false,
       common: false
     }
@@ -60,10 +53,6 @@ export class SgpState {
     this.isLeagueSessionTokenSet = value
   }
 
-  setSgpServerConfig(value: SgpServersConfig) {
-    this.sgpServerConfig = value
-  }
-
   setSupportedQueues(value: number[]) {
     this.supportedQueues = value
   }
@@ -79,7 +68,7 @@ export class SgpState {
     this.setSupportedQueues(this._remoteConfig.state.supportedQueues.queues)
 
     makeAutoObservable(this, {
-      sgpServerConfig: observable.ref,
+      leagueServers: observable.ref,
       supportedQueues: observable.ref
     })
   }

@@ -77,7 +77,7 @@
                 </NBadge>
                 <div class="sgp-server" v-if="isNeedToShowSgpServer">
                   {{
-                    sgps.sgpServerConfig.serverNames[as.settings.locale]?.[tab.sgpServerId] ||
+                    sgps.leagueServers.serverNames[as.settings.locale]?.[tab.sgpServerId] ||
                     tab.sgpServerId
                   }}
                 </div>

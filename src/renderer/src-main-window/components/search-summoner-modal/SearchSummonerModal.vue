@@ -126,8 +126,7 @@
             >
               <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
                 {{
-                  sgps.sgpServerConfig.serverNames[as.settings.locale][s.sgpServerId] ||
-                  s.sgpServerId
+                  sgps.leagueServers.serverNames[as.settings.locale][s.sgpServerId] || s.sgpServerId
                 }}
               </div>
               <div class="game-name-line">{{ s.summoner.gameName }}</div>
@@ -344,9 +343,7 @@ const searchHistory = shallowRef<SearchHistoryItem[]>([])
 const filteredSearchHistory = computed(() => {
   if (sgps.availability.region === 'TENCENT') {
     return searchHistory.value.filter((item) => {
-      return sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.includes(
-        item.sgpServerId
-      )
+      return sgps.leagueServers.tencentServerMatchHistoryInteroperability.includes(item.sgpServerId)
     })
   }
 
@@ -400,9 +397,9 @@ const tencentServers = computed(() => {
   }
 
   // 出于硬编码, 这里仅仅使用 match-history 的互操作性预定义表
-  return sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.map((serverId) => {
+  return sgps.leagueServers.tencentServerMatchHistoryInteroperability.map((serverId) => {
     return {
-      label: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[serverId] || serverId,
+      label: sgps.leagueServers.serverNames[as.settings.locale]?.[serverId] || serverId,
       value: serverId
     }
   })
