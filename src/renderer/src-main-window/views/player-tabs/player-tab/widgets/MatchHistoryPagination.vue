@@ -17,7 +17,7 @@
       size="small"
       :options="sgpTagOptions"
       :disabled="isLoading"
-      class="!w-36"
+      class="!w-56"
     />
 
     <!-- 每页条数 -->
