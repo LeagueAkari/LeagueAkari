@@ -1,4 +1,3 @@
-import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
 import {
@@ -8,9 +7,6 @@ import {
 } from '@shared/http-api-axios-helper/sgp/patterns'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosRequestConfig } from 'axios'
-import dayjs from 'dayjs'
-import ofs from 'node:original-fs'
-import path from 'node:path'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -18,26 +14,19 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { RemoteConfigMain } from '../remote-config'
-import { SettingFactoryMain } from '../setting-factory'
-import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { validateSchema } from './config-validation'
 import { SgpState } from './state'
 
 /**
- * Service Gateway Proxy
+ * Service Gateway Proxy (for **League** of Legends)
  * 处理任何跨区相关逻辑, 提供 API 调用或数据转换
  */
 @Shard(SgpMain.id)
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
 
-  static LEAGUE_SGP_SERVERS_JSON = 'league-servers.json'
-  static CONFIG_SCHEMA_VERSION = 1
-
   public readonly state: SgpState
 
   private readonly _log: AkariLogger
-  private readonly _setting: SetterSettingService
 
   private readonly _api: SgpHttpApiAxiosHelper
 
@@ -50,22 +39,18 @@ export class SgpMain implements IAkariShardInitDispose {
   constructor(
     private readonly _app: AppCommonMain,
     _loggerFactory: LoggerFactoryMain,
-    _settingFactory: SettingFactoryMain,
     private readonly _protocol: AkariProtocolMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _lc: LeagueClientMain,
     private readonly _remoteConfig: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(SgpMain.id)
-    this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
-    this.state = new SgpState(this._lc.state)
+    this.state = new SgpState(this._lc.state, this._remoteConfig)
     this._api = new SgpHttpApiAxiosHelper(this._http)
   }
 
   async onInit() {
-    await this._loadSgpServerConfigFromLocalFile()
-
     this._mobx.propSync(SgpMain.id, 'state', this.state, [
       'availability',
       'isTokenReady',
@@ -73,88 +58,12 @@ export class SgpMain implements IAkariShardInitDispose {
       'supportedQueues'
     ])
 
-    this._handleIpcCall()
     this._handleUpdateHttpProxy()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
-    this._handleUpdateSgpServerConfig()
     this._initHttpInstance()
     this._handleProtocol()
   }
-
-  /**
-   * 从本地的配置区加载配置文件. 若不存在, 则从应用内置的配置文件中加载, 并复制到本地配置区
-   */
-  private async _loadSgpServerConfigFromLocalFile() {
-    try {
-      const exists = await this._setting.jsonConfigFileExists(SgpMain.LEAGUE_SGP_SERVERS_JSON)
-
-      if (!exists) {
-        this._log.info(
-          'No saved configuration file found, will use built-in SGP server configuration file'
-        )
-
-        const localConfigPath = path.join(
-          RES_POSITIONER,
-          '..',
-          'builtin-config',
-          'sgp',
-          'league-servers.json'
-        )
-
-        if (ofs.existsSync(localConfigPath)) {
-          const data = await ofs.promises.readFile(localConfigPath, 'utf-8')
-          await this._setting.writeToJsonConfigFile(
-            SgpMain.LEAGUE_SGP_SERVERS_JSON,
-            JSON.parse(data)
-          )
-        } else {
-          this._log.warn('Built-in SGP server configuration file not found')
-          return
-        }
-      }
-
-      const json = await this._setting.readFromJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON)
-
-      if (this._validateConfig(json)) {
-        this.state.setSgpServerConfig(json)
-        this._log.info(
-          'Loaded local SGP server configuration file',
-          dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-        )
-      }
-    } catch (error) {
-      this._log.warn(
-        `Error occurred while loading SGP server configuration file: ${formatError(error)}`
-      )
-    }
-  }
-
-  /**
-   * 版本和格式校验
-   */
-  private _validateConfig(json: any) {
-    const { valid, errors } = validateSchema(json)
-
-    if (!valid) {
-      this._log.warn(
-        `SGP server configuration file format error: ${errors?.map((e) => formatError(e))}`
-      )
-      return false
-    }
-
-    // support only the exact version
-    if (json.version !== SgpMain.CONFIG_SCHEMA_VERSION) {
-      this._log.warn(
-        `SGP server configuration file version mismatch, current version: ${SgpMain.CONFIG_SCHEMA_VERSION}, remote version: ${json.version}`
-      )
-      return false
-    }
-
-    return true
-  }
-
-  private _handleIpcCall() {}
 
   private _maintainEntitlementsToken() {
     this._mobx.reaction(
@@ -211,29 +120,6 @@ export class SgpMain implements IAkariShardInitDispose {
         }
       },
       { fireImmediately: true }
-    )
-  }
-
-  private _handleUpdateSgpServerConfig() {
-    this._mobx.reaction(
-      () => this._remoteConfig.state.sgpServerConfig,
-      async (config) => {
-        if (this._validateConfig(config)) {
-          if (config.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
-            this.state.setSgpServerConfig(config)
-            await this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, config)
-            this._log.info(
-              'Updated local SGP server configuration file',
-              dayjs(config.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-            )
-          } else {
-            this._log.info(
-              'Remote SGP server configuration file has no updates',
-              dayjs(config.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-            )
-          }
-        }
-      }
     )
   }
 
@@ -342,6 +228,4 @@ export class SgpMain implements IAkariShardInitDispose {
       }
     })
   }
-
-  async onDispose() {}
 }

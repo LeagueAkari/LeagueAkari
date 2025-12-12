@@ -74,8 +74,8 @@ const router = useRouter()
 const route = useRoute()
 
 const shouldShowOngoingGameBadge = ref(false)
-const isInOngoingStage = computed(() => {
-  return ogs.queryStage.phase !== 'unavailable'
+const isInCombatPhase = computed(() => {
+  return ogs.queryStage.phase !== 'unavailable' && ogs.queryStage.phase !== 'lobby'
 })
 
 const toggleCollapse = () => {
@@ -83,7 +83,7 @@ const toggleCollapse = () => {
 }
 
 watch(
-  () => isInOngoingStage.value,
+  () => isInCombatPhase.value,
   (yes) => {
     if (yes && currentMenu.value !== 'ongoing-game') {
       shouldShowOngoingGameBadge.value = true

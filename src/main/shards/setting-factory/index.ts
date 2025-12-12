@@ -257,7 +257,10 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       filename
     )
 
-    return fs.existsSync(jsonPath)
+    return fs.promises
+      .access(jsonPath, fs.constants.F_OK)
+      .then(() => true)
+      .catch(() => false)
   }
 
   async onInit() {

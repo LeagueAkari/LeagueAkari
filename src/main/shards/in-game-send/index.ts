@@ -465,7 +465,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
     )
 
     this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
-      return this._rc.repo.getInGameSendTemplateCatalog()
+      return this._rc.repo.getInGameSendTemplateCatalog({
+        source: this._rc.settings.preferredSource,
+        repo: 'akari-config'
+      })
     })
 
     this._ipc.onCall(InGameSendMain.id, 'downloadTemplateFromRemote', (_, id: string) => {
@@ -649,14 +652,20 @@ export class InGameSendMain implements IAkariShardInitDispose {
   }
 
   private async _downloadTemplateFromRemote(id: string) {
-    const catalog = await this._rc.repo.getInGameSendTemplateCatalog()
-    const template = catalog.templates.find((t) => t.id === id)
+    const catalog = await this._rc.repo.getInGameSendTemplateCatalog({
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config'
+    })
+    const template = catalog.data.templates.find((t) => t.id === id)
 
     if (!template) {
       throw new Error(`Template ${id} not found`)
     }
 
-    const { data: code } = await this._rc.repo.getRawContent(template.path)
+    const { data: code } = await this._rc.repo.getRawContent(template.path, {
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config'
+    })
 
     this._createTemplate({
       name: template.name,

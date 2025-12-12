@@ -173,7 +173,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           this._log.info(
             `In WaitingForStats, waiting for ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
           )
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT })
           return
         }
 
@@ -182,13 +182,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           this._log.info(
             `Waiting for ballot event ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`
           )
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT })
           return
         }
 
         if (phase === 'EndOfGame' && enabled) {
           this._log.info(`Will return to lobby in ${AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT} ms`)
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT })
           return
         }
       },
@@ -202,7 +202,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       ([phase, enabled]) => {
         if (phase === 'Reconnect' && enabled) {
           this._log.info('Will attempt to reconnect in a short delay')
-          this._reconnectTask.start(1000)
+          this._reconnectTask.start({ delay: 1000 })
         } else {
           this._reconnectTask.cancel()
         }

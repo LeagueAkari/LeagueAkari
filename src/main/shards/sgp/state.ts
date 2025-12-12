@@ -3,7 +3,7 @@ import { getSgpServerId } from '@shared/utils/sgp'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientState } from '../league-client/state'
-import { SUPPORTED_QUEUES } from './supported-queues'
+import { RemoteConfigMain } from '../remote-config'
 
 export class SgpState {
   sgpServerConfig: SgpServersConfig = {
@@ -50,7 +50,7 @@ export class SgpState {
   isEntitlementsTokenSet = false
   isLeagueSessionTokenSet = false
 
-  supportedQueues = SUPPORTED_QUEUES
+  supportedQueues: number[] = []
 
   setEntitlementsTokenSet(value: boolean) {
     this.isEntitlementsTokenSet = value
@@ -64,13 +64,23 @@ export class SgpState {
     this.sgpServerConfig = value
   }
 
+  setSupportedQueues(value: number[]) {
+    this.supportedQueues = value
+  }
+
   get isTokenReady() {
     return this.isEntitlementsTokenSet && this.isLeagueSessionTokenSet
   }
 
-  constructor(private _lcState: LeagueClientState) {
+  constructor(
+    private _lcState: LeagueClientState,
+    private _remoteConfig: RemoteConfigMain
+  ) {
+    this.setSupportedQueues(this._remoteConfig.state.supportedQueues.queues)
+
     makeAutoObservable(this, {
-      sgpServerConfig: observable.ref
+      sgpServerConfig: observable.ref,
+      supportedQueues: observable.ref
     })
   }
 }

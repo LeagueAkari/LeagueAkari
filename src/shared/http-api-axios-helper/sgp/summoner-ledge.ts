@@ -10,9 +10,10 @@ export class SummonerLedgeHttpApi {
   postSummonersByPuuids(puuids: string[], options: SgpRegionParam = {}) {
     return this._http.post<SgpSummonerLol[]>(
       `/summoner-ledge/v1/regions/${URL_PLACEHOLDER_SUB_ID}/summoners/puuids`,
-      puuids,
+      { puuids },
       {
         headers: {
+          'Content-Type': 'application/json',
           'X-Akari-Sgp-Server-Id': options.__sgpServerId,
           'X-Akari-Token-Type': 'league-session'
         }

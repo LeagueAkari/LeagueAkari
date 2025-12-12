@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.4.0-rabi.5",
+  "version": "1.4.0-rabi.6",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -34,8 +34,8 @@
     "reflect-metadata": "^0.2.2",
     "regedit": "^5.1.4",
     "sqlite3": "5.1.7",
-    "typeorm": "^0.3.27",
-    "winston": "^3.18.3",
+    "typeorm": "^0.3.28",
+    "winston": "^3.19.0",
     "ws": "^8.18.3",
     "zod": "^4.1.13"
   },
@@ -49,7 +49,7 @@
     "@types/lodash": "^4.17.21",
     "@types/luaparse": "^0.2.13",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.3",
     "@types/node-7z": "^2.1.11",
     "@types/semver": "^7.7.1",
     "@types/ws": "^8.18.1",
@@ -74,9 +74,9 @@
     "dayjs": "^1.11.19",
     "electron": "37.10.3",
     "electron-builder": "26.0.12",
-    "electron-vite": "^4.0.1",
+    "electron-vite": "^5.0.0",
     "gray-matter": "^4.0.3",
-    "i18next": "^25.7.0",
+    "i18next": "^25.7.2",
     "i18next-vue": "^5.3.1",
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
@@ -84,20 +84,20 @@
     "p-queue": "^9.0.1",
     "pinia": "^3.0.4",
     "pinyin-pro": "^3.27.0",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "quick-lru": "^7.3.0",
     "safe-stable-stringify": "^2.5.0",
     "semver": "^7.7.3",
     "typescript": "~5.9.3",
-    "unocss": "^66.5.10-beta.1",
+    "unocss": "^66.5.10",
     "vfonts": "^0.0.3",
-    "vite": "^7.2.6",
+    "vite": "^7.2.7",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vue": "^3.5.25",
     "vue-chartjs": "^5.3.3",
     "vue-codemirror": "^6.1.1",
-    "vue-router": "^4.6.3",
-    "vue-tsc": "^3.1.5"
+    "vue-router": "^4.6.4",
+    "vue-tsc": "^3.1.8"
   },
   "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f"
 }

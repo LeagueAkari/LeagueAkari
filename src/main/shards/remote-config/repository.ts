@@ -1,11 +1,14 @@
 import { USER_AGENT } from '@shared/constants/common'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
 import { SgpServersConfig } from '@shared/types/shards/sgp'
+import {
+  InGameSendTemplateCatalog,
+  OngoingGameConfig,
+  SupportedQueues
+} from '@shared/validators/remote-config'
 import axios from 'axios'
 import crypto from 'crypto'
 import matter from 'gray-matter'
-
-import { InGameSendTemplateCatalog, OngoingGameConfig, SupportedQueues } from './validation'
 
 export type RemoteRepositorySource = 'github' | 'gitee'
 
@@ -15,7 +18,7 @@ export interface RepositoryRequest {
 }
 
 export interface RepositoryBranchRequest extends RepositoryRequest {
-  branch: string
+  branch?: string
 }
 
 export interface AnnouncementRequest extends RepositoryBranchRequest {
@@ -54,7 +57,7 @@ export class RemoteGitRepository {
     return `https://gitee.com/api/v5/repos/LeagueAkari/${r}/${uri}`
   }
 
-  private _rawContentUrl(uri: string, { source, repo, branch }: RepositoryBranchRequest) {
+  private _rawContentUrl(uri: string, { source, repo, branch = 'main' }: RepositoryBranchRequest) {
     if (uri.startsWith('/')) {
       uri = uri.slice(1)
     }
@@ -94,35 +97,27 @@ export class RemoteGitRepository {
   }
 
   async getSgpLeagueServersConfig(request: RepositoryBranchRequest) {
-    const { data } = await this._http.get<SgpServersConfig>(
+    return this._http.get<SgpServersConfig>(
       this._rawContentUrl(`/config/sgp/league-servers.json`, request)
     )
-
-    return data
   }
 
   async getInGameSendTemplateCatalog(request: RepositoryBranchRequest) {
-    const { data } = await this._http.get<InGameSendTemplateCatalog>(
+    return this._http.get<InGameSendTemplateCatalog>(
       this._rawContentUrl(`/config/in-game-send/templates/catalog.json`, request)
     )
-
-    return data
   }
 
   async getSupportedQueues(request: RepositoryBranchRequest) {
-    const { data } = await this._http.get<SupportedQueues>(
+    return this._http.get<SupportedQueues>(
       this._rawContentUrl(`/config/sgp/supported-queues.json`, request)
     )
-
-    return data
   }
 
   async getOngoingGameConfig(request: RepositoryBranchRequest) {
-    const { data } = await this._http.get<OngoingGameConfig>(
+    return this._http.get<OngoingGameConfig>(
       this._rawContentUrl(`/config/ongoing-game/config.json`, request)
     )
-
-    return data
   }
 
   /**

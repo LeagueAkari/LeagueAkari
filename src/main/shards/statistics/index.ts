@@ -26,7 +26,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
 
   constructor(_loggerFactory: LoggerFactoryMain, _settingFactory: SettingFactoryMain) {
     this._log = _loggerFactory.create(StatisticsMain.id)
-    this._setting = _settingFactory.register(StatisticsMain.id, {}, {})
+    this._setting = _settingFactory.register(StatisticsMain.id, {})
   }
 
   /**

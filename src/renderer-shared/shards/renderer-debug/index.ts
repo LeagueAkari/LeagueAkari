@@ -1,6 +1,6 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { RadixEventEmitter } from '@shared/event-emitter'
 import { LcuEvent } from '@shared/types/league-client/event'
+import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import { watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
