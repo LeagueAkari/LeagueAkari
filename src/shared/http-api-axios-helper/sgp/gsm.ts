@@ -2,7 +2,11 @@ import { SgpGsmLedgeRegion, SgpGsmLedgeRegionGame, SpectatorData } from '@shared
 import { AxiosInstance } from 'axios'
 
 import { SgpRegionParam } from './dto'
-import { URL_PLACEHOLDER_SUB_ID } from './patterns'
+import {
+  AKARI_HEADER_SGP_SERVER_ID,
+  AKARI_HEADER_TOKEN_TYPE,
+  URL_PLACEHOLDER_SUB_ID
+} from './patterns'
 
 export class GsmHttpApi {
   constructor(private _http: AxiosInstance) {}
@@ -12,8 +16,8 @@ export class GsmHttpApi {
       `/gsm/v1/ledge/spectator/region/${URL_PLACEHOLDER_SUB_ID}/puuid/${puuid}`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'league-session'
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
         }
       }
     )
@@ -24,8 +28,8 @@ export class GsmHttpApi {
       `/gsm/v1/ledge/region/${URL_PLACEHOLDER_SUB_ID}/puuid/${puuid}`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'league-session'
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
         }
       }
     )
@@ -36,8 +40,8 @@ export class GsmHttpApi {
       `/gsm/v1/ledge/region/${URL_PLACEHOLDER_SUB_ID}/gameId/${gameId}`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'league-session'
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
         }
       }
     )

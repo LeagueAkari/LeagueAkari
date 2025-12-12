@@ -1,12 +1,15 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
 import {
+  AKARI_HEADER_FORCE_STREAM_COLLECT,
   AKARI_HEADER_SGP_SERVER_ID,
   AKARI_HEADER_TOKEN_TYPE,
   URL_PLACEHOLDER_SUB_ID
 } from '@shared/http-api-axios-helper/sgp/patterns'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosRequestConfig } from 'axios'
+import { Buffer } from 'node:buffer'
+import { Readable } from 'node:stream'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -27,9 +30,7 @@ export class SgpMain implements IAkariShardInitDispose {
   public readonly state: SgpState
 
   private readonly _log: AkariLogger
-
   private readonly _api: SgpHttpApiAxiosHelper
-
   private readonly _http = axios.create()
 
   get api() {
@@ -97,9 +98,7 @@ export class SgpMain implements IAkariShardInitDispose {
         }
 
         const copied = token.slice(0, 24) + '...'
-
         this._log.info(`Update Lol League Session Token: ${copied}`)
-
         this.state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }
@@ -124,7 +123,7 @@ export class SgpMain implements IAkariShardInitDispose {
   }
 
   private _initHttpInstance() {
-    this._http.interceptors.request.use((config) => {
+    this._http.interceptors.request.use(async (config) => {
       const preferredSgpServerId =
         (config.headers.get(AKARI_HEADER_SGP_SERVER_ID) as string | null) ||
         this.state.availability.sgpServerId
@@ -140,16 +139,13 @@ export class SgpMain implements IAkariShardInitDispose {
 
       if (requiredTokenType) {
         const token = this._getToken(requiredTokenType)
-
         if (!token) {
           throw new Error(`Token not found for type: ${requiredTokenType}`)
         }
-
         config.headers.setAuthorization(`Bearer ${token}`)
       }
 
       const serverConfig = this.state.leagueServers.servers[preferredSgpServerId]
-
       if (!serverConfig) {
         throw new Error(`Server config not found for sgp server ID: ${preferredSgpServerId}`)
       }
@@ -164,8 +160,19 @@ export class SgpMain implements IAkariShardInitDispose {
       }
 
       config.baseURL = baseUrl
+
+      const forceContentLength = config.headers.get(AKARI_HEADER_FORCE_STREAM_COLLECT) !== null
+
+      if (forceContentLength && isNodeReadableStream(config.data)) {
+        config.data = await readNodeStreamToBuffer(config.data)
+        config.maxBodyLength = Infinity
+        config.maxContentLength = Infinity
+        config.headers.delete('Transfer-Encoding')
+      }
+
       config.headers.delete(AKARI_HEADER_SGP_SERVER_ID)
       config.headers.delete(AKARI_HEADER_TOKEN_TYPE)
+      config.headers.delete(AKARI_HEADER_FORCE_STREAM_COLLECT)
 
       return config
     })
@@ -176,7 +183,6 @@ export class SgpMain implements IAkariShardInitDispose {
       const [_, rsoPlatformId] = sgpServerId.split('_')
       return rsoPlatformId
     }
-
     return sgpServerId
   }
 
@@ -192,7 +198,6 @@ export class SgpMain implements IAkariShardInitDispose {
   private _handleProtocol() {
     this._protocol.registerDomain('sgp', async (uri, req) => {
       const reqHeaders: Record<string, string> = {}
-
       req.headers.forEach((value, key) => {
         reqHeaders[key] = value
       })
@@ -228,4 +233,20 @@ export class SgpMain implements IAkariShardInitDispose {
       }
     })
   }
+}
+
+function isNodeReadableStream(value: any): value is Readable {
+  return (
+    !!value &&
+    (value instanceof Readable || (typeof value === 'object' && typeof value.pipe === 'function'))
+  )
+}
+
+async function readNodeStreamToBuffer(stream: Readable): Promise<Buffer> {
+  const chunks: Buffer[] = []
+  for await (const chunk of stream) {
+    if (!chunk) continue
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+  }
+  return Buffer.concat(chunks)
 }

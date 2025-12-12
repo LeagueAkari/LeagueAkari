@@ -2,7 +2,11 @@ import { SgpStatsEndOfGameGame } from '@shared/types/sgp/stats'
 import { AxiosInstance } from 'axios'
 
 import { SgpRegionParam } from './dto'
-import { URL_PLACEHOLDER_SUB_ID } from './patterns'
+import {
+  AKARI_HEADER_SGP_SERVER_ID,
+  AKARI_HEADER_TOKEN_TYPE,
+  URL_PLACEHOLDER_SUB_ID
+} from './patterns'
 
 export class StatsHttpApi {
   constructor(private _http: AxiosInstance) {}
@@ -12,8 +16,8 @@ export class StatsHttpApi {
       `/stats/endOfGame/region/${URL_PLACEHOLDER_SUB_ID}/gameId/${gameId}/puuid/${puuid}`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'league-session'
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
         }
       }
     )
