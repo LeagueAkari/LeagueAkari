@@ -415,7 +415,9 @@
         </div>
       </div>
       <div class="placeholder error-loading" v-else-if="matchHistoryLoading === 'error'">
-        <NIcon><WarningIcon /></NIcon>
+        <NButton size="tiny" @click="emits('reload', puuid)">
+          {{ t('PlayerInfoCard.reloadMatchHistory') }}
+        </NButton>
         <span>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</span>
       </div>
       <div class="placeholder" v-else>{{ t('PlayerInfoCard.empty') }}</div>
@@ -431,11 +433,7 @@ import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import {
-  QueryStage,
-  SavedInfo,
-  useOngoingGameStore
-} from '@renderer-shared/shards/ongoing-game/store'
+import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
@@ -444,13 +442,13 @@ import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { QueryStage } from '@shared/types/shards/ongoing-game'
 import { ParsedRole } from '@shared/utils/ranked'
-import { Warning as WarningIcon } from '@vicons/ionicons5'
 import { StarRound as StarRoundIcon } from '@vicons/material'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NSpin, NVirtualList } from 'naive-ui'
+import { NButton, NPopover, NSpin, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import {
@@ -500,6 +498,7 @@ const emits = defineEmits<{
   showGameById: [gameId: number, puuid: string]
   showSavedInfo: [puuid: string]
   highlight: [premadeTeamId: string, boolean]
+  reload: [puuid: string]
 }>()
 
 const { t } = useTranslation()

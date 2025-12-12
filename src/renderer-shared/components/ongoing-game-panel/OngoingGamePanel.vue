@@ -53,6 +53,7 @@
             @show-game-by-id="emits('showGameById', $event, player)"
             @to-summoner="emits('toSummoner', $event)"
             @highlight="handleHighlightSubTeam"
+            @reload="og.reloadPlayer"
           />
         </div>
       </div>
@@ -104,7 +105,9 @@
 </template>
 
 <script setup lang="ts">
+import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
@@ -134,6 +137,7 @@ const lcs = useLeagueClientStore()
 
 const { t } = useTranslation()
 
+const og = useInstance(OngoingGameRenderer)
 const ogs = useOngoingGameStore()
 
 const isInIdleState = useIdleState()

@@ -2199,6 +2199,7 @@ ItemDisplay:
   combinePrice: Combine for {{gold}} G
 
 PlayerInfoCard:
+  reload: Reload
   empty: No Content
   loadingMatchHistory: Loading...
   errorLoadingMatchHistory: Unable to load
