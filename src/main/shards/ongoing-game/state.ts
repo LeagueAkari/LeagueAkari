@@ -13,6 +13,7 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
+import { RemoteConfigMain } from '../remote-config'
 import { SgpMain } from '../sgp'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
 import { memberMerge } from './member-merge'
@@ -134,7 +135,11 @@ export class OngoingGameState {
       }
 
       const processMember = (p: ChampSelectTeam) => {
-        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
           const puuid = decryptUuid(p.obfuscatedPuuid)
           selections[puuid] = p.championId || p.championPickIntent
         }
@@ -188,7 +193,11 @@ export class OngoingGameState {
       }
 
       const processMember = (p: ChampSelectTeam) => {
-        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
           const puuid = decryptUuid(p.obfuscatedPuuid)
           assignments[puuid] = {
             position: p.assignedPosition.toUpperCase(),
@@ -269,7 +278,11 @@ export class OngoingGameState {
             ...this._data.champSelect.session.theirTeam
           ]
             .map((p) => {
-              if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+              if (
+                p.nameVisibilityType === 'HIDDEN' &&
+                p.obfuscatedPuuid &&
+                this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+              ) {
                 return decryptUuid(p.obfuscatedPuuid)
               }
 
@@ -286,7 +299,11 @@ export class OngoingGameState {
       const teams: Record<string, string[]> = {}
 
       const processMember = (p: ChampSelectTeam) => {
-        if (p.nameVisibilityType === 'HIDDEN' && p.obfuscatedPuuid) {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
           p.puuid = decryptUuid(p.obfuscatedPuuid)
         }
 
@@ -661,7 +678,8 @@ export class OngoingGameState {
     private readonly _data: LeagueClientData,
     private readonly _app: AppCommonMain,
     private readonly _sgp: SgpMain,
-    private readonly _settings: OngoingGameSettings
+    private readonly _settings: OngoingGameSettings,
+    private readonly _rc: RemoteConfigMain
   ) {
     makeAutoObservable(this, {
       // shallow object

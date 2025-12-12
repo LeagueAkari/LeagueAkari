@@ -29,6 +29,7 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { RemoteConfigMain } from '../remote-config'
 import { SavedPlayerMain } from '../saved-player'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
@@ -79,7 +80,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     private readonly _ipc: AkariIpcMain,
     private readonly _sgp: SgpMain,
     private readonly _saved: SavedPlayerMain,
-    private readonly _appCommon: AppCommonMain
+    private readonly _appCommon: AppCommonMain,
+    private readonly _rc: RemoteConfigMain
   ) {
     this.settings = new OngoingGameSettings()
     this._log = _loggerFactory.create(OngoingGameMain.id)
@@ -100,7 +102,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this.state = new OngoingGameState(this._lc.data, this._appCommon, this._sgp, this.settings)
+    this.state = new OngoingGameState(
+      this._lc.data,
+      this._appCommon,
+      this._sgp,
+      this.settings,
+      this._rc
+    )
   }
 
   private async _handleState() {
@@ -1337,10 +1345,28 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           return
         }
 
-        const spectator = getSpectator(this._lc.data.summoner.me.puuid)
-        const gsmGameMembers1 = getGsmGameMembers(this._lc.data.summoner.me.puuid)
+        const puuid = this._lc.data.summoner.me.puuid
 
-        Promise.allSettled([spectator, gsmGameMembers1]).then(([spectator, gsmGameMembers1]) => {
+        const enableGsm = this._rc.state.ongoingGameConfig.spotlight.gsmByPuuid
+        const enableSpectator = this._rc.state.ongoingGameConfig.spotlight.spectatorByPuuid
+
+        type ReturnResult = {
+          teamOne: { puuid: string; championId: number; teamParticipantId: number }[]
+          teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
+          gameMode: string
+        }
+
+        const tasks: (() => Promise<ReturnResult | null>)[] = []
+
+        if (enableGsm) {
+          tasks.push(() => getGsmGameMembers(puuid))
+        }
+
+        if (enableSpectator) {
+          tasks.push(() => getSpectator(puuid))
+        }
+
+        Promise.allSettled(tasks.map((t) => t())).then((results) => {
           if (this.state.queryStage.phase !== 'in-game') {
             return
           }
@@ -1349,44 +1375,26 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           const mergedSelections = {} as Record<string, number>
           const mergedTeamParticipantGroups = {} as Record<string, number>
 
-          if (gsmGameMembers1.status === 'fulfilled' && gsmGameMembers1.value) {
-            const { teamOne, teamTwo } = gsmGameMembers1.value
-            const { teams, selections, teamParticipantGroups } = extractTeamMembers(
-              gsmGameMembers1.value.gameMode,
-              teamOne,
-              teamTwo
-            )
+          for (const result of results) {
+            if (result.status === 'fulfilled' && result.value) {
+              const { teamOne, teamTwo, gameMode } = result.value
+              const { teams, selections, teamParticipantGroups } = extractTeamMembers(
+                gameMode,
+                teamOne,
+                teamTwo
+              )
 
-            for (const [tI, m] of Object.entries(teams)) {
-              if (mergedTeams[tI]) {
-                mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
-              } else {
-                mergedTeams[tI] = m
+              for (const [tI, m] of Object.entries(teams)) {
+                if (mergedTeams[tI]) {
+                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+                } else {
+                  mergedTeams[tI] = m
+                }
               }
+
+              Object.assign(mergedSelections, selections)
+              Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
             }
-
-            Object.assign(mergedSelections, selections)
-            Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
-          }
-
-          if (spectator.status === 'fulfilled' && spectator.value) {
-            const { teamOne, teamTwo } = spectator.value
-            const { teams, selections, teamParticipantGroups } = extractTeamMembers(
-              spectator.value.gameMode,
-              teamOne,
-              teamTwo
-            )
-
-            for (const [tI, m] of Object.entries(teams)) {
-              if (mergedTeams[tI]) {
-                mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
-              } else {
-                mergedTeams[tI] = m
-              }
-            }
-
-            Object.assign(mergedSelections, selections)
-            Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
           }
 
           this.state.setAdditionalMembers({

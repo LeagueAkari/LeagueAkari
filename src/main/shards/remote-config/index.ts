@@ -7,6 +7,7 @@ import {
   supportedQueuesV1Schema
 } from '@shared/validators/remote-config'
 import { isAxiosError } from 'axios'
+import dayjs from 'dayjs'
 import { app } from 'electron'
 import { comparer } from 'mobx'
 import { gt } from 'semver'
@@ -371,9 +372,15 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
             RemoteConfigMain.SUPPORTED_QUEUES_RELATIVE_PATH,
             data
           )
-          this._log.info('Updated supported queues from remote', data.lastUpdate)
+          this._log.info(
+            'Updated supported queues from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         } else {
-          this._log.info('Supported queues is up to date', data.lastUpdate)
+          this._log.info(
+            'Supported queues is up to date',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         }
       } else {
         this._log.warn('Invalid supported queues json', error)
@@ -415,9 +422,15 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
             RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH,
             data
           )
-          this._log.info('Updated sgp league servers from remote', data.lastUpdate)
+          this._log.info(
+            'Updated sgp league servers from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         } else {
-          this._log.info('Sgp league servers is up to date', data.lastUpdate)
+          this._log.info(
+            'Sgp league servers is up to date',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         }
       } else {
         this._log.warn('Invalid sgp league servers json', error)
@@ -459,9 +472,15 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
             RemoteConfigMain.ONGOING_GAME_CONFIG_RELATIVE_PATH,
             data
           )
-          this._log.info('Updated ongoing game config from remote', data.lastUpdate)
+          this._log.info(
+            'Updated ongoing game config from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         } else {
-          this._log.info('Ongoing game config is up to date', data.lastUpdate)
+          this._log.info(
+            'Ongoing game config is up to date',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
         }
       } else {
         this._log.warn('Invalid ongoing game config json', error)
