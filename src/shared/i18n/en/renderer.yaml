@@ -2847,6 +2847,15 @@ simple-notifications-renderer:
     content: The database version in use is higher than this application supports. Please update $t(common:appName) to the latest version for best compatibility
     positiveText: View Update
 
+  badSgpConnection:
+    title: Poor SGP Data Source Network Connection
+    content:
+      usingSgp: Currently using SGP data source, but poor network connection quality has been detected, which may affect data retrieval and functionality.
+      recommendation: 'It is recommended to go to "Settings → $t(AppSettings.title) → $t(AppSettings.basic.title) → $t(AppSettings.basic.preferredLolSource.label)" and change the data source to LCU for a more stable experience.'
+      vpnReason: This may be caused by network instability when using VPN to access cross-region servers.
+    positiveText: Go to Settings
+    negativeText: Dismiss
+
   replay-download-progress-task:
     name: Replay Download
     checking: Checking replay metadata...

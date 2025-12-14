@@ -2847,6 +2847,15 @@ simple-notifications-renderer:
     content: 当前已有的数据库版本高于此应用支持的版本。请更新 $t(common:appName) 到最新版本以获得最佳兼容性
     positiveText: 查看更新
 
+  badSgpConnection:
+    title: SGP 数据源网络连接质量差
+    content:
+      usingSgp: 当前正在使用 SGP 数据源，但检测到网络连接质量很差，可能会影响数据获取和功能使用。
+      recommendation: '建议前往"设置 → $t(AppSettings.title) → $t(AppSettings.basic.title) → $t(AppSettings.basic.preferredLolSource.label)"，将数据源更改为 LCU，以获得更稳定的体验。'
+      vpnReason: 此现象可能是由于使用加速器访问跨国服务器导致的网络不稳定。
+    positiveText: 前往设置
+    negativeText: 关闭
+
   replay-download-progress-task:
     name: 录像下载
     checking: 正在检查对局 ID {{gameId}} 的录像...

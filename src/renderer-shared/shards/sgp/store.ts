@@ -35,10 +35,15 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
 
   const supportedQueues = ref<number[]>([])
 
+  const connectionSuccessesCounted = ref(0)
+  const connectionFailuresCounted = ref(0)
+
   return {
     availability,
     isTokenReady,
     leagueServers,
-    supportedQueues
+    supportedQueues,
+    connectionSuccessesCounted,
+    connectionFailuresCounted
   }
 })

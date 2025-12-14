@@ -47,12 +47,23 @@ export class SgpState {
     return this._remoteConfig.state.supportedQueues.queues
   }
 
+  connectionSuccessesCounted = 0
+  connectionFailuresCounted = 0
+
   setEntitlementsTokenSet(value: boolean) {
     this.isEntitlementsTokenSet = value
   }
 
   setLeagueSessionTokenSet(value: boolean) {
     this.isLeagueSessionTokenSet = value
+  }
+
+  setConnectionSuccessesCount(value: number) {
+    this.connectionSuccessesCounted = value
+  }
+
+  setConnectionFailuresCount(value: number) {
+    this.connectionFailuresCounted = value
   }
 
   get isTokenReady() {

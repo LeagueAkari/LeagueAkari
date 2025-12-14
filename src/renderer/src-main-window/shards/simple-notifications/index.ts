@@ -17,6 +17,7 @@ import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useStorageStore } from '@renderer-shared/shards/storage/store'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
@@ -662,6 +663,60 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleBadSgpConnectionWarning() {
+    const sgps = useSgpStore()
+    const dialog = useDialog()
+    const as = useAppCommonStore()
+    const { openSettingsModal } = useAppContext()
+
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.badSgpConnection'
+    })
+
+    const isBadSgp = computed(() => {
+      if (as.settings.preferredLolSource === 'lcu') {
+        return false
+      }
+
+      return (
+        sgps.connectionSuccessesCounted + sgps.connectionFailuresCounted >= 5 &&
+        sgps.connectionFailuresCounted /
+          (sgps.connectionSuccessesCounted + sgps.connectionFailuresCounted) >=
+          0.5
+      )
+    })
+
+    let inst: ReturnType<typeof dialog.warning> | null = null
+
+    watch(
+      () => isBadSgp.value,
+      (v) => {
+        if (v) {
+          inst = dialog.warning({
+            style: { width: '600px' },
+            closable: true,
+            title: () => t('title'),
+            content: () =>
+              h('div', { style: { display: 'flex', 'flex-direction': 'column', gap: '12px' } }, [
+                h('div', t('content.usingSgp')),
+                h('div', t('content.recommendation')),
+                h('div', t('content.vpnReason'))
+              ]),
+            positiveText: t('positiveText'),
+            negativeText: t('negativeText'),
+            onPositiveClick: () => {
+              openSettingsModal('basic')
+              inst?.destroy()
+            },
+            onNegativeClick: () => {
+              inst?.destroy()
+            }
+          })
+        }
+      }
+    )
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -681,6 +736,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._handleAskUserToRunAsAdministrator())
     this._setup.addSetupFn(() => this._handleCannotGetUxCommandLine())
     this._setup.addSetupFn(() => this._handleHigherVersionDbWarning())
+    this._setup.addSetupFn(() => this._handleBadSgpConnectionWarning())
   }
 
   showAnnouncementModal() {

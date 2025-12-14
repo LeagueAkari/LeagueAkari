@@ -7,7 +7,7 @@ import {
   URL_PLACEHOLDER_SUB_ID
 } from '@shared/http-api-axios-helper/sgp/patterns'
 import { formatError } from '@shared/utils/errors'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, isAxiosError } from 'axios'
 import { Buffer } from 'node:buffer'
 import { Readable } from 'node:stream'
 
@@ -56,7 +56,9 @@ export class SgpMain implements IAkariShardInitDispose {
       'availability',
       'isTokenReady',
       'leagueServers',
-      'supportedQueues'
+      'supportedQueues',
+      'connectionSuccessesCounted',
+      'connectionFailuresCounted'
     ])
 
     this._handleUpdateHttpProxy()
@@ -64,6 +66,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._maintainLeagueSessionToken()
     this._initHttpInstance()
     this._handleProtocol()
+    this._handleResetConnectionCount()
   }
 
   private _maintainEntitlementsToken() {
@@ -176,6 +179,21 @@ export class SgpMain implements IAkariShardInitDispose {
 
       return config
     })
+
+    // check network connectivity
+    this._http.interceptors.response.use(
+      (response) => {
+        this.state.setConnectionSuccessesCount(this.state.connectionSuccessesCounted + 1)
+        return response
+      },
+      (error) => {
+        if (isAxiosError(error) && error.response === undefined) {
+          this.state.setConnectionFailuresCount(this.state.connectionFailuresCounted + 1)
+        }
+
+        return Promise.reject(error)
+      }
+    )
   }
 
   private _getSubId(sgpServerId: string) {
@@ -232,6 +250,18 @@ export class SgpMain implements IAkariShardInitDispose {
         })
       }
     })
+  }
+
+  private _handleResetConnectionCount() {
+    this._mobx.reaction(
+      () => this.state.availability.sgpServerId,
+      (id) => {
+        if (!id) {
+          this.state.setConnectionSuccessesCount(0)
+          this.state.setConnectionFailuresCount(0)
+        }
+      }
+    )
   }
 }
 
