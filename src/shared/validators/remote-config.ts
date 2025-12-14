@@ -4,8 +4,8 @@ export const leagueServersConfigV1Schema = z.object({
   servers: z.record(
     z.string(),
     z.object({
-      matchHistory: z.string().nullable(),
-      common: z.string().nullable()
+      matchHistory: z.string(),
+      common: z.string()
     })
   ),
 

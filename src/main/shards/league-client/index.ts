@@ -276,7 +276,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       LeagueClientMain.id,
       'writeItemSetsToDisk',
-      async (_, itemSets: any[], clearPrevious: boolean) => {
+      async (_, itemSets: any[] | null, clearPrevious: boolean) => {
         await this.writeItemSetsToDisk(itemSets, clearPrevious)
       }
     )
@@ -598,7 +598,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     return res
   }
 
-  async writeItemSetsToDisk(itemSets: any[], clearPrevious = true) {
+  async writeItemSetsToDisk(itemSets: any[] | null, clearPrevious = true) {
     try {
       const { data: installDir } = await this.http.get('/data-store/v1/install-dir')
 
@@ -627,6 +627,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         for (const file of akariFiles) {
           fs.unlinkSync(path.join(targetPath, file))
         }
+      }
+
+      if (!itemSets) {
+        return
       }
 
       for (const itemSet of itemSets) {

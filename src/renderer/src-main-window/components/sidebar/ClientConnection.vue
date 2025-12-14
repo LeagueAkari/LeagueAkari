@@ -305,7 +305,7 @@ const handlePlayAgain = async () => {
     font-size: 12px;
     font-style: italic;
 
-    & [data-theme='dark'] {
+    [data-theme='dark'] & {
       color: #fffb;
     }
   }

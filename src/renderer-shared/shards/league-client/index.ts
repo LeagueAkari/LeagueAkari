@@ -262,7 +262,7 @@ export class LeagueClientRenderer {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'connect', auth)
   }
 
-  writeItemSetsToDisk(items: any[], clearPrevious?: boolean) {
+  writeItemSetsToDisk(items: any[] | null, clearPrevious?: boolean) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'writeItemSetsToDisk', items, clearPrevious)
   }
 
