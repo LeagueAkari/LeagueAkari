@@ -47,7 +47,7 @@
           @update:value="handleSgpTagChange"
           :options="sgpTagOptions"
         />
-        <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+        <NTooltip :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
           <template #trigger>
             <NButton class="refresh-button" secondary circle size="tiny" @click="() => og.reload()">
               <template #icon>
@@ -79,7 +79,7 @@ import { computed, useTemplateRef } from 'vue'
 
 const { t } = useTranslation()
 
-const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
+const TITLEBAR_TOOLTIP_Z_INDEX = 75000
 
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)

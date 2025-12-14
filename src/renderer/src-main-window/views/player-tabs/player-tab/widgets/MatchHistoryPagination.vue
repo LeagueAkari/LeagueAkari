@@ -72,9 +72,40 @@
           <NIcon size="16"><ChevronLeft20Regular /></NIcon>
         </template>
       </NButton>
-      <span class="text-sm text-black dark:text-white/80 min-w-24px text-center">
-        {{ computedCurrentPage }}
-      </span>
+
+      <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
+        <template #trigger>
+          <span class="cursor-pointer text-sm text-black dark:text-white/80 min-w-24px text-center">
+            {{ computedCurrentPage }}
+          </span>
+        </template>
+        <div class="flex gap-2">
+          <NInputNumber
+            class="!w-28"
+            size="small"
+            v-model:value="arbitraryPage"
+            :disabled="isLoading"
+            :min="1"
+          />
+          <NButton
+            size="small"
+            secondary
+            circle
+            :disabled="isLoading"
+            @click="
+              loadMatchHistory({
+                startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
+                count: pts.frontendSettings.loadCount
+              })
+            "
+          >
+            <template #icon>
+              <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
+            </template>
+          </NButton>
+        </div>
+      </NPopover>
+
       <NButton
         size="small"
         tertiary
@@ -167,9 +198,42 @@
             <NIcon size="16"><ChevronLeft20Regular /></NIcon>
           </template>
         </NButton>
-        <span class="text-sm text-black dark:text-white/80 min-w-24px text-center">
-          {{ computedCurrentPage }}
-        </span>
+
+        <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
+          <template #trigger>
+            <span
+              class="cursor-pointer text-sm text-black dark:text-white/80 min-w-24px text-center"
+            >
+              {{ computedCurrentPage }}
+            </span>
+          </template>
+          <div class="flex gap-2">
+            <NInputNumber
+              class="!w-28"
+              size="small"
+              v-model:value="arbitraryPage"
+              :disabled="isLoading"
+              :min="1"
+            />
+            <NButton
+              size="small"
+              secondary
+              circle
+              :disabled="isLoading"
+              @click="
+                loadMatchHistory({
+                  startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
+                  count: pts.frontendSettings.loadCount
+                })
+              "
+            >
+              <template #icon>
+                <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
+              </template>
+            </NButton>
+          </div>
+        </NPopover>
+
         <NButton
           size="small"
           tertiary
@@ -194,10 +258,15 @@
 
 <script setup lang="ts">
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
-import { ChevronLeft20Regular, ChevronRight20Regular, Filter20Regular } from '@vicons/fluent'
+import {
+  ArrowCircleRight32Filled,
+  ChevronLeft20Regular,
+  ChevronRight20Regular,
+  Filter20Regular
+} from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NPopover, NSelect } from 'naive-ui'
-import { computed } from 'vue'
+import { NButton, NIcon, NInputNumber, NPopover, NSelect } from 'naive-ui'
+import { computed, ref, watchEffect } from 'vue'
 
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
@@ -243,4 +312,13 @@ const selectedQueue = computed(() => {
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
 
 const { hasFilters } = useMatchHistoryFilters()
+
+const arbitraryPage = ref(computedCurrentPage.value)
+const isArbitraryPagePopupVisible = ref(false)
+
+watchEffect(() => {
+  if (isArbitraryPagePopupVisible.value) {
+    arbitraryPage.value = computedCurrentPage.value
+  }
+})
 </script>

@@ -1,8 +1,5 @@
 <template>
   <div class="player-tabs-title">
-    <!-- search -->
-    <SearchSummonerModal v-model:show="searchSummonerModalShow" @to-summoner="handleToSummoner" />
-
     <!-- context menu -->
     <NDropdown
       placement="bottom-start"
@@ -26,92 +23,85 @@
         ref="scrollbar"
       >
         <div class="mh-tabs">
-          <NPopover
-            :disabled="true || contextMenuState.show"
+          <div
             v-for="(tab, index) of pts.tabs"
             :key="tab.id"
             ref="tabs-ref"
-            :delay="1000"
+            class="tab"
+            :data-id="tab.id"
+            draggable="true"
+            :class="{
+              active: pts.currentTabId === tab.id,
+              'drag-hover': currentDragHoverTabId === tab.id
+            }"
+            @contextmenu="handleContextMenu($event, tab.id)"
+            @click="handleTabChange(tab.id)"
+            @mouseup="handleMouseUp($event, tab.id)"
+            @dragstart="handleTabDragStart($event, tab.id)"
+            @drop="handleTabDrop($event, tab.id)"
+            @dragover="handleTabDragOver($event, tab.id)"
+            @dragleave="handleTagDragLeave($event, tab.id)"
+            @dragend="handleTagDragEnd($event, tab.id)"
           >
-            <template #trigger>
-              <div
-                class="tab"
-                :data-id="tab.id"
-                draggable="true"
-                :class="{
-                  active: pts.currentTabId === tab.id,
-                  'drag-hover': currentDragHoverTabId === tab.id
-                }"
-                @contextmenu="handleContextMenu($event, tab.id)"
-                @click="handleTabChange(tab.id)"
-                @mouseup="handleMouseUp($event, tab.id)"
-                @dragstart="handleTabDragStart($event, tab.id)"
-                @drop="handleTabDrop($event, tab.id)"
-                @dragover="handleTabDragOver($event, tab.id)"
-                @dragleave="handleTagDragLeave($event, tab.id)"
-                @dragend="handleTagDragEnd($event, tab.id)"
-              >
-                <NBadge
-                  dot
-                  :show="tab.spectatorData !== null"
-                  :size="4"
-                  color="#00ff00"
-                  processing
-                  :offset="[-20, 2]"
-                >
-                  <Transition name="fade" mode="out-in">
-                    <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
-                    <ChampionIcon
-                      class="tab-icon"
-                      v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
-                      :stretched="false"
-                      :champion-id="ogs.championSelections[tab.puuid]"
-                    />
-                    <LcuImage
-                      class="tab-icon"
-                      v-else-if="tab.summoner"
-                      :src="profileIconUri(tab.summoner.profileIconId)"
-                    />
-                    <div v-else class="tab-icon tab-icon-placeholder"></div>
-                  </Transition>
-                </NBadge>
-                <div class="sgp-server" v-if="isNeedToShowSgpServer">
-                  {{
-                    sgps.leagueServers.serverNames[as.settings.locale]?.[tab.sgpServerId] ||
-                    tab.sgpServerId
-                  }}
+            <NBadge
+              dot
+              :show="tab.spectatorData !== null"
+              :size="4"
+              color="#00ff00"
+              processing
+              :offset="[-20, 2]"
+            >
+              <Transition name="fade" mode="out-in">
+                <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
+                <ChampionIcon
+                  class="tab-icon"
+                  v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
+                  :stretched="false"
+                  :champion-id="ogs.championSelections[tab.puuid]"
+                />
+                <LcuImage
+                  class="tab-icon"
+                  v-else-if="tab.summoner"
+                  :src="profileIconUri(tab.summoner.profileIconId)"
+                />
+                <div v-else class="tab-icon tab-icon-placeholder"></div>
+              </Transition>
+            </NBadge>
+            <div class="sgp-server" v-if="isNeedToShowSgpServer">
+              {{
+                sgps.leagueServers.serverNames[as.settings.locale]?.[tab.sgpServerId] ||
+                tab.sgpServerId
+              }}
+            </div>
+            <template v-if="tab.summoner">
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <div class="summoner-name">
+                    <span class="game-name-line">{{ summonerName(tab.puuid, index) }}</span>
+                  </div>
+                </template>
+                <div class="summoner-name">
+                  <span class="game-name-line">{{ tab.summoner.gameName }}</span>
+                  <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
                 </div>
-                <template v-if="tab.summoner">
-                  <StreamerModeMaskedText>
-                    <template #masked>
-                      <div class="summoner-name">
-                        <span class="game-name-line">{{ summonerName(tab.puuid, index) }}</span>
-                      </div>
-                    </template>
-                    <div class="summoner-name">
-                      <span class="game-name-line">{{ tab.summoner.gameName }}</span>
-                      <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
-                    </div>
-                  </StreamerModeMaskedText>
-                </template>
-                <template v-else-if="tabLoadingStateMap[tab.id]">
-                  <span class="empty-placeholder-text">{{ t('PlayerTabsTitle.loading') }}.</span>
-                </template>
-                <template v-else>
-                  <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
-                </template>
-                <NIcon @click.stop="pts.closeTab(tab.id)" class="close-icon"><CloseIcon /></NIcon>
-              </div>
+              </StreamerModeMaskedText>
             </template>
-            <!-- TODO 提供一个悬停查看 -->
-            <div class="tab-popover">{{ 'placeholder' }}</div>
-          </NPopover>
+            <template v-else-if="tabLoadingStateMap[tab.id]">
+              <span class="empty-placeholder-text">{{ t('PlayerTabsTitle.loading') }}.</span>
+            </template>
+            <template v-else>
+              <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
+            </template>
+            <NIcon @click.stop="pts.closeTab(tab.id)" class="close-icon"><CloseIcon /></NIcon>
+          </div>
         </div>
       </NScrollbar>
+
       <div class="divider" />
+
       <NPopconfirm
         :disabled="!as.settings.streamerMode || warningShown"
-        @positive-click="handleShowSearchSummonerModalInPopconfirm"
+        @positive-click="handleShowSearchPaneInPopconfirm"
         :positive-button-props="{
           type: 'warning',
           size: 'tiny'
@@ -123,7 +113,7 @@
         <template #trigger>
           <div
             class="search-area"
-            @click="(!as.settings.streamerMode || warningShown) && (searchSummonerModalShow = true)"
+            @click="(!as.settings.streamerMode || warningShown) && (searchPaneShow = true)"
           >
             <NIcon class="search-icon"><SearchIcon /></NIcon>
             <span class="search-label">{{ t('PlayerTabsTitle.search') }}</span>
@@ -132,6 +122,12 @@
         {{ t('PlayerTabsTitle.searchButtonStreamerModeWarning') }}
       </NPopconfirm>
     </template>
+
+    <NModal v-model:show="searchPaneShow">
+      <div class="max-h-90vh max-w-90vw h-600px w-800px">
+        <SearchPane ref="searchPaneRef" @navigate-to-summoner="handleToSummoner" />
+      </div>
+    </NModal>
   </div>
 </template>
 
@@ -149,14 +145,14 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NDropdown, NIcon, NPopconfirm, NPopover, NScrollbar, NSpin } from 'naive-ui'
+import { NBadge, NDropdown, NIcon, NModal, NPopconfirm, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
+import SearchPane from '../search-pane/SearchPane.vue'
 
 const { t } = useTranslation()
 
@@ -167,14 +163,28 @@ const lcs = useLeagueClientStore()
 const pt = useInstance(PlayerTabsRenderer)
 const as = useAppCommonStore()
 
-const scrollBarEl = useTemplateRef('scrollbar')
+const scrollbarEl = useTemplateRef('scrollbar')
+
 const handleWheel = (e: WheelEvent) => {
-  scrollBarEl.value?.scrollBy({
+  scrollbarEl.value?.scrollBy({
     left: e.deltaY * 0.75 // 这个速度会舒服一点
   })
 }
 
-const searchSummonerModalShow = ref(false)
+const searchPaneShow = ref(false)
+
+const searchPaneRef = useTemplateRef('searchPaneRef')
+
+watch(
+  () => searchPaneShow.value,
+  (show) => {
+    if (show) {
+      searchPaneRef.value?.reset()
+    } else {
+      searchPaneRef.value?.cancel()
+    }
+  }
+)
 
 const handleMouseUp = (event: MouseEvent, unionId: string) => {
   if (event.button === 1) {
@@ -200,7 +210,7 @@ const handleTabChange = async (unionId: string) => {
 const alignTabToVisibleArea = (tabId: string) => {
   const tabEl = document.querySelector(`.tab[data-id="${tabId}"]`)
   // @ts-ignore
-  const parentEl = scrollBarEl.value?.scrollbarInstRef?.wrapperRef as HTMLElement
+  const parentEl = scrollbarEl.value?.scrollbarInstRef?.wrapperRef as HTMLElement
 
   if (!tabEl || !parentEl) {
     return
@@ -264,7 +274,7 @@ const handleContextMenu = (event: MouseEvent, id: string) => {
   // 但不加 nextTick 似乎也没问题
   nextTick(() => {
     const height =
-      getComputedStyle(document.documentElement).getPropertyValue('--la-title-bar-height') || '0'
+      getComputedStyle(document.documentElement).getPropertyValue('--la-titlebar-height') || '0'
     contextMenuState.x = event.clientX
     contextMenuState.y = event.clientY - parseInt(height)
     contextMenuState.show = true
@@ -392,7 +402,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string | null, setCurrent 
   }
 
   if (setCurrent) {
-    searchSummonerModalShow.value = false
+    searchPaneShow.value = false
     navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
   } else {
     // 先路由
@@ -401,8 +411,8 @@ const handleToSummoner = (puuid: string, sgpServerId: string | null, setCurrent 
 }
 
 let warningShown = false
-const handleShowSearchSummonerModalInPopconfirm = () => {
-  searchSummonerModalShow.value = true
+const handleShowSearchPaneInPopconfirm = () => {
+  searchPaneShow.value = true
   warningShown = true
 }
 
@@ -567,11 +577,6 @@ const { summonerName } = useStreamerModeMaskedText()
       background-color: rgba(255, 255, 255, 0.4);
     }
   }
-}
-
-.tab-popover {
-  font-size: 12px;
-  font-weight: bold;
 }
 
 .search-area {

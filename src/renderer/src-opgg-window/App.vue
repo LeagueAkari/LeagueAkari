@@ -1,7 +1,7 @@
 <template>
   <div id="opgg-window-frame">
     <SetupInAppScope />
-    <OpggWindowTitleBar />
+    <OpggWindowTitlebar />
     <div class="content">
       <RouterView v-slot="{ Component }">
         <KeepAlive>
@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 
-import OpggWindowTitleBar from './components/OpggWindowTitleBar.vue'
+import OpggWindowTitlebar from './components/OpggWindowTitlebar.vue'
 </script>
 
 <style>

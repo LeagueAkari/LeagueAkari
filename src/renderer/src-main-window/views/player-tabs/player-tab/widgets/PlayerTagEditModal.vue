@@ -54,6 +54,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
+import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -65,7 +66,6 @@ import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { usePlayerTab } from '../context'
 import { useTags } from '../data/tags'
-import { useSummonerFetch } from '../utils/summoner-fetch'
 
 const { t } = useTranslation()
 
@@ -111,7 +111,7 @@ const loadSummoner = async () => {
     if (preferredSource.value === 'sgp' || isCrossRegion.value) {
       const summoners = await getSummoners([puuid.value], 'sgp', sgpServerId.value)
 
-      if (summoners.length) {
+      if (summoners.length && summoners[0]) {
         summoner.value = summoners[0]
       }
     } else {

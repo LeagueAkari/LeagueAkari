@@ -1,11 +1,11 @@
 <template>
-  <div class="title-bar" :class="{ blurred: aws.focus === 'blurred' }">
+  <div class="titlebar" :class="{ blurred: aws.focus === 'blurred' }">
     <div class="title-area">
       <span class="title">League Akari - Mini</span>
     </div>
     <div class="traffic">
       <div
-        :title="aws.settings.pinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')"
+        :title="aws.settings.pinned ? t('AuxWindowTitlebar.unpin') : t('AuxWindowTitlebar.pin')"
         class="traffic-button pin"
         :class="{ pinned: aws.settings.pinned }"
         @click="() => handlePin(!aws.settings.pinned)"
@@ -13,13 +13,13 @@
         <NIcon><PinFilledIcon /></NIcon>
       </div>
       <div
-        :title="t('AuxWindowTitleBar.minimize')"
+        :title="t('AuxWindowTitlebar.minimize')"
         class="traffic-button minimize"
         @click="handleMinimize"
       >
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
-      <div :title="t('AuxWindowTitleBar.close')" class="traffic-button close" @click="handleClose">
+      <div :title="t('AuxWindowTitlebar.close')" class="traffic-button close" @click="handleClose">
         <NIcon><CloseIcon /></NIcon>
       </div>
     </div>
@@ -55,10 +55,10 @@ const handlePin = (b: boolean) => {
 </script>
 
 <style scoped>
-.title-bar {
+.titlebar {
   display: flex;
   position: relative;
-  height: var(--la-title-bar-height);
+  height: var(--la-titlebar-height);
   align-items: center;
   z-index: 10000000;
   -webkit-app-region: drag;

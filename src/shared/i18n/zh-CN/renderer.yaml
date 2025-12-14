@@ -1458,33 +1458,31 @@ PlayerTabsTitle:
   screenshot: 截图当前页面
   searchButtonStreamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
 
-SearchSummonerModal:
-  title: 召唤师搜索
-  placeholder: Enter the summoner name
-  sgpServer: 区服
+SearchPane:
+  title: 搜索召唤师
+  combinedServersReference: 合区参照
+  searchTypePuuid: PUUID
+  searchTypeExact: 精确
+  searchTypeFuzzy: 模糊
   cancel: 取消
-  search: 搜索玩家
-  result: 搜索结果
-  friends: 好友
-  history: 近期访问
-  validating: 正在验证玩家 ({{current}} / {{total}})
-  validated: 验证了 {{countV}} 条可能的玩家记录，无搜索结果符合
-  noResult: 无搜索结果符合
+  search: 搜索
+  resultCount: 搜索结果共 {{count}} 个
   privacy: 生涯隐藏
-  currentRoute: 当前
-  invalidInput: 当前输入不符合格式要求：应为 "游戏名称#标签" 或 "游戏名称"
-  hasInvisibleChar: 当前搜索文本包含不可见字符，将被过滤
-  puuidSearch: 当前为精确搜索：搜索指定 PUUID
-  exactSearch: 当前为精确搜索：搜索指定名称和标签的召唤师
-  fuzzySearch: 当前为模糊搜索：搜索指定名称的召唤师
+  searching: 查询中
+  noResult: 暂无搜索结果
+  noResultHintFuzzy: 搜索名称，如
+  noResultHintExact: 按照名称和标签精确搜索，如
+  noResultHintPuuid: 按照 PUUID 搜索，如
+  noResultHintFuzzyExample: 赤座灯里
+  noResultHintExactExample: '岁纳京子 #12345'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: 最近访问
+  pinned: 置顶 ({{count}})
+  recent: 近期 ({{count}})
+  noRecentVisits: 暂无最近访问
+  friends: 好友 ({{count}})
+  noFriends: 暂无好友
   getFriendsFailed: 获取好友列表失败
-  showAll: 显示所有
-  clear: 清空
-
-  placeholders:
-    - '如完整查询：赤座灯里#akari'
-    - '如模糊查询 - 格式如：船见结衣'
-    - '如 PUUID 查询 - 格式如：<puuid>'
 
 PlayerTagEditModal:
   title: 编辑玩家标记
@@ -2294,7 +2292,7 @@ OngoingGame:
   avgTeamWinRate: 队伍平均胜率
   avgTeamKda: 队伍平均 KDA
 
-AuxWindowTitleBar:
+AuxWindowTitlebar:
   opgg: 使用 OP.GG
   opggTitle: 集成的 OP.GG
   close: 关闭
@@ -2305,7 +2303,7 @@ AuxWindowTitleBar:
   unpin: 取消置顶
   repositionToAlignLeagueClientUx: 贴附到客户端
 
-OpggWindowTitleBar:
+OpggWindowTitlebar:
   close: 关闭
   minimize: 最小化
   pin: 置顶

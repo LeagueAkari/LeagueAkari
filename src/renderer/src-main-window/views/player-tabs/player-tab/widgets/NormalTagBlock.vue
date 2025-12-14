@@ -75,6 +75,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
+import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -88,7 +89,6 @@ import { markRaw, ref, watch } from 'vue'
 import { usePlayerTab } from '../context'
 import { useSummoner } from '../data/summoner'
 import { useTags } from '../data/tags'
-import { useSummonerFetch } from '../utils/summoner-fetch'
 
 const { t } = useTranslation()
 

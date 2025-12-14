@@ -14,7 +14,7 @@
     </div>
 
     <div class="app-frame__right">
-      <MainWindowTitleBar />
+      <MainWindowTitlebar />
 
       <div class="app-frame__right-content" ref="contentEl">
         <RouterView v-slot="{ Component }">
@@ -61,7 +61,7 @@ import { ref, useTemplateRef } from 'vue'
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
-import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
 import { useMicaAvailability } from './composables/useMicaAvailability'
 import { provideAppContext } from './context'
 import { MainWindowUiRenderer } from './shards/main-window-ui'

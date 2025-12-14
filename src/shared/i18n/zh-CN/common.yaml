@@ -106,6 +106,7 @@ shortTiers:
   CHALLENGER: 王者
 
 sgpServers:
+  AKARI_CURRENT: 当前
   TENCENT_HN10: 黑色玫瑰
   TENCENT_HN1: 艾欧尼亚
   TENCENT_NJ100: 联盟一区
@@ -115,6 +116,7 @@ sgpServers:
   TENCENT_TJ101: 联盟五区
   TENCENT_BGP2: 峡谷之巅
   TENCENT_PBE: 体验服
+  TENCENT_PREPBE: 预体验服
   TW2: 台湾
   SG2: 新加坡
   PH2: 菲律宾

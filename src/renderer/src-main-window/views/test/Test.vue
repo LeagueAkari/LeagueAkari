@@ -1,5 +1,9 @@
 <template>
-  <div class="size-full">这个页面用于测试</div>
+  <div class="h-600px w-800px">
+    <SearchPane />
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import SearchPane from '@main-window/components/search-pane/SearchPane.vue'
+</script>

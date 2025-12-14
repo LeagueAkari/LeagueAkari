@@ -22,6 +22,8 @@ import {
   watch
 } from 'vue'
 
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+
 export type SummonerContext = {
   summoner: Readonly<Ref<Summoner | null>>
   isLoading: Readonly<Ref<boolean>>
@@ -53,7 +55,7 @@ export function provideSummoner(props: {
   const lc = useInstance(LeagueClientRenderer)
   const rc = useInstance(RiotClientRenderer)
   const log = useInstance(LoggerRenderer)
-
+  const pt = useInstance(PlayerTabsRenderer)
   const lcs = useLeagueClientStore()
 
   const isLoading = ref(false)
@@ -153,6 +155,23 @@ export function provideSummoner(props: {
     (me) => {
       if (me && me.puuid === puuid.value) {
         summoner.value = toSummoner({ source: 'lcu', data: me, puuid: me.puuid })
+      }
+    }
+  )
+
+  watch(
+    () => summoner.value,
+    (summoner) => {
+      if (summoner && summoner.puuid !== lcs.summoner.me?.puuid) {
+        pt.saveSearchHistory({
+          puuid: summoner.puuid,
+          sgpServerId: sgpServerId.value,
+          summoner: {
+            profileIconId: summoner.profileIconId,
+            gameName: summoner.gameName,
+            tagLine: summoner.tagLine
+          }
+        })
       }
     }
   )

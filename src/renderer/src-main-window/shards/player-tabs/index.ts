@@ -11,19 +11,25 @@ import { useRouter } from 'vue-router'
 import { usePlayerTabsStore } from './store'
 
 export interface SearchHistoryItem {
-  // 目标的 puuid, 当作主键
   puuid: string
-
-  // 目标所属的服务器
   sgpServerId: string
-
-  // 不是必要项, 但用于展示很方便
   summoner: {
+    profileIconId?: number
     gameName: string
     tagLine: string
   }
 
   isPinned?: boolean
+}
+
+export interface SearchResult {
+  puuid: string
+  gameName: string
+  tagLine: string
+  profileIconId: number
+  sgpServerId: string
+  privacy: string
+  summonerLevel: number
 }
 
 /**

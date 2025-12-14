@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
@@ -92,7 +93,6 @@ import { useChampionNameMatch } from '@main-window/composables/useChampionNameMa
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
-import { useSummonerFetch } from '../utils/summoner-fetch'
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()

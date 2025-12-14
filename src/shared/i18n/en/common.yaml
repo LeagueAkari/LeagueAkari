@@ -106,6 +106,7 @@ shortTiers:
   CHALLENGER: CHLG
 
 sgpServers:
+  AKARI_CURRENT: Current
   TENCENT_HN10: Black Rose
   TENCENT_HN1: Ionia
   TENCENT_NJ100: League 1
@@ -115,6 +116,7 @@ sgpServers:
   TENCENT_TJ101: League 5
   TENCENT_BGP2: Summit
   TENCENT_PBE: Tencent PBE
+  TENCENT_PREPBE: Tencent PREPBE
   TW2: Taiwan
   SG2: Singapore
   PH2: Philippines

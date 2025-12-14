@@ -1,5 +1,5 @@
 <template>
-  <div class="app-title-bar" :class="{ 'should-show-bottom-border': shouldShowBottomBorder }">
+  <div class="app-titlebar" :class="{ 'should-show-bottom-border': shouldShowBottomBorder }">
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
@@ -64,10 +64,10 @@ const shouldShowBottomBorder = computed(() => {
 </script>
 
 <style scoped>
-.app-title-bar {
+.app-titlebar {
   display: flex;
   position: relative;
-  height: var(--la-title-bar-height);
+  height: var(--la-titlebar-height);
   align-items: center;
   -webkit-app-region: drag;
   z-index: 1000000;

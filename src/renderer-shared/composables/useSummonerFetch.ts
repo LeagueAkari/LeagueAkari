@@ -3,6 +3,7 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { toSummoner } from '@shared/data-adapter/summoner'
+import { isAxiosError } from 'axios'
 
 export function useSummonerFetch() {
   const lc = useInstance(LeagueClientRenderer)
@@ -40,12 +41,21 @@ export function useSummonerFetch() {
         }
       )
     } else {
-      const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(alias.puuid)
+      try {
+        const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(alias.puuid)
 
-      return toSummoner({ source: 'lcu', data: summoner, puuid: summoner.puuid })
+        return toSummoner({ source: 'lcu', data: summoner, puuid: summoner.puuid })
+      } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          return null
+        }
+
+        throw error
+      }
     }
   }
 
+  // 保证它的返回格式类似于 sgp summonerLedge
   const getSummoners = async (puuids: string[], source: 'lcu' | 'sgp', sgpServerId?: string) => {
     if (source === 'sgp') {
       const getSgpSummoners = async () => {
@@ -65,26 +75,38 @@ export function useSummonerFetch() {
 
       const [summoners, namesets] = await Promise.all([getSgpSummoners(), getRcNamesets()])
 
-      if (summoners.length !== namesets.length) {
-        return []
-      }
+      return summoners
+        .map((summoner) => {
+          const nameset = namesets.find((nameset) => nameset.puuid === summoner.puuid)
 
-      return summoners.map((summoner, index) => {
-        return toSummoner(
-          { source: 'sgp', data: summoner, puuid: summoner.puuid },
-          {
-            gameName: namesets[index].gnt.gameName,
-            tagLine: namesets[index].gnt.tagLine
+          if (!nameset) {
+            return null
           }
-        )
-      })
+
+          return toSummoner(
+            { source: 'sgp', data: summoner, puuid: summoner.puuid },
+            {
+              gameName: nameset.gnt.gameName,
+              tagLine: nameset.gnt.tagLine
+            }
+          )
+        })
+        .filter((summoner) => summoner !== null)
     } else {
       const tasks = puuids.map(async (puuid) => {
-        const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(puuid)
-        return toSummoner({ source: 'lcu', data: summoner, puuid: summoner.puuid })
+        try {
+          const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(puuid)
+          return toSummoner({ source: 'lcu', data: summoner, puuid: summoner.puuid })
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            return null
+          }
+
+          throw error
+        }
       })
 
-      return Promise.all(tasks)
+      return (await Promise.all(tasks)).filter((summoner) => summoner !== null)
     }
   }
 

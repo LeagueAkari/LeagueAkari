@@ -6,9 +6,9 @@
 :root {
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
-  --la-title-bar-height: 36px;
-  --la-scroll-bar-height: 6px;
-  --la-scroll-bar-width: 8px;
+  --la-titlebar-height: 36px;
+  --la-scrollbar-height: 6px;
+  --la-scrollbar-width: 8px;
   --n-option-padding: 0 4px;
 }
 
@@ -21,8 +21,8 @@
 }
 
 ::-webkit-scrollbar {
-  width: var(--la-scroll-bar-width);
-  height: var(--la-scroll-bar-height);
+  width: var(--la-scrollbar-width);
+  height: var(--la-scrollbar-height);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -42,7 +42,7 @@ body,
 }
 
 #v-binder-view-measurer {
-  top: var(--la-title-bar-height) !important;
+  top: var(--la-titlebar-height) !important;
 }
 
 body {
@@ -102,7 +102,7 @@ body {
 
 /* adjust for app title bar height */
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
-  max-height: calc(100vh - var(--la-title-bar-height)) !important;
+  max-height: calc(100vh - var(--la-titlebar-height)) !important;
 }
 
 [data-theme='dark'] .n-base-select-menu {

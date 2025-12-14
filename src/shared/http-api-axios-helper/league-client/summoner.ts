@@ -75,4 +75,8 @@ export class SummonerHttpApi {
   saveAlias(gameName: string, tagLine?: string) {
     return this._http.post('/lol-summoner/v1/save-alias', { gameName, tagLine })
   }
+
+  putSummonerIcon(iconId: number) {
+    return this._http.put('/lol-summoner/v1/current-summoner/icon', { profileIconId: iconId })
+  }
 }
