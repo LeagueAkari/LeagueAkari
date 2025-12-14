@@ -129,10 +129,23 @@ AppSettings:
     preferredLolSource:
       label: Preferred Data Source
       description: Select the preferred League of Legends API data source
+      howToChoose: How to choose?
       unsupported: 'Unsupported SGP API: {{server}}'
       options:
-        sgp: SGP API (Official Match History)
-        lcu: LCU API (Client Local)
+        sgp: SGP API
+        lcu: LCU API
+      tip:
+        sgp:
+          title: SGP API
+          feature1: Fast query performance with quick response
+          feature2: Provides more detailed match data
+          feature3: Supports cross-region match history lookup
+          warning: When using VPN/accelerator to play on foreign servers, connection may fail or be extremely slow
+        lcu:
+          title: LCU API (Client Local)
+          feature1: High stability, unaffected by network conditions
+          feature2: Reliable even when using VPN/accelerator
+          warning: 'Known issue: Querying match history during champion select may cause the game client to crash'
 
     dataSource:
       label: Git Repository Source

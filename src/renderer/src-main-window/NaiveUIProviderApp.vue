@@ -68,7 +68,14 @@ const themeOverrides = computed(() => {
       }
     } as GlobalThemeOverrides
   } else {
-    return {} as GlobalThemeOverrides
+    return {
+      Popover: {
+        fontSize: '12px'
+      },
+      Scrollbar: {
+        width: '6px'
+      }
+    } as GlobalThemeOverrides
   }
 })
 

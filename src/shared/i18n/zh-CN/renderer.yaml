@@ -131,9 +131,22 @@ AppSettings:
       label: 首选数据源
       description: 选择英雄联盟 API 数据源
       unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
+      howToChoose: 如何选择？
       options:
         sgp: SGP API
         lcu: LCU API
+      tip:
+        sgp:
+          title: SGP API
+          feature1: 查询速度快，响应迅速
+          feature2: 提供更详细的对局数据
+          feature3: 支持跨大区查询战绩
+          warning: 在中国大陆使用加速器游玩外服时，可能无法连接或响应缓慢
+        lcu:
+          title: LCU API (客户端本地)
+          feature1: 稳定性高，不受网络环境影响
+          feature2: 使用加速器时依然可靠
+          warning: 已知问题：在英雄选择阶段查询战绩可能导致游戏客户端崩溃
 
     dataSource:
       label: Git 仓库源

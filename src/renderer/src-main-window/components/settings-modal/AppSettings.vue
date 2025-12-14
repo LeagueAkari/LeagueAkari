@@ -38,13 +38,63 @@
         :label-description="t('AppSettings.basic.preferredLolSource.description')"
         :label-width="400"
       >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="as.settings.preferredLolSource"
-          @update:value="(val) => app.setPreferredLolSource(val)"
-          :options="lolSourceOptions"
-        />
+        <div class="flex items-center gap-3">
+          <NSelect
+            style="width: 160px"
+            size="small"
+            :value="as.settings.preferredLolSource"
+            @update:value="(val) => app.setPreferredLolSource(val)"
+            :options="lolSourceOptions"
+          />
+          <NPopover>
+            <template #trigger>
+              <div class="hover-text">
+                {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
+              </div>
+            </template>
+            <div class="max-w-320px">
+              <div class="mb-8px">
+                <div class="flex items-center h-22px">
+                  <span class="text-12px font-bold">{{
+                    t('AppSettings.basic.preferredLolSource.tip.sgp.title')
+                  }}</span>
+                </div>
+                <div class="text-11px leading-relaxed">
+                  <div class="dark:text-gray-200 text-neutral-600">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
+                  </div>
+                  <div class="dark:text-gray-200 text-neutral-600">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
+                  </div>
+                  <div class="dark:text-gray-200 text-neutral-600">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
+                  </div>
+                </div>
+                <div class="text-11px dark:text-orange-400 text-orange-600 mt-4px">
+                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center h-22px mb-4px">
+                  <span class="text-12px font-bold">{{
+                    t('AppSettings.basic.preferredLolSource.tip.lcu.title')
+                  }}</span>
+                </div>
+                <div class="text-11px leading-relaxed">
+                  <div class="dark:text-gray-200 text-neutral-600">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
+                  </div>
+                  <div class="dark:text-gray-200 text-neutral-600">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
+                  </div>
+                </div>
+                <div class="text-11px dark:text-orange-400 text-orange-500 mt-4px">
+                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
+                </div>
+              </div>
+            </div>
+          </NPopover>
+        </div>
         <div
           v-if="
             sgps.availability.sgpServerId &&
@@ -81,7 +131,7 @@
         :label-description="t('AppSettings.basic.dataSource.description')"
         :label-width="400"
       >
-        <NFlex align="center">
+        <div class="flex items-center gap-3">
           <NSelect
             style="width: 160px"
             size="small"
@@ -89,7 +139,7 @@
             @update:value="(val) => rc.setPreferredSource(val)"
             :options="remoteConfigSource"
           />
-          <NTooltip>
+          <NPopover>
             <template #trigger>
               <div class="hover-text">
                 {{ t('AppSettings.basic.dataSource.howToChoose') }}
@@ -97,11 +147,11 @@
             </template>
             <div>
               <div style="display: flex; align-items: center; height: 22px">
-                <NIcon style="margin-right: 8px; font-size: 16px">
+                <NIcon class="mr-2">
                   <GiteeSvg />
                 </NIcon>
-                <span style="font-weight: bold; font-size: 12px">Gitee</span>
-                <span style="margin-left: 4px">
+                <span class="font-bold text-xs">Gitee</span>
+                <span class="ml-1">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
                   </template>
@@ -116,12 +166,12 @@
               </div>
               <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
             </div>
-            <div style="margin-top: 8px">
-              <div style="display: flex; align-items: center; height: 22px">
-                <NIcon style="margin-right: 8px">
+            <div class="mt-2">
+              <div class="flex items-center h-22px">
+                <NIcon class="mr-2">
                   <GithubIcon />
                 </NIcon>
-                <span style="font-size: 12px; font-weight: bold">GitHub</span>
+                <span class="font-bold text-xs">GitHub</span>
                 <span style="margin-left: 4px">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
@@ -147,8 +197,8 @@
                 {{ t('AppSettings.basic.dataSource.testButton') }}
               </NButton>
             </div>
-          </NTooltip>
-        </NFlex>
+          </NPopover>
+        </div>
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
@@ -316,7 +366,7 @@
         }}</NButton>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span>
       </template>
@@ -516,12 +566,12 @@ import {
   NIcon,
   NInput,
   NInputNumber,
+  NPopover,
   NScrollbar,
   NSelect,
   NStep,
   NSteps,
   NSwitch,
-  NTooltip,
   useDialog,
   useMessage
 } from 'naive-ui'
@@ -743,14 +793,7 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 
 <style scoped>
 .hover-text {
-  font-size: 12px;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.3s;
-
-  &:hover {
-    color: #fff;
-  }
+  --at-apply: 'text-xs dark:text-white/60 text-black/60 cursor-pointer transition-color duration-300 dark:hover:text-white hover:text-black';
 }
 
 .step-title {

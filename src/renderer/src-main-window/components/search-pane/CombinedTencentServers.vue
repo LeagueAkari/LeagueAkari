@@ -27,8 +27,8 @@
       </div>
     </div>
 
-    <div class="mt-4 text-xs dark:text-white/50 text-black/50 flex items-center gap-1">
-      <NIcon>
+    <div class="mt-4 text-xs dark:text-white/60 text-black/60 flex items-center gap-1">
+      <NIcon class="mr-1">
         <Info24Regular />
       </NIcon>
       <template v-for="(group, index) of GROUPS.filter((g) => g.members.length === 1)">
@@ -36,6 +36,13 @@
         <span v-if="index < GROUPS.filter((g) => g.members.length === 1).length - 1">, </span>
       </template>
       仍保持各自独立。
+    </div>
+
+    <div class="text-xs dark:text-white/60 text-black/60 flex items-center gap-1">
+      <NIcon class="mr-1">
+        <Info24Regular />
+      </NIcon>
+      跨区域查询依赖 SGP 数据源。
     </div>
   </div>
 </template>
