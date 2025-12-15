@@ -1,14 +1,14 @@
 <template>
-  <div class="standalone-card-wrapper">
+  <div class="h-full flex flex-col">
     <NInput
       v-model:value="filterText"
       :placeholder="t('OpggTier.searchPlaceholder')"
       size="small"
-      style="font-size: 12px; margin-bottom: 4px"
+      class="text-xs mb-1"
       clearable
     />
     <NDataTable
-      class="tier-table"
+      class="flex-1"
       flex-height
       :data="data"
       :columns="combinedColumns"
@@ -19,7 +19,7 @@
       size="small"
     >
       <template #loading>
-        <div class="loading-description">
+        <div class="flex flex-col items-center gap-2">
           <NSpin size="small" />
           <NButton size="tiny" secondary @click="emits('cancel')">{{ t('Opgg.cancel') }}</NButton>
         </div>
@@ -75,9 +75,7 @@ const rowProps: DataTableCreateRowProps<any> = (row) => {
     onClick: () => {
       emits('toChampion', row.id)
     },
-    style: {
-      cursor: 'pointer'
-    }
+    class: 'cursor-pointer'
   }
 }
 
@@ -492,163 +490,6 @@ const data = computed(() => {
 })
 </script>
 
-<style scoped>
-.standalone-card-wrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  .tier-table {
-    flex: 1;
-  }
-
-  .loading-description {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-}
-
-.champion-item {
-  display: flex;
-  align-items: center;
-  height: 42px;
-  border-radius: 4px;
-  transition: all 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #ffffff10;
-  }
-
-  .rank {
-    width: 48px;
-    text-align: center;
-    font-size: 12px;
-    color: rgb(192, 192, 192);
-  }
-
-  .first-line {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    overflow: hidden;
-
-    .name {
-      margin-left: 8px;
-      font-size: 13px;
-      color: #c9c9c9;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-  }
-
-  .image {
-    height: 32px;
-    width: 32px;
-  }
-
-  .tier {
-    width: 60px;
-    text-align: center;
-    font-weight: bold;
-
-    &.tier-1 {
-      color: #0093ff;
-    }
-
-    &.tier-2 {
-      color: #00bba3;
-    }
-
-    &.tier-3 {
-      color: #ffb900;
-    }
-
-    &.tier-4 {
-      color: #9aa4af;
-    }
-
-    &.tier-5 {
-      color: #a88a67;
-    }
-
-    &.tier-6 {
-      color: rgb(85, 34, 83);
-    }
-  }
-
-  .win-rate {
-    text-align: center;
-    width: 86px;
-    font-size: 13px;
-    color: rgb(192, 192, 192);
-  }
-}
-
-.inner {
-  padding: 8px;
-}
-
-.card-area {
-  border-radius: 2px;
-  background-color: #ffffff10;
-  padding: 4px 8px;
-
-  .card-title {
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
-
-  &:not(:last-child) {
-    margin-bottom: 4px;
-  }
-}
-
-.skill-route {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
-
-  .skill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #20618d;
-    color: white;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-  }
-}
-
-.skill-details {
-  display: flex;
-  gap: 2px;
-
-  .skill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #208d6e;
-    color: white;
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-    border-radius: 2px;
-  }
-}
-
-.filters {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-</style>
-
 <style module>
 .column-title {
   font-size: 13px;
@@ -708,7 +549,7 @@ const data = computed(() => {
   }
 
   &.tier-6 {
-    color: rgb(85, 34, 83);
+    color: #552253;
   }
 }
 </style>

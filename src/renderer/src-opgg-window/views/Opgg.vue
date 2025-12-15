@@ -2,11 +2,11 @@
   <div class="opgg-panel" ref="opgg-panel">
     <div class="tabs-area">
       <a href="https://op.gg" :title="t('Opgg.toOpgg')" target="_blank">
-        <OpggIcon class="opgg-icon" />
+        <OpggIcon class="size-8 dark:text-white text-black block" />
       </a>
       <NButton
         secondary
-        class="square-button"
+        class="!size-8"
         :title="t('Opgg.refresh')"
         :loading="isLoading"
         @click="loadAll"
@@ -17,7 +17,7 @@
       </NButton>
       <NButton
         secondary
-        class="square-button"
+        class="!size-8"
         :title="t('Opgg.settings.button')"
         @click="isSettingsLayerShow = true"
       >

@@ -130,9 +130,6 @@ interface OpggBalanceDataItem {
   default: boolean
 }
 
-// {{baseUrl}}/api/global/champions/aram/101/none?tier=platinum_plus&version=14.10
-// {{baseUrl}}/api/global/champions/aram/versions {"data":["14.10","14.09","14.08"]}
-
 export interface OpggARAMDataItem {
   id: number
   is_rotation: boolean

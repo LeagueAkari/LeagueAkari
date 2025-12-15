@@ -1,3 +1,4 @@
+import { USER_AGENT } from '@shared/constants/common'
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
 import axiosRetry from 'axios-retry'
@@ -22,15 +23,13 @@ const isNodeEnvironment =
 const _axiosRetry: AxiosRetry = isNodeEnvironment ? require('axios-retry').default : axiosRetry
 
 export class OpggDataApi {
-  static USER_AGENT =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
   static BASE_URL = 'https://lol-api-champion.op.gg'
 
   private _http = axios.create({
-    baseURL: OpggDataApi.BASE_URL
-    // headers: {
-    //   'User-Agent': OpggDataSource.USER_AGENT
-    // }
+    baseURL: OpggDataApi.BASE_URL,
+    headers: {
+      'User-Agent': USER_AGENT
+    }
   })
 
   get http() {
@@ -103,5 +102,9 @@ export class OpggDataApi {
 
   async getARAMBalance() {
     return (await this._http.get<OpggARAMBalance>('/api/contents/aram-balance')).data
+  }
+
+  getAramBalance() {
+    return this._http.get<OpggARAMBalance>('/api/contents/aram-balance')
   }
 }
