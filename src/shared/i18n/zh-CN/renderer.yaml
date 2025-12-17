@@ -1395,7 +1395,7 @@ MatchCard:
     dodgeSkillShotsSmallWindow: 短时间内躲避技巧技能
     landSkillShotsEarlyGame: 早期命中技巧技能
     blastConeOppositeOpponentCount: 爆炸果实击退敌人
-    quickCleanse: 控制秒解
+    quickCleanse: 快速净化
     dancedWithRiftHerald: 与先锋共舞
     fistBumpParticipation: 碰拳参与
     # Teamfight - 团战
@@ -1486,7 +1486,7 @@ SearchPane:
   noResultHintFuzzy: 搜索名称，如
   noResultHintExact: 按照名称和标签精确搜索，如
   noResultHintPuuid: 按照 PUUID 搜索，如
-  noResultHintFuzzyExample: 赤座灯里
+  noResultHintFuzzyExample: 船见结衣
   noResultHintExactExample: '岁纳京子 #12345'
   noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
   recentVisits: 最近访问
@@ -2438,7 +2438,7 @@ Opgg:
   toOpgg: 转到 OP.GG
   refresh: 刷新
   close: 关闭
-  tier: 梯队
+  champions: 梯队
   champion: 英雄
   empty: 无
   mode: 模式
@@ -2461,8 +2461,8 @@ Opgg:
 
     flashPosition:
       label: 闪现位置偏好
-      description: 设置召唤师技能时，若存在闪现技能，优先选择的位置
-      auto: 当前闪现的位置
+      description: 在设置召唤师技能时，放置闪现的位置
+      auto: 当前位置
       options:
         d: 闪现位置默认在 D
         f: 闪现位置默认在 F
@@ -2551,6 +2551,7 @@ OpggTier:
     banRate: 禁用率
 
 OpggChampion:
+  boots: 鞋子
   adorableRabi: 兔兔好可爱
   avgPlace: 平均排名
   1st: 第一

@@ -3,7 +3,7 @@
     <!-- Cross Region Unsupported Card -->
     <div
       v-if="isCrossRegion"
-      class="relative h-27 flex flex-col items-center justify-center rounded border border-gray-300 dark:border-white/10 text-xs text-gray-700 dark:text-gray-400"
+      class="relative flex h-27 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-400"
       :class="isSmallSize ? 'w-30' : 'w-60'"
     >
       <div>{{ t('RankedPane.crossRegion', 'Cross Region') }}</div>
@@ -15,11 +15,11 @@
       <div
         v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative h-27 flex items-center justify-center rounded-lg dark:bg-white/5 bg-black/5"
+        class="relative flex h-27 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5"
         :class="isSmallSize ? 'w-30' : 'w-60'"
       >
         <!-- Queue Type Label -->
-        <div class="absolute left-0 top-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+        <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
           {{
             t(`queueTypes.${entry.queueType}`, {
               defaultValue: entry.queueType,
@@ -33,7 +33,7 @@
           <!-- Image Container -->
           <div v-if="!isSmallSize" class="relative h-12 w-16">
             <img
-              class="absolute left-1/2 top-1/2 h-144% w-144% -translate-x-1/2 -translate-y-1/2 object-contain"
+              class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
               :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
             />
           </div>
@@ -53,7 +53,7 @@
 
             <!-- Highest Previous Season -->
             <div
-              class="flex items-center text-10px text-gray-500 dark:text-gray-300"
+              class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
               :class="{
                 'text-gray-400 dark:text-gray-500':
                   !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
@@ -77,7 +77,7 @@
       </div>
 
       <!-- More Button -->
-      <div class="absolute -bottom-1.5 -right-2">
+      <div class="absolute -right-2 -bottom-1.5">
         <NButton
           :focusable="false"
           :title="t('PlayerTab.rankedMore', '更多排位信息')"
@@ -99,10 +99,10 @@
         <div
           v-for="entry in displayedRankedEntries"
           :key="entry.queueType"
-          class="relative flex h-108px w-60 items-center justify-center rounded dark:bg-white/5 bg-black/5"
+          class="relative flex h-[108px] w-60 items-center justify-center rounded bg-black/5 dark:bg-white/5"
         >
           <!-- Queue Type Label -->
-          <div class="absolute left-0 top-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+          <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
             {{
               t(`queueTypes.${entry.queueType}`, {
                 defaultValue: entry.queueType,
@@ -116,7 +116,7 @@
             <!-- Image Container -->
             <div class="relative h-12 w-16">
               <img
-                class="absolute left-1/2 top-1/2 h-144% w-144% -translate-x-1/2 -translate-y-1/2 object-contain"
+                class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
                 :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
               />
             </div>
@@ -136,7 +136,7 @@
 
               <!-- Highest Previous Season -->
               <div
-                class="flex items-center text-10px text-gray-500 dark:text-gray-300"
+                class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
                 :class="{
                   'text-gray-400 dark:text-gray-500':
                     !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'

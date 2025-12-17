@@ -1,6 +1,6 @@
 <template>
   <div class="w-120">
-    <div v-if="title" class="text-center font-bold text-sm">{{ title }}</div>
+    <div v-if="title" class="text-center text-sm font-bold">{{ title }}</div>
     <div class="w-120" :style="{ height: `${height}px` }">
       <Bar :data="data" :options="options" />
     </div>

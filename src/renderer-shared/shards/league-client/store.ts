@@ -77,6 +77,12 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     perkName: (id: number) => {
       return gameData.perks[id]?.name || id.toString()
     },
+    summonerSpellName: (id: number) => {
+      return gameData.summonerSpells[id]?.name || id.toString()
+    },
+    augmentName: (id: number) => {
+      return gameData.augments[id]?.nameTRA || id.toString()
+    },
 
     champions: {} as Record<number, ChampionSimple>,
     augments: {} as Record<number, Augment>,

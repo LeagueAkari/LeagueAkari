@@ -1,15 +1,15 @@
 <template>
-  <div class="@container b b-solid rounded" :class="tone.borderClass">
+  <div class="@container overflow-hidden rounded border border-solid" :class="tone.borderClass">
     <!-- header -->
-    <div class="box-border flex items-center gap-4 h-8 text-xs p-2" :class="tone.headerClass">
+    <div class="box-border flex h-8 items-center gap-4 p-2 text-xs" :class="tone.headerClass">
       <!-- team name -->
       <div class="flex items-center gap-1">
         <div
           class="text-xs font-bold"
           :class="{
-            'dark:text-green-300 text-green-700': team.winResult === 'win',
-            'dark:text-red-300 text-red-700': team.winResult === 'loss',
-            'dark:text-white/80 text-black/80':
+            'text-green-700 dark:text-green-300': team.winResult === 'win',
+            'text-red-700 dark:text-red-300': team.winResult === 'loss',
+            'text-black/80 dark:text-white/80':
               team.winResult === 'remake' || team.winResult === 'abort'
           }"
         >
@@ -26,60 +26,60 @@
       </div>
 
       <!-- team kda -->
-      <div class="text-xs dark:text-white/80 text-black/80">
+      <div class="text-xs text-black/80 dark:text-white/80">
         {{ team.totalKills }}/{{ team.totalDeaths }}/{{ team.totalAssists }}
       </div>
 
-      <div class="text-xs dark:text-white/80 text-black/80">
+      <div class="text-xs text-black/80 dark:text-white/80">
         {{ (team.totalGoldEarned / 1000).toFixed(2) }} k
       </div>
 
       <!-- objective -->
       <div v-if="team.teamInfo" class="flex gap-2">
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.tower')"
         >
           <Tower class="size-3.5" />
           <span>{{ team.teamInfo.objectives.tower.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.inhibitor')"
         >
           <Inhibitor class="size-3.5" />
           <span>{{ team.teamInfo.objectives.inhibitor.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.dragon')"
         >
           <Dragon class="size-3.5" />
           <span>{{ team.teamInfo.objectives.dragon.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.baron')"
         >
           <Baron class="size-3.5" />
           <span>{{ team.teamInfo.objectives.baron.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.voidGrub')"
         >
           <VoidGrub class="size-3.5" />
           <span>{{ team.teamInfo.objectives.horde.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.riftHerald')"
         >
           <RiftHerald class="size-3.5" />
           <span>{{ team.teamInfo.objectives.riftHerald.kills }}</span>
         </div>
         <div
-          class="flex items-center gap-1 dark:text-white/60 text-black/60"
+          class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.atakhan')"
           v-if="team.teamInfo.objectives.atakhan"
         >
@@ -89,8 +89,8 @@
       </div>
 
       <!-- bans -->
-      <div class="mla flex" v-if="team.teamInfo && team.teamInfo.bans.length > 0">
-        <div class="text-xs dark:text-white/60 text-black/60 mr-1">
+      <div class="ml-auto flex" v-if="team.teamInfo && team.teamInfo.bans.length > 0">
+        <div class="mr-1 text-xs text-black/60 dark:text-white/60">
           {{ t('MatchCard.teamTable.bans') }}
         </div>
         <div class="flex gap-0.5">
@@ -102,7 +102,7 @@
           />
           <NPopover v-if="team.teamInfo.bans.length > 5">
             <template #trigger>
-              <div class="text-xs dark:text-white/60 text-black/60">
+              <div class="text-xs text-black/60 dark:text-white/60">
                 +{{ team.teamInfo.bans.length - 5 }}
               </div>
             </template>
@@ -124,20 +124,20 @@
       v-for="participant in teamParticipants"
       :key="participant.puuid"
       :class="{
-        'dark:bg-white/5 bg-black/5 bg-clip-padding': participant.puuid === puuid
+        'bg-black/5 bg-clip-padding dark:bg-white/5': participant.puuid === puuid
       }"
-      class="box-border b-t b-t-solid dark:b-t-white/5 b-t-black/5 h-12 px-2 py-1 flex items-center"
+      class="box-border flex h-12 items-center border-t border-r-0 border-b-0 border-l-0 border-solid border-t-black/5 px-2 py-1 dark:border-t-white/5"
     >
       <!-- name line -->
-      <div class="flex-1 min-w-0 flex items-center gap-1">
+      <div class="flex min-w-0 flex-1 items-center gap-1">
         <!-- left champion icon -->
         <NPopover placement="right">
           <template #trigger>
             <div class="relative size-8 cursor-pointer">
-              <ChampionIcon :champion-id="participant.championId" class="!size-full" round />
+              <ChampionIcon :champion-id="participant.championId" class="size-full!" round />
 
               <div
-                class="absolute -bottom-1 right-0 text-10px leading-none p-0.5 text-white/80 dark:bg-black/50 bg-black/70 rounded-full"
+                class="absolute right-0 -bottom-1 rounded-full bg-black/70 p-0.5 text-[10px] leading-none text-white/80 dark:bg-black/50"
               >
                 {{ participant.level }}
               </div>
@@ -147,7 +147,7 @@
         </NPopover>
 
         <!-- spells -->
-        <div v-if="participant.spells[0] || participant.spells[1]" class="flex gap-0.5 flex-col">
+        <div v-if="participant.spells[0] || participant.spells[1]" class="flex flex-col gap-0.5">
           <SummonerSpellDisplay
             v-for="spell in participant.spells"
             :key="spell"
@@ -162,25 +162,25 @@
             participant.perks.styles[0]?.selections[0]?.perk ||
             participant.perks.styles[1]?.selections[0]?.perk
           "
-          class="flex gap-0.5 flex-col -ml-0.5"
+          class="-ml-0.5 flex flex-col gap-0.5"
         >
           <PerkDisplay :perk-id="participant.perks.styles[0]?.selections[0]?.perk" :size="16" />
           <PerkstyleDisplay :perkstyle-id="participant.perks.styles[1]?.style" :size="16" />
         </div>
 
         <!-- name & position -->
-        <div class="flex-1 min-w-0 flex flex-col">
+        <div class="flex min-w-0 flex-1 flex-col">
           <NTooltip>
             <template #trigger>
               <div
-                class="text-xs cursor-pointer flex items-center gap-1"
+                class="flex cursor-pointer items-center gap-1 text-xs"
                 @click="onNavigateToSummonerByPuuid(participant.puuid)"
                 @mousedown="handleMouseDown"
                 @mouseup="handleMouseUp($event, participant.puuid)"
-                :class="{ 'font-bold dark:text-white text-black': participant.puuid === puuid }"
+                :class="{ 'font-bold text-black dark:text-white': participant.puuid === puuid }"
               >
                 <NIcon
-                  class="dark:text-white/80 text-black/80"
+                  class="text-black/80 dark:text-white/80"
                   v-if="!participant.puuid || participant.puuid === EMPTY_PUUID"
                 >
                   <Robot />
@@ -209,7 +209,7 @@
           </NTooltip>
           <div
             v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
-            class="text-11px dark:text-white/60 text-black/60"
+            class="text-[11px] text-black/60 dark:text-white/60"
           >
             {{ position(participant.position) }}
           </div>
@@ -224,7 +224,7 @@
               (participant.killParticipation * 100).toFixed(0)
             }}%)
           </div>
-          <div class="dark:text-white/60 text-black/60 text-11px">
+          <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ participant.kda.toFixed(2) }} KDA
           </div>
         </div>
@@ -260,7 +260,7 @@
         <!-- cs -->
         <div v-else-if="column.name === 'cs'" :class="column.class">
           <div class="text-xs">{{ participant.cs }} CS</div>
-          <div class="dark:text-white/60 text-black/60 text-11px">
+          <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
             {{ t('MatchCard.teamTable.perMinuteSuffix') }}
           </div>
@@ -269,7 +269,7 @@
         <!-- gold -->
         <div v-else-if="column.name === 'gold'" :class="column.class">
           <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }} k</div>
-          <div class="dark:text-white/60 text-black/60 text-11px">
+          <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }}
             {{ t('MatchCard.teamTable.perMinuteSuffix') }}
           </div>
@@ -326,28 +326,28 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   switch (basicInfo.value.gameMode) {
     case 'CHERRY':
       return [
-        { name: 'kda', class: 'min-w-26 text-center' },
-        { name: 'augments', class: 'min-w-30 flex gap-0.5 justify-center' },
+        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
+        { name: 'augments', class: 'min-w-[7.5rem] flex gap-0.5 justify-center' },
         { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[800px]:block min-w-18 text-center' },
-        { name: 'gold', class: 'hidden @[740px]:block min-w-18 text-xs text-center' },
+        { name: 'cs', class: 'hidden @[800px]:block min-w-[4.5rem] text-center' },
+        { name: 'gold', class: 'hidden @[740px]:block min-w-[4.5rem] text-xs text-center' },
         { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
       ]
     case 'KIWI':
       return [
-        { name: 'kda', class: 'min-w-26 text-center' },
-        { name: 'augments', class: 'min-w-29 flex gap-0.5 justify-center' },
-        { name: 'damage', class: 'min-w-30 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[740px]:block min-w-18 text-center' },
-        { name: 'gold', class: 'hidden @[700px]:block min-w-18 text-xs text-center' },
+        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
+        { name: 'augments', class: 'min-w-[7.25rem] flex gap-0.5 justify-center' },
+        { name: 'damage', class: 'min-w-[7.5rem] flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[740px]:block min-w-[4.5rem] text-center' },
+        { name: 'gold', class: 'hidden @[700px]:block min-w-[4.5rem] text-xs text-center' },
         { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
       ]
     default:
       return [
-        { name: 'kda', class: 'min-w-26 text-center' },
+        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
         { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[700px]:block w-18 text-center' },
-        { name: 'gold', class: 'min-w-18 text-xs text-center' },
+        { name: 'cs', class: 'hidden @[700px]:block w-[4.5rem] text-center' },
+        { name: 'gold', class: 'min-w-[4.5rem] text-xs text-center' },
         { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
       ]
   }
@@ -359,17 +359,17 @@ const { t } = useTranslation()
 const tone = computed(() => {
   const k = team.value.winResult
   const borderClass = {
-    win: 'dark:b-green-300/10 b-green-700/10',
-    loss: 'dark:b-red-300/10 b-red-700/10',
-    remake: 'dark:b-white/10 b-black/10',
-    abort: 'dark:b-white/10 b-black/10'
+    win: 'dark:border-green-300/10 border-green-700/10',
+    loss: 'dark:border-red-300/10 border-red-700/10',
+    remake: 'dark:border-white/10 border-black/10',
+    abort: 'dark:border-white/10 border-black/10'
   }[k]
 
   const headerClass = {
     win: 'dark:bg-green-300/10 bg-green-700/10',
     loss: 'dark:bg-red-300/10 bg-red-700/10',
-    remake: 'dark:bg-white/10 b-black/10',
-    abort: 'dark:bg-white/10 b-black/10'
+    remake: 'dark:bg-white/10 bg-black/10',
+    abort: 'dark:bg-white/10 bg-black/10'
   }[k]
 
   return { borderClass, headerClass }

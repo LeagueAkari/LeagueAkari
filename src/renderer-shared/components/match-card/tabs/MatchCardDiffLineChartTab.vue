@@ -1,16 +1,16 @@
 <template>
-  <div v-if="frames.length > 0" class="h-142 w-full flex gap-4 flex-1">
+  <div v-if="frames.length > 0" class="flex h-142 w-full flex-1 gap-4">
     <!-- 图表区域 -->
-    <div class="flex-1 min-w-0">
+    <div class="min-w-0 flex-1">
       <Line :data="chartData" :options="chartOptions" />
     </div>
 
     <!-- 右侧控制面板 -->
-    <NScrollbar class="!w-52">
+    <NScrollbar class="w-52!">
       <div class="flex flex-col gap-3">
         <!-- 数据类型选择器 -->
         <div class="flex flex-col gap-2">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
             {{ t('MatchCard.diffLineChart.dataType') }}
           </div>
           <NRadioGroup v-model:value="selectedMetric">
@@ -23,11 +23,11 @@
         </div>
 
         <!-- 分隔线 -->
-        <div class="h-px dark:bg-white/10 bg-black/10"></div>
+        <div class="h-px bg-black/10 dark:bg-white/10"></div>
 
         <!-- 队伍平均选择 -->
         <div class="flex flex-col gap-2">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
             {{ t('MatchCard.diffLineChart.teamAverage') }}
           </div>
           <NCheckboxGroup v-model:value="selectedTeams">
@@ -43,11 +43,11 @@
         </div>
 
         <!-- 分隔线 -->
-        <div class="h-px dark:bg-white/10 bg-black/10"></div>
+        <div class="h-px bg-black/10 dark:bg-white/10"></div>
 
         <!-- 玩家选择 -->
-        <div class="flex flex-col gap-2 w-full">
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+        <div class="flex w-full flex-col gap-2">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
             {{ t('MatchCard.diffLineChart.players') }}
           </div>
           <!-- 全选 / 半选 / 全不选 -->
@@ -70,10 +70,10 @@
                 :value="player.value"
               >
                 <template #default>
-                  <div class="flex items-center gap-2 w-48">
+                  <div class="flex w-48 items-center gap-2">
                     <!-- 颜色方块 -->
                     <div
-                      class="w-3 h-3 rounded-sm shrink-0"
+                      class="h-3 w-3 shrink-0 rounded-sm"
                       :style="{ backgroundColor: player.color }"
                     ></div>
                     <span class="truncate">{{ player.label }}</span>
@@ -88,16 +88,16 @@
   </div>
   <div
     v-else
-    class="h-142 w-full flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
+    class="flex h-142 w-full items-center justify-center text-sm text-black/60 dark:text-white/60"
   >
     <template v-if="loadingDetails">
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <NSpin :size="16" />
         <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <span>{{ t('MatchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
           {{ t('MatchCard.common.refresh') }}

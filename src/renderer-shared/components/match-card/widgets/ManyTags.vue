@@ -29,7 +29,7 @@
     <NPopover v-if="tagOverflowInfo.isOverflow">
       <template #trigger>
         <div
-          class="shrink-0 dark:bg-white/10 bg-black/10 hover:dark:bg-white/20 hover:bg-black/20 transition-colors text-xs py-0.5 px-2 rounded-xl absolute left-0"
+          class="absolute left-0 shrink-0 rounded-xl bg-black/10 px-2 py-0.5 text-xs transition-colors hover:bg-black/20 dark:bg-white/10 hover:dark:bg-white/20"
           :style="{ left: tagOverflowInfo.lastVisibleTagOffsetLeft + 'px' }"
         >
           +{{ Math.min(tags.length - tagOverflowInfo.lastVisibleTagIndex, 99) }}
@@ -126,9 +126,11 @@ useResizeObserver(() => [containerEl.value, ...(tagsEl.value || [])], recalcOver
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .tag {
-    --at-apply: 'relative shrink-0 text-xs py-0.5 px-2 rounded-xl';
+    @apply relative shrink-0 rounded-xl px-2 py-0.5 text-xs;
   }
 }
 </style>

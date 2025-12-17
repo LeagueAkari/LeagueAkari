@@ -25,7 +25,7 @@ export class OpggDataApi {
   private _http = axios.create({
     baseURL: OpggDataApi.BASE_URL,
     headers: {
-      'User-Agent': USER_AGENT
+      'User-Agent': isNodeEnvironment ? USER_AGENT : undefined
     }
   })
 

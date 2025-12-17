@@ -1,9 +1,9 @@
 <template>
-  <div class="px-4 py-2 dark:bg-white/5 rounded bg-black/5" v-if="spectatorData">
+  <div class="rounded bg-black/5 px-4 py-2 dark:bg-white/5" v-if="spectatorData">
     <!-- Queue Info -->
     <div class="flex items-center">
       <IndicatorPulse class="mr-2" />
-      <div class="text-sm font-bold flex-1 w-0 truncate dark:text-white text-gray-900">
+      <div class="w-0 flex-1 truncate text-sm font-bold text-gray-900 dark:text-white">
         {{
           lcs.gameData.queues[spectatorData.game.gameQueueConfigId]?.name ||
           spectatorData.game.gameQueueConfigId
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Time Info -->
-    <div class="text-xs text-gray-600 dark:text-gray-300 mt-0.5 mb-1">
+    <div class="mt-0.5 mb-1 text-xs text-gray-600 dark:text-gray-300">
       {{
         t('SpectateStatus.startFrom', {
           date: dayjs(spectatorData.playerCredentials.gameCreateDate).format('MM-DD HH:mm:ss'),
@@ -71,17 +71,17 @@
     </div>
 
     <!-- Divider -->
-    <div class="h-px bg-white/10 my-2"></div>
+    <div class="my-2 h-px bg-white/10"></div>
 
     <!-- Cherry Bans (斗魂竞技场) -->
     <div
-      class="flex mb-2"
+      class="mb-2 flex"
       v-if="spectatorData.game.gameMode === 'CHERRY' && spectatorData.game.bannedChampions.length"
     >
-      <span class="text-10px text-gray-400 mr-1">{{ t('SpectateStatus.bans') }}</span>
-      <div class="ml-auto flex items-end gap-0.5 flex-wrap max-w-160px">
+      <span class="mr-1 text-[10px] text-gray-400">{{ t('SpectateStatus.bans') }}</span>
+      <div class="ml-auto flex max-w-[160px] flex-wrap items-end gap-0.5">
         <LcuImage
-          class="w-18px h-18px"
+          class="size-[18px]"
           v-for="ban of spectatorData.game.bannedChampions"
           :key="ban.championId"
           :src="championIconUri(ban.championId)"
@@ -93,14 +93,14 @@
     <div class="space-y-2">
       <!-- Team 1 -->
       <div v-if="teams?.team1?.players?.length">
-        <div class="flex text-sm font-bold mb-1 dark:text-white text-gray-900">
+        <div class="mb-1 flex text-sm font-bold text-gray-900 dark:text-white">
           <span v-if="teams.team1.name">{{ teams.team1.name }}</span>
           <div class="ml-auto flex items-end gap-0.5" v-if="teams.team1.bans?.length">
-            <span class="text-10px font-normal text-gray-400 mr-0.5">{{
+            <span class="mr-0.5 text-[10px] font-normal text-gray-400">{{
               t('SpectateStatus.bans')
             }}</span>
             <LcuImage
-              class="w-18px h-18px"
+              class="size-[18px]"
               v-for="ban of teams.team1.bans"
               :key="ban.championId"
               :src="championIconUri(ban.championId)"
@@ -108,7 +108,7 @@
           </div>
         </div>
         <div
-          class="flex flex-col gap-0.5 p-1 rounded-sm"
+          class="flex flex-col gap-0.5 rounded-sm p-1"
           :class="{
             'bg-blue-900/20': teams.team1.id === 100 || teams.team1.id === 0,
             'bg-red-900/20': teams.team1.id === 200
@@ -121,24 +121,24 @@
           >
             <PositionIcon
               v-if="player.selectedPosition !== 'NONE'"
-              class="text-18px text-white/80 mr-0.5"
+              class="mr-0.5 text-lg text-white/80"
               :position="player.selectedPosition"
             />
             <LcuImage
               v-if="isTftMode"
-              class="w-18px h-18px"
+              class="size-[18px]"
               :src="profileIconUri(player.profileIconId)"
             />
-            <LcuImage v-else class="w-18px h-18px" :src="championIconUri(player.championId)" />
+            <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="text-11px font-bold leading-11px p-0.5 rounded-sm bg-white/20 min-w-12px text-center ml-1"
+              class="ml-1 min-w-3 rounded-sm bg-white/20 p-0.5 text-center text-[11px] leading-[11px] font-bold"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}
             </div>
             <div
-              class="ml-0.5 text-xs cursor-pointer transition-colors px-0.5 rounded-sm hover:bg-white/20"
+              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-white/20"
               @click="() => navigateToSummonerByPuuid(player.puuid, true)"
               @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
               @mousedown="handleMouseDown"
@@ -152,7 +152,7 @@
                 <span class="font-bold">{{
                   updatedSummonerInfo[player.puuid]?.gameName || player.summonerName
                 }}</span>
-                <span v-if="updatedSummonerInfo[player.puuid]" class="text-11px ml-0.5"
+                <span v-if="updatedSummonerInfo[player.puuid]" class="ml-0.5 text-[11px]"
                   >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
                 >
               </StreamerModeMaskedText>
@@ -163,14 +163,14 @@
 
       <!-- Team 2 -->
       <div v-if="teams?.team2?.players?.length">
-        <div class="flex text-sm font-bold mb-1 dark:text-white text-gray-900">
+        <div class="mb-1 flex text-sm font-bold text-gray-900 dark:text-white">
           <span v-if="teams.team2.name">{{ teams.team2.name }}</span>
           <div class="ml-auto flex items-end gap-0.5" v-if="teams.team2.bans?.length">
-            <span class="text-10px font-normal text-gray-400 mr-0.5">{{
+            <span class="mr-0.5 text-[10px] font-normal text-gray-400">{{
               t('SpectateStatus.bans')
             }}</span>
             <LcuImage
-              class="w-18px h-18px"
+              class="size-[18px]"
               v-for="ban of teams.team2.bans"
               :key="ban.championId"
               :src="championIconUri(ban.championId)"
@@ -178,7 +178,7 @@
           </div>
         </div>
         <div
-          class="flex flex-col gap-0.5 p-1 rounded-sm"
+          class="flex flex-col gap-0.5 rounded-sm p-1"
           :class="{
             'bg-blue-900/20': teams.team2.id === 100,
             'bg-red-900/20': teams.team2.id === 200
@@ -191,24 +191,24 @@
           >
             <PositionIcon
               v-if="player.selectedPosition !== 'NONE'"
-              class="text-18px text-white/80 mr-0.5"
+              class="mr-0.5 text-lg text-white/80"
               :position="player.selectedPosition"
             />
             <LcuImage
               v-if="isTftMode"
-              class="w-18px h-18px"
+              class="size-[18px]"
               :src="profileIconUri(player.profileIconId)"
             />
-            <LcuImage v-else class="w-18px h-18px" :src="championIconUri(player.championId)" />
+            <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="text-11px font-bold leading-11px p-0.5 rounded-sm bg-white/20 min-w-12px text-center ml-1"
+              class="ml-1 min-w-[12px] rounded-sm bg-white/20 p-0.5 text-center text-[11px] leading-[11px] font-bold"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}
             </div>
             <div
-              class="ml-0.5 text-xs cursor-pointer transition-colors px-0.5 rounded-sm hover:bg-white/20"
+              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-white/20"
               @click="() => navigateToSummonerByPuuid(player.puuid, true)"
               @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
               @mousedown="handleMouseDown"
@@ -224,7 +224,7 @@
                 <span class="font-bold">{{
                   updatedSummonerInfo[player.puuid]?.gameName || player.summonerName
                 }}</span>
-                <span v-if="updatedSummonerInfo[player.puuid]" class="text-11px ml-0.5"
+                <span v-if="updatedSummonerInfo[player.puuid]" class="ml-0.5 text-[11px]"
                   >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
                 >
               </StreamerModeMaskedText>

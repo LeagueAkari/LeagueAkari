@@ -40,3 +40,11 @@ type IsPlainObject<T> = T extends object
 
 export type DeepPartialObject<T> =
   IsPlainObject<T> extends true ? { [K in keyof T]?: DeepPartialObject<T[K]> } : T
+
+export type MergeOptionalStrict<A, B> = {
+  [K in keyof A & keyof B]: A[K] extends B[K] ? (B[K] extends A[K] ? A[K] : never) : never
+} & {
+  [K in Exclude<keyof A, keyof B>]?: A[K]
+} & {
+  [K in Exclude<keyof B, keyof A>]?: B[K]
+}

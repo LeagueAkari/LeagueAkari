@@ -52,43 +52,43 @@
                 {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
               </div>
             </template>
-            <div class="max-w-320px">
-              <div class="mb-8px">
-                <div class="flex items-center h-22px">
-                  <span class="text-12px font-bold">{{
+            <div class="max-w-[320px]">
+              <div class="mb-2">
+                <div class="flex h-[22px] items-center">
+                  <span class="text-xs font-bold">{{
                     t('AppSettings.basic.preferredLolSource.tip.sgp.title')
                   }}</span>
                 </div>
-                <div class="text-11px leading-relaxed">
-                  <div class="dark:text-gray-200 text-neutral-600">
+                <div class="text-[11px] leading-relaxed">
+                  <div class="text-neutral-600 dark:text-gray-200">
                     · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
                   </div>
-                  <div class="dark:text-gray-200 text-neutral-600">
+                  <div class="text-neutral-600 dark:text-gray-200">
                     · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
                   </div>
-                  <div class="dark:text-gray-200 text-neutral-600">
+                  <div class="text-neutral-600 dark:text-gray-200">
                     · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
                   </div>
                 </div>
-                <div class="text-11px dark:text-orange-400 text-orange-600 mt-4px">
+                <div class="mt-1 text-[11px] text-orange-600 dark:text-orange-400">
                   ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
                 </div>
               </div>
               <div>
-                <div class="flex items-center h-22px mb-4px">
-                  <span class="text-12px font-bold">{{
+                <div class="mb-1 flex h-[22px] items-center">
+                  <span class="text-xs font-bold">{{
                     t('AppSettings.basic.preferredLolSource.tip.lcu.title')
                   }}</span>
                 </div>
-                <div class="text-11px leading-relaxed">
-                  <div class="dark:text-gray-200 text-neutral-600">
+                <div class="text-[11px] leading-relaxed">
+                  <div class="text-neutral-600 dark:text-gray-200">
                     · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
                   </div>
-                  <div class="dark:text-gray-200 text-neutral-600">
+                  <div class="text-neutral-600 dark:text-gray-200">
                     · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
                   </div>
                 </div>
-                <div class="text-11px dark:text-orange-400 text-orange-500 mt-4px">
+                <div class="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
                   ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
                 </div>
               </div>
@@ -101,7 +101,7 @@
             as.settings.preferredLolSource === 'sgp' &&
             !sgps.availability.serversSupported.matchHistory
           "
-          class="mt-2 font-bold text-sm dark:text-orange-300 text-orange-500"
+          class="mt-2 text-sm font-bold text-orange-500 dark:text-orange-300"
         >
           {{
             t('AppSettings.basic.preferredLolSource.unsupported', {
@@ -150,7 +150,7 @@
                 <NIcon class="mr-2">
                   <GiteeSvg />
                 </NIcon>
-                <span class="font-bold text-xs">Gitee</span>
+                <span class="text-xs font-bold">Gitee</span>
                 <span class="ml-1">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
@@ -167,11 +167,11 @@
               <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
             </div>
             <div class="mt-2">
-              <div class="flex items-center h-22px">
+              <div class="flex h-[22px] items-center">
                 <NIcon class="mr-2">
                   <GithubIcon />
                 </NIcon>
-                <span class="font-bold text-xs">GitHub</span>
+                <span class="text-xs font-bold">GitHub</span>
                 <span style="margin-left: 4px">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}

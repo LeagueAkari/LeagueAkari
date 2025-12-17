@@ -2,11 +2,11 @@
   <!-- 横向布局模式 -->
   <div
     v-if="horizontal"
-    class="flex items-center gap-2 px-2 py-1 transition-colors rounded"
+    class="flex items-center gap-2 rounded px-2 py-1 transition-colors"
     :class="{
-      'dark:bg-neutral-800 rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60':
+      'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
         isFloating,
-      'dark:bg-white/5 bg-black/5': !isFloating
+      'bg-black/5 dark:bg-white/5': !isFloating
     }"
   >
     <!-- 队列选择器 -->
@@ -17,7 +17,7 @@
       size="small"
       :options="sgpTagOptions"
       :disabled="isLoading"
-      class="!w-56"
+      class="w-56!"
     />
 
     <!-- 每页条数 -->
@@ -27,7 +27,7 @@
       @update:value="loadMatchHistory({ count: $event })"
       size="small"
       :options="pageSizeOptions"
-      class="!w-28"
+      class="w-28!"
     />
 
     <NPopover
@@ -50,7 +50,7 @@
           </template>
         </NButton>
       </template>
-      <MatchHistoryFilter class="w-300px" />
+      <MatchHistoryFilter class="w-[300px]" />
     </NPopover>
 
     <!-- 翻页 -->
@@ -75,17 +75,25 @@
 
       <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
         <template #trigger>
-          <span class="cursor-pointer text-sm text-black dark:text-white/80 min-w-24px text-center">
+          <span
+            class="min-w-[24px] cursor-pointer text-center text-sm text-black dark:text-white/80"
+          >
             {{ computedCurrentPage }}
           </span>
         </template>
         <div class="flex gap-2">
           <NInputNumber
-            class="!w-28"
+            class="w-28!"
             size="small"
             v-model:value="arbitraryPage"
             :disabled="isLoading"
             :min="1"
+            @keyup.enter="
+              loadMatchHistory({
+                startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
+                count: pts.frontendSettings.loadCount
+              })
+            "
           />
           <NButton
             size="small"
@@ -130,11 +138,11 @@
   <div
     v-else
     :class="{
-      'dark:bg-neutral-800 rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60':
+      'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
         isFloating,
-      'dark:bg-white/5 bg-black/5': !isFloating
+      'bg-black/5 dark:bg-white/5': !isFloating
     }"
-    class="space-y-2 px-4 py-3 transition-colors rounded"
+    class="space-y-2 rounded px-4 py-3 transition-colors"
   >
     <!-- 队列选择器 - 始终可见 -->
     <NSelect
@@ -176,7 +184,7 @@
             </template>
           </NButton>
         </template>
-        <MatchHistoryFilter class="w-300px" />
+        <MatchHistoryFilter class="w-[300px]" />
       </NPopover>
 
       <!-- 翻页 -->
@@ -202,18 +210,24 @@
         <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
           <template #trigger>
             <span
-              class="cursor-pointer text-sm text-black dark:text-white/80 min-w-24px text-center"
+              class="min-w-[24px] cursor-pointer text-center text-sm text-black dark:text-white/80"
             >
               {{ computedCurrentPage }}
             </span>
           </template>
           <div class="flex gap-2">
             <NInputNumber
-              class="!w-28"
+              class="w-28!"
               size="small"
               v-model:value="arbitraryPage"
               :disabled="isLoading"
               :min="1"
+              @keyup.enter="
+                loadMatchHistory({
+                  startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
+                  count: pts.frontendSettings.loadCount
+                })
+              "
             />
             <NButton
               size="small"

@@ -124,7 +124,7 @@
     </template>
 
     <NModal v-model:show="searchPaneShow">
-      <div class="max-h-90vh max-w-90vw h-600px w-800px">
+      <div class="h-[640px] max-h-[90vh] w-[800px] max-w-[90vw]">
         <SearchPane ref="searchPaneRef" @navigate-to-summoner="handleToSummoner" />
       </div>
     </NModal>

@@ -2,10 +2,10 @@
   <!-- Privacy warning block -->
   <div
     v-if="summoner?.privacy === 'PRIVATE'"
-    class="px-4 py-2 dark:bg-red-800/20 bg-red-800 text-white rounded"
+    class="rounded bg-red-800 px-4 py-2 text-white dark:bg-red-800/20"
   >
-    <div class="text-base font-bold mb-2">{{ t('PlayerTab.private.title') }}</div>
-    <div class="text-13px">
+    <div class="mb-2 text-base font-bold">{{ t('PlayerTab.private.title') }}</div>
+    <div class="text-[13px]">
       {{ t('PlayerTab.private.content') }}
     </div>
   </div>
@@ -14,16 +14,16 @@
   <div
     v-for="(tagInfo, index) of tags"
     :key="tagInfo.selfPuuid"
-    class="px-4 py-2 dark:bg-blue-800/30 bg-blue-800/90 rounded"
+    class="rounded bg-blue-800/90 px-4 py-2 dark:bg-blue-800/30"
   >
-    <div class="flex items-center text-base mb-2">
-      <span class="font-bold dark:text-white text-white">{{ t('PlayerTab.tagged.title') }}</span>
+    <div class="mb-2 flex items-center text-base">
+      <span class="font-bold text-white dark:text-white">{{ t('PlayerTab.tagged.title') }}</span>
       <div
         v-if="!tagInfo.markedBySelf"
         class="ml-2 cursor-pointer"
         @click="handleToSummoner(tagInfo.selfPuuid)"
       >
-        <div class="flex gap-1 items-center" v-if="cachedSummoners[tagInfo.selfPuuid]">
+        <div class="flex items-center gap-1" v-if="cachedSummoners[tagInfo.selfPuuid]">
           <LcuImage
             class="rounded"
             :src="profileIconUri(cachedSummoners[tagInfo.selfPuuid].profileIconId)"
@@ -33,13 +33,13 @@
           <StreamerModeMaskedText>
             <template #masked>
               <div
-                class="text-13px text-white/80 dark:text-gray-300 hover:text-gray-200 transition-colors max-w-160px truncate"
+                class="max-w-[160px] truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
               >
                 {{ maskedMarkerName(tagInfo.selfPuuid, index) }}
               </div>
             </template>
             <div
-              class="text-13px text-white/80 dark:text-gray-300 hover:text-gray-200 transition-colors max-w-160px truncate"
+              class="max-w-[160px] truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
             >
               {{ cachedSummoners[tagInfo.selfPuuid].gameName }} #{{
                 cachedSummoners[tagInfo.selfPuuid].tagLine
@@ -55,15 +55,15 @@
         @positive-click="handleRemoveTag(tagInfo.puuid, tagInfo.selfPuuid)"
       >
         <template #trigger>
-          <NIcon class="ml-auto cursor-pointer text-gray-400 hover:text-red-400 transition-colors">
+          <NIcon class="ml-auto cursor-pointer text-gray-400 transition-colors hover:text-red-400">
             <DeleteIcon />
           </NIcon>
         </template>
         {{ t('PlayerTab.tagged.deletePopconfirm') }}
       </NPopconfirm>
     </div>
-    <NScrollbar class="max-h-100px">
-      <div class="text-13px dark:text-gray-200 text-white whitespace-pre-wrap">
+    <NScrollbar class="max-h-[100px]">
+      <div class="text-[13px] whitespace-pre-wrap text-white dark:text-gray-200">
         {{ masked(tagInfo.tag || '') }}
       </div>
     </NScrollbar>

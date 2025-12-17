@@ -1,46 +1,46 @@
 <template>
   <div class="flex flex-col items-center justify-center">
     <!-- logo placeholder -->
-    <NIcon class="startup-logo text-96px mb-4 relative -left-8px">
+    <NIcon class="startup-logo relative -left-2 mb-4 text-[96px]">
       <AkariLogo />
     </NIcon>
 
     <!-- app name -->
-    <div class="text-2xl dark:text-gray-100 text-gray-800 font-['Comfortaa',sans-serif] mb-1">
+    <div class="mb-1 font-['Comfortaa',sans-serif] text-2xl text-gray-800 dark:text-gray-100">
       {{ t('appName', { ns: 'common' }) }}
     </div>
 
     <!-- version -->
-    <div class="text-xs dark:text-white/40 text-black/40">v{{ as.version }}</div>
+    <div class="text-xs text-black/40 dark:text-white/40">v{{ as.version }}</div>
 
     <!-- spacer -->
     <div class="h-12"></div>
 
-    <NScrollbar class="max-h-232px !h-fit !w-58">
+    <NScrollbar class="h-fit! max-h-[232px] w-58!">
       <!-- summoner -->
       <div
         v-if="lcs.summoner.me"
         @click="handleOpenSelfTab"
-        class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+        class="group flex cursor-pointer items-center gap-4 rounded p-2 transition-colors not-last:mb-2 hover:bg-black/10 dark:hover:bg-white/10"
       >
         <LcuImage :src="profileIconUri(lcs.summoner.me.profileIconId)" class="size-5" />
 
         <div class="min-w-0">
           <div class="truncate">
-            <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
+            <span class="mr-1 text-[11px] font-normal text-black/60 dark:text-white/60">
               {{ t(`sgpServers.${sgps.availability.sgpServerId}`, { ns: 'common' }) }}
             </span>
-            <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
+            <span class="text-xs font-bold text-black/80 dark:text-white/80">{{
               lcs.summoner.me.gameName
             }}</span>
           </div>
-          <span class="text-xs dark:text-white/40 text-black/40"
+          <span class="text-xs text-black/40 dark:text-white/40"
             >#{{ lcs.summoner.me.tagLine }}</span
           >
         </div>
 
         <NIcon
-          class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+          class="ml-auto text-xs text-black/40 opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/40"
         >
           <ChevronRight20Filled />
         </NIcon>
@@ -51,7 +51,7 @@
         <div
           v-for="(client, index) of otherClients"
           :key="client.pid"
-          class="not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+          class="flex cursor-pointer items-center gap-4 rounded p-2 transition-colors not-last:mb-2 hover:bg-black/10 dark:hover:bg-white/10"
           @click="handleConnect(client)"
         >
           <LcuImage
@@ -61,7 +61,7 @@
 
           <div class="min-w-0">
             <div class="truncate">
-              <span class="text-11px dark:text-white/60 text-black/60 font-normal mr-1">
+              <span class="mr-1 text-[11px] font-normal text-black/60 dark:text-white/60">
                 ({{ client.pid }})
                 {{
                   t(`sgpServers.${getSgpServerId(client.region, client.rsoPlatformId)}`, {
@@ -69,17 +69,17 @@
                   })
                 }}
               </span>
-              <span class="text-xs dark:text-white/80 text-black/80 font-bold">{{
+              <span class="text-xs font-bold text-black/80 dark:text-white/80">{{
                 otherClientName(client, index)
               }}</span>
             </div>
-            <span class="text-xs dark:text-white/40 text-black/40">{{
+            <span class="text-xs text-black/40 dark:text-white/40">{{
               otherClientTagLine(client)
             }}</span>
           </div>
 
-          <NSpin class="mla" :size="12" v-if="lcs.connectingClient?.pid === client.pid" />
-          <NIcon v-else class="mla text-sm dark:text-white/60 text-black/60">
+          <NSpin class="ml-auto" :size="12" v-if="lcs.connectingClient?.pid === client.pid" />
+          <NIcon v-else class="ml-auto text-sm text-black/60 dark:text-white/60">
             <PlugConnected24Filled />
           </NIcon>
         </div>
@@ -88,26 +88,26 @@
       <!-- shortcuts -->
       <div
         v-for="item of launchItems"
-        class="group not-last:mb-2 flex gap-4 items-center dark:hover:bg-white/10 hover:bg-black/10 rounded p-2 cursor-pointer transition-colors"
+        class="group flex cursor-pointer items-center gap-4 rounded p-2 transition-colors not-last:mb-2 hover:bg-black/10 dark:hover:bg-white/10"
         @click="item.launch"
       >
         <img :src="item.imgUrl" class="size-5" />
 
         <div class="min-w-0">
-          <div class="text-xs dark:text-white/80 text-black/80 font-bold">{{ item.name }}</div>
+          <div class="text-xs font-bold text-black/80 dark:text-white/80">{{ item.name }}</div>
           <NEllipsis
             :tooltip="{ placement: 'right' }"
-            class="text-11px dark:text-white/40 text-black/40"
+            class="text-[11px] text-black/40 dark:text-white/40"
           >
             <template #tooltip>
-              <span class="text-sm font-mono">{{ item.path }}</span>
+              <span class="font-mono text-sm">{{ item.path }}</span>
             </template>
             <span class="font-mono">{{ item.path }}</span>
           </NEllipsis>
         </div>
 
         <NIcon
-          class="mla text-xs dark:text-white/40 text-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+          class="ml-auto text-xs text-black/40 opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/40"
         >
           <ChevronRight20Filled />
         </NIcon>

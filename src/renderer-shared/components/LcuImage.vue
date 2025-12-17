@@ -38,13 +38,15 @@ const handleError = () => {
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .lcu-image {
     display: block;
   }
 
   .lcu-image-placeholder {
-    --at-apply: 'dark:bg-black/20 bg-gray/40 box-border rounded';
+    @apply box-border rounded bg-gray-500/40 dark:bg-black/20;
   }
 }
 </style>

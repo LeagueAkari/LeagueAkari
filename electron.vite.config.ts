@@ -1,9 +1,9 @@
 import yaml from '@modyfi/vite-plugin-yaml'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
-import unoCSS from 'unocss/vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 const SHOULD_COMPILE_TO_BYTECODE = true
@@ -89,7 +89,7 @@ export default defineConfig({
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       }),
-      unoCSS(),
+      tailwindcss(),
       vueDevTools(),
       vueJsx({})
     ],

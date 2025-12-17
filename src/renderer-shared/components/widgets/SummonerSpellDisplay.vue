@@ -61,7 +61,9 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .cooldown,
   .description,
   .level {
@@ -88,7 +90,7 @@ const lcs = useLeagueClientStore()
   }
 
   .empty {
-    --at-apply: 'dark:bg-black/20 bg-gray/40 rounded-xs';
+    @apply rounded-xs bg-gray-500/40 dark:bg-black/20;
   }
 }
 </style>

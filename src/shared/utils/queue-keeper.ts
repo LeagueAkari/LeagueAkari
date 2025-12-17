@@ -33,7 +33,7 @@ export class QueueKeeper {
   async add<T>(
     queueId: string,
     taskId: string,
-    task: (options: Omit<TaskOptions, 'signal'>) => PromiseLike<T>,
+    task: (options: TaskOptions) => PromiseLike<T>,
     options?: TaskAddOptions
   ): Promise<T> {
     const queue = this._queues.get(queueId)
@@ -170,6 +170,6 @@ export class QueueKeeper {
   }
 }
 
-export function isAbortError(error: any): error is Error {
+export function isAbortError(error: unknown): error is Error {
   return error instanceof Error && error.name === 'AbortError'
 }

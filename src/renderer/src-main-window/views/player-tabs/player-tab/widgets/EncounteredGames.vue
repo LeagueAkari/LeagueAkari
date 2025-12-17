@@ -1,10 +1,10 @@
 <template>
   <div
-    class="px-4 py-2 dark:bg-white/5 rounded bg-black/5"
+    class="rounded bg-black/5 px-4 py-2 dark:bg-white/5"
     v-if="pagedGames && pagedGames.total > 0 && !isSelfTab"
   >
     <!-- Header Section -->
-    <div class="flex items-center justify-between mb-3">
+    <div class="mb-3 flex items-center justify-between">
       <span class="text-base font-bold text-gray-900 dark:text-white"
         >{{ t('EncounteredGames.title') }} ({{ pagedGames.total }})</span
       >
@@ -22,7 +22,7 @@
           </template>
         </NButton>
 
-        <span class="text-11px text-gray-500 dark:text-white/70">
+        <span class="text-[11px] text-gray-500 dark:text-white/70">
           {{ pagedGames.page }} /
           {{ Math.ceil(pagedGames.total / pagedGames.pageSize) }}
         </span>
@@ -45,14 +45,14 @@
     <!-- Game List Section -->
     <div class="flex flex-col gap-3" v-if="games.length > 0">
       <div
-        class="flex items-center rounded-sm cursor-pointer gap-2"
+        class="flex cursor-pointer items-center gap-2 rounded-sm"
         v-for="{ game, gameId, recordId } in games"
         :key="gameId"
         @click="onPreviewGame(gameMap[gameId] || gameId)"
       >
-        <div class="flex flex-1 gap-1 flex-col">
+        <div class="flex flex-1 flex-col gap-1">
           <!-- Game Info Line 1: Type, Queue, Date -->
-          <div class="h-4 flex items-end gap-1" v-if="game">
+          <div class="flex h-4 items-end gap-1" v-if="game">
             <div
               class="text-xs font-bold"
               :class="
@@ -69,13 +69,11 @@
               }}
             </div>
 
-            <div
-              class="flex-1 w-0 text-xs text-gray-900 dark:text-white/80 text-black font-bold truncate"
-            >
+            <div class="w-0 flex-1 truncate text-xs font-bold text-black dark:text-white/80">
               {{ game.queueName }}
             </div>
 
-            <div class="text-11px text-gray-500 dark:text-white/70 ml-auto" v-if="game.date">
+            <div class="ml-auto text-[11px] text-gray-500 dark:text-white/70" v-if="game.date">
               {{ dayjs(game.date).format('MM-DD') }}
             </div>
           </div>
@@ -85,9 +83,9 @@
           <div v-if="game" class="flex items-end gap-1">
             <!-- Player 1 (Self) -->
             <template v-if="game.p1">
-              <ChampionIcon :stretched="false" class="w-5 h-5" :champion-id="game.p1.championId" />
+              <ChampionIcon :stretched="false" class="h-5 w-5" :champion-id="game.p1.championId" />
               <div
-                class="text-11px font-bold"
+                class="text-[11px] font-bold"
                 :class="
                   game.p1.win
                     ? 'text-green-700 dark:text-green-300'
@@ -102,7 +100,7 @@
                       : t('EncounteredGames.lose')
                 }}
               </div>
-              <div class="text-11px text-gray-500 dark:text-white/70">
+              <div class="text-[11px] text-gray-500 dark:text-white/70">
                 {{ game.p1.kda.join('/') }}
               </div>
             </template>
@@ -111,9 +109,9 @@
 
             <!-- Player 2 (Encountered) -->
             <template v-if="game.p2">
-              <ChampionIcon :stretched="false" class="w-5 h-5" :champion-id="game.p2.championId" />
+              <ChampionIcon :stretched="false" class="h-5 w-5" :champion-id="game.p2.championId" />
               <div
-                class="text-11px font-bold"
+                class="text-[11px] font-bold"
                 :class="
                   game.p2.win
                     ? 'text-green-700 dark:text-green-300'
@@ -128,7 +126,7 @@
                       : t('EncounteredGames.lose')
                 }}
               </div>
-              <div class="text-11px text-gray-500 dark:text-white/70">
+              <div class="text-[11px] text-gray-500 dark:text-white/70">
                 {{ game.p2.kda.join('/') }}
               </div>
             </template>
@@ -156,7 +154,7 @@
 
     <!-- Empty State -->
     <div
-      class="flex items-center justify-center h-20 text-xs text-gray-500 dark:text-white/70"
+      class="flex h-20 items-center justify-center text-xs text-gray-500 dark:text-white/70"
       v-else
     >
       <span>{{ t('EncounteredGames.noData') }}</span>

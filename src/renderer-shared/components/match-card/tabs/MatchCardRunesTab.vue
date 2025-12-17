@@ -4,24 +4,24 @@
     <div
       v-for="p of sortedParticipants"
       :key="p.puuid"
-      class="dark:bg-white/3 bg-black/3 rounded-lg p-3 not-last:mb-2"
+      class="rounded-lg bg-black/3 p-3 not-last:mb-2 dark:bg-white/3"
     >
       <!-- Player Header -->
-      <div class="flex items-center gap-2 mb-3">
+      <div class="mb-3 flex items-center gap-2">
         <ChampionIcon
           :champion-id="p.championId"
-          class="!size-7 shrink-0 b-2 b-solid"
+          class="size-7! shrink-0 border-2 border-solid"
           :style="{
             borderColor: getTeamColor(p.teamIdentifier)
           }"
           round
         />
-        <div class="text-sm font-medium truncate min-w-0">{{ p.gameName }} #{{ p.tagLine }}</div>
+        <div class="min-w-0 truncate text-sm font-medium">{{ p.gameName }} #{{ p.tagLine }}</div>
 
-        <div v-if="playerPerks[p.participantId].statPerks" class="flex gap-2 ml-2">
+        <div v-if="playerPerks[p.participantId].statPerks" class="ml-2 flex gap-2">
           <PerkDisplay
             v-for="statPerkId of playerPerks[p.participantId].statPerks"
-            class="ring-2 rounded-full"
+            class="rounded-full ring-2"
             :class="getPerkStyleRingColor(-1)"
             :perk-id="statPerkId"
             :size="16"
@@ -30,7 +30,7 @@
       </div>
 
       <!-- divider -->
-      <div class="h-px bg-black/10 dark:bg-white/10 my-3"></div>
+      <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
 
       <!-- perks -->
       <div
@@ -42,22 +42,22 @@
           <PerkDisplay
             :perk-id="perk.perkId"
             :size="24"
-            class="ring-2 rounded-full"
+            class="rounded-full ring-2"
             :class="getPerkStyleRingColor(perk.styleId)"
           />
 
           <div>
-            <div class="text-sm font-bold dark:text-white text-black mb-2">
+            <div class="mb-2 text-sm font-bold text-black dark:text-white">
               {{ lcs.gameData.perkName(perk.perkId) }}
             </div>
 
             <div
               v-for="desc of perk.descriptions"
               :key="desc"
-              class="text-sm text-black/80 dark:text-white/80 not-last:mb-1 flex items-center flex-wrap"
+              class="flex flex-wrap items-center text-sm text-black/80 not-last:mb-1 dark:text-white/80"
             >
               <div
-                class="rotate-45 rounded-sm size-2 mr-2"
+                class="mr-2 size-2 rotate-45 rounded-sm"
                 :class="getPerkStyleIndicatorColor(perk.styleId)"
               ></div>
               <span>{{ desc }}</span>

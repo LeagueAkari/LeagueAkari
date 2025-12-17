@@ -1,5 +1,5 @@
 <template>
-  <NModal v-model:show="show" preset="card" class="max-w-60vw">
+  <NModal v-model:show="show" preset="card" class="max-w-[60vw]">
     <template #header>
       <span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span>
     </template>
@@ -9,11 +9,11 @@
         <LcuImage class="size-6 rounded" :src="profileIconUri(summoner.profileIconId)" />
         <StreamerModeMaskedText>
           <template #masked>
-            <span class="ml-2 text-sm font-bold max-w-300px truncate">
+            <span class="ml-2 max-w-[300px] truncate text-sm font-bold">
               {{ maskedSummonerName }}
             </span>
           </template>
-          <span class="ml-2 text-sm font-bold max-w-300px truncate">
+          <span class="ml-2 max-w-[300px] truncate text-sm font-bold">
             {{ `${summoner.gameName} #${summoner.tagLine}` }}
           </span>
         </StreamerModeMaskedText>

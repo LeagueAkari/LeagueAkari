@@ -1,16 +1,16 @@
 <template>
   <!-- right -->
-  <div class="flex flex-col flex-1 min-w-0">
+  <div class="flex min-w-0 flex-1 flex-col">
     <!-- header -->
-    <div class="p-3 b-b-solid b-b-1 dark:b-b-white/10 b-b-black/10">
+    <div class="border-b border-black/10 p-3 dark:border-white/10">
       <!-- big title -->
 
-      <div class="flex items-center gap-2 mb-4">
-        <div class="text-base font-bold mra">{{ t('SearchPane.title') }}</div>
+      <div class="mb-4 flex items-center gap-2">
+        <div class="mr-auto text-base font-bold">{{ t('SearchPane.title') }}</div>
         <NPopover v-if="isTencentRegion">
           <template #trigger>
             <div
-              class="flex items-center gap-1 text-10px py-0.5 px-1 rounded dark:bg-amber-700 bg-amber-500 text-white cursor-pointer"
+              class="flex cursor-pointer items-center gap-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] text-white dark:bg-amber-700"
             >
               <NIcon><Info24Regular /></NIcon>
               <span>{{ t('SearchPane.combinedServersReference') }}</span>
@@ -23,7 +23,7 @@
       <!-- inputs -->
       <div class="flex gap-2">
         <NSelect
-          class="!w-34"
+          class="w-34!"
           :consistent-menu-width="false"
           :options="tencentServers"
           v-if="isTencentRegion && as.settings.preferredLolSource === 'sgp'"
@@ -40,19 +40,19 @@
           <template #prefix>
             <div
               v-if="searchType === 'puuid'"
-              class="font-sans text-10px rounded dark:bg-sky-700 bg-sky-500 text-white px-1 flex items-center h-18px not-last:mr-1"
+              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
               {{ t('SearchPane.searchTypePuuid') }}
             </div>
             <div
               v-else-if="searchType === 'exact'"
-              class="font-sans text-10px rounded bg-sky-700 bg-sky-500 text-white px-1 flex items-center h-18px not-last:mr-1"
+              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1"
             >
               {{ t('SearchPane.searchTypeExact') }}
             </div>
             <div
               v-else-if="searchType === 'fuzzy'"
-              class="font-sans text-10px rounded dark:bg-sky-700 bg-sky-500 text-white px-1 flex items-center h-18px not-last:mr-1"
+              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
               {{ t('SearchPane.searchTypeFuzzy') }}
             </div>
@@ -81,19 +81,19 @@
     </div>
 
     <!-- search results -->
-    <div class="@container relative flex-1 min-h-0 flex flex-col">
+    <div class="@container relative flex min-h-0 flex-1 flex-col">
       <template v-if="searchResult.length > 0">
-        <div class="mt-3 mb-1 mx-3 font-bold dark:text-white/80 text-black/80">
+        <div class="mx-3 mt-3 mb-1 font-bold text-black/80 dark:text-white/80">
           {{ t('SearchPane.resultCount', { count: searchResult.length }) }}
         </div>
 
         <NScrollbar ref="scrollbarEl" class="flex-1">
-          <div class="grid @[500px]:grid-cols-2 grid-cols-1 py-2 px-3 gap-2">
+          <div class="grid grid-cols-1 gap-2 px-3 py-2 @[500px]:grid-cols-2">
             <TransitionGroup name="fade" appear>
               <div
                 v-for="result of searchResult"
                 :key="result.puuid"
-                class="flex items-center gap-2 rounded p-2 b-solid b-1 b-white/10 cursor-pointer dark:hover:bg-white/10 hover:bg-black/10 transition-colors"
+                class="flex cursor-pointer items-center gap-2 rounded border border-solid border-white/10 p-2 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
                 @click="emits('navigateToSummoner', result.puuid, result.sgpServerId, true)"
                 @mousedown="handleMouseDown"
                 @mouseup.prevent="(event) => handleMouseUp(event, result.puuid, result.sgpServerId)"
@@ -102,9 +102,9 @@
 
                 <div>
                   <!-- name first line -->
-                  <div class="flex gap-1 items-center mb-0.5">
+                  <div class="mb-0.5 flex items-center gap-1">
                     <div
-                      class="text-10px text-white rounded-xs px-1 dark:bg-cyan-800 bg-sky-500 whitespace-nowrap"
+                      class="rounded-xs bg-sky-500 px-1 text-[10px] whitespace-nowrap text-white dark:bg-cyan-800"
                       v-if="sgps.availability.sgpServerId !== result.sgpServerId"
                     >
                       {{
@@ -114,21 +114,21 @@
                         })
                       }}
                     </div>
-                    <div class="text-xs font-bold truncate">{{ result.gameName }}</div>
-                    <div class="text-11px text-neutral-500 dark:text-neutral-400">
+                    <div class="truncate text-xs font-bold">{{ result.gameName }}</div>
+                    <div class="text-[11px] text-neutral-500 dark:text-neutral-400">
                       #{{ result.tagLine }}
                     </div>
                   </div>
 
                   <!-- tags line -->
-                  <div class="flex gap-1 items-center">
+                  <div class="flex items-center gap-1">
                     <div
-                      class="text-10px dark:text-white text-black rounded-xs px-1 bg-red-800"
+                      class="rounded-xs bg-red-800 px-1 text-[10px] text-black dark:text-white"
                       v-if="result.privacy === 'PRIVATE'"
                     >
                       {{ t('SearchPane.privacy') }}
                     </div>
-                    <span class="text-11px text-white/60">Lv. {{ result.summonerLevel }}</span>
+                    <span class="text-[11px] text-white/60">Lv. {{ result.summonerLevel }}</span>
                   </div>
                 </div>
               </div>
@@ -138,7 +138,7 @@
       </template>
 
       <div
-        class="h-full flex items-center justify-center dark:text-white/50 text-black/50"
+        class="flex h-full items-center justify-center text-black/50 dark:text-white/50"
         v-else-if="searchProgress.isProcessing && searchResult.length === 0"
       >
         <div class="flex items-center gap-2">
@@ -147,27 +147,27 @@
         </div>
       </div>
 
-      <div class="h-full flex items-center justify-center" v-else>
+      <div class="flex h-full items-center justify-center" v-else>
         <div class="flex flex-col items-center gap-2">
-          <span class="mb-6 dark:text-white/60 text-black/60">{{ t('SearchPane.noResult') }}</span>
-          <span class="text-xs dark:text-white/50 text-black/50"
+          <span class="mb-6 text-black/60 dark:text-white/60">{{ t('SearchPane.noResult') }}</span>
+          <span class="text-xs text-black/50 dark:text-white/50"
             >{{ t('SearchPane.noResultHintFuzzy') }}
             <span
-              class="font-mono dark:bg-white/10 bg-neutral-200 rounded px-1 py-0.5 dark:text-white text-black"
+              class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
               >{{ t('SearchPane.noResultHintFuzzyExample') }}</span
             ></span
           >
-          <span class="text-xs dark:text-white/50 text-black/50"
+          <span class="text-xs text-black/50 dark:text-white/50"
             >{{ t('SearchPane.noResultHintExact') }}
             <span
-              class="font-mono dark:bg-white/10 bg-neutral-200 rounded px-1 py-0.5 dark:text-white text-black"
+              class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
               >{{ t('SearchPane.noResultHintExactExample') }}</span
             ></span
           >
-          <span class="text-xs dark:text-white/50 text-black/50"
+          <span class="text-xs text-black/50 dark:text-white/50"
             >{{ t('SearchPane.noResultHintPuuid') }}
             <span
-              class="font-mono dark:bg-white/10 bg-neutral-200 rounded px-1 py-0.5 dark:text-white text-black"
+              class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
               >{{ t('SearchPane.noResultHintPuuidExample') }}</span
             ></span
           >
@@ -176,7 +176,7 @@
 
       <div
         v-if="searchProgress.isProcessing"
-        class="absolute top-0 left-0 right-0 h-2px before:content-[''] before:block before:h-full before:transition-width before:w-[var(--progress-width)] before:bg-green-300"
+        class="absolute top-0 right-0 left-0 h-[2px] before:block before:h-full before:w-(--progress-width) before:bg-green-300 before:transition-[width] before:content-['']"
         :style="{
           '--progress-width': `${(searchProgress.finish / (searchProgress.total || 1)) * 100}%`
         }"

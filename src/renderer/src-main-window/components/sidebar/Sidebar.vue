@@ -15,6 +15,9 @@
       <div class="app-sidebar__logo-text">
         {{ t('appName', { ns: 'common' }) }}{{ as.isAdministrator ? ' X' : '' }}
       </div>
+
+      <!-- drag zone -->
+      <div class="absolute top-0 right-0 left-0 h-4 [-webkit-app-region:drag]"></div>
     </div>
     <SidebarMenu
       class="app-sidebar__menu"
@@ -183,8 +186,6 @@ watchEffect(() => {
     gap: 4px;
     height: 48px;
     overflow: hidden;
-
-    -webkit-app-region: drag;
   }
 
   .app-sidebar__logo {
@@ -197,16 +198,15 @@ watchEffect(() => {
     font-size: 20px;
     flex-shrink: 0;
     cursor: pointer;
-    -webkit-app-region: no-drag;
+  }
 
-    &:hover {
-      .app-sidebar__logo-icon {
-        opacity: 0;
-      }
+  &:hover {
+    .app-sidebar__logo-icon {
+      opacity: 0;
+    }
 
-      .app-sidebar__logo-toggle {
-        opacity: 1;
-      }
+    .app-sidebar__logo-toggle {
+      opacity: 1;
     }
   }
 

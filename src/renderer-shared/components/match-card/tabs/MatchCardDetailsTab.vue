@@ -1,25 +1,28 @@
 <template>
-  <NScrollbar x-scrollable class="max-h-142 rounded b-solid dark:b-white/5 b-black/5 b-1 b-b-0">
-    <div class="flex items-center gap-4 px-2 py-1 dark:bg-white/5 bg-black/5 mb-1">
-      <div class="text-11px dark:text-white/60 text-black/80" v-if="!hidePrivacy">
+  <NScrollbar
+    x-scrollable
+    class="max-h-142 rounded border border-solid border-black/5 dark:border-white/5"
+  >
+    <div class="mb-1 flex items-center gap-4 bg-black/5 px-2 py-1 dark:bg-white/5">
+      <div class="text-[11px] text-black/80 dark:text-white/60" v-if="!hidePrivacy">
         {{ t('MatchCard.detailsTab.gameId') }}:
         <span class="select-text">{{ basicInfo.gameId }}</span> ({{ basicInfo.dataSource }})
       </div>
-      <div class="text-11px dark:text-white/60 text-black/80">
+      <div class="text-[11px] text-black/80 dark:text-white/60">
         {{ gameCreationText }}
       </div>
-      <div class="text-11px dark:text-white/60 text-black/80">
+      <div class="text-[11px] text-black/80 dark:text-white/60">
         {{ t('MatchCard.detailsTab.gameVersion') }}:
         <span class="select-text">{{ basicInfo.gameVersion }}</span>
       </div>
     </div>
 
-    <table class="[border-collapse:separate] [border-spacing:0] w-full">
+    <table class="w-full border-separate [border-spacing:0]">
       <thead>
         <tr>
           <!-- divider -->
           <th
-            class="sticky left-0 top-0 z-10 b-b b-b-solid dark:b-b-white/5 b-b-black/5 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-left p-2 w-38 max-w-38"
+            class="sticky top-0 left-0 z-10 w-38 max-w-38 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-left transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             <NInput
               size="small"
@@ -33,7 +36,7 @@
           <th
             v-for="p of rawStats"
             :key="p.participantId"
-            class="sticky top-0 z-1 b-b b-b-solid dark:b-b-white/5 b-b-black/5 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2"
+            class="sticky top-0 z-1 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             <div
               class="flex items-center justify-center"
@@ -45,7 +48,7 @@
             >
               <ChampionIcon
                 :champion-id="p.championId"
-                class="size-6 b-2 b-solid"
+                class="size-6 border-2 border-solid"
                 :style="{
                   borderColor: getTeamColor(p.identity.teamIdentifier)
                 }"
@@ -60,7 +63,7 @@
         <tr>
           <td
             :colspan="rawStats.length + 1"
-            class="h-16 text-center p-2 b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs dark:text-white/60 text-black/60"
+            class="h-16 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 p-2 text-center text-xs text-black/60 dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:text-white/60"
           >
             {{ t('MatchCard.detailsTab.noFilterResult') }}
           </td>
@@ -71,7 +74,7 @@
         <tr v-if="index > 0">
           <td
             :colspan="rawStats.length + 1"
-            class="text-center h-4 b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs dark:text-white/60 text-black/60"
+            class="h-4 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 text-center text-xs text-black/60 dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:text-white/60"
           ></td>
         </tr>
 
@@ -79,7 +82,7 @@
           <NPopover placement="right" v-if="row.chartData" :delay="200">
             <template #trigger>
               <td
-                class="sticky left-0 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2 font-bold b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs truncate w-38 max-w-38"
+                class="sticky left-0 w-38 max-w-38 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
               >
                 {{ getStatKeyTranslation(row.key) }}
               </td>
@@ -89,7 +92,7 @@
           <td
             v-else
             :title="getStatKeyTranslation(row.key)"
-            class="sticky left-0 transition-colors dark:bg-[#1a1a1a] bg-[#e5e5e5] text-center p-2 font-bold b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs truncate w-38 max-w-38"
+            class="sticky left-0 w-38 max-w-38 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             {{ getStatKeyTranslation(row.key) }}
           </td>
@@ -97,7 +100,7 @@
           <!-- players from 1 to 10 -->
           <td
             v-for="cell of row.cells"
-            class="text-center p-2 b-b b-b-solid dark:b-b-white/5 b-b-black/5 text-xs max-w-24 truncate"
+            class="max-w-24 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 p-2 text-center text-xs dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5"
           >
             <component :is="renderFn(() => row.render(cell as never))" />
           </td>

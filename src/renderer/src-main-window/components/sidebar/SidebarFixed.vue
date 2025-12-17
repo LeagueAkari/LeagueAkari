@@ -18,7 +18,7 @@
                 :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
                 status="success"
               >
-                <span class="font-size-12px">{{ formattedCountdown }}</span>
+                <span class="text-xs">{{ formattedCountdown }}</span>
               </NProgress>
             </div>
             <div class="menu-item__label">
@@ -419,9 +419,5 @@ watch(
     right: 0px;
     bottom: 0px;
   }
-}
-
-.font-size-12px {
-  font-size: 12px;
 }
 </style>

@@ -40,7 +40,16 @@ import App from './App.vue'
 const as = useAppCommonStore()
 
 const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px' },
+  common: {
+    popoverColor: '#383838f8'
+  },
+  Notification: {
+    padding: '12px',
+    titleFontSize: '13px',
+    titleFontWeight: '700',
+    descriptionFontSize: '13px',
+    avatarSize: '20px'
+  },
   Card: {
     color: '#0000',
     paddingSmall: '4px 12px'
@@ -49,10 +58,14 @@ const themeOverrides: GlobalThemeOverrides = {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
-    iconMargin: '0 4px 0 0'
+    iconMargin: '0 4px 0 0',
+    colorInfo: '#2c2c2c',
+    colorSuccess: '#2c2c2c',
+    colorWarning: '#2c2c2c',
+    colorError: '#2c2c2c'
   },
   Popover: {
-    color: '#1f1f1ffa'
+    borderColor: 'rgba(255, 255, 255, 0.2)'
   },
   Checkbox: {
     fontSizeSmall: '13px'

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-full b-1 b-solid b-white/10 rounded-lg overflow-hidden dark:bg-neutral-900 bg-neutral-100"
+    class="flex h-full overflow-hidden rounded-lg border border-solid border-white/10 bg-neutral-100 dark:bg-neutral-900"
   >
     <SearchPaneSidebar ref="sidebarRef" @navigate-to-summoner="handleComponentNavigateToSummoner" />
     <SearchPaneSearchArea

@@ -17,18 +17,6 @@ export class OpggHttpApiAxiosHelper {
     _http.defaults.baseURL = OpggHttpApiAxiosHelper.BASE_URL
   }
 
-  getRegionChampionModeVersions(
-    region: RegionType,
-    mode: ModeType,
-    options: {
-      signal?: AbortSignal
-    } = {}
-  ) {
-    return this._http.get<OpggVersionsResponse>(`/api/${region}/champions/${mode}/versions`, {
-      signal: options.signal
-    })
-  }
-
   getChampions(
     region: RegionType,
     mode: ModeType,
@@ -75,5 +63,11 @@ export class OpggHttpApiAxiosHelper {
 
   getAramBalance() {
     return this._http.get<OpggAramBalanceResponse>('/api/contents/aram-balance')
+  }
+
+  getVersions(region: RegionType, mode: ModeType, options: { signal?: AbortSignal } = {}) {
+    return this._http.get<OpggVersionsResponse>(`/api/${region}/champions/${mode}/versions`, {
+      signal: options.signal
+    })
   }
 }

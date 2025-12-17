@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import 'virtual:uno.css'
+import '@renderer-shared/assets/css/tailwind.css'
 
 import '@renderer-shared/assets/css/base-styles.css'
 import '@renderer-shared/assets/css/lol-view.css'
@@ -15,7 +15,6 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.css'
-import { router } from './routes'
 import { manager } from './shards'
 
 try {
@@ -23,7 +22,6 @@ try {
   dayjs.extend(duration)
 
   const app = createApp(NaiveUIProviderApp)
-    .use(router)
     .use(createPinia())
     .use(I18nextVue, { i18next })
     .use(manager)

@@ -1,7 +1,7 @@
 <template>
   <NPopover :delay="50" :show-arrow="false">
     <template #trigger>
-      <div class="flex flex-col items-center text-11px">
+      <div class="flex flex-col items-center text-[11px]">
         <div>{{ totalDamage.toLocaleString() }}</div>
         <svg :width="width" :height="height" class="damage-bar-svg">
           <rect x="0" y="0" :width="width" :height="height" class="bg" />
@@ -21,7 +21,7 @@
         </svg>
       </div>
     </template>
-    <div class="text-11px w-204px">
+    <div class="w-[204px] text-[11px]">
       <div class="flex items-center">
         <svg :width="INNER_WIDTH" :height="height" class="damage-bar-svg">
           <rect x="0" y="0" :width="INNER_WIDTH" :height="height" class="bg" />
@@ -41,14 +41,14 @@
         </svg>
         <div class="ml-2">{{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }}%</div>
       </div>
-      <div class="h-1px bg-gray-300 dark:bg-gray-700 my-1"></div>
-      <div class="grid grid-rows-1 grid-cols-2 gap-1">
+      <div class="my-1 h-px bg-gray-300 dark:bg-gray-700"></div>
+      <div class="grid grid-cols-2 grid-rows-1 gap-1">
         <div>
-          <div class="font-bold text-11px">{{ t('DamageMetricsBar.total') }}</div>
+          <div class="text-[11px] font-bold">{{ t('DamageMetricsBar.total') }}</div>
           <div>{{ totalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div class="font-bold text-11px">
+          <div class="text-[11px] font-bold">
             {{ t('DamageMetricsBar.physical') }} ({{
               ((physicalDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)
@@ -56,7 +56,7 @@
           <div>{{ physicalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div class="font-bold text-11px">
+          <div class="text-[11px] font-bold">
             {{ t('DamageMetricsBar.magic') }} ({{
               ((magicDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)
@@ -64,7 +64,7 @@
           <div>{{ magicDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div class="font-bold text-11px">
+          <div class="text-[11px] font-bold">
             {{ t('DamageMetricsBar.true') }} ({{
               ((trueDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)

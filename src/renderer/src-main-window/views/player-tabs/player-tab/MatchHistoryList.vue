@@ -8,11 +8,11 @@
           pagedMatchHistory.games.length === 0 ||
           gamesShouldHide.size === pagedMatchHistory.games.length)
       "
-      class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+      class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
     >
       <div class="flex items-center gap-2">
         <NSpin :size="16" />
-        <span class="text-sm dark:text-white/60 text-black/80">{{ t('PlayerTab.loading') }}</span>
+        <span class="text-sm text-black/80 dark:text-white/60">{{ t('PlayerTab.loading') }}</span>
       </div>
     </div>
 
@@ -20,9 +20,9 @@
       <!-- empty placeholder -->
       <div
         v-if="pagedMatchHistory.games.length === 0"
-        class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+        class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
       >
-        <span class="text-sm dark:text-white/60 text-black/80">{{
+        <span class="text-sm text-black/80 dark:text-white/60">{{
           t('PlayerTab.noMatchHistory')
         }}</span>
       </div>
@@ -30,9 +30,9 @@
       <!-- empty filtered games -->
       <div
         v-else-if="hasFilters && gamesShouldHide.size === pagedMatchHistory.games.length"
-        class="h-50 flex items-center justify-center dark:bg-white/5 bg-black/5 rounded"
+        class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
       >
-        <span class="text-sm dark:text-white/60 text-black/80">{{
+        <span class="text-sm text-black/80 dark:text-white/60">{{
           t('PlayerTab.noFilteredMatchHistory')
         }}</span>
       </div>
@@ -42,7 +42,7 @@
     <div v-if="pagedMatchHistory && pagedMatchHistory.games.length > 0" class="space-y-1">
       <MatchCard
         :class="{
-          '!hidden': gamesShouldHide.has(g.gameId)
+          'hidden!': gamesShouldHide.has(g.gameId)
         }"
         v-for="g of pagedMatchHistory.games"
         :summary="g"

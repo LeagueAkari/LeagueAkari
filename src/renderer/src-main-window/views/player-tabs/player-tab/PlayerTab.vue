@@ -4,12 +4,12 @@
       <div
         class="mx-auto pt-10 pb-4"
         :class="{
-          'w-1064px': !isSmallSize,
-          'w-764px': isSmallSize
+          'w-[1064px]': !isSmallSize,
+          'w-[764px]': isSmallSize
         }"
       >
         <!-- head -->
-        <PlayerTabHeader class="mb-6 px-4 h-28" />
+        <PlayerTabHeader class="mb-6 h-28 px-4" />
 
         <!-- main content: thin size -->
         <div class="flex flex-col" v-if="isSmallSize">
@@ -17,7 +17,7 @@
           <MatchHistoryPagination
             horizontal
             :is-floating="!isSentinelVisibleRightSide"
-            class="sticky top-2 z-10 self-end mb-2"
+            class="sticky top-2 z-10 mb-2 self-end"
           />
 
           <MatchHistoryList />
@@ -26,7 +26,7 @@
         <!-- main content: wide size -->
         <div class="flex gap-3" v-else>
           <!-- side -->
-          <div class="space-y-2 w-300px">
+          <div class="w-[300px] space-y-2">
             <div ref="stickySentinelLeftSideEl" class="h-0 w-full"></div>
             <MatchHistoryPagination
               :is-floating="!isSentinelVisibleLeftSide"
@@ -48,10 +48,10 @@
 
     <div
       :class="{
-        'opacity-80  pointer-events-auto': shouldShowScrollToTopButton,
-        'opacity-0 pointer-events-none': !shouldShowScrollToTopButton
+        'pointer-events-auto opacity-80': shouldShowScrollToTopButton,
+        'pointer-events-none opacity-0': !shouldShowScrollToTopButton
       }"
-      class="!absolute bottom-8 right-8 transition-opacity hover:opacity-100 z-10"
+      class="absolute! right-8 bottom-8 z-10 transition-opacity hover:opacity-100"
     >
       <NButton size="large" type="primary" circle :focusable="false" @click="scrollToTop">
         <NIcon>

@@ -1,0 +1,9 @@
+@layer theme, base, components, utilities;
+
+@source '../../../renderer-shared';
+@source '../../../renderer';
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

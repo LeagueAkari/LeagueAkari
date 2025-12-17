@@ -1487,7 +1487,7 @@ SearchPane:
   noResultHintFuzzy: Search by name only, e.g.
   noResultHintExact: Search by name and tagline exactly, e.g.
   noResultHintPuuid: Search by PUUID, e.g.
-  noResultHintFuzzyExample: Akari Akaza
+  noResultHintFuzzyExample: Yui Fumani
   noResultHintExactExample: 'Akari #Akaza'
   noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
   recentVisits: Recent Visits
@@ -2437,7 +2437,7 @@ Opgg:
   toOpgg: Go to OP.GG
   refresh: Refresh
   close: Close
-  tier: Tier
+  champions: Tier
   champion: Champion
   empty: None
   mode: Mode
@@ -2460,8 +2460,8 @@ Opgg:
 
     flashPosition:
       label: Flash Position Preference
-      description: When setting summoner spells, prioritize the position for Flash if it is selected
-      auto: Current Flash position
+      description: The position for Flash when setting summoner spells
+      auto: Current position
       options:
         d: Default Flash position is D
         f: Default Flash position is F
@@ -2550,6 +2550,7 @@ OpggTier:
     banRate: B/R
 
 OpggChampion:
+  boots: Boots
   adorableRabi: Kawaii Bunny
   avgPlace: Avg. Rank
   1st: 1st Place

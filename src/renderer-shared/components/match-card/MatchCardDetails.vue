@@ -1,10 +1,10 @@
 <template>
   <!-- expanded details -->
   <div
-    class="@container w-full p-2 rounded dark:border-white/20 border-black/20 b b-solid relative overflow-hidden mt-1 box-border transition-width dark:bg-neutral-900/95 bg-neutral-100/95"
+    class="transition-width @container relative mt-1 box-border w-full overflow-hidden rounded border border-solid border-black/20 bg-neutral-100/95 p-2 dark:border-white/20 dark:bg-neutral-900/95"
   >
     <!-- header -->
-    <div class="flex gap-1 items-center mb-2">
+    <div class="mb-2 flex items-center gap-1">
       <TabSwitch
         class="flex-1"
         v-model:selected-tab="selectedTab"

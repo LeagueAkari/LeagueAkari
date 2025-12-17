@@ -54,7 +54,6 @@ export interface OpggChampionAverageStats {
   rank?: number
   tier_data: OpggChampionTierData
   role_rate?: number
-  // Arena 模式特有字段
   win?: number
   total_place?: number
   first_place?: number
@@ -135,7 +134,6 @@ export interface OpggChampionsResponseMeta {
   analyzed_at?: Date
 }
 
-// 英雄构建详情
 export interface OpggChampionBuildResponse {
   data: OpggChampionBuildData
   meta: OpggChampionBuildMeta
@@ -143,28 +141,33 @@ export interface OpggChampionBuildResponse {
 
 export interface OpggChampionBuildData {
   summary: OpggChampionBuildSummary
-  summoner_spells: OpggBuildPickItem[]
+  summoner_spells?: OpggBuildPickItem[]
   core_items: OpggBuildPickItem[]
-  mythic_items: OpggBuildPickItem[]
+  mythic_items?: OpggBuildPickItem[]
   boots: OpggBuildPickItem[]
   starter_items: OpggBuildPickItem[]
   last_items: OpggBuildPickItem[]
-  rune_pages: OpggRunePage[]
-  runes: OpggRuneBuild[]
+  rune_pages?: OpggRunePage[]
+  runes?: OpggRuneBuild[]
   skill_masteries: OpggSkillMastery[]
   skills: OpggBuildPickItem[]
   skill_evolves: OpggBuildPickItem[]
-  trends: OpggChampionTrends
-  game_lengths: OpggGameLength[]
-  counters: OpggChampionCounter[]
+  trends?: OpggChampionTrends
+  game_lengths?: OpggGameLength[]
+  counters?: OpggChampionCounter[]
+  prism_items?: OpggBuildPickItem[]
+  augment_group?: OpggArenaAugmentGroup[]
+  synergies?: OpggArenaSynergy[]
 }
 
 export interface OpggBuildPickItem {
-  ids?: number[]
+  ids: number[]
   win: number
   play: number
   pick_rate: number
   order?: OpggSkillKey[]
+  total_place?: number
+  first_place?: number
 }
 
 export enum OpggSkillKey {
@@ -213,6 +216,8 @@ export interface OpggSkillMastery {
   win: number
   pick_rate: number
   builds: OpggBuildPickItem[]
+  total_place?: number
+  first_place?: number
 }
 
 export interface OpggChampionBuildSummary {
@@ -293,4 +298,28 @@ export type RegionType =
 
 export interface OpggVersionsResponse {
   data: string[]
+}
+
+export interface OpggArenaAugmentGroup {
+  rarity: number
+  augments: OpggArenaAugment[]
+}
+
+export interface OpggArenaSynergy {
+  champion_id: number
+  op_rank: number
+  play: number
+  win: number
+  total_place: number
+  first_place: number
+  pick_rate: number
+}
+
+export interface OpggArenaAugment {
+  id: number
+  win: number
+  play: number
+  total_place: number
+  first_place: number
+  pick_rate: number
 }

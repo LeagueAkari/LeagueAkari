@@ -19,6 +19,7 @@ import {
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
 import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
@@ -35,7 +36,6 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SgpMain } from '../sgp'
 import { memberMerge } from './member-merge'
-import { QueueKeeper, isAbortError } from './queue-keeper'
 import { OngoingGameSettings, OngoingGameState } from './state'
 
 /**

@@ -4,17 +4,17 @@
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
       <div class="not-last:mb-4">
         <!-- header + tags -->
-        <div class="flex items-end mb-2">
+        <div class="mb-2 flex items-end">
           <div
             v-if="teamColor"
             :class="[
-              'self-center w-10px h-10px mr-2 rounded-full border border-white/20',
-              teamColor === 'red' ? 'bg-#ff3333' : '',
-              teamColor === 'blue' ? 'bg-#40c1ff' : '',
+              'mr-2 size-[10px] self-center rounded-full border border-white/20',
+              teamColor === 'red' ? 'bg-[#ff3333]' : '',
+              teamColor === 'blue' ? 'bg-[#40c1ff]' : '',
               teamColor === 'white' ? 'bg-neutral-200' : ''
             ]"
           ></div>
-          <span class="text-base font-bold mr-4">{{ teamName }}</span>
+          <span class="mr-4 text-base font-bold">{{ teamName }}</span>
           <TeamTagsArea
             v-if="players.length >= 1"
             :side-id="team"
@@ -27,7 +27,7 @@
 
         <!-- players -->
         <div
-          class="grid mt-1 gap-y-2 gap-x-1"
+          class="mt-1 grid gap-x-1 gap-y-2"
           :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
         >
           <PlayerInfoCard
@@ -60,7 +60,7 @@
     </DefineOngoingTeam>
 
     <NScrollbar v-if="!isInIdleState" x-scrollable>
-      <div class="relative h-full m-auto p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
+      <div class="relative m-auto h-full p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
           :team="team"
@@ -74,7 +74,7 @@
 
     <div v-else class="relative flex h-full">
       <div
-        class="absolute left-1/2 top-45% -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4"
+        class="absolute top-[45%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
       >
         <template v-if="ogs.settings.enabled">
           <div

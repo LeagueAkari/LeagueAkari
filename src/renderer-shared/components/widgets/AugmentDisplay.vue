@@ -70,7 +70,9 @@ const formatRarity = (r: string) => {
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .augment,
   .empty {
     border-radius: 2px;
@@ -139,7 +141,7 @@ const formatRarity = (r: string) => {
   }
 
   .empty {
-    --at-apply: 'dark:bg-black/20 bg-gray/40';
+    @apply bg-gray-500/40 dark:bg-black/20;
   }
 
   .rarity-indicator {

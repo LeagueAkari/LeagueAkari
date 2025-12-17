@@ -1,10 +1,10 @@
 <template>
-  <div class="px-4 py-2 dark:bg-white/5 rounded bg-black/5">
-    <div class="flex justify-between items-center mb-2">
+  <div class="rounded bg-black/5 px-4 py-2 dark:bg-white/5">
+    <div class="mb-2 flex items-center justify-between">
       <!-- title -->
       <div class="flex items-center gap-1">
         <NIcon class="text-sm"><Filter20Regular /></NIcon>
-        <span class="font-bold text-sm">{{ t('PlayerTab.filter.title') }}</span>
+        <span class="text-sm font-bold">{{ t('PlayerTab.filter.title') }}</span>
       </div>
 
       <!-- clear button -->
@@ -16,16 +16,16 @@
         :disabled="!hasFilters"
       >
         <template #icon>
-          <NIcon class="text-11px"><Delete20Regular /></NIcon>
+          <NIcon class="text-[11px]"><Delete20Regular /></NIcon>
         </template>
-        <span class="text-11px">{{ t('PlayerTab.filter.reset') }}</span>
+        <span class="text-[11px]">{{ t('PlayerTab.filter.reset') }}</span>
       </NButton>
     </div>
 
     <!-- conditions -->
     <div class="space-y-2">
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
           {{ t('PlayerTab.filter.winLoss') }}
         </div>
         <NRadioGroup size="small" v-model:value="winLoss">
@@ -36,7 +36,7 @@
       </div>
 
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
           {{ t('PlayerTab.filter.summoners') }}
         </div>
         <NSelect
@@ -56,7 +56,7 @@
       </div>
 
       <div>
-        <div class="mb-2 text-xs dark:text-white/60 text-black/80">
+        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
           {{ t('PlayerTab.filter.champions') }}
         </div>
         <NSelect

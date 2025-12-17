@@ -4,19 +4,19 @@
     <div
       v-for="p of sortedParticipants"
       :key="p.puuid"
-      class="dark:bg-white/3 bg-black/3 rounded-lg p-3 not-last:mb-2"
+      class="rounded-lg bg-black/3 p-3 not-last:mb-2 dark:bg-white/3"
     >
       <!-- Player Header -->
-      <div class="flex items-center gap-2 mb-3">
+      <div class="mb-3 flex items-center gap-2">
         <ChampionIcon
           :champion-id="p.championId"
-          class="!size-7 shrink-0 b-2 b-solid"
+          class="size-7! shrink-0 border-2 border-solid"
           :style="{
             borderColor: getTeamColor(p.teamIdentifier)
           }"
           round
         />
-        <div class="text-sm font-medium truncate min-w-0 text-black dark:text-white">
+        <div class="min-w-0 truncate text-sm font-medium text-black dark:text-white">
           <template v-if="hidePrivacy">
             {{ lcs.gameData.championName(p.championId) }}
           </template>
@@ -29,7 +29,7 @@
         <!-- anvil -->
         <div
           v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
-          class="text-xs text-black/50 py-0.5 px-1 dark:bg-white/10 dark:text-white text-black/50 text-xs bg-black/20 rounded"
+          class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/50 dark:bg-white/10 dark:text-white"
         >
           {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
         </div>
@@ -37,10 +37,10 @@
 
       <!-- Skills Section -->
       <div class="mb-3">
-        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">
+        <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
           {{ t('MatchCard.buildsTab.skillBuild') }}
         </div>
-        <div class="flex items-center gap-1 flex-wrap">
+        <div class="flex flex-wrap items-center gap-1">
           <div
             v-for="(sk, idx) of collected.skillLevelUpEvents[p.participantId]"
             :key="idx"
@@ -48,21 +48,21 @@
           >
             <div
               v-if="sk.levelUpType === 'EVOLVE'"
-              class="size-6 flex items-center justify-center text-xs font-bold rounded cursor-default relative bg-rose-500/60 b-rose-500 dark:bg-rose-400/60 dark:b-rose-400/60 b b-solid rounded-full"
+              class="relative flex size-6 cursor-default items-center justify-center rounded-full border border-solid border-rose-500 bg-rose-500/60 text-xs font-bold dark:border-rose-400/60 dark:bg-rose-400/60"
               :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (Evolved) - ${formatMilliseconds(sk.timestamp)}`"
             >
               {{
                 SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
               }}
               <div
-                class="absolute -top-1 -right-1 size-3 bg-amber-400 dark:bg-amber-500 text-black rounded-full flex items-center justify-center shadow-sm b b-solid b-white dark:b-neutral-900"
+                class="absolute -top-1 -right-1 flex size-3 items-center justify-center rounded-full border border-solid border-white bg-amber-400 text-black shadow-sm dark:border-neutral-900 dark:bg-amber-500"
               >
                 <NIcon size="10"><ArrowUp /></NIcon>
               </div>
             </div>
             <div
               v-else
-              class="size-6 flex items-center justify-center text-xs font-bold rounded cursor-default"
+              class="flex size-6 cursor-default items-center justify-center rounded text-xs font-bold"
               :class="getSkillClass(sk.skillSlot)"
               :title="`${sk.displayLevel} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
             >
@@ -73,7 +73,7 @@
 
             <div
               v-if="sk.displayLevel"
-              class="absolute z-1 -bottom-1 -right-1 text-8px leading-none py-0.5 bg-black/60 rounded text-white min-w-3 text-center"
+              class="absolute -right-1 -bottom-1 z-1 min-w-3 rounded bg-black/60 py-0.5 text-center text-[8px] leading-none text-white"
             >
               {{ sk.displayLevel }}
             </div>
@@ -82,7 +82,7 @@
           <!-- Empty state -->
           <div
             v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
-            class="text-xs dark:text-white/30 text-black/30 italic py-1"
+            class="py-1 text-xs text-black/30 italic dark:text-white/30"
           >
             {{ t('MatchCard.buildsTab.noSkillUpgrades') }}
           </div>
@@ -91,10 +91,10 @@
 
       <!-- Items Section -->
       <div>
-        <div class="text-xs dark:text-white/50 text-black/80 mb-1.5">
+        <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
           {{ t('MatchCard.buildsTab.itemPurchases') }}
         </div>
-        <div class="flex items-start gap-1 flex-wrap">
+        <div class="flex flex-wrap items-start gap-1">
           <div
             v-for="(item, idx) of collected.itemPurchaseEvents[p.participantId]?.filter(
               (x) => x.type === 'ITEM_PURCHASED' || x.type === 'LEAGUE_AKARI_ITEM_SPACER'
@@ -107,14 +107,14 @@
               <ItemDisplay :item-id="item.itemId" :size="28" />
 
               <!-- Timestamp -->
-              <div class="text-9px dark:text-white/50 text-black/80 whitespace-nowrap">
+              <div class="text-[9px] whitespace-nowrap text-black/80 dark:text-white/50">
                 {{ formatMilliseconds(item.timestamp) }}
               </div>
             </template>
 
             <div
               v-else-if="item.type === 'LEAGUE_AKARI_ITEM_SPACER'"
-              class="w-7 dark:text-white/30 text-black/50 flex items-center justify-center size-8"
+              class="flex size-8 w-7 items-center justify-center text-black/50 dark:text-white/30"
             >
               →
             </div>
@@ -127,7 +127,7 @@
                 (x) => x.type === 'ITEM_PURCHASED'
               ).length
             "
-            class="text-xs dark:text-white/30 text-black/30 italic py-1"
+            class="py-1 text-xs text-black/30 italic dark:text-white/30"
           >
             {{ t('MatchCard.buildsTab.noItemPurchases') }}
           </div>
@@ -137,16 +137,16 @@
   </NScrollbar>
   <div
     v-else
-    class="h-142 w-full flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
+    class="flex h-142 w-full items-center justify-center text-sm text-black/60 dark:text-white/60"
   >
     <template v-if="loadingDetails">
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <NSpin :size="16" />
         <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <span>{{ t('MatchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
           {{ t('MatchCard.common.refresh') }}
@@ -283,12 +283,15 @@ const collected = computed(() => {
 // 根据技能槽位返回对应的样式类
 const getSkillClass = (skillSlot: number) => {
   const classes = {
-    1: 'bg-sky-500/40 b-sky-500 dark:bg-sky-600/20 dark:b-sky-400/60 b b-solid',
-    2: 'bg-emerald-500/40 b-emerald-500 dark:bg-emerald-400/20 dark:b-emerald-400/60 b b-solid',
-    3: 'bg-violet-500/40 b-violet-500 dark:bg-violet-400/20 dark:b-violet-400/60 b b-solid',
-    4: 'bg-orange-500/40 b-orange-500 dark:bg-orange-400/20 dark:b-orange-400/60 b b-solid'
+    1: 'bg-sky-500/40 border-sky-500 dark:bg-sky-600/20 dark:border-sky-400/60 border border-solid',
+    2: 'bg-emerald-500/40 border-emerald-500 dark:bg-emerald-400/20 dark:border-emerald-400/60 border border-solid',
+    3: 'bg-violet-500/40 border-violet-500 dark:bg-violet-400/20 dark:border-violet-400/60 border border-solid',
+    4: 'bg-orange-500/40 border-orange-500 dark:bg-orange-400/20 dark:border-orange-400/60 border border-solid'
   }
-  return classes[skillSlot as keyof typeof classes] || 'bg-gray-300/20 b-gray-300/50 b b-solid'
+  return (
+    classes[skillSlot as keyof typeof classes] ||
+    'bg-gray-300/20 border-gray-300/50 border border-solid'
+  )
 }
 
 const position = usePosition()

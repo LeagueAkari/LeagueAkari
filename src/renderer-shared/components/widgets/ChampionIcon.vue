@@ -51,7 +51,9 @@ const imageSource = computed(() => {
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .champion-icon-container {
     position: relative;
     overflow: hidden;

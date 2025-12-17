@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center">
     <!-- name & something -->
-    <div class="flex flex-1 min-w-0 h-16">
+    <div class="flex h-16 min-w-0 flex-1">
       <!-- profile icon / summoner level -->
       <div class="relative size-16">
         <LcuImage
@@ -10,7 +10,7 @@
         />
         <div
           v-if="summoner"
-          class="absolute dark:text-white -bottom-1 -right-1 dark:bg-black/40 py-0.5 px-1 rounded text-10px"
+          class="absolute -right-1 -bottom-1 rounded px-1 py-0.5 text-[10px] dark:bg-black/40 dark:text-white"
         >
           {{ summoner.level }}
         </div>
@@ -19,9 +19,9 @@
       <!-- name & tag -->
       <StreamerModeMaskedText>
         <template #masked>
-          <div class="flex flex-col gap-1 self-center ml-3">
+          <div class="ml-3 flex flex-col gap-1 self-center">
             <div class="flex items-center gap-1">
-              <span class="text-xl font-bold dark:text-white text-black">{{ maskedName }}</span>
+              <span class="text-xl font-bold text-black dark:text-white">{{ maskedName }}</span>
               <NPopover
                 v-if="showSpectatorIndicator"
                 trigger="hover"
@@ -39,10 +39,10 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-1 self-center ml-3">
+        <div class="ml-3 flex flex-col gap-1 self-center">
           <div class="flex items-center gap-1">
             <CopyableText
-              class="font-bold dark:text-white text-black"
+              class="font-bold text-black dark:text-white"
               :class="summoner && summoner.gameName.length >= 16 ? 'text-sm' : 'text-xl'"
               :text="summoner ? `${summoner.gameName}#${summoner.tagLine}` : '—'"
             >
@@ -71,11 +71,11 @@
     <RankedPane />
 
     <!-- buttons -->
-    <div class="flex gap-2 ml-8 justify-end">
+    <div class="ml-8 flex justify-end gap-2">
       <!-- tag edit -->
       <NButton
         secondary
-        class="!size-42px"
+        class="size-[42px]!"
         @click="isTagEditModalShowing = true"
         v-if="!isSelfTab && !isCrossRegion"
       >
@@ -85,7 +85,7 @@
       </NButton>
 
       <!-- refresh -->
-      <NButton secondary class="!size-42px" :loading="somethingLoading" @click="refresh">
+      <NButton secondary class="size-[42px]!" :loading="somethingLoading" @click="refresh">
         <template #icon>
           <NIcon><RefreshSharp /></NIcon>
         </template>

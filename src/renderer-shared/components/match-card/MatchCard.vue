@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full min-w-700px">
+  <div class="relative w-full min-w-[700px]">
     <MatchCardOverview @toggle-expand="isExpanded = !isExpanded" />
 
     <KeepAlive>

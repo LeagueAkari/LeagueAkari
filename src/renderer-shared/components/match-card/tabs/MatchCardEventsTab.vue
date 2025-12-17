@@ -1,9 +1,9 @@
 <template>
-  <div v-if="details" class="w-full h-142 flex gap-4">
+  <div v-if="details" class="flex h-142 w-full gap-4">
     <!-- 左侧：时间线区域 -->
-    <div class="flex-1 min-h-0">
+    <div class="min-h-0 flex-1">
       <NScrollbar class="h-full w-full">
-        <div class="pl-4 pt-2">
+        <div class="pt-2 pl-4">
           <NTimeline>
             <NTimelineItem
               :title="t('MatchCard.eventsTab.start')"
@@ -27,7 +27,7 @@
                     </NPopover>
                   </div>
                 </template>
-                <div class="flex gap-2 items-center w-fit">
+                <div class="flex w-fit items-center gap-2">
                   <div class="flex items-end">
                     <ChampionIcon
                       :champion-id="participantMap[e.killerId]?.championId"
@@ -40,7 +40,7 @@
                       class="size-3.5 rounded not-last:mr-0.5"
                     />
                   </div>
-                  <div class="dark:text-white/80 text-black/80 text-sm">
+                  <div class="text-sm text-black/80 dark:text-white/80">
                     {{ t('MatchCard.eventsTab.kill') }}
                   </div>
                   <ChampionIcon
@@ -60,7 +60,7 @@
                 :time="formatDuration(e.timestamp)"
               >
                 <template #header>
-                  <div class="flex gap-2 items-center w-fit cursor-pointer">
+                  <div class="flex w-fit cursor-pointer items-center gap-2">
                     <ChampionIcon
                       :champion-id="participantMap[e.killerId]?.championId"
                       class="size-5 rounded"
@@ -92,12 +92,12 @@
               >
                 <NPopover :show-arrow="false" placement="right">
                   <template #trigger>
-                    <div class="flex gap-2 items-center w-fit cursor-pointer">
+                    <div class="flex w-fit cursor-pointer items-center gap-2">
                       <ChampionIcon
                         :champion-id="participantMap[e.killerId]?.championId"
                         class="size-5 rounded"
                       />
-                      <div class="dark:text-white/60 text-black/60">
+                      <div class="text-black/60 dark:text-white/60">
                         {{ t('MatchCard.eventsTab.destroyed') }}
                       </div>
                       <template v-if="e.buildingType === 'TOWER_BUILDING'">
@@ -129,12 +129,12 @@
                 type="warning"
                 :time="formatDuration(e.timestamp)"
               >
-                <div class="flex gap-2 items-center w-fit cursor-pointer">
+                <div class="flex w-fit cursor-pointer items-center gap-2">
                   <ChampionIcon
                     :champion-id="participantMap[e.killerId]?.championId"
                     class="size-5 rounded"
                   />
-                  <div class="dark:text-white/60 text-black/60">
+                  <div class="text-black/60 dark:text-white/60">
                     {{ t('MatchCard.eventsTab.destroyed') }}
                   </div>
                   <div class="font-bold">
@@ -158,11 +158,11 @@
     </div>
 
     <!-- 右侧：控制面板（与 DiffLineChart 风格一致） -->
-    <NScrollbar class="!w-52">
+    <NScrollbar class="w-52!">
       <div class="flex flex-col gap-3">
         <!-- 筛选器 -->
-        <div class="flex flex-col gap-2 w-full">
-          <div class="text-xs dark:text-white/60 text-black/60 font-semibold">
+        <div class="flex w-full flex-col gap-2">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
             {{ t('MatchCard.eventsTab.filters') }}
           </div>
           <NCheckboxGroup v-model:value="selectedFilters">
@@ -179,9 +179,9 @@
 
         <!-- 展示防御塔镀层每人数量 -->
         <template v-if="platesTakeParticipants">
-          <div class="h-px dark:bg-white/10 bg-black/10"></div>
+          <div class="h-px bg-black/10 dark:bg-white/10"></div>
 
-          <div class="dark:text-white/60 text-black/60 text-xs font-semibold">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
             {{ t('MatchCard.eventsTab.plateStats') }}
           </div>
 
@@ -189,7 +189,7 @@
             <div v-for="k of platesTakeParticipants">
               <div class="flex items-center gap-2">
                 <ChampionIcon :champion-id="k.championId" class="size-5 rounded" />
-                <div class="dark:text-white/80 text-black/80 text-sm">
+                <div class="text-sm text-black/80 dark:text-white/80">
                   {{ lcs.gameData.championName(k.championId) }}
                 </div>
                 <div :class="tagTheme">
@@ -204,16 +204,16 @@
   </div>
   <div
     v-else
-    class="w-full h-142 flex items-center justify-center dark:text-white/60 text-black/60 text-sm"
+    class="flex h-142 w-full items-center justify-center text-sm text-black/60 dark:text-white/60"
   >
     <template v-if="loadingDetails">
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <NSpin :size="16" />
         <span>{{ t('MatchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <span>{{ t('MatchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
           {{ t('MatchCard.common.refresh') }}

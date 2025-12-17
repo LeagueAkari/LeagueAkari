@@ -1,6 +1,6 @@
 <template>
-  <div class="px-4 py-2 dark:bg-white/5 rounded bg-black/5" v-if="analysis">
-    <div class="text-base font-bold mb-3 dark:text-white text-gray-900">
+  <div class="rounded bg-black/5 px-4 py-2 dark:bg-white/5" v-if="analysis">
+    <div class="mb-3 text-base font-bold text-gray-900 dark:text-white">
       {{ t('PlayerTab.stats.title') }}
     </div>
     <div class="flex flex-col gap-1">
@@ -14,7 +14,7 @@
           t('PlayerTab.stats.akariScore')
         }}</span>
         <span
-          class="ml-auto text-13px text-right text-gray-900 dark:text-white"
+          class="ml-auto text-right text-[13px] text-gray-900 dark:text-white"
           :class="{ 'opacity-60': analysis.akariScore === null }"
         >
           <template v-if="analysis.akariScore !== null">
@@ -31,7 +31,9 @@
         }}</span>
         <NPopover>
           <template #trigger>
-            <span class="ml-auto text-13px text-right text-gray-900 dark:text-white cursor-default">
+            <span
+              class="ml-auto cursor-default text-right text-[13px] text-gray-900 dark:text-white"
+            >
               {{ analysis.summary.avgKda.toFixed(2) }}
             </span>
           </template>
@@ -45,7 +47,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgKp')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ (analysis.summary.avgKillParticipation * 100).toFixed() }}%
         </span>
       </div>
@@ -55,7 +57,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmg')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed() }}%
         </span>
       </div>
@@ -65,7 +67,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmgTaken')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed() }}%
         </span>
       </div>
@@ -75,7 +77,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgGold')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed() }}%
         </span>
       </div>
@@ -85,7 +87,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgCs')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ (analysis.summary.avgCsPercentageOfTeam * 100).toFixed() }}%
         </span>
       </div>
@@ -103,7 +105,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.activeSession', 'active')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ analysis.summary.activeSessionWins }} {{ t('PlayerTab.stats.win') }}
           {{ analysis.summary.activeSessionLosses }}
           {{ t('PlayerTab.stats.lose') }} ({{
@@ -121,7 +123,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.winLose')
         }}</span>
-        <span class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           {{ analysis.summary.wins }} {{ t('PlayerTab.stats.win') }} {{ analysis.summary.losses }}
           {{ t('PlayerTab.stats.lose') }} ({{ (analysis.summary.winRate * 100).toFixed() }}%)
         </span>
@@ -135,12 +137,12 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.teamSides')
         }}</span>
-        <div class="ml-auto text-13px text-right text-gray-900 dark:text-white">
+        <div class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           <div class="flex items-center">
-            <div class="size-3 rounded-full bg-blue-500 mr-1"></div>
+            <div class="mr-1 size-3 rounded-full bg-blue-500"></div>
             <span>{{ analysis.summary.blueSideCount }}</span>
-            <span class="text-gray-700 dark:text-gray-400 text-xs mx-2">/</span>
-            <div class="size-3 rounded-full bg-red-400 mr-1"></div>
+            <span class="mx-2 text-xs text-gray-700 dark:text-gray-400">/</span>
+            <div class="mr-1 size-3 rounded-full bg-red-400"></div>
             <span>{{ analysis.summary.redSideCount }}</span>
           </div>
         </div>
@@ -151,7 +153,7 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.champions')
         }}</span>
-        <div class="max-w-110px ml-auto flex flex-wrap gap-0.5 justify-end">
+        <div class="ml-auto flex max-w-[110px] flex-wrap justify-end gap-0.5">
           <NPopover
             v-for="c of frequentlyUsedChampions"
             :key="c.id"
@@ -159,10 +161,10 @@
             :keep-alive-on-hover="false"
           >
             <template #trigger>
-              <div class="relative w-5 h-5">
-                <LcuImage class="w-full h-full" :src="championIconUri(c.id)" />
+              <div class="relative h-5 w-5">
+                <LcuImage class="h-full w-full" :src="championIconUri(c.id)" />
                 <div
-                  class="absolute -bottom-1 -right-0.5 text-10px text-gray-200 bg-black/60 px-0.5 rounded-sm"
+                  class="absolute -right-0.5 -bottom-1 rounded-sm bg-black/60 px-0.5 text-[10px] text-gray-200"
                 >
                   {{ c.count }}
                 </div>
@@ -173,7 +175,7 @@
                 {{ lcs.gameData.champions[c.id]?.name }} · {{ c.count }}
                 {{ t('PlayerTab.stats.times') }}
               </div>
-              <div class="flex gap-1 mt-0.5">
+              <div class="mt-0.5 flex gap-1">
                 <span class="text-green-600 dark:text-green-400"
                   >{{ c.wins }} {{ t('PlayerTab.stats.win') }}</span
                 >

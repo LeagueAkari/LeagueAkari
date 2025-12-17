@@ -1,6 +1,6 @@
 <template>
   <NModal v-model:show="show">
-    <div class="w-840px p-8">
+    <div class="w-[840px] p-8">
       <MatchCard
         v-if="summary"
         :summary="summary"

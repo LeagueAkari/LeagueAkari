@@ -88,7 +88,9 @@ const lcs = useLeagueClientStore()
 </script>
 
 <style scoped>
-@layer shortcuts {
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@layer components {
   .info {
     margin-bottom: 8px;
     display: flex;
@@ -167,7 +169,7 @@ const lcs = useLeagueClientStore()
   }
 
   .empty {
-    --at-apply: 'dark:bg-black/20 bg-gray/40';
+    @apply bg-gray-500/40 dark:bg-black/20;
   }
 }
 </style>
