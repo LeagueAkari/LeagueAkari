@@ -18,12 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, watch } from 'vue'
@@ -37,16 +33,10 @@ import PlayerTab from './player-tab/PlayerTab.vue'
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
-
 const route = useRoute()
 const router = useRouter()
 
-const componentName = useComponentName()
-
 const pts = usePlayerTabsStore()
-const ogs = useOngoingGameStore()
-const log = useInstance(LoggerRenderer)
 const pt = useInstance(PlayerTabsRenderer)
 
 const playerTabRoute = computed(() => {
@@ -102,33 +92,6 @@ watch(
     })
   },
   { immediate: true }
-)
-
-const isEndOfGame = computed(
-  () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'
-)
-
-// 页面在游戏结束后刷新对应 tab 的战绩
-// 当该页面被 KeepAlive, 即使页面不可见也会触发
-watch(
-  () => isEndOfGame.value,
-  (is, _prevP) => {
-    if (pts.frontendSettings.refreshTabsAfterGameEnds && is) {
-      if (!ogs.teams) {
-        return
-      }
-
-      const allPlayerPuuids = Object.values(ogs.teams).flat()
-
-      pts.tabs.forEach((tab) => {
-        if (allPlayerPuuids.includes(tab.puuid) && tab.refresh) {
-          tab.refresh()
-        }
-      })
-
-      log.info(componentName, `eog refresh`, allPlayerPuuids)
-    }
-  }
 )
 
 const message = useMessage()

@@ -54,6 +54,12 @@ export const RENDER_GROUPS: RenderGroup[] = [
     ]
   },
   {
+    group: 'akari',
+    items: [
+      { key: 'akariScore', render: 'float' } // ethereal
+    ]
+  },
+  {
     group: 'damage',
     items: [
       // Damage to Champions
@@ -549,39 +555,39 @@ export function useValueRenderer() {
   return {
     float: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
 
       if (value === 0) {
-        return <span class="dark:text-white/50 text-black/50">0</span>
+        return <span class="text-black/50 dark:text-white/50">0</span>
       }
 
       return <span title={value.toFixed(2)}>{value.toFixed(2)}</span>
     },
     integer: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
 
       if (value === 0) {
-        return <span class="dark:text-white/50 text-black/50">0</span>
+        return <span class="text-black/50 dark:text-white/50">0</span>
       }
 
       return <span title={value.toString()}>{Math.floor(value).toLocaleString()}</span>
     },
     text: (value: string | number) => {
       if (value === null || value === undefined || value === '') {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
       return value.toString()
     },
     k2: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
 
       if (value === 0) {
-        return <span class="dark:text-white/50 text-black/50">0</span>
+        return <span class="text-black/50 dark:text-white/50">0</span>
       }
 
       return (
@@ -592,11 +598,11 @@ export function useValueRenderer() {
     },
     'game-time': (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
 
       if (value === 0) {
-        return <span class="dark:text-white/50 text-black/50">0</span>
+        return <span class="text-black/50 dark:text-white/50">0</span>
       }
 
       return <span title={value.toString()}>{formatSeconds(value)}</span>
@@ -607,19 +613,19 @@ export function useValueRenderer() {
         value === undefined ||
         (typeof value !== 'boolean' && typeof value !== 'number')
       ) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
       return value ? t('MatchCard.statKeys.true') : t('MatchCard.statKeys.false')
     },
     percentage: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
       return <span title={`${value * 100}%`}>{`${(value * 100).toFixed(2)}%`}</span>
     },
     auto: (value: any) => {
       if (value === null || value === undefined || isNaN(value)) {
-        return <span class="dark:text-white/50 text-black/50">N/A</span>
+        return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
 
       if (typeof value === 'number') {
@@ -634,7 +640,7 @@ export function useValueRenderer() {
         return <span title={value}>{value}</span>
       }
 
-      return <span class="dark:text-white/50 text-black/50">N/A?</span>
+      return <span class="text-black/50 dark:text-white/50">N/A?</span>
     }
   }
 }

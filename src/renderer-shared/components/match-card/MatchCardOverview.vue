@@ -25,7 +25,7 @@
               <!-- top1 头顶上方的皇冠 -->
               <div
                 v-if="shouldShowCrown"
-                class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                class="absolute top-0 left-[calc(50%-2px)] -translate-x-1/2 -translate-y-1/2"
               >
                 <NIcon class="text-orange-600 dark:text-yellow-500">
                   <Crown />

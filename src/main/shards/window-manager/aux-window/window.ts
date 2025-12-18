@@ -81,7 +81,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
         }
 
         if (timing === 'show') {
-          this.showOrRestore(true)
+          this.showOrRestore()
         } else {
           this.hide()
         }

@@ -427,7 +427,7 @@ export function analyzeMatchHistory(
     losingStreak += 1
   }
 
-  // 活跃时段 (间隔不超过 1.5h 的胜负)
+  // 活跃时段 (间隔不超过 3h 的胜负)
   const {
     participant: { winResult: latestWinResult },
     basicInfo: { gameCreation: latestCreation, gameDuration: latestDuration }
@@ -445,8 +445,8 @@ export function analyzeMatchHistory(
     for (let i = 1; i < filteredGames.length; i++) {
       const { participant, basicInfo } = filteredGames[i]
 
-      // within 1.5 hours
-      if (lastGameEndedAt - basicInfo.gameCreation > 1.5 * 60 * 60 * 1000) {
+      // within 3 hours
+      if (lastGameEndedAt - basicInfo.gameCreation > 3 * 60 * 60 * 1000) {
         break
       }
 

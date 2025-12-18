@@ -12,7 +12,7 @@
         class="size-8!"
         :title="t('Opgg.refresh')"
         :loading="isLoading"
-        @click="refresh"
+        @click="() => refresh()"
       >
         <template #icon>
           <NIcon><RefreshSharp /></NIcon>

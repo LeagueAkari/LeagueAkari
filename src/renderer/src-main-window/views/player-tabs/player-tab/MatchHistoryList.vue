@@ -66,23 +66,32 @@
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
+
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from './context'
 import { useMatchHistory } from './data/match-history'
 import { useMatchHistoryFilters } from './data/match-history-filters'
 
 const as = useAppCommonStore()
+const lcs = useLeagueClientStore()
+const pts = usePlayerTabsStore()
+const ogs = useOngoingGameStore()
+
 const { t } = useTranslation()
 const { masked } = useStreamerModeMaskedText()
 
 const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
-const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay } = useMatchHistory()
+const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay, loadMatchHistory } =
+  useMatchHistory()
 
 const { filters, hasFilters } = useMatchHistoryFilters()
 
@@ -149,6 +158,35 @@ const gamesShouldHide = computed(() => {
     new Set<number>()
   )
 })
+
+const isEndOfGame = computed(
+  () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'
+)
+
+// 页面在游戏结束后刷新对应 tab 的战绩
+// 当该页面被 KeepAlive, 即使页面不可见也会触发
+watch(
+  () => isEndOfGame.value,
+  (is, _prevP) => {
+    if (pts.frontendSettings.refreshTabsAfterGameEnds && is) {
+      if (!ogs.teams) {
+        return
+      }
+
+      const allPlayerPuuids = Object.values(ogs.teams).flat()
+
+      if (
+        (!pagedMatchHistory.value || (pagedMatchHistory.value.queryParams.startIndex || 0) === 0) &&
+        allPlayerPuuids.includes(puuid.value)
+      ) {
+        loadMatchHistory({
+          startIndex: 0,
+          count: pts.frontendSettings.loadCount
+        })
+      }
+    }
+  }
+)
 
 // trick
 const hidePrivacy = computed(() => masked('__streamer_flag__') !== '__streamer_flag__')

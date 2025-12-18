@@ -2449,6 +2449,7 @@ Opgg:
   create: Create
   notConnected: Not connected to the client, some resources may not be loaded
   cancel: Cancel
+  noVersionFound: No version found
 
   settings:
     button: Settings

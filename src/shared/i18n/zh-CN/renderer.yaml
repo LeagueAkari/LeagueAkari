@@ -2450,6 +2450,7 @@ Opgg:
   create: 创建
   notConnected: 未连接到客户端，部分资源无法加载
   cancel: 取消
+  noVersionFound: 未找到版本
 
   settings:
     button: 设置

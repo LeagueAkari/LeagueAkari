@@ -67,9 +67,6 @@ export function useRegionOptions() {
     { label: t('Opgg.regions.tr'), value: 'tr' },
     { label: t('Opgg.regions.ru'), value: 'ru' },
     { label: t('Opgg.regions.sg'), value: 'sg' },
-    { label: t('Opgg.regions.id'), value: 'id' },
-    { label: t('Opgg.regions.ph'), value: 'ph' },
-    { label: t('Opgg.regions.th'), value: 'th' },
     { label: t('Opgg.regions.vn'), value: 'vn' },
     { label: t('Opgg.regions.tw'), value: 'tw' },
     { label: t('Opgg.regions.me'), value: 'me' }

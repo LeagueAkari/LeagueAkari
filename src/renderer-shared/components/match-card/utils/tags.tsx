@@ -10,7 +10,7 @@ function times(label: string, count: number, t: TFunction) {
     return `${label}`
   }
 
-  return t('MatchCard.tags.times', { label, count })
+  return t('MatchCard.tags.times', { label, count: Math.round(count) })
 }
 
 export interface PlayerTag {
@@ -354,7 +354,7 @@ function computeCsAdvantageTags({ participant }: TagContext, t: TFunction): Play
         color: 'bg-amber-600 dark:bg-amber-700',
         textColor: 'text-white',
         content: t('MatchCard.tags.csAdvantage.content', {
-          value: participant.maxCsAdvantageOnLaneOpponent.toLocaleString()
+          value: Math.round(participant.maxCsAdvantageOnLaneOpponent).toLocaleString()
         }),
         priority: 750 + participant.maxCsAdvantageOnLaneOpponent * 10
       }

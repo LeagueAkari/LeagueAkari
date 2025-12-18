@@ -1,6 +1,8 @@
 import { OpggRenderer } from '@opgg-window/shards/opgg'
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
+import { useStableComputed } from '@renderer-shared/composables/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   ModeType,
   OpggChampionBuildResponse,
@@ -10,8 +12,12 @@ import {
   TierType
 } from '@shared/types/opgg'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
+import { watchDebounced } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { InjectionKey, Ref, inject, provide, ref, shallowRef, watch } from 'vue'
+
+import { hasItemsSets, useLoadout } from './utils/loadout'
 
 export const OpggContextKey: InjectionKey<OpggContext> = Symbol('OpggContext')
 
@@ -51,9 +57,14 @@ export type OpggContext = {
 }
 
 export function provideOpgg() {
+  const lcs = useLeagueClientStore()
   const og = useInstance(OpggRenderer)
   const ogs = useOpggStore()
   const message = useMessage()
+
+  const { setSummonerSpells, setRunes, writeItemSets } = useLoadout()
+
+  const { t } = useTranslation()
 
   const currentTab = ref<'champions' | 'champion'>('champions')
 
@@ -115,58 +126,97 @@ export function provideOpgg() {
     return nextVersion
   }
 
-  const changeMode = async (mode0: ModeType) => {
+  const update = async (opts: {
+    region?: RegionType
+    mode?: ModeType
+    tier?: TierType
+    version?: string
+    championId?: number
+    position?: PositionType
+    force?: boolean
+  }) => {
     queueKeeper.cancelAll()
+
     isLoading.value = true
 
     try {
-      const region0 = region.value
-      const tier0 = tier.value
-      const newPosition: PositionType = mode0 === 'ranked' ? 'top' : 'none'
-      const nextVersion = await ensureVersionFor(region0, mode0, {
-        reload: true,
-        preferredVersion: version.value
-      })
+      const nextVersion = await ensureVersionFor(
+        opts.region ?? region.value,
+        opts.mode ?? mode.value,
+        {
+          // version 和 mode 需要刷新 version
+          // 但也没那么强制，但 mode 变化必须刷新 version
+          reload: opts.force || opts.mode !== undefined || opts.version !== undefined,
+          preferredVersion: opts.version ?? version.value
+        }
+      )
 
       if (!nextVersion) {
+        message.warning(() => t('Opgg.noVersionFound'))
         return
       }
 
-      const { data: championsData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champions',
-        ({ signal }) =>
-          og.api.getChampions(region0, mode0, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: nextVersion,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
+      const targetMode = opts.mode ?? mode.value
+      const targetRegion = opts.region ?? region.value
+      const targetTier = opts.tier ?? tier.value
+      const targetChampionId = opts.championId ?? championId.value
+      let targetPosition = opts.position ?? position.value
 
-      let championData: OpggChampionBuildResponse | null = null
+      // 硬性限制：非 ranked 模式必须为 none
+      // ranked 模式下不能为 none
+      if (targetMode === 'ranked') {
+        if (targetPosition === 'none') {
+          targetPosition = 'mid'
+        }
+      } else {
+        targetPosition = 'none'
+      }
 
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
+      let updatedChampionsData: OpggChampionsResponse | null = null
+
+      if (opts.force || opts.region || opts.mode || opts.version || opts.tier) {
+        const { data: championsData } = await queueKeeper.add(
           'default',
-          'opgg-load-champion',
+          'opgg-load-champions',
           ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, newPosition, {
-              tier: mode0 === 'arena' ? undefined : tier0,
+            og.api.getChampions(targetRegion, targetMode, {
+              tier: targetMode === 'arena' ? undefined : targetTier,
               version: nextVersion,
               signal
             }),
           { tags: ['opgg-group'] }
         )
 
-        championData = data
+        updatedChampionsData = championsData
       }
 
-      mode.value = mode0
-      position.value = newPosition
+      let updatedChampionData: OpggChampionBuildResponse | null = null
+
+      if (targetChampionId) {
+        const { data: championData } = await queueKeeper.add(
+          'default',
+          'opgg-load-champion',
+          ({ signal }) =>
+            og.api.getChampion(targetRegion, targetMode, targetChampionId, targetPosition, {
+              tier: targetMode === 'arena' ? undefined : targetTier,
+              version: nextVersion,
+              signal
+            }),
+          { tags: ['opgg-group'] }
+        )
+
+        updatedChampionData = championData
+      }
+
+      // commit
       version.value = nextVersion
-      champions.value = championsData
-      champion.value = championData
+      champions.value = updatedChampionsData
+      champion.value = updatedChampionData
+      region.value = targetRegion
+      mode.value = targetMode
+      tier.value = targetTier
+      position.value = targetPosition
+      championId.value = targetChampionId
     } catch (error) {
       if (isAbortError(error)) {
         return
@@ -179,353 +229,32 @@ export function provideOpgg() {
     }
   }
 
+  const changeMode = async (mode0: ModeType) => {
+    await update({ mode: mode0 })
+  }
+
   const changePosition = async (position0: PositionType) => {
-    // 目前，只有 ranked 模式可以改 position，这是写在 url 里面的硬性限制
     if (mode.value !== 'ranked') {
       return
     }
 
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const region0 = region.value
-      const mode0 = mode.value
-      const tier0 = tier.value
-      const version0 = version.value
-
-      let championData: OpggChampionBuildResponse | null = null
-
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, position0, {
-              tier: mode0 === 'arena' ? undefined : tier0,
-              version: version0 ?? undefined,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        championData = data
-      }
-
-      // champions 列表与 position 无关，不需要刷新；仅提交 position + champion
-      position.value = position0
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
+    await update({ position: position0 })
   }
 
   const changeRegion = async (region0: RegionType) => {
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const mode0 = mode.value
-      const tier0 = tier.value
-
-      let version0 = version.value
-
-      if (!version0) {
-        version0 = await ensureVersionFor(region0, mode0, {
-          reload: false,
-          preferredVersion: null
-        })
-
-        if (!version0) {
-          return
-        }
-      }
-
-      const { data: championsData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champions',
-        ({ signal }) =>
-          og.api.getChampions(region0, mode0, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: version0 ?? undefined,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
-
-      let championData: OpggChampionBuildResponse | null = null
-
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, position.value ?? undefined, {
-              tier: mode0 === 'arena' ? undefined : tier0,
-              version: version0 ?? undefined,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        championData = data
-      }
-
-      region.value = region0
-      version.value = version0
-      champions.value = championsData
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
+    await update({ region: region0 })
   }
 
   const changeTier = async (tier0: TierType) => {
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const region0 = region.value
-      const mode0 = mode.value
-      const version0 = version.value
-
-      const { data: championsData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champions',
-        ({ signal }) =>
-          og.api.getChampions(region0, mode0, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: version0 ?? undefined,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
-
-      let championData: OpggChampionBuildResponse | null = null
-
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, position.value ?? undefined, {
-              tier: mode0 === 'arena' ? undefined : tier0,
-              version: version0 ?? undefined,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        championData = data
-      }
-
-      tier.value = tier0
-      champions.value = championsData
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
+    await update({ tier: tier0 })
   }
 
   const changeVersion = async (version0: string) => {
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const region0 = region.value
-      const mode0 = mode.value
-      const tier0 = tier.value
-
-      const nextVersion = await ensureVersionFor(region0, mode0, {
-        reload: true,
-        preferredVersion: version0
-      })
-
-      if (!nextVersion) {
-        return
-      }
-
-      const { data: championsData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champions',
-        ({ signal }) =>
-          og.api.getChampions(region0, mode0, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: nextVersion,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
-
-      let championData: OpggChampionBuildResponse | null = null
-
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, position.value ?? undefined, {
-              tier: mode0 === 'arena' ? undefined : tier0,
-              version: nextVersion,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        championData = data
-      }
-
-      version.value = nextVersion
-      champions.value = championsData
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
+    await update({ version: version0 })
   }
 
   const changeChampion = async (championId0: number) => {
-    // 意图先行：允许 championId/tab 立即变更
-    championId.value = championId0
-    currentTab.value = 'champion'
-
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const region0 = region.value
-      const mode0 = mode.value
-      const tier0 = tier.value
-
-      let version0 = version.value
-
-      // 若还没有版本（冷启动时从「单个英雄」入口进来），需要按需拉取一次
-      if (!version0) {
-        version0 = await ensureVersionFor(region0, mode0, {
-          reload: false,
-          preferredVersion: null
-        })
-
-        if (!version0) {
-          return
-        }
-      }
-
-      const { data: championData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champion',
-        ({ signal }) =>
-          og.api.getChampion(region0, mode0, championId0, position.value ?? undefined, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: version0 ?? undefined,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
-
-      version.value = version0
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const refresh = async () => {
-    queueKeeper.cancelAll()
-    isLoading.value = true
-
-    try {
-      const region0 = region.value
-      const mode0 = mode.value
-      const tier0 = tier.value
-
-      // refresh：强制重新拉取 versions 并校准 version
-      const nextVersion = await ensureVersionFor(region0, mode0, {
-        reload: true,
-        preferredVersion: version.value
-      })
-
-      if (!nextVersion) {
-        return
-      }
-
-      const { data: championsData } = await queueKeeper.add(
-        'default',
-        'opgg-load-champions',
-        ({ signal }) =>
-          og.api.getChampions(region0, mode0, {
-            tier: mode0 === 'arena' ? undefined : tier0,
-            version: nextVersion,
-            signal
-          }),
-        { tags: ['opgg-group'] }
-      )
-
-      let championData: OpggChampionBuildResponse | null = null
-
-      if (championId.value) {
-        const { data } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(region0, mode0, championId.value!, position.value ?? undefined, {
-              tier: mode0 === 'arena' ? undefined : tier0,
-              version: nextVersion,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        championData = data
-      }
-
-      version.value = nextVersion
-      champions.value = championsData
-      champion.value = championData
-    } catch (error) {
-      if (isAbortError(error)) {
-        return
-      }
-
-      const err = error as Error
-      message.error(err.message || String(error))
-    } finally {
-      isLoading.value = false
-    }
+    await update({ championId: championId0 })
   }
 
   const cancel = () => {
@@ -541,13 +270,16 @@ export function provideOpgg() {
     }
   }
 
+  const refresh = async () => {
+    await update({ force: true })
+  }
+
   refresh()
 
-  // sync
+  // persistent
   watch(
     [flashPosition, mode, position, region, tier],
     ([flashPosition, mode, position, region, tier]) => {
-      console.log('sync', flashPosition, mode, position, region, tier)
       og.updatePreferences({
         flashPosition,
         mode,
@@ -556,6 +288,128 @@ export function provideOpgg() {
         tier
       })
     }
+  )
+
+  // sync game
+  const activeSession = useStableComputed(() => {
+    if (!lcs.champSelect.session || !lcs.gameflow.session) {
+      return
+    }
+
+    const selfCellId = lcs.champSelect.session.localPlayerCellId
+    const self = lcs.champSelect.session.myTeam.find((p) => p.cellId === selfCellId)
+    const selfActionChampionId = lcs.champSelect.session.actions
+      .flat(1)
+      .find((a) => a.actorCellId === selfCellId && a.type === 'pick' && a.championId)?.championId
+
+    if (!self && !selfActionChampionId) {
+      return
+    }
+
+    return {
+      championId: self?.championId || selfActionChampionId,
+      assignedPosition: self?.assignedPosition,
+      gameMode: lcs.gameflow.session.gameData.queue.gameMode
+    }
+  })
+
+  // handle to champion (if supported)
+  // and auto
+  watchDebounced(
+    activeSession,
+    async (active) => {
+      if (!active) {
+        return
+      }
+
+      let mode0 = mode.value
+      let isUnsupportedMode = false
+      switch (active.gameMode) {
+        case 'CLASSIC':
+          mode0 = 'ranked'
+          break
+        case 'ARAM':
+          mode0 = 'aram'
+          position.value = 'none'
+          break
+        case 'CHERRY':
+          mode0 = 'arena'
+          break
+        case 'NEXUSBLITZ':
+          mode0 = 'nexus_blitz'
+          break
+        case 'URF':
+        case 'ARURF':
+          mode0 = 'urf'
+          break
+        default:
+          isUnsupportedMode = true
+          break
+      }
+
+      if (isUnsupportedMode) {
+        return
+      }
+
+      let position0 = position.value
+
+      if (active.assignedPosition) {
+        switch (active.assignedPosition) {
+          case 'top':
+            position0 = 'top'
+            break
+          case 'jungle':
+            position0 = 'jungle'
+            break
+          case 'middle':
+            position0 = 'mid'
+            break
+          case 'bottom':
+            position0 = 'adc'
+            break
+          case 'utility':
+            position0 = 'support'
+            break
+        }
+      }
+
+      if (
+        active.championId &&
+        active.championId !== -3 /* cherry bravery */ &&
+        !lcs.champSelect.disabledChampionIds.has(active.championId)
+      ) {
+        currentTab.value = 'champion'
+        championId.value = active.championId
+
+        await update({
+          championId: active.championId,
+          mode: mode0,
+          position: position0
+        })
+
+        // 处理自动化
+        const summonerSpells = champion.value?.data.summoner_spells
+        const runes = champion.value?.data.runes
+
+        if (summonerSpells && summonerSpells[0] && ogs.frontendSettings.autoApplySpells) {
+          setSummonerSpells(summonerSpells[0].ids, flashPosition.value)
+        }
+
+        if (runes && runes[0] && ogs.frontendSettings.autoApplyRunes) {
+          setRunes(runes[0], { championId: active.championId, position: position0 })
+        }
+
+        if (champion.value && hasItemsSets(champion.value) && ogs.frontendSettings.autoApplyItems) {
+          writeItemSets(champion.value, {
+            position: position0,
+            mode: mode0,
+            region: region.value,
+            tier: tier.value
+          })
+        }
+      }
+    },
+    { immediate: true, debounce: 500 }
   )
 
   provide(OpggContextKey, {

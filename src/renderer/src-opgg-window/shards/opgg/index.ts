@@ -6,7 +6,6 @@ import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { Dep, Shard } from '@shared/akari-shard'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 import { ModeType, PositionType, RegionType, TierType } from '@shared/types/opgg'
-import { useLocalStorage } from '@vueuse/core'
 import axios from 'axios'
 import { toRaw, watch } from 'vue'
 
@@ -91,19 +90,28 @@ export class OpggRenderer {
   }
 
   private async _migratePreferences() {
-    const flashPosition = useLocalStorage<string>(
-      'opgg-flash-position',
-      '<akari:flashPositionMigrated1217>'
-    )
+    const item = localStorage.getItem('opgg-flash-position')
 
-    if (flashPosition.value !== '<akari:flashPositionMigrated1217>') {
-      await this.updatePreferences({
-        flashPosition: flashPosition.value as 'auto' | 'd' | 'f'
-      })
+    if (item !== null) {
+      try {
+        const flashPosition = JSON.parse(item) as 'auto' | 'd' | 'f'
 
-      this._logger.info('opgg', 'Migrated flash position from local storage', {
-        flashPosition: flashPosition.value
-      })
+        if (flashPosition !== 'auto' && flashPosition !== 'd' && flashPosition !== 'f') {
+          return
+        }
+
+        await this.updatePreferences({
+          flashPosition
+        })
+
+        this._logger.info('opgg', 'Migrated flash position from local storage', { flashPosition })
+      } catch (error) {
+        this._logger.error('opgg', 'Failed to migrate flash position from local storage', {
+          error
+        })
+      } finally {
+        localStorage.removeItem('opgg-flash-position')
+      }
     }
   }
 }

@@ -7,7 +7,6 @@ import { OpggChampionBuildResponse } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 
-import { useOpgg } from '../context'
 import { restoreRecipe } from './recipe-restore'
 
 const SUMMONER_SPELL_FLASH_ID = 4
@@ -19,14 +18,12 @@ export function useLoadout() {
   const lcs = useLeagueClientStore()
   const message = useMessage()
 
-  const { flashPosition } = useOpgg()
-
   const componentName = useComponentName()
 
   const { t } = useTranslation()
 
   // 更新召唤师技能，会考虑到闪现位置的偏好
-  const setSummonerSpells = async (ids: number[]) => {
+  const setSummonerSpells = async (ids: number[], flashPosition: 'auto' | 'd' | 'f') => {
     try {
       const selection = (await lc.api.champSelect.getMySelections()).data
 
@@ -35,15 +32,15 @@ export function useLoadout() {
 
       // 有闪现的情况且不为 auto 时, 优先按照偏好闪现位置, 否则强制按照 auto
       if (
-        flashPosition.value !== 'auto' &&
+        flashPosition !== 'auto' &&
         (newSpell1Id === SUMMONER_SPELL_FLASH_ID || newSpell2Id === SUMMONER_SPELL_FLASH_ID)
       ) {
         if (newSpell2Id === SUMMONER_SPELL_FLASH_ID) {
-          if (flashPosition.value === 'd') {
+          if (flashPosition === 'd') {
             ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
           }
         } else if (newSpell1Id === SUMMONER_SPELL_FLASH_ID) {
-          if (flashPosition.value === 'f') {
+          if (flashPosition === 'f') {
             ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
           }
         }
@@ -350,4 +347,14 @@ export function useLoadout() {
     setRunes,
     writeItemSets
   }
+}
+
+export function hasItemsSets(champion: OpggChampionBuildResponse) {
+  return (
+    (champion.data.starter_items && champion.data.starter_items.length) ||
+    (champion.data.boots && champion.data.boots.length) ||
+    (champion.data.prism_items && champion.data.prism_items.length) ||
+    (champion.data.core_items && champion.data.core_items.length) ||
+    (champion.data.last_items && champion.data.last_items.length)
+  )
 }
