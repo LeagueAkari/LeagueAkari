@@ -1,6 +1,12 @@
-import { ModeType, PositionType, RegionType, TierType } from '@shared/types/opgg'
+import {
+  ModeType,
+  OpggAramBalanceItem,
+  PositionType,
+  RegionType,
+  TierType
+} from '@shared/types/opgg'
 import { defineStore } from 'pinia'
-import { shallowReactive } from 'vue'
+import { shallowReactive, shallowRef } from 'vue'
 
 export const useOpggStore = defineStore('shard:opgg-renderer', () => {
   const frontendSettings = shallowReactive({
@@ -23,9 +29,11 @@ export const useOpggStore = defineStore('shard:opgg-renderer', () => {
     tier: 'all'
   })
 
-  return {
-    savedPreferences,
+  const aramBalance = shallowRef<Record<number, OpggAramBalanceItem>>([])
 
-    frontendSettings
+  return {
+    frontendSettings,
+    savedPreferences,
+    aramBalance
   }
 })

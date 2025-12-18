@@ -3,9 +3,17 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, Shard } from '@shared/akari-shard'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
-import { ModeType, PositionType, RegionType, TierType } from '@shared/types/opgg'
+import {
+  ModeType,
+  OpggAramBalanceItem,
+  PositionType,
+  RegionType,
+  TierType
+} from '@shared/types/opgg'
+import { useIntervalFn } from '@vueuse/core'
 import axios from 'axios'
 import { toRaw, watch } from 'vue'
 
@@ -20,6 +28,7 @@ export class OpggRenderer {
   public readonly api = new OpggHttpApiAxiosHelper(this._http)
 
   constructor(
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
     @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer
@@ -40,6 +49,7 @@ export class OpggRenderer {
     }
 
     this._handleRestoreItemSet()
+    this._handleUpdateAramBalance()
     this._handleHttpProxy()
   }
 
@@ -113,5 +123,31 @@ export class OpggRenderer {
         localStorage.removeItem('opgg-flash-position')
       }
     }
+  }
+
+  private _handleUpdateAramBalance() {
+    this._setup.addSetupFn(() => {
+      const store = useOpggStore()
+
+      useIntervalFn(
+        async () => {
+          try {
+            const { data } = await this.api.getAramBalance()
+
+            store.aramBalance = data.data.reduce(
+              (acc, item) => {
+                acc[item.champion_id] = item
+                return acc
+              },
+              {} as Record<number, OpggAramBalanceItem>
+            )
+
+            this._logger.info(OpggRenderer.id, 'Updated ARAM balance', `${data.data.length} items`)
+          } catch {}
+        },
+        30 * 60 * 1000,
+        { immediateCallback: true, immediate: true }
+      )
+    })
   }
 }
