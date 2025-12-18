@@ -1,10 +1,10 @@
 <template>
-  <div class="box-border flex gap-1 items-center h-8 dark:bg-white/10 bg-black/10 rounded p-1">
+  <div class="box-border flex h-8 items-center gap-1 rounded bg-black/10 p-1 dark:bg-white/10">
     <div
       v-for="tab of tabs"
       :key="tab.value"
       :class="[selectedTab === tab.value ? tabClass.selected : tabClass.unselected]"
-      class="h-full flex-1 rounded flex justify-center items-center text-xs cursor-pointer transition-colors"
+      class="flex h-full flex-1 cursor-pointer items-center justify-center rounded text-xs transition-colors"
       @click="handleTabClick(tab.value)"
     >
       {{ tab.label }}

@@ -40,7 +40,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         frame: false,
         fullscreenable: false,
         maximizable: true,
-        titlebarStyle: 'hidden'
+        titleBarStyle: 'hidden'
       }
     })
   }

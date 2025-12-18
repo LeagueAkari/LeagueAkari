@@ -1,4 +1,4 @@
-import { ModeType } from '@shared/data-sources/opgg/types2'
+import { ModeType } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { MaybeRefOrGetter, computed, toValue } from 'vue'
 

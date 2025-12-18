@@ -1,11 +1,11 @@
 <template>
   <div>
     <div
-      class="flex justify-end mb-2 dark:bg-neutral-800 bg-neutral-200 px-2 py-1 rounded-xs"
+      class="mb-2 flex justify-end rounded-xs bg-neutral-200 px-2 py-1 dark:bg-neutral-800"
       v-if="basicInfo.isCherrySubteam"
     >
       <div class="flex gap-0.5">
-        <div class="text-xs dark:text-white/60 text-black/60 mr-1">
+        <div class="mr-1 text-xs text-black/60 dark:text-white/60">
           {{ t('MatchCard.teamTable.bans') }}
         </div>
         <ChampionIcon

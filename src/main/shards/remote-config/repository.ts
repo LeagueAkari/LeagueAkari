@@ -1,8 +1,8 @@
 import { USER_AGENT } from '@shared/constants/common'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
-import { SgpServersConfig } from '@shared/types/shards/sgp'
 import {
   InGameSendTemplateCatalog,
+  LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
 } from '@shared/validators/remote-config'
@@ -97,7 +97,7 @@ export class RemoteGitRepository {
   }
 
   async getSgpLeagueServersConfig(request: RepositoryBranchRequest) {
-    return this._http.get<SgpServersConfig>(
+    return this._http.get<LeagueServersConfig>(
       this._rawContentUrl(`/config/sgp/league-servers.json`, request)
     )
   }

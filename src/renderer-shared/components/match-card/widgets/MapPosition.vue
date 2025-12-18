@@ -3,7 +3,7 @@
     <div
       v-for="point of mappedPoints"
       :key="point.left + point.top"
-      class="absolute rounded-full bg-blue-300 size-1.5 z-20 -translate-x-1/2 -translate-y-1/2"
+      class="absolute z-20 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-300"
       :style="{
         left: `${point.left}px`,
         top: `${point.top}px`
@@ -11,10 +11,10 @@
     ></div>
 
     <!-- map bg -->
-    <img class="h-full w-full absolute" :src="map11" v-if="mapId === 11" />
-    <img class="h-full w-full absolute" :src="map12" v-else-if="mapId === 12" />
-    <img class="h-full w-full absolute" :src="map21" v-else-if="mapId === 21" />
-    <div class="h-full w-full absolute bg-gray-700" v-else></div>
+    <img class="absolute h-full w-full" :src="map11" v-if="mapId === 11" />
+    <img class="absolute h-full w-full" :src="map12" v-else-if="mapId === 12" />
+    <img class="absolute h-full w-full" :src="map21" v-else-if="mapId === 21" />
+    <div class="absolute h-full w-full bg-gray-700" v-else></div>
   </div>
 </template>
 
