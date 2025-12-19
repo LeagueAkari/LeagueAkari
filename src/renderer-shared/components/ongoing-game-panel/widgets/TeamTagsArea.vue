@@ -47,9 +47,9 @@
                 class="tag"
                 :style="{
                   backgroundColor: p.premadeId
-                    ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                    ? premadeColors[p.premadeId]?.foregroundColor
                     : '#ffffff40',
-                  color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                  color: p.premadeId ? premadeColors[p.premadeId]?.color || '#fff' : '#fff'
                 }"
               >
                 {{
@@ -71,9 +71,9 @@
               class="tag"
               :style="{
                 backgroundColor: p.premadeId
-                  ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                  ? premadeColors[p.premadeId]?.foregroundColor
                   : '#ffffff40',
-                color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                color: p.premadeId ? premadeColors[p.premadeId]?.color || '#fff' : '#fff'
               }"
             >
               {{
@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -98,7 +99,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
 const WIN_RATE_TEAM_MIN_MATCHES = 13
@@ -134,6 +135,11 @@ interface WinRateTeamInfo {
 }
 
 const { t } = useTranslation()
+const as = useAppCommonStore()
+
+const premadeColors = computed(() => {
+  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+})
 
 // ## 胜率队
 // 1. 3 人以上的预组队队伍

@@ -3,6 +3,7 @@
     <div class="tag self" v-if="isSelf && ogs.settings.playerCardTags.showSelfTag">
       {{ t('PlayerInfoCard.self') }}
     </div>
+
     <NPopover
       v-if="
         ogs.settings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tags.length
@@ -38,6 +39,7 @@
         </div>
       </div>
     </NPopover>
+
     <NPopover
       v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
       :delay="50"
@@ -48,9 +50,9 @@
           class="tag"
           :style="{
             backgroundColor: premadeTeamId
-              ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+              ? premadeColors[premadeTeamId]?.foregroundColor
               : '#ffffff40',
-            color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#fff'
+            color: premadeTeamId ? premadeColors[premadeTeamId]?.color || '#fff' : '#fff'
           }"
           ref="premade-tag-el"
         >
@@ -65,6 +67,7 @@
         {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       :delay="50"
@@ -87,6 +90,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       v-if="ogs.settings.playerCardTags.showMetTag && savedInfo && savedInfo.lastMetAt && !isSelf"
       :delay="50"
@@ -96,8 +100,8 @@
       <template #trigger>
         <div class="tag have-met">{{ t('PlayerInfoCard.met') }}</div>
       </template>
-      <div class="popover-text have-met-popover">
-        <div style="margin-bottom: 4px">
+      <div class="w-min max-w-none text-xs">
+        <div class="mb-1 text-gray-900 dark:text-gray-100">
           {{
             t('PlayerInfoCard.metPopover.title', {
               date: dayjs(savedInfo.lastMetAt)
@@ -108,21 +112,37 @@
             })
           }}
         </div>
-        <table class="encountered-game-table">
+        <table
+          class="w-min border-collapse border-spacing-0 border border-black/20 text-xs text-black dark:border-white/25 dark:text-gray-300"
+        >
           <colgroup>
-            <col class="game-id-col" />
+            <col style="width: 180px" />
+            <col style="width: auto" />
+            <col style="width: auto" />
           </colgroup>
           <thead>
             <tr>
-              <th>{{ t('PlayerInfoCard.metPopover.gameId') }}</th>
-              <th>{{ t('PlayerInfoCard.metPopover.date') }}</th>
-              <th>{{ t('PlayerInfoCard.metPopover.gameStats') }}</th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.gameId') }}
+              </th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.date') }}
+              </th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.gameStats') }}
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in encounteredGames" :key="item.gameId">
               <td
-                class="game-id-td"
+                class="cursor-pointer border border-black/20 px-2 py-0.5 text-center whitespace-nowrap transition-colors hover:text-black/70 dark:border-white/25 dark:text-gray-300 dark:hover:text-white"
                 @click="
                   () =>
                     ogs.cachedGames[item.gameId]
@@ -130,7 +150,9 @@
                       : emits('showGameById', item.gameId, puuid)
                 "
               >
-                <div class="game-id-tag">
+                <div
+                  class="inline-block rounded bg-black/10 px-1 py-0.5 text-xs leading-3 whitespace-nowrap text-black dark:bg-white/12 dark:text-gray-100"
+                >
                   {{
                     t('PlayerInfoCard.metPopover.inspectByGameId', {
                       gameId: masked(
@@ -141,72 +163,106 @@
                   }}
                 </div>
               </td>
-              <td>
+              <td
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
                 {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
                   dayjs(item.updateAt).locale(as.settings.locale.toLowerCase()).fromNow()
                 }})
               </td>
-              <td>
+              <td
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
                 <template v-if="item.gameStats">
-                  <div class="game-stats">
-                    <span class="win-result" :class="item.gameStats.selfWinResult">{{
-                      t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`)
-                    }}</span>
+                  <div class="flex items-center gap-1">
+                    <span
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.selfWinResult === 'win',
+                        'text-red-600 dark:text-red-400': item.gameStats.selfWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.selfWinResult === 'abort' ||
+                          item.gameStats.selfWinResult === 'remake'
+                      }"
+                    >
+                      {{ t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`) }}
+                    </span>
                     <span
                       v-if="item.gameStats.myPlacement"
-                      class="win-result"
-                      :class="item.gameStats.selfWinResult"
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.selfWinResult === 'win',
+                        'text-red-600 dark:text-red-400': item.gameStats.selfWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.selfWinResult === 'abort' ||
+                          item.gameStats.selfWinResult === 'remake'
+                      }"
                     >
                       ({{ formatI18nOrdinal(item.gameStats.myPlacement, as.settings.locale) }})
                     </span>
                     <span
-                      class="team"
+                      class="mr-2 text-xs leading-3 font-bold whitespace-nowrap"
                       :class="{
-                        teammate: item.gameStats.isSameTeam,
-                        opponent: !item.gameStats.isSameTeam
+                        'text-emerald-600 dark:text-emerald-400': item.gameStats.isSameTeam,
+                        'text-red-600 dark:text-red-400': !item.gameStats.isSameTeam
                       }"
-                      >{{
+                    >
+                      {{
                         item.gameStats.isSameTeam
                           ? t(`PlayerInfoCard.metPopover.team.teammate`)
                           : t(`PlayerInfoCard.metPopover.team.opponent`)
-                      }}</span
-                    >
+                      }}
+                    </span>
                     <PositionIcon
-                      class="position-icon"
                       v-if="item.gameStats.myPosition"
+                      class="shrink-0 text-base"
                       :position="item.gameStats.myPosition"
                     />
                     <LcuImage
-                      class="champion-icon"
+                      class="h-4 w-4 shrink-0"
                       :src="championIconUri(item.gameStats.myChampionId)"
                     />
-                    <div class="kda">
+                    <div
+                      class="flex gap-0.5 text-[11px] whitespace-nowrap text-black/90 dark:text-white/90"
+                    >
                       <span>{{ item.gameStats.selfKda.k }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.selfKda.d }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.selfKda.a }}</span>
                     </div>
-                    <div class="divider"></div>
+                    <div class="mx-1 h-3 w-px shrink-0 bg-black/20 dark:bg-white/25"></div>
                     <span
                       v-if="item.gameStats.opponentPlacement"
-                      class="win-result"
-                      :class="item.gameStats.opponentWinResult"
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.opponentWinResult === 'win',
+                        'text-red-600 dark:text-red-400':
+                          item.gameStats.opponentWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.opponentWinResult === 'abort' ||
+                          item.gameStats.opponentWinResult === 'remake'
+                      }"
                     >
                       ({{
                         formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale)
                       }})
                     </span>
                     <PositionIcon
-                      class="position-icon"
                       v-if="item.gameStats.opponentPosition"
+                      class="shrink-0 text-base"
                       :position="item.gameStats.opponentPosition"
                     />
                     <LcuImage
-                      class="champion-icon"
+                      class="h-4 w-4 shrink-0"
                       :src="championIconUri(item.gameStats.opponentChampionId)"
                     />
-                    <div class="kda">
+                    <div
+                      class="flex gap-0.5 text-[11px] whitespace-nowrap text-black/90 dark:text-white/90"
+                    >
                       <span>{{ item.gameStats.opponentKda.k }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.opponentKda.d }}</span>
@@ -222,6 +278,7 @@
         </table>
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
@@ -234,6 +291,7 @@
         {{ t('PlayerInfoCard.privatePopover') }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
@@ -260,6 +318,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
@@ -286,6 +345,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
@@ -310,6 +370,7 @@
         {{ t('PlayerInfoCard.akariLoved.outstandingPopover') }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
@@ -333,6 +394,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showSoloKillsTag && analysis?.summary.avgSoloKills"
@@ -356,6 +418,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
@@ -379,6 +442,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
@@ -402,6 +466,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
@@ -425,6 +490,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
@@ -448,6 +514,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
@@ -474,6 +541,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAverageVisionScoreTag && analysis"
@@ -496,6 +564,7 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="as.settings.isInKyokoMode && ogs.settings.playerCardTags.showAkariScoreTag && analysis"
@@ -548,7 +617,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
 
 const { puuid, analysis, premadeTeamId, summoner, savedInfo } = defineProps<{
   puuid: string
@@ -571,6 +640,10 @@ const { t } = useTranslation()
 
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
+
+const premadeColors = computed(() => {
+  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+})
 
 const premadeTagElHovering = useElementHover(useTemplateRef('premade-tag-el'))
 watch(
@@ -775,11 +848,6 @@ onDeactivated(() => {
   max-width: 240px;
 }
 
-.popover-text.have-met-popover {
-  max-width: unset;
-  width: min-content;
-}
-
 .tagged-text-list {
   display: flex;
   flex-direction: column;
@@ -815,106 +883,6 @@ onDeactivated(() => {
     font-size: 12px;
     white-space: pre-wrap;
     max-width: 260px;
-  }
-}
-
-.encountered-game-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #ffffff40;
-  font-size: 12px;
-  color: #d4d4d4;
-
-  th,
-  td {
-    border: 1px solid #ffffff40;
-    padding: 2px 8px;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .game-id-col {
-    width: 120px;
-  }
-
-  .game-id-td:hover {
-    color: #ffffff;
-  }
-
-  .game-id-td {
-    transition: color 0.2s;
-    cursor: pointer;
-  }
-
-  .game-id-tag {
-    padding: 2px 4px;
-    line-height: 12px;
-    font-size: 12px;
-    background-color: #ffffff20;
-    border-radius: 2px;
-  }
-
-  .game-stats {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-
-    .champion-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .position-icon {
-      font-size: 16px;
-    }
-
-    .team,
-    .win-result {
-      font-size: 12px;
-      line-height: 12px;
-      font-weight: bold;
-    }
-
-    .team {
-      margin-right: 8px;
-
-      &.teammate {
-        color: #4cc69d;
-      }
-
-      &.opponent {
-        color: #ff6161;
-      }
-    }
-
-    .win-result {
-      &.win {
-        color: #4cc69d;
-      }
-
-      &.loss {
-        color: #ff6161;
-      }
-
-      &.abort,
-      &.remake {
-        color: #c0c0c0;
-      }
-    }
-
-    .kda {
-      color: #fffb;
-      font-size: 11px;
-      display: flex;
-      gap: 2px;
-    }
-
-    .divider {
-      margin: 0 4px;
-      width: 1px;
-      height: 12px;
-      background-color: #ffffff40;
-    }
   }
 }
 </style>

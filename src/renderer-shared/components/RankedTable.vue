@@ -1,64 +1,121 @@
 <template>
-  <table class="ranked-stats-table">
-    <colgroup></colgroup>
+  <table
+    class="w-min border-collapse border-spacing-0 border border-black/20 text-xs text-black dark:border-white/25 dark:text-gray-300"
+  >
     <thead>
       <tr>
-        <th>{{ t('RankedTable.queueType') }}</th>
-        <th>{{ t('RankedTable.tier') }}</th>
-        <th>{{ t('RankedTable.leaguePoints') }}</th>
-        <th>{{ t('RankedTable.wins') }}</th>
-        <th>{{ t('RankedTable.losses') }}</th>
-        <th>{{ t('RankedTable.previousSeasonEndTier') }}</th>
-        <th>{{ t('RankedTable.previousSeasonHighestTier') }}</th>
-        <th>{{ t('RankedTable.highestTier') }}</th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.queueType') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.tier') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.leaguePoints') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.wins') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.losses') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.previousSeasonEndTier') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.previousSeasonHighestTier') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ t('RankedTable.highestTier') }}
+        </th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="r of sortedQueues" :key="r.queueType">
-        <td>{{ formatQueueName(r.queueType) }}</td>
-        <td>
-          <div class="tier">
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ formatQueueName(r.queueType) }}
+        </td>
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          <div class="flex items-center justify-center gap-1 whitespace-nowrap">
             <img
               v-if="RANKED_MEDAL_MAP[r.tier]"
               :src="RANKED_MEDAL_MAP[r.tier]"
               alt="tier"
-              class="tier-img"
+              class="h-4 w-4 shrink-0 align-middle"
             />
             {{ formatTierDivision(r, 'current') }}
           </div>
         </td>
-        <td>{{ formatPoints(r) }}</td>
-        <td>{{ formatWins(r) }}</td>
-        <td>{{ formatLosses(r.losses) }}</td>
-        <td>
-          <div class="tier">
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ formatPoints(r) }}
+        </td>
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ formatWins(r) }}
+        </td>
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ formatLosses(r.losses) }}
+        </td>
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          <div class="flex items-center justify-center gap-1 whitespace-nowrap">
             <img
               v-if="RANKED_MEDAL_MAP[r.previousSeasonEndTier]"
               :src="RANKED_MEDAL_MAP[r.previousSeasonEndTier]"
               alt="tier"
-              class="tier-img"
+              class="h-4 w-4 shrink-0 align-middle"
             />
             {{ formatTierDivision(r, 'previousSeasonEnd') }}
           </div>
         </td>
-        <td>
-          <div class="tier">
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          <div class="flex items-center justify-center gap-1 whitespace-nowrap">
             <img
               v-if="RANKED_MEDAL_MAP[r.previousSeasonHighestTier]"
               :src="RANKED_MEDAL_MAP[r.previousSeasonHighestTier]"
               alt="tier"
-              class="tier-img"
+              class="h-4 w-4 shrink-0 align-middle"
             />
             {{ formatTierDivision(r, 'previousSeasonHighest') }}
           </div>
         </td>
-        <td>
-          <div class="tier">
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          <div class="flex items-center justify-center gap-1 whitespace-nowrap">
             <img
               v-if="RANKED_MEDAL_MAP[r.highestTier]"
               :src="RANKED_MEDAL_MAP[r.highestTier]"
               alt="tier"
-              class="tier-img"
+              class="h-4 w-4 shrink-0 align-middle"
             />
             {{ formatTierDivision(r, 'highest') }}
           </div>
@@ -192,33 +249,4 @@ const formatLosses = (losses: number) => {
 }
 </script>
 
-<style scoped>
-/* 轻度边框 */
-.ranked-stats-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #ffffff40;
-  font-size: 12px;
-  color: #d4d4d4;
-
-  th,
-  td {
-    border: 1px solid #ffffff40;
-    padding: 0 4px;
-    text-align: center;
-  }
-
-  .tier {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    justify-content: center;
-
-    .tier-img {
-      width: 16px;
-      height: 16px;
-      vertical-align: middle;
-    }
-  }
-}
-</style>
+<style scoped></style>

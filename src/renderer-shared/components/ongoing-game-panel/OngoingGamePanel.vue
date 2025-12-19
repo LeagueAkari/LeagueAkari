@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full" ref="og-view-container">
+  <div class="h-full" ref="viewContainer">
     <!-- teams template -->
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
       <div class="not-last:mb-4">
@@ -11,10 +11,10 @@
               'mr-2 size-[10px] self-center rounded-full border border-white/20',
               teamColor === 'red' ? 'bg-[#ff3333]' : '',
               teamColor === 'blue' ? 'bg-[#40c1ff]' : '',
-              teamColor === 'white' ? 'bg-neutral-200' : ''
+              teamColor === 'white' ? 'bg-neutral-500 dark:bg-neutral-200' : ''
             ]"
           ></div>
-          <span class="mr-4 text-base font-bold">{{ teamName }}</span>
+          <span class="mr-3 text-base leading-tight font-bold">{{ teamName }}</span>
           <TeamTagsArea
             v-if="players.length >= 1"
             :side-id="team"
@@ -31,6 +31,13 @@
           :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
         >
           <PlayerInfoCard
+            :class="{
+              'h-[280px]': playerInfoCardHeightLevel === 1,
+              'h-[320px]': playerInfoCardHeightLevel === 2,
+              'h-[360px]': playerInfoCardHeightLevel === 3,
+              'h-[400px]': playerInfoCardHeightLevel === 4,
+              'h-[440px]': playerInfoCardHeightLevel === 5
+            }"
             v-for="player of players"
             :puuid="player"
             :key="player"
@@ -380,7 +387,15 @@ const mapSummoners = (team: string) => {
   return thisTeamSummoners
 }
 
-const { width } = useElementSize(useTemplateRef('og-view-container'))
+const viewContainerEl = useTemplateRef('viewContainer')
+const { width, height } = useElementSize(
+  viewContainerEl,
+  {
+    width: 1024,
+    height: 800
+  },
+  {}
+)
 const columnsNeed = computed(() => {
   const teamColumns = Object.values(ogs.teams || {})
     .map((t) => t.length)
@@ -391,5 +406,25 @@ const columnsNeed = computed(() => {
   )
 
   return Math.min(maxAllowed || 2, teamColumns)
+})
+
+const playerInfoCardHeightLevel = computed(() => {
+  if (height.value > 990) {
+    return 5
+  }
+
+  if (height.value > 880) {
+    return 4
+  }
+
+  if (height.value > 800) {
+    return 3
+  }
+
+  if (height.value > 720) {
+    return 2
+  }
+
+  return 1
 })
 </script>

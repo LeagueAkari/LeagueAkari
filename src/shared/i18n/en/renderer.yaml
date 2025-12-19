@@ -590,7 +590,7 @@ DebugSettings:
 
   kyokoMode:
     label: Kyoko Mode
-    description: The hidden side of League Akari, enable more features!
+    description: The hidden side of $t(common:appName), enable more features!
 
 StorageSettings:
   title: Storage
@@ -2547,8 +2547,8 @@ OpggView:
   runes: Rune Builds
   setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
   setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
-  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
-  runesSet: '[League Akari] {{action}} rune build: {{name}}'
+  spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+  runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
 
 OpggChampion:
   boots: Boots

@@ -483,6 +483,10 @@ export class OngoingGameState {
       ...this._data.gameflow.session.gameData.teamOne,
       ...this._data.gameflow.session.gameData.teamTwo
     ]) {
+      if (!p.teamParticipantId) {
+        continue
+      }
+
       if (!groups[p.teamParticipantId]) {
         groups[p.teamParticipantId] = []
       }

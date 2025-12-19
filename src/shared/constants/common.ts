@@ -1,5 +1,6 @@
 export const LEAGUE_AKARI_GITHUB = 'https://github.com/LeagueAkari/LeagueAkari'
 
+// deprecated
 export const LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL =
   'https://api.github.com/repos/LeagueAkari/LeagueAkari/contents/docs/announcement.md'
 

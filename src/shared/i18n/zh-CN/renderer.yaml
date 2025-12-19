@@ -591,7 +591,7 @@ DebugSettings:
 
   kyokoMode:
     label: Kyoko 模式
-    description: League Akari 不为人知的一面，启用更多的功能！
+    description: $t(common:appName) 不为人知的一面，启用更多的功能！
 
 StorageSettings:
   title: 存储

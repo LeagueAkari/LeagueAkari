@@ -77,18 +77,18 @@ export const PREMADE_TEAM_COLORS = {
 }
 
 export const PREMADE_TEAM_COLORS_LIGHT = {
-  A: { foregroundColor: '#0f6f68', color: '#000', borderColor: '#6fefe5d0' },
-  B: { foregroundColor: '#1f3fa6', color: '#000', borderColor: '#90a8ffd0' },
-  C: { foregroundColor: '#5c6000', color: '#000', borderColor: '#e3ea63d0' },
-  D: { foregroundColor: '#1a7a2a', color: '#000', borderColor: '#78e686d0' },
-  E: { foregroundColor: '#8a4400', color: '#000', borderColor: '#ffbf74d0' },
-  F: { foregroundColor: '#8a2a00', color: '#fff', borderColor: '#ffb07ad0' },
-  G: { foregroundColor: '#6a0d6a', color: '#fff', borderColor: '#d991d9d0' },
-  H: { foregroundColor: '#a2133f', color: '#fff', borderColor: '#ff97b2d0' },
-  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#86a6ead0' },
-  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#ff6b6bd0' },
-  K: { foregroundColor: '#5a2a0b', color: '#fff', borderColor: '#d7a383d0' },
-  L: { foregroundColor: '#333333', color: '#fff', borderColor: '#bebebed0' }
+  A: { foregroundColor: '#0f6f68', color: '#fff', borderColor: '#0f6f68d0' },
+  B: { foregroundColor: '#1f3fa6', color: '#fff', borderColor: '#1f3fa6d0' },
+  C: { foregroundColor: '#5c6000', color: '#fff', borderColor: '#5c6000d0' },
+  D: { foregroundColor: '#1a7a2a', color: '#fff', borderColor: '#1a7a2ad0' },
+  E: { foregroundColor: '#8a4400', color: '#fff', borderColor: '#8a4400d0' },
+  F: { foregroundColor: '#8a2a00', color: '#fff', borderColor: '#8a2a00d0' },
+  G: { foregroundColor: '#6a0d6a', color: '#fff', borderColor: '#6a0d6ad0' },
+  H: { foregroundColor: '#a2133f', color: '#fff', borderColor: '#a2133fd0' },
+  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#0b3d91d0' },
+  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#7f0000d0' },
+  K: { foregroundColor: '#5a2a0b', color: '#fff', borderColor: '#5a2a0bd0' },
+  L: { foregroundColor: '#333333', color: '#fff', borderColor: '#333333d0' }
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'

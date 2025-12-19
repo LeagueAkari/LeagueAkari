@@ -362,6 +362,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
   }
 
+  // 暂未使用此
+  // @ts-ignore
   private async _loadGameDetails(
     gameIds: number[],
     options: {
@@ -511,7 +513,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             }
           )
 
-          this._log.debug('Additional game loaded: SGP', gameId)
+          this._log.info('Additional game loaded: SGP', gameId)
 
           const toBeLoaded = { data, source: 'sgp', gameId } satisfies SgpGameSummary
 
@@ -554,7 +556,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             }
           )
 
-          this._log.debug('Additional game loaded: LCU', gameId)
+          this._log.info('Additional game loaded: LCU', gameId)
 
           const toBeLoaded = { data, source: 'lcu', gameId } satisfies LcuGameSummary
 
@@ -634,10 +636,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
         const filtered = data.games.filter((g) => g.json)
 
-        this._loadGameDetails(
-          filtered.map((g) => g.json.gameId).slice(0, this.settings.gameDetailsLoadCount),
-          { force, apiSource }
-        )
+        // this._loadGameDetails(
+        //   filtered.map((g) => g.json.gameId).slice(0, this.settings.gameDetailsLoadCount),
+        //   { force, apiSource }
+        // )
 
         const toBeLoaded = {
           data: filtered.map(
@@ -727,10 +729,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           }
         }
 
-        this._loadGameDetails(
-          data.games.games.map((g) => g.gameId).slice(0, this.settings.gameDetailsLoadCount),
-          { force, apiSource }
-        )
+        // this._loadGameDetails(
+        //   data.games.games.map((g) => g.gameId).slice(0, this.settings.gameDetailsLoadCount),
+        //   { force, apiSource }
+        // )
 
         await Promise.allSettled(data.games.games.map((g) => loadGame(g.gameId)))
 
@@ -1330,6 +1332,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         ),
         teamParticipantGroups: all.reduce(
           (acc, p) => {
+            if (!p.teamParticipantId) {
+              return acc
+            }
+
             acc[p.puuid] = p.teamParticipantId
             return acc
           },
