@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex gap-1" ref="container">
+  <div class="relative flex gap-1 overflow-hidden" ref="container">
     <div
       v-for="(tag, index) in tags"
       ref="tagsEl"
@@ -78,7 +78,7 @@ const tags = usePlayerTags()
 const RESERVED_WIDTH = 40 // for +xx tags
 
 const updateOverflowTagInfo = () => {
-  if (!containerEl.value || !tagsEl.value) {
+  if (!containerEl.value || !tagsEl.value || tagsEl.value.length === 0) {
     return {
       isOverflow: false,
       lastVisibleTagIndex: -1,
@@ -86,29 +86,46 @@ const updateOverflowTagInfo = () => {
     }
   }
 
-  const containerWidth = containerEl.value.getBoundingClientRect().width
-  const gapSize = Number.parseFloat(getComputedStyle(containerEl.value).rowGap)
+  const container = containerEl.value
+  const els = tagsEl.value
 
-  let acc = 0
-  let lastVisibleTagIndex = tagsEl.value.length - 1
-  for (let i = 0; i < tagsEl.value.length; i++) {
-    const tag = tagsEl.value[i]
+  const cRect = container.getBoundingClientRect()
+  const cLeft = cRect.left
+  const cRight = cRect.right
 
-    let toAdd = tag.getBoundingClientRect().width + (i !== 0 ? gapSize : 0)
+  // 子像素rounding，解决刚好超一点点场景
+  const EPS = 0.5
 
-    if (acc + toAdd + RESERVED_WIDTH + gapSize > containerWidth) {
-      lastVisibleTagIndex = i
-      break
+  const lastRect = els[els.length - 1].getBoundingClientRect()
+  const isOverflow = lastRect.right > cRight + EPS
+
+  if (!isOverflow) {
+    const lastLeftRel = lastRect.left - cLeft
+    return {
+      isOverflow: false,
+      lastVisibleTagIndex: els.length - 1,
+      lastVisibleTagOffsetLeft: lastLeftRel
     }
-
-    acc += toAdd
   }
 
+  let firstHiddenIndex = els.length - 1
+  for (let i = 0; i < els.length; i++) {
+    const r = els[i].getBoundingClientRect()
+    const leftRel = r.left - cLeft
+
+    if (leftRel + RESERVED_WIDTH > cRect.width + EPS) {
+      firstHiddenIndex = i
+      break
+    }
+  }
+
+  const firstHiddenRect = els[firstHiddenIndex].getBoundingClientRect()
+  const firstHiddenLeftRel = firstHiddenRect.left - cLeft
+
   return {
-    isOverflow: lastVisibleTagIndex !== tagsEl.value.length - 1,
-    lastVisibleTagIndex,
-    lastVisibleTagOffsetLeft:
-      lastVisibleTagIndex === -1 ? 0 : tagsEl.value[lastVisibleTagIndex].offsetLeft
+    isOverflow: true,
+    lastVisibleTagIndex: firstHiddenIndex,
+    lastVisibleTagOffsetLeft: firstHiddenLeftRel
   }
 }
 

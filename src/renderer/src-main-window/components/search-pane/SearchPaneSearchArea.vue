@@ -123,12 +123,14 @@
                   <!-- tags line -->
                   <div class="flex items-center gap-1">
                     <div
-                      class="rounded-xs bg-red-800 px-1 text-[10px] text-black dark:text-white"
+                      class="rounded-xs bg-red-800 px-1 text-[10px] text-white"
                       v-if="result.privacy === 'PRIVATE'"
                     >
                       {{ t('SearchPane.privacy') }}
                     </div>
-                    <span class="text-[11px] text-white/60">Lv. {{ result.summonerLevel }}</span>
+                    <span class="text-[11px] text-black/60 dark:text-white/60"
+                      >Lv. {{ result.summonerLevel }}</span
+                    >
                   </div>
                 </div>
               </div>
