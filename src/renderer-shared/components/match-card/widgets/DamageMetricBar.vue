@@ -2,7 +2,7 @@
   <NPopover :delay="50" :show-arrow="false">
     <template #trigger>
       <div class="flex flex-col items-center text-[11px]">
-        <div>{{ totalDamage.toLocaleString() }}</div>
+        <div>{{ formatExtremeNumber(totalDamage || 0) }}</div>
         <svg :width="width" :height="height" class="damage-bar-svg">
           <rect x="0" y="0" :width="width" :height="height" class="bg" />
           <rect
@@ -21,7 +21,7 @@
         </svg>
       </div>
     </template>
-    <div class="w-[204px] text-[11px]">
+    <div class="min-w-[204px] text-[11px]">
       <div class="flex items-center">
         <svg :width="INNER_WIDTH" :height="height" class="damage-bar-svg">
           <rect x="0" y="0" :width="INNER_WIDTH" :height="height" class="bg" />
@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNumberFormatter } from '@renderer-shared/composables/useNumebrFormatter'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
@@ -102,6 +103,8 @@ const {
 }>()
 
 const INNER_WIDTH = 140
+
+const { formatExtremeNumber } = useNumberFormatter()
 
 const calcMetricBar = (baseWidth: number) => {
   const list = [
