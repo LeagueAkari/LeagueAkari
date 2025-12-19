@@ -55,10 +55,7 @@
             </NButton>
           </div>
           <NDataTable
-            :theme-overrides="{
-              thColor: '#0005',
-              tdColor: '#0004'
-            }"
+            :theme-overrides="dataTableThemeOverrides"
             :loading="isLoading"
             :columns="columns"
             :data="tableData"
@@ -137,10 +134,10 @@ const extraInfoMap = ref<
 >({})
 
 const renderFormattedDate = (date: number) => {
-  return h('span', { style: { fontSize: '12px' } }, [
+  return h('span', { class: 'text-xs text-black/80 dark:text-white/80' }, [
     dayjs(date).locale(as.settings.locale.toLowerCase()).format('YYYY-MM-DD HH:mm:ss'),
     ' ',
-    h('span', { style: { color: '#fff8' } }, [
+    h('span', { class: 'text-[11px] text-black/45 dark:text-white/60' }, [
       '(',
       dayjs(date).locale(as.settings.locale.toLowerCase()).fromNow(),
       ')'
@@ -160,7 +157,7 @@ const renderDateField = (
     return renderFormattedDate(extraInfo[field])
   }
 
-  return h('span', { style: { color: '#fff6', fontSize: '12px' } }, fallbackText)
+  return h('span', { class: 'text-xs text-black/45 dark:text-white/65' }, fallbackText)
 }
 
 const renderGroupName = (row: any) => {
@@ -189,6 +186,20 @@ const renderGroupName = (row: any) => {
     ]
   )
 }
+
+const dataTableThemeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      thColor: 'rgba(15, 23, 42, 0.75)',
+      tdColor: 'rgba(15, 23, 42, 0.6)'
+    }
+  }
+
+  return {
+    thColor: 'rgba(15, 23, 42, 0.04)',
+    tdColor: 'rgba(15, 23, 42, 0.02)'
+  }
+})
 
 const columns = computed<DataTableColumns<any>>(() => [
   {

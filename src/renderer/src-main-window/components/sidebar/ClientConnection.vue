@@ -1,33 +1,50 @@
 <template>
-  <div class="cc">
-    <div class="cc__group" v-if="lcs.auth">
-      <div class="cc__group-name">{{ $t('ClientConnection.connectedGroup') }}</div>
-      <div class="cc__list">
-        <div class="cc__item cc__item--connected">
-          <div class="cc__wrap">
+  <div class="flex flex-col">
+    <div v-if="lcs.auth" class="mb-4 last:mb-0">
+      <div class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
+        {{ $t('ClientConnection.connectedGroup') }}
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div
+          class="relative flex w-[222px] flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 dark:bg-white/5"
+        >
+          <div class="flex">
             <LcuImage
-              class="cc__icon"
+              class="mr-2 h-9 w-9 rounded-full"
               :src="lcs.summoner.me ? profileIconUri(lcs.summoner.me.profileIconId) : undefined"
             />
-            <div class="cc__info">
-              <NEllipsis class="cc__name" v-if="lcs.summoner.me">
+
+            <div class="mr-3 flex w-0 flex-1 flex-col justify-center gap-1">
+              <NEllipsis v-if="lcs.summoner.me" class="w-full">
                 <StreamerModeMaskedText>
                   <template #masked>
-                    <span class="cc__name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                    <span class="text-sm font-bold text-black dark:text-white">
+                      {{ t('summoner', { ns: 'common' }) }}
+                    </span>
                   </template>
-                  <span class="cc__name-text">{{ lcs.summoner.me.gameName }}</span>
-                  <span class="cc__name-tag">#{{ lcs.summoner.me.tagLine }}</span>
+
+                  <span class="text-sm font-bold text-black dark:text-white">
+                    {{ lcs.summoner.me.gameName }}
+                  </span>
+                  <span class="ml-1 text-xs text-black/70 dark:text-white/90">
+                    #{{ lcs.summoner.me.tagLine }}
+                  </span>
                 </StreamerModeMaskedText>
               </NEllipsis>
-              <div class="cc__name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
+
+              <div v-else class="text-xs text-black/60 italic dark:text-white/85">
+                {{ $t('ClientConnection.noData') }}
+              </div>
 
               <StreamerModeMaskedText>
                 <template #masked>
-                  <div class="cc__region">
+                  <div class="text-[10px] text-black/60 dark:text-white/85">
                     {{ t('region', { ns: 'common' }) }}
                   </div>
                 </template>
-                <div class="cc__region">
+
+                <div class="text-[10px] text-black/60 dark:text-white/85">
                   {{
                     sgps.leagueServers.serverNames[as.settings.locale]?.[
                       sgps.availability.sgpServerId
@@ -37,7 +54,8 @@
               </StreamerModeMaskedText>
             </div>
           </div>
-          <div class="cc__actions">
+
+          <div class="mt-2 flex flex-wrap items-center gap-1">
             <NButton size="tiny" secondary @click="handleRestartUx">
               <template #icon>
                 <NIcon>
@@ -46,7 +64,8 @@
               </template>
               {{ $t('ClientConnection.restartUx') }}
             </NButton>
-            <NButton size="tiny" secondary @click="handlePlayAgain" v-if="isInEndgamePhase">
+
+            <NButton v-if="isInEndgamePhase" size="tiny" secondary @click="handlePlayAgain">
               <template #icon>
                 <NIcon>
                   <RefreshIcon />
@@ -54,6 +73,7 @@
               </template>
               {{ $t('ClientConnection.playAgain') }}
             </NButton>
+
             <NButton size="tiny" secondary @click="() => lc.disconnect()">
               <template #icon>
                 <NIcon>
@@ -62,12 +82,9 @@
               </template>
               {{ $t('ClientConnection.disconnect') }}
             </NButton>
+
             <NDropdown
-              :theme-overrides="{
-                color: '#222e',
-                fontSizeSmall: '12px',
-                optionHeightSmall: '24px'
-              }"
+              :theme-overrides="dropdownThemeOverrides"
               trigger="click"
               placement="top-start"
               size="small"
@@ -87,42 +104,52 @@
         </div>
       </div>
     </div>
-    <div class="cc__group" v-if="otherClients.length > 0">
-      <div class="cc__group-name" v-if="lcs.auth">
+
+    <div v-if="otherClients.length > 0" class="mb-4 last:mb-0">
+      <div v-if="lcs.auth" class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
         {{ $t('ClientConnection.launchedOtherClientsGroup') }}
       </div>
-      <div class="cc__group-name" v-else>
+      <div v-else class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
         {{ $t('ClientConnection.launchedClientsGroup') }}
       </div>
+
       <NScrollbar style="max-height: 240px">
-        <div class="cc__list">
+        <div class="flex flex-col gap-1">
           <div
-            class="cc__item"
             v-for="cmd of otherClients"
             :key="cmd.pid"
+            class="relative flex w-[222px] flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 transition-colors hover:cursor-pointer hover:bg-white/5 dark:bg-white/5 dark:hover:bg-white/10"
             @click="handleConnect(cmd)"
           >
-            <div class="cc__wrap">
+            <div class="flex">
               <LcuImage
-                class="cc__icon"
+                class="mr-2 h-9 w-9 rounded-full"
                 :src="clientExtraInfo[cmd.pid] ? clientExtraInfo[cmd.pid].profileIcon : undefined"
               />
-              <div class="cc__info">
-                <NEllipsis class="cc__name" v-if="clientExtraInfo[cmd.pid]">
+
+              <div class="mr-3 flex w-0 flex-1 flex-col justify-center gap-1">
+                <NEllipsis v-if="clientExtraInfo[cmd.pid]" class="w-full">
                   <StreamerModeMaskedText>
                     <template #masked>
-                      <span class="cc__name-text">{{ t('summoner', { ns: 'common' }) }}</span>
+                      <span class="text-sm font-bold text-black dark:text-white">
+                        {{ t('summoner', { ns: 'common' }) }}
+                      </span>
                     </template>
-                    <span class="cc__name-text">{{
-                      clientExtraInfo[cmd.pid].summoner.gameName
-                    }}</span>
-                    <span class="cc__name-tag"
-                      >#{{ clientExtraInfo[cmd.pid].summoner.tagLine }}</span
-                    >
+
+                    <span class="text-sm font-bold text-black dark:text-white">
+                      {{ clientExtraInfo[cmd.pid].summoner.gameName }}
+                    </span>
+                    <span class="ml-1 text-xs text-black/70 dark:text-white/90">
+                      #{{ clientExtraInfo[cmd.pid].summoner.tagLine }}
+                    </span>
                   </StreamerModeMaskedText>
                 </NEllipsis>
-                <div class="cc__name-none" v-else>{{ $t('ClientConnection.noData') }}</div>
-                <div class="cc__region">
+
+                <div v-else class="text-xs text-black/60 italic dark:text-white/85">
+                  {{ $t('ClientConnection.noData') }}
+                </div>
+
+                <div class="text-[10px] text-black/60 dark:text-white/85">
                   {{
                     sgps.leagueServers.serverNames[as.settings.locale]?.[
                       getSgpServerId(cmd.region, cmd.rsoPlatformId)
@@ -131,18 +158,30 @@
                   (PID: {{ cmd.pid }})
                 </div>
               </div>
-              <div class="cc__connecting" v-if="lcs.connectingClient?.pid === cmd.pid">
+
+              <div
+                v-if="lcs.connectingClient?.pid === cmd.pid"
+                class="absolute right-2 bottom-2 flex gap-1"
+              >
                 <NSpin :size="10" />
-                <span class="cc__connecting-text">{{ $t('ClientConnection.connecting') }}</span>
+                <span class="text-[10px]">
+                  {{ $t('ClientConnection.connecting') }}
+                </span>
               </div>
             </div>
           </div>
         </div>
       </NScrollbar>
     </div>
-    <div class="cc__group" v-if="!lcs.auth && otherClients.length === 0">
-      <div class="cc__group-name">{{ $t('ClientConnection.noClientGroup') }}</div>
-      <div class="cc__no-client">{{ $t('ClientConnection.noClient') }}</div>
+
+    <div v-if="!lcs.auth && otherClients.length === 0" class="mb-4 last:mb-0">
+      <div class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
+        {{ $t('ClientConnection.noClientGroup') }}
+      </div>
+
+      <div class="text-xs text-black/70 italic dark:text-white/80">
+        {{ $t('ClientConnection.noClient') }}
+      </div>
     </div>
   </div>
 </template>
@@ -187,6 +226,22 @@ const otherClients = computed(() => {
 })
 
 const clientExtraInfo = lcps.connectableClientExtraInfo
+
+const dropdownThemeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      color: '#222e',
+      fontSizeSmall: '12px',
+      optionHeightSmall: '24px'
+    }
+  }
+
+  return {
+    color: '#ffffff',
+    fontSizeSmall: '12px',
+    optionHeightSmall: '24px'
+  }
+})
 
 const actions = computed(() => {
   return [
@@ -283,131 +338,4 @@ const handlePlayAgain = async () => {
 }
 </script>
 
-<style scoped>
-.cc {
-  display: flex;
-  flex-direction: column;
-}
-
-.cc__group {
-  .cc__group-name {
-    margin-bottom: 8px;
-    color: #000b;
-    font-weight: bold;
-
-    [data-theme='dark'] & {
-      color: #fffb;
-    }
-  }
-
-  .cc__no-client {
-    color: #000b;
-    font-size: 12px;
-    font-style: italic;
-
-    [data-theme='dark'] & {
-      color: #fffb;
-    }
-  }
-
-  &:not(:last-child) {
-    margin-bottom: 16px;
-  }
-}
-
-.cc__list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.cc__item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  border: 1px solid #fff2;
-  padding: 8px 12px;
-  transition: background-color 0.2s ease-in-out;
-  box-shadow: 0 0 2px 2px #0002;
-  width: 222px;
-  background-color: rgba(0, 0, 0, 0.05);
-
-  [data-theme='dark'] & {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  &:not(.cc__item--connected):hover {
-    background-color: #fff1;
-    cursor: pointer;
-  }
-
-  .cc__connecting {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    display: flex;
-    gap: 4px;
-
-    .cc__connecting-text {
-      font-size: 10px;
-    }
-  }
-}
-
-.cc__item .cc__wrap {
-  display: flex;
-
-  .cc__icon {
-    width: 36px;
-    height: 36px;
-    margin-right: 8px;
-    border-radius: 50%;
-  }
-
-  .cc__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    margin-right: 12px;
-    flex: 1;
-    width: 0;
-
-    .cc__name {
-      width: 100%;
-
-      .cc__name-text {
-        color: #fff;
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      .cc__name-tag {
-        margin-left: 4px;
-        color: #fffa;
-        font-size: 12px;
-      }
-    }
-
-    .cc__name-none {
-      color: #fffa;
-      font-size: 12px;
-      font-style: italic;
-    }
-
-    .cc__region {
-      font-size: 10px;
-      color: #fffa;
-    }
-  }
-}
-
-.cc__item .cc__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-}
-</style>
+<style scoped></style>

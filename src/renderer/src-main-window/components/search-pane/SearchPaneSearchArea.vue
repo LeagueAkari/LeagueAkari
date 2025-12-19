@@ -93,7 +93,7 @@
               <div
                 v-for="result of searchResult"
                 :key="result.puuid"
-                class="flex cursor-pointer items-center gap-2 rounded border border-solid border-white/10 p-2 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+                class="flex cursor-pointer items-center gap-2 rounded border border-solid border-black/10 p-2 transition-colors hover:bg-black/10 dark:border-white/10 dark:hover:bg-white/10"
                 @click="emits('navigateToSummoner', result.puuid, result.sgpServerId, true)"
                 @mousedown="handleMouseDown"
                 @mouseup.prevent="(event) => handleMouseUp(event, result.puuid, result.sgpServerId)"
@@ -178,7 +178,7 @@
 
       <div
         v-if="searchProgress.isProcessing"
-        class="absolute top-0 right-0 left-0 h-[2px] before:block before:h-full before:w-(--progress-width) before:bg-green-300 before:transition-[width] before:content-['']"
+        class="absolute top-0 right-0 left-0 h-[2px] before:block before:h-full before:w-(--progress-width) before:bg-green-600 before:transition-[width] before:content-[''] dark:before:bg-green-300"
         :style="{
           '--progress-width': `${(searchProgress.finish / (searchProgress.total || 1)) * 100}%`
         }"

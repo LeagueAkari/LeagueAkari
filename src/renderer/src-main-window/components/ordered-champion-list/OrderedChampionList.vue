@@ -1,8 +1,8 @@
 <template>
-  <div class="ordered-champion-list-wrapper">
+  <div class="flex h-6 items-center">
     <NModal v-model:show="show">
       <NTransfer
-        class="transfer"
+        class="h-[65vh]! w-[600px]! rounded bg-white/95 dark:bg-neutral-900/95"
         size="small"
         v-model:value="champions"
         virtual-scroll
@@ -15,18 +15,20 @@
         source-filterable
       />
     </NModal>
-    <NButton size="tiny" style="margin-right: 8px; flex-shrink: 0" @click="show = true">
+
+    <NButton size="tiny" class="mr-2! shrink-0" @click="show = true">
       <template #icon>
         <NIcon>
           <Edit20FilledIcon />
         </NIcon>
       </template>
     </NButton>
-    <div class="champions">
+
+    <div class="flex flex-wrap items-center gap-1">
       <ChampionIcon
         :champion-id="c"
         :stretched="false"
-        class="champion"
+        class="size-5 rounded"
         :title="lcs.gameData.champions[c]?.name"
         :class="{
           [styles['not-pickable']]:
@@ -38,8 +40,10 @@
         v-for="c of champions.slice(0, maxShow)"
         :key="c"
       />
-      <div class="hint" v-if="champions.length > maxShow">+{{ champions.length - maxShow }}</div>
-      <div class="hint" v-if="champions.length === 0">
+      <div class="text-xs text-black/60 dark:text-white/60" v-if="champions.length > maxShow">
+        +{{ champions.length - maxShow }}
+      </div>
+      <div class="text-xs text-black/60 dark:text-white/60" v-if="champions.length === 0">
         {{ t('OrderedChampionList.unselected') }}
       </div>
     </div>
@@ -308,38 +312,6 @@ watch(
   }
 )
 </script>
-
-<style scoped>
-.ordered-champion-list-wrapper {
-  display: flex;
-  align-items: center;
-  height: 24px;
-}
-
-.champions {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  flex-wrap: wrap;
-
-  .champion {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-  }
-
-  .hint {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.transfer {
-  width: 600px;
-  height: 65vh;
-  background-color: rgba(24, 24, 24, 0.98);
-}
-</style>
 
 <style module>
 .target-item .move-btn {

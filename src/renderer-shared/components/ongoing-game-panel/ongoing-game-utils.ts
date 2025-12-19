@@ -76,5 +76,20 @@ export const PREMADE_TEAM_COLORS = {
   L: { foregroundColor: '#555555', color: '#fff', borderColor: '#555555d0' }
 }
 
+export const PREMADE_TEAM_COLORS_LIGHT = {
+  A: { foregroundColor: '#0f6f68', color: '#000', borderColor: '#6fefe5d0' },
+  B: { foregroundColor: '#1f3fa6', color: '#000', borderColor: '#90a8ffd0' },
+  C: { foregroundColor: '#5c6000', color: '#000', borderColor: '#e3ea63d0' },
+  D: { foregroundColor: '#1a7a2a', color: '#000', borderColor: '#78e686d0' },
+  E: { foregroundColor: '#8a4400', color: '#000', borderColor: '#ffbf74d0' },
+  F: { foregroundColor: '#8a2a00', color: '#fff', borderColor: '#ffb07ad0' },
+  G: { foregroundColor: '#6a0d6a', color: '#fff', borderColor: '#d991d9d0' },
+  H: { foregroundColor: '#a2133f', color: '#fff', borderColor: '#ff97b2d0' },
+  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#86a6ead0' },
+  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#ff6b6bd0' },
+  K: { foregroundColor: '#5a2a0b', color: '#fff', borderColor: '#d7a383d0' },
+  L: { foregroundColor: '#333333', color: '#fff', borderColor: '#bebebed0' }
+}
+
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'
 export const FIXED_CARD_WIDTH_PX_NUMBER = 240

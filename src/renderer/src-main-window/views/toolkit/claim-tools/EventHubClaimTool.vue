@@ -3,7 +3,7 @@
     <template #header>
       <span class="card-header-title">{{ t('EventHubClaimTool.title') }}</span>
     </template>
-    <div class="hint">
+    <div class="mb-3 text-[13px] italic text-black/60 dark:text-white/70">
       <span>{{ t('EventHubClaimTool.hint') }}</span>
     </div>
     <div class="button-group">
@@ -40,10 +40,7 @@
       </NButton>
     </div>
     <NDataTable
-      :theme-overrides="{
-        thColor: '#0005',
-        tdColor: '#0004'
-      }"
+      :theme-overrides="dataTableThemeOverrides"
       :loading="isLoading"
       size="small"
       :columns="columns"
@@ -57,6 +54,7 @@
 
 <script lang="ts" setup>
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EventHubEvents } from '@shared/types/league-client/event-hub'
@@ -71,6 +69,7 @@ const REWARD_STATE_UNSELECTED = 'Unselected'
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const lc = useInstance(LeagueClientRenderer)
 const lcs = useLeagueClientStore()
 
@@ -90,6 +89,20 @@ const cachedEventHubRewardGroups = ref<
   >
 >({})
 const events = shallowRef<EventHubEvents[]>([])
+
+const dataTableThemeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      thColor: 'rgba(15, 23, 42, 0.75)',
+      tdColor: 'rgba(15, 23, 42, 0.6)'
+    }
+  }
+
+  return {
+    thColor: 'rgba(15, 23, 42, 0.04)',
+    tdColor: 'rgba(15, 23, 42, 0.02)'
+  }
+})
 
 const columns = computed<DataTableColumns<EventHubEvents>>(() => [
   {
@@ -214,12 +227,5 @@ watch(
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
-}
-
-.hint {
-  color: #fff8;
-  font-style: italic;
-  font-size: 13px;
-  margin-bottom: 12px;
 }
 </style>

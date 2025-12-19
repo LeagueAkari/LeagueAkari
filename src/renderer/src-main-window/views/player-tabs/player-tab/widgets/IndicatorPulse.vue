@@ -1,13 +1,9 @@
 <template>
-  <div class="ongoing-indicator"></div>
+  <div class="indicator-pulse size-2.5 rounded-full bg-green-500 dark:bg-[#00ff00]"></div>
 </template>
 
 <style scoped>
-.ongoing-indicator {
-  width: 8px;
-  height: 8px;
-  background-color: #00ff00;
-  border-radius: 50%;
+.indicator-pulse {
   animation: indicator-pulse 4s infinite;
 }
 

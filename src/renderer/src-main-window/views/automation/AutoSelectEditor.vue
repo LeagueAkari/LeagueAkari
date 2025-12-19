@@ -105,7 +105,9 @@
                   </template>
                   <span
                     >{{ t('AutoSelect.pick.expectedChampions.fragment1') }}
-                    <span class="font-semibold">{{ position }}</span>
+                    <span class="font-semibold">{{
+                      t(`positions.${position}`, { ns: 'common' })
+                    }}</span>
                     {{ t('AutoSelect.pick.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>

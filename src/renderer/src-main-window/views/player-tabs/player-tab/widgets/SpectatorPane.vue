@@ -13,6 +13,7 @@
         <template #trigger>
           <NButton
             size="tiny"
+            type="primary"
             @click="() => handleSpectate(false)"
             :disabled="!isSpectatorAvailable || !canSpectate"
           >
@@ -110,8 +111,8 @@
         <div
           class="flex flex-col gap-0.5 rounded-sm p-1"
           :class="{
-            'bg-blue-900/20': teams.team1.id === 100 || teams.team1.id === 0,
-            'bg-red-900/20': teams.team1.id === 200
+            'bg-blue-300/20 dark:bg-blue-900/20': teams.team1.id === 100 || teams.team1.id === 0,
+            'bg-red-300/20 dark:bg-red-900/20': teams.team1.id === 200
           }"
         >
           <div
@@ -132,18 +133,23 @@
             <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="ml-1 min-w-3 rounded-sm bg-white/20 p-0.5 text-center text-[11px] leading-[11px] font-bold"
+              class="ml-1 min-w-3 rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-[11px] font-bold dark:bg-white/20"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}
             </div>
             <div
-              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-white/20"
+              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-black/10 dark:hover:bg-white/20"
               @click="() => navigateToSummonerByPuuid(player.puuid, true)"
               @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
               @mousedown="handleMouseDown"
-              :class="{ 'font-bold': player.puuid === puuid }"
-              :style="{ color: premadeInfo[player.puuid]?.color.foregroundColor || '#fffd' }"
+              :class="{
+                'font-bold': player.puuid === puuid,
+                'text-black dark:text-white': !premadeInfo[player.puuid]
+              }"
+              :style="{
+                color: premadeInfo[player.puuid]?.color.foregroundColor
+              }"
             >
               <StreamerModeMaskedText>
                 <template #masked>
@@ -180,8 +186,8 @@
         <div
           class="flex flex-col gap-0.5 rounded-sm p-1"
           :class="{
-            'bg-blue-900/20': teams.team2.id === 100,
-            'bg-red-900/20': teams.team2.id === 200
+            'bg-blue-300/20 dark:bg-blue-900/20': teams.team2.id === 100,
+            'bg-red-300/20 dark:bg-red-900/20': teams.team2.id === 200
           }"
         >
           <div
@@ -202,18 +208,21 @@
             <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="ml-1 min-w-[12px] rounded-sm bg-white/20 p-0.5 text-center text-[11px] leading-[11px] font-bold"
+              class="ml-1 min-w-[12px] rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-[11px] font-bold dark:bg-white/20"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}
             </div>
             <div
-              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-white/20"
+              class="ml-0.5 cursor-pointer rounded-sm px-0.5 text-xs transition-colors hover:bg-black/10 dark:hover:bg-white/20"
               @click="() => navigateToSummonerByPuuid(player.puuid, true)"
               @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
               @mousedown="handleMouseDown"
-              :class="{ 'font-bold': player.puuid === puuid }"
-              :style="{ color: premadeInfo[player.puuid]?.color.foregroundColor || '#fffd' }"
+              :class="{
+                'font-bold': player.puuid === puuid,
+                'text-black dark:text-white': !premadeInfo[player.puuid]
+              }"
+              :style="{ color: premadeInfo[player.puuid]?.color.foregroundColor }"
             >
               <StreamerModeMaskedText>
                 <template #masked>
@@ -243,7 +252,8 @@ import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMask
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import {
   PREMADE_TEAMS,
-  PREMADE_TEAM_COLORS
+  PREMADE_TEAM_COLORS,
+  PREMADE_TEAM_COLORS_LIGHT
 } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
@@ -439,6 +449,11 @@ const handleMouseUp = (event: MouseEvent, playerPuuid: string) => {
   }
 }
 
+// 组队配色（根据主题）
+const premadeColors = computed(() => {
+  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+})
+
 // 组队信息
 const premadeInfo = computed(() => {
   if (!spectatorData.value) {
@@ -464,7 +479,7 @@ const premadeInfo = computed(() => {
       }
 
       const teamName = PREMADE_TEAMS[index++]
-      const color = PREMADE_TEAM_COLORS[teamName]
+      const color = premadeColors.value[teamName]
       puuids.forEach((puuid) => {
         prev[puuid] = {
           color,

@@ -72,6 +72,10 @@ const themeOverrides = computed(() => {
       Popover: {
         fontSize: '12px'
       },
+      Card: {
+        borderColor: 'rgba(15, 23, 42, 0.10)',
+        borderColorModal: 'rgba(15, 23, 42, 0.16)'
+      },
       Scrollbar: {
         width: '6px'
       }

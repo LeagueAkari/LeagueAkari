@@ -204,11 +204,11 @@
             <div class="relative size-7">
               <LcuImage class="size-full rounded-full" :src="profileIconUri(friend.icon || 29)" />
               <div
-                class="absolute right-0 bottom-0 size-2 rounded-full"
+                class="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-neutral-200 dark:border-neutral-800"
                 :class="{
-                  'bg-green-600 dark:bg-green-500': friend.availability === 'chat',
-                  'bg-cyan-600 dark:bg-cyan-400': friend.availability === 'dnd',
-                  'bg-red-700 dark:bg-red-500': friend.availability === 'away'
+                  'border bg-green-600 dark:bg-green-500': friend.availability === 'chat',
+                  'border bg-cyan-500 dark:bg-cyan-400': friend.availability === 'dnd',
+                  'border bg-red-600 dark:bg-red-500': friend.availability === 'away'
                 }"
               ></div>
             </div>

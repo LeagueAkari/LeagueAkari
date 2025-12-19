@@ -1,8 +1,12 @@
 <template>
-  <div class="position-filter">
+  <div class="flex h-6 items-center gap-1 p-0.5">
     <div
-      class="position"
-      :class="{ active: positionModel === position }"
+      class="flex aspect-square cursor-pointer items-center justify-center rounded-[2px] border border-black/10 text-base text-black/60 transition-colors hover:border-black/30 hover:bg-black/10 hover:text-black dark:border-white/10 dark:text-white/60 dark:hover:border-white/30 dark:hover:bg-white/10 dark:hover:text-white"
+      :class="
+        positionModel === position
+          ? 'border-black/50 bg-black/15 text-black dark:border-white/60 dark:bg-white/15 dark:text-white'
+          : ''
+      "
       v-for="position in POSITIONS"
       :key="position"
       @click="handleClick(position)"
@@ -28,38 +32,4 @@ const handleClick = (position: string) => {
 }
 </script>
 
-<style scoped>
-.position-filter {
-  display: flex;
-  gap: 4px;
-  padding: 2px;
-  box-sizing: border-box;
-  height: 22px;
-
-  .position {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #fff1;
-    border-radius: 2px;
-    aspect-ratio: 1;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-    color: #fff8;
-  }
-
-  .position:hover {
-    background-color: #fff2;
-    color: #fff;
-
-    cursor: pointer;
-  }
-
-  .position.active {
-    color: #fff;
-    background-color: #fff2;
-    border: 1px solid #fff4;
-  }
-}
-</style>
+<style scoped></style>
