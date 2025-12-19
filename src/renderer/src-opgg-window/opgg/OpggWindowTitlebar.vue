@@ -1,25 +1,47 @@
 <template>
-  <div class="titlebar" :class="{ blurred: ws.focus === 'blurred' }">
-    <div class="title-area">
-      <span class="title">League Akari - OP.GG</span>
+  <div
+    class="relative z-10000000 flex h-(--la-titlebar-height) items-center"
+    :class="{ blurred: ws.focus === 'blurred' }"
+    style="-webkit-app-region: drag"
+  >
+    <div
+      class="box-border flex h-full flex-1 items-center pt-1 pr-1 pb-0.5 pl-2 transition-all duration-300"
+      :class="{ 'brightness-80': ws.focus === 'blurred' }"
+    >
+      <span
+        class="text-xs text-black/85 dark:text-white/85"
+        :class="{ 'brightness-80': ws.focus === 'blurred' }"
+      >
+        {{ $t('appName', { ns: 'common' }) }} - OP.GG
+      </span>
     </div>
-    <div class="traffic">
+    <div
+      class="flex h-full justify-end transition-all duration-300 ease-in-out"
+      :class="{ 'brightness-80': ws.focus === 'blurred' }"
+    >
       <div
         :title="ws.settings.pinned ? t('OpggWindowTitlebar.unpin') : t('OpggWindowTitlebar.pin')"
-        class="traffic-button pin"
-        :class="{ pinned: ws.settings.pinned }"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
+        :class="{ 'bg-black/15 dark:bg-white/15': ws.settings.pinned }"
+        style="-webkit-app-region: no-drag"
         @click="() => handlePin(!ws.settings.pinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
       <div
         :title="t('OpggWindowTitlebar.minimize')"
-        class="traffic-button minimize"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
+        style="-webkit-app-region: no-drag"
         @click="handleMinimize"
       >
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
-      <div :title="t('OpggWindowTitlebar.close')" class="traffic-button close" @click="handleClose">
+      <div
+        :title="t('OpggWindowTitlebar.close')"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-red-600 hover:text-white active:brightness-80 dark:hover:bg-red-500"
+        style="-webkit-app-region: no-drag"
+        @click="handleClose"
+      >
         <NIcon><CloseIcon /></NIcon>
       </div>
     </div>
@@ -54,79 +76,4 @@ const handlePin = (b: boolean) => {
 }
 </script>
 
-<style scoped>
-.titlebar {
-  display: flex;
-  position: relative;
-  height: var(--la-titlebar-height);
-  align-items: center;
-  z-index: 10000000;
-  -webkit-app-region: drag;
-}
-
-.title-area {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  flex: 1;
-  transition: all 0.3s;
-  padding: 4px 4px 2px 8px;
-  box-sizing: border-box;
-
-  .blurred & {
-    filter: brightness(0.8);
-  }
-
-  .title {
-    font-size: 12px;
-    color: #fffd;
-  }
-}
-
-.blurred :is(.title, .traffic) {
-  filter: brightness(0.8);
-}
-
-.traffic {
-  height: 100%;
-  display: flex;
-  justify-content: flex-end;
-  transition: all 0.3s ease;
-
-  .traffic-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 45px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    -webkit-app-region: no-drag;
-
-    &:active {
-      filter: brightness(0.8);
-    }
-  }
-
-  .traffic-button.close {
-    &:hover {
-      background-color: rgb(194, 0, 0);
-      color: #fff;
-    }
-  }
-
-  .traffic-button.align,
-  .traffic-button.pin,
-  .traffic-button.minimize {
-    &.pinned {
-      background-color: rgba(102, 102, 102, 0.15);
-    }
-
-    &:hover {
-      background-color: rgb(102, 102, 102);
-      color: #fff;
-    }
-  }
-}
-</style>
+<style scoped></style>

@@ -15,7 +15,7 @@ import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
 import { watchDebounced } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
-import { InjectionKey, Ref, inject, provide, ref, shallowRef, watch } from 'vue'
+import { InjectionKey, Ref, inject, onMounted, provide, ref, shallowRef, watch } from 'vue'
 
 import { hasItemsSets, useLoadout } from './utils/loadout'
 
@@ -210,13 +210,19 @@ export function provideOpgg() {
 
       // commit
       version.value = nextVersion
-      champions.value = updatedChampionsData
-      champion.value = updatedChampionData
       region.value = targetRegion
       mode.value = targetMode
       tier.value = targetTier
       position.value = targetPosition
       championId.value = targetChampionId
+
+      if (updatedChampionsData) {
+        champions.value = updatedChampionsData
+      }
+
+      if (updatedChampionData) {
+        champion.value = updatedChampionData
+      }
     } catch (error) {
       if (isAbortError(error)) {
         return
@@ -274,7 +280,9 @@ export function provideOpgg() {
     await update({ force: true })
   }
 
-  refresh()
+  onMounted(() => {
+    refresh()
+  })
 
   // persistent
   watch(

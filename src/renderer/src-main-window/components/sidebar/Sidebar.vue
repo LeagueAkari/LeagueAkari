@@ -1,5 +1,12 @@
 <template>
-  <div class="app-sidebar" :class="{ collapsed: mui.frontendSettings.sidebarCollapsed }">
+  <div
+    class="app-sidebar"
+    ref="sidebarEl"
+    :class="{
+      collapsed: mui.frontendSettings.sidebarCollapsed,
+      'is-hovered': isSidebarHoveredDebounced
+    }"
+  >
     <div class="app-sidebar__head">
       <div class="app-sidebar__logo" @click="toggleCollapse">
         <NIcon class="app-sidebar__logo-icon">
@@ -39,7 +46,6 @@ import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import SidebarCollapseLeft from '@renderer-shared/assets/icon/SidebarCollapseLeft.vue'
 import SidebarCollapseRight from '@renderer-shared/assets/icon/SidebarCollapseRight.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
@@ -49,9 +55,10 @@ import {
   Games24Filled as Games24FilledIcon
 } from '@vicons/fluent'
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
+import { refDebounced, useElementHover } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
+import { Component as ComponentC, computed, h, ref, useTemplateRef, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
@@ -65,9 +72,6 @@ const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const mui = useMainWindowUiStore()
 const lcs = useLeagueClientStore()
-const lcuxs = useLeagueClientUxStore()
-
-const isClientsPreviewShow = ref(false)
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -155,12 +159,8 @@ watch(
   }
 )
 
-// 善意的提醒，以防用户一直在等
-watchEffect(() => {
-  if (lcs.connectionState === 'disconnected' && lcuxs.launchedClients.length > 1) {
-    isClientsPreviewShow.value = true
-  }
-})
+const isSidebarHovered = useElementHover(useTemplateRef('sidebarEl'))
+const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
 </script>
 
 <style scoped>
@@ -200,7 +200,7 @@ watchEffect(() => {
     cursor: pointer;
   }
 
-  &:hover {
+  &.is-hovered {
     .app-sidebar__logo-icon {
       opacity: 0;
     }

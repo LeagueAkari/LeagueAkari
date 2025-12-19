@@ -5,7 +5,8 @@
 
 :root {
   color-scheme: dark;
-  --la-background-color-primary: #1a1a1d;
+  --la-background-dark-color-primary: #1a1a1d;
+  --la-background-light-color-primary: #f9f9f9;
   --la-app-min-height: 200px;
   --la-app-min-width: 200px;
   --la-titlebar-height: 28px;
@@ -44,8 +45,12 @@ body {
 
 body {
   user-select: none;
-  background-color: var(--la-background-color-primary);
+  background-color: var(--la-background-light-color-primary);
   line-height: normal;
+
+  [data-theme='dark'] & {
+    background-color: var(--la-background-dark-color-primary);
+  }
 }
 
 a {

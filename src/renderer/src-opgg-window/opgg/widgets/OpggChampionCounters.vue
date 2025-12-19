@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mb-1 rounded border border-[#37373c] p-2 last:mb-0"
+    class="mb-1 rounded border border-black/10 p-2 last:mb-0 dark:border-[#37373c]"
     v-if="champion && thatPosition && thatPosition.counters.length"
   >
     <!-- title line (title + expand) -->
@@ -13,7 +13,7 @@
         class="mr-2"
         :rail-style="
           ({ checked }) => ({
-            backgroundColor: checked ? '#2a947d' : '#d75a5a'
+            backgroundColor: checked ? '#2a947d' : '#dc2626'
           })
         "
       >
@@ -35,13 +35,13 @@
       >
         <LcuImage class="image mb-1 h-8 w-8" :src="championIconUri(c.champion_id)" />
         <div
-          class="win-rate text-[11px] font-bold text-[#d75a5a]"
+          class="win-rate text-[11px] font-bold text-[#dc2626] dark:text-[#d75a5a]"
           :title="t('OpggChampion.winRate')"
-          :class="{ 'text-[#a0c6f8]': c.win / (c.play || 1) > 0.5 }"
+          :class="{ 'text-[#2563eb] dark:text-[#a0c6f8]': c.win / (c.play || 1) > 0.5 }"
         >
           {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
         </div>
-        <div class="play text-center text-[10px] text-[#a4a4a4]">
+        <div class="play text-center text-[10px] text-[#666666] dark:text-[#a4a4a4]">
           {{
             t('OpggChampion.times', {
               times: c.play.toLocaleString()
@@ -69,12 +69,12 @@
       >
         <LcuImage class="image mb-1 h-8 w-8" :src="championIconUri(c.champion_id)" />
         <div
-          class="win-rate text-[11px] font-bold text-[#d75a5a]"
+          class="win-rate text-[11px] font-bold text-[#dc2626] dark:text-[#d75a5a]"
           :title="t('OpggChampion.winRate')"
         >
           {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
         </div>
-        <div class="play text-center text-[10px] text-[#a4a4a4]">
+        <div class="play text-center text-[10px] text-[#666666] dark:text-[#a4a4a4]">
           {{
             t('OpggChampion.times', {
               times: c.play.toLocaleString()

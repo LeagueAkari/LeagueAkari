@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mb-1 rounded border border-[#37373c] p-2 last:mb-0"
+    class="mb-1 rounded border border-black/10 p-2 last:mb-0 dark:border-[#37373c]"
     v-if="champion && champion.data.runes && champion.data.runes.length"
   >
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
@@ -15,7 +15,7 @@
       class="mb-3 flex items-center gap-1 last:mb-0"
       v-for="(r, i) of champion.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
     >
-      <div class="min-w-[16px] text-[10px] text-[#b2b2b2]">#{{ i + 1 }}</div>
+      <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <div>
         <div class="primary items.end mb-1 flex gap-[2px]">
           <PerkstyleDisplay class="mr-1" :size="24" :perkstyle-id="r.primary_page_id" />
@@ -35,12 +35,12 @@
       <div class="desc ml-auto flex items-center">
         <div class="pick flex min-w-[76px] flex-col items-center">
           <span
-            class="pick-rate text-xs font-bold text-[#ebebeb]"
+            class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('OpggChampion.pickRate')"
             >{{ (r.pick_rate * 100).toFixed(2) }}%</span
           >
           <span
-            class="pick-play text-center text-xs text-[#bebebe]"
+            class="pick-play text-center text-xs text-[#666666] dark:text-[#bebebe]"
             :title="t('OpggChampion.plays')"
           >
             {{
@@ -51,7 +51,7 @@
           >
         </div>
         <div
-          class="win-rate min-w-[76px] text-center text-xs font-bold text-[#a0c6f8]"
+          class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
           :title="t('OpggChampion.winRate')"
         >
           {{ ((r.win / (r.play || 1)) * 100).toFixed(2) }}%

@@ -28,10 +28,12 @@ import LcuImage from '../LcuImage.vue'
 const { championId = -1, stretched = true } = defineProps<{
   championId?: number
   round?: boolean
+  stretched?: boolean // to remove the black border
+
+  // ring 系列属性可以 deprecated 了，未来将逐渐取代
   ring?: boolean
   ringColor?: string
   ringWidth?: number
-  stretched?: boolean // to remove the black border
 }>()
 
 const imageSource = computed(() => {

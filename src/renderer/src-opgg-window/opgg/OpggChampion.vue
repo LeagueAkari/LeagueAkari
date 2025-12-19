@@ -16,7 +16,7 @@
       <div class="flex h-20 items-center gap-3 px-2 pt-1 pb-3" v-if="summary">
         <ChampionIcon
           round
-          class="size-14 ring-2 dark:ring-amber-400/80"
+          class="size-14 ring-2 ring-amber-600/80 dark:ring-amber-400/80"
           :champion-id="summary.id"
         />
 
@@ -125,6 +125,7 @@
       </div>
 
       <!-- 堆叠的艺术 -->
+      <OpggChampionBalance />
       <OpggChampionCounters />
       <OpggChampionSpells />
       <OpggChampionRunes />
@@ -151,6 +152,7 @@ import { computed } from 'vue'
 import { useOpgg } from './context'
 import { getTierTextColorClass } from './utils/theme'
 import OpggChampionAugments from './widgets/OpggChampionAugments.vue'
+import OpggChampionBalance from './widgets/OpggChampionBalance.vue'
 import OpggChampionBoots from './widgets/OpggChampionBoots.vue'
 import OpggChampionCoreItems from './widgets/OpggChampionCoreItems.vue'
 import OpggChampionCounters from './widgets/OpggChampionCounters.vue'

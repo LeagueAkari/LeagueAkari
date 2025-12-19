@@ -161,6 +161,7 @@ AppSettings:
       tip:
         gitee: '在中国大陆内拥有较好的响应速度'
         github: '在中国大陆外拥有较好的响应速度'
+      better: 更快
 
   selfUpdate:
     title: 应用更新
@@ -2582,6 +2583,17 @@ OpggChampion:
   augmentSilver: 白银阶
   augmentPrism: 棱彩阶
   synergies: 搭配
+  balance:
+    title: 平衡性调整
+    attack_speed: 攻击速度
+    damage_dealt: 造成伤害
+    damage_taken: 承受伤害
+    cooldown_reduction: 冷却缩减
+    healing: 治疗效果
+    tenacity: 韧性
+    shield_amount: 护盾值
+    energy_regen: 能量回复
+    area_of_effect_damage: AoE 伤害
 
   writeToDisk: '[$t(common:appName)] 已写入到装备方案：{{name}}'
   writtenToDisk: 已写入到文件中

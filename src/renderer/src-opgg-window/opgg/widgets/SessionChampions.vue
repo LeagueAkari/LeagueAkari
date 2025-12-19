@@ -5,7 +5,7 @@
         class="absolute right-5 bottom-5 size-9 cursor-pointer transition-opacity hover:opacity-20"
         :champion-id="-1"
         ring
-        ring-color="#fff8"
+        :ring-color="triggerRingColor"
         round
       />
     </template>
@@ -18,7 +18,7 @@
         :key="c"
         :champion-id="c"
         ring
-        ring-color="#fff4"
+        :ring-color="itemRingColor"
         round
         @click="emits('toChampion', c)"
       />
@@ -28,11 +28,21 @@
 
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
 const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
+
+const triggerRingColor = computed(() => {
+  return as.colorTheme === 'dark' ? '#fff8' : 'rgba(0, 0, 0, 0.1)'
+})
+
+const itemRingColor = computed(() => {
+  return as.colorTheme === 'dark' ? '#fff4' : 'rgba(0, 0, 0, 0.15)'
+})
 
 const emits = defineEmits<{
   toChampion: [championId: number]

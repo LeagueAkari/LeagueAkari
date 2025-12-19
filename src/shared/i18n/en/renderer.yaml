@@ -160,6 +160,7 @@ AppSettings:
       tip:
         gitee: 'Better response speed in mainland China'
         github: 'Better response speed outside mainland China'
+      better: Faster
 
   selfUpdate:
     title: Application Update
@@ -2581,6 +2582,17 @@ OpggChampion:
   augmentSilver: Silver
   augmentPrism: Prism
   synergies: Synergies
+  balance:
+    title: Balance
+    attack_speed: Attack Speed
+    damage_dealt: Damage Dealt
+    damage_taken: Damage Taken
+    cooldown_reduction: CDR
+    healing: Healing
+    tenacity: Tenacity
+    shield_amount: Shield Amount
+    energy_regen: Energy Regen
+    area_of_effect_damage: AoE Damage
 
   writeToDisk: '[$t(common:appName)] Written to item build: {{name}}'
   writtenToDisk: Successfully written to file

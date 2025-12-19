@@ -146,7 +146,7 @@
               </div>
             </template>
             <div>
-              <div style="display: flex; align-items: center; height: 22px">
+              <div class="flex h-[22px] items-center">
                 <NIcon class="mr-2">
                   <GiteeSvg />
                 </NIcon>
@@ -161,6 +161,12 @@
                         ? t('AppSettings.basic.dataSource.timeout')
                         : `${latency.giteeLatency.toFixed(1)} ms`
                     }})
+
+                    <span
+                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                      v-if="latency.giteeLatency < latency.githubLatency"
+                      >{{ t('AppSettings.basic.dataSource.better') }}</span
+                    >
                   </template>
                 </span>
               </div>
@@ -172,7 +178,7 @@
                   <GithubIcon />
                 </NIcon>
                 <span class="text-xs font-bold">GitHub</span>
-                <span style="margin-left: 4px">
+                <span class="ml-1">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
                   </template>
@@ -182,12 +188,18 @@
                         ? t('AppSettings.basic.dataSource.timeout')
                         : `${latency.githubLatency.toFixed(1)} ms`
                     }})
+
+                    <span
+                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                      v-if="latency.githubLatency < latency.giteeLatency"
+                      >{{ t('AppSettings.basic.dataSource.better') }}</span
+                    >
                   </template>
                 </span>
               </div>
               <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
             </div>
-            <div style="margin-top: 8px; display: flex; justify-content: center">
+            <div class="mt-2 flex justify-center">
               <NButton
                 size="tiny"
                 secondary
@@ -201,7 +213,7 @@
         </div>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
       </template>
@@ -279,7 +291,7 @@
           >
             {{ t('AppSettings.selfUpdate.cancelUpdate') }}
           </NButton>
-          <span v-if="sus.lastCheckAt" style="font-size: 12px"
+          <span v-if="sus.lastCheckAt" class="text-xs"
             >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
             {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
           >
@@ -398,7 +410,7 @@
         />
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span>
       </template>
@@ -437,7 +449,7 @@
         </NButton>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.misc.title') }}</span>
       </template>
@@ -792,15 +804,19 @@ const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
 <style scoped>
-.hover-text {
-  --at-apply: 'text-xs dark:text-white/60 text-black/60 cursor-pointer transition-color duration-300 dark:hover:text-white hover:text-black';
-}
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-.step-title {
-  font-size: 12px;
-}
+@layer components {
+  .hover-text {
+    @apply cursor-pointer text-xs text-black/60 transition-[color] duration-300 hover:text-black dark:text-white/60 dark:hover:text-white;
+  }
 
-.step-description {
-  font-size: 11px;
+  .step-title {
+    @apply text-xs;
+  }
+
+  .step-description {
+    @apply text-[11px];
+  }
 }
 </style>

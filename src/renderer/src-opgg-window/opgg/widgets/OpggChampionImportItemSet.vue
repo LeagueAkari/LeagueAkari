@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-1 rounded border border-[#37373c] p-2 last:mb-0" v-if="champion && canAddItemSet">
+  <div class="mb-1 rounded border border-black/10 p-2 last:mb-0 dark:border-[#37373c]" v-if="champion && canAddItemSet">
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
       {{ t('OpggChampion.applyRunesText') }}
     </div>
