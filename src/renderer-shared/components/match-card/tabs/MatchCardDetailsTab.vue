@@ -213,7 +213,7 @@ const groups = computed(() => {
 
             // 支持 chart 展示的类型
             if (
-              item.render === 'k2' ||
+              item.render === 'compat' ||
               item.render === 'integer' ||
               item.render === 'float' ||
               item.render === 'percentage'

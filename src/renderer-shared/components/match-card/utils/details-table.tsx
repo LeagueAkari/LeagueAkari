@@ -1,3 +1,4 @@
+import { useNumberFormatter } from '@renderer-shared/composables/useNumebrFormatter'
 import { Participant } from '@shared/types/league-client/match-history'
 import { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { useTranslation } from 'i18next-vue'
@@ -21,7 +22,7 @@ export type RenderGroupOptions = {
     | 'float'
     | 'integer'
     | 'text'
-    | 'k2'
+    | 'compat'
     | 'boolean'
     | 'game-time'
     | 'percentage'
@@ -63,29 +64,29 @@ export const RENDER_GROUPS: RenderGroup[] = [
     group: 'damage',
     items: [
       // Damage to Champions
-      { key: 'totalDamageDealtToChampions', render: 'k2' }, // lcu + sgp
-      { key: 'physicalDamageDealtToChampions', render: 'k2' }, // lcu + sgp
-      { key: 'magicDamageDealtToChampions', render: 'k2' }, // lcu + sgp
-      { key: 'trueDamageDealtToChampions', render: 'k2' }, // lcu + sgp
+      { key: 'totalDamageDealtToChampions', render: 'compat' }, // lcu + sgp
+      { key: 'physicalDamageDealtToChampions', render: 'compat' }, // lcu + sgp
+      { key: 'magicDamageDealtToChampions', render: 'compat' }, // lcu + sgp
+      { key: 'trueDamageDealtToChampions', render: 'compat' }, // lcu + sgp
       // Total Damage Dealt
-      { key: 'totalDamageDealt', render: 'k2' }, // lcu + sgp
-      { key: 'physicalDamageDealt', render: 'k2' }, // lcu + sgp
-      { key: 'magicDamageDealt', render: 'k2' }, // lcu + sgp
-      { key: 'trueDamageDealt', render: 'k2' }, // lcu + sgp
+      { key: 'totalDamageDealt', render: 'compat' }, // lcu + sgp
+      { key: 'physicalDamageDealt', render: 'compat' }, // lcu + sgp
+      { key: 'magicDamageDealt', render: 'compat' }, // lcu + sgp
+      { key: 'trueDamageDealt', render: 'compat' }, // lcu + sgp
       // Damage to Structures
-      { key: 'damageDealtToObjectives', render: 'k2' }, // lcu + sgp
-      { key: 'damageDealtToTurrets', render: 'k2' }, // lcu + sgp
-      { key: 'damageDealtToBuildings', render: 'k2' }, // sgp only
-      { key: 'damageDealtToEpicMonsters', render: 'k2' }, // sgp only
+      { key: 'damageDealtToObjectives', render: 'compat' }, // lcu + sgp
+      { key: 'damageDealtToTurrets', render: 'compat' }, // lcu + sgp
+      { key: 'damageDealtToBuildings', render: 'compat' }, // sgp only
+      { key: 'damageDealtToEpicMonsters', render: 'compat' }, // sgp only
       // Damage Taken
-      { key: 'totalDamageTaken', render: 'k2' }, // lcu + sgp
-      { key: 'physicalDamageTaken', render: 'k2' }, // lcu + sgp
-      { key: 'magicDamageTaken', render: 'k2' }, // sgp only
-      { key: 'magicalDamageTaken', render: 'k2' }, // lcu only
-      { key: 'trueDamageTaken', render: 'k2' }, // lcu + sgp
-      { key: 'damageSelfMitigated', render: 'k2' }, // lcu + sgp
+      { key: 'totalDamageTaken', render: 'compat' }, // lcu + sgp
+      { key: 'physicalDamageTaken', render: 'compat' }, // lcu + sgp
+      { key: 'magicDamageTaken', render: 'compat' }, // sgp only
+      { key: 'magicalDamageTaken', render: 'compat' }, // lcu only
+      { key: 'trueDamageTaken', render: 'compat' }, // lcu + sgp
+      { key: 'damageSelfMitigated', render: 'compat' }, // lcu + sgp
       // Damage Related (Support/Shield)
-      { key: 'totalDamageShieldedOnTeammates', render: 'k2' } // sgp only
+      { key: 'totalDamageShieldedOnTeammates', render: 'compat' } // sgp only
     ]
   },
   {
@@ -160,8 +161,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
   {
     group: 'economy',
     items: [
-      { key: 'goldEarned', render: 'k2' }, // lcu + sgp
-      { key: 'goldSpent', render: 'k2' }, // lcu + sgp
+      { key: 'goldEarned', render: 'compat' }, // lcu + sgp
+      { key: 'goldSpent', render: 'compat' }, // lcu + sgp
       { key: 'totalMinionsKilled', render: 'integer' }, // lcu + sgp
       { key: 'neutralMinionsKilled', render: 'integer' }, // lcu + sgp
       { key: 'neutralMinionsKilledEnemyJungle', render: 'integer' }, // lcu only
@@ -178,9 +179,9 @@ export const RENDER_GROUPS: RenderGroup[] = [
   {
     group: 'healing',
     items: [
-      { key: 'totalHeal', render: 'k2' }, // lcu + sgp
+      { key: 'totalHeal', render: 'compat' }, // lcu + sgp
       { key: 'totalUnitsHealed', render: 'integer' }, // lcu + sgp
-      { key: 'totalHealsOnTeammates', render: 'k2' } // sgp only
+      { key: 'totalHealsOnTeammates', render: 'compat' } // sgp only
     ]
   },
   {
@@ -264,8 +265,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
     items: [
       { key: 'kda', render: 'float' }, // sgp challenges
       { key: 'killParticipation', render: 'percentage' }, // sgp challenges
-      { key: 'damagePerMinute', render: 'k2' }, // sgp challenges
-      { key: 'goldPerMinute', render: 'k2' }, // sgp challenges
+      { key: 'damagePerMinute', render: 'compat' }, // sgp challenges
+      { key: 'goldPerMinute', render: 'compat' }, // sgp challenges
       { key: 'damageTakenOnTeamPercentage', render: 'integer' }, // sgp challenges
       { key: 'teamDamagePercentage', render: 'integer' } // sgp challenges
     ]
@@ -329,7 +330,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
     group: 'misc',
     items: [
       { key: 'champLevel', render: 'integer' }, // lcu + sgp
-      { key: 'champExperience', render: 'k2' }, // sgp only
+      { key: 'champExperience', render: 'compat' }, // sgp only
       { key: 'timePlayed', render: 'integer' }, // sgp only
       { key: 'totalTimeSpentDead', render: 'integer' }, // sgp only
       { key: 'firstBloodKill', render: 'boolean' }, // lcu + sgp
@@ -339,7 +340,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'killsNearEnemyTurret', render: 'integer' }, // sgp challenges
       { key: 'killsUnderOwnTurret', render: 'integer' }, // sgp challenges
       { key: 'unseenRecalls', render: 'integer' }, // sgp challenges
-      { key: 'effectiveHealAndShielding', render: 'k2' }, // sgp challenges
+      { key: 'effectiveHealAndShielding', render: 'compat' }, // sgp challenges
       { key: 'bountyGold', render: 'integer' }, // sgp challenges
       { key: 'laneMinionsFirst10Minutes', render: 'integer' }, // sgp challenges
       { key: 'twentyMinionsIn3SecondsCount', render: 'integer' }, // sgp challenges
@@ -349,7 +350,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'maxLevelLeadLaneOpponent', render: 'integer' }, // sgp challenges
       { key: 'completeSupportQuestInTime', render: 'integer' }, // sgp challenges
       { key: 'mejaisFullStackInTime', render: 'integer' }, // sgp challenges
-      { key: 'HealFromMapSources', render: 'k2' }, // sgp challenges
+      { key: 'HealFromMapSources', render: 'compat' }, // sgp challenges
       { key: 'gameLength', render: 'game-time' }, // sgp challenges
       { key: 'hadAfkTeammate', render: 'boolean' }, // sgp challenges
       { key: 'highestChampionDamage', render: 'boolean' }, // sgp challenges
@@ -551,6 +552,7 @@ export function useRawDetails() {
 
 export function useValueRenderer() {
   const { t } = useTranslation()
+  const { formatNumber } = useNumberFormatter()
 
   return {
     float: (value: number) => {
@@ -581,7 +583,7 @@ export function useValueRenderer() {
       }
       return value.toString()
     },
-    k2: (value: number) => {
+    compat: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
         return <span class="text-black/50 dark:text-white/50">N/A</span>
       }
@@ -590,11 +592,7 @@ export function useValueRenderer() {
         return <span class="text-black/50 dark:text-white/50">0</span>
       }
 
-      return (
-        <span title={value.toString()}>
-          {`${(value / 1000).toLocaleString('en-US', { maximumFractionDigits: 2 })} k`}
-        </span>
-      )
+      return <span title={value.toString()}>{formatNumber(value)}</span>
     },
     'game-time': (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {

@@ -33,6 +33,9 @@ export function useNumberFormatter() {
   return {
     formatExtremeNumber: (value: number, threshold = 10000000) => {
       return formatExtremeNumber(value, threshold)
+    },
+    formatNumber: (value: number) => {
+      return formatter.value.format(value)
     }
   }
 }
