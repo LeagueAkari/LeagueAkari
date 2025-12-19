@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { NCard, NScrollbar } from 'naive-ui'
 
-import AutoSelectEditor from './auto-select-editor/AutoSelectEditor.vue'
+import AutoSelectEditor from './AutoSelectEditor.vue'
 </script>
 
 <style scoped>

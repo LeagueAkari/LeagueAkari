@@ -2,7 +2,7 @@
   <div class="flex h-full flex-col">
     <NInput
       v-model:value="filterText"
-      :placeholder="t('OpggTier.searchPlaceholder')"
+      :placeholder="t('OpggChampionTable.searchPlaceholder')"
       size="small"
       class="mb-1 text-xs"
       clearable
@@ -21,7 +21,7 @@
       <template #loading>
         <div class="flex flex-col items-center gap-2">
           <NSpin size="small" />
-          <NButton size="tiny" secondary @click="cancel">{{ t('Opgg.cancel') }}</NButton>
+          <NButton size="tiny" secondary @click="cancel">{{ t('OpggChampionTable.cancel') }}</NButton>
         </div>
       </template>
     </NDataTable>
@@ -78,7 +78,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
     }
   },
   {
-    title: () => t('OpggTier.columns.champion'),
+    title: () => t('OpggChampionTable.columns.champion'),
     key: 'name',
     align: 'center',
     className: 'text-[13px] dark:text-white/80 text-black/80',
@@ -115,7 +115,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
     }
   },
   {
-    title: () => t('OpggTier.columns.tier'),
+    title: () => t('OpggChampionTable.columns.tier'),
     key: 'tier',
     align: 'center',
     width: 76,
@@ -162,7 +162,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
     }
   },
   {
-    title: () => t('OpggTier.columns.winRate'),
+    title: () => t('OpggChampionTable.columns.winRate'),
     key: 'winRate',
     align: 'center',
     width: 76,
@@ -217,7 +217,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
     }
   },
   {
-    title: () => t('OpggTier.columns.pickRate'),
+    title: () => t('OpggChampionTable.columns.pickRate'),
     key: 'pickRate',
     align: 'center',
     width: 86,
@@ -259,7 +259,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
 ]
 
 const countersColumn: DataTableColumn<OpggChampionItem> = {
-  title: () => t('OpggTier.columns.counter'),
+  title: () => t('OpggChampionTable.columns.counter'),
   key: 'counters',
   align: 'center',
   width: 90,
@@ -293,7 +293,7 @@ const countersColumn: DataTableColumn<OpggChampionItem> = {
 }
 
 const banRateColumn: DataTableColumn<OpggChampionItem> = {
-  title: () => t('OpggTier.columns.banRate'),
+  title: () => t('OpggChampionTable.columns.banRate'),
   key: 'banRate',
   align: 'center',
   width: 86,

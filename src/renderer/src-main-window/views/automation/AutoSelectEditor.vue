@@ -1,8 +1,8 @@
 <template>
-  <div class="as-editor">
-    <NCollapseTransition :show="as2.temporarilyDisabled" class="as-editor__temporary-disabled">
+  <div class="flex flex-col">
+    <NCollapseTransition :show="as2.temporarilyDisabled" class="mb-4">
       <NAlert type="warning">
-        <div class="as-editor__temporary-disabled-description">
+        <div class="mb-1 text-sm text-gray-700 dark:text-gray-200">
           {{ t('AutoSelect.temporarilyDisabled.description') }}
         </div>
         <NButton size="small" type="primary" @click="as.setTemporarilyDisabled(false)">
@@ -12,33 +12,39 @@
     </NCollapseTransition>
 
     <!-- 可选分组列表 -->
-    <div class="as-editor__groups-container">
-      <div class="as-editor__groups" v-if="as2.groups.length > 0">
-        <div class="as-editor__groups-title">{{ t('AutoSelect.groupTitle') }}</div>
-        <div class="as-editor__groups-list">
+    <div class="flex gap-4">
+      <div class="flex shrink-0 flex-col" v-if="as2.groups.length > 0">
+        <div class="mb-1 ml-2 text-xs text-gray-600 dark:text-gray-300">
+          {{ t('AutoSelect.groupTitle') }}
+        </div>
+        <div class="flex flex-col gap-0.5">
           <div
-            class="as-editor__group-item"
-            :class="{ 'as-editor__group-item--current': currentGroupId === group.groupId }"
+            class="flex h-7 w-44 cursor-pointer items-center rounded px-2 text-sm text-gray-700 transition-colors duration-200 dark:text-gray-100"
+            :class="[
+              currentGroupId === group.groupId
+                ? 'bg-black/10 text-gray-900 dark:bg-white/15 dark:text-white'
+                : 'hover:bg-black/5 hover:text-gray-900 dark:hover:bg-white/10 dark:hover:text-white'
+            ]"
             v-for="group in as2.groups"
             :key="group.groupId"
             @click="currentGroupId = group.groupId"
           >
             <LcuImage
-              class="as-editor__group-icon"
+              class="mr-2 h-4 w-4"
               :src="gameModeIconUri[group.targetGameModes[0].gameMode]"
             />
-            <span class="as-editor__group-label">{{
+            <span class="flex-1 truncate">{{
               t(`AutoSelect.groups.${group.groupId}`, { defaultValue: group.groupId })
             }}</span>
-            <div class="as-editor__group-enabled-icon-wrapper">
+            <div class="ml-auto flex gap-1">
               <NIcon
-                class="as-editor__group-enabled-icon as-editor__group-enabled-icon--pick"
+                class="text-base text-emerald-600 dark:text-emerald-300"
                 v-if="as2.settings.pickConfig[group.groupId]?.enabled"
               >
                 <CheckmarkIcon />
               </NIcon>
               <NIcon
-                class="as-editor__group-enabled-icon as-editor__group-enabled-icon--ban"
+                class="text-base text-amber-600 dark:text-amber-300"
                 v-if="as2.settings.banConfig[group.groupId]?.enabled"
               >
                 <CheckmarkIcon />
@@ -49,8 +55,10 @@
       </div>
 
       <!-- 一般来说这里不会抵达 -->
-      <div class="as-editor__empty-group" v-else>
-        <div class="as-editor__empty-group-title">{{ t('AutoSelect.groupEmpty') }}</div>
+      <div class="flex h-full items-center justify-center" v-else>
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          {{ t('AutoSelect.groupEmpty') }}
+        </div>
       </div>
 
       <!-- 右侧配置区域 -->
@@ -58,7 +66,7 @@
         size="small"
         type="line"
         animated
-        class="as-editor__config"
+        class="flex-1"
         v-if="currentGroup && currentPickConfig"
         v-model:value="banPick"
       >
@@ -84,17 +92,20 @@
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
               <div
-                class="as-editor__position"
+                class="mb-1 flex items-center gap-2"
                 v-for="position in currentGroup.positions"
                 :key="position"
               >
                 <NTooltip placement="left">
                   <template #trigger>
-                    <PositionIcon :position="position" class="as-editor__position-icon" />
+                    <PositionIcon
+                      :position="position"
+                      class="shrink-0 text-lg text-gray-900 dark:text-white"
+                    />
                   </template>
                   <span
                     >{{ t('AutoSelect.pick.expectedChampions.fragment1') }}
-                    <span style="font-weight: bold">{{ position }}</span>
+                    <span class="font-semibold">{{ position }}</span>
                     {{ t('AutoSelect.pick.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>
@@ -113,8 +124,11 @@
             <NCollapseTransition
               :show="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
             >
-              <div class="as-editor__position">
-                <PositionIcon position="all" class="as-editor__position-icon" />
+              <div class="mb-1 flex items-center gap-2">
+                <PositionIcon
+                  position="all"
+                  class="shrink-0 text-lg text-gray-900 dark:text-white"
+                />
                 <OrderedChampionList
                   type="pick"
                   :allow-bravery="currentGroup.additionalPicks.includes(-3)"
@@ -188,16 +202,16 @@
             <NInputNumber
               size="small"
               :value="currentPickConfig.delaySeconds"
-              style="width: 120px"
+              class="w-28"
               @update:value="
                 (val) => as.setPickConfig(currentGroup!.groupId, { delaySeconds: val || 0 })
               "
             />
           </ControlItem>
 
-          <div class="as-editor__bench-options-divider"></div>
+          <div class="mb-3 border-t border-gray-200 dark:border-white/20"></div>
           <TooltipWithIcon
-            class="as-editor__subtitle"
+            class="mb-2 text-xs text-gray-600 dark:text-gray-300"
             :tooltip="t('AutoSelect.pick.benchMode.tooltip')"
           >
             <div>{{ t('AutoSelect.pick.benchMode.title') }}</div>
@@ -211,7 +225,7 @@
           >
             <NInputNumber
               size="small"
-              style="width: 120px"
+              class="w-28"
               :value="currentPickConfig.benchSwapAccumulatedDelaySeconds"
               @update:value="
                 (val) =>
@@ -278,17 +292,20 @@
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
               <div
-                class="as-editor__position"
+                class="mb-1 flex items-center gap-2"
                 v-for="position in currentGroup.positions"
                 :key="position"
               >
                 <NTooltip placement="left">
                   <template #trigger>
-                    <PositionIcon :position="position" class="as-editor__position-icon" />
+                    <PositionIcon
+                      :position="position"
+                      class="shrink-0 text-lg text-gray-900 dark:text-white"
+                    />
                   </template>
                   <span
                     >{{ t('AutoSelect.ban.expectedChampions.fragment1') }}
-                    <span style="font-weight: bold">{{
+                    <span class="font-semibold">{{
                       t(`positions.${position}`, { ns: 'common' })
                     }}</span>
                     {{ t('AutoSelect.ban.expectedChampions.fragment2') }}</span
@@ -310,8 +327,11 @@
             <NCollapseTransition
               :show="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
             >
-              <div class="as-editor__position">
-                <PositionIcon position="all" class="as-editor__position-icon" />
+              <div class="mb-1 flex items-center gap-2">
+                <PositionIcon
+                  position="all"
+                  class="shrink-0 text-lg text-gray-900 dark:text-white"
+                />
                 <OrderedChampionList
                   type="ban"
                   :allow-bravery="currentGroup.additionalBans.includes(-3)"
@@ -368,7 +388,7 @@
           >
             <NInputNumber
               size="small"
-              style="width: 120px"
+              class="w-28"
               :value="currentBanConfig.delaySeconds"
               @update:value="
                 (val) => as.setBanConfig(currentGroup!.groupId, { delaySeconds: val || 0 })
@@ -486,180 +506,4 @@ watch(
 )
 </script>
 
-<style scoped>
-.as-editor {
-  display: flex;
-  flex-direction: column;
-}
-
-.as-editor__temporary-disabled {
-  margin-bottom: 16px;
-
-  .as-editor__temporary-disabled-description {
-    margin-bottom: 4px;
-  }
-}
-
-.as-editor__groups-container {
-  display: flex;
-  gap: 16px;
-}
-
-.as-editor__selector {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.as-editor__tab-title,
-.as-editor__mode-list-title {
-  font-size: 11px;
-  color: #fff8;
-  margin-bottom: 4px;
-}
-
-.as-editor__tabs-sections {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.as-editor__tabs-section {
-  .as-editor__tab-title {
-    font-size: 11px;
-    color: #fff8;
-    margin-bottom: 4px;
-  }
-
-  &:last-child {
-    margin-bottom: 16px;
-  }
-}
-
-.as-editor__mode-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.as-editor__groups-title {
-  color: #fff8;
-  font-size: 12px;
-  margin-left: 8px;
-  margin-bottom: 4px;
-}
-
-.as-editor__groups-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.as-editor__group-item {
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  height: 28px;
-  color: #fffa;
-  padding: 0 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-  width: 180px;
-
-  .as-editor__group-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .as-editor__group-icon {
-    margin-right: 8px;
-  }
-
-  .as-editor__group-enabled-icon-wrapper {
-    display: flex;
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  .as-editor__group-enabled-icon {
-    font-size: 14px;
-  }
-
-  .as-editor__group-enabled-icon--ban {
-    color: #ffa436;
-  }
-
-  .as-editor__group-enabled-icon--pick {
-    color: #00ff00;
-  }
-
-  &:hover {
-    background-color: #fff1;
-    color: #fff;
-  }
-
-  &.as-editor__group-item--current {
-    background-color: #fff2;
-    color: #fff;
-  }
-}
-
-.as-editor__group-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.as-editor__radio-button-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  gap: 4px;
-}
-
-.as-editor__empty-group,
-.as-editor__empty-selected-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.as-editor__empty-group-title,
-.as-editor__empty-selected-group-title {
-  font-size: 12px;
-  color: #fff8;
-}
-
-.as-editor__subtitle {
-  font-size: 12px;
-  color: #fff8;
-  margin-bottom: 8px;
-}
-
-.as-editor__spacer {
-  height: 8px;
-}
-
-.as-editor__bench-options-divider {
-  border-top: 1px solid #fff2;
-  margin-bottom: 12px;
-}
-
-.as-editor__position {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 4px;
-
-  .as-editor__position-icon {
-    color: #fff;
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-}
-</style>
+<style scoped></style>

@@ -2435,10 +2435,9 @@ Placeholder:
   idle: 当前没有进行中的活动
   spectating: 等待观战中
 
-Opgg:
+OpggTabAndFilters:
   toOpgg: 转到 OP.GG
   refresh: 刷新
-  close: 关闭
   champions: 梯队
   champion: 英雄
   empty: 无
@@ -2447,51 +2446,6 @@ Opgg:
   rankTier: 段位
   position: 位置
   version: 版本
-  replace: 提供
-  create: 创建
-  notConnected: 未连接到客户端，部分资源无法加载
-  cancel: 取消
-  noVersionFound: 未找到版本
-
-  settings:
-    button: 设置
-    title: OP.GG 设置
-
-    enabled:
-      label: 开启
-      description: 启用 OP.GG 窗口。关闭后，可在主菜单重新启用它
-
-    flashPosition:
-      label: 闪现位置偏好
-      description: 在设置召唤师技能时，放置闪现的位置
-      auto: 当前位置
-      options:
-        d: 闪现位置默认在 D
-        f: 闪现位置默认在 F
-        auto: 根据当前闪现的位置决定
-
-    autoApplyRunes:
-      label: 自动应用符文
-      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
-
-    autoApplySpells:
-      label: 自动应用召唤师技能
-      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
-
-    autoApplyItems:
-      label: 自动应用装备方案
-      description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
-
-  success: '请求已发送: {{reason}}'
-  summonerSpells: 召唤师技能
-  runes: 符文配法
-  loadVersionsFailedMessage: 获取版本数据失败：{{reason}}
-  loadTierFailedMessage: 获取梯队数据失败：{{reason}}
-  loadChampionFailedMessage: 获取英雄数据失败：{{reason}}
-  setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
-  setRunesFailedMessage: 设置符文配法失败：{{reason}}
-  spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
-  runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
 
   modes:
     ranked: '排位'
@@ -2542,7 +2496,10 @@ Opgg:
     grandmaster: '宗师'
     challenger: '王者'
 
-OpggTier:
+  settings:
+    button: 设置
+
+OpggChampionTable:
   searchPlaceholder: 查找英雄
   columns:
     champion: 英雄
@@ -2551,6 +2508,48 @@ OpggTier:
     pickRate: 登场率
     counter: 劣势对位
     banRate: 禁用率
+  cancel: 取消
+
+OpggView:
+  replace: 提供
+  create: 创建
+  noVersionFound: 未找到版本
+
+  settings:
+    title: OP.GG 设置
+
+    enabled:
+      label: 开启
+      description: 启用 OP.GG 窗口。关闭后，可在主菜单重新启用它
+
+    flashPosition:
+      label: 闪现位置偏好
+      description: 在设置召唤师技能时，放置闪现的位置
+      auto: 当前位置
+      options:
+        d: 闪现位置默认在 D
+        f: 闪现位置默认在 F
+        auto: 根据当前闪现的位置决定
+
+    autoApplyRunes:
+      label: 自动应用符文
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplySpells:
+      label: 自动应用召唤师技能
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplyItems:
+      label: 自动应用装备方案
+      description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
+
+  success: '请求已发送: {{reason}}'
+  summonerSpells: 召唤师技能
+  runes: 符文配法
+  setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
+  setRunesFailedMessage: 设置符文配法失败：{{reason}}
+  spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
+  runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
 
 OpggChampion:
   boots: 鞋子

@@ -2434,10 +2434,9 @@ Placeholder:
   idle: No active activities
   spectating: Spectating
 
-Opgg:
+OpggTabAndFilters:
   toOpgg: Go to OP.GG
   refresh: Refresh
-  close: Close
   champions: Tier
   champion: Champion
   empty: None
@@ -2446,51 +2445,6 @@ Opgg:
   rankTier: Rank Tier
   position: Position
   version: Version
-  replace: Provide
-  create: Create
-  notConnected: Not connected to the client, some resources may not be loaded
-  cancel: Cancel
-  noVersionFound: No version found
-
-  settings:
-    button: Settings
-    title: OP.GG Settings
-
-    enabled:
-      label: Enable
-      description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
-
-    flashPosition:
-      label: Flash Position Preference
-      description: The position for Flash when setting summoner spells
-      auto: Current position
-      options:
-        d: Default Flash position is D
-        f: Default Flash position is F
-        auto: Decide based on the current Flash position
-
-    autoApplyRunes:
-      label: Auto Apply Runes
-      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-    autoApplySpells:
-      label: Auto Apply Summoner Spells
-      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-    autoApplyItems:
-      label: Auto Apply Item Builds
-      description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-  success: 'Request sent: {{reason}}'
-  summonerSpells: Summoner Spells
-  runes: Rune Builds
-  loadVersionsFailedMessage: 'Failed to fetch version data: {{reason}}'
-  loadTierFailedMessage: 'Failed to fetch tier data: {{reason}}'
-  loadChampionFailedMessage: 'Failed to fetch champion data: {{reason}}'
-  setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
-  setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
-  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
-  runesSet: '[League Akari] {{action}} rune build: {{name}}'
 
   modes:
     ranked: 'Ranked'
@@ -2541,7 +2495,10 @@ Opgg:
     grandmaster: 'Grandmaster'
     challenger: 'Challenger'
 
-OpggTier:
+  settings:
+    button: Settings
+
+OpggChampionTable:
   searchPlaceholder: Search for name
   columns:
     champion: Name
@@ -2550,6 +2507,48 @@ OpggTier:
     pickRate: P/R
     counter: Counters
     banRate: B/R
+  cancel: Cancel
+
+OpggView:
+  replace: Provide
+  create: Create
+  noVersionFound: No version found
+
+  settings:
+    title: OP.GG Settings
+
+    enabled:
+      label: Enable
+      description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+
+    flashPosition:
+      label: Flash Position Preference
+      description: The position for Flash when setting summoner spells
+      auto: Current position
+      options:
+        d: Default Flash position is D
+        f: Default Flash position is F
+        auto: Decide based on the current Flash position
+
+    autoApplyRunes:
+      label: Auto Apply Runes
+      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+    autoApplySpells:
+      label: Auto Apply Summoner Spells
+      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+    autoApplyItems:
+      label: Auto Apply Item Builds
+      description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+  success: 'Request sent: {{reason}}'
+  summonerSpells: Summoner Spells
+  runes: Rune Builds
+  setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
+  setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
+  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+  runesSet: '[League Akari] {{action}} rune build: {{name}}'
 
 OpggChampion:
   boots: Boots

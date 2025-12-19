@@ -5,7 +5,7 @@
       <template #description>
         <div class="flex flex-col items-center gap-2">
           <NButton size="tiny" secondary @click="cancel">
-            {{ t('Opgg.cancel') }}
+            {{ t('OpggChampion.cancel') }}
           </NButton>
         </div>
       </template>
@@ -37,7 +37,7 @@
               class="text-[13px] text-black/80 dark:text-white/80"
               v-if="position && position !== 'none'"
             >
-              {{ t(`Opgg.positions.${position}`) || position }}
+              {{ t(`OpggTabAndFilters.positions.${position}`) || position }}
             </div>
           </div>
         </div>

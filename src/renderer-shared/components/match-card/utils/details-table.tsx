@@ -1,4 +1,4 @@
-import { useNumberFormatter } from '@renderer-shared/composables/useNumebrFormatter'
+import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { Participant } from '@shared/types/league-client/match-history'
 import { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { useTranslation } from 'i18next-vue'

@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNumberFormatter } from '@renderer-shared/composables/useNumebrFormatter'
+import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'

@@ -85,7 +85,7 @@
 
       <!-- empty -->
       <div
-        class="flex h-16 w-full items-center justify-center text-sm text-white/50 dark:text-white/50"
+        class="flex h-16 w-full items-center justify-center text-sm text-black/50 dark:text-white/50"
         v-else
       >
         {{ t('OpggChampion.empty') }}

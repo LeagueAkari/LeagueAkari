@@ -55,13 +55,13 @@ export function useLoadout() {
         spell2Id: newSpell2Id
       })
 
-      message.success(() => t('Opgg.success', { reason: t('Opgg.summonerSpells') }))
+      message.success(() => t('OpggView.success', { reason: t('OpggView.summonerSpells') }))
 
       if (lcs.chat.conversations.championSelect) {
         lc.api.chat
           .chatSend(
             lcs.chat.conversations.championSelect.id,
-            t('Opgg.spellsSet', {
+            t('OpggView.spellsSet', {
               spell1: lcs.gameData.summonerSpellName(newSpell1Id),
               spell2: lcs.gameData.summonerSpellName(newSpell2Id)
             }),
@@ -71,7 +71,7 @@ export function useLoadout() {
       }
     } catch (error) {
       log.warn(componentName, '	set summoner spells failed', error)
-      message.warning(t('Opgg.setSpellsFailedMessage', { reason: (error as any).message }))
+      message.warning(t('OpggView.setSpellsFailedMessage', { reason: (error as any).message }))
     }
   }
 
@@ -81,7 +81,9 @@ export function useLoadout() {
       return `[OP.GG] ${lcs.gameData.championName(championId)}`
     }
 
-    return `[OP.GG] ${lcs.gameData.championName(championId)} - ${t(`Opgg.positions.${position}`)}`
+    return `[OP.GG] ${lcs.gameData.championName(championId)} - ${t(
+      `OpggTabAndFilters.positions.${position}`
+    )}`
   }
 
   const setRunes = async (
@@ -149,21 +151,21 @@ export function useLoadout() {
         await lc.api.perks.putCurrentPage(page1.id)
       }
 
-      message.success(() => t('Opgg.success', { reason: t('Opgg.runes') }))
+      message.success(() => t('OpggView.success', { reason: t('OpggView.runes') }))
 
       if (lcs.chat.conversations.championSelect) {
         lc.api.chat.chatSend(
           lcs.chat.conversations.championSelect.id,
-          t('Opgg.runesSet', {
+          t('OpggView.runesSet', {
             name: getRunePageName(championId, position),
-            action: newRunePageAdded ? t('Opgg.create') : t('Opgg.replace')
+            action: newRunePageAdded ? t('OpggView.create') : t('OpggView.replace')
           }),
           'celebration'
         )
       }
     } catch (error) {
       log.warn(componentName, 'set runes failed', error)
-      message.warning(t('Opgg.setRunesFailedMessage', { reason: (error as any).message }))
+      message.warning(t('OpggView.setRunesFailedMessage', { reason: (error as any).message }))
     }
   }
 
@@ -185,13 +187,13 @@ export function useLoadout() {
     let title = `[OP.GG] ${championName}`
 
     if (mode) {
-      const modeName = t(`Opgg.modes.${mode}`)
+      const modeName = t(`OpggTabAndFilters.modes.${mode}`)
       title += ` - ${modeName || mode}`
     }
 
     const hasPosition = position && position !== 'none'
     if (hasPosition) {
-      const positionName = t(`Opgg.positions.${position}`)
+      const positionName = t(`OpggTabAndFilters.positions.${position}`)
       title += ` - ${positionName || position}`
     }
 
@@ -206,7 +208,7 @@ export function useLoadout() {
 
     const hasPosition = position && position !== 'none'
     if (hasPosition) {
-      const positionName = t(`Opgg.positions.${position}`)
+      const positionName = t(`OpggTabAndFilters.positions.${position}`)
       name += ` - ${positionName || position}`
     }
 

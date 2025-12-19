@@ -36,65 +36,67 @@
 
           <!-- stats line -->
           <div class="flex min-w-0 flex-1 items-center gap-2">
-            <!-- KDA -->
-            <div class="min-w-22">
-              <div class="flex items-center justify-center gap-0.5">
-                <div class="text-base font-bold text-black dark:text-white">
-                  {{ participant.kills }}
-                </div>
-                <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
-                <div class="text-base font-bold text-red-600 dark:text-red-300">
-                  {{ participant.deaths }}
-                </div>
-                <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
-                <div class="text-base font-bold text-black dark:text-white">
-                  {{ participant.assists }}
-                </div>
-              </div>
-
-              <!-- KDA value -->
-              <div
-                class="flex justify-center text-xs text-yellow-700 dark:text-yellow-200"
-                v-if="
-                  participant.deaths === 0 && (participant.kills > 0 || participant.assists > 0)
-                "
-              >
-                {{ t('MatchCard.overview.perfect') }}
-                ({{ (participant.killParticipation * 100).toFixed(0) }}%)
-              </div>
-
-              <div class="flex justify-center gap-1" v-else>
-                <div class="text-xs text-black/80 dark:text-white/80">
-                  {{ participant.kda.toFixed(2) }}
-                </div>
-                <div class="text-xs text-black/60 dark:text-white/60">KDA</div>
-                <div class="text-xs text-black/80 dark:text-white/80">
-                  ({{ (participant.killParticipation * 100).toFixed(0) }}%)
-                </div>
-              </div>
-            </div>
-
             <!-- DMG -->
-            <NPopover>
+            <NPopover :delay="300">
               <template #trigger>
-                <div class="min-w-22">
-                  <div class="text-center text-base font-bold">
-                    {{
-                      (
-                        (participant.totalDamageDealtToChampions /
-                          (teams.teamStatMap[participant.teamIdentifier]
-                            .totalDamageDealtToChampions || 1)) *
-                        100
-                      ).toFixed(0)
-                    }}%
+                <div class="flex gap-2">
+                  <!-- KDA -->
+                  <div class="min-w-22">
+                    <div class="flex items-center justify-center gap-0.5">
+                      <div class="text-base font-bold text-black dark:text-white">
+                        {{ participant.kills }}
+                      </div>
+                      <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
+                      <div class="text-base font-bold text-red-600 dark:text-red-300">
+                        {{ participant.deaths }}
+                      </div>
+                      <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
+                      <div class="text-base font-bold text-black dark:text-white">
+                        {{ participant.assists }}
+                      </div>
+                    </div>
+
+                    <!-- KDA value -->
+                    <div
+                      class="flex justify-center text-xs text-yellow-700 dark:text-yellow-200"
+                      v-if="
+                        participant.deaths === 0 &&
+                        (participant.kills > 0 || participant.assists > 0)
+                      "
+                    >
+                      {{ t('MatchCard.overview.perfect') }}
+                      ({{ (participant.killParticipation * 100).toFixed(0) }}%)
+                    </div>
+
+                    <div class="flex justify-center gap-1" v-else>
+                      <div class="text-xs text-black/80 dark:text-white/80">
+                        {{ participant.kda.toFixed(2) }}
+                      </div>
+                      <div class="text-xs text-black/80 dark:text-white/80">
+                        ({{ (participant.killParticipation * 100).toFixed(0) }}%)
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="flex justify-center gap-1">
-                    <div class="text-xs text-black/80 dark:text-white/80">
-                      {{ participant.totalDamageDealtToChampions.toLocaleString() }}
+                  <div class="min-w-22">
+                    <div class="text-center text-base font-bold">
+                      {{
+                        (
+                          (participant.totalDamageDealtToChampions /
+                            (teams.teamStatMap[participant.teamIdentifier]
+                              .totalDamageDealtToChampions || 1)) *
+                          100
+                        ).toFixed(0)
+                      }}%
                     </div>
-                    <div class="text-xs text-black/60 dark:text-white/60">
-                      {{ t('MatchCard.overview.damage') }}
+
+                    <div class="flex justify-center gap-1">
+                      <div class="text-xs text-black/80 dark:text-white/80">
+                        {{ formatExtremeNumber(participant.totalDamageDealtToChampions) }}
+                      </div>
+                      <div class="text-xs text-black/60 dark:text-white/60">
+                        {{ t('MatchCard.overview.damage') }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -348,6 +350,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
@@ -384,6 +387,8 @@ const {
   hidePrivacy,
   onNavigateToSummonerByPuuid
 } = useMatchCard()
+
+const { formatExtremeNumber } = useNumberFormatter()
 
 const gameResultName = useGameResultName()
 
