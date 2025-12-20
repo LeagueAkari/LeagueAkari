@@ -8,12 +8,12 @@
     <template #trigger>
       <LcuImage
         :src="lcs.gameData.items[itemId].iconPath"
-        v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="item"
         :class="{ trinket: isTrinket, item: !isTrinket }"
       />
     </template>
+
     <div class="info">
       <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
@@ -30,6 +30,7 @@
         </div>
       </div>
     </div>
+
     <div class="from" v-if="lcs.gameData.items[itemId].from.length !== 0">
       <LcuImage
         class="image"
@@ -39,6 +40,7 @@
         :key="item"
       />
     </div>
+
     <div class="to" v-if="lcs.gameData.items[itemId].to.length !== 0">
       <LcuImage
         class="image"
@@ -48,20 +50,22 @@
         :key="item"
       />
     </div>
+
     <div
       :style="{ maxWidth: `${maxWidth}px` }"
-      style="font-size: 12px"
+      class="text-xs"
       lol-view
       v-html="lcs.gameData.items[itemId].description"
-    ></div>
+    />
   </NPopover>
+
   <div
     v-else
     :style="{ width: `${size}px`, height: `${size}px` }"
     :class="{ trinket: isTrinket, item: !isTrinket }"
     v-bind="$attrs"
     class="empty"
-  ></div>
+  />
 </template>
 
 <script setup lang="ts">

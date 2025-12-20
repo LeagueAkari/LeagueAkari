@@ -5,7 +5,7 @@ export const GROUPS = [
   {
     groupId: 'ranked', // 独一无二的标注
     // 匹配自定义对局
-    isCumstom: false,
+    isCustom: false,
     // 适用的游戏模式，* 表示所有
     targetGameModes: [
       {
@@ -21,7 +21,7 @@ export const GROUPS = [
   },
   {
     groupId: 'normal',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'CLASSIC',
@@ -36,7 +36,7 @@ export const GROUPS = [
   },
   {
     groupId: 'aram',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'ARAM',
@@ -55,7 +55,7 @@ export const GROUPS = [
   },
   {
     groupId: 'cherry',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'CHERRY',
@@ -70,7 +70,7 @@ export const GROUPS = [
   },
   {
     groupId: 'urf',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'URF',
@@ -85,7 +85,7 @@ export const GROUPS = [
   },
   {
     groupId: 'oneforall',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'ONEFORALL',
@@ -100,7 +100,7 @@ export const GROUPS = [
   },
   {
     groupId: 'ultbook',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'ULTBOOK',
@@ -115,7 +115,7 @@ export const GROUPS = [
   },
   {
     groupId: 'bot',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'SWIFTPLAY',
@@ -130,11 +130,15 @@ export const GROUPS = [
   },
   {
     groupId: 'custom',
-    isCumstom: false,
+    isCustom: true,
     targetGameModes: [
       {
         gameMode: 'CLASSIC',
-        queueTypes: ['PRACTICE_GAME']
+        queueTypes: ['NORMAL']
+      },
+      {
+        gameMode: 'PRACTICETOOL',
+        queueTypes: ['NORMAL']
       }
     ],
     positions: ['default'],
@@ -145,7 +149,7 @@ export const GROUPS = [
   },
   {
     groupId: 'ruby',
-    isCumstom: false,
+    isCustom: false,
     targetGameModes: [
       {
         gameMode: 'RUBY',

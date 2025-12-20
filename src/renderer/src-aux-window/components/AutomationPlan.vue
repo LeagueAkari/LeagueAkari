@@ -1,101 +1,105 @@
 <template>
   <NCard size="small" v-if="hasDelayedItems">
-    <div v-if="as2.delayedPick" class="delayed-item">
-      <div class="delayed-item__title">{{ t('AutomationPlan.autoPick.title') }}</div>
-      <div class="delayed-item__detail">
-        <div class="delayed-item__label">
-          <span class="delayed-item__action">{{ t('AutomationPlan.autoPick.willPick') }}</span>
-          <div class="delayed-item__champion">
-            <ChampionIcon
-              class="delayed-item__champion-icon"
-              :champion-id="as2.delayedPick.championId"
-            />
-            <div class="delayed-item__champion-name">
+    <div v-if="as2.delayedPick" class="flex flex-col gap-1 not-last:mb-1">
+      <div class="text-sm font-bold text-black/90 dark:text-white">
+        {{ t('AutomationPlan.autoPick.title') }}
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-black/90 dark:text-white">{{
+            t('AutomationPlan.autoPick.willPick')
+          }}</span>
+          <div class="flex items-center gap-1">
+            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedPick.championId" />
+            <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedPick.championId) }}
             </div>
-            <div class="delayed-item__delay">{{ formatMsToSeconds(pickCountdown) }}s</div>
+            <div class="text-xs text-black/90 dark:text-white">
+              {{ formatMsToSeconds(pickCountdown) }}s
+            </div>
           </div>
         </div>
       </div>
-      <NProgress
-        class="delayed-item__progress"
-        :height="2"
-        :show-indicator="false"
-        :percentage="pickProgress * 100"
-      />
+      <NProgress :height="2" :show-indicator="false" :percentage="pickProgress * 100" />
     </div>
-    <div v-if="as2.delayedBan" class="delayed-item">
-      <div class="delayed-item__title">{{ t('AutomationPlan.autoBan.title') }}</div>
-      <div class="delayed-item__detail">
-        <div class="delayed-item__label">
-          <span class="delayed-item__action">{{ t('AutomationPlan.autoBan.willBan') }}</span>
-          <div class="delayed-item__champion">
-            <ChampionIcon
-              class="delayed-item__champion-icon"
-              :champion-id="as2.delayedBan.championId"
-            />
-            <div class="delayed-item__champion-name">
+
+    <div v-if="as2.delayedBan" class="flex flex-col gap-1 not-last:mb-1">
+      <div class="text-sm font-bold text-black/90 dark:text-white">
+        {{ t('AutomationPlan.autoBan.title') }}
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-black/90 dark:text-white">{{
+            t('AutomationPlan.autoBan.willBan')
+          }}</span>
+          <div class="flex items-center gap-1">
+            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBan.championId" />
+            <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedBan.championId) }}
             </div>
-            <div class="delayed-item__delay">{{ formatMsToSeconds(banCountdown) }}s</div>
+            <div class="text-xs text-black/90 dark:text-white">
+              {{ formatMsToSeconds(banCountdown) }}s
+            </div>
           </div>
         </div>
       </div>
-      <NProgress
-        class="delayed-item__progress"
-        :height="2"
-        :show-indicator="false"
-        :percentage="banProgress * 100"
-      />
+      <NProgress :height="2" :show-indicator="false" :percentage="banProgress * 100" />
     </div>
-    <div v-if="as2.delayedBenchSwap" class="delayed-item">
-      <div class="delayed-item__title">{{ t('AutomationPlan.autoBenchSwap.title') }}</div>
-      <div class="delayed-item__detail">
-        <div class="delayed-item__label">
-          <span class="delayed-item__action">{{ t('AutomationPlan.autoBenchSwap.willSwap') }}</span>
-          <div class="delayed-item__champion">
-            <ChampionIcon
-              class="delayed-item__champion-icon"
-              :champion-id="as2.delayedBenchSwap.championId"
-            />
-            <div class="delayed-item__champion-name">
+
+    <div v-if="as2.delayedBenchSwap" class="flex flex-col gap-1 not-last:mb-1">
+      <div class="text-sm font-bold text-black/90 dark:text-white">
+        {{ t('AutomationPlan.autoBenchSwap.title') }}
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-black/90 dark:text-white">{{
+            t('AutomationPlan.autoBenchSwap.willSwap')
+          }}</span>
+          <div class="flex items-center gap-1">
+            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBenchSwap.championId" />
+            <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedBenchSwap.championId) }}
             </div>
-            <div class="delayed-item__delay">{{ formatMsToSeconds(benchSwapCountdown) }}s</div>
+            <div class="text-xs text-black/90 dark:text-white">
+              {{ formatMsToSeconds(benchSwapCountdown) }}s
+            </div>
           </div>
         </div>
       </div>
       <NProgress
         :height="2"
         :border-radius="0"
-        class="delayed-item__progress"
         :show-indicator="false"
         :percentage="benchSwapProgress * 100"
       />
     </div>
-    <div v-if="as2.delayedChampionSwap" class="delayed-item">
-      <div class="delayed-item__title">{{ t('AutomationPlan.autoChampionSwap.title') }}</div>
-      <div class="delayed-item__detail">
-        <div class="delayed-item__label">
-          <span class="delayed-item__action">{{
+
+    <div v-if="as2.delayedChampionSwap" class="flex flex-col gap-1 not-last:mb-1">
+      <div class="text-sm font-bold text-black/90 dark:text-white">
+        {{ t('AutomationPlan.autoChampionSwap.title') }}
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-black/90 dark:text-white">{{
             t('AutomationPlan.autoChampionSwap.willAccept')
           }}</span>
-          <div class="delayed-item__champion">
+          <div class="flex items-center gap-1">
             <ChampionIcon
-              class="delayed-item__champion-icon"
+              class="h-4 w-4"
               :champion-id="as2.delayedChampionSwap.requesterChampionId"
             />
-            <div class="delayed-item__champion-name">
+            <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedChampionSwap.requesterChampionId) }}
             </div>
-            <div class="delayed-item__delay">{{ formatMsToSeconds(championSwapCountdown) }}s</div>
+            <div class="text-xs text-black/90 dark:text-white">
+              {{ formatMsToSeconds(championSwapCountdown) }}s
+            </div>
           </div>
         </div>
       </div>
       <NProgress
         :height="2"
         :border-radius="0"
-        class="delayed-item__progress"
         :show-indicator="false"
         :percentage="championSwapProgress * 100"
       />
@@ -148,70 +152,4 @@ const formatMsToSeconds = (ms: number) => {
 }
 </script>
 
-<style scoped>
-.delayed-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  &:not(:last-child) {
-    margin-bottom: 4px;
-  }
-
-  .delayed-item__title {
-    font-size: 14px;
-    font-weight: bold;
-    color: #000a;
-  }
-
-  .delayed-item__detail {
-    flex: 1;
-  }
-
-  .delayed-item__label,
-  .delayed-item__champion {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .delayed-item__action {
-    font-size: 12px;
-    color: #000a;
-  }
-
-  .delayed-item__champion-icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .delayed-item__champion-name {
-    font-size: 12px;
-    font-weight: bold;
-    color: #000;
-  }
-
-  .delayed-item__delay {
-    font-size: 12px;
-    color: #000a;
-  }
-
-  [data-theme='dark'] & {
-    .delayed-item__title {
-      color: #fff;
-    }
-
-    .delayed-item__action {
-      color: #fff;
-    }
-
-    .delayed-item__champion-name {
-      color: #fff;
-    }
-
-    .delayed-item__delay {
-      color: #fff;
-    }
-  }
-}
-</style>
+<style scoped></style>

@@ -1,27 +1,38 @@
 <template>
   <NCard size="small" v-if="myActions && myActions.length">
-    <NScrollbar :class="$style['scrollbar']" ref="scrollbar">
+    <NScrollbar class="max-h-[240px]!" ref="scrollbar">
       <NTimeline>
         <NTimelineItem v-for="a of myActions" :type="getTimelineTypeByAction(a)">
           <template #header>
             <span
-              class="action"
-              :class="{ completed: a.completed, 'in-progress': a.isInProgress }"
+              class="text-[11px]"
+              :class="{
+                'brightness-80': a.completed,
+                'text-black dark:text-white': a.isInProgress,
+                'text-black/60 dark:text-white/60': !a.isInProgress
+              }"
               >{{ formatActionTypeText(a) }}</span
             >
           </template>
+
           <template v-if="a.completed">
-            <div class="solution completed" v-if="a.type === 'pick'">
-              <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
-              <span class="label">{{ t('ChampSelectActions.picked') }}</span>
+            <div class="flex items-center gap-1 brightness-80" v-if="a.type === 'pick'">
+              <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
+              <span class="text-[10px] text-black/60 dark:text-white/60">{{
+                t('ChampSelectActions.picked')
+              }}</span>
             </div>
-            <div class="solution completed" v-else-if="a.type === 'vote'">
-              <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
-              <span class="label">{{ t('ChampSelectActions.voted') }}</span>
+            <div class="flex items-center gap-1 brightness-80" v-else-if="a.type === 'vote'">
+              <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
+              <span class="text-[10px] text-black/60 dark:text-white/60">{{
+                t('ChampSelectActions.voted')
+              }}</span>
             </div>
-            <div class="solution completed" v-else-if="a.type === 'ban'">
-              <ChampionIcon class="image" :stretched="false" :champion-id="a.championId" />
-              <span class="label">{{ t('ChampSelectActions.banned') }}</span>
+            <div class="flex items-center gap-1 brightness-80" v-else-if="a.type === 'ban'">
+              <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
+              <span class="text-[10px] text-black/60 dark:text-white/60">{{
+                t('ChampSelectActions.banned')
+              }}</span>
             </div>
           </template>
         </NTimelineItem>
@@ -104,42 +115,3 @@ const myActions = computed(() => {
     .map((arr) => arr[0])
 })
 </script>
-
-<style scoped>
-.action {
-  font-size: 11px;
-  color: rgb(146, 146, 146);
-}
-
-.action.completed,
-.solution.completed {
-  filter: brightness(0.8);
-}
-
-.action.in-progress {
-  color: #ffffff;
-}
-
-.solution {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  .label {
-    font-size: 10px;
-    color: rgb(146, 146, 146);
-  }
-
-  .image {
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-  }
-}
-</style>
-
-<style module>
-.scrollbar {
-  max-height: 240px;
-}
-</style>

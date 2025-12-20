@@ -1,5 +1,7 @@
 import 'reflect-metadata'
 
+import '@renderer-shared/assets/css/tailwind.css'
+
 import '@renderer-shared/assets/css/base-styles.css'
 import '@renderer-shared/assets/css/lol-view.css'
 import { i18next } from '@renderer-shared/i18n'

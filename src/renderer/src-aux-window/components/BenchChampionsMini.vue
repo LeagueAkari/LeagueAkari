@@ -1,7 +1,7 @@
 <template>
   <NCard size="small" v-if="combinedChampions && gameMode">
-    <div class="outer">
-      <div class="operations">
+    <div class="flex items-center justify-center">
+      <div class="flex flex-col items-center gap-1">
         <NTooltip
           raw
           :show-arrow="false"
@@ -11,29 +11,38 @@
           :disabled="!hasChampionAdjustment(lcs.champSelect.currentChampion || -1)"
         >
           <template #trigger>
-            <LcuImage
-              class="champion-image"
-              style="border-radius: 50%; cursor: default"
-              :class="championAdjustment(lcs.champSelect.currentChampion || -1)?.overallEffect"
-              :src="championIconUri(lcs.champSelect.currentChampion || -1)"
+            <ChampionIcon
+              class="size-9 cursor-default rounded-full border border-black/10 dark:border-white/10"
+              :class="
+                getChampionImageClasses(
+                  championAdjustment(lcs.champSelect.currentChampion || -1)?.overallEffect
+                )
+              "
+              :champion-id="lcs.champSelect.currentChampion || -1"
             />
           </template>
-          <div class="raw-popover">
+          <div class="rounded-sm bg-black/90 px-2 py-1 dark:bg-white/90">
             <div
-              class="balance-item"
+              class="flex text-[11px] text-black/60 dark:text-white/60"
               v-for="b of championAdjustment(lcs.champSelect.currentChampion || -1)
                 ?.sortedAdjustments"
               :key="b.type"
             >
-              <span class="balance-item-name">{{ balanceTypes[b.type]?.name || b.type }}</span>
-              <span class="balance-item-value" :class="b.effect">{{ b.formattedValue }}</span>
+              <span class="flex-1">{{ fandomBalanceTypes[b.type]?.name || b.type }}</span>
+              <span
+                class="min-w-[36px] text-right whitespace-nowrap"
+                :class="getBalanceValueClasses(b.effect)"
+                >{{ b.formattedValue }}</span
+              >
             </div>
-            <div class="balance-data-source-name">{{ SOURCE_NAME[source] }}</div>
+            <div class="mt-1 text-[10px] text-gray-400 dark:text-gray-500">
+              {{ SOURCE_NAME[source] }}
+            </div>
           </div>
         </NTooltip>
 
         <!-- 新版大乱斗将不再有 Reroll 机制 -->
-        <div class="btns">
+        <div class="flex gap-1">
           <NButton
             v-if="shouldShowRerollButton"
             @click="() => handleReroll()"
@@ -69,8 +78,10 @@
           </NButton>
         </div>
       </div>
+
       <NDivider vertical />
-      <div class="champions">
+
+      <div class="grid grid-cols-5 gap-1">
         <NTooltip
           raw
           :show-arrow="false"
@@ -82,32 +93,43 @@
           :disabled="!hasChampionAdjustment(c.championId)"
         >
           <template #trigger>
-            <LcuImage
-              class="champion-image"
-              :class="{
-                'champion-image-invalid': !isChampionSwappable(c.championId) || !canUseBench,
-                [championAdjustment(c.championId)?.overallEffect || 'neutral']: true
-              }"
-              :src="championIconUri(c.championId)"
+            <ChampionIcon
+              class="size-9 cursor-pointer rounded-sm border border-black/10 dark:border-white/10"
+              :class="[
+                getChampionImageClasses(
+                  championAdjustment(c.championId)?.overallEffect || 'neutral'
+                ),
+                {
+                  'cursor-not-allowed grayscale-[0.8]':
+                    !isChampionSwappable(c.championId) || !canUseBench
+                }
+              ]"
+              :champion-id="c.championId"
               @click="() => handleBenchSwapOrPick(c.championId)"
               @click.right="handleBenchSwapOrPick(c.championId, false)"
             />
           </template>
-          <div class="raw-popover">
+          <div class="rounded-sm bg-black/90 px-2 py-1 dark:bg-white/90">
             <div
-              class="balance-item"
+              class="flex text-[11px] text-black/60 dark:text-white/60"
               v-for="b of championAdjustment(c.championId)?.sortedAdjustments"
               :key="b.type"
             >
-              <span class="balance-item-name">{{ b.name }}</span>
-              <span class="balance-item-value" :class="b.effect">{{ b.formattedValue }}</span>
+              <span class="flex-1">{{ b.name }}</span>
+              <span
+                class="min-w-[36px] text-right whitespace-nowrap"
+                :class="getBalanceValueClasses(b.effect)"
+                >{{ b.formattedValue }}</span
+              >
             </div>
-            <div class="balance-data-source-name">{{ SOURCE_NAME[source] }}</div>
+            <div class="mt-1 text-[10px] text-black/40 dark:text-white/40">
+              {{ SOURCE_NAME[source] }}
+            </div>
           </div>
         </NTooltip>
         <div
           v-for="_i of Math.max(10 - combinedChampions.length, 0)"
-          class="champion-image-placeholder"
+          class="size-9 rounded-sm border border-black/10 dark:border-white/10"
         />
       </div>
     </div>
@@ -115,12 +137,14 @@
 </template>
 
 <script setup lang="ts">
-import { BalanceAdjustment, useChampionBalanceData } from '@aux-window/composables/useBalanceData'
-import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import {
+  BalanceAdjustment,
+  useChampionBalanceData
+} from '@aux-window/composables/useFandomBalanceData'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -143,7 +167,7 @@ const gameMode = computed(() => {
   return lcs.gameflow.session.gameData.queue.gameMode
 })
 
-const balanceTypes = computed(() => {
+const fandomBalanceTypes = computed(() => {
   return {
     'damage-dealt': {
       name: t('BenchChampionsMini.balanceTypes.damage-dealt'),
@@ -227,8 +251,8 @@ const championAdjustment = (championId: number) => {
     ...modeAdjustment,
     sortedAdjustments: modeAdjustment.adjustments
       .toSorted((a, b) => {
-        const aBalanceOrder = balanceTypes.value[a.type]?.order ?? 0
-        const bBalanceOrder = balanceTypes.value[b.type]?.order ?? 0
+        const aBalanceOrder = fandomBalanceTypes.value[a.type]?.order ?? 0
+        const bBalanceOrder = fandomBalanceTypes.value[b.type]?.order ?? 0
 
         if (aBalanceOrder !== bBalanceOrder) {
           return aBalanceOrder - bBalanceOrder
@@ -242,7 +266,7 @@ const championAdjustment = (championId: number) => {
 
       .map((item) => ({
         ...item,
-        name: balanceTypes.value[item.type]?.name || item.type,
+        name: fandomBalanceTypes.value[item.type]?.name || item.type,
         formattedValue: formatValue(item)
       }))
   }
@@ -354,6 +378,30 @@ const message = useMessage()
 const isRerolling = ref(false)
 const isSwappingOrPicking = ref(false)
 
+const getChampionImageClasses = (effect?: string) => {
+  switch (effect) {
+    case 'buffed':
+      return 'border-emerald-600 dark:border-emerald-400'
+    case 'nerfed':
+      return 'border-orange-600 dark:border-orange-400'
+    case 'mixed':
+      return 'champion-image-mixed border'
+    default:
+      return ''
+  }
+}
+
+const getBalanceValueClasses = (effect?: string) => {
+  switch (effect) {
+    case 'buffed':
+      return 'text-emerald-500 dark:text-emerald-300'
+    case 'nerfed':
+      return 'text-orange-500 dark:text-orange-300'
+    default:
+      return ''
+  }
+}
+
 // complete takes effect only when in ban-pick phase
 const handleBenchSwapOrPick = async (championId: number, complete = true) => {
   if (isSwappingOrPicking.value) {
@@ -427,99 +475,13 @@ const handleReroll = async (grabBack = false) => {
 </script>
 
 <style scoped>
-.outer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.operations {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.btns {
-  display: flex;
-  gap: 4px;
-}
-
-.champions {
-  display: grid;
-  grid-template-columns: repeat(5, auto);
-  gap: 4px;
-}
-
-.champion-image {
-  width: 36px;
-  height: 36px;
-  border-radius: 2px;
-  cursor: pointer;
-  box-sizing: border-box;
+.champion-image-mixed {
   border-style: solid;
   border-width: 1px;
-  border-color: rgb(72, 72, 72);
-}
-
-.champion-image.buffed {
-  border-width: 1px;
-  border-color: rgb(0, 161, 67);
-}
-
-.champion-image.nerfed {
-  border-width: 1px;
-  border-color: rgb(181, 75, 0);
-}
-
-.champion-image.mixed {
-  border-width: 1px;
-  border-style: solid;
   border-image: linear-gradient(to bottom right, rgb(0, 161, 67) 50%, rgb(181, 75, 0) 50%) 1;
-}
 
-.champion-image-invalid {
-  cursor: not-allowed;
-  filter: grayscale(0.8);
-}
-
-.champion-image-placeholder {
-  width: 36px;
-  height: 36px;
-  box-sizing: border-box;
-  border: 1px solid rgb(72, 72, 72);
-  border-radius: 2px;
-}
-
-.raw-popover {
-  background-color: rgba(0, 0, 0, 0.866);
-  padding: 4px 8px;
-  border-radius: 2px;
-}
-
-.balance-item {
-  font-size: 11px;
-  color: rgb(204, 204, 204);
-
-  .balance-item-value {
-    display: inline-block;
-    text-align: end;
-    min-width: 36px;
-    white-space: nowrap;
+  [data-theme='dark'] & {
+    border-image: linear-gradient(to bottom right, rgb(16, 185, 129) 50%, rgb(251, 146, 60) 50%) 1;
   }
-
-  .balance-item-value.buffed {
-    color: rgb(0, 219, 91);
-  }
-
-  .balance-item-value.nerfed {
-    color: rgb(255, 106, 0);
-  }
-}
-
-.balance-data-source-name {
-  margin-top: 4px;
-  font-size: 10px;
-  color: rgb(145, 145, 145);
 }
 </style>

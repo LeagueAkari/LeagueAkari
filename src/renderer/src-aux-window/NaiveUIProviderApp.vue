@@ -39,25 +39,85 @@ import App from './App.vue'
 
 const as = useAppCommonStore()
 
-const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px' },
-  Card: {
-    color: '#0000',
-    paddingSmall: '4px 12px'
-  },
-  Message: {
-    padding: '4px 8px',
-    fontSize: '12px',
-    iconSize: '16px',
-    iconMargin: '0 4px 0 0'
-  },
-  Popover: {
-    color: '#1f1f1ffa'
-  },
-  Checkbox: {
-    fontSizeSmall: '13px'
+const themeOverrides = computed<GlobalThemeOverrides>(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      common: {
+        popoverColor: '#383838f8'
+      },
+      Notification: {
+        padding: '12px',
+        titleFontSize: '13px',
+        titleFontWeight: '700',
+        descriptionFontSize: '13px',
+        avatarSize: '20px',
+        color: '#313131fa'
+      },
+      Card: {
+        color: '#0000',
+        paddingSmall: '4px 12px'
+      },
+      Message: {
+        padding: '4px 8px',
+        fontSize: '12px',
+        iconSize: '16px',
+        iconMargin: '0 4px 0 0',
+        colorInfo: '#2c2c2c',
+        colorSuccess: '#2c2c2c',
+        colorWarning: '#2c2c2c',
+        colorError: '#2c2c2c'
+      },
+      Popover: {
+        color: '#1f1f1ffa',
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        arrowColor: '#1f1f1ffa'
+      },
+      InternalSelectMenu: {
+        color: '#383838f8'
+      },
+      Checkbox: {
+        fontSizeSmall: '13px'
+      }
+    }
+  } else {
+    return {
+      common: {
+        popoverColor: '#ffffff'
+      },
+      Notification: {
+        padding: '12px',
+        titleFontSize: '13px',
+        titleFontWeight: '700',
+        descriptionFontSize: '13px',
+        avatarSize: '20px'
+      },
+      Card: {
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        color: '#0000',
+        paddingSmall: '4px 12px'
+      },
+      Message: {
+        padding: '4px 8px',
+        fontSize: '12px',
+        iconSize: '16px',
+        iconMargin: '0 4px 0 0',
+        colorInfo: '#f5f5f5',
+        colorSuccess: '#f5f5f5',
+        colorWarning: '#f5f5f5',
+        colorError: '#f5f5f5'
+      },
+      Popover: {
+        borderColor: 'rgba(0, 0, 0, 0.2)'
+      },
+      InternalSelectMenu: {
+        color: '#ffffff'
+      },
+      Checkbox: {
+        fontSizeSmall: '13px'
+      }
+    }
   }
-}
+})
 
 const NAIVE_UI_LOCALE = {
   'zh-CN': {

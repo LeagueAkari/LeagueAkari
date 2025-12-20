@@ -343,7 +343,7 @@ export class AutoSelectState {
 
     const firstGroup = this.groups.find((g) => {
       return (
-        g.isCumstom === this.isCustomGame &&
+        g.isCustom === this.isCustomGame &&
         g.targetGameModes.some((gm) => {
           return (
             gm.gameMode === this.gameMode! &&

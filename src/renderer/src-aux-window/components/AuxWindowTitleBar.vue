@@ -1,25 +1,44 @@
 <template>
-  <div class="titlebar" :class="{ blurred: aws.focus === 'blurred' }">
-    <div class="title-area">
-      <span class="title">League Akari - Mini</span>
+  <div
+    class="relative z-10000000 flex h-(--la-titlebar-height) items-center [-webkit-app-region:drag]"
+    :class="{ 'brightness-80': aws.focus === 'blurred' }"
+  >
+    <div
+      class="flex h-full flex-1 items-center px-2 pt-1 pb-0.5 transition-all"
+      :class="{ 'brightness-80': aws.focus === 'blurred' }"
+    >
+      <span class="text-xs text-black/90 dark:text-white/90"
+        >{{ t('appName', { ns: 'common' }) }} - Mini</span
+      >
     </div>
-    <div class="traffic">
+    <div
+      class="flex h-full justify-end transition-all"
+      :class="{ 'brightness-80': aws.focus === 'blurred' }"
+    >
       <div
         :title="aws.settings.pinned ? t('AuxWindowTitlebar.unpin') : t('AuxWindowTitlebar.pin')"
-        class="traffic-button pin"
-        :class="{ pinned: aws.settings.pinned }"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] active:brightness-80 dark:text-white/80"
+        :class="{
+          'bg-black/15 dark:bg-white/15': aws.settings.pinned,
+          'hover:bg-black/20 hover:text-black dark:hover:bg-white/20 dark:hover:text-white':
+            !aws.settings.pinned
+        }"
         @click="() => handlePin(!aws.settings.pinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
       <div
         :title="t('AuxWindowTitlebar.minimize')"
-        class="traffic-button minimize"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] hover:bg-black/20 hover:text-black active:brightness-80 dark:text-white/80 dark:hover:bg-white/20 dark:hover:text-white"
         @click="handleMinimize"
       >
-        <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
+        <NIcon class="rotate-90"><DividerShort20RegularIcon /></NIcon>
       </div>
-      <div :title="t('AuxWindowTitlebar.close')" class="traffic-button close" @click="handleClose">
+      <div
+        :title="t('AuxWindowTitlebar.close')"
+        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all [-webkit-app-region:no-drag] hover:bg-red-600 hover:text-white active:brightness-80"
+        @click="handleClose"
+      >
         <NIcon><CloseIcon /></NIcon>
       </div>
     </div>
@@ -54,79 +73,4 @@ const handlePin = (b: boolean) => {
 }
 </script>
 
-<style scoped>
-.titlebar {
-  display: flex;
-  position: relative;
-  height: var(--la-titlebar-height);
-  align-items: center;
-  z-index: 10000000;
-  -webkit-app-region: drag;
-}
-
-.title-area {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  flex: 1;
-  transition: all 0.3s;
-  padding: 4px 4px 2px 8px;
-  box-sizing: border-box;
-
-  .blurred & {
-    filter: brightness(0.8);
-  }
-
-  .title {
-    font-size: 12px;
-    color: #fffd;
-  }
-}
-
-.blurred :is(.title, .traffic) {
-  filter: brightness(0.8);
-}
-
-.traffic {
-  height: 100%;
-  display: flex;
-  justify-content: flex-end;
-  transition: all 0.3s ease;
-
-  .traffic-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 45px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    -webkit-app-region: no-drag;
-
-    &:active {
-      filter: brightness(0.8);
-    }
-  }
-
-  .traffic-button.close {
-    &:hover {
-      background-color: rgb(194, 0, 0);
-      color: #fff;
-    }
-  }
-
-  .traffic-button.align,
-  .traffic-button.pin,
-  .traffic-button.minimize {
-    &.pinned {
-      background-color: rgba(102, 102, 102, 0.15);
-    }
-
-    &:hover {
-      background-color: rgb(102, 102, 102);
-      color: #fff;
-    }
-  }
-}
-</style>
+<style scoped></style>

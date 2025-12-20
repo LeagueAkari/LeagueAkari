@@ -1,6 +1,9 @@
 <template>
   <Transition name="one-way-fade">
-    <div v-show="ogws.fakeShow" class="ongoing-game-wrapper">
+    <div
+      v-show="ogws.fakeShow"
+      class="box-border h-full rounded-lg bg-(--la-background-color-primary) opacity-90"
+    >
       <MatchPreviewer
         :summary="showingGame.game"
         :game-id="showingGame.gameId"
@@ -9,11 +12,7 @@
         v-model:show="showPreviewModal"
       />
       <SetupInAppScope />
-      <OngoingGamePanel
-        class="ongoing-game-app-wrapper"
-        @show-game="handleShowGame"
-        @show-game-by-id="handleShowGameById"
-      />
+      <OngoingGamePanel @show-game="handleShowGame" @show-game-by-id="handleShowGameById" />
     </div>
   </Transition>
 </template>
@@ -76,13 +75,6 @@ useHideNotAppTag(() => ogws.fakeShow)
 </script>
 
 <style>
-.ongoing-game-wrapper {
-  background-color: #1a1a1da0;
-  border-radius: 8px;
-  height: 100%;
-  box-sizing: border-box;
-}
-
 .one-way-fade-enter-active,
 .one-way-fade-leave-active {
   transition: opacity 0.15s;

@@ -81,7 +81,7 @@
 
     <div v-else class="relative flex h-full">
       <div
-        class="absolute top-[45%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
+        class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
       >
         <template v-if="ogs.settings.enabled">
           <div

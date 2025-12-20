@@ -1,7 +1,7 @@
 <template>
-  <div class="shortcut-selector-wrapper">
+  <div class="flex items-center gap-2">
     <NModal
-      :class="$style['modal-content']"
+      class="w-fit!"
       size="small"
       preset="card"
       transform-origin="center"
@@ -12,7 +12,7 @@
       :title="t('ShortcutSelector.title')"
     >
       <template #footer>
-        <div class="action-buttons">
+        <div class="flex justify-end gap-1">
           <NButton size="small" @click="show = false">{{ t('ShortcutSelector.cancel') }}</NButton>
           <NButton size="small" type="warning" @click="currentShortcutId = null">{{
             t('ShortcutSelector.clear')
@@ -26,16 +26,33 @@
           >
         </div>
       </template>
-      <div class="keys-outline">
+
+      <div
+        class="flex min-h-[28px] w-[400px] flex-wrap items-center justify-center gap-1 rounded border border-black/20 bg-gray-100 p-1 dark:border-white/10 dark:bg-black/60"
+      >
         <template v-for="(key, index) of editingKeys" :key="key">
-          <div class="key">
+          <div
+            class="rounded-[2px] border-b border-black/40 bg-black/2 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
+          >
             {{ key }}
           </div>
-          <span class="plus" v-if="index !== editingKeys.length - 1">+</span>
+          <span
+            class="leading-none text-black/60 dark:text-white/60"
+            v-if="index !== editingKeys.length - 1"
+            >+</span
+          >
         </template>
-        <span class="empty" v-if="!editingKeys.length">{{ t('ShortcutSelector.hint') }}</span>
+        <span
+          class="text-xs leading-none text-black/40 dark:text-white/40"
+          v-if="!editingKeys.length"
+          >{{ t('ShortcutSelector.hint') }}</span
+        >
       </div>
-      <div v-if="isOccupiedBy && targetId !== isOccupiedBy.targetId" class="warn-text">
+
+      <div
+        v-if="isOccupiedBy && targetId !== isOccupiedBy.targetId"
+        class="mt-1 text-xs text-yellow-600/80 dark:text-yellow-400/80"
+      >
         <template
           v-if="isOccupiedBy.targetId === KeyboardShortcutsRenderer.DISABLED_KEYS_TARGET_ID"
         >
@@ -45,10 +62,15 @@
           {{ t('ShortcutSelector.beingOccupied') }}
         </template>
       </div>
-      <div v-if="editingKeys.length > 4" class="warn-text">
+
+      <div
+        v-if="editingKeys.length > 4"
+        class="mt-1 text-xs text-yellow-500/80 dark:text-yellow-400/80"
+      >
         {{ t('ShortcutSelector.tooComplicated') }}
       </div>
     </NModal>
+
     <NPopover :disabled="as.isAdministrator">
       <template #trigger>
         <NButton size="tiny" :disabled="!as.isAdministrator" type="primary" @click="show = true">
@@ -57,14 +79,21 @@
       </template>
       {{ t('ShortcutSelector.notRunAsAdministrator') }}
     </NPopover>
-    <div class="keys-preview">
+
+    <div class="flex flex-wrap items-center gap-1">
       <template v-for="(key, index) of keys" :key="key">
-        <div class="key">
+        <div
+          class="rounded-[2px] border-b border-black/40 bg-black/5 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
+        >
           {{ key }}
         </div>
-        <span class="plus" v-if="index !== keys.length - 1">+</span>
+        <span class="leading-none text-black/60 dark:text-white/60" v-if="index !== keys.length - 1"
+          >+</span
+        >
       </template>
-      <span class="empty" v-if="!keys.length">{{ t('ShortcutSelector.unset') }}</span>
+      <span class="text-xs leading-none text-black/40 dark:text-white/40" v-if="!keys.length">{{
+        t('ShortcutSelector.unset')
+      }}</span>
     </div>
   </div>
 </template>
@@ -187,72 +216,4 @@ onDeactivated(() => {
 })
 </script>
 
-<style scoped>
-.shortcut-selector-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.keys-outline {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  min-height: 28px;
-  width: 400px;
-  padding: 4px 8px;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 4px;
-  gap: 4px;
-}
-
-.keys-preview {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-}
-
-.key {
-  color: rgb(204, 204, 204);
-  font-size: 12px;
-  font-weight: bold;
-  padding: 2px 8px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 2px;
-  line-height: 1;
-}
-
-.empty {
-  line-height: 1;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.warn-text {
-  font-size: 12px;
-  color: rgba(243, 207, 31, 0.8);
-  margin-top: 4px;
-}
-
-.plus {
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
-</style>
-
-<style module>
-.modal-content {
-  width: fit-content;
-}
-</style>
+<style scoped></style>

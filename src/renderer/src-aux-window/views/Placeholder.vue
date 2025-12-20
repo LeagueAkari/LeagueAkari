@@ -1,44 +1,33 @@
 <template>
-  <div class="la-placeholder">
-    <LeagueAkariSpan />
-    <span class="sub" v-if="lcs.gameflow.phase === 'InProgress'">{{
-      t('Placeholder.inProgress')
-    }}</span>
-    <span class="sub" v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">{{
+  <div class="relative -mt-4 flex h-full flex-col items-center justify-center">
+    <NIcon class="relative -left-2 mb-4 text-[80px] text-black/20 dark:text-white/20">
+      <AkariLogo />
+    </NIcon>
+    <span
+      class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+      v-if="lcs.gameflow.phase === 'InProgress'"
+      >{{ t('Placeholder.inProgress') }}</span
+    >
+    <span
+      class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+      v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating"
+      >{{ t('Placeholder.idle') }}</span
+    >
+    <span class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400" v-else>{{
       t('Placeholder.idle')
     }}</span>
-    <span class="sub" v-else>{{ t('Placeholder.idle') }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
+import { NIcon } from 'naive-ui'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 </script>
 
-<style scoped>
-.la-placeholder {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  top: calc(var(--la-titlebar-height) * -0.5);
-  color: #8d8d8d;
-  font-size: 18px;
-  font-weight: bold;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.sub {
-  font-size: 14px;
-  font-weight: normal;
-  margin-top: 8px;
-}
-</style>
+<style scoped></style>

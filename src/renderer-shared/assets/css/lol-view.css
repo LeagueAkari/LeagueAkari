@@ -2,9 +2,13 @@
   font-size: 12px;
 
   attention {
-    color: rgb(255, 179, 0);
+    color: rgb(204, 143, 0);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(255, 179, 0);
+    }
   }
 
   stats {
@@ -20,26 +24,38 @@
   }
 
   truedamage {
-    color: rgb(233, 255, 255);
+    color: rgb(0, 150, 150);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(233, 255, 255);
+    }
   }
 
   physicaldamage {
-    color: rgb(255, 212, 113);
+    color: rgb(204, 120, 50);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(255, 212, 113);
+    }
   }
 
   festeal {
-    color: rgb(255, 125, 113);
+    color: rgb(204, 50, 40);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(255, 125, 113);
+    }
   }
 
   buffedstat,
   ornnbonus {
-    color: rgb(94, 255, 0);
+    color: rgb(0, 150, 0);
     font-weight: bold;
     margin: 0 2px;
 
@@ -47,10 +63,14 @@
       content: '↑';
       margin-left: 2px;
     }
+
+    [data-theme='dark'] & {
+      color: rgb(94, 255, 0);
+    }
   }
 
   nerfedstat {
-    color: rgb(255, 87, 36);
+    color: rgb(204, 50, 20);
     font-weight: bold;
     margin: 0 2px;
 
@@ -58,20 +78,32 @@
       content: '↓';
       margin-left: 2px;
     }
+
+    [data-theme='dark'] & {
+      color: rgb(255, 87, 36);
+    }
   }
 
   passive,
   active {
-    color: white;
+    color: rgb(50, 50, 50);
     font-weight: bold;
     font-style: italic;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: white;
+    }
   }
 
   status {
-    color: rgb(246, 138, 214);
+    color: rgb(180, 50, 120);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(246, 138, 214);
+    }
   }
 
   stats + br,
@@ -88,39 +120,63 @@
 
   raritymythic {
     font-weight: bold;
-    color: yellow;
+    color: rgb(204, 180, 0);
+
+    [data-theme='dark'] & {
+      color: yellow;
+    }
   }
 
   raritylegendary {
-    color: rgb(244, 246, 138);
+    color: rgb(180, 180, 50);
     font-weight: bold;
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(244, 246, 138);
+    }
   }
 
   scalemr {
     font-weight: bold;
-    color: rgb(47, 158, 255);
+    color: rgb(0, 100, 180);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(47, 158, 255);
+    }
   }
 
   scalead {
     font-weight: bold;
-    color: rgb(247, 247, 113);
+    color: rgb(180, 150, 0);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(247, 247, 113);
+    }
   }
 
   scaleap,
   magicdamage,
   scalemana {
     font-weight: bold;
-    color: rgb(47, 231, 255);
+    color: rgb(0, 150, 180);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(47, 231, 255);
+    }
   }
 
   speed {
     font-weight: bold;
-    color: rgb(161, 232, 74);
+    color: rgb(100, 150, 0);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(161, 232, 74);
+    }
   }
 
   flavortext,
@@ -129,23 +185,31 @@
   }
 
   flavortext::before {
-    content: '“';
+    content: '"';
   }
 
   flavortext:after {
-    content: '”';
+    content: '"';
   }
 
   gold {
     font-weight: bold;
-    color: rgb(255, 231, 47);
+    color: rgb(180, 150, 0);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(255, 231, 47);
+    }
   }
 
   scalelevel {
     font-weight: bold;
-    color: rgb(226, 226, 226);
+    color: rgb(80, 80, 80);
     margin: 0 2px;
+
+    [data-theme='dark'] & {
+      color: rgb(226, 226, 226);
+    }
   }
 
   lol-uikit-tooltipped-keyword {
@@ -156,6 +220,10 @@
     border: none;
     height: 1px;
     margin: 8px 0;
-    background-color: rgb(96, 96, 96);
+    background-color: rgb(200, 200, 200);
+
+    [data-theme='dark'] & {
+      background-color: rgb(96, 96, 96);
+    }
   }
 }

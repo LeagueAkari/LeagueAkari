@@ -2041,7 +2041,8 @@ MatchHistoryCard:
   abort: 被终止
   surrender: 投降
 
-StandaloneMatchHistoryCardModal:
+MatchPreviewer:
+  noData: 暂无数据
   notFound: 未找到对局
   error: 加载对局失败
   reload: 重新拉取

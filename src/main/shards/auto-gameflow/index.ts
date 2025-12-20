@@ -2,7 +2,7 @@ import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
-import { formatError, formatErrorMessage } from '@shared/utils/errors'
+import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
 import { comparer, computed } from 'mobx'
 
@@ -451,14 +451,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             this._log.info(`Auto-honor: voting for ${candidates.join(', ')}, game ID: ${h.gameId}`)
           } catch (error) {
             this._ipc.sendEvent(AutoGameflowMain.id, 'error-auto-honor', formatError(error))
-            this._lc.api.playerNotifications
-              .createTitleDetailsNotification(
-                i18next.t('appName', { ns: 'common' }),
-                i18next.t('auto-gameflow-main.error-auto-honor', {
-                  reason: formatErrorMessage(error)
-                })
-              )
-              .catch(() => {})
+
             this._log.warn(`Auto-honor error: ${formatError(error)}`)
           }
         }
@@ -649,14 +642,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       await this._lc.api.matchmaking.accept()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-accept-match', formatError(error))
-      this._lc.api.playerNotifications
-        .createTitleDetailsNotification(
-          i18next.t('appName', { ns: 'common' }),
-          i18next.t('auto-gameflow-main.error-accept-match', {
-            reason: formatErrorMessage(error)
-          })
-        )
-        .catch(() => {})
+
       this._log.warn(`Failed to accept match`, error)
     }
     this.state.clearAutoAccept()
@@ -674,14 +660,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       await this._lc.api.lobby.searchMatch()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-matchmaking', formatError(error))
-      this._lc.api.playerNotifications
-        .createTitleDetailsNotification(
-          i18next.t('appName', { ns: 'common' }),
-          i18next.t('auto-gameflow-main.error-matchmaking', {
-            reason: formatErrorMessage(error)
-          })
-        )
-        .catch(() => {})
+
       this._log.warn(`Failed to start matchmaking`, error)
     }
   }

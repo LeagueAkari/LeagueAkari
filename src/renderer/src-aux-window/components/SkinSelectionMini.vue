@@ -3,12 +3,12 @@
     size="small"
     v-if="aws.settings.showSkinSelector && lcs.champSelect.currentChampion && skinOptions.length"
   >
-    <NFlex align="center" class="control-item" style="gap: 4px">
+    <div class="flex items-center gap-1">
       <NSelect
         size="tiny"
         :render-label="renderLabel"
         :render-tag="renderTag"
-        style="flex: 1"
+        class="flex-1"
         v-model:value="currentSkinId"
         :placeholder="
           t('SkinSelectionMini.skins', {
@@ -25,7 +25,7 @@
         @click="handleSetSkin"
         >{{ t('SkinSelectionMini.button') }}</NButton
       >
-    </NFlex>
+    </div>
   </NCard>
 </template>
 
@@ -38,15 +38,7 @@ import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCard,
-  NFlex,
-  NSelect,
-  SelectRenderLabel,
-  SelectRenderTag,
-  useMessage
-} from 'naive-ui'
+import { NButton, NCard, NSelect, SelectRenderLabel, SelectRenderTag, useMessage } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
@@ -61,33 +53,21 @@ const isSettingSkin = ref(false)
 
 const renderLabel: SelectRenderLabel = (option) => {
   return h(
-    NFlex,
+    'div',
     {
-      align: 'center',
-      justify: 'center',
-      wrap: false,
-      style: { padding: '2px 4px' }
+      class: 'flex items-center justify-center px-1 py-0.5 gap-2'
     },
-    () => [
+    [
       h(LcuImage, {
         src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
         cache: false,
-        style: {
-          height: '20px',
-          width: '36px',
-          objectFit: 'contain',
-          borderRadius: '2px'
-        }
+        class: 'h-5 w-9 rounded-[2px] object-contain'
       }),
       h(
         'div',
         {
-          style: {
-            fontSize: '12px',
-            overflow: 'hidden',
-            whiteSpace: 'no-wrap',
-            textOverflow: 'ellipsis'
-          },
+          class:
+            'overflow-hidden text-xs whitespace-nowrap text-ellipsis text-black/70 dark:text-white/70',
           title: option.label as string
         },
         option.label as string
@@ -97,7 +77,7 @@ const renderLabel: SelectRenderLabel = (option) => {
 }
 
 const renderTag: SelectRenderTag = ({ option }) => {
-  return h('span', { style: 'font-size: 12px;' }, option.label as string)
+  return h('span', { class: 'text-xs text-black/70 dark:text-white/70' }, option.label as string)
 }
 
 const carouselSkins = shallowRef<CarouselSkins[]>([])
@@ -211,48 +191,4 @@ const handleSetSkin = async () => {
 }
 </script>
 
-<style scoped>
-.outer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.operations {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.btns {
-  display: flex;
-  gap: 4px;
-}
-
-.champions {
-  display: grid;
-  grid-template-columns: repeat(5, auto);
-  gap: 4px;
-}
-
-.champion-image {
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.champion-image-invalid {
-  cursor: not-allowed;
-  filter: grayscale(1);
-}
-
-.champion-image-placeholder {
-  width: 24px;
-  height: 24px;
-  box-sizing: border-box;
-  border: 1px solid rgb(72, 72, 72);
-  border-radius: 2px;
-}
-</style>
+<style scoped></style>

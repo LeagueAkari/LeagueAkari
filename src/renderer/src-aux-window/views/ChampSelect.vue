@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="champ-select-wrapper">
+  <NScrollbar class="box-border px-3 py-2">
     <BenchChampionsMini style="margin-bottom: 4px" />
     <ChampSelectActions style="margin-bottom: 4px" />
     <AutomationPlan style="margin-bottom: 4px" />
@@ -16,10 +16,3 @@ import ChampSelectOperations from '@aux-window/components/ChampSelectOperations.
 import SkinSelectionMini from '@aux-window/components/SkinSelectionMini.vue'
 import { NScrollbar } from 'naive-ui'
 </script>
-
-<style>
-.champ-select-wrapper {
-  padding: 8px 12px;
-  box-sizing: border-box;
-}
-</style>

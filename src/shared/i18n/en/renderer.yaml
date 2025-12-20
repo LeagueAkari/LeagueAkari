@@ -2041,7 +2041,8 @@ MatchHistoryCard:
   abort: Aborted
   surrender: Surrender
 
-StandaloneMatchHistoryCardModal:
+MatchPreviewer:
+  noData: No data available.
   notFound: Game not found
   error: Failed to load game
   reload: Reload

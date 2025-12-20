@@ -13,6 +13,10 @@
   --la-scrollbar-width: 6px;
 }
 
+[data-theme='light'] {
+  --la-background-color-primary: #f5f5f5;
+}
+
 ::-webkit-scrollbar {
   width: var(--la-scrollbar-width);
   height: var(--la-scrollbar-height);
@@ -24,6 +28,14 @@
 
   &:hover {
     background-color: #626262;
+  }
+}
+
+[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+
+  &:hover {
+    background-color: #a0a0a0;
   }
 }
 
@@ -54,6 +66,14 @@ a {
 
 a:visited {
   color: rgb(144, 198, 166);
+}
+
+[data-theme='light'] a {
+  color: rgb(34, 139, 80);
+}
+
+[data-theme='light'] a:visited {
+  color: rgb(34, 139, 80);
 }
 
 .n-radio {
@@ -90,16 +110,7 @@ a:visited {
 }
 
 .n-message {
-  background-color: #4141413e;
   backdrop-filter: blur(4px);
-}
-
-.n-popover.n-popconfirm {
-  background-color: #2a2a2ad5;
-}
-
-.n-base-select-menu {
-  background-color: #3e3e3ef0;
 }
 
 .n-base-select-menu .n-scrollbar {
@@ -132,22 +143,6 @@ a:visited {
   transform: none;
 }
 
-.n-base-select-menu {
-  background-color: #383838f8;
-}
-
-.n-message {
-  background-color: #2c2c2c;
-}
-
 .n-checkbox.n-checkbox--show-label {
   align-items: center;
-}
-
-.n-popover .n-popover-arrow-wrapper .n-popover-arrow {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.n-popover {
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }

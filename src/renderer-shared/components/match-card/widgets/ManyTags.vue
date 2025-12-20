@@ -75,7 +75,7 @@ const tagsEl = useTemplateRef('tagsEl')
 
 const tags = usePlayerTags()
 
-const RESERVED_WIDTH = 40 // for +xx tags
+const RESERVED_WIDTH = 44 // for +xx tags
 
 const updateOverflowTagInfo = () => {
   if (!containerEl.value || !tagsEl.value || tagsEl.value.length === 0) {
@@ -89,43 +89,32 @@ const updateOverflowTagInfo = () => {
   const container = containerEl.value
   const els = tagsEl.value
 
-  const cRect = container.getBoundingClientRect()
-  const cLeft = cRect.left
-  const cRight = cRect.right
+  const lastEl = els[els.length - 1]
 
-  // 子像素rounding，解决刚好超一点点场景
-  const EPS = 0.5
-
-  const lastRect = els[els.length - 1].getBoundingClientRect()
-  const isOverflow = lastRect.right > cRight + EPS
+  const isOverflow = lastEl.offsetLeft + lastEl.offsetWidth > container.offsetWidth
 
   if (!isOverflow) {
-    const lastLeftRel = lastRect.left - cLeft
     return {
       isOverflow: false,
       lastVisibleTagIndex: els.length - 1,
-      lastVisibleTagOffsetLeft: lastLeftRel
+      lastVisibleTagOffsetLeft: els[els.length - 1].offsetLeft
     }
   }
 
   let firstHiddenIndex = els.length - 1
   for (let i = 0; i < els.length; i++) {
-    const r = els[i].getBoundingClientRect()
-    const leftRel = r.left - cLeft
+    const leftRel = els[i].offsetLeft + els[i].offsetWidth
 
-    if (leftRel + RESERVED_WIDTH > cRect.width + EPS) {
+    if (leftRel + RESERVED_WIDTH > container.offsetWidth) {
       firstHiddenIndex = i
       break
     }
   }
 
-  const firstHiddenRect = els[firstHiddenIndex].getBoundingClientRect()
-  const firstHiddenLeftRel = firstHiddenRect.left - cLeft
-
   return {
     isOverflow: true,
     lastVisibleTagIndex: firstHiddenIndex,
-    lastVisibleTagOffsetLeft: firstHiddenLeftRel
+    lastVisibleTagOffsetLeft: els[firstHiddenIndex].offsetLeft
   }
 }
 

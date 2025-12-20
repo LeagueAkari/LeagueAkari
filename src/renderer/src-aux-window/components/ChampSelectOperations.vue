@@ -1,7 +1,9 @@
 <template>
   <NCard v-if="!isCustomGame" size="small">
-    <NFlex align="center" v-if="!isCustomGame" class="tiny-control-item">
-      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.dodge.label') }}</span>
+    <div class="flex h-6 items-center not-last:mb-0.5" v-if="!isCustomGame">
+      <span class="flex-1 text-xs text-black/70 dark:text-white/70">{{
+        t('ChampSelectOperations.dodge.label')
+      }}</span>
       <NButton size="tiny" type="primary" secondary @click="dodgeLoop" :disabled="isLoopingDodge">
         {{ t('ChampSelectOperations.dodge.button') }}
         <template v-if="iteration">({{ iteration >= 1000 ? '999+' : iteration }})</template>
@@ -15,9 +17,10 @@
       >
         {{ t('ChampSelectOperations.dodge.cancel') }}
       </NButton>
-    </NFlex>
-    <NFlex align="center" v-if="!isCustomGame" class="tiny-control-item">
-      <span class="label" style="flex: 1">{{
+    </div>
+
+    <div class="flex h-6 items-center not-last:mb-0.5" v-if="!isCustomGame">
+      <span class="flex-1 text-xs text-black/70 dark:text-white/70">{{
         t('ChampSelectOperations.temporarilyDisabled.label')
       }}</span>
       <NSwitch
@@ -25,7 +28,7 @@
         @update:value="(val) => as.setTemporarilyDisabled(val)"
         size="small"
       />
-    </NFlex>
+    </div>
   </NCard>
 </template>
 
@@ -36,7 +39,7 @@ import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NFlex, NSwitch } from 'naive-ui'
+import { NButton, NCard, NSwitch } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()
@@ -82,17 +85,4 @@ const dodgeLoop = async () => {
 }
 </script>
 
-<style scoped>
-.label {
-  font-size: 12px;
-  color: rgb(178, 178, 178);
-}
-
-.tiny-control-item {
-  height: 24px;
-
-  &:not(:last-child) {
-    margin-bottom: 2px;
-  }
-}
-</style>
+<style scoped></style>

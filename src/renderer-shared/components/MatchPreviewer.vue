@@ -1,5 +1,10 @@
 <template>
-  <NModal v-model:show="show">
+  <NModal
+    v-model:show="show"
+    :class="{
+      'shadow-none!': as.colorTheme === 'light' /* 亮色模式下阴影会非常诡异 */
+    }"
+  >
     <div class="w-[840px] p-8">
       <MatchCard
         v-if="summary"
@@ -12,7 +17,7 @@
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
         @load-details="loadDetails(summary?.source || 'lcu')"
       />
-      <div v-else>没有数据</div>
+      <div v-else>{{ $t('MatchPreviewer.noData') }}</div>
     </div>
   </NModal>
 </template>

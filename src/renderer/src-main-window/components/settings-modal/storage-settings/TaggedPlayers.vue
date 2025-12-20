@@ -1,10 +1,10 @@
 <template>
-  <NCard size="small" style="height: 100%">
+  <NCard size="small" class="h-full">
     <NModal
       v-model:show="showEditModal"
       preset="card"
       :title="t('TaggedPlayers.editModal.title')"
-      style="max-width: 60vw"
+      class="max-w-[60vw]"
     >
       <NInput
         v-model:value="currentEditingTag"
@@ -12,11 +12,13 @@
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
-      ></NInput>
-      <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
+      />
+
+      <div class="mt-3 flex justify-end gap-1">
         <NButton size="small" @click="showEditModal = false">{{
           t('TaggedPlayers.cancelButton')
         }}</NButton>
+
         <NButton
           size="small"
           type="primary"
@@ -32,8 +34,9 @@
         >
       </div>
     </NModal>
-    <div class="flex-content">
-      <div class="operations">
+
+    <div class="flex h-full flex-col">
+      <div class="mb-2 flex items-center gap-2">
         <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
           {{ t('TaggedPlayers.exportButton') }}
         </NButton>
@@ -51,9 +54,10 @@
           {{ t('TaggedPlayers.onlyCurrentAccountCheckbox') }}
         </NCheckbox>
       </div>
+
       <MaskedComponent :show-mask="showMask">
         <template #mask>
-          <div class="streamer-mode-mask">
+          <div class="flex h-full w-full flex-col items-center justify-center gap-4">
             <span>{{ t('TaggedPlayers.streamerModeWarning') }}</span>
             <NButton type="warning" size="small" @click="showMask = false">{{
               t('TaggedPlayers.showButton')
@@ -68,7 +72,7 @@
           :columns="columns"
           :loading="isLoading"
           :pagination="pagination"
-          style="height: 100%"
+          class="h-full"
           flex-height
         />
       </MaskedComponent>
@@ -116,7 +120,6 @@ import {
   ref,
   shallowReactive,
   shallowRef,
-  useCssModule,
   useTemplateRef,
   watch
 } from 'vue'
@@ -152,7 +155,6 @@ const sgps = useSgpStore()
 
 const message = useMessage()
 
-const styles = useCssModule()
 const tableData = shallowRef<MappedRecordType[]>([])
 
 const { getInteroperability } = useInteroperableSgpServers()
@@ -168,20 +170,20 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
     return h(
       'div',
       {
-        class: styles['summoner-name'],
+        class: 'flex w-fit cursor-pointer items-center gap-2',
         onClick: () => {
           navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
         }
       },
       [
         h(LcuImage, {
-          class: styles['image'],
+          class: 'h-4 w-4 rounded-sm',
           src: profileIconUri(cached.profileIconId)
         }),
         h(
           'span',
           {
-            class: styles['name']
+            class: 'text-xs'
           },
           `${cached.gameName}#${cached.tagLine}`
         )
@@ -199,7 +201,7 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
         h(
           'span',
           {
-            class: styles['empty']
+            class: 'text-xs text-black/60 dark:text-white/60'
           },
           t('TaggedPlayers.na', {
             truncatedPuuid: puuid.slice(0, 8)
@@ -210,7 +212,7 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
           h(
             'div',
             {
-              style: 'margin-bottom: 4px'
+              class: 'mb-1'
             },
             t('TaggedPlayers.naPopoverContent')
           ),
@@ -246,13 +248,13 @@ const renderLinedText = (text: string) => {
   return h(
     NScrollbar,
     {
-      style: 'max-height: 100px'
+      class: 'max-h-[100px]'
     },
     () =>
       h(
         'div',
         {
-          class: styles['as-is-text']
+          class: 'whitespace-pre-wrap text-xs'
         },
         text
       )
@@ -263,7 +265,7 @@ const renderBoldTitle = (text: string) => {
   return h(
     'span',
     {
-      class: styles['bold-title']
+      class: 'text-xs font-bold'
     },
     text
   )
@@ -279,7 +281,7 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
       return h(
         'span',
         {
-          class: styles['row-base']
+          class: 'text-xs'
         },
         ((pagination.page || 1) - 1) * (pagination.pageSize || 20) + index + 1
       )
@@ -321,11 +323,7 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
       return h(
         'div',
         {
-          style: {
-            display: 'flex',
-            gap: '4px',
-            alignItems: 'center'
-          }
+          class: 'flex items-center gap-1'
         },
         [
           h(
@@ -556,66 +554,4 @@ const handleImportTaggedPlayers = async () => {
 }
 </script>
 
-<style scoped>
-.operations {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.flex-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.streamer-mode-mask {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  gap: 16px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-</style>
-
-<style module>
-.row-base {
-  font-size: 12px;
-}
-
-.empty {
-  color: #ffffffa0;
-  font-size: 12px;
-}
-
-.summoner-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  width: fit-content;
-
-  .image {
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-  }
-
-  .name {
-    font-size: 12px;
-  }
-}
-
-.as-is-text {
-  font-size: 12px;
-  white-space: pre-wrap;
-}
-
-.bold-title {
-  font-size: 12px;
-  font-weight: bold;
-}
-</style>
+<style scoped></style>

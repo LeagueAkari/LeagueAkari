@@ -36,25 +36,45 @@ import App from './App.vue'
 
 const as = useAppCommonStore()
 
-const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px' },
-  Card: {
-    color: '#0000',
-    paddingSmall: '4px 12px'
-  },
-  Message: {
-    padding: '4px 8px',
-    fontSize: '12px',
-    iconSize: '16px',
-    iconMargin: '0 4px 0 0'
-  },
-  Popover: {
-    color: '#1f1f1ffa'
-  },
-  Checkbox: {
-    fontSizeSmall: '13px'
+const themeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      Notification: { padding: '12px', color: '#313131fa' },
+      Popover: {
+        color: '#1f1f1ffa',
+        fontSize: '12px'
+      },
+      Card: {
+        colorModal: '#232329'
+      },
+      Message: {
+        colorInfo: 'rgba(45, 45, 55, 1)',
+        colorSuccess: 'rgba(45, 45, 55, 1)',
+        colorWarning: 'rgba(45, 45, 55, 1)',
+        colorError: 'rgba(45, 45, 55, 1)'
+      },
+      Menu: {
+        padding: '1px'
+      },
+      Scrollbar: {
+        width: '6px'
+      }
+    } as GlobalThemeOverrides
+  } else {
+    return {
+      Popover: {
+        fontSize: '12px'
+      },
+      Card: {
+        borderColor: 'rgba(15, 23, 42, 0.10)',
+        borderColorModal: 'rgba(15, 23, 42, 0.16)'
+      },
+      Scrollbar: {
+        width: '6px'
+      }
+    } as GlobalThemeOverrides
   }
-}
+})
 
 const NAIVE_UI_LOCALE = {
   'zh-CN': {

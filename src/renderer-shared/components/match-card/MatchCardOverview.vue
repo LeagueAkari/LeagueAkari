@@ -149,7 +149,7 @@
 
               <!-- trinket -->
               <div class="flex flex-col gap-0.5">
-                <ItemDisplay :item-id="participant.items[6]" :size="20" class="rounded-full!" />
+                <ItemDisplay :item-id="participant.items[6]" :size="20" is-trinket />
                 <div class="invisible size-5"></div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
-    <NFlex align="center" class="control-item">
-      <span class="label" style="flex: 1"
+    <NFlex align="center" class="h-6 not-last:mb-0.5">
+      <span class="flex-1 text-xs text-gray-600 dark:text-gray-400"
         >{{ t('LoungeOperations.autoAccept.label') }} ({{
           isCustomGame
             ? t('LoungeOperations.autoAccept.unavailable')
@@ -14,18 +14,19 @@
         @update:value="(val) => agf.setAutoAcceptEnabled(val)"
       />
     </NFlex>
+
     <NPopover :show-arrow="false">
       <template #trigger>
-        <NFlex align="center" class="control-item">
-          <div style="flex: 1; display: flex; justify-content: flex-start; align-items: center">
-            <span class="label"
+        <NFlex align="center" class="h-6 not-last:mb-0.5">
+          <div class="flex flex-1 items-center justify-start">
+            <span class="text-xs text-gray-600 dark:text-gray-400"
               >{{ t('LoungeOperations.autoMatchmaking.label') }} ({{
                 isCustomGame
                   ? t('LoungeOperations.autoMatchmaking.unavailable')
                   : formatDelayText(agfs.settings.autoMatchmakingDelaySeconds)
               }})</span
             >
-            <NIcon class="icon">
+            <NIcon class="ml-1 text-lg text-gray-600 dark:text-gray-400">
               <ExpandMoreSharpIcon />
             </NIcon>
           </div>
@@ -36,9 +37,9 @@
           />
         </NFlex>
       </template>
-      <NFlex class="more" vertical>
-        <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">{{
+      <NFlex class="w-[82vw] text-[11px]" vertical>
+        <NFlex align="center" class="h-6 not-last:mb-0.5">
+          <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
             t('LoungeOperations.autoMatchmakingMinimumMembers.label')
           }}</span>
           <NInputNumber
@@ -47,11 +48,11 @@
             :min="1"
             :max="99"
             size="tiny"
-            style="width: 80px"
+            class="w-20"
           />
         </NFlex>
-        <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">{{
+        <NFlex align="center" class="h-6 not-last:mb-0.5">
+          <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
             t('LoungeOperations.autoMatchmakingDelaySeconds.label')
           }}</span>
           <NInputNumber
@@ -60,11 +61,11 @@
             :placeholder="t('LoungeOperations.second')"
             :min="0"
             size="tiny"
-            style="width: 80px"
+            class="w-20"
           />
         </NFlex>
-        <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">{{
+        <NFlex align="center" class="h-6 not-last:mb-0.5">
+          <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
             t('LoungeOperations.autoMatchmakingWaitForInvitees.label')
           }}</span>
           <NSwitch
@@ -111,28 +112,4 @@ const formatDelayText = (d: number) => {
 }
 </script>
 
-<style scoped>
-.label {
-  font-size: 12px;
-  color: rgb(178, 178, 178);
-}
-
-.icon {
-  font-size: 18px;
-  color: rgb(178, 178, 178);
-  margin-left: 4px;
-}
-
-.more {
-  font-size: 11px;
-  width: 82vw;
-}
-
-.control-item {
-  height: 24px;
-
-  &:not(:last-child) {
-    margin-bottom: 2px;
-  }
-}
-</style>
+<style scoped></style>
