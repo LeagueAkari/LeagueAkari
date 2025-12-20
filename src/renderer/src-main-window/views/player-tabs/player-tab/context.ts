@@ -39,6 +39,9 @@ export type PlayerTabContext = {
   /** 是否是自己 */
   isSelfTab: Readonly<Ref<boolean>>
 
+  /** 是否是当前 tab */
+  isCurrentTab: Readonly<Ref<boolean>>
+
   /** 是否 TENCENT 跨区查询 */
   isCrossRegion: Readonly<Ref<boolean>>
 
@@ -69,6 +72,7 @@ export function providePlayerTab(props: {
   id: MaybeRefOrGetter<string>
   puuid: MaybeRefOrGetter<string>
   sgpServerId: MaybeRefOrGetter<string>
+  isCurrentTab: MaybeRefOrGetter<boolean>
   isSmallSize: MaybeRefOrGetter<boolean>
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }) {
@@ -100,6 +104,7 @@ export function providePlayerTab(props: {
     sgpServerId,
 
     isSmallSize: toRef(props.isSmallSize),
+    isCurrentTab: toRef(props.isCurrentTab),
     isCrossRegion: toRef(isCrossRegion),
     isSelfTab: toRef(isSelfTab),
 

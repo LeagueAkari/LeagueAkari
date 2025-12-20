@@ -8,6 +8,7 @@ import {
 } from '@shared/http-api-axios-helper/sgp/patterns'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosRequestConfig, isAxiosError } from 'axios'
+import { AxiosRetry } from 'axios-retry'
 import { Buffer } from 'node:buffer'
 import { Readable } from 'node:stream'
 
@@ -18,6 +19,8 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { RemoteConfigMain } from '../remote-config'
 import { SgpState } from './state'
+
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 /**
  * Service Gateway Proxy (for **League** of Legends)
@@ -46,6 +49,7 @@ export class SgpMain implements IAkariShardInitDispose {
     private readonly _remoteConfig: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(SgpMain.id)
+    axiosRetry(this._http, { retries: 2 })
 
     this.state = new SgpState(this._lc.state, this._remoteConfig)
     this._api = new SgpHttpApiAxiosHelper(this._http)

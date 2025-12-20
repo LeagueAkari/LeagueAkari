@@ -6,7 +6,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalTeamMembersResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
@@ -178,7 +178,7 @@ export class OngoingGameState {
         }
       })
 
-      Object.assign(selections, this.additionalMembers.selections)
+      Object.assign(selections, this.additional.selections)
 
       return selections
     }
@@ -364,7 +364,7 @@ export class OngoingGameState {
         })
 
       // experimental 特性
-      for (const [tI, m] of Object.entries(this.additionalMembers.teams)) {
+      for (const [tI, m] of Object.entries(this.additional.teams)) {
         if (teams[tI]) {
           teams[tI] = memberMerge(teams[tI], m)
         } else {
@@ -495,7 +495,7 @@ export class OngoingGameState {
     }
 
     for (const [puuid, teamParticipantId] of Object.entries(
-      this.additionalMembers.teamParticipantGroups
+      this.additional.teamParticipantGroups
     )) {
       if (!groups[teamParticipantId]) {
         groups[teamParticipantId] = [puuid]
@@ -634,10 +634,11 @@ export class OngoingGameState {
     this.gameDetailsLoadingState = {}
     this.gameDetails = {}
     this.additionalGame = {}
-    this.additionalMembers = {
+    this.additional = {
       teams: {},
       selections: {},
-      teamParticipantGroups: {}
+      teamParticipantGroups: {},
+      spells: {}
     }
   }
 
@@ -668,14 +669,15 @@ export class OngoingGameState {
   }
 
   /** 结构同 teams  */
-  additionalMembers: AdditionalTeamMembersResult = {
+  additional: AdditionalResult = {
     teams: {},
     selections: {},
-    teamParticipantGroups: {}
+    teamParticipantGroups: {},
+    spells: {}
   }
 
-  setAdditionalMembers(value: AdditionalTeamMembersResult) {
-    this.additionalMembers = value
+  setAdditional(value: AdditionalResult) {
+    this.additional = value
   }
 
   constructor(
@@ -711,7 +713,7 @@ export class OngoingGameState {
       teamParticipantGroups: computed.struct,
       draft: observable.struct,
       matchHistoryTagParams: observable.struct,
-      additionalMembers: observable.struct
+      additional: observable.struct
     })
   }
 }

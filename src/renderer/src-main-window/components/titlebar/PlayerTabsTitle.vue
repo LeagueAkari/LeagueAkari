@@ -11,7 +11,7 @@
       @clickoutside="contextMenuState.show = false"
       size="small"
       @select="handleContextMenuSelect"
-      :theme-overrides="{ color: '#222e', fontSizeSmall: '13px', optionHeightSmall: '26px' }"
+      :theme-overrides="{ fontSizeSmall: '13px', optionHeightSmall: '26px' }"
     />
 
     <template v-if="lcs.isConnected">
@@ -477,6 +477,7 @@ const { summonerName } = useStreamerModeMaskedText()
     margin-right: 4px;
     width: 16px;
     height: 16px;
+    border-radius: 2px;
   }
 
   .tab-icon-placeholder {

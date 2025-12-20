@@ -230,6 +230,13 @@ const sortedTeams = computed(() => {
 })
 
 const premadeTeamInfo = computed(() => {
+  if (ogs.queryStage.phase === 'lobby' || ogs.queryStage.phase === 'unavailable') {
+    return {
+      groups: {},
+      premadeTeamIdMap: {}
+    }
+  }
+
   const playerMap: {
     groups: Record<string, string[]> // premadeId, puuids
     premadeTeamIdMap: Record<string, string> // puuid, premadeId (A, B, C, ...)

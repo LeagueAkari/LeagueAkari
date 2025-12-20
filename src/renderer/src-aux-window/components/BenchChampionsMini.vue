@@ -94,7 +94,7 @@
         >
           <template #trigger>
             <ChampionIcon
-              class="size-9 cursor-pointer rounded-sm border border-black/10 dark:border-white/10"
+              class="size-8 cursor-pointer rounded-sm border border-black/10 dark:border-white/10"
               :class="[
                 getChampionImageClasses(
                   championAdjustment(c.championId)?.overallEffect || 'neutral'
@@ -129,7 +129,7 @@
         </NTooltip>
         <div
           v-for="_i of Math.max(10 - combinedChampions.length, 0)"
-          class="size-9 rounded-sm border border-black/10 dark:border-white/10"
+          class="size-8 rounded-sm border border-black/10 dark:border-white/10"
         />
       </div>
     </div>

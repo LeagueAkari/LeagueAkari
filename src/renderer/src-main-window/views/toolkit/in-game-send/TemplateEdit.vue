@@ -15,7 +15,10 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="{
+            fontSizeSmall: '13px',
+            optionHeightSmall: '26px'
+          }"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -214,7 +217,6 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
-import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 

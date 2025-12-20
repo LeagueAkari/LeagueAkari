@@ -30,8 +30,10 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+
+asar: true
 electronFuses:
-  EnableEmbeddedAsarIntegrityValidation: true
+  enableEmbeddedAsarIntegrityValidation: true
 
 npmRebuild: false
 publish:

@@ -10,7 +10,10 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="{
+            fontSizeSmall: '13px',
+            optionHeightSmall: '26px'
+          }"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -365,8 +368,6 @@ import { computed, h, nextTick, ref, shallowReactive, shallowRef, useTemplateRef
 import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
-
-import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 // 还是直接复制一份组件好用
 const { t } = useTranslation('renderer', { keyPrefix: 'SendableItemEdit' })

@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'relative box-border flex flex-col overflow-hidden rounded border border-neutral-900/10 bg-neutral-100/90 p-2 transition-[filter] dark:border-white/10 dark:bg-neutral-900/90',
+      'relative box-border flex flex-col overflow-hidden rounded border border-neutral-900/20 bg-neutral-100/90 p-2 transition-[filter] dark:border-white/10 dark:bg-neutral-900/90',
       currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId !== premadeTeamId
         ? 'brightness-30'
         : '',

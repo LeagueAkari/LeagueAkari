@@ -1,8 +1,8 @@
 <template>
-  <div class="cd-timer-wrapper" ref="wrapper">
+  <div class="box-border flex w-fit flex-col overflow-hidden rounded bg-[#1a1a1da0]" ref="wrapper">
     <SetupInAppScope />
     <CdTimerWindowTitlebar />
-    <SummonerSpellsCdTimer class="content" />
+    <SummonerSpellsCdTimer class="opacity-70 transition-opacity hover:opacity-90" />
   </div>
 </template>
 
@@ -38,24 +38,5 @@ body,
 #app {
   width: fit-content;
   height: fit-content;
-}
-
-.cd-timer-wrapper {
-  width: fit-content;
-  display: flex;
-  flex-direction: column;
-  background-color: #1a1a1da0;
-  border-radius: 4px;
-  box-sizing: border-box;
-  overflow: hidden;
-
-  .content {
-    opacity: 0.7;
-    transition: opacity 0.3s;
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
 }
 </style>

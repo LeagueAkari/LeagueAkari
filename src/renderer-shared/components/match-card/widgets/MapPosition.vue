@@ -29,7 +29,7 @@ import { type MapId, mapToImagePosition } from '../utils/game-map'
 const {
   mapId = 11,
   points = [],
-  size = 200
+  size = 350
 } = defineProps<{
   size?: number
   mapId?: number

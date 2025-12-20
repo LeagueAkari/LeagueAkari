@@ -18,7 +18,7 @@ import {
   SgpGameSummary
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { AdditionalTeamMembersResult } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult } from '@shared/types/shards/ongoing-game'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
 import { isAxiosError } from 'axios'
 import _ from 'lodash'
@@ -142,8 +142,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'teamParticipantGroups',
       'matchHistoryTagParams',
       'draft',
-      'additionalMembers'
+      'additional'
     ])
+
+    // 便于精准订阅
+    this._mobx.propSync(OngoingGameMain.id, 'additional', this.state, ['additional'])
   }
 
   async onInit() {
@@ -1247,13 +1250,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       try {
         const {
           data: {
-            game: { teamOne, teamTwo, gameMode }
+            game: { teamOne, teamTwo, gameMode, playerChampionSelections }
           }
         } = await this._sgp.api.gsm.getByPuuid(puuid)
 
         this._log.info('additional team info by gsm game')
 
-        return { teamOne, teamTwo, gameMode }
+        return { teamOne, teamTwo, gameMode, spells: playerChampionSelections }
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null
@@ -1268,13 +1271,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       try {
         const {
           data: {
-            game: { teamOne, teamTwo, gameMode }
+            game: { teamOne, teamTwo, gameMode, playerChampionSelections }
           }
         } = await this._sgp.api.gsm.getSpectatorByPuuid(puuid)
 
         this._log.info('additional team info by spectator data')
 
-        return { teamOne, teamTwo, gameMode }
+        return { teamOne, teamTwo, gameMode, spells: playerChampionSelections }
       } catch (error) {
         // 忽略 404 和 409 (disabled spectator APIs)
         if (
@@ -1292,8 +1295,9 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const extractTeamMembers = (
       gameMode: string,
       teamOne: { puuid: string; championId: number; teamParticipantId: number }[],
-      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
-    ): AdditionalTeamMembersResult => {
+      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[],
+      spells: { puuid: string; spell1Id: number; spell2Id: number }[]
+    ): AdditionalResult => {
       const all = [...teamOne, ...teamTwo].filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
 
       if (gameMode === 'CHERRY') {
@@ -1314,6 +1318,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
               return acc
             },
             {} as Record<string, number>
+          ),
+          spells: spells.reduce(
+            (acc, p) => {
+              acc[p.puuid] = { spell1Id: p.spell1Id, spell2Id: p.spell2Id }
+              return acc
+            },
+            {} as Record<string, { spell1Id: number; spell2Id: number }>
           )
         }
       }
@@ -1340,8 +1351,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             return acc
           },
           {} as Record<string, number>
+        ),
+        spells: spells.reduce(
+          (acc, p) => {
+            acc[p.puuid] = { spell1Id: p.spell1Id, spell2Id: p.spell2Id }
+            return acc
+          },
+          {} as Record<string, { spell1Id: number; spell2Id: number }>
         )
-      } as AdditionalTeamMembersResult
+      } as AdditionalResult
     }
 
     this._mobx.reaction(
@@ -1359,6 +1377,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         type ReturnResult = {
           teamOne: { puuid: string; championId: number; teamParticipantId: number }[]
           teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
+          spells: { puuid: string; spell1Id: number; spell2Id: number }[]
           gameMode: string
         }
 
@@ -1380,14 +1399,22 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           const mergedTeams = {} as Record<string, string[]>
           const mergedSelections = {} as Record<string, number>
           const mergedTeamParticipantGroups = {} as Record<string, number>
+          const mergedSpells = {} as Record<
+            string,
+            {
+              spell1Id: number
+              spell2Id: number
+            }
+          >
 
           for (const result of results) {
             if (result.status === 'fulfilled' && result.value) {
-              const { teamOne, teamTwo, gameMode } = result.value
+              const { teamOne, teamTwo, gameMode, spells } = result.value
               const { teams, selections, teamParticipantGroups } = extractTeamMembers(
                 gameMode,
                 teamOne,
-                teamTwo
+                teamTwo,
+                spells
               )
 
               for (const [tI, m] of Object.entries(teams)) {
@@ -1400,13 +1427,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
               Object.assign(mergedSelections, selections)
               Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
+              Object.assign(mergedSpells, spells)
             }
           }
 
-          this.state.setAdditionalMembers({
+          this.state.setAdditional({
             teams: mergedTeams,
             selections: mergedSelections,
-            teamParticipantGroups: mergedTeamParticipantGroups
+            teamParticipantGroups: mergedTeamParticipantGroups,
+            spells: mergedSpells
           })
         })
       },

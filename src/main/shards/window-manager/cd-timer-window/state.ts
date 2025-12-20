@@ -73,7 +73,8 @@ export class CdTimerWindowState {
     { gameMode: 'ONEFORALL', abilityHaste: 0 },
     { gameMode: 'NEXUSBLITZ', abilityHaste: 0 },
     { gameMode: 'ULTBOOK', abilityHaste: 0 },
-    { gameMode: 'ONEFORALL', abilityHaste: 0 }
+    { gameMode: 'ONEFORALL', abilityHaste: 0 },
+    { gameMode: 'KIWI', abilityHaste: 70 }
   ]
 
   gameTime: number | null = null

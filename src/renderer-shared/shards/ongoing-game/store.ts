@@ -5,7 +5,7 @@ import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalTeamMembersResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
@@ -160,10 +160,11 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const draft = shallowRef<{
     teams: Record<string, string[]>
   } | null>(null)
-  const additionalMembers = shallowRef<AdditionalTeamMembersResult>({
+  const additional = shallowRef<AdditionalResult>({
     teams: {},
     selections: {},
-    teamParticipantGroups: {}
+    teamParticipantGroups: {},
+    spells: {}
   })
 
   return {
@@ -191,7 +192,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     rankedStatsLoadingState,
     championMasteryLoadingState,
     teamParticipantGroups,
-    additionalMembers,
+    additional,
     draft
   }
 })

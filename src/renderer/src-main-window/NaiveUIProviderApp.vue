@@ -65,6 +65,9 @@ const themeOverrides = computed(() => {
       },
       Scrollbar: {
         width: '6px'
+      },
+      Dropdown: {
+        color: '#222e'
       }
     } as GlobalThemeOverrides
   } else {

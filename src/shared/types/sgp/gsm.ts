@@ -46,7 +46,7 @@ interface SpectatorGameflowSession {
 }
 
 interface SpectatorGameflowSessionPlayerChampionSelection {
-  summonerInternalName: string
+  puuid: string
   championId: number
   selectedSkinIndex: number
   spell1Id: number

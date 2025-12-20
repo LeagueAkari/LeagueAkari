@@ -29,7 +29,7 @@
         <!-- anvil -->
         <div
           v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
-          class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/50 dark:bg-white/10 dark:text-white"
+          class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/80 dark:bg-white/10 dark:text-white"
         >
           {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
         </div>

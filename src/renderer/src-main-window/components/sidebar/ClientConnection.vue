@@ -84,7 +84,10 @@
             </NButton>
 
             <NDropdown
-              :theme-overrides="dropdownThemeOverrides"
+              :theme-overrides="{
+                fontSizeSmall: '13px',
+                optionHeightSmall: '24px'
+              }"
               trigger="click"
               placement="top-start"
               size="small"
@@ -226,22 +229,6 @@ const otherClients = computed(() => {
 })
 
 const clientExtraInfo = lcps.connectableClientExtraInfo
-
-const dropdownThemeOverrides = computed(() => {
-  if (as.colorTheme === 'dark') {
-    return {
-      color: '#222e',
-      fontSizeSmall: '12px',
-      optionHeightSmall: '24px'
-    }
-  }
-
-  return {
-    color: '#ffffff',
-    fontSizeSmall: '12px',
-    optionHeightSmall: '24px'
-  }
-})
 
 const actions = computed(() => {
   return [

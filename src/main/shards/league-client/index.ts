@@ -561,9 +561,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    axiosRetry(this._http, {
-      retries: 2
-    })
+    axiosRetry(this._http, { retries: 2 })
 
     try {
       await this._http.get(LeagueClientMain.HTTP_PING_URL)

@@ -12,8 +12,11 @@ import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-sc
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
+import { AdditionalInfoShard } from './additional-info'
+
 const manager = createManager()
 
+manager.use(AdditionalInfoShard)
 manager.use(AkariIpcRenderer)
 manager.use(AppCommonRenderer)
 manager.use(LeagueClientRenderer, {
