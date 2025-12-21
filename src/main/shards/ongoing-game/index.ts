@@ -280,8 +280,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
    * 更新所有涉及到的玩家的数据
    */
   private _updateSummoners(puuids: string[], force = false) {
-    this._log.warn('DEBUG -> Update summoners', puuids)
-
     for (const puuid of Object.keys(this.state.summoner)) {
       if (!puuids.includes(puuid)) {
         delete this.state.summoner[puuid]

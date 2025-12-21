@@ -29,7 +29,7 @@
           <div class="w-[300px] space-y-2">
             <div ref="stickySentinelLeftSideEl" class="h-0 w-full"></div>
             <MatchHistoryPagination
-              :is-floating="isReadyToPerformTransition && !isSentinelVisibleLeftSide"
+              :is-floating="!frozenVisibleLeftSide"
               class="sticky top-2 z-10 -mt-2"
             />
             <NormalTagBlock />
@@ -48,8 +48,8 @@
 
     <div
       :class="{
-        'pointer-events-auto opacity-80': isReadyToPerformTransition && shouldShowScrollToTopButton,
-        'pointer-events-none opacity-0': !isReadyToPerformTransition || !shouldShowScrollToTopButton
+        'pointer-events-auto opacity-80': shouldShowScrollToTopButton,
+        'pointer-events-none opacity-0': !shouldShowScrollToTopButton
       }"
       class="absolute! right-8 bottom-8 z-10 transition-opacity hover:opacity-100"
     >
@@ -92,6 +92,7 @@ import MatchHistoryList from './MatchHistoryList.vue'
 import PlayerTabHeader from './PlayerTabHeader.vue'
 import { providePlayerTab } from './context'
 import { SMALL_SIZE_THRESHOLD } from './data/constants'
+import { useFreezeValue } from './utils/freeze'
 import EncounteredGames from './widgets/EncounteredGames.vue'
 import MatchHistoryPagination from './widgets/MatchHistoryPagination.vue'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'
@@ -107,10 +108,21 @@ const { id, puuid, sgpServerId } = defineProps<{
 
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
+const pts = usePlayerTabsStore()
 
 const { contentWidth } = useAppContext()
 
 const isSmallSize = computed(() => contentWidth.value < SMALL_SIZE_THRESHOLD)
+
+const isCurrentTab = computed(() => {
+  return pts.currentTabId === id
+})
+
+const isActivated = useActivated()
+
+const isInvisible = computed(() => {
+  return !isCurrentTab.value || !isActivated.value
+})
 
 const scrollbarEl = useTemplateRef('scrollbarEl')
 const stickySentinelLeftSideEl = useTemplateRef('stickySentinelLeftSideEl')
@@ -122,12 +134,23 @@ const isSentinelVisibleRightSide = useElementVisibility(stickySentinelRightSideE
   initialValue: true
 })
 
+const {
+  value: frozenVisibleLeftSide,
+  freeze: freezeLeftSide,
+  unfreeze: unfreezeLeftSide
+} = useFreezeValue(isSentinelVisibleLeftSide)
+const {
+  value: frozenVisibleRightSide,
+  freeze: freezeRightSide,
+  unfreeze: unfreezeRightSide
+} = useFreezeValue(isSentinelVisibleRightSide)
+
 const shouldShowScrollToTopButton = computed(() => {
   if (isSmallSize.value) {
-    return !isSentinelVisibleRightSide.value
+    return !frozenVisibleRightSide.value
   }
 
-  return !isSentinelVisibleLeftSide.value
+  return !frozenVisibleLeftSide.value
 })
 
 const showPreviewModal = ref(false)
@@ -157,34 +180,20 @@ const scrollToTop = () => {
   scrollbarEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// 一个粗糙的处理闪烁问题的实现
-// v-show / keep-alive 在不可见时，实际上 dom 的可见性也会变化，在后台它们的可见性被设置为 false，在切换回之后被切换成 true
-// 这中间就会产生闪烁，不符合直觉
-// 虽然目前的方式也很怪，但两者取其轻
-const pts = usePlayerTabsStore()
-
-const isCurrentTab = computed(() => {
-  return pts.currentTabId === id
-})
-
-const isActivated = useActivated()
-
-const isCriticalPoint = computed(() => {
-  return isCurrentTab.value && isActivated.value
-})
-
-const isReadyToPerformTransition = ref(false)
-
+// 一个粗糙的解决闪烁问题的方式
+// 我们假设浏览器在 50ms 内可以完成异步的 intersection observer 的回调
 const { start, stop } = useTimeoutFn(() => {
-  isReadyToPerformTransition.value = true
+  unfreezeLeftSide()
+  unfreezeRightSide()
 }, 50)
 
 watchEffect(() => {
-  if (isCriticalPoint.value) {
-    start()
-  } else {
+  if (isInvisible.value) {
     stop()
-    isReadyToPerformTransition.value = false
+    freezeLeftSide()
+    freezeRightSide()
+  } else {
+    start()
   }
 })
 

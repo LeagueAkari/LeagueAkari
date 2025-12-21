@@ -1,7 +1,7 @@
 import { makeAutoObservable, observable } from 'mobx'
 
 export class RespawnTimerSettings {
-  enabled: boolean = false
+  enabled: boolean = true
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled
