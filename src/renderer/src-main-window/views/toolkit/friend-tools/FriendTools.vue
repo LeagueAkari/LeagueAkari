@@ -65,7 +65,7 @@
             v-model:expanded-row-keys="expandedRowKeys"
             size="small"
             :max-height="600"
-          ></NDataTable>
+          />
         </NCard>
       </div>
     </NScrollbar>
@@ -190,8 +190,8 @@ const renderGroupName = (row: any) => {
 const dataTableThemeOverrides = computed(() => {
   if (as.colorTheme === 'dark') {
     return {
-      thColor: 'rgba(15, 23, 42, 0.75)',
-      tdColor: 'rgba(15, 23, 42, 0.6)'
+      thColor: 'rgba(23, 23, 23, 0.6)',
+      tdColor: 'rgba(23, 23, 23, 0.4)'
     }
   }
 

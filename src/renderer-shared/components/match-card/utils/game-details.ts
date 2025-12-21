@@ -35,8 +35,10 @@ export function isCritAttack(spellName: string): boolean {
   return spellName.includes('critattack')
 }
 
-export function isBasicAttack(spellName: string): boolean {
-  return spellName.includes('basicattack')
+export function isBasicAttack(spellSlot: number): boolean {
+  return (
+    spellSlot === 64 || spellSlot === 65 || spellSlot === 66 || spellSlot === 63 || spellSlot === 56
+  )
 }
 
 export function isAugmentSpell(spellName: string): boolean {

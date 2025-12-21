@@ -138,6 +138,11 @@ export class AutoGameflowState {
    */
   willSearchMatchAt: number = -1
 
+  /**
+   * 即将进行的自动重连操作将在指定时间戳完成
+   */
+  willReconnectAt: number = -1
+
   get activityStartStatus() {
     if (!this._lcData.lobby.lobby) {
       return 'unavailable'
@@ -209,6 +214,10 @@ export class AutoGameflowState {
   clearAutoSearchMatch() {
     this.willSearchMatch = false
     this.willSearchMatchAt = -1
+  }
+
+  setReconnectAt(at: number) {
+    this.willReconnectAt = at
   }
 
   constructor(

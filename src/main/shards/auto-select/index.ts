@@ -90,7 +90,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     await this._handleState()
     this._handleIpcCall()
 
-    this._handleBanPickEx()
+    this._handleBanPick()
   }
 
   /**
@@ -138,8 +138,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       .catch(() => {})
   }
 
-  // testing only
-  private _handleBanPickEx() {
+  private _handleBanPick() {
     this._mobx.reaction(
       () => this.state.chatId,
       (id) => {
@@ -552,21 +551,32 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       return newObj
     }
 
+    /**
+     * 可选池子可见性处理
+     */
+    const scopedBenchChampions = computed(() => {
+      if (this.state.move === 'subset-bench-swap') {
+        return this.state.subsetChampionList
+      } else if (this.state.move === 'bench-swap') {
+        return this.state.benchChampions.map((c) => c.championId)
+      }
+
+      return []
+    })
+
     // diff
     this._mobx.reaction(
-      () => this.state.benchChampions,
+      () => scopedBenchChampions.get(),
       (bench) => {
         if (!bench) {
           benchChampionCooldown.set(null)
           return
         }
 
-        const newCd = trackCd(
-          benchChampionCooldown.get(),
-          bench.map((c) => c.championId)
-        )
+        const newCd = trackCd(benchChampionCooldown.get(), bench)
         benchChampionCooldown.set(newCd)
-      }
+      },
+      { equals: comparer.shallow }
     )
 
     const benchSwapContext = computed(() => {
@@ -689,17 +699,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.state.ongoingChampionSwap,
       (trade, prev) => {
-        if (!trade || trade.state !== 'RECEIVED') {
-          this._log.error('[DEBUG]', trade, '=>', null)
-          this.state.setOngoingChampionSwapCreatedAt(null)
+        // 仅在第一次**收到** trade 时，记录其可用的时间
+        if (!prev && trade && trade.state === 'RECEIVED') {
+          this.state.setOngoingChampionSwapCreatedAt(Date.now())
           return
         }
 
-        // 仅在第一次**收到** trade 时，记录其可用的时间
-        if (!prev && trade.state === 'RECEIVED') {
-          this._log.error('[DEBUG]', trade, '=>', Date.now())
-          this.state.setOngoingChampionSwapCreatedAt(Date.now())
-        }
+        this.state.setOngoingChampionSwapCreatedAt(null)
       },
       { fireImmediately: true }
     )

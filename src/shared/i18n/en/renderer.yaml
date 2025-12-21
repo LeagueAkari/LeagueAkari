@@ -162,6 +162,14 @@ AppSettings:
         github: 'Better response speed outside mainland China'
       better: Faster
 
+    theme:
+      label: Theme Color
+      description: Theme color for $t(common:appName)
+      options:
+        default: Follow System
+        light: Light
+        dark: Dark
+
   selfUpdate:
     title: Application Update
 
@@ -2894,6 +2902,10 @@ simple-notifications-renderer:
     extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, $t(common:appName) may not work properly'
     withAdminPositiveText: Confirm
     noAdminPositiveText: Restart with Administrator privileges
+
+  autoReconnect:
+    title: Auto Reconnect
+    content: Will reconnect in {{timeLeft}}.
 
 league-client-renderer:
   initialization-task:

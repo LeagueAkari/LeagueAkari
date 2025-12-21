@@ -3,7 +3,7 @@
     <template #header>
       <span class="card-header-title">{{ t('RewardClaimTool.title') }}</span>
     </template>
-    <div class="mb-3 text-[13px] italic text-black/60 dark:text-white/70">
+    <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
       <span>{{ t('RewardClaimTool.hint') }}</span>
     </div>
     <div class="button-group">
@@ -90,8 +90,8 @@ const isActivated = useActivated()
 const dataTableThemeOverrides = computed(() => {
   if (as.colorTheme === 'dark') {
     return {
-      thColor: 'rgba(15, 23, 42, 0.75)',
-      tdColor: 'rgba(15, 23, 42, 0.6)'
+      thColor: 'rgba(23, 23, 23, 0.3)',
+      tdColor: 'rgba(23, 23, 23, 0.2)'
     }
   }
 

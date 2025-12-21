@@ -39,6 +39,7 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
   const willAcceptAt = ref(-1)
   const willSearchMatch = ref(false)
   const willSearchMatchAt = ref(-1)
+  const willReconnectAt = ref(-1)
   const activityStartStatus = ref('unavailable')
 
   return {
@@ -48,6 +49,7 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     willAcceptAt,
     willSearchMatch,
     willSearchMatchAt,
+    willReconnectAt,
     activityStartStatus
   }
 })

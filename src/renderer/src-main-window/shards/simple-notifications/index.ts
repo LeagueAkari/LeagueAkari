@@ -1,9 +1,11 @@
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import FunnyPricing from '@renderer-shared/components/easter-eggs/FunnyPricing.vue'
 import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
+import { useTimeLeft } from '@renderer-shared/composables/useTimeLeft'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
@@ -717,6 +719,34 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleAutoReconnectNotification() {
+    const agfs = useAutoGameflowStore()
+    const notification = useNotification()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.autoReconnect'
+    })
+
+    const { timeLeft } = useTimeLeft(() => agfs.willReconnectAt, null)
+
+    let notificationReactive: NotificationReactive | null = null
+
+    watch(
+      () => timeLeft.value,
+      (leftMs) => {
+        if (leftMs > 0) {
+          notificationReactive = notification.success({
+            title: () => t('title'),
+            content: () => h('span', t('content', { timeLeft: formatSeconds(leftMs / 1000, 1) })),
+            duration: 0
+          })
+        } else {
+          notificationReactive?.destroy()
+        }
+      },
+      { immediate: true }
+    )
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -737,6 +767,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._handleCannotGetUxCommandLine())
     this._setup.addSetupFn(() => this._handleHigherVersionDbWarning())
     this._setup.addSetupFn(() => this._handleBadSgpConnectionWarning())
+    this._setup.addSetupFn(() => this._handleAutoReconnectNotification())
   }
 
   showAnnouncementModal() {

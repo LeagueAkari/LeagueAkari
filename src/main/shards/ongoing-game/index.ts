@@ -972,7 +972,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   private _clearAndReloadAll() {
-    this.state.clear()
+    this.state.clear({ keepTagParams: true })
     this._ipc.sendEvent(OngoingGameMain.id, 'clear')
 
     const puuids = Object.values(this.state.teams).flat()

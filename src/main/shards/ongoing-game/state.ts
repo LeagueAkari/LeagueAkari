@@ -618,14 +618,13 @@ export class OngoingGameState {
   // unused
   gameDetailsLoadingState: Record<number, string> = {}
 
-  clear() {
+  clear(options?: { keepTagParams?: boolean }) {
     this.playerStats = null
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
     this.rankedStats = {}
     this.championMastery = {}
-    this.matchHistoryTagParams = {}
     this.matchHistoryLoadingState = {}
     this.summonerLoadingState = {}
     this.savedInfoLoadingState = {}
@@ -639,6 +638,10 @@ export class OngoingGameState {
       selections: {},
       teamParticipantGroups: {},
       spells: {}
+    }
+
+    if (!options?.keepTagParams) {
+      this.matchHistoryTagParams = {}
     }
   }
 

@@ -117,8 +117,8 @@ const selectedMissionIds = ref<string[]>([])
 const dataTableThemeOverrides = computed(() => {
   if (as.colorTheme === 'dark') {
     return {
-      thColor: 'rgba(15, 23, 42, 0.75)',
-      tdColor: 'rgba(15, 23, 42, 0.6)'
+      thColor: 'rgba(23, 23, 23, 0.3)',
+      tdColor: 'rgba(23, 23, 23, 0.2)'
     }
   }
 

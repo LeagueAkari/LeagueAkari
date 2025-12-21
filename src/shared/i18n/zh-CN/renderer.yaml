@@ -163,6 +163,14 @@ AppSettings:
         github: '在中国大陆外拥有较好的响应速度'
       better: 更快
 
+    theme:
+      label: 主题颜色
+      description: $t(common:appName) 的主题颜色
+      options:
+        default: 跟随系统
+        light: 亮色
+        dark: 暗色
+
   selfUpdate:
     title: 应用更新
 
@@ -2894,6 +2902,10 @@ simple-notifications-renderer:
     extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，$t(common:appName) 可能无法正常工作
     withAdminPositiveText: 确认
     noAdminPositiveText: 以管理员权限重新启动
+
+  autoReconnect:
+    title: 自动重连
+    content: 将在 {{timeLeft}} 后重连
 
 league-client-renderer:
   initialization-task:
