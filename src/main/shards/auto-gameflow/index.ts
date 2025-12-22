@@ -670,15 +670,16 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
         if (
           !data.puuid ||
-          data.availability !== 'online' ||
+          data.availability !== 'chat' ||
           !this._lc.data.lobby.lobby?.localMember.allowedInviteOthers ||
-          !this.state.friendsToBeInvited.includes(data.puuid)
+          !this.state.friendsToBeInvited.includes(data.puuid) ||
+          this._lc.data.lobby.lobby.members.some((m) => m.puuid === data.puuid)
         ) {
           return
         }
 
         try {
-          await this._lc.api.lobby.postInvitation(data.summonerId)
+          await this._lc.api.lobby.postInvitation([data.summonerId])
 
           if (this._lc.data.chat.conversations.customGame) {
             this._lc.api.chat.chatSend(

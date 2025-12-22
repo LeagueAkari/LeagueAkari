@@ -204,14 +204,22 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       { delay: 500, fireImmediately: true } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
     )
 
-    const currentQueueId = computed(() => {
-      const session = this._lc.data.gameflow.session
-
-      if (!session) {
-        return null
+    const currentQueueTagInfo = computed(() => {
+      if (this._lc.data.lobby.lobby) {
+        return {
+          queueId: this._lc.data.lobby.lobby.gameConfig.queueId,
+          from: 'lobby' // 一个无关字段让其保持变化
+        }
       }
 
-      return session.gameData.queue.id
+      if (this._lc.data.gameflow.session) {
+        return {
+          queueId: this._lc.data.gameflow.session.gameData.queue.id,
+          from: 'gameflow-session'
+        }
+      }
+
+      return null
     })
 
     // match history
@@ -242,19 +250,24 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     this._mobx.reaction(
       () => ({
-        currentQueueId: currentQueueId.get(),
+        currentQueueTagInfo: currentQueueTagInfo.get(),
         matchHistoryTagPreference: this.settings.matchHistoryTagPreference
       }),
-      ({ currentQueueId, matchHistoryTagPreference }) => {
-        if (!currentQueueId) {
+      ({ currentQueueTagInfo, matchHistoryTagPreference }) => {
+        this._log.info('Setting match history tag params', {
+          currentQueueTagInfo,
+          matchHistoryTagPreference
+        })
+
+        if (!currentQueueTagInfo) {
           this.state.setMatchHistoryTagParams({ tag: undefined })
           return
         }
 
         this.state.setMatchHistoryTagParams({
           tag:
-            currentQueueId && matchHistoryTagPreference === 'current'
-              ? `q_${currentQueueId}`
+            currentQueueTagInfo && matchHistoryTagPreference === 'current'
+              ? `q_${currentQueueTagInfo.queueId}`
               : undefined
         })
       },

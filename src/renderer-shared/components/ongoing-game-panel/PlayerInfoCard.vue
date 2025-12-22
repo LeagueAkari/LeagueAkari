@@ -425,7 +425,7 @@
         <template #default="{ item, index }">
           <div
             :class="[
-              'relative mb-0.5 box-border flex h-[34px] cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-125',
+              'group relative mb-0.5 box-border flex h-[34px] cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-125',
               ogs.settings.showMatchHistoryItemBorder
                 ? `border ${getMatchItemThemeClasses(item).border}`
                 : '',
@@ -435,7 +435,7 @@
             @click="emits('showGame', item.game, puuid)"
           >
             <div
-              class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity hover:opacity-100"
+              class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
               :class="getMatchItemThemeClasses(item).resultText"
             >
               #{{ index + 1 }}
@@ -856,7 +856,7 @@ const getMatchItemThemeClasses = (match: {
 
   if (match.participant.winResult === 'win') {
     return {
-      bg: 'bg-[rgba(16,185,171,0.3)] dark:bg-[rgba(16,185,137,0.15)]',
+      bg: 'bg-[rgba(16,185,171,0.3)] dark:bg-[rgba(16,185,137,0.2)]',
       border: 'border-[rgba(16,185,171,1)] dark:border-[rgba(16,185,137,0.6)]',
       text: 'text-black dark:text-white',
       resultText: 'text-emerald-700 dark:text-emerald-300'

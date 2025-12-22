@@ -138,7 +138,10 @@ export class LobbyHttpApi {
     return this._http.put<void>('/lol-lobby/v2/lobby/strawberryMapId', data)
   }
 
-  postInvitation(summonerId: number) {
-    return this._http.post(`/lol-lobby/v1/lobby/invitations`, { toSummonerId: summonerId })
+  postInvitation(summonerIds: number[]) {
+    return this._http.post(
+      `/lol-lobby/v2/lobby/invitations`,
+      summonerIds.map((id) => ({ toSummonerId: id }))
+    )
   }
 }
