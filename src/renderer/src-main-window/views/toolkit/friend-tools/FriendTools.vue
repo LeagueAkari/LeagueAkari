@@ -53,6 +53,17 @@
             >
               {{ t('FriendTools.refreshButton') }}
             </NButton>
+            <NInput
+              v-model:value="friendSearchInput"
+              clearable
+              size="small"
+              :placeholder="t('FriendTools.searchPlaceholder')"
+              class="w-72!"
+            >
+              <template #prefix>
+                <NIcon><SearchIcon /></NIcon>
+              </template>
+            </NInput>
           </div>
           <NDataTable
             :theme-overrides="dataTableThemeOverrides"
@@ -84,6 +95,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Friend, FriendGroup } from '@shared/types/league-client/chat'
+import { Search as SearchIcon } from '@vicons/carbon'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -92,6 +104,8 @@ import {
   NCard,
   NDataTable,
   NEllipsis,
+  NIcon,
+  NInput,
   NPopconfirm,
   NScrollbar,
   useMessage
@@ -121,6 +135,7 @@ const expandedRowKeys = ref<number[]>([])
 
 const isLoading = ref(false)
 const isDeleting = ref(false)
+const friendSearchInput = ref('')
 
 // puuid -> info
 const extraInfoMap = ref<
@@ -223,35 +238,50 @@ const columns = computed<DataTableColumns<any>>(() => [
 ])
 
 const tableData = computed(() => {
-  return combinedGroups.value.map((group) => {
-    return {
-      id: group.id,
-      name: t(`FriendTools.groupNames.${group.name}`, group.name),
-      children: group.friends
-        .map((friend) => {
-          return {
-            id: friend.id,
-            puuid: friend.puuid,
-            icon: friend.icon,
-            name: `${friend.gameName}#${friend.gameTag}`
-          }
-        })
-        .toSorted((a, b) => {
-          const aSince = extraInfoMap.value[a.puuid]?.friendsSince
-          const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+  const query = friendSearchInput.value.toLowerCase().trim()
 
-          if (aSince && bSince) {
-            return aSince - bSince
-          } else if (aSince) {
-            return -1
-          } else if (bSince) {
-            return 1
-          } else {
-            return 0
-          }
+  return combinedGroups.value
+    .map((group) => {
+      let filteredFriends = group.friends
+
+      if (query) {
+        filteredFriends = group.friends.filter((friend) => {
+          const gameName = friend.gameName?.toLowerCase() || ''
+          const gameTag = friend.gameTag?.toLowerCase() || ''
+          const fullName = `${gameName}#${gameTag}`.toLowerCase()
+          return fullName.includes(query)
         })
-    }
-  })
+      }
+
+      return {
+        id: group.id,
+        name: t(`FriendTools.groupNames.${group.name}`, group.name),
+        children: filteredFriends
+          .map((friend) => {
+            return {
+              id: friend.id,
+              puuid: friend.puuid,
+              icon: friend.icon,
+              name: `${friend.gameName}#${friend.gameTag}`
+            }
+          })
+          .toSorted((a, b) => {
+            const aSince = extraInfoMap.value[a.puuid]?.friendsSince
+            const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+
+            if (aSince && bSince) {
+              return aSince - bSince
+            } else if (aSince) {
+              return -1
+            } else if (bSince) {
+              return 1
+            } else {
+              return 0
+            }
+          })
+      }
+    })
+    .filter((group) => group.children.length > 0)
 })
 
 const selectedFriendCount = computed(() => {

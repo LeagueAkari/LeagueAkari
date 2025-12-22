@@ -887,6 +887,7 @@ AutoMisc:
     cancelSchedule: 取消预约
     noFriends: 暂无好友
     notInLobby: 不在房间内
+    searchPlaceholder: 搜索好友名称或标签
 
 SideBarMenu:
   match-history: 战绩
@@ -2713,6 +2714,7 @@ ClaimableItem:
 
 FriendTools:
   title: 好友
+  searchPlaceholder: 搜索好友名称或标签
 
   deleteButtonC: 删除 ({{countV}})
   deleteButton: 删除

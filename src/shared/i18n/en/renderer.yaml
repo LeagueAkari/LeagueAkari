@@ -886,6 +886,7 @@ AutoMisc:
     cancelSchedule: Cancel Schedule
     noFriends: No Friends
     notInLobby: Not in Lobby
+    searchPlaceholder: Search friend name or tag
 
 SideBarMenu:
   match-history: Match History
@@ -2713,6 +2714,7 @@ ClaimableItem:
 
 FriendTools:
   title: Friends
+  searchPlaceholder: Search friend name or tag
 
   deleteButtonC: Delete ({{countV}})
   deleteButton: Delete
