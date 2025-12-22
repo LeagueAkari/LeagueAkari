@@ -1,6 +1,8 @@
 import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { Friend } from '@shared/types/league-client/chat'
+import { LcuEvent } from '@shared/types/league-client/event'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
@@ -88,8 +90,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoAccept', () => {
       this.cancelAutoAccept('normal')
     })
+
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoMatchmaking', () => {
       this.cancelAutoMatchmaking('normal')
+    })
+
+    this._ipc.onCall(AutoGameflowMain.id, 'setFriendsToBeInvited', (_, puuids: string[]) => {
+      this.state.setFriendsToBeInvited(puuids)
     })
   }
 
@@ -639,6 +646,60 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     )
   }
 
+  private _handleAutoInvitation() {
+    this._mobx.reaction(
+      () => Boolean(this._lc.data.lobby.lobby),
+      (hasLobby) => {
+        if (!hasLobby) {
+          this.state.setFriendsToBeInvited([])
+        }
+      }
+    )
+
+    this._lc.events.on<LcuEvent<Friend>>(
+      '/lol-chat/v1/friends/:id',
+      async ({ data, eventType }) => {
+        if (eventType === 'Delete') {
+          this.state.setFriendsToBeInvited(
+            this.state.friendsToBeInvited.filter((p) => p !== data.puuid)
+          )
+          return
+        }
+
+        // Create or Update is OK
+
+        if (
+          !data.puuid ||
+          data.availability !== 'online' ||
+          !this._lc.data.lobby.lobby?.localMember.allowedInviteOthers ||
+          !this.state.friendsToBeInvited.includes(data.puuid)
+        ) {
+          return
+        }
+
+        try {
+          await this._lc.api.lobby.postInvitation(data.summonerId)
+
+          if (this._lc.data.chat.conversations.customGame) {
+            this._lc.api.chat.chatSend(
+              this._lc.data.chat.conversations.customGame.id,
+              i18next.t('auto-gameflow-main.auto-invitation-sent', {
+                name: `${data.gameName} #${data.gameTag}`
+              }),
+              'celebration'
+            )
+          }
+        } catch (error) {
+          this._log.warn(`Failed to invite friend`, error)
+        } finally {
+          this.state.setFriendsToBeInvited(
+            this.state.friendsToBeInvited.filter((p) => p !== data.puuid)
+          )
+        }
+      }
+    )
+  }
+
   private async _acceptMatch() {
     try {
       await this._lc.api.matchmaking.accept()
@@ -726,7 +787,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'willAcceptAt',
       'willSearchMatch',
       'willSearchMatchAt',
-      'activityStartStatus'
+      'activityStartStatus',
+      'friendsToBeInvited'
     ])
   }
 
@@ -828,6 +890,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
     this._handleSendARAMTeamSide()
+    this._handleAutoInvitation()
   }
 
   async onDispose() {}

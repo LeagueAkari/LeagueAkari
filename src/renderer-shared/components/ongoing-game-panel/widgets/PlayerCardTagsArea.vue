@@ -404,7 +404,7 @@
         <div class="tag too-many-solo-kills">
           {{
             t('PlayerInfoCard.soloKills', {
-              times: analysis.summary.avgSoloKills.toFixed(0)
+              times: analysis.summary.avgSoloKills.toFixed(1)
             })
           }}
         </div>

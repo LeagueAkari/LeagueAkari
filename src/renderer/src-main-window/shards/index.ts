@@ -30,6 +30,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { LeagueClientPeekRenderer } from './league-client-peek'
 import { MainWindowUiRenderer } from './main-window-ui'
 import { PlayerTabsRenderer } from './player-tabs'
+import { SelfHostedLcuDataRenderer } from './self-hosted-lcu-data'
 import { SimpleNotificationsRenderer } from './simple-notifications'
 
 const manager = createManager()
@@ -53,17 +54,18 @@ manager.use(MainWindowUiRenderer)
 manager.use(PlayerTabsRenderer)
 manager.use(OngoingGameRenderer)
 manager.use(PiniaMobxUtilsRenderer)
-manager.use(StorageRenderer)
 manager.use(RendererDebugRenderer)
 manager.use(RemoteConfigRenderer)
 manager.use(RespawnTimerRenderer)
 manager.use(RiotClientRenderer)
 manager.use(SavedPlayerRenderer)
+manager.use(SelfHostedLcuDataRenderer)
 manager.use(SelfUpdateRenderer)
 manager.use(SettingUtilsRenderer)
 manager.use(SetupInAppScopeRenderer)
 manager.use(SgpRenderer)
 manager.use(SimpleNotificationsRenderer)
+manager.use(StorageRenderer)
 manager.use(WindowManagerRenderer)
 
 export { manager }

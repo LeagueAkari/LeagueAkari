@@ -143,6 +143,11 @@ export class AutoGameflowState {
    */
   willReconnectAt: number = -1
 
+  /**
+   * 即将被邀请的好友的 PUUID 列表
+   */
+  friendsToBeInvited: string[] = []
+
   get activityStartStatus() {
     if (!this._lcData.lobby.lobby) {
       return 'unavailable'
@@ -218,6 +223,10 @@ export class AutoGameflowState {
 
   setReconnectAt(at: number) {
     this.willReconnectAt = at
+  }
+
+  setFriendsToBeInvited(puuids: string[]) {
+    this.friendsToBeInvited = puuids
   }
 
   constructor(

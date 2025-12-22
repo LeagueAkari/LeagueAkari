@@ -105,6 +105,10 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideVisibleToTeam', visible)
   }
 
+  setFriendsToBeInvited(puuids: string[]) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setFriendsToBeInvited', puuids)
+  }
+
   async onInit() {
     const store = useAutoGameflowStore()
 

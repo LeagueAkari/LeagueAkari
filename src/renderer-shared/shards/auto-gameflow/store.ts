@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, shallowReactive } from 'vue'
+import { ref, shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 export type AutoHonorStrategy =
@@ -41,6 +41,7 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
   const willSearchMatchAt = ref(-1)
   const willReconnectAt = ref(-1)
   const activityStartStatus = ref('unavailable')
+  const friendsToBeInvited = shallowRef<string[]>([])
 
   return {
     settings,
@@ -50,6 +51,7 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     willSearchMatch,
     willSearchMatchAt,
     willReconnectAt,
-    activityStartStatus
+    activityStartStatus,
+    friendsToBeInvited
   }
 })

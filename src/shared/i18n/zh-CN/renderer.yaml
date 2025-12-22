@@ -778,7 +778,7 @@ AutoSelect:
   groups:
     ranked: 排位模式
     normal: 普通模式
-    aram: 大乱斗
+    aram: 大乱斗类
     cherry: 斗魂竞技场
     urf: 无限火力
     oneforall: 克隆模式
@@ -878,6 +878,15 @@ AutoMisc:
     text:
       label: 回复内容
       description: 将作为自动回复的内容词
+
+  autoInvitation:
+    title: 邀请好友进入房间
+    description: 进行一次性的监听，当指定好友空闲时，发出房间邀请。
+    unavailable: 当前不可用
+    scheduleInvite: 预约邀请
+    cancelSchedule: 取消预约
+    noFriends: 暂无好友
+    notInLobby: 不在房间内
 
 SideBarMenu:
   match-history: 战绩
@@ -2931,3 +2940,6 @@ self-update-renderer:
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
   lastUpdateSuccess: 已成功更新到 {{version}}
+
+self-hosted-lcu-data-renderer:
+  reloadFriendsFailed: 加载好友列表失败
