@@ -78,6 +78,7 @@ ongoing-game-main:
   taggedPlayer: 已标记的玩家
 
 in-game-send-main:
+  templateSuffix: 模板
   newTemplate: 新模板 {{index}}
   exampleTemplate: |
     // 定义模板元数据

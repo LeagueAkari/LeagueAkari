@@ -78,6 +78,7 @@ ongoing-game-main:
   taggedPlayer: Tagged Player
 
 in-game-send-main:
+  templateSuffix: Template
   newTemplate: New Template {{index}}
   exampleTemplate: |
     // Define the metadata of the template

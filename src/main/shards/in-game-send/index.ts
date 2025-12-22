@@ -40,6 +40,7 @@ import { TemplateEnv } from './templates/env-types'
 @Shard(InGameSendMain.id)
 export class InGameSendMain implements IAkariShardInitDispose {
   static id = 'in-game-send-main'
+  private static readonly AUTO_TEMPLATE_BOOTSTRAP_FLAG = 'autoTemplateBootstrap'
 
   /**
    * 硬性大小限制, FOR NO REASON
@@ -511,6 +512,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._handleTemplateAutoDeprecation()
     this._handelCancelShortcut()
     this._handleIpcCall()
+
+    this._autoBootstrapTemplatesIfNeeded()
   }
 
   private _checkAndInitTemplates() {
@@ -675,6 +678,70 @@ export class InGameSendMain implements IAkariShardInitDispose {
     })
 
     return template
+  }
+
+  private _isTemplateUsable(template: TemplateDef) {
+    return Boolean(template?.isValid) && template.type !== 'unknown'
+  }
+
+  private async _autoBootstrapTemplatesIfNeeded() {
+    const alreadyBootstrapped =
+      (await this._setting._getFromStorage(InGameSendMain.AUTO_TEMPLATE_BOOTSTRAP_FLAG, false)) ===
+      true
+
+    if (alreadyBootstrapped) {
+      return
+    }
+
+    const usableTemplateCount = this.settings.templates.filter((template) =>
+      this._isTemplateUsable(template)
+    ).length
+    const shouldBootstrap = usableTemplateCount === 0
+
+    if (!shouldBootstrap) {
+      return
+    }
+
+    this._log.info('Auto bootstrap remote templates')
+
+    const repoRequest = {
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config' as const
+    }
+
+    try {
+      const catalog = await this._rc.repo.getInGameSendTemplateCatalog(repoRequest)
+      for (const templateMeta of catalog.data.templates) {
+        try {
+          const { data: code } = await this._rc.repo.getRawContent(templateMeta.path, repoRequest)
+          const createdTemplate = this._createTemplate({
+            name: `${templateMeta.name} - ${i18next.t('in-game-send-main.templateSuffix')}`,
+            code,
+            type: templateMeta.type
+          })
+
+          if (!createdTemplate) {
+            continue
+          }
+
+          this._createSendableItem({
+            name: templateMeta.name,
+            content: {
+              type: 'template',
+              templateId: createdTemplate.id
+            }
+          })
+        } catch (error) {
+          this._log.warn('Auto bootstrap template failed', templateMeta.id, error)
+        }
+      }
+    } catch (error) {
+      this._log.warn('Auto bootstrap remote templates failed', error)
+    } finally {
+      await this._setting
+        ._saveToStorage(InGameSendMain.AUTO_TEMPLATE_BOOTSTRAP_FLAG, true)
+        .catch(() => {})
+    }
   }
 
   private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }): TemplateEnv {
