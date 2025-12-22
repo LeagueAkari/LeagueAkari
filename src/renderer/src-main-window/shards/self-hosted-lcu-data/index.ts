@@ -6,6 +6,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, Shard } from '@shared/akari-shard'
 import { Friend } from '@shared/types/league-client/chat'
+import { isAxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed, watch } from 'vue'
@@ -72,6 +73,10 @@ export class SelfHostedLcuDataRenderer {
         const { data } = await lc.api.chat.getFriends()
         store.friends = data
       } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 503) {
+          return
+        }
+
         message.error(() => t('self-hosted-lcu-data-renderer.reloadFriendsFailed'))
         log.error(SelfHostedLcuDataRenderer.id, 'Failed to reload friends', error)
       }

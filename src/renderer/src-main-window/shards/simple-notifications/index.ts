@@ -24,7 +24,13 @@ import { useStorageStore } from '@renderer-shared/shards/storage/store'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
-import { NotificationReactive, useDialog, useMessage, useNotification } from 'naive-ui'
+import {
+  DialogReactive,
+  NotificationReactive,
+  useDialog,
+  useMessage,
+  useNotification
+} from 'naive-ui'
 import { computed, defineComponent, h, ref, watch, watchEffect } from 'vue'
 
 import { useAppContext } from '@main-window/context'
@@ -569,6 +575,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
     const app = useInstance(AppCommonRenderer)
 
+    let dl: DialogReactive | null = null
     watch(
       [
         () => lcuxs.hasClientButNoCommandLine,
@@ -578,18 +585,18 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
       ([hasClientButNoCommandLine, isDisconnected]) => {
         if (hasClientButNoCommandLine && isDisconnected) {
           if (lcuxs.settings.useWmi) {
-            const dl = dialog.warning({
+            dl = dialog.warning({
               style: { width: '600px' },
               title: () => t('title'),
               content: () => t('alreadyUseWmi'),
               positiveText: t('withAdminPositiveText'),
-              onPositiveClick: () => dl.destroy()
+              onPositiveClick: () => dl?.destroy()
             })
 
             return
           }
 
-          const dl = dialog.warning({
+          dl = dialog.warning({
             style: { width: '600px' },
             title: () => t('title'),
             content: () =>
@@ -606,10 +613,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                   app.relaunchAsAdministrator()
                 })
               } else {
-                dl.destroy()
+                dl?.destroy()
               }
             }
           })
+        } else {
+          dl?.destroy()
         }
       },
       { immediate: true }

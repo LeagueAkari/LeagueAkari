@@ -35,6 +35,8 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
+  private _hasClientButNoCommandLineCount = 0
+
   constructor(
     private readonly _ipc: AkariIpcMain,
     private readonly _common: AppCommonMain,
@@ -123,6 +125,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       const cmds = await queryUxCommandLine(LeagueClientUxMain.UX_PROCESS_NAME)
 
       this.state.setHasClientButNoCommandLine(false)
+      this._hasClientButNoCommandLineCount = 0
 
       return cmds
     } else {
@@ -139,7 +142,13 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
         } catch {}
       }
 
-      this.state.setHasClientButNoCommandLine(pids.length !== 0 && auths.length === 0)
+      if (pids.length !== 0 && auths.length === 0) {
+        this._hasClientButNoCommandLineCount++
+      }
+
+      if (this._hasClientButNoCommandLineCount >= 5) {
+        this.state.setHasClientButNoCommandLine(true)
+      }
 
       return auths
     }

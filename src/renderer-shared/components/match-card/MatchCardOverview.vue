@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="participant && team"
-    class="transition-width @container box-border flex h-29 w-full overflow-hidden rounded border border-solid border-black/20 bg-neutral-100/95 select-none dark:border-white/20 dark:bg-neutral-900/95"
+    class="transition-width @container relative box-border flex h-29 w-full overflow-hidden rounded border border-solid border-black/20 bg-neutral-100/95 select-none dark:border-white/20 dark:bg-neutral-900/95"
   >
     <!-- main content -->
-    <div class="relative flex min-w-0 flex-1 gap-2 px-4 py-1">
+    <div class="z-1 flex min-w-0 flex-1 gap-2 px-4 py-1">
       <!-- stats content -->
       <div class="z-2 my-1 flex min-w-0 flex-1 flex-col justify-between">
         <!-- 上半部分：英雄头像 + stats line -->
@@ -322,22 +322,12 @@
           </div>
         </div>
       </div>
-
-      <!-- shadow for win / loss -->
-      <div
-        class="absolute top-0 left-0 z-1 h-full w-full"
-        :class="{
-          'shadow-win': winStyleType === 'win',
-          'shadow-loss': winStyleType === 'loss',
-          'shadow-remake': winStyleType === 'neutral'
-        }"
-      ></div>
     </div>
 
     <!-- right-end expand icon -->
     <div
       @click="$emit('toggle-expand')"
-      class="flex w-8 cursor-pointer items-center justify-center border-t-0 border-r-0 border-b-0 border-l border-solid border-l-black/10 bg-black/5 transition-colors hover:bg-black/10 active:bg-black/5 dark:border-l-white/10 dark:bg-white/5 hover:dark:bg-white/10 active:dark:bg-white/5"
+      class="z-1 flex w-8 cursor-pointer items-center justify-center border-t-0 border-r-0 border-b-0 border-l border-solid border-l-black/10 bg-white/20 transition-colors hover:bg-black/5 active:bg-black/5 dark:border-l-white/10 dark:bg-white/5 hover:dark:bg-white/10 active:dark:bg-white/5"
     >
       <NIcon
         class="text-base text-black/60 dark:text-white/60"
@@ -346,6 +336,16 @@
         <ArrowBackIosFilled />
       </NIcon>
     </div>
+
+    <!-- shadow for win / loss -->
+    <div
+      class="absolute top-0 left-0 z-0 h-full w-full"
+      :class="{
+        'shadow-win': winStyleType === 'win',
+        'shadow-loss': winStyleType === 'loss',
+        'shadow-remake': winStyleType === 'neutral'
+      }"
+    />
   </div>
 </template>
 

@@ -94,7 +94,7 @@
   </div>
 
   <NModal v-model:show="isShowingRankedModal">
-    <div class="flex flex-col items-center rounded bg-[rgba(25,25,28,0.98)] p-4">
+    <div class="flex flex-col items-center rounded bg-neutral-100/95 p-4 dark:bg-neutral-900/95">
       <div class="mb-4 grid grid-cols-2 gap-4">
         <div
           v-for="entry in displayedRankedEntries"

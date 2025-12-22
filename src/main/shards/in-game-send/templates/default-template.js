@@ -2,12 +2,12 @@ const TRANS = {
   'zh-CN': {
     unknownSummoner: '未知召唤师',
     unknownChampion: '未知英雄',
-    text: '{name}：近{count}场KDA {averageKda} 胜率 {winRate}%'
+    text: '{name}：近{count}场KDA {avgKda} 胜率 {winRate}%'
   },
   en: {
     unknownSummoner: 'Unknown Summoner',
     unknownChampion: 'Unknown Champion',
-    text: '{name}：{count} games KDA {averageKda}, win rate {winRate}%'
+    text: '{name}：{count} games KDA {avgKda}, win rate {winRate}%'
   }
 }
 
@@ -24,25 +24,21 @@ function getMessages(env) {
         name = env.gameData.champions[selection]?.name || TRANS[env.locale].unknownChampion
       }
 
-      const {
-        averageKda = 0,
-        count = 0,
-        winRate = 0
-      } = env.playerStats.players[puuid]?.summary || {}
-      return { puuid, name, averageKda, count, winRate }
+      const { avgKda = 0, count = 0, winRate = 0 } = env.playerStats.players[puuid]?.summary || {}
+      return { puuid, name, avgKda, count, winRate }
     })
-    .map(({ name, averageKda, count, winRate }) =>
+    .map(({ name, avgKda, count, winRate }) =>
       TRANS[env.locale].text
         .replace('{name}', name)
         .replace('{count}', count)
-        .replace('{averageKda}', averageKda.toFixed(2))
+        .replace('{avgKda}', avgKda.toFixed(2))
         .replace('{winRate}', (winRate * 100).toFixed(0))
     )
 }
 
 function getMetadata() {
   return {
-    version: 10,
+    version: 20,
     type: 'ongoing-game'
   }
 }
