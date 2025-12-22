@@ -2771,6 +2771,14 @@ TemplateEdit:
     ongoing-game: Default Ongoing Game Template
     remote: Remote Template
 
+  templateErrorTypes:
+    'not-an-object': Template is not an object
+    'no-getMetadata': Template is missing getMetadata method
+    'no-metadata': getMetadata method did not return a metadata object
+    'unsupported-version': Template version is not supported
+    'wrong-template-type': Template type is incorrect
+    'no-getMessages': Template is missing getMessages method
+
 SendableItemEdit:
   title: Sendable Item
   newButton: New Sendable Item
@@ -2783,6 +2791,14 @@ SendableItemEdit:
   deleteButton: Delete
   errorTemplateInvalid: Invalid template used
   errorTemplateExecutionFailed: An error occurred when executing the template last time
+
+  templateErrorTypes:
+    'not-an-object': Template is not an object
+    'no-getMetadata': Template is missing getMetadata method
+    'no-metadata': getMetadata method did not return a metadata object
+    'unsupported-version': Template version is not supported
+    'wrong-template-type': Template type is incorrect
+    'no-getMessages': Template is missing getMessages method
   plaintextPlaceholder: |
     Provide the text split by lines here, like:
     First line

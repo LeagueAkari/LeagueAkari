@@ -71,7 +71,7 @@
                     {{ t('errorTitle') }}
                   </div>
                   <div :class="$style['error-divider']"></div>
-                  <div :class="$style['error-content']">{{ item.error }}</div>
+                  <div :class="$style['error-content']">{{ translateError(item.error) }}</div>
                 </div>
               </NPopover>
             </div>
@@ -222,6 +222,26 @@ const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
+
+// TODO Merge
+const TEMPLATE_ERROR_TYPES = [
+  'not-an-object',
+  'no-getMetadata',
+  'no-metadata',
+  'unsupported-version',
+  'wrong-template-type',
+  'no-getMessages'
+] as const
+
+const translateError = (error: string | null): string => {
+  if (!error) return ''
+
+  if (TEMPLATE_ERROR_TYPES.includes(error as any)) {
+    return t(`templateErrorTypes.${error}`)
+  }
+
+  return error
+}
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)

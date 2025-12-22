@@ -23,6 +23,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
   JSContextV1,
   JS_TEMPLATE_CHECK_RESULT,
+  JS_TEMPLATE_MIN_VERSION_SUPPORT,
   checkContextV1,
   getExampleTemplate
 } from './js-template'
@@ -741,7 +742,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       playerStats: this._og.state.playerStats,
       gameDetails: this._og.state.gameDetails,
       teamParticipantGroups: this._og.state.teamParticipantGroups,
-      additionalGame: this._og.state.additionalGame
+      additionalGame: this._og.state.additionalGame,
+      addition: this._og.state.additional
     }
   }
 
@@ -751,8 +753,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private _getAkariContext(templateId: string) {
     return {
-      MAX_VERSION_SUPPORTED: 20,
-      MIN_VERSION_SUPPORTED: 20,
+      MIN_VERSION_SUPPORTED: JS_TEMPLATE_MIN_VERSION_SUPPORT,
       require,
       process,
       akariManager: this._shared.manager,

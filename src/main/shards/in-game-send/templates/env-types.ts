@@ -150,4 +150,9 @@ export interface TemplateEnv {
    * 一个 map，key 为 gameId。记录了一些由于特殊原因额外加载的对局。一个例子是遇到了熟人，会自动加载和此人相关的历史对局
    */
   additionalGame: OngoingGameState['additionalGame']
+
+  /**
+   * 额外拉取的信息，用于补全
+   */
+  addition: OngoingGameState['additional']
 }

@@ -2771,6 +2771,14 @@ TemplateEdit:
     ongoing-game: 默认对局模板
     remote: 云端模板
 
+  templateErrorTypes:
+    'not-an-object': 模板不是一个对象
+    'no-getMetadata': 模板缺少 getMetadata 方法
+    'no-metadata': getMetadata 方法未返回元数据对象
+    'unsupported-version': 模板版本不受支持
+    'wrong-template-type': 模板类型不正确
+    'no-getMessages': 模板缺少 getMessages 方法
+
 SendableItemEdit:
   title: 发送项
   newButton: 新发送项
@@ -2783,6 +2791,14 @@ SendableItemEdit:
   deleteButton: 删除
   errorTemplateInvalid: 使用了无效的模板
   errorTemplateExecutionFailed: 上一次执行次模板时出现错误
+
+  templateErrorTypes:
+    'not-an-object': 模板不是一个对象
+    'no-getMetadata': 模板缺少 getMetadata 方法
+    'no-metadata': getMetadata 方法未返回元数据对象
+    'unsupported-version': 模板版本不受支持
+    'wrong-template-type': 模板类型不正确
+    'no-getMessages': 模板缺少 getMessages 方法
   plaintextPlaceholder: |
     在这里提供按行分割的文本，比如：
     第一行

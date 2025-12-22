@@ -77,7 +77,9 @@
                       {{ t('errorTemplateExecutionFailed') }}
                     </div>
                     <div :class="$style['error-divider']"></div>
-                    <div :class="$style['error-content']">{{ executionErrors[item.id] }}</div>
+                    <div :class="$style['error-content']">
+                      {{ translateError(executionErrors[item.id]) }}
+                    </div>
                   </div>
                 </NPopover>
                 <NPopover v-else-if="item.enabled" placement="right">
@@ -374,6 +376,25 @@ const { t } = useTranslation('renderer', { keyPrefix: 'SendableItemEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
+
+const TEMPLATE_ERROR_TYPES = [
+  'not-an-object',
+  'no-getMetadata',
+  'no-metadata',
+  'unsupported-version',
+  'wrong-template-type',
+  'no-getMessages'
+] as const
+
+const translateError = (error: string | null | undefined): string => {
+  if (!error) return ''
+
+  if (TEMPLATE_ERROR_TYPES.includes(error as any)) {
+    return t(`templateErrorTypes.${error}`, { defaultValue: error })
+  }
+
+  return error
+}
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
