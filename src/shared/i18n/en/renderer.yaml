@@ -1122,6 +1122,7 @@ MatchCard:
     plateStats: Plate Stats
     plateCount_one: '{{count}} plate'
     plateCount_other: '{{count}} plates'
+    viewVictimDamageDetails: Damage Details
 
     victimDamageDetails:
       received: Received From

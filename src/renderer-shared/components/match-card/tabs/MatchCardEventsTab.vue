@@ -35,7 +35,9 @@
                       placement="right"
                     >
                       <template #trigger>
-                        <div :class="tagTheme">伤害明细</div>
+                        <div :class="tagTheme">
+                          {{ t('MatchCard.eventsTab.viewVictimDamageDetails') }}
+                        </div>
                       </template>
                       <VictimDamageDetails :event="e" />
                     </NPopover>

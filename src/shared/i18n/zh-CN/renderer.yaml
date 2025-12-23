@@ -1121,6 +1121,7 @@ MatchCard:
     filters: 筛选
     plateStats: 防御塔镀层统计
     plateCount: '{{count}} 层'
+    viewVictimDamageDetails: 伤害明细
 
     victimDamageDetails:
       received: 受到伤害

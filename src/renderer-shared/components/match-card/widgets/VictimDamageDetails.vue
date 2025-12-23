@@ -2,45 +2,54 @@
   <NScrollbar class="max-h-[70vh]">
     <div v-for="(group, index) of data.grouped" :key="group.type" class="pr-4">
       <!-- overview -->
-      <div class="mb-3 flex items-end gap-1">
-        <span class="mr-2 text-sm font-bold text-black dark:text-white">{{
-          $t(`MatchCard.eventsTab.victimDamageDetails.${group.type}`)
-        }}</span>
+      <div class="mb-3 flex items-end gap-2">
+        <div class="flex items-center gap-2">
+          <ChampionIcon
+            class="size-4 rounded"
+            :champion-id="participantMap[event.victimId]?.championId"
+          />
 
-        <span class="font-bold">
-          {{
+          <span class="text-sm font-bold text-black dark:text-white">{{
+            $t(`MatchCard.eventsTab.victimDamageDetails.${group.type}`)
+          }}</span>
+        </div>
+
+        <div>
+          <span class="font-bold">
+            {{
+              formatExtremeNumber(
+                group.type === 'received'
+                  ? data.totalPhysicalDamageReceived +
+                      data.totalMagicDamageReceived +
+                      data.totalTrueDamageReceived
+                  : data.totalPhysicalDamageDealt +
+                      data.totalMagicDamageDealt +
+                      data.totalTrueDamageDealt
+              )
+            }}
+          </span>
+          (
+          <span :class="getDamageTextColor('physical')">{{
             formatExtremeNumber(
               group.type === 'received'
-                ? data.totalPhysicalDamageReceived +
-                    data.totalMagicDamageReceived +
-                    data.totalTrueDamageReceived
-                : data.totalPhysicalDamageDealt +
-                    data.totalMagicDamageDealt +
-                    data.totalTrueDamageDealt
+                ? data.totalPhysicalDamageReceived
+                : data.totalPhysicalDamageDealt
             )
-          }}
-        </span>
-        (
-        <span :class="getDamageTextColor('physical')">{{
-          formatExtremeNumber(
-            group.type === 'received'
-              ? data.totalPhysicalDamageReceived
-              : data.totalPhysicalDamageDealt
+          }}</span>
+          /
+          <span :class="getDamageTextColor('magic')">{{
+            formatExtremeNumber(
+              group.type === 'received' ? data.totalMagicDamageReceived : data.totalMagicDamageDealt
+            )
+          }}</span>
+          /
+          <span :class="getDamageTextColor('true')">{{
+            formatExtremeNumber(
+              group.type === 'received' ? data.totalTrueDamageReceived : data.totalTrueDamageDealt
+            )
+          }}</span>
           )
-        }}</span>
-        /
-        <span :class="getDamageTextColor('magic')">{{
-          formatExtremeNumber(
-            group.type === 'received' ? data.totalMagicDamageReceived : data.totalMagicDamageDealt
-          )
-        }}</span>
-        /
-        <span :class="getDamageTextColor('true')">{{
-          formatExtremeNumber(
-            group.type === 'received' ? data.totalTrueDamageReceived : data.totalTrueDamageDealt
-          )
-        }}</span>
-        )
+        </div>
       </div>
 
       <!-- champion, minion, other -->

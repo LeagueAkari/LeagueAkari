@@ -150,7 +150,7 @@
               v-if="analysis"
               class="flex-1 text-center text-[13px] font-bold"
               :class="{
-                'text-emerald-700 dark:text-emerald-400': analysis.summary.winRate >= 0.53,
+                'text-teal-600 dark:text-teal-300': analysis.summary.winRate >= 0.53,
                 'text-black/80 dark:text-white/80':
                   analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
                 'text-red-700 dark:text-red-400': analysis.summary.winRate <= 0.47
@@ -191,7 +191,7 @@
               v-if="analysis"
               class="flex-1 text-center text-[13px] font-bold"
               :class="{
-                'text-emerald-700 dark:text-emerald-400': analysis.summary.winRate >= 0.53,
+                'text-teal-600 dark:text-teal-300': analysis.summary.winRate >= 0.53,
                 'text-black/80 dark:text-white/80':
                   analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
                 'text-red-700 dark:text-red-400': analysis.summary.winRate <= 0.47
@@ -222,7 +222,7 @@
           <div
             class="flex-1 text-center text-[13px] font-bold"
             :class="{
-              'text-emerald-700 dark:text-emerald-400': kdaIqr === 'over',
+              'text-teal-600 dark:text-teal-300': kdaIqr === 'over',
               'text-black/80 dark:text-white/80': kdaIqr === null || kdaIqr === undefined,
               'text-red-700 dark:text-red-400': kdaIqr === 'below'
             }"
@@ -856,10 +856,10 @@ const getMatchItemThemeClasses = (match: {
 
   if (match.participant.winResult === 'win') {
     return {
-      bg: 'bg-[rgba(16,185,171,0.3)] dark:bg-[rgba(16,185,137,0.2)]',
-      border: 'border-[rgba(16,185,171,1)] dark:border-[rgba(16,185,137,0.6)]',
+      bg: 'bg-[rgba(45,212,191,0.35)] dark:bg-[rgba(20,184,166,0.2)]',
+      border: 'border-[rgba(45,212,191,1)] dark:border-[rgba(20,184,166,0.6)]',
       text: 'text-black dark:text-white',
-      resultText: 'text-emerald-700 dark:text-emerald-300'
+      resultText: 'text-teal-600 dark:text-teal-300'
     }
   }
 
