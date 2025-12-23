@@ -50,7 +50,10 @@ export default defineConfig({
     plugins: [swcPlugin(), yaml()],
     build: {
       minify,
-      bytecode: SHOULD_COMPILE_TO_BYTECODE ? { transformArrowFunctions: false } : false
+      bytecode: SHOULD_COMPILE_TO_BYTECODE ? { transformArrowFunctions: false } : false,
+      rollupOptions: {
+        external: ['electron']
+      }
     },
     resolve: {
       alias: {
@@ -63,7 +66,10 @@ export default defineConfig({
   preload: {
     plugins: [swcPlugin()],
     build: {
-      minify
+      minify,
+      rollupOptions: {
+        external: ['electron']
+      }
     },
     resolve: {
       alias: {

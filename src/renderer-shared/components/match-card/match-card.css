@@ -1,7 +1,7 @@
 [data-theme='dark'] .shadow-win {
   background: radial-gradient(
     96% 168% at 0% 0%,
-    rgba(20, 184, 166, 0.35) 0%,
+    rgba(20, 184, 166, 0.3) 0%,
     rgba(20, 184, 166, 0) 100%
   );
 }
