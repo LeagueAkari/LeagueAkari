@@ -177,6 +177,7 @@ export interface Stats {
   playerScore9: number
   playerSubteamId: number
   quadraKills: number
+  roleBoundItem: number
   sightWardsBoughtInGame: number
   subteamPlacement: number
   teamEarlySurrendered: boolean

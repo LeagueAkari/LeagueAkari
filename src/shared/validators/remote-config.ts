@@ -5,7 +5,8 @@ export const leagueServersConfigV1Schema = z.object({
     z.string(),
     z.object({
       matchHistory: z.string(),
-      common: z.string()
+      common: z.string(),
+      regionPathParam: z.string().optional()
     })
   ),
 
@@ -15,7 +16,7 @@ export const leagueServersConfigV1Schema = z.object({
 
   serverNames: z.record(z.string(), z.record(z.string(), z.string())),
 
-  version: z.number().lte(1),
+  version: z.number().lte(2),
   lastUpdate: z.number()
 })
 

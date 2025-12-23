@@ -379,7 +379,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         } else {
           this._log.info(
             'Supported queues is up to date',
-            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+            dayjs(this.state.supportedQueues.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
           )
         }
       } else {
@@ -429,7 +429,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         } else {
           this._log.info(
             'Sgp league servers is up to date',
-            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+            dayjs(this.state.leagueServers.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
           )
         }
       } else {
@@ -479,7 +479,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         } else {
           this._log.info(
             'Ongoing game config is up to date',
-            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+            dayjs(this.state.ongoingGameConfig.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
           )
         }
       } else {

@@ -847,7 +847,7 @@ const getMatchItemThemeClasses = (match: {
 
   if (isNeutral) {
     return {
-      bg: 'bg-[rgba(200,200,200,0.45)] dark:bg-[rgba(255,255,255,0.12)]',
+      bg: 'bg-[rgba(200,200,200,0.45)] dark:bg-[rgba(255,255,255,0.20)]',
       border: 'border-[rgba(200,200,200,1)] dark:border-[rgba(255,255,255,0.6)]',
       text: 'text-black dark:text-white',
       resultText: 'text-black dark:text-white/80'
@@ -856,7 +856,7 @@ const getMatchItemThemeClasses = (match: {
 
   if (match.participant.winResult === 'win') {
     return {
-      bg: 'bg-[rgba(45,212,191,0.35)] dark:bg-[rgba(20,184,166,0.2)]',
+      bg: 'bg-[rgba(45,212,191,0.35)] dark:bg-[rgba(20,184,166,0.25)]',
       border: 'border-[rgba(45,212,191,1)] dark:border-[rgba(20,184,166,0.6)]',
       text: 'text-black dark:text-white',
       resultText: 'text-teal-600 dark:text-teal-300'
@@ -865,7 +865,7 @@ const getMatchItemThemeClasses = (match: {
 
   // loss
   return {
-    bg: 'bg-[rgba(239,68,68,0.3)] dark:bg-[rgba(239,68,68,0.2)]',
+    bg: 'bg-[rgba(239,68,68,0.3)] dark:bg-[rgba(239,68,68,0.25)]',
     border: 'border-[rgba(239,68,68,1)] dark:border-[rgba(239,68,68,0.6)]',
     text: 'text-black dark:text-white',
     resultText: 'text-red-700 dark:text-red-300'

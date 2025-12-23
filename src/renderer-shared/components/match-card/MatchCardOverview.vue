@@ -260,6 +260,9 @@
               </div>
             </NTooltip>
           </div>
+
+          <!-- spacer -->
+          <div v-for="i in 5 - team.length" :key="i" class="h-4"></div>
         </div>
       </div>
 

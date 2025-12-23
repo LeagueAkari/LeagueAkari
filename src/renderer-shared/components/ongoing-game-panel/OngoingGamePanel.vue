@@ -416,19 +416,19 @@ const columnsNeed = computed(() => {
 })
 
 const playerInfoCardHeightLevel = computed(() => {
-  if (height.value > 990) {
+  if (height.value > 1000) {
     return 5
   }
 
-  if (height.value > 880) {
+  if (height.value > 900) {
     return 4
   }
 
-  if (height.value > 800) {
+  if (height.value > 820) {
     return 3
   }
 
-  if (height.value > 720) {
+  if (height.value > 740) {
     return 2
   }
 

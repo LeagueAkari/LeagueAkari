@@ -58,6 +58,7 @@ export type MatchParticipant = {
   playerSubteamId: number
   teamIdentifier: string
   items: number[]
+  roleBoundItem: number
   augments: number[]
   spells: number[]
   perks: MatchParticipantPerks
@@ -203,6 +204,7 @@ export function toParticipants(
         playerSubteamId: p.playerSubteamId,
         teamIdentifier,
         items: [p.item0, p.item1, p.item2, p.item3, p.item4, p.item5, p.item6],
+        roleBoundItem: p.roleBoundItem,
         augments: [
           p.playerAugment1,
           p.playerAugment2,
@@ -324,6 +326,7 @@ export function toParticipants(
           participant.stats.item5,
           participant.stats.item6
         ],
+        roleBoundItem: participant.stats.roleBoundItem,
         augments: [
           participant.stats.playerAugment1,
           participant.stats.playerAugment2,

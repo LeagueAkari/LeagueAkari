@@ -14,7 +14,6 @@ export interface SgpGameSummaryJsonLol {
   gameCreation: number
   gameDuration: number
   gameEndTimestamp: number
-  gameModeMutators: string[]
   gameId: number
   gameMode: string
   gameName: string
@@ -28,6 +27,8 @@ export interface SgpGameSummaryJsonLol {
   seasonId: number
   teams: Team[]
   tournamentCode: string
+
+  gameModeMutators?: string[]
 }
 
 export interface Team {
@@ -199,6 +200,9 @@ export interface SgpParticipantLol {
   summonerName: string
   teamId: number
 
+  // 新赛季额外装备
+  roleBoundItem: number
+
   // 强化符文（特殊模式）
   playerAugment1: number
   playerAugment2: number
@@ -266,6 +270,12 @@ export interface SgpStatPerks {
 }
 
 export interface SgpMissions {
+  /**
+   * 目前 missions 下的字段非常多，且会随赛季更新。
+   * 保留常用字段的显式声明，同时通过索引签名允许任意数值字段。
+   */
+  [key: string]: number
+
   Missions_ChampionsKilled: number
   Missions_CreepScore: number
   Missions_GoldFromStructuresDestroyed: number
@@ -288,6 +298,7 @@ export interface SgpMissions {
 }
 
 interface Challenges {
+  [key: string]: number | undefined
   '12AssistStreakCount'?: number
   HealFromMapSources?: number
   InfernalScalePickup?: number

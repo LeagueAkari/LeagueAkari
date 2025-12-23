@@ -135,13 +135,6 @@ export class SgpMain implements IAkariShardInitDispose {
         (config.headers.get(AKARI_HEADER_SGP_SERVER_ID) as string | null) ||
         this.state.availability.sgpServerId
 
-      if (config.url) {
-        config.url = config.url.replace(
-          URL_PLACEHOLDER_SUB_ID,
-          this._getSubId(preferredSgpServerId)
-        )
-      }
-
       const requiredTokenType = config.headers.get(AKARI_HEADER_TOKEN_TYPE) as string | null
 
       if (requiredTokenType) {
@@ -155,6 +148,13 @@ export class SgpMain implements IAkariShardInitDispose {
       const serverConfig = this.state.leagueServers.servers[preferredSgpServerId]
       if (!serverConfig) {
         throw new Error(`Server config not found for sgp server ID: ${preferredSgpServerId}`)
+      }
+
+      if (config.url) {
+        config.url = config.url.replace(
+          URL_PLACEHOLDER_SUB_ID,
+          serverConfig.regionPathParam ?? this._getSubId(preferredSgpServerId)
+        )
       }
 
       const baseUrl =

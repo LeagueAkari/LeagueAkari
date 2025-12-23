@@ -15,8 +15,8 @@ export const BUILTIN_ONGOING_GAME_CONFIG: OngoingGameConfig = {
 }
 
 export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
-  version: 1,
-  lastUpdate: 1750232342632,
+  version: 2,
+  lastUpdate: 1766507714644,
   servers: {
     TENCENT_HN1: {
       matchHistory: 'https://hn1-k8s-sgp.lol.qq.com:21019',
@@ -76,7 +76,8 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
     },
     PBE: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
-      common: 'https://pbe-red.lol.sgp.pvp.net'
+      common: 'https://pbe-red.lol.sgp.pvp.net',
+      regionPathParam: 'PBE1'
     },
     EUW: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',

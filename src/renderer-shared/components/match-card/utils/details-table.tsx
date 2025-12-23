@@ -390,6 +390,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'item4', hide: true },
       { key: 'item5', hide: true },
       { key: 'item6', hide: true },
+      { key: 'roleBoundItem', hide: true },
       // Augments
       { key: 'playerAugment1', hide: true },
       { key: 'playerAugment2', hide: true },

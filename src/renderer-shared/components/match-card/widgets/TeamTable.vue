@@ -284,6 +284,13 @@
             :is-trinket="index === participant.items.length - 1"
             :key="item"
           />
+
+          <ItemDisplay
+            v-if="hasRoleBoundItems"
+            :item-id="participant.roleBoundItem"
+            :size="20"
+            :key="participant.roleBoundItem"
+          />
         </div>
       </template>
     </div>
@@ -322,6 +329,15 @@ interface ColumnConfig {
   class: string
 }
 
+const hasRoleBoundItems = computed(() => {
+  return teamParticipants.value.some((p) => p.roleBoundItem)
+})
+
+const someoneHas6Augments = computed(() => {
+  // 0 或 undefined 都算没有
+  return teamParticipants.value.some((p) => p.augments[5])
+})
+
 const extraColumns = computed<ColumnConfig[]>(() => {
   switch (basicInfo.value.gameMode) {
     case 'CHERRY':
@@ -348,7 +364,10 @@ const extraColumns = computed<ColumnConfig[]>(() => {
         { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
         { name: 'cs', class: 'hidden @[700px]:block w-[4.5rem] text-center' },
         { name: 'gold', class: 'min-w-[4.5rem] text-xs text-center' },
-        { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
+        {
+          name: 'items',
+          class: `${hasRoleBoundItems ? 'min-w-45' : 'min-w-40'} flex gap-0.5 justify-center`
+        }
       ]
   }
 })
@@ -390,11 +409,6 @@ const team = computed(() => {
 
 const teamParticipants = computed(() => {
   return participants.value.filter((p) => p.teamIdentifier === teamIdentifier)
-})
-
-const someoneHas6Augments = computed(() => {
-  // 0 或 undefined 都算没有
-  return teamParticipants.value.some((p) => p.augments[5])
 })
 
 const handleMouseDown = (event: MouseEvent) => {
