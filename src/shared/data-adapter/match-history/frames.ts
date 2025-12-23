@@ -6,7 +6,11 @@ import { LcuOrSgpGameDetails } from '../wrapper'
 export function isSgpChampionKillEvent(event: any): event is DetailedChampionKillEvent {
   if (typeof event !== 'object') return false
 
-  return Array.isArray(event.victimDamageDealt) && Array.isArray(event.victimDamageReceived)
+  return (
+    event.type === 'CHAMPION_KILL' &&
+    Array.isArray(event.victimDamageDealt) &&
+    Array.isArray(event.victimDamageReceived)
+  )
 }
 
 export function toFrames(details: LcuOrSgpGameDetails): (DetailedTimelineFrame | TimelineFrame)[] {

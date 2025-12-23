@@ -24,6 +24,61 @@ export const playerColors = [
   '#64B5F6' // 浅蓝色
 ]
 
+export const skillKeyColors: Record<
+  string,
+  {
+    light: string
+    dark: string
+  }
+> = {
+  A: {
+    light: 'bg-slate-500/40 border-slate-500',
+    dark: 'dark:bg-slate-400/20 dark:border-slate-300/60'
+  },
+  P: {
+    light: 'bg-amber-500/40 border-amber-500',
+    dark: 'dark:bg-amber-400/20 dark:border-amber-300/60'
+  },
+  Q: {
+    light: 'bg-sky-500/40 border-sky-500',
+    dark: 'dark:bg-sky-600/20 dark:border-sky-400/60'
+  },
+  W: {
+    light: 'bg-emerald-500/40 border-emerald-500',
+    dark: 'dark:bg-emerald-400/20 dark:border-emerald-400/60'
+  },
+  E: {
+    light: 'bg-violet-500/40 border-violet-500',
+    dark: 'dark:bg-violet-400/20 dark:border-violet-400/60'
+  },
+  R: {
+    light: 'bg-orange-500/40 border-orange-500',
+    dark: 'dark:bg-orange-400/20 dark:border-orange-400/60'
+  },
+  '?': {
+    light: 'bg-gray-300/40 border-gray-400',
+    dark: 'dark:bg-gray-500/20 dark:border-gray-400/60'
+  }
+}
+
+export function getClassBySkillKey(key: string) {
+  const base = 'border border-solid'
+  const theme = skillKeyColors[key.toUpperCase()] ?? skillKeyColors['?']
+  return `${base} ${theme.light} ${theme.dark}`
+}
+
+export function getClassBySkillSlot(slot: number) {
+  const map: Record<number, 'Q' | 'W' | 'E' | 'R'> = {
+    1: 'Q',
+    2: 'W',
+    3: 'E',
+    4: 'R'
+  }
+
+  const key = map[slot] ?? '?'
+  return getClassBySkillKey(key)
+}
+
 export function useWinResultTagTheme(result: MaybeRefOrGetter<string | undefined>) {
   return computed(() => {
     const r = toValue(result)
@@ -63,7 +118,9 @@ export function useWinResultTabSwitchTheme(result: MaybeRefOrGetter<string | und
   })
 }
 
-export function getTeamColor(teamIdentifier: string) {
+export function getTeamColor(teamIdentifier?: string) {
+  if (!teamIdentifier) return '#9CA3AF'
+
   if (teamIdentifier === 'TEAM-100') return '#3B82F6'
   if (teamIdentifier === 'TEAM-200') return '#EF4444'
 
@@ -75,4 +132,12 @@ export function getTeamColor(teamIdentifier: string) {
   }
 
   return '#9CA3AF'
+}
+
+export function getDamageTextColor(type: 'physical' | 'magic' | 'true' | (string & {})) {
+  if (type === 'physical') return 'text-[#e07856] dark:text-[#f08a6a]'
+  if (type === 'magic') return 'text-[#5b9fd7] dark:text-[#6fb0e6]'
+  if (type === 'true') return 'text-[#a8a8a8] dark:text-white'
+
+  return 'text-[#e07856] dark:text-[#f08a6a]'
 }

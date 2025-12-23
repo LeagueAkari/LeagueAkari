@@ -241,14 +241,14 @@
 
         <!-- dmg dealt / dmg taken -->
         <div v-else-if="column.name === 'damage'" :class="column.class">
-          <DamageMetricBar
+          <DamageBarWithPopover
             :total-damage="participant.totalDamageDealtToChampions"
             :physical-damage="participant.physicalDamageDealtToChampions"
             :magic-damage="participant.magicDamageDealtToChampions"
             :true-damage="participant.trueDamageDealtToChampions"
             :baseline-damage="teams.allTeamStats.maxDamageDealtToChampions"
           />
-          <DamageMetricBar
+          <DamageBarWithPopover
             :total-damage="participant.totalDamageTaken"
             :physical-damage="participant.physicalDamageTaken"
             :magic-damage="participant.magicDamageTaken"
@@ -314,7 +314,7 @@ import RiftHerald from '../icons/RiftHerald.vue'
 import Tower from '../icons/Tower.vue'
 import VoidGrub from '../icons/VoidGrub.vue'
 import { useGameResultName, usePosition, useTeamName } from '../utils/text'
-import DamageMetricBar from './DamageMetricBar.vue'
+import DamageBarWithPopover from './DamageBarWithPopover.vue'
 import RadarChart from './RadarChart.vue'
 
 interface ColumnConfig {

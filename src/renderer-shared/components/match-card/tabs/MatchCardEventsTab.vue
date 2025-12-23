@@ -19,11 +19,25 @@
                 <template #header>
                   <div class="flex items-center gap-2">
                     <div>{{ frameEventType(e.type) }}</div>
+
+                    <!-- view map position -->
                     <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
                       <template #trigger>
                         <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
                       </template>
                       <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
+                    </NPopover>
+
+                    <!-- view victim damage details -->
+                    <NPopover
+                      v-if="isSgpChampionKillEvent(e)"
+                      :show-arrow="false"
+                      placement="right"
+                    >
+                      <template #trigger>
+                        <div :class="tagTheme">伤害明细</div>
+                      </template>
+                      <VictimDamageDetails :event="e" />
                     </NPopover>
                   </div>
                 </template>
@@ -226,6 +240,7 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { isSgpChampionKillEvent } from '@shared/data-adapter/match-history/frames'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -246,6 +261,7 @@ import Tower from '../icons/Tower.vue'
 import { useBuildingType, useFrameEventType, useLaneType, useTowerType } from '../utils/text'
 import { useWinResultTagTheme } from '../utils/theme'
 import MapPosition from '../widgets/MapPosition.vue'
+import VictimDamageDetails from '../widgets/VictimDamageDetails.vue'
 
 const { participants, details, basicInfo, frames, team, loadingDetails, onLoadDetails } =
   useMatchCard()

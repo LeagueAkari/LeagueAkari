@@ -63,7 +63,7 @@
             <div
               v-else
               class="flex size-6 cursor-default items-center justify-center rounded text-xs font-bold"
-              :class="getSkillClass(sk.skillSlot)"
+              :class="getClassBySkillSlot(sk.skillSlot)"
               :title="`${sk.displayLevel} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
             >
               {{
@@ -171,8 +171,7 @@ import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
-import { getTeamColor } from '../utils/theme'
-import { useWinResultTagTheme } from '../utils/theme'
+import { getClassBySkillSlot, getTeamColor, useWinResultTagTheme } from '../utils/theme'
 import { formatMilliseconds } from '../utils/time'
 
 const {
@@ -279,20 +278,6 @@ const collected = computed(() => {
     itemPurchaseEvents
   }
 })
-
-// 根据技能槽位返回对应的样式类
-const getSkillClass = (skillSlot: number) => {
-  const classes = {
-    1: 'bg-sky-500/40 border-sky-500 dark:bg-sky-600/20 dark:border-sky-400/60 border border-solid',
-    2: 'bg-emerald-500/40 border-emerald-500 dark:bg-emerald-400/20 dark:border-emerald-400/60 border border-solid',
-    3: 'bg-violet-500/40 border-violet-500 dark:bg-violet-400/20 dark:border-violet-400/60 border border-solid',
-    4: 'bg-orange-500/40 border-orange-500 dark:bg-orange-400/20 dark:border-orange-400/60 border border-solid'
-  }
-  return (
-    classes[skillSlot as keyof typeof classes] ||
-    'bg-gray-300/20 border-gray-300/50 border border-solid'
-  )
-}
 
 const position = usePosition()
 const tagTheme = useWinResultTagTheme(() => team.value?.winResult)

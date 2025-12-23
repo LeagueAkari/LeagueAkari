@@ -1123,6 +1123,16 @@ MatchCard:
     plateCount_one: '{{count}} plate'
     plateCount_other: '{{count}} plates'
 
+    victimDamageDetails:
+      received: Received From
+      dealt: Dealt To
+      damageDealerNames:
+        champion: Champion
+        tower: Tower
+        minion: Minion
+        monster: Monster
+        other: Other
+
   tags:
     times: '{{label}}×{{count}}'
     multiKill:

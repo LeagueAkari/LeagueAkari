@@ -1122,6 +1122,16 @@ MatchCard:
     plateStats: 防御塔镀层统计
     plateCount: '{{count}} 层'
 
+    victimDamageDetails:
+      received: 受到伤害
+      dealt: 造成伤害
+      damageDealerNames:
+        champion: 英雄
+        tower: 防御塔
+        minion: 小兵
+        monster: 野怪
+        other: 其他
+
   tags:
     times: '{{label}}×{{count}}'
     multiKill:
