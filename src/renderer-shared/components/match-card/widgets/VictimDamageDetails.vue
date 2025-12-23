@@ -72,7 +72,15 @@
           v-if="receiver.type === 'monster'"
           :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.monster`)"
         >
+          <NIcon
+            v-if="receiver.name === CHERRY_SHOPKEEPER_NAME"
+            class="rounded-full border-solid border-black/40 p-1 text-[24px] dark:border-white/40"
+          >
+            <Fire />
+          </NIcon>
+
           <DragonIcon
+            v-else
             class="size-6 rounded-full border-solid border-black/40 p-1 dark:border-white/40"
           />
         </div>
@@ -182,7 +190,8 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import { DamageDetail, DetailedChampionKillEvent } from '@shared/types/sgp/match-history'
-import { NPopover, NScrollbar } from 'naive-ui'
+import { Fire } from '@vicons/fa'
+import { NIcon, NPopover, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -209,6 +218,8 @@ const participantMap = computed(() => {
   )
 })
 
+const CHERRY_SHOPKEEPER_NAME = 'Cherry_Shopkeeper'
+
 type DamageType = 'champion' | 'tower' | 'minion' | 'monster' | 'other'
 
 type Damage = {
@@ -229,6 +240,7 @@ type DamageSource = {
 
 type DamageDetails = {
   type: 'champion' | 'tower' | 'minion' | 'monster' | 'other'
+  name: string
   participantId: number // 非 champion 则为 0
   damageDetails: DamageSource
   totalPhysicalDamage: number
@@ -261,6 +273,7 @@ const data = computed(() => {
         if (!acc[key]) {
           acc[key] = {
             type,
+            name: cur.name,
             participantId: cur.participantId,
             damageDetails: {
               basic: null,
