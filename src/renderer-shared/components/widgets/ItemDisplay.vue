@@ -17,7 +17,10 @@
     <div class="info">
       <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
-        <div class="name">{{ lcs.gameData.items[itemId].name }} (ID: {{ itemId }})</div>
+        <div class="name">
+          {{ lcs.gameData.items[itemId].name }}
+          <span class="font-normal text-black/50 dark:text-white/50">({{ itemId }})</span>
+        </div>
         <div class="price">
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
@@ -96,80 +99,50 @@ const lcs = useLeagueClientStore()
 
 @layer components {
   .info {
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
+    @apply mb-2 flex items-center;
 
     .image {
-      width: 28px;
-      height: 28px;
-      border-radius: 2px;
+      @apply size-7 rounded-xs;
     }
 
     .right-side {
-      margin-left: 8px;
+      @apply ml-2;
 
       .name {
-        font-size: 12px;
-        line-height: 12px;
-        font-weight: bold;
-        margin-bottom: 4px;
+        @apply mb-1 text-xs leading-none font-bold;
       }
 
       .price {
-        font-size: 12px;
-        line-height: 12px;
+        @apply text-xs leading-none;
       }
     }
   }
 
   .from {
-    margin-bottom: 4px;
-
-    &::before {
-      content: '=';
-    }
+    @apply mb-1 before:content-['='];
   }
 
   .to {
-    margin-bottom: 8px;
-
-    &::before {
-      content: '⇒';
-    }
+    @apply mb-2 before:content-['⇒'];
   }
 
   .from,
   .to {
-    display: flex;
-    gap: 2px;
-    align-items: center;
-    max-width: 460px;
-    flex-wrap: wrap;
+    @apply flex max-w-[460px] flex-wrap items-center gap-0.5 before:mr-1 before:text-xs before:text-white/50 before:italic before:dark:text-black/50;
 
     .image {
-      width: 20px;
-      height: 20px;
-      border-radius: 2px;
-    }
-
-    &::before {
-      font-size: 12px;
-      font-style: italic;
-      color: rgb(168, 168, 168);
-      margin-right: 4px;
+      @apply size-5 rounded-xs;
     }
   }
 
   .item.trinket,
   .trinket.empty {
-    border-radius: 50%;
+    @apply rounded-full;
   }
 
   .item,
   .item.empty {
-    flex-shrink: 0;
-    border-radius: 2px;
+    @apply shrink-0 rounded-xs;
   }
 
   .empty {

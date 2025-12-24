@@ -2,7 +2,7 @@ import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import {
-  leagueServersConfigV1Schema,
+  leagueServersConfigV2Schema,
   ongoingGameConfigV1Schema,
   supportedQueuesV1Schema
 } from '@shared/validators/remote-config'
@@ -240,7 +240,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const rawJson = await this._setting.readFromJsonConfigFile(
         RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH
       )
-      const { success, data, error } = leagueServersConfigV1Schema.safeParse(rawJson)
+      const { success, data, error } = leagueServersConfigV2Schema.safeParse(rawJson)
 
       if (success) {
         this.state.setLeagueServers(data)
@@ -413,7 +413,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         branch: 'main'
       })
 
-      const { success, data, error } = leagueServersConfigV1Schema.safeParse(remoteData)
+      const { success, data, error } = leagueServersConfigV2Schema.safeParse(remoteData)
 
       if (success) {
         if (data.lastUpdate > this.state.leagueServers.lastUpdate) {

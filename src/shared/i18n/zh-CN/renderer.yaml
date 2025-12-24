@@ -1245,6 +1245,7 @@ MatchCard:
     largestMultiKill: 最大多杀
     longestTimeSpentLiving: 最长存活时间
     largestCriticalStrike: 最大暴击伤害
+    damageGoldEfficiency: 伤转率
     # Damage - 伤害数据
     totalDamageDealtToChampions: 对英雄总伤害
     physicalDamageDealtToChampions: 对英雄物理伤害
@@ -2244,7 +2245,7 @@ SummonerSpellDisplay:
 # 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
   reload: 重新加载
-  empty: 无内容
+  empty: 无此队列对局记录
   loadingMatchHistory: 加载中...
   errorLoadingMatchHistory: 无法加载
   top4Rate: 前四率
@@ -2320,6 +2321,8 @@ PlayerInfoCard:
   winningStreak: '{{countV}} 连胜'
   losingStreak: '{{countV}} 连败'
   unknown: 未知
+
+  reloadMatchHistory: 重新加载
 
 TeamTagsArea:
   winRateTeam: 胜率队
@@ -2580,6 +2583,9 @@ OpggView:
   setRunesFailedMessage: 设置符文配法失败：{{reason}}
   spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
   runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
+
+  sessionChampions:
+    title: 本局英雄
 
 OpggChampion:
   boots: 鞋子

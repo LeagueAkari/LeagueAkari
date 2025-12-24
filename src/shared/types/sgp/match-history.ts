@@ -612,7 +612,7 @@ export interface DetailedChampionKillEvent extends BaseDetailedGameEvent {
   bounty: number
   shutdownBounty: number
   killStreakLength: number
-  victimDamageDealt: DamageDetail[]
+  victimDamageDealt?: DamageDetail[]
   victimDamageReceived: DamageDetail[]
 }
 

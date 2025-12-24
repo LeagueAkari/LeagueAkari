@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const leagueServersConfigV1Schema = z.object({
+export const leagueServersConfigV2Schema = z.object({
   servers: z.record(
     z.string(),
     z.object({
@@ -20,7 +20,7 @@ export const leagueServersConfigV1Schema = z.object({
   lastUpdate: z.number()
 })
 
-export type LeagueServersConfig = z.infer<typeof leagueServersConfigV1Schema>
+export type LeagueServersConfig = z.infer<typeof leagueServersConfigV2Schema>
 
 export const inGameSendTemplateCatalogV1Schema = z.object({
   templates: z.array(

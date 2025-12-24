@@ -1,6 +1,12 @@
 <template>
   <NScrollbar class="max-h-[70vh]">
-    <div v-for="(group, index) of data.grouped" :key="group.type" class="pr-4">
+    <div
+      v-for="(group, index) of data.grouped.filter((g) => g.data.length > 0)"
+      :key="group.type"
+      class="pr-4"
+    >
+      <div v-if="index !== 0" class="my-2 h-px w-full bg-black/10 dark:bg-white/10" />
+
       <!-- overview -->
       <div class="mb-3 flex items-end gap-2">
         <div class="flex items-center gap-2">
@@ -185,11 +191,6 @@
           </div>
         </div>
       </div>
-
-      <div
-        v-if="index !== data.grouped.length - 1"
-        class="my-2 h-px w-full bg-black/10 dark:bg-white/10"
-      />
     </div>
   </NScrollbar>
 </template>
@@ -388,7 +389,7 @@ const data = computed(() => {
   }
 
   // id 0 可能代表很多其他的伤害来源，这里当成独立处理
-  const damageDealtMap = collectDamage(event.victimDamageDealt)
+  const damageDealtMap = collectDamage(event.victimDamageDealt || [])
   const damageReceivedMap = collectDamage(event.victimDamageReceived)
 
   const { sorted: damageReceived, maxTotal: maxDamageReceived } = extractMaxAndSorted(

@@ -511,11 +511,11 @@ export function analyzeMatchHistory(
 
     count: gamesAnalysis.length,
 
-    redSideCount: filteredGames.reduce(
+    blueSideCount: filteredGames.reduce(
       (sum, { participant }) => (participant.teamIdentifier === 'TEAM-100' ? sum + 1 : sum),
       0
     ),
-    blueSideCount: filteredGames.reduce(
+    redSideCount: filteredGames.reduce(
       (sum, { participant }) => (participant.teamIdentifier === 'TEAM-200' ? sum + 1 : sum),
       0
     ),

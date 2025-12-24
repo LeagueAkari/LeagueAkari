@@ -618,6 +618,29 @@ export class OngoingGameState {
   // unused
   gameDetailsLoadingState: Record<number, string> = {}
 
+  // inferred premade
+  inferredPremade: Record<
+    string,
+    {
+      puuids: string[]
+      times: number
+      gameIds: number[]
+    }[]
+  > = {}
+
+  setInferredPremade(
+    value: Record<
+      string,
+      {
+        puuids: string[]
+        times: number
+        gameIds: number[]
+      }[]
+    >
+  ) {
+    this.inferredPremade = value
+  }
+
   clear(options?: { keepTagParams?: boolean }) {
     this.playerStats = null
     this.matchHistory = {}
@@ -633,12 +656,13 @@ export class OngoingGameState {
     this.gameDetailsLoadingState = {}
     this.gameDetails = {}
     this.additionalGame = {}
-    this.additional = {
+    ;((this.additional = {
       teams: {},
       selections: {},
       teamParticipantGroups: {},
       spells: {}
-    }
+    }),
+      (this.inferredPremade = {}))
 
     if (!options?.keepTagParams) {
       this.matchHistoryTagParams = {}
@@ -716,7 +740,8 @@ export class OngoingGameState {
       teamParticipantGroups: computed.struct,
       draft: observable.struct,
       matchHistoryTagParams: observable.struct,
-      additional: observable.struct
+      additional: observable.struct,
+      inferredPremade: observable.struct
     })
   }
 }

@@ -9,6 +9,7 @@ import {
   MatchHistoryGamesAnalysisTeamSide,
   analyzeTeamMatchHistory
 } from '@shared/data-adapter/analysis/teams'
+import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
 import {
   LcuGameSummary,
   LcuGameTimeline,
@@ -20,6 +21,7 @@ import {
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { AdditionalResult } from '@shared/types/shards/ongoing-game'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
+import { calculateTogetherTimes } from '@shared/utils/team-up-calc'
 import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
@@ -1101,6 +1103,32 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
   }
 
+  private _calcTeamUp() {
+    if (
+      !Object.keys(this.state.matchHistory).length ||
+      !Object.keys(this.state.additionalGame).length
+    ) {
+      return []
+    }
+
+    const playerMatches = Object.values(this.state.matchHistory).flatMap((m) => {
+      return m.data.map((d) => ({
+        players: toIdentities(d).map((i) => i.puuid),
+        id: d.gameId.toString()
+      }))
+    })
+
+    // 用到了将近两年前的工具，我选择不去动它，只做转换
+    // 此方法追溯到 v1.1.x
+    return calculateTogetherTimes(playerMatches, Object.values(this.state.teams).flat()).map(
+      (t) => ({
+        puuids: t.players,
+        times: t.times,
+        gameIds: t.ids.map((id) => parseInt(id))
+      })
+    )
+  }
+
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
@@ -1110,6 +1138,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       ],
       (_changedV) => {
         this.state.setPlayerStats(this._calcAnalysis())
+        // this.state.setInferredPremade(this._calcTeamUp())
       },
       { delay: 200, equals: comparer.shallow }
     )

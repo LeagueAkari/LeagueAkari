@@ -80,6 +80,7 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { usePlayerTab } from './context'
 import { useMatchHistory } from './data/match-history'
 import { useMatchHistoryFilters } from './data/match-history-filters'
+import { useSpectator } from './data/spectator'
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
@@ -92,6 +93,8 @@ const { masked } = useStreamerModeMaskedText()
 const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
 const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay, loadMatchHistory } =
   useMatchHistory()
+
+const { loadSpectatorData } = useSpectator()
 
 const { filters, hasFilters } = useMatchHistoryFilters()
 
@@ -175,14 +178,18 @@ watch(
 
       const allPlayerPuuids = Object.values(ogs.teams).flat()
 
-      if (
-        (!pagedMatchHistory.value || (pagedMatchHistory.value.queryParams.startIndex || 0) === 0) &&
-        allPlayerPuuids.includes(puuid.value)
-      ) {
-        loadMatchHistory({
-          startIndex: 0,
-          count: pts.frontendSettings.loadCount
-        })
+      if (allPlayerPuuids.includes(puuid.value)) {
+        loadSpectatorData()
+
+        if (
+          !pagedMatchHistory.value ||
+          (pagedMatchHistory.value.queryParams.startIndex || 0) === 0
+        ) {
+          loadMatchHistory({
+            startIndex: 0,
+            count: pts.frontendSettings.loadCount
+          })
+        }
       }
     }
   }

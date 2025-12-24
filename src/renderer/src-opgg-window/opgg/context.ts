@@ -332,11 +332,18 @@ export function provideOpgg() {
 
       let mode0 = mode.value
       let isUnsupportedMode = false
+      let justSwitchTab = false
+
       switch (active.gameMode) {
         case 'CLASSIC':
           mode0 = 'ranked'
           break
         case 'ARAM':
+          mode0 = 'aram'
+          position.value = 'none'
+          break
+        case 'KIWI':
+          justSwitchTab = true
           mode0 = 'aram'
           position.value = 'none'
           break
@@ -394,6 +401,10 @@ export function provideOpgg() {
           mode: mode0,
           position: position0
         })
+
+        if (justSwitchTab) {
+          return
+        }
 
         // 处理自动化
         const summonerSpells = champion.value?.data.summoner_spells

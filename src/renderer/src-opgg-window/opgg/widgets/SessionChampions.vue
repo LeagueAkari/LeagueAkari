@@ -1,13 +1,12 @@
 <template>
   <NPopover v-if="champions.length" raw placement="top-end" :show-arrow="false">
     <template #trigger>
-      <ChampionIcon
-        class="absolute right-5 bottom-5 size-9 cursor-pointer transition-opacity hover:opacity-20"
-        :champion-id="-1"
-        ring
-        :ring-color="triggerRingColor"
-        round
-      />
+      <div
+        class="absolute right-5 bottom-5 flex cursor-pointer items-center gap-1 rounded-full bg-blue-400 py-1 pr-2 pl-1 text-white transition-opacity hover:opacity-20 dark:bg-neutral-600"
+      >
+        <ChampionIcon class="size-6" :champion-id="-1" ring :ring-color="triggerRingColor" round />
+        <div class="text-sm">{{ $t('OpggView.sessionChampions.title') }}</div>
+      </div>
     </template>
     <div
       class="grid grid-cols-5 gap-2 rounded-lg bg-neutral-100 p-3 backdrop-blur-sm dark:bg-neutral-900"
@@ -20,7 +19,7 @@
         ring
         :ring-color="itemRingColor"
         round
-        @click="emits('toChampion', c)"
+        @click="setTab('champion', c)"
       />
     </div>
   </NPopover>
@@ -33,6 +32,8 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
+import { useOpgg } from '../context'
+
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
 
@@ -44,9 +45,7 @@ const itemRingColor = computed(() => {
   return as.colorTheme === 'dark' ? '#fff4' : 'rgba(0, 0, 0, 0.15)'
 })
 
-const emits = defineEmits<{
-  toChampion: [championId: number]
-}>()
+const { setTab } = useOpgg()
 
 const champions = computed(() => {
   const s1 = lcs.gameflow.session

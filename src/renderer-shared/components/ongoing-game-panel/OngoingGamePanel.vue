@@ -60,7 +60,7 @@
             @show-game-by-id="emits('showGameById', $event, player)"
             @to-summoner="emits('toSummoner', $event)"
             @highlight="handleHighlightSubTeam"
-            @reload="og.reloadPlayer"
+            @reload="(player) => og.reloadPlayer(player)"
           />
         </div>
       </div>

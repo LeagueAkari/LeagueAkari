@@ -8,8 +8,7 @@ export function isSgpChampionKillEvent(event: any): event is DetailedChampionKil
 
   return (
     event.type === 'CHAMPION_KILL' &&
-    Array.isArray(event.victimDamageDealt) &&
-    Array.isArray(event.victimDamageReceived)
+    (Array.isArray(event.victimDamageDealt) || Array.isArray(event.victimDamageReceived))
   )
 }
 

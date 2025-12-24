@@ -1246,6 +1246,7 @@ MatchCard:
     largestMultiKill: Largest Multi Kill
     longestTimeSpentLiving: Longest Time Spent Living
     largestCriticalStrike: Largest Critical Strike
+    damageGoldEfficiency: Damage Gold Efficiency
     # Damage
     totalDamageDealtToChampions: Total Damage to Champions
     physicalDamageDealtToChampions: Physical Damage to Champions
@@ -2242,7 +2243,7 @@ ItemDisplay:
 
 PlayerInfoCard:
   reload: Reload
-  empty: No Content
+  empty: No matches found for this queue
   loadingMatchHistory: Loading...
   errorLoadingMatchHistory: Unable to load
   top4Rate: Top 4 Rate
@@ -2318,6 +2319,8 @@ PlayerInfoCard:
   private: Private
   winningStreak: '{{countV}} Wins'
   losingStreak: '{{countV}} Losses'
+
+  reloadMatchHistory: Reload
 
 TeamTagsArea:
   winRateTeam: Win-Rate Team
@@ -2579,6 +2582,9 @@ OpggView:
   setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
   spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
   runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
+
+  sessionChampions:
+    title: Session Champions
 
 OpggChampion:
   boots: Boots

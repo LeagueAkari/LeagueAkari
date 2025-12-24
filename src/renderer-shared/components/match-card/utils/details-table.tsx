@@ -51,7 +51,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'largestKillingSpree', render: 'integer' }, // lcu + sgp
       { key: 'largestMultiKill', render: 'integer' }, // lcu + sgp
       { key: 'longestTimeSpentLiving', render: 'integer' }, // lcu + sgp
-      { key: 'largestCriticalStrike', render: 'integer' } // lcu + sgp
+      { key: 'largestCriticalStrike', render: 'integer' }, // lcu + sgp
+      { key: 'damageGoldEfficiency', render: 'percentage' } // lcu + sgp
     ]
   },
   {
@@ -498,6 +499,22 @@ export const MAPPED_RENDER_GROUP_OPTIONS = RENDER_GROUPS.reduce(
 export function useRawDetails() {
   const { summary } = useMatchCard()
 
+  const addUp = (
+    participant: { data: SgpParticipantLol; source: 'sgp' } | { data: Participant; source: 'lcu' }
+  ) => {
+    if (participant.source === 'sgp') {
+      return {
+        damageGoldEfficiency:
+          participant.data.totalDamageDealtToChampions / participant.data.goldEarned
+      }
+    }
+
+    return {
+      damageGoldEfficiency:
+        participant.data.stats.totalDamageDealtToChampions / participant.data.stats.goldEarned
+    }
+  }
+
   return computed(() => {
     const { source, data } = toValue(summary)
 
@@ -518,6 +535,7 @@ export function useRawDetails() {
           return {
             ...rest,
             ...challenges,
+            ...addUp({ data: p, source: 'sgp' }),
             championId: p.championId,
             identity: {
               puuid: p.puuid,
@@ -538,6 +556,7 @@ export function useRawDetails() {
 
         return {
           ...p.stats,
+          ...addUp({ data: p, source: 'lcu' }),
           championId: p.championId,
           identity: {
             puuid: identity.player.puuid,

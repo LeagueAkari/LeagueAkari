@@ -336,6 +336,8 @@
         </div>
       </NPopover>
     </div>
+
+    <!-- tags -->
     <PlayerCardTagsArea
       :analysis="analysis"
       :puuid="puuid"
@@ -349,6 +351,8 @@
       @highlight="(premadeTeamId, hovering) => emits('highlight', premadeTeamId, hovering)"
       @to-summoner="emits('toSummoner', $event)"
     />
+
+    <!-- champion usage -->
     <div v-if="championUsage.length" class="mb-1 flex w-full gap-1">
       <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :key="c.id" :delay="50">
         <template #trigger>
@@ -414,7 +418,9 @@
         </div>
       </NPopover>
     </div>
-    <div class="mt-1 flex h-0 flex-1 flex-col gap-0.5">
+
+    <!-- list -->
+    <div class="relative mt-1 flex h-0 flex-1 flex-col gap-0.5">
       <NVirtualList
         key-field="gameId"
         style="height: 100%"
@@ -465,29 +471,39 @@
           </div>
         </template>
       </NVirtualList>
+
+      <!-- loading -->
       <div
-        v-else-if="matchHistoryLoading === 'loading'"
-        class="flex h-full w-full items-center justify-center gap-1 text-xs text-black/60 dark:text-white/60"
+        v-if="matchHistoryLoading === 'loading'"
+        class="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center gap-1 rounded text-xs text-black/60 dark:bg-white/5 dark:text-white/60"
       >
         <div class="flex items-center gap-1">
           <NSpin :size="16" />
           <span>{{ t('PlayerInfoCard.loadingMatchHistory') }}</span>
         </div>
       </div>
+
+      <!-- error -->
       <div
         v-else-if="matchHistoryLoading === 'error'"
-        class="relative -left-1 flex h-full w-full items-center justify-center gap-1 text-xs text-orange-500 dark:text-orange-400"
+        class="absolute inset-0 flex h-full w-full items-center justify-center gap-1 rounded text-xs text-orange-600 dark:bg-white/5 dark:text-orange-300"
       >
-        <NButton size="tiny" @click="emits('reload', puuid)">
-          {{ t('PlayerInfoCard.reloadMatchHistory') }}
-        </NButton>
-        <span>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</span>
+        <div class="flex flex-col items-center gap-2">
+          <div>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</div>
+
+          <NButton size="tiny" @click="emits('reload', puuid)">
+            {{ t('PlayerInfoCard.reloadMatchHistory') }}
+          </NButton>
+        </div>
       </div>
+
       <div
-        v-else
-        class="flex h-full w-full items-center justify-center text-xs text-black/60 dark:text-white/60"
+        v-else-if="matches.length === 0"
+        class="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center rounded text-xs text-black/60 dark:bg-white/5 dark:text-white/60"
       >
-        {{ t('PlayerInfoCard.empty') }}
+        <div class="flex flex-col items-center gap-2">
+          {{ t('PlayerInfoCard.empty') }}
+        </div>
       </div>
     </div>
   </div>
@@ -865,8 +881,8 @@ const getMatchItemThemeClasses = (match: {
 
   // loss
   return {
-    bg: 'bg-[rgba(239,68,68,0.3)] dark:bg-[rgba(239,68,68,0.25)]',
-    border: 'border-[rgba(239,68,68,1)] dark:border-[rgba(239,68,68,0.6)]',
+    bg: 'bg-[rgba(243,73,72,0.3)] dark:bg-[rgba(243,73,72,0.25)]',
+    border: 'border-[rgba(243,73,72,1)] dark:border-[rgba(243,73,72,0.6)]',
     text: 'text-black dark:text-white',
     resultText: 'text-red-700 dark:text-red-300'
   }
