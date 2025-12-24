@@ -1,24 +1,5 @@
 <template>
-  <div class="h-[600px] w-[800px] space-y-4 p-4">
-    <h2 class="text-lg font-semibold text-black dark:text-white">PREMADE_TEAM_COLORS_LIGHT 预览</h2>
-    <div class="grid grid-cols-4 gap-3">
-      <div
-        v-for="(cfg, key) in lightColors"
-        :key="key"
-        class="flex flex-col items-center justify-center rounded-lg text-sm font-medium"
-        :style="{
-          backgroundColor: cfg.foregroundColor,
-          color: cfg.color,
-          borderColor: cfg.borderColor
-        }"
-      >
-        <div class="mb-1 text-base font-bold">{{ key }}</div>
-        <div class="text-[10px] opacity-80">
-          {{ cfg.foregroundColor }}
-        </div>
-      </div>
-    </div>
-
+  <div class="flex h-[600px] w-[800px] gap-2 space-y-4 p-4">
     <!-- test2 -->
     <div
       class="flex h-[400px] w-[550px] overflow-hidden rounded bg-neutral-100 shadow-lg dark:bg-neutral-900"
@@ -43,16 +24,16 @@
         </div>
       </div>
     </div>
+
+    <JMComicStartup />
   </div>
 </template>
 
 <script setup lang="ts">
-import { PREMADE_TEAM_COLORS_LIGHT } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
+import JMComicStartup from '@renderer-shared/components/easter-eggs/JMComicStartup.vue'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NButton, NCarousel, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
-
-const lightColors = PREMADE_TEAM_COLORS_LIGHT
 
 const markdownHtmlText = computed(() => {
   return markdownIt.render('当前 League Akari 已经支持 **亮色模式**。测试测试测试。')
