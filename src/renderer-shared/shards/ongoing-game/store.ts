@@ -79,6 +79,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     concurrency: 3,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
     gameDetailsLoadCount: 0,
+    premadeTeamInferMatchCountThreshold: 5,
 
     orderPlayerBy: 'default' as
       | 'win-rate'
@@ -156,6 +157,14 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const championMasteryLoadingState = ref<Record<string, string>>({}) // 未实装
 
   const teamParticipantGroups = shallowRef<Record<string, string[]>>({})
+  const calculatedPremadeTeamMap = shallowRef<Record<string, number>>({})
+  const inferredPremadeTeams = shallowRef<
+    {
+      puuids: string[]
+      times: number
+      gameIds: number[]
+    }[]
+  >([])
 
   const draft = shallowRef<{
     teams: Record<string, string[]>
@@ -193,6 +202,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     championMasteryLoadingState,
     teamParticipantGroups,
     additional,
-    draft
+    draft,
+    calculatedPremadeTeamMap,
+    inferredPremadeTeams
   }
 })

@@ -71,6 +71,11 @@ export class OngoingGameSettings {
    */
   queryInLobbyPhase = false
 
+  /**
+   * 推测预组队时，需要至少多少局游戏才能被推测
+   */
+  premadeTeamInferMatchCountThreshold: number = 5
+
   setOrderPlayerBy(
     value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
   ) {
@@ -115,6 +120,10 @@ export class OngoingGameSettings {
 
   setQueryInLobbyPhase(value: boolean) {
     this.queryInLobbyPhase = value
+  }
+
+  setPremadeTeamInferMatchCountThreshold(value: number) {
+    this.premadeTeamInferMatchCountThreshold = value
   }
 
   constructor() {
@@ -619,26 +628,20 @@ export class OngoingGameState {
   gameDetailsLoadingState: Record<number, string> = {}
 
   // inferred premade
-  inferredPremade: Record<
-    string,
-    {
+  inferredPremadeTeams: {
+    puuids: string[]
+    times: number
+    gameIds: number[]
+  }[] = []
+
+  setInferredPremadeTeams(
+    value: {
       puuids: string[]
       times: number
       gameIds: number[]
     }[]
-  > = {}
-
-  setInferredPremade(
-    value: Record<
-      string,
-      {
-        puuids: string[]
-        times: number
-        gameIds: number[]
-      }[]
-    >
   ) {
-    this.inferredPremade = value
+    this.inferredPremadeTeams = value
   }
 
   clear(options?: { keepTagParams?: boolean }) {
@@ -656,13 +659,13 @@ export class OngoingGameState {
     this.gameDetailsLoadingState = {}
     this.gameDetails = {}
     this.additionalGame = {}
-    ;((this.additional = {
+    this.additional = {
       teams: {},
       selections: {},
       teamParticipantGroups: {},
       spells: {}
-    }),
-      (this.inferredPremade = {}))
+    }
+    this.inferredPremadeTeams = []
 
     if (!options?.keepTagParams) {
       this.matchHistoryTagParams = {}
@@ -670,6 +673,7 @@ export class OngoingGameState {
   }
 
   /**
+   * 暂未实装，需要测试
    * 置于一个草稿模式。草稿模式可在 unavailable 阶段被设置，用于自定义加载任何玩家战绩
    */
   draft: {
@@ -682,6 +686,46 @@ export class OngoingGameState {
     } | null
   ) {
     this.draft = value
+  }
+
+  /**
+   * 现在由这里进行预组队合并
+   */
+  get calculatedPremadeTeamMap() {
+    let assignedTeamIndex = 0
+    const premadeTeamMap: Record<string, number> = {}
+
+    // 先确认权威数据
+    for (const [_, puuids] of Object.entries(this.teamParticipantGroups)) {
+      if (puuids.length < 2) {
+        continue
+      }
+
+      const index = ++assignedTeamIndex
+
+      for (const p of puuids) {
+        premadeTeamMap[p] = index
+      }
+    }
+
+    // 再补充推测数据，冲突则以权威数据为准
+    for (const { puuids } of this.inferredPremadeTeams) {
+      if (puuids.length < 2) {
+        continue
+      }
+
+      const index = ++assignedTeamIndex
+
+      if (puuids.some((p) => premadeTeamMap[p])) {
+        continue
+      }
+
+      for (const p of puuids) {
+        premadeTeamMap[p] = index
+      }
+    }
+
+    return premadeTeamMap
   }
 
   get apiShouldUse() {
@@ -741,7 +785,8 @@ export class OngoingGameState {
       draft: observable.struct,
       matchHistoryTagParams: observable.struct,
       additional: observable.struct,
-      inferredPremade: observable.struct
+      inferredPremadeTeams: observable.struct,
+      calculatedPremadeTeamMap: computed.struct
     })
   }
 }

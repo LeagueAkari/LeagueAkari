@@ -79,6 +79,7 @@
       </div>
     </NScrollbar>
 
+    <!-- placeholder panel -->
     <div v-else class="relative flex h-full">
       <div
         class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
@@ -245,18 +246,17 @@ const premadeTeamInfo = computed(() => {
     premadeTeamIdMap: {}
   }
 
-  let groupIndex = 0
-  Object.entries(ogs.teamParticipantGroups).forEach(([_, groups]) => {
-    if (groups.length < 2) {
-      return
+  for (const [puuid, premadeId] of Object.entries(ogs.calculatedPremadeTeamMap)) {
+    const groupId = PREMADE_TEAMS[premadeId - 1]
+
+    if (playerMap.groups[groupId]) {
+      playerMap.groups[groupId].push(puuid)
+    } else {
+      playerMap.groups[groupId] = [puuid]
     }
 
-    const groupId = PREMADE_TEAMS[groupIndex++]
-    playerMap.groups[groupId] = groups
-    groups.forEach((p) => {
-      playerMap.premadeTeamIdMap[p] = groupId
-    })
-  })
+    playerMap.premadeTeamIdMap[puuid] = groupId
+  }
 
   return playerMap
 })

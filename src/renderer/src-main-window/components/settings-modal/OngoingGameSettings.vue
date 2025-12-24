@@ -120,6 +120,24 @@
           @update:value="(val) => og.setQueryInLobbyPhase(val)"
         />
       </ControlItem>
+
+      <!-- premade team infer match count threshold -->
+      <ControlItem
+        class="control-item-margin"
+        :label="t('OngoingGameSettings.premadeTeamInferMatchCountThreshold.label')"
+        :label-description="
+          t('OngoingGameSettings.premadeTeamInferMatchCountThreshold.description')
+        "
+        :label-width="400"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="small"
+          :min="1"
+          :value="ogs.settings.premadeTeamInferMatchCountThreshold"
+          @update:value="(val) => og.setPremadeTeamInferMatchCountThreshold(val || 5)"
+        />
+      </ControlItem>
     </NCard>
 
     <!-- player card -->

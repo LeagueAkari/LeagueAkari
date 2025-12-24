@@ -87,7 +87,7 @@ import { computed, ref, shallowRef, useTemplateRef, watchEffect } from 'vue'
 import { useAppContext } from '@main-window/context'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import GlobalStateTracker from './GlobalStateTracker.vue'
+import GlobalStateTracker from './GlobalStateTracker'
 import MatchHistoryList from './MatchHistoryList.vue'
 import PlayerTabHeader from './PlayerTabHeader.vue'
 import { providePlayerTab } from './context'

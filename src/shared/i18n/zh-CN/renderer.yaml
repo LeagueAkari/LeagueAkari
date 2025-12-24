@@ -329,6 +329,10 @@ OngoingGameSettings:
     label: 在房间阶段生效
     description: 位于房间时，查询房间内所有玩家的数据
 
+  premadeTeamInferMatchCountThreshold:
+    label: 预组队推测对局数阈值
+    description: $t(common:appName) 同时会收集战绩数据，用于推测玩家是否为预组队（开黑）。该数值用于确定：多名玩家在同一队伍中累计出现多少场对局，才会被判定为预组队
+
   gameDetailsLoadCount:
     label: 对局详情加载数量
     description: 会额外加载前 {{countV}} 场对局的详细信息，用于对局分析

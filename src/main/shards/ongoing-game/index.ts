@@ -100,7 +100,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
         playerCardTags: { default: this.settings.playerCardTags },
-        queryInLobbyPhase: { default: this.settings.queryInLobbyPhase }
+        queryInLobbyPhase: { default: this.settings.queryInLobbyPhase },
+        premadeTeamInferMatchCountThreshold: {
+          default: this.settings.premadeTeamInferMatchCountThreshold
+        }
       },
       this.settings
     )
@@ -126,7 +129,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'showMatchHistoryItemBorder',
       'autoRouteWhenGameStarts',
       'playerCardTags',
-      'queryInLobbyPhase'
+      'queryInLobbyPhase',
+      'premadeTeamInferMatchCountThreshold'
     ])
 
     this._mobx.propSync(OngoingGameMain.id, 'state', this.state, [
@@ -144,7 +148,9 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'teamParticipantGroups',
       'matchHistoryTagParams',
       'draft',
-      'additional'
+      'additional',
+      'calculatedPremadeTeamMap',
+      'inferredPremadeTeams'
     ])
 
     // 便于精准订阅
@@ -1103,42 +1109,56 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
   }
 
-  private _calcTeamUp() {
-    if (
-      !Object.keys(this.state.matchHistory).length ||
-      !Object.keys(this.state.additionalGame).length
-    ) {
+  private _calcPremade() {
+    if (!Object.keys(this.state.matchHistory).length) {
       return []
     }
 
-    const playerMatches = Object.values(this.state.matchHistory).flatMap((m) => {
-      return m.data.map((d) => ({
+    const gameMap = new Map<string, { players: string[]; id: string }>()
+
+    const playerMatches = Object.values(this.state.matchHistory).flatMap((m) =>
+      m.data.map((d) => ({
         players: toIdentities(d).map((i) => i.puuid),
         id: d.gameId.toString()
       }))
+    )
+
+    playerMatches.forEach((m) => {
+      gameMap.set(m.id, m)
     })
 
     // 用到了将近两年前的工具，我选择不去动它，只做转换
     // 此方法追溯到 v1.1.x
-    return calculateTogetherTimes(playerMatches, Object.values(this.state.teams).flat()).map(
-      (t) => ({
-        puuids: t.players,
-        times: t.times,
-        gameIds: t.ids.map((id) => parseInt(id))
-      })
-    )
+    return calculateTogetherTimes(
+      Array.from(gameMap.values()),
+      Object.values(this.state.teams).flat(),
+      this.settings.premadeTeamInferMatchCountThreshold
+    ).map((t) => ({
+      puuids: t.players,
+      times: t.times,
+      gameIds: t.ids.map((id) => parseInt(id))
+    }))
   }
 
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
-      () => [
-        ...Object.values(this.state.matchHistory),
-        ...Object.values(this.state.additionalGame)
-      ],
+      () => Object.values(this.state.matchHistory),
       (_changedV) => {
         this.state.setPlayerStats(this._calcAnalysis())
-        // this.state.setInferredPremade(this._calcTeamUp())
+        this.state.setInferredPremadeTeams(this._calcPremade())
+      },
+      { delay: 200, equals: comparer.shallow }
+    )
+
+    // 计算基于推测的组队信息
+    this._mobx.reaction(
+      () => ({
+        matchHistory: Object.values(this.state.matchHistory),
+        threshold: this.settings.premadeTeamInferMatchCountThreshold
+      }),
+      (_changedV) => {
+        this.state.setInferredPremadeTeams(this._calcPremade())
       },
       { delay: 200, equals: comparer.shallow }
     )

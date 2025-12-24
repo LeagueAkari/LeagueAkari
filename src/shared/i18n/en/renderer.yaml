@@ -328,6 +328,10 @@ OngoingGameSettings:
     label: Query in Lobby Phase
     description: When enabled, the player stats will be queried when in the lobby.
 
+  premadeTeamInferMatchCountThreshold:
+    label: Premade Team Inference Match Count Threshold
+    description: Minimum number of games required to confirm premade teams.
+
   gameDetailsLoadCount:
     label: Game Details Load Count
     description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
