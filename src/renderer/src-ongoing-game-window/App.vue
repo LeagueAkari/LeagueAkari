@@ -10,6 +10,7 @@
         :puuid="showingGame.puuid"
         :source="showingGame.source"
         v-model:show="showPreviewModal"
+        :hide-privacy="as.settings.streamerMode"
       />
       <SetupInAppScope />
       <OngoingGamePanel @show-game="handleShowGame" @show-game-by-id="handleShowGameById" />
@@ -21,12 +22,14 @@
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ref, shallowRef, watch } from 'vue'
 
 const ogws = useOngoingGameWindowStore()
+const as = useAppCommonStore()
 
 const showingGame = shallowRef<{
   gameId: number

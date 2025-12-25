@@ -79,6 +79,22 @@ DeclarationModal:
 
     </div>
 
+FeatureGuide:
+  previous: Previous
+  next: Next
+  confirm: Confirm
+
+  ongoingGameNewFeatures20251225:
+    item1:
+      title: Query Available in Lobby
+      description: |
+        In addition to champion select and in-game phases, you can now also view data for all members in the lobby.
+
+        Enable this feature in `Settings` → `Game Analysis` → `Enable in Lobby Phase`.
+    item2:
+      title: Show More Tags
+      description: Enable more tags in `Settings` → `Game Analysis` → `Player Card Tags`.
+
 CommonButtons:
   announcement: Announcement
   github: Project GitHub

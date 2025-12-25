@@ -6,6 +6,7 @@
       :source="previewingGame.source"
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
+      :hide-privacy="as.settings.streamerMode"
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <OngoingGamePanel

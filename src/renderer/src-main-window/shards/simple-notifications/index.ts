@@ -13,6 +13,7 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
@@ -32,8 +33,12 @@ import {
   useNotification
 } from 'naive-ui'
 import { computed, defineComponent, h, ref, watch, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
+import FeatureGuide from '@main-window/components/FeatureGuide.vue'
 import { useAppContext } from '@main-window/context'
+import moreTags from '@main-window/shards/simple-notifications/imgs/more-tags.png'
+import queryInLobby from '@main-window/shards/simple-notifications/imgs/query-in-lobby.png'
 
 import AnnouncementModal from './modals/AnnouncementModal.vue'
 import DeclarationModal from './modals/DeclarationModal.vue'
@@ -756,6 +761,65 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _setupOngoingGameNewFeatures() {
+    const comp = defineComponent({
+      setup() {
+        const st = useInstance(SettingUtilsRenderer)
+
+        const ogs = useOngoingGameStore()
+        const route = useRoute()
+
+        const { t } = useTranslation(undefined, {
+          keyPrefix: 'FeatureGuide.ongoingGameNewFeatures20251225'
+        })
+
+        const show = ref(false)
+
+        watch(
+          () => route.name,
+          async (name) => {
+            if (name === 'ongoing-game' && ogs.queryStage.phase !== 'unavailable') {
+              const isConfirmed = await st.get(
+                SimpleNotificationsRenderer.id,
+                'ongoingGameNewFeatures20251225'
+              )
+
+              if (!isConfirmed) {
+                show.value = true
+              }
+            }
+          }
+        )
+
+        return () =>
+          h(FeatureGuide, {
+            items: [
+              {
+                title: t('item1.title'),
+                description: t('item1.description'),
+                imageUrls: [queryInLobby]
+              },
+              {
+                title: t('item2.title'),
+                description: t('item2.description'),
+                imageUrls: [moreTags]
+              }
+            ],
+            show: show.value,
+            'onUpdate:show': (v) => (show.value = v),
+            onConfirm: () => {
+              show.value = false
+              st.set(SimpleNotificationsRenderer.id, 'ongoingGameNewFeatures20251225', true).catch(
+                () => {}
+              )
+            }
+          })
+      }
+    })
+
+    this._setup.addRenderVNode(() => h(comp))
+  }
+
   async onInit() {
     const sns = useSimpleNotificationsStore()
 
@@ -769,6 +833,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupAnnouncementModal()
     this._setupNewReleaseModal()
     this._setupFunnyPricingModal()
+    this._setupOngoingGameNewFeatures()
     this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())

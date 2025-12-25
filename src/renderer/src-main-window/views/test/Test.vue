@@ -1,50 +1,31 @@
 <template>
-  <div class="flex h-[600px] w-[800px] gap-2 space-y-4 p-4">
+  <div class="flex h-[600px] w-[800px] flex-col gap-1 space-y-2 p-4">
     <div>此页面用作内部测试。它不会在正式版本中出现。</div>
 
     <!-- test2 -->
-    <div
-      class="flex h-[400px] w-[550px] overflow-hidden rounded bg-neutral-100 shadow-lg dark:bg-neutral-900"
-    >
-      <!-- left image  -->
-      <NCarousel autoplay show-arrow class="w-[240px]!">
-        <img v-for="url in exampleImageUrls" class="size-full object-cover" :src="url" />
-      </NCarousel>
-
-      <!-- right text -->
-      <div class="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-3">
-        <div class="mb-4 truncate text-base font-bold text-black dark:text-white">亮色主题可用</div>
-
-        <NScrollbar class="flex-1">
-          <!-- description -->
-          <div class="markdown-body" v-html="markdownHtmlText" />
-        </NScrollbar>
-
-        <!-- button -->
-        <div class="flex justify-end">
-          <NButton size="small">已知晓</NButton>
-        </div>
-      </div>
-    </div>
-
-    <JMComicStartup />
+    <FeatureGuide :items="items" v-model:show="show" />
   </div>
 </template>
 
 <script setup lang="ts">
-import JMComicStartup from '@renderer-shared/components/easter-eggs/JMComicStartup.vue'
-import { markdownIt } from '@renderer-shared/utils/markdown'
-import { NButton, NCarousel, NScrollbar } from 'naive-ui'
-import { computed } from 'vue'
+import { ref } from 'vue'
 
-const markdownHtmlText = computed(() => {
-  return markdownIt.render('当前 League Akari 已经支持 **亮色模式**。测试测试测试。')
-})
+import FeatureGuide from '@main-window/components/FeatureGuide.vue'
+import moreTags from '@main-window/shards/simple-notifications/imgs/more-tags.png'
+import queryInLobby from '@main-window/shards/simple-notifications/imgs/query-in-lobby.png'
 
-const exampleImageUrls = [
-  'https://sm.ign.com/ign_in/screenshot/default/lucky-star_85ab.jpg',
-  'https://wallpapers.com/images/hd/lucky-star-6u9od1ao7yrb98tx.jpg',
-  'https://th.bing.com/th/id/R.2df31e3ed2b2d0b8084b49566ca6cc6b?rik=1R5n3Ie6NFQ9tQ&riu=http%3a%2f%2fstatic.zerochan.net%2fYuru.Yuri.full.1277564.jpg&ehk=%2be7Ws8fA4UgOdXORAOvBFSOClCCAMnoaC0qKw6LPQvE%3d&risl=&pid=ImgRaw&r=0',
-  'https://preview.redd.it/j2xa2oonxiy41.jpg?auto=webp&s=86814e4f940e748c7c481ac9ee062f6a349f3f27'
+const show = ref(true)
+const items = [
+  {
+    title: '房间内查询可用',
+    description:
+      '除了英雄选择和游戏中阶段，现在也可以展示房间内所有成员的数据。\n\n在 `设置` → `对局分析` → `在房间阶段内生效`，启用此功能。',
+    imageUrls: [queryInLobby]
+  },
+  {
+    title: '展示更多标签',
+    description: '在 `设置` → `对局分析` → `玩家卡片标签` 中，启用更多标签。',
+    imageUrls: [moreTags]
+  }
 ]
 </script>
