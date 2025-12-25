@@ -644,7 +644,7 @@ export class OngoingGameState {
     this.inferredPremadeTeams = value
   }
 
-  clear(options?: { keepTagParams?: boolean }) {
+  clear(options?: { keepTagParams?: boolean; keepAdditionalInfo?: boolean }) {
     this.playerStats = null
     this.matchHistory = {}
     this.summoner = {}
@@ -659,13 +659,16 @@ export class OngoingGameState {
     this.gameDetailsLoadingState = {}
     this.gameDetails = {}
     this.additionalGame = {}
-    this.additional = {
-      teams: {},
-      selections: {},
-      teamParticipantGroups: {},
-      spells: {}
-    }
     this.inferredPremadeTeams = []
+
+    if (!options?.keepAdditionalInfo) {
+      this.additional = {
+        teams: {},
+        selections: {},
+        teamParticipantGroups: {},
+        spells: {}
+      }
+    }
 
     if (!options?.keepTagParams) {
       this.matchHistoryTagParams = {}

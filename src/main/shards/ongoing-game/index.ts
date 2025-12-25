@@ -48,6 +48,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   static id = 'ongoing-game-main'
 
   static LOADING_PRIORITY = {
+    ADDITIONAL_INFO: 7,
     ADDITIONAL_SUMMONER: -1,
     SUMMONER: 6,
     MATCH_HISTORY: 5,
@@ -993,7 +994,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   private _clearAndReloadAll() {
-    this.state.clear({ keepTagParams: true })
+    this.state.clear({ keepTagParams: true, keepAdditionalInfo: true })
     this._ipc.sendEvent(OngoingGameMain.id, 'clear')
 
     const puuids = Object.values(this.state.teams).flat()
@@ -1012,6 +1013,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this.state.apiShouldUse,
       true
     )
+    this._updateAdditionalInfo()
   }
 
   private _reloadPlayer(puuid: string) {
@@ -1306,18 +1308,56 @@ export class OngoingGameMain implements IAkariShardInitDispose {
    * 聊胜于无的信息补全功能
    */
   private _handleInformationCompletion() {
+    this._mobx.reaction(
+      () => this.state.queryStage,
+      (_stage) => {
+        this._updateAdditionalInfo()
+      },
+      { delay: 500, fireImmediately: true }
+    )
+  }
+
+  private _updateAdditionalInfo() {
+    if (
+      !this.state.queryStage.gameInfo ||
+      this.state.queryStage.phase !== 'in-game' ||
+      !this._lc.data.summoner.me?.puuid
+    ) {
+      return
+    }
+
+    this._queueKeeper.cancelByTags(['gsm-gameflow', 'spectator-gameflow'], 'or')
+
     const getGsmGameMembers = async (puuid: string) => {
       try {
+        if (this._queueKeeper.hasTask('gsm-gameflow')) {
+          this._log.debug('Game members already in queue', puuid)
+          return null
+        }
+
         const {
           data: {
             game: { teamOne, teamTwo, gameMode, playerChampionSelections }
           }
-        } = await this._sgp.api.gsm.getByPuuid(puuid)
+        } = await this._queueKeeper.add(
+          'misc',
+          `gsm-gameflow:${puuid}`,
+          () => this._sgp.api.gsm.getByPuuid(puuid),
+          {
+            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_INFO,
+            tags: [puuid, 'gsm-gameflow']
+          }
+        )
 
         this._log.info('additional team info by gsm game')
 
         return { teamOne, teamTwo, gameMode, spells: playerChampionSelections }
       } catch (error) {
+        if (isAbortError(error)) {
+          this._log.info('Abort error getting game members', error)
+          return null
+        }
+
         if (isAxiosError(error) && error.response?.status === 404) {
           return null
         }
@@ -1329,16 +1369,34 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     const getSpectator = async (puuid: string) => {
       try {
+        if (this._queueKeeper.hasTask('spectator-gameflow')) {
+          this._log.debug('Spectator already in queue', puuid)
+          return null
+        }
+
         const {
           data: {
             game: { teamOne, teamTwo, gameMode, playerChampionSelections }
           }
-        } = await this._sgp.api.gsm.getSpectatorByPuuid(puuid)
+        } = await this._queueKeeper.add(
+          'misc',
+          `spectator-gameflow:${puuid}`,
+          () => this._sgp.api.gsm.getSpectatorByPuuid(puuid),
+          {
+            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_INFO,
+            tags: [puuid, 'spectator-gameflow']
+          }
+        )
 
         this._log.info('additional team info by spectator data')
 
         return { teamOne, teamTwo, gameMode, spells: playerChampionSelections }
       } catch (error) {
+        if (isAbortError(error)) {
+          this._log.info('Abort error getting spectator', error)
+          return null
+        }
+
         // 忽略 404 和 409 (disabled spectator APIs)
         if (
           isAxiosError(error) &&
@@ -1422,84 +1480,74 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       } as AdditionalResult
     }
 
-    this._mobx.reaction(
-      () => this.state.queryStage,
-      (stage) => {
-        if (!stage || stage.phase !== 'in-game' || !this._lc.data.summoner.me?.puuid) {
-          return
+    const puuid = this._lc.data.summoner.me.puuid
+
+    const enableGsm = this._rc.state.ongoingGameConfig.spotlight.gsmByPuuid
+    const enableSpectator = this._rc.state.ongoingGameConfig.spotlight.spectatorByPuuid
+
+    type ReturnResult = {
+      teamOne: { puuid: string; championId: number; teamParticipantId: number }[]
+      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
+      spells: { puuid: string; spell1Id: number; spell2Id: number }[]
+      gameMode: string
+    }
+
+    const tasks: (() => Promise<ReturnResult | null>)[] = []
+
+    if (enableGsm) {
+      tasks.push(() => getGsmGameMembers(puuid))
+    }
+
+    if (enableSpectator) {
+      tasks.push(() => getSpectator(puuid))
+    }
+
+    Promise.allSettled(tasks.map((t) => t())).then((results) => {
+      if (this.state.queryStage.phase !== 'in-game') {
+        return
+      }
+
+      const mergedTeams = {} as Record<string, string[]>
+      const mergedSelections = {} as Record<string, number>
+      const mergedTeamParticipantGroups = {} as Record<string, number>
+      const mergedSpells = {} as Record<
+        string,
+        {
+          spell1Id: number
+          spell2Id: number
         }
+      >
 
-        const puuid = this._lc.data.summoner.me.puuid
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+          const { teamOne, teamTwo, gameMode, spells } = result.value
+          const { teams, selections, teamParticipantGroups } = extractTeamMembers(
+            gameMode,
+            teamOne,
+            teamTwo,
+            spells
+          )
 
-        const enableGsm = this._rc.state.ongoingGameConfig.spotlight.gsmByPuuid
-        const enableSpectator = this._rc.state.ongoingGameConfig.spotlight.spectatorByPuuid
-
-        type ReturnResult = {
-          teamOne: { puuid: string; championId: number; teamParticipantId: number }[]
-          teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
-          spells: { puuid: string; spell1Id: number; spell2Id: number }[]
-          gameMode: string
-        }
-
-        const tasks: (() => Promise<ReturnResult | null>)[] = []
-
-        if (enableGsm) {
-          tasks.push(() => getGsmGameMembers(puuid))
-        }
-
-        if (enableSpectator) {
-          tasks.push(() => getSpectator(puuid))
-        }
-
-        Promise.allSettled(tasks.map((t) => t())).then((results) => {
-          if (this.state.queryStage.phase !== 'in-game') {
-            return
-          }
-
-          const mergedTeams = {} as Record<string, string[]>
-          const mergedSelections = {} as Record<string, number>
-          const mergedTeamParticipantGroups = {} as Record<string, number>
-          const mergedSpells = {} as Record<
-            string,
-            {
-              spell1Id: number
-              spell2Id: number
-            }
-          >
-
-          for (const result of results) {
-            if (result.status === 'fulfilled' && result.value) {
-              const { teamOne, teamTwo, gameMode, spells } = result.value
-              const { teams, selections, teamParticipantGroups } = extractTeamMembers(
-                gameMode,
-                teamOne,
-                teamTwo,
-                spells
-              )
-
-              for (const [tI, m] of Object.entries(teams)) {
-                if (mergedTeams[tI]) {
-                  mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
-                } else {
-                  mergedTeams[tI] = m
-                }
-              }
-
-              Object.assign(mergedSelections, selections)
-              Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
-              Object.assign(mergedSpells, spells)
+          for (const [tI, m] of Object.entries(teams)) {
+            if (mergedTeams[tI]) {
+              mergedTeams[tI] = memberMerge(mergedTeams[tI], m)
+            } else {
+              mergedTeams[tI] = m
             }
           }
 
-          this.state.setAdditional({
-            teams: mergedTeams,
-            selections: mergedSelections,
-            teamParticipantGroups: mergedTeamParticipantGroups,
-            spells: mergedSpells
-          })
-        })
-      },
-      { delay: 500, fireImmediately: true }
-    )
+          Object.assign(mergedSelections, selections)
+          Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
+          Object.assign(mergedSpells, spells)
+        }
+      }
+
+      this.state.setAdditional({
+        teams: mergedTeams,
+        selections: mergedSelections,
+        teamParticipantGroups: mergedTeamParticipantGroups,
+        spells: mergedSpells
+      })
+    })
   }
 }
