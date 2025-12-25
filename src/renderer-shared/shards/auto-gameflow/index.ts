@@ -25,10 +25,6 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelAutoMatchmaking')
   }
 
-  setWillDodgeAtLastSecond(enabled: number) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setWillDodgeAtLastSecond', enabled)
-  }
-
   setAutoHonorEnabled(enabled: boolean) {
     this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHonorEnabled', enabled)
   }
@@ -99,6 +95,18 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
 
   setInvitationHandlingStrategies(strategies: Record<string, string>) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'invitationHandlingStrategies', strategies)
+  }
+
+  setAutoSendARAMTeamSideEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideEnabled', enabled)
+  }
+
+  setAutoSendARAMTeamSideVisibleToTeam(visible: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideVisibleToTeam', visible)
+  }
+
+  setFriendsToBeInvited(puuids: string[]) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setFriendsToBeInvited', puuids)
   }
 
   async onInit() {

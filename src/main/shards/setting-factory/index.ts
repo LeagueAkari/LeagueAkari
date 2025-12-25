@@ -3,13 +3,13 @@ import { Paths } from '@shared/utils/types'
 import { app, dialog } from 'electron'
 import fs from 'node:original-fs'
 import path from 'node:path'
-import { Like } from 'typeorm'
+import { Raw } from 'typeorm'
 
 import { AkariIpcError, AkariIpcMain } from '../ipc'
-import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
 import { type WindowManagerMain } from '../window-manager'
+import { DelayedTaskScheduler } from './delayed-task-scheduler'
 import { SetterSettingService } from './setter-setting-service'
 
 export type OnChangeCallback<T = any> = (
@@ -45,18 +45,15 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = 'setting-factory-main'
 
-  private readonly _log: AkariLogger
-
   private readonly _settings: Map<string, SetterSettingService> = new Map()
+
+  readonly _delayed = new DelayedTaskScheduler()
 
   constructor(
     private readonly _ipc: AkariIpcMain,
     private readonly _storage: StorageMain,
-    private readonly _shared: SharedGlobalShard,
-    _loggerFactory: LoggerFactoryMain
-  ) {
-    this._log = _loggerFactory.create(SettingFactoryMain.id)
-  }
+    private readonly _shared: SharedGlobalShard
+  ) {}
 
   register<T extends object = any>(
     namespace: string,
@@ -104,16 +101,28 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     return v.value
   }
 
+  /**
+   * unused
+   */
   async _getValuesFromStorage(namespace: string, keyPrefix: string) {
     const prefix = `${namespace}/${keyPrefix}`
 
-    const results = await this._storage.dataSource.manager.findBy(Setting, {
-      key: Like(`${prefix}%`)
+    if (keyPrefix.endsWith('/')) {
+      keyPrefix = keyPrefix.slice(0, -1)
+    }
+
+    const results = await this._storage.dataSource.getRepository(Setting).find({
+      where: {
+        key: Raw((a) => `${a} GLOB ${prefix}/*`)
+      }
     })
 
-    return results.map((v) => v.value)
+    return results
   }
 
+  /**
+   * unused
+   */
   async _setJsonValue(namespace: string, key: string, path: string, value: any, defaultJson?: any) {
     const key2 = `${namespace}/${key}`
 
@@ -142,6 +151,9 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     return result.affected || 0
   }
 
+  /**
+   * unused
+   */
   async _removeJsonValue(namespace: string, key: string, path: string) {
     const key2 = `${namespace}/${key}`
 
@@ -245,7 +257,10 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       filename
     )
 
-    return fs.existsSync(jsonPath)
+    return fs.promises
+      .access(jsonPath, fs.constants.F_OK)
+      .then(() => true)
+      .catch(() => false)
   }
 
   async onInit() {
@@ -367,5 +382,6 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
   async onDispose() {
     this._settings.clear()
+    await this._delayed.flush()
   }
 }

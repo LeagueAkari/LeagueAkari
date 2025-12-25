@@ -30,17 +30,18 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoHandleInvitationsEnabled: false,
     autoSkipLeaderEnabled: false,
     invitationHandlingStrategies: {} as Record<string, string>,
-    dodgeAtLastSecondThreshold: 2,
-    rejectInvitationWhenAway: false
+    rejectInvitationWhenAway: false,
+    autoSendARAMTeamSideEnabled: false,
+    autoSendARAMTeamSideVisibleToTeam: true
   })
 
   const willAccept = ref(false)
   const willAcceptAt = ref(-1)
   const willSearchMatch = ref(false)
   const willSearchMatchAt = ref(-1)
-  const willDodgeAt = ref(-1)
-  const willDodgeAtLastSecond = ref(false)
+  const willReconnectAt = ref(-1)
   const activityStartStatus = ref('unavailable')
+  const friendsToBeInvited = shallowRef<string[]>([])
 
   return {
     settings,
@@ -49,8 +50,8 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     willAcceptAt,
     willSearchMatch,
     willSearchMatchAt,
-    willDodgeAt,
-    willDodgeAtLastSecond,
-    activityStartStatus
+    willReconnectAt,
+    activityStartStatus,
+    friendsToBeInvited
   }
 })

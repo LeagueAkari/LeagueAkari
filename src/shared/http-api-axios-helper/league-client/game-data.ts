@@ -4,7 +4,9 @@ import {
   ChampionSimple,
   GameMap,
   GameMapAsset,
+  GameModeMutator,
   Item,
+  LootMap,
   Perk,
   Perkstyles,
   Queue,
@@ -30,6 +32,10 @@ export class GameDataHttpApi {
 
   getChampionSummary() {
     return this._http.get<ChampionSimple[]>('/lol-game-data/assets/v1/champion-summary.json')
+  }
+
+  getGameModeMutators() {
+    return this._http.get<GameModeMutator[]>('/lol-game-data/assets/v1/game-mode-mutators.json')
   }
 
   getMaps() {
@@ -58,5 +64,9 @@ export class GameDataHttpApi {
 
   getStrawberryHub() {
     return this._http.get<StrawberryHub[]>('/lol-game-data/assets/v1/strawberry-hub.json')
+  }
+
+  getLoots() {
+    return this._http.get<LootMap>('/lol-game-data/assets/v1/loots.json')
   }
 }

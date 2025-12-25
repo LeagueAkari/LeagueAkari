@@ -210,6 +210,8 @@ export type GameMode =
   | 'BRAWL' // 神木之门
   | 'CHERRY' // 斗魂竞技场 (Arena)
   | 'STRAWBERRY' // 无尽狂潮 (Swarm)
+  | 'RUBY' // 末日人机 (维嘉) (queueType: "NIGHTMARE_BOT")
+  | 'KIWI' // 符文大乱斗
 
 export interface GameMap {
   id: number
@@ -762,6 +764,109 @@ interface COMPANIONSLOT {
   contentId: string
   inventoryType: string
   itemId: number
+}
+
+export interface GameModeMutator {
+  MapId: number
+  Mutators: GameModeMutatorMutator[]
+  MapNameBase: string
+}
+
+interface GameModeMutatorMutator {
+  Mutator: GameModeMutatorMutatorMutator
+  MapNameOverride: string
+}
+
+interface GameModeMutatorMutatorMutator {
+  ExpandedMutator: string
+}
+
+export interface LootMap {
+  LootItems: LootItem[]
+  LootRecipes: LootRecipe[]
+  LootTables: LootTable[]
+  LootBundles: LootBundle[]
+  LootTokenBankCards: LootTokenBankCard[]
+}
+
+interface LootTokenBankCard {
+  lootItemName: string
+  backsplashImagePath: string
+  buttonText: string
+  nonPremiumCapCurrencyId: string
+  premiumCapCurrencyId: string
+  titleText: string
+  tokenIconPath: string
+  tooltipDescriptionText: string
+  tooltipSplashPath: string
+  tooltipTitleText: string
+  unlockItemId: string
+  unlockItemType: string
+  activationDate: string
+  deactivationDate: string
+  storeLinkItem: string
+  storeLinkType: string
+}
+
+interface LootBundle {
+  id: string
+  description: string
+  descriptionLong: string
+  image: string
+  contents: Content[]
+}
+
+interface Content {
+  query: Query
+  quantityExpression: string
+  localizedDescription: string
+}
+
+interface Query {
+  lootId: string
+}
+
+interface LootTable {
+  id: string
+  description: string
+  descriptionLong: string
+  image: string
+  dropChance: Output[]
+}
+
+interface LootRecipe {
+  id: string
+  description: string
+  contextMenuText: string
+  requirementText: string
+  imagePath: string
+  introVideoPath: string
+  loopVideoPath: string
+  outroVideoPath: string
+  hasVisibleLootOdds: boolean
+  outputs: Output[]
+}
+
+interface Output {
+  lootId: string
+  localizedDescription: string
+}
+
+interface LootItem {
+  id: string
+  name: string
+  description: string
+  image: string
+  startDate: string
+  endDate: string
+  mappedStoreId: number
+  lifetimeMax: number
+  autoRedeem: boolean
+  rarity: string
+  type: string
+  recipeMenuActive?: string
+  recipeMenuTitle?: string
+  recipeMenuSubtitle?: string
 }
 
 /**

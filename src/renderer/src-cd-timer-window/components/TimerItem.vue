@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRightClick } from '@cd-timer-window/compositions/useRightClick'
+import { useRightClick } from '@cd-timer-window/composables/useRightClick'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { ChevronRight16Filled as ChevronRight16FilledIcon } from '@vicons/fluent'
@@ -167,7 +167,7 @@ const { pressed: spell2Pressed } = useMousePressed({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .player {
   display: flex;
   align-items: center;

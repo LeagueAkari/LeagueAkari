@@ -1,25 +1,26 @@
 <template>
   <div
     class="sidebar-menu"
-    :class="{ 'test-page': currentActiveItem === 'test' }"
+    :class="{ 'rabi-test': currentActiveItem === 'test' }"
     ref="sidebar-menu"
     :style="{
       '--indicator-top': `${indicatorPosition.top}px`,
       '--indicator-rail-height': `${indicatorPosition.height}px`
     }"
   >
-    <NTooltip v-for="item of showItems" :key="item.key" placement="right">
+    <NTooltip v-for="item of showItems" :key="item.key" placement="right" :disabled="!isCollapsed">
       <template #trigger>
         <div
           class="menu-item"
           :data-key="item.key"
-          @click="handleMenuChange(item.key)"
-          :class="{ active: currentActiveItem === item.key }"
+          @click="item.isDisabled ? undefined : handleMenuChange(item.key)"
+          :class="{ active: currentActiveItem === item.key, disabled: item.isDisabled }"
         >
-          <div class="menu-item-inner">
-            <NBadge :show="!!item.inProgress" dot>
-              <component :is="item.icon" class="menu-item-icon" />
+          <div class="menu-item__inner">
+            <NBadge :show="!!item.inProgress" dot :offset="[-6, 8]">
+              <component :is="item.icon" class="menu-item__icon" />
             </NBadge>
+            <div class="menu-item__label">{{ item.name }}</div>
           </div>
         </div>
       </template>
@@ -41,9 +42,21 @@ import {
   watchEffect
 } from 'vue'
 
-const { defaultValue, items = [] } = defineProps<{
+const {
+  defaultValue,
+  items = [],
+  isCollapsed = false
+} = defineProps<{
   defaultValue?: string
-  items?: { key: string; icon: ComponentC; name: string; show?: boolean; inProgress?: boolean }[]
+  isCollapsed?: boolean
+  items?: {
+    key: string
+    icon: ComponentC
+    name: string
+    show?: boolean
+    inProgress?: boolean
+    isDisabled?: boolean
+  }[]
 }>()
 
 const showItems = computed(() => items.filter((item) => item.show !== false))
@@ -72,7 +85,7 @@ const updateIndicatorPosition = () => {
     const { top: itemTop, height } = activeItem.getBoundingClientRect()
     const { top: sidebarTop } = sidebarMenu.value.getBoundingClientRect()
 
-    const thatHeight = 0.4 * height
+    const thatHeight = 0.5 * height
     indicatorPosition.value.top = itemTop - sidebarTop + (height - thatHeight) / 2
     indicatorPosition.value.height = thatHeight
   }
@@ -87,12 +100,12 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .sidebar-menu {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 4px;
 
   .indicator-rail {
     position: absolute;
@@ -110,8 +123,11 @@ watch(
       height: var(--indicator-rail-height);
       top: var(--indicator-top);
       border-radius: 2px;
+      background-color: #1ea90c;
+    }
 
-      // now for dark only
+    [data-theme='dark'] &::before,
+    [data-theme='dark'] &::after {
       background-color: #26dd0e;
     }
 
@@ -130,8 +146,8 @@ watch(
     }
   }
 
-  // dedicated for test page
-  &.test-page .indicator-rail {
+  /*  dedicated for test page */
+  &.rabi-test .indicator-rail {
     &::before,
     &::after {
       background-color: #f94395;
@@ -140,87 +156,124 @@ watch(
 }
 
 .menu-item {
+  width: 100%;
   position: relative;
-  height: 52px;
-  width: 52px;
-  padding: 4px;
+  padding: 0 4px;
   box-sizing: border-box;
   cursor: pointer;
 
-  .menu-item-inner {
-    position: relative;
+  .menu-item__inner {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+    gap: 4px;
     width: 100%;
+    position: relative;
+    align-items: center;
     border-radius: 8px;
     transition: background-color 0.2s;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
+
+  .menu-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    font-size: 16px;
+    transition:
+      color 0.2s,
+      font-size 0.2s;
+    flex-shrink: 0;
+
+    .collapsed & {
+      font-size: 20px;
+    }
+  }
+
+  .menu-item__label {
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    text-overflow: ellipsis;
     overflow: hidden;
+    transition:
+      color 0.2s,
+      opacity 0.2s;
+
+    .collapsed & {
+      opacity: 0;
+    }
   }
 
-  .menu-item-icon {
-    font-size: 20px;
-    transition: color 0.2s;
-    left: 0px;
+  &.disabled {
+    cursor: not-allowed;
   }
-}
 
-[data-theme='dark'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #fff;
-      }
+  &:hover:not(.disabled) {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 1);
 
-      .menu-item-inner {
-        background-color: #fff1;
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
       }
     }
 
-    &:active {
-      .menu-item-icon {
-        color: #fff8;
-      }
-    }
+    .menu-item__inner {
+      background-color: rgba(0, 0, 0, 0.05);
 
-    .menu-item-icon {
-      color: rgba(255, 255, 255, 0.45);
-    }
-
-    &.active {
-      .menu-item-icon {
-        color: #fff;
-      }
-
-      .menu-item-inner {
-        background-color: #fff1;
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
       }
     }
   }
-}
 
-[data-theme='light'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #000;
+  &:active:not(.disabled) {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 0.8);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+
+  .menu-item__icon,
+  .menu-item__label {
+    color: rgba(0, 0, 0, 0.6);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  &.disabled {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 0.3);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  &.active {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 1);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
       }
     }
 
-    &:active {
-      .menu-item-icon {
-        color: #0008;
-      }
-    }
+    .menu-item__inner {
+      background-color: rgba(0, 0, 0, 0.08);
 
-    .menu-item-icon {
-      color: rgba(0, 0, 0, 0.45);
-    }
-
-    &.active {
-      .menu-item-icon {
-        color: #000;
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
       }
     }
   }

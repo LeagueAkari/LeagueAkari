@@ -3,7 +3,7 @@
     <template #header>
       <span class="card-header-title">{{ t('MissionClaimTool.title') }}</span>
     </template>
-    <div class="hint">
+    <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
       <span>{{ t('MissionClaimTool.hint') }}</span>
     </div>
     <div class="button-group">
@@ -40,10 +40,7 @@
       </NButton>
     </div>
     <NDataTable
-      :theme-overrides="{
-        thColor: '#0005',
-        tdColor: '#0004'
-      }"
+      :theme-overrides="dataTableThemeOverrides"
       :loading="isLoading"
       size="small"
       :columns="columns"
@@ -56,8 +53,9 @@
 </template>
 
 <script setup lang="ts">
-import { useActivated } from '@renderer-shared/compositions/useActivated'
+import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -75,6 +73,7 @@ const TARGET_MISSION_STATUS = 'SELECT_REWARDS'
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const lc = useInstance(LeagueClientRenderer)
 const log = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
@@ -114,6 +113,20 @@ const columns = computed<DataTableColumns<Mission>>(() => [
 
 const missions = shallowRef<Mission[]>([])
 const selectedMissionIds = ref<string[]>([])
+
+const dataTableThemeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      thColor: 'rgba(23, 23, 23, 0.3)',
+      tdColor: 'rgba(23, 23, 23, 0.2)'
+    }
+  }
+
+  return {
+    thColor: 'rgba(15, 23, 42, 0.04)',
+    tdColor: 'rgba(15, 23, 42, 0.02)'
+  }
+})
 
 const updateClaimableMissions = async (manually = false) => {
   if (isLoading.value) {
@@ -209,17 +222,10 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .button-group {
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
-}
-
-.hint {
-  color: #fff8;
-  font-style: italic;
-  font-size: 13px;
-  margin-bottom: 12px;
 }
 </style>

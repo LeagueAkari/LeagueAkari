@@ -13,6 +13,7 @@
       <NFlex justify="flex-end" align="center">
         <NButton
           @click="() => emits('confirm')"
+          @click.right="handleRightClick"
           size="small"
           type="primary"
           :disabled="countdown > 0"
@@ -24,7 +25,7 @@
             {{ t('DeclarationModal.ok') }}
           </template>
         </NButton>
-        <NButton @click="() => emits('quit')" size="small">
+        <NButton @click="() => emits('exit')" size="small">
           {{ t('DeclarationModal.quit') }}
         </NButton>
       </NFlex>
@@ -43,7 +44,8 @@
 
 <script setup lang="ts">
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { useIntervalFn } from '@vueuse/core'
+import { randomTruncatedNormal } from '@shared/utils/random'
+import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NFlex, NModal, NScrollbar } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
@@ -52,7 +54,7 @@ const { t } = useTranslation()
 
 const emits = defineEmits<{
   (e: 'confirm'): void
-  (e: 'quit'): void
+  (e: 'exit'): void
 }>()
 
 const markdownHtmlText = computed(() => {
@@ -61,7 +63,7 @@ const markdownHtmlText = computed(() => {
 
 const show = defineModel<boolean>('show', { default: false })
 
-const countdown = ref(25)
+const countdown = ref(Math.floor(randomTruncatedNormal(10, 35)))
 
 const { pause } = useIntervalFn(() => {
   countdown.value--
@@ -76,16 +78,35 @@ const handle = watch(
     }
   }
 )
+
+let rightClickCount = 0
+const { start, stop } = useTimeoutFn(() => {
+  rightClickCount = 0
+}, 500)
+
+const handleRightClick = (e: MouseEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+
+  rightClickCount++
+
+  if (rightClickCount >= 3) {
+    emits('confirm')
+    stop()
+  } else {
+    start()
+  }
+}
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .markdown-container {
   user-select: text;
   border-radius: 4px;
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .declaration-modal {
   min-width: 720px;
   max-width: 1106px;

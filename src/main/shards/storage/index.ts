@@ -6,10 +6,12 @@ import { join } from 'node:path'
 import { DataSource, QueryRunner } from 'typeorm'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
+import { MobxUtilsMain } from '../mobx-utils'
 import { EncounteredGame } from './entities/EncounteredGame'
 import { Metadata } from './entities/Metadata'
 import { SavedPlayer } from './entities/SavedPlayers'
 import { Setting } from './entities/Settings'
+import { StorageState } from './state'
 import { v10_LA1_2_0initializationUpgrade } from './upgrades/version-10'
 import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
 
@@ -32,11 +34,18 @@ export class StorageMain implements IAkariShardInitDispose {
     15: v15_LA1_2_2Upgrade
   }
 
+  private _rebuildOnUpgradeFailedAttempted = false
+
+  public readonly state = new StorageState()
+
   get dataSource() {
     return this._dataSource
   }
 
-  constructor(private readonly _loggerFactory: LoggerFactoryMain) {
+  constructor(
+    readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _mobx: MobxUtilsMain
+  ) {
     this._log = _loggerFactory.create(StorageMain.id)
 
     this._dataSource = new DataSource({
@@ -48,6 +57,7 @@ export class StorageMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    this._mobx.propSync(StorageMain.id, 'state', this.state, ['usingHigherVersionDb'])
     await this._checkAndInitializeDatabase(this._dataSource)
   }
 
@@ -71,7 +81,7 @@ export class StorageMain implements IAkariShardInitDispose {
 
     let cv = currentVersion
 
-    if (!needToPerformUpgrade && !needToPerformUpgrade) {
+    if (!needToPerformUpgrade && !needToRecreateDatabase) {
       this._log.info(`Current version database does not need to be migrated`)
     }
 
@@ -83,18 +93,22 @@ export class StorageMain implements IAkariShardInitDispose {
 
     if (needToPerformUpgrade) {
       this._log.info(`Database needs to be upgraded from ${cv} version`)
-      const queryRunner = dataSource.createQueryRunner()
-      await queryRunner.startTransaction()
 
       try {
-        await this._performUpgrades(queryRunner, cv)
-
-        await queryRunner.commitTransaction()
+        await this._runMigrationsInTransaction(dataSource, cv)
       } catch (error) {
-        await queryRunner.rollbackTransaction()
-        throw error
-      } finally {
-        await queryRunner.release()
+        // Retry once by recreating the database to avoid infinite loops
+        if (!this._rebuildOnUpgradeFailedAttempted) {
+          this._log.error('Database upgrade failed, will recreate database once and retry', error)
+          this._rebuildOnUpgradeFailedAttempted = true
+
+          await this._recreateDatabase(dataSource, dbPath)
+
+          // After recreation, run migrations from empty (version 0)
+          await this._runMigrationsInTransaction(dataSource, 0)
+        } else {
+          throw error
+        }
       }
     }
   }
@@ -153,9 +167,13 @@ export class StorageMain implements IAkariShardInitDispose {
         if (versionResult.length) {
           currentVersion = parseInt(versionResult[0].value, 10)
           if (currentVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
-            // version is too high and needs recreation
-            needToRecreateDatabase = true
-            needToPerformUpgrade = true
+            // Higher version DB detected: use as-is, do not migrate/recreate, and set warning flag
+            this._log.warn(
+              `Database version (${currentVersion}) is higher than supported (${StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION}). Using higher version database as-is.`
+            )
+            this.state.setUsingHigherVersionDb(true)
+            needToRecreateDatabase = false
+            needToPerformUpgrade = false
           } else if (currentVersion < StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
             // low version, need to upgrade
             needToPerformUpgrade = true
@@ -174,5 +192,20 @@ export class StorageMain implements IAkariShardInitDispose {
     }
 
     return { needToRecreateDatabase, needToPerformUpgrade, currentVersion }
+  }
+
+  private async _runMigrationsInTransaction(dataSource: DataSource, fromVersion: number) {
+    const queryRunner = dataSource.createQueryRunner()
+    await queryRunner.startTransaction()
+
+    try {
+      await this._performUpgrades(queryRunner, fromVersion)
+      await queryRunner.commitTransaction()
+    } catch (error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
   }
 }

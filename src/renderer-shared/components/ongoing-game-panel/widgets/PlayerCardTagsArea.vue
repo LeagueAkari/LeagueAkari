@@ -1,14 +1,12 @@
 <template>
   <div class="tags">
-    <div class="tag self" v-if="isSelf && ogs.frontendSettings.playerCardTags.showSelfTag">
+    <div class="tag self" v-if="isSelf && ogs.settings.playerCardTags.showSelfTag">
       {{ t('PlayerInfoCard.self') }}
     </div>
+
     <NPopover
       v-if="
-        ogs.frontendSettings.playerCardTags.showTaggedTag &&
-        savedInfo &&
-        !isSelf &&
-        savedInfo.tags.length
+        ogs.settings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tags.length
       "
       :delay="50"
       style="max-height: 240px"
@@ -29,7 +27,7 @@
               class="tagged-by-other-name"
               @click="emits('toSummoner', tag.selfPuuid)"
             >
-              {{ riotId(ogs.summoner[tag.selfPuuid].data) }}
+              {{ riotId(ogs.summoner[tag.selfPuuid]) }}
             </span>
             <span v-else class="tagged-by-other-name unknown">
               {{ t('PlayerInfoCard.unknown') }}
@@ -41,8 +39,9 @@
         </div>
       </div>
     </NPopover>
+
     <NPopover
-      v-if="ogs.frontendSettings.playerCardTags.showPremadeTeamTag && premadeTeamId"
+      v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
       :delay="50"
       style="max-height: 240px"
     >
@@ -51,9 +50,9 @@
           class="tag"
           :style="{
             backgroundColor: premadeTeamId
-              ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+              ? premadeColors[premadeTeamId]?.foregroundColor
               : '#ffffff40',
-            color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#fff'
+            color: premadeTeamId ? premadeColors[premadeTeamId]?.color || '#fff' : '#fff'
           }"
           ref="premade-tag-el"
         >
@@ -68,11 +67,12 @@
         {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       :delay="50"
       v-if="
-        ogs.frontendSettings.playerCardTags.showWinRateTeamTag &&
+        ogs.settings.playerCardTags.showWinRateTeamTag &&
         analysis &&
         analysis.summary.count >= 16 &&
         analysis.summary.winRate >= 0.85
@@ -85,18 +85,14 @@
         {{
           t('PlayerInfoCard.highWinRatePopover', {
             countV: analysis.summary.count,
-            winCount: analysis.summary.win
+            winCount: analysis.summary.wins
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
-      v-if="
-        ogs.frontendSettings.playerCardTags.showMetTag &&
-        savedInfo &&
-        savedInfo.lastMetAt &&
-        !isSelf
-      "
+      v-if="ogs.settings.playerCardTags.showMetTag && savedInfo && savedInfo.lastMetAt && !isSelf"
       :delay="50"
       scrollable
       style="max-height: 240px"
@@ -104,8 +100,8 @@
       <template #trigger>
         <div class="tag have-met">{{ t('PlayerInfoCard.met') }}</div>
       </template>
-      <div class="popover-text have-met-popover">
-        <div style="margin-bottom: 4px">
+      <div class="w-min max-w-none text-xs">
+        <div class="mb-1 text-gray-900 dark:text-gray-100">
           {{
             t('PlayerInfoCard.metPopover.title', {
               date: dayjs(savedInfo.lastMetAt)
@@ -116,21 +112,37 @@
             })
           }}
         </div>
-        <table class="encountered-game-table">
+        <table
+          class="w-min border-collapse border-spacing-0 border border-black/20 text-xs text-black dark:border-white/25 dark:text-gray-300"
+        >
           <colgroup>
-            <col class="game-id-col" />
+            <col style="width: 180px" />
+            <col style="width: auto" />
+            <col style="width: auto" />
           </colgroup>
           <thead>
             <tr>
-              <th>{{ t('PlayerInfoCard.metPopover.gameId') }}</th>
-              <th>{{ t('PlayerInfoCard.metPopover.date') }}</th>
-              <th>{{ t('PlayerInfoCard.metPopover.gameStats') }}</th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.gameId') }}
+              </th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.date') }}
+              </th>
+              <th
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
+                {{ t('PlayerInfoCard.metPopover.gameStats') }}
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in encounteredGames" :key="item.gameId">
               <td
-                class="game-id-td"
+                class="cursor-pointer border border-black/20 px-2 py-0.5 text-center whitespace-nowrap transition-colors hover:text-black/70 dark:border-white/25 dark:text-gray-300 dark:hover:text-white"
                 @click="
                   () =>
                     ogs.cachedGames[item.gameId]
@@ -138,7 +150,9 @@
                       : emits('showGameById', item.gameId, puuid)
                 "
               >
-                <div class="game-id-tag">
+                <div
+                  class="inline-block rounded bg-black/10 px-1 py-0.5 text-xs leading-3 whitespace-nowrap text-black dark:bg-white/12 dark:text-gray-100"
+                >
                   {{
                     t('PlayerInfoCard.metPopover.inspectByGameId', {
                       gameId: masked(
@@ -149,72 +163,106 @@
                   }}
                 </div>
               </td>
-              <td>
+              <td
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
                 {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
                   dayjs(item.updateAt).locale(as.settings.locale.toLowerCase()).fromNow()
                 }})
               </td>
-              <td>
+              <td
+                class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+              >
                 <template v-if="item.gameStats">
-                  <div class="game-stats">
-                    <span class="win-result" :class="item.gameStats.selfWinResult">{{
-                      t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`)
-                    }}</span>
+                  <div class="flex items-center gap-1">
+                    <span
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.selfWinResult === 'win',
+                        'text-red-600 dark:text-red-400': item.gameStats.selfWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.selfWinResult === 'abort' ||
+                          item.gameStats.selfWinResult === 'remake'
+                      }"
+                    >
+                      {{ t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`) }}
+                    </span>
                     <span
                       v-if="item.gameStats.myPlacement"
-                      class="win-result"
-                      :class="item.gameStats.selfWinResult"
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.selfWinResult === 'win',
+                        'text-red-600 dark:text-red-400': item.gameStats.selfWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.selfWinResult === 'abort' ||
+                          item.gameStats.selfWinResult === 'remake'
+                      }"
                     >
                       ({{ formatI18nOrdinal(item.gameStats.myPlacement, as.settings.locale) }})
                     </span>
                     <span
-                      class="team"
+                      class="mr-2 text-xs leading-3 font-bold whitespace-nowrap"
                       :class="{
-                        teammate: item.gameStats.sameTeam,
-                        opponent: !item.gameStats.sameTeam
+                        'text-emerald-600 dark:text-emerald-400': item.gameStats.isSameTeam,
+                        'text-red-600 dark:text-red-400': !item.gameStats.isSameTeam
                       }"
-                      >{{
-                        item.gameStats.sameTeam
+                    >
+                      {{
+                        item.gameStats.isSameTeam
                           ? t(`PlayerInfoCard.metPopover.team.teammate`)
                           : t(`PlayerInfoCard.metPopover.team.opponent`)
-                      }}</span
-                    >
+                      }}
+                    </span>
                     <PositionIcon
-                      class="position-icon"
-                      v-if="item.gameStats.selfPosition"
-                      :position="item.gameStats.selfPosition"
+                      v-if="item.gameStats.myPosition"
+                      class="shrink-0 text-base"
+                      :position="item.gameStats.myPosition"
                     />
                     <LcuImage
-                      class="champion-icon"
-                      :src="championIconUri(item.gameStats.selfChampionId)"
+                      class="h-4 w-4 shrink-0"
+                      :src="championIconUri(item.gameStats.myChampionId)"
                     />
-                    <div class="kda">
+                    <div
+                      class="flex gap-0.5 text-[11px] whitespace-nowrap text-black/90 dark:text-white/90"
+                    >
                       <span>{{ item.gameStats.selfKda.k }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.selfKda.d }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.selfKda.a }}</span>
                     </div>
-                    <div class="divider"></div>
+                    <div class="mx-1 h-3 w-px shrink-0 bg-black/20 dark:bg-white/25"></div>
                     <span
                       v-if="item.gameStats.opponentPlacement"
-                      class="win-result"
-                      :class="item.gameStats.opponentWinResult"
+                      class="text-xs leading-3 font-bold whitespace-nowrap"
+                      :class="{
+                        'text-emerald-600 dark:text-emerald-400':
+                          item.gameStats.opponentWinResult === 'win',
+                        'text-red-600 dark:text-red-400':
+                          item.gameStats.opponentWinResult === 'loss',
+                        'text-gray-600 dark:text-gray-400':
+                          item.gameStats.opponentWinResult === 'abort' ||
+                          item.gameStats.opponentWinResult === 'remake'
+                      }"
                     >
                       ({{
                         formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale)
                       }})
                     </span>
                     <PositionIcon
-                      class="position-icon"
                       v-if="item.gameStats.opponentPosition"
+                      class="shrink-0 text-base"
                       :position="item.gameStats.opponentPosition"
                     />
                     <LcuImage
-                      class="champion-icon"
+                      class="h-4 w-4 shrink-0"
                       :src="championIconUri(item.gameStats.opponentChampionId)"
                     />
-                    <div class="kda">
+                    <div
+                      class="flex gap-0.5 text-[11px] whitespace-nowrap text-black/90 dark:text-white/90"
+                    >
                       <span>{{ item.gameStats.opponentKda.k }}</span>
                       <span>/</span>
                       <span>{{ item.gameStats.opponentKda.d }}</span>
@@ -230,9 +278,10 @@
         </table>
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
+      v-if="ogs.settings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
       :delay="50"
     >
       <template #trigger>
@@ -242,10 +291,11 @@
         {{ t('PlayerInfoCard.privatePopover') }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showWinningStreakTag &&
+        ogs.settings.playerCardTags.showWinningStreakTag &&
         analysis &&
         analysis.summary.winningStreak >= 3
       "
@@ -268,10 +318,11 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showLosingStreakTag &&
+        ogs.settings.playerCardTags.showLosingStreakTag &&
         analysis &&
         analysis.summary.losingStreak >= 3
       "
@@ -294,34 +345,36 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showGreatPerformanceTag &&
+        ogs.settings.playerCardTags.showGreatPerformanceTag &&
         analysis &&
-        (analysis.akariScore.good || analysis.akariScore.great)
+        (analysis.akariScore.outstanding || analysis.akariScore.extraordinary)
       "
       :delay="50"
     >
       <template #trigger>
-        <div class="tag akari-loved" v-if="analysis.akariScore.good">
-          {{ t('PlayerInfoCard.akariLoved.good') }}
+        <div class="tag akari-loved" v-if="analysis.akariScore.extraordinary">
+          {{ t('PlayerInfoCard.akariLoved.extraordinary') }}
         </div>
-        <div class="tag akari-loved" v-else-if="analysis.akariScore.great">
-          {{ t('PlayerInfoCard.akariLoved.great') }}
+        <div class="tag akari-loved" v-else-if="analysis.akariScore.outstanding">
+          {{ t('PlayerInfoCard.akariLoved.outstanding') }}
         </div>
       </template>
-      <div class="popover-text" v-if="analysis.akariScore.good">
-        {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
+      <div class="popover-text" v-if="analysis.akariScore.extraordinary">
+        {{ t('PlayerInfoCard.akariLoved.extraordinaryPopover') }}
       </div>
-      <div class="popover-text" v-else-if="analysis.akariScore.great">
-        {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
+      <div class="popover-text" v-else-if="analysis.akariScore.outstanding">
+        {{ t('PlayerInfoCard.akariLoved.outstandingPopover') }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showSuspiciousFlashPositionTag &&
+        ogs.settings.playerCardTags.showSuspiciousFlashPositionTag &&
         isSuspiciousFlashPosition &&
         isSuspiciousFlashPosition.isSuspicious
       "
@@ -341,76 +394,41 @@
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        ogs.frontendSettings.playerCardTags.showSoloDeathsTag &&
-        soloKills &&
-        soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
-        soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD
-      "
-      :delay="50"
-    >
-      <template #trigger>
-        <div class="tag too-many-solo-deaths">
-          {{
-            t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGame', {
-              times: soloKills.avgSoloDeathsInEarlyGame.toFixed(0)
-            })
-          }}
-        </div>
-      </template>
-      <div class="popover-text">
-        {{
-          t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGamePopover', {
-            times: soloKills.avgSoloDeathsInEarlyGame.toFixed(2),
-            countV: soloKills.count,
-            minutes: EARLY_GAME_THRESHOLD_MINUTES
-          })
-        }}
-        ({{ soloKills.details.map((d) => d.soloDeathsBefore.length).join(', ') }})
-      </div>
-    </NPopover>
-    <NPopover
-      :keep-alive-on-hover="false"
-      v-if="
-        ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
-        soloKills &&
-        soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
-        soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD
-      "
+      v-if="ogs.settings.playerCardTags.showSoloKillsTag && analysis?.summary.avgSoloKills"
       :delay="50"
     >
       <template #trigger>
         <div class="tag too-many-solo-kills">
           {{
-            t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGame', {
-              times: soloKills.avgSoloKillsInEarlyGame.toFixed(0)
+            t('PlayerInfoCard.soloKills', {
+              times: analysis.summary.avgSoloKills.toFixed(1)
             })
           }}
         </div>
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGamePopover', {
-            times: soloKills.avgSoloKillsInEarlyGame.toFixed(2),
-            countV: soloKills.count,
-            minutes: EARLY_GAME_THRESHOLD_MINUTES
+          t('PlayerInfoCard.soloKillsPopover', {
+            times: analysis.summary.avgSoloKills.toFixed(2),
+            countV: analysis.summary.count
           })
         }}
-        ({{ soloKills.details.map((d) => d.soloKillsBefore.length).join(', ') }})
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
         <div class="tag team-damage-share">
           {{
             t('PlayerInfoCard.teamDamageShare', {
-              rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -418,22 +436,23 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamDamageSharePopover', {
-            rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
         <div class="tag team-damage-taken-share">
           {{
             t('PlayerInfoCard.teamDamageTakenShare', {
-              rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -441,22 +460,23 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamDamageTakenSharePopover', {
-            rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
         <div class="tag team-gold-share">
           {{
             t('PlayerInfoCard.teamGoldShare', {
-              rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(0)
+              rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(0)
             })
           }}
         </div>
@@ -464,22 +484,23 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.teamGoldSharePopover', {
-            rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(2),
+            rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
       :delay="50"
     >
       <template #trigger>
         <div class="tag damage-gold-efficiency">
           {{
             t('PlayerInfoCard.damageGoldEfficiency', {
-              rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(0)
+              rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(0)
             })
           }}
         </div>
@@ -487,18 +508,19 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.damageGoldEfficiencyPopover', {
-            rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(2),
+            rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(2),
             countV: analysis.summary.count
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.frontendSettings.playerCardTags.showAverageEnemyMissingPingsTag &&
+        ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag &&
         analysis &&
-        analysis.summary.averageEnemyMissingPings !== null
+        analysis.summary.avgEnemyMissingPings !== null
       "
       :delay="50"
     >
@@ -506,7 +528,7 @@
         <div class="tag enemy-missing-pings">
           {{
             t('PlayerInfoCard.enemyMissingPings', {
-              countV: truncateTailingZeros(analysis.summary.averageEnemyMissingPings)
+              countV: truncateTailingZeros(analysis.summary.avgEnemyMissingPings)
             })
           }}
         </div>
@@ -514,21 +536,22 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.enemyMissingPingsPopover', {
-            countV: analysis.summary.averageEnemyMissingPings.toFixed(3)
+            countV: analysis.summary.avgEnemyMissingPings.toFixed(3)
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.frontendSettings.playerCardTags.showAverageVisionScoreTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageVisionScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>
         <div class="tag vision-score">
           {{
             t('PlayerInfoCard.visionScore', {
-              countV: truncateTailingZeros(analysis.summary.averageVisionScore)
+              countV: truncateTailingZeros(analysis.summary.avgVisionScore)
             })
           }}
         </div>
@@ -536,18 +559,15 @@
       <div class="popover-text">
         {{
           t('PlayerInfoCard.visionScorePopover', {
-            countV: analysis.summary.averageVisionScore.toFixed(3)
+            countV: analysis.summary.avgVisionScore.toFixed(3)
           })
         }}
       </div>
     </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="
-        as.settings.isInKyokoMode &&
-        ogs.frontendSettings.playerCardTags.showAkariScoreTag &&
-        analysis
-      "
+      v-if="as.settings.isInKyokoMode && ogs.settings.playerCardTags.showAkariScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -580,14 +600,16 @@
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
+import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
-import { Game } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { MatchHistoryGameWithState, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { riotId } from '@shared/utils/name'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -595,22 +617,21 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
 
-const { puuid, analysis, matchHistory, premadeTeamId, summoner, savedInfo } = defineProps<{
+const { puuid, analysis, premadeTeamId, summoner, savedInfo } = defineProps<{
   puuid: string
   isSelf?: boolean
   premadeTeamId?: string
   currentHighlightingPremadeTeamId?: string | null
   summoner?: SummonerInfo
-  matchHistory?: MatchHistoryGameWithState[]
   analysis?: MatchHistoryGamesAnalysisAll
   savedInfo?: SavedInfo
 }>()
 
 const emits = defineEmits<{
-  showGame: [game: Game, selfPuuid: string]
-  showGameById: [gameId: number, selfPuuid: string]
+  showGame: [game: LcuOrSgpGameSummary, puuid: string]
+  showGameById: [gameId: number, puuid: string]
   highlight: [premadeTeamId: string, boolean]
   toSummoner: [puuid: string]
 }>()
@@ -620,9 +641,9 @@ const { t } = useTranslation()
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
 
-const SOLO_DEATHS_THRESHOLD = 2
-const SOLO_KILLS_THRESHOLD = 2
-const EARLY_GAME_THRESHOLD_MINUTES = 14
+const premadeColors = computed(() => {
+  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+})
 
 const premadeTagElHovering = useElementHover(useTemplateRef('premade-tag-el'))
 watch(
@@ -633,62 +654,6 @@ watch(
     }
   }
 )
-
-const soloKills = computed(() => {
-  if (!analysis || !matchHistory) {
-    return null
-  }
-
-  if (
-    !ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
-    !ogs.frontendSettings.playerCardTags.showSoloDeathsTag
-  ) {
-    return null
-  }
-
-  const sl = matchHistory
-    .map(({ game }) => {
-      const gameId = game.gameId
-      const a = analysis.games[gameId]
-
-      if (a && a.soloKills !== null && a.soloDeaths !== null) {
-        return {
-          gameId,
-          soloKills: a.soloKills,
-          soloDeaths: a.soloDeaths,
-          soloKillsBefore: a.soloKills.filter(
-            (k) => k.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
-          ),
-          soloDeathsBefore: a.soloDeaths.filter(
-            (d) => d.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
-          )
-        }
-      }
-
-      return null
-    })
-    .filter((a) => a !== null)
-
-  if (sl.length === 0) {
-    return null
-  }
-
-  const avgSoloKills = sl.reduce((acc, cur) => acc + cur.soloKills.length, 0) / sl.length
-  const avgSoloDeaths = sl.reduce((acc, cur) => acc + cur.soloDeaths.length, 0) / sl.length
-  const avgSoloKillsInEarlyGame =
-    sl.reduce((acc, cur) => acc + cur.soloKillsBefore.length, 0) / sl.length
-  const avgSoloDeathsInEarlyGame =
-    sl.reduce((acc, cur) => acc + cur.soloDeathsBefore.length, 0) / sl.length
-
-  return {
-    avgSoloKills,
-    avgSoloDeaths,
-    avgSoloKillsInEarlyGame,
-    avgSoloDeathsInEarlyGame,
-    count: sl.length,
-    details: sl
-  }
-})
 
 const isSuspiciousFlashPosition = computed(() => {
   if (!analysis) {
@@ -714,72 +679,37 @@ const encounteredGames = computed(() => {
       return { gameStats: null, ...record }
     }
 
-    const sI = game.participantIdentities.find((p) => p.player.puuid === record.selfPuuid)
-    const hI = game.participantIdentities.find((p) => p.player.puuid === record.puuid)
+    const basicInfo = toBasicInfo(game)
+    const participants = toParticipants(game, basicInfo)
 
-    if (!sI || !hI) {
-      return { gameStats: null, ...record }
-    }
-
-    const s = game.participants.find((par) => par.participantId === sI.participantId)
-    const h = game.participants.find((par) => par.participantId === hI.participantId)
+    const s = participants.find((p) => p.puuid === record.selfPuuid)
+    const h = participants.find((p) => p.puuid === record.puuid)
 
     if (!s || !h) {
       return { gameStats: null, ...record }
     }
 
     // for cherry mode, all players are placed in the same team
-    const sameTeam =
-      game.gameMode === 'CHERRY'
-        ? s.stats.playerSubteamId === h.stats.playerSubteamId
-        : s.teamId === h.teamId
-
-    let selfWinResult: string
-    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
-      selfWinResult = 'abort'
-    } else if (s.stats.gameEndedInEarlySurrender) {
-      selfWinResult = 'remake'
-    } else {
-      selfWinResult = s.stats.win ? 'win' : 'lose'
-    }
-
-    let opponentWinResult: string
-    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
-      opponentWinResult = 'abort'
-    } else if (h.stats.gameEndedInEarlySurrender) {
-      opponentWinResult = 'remake'
-    } else {
-      opponentWinResult = h.stats.win ? 'win' : 'lose'
-    }
-
-    const selfChampionId = s.championId
-    const opponentChampionId = h.championId
-
-    const date = game.gameCreation
-
-    const selfKda = { k: s.stats.kills, d: s.stats.deaths, a: s.stats.assists }
-    const opponentKda = { k: h.stats.kills, d: h.stats.deaths, a: h.stats.assists }
-
-    // FOR SGP ONLY
-    const selfPosition = s.stats.teamPosition || null
-    const opponentPosition = h.stats.teamPosition || null
+    const isSameTeam = basicInfo.isCherrySubteam
+      ? s.playerSubteamId === h.playerSubteamId
+      : s.teamId === h.teamId
 
     return {
       gameStats: {
         gameId: game.gameId,
-        selfChampionId,
-        opponentChampionId,
-        selfPosition,
-        opponentPosition,
-        selfWinResult,
-        opponentWinResult,
-        selfKda,
-        opponentKda,
-        sameTeam,
-        date,
-        mode: game.gameMode,
-        myPlacement: s.stats.subteamPlacement,
-        opponentPlacement: h.stats.subteamPlacement
+        myChampionId: s.championId,
+        opponentChampionId: h.championId,
+        myPosition: s.position,
+        opponentPosition: h.position,
+        selfWinResult: s.winResult,
+        opponentWinResult: h.winResult,
+        selfKda: { k: s.kills, d: s.deaths, a: s.assists },
+        opponentKda: { k: h.kills, d: h.deaths, a: h.assists },
+        isSameTeam,
+        date: basicInfo.gameCreation,
+        mode: basicInfo.gameMode,
+        myPlacement: s.subteamPlacement,
+        opponentPlacement: h.subteamPlacement
       },
       ...record
     }
@@ -818,7 +748,7 @@ onDeactivated(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -918,11 +848,6 @@ onDeactivated(() => {
   max-width: 240px;
 }
 
-.popover-text.have-met-popover {
-  max-width: unset;
-  width: min-content;
-}
-
 .tagged-text-list {
   display: flex;
   flex-direction: column;
@@ -958,106 +883,6 @@ onDeactivated(() => {
     font-size: 12px;
     white-space: pre-wrap;
     max-width: 260px;
-  }
-}
-
-.encountered-game-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #ffffff40;
-  font-size: 12px;
-  color: #d4d4d4;
-
-  th,
-  td {
-    border: 1px solid #ffffff40;
-    padding: 2px 8px;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .game-id-col {
-    width: 120px;
-  }
-
-  .game-id-td:hover {
-    color: #ffffff;
-  }
-
-  .game-id-td {
-    transition: color 0.2s;
-    cursor: pointer;
-  }
-
-  .game-id-tag {
-    padding: 2px 4px;
-    line-height: 12px;
-    font-size: 12px;
-    background-color: #ffffff20;
-    border-radius: 2px;
-  }
-
-  .game-stats {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-
-    .champion-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .position-icon {
-      font-size: 16px;
-    }
-
-    .team,
-    .win-result {
-      font-size: 12px;
-      line-height: 12px;
-      font-weight: bold;
-    }
-
-    .team {
-      margin-right: 8px;
-
-      &.teammate {
-        color: #4cc69d;
-      }
-
-      &.opponent {
-        color: #ff6161;
-      }
-    }
-
-    .win-result {
-      &.win {
-        color: #4cc69d;
-      }
-
-      &.lose {
-        color: #ff6161;
-      }
-
-      &.abort,
-      &.remake {
-        color: #c0c0c0;
-      }
-    }
-
-    .kda {
-      color: #fffb;
-      font-size: 11px;
-      display: flex;
-      gap: 2px;
-    }
-
-    .divider {
-      margin: 0 4px;
-      width: 1px;
-      height: 12px;
-      background-color: #ffffff40;
-    }
   }
 }
 </style>

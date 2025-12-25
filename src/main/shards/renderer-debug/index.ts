@@ -19,7 +19,7 @@ export class RendererDebugMain {
     private readonly _ipc: AkariIpcMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _loggerFactory: LoggerFactoryMain
+    readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(RendererDebugMain.id)
   }

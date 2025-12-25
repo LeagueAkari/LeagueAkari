@@ -1,15 +1,36 @@
 <template>
   <div
-    id="app-frame"
+    class="app-frame"
     :class="{
+      mica: preferMica,
       'use-plain-bg': !backgroundImageUrl
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <SetupInAppScope />
+
+    <div class="app-frame__left">
+      <Sidebar />
+    </div>
+
+    <div class="app-frame__right">
+      <MainWindowTitlebar />
+
+      <div class="app-frame__right-content" ref="contentEl">
+        <RouterView v-slot="{ Component }">
+          <Transition name="fade">
+            <KeepAlive>
+              <component :is="Component" />
+            </KeepAlive>
+          </Transition>
+        </RouterView>
+      </div>
+    </div>
+
+    <!--transition background profile skin -->
     <Transition name="bg-fade">
       <div
-        v-if="backgroundImageUrl"
+        v-if="backgroundImageUrl && !preferMica"
         :key="backgroundImageUrl"
         class="background-wallpaper"
         :class="{
@@ -20,98 +41,96 @@
         }"
       ></div>
     </Transition>
-    <MainWindowTitleBar />
-    <div id="app-content"><RouterView /></div>
-    <div v-if="as.isRabiVersion" id="version-watermark">League Akari {{ as.version }}</div>
+
+    <!-- watermark -->
+    <div v-if="as.isRabiVersion" class="version-watermark">
+      {{ t('appName', { ns: 'common' }) }} {{ as.version }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
+import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { useMessage, useNotification } from 'naive-ui'
-import { provide, ref } from 'vue'
-import { h } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+
+import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
-import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
+import { useMicaAvailability } from './composables/useMicaAvailability'
+import { provideAppContext } from './context'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
 
 const as = useAppCommonStore()
 
-const app = useInstance(AppCommonRenderer)
-
 const { t } = useTranslation()
 
 greeting(as.version)
 
-const appProvide = {
+const contentEl = useTemplateRef('contentEl')
+const { width } = useElementSize(contentEl)
+
+provideAppContext({
+  contentWidth: width,
   openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
     if (tabName) {
       settingModelTab.value = tabName
     }
   }
-}
-
-provide('app', appProvide)
-
-const notification = useNotification()
+})
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
 
-app.onSecondInstance(() => {
-  notification.info({
-    title: 'League Akari',
-    content: () => t('app.singleton'),
-    duration: 10000
-  })
-})
-
-const message = useMessage()
-
-useKeyboardCombo('AKARI', {
-  onFinish: () => {
-    message.info(() => h(LeagueAkariSpan))
-  },
-  requireSameEl: true,
-  caseSensitive: false,
-  timeout: 250
-})
-
+const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 </script>
 
-<style lang="less">
-#app-frame {
+<style scoped>
+.app-frame {
   position: relative;
   height: 100%;
   display: flex;
-  flex-direction: column;
-  min-width: var(--app-min-width);
-  min-height: var(--app-min-height);
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
 
-  &.use-plain-bg {
-    background-color: var(--background-color-primary);
+  &.use-plain-bg:not(.mica) {
+    background-color: var(--la-background-color-primary);
   }
 
-  > #app-content {
+  .app-frame__left {
+    background-color: rgba(189, 189, 189, 0.2);
     z-index: 5;
-    height: 0;
+
+    [data-theme='dark'] & {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .app-frame__right {
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+    width: 0;
     flex: 1;
     overflow: hidden;
+
+    .app-frame__right-content {
+      height: 0;
+      flex: 1;
+      overflow: hidden;
+    }
   }
 
-  > #version-watermark {
+  .version-watermark {
     position: absolute;
     bottom: 8px;
     right: 16px;
@@ -139,11 +158,20 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
     left: 0;
     width: 100%;
     height: 100%;
-  }
-}
 
-[data-theme='dark'] {
-  .background-wallpaper::before {
+    background: linear-gradient(
+      180deg,
+      oklch(98.5% 0.002 247.839 / 0.9) 0%,
+      oklch(98.5% 0.002 247.839 / 0.95) 75%,
+      oklch(98.5% 0.002 247.839 / 0.95) 100%
+    );
+  }
+
+  &.no-image::before {
+    background: none;
+  }
+
+  [data-theme='dark'] &::before {
     background: linear-gradient(
       180deg,
       rgba(0, 0, 0, 0.8) 0%,
@@ -151,24 +179,17 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
       rgba(0, 0, 0, 0.85) 100%
     );
   }
-
-  .background-wallpaper.no-image::before {
-    background: none;
-  }
 }
 
-[data-theme='light'] {
-  .background-wallpaper::before {
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.95) 75%,
-      rgba(255, 255, 255, 0.95) 100%
-    );
-  }
+.app-background {
+  position: relative;
+  height: 100%;
+  display: flex;
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
 
-  .background-wallpaper.no-image::before {
-    background: none;
+  &.use-plain-bg:not(.mica) {
+    background-color: var(--la-background-color-primary);
   }
 }
 

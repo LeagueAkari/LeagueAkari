@@ -94,7 +94,7 @@ export function initAppLogger(level: string = 'info') {
   })
 
   const consoleTransport = new transports.Console({
-    level: import.meta.env.DEV ? 'debug' : level,
+    level,
     format: format.combine(
       format.timestamp(),
       format.printf(({ level, message, namespace, timestamp }) => {
@@ -110,7 +110,7 @@ export function initAppLogger(level: string = 'info') {
 
   const setLevel = (level: string) => {
     fileTransport.level = level
-    consoleTransport.level = import.meta.env.DEV ? 'debug' : level
+    consoleTransport.level = level
   }
 
   const logger = createLogger({

@@ -1,6 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
-import fs from 'node:fs'
 
 /**
  * 来自 Riot 的证书文件
@@ -42,16 +40,14 @@ export interface UxCommandLine {
   riotClientAuthToken: string
 }
 
-const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
-
-export function checkWmicAvailability() {
-  const isExists = fs.existsSync(WMIC_PATH)
-  if (!isExists) {
-    throw new Error(
-      'WMIC unavailable, League Akari relies on this tool to obtain process information'
-    )
-  }
-}
+const POWERSHELL_PATH = 'powershell'
+const POWERSHELL_BASE_ARGS = [
+  '-NoProfile',
+  '-NonInteractive',
+  '-ExecutionPolicy',
+  'Bypass',
+  '-Command'
+]
 
 function runCommand(
   command: string,
@@ -71,6 +67,10 @@ function runCommand(
       stderr += data.toString()
     })
 
+    child.on('error', (error) => {
+      reject(error)
+    })
+
     child.on('close', (code) => {
       if (code === 0) {
         resolve(stdout)
@@ -86,31 +86,6 @@ function runCommand(
   })
 }
 
-export async function isProcessExists(clientName: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    runCommand(WMIC_PATH, ['process', 'where', `name like '%${clientName}%'`, 'get', 'name'])
-      .then((out) => resolve(out.includes(clientName)))
-      .catch((error) => {
-        reject(error)
-      })
-  })
-}
-
-export async function getProcessPidByName(name: string): Promise<number[]> {
-  return new Promise((resolve, reject) => {
-    runCommand(WMIC_PATH, ['process', 'where', `name like '%${name}%'`, 'get', 'processid'])
-      .then((out) => {
-        const pids = out
-          .split('\n')
-          .map((i) => i.trim())
-          .map(Number)
-          .filter(Boolean)
-        resolve(pids)
-      })
-      .catch((error) => reject(error))
-  })
-}
-
 const portRegex = /--app-port=([0-9]+)/
 const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
@@ -119,7 +94,7 @@ const regionRegex = /--region=([\w-_]+)/
 const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
 const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
 
-function parseCommandLine(s: string): UxCommandLine | null {
+export function parseCommandLine(s: string): UxCommandLine | null {
   const [, port] = s.match(portRegex) || []
   const [, password] = s.match(remotingAuth) || []
   const [, pid] = s.match(pidRegex) || []
@@ -144,31 +119,19 @@ function parseCommandLine(s: string): UxCommandLine | null {
   }
 }
 
-export async function queryUxCommandLine(pid: number): Promise<UxCommandLine[]>
-export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]>
-export async function queryUxCommandLine(arg: string | number): Promise<UxCommandLine[]> {
+export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]> {
   return new Promise((resolve, reject) => {
-    let task: Promise<string>
-
-    if (typeof arg === 'number') {
-      task = runCommand(WMIC_PATH, ['process', 'where', `processid=${arg}`, 'get', 'CommandLine'])
-    } else {
-      // arg is string
-      task = runCommand(WMIC_PATH, [
-        'process',
-        'where',
-        `name like '%${arg}%'`,
-        'get',
-        'CommandLine'
-      ])
-    }
+    const task = runCommand(POWERSHELL_PATH, [
+      ...POWERSHELL_BASE_ARGS,
+      `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
+    ])
 
     task
       .then((out) => {
         const authObjects = out
           .split('\n')
           .map((s) => s.trim())
-          .filter((s) => Boolean(s) && s.toUpperCase() !== 'COMMANDLINE')
+          .filter(Boolean)
           .map(parseCommandLine)
           .filter(Boolean) as UxCommandLine[]
 
@@ -176,21 +139,4 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
       })
       .catch((error) => reject(error))
   })
-}
-
-export function queryUxCommandLineNative(clientName: string): UxCommandLine[] {
-  const pids = tools.getPidsByName(clientName)
-
-  const auths: UxCommandLine[] = []
-  for (const p of pids) {
-    try {
-      const cmd = tools.getCommandLine1(p)
-      const parsed = parseCommandLine(cmd)
-      if (parsed) {
-        auths.push(parsed)
-      }
-    } catch {}
-  }
-
-  return auths
 }

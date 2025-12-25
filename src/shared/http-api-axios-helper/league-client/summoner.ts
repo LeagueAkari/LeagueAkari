@@ -32,6 +32,7 @@ export class SummonerHttpApi {
     return this._http.post('/lol-summoner/v1/current-summoner/name', name)
   }
 
+  // 疑似不可用
   newSummonerName(name: string) {
     return this._http.post('/lol-summoner/v1/summoners', { name })
   }
@@ -68,5 +69,14 @@ export class SummonerHttpApi {
     return this._http.get<SummonerProfile>(`/lol-summoner/v1/summoner-profile`, {
       params: { puuid }
     })
+  }
+
+  // 新号命名
+  saveAlias(gameName: string, tagLine?: string) {
+    return this._http.post('/lol-summoner/v1/save-alias', { gameName, tagLine })
+  }
+
+  putSummonerIcon(iconId: number) {
+    return this._http.put('/lol-summoner/v1/current-summoner/icon', { profileIconId: iconId })
   }
 }

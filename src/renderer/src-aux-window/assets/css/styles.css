@@ -1,0 +1,148 @@
+::selection {
+  background: #c0c0c0;
+  text-shadow: none;
+}
+
+:root {
+  color-scheme: dark;
+  --la-background-color-primary: #1a1a1d;
+  --la-app-min-height: 200px;
+  --la-app-min-width: 200px;
+  --la-titlebar-height: 28px;
+  --la-scrollbar-height: 6px;
+  --la-scrollbar-width: 6px;
+}
+
+[data-theme='light'] {
+  --la-background-color-primary: #f5f5f5;
+}
+
+::-webkit-scrollbar {
+  width: var(--la-scrollbar-width);
+  height: var(--la-scrollbar-height);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4c4c4c;
+  border-radius: 2px;
+
+  &:hover {
+    background-color: #626262;
+  }
+}
+
+[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+
+  &:hover {
+    background-color: #a0a0a0;
+  }
+}
+
+#app,
+html,
+body,
+#naive-ui-config-provider {
+  height: 100%;
+}
+
+#v-binder-view-measurer {
+  top: var(--la-titlebar-height) !important;
+}
+
+body {
+  overflow: hidden;
+}
+
+body {
+  user-select: none;
+  background-color: var(--la-background-color-primary);
+  line-height: normal;
+}
+
+a {
+  color: rgb(144, 198, 166);
+}
+
+a:visited {
+  color: rgb(144, 198, 166);
+}
+
+[data-theme='light'] a {
+  color: rgb(34, 139, 80);
+}
+
+[data-theme='light'] a:visited {
+  color: rgb(34, 139, 80);
+}
+
+.n-radio {
+  align-items: center;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__header {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__content {
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+.n-notification-container .n-notification .n-notification__avatar {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.n-notification-container .n-notification.n-notification--show-avatar .n-notification-main {
+  margin-left: 30px;
+  width: calc(100% - 30px);
+}
+
+.n-notification-container > .n-scrollbar > .n-scrollbar-container {
+  max-height: calc(100vh - var(--la-titlebar-height)) !important;
+}
+
+.n-timeline .n-timeline-item .n-timeline-item-content .n-timeline-item-content__meta {
+  margin-bottom: 0px;
+}
+
+.n-message {
+  backdrop-filter: blur(4px);
+}
+
+.n-base-select-menu .n-scrollbar {
+  max-height: 50vh;
+
+  .n-virtual-list.v-vl {
+    max-height: 50vh;
+  }
+}
+
+.n-popover-shared.popover-transition-enter-from,
+.n-popover-shared.popover-transition-leave-to {
+  transform: none;
+}
+
+.n-popover-shared.popover-transition-enter-to,
+.n-popover-shared.popover-transition-leave-from {
+  transform: none;
+}
+
+.n-modal.fade-in-scale-up-transition-enter-from,
+.n-modal.fade-in-scale-up-transition-leave-to {
+  opacity: 0;
+  transform: none;
+}
+
+.n-modal.fade-in-scale-up-transition-leave-from,
+.n-modal.fade-in-scale-up-transition-enter-to {
+  opacity: 1;
+  transform: none;
+}
+
+.n-checkbox.n-checkbox--show-label {
+  align-items: center;
+}

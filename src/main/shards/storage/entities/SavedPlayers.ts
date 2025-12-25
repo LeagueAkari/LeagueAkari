@@ -37,7 +37,7 @@ export class SavedPlayer {
   /**
    * 上次一更新的时间
    */
-  @Column({ nullable: false })
+  @Column({ nullable: false, type: 'datetime' })
   @Index('saved_players_update_at_index')
   updateAt: Date
 

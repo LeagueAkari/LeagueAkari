@@ -1,19 +1,33 @@
 <template>
   <div class="sidebar-fixed">
-    <NPopover placement="right" v-if="rts.settings.enabled && rts.info.isDead">
+    <!-- respawn timer -->
+    <NPopover
+      placement="right"
+      v-if="rts.settings.enabled && rts.info.isDead"
+      :disabled="!isCollapsed"
+    >
       <template #trigger>
-        <div class="menu-item">
-          <div class="menu-item-inner">
-            <NProgress
-              type="circle"
-              :gap-offset-degree="180"
-              :stroke-width="4"
-              :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
-              status="success"
-            >
-              <span class="respawn-timer-countdown">{{ formattedCountdown }}</span>
-            </NProgress>
-            <NIcon class="respawn-timer-hourglass"><HourglassIcon /></NIcon>
+        <div class="menu-item menu-item-no-click">
+          <div class="menu-item__inner">
+            <div class="menu-item__custom-icon">
+              <NProgress
+                class="menu-item__icon-n-progress"
+                type="circle"
+                :gap-offset-degree="180"
+                :stroke-width="4"
+                :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
+                status="success"
+              >
+                <span class="text-xs">{{ formattedCountdown }}</span>
+              </NProgress>
+            </div>
+            <div class="menu-item__label">
+              {{
+                t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) })
+              }}
+              ({{ rts.info.totalTime.toFixed(0) }}
+              s)
+            </div>
           </div>
         </div>
       </template>
@@ -24,48 +38,78 @@
         s)
       </div>
     </NPopover>
+
+    <!-- connection hub -->
     <NPopover placement="right-end" ref="popover-connection" :duration="250">
       <template #trigger>
-        <div class="menu-item">
-          <div class="menu-item-inner">
-            <NProgress
-              v-if="lcs.summoner.me"
-              @click="handleSummonerClick(lcs.summoner.me)"
-              type="circle"
-              :stroke-width="4"
-              :percentage="
-                (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
-              "
-              :gap-degree="45"
-            >
-              <LcuImage
-                class="summoner-profile-icon"
-                :src="profileIconUri(lcs.summoner.me.profileIconId)"
-              />
-            </NProgress>
+        <div class="menu-item menu-item-no-click">
+          <div
+            class="menu-item__inner"
+            @click="lcs.summoner.me ? handleSummonerClick(lcs.summoner.me) : undefined"
+          >
+            <div class="menu-item__custom-icon" v-if="lcs.summoner.me">
+              <NProgress
+                class="menu-item__icon-n-progress"
+                type="circle"
+                :stroke-width="4"
+                :percentage="
+                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100 + 60
+                "
+                :gap-degree="45"
+              >
+                <LcuImage
+                  class="summoner-profile-icon"
+                  :src="profileIconUri(lcs.summoner.me.profileIconId)"
+                />
+              </NProgress>
+            </div>
             <NBadge
               v-else
               dot
               processing
+              :offset="[-6, 8]"
               :show="!lcs.isInConnectionLoop && otherClients.length > 0"
             >
-              <NIcon class="menu-item-icon"><PlugDisconnected20FilledIcon /></NIcon>
+              <NIcon class="menu-item__icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
+            <template v-if="lcs.isConnected">
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <div class="menu-item__label">{{ t('summoner', { ns: 'common' }) }}</div>
+                </template>
+                <div class="menu-item__label" v-if="lcs.summoner.me">
+                  <span class="menu-item__label-game-name">{{ lcs.summoner.me.gameName }}</span>
+                  <span class="menu-item__label-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+                </div>
+                <div class="menu-item__label" v-else>{{ t('SideBarFixed.unknown') }}</div>
+              </StreamerModeMaskedText>
+            </template>
+            <template v-else-if="lcs.isInConnectionLoop">
+              <div class="menu-item__label">{{ t('SideBarFixed.inConnectionLoop') }}</div>
+            </template>
+            <template v-else>
+              <div class="menu-item__label menu-item__label--not-connected">
+                {{ t('SideBarFixed.notConnected') }}
+              </div>
+            </template>
           </div>
         </div>
       </template>
       <ClientConnection ref="client-connection-body" />
     </NPopover>
-    <NTooltip placement="right">
+
+    <!-- settings -->
+    <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
-        <div class="menu-item" @click="handleOpenSettingsModal">
-          <div class="menu-item-inner">
-            <NIcon class="menu-item-icon"><Settings28FilledIcon /></NIcon>
+        <div class="menu-item" @click="() => openSettingsModal()">
+          <div class="menu-item__inner">
+            <NIcon class="menu-item__icon"><Settings28FilledIcon /></NIcon>
+            <div class="menu-item__label">{{ t('SideBarFixed.settings') }}</div>
           </div>
         </div>
       </template>
-      <span class="simple-popover">
-        <div class="title">{{ t('SideBarFixed.settings') }}</div>
+      <span class="menu-item-popover">
+        {{ t('SideBarFixed.settings') }}
       </span>
     </NTooltip>
   </div>
@@ -73,49 +117,68 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
+import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
   Settings28Filled as Settings28FilledIcon
 } from '@vicons/fluent'
-import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NIcon, NPopover, NProgress, NTooltip } from 'naive-ui'
-import { computed, inject, useTemplateRef, watch } from 'vue'
+import { NBadge, NIcon, NPopover, NProgress, NTooltip, useNotification } from 'naive-ui'
+import { computed, useTemplateRef, watch } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { useAppContext } from '@main-window/context'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import ClientConnection from './ClientConnection.vue'
+
+const { isCollapsed = false } = defineProps<{
+  isCollapsed?: boolean
+}>()
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
+const mws = useMainWindowStore()
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
 const formattedCountdown = computed(() => {
   const seconds = rts.info.timeLeft
   return seconds > 99 ? '99+' : `${seconds.toFixed(0)}`
 })
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const notification = useNotification()
+
+watch(
+  () => rts.info.isDead,
+  (isDead, prevIsDead) => {
+    if (!isDead && prevIsDead && mws.focus === 'focused') {
+      notification.success({
+        title: () => t('SideBarFixed.respawned'),
+        content: () => t('SideBarFixed.respawnedContent'),
+        duration: 4000
+      })
+    }
+  }
+)
+
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const handleSummonerClick = (summoner: SummonerInfo) => {
   navigateToTabByPuuid(summoner.puuid)
 }
 
-const { openSettingsModal } = inject('app') as any
-const handleOpenSettingsModal = () => {
-  openSettingsModal()
-}
+const { openSettingsModal } = useAppContext()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
@@ -133,65 +196,160 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .sidebar-fixed {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .menu-item {
-  display: flex;
+  width: 100%;
   position: relative;
-  justify-content: center;
-  align-items: center;
-  height: 52px;
-  width: 52px;
-  padding: 2px;
+  padding: 0 4px;
   box-sizing: border-box;
   cursor: pointer;
 
-  .menu-item-inner {
-    position: relative;
+  .menu-item__inner {
     display: flex;
-    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    position: relative;
     align-items: center;
-    height: 72%;
-    width: 72%;
-    border-radius: 2px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
 
-    .summoner-profile-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
+  .menu-item__icon,
+  .menu-item__custom-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    flex-shrink: 0;
+  }
+
+  .menu-item__icon {
+    font-size: 16px;
+    transition:
+      color 0.2s,
+      font-size 0.2s;
+
+    .collapsed & {
+      font-size: 20px;
     }
   }
 
-  .menu-item-icon {
-    font-size: 24px;
-    transition: color 0.2s;
+  .menu-item__icon-n-progress {
+    width: 24px;
+    height: 24px;
+    transition:
+      width 0.2s,
+      height 0.2s;
+
+    .collapsed & {
+      width: 28px;
+      height: 28px;
+    }
+
+    .summoner-profile-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      transition:
+        width 0.2s,
+        height 0.2s;
+      max-width: none;
+
+      .collapsed & {
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 
-  .menu-item-indicator {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 5px;
-    height: 64%;
-    border-radius: 4px;
+  .menu-item__label {
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transition:
+      color 0.2s,
+      opacity 0.2s;
+
+    .collapsed & {
+      opacity: 0;
+    }
+
+    .menu-item__label-game-name {
+      font-weight: bold;
+    }
+
+    .menu-item__label-tag-line {
+      font-size: 12px;
+      margin-left: 4px;
+      color: rgba(0, 0, 0, 0.6);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &.menu-item__label--not-connected {
+      color: rgba(0, 0, 0, 0.6);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+
+  &:hover {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 1);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+
+    .menu-item__inner {
+      background-color: rgba(0, 0, 0, 0.05);
+
+      [data-theme='dark'] & {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+
+  &:not(.menu-item-no-click):active {
+    .menu-item__icon,
+    .menu-item__label {
+      color: rgba(0, 0, 0, 0.8);
+
+      [data-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+
+  .menu-item__icon,
+  .menu-item__label {
+    color: rgba(0, 0, 0, 0.8);
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 
-.simple-popover {
-  .title {
-    font-weight: bold;
-    font-size: 14px;
-  }
-
-  .content {
-    margin-top: 8px;
-    font-size: 12px;
-  }
+.menu-item-popover {
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .summoner-name {
@@ -260,181 +418,6 @@ watch(
     position: absolute;
     right: 0px;
     bottom: 0px;
-  }
-}
-
-.no-client {
-  font-size: 12px;
-}
-
-.respawn-timer-countdown {
-  font-size: 12px;
-}
-
-.respawn-timer-hourglass {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 16px;
-  transform: translate(25%, 25%);
-  animation: hourglass-rotate 6s ease infinite;
-}
-
-[data-theme='dark'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #fff;
-      }
-    }
-
-    .menu-item-icon {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .summoner-name {
-    .tag-line {
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  .region {
-    .region-name {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .separator {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .title-label {
-    color: rgba(255, 255, 255, 1);
-
-    .icon {
-      color: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  .client {
-    background-color: rgba(255, 255, 255, 0.03);
-
-    &.connectable {
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-
-      &:active {
-        background-color: rgba(255, 255, 255, 0.08);
-      }
-    }
-
-    .region-name {
-      color: #fff;
-    }
-
-    .pid {
-      color: #6a6a6ae3;
-    }
-  }
-
-  .respawn-timer-hourglass {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .no-client {
-    color: rgba(255, 255, 255, 1);
-  }
-
-  .respawn-timer-countdown {
-    color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-[data-theme='light'] {
-  .menu-item {
-    &:hover {
-      .menu-item-icon {
-        color: #000;
-      }
-    }
-
-    .menu-item-icon {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .summoner-name {
-    .tag-line {
-      color: rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  .region {
-    .region-name {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .separator {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  .title-label {
-    color: rgba(0, 0, 0, 1);
-
-    .icon {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-
-  .client {
-    background-color: rgba(0, 0, 0, 0.03);
-
-    &.connectable {
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-
-      &:active {
-        background-color: rgba(0, 0, 0, 0.08);
-      }
-    }
-
-    .region-name {
-      color: #000;
-    }
-
-    .pid {
-      color: #3e3e3ee3;
-    }
-  }
-
-  .respawn-timer-hourglass {
-    color: rgba(0, 0, 0, 0.4);
-  }
-
-  .no-client {
-    color: rgba(0, 0, 0, 1);
-  }
-
-  .respawn-timer-countdown {
-    color: rgba(0, 0, 0, 0.8);
-  }
-}
-
-@keyframes hourglass-rotate {
-  0%,
-  40% {
-    transform: translate(25%, 25%) rotate(0deg); /* 保持静止 */
-  }
-  50%,
-  90% {
-    transform: translate(25%, 25%) rotate(180deg); /* 保持静止 */
-  }
-  100% {
-    transform: translate(25%, 25%) rotate(360deg); /* 快速复原 */
   }
 }
 </style>

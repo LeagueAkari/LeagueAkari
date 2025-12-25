@@ -1,4 +1,5 @@
 import { usePreferredColorScheme } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { defineStore } from 'pinia'
 import { computed, ref, shallowReactive, shallowRef } from 'vue'
 
@@ -19,18 +20,30 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     locale: 'zh-CN',
     theme: 'default' as 'default' | 'dark' | 'light',
     httpProxy: {
-      strategy: 'auto' as 'auto' | 'force' | 'disable',
+      strategy: 'disable' as 'auto' | 'force' | 'disable',
       port: 0,
       host: ''
     } as HttpProxySetting,
     forceDisableProxy: false,
     streamerMode: false,
-    streamerModeUseAkariStyledName: false
+    streamerModeUseAkariStyledName: false,
+    preferredLolSource: 'sgp' as 'sgp' | 'lcu'
   })
+
+  const { t } = useTranslation()
 
   const version = ref('0.0.0')
   const isRabiVersion = computed(() => version.value.includes('-rabi'))
   const isAdministrator = ref(false)
+  const startupDeepLink = ref<string | null>(null)
+  const overrideAppTitle = ref('') // 可以覆盖掉
+  const appTitle = computed(
+    () =>
+      overrideAppTitle.value ||
+      (isAdministrator.value
+        ? `${t('appName', { ns: 'common' })} X`
+        : t('appName', { ns: 'common' }))
+  )
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
 
@@ -52,12 +65,14 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   return {
     settings,
+    appTitle,
+    overrideAppTitle,
     isAdministrator,
     disableHardwareAcceleration,
     version,
     isRabiVersion,
     baseConfig,
-
+    startupDeepLink,
     colorTheme,
 
     tempAkariSubscriptionInfo

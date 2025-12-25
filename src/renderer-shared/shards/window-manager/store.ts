@@ -22,7 +22,8 @@ export function useBasicWindowStates() {
 
 export const useWindowManagerStore = defineStore('shard:window-manager-renderer', () => {
   const settings = shallowReactive({
-    backgroundMaterial: 'none' as 'none' | 'mica'
+    backgroundMaterial: 'none' as 'none' | 'mica',
+    contentProtection: false
   })
 
   const supportsMica = ref(false)

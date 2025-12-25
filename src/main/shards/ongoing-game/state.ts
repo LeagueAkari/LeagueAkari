@@ -1,44 +1,109 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { Game, GameTimeline } from '@shared/types/league-client/match-history'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
+import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
+import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
+import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
+import { RemoteConfigMain } from '../remote-config'
+import { SgpMain } from '../sgp'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
+import { memberMerge } from './member-merge'
 
 export class OngoingGameSettings {
   enabled: boolean = true
-  premadeTeamThreshold: number = 6
-  matchHistoryLoadCount: number = 20
+  matchHistoryLoadCount: number = 50
 
   /**
    * 会拉取战绩中前 n 局的时间线数量
    */
-  gameTimelineLoadCount: number = 8
+  gameDetailsLoadCount: number = 8
   concurrency: number = 4
-
-  /**
-   * 查询战绩时是否优先使用 SGP API
-   */
-  matchHistoryUseSgpApi: boolean = true
 
   /**
    * 战绩查询时, 优先查询当前模式还是全部模式, 仅当 SGP API 启用时有效
    */
   matchHistoryTagPreference: 'current' | 'all' = 'current'
 
-  setEnabled(value: boolean) {
-    this.enabled = value
+  orderPlayerBy = 'default' as
+    | 'win-rate'
+    | 'kda'
+    | 'default'
+    | 'akari-score'
+    | 'position'
+    | 'premade-team'
+
+  showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
+  showMatchHistoryItemBorder = false
+  autoRouteWhenGameStarts = false
+  playerCardTags = {
+    showPremadeTeamTag: true,
+    showSuspiciousFlashPositionTag: true,
+    showWinningStreakTag: true,
+    showLosingStreakTag: true,
+    showSoloKillsTag: true,
+    showSoloDeathsTag: true,
+    showGreatPerformanceTag: true,
+    showAverageTeamDamageTag: false,
+    showAverageTeamDamageTakenTag: false,
+    showAverageTeamGoldTag: false,
+    showAverageDamageGoldEfficiencyTag: false,
+    showAverageEnemyMissingPingsTag: false,
+    showAverageVisionScoreTag: false,
+    showSelfTag: true,
+    showMetTag: true,
+    showTaggedTag: true,
+    showWinRateTeamTag: true,
+    showPrivacyTag: true,
+    showAkariScoreTag: false
   }
 
-  setPreMadeTeamThreshold(value: number) {
-    this.premadeTeamThreshold = value
+  /**
+   * 是否在 lobby 阶段查询战绩
+   */
+  queryInLobbyPhase = false
+
+  /**
+   * 推测预组队时，需要至少多少局游戏才能被推测
+   */
+  premadeTeamInferMatchCountThreshold: number = 5
+
+  setOrderPlayerBy(
+    value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
+  ) {
+    this.orderPlayerBy = value
+  }
+
+  setMatchHistoryTagPreference(value: 'current' | 'all') {
+    this.matchHistoryTagPreference = value
+  }
+
+  setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
+    this.showChampionUsage = value
+  }
+
+  setShowMatchHistoryItemBorder(value: boolean) {
+    this.showMatchHistoryItemBorder = value
+  }
+
+  setAutoRouteWhenGameStarts(value: boolean) {
+    this.autoRouteWhenGameStarts = value
+  }
+
+  setPlayerCardTags(value: typeof this.playerCardTags) {
+    this.playerCardTags = value
+  }
+
+  setEnabled(value: boolean) {
+    this.enabled = value
   }
 
   setMatchHistoryLoadCount(value: number) {
@@ -49,79 +114,80 @@ export class OngoingGameSettings {
     this.concurrency = limit
   }
 
-  setMatchHistoryUseSgpApi(value: boolean) {
-    this.matchHistoryUseSgpApi = value
+  setGameDetailsLoadCount(value: number) {
+    this.gameDetailsLoadCount = value
   }
 
-  setGameTimelineLoadCount(value: number) {
-    this.gameTimelineLoadCount = value
+  setQueryInLobbyPhase(value: boolean) {
+    this.queryInLobbyPhase = value
+  }
+
+  setPremadeTeamInferMatchCountThreshold(value: number) {
+    this.premadeTeamInferMatchCountThreshold = value
   }
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      playerCardTags: observable.ref
+    })
   }
 }
 
 export class OngoingGameState {
-  get gameInfo() {
-    if (!this._lcData.gameflow.session) {
-      return null
-    }
-
-    return {
-      queueId: this._lcData.gameflow.session.gameData.queue.id,
-      queueType: this._lcData.gameflow.session.gameData.queue.type,
-      gameId: this._lcData.gameflow.session.gameData.gameId,
-      gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
-    }
-  }
-
   /**
    * 当前进行的英雄选择
    */
   get championSelections() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
       }
 
-      const selections: Record<string, number> = {}
-      this._lcData.champSelect.session.myTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          selections[p.puuid] = p.championId || p.championPickIntent
+      const processMember = (p: ChampSelectTeam) => {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
+          const puuid = decryptUuid(p.obfuscatedPuuid)
+          selections[puuid] = p.championId || p.championPickIntent
         }
-      })
 
-      this._lcData.champSelect.session.theirTeam.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
-      })
+      }
+
+      const selections: Record<string, number> = {}
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return selections
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      if (!this._data.gameflow.session) {
         return {}
       }
 
       const selections: Record<string, number> = {}
-      this._lcData.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
+      this._data.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamOne.forEach((p) => {
+      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamTwo.forEach((p) => {
+      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
       })
+
+      Object.assign(selections, this.additional.selections)
 
       return selections
     }
@@ -131,8 +197,29 @@ export class OngoingGameState {
 
   get positionAssignments() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
+      }
+
+      const processMember = (p: ChampSelectTeam) => {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
+          const puuid = decryptUuid(p.obfuscatedPuuid)
+          assignments[puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
+
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
       }
 
       const assignments: Record<
@@ -143,27 +230,12 @@ export class OngoingGameState {
         }
       > = {}
 
-      this._lcData.champSelect.session.myTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-      })
-
-      this._lcData.champSelect.session.theirTeam.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-      })
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return assignments
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      if (!this._data.gameflow.session) {
         return {}
       }
 
@@ -175,7 +247,7 @@ export class OngoingGameState {
         }
       > = {}
 
-      this._lcData.gameflow.session.gameData.teamOne.forEach((p) => {
+      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           assignments[p.puuid] = {
             position: p.selectedPosition,
@@ -184,7 +256,7 @@ export class OngoingGameState {
         }
       })
 
-      this._lcData.gameflow.session.gameData.teamTwo.forEach((p) => {
+      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
         if (p.puuid && p.puuid !== EMPTY_PUUID) {
           assignments[p.puuid] = {
             position: p.selectedPosition,
@@ -204,59 +276,78 @@ export class OngoingGameState {
    */
   get teams() {
     if (this.queryStage.phase === 'champ-select') {
-      if (!this._lcData.champSelect.session) {
+      if (!this._data.champSelect.session) {
         return {}
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
         return {
-          all: [
-            ...this._lcData.champSelect.session.myTeam,
-            ...this._lcData.champSelect.session.theirTeam
+          'TEAM-ALL': [
+            ...this._data.champSelect.session.myTeam,
+            ...this._data.champSelect.session.theirTeam
           ]
-            .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-            .map((p) => p.puuid)
+            .map((p) => {
+              if (
+                p.nameVisibilityType === 'HIDDEN' &&
+                p.obfuscatedPuuid &&
+                this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+              ) {
+                return decryptUuid(p.obfuscatedPuuid)
+              }
+
+              if (!p.puuid || p.puuid === EMPTY_PUUID) {
+                return null
+              }
+
+              return p.puuid
+            })
+            .filter((p) => p !== null)
         }
       }
 
       const teams: Record<string, string[]> = {}
 
-      this._lcData.champSelect.session.myTeam
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          const key = p.team ? `our-${p.team}` : 'our'
-          if (!teams[key]) {
-            teams[key] = []
-          }
-          teams[key].push(p.puuid)
-        })
+      const processMember = (p: ChampSelectTeam) => {
+        if (
+          p.nameVisibilityType === 'HIDDEN' &&
+          p.obfuscatedPuuid &&
+          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
+        ) {
+          p.puuid = decryptUuid(p.obfuscatedPuuid)
+        }
 
-      this._lcData.champSelect.session.theirTeam
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          const key = p.team ? `their-${p.team}` : 'their'
-          if (!teams[key]) {
-            teams[key] = []
-          }
-          teams[key].push(p.puuid)
-        })
+        if (!p.puuid || p.puuid === EMPTY_PUUID) {
+          return
+        }
+
+        const teamIdentifier = p.team === 100 || p.team === 1 ? 'TEAM-100' : 'TEAM-200'
+
+        if (!teams[teamIdentifier]) {
+          teams[teamIdentifier] = []
+        }
+        teams[teamIdentifier].push(p.puuid)
+      }
+
+      this._data.champSelect.session.myTeam.forEach(processMember)
+      this._data.champSelect.session.theirTeam.forEach(processMember)
 
       return teams
     } else if (this.queryStage.phase === 'in-game') {
-      if (!this._lcData.gameflow.session) {
+      // hack for 避免数据残留
+      if (!this._data.gameflow.session || this._data.gameflow.session.phase === 'GameStart') {
         return {}
       }
 
       if (this.queryStage.gameInfo.queueType === 'CHERRY') {
         // sometimes teamOne and teamTwo will have fake players, need to filter out
-        const realPlayers = this._lcData.gameflow.session.gameData.playerChampionSelections.map(
+        const realPlayers = this._data.gameflow.session.gameData.playerChampionSelections.map(
           (c) => c.puuid
         )
 
         return {
-          all: [
-            ...this._lcData.gameflow.session.gameData.teamOne,
-            ...this._lcData.gameflow.session.gameData.teamTwo
+          'TEAM-ALL': [
+            ...this._data.gameflow.session.gameData.teamOne,
+            ...this._data.gameflow.session.gameData.teamTwo
           ]
             .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
             .filter((p) => realPlayers.includes(p.puuid))
@@ -265,21 +356,40 @@ export class OngoingGameState {
       }
 
       const teams: Record<string, string[]> = {
-        100: [],
-        200: []
+        'TEAM-100': [],
+        'TEAM-200': []
       }
 
-      this._lcData.gameflow.session.gameData.teamOne
+      this._data.gameflow.session.gameData.teamOne
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['100'].push(p.puuid)
+          teams['TEAM-100'].push(p.puuid)
         })
 
-      this._lcData.gameflow.session.gameData.teamTwo
+      this._data.gameflow.session.gameData.teamTwo
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['200'].push(p.puuid)
+          teams['TEAM-200'].push(p.puuid)
         })
+
+      // experimental 特性
+      for (const [tI, m] of Object.entries(this.additional.teams)) {
+        if (teams[tI]) {
+          teams[tI] = memberMerge(teams[tI], m)
+        } else {
+          teams[tI] = m
+        }
+      }
+
+      return teams
+    } else if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
+      const teams: Record<string, string[]> = { LOBBY: [] }
+
+      this._data.lobby.lobby.members.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          teams['LOBBY'].push(p.puuid)
+        }
+      })
 
       return teams
     }
@@ -297,46 +407,63 @@ export class OngoingGameState {
    * in-game - 在游戏中或游戏结算中
    */
   get queryStage() {
-    if (
-      this._lcData.gameflow.session &&
-      this._lcData.gameflow.session.phase === 'ChampSelect' &&
-      this._lcData.champSelect.session
-    ) {
+    if (!this._settings.enabled) {
       return {
-        phase: 'champ-select' as 'champ-select' | 'in-game',
-        gameInfo: {
-          queueId: this._lcData.gameflow.session.gameData.queue.id,
-          queueType: this._lcData.gameflow.session.gameData.queue.type,
-          gameId: this._lcData.gameflow.session.gameData.gameId,
-          gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
-        }
-      }
+        phase: 'unavailable',
+        gameInfo: null
+      } as QueryStage
     }
 
     if (
-      this._lcData.gameflow.session &&
-      (this._lcData.gameflow.session.phase === 'GameStart' ||
-        this._lcData.gameflow.session.phase === 'InProgress' ||
-        this._lcData.gameflow.session.phase === 'WaitingForStats' ||
-        this._lcData.gameflow.session.phase === 'PreEndOfGame' ||
-        this._lcData.gameflow.session.phase === 'EndOfGame' ||
-        this._lcData.gameflow.session.phase === 'Reconnect')
+      this._data.gameflow.session &&
+      this._data.gameflow.session.phase === 'ChampSelect' &&
+      this._data.champSelect.session
     ) {
       return {
-        phase: 'in-game' as 'champ-select' | 'in-game',
+        phase: 'champ-select',
         gameInfo: {
-          queueId: this._lcData.gameflow.session.gameData.queue.id,
-          queueType: this._lcData.gameflow.session.gameData.queue.type,
-          gameId: this._lcData.gameflow.session.gameData.gameId,
-          gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
+          queueId: this._data.gameflow.session.gameData.queue.id,
+          queueType: this._data.gameflow.session.gameData.queue.type,
+          gameId: this._data.gameflow.session.gameData.gameId,
+          gameMode: this._data.gameflow.session.gameData.queue.gameMode
         }
-      }
+      } as QueryStage
+    }
+
+    if (
+      this._data.gameflow.session &&
+      (this._data.gameflow.session.phase === 'GameStart' ||
+        this._data.gameflow.session.phase === 'InProgress' ||
+        this._data.gameflow.session.phase === 'WaitingForStats' ||
+        this._data.gameflow.session.phase === 'PreEndOfGame' ||
+        this._data.gameflow.session.phase === 'EndOfGame' ||
+        this._data.gameflow.session.phase === 'Reconnect')
+    ) {
+      return {
+        phase: 'in-game',
+        gameInfo: {
+          queueId: this._data.gameflow.session.gameData.queue.id,
+          queueType: this._data.gameflow.session.gameData.queue.type,
+          gameId: this._data.gameflow.session.gameData.gameId,
+          gameMode: this._data.gameflow.session.gameData.queue.gameMode
+        }
+      } as QueryStage
+    }
+
+    if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
+      return {
+        phase: 'lobby',
+        gameInfo: {
+          queueId: this._data.lobby.lobby.gameConfig.queueId,
+          queueType: this._data.lobby.lobby.gameConfig.gameMode
+        }
+      } as QueryStage
     }
 
     return {
-      phase: 'unavailable' as const,
+      phase: 'unavailable',
       gameInfo: null
-    }
+    } as QueryStage
   }
 
   /**
@@ -344,9 +471,9 @@ export class OngoingGameState {
    */
   get isInEog() {
     return (
-      this._lcData.gameflow.phase === 'WaitingForStats' ||
-      this._lcData.gameflow.phase === 'PreEndOfGame' ||
-      this._lcData.gameflow.phase === 'EndOfGame'
+      this._data.gameflow.phase === 'WaitingForStats' ||
+      this._data.gameflow.phase === 'PreEndOfGame' ||
+      this._data.gameflow.phase === 'EndOfGame'
     )
   }
 
@@ -356,15 +483,19 @@ export class OngoingGameState {
    * 更加精准的队伍预测
    */
   get teamParticipantGroups() {
-    if (!this._lcData.gameflow.session) {
+    if (!this._data.gameflow.session) {
       return {}
     }
 
     const groups: Record<string, string[]> = {}
     for (const p of [
-      ...this._lcData.gameflow.session.gameData.teamOne,
-      ...this._lcData.gameflow.session.gameData.teamTwo
+      ...this._data.gameflow.session.gameData.teamOne,
+      ...this._data.gameflow.session.gameData.teamTwo
     ]) {
+      if (!p.teamParticipantId) {
+        continue
+      }
+
       if (!groups[p.teamParticipantId]) {
         groups[p.teamParticipantId] = []
       }
@@ -372,16 +503,20 @@ export class OngoingGameState {
       groups[p.teamParticipantId].push(p.puuid)
     }
 
+    for (const [puuid, teamParticipantId] of Object.entries(
+      this.additional.teamParticipantGroups
+    )) {
+      if (!groups[teamParticipantId]) {
+        groups[teamParticipantId] = [puuid]
+        continue
+      }
+
+      if (!groups[teamParticipantId].includes(puuid)) {
+        groups[teamParticipantId].push(puuid)
+      }
+    }
+
     return groups
-  }
-
-  /**
-   * 计算出来的预设队伍
-   */
-  inferredPremadeTeams: Record<string, string[][]> = {}
-
-  setInferredPremadeTeams(value: Record<string, string[][]>) {
-    this.inferredPremadeTeams = value
   }
 
   /**
@@ -401,13 +536,10 @@ export class OngoingGameState {
     this.playerStats = value
   }
 
-  /**
-   * 战绩列表的 tag, 用于 SGP API
-   */
-  matchHistoryTag: string = 'all'
+  matchHistoryTagParams: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'> = {}
 
-  setMatchHistoryTag(value: string) {
-    this.matchHistoryTag = value
+  setMatchHistoryTagParams(value: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) {
+    this.matchHistoryTagParams = value
   }
 
   /**
@@ -417,17 +549,9 @@ export class OngoingGameState {
   matchHistory: Record<
     string,
     {
-      /** 战绩源, lc 为通过 LC 代理查询服务器, SGP 为直接查询服务器. 前者高可用 */
       source: 'lcu' | 'sgp'
-
-      /** 适用于 SGP 的 tag string, 当设置为 lcu 时, 该选项会被忽略 */
-      tag?: string
-
-      /** 目标加载数量, 非实际数量 */
-      targetCount: number
-
-      /** 大概不用说明 */
-      data: Game[]
+      params: MatchHistoryQueryParams
+      data: LcuOrSgpGameSummary[]
     }
   > = {}
 
@@ -444,16 +568,9 @@ export class OngoingGameState {
   }
 
   /**
-   * 每名玩家的召唤师信息
-   * 手动同步
+   * 每名玩家的召唤师信息。目前一定是 LCU 格式
    */
-  summoner: Record<
-    string,
-    {
-      source: 'lcu' | 'sgp'
-      data: SummonerInfo
-    }
-  > = {}
+  summoner: Record<string, SummonerInfo> = {}
 
   /**
    * 玩家召唤师信息加载情况, 可为 'loaded' | 'loading' | 'error'
@@ -461,16 +578,9 @@ export class OngoingGameState {
   summonerLoadingState: Record<string, string> = {}
 
   /**
-   * 每名玩家的段位
-   * 手动同步
+   * 每名玩家的段位。目前一定是 LCU 格式
    */
-  rankedStats: Record<
-    string,
-    {
-      source: 'lcu' | 'sgp'
-      data: RankedStats
-    }
-  > = {}
+  rankedStats: Record<string, RankedStats> = {}
 
   /**
    * 玩家段位加载情况, 可为 'loaded' | 'loading' | 'error'
@@ -483,17 +593,14 @@ export class OngoingGameState {
    */
   championMastery: Record<
     string,
-    {
-      source: 'lcu' | 'sgp'
-      data: Record<
-        number,
-        {
-          championId: number
-          championLevel: number
-          championPoints: number
-        }
-      >
-    }
+    Record<
+      number,
+      {
+        championId: number
+        championLevel: number
+        championPoints: number
+      }
+    >
   > = {}
 
   /**
@@ -510,47 +617,150 @@ export class OngoingGameState {
   savedInfoLoadingState: Record<string, string> = {}
 
   /** 或者说是 game 的 details，区分 summary (常见的战绩其实是 summary) */
-  gameTimeline: Record<
-    number,
-    {
-      source: 'lcu' | 'sgp'
-      data: GameTimeline
-    }
-  > = {}
+  gameDetails: Record<number, LcuOrSgpGameDetails> = {}
 
   /**
    * 除了战绩中的对局外, 额外被加载的对局信息
    */
-  additionalGame: Record<
-    number,
-    {
-      source: 'lcu' | 'sgp'
-      data: Game
-    }
-  > = {}
+  additionalGame: Record<number, LcuOrSgpGameSummary> = {}
 
   // unused
-  gameTimelineLoadingState: Record<number, string> = {}
+  gameDetailsLoadingState: Record<number, string> = {}
 
-  clear() {
+  // inferred premade
+  inferredPremadeTeams: {
+    puuids: string[]
+    times: number
+    gameIds: number[]
+  }[] = []
+
+  setInferredPremadeTeams(
+    value: {
+      puuids: string[]
+      times: number
+      gameIds: number[]
+    }[]
+  ) {
+    this.inferredPremadeTeams = value
+  }
+
+  clear(options?: { keepTagParams?: boolean; keepAdditionalInfo?: boolean }) {
     this.playerStats = null
-    this.inferredPremadeTeams = {}
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
     this.rankedStats = {}
     this.championMastery = {}
-    this.matchHistoryTag = 'all'
     this.matchHistoryLoadingState = {}
     this.summonerLoadingState = {}
     this.savedInfoLoadingState = {}
     this.rankedStatsLoadingState = {}
     this.championMasteryLoadingState = {}
-    this.gameTimeline = {}
+    this.gameDetailsLoadingState = {}
+    this.gameDetails = {}
     this.additionalGame = {}
+    this.inferredPremadeTeams = []
+
+    if (!options?.keepAdditionalInfo) {
+      this.additional = {
+        teams: {},
+        selections: {},
+        teamParticipantGroups: {},
+        spells: {}
+      }
+    }
+
+    if (!options?.keepTagParams) {
+      this.matchHistoryTagParams = {}
+    }
   }
 
-  constructor(private readonly _lcData: LeagueClientData) {
+  /**
+   * 暂未实装，需要测试
+   * 置于一个草稿模式。草稿模式可在 unavailable 阶段被设置，用于自定义加载任何玩家战绩
+   */
+  draft: {
+    teams: Record<string, string[]>
+  } | null = null
+
+  setDraft(
+    value: {
+      teams: Record<string, string[]>
+    } | null
+  ) {
+    this.draft = value
+  }
+
+  /**
+   * 现在由这里进行预组队合并
+   */
+  get calculatedPremadeTeamMap() {
+    let assignedTeamIndex = 0
+    const premadeTeamMap: Record<string, number> = {}
+
+    // 先确认权威数据
+    for (const [_, puuids] of Object.entries(this.teamParticipantGroups)) {
+      if (puuids.length < 2) {
+        continue
+      }
+
+      const index = ++assignedTeamIndex
+
+      for (const p of puuids) {
+        premadeTeamMap[p] = index
+      }
+    }
+
+    // 再补充推测数据，冲突则以权威数据为准
+    for (const { puuids } of this.inferredPremadeTeams) {
+      if (puuids.length < 2) {
+        continue
+      }
+
+      const index = ++assignedTeamIndex
+
+      if (puuids.some((p) => premadeTeamMap[p])) {
+        continue
+      }
+
+      for (const p of puuids) {
+        premadeTeamMap[p] = index
+      }
+    }
+
+    return premadeTeamMap
+  }
+
+  get apiShouldUse() {
+    if (
+      this._app.settings.preferredLolSource === 'sgp' &&
+      this._sgp.state.availability.serversSupported.matchHistory
+    ) {
+      return 'sgp'
+    }
+
+    return 'lcu'
+  }
+
+  /** 结构同 teams  */
+  additional: AdditionalResult = {
+    teams: {},
+    selections: {},
+    teamParticipantGroups: {},
+    spells: {}
+  }
+
+  setAdditional(value: AdditionalResult) {
+    this.additional = value
+  }
+
+  constructor(
+    private readonly _data: LeagueClientData,
+    private readonly _app: AppCommonMain,
+    private readonly _sgp: SgpMain,
+    private readonly _settings: OngoingGameSettings,
+    private readonly _rc: RemoteConfigMain
+  ) {
     makeAutoObservable(this, {
       // shallow object
       matchHistory: observable.shallow,
@@ -558,7 +768,7 @@ export class OngoingGameState {
       rankedStats: observable.shallow,
       savedInfo: observable.shallow,
       championMastery: observable.shallow,
-      gameTimeline: observable.shallow,
+      gameDetails: observable.shallow,
       additionalGame: observable.shallow,
 
       // ref object, override only, no modification
@@ -566,17 +776,20 @@ export class OngoingGameState {
       summonerLoadingState: observable.ref,
       rankedStatsLoadingState: observable.ref,
       savedInfoLoadingState: observable.ref,
-      gameTimelineLoadingState: observable.ref,
+      gameDetailsLoadingState: observable.ref,
 
       // structured data
       championSelections: computed.struct,
-      gameInfo: computed.struct,
       positionAssignments: computed.struct,
       teams: computed.struct,
-      inferredPremadeTeams: observable.struct,
       playerStats: observable.struct,
       queryStage: computed.struct,
-      teamParticipantGroups: computed.struct
+      teamParticipantGroups: computed.struct,
+      draft: observable.struct,
+      matchHistoryTagParams: observable.struct,
+      additional: observable.struct,
+      inferredPremadeTeams: observable.struct,
+      calculatedPremadeTeamMap: computed.struct
     })
   }
 }

@@ -144,22 +144,19 @@ function _backtrack(nums: string[], current: string[], start: number, res: strin
 }
 
 /**
- * 注意：健壮性和 BUG 未完全测试
  * @param matches 包含了若干对局的召唤师 ID 列表
  * @param players 需要计算的玩家列表，时间复杂度很高，所以要尽可能少
  * @param threshold 阈值，多少重复场次即过滤
  * @returns
  */
 export function calculateTogetherTimes(
-  matches: {
-    players: string[]
-    id: string
-  }[],
+  matches: { players: string[]; id: string }[],
   players: string[],
   threshold = 3
 ): Array<{ players: string[]; times: number; ids: string[] }> {
   const graph = new TeamUpGraph()
   const set = new Set(players)
+
   matches
     .map((m) => ({
       players: m.players.filter((mm) => set.has(mm)),

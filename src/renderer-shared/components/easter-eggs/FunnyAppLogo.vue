@@ -64,7 +64,7 @@ const handleNotEnough = (item: any) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .funny-app-logo {
   height: 100%;
   display: flex;

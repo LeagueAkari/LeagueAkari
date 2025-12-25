@@ -1,8 +1,14 @@
-import { ChampSelectSession, OngoingTrade } from '@shared/types/league-client/champ-select'
+import {
+  ChampSelectSession,
+  GridChamp,
+  OngoingChampionSwap
+} from '@shared/types/league-client/champ-select'
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
   Augment,
   ChampionSimple,
+  GameMap,
+  GameModeMutator,
   Item,
   Perk,
   Queue,
@@ -57,82 +63,105 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     autoConnect: false
   })
 
-  const gameData = {
-    champions: shallowRef<Record<number, ChampionSimple>>({}),
-    augments: shallowRef<Record<number, Augment>>({}),
-    perks: shallowRef<Record<number, Perk>>({}),
-    perkstyles: shallowRef<{
-      schemaVersion: number
-      styles: Record<number, Style>
-    }>({
+  const gameData = shallowReactive({
+    // utils
+    championName: (id: number) => {
+      return gameData.champions[id]?.name || id.toString()
+    },
+    queueName: (id: number) => {
+      return gameData.queues[id]?.name || id.toString()
+    },
+    mapName: (id: number) => {
+      return gameData.maps[id]?.name || id.toString()
+    },
+    perkName: (id: number) => {
+      return gameData.perks[id]?.name || id.toString()
+    },
+    summonerSpellName: (id: number) => {
+      return gameData.summonerSpells[id]?.name || id.toString()
+    },
+    augmentName: (id: number) => {
+      return gameData.augments[id]?.nameTRA || id.toString()
+    },
+
+    champions: {} as Record<number, ChampionSimple>,
+    augments: {} as Record<number, Augment>,
+    perks: {} as Record<number, Perk>,
+    perkstyles: {
       schemaVersion: 0,
       styles: {}
+    } as {
+      schemaVersion: number
+      styles: Record<number, Style>
+    },
+    queues: {} as Record<number, Queue>,
+    items: {} as Record<number, Item>,
+    summonerSpells: {} as Record<number, SummonerSpell>,
+    gameModeMutators: {} as Record<number, GameModeMutator>,
+    maps: {} as Record<number, GameMap>
+  })
+
+  const champSelect = shallowReactive({
+    session: null as ChampSelectSession | null,
+    currentChampion: null as number | null,
+    currentPickableChampionIds: new Set() as Set<number>,
+    currentBannableChampionIds: new Set() as Set<number>,
+    disabledChampionIds: new Set() as Set<number>,
+    ongoingChampionSwap: null as OngoingChampionSwap | null,
+    gridChampions: {} as Record<number, GridChamp>
+  })
+
+  const chat = shallowReactive({
+    me: null as ChatPerson | null,
+    conversations: shallowReactive({
+      championSelect: null as Conversation | null,
+      postGame: null as Conversation | null,
+      customGame: null as Conversation | null
     }),
-    queues: shallowRef<Record<number, Queue>>({}),
-    items: shallowRef<Record<number, Item>>({}),
-    summonerSpells: shallowRef<Record<number, SummonerSpell>>({})
-  } as const
+    participants: shallowReactive({
+      championSelect: null as Conversation | null,
+      postGame: null as Conversation | null,
+      customGame: null as Conversation | null
+    })
+  })
 
-  const champSelect = {
-    session: shallowRef<ChampSelectSession | null>(null),
-    currentChampion: shallowRef<number | null>(null),
-    currentPickableChampionIds: shallowRef<Set<number>>(new Set()),
-    currentBannableChampionIds: shallowRef<Set<number>>(new Set()),
-    disabledChampionIds: shallowRef<Set<number>>(new Set()),
-    ongoingTrade: shallowRef<OngoingTrade | null>(null)
-  } as const
+  const gameflow = shallowReactive({
+    phase: null as GameflowPhase | null,
+    session: null as GameflowSession | null
+  })
 
-  const chat = {
-    me: shallowRef<ChatPerson | null>(null),
-    conversations: {
-      championSelect: shallowRef<Conversation | null>(null),
-      postGame: shallowRef<Conversation | null>(null),
-      customGame: shallowRef<Conversation | null>(null)
-    } as const,
-    participants: {
-      championSelect: shallowRef<Conversation | null>(null),
-      postGame: shallowRef<Conversation | null>(null),
-      customGame: shallowRef<Conversation | null>(null)
-    } as const
-  } as const
+  const honor = shallowReactive({
+    ballot: null as Ballot | null
+  })
 
-  const gameflow = {
-    phase: shallowRef<GameflowPhase | null>(null),
-    session: shallowRef<GameflowSession | null>(null)
-  } as const
+  const lobby = shallowReactive({
+    lobby: null as Lobby | null,
+    receivedInvitations: [] as ReceivedInvitation[]
+  })
 
-  const honor = {
-    ballot: shallowRef<Ballot | null>(null)
-  } as const
+  const summoner = shallowReactive({
+    me: null as SummonerInfo | null,
+    profile: null as SummonerProfile | null
+  })
 
-  const lobby = {
-    lobby: shallowRef<Lobby | null>(null),
-    receivedInvitations: shallowRef<ReceivedInvitation[]>([])
-  } as const
+  const login = shallowReactive({
+    loginQueueState: null as LoginQueueState | null
+  })
 
-  const summoner = {
-    me: shallowRef<SummonerInfo | null>(null),
-    profile: shallowRef<SummonerProfile | null>(null)
-  } as const
+  const matchmaking = shallowReactive({
+    readyCheck: null as ReadyCheck | null,
+    search: null as GetSearch | null
+  })
 
-  const login = {
-    loginQueueState: shallowRef<LoginQueueState | null>(null)
-  } as const
-
-  const matchmaking = {
-    readyCheck: shallowRef<ReadyCheck | null>(null),
-    search: shallowRef<GetSearch | null>(null)
-  } as const
-
-  const initialization = {
+  const initialization = shallowReactive({
     progress: null as InitializationProgress | null
-  }
+  })
 
-  const lobbyTeamBuilder = {
-    champSelect: {
-      subsetChampionList: shallowRef<number[]>([])
-    }
-  } as const
+  const lobbyTeamBuilder = shallowReactive({
+    champSelect: shallowReactive({
+      subsetChampionList: [] as number[]
+    })
+  })
 
   return {
     gameData,

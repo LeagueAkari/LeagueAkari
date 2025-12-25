@@ -60,34 +60,37 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
-.cooldown,
-.description,
-.level {
-  font-size: 12px;
-}
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-.cooldown,
-.level {
-  font-style: italic;
-}
+@layer components {
+  .cooldown,
+  .description,
+  .level {
+    font-size: 12px;
+  }
 
-.level {
-  margin-bottom: 2px;
-}
+  .cooldown,
+  .level {
+    font-style: italic;
+  }
 
-.name {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 2px;
-}
+  .level {
+    margin-bottom: 2px;
+  }
 
-.spell {
-  border-radius: 2px;
-}
+  .name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
 
-.empty {
-  border-radius: 2px;
-  background-color: rgb(34, 34, 34);
+  .spell {
+    border-radius: 2px;
+  }
+
+  .empty {
+    @apply rounded-xs bg-gray-500/40 dark:bg-black/20;
+  }
 }
 </style>

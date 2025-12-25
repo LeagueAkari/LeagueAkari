@@ -336,8 +336,8 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     }
 
     if (
-      !Array.isArray(content.data) &&
-      content.data.every((v: any) => {
+      !Array.isArray(content.data) ||
+      !content.data.every((v: any) => {
         return (
           typeof v === 'object' &&
           typeof v.puuid === 'string' &&
@@ -354,19 +354,25 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       )
     }
 
-    await this._storage.dataSource.manager.save(
-      SavedPlayer,
-      content.data.map((record: any) => {
-        return {
-          puuid: record.puuid,
-          selfPuuid: record.selfPuuid,
-          region: record.region,
-          rsoPlatformId: record.rsoPlatformId,
-          tag: record.tag,
-          updateAt: new Date()
-        }
-      })
-    )
+    const BATCH_SIZE = 500
+    const now = new Date()
+    const rows = content.data.map((record: any) => {
+      return {
+        puuid: record.puuid,
+        selfPuuid: record.selfPuuid,
+        region: record.region,
+        rsoPlatformId: record.rsoPlatformId,
+        tag: record.tag,
+        updateAt: now
+      }
+    })
+
+    await this._storage.dataSource.manager.transaction(async (tx) => {
+      for (let start = 0; start < rows.length; start += BATCH_SIZE) {
+        const slice = rows.slice(start, start + BATCH_SIZE)
+        await tx.save(SavedPlayer, slice)
+      }
+    })
 
     return path
   }

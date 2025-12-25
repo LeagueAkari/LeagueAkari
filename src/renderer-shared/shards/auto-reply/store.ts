@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, shallowReactive, shallowRef } from 'vue'
+import { shallowReactive } from 'vue'
 
 export const useAutoReplyStore = defineStore('shard:auto-reply-renderer', () => {
   const settings = shallowReactive({

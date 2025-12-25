@@ -37,7 +37,8 @@ export class AutoGameflowSettings {
 
   invitationHandlingStrategies: Record<string, string> = {}
 
-  dodgeAtLastSecondThreshold: number = 2
+  autoSendARAMTeamSideEnabled: boolean = false
+  autoSendARAMTeamSideVisibleToTeam: boolean = true
 
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
@@ -95,16 +96,20 @@ export class AutoGameflowSettings {
     this.rejectInvitationWhenAway = yes
   }
 
-  setDodgeAtLastSecondThreshold(threshold: number) {
-    this.dodgeAtLastSecondThreshold = threshold
-  }
-
   setInvitationHandlingStrategies(strategies: Record<string, string>) {
     this.invitationHandlingStrategies = strategies
   }
 
   setAutoSkipLeaderEnabled(enabled: boolean) {
     this.autoSkipLeaderEnabled = enabled
+  }
+
+  setAutoSendARAMTeamSideEnabled(enabled: boolean) {
+    this.autoSendARAMTeamSideEnabled = enabled
+  }
+
+  setAutoSendARAMTeamSideVisibleToTeam(visible: boolean) {
+    this.autoSendARAMTeamSideVisibleToTeam = visible
   }
 
   constructor() {
@@ -134,15 +139,14 @@ export class AutoGameflowState {
   willSearchMatchAt: number = -1
 
   /**
-   * 即将进行的秒退操作将在指定时间执行
+   * 即将进行的自动重连操作将在指定时间戳完成
    */
-  willDodgeAt: number = -1
+  willReconnectAt: number = -1
 
   /**
-   * 是否在最后一秒秒退
-   * @deprecated 将使用 willDodgeAt 的值来判断是否进行自动秒退操作
+   * 即将被邀请的好友的 PUUID 列表
    */
-  willDodgeAtLastSecond: boolean = false
+  friendsToBeInvited: string[] = []
 
   get activityStartStatus() {
     if (!this._lcData.lobby.lobby) {
@@ -207,14 +211,6 @@ export class AutoGameflowState {
     this.willSearchMatchAt = at
   }
 
-  setWillDodgeAtLastSecond(yes: boolean) {
-    this.willDodgeAtLastSecond = yes
-  }
-
-  setDodgeAt(at: number) {
-    this.willDodgeAt = at
-  }
-
   clearAutoAccept() {
     this.willAccept = false
     this.willAcceptAt = -1
@@ -223,6 +219,14 @@ export class AutoGameflowState {
   clearAutoSearchMatch() {
     this.willSearchMatch = false
     this.willSearchMatchAt = -1
+  }
+
+  setReconnectAt(at: number) {
+    this.willReconnectAt = at
+  }
+
+  setFriendsToBeInvited(puuids: string[]) {
+    this.friendsToBeInvited = puuids
   }
 
   constructor(

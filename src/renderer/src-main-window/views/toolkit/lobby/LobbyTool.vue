@@ -269,11 +269,11 @@ const teamOptions = computed(() => {
   return [
     {
       value: '100',
-      label: t('teams.100', { ns: 'common' })
+      label: t('teams.TEAM-100', { ns: 'common' })
     },
     {
       value: '200',
-      label: t('teams.200', { ns: 'common' })
+      label: t('teams.TEAM-200', { ns: 'common' })
     }
   ]
 })
@@ -335,4 +335,4 @@ const handleLoadAvailableBots = async (show: boolean) => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

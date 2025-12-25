@@ -61,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAdditionalInfoStore } from '@cd-timer-window/shards/additional-info/store'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -194,91 +195,79 @@ watch(
   }
 )
 
+const ais = useAdditionalInfoStore()
+
 const items = computed(() => {
   if (!lcs.gameflow.session || lcs.gameflow.session.phase !== 'InProgress' || !lcs.summoner.me) {
     return createEmptyTimer(5)
   }
 
-  const selfPuuid = lcs.summoner.me.puuid
-  // 注意到, playerChampionSelections 中提供的列表的顺序是按照阵营排序好的
-  // 因此在目前缺少必要的字段以区分阵营时, 只能通过这些数据来实现阵营判断
-  // 期待日后 playerChampionSelections 能提供必要的 puuid 字段
-  const selections = lcs.gameflow.session.gameData.playerChampionSelections
-  const teamOne = lcs.gameflow.session.gameData.teamOne
-  const teamTwo = lcs.gameflow.session.gameData.teamTwo
+  const gameModeConfig = ctws.supportedGameModes.find(
+    (mode) => mode.gameMode === lcs.gameflow.session?.gameData.queue.gameMode
+  )
 
-  if (
-    selections[0] &&
-    selections[0].puuid !== undefined &&
-    selections[0].puuid !== '' &&
-    selections[0].puuid !== EMPTY_PUUID
-  ) {
-    // able to distinguish by puuid field
-    const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
-
-    if (!otherTeam.length) {
-      return createEmptyTimer(5)
-    }
-
-    const theirTeamSelections = selections.filter((player) =>
-      otherTeam.some((p) => p.puuid === player.puuid)
-    )
-
-    return theirTeamSelections.map((p, i) => ({
-      id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
-      type: 'summoner-spell',
-      timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
-      timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
-      ...p
-    }))
-  } else {
-    if (
-      !ctws.supportedGameModes.some(
-        (mode) => mode.gameMode === lcs.gameflow.session?.gameData.queue.gameMode
-      )
-    ) {
-      return createEmptyTimer(5)
-    }
-
-    // previously, it has only summonerInternalName field (which is completely useless)
-    // thus we can only infer team members by championId
-    if (selections.length !== 10) {
-      return createEmptyTimer(5)
-    }
-
-    const teamA = selections.slice(0, 5)
-    const teamB = selections.slice(5)
-
-    const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
-
-    const teamAMatchCount = teamA.reduce((acc, player) => {
-      if (otherTeam.some((p) => p.championId === player.championId)) {
-        return acc + 1
-      }
-
-      return acc
-    }, 0)
-
-    const teamBMatchCount = teamB.reduce((acc, player) => {
-      if (otherTeam.some((p) => p.championId === player.championId)) {
-        return acc + 1
-      }
-
-      return acc
-    }, 0)
-
-    const presumedEnemyTeam = teamAMatchCount > teamBMatchCount ? teamA : teamB
-
-    const enemyTeam = presumedEnemyTeam.map((p, i) => ({
-      id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
-      type: 'summoner-spell',
-      timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
-      timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
-      ...p
-    }))
-
-    return [...enemyTeam, ...createEmptyTimer(2)]
+  if (!gameModeConfig) {
+    return createEmptyTimer(5)
   }
+
+  const selfPuuid = lcs.summoner.me.puuid
+  const game = lcs.gameflow.session.gameData
+
+  const teamOnePuuids = Array.from(
+    new Set<string>([
+      ...game.teamOne.map((p) => p.puuid),
+      ...(ais.additional.teams['TEAM-100'] || [])
+    ])
+  )
+  const teamTwoPuuids = Array.from(
+    new Set<string>([
+      ...game.teamTwo.map((p) => p.puuid),
+      ...(ais.additional.teams['TEAM-200'] || [])
+    ])
+  )
+
+  const selections = game.playerChampionSelections
+  const selectionMap: Record<string, { championId: number; spell1Id: number; spell2Id: number }> =
+    {}
+
+  for (const selection of selections) {
+    if (selection.puuid && selection.puuid !== EMPTY_PUUID) {
+      selectionMap[selection.puuid] = {
+        championId: selection.championId,
+        spell1Id: selection.spell1Id,
+        spell2Id: selection.spell2Id
+      }
+    }
+  }
+
+  for (const [puuid, championId] of Object.entries(ais.additional.selections)) {
+    const spells = ais.additional.spells[puuid]
+    if (spells) {
+      selectionMap[puuid] = {
+        championId,
+        spell1Id: spells.spell1Id,
+        spell2Id: spells.spell2Id
+      }
+    }
+  }
+
+  const theirTeamPuuids = teamOnePuuids.includes(selfPuuid) ? teamTwoPuuids : teamOnePuuids
+
+  if (!theirTeamPuuids.length) {
+    return createEmptyTimer(5)
+  }
+
+  const theirTeamSelections = theirTeamPuuids
+    .map((puuid) => selectionMap[puuid])
+    .filter((p) => p !== undefined)
+
+  return theirTeamSelections.map((p, i) => ({
+    id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
+    type: 'summoner-spell',
+    timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
+    timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
+    ...p
+  }))
 })
 
 const sendInGameText = (
@@ -329,7 +318,7 @@ const sendInGameText = (
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .spells-cd-timer {
   position: relative;
   padding: 8px;

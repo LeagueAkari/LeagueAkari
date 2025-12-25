@@ -14,7 +14,8 @@
     "src/renderer/src-cd-timer-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
-    "src/renderer-shared/**/*"
+    "src/renderer-shared/**/*",
+    "uno.config.*"
   ],
   "compilerOptions": {
     "target": "ESNext",
@@ -31,8 +32,8 @@
       "@shared/*": ["src/shared/*"],
       "@renderer-shared/*": ["src/renderer-shared/*"]
     },
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   }

@@ -1,0 +1,35 @@
+[data-theme='dark'] .shadow-win {
+  background: radial-gradient(
+    96% 168% at 0% 0%,
+    rgba(20, 184, 166, 0.3) 0%,
+    rgba(20, 184, 166, 0) 100%
+  );
+}
+
+.shadow-win {
+  background-color: rgba(45, 212, 191, 0.35);
+}
+
+[data-theme='dark'] .shadow-loss {
+  background: radial-gradient(
+    96% 168% at 0% 0%,
+    rgba(243, 73, 72, 0.3) 0%,
+    rgba(239, 68, 68, 0) 100%
+  );
+}
+
+.shadow-loss {
+  background-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme='dark'] .shadow-remake {
+  background: radial-gradient(
+    96% 168% at 0% 0%,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.shadow-remake {
+  background-color: rgba(168, 168, 168, 0.24);
+}

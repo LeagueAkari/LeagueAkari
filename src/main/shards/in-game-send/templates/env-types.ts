@@ -139,12 +139,7 @@ export interface TemplateEnv {
   /**
    * 一个 map，key 为 puuid。记录了部分对局的游戏时间线信息（是前 N 场，具体设置项可在 OngoingGameSettings 中找到）
    */
-  gameTimeline: OngoingGameState['gameTimeline']
-
-  /**
-   * 一个 map，key 为 teamId。记录了基于推断的预组队信息，不是很准
-   */
-  inferredPremadeTeams: OngoingGameState['inferredPremadeTeams']
+  gameDetails: OngoingGameState['gameDetails']
 
   /**
    * 一个 map，key 为 teamParticipantId。由 LCU 标记了每个阵营的组队情况，可以精准判断预组队情况
@@ -152,7 +147,17 @@ export interface TemplateEnv {
   teamParticipantGroups: OngoingGameState['teamParticipantGroups']
 
   /**
+   * 一个 map，key 为 puuid。整合权威数据与推测数据后的预组队编号，编号相同即为一组
+   */
+  calculatedPremadeTeamMap: OngoingGameState['calculatedPremadeTeamMap']
+
+  /**
    * 一个 map，key 为 gameId。记录了一些由于特殊原因额外加载的对局。一个例子是遇到了熟人，会自动加载和此人相关的历史对局
    */
   additionalGame: OngoingGameState['additionalGame']
+
+  /**
+   * 额外拉取的信息，用于补全
+   */
+  addition: OngoingGameState['additional']
 }

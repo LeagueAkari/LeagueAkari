@@ -25,18 +25,17 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _app: AppCommonMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
     private readonly _mobx: MobxUtilsMain
   ) {
     this._log = _loggerFactory.create(ExtraAssetsMain.id)
   }
 
-  static GTIMG_HERO_LIST_UPDATE_INTERVAL = 3.6e6 // 1 hour
+  static GTIMG_HERO_LIST_UPDATE_INTERVAL = 3 * 60 * 60 * 1000 // 3 hour
+  static FANDOM_BALANCE_UPDATE_INTERVAL = 4 * 60 * 60 * 1000 // 4 hour
 
-  static FANDOM_BALANCE_UPDATE_INTERVAL = 3.6e6 // 2 hour
-
-  private _gtimgTimerTask = new TimeoutTask(() => this._updateGtimgHeroList())
-  private _fandomTimerTask = new TimeoutTask(() => this._updateFandomBalance())
+  private _gtimgTask = new TimeoutTask(this._updateGtimgHeroList.bind(this))
+  private _fandomTask = new TimeoutTask(this._updateFandomBalance.bind(this))
 
   private async _updateGtimgHeroList() {
     try {
@@ -46,7 +45,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
     } catch (error) {
       this._log.warn(`Gtimg: failed to update hero list, will retry`, error)
     } finally {
-      this._gtimgTimerTask.start(ExtraAssetsMain.GTIMG_HERO_LIST_UPDATE_INTERVAL)
+      this._gtimgTask.start({ delay: ExtraAssetsMain.GTIMG_HERO_LIST_UPDATE_INTERVAL })
     }
   }
 
@@ -58,7 +57,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
     } catch (error) {
       this._log.warn('Fandom: failed to update balance data', error)
     } finally {
-      this._fandomTimerTask.start(ExtraAssetsMain.FANDOM_BALANCE_UPDATE_INTERVAL)
+      this._fandomTask.start({ delay: ExtraAssetsMain.FANDOM_BALANCE_UPDATE_INTERVAL })
     }
   }
 
@@ -75,9 +74,6 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
             host: httpProxy.host,
             port: httpProxy.port
           }
-        } else if (httpProxy.strategy === 'auto') {
-          this._gtimgApi.http.defaults.proxy = undefined
-          this._fandomApi.http.defaults.proxy = undefined
         } else if (httpProxy.strategy === 'disable') {
           this._gtimgApi.http.defaults.proxy = false
           this._fandomApi.http.defaults.proxy = false

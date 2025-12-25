@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { DEEP_LINK_PROTOCOL_DEV, DEEP_LINK_PROTOCOL_PROD } from '@main/utils/deep-link'
 import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
@@ -65,7 +66,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       SelfUpdateMain.id,
       {
-        autoCheckUpdates: { default: this.settings.autoCheckUpdates },
         autoDownloadUpdates: { default: this.settings.autoDownloadUpdates }
       },
       this.settings
@@ -81,7 +81,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     ])
 
     this._mobx.propSync(SelfUpdateMain.id, 'settings', this.settings, [
-      'autoCheckUpdates',
       'autoDownloadUpdates',
       'ignoreVersion'
     ])
@@ -332,11 +331,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private async _applyUpdatesOnNextStartup(newUpdateDir: string, newVersion: string) {
-    if (!ofs.existsSync(newUpdateDir)) {
+  private async _applyUpdatesOnNextStartup(newVersionDirPath: string, newVersion: string) {
+    if (!ofs.existsSync(newVersionDirPath)) {
       this.state.setUpdateProgressInfo(null)
-      this._log.error(`Update directory does not exist ${newUpdateDir}`)
-      throw new Error(`No such directory ${newUpdateDir}`)
+      this._log.error(`Update directory does not exist ${newVersionDirPath}`)
+      throw new Error(`No such directory ${newVersionDirPath}`)
     }
 
     const copiedExecutablePath = path.join(
@@ -363,7 +362,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
 
     this._log.info(
-      `Adding exit task: update process ${copiedExecutablePath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
+      `Adding exit task: update process ${copiedExecutablePath}: ${newVersionDirPath} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
     )
 
     this._createNotification(
@@ -374,7 +373,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const _updateOnQuitFn = () => {
       const c = cp.spawn(
         copiedExecutablePath,
-        [`"${newUpdateDir}"`, `"${appDir}"`, `"${SelfUpdateMain.EXECUTABLE_NAME}"`],
+        [
+          `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+          'apply',
+          `--from="${newVersionDirPath}"`,
+          `--to="${appDir}"`
+        ],
         {
           detached: true,
           stdio: 'ignore',
@@ -410,8 +414,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         })
       }
 
-      if (ofs.existsSync(newUpdateDir)) {
-        ofs.rmSync(newUpdateDir, { recursive: true, force: true })
+      if (ofs.existsSync(newVersionDirPath)) {
+        ofs.rmSync(newVersionDirPath, { recursive: true, force: true })
       }
 
       this._currentUpdateTaskCanceler = null
@@ -421,7 +425,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       this._log.info(
         `Cancelling exit update task`,
         `Deleting update script ${copiedExecutablePath}`,
-        `Deleting update directory ${newUpdateDir}`
+        `Deleting update directory ${newVersionDirPath}`
       )
     }
   }
@@ -534,6 +538,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       const p = path.join(app.getPath('userData'), SelfUpdateMain.DOWNLOAD_DIR_NAME)
       return shell.openPath(p)
     })
+
+    this._ipc.onCall(SelfUpdateMain.id, 'uninstallApp', () => {
+      this._uninstallApp()
+    })
   }
 
   async onInit() {
@@ -606,6 +614,43 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     } catch (error) {
       this._log.warn('Error checking update flag', error)
     }
+  }
+
+  private async _uninstallApp() {
+    const appPath = path.dirname(app.getPath('exe'))
+    const dataPath = app.getPath('userData')
+
+    const copiedExecutablePath = path.join(
+      app.getPath('temp'),
+      SelfUpdateMain.UPDATE_EXECUTABLE_NAME
+    )
+
+    await ofs.promises.copyFile(
+      updateExecutablePath.replace('app.asar', 'app.asar.unpacked'),
+      copiedExecutablePath
+    )
+
+    const c = cp.spawn(
+      copiedExecutablePath,
+      [
+        `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+        'uninstall',
+        `--app-id="${DEEP_LINK_PROTOCOL_PROD}"`,
+        `--app-id="${DEEP_LINK_PROTOCOL_DEV}"`,
+        `--dirs-to-remove="${appPath}"`,
+        `--dirs-to-remove="${dataPath}"`
+      ],
+      {
+        detached: true,
+        stdio: 'ignore',
+        shell: true,
+        cwd: app.getPath('temp')
+      }
+    )
+
+    c.unref()
+
+    app.exit()
   }
 
   private _handleUpdateHttpProxy() {

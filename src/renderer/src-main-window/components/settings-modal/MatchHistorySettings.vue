@@ -10,41 +10,20 @@
         :label-description="t('MatchHistorySettings.refreshTabsAfterGameEnds.description')"
         :label-width="400"
       >
-        <NSwitch size="small" v-model:value="mhs.settings.refreshTabsAfterGameEnds" />
+        <NSwitch size="small" v-model:value="pts.frontendSettings.refreshTabsAfterGameEnds" />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('MatchHistorySettings.matchHistoryUseSgpApi.label')"
+        :label="t('MatchHistorySettings.loadCount.label')"
+        :label-description="t('MatchHistorySettings.loadCount.description')"
         :label-width="400"
       >
-        <template #labelDescription>
-          <div>{{ t('MatchHistorySettings.matchHistoryUseSgpApi.description') }}</div>
-          <template
-            v-if="mhs.settings.matchHistoryUseSgpApi && lcs.connectionState === 'connected'"
-          >
-            <div
-              v-if="
-                sgps.availability.sgpServerId && sgps.availability.serversSupported.matchHistory
-              "
-              class="sgp-server-hint-ok"
-              style="font-weight: bold; user-select: text"
-            >
-              {{
-                t('MatchHistorySettings.matchHistoryUseSgpApi.current', {
-                  server: sgps.availability.sgpServerId
-                })
-              }}
-            </div>
-            <div class="sgp-server-hint-not-ok" v-else style="font-weight: bold">
-              {{
-                t('MatchHistorySettings.matchHistoryUseSgpApi.unsupported', {
-                  server: sgps.availability.sgpServerId
-                })
-              }}
-            </div>
-          </template>
-        </template>
-        <NSwitch size="small" v-model:value="mhs.settings.matchHistoryUseSgpApi" />
+        <NSelect
+          style="width: 120px"
+          size="small"
+          v-model:value="pts.frontendSettings.loadCount"
+          :options="pageSizeOptions"
+        />
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -52,21 +31,20 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+import { usePageSizeOptions } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 const { t } = useTranslation()
 
-const mhs = useMatchHistoryTabsStore()
-const sgps = useSgpStore()
-const lcs = useLeagueClientStore()
+const pts = usePlayerTabsStore()
+
+const pageSizeOptions = usePageSizeOptions()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 [data-theme='dark'] {
   .sgp-server-hint-ok {
     color: #63e2b7;

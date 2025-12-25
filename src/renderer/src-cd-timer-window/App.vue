@@ -1,8 +1,8 @@
 <template>
-  <div class="cd-timer-wrapper" ref="wrapper">
+  <div class="box-border flex w-fit flex-col overflow-hidden rounded bg-[#1a1a1da0]" ref="wrapper">
     <SetupInAppScope />
-    <CdTimerWindowTitleBar />
-    <SummonerSpellsCdTimer class="content" />
+    <CdTimerWindowTitlebar />
+    <SummonerSpellsCdTimer class="opacity-70 transition-opacity hover:opacity-90" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useElementSize } from '@vueuse/core'
 import { useTemplateRef, watch } from 'vue'
 
-import CdTimerWindowTitleBar from './components/CdTimerWindowTitleBar.vue'
+import CdTimerWindowTitlebar from './components/CdTimerWindowTitlebar.vue'
 import SummonerSpellsCdTimer from './components/SummonerSpellsCdTimer.vue'
 
 const wrapperEl = useTemplateRef('wrapper')
@@ -32,30 +32,11 @@ watch(
 )
 </script>
 
-<style lang="less">
+<style>
 html,
 body,
 #app {
   width: fit-content;
   height: fit-content;
-}
-
-.cd-timer-wrapper {
-  width: fit-content;
-  display: flex;
-  flex-direction: column;
-  background-color: #1a1a1da0;
-  border-radius: 4px;
-  box-sizing: border-box;
-  overflow: hidden;
-
-  .content {
-    opacity: 0.7;
-    transition: opacity 0.3s;
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
 }
 </style>

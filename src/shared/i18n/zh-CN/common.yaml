@@ -8,22 +8,23 @@ na: N/A
 
 summonerPlaceholder: 召唤师 {{index}}
 summoner: 召唤师
+region: 大区
 
-lanes:
+positions:
   all: 无
   ALL: 无
-  top: 上单
+  top: 上路
   jungle: 打野
-  mid: 中单
-  middle: 中单
+  mid: 中路
+  middle: 中路
   bot: 下路
   bottom: 下路
   support: 辅助
   utility: 辅助
-  TOP: 上单
+  TOP: 上路
   JUNGLE: 打野
-  MID: 中单
-  MIDDLE: 中单
+  MID: 中路
+  MIDDLE: 中路
   BOTTOM: 下路
   BOT: 下路
   SUPPORT: 辅助
@@ -38,22 +39,18 @@ positionAssignmentReason:
   AUTOFILL_SHORT: 补
 
 teams:
-  all: 所有
+  TEAM-ALL: 所有
+  TEAM-100: 蓝队
+  TEAM-200: 红队
+  LOBBY: 房间
   unknown: 未知
-  100: 蓝队
-  200: 红队
-  our: 我方
-  their: 敌方
-  our-1: 我方 (蓝队)
-  our-2: 我方 (红队)
-  their-1: 敌方 (蓝队)
-  their-2: 敌方 (红队)
 
 queueTypes:
   RANKED_SOLO_5x5: 单双排位
   RANKED_FLEX_SR: 灵活排位
   NORMAL: 匹配模式
   ARAM_UNRANKED_5x5: 极地大乱斗
+  KIWI: 海克斯大乱斗
   CHERRY: 斗魂竞技场
   URF: 无限火力 / 无限乱斗
   RANKED_FLEX_TT: 灵活排位 3v3
@@ -70,6 +67,8 @@ gameModes:
 
 sgpMatchHistoryTags:
   all: 所有模式
+  ranked: 排位积分类模式
+  normal: 普通类模式
   current: 当前模式
   q_420: 单双排位
   q_430: 匹配模式
@@ -109,6 +108,7 @@ shortTiers:
   CHALLENGER: 王者
 
 sgpServers:
+  AKARI_CURRENT: 当前
   TENCENT_HN10: 黑色玫瑰
   TENCENT_HN1: 艾欧尼亚
   TENCENT_NJ100: 联盟一区
@@ -118,6 +118,7 @@ sgpServers:
   TENCENT_TJ101: 联盟五区
   TENCENT_BGP2: 峡谷之巅
   TENCENT_PBE: 体验服
+  TENCENT_PREPBE: 预体验服
   TW2: 台湾
   SG2: 新加坡
   PH2: 菲律宾
@@ -133,3 +134,10 @@ sgpServers:
   TR1: 土耳其
   RU: 俄罗斯
   JP1: 日本
+
+champions:
+  bravery: 勇敢举动
+  dummy: 占位
+
+app:
+  singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

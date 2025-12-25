@@ -2,9 +2,9 @@ import { tools } from '@leagueakari/league-akari-addons'
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
-import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { AxiosRetry } from 'axios-retry'
@@ -53,10 +53,9 @@ export class LeagueClientLcuUninitializedError extends Error {
 export class LeagueClientMain implements IAkariShardInitDispose {
   static id = 'league-client-main'
 
-  static INTERNAL_TIMEOUT = 12500
   static CONNECT_TO_LC_RETRY_INTERVAL = 2000
   static HTTP_PING_URL = '/riotclient/auth-token'
-  static REQUEST_TIMEOUT_MS = 12500
+  static REQUEST_TIMEOUT_MS = 17500
   static FIXED_ITEM_SET_PREFIX = 'akari1'
 
   static PROCESS_NAME = 'LeagueClient.exe'
@@ -110,8 +109,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ux: LeagueClientUxMain,
     private readonly _protocol: AkariProtocolMain
@@ -197,7 +196,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
         )
 
-        return new Response(res.status === 204 || res.status === 304 ? null : res.data, {
+        return new Response(AkariProtocolMain.shouldNotHaveBody(res.status) ? null : res.data, {
           statusText: res.statusText,
           headers: resHeaders,
           status: res.status
@@ -277,7 +276,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       LeagueClientMain.id,
       'writeItemSetsToDisk',
-      async (_, itemSets: any[], clearPrevious: boolean) => {
+      async (_, itemSets: any[] | null, clearPrevious: boolean) => {
         await this.writeItemSetsToDisk(itemSets, clearPrevious)
       }
     )
@@ -449,7 +448,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   private _wsPromisified(
     url: string,
     options: WebSocket.ClientOptions | ClientRequestArgs = {},
-    timeout = 12500
+    timeout = 17500
   ): Promise<WebSocket> {
     return new Promise<WebSocket>((resolve, reject) => {
       const ws = new WebSocket(url, options)
@@ -562,16 +561,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    axiosRetry(this._http, {
-      retries: 2,
-      retryCondition: (error) => {
-        if (error.response === undefined) {
-          return true
-        }
-
-        return !(error.response.status >= 400 && error.response.status < 500)
-      }
-    })
+    axiosRetry(this._http, { retries: 2 })
 
     try {
       await this._http.get(LeagueClientMain.HTTP_PING_URL)
@@ -606,7 +596,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     return res
   }
 
-  async writeItemSetsToDisk(itemSets: any[], clearPrevious = true) {
+  async writeItemSetsToDisk(itemSets: any[] | null, clearPrevious = true) {
     try {
       const { data: installDir } = await this.http.get('/data-store/v1/install-dir')
 
@@ -635,6 +625,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         for (const file of akariFiles) {
           fs.unlinkSync(path.join(targetPath, file))
         }
+      }
+
+      if (!itemSets) {
+        return
       }
 
       for (const itemSet of itemSets) {

@@ -1,9 +1,9 @@
 import { Config, Dep, Shard } from '@shared/akari-shard'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
-import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { RadixEventEmitter } from '@shared/utils/event-emitter'
+import { getSgpServerId } from '@shared/utils/sgp'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { useTranslation } from 'i18next-vue'
@@ -40,7 +40,11 @@ export class LeagueClientRenderer {
   /** 这里只用于当作一个普通的静态事件分发器 */
   private readonly _emitter = new RadixEventEmitter()
 
-  public readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
+  public readonly _http = axios.create({
+    baseURL: 'akari://league-client',
+    adapter: 'fetch',
+    paramsSerializer: { indexes: null }
+  })
   public readonly api: LeagueClientHttpApiAxiosHelper
 
   async onInit() {
@@ -120,14 +124,7 @@ export class LeagueClientRenderer {
     @Config() private _config?: LeagueClientRendererConfig
   ) {
     axiosRetry(this._http, {
-      retries: 2,
-      retryCondition: (error) => {
-        if (error.response === undefined) {
-          return true
-        }
-
-        return !(error.response.status >= 400 && error.response.status < 500)
-      }
+      retries: 2
     })
 
     this.api = new LeagueClientHttpApiAxiosHelper(this._http)
@@ -178,7 +175,6 @@ export class LeagueClientRenderer {
         taskStore.updateTask(initTaskId, {
           description: () =>
             t('league-client-renderer.initialization-task.current', {
-              endpoint: progress.currentId,
               finishedCount: progress.finished.length,
               allCount: progress.all.length
             }),
@@ -266,7 +262,7 @@ export class LeagueClientRenderer {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'connect', auth)
   }
 
-  writeItemSetsToDisk(items: any[], clearPrevious?: boolean) {
+  writeItemSetsToDisk(items: any[] | null, clearPrevious?: boolean) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'writeItemSetsToDisk', items, clearPrevious)
   }
 

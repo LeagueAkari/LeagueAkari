@@ -38,7 +38,7 @@ const translatedTitle = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .claimable-item {
   display: flex;
   flex-direction: column;

@@ -71,7 +71,7 @@ const handleClickEasterEgg = () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .about-para {
   font-size: 13px;
 }

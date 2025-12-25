@@ -13,7 +13,7 @@ export class SetupInAppScopeRenderer {
   private _renderVNodes: (() => VNode)[] = []
   private _setupFns: (() => void)[] = []
 
-  setup() {
+  _setup() {
     this._setupFns.forEach((fn) => fn())
   }
 

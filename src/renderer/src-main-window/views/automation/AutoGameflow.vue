@@ -33,7 +33,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoHonorEnabled.label')"
@@ -46,7 +46,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.playAgainEnabled.label')"
@@ -68,7 +68,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingEnabled.label')"
@@ -173,7 +173,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoReconnectEnabled.label')"
@@ -186,7 +186,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoSkipLeaderEnabled.label')"
@@ -199,7 +199,7 @@
               size="small"
             />
           </ControlItem>
-          <div class="divider"></div>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoHandleInvitationsEnabled.label')"
@@ -278,6 +278,31 @@
               </NPopselect>
             </NFlex>
           </ControlItem>
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoGameflow.autoSendARAMTeamSideEnabled.label')"
+            :label-description="t('AutoGameflow.autoSendARAMTeamSideEnabled.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.autoSendARAMTeamSideEnabled"
+              @update:value="(val) => shard.setAutoSendARAMTeamSideEnabled(val)"
+              size="small"
+            />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoGameflow.autoSendARAMTeamSideVisibleToTeam.label')"
+            :label-description="t('AutoGameflow.autoSendARAMTeamSideVisibleToTeam.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.autoSendARAMTeamSideVisibleToTeam"
+              @update:value="(val) => shard.setAutoSendARAMTeamSideVisibleToTeam(val)"
+              size="small"
+            />
+          </ControlItem>
         </NCard>
       </div>
     </NScrollbar>
@@ -348,6 +373,10 @@ const queueTypes = computed(() => {
       label: t('queueTypes.ARAM_UNRANKED_5x5', { ns: 'common' }),
       order: 300
     },
+    KIWI: {
+      label: t('queueTypes.KIWI', { ns: 'common' }),
+      order: 310
+    },
     CHERRY: {
       label: t('queueTypes.CHERRY', { ns: 'common' }),
       order: 400
@@ -411,13 +440,6 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
 }
 </script>
 
-<style lang="less" scoped>
-@import './automation-styles.less';
-
-.divider {
-  margin-top: 12px;
-  margin-bottom: 12px;
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.084);
-}
+<style scoped>
+@import './automation-styles.css';
 </style>

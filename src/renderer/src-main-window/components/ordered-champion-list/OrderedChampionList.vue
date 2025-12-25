@@ -1,8 +1,8 @@
 <template>
-  <div class="ordered-champion-list-wrapper">
+  <div class="flex h-6 items-center">
     <NModal v-model:show="show">
       <NTransfer
-        class="transfer"
+        class="h-[65vh]! w-[600px]! rounded bg-white/95 dark:bg-neutral-900/95"
         size="small"
         v-model:value="champions"
         virtual-scroll
@@ -15,14 +15,20 @@
         source-filterable
       />
     </NModal>
-    <NButton size="tiny" type="primary" style="margin-right: 8px" @click="show = true">{{
-      t('OrderedChampionList.edit')
-    }}</NButton>
-    <div class="champions">
+
+    <NButton size="tiny" class="mr-2! shrink-0" @click="show = true">
+      <template #icon>
+        <NIcon>
+          <Edit20FilledIcon />
+        </NIcon>
+      </template>
+    </NButton>
+
+    <div class="flex flex-wrap items-center gap-1">
       <ChampionIcon
         :champion-id="c"
         :stretched="false"
-        class="champion"
+        class="size-5 rounded"
         :title="lcs.gameData.champions[c]?.name"
         :class="{
           [styles['not-pickable']]:
@@ -34,8 +40,10 @@
         v-for="c of champions.slice(0, maxShow)"
         :key="c"
       />
-      <div class="hint" v-if="champions.length > maxShow">+{{ champions.length - maxShow }}</div>
-      <div class="hint" v-if="champions.length === 0">
+      <div class="text-xs text-black/60 dark:text-white/60" v-if="champions.length > maxShow">
+        +{{ champions.length - maxShow }}
+      </div>
+      <div class="text-xs text-black/60 dark:text-white/60" v-if="champions.length === 0">
         {{ t('OrderedChampionList.unselected') }}
       </div>
     </div>
@@ -45,10 +53,11 @@
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { maybePveChampion } from '@shared/types/league-client/game-data'
+import { Edit20Filled as Edit20FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
+  NIcon,
   NModal,
   NTransfer,
   TransferRenderSourceLabel,
@@ -56,24 +65,24 @@ import {
 } from 'naive-ui'
 import { computed, h, ref, useCssModule, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-import { useRecommendedChampionPositions } from '@main-window/compositions/useRecommendedChampionPositions'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { useRecommendedChampionPositions } from '@main-window/composables/useRecommendedChampionPositions'
 
 import PositionFilter from './PositionFilter.vue'
 
 const { t } = useTranslation()
 
 const {
-  maxShow = 6,
-  allowEmpty = false,
+  maxShow = 5,
+  allowDummy = false,
   allowBravery = false,
   type = 'pick'
 } = defineProps<{
   maxShow?: number
   maxCount?: number
   type?: 'pick' | 'ban'
-  allowEmpty?: boolean
-  allowBravery?: boolean
+  allowDummy?: boolean // 允许 -1
+  allowBravery?: boolean // 允许 -3
 }>()
 
 const show = defineModel<boolean>('show', { default: false })
@@ -89,10 +98,8 @@ const championOptions = computed(() => {
     name: c.name
   }))
 
-  if (type === 'pick') {
-    if (allowBravery) {
-      mapped.push({ id: -3, name: t('champions.bravery') })
-    }
+  if (allowBravery) {
+    mapped.push({ id: -3, name: t('champions.bravery', { ns: 'common' }) })
   }
 
   const sorted = mapped.toSorted((a, b) => {
@@ -108,11 +115,6 @@ const championOptions = computed(() => {
       return 1
     }
 
-    // 只要是 PVE 英雄，直接放在最后面以防止失误选择
-    if (maybePveChampion(a.id) || maybePveChampion(b.id)) {
-      return 1
-    }
-
     return a.name.localeCompare(b.name, 'zh-Hans-CN')
   })
 
@@ -123,15 +125,11 @@ const championOptions = computed(() => {
         return false
       }
 
-      if (allowEmpty) {
-        return b.id !== 0
-      }
-
-      return b.id !== 0 && b.id !== -1
+      return b.id !== 0 && (allowDummy || b.id !== -1)
     })
     .map((b) => ({
       value: b.id,
-      label: maybePveChampion(b.id) ? `${b.name} (PVE)` : b.name
+      label: b.name
     }))
 })
 
@@ -179,7 +177,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
   return h(
     'div',
     {
-      style: { display: 'flex', 'align-items': 'center', gap: '4px' },
+      style: { display: 'flex', 'align-items': 'center', gap: '4px', cursor: 'grab' },
       class: {
         [styles['target-item']]: true,
         [styles['not-pickable']]: !pickable
@@ -210,7 +208,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
           onClick: () => moveUp(option.value as number),
           disabled: champions.value.indexOf(option.value as number) === 0
         },
-        () => '↑上移'
+        () => t('OrderedChampionList.moveUp')
       ),
       h(
         NButton,
@@ -223,7 +221,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
           onClick: () => moveDown(option.value as number),
           disabled: champions.value.indexOf(option.value as number) === champions.value.length - 1
         },
-        () => '↓下移'
+        () => t('OrderedChampionList.moveDown')
       )
     ]
   )
@@ -315,37 +313,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
-.ordered-champion-list-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.champions {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-
-  .champion {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-  }
-
-  .hint {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.transfer {
-  width: 600px;
-  height: 65vh;
-  background-color: rgba(24, 24, 24, 0.98);
-}
-</style>
-
-<style lang="less" module>
+<style module>
 .target-item .move-btn {
   opacity: 0;
   transition: opacity 0.2s;

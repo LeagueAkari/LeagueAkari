@@ -142,19 +142,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCard,
-  NFlex,
-  NModal,
-  NSelect,
-  NTooltip,
-  SelectOption,
-  useMessage
-} from 'naive-ui'
+import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
 const { t } = useTranslation()
 
@@ -521,4 +512,4 @@ const handleClearEmotes = async () => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

@@ -1,8 +1,8 @@
 <template>
   <div class="toolkit-page">
-    <div class="sections">
+    <div class="page-sections">
       <div class="section-icon-container">
-        <NIcon class="section-icon"><ToolkitIcon /></NIcon>
+        <NIcon class="section-icon"><ToolFilledIcon /></NIcon>
         <span class="session-label">{{ t('Toolkit.title') }}</span>
       </div>
       <NTabs
@@ -15,7 +15,7 @@
         </NTab>
       </NTabs>
     </div>
-    <div class="contents">
+    <div class="page-contents">
       <Transition :name="transitionType">
         <KeepAlive>
           <Client v-if="currentTab === 'client'" />
@@ -24,6 +24,7 @@
           <Lobby v-else-if="currentTab === 'lobby'" />
           <Misc v-else-if="currentTab === 'misc'" />
           <ClaimTools v-else-if="currentTab === 'claim-tools'" />
+          <LootTools v-else-if="currentTab === 'loot-tools'" />
           <FriendTools v-else-if="currentTab === 'friend-tools'" />
         </KeepAlive>
       </Transition>
@@ -32,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ToolKit as ToolkitIcon } from '@vicons/carbon'
+import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { computed, onActivated, ref, watch } from 'vue'
@@ -44,6 +45,7 @@ import FriendTools from './friend-tools/FriendTools.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
+import LootTools from './loot-tools/LootTools.vue'
 import Misc from './misc/Misc.vue'
 
 const { t } = useTranslation()
@@ -75,6 +77,14 @@ const tabs = computed(() => [
     key: 'claim-tools',
     name: t('Toolkit.claim-tools')
   },
+  ...(import.meta.env.DEV
+    ? [
+        {
+          key: 'loot-tools',
+          name: t('Toolkit.loot-tools')
+        }
+      ]
+    : []),
   {
     key: 'friend-tools',
     name: t('Toolkit.friend-tools')
@@ -131,22 +141,21 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
-@import './toolkit-styles.less';
+<style scoped>
+@import './toolkit-styles.css';
 
 .toolkit-page {
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  .sections {
+  .page-sections {
     display: flex;
-    height: 52px;
     padding: 0 24px;
     align-items: flex-end;
   }
 
-  .contents {
+  .page-contents {
     position: relative;
     flex: 1;
     height: 0;
@@ -177,7 +186,7 @@ watch(
 
 [data-theme='dark'] {
   .toolkit-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
   }
@@ -189,7 +198,7 @@ watch(
 
 [data-theme='light'] {
   .toolkit-page {
-    .sections {
+    .page-sections {
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
   }

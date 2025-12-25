@@ -94,7 +94,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   constructor(
     private readonly _app: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
-    private readonly _loggerFactory: LoggerFactoryMain
+    readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(KeyboardShortcutsMain.id)
   }

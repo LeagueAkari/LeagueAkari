@@ -3,21 +3,29 @@
     <NModal
       preset="card"
       size="small"
-      :class="$style['champion-config-wrapper']"
+      class="w-full max-w-[980px] min-w-[940px]"
       transform-origin="center"
       v-model:show="show"
     >
       <template #header>
-        <div class="header">
+        <div class="flex items-center gap-2">
           <template v-if="selectedId">
-            <LcuImage class="header-icon" :src="championIconUri(selectedId)" />
-            <span>{{ lcs.gameData.champions[selectedId]?.name }}</span>
+            <LcuImage class="h-5 w-5" :src="championIconUri(selectedId)" />
+            <span class="text-sm font-medium text-black dark:text-white">
+              {{ lcs.gameData.champions[selectedId]?.name }}
+            </span>
           </template>
-          <template v-else>{{ t('ChampionConfig.configure') }}</template>
+          <template v-else>
+            <span class="text-sm font-medium text-black dark:text-white">
+              {{ t('ChampionConfig.configure') }}
+            </span>
+          </template>
         </div>
       </template>
-      <div class="content">
-        <div class="filter-area">
+
+      <div class="flex max-h-[520px] gap-4 text-xs text-black/80 dark:text-white/80">
+        <div class="flex max-h-[520px] w-52 flex-col gap-2">
+          <!-- filter -->
           <NInput
             clearable
             size="small"
@@ -28,8 +36,10 @@
               <NIcon :component="SearchIcon" />
             </template>
           </NInput>
+
+          <!-- champion list -->
           <NVirtualList
-            class="champion-list"
+            class="flex-1 overflow-y-auto"
             :padding-top="2"
             :item-size="30"
             key-field="value"
@@ -37,23 +47,32 @@
           >
             <template #default="{ item }">
               <div
-                class="champion-item"
-                :class="{
-                  selected: item.value === selectedId
-                }"
+                :class="[
+                  'mb-0.5 flex h-7 cursor-pointer items-center gap-2 rounded px-2 text-xs transition-colors last:mb-0 hover:bg-black/10 hover:text-black dark:hover:bg-white/10 dark:hover:text-white',
+                  item.value === selectedId
+                    ? 'bg-black/10 text-black dark:bg-white/10 dark:text-white'
+                    : 'text-black/60 dark:text-white/60'
+                ]"
                 @click="handleChangeChampion(item.value)"
               >
-                <LcuImage class="icon" :src="championIconUri(item.value)" />
-                <div class="champion-name">{{ item.label }}</div>
+                <LcuImage
+                  class="mr-2 h-5 w-5 shrink-0 rounded-sm bg-black/10 dark:bg-white/10"
+                  :src="championIconUri(item.value)"
+                />
+                <div class="mr-2 flex-1 truncate text-xs">
+                  {{ item.label }}
+                </div>
+
+                <!-- runes configuration status -->
                 <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
                   <template #trigger>
                     <template v-if="item.hasRunes">
-                      <NIcon class="configure-status configured">
+                      <NIcon class="text-lg text-emerald-600 dark:text-emerald-400">
                         <CheckmarkCircle16RegularIcon />
                       </NIcon>
                     </template>
                     <template v-else>
-                      <NIcon class="configure-status not-configured">
+                      <NIcon class="text-lg text-gray-500 dark:text-gray-400">
                         <SubtractCircle16RegularIcon />
                       </NIcon>
                     </template>
@@ -63,15 +82,17 @@
                   }}</template>
                   <template v-else>{{ t('ChampionConfig.runesUnconfigured') }}</template>
                 </NPopover>
+
+                <!-- spells configuration status -->
                 <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
                   <template #trigger>
                     <template v-if="item.hasSpells">
-                      <NIcon class="configure-status configured">
+                      <NIcon class="ml-1 text-lg text-emerald-600 dark:text-emerald-400">
                         <CheckmarkCircle16RegularIcon />
                       </NIcon>
                     </template>
                     <template v-else>
-                      <NIcon class="configure-status not-configured">
+                      <NIcon class="ml-1 text-lg text-gray-500 dark:text-gray-400">
                         <SubtractCircle16RegularIcon />
                       </NIcon>
                     </template>
@@ -85,96 +106,109 @@
             </template>
           </NVirtualList>
         </div>
-        <div class="divider"></div>
-        <div class="config-area" v-if="selectedId">
-          <div class="tabs-section">
-            <div class="tab-title">{{ t('ChampionConfig.targetMode') }}</div>
-            <NRadioGroup v-model:value="currentType" size="small">
+
+        <div class="h-full w-px bg-black/10 dark:bg-white/10"></div>
+
+        <!-- right content -->
+        <div class="flex min-w-[540px] flex-1 flex-col" v-if="selectedId">
+          <!-- modes -->
+          <div class="mb-2">
+            <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
+              {{ t('ChampionConfig.targetMode') }}
+            </div>
+
+            <NRadioGroup
+              v-model:value="currentType"
+              size="small"
+              :theme-overrides="{
+                buttonHeightSmall: '28px'
+              }"
+            >
               <NRadioButton value="ranked">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['CLASSIC']" />
                   <span>{{ t('ChampionConfig.ranked') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.some((r) => r.startsWith('ranked')) ||
                       configExistence.spells.some((r) => r.startsWith('ranked'))
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
                 </div>
               </NRadioButton>
               <NRadioButton value="normal">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['CLASSIC']" />
                   <span>{{ t('ChampionConfig.normal') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('normal') ||
                       configExistence.spells.includes('normal')
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
                 </div>
               </NRadioButton>
               <NRadioButton value="aram">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['ARAM']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['ARAM']" />
                   <span>{{ t('ChampionConfig.aram') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('aram') ||
                       configExistence.spells.includes('aram')
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
                 </div>
               </NRadioButton>
               <NRadioButton value="urf">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['URF']" />
                   <span>{{ t('ChampionConfig.urf') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('urf') ||
                       configExistence.spells.includes('urf')
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
                 </div>
               </NRadioButton>
               <NRadioButton value="nexusblitz">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['NEXUSBLITZ']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['NEXUSBLITZ']" />
                   <span>{{ t('ChampionConfig.nexusblitz') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('nexusblitz') ||
                       configExistence.spells.includes('nexusblitz')
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
                 </div>
               </NRadioButton>
               <NRadioButton value="ultbook">
-                <div class="radio-button-inner">
-                  <LcuImage class="mode-icon" :src="gameModeIconUri['ULTBOOK']" />
+                <div class="flex h-full items-center gap-1 text-xs">
+                  <LcuImage class="h-4 w-4" :src="gameModeIconUri['ULTBOOK']" />
                   <span>{{ t('ChampionConfig.ultbook') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('ultbook') ||
                       configExistence.spells.includes('ultbook')
                     "
-                    class="check-icon"
+                    class="text-sm"
                   >
                     <CheckmarkCircle16RegularIcon />
                   </NIcon>
@@ -182,27 +216,39 @@
               </NRadioButton>
             </NRadioGroup>
           </div>
-          <div class="tabs-sections">
-            <div class="tabs-section">
-              <div class="tab-title">{{ t('ChampionConfig.configure') }}</div>
-              <NRadioGroup v-model:value="currentConfig" size="small">
+
+          <!-- line2 radios -->
+          <div class="flex gap-2">
+            <!-- group: configure -->
+            <div class="mb-2">
+              <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
+                {{ t('ChampionConfig.configure') }}
+              </div>
+
+              <NRadioGroup
+                v-model:value="currentConfig"
+                size="small"
+                :theme-overrides="{
+                  buttonHeightSmall: '28px'
+                }"
+              >
                 <NRadioButton value="runes">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <span>{{ t('ChampionConfig.runes') }}</span>
                     <NIcon
                       v-if="configExistence.runes.some((r) => r.startsWith(currentType))"
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
                   </div>
                 </NRadioButton>
                 <NRadioButton value="spells">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <span>{{ t('ChampionConfig.spells') }}</span>
                     <NIcon
                       v-if="configExistence.spells.some((r) => r.startsWith(currentType))"
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
@@ -210,17 +256,23 @@
                 </NRadioButton>
               </NRadioGroup>
             </div>
-            <div class="tabs-section" v-if="currentType === 'ranked'">
-              <div class="tab-title">{{ t('ChampionConfig.position') }}</div>
+
+            <!-- group: position -->
+            <div class="mb-2" v-if="currentType === 'ranked'">
+              <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
+                {{ t('ChampionConfig.position') }}
+              </div>
+
               <NRadioGroup
                 v-model:value="currentPosition"
                 size="small"
                 :theme-overrides="{
-                  labelPadding: '0 8px'
+                  labelPadding: '0 8px',
+                  buttonHeightSmall: '28px'
                 }"
               >
                 <NRadioButton value="default">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="all" />
                     <span>{{ t('ChampionConfig.default') }}</span>
                     <NIcon
@@ -229,87 +281,87 @@
                           ? configExistence.runes.includes(`${currentType}-default`)
                           : configExistence.spells.includes(`${currentType}-default`)
                       "
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
                   </div>
                 </NRadioButton>
                 <NRadioButton value="top">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="top" />
-                    <span>{{ t('lanes.top', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.top', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
                           ? configExistence.runes.includes(`${currentType}-top`)
                           : configExistence.spells.includes(`${currentType}-top`)
                       "
-                      class="check-icon"
-                    >
-                      <CheckmarkCircle16RegularIcon />
-                    </NIcon>
-                  </div>
-                </NRadioButton>
-                <NRadioButton value="middle">
-                  <div class="radio-button-inner">
-                    <PositionIcon position="middle" />
-                    <span>{{ t('lanes.middle', { ns: 'common' }) }}</span>
-                    <NIcon
-                      v-if="
-                        currentConfig === 'runes'
-                          ? configExistence.runes.includes(`${currentType}-middle`)
-                          : configExistence.spells.includes(`${currentType}-middle`)
-                      "
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
                   </div>
                 </NRadioButton>
                 <NRadioButton value="jungle">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="jungle" />
-                    <span>{{ t('lanes.jungle', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.jungle', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
                           ? configExistence.runes.includes(`${currentType}-jungle`)
                           : configExistence.spells.includes(`${currentType}-jungle`)
                       "
-                      class="check-icon"
+                      class="text-sm"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="middle">
+                  <div class="flex h-full items-center gap-1 text-xs">
+                    <PositionIcon position="middle" />
+                    <span>{{ t('positions.middle', { ns: 'common' }) }}</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-middle`)
+                          : configExistence.spells.includes(`${currentType}-middle`)
+                      "
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
                   </div>
                 </NRadioButton>
                 <NRadioButton value="bottom">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="bottom" />
-                    <span>{{ t('lanes.bottom', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.bottom', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
                           ? configExistence.runes.includes(`${currentType}-bottom`)
                           : configExistence.spells.includes(`${currentType}-bottom`)
                       "
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
                   </div>
                 </NRadioButton>
                 <NRadioButton value="utility">
-                  <div class="radio-button-inner">
+                  <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="utility" />
-                    <span>{{ t('lanes.utility', { ns: 'common' }) }}</span>
+                    <span>{{ t('positions.utility', { ns: 'common' }) }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
                           ? configExistence.runes.includes(`${currentType}-utility`)
                           : configExistence.spells.includes(`${currentType}-utility`)
                       "
-                      class="check-icon"
+                      class="text-sm"
                     >
                       <CheckmarkCircle16RegularIcon />
                     </NIcon>
@@ -318,29 +370,51 @@
               </NRadioGroup>
             </div>
           </div>
-          <div class="runes" v-if="currentConfig === 'runes'">
+
+          <!-- runes editor -->
+          <div
+            class="mb-2 flex flex-1 items-center justify-center rounded-sm bg-black/5 p-4 dark:bg-white/5"
+            v-if="currentConfig === 'runes'"
+          >
             <RuneV2Edit v-model:page="tempEditingRunes" v-if="tempEditingRunes" />
-            <div class="empty-placeholder" v-else>
-              <span>{{ t('ChampionConfig.runesUnconfigured') }}</span>
+            <div
+              class="flex h-full flex-col items-center justify-center gap-2 text-sm text-black/60 dark:text-white/60"
+              v-else
+            >
+              <span>
+                {{ t('ChampionConfig.runesUnconfigured') }}
+              </span>
               <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig">{{
                 t('ChampionConfig.configureRunes')
               }}</NButton>
             </div>
           </div>
-          <div class="spells" v-else-if="currentConfig === 'spells'">
+
+          <!-- spells editor -->
+          <div
+            class="mb-2 flex flex-1 items-center justify-center rounded-sm bg-black/5 p-4 dark:bg-white/5"
+            v-else-if="currentConfig === 'spells'"
+          >
             <SummonerSpellEdit
               v-if="tempEditingSpells"
               :game-mode="typeToGameMode(currentType)"
               v-model:spell-ids="tempEditingSpells"
             />
-            <div class="empty-placeholder" v-else>
-              <span>{{ t('ChampionConfig.spellsUnconfigured') }}</span>
+            <div
+              class="flex h-full flex-col items-center justify-center gap-2 text-sm text-black/60 dark:text-white/60"
+              v-else
+            >
+              <span>
+                {{ t('ChampionConfig.spellsUnconfigured') }}
+              </span>
               <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig">{{
                 t('ChampionConfig.configureSpells')
               }}</NButton>
             </div>
           </div>
-          <div class="actions">
+
+          <!-- buttons -->
+          <div class="flex justify-end gap-1">
             <template v-if="currentConfig === 'runes'">
               <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes">{{
                 t('ChampionConfig.clear')
@@ -374,11 +448,17 @@
             </template>
           </div>
         </div>
-        <div v-else class="config-area-empty-placeholder">
-          {{ t('ChampionConfig.noChampionPlaceholder') }}
+
+        <!-- no champion placeholder -->
+        <div
+          v-else
+          class="flex h-full min-w-[540px] items-center justify-center text-sm text-black/60 dark:text-white/60"
+        >
+          <span>{{ t('ChampionConfig.noChampionPlaceholder') }}</span>
         </div>
       </div>
     </NModal>
+
     <NButton size="tiny" type="primary" @click="show = true">{{
       t('ChampionConfig.configure')
     }}</NButton>
@@ -407,7 +487,6 @@ import { useTranslation } from 'i18next-vue'
 import _ from 'lodash'
 import {
   NButton,
-  NCard,
   NIcon,
   NInput,
   NModal,
@@ -415,13 +494,12 @@ import {
   NRadioButton,
   NRadioGroup,
   NVirtualList,
-  selectDark,
   useMessage
 } from 'naive-ui'
 import { computed, ref, toRaw, watch } from 'vue'
 
-import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-import { useMapAssets } from '@main-window/compositions/useMapAssets'
+import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { useMapAssets } from '@main-window/composables/useMapAssets'
 
 import RuneV2Edit from './RuneV2Edit.vue'
 import SummonerSpellEdit from './SummonerSpellEdit.vue'
@@ -880,192 +958,8 @@ const configExistence = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
-.header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .header-icon {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.tabs {
+<style scoped>
+:deep(.n-radio-button .n-radio__label) {
   height: 100%;
-}
-
-.content {
-  display: flex;
-  gap: 16px;
-  height: 100%;
-
-  .filter-area {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 200px;
-    height: 100%;
-
-    .champion-list {
-      flex-grow: 1;
-      height: 0;
-    }
-  }
-
-  .divider {
-    width: 1px;
-    height: 100%;
-    background-color: #fff1;
-  }
-
-  .config-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 540px;
-
-    .tabs-sections {
-      display: flex;
-      gap: 8px;
-    }
-
-    .tabs-section {
-      margin-bottom: 8px;
-
-      .tab-title {
-        font-size: 11px;
-        color: #fff8;
-        margin-bottom: 4px;
-      }
-
-      &:last-child {
-        margin-bottom: 16px;
-      }
-    }
-
-    .spells,
-    .runes {
-      flex: 1;
-      padding: 16px;
-      margin-bottom: 8px;
-      background-color: #fff1;
-      border-radius: 2px;
-    }
-
-    .runes,
-    .spells {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .empty-placeholder {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      color: #fff8;
-    }
-  }
-
-  .config-area-empty-placeholder {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    min-width: 540px;
-    color: #fff8;
-  }
-}
-
-.champion-item {
-  display: flex;
-  align-items: center;
-  height: 28px;
-  padding: 0 8px;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-  margin-bottom: 2px;
-  border-radius: 2px;
-  color: #fff8;
-
-  &:hover {
-    background-color: #fff1;
-  }
-
-  &.selected {
-    color: #ffff;
-    background-color: #fff1;
-  }
-
-  .icon {
-    width: 20px;
-    height: 20px;
-    background-color: #fff1;
-    margin-right: 8px;
-  }
-
-  .champion-name {
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    margin-right: 8px;
-  }
-
-  .configure-status {
-    font-size: 20px;
-
-    &:not(:last-child) {
-      margin-right: 4px;
-    }
-
-    &.configured {
-      color: #63e2b7;
-    }
-
-    &.not-configured {
-      color: #646464;
-    }
-  }
-}
-
-.radio-button-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  gap: 4px;
-
-  .mode-icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .check-icon {
-    font-size: 14px;
-  }
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
-</style>
-
-<style lang="less" module>
-.champion-config-wrapper {
-  height: 580px;
-  width: fit-content;
-  min-width: 940px;
 }
 </style>

@@ -9,7 +9,7 @@ export const SetupInAppScope = defineComponent({
   setup() {
     const inst = useInstance(SetupInAppScopeRenderer)
 
-    inst.setup()
+    inst._setup()
 
     return () =>
       h(

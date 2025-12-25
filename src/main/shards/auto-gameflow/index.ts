@@ -1,8 +1,10 @@
 import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { Friend } from '@shared/types/league-client/chat'
+import { LcuEvent } from '@shared/types/league-client/event'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
-import { formatError, formatErrorMessage } from '@shared/utils/errors'
+import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
 import { comparer, computed } from 'mobx'
 
@@ -31,9 +33,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
-  private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
-  private _dodgeTask = new TimeoutTask(() => this._dodgeFn())
-  private _reconnectTask = new TimeoutTask(() => this._reconnectFn())
+  private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
+  private _reconnectTask = new TimeoutTask(this._reconnectFn.bind(this))
 
   static HONOR_CATEGORY = ['HEART'] as const
 
@@ -42,8 +43,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
 
   constructor(
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
+    readonly _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain
@@ -74,9 +75,12 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         autoMatchmakingRematchStrategy: { default: this.settings.autoMatchmakingRematchStrategy },
         autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
         autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
-        dodgeAtLastSecondThreshold: { default: this.settings.dodgeAtLastSecondThreshold },
         invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies },
-        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway }
+        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway },
+        autoSendARAMTeamSideEnabled: { default: this.settings.autoSendARAMTeamSideEnabled },
+        autoSendARAMTeamSideVisibleToTeam: {
+          default: this.settings.autoSendARAMTeamSideVisibleToTeam
+        }
       },
       this.settings
     )
@@ -86,11 +90,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoAccept', () => {
       this.cancelAutoAccept('normal')
     })
+
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoMatchmaking', () => {
       this.cancelAutoMatchmaking('normal')
     })
-    this._ipc.onCall(AutoGameflowMain.id, 'setWillDodgeAtLastSecond', (_, enabled: boolean) => {
-      this.state.setWillDodgeAtLastSecond(enabled)
+
+    this._ipc.onCall(AutoGameflowMain.id, 'setFriendsToBeInvited', (_, puuids: string[]) => {
+      this.state.setFriendsToBeInvited(puuids)
     })
   }
 
@@ -174,7 +180,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           this._log.info(
             `In WaitingForStats, waiting for ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
           )
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT })
           return
         }
 
@@ -183,13 +189,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           this._log.info(
             `Waiting for ballot event ${AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`
           )
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT })
           return
         }
 
         if (phase === 'EndOfGame' && enabled) {
           this._log.info(`Will return to lobby in ${AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT} ms`)
-          this._playAgainTask.start(AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT)
+          this._playAgainTask.start({ delay: AutoGameflowMain.PLAY_AGAIN_BUFFER_TIMEOUT })
           return
         }
       },
@@ -203,8 +209,10 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       ([phase, enabled]) => {
         if (phase === 'Reconnect' && enabled) {
           this._log.info('Will attempt to reconnect in a short delay')
-          this._reconnectTask.start(1000)
+          this.state.setReconnectAt(Date.now() + 10000)
+          this._reconnectTask.start({ delay: 10000 })
         } else {
+          this.state.setReconnectAt(-1)
           this._reconnectTask.cancel()
         }
       }
@@ -359,50 +367,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     )
   }
 
-  /**
-   * @deprecated 已无法使用
-   */
-  private _adjustDodgeTimer(msLeft: number, threshold: number) {
-    const dodgeIn = Math.max(msLeft - threshold * 1e3, 0)
-    this._log.info(`Time correction: will dodge in ${dodgeIn} ms`)
-    this._dodgeTask.start(dodgeIn)
-    this.state.setDodgeAt(Date.now() + dodgeIn)
-  }
-
-  private _handleLastSecondDodge() {
-    this._mobx.reaction(
-      () => [Boolean(this._lc.data.champSelect.session), this.state.willDodgeAtLastSecond] as const,
-      ([hasSession, enabled]) => {
-        if (!hasSession || !enabled) {
-          if (this._dodgeTask.cancel()) {
-            this._log.info('Dodge timer cancelled')
-          }
-          this.state.setDodgeAt(-1)
-          this.state.setWillDodgeAtLastSecond(false)
-          return
-        }
-      },
-      { equals: comparer.shallow }
-    )
-
-    this._mobx.reaction(
-      () =>
-        [
-          this._lc.data.champSelect.session?.timer,
-          this.state.willDodgeAtLastSecond,
-          this.settings.dodgeAtLastSecondThreshold
-        ] as const,
-      ([timer, enabled, threshold]) => {
-        if (timer && enabled) {
-          if (timer.phase === 'FINALIZATION') {
-            this._adjustDodgeTimer(timer.adjustedTimeLeftInPhase, threshold)
-          }
-        }
-      },
-      { equals: comparer.shallow }
-    )
-  }
-
   private _handleAutoBallot() {
     const honorables = computed(() => {
       if (!this._lc.data.honor.ballot) {
@@ -496,14 +460,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             this._log.info(`Auto-honor: voting for ${candidates.join(', ')}, game ID: ${h.gameId}`)
           } catch (error) {
             this._ipc.sendEvent(AutoGameflowMain.id, 'error-auto-honor', formatError(error))
-            this._lc.api.playerNotifications
-              .createTitleDetailsNotification(
-                i18next.t('appName', { ns: 'common' }),
-                i18next.t('auto-gameflow-main.error-auto-honor', {
-                  reason: formatErrorMessage(error)
-                })
-              )
-              .catch(() => {})
+
             this._log.warn(`Auto-honor error: ${formatError(error)}`)
           }
         }
@@ -638,19 +595,118 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     })
   }
 
+  private _handleSendARAMTeamSide() {
+    this._mobx.reaction(
+      () =>
+        [
+          this._lc.data.chat.conversations.championSelect?.id,
+          this.settings.autoSendARAMTeamSideEnabled
+        ] as const,
+      ([id, enabled]) => {
+        if (!enabled) {
+          return
+        }
+
+        if (!id) {
+          return
+        }
+
+        const localPlayerCellId = this._lc.data.champSelect.session?.localPlayerCellId
+        const myTeam = this._lc.data.champSelect.session?.myTeam
+        const gameData = this._lc.data.gameflow.session?.gameData
+
+        if (!gameData || !myTeam || !localPlayerCellId) {
+          return
+        }
+
+        // 这些模式, ARAM / 海克斯大乱斗 等，使用 AllRandomPickStrategy 模式，需告知所属方
+        if (gameData.queue.gameTypeConfig.pickMode === 'AllRandomPickStrategy') {
+          const me = myTeam.find((p) => p.cellId === localPlayerCellId)
+
+          if (!me) {
+            return
+          }
+
+          if (me.team !== 1 && me.team !== 2) {
+            return
+          }
+
+          this._lc.api.chat
+            .chatSend(
+              id,
+              `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(`auto-gameflow-main.aram-team-side-${me.team}`)}`,
+              this.settings.autoSendARAMTeamSideVisibleToTeam ? undefined : 'celebration'
+            )
+            .catch((error) => {
+              this._log.warn(`Failed to send ARAM team side`, error)
+            })
+        }
+      },
+      { equals: comparer.shallow, fireImmediately: true }
+    )
+  }
+
+  private _handleAutoInvitation() {
+    this._mobx.reaction(
+      () => Boolean(this._lc.data.lobby.lobby),
+      (hasLobby) => {
+        if (!hasLobby) {
+          this.state.setFriendsToBeInvited([])
+        }
+      }
+    )
+
+    this._lc.events.on<LcuEvent<Friend>>(
+      '/lol-chat/v1/friends/:id',
+      async ({ data, eventType }) => {
+        if (eventType === 'Delete') {
+          this.state.setFriendsToBeInvited(
+            this.state.friendsToBeInvited.filter((p) => p !== data.puuid)
+          )
+          return
+        }
+
+        // Create or Update is OK
+
+        if (
+          !data.puuid ||
+          data.availability !== 'chat' ||
+          !this._lc.data.lobby.lobby?.localMember.allowedInviteOthers ||
+          !this.state.friendsToBeInvited.includes(data.puuid) ||
+          this._lc.data.lobby.lobby.members.some((m) => m.puuid === data.puuid)
+        ) {
+          return
+        }
+
+        try {
+          await this._lc.api.lobby.postInvitation([data.summonerId])
+
+          if (this._lc.data.chat.conversations.customGame) {
+            this._lc.api.chat.chatSend(
+              this._lc.data.chat.conversations.customGame.id,
+              i18next.t('auto-gameflow-main.auto-invitation-sent', {
+                name: `${data.gameName} #${data.gameTag}`
+              }),
+              'celebration'
+            )
+          }
+        } catch (error) {
+          this._log.warn(`Failed to invite friend`, error)
+        } finally {
+          this.state.setFriendsToBeInvited(
+            this.state.friendsToBeInvited.filter((p) => p !== data.puuid)
+          )
+        }
+      }
+    )
+  }
+
   private async _acceptMatch() {
     try {
       await this._lc.api.matchmaking.accept()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-accept-match', formatError(error))
-      this._lc.api.playerNotifications
-        .createTitleDetailsNotification(
-          i18next.t('appName', { ns: 'common' }),
-          i18next.t('auto-gameflow-main.error-accept-match', {
-            reason: formatErrorMessage(error)
-          })
-        )
-        .catch(() => {})
+
       this._log.warn(`Failed to accept match`, error)
     }
     this.state.clearAutoAccept()
@@ -668,14 +724,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       await this._lc.api.lobby.searchMatch()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-matchmaking', formatError(error))
-      this._lc.api.playerNotifications
-        .createTitleDetailsNotification(
-          i18next.t('appName', { ns: 'common' }),
-          i18next.t('auto-gameflow-main.error-matchmaking', {
-            reason: formatErrorMessage(error)
-          })
-        )
-        .catch(() => {})
+
       this._log.warn(`Failed to start matchmaking`, error)
     }
   }
@@ -689,35 +738,19 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _dodgeFn() {
-    try {
-      this._log.info('Dodge, dodging')
-      await this._lc.api.login.dodge()
-    } catch (error) {
-      this._log.warn(`Failed to dodge`, error)
-    } finally {
-      this.state.setDodgeAt(-1)
-    }
-  }
-
   private async _reconnectFn() {
     try {
       this._log.info('Reconnect! Attempting to reconnect')
       await this._lc.api.gameflow.reconnect()
-    } catch (error) {}
+    } catch (error) {
+      this._log.warn(`Failed to reconnect`, error)
+    } finally {
+      this.state.setReconnectAt(-1)
+    }
   }
 
   private async _handleState() {
     await this._setting.applyToState()
-
-    this._setting.onChange('dodgeAtLastSecondThreshold', async (v, { setter }) => {
-      if (v < 0) {
-        v = 0
-      }
-
-      this.settings.setDodgeAtLastSecondThreshold(v)
-      await setter()
-    })
 
     this._setting.onChange('autoAcceptEnabled', async (v, { setter }) => {
       if (!v) {
@@ -741,12 +774,13 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoMatchmakingWaitForInvitees',
       'autoSkipLeaderEnabled',
       'playAgainEnabled',
-      'dodgeAtLastSecondThreshold',
       'autoHandleInvitationsEnabled',
       'autoReconnectEnabled',
       'autoMatchmakingMaximumMatchDuration',
       'invitationHandlingStrategies',
-      'rejectInvitationWhenAway'
+      'rejectInvitationWhenAway',
+      'autoSendARAMTeamSideEnabled',
+      'autoSendARAMTeamSideVisibleToTeam'
     ])
 
     this._mobx.propSync(AutoGameflowMain.id, 'state', this.state, [
@@ -755,8 +789,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'willSearchMatch',
       'willSearchMatchAt',
       'activityStartStatus',
-      'willDodgeAt',
-      'willDodgeAtLastSecond'
+      'friendsToBeInvited'
     ])
   }
 
@@ -766,9 +799,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         clearTimeout(this._autoAcceptTimerId)
         this._autoAcceptTimerId = null
         if (reason === 'accepted') {
-          this._log.info(`Auto-accept cancelled - already accepted`)
+          this._log.info(`Already accepted match`)
         } else if (reason === 'declined') {
-          this._log.info(`Auto-accept cancelled - already declined`)
+          this._log.info(`Already declined match`)
         } else {
           this._log.info(`Auto-accept cancelled - ${reason || 'unknown reason'}`)
         }
@@ -794,7 +827,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     }
   }
 
-  private _sendAutoSearchMatchInfoInChat = async (cancel?: string) => {
+  private async _sendAutoSearchMatchInfoInChat(cancel?: string) {
     if (this._lc.data.chat.conversations.customGame && this.state.willSearchMatch) {
       if (cancel === 'normal') {
         this._lc.api.chat
@@ -855,9 +888,10 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoHandleInvitation()
     this._handleAutoSkipLeader()
     this._handleLogging()
-    this._handleLastSecondDodge()
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
+    this._handleSendARAMTeamSide()
+    this._handleAutoInvitation()
   }
 
   async onDispose() {}

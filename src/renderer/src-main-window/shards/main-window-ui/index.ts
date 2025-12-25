@@ -8,10 +8,10 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
+import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
 import { router } from '@main-window/routes'
 
-import { useMatchHistoryTabsStore } from '../match-history-tabs/store'
+import { usePlayerTabsStore } from '../player-tabs/store'
 import { useMainWindowUiStore } from './store'
 
 @Shard(MainWindowUiRenderer.id)
@@ -48,7 +48,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     watch(
       () => shouldRoute.value,
       (value) => {
-        if (value && store.frontendSettings.autoRouteWhenGameStarts) {
+        if (value && store.settings.autoRouteWhenGameStarts) {
           router.replace({ name: 'ongoing-game' })
         }
       },
@@ -59,7 +59,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private _handleSyncProfileSkinUrl() {
     const lcs = useLeagueClientStore()
     const mui = useMainWindowUiStore()
-    const mhs = useMatchHistoryTabsStore()
+    const pts = usePlayerTabsStore()
 
     const preferMica = useMicaAvailability()
 
@@ -96,12 +96,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
     const currentTabProfileSkinId = computed(() => {
       if (
-        router.currentRoute.value.name === 'match-history' &&
-        mhs.currentTab &&
-        mhs.currentTab.summonerProfile &&
-        mhs.currentTab.summonerProfile.backgroundSkinId
+        router.currentRoute.value.name === 'player-tabs' &&
+        pts.currentTab &&
+        pts.currentTab.summonerProfile &&
+        pts.currentTab.summonerProfile.backgroundSkinId
       ) {
-        return mhs.currentTab.summonerProfile.backgroundSkinId
+        return pts.currentTab.summonerProfile.backgroundSkinId
       }
 
       return null
@@ -170,17 +170,18 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
       store.frontendSettings,
       'useProfileSkinAsBackground'
     )
+
+    await this._setting.savedPropVue(
+      MainWindowUiRenderer.id,
+      store.frontendSettings,
+      'sidebarCollapsed'
+    )
   }
 
   usePreferredBackgroundImageUrl() {
     const store = useMainWindowUiStore()
-    const preferMica = useMicaAvailability()
 
     const backgroundImageUrl = computed(() => {
-      if (preferMica.value) {
-        return null
-      }
-
       if (store.frontendSettings.useProfileSkinAsBackground) {
         if (store.tabBackgroundSkinUrl) {
           return LeagueClientRenderer.url(store.tabBackgroundSkinUrl)

@@ -10,7 +10,10 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="{
+            fontSizeSmall: '13px',
+            optionHeightSmall: '26px'
+          }"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -74,7 +77,9 @@
                       {{ t('errorTemplateExecutionFailed') }}
                     </div>
                     <div :class="$style['error-divider']"></div>
-                    <div :class="$style['error-content']">{{ executionErrors[item.id] }}</div>
+                    <div :class="$style['error-content']">
+                      {{ translateError(executionErrors[item.id]) }}
+                    </div>
                   </div>
                 </NPopover>
                 <NPopover v-else-if="item.enabled" placement="right">
@@ -366,13 +371,30 @@ import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
-import { DROPDOWN_OVERRIDES } from './style-overrides'
-
 // 还是直接复制一份组件好用
 const { t } = useTranslation('renderer', { keyPrefix: 'SendableItemEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
+
+const TEMPLATE_ERROR_TYPES = [
+  'not-an-object',
+  'no-getMetadata',
+  'no-metadata',
+  'unsupported-version',
+  'wrong-template-type',
+  'no-getMessages'
+] as const
+
+const translateError = (error: string | null | undefined): string => {
+  if (!error) return ''
+
+  if (TEMPLATE_ERROR_TYPES.includes(error as any)) {
+    return t(`templateErrorTypes.${error}`, { defaultValue: error })
+  }
+
+  return error
+}
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
@@ -619,7 +641,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .template-edit {
   display: flex;
   height: 600px;
@@ -708,6 +730,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
     display: flex;
     gap: 8px;
     align-items: center;
+    margin-bottom: 16px;
 
     .title {
       font-size: 16px;
@@ -738,8 +761,6 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
       gap: 8px;
       align-items: center;
     }
-
-    margin-bottom: 16px; // here 16px
   }
 
   .control-items {
@@ -799,7 +820,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .error-message {
   .error-title {
     font-size: 12px;

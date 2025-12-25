@@ -25,7 +25,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(RemoteConfigRenderer) private readonly _rc: RemoteConfigRenderer
+    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer
   ) {
     // @ts-ignore
     window.selfUpdateShard = this
@@ -131,9 +131,9 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
       if (s.lastUpdateResult) {
         if (s.lastUpdateResult.success) {
           notification.success({
-            title: () => t('self-update-main.title'),
+            title: () => t('self-update-renderer.title'),
             content: () =>
-              t('self-update-main.lastUpdateSuccess', {
+              t('self-update-renderer.lastUpdateSuccess', {
                 version: as.version
               }),
             duration: 4000,
@@ -141,10 +141,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
           })
         } else {
           notification.warning({
-            title: () => t('self-update-main.title'),
+            title: () => t('self-update-renderer.title'),
             content: () =>
               h('div', {
-                innerHTML: t('self-update-main.lastUpdateFailed', {
+                innerHTML: t('self-update-renderer.lastUpdateFailed', {
                   url: releasePageUrl.value
                 })
               }),
@@ -158,10 +158,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
 
   checkUpdates() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'checkUpdates')
-  }
-
-  checkUpdatesDebug() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'checkUpdatesDebug')
   }
 
   startUpdate() {
@@ -180,10 +176,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openNewUpdatesDir')
   }
 
-  setAutoCheckUpdates(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoCheckUpdates', enabled)
-  }
-
   setAutoDownloadUpdates(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
   }
@@ -194,6 +186,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
 
   setIgnoreVersion(version: string | null) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'ignoreVersion', version)
+  }
+
+  uninstallApp() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'uninstallApp')
   }
 
   async onInit() {

@@ -37,15 +37,16 @@ const handleError = () => {
 }
 </script>
 
-<style lang="less" scoped>
-.lcu-image {
-  display: block;
-}
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-.lcu-image-placeholder {
-  border: 1px solid #fff2;
-  background-color: #0006;
-  border-radius: 4px;
-  box-sizing: border-box;
+@layer components {
+  .lcu-image {
+    display: block;
+  }
+
+  .lcu-image-placeholder {
+    @apply box-border rounded bg-gray-500/40 dark:bg-black/20;
+  }
 }
 </style>

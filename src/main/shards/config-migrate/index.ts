@@ -19,17 +19,18 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
   static MIGRATION_FROM_135 = 'akari-migration-from-1.3.5_patch1'
+  static MIGRATION_FROM_140 = 'akari-migration-from-1.4.0_patch1'
 
   private readonly _log: AkariLogger
 
   constructor(
     private readonly _st: StorageMain,
-    private readonly _loggerFactory: LoggerFactoryMain
+    readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(ConfigMigrateMain.id)
   }
 
-  private async _do(manager: EntityManager, from: string, to: string) {
+  private async _do(manager: EntityManager, from: string, to: string, remove = true) {
     const s = await manager.findOneBy(Setting, { key: Equal(from) })
 
     if (!s) {
@@ -37,7 +38,10 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     }
 
     await manager.save(Setting.create(to, s.value))
-    await manager.remove(s)
+
+    if (remove) {
+      await manager.remove(s)
+    }
   }
 
   // NOTE: drop support before League Akari 1.1.x
@@ -146,7 +150,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(
       manager,
       'core-functionality/fetchAfterGame',
-      'match-history-tabs-renderer/refreshTabsAfterGameEnds'
+      'player-tabs-renderer/refreshTabsAfterGameEnds'
     )
     await this._do(
       manager,
@@ -347,12 +351,137 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(manager, 'self-update-main/downloadSource', 'remote-config-main/preferredSource')
   }
 
+  private async _migrateFrom137(manager: EntityManager) {
+    const hasMigratedSymbol = await manager.findOneBy(Setting, {
+      key: Equal(ConfigMigrateMain.MIGRATION_FROM_140)
+    })
+
+    if (hasMigratedSymbol) {
+      return
+    }
+
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_140)
+
+    // Migrate preferredLolSource
+    try {
+      const ongoingSgpSetting = await manager.findOneBy(Setting, {
+        key: Equal('ongoing-game-main/matchHistoryUseSgpApi')
+      })
+
+      const tabsFrontendSetting = await manager.findOneBy(Setting, {
+        key: Equal('match-history-tabs-renderer/frontendSettings')
+      })
+
+      let ongoingSgp = true
+      if (ongoingSgpSetting) {
+        ongoingSgp = ongoingSgpSetting.value
+      }
+
+      let tabsSgp = true
+      if (
+        tabsFrontendSetting &&
+        tabsFrontendSetting.value &&
+        typeof tabsFrontendSetting.value.matchHistoryUseSgpApi === 'boolean'
+      ) {
+        tabsSgp = tabsFrontendSetting.value.matchHistoryUseSgpApi
+      }
+
+      const preferredLolSource = ongoingSgp || tabsSgp ? 'sgp' : 'lcu'
+
+      await manager.save(Setting.create('app-common-main/preferredLolSource', preferredLolSource))
+
+      if (ongoingSgpSetting) {
+        await manager.remove(ongoingSgpSetting)
+      }
+    } catch (error) {
+      this._log.error('Failed to migrate preferredLolSource', error)
+    }
+
+    await this._do(
+      manager,
+      'ongoing-game-renderer/autoRouteWhenGameStarts',
+      'ongoing-game-main/autoRouteWhenGameStarts'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/showChampionUsage',
+      'ongoing-game-main/showChampionUsage'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/showMatchHistoryItemBorder',
+      'ongoing-game-main/showMatchHistoryItemBorder'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/orderPlayerBy',
+      'ongoing-game-main/orderPlayerBy'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-renderer/frontend/playerCard',
+      'ongoing-game-main/playerCardTags'
+    )
+    await this._do(
+      manager,
+      'ongoing-game-main/gameTimelineLoadCount',
+      'ongoing-game-main/gameDetailsLoadCount'
+    )
+
+    await this._do(manager, 'league-client-ux-main/useWmic', 'league-client-ux-main/useWmi')
+
+    await this._do(
+      manager,
+      'window-manager-main/main-window/bounds',
+      'window-manager-main/main-window/normalBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/opgg-window/bounds',
+      'window-manager-main/opgg-window/normalBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/aux-window/bounds',
+      'window-manager-main/aux-window/normalBounds'
+    )
+
+    await this._do(
+      manager,
+      'window-manager-main/ongoing-game-window/bounds',
+      'window-manager-main/ongoing-game-window/normalBounds'
+    )
+
+    await this._do(
+      manager,
+      'window-manager-main/cd-timer-window/bounds',
+      'window-manager-main/cd-timer-window/normalBounds'
+    )
+
+    // Migrate match-history-tabs-renderer to player-tabs-renderer
+    await this._do(
+      manager,
+      'match-history-tabs-renderer/frontendSettings',
+      'player-tabs-renderer/frontendSettings'
+    )
+    await this._do(
+      manager,
+      'match-history-tabs-renderer/searchHistory',
+      'player-tabs-renderer/searchHistory'
+    )
+
+    await manager.save(
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_140, ConfigMigrateMain.MIGRATION_FROM_140)
+    )
+  }
+
   async onInit() {
     try {
       await this._st.dataSource.transaction(async (manager) => {
         await this._migrateFrom126(manager)
         await this._migrateFrom134(manager)
         await this._migrateFrom135(manager)
+        await this._migrateFrom137(manager)
       })
     } catch (error) {
       this._log.error('Failed to migrate settings', error)

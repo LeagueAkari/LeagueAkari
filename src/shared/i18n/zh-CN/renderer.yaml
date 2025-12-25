@@ -42,7 +42,7 @@ DeclarationModal:
     .akari-disclaimer a:hover{text-decoration:underline;}
     </style>
 
-    # League **Akari** 用户须知与免责声明
+    # $t(common:appName) 用户须知与免责声明
 
     > **请在下载、安装或使用本软件之前，务必仔细阅读并充分理解本须知与免责声明。**
     > 一旦您开始使用，即视为已充分理解并同意下列全部条款。
@@ -50,7 +50,7 @@ DeclarationModal:
     ---
 
     ## 一、软件性质与获取途径
-    - **League Akari** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
+    - **$t(common:appName)** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
     - 本软件不得以任何付费、捆绑销售或其他牟利形式发布、传播或获取。请务必通过官方公开仓库或其镜像下载，防止经济损失及安全隐患。
 
     ## 二、风险提示与责任限制
@@ -58,15 +58,20 @@ DeclarationModal:
       1. 游戏账户被暂停或永久封禁；
       2. 游戏数据丢失、损坏或与服务器数据不一致；
       3. 客户端异常、性能下降或其他不良游戏体验。
-    - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**League Akari** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
+    - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**$t(common:appName)** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
+
+    > 请参考 [Patch 25.17 更新说明](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/) 中的 **Game Info Tracking Improvements** 一节。
 
     ## 三、服务器兼容性声明
-    - **自本声明发布之日起，League Akari 不再对腾讯游戏服务器提供任何形式的支持。**
+    - **自本声明发布之日起，$t(common:appName) 不再对腾讯游戏服务器提供任何形式的支持。**
     - 在腾讯服务器环境中使用本软件**极有可能**违反腾讯游戏相关用户协议、管理规范或技术保护措施；由此产生的封号、数据丢失或其他不利后果，概由用户自行负责。
 
     ## 四、信息收集与隐私保护
     - 为改进产品质量、分析错误及进行安全统计，软件运行时将收集**必要且有限**的系统信息与崩溃日志。
     - 所收集信息**不含**可识别个人身份之数据，不会上传至任何第三方服务器，亦不会用于商业用途。
+
+    ## 五、其他事项
+    - 在任意位置快速敲击 “AKARI”，或连续使用右键点击三次“我已阅读”按钮，可快速关闭这个页面，同时视为您已经阅读并同意本须知与免责声明。
 
     ---
 
@@ -74,6 +79,22 @@ DeclarationModal:
     > <https://github.com/LeagueAkari/LeagueAkari> 。
 
     </div>
+
+FeatureGuide:
+  previous: 上一条
+  next: 下一条
+  confirm: 确认
+
+  ongoingGameNewFeatures20251225:
+    item1:
+      title: 房间内查询
+      description: |
+        除了英雄选择和游戏中阶段，现在也可以展示房间内所有成员的数据。
+
+        在 `设置` → `对局分析` → `在房间阶段内生效`，启用此功能。
+    item2:
+      title: 展示更多标签
+      description: 在 `设置` → `对局分析` → `玩家卡片标签` 中，启用更多标签。
 
 CommonButtons:
   announcement: 公告
@@ -89,7 +110,7 @@ TrafficButtons:
   close: 关闭
 
   modal:
-    title: 退出 League Akari
+    title: 退出 $t(common:appName)
     options:
       minimize-to-tray: 最小化到托盘区
       quit: 退出应用
@@ -122,16 +143,30 @@ AppSettings:
         quit: 退出应用
         ask: 每次询问
 
-    backgroundMaterial:
-      label: 背景材质
-      description: 设置应用界面的背景材质，需特定系统版本支持
+    preferredLolSource:
+      label: 首选数据源
+      description: 选择英雄联盟 API 数据源
+      unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
+      howToChoose: 如何选择？
       options:
-        none: 默认
-        mica: Mica
+        sgp: SGP API
+        lcu: LCU API
+      tip:
+        sgp:
+          title: SGP API
+          feature1: 查询速度快，响应迅速
+          feature2: 提供更详细的对局数据
+          feature3: 支持跨大区查询战绩
+          warning: 在中国大陆使用加速器游玩外服时，可能无法连接或响应缓慢
+        lcu:
+          title: LCU API (客户端本地)
+          feature1: 稳定性高，不受网络环境影响
+          feature2: 使用加速器时依然可靠
+          warning: 已知问题：在英雄选择阶段查询战绩可能导致游戏客户端崩溃
 
     dataSource:
-      label: 远程数据源
-      description: 设置应用的远程配置源，通过 GitHub / Gitee 获取或更新数据
+      label: Git 仓库源
+      description: 设置应用的 Git 仓库源，通过 GitHub / Gitee 获取或更新数据
       options:
         gitee: Gitee
         github: GitHub
@@ -142,13 +177,22 @@ AppSettings:
       tip:
         gitee: '在中国大陆内拥有较好的响应速度'
         github: '在中国大陆外拥有较好的响应速度'
+      better: 更快
+
+    theme:
+      label: 主题颜色
+      description: $t(common:appName) 的主题颜色
+      options:
+        default: 跟随系统
+        light: 亮色
+        dark: 暗色
 
   selfUpdate:
     title: 应用更新
 
-    autoCheckUpdates:
+    updateLatestRelease:
       label: 自动检查更新
-      description: 在应用启动时，自动从更新源拉取最新版本信息
+      description: 周期性检查是否有新版本
 
     autoDownloadUpdates:
       label: 自动下载更新
@@ -189,7 +233,15 @@ AppSettings:
 
     useProfileSkinAsBackground:
       label: 使用生涯皮肤背景
-      description: League Akari 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
+      description: $t(common:appName) 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
+
+    backgroundMaterial:
+      label: 背景材质
+      description: 设置应用界面的背景材质，需特定系统版本支持
+      options:
+        none: 默认
+        mica: Mica
+        micaUnsupported: 'Mica (不支持)'
 
   lcConnection:
     title: LCU 连接
@@ -198,13 +250,13 @@ AppSettings:
       label: 自动连接
       description: 存在唯一的客户端时，则自动连接该客户端
 
-    useWmic:
-      label: 使用 WMIC
-      description: 使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限
+    useWmi:
+      label: 使用 WMI 查询命令行
+      description: 使用 WMI 获取客户端命令行信息，而不是默认的 Win32 API 方式。使用 WMI 方式需要管理员权限
 
     rebuildWmi:
       label: 重建 WMI
-      description: 如果 WMIC 无法正常使用，可尝试此修复选项
+      description: 如果 WMI 无法正常使用，可尝试此修复选项
       rebuildButton: 重建 WMI
 
   misc:
@@ -241,6 +293,15 @@ AppSettings:
         label: 代理端口
         description: 代理服务器的端口
 
+    uninstallApp:
+      label: 卸载应用
+      description: 卸载应用，将删除所有数据和配置
+      button: 卸载应用
+      title: 卸载应用
+      content: 确定要卸载 $t(common:appName) 吗？将同时移除所有应用数据。
+      positiveText: 卸载
+      negativeText: 取消
+
 MatchHistorySettings:
   title: 战绩页面
 
@@ -248,11 +309,9 @@ MatchHistorySettings:
     label: 更新页面战绩
     description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
 
-  matchHistoryUseSgpApi:
-    label: 使用 SGP API
-    description: 战绩页面使用 SGP API 作为数据源
-    current: '当前 SGP Server: {{server}}'
-    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
+  loadCount:
+    label: 加载数量
+    description: 每个战绩页面加载的战绩数量
 
 OngoingGameSettings:
   title: 对局分析
@@ -271,18 +330,9 @@ OngoingGameSettings:
     label: 对局战绩分析数量
     description: 在对局页面中，用于分析每名玩家的战绩拉取对局数量
 
-  premadeTeamThreshold:
-    label: 预组队判定阈值
-    description: 当需要进行推测时，如果目标玩家群体出现在同一阵营超过 {{threshold}} 次时，则判定为预组队
-
   concurrency:
     label: 并发请求数量
     description: 在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数
-
-  matchHistoryUseSgpApi:
-    label: 使用 SGP API
-    description: 对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API
-    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
 
   matchHistoryTagPreference:
     label: 队列筛选偏好
@@ -291,9 +341,17 @@ OngoingGameSettings:
       all: 所有模式
       current: 当前模式
 
-  gameTimelineLoadCount:
-    label: 时间线信息加载数量
-    description: 会额外加载前 {{countV}} 场对局的时间线信息，用于对局分析
+  queryInLobbyPhase:
+    label: 在房间阶段生效
+    description: 位于房间时，查询房间内所有玩家的数据
+
+  premadeTeamInferMatchCountThreshold:
+    label: 预组队推测对局数阈值
+    description: $t(common:appName) 同时会收集战绩数据，用于推测玩家是否为预组队（开黑）。该数值用于确定：多名玩家在同一队伍中累计出现多少场对局，才会被判定为预组队
+
+  gameDetailsLoadCount:
+    label: 对局详情加载数量
+    description: 会额外加载前 {{countV}} 场对局的详细信息，用于对局分析
 
   showRecentlyUsedChampions:
     label: 显示最近使用的英雄
@@ -323,9 +381,9 @@ OngoingGameSettings:
       showLosingStreakTag:
         label: 连败场次
       showSoloKillsTag:
-        label: 场均单杀次数 (近 {{countV}} 场)
+        label: 场均单杀次数
       showSoloDeathsTag:
-        label: 场均被单杀次数 (近 {{countV}} 场)
+        label: 场均被单杀次数
       showAverageTeamDamageTag:
         label: 场均队伍伤害
       showAverageTeamDamageTakenTag:
@@ -356,7 +414,7 @@ OngoingGameSettings:
         label: Akari Score
 
 MultiWindowSettings:
-  title: 多窗口
+  title: 窗口管理
 
   auxWindow:
     title: 小窗口
@@ -467,13 +525,17 @@ MiscSettings:
   streamerMode:
     title: 直播模式
 
-    enabled:
-      label: 启用
-      description: 启用直播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
+    streamerMode:
+      label: 隐藏敏感信息
+      description: 隐藏所有敏感信息 (玩家 ID，区服等)
 
     useAkariStyledName:
       label: 使用 Akari 风格的名字
       description: 使用 Akari 风格的占位名字
+
+    contentProtection:
+      label: 内容保护
+      description: 启用内容保护，将禁止其他应用捕获窗口内容。注意，这可能会影响一些屏幕录制工具的正常使用
 
 DebugSettings:
   title: 调试
@@ -488,7 +550,7 @@ DebugSettings:
 
     reload:
       label: 页面重载
-      description: 刷新 League Akari 用户界面
+      description: 刷新 $t(common:appName) 用户界面
       button: 重新加载页面
 
   files:
@@ -504,7 +566,7 @@ DebugSettings:
       popoverTrigger: 详情
       button: 应用目录
       description:
-        part1: 打开 League Akari 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+        part1: 打开 $t(common:appName) 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
         part2: 存储用户设置、已标记的玩家等信息
         part3: 即将进行的自动更新临时文件
         part4: 一些可以替换的设置项文件
@@ -553,11 +615,11 @@ DebugSettings:
     TerminatedInError: '错误终止'
 
   inAdministrator:
-    description: League Akari 目前以管理员权限运行。现在，它是 League Akari X。
+    description: $t(common:appName) 目前以管理员权限运行。现在，它是 $t(common:appName) X
 
   kyokoMode:
     label: Kyoko 模式
-    description: 启用被废弃或实验性的功能
+    description: $t(common:appName) 不为人知的一面，启用更多的功能！
 
 StorageSettings:
   title: 存储
@@ -653,7 +715,7 @@ AutoGameflow:
     description: 在可接受时延迟执行接受操作的时间，单位为秒
   autoHonorEnabled:
     label: 自动点赞开启
-    description: 在游戏结束时，自动点赞。外部工具无法跳过点赞阶段，因此将会尝试用尽票数以完成点赞阶段
+    description: 在游戏结束时，自动用尽票数点赞。
   autoHonorStrategy:
     label: 点赞选择策略
     description: 这将决定具体给哪位玩家点赞
@@ -715,94 +777,111 @@ AutoGameflow:
   rejectInvitationWhenAway:
     label: 离开时拒绝邀请
     description: 当游戏状态为离开时，将拒绝所有房间邀请
+  autoSendARAMTeamSideEnabled:
+    label: 发送地图位置信息
+    description: 在如极地大乱斗、海克斯大乱斗等模式中，进入英雄选择时，将告知当前阵营所处地图的位置（蓝色方或红色方）。
+  autoSendARAMTeamSideVisibleToTeam:
+    label: 发送地图位置信息队友可见
+    description: “发送地图位置信息”的内容将对队伍内成员可见。
 
 AutoSelect:
-  normalModeTitle: 自动英雄选择 · 普通模式
-  benchModeTitle: 自动英雄选择 · 随机模式
-  banTitle: 自动禁用
+  title: 自动英雄选择和禁用
 
-  normalModeEnabled:
-    label: 开启
-    description: 在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式
+  temporarilyDisabled:
+    label: 临时禁用
+    button: 重新启用
+    description: 在本次英雄选择中，相关功能已被临时禁用。
 
-  showIntent:
-    label: 提前预选
-    description: 预选即将自动选用的英雄
+  groupTitle: 生效模式
+  groupEmpty: 暂无分组
 
-  selectTeammateIntendedChampion:
-    label: 无视队友预选
-    description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
+  groups:
+    ranked: 排位模式
+    normal: 普通模式
+    aram: 大乱斗类
+    cherry: 斗魂竞技场
+    urf: 无限火力
+    oneforall: 克隆模式
+    ultbook: 终极魔典
+    bot: 人机模式
+    custom: 自定义对局
+    ruby: 末日人工智能
 
-  pickStrategy:
-    label: 锁定策略
-    description: 立即锁定或只是亮出
-    options:
-      lock-in: 立即锁定
-      show: 仅亮出
-      show-and-delay-lock-in: 亮出后延迟锁定
+  pick:
+    title: 英雄选择
 
-  lockInDelaySeconds:
-    label: 自动锁定延迟 (s)
-    description: 在亮出英雄后，执行锁定操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
+    enabled:
+      label: 启用
+      description: 启用该模式的自动选择
 
-  expectedChampions:
-    label: 意向英雄
-    button: 配置
-    description: |
-      <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
-      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
-      <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+    expectedChampions:
+      label: 意向英雄
+      description: 自动选择将选择这些英雄，优先选择列表靠前的英雄
+      fragment1: 当分配到
+      fragment2: 位置时
 
-  benchModeEnabled:
-    label: 开启
-    description: 在随机英雄的模式中启用。如极地大乱斗等随机英雄的模式
+    showIntent:
+      label: 提前预选
+      description: 提前预选目标英雄
 
-  grabDelaySeconds:
-    label: 选用最低累积时间 (s)
-    description:
-      part1: 目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
-      part2: 当英雄出现在英雄选择台上时，会针对该英雄进行计时。仅当其在英雄选择台上的累计时间满足设定值时，自动交换才会执行，避免过早选择英雄，即 “秒抢”
+    ignoreIntent:
+      label: 无视队友预选
+      description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
 
-  benchSelectFirstAvailableChampion:
-    label: 优先选择首位
-    description: 开启此项后，将始终选用期望列表中第一个可用的英雄
+    strategy:
+      label: 锁定策略
+      description: 按照预设的策略执行自动选择流程
+      options:
+        just-show: 仅亮出
+        show-and-lock-in: 亮出后延迟锁定
 
-  benchHandleTradeEnabled:
-    label: 自动处理交换请求
-    description: |
-      <div>启用后，将接管即将到来的英雄交换请求</div>
-      <div>若已经启用“优先选择首位”，则接受优先级位更高的期望英雄，拒绝其他英雄</div>
-      <div>未启用“优先选择首位”同时未持有期望英雄时，若目标英雄为期望英雄，则接受</div>
-      <div>未启用“优先选择首位”同时持有期望英雄时，若目标英雄为期望英雄，则忽略</div>
+    delaySeconds:
+      label: 延时 (s)
+      description: 自动选择相关功能将根据预设的延时规划时间，包括预选、亮出、锁定或处理交换等。每个阶段都不会超过系统限时
 
-  benchHandleTradeIgnoreChampionOwner:
-    label: 忽略英雄物主
-    description: |
-      <div>处理英雄交换请求时，将考虑英雄所有者</div>
-      <div>若对方为该英雄的所有者，则不接管交换请求</div>
-      <div style="font-weight:bold">注意：无法处理追踪中途加入的英雄选择阶段</div>
+    benchMode:
+      title: 英雄备战席模式特定 (如果有)
+      tooltip: 如极地大乱斗、无限乱斗等拥有英雄备战席的模式
 
-  benchExpectedChampions:
-    label: 期望英雄
+    benchSwapAccumulatedDelaySeconds:
+      label: 选用最低累积时间 (s)
+      description: 仅当目标英雄出现在备战席上的累计时长超过此值时，才会执行交换操作
 
-  banEnabled:
-    label: 开启
-    description: 自动执行英雄的禁用操作
+    benchSelectFirstAvailableChampion:
+      label: 优先选择首位
+      description: 在目标英雄存在于备战席时，优先选择列表靠前的英雄
 
-  banDelaySeconds:
-    label: 自动禁用延时 (s)
-    description: 执行禁用操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
+    benchHandleTradeEnabled:
+      label: 自动处理交换请求
+      description: 当收到交换请求时，若满足预期英雄设置，则接受交换请求。否则会拒绝交换请求
 
-  banTeammateIntendedChampion:
-    label: 无视队友预选
-    description: 开启后将不会考虑队友的预选英雄
+  ban:
+    title: 英雄禁用
 
-  bannedChampions:
-    label: 禁用英雄
-    description: |
-      <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
-      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
-      <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
+    enabled:
+      label: 启用
+      description: 启用该模式的自动禁用
+
+    expectedChampions:
+      label: 意向英雄
+      description: 自动禁用将选择这些英雄，优先选择列表靠前的英雄
+      fragment1: 当分配到
+      fragment2: 位置时
+
+    ignoreIntent:
+      label: 无视队友预选
+      description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
+
+    strategy:
+      label: 锁定策略
+      description: 按照预设的策略执行自动禁用流程
+      options:
+        just-show: 仅亮出
+        show-and-lock-in: 亮出后延迟锁定
+
+    delaySeconds:
+      label: 延时 (s)
+      description: 自动禁用相关功能将根据预设的延时规划时间，包括亮出、锁定或处理交换等。每个阶段都不会超过系统限时
 
 AutoMisc:
   autoReply:
@@ -820,24 +899,39 @@ AutoMisc:
       label: 回复内容
       description: 将作为自动回复的内容词
 
+  autoInvitation:
+    title: 邀请好友进入房间
+    description: 进行一次性的监听，当指定好友空闲时，发出房间邀请。
+    unavailable: 当前不可用
+    scheduleInvite: 预约邀请
+    cancelSchedule: 取消预约
+    noFriends: 暂无好友
+    notInLobby: 不在房间内
+    searchPlaceholder: 搜索好友名称或标签
+
 SideBarMenu:
   match-history: 战绩
-  ongoing-game: 对局分析
+  ongoing-game: 对局
   automation: 自动操作
   toolkit: 工具集
   test: 测试
 
 SideBarFixed:
+  respawned: 已复活
+  respawnedContent: 你在游戏内已复活，祝你游戏愉快！
   currentConnected: 当前已连接
   launchedClients: 已启动的客户端
   launchedClientPlaceholder: 已启动的客户端 {{index}}
   noClientTitle: 无可用客户端
   noClient: 当前无可用客户端，请启动游戏
   settings: 设置
+  notConnected: 未连接
+  unknown: 未知
+  inConnectionLoop: 连接中...
   connectedClient: 已连接的客户端
 
   respawnTimer:
-    timeLeft: 距离重生还有 {{seconds}} s
+    timeLeft: 距离重生 {{seconds}} s
 
 ClientConnection:
   noClientGroup: 无可用客户端
@@ -853,11 +947,14 @@ ClientConnection:
   quitClient: 退出客户端进程
   disconnect: 断开
   more: 更多
+  playAgain: 回到房间
 
 OrderedChampionList:
   searchForChampion: 搜索英雄
   edit: 编辑
   unselected: 未选择
+  moveUp: 上移
+  moveDown: 下移
 
 RankedTable:
   queueType: 队列
@@ -879,11 +976,523 @@ RankedDisplay:
   highest: 最高
   empty: 无内容
 
+RankedPane:
+  unranked: 未定级
+  win: 胜
+  lose: 负
+  point: 分
+  leaguePoint: 胜点
+  highest: 最高
+  empty: 无内容
+  crossRegion: 跨区环境
+  unavailable: 无法获取排位队列信息
+
 DamageMetricsBar:
   total: 伤害总计
   physical: 物理伤害
   magic: 魔法伤害
   true: 真实伤害
+
+MatchCard:
+  common:
+    loading: 加载中...
+    noData: 暂无数据
+    refresh: 刷新
+
+  result:
+    abort: 被终止
+    remake: 重开
+    win: 胜利
+    loss: 失败
+    surrender: 投降
+
+  teamName:
+    TEAM-100: 蓝队
+    TEAM-200: 红队
+    CHERRY-0: '?'
+    CHERRY-1: 魄罗
+    CHERRY-2: 小兵
+    CHERRY-3: 迅捷蟹
+    CHERRY-4: 石甲虫
+    CHERRY-5: 锋喙鸟
+    CHERRY-6: 哨卫
+    CHERRY-7: 狼
+    CHERRY-8: 魔沼蛙
+
+  frameEventType:
+    CHAMPION_KILL: 英雄击杀
+    CHAMPION_SPECIAL_KILL: 特殊击杀
+    BUILDING_KILL: 摧毁建筑
+    TURRET_PLATE_DESTROYED: 防御塔镀层摧毁
+
+  buildingType:
+    TOWER_BUILDING: 防御塔
+    INHIBITOR_BUILDING: 抑制水晶
+
+  towerType:
+    OUTER_TURRET: 外防御塔
+    INNER_TURRET: 内防御塔
+    BASE_TURRET: 高地防御塔
+    NEXUS_TURRET: 枢纽防御塔
+
+  laneType:
+    MID_LANE: 中路
+    TOP_LANE: 上路
+    BOT_LANE: 下路
+
+  position:
+    TOP: 上路
+    JUNGLE: 打野
+    MIDDLE: 中路
+    BOTTOM: 下路
+    UTILITY: 辅助
+
+  teamTable:
+    objectives:
+      tower: 防御塔
+      inhibitor: 水晶
+      dragon: 巨龙
+      baron: 纳什男爵
+      voidGrub: 虚空巢虫
+      riftHerald: 峡谷先锋
+      atakhan: 厄塔汗
+    bans: 禁用
+    perMinuteSuffix: / 分钟
+
+  overview:
+    perfect: 完美
+    damage: 伤害
+
+  radar:
+    damage: 伤害 ({{value}})
+    taken: 承伤 ({{value}})
+    gold: 金币 ({{value}})
+    cs: 补兵 ({{value}})
+    kda: KDA ({{value}})
+    kp: 击杀参与率 ({{value}}%)
+    heal: 治疗 ({{value}})
+    teamAvg: 队伍平均
+
+  tabs:
+    summary: 总览
+    details: 详尽表格
+    runes: 符文
+    events: 事件
+    builds: 构建
+    lineChart: 线图
+
+  replay:
+    download: 下载回放
+    watch: 观看回放
+    unavailable: 回放不可用
+    label: 回放
+
+  buildsTab:
+    anvils: '{{count}} 锻'
+    skillBuild: 技能构建
+    noSkillUpgrades: 无技能升级
+    itemPurchases: 装备购买
+    noItemPurchases: 无装备购买
+
+  detailsTab:
+    gameId: 游戏 ID
+    gameVersion: 游戏版本
+    filterPlaceholder: 筛选
+    noFilterResult: 无筛选结果
+
+  diffLineChart:
+    dataType: 数据类型
+    gold: 金币
+    cs: 补刀
+    exp: 经验
+    teamAverage: 队伍平均
+    players: 玩家
+    selectAll: 全选
+    teamAverageSuffix: '{{name}}平均'
+    playerLabel: 玩家 {{id}}
+    gameTime: 游戏时间
+    metric:
+      gold:
+        title: 玩家经济增长曲线
+        yAxis: 金币
+        unit: 金币
+      cs:
+        title: 玩家补刀数增长曲线
+        yAxis: 补刀数
+        unit: 个
+      exp:
+        title: 玩家经验增长曲线
+        yAxis: 经验值
+        unit: 经验
+
+  eventsTab:
+    start: 开始游戏
+    end: 结束游戏
+    viewPosition: 查看位置
+    kill: 击杀
+    firstBlood: 第一滴血
+    multiKill: '{{count}} 杀'
+    ace: 团灭敌队
+    destroyBuilding: 摧毁建筑
+    destroyed: 摧毁了
+    destroyPlateTitle: 摧毁防御塔镀层
+    plateLane: '{{lane}} 防御塔镀层'
+    plate: 防御塔镀层
+    filters: 筛选
+    plateStats: 防御塔镀层统计
+    plateCount: '{{count}} 层'
+    viewVictimDamageDetails: 伤害明细
+
+    victimDamageDetails:
+      received: 受到伤害
+      dealt: 造成伤害
+      damageDealerNames:
+        champion: 英雄
+        tower: 防御塔
+        minion: 小兵
+        monster: 野怪
+        other: 其他
+
+  tags:
+    times: '{{label}}×{{count}}'
+    multiKill:
+      penta: 五杀
+      quadra: 四杀
+      triple: 三杀
+      double: 双杀
+    damage:
+      bestLabel: '★ 伤害'
+      teamLabel: 伤害
+      bestContent: '全场最高伤害：{{value}}，占队伍伤害的 {{rate}}%'
+      teamContent: '队伍最高伤害：{{value}}，占队伍伤害的 {{rate}}%'
+    taken:
+      bestLabel: '★ 承伤'
+      teamLabel: 承伤
+      bestContent: '全场最高承伤：{{value}}，占队伍承伤的 {{rate}}%'
+      teamContent: '队伍最高承伤：{{value}}，占队伍承伤的 {{rate}}%'
+    heal:
+      bestLabel: '★ 治疗'
+      teamLabel: 治疗
+      bestContent: '全场最高治疗：{{value}}，占队伍治疗的 {{rate}}%'
+      teamContent: '队伍最高治疗：{{value}}，占队伍治疗的 {{rate}}%'
+    tower:
+      bestLabel: '★ 拆塔'
+      teamLabel: 拆塔
+      bestContent: '全场最高对塔伤害：{{value}}，占队伍对塔伤害的 {{rate}}%'
+      teamContent: '队伍最高对塔伤害：{{value}}，占队伍对塔伤害的 {{rate}}%'
+    shield:
+      bestLabel: '★ 护盾'
+      teamLabel: 护盾
+      bestContent: '全场最高护盾：{{value}}，占队伍护盾的 {{rate}}%'
+      teamContent: '队伍最高护盾：{{value}}，占队伍护盾的 {{rate}}%'
+    solo:
+      label: 单杀
+      content: '造成了 {{value}} 次单杀'
+    gold:
+      bestLabel: '★ 金币'
+      teamLabel: 金币
+      bestContent: '全场最高经济：{{value}}，占队伍经济的 {{rate}}%'
+      teamContent: '队伍最高经济：{{value}}，占队伍经济的 {{rate}}%'
+    damageGoldEfficiency:
+      bestLabel: '★ 伤转率'
+      teamLabel: 伤转率
+      bestContent: '最高伤转率：{{rate}}%'
+      teamContent: '队内最高伤转率：{{rate}}%'
+    cs:
+      bestLabel: '★ 补兵'
+      bestContent: '全场最高补兵：{{value}}'
+    csAdvantage:
+      label: 压刀
+      content: '同路补刀压制对手最多 {{value}} 个'
+    kills:
+      bestLabel: '★ 击杀'
+      teamLabel: 击杀
+      bestContent: '全场最多击杀：{{value}}'
+      teamContent: '队伍最多击杀：{{value}}'
+    kp:
+      bestLabel: '★ 参团'
+      teamLabel: 参团
+      bestContent: '全场最高参团率：{{value}}%'
+      teamContent: '队伍最高参团率：{{value}}%'
+    knockUp:
+      label: 好钩
+      content: '将敌方英雄击飞或拉入我方并击杀 {{value}} 次'
+    cc:
+      bestLabel: '★ 控制'
+      teamLabel: 控制
+      bestContent: '全场最久控制，控制了敌方英雄 {{value}} 秒'
+      teamContent: '队伍最久控制，控制了敌方英雄 {{value}} 秒'
+    towerKill:
+      diveLabel: 越塔
+      underLabel: 塔之子
+      diveContent: '在敌方塔下击杀 {{value}} 次'
+      underContent: '在己方塔下击杀 {{value}} 次'
+    none:
+      label: 平平无奇
+      content: 本局没有出彩的地方
+
+  groups:
+    combat-stats: 战斗数据
+    damage: 伤害数据
+    cc: 控制
+    vision: 视野
+    buildings: 建筑
+    economy: 经济
+    healing: 治疗
+    pings: 信号
+    combat-advanced: 战斗进阶
+    objectives: 目标
+    statistics: 统计
+    abilities: 技能
+    survival-skills: 生存技巧
+    teamfight: 团战
+    misc: 其他
+    ignored: 忽略
+    game-state: 游戏状态
+
+  statKeys:
+    # Combat Stats - 战斗数据
+    kills: 击杀
+    deaths: 死亡
+    assists: 助攻
+    doubleKills: 双杀
+    tripleKills: 三杀
+    quadraKills: 四杀
+    pentaKills: 五杀
+    unrealKills: 超神
+    killingSprees: 连杀
+    largestKillingSpree: 最大连杀
+    largestMultiKill: 最大多杀
+    longestTimeSpentLiving: 最长存活时间
+    largestCriticalStrike: 最大暴击伤害
+    damageGoldEfficiency: 伤转率
+    # Damage - 伤害数据
+    totalDamageDealtToChampions: 对英雄总伤害
+    physicalDamageDealtToChampions: 对英雄物理伤害
+    magicDamageDealtToChampions: 对英雄魔法伤害
+    trueDamageDealtToChampions: 对英雄真实伤害
+    totalDamageDealt: 总伤害输出
+    physicalDamageDealt: 物理伤害输出
+    magicDamageDealt: 魔法伤害输出
+    trueDamageDealt: 真实伤害输出
+    damageDealtToObjectives: 对战略点伤害
+    damageDealtToTurrets: 对防御塔伤害
+    damageDealtToBuildings: 对建筑物伤害
+    damageDealtToEpicMonsters: 对史诗野怪伤害
+    totalDamageTaken: 承受总伤害
+    physicalDamageTaken: 承受物理伤害
+    magicDamageTaken: 承受魔法伤害
+    magicalDamageTaken: 承受魔法伤害
+    trueDamageTaken: 承受真实伤害
+    damageSelfMitigated: 自我缓和的伤害
+    totalDamageShieldedOnTeammates: 为队友提供护盾量
+    # CC - 控制
+    timeCCingOthers: 控制他人时长
+    totalTimeCCDealt: 总控制时长
+    totalTimeCrowdControlDealt: 总控制时长
+    enemyChampionImmobilizations: 定身敌方英雄次数
+    immobilizeAndKillWithAlly: 定身并与队友击杀
+    knockEnemyIntoTeamAndKill: 将敌方拉入己方并击杀
+    survivedThreeImmobilizesInFight: 三次定身后仍存活
+    highestCrowdControlScore: 最高控制得分
+    # Vision - 视野
+    visionScore: 视野得分
+    wardsPlaced: 插眼数
+    wardsKilled: 排眼数
+    sightWardsBoughtInGame: 购买假眼数
+    visionWardsBoughtInGame: 购买真眼数
+    detectorWardsPlaced: 放置侦查守卫
+    visionScorePerMinute: 每分钟视野得分
+    visionScoreAdvantageLaneOpponent: 对线对手视野得分优势
+    wardTakedowns: 摧毁守卫数
+    wardTakedownsBefore20M: 二十分钟前排眼数
+    wardsGuarded: 守卫保护数
+    twoWardsOneSweeperCount: 一次扫描清除两个眼
+    controlWardsPlaced: 放置控制守卫
+    stealthWardsPlaced: 放置隐形守卫
+    # Buildings - 建筑
+    turretKills: 防御塔击杀
+    turretTakedowns: 防御塔摧毁
+    soloTurretsLategame: 后期单带拆塔
+    turretsLost: 失去防御塔
+    firstTowerKill: 首个防御塔摧毁
+    firstTowerAssist: 首个防御塔助攻
+    firstTurretKilled: 首个防御塔
+    firstTurretKilledTime: 首个防御塔时间
+    turretPlatesTaken: 塔皮摧毁数
+    kTurretsDestroyedBeforePlatesFall: 塔皮掉落前摧毁防御塔
+    outerTurretExecutesBefore10Minutes: 十分钟前外塔击杀
+    quickFirstTurret: 快速首塔
+    takedownOnFirstTurret: 首塔击杀参与
+    turretsTakenWithRiftHerald: 峡谷先锋摧毁防御塔
+    multiTurretRiftHeraldCount: 先锋多塔摧毁
+    inhibitorKills: 水晶击杀
+    inhibitorTakedowns: 水晶摧毁
+    inhibitorsLost: 失去水晶
+    firstInhibitorKill: 首个水晶击杀
+    firstInhibitorAssist: 首个水晶助攻
+    lostAnInhibitor: 失去水晶
+    nexusKills: 主水晶击杀
+    nexusLost: 失去主水晶
+    nexusTakedowns: 主水晶摧毁
+    hadOpenNexus: 主水晶暴露
+    outnumberedNexusKill: 人数劣势主水晶摧毁
+    objectivesStolen: 战略点偷取
+    objectivesStolenAssists: 战略点偷取助攻
+    # Economy - 经济
+    goldEarned: 获得金币
+    goldSpent: 花费金币
+    totalMinionsKilled: 补刀数
+    neutralMinionsKilled: 野怪击杀
+    neutralMinionsKilledEnemyJungle: 敌方野区野怪
+    neutralMinionsKilledTeamJungle: 己方野区野怪
+    totalAllyJungleMinionsKilled: 己方野区野怪总数
+    totalEnemyJungleMinionsKilled: 敌方野区野怪总数
+    consumablesPurchased: 购买消耗品
+    itemsPurchased: 购买装备
+    earlyLaningPhaseGoldExpAdvantage: 早期对线阶段金币经验优势
+    laningPhaseGoldExpAdvantage: 对线阶段金币经验优势
+    maxCsAdvantageOnLaneOpponent: 对线对手最大补刀优势
+    # Healing - 治疗
+    totalHeal: 总治疗量
+    totalUnitsHealed: 治疗单位数
+    totalHealsOnTeammates: 队友治疗量
+    # Pings - 信号
+    allInPings: 开团信号
+    assistMePings: 请求协助信号
+    basicPings: 基础信号
+    commandPings: 命令信号
+    dangerPings: 危险信号
+    enemyMissingPings: 敌人消失信号
+    enemyVisionPings: 敌方视野信号
+    getBackPings: 后退信号
+    holdPings: 等待信号
+    needVisionPings: 需要视野信号
+    onMyWayPings: 正在路上信号
+    pushPings: 推进信号
+    retreatPings: 撤退信号
+    visionClearedPings: 视野清除信号
+    # Combat Advanced - 战斗进阶
+    soloKills: 单杀
+    quickSoloKills: 快速单杀
+    takedowns: 击杀参与
+    outnumberedKills: 以少打多击杀
+    multikills: 多杀
+    multikillsAfterAggressiveFlash: 进攻性闪现多杀
+    multiKillOneSpell: 单技能多杀
+    killAfterHiddenWithAlly: 与队友藏身后击杀
+    pickKillWithAlly: 与队友抓人
+    killsWithHelpFromEpicMonster: 史诗野怪增益击杀
+    takedownsBeforeJungleMinionSpawn: 野怪刷新前击杀
+    takedownsFirstXMinutes: 前X分钟击杀
+    takedownsAfterGainingLevelAdvantage: 等级优势击杀
+    takedownsInAlcove: 凹室击杀
+    takedownsInEnemyFountain: 敌方泉水击杀
+    killsOnOtherLanesEarlyJungleAsLaner: 线上英雄早期支援击杀
+    getTakedownsInAllLanesEarlyJungleAsLaner: 早期全线支援
+    killsOnRecentlyHealedByAramPack: 击杀刚拾取治疗包的敌人
+    # Objectives - 战略点
+    baronTakedowns: 参与大龙击杀
+    dragonTakedowns: 参与小龙击杀
+    riftHeraldTakedowns: 参与峡谷先锋击杀
+    teamBaronKills: 团队大龙击杀
+    teamElderDragonKills: 团队远古龙击杀
+    teamRiftHeraldKills: 团队先锋击杀
+    soloBaronKills: 单杀大龙
+    baronBuffGoldAdvantageOverThreshold: 大龙Buff金币优势
+    earliestBaron: 最早大龙时间
+    earliestDragonTakedown: 最早小龙时间
+    elderDragonKillsWithOpposingSoul: 敌方有龙魂时的远古龙
+    elderDragonMultikills: 远古龙增益多杀
+    perfectDragonSoulsTaken: 完美龙魂
+    epicMonsterSteals: 偷取史诗野怪
+    epicMonsterStolenWithoutSmite: 无惩戒偷取史诗野怪
+    epicMonsterKillsNearEnemyJungler: 敌方打野附近击杀史诗野怪
+    epicMonsterKillsWithin30SecondsOfSpawn: 刷新30秒内击杀史诗野怪
+    junglerTakedownsNearDamagedEpicMonster: 打野在受伤史诗野怪附近击杀
+    voidMonsterKill: 虚空野怪击杀
+    alliedJungleMonsterKills: 己方野怪击杀
+    enemyJungleMonsterKills: 敌方野怪击杀
+    scuttleCrabKills: 河蟹击杀
+    buffsStolen: 偷取 BUFF
+    jungleCsBefore10Minutes: 十分钟前野区补刀
+    initialBuffCount: 初始 BUFF 数量
+    initialCrabCount: 初始河蟹数量
+    moreEnemyJungleThanOpponent: 反野数量领先
+    # Statistics - 统计
+    kda: KDA
+    killParticipation: 击杀参与率
+    damagePerMinute: 每分钟伤害
+    goldPerMinute: 每分钟金币
+    damageTakenOnTeamPercentage: 团队承伤占比
+    teamDamagePercentage: 团队伤害占比
+    # Abilities - 技能
+    abilityUses: 技能使用次数
+    spell1Casts: Q技能施放
+    spell2Casts: W技能施放
+    spell3Casts: E技能施放
+    spell4Casts: R技能施放
+    summoner1Casts: 召唤师技能1施放
+    summoner2Casts: 召唤师技能2施放
+    # Survival Skills - 生存技巧
+    deathsByEnemyChamps: 被敌方英雄击杀
+    survivedSingleDigitHpCount: 个位数生命存活
+    tookLargeDamageSurvived: 承受大量伤害存活
+    killedChampTookFullTeamDamageSurvived: 击杀后承受全队伤害存活
+    saveAllyFromDeath: 救队友于死亡
+    skillshotsDodged: 躲避技巧技能
+    skillshotsHit: 命中技巧技能
+    snowballsHit: 命中雪球
+    dodgeSkillShotsSmallWindow: 短时间内躲避技巧技能
+    landSkillShotsEarlyGame: 早期命中技巧技能
+    blastConeOppositeOpponentCount: 爆炸果实击退敌人
+    quickCleanse: 快速净化
+    dancedWithRiftHerald: 与先锋共舞
+    fistBumpParticipation: 碰拳参与
+    # Teamfight - 团战
+    flawlessAces: 完美团灭
+    doubleAces: 双重团灭
+    acesBefore15Minutes: 十五分钟前团灭敌方
+    fullTeamTakedown: 全队参与击杀
+    shortestTimeToAceFromFirstTakedown: 首杀到团灭最短时间
+    12AssistStreakCount: 12连助攻
+    teleportTakedowns: 传送参与击杀
+    # Misc - 其他
+    champLevel: 英雄等级
+    champExperience: 英雄经验
+    timePlayed: 游玩时长
+    totalTimeSpentDead: 死亡时长
+    firstBloodKill: 一血
+    firstBloodAssist: 一血助攻
+    baronKills: 大龙击杀
+    dragonKills: 小龙击杀
+    killsNearEnemyTurret: 敌方塔下击杀
+    killsUnderOwnTurret: 己方塔下击杀
+    unseenRecalls: 未被发现回城
+    effectiveHealAndShielding: 有效治疗和护盾
+    bountyGold: 赏金金币
+    laneMinionsFirst10Minutes: 前十分钟线上补刀
+    twentyMinionsIn3SecondsCount: 三秒内二十补刀
+    legendaryCount: 超神次数
+    perfectGame: 完美游戏
+    maxKillDeficit: 最大击杀劣势
+    maxLevelLeadLaneOpponent: 对线对手最大等级领先
+    completeSupportQuestInTime: 按时完成辅助任务
+    mejaisFullStackInTime: 按时满层杀人书
+    HealFromMapSources: 地图资源治疗
+    gameLength: 游戏总时长
+    playedChampSelectPosition: 选择的英雄位置
+    hadAfkTeammate: 队友挂机
+    highestChampionDamage: 最高英雄伤害
+    # Game State - 游戏状态
+    gameEndedInEarlySurrender: 重开投降
+    gameEndedInSurrender: 游戏以投降结束
+    causedEarlySurrender: 导致提前投降
+    earlySurrenderAccomplice: 提前投降同谋
+    teamEarlySurrendered: 队伍提前投降
+    # Boolean values
+    'true': 是
+    'false': 否
 
 SpectateStatus:
   button: 观战
@@ -897,13 +1506,13 @@ SpectateStatus:
     button: LCU API 观战
 
   tokenSpectate:
-    label: 复制观战口令
-    description: 可以在另一个 League Akari 中调起观战进程
+    label: 分享观战信息
+    description: 可以在另一个 $t(common:appName) 或其他应用中调起观战进程
     button: 复制
-    copied: 已复制观战口令
-    copyFailed: 复制观战口令失败
+    copied: 对局密钥已复制
+    copyFailed: 复制观战信息失败
 
-MatchHistoryTabsTitle:
+PlayerTabsTitle:
   loading: 加载中...
   search: 搜索玩家
   refresh: 刷新
@@ -913,33 +1522,31 @@ MatchHistoryTabsTitle:
   screenshot: 截图当前页面
   searchButtonStreamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
 
-SearchSummonerModal:
-  title: 召唤师搜索
-  placeholder: Enter the summoner name
-  sgpServer: 区服
+SearchPane:
+  title: 搜索召唤师
+  combinedServersReference: 合区参照
+  searchTypePuuid: PUUID
+  searchTypeExact: 精确
+  searchTypeFuzzy: 模糊
   cancel: 取消
-  search: 搜索玩家
-  result: 搜索结果
-  friends: 好友
-  history: 近期访问
-  validating: 正在验证玩家 ({{current}} / {{total}})
-  validated: 验证了 {{countV}} 条可能的玩家记录，无搜索结果符合
-  noResult: 无搜索结果符合
+  search: 搜索
+  resultCount: 搜索结果共 {{count}} 个
   privacy: 生涯隐藏
-  currentRoute: 当前
-  invalidInput: 当前输入不符合格式要求：应为 "游戏名称#标签" 或 "游戏名称"
-  hasInvisibleChar: 当前搜索文本包含不可见字符，将被过滤
-  puuidSearch: 当前为精确搜索：搜索指定 PUUID
-  exactSearch: 当前为精确搜索：搜索指定名称和标签的召唤师
-  fuzzySearch: 当前为模糊搜索：搜索指定名称的召唤师
+  searching: 查询中
+  noResult: 暂无搜索结果
+  noResultHintFuzzy: 搜索名称，如
+  noResultHintExact: 按照名称和标签精确搜索，如
+  noResultHintPuuid: 按照 PUUID 搜索，如
+  noResultHintFuzzyExample: 船见结衣
+  noResultHintExactExample: '岁纳京子 #12345'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: 最近访问
+  pinned: 置顶 ({{count}})
+  recent: 近期 ({{count}})
+  noRecentVisits: 暂无最近访问
+  friends: 好友 ({{count}})
+  noFriends: 暂无好友
   getFriendsFailed: 获取好友列表失败
-  showAll: 显示所有
-  clear: 清空
-
-  placeholders:
-    - '如完整查询：赤座灯里#akari'
-    - '如模糊查询 - 格式如：船见结衣'
-    - '如 PUUID 查询 - 格式如：<puuid>'
 
 PlayerTagEditModal:
   title: 编辑玩家标记
@@ -979,7 +1586,7 @@ Client:
 
     disconnect:
       label: 断开连接
-      description: 断开 League Akari 与 League Client 的连接
+      description: 断开 $t(common:appName) 与 League Client 的连接
       button: 断开
 
     quitClient:
@@ -1070,6 +1677,7 @@ Toolkit:
   misc: 百宝箱
   claim-tools: 领取工具
   friend-tools: 好友工具
+  loot-tools: 战利品工具
 
 ChampionBench:
   title: 英雄选择台
@@ -1348,21 +1956,43 @@ Spectate:
 
   failedToLoadFriends: 无法加载好友列表
 
-MatchHistoryTabs:
+PlayerTabs:
   disconnected: 未连接到客户端
   queueing: 正在进行登录排队
   noActiveTab: 当前没有活跃的战绩页面
   copiedToClipboard: 已复制到剪贴板
   dropZoneRosterMember: 投放以转到该玩家
 
-MatchHistoryTab:
+PlayerTab:
   prevPage: 上一页
   nextPage: 下一页
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家
-  itemPerPage: '{{countV}} 项'
+  filter:
+    title: 页内筛选
+    reset: 重置条件
+    winLoss: 胜负
+    all: 全部
+    win: 胜利
+    loss: 失败
+    summoners: 涉及召唤师
+    champions: 涉及英雄
+  itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
+
+  summonerNotFoundTitle: 找不到召唤师 {{puuid}}
+  summonerNotFoundContent: 您正在寻找的召唤师不存在
+  failedToLoadSummonerTitle: 加载召唤师失败
+  failedToLoadSummonerContent: 无法加载召唤师信息：{{reason}}
+  failedToLoadMatchHistoryTitle: 加载战绩失败
+  failedToLoadMatchHistoryContent: 无法加载战绩：{{reason}}
+  failedToLoadRankedStatsTitle: 加载排位统计失败
+  failedToLoadRankedStatsContent: 无法加载排位统计：{{reason}}
+
+  noMatchHistory: 暂无战绩
+  noFilteredMatchHistory: 暂无符合条件的战绩
+  loading: 加载中...
 
   private:
     title: 生涯隐藏
@@ -1393,6 +2023,8 @@ MatchHistoryTab:
     wr: 胜率
     champions: 英雄使用
     times: 场
+    teamSides: 阵营分布
+    activeSession: 活跃时段胜负
 
   recentPlayers:
     teammatesTitle: 最近队友
@@ -1459,7 +2091,8 @@ MatchHistoryCard:
   abort: 被终止
   surrender: 投降
 
-StandaloneMatchHistoryCardModal:
+MatchPreviewer:
+  noData: 暂无数据
   notFound: 未找到对局
   error: 加载对局失败
   reload: 重新拉取
@@ -1631,7 +2264,8 @@ SummonerSpellDisplay:
 
 # 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
-  empty: 无内容
+  reload: 重新加载
+  empty: 无此队列对局记录
   loadingMatchHistory: 加载中...
   errorLoadingMatchHistory: 无法加载
   top4Rate: 前四率
@@ -1666,7 +2300,7 @@ PlayerInfoCard:
     gameStats: 对局详情
     winResult:
       abort: 终止
-      lose: 失败
+      loss: 失败
       remake: 重开
       win: 胜利
     team:
@@ -1677,16 +2311,13 @@ PlayerInfoCard:
   losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
   suspiciousFlashPosition: 闪现异位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
-  soloKills:
-    tooManySoloDeathsInEarlyGame: 被单杀 {{times}} 次
-    tooManySoloDeathsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家被单杀平均 {{times}} 次
-    tooManySoloKillsInEarlyGame: '{{times}} 单杀'
-    tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
+  soloKills: '{{times}} 单杀'
+  soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家场均单杀 {{times}} 次
   akariLoved:
-    good: 优异
-    great: 通天代
-    goodPopover: 该玩家在近期对局中表现优异
-    greatPopover: 该玩家的水平远远超过当前段位
+    outstanding: 优异
+    extraordinary: 通天代
+    outstandingPopover: 该玩家在近期对局中表现优异
+    extraordinaryPopover: 该玩家的水平远远超过当前段位
   champion:
     winRate: 近期 {{countV}} 场，胜率为 {{winRate}}%
     level: '{{level}} 级'
@@ -1695,7 +2326,7 @@ PlayerInfoCard:
     winResult:
       na: '-'
       win: 胜
-      lose: 负
+      loss: 负
       remake: 重
       abort: 终
 
@@ -1711,6 +2342,8 @@ PlayerInfoCard:
   losingStreak: '{{countV}} 连败'
   unknown: 未知
 
+  reloadMatchHistory: 重新加载
+
 TeamTagsArea:
   winRateTeam: 胜率队
   loseRateTeam: 败率队
@@ -1722,22 +2355,22 @@ OngoingGame:
   disconnected: 未连接到客户端
   waitingForSpectate: 等待观战延迟
   noOngoingGame: 没有正在进行中的游戏
-  disabled: 对局分析已禁用
+  disabled: 对局分析已禁用，请在设置中重新启用此功能
   avgTeamWinRate: 队伍平均胜率
   avgTeamKda: 队伍平均 KDA
 
-AuxWindowTitleBar:
+AuxWindowTitlebar:
   opgg: 使用 OP.GG
   opggTitle: 集成的 OP.GG
   close: 关闭
   minimize: 最小化
   indicator: 小窗
-  indicatorTitle: League Akari 的小型辅助功能窗口
+  indicatorTitle: $t(common:appName) 的小型辅助功能窗口
   pin: 置顶
   unpin: 取消置顶
   repositionToAlignLeagueClientUx: 贴附到客户端
 
-OpggWindowTitleBar:
+OpggWindowTitlebar:
   close: 关闭
   minimize: 最小化
   pin: 置顶
@@ -1765,11 +2398,6 @@ BenchChampionsMini:
     tenacity: 韧性
     energy-regen: 能量回复
 
-BenchModeAutoGrab:
-  grabbing: 即将选择 {{seconds}} s
-  noExpectedChampions: 自动选择没有设置期望英雄列表
-  noCandidate: 自动选择无可用英雄
-
 ChampSelectActions:
   picked: 已选择
   voted: 已投票
@@ -1782,6 +2410,12 @@ ChampSelectActions:
   tenBansRevealing: 系统 · 禁用展示
   inProgress: 进行中
   completed: 已完成
+  ceremonies:
+    ten_bans_reveal: '禁用展示'
+    TEN_BANS_REVEAL: '禁用展示'
+    phase_transition: '阶段过渡'
+    vote_transition: '投票过渡'
+    team_vote_reveal: '团队投票展示'
 
 ChampSelectOperations:
   dodge:
@@ -1790,18 +2424,10 @@ ChampSelectOperations:
     popconfirm: 这将退出英雄选择阶段
     positiveText: 退出
     negativeText: 取消
+    cancel: 取消
 
-  dodgeAtLastSecond:
-    label: 最后一秒秒退阈值
-    waitingForTiming: 最后一秒秒退 (等待时机)
-    waiting: 最后一秒秒退 ({{seconds}} s)
-    text: '最后一秒秒退'
-    thresholdWarning: 过低的阈值 ({{seconds}} s) 可能会导致秒退失败
-
-  autos:
-    autoPick: 自动选择
-    autoBan: 自动禁用
-    autoGrab: 自动选择
+  temporarilyDisabled:
+    label: 临时取消自动选择/禁用
 
 LoungeOperations:
   immediately: 立即
@@ -1862,11 +2488,10 @@ Placeholder:
   idle: 当前没有进行中的活动
   spectating: 等待观战中
 
-Opgg:
+OpggTabAndFilters:
   toOpgg: 转到 OP.GG
   refresh: 刷新
-  close: 关闭
-  tier: 梯队
+  champions: 梯队
   champion: 英雄
   empty: 无
   mode: 模式
@@ -1874,46 +2499,6 @@ Opgg:
   rankTier: 段位
   position: 位置
   version: 版本
-  replace: 提供
-  create: 创建
-  notConnected: 未连接到客户端，部分资源无法加载
-  cancel: 取消
-
-  settings:
-    button: 设置
-    title: OP.GG 设置
-
-    flashPosition:
-      label: 闪现位置偏好
-      description: 设置召唤师技能时，若存在闪现技能，优先选择的位置
-      auto: 当前闪现的位置
-      options:
-        d: 闪现位置默认在 D
-        f: 闪现位置默认在 F
-        auto: 根据当前闪现的位置决定
-
-    autoApplyRunes:
-      label: 自动应用符文
-      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
-
-    autoApplySpells:
-      label: 自动应用召唤师技能
-      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
-
-    autoApplyItems:
-      label: 自动应用装备方案
-      description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
-
-  success: '请求已发送: {{reason}}'
-  summonerSpells: 召唤师技能
-  runes: 符文配法
-  loadVersionsFailedMessage: 获取版本数据失败：{{reason}}
-  loadTierFailedMessage: 获取梯队数据失败：{{reason}}
-  loadChampionFailedMessage: 获取英雄数据失败：{{reason}}
-  setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
-  setRunesFailedMessage: 设置符文配法失败：{{reason}}
-  spellsSet: '[League Akari] 已设置召唤师技能: {{spell1}} | {{spell2}}'
-  runesSet: '[League Akari] 已{{action}}符文配法: {{name}}'
 
   modes:
     ranked: '排位'
@@ -1964,7 +2549,10 @@ Opgg:
     grandmaster: '宗师'
     challenger: '王者'
 
-OpggTier:
+  settings:
+    button: 设置
+
+OpggChampionTable:
   searchPlaceholder: 查找英雄
   columns:
     champion: 英雄
@@ -1973,8 +2561,54 @@ OpggTier:
     pickRate: 登场率
     counter: 劣势对位
     banRate: 禁用率
+  cancel: 取消
+
+OpggView:
+  replace: 提供
+  create: 创建
+  noVersionFound: 未找到版本
+
+  settings:
+    title: OP.GG 设置
+
+    enabled:
+      label: 开启
+      description: 启用 OP.GG 窗口。关闭后，可在主菜单重新启用它
+
+    flashPosition:
+      label: 闪现位置偏好
+      description: 在设置召唤师技能时，放置闪现的位置
+      auto: 当前位置
+      options:
+        d: 闪现位置默认在 D
+        f: 闪现位置默认在 F
+        auto: 根据当前闪现的位置决定
+
+    autoApplyRunes:
+      label: 自动应用符文
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplySpells:
+      label: 自动应用召唤师技能
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplyItems:
+      label: 自动应用装备方案
+      description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
+
+  success: '请求已发送: {{reason}}'
+  summonerSpells: 召唤师技能
+  runes: 符文配法
+  setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
+  setRunesFailedMessage: 设置符文配法失败：{{reason}}
+  spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
+  runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
+
+  sessionChampions:
+    title: 本局英雄
 
 OpggChampion:
+  boots: 鞋子
   adorableRabi: 兔兔好可爱
   avgPlace: 平均排名
   1st: 第一
@@ -2004,8 +2638,19 @@ OpggChampion:
   augmentSilver: 白银阶
   augmentPrism: 棱彩阶
   synergies: 搭配
+  balance:
+    title: 平衡性调整
+    attack_speed: 攻击速度
+    damage_dealt: 造成伤害
+    damage_taken: 承受伤害
+    cooldown_reduction: 冷却缩减
+    healing: 治疗效果
+    tenacity: 韧性
+    shield_amount: 护盾值
+    energy_regen: 能量回复
+    area_of_effect_damage: AoE 伤害
 
-  writeToDisk: '[League Akari] 已写入到装备方案：{{name}}'
+  writeToDisk: '[$t(common:appName)] 已写入到装备方案：{{name}}'
   writtenToDisk: 已写入到文件中
   writeFileFailedMessage: 写入文件失败 {{reason}}
   bootsDesc: 鞋子 (按出场率排序)
@@ -2013,8 +2658,9 @@ OpggChampion:
   itemsDesc: 装备 (按出场率排序)
   coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
   starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
+  cancel: 取消
 
-EasyToLaunch:
+StartupPane:
   tcls: TCLS 客户端
   weGame: WeGame
   riotClient: Riot 客户端
@@ -2106,6 +2752,7 @@ ClaimableItem:
 
 FriendTools:
   title: 好友
+  searchPlaceholder: 搜索好友名称或标签
 
   deleteButtonC: 删除 ({{countV}})
   deleteButton: 删除
@@ -2124,6 +2771,11 @@ FriendTools:
     groupName: 好友分组
     lastGameDate: 最后对局日期
     friendSince: 成为好友时间
+
+LootTools:
+  title: 战利品工具
+  refreshSuccess: 已刷新
+  refreshFailed: 拉取失败 {{reason}}
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
@@ -2157,6 +2809,14 @@ TemplateEdit:
     ongoing-game: 默认对局模板
     remote: 云端模板
 
+  templateErrorTypes:
+    'not-an-object': 模板不是一个对象
+    'no-getMetadata': 模板缺少 getMetadata 方法
+    'no-metadata': getMetadata 方法未返回元数据对象
+    'unsupported-version': 模板版本不受支持
+    'wrong-template-type': 模板类型不正确
+    'no-getMessages': 模板缺少 getMessages 方法
+
 SendableItemEdit:
   title: 发送项
   newButton: 新发送项
@@ -2169,6 +2829,14 @@ SendableItemEdit:
   deleteButton: 删除
   errorTemplateInvalid: 使用了无效的模板
   errorTemplateExecutionFailed: 上一次执行次模板时出现错误
+
+  templateErrorTypes:
+    'not-an-object': 模板不是一个对象
+    'no-getMetadata': 模板缺少 getMetadata 方法
+    'no-metadata': getMetadata 方法未返回元数据对象
+    'unsupported-version': 模板版本不受支持
+    'wrong-template-type': 模板类型不正确
+    'no-getMessages': 模板缺少 getMessages 方法
   plaintextPlaceholder: |
     在这里提供按行分割的文本，比如：
     第一行
@@ -2222,6 +2890,24 @@ RemoteTemplatesModal:
   noTemplates: 暂无模板
   noTemplateDescription: 暂无描述
 
+AutomationPlan:
+  autoPick:
+    title: 自动选择
+    willPick: 将自动选择
+
+  autoBan:
+    title: 自动禁用
+    willBan: 将自动禁用
+
+  autoBenchSwap:
+    title: 自动交换
+    willSwap: 将自动交换
+
+  autoChampionSwap:
+    title: 自动交换
+    willAccept: 将自动接受交换
+    willDecline: 将自动拒绝交换
+
 simple-notifications-renderer:
   newReleaseHints:
     title: 新版本可用
@@ -2236,12 +2922,26 @@ simple-notifications-renderer:
 
     detected:
       title: 在直播吗？
-      liveTools: League Akari 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
-      bySettings: League Akari 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
+      liveTools: $t(common:appName) 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
+      bySettings: $t(common:appName) 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
 
   login-queue-task:
     name: 登录排队
     description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}})'
+
+  higherVersionDb:
+    title: 检测到降级版本
+    content: 当前已有的数据库版本高于此应用支持的版本。请更新 $t(common:appName) 到最新版本以获得最佳兼容性
+    positiveText: 查看更新
+
+  badSgpConnection:
+    title: SGP 数据源网络连接质量差
+    content:
+      usingSgp: 当前正在使用 SGP 数据源，但检测到网络连接质量很差，可能会影响数据获取和功能使用。
+      recommendation: '建议前往"设置 → $t(AppSettings.title) → $t(AppSettings.basic.title) → $t(AppSettings.basic.preferredLolSource.label)"，将数据源更改为 LCU，以获得更稳定的体验。'
+      vpnReason: 此现象可能是由于使用加速器访问跨国服务器导致的网络不稳定。
+    positiveText: 前往设置
+    negativeText: 关闭
 
   replay-download-progress-task:
     name: 录像下载
@@ -2253,10 +2953,29 @@ simple-notifications-renderer:
     closeButton: 关闭
     watchButton: 观看录像
 
+  wmiRequiresAdministrator:
+    title: 需要管理员权限
+    content: 当前使用 WMI 方式获取 League Client 命令行信息，需要以管理员权限运行此应用
+    positiveText: 以管理员权限重新启动
+    negativeText: 取消
+
+  cannotGetUxCommandLine:
+    title: 无法获取客户端命令行信息
+    alreadyUseWmi: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。可能在此计算机上无法使用 $t(common:appName)
+    noAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请尝试以管理员权限重新启动此应用，之后在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+    withAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+    extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，$t(common:appName) 可能无法正常工作
+    withAdminPositiveText: 确认
+    noAdminPositiveText: 以管理员权限重新启动
+
+  autoReconnect:
+    title: 自动重连
+    content: 将在 {{timeLeft}} 后重连
+
 league-client-renderer:
   initialization-task:
     name: LCU 初始化
-    current: 加载 {{endpoint}} ({{finishedCount}}/{{allCount}})
+    current: 已完成  {{finishedCount}}/{{allCount}}
 
   connection-task:
     name: 连接到 LCU
@@ -2264,10 +2983,19 @@ league-client-renderer:
 
 self-update-renderer:
   self-update-task:
-    name: League Akari 更新
+    name: $t(common:appName) 更新
     downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
     download-failed: 下载更新包失败
     unpacking: 正在解压更新包 {{progress}}%
     unpack-failed: 解压更新包失败
     waiting-for-restart: 更新包解压完成，应用关闭后将自动应用更新流程
     cancelButton: 取消
+
+  title: 自动更新
+  start-update: $t(common:appName) 更新已开始
+  updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
+  lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
+  lastUpdateSuccess: 已成功更新到 {{version}}
+
+self-hosted-lcu-data-renderer:
+  reloadFriendsFailed: 加载好友列表失败

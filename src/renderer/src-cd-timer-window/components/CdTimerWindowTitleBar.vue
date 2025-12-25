@@ -1,5 +1,5 @@
 <template>
-  <div class="title-bar">
+  <div class="titlebar">
     <div class="title-area">
       <span class="title">Akari Timer</span>
     </div>
@@ -24,8 +24,8 @@ const handleClose = () => {
 }
 </script>
 
-<style lang="less" scoped>
-.title-bar {
+<style scoped>
+.titlebar {
   display: flex;
   height: 20px;
   background-color: #fc82eaa0;

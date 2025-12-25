@@ -343,7 +343,7 @@ const subPerksSelectedTwo = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .rune-edit-wrapper {
   display: flex;
   align-items: center;
@@ -420,7 +420,7 @@ const subPerksSelectedTwo = computed(() => {
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .modal-content {
   width: fit-content;
 }

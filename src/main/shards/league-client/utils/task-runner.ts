@@ -50,9 +50,9 @@ export class TaskRunner extends EventEmitter<{
     return this._tasks
   }
 
-  constructor(defaultConcurrency: number = 2992) {
+  constructor(private readonly _defaultConcurrency: number = 2992) {
     super()
-    const defaultQueue = new PQueue({ concurrency: defaultConcurrency })
+    const defaultQueue = new PQueue({ concurrency: _defaultConcurrency })
     this._queues.set('default', defaultQueue)
     this._groupDeps.set('default', [])
   }
@@ -81,7 +81,7 @@ export class TaskRunner extends EventEmitter<{
     }
 
     // 创建队列并根据是否有依赖暂停
-    const queue = new PQueue({ concurrency: options.concurrency })
+    const queue = new PQueue({ concurrency: options.concurrency ?? this._defaultConcurrency })
     if (deps.length) queue.pause()
 
     this._queues.set(id, queue)

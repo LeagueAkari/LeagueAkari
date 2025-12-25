@@ -11,7 +11,7 @@ tray:
   adjustAllWindowPositions: 调整所有窗口的位置
 
 windowOpenHandler:
-  toAkari: 将转到 League Akari 的项目主页 ❤️
+  toAkari: 将转到 $t(common:appName) 的项目主页 ❤️
   toExternalLink: 将跳转到外部链接 {{target}}
 
 auto-gameflow-main:
@@ -23,29 +23,29 @@ auto-gameflow-main:
   auto-matchmaking-canceled-not-leader: 自动匹配已取消，当前不是房间房主
   auto-matchmaking-canceled-wait-for-penalty: 自动匹配已取消，等待秒退计时器
   auto-matchmaking-in: 将在 {{seconds}} 秒后自动匹配
-  skip-leader: '[League Akari] 尝试将房主转让'
+  skip-leader: '[$t(common:appName)] 尝试将房主转让'
+  aram-team-side-1: '本局游戏你的队伍位于 🟦蓝色方 (↙️ 左下侧)'
+  aram-team-side-2: '本局游戏你的队伍位于 🟥红色方 (↗️ 右上侧)'
+  auto-invitation-sent: '[$t(common:appName)] 已向 {{name}} 发送房间邀请'
 
 auto-select-main:
   error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}
-  error-pre-pick: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
+  error-intent: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
   error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
-  cancel-grab: 已取消选择 {{champion}}
-  grab-soon: 即将在 {{seconds}} 秒后选择 {{champion}}
-  ignore-trade: 不自动处理交换请求 ({{from}} -> {{to}})
-  ignore-trade-owner: 不自动处理交换请求，对方为物主 ({{from}} -> {{to}})
-  auto-pick-normal-mode: 普通模式自动选择
-  auto-grab-bench-mode: 随机模式自动选择
-  auto-ban: 自动英雄禁用
-  enabled: 已启用
-  delayed-lock-in: 将在 {{seconds}} 秒后锁定英雄 {{champion}}
-  delayed-ban: 将在 {{seconds}} 秒后禁用英雄 {{champion}}
-  cancel-delayed-lock-in: 已取消锁定英雄 {{champion}}
-  cancel-delayed-ban: 已取消禁用英雄 {{champion}}
+  cancel-bench-swap: 已取消选择 {{champion}}
+  bench-swap: 即将在 {{seconds}} 秒后交换 {{champion}}
+  accept-champion-swap: 将在 {{seconds}} 秒后接受交换请求 {{champion}}
+  decline-champion-swap: 将在 {{seconds}} 秒后拒绝交换请求 {{champion}}
+  show-ban: 将在 {{seconds}} 秒后预禁用 {{champion}}
+  complete-ban: 将在 {{seconds}} 秒后完成禁用 {{champion}}
+  show-pick: 将在 {{seconds}} 秒后亮出 {{champion}}
+  complete-pick: 将在 {{seconds}} 秒后锁定 {{champion}}
+  intent-pick: 将在 {{seconds}} 秒后预选 {{champion}}
 
 self-update-main:
   title: 自动更新
-  start-update: League Akari 更新已开始
+  start-update: $t(common:appName) 更新已开始
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
   lastUpdateSuccess: 已成功更新到 {{version}}
@@ -78,6 +78,7 @@ ongoing-game-main:
   taggedPlayer: 已标记的玩家
 
 in-game-send-main:
+  templateSuffix: 模板
   newTemplate: 新模板 {{index}}
   exampleTemplate: |
     // 定义模板元数据
@@ -114,5 +115,14 @@ in-game-send-main:
 
   newSendableItem: 新发送项 {{index}}
 
-app:
-  singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari
+client-installation-main:
+  jumpList:
+    launchTcls:
+      title: 启动 TCLS 客户端
+      description: 启动 League Akari 并启动 TCLS 客户端
+    launchRiot:
+      title: 启动 Riot 客户端
+      description: 启动 League Akari 并启动 Riot 客户端
+    launchWeGame:
+      title: 启动 WeGame
+      description: 启动 League Akari 并启动 WeGame

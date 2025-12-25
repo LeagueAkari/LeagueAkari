@@ -8,8 +8,9 @@ na: N/A
 
 summonerPlaceholder: Summoner {{index}}
 summoner: Summoner
+region: Region
 
-lanes:
+positions:
   all: None
   ALL: None
   top: Top
@@ -30,30 +31,26 @@ lanes:
   UTILITY: Support
 
 positionAssignmentReason:
-  FILL_SECONDARY: Fill Primary
-  FILL_PRIMARY: Fill Secondary
+  FILL_SECONDARY: Fill Secondary
+  FILL_PRIMARY: Fill Primary
   PRIMARY: Primary
   SECONDARY: Secondary
   AUTOFILL: Autofill
   AUTOFILL_SHORT: Fill
 
 teams:
-  all: All
-  100: Blue Team
-  200: Red Team
+  TEAM-ALL: All
+  TEAM-100: Blue Team
+  TEAM-200: Red Team
+  LOBBY: Lobby
   unknown: Unknown
-  our: Our
-  their: Their
-  our-1: Our (Blue Team)
-  our-2: Our (Red Team)
-  their-1: Their (Blue Team)
-  their-2: Their (Red Team)
 
 queueTypes:
   RANKED_SOLO_5x5: Ranked Solo/Duo
   RANKED_FLEX_SR: Ranked Flex
   NORMAL: Normal SR
   ARAM_UNRANKED_5x5: ARAM
+  KIWI: 'ARAM: Mayhem'
   CHERRY: Arena
   URF: URF
   RANKED_FLEX_TT: Ranked Flex TT
@@ -70,6 +67,8 @@ gameModes:
 
 sgpMatchHistoryTags:
   all: All Modes
+  ranked: Ranked Modes
+  normal: Normal Modes
   current: Current Mode
   q_420: Ranked Solo/Duo
   q_430: Normal SR
@@ -98,17 +97,18 @@ tiers:
 shortTiers:
   UNRANKED: N/A
   IRON: IRON
-  BRONZE: BRON
-  SILVER: SILV
+  BRONZE: BRNZ
+  SILVER: SLVR
   GOLD: GOLD
   PLATINUM: PLAT
-  EMERALD: EMERD
-  DIAMOND: DIAMD
-  MASTER: MASTR
+  EMERALD: EMRD
+  DIAMOND: DIAM
+  MASTER: MSTR
   GRANDMASTER: GM
-  CHALLENGER: CHALL
+  CHALLENGER: CHLG
 
 sgpServers:
+  AKARI_CURRENT: Current
   TENCENT_HN10: Black Rose
   TENCENT_HN1: Ionia
   TENCENT_NJ100: League 1
@@ -118,6 +118,7 @@ sgpServers:
   TENCENT_TJ101: League 5
   TENCENT_BGP2: Summit
   TENCENT_PBE: Tencent PBE
+  TENCENT_PREPBE: Tencent PREPBE
   TW2: Taiwan
   SG2: Singapore
   PH2: Philippines
@@ -136,3 +137,7 @@ sgpServers:
 
 champions:
   bravery: Bravery
+  dummy: Dummy
+
+app:
+  singleton: Because Akari is unique, there can only be ONE Akari at a time

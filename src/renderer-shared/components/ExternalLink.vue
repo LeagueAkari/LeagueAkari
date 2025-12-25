@@ -17,7 +17,7 @@ const { blank = true } = defineProps<{
 }>()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .icon {
   font-size: 1em;
   margin-left: 4px;

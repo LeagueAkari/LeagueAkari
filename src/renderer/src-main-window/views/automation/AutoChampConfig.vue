@@ -47,6 +47,6 @@ const acs = useAutoChampConfigStore()
 const ac = useInstance(AutoChampConfigRenderer)
 </script>
 
-<style lang="less" scoped>
-@import './automation-styles.less';
+<style scoped>
+@import './automation-styles.css';
 </style>

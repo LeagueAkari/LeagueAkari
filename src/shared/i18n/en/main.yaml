@@ -11,7 +11,7 @@ tray:
   adjustAllWindowPositions: Adjust All Window Positions
 
 windowOpenHandler:
-  toAkari: To League Akari GitHub ❤️
+  toAkari: To $t(common:appName) GitHub ❤️
   toExternalLink: To external site {{target}}
 
 auto-gameflow-main:
@@ -24,28 +24,28 @@ auto-gameflow-main:
   auto-matchmaking-canceled-wait-for-penalty: Auto matchmaking canceled, waiting for penalty timer
   auto-matchmaking-in: Auto matchmaking in {{seconds}} seconds
   skip-leader: Attempting to skip becoming the leader
+  aram-team-side-1: Your team is in 🟦blue (↙️ left bottom)
+  aram-team-side-2: Your team is in 🟥red (↗️ right top)
+  auto-invitation-sent: '[$t(common:appName)] Invitation sent to {{name}}'
 
 auto-select-main:
-  error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'
-  error-pre-pick: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
+  error-pick: 'Failed to auto pick champion, target champion {{champion}}: {{reason}}'
+  error-intent: 'Failed to auto intent champion, target champion {{champion}}: {{reason}}'
   error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
   error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
-  cancel-grab: Selection of {{champion}} has been canceled
-  grab-soon: Will swap {{champion}} in {{seconds}} seconds
-  ignore-trade: Trade request not auto-processed ({{from}} -> {{to}})
-  ignore-trade-owner: Trade request not auto-processed since the trader is the champion owner ({{from}} -> {{to}})
-  auto-pick-normal-mode: Auto-select in Normal Mode
-  auto-grab-bench-mode: Auto-select in Bench Mode
-  auto-ban: Auto Ban
-  enabled: Enabled
-  delayed-lock-in: Will lock in champion {{champion}} in {{seconds}} seconds
-  delayed-ban: Will ban champion {{champion}} in {{seconds}} seconds
-  cancel-delayed-lock-in: Lock-in of champion {{champion}} has been canceled
-  cancel-delayed-ban: Ban of champion {{champion}} has been canceled
+  cancel-bench-swap: Selection of {{champion}} has been canceled
+  bench-swap: Will swap {{champion}} in {{seconds}} seconds
+  accept-champion-swap: Will accept swap request for {{champion}} in {{seconds}} seconds
+  decline-champion-swap: Will decline swap request for {{champion}} in {{seconds}} seconds
+  show-ban: Will show ban {{champion}} in {{seconds}} seconds
+  complete-ban: Will complete ban {{champion}} in {{seconds}} seconds
+  show-pick: Will show pick {{champion}} in {{seconds}} seconds
+  complete-pick: Will complete pick {{champion}} in {{seconds}} seconds
+  intent-pick: Will intent pick {{champion}} in {{seconds}} seconds
 
 self-update-main:
   title: Self Update
-  start-update: Starting update League Akari
+  start-update: Starting update $t(common:appName)
   updateOnNextStartup: Updated Applied. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}
@@ -78,6 +78,7 @@ ongoing-game-main:
   taggedPlayer: Tagged Player
 
 in-game-send-main:
+  templateSuffix: Template
   newTemplate: New Template {{index}}
   exampleTemplate: |
     // Define the metadata of the template
@@ -114,5 +115,14 @@ in-game-send-main:
 
   newSendableItem: New Sendable Item {{index}}
 
-app:
-  singleton: Because Akari is unique, there can only be ONE Akari at a time
+client-installation-main:
+  jumpList:
+    launchTcls:
+      title: Launch TCLS Client
+      description: Open League Akari and launch TCLS client
+    launchRiot:
+      title: Launch Riot Client
+      description: Open League Akari launch Riot client
+    launchWeGame:
+      title: Launch WeGame
+      description: Open League Akari and launch WeGame

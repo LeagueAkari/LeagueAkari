@@ -39,11 +39,6 @@ interface LastUpdateResult {
 
 export class SelfUpdateSettings {
   /**
-   * 是否自动检查更新，检查到更新才会下载更新
-   */
-  autoCheckUpdates: boolean = true
-
-  /**
    * 是否自动下载更新
    */
   autoDownloadUpdates: boolean = true
@@ -55,10 +50,6 @@ export class SelfUpdateSettings {
 
   constructor() {
     makeAutoObservable(this)
-  }
-
-  setAutoCheckUpdates(autoCheckUpdates: boolean) {
-    this.autoCheckUpdates = autoCheckUpdates
   }
 
   setAutoDownloadUpdates(autoDownloadUpdates: boolean) {

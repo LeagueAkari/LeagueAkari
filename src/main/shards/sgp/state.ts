@@ -1,18 +1,12 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
-import { makeAutoObservable, observable } from 'mobx'
+import { getSgpServerId } from '@shared/utils/sgp'
+import { makeAutoObservable } from 'mobx'
 
 import { LeagueClientState } from '../league-client/state'
+import { RemoteConfigMain } from '../remote-config'
 
 export class SgpState {
-  sgpServerConfig: SgpServersConfig = {
-    version: 0,
-    lastUpdate: 0,
-    servers: {},
-    serverNames: {},
-    tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
-    tencentServerSummonerInteroperability: []
+  get leagueServers() {
+    return this._remoteConfig.state.leagueServers
   }
 
   get availability() {
@@ -29,7 +23,7 @@ export class SgpState {
     }
 
     const sgpServerId = getSgpServerId(this._lcState.auth.region, this._lcState.auth.rsoPlatformId)
-    const supported = this.sgpServerConfig.servers[sgpServerId.toUpperCase()] || {
+    const supported = this.leagueServers.servers[sgpServerId.toUpperCase()] || {
       matchHistory: false,
       common: false
     }
@@ -49,6 +43,13 @@ export class SgpState {
   isEntitlementsTokenSet = false
   isLeagueSessionTokenSet = false
 
+  get supportedQueues() {
+    return this._remoteConfig.state.supportedQueues.queues
+  }
+
+  connectionSuccessesCounted = 0
+  connectionFailuresCounted = 0
+
   setEntitlementsTokenSet(value: boolean) {
     this.isEntitlementsTokenSet = value
   }
@@ -57,17 +58,22 @@ export class SgpState {
     this.isLeagueSessionTokenSet = value
   }
 
-  setSgpServerConfig(value: SgpServersConfig) {
-    this.sgpServerConfig = value
+  setConnectionSuccessesCount(value: number) {
+    this.connectionSuccessesCounted = value
+  }
+
+  setConnectionFailuresCount(value: number) {
+    this.connectionFailuresCounted = value
   }
 
   get isTokenReady() {
     return this.isEntitlementsTokenSet && this.isLeagueSessionTokenSet
   }
 
-  constructor(private _lcState: LeagueClientState) {
-    makeAutoObservable(this, {
-      sgpServerConfig: observable.ref
-    })
+  constructor(
+    private _lcState: LeagueClientState,
+    private _remoteConfig: RemoteConfigMain
+  ) {
+    makeAutoObservable(this)
   }
 }

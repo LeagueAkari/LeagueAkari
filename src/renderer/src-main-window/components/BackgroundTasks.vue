@@ -64,7 +64,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .tasks {
   display: flex;
   flex-direction: column;
@@ -72,7 +72,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
   padding: 8px;
   border: solid 1px #fff2;
   border-radius: 4px;
-  background-color: var(--background-color-primary);
+  background-color: var(--la-background-color-primary);
 }
 
 .actions {

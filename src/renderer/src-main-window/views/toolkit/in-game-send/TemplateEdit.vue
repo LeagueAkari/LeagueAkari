@@ -15,7 +15,10 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="DROPDOWN_OVERRIDES"
+          :theme-overrides="{
+            fontSizeSmall: '13px',
+            optionHeightSmall: '26px'
+          }"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -68,7 +71,7 @@
                     {{ t('errorTitle') }}
                   </div>
                   <div :class="$style['error-divider']"></div>
-                  <div :class="$style['error-content']">{{ item.error }}</div>
+                  <div :class="$style['error-content']">{{ translateError(item.error) }}</div>
                 </div>
               </NPopover>
             </div>
@@ -214,12 +217,31 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
-import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
+
+// TODO Merge
+const TEMPLATE_ERROR_TYPES = [
+  'not-an-object',
+  'no-getMetadata',
+  'no-metadata',
+  'unsupported-version',
+  'wrong-template-type',
+  'no-getMessages'
+] as const
+
+const translateError = (error: string | null): string => {
+  if (!error) return ''
+
+  if (TEMPLATE_ERROR_TYPES.includes(error as any)) {
+    return t(`templateErrorTypes.${error}`)
+  }
+
+  return error
+}
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
@@ -355,7 +377,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .template-edit {
   display: flex;
   height: 600px;
@@ -506,7 +528,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .error-message {
   .error-title {
     font-size: 12px;

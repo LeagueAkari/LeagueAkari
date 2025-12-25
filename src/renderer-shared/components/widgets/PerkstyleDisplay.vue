@@ -38,30 +38,34 @@ const { size = 20 } = defineProps<{
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
-.perkstyle,
-.empty {
-  border-radius: 2px;
-}
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-.info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-
-  .image {
+@layer components {
+  .perkstyle,
+  .empty {
     border-radius: 2px;
-    height: 28px;
   }
 
-  .right-side {
-    margin-left: 8px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-}
+  .info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
 
-.empty {
-  background-color: rgb(34, 34, 34);
+    .image {
+      border-radius: 2px;
+      height: 28px;
+    }
+
+    .right-side {
+      margin-left: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+
+  .empty {
+    @apply bg-gray-500/40 dark:bg-black/20;
+  }
 }
 </style>

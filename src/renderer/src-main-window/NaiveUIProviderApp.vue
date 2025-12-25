@@ -8,7 +8,7 @@
     inline-theme-disabled
   >
     <NMessageProvider
-      :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }"
+      :container-style="{ top: 'calc(var(--la-titlebar-height) + 12px)' }"
       placement="top-right"
     >
       <NNotificationProvider placement="bottom-right">
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // @ts-ignore
-import { useColorThemeAttr } from '@renderer-shared/compositions/useColorThemeAttr'
+import { useColorThemeAttr } from '@renderer-shared/composables/useColorThemeAttr'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,
@@ -62,10 +62,27 @@ const themeOverrides = computed(() => {
       },
       Menu: {
         padding: '1px'
+      },
+      Scrollbar: {
+        width: '6px'
+      },
+      Dropdown: {
+        color: '#222e'
       }
     } as GlobalThemeOverrides
   } else {
-    return {} as GlobalThemeOverrides
+    return {
+      Popover: {
+        fontSize: '12px'
+      },
+      Card: {
+        borderColor: 'rgba(15, 23, 42, 0.10)',
+        borderColorModal: 'rgba(15, 23, 42, 0.16)'
+      },
+      Scrollbar: {
+        width: '6px'
+      }
+    } as GlobalThemeOverrides
   }
 })
 

@@ -41,7 +41,7 @@ DeclarationModal:
     .akari-disclaimer a:hover{text-decoration:underline;}
     </style>
 
-    # League **Akari** User Guide & Disclaimer
+    # $t(common:appName) User Guide & Disclaimer
 
     > **Before downloading, installing, or using this software, please read and fully understand this guide and disclaimer.**
     > Once you start using it, you are deemed to have fully understood and agreed to all the following terms.
@@ -49,7 +49,7 @@ DeclarationModal:
     ---
 
     ## I. Nature of the Software & Acquisition
-    - **League Akari** is entirely open-source and free; all features are provided “as-is.”
+    - **$t(common:appName)i** is entirely open-source and free; all features are provided “as-is.”
     - This software may not be released, distributed, or obtained in any paid, bundled, or profit-making form. Always download it through the official public repository or its mirrors to avoid financial loss and security risks.
 
     ## II. Risk Notice & Limitation of Liability
@@ -57,15 +57,20 @@ DeclarationModal:
       1. Your game account being suspended or permanently banned;
       2. Loss, corruption, or inconsistency of game data with server data;
       3. Client crashes, performance degradation, or other poor game experiences.
-    - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **League Akari** development team and all contributors assume no liability; all related risks are borne by the user.
+    - For any direct, indirect, incidental, special, or consequential damages arising from using or being unable to use this software, the **$t(common:appName)** development team and all contributors assume no liability; all related risks are borne by the user.
+
+    > Please refer to the **Game Info Tracking Improvements** section in [Patch 25.17 Notes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/).
 
     ## III. Server Compatibility Statement
-    - **Effective from the release of this statement, League Akari will no longer provide any form of support for Tencent Game servers.**
+    - **Effective from the release of this statement, $t(common:appName) will no longer provide any form of support for Tencent Game servers.**
     - Using this software in Tencent server environments is highly likely to violate Tencent Games’ user agreements, management regulations, or technical protection measures; any account bans, data loss, or other adverse consequences are solely the user’s responsibility.
 
     ## IV. Information Collection & Privacy Protection
     - To improve product quality, analyze errors, and conduct security statistics, the software collects **necessary and limited** system information and crash logs during operation.
     - The collected information **does not** contain personally identifiable data, will not be uploaded to any third-party server, and will not be used for commercial purposes.
+
+    ## V. Other
+    - Typing "AKARI" quickly in any place, or clicking the "Got it" button three times in a row, can quickly close this modal. By doing this, it is deemed that you have read and agreed to this guide and disclaimer.
 
     ---
 
@@ -73,6 +78,22 @@ DeclarationModal:
     > <https://github.com/LeagueAkari/LeagueAkari> .
 
     </div>
+
+FeatureGuide:
+  previous: Previous
+  next: Next
+  confirm: Confirm
+
+  ongoingGameNewFeatures20251225:
+    item1:
+      title: Query Available in Lobby
+      description: |
+        In addition to champion select and in-game phases, you can now also view data for all members in the lobby.
+
+        Enable this feature in `Settings` → `Game Analysis` → `Enable in Lobby Phase`.
+    item2:
+      title: Show More Tags
+      description: Enable more tags in `Settings` → `Game Analysis` → `Player Card Tags`.
 
 CommonButtons:
   announcement: Announcement
@@ -88,7 +109,7 @@ TrafficButtons:
   close: Close
 
   modal:
-    title: Quit League Akari
+    title: Quit $t(common:appName)
     options:
       minimize-to-tray: Minimize to tray
       quit: Quit
@@ -121,16 +142,30 @@ AppSettings:
         quit: Quit
         ask: Ask every time
 
-    backgroundMaterial:
-      label: Background Material
-      description: Set the background material of the application interface, requires specific system version support
+    preferredLolSource:
+      label: Preferred Data Source
+      description: Select the preferred League of Legends API data source
+      howToChoose: How to choose?
+      unsupported: 'Unsupported SGP API: {{server}}'
       options:
-        none: Default
-        mica: Mica
+        sgp: SGP API
+        lcu: LCU API
+      tip:
+        sgp:
+          title: SGP API
+          feature1: Fast query performance with quick response
+          feature2: Provides more detailed match data
+          feature3: Supports cross-region match history lookup
+          warning: When using VPN/accelerator to play on foreign servers, connection may fail or be extremely slow
+        lcu:
+          title: LCU API (Client Local)
+          feature1: High stability, unaffected by network conditions
+          feature2: Reliable even when using VPN/accelerator
+          warning: 'Known issue: Querying match history during champion select may cause the game client to crash'
 
     dataSource:
-      label: Remote Data Source
-      description: Set the remote config source of the application, get or update data from GitHub / Gitee
+      label: Git Repository Source
+      description: Set the Git repository source of the application, get or update data from GitHub / Gitee
       options:
         gitee: Gitee
         github: GitHub
@@ -141,13 +176,22 @@ AppSettings:
       tip:
         gitee: 'Better response speed in mainland China'
         github: 'Better response speed outside mainland China'
+      better: Faster
+
+    theme:
+      label: Theme Color
+      description: Theme color for $t(common:appName)
+      options:
+        default: Follow System
+        light: Light
+        dark: Dark
 
   selfUpdate:
     title: Application Update
 
-    autoCheckUpdates:
+    updateLatestRelease:
       label: Auto Check Updates
-      description: Automatically pull the latest version information from the update source when the application starts
+      description: Periodically check for new versions
 
     autoDownloadUpdates:
       label: Auto Download Updates
@@ -185,9 +229,18 @@ AppSettings:
 
   mainWindowUi:
     title: Main Window UI
+
     useProfileSkinAsBackground:
       label: Use Profile Skin as Background
-      description: League Akari will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+      description: $t(common:appName) will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+
+    backgroundMaterial:
+      label: Background Material
+      description: Set the background material of the application interface, requires specific system version support
+      options:
+        none: Default
+        mica: Mica
+        micaUnsupported: 'Mica (Unsupported)'
 
   lcConnection:
     title: LCU Connection
@@ -196,7 +249,7 @@ AppSettings:
       label: Auto Connect
       description: Automatically connect to the client when there is a unique client
 
-    useWmic:
+    useWmi:
       label: Use WMIC
       description: Use WMIC to get client command line information instead of the default Win32 API method. Requires administrator privileges
 
@@ -239,6 +292,15 @@ AppSettings:
         label: Proxy Port
         description: The port of the proxy server
 
+    uninstallApp:
+      label: Uninstall Application
+      description: Uninstall the application, which will delete all data and configurations
+      button: Uninstall Application
+      title: Uninstall Application
+      content: Are you sure you want to uninstall $t(common:appName)? This will also remove all application data.
+      positiveText: Uninstall
+      negativeText: Cancel
+
 MatchHistorySettings:
   title: Match History Tabs
 
@@ -246,11 +308,9 @@ MatchHistorySettings:
     label: Refresh Tabs After Game Ends
     description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
 
-  matchHistoryUseSgpApi:
-    label: Use SGP API
-    description: Use SGP API as the data source for the match history page
-    current: 'Current SGP Server: {{server}}'
-    unsupported: 'Unsupported SGP API: {{server}}'
+  loadCount:
+    label: Load Count
+    description: Number of matches to load for each match history tab.
 
 OngoingGameSettings:
   title: Ongoing Game
@@ -269,18 +329,9 @@ OngoingGameSettings:
     label: Match History Load Count
     description: Number of matches to fetch for analyzing each player's performance on the match page.
 
-  premadeTeamThreshold:
-    label: Premade Team Detection Threshold
-    description: A group of players will be considered a premade team if they appear on the same side more than {{threshold}} times.
-
   concurrency:
     label: Concurrent Request Limit
     description: Limits the total number of concurrent network requests during match analysis. This does not affect the concurrency limits of other modules.
-
-  matchHistoryUseSgpApi:
-    label: Use SGP API
-    description: Prioritizes using the SGP API for match analysis. If the SGP API is unavailable, the LCU API will be used instead.
-    unsupported: 'SGP API is not supported for the current server: {{server}}'
 
   matchHistoryTagPreference:
     label: Queue Filter Preference
@@ -289,9 +340,17 @@ OngoingGameSettings:
       all: All Modes
       current: Current Mode
 
-  gameTimelineLoadCount:
-    label: Game Timeline Load Count
-    description: Will additionally load the timeline information for the first {{countV}} matches for game analysis.
+  queryInLobbyPhase:
+    label: Query in Lobby Phase
+    description: When enabled, the player stats will be queried when in the lobby.
+
+  premadeTeamInferMatchCountThreshold:
+    label: Premade Team Inference Match Count Threshold
+    description: Minimum number of games required to confirm premade teams.
+
+  gameDetailsLoadCount:
+    label: Game Details Load Count
+    description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
 
   showRecentlyUsedChampions:
     label: Show Recently Used Champions
@@ -321,9 +380,9 @@ OngoingGameSettings:
       showLosingStreakTag:
         label: Losing Streak
       showSoloKillsTag:
-        label: Average Solo Kills Per Game (Last {{countV}} games)
+        label: Average Solo Kills Per Game
       showSoloDeathsTag:
-        label: Average Solo Deaths Per Game (Last {{countV}} games)
+        label: Average Solo Deaths Per Game
       showAverageTeamDamageTag:
         label: Average Team Damage
       showAverageTeamDamageTakenTag:
@@ -465,13 +524,17 @@ MiscSettings:
   streamerMode:
     title: Streamer Mode
 
-    enabled:
-      label: Enable
+    streamerMode:
+      label: Hide Sensitive Information
       description: Hide sensitive information, such as the player's name, in the application interface.
 
     useAkariStyledName:
       label: Use Akari-Styled Name
       description: Use the Akari-styled names in summoner placeholder.
+
+    contentProtection:
+      label: Content Protection
+      description: Enable content protection, which will prevent other applications from capturing the window content. Note that this may affect the normal use of some screen recording tools.
 
 DebugSettings:
   title: Debug
@@ -486,7 +549,7 @@ DebugSettings:
 
     reload:
       label: Reload Page
-      description: Refresh the League Akari user interface.
+      description: Refresh the $t(common:appName) user interface.
       button: Reload Page
 
   files:
@@ -502,7 +565,7 @@ DebugSettings:
       popoverTrigger: Details
       button: Open Directory
       description:
-        part1: Open the League Akari application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
+        part1: Open the $t(common:appName) application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
         part2: Contains user settings, marked players, and other information.
         part3: Temporary files for upcoming automatic updates.
         part4: Configurable setting files.
@@ -551,11 +614,11 @@ DebugSettings:
     TerminatedInError: 'Terminated in Error'
 
   inAdministrator:
-    description: League Akari is currently running with administrator privileges. Now, it is League Akari X.
+    description: $t(common:appName) is currently running with administrator privileges. Now, it is $t(common:appName) X.
 
   kyokoMode:
     label: Kyoko Mode
-    description: Enabled features that are deprecated or experimental. Use with caution.
+    description: The hidden side of $t(common:appName), enable more features!
 
 StorageSettings:
   title: Storage
@@ -651,7 +714,7 @@ AutoGameflow:
     description: Delay in seconds before accepting the match after it becomes available.
   autoHonorEnabled:
     label: Auto-Honor Enabled
-    description: Automatically gives honors at the end of a match. External tools cannot skip the honor phase, so all votes will be used to complete the phase.
+    description: Automatically gives all the votes at the end of a match.
   autoHonorStrategy:
     label: Honor Selection Strategy
     description: Determines which players will receive honors.
@@ -713,94 +776,111 @@ AutoGameflow:
   rejectInvitationWhenAway:
     label: Reject When Away
     description: Automatically rejects lobby invitations when the game status is set to Away.
+  autoSendARAMTeamSideEnabled:
+    label: Send Team Side Information
+    description: 'In modes like ARAM or ARAM: Mayhem, when entering champion select, the current team side (blue or red) will be notified.'
+  autoSendARAMTeamSideVisibleToTeam:
+    label: Send Team Side Information Visible to Team
+    description: The content of "Send Team Side Information" will be visible to team.
 
 AutoSelect:
-  normalModeTitle: Auto Pick · Normal Mode
-  benchModeTitle: Auto Pick · Bench Mode
-  banTitle: Auto Ban
+  title: Auto Pick Ban
 
-  normalModeEnabled:
-    label: Enable
-    description: Enable auto pick in standard modes, such as Matchmaking, Ranked, or any non-random champion modes.
+  temporarilyDisabled:
+    label: Temporarily Disabled
+    button: Re-enable
+    description: The feature have been temporarily disabled in THIS champion selection.
 
-  showIntent:
-    label: Show Intent
-    description: Preselect the champion that will be automatically chosen.
+  groupTitle: Active Mode
+  groupEmpty: No Groups
 
-  selectTeammateIntendedChampion:
-    label: Ignore Teammates' Intent
-    description: When enabled, teammates' intended champions will be ignored. Otherwise, it will avoid conflicts with their selections.
+  groups:
+    ranked: Ranked
+    normal: Normal
+    aram: ARAM-like
+    cherry: Arena
+    urf: URF
+    oneforall: One for All
+    ultbook: Ultbook
+    bot: Bot
+    custom: Custom
+    ruby: Nightmare Bot
 
-  pickStrategy:
-    label: Lock-In Strategy
-    description: Instantly lock in or just show the champion.
-    options:
-      lock-in: Instantly Lock In
-      show: Just Show
-      show-and-delay-lock-in: Show and Delay Lock In
+  pick:
+    title: Auto Pick
 
-  lockInDelaySeconds:
-    label: Auto Lock-In Delay (s)
-    description: The delay time (in seconds) to perform the lock-in action after revealing the champion. It will not exceed the maximum duration of the phase.
+    enabled:
+      label: Enable
+      description: Enable the automatic pick of this mode.
 
-  expectedChampions:
-    label: Intended Champions
-    button: Configure
-    description: |
-      <div style="margin-bottom: 8px">Select champions based on the preset list.</div>
-      <div style="margin-bottom: 8px">If the current mode <span style="font-weight: bold">has no role information</span> or <span style="font-weight: bold">the current role has no champions set</span>, the <span style="font-weight: bold">default</span> list will be used.</div>
-      <div>The selection priority follows the order defined in the list, preferring champions listed earlier.</div>
+    expectedChampions:
+      label: Expected Champions
+      description: The automatic pick will pick these champions, prioritizing the earlier ones in the list.
+      fragment1: When assigned to
+      fragment2: position
 
-  benchModeEnabled:
-    label: Enable
-    description: Enable auto selection in random champion modes, such as ARAM or other random modes.
+    showIntent:
+      label: Show Intent
+      description: Show the target champion before the pick.
 
-  grabDelaySeconds:
-    label: Minimum Selection Delay (s)
-    description:
-      part1: The cumulative time a target champion is available on the selection bench must reach this value before executing a swap. Time is measured in seconds.
-      part2: When a champion appears on the selection bench, a timer starts for that champion. Auto-swap will only occur if the cumulative time satisfies this value, preventing premature selection, also known as "insta-picking."
+    ignoreIntent:
+      label: Ignore Intent
+      description: Ignore the intent of the teammates.
 
-  benchSelectFirstAvailableChampion:
-    label: Prioritize First Available Champion
-    description: When enabled, the first available champion from the intended list will always be selected.
+    strategy:
+      label: Lock Strategy
+      description: Execute the automatic pick process according to the preset strategy.
+      options:
+        just-show: Just Show
+        show-and-lock-in: Show and Lock-in
 
-  benchHandleTradeEnabled:
-    label: Auto Handle Trade Requests
-    description: |
-      <div>When enabled, upcoming champion trade requests will be managed automatically.</div>
-      <div>If "Prioritize First Available Champion" is enabled, trade for a higher-priority preferred champion will be accepted.</div>
-      <div>If "Prioritize First Available Champion" is not enabled and no expected champions are held, trade for a preferred champion will be accepted.</div>
-      <div>If "Prioritize First Available Champion" is enabled and expected champions are held, trade will be ignored.</div>
+    delaySeconds:
+      label: Delay (s)
+      description: The automatic pick process will be planned according to the preset delay, including show, lock-in, or handle swap. Each stage will not exceed the system limit.
 
-  benchHandleTradeIgnoreChampionOwner:
-    label: Ignore Champion Owner
-    description: |
-      <div>When handling champion trade requests, the champion's owner will be considered</div>
-      <div>If the other party is the owner of the champion, the trade request will not be taken over</div>
-      <div style="font-weight:bold">Note: Cannot handle scenarios where champion select is joined midway</div>
+    benchMode:
+      title: Bench Mode Specific (If applicable)
+      tooltip: For modes that have a bench, such as ARAM or URF.
 
-  benchExpectedChampions:
-    label: Intended Champions
+    benchSwapAccumulatedDelaySeconds:
+      label: Minimum Accumulated Time (s)
+      description: Only when the target champion has been on the bench for more than this value, the swap operation will be executed.
 
-  banEnabled:
-    label: Enable
-    description: Automatically execute champion bans.
+    benchSelectFirstAvailableChampion:
+      label: Select First Available Champion
+      description: When the target champion is on the bench, select the earlier ones in the list.
 
-  banDelaySeconds:
-    label: Auto Ban Delay (s)
-    description: The delay time (in seconds) to perform the ban action. It will not exceed the maximum duration of the phase.
+    benchHandleTradeEnabled:
+      label: Handle Swap Request
+      description: When a swap request is received, if the expected champion settings are met, accept the swap request. Otherwise, reject the swap request.
 
-  banTeammateIntendedChampion:
-    label: Ignore Teammates' Intent
-    description: When enabled, teammates' intended champions will not be considered.
+  ban:
+    title: Auto Ban
 
-  bannedChampions:
-    label: Banned Champions
-    description: |
-      <div style="margin-bottom: 8px">Ban champions based on the preset list.</div>
-      <div style="margin-bottom: 8px">If the current mode <span style="font-weight: bold">has no role information</span> or <span style="font-weight: bold">the current role has no champions set</span>, the <span style="font-weight: bold">default</span> list will be used.</div>
-      <div>The ban priority follows the order defined in the list, prioritizing champions listed earlier.</div>
+    enabled:
+      label: Enable
+      description: Enable the automatic ban of this mode.
+
+    expectedChampions:
+      label: Expected Champions
+      description: The automatic ban will ban these champions, prioritizing the earlier ones in the list.
+      fragment1: When assigned to
+      fragment2: position
+
+    ignoreIntent:
+      label: Ignore Intent
+      description: Ignore the intent of the teammates.
+
+    strategy:
+      label: Lock Strategy
+      description: Execute the automatic ban process according to the preset strategy.
+      options:
+        just-show: Just Show
+        show-and-lock-in: Show and Lock-in
+
+    delaySeconds:
+      label: Delay (s)
+      description: The automatic ban process will be planned according to the preset delay, including show, lock-in, or handle swap. Each stage will not exceed the system limit.
 
 AutoMisc:
   autoReply:
@@ -818,19 +898,34 @@ AutoMisc:
       label: Reply Text
       description: The content to be used as the auto-reply message.
 
+  autoInvitation:
+    title: Invite Friends to Room
+    description: 'One-time monitoring: when specified friends become available, send room invitations.'
+    unavailable: Currently Unavailable
+    scheduleInvite: Schedule Invite
+    cancelSchedule: Cancel Schedule
+    noFriends: No Friends
+    notInLobby: Not in Lobby
+    searchPlaceholder: Search friend name or tag
+
 SideBarMenu:
-  match-history: Match History Tabs
+  match-history: Match History
   ongoing-game: Ongoing Game
   automation: Automation
   toolkit: Toolkit
   test: Test
 
 SideBarFixed:
+  respawned: Respawned
+  respawnedContent: You have respawned in the game, have fun!
   currentConnected: Connected
   launchedClients: Launched Clients
   noClientTitle: No Available Client
   noClient: No available client, please start the game
   settings: Settings
+  notConnected: Not Connected
+  inConnectionLoop: Connecting...
+  unknown: Unknown
   connectedClient: Connected Client
   launchedClientPlaceholder: Launched Client {{index}}
 
@@ -851,11 +946,14 @@ ClientConnection:
   quitClient: Quit Client Process
   disconnect: Disconnect
   more: More
+  playAgain: Play Again
 
 OrderedChampionList:
   searchForChampion: Search for Champion
   edit: Edit
   unselected: Unselected
+  moveUp: Move Up
+  moveDown: Move Down
 
 RankedTable:
   queueType: Queue Type
@@ -877,11 +975,525 @@ RankedDisplay:
   highest: Highest
   empty: No Content
 
+RankedPane:
+  unranked: Unranked
+  win: W
+  lose: L
+  point: P
+  leaguePoint: LP
+  highest: Highest
+  empty: No Content
+  crossRegion: Cross Region
+  unavailable: Unavailable
+
 DamageMetricsBar:
   total: Total
   physical: Physical
   magic: Magic
   true: 'True'
+
+MatchCard:
+  common:
+    loading: Loading...
+    noData: No data
+    refresh: Refresh
+
+  result:
+    abort: Aborted
+    remake: Remake
+    win: Victory
+    loss: Defeat
+    surrender: Surrender
+
+  teamName:
+    TEAM-100: Blue Team
+    TEAM-200: Red Team
+    CHERRY-0: '?'
+    CHERRY-1: Poro
+    CHERRY-2: Minion
+    CHERRY-3: Rift Scuttler
+    CHERRY-4: Krugs
+    CHERRY-5: Raptors
+    CHERRY-6: Sentinel
+    CHERRY-7: Wolves
+    CHERRY-8: Gromp
+
+  frameEventType:
+    CHAMPION_KILL: Champion Kill
+    CHAMPION_SPECIAL_KILL: Special Kill
+    BUILDING_KILL: Building Destroyed
+    TURRET_PLATE_DESTROYED: Turret Plate Destroyed
+
+  buildingType:
+    TOWER_BUILDING: Turret
+    INHIBITOR_BUILDING: Inhibitor
+
+  towerType:
+    OUTER_TURRET: Outer Turret
+    INNER_TURRET: Inner Turret
+    BASE_TURRET: Base Turret
+    NEXUS_TURRET: Nexus Turret
+
+  laneType:
+    MID_LANE: Mid Lane
+    TOP_LANE: Top Lane
+    BOT_LANE: Bot Lane
+
+  position:
+    TOP: Top
+    JUNGLE: Jungle
+    MIDDLE: Mid
+    BOTTOM: Bot
+    UTILITY: Support
+
+  teamTable:
+    objectives:
+      tower: Turret
+      inhibitor: Inhibitor
+      dragon: Dragon
+      baron: Baron Nashor
+      voidGrub: Voidgrub
+      riftHerald: Rift Herald
+      atakhan: Atakhan
+    bans: Bans
+    perMinuteSuffix: / min
+
+  overview:
+    perfect: Perfect
+    damage: Dmg.
+
+  radar:
+    damage: Damage ({{value}})
+    taken: Damage Taken ({{value}})
+    gold: Gold ({{value}})
+    cs: CS ({{value}})
+    kda: KDA ({{value}})
+    kp: KP ({{value}}%)
+    heal: Healing ({{value}})
+    teamAvg: Team Average
+
+  tabs:
+    summary: Overview
+    details: Detailed Table
+    runes: Runes
+    events: Events
+    builds: Builds
+    lineChart: Line Chart
+
+  replay:
+    download: Download Replay
+    watch: Watch Replay
+    unavailable: Replay Unavailable
+    label: Replay
+
+  buildsTab:
+    anvils_one: '{{count}} anvil'
+    anvils_other: '{{count}} anvils'
+    skillBuild: Skill Build
+    noSkillUpgrades: No skill upgrades
+    itemPurchases: Item Purchases
+    noItemPurchases: No item purchases
+
+  detailsTab:
+    gameId: Game ID
+    gameVersion: Game Version
+    filterPlaceholder: Filter
+    noFilterResult: No filter result
+
+  diffLineChart:
+    dataType: Data Type
+    gold: Gold
+    cs: CS
+    exp: XP
+    teamAverage: Team Average
+    players: Players
+    selectAll: Select All
+    teamAverageSuffix: '{{name}} Avg'
+    playerLabel: Player {{id}}
+    gameTime: Game Time
+    metric:
+      gold:
+        title: Player gold growth
+        yAxis: Gold
+        unit: Gold
+      cs:
+        title: Player CS growth
+        yAxis: CS
+        unit: CS
+      exp:
+        title: Player experience growth
+        yAxis: Experience
+        unit: EXP
+
+  eventsTab:
+    start: Game Start
+    end: Game End
+    viewPosition: View Position
+    kill: Kill
+    firstBlood: First Blood
+    multiKill: '{{count}} Kill(s)'
+    ace: Ace
+    destroyBuilding: Destroy Building
+    destroyed: Destroyed
+    destroyPlateTitle: Destroy Turret Plate
+    plateLane: '{{lane}} Plate'
+    plate: Turret Plate
+    filters: Filters
+    plateStats: Plate Stats
+    plateCount_one: '{{count}} plate'
+    plateCount_other: '{{count}} plates'
+    viewVictimDamageDetails: Damage Details
+
+    victimDamageDetails:
+      received: Received From
+      dealt: Dealt To
+      damageDealerNames:
+        champion: Champion
+        tower: Tower
+        minion: Minion
+        monster: Monster
+        other: Other
+
+  tags:
+    times: '{{label}}×{{count}}'
+    multiKill:
+      penta: Pentakill
+      quadra: Quadrakill
+      triple: Triple Kill
+      double: Double Kill
+    damage:
+      bestLabel: '★ Damage'
+      teamLabel: Damage
+      bestContent: 'Highest damage: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-best damage: {{value}}, {{rate}}% of team'
+    taken:
+      bestLabel: '★ Damage Taken'
+      teamLabel: Damage Taken
+      bestContent: 'Most damage taken: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most damage taken: {{value}}, {{rate}}% of team'
+    heal:
+      bestLabel: '★ Healing'
+      teamLabel: Healing
+      bestContent: 'Highest healing: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most healing: {{value}}, {{rate}}% of team'
+    tower:
+      bestLabel: '★ Tower Damage'
+      teamLabel: Tower Damage
+      bestContent: 'Highest turret damage: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-best turret damage: {{value}}, {{rate}}% of team'
+    shield:
+      bestLabel: '★ Shielding'
+      teamLabel: Shielding
+      bestContent: 'Highest shielding: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most shielding: {{value}}, {{rate}}% of team'
+    solo:
+      label: Solo Kill
+      content: 'Secured {{value}} solo kills'
+    gold:
+      bestLabel: '★ Gold'
+      teamLabel: Gold
+      bestContent: 'Highest gold: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most gold: {{value}}, {{rate}}% of team'
+    damageGoldEfficiency:
+      bestLabel: '★ Dmg-Gold'
+      teamLabel: Dmg-Gold
+      bestContent: 'Best damage-gold efficiency: {{rate}}%'
+      teamContent: 'Team-best damage-gold efficiency: {{rate}}%'
+    cs:
+      bestLabel: '★ CS'
+      bestContent: 'Highest CS: {{value}}'
+    csAdvantage:
+      label: CS Lead
+      content: 'Largest lane CS lead {{value}}'
+    kills:
+      bestLabel: '★ Kills'
+      teamLabel: Kills
+      bestContent: 'Most kills: {{value}}'
+      teamContent: 'Team-most kills: {{value}}'
+    kp:
+      bestLabel: '★ KP'
+      teamLabel: KP
+      bestContent: 'Highest kill participation: {{value}}%'
+      teamContent: 'Team-high kill participation: {{value}}%'
+    knockUp:
+      label: Knock Up
+      content: 'Knocked or pulled enemies into team {{value}} times'
+    cc:
+      bestLabel: '★ CC'
+      teamLabel: CC
+      bestContent: 'Most crowd control: {{value}}s'
+      teamContent: 'Team-most crowd control: {{value}}s'
+    towerKill:
+      diveLabel: Dives
+      underLabel: Under Tower
+      diveContent: 'Kills under enemy turret {{value}} times'
+      underContent: 'Kills under own turret {{value}} times'
+    none:
+      label: Nothing Special
+      content: No standout moments this game
+
+  groups:
+    combat-stats: Combat Stats
+    damage: Damage
+    cc: Crowd Control
+    vision: Vision
+    buildings: Buildings
+    economy: Economy
+    healing: Healing
+    pings: Pings
+    combat-advanced: Combat Advanced
+    objectives: Objectives
+    statistics: Statistics
+    abilities: Abilities
+    survival-skills: Survival Skills
+    teamfight: Teamfight
+    misc: Miscellaneous
+    ignored: Ignored
+    game-state: Game State
+
+  statKeys:
+    # Combat Stats
+    kills: Kills
+    deaths: Deaths
+    assists: Assists
+    doubleKills: Double Kills
+    tripleKills: Triple Kills
+    quadraKills: Quadra Kills
+    pentaKills: Penta Kills
+    unrealKills: Unreal Kills
+    killingSprees: Killing Sprees
+    largestKillingSpree: Largest Killing Spree
+    largestMultiKill: Largest Multi Kill
+    longestTimeSpentLiving: Longest Time Spent Living
+    largestCriticalStrike: Largest Critical Strike
+    damageGoldEfficiency: Damage Gold Efficiency
+    # Damage
+    totalDamageDealtToChampions: Total Damage to Champions
+    physicalDamageDealtToChampions: Physical Damage to Champions
+    magicDamageDealtToChampions: Magic Damage to Champions
+    trueDamageDealtToChampions: True Damage to Champions
+    totalDamageDealt: Total Damage Dealt
+    physicalDamageDealt: Physical Damage Dealt
+    magicDamageDealt: Magic Damage Dealt
+    trueDamageDealt: True Damage Dealt
+    damageDealtToObjectives: Damage to Objectives
+    damageDealtToTurrets: Damage to Turrets
+    damageDealtToBuildings: Damage to Buildings
+    damageDealtToEpicMonsters: Damage to Epic Monsters
+    totalDamageTaken: Total Damage Taken
+    physicalDamageTaken: Physical Damage Taken
+    magicDamageTaken: Magic Damage Taken
+    magicalDamageTaken: Magical Damage Taken
+    trueDamageTaken: True Damage Taken
+    damageSelfMitigated: Damage Self Mitigated
+    totalDamageShieldedOnTeammates: Total Shield on Teammates
+    # CC
+    timeCCingOthers: Time CCing Others
+    totalTimeCCDealt: Total CC Time Dealt
+    totalTimeCrowdControlDealt: Total Crowd Control Time
+    enemyChampionImmobilizations: Enemy Champion Immobilizations
+    immobilizeAndKillWithAlly: Immobilize and Kill with Ally
+    knockEnemyIntoTeamAndKill: Knock Enemy into Team and Kill
+    survivedThreeImmobilizesInFight: Survived Three Immobilizes
+    highestCrowdControlScore: Highest Crowd Control Score
+    # Vision
+    visionScore: Vision Score
+    wardsPlaced: Wards Placed
+    wardsKilled: Wards Killed
+    sightWardsBoughtInGame: Sight Wards Bought
+    visionWardsBoughtInGame: Vision Wards Bought
+    detectorWardsPlaced: Detector Wards Placed
+    visionScorePerMinute: Vision Score Per Minute
+    visionScoreAdvantageLaneOpponent: Vision Score Advantage vs Lane Opponent
+    wardTakedowns: Ward Takedowns
+    wardTakedownsBefore20M: Ward Takedowns Before 20 Min
+    wardsGuarded: Wards Guarded
+    twoWardsOneSweeperCount: Two Wards One Sweeper
+    controlWardsPlaced: Control Wards Placed
+    stealthWardsPlaced: Stealth Wards Placed
+    # Buildings
+    turretKills: Turret Kills
+    turretTakedowns: Turret Takedowns
+    soloTurretsLategame: Solo Turrets Late Game
+    turretsLost: Turrets Lost
+    firstTowerKill: First Tower Kill
+    firstTowerAssist: First Tower Assist
+    firstTurretKilled: First Turret Killed
+    firstTurretKilledTime: First Turret Kill Time
+    turretPlatesTaken: Turret Plates Taken
+    kTurretsDestroyedBeforePlatesFall: Turrets Destroyed Before Plates Fall
+    outerTurretExecutesBefore10Minutes: Outer Turret Kills Before 10 Min
+    quickFirstTurret: Quick First Turret
+    takedownOnFirstTurret: First Turret Takedown
+    turretsTakenWithRiftHerald: Turrets Taken with Rift Herald
+    multiTurretRiftHeraldCount: Multi Turret Rift Herald
+    inhibitorKills: Inhibitor Kills
+    inhibitorTakedowns: Inhibitor Takedowns
+    inhibitorsLost: Inhibitors Lost
+    firstInhibitorKill: First Inhibitor Kill
+    firstInhibitorAssist: First Inhibitor Assist
+    lostAnInhibitor: Lost an Inhibitor
+    nexusKills: Nexus Kills
+    nexusLost: Nexus Lost
+    nexusTakedowns: Nexus Takedowns
+    hadOpenNexus: Had Open Nexus
+    outnumberedNexusKill: Outnumbered Nexus Kill
+    objectivesStolen: Objectives Stolen
+    objectivesStolenAssists: Objectives Stolen Assists
+    # Economy
+    goldEarned: Gold Earned
+    goldSpent: Gold Spent
+    totalMinionsKilled: Total Minions Killed
+    neutralMinionsKilled: Neutral Minions Killed
+    neutralMinionsKilledEnemyJungle: Enemy Jungle Minions
+    neutralMinionsKilledTeamJungle: Team Jungle Minions
+    totalAllyJungleMinionsKilled: Ally Jungle Minions Killed
+    totalEnemyJungleMinionsKilled: Enemy Jungle Minions Killed
+    consumablesPurchased: Consumables Purchased
+    itemsPurchased: Items Purchased
+    earlyLaningPhaseGoldExpAdvantage: Early Laning Gold/XP Advantage
+    laningPhaseGoldExpAdvantage: Laning Phase Gold/XP Advantage
+    maxCsAdvantageOnLaneOpponent: Max CS Advantage vs Lane Opponent
+    # Healing
+    totalHeal: Total Healing
+    totalUnitsHealed: Total Units Healed
+    totalHealsOnTeammates: Total Heals on Teammates
+    # Pings
+    allInPings: All-In Pings
+    assistMePings: Assist Me Pings
+    basicPings: Basic Pings
+    commandPings: Command Pings
+    dangerPings: Danger Pings
+    enemyMissingPings: Enemy Missing Pings
+    enemyVisionPings: Enemy Vision Pings
+    getBackPings: Get Back Pings
+    holdPings: Hold Pings
+    needVisionPings: Need Vision Pings
+    onMyWayPings: On My Way Pings
+    pushPings: Push Pings
+    retreatPings: Retreat Pings
+    visionClearedPings: Vision Cleared Pings
+    # Combat Advanced
+    soloKills: Solo Kills
+    quickSoloKills: Quick Solo Kills
+    takedowns: Takedowns
+    outnumberedKills: Outnumbered Kills
+    multikills: Multikills
+    multikillsAfterAggressiveFlash: Multikills After Aggressive Flash
+    multiKillOneSpell: Multi Kill One Spell
+    killAfterHiddenWithAlly: Kill After Hidden with Ally
+    pickKillWithAlly: Pick Kill with Ally
+    killsWithHelpFromEpicMonster: Kills with Epic Monster Help
+    takedownsBeforeJungleMinionSpawn: Takedowns Before Jungle Spawn
+    takedownsFirstXMinutes: Takedowns First X Minutes
+    takedownsAfterGainingLevelAdvantage: Takedowns After Level Advantage
+    takedownsInAlcove: Takedowns in Alcove
+    takedownsInEnemyFountain: Takedowns in Enemy Fountain
+    killsOnOtherLanesEarlyJungleAsLaner: Early Roam Kills as Laner
+    getTakedownsInAllLanesEarlyJungleAsLaner: Early All Lane Roams
+    killsOnRecentlyHealedByAramPack: Kills on Recently Healed (ARAM)
+    # Objectives
+    baronTakedowns: Baron Takedowns
+    dragonTakedowns: Dragon Takedowns
+    riftHeraldTakedowns: Rift Herald Takedowns
+    teamBaronKills: Team Baron Kills
+    teamElderDragonKills: Team Elder Dragon Kills
+    teamRiftHeraldKills: Team Rift Herald Kills
+    soloBaronKills: Solo Baron Kills
+    baronBuffGoldAdvantageOverThreshold: Baron Buff Gold Advantage
+    earliestBaron: Earliest Baron
+    earliestDragonTakedown: Earliest Dragon Takedown
+    elderDragonKillsWithOpposingSoul: Elder Dragon vs Opposing Soul
+    elderDragonMultikills: Elder Dragon Multikills
+    perfectDragonSoulsTaken: Perfect Dragon Souls
+    epicMonsterSteals: Epic Monster Steals
+    epicMonsterStolenWithoutSmite: Epic Monster Stolen Without Smite
+    epicMonsterKillsNearEnemyJungler: Epic Monster Kills Near Enemy Jungler
+    epicMonsterKillsWithin30SecondsOfSpawn: Epic Monster Kills Within 30s of Spawn
+    junglerTakedownsNearDamagedEpicMonster: Jungler Takedowns Near Damaged Epic Monster
+    voidMonsterKill: Void Monster Kill
+    alliedJungleMonsterKills: Allied Jungle Monster Kills
+    enemyJungleMonsterKills: Enemy Jungle Monster Kills
+    scuttleCrabKills: Scuttle Crab Kills
+    buffsStolen: Buffs Stolen
+    jungleCsBefore10Minutes: Jungle CS Before 10 Min
+    initialBuffCount: Initial Buff Count
+    initialCrabCount: Initial Crab Count
+    moreEnemyJungleThanOpponent: More Enemy Jungle Than Opponent
+    # Statistics
+    kda: KDA
+    killParticipation: Kill Participation
+    damagePerMinute: Damage Per Minute
+    goldPerMinute: Gold Per Minute
+    damageTakenOnTeamPercentage: Team Damage Taken %
+    teamDamagePercentage: Team Damage %
+    # Abilities
+    abilityUses: Ability Uses
+    spell1Casts: Q Casts
+    spell2Casts: W Casts
+    spell3Casts: E Casts
+    spell4Casts: R Casts
+    summoner1Casts: Summoner Spell 1 Casts
+    summoner2Casts: Summoner Spell 2 Casts
+    # Survival Skills
+    deathsByEnemyChamps: Deaths by Enemy Champions
+    survivedSingleDigitHpCount: Survived with Single Digit HP
+    tookLargeDamageSurvived: Took Large Damage and Survived
+    killedChampTookFullTeamDamageSurvived: Killed Champ and Survived Full Team Damage
+    saveAllyFromDeath: Saved Ally from Death
+    skillshotsDodged: Skillshots Dodged
+    skillshotsHit: Skillshots Hit
+    snowballsHit: Snowballs Hit
+    dodgeSkillShotsSmallWindow: Dodge Skillshots in Small Window
+    landSkillShotsEarlyGame: Land Skillshots Early Game
+    blastConeOppositeOpponentCount: Blast Cone Knockback Count
+    quickCleanse: Quick Cleanse
+    dancedWithRiftHerald: Danced with Rift Herald
+    fistBumpParticipation: Fist Bump Participation
+    # Teamfight
+    flawlessAces: Flawless Aces
+    doubleAces: Double Aces
+    acesBefore15Minutes: Aces Before 15 Minutes
+    fullTeamTakedown: Full Team Takedown
+    shortestTimeToAceFromFirstTakedown: Shortest Time to Ace
+    12AssistStreakCount: 12 Assist Streak
+    teleportTakedowns: Teleport Takedowns
+    # Misc
+    champLevel: Champion Level
+    champExperience: Champion Experience
+    timePlayed: Time Played
+    totalTimeSpentDead: Time Spent Dead
+    firstBloodKill: First Blood
+    firstBloodAssist: First Blood Assist
+    baronKills: Baron Kills
+    dragonKills: Dragon Kills
+    killsNearEnemyTurret: Kills Near Enemy Turret
+    killsUnderOwnTurret: Kills Under Own Turret
+    unseenRecalls: Unseen Recalls
+    effectiveHealAndShielding: Effective Heal and Shield
+    bountyGold: Bounty Gold
+    laneMinionsFirst10Minutes: Lane Minions First 10 Min
+    twentyMinionsIn3SecondsCount: 20 Minions in 3 Seconds
+    legendaryCount: Legendary Count
+    perfectGame: Perfect Game
+    maxKillDeficit: Max Kill Deficit
+    maxLevelLeadLaneOpponent: Max Level Lead vs Lane Opponent
+    completeSupportQuestInTime: Complete Support Quest in Time
+    mejaisFullStackInTime: Mejai's Full Stack in Time
+    HealFromMapSources: Heal from Map Sources
+    gameLength: Game Length
+    playedChampSelectPosition: Played Champ Select Position
+    hadAfkTeammate: Had AFK Teammate
+    highestChampionDamage: Highest Champion Damage
+    # Game State
+    gameEndedInEarlySurrender: Ended in Early Surrender
+    gameEndedInSurrender: Ended in Surrender
+    causedEarlySurrender: Caused Early Surrender
+    earlySurrenderAccomplice: Early Surrender Accomplice
+    teamEarlySurrendered: Team Early Surrendered
+    # Boolean values
+    'true': 'Yes'
+    'false': 'No'
 
 SpectateStatus:
   button: Spectate
@@ -896,12 +1508,12 @@ SpectateStatus:
 
   tokenSpectate:
     label: Copy Token
-    description: Can be used to start the spectate process in another instance of League Akari.
+    description: Can be used to start the spectate process in another instance of $t(common:appName).
     button: Copy
     copied: Spectate token copied
     copyFailed: Failed to copy spectate token
 
-MatchHistoryTabsTitle:
+PlayerTabsTitle:
   loading: Loading...
   search: Search
   refresh: Refresh
@@ -911,33 +1523,31 @@ MatchHistoryTabsTitle:
   screenshot: Screenshot Tab
   searchButtonStreamerModeWarning: Searching for players will expose sensitive information, continue?
 
-SearchSummonerModal:
+SearchPane:
   title: Summoner Search
-  placeholder: Enter the summoner name
-  sgpServer: Server
+  combinedServersReference: Combined Servers Reference
+  searchTypePuuid: PUUID
+  searchTypeExact: Exact
+  searchTypeFuzzy: Fuzzy
   cancel: Cancel
-  search: Search Player
-  result: Search Results
-  friends: Friends
-  history: Recent Visit
-  validating: Validating players ({{current}} / {{total}})
-  validated: Validated {{countV}} possible player records, no matching results found
-  noResult: No matching results found
+  search: Search
+  resultCount: 'Search Results: {{count}}'
   privacy: Private
-  currentRoute: Current
-  invalidInput: 'The input format is invalid: it should be "GameName#Tag" or "GameName"'
-  hasInvisibleChar: The search text contains invisible characters, which will be filtered out
-  puuidSearch: 'Performing exact search: Searching by specified PUUID'
-  exactSearch: 'Performing exact search: Searching for summoner with specified name and tag'
-  fuzzySearch: 'Performing fuzzy search: Searching for summoners with specified name'
+  searching: Searching
+  noResult: No Search Results
+  noResultHintFuzzy: Search by name only, e.g.
+  noResultHintExact: Search by name and tagline exactly, e.g.
+  noResultHintPuuid: Search by PUUID, e.g.
+  noResultHintFuzzyExample: Yui Fumani
+  noResultHintExactExample: 'Akari #Akaza'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: Recent Visits
+  pinned: Pinned ({{count}})
+  recent: Recent ({{count}})
+  noRecentVisits: No Recent Visits
+  friends: Friends ({{count}})
+  noFriends: No Friends
   getFriendsFailed: Failed to get friend list
-  showAll: Show All
-  clear: Clear
-
-  placeholders:
-    - 'For exact search: AkazaAkari#akari'
-    - 'For fuzzy search - Format: FunamiYui'
-    - 'For PUUID search - Format: <puuid>'
 
 PlayerTagEditModal:
   title: Edit Player Tag
@@ -977,7 +1587,7 @@ Client:
 
     disconnect:
       label: Disconnect
-      description: Disconnect League Akari from the League Client.
+      description: Disconnect $t(common:appName) from the League Client.
       button: Disconnect
 
     quitClient:
@@ -1068,6 +1678,7 @@ Toolkit:
   misc: Misc
   claim-tools: Claim Tools
   friend-tools: Friend Tools
+  loot-tools: Loot Tools
 
 ChampionBench:
   title: Champion Bench
@@ -1344,21 +1955,44 @@ Spectate:
     failedNotification:
       title:
 
-MatchHistoryTabs:
+PlayerTabs:
   disconnected: Not connected to the client
   queueing: Logging in...
   noActiveTab: No active match history tab
   copiedToClipboard: Copied to clipboard
   dropZoneRosterMember: Drop here to navigate to the player's profile
 
-MatchHistoryTab:
+PlayerTab:
   prevPage: Previous
   nextPage: Next
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
-  itemPerPage: '{{countV}}'
+  filter:
+    title: In-page Filters
+    reset: Clear Filters
+    winLoss: Result
+    all: All
+    win: Win
+    loss: Loss
+    summoners: Summoners involved
+    champions: Champions involved
+  itemPerPage_one: '{{count}} item'
+  itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'
+
+  summonerNotFoundTitle: Summoner Not Found {{puuid}}
+  summonerNotFoundContent: The summoner you are looking for does not exist
+  failedToLoadSummonerTitle: Failed to Load Summoner
+  failedToLoadSummonerContent: 'Unable to load summoner information: {{reason}}'
+  failedToLoadMatchHistoryTitle: Failed to Load Match History
+  failedToLoadMatchHistoryContent: 'Unable to load match history: {{reason}}'
+  failedToLoadRankedStatsTitle: Failed to Load Ranked Stats
+  failedToLoadRankedStatsContent: 'Unable to load ranked stats: {{reason}}'
+
+  noMatchHistory: No match history
+  noFilteredMatchHistory: No filtered match history
+  loading: Loading...
 
   private:
     title: Profile Hidden
@@ -1389,6 +2023,8 @@ MatchHistoryTab:
     wr: Win Rate
     champions: Champion Usage
     times: Games
+    teamSides: Team Sides
+    activeSession: Active Session Win/Lose
 
   recentPlayers:
     teammatesTitle: Recent Teammates
@@ -1455,7 +2091,8 @@ MatchHistoryCard:
   abort: Aborted
   surrender: Surrender
 
-StandaloneMatchHistoryCardModal:
+MatchPreviewer:
+  noData: No data available.
   notFound: Game not found
   error: Failed to load game
   reload: Reload
@@ -1625,7 +2262,8 @@ ItemDisplay:
   combinePrice: Combine for {{gold}} G
 
 PlayerInfoCard:
-  empty: No Content
+  reload: Reload
+  empty: No matches found for this queue
   loadingMatchHistory: Loading...
   errorLoadingMatchHistory: Unable to load
   top4Rate: Top 4 Rate
@@ -1660,7 +2298,7 @@ PlayerInfoCard:
     gameStats: Game Stats
     winResult:
       abort: Abort
-      lose: Lose
+      loss: Loss
       remake: Remake
       win: Win
     team:
@@ -1671,16 +2309,13 @@ PlayerInfoCard:
   losingStreakPopover: Currently on a losing streak of {{countV}} games.
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
-  soloKills:
-    tooManySoloDeathsInEarlyGame: '{{times}} Solo Deaths'
-    tooManySoloDeathsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player was solo killed {{times}} times on average
-    tooManySoloKillsInEarlyGame: '{{times}} Solo Kills'
-    tooManySoloKillsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player get solo kills {{times}} times on average
+  soloKills: '{{times}} Solo Kills'
+  soloKillsPopover: In the recent {{countV}} games, this player get solo kills {{times}} times on average
   akariLoved:
-    good: Good
-    great: Excellent
-    goodPopover: This player has performed well in recent games.
-    greatPopover: This player has shown exceptional performance in recent games.
+    outstanding: Outstanding
+    extraordinary: Extraordinary
+    outstandingPopover: This player has performed well in recent games.
+    extraordinaryPopover: This player has shown exceptional performance in recent games.
   champion:
     winRate: 'Recent {{countV}} games, win rate {{winRate}}%'
     level: 'Level {{level}}'
@@ -1689,7 +2324,7 @@ PlayerInfoCard:
     winResult:
       na: '-'
       win: W
-      lose: L
+      loss: L
       remake: R
       abort: Abrt
 
@@ -1699,11 +2334,13 @@ PlayerInfoCard:
   taggedByOther: Tagged by
   unknown: Unknown
   premade: Team {{team}}
-  highWinRate: High Win Rate
+  highWinRate: High W/R
   met: Met
   private: Private
   winningStreak: '{{countV}} Wins'
   losingStreak: '{{countV}} Losses'
+
+  reloadMatchHistory: Reload
 
 TeamTagsArea:
   winRateTeam: Win-Rate Team
@@ -1716,22 +2353,22 @@ OngoingGame:
   disconnected: Not connected to the client
   waitingForSpectate: Waiting for spectate delay
   noOngoingGame: No ongoing game
-  disabled: Game analysis disabled
+  disabled: Game analysis disabled, please re-enable this feature in settings
   avgTeamWinRate: Average Team Win Rate
   avgTeamKda: Average Team KDA
 
-AuxWindowTitleBar:
+AuxWindowTitlebar:
   opgg: OP.GG View
   opggTitle: View on OP.GG
   close: Close
   minimize: Minimize
   indicator: Aux Win.
-  indicatorTitle: Auxiliary Window of League Akari
+  indicatorTitle: Auxiliary Window of $t(common:appName)
   pin: Pin
   unpin: Unpin
   repositionToAlignLeagueClientUx: Align with League Client UX
 
-OpggWindowTitleBar:
+OpggWindowTitlebar:
   close: Close
   minimize: Minimize
   pin: Pin
@@ -1760,11 +2397,6 @@ BenchChampionsMini:
     tenacity: Tenacity
     energy-regen: Energy Regen
 
-BenchModeAutoGrab:
-  grabbing: Selecting in {{seconds}}s
-  noExpectedChampions: No expected champion list set for auto-selection
-  noCandidate: No available champions for auto-selection
-
 ChampSelectActions:
   picked: Picked
   voted: Voted
@@ -1777,6 +2409,12 @@ ChampSelectActions:
   tenBansRevealing: bans Revealing
   inProgress: In Progress
   completed: Completed
+  ceremonies:
+    ten_bans_reveal: 10 Bans Reveal
+    TEN_BANS_REVEAL: 10 Bans Reveal
+    phase_transition: Phase Transition
+    vote_transition: Vote Transition
+    team_vote_reveal: Team Vote Reveal
 
 ChampSelectOperations:
   dodge:
@@ -1785,18 +2423,10 @@ ChampSelectOperations:
     popconfirm: This will exit the champion select phase.
     positiveText: Exit
     negativeText: Cancel
+    cancel: Cancel
 
-  dodgeAtLastSecond:
-    label: Last-Second Dodge Threshold
-    waitingForTiming: Last-Second Dodge (Waiting)
-    waiting: Dodge in {{seconds}} s
-    text: 'Last-Second Dodge'
-    thresholdWarning: A threshold that is too low ({{seconds}} s) may result in dodge failure
-
-  autos:
-    autoPick: Auto Pick
-    autoBan: Auto Ban
-    autoGrab: Auto Grab
+  temporarilyDisabled:
+    label: Temporarily Disable Auto Ban/Pick
 
 LoungeOperations:
   immediately: Immediately
@@ -1857,11 +2487,10 @@ Placeholder:
   idle: No active activities
   spectating: Spectating
 
-Opgg:
+OpggTabAndFilters:
   toOpgg: Go to OP.GG
   refresh: Refresh
-  close: Close
-  tier: Tier
+  champions: Tier
   champion: Champion
   empty: None
   mode: Mode
@@ -1869,46 +2498,6 @@ Opgg:
   rankTier: Rank Tier
   position: Position
   version: Version
-  replace: Provide
-  create: Create
-  notConnected: Not connected to the client, some resources may not be loaded
-  cancel: Cancel
-
-  settings:
-    button: Settings
-    title: OP.GG Settings
-
-    flashPosition:
-      label: Flash Position Preference
-      description: When setting summoner spells, prioritize the position for Flash if it is selected
-      auto: Current Flash position
-      options:
-        d: Default Flash position is D
-        f: Default Flash position is F
-        auto: Decide based on the current Flash position
-
-    autoApplyRunes:
-      label: Auto Apply Runes
-      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-    autoApplySpells:
-      label: Auto Apply Summoner Spells
-      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-    autoApplyItems:
-      label: Auto Apply Item Builds
-      description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
-
-  success: 'Request sent: {{reason}}'
-  summonerSpells: Summoner Spells
-  runes: Rune Builds
-  loadVersionsFailedMessage: 'Failed to fetch version data: {{reason}}'
-  loadTierFailedMessage: 'Failed to fetch tier data: {{reason}}'
-  loadChampionFailedMessage: 'Failed to fetch champion data: {{reason}}'
-  setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
-  setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
-  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
-  runesSet: '[League Akari] {{action}} rune build: {{name}}'
 
   modes:
     ranked: 'Ranked'
@@ -1959,7 +2548,10 @@ Opgg:
     grandmaster: 'Grandmaster'
     challenger: 'Challenger'
 
-OpggTier:
+  settings:
+    button: Settings
+
+OpggChampionTable:
   searchPlaceholder: Search for name
   columns:
     champion: Name
@@ -1968,8 +2560,54 @@ OpggTier:
     pickRate: P/R
     counter: Counters
     banRate: B/R
+  cancel: Cancel
+
+OpggView:
+  replace: Provide
+  create: Create
+  noVersionFound: No version found
+
+  settings:
+    title: OP.GG Settings
+
+    enabled:
+      label: Enable
+      description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+
+    flashPosition:
+      label: Flash Position Preference
+      description: The position for Flash when setting summoner spells
+      auto: Current position
+      options:
+        d: Default Flash position is D
+        f: Default Flash position is F
+        auto: Decide based on the current Flash position
+
+    autoApplyRunes:
+      label: Auto Apply Runes
+      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+    autoApplySpells:
+      label: Auto Apply Summoner Spells
+      description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+    autoApplyItems:
+      label: Auto Apply Item Builds
+      description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+
+  success: 'Request sent: {{reason}}'
+  summonerSpells: Summoner Spells
+  runes: Rune Builds
+  setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
+  setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
+  spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+  runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
+
+  sessionChampions:
+    title: Session Champions
 
 OpggChampion:
+  boots: Boots
   adorableRabi: Kawaii Bunny
   avgPlace: Avg. Rank
   1st: 1st Place
@@ -1999,8 +2637,19 @@ OpggChampion:
   augmentSilver: Silver
   augmentPrism: Prism
   synergies: Synergies
+  balance:
+    title: Balance
+    attack_speed: Attack Speed
+    damage_dealt: Damage Dealt
+    damage_taken: Damage Taken
+    cooldown_reduction: CDR
+    healing: Healing
+    tenacity: Tenacity
+    shield_amount: Shield Amount
+    energy_regen: Energy Regen
+    area_of_effect_damage: AoE Damage
 
-  writeToDisk: '[League Akari] Written to item build: {{name}}'
+  writeToDisk: '[$t(common:appName)] Written to item build: {{name}}'
   writtenToDisk: Successfully written to file
   writeFileFailedMessage: Failed to write file {{reason}}
   bootsDesc: Boots (sorted by pick rate)
@@ -2008,8 +2657,9 @@ OpggChampion:
   itemsDesc: Items (sorted by pick rate)
   coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
   starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
+  cancel: Cancel
 
-EasyToLaunch:
+StartupPane:
   tcls: TCLS Client
   weGame: WeGame
   riotClient: Riot Client
@@ -2033,7 +2683,7 @@ ChampionConfig:
   aram: ARAM
   urf: URF
   nexusblitz: Nexus Blitz
-  ultbook: Ultimate Spellbook
+  ultbook: Ult Book
   runes: Runes
   configure: Configure
   spells: Spells
@@ -2102,6 +2752,7 @@ ClaimableItem:
 
 FriendTools:
   title: Friends
+  searchPlaceholder: Search friend name or tag
 
   deleteButtonC: Delete ({{countV}})
   deleteButton: Delete
@@ -2120,6 +2771,11 @@ FriendTools:
     groupName: Friend Group
     lastGameDate: Last Game Date
     friendSince: Friend Since
+
+LootTools:
+  title: Loot Tools
+  refreshSuccess: Refreshed
+  refreshFailed: Failed to fetch {{reason}}
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
@@ -2153,6 +2809,14 @@ TemplateEdit:
     ongoing-game: Default Ongoing Game Template
     remote: Remote Template
 
+  templateErrorTypes:
+    'not-an-object': Template is not an object
+    'no-getMetadata': Template is missing getMetadata method
+    'no-metadata': getMetadata method did not return a metadata object
+    'unsupported-version': Template version is not supported
+    'wrong-template-type': Template type is incorrect
+    'no-getMessages': Template is missing getMessages method
+
 SendableItemEdit:
   title: Sendable Item
   newButton: New Sendable Item
@@ -2165,6 +2829,14 @@ SendableItemEdit:
   deleteButton: Delete
   errorTemplateInvalid: Invalid template used
   errorTemplateExecutionFailed: An error occurred when executing the template last time
+
+  templateErrorTypes:
+    'not-an-object': Template is not an object
+    'no-getMetadata': Template is missing getMetadata method
+    'no-metadata': getMetadata method did not return a metadata object
+    'unsupported-version': Template version is not supported
+    'wrong-template-type': Template type is incorrect
+    'no-getMessages': Template is missing getMessages method
   plaintextPlaceholder: |
     Provide the text split by lines here, like:
     First line
@@ -2218,6 +2890,24 @@ RemoteTemplatesModal:
   noTemplates: No templates
   noTemplateDescription: No description
 
+AutomationPlan:
+  autoPick:
+    title: Auto Pick
+    willPick: Will Pick
+
+  autoBan:
+    title: Auto Ban
+    willBan: Will Ban
+
+  autoBenchSwap:
+    title: Auto Bench Swap
+    willSwap: Will Swap
+
+  autoChampionSwap:
+    title: Auto Champion Swap
+    willAccept: Will Accept
+    willDecline: Will Decline
+
 simple-notifications-renderer:
   newReleaseHints:
     title: New Version Available
@@ -2232,12 +2922,26 @@ simple-notifications-renderer:
 
     detected:
       title: Are you live streaming?
-      liveTools: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
-      bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
+      liveTools: $t(common:appName) has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+      bySettings: $t(common:appName) has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
 
   login-queue-task:
     name: Login Queue
     description: 'Queueing: {{position}} / {{maxPosition}} (estimated {{waitTime}})'
+
+  higherVersionDb:
+    title: Detected higher version database
+    content: The database version in use is higher than this application supports. Please update $t(common:appName) to the latest version for best compatibility
+    positiveText: View Update
+
+  badSgpConnection:
+    title: Poor SGP Data Source Network Connection
+    content:
+      usingSgp: Currently using SGP data source, but poor network connection quality has been detected, which may affect data retrieval and functionality.
+      recommendation: 'It is recommended to go to "Settings → $t(AppSettings.title) → $t(AppSettings.basic.title) → $t(AppSettings.basic.preferredLolSource.label)" and change the data source to LCU for a more stable experience.'
+      vpnReason: This may be caused by network instability when using VPN to access cross-region servers.
+    positiveText: Go to Settings
+    negativeText: Dismiss
 
   replay-download-progress-task:
     name: Replay Download
@@ -2249,10 +2953,29 @@ simple-notifications-renderer:
     closeButton: Close
     watchButton: Watch Replay
 
+  wmiRequiresAdministrator:
+    title: Requires Administrator
+    content: Current use WMI to get league client command line, requires running this application with administrator privileges
+    positiveText: Restart with Administrator privileges
+    negativeText: Cancel
+
+  cannotGetUxCommandLine:
+    title: Cannot Get League Client UX Command Line
+    alreadyUseWmi: Detected League Client UX is running, but cannot get its command line information. It may be that $t(common:appName) cannot be used on this computer
+    noAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to restart this application with administrator privileges, then enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
+    withAdminContent: Detected League Client UX is running, but cannot get its command line information. Please try to enable or disable "Use WMI to get command line" in settings to try to solve the problem. If the connection continues to be unavailable, please feedback this issue to the development team
+    extraContent: 'Please note: In some streamlined systems or internet café environments, due to certain restrictions, $t(common:appName) may not work properly'
+    withAdminPositiveText: Confirm
+    noAdminPositiveText: Restart with Administrator privileges
+
+  autoReconnect:
+    title: Auto Reconnect
+    content: Will reconnect in {{timeLeft}}.
+
 league-client-renderer:
   initialization-task:
     name: LCU Initialization
-    current: Loading {{endpoint}} ({{finishedCount}}/{{allCount}})
+    current: Completed {{finishedCount}}/{{allCount}}
 
   connection-task:
     name: Connect to LCU
@@ -2260,10 +2983,19 @@ league-client-renderer:
 
 self-update-renderer:
   self-update-task:
-    name: League Akari Update
+    name: $t(common:appName) Update
     downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
     download-failed: Failed to download archive
     unpacking: Unpacking archive {{progress}}%
     unpack-failed: Failed to unpack the archive file
     waiting-for-restart: Updated applied. Restart the application to apply the update
     cancelButton: Cancel
+
+  title: Self Update
+  start-update: Starting update $t(common:appName)
+  updateOnNextStartup: Updated Applied. Restart the application to apply the update
+  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
+  lastUpdateSuccess: Updated to {{version}}
+
+self-hosted-lcu-data-renderer:
+  reloadFriendsFailed: Failed to reload friends

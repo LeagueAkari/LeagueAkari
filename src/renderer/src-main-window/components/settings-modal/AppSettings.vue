@@ -33,10 +33,87 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
-        label="Theme Color (experimental)"
-        label-description="Theme color for League Akari (!!DEBUG ONLY!!)"
+        :label="t('AppSettings.basic.preferredLolSource.label')"
+        :label-description="t('AppSettings.basic.preferredLolSource.description')"
+        :label-width="400"
+      >
+        <div class="flex items-center gap-3">
+          <NSelect
+            style="width: 160px"
+            size="small"
+            :value="as.settings.preferredLolSource"
+            @update:value="(val) => app.setPreferredLolSource(val)"
+            :options="lolSourceOptions"
+          />
+          <NPopover>
+            <template #trigger>
+              <div class="hover-text">
+                {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
+              </div>
+            </template>
+            <div class="max-w-[320px]">
+              <div class="mb-2">
+                <div class="flex h-[22px] items-center">
+                  <span class="text-xs font-bold">{{
+                    t('AppSettings.basic.preferredLolSource.tip.sgp.title')
+                  }}</span>
+                </div>
+                <div class="text-[11px] leading-relaxed">
+                  <div class="text-neutral-600 dark:text-gray-200">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
+                  </div>
+                  <div class="text-neutral-600 dark:text-gray-200">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
+                  </div>
+                  <div class="text-neutral-600 dark:text-gray-200">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
+                  </div>
+                </div>
+                <div class="mt-1 text-[11px] text-orange-600 dark:text-orange-400">
+                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
+                </div>
+              </div>
+              <div>
+                <div class="mb-1 flex h-[22px] items-center">
+                  <span class="text-xs font-bold">{{
+                    t('AppSettings.basic.preferredLolSource.tip.lcu.title')
+                  }}</span>
+                </div>
+                <div class="text-[11px] leading-relaxed">
+                  <div class="text-neutral-600 dark:text-gray-200">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
+                  </div>
+                  <div class="text-neutral-600 dark:text-gray-200">
+                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
+                  </div>
+                </div>
+                <div class="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
+                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
+                </div>
+              </div>
+            </div>
+          </NPopover>
+        </div>
+        <div
+          v-if="
+            sgps.availability.sgpServerId &&
+            as.settings.preferredLolSource === 'sgp' &&
+            !sgps.availability.serversSupported.matchHistory
+          "
+          class="mt-2 text-sm font-bold text-orange-500 dark:text-orange-300"
+        >
+          {{
+            t('AppSettings.basic.preferredLolSource.unsupported', {
+              server: sgps.availability.sgpServerId
+            })
+          }}
+        </div>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.basic.theme.label')"
+        :label-description="t('AppSettings.basic.theme.description')"
         :label-width="400"
       >
         <NSelect
@@ -48,27 +125,12 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="isDev && as.settings.isInKyokoMode"
-        class="control-item-margin"
-        :label="t('AppSettings.basic.backgroundMaterial.label')"
-        :label-description="t('AppSettings.basic.backgroundMaterial.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="wms.settings.backgroundMaterial"
-          @update:value="(val) => wm.setBackgroundMaterial(val)"
-          :options="backgroundMaterials"
-        />
-      </ControlItem>
-      <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.basic.dataSource.label')"
         :label-description="t('AppSettings.basic.dataSource.description')"
         :label-width="400"
       >
-        <NFlex align="center">
+        <div class="flex items-center gap-3">
           <NSelect
             style="width: 160px"
             size="small"
@@ -76,19 +138,19 @@
             @update:value="(val) => rc.setPreferredSource(val)"
             :options="remoteConfigSource"
           />
-          <NTooltip>
+          <NPopover>
             <template #trigger>
               <div class="hover-text">
                 {{ t('AppSettings.basic.dataSource.howToChoose') }}
               </div>
             </template>
             <div>
-              <div style="display: flex; align-items: center; height: 22px">
-                <NIcon style="margin-right: 8px; font-size: 16px">
+              <div class="flex h-[22px] items-center">
+                <NIcon class="mr-2">
                   <GiteeSvg />
                 </NIcon>
-                <span style="font-weight: bold; font-size: 12px">Gitee</span>
-                <span style="margin-left: 4px">
+                <span class="text-xs font-bold">Gitee</span>
+                <span class="ml-1">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
                   </template>
@@ -96,20 +158,26 @@
                     ({{
                       latency.giteeLatency === -1
                         ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.giteeLatency} ms`
+                        : `${latency.giteeLatency.toFixed(1)} ms`
                     }})
+
+                    <span
+                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                      v-if="latency.giteeLatency < latency.githubLatency"
+                      >{{ t('AppSettings.basic.dataSource.better') }}</span
+                    >
                   </template>
                 </span>
               </div>
               <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
             </div>
-            <div style="margin-top: 8px">
-              <div style="display: flex; align-items: center; height: 22px">
-                <NIcon style="margin-right: 8px">
+            <div class="mt-2">
+              <div class="flex h-[22px] items-center">
+                <NIcon class="mr-2">
                   <GithubIcon />
                 </NIcon>
-                <span style="font-size: 12px; font-weight: bold">GitHub</span>
-                <span style="margin-left: 4px">
+                <span class="text-xs font-bold">GitHub</span>
+                <span class="ml-1">
                   <template v-if="isTestingLatency">
                     {{ t('AppSettings.basic.dataSource.testingSpeed') }}
                   </template>
@@ -117,14 +185,20 @@
                     ({{
                       latency.githubLatency === -1
                         ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.githubLatency} ms`
+                        : `${latency.githubLatency.toFixed(1)} ms`
                     }})
+
+                    <span
+                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                      v-if="latency.githubLatency < latency.giteeLatency"
+                      >{{ t('AppSettings.basic.dataSource.better') }}</span
+                    >
                   </template>
                 </span>
               </div>
               <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
             </div>
-            <div style="margin-top: 8px; display: flex; justify-content: center">
+            <div class="mt-2 flex justify-center">
               <NButton
                 size="tiny"
                 secondary
@@ -134,14 +208,26 @@
                 {{ t('AppSettings.basic.dataSource.testButton') }}
               </NButton>
             </div>
-          </NTooltip>
-        </NFlex>
+          </NPopover>
+        </div>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
       </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.selfUpdate.updateLatestRelease.label')"
+        :label-description="t('AppSettings.selfUpdate.updateLatestRelease.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="rcs.settings.updateLatestRelease"
+          @update:value="(val: boolean) => rc.setUpdateLatestRelease(val)"
+        />
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
@@ -204,7 +290,7 @@
           >
             {{ t('AppSettings.selfUpdate.cancelUpdate') }}
           </NButton>
-          <span v-if="sus.lastCheckAt" style="font-size: 12px"
+          <span v-if="sus.lastCheckAt" class="text-xs"
             >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
             {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
           >
@@ -291,10 +377,24 @@
         }}</NButton>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span>
       </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.mainWindowUi.backgroundMaterial.label')"
+        :label-description="t('AppSettings.mainWindowUi.backgroundMaterial.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="wms.settings.backgroundMaterial"
+          @update:value="(val) => wm.setBackgroundMaterial(val)"
+          :options="backgroundMaterials"
+        />
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
@@ -309,7 +409,7 @@
         />
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span>
       </template>
@@ -327,14 +427,14 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AppSettings.lcConnection.useWmic.label')"
-        :label-description="t('AppSettings.lcConnection.useWmic.description')"
+        :label="t('AppSettings.lcConnection.useWmi.label')"
+        :label-description="t('AppSettings.lcConnection.useWmi.description')"
         :label-width="400"
       >
         <NSwitch
           size="small"
-          :value="lcus.settings.useWmic"
-          @update:value="(val: boolean) => lcu.setUseWmic(val)"
+          :value="lcus.settings.useWmi"
+          @update:value="(val: boolean) => lcu.setUseWmi(val)"
         />
       </ControlItem>
       <ControlItem
@@ -348,7 +448,7 @@
         </NButton>
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <NCard size="small" class="mt-2">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.misc.title') }}</span>
       </template>
@@ -428,6 +528,16 @@
           @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.misc.uninstallApp.label')"
+        :label-description="t('AppSettings.misc.uninstallApp.description')"
+        :label-width="400"
+      >
+        <NButton size="small" type="error" @click="() => handleUninstallApp()">
+          {{ t('AppSettings.misc.uninstallApp.button') }}
+        </NButton>
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -448,6 +558,7 @@ import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useMainWindowStore,
@@ -466,28 +577,27 @@ import {
   NIcon,
   NInput,
   NInputNumber,
+  NPopover,
   NScrollbar,
   NSelect,
   NStep,
   NSteps,
   NSwitch,
-  NTooltip,
   useDialog,
   useMessage
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
+import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
 const { t } = useTranslation()
 
-const isDev = import.meta.env.DEV
-
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
 const sus = useSelfUpdateStore()
+const sgps = useSgpStore()
 const wms = useWindowManagerStore()
 const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
@@ -527,11 +637,18 @@ const locales = [
   { label: 'English', value: 'en' }
 ]
 
-const themes = [
-  { label: '跟随系统', value: 'default' },
-  { label: '亮色', value: 'light' },
-  { label: '暗色', value: 'dark' }
+const lolSourceOptions = [
+  { label: 'SGP', value: 'sgp' },
+  { label: 'LCU', value: 'lcu' }
 ]
+
+const themes = computed(() => {
+  return [
+    { label: t('AppSettings.basic.theme.options.default'), value: 'default' },
+    { label: t('AppSettings.basic.theme.options.light'), value: 'light' },
+    { label: t('AppSettings.basic.theme.options.dark'), value: 'dark' }
+  ]
+})
 
 const logLevels = [
   { label: 'Info', value: 'info' },
@@ -542,10 +659,17 @@ const logLevels = [
 
 const backgroundMaterials = computed(() => {
   return [
-    { label: '默认', value: 'none' },
-    { label: 'Mica', value: 'mica', disabled: !wms.supportsMica }
+    { label: t('AppSettings.mainWindowUi.backgroundMaterial.options.none'), value: 'none' },
+    {
+      label: wms.supportsMica
+        ? t('AppSettings.mainWindowUi.backgroundMaterial.options.mica')
+        : t('AppSettings.mainWindowUi.backgroundMaterial.options.micaUnsupported'),
+      value: 'mica',
+      disabled: !wms.supportsMica
+    }
   ]
 })
+
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({
@@ -563,12 +687,26 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
   })
 }
 
+const handleUninstallApp = () => {
+  dialog.warning({
+    title: t('AppSettings.misc.uninstallApp.title'),
+    content: t('AppSettings.misc.uninstallApp.content'),
+    positiveText: t('AppSettings.misc.uninstallApp.positiveText'),
+    negativeText: t('AppSettings.misc.uninstallApp.negativeText'),
+    onPositiveClick: async () => {
+      if (!import.meta.env.DEV) {
+        await su.uninstallApp()
+      }
+    }
+  })
+}
+
 const httpProxyStrategies = computed(() => {
   return [
-    {
-      label: t('AppSettings.misc.httpProxy.strategy.options.auto'),
-      value: 'auto'
-    },
+    // {
+    //   label: t('AppSettings.misc.httpProxy.strategy.options.auto'),
+    //   value: 'auto'
+    // },
     {
       label: t('AppSettings.misc.httpProxy.strategy.options.disable'),
       value: 'disable'
@@ -666,23 +804,20 @@ handleTestLatency()
 const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
-<style lang="less" scoped>
-.hover-text {
-  font-size: 12px;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.3s;
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-  &:hover {
-    color: #fff;
+@layer components {
+  .hover-text {
+    @apply cursor-pointer text-xs text-black/60 transition-[color] duration-300 hover:text-black dark:text-white/60 dark:hover:text-white;
   }
-}
 
-.step-title {
-  font-size: 12px;
-}
+  .step-title {
+    @apply text-xs;
+  }
 
-.step-description {
-  font-size: 11px;
+  .step-description {
+    @apply text-[11px];
+  }
 }
 </style>

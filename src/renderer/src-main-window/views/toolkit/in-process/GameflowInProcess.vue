@@ -6,21 +6,6 @@
       </span>
     </template>
     <ControlItem
-      v-if="as.settings.isInKyokoMode"
-      class="control-item-margin"
-      :label="t('GameflowInProgress.dodge.label')"
-      :label-description="t('GameflowInProgress.dodge.description')"
-      :label-width="260"
-    >
-      <NButton
-        type="warning"
-        :disabled="lcs.gameflow.phase !== 'ChampSelect'"
-        @click="handleDodge"
-        size="small"
-        >{{ t('GameflowInProgress.dodge.button') }}</NButton
-      >
-    </ControlItem>
-    <ControlItem
       class="control-item-margin"
       :label="t('GameflowInProgress.playAgain.label')"
       :label-description="t('GameflowInProgress.playAgain.description')"
@@ -49,7 +34,6 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
@@ -58,25 +42,10 @@ import { computed } from 'vue'
 
 const { t } = useTranslation()
 
-const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
 
 const notification = useNotification()
-
-const handleDodge = async () => {
-  try {
-    await lc.api.login.dodge()
-  } catch (error) {
-    notification.warning({
-      title: () => t('GameflowInProgress.dodge.failedNotification.title'),
-      content: () =>
-        t('GameflowInProgress.dodge.failedNotification.description', {
-          reason: (error as Error).message
-        })
-    })
-  }
-}
 
 const isInEndgamePhase = computed(() => {
   return (
@@ -101,4 +70,4 @@ const handlePlayAgain = async () => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style scoped></style>

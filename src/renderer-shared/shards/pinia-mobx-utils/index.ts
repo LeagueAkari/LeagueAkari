@@ -7,6 +7,10 @@ import { AkariIpcRenderer } from '../ipc'
 // 对应主进程相应模块
 export const MAIN_SHARD_NAMESPACE = 'mobx-utils-main'
 
+interface PropConfig {
+  raw: boolean
+}
+
 /**
  * 对应主进程模块, 适用于 Pinia 的状态同步器
  */
@@ -20,24 +24,24 @@ export class PiniaMobxUtilsRenderer implements IAkariShardInitDispose {
     this._ipc.onEvent(
       MAIN_SHARD_NAMESPACE,
       `update-state-prop/${namespace}:${stateId}`,
-      (path, value, { action }) => {
+      (path, value, { action, raw }) => {
         if (action === 'update' || action === 'create') {
-          _.set(store, path, _.isObject(value) ? markRaw(value) : value)
+          _.set(store, path, _.isObject(value) ? (raw ? markRaw(value) : value) : value)
         } else if (action === 'delete') {
           _.unset(store, path)
         }
       }
     )
 
-    const initial: Record<string, any> = await this._ipc.call(
+    const initial: Record<string, { value: any; config: PropConfig }> = await this._ipc.call(
       MAIN_SHARD_NAMESPACE,
       'subscribeAndGetInitialState',
       namespace,
       stateId
     )
 
-    Object.entries(initial).forEach(([key, value]) => {
-      _.set(store, key, _.isObject(value) ? markRaw(value) : value)
+    Object.entries(initial).forEach(([key, { value, config }]) => {
+      _.set(store, key, _.isObject(value) ? (config.raw ? markRaw(value) : value) : value)
     })
   }
 

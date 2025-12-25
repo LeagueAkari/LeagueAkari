@@ -8,7 +8,7 @@ import IronMedal from '@renderer-shared/assets/ranked-icons/iron.png'
 import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
 
 export const RANKED_MEDAL_MAP: Record<string, string> = {
@@ -25,25 +25,9 @@ export const RANKED_MEDAL_MAP: Record<string, string> = {
 }
 
 export function useIdleState() {
-  const lc = useLeagueClientStore()
+  const ogs = useOngoingGameStore()
 
-  return computed(() => {
-    return (
-      lc.gameflow.phase === 'Lobby' ||
-      lc.gameflow.phase === 'None' ||
-      lc.gameflow.phase === 'Matchmaking' ||
-      lc.gameflow.phase === 'ReadyCheck' ||
-      lc.gameflow.phase === 'WatchInProgress' ||
-      (lc.gameflow.phase !== 'InProgress' &&
-        lc.champSelect.session &&
-        lc.champSelect.session.isSpectating) ||
-      lc.connectionState !== 'connected'
-    )
-  })
-}
-
-export interface TeamMeta {
-  name: string
+  return computed(() => ogs.queryStage.phase === 'unavailable')
 }
 
 export const CHINESE_NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
@@ -86,10 +70,25 @@ export const PREMADE_TEAM_COLORS = {
   F: { foregroundColor: '#da4e2e', color: '#fff', borderColor: '#da4e2ed0' },
   G: { foregroundColor: '#bc2ebc', color: '#fff', borderColor: '#bc2ebcd0' },
   H: { foregroundColor: '#fa4e80', color: '#000', borderColor: '#fa4e80d0' },
-  I: { foregroundColor: '#0B3D91', color: '#fff', borderColor: '#0B3D91d0' },
-  J: { foregroundColor: '#7F0000', color: '#fff', borderColor: '#7F0000d0' },
-  K: { foregroundColor: '#8B4513', color: '#fff', borderColor: '#8B4513d0' },
+  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#0b3d91d0' },
+  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#7f0000d0' },
+  K: { foregroundColor: '#8b4513', color: '#fff', borderColor: '#8b4513d0' },
   L: { foregroundColor: '#555555', color: '#fff', borderColor: '#555555d0' }
+}
+
+export const PREMADE_TEAM_COLORS_LIGHT = {
+  A: { foregroundColor: '#0f6f68', color: '#fff', borderColor: '#0f6f68d0' },
+  B: { foregroundColor: '#1f3fa6', color: '#fff', borderColor: '#1f3fa6d0' },
+  C: { foregroundColor: '#5c6000', color: '#fff', borderColor: '#5c6000d0' },
+  D: { foregroundColor: '#1a7a2a', color: '#fff', borderColor: '#1a7a2ad0' },
+  E: { foregroundColor: '#8a4400', color: '#fff', borderColor: '#8a4400d0' },
+  F: { foregroundColor: '#8a2a00', color: '#fff', borderColor: '#8a2a00d0' },
+  G: { foregroundColor: '#6a0d6a', color: '#fff', borderColor: '#6a0d6ad0' },
+  H: { foregroundColor: '#a2133f', color: '#fff', borderColor: '#a2133fd0' },
+  I: { foregroundColor: '#0b3d91', color: '#fff', borderColor: '#0b3d91d0' },
+  J: { foregroundColor: '#7f0000', color: '#fff', borderColor: '#7f0000d0' },
+  K: { foregroundColor: '#5a2a0b', color: '#fff', borderColor: '#5a2a0bd0' },
+  L: { foregroundColor: '#333333', color: '#fff', borderColor: '#333333d0' }
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'

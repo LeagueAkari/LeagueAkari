@@ -77,12 +77,12 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
   }
 
-  readClipboardText() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
+  setPreferredLolSource(s: 'sgp' | 'lcu') {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'preferredLolSource', s)
   }
 
-  writeClipboardImage(buffer: ArrayBuffer) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'writeClipboardImage', buffer)
+  readClipboardText() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }
 
   async onInit() {
@@ -104,12 +104,16 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRuntimeInfo') as Promise<any>
   }
 
-  quit() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'quit')
+  exit() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exit')
   }
 
   onRendererLink(fn: (url: string) => void) {
     return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'renderer-link', fn)
+  }
+
+  relaunchAsAdministrator() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'relaunchAsAdministrator')
   }
 
   async onDispose() {}

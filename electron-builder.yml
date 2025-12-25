@@ -6,6 +6,7 @@ files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!uno.config.{js,ts,mjs,cjs}'
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,README-en.md,FAQ.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml,yarn.lock}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
@@ -14,6 +15,7 @@ files:
   - '!images'
   - '!pictures'
   - '!akari-updater'
+  - '!rabi-*'
 
 asarUnpack:
   - resources/**
@@ -28,6 +30,10 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+
+asar: true
+electronFuses:
+  enableEmbeddedAsarIntegrityValidation: true
 
 npmRebuild: false
 publish:

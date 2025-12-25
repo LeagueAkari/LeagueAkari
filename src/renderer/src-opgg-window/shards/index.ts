@@ -1,5 +1,6 @@
 import { createManager } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import {
@@ -18,6 +19,7 @@ const manager = createManager()
 
 manager.use(AkariIpcRenderer)
 manager.use(AppCommonRenderer)
+manager.use(AutoChampConfigRenderer)
 manager.use(ExtraAssetsRenderer)
 manager.use(LeagueClientRenderer, {
   subscribeState: {

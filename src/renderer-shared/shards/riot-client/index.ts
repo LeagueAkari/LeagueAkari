@@ -11,13 +11,12 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
   public readonly api = new RiotClientHttpApiAxiosHelper(
     axios.create({
       baseURL: 'akari://riot-client',
-      adapter: 'fetch'
+      adapter: 'fetch',
+      paramsSerializer: { indexes: null }
     })
   )
 
-  async onInit() {
-    // await this._pm.sync('league-client-main')
-  }
+  async onInit() {}
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
+  constructor(@Dep(PiniaMobxUtilsRenderer) readonly _pm: PiniaMobxUtilsRenderer) {}
 }

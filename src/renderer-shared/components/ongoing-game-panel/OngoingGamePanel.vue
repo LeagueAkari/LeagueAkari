@@ -1,9 +1,20 @@
 <template>
-  <div class="ongoing-game-view" ref="og-view-container">
-    <DefineOngoingTeam v-slot="{ players, team }">
-      <div class="team-wrapper">
-        <div class="team-stats-header">
-          <span class="title">{{ formatTeamText(team).name }}</span>
+  <div class="h-full" ref="viewContainer">
+    <!-- teams template -->
+    <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
+      <div class="not-last:mb-4">
+        <!-- header + tags -->
+        <div class="mb-2 flex items-end">
+          <div
+            v-if="teamColor"
+            :class="[
+              'mr-2 size-[10px] self-center rounded-full border border-white/20',
+              teamColor === 'red' ? 'bg-[#ff3333]' : '',
+              teamColor === 'blue' ? 'bg-[#40c1ff]' : '',
+              teamColor === 'white' ? 'bg-neutral-500 dark:bg-neutral-200' : ''
+            ]"
+          ></div>
+          <span class="mr-3 text-base leading-tight font-bold">{{ teamName }}</span>
           <TeamTagsArea
             v-if="players.length >= 1"
             :side-id="team"
@@ -13,21 +24,31 @@
             :champion-selections="ogs.championSelections"
           />
         </div>
-        <div class="team-members">
+
+        <!-- players -->
+        <div
+          class="mt-1 grid gap-x-1 gap-y-2"
+          :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
+        >
           <PlayerInfoCard
+            :class="{
+              'h-[280px]': playerInfoCardHeightLevel === 1,
+              'h-[320px]': playerInfoCardHeightLevel === 2,
+              'h-[360px]': playerInfoCardHeightLevel === 3,
+              'h-[400px]': playerInfoCardHeightLevel === 4,
+              'h-[440px]': playerInfoCardHeightLevel === 5
+            }"
             v-for="player of players"
             :puuid="player"
             :key="player"
             :is-self="player === lcs.summoner.me?.puuid"
             :champion-id="ogs.championSelections?.[player]"
-            :match-history="
-              ogs.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
-            "
+            :match-history="ogs.matchHistory[player]?.data"
             :match-history-loading="ogs.matchHistoryLoadingState[player]"
-            :summoner="ogs.summoner[player]?.data"
-            :ranked-stats="ogs.rankedStats[player]?.data"
+            :summoner="ogs.summoner[player]"
+            :ranked-stats="ogs.rankedStats[player]"
             :saved-info="ogs.savedInfo[player]"
-            :champion-mastery="ogs.championMastery[player]?.data"
+            :champion-mastery="ogs.championMastery[player]"
             :analysis="ogs.playerStats?.players[player]"
             :position="ogs.positionAssignments?.[player]"
             :premade-team-id="premadeTeamInfo.premadeTeamIdMap[player]"
@@ -39,49 +60,67 @@
             @show-game-by-id="emits('showGameById', $event, player)"
             @to-summoner="emits('toSummoner', $event)"
             @highlight="handleHighlightSubTeam"
+            @reload="(player) => og.reloadPlayer(player)"
           />
         </div>
       </div>
     </DefineOngoingTeam>
-    <NScrollbar v-if="!isInIdleState && ogs.settings.enabled" x-scrollable>
-      <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
+
+    <NScrollbar v-if="!isInIdleState" x-scrollable>
+      <div class="relative m-auto h-full p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
           :team="team"
           :key="team"
           :players="players"
+          :teamColor="mapTeamColor(team)"
+          :teamName="formatTeamText(team)"
         />
       </div>
     </NScrollbar>
-    <div v-else class="no-ongoing-game">
-      <div class="centered">
-        <LeagueAkariSpan bold class="akari-text" />
+
+    <!-- placeholder panel -->
+    <div v-else class="relative flex h-full">
+      <div
+        class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
+      >
         <template v-if="ogs.settings.enabled">
-          <template v-if="lcs.connectionState !== 'connected'">
-            <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
-            <EasyToLaunch v-if="showEasyToLaunch" />
-          </template>
-          <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
-            <span class="no-ongoing-game-text"> {{ t('OngoingGame.waitingForSpectate') }}</span>
-          </template>
-          <template v-else>
-            <span class="no-ongoing-game-text"> {{ t('OngoingGame.noOngoingGame') }}</span>
-          </template>
+          <div
+            v-if="lcs.connectionState !== 'connected'"
+            class="text-base font-normal text-black/60 dark:text-white/80"
+          >
+            {{ t('OngoingGame.disconnected') }}
+          </div>
+
+          <div
+            v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating"
+            class="text-base font-normal text-black/60 dark:text-white/80"
+          >
+            {{ t('OngoingGame.waitingForSpectate') }}
+          </div>
+
+          <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
+            {{ t('OngoingGame.noOngoingGame') }}
+          </div>
         </template>
-        <span v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</span>
+
+        <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
+          {{ t('OngoingGame.disabled') }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { Game } from '@shared/types/league-client/match-history'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { findOutliersByIqr } from '@shared/data-adapter/utils'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { MatchHistoryGamesAnalysisAll, findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
@@ -92,18 +131,13 @@ import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   FIXED_CARD_WIDTH_PX_NUMBER,
   PREMADE_TEAMS,
-  TeamMeta,
   useIdleState
 } from './ongoing-game-utils'
 import TeamTagsArea from './widgets/TeamTagsArea.vue'
 
-const { showEasyToLaunch = true } = defineProps<{
-  showEasyToLaunch?: boolean
-}>()
-
 const emits = defineEmits<{
   toSummoner: [puuid: string]
-  showGame: [game: Game, puuid: string]
+  showGame: [game: LcuOrSgpGameSummary, puuid: string]
   showGameById: [id: number, selfPuuid: string]
 }>()
 
@@ -111,6 +145,7 @@ const lcs = useLeagueClientStore()
 
 const { t } = useTranslation()
 
+const og = useInstance(OngoingGameRenderer)
 const ogs = useOngoingGameStore()
 
 const isInIdleState = useIdleState()
@@ -181,7 +216,7 @@ const sortedTeams = computed(() => {
       }
 
       if (ogs.settings.orderPlayerBy === 'kda') {
-        return (statsB?.summary.averageKda || 0) - (statsA?.summary.averageKda || 0)
+        return (statsB?.summary.avgKda || 0) - (statsA?.summary.avgKda || 0)
       }
 
       if (ogs.settings.orderPlayerBy === 'win-rate') {
@@ -196,6 +231,13 @@ const sortedTeams = computed(() => {
 })
 
 const premadeTeamInfo = computed(() => {
+  if (ogs.queryStage.phase === 'lobby' || ogs.queryStage.phase === 'unavailable') {
+    return {
+      groups: {},
+      premadeTeamIdMap: {}
+    }
+  }
+
   const playerMap: {
     groups: Record<string, string[]> // premadeId, puuids
     premadeTeamIdMap: Record<string, string> // puuid, premadeId (A, B, C, ...)
@@ -204,61 +246,46 @@ const premadeTeamInfo = computed(() => {
     premadeTeamIdMap: {}
   }
 
-  let groupIndex = 0
-  Object.entries(ogs.teamParticipantGroups).forEach(([_, groups]) => {
-    if (groups.length < 2) {
-      return
+  for (const [puuid, premadeId] of Object.entries(ogs.calculatedPremadeTeamMap)) {
+    const groupId = PREMADE_TEAMS[premadeId - 1]
+
+    if (playerMap.groups[groupId]) {
+      playerMap.groups[groupId].push(puuid)
+    } else {
+      playerMap.groups[groupId] = [puuid]
     }
 
-    const groupId = PREMADE_TEAMS[groupIndex++]
-    playerMap.groups[groupId] = groups
-    groups.forEach((p) => {
-      playerMap.premadeTeamIdMap[p] = groupId
-    })
-  })
-
-  // 组队信息以 teamParticipantGroups 为准, 推断性的信息则仅仅作补充
-  Object.entries(ogs.inferredPremadeTeams).forEach(([_, groups]) => {
-    groups.forEach((g) => {
-      if (g.some((p) => playerMap.premadeTeamIdMap[p])) {
-        return
-      }
-
-      const groupId = PREMADE_TEAMS[groupIndex++]
-      playerMap.groups[groupId] = g
-
-      g.forEach((p) => {
-        playerMap.premadeTeamIdMap[p] = groupId
-      })
-    })
-  })
+    playerMap.premadeTeamIdMap[puuid] = groupId
+  }
 
   return playerMap
 })
 
-const formatTeamText = (team: string): TeamMeta => {
-  if (ogs.gameInfo?.queueType === 'CHERRY') {
-    if (lcs.gameflow.phase === 'ChampSelect') {
-      return {
-        name: team.startsWith('our')
-          ? t(`teams.our`, { ns: 'common' })
-          : t(`teams.their`, { ns: 'common' })
-      }
-    } else {
-      if (team === 'all') {
-        return { name: t(`teams.all`, { ns: 'common' }) }
-      }
+const formatTeamText = (teamIdentifier: string) => {
+  return t(`teams.${teamIdentifier}`, { ns: 'common', defaultValue: teamIdentifier })
+}
 
-      return { name: t(`teams.unknown`, { ns: 'common' }) }
-    }
-  } else {
-    return { name: t(`teams.${team}`, { ns: 'common', defaultValue: team }) }
+const mapTeamColor = (team: string) => {
+  switch (team) {
+    case 'TEAM-100':
+      return 'blue'
+
+    case 'TEAM-200':
+      return 'red'
+
+    case 'LOBBY':
+      return 'white'
+
+    default:
+      return null
   }
 }
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
   players: string[]
   team: string
+  teamColor: string | null
+  teamName: string
 }>({ inheritAttrs: false })
 
 const currentHighlightingPremadeTeamId = ref<string | null>(null)
@@ -283,7 +310,7 @@ const kdaOutliers = computed(() => {
 
   const kdaList = Object.entries(ogs.playerStats.players).map(([puuid, p]) => ({
     puuid,
-    kda: p.summary.averageKda
+    kda: p.summary.avgKda
   }))
 
   const iqr = findOutliersByIqr(kdaList, (a) => a.kda, IQR_THRESHOLD)
@@ -360,14 +387,22 @@ const mapSummoners = (team: string) => {
   const thisTeamSummoners: Record<string, SummonerInfo> = {}
   Object.entries(ogs.summoner).forEach(([puuid, summoner]) => {
     if (t.includes(puuid)) {
-      thisTeamSummoners[puuid] = summoner.data
+      thisTeamSummoners[puuid] = summoner
     }
   })
 
   return thisTeamSummoners
 }
 
-const { width } = useElementSize(useTemplateRef('og-view-container'))
+const viewContainerEl = useTemplateRef('viewContainer')
+const { width, height } = useElementSize(
+  viewContainerEl,
+  {
+    width: 1024,
+    height: 800
+  },
+  {}
+)
 const columnsNeed = computed(() => {
   const teamColumns = Object.values(ogs.teams || {})
     .map((t) => t.length)
@@ -379,132 +414,24 @@ const columnsNeed = computed(() => {
 
   return Math.min(maxAllowed || 2, teamColumns)
 })
+
+const playerInfoCardHeightLevel = computed(() => {
+  if (height.value > 1000) {
+    return 5
+  }
+
+  if (height.value > 900) {
+    return 4
+  }
+
+  if (height.value > 820) {
+    return 3
+  }
+
+  if (height.value > 740) {
+    return 2
+  }
+
+  return 1
+})
 </script>
-
-<style lang="less" scoped>
-.ongoing-game-view {
-  height: 100%;
-}
-
-.inner-container {
-  position: relative;
-  height: 100%;
-  margin: 0 auto;
-  padding: 16px;
-
-  .content {
-    display: flex;
-  }
-
-  &.fit-content {
-    width: fit-content;
-  }
-}
-
-.team-members {
-  display: grid;
-  margin-top: 4px;
-  grid-template-columns: repeat(v-bind(columnsNeed), v-bind(FIXED_CARD_WIDTH_PX_LITERAL));
-  gap: 8px 4px;
-}
-
-.sora {
-  height: 16px;
-}
-
-.team-stats-header {
-  display: flex;
-  margin-bottom: 8px;
-  align-items: flex-end;
-
-  .title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 8px;
-  }
-
-  .analysis {
-    display: flex;
-    gap: 8px;
-  }
-
-  .win-rate {
-    font-weight: bold;
-  }
-}
-
-.team-wrapper {
-  &:not(:last-child) {
-    margin-bottom: 16px;
-  }
-}
-
-.team-side-analysis-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.no-ongoing-game {
-  height: 100%;
-  display: flex;
-  position: relative;
-
-  .akari-text {
-    font-size: 22px;
-  }
-
-  .no-ongoing-game-text {
-    font-size: 14px;
-    font-weight: normal;
-  }
-}
-
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  gap: 16px;
-}
-
-[data-theme='dark'] {
-  .team-stats-header {
-    .win-rate.gte-50 {
-      color: #4cc69d;
-    }
-
-    .win-rate.lt-50 {
-      color: #ff6161;
-    }
-  }
-
-  .no-ongoing-game {
-    .no-ongoing-game-text {
-      color: rgba(255, 255, 255, 0.4);
-    }
-  }
-}
-
-[data-theme='light'] {
-  .team-stats-header {
-    .win-rate.gte-50 {
-      color: rgb(44, 140, 108);
-    }
-
-    .win-rate.lt-50 {
-      color: rgb(204, 0, 0);
-    }
-  }
-
-  .no-ongoing-game {
-    .no-ongoing-game-text {
-      color: rgba(0, 0, 0, 0.4);
-    }
-  }
-}
-</style>

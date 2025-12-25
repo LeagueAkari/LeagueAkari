@@ -34,7 +34,7 @@ const { position = 'ALL' } = defineProps<{
 }>()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .icon {
   display: inline-block;
   width: 1em;

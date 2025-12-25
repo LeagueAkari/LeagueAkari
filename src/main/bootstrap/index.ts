@@ -32,6 +32,7 @@ import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
+import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { AkariManager } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
@@ -51,6 +52,9 @@ import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
   'log-level-changed': [level: string]
+
+  /** 当其他实例附带参数时 */
+  'second-instance-deep-link': [url: string]
 }
 
 declare module '@shared/akari-shard' {
@@ -87,6 +91,11 @@ declare module '@shared/akari-shard' {
       value: BaseConfig | null
       write: (config: Partial<BaseConfig>) => void
     }
+
+    /**
+     * 跟随本次启动而来的 deep link
+     */
+    startupDeepLink: string | null
 
     version: string
 
@@ -219,7 +228,7 @@ export function bootstrap() {
     manager.global.quit = () => app.quit()
     manager.global.restart = () => {
       app.relaunch()
-      app.quit()
+      app.exit()
     }
     manager.global.getLogLevel = getLevel
     manager.global.setLogLevel = (level: string) => {
@@ -293,12 +302,38 @@ export function bootstrap() {
       }
     }
 
+    if (process.defaultApp) {
+      const appPath = path.resolve(process.argv[1])
+      app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL, process.execPath, [appPath])
+    } else {
+      app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL)
+    }
+
+    const getDeepLinkArg = (argv: string[]) => {
+      const urlArg = argv.find(
+        (a) => typeof a === 'string' && a.startsWith(`${DEEP_LINK_PROTOCOL}://`)
+      )
+
+      return urlArg || null
+    }
+
+    const deepLinkArg = getDeepLinkArg(process.argv)
+    if (deepLinkArg) {
+      manager.global.startupDeepLink = deepLinkArg
+    }
+
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
-      logger.warn({
-        message: `User attempted to start a second instance, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
-        namespace: 'electron'
+
+      logger.info({
+        message: `Second instance detected with command line: ${commandLine.join(' ')}`,
+        namespace: 'app'
       })
+
+      const deepLinkArg = getDeepLinkArg(commandLine)
+      if (deepLinkArg) {
+        events.emit('second-instance-deep-link', deepLinkArg)
+      }
     })
 
     app.on('window-all-closed', () => {
@@ -352,7 +387,7 @@ export function bootstrap() {
         })
     })
 
-    app.on('quit', () => {
+    process.on('exit', () => {
       console.log(
         `\x1b[1m\x1b[92m[${dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')}] [finale] Application exited\x1b[0m`
       )

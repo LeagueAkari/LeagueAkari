@@ -1,35 +1,17 @@
 <template>
-  <div id="opgg-window-frame">
+  <div class="flex h-full min-h-(--la-app-min-height) min-w-(--la-app-min-width) flex-col">
     <SetupInAppScope />
-    <OpggWindowTitleBar />
-    <div class="content">
-      <RouterView v-slot="{ Component }">
-        <KeepAlive>
-          <component :is="Component" />
-        </KeepAlive>
-      </RouterView>
-    </div>
+    <OpggWindowTitlebar />
+    <OpggView class="h-0 flex-1" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 
-import OpggWindowTitleBar from './components/OpggWindowTitleBar.vue'
+import OpggView from './opgg/OpggView.vue'
+import OpggWindowTitlebar from './opgg/OpggWindowTitlebar.vue'
+import { provideOpgg } from './opgg/context'
+
+provideOpgg()
 </script>
-
-<style lang="less">
-#opgg-window-frame {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  min-width: var(--app-min-width);
-  min-height: var(--app-min-height);
-
-  > .content {
-    height: 0;
-    flex: 1;
-    overflow: hidden;
-  }
-}
-</style>

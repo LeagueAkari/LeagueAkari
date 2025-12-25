@@ -1,89 +1,74 @@
-import { SgpServersConfig } from '@shared/data-sources/sgp'
+import { USER_AGENT } from '@shared/constants/common'
 import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
+import {
+  InGameSendTemplateCatalog,
+  LeagueServersConfig,
+  OngoingGameConfig,
+  SupportedQueues
+} from '@shared/validators/remote-config'
 import axios from 'axios'
 import crypto from 'crypto'
 import matter from 'gray-matter'
 
-export interface RemoteConfigRepositoryConfig {
-  locale: 'zh-CN' | 'en'
-  source: 'github' | 'gitee'
+export type RemoteRepositorySource = 'github' | 'gitee'
+
+export interface RepositoryRequest {
+  source: RemoteRepositorySource
+  repo: 'akari-config' | 'akari'
 }
 
-export interface InGameSendTemplateCatalog {
-  templates: Array<{
-    id: string
-    name: string
-    type: string
-    description: string
-    version: number
-    path: string
-  }>
+export interface RepositoryBranchRequest extends RepositoryRequest {
+  branch?: string
+}
+
+export interface AnnouncementRequest extends RepositoryBranchRequest {
+  locale: 'zh-CN' | 'en'
+}
+
+export interface ReleaseRequest extends RepositoryRequest {
+  page?: number
+  perPage?: number
 }
 
 /**
  * 连接到 LeagueAkari/LeagueAkari-Config 或 LeagueAkari/LeagueAkari 仓库
  */
 export class RemoteGitRepository {
-  private _config = {
-    locale: 'zh-CN',
-    source: 'github'
-  }
-
   private _http = axios.create({
     headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0 OPR/105.0.0.0'
+      'User-Agent': USER_AGENT
     }
   })
-
-  constructor(config: Partial<RemoteConfigRepositoryConfig> = {}) {
-    this.setConfig(config)
-  }
 
   /**
    * 获取 API 地址
    */
-  private _apiUrl(uri: string, repo: 'akari-config' | 'akari' = 'akari-config') {
+  private _apiUrl(uri: string, { source, repo }: RepositoryRequest) {
     if (uri.startsWith('/')) {
       uri = uri.slice(1)
     }
 
     const r = repo === 'akari-config' ? 'LeagueAkari-Config' : 'LeagueAkari'
 
-    if (this._config.source === 'github') {
+    if (source === 'github') {
       return `https://api.github.com/repos/LeagueAkari/${r}/${uri}`
     }
 
     return `https://gitee.com/api/v5/repos/LeagueAkari/${r}/${uri}`
   }
 
-  private _rawContentUrl(
-    uri: string,
-    repo: 'akari-config' | 'akari' = 'akari-config',
-    branch = 'main'
-  ) {
+  private _rawContentUrl(uri: string, { source, repo, branch = 'main' }: RepositoryBranchRequest) {
     if (uri.startsWith('/')) {
       uri = uri.slice(1)
     }
 
     const r = repo === 'akari-config' ? 'LeagueAkari-Config' : 'LeagueAkari'
 
-    if (this._config.source === 'github') {
+    if (source === 'github') {
       return `https://raw.githubusercontent.com/LeagueAkari/${r}/refs/heads/${branch}/${uri}`
     }
 
     return `https://gitee.com/LeagueAkari/${r}/raw/${branch}/${uri}`
-  }
-
-  setConfig(config: Partial<RemoteConfigRepositoryConfig>) {
-    this._config = {
-      ...this._config,
-      ...config
-    }
-  }
-
-  get config() {
-    return this._config
   }
 
   static getGitHubApiFileBase64Content(data: GithubApiFile) {
@@ -96,9 +81,10 @@ export class RemoteGitRepository {
     return Buffer.from(content, 'base64').toString('utf-8')
   }
 
-  async getAnnouncement() {
+  async getAnnouncement(request: AnnouncementRequest) {
+    const { locale, ...repoRequest } = request
     const { data: rawData } = await this._http.get<string>(
-      this._rawContentUrl(`/announcement/${this._config.locale}.md`)
+      this._rawContentUrl(`/announcement/${locale}.md`, repoRequest)
     )
 
     const { data, content } = matter(rawData)
@@ -110,35 +96,42 @@ export class RemoteGitRepository {
     }
   }
 
-  async getSgpLeagueServersConfig() {
-    const { data } = await this._http.get<SgpServersConfig>(
-      this._rawContentUrl(`/config/sgp/league-servers.json`)
+  async getSgpLeagueServersConfig(request: RepositoryBranchRequest) {
+    return this._http.get<LeagueServersConfig>(
+      this._rawContentUrl(`/config/sgp/league-servers.json`, request)
     )
-
-    return data
   }
 
-  async getInGameSendTemplateCatalog() {
-    const { data } = await this._http.get<InGameSendTemplateCatalog>(
-      this._rawContentUrl(`/config/in-game-send/templates/catalog.json`)
+  async getInGameSendTemplateCatalog(request: RepositoryBranchRequest) {
+    return this._http.get<InGameSendTemplateCatalog>(
+      this._rawContentUrl(`/config/in-game-send/templates/catalog.json`, request)
     )
+  }
 
-    return data
+  async getSupportedQueues(request: RepositoryBranchRequest) {
+    return this._http.get<SupportedQueues>(
+      this._rawContentUrl(`/config/sgp/supported-queues.json`, request)
+    )
+  }
+
+  async getOngoingGameConfig(request: RepositoryBranchRequest) {
+    return this._http.get<OngoingGameConfig>(
+      this._rawContentUrl(`/config/ongoing-game/config.json`, request)
+    )
   }
 
   /**
    *
    * @param uri
-   * @param repo default is akari-config
-   * @param branch default is main
+   * @param request
    * @returns
    */
-  getRawContent(uri: string, repo: 'akari-config' | 'akari' = 'akari-config', branch = 'main') {
-    return this._http.get(this._rawContentUrl(uri, repo, branch))
+  getRawContent(uri: string, request: RepositoryBranchRequest) {
+    return this._http.get(this._rawContentUrl(uri, request))
   }
 
-  getReleases(page = 1, perPage = 20) {
-    return this._http.get<GithubApiLatestRelease[]>(this._apiUrl(`/releases`, 'akari'), {
+  getReleases({ page = 1, perPage = 20, ...request }: ReleaseRequest) {
+    return this._http.get<GithubApiLatestRelease[]>(this._apiUrl(`/releases`, request), {
       params: {
         page,
         per_page: perPage
@@ -146,8 +139,8 @@ export class RemoteGitRepository {
     })
   }
 
-  getLatestRelease() {
-    return this._http.get<GithubApiLatestRelease>(this._apiUrl(`/releases/latest`, 'akari'))
+  getLatestRelease(request: RepositoryRequest) {
+    return this._http.get<GithubApiLatestRelease>(this._apiUrl(`/releases/latest`, request))
   }
 
   async testGitHubLatency() {

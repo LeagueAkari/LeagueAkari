@@ -6,8 +6,8 @@ import { bootstrap } from './bootstrap'
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-if (!gotTheLock) {
+if (gotTheLock) {
+  bootstrap()
+} else {
   app.quit()
 }
-
-bootstrap()

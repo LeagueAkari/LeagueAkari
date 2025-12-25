@@ -1,9 +1,9 @@
 <template>
-  <div class="summoner-spells">
+  <div class="flex gap-2">
     <NPopover trigger="click" v-model:show="popover1Show">
       <template #trigger>
         <LcuImage
-          class="icon"
+          class="h-7 w-7 cursor-pointer rounded"
           :src="
             modelData.spell1Id
               ? lcs.gameData.summonerSpells[modelData.spell1Id]?.iconPath
@@ -11,8 +11,9 @@
           "
         />
       </template>
-      <div class="selectable-spells">
+      <div class="grid grid-cols-4 gap-2 p-2 text-xs text-black dark:text-white">
         <SummonerSpellDisplay
+          class="cursor-pointer rounded"
           :keep-alive-on-hover="false"
           :size="32"
           :delay="1000"
@@ -25,7 +26,7 @@
     <NPopover trigger="click" v-model:show="popover2Show">
       <template #trigger>
         <LcuImage
-          class="icon"
+          class="h-7 w-7 cursor-pointer rounded"
           :src="
             modelData.spell2Id
               ? lcs.gameData.summonerSpells[modelData.spell2Id]?.iconPath
@@ -33,8 +34,9 @@
           "
         />
       </template>
-      <div class="selectable-spells">
+      <div class="grid grid-cols-4 gap-2 p-2 text-xs text-black dark:text-white">
         <SummonerSpellDisplay
+          class="cursor-pointer rounded"
           :keep-alive-on-hover="false"
           :size="32"
           :delay="1000"
@@ -174,7 +176,7 @@ watch(
 const isValidated = computed(() => {
   return Boolean(
     availableSpells.value.find((s) => s.id === modelData.value.spell1Id) &&
-      availableSpells.value.find((s) => s.id === modelData.value.spell2Id)
+    availableSpells.value.find((s) => s.id === modelData.value.spell2Id)
   )
 })
 
@@ -186,27 +188,4 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped lang="less">
-.summoner-spells {
-  display: flex;
-  gap: 8px;
-}
-
-.icon {
-  border-radius: 2px;
-  cursor: pointer;
-  width: 28px;
-  height: 28px;
-}
-
-.selectable-spells {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-</style>
+<style scoped></style>

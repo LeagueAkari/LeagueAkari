@@ -1,3 +1,4 @@
+import { USER_AGENT } from '@shared/constants/common'
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
 import luaparse from 'luaparse'
@@ -23,8 +24,6 @@ export interface Balance {
 
 export class LolFandomWikiApi {
   static BASE_URL = 'https://leagueoflegends.fandom.com'
-  static USER_AGENT =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
   static GAME_MODES = ['aram', 'ar', 'nb', 'ofa', 'urf', 'usb'] as const
   static BALANCE_TYPES = [
     'dmg_dealt',
@@ -45,11 +44,7 @@ export class LolFandomWikiApi {
 
   constructor() {
     axiosRetry(this._http, {
-      retries: 3,
-      retryDelay: () => 0,
-      retryCondition: (error) => {
-        return Boolean(error.response)
-      }
+      retries: 2
     })
   }
 
@@ -72,7 +67,7 @@ export class LolFandomWikiApi {
   private _http = axios.create({
     baseURL: LolFandomWikiApi.BASE_URL,
     headers: {
-      'User-Agent': LolFandomWikiApi.USER_AGENT
+      'User-Agent': USER_AGENT
     }
   })
 
@@ -99,7 +94,7 @@ export class LolFandomWikiApi {
 
     const match = res.data.match(regex)
     if (!match) {
-      throw new Error('未找到符合条件的 <pre> 标签')
+      throw new Error(`未找到符合条件的 <pre> 标签: ${res.data.slice(0, 256)}...`)
     }
 
     const raw = match[1]

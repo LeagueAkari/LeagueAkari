@@ -6,31 +6,35 @@
           <div
             class="normal-text win-rate"
             :class="{
-              'gte-50': analysis.team.averageWinRate >= 0.5,
-              'lt-50': analysis.team.averageWinRate < 0.5
+              'gte-50': analysis.team.avgWinRate >= 0.5,
+              'lt-50': analysis.team.avgWinRate < 0.5
             }"
           >
-            {{ (analysis.team.averageWinRate * 100).toFixed() }}%
+            {{ (analysis.team.avgWinRate * 100).toFixed() }}%
           </div>
         </template>
         {{
           t('TeamTagsArea.winRate', {
-            rate: (analysis.team.averageWinRate * 100).toFixed(4)
+            rate: (analysis.team.avgWinRate * 100).toFixed(2)
           })
         }}
+        ({{ analysis.team.wins.toLocaleString() }} / {{ analysis.team.games.toLocaleString() }})
       </NPopover>
       <div class="divider"></div>
       <NPopover>
         <template #trigger>
           <div class="normal-text">
-            {{ analysis.team.averageKda.toFixed(2) }}
+            {{ analysis.team.avgKda.toFixed(2) }}
           </div>
         </template>
         {{
           t('TeamTagsArea.kda', {
-            kda: analysis.team.averageKda.toFixed(4)
+            kda: analysis.team.avgKda.toFixed(4)
           })
         }}
+        (K {{ analysis.team.kills.toLocaleString() }} / D
+        {{ analysis.team.deaths.toLocaleString() }} / A
+        {{ analysis.team.assists.toLocaleString() }})
       </NPopover>
     </template>
     <div class="divider" v-if="hasTags"></div>
@@ -43,9 +47,9 @@
                 class="tag"
                 :style="{
                   backgroundColor: p.premadeId
-                    ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                    ? premadeColors[p.premadeId]?.foregroundColor
                     : '#ffffff40',
-                  color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                  color: p.premadeId ? premadeColors[p.premadeId]?.color || '#fff' : '#fff'
                 }"
               >
                 {{
@@ -67,9 +71,9 @@
               class="tag"
               :style="{
                 backgroundColor: p.premadeId
-                  ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                  ? premadeColors[p.premadeId]?.foregroundColor
                   : '#ffffff40',
-                color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                color: p.premadeId ? premadeColors[p.premadeId]?.color || '#fff' : '#fff'
               }"
             >
               {{
@@ -87,16 +91,15 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
 const WIN_RATE_TEAM_MIN_MATCHES = 13
@@ -132,6 +135,11 @@ interface WinRateTeamInfo {
 }
 
 const { t } = useTranslation()
+const as = useAppCommonStore()
+
+const premadeColors = computed(() => {
+  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+})
 
 // ## 胜率队
 // 1. 3 人以上的预组队队伍
@@ -254,7 +262,7 @@ const hasTags = computed(() => {
 })
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .team-tags {
   display: flex;
   align-items: flex-end;

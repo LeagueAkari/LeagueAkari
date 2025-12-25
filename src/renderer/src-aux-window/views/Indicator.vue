@@ -44,7 +44,7 @@ const currentPage = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .control-item {
   height: 24px;
 

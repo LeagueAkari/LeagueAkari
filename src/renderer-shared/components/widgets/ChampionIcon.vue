@@ -9,7 +9,7 @@
     />
     <div
       v-if="ring"
-      class="ring"
+      class="champion-icon-ring"
       :class="{ round: round }"
       :style="{
         borderColor: ringColor || '#2a947d',
@@ -28,10 +28,12 @@ import LcuImage from '../LcuImage.vue'
 const { championId = -1, stretched = true } = defineProps<{
   championId?: number
   round?: boolean
+  stretched?: boolean // to remove the black border
+
+  // ring 系列属性可以 deprecated 了，未来将逐渐取代
   ring?: boolean
   ringColor?: string
   ringWidth?: number
-  stretched?: boolean // to remove the black border
 }>()
 
 const imageSource = computed(() => {
@@ -50,50 +52,55 @@ const imageSource = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
-.champion-icon-container {
-  position: relative;
-  overflow: hidden;
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-  .plain-img {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+@layer components {
+  .champion-icon-container {
+    position: relative;
+    overflow: hidden;
 
-  // default size
-  width: 64px;
-  height: 64px;
+    .plain-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
-  &.round {
-    border-radius: 50%;
-  }
-
-  .champion-icon {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .champion-icon-stretched {
-    width: 112%;
-    height: 112%;
-  }
-
-  .ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-style: solid;
-    box-sizing: border-box;
+    /*  default size */
+    width: 64px;
+    height: 64px;
 
     &.round {
       border-radius: 50%;
+    }
+
+    .champion-icon {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: none;
+    }
+
+    .champion-icon-stretched {
+      width: 112%;
+      height: 112%;
+    }
+
+    .champion-icon-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-style: solid;
+      box-sizing: border-box;
+
+      &.round {
+        border-radius: 50%;
+      }
     }
   }
 }

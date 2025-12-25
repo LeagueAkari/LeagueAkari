@@ -8,6 +8,8 @@
     "src/main/shards/game-client"
   ],
   "compilerOptions": {
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "target": "ESNext",
     "lib": ["ESNext"],
     "composite": true,
@@ -17,8 +19,8 @@
       "@shared/*": ["src/shared/*"],
       "@main/*": ["src/main/*"]
     },
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true

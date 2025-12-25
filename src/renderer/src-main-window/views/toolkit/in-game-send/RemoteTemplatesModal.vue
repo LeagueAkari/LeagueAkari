@@ -109,7 +109,7 @@ watch(
 )
 </script>
 
-<style scoped lang="less">
+<style scoped>
 .templates {
   display: grid;
   gap: 4px;
@@ -172,7 +172,7 @@ watch(
 }
 </style>
 
-<style lang="less" module>
+<style module>
 .modal {
   width: 800px;
 }

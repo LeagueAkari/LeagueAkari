@@ -1,8 +1,15 @@
 import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GithubApiLatestRelease } from '@shared/types/github'
+import {
+  leagueServersConfigV2Schema,
+  ongoingGameConfigV1Schema,
+  supportedQueuesV1Schema
+} from '@shared/validators/remote-config'
 import { isAxiosError } from 'axios'
+import dayjs from 'dayjs'
 import { app } from 'electron'
+import { comparer } from 'mobx'
 import { gt } from 'semver'
 
 import { AppCommonMain } from '../app-common'
@@ -26,6 +33,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   public readonly state = new RemoteConfigState()
   public readonly settings = new RemoteConfigSettings()
 
+  static SUPPORTED_QUEUES_RELATIVE_PATH = 'sgp/supported-queues.json'
+  static LEAGUE_SERVERS_RELATIVE_PATH = 'sgp/league-servers.json'
+  static ONGOING_GAME_CONFIG_RELATIVE_PATH = 'ongoing-game/config.json'
+
   private _repo = new RemoteGitRepository()
 
   get repo() {
@@ -35,22 +46,32 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
+  // locale / source changed will trigger this task
+  private _announcementTask = new IntervalTask(
+    this._updateAnnouncementFromRemote.bind(this),
+    { interval: 4 * 60 * 60 * 1000 } // 4 hours
+  )
+
+  // locale / source changed will trigger this task
+  private _latestReleaseTask = new IntervalTask(
+    this._updateLatestReleaseFromRemote.bind(this),
+    { interval: 4 * 60 * 60 * 1000 } // 4 hours
+  )
+
   // only source changed will trigger this task
-  private _updateSgpLeagueServersTask = new IntervalTask(
-    () => this._updateSgpLeagueServers(),
-    2 * 60 * 60 * 1000 // 2 hours
+  private _leagueServersTask = new IntervalTask(
+    this._updateLeagueServersFromRemoteAndSave.bind(this),
+    { interval: 2 * 60 * 60 * 1000 } // 2 hours
   )
 
-  // locale / source changed will trigger this task
-  private _updateAnnouncementTask = new IntervalTask(
-    () => this._updateAnnouncement(),
-    4 * 60 * 60 * 1000 // 4 hours
+  private _supportedQueuesTask = new IntervalTask(
+    this._updateSupportedQueuesFromRemoteAndSave.bind(this),
+    { interval: 2 * 60 * 60 * 1000 } // 2 hours
   )
 
-  // locale / source changed will trigger this task
-  private _updateLatestReleaseTask = new IntervalTask(
-    () => this._updateLatestRelease(),
-    4 * 60 * 60 * 1000 // 4 hours
+  private _ongoingGameConfigTask = new IntervalTask(
+    this._updateOngoingGameConfigFromRemoteAndSave.bind(this),
+    { interval: 2 * 60 * 60 * 1000 } // 2 hours
   )
 
   constructor(
@@ -84,11 +105,18 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   ): Promise<LatestReleaseWithMetadata> {
     const isNew = gt(release.tag_name, app.getVersion())
     const currentVersion = app.getVersion()
+    const locale = this._app.settings.locale as 'zh-CN' | 'en'
+    const configRepoRequest = {
+      source: this.settings.preferredSource,
+      repo: 'akari-config' as const,
+      branch: 'main'
+    }
 
     let detailedChangelog: string | null = null
     try {
       const { data } = await this.repo.getRawContent(
-        `/releases/${release.tag_name}/${this._app.settings.locale}.md`
+        `/releases/${release.tag_name}/${locale}.md`,
+        configRepoRequest
       )
 
       detailedChangelog = data
@@ -130,29 +158,133 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     return false
   }
 
-  private async _updateSgpLeagueServers() {
-    try {
-      this.state.setUpdatingSgpLeagueServers(true)
-      this._log.info('Updating Sgp League Servers', this._repo.config.source)
-      const config = await this._repo.getSgpLeagueServersConfig()
-      this.state.setSgpServerConfig(config)
-    } catch (error) {
-      if (this._checkIfReachRateLimit(error)) {
-        return
+  /**
+   * 三次平均值
+   */
+  async testLatency() {
+    const githubLatencies: number[] = []
+    const giteeLatencies: number[] = []
+
+    for (let i = 0; i < 3; i++) {
+      const [gh, gi] = await Promise.all([
+        this._repo.testGitHubLatency().catch(() => -1),
+        this._repo.testGiteeLatency().catch(() => -1)
+      ])
+
+      if (gh !== -1) {
+        githubLatencies.push(gh)
       }
 
-      this._log.warn('Update Sgp League Servers failed', error)
-    } finally {
-      this.state.setUpdatingSgpLeagueServers(false)
+      if (gi !== -1) {
+        giteeLatencies.push(gi)
+      }
+    }
+
+    return {
+      githubLatency: githubLatencies.reduce((a, b) => a + b, 0) / githubLatencies.length,
+      giteeLatency: giteeLatencies.reduce((a, b) => a + b, 0) / giteeLatencies.length
     }
   }
 
-  private async _updateAnnouncement() {
+  async onInit() {
+    await this._setting.applyToState()
+
+    this._mobx.propSync(RemoteConfigMain.id, 'state', this.state, [
+      'announcement',
+      'latestRelease',
+      'leagueServers',
+      'supportedQueues',
+      'ongoingGameConfig',
+      'isUpdatingLatestRelease',
+      'isUpdatingAnnouncement',
+      'isUpdatingLeagueServers',
+      'isUpdatingSupportedQueues',
+      'isUpdatingOngoingGameConfig'
+    ])
+
+    this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, [
+      'preferredSource',
+      'updateLatestRelease'
+    ])
+
+    await this._initConfigFilesFromLocal()
+
+    this._handleIpcCall()
+    this._handlePeriodicTasksUpdate()
+  }
+
+  private _handleIpcCall() {
+    this._ipc.onCall(RemoteConfigMain.id, 'testLatency', () => {
+      return this.testLatency()
+    })
+  }
+
+  /**
+   * 从已缓存的数据中获取部分配置
+   */
+  private async _initConfigFilesFromLocal() {
+    if (await this._setting.jsonConfigFileExists(RemoteConfigMain.SUPPORTED_QUEUES_RELATIVE_PATH)) {
+      const rawJson = await this._setting.readFromJsonConfigFile(
+        RemoteConfigMain.SUPPORTED_QUEUES_RELATIVE_PATH
+      )
+      const { success, data, error } = supportedQueuesV1Schema.safeParse(rawJson)
+
+      if (success) {
+        this.state.setSupportedQueues(data)
+      } else {
+        this._log.warn('Invalid supported queues json', error)
+      }
+    }
+
+    if (await this._setting.jsonConfigFileExists(RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH)) {
+      const rawJson = await this._setting.readFromJsonConfigFile(
+        RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH
+      )
+      const { success, data, error } = leagueServersConfigV2Schema.safeParse(rawJson)
+
+      if (success) {
+        this.state.setLeagueServers(data)
+      } else {
+        this._log.warn('Invalid sgp league servers json', error)
+      }
+    }
+
+    if (
+      await this._setting.jsonConfigFileExists(RemoteConfigMain.ONGOING_GAME_CONFIG_RELATIVE_PATH)
+    ) {
+      const rawJson = await this._setting.readFromJsonConfigFile(
+        RemoteConfigMain.ONGOING_GAME_CONFIG_RELATIVE_PATH
+      )
+      const { success, data, error } = ongoingGameConfigV1Schema.safeParse(rawJson)
+
+      if (success) {
+        this.state.setOngoingGameConfig(data)
+      } else {
+        this._log.warn('Invalid ongoing game config json', error)
+      }
+    }
+  }
+
+  /**
+   * 更新公告，不会保存到本地
+   */
+  private async _updateAnnouncementFromRemote() {
+    if (this.state.isUpdatingAnnouncement) {
+      return
+    }
+
+    this.state.setUpdatingAnnouncement(true)
+
     try {
-      this.state.setUpdatingAnnouncement(true)
-      this._log.info('Updating Announcement', this._repo.config.source)
-      const content = await this._repo.getAnnouncement()
+      const locale = this._app.settings.locale as 'zh-CN' | 'en'
+      const content = await this._repo.getAnnouncement({
+        source: this.settings.preferredSource,
+        repo: 'akari-config',
+        branch: 'main',
+        locale
+      })
       this.state.setAnnouncement(content)
+      this._log.info('Updated Announcement', this.settings.preferredSource)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
         return
@@ -164,12 +296,24 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _updateLatestRelease() {
+  /**
+   * 更新最新版本，不会保存到本地
+   */
+  private async _updateLatestReleaseFromRemote() {
+    if (this.state.isUpdatingLatestRelease) {
+      return
+    }
+
+    this.state.setUpdatingLatestRelease(true)
+
     try {
-      this.state.setUpdatingLatestRelease(true)
-      this._log.info('Updating Latest Release', this._repo.config.source)
-      const { data } = await this._repo.getLatestRelease()
+      const { data } = await this._repo.getLatestRelease({
+        source: this.settings.preferredSource,
+        repo: 'akari'
+      })
       this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
+
+      this._log.info('Updated Latest Release', this.settings.preferredSource)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
         return
@@ -181,86 +325,216 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     }
   }
 
+  /**
+   * 手动执行一次独立的版本更新检查。这不会计入到全局的 loading 状态中
+   *
+   * 但是如果查询成功，则会立即替换当前的 latestRelease，同时重启定时任务
+   */
   async updateLatestReleaseManually() {
-    this._updateLatestReleaseTask.cancel()
+    this._latestReleaseTask.cancel()
+
+    this._log.info('Updating Latest Release.. Manually', this.settings.preferredSource)
+
+    const { data } = await this._repo.getLatestRelease({
+      source: this.settings.preferredSource,
+      repo: 'akari'
+    })
+
+    const release = await this._addMoreInfoToRelease(data)
+    this.state.setLatestRelease(release)
+    this._latestReleaseTask.start()
+
+    return release
+  }
+
+  /**
+   * 更新支持的队列，会缓存到本地
+   */
+  private async _updateSupportedQueuesFromRemoteAndSave() {
+    if (this.state.isUpdatingSupportedQueues) {
+      return
+    }
+
+    this.state.setUpdatingSupportedQueues(true)
 
     try {
-      this.state.setUpdatingLatestRelease(true)
-      this._log.info('Updating Latest Release.. Manually', this._repo.config.source)
-      const { data } = await this._repo.getLatestRelease()
-      const release = await this._addMoreInfoToRelease(data)
-      this.state.setLatestRelease(release)
+      const { data: remoteData } = await this._repo.getSupportedQueues({
+        repo: 'akari-config',
+        source: this.settings.preferredSource
+      })
 
-      return release
+      const { success, data, error } = supportedQueuesV1Schema.safeParse(remoteData)
+
+      if (success) {
+        if (data.lastUpdate > this.state.supportedQueues.lastUpdate) {
+          this.state.setSupportedQueues(data)
+          await this._setting.writeToJsonConfigFile(
+            RemoteConfigMain.SUPPORTED_QUEUES_RELATIVE_PATH,
+            data
+          )
+          this._log.info(
+            'Updated supported queues from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        } else {
+          this._log.info(
+            'Supported queues is up to date',
+            dayjs(this.state.supportedQueues.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        }
+      } else {
+        this._log.warn('Invalid supported queues json', error)
+      }
     } catch (error) {
-      throw error
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
+      this._log.warn('Update Supported Queues from remote failed', error)
     } finally {
-      this.state.setUpdatingLatestRelease(false)
-      this._updateLatestReleaseTask.start() // restart the task
+      this.state.setUpdatingSupportedQueues(false)
     }
   }
 
-  async testLatency() {
-    const [githubLatency, giteeLatency] = await Promise.all([
-      this._repo.testGitHubLatency(),
-      this._repo.testGiteeLatency()
-    ])
+  /**
+   * 更新 SGP 联赛服务器，会缓存到本地
+   */
+  private async _updateLeagueServersFromRemoteAndSave() {
+    if (this.state.isUpdatingLeagueServers) {
+      return
+    }
 
-    return { githubLatency, giteeLatency }
+    this.state.setUpdatingLeagueServers(true)
+
+    try {
+      const { data: remoteData } = await this._repo.getSgpLeagueServersConfig({
+        source: this.settings.preferredSource,
+        repo: 'akari-config',
+        branch: 'main'
+      })
+
+      const { success, data, error } = leagueServersConfigV2Schema.safeParse(remoteData)
+
+      if (success) {
+        if (data.lastUpdate > this.state.leagueServers.lastUpdate) {
+          this.state.setLeagueServers(data)
+          await this._setting.writeToJsonConfigFile(
+            RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH,
+            data
+          )
+          this._log.info(
+            'Updated sgp league servers from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        } else {
+          this._log.info(
+            'Sgp league servers is up to date',
+            dayjs(this.state.leagueServers.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        }
+      } else {
+        this._log.warn('Invalid sgp league servers json', error)
+      }
+    } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
+      this._log.warn('Update Sgp League Servers failed', error)
+    } finally {
+      this.state.setUpdatingLeagueServers(false)
+    }
   }
 
-  async onInit() {
-    await this._setting.applyToState()
+  /**
+   * 更新对局模块的配置，会缓存到本地
+   */
+  private async _updateOngoingGameConfigFromRemoteAndSave() {
+    if (this.state.isUpdatingOngoingGameConfig) {
+      return
+    }
 
-    this._mobx.propSync(RemoteConfigMain.id, 'state', this.state, [
-      'announcement',
-      'latestRelease',
-      // 'sgpServerConfig', // 目前仅涉及到主进程内数据共享, 无需发送到渲染进程
-      'isUpdatingLatestRelease',
-      'isUpdatingAnnouncement',
-      'isUpdatingSgpLeagueServers'
-    ])
-    this._mobx.propSync(RemoteConfigMain.id, 'settings', this.settings, ['preferredSource'])
+    this.state.setUpdatingOngoingGameConfig(true)
 
-    this._handleIpcCall()
+    try {
+      const { data: remoteData } = await this._repo.getOngoingGameConfig({
+        source: this.settings.preferredSource,
+        repo: 'akari-config',
+        branch: 'main'
+      })
 
-    this._repo.setConfig({
-      locale: this._app.settings.locale as 'zh-CN' | 'en',
-      source: this.settings.preferredSource
-    })
+      const { success, data, error } = ongoingGameConfigV1Schema.safeParse(remoteData)
 
-    this._updateAnnouncementTask.start(true)
-    this._updateSgpLeagueServersTask.start(true)
-    this._updateLatestReleaseTask.start(true)
+      if (success) {
+        if (data.lastUpdate > this.state.ongoingGameConfig.lastUpdate) {
+          this.state.setOngoingGameConfig(data)
+          await this._setting.writeToJsonConfigFile(
+            RemoteConfigMain.ONGOING_GAME_CONFIG_RELATIVE_PATH,
+            data
+          )
+          this._log.info(
+            'Updated ongoing game config from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        } else {
+          this._log.info(
+            'Ongoing game config is up to date',
+            dayjs(this.state.ongoingGameConfig.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        }
+      } else {
+        this._log.warn('Invalid ongoing game config json', error)
+      }
+    } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
 
-    this._mobx.reaction(
-      () => this._app.settings.locale,
-      (locale) => {
-        this._repo.setConfig({ locale: locale as 'zh-CN' | 'en' })
-        this.state.setAnnouncement(null)
-        this._updateAnnouncementTask.start(true)
-        this._updateLatestReleaseTask.start(true)
-      },
-      { delay: 1000 }
-    )
+      this._log.warn('Update Ongoing Game Config failed', error)
+    } finally {
+      this.state.setUpdatingOngoingGameConfig(false)
+    }
+  }
 
+  private _handlePeriodicTasksUpdate() {
+    // 源切换时需要重新获取支持的队列、league servers 和对局模块配置
     this._mobx.reaction(
       () => this.settings.preferredSource,
-      (source) => {
-        this._repo.setConfig({ source })
-        this.state.setLatestRelease(null)
-        this.state.setAnnouncement(null)
-        this._updateAnnouncementTask.start(true)
-        this._updateSgpLeagueServersTask.start(true)
-        this._updateLatestReleaseTask.start(true)
+      (_source) => {
+        this._supportedQueuesTask.start({ runImmediately: true })
+        this._leagueServersTask.start({ runImmediately: true })
+        this._ongoingGameConfigTask.start({ runImmediately: true })
       },
-      { delay: 1000 }
+      { fireImmediately: true }
     )
-  }
 
-  private _handleIpcCall() {
-    this._ipc.onCall(RemoteConfigMain.id, 'testLatency', async () => {
-      return await this.testLatency()
-    })
+    // 语言和源切换时需要重新获取公告
+    this._mobx.reaction(
+      () => ({
+        source: this.settings.preferredSource,
+        locale: this._app.settings.locale
+      }),
+      () => {
+        this._announcementTask.start({ runImmediately: true })
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    // 版本更新开关切换时需要重新获取版本更新
+    this._mobx.reaction(
+      () => ({
+        source: this.settings.preferredSource,
+        locale: this._app.settings.locale,
+        updateLatestRelease: this.settings.updateLatestRelease
+      }),
+      ({ updateLatestRelease }) => {
+        if (updateLatestRelease) {
+          this._latestReleaseTask.start({ runImmediately: true })
+        } else {
+          this._latestReleaseTask.cancel()
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
   }
 }

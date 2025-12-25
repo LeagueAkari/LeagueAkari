@@ -1,15 +1,21 @@
 import { i18next } from '@main/i18n'
+import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { app, nativeImage, nativeTheme, shell } from 'electron'
+import { app, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
+import { exec } from 'node:child_process'
 import os from 'node:os'
+import { promisify } from 'node:util'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AppCommonSettings, AppCommonState } from './state'
+
+const execAsync = promisify(exec)
 
 /**
  * 一些不知道如何分类的通用功能, 可以放到这里
@@ -22,14 +28,17 @@ export class AppCommonMain implements IAkariShardInitDispose {
   public readonly settings = new AppCommonSettings()
 
   private readonly _setting: SetterSettingService
+  private readonly _log: AkariLogger
 
   constructor(
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
+    private readonly _protocol: AkariProtocolMain,
     _settingFactory: SettingFactoryMain,
-    private readonly _protocol: AkariProtocolMain
+    _loggerFactory: LoggerFactoryMain
   ) {
+    this._log = _loggerFactory.create(AppCommonMain.id)
     this._setting = _settingFactory.register(
       AppCommonMain.id,
       {
@@ -39,16 +48,21 @@ export class AppCommonMain implements IAkariShardInitDispose {
         theme: { default: this.settings.theme },
         httpProxy: { default: this.settings.httpProxy },
         streamerMode: { default: this.settings.streamerMode },
-        streamerModeUseAkariStyledName: { default: this.settings.streamerModeUseAkariStyledName }
+        streamerModeUseAkariStyledName: { default: this.settings.streamerModeUseAkariStyledName },
+        preferredLolSource: { default: this.settings.preferredLolSource }
       },
       this.settings
     )
 
     this.state.setAdministrator(this._shared.global.isAdministrator)
+    this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
 
-    // 通知第二实例事件
     this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {
       this._ipc.sendEvent(AppCommonMain.id, 'second-instance', commandLine, workingDirectory)
+    })
+
+    this._shared.global.events.on('second-instance-deep-link', (url) => {
+      this._ipc.sendEvent(AppCommonMain.id, 'second-instance-deep-link', url)
     })
 
     this.state.setBaseConfig(this._shared.global.baseConfig.value)
@@ -88,6 +102,16 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   openUserDataDir() {
     return shell.openPath(app.getPath('userData'))
+  }
+
+  async relaunchAsAdministrator() {
+    const appPath = process.execPath
+
+    await execAsync(`"${elevateExecutablePath}" "${appPath}"`, {
+      shell: 'cmd'
+    })
+
+    app.exit()
   }
 
   async getRuntimeInfo() {
@@ -134,12 +158,14 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'theme',
       'httpProxy',
       'streamerMode',
-      'streamerModeUseAkariStyledName'
+      'streamerModeUseAkariStyledName',
+      'preferredLolSource'
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',
       'disableHardwareAcceleration',
-      'baseConfig'
+      'baseConfig',
+      'startupDeepLink'
     ])
 
     // 状态指示, 是否禁用硬件加速
@@ -181,6 +207,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
       this._setDisableHardwareAccelerationAndRelaunch(s)
     })
 
+    this._ipc.onCall(AppCommonMain.id, 'relaunchAsAdministrator', () => {
+      return this.relaunchAsAdministrator()
+    })
+
     this._ipc.onCall(AppCommonMain.id, 'getVersion', () => {
       return this._shared.global.version
     })
@@ -193,18 +223,12 @@ export class AppCommonMain implements IAkariShardInitDispose {
       return clipboard.readText()
     })
 
-    this._ipc.onCall(AppCommonMain.id, 'writeClipboardImage', (_, buffer: ArrayBuffer) => {
-      const buf = Buffer.from(buffer)
-      const image = nativeImage.createFromBuffer(buf)
-      clipboard.writeImage(image)
-    })
-
     this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {
       return this.getRuntimeInfo()
     })
 
-    this._ipc.onCall(AppCommonMain.id, 'quit', () => {
-      app.quit()
+    this._ipc.onCall(AppCommonMain.id, 'exit', () => {
+      app.exit()
     })
 
     this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {
@@ -223,6 +247,24 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
       return new Response(null, { status: 204 })
     })
+
+    this._logInstantiatedShards()
+  }
+
+  private _logInstantiatedShards() {
+    // @ts-ignore
+    const loadedShards = this._shared.manager._instances.keys()
+
+    const shards: string[] = []
+    for (const shard of loadedShards) {
+      if (typeof shard === 'symbol') {
+        shards.push(shard.description || '[unknown]')
+      } else {
+        shards.push(shard)
+      }
+    }
+
+    this._log.info('instantiated shards', shards)
   }
 
   /**

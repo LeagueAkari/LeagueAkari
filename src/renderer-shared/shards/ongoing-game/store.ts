@@ -1,47 +1,20 @@
+import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
+import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
+import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
-import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
+import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowReactive, shallowRef } from 'vue'
-
-// copied from main shard
-interface OngoingGameInfo {
-  queueId: number
-  queueType: string
-  gameId: number
-  gameMode: string
-}
+import { ref, shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 export interface MatchHistoryPlayer {
   source: 'lcu' | 'sgp'
-  tag?: string
-  targetCount: number
-  data: Game[]
-}
-
-// copied from main shard
-export interface SummonerPlayer {
-  source: 'lcu' | 'sgp'
-  data: SummonerInfo
-}
-
-// copied from main shard
-export interface RankedStatsPlayer {
-  source: 'lcu' | 'sgp'
-  data: RankedStats
-}
-
-// copied from main shard
-export interface ChampionMasteryPlayer {
-  source: 'lcu' | 'sgp'
-  data: Record<number, Mastery>
+  params: MatchHistoryQueryParams
+  data: LcuOrSgpGameSummary[]
 }
 
 // copied from main shard
@@ -99,43 +72,23 @@ export interface SavedInfo {
   }
 }
 
-// copied from main shard
-export type QueryStage =
-  | {
-      phase: 'champ-select' | 'in-game'
-      gameInfo: {
-        queueId: number
-        queueType: string
-        gameId: number
-        gameMode: string
-      }
-    }
-  | {
-      phase: 'unavailable'
-      gameInfo: null
-    }
-
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
-    enabled: false,
-    premadeTeamThreshold: 3,
+    enabled: true,
     matchHistoryLoadCount: 20,
     concurrency: 3,
-    matchHistoryUseSgpApi: true,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
-    gameTimelineLoadCount: 0,
+    gameDetailsLoadCount: 0,
+    premadeTeamInferMatchCountThreshold: 5,
 
-    // renderer only
     orderPlayerBy: 'default' as
       | 'win-rate'
       | 'kda'
       | 'default'
       | 'akari-score'
       | 'position'
-      | 'premade-team'
-  })
+      | 'premade-team',
 
-  const frontendSettings = reactive({
     showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
     showMatchHistoryItemBorder: false,
     autoRouteWhenGameStarts: false,
@@ -145,7 +98,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showWinningStreakTag: true,
       showLosingStreakTag: true,
       showSoloKillsTag: true,
-      showSoloDeathsTag: true,
       showGreatPerformanceTag: true,
       showAverageTeamDamageTag: false,
       showAverageTeamDamageTakenTag: false,
@@ -158,11 +110,11 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showTaggedTag: true,
       showWinRateTeamTag: true,
       showPrivacyTag: true,
-      showAkariScoreTag: true
-    }
+      showAkariScoreTag: false
+    },
+    queryInLobbyPhase: false
   })
 
-  const gameInfo = shallowRef<OngoingGameInfo | null>(null)
   const championSelections = shallowRef<Record<string, number>>({})
   const positionAssignments = shallowRef<
     Record<
@@ -178,22 +130,24 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   // untyped
   const queryStage = shallowRef<QueryStage>({ phase: 'unavailable', gameInfo: null })
   const isInEog = shallowRef(false)
-  const inferredPremadeTeams = shallowRef<Record<string, string[][]>>({})
 
   const playerStats = shallowRef<{
     players: Record<string, MatchHistoryGamesAnalysisAll>
     teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
   } | null>(null)
 
-  const matchHistoryTag = shallowRef<string | null>(null)
+  const matchHistoryTagParams = shallowRef<Pick<
+    MatchHistoryQueryParams,
+    'tag' | 'tagsQueryType'
+  > | null>(null)
 
   const matchHistory = ref<Record<string, MatchHistoryPlayer>>({})
-  const summoner = ref<Record<string, SummonerPlayer>>({})
-  const rankedStats = ref<Record<string, RankedStatsPlayer>>({})
-  const championMastery = ref<Record<string, ChampionMasteryPlayer>>({})
+  const summoner = ref<Record<string, SummonerInfo>>({})
+  const rankedStats = ref<Record<string, RankedStats>>({})
+  const championMastery = ref<Record<string, Record<number, Mastery>>>({})
   const savedInfo = ref<Record<string, SavedInfo>>({})
 
-  const cachedGames = ref<Record<number, Game>>({})
+  const cachedGames = ref<Record<number, LcuOrSgpGameSummary>>({})
 
   const matchHistoryLoadingState = ref<Record<string, string>>({})
 
@@ -203,20 +157,35 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const championMasteryLoadingState = ref<Record<string, string>>({}) // 未实装
 
   const teamParticipantGroups = shallowRef<Record<string, string[]>>({})
+  const calculatedPremadeTeamMap = shallowRef<Record<string, number>>({})
+  const inferredPremadeTeams = shallowRef<
+    {
+      puuids: string[]
+      times: number
+      gameIds: number[]
+    }[]
+  >([])
+
+  const draft = shallowRef<{
+    teams: Record<string, string[]>
+  } | null>(null)
+  const additional = shallowRef<AdditionalResult>({
+    teams: {},
+    selections: {},
+    teamParticipantGroups: {},
+    spells: {}
+  })
 
   return {
     settings,
-    frontendSettings,
 
-    gameInfo,
     championSelections,
     positionAssignments,
     teams,
     queryStage,
     isInEog,
-    inferredPremadeTeams,
     playerStats,
-    matchHistoryTag,
+    matchHistoryTagParams,
 
     matchHistory,
     summoner,
@@ -231,6 +200,10 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     savedInfoLoadingState,
     rankedStatsLoadingState,
     championMasteryLoadingState,
-    teamParticipantGroups
+    teamParticipantGroups,
+    additional,
+    draft,
+    calculatedPremadeTeamMap,
+    inferredPremadeTeams
   }
 })

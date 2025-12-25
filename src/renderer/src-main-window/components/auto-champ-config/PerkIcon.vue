@@ -63,7 +63,7 @@ const emits = defineEmits<{
 const lcs = useLeagueClientStore()
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .ring-wrapper {
   cursor: pointer;
   border-radius: 50%;
@@ -112,57 +112,56 @@ const lcs = useLeagueClientStore()
 .perkstyle-icon {
   mask-position: 50% 50%;
   mask-repeat: no-repeat;
-}
 
-// copied from LeagueClientUx
-@perks-color-domination-light: #d44242;
-@perks-color-domination-dark: #dc4747;
-@perks-color-inspiration-light: #49aab9;
-@perks-color-inspiration-dark: #48b4be;
-@perks-color-precision-light: #aea789;
-@perks-color-precision-dark: #c8aa6e;
-@perks-color-resolve-light: #a1d586;
-@perks-color-resolve-dark: #a4d08d;
-@perks-color-sorcery-light: #9faafc;
-@perks-color-sorcery-dark: #6c75f5;
+  --la-perks-color-domination-light: #d44242;
+  --la-perks-color-domination-dark: #dc4747;
+  --la-perks-color-inspiration-light: #49aab9;
+  --la-perks-color-inspiration-dark: #48b4be;
+  --la-perks-color-precision-light: #aea789;
+  --la-perks-color-precision-dark: #c8aa6e;
+  --la-perks-color-resolve-light: #a1d586;
+  --la-perks-color-resolve-dark: #a4d08d;
+  --la-perks-color-sorcery-light: #9faafc;
+  --la-perks-color-sorcery-dark: #6c75f5;
+}
 
 .perks-domination-style-icon {
   background: linear-gradient(
     to bottom,
-    @perks-color-domination-light 0%,
-    @perks-color-domination-dark 100%
+    var(--la-perks-color-domination-light) 0%,
+    var(--la-perks-color-domination-dark) 100%
   );
 }
 
 .perks-inspiration-style-icon {
   background: linear-gradient(
     to bottom,
-    @perks-color-inspiration-light 0%,
-    @perks-color-inspiration-dark 100%
+    var(--la-perks-color-inspiration-light) 0%,
+    var(--la-perks-color-inspiration-dark) 100%
   );
 }
 
 .perks-precision-style-icon {
   background: linear-gradient(
     to bottom,
-    @perks-color-precision-light 0%,
-    @perks-color-precision-dark 100%
+    var(--la-perks-color-precision-light) 0%,
+    var(--la-perks-color-precision-dark) 100%
   );
 }
 
 .perks-resolve-style-icon {
   background: linear-gradient(
     to bottom,
-    @perks-color-resolve-light 0%,
-    @perks-color-resolve-dark 100%
+    var(--la-perks-color-resolve-light) 0%,
+    var(--la-perks-color-resolve-dark) 100%
   );
 }
 
 .perks-sorcery-style-icon {
   background: linear-gradient(
     to bottom,
-    @perks-color-sorcery-light 0%,
-    @perks-color-sorcery-dark 100%
+    var(--la-perks-color-sorcery-light) 0%,
+    var(--la-perks-color-sorcery-dark) 100%
   );
 }
 </style>

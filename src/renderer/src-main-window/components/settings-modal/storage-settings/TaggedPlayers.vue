@@ -1,10 +1,10 @@
 <template>
-  <NCard size="small" style="height: 100%">
+  <NCard size="small" class="h-full">
     <NModal
       v-model:show="showEditModal"
       preset="card"
       :title="t('TaggedPlayers.editModal.title')"
-      style="max-width: 60vw"
+      class="max-w-[60vw]"
     >
       <NInput
         v-model:value="currentEditingTag"
@@ -12,11 +12,13 @@
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
-      ></NInput>
-      <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
+      />
+
+      <div class="mt-3 flex justify-end gap-1">
         <NButton size="small" @click="showEditModal = false">{{
           t('TaggedPlayers.cancelButton')
         }}</NButton>
+
         <NButton
           size="small"
           type="primary"
@@ -32,8 +34,9 @@
         >
       </div>
     </NModal>
-    <div class="flex-content">
-      <div class="operations">
+
+    <div class="flex h-full flex-col">
+      <div class="mb-2 flex items-center gap-2">
         <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
           {{ t('TaggedPlayers.exportButton') }}
         </NButton>
@@ -51,9 +54,10 @@
           {{ t('TaggedPlayers.onlyCurrentAccountCheckbox') }}
         </NCheckbox>
       </div>
+
       <MaskedComponent :show-mask="showMask">
         <template #mask>
-          <div class="streamer-mode-mask">
+          <div class="flex h-full w-full flex-col items-center justify-center gap-4">
             <span>{{ t('TaggedPlayers.streamerModeWarning') }}</span>
             <NButton type="warning" size="small" @click="showMask = false">{{
               t('TaggedPlayers.showButton')
@@ -68,7 +72,7 @@
           :columns="columns"
           :loading="isLoading"
           :pagination="pagination"
-          style="height: 100%"
+          class="h-full"
           flex-height
         />
       </MaskedComponent>
@@ -79,7 +83,7 @@
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
-import { useInteroperableSgpServers } from '@renderer-shared/compositions/useInteroperableSgpServers'
+import { useInteroperableSgpServers } from '@renderer-shared/composables/useInteroperableSgpServers'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -89,8 +93,9 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { getSgpServerId, isTencentServer } from '@shared/data-sources/sgp/utils'
+import { toLcuSummoner } from '@shared/data-adapter/summoner'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { getSgpServerId, isTencentServer } from '@shared/utils/sgp'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
@@ -115,12 +120,11 @@ import {
   ref,
   shallowReactive,
   shallowRef,
-  useCssModule,
   useTemplateRef,
   watch
 } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 interface RecordType {
   selfPuuid: string
@@ -138,20 +142,19 @@ interface MappedRecordType extends RecordType {
 const { t } = useTranslation()
 const sp = useInstance(SavedPlayerRenderer)
 const lc = useInstance(LeagueClientRenderer)
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 const sgp = useInstance(SgpRenderer)
 const rc = useInstance(RiotClientRenderer)
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
-const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
+const { navigateToTabByPuuidAndSgpServerId } = pt.useNavigateToTab()
 
 const sgps = useSgpStore()
 
 const message = useMessage()
 
-const styles = useCssModule()
 const tableData = shallowRef<MappedRecordType[]>([])
 
 const { getInteroperability } = useInteroperableSgpServers()
@@ -167,20 +170,20 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
     return h(
       'div',
       {
-        class: styles['summoner-name'],
+        class: 'flex w-fit cursor-pointer items-center gap-2',
         onClick: () => {
           navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
         }
       },
       [
         h(LcuImage, {
-          class: styles['image'],
+          class: 'h-4 w-4 rounded-sm',
           src: profileIconUri(cached.profileIconId)
         }),
         h(
           'span',
           {
-            class: styles['name']
+            class: 'text-xs'
           },
           `${cached.gameName}#${cached.tagLine}`
         )
@@ -198,7 +201,7 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
         h(
           'span',
           {
-            class: styles['empty']
+            class: 'text-xs text-black/60 dark:text-white/60'
           },
           t('TaggedPlayers.na', {
             truncatedPuuid: puuid.slice(0, 8)
@@ -209,7 +212,7 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
           h(
             'div',
             {
-              style: 'margin-bottom: 4px'
+              class: 'mb-1'
             },
             t('TaggedPlayers.naPopoverContent')
           ),
@@ -233,7 +236,11 @@ const renderSgpServerTag = (sgpServerId: string) => {
       bordered: false,
       type: isTencentServer(sgpServerId) ? 'success' : 'info'
     },
-    () => t(`sgpServers.${sgpServerId}`, sgpServerId)
+    () =>
+      t(`sgpServers.${sgpServerId}`, {
+        defaultValue: sgpServerId,
+        ns: 'common'
+      })
   )
 }
 
@@ -241,13 +248,13 @@ const renderLinedText = (text: string) => {
   return h(
     NScrollbar,
     {
-      style: 'max-height: 100px'
+      class: 'max-h-[100px]'
     },
     () =>
       h(
         'div',
         {
-          class: styles['as-is-text']
+          class: 'whitespace-pre-wrap text-xs'
         },
         text
       )
@@ -258,7 +265,7 @@ const renderBoldTitle = (text: string) => {
   return h(
     'span',
     {
-      class: styles['bold-title']
+      class: 'text-xs font-bold'
     },
     text
   )
@@ -274,7 +281,7 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
       return h(
         'span',
         {
-          class: styles['row-base']
+          class: 'text-xs'
         },
         ((pagination.page || 1) - 1) * (pagination.pageSize || 20) + index + 1
       )
@@ -316,11 +323,7 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
       return h(
         'div',
         {
-          style: {
-            display: 'flex',
-            gap: '4px',
-            alignItems: 'center'
-          }
+          class: 'flex items-center gap-1'
         },
         [
           h(
@@ -413,15 +416,23 @@ const updateCachedSummoners = async (
         summonerShallowMap[player.puuid] = summoner.data
       })
     } else {
-      sgp.getSummonerLcuFormat(player.puuid, player.sgpServerId).then((summoner) => {
-        if (summoner) {
-          rc.api.playerAccount.getPlayerAccountNameset([player.puuid]).then((nameset) => {
-            summoner.gameName = nameset.data.namesets[0]?.gnt.gameName || summoner.displayName
-            summoner.tagLine = nameset.data.namesets[0]?.gnt.tagLine || '?????'
-            summonerShallowMap[player.puuid] = summoner
-          })
-        }
-      })
+      sgp.api.summonerLedge
+        .postSummonersByPuuids([player.puuid], {
+          __sgpServerId: player.sgpServerId
+        })
+        .then(({ data: summoners }) => {
+          if (summoners.length) {
+            rc.api.playerAccount.getPlayerAccountNameset([player.puuid]).then((nameset) => {
+              const summoner = toLcuSummoner(
+                summoners[0],
+                nameset.data.namesets[0]?.gnt.gameName || '',
+                nameset.data.namesets[0]?.gnt.tagLine || ''
+              )
+
+              summonerShallowMap[player.puuid] = summoner
+            })
+          }
+        })
     }
   }
 }
@@ -543,66 +554,4 @@ const handleImportTaggedPlayers = async () => {
 }
 </script>
 
-<style lang="less" scoped>
-.operations {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.flex-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.streamer-mode-mask {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  gap: 16px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-</style>
-
-<style lang="less" module>
-.row-base {
-  font-size: 12px;
-}
-
-.empty {
-  color: #ffffffa0;
-  font-size: 12px;
-}
-
-.summoner-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  width: fit-content;
-
-  .image {
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-  }
-
-  .name {
-    font-size: 12px;
-  }
-}
-
-.as-is-text {
-  font-size: 12px;
-  white-space: pre-wrap;
-}
-
-.bold-title {
-  font-size: 12px;
-  font-weight: bold;
-}
-</style>
+<style scoped></style>

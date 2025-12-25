@@ -57,19 +57,14 @@
 
 <script lang="ts" setup>
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
-import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 const show = defineModel('show', { default: false })
-const balance = ref(0) // 单位是厘
-
-// 很遗憾, 没有 i18n
-//
-const { t } = useTranslation()
+const balance = defineModel('balance', { default: 0 })
 
 const emits = defineEmits<{
-  purchased: [item: ItemType]
+  purchase: [item: ItemType]
   notEnough: [item: ItemType]
 }>()
 
@@ -115,7 +110,7 @@ const commonPart = [
     level: 1,
     text: '自动英雄选择或禁用，自动游戏流程（接受对局，自动匹配，自动点赞，自动回到房间）等'
   },
-  { level: 1, text: '小工具集合，包括修改生涯背景，伪装段位信息等' }
+  { level: 1, text: '小工具集合，包括修改生涯背景，伪装段位信息，领取奖励等' }
 ]
 
 const choices = ref([
@@ -154,8 +149,7 @@ const handleBuy = (item: any) => {
   if (item.price > balance.value) {
     emits('notEnough', item)
   } else {
-    balance.value -= item.price
-    emits('purchased', item)
+    emits('purchase', item)
   }
 }
 
@@ -258,10 +252,10 @@ const formatCredit = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .pricing-wrapper {
   padding: 24px;
-  background-color: var(--background-color-primary);
+  background-color: var(--la-background-color-primary);
 }
 
 .huge-title {

@@ -45,7 +45,7 @@ export class AuxWindowState {
 
   show: boolean = true
 
-  bounds: Rectangle | null = null
+  normalBounds: Rectangle | null = null
 
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
@@ -63,13 +63,13 @@ export class AuxWindowState {
     this.show = show
   }
 
-  setBounds(bounds: Rectangle | null) {
-    this.bounds = bounds
+  setNormalBounds(bounds: Rectangle | null) {
+    this.normalBounds = bounds
   }
 
   constructor() {
     makeAutoObservable(this, {
-      bounds: observable.ref
+      normalBounds: observable.ref
     })
   }
 }

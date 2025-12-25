@@ -1,8 +1,10 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { DeepPartialObject } from '@shared/utils/types'
 
+import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAutoSelectStore } from './store'
+import { BanChampionConfig, PickChampionConfig, useAutoSelectStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-select-main'
 
@@ -11,72 +13,21 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
   static id = 'auto-select-renderer'
 
   constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) readonly _setting: SettingUtilsRenderer
   ) {}
 
-  setNormalModeEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'normalModeEnabled', enabled)
+  setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPickConfig', groupId, config)
   }
 
-  setExpectedChampions(expectedChampions: Record<string, number[]>) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'expectedChampions', expectedChampions)
+  setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', groupId, config)
   }
 
-  setSelectTeammateIntendedChampion(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'selectTeammateIntendedChampion', enabled)
-  }
-
-  setShowIntent(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showIntent', enabled)
-  }
-
-  setPickStrategy(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'pickStrategy', enabled)
-  }
-
-  setLockInDelaySeconds(threshold: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lockInDelaySeconds', threshold)
-  }
-
-  setBenchModeEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchModeEnabled', enabled)
-  }
-
-  setBenchExpectedChampions(expectedChampions: number[]) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchExpectedChampions', expectedChampions)
-  }
-
-  setGrabDelaySeconds(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'grabDelaySeconds', seconds)
-  }
-
-  setBenchSelectFirstAvailableChampion(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchSelectFirstAvailableChampion', enabled)
-  }
-
-  setBanEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'banEnabled', enabled)
-  }
-
-  setBanDelaySeconds(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'banDelaySeconds', seconds)
-  }
-
-  setBannedChampions(bannedChampions: Record<string, number[]>) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'bannedChampions', bannedChampions)
-  }
-
-  setBanTeammateIntendedChampion(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'banTeammateIntendedChampion', enabled)
-  }
-
-  setBenchHandleTradeEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeEnabled', enabled)
-  }
-
-  setBenchHandleTradeIgnoreChampionOwner(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeIgnoreChampionOwner', enabled)
+  setTemporarilyDisabled(temporarilyDisabled: boolean) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setTemporarilyDisabled', temporarilyDisabled)
   }
 
   async onInit() {

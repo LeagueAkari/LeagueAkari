@@ -26,7 +26,7 @@ watchEffect(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .lcu-video {
   display: block;
 }

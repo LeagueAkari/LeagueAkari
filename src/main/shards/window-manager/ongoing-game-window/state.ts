@@ -40,7 +40,7 @@ export class OngoingGameWindowState {
 
   show: boolean = true
 
-  bounds: Rectangle | null
+  normalBounds: Rectangle | null
 
   /**
    * 用于指示渲染层面的显示状态，不会影响窗口的实际显示状态
@@ -59,8 +59,8 @@ export class OngoingGameWindowState {
     this.show = show
   }
 
-  setBounds(bounds: Rectangle | null) {
-    this.bounds = bounds
+  setNormalBounds(bounds: Rectangle | null) {
+    this.normalBounds = bounds
   }
 
   setFakeShow(show: boolean) {
@@ -69,7 +69,7 @@ export class OngoingGameWindowState {
 
   constructor() {
     makeAutoObservable(this, {
-      bounds: observable.ref
+      normalBounds: observable.ref
     })
   }
 }

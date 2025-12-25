@@ -53,12 +53,20 @@
             >
               {{ t('FriendTools.refreshButton') }}
             </NButton>
+            <NInput
+              v-model:value="friendSearchInput"
+              clearable
+              size="small"
+              :placeholder="t('FriendTools.searchPlaceholder')"
+              class="w-72!"
+            >
+              <template #prefix>
+                <NIcon><SearchIcon /></NIcon>
+              </template>
+            </NInput>
           </div>
           <NDataTable
-            :theme-overrides="{
-              thColor: '#0005',
-              tdColor: '#0004'
-            }"
+            :theme-overrides="dataTableThemeOverrides"
             :loading="isLoading"
             :columns="columns"
             :data="tableData"
@@ -68,7 +76,7 @@
             v-model:expanded-row-keys="expandedRowKeys"
             size="small"
             :max-height="600"
-          ></NDataTable>
+          />
         </NCard>
       </div>
     </NScrollbar>
@@ -77,15 +85,17 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useActivated } from '@renderer-shared/compositions/useActivated'
+import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Friend, FriendGroup } from '@shared/types/league-client/chat'
+import { Search as SearchIcon } from '@vicons/carbon'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -94,13 +104,15 @@ import {
   NCard,
   NDataTable,
   NEllipsis,
+  NIcon,
+  NInput,
   NPopconfirm,
   NScrollbar,
   useMessage
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
 
@@ -110,10 +122,11 @@ const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
 const sgp = useInstance(SgpRenderer)
+const log = useInstance(LoggerRenderer)
 
-const mh = useInstance(MatchHistoryTabsRenderer)
+const pt = useInstance(PlayerTabsRenderer)
 
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const message = useMessage()
 
@@ -122,6 +135,7 @@ const expandedRowKeys = ref<number[]>([])
 
 const isLoading = ref(false)
 const isDeleting = ref(false)
+const friendSearchInput = ref('')
 
 // puuid -> info
 const extraInfoMap = ref<
@@ -135,10 +149,10 @@ const extraInfoMap = ref<
 >({})
 
 const renderFormattedDate = (date: number) => {
-  return h('span', { style: { fontSize: '12px' } }, [
+  return h('span', { class: 'text-xs text-black/80 dark:text-white/80' }, [
     dayjs(date).locale(as.settings.locale.toLowerCase()).format('YYYY-MM-DD HH:mm:ss'),
     ' ',
-    h('span', { style: { color: '#fff8' } }, [
+    h('span', { class: 'text-[11px] text-black/45 dark:text-white/60' }, [
       '(',
       dayjs(date).locale(as.settings.locale.toLowerCase()).fromNow(),
       ')'
@@ -158,7 +172,7 @@ const renderDateField = (
     return renderFormattedDate(extraInfo[field])
   }
 
-  return h('span', { style: { color: '#fff6', fontSize: '12px' } }, fallbackText)
+  return h('span', { class: 'text-xs text-black/45 dark:text-white/65' }, fallbackText)
 }
 
 const renderGroupName = (row: any) => {
@@ -188,6 +202,20 @@ const renderGroupName = (row: any) => {
   )
 }
 
+const dataTableThemeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      thColor: 'rgba(23, 23, 23, 0.6)',
+      tdColor: 'rgba(23, 23, 23, 0.4)'
+    }
+  }
+
+  return {
+    thColor: 'rgba(15, 23, 42, 0.04)',
+    tdColor: 'rgba(15, 23, 42, 0.02)'
+  }
+})
+
 const columns = computed<DataTableColumns<any>>(() => [
   {
     type: 'selection'
@@ -210,35 +238,50 @@ const columns = computed<DataTableColumns<any>>(() => [
 ])
 
 const tableData = computed(() => {
-  return combinedGroups.value.map((group) => {
-    return {
-      id: group.id,
-      name: t(`FriendTools.groupNames.${group.name}`, group.name),
-      children: group.friends
-        .map((friend) => {
-          return {
-            id: friend.id,
-            puuid: friend.puuid,
-            icon: friend.icon,
-            name: `${friend.gameName}#${friend.gameTag}`
-          }
-        })
-        .toSorted((a, b) => {
-          const aSince = extraInfoMap.value[a.puuid]?.friendsSince
-          const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+  const query = friendSearchInput.value.toLowerCase().trim()
 
-          if (aSince && bSince) {
-            return aSince - bSince
-          } else if (aSince) {
-            return -1
-          } else if (bSince) {
-            return 1
-          } else {
-            return 0
-          }
+  return combinedGroups.value
+    .map((group) => {
+      let filteredFriends = group.friends
+
+      if (query) {
+        filteredFriends = group.friends.filter((friend) => {
+          const gameName = friend.gameName?.toLowerCase() || ''
+          const gameTag = friend.gameTag?.toLowerCase() || ''
+          const fullName = `${gameName}#${gameTag}`.toLowerCase()
+          return fullName.includes(query)
         })
-    }
-  })
+      }
+
+      return {
+        id: group.id,
+        name: t(`FriendTools.groupNames.${group.name}`, group.name),
+        children: filteredFriends
+          .map((friend) => {
+            return {
+              id: friend.id,
+              puuid: friend.puuid,
+              icon: friend.icon,
+              name: `${friend.gameName}#${friend.gameTag}`
+            }
+          })
+          .toSorted((a, b) => {
+            const aSince = extraInfoMap.value[a.puuid]?.friendsSince
+            const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+
+            if (aSince && bSince) {
+              return aSince - bSince
+            } else if (aSince) {
+              return -1
+            } else if (bSince) {
+              return 1
+            } else {
+              return 0
+            }
+          })
+      }
+    })
+    .filter((group) => group.children.length > 0)
 })
 
 const selectedFriendCount = computed(() => {
@@ -287,13 +330,17 @@ const shouldUseVirtualScroll = computed(() => {
 
 const updateLastGameDate = async (puuid: string) => {
   if (sgps.availability.serversSupported.matchHistory && sgps.isTokenReady) {
-    const data = await sgp.getMatchHistoryLcuFormat(puuid, 0, 1)
-    if (data.games.games.length) {
+    const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(puuid, {
+      startIndex: 0,
+      count: 1
+    })
+
+    if (data.games.length) {
       if (!extraInfoMap.value[puuid]) {
         extraInfoMap.value[puuid] = {}
       }
 
-      extraInfoMap.value[puuid].lastGameDate = data.games.games[0].gameCreation
+      extraInfoMap.value[puuid].lastGameDate = data.games[0].json.gameCreation
     }
   } else {
     const { data } = await lc.api.matchHistory.getMatchHistory(puuid, 0, 0)
@@ -382,6 +429,7 @@ const deleteSelectedFriends = async () => {
       }
 
       await lc.api.chat.deleteFriend(friendId)
+      log.infoRenderer('comp:FriendTools', 'deleted', friendId)
     }
 
     message.success(() => t('FriendTools.deleteSuccess', { countV: filtered.length }))
@@ -418,8 +466,8 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 
 .button-group {
   display: flex;

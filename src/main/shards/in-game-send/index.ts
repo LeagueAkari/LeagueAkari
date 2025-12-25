@@ -1,10 +1,10 @@
-import { input, tools } from '@leagueakari/league-akari-addons'
+import { input } from '@leagueakari/league-akari-addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
 import { formatError } from '@shared/utils/errors'
+import { getSgpServerId } from '@shared/utils/sgp'
 import { sleep } from '@shared/utils/sleep'
 import fs from 'node:fs'
 import vm from 'node:vm'
@@ -23,6 +23,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
   JSContextV1,
   JS_TEMPLATE_CHECK_RESULT,
+  JS_TEMPLATE_MIN_VERSION_SUPPORT,
   checkContextV1,
   getExampleTemplate
 } from './js-template'
@@ -39,6 +40,7 @@ import { TemplateEnv } from './templates/env-types'
 @Shard(InGameSendMain.id)
 export class InGameSendMain implements IAkariShardInitDispose {
   static id = 'in-game-send-main'
+  private static readonly AUTO_TEMPLATE_BOOTSTRAP_FLAG = 'autoTemplateBootstrap'
 
   /**
    * 硬性大小限制, FOR NO REASON
@@ -421,8 +423,54 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
     )
 
+    // 适用于在 dry run 中手动触发的消息发送
+    this._ipc.onCall(
+      InGameSendMain.id,
+      'sendTemplateInChampSelectChat',
+      (_, templateId: string, target: 'ally' | 'enemy' | 'all') => {
+        const { messages, error } = this._getDryRunResult(templateId, target)
+
+        if (error) {
+          return { error }
+        }
+
+        const cv = this._lc.data.chat.conversations.championSelect
+
+        if (!cv) {
+          this._log.warn('Champion select chat not found')
+          return { error: 'Champion select chat not found' }
+        }
+
+        this._log.info('Sending message during champion select, manually', messages)
+
+        const interval = this.settings.sendInterval
+        const tasks: (() => Promise<any>)[] = []
+
+        for (let i = 0; i < messages.length; i++) {
+          tasks.push(() => this._lc.api.chat.chatSend(cv.id, messages[i]).catch(() => {}))
+
+          if (i !== messages.length - 1) {
+            tasks.push(() => sleep(interval))
+          }
+        }
+
+        const runTasks = async () => {
+          for (const task of tasks) {
+            await task()
+          }
+        }
+
+        runTasks()
+
+        return { error: null }
+      }
+    )
+
     this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
-      return this._rc.repo.getInGameSendTemplateCatalog()
+      return this._rc.repo.getInGameSendTemplateCatalog({
+        source: this._rc.settings.preferredSource,
+        repo: 'akari-config'
+      })
     })
 
     this._ipc.onCall(InGameSendMain.id, 'downloadTemplateFromRemote', (_, id: string) => {
@@ -464,6 +512,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._handleTemplateAutoDeprecation()
     this._handelCancelShortcut()
     this._handleIpcCall()
+
+    this._autoBootstrapTemplatesIfNeeded()
   }
 
   private _checkAndInitTemplates() {
@@ -606,14 +656,20 @@ export class InGameSendMain implements IAkariShardInitDispose {
   }
 
   private async _downloadTemplateFromRemote(id: string) {
-    const catalog = await this._rc.repo.getInGameSendTemplateCatalog()
-    const template = catalog.templates.find((t) => t.id === id)
+    const catalog = await this._rc.repo.getInGameSendTemplateCatalog({
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config'
+    })
+    const template = catalog.data.templates.find((t) => t.id === id)
 
     if (!template) {
       throw new Error(`Template ${id} not found`)
     }
 
-    const { data: code } = await this._rc.repo.getRawContent(template.path)
+    const { data: code } = await this._rc.repo.getRawContent(template.path, {
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config'
+    })
 
     this._createTemplate({
       name: template.name,
@@ -622,6 +678,70 @@ export class InGameSendMain implements IAkariShardInitDispose {
     })
 
     return template
+  }
+
+  private _isTemplateUsable(template: TemplateDef) {
+    return Boolean(template?.isValid) && template.type !== 'unknown'
+  }
+
+  private async _autoBootstrapTemplatesIfNeeded() {
+    const alreadyBootstrapped =
+      (await this._setting._getFromStorage(InGameSendMain.AUTO_TEMPLATE_BOOTSTRAP_FLAG, false)) ===
+      true
+
+    if (alreadyBootstrapped) {
+      return
+    }
+
+    const usableTemplateCount = this.settings.templates.filter((template) =>
+      this._isTemplateUsable(template)
+    ).length
+    const shouldBootstrap = usableTemplateCount === 0
+
+    if (!shouldBootstrap) {
+      return
+    }
+
+    this._log.info('Auto bootstrap remote templates')
+
+    const repoRequest = {
+      source: this._rc.settings.preferredSource,
+      repo: 'akari-config' as const
+    }
+
+    try {
+      const catalog = await this._rc.repo.getInGameSendTemplateCatalog(repoRequest)
+      for (const templateMeta of catalog.data.templates) {
+        try {
+          const { data: code } = await this._rc.repo.getRawContent(templateMeta.path, repoRequest)
+          const createdTemplate = this._createTemplate({
+            name: `${templateMeta.name} - ${i18next.t('in-game-send-main.templateSuffix')}`,
+            code,
+            type: templateMeta.type
+          })
+
+          if (!createdTemplate) {
+            continue
+          }
+
+          this._createSendableItem({
+            name: templateMeta.name,
+            content: {
+              type: 'template',
+              templateId: createdTemplate.id
+            }
+          })
+        } catch (error) {
+          this._log.warn('Auto bootstrap template failed', templateMeta.id, error)
+        }
+      }
+    } catch (error) {
+      this._log.warn('Auto bootstrap remote templates failed', error)
+    } finally {
+      await this._setting
+        ._saveToStorage(InGameSendMain.AUTO_TEMPLATE_BOOTSTRAP_FLAG, true)
+        .catch(() => {})
+    }
   }
 
   private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }): TemplateEnv {
@@ -687,10 +807,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
       championSelections: this._og.state.championSelections,
       positionAssignments: this._og.state.positionAssignments,
       playerStats: this._og.state.playerStats,
-      gameTimeline: this._og.state.gameTimeline,
-      inferredPremadeTeams: this._og.state.inferredPremadeTeams,
+      gameDetails: this._og.state.gameDetails,
       teamParticipantGroups: this._og.state.teamParticipantGroups,
-      additionalGame: this._og.state.additionalGame
+      calculatedPremadeTeamMap: this._og.state.calculatedPremadeTeamMap,
+      additionalGame: this._og.state.additionalGame,
+      addition: this._og.state.additional
     }
   }
 
@@ -700,7 +821,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private _getAkariContext(templateId: string) {
     return {
-      MAX_VERSION_SUPPORTED: 10,
+      MIN_VERSION_SUPPORTED: JS_TEMPLATE_MIN_VERSION_SUPPORT,
       require,
       process,
       akariManager: this._shared.manager,

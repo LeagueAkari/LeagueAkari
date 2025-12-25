@@ -1,42 +1,44 @@
 <template>
   <div class="copyable">
-    <span class="copyable-text">
+    <span class="copyable__text">
       <template v-if="slots.default"><slot></slot></template>
       <template v-else>{{ text }}</template>
     </span>
-    <NIcon :title="t('CopyableText.copy')" class="copyable-icon" @click.stop="handleCopy"
-      ><CopyIcon
-    /></NIcon>
+    <NIcon
+      :style="{
+        '--la-copyable-icon-size': iconSize + 'px'
+      }"
+      :title="t('CopyableText.copy')"
+      class="copyable__icon"
+      @click.stop="handleCopy"
+    >
+      <DoneSharp v-if="copied" />
+      <Copy24Regular v-else />
+    </NIcon>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Copy as CopyIcon } from '@vicons/carbon'
+import { Copy24Regular } from '@vicons/fluent'
+import { DoneSharp } from '@vicons/material'
+import { useTimeoutFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, useMessage } from 'naive-ui'
-import { useSlots } from 'vue'
+import { NIcon } from 'naive-ui'
+import { ref, useSlots } from 'vue'
 
-const {
-  showMessage = true,
-  prefix = '',
-  suffix = '',
-  text: propText
-} = defineProps<{
+const { text: propText, iconSize = 14 } = defineProps<{
+  iconSize?: number
   text?: string | number
-  showMessage?: boolean
-  prefix?: string
-  suffix?: string
 }>()
 
 const { t } = useTranslation()
 
 const emits = defineEmits<{
-  (e: 'copy', text: string): void
-  (e: 'error', err: any): void
+  copy: [text: string]
+  error: [err: any]
 }>()
 
 const slots = useSlots()
-const message = useMessage()
 
 const handleCopy = async () => {
   let text = ''
@@ -54,24 +56,27 @@ const handleCopy = async () => {
   }
 
   try {
-    await navigator.clipboard.writeText(prefix + text + suffix)
+    await navigator.clipboard.writeText(text)
 
-    if (showMessage) {
-      message.success(t('CopyableText.copied'), {
-        duration: 1000
-      })
-    }
+    copied.value = true
+    start()
 
     emits('copy', text)
   } catch (error) {
+    console.error(error)
     emits('error', error)
   }
 }
+
+const copied = ref(false)
+const { start } = useTimeoutFn(() => {
+  copied.value = false
+}, 2000)
 </script>
 
-<style lang="less" scoped>
-.copyable-text {
-  margin-right: 4px;
+<style scoped>
+.copyable__text {
+  margin-right: 8px;
 }
 
 .copyable {
@@ -79,15 +84,13 @@ const handleCopy = async () => {
   align-items: center;
 }
 
-.copyable-icon {
+.copyable__icon {
   cursor: pointer;
-  font-size: 12px;
-  color: rgb(212, 212, 212);
   transition: all 0.3s ease;
+  font-size: var(--la-copyable-icon-size);
 }
 
-.copyable-icon:hover {
+.copyable__icon:hover {
   cursor: pointer;
-  color: rgb(162, 162, 162);
 }
 </style>

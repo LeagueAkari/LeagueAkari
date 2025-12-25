@@ -80,7 +80,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
           try {
             return JSON.stringify(arg, null, 2)
           } catch (error) {
-            return arg.toString()
+            return `[Cannot stringify: ${arg}]`
           }
         }
 

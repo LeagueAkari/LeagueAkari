@@ -2,7 +2,7 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
-        <NCard size="small" style="margin-top: 8px">
+        <NCard size="small">
           <template #header>
             <span class="card-header-title">{{ t('Client.gameClient.title') }}</span>
           </template>
@@ -212,8 +212,8 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
 }
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 
 .outer-wrapper {
   position: relative;

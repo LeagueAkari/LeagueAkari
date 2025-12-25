@@ -1,9 +1,14 @@
-import { ChampSelectSummoner, OngoingTrade } from '@shared/types/league-client/champ-select'
+import {
+  ChampSelectSummoner,
+  GridChamp,
+  OngoingChampionSwap
+} from '@shared/types/league-client/champ-select'
 import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { Ballot } from '@shared/types/league-client/honorV2'
 import { isAxiosError } from 'axios'
 import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
+import PQueue from 'p-queue'
 
 import type { LeagueClientMainContext } from '..'
 import { TaskRunner } from '../utils/task-runner'
@@ -333,6 +338,11 @@ export class LeagueClientData {
         const token = (await this._context.lc.api.leagueSession.getLeagueSessionToken()).data
         this.leagueSession.setToken(token)
       } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          this.leagueSession.setToken(null)
+          return
+        }
+
         this._context.ipc.sendEvent(
           this._context.namespace,
           'error-sync-data',
@@ -579,8 +589,16 @@ export class LeagueClientData {
       'currentBannableChampionIds',
       'disabledChampionIds',
       'currentChampion',
-      'ongoingTrade'
+      'ongoingChampionSwap'
     ])
+
+    this._context.mobx.propSync(
+      this._context.namespace,
+      'champSelect',
+      this.champSelect,
+      'gridChampions',
+      { raw: false }
+    )
 
     const loadSession = async () => {
       try {
@@ -694,9 +712,12 @@ export class LeagueClientData {
       { equals: comparer.structural }
     )
 
+    const gridChampionsQueue = new PQueue({ concurrency: 6 })
+
     this._onLcuNotConnected(() => {
       this.champSelect.setSelfSummoner(null)
       isCellSummonerUpdated = false
+      gridChampionsQueue.clear()
     })
 
     const loadCurrentChampion = async () => {
@@ -744,34 +765,74 @@ export class LeagueClientData {
       }
     }
 
-    const loadOngoingTrade = async () => {
+    const loadOngoingChampionSwap = async () => {
       try {
-        const trade = (await this._context.lc.api.champSelect.getOngoingTrade()).data
-        this.champSelect.setOngoingTrade(trade)
+        const trade = (await this._context.lc.api.champSelect.getOngoingChampionSwap()).data
+        this.champSelect.setOngoingChampionSwap(trade)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
-          this.champSelect.setOngoingTrade(null)
+          this.champSelect.setOngoingChampionSwap(null)
           return
         }
 
-        this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-ongoing-trade')
-        this._context.log.warn(`Failed to get ongoing trade`, error)
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-ongoing-champion-swap'
+        )
+        this._context.log.warn(`Failed to get ongoing champion swap`, error)
+      }
+    }
+
+    const fillGridChampions = async (champs: GridChamp[]) => {
+      for (const champ of champs) {
+        gridChampionsQueue.add(async () => {
+          try {
+            const { data } = await this._context.lc.api.champSelect.getGridChamp(champ.id)
+            this.champSelect.setGridChampion(data)
+            this._context.mobx.notifyStatePropChange(
+              this._context.namespace,
+              'champSelect',
+              `gridChampions[${champ.id}]`,
+              data,
+              { action: 'update', raw: true }
+            )
+          } catch (error) {
+            // just skip
+            this._context.log.warn(`Failed to load grid champions: ${champ.id}`, error)
+          }
+        })
+      }
+
+      await gridChampionsQueue.onIdle()
+    }
+
+    const loadAllGridChampionsAndFillGridChampions = async () => {
+      try {
+        const champs = (await this._context.lc.api.champSelect.getAllGridChamps()).data
+        await fillGridChampions(champs)
+      } catch (error) {
+        this._context.log.warn(`Failed to get all grid champions`, error)
       }
     }
 
     this._stateInitializer.register('champ-select-session', loadSession)
     this._stateInitializer.register('champ-select-current-champion', loadCurrentChampion)
     this._stateInitializer.register('champ-select-disabled-champions', loadDisabledChampions)
-    this._stateInitializer.register('champ-select-ongoing-trade', loadOngoingTrade)
+    this._stateInitializer.register('champ-select-ongoing-champion-swap', loadOngoingChampionSwap)
     this._stateInitializer.register('champ-select-pickable-champ-ids', loadPickables)
     this._stateInitializer.register('champ-select-bannable-champ-ids', loadBannables)
+    this._stateInitializer.register(
+      'champ-select-all-grid-champions',
+      loadAllGridChampionsAndFillGridChampions
+    )
 
     this._onLcuNotConnected(() => {
       this.champSelect.setCurrentBannableChampionArray([])
       this.champSelect.setCurrentChampion(null)
       this.champSelect.setCurrentPickableChampionArray([])
       this.champSelect.setDisabledChampionIds([])
-      this.champSelect.setOngoingTrade(null)
+      this.champSelect.setOngoingChampionSwap(null)
       this.champSelect.setSelfSummoner(null)
       this.champSelect.setSession(null)
     })
@@ -878,15 +939,29 @@ export class LeagueClientData {
       }
     })
 
-    this._context.lc.events.on<LcuEvent<OngoingTrade>>(
-      '/lol-champ-select/v1/ongoing-trade',
+    this._context.lc.events.on<LcuEvent<OngoingChampionSwap>>(
+      '/lol-champ-select/v1/ongoing-champion-swap',
       (event) => {
         if (event.eventType === 'Delete') {
-          this.champSelect.setOngoingTrade(null)
+          this.champSelect.setOngoingChampionSwap(null)
           return
         }
 
-        this.champSelect.setOngoingTrade(event.data)
+        this.champSelect.setOngoingChampionSwap(event.data)
+      }
+    )
+
+    this._context.lc.events.on<LcuEvent<GridChamp>>(
+      '/lol-champ-select/v1/grid-champions/*',
+      (event) => {
+        this.champSelect.setGridChampion(event.data)
+        this._context.mobx.notifyStatePropChange(
+          this._context.namespace,
+          'champSelect',
+          `gridChampions[${event.data.id}]`,
+          event.data,
+          { action: 'update', raw: true }
+        )
       }
     )
   }
@@ -932,7 +1007,9 @@ export class LeagueClientData {
       'perkstyles',
       'queues',
       'summonerSpells',
-      'augments'
+      'augments',
+      'gameModeMutators',
+      'maps'
     ])
 
     const loadSummonerSpells = async () => {
@@ -1053,6 +1130,40 @@ export class LeagueClientData {
       }
     }
 
+    const loadMaps = async () => {
+      try {
+        const maps = (await this._context.lc.api.gameData.getMaps()).data
+        this.gameData.setMaps(
+          maps.reduce((prev, cur) => {
+            prev[cur.id] = cur
+            return prev
+          }, {})
+        )
+      } catch (error) {
+        this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-maps')
+        this._context.log.warn(`Failed to get maps`, error)
+      }
+    }
+
+    const loadGameModeMutators = async () => {
+      try {
+        const gameModeMutators = (await this._context.lc.api.gameData.getGameModeMutators()).data
+        this.gameData.setGameModeMutators(
+          gameModeMutators.reduce((prev, cur) => {
+            prev[cur.MapId] = cur
+            return prev
+          }, {})
+        )
+      } catch (error) {
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-game-mode-mutators'
+        )
+        this._context.log.warn(`Failed to get game mode mutators`, error)
+      }
+    }
+
     this._stateInitializer.register('game-data-summoner-spells', loadSummonerSpells, {
       group: 'game-data'
     })
@@ -1062,6 +1173,10 @@ export class LeagueClientData {
     this._stateInitializer.register('game-data-perkstyles', loadPerkstyles, { group: 'game-data' })
     this._stateInitializer.register('game-data-augments', loadAugments, { group: 'game-data' })
     this._stateInitializer.register('game-data-champions', loadChampions, { group: 'game-data' })
+    this._stateInitializer.register('game-data-game-mode-mutators', loadGameModeMutators, {
+      group: 'game-data'
+    })
+    this._stateInitializer.register('game-data-maps', loadMaps, { group: 'game-data' })
 
     this._onLcuNotConnected(() => {
       // NO NEED TO CLEAR
@@ -1080,7 +1195,7 @@ export class LeagueClientData {
       try {
         const { data } =
           await this._context.lc.api.lobbyTeamBuilder.getChampSelectSubsetChampionList()
-        this.lobbyTeamBuilder.champSelect.subsetChampionList = data
+        this.lobbyTeamBuilder.champSelect.setSubsetChampionList(data)
       } catch (error) {
         this._context.ipc.sendEvent(
           this._context.namespace,

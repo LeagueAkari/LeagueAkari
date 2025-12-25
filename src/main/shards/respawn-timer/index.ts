@@ -27,10 +27,10 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _gameClient: GameClientMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
+    readonly _loggerFactory: LoggerFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _settingFactory: SettingFactoryMain
+    readonly _settingFactory: SettingFactoryMain
   ) {
     this._log = _loggerFactory.create(RespawnTimerMain.id)
     this._setting = _settingFactory.register(
@@ -40,7 +40,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this.state = new RespawnTimerState(this._lc.data)
+    this.state = new RespawnTimerState()
   }
 
   async onInit() {

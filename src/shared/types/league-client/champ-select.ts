@@ -19,6 +19,7 @@ export interface ChampSelectSessionBase {
   allowRerolling: boolean
   allowSkinSelection: boolean
   allowSubsetChampionPicks: boolean
+  gameId: number
   bans: Bans
   chatDetails: ChatDetails
   hasSimultaneousBans: boolean
@@ -208,7 +209,20 @@ export interface OngoingTrade {
   requesterChampionSplashPath: string
   responderChampionName: string
   responderIndex: number
-  state: string | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
+  state: (string & {}) | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
+}
+
+export interface OngoingChampionSwap {
+  id: number
+  initiatedByLocalPlayer: boolean
+  otherSummonerIndex: number
+  requesterChampionId: number
+  requesterChampionName: string
+  requesterChampionSplashPath: string
+  responderChampionName: string
+  responderIndex: number
+  state: (string & {}) | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
+  type: 'CHAMPION'
 }
 
 export interface CarouselSkins {

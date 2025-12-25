@@ -1,32 +1,67 @@
 <template>
-  <div class="app-sidebar">
+  <div
+    class="app-sidebar"
+    ref="sidebarEl"
+    :class="{
+      collapsed: mui.frontendSettings.sidebarCollapsed,
+      'is-hovered': isSidebarHoveredDebounced
+    }"
+  >
+    <div class="app-sidebar__head">
+      <div class="app-sidebar__logo" @click="toggleCollapse">
+        <NIcon class="app-sidebar__logo-icon">
+          <AkariLogo />
+        </NIcon>
+        <NIcon class="app-sidebar__logo-toggle">
+          <Transition name="fade">
+            <SidebarCollapseRight v-if="mui.frontendSettings.sidebarCollapsed" />
+            <SidebarCollapseLeft v-else />
+          </Transition>
+        </NIcon>
+      </div>
+      <div class="app-sidebar__logo-text">
+        {{ t('appName', { ns: 'common' }) }}{{ as.isAdministrator ? ' X' : '' }}
+      </div>
+
+      <!-- drag zone -->
+      <div class="absolute top-0 right-0 left-0 h-4 [-webkit-app-region:drag]"></div>
+    </div>
     <SidebarMenu
-      class="sidebar-menu"
+      class="app-sidebar__menu"
       :items="menu"
       :current="currentMenu"
       @update:current="(key) => handleMenuChange(key)"
+      :is-collapsed="mui.frontendSettings.sidebarCollapsed"
     />
-    <div class="padding-zone"></div>
-    <SidebarFixed />
+    <div class="app-sidebar__padding"></div>
+    <SidebarFixed
+      class="app-sidebar__fixed"
+      :is-collapsed="mui.frontendSettings.sidebarCollapsed"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
+import SidebarCollapseLeft from '@renderer-shared/assets/icon/SidebarCollapseLeft.vue'
+import SidebarCollapseRight from '@renderer-shared/assets/icon/SidebarCollapseRight.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
-import { Tools as ToolsIcon } from '@vicons/fa'
 import {
   AnimalRabbit28Filled as AnimalRabbit28FilledIcon,
   Games24Filled as Games24FilledIcon
 } from '@vicons/fluent'
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
+import { refDebounced, useElementHover } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
+import { Component as ComponentC, computed, h, ref, useTemplateRef, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
 import SidebarFixed from './SidebarFixed.vue'
 import SidebarMenu from './SidebarMenu.vue'
@@ -35,6 +70,8 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
+const mui = useMainWindowUiStore()
+const lcs = useLeagueClientStore()
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -44,12 +81,16 @@ const router = useRouter()
 const route = useRoute()
 
 const shouldShowOngoingGameBadge = ref(false)
-const isInOngoingStage = computed(() => {
-  return ogs.queryStage.phase !== 'unavailable'
+const isInCombatPhase = computed(() => {
+  return ogs.queryStage.phase !== 'unavailable' && ogs.queryStage.phase !== 'lobby'
 })
 
+const toggleCollapse = () => {
+  mui.frontendSettings.sidebarCollapsed = !mui.frontendSettings.sidebarCollapsed
+}
+
 watch(
-  () => isInOngoingStage.value,
+  () => isInCombatPhase.value,
   (yes) => {
     if (yes && currentMenu.value !== 'ongoing-game') {
       shouldShowOngoingGameBadge.value = true
@@ -63,7 +104,7 @@ const currentMenu = ref('match-history')
 const menu = computed(() => {
   return [
     {
-      key: 'match-history',
+      key: 'player-tabs',
       icon: renderIcon(AnalyticsRoundIcon),
       name: t('SideBarMenu.match-history')
     },
@@ -71,7 +112,8 @@ const menu = computed(() => {
       key: 'ongoing-game',
       icon: renderIcon(Games24FilledIcon),
       name: t('SideBarMenu.ongoing-game'),
-      inProgress: shouldShowOngoingGameBadge.value
+      inProgress: shouldShowOngoingGameBadge.value,
+      isDisabled: !lcs.isConnected
     },
     {
       key: 'automation',
@@ -80,7 +122,7 @@ const menu = computed(() => {
     },
     {
       key: 'toolkit',
-      icon: renderIcon(ToolsIcon),
+      icon: renderIcon(ToolFilledIcon),
       name: t('SideBarMenu.toolkit')
     },
     {
@@ -108,28 +150,110 @@ watchEffect(() => {
   }
 })
 
-const lcs = useLeagueClientStore()
-const lcuxs = useLeagueClientUxStore()
-
-const isClientsPreviewShow = ref(false)
-
-// 善意的提醒，以防用户一直在等
-watchEffect(() => {
-  if (lcs.connectionState === 'disconnected' && lcuxs.launchedClients.length > 1) {
-    isClientsPreviewShow.value = true
+watch(
+  () => lcs.isConnected,
+  (isConnected) => {
+    if (!isConnected && route.name === 'ongoing-game') {
+      router.replace({ name: 'player-tabs' })
+    }
   }
-})
+)
+
+const isSidebarHovered = useElementHover(useTemplateRef('sidebarEl'))
+const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .app-sidebar {
+  --la-sidebar-width-collapsed: 52px;
+  --la-sidebar-width-expanded: 186px;
+
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #0001;
+  width: var(--la-sidebar-width-expanded);
+  transition: width 0.2s;
 
-  .padding-zone {
+  &.collapsed {
+    width: var(--la-sidebar-width-collapsed);
+  }
+
+  .app-sidebar__head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 4px;
+    height: 48px;
+    overflow: hidden;
+  }
+
+  .app-sidebar__logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  &.is-hovered {
+    .app-sidebar__logo-icon {
+      opacity: 0;
+    }
+
+    .app-sidebar__logo-toggle {
+      opacity: 1;
+    }
+  }
+
+  .app-sidebar__logo-icon {
+    color: rgba(248, 63, 111);
+    filter: drop-shadow(0 0 8px rgba(248, 63, 111, 0.3));
+    transition:
+      filter 0.2s,
+      opacity 0.2s;
+  }
+
+  .app-sidebar__logo-text {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Comfortaa', sans-serif;
+    text-wrap-mode: nowrap;
+    transition: opacity 0.2s;
+
+    .collapsed & {
+      opacity: 0;
+    }
+  }
+
+  .app-sidebar__logo-toggle {
+    position: absolute;
+    color: rgba(0, 0, 0, 1);
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
+    opacity: 0;
+
+    &:active {
+      transform: scale(0.9);
+    }
+
+    [data-theme='dark'] & {
+      color: rgba(255, 255, 255, 1);
+    }
+  }
+
+  .app-sidebar__padding {
     flex: 1;
+  }
+
+  .app-sidebar__fixed {
+    margin-bottom: 4px;
   }
 }
 </style>

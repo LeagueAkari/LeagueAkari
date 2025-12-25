@@ -3,7 +3,6 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <SummonerProfile class="tool" />
-        <Spectate class="tool" />
         <ChatAvailability class="tool" />
         <FakeRanked class="tool" />
         <ChatStatusMessage class="tool" />
@@ -20,10 +19,9 @@ import ChatAvailability from './ChatAvailability.vue'
 import ChatStatusMessage from './ChatStatusMessage.vue'
 import FakeRanked from './FakeRanked.vue'
 import GameView from './GameView.vue'
-import Spectate from './Spectate.vue'
 import SummonerProfile from './SummonerProfile.vue'
 </script>
 
-<style lang="less" scoped>
-@import '../toolkit-styles.less';
+<style scoped>
+@import '../toolkit-styles.css';
 </style>

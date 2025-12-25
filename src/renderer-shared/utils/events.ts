@@ -1,4 +1,4 @@
-import { RadixEventEmitter } from '@shared/event-emitter'
+import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
 export function createEventBus() {

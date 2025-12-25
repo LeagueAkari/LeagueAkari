@@ -1,7 +1,7 @@
 <template>
   <div id="aux-window-frame">
     <SetupInAppScope />
-    <AuxWindowTitleBar />
+    <AuxWindowTitlebar />
     <div class="content">
       <RouterView v-slot="{ Component }">
         <KeepAlive>
@@ -15,16 +15,16 @@
 <script setup lang="ts">
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 
-import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
+import AuxWindowTitlebar from './components/AuxWindowTitlebar.vue'
 </script>
 
-<style lang="less">
+<style>
 #aux-window-frame {
   height: 100%;
   display: flex;
   flex-direction: column;
-  min-width: var(--app-min-width);
-  min-height: var(--app-min-height);
+  min-width: var(--la-app-min-width);
+  min-height: var(--la-app-min-height);
 
   > .content {
     height: 0;

@@ -190,7 +190,7 @@ const queueOptions = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

@@ -1,10 +1,12 @@
 import yaml from '@modyfi/vite-plugin-yaml'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
-import { bytecodePlugin, defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import { defineConfig, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const SHOULD_COMPILE_TO_BYTECODE = false
+const SHOULD_COMPILE_TO_BYTECODE = true
 
 const minify = process.env.NODE_ENV === 'production'
 
@@ -43,13 +45,15 @@ const LC_CUSTOM_TAGS = new Set([
   'keywordMajor' // 关键词护卫
 ])
 
-const mainPlugins = [swcPlugin(), yaml(), externalizeDepsPlugin()]
-
 export default defineConfig({
   main: {
-    plugins: SHOULD_COMPILE_TO_BYTECODE ? [bytecodePlugin(), ...mainPlugins] : mainPlugins,
+    plugins: [swcPlugin(), yaml()],
     build: {
-      minify
+      minify,
+      bytecode: SHOULD_COMPILE_TO_BYTECODE ? { transformArrowFunctions: false } : false,
+      rollupOptions: {
+        external: ['electron']
+      }
     },
     resolve: {
       alias: {
@@ -60,9 +64,12 @@ export default defineConfig({
     }
   },
   preload: {
-    plugins: [swcPlugin(), externalizeDepsPlugin()],
+    plugins: [swcPlugin()],
     build: {
-      minify
+      minify,
+      rollupOptions: {
+        external: ['electron']
+      }
     },
     resolve: {
       alias: {
@@ -88,7 +95,9 @@ export default defineConfig({
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       }),
-      vueDevTools()
+      tailwindcss(),
+      vueDevTools(),
+      vueJsx({})
     ],
     build: {
       minify,
