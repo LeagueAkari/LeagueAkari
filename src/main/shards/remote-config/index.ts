@@ -129,7 +129,14 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     })
 
     if (archiveFile) {
-      return { ...release, archiveFile, isNew, currentVersion, detailedChangelog }
+      return {
+        ...release,
+        source: configRepoRequest.source,
+        archiveFile,
+        isNew,
+        currentVersion,
+        detailedChangelog
+      }
     }
 
     // compatibility with gitee
@@ -138,10 +145,24 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     })
 
     if (archiveFile) {
-      return { ...release, archiveFile, isNew, currentVersion, detailedChangelog }
+      return {
+        ...release,
+        source: configRepoRequest.source,
+        archiveFile,
+        isNew,
+        currentVersion,
+        detailedChangelog
+      }
     }
 
-    return { ...release, isNew, archiveFile: null, currentVersion, detailedChangelog }
+    return {
+      ...release,
+      source: configRepoRequest.source,
+      isNew,
+      archiveFile: null,
+      currentVersion,
+      detailedChangelog
+    }
   }
 
   private _checkIfReachRateLimit(error: unknown) {
@@ -311,7 +332,10 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         source: this.settings.preferredSource,
         repo: 'akari'
       })
+
       this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
+
+      this._log.warn(this.state.latestRelease?.assets)
 
       this._log.info('Updated Latest Release', this.settings.preferredSource)
     } catch (error) {

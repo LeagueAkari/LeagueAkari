@@ -18,6 +18,7 @@ interface Announcement {
 }
 
 export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
+  source: 'github' | 'gitee'
   isNew: boolean
   currentVersion: string
   detailedChangelog: string | null
@@ -34,6 +35,10 @@ function releaseEquals(a: LatestReleaseWithMetadata | null, b: LatestReleaseWith
   }
 
   if (a.isNew !== b.isNew) {
+    return false
+  }
+
+  if (a.source !== b.source) {
     return false
   }
 
@@ -122,7 +127,8 @@ export class RemoteConfigState {
     makeAutoObservable(this, {
       leagueServers: observable.ref,
       supportedQueues: observable.ref,
-      ongoingGameConfig: observable.ref
+      ongoingGameConfig: observable.ref,
+      latestReleaseValue: observable.ref
     })
   }
 }
