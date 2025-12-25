@@ -66,6 +66,7 @@
       :source="previewingGame.source"
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
+      :hide-privacy="as.settings.streamerMode"
     />
 
     <!-- 这个组件不会生成 DOM，但用来保证全局状态同步 -->

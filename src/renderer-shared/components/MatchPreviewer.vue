@@ -13,6 +13,7 @@
         :puuid="puuid"
         :theme="as.colorTheme"
         :loading-details="isLoadingDetails"
+        :hide-privacy="hidePrivacy"
         is-expanded
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
         @load-details="loadDetails(summary?.source || 'lcu')"
@@ -41,11 +42,13 @@ const {
   summary: propSummary,
   details: propDetails,
   source,
-  puuid
+  puuid,
+  hidePrivacy = false
 } = defineProps<{
   gameId: number
   source: 'sgp' | 'lcu'
   puuid?: string
+  hidePrivacy?: boolean
   summary?: LcuOrSgpGameSummary // 如果提供了数据且和 gameId 一致，则优先使用 summary
   details?: LcuOrSgpGameDetails // 如果提供了数据且和 gameId 一致，则优先使用 details
 }>()

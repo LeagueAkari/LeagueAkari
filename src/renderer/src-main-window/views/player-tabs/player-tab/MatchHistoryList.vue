@@ -55,7 +55,7 @@
         @watch-replay="launchRelay(g.gameId)"
         :details="pagedMatchHistory.details[g.gameId]"
         :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
-        :hide-privacy="hidePrivacy"
+        :hide-privacy="as.settings.streamerMode"
         :replay-state="pagedMatchHistory.replayMetadata[g.gameId]?.state"
       />
     </div>
@@ -64,7 +64,6 @@
 
 <script setup lang="ts">
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
-import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -88,7 +87,6 @@ const pts = usePlayerTabsStore()
 const ogs = useOngoingGameStore()
 
 const { t } = useTranslation()
-const { masked } = useStreamerModeMaskedText()
 
 const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
 const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay, loadMatchHistory } =
@@ -194,7 +192,4 @@ watch(
     }
   }
 )
-
-// trick
-const hidePrivacy = computed(() => masked('__streamer_flag__') !== '__streamer_flag__')
 </script>

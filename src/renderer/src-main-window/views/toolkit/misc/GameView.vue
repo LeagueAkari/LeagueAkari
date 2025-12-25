@@ -9,6 +9,7 @@
       v-model:show="showPreviewModal"
       :game-id="previewingGameId || 0"
       :source="as.settings.preferredLolSource"
+      :hide-privacy="as.settings.streamerMode"
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <ControlItem
