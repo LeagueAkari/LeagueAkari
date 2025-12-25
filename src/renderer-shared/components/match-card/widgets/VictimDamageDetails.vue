@@ -59,22 +59,54 @@
       </div>
 
       <!-- champion, minion, other -->
-      <div v-for="receiver of group.data" class="flex items-start gap-2 not-last:mb-2">
+      <div v-for="item of group.data" class="flex items-start gap-3 not-last:mb-2">
+        <div v-if="item.type === 'champion'" class="relative shrink-0">
+          <template v-if="group.type === 'received'">
+            <ChampionIcon
+              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              class="size-8 rounded-full border-2 border-solid"
+              :style="{
+                borderColor: getTeamColor(participantMap[item.participantId]?.teamIdentifier)
+              }"
+              :champion-id="participantMap[item.participantId]?.championId"
+            />
+          </template>
+
+          <!-- 对 dealt 使用更加直观的方式 -->
+          <template v-else>
+            <ChampionIcon
+              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              class="size-8 rounded-full border-2 border-solid"
+              :style="{
+                borderColor: getTeamColor(participantMap[event.victimId]?.teamIdentifier)
+              }"
+              :champion-id="participantMap[event.victimId]?.championId"
+            />
+
+            <ChampionIcon
+              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              class="absolute right-0 bottom-0 size-1/2 translate-x-1/4 translate-y-1/4 rounded-full border-2 border-solid"
+              :style="{
+                borderColor: getTeamColor(participantMap[item.participantId]?.teamIdentifier)
+              }"
+              :champion-id="participantMap[item.participantId]?.championId"
+            />
+          </template>
+        </div>
+
         <ChampionIcon
-          :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${receiver.type}`)"
-          v-if="
-            receiver.type === 'champion' || receiver.type === 'minion' || receiver.type === 'other'
-          "
+          :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+          v-else-if="item.type === 'minion' || item.type === 'other'"
           class="size-8 rounded-full border-2 border-solid"
           :style="{
-            borderColor: getTeamColor(participantMap[receiver.participantId]?.teamIdentifier)
+            borderColor: getTeamColor(participantMap[item.participantId]?.teamIdentifier)
           }"
-          :champion-id="participantMap[receiver.participantId]?.championId"
+          :champion-id="participantMap[item.participantId]?.championId"
         />
 
         <!-- tower -->
         <div
-          v-if="receiver.type === 'tower'"
+          v-if="item.type === 'tower'"
           :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.tower`)"
         >
           <TowerIcon
@@ -84,11 +116,11 @@
 
         <!-- monster -->
         <div
-          v-if="receiver.type === 'monster'"
+          v-if="item.type === 'monster'"
           :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.monster`)"
         >
           <NIcon
-            v-if="receiver.name === CHERRY_SHOPKEEPER_NAME"
+            v-if="item.name === CHERRY_SHOPKEEPER_NAME"
             class="rounded-full border-solid border-black/40 p-1 text-[24px] dark:border-white/40"
           >
             <Fire />
@@ -107,9 +139,9 @@
               :border-radius="0"
               :height="14"
               :width="160"
-              :physical-damage="receiver.totalPhysicalDamage"
-              :magic-damage="receiver.totalMagicDamage"
-              :true-damage="receiver.totalTrueDamage"
+              :physical-damage="item.totalPhysicalDamage"
+              :magic-damage="item.totalMagicDamage"
+              :true-damage="item.totalTrueDamage"
               :baseline-damage="data.maxDamageBaseline"
             />
 
@@ -118,23 +150,21 @@
               <span class="font-bold">
                 {{
                   formatExtremeNumber(
-                    receiver.totalPhysicalDamage +
-                      receiver.totalMagicDamage +
-                      receiver.totalTrueDamage
+                    item.totalPhysicalDamage + item.totalMagicDamage + item.totalTrueDamage
                   )
                 }}
               </span>
               (
               <span :class="getDamageTextColor('physical')">{{
-                formatExtremeNumber(receiver.totalPhysicalDamage)
+                formatExtremeNumber(item.totalPhysicalDamage)
               }}</span>
               /
               <span :class="getDamageTextColor('magic')">{{
-                formatExtremeNumber(receiver.totalMagicDamage)
+                formatExtremeNumber(item.totalMagicDamage)
               }}</span>
               /
               <span :class="getDamageTextColor('true')">{{
-                formatExtremeNumber(receiver.totalTrueDamage)
+                formatExtremeNumber(item.totalTrueDamage)
               }}</span>
               )
             </div>
@@ -144,15 +174,13 @@
           <div class="flex items-center gap-1">
             <NPopover
               v-for="[type, damage] of [
-                receiver.damageDetails.basic
-                  ? (['A', receiver.damageDetails.basic] as const)
-                  : null,
-                receiver.damageDetails.p ? (['P', receiver.damageDetails.p] as const) : null,
-                receiver.damageDetails.q ? (['Q', receiver.damageDetails.q] as const) : null,
-                receiver.damageDetails.w ? (['W', receiver.damageDetails.w] as const) : null,
-                receiver.damageDetails.e ? (['E', receiver.damageDetails.e] as const) : null,
-                receiver.damageDetails.r ? (['R', receiver.damageDetails.r] as const) : null,
-                receiver.damageDetails.other ? (['?', receiver.damageDetails.other] as const) : null
+                item.damageDetails.basic ? (['A', item.damageDetails.basic] as const) : null,
+                item.damageDetails.p ? (['P', item.damageDetails.p] as const) : null,
+                item.damageDetails.q ? (['Q', item.damageDetails.q] as const) : null,
+                item.damageDetails.w ? (['W', item.damageDetails.w] as const) : null,
+                item.damageDetails.e ? (['E', item.damageDetails.e] as const) : null,
+                item.damageDetails.r ? (['R', item.damageDetails.r] as const) : null,
+                item.damageDetails.other ? (['?', item.damageDetails.other] as const) : null
               ].filter((skill) => skill !== null)"
             >
               <template #trigger>
