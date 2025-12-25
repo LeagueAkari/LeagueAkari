@@ -1,6 +1,5 @@
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import FunnyPricing from '@renderer-shared/components/easter-eggs/FunnyPricing.vue'
-import JMComicStartup from '@renderer-shared/components/easter-eggs/JMComicStartup.vue'
 import { useKeyboardCombo } from '@renderer-shared/composables/useKeyboardCombo'
 import { useTimeLeft } from '@renderer-shared/composables/useTimeLeft'
 import { useInstance } from '@renderer-shared/shards'
@@ -27,13 +26,12 @@ import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import {
   DialogReactive,
-  NModal,
   NotificationReactive,
   useDialog,
   useMessage,
   useNotification
 } from 'naive-ui'
-import { computed, defineComponent, h, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, defineComponent, h, ref, watch, watchEffect } from 'vue'
 
 import { useAppContext } from '@main-window/context'
 
@@ -508,54 +506,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addRenderVNode(() => h(comp))
   }
 
-  private _setupJMComicStartupModal() {
-    const as = useAppCommonStore()
-
-    if (!as.isRabiVersion || new Date().getFullYear() > 2025) {
-      return
-    }
-
-    const comp = defineComponent({
-      setup() {
-        const show = ref(false)
-
-        const st = useInstance(SettingUtilsRenderer)
-
-        onMounted(async () => {
-          const shown = await st.get(SimpleNotificationsRenderer.id, 'easterEgg20251224Shown')
-
-          if (!shown) {
-            show.value = true
-          }
-        })
-
-        return () =>
-          h(
-            NModal,
-            {
-              show: show.value,
-              'onUpdate:show': (v) => (show.value = v),
-              closable: false,
-              maskClosable: false,
-              closeOnEsc: false
-            },
-            () =>
-              h(JMComicStartup, {
-                onClick: () => {
-                  show.value = false
-
-                  st.set(SimpleNotificationsRenderer.id, 'easterEgg20251224Shown', true).catch(
-                    () => {}
-                  )
-                }
-              })
-          )
-      }
-    })
-
-    this._setup.addRenderVNode(() => h(comp))
-  }
-
   private _setupSpecialKeyboardCombo() {
     const message = useMessage()
     const sns = useSimpleNotificationsStore()
@@ -819,7 +769,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupAnnouncementModal()
     this._setupNewReleaseModal()
     this._setupFunnyPricingModal()
-    this._setupJMComicStartupModal()
     this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())

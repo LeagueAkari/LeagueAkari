@@ -1,5 +1,7 @@
 <template>
   <div class="flex h-[600px] w-[800px] gap-2 space-y-4 p-4">
+    <div>此页面用作内部测试。它不会在正式版本中出现。</div>
+
     <!-- test2 -->
     <div
       class="flex h-[400px] w-[550px] overflow-hidden rounded bg-neutral-100 shadow-lg dark:bg-neutral-900"

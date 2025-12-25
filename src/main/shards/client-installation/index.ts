@@ -361,7 +361,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       const p = cp.spawn(location, [], {
         detached: true,
         stdio: 'ignore',
-        shell: 'cmd'
+        shell: true
       })
 
       let hasError = false
@@ -395,7 +395,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: 'cmd' })
+    const child = cp.spawn(location, [], { detached: true, stdio: 'ignore', shell: true })
     child.unref()
     child.on('error', () => {
       this._log.warn('Failed to launch WeGame (LoL) client', location)
@@ -413,7 +413,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       const p = cp.spawn(executablePath, [], {
         detached: true,
         stdio: 'ignore',
-        shell: 'cmd'
+        shell: true
       })
 
       let hasError = false

@@ -67,6 +67,8 @@ gameModes:
 
 sgpMatchHistoryTags:
   all: All Modes
+  ranked: Ranked Modes
+  normal: Normal Modes
   current: Current Mode
   q_420: Ranked Solo/Duo
   q_430: Normal SR

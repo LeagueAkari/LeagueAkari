@@ -46,18 +46,6 @@
             {{ t('SpectateStatus.lcuSpectate.button') }}
           </NButton>
         </ControlItem>
-        <ControlItem
-          :label="t('SpectateStatus.tokenSpectate.label')"
-          :label-width="240"
-          :label-description="t('SpectateStatus.tokenSpectate.description')"
-        >
-          <NButton size="tiny" @click="handleCopyToken" :disabled="!canSpectate">
-            <template #icon>
-              <NIcon><CopyAllFilledIcon /></NIcon>
-            </template>
-            {{ t('SpectateStatus.tokenSpectate.button') }}
-          </NButton>
-        </ControlItem>
       </NPopover>
     </div>
 
@@ -262,14 +250,11 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import {
-  CopyAllFilled as CopyAllFilledIcon,
-  PlayCircleFilled as PlayCircleFilledIcon
-} from '@vicons/material'
+import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
+import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import { usePlayerTab } from '../context'
@@ -406,33 +391,6 @@ const handleSpectate = (byLcuApi: boolean) => {
   isSpectatorAvailable.value = false
   startCooldown()
   launchSpectator(byLcuApi)
-}
-
-const message = useMessage()
-
-const handleCopyToken = () => {
-  if (!spectatorData.value) return
-
-  const token = {
-    akariVersion: as.version,
-    sgpServerId: sgpServerId.value,
-    observerEncryptionKey: spectatorData.value.playerCredentials.observerEncryptionKey,
-    observerServerPort: spectatorData.value.playerCredentials.observerServerPort,
-    observerServerIp: spectatorData.value.playerCredentials.observerServerIp,
-    gameId: spectatorData.value.game.id,
-    gameMode: spectatorData.value.game.gameMode
-  }
-
-  const str = JSON.stringify(token)
-
-  navigator.clipboard
-    .writeText(str)
-    .then(() => {
-      message.success(t('SpectateStatus.tokenSpectate.copied'))
-    })
-    .catch(() => {
-      message.error(t('SpectateStatus.tokenSpectate.copyFailed'))
-    })
 }
 
 const { summonerName } = useStreamerModeMaskedText()

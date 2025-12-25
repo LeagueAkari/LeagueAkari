@@ -60,7 +60,7 @@
                 class="mr-2 size-2 rotate-45 rounded-sm"
                 :class="getPerkStyleIndicatorColor(perk.styleId)"
               ></div>
-              <span>{{ desc }}</span>
+              <div class="text-sm!" lol-view v-html="desc" />
             </div>
           </div>
         </div>

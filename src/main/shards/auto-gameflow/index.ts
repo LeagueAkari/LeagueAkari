@@ -209,8 +209,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       ([phase, enabled]) => {
         if (phase === 'Reconnect' && enabled) {
           this._log.info('Will attempt to reconnect in a short delay')
-          this.state.setReconnectAt(Date.now() + 8000)
-          this._reconnectTask.start({ delay: 8000 })
+          this.state.setReconnectAt(Date.now() + 10000)
+          this._reconnectTask.start({ delay: 10000 })
         } else {
           this.state.setReconnectAt(-1)
           this._reconnectTask.cancel()

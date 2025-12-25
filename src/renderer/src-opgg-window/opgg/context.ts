@@ -2,6 +2,7 @@ import { OpggRenderer } from '@opgg-window/shards/opgg'
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import { useStableComputed } from '@renderer-shared/composables/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
+import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   ModeType,
@@ -18,6 +19,15 @@ import { useMessage } from 'naive-ui'
 import { InjectionKey, Ref, inject, onMounted, provide, ref, shallowRef, watch } from 'vue'
 
 import { hasItemsSets, useLoadout } from './utils/loadout'
+
+// 对齐 auto champ config (暂定)
+const AUTO_CHAMP_CONFIG_GAME_MODE_MAP: Record<string, string> = {
+  CLASSIC: 'normal',
+  URF: 'urf',
+  ARAM: 'aram',
+  NEXUSBLITZ: 'nexusblitz',
+  ULTBOOK: 'ultbook'
+}
 
 export const OpggContextKey: InjectionKey<OpggContext> = Symbol('OpggContext')
 
@@ -56,10 +66,70 @@ export type OpggContext = {
   cancel: () => void
 }
 
+type AutoChampConfigCheckOptions = {
+  championId: number | null
+  gameMode: string
+  queueType: string
+  assignedPosition?: string | null
+}
+
+type AutoChampConfigCheckResult = {
+  hasRunesConfig: boolean
+  hasSummonerSpellsConfig: boolean
+}
+
+type AutoChampConfigCheckFn = (options: AutoChampConfigCheckOptions) => AutoChampConfigCheckResult
+
+function useHasAutoChampConfig(): AutoChampConfigCheckFn {
+  const acs = useAutoChampConfigStore()
+
+  const resolveConfigKeys = (options: AutoChampConfigCheckOptions): string[] => {
+    if (options.gameMode === 'CLASSIC') {
+      if (options.queueType.startsWith('RANKED_')) {
+        const rankedKey = `ranked-${options.assignedPosition ?? 'undefined'}`
+        return [rankedKey, 'ranked-default']
+      }
+
+      return ['normal']
+    }
+
+    const mappedKey = AUTO_CHAMP_CONFIG_GAME_MODE_MAP[options.gameMode]
+    return mappedKey ? [mappedKey] : []
+  }
+
+  return (options) => {
+    if (!options.championId) {
+      return {
+        hasRunesConfig: false,
+        hasSummonerSpellsConfig: false
+      }
+    }
+
+    const configKeys = resolveConfigKeys(options)
+    if (configKeys.length === 0) {
+      return {
+        hasRunesConfig: false,
+        hasSummonerSpellsConfig: false
+      }
+    }
+
+    const runesConfig = acs.settings.runesV2[options.championId]
+    const spellsConfig = acs.settings.summonerSpells[options.championId]
+
+    return {
+      hasRunesConfig: configKeys.some((key) => Boolean(runesConfig?.[key])),
+      hasSummonerSpellsConfig: configKeys.some((key) => Boolean(spellsConfig?.[key]))
+    }
+  }
+}
+
 export function provideOpgg() {
-  const lcs = useLeagueClientStore()
   const og = useInstance(OpggRenderer)
+
+  const lcs = useLeagueClientStore()
   const ogs = useOpggStore()
+  const resolveAutoChampConfig = useHasAutoChampConfig()
+
   const message = useMessage()
 
   const { setSummonerSpells, setRunes, writeItemSets } = useLoadout()
@@ -314,10 +384,27 @@ export function provideOpgg() {
       return
     }
 
+    const championId = self?.championId ?? selfActionChampionId ?? null
+
+    if (championId === null) {
+      return
+    }
+
+    // 避免和 auto champ config 冲突，优先按照那边的来
+    const queue = lcs.gameflow.session.gameData.queue
+    const autoChampConfig = resolveAutoChampConfig({
+      championId,
+      gameMode: queue.gameMode,
+      queueType: queue.type,
+      assignedPosition: self?.assignedPosition
+    })
+
     return {
-      championId: self?.championId || selfActionChampionId,
+      championId,
       assignedPosition: self?.assignedPosition,
-      gameMode: lcs.gameflow.session.gameData.queue.gameMode
+      gameMode: queue.gameMode,
+      hasAutoRunesConfig: autoChampConfig.hasRunesConfig,
+      hasAutoSpellsConfig: autoChampConfig.hasSummonerSpellsConfig
     }
   })
 
@@ -410,11 +497,21 @@ export function provideOpgg() {
         const summonerSpells = champion.value?.data.summoner_spells
         const runes = champion.value?.data.runes
 
-        if (summonerSpells && summonerSpells[0] && ogs.frontendSettings.autoApplySpells) {
+        if (
+          !active.hasAutoSpellsConfig &&
+          summonerSpells &&
+          summonerSpells[0] &&
+          ogs.frontendSettings.autoApplySpells
+        ) {
           setSummonerSpells(summonerSpells[0].ids, flashPosition.value)
         }
 
-        if (runes && runes[0] && ogs.frontendSettings.autoApplyRunes) {
+        if (
+          !active.hasAutoRunesConfig &&
+          runes &&
+          runes[0] &&
+          ogs.frontendSettings.autoApplyRunes
+        ) {
           setRunes(runes[0], { championId: active.championId, position: position0 })
         }
 
