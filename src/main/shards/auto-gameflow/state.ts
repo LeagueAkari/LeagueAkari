@@ -37,8 +37,8 @@ export class AutoGameflowSettings {
 
   invitationHandlingStrategies: Record<string, string> = {}
 
-  autoSendARAMTeamSideEnabled: boolean = true
-  autoSendARAMTeamSideVisibleToTeam: boolean = false
+  autoSendARAMTeamSideEnabled: boolean = false
+  autoSendARAMTeamSideVisibleToTeam: boolean = true
 
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
