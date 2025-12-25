@@ -466,11 +466,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', () => {
-      return this._rc.repo.getInGameSendTemplateCatalog({
-        source: this._rc.settings.preferredSource,
-        repo: 'akari-config'
-      })
+    this._ipc.onCall(InGameSendMain.id, 'getInGameSendTemplateCatalog', async () => {
+      return (
+        await this._rc.repo.getInGameSendTemplateCatalog({
+          source: this._rc.settings.preferredSource,
+          repo: 'akari-config'
+        })
+      ).data
     })
 
     this._ipc.onCall(InGameSendMain.id, 'downloadTemplateFromRemote', (_, id: string) => {
