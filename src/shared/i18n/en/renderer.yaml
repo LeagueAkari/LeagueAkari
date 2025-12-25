@@ -2641,6 +2641,7 @@ OpggChampion:
   itemsDesc: Items (sorted by pick rate)
   coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
   starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
+  cancel: Cancel
 
 StartupPane:
   tcls: TCLS Client

@@ -2642,6 +2642,7 @@ OpggChampion:
   itemsDesc: 装备 (按出场率排序)
   coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
   starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
+  cancel: 取消
 
 StartupPane:
   tcls: TCLS 客户端

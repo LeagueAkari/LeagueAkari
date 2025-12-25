@@ -35,9 +35,13 @@
       >
         <LcuImage class="image mb-1 h-8 w-8" :src="championIconUri(c.champion_id)" />
         <div
-          class="win-rate text-[11px] font-bold text-[#dc2626] dark:text-[#d75a5a]"
+          class="win-rate text-[11px] font-bold"
           :title="t('OpggChampion.winRate')"
-          :class="{ 'text-[#2563eb] dark:text-[#a0c6f8]': c.win / (c.play || 1) > 0.5 }"
+          :class="
+            c.win / (c.play || 1) > 0.5
+              ? 'text-[#2563eb] dark:text-[#a0c6f8]'
+              : 'text-[#dc2626] dark:text-[#d75a5a]'
+          "
         >
           {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
         </div>
