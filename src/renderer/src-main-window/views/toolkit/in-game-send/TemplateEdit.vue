@@ -7,9 +7,11 @@
     <!-- 此 Modal 内部自行处理逻辑 -->
     <RemoteTemplatesModal v-model:show="showRemoteTemplatesModal" />
 
-    <div class="template-hint" v-html="t('hint')" />
-    <div class="template-edit">
-      <div class="left-list">
+    <div class="mb-3 text-[13px] text-black/60 italic dark:text-[#fff8]" v-html="t('hint')" />
+    <div class="flex h-[600px] border border-black/10 dark:border-[#fff1]">
+      <div
+        class="flex h-full w-[200px] shrink-0 flex-col border-r border-black/10 p-2 dark:border-[#fff1]"
+      >
         <NDropdown
           trigger="click"
           placement="bottom-start"
@@ -21,7 +23,7 @@
           }"
           @select="handleDropdownSelect"
         >
-          <NButton type="primary" secondary class="button-new" size="small">
+          <NButton type="primary" secondary class="mb-2! self-start" size="small">
             <template #icon>
               <NIcon>
                 <AddIcon />
@@ -34,7 +36,7 @@
           v-if="igs2.settings.templates.length > 0"
           v-model:value="filterText"
           :placeholder="t('filterPlaceholder')"
-          class="filter-input"
+          class="mb-2"
           size="small"
           clearable
         >
@@ -46,7 +48,7 @@
         </NInput>
         <NVirtualList
           v-if="igs2.settings.templates.length > 0"
-          class="list"
+          class="grow rounded border border-black/10 pt-1 dark:border-[#fff1]"
           :padding-top="4"
           :item-size="30"
           key-field="id"
@@ -56,13 +58,15 @@
           <template #default="{ item }">
             <div
               @click="updateActiveItem(item.id)"
-              class="list-item"
-              :class="{ active: item.id === activeItemId }"
+              class="mx-1 mb-0.5 flex h-7 cursor-pointer items-center rounded px-2 text-xs transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+              :class="{
+                'bg-black/10 dark:bg-white/10': item.id === activeItemId
+              }"
             >
-              <NEllipsis class="name" :tooltip="{ placement: 'right' }">{{ item.name }}</NEllipsis>
+              <NEllipsis class="grow" :tooltip="{ placement: 'right' }">{{ item.name }}</NEllipsis>
               <NPopover v-if="!item.isValid" placement="right">
                 <template #trigger>
-                  <NIcon class="invalid-icon">
+                  <NIcon class="ml-auto text-sm text-yellow-500 dark:text-[#ffd900e0]">
                     <Warning20FilledIcon />
                   </NIcon>
                 </template>
@@ -77,15 +81,15 @@
             </div>
           </template>
         </NVirtualList>
-        <div v-else class="empty">
-          <div class="empty-text">
+        <div v-else class="flex grow items-center justify-center">
+          <div class="text-base text-black/60 dark:text-[#fff1]">
             {{ t('noTemplate') }}
           </div>
         </div>
       </div>
-      <div class="right-content">
+      <div class="flex h-full min-w-0 grow flex-col p-2">
         <template v-if="currentItem">
-          <div class="header">
+          <div class="mb-2 flex items-center gap-2">
             <NTag
               size="small"
               :type="currentItem.type !== 'unknown' ? 'info' : 'error'"
@@ -101,15 +105,21 @@
               v-model:value="tempName"
               ref="nameInputEl"
             />
-            <div v-else class="title" @click="handleShowEditNameInput">
-              <NEllipsis class="name">
+            <div
+              v-else
+              class="flex min-w-0 grow cursor-pointer items-center gap-1 transition-colors hover:text-black dark:hover:text-white"
+              @click="handleShowEditNameInput"
+            >
+              <NEllipsis
+                class="min-w-0 overflow-hidden text-base font-bold text-ellipsis whitespace-nowrap text-black dark:text-white"
+              >
                 {{ currentItem.name }}
               </NEllipsis>
               <NIcon>
                 <EditIcon />
               </NIcon>
             </div>
-            <div class="actions">
+            <div class="flex shrink-0 items-center gap-2">
               <NPopover>
                 <template #trigger>
                   <NButton size="small" secondary @click="handleRevert" :disabled="!changed">
@@ -164,19 +174,21 @@
             </div>
           </div>
           <Codemirror
-            class="editor"
+            class="min-w-0 grow rounded border border-black/10 dark:border-[#fff1]"
             v-model="tempCode"
-            :style="{ flex: 1, height: 0, borderRadius: '2px', overflow: 'hidden' }"
+            :style="{ flex: 1, height: 0, borderRadius: '2px', overflow: 'hidden', minWidth: 0 }"
             :autofocus="true"
             :indent-with-tab="true"
             :tab-size="2"
-            :extensions="[vscodeDark, javascript()]"
+            :extensions="[as.colorTheme === 'dark' ? vscodeDark : vscodeLight, javascript()]"
             @change="handleChange"
           />
         </template>
         <template v-else>
-          <div class="empty">
-            <div class="empty-text">{{ t('noTemplateSelected') }}</div>
+          <div class="flex grow items-center justify-center">
+            <div class="text-base text-black/60 dark:text-[#fff1]">
+              {{ t('noTemplateSelected') }}
+            </div>
           </div>
         </template>
       </div>
@@ -187,9 +199,10 @@
 <script lang="ts" setup>
 import { javascript } from '@codemirror/lang-javascript'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
-import { vscodeDark } from '@uiw/codemirror-theme-vscode'
+import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode'
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -219,6 +232,8 @@ import { Codemirror } from 'vue-codemirror'
 import RemoteTemplatesModal from './RemoteTemplatesModal.vue'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'TemplateEdit' })
+
+const as = useAppCommonStore()
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
@@ -377,157 +392,6 @@ watch(
 )
 </script>
 
-<style scoped>
-.template-edit {
-  display: flex;
-  height: 600px;
-  border: 1px solid #fff1;
-}
-
-.left-list {
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  height: 100%;
-  border-right: 1px solid #fff1;
-  flex-shrink: 0;
-
-  .button-new {
-    margin-bottom: 8px;
-    align-self: flex-start;
-  }
-
-  .filter-input {
-    margin-bottom: 8px;
-  }
-
-  .list {
-    flex-grow: 1;
-    border: 1px solid #fff1;
-    border-radius: 2px;
-
-    .list-item {
-      display: flex;
-      align-items: center;
-      border-radius: 2px;
-      height: 28px;
-      padding: 0 8px;
-      box-sizing: border-box;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      margin: 0 4px 2px 4px;
-      font-size: 12px;
-
-      &:hover {
-        background-color: #fff1;
-      }
-
-      &.active {
-        background-color: #fff2;
-      }
-
-      .name {
-        flex-grow: 1;
-      }
-
-      .invalid-icon {
-        font-size: 14px;
-        color: #ffd900e0;
-        margin-left: auto;
-      }
-    }
-  }
-
-  .empty {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .empty-text {
-      font-size: 16px;
-      color: #fff1;
-    }
-  }
-}
-
-.right-content {
-  flex: 1;
-  width: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  .header {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-
-    .title {
-      font-size: 16px;
-      font-weight: bold;
-      flex-grow: 1;
-      width: 0;
-
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      transition: color 0.2s;
-
-      .name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      &:hover {
-        color: #fff;
-      }
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    margin-bottom: 8px;
-  }
-
-  .editor {
-    flex: 1;
-    border: 1px solid #fff1;
-    border-radius: 2px;
-  }
-
-  .empty {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .empty-text {
-      font-size: 16px;
-      color: #fff1;
-    }
-  }
-}
-
-.left-list,
-.right-content {
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.template-hint {
-  color: #fff8;
-  font-style: italic;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-</style>
-
 <style module>
 .error-message {
   .error-title {
@@ -536,8 +400,12 @@ watch(
 
   .error-divider {
     height: 1px;
-    background-color: #fff2;
+    background-color: rgba(0, 0, 0, 0.1);
     margin: 8px 0;
+  }
+
+  [data-theme='dark'] & .error-divider {
+    background-color: rgba(255, 255, 255, 0.133);
   }
 
   .error-content {

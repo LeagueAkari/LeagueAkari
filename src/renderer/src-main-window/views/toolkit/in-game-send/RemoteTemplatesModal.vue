@@ -5,14 +5,20 @@
     </template>
     <NSpin :show="isLoadingTemplates">
       <NScrollbar style="max-height: 680px">
-        <div class="templates" v-if="templates.length > 0">
-          <div class="template" v-for="template in templates" :key="template.id">
-            <div class="template-name">
+        <div v-if="templates.length > 0" class="grid grid-cols-3 gap-1">
+          <div
+            v-for="template in templates"
+            :key="template.id"
+            class="flex h-28 flex-col gap-1 rounded border border-black/10 p-2 transition-colors hover:border-black/20 dark:border-[#fff2] dark:hover:border-[#fff4]"
+          >
+            <div class="flex items-center gap-1">
               <NEllipsis style="flex: 1; width: 0">
-                <span class="title">{{ template.name }}</span>
+                <span class="text-sm font-bold text-black dark:text-white">{{
+                  template.name
+                }}</span>
               </NEllipsis>
               <NButton
-                class="download-button"
+                class="ml-auto"
                 tertiary
                 size="tiny"
                 @click="downloadTemplate(template.id)"
@@ -20,23 +26,26 @@
                 :loading="currentDownloading === template.id"
               >
                 <template #icon>
-                  <NIcon class="download-icon">
+                  <NIcon class="text-black/60 dark:text-[#fffa]">
                     <DownloadIcon />
                   </NIcon>
                 </template>
               </NButton>
             </div>
             <NEllipsis :line-clamp="3" :tooltip="{ delay: 1000 }">
-              <span v-if="template.description" class="template-description">{{
+              <span v-if="template.description" class="text-xs text-black/80 dark:text-[#fffd]">{{
                 template.description
               }}</span>
-              <span v-else class="template-description empty">{{
+              <span v-else class="text-xs text-black/60 italic dark:text-[#fffa]">{{
                 t('noTemplateDescription')
               }}</span>
             </NEllipsis>
           </div>
         </div>
-        <div class="templates-placeholder" v-else>
+        <div
+          v-else
+          class="flex h-[120px] items-center justify-center rounded border border-black/10 text-black/60 dark:border-[#fff1] dark:text-[#fffa]"
+        >
           <span class="placeholder-text">{{ t('noTemplates') }}</span>
         </div>
       </NScrollbar>
@@ -108,69 +117,6 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped>
-.templates {
-  display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.templates-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-  border: 1px solid #fff1;
-  border-radius: 4px;
-  color: #fffa;
-}
-
-.templates .template {
-  display: flex;
-  gap: 4px;
-  border: 1px solid #fff2;
-  border-radius: 4px;
-  flex-direction: column;
-  padding: 8px;
-  height: 112px;
-  transition: border-color 0.2s ease-in-out;
-
-  &:hover {
-    border-color: #fff4;
-  }
-
-  .template-name {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    .title {
-      font-size: 14px;
-      font-weight: bold;
-      color: #fff;
-    }
-
-    .download-button {
-      margin-left: auto;
-    }
-
-    .download-icon {
-      color: #fffa;
-    }
-  }
-
-  .template-description {
-    font-size: 12px;
-    color: #fffd;
-
-    &.empty {
-      color: #fffa;
-      font-style: italic;
-    }
-  }
-}
-</style>
 
 <style module>
 .modal {
