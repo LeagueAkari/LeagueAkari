@@ -220,6 +220,9 @@ function isSuperset(set: Set<string>, subset: Set<string>) {
 export function removeSubsets<T>(objects: T[], getter: (element: T) => ElementKey[]): T[] {
   const sets = objects.map((obj) => new Set(getter(obj)))
 
+  const isSubsetOrEqual = (a: Set<ElementKey>, b: Set<ElementKey>) =>
+    Array.from(a).every((element) => b.has(element))
+
   return objects.filter((_object, index) => {
     const currentSet = sets[index]
 
@@ -228,12 +231,16 @@ export function removeSubsets<T>(objects: T[], getter: (element: T) => ElementKe
         return false
       }
 
-      return Array.from(currentSet).every((element) => otherSet.has(element))
+      if (otherSet.size === currentSet.size) {
+        return otherIndex < index && isSubsetOrEqual(currentSet, otherSet)
+      }
+
+      return isSubsetOrEqual(currentSet, otherSet)
     })
   })
 }
 
-export function removeOverlappingSubsets(keys: ElementKey[][]): ElementKey[][] {
+export function mergeOverlappingSets(keys: ElementKey[][]): ElementKey[][] {
   const elements = new Set<ElementKey>()
   keys.forEach((k) => k.forEach((el) => elements.add(el)))
   const uf = new UnionFind(Array.from(elements))

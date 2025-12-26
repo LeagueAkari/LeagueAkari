@@ -21,7 +21,11 @@ import {
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { AdditionalResult } from '@shared/types/shards/ongoing-game'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
-import { calculateTogetherTimes } from '@shared/utils/team-up-calc'
+import {
+  calculateTogetherTimes,
+  mergeOverlappingSets,
+  removeSubsets
+} from '@shared/utils/team-up-calc'
 import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
@@ -1131,15 +1135,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     // 用到了将近两年前的工具，我选择不去动它，只做转换
     // 此方法追溯到 v1.1.x
-    return calculateTogetherTimes(
+    const calculated = calculateTogetherTimes(
       Array.from(gameMap.values()),
       Object.values(this.state.teams).flat(),
       this.settings.premadeTeamInferMatchCountThreshold
-    ).map((t) => ({
-      puuids: t.players,
-      times: t.times,
-      gameIds: t.ids.map((id) => parseInt(id))
-    }))
+    )
+
+    const simplified = removeSubsets(calculated, (t) => t.players)
+    const mergedOverlappingSets = mergeOverlappingSets(simplified.map((t) => t.players))
+
+    return mergedOverlappingSets as string[][]
   }
 
   private _handleCalculation() {

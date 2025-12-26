@@ -1,13 +1,13 @@
 [data-theme='dark'] .shadow-win {
   background: radial-gradient(
     96% 168% at 0% 0%,
-    rgba(20, 184, 166, 0.3) 0%,
-    rgba(20, 184, 166, 0) 100%
+    rgba(59, 130, 246, 0.3) 0%,
+    rgba(59, 130, 246, 0) 100%
   );
 }
 
 .shadow-win {
-  background-color: rgba(45, 212, 191, 0.35);
+  background-color: rgba(96, 165, 250, 0.35);
 }
 
 [data-theme='dark'] .shadow-loss {

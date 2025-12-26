@@ -16,7 +16,7 @@
                 :champion-id="participant.championId"
                 class="relative -left-[2px] box-border size-11 rounded-lg border-2 border-solid"
                 :class="{
-                  'border-teal-600/80 dark:border-teal-300/80': winStyleType === 'win',
+                  'border-blue-600/80 dark:border-blue-300/80': winStyleType === 'win',
                   'border-red-600/80 dark:border-red-300/80': winStyleType === 'loss',
                   'border-black/80 dark:border-white/80': winStyleType === 'neutral'
                 }"
@@ -162,7 +162,7 @@
           <div class="min-w-16 shrink-0">
             <div
               :class="{
-                'text-teal-600 dark:text-teal-300': winStyleType === 'win',
+                'text-blue-600 dark:text-blue-300': winStyleType === 'win',
                 'text-red-700 dark:text-red-300': winStyleType === 'loss',
                 'text-black/80 dark:text-white': winStyleType === 'neutral'
               }"

@@ -9,6 +9,7 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
 import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
+import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { AppCommonMain } from '../app-common'
@@ -628,19 +629,9 @@ export class OngoingGameState {
   gameDetailsLoadingState: Record<number, string> = {}
 
   // inferred premade
-  inferredPremadeTeams: {
-    puuids: string[]
-    times: number
-    gameIds: number[]
-  }[] = []
+  inferredPremadeTeams: string[][] = []
 
-  setInferredPremadeTeams(
-    value: {
-      puuids: string[]
-      times: number
-      gameIds: number[]
-    }[]
-  ) {
+  setInferredPremadeTeams(value: string[][]) {
     this.inferredPremadeTeams = value
   }
 
@@ -695,33 +686,30 @@ export class OngoingGameState {
    * 现在由这里进行预组队合并
    */
   get calculatedPremadeTeamMap() {
-    let assignedTeamIndex = 0
-    const premadeTeamMap: Record<string, number> = {}
-
-    // 先确认权威数据
-    for (const [_, puuids] of Object.entries(this.teamParticipantGroups)) {
-      if (puuids.length < 2) {
-        continue
-      }
-
-      const index = ++assignedTeamIndex
-
+    // 成员打标记
+    const teamIdentifierMap: Record<string, string> = {}
+    for (const [teamIdentifier, puuids] of Object.entries(this.teams)) {
       for (const p of puuids) {
-        premadeTeamMap[p] = index
+        teamIdentifierMap[p] = teamIdentifier
       }
     }
 
-    // 再补充推测数据，冲突则以权威数据为准
-    for (const { puuids } of this.inferredPremadeTeams) {
-      if (puuids.length < 2) {
+    let assignedTeamIndex = 0
+    const premadeTeamMap: Record<string, number> = {}
+    const participationGroups = Object.values(this.teamParticipantGroups)
+    const inferredGroups = this.inferredPremadeTeams
+
+    const simplified = removeSubsets(
+      [...participationGroups, ...inferredGroups].filter((t) => t.length > 1),
+      (t) => t
+    )
+
+    for (const puuids of simplified) {
+      if (puuids.some((p) => teamIdentifierMap[p] !== teamIdentifierMap[puuids[0]])) {
         continue
       }
 
       const index = ++assignedTeamIndex
-
-      if (puuids.some((p) => premadeTeamMap[p])) {
-        continue
-      }
 
       for (const p of puuids) {
         premadeTeamMap[p] = index
