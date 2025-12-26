@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
@@ -52,19 +53,21 @@ const { size = 20 } = defineProps<{
 
 const lcs = useLeagueClientStore()
 
+const { t } = useTranslation()
+
 const formatRarity = (r: string) => {
   switch (r) {
     case 'kSilver':
-      return 'Sliver'
+      return t('AugmentDisplay.sliver')
 
     case 'kGold':
-      return 'Gold'
+      return t('AugmentDisplay.gold')
 
     case 'kPrismatic':
-      return 'Prismatic'
+      return t('AugmentDisplay.prismatic')
 
     default:
-      return r
+      return t('AugmentDisplay.rarity', { rarity: r })
   }
 }
 </script>

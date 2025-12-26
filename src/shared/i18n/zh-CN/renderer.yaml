@@ -2258,6 +2258,12 @@ CopyableText:
 ItemDisplay:
   combinePrice: 合成 {{gold}} G
 
+AugmentDisplay:
+  sliver: 白银阶
+  gold: 黄金阶
+  prismatic: 棱彩阶
+  rarity: '{{rarity}}'
+
 SummonerSpellDisplay:
   cooldown: 冷却时间：{{time}} 秒
   levelRequirement: 等级需求：{{level}}

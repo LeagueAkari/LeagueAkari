@@ -445,7 +445,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTakenTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -469,7 +469,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAverageTeamGoldTag && analysis"
       :delay="50"
     >
       <template #trigger>

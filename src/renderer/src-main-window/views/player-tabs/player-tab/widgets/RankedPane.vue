@@ -77,7 +77,10 @@
       </div>
 
       <!-- More Button -->
-      <div class="absolute -right-2 -bottom-1.5" v-if="displayedRankedEntries.length > 1">
+      <div
+        class="absolute right-0 bottom-0 translate-x-1/2 translate-y-1/3"
+        v-if="displayedRankedEntries.length > 1"
+      >
         <NButton
           :focusable="false"
           :title="t('PlayerTab.rankedMore', '更多排位信息')"

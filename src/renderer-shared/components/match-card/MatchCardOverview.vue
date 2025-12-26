@@ -16,8 +16,8 @@
                 :champion-id="participant.championId"
                 class="relative -left-[2px] box-border size-11 rounded-lg border-2 border-solid"
                 :class="{
-                  'border-teal-600 dark:border-teal-300': winStyleType === 'win',
-                  'border-red-600 dark:border-red-300': winStyleType === 'loss',
+                  'border-teal-600/80 dark:border-teal-300/80': winStyleType === 'win',
+                  'border-red-600/80 dark:border-red-300/80': winStyleType === 'loss',
                   'border-black/80 dark:border-white/80': winStyleType === 'neutral'
                 }"
               />

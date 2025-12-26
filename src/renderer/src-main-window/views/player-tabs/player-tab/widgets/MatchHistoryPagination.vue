@@ -65,8 +65,9 @@
         :title="t('PlayerTab.prevPage')"
         @click="
           loadMatchHistory({
-            startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
-            count: pts.frontendSettings.loadCount
+            startIndex:
+              (computedCurrentPage - 2) *
+              (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
           })
         "
       >
@@ -92,8 +93,9 @@
             :min="1"
             @keyup.enter="
               loadMatchHistory({
-                startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
-                count: pts.frontendSettings.loadCount
+                startIndex:
+                  (arbitraryPage - 1) *
+                  (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
               })
             "
           />
@@ -104,8 +106,9 @@
             :disabled="isLoading"
             @click="
               loadMatchHistory({
-                startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
-                count: pts.frontendSettings.loadCount
+                startIndex:
+                  (arbitraryPage - 1) *
+                  (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
               })
             "
           >
@@ -123,8 +126,9 @@
         :title="t('PlayerTab.nextPage')"
         @click="
           loadMatchHistory({
-            startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
-            count: pts.frontendSettings.loadCount
+            startIndex:
+              computedCurrentPage *
+              (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
           })
         "
         :disabled="isLoading"
@@ -201,8 +205,9 @@
           :title="t('PlayerTab.prevPage')"
           @click="
             loadMatchHistory({
-              startIndex: (computedCurrentPage - 2) * pts.frontendSettings.loadCount,
-              count: pts.frontendSettings.loadCount
+              startIndex:
+                (computedCurrentPage - 2) *
+                (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
             })
           "
         >
@@ -228,8 +233,9 @@
               :min="1"
               @keyup.enter="
                 loadMatchHistory({
-                  startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
-                  count: pts.frontendSettings.loadCount
+                  startIndex:
+                    (arbitraryPage - 1) *
+                    (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
                 })
               "
             />
@@ -240,8 +246,9 @@
               :disabled="isLoading"
               @click="
                 loadMatchHistory({
-                  startIndex: (arbitraryPage - 1) * pts.frontendSettings.loadCount,
-                  count: pts.frontendSettings.loadCount
+                  startIndex:
+                    (arbitraryPage - 1) *
+                    (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
                 })
               "
             >
@@ -259,8 +266,9 @@
           :title="t('PlayerTab.nextPage')"
           @click="
             loadMatchHistory({
-              startIndex: computedCurrentPage * pts.frontendSettings.loadCount,
-              count: pts.frontendSettings.loadCount
+              startIndex:
+                computedCurrentPage *
+                (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
             })
           "
           :disabled="isLoading"

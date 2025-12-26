@@ -335,8 +335,6 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
       this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
 
-      this._log.warn(this.state.latestRelease?.assets)
-
       this._log.info('Updated Latest Release', this.settings.preferredSource)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
