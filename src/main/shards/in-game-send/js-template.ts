@@ -1,6 +1,7 @@
 import { i18next } from '@main/i18n'
 
 export const JS_TEMPLATE_MIN_VERSION_SUPPORT = 20
+export const JS_TEMPLATE_MAX_VERSION_SUPPORT = 20
 
 export const enum JS_TEMPLATE_CHECK_RESULT {
   VALID = 'valid',
@@ -37,7 +38,11 @@ export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {
     return JS_TEMPLATE_CHECK_RESULT.NO_METADATA
   }
 
-  if (typeof metadata.version !== 'number' || metadata.version < JS_TEMPLATE_MIN_VERSION_SUPPORT) {
+  if (
+    typeof metadata.version !== 'number' ||
+    metadata.version < JS_TEMPLATE_MIN_VERSION_SUPPORT ||
+    metadata.version > JS_TEMPLATE_MAX_VERSION_SUPPORT
+  ) {
     return JS_TEMPLATE_CHECK_RESULT.UNSUPPORTED_VERSION
   }
 

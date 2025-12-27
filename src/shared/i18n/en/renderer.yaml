@@ -2978,6 +2978,11 @@ simple-notifications-renderer:
     title: Auto Reconnect
     content: Will reconnect in {{timeLeft}}.
 
+  runInTempDirWarning:
+    title: Run in Temp Dir Warning
+    content: The application is running in the temp directory, which may cause security issues. This may be because the application is not located in the correct installation location, or not properly unzipped.
+    negativeText: Dismiss
+
 league-client-renderer:
   initialization-task:
     name: LCU Initialization

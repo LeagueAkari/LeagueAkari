@@ -1,10 +1,10 @@
 <template>
-  <div class="h-full" ref="viewContainer">
+  <div class="h-full">
     <!-- teams template -->
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
-      <div class="not-last:mb-4">
+      <div class="flex min-h-0 flex-1 flex-col gap-2">
         <!-- header + tags -->
-        <div class="mb-2 flex items-end">
+        <div class="flex items-end">
           <div
             v-if="teamColor"
             :class="[
@@ -27,17 +27,11 @@
 
         <!-- players -->
         <div
-          class="mt-1 grid gap-x-1 gap-y-2"
+          class="grid min-h-0 flex-1 gap-x-1 gap-y-2"
           :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
         >
           <PlayerInfoCard
-            :class="{
-              'h-[280px]': playerInfoCardHeightLevel === 1,
-              'h-[320px]': playerInfoCardHeightLevel === 2,
-              'h-[360px]': playerInfoCardHeightLevel === 3,
-              'h-[400px]': playerInfoCardHeightLevel === 4,
-              'h-[440px]': playerInfoCardHeightLevel === 5
-            }"
+            class="h-full"
             v-for="player of players"
             :puuid="player"
             :key="player"
@@ -67,7 +61,15 @@
     </DefineOngoingTeam>
 
     <NScrollbar v-if="!isInIdleState" x-scrollable>
-      <div class="relative m-auto h-full p-4" :class="{ 'w-fit': columnsNeed >= 4 }">
+      <div
+        class="m relative mx-auto box-border flex flex-col gap-4 p-4"
+        :class="{ 'w-fit': columnsNeed >= 4 }"
+        :style="{
+          height: `${contentHeight}px`,
+          maxHeight: `${linesPerTeam * 1200}px`,
+          minHeight: `${(500 + (linesPerTeam - 1) * 300) * linesPerTeam}px`
+        }"
+      >
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
           :team="team"
@@ -121,10 +123,12 @@ import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/play
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
+import { createReusableTemplate, refDebounced } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref } from 'vue'
+
+import { useAppContext } from '@main-window/context'
 
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
@@ -147,6 +151,8 @@ const { t } = useTranslation()
 
 const og = useInstance(OngoingGameRenderer)
 const ogs = useOngoingGameStore()
+
+const { contentWidth, contentHeight } = useAppContext()
 
 const isInIdleState = useIdleState()
 
@@ -394,44 +400,21 @@ const mapSummoners = (team: string) => {
   return thisTeamSummoners
 }
 
-const viewContainerEl = useTemplateRef('viewContainer')
-const { width, height } = useElementSize(
-  viewContainerEl,
-  {
-    width: 1024,
-    height: 800
-  },
-  {}
-)
 const columnsNeed = computed(() => {
   const teamColumns = Object.values(ogs.teams || {})
     .map((t) => t.length)
     .reduce((a, b) => Math.max(a, b), 0)
 
   const maxAllowed = [8, 7, 6, 5, 4, 3].find(
-    (col) => width.value > FIXED_CARD_WIDTH_PX_NUMBER * (col + 0.25)
+    (col) => contentWidth.value > FIXED_CARD_WIDTH_PX_NUMBER * (col + 0.25)
   )
 
   return Math.min(maxAllowed || 2, teamColumns)
 })
 
-const playerInfoCardHeightLevel = computed(() => {
-  if (height.value > 1000) {
-    return 5
-  }
+const linesPerTeam = computed(() => {
+  const maxMembers = Math.max(...Object.values(sortedTeams.value).map((t) => t.length))
 
-  if (height.value > 900) {
-    return 4
-  }
-
-  if (height.value > 820) {
-    return 3
-  }
-
-  if (height.value > 740) {
-    return 2
-  }
-
-  return 1
+  return Math.ceil(maxMembers / columnsNeed.value)
 })
 </script>

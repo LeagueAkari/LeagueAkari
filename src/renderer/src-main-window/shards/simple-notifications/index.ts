@@ -761,6 +761,35 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleRunInTempDirWarning() {
+    const app = useAppCommonStore()
+
+    const dialog = useDialog()
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.runInTempDirWarning'
+    })
+
+    let inst: ReturnType<typeof dialog.warning> | null = null
+
+    watch(
+      () => app.isRunInTempDir,
+      (v) => {
+        if (v) {
+          inst = dialog.warning({
+            title: () => t('title'),
+            content: () => t('content'),
+            negativeText: t('negativeText'),
+            negativeButtonProps: { type: 'warning', secondary: false },
+            onNegativeClick: () => {
+              inst?.destroy()
+            }
+          })
+        }
+      },
+      { immediate: true }
+    )
+  }
+
   private _setupOngoingGameNewFeatures() {
     const comp = defineComponent({
       setup() {
@@ -842,6 +871,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._handleHigherVersionDbWarning())
     this._setup.addSetupFn(() => this._handleBadSgpConnectionWarning())
     this._setup.addSetupFn(() => this._handleAutoReconnectNotification())
+    this._setup.addSetupFn(() => this._handleRunInTempDirWarning())
   }
 
   showAnnouncementModal() {

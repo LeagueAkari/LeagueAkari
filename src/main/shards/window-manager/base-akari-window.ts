@@ -373,15 +373,20 @@ export abstract class BaseAkariWindow<
       this._window?.webContents.setZoomFactor(1.0)
 
       this._log.info(`WebContents did-finish-load (${this._namespace})`)
+
       if (this._forceReadyTimerId) {
         clearTimeout(this._forceReadyTimerId)
         this._forceReadyTimerId = null
       }
 
+      if (this.state.ready) {
+        return
+      }
+
       this._forceReadyTimerId = setTimeout(() => {
         this._log.warn(`WebContents force-ready (${this._namespace})`)
         runInAction(() => (this.state.ready = true))
-      }, 2000)
+      }, 5000)
     })
 
     this._window.webContents.on(

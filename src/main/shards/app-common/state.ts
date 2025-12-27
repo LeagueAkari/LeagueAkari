@@ -18,6 +18,8 @@ export class AppCommonState {
    */
   startupDeepLink: string | null = null
 
+  isRunInTempDir: boolean = false
+
   setAdministrator(s: boolean) {
     this.isAdministrator = s
   }
@@ -36,6 +38,10 @@ export class AppCommonState {
 
   setStartupDeepLink(s: string | null) {
     this.startupDeepLink = s
+  }
+
+  setRunInTempDir(s: boolean) {
+    this.isRunInTempDir = s
   }
 
   constructor() {

@@ -75,10 +75,11 @@ const { t } = useTranslation()
 greeting(as.version)
 
 const contentEl = useTemplateRef('contentEl')
-const { width } = useElementSize(contentEl)
+const { width, height } = useElementSize(contentEl)
 
 provideAppContext({
   contentWidth: width,
+  contentHeight: height,
   openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
     if (tabName) {

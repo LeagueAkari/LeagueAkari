@@ -46,6 +46,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   )
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
+  const isRunInTempDir = ref(false)
 
   /* for fun only */
   const tempAkariSubscriptionInfo = shallowRef({
@@ -73,6 +74,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     isRabiVersion,
     baseConfig,
     startupDeepLink,
+    isRunInTempDir,
     colorTheme,
 
     tempAkariSubscriptionInfo

@@ -165,7 +165,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'isAdministrator',
       'disableHardwareAcceleration',
       'baseConfig',
-      'startupDeepLink'
+      'startupDeepLink',
+      'isRunInTempDir'
     ])
 
     // 状态指示, 是否禁用硬件加速
@@ -253,6 +254,21 @@ export class AppCommonMain implements IAkariShardInitDispose {
     app.on('browser-window-created', (_, window) => {
       this._log.info('browser-window-created', window.id, window.title)
     })
+
+    this._handleCheckIfRunInTempDir()
+  }
+
+  private _handleCheckIfRunInTempDir() {
+    // 主程序是否目录在 temp 下
+    const exePath = app.getPath('exe')
+    const tempPath = app.getPath('temp')
+
+    this._log.info('exePath', exePath, tempPath)
+
+    if (exePath.startsWith(tempPath)) {
+      this.state.setRunInTempDir(true)
+      this._log.warn('run in temp dir warning', exePath, tempPath)
+    }
   }
 
   private _logInstantiatedShards() {

@@ -2978,6 +2978,11 @@ simple-notifications-renderer:
     title: 自动重连
     content: 将在 {{timeLeft}} 后重连
 
+  runInTempDirWarning:
+    title: 运行在临时目录警告
+    content: 应用程序运行在临时目录，可能会导致安全问题。这可能是程序没有位于正确的安装位置，或未被妥善解压。
+    negativeText: 关闭
+
 league-client-renderer:
   initialization-task:
     name: LCU 初始化

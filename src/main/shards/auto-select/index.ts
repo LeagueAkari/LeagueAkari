@@ -593,7 +593,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
 
       if (
-        !pickConfig.pick.enabled ||
+        !pickConfig.pick.benchHandleTradeEnabled ||
         pickConfig.temporarilyDisabled ||
         !this.state.currentSessionChampionId
       ) {
@@ -868,44 +868,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       },
       { fireImmediately: true }
     )
-
-    // for debugging
-    // this._mobx.reaction(
-    //   () => this.state.move,
-    //   (move) => {
-    //     this._log.warn(`Move: ${move}`)
-    //   }
-    // )
-
-    // this._mobx.reaction(
-    //   () => benchSwapContext.get(),
-    //   (ctx) => {
-    //     this._log.warn(`benchSwapContext:`, ctx)
-    //   },
-    //   { fireImmediately: true }
-    // )
-
-    // this._mobx.reaction(
-    //   () => this.state.activeGroupConfig,
-    //   (groups) => {
-    //     this._log.warn(`activeGroupConfig`, groups)
-    //   },
-    //   { fireImmediately: true }
-    // )
-
-    // this._mobx.reaction(
-    //   () => this.state.expectedSwaps,
-    //   (swaps) => {
-    //     this._log.warn(
-    //       `expectedSwaps`,
-    //       swaps?.map((c) => ({
-    //         name: this._lc.data.gameData.championName(c.id),
-    //         status: c.status
-    //       }))
-    //     )
-    //   },
-    //   { fireImmediately: true }
-    // )
   }
 
   private _championNameWithId(id: number) {
