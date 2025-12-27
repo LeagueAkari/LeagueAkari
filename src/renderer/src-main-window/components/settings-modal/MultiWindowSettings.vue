@@ -202,7 +202,7 @@
             : t('MultiWindowSettings.cdTimerWindow.titleRequireAdmin')
         }}</span>
       </template>
-      <div class="control-item-margin cd-timer-window-description">
+      <div class="control-item-margin cd-timer-window-description mb-2">
         <div class="line-a">{{ t('MultiWindowSettings.cdTimerWindow.description.lineA') }}</div>
         <div class="line-b indent">
           <span class="emphasize">{{

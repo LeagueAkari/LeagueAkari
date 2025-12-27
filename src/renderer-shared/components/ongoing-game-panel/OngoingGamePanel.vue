@@ -78,6 +78,8 @@
           :teamColor="mapTeamColor(team)"
           :teamName="formatTeamText(team)"
         />
+
+        <div v-if="Object.keys(sortedTeams).length < 2" class="flex-1"></div>
       </div>
     </NScrollbar>
 

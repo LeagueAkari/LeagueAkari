@@ -97,7 +97,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showSuspiciousFlashPositionTag: true,
       showWinningStreakTag: true,
       showLosingStreakTag: true,
-      showSoloKillsTag: true,
+      showSoloKillsTag: false,
       showGreatPerformanceTag: true,
       showAverageTeamDamageTag: false,
       showAverageTeamDamageTakenTag: false,
