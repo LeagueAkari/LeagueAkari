@@ -384,7 +384,7 @@ export function provideOpgg() {
       return
     }
 
-    const championId = self?.championId ?? selfActionChampionId ?? null
+    const championId = selfActionChampionId ?? self?.championId ?? null
 
     if (championId === null) {
       return

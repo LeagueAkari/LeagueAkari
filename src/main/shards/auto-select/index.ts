@@ -428,8 +428,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         // 接下来针对几种特殊情况取消操作
         if (move === 'complete-pick') {
-          // 1. 在 just-show 策略下，对于手上已经存在预期英雄时，取消计时器并返回
-          if (strategy === 'just-show' && activeAction.championId === expectedPick.id) {
+          // 1. 在 just-show 策略下，对于手上已经存在任何英雄时，取消计时器并返回
+          if (strategy === 'just-show' && activeAction.championId) {
             if (this.state._delayedPick) {
               this._log.error('canceled just-show')
 

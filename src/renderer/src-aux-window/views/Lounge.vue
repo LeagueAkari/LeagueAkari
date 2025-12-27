@@ -8,7 +8,7 @@
       />
 
       <template v-if="lcs.gameflow.phase === 'ReadyCheck'">
-        <template v-if="agfs.willAccept">
+        <template v-if="agfs.willAcceptAt > 0">
           <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
             t('Lounge.autoAccept.acceptIn', { seconds: willAcceptIn.toFixed(1) })
           }}</span>
@@ -218,9 +218,9 @@ const penaltyTime = computed(() => {
 })
 
 watch(
-  () => agfs.willAccept,
-  (ok) => {
-    if (ok) {
+  () => agfs.willAcceptAt,
+  (at) => {
+    if (at > 0) {
       resumeAC()
     } else {
       pauseAC()

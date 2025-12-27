@@ -99,6 +99,7 @@ export abstract class BaseAkariWindow<
   protected _partition: string
   protected _log: AkariLogger
 
+  protected _forceReadyTimerId: NodeJS.Timeout | null = null
   protected _forceClose = false
 
   protected readonly _setting: SetterSettingService
@@ -308,6 +309,20 @@ export abstract class BaseAkariWindow<
       ...rest
     })
 
+    this._window.once('ready-to-show', () => {
+      this._log.info(`BrowserWindow ready-to-show (${this._namespace})`)
+
+      if (this._forceReadyTimerId) {
+        clearTimeout(this._forceReadyTimerId)
+        this._forceReadyTimerId = null
+      }
+      runInAction(() => (this.state.ready = true))
+
+      if (this._window && this._config.repositionWindowIfInvisible) {
+        repositionWindowIfInvisible(this._window)
+      }
+    })
+
     runInAction(() => {
       this.state.show = this._config.browserWindowOptions?.show ?? true
 
@@ -350,8 +365,47 @@ export abstract class BaseAkariWindow<
       }
     }
 
+    this._window.webContents.on('dom-ready', () => {
+      this._log.info(`WebContents dom-ready (${this._namespace})`)
+    })
+
     this._window.webContents.on('did-finish-load', () => {
       this._window?.webContents.setZoomFactor(1.0)
+
+      this._log.info(`WebContents did-finish-load (${this._namespace})`)
+      if (this._forceReadyTimerId) {
+        clearTimeout(this._forceReadyTimerId)
+        this._forceReadyTimerId = null
+      }
+
+      this._forceReadyTimerId = setTimeout(() => {
+        this._log.warn(`WebContents force-ready (${this._namespace})`)
+        runInAction(() => (this.state.ready = true))
+      }, 2000)
+    })
+
+    this._window.webContents.on(
+      'did-fail-load',
+      (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+        this._log.error(`WebContents did-fail-load (${this._namespace})`, {
+          errorCode,
+          errorDescription,
+          validatedURL,
+          isMainFrame
+        })
+      }
+    )
+
+    this._window.webContents.on('render-process-gone', (_event, details) => {
+      this._log.warn(`WebContents render-process-gone (${this._namespace})`, details)
+    })
+
+    this._window.on('unresponsive', () => {
+      this._log.warn(`BrowserWindow unresponsive (${this._namespace})`)
+    })
+
+    this._window.on('responsive', () => {
+      this._log.info(`BrowserWindow responsive (${this._namespace})`)
     })
 
     this._window.webContents.setWindowOpenHandler((details) => {
@@ -375,13 +429,6 @@ export abstract class BaseAkariWindow<
         })
 
       return { action: 'deny' }
-    })
-
-    this._window.on('ready-to-show', () => {
-      runInAction(() => (this.state.ready = true))
-      if (this._window && this._config.repositionWindowIfInvisible) {
-        repositionWindowIfInvisible(this._window)
-      }
     })
 
     this._window.on('unmaximize', () => {
@@ -409,14 +456,17 @@ export abstract class BaseAkariWindow<
     })
 
     this._window.on('show', () => {
+      this._log.info(`BrowserWindow show (${this._namespace})`)
       runInAction(() => (this.state.show = true))
     })
 
     this._window.on('hide', () => {
+      this._log.info(`BrowserWindow hide (${this._namespace})`)
       runInAction(() => (this.state.show = false))
     })
 
     this._window.on('closed', () => {
+      this._log.info(`BrowserWindow closed (${this._namespace})`)
       runInAction(() => (this.state.ready = false))
       this._window = null
     })
@@ -481,7 +531,7 @@ export abstract class BaseAkariWindow<
   }
 
   showOrRestore(inactive = false) {
-    if (this._window && this.state.ready) {
+    if (this._window) {
       if (!this.state.show) {
         if (inactive) {
           this._window.showInactive()
@@ -614,7 +664,12 @@ export abstract class BaseAkariWindow<
     this._baseWindowObservations()
   }
 
-  async onDispose() {}
+  async onDispose() {
+    if (this._forceReadyTimerId) {
+      clearTimeout(this._forceReadyTimerId)
+      this._forceReadyTimerId = null
+    }
+  }
 
   async onFinish() {}
 }

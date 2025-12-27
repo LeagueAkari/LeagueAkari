@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.4.1-rabi.1",
+  "version": "1.4.1-rabi.3",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -70,7 +70,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "codemirror": "^6.0.2",
     "dayjs": "^1.11.19",
-    "electron": "39.2.7",
+    "electron": "^39.2.7",
     "electron-builder": "26.0.12",
     "electron-vite": "^5.0.0",
     "gray-matter": "^4.0.3",

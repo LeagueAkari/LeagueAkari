@@ -21,9 +21,9 @@
               :champion-id="lcs.champSelect.currentChampion || -1"
             />
           </template>
-          <div class="rounded-sm bg-black/90 px-2 py-1 dark:bg-white/90">
+          <div class="rounded-sm bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
             <div
-              class="flex text-[11px] text-black/60 dark:text-white/60"
+              class="flex text-[11px] text-neutral-900/60 dark:text-neutral-100/60"
               v-for="b of championAdjustment(lcs.champSelect.currentChampion || -1)
                 ?.sortedAdjustments"
               :key="b.type"
@@ -35,7 +35,7 @@
                 >{{ b.formattedValue }}</span
               >
             </div>
-            <div class="mt-1 text-[10px] text-gray-400 dark:text-gray-500">
+            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">
               {{ SOURCE_NAME[source] }}
             </div>
           </div>
@@ -109,9 +109,9 @@
               @click.right="handleBenchSwapOrPick(c.championId, false)"
             />
           </template>
-          <div class="rounded-sm bg-black/90 px-2 py-1 dark:bg-white/90">
+          <div class="rounded-sm bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
             <div
-              class="flex text-[11px] text-black/60 dark:text-white/60"
+              class="flex text-[11px] text-neutral-900/60 dark:text-neutral-100/60"
               v-for="b of championAdjustment(c.championId)?.sortedAdjustments"
               :key="b.type"
             >
@@ -122,7 +122,7 @@
                 >{{ b.formattedValue }}</span
               >
             </div>
-            <div class="mt-1 text-[10px] text-black/40 dark:text-white/40">
+            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">
               {{ SOURCE_NAME[source] }}
             </div>
           </div>

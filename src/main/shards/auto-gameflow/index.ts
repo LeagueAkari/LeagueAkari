@@ -29,10 +29,10 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  private _autoAcceptTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
+  private _autoAcceptTask = new TimeoutTask(this._acceptMatch.bind(this))
   private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
   private _reconnectTask = new TimeoutTask(this._reconnectFn.bind(this))
 
@@ -119,23 +119,17 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         if (phase === 'ReadyCheck') {
-          this.state.setAcceptAt(Date.now() + this.settings.autoAcceptDelaySeconds * 1e3)
-          this._autoAcceptTimerId = setTimeout(
-            () => this._acceptMatch(),
-            this.settings.autoAcceptDelaySeconds * 1e3
-          )
+          const delay = this.settings.autoAcceptDelaySeconds * 1e3
+          this.state.setAcceptAt(Date.now() + delay)
+          this._autoAcceptTask.start({ delay })
 
           this._log.info(
             `ReadyCheck! Will accept in ${this.settings.autoAcceptDelaySeconds} seconds`
           )
         } else {
-          if (this._autoAcceptTimerId) {
-            if (this.state.willAccept) {
-              this._log.info(`Cancelled upcoming auto-accept - not in ReadyCheck phase`)
-            }
-
-            clearTimeout(this._autoAcceptTimerId)
-            this._autoAcceptTimerId = null
+          if (this._autoAcceptTask.isStarted) {
+            this._log.info(`Cancelled upcoming auto-accept - not in ReadyCheck phase`)
+            this._autoAcceptTask.cancel()
           }
           this.state.clearAutoAccept()
         }
@@ -710,7 +704,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       this._log.warn(`Failed to accept match`, error)
     }
     this.state.clearAutoAccept()
-    this._autoSearchMatchTimerId = null
   }
 
   private async _startMatchmaking() {
@@ -784,7 +777,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     ])
 
     this._mobx.propSync(AutoGameflowMain.id, 'state', this.state, [
-      'willAccept',
       'willAcceptAt',
       'willSearchMatch',
       'willSearchMatchAt',
@@ -794,10 +786,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   }
 
   cancelAutoAccept(reason?: string) {
-    if (this.state.willAccept) {
-      if (this._autoAcceptTimerId) {
-        clearTimeout(this._autoAcceptTimerId)
-        this._autoAcceptTimerId = null
+    if (this.state.willAcceptAt > 0) {
+      if (this._autoAcceptTask.isStarted) {
+        this._autoAcceptTask.cancel()
         if (reason === 'accepted') {
           this._log.info(`Already accepted match`)
         } else if (reason === 'declined') {

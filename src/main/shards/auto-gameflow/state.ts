@@ -121,12 +121,6 @@ export class AutoGameflowSettings {
 
 export class AutoGameflowState {
   /**
-   * 即将进行自动接受操作
-   * @deprecated 将使用 willAcceptAt 的值来判断是否进行自动接受操作
-   */
-  willAccept: boolean = false
-
-  /**
    * 即将进行的自动接受操作将在指定时间戳完成
    */
   willAcceptAt: number = -1
@@ -202,7 +196,6 @@ export class AutoGameflowState {
   }
 
   setAcceptAt(at: number) {
-    this.willAccept = true
     this.willAcceptAt = at
   }
 
@@ -212,7 +205,6 @@ export class AutoGameflowState {
   }
 
   clearAutoAccept() {
-    this.willAccept = false
     this.willAcceptAt = -1
   }
 

@@ -35,7 +35,6 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoSendARAMTeamSideVisibleToTeam: true
   })
 
-  const willAccept = ref(false)
   const willAcceptAt = ref(-1)
   const willSearchMatch = ref(false)
   const willSearchMatchAt = ref(-1)
@@ -46,7 +45,6 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
   return {
     settings,
 
-    willAccept,
     willAcceptAt,
     willSearchMatch,
     willSearchMatchAt,

@@ -51,7 +51,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
   })
 
-  private _updateOnQuitFn: (() => void) | null = null
+  private _updateOnQuitFn: (() => Promise<void>) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
   constructor(
@@ -138,7 +138,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const downloadDir = path.join(appDir, SelfUpdateMain.DOWNLOAD_DIR_NAME)
     const downloadPath = path.join(downloadDir, filename)
 
-    ofs.mkdirSync(downloadDir, { recursive: true })
+    await ofs.promises.mkdir(downloadDir, { recursive: true })
 
     const now = Date.now()
 
@@ -203,11 +203,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
             this._log.warn(`Failed to download or write update file ${formatError(error)}`)
           }
 
-          if (ofs.existsSync(downloadPath)) {
-            ofs.rmSync(downloadPath, { force: true })
-          }
-
-          reject(error)
+          ofs.promises.rm(downloadPath, { force: true }).catch((error) => reject(error))
         } else {
           this._log.info(`Downloaded and wrote to: ${downloadPath}`)
           resolve(downloadPath)
@@ -221,7 +217,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   }
 
   private async _unpackDownloadedUpdate(filepath: string) {
-    if (!ofs.existsSync(filepath)) {
+    try {
+      await ofs.promises.access(filepath)
+    } catch (error) {
       this.state.setUpdateProgressInfo({
         phase: 'unpack-failed',
         downloadingProgress: 1,
@@ -245,9 +243,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       unpackingProgress: 0
     })
 
-    if (ofs.existsSync(extractedTo)) {
+    try {
+      await ofs.promises.access(extractedTo)
+    } catch (error) {
       this._log.info(`Old update directory exists, deleting old update directory ${extractedTo}`)
-      ofs.rmSync(extractedTo, { recursive: true, force: true })
+      await ofs.promises.rm(extractedTo, { recursive: true, force: true }).catch((error) => {
+        this._log.warn(`Failed to remove old update directory ${extractedTo}`, error)
+      })
     }
 
     const asyncTask = new Promise<string>((resolve, reject) => {
@@ -295,8 +297,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           unpackingProgress: 1
         })
 
-        ofs.rmSync(filepath, { force: true })
-        resolve(extractedTo)
+        ofs.promises
+          .rm(filepath, { force: true, recursive: true })
+          .then(() => resolve(extractedTo))
+          .catch((error) => reject(error))
       })
 
       seven.on('rejected', (error) => {
@@ -320,11 +324,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._log.error(`Failed to unpack update package`, error)
         }
 
-        if (ofs.existsSync(filepath)) {
-          ofs.rmSync(filepath, { recursive: true, force: true })
-        }
-
-        reject(error)
+        ofs.promises.rm(filepath, { force: true, recursive: true }).catch((error) => reject(error))
       })
     })
 
@@ -332,7 +332,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   }
 
   private async _applyUpdatesOnNextStartup(newVersionDirPath: string, newVersion: string) {
-    if (!ofs.existsSync(newVersionDirPath)) {
+    try {
+      await ofs.promises.access(newVersionDirPath)
+    } catch (error) {
       this.state.setUpdateProgressInfo(null)
       this._log.error(`Update directory does not exist ${newVersionDirPath}`)
       throw new Error(`No such directory ${newVersionDirPath}`)
@@ -370,7 +372,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       i18next.t('self-update-main.updateOnNextStartup')
     )
 
-    const _updateOnQuitFn = () => {
+    const _updateOnQuitFn = async () => {
       const c = cp.spawn(
         copiedExecutablePath,
         [
@@ -389,7 +391,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
       c.unref()
 
-      ofs.writeFileSync(
+      await ofs.promises.writeFile(
         path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG),
         JSON.stringify(newVersion)
       )
@@ -407,16 +409,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._currentUpdateTaskCanceler = () => {
-      if (ofs.existsSync(copiedExecutablePath)) {
-        ofs.rmSync(copiedExecutablePath, {
-          force: true,
-          recursive: true
-        })
-      }
+      ofs.promises.rm(copiedExecutablePath, { force: true, recursive: true }).catch((error) => {
+        this._log.warn(`Failed to remove update script ${copiedExecutablePath}`, error)
+      })
 
-      if (ofs.existsSync(newVersionDirPath)) {
-        ofs.rmSync(newVersionDirPath, { recursive: true, force: true })
-      }
+      ofs.promises.rm(newVersionDirPath, { recursive: true, force: true }).catch((error) => {
+        this._log.warn(`Failed to remove update directory ${newVersionDirPath}`, error)
+      })
 
       this._currentUpdateTaskCanceler = null
       this._updateOnQuitFn = null
@@ -553,7 +552,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    this._updateOnQuitFn?.()
+    await this._updateOnQuitFn?.()
 
     if (this.state.updateProgressInfo?.phase !== 'waiting-for-restart') {
       this._cancelUpdateProcess()
