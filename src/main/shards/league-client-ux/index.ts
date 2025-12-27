@@ -25,7 +25,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
-  static CLIENT_CMD_LONG_POLL_INTERVAL = 15000
+  static CLIENT_CMD_LONG_POLL_INTERVAL = 60 * 1000
 
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()

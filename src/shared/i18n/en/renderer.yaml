@@ -2994,8 +2994,9 @@ self-update-renderer:
     download-failed: Failed to download archive
     unpacking: Unpacking archive {{progress}}%
     unpack-failed: Failed to unpack the archive file
-    waiting-for-restart: Updated applied. Restart the application to apply the update
+    waiting-for-restart: Updated applied. Close the application to apply the update
     cancelButton: Cancel
+    closeButton: Close Application
 
   title: Self Update
   start-update: Starting update $t(common:appName)

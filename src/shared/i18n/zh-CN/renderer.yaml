@@ -2994,8 +2994,9 @@ self-update-renderer:
     download-failed: 下载更新包失败
     unpacking: 正在解压更新包 {{progress}}%
     unpack-failed: 解压更新包失败
-    waiting-for-restart: 更新包解压完成，应用关闭后将自动应用更新流程
+    waiting-for-restart: 更新包解压完成，关闭应用后将自动应用更新流程
     cancelButton: 取消
+    closeButton: 关闭应用
 
   title: 自动更新
   start-update: $t(common:appName) 更新已开始

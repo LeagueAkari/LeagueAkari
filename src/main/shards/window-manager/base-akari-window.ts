@@ -509,7 +509,7 @@ export abstract class BaseAkariWindow<
       }
     }
 
-    this._log.info(`Create ${this._namespace} window`)
+    this._log.info(`Create ${this._namespace}`)
   }
 
   setOpacity(opacity: number) {

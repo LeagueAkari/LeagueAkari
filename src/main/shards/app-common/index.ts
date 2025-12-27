@@ -249,6 +249,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
     })
 
     this._logInstantiatedShards()
+
+    app.on('browser-window-created', (_, window) => {
+      this._log.info('browser-window-created', window.id, window.title)
+    })
   }
 
   private _logInstantiatedShards() {

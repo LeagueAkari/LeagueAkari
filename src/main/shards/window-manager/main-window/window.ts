@@ -105,6 +105,10 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       this._nextCloseAction = strategy
       this._window?.close()
     })
+
+    this._ipc.onCall(this._namespace, 'closeMainWindowForce', async () => {
+      this.close(true)
+    })
   }
 
   protected override handleClose(event: Event) {

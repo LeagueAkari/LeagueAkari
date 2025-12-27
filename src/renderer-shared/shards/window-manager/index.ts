@@ -51,6 +51,10 @@ class AkariMainWindow extends BaseAkariWindowRenderer<
   override close(strategy?: string) {
     return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindow', strategy)
   }
+
+  closeForce() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindowForce')
+  }
 }
 
 class AkariAuxWindow extends BaseAkariWindowRenderer<

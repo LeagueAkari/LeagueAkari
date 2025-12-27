@@ -4,6 +4,7 @@ import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import { computed, h, watch, watchEffect } from 'vue'
 
+import { useInstance } from '..'
 import { useAppCommonStore } from '../app-common/store'
 import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
@@ -12,6 +13,7 @@ import { RemoteConfigRenderer } from '../remote-config'
 import { useRemoteConfigStore } from '../remote-config/store'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
+import { WindowManagerRenderer } from '../window-manager'
 import { useSelfUpdateStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'self-update-main'
@@ -34,6 +36,9 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
   private _handleUpdateProgressShow() {
     const store = useSelfUpdateStore()
     const taskStore = useBackgroundTasksStore()
+
+    const wm = useInstance(WindowManagerRenderer)
+
     const { t } = useTranslation()
     const taskId = `${SelfUpdateRenderer.id}/update`
 
@@ -103,7 +108,22 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
             taskStore.updateTask(taskId, {
               progress: 1,
               status: 'success',
-              description: () => t('self-update-renderer.self-update-task.waiting-for-restart')
+              description: () => t('self-update-renderer.self-update-task.waiting-for-restart'),
+              actions: [
+                {
+                  label: () => t('self-update-renderer.self-update-task.cancelButton'),
+                  callback: () => {
+                    this.cancelUpdate()
+                  },
+                  buttonProps: { type: 'warning' }
+                },
+                {
+                  label: () => t('self-update-renderer.self-update-task.closeButton'),
+                  callback: () => {
+                    wm.mainWindow.closeForce()
+                  }
+                }
+              ]
             })
         }
       },
