@@ -7,7 +7,8 @@ export const useAdditionalInfoStore = defineStore('additional-info', () => {
     teams: {},
     selections: {},
     teamParticipantGroups: {},
-    spells: {}
+    spells: {},
+    positions: {}
   })
 
   return {

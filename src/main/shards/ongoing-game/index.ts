@@ -21,6 +21,7 @@ import {
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { AdditionalResult } from '@shared/types/shards/ongoing-game'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
+import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import {
   calculateTogetherTimes,
   mergeOverlappingSets,
@@ -1417,8 +1418,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     const extractTeamMembers = (
       gameMode: string,
-      teamOne: { puuid: string; championId: number; teamParticipantId: number }[],
-      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[],
+      teamOne: TeamPropsToBeExtracted[],
+      teamTwo: TeamPropsToBeExtracted[],
       spells: { puuid: string; spell1Id: number; spell2Id: number }[]
     ): AdditionalResult => {
       const all = [...teamOne, ...teamTwo].filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
@@ -1448,6 +1449,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
               return acc
             },
             {} as Record<string, { spell1Id: number; spell2Id: number }>
+          ),
+          positions: all.reduce(
+            (acc, p) => {
+              acc[p.puuid] = {
+                position: p.selectedPosition,
+                role: parseSelectedRole(p.selectedRole)
+              }
+              return acc
+            },
+            {} as Record<string, { position: string; role: ParsedRole | null }>
           )
         }
       }
@@ -1481,6 +1492,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             return acc
           },
           {} as Record<string, { spell1Id: number; spell2Id: number }>
+        ),
+        positions: all.reduce(
+          (acc, p) => {
+            acc[p.puuid] = { position: p.selectedPosition, role: parseSelectedRole(p.selectedRole) }
+            return acc
+          },
+          {} as Record<string, { position: string; role: ParsedRole | null }>
         )
       } as AdditionalResult
     }
@@ -1490,9 +1508,17 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const enableGsm = this._rc.state.ongoingGameConfig.spotlight.gsmByPuuid
     const enableSpectator = this._rc.state.ongoingGameConfig.spotlight.spectatorByPuuid
 
+    type TeamPropsToBeExtracted = {
+      puuid: string
+      championId: number
+      teamParticipantId: number
+      selectedPosition: string
+      selectedRole: string
+    }
+
     type ReturnResult = {
-      teamOne: { puuid: string; championId: number; teamParticipantId: number }[]
-      teamTwo: { puuid: string; championId: number; teamParticipantId: number }[]
+      teamOne: TeamPropsToBeExtracted[]
+      teamTwo: TeamPropsToBeExtracted[]
       spells: { puuid: string; spell1Id: number; spell2Id: number }[]
       gameMode: string
     }
@@ -1522,11 +1548,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           spell2Id: number
         }
       >
+      const mergedPositions = {} as Record<string, { position: string; role: ParsedRole | null }>
 
       for (const result of results) {
         if (result.status === 'fulfilled' && result.value) {
           const { teamOne, teamTwo, gameMode, spells } = result.value
-          const { teams, selections, teamParticipantGroups } = extractTeamMembers(
+          const { teams, selections, teamParticipantGroups, positions } = extractTeamMembers(
             gameMode,
             teamOne,
             teamTwo,
@@ -1544,6 +1571,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           Object.assign(mergedSelections, selections)
           Object.assign(mergedTeamParticipantGroups, teamParticipantGroups)
           Object.assign(mergedSpells, spells)
+          Object.assign(mergedPositions, positions)
         }
       }
 
@@ -1551,7 +1579,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         teams: mergedTeams,
         selections: mergedSelections,
         teamParticipantGroups: mergedTeamParticipantGroups,
-        spells: mergedSpells
+        spells: mergedSpells,
+        positions: mergedPositions
       })
     })
   }

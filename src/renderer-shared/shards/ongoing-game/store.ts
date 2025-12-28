@@ -173,7 +173,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     teams: {},
     selections: {},
     teamParticipantGroups: {},
-    spells: {}
+    spells: {},
+    positions: {}
   })
 
   return {

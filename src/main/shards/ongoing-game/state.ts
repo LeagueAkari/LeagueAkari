@@ -266,6 +266,8 @@ export class OngoingGameState {
         }
       })
 
+      Object.assign(assignments, this.additional.positions)
+
       return assignments
     }
 
@@ -657,7 +659,8 @@ export class OngoingGameState {
         teams: {},
         selections: {},
         teamParticipantGroups: {},
-        spells: {}
+        spells: {},
+        positions: {}
       }
     }
 
@@ -735,7 +738,8 @@ export class OngoingGameState {
     teams: {},
     selections: {},
     teamParticipantGroups: {},
-    spells: {}
+    spells: {},
+    positions: {}
   }
 
   setAdditional(value: AdditionalResult) {
