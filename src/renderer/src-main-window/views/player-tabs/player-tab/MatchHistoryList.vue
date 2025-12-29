@@ -45,6 +45,7 @@
           'hidden!': gamesShouldHide.has(g.gameId)
         }"
         v-for="g of pagedMatchHistory.games"
+        ref="matchCardEls"
         :summary="g"
         :puuid="puuid"
         :key="`${g.source}${g.gameId}`"
@@ -72,7 +73,7 @@ import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
-import { computed, watch } from 'vue'
+import { computed, nextTick, useTemplateRef, watch } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -192,4 +193,20 @@ watch(
     }
   }
 )
+
+const matchCardEls = useTemplateRef('matchCardEls')
+
+defineExpose({
+  focusGame: (gameId: number, expanded: boolean) => {
+    const el = matchCardEls.value?.find((el) => el?.summary.gameId === gameId)
+
+    if (el) {
+      el.setExpanded(expanded)
+
+      nextTick(() => {
+        ;(el.$el as HTMLElement).scrollIntoView({ behavior: 'smooth' })
+      })
+    }
+  }
+})
 </script>

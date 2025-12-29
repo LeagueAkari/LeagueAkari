@@ -285,7 +285,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
               : undefined
         })
       },
-      { fireImmediately: true }
+      { fireImmediately: true, equals: comparer.structural }
     )
 
     this._mobx.reaction(

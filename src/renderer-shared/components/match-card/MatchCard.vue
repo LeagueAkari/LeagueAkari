@@ -75,4 +75,10 @@ onErrorCaptured((error) => {
 })
 
 registerChartJS()
+
+defineExpose({
+  setExpanded: (expanded: boolean) => {
+    isExpanded.value = expanded
+  }
+})
 </script>

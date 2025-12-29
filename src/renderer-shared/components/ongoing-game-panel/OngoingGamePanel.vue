@@ -31,7 +31,7 @@
           :style="{ gridTemplateColumns: `repeat(${columnsNeed}, ${FIXED_CARD_WIDTH_PX_LITERAL})` }"
         >
           <PlayerInfoCard
-            class="h-full"
+            :style="playerCardStyles"
             v-for="player of players"
             :puuid="player"
             :key="player"
@@ -64,11 +64,7 @@
       <div
         class="m relative mx-auto box-border flex flex-col gap-4 p-4"
         :class="{ 'w-fit': columnsNeed >= 4 }"
-        :style="{
-          height: `${contentHeight}px`,
-          maxHeight: `${linesPerTeam * 1200}px`,
-          minHeight: `${(500 + (linesPerTeam - 1) * 300) * linesPerTeam}px`
-        }"
+        :style="teamsContainerStyles"
       >
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
@@ -79,7 +75,10 @@
           :teamName="formatTeamText(team)"
         />
 
-        <div v-if="Object.keys(sortedTeams).length < 2" class="flex-1"></div>
+        <div
+          v-if="isTwoTeamsMode && linesPerTeam === 1 && Object.keys(sortedTeams).length === 1"
+          class="flex-1"
+        ></div>
       </div>
     </NScrollbar>
 
@@ -418,5 +417,34 @@ const linesPerTeam = computed(() => {
   const maxMembers = Math.max(...Object.values(sortedTeams.value).map((t) => t.length))
 
   return Math.ceil(maxMembers / columnsNeed.value)
+})
+
+const isTwoTeamsMode = computed(() => {
+  return Object.keys(sortedTeams.value).some((t) => t === 'TEAM-100' || t === 'TEAM-200')
+})
+
+const playerCardStyles = computed(() => {
+  if (isTwoTeamsMode.value && isTwoTeamsMode.value && linesPerTeam.value === 1) {
+    return { height: '100%' }
+  }
+
+  return {
+    height: '375px'
+  }
+})
+
+const teamsContainerStyles = computed(() => {
+  // 1. 必须是两队式
+  // 2. 只有一排显示
+  if (isTwoTeamsMode.value && linesPerTeam.value === 1) {
+    return {
+      height: contentHeight.value + 'px',
+      maxHeight: '1200px',
+      minHeight: '500px'
+    }
+  }
+
+  // 其他情况容器固定高度 (600px)
+  return {}
 })
 </script>

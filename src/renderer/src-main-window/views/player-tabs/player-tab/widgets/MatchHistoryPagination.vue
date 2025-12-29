@@ -26,7 +26,7 @@
     <NSelect
       :disabled="isLoading"
       :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
-      @update:value="loadMatchHistory({ count: $event })"
+      @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
       size="small"
       :options="pageSizeOptions"
       class="w-28!"
@@ -167,7 +167,7 @@
       <NSelect
         :disabled="isLoading"
         :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
-        @update:value="loadMatchHistory({ count: $event })"
+        @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
         size="small"
         :options="pageSizeOptions"
       />

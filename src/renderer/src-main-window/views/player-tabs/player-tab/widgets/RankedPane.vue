@@ -213,7 +213,13 @@ const DISPLAY_QUEUE_TYPES = ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR']
 const displayedRankedEntries = computed(() => {
   if (!rankedStats.value?.queues) return []
 
-  return rankedStats.value.queues.filter((entry) => DISPLAY_QUEUE_TYPES.includes(entry.queueType))
+  return rankedStats.value.queues
+    .filter((entry) => DISPLAY_QUEUE_TYPES.includes(entry.queueType))
+    .sort((a, b) => {
+      const indexA = DISPLAY_QUEUE_TYPES.indexOf(a.queueType)
+      const indexB = DISPLAY_QUEUE_TYPES.indexOf(b.queueType)
+      return indexA - indexB
+    })
 })
 
 const rankedImageMap: Record<string, string> = {

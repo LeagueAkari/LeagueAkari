@@ -184,6 +184,7 @@
           </div>
         </NPopover>
       </template>
+
       <template v-else>
         <NPopover :keep-alive-on-hover="false" :disabled="!analysis">
           <template #trigger>
@@ -243,6 +244,7 @@
           (KDA CV: {{ analysis.summary.kdaCv.toFixed(2) }})
         </div>
       </NPopover>
+
       <NPopover v-if="positionInfo">
         <template #trigger>
           <div
@@ -253,7 +255,7 @@
           >
             <div
               v-if="positionInfo.role && positionInfo.role.assignmentReason === 'AUTOFILL'"
-              class="rounded px-1 py-0.5 text-[11px] leading-[11px] whitespace-nowrap text-white"
+              class="rounded px-1 py-0.5 text-[11px] leading-[11px] whitespace-nowrap text-black dark:text-white"
               :style="{
                 'background-color': positionAssignmentReason.AUTOFILL_SHORT?.color,
                 color: positionAssignmentReason.AUTOFILL_SHORT?.foregroundColor
@@ -266,7 +268,7 @@
               <PositionIcon :position="positionInfo.current" />
               <div
                 v-if="(positionInfo.recent && positionInfo.recent.length) || positionInfo.role"
-                class="mx-0.5 h-3 w-px bg-white/25"
+                class="mx-0.5 h-3 w-px bg-black/25 dark:bg-white/25"
               ></div>
             </template>
 
@@ -290,7 +292,7 @@
           <div class="mb-2 flex items-end gap-1">
             <PositionIcon
               v-if="positionInfo.current && positionInfo.current !== 'NONE'"
-              class="text-lg text-white"
+              class="text-lg text-black dark:text-white"
               :position="positionInfo.current || 'ALL'"
             />
             <span class="text-sm font-bold">{{
@@ -300,7 +302,7 @@
             }}</span>
             <div
               v-if="positionInfo.role && positionInfo.role.assignmentReason !== 'NONE'"
-              class="rounded px-1 py-0.5 text-[11px] leading-[11px] whitespace-nowrap text-white"
+              class="rounded px-1 py-0.5 text-[11px] leading-[11px] whitespace-nowrap text-black dark:text-white"
               :style="{
                 'background-color':
                   positionAssignmentReason[positionInfo.role.assignmentReason]?.color || '#5b4694',
@@ -318,7 +320,7 @@
           <div v-if="positionInfo.recent && positionInfo.recent.length" class="flex items-center">
             <span class="mr-2 w-16 text-xs">{{ t('PlayerInfoCard.position.recentlyPlayed') }}</span>
             <PositionIcon
-              class="text-lg text-white"
+              class="text-lg text-black dark:text-white"
               v-for="p of positionInfo.recent"
               :key="p.position"
               :position="p.position"
@@ -326,9 +328,12 @@
           </div>
           <div v-if="positionInfo.role" class="flex items-center">
             <span class="mr-2 w-16 text-xs">{{ t('PlayerInfoCard.position.selection') }}</span>
-            <PositionIcon class="text-lg text-white" :position="positionInfo.role.primary" />
             <PositionIcon
-              class="text-lg text-white"
+              class="text-lg text-black dark:text-white"
+              :position="positionInfo.role.primary"
+            />
+            <PositionIcon
+              class="text-lg text-black dark:text-white"
               v-if="positionInfo.role.secondary !== 'UNSELECTED'"
               :position="positionInfo.role.secondary"
             />
