@@ -73,7 +73,7 @@ import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
-import { computed, nextTick, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -89,7 +89,7 @@ const ogs = useOngoingGameStore()
 
 const { t } = useTranslation()
 
-const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
+const { puuid, events, navigateToSummonerByPuuid, previewGame } = usePlayerTab()
 const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay, loadMatchHistory } =
   useMatchHistory()
 
@@ -196,17 +196,26 @@ watch(
 
 const matchCardEls = useTemplateRef('matchCardEls')
 
-defineExpose({
-  focusGame: (gameId: number, expanded: boolean) => {
-    const el = matchCardEls.value?.find((el) => el?.summary.gameId === gameId)
+const handleFocusGame = ({ summary }: { summary: LcuOrSgpGameSummary | number }) => {
+  const extractedGameId = typeof summary === 'number' ? summary : summary.gameId
+  const el = matchCardEls.value?.find((el) => el?.$props.summary?.gameId === extractedGameId)
 
-    if (el) {
-      el.setExpanded(expanded)
+  if (el) {
+    el.setExpanded(true)
 
-      nextTick(() => {
-        ;(el.$el as HTMLElement).scrollIntoView({ behavior: 'smooth' })
-      })
-    }
+    nextTick(() => {
+      ;(el.$el as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  } else {
+    previewGame(summary)
   }
+}
+
+onMounted(() => {
+  events.on('focusGame', handleFocusGame)
+})
+
+onUnmounted(() => {
+  events.off('focusGame', handleFocusGame)
 })
 </script>

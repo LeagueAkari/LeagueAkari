@@ -5775,6 +5775,7 @@ __metadata:
     luaparse: "npm:^0.3.1"
     markdown-it: "npm:^14.1.0"
     mime-types: "npm:^3.0.2"
+    mitt: "npm:^3.0.1"
     mobx: "npm:^6.15.0"
     naive-ui: "npm:^2.43.2"
     node-7z: "npm:^3.0.0"

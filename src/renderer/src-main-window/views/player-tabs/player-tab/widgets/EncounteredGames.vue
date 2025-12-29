@@ -48,7 +48,7 @@
         class="flex cursor-pointer items-center gap-2 rounded-sm"
         v-for="{ game, gameId, recordId } in games"
         :key="gameId"
-        @click="onPreviewGame(gameMap[gameId] || gameId)"
+        @click="events.emit('focusGame', { summary: gameMap[gameId] || gameId })"
       >
         <div class="flex flex-1 flex-col gap-1">
           <!-- Game Info Line 1: Type, Queue, Date -->
@@ -183,7 +183,7 @@ import { usePlayerTab } from '../context'
 import { useEncounteredGames } from '../data/encountered-games'
 
 const { t } = useTranslation()
-const { previewGame: onPreviewGame, isSelfTab } = usePlayerTab()
+const { events, isSelfTab } = usePlayerTab()
 const { pagedGames, gameMap, isLoading, loadGames, deleteGame } = useEncounteredGames()
 
 const as = useAppCommonStore()

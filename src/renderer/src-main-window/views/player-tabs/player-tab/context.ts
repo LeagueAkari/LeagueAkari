@@ -3,6 +3,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import mitt, { Emitter } from 'mitt'
 import {
   type InjectionKey,
   type MaybeRefOrGetter,
@@ -51,12 +52,22 @@ export type PlayerTabContext = {
   /** 是否小尺寸 */
   isSmallSize: Readonly<Ref<boolean>>
 
+  /** 松散事件 */
+  events: Emitter<PlayerTabEvents>
+
   // events
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
 export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('PlayerTabContext')
+
+export type PlayerTabEvents = {
+  /**
+   * 一些预览战绩的组件需要和 MatchHistoryList 组件联动
+   */
+  focusGame: { summary: LcuOrSgpGameSummary | number; puuid?: string }
+}
 
 export function usePlayerTab(): PlayerTabContext {
   const context = inject(PlayerTabContextKey)
@@ -81,6 +92,8 @@ export function providePlayerTab(props: {
   const as = useAppCommonStore()
 
   const pt = useInstance(PlayerTabsRenderer)
+
+  const events = mitt<PlayerTabEvents>()
 
   const { navigateToTabByPuuidAndSgpServerId } = pt.useNavigateToTab()
 
@@ -107,6 +120,8 @@ export function providePlayerTab(props: {
     isCurrentTab: toRef(props.isCurrentTab),
     isCrossRegion: toRef(isCrossRegion),
     isSelfTab: toRef(isSelfTab),
+
+    events,
 
     navigateToSummonerByPuuid: (puuid, setCurrent = true) => {
       if (setCurrent) {
