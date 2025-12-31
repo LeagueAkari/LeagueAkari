@@ -3,7 +3,6 @@ import { DEEP_LINK_PROTOCOL_DEV, DEEP_LINK_PROTOCOL_PROD } from '@main/utils/dee
 import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
-import elevateExecutablePath from '@resources/elevate.exe?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GithubApiAsset } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
@@ -263,7 +262,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         $progress: true
       })
 
+      let isCancelled = false
+      let hasError = false
+
       this._currentUpdateTaskCanceler = () => {
+        isCancelled = true
+        hasError = true
         const error = new Error('Unpacking canceled')
         error.name = 'Canceled'
         seven.destroy(error)
@@ -271,6 +275,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
 
       seven.on('progress', (progress) => {
+        if (isCancelled || hasError) {
+          return
+        }
         this.state.setUpdateProgressInfo({
           phase: 'unpacking',
           downloadingProgress: 1,
@@ -281,9 +288,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         })
       })
 
-      let hasError = false
       seven.on('end', () => {
-        if (hasError) {
+        if (hasError || isCancelled) {
           return
         }
 
@@ -309,6 +315,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         this._currentUpdateTaskCanceler = null
 
         if (error.name === 'Canceled') {
+          isCancelled = true
           this.state.setUpdateProgressInfo(null)
           this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-unpack-update')
           this._log.info(`Cancelled unpacking update package ${filepath}`)
@@ -333,6 +340,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         this._currentUpdateTaskCanceler = null
 
         if (error.name === 'Canceled') {
+          isCancelled = true
           this.state.setUpdateProgressInfo(null)
           this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-unpack-update')
           this._log.info(`Cancelled unpacking update package ${filepath}`)
@@ -389,21 +397,21 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     )
 
     const _updateOnQuitFn = async () => {
-      const args = [
-        `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
-        'apply',
-        `--from="${newVersionDirPath}"`,
-        `--to="${appDir}"`
-      ]
-      const command = `"${copiedExecutablePath}" ${args.join(' ')}`
-      const elevatedCommand = `"${elevateExecutablePath}" ${command}`
-
-      const c = cp.spawn(elevatedCommand, [], {
-        detached: true,
-        stdio: 'ignore',
-        shell: true,
-        cwd: app.getPath('temp')
-      })
+      const c = cp.spawn(
+        copiedExecutablePath,
+        [
+          `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+          'apply',
+          `--from="${newVersionDirPath}"`,
+          `--to="${appDir}"`
+        ],
+        {
+          detached: true,
+          stdio: 'ignore',
+          shell: true,
+          cwd: app.getPath('temp')
+        }
+      )
 
       c.unref()
 
@@ -645,23 +653,23 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       copiedExecutablePath
     )
 
-    const args = [
-      `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
-      'uninstall',
-      `--app-id="${DEEP_LINK_PROTOCOL_PROD}"`,
-      `--app-id="${DEEP_LINK_PROTOCOL_DEV}"`,
-      `--dirs-to-remove="${appPath}"`,
-      `--dirs-to-remove="${dataPath}"`
-    ]
-    const command = `"${copiedExecutablePath}" ${args.join(' ')}`
-    const elevatedCommand = `"${elevateExecutablePath}" ${command}`
-
-    const c = cp.spawn(elevatedCommand, [], {
-      detached: true,
-      stdio: 'ignore',
-      shell: true,
-      cwd: app.getPath('temp')
-    })
+    const c = cp.spawn(
+      copiedExecutablePath,
+      [
+        `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+        'uninstall',
+        `--app-id="${DEEP_LINK_PROTOCOL_PROD}"`,
+        `--app-id="${DEEP_LINK_PROTOCOL_DEV}"`,
+        `--dirs-to-remove="${appPath}"`,
+        `--dirs-to-remove="${dataPath}"`
+      ],
+      {
+        detached: true,
+        stdio: 'ignore',
+        shell: true,
+        cwd: app.getPath('temp')
+      }
+    )
 
     c.unref()
 

@@ -4277,16 +4277,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^39.2.7":
-  version: 39.2.7
-  resolution: "electron@npm:39.2.7"
+"electron@npm:^37":
+  version: 37.10.3
+  resolution: "electron@npm:37.10.3"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^22.7.7"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/5923992063245f4b9593edd4186d9d7738f808120b60592bce16bd2e53815c551b2fc824a633597e7a542bd1b456760df0dbdf02d18dde5b1d77eb037979037c
+  checksum: 10c0/a09c10d76be021a94f6c8b251ef990553fe530a6a1271c22026f06a502e977fac116a88b78e73abf50177386a76d69b1c9a52f62d6de60006cc50ed4cb969f0f
   languageName: node
   linkType: hard
 
@@ -5765,7 +5765,7 @@ __metadata:
     chartjs-plugin-datalabels: "npm:^2.2.0"
     codemirror: "npm:^6.0.2"
     dayjs: "npm:^1.11.19"
-    electron: "npm:^39.2.7"
+    electron: "npm:^37"
     electron-builder: "npm:26.0.12"
     electron-vite: "npm:^5.0.0"
     gray-matter: "npm:^4.0.3"

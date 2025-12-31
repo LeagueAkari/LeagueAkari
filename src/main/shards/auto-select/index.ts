@@ -100,7 +100,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
    *
    * counterCompensation: 抵消客户端的时间空余，但可能造成不及时
    *
+   * 目前似乎存在问题，暂不使用
    */
+  // @ts-ignore
   private _calcShouldWait(offset: number, margin = 0, fill = 0) {
     const t = this.state.timer
 
@@ -200,16 +202,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
-        const stageOffset =
-          banConfig.ban.strategy === 'show-and-lock-in' && this.state.move === 'complete-ban'
-            ? banConfig.ban.delaySeconds * 2e3
-            : banConfig.ban.delaySeconds * 1e3
-
         return {
           move: this.state.move,
           activeAction: this.state.activeAction,
           expectedBan: expectedBan,
-          delayMs: this._calcShouldWait(stageOffset),
+          delayMs: banConfig.ban.delaySeconds * 1e3,
           strategy: banConfig.ban.strategy
         } as const
       },
@@ -354,17 +351,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return null
         }
 
-        const stageOffset =
-          pickConfig.pick.strategy === 'show-and-lock-in' && this.state.move === 'complete-pick'
-            ? pickConfig.pick.delaySeconds * 2e3
-            : pickConfig.pick.delaySeconds * 1e3 // 包括 show-pick 和 pick-intent
-
         return {
           move: this.state.move,
           firstUnfinishedPickAction: this.state.firstUnfinishedPickAction,
           activeAction: this.state.activeAction,
           expectedPick: expectedPick,
-          delayMs: this._calcShouldWait(stageOffset),
+          delayMs: pickConfig.pick.delaySeconds * 1e3,
           strategy: pickConfig.pick.strategy
         } as const
       },

@@ -56,7 +56,7 @@ export class RemoteConfigState {
   supportedQueues = BUILTIN_SUPPORTED_QUEUES
 
   /**
-   * 对局分析模块的一些元信息指导
+   * 对局模块的一些元信息指导
    */
   ongoingGameConfig = BUILTIN_ONGOING_GAME_CONFIG
 

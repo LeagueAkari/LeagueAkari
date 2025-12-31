@@ -42,7 +42,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     const store = useOngoingGameStore()
 
     const shouldRoute = computed(() => {
-      return store.queryStage.phase !== 'unavailable'
+      return store.queryStage.phase !== 'unavailable' && store.queryStage.phase !== 'lobby'
     })
 
     watch(

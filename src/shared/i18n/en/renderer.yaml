@@ -323,7 +323,7 @@ OngoingGameSettings:
 
   autoRouteWhenGameStarts:
     label: Auto Route to Ongoing-Game
-    description: Automatically switch to the ongoing-game page when entering the champion selection phase or when the game starts.
+    description: Automatically switch to the ongoing-game page when entering the champion selection phase or when the game starts. Excluded in the lobby phase.
 
   matchHistoryLoadCount:
     label: Match History Load Count

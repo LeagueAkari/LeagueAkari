@@ -143,14 +143,24 @@ export class AkariManager {
     for (const id of this._initializationOrder) {
       const instance = this._instances.get(id)
       if (instance && instance.onInit) {
-        await instance.onInit()
+        try {
+          await instance.onInit()
+        } catch (error) {
+          throw new Error(`Failed to initialize shard ${id.toString()}`, { cause: error })
+        }
       }
     }
 
     for (const id of this._initializationOrder) {
       const instance = this._instances.get(id)
       if (instance && instance.onFinish) {
-        await instance.onFinish()
+        try {
+          await instance.onFinish()
+        } catch (error) {
+          throw new Error(`Failed to trigger onFinish hook of shard ${id.toString()}`, {
+            cause: error
+          })
+        }
       }
     }
 
@@ -166,7 +176,13 @@ export class AkariManager {
     for (const id of reversed) {
       const instance = this._instances.get(id)
       if (instance && instance.onDispose) {
-        await instance.onDispose()
+        try {
+          await instance.onDispose()
+        } catch (error) {
+          throw new Error(`Failed to trigger onDispose hook of shard ${id.toString()}`, {
+            cause: error
+          })
+        }
       }
     }
 
