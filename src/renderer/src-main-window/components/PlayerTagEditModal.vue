@@ -4,9 +4,9 @@
       <span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span>
     </template>
     <template v-if="summoner">
-      <div class="summoner-info">
-        <LcuImage class="image" :src="profileIconUri(summoner.profileIconId)" />
-        <span class="name">{{
+      <div class="flex items-center">
+        <LcuImage class="size-6 rounded" :src="profileIconUri(summoner.profileIconId)" />
+        <span class="ml-2 max-w-[300px] truncate text-sm font-bold">{{
           masked(
             summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid),
             t('summoner', { ns: 'common' })
@@ -14,10 +14,12 @@
         }}</span>
       </div>
     </template>
+
     <template v-else>
-      <span style="font-size: 12px">{{ t('PlayerTagEditModal.loading') }}</span>
+      <span class="text-xs">{{ t('PlayerTagEditModal.loading') }}</span>
     </template>
-    <div style="margin-top: 12px">
+
+    <div class="mt-3">
       <NInput
         v-model:value="text"
         :placeholder="
@@ -31,9 +33,10 @@
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
-      ></NInput>
+      />
     </div>
-    <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
+
+    <div class="mt-3 flex justify-end gap-1">
       <NButton size="small" @click="show = false">{{ t('PlayerTagEditModal.cancel') }}</NButton>
       <NButton size="small" type="primary" @click="handleSaveTag">{{
         t('PlayerTagEditModal.save')
@@ -92,25 +95,4 @@ const handleSaveTag = async () => {
 }
 </script>
 
-<style scoped>
-.summoner-info {
-  display: flex;
-  align-items: center;
-
-  .image {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-  }
-
-  .name {
-    margin-left: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-</style>
+<style scoped></style>

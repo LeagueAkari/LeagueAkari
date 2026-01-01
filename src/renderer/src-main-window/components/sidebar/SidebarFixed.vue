@@ -53,7 +53,7 @@
                 type="circle"
                 :stroke-width="4"
                 :percentage="
-                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100 + 60
+                  (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
                 "
                 :gap-degree="45"
               >

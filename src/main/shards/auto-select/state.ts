@@ -193,6 +193,17 @@ export class AutoSelectState {
     return this.csSession?.benchChampions || []
   }
 
+  /**
+   * 当前可见的可自动选择用的列表
+   */
+  get scopedBenchChampions() {
+    if (this.subsetChampionList.length && this.timer?.phase === 'BAN_PICK') {
+      return this.subsetChampionList
+    }
+
+    return this.benchChampions.map((c) => c.championId)
+  }
+
   get ongoingChampionSwap() {
     return this._lcData.champSelect.ongoingChampionSwap
   }
@@ -504,7 +515,7 @@ export class AutoSelectState {
    * 当前可以 swap 的英雄
    */
   get expectedSwaps() {
-    if (!this.activeGroupConfig || !this.benchEnabled || !this.benchChampions) {
+    if (!this.activeGroupConfig || !this.benchEnabled || !this.scopedBenchChampions.length) {
       return null
     }
 
@@ -512,10 +523,7 @@ export class AutoSelectState {
     const pick = config.pick.champions[this.assignedPosition || 'default'] || []
 
     return pick.map((c) => {
-      if (
-        !this.benchChampions.some((bc) => bc.championId === c) ||
-        !this.currentPickableChampionIds.has(c)
-      ) {
+      if (!this.scopedBenchChampions.includes(c) || !this.currentPickableChampionIds.has(c)) {
         return { id: c, status: 'unswappable' }
       }
 
@@ -682,6 +690,7 @@ export class AutoSelectState {
 
       timer: computed.struct,
       benchChampions: computed.struct,
+      scopedBenchChampions: computed.struct,
 
       _delayedBan: observable.struct,
       _delayedPick: observable.struct,

@@ -1,17 +1,20 @@
 <template>
   <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
+    <!-- announcement -->
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer" @click="sn.showAnnouncementModal()">
           <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]">
             <div class="common-button-inner">
-              <NIcon><NotificationIcon /></NIcon>
+              <NIcon><Notification /></NIcon>
             </div>
           </NBadge>
         </div>
       </template>
       {{ t('CommonButtons.announcement') }}
     </NTooltip>
+
+    <!-- github -->
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer" @click="handleToGithub">
@@ -22,19 +25,23 @@
       </template>
       {{ t('CommonButtons.github') }}
     </NTooltip>
-    <HorizontalExpand :show="aws.settings.enabled">
+
+    <!-- aux window -->
+    <HorizontalExpand :show="aws.settings.enabled" class="h-full">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
           <div class="common-button-outer" @click="handleShowAuxWindow">
             <div class="common-button-inner">
-              <NIcon><Window24FilledIcon /></NIcon>
+              <NIcon><Window24Filled /></NIcon>
             </div>
           </div>
         </template>
         {{ t('CommonButtons.auxWindow') }}
       </NTooltip>
     </HorizontalExpand>
-    <HorizontalExpand :show="ows.settings.enabled">
+
+    <!-- op.gg -->
+    <HorizontalExpand :show="ows.settings.enabled" class="h-full">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
           <div class="common-button-outer" @click="handleShowOpggWindow">
@@ -44,7 +51,25 @@
         {{ t('CommonButtons.opggWindow') }}
       </NTooltip>
     </HorizontalExpand>
-    <HorizontalExpand :show="bts.tasks.length !== 0">
+
+    <!-- toggle theme -->
+    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+      <template #trigger>
+        <div class="common-button-outer" @click="handleToggleTheme">
+          <div class="common-button-inner">
+            <NIcon><component :is="themeIcon" /></NIcon>
+          </div>
+        </div>
+      </template>
+      {{
+        as.colorTheme === 'dark'
+          ? t('CommonButtons.toggleTheme.toLight')
+          : t('CommonButtons.toggleTheme.toDark')
+      }}
+    </NTooltip>
+
+    <!-- tasks -->
+    <HorizontalExpand :show="bts.tasks.length !== 0" class="h-full">
       <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
         <template #trigger>
           <div class="common-button-outer">
@@ -66,6 +91,8 @@ import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -75,8 +102,8 @@ import {
   useOpggWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
-import { Notification as NotificationIcon } from '@vicons/carbon'
-import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
+import { Moon, Notification, Sun } from '@vicons/carbon'
+import { Window24Filled } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NTooltip } from 'naive-ui'
@@ -94,9 +121,11 @@ const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const rcs = useRemoteConfigStore()
 const sns = useSimpleNotificationsStore()
+const as = useAppCommonStore()
 
 const wm = useInstance(WindowManagerRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
+const app = useInstance(AppCommonRenderer)
 
 const bts = useBackgroundTasksStore()
 
@@ -135,6 +164,16 @@ const handleShowOpggWindow = () => {
 const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
+
+const handleToggleTheme = () => {
+  const currentTheme = as.colorTheme
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+  app.setTheme(newTheme)
+}
+
+const themeIcon = computed(() => {
+  return as.colorTheme === 'dark' ? Moon : Sun
+})
 
 const shouldShowAnnouncementBadge = computed(() => {
   return (

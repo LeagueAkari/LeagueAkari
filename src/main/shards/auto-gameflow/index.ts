@@ -672,6 +672,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           return
         }
 
+        this._log.info(`Inviting friend ${data.gameName} #${data.gameTag}`, data.puuid)
+
         try {
           await this._lc.api.lobby.postInvitation([data.summonerId])
 

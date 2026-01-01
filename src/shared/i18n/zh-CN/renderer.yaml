@@ -102,6 +102,9 @@ CommonButtons:
   auxWindow: 小窗口
   opggWindow: OP.GG
   backgroundTasks: 后台任务
+  toggleTheme:
+    toLight: 切换至亮色
+    toDark: 切换至暗色
 
 TrafficButtons:
   minimize: 最小化
@@ -1615,7 +1618,7 @@ Client:
 
     settingsFileMode:
       label: 锁定设置项
-      description: 更改当前登录客户端的设置项可写性。设置为只读阻止游戏客户端修改设置项，设置为可写则允许游戏客户端修改设置项
+      description: 更改客户端设置文件属性，以避免游戏内设置项被更改。只读为锁定，可写为解锁
       setReadonlyButton: 设置只读
       setWritableButton: 设置可写
       setToReadonly: 已设置为只读

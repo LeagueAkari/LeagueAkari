@@ -150,7 +150,7 @@
               v-if="analysis"
               class="flex-1 text-center text-[13px] font-bold"
               :class="{
-                'text-green-600 dark:text-green-300': analysis.summary.winRate >= 0.53,
+                'text-green-700 dark:text-green-300': analysis.summary.winRate >= 0.53,
                 'text-black/80 dark:text-white/80':
                   analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
                 'text-red-700 dark:text-red-400': analysis.summary.winRate <= 0.47
@@ -166,7 +166,7 @@
                   })
                 }}</span
               >
-              <span class="ml-1 text-[9px] font-normal text-black/90 dark:text-white/90"
+              <span class="text-[9px] font-normal text-black/90 dark:text-white/90"
                 >({{ analysis.summary.count }})</span
               >
             </div>
@@ -192,14 +192,14 @@
               v-if="analysis"
               class="flex-1 text-center text-[13px] font-bold"
               :class="{
-                'text-green-600 dark:text-green-300': analysis.summary.winRate >= 0.53,
+                'text-green-700 dark:text-green-300': analysis.summary.winRate >= 0.53,
                 'text-black/80 dark:text-white/80':
                   analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
                 'text-red-700 dark:text-red-400': analysis.summary.winRate <= 0.47
               }"
             >
               {{ (analysis.summary.winRate * 100).toFixed() }}%
-              <span class="ml-1 text-[9px] font-normal text-black/90 dark:text-white/90"
+              <span class="text-[9px] font-normal text-black/90 dark:text-white/90"
                 >({{ analysis.summary.count }})</span
               >
             </div>
@@ -223,7 +223,7 @@
           <div
             class="flex-1 text-center text-[13px] font-bold"
             :class="{
-              'text-green-600 dark:text-green-300': kdaIqr === 'over',
+              'text-green-700 dark:text-green-300': kdaIqr === 'over',
               'text-black/80 dark:text-white/80': kdaIqr === null || kdaIqr === undefined,
               'text-red-700 dark:text-red-400': kdaIqr === 'below'
             }"
@@ -898,17 +898,23 @@ const matches = computed(() => {
     return []
   }
 
-  return matchHistory.map((game) => {
-    const basicInfo = toBasicInfo(game)
-    const participant = toParticipants(game, basicInfo).find((p) => p.puuid === puuid)
+  return matchHistory
+    .map((game) => {
+      const basicInfo = toBasicInfo(game)
+      const participant = toParticipants(game, basicInfo).find((p) => p.puuid === puuid)
 
-    return {
-      gameId: game.gameId,
-      basicInfo,
-      participant,
-      game
-    }
-  })
+      if (!participant) {
+        return null
+      }
+
+      return {
+        gameId: game.gameId,
+        basicInfo,
+        participant,
+        game
+      }
+    })
+    .filter((m) => m !== null)
 })
 
 const { masked } = useStreamerModeMaskedText()

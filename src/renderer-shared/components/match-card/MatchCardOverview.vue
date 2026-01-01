@@ -1,7 +1,8 @@
 <template>
   <div
     v-if="participant && team"
-    class="transition-width @container relative box-border flex h-29 w-full overflow-hidden rounded border border-solid border-black/20 bg-neutral-100/95 select-none dark:border-white/20 dark:bg-neutral-900/95"
+    class="transition-width @container relative box-border flex h-29 w-full overflow-hidden rounded border border-solid bg-neutral-100/95 select-none dark:bg-neutral-900/95"
+    :class="cardBorderClasses"
   >
     <!-- main content -->
     <div class="z-1 flex min-w-0 flex-1 gap-2 px-4 py-1">
@@ -373,6 +374,7 @@ import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 import { useMatchCard } from './context'
 import { useGameResultName } from './utils/text'
+import { useCardBorderTheme, useWinResultStyleType } from './utils/theme'
 import { formatSeconds } from './utils/time'
 import ManyTags from './widgets/ManyTags.vue'
 import RadarChart from './widgets/RadarChart.vue'
@@ -486,25 +488,8 @@ const mapName = computed(() => {
   return mutators.MapNameBase
 })
 
-const winStyleType = computed(() => {
-  if (!team.value) {
-    return 'neutral'
-  }
-
-  if (
-    basicInfo.value.gameMode === 'PRACTICETOOL' ||
-    team.value.winResult === 'remake' ||
-    team.value.winResult === 'abort'
-  ) {
-    return 'neutral'
-  }
-
-  if (team.value.winResult === 'win') {
-    return 'win'
-  }
-
-  return 'loss'
-})
+const winStyleType = useWinResultStyleType()
+const cardBorderClasses = useCardBorderTheme()
 
 const formattedRelativeTime = ref('')
 const gameCreationTitle = computed(() => {

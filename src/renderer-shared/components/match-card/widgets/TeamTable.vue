@@ -7,7 +7,7 @@
         <div
           class="text-xs font-bold"
           :class="{
-            'text-blue-700 dark:text-blue-200': team.winResult === 'win',
+            'text-blue-700 dark:text-blue-300': team.winResult === 'win',
             'text-red-700 dark:text-red-300': team.winResult === 'loss',
             'text-black/80 dark:text-white/80':
               team.winResult === 'remake' || team.winResult === 'abort'

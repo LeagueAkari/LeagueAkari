@@ -1,5 +1,7 @@
 import { MaybeRefOrGetter, computed, toValue } from 'vue'
 
+import { useMatchCard } from '../context'
+
 /**
  * 玩家图表颜色数组
  * 用于图表中区分不同玩家的数据线
@@ -140,4 +142,52 @@ export function getDamageTextColor(type: 'physical' | 'magic' | 'true' | (string
   if (type === 'true') return 'text-[#a8a8a8] dark:text-white'
 
   return 'text-[#e07856] dark:text-[#f08a6a]'
+}
+
+export function useWinResultStyleType() {
+  const { basicInfo, team } = useMatchCard()
+
+  return computed(() => {
+    if (!team.value) {
+      return 'neutral'
+    }
+
+    if (
+      basicInfo.value.gameMode === 'PRACTICETOOL' ||
+      team.value.winResult === 'remake' ||
+      team.value.winResult === 'abort'
+    ) {
+      return 'neutral'
+    }
+
+    if (team.value.winResult === 'win') {
+      return 'win'
+    }
+
+    return 'loss'
+  })
+}
+
+export function useCardBorderTheme() {
+  const { basicInfo, team } = useMatchCard()
+
+  return computed(() => {
+    if (!team.value) {
+      return 'border-black/20 dark:border-white/20'
+    }
+
+    if (
+      basicInfo.value.gameMode === 'PRACTICETOOL' ||
+      team.value.winResult === 'remake' ||
+      team.value.winResult === 'abort'
+    ) {
+      return 'border-black/20 dark:border-white/20'
+    }
+
+    if (team.value.winResult === 'win') {
+      return 'border-blue-600/20 dark:border-blue-300/20'
+    }
+
+    return 'border-red-600/20 dark:border-red-300/20'
+  })
 }

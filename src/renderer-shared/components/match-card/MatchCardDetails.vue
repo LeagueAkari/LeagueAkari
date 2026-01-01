@@ -1,7 +1,8 @@
 <template>
   <!-- expanded details -->
   <div
-    class="transition-width @container relative mt-1 box-border w-full overflow-hidden rounded border border-solid border-black/20 bg-neutral-100/95 p-2 dark:border-white/20 dark:bg-neutral-900/95"
+    class="transition-width @container relative mt-1 box-border w-full overflow-hidden rounded border border-solid bg-neutral-100/95 p-2 dark:bg-neutral-900/95"
+    :class="cardBorderClasses"
   >
     <!-- header -->
     <div class="mb-2 flex items-center gap-1">
@@ -64,6 +65,7 @@ import MatchCardLineChartTab from './tabs/MatchCardDiffLineChartTab.vue'
 import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
 import MatchCardRunesTab from './tabs/MatchCardRunesTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
+import { useCardBorderTheme } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
 const { basicInfo, teams, participants, puuid, replayState, onLoadReplay, onWatchReplay } =
@@ -136,6 +138,8 @@ const replayButtonTitle = computed(() => {
       return t('MatchCard.replay.label')
   }
 })
+
+const cardBorderClasses = useCardBorderTheme()
 </script>
 
 <style scoped>

@@ -1,5 +1,30 @@
 <template>
   <div class="traffic-buttons" :class="{ blurred: mws.focus === 'blurred' }">
+    <!-- 目前仍存在的绝赞 bug，最小化的时候无法清除 hover 状态 -->
+    <!-- 其他 electron 应用中多少也发现了类似的情况 -->
+    <div
+      :title="t('TrafficButtons.minimize')"
+      class="traffic-button minimize"
+      @click="handleMinimize"
+    >
+      <!-- 邪道最小化 -->
+      <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
+    </div>
+    <div
+      :title="mws.status === 'normal' ? t('TrafficButtons.maximize') : t('TrafficButtons.restore')"
+      class="traffic-button maximize"
+      @click="handleMaximize"
+    >
+      <NIcon>
+        <Maximize24FilledIcon v-if="mws.status === 'normal'" />
+        <WindowMultiple16FilledIcon v-else />
+      </NIcon>
+    </div>
+    <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
+      <NIcon><CloseOutlinedIcon /></NIcon>
+    </div>
+
+    <!-- quit 的时候的确认弹窗 -->
     <NModal
       style="width: 300px"
       transform-origin="center"
@@ -40,28 +65,6 @@
         </NFlex>
       </NFlex>
     </NModal>
-    <!-- 目前仍存在的绝赞 bug，最小化的时候无法清除 hover 状态 -->
-    <!-- 其他 electron 应用中多少也发现了类似的情况 -->
-    <div
-      :title="t('TrafficButtons.minimize')"
-      class="traffic-button minimize"
-      @click="handleMinimize"
-    >
-      <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
-    </div>
-    <div
-      :title="mws.status === 'normal' ? t('TrafficButtons.maximize') : t('TrafficButtons.restore')"
-      class="traffic-button maximize"
-      @click="handleMaximize"
-    >
-      <NIcon>
-        <Maximize24FilledIcon v-if="mws.status === 'normal'" />
-        <WindowMultiple16FilledIcon v-else />
-      </NIcon>
-    </div>
-    <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
-      <NIcon><CloseOutlinedIcon /></NIcon>
-    </div>
   </div>
 </template>
 

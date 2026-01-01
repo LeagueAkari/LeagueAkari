@@ -543,22 +543,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       return newObj
     }
 
-    /**
-     * 可选池子可见性处理
-     */
-    const scopedBenchChampions = computed(() => {
-      if (this.state.move === 'subset-bench-swap') {
-        return this.state.subsetChampionList
-      } else if (this.state.move === 'bench-swap') {
-        return this.state.benchChampions.map((c) => c.championId)
-      }
-
-      return []
-    })
-
     // diff
     this._mobx.reaction(
-      () => scopedBenchChampions.get(),
+      () => this.state.scopedBenchChampions,
       (bench) => {
         if (!bench) {
           benchChampionCooldown.set(null)
@@ -585,7 +572,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
 
       if (
-        !pickConfig.pick.benchHandleTradeEnabled ||
+        !pickConfig.pick.enabled ||
         pickConfig.temporarilyDisabled ||
         !this.state.currentSessionChampionId
       ) {
@@ -713,7 +700,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         if (
           !pickConfig ||
-          !pickConfig.pick.enabled ||
+          !pickConfig.pick.benchHandleTradeEnabled ||
           !expected ||
           !this.state.ongoingChampionSwapCreatedAt
         ) {
@@ -769,6 +756,33 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
       },
       { equals: comparer.structural }
+    )
+
+    // DEBUG
+    this._mobx.reaction(
+      () => this.state.activeGroupConfigId,
+      (id) => {
+        this._log.error('[DEBUG] activeGroupConfigId', id)
+      },
+      { fireImmediately: true }
+    )
+
+    // DEBUG
+    this._mobx.reaction(
+      () => this.state.scopedBenchChampions,
+      (bench) => {
+        this._log.error('[DEBUG] scopedBenchChampions', bench)
+      },
+      { fireImmediately: true }
+    )
+
+    // DEBUG
+    this._mobx.reaction(
+      () => benchSwapContext.get(),
+      (ctx) => {
+        this._log.error('[DEBUG] benchSwapContext', ctx)
+      },
+      { fireImmediately: true }
     )
 
     const acceptChampionSwap = async (tradeId: number) => {
