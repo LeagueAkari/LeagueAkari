@@ -1128,23 +1128,36 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return []
     }
 
-    const gameMap = new Map<string, { players: string[]; id: string }>()
+    const matchesByTeams = Object.values(this.state.matchHistory)
+      .map((m) => {
+        return m.data.map((d) => {
+          // 按照队伍分组
+          // CHERRY 下也按照集体分组，而非子队。这是考虑到斗魂组队可以跨越子队
+          const groupedByTeamId = toIdentities(d).reduce(
+            (acc, i) => {
+              if (!acc[i.teamId]) {
+                acc[i.teamId] = []
+              }
+              acc[i.teamId].push(i.puuid)
+              return acc
+            },
+            {} as Record<number, string[]>
+          )
 
-    const playerMatches = Object.values(this.state.matchHistory).flatMap((m) =>
-      m.data.map((d) => ({
-        players: toIdentities(d).map((i) => i.puuid),
-        id: d.gameId.toString()
-      }))
-    )
-
-    playerMatches.forEach((m) => {
-      gameMap.set(m.id, m)
-    })
+          return Object.values(groupedByTeamId)
+            .filter((c) => c.length > 1)
+            .map((g) => ({
+              players: g,
+              id: d.gameId.toString()
+            }))
+        })
+      })
+      .flat(2)
 
     // 用到了将近两年前的工具，我选择不去动它，只做转换
     // 此方法追溯到 v1.1.x
     const calculated = calculateTogetherTimes(
-      Array.from(gameMap.values()),
+      matchesByTeams,
       Object.values(this.state.teams).flat(),
       this.settings.premadeTeamInferMatchCountThreshold
     )
