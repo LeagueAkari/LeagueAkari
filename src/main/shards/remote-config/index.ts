@@ -228,7 +228,11 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       'updateLatestRelease'
     ])
 
-    await this._initConfigFilesFromLocal()
+    try {
+      await this._initConfigFilesFromLocal()
+    } catch (error) {
+      this._log.warn('Failed to init config files from local', error)
+    }
 
     this._handleIpcCall()
     this._handlePeriodicTasksUpdate()

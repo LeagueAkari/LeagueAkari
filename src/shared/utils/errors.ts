@@ -43,30 +43,54 @@ function stringifyAxiosResponseData(input: any, maxLen = 2000): string {
   }
 }
 
+function getCauseLines(err: any, limit = 10): string[] {
+  const lines: string[] = []
+  const seen = new Set<any>()
+
+  let cur = err?.cause
+  while (cur && lines.length < limit) {
+    if (seen.has(cur)) {
+      lines.push('cause: [circular]')
+      break
+    }
+    seen.add(cur)
+
+    const msg =
+      cur instanceof Error
+        ? cur.message
+        : typeof cur === 'object' && cur !== null && 'message' in cur
+          ? String((cur as any).message)
+          : String(cur)
+
+    lines.push(`cause: ${msg}`)
+    cur = (cur as any)?.cause
+  }
+
+  return lines
+}
+
 export function formatError(e: any) {
+  const causeLines = getCauseLines(e, 10)
+  const causeSuffix = causeLines.length ? `\n${causeLines.join('\n')}` : ''
+
   if (e instanceof AxiosError) {
-    return `${e.name}: ${e.message}
-[${e.config?.method}] ${e.config?.url} (${e.code} ${e.response?.statusText})
-payload: ${stringifyAxiosResponseData(e.config?.data)},
-data: ${stringifyAxiosResponseData(e.response?.data)},
-stack: ${e.stack}`
+    return (
+      `${e.name}: ${e.message}\n` +
+      `[${e.config?.method}] ${e.config?.url} (${e.code} ${e.response?.statusText})\n` +
+      `payload: ${stringifyAxiosResponseData(e.config?.data)},\n` +
+      `data: ${stringifyAxiosResponseData(e.response?.data)},\n` +
+      `stack: ${e.stack}` +
+      causeSuffix
+    )
   }
 
   if (e instanceof Error) {
-    return `${e.message} ${e.stack}`
+    return `${e.message} ${e.stack}${causeSuffix}`
   }
 
   if (typeof e === 'object' && e !== null) {
-    return `${e.message ?? ''} ${e.stack ?? ''}`
+    return `${e.message ?? ''} ${e.stack ?? ''}${causeSuffix}`
   }
 
-  return String(e)
-}
-
-export function formatErrorMessage(e: any) {
-  if (e instanceof Error) {
-    return e.message
-  }
-
-  return 'Error'
+  return `${String(e)}${causeSuffix}`
 }
