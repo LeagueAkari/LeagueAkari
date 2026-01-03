@@ -19,10 +19,22 @@
           :disabled="countdown > 0"
         >
           <template v-if="countdown > 0">
-            {{ t('DeclarationModal.ok') }} ({{ countdown }})
+            <i18next :translation="`${t('DeclarationModal.ok')} (${countdown})`">
+              <template #isFree>
+                <span class="font-bold text-amber-200 dark:text-red-800">{{
+                  t('DeclarationModal.isFree')
+                }}</span>
+              </template>
+            </i18next>
           </template>
           <template v-else>
-            {{ t('DeclarationModal.ok') }}
+            <i18next :translation="$t('DeclarationModal.ok')">
+              <template #isFree>
+                <span class="font-bold text-amber-200 dark:text-red-800">{{
+                  t('DeclarationModal.isFree')
+                }}</span>
+              </template>
+            </i18next>
           </template>
         </NButton>
         <NButton @click="() => emits('exit')" size="small">

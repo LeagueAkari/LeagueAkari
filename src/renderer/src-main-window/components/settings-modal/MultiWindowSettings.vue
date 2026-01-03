@@ -12,9 +12,11 @@
         <template #labelDescription>
           <div>{{ t('MultiWindowSettings.auxWindow.enabled.description') }}</div>
           <div>
-            {{ t('MultiWindowSettings.auxWindow.enabled.descriptionPart1')
-            }}<NIcon class="inline-icon"><Window24FilledIcon /></NIcon
-            >{{ t('MultiWindowSettings.auxWindow.enabled.descriptionPart2') }}
+            <i18next :translation="t('MultiWindowSettings.auxWindow.enabled.descriptionWithIcon')">
+              <template #icon>
+                <NIcon class="inline-icon"><Window24FilledIcon /></NIcon>
+              </template>
+            </i18next>
           </div>
         </template>
         <NSwitch
@@ -91,10 +93,11 @@
         <template #labelDescription>
           <div>{{ t('MultiWindowSettings.opggWindow.enabled.description') }}</div>
           <div>
-            {{ t('MultiWindowSettings.opggWindow.enabled.descriptionPart1')
-            }}<OpggIcon class="inline-icon" />{{
-              t('MultiWindowSettings.opggWindow.enabled.descriptionPart2')
-            }}
+            <i18next :translation="t('MultiWindowSettings.opggWindow.enabled.descriptionWithIcon')">
+              <template #icon>
+                <OpggIcon class="inline-icon" />
+              </template>
+            </i18next>
           </div>
         </template>
         <NSwitch

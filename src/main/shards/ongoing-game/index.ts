@@ -227,6 +227,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
 
       if (this._lc.data.gameflow.session) {
+        if (
+          this._lc.data.gameflow.session.gameData.queue.id === 0 ||
+          this._lc.data.gameflow.session.gameData.queue.id === -1
+        ) {
+          return null
+        }
+
         return {
           queueId: this._lc.data.gameflow.session.gameData.queue.id,
           from: 'gameflow-session'
@@ -1151,8 +1158,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
-      () => Object.values(this.state.matchHistory),
-      (_changedV) => {
+      () => ({
+        matches: Object.values(this.state.matchHistory),
+        teams: Object.values(this.state.teams).flat()
+      }),
+      (_) => {
         this.state.setPlayerStats(this._calcAnalysis())
         this.state.setInferredPremadeTeams(this._calcPremade())
       },

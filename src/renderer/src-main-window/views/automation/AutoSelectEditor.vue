@@ -23,7 +23,7 @@
             :class="[
               currentGroupId === group.groupId
                 ? 'bg-black/10 text-gray-900 dark:bg-white/15 dark:text-white'
-                : 'hover:bg-black/5 hover:text-gray-900 dark:hover:bg-white/10 dark:hover:text-white'
+                : 'text-black/90 hover:bg-black/5 hover:text-gray-900 dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white'
             ]"
             v-for="group in as2.groups"
             :key="group.groupId"
@@ -191,6 +191,9 @@
                 <NRadio value="show-and-lock-in">{{
                   t('AutoSelect.pick.strategy.options.show-and-lock-in')
                 }}</NRadio>
+                <NRadio value="lock-in-immediately">{{
+                  t('AutoSelect.pick.strategy.options.lock-in-immediately')
+                }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </ControlItem>
@@ -349,19 +352,6 @@
 
           <ControlItem
             class="control-item-margin"
-            :label="t('AutoSelect.ban.ignoreIntent.label')"
-            :label-description="t('AutoSelect.ban.ignoreIntent.description')"
-            :label-width="260"
-          >
-            <NSwitch
-              size="small"
-              :value="currentBanConfig.ignoreIntent"
-              @update:value="(val) => as.setBanConfig(currentGroup!.groupId, { ignoreIntent: val })"
-            />
-          </ControlItem>
-
-          <ControlItem
-            class="control-item-margin"
             :label="t('AutoSelect.ban.strategy.label')"
             :label-description="t('AutoSelect.ban.strategy.description')"
             :label-width="260"
@@ -377,6 +367,9 @@
                 }}</NRadio>
                 <NRadio value="show-and-lock-in">{{
                   t('AutoSelect.ban.strategy.options.show-and-lock-in')
+                }}</NRadio>
+                <NRadio value="lock-in-immediately">{{
+                  t('AutoSelect.ban.strategy.options.lock-in-immediately')
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>

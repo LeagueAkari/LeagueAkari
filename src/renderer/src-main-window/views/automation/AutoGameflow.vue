@@ -53,14 +53,16 @@
             :label-width="260"
           >
             <template #labelDescription>
-              {{ t('AutoGameflow.playAgainEnabled.description.part1') }}
-              <span
-                style="font-weight: bold; cursor: pointer"
-                @click="() => shard.setAutoHonorEnabled(true)"
-              >
-                {{ t('AutoGameflow.playAgainEnabled.description.part2') }}</span
-              >
-              {{ t('AutoGameflow.playAgainEnabled.description.part3') }}
+              <i18next :translation="t('AutoGameflow.playAgainEnabled.description.full')">
+                <template #autoHonor>
+                  <span
+                    style="font-weight: bold; cursor: pointer"
+                    @click="() => shard.setAutoHonorEnabled(true)"
+                  >
+                    {{ t('AutoGameflow.playAgainEnabled.description.part2') }}
+                  </span>
+                </template>
+              </i18next>
             </template>
             <NSwitch
               :value="store.settings.playAgainEnabled"

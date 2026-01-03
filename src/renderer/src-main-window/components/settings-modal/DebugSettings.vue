@@ -45,37 +45,40 @@
         :label-width="400"
       >
         <template #labelDescription>
-          {{ t('DebugSettings.files.appData.description.part1') }}
-          <NPopover :delay="50">
-            <template #trigger>
-              <span style="font-weight: bold; color: #fff">
-                {{ t('DebugSettings.files.appData.popoverTrigger') }}
-              </span>
+          <i18next :translation="t('DebugSettings.files.appData.description.full')">
+            <template #details>
+              <NPopover :delay="50">
+                <template #trigger>
+                  <span style="font-weight: bold; color: #fff">
+                    {{ t('DebugSettings.files.appData.popoverTrigger') }}
+                  </span>
+                </template>
+                <table>
+                  <colgroup>
+                    <col style="width: 100px" />
+                  </colgroup>
+                  <tbody style="font-size: 12px">
+                    <tr>
+                      <td>LeagueAkari.db</td>
+                      <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
+                    </tr>
+                    <tr>
+                      <td>NewUpdates/</td>
+                      <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
+                    </tr>
+                    <tr>
+                      <td>AkariConfig/</td>
+                      <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
+                    </tr>
+                    <tr>
+                      <td>base-config.json</td>
+                      <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </NPopover>
             </template>
-            <table>
-              <colgroup>
-                <col style="width: 100px" />
-              </colgroup>
-              <tbody style="font-size: 12px">
-                <tr>
-                  <td>LeagueAkari.db</td>
-                  <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
-                </tr>
-                <tr>
-                  <td>NewUpdates/</td>
-                  <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
-                </tr>
-                <tr>
-                  <td>AkariConfig/</td>
-                  <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
-                </tr>
-                <tr>
-                  <td>base-config.json</td>
-                  <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </NPopover>
+          </i18next>
         </template>
         <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()">{{
           t('DebugSettings.files.appData.button')

@@ -42,6 +42,7 @@ auto-select-main:
   show-pick: Will show pick {{champion}} in {{seconds}} seconds
   complete-pick: Will complete pick {{champion}} in {{seconds}} seconds
   intent-pick: Will intent pick {{champion}} in {{seconds}} seconds
+  user-takeover: User intervened in the automatic process
 
 self-update-main:
   title: Self Update

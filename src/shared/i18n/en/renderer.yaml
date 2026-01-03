@@ -12,7 +12,8 @@ AnnouncementModal:
 
 DeclarationModal:
   title: Declaration
-  ok: Got it
+  isFree: is free
+  ok: I acknowledge this software {isFree} and agree to the disclaimer
   quit: Quit
 
   newContent: |
@@ -20,15 +21,15 @@ DeclarationModal:
 
     <style>
     .akari-disclaimer{
-      background-color:#1e1e1e;
-      color:#e6e6e6;
+      background-color:#ffffff;
+      color:#333333;
       line-height:1.65;
       padding:1.75rem 2rem;
-      box-shadow:0 2px 6px rgba(0,0,0,.35);
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
     }
     .akari-disclaimer h1,
     .akari-disclaimer h2{
-      color:#ffd866;
+      color:#d97706;
       margin-top:1.5rem;
       margin-bottom:.75rem;
       line-height:1.25;
@@ -37,8 +38,20 @@ DeclarationModal:
     .akari-disclaimer h2{font-size:1.25rem;}
     .akari-disclaimer ul{margin-left:1.5rem;}
     .akari-disclaimer li{margin-bottom:.65rem;}
-    .akari-disclaimer a{color:#8ab4f8;text-decoration:none;}
+    .akari-disclaimer a{color:#2563eb;text-decoration:none;}
     .akari-disclaimer a:hover{text-decoration:underline;}
+    [data-theme='dark'] .akari-disclaimer{
+      background-color:#1e1e1e;
+      color:#e6e6e6;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+    }
+    [data-theme='dark'] .akari-disclaimer h1,
+    [data-theme='dark'] .akari-disclaimer h2{
+      color:#ffd866;
+    }
+    [data-theme='dark'] .akari-disclaimer a{
+      color:#8ab4f8;
+    }
     </style>
 
     # $t(common:appName) User Guide & Disclaimer
@@ -50,7 +63,7 @@ DeclarationModal:
 
     ## I. Nature of the Software & Acquisition
     - **$t(common:appName)i** is entirely open-source and free; all features are provided “as-is.”
-    - This software may not be released, distributed, or obtained in any paid, bundled, or profit-making form. Always download it through the official public repository or its mirrors to avoid financial loss and security risks.
+    - This software is not sold in any form of paid, bundled, or profit-making manner. If you encounter any form of reselling, bundling, or other profit-making activities, please do not purchase it. If you purchase it, please **immediately refund**.
 
     ## II. Risk Notice & Limitation of Liability
     - Using this software **may** result in (including but not limited to):
@@ -70,7 +83,7 @@ DeclarationModal:
     - The collected information **does not** contain personally identifiable data, will not be uploaded to any third-party server, and will not be used for commercial purposes.
 
     ## V. Other
-    - Typing "AKARI" quickly in any place, or clicking the "Got it" button three times in a row, can quickly close this modal. By doing this, it is deemed that you have read and agreed to this guide and disclaimer.
+    - Clicking the confirm button three times in a row, can quickly close this modal. By doing this, it is deemed that you have read and agreed to this guide and disclaimer.
 
     ---
 
@@ -424,8 +437,7 @@ MultiWindowSettings:
     enabled:
       label: Enable Auxiliary Window
       description: Use a small window during certain game phases to display status and provide additional actions.
-      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-      descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
+      descriptionWithIcon: Can be opened by clicking the quick icon on the right side of the title bar ({icon}) or by right-clicking the tray icon and selecting "Aux Window").
 
     autoShow:
       label: Auto Show and Close
@@ -450,8 +462,7 @@ MultiWindowSettings:
     enabled:
       label: Enable OP.GG Features
       description: Use the OP.GG window to view detailed player information and match history
-      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-      descriptionPart2: ) or by right-clicking the tray icon and selecting "OP.GG Window").
+      descriptionWithIcon: Can be opened by clicking the quick icon on the right side of the title bar ({icon}) or by right-clicking the tray icon and selecting "OP.GG Window").
 
     autoShow:
       label: Auto Show and Close
@@ -568,7 +579,7 @@ DebugSettings:
       popoverTrigger: Details
       button: Open Directory
       description:
-        part1: Open the $t(common:appName) application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
+        full: Open the $t(common:appName) application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content. {details}
         part2: Contains user settings, marked players, and other information.
         part3: Temporary files for upcoming automatic updates.
         part4: Configurable setting files.
@@ -730,9 +741,8 @@ AutoGameflow:
   playAgainEnabled:
     label: Auto Play Again
     description:
-      part1: Automatically returns to the lobby after a match.
+      full: Automatically returns to the lobby after a match. {autoHonor} to complete the honor voting phase.
       part2: Auto-Honor
-      part3: to complete the honor voting phase.
   autoMatchmakingEnabled:
     label: Auto Matchmaking
     description: Automatically starts matchmaking when available.
@@ -836,6 +846,7 @@ AutoSelect:
       options:
         just-show: Just Show
         show-and-lock-in: Show and Lock-in
+        lock-in-immediately: Lock-in Immediately
 
     delaySeconds:
       label: Delay (s)
@@ -870,16 +881,13 @@ AutoSelect:
       fragment1: When assigned to
       fragment2: position
 
-    ignoreIntent:
-      label: Ignore Intent
-      description: Ignore the intent of the teammates.
-
     strategy:
       label: Lock Strategy
       description: Execute the automatic ban process according to the preset strategy.
       options:
         just-show: Just Show
         show-and-lock-in: Show and Lock-in
+        lock-in-immediately: Lock-in Immediately
 
     delaySeconds:
       label: Delay (s)
@@ -1060,6 +1068,7 @@ MatchCard:
       atakhan: Atakhan
     bans: Bans
     perMinuteSuffix: / min
+    cs: CS
 
   overview:
     perfect: Perfect

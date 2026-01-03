@@ -42,6 +42,7 @@ auto-select-main:
   show-pick: 将在 {{seconds}} 秒后亮出 {{champion}}
   complete-pick: 将在 {{seconds}} 秒后锁定 {{champion}}
   intent-pick: 将在 {{seconds}} 秒后预选 {{champion}}
+  user-takeover: 用户干预了自动流程
 
 self-update-main:
   title: 自动更新

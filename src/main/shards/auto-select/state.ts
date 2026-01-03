@@ -5,7 +5,7 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 import { LeagueClientData } from '../league-client/lc-state'
 import { GROUPS } from './groups'
 
-export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in'
+export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in' | 'lock-in-immediately'
 
 export const NONE_CHAMPION_ID = -1
 export const RANDOM_CHAMPION_ID = -2
@@ -44,7 +44,6 @@ export interface BanChampionConfig {
   champions: PositionChampion
   strategy: AutoPickBanStrategy
   delaySeconds: number
-  ignoreIntent: boolean
 }
 
 export interface DelayedBanPick {
@@ -91,9 +90,9 @@ export class AutoSelectSettings {
         utility: [],
         default: []
       },
+      ignoreIntent: false,
       showIntent: false,
       delaySeconds: 0,
-      ignoreIntent: false,
       strategy: 'show-and-lock-in',
       benchHandleTradeEnabled: false,
       benchSelectFirstAvailableChampion: false,
@@ -112,7 +111,6 @@ export class AutoSelectSettings {
         utility: [],
         default: []
       },
-      ignoreIntent: false,
       delaySeconds: 0,
       strategy: 'show-and-lock-in'
     }
@@ -149,6 +147,10 @@ export class AutoSelectState {
     return this._lcData.champSelect.session
   }
 
+  get gfSession() {
+    return this._lcData.gameflow.session
+  }
+
   get inChampSelect() {
     return Boolean(this.csSession)
   }
@@ -182,7 +184,7 @@ export class AutoSelectState {
   }
 
   get isCustomGame() {
-    return this.csSession?.isCustomGame || false
+    return this.gfSession?.gameData.isCustomGame || this.csSession?.isCustomGame || false
   }
 
   get timer() {

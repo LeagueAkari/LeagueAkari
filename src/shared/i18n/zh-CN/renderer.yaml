@@ -14,22 +14,23 @@ AnnouncementModal:
 
 DeclarationModal:
   title: 声明
-  ok: 我已阅读
+  isFree: 为免费软件
+  ok: 我已知晓此软件{isFree}并已认同免责条款
   quit: 退出
   newContent: |
     <div class="akari-disclaimer">
 
     <style>
     .akari-disclaimer{
-      background-color:#1e1e1e;
-      color:#e6e6e6;
+      background-color:#ffffff;
+      color:#333333;
       line-height:1.65;
       padding:1.75rem 2rem;
-      box-shadow:0 2px 6px rgba(0,0,0,.35);
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
     }
     .akari-disclaimer h1,
     .akari-disclaimer h2{
-      color:#ffd866;
+      color:#d97706;
       margin-top:1.5rem;
       margin-bottom:.75rem;
       line-height:1.25;
@@ -38,8 +39,20 @@ DeclarationModal:
     .akari-disclaimer h2{font-size:1.25rem;}
     .akari-disclaimer ul{margin-left:1.5rem;}
     .akari-disclaimer li{margin-bottom:.65rem;}
-    .akari-disclaimer a{color:#8ab4f8;text-decoration:none;}
+    .akari-disclaimer a{color:#2563eb;text-decoration:none;}
     .akari-disclaimer a:hover{text-decoration:underline;}
+    [data-theme='dark'] .akari-disclaimer{
+      background-color:#1e1e1e;
+      color:#e6e6e6;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+    }
+    [data-theme='dark'] .akari-disclaimer h1,
+    [data-theme='dark'] .akari-disclaimer h2{
+      color:#ffd866;
+    }
+    [data-theme='dark'] .akari-disclaimer a{
+      color:#8ab4f8;
+    }
     </style>
 
     # $t(common:appName) 用户须知与免责声明
@@ -51,7 +64,7 @@ DeclarationModal:
 
     ## 一、软件性质与获取途径
     - **$t(common:appName)** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
-    - 本软件不得以任何付费、捆绑销售或其他牟利形式发布、传播或获取。请务必通过官方公开仓库或其镜像下载，防止经济损失及安全隐患。
+    - 本软件并未以**任何**方式公开售卖，如遇倒卖、捆绑销售或其他牟利形式，请勿购买，若购买请**立即退款**。
 
     ## 二、风险提示与责任限制
     - 使用本软件**可能**导致（包括但不限于）：
@@ -71,7 +84,7 @@ DeclarationModal:
     - 所收集信息**不含**可识别个人身份之数据，不会上传至任何第三方服务器，亦不会用于商业用途。
 
     ## 五、其他事项
-    - 在任意位置快速敲击 “AKARI”，或连续使用右键点击三次“我已阅读”按钮，可快速关闭这个页面，同时视为您已经阅读并同意本须知与免责声明。
+    - 连续使用右键点击三次确认按钮，可快速关闭这个页面，同时视为您已经阅读并同意本须知与免责声明。
 
     ---
 
@@ -425,8 +438,7 @@ MultiWindowSettings:
     enabled:
       label: 启用小窗口
       description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
-      descriptionPart1: 可通过标题栏右侧的快捷图标 (
-      descriptionPart2: )，或托盘区右键菜单中的 “小窗口” 打开小窗口
+      descriptionWithIcon: 可通过标题栏右侧的快捷图标 ({icon})，或托盘区右键菜单中的 "小窗口" 打开小窗口
 
     autoShow:
       label: 自动弹出和关闭
@@ -451,8 +463,7 @@ MultiWindowSettings:
     enabled:
       label: 启用 OP.GG 特性
       description: 启用 OP.GG 相关功能
-      descriptionPart1: 可通过标题栏右侧的快捷图标 (
-      descriptionPart2: )，或托盘区右键菜单中的 “OP.GG 窗口” 打开 OP.GG 窗口
+      descriptionWithIcon: 可通过标题栏右侧的快捷图标 ({icon})，或托盘区右键菜单中的 "OP.GG 窗口" 打开 OP.GG 窗口
 
     autoShow:
       label: 自动弹出和关闭
@@ -569,7 +580,7 @@ DebugSettings:
       popoverTrigger: 详情
       button: 应用目录
       description:
-        part1: 打开 $t(common:appName) 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+        full: 打开 $t(common:appName) 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容 {details}
         part2: 存储用户设置、已标记的玩家等信息
         part3: 即将进行的自动更新临时文件
         part4: 一些可以替换的设置项文件
@@ -731,9 +742,8 @@ AutoGameflow:
   playAgainEnabled:
     label: 自动回到房间
     description:
-      part1: 对局结束时回到房间。可能需要先启用
+      full: 对局结束时回到房间。可能需要先启用 {autoHonor} 以完成点赞投票阶段
       part2: 自动点赞
-      part3: 以完成点赞投票阶段
   autoMatchmakingEnabled:
     label: 自动匹配对局
     description: 在可匹配对局时，将自动开始匹配对局
@@ -837,6 +847,7 @@ AutoSelect:
       options:
         just-show: 仅亮出
         show-and-lock-in: 亮出后延迟锁定
+        lock-in-immediately: 立即锁定
 
     delaySeconds:
       label: 延时 (s)
@@ -871,16 +882,13 @@ AutoSelect:
       fragment1: 当分配到
       fragment2: 位置时
 
-    ignoreIntent:
-      label: 无视队友预选
-      description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
-
     strategy:
       label: 锁定策略
       description: 按照预设的策略执行自动禁用流程
       options:
         just-show: 仅亮出
         show-and-lock-in: 亮出后延迟锁定
+        lock-in-immediately: 立即锁定
 
     delaySeconds:
       label: 延时 (s)
@@ -1061,6 +1069,7 @@ MatchCard:
       atakhan: 厄塔汗
     bans: 禁用
     perMinuteSuffix: / 分钟
+    cs: 补兵
 
   overview:
     perfect: 完美

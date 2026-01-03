@@ -36,7 +36,6 @@ export interface BanChampionConfig {
   champions: PositionChampion
   delaySeconds: number
   strategy: AutoPickBanStrategy
-  ignoreIntent: boolean
 }
 
 // copied from main shard

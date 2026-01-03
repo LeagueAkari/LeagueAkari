@@ -259,7 +259,7 @@
 
         <!-- cs -->
         <div v-else-if="column.name === 'cs'" :class="column.class">
-          <div class="text-xs">{{ participant.cs }} CS</div>
+          <div class="text-xs">{{ participant.cs }} {{ t('MatchCard.teamTable.cs') }}</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
             {{ t('MatchCard.teamTable.perMinuteSuffix') }}
