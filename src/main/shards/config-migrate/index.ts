@@ -20,6 +20,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
   static MIGRATION_FROM_135 = 'akari-migration-from-1.3.5_patch1'
   static MIGRATION_FROM_140 = 'akari-migration-from-1.4.0_patch1'
+  static MIGRATION_FROM_141 = 'akari-migration-from-1.4.1_patch1'
 
   private readonly _log: AkariLogger
 
@@ -475,6 +476,51 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     )
   }
 
+  private async _migrateFrom140(manager: EntityManager) {
+    const hasMigratedSymbol = await manager.findOneBy(Setting, {
+      key: Equal(ConfigMigrateMain.MIGRATION_FROM_141)
+    })
+
+    if (hasMigratedSymbol) {
+      return
+    }
+
+    this._log.info('Start migrating settings', ConfigMigrateMain.MIGRATION_FROM_141)
+
+    // Migrate normalBounds to trackedBounds
+    await this._do(
+      manager,
+      'window-manager-main/main-window/normalBounds',
+      'window-manager-main/main-window/trackedBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/opgg-window/normalBounds',
+      'window-manager-main/opgg-window/trackedBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/aux-window/normalBounds',
+      'window-manager-main/aux-window/trackedBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/ongoing-game-window/normalBounds',
+      'window-manager-main/ongoing-game-window/trackedBounds'
+    )
+    await this._do(
+      manager,
+      'window-manager-main/cd-timer-window/normalBounds',
+      'window-manager-main/cd-timer-window/trackedBounds'
+    )
+
+    await manager.save(
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_141, ConfigMigrateMain.MIGRATION_FROM_141)
+    )
+
+    this._log.info(`Migration completed, to ${ConfigMigrateMain.MIGRATION_FROM_141}`)
+  }
+
   async onInit() {
     try {
       await this._st.dataSource.transaction(async (manager) => {
@@ -482,6 +528,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
         await this._migrateFrom134(manager)
         await this._migrateFrom135(manager)
         await this._migrateFrom137(manager)
+        await this._migrateFrom140(manager)
       })
     } catch (error) {
       this._log.error('Failed to migrate settings', error)

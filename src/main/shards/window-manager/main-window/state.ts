@@ -48,7 +48,7 @@ export class MainWindowState {
 
   show: boolean = true
 
-  normalBounds: Rectangle | null
+  trackedBounds: Rectangle | null
 
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
@@ -66,13 +66,13 @@ export class MainWindowState {
     this.show = show
   }
 
-  setNormalBounds(bounds: Rectangle | null) {
-    this.normalBounds = bounds
+  setTrackedBounds(bounds: Rectangle | null) {
+    this.trackedBounds = bounds
   }
 
   constructor() {
     makeAutoObservable(this, {
-      normalBounds: observable.ref
+      trackedBounds: observable.ref
     })
   }
 }

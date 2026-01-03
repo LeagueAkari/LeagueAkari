@@ -39,7 +39,7 @@ export interface BaseAkariWindowBasicState {
 
   show: boolean
 
-  normalBounds: Electron.Rectangle | null
+  trackedBounds: Electron.Rectangle | null
 }
 
 export interface AkariBaseWindowConfig<TSettings extends BaseAkariWindowBasicSetting> {
@@ -270,13 +270,13 @@ export abstract class BaseAkariWindow<
     )
 
     this._context.mobx.reaction(
-      () => this.state.normalBounds,
+      () => this.state.trackedBounds,
       (bounds) => {
         if (bounds) {
-          this._setting._saveToStorage('normalBounds', bounds)
+          this._setting._saveToStorage('trackedBounds', bounds)
         }
       },
-      { delay: 100, equals: comparer.shallow }
+      { delay: 1000, equals: comparer.shallow }
     )
 
     this._context.mobx.reaction(
@@ -354,13 +354,13 @@ export abstract class BaseAkariWindow<
 
     runInAction(() => (this.state.focus = this._window!.isFocused() ? 'focused' : 'blurred'))
 
-    if (this.state.normalBounds) {
+    if (this.state.trackedBounds) {
       if (this._config.rememberPosition && this._config.rememberSize) {
-        this._window.setBounds(this.state.normalBounds)
+        this._window.setContentBounds(this.state.trackedBounds)
       } else if (this._config.rememberPosition) {
-        this._window.setPosition(this.state.normalBounds.x, this.state.normalBounds.y)
+        this._window.setPosition(this.state.trackedBounds.x, this.state.trackedBounds.y)
       } else if (this._config.rememberSize) {
-        this._window.setSize(this.state.normalBounds.width, this.state.normalBounds.height)
+        this._window.setContentSize(this.state.trackedBounds.width, this.state.trackedBounds.height)
         this._window.center()
       }
     }
@@ -476,18 +476,27 @@ export abstract class BaseAkariWindow<
       this._window = null
     })
 
-    this._window.on('move', () => {
-      if (this._window) {
-        const bounds = this._window.getNormalBounds()
-        runInAction(() => (this.state.normalBounds = bounds))
+    const saveBounds = () => {
+      if (!this._window) {
+        return
       }
+
+      if (
+        !this._window.isMinimized() &&
+        !this._window.isMaximized() &&
+        !this._window.isFullScreen()
+      ) {
+        const bounds = this._window.getContentBounds()
+        runInAction(() => (this.state.trackedBounds = bounds))
+      }
+    }
+
+    this._window.on('move', () => {
+      saveBounds()
     })
 
     this._window.on('resize', () => {
-      if (this._window) {
-        const bounds = this._window.getNormalBounds()
-        runInAction(() => (this.state.normalBounds = bounds))
-      }
+      saveBounds()
     })
 
     this._window.on('page-title-updated', (e) => e.preventDefault())
@@ -649,7 +658,7 @@ export abstract class BaseAkariWindow<
       'ready',
       'status',
       'show',
-      'normalBounds',
+      'trackedBounds',
       ...this.getStatePropKeys()
     ])
 
@@ -660,9 +669,9 @@ export abstract class BaseAkariWindow<
       ...this.getSettingPropKeys()
     ])
 
-    const bounds = await this._setting._getFromStorage('normalBounds')
+    const bounds = await this._setting._getFromStorage('trackedBounds')
     if (bounds) {
-      runInAction(() => (this.state.normalBounds = bounds))
+      runInAction(() => (this.state.trackedBounds = bounds))
     }
 
     this._baseWindowIpcCall()
