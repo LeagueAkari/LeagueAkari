@@ -1105,6 +1105,7 @@ MatchCard:
     noSkillUpgrades: No skill upgrades
     itemPurchases: Item Purchases
     noItemPurchases: No item purchases
+    evolved: Evolved
 
   detailsTab:
     gameId: Game ID

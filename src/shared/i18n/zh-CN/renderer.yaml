@@ -1105,6 +1105,7 @@ MatchCard:
     noSkillUpgrades: 无技能升级
     itemPurchases: 装备购买
     noItemPurchases: 无装备购买
+    evolved: 已进化
 
   detailsTab:
     gameId: 游戏 ID

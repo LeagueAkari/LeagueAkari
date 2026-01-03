@@ -49,7 +49,7 @@
             <div
               v-if="sk.levelUpType === 'EVOLVE'"
               class="relative flex size-6 cursor-default items-center justify-center rounded-full border border-solid border-rose-500 bg-rose-500/60 text-xs font-bold dark:border-rose-400/60 dark:bg-rose-400/60"
-              :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (Evolved) - ${formatMilliseconds(sk.timestamp)}`"
+              :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (${t('MatchCard.buildsTab.evolved')}) - ${formatMilliseconds(sk.timestamp)}`"
             >
               {{
                 SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
