@@ -133,7 +133,7 @@
         <NInputNumber
           style="width: 100px"
           size="small"
-          :min="1"
+          :min="2"
           :value="ogs.settings.premadeTeamInferMatchCountThreshold"
           @update:value="(val) => og.setPremadeTeamInferMatchCountThreshold(val || 5)"
         />

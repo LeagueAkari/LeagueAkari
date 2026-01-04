@@ -23,7 +23,7 @@ const { tabs = [], winResult } = defineProps<{
   winResult?: string
 }>()
 
-const selectedTab = defineModel<number | string>('selectedTab', { required: false, default: 1 })
+const selectedTab = defineModel<number | string>('selectedTab', { required: false })
 
 const handleTabClick = (tab: number | string) => {
   selectedTab.value = tab

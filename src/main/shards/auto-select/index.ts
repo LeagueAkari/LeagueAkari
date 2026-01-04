@@ -324,28 +324,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       }
     )
 
-    this._mobx.reaction(
-      () => this.state.expectedBans,
-      (bans) => {
-        this._log.error(
-          '[DEBUG] expectedBans',
-          bans?.map((b) => `${this._championNameWithId(b.id)} (${b.status})`)
-        )
-      },
-      { fireImmediately: true }
-    )
-
-    this._mobx.reaction(
-      () => this.state.expectedPicks,
-      (picks) => {
-        this._log.error(
-          '[DEBUG] expectedPicks',
-          picks?.map((p) => `${this._championNameWithId(p.id)} (${p.status})`)
-        )
-      },
-      { fireImmediately: true }
-    )
-
     const pickContext = computed(
       () => {
         const pickConfig = this.state.activeGroupConfig
@@ -845,12 +823,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.state._delayedChampionSwap.tradeId !== tradeId ||
           this.state._delayedChampionSwap.requesterChampionId !== requesterChampionId
         ) {
-          this._log.error('[DEBUG]', this.state._delayedChampionSwap, '=>', {
-            action,
-            tradeId,
-            requesterChampionId
-          })
-
           this._sendCelebration(
             i18next.t(`auto-select-main.${action}-champion-swap`, {
               seconds: (delayMs / 1e3).toFixed(1),

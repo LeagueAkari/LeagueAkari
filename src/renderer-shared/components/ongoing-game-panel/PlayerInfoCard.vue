@@ -868,7 +868,7 @@ const getMatchItemThemeClasses = (match: {
 
   if (isNeutral) {
     return {
-      bg: 'bg-[rgba(200,200,200,0.45)] dark:bg-[rgba(255,255,255,0.20)]',
+      bg: 'bg-[rgba(200,200,200,0.45)] dark:bg-[rgba(255,255,255,0.15)]',
       border: 'border-[rgba(200,200,200,1)] dark:border-[rgba(255,255,255,0.6)]',
       text: 'text-black dark:text-white',
       resultText: 'text-black dark:text-white/80'
