@@ -120,7 +120,7 @@ import {
   NScrollbar,
   NSpin
 } from 'naive-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { Line } from 'vue-chartjs'
 
 import { useMatchCard } from '../context'
@@ -155,10 +155,6 @@ const selectedPlayers = ref<number[]>([])
 watchEffect(() => {
   selectedTeams.value = teams.value.teamStatsArr.map((team) => team.teamIdentifier)
 })
-
-if (!details.value && !loadingDetails.value) {
-  onLoadDetails(basicInfo.value.gameId)
-}
 
 const metricConfigs = computed(() => ({
   gold: {
@@ -426,6 +422,16 @@ const chartOptions = computed(() => {
     }
   }
 })
+
+watch(
+  [details, loadingDetails, () => basicInfo.value.gameId],
+  ([d, l, g]) => {
+    if (!d && !l) {
+      onLoadDetails(g)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped></style>

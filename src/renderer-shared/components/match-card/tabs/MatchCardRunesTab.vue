@@ -74,7 +74,7 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NScrollbar } from 'naive-ui'
-import { computed, watchEffect } from 'vue'
+import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
 import { getTeamColor } from '../utils/theme'
@@ -188,8 +188,4 @@ const getPerkStyleIndicatorColor = (styleId: number) => {
       return 'bg-gray-500/80'
   }
 }
-
-watchEffect(() => {
-  console.log(playerPerks.value)
-})
 </script>

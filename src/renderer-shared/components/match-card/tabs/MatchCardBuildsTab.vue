@@ -167,7 +167,7 @@ import {
 import { ArrowUp } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NScrollbar, NSpin } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
@@ -282,7 +282,13 @@ const collected = computed(() => {
 const position = usePosition()
 const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
 
-if (!details.value && !loadingDetails.value) {
-  onLoadDetails(basicInfo.value.gameId)
-}
+watch(
+  [details, loadingDetails, () => basicInfo.value.gameId],
+  ([d, l, g]) => {
+    if (!d && !l) {
+      onLoadDetails(g)
+    }
+  },
+  { immediate: true }
+)
 </script>

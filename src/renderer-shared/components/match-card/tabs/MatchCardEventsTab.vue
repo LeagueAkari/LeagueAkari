@@ -255,7 +255,7 @@ import {
   NTimeline,
   NTimelineItem
 } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import Inhibitor from '../icons/Inhibitor.vue'
@@ -283,10 +283,6 @@ const selectedFilters = ref<(typeof SUPPORTED_EVENT_TYPES)[number][]>([
 ])
 
 const formatDuration = (timestamp: number) => dayjs.duration(timestamp).format('mm:ss:SSS')
-
-if (!details.value && !loadingDetails.value) {
-  onLoadDetails(basicInfo.value.gameId)
-}
 
 const canViewPosition = computed(() => {
   return [12, 11, 21].includes(basicInfo.value.mapId)
@@ -374,6 +370,16 @@ const towerType = useTowerType()
 const laneType = useLaneType()
 
 const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
+
+watch(
+  [details, loadingDetails, () => basicInfo.value.gameId],
+  ([d, l, g]) => {
+    if (!d && !l) {
+      onLoadDetails(g)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
