@@ -88,9 +88,20 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
   private _handlePeriodicCheck() {
     this._mobx.reaction(
-      () => [this.settings.autoDownloadUpdates, this._rc.state.latestRelease] as const,
-      ([yes, release]) => {
-        if (yes && release && release.isNew && release.archiveFile) {
+      () =>
+        [
+          this.settings.autoDownloadUpdates,
+          this.settings.ignoreVersion,
+          this._rc.state.latestRelease
+        ] as const,
+      ([yes, ignoreVersion, release]) => {
+        if (
+          yes &&
+          release &&
+          release.isNew &&
+          release.archiveFile &&
+          release.tag_name !== ignoreVersion
+        ) {
           this._startUpdateProcess(
             release as LatestReleaseWithMetadata & { archiveFile: GithubApiAsset }
           )
