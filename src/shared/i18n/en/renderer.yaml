@@ -171,7 +171,7 @@ AppSettings:
           title: SGP API
           feature1: Fast query performance with quick response
           feature2: Provides more detailed match data
-          feature3: Supports cross-region match history lookup
+          feature3: Supports cross-region match history lookup on mainland servers
           warning: When using VPN/accelerator to play on foreign servers, connection may fail or be extremely slow
         lcu:
           title: LCU API (Client Local)

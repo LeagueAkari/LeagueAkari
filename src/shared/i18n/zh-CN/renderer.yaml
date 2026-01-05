@@ -172,7 +172,7 @@ AppSettings:
           title: SGP API
           feature1: 查询速度快，响应迅速
           feature2: 提供更详细的对局数据
-          feature3: 支持跨大区查询战绩
+          feature3: 支持大陆服务器跨大区查询战绩
           warning: 在中国大陆使用加速器游玩外服时，可能无法连接或响应缓慢
         lcu:
           title: LCU API (客户端本地)
