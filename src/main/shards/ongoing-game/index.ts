@@ -1154,10 +1154,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       })
       .flat(2)
 
+    // matchesByTeams 可能包含多个相同的对局，去重
+    const deduplicatedMap = new Map<string, { players: string[]; id: string }>(
+      matchesByTeams.map((m) => [m.id, m])
+    )
+
     // 用到了将近两年前的工具，我选择不去动它，只做转换
     // 此方法追溯到 v1.1.x
     const calculated = calculateTogetherTimes(
-      matchesByTeams,
+      Array.from(deduplicatedMap.values()),
       Object.values(this.state.teams).flat(),
       this.settings.premadeTeamInferMatchCountThreshold
     )

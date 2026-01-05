@@ -1,5 +1,11 @@
 <template>
-  <div class="h-full">
+  <div
+    class="h-(--la-ongoing-game-height) w-(--la-ongoing-game-width)"
+    :style="{
+      '--la-ongoing-game-height': contentHeight + 'px',
+      '--la-ongoing-game-width': contentWidth + 'px'
+    }"
+  >
     <!-- teams template -->
     <DefineOngoingTeam v-slot="{ players, team, teamColor, teamName }">
       <div class="flex min-h-0 flex-1 flex-col gap-2">
