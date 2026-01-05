@@ -1,6 +1,6 @@
 # League Akari Distribution Branch
 
-The current version is v1.4.0.
+The latest version is v1.4.2.
 
 This branch is dedicated to distributing the binary releases of the League Akari project.
 
