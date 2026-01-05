@@ -22,6 +22,7 @@
             :premade-info="mapPremadePlayers(team)"
             :summoners="mapSummoners(team)"
             :champion-selections="ogs.championSelections"
+            @to-summoner="emits('toSummoner', $event)"
           />
         </div>
 
@@ -129,8 +130,6 @@ import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useAppContext } from '@main-window/context'
-
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
@@ -139,6 +138,13 @@ import {
   useIdleState
 } from './ongoing-game-utils'
 import TeamTagsArea from './widgets/TeamTagsArea.vue'
+
+const props = defineProps<{
+  /** 容器参考宽度，用于计算列数 */
+  contentWidth: number
+  /** 容器参考高度，用于计算两队模式下的高度样式 */
+  contentHeight: number
+}>()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
@@ -152,8 +158,6 @@ const { t } = useTranslation()
 
 const og = useInstance(OngoingGameRenderer)
 const ogs = useOngoingGameStore()
-
-const { contentWidth, contentHeight } = useAppContext()
 
 const isInIdleState = useIdleState()
 
@@ -407,7 +411,7 @@ const columnsNeed = computed(() => {
     .reduce((a, b) => Math.max(a, b), 0)
 
   const maxAllowed = [8, 7, 6, 5, 4, 3].find(
-    (col) => contentWidth.value > FIXED_CARD_WIDTH_PX_NUMBER * (col + 0.25)
+    (col) => props.contentWidth > FIXED_CARD_WIDTH_PX_NUMBER * (col + 0.25)
   )
 
   return Math.min(maxAllowed || 2, teamColumns)
@@ -438,7 +442,7 @@ const teamsContainerStyles = computed(() => {
   // 2. 只有一排显示
   if (isTwoTeamsMode.value && linesPerTeam.value === 1) {
     return {
-      height: contentHeight.value + 'px',
+      height: props.contentHeight + 'px',
       maxHeight: '1200px',
       minHeight: '500px'
     }

@@ -7,6 +7,7 @@ import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuGameSummary, LcuOrSgpGameSummary, SgpGameSummary } from '@shared/data-adapter/wrapper'
+import { EncounteredGame } from '@shared/types/shards/saved-player'
 import {
   InjectionKey,
   Ref,
@@ -25,16 +26,8 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { ENCOUNTERED_GAMES_PAGE_SIZE } from './constants'
 
-export interface EncounteredGame {
-  id: number
-  gameId: number
-  puuid: string
-  selfPuuid: string
-  region: string
-  rsoPlatformId: string
-  updateAt: Date
-  queueType: string
-}
+// Re-export for backward compatibility
+export type { EncounteredGame }
 
 export type EncounteredGameContext = {
   pagedGames: Readonly<Ref<PagedEncounteredGames | null>>

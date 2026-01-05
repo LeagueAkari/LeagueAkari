@@ -84,7 +84,7 @@
             </div>
           </template>
         </template>
-        <TinyPlayerChampionList :list="p.players" />
+        <TinyPlayerChampionList :list="p.players" @to-summoner="emits('toSummoner', $event)" />
       </NPopover>
     </div>
   </div>
@@ -126,6 +126,10 @@ const {
   }
   summoners?: Record<string, SummonerInfo>
   championSelections?: Record<string, number>
+}>()
+
+const emits = defineEmits<{
+  toSummoner: [puuid: string]
 }>()
 
 interface WinRateTeamInfo {

@@ -5,7 +5,7 @@
       <div
         class="flex cursor-pointer items-end gap-0.5"
         v-if="p.gameName"
-        @click="navigateToTabByPuuid(p.puuid)"
+        @click="emits('toSummoner', p.puuid)"
       >
         <div
           class="text-[13px] font-bold text-black/90 transition-colors hover:text-black dark:text-white/80 dark:hover:text-white"
@@ -19,9 +19,6 @@
 
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useInstance } from '@renderer-shared/shards'
-
-import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { list = [] } = defineProps<{
   list?: Array<{
@@ -32,7 +29,7 @@ const { list = [] } = defineProps<{
   }>
 }>()
 
-const pt = useInstance(PlayerTabsRenderer)
-
-const { navigateToTabByPuuid } = pt.useNavigateToTab()
+const emits = defineEmits<{
+  toSummoner: [puuid: string]
+}>()
 </script>

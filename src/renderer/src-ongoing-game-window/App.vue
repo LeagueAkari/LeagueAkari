@@ -2,6 +2,7 @@
   <Transition name="one-way-fade">
     <div
       v-show="ogws.fakeShow"
+      ref="containerEl"
       class="box-border h-full rounded-lg bg-(--la-background-color-primary) opacity-90"
     >
       <MatchPreviewer
@@ -13,7 +14,12 @@
         :hide-privacy="as.settings.streamerMode"
       />
       <SetupInAppScope />
-      <OngoingGamePanel @show-game="handleShowGame" @show-game-by-id="handleShowGameById" />
+      <OngoingGamePanel
+        :content-width="containerWidth"
+        :content-height="containerHeight"
+        @show-game="handleShowGame"
+        @show-game-by-id="handleShowGameById"
+      />
     </div>
   </Transition>
 </template>
@@ -26,9 +32,14 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { ref, shallowRef, watch } from 'vue'
+import { useElementSize } from '@vueuse/core'
+import { ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 const ogws = useOngoingGameWindowStore()
+
+const containerEl = useTemplateRef('containerEl')
+const { width: containerWidth, height: containerHeight } = useElementSize(containerEl)
+
 const as = useAppCommonStore()
 
 const showingGame = shallowRef<{

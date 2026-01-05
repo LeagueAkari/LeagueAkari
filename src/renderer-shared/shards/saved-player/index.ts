@@ -1,8 +1,7 @@
 import { Dep, Shard } from '@shared/akari-shard'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { EncounteredGame } from '@shared/types/shards/saved-player'
 import LRUMap from 'quick-lru'
-
-import { EncounteredGame } from '@main-window/views/player-tabs/player-tab/data/encountered-games'
 
 import { AkariIpcRenderer } from '../ipc'
 

@@ -10,6 +10,8 @@
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
     />
     <OngoingGamePanel
+      :content-width="contentWidth"
+      :content-height="contentHeight"
       @to-summoner="navigateToTabByPuuid"
       @show-game="handleShowGame"
       @show-game-by-id="handleShowGameById"
@@ -25,7 +27,10 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ref, shallowRef } from 'vue'
 
+import { useAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+
+const { contentWidth, contentHeight } = useAppContext()
 
 const pt = useInstance(PlayerTabsRenderer)
 
