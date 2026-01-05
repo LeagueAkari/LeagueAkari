@@ -448,7 +448,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
             release: rcs.latestRelease,
             show: sns.showNewReleaseModal,
             ignoreVersion: sus.settings.ignoreVersion,
-            isUpdating: sus.updateProgressInfo !== null,
+            updateProgressInfo: sus.updateProgressInfo,
             'onUpdate:show': (v) => (sns.showNewReleaseModal = v),
             onIgnoreVersion: (version, ignore) => {
               su.setIgnoreVersion(ignore ? version : null)

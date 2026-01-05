@@ -1590,6 +1590,11 @@ UpdateModal:
   currentVersion: 'Current Version: {{version}}'
   releasePage: Release Page
   startUpdate: Start Update
+  downloading: 'Downloading {{progress}}%'
+  unpacking: 'Unpacking {{progress}}%'
+  waitingForRestart: Update on Close
+  downloadFailed: Download Failed
+  unpackFailed: Unpack Failed
   externalDownload: Download from GitHub / Gitee
   noUpdateMd: No release notes
   ignoreThisVersion: Ignore This Version

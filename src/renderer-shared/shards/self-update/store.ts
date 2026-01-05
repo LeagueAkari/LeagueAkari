@@ -1,26 +1,6 @@
+import { LastUpdateResult, UpdateProgressInfo } from '@shared/types/shards/self-update'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
-
-// copied from main shard
-interface UpdateProgressInfo {
-  phase: 'downloading' | 'unpacking' | 'waiting-for-restart' | 'download-failed' | 'unpack-failed'
-
-  downloadingProgress: number
-
-  averageDownloadSpeed: number
-
-  downloadTimeLeft: number
-
-  fileSize: number
-
-  unpackingProgress: number
-}
-
-// copied from main shard
-interface LastUpdateResult {
-  success: boolean
-  reason: string
-}
 
 export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () => {
   const settings = shallowReactive({

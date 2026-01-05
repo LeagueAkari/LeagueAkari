@@ -53,11 +53,12 @@
         <NButton
           v-if="release.isNew && release.archiveFile"
           :loading="isUpdating"
+          :disabled="isUpdating"
           size="small"
           type="primary"
           @click="emits('startDownload')"
         >
-          {{ t('UpdateModal.startUpdate') }}
+          {{ updateButtonText }}
         </NButton>
       </div>
     </div>
@@ -68,6 +69,7 @@
 import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
 import { LatestReleaseWithMetadata } from '@renderer-shared/shards/remote-config/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
+import { UpdateProgressInfo } from '@shared/types/shards/self-update'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
@@ -75,7 +77,7 @@ import { computed } from 'vue'
 const props = defineProps<{
   release: LatestReleaseWithMetadata | null
   ignoreVersion: string | null
-  isUpdating: boolean
+  updateProgressInfo: UpdateProgressInfo | null
 }>()
 
 const emits = defineEmits<{
@@ -91,6 +93,33 @@ const markdownHtmlText = computed(() => {
       ? props.release.detailedChangelog || props.release.body || t('UpdateModal.noUpdateMd')
       : t('UpdateModal.noUpdateMd')
   )
+})
+
+const isUpdating = computed(() => props.updateProgressInfo !== null)
+
+const updateButtonText = computed(() => {
+  if (!props.updateProgressInfo) {
+    return t('UpdateModal.startUpdate')
+  }
+
+  switch (props.updateProgressInfo.phase) {
+    case 'downloading':
+      return t('UpdateModal.downloading', {
+        progress: (props.updateProgressInfo.downloadingProgress * 100).toFixed(0)
+      })
+    case 'unpacking':
+      return t('UpdateModal.unpacking', {
+        progress: (props.updateProgressInfo.unpackingProgress * 100).toFixed(0)
+      })
+    case 'waiting-for-restart':
+      return t('UpdateModal.waitingForRestart')
+    case 'download-failed':
+      return t('UpdateModal.downloadFailed')
+    case 'unpack-failed':
+      return t('UpdateModal.unpackFailed')
+    default:
+      return t('UpdateModal.startUpdate')
+  }
 })
 
 const show = defineModel<boolean>('show', { default: false })

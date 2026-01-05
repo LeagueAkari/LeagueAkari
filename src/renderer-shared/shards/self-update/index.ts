@@ -121,7 +121,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
                   label: () => t('self-update-renderer.self-update-task.closeButton'),
                   callback: () => {
                     wm.mainWindow.closeForce()
-                  }
+                  },
+                  buttonProps: { type: 'primary' }
                 }
               ]
             })

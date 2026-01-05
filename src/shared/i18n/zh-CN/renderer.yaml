@@ -1590,6 +1590,11 @@ UpdateModal:
   releasePage: 发布页面
   externalDownload: 从 GitHub / Gitee 下载
   startUpdate: 立即更新
+  downloading: '正在下载 {{progress}}%'
+  unpacking: '正在解压 {{progress}}%'
+  waitingForRestart: 关闭后更新
+  downloadFailed: 下载失败
+  unpackFailed: 解压失败
   noUpdateMd: 无发布说明
   ignoreThisVersion: 忽略此版本
 
