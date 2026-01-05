@@ -66,7 +66,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._setting = _settingFactory.register(
       SelfUpdateMain.id,
       {
-        autoDownloadUpdates: { default: this.settings.autoDownloadUpdates }
+        autoDownloadUpdates: { default: this.settings.autoDownloadUpdates },
+        ignoreVersion: { default: this.settings.ignoreVersion }
       },
       this.settings
     )
