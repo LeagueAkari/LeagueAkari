@@ -6,7 +6,7 @@ export type WinResultInfo = {
 }
 
 export function computeWinResult(
-  endOfGameResult: string,
+  endOfGameResult: string | undefined,
   participant: {
     gameEndedInEarlySurrender: boolean
     gameEndedInSurrender: boolean
@@ -15,7 +15,7 @@ export function computeWinResult(
   }
 ): WinResultInfo {
   // 目前已知有：Abort_AntiCheatExit, Abort_Unexpected
-  if (endOfGameResult.startsWith('Abort_')) {
+  if (endOfGameResult && endOfGameResult.startsWith('Abort_')) {
     return { isSurrender: false, result: 'abort' }
   }
 

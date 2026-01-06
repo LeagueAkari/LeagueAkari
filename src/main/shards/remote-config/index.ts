@@ -352,25 +352,34 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 手动执行一次独立的版本更新检查。这不会计入到全局的 loading 状态中
+   * 手动执行一次独立的版本更新检查
    *
-   * 但是如果查询成功，则会立即替换当前的 latestRelease，同时重启定时任务
+   * 如果查询成功，则会立即替换当前的 latestRelease，同时重启定时任务
    */
   async updateLatestReleaseManually() {
+    if (this.state.isUpdatingLatestRelease) {
+      return this.state.latestRelease
+    }
+
+    this.state.setUpdatingLatestRelease(true)
     this._latestReleaseTask.cancel()
 
-    this._log.info('Updating Latest Release.. Manually', this.settings.preferredSource)
+    try {
+      this._log.info('Updating Latest Release.. Manually', this.settings.preferredSource)
 
-    const { data } = await this._repo.getLatestRelease({
-      source: this.settings.preferredSource,
-      repo: 'akari'
-    })
+      const { data } = await this._repo.getLatestRelease({
+        source: this.settings.preferredSource,
+        repo: 'akari'
+      })
 
-    const release = await this._addMoreInfoToRelease(data)
-    this.state.setLatestRelease(release)
-    this._latestReleaseTask.start()
+      const release = await this._addMoreInfoToRelease(data)
+      this.state.setLatestRelease(release)
+      this._latestReleaseTask.start()
 
-    return release
+      return release
+    } finally {
+      this.state.setUpdatingLatestRelease(false)
+    }
   }
 
   /**

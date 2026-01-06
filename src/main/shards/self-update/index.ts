@@ -524,7 +524,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         return { result: 'no-updates' }
       }
     } catch (error) {
-      return { result: 'failed', reason: error }
+      return { result: 'failed', reason: error instanceof Error ? error.message : String(error) }
     }
   }
 
