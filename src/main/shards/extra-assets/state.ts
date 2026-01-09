@@ -1,17 +1,23 @@
 import { BalanceType } from '@shared/data-sources/fandom'
-import { GtimgHeroListJs } from '@shared/data-sources/gtimg'
+import { GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class ExtraAssetsStateGtimg {
   heroList: GtimgHeroListJs | null
+  kiwiAugments: GtimgKiwiAugments[] | null
 
   setHeroList(heroList: GtimgHeroListJs | null) {
     this.heroList = heroList
   }
 
+  setKiwiAugments(kiwiAugments: GtimgKiwiAugments[] | null) {
+    this.kiwiAugments = kiwiAugments
+  }
+
   constructor() {
     makeAutoObservable(this, {
-      heroList: observable.ref
+      heroList: observable.ref,
+      kiwiAugments: observable.ref
     })
   }
 }

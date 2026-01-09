@@ -32,9 +32,11 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   }
 
   static GTIMG_HERO_LIST_UPDATE_INTERVAL = 3 * 60 * 60 * 1000 // 3 hour
+  static GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL = 3 * 60 * 60 * 1000 // 3 hour
   static FANDOM_BALANCE_UPDATE_INTERVAL = 4 * 60 * 60 * 1000 // 4 hour
 
   private _gtimgTask = new TimeoutTask(this._updateGtimgHeroList.bind(this))
+  private _gtimgKiwiAugmentsTask = new TimeoutTask(this._updateGtimgKiwiAugments.bind(this))
   private _fandomTask = new TimeoutTask(this._updateFandomBalance.bind(this))
 
   private async _updateGtimgHeroList() {
@@ -46,6 +48,20 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
       this._log.warn(`Gtimg: failed to update hero list, will retry`, error)
     } finally {
       this._gtimgTask.start({ delay: ExtraAssetsMain.GTIMG_HERO_LIST_UPDATE_INTERVAL })
+    }
+  }
+
+  private async _updateGtimgKiwiAugments() {
+    try {
+      this._log.info('Gtimg: updating "kiwi_augments"')
+      const kiwiAugments = await this._gtimgApi.getKiwiAugments()
+      this.gtimg.setKiwiAugments(kiwiAugments)
+    } catch (error) {
+      this._log.warn('Gtimg: failed to update kiwi augments', error)
+    } finally {
+      this._gtimgKiwiAugmentsTask.start({
+        delay: ExtraAssetsMain.GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL
+      })
     }
   }
 
@@ -84,10 +100,11 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._mobx.propSync(ExtraAssetsMain.id, 'gtimg', this.gtimg, ['heroList'])
+    this._mobx.propSync(ExtraAssetsMain.id, 'gtimg', this.gtimg, ['heroList', 'kiwiAugments'])
     this._mobx.propSync(ExtraAssetsMain.id, 'fandom', this.fandom, ['balance'])
 
     this._updateGtimgHeroList()
+    this._updateGtimgKiwiAugments()
     this._updateFandomBalance()
     this._handleUpdateHttpProxy()
   }

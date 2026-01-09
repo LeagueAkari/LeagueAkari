@@ -14,11 +14,13 @@
         }"
       />
     </template>
-    <div style="width: 180px" class="info">
+
+    <div class="info max-w-[180px]">
       <LcuImage class="image" :src="lcs.gameData.augments[augmentId].augmentSmallIconPath" />
       <div class="right-side">{{ lcs.gameData.augments[augmentId].nameTRA }}</div>
     </div>
-    <div class="rarity" style="max-width: 180px; font-size: 12px">
+
+    <div class="rarity max-w-[180px] text-xs">
       <span
         :class="{
           prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
@@ -30,6 +32,12 @@
       ></span>
       {{ formatRarity(lcs.gameData.augments[augmentId].rarity) }}
     </div>
+
+    <!-- for gtimg source -->
+    <template v-if="as.settings.locale === 'zh-CN' && es.kiwiAugmentsMap?.[augmentId]?.tooltip">
+      <div class="my-2 h-px bg-black/10 dark:bg-white/10" />
+      <div class="max-w-[400px]" v-html="es.kiwiAugmentsMap[augmentId].tooltip" />
+    </template>
   </NPopover>
   <div
     v-else
@@ -40,6 +48,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
@@ -51,6 +61,8 @@ const { size = 20 } = defineProps<{
   size?: number
 }>()
 
+const as = useAppCommonStore()
+const es = useExtraAssetsStore()
 const lcs = useLeagueClientStore()
 
 const { t } = useTranslation()

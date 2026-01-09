@@ -34,6 +34,23 @@ export interface Hero {
   instance_id: string
 }
 
+export interface GtimgKiwiAugments {
+  augmentID: number
+  name_en: string
+  name_cn: string
+  level: Level
+  desc: string
+  tooltip: string
+  large_Icon: string
+  small_Icon: string
+}
+
+export enum Level {
+  KGold = 'kGold',
+  KPrismatic = 'kPrismatic',
+  KSilver = 'kSilver'
+}
+
 export class GtimgApi {
   static BASE_URL = 'https://game.gtimg.cn/'
 
@@ -60,6 +77,13 @@ export class GtimgApi {
   async getHeroList() {
     const { data } = await this._http.get<GtimgHeroListJs>(
       '/images/lol/act/img/js/heroList/hero_list.js'
+    )
+    return data
+  }
+
+  async getKiwiAugments() {
+    const { data } = await this._http.get<GtimgKiwiAugments[]>(
+      'https://game.gtimg.cn/images/lol/act/img/js/kiwi/kiwi_augments.json'
     )
     return data
   }
