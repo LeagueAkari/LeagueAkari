@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
 import axios from 'axios'
 import { app } from 'electron'
 
@@ -13,13 +14,14 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 export class StatisticsMain implements IAkariShardInitDispose {
   static readonly id = 'statistics-main'
 
-  private _http = axios.create({
-    baseURL: 'https://akari-api.hanxven.cc',
-    headers: {
-      'User-Agent': `LeagueAkari/${app.getVersion()}`,
-      'X-Akari-Version': app.getVersion()
-    }
-  })
+  private _api = new AkariApiHttpApiAxiosHelper(
+    axios.create({
+      headers: {
+        'User-Agent': `LeagueAkari/${app.getVersion()}`,
+        'X-Akari-Version': app.getVersion()
+      }
+    })
+  )
 
   private _log: AkariLogger
   private _setting: SetterSettingService
@@ -47,12 +49,12 @@ export class StatisticsMain implements IAkariShardInitDispose {
           return
         }
 
-        const { data } = await this._http.post('/statistics/v1/records', { version })
+        const { data } = await this._api.postStatisticsRecord(version)
         await this._setting._saveToStorage('alreadyCounted', [...countedVersions, version])
         this._log.info('Counter increment success', data)
       } else {
-        const { data: aka } = await this._http.post('/statistics/v1/records', { version: 'v0.0.0' })
-        const { data: ri } = await this._http.post('/statistics/v1/records', { version })
+        const { data: aka } = await this._api.postStatisticsRecord('v0.0.0')
+        const { data: ri } = await this._api.postStatisticsRecord(version)
         await this._setting._saveToStorage('alreadyCounted', [version])
         this._log.info('Counter increment success', aka, ri)
       }

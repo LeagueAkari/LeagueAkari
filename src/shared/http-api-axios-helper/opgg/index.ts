@@ -14,7 +14,9 @@ export class OpggHttpApiAxiosHelper {
   static BASE_URL = 'https://lol-api-champion.op.gg'
 
   constructor(private _http: AxiosInstance) {
-    _http.defaults.baseURL = OpggHttpApiAxiosHelper.BASE_URL
+    if (!_http.defaults.baseURL) {
+      _http.defaults.baseURL = OpggHttpApiAxiosHelper.BASE_URL
+    }
   }
 
   getChampions(
