@@ -6,7 +6,7 @@ export type MatchBasicInfo = {
   gameId: number
   isTwoTeam: boolean
   isCherrySubteam: boolean
-  endOfGameResult: string
+  endOfGameResult?: string
   gameCreation: number
   gameDuration: number
   gameType: string

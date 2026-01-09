@@ -622,13 +622,20 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           }
 
           if (me.team !== 1 && me.team !== 2) {
+            this._log.warn(`Invalid team: ${me.team}, ignoring`)
+
             return
           }
+
+          const isTw2 = this._lc.state.auth?.region === 'TW2'
+          const key = isTw2
+            ? `auto-gameflow-main.aram-team-side-${me.team}-tw`
+            : `auto-gameflow-main.aram-team-side-${me.team}`
 
           this._lc.api.chat
             .chatSend(
               id,
-              `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(`auto-gameflow-main.aram-team-side-${me.team}`)}`,
+              `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(key)}`,
               this.settings.autoSendARAMTeamSideVisibleToTeam ? undefined : 'celebration'
             )
             .catch((error) => {

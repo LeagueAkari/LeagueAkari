@@ -25,7 +25,9 @@ auto-gameflow-main:
   auto-matchmaking-in: 将在 {{seconds}} 秒后自动匹配
   skip-leader: '[$t(common:appName)] 尝试将房主转让'
   aram-team-side-1: '本局游戏你的队伍位于 🟦蓝色方 (↙️ 左下侧)'
+  aram-team-side-1-tw: '本局遊戲你的隊伍位於 🟦藍色方 (↙️ 左下側)'
   aram-team-side-2: '本局游戏你的队伍位于 🟥红色方 (↗️ 右上侧)'
+  aram-team-side-2-tw: '本局遊戲你的隊伍位於 🟥紅色方 (↗️ 右上側)'
   auto-invitation-sent: '[$t(common:appName)] 已向 {{name}} 发送房间邀请'
 
 auto-select-main:

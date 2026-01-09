@@ -9,7 +9,7 @@
           spectatorData.game.gameQueueConfigId
         }}
       </div>
-      <NPopover>
+      <NPopover :disabled="isCrossRegion">
         <template #trigger>
           <NButton
             size="tiny"

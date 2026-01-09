@@ -28,7 +28,7 @@ export const GROUPS = [
         queueTypes: ['NORMAL']
       }
     ],
-    positions: ['default'],
+    positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
     additionalPicks: [],
     additionalBans: [],
     excludedPicks: [-1],
@@ -141,37 +141,38 @@ export const GROUPS = [
         queueTypes: ['NORMAL']
       }
     ],
-    positions: ['default'],
-    additionalPicks: [],
-    additionalBans: [],
-    excludedPicks: [-1],
-    excludedBans: []
-  },
-  {
-    groupId: 'ruby',
-    isCustom: false,
-    targetGameModes: [
-      {
-        gameMode: 'RUBY',
-        queueTypes: ['NIGHTMARE_BOT']
-      },
-      {
-        gameMode: 'RUBY_TRIAL_1',
-        queueTypes: ['NIGHTMARE_BOT']
-      },
-      {
-        gameMode: 'RUBY_TRIAL_2',
-        queueTypes: ['NIGHTMARE_BOT']
-      },
-      {
-        gameMode: 'RUBY_TRIAL_3',
-        queueTypes: ['NIGHTMARE_BOT']
-      }
-    ],
-    positions: ['default'],
+    positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
     additionalPicks: [],
     additionalBans: [],
     excludedPicks: [-1],
     excludedBans: []
   }
+  // 已经下架的模式，暂时无需了
+  // {
+  //   groupId: 'ruby',
+  //   isCustom: false,
+  //   targetGameModes: [
+  //     {
+  //       gameMode: 'RUBY',
+  //       queueTypes: ['NIGHTMARE_BOT']
+  //     },
+  //     {
+  //       gameMode: 'RUBY_TRIAL_1',
+  //       queueTypes: ['NIGHTMARE_BOT']
+  //     },
+  //     {
+  //       gameMode: 'RUBY_TRIAL_2',
+  //       queueTypes: ['NIGHTMARE_BOT']
+  //     },
+  //     {
+  //       gameMode: 'RUBY_TRIAL_3',
+  //       queueTypes: ['NIGHTMARE_BOT']
+  //     }
+  //   ],
+  //   positions: ['default'],
+  //   additionalPicks: [],
+  //   additionalBans: [],
+  //   excludedPicks: [-1],
+  //   excludedBans: []
+  // }
 ]
