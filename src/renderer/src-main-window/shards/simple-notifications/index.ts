@@ -322,6 +322,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
               return
             }
 
+            sns.announcementSummary = a.summary ?? null
+
             // unchanged
             if (p && a.uniqueId === p.uniqueId) {
               return

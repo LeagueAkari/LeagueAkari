@@ -6,6 +6,7 @@ export const useSimpleNotificationsStore = defineStore(
   () => {
     // need globally shared
     const showAnnouncementModal = ref(false)
+    const announcementSummary = ref<string | null>(null)
     const showNewReleaseModal = ref(false)
     const showDeclarationModal = ref(false)
 
@@ -13,6 +14,7 @@ export const useSimpleNotificationsStore = defineStore(
 
     return {
       showAnnouncementModal,
+      announcementSummary,
       showNewReleaseModal,
       showDeclarationModal,
       lastAnnouncementUniqueId

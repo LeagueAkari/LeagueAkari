@@ -21,6 +21,7 @@ interface AnnouncementFrontMatter {
 export interface Announcement {
   content: string
   frontMatter: AnnouncementFrontMatter
+  summary?: string
   uniqueId: string
 }
 

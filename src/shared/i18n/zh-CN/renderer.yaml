@@ -111,6 +111,7 @@ FeatureGuide:
 
 CommonButtons:
   announcement: 公告
+  announcementSummary: 公告摘要
   github: 项目主页
   auxWindow: 小窗口
   opggWindow: OP.GG

@@ -1,7 +1,11 @@
 <template>
   <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
     <!-- announcement -->
-    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+    <NTooltip
+      :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
+      :show="shouldShowAnnouncementTooltip || announcementTooltipShow"
+      @update:show="(v) => (announcementTooltipShow = v)"
+    >
       <template #trigger>
         <div class="common-button-outer" @click="sn.showAnnouncementModal()">
           <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]">
@@ -11,7 +15,21 @@
           </NBadge>
         </div>
       </template>
-      {{ t('CommonButtons.announcement') }}
+
+      <template v-if="sns.announcementSummary">
+        <div>
+          <div class="font-bold text-black/60 dark:text-white/60">
+            {{ t('CommonButtons.announcementSummary') }}
+          </div>
+          <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
+          <div class="max-w-[400px] text-xs text-black/80 dark:text-white/80">
+            {{ sns.announcementSummary }}
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        {{ t('CommonButtons.announcement') }}
+      </template>
     </NTooltip>
 
     <!-- github -->
@@ -107,7 +125,7 @@ import { Window24Filled } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifications/store'
@@ -181,6 +199,17 @@ const shouldShowAnnouncementBadge = computed(() => {
     (rcs.announcement.frontMatter.alertLevel === 'medium' ||
       rcs.announcement.frontMatter.alertLevel === 'high') && // medium or high announcement
     sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId // unread
+  )
+})
+
+const announcementTooltipShow = ref(false)
+const shouldShowAnnouncementTooltip = computed(() => {
+  return (
+    rcs.announcement !== null &&
+    (rcs.announcement.frontMatter.alertLevel === 'low' ||
+      rcs.announcement.frontMatter.alertLevel === 'medium' ||
+      rcs.announcement.frontMatter.alertLevel === 'high') &&
+    sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId
   )
 })
 </script>
