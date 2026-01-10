@@ -93,32 +93,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._handleBanPick()
   }
 
-  /**
-   * 给定目标时间点，计算距离英雄选择阶段开始时，还有多久，最小为 0
-   *
-   * margin: 自动选择会在真正时间点前最晚多久开始执行
-   *
-   * counterCompensation: 抵消客户端的时间空余，但可能造成不及时
-   *
-   * 目前似乎存在问题，暂不使用
-   */
-  // @ts-ignore
-  private _calcShouldWait(offset: number, margin = 0, fill = 0) {
-    const t = this.state.timer
-
-    if (!t || t.isInfinite || !t.phase) {
-      return offset
-    }
-
-    // 达到预期的时间点还有多久
-    const target = Math.max(
-      offset - Math.max(t.totalTimeInPhase - margin - t.adjustedTimeLeftInPhase - fill, 0),
-      0
-    )
-
-    return target
-  }
-
   private _backloggedMessages: (() => string)[] = []
 
   private async _sendCelebration(message: string) {
@@ -203,7 +177,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           move: this.state.move,
           activeAction: this.state.activeAction,
           expectedBan: expectedBan,
-          delayMs: banConfig.ban.delaySeconds * 1e3,
+          delayMs: Math.min(
+            banConfig.ban.delaySeconds * 1e3,
+            this.state.correctedTimer?.remainingMs ?? Infinity
+          ),
           strategy: banConfig.ban.strategy
         } as const
       },
@@ -303,7 +280,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                 })
           )
 
-          this._log.info(`Delayed ban completed=${completed} move=${move} strategy=${strategy}`)
+          this._log.info(
+            `Delayed ban champion=${this._championNameWithId(expectedBan.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
+          )
         }
 
         this.state.setDelayedBan({
@@ -372,7 +351,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           firstUnfinishedPickAction: this.state.firstUnfinishedPickAction,
           activeAction: this.state.activeAction,
           expectedPick: expectedPick,
-          delayMs: pickConfig.pick.delaySeconds * 1e3,
+          delayMs: Math.min(
+            pickConfig.pick.delaySeconds * 1e3,
+            this.state.correctedTimer?.remainingMs ?? Infinity
+          ),
           strategy: pickConfig.pick.strategy
         } as const
       },
@@ -494,6 +476,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                 champion: this._championNameWithId(expectedPick.id)
               })
             )
+
+            this._log.info(
+              `Delayed pick intent champion=${this._championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
+            )
           } else {
             this._sendCelebration(
               completed
@@ -505,6 +491,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
                     seconds: (delayMs / 1e3).toFixed(1),
                     champion: this._championNameWithId(expectedPick.id)
                   })
+            )
+
+            this._log.info(
+              `Delayed pick champion=${this._championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
             )
           }
         }
@@ -638,7 +628,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         return {
           expectedSwap: champion,
-          delayMs: Math.max(0, delayMs)
+          delayMs: Math.min(delayMs, this.state.correctedTimer?.remainingMs ?? Infinity)
         }
       }
 
@@ -743,16 +733,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           (Date.now() - this.state.ongoingChampionSwapCreatedAt)
 
         const timeLeft =
-          this.state.inFinalizationPhase && this.state.timer
-            ? this.state.timer.adjustedTimeLeftInPhase - 2000
-            : 0.114514 * 1e7 // 很大的值
+          this.state.inFinalizationPhase && this.state.correctedTimer
+            ? this.state.correctedTimer.remainingMs
+            : Infinity
 
         const herIndex = expected.findIndex((c) => c.id === herChampionId)
 
         if (herIndex === -1) {
           return {
             action: 'decline',
-            delayMs: Math.min(timeLeft, Math.max(0, delayMs)),
+            delayMs: Math.min(delayMs, timeLeft),
             requesterChampionId: herChampionId,
             tradeId: tradeId
           }

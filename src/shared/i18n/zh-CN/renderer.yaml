@@ -851,7 +851,7 @@ AutoSelect:
 
     delaySeconds:
       label: 延时 (s)
-      description: 自动选择相关功能将根据预设的延时规划时间，包括预选、亮出、锁定或处理交换等。每个阶段都不会超过系统限时
+      description: 自动选择相关功能将根据预设的延时规划时间，包括预选、亮出、锁定或处理交换等。该功能会将延时强制限定在本阶段可操作的最晚时间点
 
     benchMode:
       title: 英雄备战席模式特定 (如果有)
@@ -892,7 +892,7 @@ AutoSelect:
 
     delaySeconds:
       label: 延时 (s)
-      description: 自动禁用相关功能将根据预设的延时规划时间，包括亮出、锁定或处理交换等。每个阶段都不会超过系统限时
+      description: 自动禁用相关功能将根据预设的延时规划时间，包括亮出、锁定或处理交换等。该功能会将延时强制限定在本阶段可操作的最晚时间点
 
 AutoMisc:
   autoReply:

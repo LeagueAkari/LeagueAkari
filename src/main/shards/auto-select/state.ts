@@ -191,6 +191,28 @@ export class AutoSelectState {
     return this.csSession?.timer || null
   }
 
+  /** 经过校准后的 timer */
+  get correctedTimer() {
+    if (!this.timer) {
+      return null
+    }
+
+    if (this.timer.isInfinite) {
+      return null
+    }
+
+    const remainingMs =
+      this.timer.adjustedTimeLeftInPhase - (Date.now() - this.timer.internalNowInEpochMs)
+    const totalMs = this.timer.totalTimeInPhase
+    const elapsedMs = totalMs - remainingMs
+
+    return {
+      remainingMs,
+      totalMs,
+      elapsedMs
+    }
+  }
+
   get benchChampions() {
     return this.csSession?.benchChampions || []
   }
@@ -690,7 +712,7 @@ export class AutoSelectState {
       expectedBans: computed.struct,
       expectedSwaps: computed.struct,
 
-      timer: computed.struct,
+      correctedTimer: computed.struct,
       benchChampions: computed.struct,
       scopedBenchChampions: computed.struct,
 
