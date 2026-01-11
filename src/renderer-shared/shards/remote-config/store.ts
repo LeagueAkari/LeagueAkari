@@ -15,13 +15,17 @@ interface AnnouncementFrontMatter {
    * high: 会弹窗提醒
    */
   alertLevel?: 'low' | 'medium' | 'high'
+
+  /**
+   * 公告摘要
+   */
+  summary?: string
 }
 
 // copied from main
 export interface Announcement {
   content: string
   frontMatter: AnnouncementFrontMatter
-  summary?: string
   uniqueId: string
 }
 

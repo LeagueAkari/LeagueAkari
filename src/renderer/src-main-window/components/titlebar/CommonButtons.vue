@@ -22,8 +22,16 @@
             {{ t('CommonButtons.announcementSummary') }}
           </div>
           <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
-          <div class="max-w-[400px] text-xs text-black/80 dark:text-white/80">
+          <div class="mb-1 max-w-[400px] text-xs text-black/80 dark:text-white/80">
             {{ sns.announcementSummary }}
+          </div>
+          <div class="flex justify-end gap-2">
+            <NButton size="tiny" @click="setRead()">{{
+              t('CommonButtons.announcementOk')
+            }}</NButton>
+            <NButton size="tiny" type="primary" @click="sn.showAnnouncementModal()">{{
+              t('CommonButtons.announcementSeeMore')
+            }}</NButton>
           </div>
         </div>
       </template>
@@ -124,7 +132,7 @@ import { Moon, Notification, Sun } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NIcon, NPopover, NTooltip } from 'naive-ui'
+import { NBadge, NButton, NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
@@ -206,12 +214,17 @@ const announcementTooltipShow = ref(false)
 const shouldShowAnnouncementTooltip = computed(() => {
   return (
     rcs.announcement !== null &&
+    rcs.announcement.frontMatter.summary &&
     (rcs.announcement.frontMatter.alertLevel === 'low' ||
       rcs.announcement.frontMatter.alertLevel === 'medium' ||
       rcs.announcement.frontMatter.alertLevel === 'high') &&
     sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId
   )
 })
+
+const setRead = () => {
+  sns.lastAnnouncementUniqueId = rcs.announcement?.uniqueId ?? null
+}
 </script>
 
 <style scoped>

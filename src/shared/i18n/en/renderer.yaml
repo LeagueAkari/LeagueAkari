@@ -111,6 +111,8 @@ FeatureGuide:
 CommonButtons:
   announcement: Announcement
   announcementSummary: Announcement Summary
+  announcementOk: Got it
+  announcementSeeMore: See More
   github: Project GitHub
   auxWindow: Auxiliary Window
   opggWindow: OP.GG

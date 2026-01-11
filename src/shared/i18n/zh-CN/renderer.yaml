@@ -112,6 +112,8 @@ FeatureGuide:
 CommonButtons:
   announcement: 公告
   announcementSummary: 公告摘要
+  announcementOk: 确认
+  announcementSeeMore: 查看详情
   github: 项目主页
   auxWindow: 小窗口
   opggWindow: OP.GG
