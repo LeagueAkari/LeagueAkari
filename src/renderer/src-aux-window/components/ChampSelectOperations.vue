@@ -4,10 +4,22 @@
       <span class="flex-1 text-xs text-black/70 dark:text-white/70">{{
         t('ChampSelectOperations.dodge.label')
       }}</span>
-      <NButton size="tiny" type="primary" secondary @click="dodgeLoop" :disabled="isLoopingDodge">
-        {{ t('ChampSelectOperations.dodge.button') }}
-        <template v-if="iteration">({{ iteration >= 1000 ? '999+' : iteration }})</template>
-      </NButton>
+      <NPopconfirm
+        :disabled="isLoopingDodge"
+        :negative-text="t('ChampSelectOperations.dodge.negativeText')"
+        :positive-text="t('ChampSelectOperations.dodge.positiveText')"
+        :negative-button-props="{ size: 'tiny' }"
+        :positive-button-props="{ size: 'tiny', type: 'warning' }"
+        @positive-click="dodgeLoop"
+      >
+        <template #trigger>
+          <NButton size="tiny" type="primary" secondary :disabled="isLoopingDodge">
+            {{ t('ChampSelectOperations.dodge.button') }}
+            <template v-if="iteration">({{ iteration >= 1000 ? '999+' : iteration }})</template>
+          </NButton>
+        </template>
+        {{ t('ChampSelectOperations.dodge.popconfirm') }}
+      </NPopconfirm>
       <NButton
         v-if="isLoopingDodge"
         size="tiny"
@@ -39,7 +51,7 @@ import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSwitch } from 'naive-ui'
+import { NButton, NCard, NPopconfirm, NSwitch } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()

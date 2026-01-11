@@ -2,7 +2,7 @@
   <div class="automation-page">
     <div class="page-sections">
       <div class="section-icon-container">
-        <NIcon class="section-icon"><AiStatusIcon /></NIcon>
+        <NIcon class="section-icon" :component="AiStatus" />
         <span class="session-label">{{ t('Automation.title') }}</span>
       </div>
       <NTabs
@@ -11,7 +11,10 @@
         size="medium"
       >
         <NTab v-for="tab in tabs" :key="tab.key" :name="tab.key" :tab="tab.name">
-          <span class="tab-name">{{ tab.name }}</span>
+          <div class="tab-content">
+            <NIcon class="tab-icon" :component="tab.icon" />
+            <span class="tab-name">{{ tab.name }}</span>
+          </div>
         </NTab>
       </NTabs>
     </div>
@@ -29,9 +32,12 @@
 </template>
 
 <script setup lang="tsx">
-import { AiStatus as AiStatusIcon } from '@vicons/carbon'
+import { SettingFilled } from '@vicons/antd'
+import { AiStatus, Cursor1, UserProfile } from '@vicons/carbon'
+import { TextBulletListTree20Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
+import { Component, FunctionalComponent } from 'vue'
 import { computed, onActivated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -49,24 +55,30 @@ const { t } = useTranslation()
 
 const currentTab = ref('auto-gameflow')
 
-const tabs = computed(() => [
-  {
-    key: 'auto-gameflow',
-    name: t('Automation.autoGameflow')
-  },
-  {
-    key: 'auto-select',
-    name: t('Automation.autoSelect')
-  },
-  {
-    key: 'auto-champ-config',
-    name: t('Automation.autoChampConfig')
-  },
-  {
-    key: 'misc',
-    name: t('Automation.autoMisc')
-  }
-])
+const tabs = computed<{ key: string; name: string; icon: Component | FunctionalComponent }[]>(
+  () => [
+    {
+      key: 'auto-gameflow',
+      name: t('Automation.autoGameflow'),
+      icon: TextBulletListTree20Filled
+    },
+    {
+      key: 'auto-select',
+      name: t('Automation.autoSelect'),
+      icon: Cursor1
+    },
+    {
+      key: 'auto-champ-config',
+      name: t('Automation.autoChampConfig'),
+      icon: UserProfile
+    },
+    {
+      key: 'misc',
+      name: t('Automation.autoMisc'),
+      icon: SettingFilled
+    }
+  ]
+)
 
 const transitionType = ref<'move-from-right-fade' | 'move-from-left-fade'>('move-from-left-fade')
 watch(
@@ -137,6 +149,16 @@ watch(
     flex: 1;
     height: 0;
   }
+}
+
+.tab-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tab-icon {
+  font-size: 16px;
 }
 
 .tab-name {

@@ -2,7 +2,7 @@
   <div class="toolkit-page">
     <div class="page-sections">
       <div class="section-icon-container">
-        <NIcon class="section-icon"><ToolFilledIcon /></NIcon>
+        <NIcon class="section-icon" :component="ToolFilled" />
         <span class="session-label">{{ t('Toolkit.title') }}</span>
       </div>
       <NTabs
@@ -11,7 +11,10 @@
         size="medium"
       >
         <NTab v-for="tab in tabs" :key="tab.key" :name="tab.key" :tab="tab.name">
-          <span class="tab-name">{{ tab.name }}</span>
+          <div class="tab-content">
+            <NIcon class="tab-icon" :component="tab.icon" />
+            <span class="tab-name">{{ tab.name }}</span>
+          </div>
         </NTab>
       </NTabs>
     </div>
@@ -33,9 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
+import { GiftFilled, MessageFilled, SettingFilled, ToolFilled } from '@vicons/antd'
+import { Box, Chat, UserMultiple } from '@vicons/carbon'
+import { Apps24Filled, Play24Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
+import { Component, FunctionalComponent } from 'vue'
 import { computed, onActivated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -52,44 +58,54 @@ const { t } = useTranslation()
 
 const currentTab = ref('client')
 
-const tabs = computed(() => [
-  {
-    key: 'client',
-    name: t('Toolkit.client')
-  },
-  {
-    key: 'in-game-send',
-    name: t('Toolkit.in-game-send')
-  },
-  {
-    key: 'in-process',
-    name: t('Toolkit.in-process')
-  },
-  {
-    key: 'lobby',
-    name: t('Toolkit.lobby')
-  },
-  {
-    key: 'misc',
-    name: t('Toolkit.misc')
-  },
-  {
-    key: 'claim-tools',
-    name: t('Toolkit.claim-tools')
-  },
-  ...(import.meta.env.DEV
-    ? [
-        {
-          key: 'loot-tools',
-          name: t('Toolkit.loot-tools')
-        }
-      ]
-    : []),
-  {
-    key: 'friend-tools',
-    name: t('Toolkit.friend-tools')
-  }
-])
+const tabs = computed<{ key: string; name: string; icon: Component | FunctionalComponent }[]>(
+  () => [
+    {
+      key: 'client',
+      name: t('Toolkit.client'),
+      icon: Apps24Filled
+    },
+    {
+      key: 'in-game-send',
+      name: t('Toolkit.in-game-send'),
+      icon: Chat
+    },
+    {
+      key: 'in-process',
+      name: t('Toolkit.in-process'),
+      icon: Play24Filled
+    },
+    {
+      key: 'lobby',
+      name: t('Toolkit.lobby'),
+      icon: MessageFilled
+    },
+    {
+      key: 'misc',
+      name: t('Toolkit.misc'),
+      icon: SettingFilled
+    },
+    {
+      key: 'claim-tools',
+      name: t('Toolkit.claim-tools'),
+      icon: GiftFilled
+    },
+    ...(import.meta.env.DEV
+      ? [
+          {
+            key: 'loot-tools',
+            name: t('Toolkit.loot-tools'),
+            icon: Box
+          }
+        ]
+      : []),
+    {
+      key: 'friend-tools',
+      name: t('Toolkit.friend-tools'),
+      icon: UserMultiple
+    }
+  ]
+)
 
 const transitionType = ref<'move-from-right-fade' | 'move-from-left-fade'>('move-from-left-fade')
 watch(
@@ -160,6 +176,16 @@ watch(
     flex: 1;
     height: 0;
   }
+}
+
+.tab-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tab-icon {
+  font-size: 16px;
 }
 
 .tab-name {
