@@ -5,7 +5,7 @@ export interface UpdateProgressInfo {
   /**
    * 当前更新阶段
    */
-  phase: 'downloading' | 'unpacking' | 'waiting-for-restart' | 'download-failed' | 'unpack-failed'
+  phase: 'downloading' | 'waiting-for-restart' | 'download-failed'
 
   /**
    * 当前下载进度，0 到 1
@@ -26,11 +26,6 @@ export interface UpdateProgressInfo {
    * 更新包大小
    */
   fileSize: number
-
-  /**
-   * 解压进度，0 到 1
-   */
-  unpackingProgress: number
 }
 
 /**

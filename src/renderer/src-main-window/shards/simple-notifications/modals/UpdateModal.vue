@@ -107,16 +107,10 @@ const updateButtonText = computed(() => {
       return t('UpdateModal.downloading', {
         progress: (props.updateProgressInfo.downloadingProgress * 100).toFixed(0)
       })
-    case 'unpacking':
-      return t('UpdateModal.unpacking', {
-        progress: (props.updateProgressInfo.unpackingProgress * 100).toFixed(0)
-      })
     case 'waiting-for-restart':
       return t('UpdateModal.waitingForRestart')
     case 'download-failed':
       return t('UpdateModal.downloadFailed')
-    case 'unpack-failed':
-      return t('UpdateModal.unpackFailed')
     default:
       return t('UpdateModal.startUpdate')
   }

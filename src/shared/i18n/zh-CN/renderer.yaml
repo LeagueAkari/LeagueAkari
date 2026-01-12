@@ -232,8 +232,6 @@ AppSettings:
       finished: 已完成 {{progress}}%
       remain: 剩余 {{time}}
       downloadFailed: 下载出错
-      unpacking: 解压更新包
-      unpackFailed: 解压出错
       waitingForRestart: 等待重新启动
       waitingForRestartDescription: 关闭应用后将进行自动更新流程
 
@@ -1597,7 +1595,6 @@ UpdateModal:
   unpacking: '正在解压 {{progress}}%'
   waitingForRestart: 关闭后更新
   downloadFailed: 下载失败
-  unpackFailed: 解压失败
   noUpdateMd: 无发布说明
   ignoreThisVersion: 忽略此版本
 
@@ -3018,9 +3015,7 @@ self-update-renderer:
     name: $t(common:appName) 更新
     downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
     download-failed: 下载更新包失败
-    unpacking: 正在解压更新包 {{progress}}%
-    unpack-failed: 解压更新包失败
-    waiting-for-restart: 更新包解压完成，关闭应用后将自动应用更新流程
+    waiting-for-restart: 更新包下载完成，关闭应用后将自动应用更新流程
     cancelButton: 取消
     closeButton: 关闭应用
 

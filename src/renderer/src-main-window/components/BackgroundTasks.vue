@@ -1,22 +1,28 @@
 <template>
-  <div class="tasks">
-    <div class="task-title">{{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}</div>
+  <div
+    class="flex flex-col gap-2 rounded border border-black/10 bg-(--la-background-color-primary) p-2 dark:border-white/13"
+  >
+    <div class="mb-1 px-2 text-sm font-bold">
+      {{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}
+    </div>
     <template v-if="bts.tasks.length > 0">
       <NScrollbar style="max-height: calc(100vh - 80px)">
         <div
-          class="task"
-          :class="{
-            error: task.status === 'error'
-          }"
+          :class="[
+            task.status === 'error'
+              ? 'bg-red-500/10 dark:bg-red-500/12.5'
+              : 'bg-black/5 dark:bg-white/6',
+            'w-80 rounded-sm p-2'
+          ]"
           v-for="task of bts.tasks"
           :key="task.id"
         >
-          <div class="task-name">
+          <div class="text-sm">
             <component :is="renderText(task.name)" />
           </div>
           <NProgress
             v-if="task.progress !== null"
-            class="task-progress"
+            class="mt-2"
             type="line"
             :border-radius="0"
             :percentage="task.progress * 100"
@@ -24,10 +30,10 @@
           >
             {{ (task.progress * 100).toFixed(2) }}%
           </NProgress>
-          <div class="task-description">
+          <div class="mt-2 text-xs text-black/70 dark:text-white/80">
             <component :is="renderText(task.description)" />
           </div>
-          <div class="actions" v-if="task.actions.length">
+          <div class="mt-2 flex flex-wrap justify-end gap-1" v-if="task.actions.length">
             <NButton
               size="tiny"
               v-for="action of task.actions"
@@ -40,7 +46,10 @@
         </div>
       </NScrollbar>
     </template>
-    <div class="empty-placeholder" v-if="bts.tasks.length === 0">
+    <div
+      class="p-2 text-center text-xs text-black/70 dark:text-white/80"
+      v-if="bts.tasks.length === 0"
+    >
       {{ t('BackgroundTasks.emptyPlaceholder') }}
     </div>
   </div>
@@ -64,66 +73,4 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 </script>
 
-<style scoped>
-.tasks {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  border: solid 1px #fff2;
-  border-radius: 4px;
-  background-color: var(--la-background-color-primary);
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 8px;
-  justify-content: flex-end;
-}
-
-.task-title {
-  font-size: 14px;
-  font-weight: bold;
-  padding: 0 8px;
-  margin-bottom: 4px;
-}
-
-.divider {
-  height: 1px;
-  background-color: #fff1;
-}
-
-.task {
-  background-color: #fff1;
-  border-radius: 2px;
-  padding: 8px 8px;
-  width: 320px;
-
-  &.error {
-    background-color: #ff4d4f20;
-  }
-
-  .task-name {
-    font-size: 14px;
-  }
-
-  .task-progress {
-    margin-top: 8px;
-  }
-
-  .task-description {
-    font-size: 12px;
-    margin-top: 8px;
-    color: #fffc;
-  }
-}
-
-.empty-placeholder {
-  font-size: 12px;
-  color: #fffc;
-  text-align: center;
-  padding: 8px;
-}
-</style>
+<style scoped></style>

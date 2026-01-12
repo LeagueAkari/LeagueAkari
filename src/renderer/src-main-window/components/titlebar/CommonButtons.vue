@@ -100,8 +100,10 @@
         <template #trigger>
           <div class="common-button-outer">
             <SpinningIcon
+              :spinning="overallProgress !== 1"
               :count="bts.tasks.length"
               :progress="overallProgress"
+              :class="{ 'all-finished': overallProgress === 1 }"
               class="common-button-inner common-button-inner-img"
             />
           </div>
@@ -157,12 +159,8 @@ const bts = useBackgroundTasksStore()
 
 const overallProgress = computed(() => {
   let total = 0
-  let hasInProgressTask = false
-  for (const task of bts.tasks) {
-    if (task.inProgress) {
-      hasInProgressTask = true
-    }
 
+  for (const task of bts.tasks) {
     if (task.progress !== null) {
       total += task.progress
     } else {
@@ -170,11 +168,7 @@ const overallProgress = computed(() => {
     }
   }
 
-  if (hasInProgressTask) {
-    return Math.min(total / bts.tasks.length, 0.9)
-  } else {
-    return 1
-  }
+  return total / bts.tasks.length
 })
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
@@ -228,6 +222,8 @@ const setRead = () => {
 </script>
 
 <style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
+
 .common-buttons {
   height: 100%;
   display: flex;
@@ -298,6 +294,12 @@ const setRead = () => {
     .common-button-inner {
       color: rgba(0, 0, 0, 0.86);
     }
+  }
+}
+
+@layer components {
+  .all-finished {
+    @apply text-green-700! dark:text-green-300!;
   }
 }
 </style>

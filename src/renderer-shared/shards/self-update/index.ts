@@ -87,23 +87,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
               description: () => t('self-update-renderer.self-update-task.download-failed')
             })
             break
-          case 'unpacking':
-            taskStore.updateTask(taskId, {
-              progress: info.unpackingProgress,
-              description: () =>
-                t('self-update-renderer.self-update-task.unpacking', {
-                  progress: (info.unpackingProgress * 100).toFixed(2)
-                })
-            })
-            break
-          case 'unpack-failed':
-            taskStore.updateTask(taskId, {
-              progress: null,
-              status: 'error',
-              description: () => t('self-update-renderer.self-update-task.unpack-failed')
-            })
-            break
-
           case 'waiting-for-restart':
             taskStore.updateTask(taskId, {
               progress: 1,

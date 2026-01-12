@@ -65,3 +65,22 @@ export const ongoingGameConfigV1Schema = z.object({
 })
 
 export type OngoingGameConfig = z.infer<typeof ongoingGameConfigV1Schema>
+
+export const releaseConfigV1Schema = z.object({
+  /** 通常是版本号，semver */
+  tagName: z.string(),
+
+  /** 版本更新说明 */
+  description: z.string(),
+
+  /** 可下载链接 */
+  archiveFile: z.object({
+    downloadUrl: z.string(),
+    contentType: z.string()
+  }),
+
+  version: z.number().lte(1),
+  lastUpdate: z.number()
+})
+
+export type ReleaseConfig = z.infer<typeof releaseConfigV1Schema>

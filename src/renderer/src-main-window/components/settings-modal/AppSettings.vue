@@ -336,23 +336,6 @@
           <NStep>
             <template #title>
               <span class="step-title">{{
-                t('AppSettings.selfUpdate.updateProgress.unpacking')
-              }}</span>
-            </template>
-            <div class="step-description">
-              {{
-                t('AppSettings.selfUpdate.updateProgress.finished', {
-                  progress: (sus.updateProgressInfo.unpackingProgress * 100).toFixed()
-                })
-              }}
-            </div>
-            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'unpack-failed'">
-              {{ t('AppSettings.selfUpdate.updateProgress.unpackFailed') }}
-            </div>
-          </NStep>
-          <NStep>
-            <template #title>
-              <span class="step-title">{{
                 t('AppSettings.selfUpdate.updateProgress.waitingForRestart')
               }}</span>
             </template>
@@ -367,10 +350,7 @@
         :label="t('AppSettings.selfUpdate.updateDir.label')"
         :label-description="t('AppSettings.selfUpdate.updateDir.description')"
         :label-width="400"
-        v-if="
-          processStatus.current >= 2 ||
-          (processStatus.current === 1 && processStatus.status !== 'error')
-        "
+        v-if="processStatus.current === 1 && processStatus.status !== 'error'"
       >
         <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
           t('AppSettings.selfUpdate.updateDir.open')
@@ -767,19 +747,9 @@ const processStatus = computed(() => {
         current: 1,
         status: 'error'
       }
-    case 'unpacking':
-      return {
-        current: 2,
-        status: 'process'
-      }
-    case 'unpack-failed':
-      return {
-        current: 2,
-        status: 'error'
-      }
     case 'waiting-for-restart':
       return {
-        current: 3,
+        current: 2,
         status: 'process'
       }
     default:

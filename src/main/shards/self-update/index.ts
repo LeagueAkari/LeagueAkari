@@ -1,6 +1,5 @@
 import { i18next } from '@main/i18n'
 import { DEEP_LINK_PROTOCOL_DEV, DEEP_LINK_PROTOCOL_PROD } from '@main/utils/deep-link'
-import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -9,7 +8,6 @@ import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
 import { Notification, app, shell } from 'electron'
 import { comparer } from 'mobx'
-import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
 import ofs from 'node:original-fs'
 import path from 'node:path'
@@ -118,8 +116,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       downloadingProgress: 0,
       averageDownloadSpeed: 0,
       downloadTimeLeft: -1,
-      fileSize: 0,
-      unpackingProgress: 0
+      fileSize: 0
     })
 
     let resp: AxiosResponse<Readable>
@@ -142,8 +139,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       downloadingProgress: 0,
       averageDownloadSpeed: 0,
       downloadTimeLeft: -1,
-      fileSize: totalLength,
-      unpackingProgress: 0
+      fileSize: totalLength
     })
 
     const appDir = app.getPath('userData')
@@ -178,8 +174,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           downloadingProgress: totalDownloaded / totalLength,
           averageDownloadSpeed: averageSpeed,
           downloadTimeLeft: timeSecondsLeft,
-          fileSize: totalLength,
-          unpackingProgress: 0
+          fileSize: totalLength
         })
       }
 
@@ -208,8 +203,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
               downloadingProgress: 0,
               averageDownloadSpeed: 0,
               downloadTimeLeft: -1,
-              fileSize: totalLength,
-              unpackingProgress: 0
+              fileSize: totalLength
             })
             this._ipc.sendEvent(SelfUpdateMain.id, 'error-download-update', formatError(error))
             this._log.warn(`Failed to download or write update file ${formatError(error)}`)
@@ -228,152 +222,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private async _unpackDownloadedUpdate(filepath: string) {
+  private async _applyUpdatesOnNextStartup(archivePath: string, newVersion: string) {
     try {
-      await ofs.promises.access(filepath)
-    } catch (error) {
-      this.state.setUpdateProgressInfo({
-        phase: 'unpack-failed',
-        downloadingProgress: 1,
-        averageDownloadSpeed: 0,
-        downloadTimeLeft: 0,
-        fileSize: 0,
-        unpackingProgress: 0
-      })
-      this._log.error(`Update package does not exist ${filepath}`)
-      throw new Error(`No such file ${filepath}`)
-    }
-
-    const extractedTo = path.join(filepath, '..', 'extracted')
-
-    this.state.setUpdateProgressInfo({
-      phase: 'unpacking',
-      downloadingProgress: 1,
-      averageDownloadSpeed: 0,
-      downloadTimeLeft: 0,
-      fileSize: 0,
-      unpackingProgress: 0
-    })
-
-    try {
-      await ofs.promises.access(extractedTo)
-    } catch (error) {
-      this._log.info(`Old update directory exists, deleting old update directory ${extractedTo}`)
-      await ofs.promises.rm(extractedTo, { recursive: true, force: true }).catch((error) => {
-        this._log.warn(`Failed to remove old update directory ${extractedTo}`, error)
-      })
-    }
-
-    const asyncTask = new Promise<string>((resolve, reject) => {
-      this._log.info(
-        `Starting to unpack update package ${filepath} to ${extractedTo}, using ${sevenBinPath}`
-      )
-
-      const seven = extractFull(filepath, extractedTo, {
-        $bin: sevenBinPath.replace('app.asar', 'app.asar.unpacked'),
-        $progress: true
-      })
-
-      let isCancelled = false
-      let hasError = false
-
-      this._currentUpdateTaskCanceler = () => {
-        isCancelled = true
-        hasError = true
-        const error = new Error('Unpacking canceled')
-        error.name = 'Canceled'
-        seven.destroy(error)
-        this._log.info(`Cancelled unpacking update package ${filepath}`)
-      }
-
-      seven.on('progress', (progress) => {
-        if (isCancelled || hasError) {
-          return
-        }
-        this.state.setUpdateProgressInfo({
-          phase: 'unpacking',
-          downloadingProgress: 1,
-          averageDownloadSpeed: 0,
-          downloadTimeLeft: 0,
-          fileSize: 0,
-          unpackingProgress: progress.percent / 100
-        })
-      })
-
-      seven.on('end', () => {
-        if (hasError || isCancelled) {
-          return
-        }
-
-        this._currentUpdateTaskCanceler = null
-
-        this.state.setUpdateProgressInfo({
-          phase: 'unpacking',
-          downloadingProgress: 1,
-          averageDownloadSpeed: 0,
-          downloadTimeLeft: 0,
-          fileSize: 0,
-          unpackingProgress: 1
-        })
-
-        ofs.promises
-          .rm(filepath, { force: true, recursive: true })
-          .then(() => resolve(extractedTo))
-          .catch((error) => reject(error))
-      })
-
-      seven.on('rejected', (error) => {
-        hasError = true
-        this._currentUpdateTaskCanceler = null
-
-        if (error.name === 'Canceled') {
-          isCancelled = true
-          this.state.setUpdateProgressInfo(null)
-          this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-unpack-update')
-          this._log.info(`Cancelled unpacking update package ${filepath}`)
-        } else {
-          this.state.setUpdateProgressInfo({
-            phase: 'unpack-failed',
-            downloadingProgress: 1,
-            averageDownloadSpeed: 0,
-            downloadTimeLeft: 0,
-            fileSize: 0,
-            unpackingProgress: 0
-          })
-          this._ipc.sendEvent(SelfUpdateMain.id, 'error-unpack-update', formatError(error))
-          this._log.error(`Failed to unpack update package`, error)
-        }
-
-        ofs.promises.rm(filepath, { force: true, recursive: true }).catch((error) => reject(error))
-      })
-
-      seven.on('error', (error) => {
-        hasError = true
-        this._currentUpdateTaskCanceler = null
-
-        if (error.name === 'Canceled') {
-          isCancelled = true
-          this.state.setUpdateProgressInfo(null)
-          this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-unpack-update')
-          this._log.info(`Cancelled unpacking update package ${filepath}`)
-        }
-
-        this._log.error(`Failed to unpack update package`, error)
-
-        ofs.promises.rm(filepath, { force: true, recursive: true }).catch((error) => reject(error))
-      })
-    })
-
-    return asyncTask
-  }
-
-  private async _applyUpdatesOnNextStartup(newVersionDirPath: string, newVersion: string) {
-    try {
-      await ofs.promises.access(newVersionDirPath)
+      await ofs.promises.access(archivePath)
     } catch (error) {
       this.state.setUpdateProgressInfo(null)
-      this._log.error(`Update directory does not exist ${newVersionDirPath}`)
-      throw new Error(`No such directory ${newVersionDirPath}`)
+      this._log.error(`Update archive does not exist ${archivePath}`)
+      throw new Error(`No such file ${archivePath}`)
     }
 
     const copiedExecutablePath = path.join(
@@ -400,7 +255,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
 
     this._log.info(
-      `Adding exit task: update process ${copiedExecutablePath}: ${newVersionDirPath} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
+      `Adding exit task: update process ${copiedExecutablePath}: ${archivePath} -> ${appDir}, executable: ${SelfUpdateMain.EXECUTABLE_NAME}`
     )
 
     this._createNotification(
@@ -412,10 +267,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       const c = cp.spawn(
         copiedExecutablePath,
         [
-          `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+          `--lang=${this._app.settings.locale}`,
+          `--executable=${SelfUpdateMain.EXECUTABLE_NAME}`,
           'apply',
-          `--from="${newVersionDirPath}"`,
-          `--to="${appDir}"`
+          `--archive=${archivePath}`,
+          `--target=${appDir}`,
+          '--delete-archive',
+          '--launch'
         ],
         {
           detached: true,
@@ -440,8 +298,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       downloadingProgress: 1,
       averageDownloadSpeed: 0,
       downloadTimeLeft: 0,
-      fileSize: 0,
-      unpackingProgress: 1
+      fileSize: 0
     })
 
     this._currentUpdateTaskCanceler = () => {
@@ -449,8 +306,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         this._log.warn(`Failed to remove update script ${copiedExecutablePath}`, error)
       })
 
-      ofs.promises.rm(newVersionDirPath, { recursive: true, force: true }).catch((error) => {
-        this._log.warn(`Failed to remove update directory ${newVersionDirPath}`, error)
+      ofs.promises.rm(archivePath, { recursive: true, force: true }).catch((error) => {
+        this._log.warn(`Failed to remove update archive ${archivePath}`, error)
       })
 
       this._currentUpdateTaskCanceler = null
@@ -460,7 +317,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       this._log.info(
         `Cancelling exit update task`,
         `Deleting update script ${copiedExecutablePath}`,
-        `Deleting update directory ${newVersionDirPath}`
+        `Deleting update archive ${archivePath}`
       )
     }
   }
@@ -471,7 +328,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     if (
       this.state.updateProgressInfo &&
       (this.state.updateProgressInfo.phase === 'downloading' ||
-        this.state.updateProgressInfo.phase === 'unpacking' ||
         this.state.updateProgressInfo.phase === 'waiting-for-restart')
     ) {
       return
@@ -489,15 +345,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       return
     }
 
-    let unpackedPath: string
     try {
-      unpackedPath = await this._unpackDownloadedUpdate(downloadPath)
-    } catch {
-      return
-    }
-
-    try {
-      await this._applyUpdatesOnNextStartup(unpackedPath, release.tag_name)
+      await this._applyUpdatesOnNextStartup(downloadPath, release.tag_name)
     } catch {}
   }
 
@@ -668,12 +517,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const c = cp.spawn(
       copiedExecutablePath,
       [
-        `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
+        `--lang=${this._app.settings.locale}`,
+        `--executable=${SelfUpdateMain.EXECUTABLE_NAME}`,
         'uninstall',
-        `--app-id="${DEEP_LINK_PROTOCOL_PROD}"`,
-        `--app-id="${DEEP_LINK_PROTOCOL_DEV}"`,
-        `--dirs-to-remove="${appPath}"`,
-        `--dirs-to-remove="${dataPath}"`
+        `--app-id=${DEEP_LINK_PROTOCOL_PROD}`,
+        `--app-id=${DEEP_LINK_PROTOCOL_DEV}`,
+        `--dirs-to-remove=${appPath}`,
+        `--dirs-to-remove=${dataPath}`
       ],
       {
         detached: true,

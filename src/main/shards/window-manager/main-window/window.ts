@@ -86,13 +86,6 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
           case 'download-failed':
             this._window.setProgressBar(info.downloadingProgress, { mode: 'error' })
             break
-          case 'unpacking':
-            this._window.setProgressBar(info.unpackingProgress)
-            break
-          case 'unpack-failed':
-            this._window.setProgressBar(info.unpackingProgress, { mode: 'error' })
-            break
-
           default:
             this._window.setProgressBar(-1)
         }

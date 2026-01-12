@@ -231,8 +231,6 @@ AppSettings:
       finished: Completed {{progress}}%
       remain: Remaining {{time}}
       downloadFailed: Download failed
-      unpacking: Unpacking update package
-      unpackFailed: Unpack failed
       waitingForRestart: Waiting for restart
       waitingForRestartDescription: The auto-update process will be performed after closing the application
 
@@ -1597,7 +1595,6 @@ UpdateModal:
   unpacking: 'Unpacking {{progress}}%'
   waitingForRestart: Update on Close
   downloadFailed: Download Failed
-  unpackFailed: Unpack Failed
   externalDownload: Download from GitHub / Gitee
   noUpdateMd: No release notes
   ignoreThisVersion: Ignore This Version
@@ -3018,9 +3015,7 @@ self-update-renderer:
     name: $t(common:appName) Update
     downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
     download-failed: Failed to download archive
-    unpacking: Unpacking archive {{progress}}%
-    unpack-failed: Failed to unpack the archive file
-    waiting-for-restart: Updated applied. Close the application to apply the update
+    waiting-for-restart: Update package downloaded. Close the application to apply the update
     cancelButton: Cancel
     closeButton: Close Application
 

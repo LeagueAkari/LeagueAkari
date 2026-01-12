@@ -12,6 +12,7 @@
     />
     <circle
       class="spin-ring"
+      :class="{ spinning }"
       cx="50"
       cy="50"
       r="45"
@@ -42,7 +43,11 @@ const DEFAULT_MIN = 0.1
 const RADIUS = 45
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
-const { count = 1, progress = 0.3 } = defineProps<{ count?: number; progress?: number }>()
+const {
+  count = 1,
+  progress = 0.3,
+  spinning = true
+} = defineProps<{ count?: number; progress?: number; spinning?: boolean }>()
 
 /**
  * Compute the dash–gap pattern so the arc length reflects progress.
@@ -64,9 +69,12 @@ const dashArray = computed(() => {
 }
 
 .spin-ring {
-  animation: spin 3s linear infinite;
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.spin-ring.spinning {
+  animation: spin 3s linear infinite;
 }
 
 @keyframes spin {
