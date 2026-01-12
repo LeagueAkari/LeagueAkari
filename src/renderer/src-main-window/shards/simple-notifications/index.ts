@@ -9,6 +9,7 @@ import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/stor
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
+import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
@@ -27,6 +28,7 @@ import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import {
   DialogReactive,
+  NButton,
   NotificationReactive,
   useDialog,
   useMessage,
@@ -65,7 +67,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
     @Dep(LeagueClientUxRenderer) readonly _lcux: LeagueClientUxRenderer,
-    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer
+    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer,
+    @Dep(AkariIpcRenderer) readonly _ipc: AkariIpcRenderer
   ) {}
 
   /**
@@ -513,7 +516,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addRenderVNode(() => h(comp))
   }
 
-  private _setupSpecialKeyboardCombo() {
+  private _handleSpecialKeyboardCombo() {
     const message = useMessage()
     const sns = useSimpleNotificationsStore()
 
@@ -792,6 +795,50 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
+  private _handleUpdateDownloadFailed() {
+    const { t } = useTranslation(undefined, {
+      keyPrefix: 'simple-notifications-renderer.updateDownloadFailed'
+    })
+
+    const notification = useNotification()
+
+    this._ipc.onEventVue(SelfUpdateRenderer.id, 'error-download-update', (error) => {
+      const no = notification.warning({
+        title: () => t('title'),
+        content: () =>
+          h('div', [
+            t('content', { error: error.message }),
+
+            // buttons group
+            h('div', { class: 'flex justify-end gap-2' }, [
+              h(
+                NButton,
+                {
+                  size: 'tiny',
+                  onClick: () => {
+                    no.destroy()
+                  }
+                },
+                () => t('negativeText')
+              ),
+              h(
+                NButton,
+                {
+                  type: 'primary',
+                  size: 'tiny',
+                  onClick: () => {
+                    this.showAnnouncementModal()
+                    no.destroy()
+                  }
+                },
+                () => t('positiveText')
+              )
+            ])
+          ])
+      })
+    })
+  }
+
   private _setupOngoingGameNewFeatures() {
     const comp = defineComponent({
       setup() {
@@ -865,7 +912,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setupNewReleaseModal()
     this._setupFunnyPricingModal()
     this._setupOngoingGameNewFeatures()
-    this._setup.addSetupFn(() => this._setupSpecialKeyboardCombo())
+    this._setup.addSetupFn(() => this._handleSpecialKeyboardCombo())
     this._setup.addSetupFn(() => this._handleNotifications())
     this._setup.addSetupFn(() => this._handleQueueingProgress())
     this._setup.addSetupFn(() => this._handleAskUserToRunAsAdministrator())
@@ -874,6 +921,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this._setup.addSetupFn(() => this._handleBadSgpConnectionWarning())
     this._setup.addSetupFn(() => this._handleAutoReconnectNotification())
     this._setup.addSetupFn(() => this._handleRunInTempDirWarning())
+    this._setup.addSetupFn(() => this._handleUpdateDownloadFailed())
   }
 
   showAnnouncementModal() {

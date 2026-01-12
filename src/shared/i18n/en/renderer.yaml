@@ -3001,6 +3001,12 @@ simple-notifications-renderer:
     content: The application is running in the temp directory, which may cause security issues. This may be because the application is not located in the correct installation location, or not properly unzipped.
     negativeText: Dismiss
 
+  updateDownloadFailed:
+    title: Update Download Failed
+    content: 'Failed to download update: {{error}}. Please check your network connection, or check the announcement for more information to get possible solutions.'
+    positiveText: Check Announcement
+    negativeText: Dismiss
+
 league-client-renderer:
   initialization-task:
     name: LCU Initialization

@@ -3001,6 +3001,12 @@ simple-notifications-renderer:
     content: 应用程序运行在临时目录，可能会导致安全问题。这可能是程序没有位于正确的安装位置，或未被妥善解压。
     negativeText: 关闭
 
+  updateDownloadFailed:
+    title: 更新下载失败
+    content: 尝试下载更新时出现错误：{{error}}。请检查网络连接，或查看公告获取更多信息以获取可能的解决方案。
+    positiveText: 前往公告
+    negativeText: 关闭
+
 league-client-renderer:
   initialization-task:
     name: LCU 初始化
