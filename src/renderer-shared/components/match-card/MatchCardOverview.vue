@@ -11,8 +11,8 @@
         <!-- 上半部分：英雄头像 + stats line -->
         <div class="flex h-12 gap-2">
           <!-- champion icon -->
-          <div class="flex w-16 shrink-0 items-center">
-            <div class="relative" :class="{ contents: !shouldShowCrown }">
+          <div class="flex w-[70px] shrink-0 items-center">
+            <div class="relative" :class="{ contents: !shouldShowCrown && !participant.position }">
               <ChampionIcon
                 :champion-id="participant.championId"
                 class="relative -left-[2px] box-border size-11 rounded-lg border-2 border-solid"
@@ -32,12 +32,54 @@
                   <Crown />
                 </NIcon>
               </div>
+
+              <!-- top1 头顶上方的皇冠 -->
+              <div
+                v-if="participant.position"
+                class="absolute -right-px -bottom-[2px] rounded-sm bg-black/60 p-0.5 dark:bg-black/80"
+              >
+                <PositionIcon
+                  :position="participant.position"
+                  class="text-5 block! text-white/80"
+                />
+              </div>
             </div>
           </div>
 
           <!-- stats line -->
           <div class="flex min-w-0 flex-1 items-center gap-2">
-            <!-- DMG -->
+            <!-- spells + runes -->
+            <div v-if="displayParts.spells || displayParts.runes" class="flex gap-0.5">
+              <!-- spells -->
+              <div
+                v-if="displayParts.spells && (participant.spells[0] || participant.spells[1])"
+                class="flex flex-col gap-0.5"
+              >
+                <SummonerSpellDisplay :spell-id="participant.spells[0]" :size="20" />
+                <SummonerSpellDisplay :spell-id="participant.spells[1]" :size="20" />
+              </div>
+
+              <!-- runes / styles -->
+              <div v-if="displayParts.runes && perks" class="flex flex-col gap-0.5">
+                <PerkDisplay :perk-id="perks.primaryPerkId" :size="20" />
+                <PerkstyleDisplay :perkstyle-id="perks.subPerkStyleId" :size="20" />
+              </div>
+            </div>
+
+            <!-- augments -->
+            <div v-if="displayParts.augments" class="hidden grid-cols-3 gap-0.5 @[680px]:grid">
+              <AugmentDisplay
+                v-for="augment of participant.augments"
+                :key="augment"
+                :augment-id="augment"
+                :size="20"
+              />
+            </div>
+
+            <!-- spacer -->
+            <div class="w-0"></div>
+
+            <!-- KDA + DMG -->
             <NPopover :delay="300">
               <template #trigger>
                 <div class="flex gap-2">
@@ -104,63 +146,13 @@
               </template>
               <RadarChart :puuid="puuid" />
             </NPopover>
-
-            <!-- spacer -->
-            <div class="w-0"></div>
-
-            <!-- spells + runes -->
-            <div v-if="displayParts.spells || displayParts.runes" class="flex gap-0.5">
-              <!-- spells -->
-              <div
-                v-if="displayParts.spells && (participant.spells[0] || participant.spells[1])"
-                class="flex flex-col gap-0.5"
-              >
-                <SummonerSpellDisplay :spell-id="participant.spells[0]" :size="20" />
-                <SummonerSpellDisplay :spell-id="participant.spells[1]" :size="20" />
-              </div>
-
-              <!-- runes / styles -->
-              <div v-if="displayParts.runes && perks" class="flex flex-col gap-0.5">
-                <PerkDisplay :perk-id="perks.primaryPerkId" :size="20" />
-                <PerkstyleDisplay :perkstyle-id="perks.subPerkStyleId" :size="20" />
-              </div>
-            </div>
-
-            <!-- augments -->
-            <div v-if="displayParts.augments" class="hidden grid-cols-3 gap-0.5 @[680px]:grid">
-              <AugmentDisplay
-                v-for="augment of participant.augments"
-                :key="augment"
-                :augment-id="augment"
-                :size="20"
-              />
-            </div>
-
-            <!-- items area -->
-            <div v-if="displayParts.items" class="flex gap-0.5">
-              <!-- items, 2 rows, 3 cols -->
-              <div class="grid grid-cols-3 grid-rows-2 gap-0.5">
-                <ItemDisplay
-                  v-for="item of participant.items.slice(0, 6)"
-                  :key="item"
-                  :item-id="item"
-                  :size="20"
-                />
-              </div>
-
-              <!-- trinket -->
-              <div class="flex flex-col gap-0.5">
-                <ItemDisplay :item-id="participant.items[6]" :size="20" is-trinket />
-                <div class="invisible size-5"></div>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- 下半部分：胜利结果 + tags -->
         <div class="flex items-center gap-2">
           <!-- result -->
-          <div class="min-w-16 shrink-0">
+          <div class="min-w-[70px] shrink-0">
             <div
               :class="{
                 'text-blue-600 dark:text-blue-300': winStyleType === 'win',
@@ -178,6 +170,23 @@
                 )
               }}
             </div>
+          </div>
+
+          <!-- items -->
+          <div class="flex gap-0.5">
+            <ItemDisplay
+              v-for="item of participant.items.slice(0, 6)"
+              :key="item"
+              :item-id="item"
+              :size="20"
+            />
+
+            <ItemDisplay :item-id="participant.items[6]" :size="20" is-trinket />
+            <ItemDisplay
+              v-if="participant.roleBoundItem"
+              :item-id="participant.roleBoundItem"
+              :size="20"
+            />
           </div>
 
           <!-- tags line -->
@@ -354,6 +363,7 @@
 </template>
 
 <script lang="ts" setup>
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -463,7 +473,7 @@ const perks = computed(() => {
 // UI 有些地方可以不用展示
 const displayParts = computed(() => {
   return {
-    spells: basicInfo.value.gameMode !== 'CHERRY',
+    spells: true,
     augments: basicInfo.value.gameMode === 'CHERRY' || basicInfo.value.gameMode === 'KIWI',
     runes: basicInfo.value.gameMode !== 'CHERRY' && basicInfo.value.gameMode !== 'KIWI',
     items: true

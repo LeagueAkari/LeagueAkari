@@ -81,7 +81,7 @@
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
           :title="t('MatchCard.teamTable.objectives.atakhan')"
-          v-if="team.teamInfo.objectives.atakhan"
+          v-if="someTeamHasAtakhan && team.teamInfo.objectives.atakhan"
         >
           <Atakhan class="size-3.5" />
           <span>{{ team.teamInfo.objectives.atakhan.kills }}</span>
@@ -405,6 +405,13 @@ const lcs = useLeagueClientStore()
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]
+})
+
+// 版本更新后，这个野怪被移除了
+const someTeamHasAtakhan = computed(() => {
+  return teams.value.teamStatsArr.some(
+    (t) => t.teamInfo?.objectives.atakhan && (t.teamInfo.objectives.atakhan.kills || 0) > 0
+  )
 })
 
 const teamParticipants = computed(() => {

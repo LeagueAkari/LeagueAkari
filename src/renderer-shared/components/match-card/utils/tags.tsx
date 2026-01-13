@@ -437,7 +437,7 @@ function computedKnockUpTags({ participant }: TagContext, t: TFunction): PlayerT
         content: t('MatchCard.tags.knockUp.content', {
           value: participant.knockEnemyIntoTeamAndKill.toLocaleString()
         }),
-        priority: 1650
+        priority: 980
       }
     ]
   }
@@ -491,7 +491,7 @@ function computeDamageGoldEfficiencyTags(
         color: 'bg-lime-700 dark:bg-lime-800',
         textColor: 'text-white',
         content: t('MatchCard.tags.damageGoldEfficiency.bestContent', { rate }),
-        priority: 980
+        priority: 1800
       }
     ]
   }
@@ -586,16 +586,6 @@ export function usePlayerTags() {
       ...computedKnockUpTags(context, t),
       ...computeCcTags(context, t)
     ]
-
-    if (tags.length === 0) {
-      tags.push({
-        label: t('MatchCard.tags.none.label'),
-        color: 'bg-zinc-500 dark:bg-zinc-600',
-        textColor: 'text-white',
-        content: t('MatchCard.tags.none.content'),
-        priority: 0
-      })
-    }
 
     return tags.sort((a, b) => (b.priority || 0) - (a.priority || 0))
   })
