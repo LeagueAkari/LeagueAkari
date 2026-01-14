@@ -22,13 +22,19 @@
             {{ t('CommonButtons.announcementSummary') }}
           </div>
           <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
-          <div class="mb-1 max-w-[400px] text-xs text-black/80 dark:text-white/80">
+          <div class="mb-2 max-w-[400px] text-xs text-black/80 dark:text-white/80">
             {{ sns.announcementSummary }}
           </div>
           <div class="flex justify-end gap-2">
-            <NButton size="tiny" @click="setRead()">{{
-              t('CommonButtons.announcementOk')
-            }}</NButton>
+            <NButton
+              size="tiny"
+              @click="setRead()"
+              v-if="
+                rcs.announcement?.frontMatter.alertLevel !== 'low' &&
+                sns.lastAnnouncementUniqueId !== rcs.announcement?.uniqueId
+              "
+              >{{ t('CommonButtons.announcementOk') }}</NButton
+            >
             <NButton size="tiny" type="primary" @click="sn.showAnnouncementModal()">{{
               t('CommonButtons.announcementSeeMore')
             }}</NButton>
