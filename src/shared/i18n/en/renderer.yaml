@@ -1406,6 +1406,7 @@ MatchCard:
     killsOnOtherLanesEarlyJungleAsLaner: Early Roam Kills as Laner
     getTakedownsInAllLanesEarlyJungleAsLaner: Early All Lane Roams
     killsOnRecentlyHealedByAramPack: Kills on Recently Healed (ARAM)
+    fastestLegendary: Fastest Legendary
     # Objectives
     baronTakedowns: Baron Takedowns
     dragonTakedowns: Dragon Takedowns

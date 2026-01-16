@@ -95,28 +95,34 @@
         class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
       >
         <template v-if="ogs.settings.enabled">
-          <div
-            v-if="lcs.connectionState !== 'connected'"
-            class="text-base font-normal text-black/60 dark:text-white/80"
-          >
-            {{ t('OngoingGame.disconnected') }}
-          </div>
+          <template v-if="lcs.connectionState !== 'connected'">
+            <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="PlugConnected" />
+            <div class="text-base font-normal text-black/60 dark:text-white/80">
+              {{ t('OngoingGame.disconnected') }}
+            </div>
+          </template>
 
-          <div
-            v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating"
-            class="text-base font-normal text-black/60 dark:text-white/80"
-          >
-            {{ t('OngoingGame.waitingForSpectate') }}
-          </div>
+          <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
+            <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="TimeOutline" />
+            <div class="text-base font-normal text-black/60 dark:text-white/80">
+              {{ t('OngoingGame.waitingForSpectate') }}
+            </div>
+          </template>
 
-          <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
-            {{ t('OngoingGame.noOngoingGame') }}
-          </div>
+          <template v-else>
+            <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="GameController" />
+            <div class="text-base font-normal text-black/60 dark:text-white/80">
+              {{ t('OngoingGame.noOngoingGame') }}
+            </div>
+          </template>
         </template>
 
-        <div v-else class="text-base font-normal text-black/60 dark:text-white/80">
-          {{ t('OngoingGame.disabled') }}
-        </div>
+        <template v-else>
+          <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="Forbid" />
+          <div class="text-base font-normal text-black/60 dark:text-white/80">
+            {{ t('OngoingGame.disabled') }}
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -131,9 +137,11 @@ import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/play
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { GameController, TimeOutline } from '@vicons/ionicons5'
+import { Forbid, PlugConnected } from '@vicons/tabler'
 import { createReusableTemplate, refDebounced } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NScrollbar } from 'naive-ui'
+import { NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import PlayerInfoCard from './PlayerInfoCard.vue'

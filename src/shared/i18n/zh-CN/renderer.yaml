@@ -1405,6 +1405,7 @@ MatchCard:
     killsOnOtherLanesEarlyJungleAsLaner: 线上英雄早期支援击杀
     getTakedownsInAllLanesEarlyJungleAsLaner: 早期全线支援
     killsOnRecentlyHealedByAramPack: 击杀刚拾取治疗包的敌人
+    fastestLegendary: 最快超神
     # Objectives - 战略点
     baronTakedowns: 参与大龙击杀
     dragonTakedowns: 参与小龙击杀
