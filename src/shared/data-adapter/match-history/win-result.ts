@@ -14,7 +14,7 @@ export function computeWinResult(
     win: boolean
   }
 ): WinResultInfo {
-  // 目前已知有：Abort_AntiCheatExit, Abort_Unexpected
+  // 目前已知有：Abort_AntiCheatExit, Abort_Unexpected, Abort_TooFewPlayers
   if (endOfGameResult && endOfGameResult.startsWith('Abort_')) {
     return { isSurrender: false, result: 'abort' }
   }

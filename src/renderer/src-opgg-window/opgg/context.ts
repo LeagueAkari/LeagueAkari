@@ -456,7 +456,7 @@ export function provideOpgg() {
       let position0 = position.value
 
       if (active.assignedPosition) {
-        switch (active.assignedPosition) {
+        switch (active.assignedPosition.toLowerCase()) {
           case 'top':
             position0 = 'top'
             break
