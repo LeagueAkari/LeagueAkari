@@ -1984,6 +1984,8 @@ PlayerTabs:
 PlayerTab:
   prevPage: 上一页
   nextPage: 下一页
+  firstPage: 跳到第一页
+  goToPage: 跳转到指定页
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家

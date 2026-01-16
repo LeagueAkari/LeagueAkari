@@ -84,38 +84,43 @@
             {{ computedCurrentPage }}
           </span>
         </template>
-        <div class="flex gap-2">
-          <NInputNumber
-            class="w-28!"
-            size="small"
-            v-model:value="arbitraryPage"
-            :disabled="isLoading"
-            :min="1"
-            @keyup.enter="
-              loadMatchHistory({
-                startIndex:
-                  (arbitraryPage - 1) *
-                  (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-              })
-            "
-          />
-          <NButton
-            size="small"
-            secondary
-            circle
-            :disabled="isLoading"
-            @click="
-              loadMatchHistory({
-                startIndex:
-                  (arbitraryPage - 1) *
-                  (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-              })
-            "
-          >
-            <template #icon>
-              <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
-            </template>
-          </NButton>
+        <div class="flex flex-col gap-2 p-1">
+          <div class="text-xs text-black/60 dark:text-white/60">
+            {{ t('PlayerTab.goToPage') }}
+          </div>
+          <div class="flex items-center gap-2">
+            <NInputNumber
+              class="w-28!"
+              size="small"
+              v-model:value="arbitraryPage"
+              :disabled="isLoading"
+              :min="1"
+              @keyup.enter="handleGoToArbitraryPage"
+            />
+            <NButton
+              size="small"
+              secondary
+              circle
+              :disabled="isLoading"
+              @click="handleGoToArbitraryPage"
+            >
+              <template #icon>
+                <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
+              </template>
+            </NButton>
+            <NButton
+              size="small"
+              tertiary
+              circle
+              :disabled="isLoading || isFirstPage"
+              :title="t('PlayerTab.firstPage')"
+              @click="handleGoToFirstPage"
+            >
+              <template #icon>
+                <NIcon size="14"><Previous20Filled /></NIcon>
+              </template>
+            </NButton>
+          </div>
         </div>
       </NPopover>
 
@@ -224,38 +229,43 @@
               {{ computedCurrentPage }}
             </span>
           </template>
-          <div class="flex gap-2">
-            <NInputNumber
-              class="w-28!"
-              size="small"
-              v-model:value="arbitraryPage"
-              :disabled="isLoading"
-              :min="1"
-              @keyup.enter="
-                loadMatchHistory({
-                  startIndex:
-                    (arbitraryPage - 1) *
-                    (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-                })
-              "
-            />
-            <NButton
-              size="small"
-              secondary
-              circle
-              :disabled="isLoading"
-              @click="
-                loadMatchHistory({
-                  startIndex:
-                    (arbitraryPage - 1) *
-                    (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-                })
-              "
-            >
-              <template #icon>
-                <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
-              </template>
-            </NButton>
+          <div class="flex flex-col gap-2 p-1">
+            <div class="text-xs text-black/60 dark:text-white/60">
+              {{ t('PlayerTab.goToPage') }}
+            </div>
+            <div class="flex items-center gap-2">
+              <NInputNumber
+                class="w-28!"
+                size="small"
+                v-model:value="arbitraryPage"
+                :disabled="isLoading"
+                :min="1"
+                @keyup.enter="handleGoToArbitraryPage"
+              />
+              <NButton
+                size="small"
+                secondary
+                circle
+                :disabled="isLoading"
+                @click="handleGoToArbitraryPage"
+              >
+                <template #icon>
+                  <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
+                </template>
+              </NButton>
+              <NButton
+                size="small"
+                tertiary
+                circle
+                :disabled="isLoading || isFirstPage"
+                :title="t('PlayerTab.firstPage')"
+                @click="handleGoToFirstPage"
+              >
+                <template #icon>
+                  <NIcon size="14"><Previous20Filled /></NIcon>
+                </template>
+              </NButton>
+            </div>
           </div>
         </NPopover>
 
@@ -288,7 +298,8 @@ import {
   ArrowCircleRight32Filled,
   ChevronLeft20Regular,
   ChevronRight20Regular,
-  Filter20Regular
+  Filter20Regular,
+  Previous20Filled
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInputNumber, NPopover, NSelect } from 'naive-ui'
@@ -347,4 +358,16 @@ watchEffect(() => {
     arbitraryPage.value = computedCurrentPage.value
   }
 })
+
+const handleGoToArbitraryPage = () => {
+  loadMatchHistory({
+    startIndex:
+      (arbitraryPage.value - 1) *
+      (pagedMatchHistory.value?.queryParams.count ?? pts.frontendSettings.loadCount)
+  })
+}
+
+const handleGoToFirstPage = () => {
+  loadMatchHistory({ startIndex: 0 })
+}
 </script>

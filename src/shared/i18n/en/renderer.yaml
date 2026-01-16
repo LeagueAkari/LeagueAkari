@@ -1983,6 +1983,8 @@ PlayerTabs:
 PlayerTab:
   prevPage: Previous
   nextPage: Next
+  firstPage: Go to First Page
+  goToPage: Go to Page
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
