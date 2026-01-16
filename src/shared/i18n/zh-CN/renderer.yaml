@@ -360,7 +360,7 @@ OngoingGameSettings:
 
   queryInLobbyPhase:
     label: 在房间阶段生效
-    description: 位于房间时，查询房间内所有玩家的数据
+    description: 除了在英雄选择阶段和游戏进行中阶段之外，当位于房间阶段时，也查询房间内所有玩家的数据
 
   premadeTeamInferMatchCountThreshold:
     label: 预组队推测对局数阈值

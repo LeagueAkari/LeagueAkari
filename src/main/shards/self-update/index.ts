@@ -260,10 +260,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         copiedExecutablePath,
         [
           `--lang=${this._app.settings.locale}`,
-          `--executable=${SelfUpdateMain.EXECUTABLE_NAME}`,
+          `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
           'apply',
-          `--archive=${archivePath}`,
-          `--target=${appDir}`,
+          `--archive="${archivePath}"`,
+          `--target="${appDir}"`,
           '--delete-archive',
           '--launch'
         ],
@@ -274,6 +274,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           cwd: app.getPath('temp')
         }
       )
+
+      // print cmd
+      this._log.info(`Command: ${c.spawnargs.join(' ')}`)
 
       c.unref()
 
@@ -516,12 +519,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       copiedExecutablePath,
       [
         `--lang=${this._app.settings.locale}`,
-        `--executable=${SelfUpdateMain.EXECUTABLE_NAME}`,
+        `--executable="${SelfUpdateMain.EXECUTABLE_NAME}"`,
         'uninstall',
         `--app-id=${DEEP_LINK_PROTOCOL_PROD}`,
         `--app-id=${DEEP_LINK_PROTOCOL_DEV}`,
-        `--dirs-to-remove=${appPath}`,
-        `--dirs-to-remove=${dataPath}`
+        `--dirs-to-remove="${appPath}"`,
+        `--dirs-to-remove="${dataPath}"`
       ],
       {
         detached: true,

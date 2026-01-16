@@ -359,7 +359,7 @@ OngoingGameSettings:
 
   queryInLobbyPhase:
     label: Query in Lobby Phase
-    description: When enabled, the player stats will be queried when in the lobby.
+    description: In addition to champion select and in-game phases, you can now also view data for all members in the lobby.
 
   premadeTeamInferMatchCountThreshold:
     label: Premade Team Inference Match Count Threshold
