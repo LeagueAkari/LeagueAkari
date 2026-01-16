@@ -42,7 +42,7 @@ export class RemoteConfigRenderer {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'updateLatestRelease', updateLatestRelease)
   }
 
-  async testLatency(): Promise<{ githubLatency: number; giteeLatency: number }> {
-    return await this._ipc.call(MAIN_SHARD_NAMESPACE, 'testLatency')
+  async testRepoLatency(): Promise<{ githubLatency: number; giteeLatency: number }> {
+    return await this._ipc.call(MAIN_SHARD_NAMESPACE, 'testRepoLatency')
   }
 }

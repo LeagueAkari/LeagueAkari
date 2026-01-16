@@ -1,4 +1,4 @@
-import { GithubApiAsset, GithubApiLatestRelease } from '@shared/types/github'
+import { LatestReleaseWithMetadata } from '@shared/types/github'
 import {
   LeagueServersConfig,
   OngoingGameConfig,
@@ -17,13 +17,7 @@ interface Announcement {
   uniqueId: string
 }
 
-export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
-  source: 'github' | 'gitee'
-  isNew: boolean
-  currentVersion: string
-  detailedChangelog: string | null
-  archiveFile: GithubApiAsset | null
-}
+export type { LatestReleaseWithMetadata }
 
 function releaseEquals(a: LatestReleaseWithMetadata | null, b: LatestReleaseWithMetadata | null) {
   if (a === null && b === null) {

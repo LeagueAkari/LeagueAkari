@@ -50,7 +50,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   })
 
   private _updateOnQuitFn: (() => Promise<void>) | null = null
-  private _currentUpdateTaskCanceler: (() => void) | null = null
+  private _updateCancelFn: (() => void) | null = null
 
   constructor(
     private readonly _app: AppCommonMain,
@@ -85,7 +85,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     ])
   }
 
-  private _handlePeriodicCheck() {
+  private _handleUpdateProcess() {
     this._mobx.reaction(
       () =>
         [
@@ -98,11 +98,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           yes &&
           release &&
           release.isNew &&
-          release.archiveFile &&
+          release.githubArchiveFile &&
           release.tag_name !== ignoreVersion
         ) {
           this._startUpdateProcess(
-            release as LatestReleaseWithMetadata & { archiveFile: GithubApiAsset }
+            release as LatestReleaseWithMetadata & { githubArchiveFile: GithubApiAsset }
           )
         }
       },
@@ -157,7 +157,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const asyncTask = new Promise<string>((resolve, reject) => {
       const writer = ofs.createWriteStream(downloadPath)
 
-      this._currentUpdateTaskCanceler = () => {
+      this._updateCancelFn = () => {
         const error = new Error('Download canceled')
         error.name = 'Canceled'
         resp.data.destroy(error)
@@ -215,22 +215,14 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           resolve(downloadPath)
         }
 
-        this._currentUpdateTaskCanceler = null
+        this._updateCancelFn = null
       })
     })
 
     return asyncTask
   }
 
-  private async _applyUpdatesOnNextStartup(archivePath: string, newVersion: string) {
-    try {
-      await ofs.promises.access(archivePath)
-    } catch (error) {
-      this.state.setUpdateProgressInfo(null)
-      this._log.error(`Update archive does not exist ${archivePath}`)
-      throw new Error(`No such file ${archivePath}`)
-    }
-
+  private async _spawnUpdaterOnQuit(archivePath: string, newVersion: string) {
     const copiedExecutablePath = path.join(
       app.getPath('temp'),
       SelfUpdateMain.UPDATE_EXECUTABLE_NAME
@@ -260,7 +252,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     this._createNotification(
       i18next.t('appName', { ns: 'common' }),
-      i18next.t('self-update-main.updateOnNextStartup')
+      i18next.t('self-update-main.updateOnQuit')
     )
 
     const _updateOnQuitFn = async () => {
@@ -301,7 +293,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       fileSize: 0
     })
 
-    this._currentUpdateTaskCanceler = () => {
+    this._updateCancelFn = () => {
       ofs.promises.rm(copiedExecutablePath, { force: true, recursive: true }).catch((error) => {
         this._log.warn(`Failed to remove update script ${copiedExecutablePath}`, error)
       })
@@ -310,7 +302,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         this._log.warn(`Failed to remove update archive ${archivePath}`, error)
       })
 
-      this._currentUpdateTaskCanceler = null
+      this._updateCancelFn = null
       this._updateOnQuitFn = null
       this.state.setUpdateProgressInfo(null)
 
@@ -323,7 +315,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   }
 
   private async _startUpdateProcess(
-    release: LatestReleaseWithMetadata & { archiveFile: GithubApiAsset }
+    release: LatestReleaseWithMetadata & { githubArchiveFile: GithubApiAsset }
   ) {
     if (
       this.state.updateProgressInfo &&
@@ -333,27 +325,33 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       return
     }
 
-    this._ipc.sendEvent(SelfUpdateMain.id, 'start-update')
+    // for CHINA only, fuck u gitee
+    const downloadUrl =
+      release.source === 'gitee'
+        ? release.downloadUrlCn
+        : release.githubArchiveFile.browser_download_url
 
-    let downloadPath: string
-    try {
-      downloadPath = await this._downloadUpdate(
-        release.archiveFile.browser_download_url,
-        release.archiveFile.name
+    if (!downloadUrl) {
+      this._log.warn('No download URL found for release', release.tag_name)
+      this._ipc.sendEvent(
+        SelfUpdateMain.id,
+        'error-download-update',
+        formatError(new Error('No download URL found for release'))
       )
-    } catch {
+
       return
     }
 
     try {
-      await this._applyUpdatesOnNextStartup(downloadPath, release.tag_name)
+      const downloadPath = await this._downloadUpdate(downloadUrl, release.githubArchiveFile.name)
+      await this._spawnUpdaterOnQuit(downloadPath, release.tag_name)
     } catch {}
   }
 
   private _cancelUpdateProcess() {
-    if (this._currentUpdateTaskCanceler) {
+    if (this._updateCancelFn) {
       try {
-        this._currentUpdateTaskCanceler()
+        this._updateCancelFn()
       } catch (error) {
         this._ipc.sendEvent(SelfUpdateMain.id, 'error-cancel-update', formatError(error))
         this._log.warn(`Failed to cancel update task`, error)
@@ -367,7 +365,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     try {
       const release = await this._rc.updateLatestReleaseManually()
 
-      if (release && release.isNew && release.archiveFile) {
+      if (release && release.isNew && release.githubArchiveFile) {
         return { result: 'new-updates' }
       } else {
         return { result: 'no-updates' }
@@ -386,11 +384,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       if (
         this._rc.state.latestRelease &&
         this._rc.state.latestRelease.isNew &&
-        this._rc.state.latestRelease.archiveFile
+        this._rc.state.latestRelease.githubArchiveFile
       ) {
         await this._startUpdateProcess(
           this._rc.state.latestRelease as LatestReleaseWithMetadata & {
-            archiveFile: GithubApiAsset
+            githubArchiveFile: GithubApiAsset
           }
         )
       }
@@ -398,15 +396,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     // 仅仅用于 debug
     this._ipc.onCall(SelfUpdateMain.id, 'forceStartUpdate', async () => {
-      if (this._rc.state.latestRelease && this._rc.state.latestRelease.archiveFile) {
+      if (this._rc.state.latestRelease && this._rc.state.latestRelease.githubArchiveFile) {
         this._log.info(
           'Force start update, target:',
           this._rc.state.latestRelease.tag_name,
-          this._rc.state.latestRelease.archiveFile.name
+          this._rc.state.latestRelease.githubArchiveFile.name
         )
         await this._startUpdateProcess(
           this._rc.state.latestRelease as LatestReleaseWithMetadata & {
-            archiveFile: GithubApiAsset
+            githubArchiveFile: GithubApiAsset
           }
         )
       } else {
@@ -432,7 +430,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     await this._handleState()
     await this._checkLastFailedUpdate()
     this._handleUpdateHttpProxy()
-    this._handlePeriodicCheck()
+    this._handleUpdateProcess()
     this._handleIpcCall()
   }
 

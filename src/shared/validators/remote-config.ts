@@ -84,3 +84,11 @@ export const releaseConfigV1Schema = z.object({
 })
 
 export type ReleaseConfig = z.infer<typeof releaseConfigV1Schema>
+
+/** 没有版本号的普通 json 对象，很简单 */
+export const releaseMetadataPlainObjectSchema = z.object({
+  downloadUrlCn: z.string().nullable(),
+  downloadUrlGlobal: z.string().nullable()
+})
+
+export type ReleaseMetadataPlainObject = z.infer<typeof releaseMetadataPlainObjectSchema>

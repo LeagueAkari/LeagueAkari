@@ -1,4 +1,4 @@
-import { GithubApiAsset, GithubApiLatestRelease } from '@shared/types/github'
+import { LatestReleaseWithMetadata } from '@shared/types/github'
 import {
   LeagueServersConfig,
   OngoingGameConfig,
@@ -27,14 +27,6 @@ export interface Announcement {
   content: string
   frontMatter: AnnouncementFrontMatter
   uniqueId: string
-}
-
-// copied from main
-export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
-  isNew: boolean
-  currentVersion: string
-  detailedChangelog: string | null
-  archiveFile: GithubApiAsset | null
 }
 
 export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', () => {

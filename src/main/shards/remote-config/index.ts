@@ -4,6 +4,7 @@ import { GithubApiLatestRelease } from '@shared/types/github'
 import {
   leagueServersConfigV2Schema,
   ongoingGameConfigV1Schema,
+  releaseMetadataPlainObjectSchema,
   supportedQueuesV1Schema
 } from '@shared/validators/remote-config'
 import { isAxiosError } from 'axios'
@@ -100,6 +101,9 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     )
   }
 
+  /**
+   * 通过另一个专门的配置仓库，补全更多信息
+   */
   private async _addMoreInfoToRelease(
     release: GithubApiLatestRelease
   ): Promise<LatestReleaseWithMetadata> {
@@ -112,46 +116,48 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       branch: 'main'
     }
 
+    const [changelogResponse, metadataResponse] = await Promise.allSettled([
+      this.repo.getRawContent(`/releases/${release.tag_name}/${locale}.md`, configRepoRequest),
+      this.repo.getRawContent(`/releases/${release.tag_name}/metadata.json`, configRepoRequest)
+    ])
+
     let detailedChangelog: string | null = null
-    try {
-      const { data } = await this.repo.getRawContent(
-        `/releases/${release.tag_name}/${locale}.md`,
-        configRepoRequest
+    let downloadUrlCn: string | null = null
+    let downloadUrlGlobal: string | null = null
+
+    if (changelogResponse.status === 'fulfilled') {
+      detailedChangelog = changelogResponse.value.data
+    } else {
+      this._log.warn('Failed to get changelog', release.tag_name, changelogResponse.reason)
+    }
+
+    if (metadataResponse.status === 'fulfilled') {
+      const data = releaseMetadataPlainObjectSchema.parse(metadataResponse.value.data)
+
+      downloadUrlCn = data.downloadUrlCn
+      downloadUrlGlobal = data.downloadUrlGlobal
+    } else {
+      this._log.warn('Failed to parse metadata', release.tag_name, metadataResponse.reason)
+    }
+
+    const archiveFile = release.assets.find((a) => {
+      return (
+        a.content_type === 'application/x-compressed' ||
+        // for gitee
+        a.browser_download_url.endsWith('win.7z')
       )
-
-      detailedChangelog = data
-    } catch (error) {
-      this._log.warn('Failed to get changelog', error)
-    }
-
-    let archiveFile = release.assets.find((a) => {
-      return a.content_type === 'application/x-compressed'
     })
 
     if (archiveFile) {
       return {
         ...release,
         source: configRepoRequest.source,
-        archiveFile,
+        githubArchiveFile: archiveFile,
         isNew,
         currentVersion,
-        detailedChangelog
-      }
-    }
-
-    // compatibility with gitee
-    archiveFile = release.assets.find((a) => {
-      return a.browser_download_url.endsWith('win.7z') || a.browser_download_url.endsWith('win.zip')
-    })
-
-    if (archiveFile) {
-      return {
-        ...release,
-        source: configRepoRequest.source,
-        archiveFile,
-        isNew,
-        currentVersion,
-        detailedChangelog
+        detailedChangelog,
+        downloadUrlCn,
+        downloadUrlGlobal
       }
     }
 
@@ -159,9 +165,11 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       ...release,
       source: configRepoRequest.source,
       isNew,
-      archiveFile: null,
+      githubArchiveFile: null,
       currentVersion,
-      detailedChangelog
+      detailedChangelog,
+      downloadUrlCn,
+      downloadUrlGlobal
     }
   }
 
@@ -182,7 +190,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   /**
    * 三次平均值
    */
-  async testLatency() {
+  async testRepoLatency() {
     const githubLatencies: number[] = []
     const giteeLatencies: number[] = []
 
@@ -239,8 +247,8 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(RemoteConfigMain.id, 'testLatency', () => {
-      return this.testLatency()
+    this._ipc.onCall(RemoteConfigMain.id, 'testRepoLatency', () => {
+      return this.testRepoLatency()
     })
   }
 

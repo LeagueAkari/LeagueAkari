@@ -3027,7 +3027,7 @@ self-update-renderer:
 
   title: 自动更新
   start-update: $t(common:appName) 更新已开始
-  updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
+  updateOnQuit: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
   lastUpdateSuccess: 已成功更新到 {{version}}
 

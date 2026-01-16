@@ -34,11 +34,7 @@
         <div class="markdown-container markdown-body" v-html="markdownHtmlText"></div>
       </NScrollbar>
       <div class="button-group">
-        <ExternalLink
-          class="small-link"
-          v-if="release.archiveFile"
-          :href="release.archiveFile.browser_download_url"
-        >
+        <ExternalLink class="small-link" v-if="externalDownloadUrl" :href="externalDownloadUrl">
           {{ t('UpdateModal.externalDownload') }}
         </ExternalLink>
         <NCheckbox
@@ -51,7 +47,7 @@
           {{ t('UpdateModal.ignoreThisVersion') }}
         </NCheckbox>
         <NButton
-          v-if="release.isNew && release.archiveFile"
+          v-if="release.isNew && release.githubArchiveFile"
           :loading="isUpdating"
           :disabled="isUpdating"
           size="small"
@@ -67,8 +63,8 @@
 
 <script setup lang="ts">
 import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
-import { LatestReleaseWithMetadata } from '@renderer-shared/shards/remote-config/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
+import { LatestReleaseWithMetadata } from '@shared/types/github'
 import { UpdateProgressInfo } from '@shared/types/shards/self-update'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NScrollbar } from 'naive-ui'
@@ -114,6 +110,16 @@ const updateButtonText = computed(() => {
     default:
       return t('UpdateModal.startUpdate')
   }
+})
+
+const externalDownloadUrl = computed(() => {
+  if (!props.release) {
+    return null
+  }
+
+  return props.release.source === 'gitee'
+    ? props.release.downloadUrlCn
+    : (props.release.githubArchiveFile?.browser_download_url ?? null)
 })
 
 const show = defineModel<boolean>('show', { default: false })

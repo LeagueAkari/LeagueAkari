@@ -202,7 +202,7 @@
               <NButton
                 size="tiny"
                 secondary
-                @click="() => handleTestLatency()"
+                @click="() => handleTestRepoLatency()"
                 :loading="isTestingLatency"
               >
                 {{ t('AppSettings.basic.dataSource.testButton') }}
@@ -763,13 +763,13 @@ const processStatus = computed(() => {
 const isTestingLatency = ref(false)
 const latency = ref<{ githubLatency: number; giteeLatency: number } | null>(null)
 
-const handleTestLatency = async () => {
+const handleTestRepoLatency = async () => {
   isTestingLatency.value = true
-  latency.value = await rc.testLatency()
+  latency.value = await rc.testRepoLatency()
   isTestingLatency.value = false
 }
 
-handleTestLatency()
+handleTestRepoLatency()
 
 const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
