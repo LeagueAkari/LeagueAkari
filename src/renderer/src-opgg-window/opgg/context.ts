@@ -6,6 +6,7 @@ import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-conf
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   ModeType,
+  OpggAramMayhemChampionAugmentsResponse,
   OpggChampionBuildResponse,
   OpggChampionsResponse,
   PositionType,
@@ -49,6 +50,8 @@ export type OpggContext = {
   versions: Readonly<Ref<string[]>>
   champions: Readonly<Ref<OpggChampionsResponse | null>>
   champion: Readonly<Ref<OpggChampionBuildResponse | null>>
+
+  kiwiAugments: Readonly<Ref<OpggAramMayhemChampionAugmentsResponse | null>>
 
   isLoading: Readonly<Ref<boolean>>
 
@@ -154,6 +157,9 @@ export function provideOpgg() {
   const versions = shallowRef<string[]>([])
   const champions = shallowRef<OpggChampionsResponse | null>(null)
   const champion = shallowRef<OpggChampionBuildResponse | null>(null)
+
+  // 目前 op.gg 榜单依然采用 aram 总榜，但额外加了 Kiwi 模式的 augments 榜单
+  const kiwiAugments = shallowRef<OpggAramMayhemChampionAugmentsResponse | null>(null)
 
   const queueKeeper = new QueueKeeper([{ id: 'default' }])
 
@@ -278,6 +284,20 @@ export function provideOpgg() {
         updatedChampionData = championData
       }
 
+      let updatedKiwiAugmentsData: OpggAramMayhemChampionAugmentsResponse | null = null
+
+      // 特例判定
+      if (targetChampionId && targetMode === 'aram') {
+        const { data: kiwiAugmentsData } = await queueKeeper.add(
+          'default',
+          'opgg-load-kiwi-augments',
+          ({ signal }) => og.api.getAramMayhemChampionAugments(targetChampionId, { signal }),
+          { tags: ['opgg-group'] }
+        )
+
+        updatedKiwiAugmentsData = kiwiAugmentsData
+      }
+
       // commit
       version.value = nextVersion
       region.value = targetRegion
@@ -293,6 +313,9 @@ export function provideOpgg() {
       if (updatedChampionData) {
         champion.value = updatedChampionData
       }
+
+      // 会在模式不匹配时主动清空
+      kiwiAugments.value = updatedKiwiAugmentsData
     } catch (error) {
       if (isAbortError(error)) {
         return
@@ -371,7 +394,7 @@ export function provideOpgg() {
   // sync game
   const activeSession = useStableComputed(() => {
     if (!lcs.champSelect.session || !lcs.gameflow.session) {
-      return
+      return null
     }
 
     const selfCellId = lcs.champSelect.session.localPlayerCellId
@@ -381,13 +404,13 @@ export function provideOpgg() {
       .find((a) => a.actorCellId === selfCellId && a.type === 'pick' && a.championId)?.championId
 
     if (!self && !selfActionChampionId) {
-      return
+      return null
     }
 
     const championId = selfActionChampionId ?? self?.championId ?? null
 
     if (championId === null) {
-      return
+      return null
     }
 
     // 避免和 auto champ config 冲突，优先按照那边的来
@@ -547,6 +570,8 @@ export function provideOpgg() {
     versions,
     champions,
     champion,
+
+    kiwiAugments,
 
     isLoading,
 

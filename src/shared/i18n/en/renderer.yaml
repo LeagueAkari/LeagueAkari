@@ -2660,9 +2660,13 @@ OpggChampion:
   tierText: T{{tier}}
   applyRunes: Import Current Item Build
   applyRunesText: Build Applied
+  augmentAll: All
   augmentGold: Gold
   augmentSilver: Silver
   augmentPrism: Prism
+  augmentPerformance: Perf.
+  augmentPopular: Popular
+  showAdvancedStats: Show Advanced
   synergies: Synergies
   balance:
     title: Balance

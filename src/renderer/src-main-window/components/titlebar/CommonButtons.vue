@@ -18,11 +18,11 @@
 
       <template v-if="sns.announcementSummary">
         <div>
-          <div class="font-bold text-black/60 dark:text-white/60">
+          <div class="font-bold text-white/80">
             {{ t('CommonButtons.announcementSummary') }}
           </div>
-          <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
-          <div class="mb-2 max-w-[400px] text-xs text-black/80 dark:text-white/80">
+          <div class="my-2 h-px bg-white/10"></div>
+          <div class="mb-2 max-w-[400px] text-xs text-white/80">
             {{ sns.announcementSummary }}
           </div>
           <div class="flex justify-end gap-2">

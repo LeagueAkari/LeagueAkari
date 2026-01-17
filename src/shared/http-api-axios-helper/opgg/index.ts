@@ -1,6 +1,7 @@
 import {
   ModeType,
   OpggAramBalanceResponse,
+  OpggAramMayhemChampionAugmentsResponse,
   OpggChampionBuildResponse,
   OpggChampionsResponse,
   OpggVersionsResponse,
@@ -71,5 +72,14 @@ export class OpggHttpApiAxiosHelper {
     return this._http.get<OpggVersionsResponse>(`/api/${region}/champions/${mode}/versions`, {
       signal: options.signal
     })
+  }
+
+  getAramMayhemChampionAugments(championId: number, options: { signal?: AbortSignal } = {}) {
+    return this._http.get<OpggAramMayhemChampionAugmentsResponse>(
+      `/api/contents/stats/champions/${championId}/aram-augments`,
+      {
+        signal: options.signal
+      }
+    )
   }
 }

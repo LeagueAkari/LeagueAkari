@@ -2661,9 +2661,13 @@ OpggChampion:
   tierText: T{{tier}} 级别
   applyRunes: 导入当前装备方案
   applyRunesText: 方案应用
+  augmentAll: 全部
   augmentGold: 黄金阶
   augmentSilver: 白银阶
   augmentPrism: 棱彩阶
+  augmentPerformance: 强度
+  augmentPopular: 欢迎度
+  showAdvancedStats: 显示进阶数据
   synergies: 搭配
   balance:
     title: 平衡性调整

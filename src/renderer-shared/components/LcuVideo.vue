@@ -27,13 +27,15 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-.lcu-video {
-  display: block;
-}
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-.lcu-video-placeholder {
-  color: rgb(103, 103, 103);
-  background-color: rgb(56, 56, 56);
-  border-radius: 4px;
+@layer components {
+  .lcu-video {
+    display: block;
+  }
+
+  .lcu-video-placeholder {
+    @apply box-border rounded bg-gray-500/40 dark:bg-black/20;
+  }
 }
 </style>

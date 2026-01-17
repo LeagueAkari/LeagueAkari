@@ -323,3 +323,14 @@ export interface OpggArenaAugment {
   first_place: number
   pick_rate: number
 }
+
+export interface OpggAramMayhemChampionAugmentsResponse {
+  data: OpggAramMayhemChampionAugmentItem[]
+}
+
+export interface OpggAramMayhemChampionAugmentItem {
+  id: number
+  tier: number
+  performance: number
+  popular: number
+}

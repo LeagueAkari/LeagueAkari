@@ -19,7 +19,9 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
+            #{{ i + 1 }}
+          </div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
@@ -61,7 +63,9 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
+            #{{ i + 1 }}
+          </div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
@@ -104,7 +108,9 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
+            #{{ i + 1 }}
+          </div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>

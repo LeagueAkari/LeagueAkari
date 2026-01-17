@@ -45,6 +45,10 @@ const themeOverrides = computed<GlobalThemeOverrides>(() => {
       common: {
         popoverColor: '#383838f8'
       },
+      Popover: {
+        color: '#1f1f1ffa',
+        fontSize: '12px'
+      },
       Notification: {
         padding: '12px',
         titleFontSize: '13px',
@@ -66,9 +70,6 @@ const themeOverrides = computed<GlobalThemeOverrides>(() => {
         colorWarning: '#2c2c2c',
         colorError: '#2c2c2c'
       },
-      Popover: {
-        borderColor: 'rgba(255, 255, 255, 0.2)'
-      },
       Checkbox: {
         fontSizeSmall: '13px'
       }
@@ -77,6 +78,9 @@ const themeOverrides = computed<GlobalThemeOverrides>(() => {
     return {
       common: {
         popoverColor: '#ffffff'
+      },
+      Popover: {
+        fontSize: '12px'
       },
       Notification: {
         padding: '12px',
@@ -98,9 +102,6 @@ const themeOverrides = computed<GlobalThemeOverrides>(() => {
         colorSuccess: '#f5f5f5',
         colorWarning: '#f5f5f5',
         colorError: '#f5f5f5'
-      },
-      Popover: {
-        borderColor: 'rgba(0, 0, 0, 0.2)'
       },
       Checkbox: {
         fontSizeSmall: '13px'
