@@ -282,7 +282,13 @@ const selectedFilters = ref<(typeof SUPPORTED_EVENT_TYPES)[number][]>([
   'BUILDING_KILL'
 ])
 
-const formatDuration = (timestamp: number) => dayjs.duration(timestamp).format('mm:ss:SSS')
+const formatDuration = (timestamp: number) => {
+  if (timestamp > 60 * 60 * 1000) {
+    return dayjs.duration(timestamp).format('HH:mm:ss:SSS')
+  }
+
+  return dayjs.duration(timestamp).format('mm:ss:SSS')
+}
 
 const canViewPosition = computed(() => {
   return [12, 11, 21].includes(basicInfo.value.mapId)

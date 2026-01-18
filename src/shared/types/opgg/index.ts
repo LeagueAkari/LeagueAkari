@@ -84,6 +84,8 @@ export interface OpggChampionPositionStats {
   ban_rate: number
   kda: number
   tier_data: OpggChampionTierData
+  total_place: never
+  first_place: never
 }
 
 export enum OpggChampionPositionName {
