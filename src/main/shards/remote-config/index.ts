@@ -175,10 +175,8 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
           archiveFile = data.archiveFileGitHub
         }
 
-        if (locale === 'zh-CN' && data.descriptionZhCn) {
-          description = data.descriptionZhCn
-        } else if (locale === 'en' && data.descriptionEn) {
-          description = data.descriptionEn
+        if (data.descriptions && data.descriptions[locale]) {
+          description = data.descriptions[locale]
         }
 
         if (data.version) {
@@ -220,8 +218,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     if (
       !data.version ||
       !data.publishedAt ||
-      !data.descriptionZhCn ||
-      !data.descriptionEn ||
+      !data.descriptions ||
       !data.archiveFileGitHub ||
       !data.archiveFileGitee
     ) {
@@ -238,7 +235,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       isNew: gt(data.version, currentVersion),
       source: 'last-resort',
       publishedAt: data.publishedAt,
-      description: locale === 'zh-CN' ? data.descriptionZhCn : data.descriptionEn,
+      description: data.descriptions[locale] ?? '',
       archiveFile: source === 'gitee' ? data.archiveFileGitee : data.archiveFileGitHub
     }
   }

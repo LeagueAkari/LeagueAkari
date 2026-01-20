@@ -78,8 +78,7 @@ export const ReleaseOverridesPlainObjectSchema = z.object({
   /** 指的是软件版本号，并非 schema 版本 */
   version: z.string().optional(),
   publishedAt: z.iso.datetime().optional(),
-  descriptionZhCn: z.string().optional(),
-  descriptionEn: z.string().optional(),
+  descriptions: z.record(z.enum(['zh-CN', 'en']), z.string()).optional(),
   archiveFileGitHub: ArchiveFileSchema.optional(),
   archiveFileGitee: ArchiveFileSchema.optional()
 })

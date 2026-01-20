@@ -374,17 +374,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     // 仅仅用于 debug
     this._ipc.onCall(SelfUpdateMain.id, 'forceStartUpdate', async () => {
-      if (this._rc.state.latestRelease && this._rc.state.latestRelease.archiveFile) {
+      if (this._rc.state.latestRelease) {
         this._log.info(
           'Force start update, target:',
           this._rc.state.latestRelease.version,
           this._rc.state.latestRelease.archiveFile.name
         )
-        await this._startUpdateProcess(
-          this._rc.state.latestRelease as LatestReleaseInfo & {
-            archiveFile: ReleaseArchiveFile
-          }
-        )
+        await this._startUpdateProcess(this._rc.state.latestRelease)
       } else {
         this._log.warn('No latest release found, cannot force start update')
       }
