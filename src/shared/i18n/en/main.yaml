@@ -50,7 +50,6 @@ self-update-main:
   title: Self Update
   start-update: Starting update $t(common:appName)
   updateOnQuit: Updated Applied. Restart the application to apply the update
-  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}
 
 auto-champ-config-main:

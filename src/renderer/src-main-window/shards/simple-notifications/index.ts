@@ -395,12 +395,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
         watch(
           () => rcs.latestRelease,
           (release, p) => {
-            if (!release || sus.settings.ignoreVersion === release.tag_name) {
+            if (!release || sus.settings.ignoreVersion === release.version) {
               return
             }
 
             // unchanged
-            if (p && p.tag_name === release.tag_name) {
+            if (p && p.version === release.version) {
               return
             }
 
@@ -430,7 +430,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                         }
                       ]
                     },
-                    () => h('span', t('content', { version: release.tag_name }))
+                    () => h('span', t('content', { version: release.version }))
                   ),
                 duration: 0
               })

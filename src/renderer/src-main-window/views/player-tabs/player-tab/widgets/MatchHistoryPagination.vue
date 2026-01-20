@@ -20,6 +20,8 @@
       :options="sgpTagOptions"
       :disabled="isLoading"
       class="w-56!"
+      :render-label="renderLabel"
+      :consistent-menu-width="false"
     />
 
     <!-- 每页条数 -->
@@ -165,6 +167,8 @@
       size="small"
       :options="sgpTagOptions"
       :disabled="isLoading"
+      :render-label="renderLabel"
+      :consistent-menu-width="false"
     />
 
     <!-- 更多筛选 + 翻页 -->
@@ -293,6 +297,7 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import {
   ArrowCircleRight32Filled,
@@ -302,11 +307,13 @@ import {
   Previous20Filled
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber, NPopover, NSelect } from 'naive-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { NButton, NIcon, NInputNumber, NPopover, NSelect, SelectOption } from 'naive-ui'
+import { computed, h, ref, watchEffect } from 'vue'
 
+import { useMapAssets } from '@main-window/composables/useMapAssets'
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
+import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-data/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
@@ -319,6 +326,7 @@ const { isFloating = false, horizontal = false } = defineProps<{
 }>()
 
 const { t } = useTranslation()
+
 const pts = usePlayerTabsStore()
 const sgpTagOptions = useSgpTagOptions()
 const pageSizeOptions = usePageSizeOptions()
@@ -369,5 +377,70 @@ const handleGoToArbitraryPage = () => {
 
 const handleGoToFirstPage = () => {
   loadMatchHistory({ startIndex: 0 })
+}
+
+const mapAssets = useMapAssets()
+const shs = useSelfHostedLcuDataStore()
+
+const mapIdGameModeIconUri = computed(() => {
+  if (!mapAssets.value) {
+    return {}
+  }
+
+  const uriMap: Record<string, string> = {}
+
+  for (const [mapId, mapAsset] of Object.entries(mapAssets.value)) {
+    for (const item of mapAsset) {
+      const key = `${mapId}_${item.gameMode}`
+
+      if (uriMap[key]) {
+        continue
+      }
+
+      uriMap[key] = item.assets?.['game-select-icon-hover']
+    }
+  }
+
+  return uriMap
+})
+
+const getQueueMapIconUri = (queueId: number | undefined) => {
+  if (!queueId) {
+    return mapIdGameModeIconUri.value['11_CLASSIC']
+  }
+
+  const queue = shs.gameQueues[queueId]
+
+  if (queue) {
+    return (
+      mapIdGameModeIconUri.value[`${queue.mapId}_${queue.gameMode}`] ??
+      mapIdGameModeIconUri.value['11_CLASSIC']
+    )
+  } else {
+    return mapIdGameModeIconUri.value['11_CLASSIC']
+  }
+}
+
+const renderLabel = (option: SelectOption) => {
+  if (option.type === 'group') {
+    return h('span', option.label as string)
+  }
+
+  const value = option.value as string
+  const [_, queueId] = value.split('q_')
+
+  return h(
+    'div',
+    {
+      class: 'flex items-center gap-2'
+    },
+    [
+      h(LcuImage, {
+        src: getQueueMapIconUri(queueId ? parseInt(queueId) : undefined),
+        class: 'size-5 rounded'
+      }),
+      h('span', { class: 'text-sm' }, option.label as string)
+    ]
+  )
 }
 </script>

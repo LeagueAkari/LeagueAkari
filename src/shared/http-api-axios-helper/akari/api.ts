@@ -1,4 +1,5 @@
 import { AKARI_API_BASE_URL } from '@shared/constants/common'
+import { ReleaseOverridesPlainObject } from '@shared/validators/remote-config'
 import { AxiosInstance } from 'axios'
 
 export class AkariApiHttpApiAxiosHelper {
@@ -10,5 +11,9 @@ export class AkariApiHttpApiAxiosHelper {
 
   postStatisticsRecord(version: string) {
     return this._http.post('/statistics/v1/records', { version })
+  }
+
+  getLastResortLatestRelease() {
+    return this._http.get<ReleaseOverridesPlainObject>('/last-resort/v1/latest-release')
   }
 }

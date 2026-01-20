@@ -1,4 +1,4 @@
-import { LatestReleaseWithMetadata } from '@shared/types/github'
+import { LatestReleaseInfo } from '@shared/types/akari'
 import {
   LeagueServersConfig,
   OngoingGameConfig,
@@ -17,9 +17,7 @@ interface Announcement {
   uniqueId: string
 }
 
-export type { LatestReleaseWithMetadata }
-
-function releaseEquals(a: LatestReleaseWithMetadata | null, b: LatestReleaseWithMetadata | null) {
+function releaseEquals(a: LatestReleaseInfo | null, b: LatestReleaseInfo | null) {
   if (a === null && b === null) {
     return true
   }
@@ -36,7 +34,7 @@ function releaseEquals(a: LatestReleaseWithMetadata | null, b: LatestReleaseWith
     return false
   }
 
-  return a.currentVersion === b.currentVersion && a.tag_name === b.tag_name
+  return a.currentVersion === b.currentVersion && a.version === b.version
 }
 export class RemoteConfigState {
   /**
@@ -57,7 +55,7 @@ export class RemoteConfigState {
   /**
    * latestRelease 的值，用于添加自定义 equals 方法
    */
-  latestReleaseValue = observable.box<LatestReleaseWithMetadata | null>(null, {
+  latestReleaseValue = observable.box<LatestReleaseInfo | null>(null, {
     equals: releaseEquals
   })
 
@@ -81,7 +79,7 @@ export class RemoteConfigState {
     this.leagueServers = leagueServers
   }
 
-  setLatestRelease(latestRelease: LatestReleaseWithMetadata | null) {
+  setLatestRelease(latestRelease: LatestReleaseInfo | null) {
     this.latestReleaseValue.set(latestRelease)
   }
 

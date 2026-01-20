@@ -89,16 +89,3 @@ export interface GithubApiFile {
   encoding: string
   _links: Links
 }
-
-/**
- * 用于应用更新的 release 扩展信息
- */
-export interface LatestReleaseWithMetadata extends GithubApiLatestRelease {
-  source: 'github' | 'gitee'
-  isNew: boolean
-  currentVersion: string
-  detailedChangelog: string | null
-  githubArchiveFile: GithubApiAsset | null
-  downloadUrlCn: string | null
-  downloadUrlGlobal: string | null
-}

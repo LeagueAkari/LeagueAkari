@@ -66,6 +66,8 @@ gameModes:
   TFT: 云顶之弈
 
 sgpMatchHistoryTags:
+  groupGeneral: 通用模式
+  groupGameModes: 游戏模式
   all: 所有模式
   ranked: 排位积分类模式
   normal: 普通类模式

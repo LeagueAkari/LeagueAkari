@@ -3,7 +3,7 @@ import { DEEP_LINK_PROTOCOL_DEV, DEEP_LINK_PROTOCOL_PROD } from '@main/utils/dee
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { GithubApiAsset } from '@shared/types/github'
+import { LatestReleaseInfo, ReleaseArchiveFile } from '@shared/types/akari'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
 import { Notification, app, shell } from 'electron'
@@ -19,7 +19,6 @@ import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { RemoteConfigMain } from '../remote-config'
-import { LatestReleaseWithMetadata } from '../remote-config/state'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SelfUpdateSettings, SelfUpdateState } from './state'
@@ -94,16 +93,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._rc.state.latestRelease
         ] as const,
       ([yes, ignoreVersion, release]) => {
-        if (
-          yes &&
-          release &&
-          release.isNew &&
-          release.githubArchiveFile &&
-          release.tag_name !== ignoreVersion
-        ) {
-          this._startUpdateProcess(
-            release as LatestReleaseWithMetadata & { githubArchiveFile: GithubApiAsset }
-          )
+        if (yes && release && release.isNew && release.version !== ignoreVersion) {
+          this._startUpdateProcess(release)
         }
       },
       { equals: comparer.shallow }
@@ -317,9 +308,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _startUpdateProcess(
-    release: LatestReleaseWithMetadata & { githubArchiveFile: GithubApiAsset }
-  ) {
+  private async _startUpdateProcess(release: LatestReleaseInfo) {
     if (
       this.state.updateProgressInfo &&
       (this.state.updateProgressInfo.phase === 'downloading' ||
@@ -328,26 +317,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       return
     }
 
-    // for CHINA only, fuck u gitee
-    const downloadUrl =
-      release.source === 'gitee'
-        ? release.downloadUrlCn
-        : release.githubArchiveFile.browser_download_url
-
-    if (!downloadUrl) {
-      this._log.warn('No download URL found for release', release.tag_name)
-      this._ipc.sendEvent(
-        SelfUpdateMain.id,
-        'error-download-update',
-        formatError(new Error('No download URL found for release'))
-      )
-
-      return
-    }
-
     try {
-      const downloadPath = await this._downloadUpdate(downloadUrl, release.githubArchiveFile.name)
-      await this._spawnUpdaterOnQuit(downloadPath, release.tag_name)
+      const downloadPath = await this._downloadUpdate(
+        release.archiveFile.downloadUrl,
+        release.archiveFile.name
+      )
+      await this._spawnUpdaterOnQuit(downloadPath, release.version)
     } catch {}
   }
 
@@ -368,7 +343,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     try {
       const release = await this._rc.updateLatestReleaseManually()
 
-      if (release && release.isNew && release.githubArchiveFile) {
+      if (release && release.isNew) {
         return { result: 'new-updates' }
       } else {
         return { result: 'no-updates' }
@@ -387,11 +362,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       if (
         this._rc.state.latestRelease &&
         this._rc.state.latestRelease.isNew &&
-        this._rc.state.latestRelease.githubArchiveFile
+        this._rc.state.latestRelease.archiveFile
       ) {
         await this._startUpdateProcess(
-          this._rc.state.latestRelease as LatestReleaseWithMetadata & {
-            githubArchiveFile: GithubApiAsset
+          this._rc.state.latestRelease as LatestReleaseInfo & {
+            archiveFile: ReleaseArchiveFile
           }
         )
       }
@@ -399,15 +374,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     // 仅仅用于 debug
     this._ipc.onCall(SelfUpdateMain.id, 'forceStartUpdate', async () => {
-      if (this._rc.state.latestRelease && this._rc.state.latestRelease.githubArchiveFile) {
+      if (this._rc.state.latestRelease && this._rc.state.latestRelease.archiveFile) {
         this._log.info(
           'Force start update, target:',
-          this._rc.state.latestRelease.tag_name,
-          this._rc.state.latestRelease.githubArchiveFile.name
+          this._rc.state.latestRelease.version,
+          this._rc.state.latestRelease.archiveFile.name
         )
         await this._startUpdateProcess(
-          this._rc.state.latestRelease as LatestReleaseWithMetadata & {
-            githubArchiveFile: GithubApiAsset
+          this._rc.state.latestRelease as LatestReleaseInfo & {
+            archiveFile: ReleaseArchiveFile
           }
         )
       } else {

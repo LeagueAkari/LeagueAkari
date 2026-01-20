@@ -442,7 +442,7 @@ export function provideOpgg() {
 
       let mode0 = mode.value
       let isUnsupportedMode = false
-      let justSwitchTab = false
+      let isFakeKiwi = false
 
       switch (active.gameMode) {
         case 'CLASSIC':
@@ -453,7 +453,7 @@ export function provideOpgg() {
           position.value = 'none'
           break
         case 'KIWI':
-          justSwitchTab = true
+          isFakeKiwi = true
           mode0 = 'aram'
           position.value = 'none'
           break
@@ -512,15 +512,12 @@ export function provideOpgg() {
           position: position0
         })
 
-        if (justSwitchTab) {
-          return
-        }
-
         // 处理自动化
         const summonerSpells = champion.value?.data.summoner_spells
         const runes = champion.value?.data.runes
 
         if (
+          !isFakeKiwi &&
           !active.hasAutoSpellsConfig &&
           summonerSpells &&
           summonerSpells[0] &&
@@ -530,6 +527,7 @@ export function provideOpgg() {
         }
 
         if (
+          !isFakeKiwi &&
           !active.hasAutoRunesConfig &&
           runes &&
           runes[0] &&

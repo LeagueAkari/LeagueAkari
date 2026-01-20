@@ -16,20 +16,30 @@ export function useSgpTagOptions() {
   return computed(() => {
     return [
       {
-        label: t('sgpMatchHistoryTags.all', { ns: 'common' }),
-        value: ALL_SGPTAG_VALUE
+        type: 'group',
+        children: [
+          {
+            label: t('sgpMatchHistoryTags.all', { ns: 'common' }),
+            value: ALL_SGPTAG_VALUE
+          },
+          {
+            label: t('sgpMatchHistoryTags.ranked', { ns: 'common' }),
+            value: RANKED_SGPTAG_VALUE
+          },
+          {
+            label: t('sgpMatchHistoryTags.normal', { ns: 'common' }),
+            value: NORMAL_SGPTAG_VALUE
+          }
+        ],
+        label: t('sgpMatchHistoryTags.groupGeneral', { ns: 'common' })
       },
-      ...sgps.supportedQueues.map((id) => ({
-        label: lcs.gameData.queues[id]?.name || id,
-        value: `q_${id}`
-      })),
       {
-        label: t('sgpMatchHistoryTags.ranked', { ns: 'common' }),
-        value: RANKED_SGPTAG_VALUE
-      },
-      {
-        label: t('sgpMatchHistoryTags.normal', { ns: 'common' }),
-        value: NORMAL_SGPTAG_VALUE
+        type: 'group',
+        children: sgps.supportedQueues.map((id) => ({
+          label: lcs.gameData.queues[id]?.name || id,
+          value: `q_${id}`
+        })),
+        label: t('sgpMatchHistoryTags.groupGameModes', { ns: 'common' })
       }
     ] as SelectMixedOption[]
   })

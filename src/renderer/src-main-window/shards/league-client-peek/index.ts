@@ -66,7 +66,7 @@ export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
       )
     }
 
-    const { resume } = useIntervalFn(updateConnectableClientExtraInfo, 1 * 60 * 1000, {
+    const { resume } = useIntervalFn(updateConnectableClientExtraInfo, 10 * 1000, {
       immediate: false,
       immediateCallback: true
     })

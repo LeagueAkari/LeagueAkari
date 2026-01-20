@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const leagueServersConfigV2Schema = z.object({
+export const LeagueServersConfigV2Schema = z.object({
   servers: z.record(
     z.string(),
     z.object({
@@ -20,9 +20,9 @@ export const leagueServersConfigV2Schema = z.object({
   lastUpdate: z.number()
 })
 
-export type LeagueServersConfig = z.infer<typeof leagueServersConfigV2Schema>
+export type LeagueServersConfig = z.infer<typeof LeagueServersConfigV2Schema>
 
-export const inGameSendTemplateCatalogV1Schema = z.object({
+export const InGameSendTemplateCatalogV1Schema = z.object({
   templates: z.array(
     z.object({
       id: z.string(),
@@ -37,17 +37,17 @@ export const inGameSendTemplateCatalogV1Schema = z.object({
   lastUpdate: z.number()
 })
 
-export type InGameSendTemplateCatalog = z.infer<typeof inGameSendTemplateCatalogV1Schema>
+export type InGameSendTemplateCatalog = z.infer<typeof InGameSendTemplateCatalogV1Schema>
 
-export const supportedQueuesV1Schema = z.object({
+export const SupportedQueuesV1Schema = z.object({
   queues: z.array(z.number()),
   version: z.number().lte(1),
   lastUpdate: z.number()
 })
 
-export type SupportedQueues = z.infer<typeof supportedQueuesV1Schema>
+export type SupportedQueues = z.infer<typeof SupportedQueuesV1Schema>
 
-export const ongoingGameConfigV1Schema = z.object({
+export const OngoingGameConfigV1Schema = z.object({
   /** 主播模式特殊策略 */
   spotlight: z.object({
     /** 英雄选择阶段的 puuid 反混淆 */
@@ -64,31 +64,24 @@ export const ongoingGameConfigV1Schema = z.object({
   lastUpdate: z.number()
 })
 
-export type OngoingGameConfig = z.infer<typeof ongoingGameConfigV1Schema>
+export type OngoingGameConfig = z.infer<typeof OngoingGameConfigV1Schema>
 
-export const releaseConfigV1Schema = z.object({
-  /** 通常是版本号，semver */
-  tagName: z.string(),
-
-  /** 版本更新说明 */
-  description: z.string(),
-
-  /** 可下载链接 */
-  archiveFile: z.object({
-    downloadUrl: z.string(),
-    contentType: z.string()
-  }),
-
-  version: z.number().lte(1),
-  lastUpdate: z.number()
+const ArchiveFileSchema = z.object({
+  name: z.string(),
+  size: z.number(),
+  downloadUrl: z.url(),
+  contentType: z.string()
 })
-
-export type ReleaseConfig = z.infer<typeof releaseConfigV1Schema>
 
 /** 没有版本号的普通 json 对象，很简单 */
-export const releaseMetadataPlainObjectSchema = z.object({
-  downloadUrlCn: z.string().nullable(),
-  downloadUrlGlobal: z.string().nullable()
+export const ReleaseOverridesPlainObjectSchema = z.object({
+  /** 指的是软件版本号，并非 schema 版本 */
+  version: z.string().optional(),
+  publishedAt: z.iso.datetime().optional(),
+  descriptionZhCn: z.string().optional(),
+  descriptionEn: z.string().optional(),
+  archiveFileGitHub: ArchiveFileSchema.optional(),
+  archiveFileGitee: ArchiveFileSchema.optional()
 })
 
-export type ReleaseMetadataPlainObject = z.infer<typeof releaseMetadataPlainObjectSchema>
+export type ReleaseOverridesPlainObject = z.infer<typeof ReleaseOverridesPlainObjectSchema>

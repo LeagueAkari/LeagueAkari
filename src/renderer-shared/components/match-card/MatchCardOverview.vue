@@ -121,6 +121,7 @@
                     </div>
                   </div>
 
+                  <!-- dmg -->
                   <div class="min-w-22">
                     <div class="text-center text-base font-bold">
                       {{
@@ -139,6 +140,25 @@
                       </div>
                       <div class="text-xs text-black/60 dark:text-white/60">
                         {{ t('MatchCard.overview.damage') }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- cs -->
+                  <div class="hidden min-w-22 @min-[700px]:block" v-if="displayParts.cs">
+                    <div class="text-center text-base font-bold">
+                      {{ formatExtremeNumber(participant.cs) }}
+                      <span class="text-[11px] font-normal text-black/60 dark:text-white/60">{{
+                        t('MatchCard.overview.cs')
+                      }}</span>
+                    </div>
+
+                    <div class="flex justify-center gap-1">
+                      <div class="text-xs text-black/80 dark:text-white/80">
+                        {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
+                      </div>
+                      <div class="text-xs text-black/60 dark:text-white/60">
+                        {{ t('MatchCard.overview.csPerMin') }}
                       </div>
                     </div>
                   </div>
@@ -476,7 +496,8 @@ const displayParts = computed(() => {
     spells: true,
     augments: basicInfo.value.gameMode === 'CHERRY' || basicInfo.value.gameMode === 'KIWI',
     runes: basicInfo.value.gameMode !== 'CHERRY' && basicInfo.value.gameMode !== 'KIWI',
-    items: true
+    items: true,
+    cs: basicInfo.value.gameMode === 'CLASSIC'
   }
 })
 

@@ -211,7 +211,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NEllipsis, NIcon, NScrollbar, NSpin } from 'naive-ui'
 import { computed, h } from 'vue'
 
-import { useLeagueClientPeekStore } from '../../shards/league-client-peek/store'
+import { useLeagueClientPeekStore } from '@main-window/shards/league-client-peek/store'
 
 const { t } = useTranslation()
 

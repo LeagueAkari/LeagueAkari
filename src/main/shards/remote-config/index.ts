@@ -1,13 +1,15 @@
 import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
+import { LatestReleaseInfo, ReleaseArchiveFile } from '@shared/types/akari'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import {
-  leagueServersConfigV2Schema,
-  ongoingGameConfigV1Schema,
-  releaseMetadataPlainObjectSchema,
-  supportedQueuesV1Schema
+  LeagueServersConfigV2Schema,
+  OngoingGameConfigV1Schema,
+  ReleaseOverridesPlainObjectSchema,
+  SupportedQueuesV1Schema
 } from '@shared/validators/remote-config'
-import { isAxiosError } from 'axios'
+import axios, { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { app } from 'electron'
 import { comparer } from 'mobx'
@@ -20,7 +22,7 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { RemoteGitRepository } from './repository'
-import { LatestReleaseWithMetadata, RemoteConfigSettings, RemoteConfigState } from './state'
+import { RemoteConfigSettings, RemoteConfigState } from './state'
 
 /**
  * 从 GitHub / Gitee 获取数据, 并提供给其他模块使用
@@ -39,6 +41,13 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   static ONGOING_GAME_CONFIG_RELATIVE_PATH = 'ongoing-game/config.json'
 
   private _repo = new RemoteGitRepository()
+  private _akariApi = new AkariApiHttpApiAxiosHelper(
+    axios.create({
+      headers: {
+        'User-Agent': `LeagueAkari/${app.getVersion()} `
+      }
+    })
+  )
 
   get repo() {
     return this._repo
@@ -102,74 +111,135 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 通过另一个专门的配置仓库，补全更多信息
+   * 补全此 release 的信息
+   *
+   * 优先以 overrides.json 中的信息为准:
+   *
+   * - 对于 description，优先级 overrides.json > changelog.md >  release body
+   * - 对于 publishedAt，优先级 overrides.json > release.published_at
+   * - 对于 version，优先级 overrides.json > release.tag_name
+   * - 对于 archiveFile，优先级 overrides.json > release.assets 中找到的文件
    */
-  private async _addMoreInfoToRelease(
-    release: GithubApiLatestRelease
-  ): Promise<LatestReleaseWithMetadata> {
-    const isNew = gt(release.tag_name, app.getVersion())
+  private async _completeReleaseInfo(release: GithubApiLatestRelease): Promise<LatestReleaseInfo> {
     const currentVersion = app.getVersion()
     const locale = this._app.settings.locale as 'zh-CN' | 'en'
+    const source = this.settings.preferredSource
     const configRepoRequest = {
-      source: this.settings.preferredSource,
+      source,
       repo: 'akari-config' as const,
       branch: 'main'
     }
 
-    const [changelogResponse, metadataResponse] = await Promise.allSettled([
+    const [changelogResp, overridesResp] = await Promise.allSettled([
       this.repo.getRawContent(`/releases/${release.tag_name}/${locale}.md`, configRepoRequest),
-      this.repo.getRawContent(`/releases/${release.tag_name}/metadata.json`, configRepoRequest)
+      this.repo.getRawContent(`/releases/${release.tag_name}/overrides.json`, configRepoRequest)
     ])
 
-    let detailedChangelog: string | null = null
-    let downloadUrlCn: string | null = null
-    let downloadUrlGlobal: string | null = null
-
-    if (changelogResponse.status === 'fulfilled') {
-      detailedChangelog = changelogResponse.value.data
-    } else {
-      this._log.warn('Failed to get changelog', release.tag_name, changelogResponse.reason)
-    }
-
-    if (metadataResponse.status === 'fulfilled') {
-      const data = releaseMetadataPlainObjectSchema.parse(metadataResponse.value.data)
-
-      downloadUrlCn = data.downloadUrlCn
-      downloadUrlGlobal = data.downloadUrlGlobal
-    } else {
-      this._log.warn('Failed to parse metadata', release.tag_name, metadataResponse.reason)
-    }
-
-    const archiveFile = release.assets.find((a) => {
+    // 从 assets 中找到归档包文件，在没有默认覆盖的情况下就用这个
+    const archiveAsset = release.assets.find((a) => {
       return (
-        a.content_type === 'application/x-compressed' ||
-        // for gitee
+        // for github
+        ((a.content_type === 'application/x-compressed' ||
+          a.content_type === 'application/x-7z-compressed') &&
+          a.name.includes('win')) ||
+        // for gitee，它没有 content_type 字段
         a.browser_download_url.endsWith('win.7z')
       )
     })
 
-    if (archiveFile) {
-      return {
-        ...release,
-        source: configRepoRequest.source,
-        githubArchiveFile: archiveFile,
-        isNew,
-        currentVersion,
-        detailedChangelog,
-        downloadUrlCn,
-        downloadUrlGlobal
+    // overrides
+    let description =
+      changelogResp.status === 'fulfilled' ? changelogResp.value.data.data : release.body
+    let publishedAt = release.published_at
+    let version = release.tag_name
+    let archiveFile: ReleaseArchiveFile | null = archiveAsset
+      ? {
+          name: archiveAsset.name,
+          size: archiveAsset.size,
+          downloadUrl: archiveAsset.browser_download_url,
+          contentType: archiveAsset.content_type
+        }
+      : null
+
+    if (overridesResp.status === 'fulfilled') {
+      const { success, data, error } = ReleaseOverridesPlainObjectSchema.safeParse(
+        overridesResp.value.data
+      )
+
+      this._log.info('Got overrides.json for release ', data)
+
+      if (success) {
+        if (source === 'gitee' && data.archiveFileGitee) {
+          archiveFile = data.archiveFileGitee
+        } else if (source === 'github' && data.archiveFileGitHub) {
+          archiveFile = data.archiveFileGitHub
+        }
+
+        if (locale === 'zh-CN' && data.descriptionZhCn) {
+          description = data.descriptionZhCn
+        } else if (locale === 'en' && data.descriptionEn) {
+          description = data.descriptionEn
+        }
+
+        if (data.version) {
+          version = data.version
+        }
+
+        if (data.publishedAt) {
+          publishedAt = data.publishedAt
+        }
+      } else {
+        // 没有 overrides
+        this._log.warn('Failed to parse overrides.json for release ' + release.tag_name, error)
       }
+    } else {
+      this._log.info('No release overrides found for release ' + release.tag_name)
+    }
+
+    // 红线：必须要有 archiveFile
+    if (!archiveFile) {
+      this._log.warn('No archive file found for release ' + release.tag_name)
+      throw new Error('No archive file found for release ' + release.tag_name)
     }
 
     return {
-      ...release,
-      source: configRepoRequest.source,
-      isNew,
-      githubArchiveFile: null,
+      version,
       currentVersion,
-      detailedChangelog,
-      downloadUrlCn,
-      downloadUrlGlobal
+      publishedAt,
+      isNew: gt(version, currentVersion),
+      source,
+      description,
+      archiveFile
+    }
+  }
+
+  async getLatestReleaseFromLastResort(): Promise<LatestReleaseInfo> {
+    const { data } = await this._akariApi.getLastResortLatestRelease()
+
+    // 最终的希望
+    if (
+      !data.version ||
+      !data.publishedAt ||
+      !data.descriptionZhCn ||
+      !data.descriptionEn ||
+      !data.archiveFileGitHub ||
+      !data.archiveFileGitee
+    ) {
+      throw new Error('Invalid last resort latest release')
+    }
+
+    const currentVersion = app.getVersion()
+    const locale = this._app.settings.locale as 'zh-CN' | 'en'
+    const source = this.settings.preferredSource
+
+    return {
+      version: data.version,
+      currentVersion,
+      isNew: gt(data.version, currentVersion),
+      source: 'last-resort',
+      publishedAt: data.publishedAt,
+      description: locale === 'zh-CN' ? data.descriptionZhCn : data.descriptionEn,
+      archiveFile: source === 'gitee' ? data.archiveFileGitee : data.archiveFileGitHub
     }
   }
 
@@ -178,7 +248,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       isAxiosError(error) &&
       error.status === 403 &&
       typeof error.response?.data === 'string' &&
-      error.response?.data.toLowerCase().includes('rate limit exceeded')
+      error.response.data.match(/rate[-_\s]?limit/i)
     ) {
       this._log.warn('Rate limit exceeded', error.config?.url, error.config?.method)
       return true
@@ -260,7 +330,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const rawJson = await this._setting.readFromJsonConfigFile(
         RemoteConfigMain.SUPPORTED_QUEUES_RELATIVE_PATH
       )
-      const { success, data, error } = supportedQueuesV1Schema.safeParse(rawJson)
+      const { success, data, error } = SupportedQueuesV1Schema.safeParse(rawJson)
 
       if (success) {
         this.state.setSupportedQueues(data)
@@ -273,7 +343,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const rawJson = await this._setting.readFromJsonConfigFile(
         RemoteConfigMain.LEAGUE_SERVERS_RELATIVE_PATH
       )
-      const { success, data, error } = leagueServersConfigV2Schema.safeParse(rawJson)
+      const { success, data, error } = LeagueServersConfigV2Schema.safeParse(rawJson)
 
       if (success) {
         this.state.setLeagueServers(data)
@@ -288,7 +358,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
       const rawJson = await this._setting.readFromJsonConfigFile(
         RemoteConfigMain.ONGOING_GAME_CONFIG_RELATIVE_PATH
       )
-      const { success, data, error } = ongoingGameConfigV1Schema.safeParse(rawJson)
+      const { success, data, error } = OngoingGameConfigV1Schema.safeParse(rawJson)
 
       if (success) {
         this.state.setOngoingGameConfig(data)
@@ -345,11 +415,24 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         repo: 'akari'
       })
 
-      this.state.setLatestRelease(await this._addMoreInfoToRelease(data))
+      this.state.setLatestRelease(await this._completeReleaseInfo(data))
 
       this._log.info('Updated Latest Release', this.settings.preferredSource)
     } catch (error) {
       if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
+      // 走 last-resort 逻辑，疑似目标仓库出现问题，使用备用方案
+      if (isAxiosError(error) && error.response) {
+        try {
+          this.state.setLatestRelease(await this.getLatestReleaseFromLastResort())
+
+          this._log.info('Updated Latest Release from last resort')
+        } catch (error) {
+          this._log.warn('Failed to get latest release from last resort', error)
+        }
+
         return
       }
 
@@ -380,14 +463,31 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         repo: 'akari'
       })
 
-      const release = await this._addMoreInfoToRelease(data)
+      const release = await this._completeReleaseInfo(data)
       this.state.setLatestRelease(release)
       this._latestReleaseTask.start()
+    } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
 
-      return release
+      // 同上
+      if (isAxiosError(error) && error.response) {
+        try {
+          this.state.setLatestRelease(await this.getLatestReleaseFromLastResort())
+
+          this._log.info('Updated Latest Release from last resort (manual)')
+        } catch (error) {
+          this._log.warn('Failed to get latest release from last resort (manual)', error)
+        }
+      }
+
+      this._log.warn('Update Latest Release failed (manual)', error)
     } finally {
       this.state.setUpdatingLatestRelease(false)
     }
+
+    return this.state.latestRelease
   }
 
   /**
@@ -406,7 +506,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         source: this.settings.preferredSource
       })
 
-      const { success, data, error } = supportedQueuesV1Schema.safeParse(remoteData)
+      const { success, data, error } = SupportedQueuesV1Schema.safeParse(remoteData)
 
       if (success) {
         if (data.lastUpdate > this.state.supportedQueues.lastUpdate) {
@@ -456,7 +556,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         branch: 'main'
       })
 
-      const { success, data, error } = leagueServersConfigV2Schema.safeParse(remoteData)
+      const { success, data, error } = LeagueServersConfigV2Schema.safeParse(remoteData)
 
       if (success) {
         if (data.lastUpdate > this.state.leagueServers.lastUpdate) {
@@ -506,7 +606,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         branch: 'main'
       })
 
-      const { success, data, error } = ongoingGameConfigV1Schema.safeParse(remoteData)
+      const { success, data, error } = OngoingGameConfigV1Schema.safeParse(remoteData)
 
       if (success) {
         if (data.lastUpdate > this.state.ongoingGameConfig.lastUpdate) {

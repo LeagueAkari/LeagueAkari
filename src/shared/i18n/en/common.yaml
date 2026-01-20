@@ -66,6 +66,8 @@ gameModes:
   TFT: TFT
 
 sgpMatchHistoryTags:
+  groupGeneral: General
+  groupGameModes: Game Modes
   all: All Modes
   ranked: Ranked Modes
   normal: Normal Modes

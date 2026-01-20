@@ -10,7 +10,7 @@
       <span class="card-header-title">
         <template v-if="release">
           {{ release.isNew ? t('UpdateModal.newVersion') : t('UpdateModal.versionFeatures') }}
-          {{ release.tag_name }}
+          {{ release.version }}
         </template>
         <template v-else>
           {{ t('UpdateModal.noUpdate') }}
@@ -21,7 +21,7 @@
       <div v-if="release.isNew" class="para">
         {{
           t('UpdateModal.newVersionAvailable', {
-            version: release.tag_name,
+            version: release.version,
             currentVersion: release.currentVersion
           })
         }}
@@ -39,15 +39,15 @@
         </ExternalLink>
         <NCheckbox
           v-if="release.isNew"
-          @update:checked="(val) => emits('ignoreVersion', release!.tag_name, val)"
+          @update:checked="(val) => emits('ignoreVersion', release!.version, val)"
           :disabled="isUpdating"
-          :checked="props.release?.tag_name === props.ignoreVersion"
+          :checked="props.release?.version === props.ignoreVersion"
           size="small"
         >
           {{ t('UpdateModal.ignoreThisVersion') }}
         </NCheckbox>
         <NButton
-          v-if="release.isNew && release.githubArchiveFile"
+          v-if="release.isNew && release.archiveFile"
           :loading="isUpdating"
           :disabled="isUpdating"
           size="small"
@@ -64,14 +64,14 @@
 <script setup lang="ts">
 import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { LatestReleaseWithMetadata } from '@shared/types/github'
+import { LatestReleaseInfo } from '@shared/types/akari'
 import { UpdateProgressInfo } from '@shared/types/shards/self-update'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  release: LatestReleaseWithMetadata | null
+  release: LatestReleaseInfo | null
   ignoreVersion: string | null
   updateProgressInfo: UpdateProgressInfo | null
 }>()
@@ -86,7 +86,7 @@ const { t } = useTranslation()
 const markdownHtmlText = computed(() => {
   return markdownIt.render(
     props.release
-      ? props.release.detailedChangelog || props.release.body || t('UpdateModal.noUpdateMd')
+      ? props.release.description || t('UpdateModal.noUpdateMd')
       : t('UpdateModal.noUpdateMd')
   )
 })
@@ -117,9 +117,7 @@ const externalDownloadUrl = computed(() => {
     return null
   }
 
-  return props.release.source === 'gitee'
-    ? props.release.downloadUrlCn
-    : (props.release.githubArchiveFile?.browser_download_url ?? null)
+  return props.release.archiveFile.downloadUrl
 })
 
 const show = defineModel<boolean>('show', { default: false })

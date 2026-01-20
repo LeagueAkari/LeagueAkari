@@ -1074,6 +1074,8 @@ MatchCard:
   overview:
     perfect: Perfect
     damage: Dmg.
+    cs: CS
+    csPerMin: / Min
 
   radar:
     damage: Damage ({{value}})
@@ -1596,7 +1598,7 @@ UpdateModal:
   unpacking: 'Unpacking {{progress}}%'
   waitingForRestart: Update on Close
   downloadFailed: Download Failed
-  externalDownload: Download from GitHub / Gitee
+  externalDownload: External Download
   noUpdateMd: No release notes
   ignoreThisVersion: Ignore This Version
 
@@ -2696,6 +2698,7 @@ StartupPane:
   riotClient: Riot Client
   successMessage: 'Successfully launched: {{name}}'
   failedMessage: 'Failed to launch {{name}}: {{reason}}'
+  newVersionAvailable: New
 
 InGameSend:
   settings:
@@ -3035,7 +3038,7 @@ self-update-renderer:
   title: Self Update
   start-update: Starting update $t(common:appName)
   updateOnQuit: Updated Applied. Restart the application to apply the update
-  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
+  lastUpdateFailed: The last update failed, please check the logs and try to download the latest version from the official repository
   lastUpdateSuccess: Updated to {{version}}
 
 self-hosted-lcu-data-renderer:

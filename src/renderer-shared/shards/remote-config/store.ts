@@ -1,4 +1,4 @@
-import { LatestReleaseWithMetadata } from '@shared/types/github'
+import { LatestReleaseInfo } from '@shared/types/akari'
 import {
   LeagueServersConfig,
   OngoingGameConfig,
@@ -31,7 +31,7 @@ export interface Announcement {
 
 export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', () => {
   const announcement = ref<Announcement | null>(null)
-  const latestRelease = shallowRef<LatestReleaseWithMetadata | null>(null)
+  const latestRelease = shallowRef<LatestReleaseInfo | null>(null)
 
   const leagueServers = shallowRef<LeagueServersConfig>({
     version: 0,

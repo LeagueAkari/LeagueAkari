@@ -8,6 +8,7 @@ import { EndOfGameHttpApi } from './end-of-game'
 import { EntitlementsHttpApi } from './entitlements'
 import { EventHubHttpApi } from './event-hub'
 import { GameDataHttpApi } from './game-data'
+import { GameQueuesHttpApi } from './game-queues'
 import { GameflowHttpApi } from './gameflow'
 import { HonorHttpApi } from './honor'
 import { LeagueSessionHttpApi } from './league-session'
@@ -73,6 +74,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly replays: ReplaysHttpApi
   public readonly lobbyTeamBuilder: LobbyTeamBuilderHttpApi
   public readonly playerReportSender: PlayerReportSenderHttpApi
+  public readonly gameQueues: GameQueuesHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -109,5 +111,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.replays = new ReplaysHttpApi(this._http)
     this.lobbyTeamBuilder = new LobbyTeamBuilderHttpApi(this._http)
     this.playerReportSender = new PlayerReportSenderHttpApi(this._http)
+    this.gameQueues = new GameQueuesHttpApi(this._http)
   }
 }

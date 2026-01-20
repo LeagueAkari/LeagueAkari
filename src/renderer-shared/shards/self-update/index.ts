@@ -2,7 +2,7 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatBytes, formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
-import { computed, h, watch, watchEffect } from 'vue'
+import { h, watch, watchEffect } from 'vue'
 
 import { useInstance } from '..'
 import { useAppCommonStore } from '../app-common/store'
@@ -10,7 +10,6 @@ import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { RemoteConfigRenderer } from '../remote-config'
-import { useRemoteConfigStore } from '../remote-config/store'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { WindowManagerRenderer } from '../window-manager'
@@ -118,18 +117,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
   private _handleLastUpdateResult() {
     const as = useAppCommonStore()
     const s = useSelfUpdateStore()
-    const rcs = useRemoteConfigStore()
     const { t } = useTranslation()
     const notification = useNotification()
-
-    // hardcoded for now
-    const releasePageUrl = computed(() => {
-      if (rcs.settings.preferredSource === 'gitee') {
-        return 'https://gitee.com/LeagueAkari/LeagueAkari/releases/latest'
-      }
-
-      return 'https://github.com/LeagueAkari/LeagueAkari/releases/latest'
-    })
 
     watchEffect(() => {
       if (s.lastUpdateResult) {
@@ -146,12 +135,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
         } else {
           notification.warning({
             title: () => t('self-update-renderer.title'),
-            content: () =>
-              h('div', {
-                innerHTML: t('self-update-renderer.lastUpdateFailed', {
-                  url: releasePageUrl.value
-                })
-              }),
+            content: () => h('div', t('self-update-renderer.lastUpdateFailed')),
             duration: 1e10,
             closable: true
           })

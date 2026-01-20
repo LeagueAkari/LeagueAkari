@@ -1,4 +1,3 @@
-import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -6,10 +5,11 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, Shard } from '@shared/akari-shard'
 import { Friend } from '@shared/types/league-client/chat'
+import { GameQueue } from '@shared/types/league-client/game-queues'
 import { isAxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 
 import { useSelfHostedLcuDataStore } from './store'
 
@@ -24,6 +24,7 @@ export class SelfHostedLcuDataRenderer {
 
   constructor(@Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer) {
     this._setup.addSetupFn(() => this._handleFriendsUpdate())
+    this._setup.addSetupFn(() => this._handleQueuesUpdate())
   }
 
   private _handleFriendsUpdate = () => {
@@ -55,19 +56,6 @@ export class SelfHostedLcuDataRenderer {
       }
     })
 
-    const isActivated = useActivated()
-    const shouldReloadFriends = computed(() => {
-      return lcs.isConnected && isActivated.value
-    })
-
-    watch(shouldReloadFriends, (should) => {
-      if (should) {
-        reloadFriends()
-      } else {
-        store.friends = []
-      }
-    })
-
     const reloadFriends = async () => {
       try {
         const { data } = await lc.api.chat.getFriends()
@@ -81,5 +69,61 @@ export class SelfHostedLcuDataRenderer {
         log.error(SelfHostedLcuDataRenderer.id, 'Failed to reload friends', error)
       }
     }
+
+    watch(
+      () => lcs.isConnected,
+      (isConnected) => {
+        if (isConnected) {
+          reloadFriends()
+        } else {
+          store.friends = []
+        }
+      },
+      { immediate: true }
+    )
+  }
+
+  private _handleQueuesUpdate = () => {
+    const store = useSelfHostedLcuDataStore()
+
+    const lc = useInstance(LeagueClientRenderer)
+    const log = useInstance(LoggerRenderer)
+
+    const lcs = useLeagueClientStore()
+
+    lc.onLcuEventVue<GameQueue[]>('/lol-game-queues/v1/queues', ({ eventType, data }) => {
+      if (eventType === 'Delete') {
+        store.gameQueues = {}
+      }
+
+      store.gameQueues = data.reduce((prev, cur) => {
+        prev[cur.id] = cur
+        return prev
+      }, {})
+    })
+
+    const reloadQueues = async () => {
+      try {
+        const { data } = await lc.api.gameQueues.getQueues()
+        store.gameQueues = data.reduce((prev, cur) => {
+          prev[cur.id] = cur
+          return prev
+        }, {})
+      } catch (error) {
+        log.error(SelfHostedLcuDataRenderer.id, 'Failed to reload queues', error)
+      }
+    }
+
+    watch(
+      () => lcs.isConnected,
+      (isConnected) => {
+        if (isConnected) {
+          reloadQueues()
+        } else {
+          store.gameQueues = {}
+        }
+      },
+      { immediate: true }
+    )
   }
 }
