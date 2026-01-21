@@ -148,9 +148,8 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     })
 
     // overrides
-    let description =
-      changelogResp.status === 'fulfilled' ? changelogResp.value.data.data : release.body
-    let publishedAt = release.published_at
+    let description = changelogResp.status === 'fulfilled' ? changelogResp.value.data : release.body
+    let publishedAt = release.published_at || release.created_at
     let version = release.tag_name
     let archiveFile: ReleaseArchiveFile | null = archiveAsset
       ? {

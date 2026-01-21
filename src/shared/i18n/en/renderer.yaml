@@ -3033,7 +3033,7 @@ self-update-renderer:
     download-failed: Failed to download archive
     waiting-for-restart: Update package downloaded. Close the application to apply the update
     cancelButton: Cancel
-    closeButton: Close Application
+    closeButton: Close and Update
 
   title: Self Update
   start-update: Starting update $t(common:appName)

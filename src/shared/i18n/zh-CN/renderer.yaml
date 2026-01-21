@@ -3033,7 +3033,7 @@ self-update-renderer:
     download-failed: 下载更新包失败
     waiting-for-restart: 更新包下载完成，关闭应用后将自动应用更新流程
     cancelButton: 取消
-    closeButton: 关闭应用
+    closeButton: 关闭应用并开始更新
 
   title: 自动更新
   start-update: $t(common:appName) 更新已开始
