@@ -25,7 +25,7 @@ const {
   details = null,
   hidePrivacy = false,
   loadingDetails = false,
-  replayState = 'checking'
+  replayState = null
 } = defineProps<{
   summary: LcuOrSgpGameSummary
   details?: LcuOrSgpGameDetails | null
@@ -34,7 +34,7 @@ const {
   hidePrivacy?: boolean
 
   loadingDetails?: boolean
-  replayState?: ReplayDownloadProgress['state']
+  replayState?: ReplayDownloadProgress
 }>()
 
 const emits = defineEmits<{

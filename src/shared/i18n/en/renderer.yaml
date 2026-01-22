@@ -1100,6 +1100,8 @@ MatchCard:
     watch: Watch Replay
     unavailable: Replay Unavailable
     label: Replay
+    downloading: Downloading {{progress}}%
+    checking: Checking
 
   buildsTab:
     anvils_one: '{{count}} anvil'

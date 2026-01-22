@@ -15,28 +15,35 @@
 
       <!-- btns (download replay) -->
       <div class="flex gap-1">
-        <NButton
-          :theme-overrides="{
-            heightMedium: '32px',
-            paddingMedium: '0 8px'
-          }"
-          secondary
-          :disabled="
-            replayState !== 'download' && replayState !== 'watch' && replayState !== 'downloading'
-          "
-          :loading="replayState === 'downloading'"
-          @click="
-            replayState === 'watch'
-              ? onWatchReplay(basicInfo.gameId)
-              : onLoadReplay(basicInfo.gameId)
-          "
-          :title="replayButtonTitle"
-        >
-          <template #icon>
-            <NIcon v-if="replayState === 'watch'"><Replay20Filled /></NIcon>
-            <NIcon v-else><Replay20Regular /></NIcon>
+        <NTooltip>
+          <template #trigger>
+            <NButton
+              :theme-overrides="{
+                heightMedium: '32px',
+                paddingMedium: '0 8px'
+              }"
+              secondary
+              :disabled="
+                !replayState ||
+                (replayState.state !== 'download' &&
+                  replayState.state !== 'watch' &&
+                  replayState.state !== 'downloading')
+              "
+              :loading="replayState?.state === 'downloading'"
+              @click="
+                replayState?.state === 'watch'
+                  ? onWatchReplay(basicInfo.gameId)
+                  : onLoadReplay(basicInfo.gameId)
+              "
+            >
+              <template #icon>
+                <NIcon v-if="replayState?.state === 'watch'"><Replay20Filled /></NIcon>
+                <NIcon v-else><Replay20Regular /></NIcon>
+              </template>
+            </NButton>
           </template>
-        </NButton>
+          {{ replayButtonTitle }}
+        </NTooltip>
       </div>
     </div>
 
@@ -56,6 +63,7 @@
 import { Replay20Filled, Replay20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon } from 'naive-ui'
+import { NTooltip } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 import { useMatchCard } from './context'
@@ -127,13 +135,21 @@ watchEffect(() => {
 })
 
 const replayButtonTitle = computed(() => {
-  switch (replayState.value) {
+  if (!replayState.value) {
+    return t('MatchCard.replay.label')
+  }
+
+  switch (replayState.value.state) {
     case 'download':
       return t('MatchCard.replay.download')
     case 'watch':
       return t('MatchCard.replay.watch')
     case 'incompatible':
       return t('MatchCard.replay.unavailable')
+    case 'downloading':
+      return t('MatchCard.replay.downloading', { progress: replayState.value.downloadProgress })
+    case 'checking':
+      return t('MatchCard.replay.checking')
     default:
       return t('MatchCard.replay.label')
   }

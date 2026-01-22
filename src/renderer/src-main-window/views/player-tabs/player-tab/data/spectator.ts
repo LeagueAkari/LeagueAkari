@@ -102,8 +102,8 @@ export function provideSpectator(props: {
       if (isAxiosError(error)) {
         const status = error.response?.status
 
-        // 409 Conflict - API 在该服务器上被禁用
-        if (status === 409) {
+        // 意外情况，直接不再进行请求
+        if (status && status >= 400 && status < 500 && status !== 404) {
           isApiDisabled.value = true
           pause()
           log.warn(componentName, `Spectator API disabled for server: ${sgpServerId.value}`)

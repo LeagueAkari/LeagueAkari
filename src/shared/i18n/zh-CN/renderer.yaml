@@ -1101,6 +1101,8 @@ MatchCard:
     watch: 观看回放
     unavailable: 回放不可用
     label: 回放
+    downloading: 下载中 {{progress}}%
+    checking: 检查中
 
   buildsTab:
     anvils: '{{count}} 锻'

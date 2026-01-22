@@ -24,7 +24,7 @@ export type MatchCardContext = {
   hidePrivacy: Readonly<Ref<boolean>>
 
   loadingDetails: Readonly<Ref<boolean>>
-  replayState: Readonly<Ref<ReplayDownloadProgress['state']>>
+  replayState: Readonly<Ref<ReplayDownloadProgress | null | undefined>>
 
   basicInfo: Readonly<Ref<ReturnType<typeof toBasicInfo>>>
   participants: Readonly<Ref<ReturnType<typeof toParticipants>>>
@@ -58,10 +58,10 @@ export function provideMatchCard(props: {
   isExpanded: MaybeRefOrGetter<boolean>
   summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
   puuid: MaybeRefOrGetter<string | undefined>
-  details: MaybeRefOrGetter<LcuOrSgpGameDetails | null>
+  details: MaybeRefOrGetter<LcuOrSgpGameDetails | null | undefined>
   hidePrivacy: MaybeRefOrGetter<boolean>
   loadingDetails: MaybeRefOrGetter<boolean>
-  replayState: MaybeRefOrGetter<ReplayDownloadProgress['state']>
+  replayState: MaybeRefOrGetter<ReplayDownloadProgress | null>
 
   onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
   onLoadReplay: (gameId: number) => void

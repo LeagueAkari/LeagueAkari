@@ -57,7 +57,7 @@
         :details="pagedMatchHistory.details[g.gameId]"
         :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
         :hide-privacy="as.settings.streamerMode"
-        :replay-state="pagedMatchHistory.replayMetadata[g.gameId]?.state"
+        :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
       />
     </div>
   </div>
