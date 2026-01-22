@@ -6,70 +6,15 @@ import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import { SavedInfo } from '@shared/types/shards/saved-player'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 
-// copied from main shard
 export interface MatchHistoryPlayer {
   source: 'lcu' | 'sgp'
   params: MatchHistoryQueryParams
   data: LcuOrSgpGameSummary[]
-}
-
-// copied from main shard
-interface EncounteredGame {
-  id: number
-
-  gameId: number
-
-  puuid: string
-
-  selfPuuid: string
-
-  region: string
-
-  rsoPlatformId: string
-
-  updateAt: Date
-
-  queueType: string
-}
-
-// copied from main shard
-export interface SavedInfo {
-  puuid: string
-
-  selfPuuid: string
-
-  region: string
-
-  rsoPlatformId: string
-
-  tag: string | null
-
-  updateAt: Date
-
-  lastMetAt: Date | null
-
-  // copied from main shard
-  tags: {
-    markedBySelf: boolean
-    puuid: string
-    selfPuuid: string
-    region: string
-    rsoPlatformId: string
-    tag: string | null
-    updateAt: Date
-    lastMetAt: Date | null
-  }[]
-
-  encounteredGames: {
-    data: EncounteredGame[]
-    page: number
-    pageSize: number
-    total: number
-  }
 }
 
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {

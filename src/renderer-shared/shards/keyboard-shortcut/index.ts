@@ -1,20 +1,9 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { ShortcutDetails } from '@shared/types/shards/keyboard-shortcut'
 
 import { AkariIpcRenderer } from '../ipc'
 
 const MAIN_SHARD_NAMESPACE = 'keyboard-shortcuts-main'
-
-// copied from main shard
-interface ShortcutDetails {
-  keyCodes: number[]
-  keys: {
-    keyId: string
-    isModifier: boolean
-    keyCode: number
-  }[]
-  id: string
-  unifiedId: string
-}
 
 /**
  * 连接到主进程的快捷键服务

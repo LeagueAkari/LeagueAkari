@@ -1,20 +1,10 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { LaunchSpectatorConfig } from '@shared/types/shards/game-client'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { useGameClientStore } from './store'
-
-// copied from main shard
-interface LaunchSpectatorConfig {
-  locale?: string
-  sgpServerId: string
-  observerEncryptionKey: string
-  observerServerPort: number
-  observerServerIp: string
-  gameId: number
-  gameMode: string
-}
 
 const MAIN_SHARD_NAMESPACE = 'game-client-main'
 

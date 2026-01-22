@@ -1,89 +1,14 @@
+import { AutoSelectGroup } from '@shared/schemas/remote-config'
+import {
+  BanChampionConfig,
+  DelayedBanPick,
+  DelayedBenchSwap,
+  DelayedChampionSwap,
+  ExpectedChampionStatus,
+  PickChampionConfig
+} from '@shared/types/shards/auto-select'
 import { defineStore } from 'pinia'
 import { shallowReactive, shallowRef } from 'vue'
-
-interface PositionChampion {
-  // non-ranked queues
-  default: number[]
-
-  // ranked queues
-  top: number[]
-  jungle: number[]
-  middle: number[]
-  bottom: number[]
-  utility: number[]
-}
-
-export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in'
-
-// copied from main shard
-export interface PickChampionConfig {
-  enabled: boolean
-  champions: PositionChampion
-  delaySeconds: number
-  ignoreIntent: boolean
-  strategy: AutoPickBanStrategy
-  showIntent: boolean
-
-  // bench mode only
-  benchSelectFirstAvailableChampion: boolean
-  benchSwapAccumulatedDelaySeconds: number
-  benchHandleTradeEnabled: boolean
-}
-
-// copied from main shard
-export interface BanChampionConfig {
-  enabled: boolean
-  champions: PositionChampion
-  delaySeconds: number
-  strategy: AutoPickBanStrategy
-}
-
-// copied from main shard
-export interface AutoSelectGroup {
-  groupId: string
-  targetGameModes: {
-    gameMode: string
-    queueTypes: string[]
-  }[]
-  positions: string[]
-  additionalPicks: number[]
-  additionalBans: number[]
-  excludedPicks: number[]
-  excludedBans: number[]
-}
-
-// copied from main shard
-export interface DelayedBanPick {
-  isPickIntent: boolean
-  completed: boolean
-  championId: number
-  delayMs: number
-  startAt: number
-  finishAt: number
-}
-
-// copied from main shard
-export interface DelayedBenchSwap {
-  championId: number
-  delayMs: number
-  startAt: number
-  finishAt: number
-}
-
-// copied from main shard
-export interface DelayedChampionSwap {
-  action: 'accept' | 'decline'
-  tradeId: number
-  delayMs: number
-  startAt: number
-  finishAt: number
-  requesterChampionId: number
-}
-
-export interface ExpectedChampionStatus {
-  id: number
-  status: string
-}
 
 export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () => {
   const settings = shallowReactive({

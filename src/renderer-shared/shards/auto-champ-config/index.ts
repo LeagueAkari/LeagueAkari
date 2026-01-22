@@ -1,9 +1,10 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/auto-champ-config'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { ChampionRunesConfig, SummonerSpellsConfig, useAutoChampConfigStore } from './store'
+import { useAutoChampConfigStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-champ-config-main'
 

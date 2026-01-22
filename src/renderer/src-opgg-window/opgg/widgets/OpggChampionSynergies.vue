@@ -13,7 +13,9 @@
       class="mb-1 flex items-center gap-1 last:mb-0"
       v-for="(s, i) of champion.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
     >
-      <div class="mr-1 min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+      <div class="mr-1 min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
+        #{{ i + 1 }}
+      </div>
       <div
         class="flex cursor-pointer items-center gap-1 text-xs transition-[filter] duration-200 hover:brightness-[1.2]"
         @click="setTab('champion', s.champion_id)"
@@ -26,19 +28,28 @@
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]">{{
             (s.total_place / (s.play || 1)).toFixed(2)
           }}</span>
-          <span class="text text-xs text-[#666666] dark:text-[#bebebe]">{{ t('OpggChampion.avgPlace') }} </span>
+          <span class="text text-xs text-[#666666] dark:text-[#bebebe]"
+            >{{ t('OpggChampion.avgPlace') }}
+          </span>
         </div>
         <div class="value-text flex min-w-[76px] flex-col items-center">
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             >{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span
           >
-          <span class="text text-xs text-[#666666] dark:text-[#bebebe]">{{ t('OpggChampion.1st') }}</span>
+          <span class="text text-xs text-[#666666] dark:text-[#bebebe]">{{
+            t('OpggChampion.1st')
+          }}</span>
         </div>
         <div class="value-text flex min-w-[76px] flex-col items-center">
-          <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]" :title="t('OpggChampion.pickRate')"
+          <span
+            class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
+            :title="t('OpggChampion.pickRate')"
             >{{ (s.pick_rate * 100).toFixed(2) }}%</span
           >
-          <span class="text text-xs text-[#666666] dark:text-[#bebebe]" :title="t('OpggChampion.plays')">
+          <span
+            class="text text-xs text-[#666666] dark:text-[#bebebe]"
+            :title="t('OpggChampion.plays')"
+          >
             {{
               t('OpggChampion.times', {
                 times: s.play.toLocaleString()
@@ -47,12 +58,16 @@
           >
         </div>
         <div class="value-text flex min-w-[76px] flex-col items-center">
-          <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]" :title="t('OpggChampion.winRate')"
+          <span
+            class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
+            :title="t('OpggChampion.winRate')"
             >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
           >
-          <span class="text text-xs text-[#666666] dark:text-[#bebebe]" :title="t('OpggChampion.winRate')">{{
-            t('OpggChampion.winRate')
-          }}</span>
+          <span
+            class="text text-xs text-[#666666] dark:text-[#bebebe]"
+            :title="t('OpggChampion.winRate')"
+            >{{ t('OpggChampion.winRate') }}</span
+          >
         </div>
       </div>
     </div>

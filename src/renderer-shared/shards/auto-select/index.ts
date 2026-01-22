@@ -1,10 +1,11 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { BanChampionConfig, PickChampionConfig } from '@shared/types/shards/auto-select'
 import { DeepPartialObject } from '@shared/utils/types'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { BanChampionConfig, PickChampionConfig, useAutoSelectStore } from './store'
+import { useAutoSelectStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-select-main'
 

@@ -2,7 +2,8 @@ import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { PlayerTagDto, SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
+import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
+import { PlayerTagDto } from '@shared/types/shards/saved-player'
 import {
   InjectionKey,
   MaybeRefOrGetter,

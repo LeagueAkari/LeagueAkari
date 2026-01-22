@@ -470,14 +470,11 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
-import {
-  ChampionRunesConfig,
-  SummonerSpellsConfig,
-  useAutoChampConfigStore
-} from '@renderer-shared/shards/auto-champ-config/store'
+import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
+import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/auto-champ-config'
 import { Search as SearchIcon } from '@vicons/carbon'
 import {
   CheckmarkCircle16Regular as CheckmarkCircle16RegularIcon,

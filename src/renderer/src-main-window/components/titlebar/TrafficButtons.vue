@@ -71,10 +71,8 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import {
-  MainWindowCloseAction,
-  useMainWindowStore
-} from '@renderer-shared/shards/window-manager/store'
+import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Maximize24Filled as Maximize24FilledIcon } from '@vicons/fluent'

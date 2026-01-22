@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
-import { InGameSendTemplateCatalog } from '@renderer-shared/shards/remote-config'
+import { InGameSendTemplateCatalog } from '@shared/types/shards/in-game-send'
 import { Download as DownloadIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NEllipsis, NIcon, NModal, NScrollbar, NSpin, useMessage } from 'naive-ui'

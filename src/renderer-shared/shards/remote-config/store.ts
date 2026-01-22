@@ -4,30 +4,9 @@ import {
   SupportedQueues
 } from '@shared/schemas/remote-config'
 import { LatestReleaseInfo } from '@shared/types/akari'
+import { Announcement } from '@shared/types/shards/remote-config'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
-
-// pre-defined
-interface AnnouncementFrontMatter {
-  /**
-   * low: 不会提醒
-   * medium: 只会提示
-   * high: 会弹窗提醒
-   */
-  alertLevel?: 'low' | 'medium' | 'high'
-
-  /**
-   * 公告摘要
-   */
-  summary?: string
-}
-
-// copied from main
-export interface Announcement {
-  content: string
-  frontMatter: AnnouncementFrontMatter
-  uniqueId: string
-}
 
 export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', () => {
   const announcement = ref<Announcement | null>(null)

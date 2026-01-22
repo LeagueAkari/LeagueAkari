@@ -21,7 +21,9 @@
       <template #loading>
         <div class="flex flex-col items-center gap-2">
           <NSpin size="small" />
-          <NButton size="tiny" secondary @click="cancel">{{ t('OpggChampionTable.cancel') }}</NButton>
+          <NButton size="tiny" secondary @click="cancel">{{
+            t('OpggChampionTable.cancel')
+          }}</NButton>
         </div>
       </template>
     </NDataTable>

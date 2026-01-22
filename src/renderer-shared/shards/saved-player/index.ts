@@ -1,58 +1,18 @@
 import { Dep, Shard } from '@shared/akari-shard'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { EncounteredGame } from '@shared/types/shards/saved-player'
+import {
+  AllTaggedPlayerQueryDto,
+  EncounteredGame,
+  EncounteredGameQueryDto,
+  PlayerTagDto,
+  SavedPlayerQueryDto,
+  UpdateTagDto
+} from '@shared/types/shards/saved-player'
 import LRUMap from 'quick-lru'
 
 import { AkariIpcRenderer } from '../ipc'
 
 const MAIN_SHARD_NAMESPACE = 'saved-player-main'
-
-// copied from main shard
-interface SavedPlayerQueryDto {
-  selfPuuid: string
-  puuid: string
-}
-
-interface AllTaggedPlayerQueryDto {
-  selfPuuid: string
-  puuid: string
-  region: string
-  rsoPlatformId: string
-  timeOrder: 'desc' | 'asc'
-  page: number
-  pageSize: number
-}
-
-// copied from main shard
-export interface PlayerTagDto {
-  markedBySelf: boolean
-  puuid: string
-  selfPuuid: string
-  region: string
-  rsoPlatformId: string
-  tag: string | null
-  updateAt: Date
-  lastMetAt: Date | null
-}
-
-// copied from main shard
-interface UpdateTagDto {
-  selfPuuid: string
-  puuid: string
-  tag: string | null
-}
-
-// copied from main shard
-export interface EncounteredGameQueryDto {
-  selfPuuid: string
-  puuid: string
-  region?: string
-  rsoPlatformId?: string
-  queueType?: string
-  pageSize?: number
-  page?: number
-  timeOrder?: 'desc' | 'asc'
-}
 
 @Shard(SavedPlayerRenderer.id)
 export class SavedPlayerRenderer {

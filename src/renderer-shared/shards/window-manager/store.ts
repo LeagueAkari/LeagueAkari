@@ -1,8 +1,6 @@
+import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive } from 'vue'
-
-// copied
-export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
 
 export function useBasicWindowStates() {
   const status = ref<'normal' | 'maximized' | 'minimized'>('normal')

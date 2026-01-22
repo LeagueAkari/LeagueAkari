@@ -30,8 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { Announcement } from '@renderer-shared/shards/remote-config/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
+import { Announcement } from '@shared/types/shards/remote-config'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'

@@ -19,24 +19,24 @@
 
     <!-- settings -->
     <div class="mt-6">
-        <ControlItem
-          class="control-item-margin justify-between"
-          :label="t('OpggView.settings.enabled.label')"
-          :label-description="t('OpggView.settings.enabled.description')"
-          :label-width="300"
-        >
+      <ControlItem
+        class="control-item-margin justify-between"
+        :label="t('OpggView.settings.enabled.label')"
+        :label-description="t('OpggView.settings.enabled.description')"
+        :label-width="300"
+      >
         <NSwitch
           @update:value="(val) => wm.opggWindow.setEnabled(val)"
           :value="ows.settings.enabled"
           size="small"
         />
       </ControlItem>
-        <ControlItem
-          class="control-item-margin justify-between"
-          :label="t('OpggView.settings.flashPosition.label')"
-          :label-description="t('OpggView.settings.flashPosition.description')"
-          :label-width="300"
-        >
+      <ControlItem
+        class="control-item-margin justify-between"
+        :label="t('OpggView.settings.flashPosition.label')"
+        :label-description="t('OpggView.settings.flashPosition.description')"
+        :label-width="300"
+      >
         <NRadioGroup size="small" :value="flashPosition" @update:value="setFlashPosition">
           <div class="flex flex-col gap-1">
             <NRadio value="d" :title="t('OpggView.settings.flashPosition.options.d')">D</NRadio>
@@ -47,28 +47,28 @@
           </div>
         </NRadioGroup>
       </ControlItem>
-        <ControlItem
-          class="control-item-margin justify-between"
-          :label="t('OpggView.settings.autoApplyRunes.label')"
-          :label-description="t('OpggView.settings.autoApplyRunes.description')"
-          :label-width="300"
-        >
+      <ControlItem
+        class="control-item-margin justify-between"
+        :label="t('OpggView.settings.autoApplyRunes.label')"
+        :label-description="t('OpggView.settings.autoApplyRunes.description')"
+        :label-width="300"
+      >
         <NSwitch v-model:value="os.frontendSettings.autoApplyRunes" size="small" />
       </ControlItem>
-        <ControlItem
-          class="control-item-margin justify-between"
-          :label="t('OpggView.settings.autoApplySpells.label')"
-          :label-description="t('OpggView.settings.autoApplySpells.description')"
-          :label-width="300"
-        >
+      <ControlItem
+        class="control-item-margin justify-between"
+        :label="t('OpggView.settings.autoApplySpells.label')"
+        :label-description="t('OpggView.settings.autoApplySpells.description')"
+        :label-width="300"
+      >
         <NSwitch v-model:value="os.frontendSettings.autoApplySpells" size="small" />
       </ControlItem>
-        <ControlItem
-          class="control-item-margin justify-between"
-          :label="t('OpggView.settings.autoApplyItems.label')"
-          :label-description="t('OpggView.settings.autoApplyItems.description')"
-          :label-width="300"
-        >
+      <ControlItem
+        class="control-item-margin justify-between"
+        :label="t('OpggView.settings.autoApplyItems.label')"
+        :label-description="t('OpggView.settings.autoApplyItems.description')"
+        :label-width="300"
+      >
         <NSwitch v-model:value="os.frontendSettings.autoApplyItems" size="small" />
       </ControlItem>
     </div>

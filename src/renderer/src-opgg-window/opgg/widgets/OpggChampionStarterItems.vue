@@ -19,7 +19,10 @@
       <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <template v-for="(ss, i) of s.ids">
         <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
-        <NIcon v-if="i < s.ids.length - 1" class="separator text-[10px] text-[#999999] dark:text-[#909090]">
+        <NIcon
+          v-if="i < s.ids.length - 1"
+          class="separator text-[10px] text-[#999999] dark:text-[#909090]"
+        >
           <ArrowForwardIosOutlinedIcon />
         </NIcon>
       </template>

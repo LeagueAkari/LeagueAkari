@@ -1,21 +1,12 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { InGameSendTemplateCatalog, SendableItem } from '@shared/types/shards/in-game-send'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { SendableItem, TemplateDef, useInGameSendStore } from './store'
+import { TemplateDef, useInGameSendStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
-
-// copied from main/shards/remote-config/repository.ts
-export interface InGameSendTemplateCatalog {
-  templates: Array<{
-    id: string
-    name: string
-    type: string
-    description: string
-  }>
-}
 
 @Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {

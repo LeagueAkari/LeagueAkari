@@ -1,16 +1,6 @@
+import { AutoHonorStrategy, AutoMatchmakingStrategy } from '@shared/types/shards/auto-gameflow'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
-
-// copied from main shard
-export type AutoHonorStrategy =
-  | 'prefer-lobby-member'
-  | 'only-lobby-member'
-  | 'all-member'
-  | 'opt-out'
-  | 'all-member-including-opponent'
-
-// copied from main shard
-export type AutoMatchmakingStrategy = 'never' | 'fixed-duration' | 'estimated-duration'
 
 export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', () => {
   const settings = shallowReactive({
