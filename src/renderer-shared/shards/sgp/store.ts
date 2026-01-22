@@ -1,4 +1,4 @@
-import { LeagueServersConfig } from '@shared/validators/remote-config'
+import { LeagueServersConfig } from '@shared/schemas/remote-config'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 

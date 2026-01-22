@@ -84,3 +84,50 @@ export const ReleaseOverridesPlainObjectSchema = z.object({
 })
 
 export type ReleaseOverridesPlainObject = z.infer<typeof ReleaseOverridesPlainObjectSchema>
+
+/**
+ * 自动选择组的游戏模式匹配规则
+ */
+export const AutoSelectTargetGameModeSchema = z.object({
+  /** 游戏模式，如 CLASSIC, ARAM, CHERRY 等 */
+  gameMode: z.string(),
+  /** 队列类型，'*' 表示所有 */
+  queueTypes: z.array(z.string())
+})
+
+export type AutoSelectTargetGameMode = z.infer<typeof AutoSelectTargetGameModeSchema>
+
+/**
+ * 自动选择组配置
+ */
+export const AutoSelectGroupSchema = z.object({
+  /** 组的唯一标识 */
+  groupId: z.string(),
+  /** 是否匹配自定义对局 */
+  isCustom: z.boolean(),
+  /** 适用的游戏模式 */
+  targetGameModes: z.array(AutoSelectTargetGameModeSchema),
+  /** 可以根据什么位置选择 */
+  positions: z.array(z.string()),
+  /** 可以额外选用的英雄 */
+  additionalPicks: z.array(z.number()),
+  /** 可以额外禁用的英雄 */
+  additionalBans: z.array(z.number()),
+  /** 禁止选用的英雄 */
+  excludedPicks: z.array(z.number()),
+  /** 禁止 Ban 的英雄 */
+  excludedBans: z.array(z.number())
+})
+
+export type AutoSelectGroup = z.infer<typeof AutoSelectGroupSchema>
+
+/**
+ * 自动选择组配置 V1
+ */
+export const AutoSelectGroupsV1Schema = z.object({
+  groups: z.array(AutoSelectGroupSchema),
+  version: z.number().lte(1),
+  lastUpdate: z.number()
+})
+
+export type AutoSelectGroups = z.infer<typeof AutoSelectGroupsV1Schema>

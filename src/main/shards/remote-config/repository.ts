@@ -1,11 +1,12 @@
 import { USER_AGENT } from '@shared/constants/common'
-import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
 import {
+  AutoSelectGroups,
   InGameSendTemplateCatalog,
   LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
-} from '@shared/validators/remote-config'
+} from '@shared/schemas/remote-config'
+import { GithubApiFile, GithubApiLatestRelease } from '@shared/types/github'
 import axios from 'axios'
 import crypto from 'crypto'
 import matter from 'gray-matter'
@@ -117,6 +118,12 @@ export class RemoteGitRepository {
   async getOngoingGameConfig(request: RepositoryBranchRequest) {
     return this._http.get<OngoingGameConfig>(
       this._rawContentUrl(`/config/ongoing-game/config.json`, request)
+    )
+  }
+
+  async getAutoSelectGroups(request: RepositoryBranchRequest) {
+    return this._http.get<AutoSelectGroups>(
+      this._rawContentUrl(`/config/auto-select/groups.json`, request)
     )
   }
 

@@ -1,9 +1,9 @@
-import { LatestReleaseInfo } from '@shared/types/akari'
 import {
   LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
-} from '@shared/validators/remote-config'
+} from '@shared/schemas/remote-config'
+import { LatestReleaseInfo } from '@shared/types/akari'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 

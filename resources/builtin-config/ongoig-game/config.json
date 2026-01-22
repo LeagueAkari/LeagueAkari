@@ -1,9 +1,0 @@
-{
-  "version": 1,
-  "lastUpdate": 1759568091536,
-  "spotlight": {
-    "deobfuscation": true,
-    "gsmByPuuid": true,
-    "spectatorByPuuid": true
-  }
-}

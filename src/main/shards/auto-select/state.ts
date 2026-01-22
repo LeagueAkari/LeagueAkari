@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientData } from '../league-client/lc-state'
-import { GROUPS } from './groups'
+import { RemoteConfigState } from '../remote-config/state'
 
 export type AutoPickBanStrategy = 'just-show' | 'show-and-lock-in' | 'lock-in-immediately'
 
@@ -139,7 +139,9 @@ export class AutoSelectSettings {
 }
 
 export class AutoSelectState {
-  groups = GROUPS
+  get groups() {
+    return this._remoteConfigState.autoSelectGroups.groups
+  }
 
   temporarilyDisabled = false
 
@@ -702,7 +704,8 @@ export class AutoSelectState {
 
   constructor(
     private readonly _lcData: LeagueClientData,
-    private readonly _settings: AutoSelectSettings
+    private readonly _settings: AutoSelectSettings,
+    private readonly _remoteConfigState: RemoteConfigState
   ) {
     makeAutoObservable(this, {
       // activeGroupConfig: computed.struct, // no need to set it structurally equals
@@ -719,9 +722,7 @@ export class AutoSelectState {
       _delayedBan: observable.struct,
       _delayedPick: observable.struct,
       _delayedBenchSwap: observable.struct,
-      _delayedChampionSwap: observable.struct,
-
-      groups: observable.ref
+      _delayedChampionSwap: observable.struct
     })
   }
 }

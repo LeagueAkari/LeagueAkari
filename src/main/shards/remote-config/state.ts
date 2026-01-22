@@ -1,12 +1,14 @@
-import { LatestReleaseInfo } from '@shared/types/akari'
 import {
+  AutoSelectGroups,
   LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
-} from '@shared/validators/remote-config'
+} from '@shared/schemas/remote-config'
+import { LatestReleaseInfo } from '@shared/types/akari'
 import { makeAutoObservable, observable } from 'mobx'
 
 import {
+  BUILTIN_AUTO_SELECT_GROUPS,
   BUILTIN_ONGOING_GAME_CONFIG,
   BUILTIN_SGP_LEAGUE_SERVERS_CONFIG,
   BUILTIN_SUPPORTED_QUEUES
@@ -53,6 +55,11 @@ export class RemoteConfigState {
   ongoingGameConfig = BUILTIN_ONGOING_GAME_CONFIG
 
   /**
+   * 自动选择组配置
+   */
+  autoSelectGroups = BUILTIN_AUTO_SELECT_GROUPS
+
+  /**
    * latestRelease 的值，用于添加自定义 equals 方法
    */
   latestReleaseValue = observable.box<LatestReleaseInfo | null>(null, {
@@ -74,6 +81,7 @@ export class RemoteConfigState {
   isUpdatingLeagueServers: boolean = false
   isUpdatingSupportedQueues: boolean = false
   isUpdatingOngoingGameConfig: boolean = false
+  isUpdatingAutoSelectGroups: boolean = false
 
   setLeagueServers(leagueServers: LeagueServersConfig) {
     this.leagueServers = leagueServers
@@ -93,6 +101,10 @@ export class RemoteConfigState {
 
   setOngoingGameConfig(ongoingGameConfig: OngoingGameConfig) {
     this.ongoingGameConfig = ongoingGameConfig
+  }
+
+  setAutoSelectGroups(autoSelectGroups: AutoSelectGroups) {
+    this.autoSelectGroups = autoSelectGroups
   }
 
   setUpdatingLatestRelease(isUpdatingLatestRelease: boolean) {
@@ -115,11 +127,16 @@ export class RemoteConfigState {
     this.isUpdatingOngoingGameConfig = isUpdating
   }
 
+  setUpdatingAutoSelectGroups(isUpdating: boolean) {
+    this.isUpdatingAutoSelectGroups = isUpdating
+  }
+
   constructor() {
     makeAutoObservable(this, {
       leagueServers: observable.ref,
       supportedQueues: observable.ref,
       ongoingGameConfig: observable.ref,
+      autoSelectGroups: observable.ref,
       latestReleaseValue: observable.ref
     })
   }

@@ -8,9 +8,9 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { GROUPS } from './groups'
 import { AutoSelectSettings, AutoSelectState, BanChampionConfig, PickChampionConfig } from './state'
 
 @Shard(AutoSelectMain.id)
@@ -28,10 +28,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     _settingFactory: SettingFactoryMain,
     private readonly _lc: LeagueClientMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _ipc: AkariIpcMain
+    private readonly _ipc: AkariIpcMain,
+    private readonly _remoteConfig: RemoteConfigMain
   ) {
     this._log = _loggerFactory.create(AutoSelectMain.id)
-    this.state = new AutoSelectState(this._lc.data, this.settings)
+    this.state = new AutoSelectState(this._lc.data, this.settings, this._remoteConfig.state)
     this._setting = _settingFactory.register(
       AutoSelectMain.id,
       {
@@ -46,7 +47,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     let modified = false
 
     runInAction(() => {
-      for (const group of GROUPS) {
+      for (const group of this.state.groups) {
         if (!this.settings.pickConfig[group.groupId]) {
           modified = true
           this.settings.setPickConfig(group.groupId, this.settings.createNewEmptyPickConfig())

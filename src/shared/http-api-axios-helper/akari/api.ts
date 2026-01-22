@@ -1,5 +1,5 @@
 import { AKARI_API_BASE_URL } from '@shared/constants/common'
-import { ReleaseOverridesPlainObject } from '@shared/validators/remote-config'
+import { ReleaseOverridesPlainObject } from '@shared/schemas/remote-config'
 import { AxiosInstance } from 'axios'
 
 export class AkariApiHttpApiAxiosHelper {

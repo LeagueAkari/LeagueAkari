@@ -1,8 +1,9 @@
 import {
+  AutoSelectGroups,
   LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
-} from '@shared/validators/remote-config'
+} from '@shared/schemas/remote-config'
 
 export const BUILTIN_ONGOING_GAME_CONFIG: OngoingGameConfig = {
   version: 1,
@@ -224,4 +225,154 @@ export const BUILTIN_SUPPORTED_QUEUES: SupportedQueues = {
   version: 1,
   lastUpdate: 1759568091535,
   queues: [420, 440, 430, 450, 480, 1700, 490, 1900, 900, 2300, 2400, 4210, 4220, 4240, 4250, 4260]
+}
+
+export const BUILTIN_AUTO_SELECT_GROUPS: AutoSelectGroups = {
+  version: 1,
+  lastUpdate: 1759568091535,
+  groups: [
+    {
+      groupId: 'ranked',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'CLASSIC',
+          queueTypes: ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR']
+        }
+      ],
+      positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'normal',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'CLASSIC',
+          queueTypes: ['NORMAL']
+        }
+      ],
+      positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'aram',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'ARAM',
+          queueTypes: ['*']
+        },
+        {
+          gameMode: 'KIWI',
+          queueTypes: ['*']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'cherry',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'CHERRY',
+          queueTypes: ['*']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [-3],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'urf',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'URF',
+          queueTypes: ['*']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'oneforall',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'ONEFORALL',
+          queueTypes: ['*']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'ultbook',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'ULTBOOK',
+          queueTypes: ['*']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'bot',
+      isCustom: false,
+      targetGameModes: [
+        {
+          gameMode: 'SWIFTPLAY',
+          queueTypes: ['RIOTSCRIPT_BOT']
+        }
+      ],
+      positions: ['default'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    },
+    {
+      groupId: 'custom',
+      isCustom: true,
+      targetGameModes: [
+        {
+          gameMode: 'CLASSIC',
+          queueTypes: ['NORMAL']
+        },
+        {
+          gameMode: 'PRACTICETOOL',
+          queueTypes: ['NORMAL']
+        }
+      ],
+      positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
+      additionalPicks: [],
+      additionalBans: [],
+      excludedPicks: [-1],
+      excludedBans: []
+    }
+  ]
 }

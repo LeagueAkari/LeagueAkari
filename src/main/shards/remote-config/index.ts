@@ -1,14 +1,15 @@
 import { IntervalTask } from '@main/utils/timer'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
-import { LatestReleaseInfo, ReleaseArchiveFile } from '@shared/types/akari'
-import { GithubApiLatestRelease } from '@shared/types/github'
 import {
+  AutoSelectGroupsV1Schema,
   LeagueServersConfigV2Schema,
   OngoingGameConfigV1Schema,
   ReleaseOverridesPlainObjectSchema,
   SupportedQueuesV1Schema
-} from '@shared/validators/remote-config'
+} from '@shared/schemas/remote-config'
+import { LatestReleaseInfo, ReleaseArchiveFile } from '@shared/types/akari'
+import { GithubApiLatestRelease } from '@shared/types/github'
 import axios, { isAxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { app } from 'electron'
@@ -39,6 +40,7 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
   static SUPPORTED_QUEUES_RELATIVE_PATH = 'sgp/supported-queues.json'
   static LEAGUE_SERVERS_RELATIVE_PATH = 'sgp/league-servers.json'
   static ONGOING_GAME_CONFIG_RELATIVE_PATH = 'ongoing-game/config.json'
+  static AUTO_SELECT_GROUPS_RELATIVE_PATH = 'auto-select/groups.json'
 
   private _repo = new RemoteGitRepository()
   private _akariApi = new AkariApiHttpApiAxiosHelper(
@@ -81,6 +83,11 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
 
   private _ongoingGameConfigTask = new IntervalTask(
     this._updateOngoingGameConfigFromRemoteAndSave.bind(this),
+    { interval: 2 * 60 * 60 * 1000 } // 2 hours
+  )
+
+  private _autoSelectGroupsTask = new IntervalTask(
+    this._updateAutoSelectGroupsFromRemoteAndSave.bind(this),
     { interval: 2 * 60 * 60 * 1000 } // 2 hours
   )
 
@@ -362,6 +369,21 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
         this._log.warn('Invalid ongoing game config json', error)
       }
     }
+
+    if (
+      await this._setting.jsonConfigFileExists(RemoteConfigMain.AUTO_SELECT_GROUPS_RELATIVE_PATH)
+    ) {
+      const rawJson = await this._setting.readFromJsonConfigFile(
+        RemoteConfigMain.AUTO_SELECT_GROUPS_RELATIVE_PATH
+      )
+      const { success, data, error } = AutoSelectGroupsV1Schema.safeParse(rawJson)
+
+      if (success) {
+        this.state.setAutoSelectGroups(data)
+      } else {
+        this._log.warn('Invalid auto select groups json', error)
+      }
+    }
   }
 
   /**
@@ -635,14 +657,65 @@ export class RemoteConfigMain implements IAkariShardInitDispose {
     }
   }
 
+  /**
+   * 更新自动选择组配置，会缓存到本地
+   */
+  private async _updateAutoSelectGroupsFromRemoteAndSave() {
+    if (this.state.isUpdatingAutoSelectGroups) {
+      return
+    }
+
+    this.state.setUpdatingAutoSelectGroups(true)
+
+    try {
+      const { data: remoteData } = await this._repo.getAutoSelectGroups({
+        source: this.settings.preferredSource,
+        repo: 'akari-config',
+        branch: 'main'
+      })
+
+      const { success, data, error } = AutoSelectGroupsV1Schema.safeParse(remoteData)
+
+      if (success) {
+        if (data.lastUpdate > this.state.autoSelectGroups.lastUpdate) {
+          this.state.setAutoSelectGroups(data)
+          await this._setting.writeToJsonConfigFile(
+            RemoteConfigMain.AUTO_SELECT_GROUPS_RELATIVE_PATH,
+            data
+          )
+          this._log.info(
+            'Updated auto select groups from remote',
+            dayjs(data.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        } else {
+          this._log.info(
+            'Auto select groups is up to date',
+            dayjs(this.state.autoSelectGroups.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        }
+      } else {
+        this._log.warn('Invalid auto select groups json', error)
+      }
+    } catch (error) {
+      if (this._checkIfReachRateLimit(error)) {
+        return
+      }
+
+      this._log.warn('Update Auto Select Groups failed', error)
+    } finally {
+      this.state.setUpdatingAutoSelectGroups(false)
+    }
+  }
+
   private _handlePeriodicTasksUpdate() {
-    // 源切换时需要重新获取支持的队列、league servers 和对局模块配置
+    // 源切换时需要重新获取支持的队列、league servers、对局模块配置和自动选择组配置
     this._mobx.reaction(
       () => this.settings.preferredSource,
       (_source) => {
         this._supportedQueuesTask.start({ runImmediately: true })
         this._leagueServersTask.start({ runImmediately: true })
         this._ongoingGameConfigTask.start({ runImmediately: true })
+        this._autoSelectGroupsTask.start({ runImmediately: true })
       },
       { fireImmediately: true }
     )
