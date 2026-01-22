@@ -1,7 +1,7 @@
 <template>
   <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
     <!-- announcement -->
-    <NTooltip
+    <NPopover
       :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
       :show="shouldShowAnnouncementTooltip || announcementTooltipShow"
       @update:show="(v) => (announcementTooltipShow = v)"
@@ -18,11 +18,11 @@
 
       <template v-if="sns.announcementSummary">
         <div>
-          <div class="font-bold text-white/80">
+          <div class="font-bold text-black/80 dark:text-white/80">
             {{ t('CommonButtons.announcementSummary') }}
           </div>
-          <div class="my-2 h-px bg-white/10"></div>
-          <div class="mb-2 max-w-[400px] text-xs text-white/80">
+          <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
+          <div class="mb-2 max-w-[400px] text-xs text-black/80 dark:text-white/80">
             {{ sns.announcementSummary }}
           </div>
           <div class="flex justify-end gap-2">
@@ -44,7 +44,7 @@
       <template v-else>
         {{ t('CommonButtons.announcement') }}
       </template>
-    </NTooltip>
+    </NPopover>
 
     <!-- github -->
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
@@ -215,9 +215,7 @@ const shouldShowAnnouncementTooltip = computed(() => {
   return (
     rcs.announcement !== null &&
     rcs.announcement.frontMatter.summary &&
-    (rcs.announcement.frontMatter.alertLevel === 'low' ||
-      rcs.announcement.frontMatter.alertLevel === 'medium' ||
-      rcs.announcement.frontMatter.alertLevel === 'high') &&
+    rcs.announcement.frontMatter.alertLevel === 'medium' &&
     sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId
   )
 })
