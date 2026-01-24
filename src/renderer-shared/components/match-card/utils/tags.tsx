@@ -437,7 +437,7 @@ function computedKnockUpTags({ participant }: TagContext, t: TFunction): PlayerT
         content: t('MatchCard.tags.knockUp.content', {
           value: participant.knockEnemyIntoTeamAndKill.toLocaleString()
         }),
-        priority: 980
+        priority: 660
       }
     ]
   }

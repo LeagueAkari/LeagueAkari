@@ -31,7 +31,7 @@
       </div>
 
       <div class="text-xs text-black/80 dark:text-white/80">
-        {{ (team.totalGoldEarned / 1000).toFixed(2) }} k
+        {{ (team.totalGoldEarned / 1000).toFixed(2) }}k
       </div>
 
       <!-- objective -->
@@ -268,7 +268,7 @@
 
         <!-- gold -->
         <div v-else-if="column.name === 'gold'" :class="column.class">
-          <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }} k</div>
+          <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }}k</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }}
             {{ t('MatchCard.teamTable.perMinuteSuffix') }}
