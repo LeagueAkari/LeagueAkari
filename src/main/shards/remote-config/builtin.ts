@@ -229,7 +229,7 @@ export const BUILTIN_SUPPORTED_QUEUES: SupportedQueues = {
 
 export const BUILTIN_AUTO_SELECT_GROUPS: AutoSelectGroups = {
   version: 1,
-  lastUpdate: 1759568091535,
+  lastUpdate: 1769309207628,
   groups: [
     {
       groupId: 'ranked',
@@ -255,7 +255,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AutoSelectGroups = {
           queueTypes: ['NORMAL']
         }
       ],
-      positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
+      positions: ['default'],
       additionalPicks: [],
       additionalBans: [],
       excludedPicks: [-1],
