@@ -129,7 +129,7 @@ const menu = computed(() => {
       key: 'test',
       icon: renderIcon(AnimalRabbit28FilledIcon),
       name: t('SideBarMenu.test'),
-      show: import.meta.env.DEV || as.version.includes('rabi')
+      show: mui.frontendSettings.showTestPage
     }
   ]
 })

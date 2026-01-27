@@ -60,7 +60,7 @@
     </div>
 
     <!-- Divider -->
-    <div class="my-2 h-px bg-white/10"></div>
+    <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
 
     <!-- Cherry Bans (斗魂竞技场) -->
     <div

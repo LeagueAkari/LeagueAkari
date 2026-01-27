@@ -235,6 +235,18 @@
       <template #header><span class="card-header-title">Akari Zone</span></template>
       <ControlItem
         class="control-item-margin"
+        :label="t('DebugSettings.testPage.label')"
+        :label-description="t('DebugSettings.testPage.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="mui.frontendSettings.showTestPage"
+          @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('DebugSettings.kyokoMode.label')"
         :label-description="t('DebugSettings.kyokoMode.description')"
         :label-width="400"
@@ -283,6 +295,8 @@ import {
 } from 'naive-ui'
 import { computed, h, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
+import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
+
 import { LCU_ENDPOINTS } from './lcu-endpoints'
 
 const { t } = useTranslation()
@@ -290,6 +304,7 @@ const { t } = useTranslation()
 const lc = useLeagueClientStore()
 const rds = useRendererDebugStore()
 const as = useAppCommonStore()
+const mui = useMainWindowUiStore()
 
 const log = useInstance(LoggerRenderer)
 const app = useInstance(AppCommonRenderer)

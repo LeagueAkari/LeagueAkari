@@ -4,7 +4,8 @@ import { ref, shallowReactive } from 'vue'
 export const useMainWindowUiStore = defineStore('shard:main-window-ui-renderer', () => {
   const frontendSettings = shallowReactive({
     useProfileSkinAsBackground: true,
-    sidebarCollapsed: true
+    sidebarCollapsed: true,
+    showTestPage: false
   })
 
   const backgroundSkinUrl = ref<string | null>(null)

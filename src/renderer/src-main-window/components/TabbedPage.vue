@@ -19,7 +19,10 @@
       </NTabs>
     </div>
     <div class="relative h-0 flex-1">
-      <Transition :name="transitionType">
+      <KeepAlive v-if="disableTransition">
+        <component :is="currentTabComponent" :key="currentTab" />
+      </KeepAlive>
+      <Transition v-else :name="transitionType">
         <KeepAlive>
           <component :is="currentTabComponent" :key="currentTab" />
         </KeepAlive>
@@ -51,6 +54,7 @@ const props = defineProps<{
   icon: ComponentC | FunctionalComponent
   title: string
   tabs: TabConfig[]
+  disableTransition?: boolean
 
   /**
    * 暂时强制要求路由必须提供 route name
@@ -70,6 +74,10 @@ const transitionType = ref<'move-from-right-fade' | 'move-from-left-fade'>('move
 watch(
   () => currentTab.value,
   (cur, prev) => {
+    if (props.disableTransition) {
+      return
+    }
+
     if (!prev) {
       transitionType.value = 'move-from-right-fade'
       return

@@ -96,7 +96,7 @@ export class AutoSelectSettings {
       strategy: 'show-and-lock-in',
       benchHandleTradeEnabled: false,
       benchSelectFirstAvailableChampion: false,
-      benchSwapAccumulatedDelaySeconds: 1
+      benchSwapAccumulatedDelaySeconds: 2.9
     }
   }
 

@@ -631,6 +631,10 @@ DebugSettings:
   inAdministrator:
     description: $t(common:appName) is currently running with administrator privileges. Now, it is $t(common:appName) X.
 
+  testPage:
+    label: Test Page
+    description: Show the "Test" page entry in the sidebar for developers to test various features
+
   kyokoMode:
     label: Kyoko Mode
     description: The hidden side of $t(common:appName), enable more features!
@@ -2287,6 +2291,7 @@ ItemDisplay:
   combinePrice: Combine for {{gold}} G
 
 AugmentDisplay:
+  bronze: Bronze
   sliver: Silver
   gold: Gold
   prismatic: Prismatic

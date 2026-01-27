@@ -403,13 +403,13 @@ export function provideOpgg() {
       .flat(1)
       .find((a) => a.actorCellId === selfCellId && a.type === 'pick' && a.championId)?.championId
 
-    if (!self && !selfActionChampionId) {
+    if (!self) {
       return null
     }
 
-    const championId = selfActionChampionId ?? self?.championId ?? null
+    const championId = selfActionChampionId ?? self.championId // 可能是 0
 
-    if (championId === null) {
+    if (!championId) {
       return null
     }
 
@@ -419,12 +419,12 @@ export function provideOpgg() {
       championId,
       gameMode: queue.gameMode,
       queueType: queue.type,
-      assignedPosition: self?.assignedPosition
+      assignedPosition: self.assignedPosition
     })
 
     return {
       championId,
-      assignedPosition: self?.assignedPosition,
+      assignedPosition: self.assignedPosition,
       gameMode: queue.gameMode,
       hasAutoRunesConfig: autoChampConfig.hasRunesConfig,
       hasAutoSpellsConfig: autoChampConfig.hasSummonerSpellsConfig

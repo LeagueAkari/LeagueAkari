@@ -79,6 +79,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
       fnName,
       ...args
     )
+
     if (result.success) {
       return result.data as T
     } else {

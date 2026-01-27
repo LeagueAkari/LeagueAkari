@@ -632,6 +632,10 @@ DebugSettings:
   inAdministrator:
     description: $t(common:appName) 目前以管理员权限运行。现在，它是 $t(common:appName) X
 
+  testPage:
+    label: 测试页面
+    description: 在侧边栏中显示测试页面入口，用于测试各种功能
+
   kyokoMode:
     label: Kyoko 模式
     description: $t(common:appName) 不为人知的一面，启用更多的功能！
@@ -2284,6 +2288,7 @@ ItemDisplay:
   combinePrice: 合成 {{gold}} G
 
 AugmentDisplay:
+  bronze: 青铜阶
   sliver: 白银阶
   gold: 黄金阶
   prismatic: 棱彩阶

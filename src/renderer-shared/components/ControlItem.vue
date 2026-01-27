@@ -1,29 +1,47 @@
 <template>
   <div
-    class="control-item control-item-margin"
-    :class="{ [`align-${align}`]: align, highlight: isHighlighting }"
+    class="control-item"
+    :class="{
+      'control-item-align-center': align === 'center',
+      'control-item-align-start': align === 'start',
+      'control-item-highlight': isHighlighting
+    }"
   >
-    <div class="label-area" :style="{ width: labelWidth ? `${labelWidth}px` : 'unset' }">
-      <div v-if="$slots.label" class="label">
+    <div
+      class="control-item-label-area"
+      :style="{ width: labelWidth ? `${labelWidth}px` : 'unset' }"
+    >
+      <div v-if="$slots.label" class="control-item-label">
         <slot name="label" :disabled="disabled"></slot>
       </div>
-      <div v-else class="label" :class="{ disabled: disabled }">{{ label }}</div>
-      <div v-if="$slots.labelDescription" class="label-description" :class="{ disabled: disabled }">
+      <div v-else class="control-item-label" :class="{ 'control-item-disabled': disabled }">
+        {{ label }}
+      </div>
+      <div
+        v-if="$slots.labelDescription"
+        class="control-item-label-desc"
+        :class="{ 'control-item-disabled': disabled }"
+      >
         <slot name="labelDescription" :disabled="disabled"></slot>
       </div>
-      <div v-else-if="labelDescription" class="label-description" :class="{ disabled: disabled }">
+      <div
+        v-else-if="labelDescription"
+        class="control-item-label-desc"
+        :class="{ 'control-item-disabled': disabled }"
+      >
         {{ labelDescription }}
       </div>
     </div>
-    <div class="control"><slot></slot></div>
+    <div class="control-item-control"><slot></slot></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useTimeoutFn } from '@vueuse/core'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const { align = 'center' } = defineProps<{
+  itemId?: string
   labelWidth?: number
   align?: 'center' | 'start'
   label?: string
@@ -39,7 +57,9 @@ const highlight = () => {
 
 const { start } = useTimeoutFn(() => {
   isHighlighting.value = false
-}, 2500)
+}, 300)
+
+onMounted(() => {})
 
 defineExpose({
   highlight
@@ -50,91 +70,50 @@ defineOptions({
 })
 </script>
 
-<style scoped>
-.control-item {
-  display: flex;
-  width: 100%;
-  transition: background-color 0.3s ease;
+<style>
+@reference '@renderer-shared/assets/css/tailwind.css';
 
-  &.align-center {
-    align-items: center;
+@layer components {
+  .control-item {
+    @apply flex w-full transition-colors duration-300;
+
+    &:not(:last-child) {
+      @apply mb-3;
+    }
   }
 
-  &.align-start {
-    align-items: start;
+  .control-item-align-center {
+    @apply items-center;
   }
 
-  .label-area {
-    margin-right: 24px;
-    flex-shrink: 0;
+  .control-item-align-start {
+    @apply items-start;
   }
 
-  .label {
-    font-size: 14px;
-    font-weight: bold;
-    transition: color 0.3s ease;
+  .control-item-label-area {
+    @apply mr-6 shrink-0;
   }
 
-  .label-description {
-    transition: color 0.3s ease;
-    font-size: 13px;
-    margin-top: 2px;
+  .control-item-label {
+    @apply text-sm font-bold transition-colors duration-300;
+    @apply text-black dark:text-white;
   }
 
-  .control {
-    flex: 1;
-  }
-}
-
-[data-theme='dark'] {
-  .label {
-    color: #fff;
+  .control-item-label-desc {
+    @apply mt-0.5 text-[13px] transition-colors duration-300;
+    @apply text-black/80 dark:text-white/80;
   }
 
-  .label.disabled {
-    color: #fff8;
+  .control-item-disabled {
+    @apply text-black/50 dark:text-white/50;
   }
 
-  .label-description {
-    color: #fffc;
+  .control-item-control {
+    @apply flex-1;
   }
 
-  .label-description.disabled {
-    color: #fff8;
-  }
-
-  .control-item.highlight {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-  }
-}
-
-[data-theme='light'] {
-  .label {
-    color: #000;
-  }
-
-  .label.disabled {
-    color: #0008;
-  }
-
-  .label-description {
-    color: #000c;
-  }
-
-  .label-description.disabled {
-    color: #0008;
-  }
-
-  .control-item.highlight {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-  }
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
+  .control-item-highlight {
+    @apply rounded bg-black/10 dark:bg-white/10;
   }
 }
 </style>

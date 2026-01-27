@@ -176,6 +176,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
       store.frontendSettings,
       'sidebarCollapsed'
     )
+
+    await this._setting.savedPropVue(
+      MainWindowUiRenderer.id,
+      store.frontendSettings,
+      'showTestPage'
+    )
   }
 
   usePreferredBackgroundImageUrl() {
