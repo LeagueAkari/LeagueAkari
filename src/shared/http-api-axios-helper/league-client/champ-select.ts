@@ -4,7 +4,8 @@ import {
   ChampSelectSummoner,
   GridChamp,
   MySelection,
-  OngoingChampionSwap
+  OngoingChampionSwap,
+  SkinSelectorInfo
 } from '@shared/types/league-client/champ-select'
 import { AxiosInstance } from 'axios'
 
@@ -122,5 +123,9 @@ export class ChampSelectHttpApi {
 
   setSummonerSpells(data: { spell1Id?: number; spell2Id?: number }) {
     return this._http.patch<void>('/lol-champ-select/v1/session/my-selection', data)
+  }
+
+  getSkinSelectorInfo() {
+    return this._http.get<SkinSelectorInfo>('/lol-champ-select/v1/skin-selector-info')
   }
 }

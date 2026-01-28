@@ -1,7 +1,8 @@
 import {
   ChampSelectSession,
   GridChamp,
-  OngoingChampionSwap
+  OngoingChampionSwap,
+  SkinSelectorInfo
 } from '@shared/types/league-client/champ-select'
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
@@ -91,7 +92,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     currentBannableChampionIds: new Set() as Set<number>,
     disabledChampionIds: new Set() as Set<number>,
     ongoingChampionSwap: null as OngoingChampionSwap | null,
-    gridChampions: {} as Record<number, GridChamp>
+    gridChampions: {} as Record<number, GridChamp>,
+    skinSelectorInfo: null as SkinSelectorInfo | null
   })
 
   const chat = shallowReactive({

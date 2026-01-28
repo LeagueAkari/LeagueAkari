@@ -2,7 +2,8 @@ import {
   ChampSelectSession,
   ChampSelectSummoner,
   GridChamp,
-  OngoingChampionSwap
+  OngoingChampionSwap,
+  SkinSelectorInfo
 } from '@shared/types/league-client/champ-select'
 import { makeAutoObservable, observable } from 'mobx'
 
@@ -20,6 +21,8 @@ export class ChampSelectState {
   selfSummoner: ChampSelectSummoner | null = null
 
   ongoingChampionSwap: OngoingChampionSwap | null = null
+
+  skinSelectorInfo: SkinSelectorInfo | null = null
 
   /**
    * 客户端会先推送所有 /grid-champions/* 事件 (Create), 之后才会推送 /all-grid-champions 事件
@@ -39,7 +42,8 @@ export class ChampSelectState {
       disabledChampionIdArray: observable.struct,
       selfSummoner: observable.struct,
       ongoingChampionSwap: observable.struct,
-      gridChampions: observable.shallow
+      gridChampions: observable.shallow,
+      skinSelectorInfo: observable.struct
     })
   }
 
@@ -89,5 +93,9 @@ export class ChampSelectState {
 
   resetGridChampions() {
     this.gridChampions = {}
+  }
+
+  setSkinSelectorInfo(info: SkinSelectorInfo | null) {
+    this.skinSelectorInfo = info
   }
 }

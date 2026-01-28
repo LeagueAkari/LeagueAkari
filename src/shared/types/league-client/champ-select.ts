@@ -313,3 +313,12 @@ export interface MySelection {
   team: number
   wardSkinId: number
 }
+
+export interface SkinSelectorInfo {
+  championName: string
+  isSkinGrantedFromBoost: boolean
+  selectedChampionId: number
+  selectedSkinId: number
+  showSkinSelector: boolean
+  skinSelectionDisabled: boolean
+}

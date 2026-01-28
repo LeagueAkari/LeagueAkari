@@ -1,7 +1,8 @@
 import {
   ChampSelectSummoner,
   GridChamp,
-  OngoingChampionSwap
+  OngoingChampionSwap,
+  SkinSelectorInfo
 } from '@shared/types/league-client/champ-select'
 import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
@@ -589,7 +590,8 @@ export class LeagueClientData {
       'currentBannableChampionIds',
       'disabledChampionIds',
       'currentChampion',
-      'ongoingChampionSwap'
+      'ongoingChampionSwap',
+      'skinSelectorInfo'
     ])
 
     this._context.mobx.propSync(
@@ -816,6 +818,26 @@ export class LeagueClientData {
       }
     }
 
+    const loadSkinSelectorInfo = async () => {
+      try {
+        const info = (await this._context.lc.api.champSelect.getSkinSelectorInfo()).data
+        this.champSelect.setSkinSelectorInfo(info)
+      } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          this.champSelect.setSkinSelectorInfo(null)
+          return
+        }
+
+        this._context.ipc.sendEvent(
+          this._context.namespace,
+          'error-sync-data',
+          'get-skin-selector-info'
+        )
+        this._context.log.warn(`Failed to get skin selector info`, error)
+      }
+    }
+
+    this._stateInitializer.register('champ-select-skin-selector-info', loadSkinSelectorInfo)
     this._stateInitializer.register('champ-select-session', loadSession)
     this._stateInitializer.register('champ-select-current-champion', loadCurrentChampion)
     this._stateInitializer.register('champ-select-disabled-champions', loadDisabledChampions)
@@ -835,6 +857,7 @@ export class LeagueClientData {
       this.champSelect.setOngoingChampionSwap(null)
       this.champSelect.setSelfSummoner(null)
       this.champSelect.setSession(null)
+      this.champSelect.setSkinSelectorInfo(null)
     })
 
     // 额外的检查步骤, 下同
@@ -962,6 +985,18 @@ export class LeagueClientData {
           event.data,
           { action: 'update', raw: true }
         )
+      }
+    )
+
+    this._context.lc.events.on<LcuEvent<SkinSelectorInfo>>(
+      '/lol-champ-select/v1/skin-selector-info',
+      (event) => {
+        if (event.eventType === 'Delete') {
+          this.champSelect.setSkinSelectorInfo(null)
+          return
+        }
+
+        this.champSelect.setSkinSelectorInfo(event.data)
       }
     )
   }

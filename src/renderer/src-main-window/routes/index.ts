@@ -37,7 +37,7 @@ const router = createRouter({
     },
     {
       name: 'test',
-      path: '/test',
+      path: '/test/:section?',
       component: Test
     }
   ]

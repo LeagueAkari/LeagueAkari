@@ -3,29 +3,21 @@
     size="small"
     v-if="aws.settings.showSkinSelector && lcs.champSelect.currentChampion && skinOptions.length"
   >
-    <div class="flex items-center gap-1">
-      <NSelect
-        size="tiny"
-        :render-label="renderLabel"
-        :render-tag="renderTag"
-        class="flex-1"
-        v-model:value="currentSkinId"
-        :placeholder="
-          t('SkinSelectionMini.skins', {
-            countV: skinOptions.length
-          })
-        "
-        :options="skinOptions"
-      />
-      <NButton
-        :loading="isSettingSkin"
-        type="primary"
-        size="tiny"
-        secondary
-        @click="handleSetSkin"
-        >{{ t('SkinSelectionMini.button') }}</NButton
-      >
-    </div>
+    <NSelect
+      size="tiny"
+      :render-label="renderLabel"
+      :render-tag="renderTag"
+      class="flex-1"
+      :value="lcs.champSelect.skinSelectorInfo?.selectedSkinId"
+      @update:value="handleSetSkin"
+      :placeholder="
+        t('SkinSelectionMini.skins', {
+          countV: skinOptions.length
+        })
+      "
+      :options="skinOptions"
+      :loading="isSettingSkin"
+    />
   </NCard>
 </template>
 
@@ -38,7 +30,7 @@ import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, SelectRenderLabel, SelectRenderTag, useMessage } from 'naive-ui'
+import { NCard, NSelect, SelectRenderLabel, SelectRenderTag, useMessage } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
@@ -173,15 +165,15 @@ watch(
 
 const message = useMessage()
 
-const handleSetSkin = async () => {
-  if (!currentSkinId.value || isSettingSkin.value) {
+const handleSetSkin = async (skinId: number) => {
+  if (!skinId || isSettingSkin.value) {
     return
   }
 
   isSettingSkin.value = true
 
   try {
-    await lc.api.champSelect.setSkin(currentSkinId.value)
+    await lc.api.champSelect.setSkin(skinId)
     message.success(t('SkinSelectionMini.success'))
   } catch (error) {
     message.warning(t('SkinSelectionMini.failed'))
@@ -189,6 +181,20 @@ const handleSetSkin = async () => {
     isSettingSkin.value = false
   }
 }
+
+watch(
+  () => lcs.champSelect.skinSelectorInfo,
+  (info) => {
+    if (!info) {
+      return
+    }
+
+    if (info.selectedSkinId) {
+      currentSkinId.value = info.selectedSkinId
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped></style>
