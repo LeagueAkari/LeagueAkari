@@ -110,7 +110,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.state.setSupportsMica(true)
     }
 
-    this._mobx.propSync(WindowManagerMain.id, 'state', this.state, ['supportsMica'])
+    this._mobx.propSync(WindowManagerMain.id, 'state', this.state, [
+      'supportsMica',
+      'downloadTasks'
+    ])
     this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, [
       'backgroundMaterial',
       'contentProtection'

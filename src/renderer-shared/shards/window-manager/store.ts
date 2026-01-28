@@ -1,6 +1,6 @@
-import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
+import { DownloadTask, MainWindowCloseAction } from '@shared/types/shards/window-manager'
 import { defineStore } from 'pinia'
-import { ref, shallowReactive } from 'vue'
+import { ref, shallowReactive, shallowRef } from 'vue'
 
 export function useBasicWindowStates() {
   const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
@@ -26,9 +26,12 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
 
   const supportsMica = ref(false)
 
+  const downloadTasks = shallowRef<DownloadTask[]>([])
+
   return {
     settings,
-    supportsMica
+    supportsMica,
+    downloadTasks
   }
 })
 

@@ -75,6 +75,9 @@ window-manager-main:
     quickClose:
       title: 不需要小窗?
       body: 可以在设置项中 (设置 > 多窗口) 永久禁用小窗口
+  download:
+    dialogTitle: 保存文件
+    dialogButtonLabel: 保存
 
 ongoing-game-main:
   taggedPlayer: 已标记的玩家

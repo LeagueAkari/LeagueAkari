@@ -75,6 +75,9 @@ window-manager-main:
     quickClose:
       title: Don't want mini window?
       body: You can permanently disable the mini window in the settings (Settings > Multi-window)
+  download:
+    dialogTitle: Save File
+    dialogButtonLabel: Save
 
 ongoing-game-main:
   taggedPlayer: Tagged Player

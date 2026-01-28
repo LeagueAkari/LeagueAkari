@@ -7,6 +7,7 @@ import {
   BrowserWindowConstructorOptions,
   Event,
   IgnoreMouseEventsOptions,
+  app,
   dialog,
   shell
 } from 'electron'
@@ -241,6 +242,11 @@ export abstract class BaseAkariWindow<
 
     this._context.ipc.onCall(this._namespace, 'repositionWindowIfInvisible', () => {
       this.repositionWindowIfInvisible()
+    })
+
+    this._context.ipc.onCall(this._namespace, 'downloadUrl', (event, url: string) => {
+      const sender = event.sender
+      sender.downloadURL(url)
     })
 
     this._context.ipc.onCall(
@@ -522,6 +528,67 @@ export abstract class BaseAkariWindow<
         this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry}`))
       }
     }
+
+    this._window.webContents.session.on('will-download', (_event, item) => {
+      const filename = item.getFilename()
+      const url = item.getURL()
+      const taskId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+
+      item.setSaveDialogOptions({
+        title: i18next.t('window-manager-main.download.dialogTitle'),
+        defaultPath: path.join(app.getPath('downloads'), filename),
+        buttonLabel: i18next.t('window-manager-main.download.dialogButtonLabel')
+      })
+
+      runInAction(() => {
+        this._windowManager.state.addDownloadTask({
+          id: taskId,
+          filename,
+          url,
+          savePath: '',
+          receivedBytes: 0,
+          totalBytes: item.getTotalBytes(),
+          state: 'progressing',
+          startTime: Date.now()
+        })
+      })
+
+      item.on('updated', (_e, state) => {
+        if (state === 'progressing') {
+          const received = item.getReceivedBytes()
+          const total = item.getTotalBytes()
+
+          runInAction(() => {
+            this._windowManager.state.updateDownloadTask(taskId, {
+              receivedBytes: received,
+              totalBytes: total,
+              state: 'progressing'
+            })
+          })
+        }
+      })
+
+      item.once('done', (_e, state) => {
+        const endTime = Date.now()
+        const savePath = item.getSavePath()
+
+        if (state === 'completed') {
+          this._log.info(`Download completed: ${savePath}`)
+        } else {
+          this._log.info(`Download ended with state: ${state}`)
+        }
+
+        runInAction(() => {
+          this._windowManager.state.updateDownloadTask(taskId, {
+            state: state as 'completed' | 'interrupted' | 'cancelled',
+            savePath,
+            endTime,
+            receivedBytes: item.getReceivedBytes(),
+            totalBytes: item.getTotalBytes()
+          })
+        })
+      })
+    })
 
     this._log.info(`Create ${this._namespace}`)
   }

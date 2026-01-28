@@ -90,6 +90,10 @@ export class BaseAkariWindowRenderer<
     return this._context.ipc.call(this._mainShardNamespace, 'setIgnoreMouseEvents', value, options)
   }
 
+  downloadUrl(url: string) {
+    return this._context.ipc.call(this._mainShardNamespace, 'downloadUrl', url)
+  }
+
   async onInit() {
     const state = this.stateGetter()
     const settings = this.settingsGetter()

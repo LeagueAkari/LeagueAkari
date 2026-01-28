@@ -79,6 +79,18 @@
               {{ item.extra }}
             </div>
           </div>
+
+          <NButton
+            v-if="getIconPath(item.id)"
+            size="tiny"
+            secondary
+            class="shrink-0"
+            @click="handleDownloadIcon(getIconPath(item.id)!)"
+          >
+            <template #icon>
+              <NIcon><DownloadIcon /></NIcon>
+            </template>
+          </NButton>
         </div>
       </div>
 
@@ -99,11 +111,15 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { NInput, NScrollbar, NSelect } from 'naive-ui'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { Download as DownloadIcon } from '@vicons/carbon'
+import { NButton, NIcon, NInput, NScrollbar, NSelect } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const lcs = useLeagueClientStore()
+const wm = useInstance(WindowManagerRenderer)
 
 const selectedCategory = ref<string>('items')
 const searchText = ref('')
@@ -201,4 +217,28 @@ const filteredData = computed(() => {
       item.extra?.toLowerCase().includes(search)
   )
 })
+
+const getIconPath = (id: number): string | null => {
+  const gd = lcs.gameData
+
+  switch (selectedCategory.value) {
+    case 'items':
+      return gd.items[id]?.iconPath || null
+    case 'perks':
+      return gd.perks[id]?.iconPath || null
+    case 'perkstyles':
+      return gd.perkstyles.styles[id]?.iconPath || null
+    case 'augments':
+      return gd.augments[id]?.augmentSmallIconPath || null
+    case 'summonerSpells':
+      return gd.summonerSpells[id]?.iconPath || null
+    default:
+      return null
+  }
+}
+
+const handleDownloadIcon = (iconPath: string) => {
+  const url = new URL(iconPath, 'akari://league-client').href
+  wm.mainWindow.downloadUrl(url)
+}
 </script>
