@@ -133,6 +133,7 @@
         :is-able-to-add-to-item-set="isAbleToAddToItemSet"
         :is-aram-mayhem="isAramMayhem"
         :aram-augments-data="aramAugmentsData"
+        :arena-champion="arenaChampion"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
@@ -365,6 +366,8 @@ const tierData = shallowRef<
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
 // Store ARAM augments data for ARAM: Mayhem mode
 const aramAugmentsData = shallowRef<OpggARAMAugments | null>(null)
+// Store Arena champion data for merging core items in ARAM: Mayhem mode
+const arenaChampion = shallowRef<OpggArenaModeChampion | null>(null)
 
 const message = useMessage()
 
@@ -491,7 +494,7 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       signal: loadChampionController.signal
     })
 
-    // If in ARAM: Mayhem mode, fetch ARAM augments data instead of Arena augments
+    // If in ARAM: Mayhem mode, fetch ARAM augments data and Arena champion data
     if (isAramMayhem.value && championId.value) {
       try {
         aramAugmentsData.value = await api.getARAMAugments({
@@ -503,8 +506,26 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
         // Don't fail the whole load if augments fail
         aramAugmentsData.value = null
       }
+
+      // Fetch Arena champion data for merging core items
+      try {
+        arenaChampion.value = await api.getChampion({
+          region: region.value,
+          mode: 'arena',
+          tier: tier.value,
+          version: version.value ?? undefined,
+          id: championId.value,
+          position: 'none',
+          signal: loadChampionController.signal
+        }) as OpggArenaModeChampion
+      } catch (arenaError) {
+        log.warn('view:Opgg', `获取 Arena 数据失败 (for core items merge): ${(arenaError as any).message}`, arenaError)
+        // Don't fail the whole load if Arena data fetch fails
+        arenaChampion.value = null
+      }
     } else {
       aramAugmentsData.value = null
+      arenaChampion.value = null
     }
 
     // 这段逻辑先耦合在这里, 以后可能会被移除
@@ -554,6 +575,7 @@ const loadAll = async () => {
     champion.value = null
     tierData.value = null
     aramAugmentsData.value = null
+    arenaChampion.value = null
     versions.value = []
     shouldStopLoading = false
 

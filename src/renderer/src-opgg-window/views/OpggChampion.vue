@@ -909,6 +909,7 @@ const props = defineProps<{
   isAbleToAddToItemSet?: boolean
   isAramMayhem?: boolean
   aramAugmentsData?: any
+  arenaChampion?: any
 }>()
 
 const emits = defineEmits<{
@@ -1076,7 +1077,37 @@ const coreItems = computed(() => {
     return []
   }
   
-  return props.data.data.core_items || []
+  const aramCoreItems = props.data.data.core_items || []
+  
+  // In ARAM: Mayhem mode, merge Arena core items with ARAM core items
+  if (props.isAramMayhem && props.arenaChampion?.data?.core_items) {
+    const arenaCoreItems = props.arenaChampion.data.core_items || []
+    
+    // Combine both arrays, Arena items first, then ARAM items
+    // Use a Set to track item IDs we've already added to avoid duplicates
+    const seenItemIds = new Set<number>()
+    const combined: any[] = []
+    
+    // Add Arena core items first
+    for (const item of arenaCoreItems) {
+      if (!seenItemIds.has(item.ids[0])) {
+        combined.push(item)
+        seenItemIds.add(item.ids[0])
+      }
+    }
+    
+    // Add ARAM core items that aren't already included
+    for (const item of aramCoreItems) {
+      if (!seenItemIds.has(item.ids[0])) {
+        combined.push(item)
+        seenItemIds.add(item.ids[0])
+      }
+    }
+    
+    return combined
+  }
+  
+  return aramCoreItems
 })
 
 const augmentTab = ref<string | undefined>('all')
