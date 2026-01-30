@@ -70,6 +70,14 @@ const eas = useExtraAssetsStore()
 
 const styles = useCssModule()
 
+// Detect if this is ARAM: Mayhem mode based on data structure
+const isAramMayhem = computed(() => {
+  return (props.mode === 'aram' || props.mode === 'aram_mayhem') && 
+         props.data?.data && 
+         props.data.data.length > 0 && 
+         !props.data.data[0].average_stats
+})
+
 const rowProps: DataTableCreateRowProps<any> = (row) => {
   return {
     onClick: () => {
@@ -177,6 +185,9 @@ const columns: DataTableColumns<any> = [
       let tierText: string
       if (!row.average_stats) {
         tierText = '-'
+      } else if (isAramMayhem.value) {
+        // ARAM: Mayhem uses tier values 1-5 directly
+        tierText = row.average_stats.tier ? row.average_stats.tier.toString() : '-'
       } else if (row.average_stats.tier === 0) {
         tierText = 'OP'
       } else if (row.average_stats.tier) {
@@ -295,6 +306,11 @@ const columns: DataTableColumns<any> = [
       }
 
       if (!row.average_stats) {
+        return '-'
+      }
+
+      // For ARAM Mayhem, pick_rate is null, show "-" instead of 0.00%
+      if (!row.average_stats.pick_rate) {
         return '-'
       }
 
@@ -433,6 +449,35 @@ const isNameMatch = (pattern: string, label: string, value?: number) => {
 const data = computed(() => {
   if (!props.data) {
     return []
+  }
+
+  // ARAM: Mayhem tier list has a simpler structure
+  // Transform it to match the expected format
+  if ((props.mode === 'aram' || props.mode === 'aram_mayhem') && props.data.data && props.data.data.length > 0 && !props.data.data[0].average_stats) {
+    // This is ARAM: Mayhem tier list format
+    return props.data.data
+      .map((item: any) => ({
+        id: item.champion_id,
+        average_stats: {
+          rank: item.rank,
+          tier: item.tier,
+          win_rate: null,
+          pick_rate: null,
+          ban_rate: null,
+          kda: null
+        }
+      }))
+      .toSorted((a: any, b: any) => {
+        const aRank = a.average_stats?.rank || Infinity
+        const bRank = b.average_stats?.rank || Infinity
+        return aRank - bRank
+      })
+      .filter((value: any) => {
+        if (filterText.value === '') {
+          return true
+        }
+        return isNameMatch(filterText.value, lcs.gameData.champions[value.id]?.name, value.id)
+      })
   }
 
   // 排位数据按照位置的 tier 排序

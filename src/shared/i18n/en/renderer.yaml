@@ -1921,6 +1921,7 @@ Opgg:
   modes:
     ranked: 'Ranked'
     aram: 'ARAM'
+    aram_mayhem: 'ARAM: Mayhem'
     arena: 'Arena'
     nexus_blitz: 'Nexus Blitz'
     urf: 'URF'
@@ -2006,7 +2007,10 @@ OpggChampion:
   augmentGold: Gold
   augmentSilver: Silver
   augmentPrism: Prism
-  aramMayhemAugments: Augments (from Arena)
+  augmentAll: All
+  performance: Performance
+  popular: Popular
+  aramMayhemAugments: Augments
   synergies: Synergies
 
   writeToDisk: '[League Akari] Written to item build: {{name}}'

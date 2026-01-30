@@ -81,7 +81,7 @@
         :render-label="renderLabel"
         style="width: 0; flex: 1"
         :consistent-menu-width="false"
-        :disabled="isLoading || mode === 'arena'"
+        :disabled="isLoading || mode === 'arena' || mode === 'aram_mayhem'"
       />
       <NSelect
         size="small"
@@ -132,7 +132,8 @@
         :version="version || undefined"
         :is-able-to-add-to-item-set="isAbleToAddToItemSet"
         :is-aram-mayhem="isAramMayhem"
-        :arena-augments-data="arenaAugmentsData"
+        :aram-augments-data="aramAugmentsData"
+        :arena-champion="arenaChampion"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
@@ -239,7 +240,9 @@ import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store
 import { OpggDataApi } from '@shared/data-sources/opgg'
 import {
   ModeType,
+  OpggARAMAugments,
   OpggARAMChampionSummary,
+  OpggARAMMayhemTierList,
   OpggArenaChampionSummary,
   OpggArenaModeChampion,
   OpggNormalModeChampion,
@@ -324,7 +327,13 @@ const tier = ref<TierType>(savedPreferences.value.tier as TierType)
 const version = ref<string | null>(null)
 
 // Track if we're in ARAM: Mayhem mode (ARAM with augments)
-const isAramMayhem = ref(false)
+// Initialize based on saved mode preference
+const isAramMayhem = ref(savedPreferences.value.mode === 'aram_mayhem')
+
+// Compute the effective mode for API calls (aram_mayhem -> aram)
+const effectiveMode = computed(() => {
+  return mode.value === 'aram_mayhem' ? 'aram' : mode.value
+})
 
 const versions = shallowRef<string[]>([])
 
@@ -352,11 +361,13 @@ watch(
 )
 
 const tierData = shallowRef<
-  OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | null
+  OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | OpggARAMMayhemTierList | null
 >(null)
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
-// Store Arena augments data separately for ARAM: Mayhem mode
-const arenaAugmentsData = shallowRef<OpggArenaModeChampion | null>(null)
+// Store ARAM augments data for ARAM: Mayhem mode
+const aramAugmentsData = shallowRef<OpggARAMAugments | null>(null)
+// Store Arena champion data for merging core items in ARAM: Mayhem mode
+const arenaChampion = shallowRef<OpggArenaModeChampion | null>(null)
 
 const message = useMessage()
 
@@ -381,7 +392,7 @@ watchEffect(() => {
     position.value = savedPreferences.value.position as PositionType
   }
 
-  if (mode.value === 'arena') {
+  if (mode.value === 'arena' || mode.value === 'aram_mayhem') {
     tier.value = 'all'
   } else {
     tier.value = savedPreferences.value.tier as TierType
@@ -405,7 +416,7 @@ const loadVersionsData = async () => {
     versions.value = (
       await api.getVersions({
         region: region.value,
-        mode: mode.value,
+        mode: effectiveMode.value,
         signal: loadVersionsController.signal
       })
     ).data
@@ -434,13 +445,20 @@ const loadTierData = async () => {
   loadTierController = new AbortController()
 
   try {
-    tierData.value = await api.getChampionsTier({
-      region: region.value,
-      mode: mode.value,
-      tier: tier.value,
-      version: version.value ?? undefined,
-      signal: loadTierController.signal
-    })
+    // Use ARAM Mayhem tier list API if in ARAM Mayhem mode
+    if (isAramMayhem.value) {
+      tierData.value = await api.getARAMMayhemTierList({
+        signal: loadTierController.signal
+      })
+    } else {
+      tierData.value = await api.getChampionsTier({
+        region: region.value,
+        mode: effectiveMode.value,
+        tier: tier.value,
+        version: version.value ?? undefined,
+        signal: loadTierController.signal
+      })
+    }
   } catch (error) {
     if ((error as any).name === 'CanceledError') {
       return
@@ -468,7 +486,7 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
   try {
     champion.value = await api.getChampion({
       region: region.value,
-      mode: mode.value,
+      mode: effectiveMode.value,
       tier: tier.value,
       version: version.value ?? undefined,
       id: championId.value,
@@ -476,25 +494,38 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       signal: loadChampionController.signal
     })
 
-    // If in ARAM: Mayhem mode, also fetch Arena augments data
+    // If in ARAM: Mayhem mode, fetch ARAM augments data and Arena champion data
     if (isAramMayhem.value && championId.value) {
       try {
-        arenaAugmentsData.value = await api.getChampion({
+        aramAugmentsData.value = await api.getARAMAugments({
+          championId: championId.value,
+          signal: loadChampionController.signal
+        })
+      } catch (augmentError) {
+        log.warn('view:Opgg', `获取 ARAM augments 数据失败: ${(augmentError as any).message}`, augmentError)
+        // Don't fail the whole load if augments fail
+        aramAugmentsData.value = null
+      }
+
+      // Fetch Arena champion data for merging core items
+      try {
+        arenaChampion.value = await api.getChampion({
           region: region.value,
           mode: 'arena',
-          tier: 'all', // Arena mode always uses 'all' tier
+          tier: tier.value,
           version: version.value ?? undefined,
           id: championId.value,
-          position: position.value,
+          position: 'none',
           signal: loadChampionController.signal
         }) as OpggArenaModeChampion
-      } catch (augmentError) {
-        log.warn('view:Opgg', `获取 Arena augments 数据失败: ${(augmentError as any).message}`, augmentError)
-        // Don't fail the whole load if augments fail
-        arenaAugmentsData.value = null
+      } catch (arenaError) {
+        log.warn('view:Opgg', `获取 Arena 数据失败 (for core items merge): ${(arenaError as any).message}`, arenaError)
+        // Don't fail the whole load if Arena data fetch fails
+        arenaChampion.value = null
       }
     } else {
-      arenaAugmentsData.value = null
+      aramAugmentsData.value = null
+      arenaChampion.value = null
     }
 
     // 这段逻辑先耦合在这里, 以后可能会被移除
@@ -543,6 +574,8 @@ const loadAll = async () => {
   try {
     champion.value = null
     tierData.value = null
+    aramAugmentsData.value = null
+    arenaChampion.value = null
     versions.value = []
     shouldStopLoading = false
 
@@ -577,6 +610,10 @@ const handleVersionChange = async (v: string) => {
 const handleModeChange = async (m: ModeType) => {
   mode.value = m
   savedPreferences.value.mode = m
+  
+  // Set isAramMayhem flag based on selected mode
+  isAramMayhem.value = (m === 'aram_mayhem')
+  
   await loadAll()
 }
 
@@ -638,6 +675,7 @@ const championItem = computed(() => {
 const modeOptions = computed(() => [
   { label: t('Opgg.modes.ranked'), value: 'ranked' },
   { label: t('Opgg.modes.aram'), value: 'aram' },
+  { label: t('Opgg.modes.aram_mayhem'), value: 'aram_mayhem' },
   { label: t('Opgg.modes.arena'), value: 'arena' },
   { label: t('Opgg.modes.nexus_blitz'), value: 'nexus_blitz' },
   { label: t('Opgg.modes.urf'), value: 'urf' }
@@ -760,7 +798,7 @@ watchDebounced(
         break
       case 'KIWI':
         // ARAM: Mayhem - combination of ARAM with Arena augments
-        mode.value = 'aram'
+        mode.value = 'aram_mayhem'
         position.value = 'none'
         isAramMayhem.value = true
         break
@@ -777,6 +815,9 @@ watchDebounced(
       default:
         isModeMatch.value = false
     }
+
+    // Update saved preferences to reflect auto-detected mode
+    savedPreferences.value.mode = mode.value
 
     await loadAll()
 
@@ -977,7 +1018,7 @@ const handleAddToItemSet = async () => {
 
     const newUid = toItemSetsUid({
       championId: championItem.value?.id || -1,
-      mode: mode.value,
+      mode: effectiveMode.value,
       region: region.value,
       tier: tier.value,
       position: position.value,
@@ -1043,7 +1084,7 @@ const handleAddToItemSet = async () => {
     await lc.writeItemSetsToDisk([
       {
         uid: newUid,
-        title: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${mode.value === 'arena' || mode.value === 'nexus_blitz' ? ` ${t(`Opgg.modes.${position.value}`)}` : ''}`,
+        title: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${mode.value === 'arena' || mode.value === 'nexus_blitz' || mode.value === 'aram_mayhem' ? ` ${t(`Opgg.modes.${mode.value === 'aram_mayhem' ? 'aram_mayhem' : position.value}`)}` : ''}`,
         sortrank: 0,
         type: 'global',
         map: 'any',

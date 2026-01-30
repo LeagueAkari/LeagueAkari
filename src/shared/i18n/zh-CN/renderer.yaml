@@ -1926,6 +1926,7 @@ Opgg:
   modes:
     ranked: '排位'
     aram: '极地大乱斗'
+    aram_mayhem: '海克斯大乱斗'
     arena: '斗魂竞技场'
     nexus_blitz: '极限闪击'
     urf: '无限火力'
@@ -2011,7 +2012,10 @@ OpggChampion:
   augmentGold: 黄金阶
   augmentSilver: 白银阶
   augmentPrism: 棱彩阶
-  aramMayhemAugments: 强化符文 (来自斗魂竞技场)
+  augmentAll: 全部
+  performance: 强度
+  popular: 热度
+  aramMayhemAugments: 强化符文
   synergies: 搭配
 
   writeToDisk: '[League Akari] 已写入到装备方案：{{name}}'

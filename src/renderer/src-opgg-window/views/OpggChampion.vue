@@ -329,105 +329,236 @@
             <NCheckbox size="small" v-model:checked="isAugmentsExpanded"
             >{{ t('OpggChampion.showAll') }}</NCheckbox>
           </template>
-          <NTabPane name="silver" v-if="augments && augments[1]">
-            <template #tab>
-              <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
-            </template>
-            <div
-              class="augments-group"
-              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[1].augments)"
-              :key="i"
-            >
-              <div class="index">#{{ i + 1 }}</div>
-              <div class="image-name">
-                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
-                <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
-              </div>
-              <div class="desc">
-                <div class="pick">
-                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
-                  >
-                  <span class="pick-play" :title="t('OpggChampion.plays')">
-                    {{
-                      t('OpggChampion.times', {
-                        times: a.play.toLocaleString()
-                      })
-                    }}</span
-                  >
+          
+          <!-- ARAM Mayhem tier-based tabs: All, Silver, Gold, Prism -->
+          <template v-if="props.isAramMayhem">
+            <!-- ALL tab -->
+            <NTabPane name="all" v-if="augments && augments['all']">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentAll') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments['all'].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
                 </div>
-                <div class="win-rate" :title="t('OpggChampion.winRate')">
-                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
-                </div>
-              </div>
-            </div>
-          </NTabPane>
-          <NTabPane name="gold" v-if="augments && augments[4]">
-            <template #tab>
-              <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
-            </template>
-            <div
-              class="augments-group"
-              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[4].augments)"
-              :key="i"
-            >
-              <div class="index">#{{ i + 1 }}</div>
-              <div class="image-name">
-                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
-                <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
-              </div>
-              <div class="desc">
-                <div class="pick">
-                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
-                  >
-                  <span class="pick-play" :title="t('OpggChampion.plays')">
-                    {{
-                      t('OpggChampion.times', {
-                        times: a.play.toLocaleString()
-                      })
-                    }}</span
-                  >
-                </div>
-                <div class="win-rate" :title="t('OpggChampion.winRate')">
-                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                <div class="desc">
+                  <div class="pick">
+                    <span class="tier-badge" :class="`tier-${getTierLabel(a.tier).toLowerCase()}`">{{ getTierLabel(a.tier) }}</span>
+                  </div>
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.popular')">
+                      {{ t('OpggChampion.popular') }}: {{ a.popular }}
+                    </span>
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.performance')">
+                    {{ t('OpggChampion.performance') }}: {{ a.performance }}
+                  </div>
                 </div>
               </div>
-            </div>
-          </NTabPane>
-          <NTabPane name="prism" v-if="augments && augments[8]">
-            <template #tab>
-              <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
-            </template>
-            <div
-              class="augments-group"
-              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[8].augments)"
-              :key="i"
-            >
-              <div class="index">#{{ i + 1 }}</div>
-              <div class="image-name">
-                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
-                <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
-              </div>
-              <div class="desc">
-                <div class="pick">
-                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
-                  >
-                  <span class="pick-play" :title="t('OpggChampion.plays')">
-                    {{
-                      t('OpggChampion.times', {
-                        times: a.play.toLocaleString()
-                      })
-                    }}</span
-                  >
+            </NTabPane>
+            
+            <!-- Silver tab -->
+            <NTabPane name="silver" v-if="augments && augments[1]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[1].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
                 </div>
-                <div class="win-rate" :title="t('OpggChampion.winRate')">
-                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                <div class="desc">
+                  <div class="pick">
+                    <span class="tier-badge" :class="`tier-${getTierLabel(a.tier).toLowerCase()}`">{{ getTierLabel(a.tier) }}</span>
+                  </div>
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.popular')">
+                      {{ t('OpggChampion.popular') }}: {{ a.popular }}
+                    </span>
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.performance')">
+                    {{ t('OpggChampion.performance') }}: {{ a.performance }}
+                  </div>
                 </div>
               </div>
-            </div>
-          </NTabPane>
+            </NTabPane>
+            
+            <!-- Gold tab -->
+            <NTabPane name="gold" v-if="augments && augments[4]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[4].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
+                </div>
+                <div class="desc">
+                  <div class="pick">
+                    <span class="tier-badge" :class="`tier-${getTierLabel(a.tier).toLowerCase()}`">{{ getTierLabel(a.tier) }}</span>
+                  </div>
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.popular')">
+                      {{ t('OpggChampion.popular') }}: {{ a.popular }}
+                    </span>
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.performance')">
+                    {{ t('OpggChampion.performance') }}: {{ a.performance }}
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+            
+            <!-- Prism tab -->
+            <NTabPane name="prism" v-if="augments && augments[8]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[8].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
+                </div>
+                <div class="desc">
+                  <div class="pick">
+                    <span class="tier-badge" :class="`tier-${getTierLabel(a.tier).toLowerCase()}`">{{ getTierLabel(a.tier) }}</span>
+                  </div>
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.popular')">
+                      {{ t('OpggChampion.popular') }}: {{ a.popular }}
+                    </span>
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.performance')">
+                    {{ t('OpggChampion.performance') }}: {{ a.performance }}
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+          </template>
+          
+          <!-- Regular mode rarity-based tabs -->
+          <template v-else>
+            <NTabPane name="silver" v-if="augments && augments[1]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[1].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
+                </div>
+                <div class="desc">
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                    >
+                    <span class="pick-play" :title="t('OpggChampion.plays')">
+                      {{
+                        t('OpggChampion.times', {
+                          times: a.play.toLocaleString()
+                        })
+                      }}</span
+                    >
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.winRate')">
+                    {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+            <NTabPane name="gold" v-if="augments && augments[4]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[4].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
+                </div>
+                <div class="desc">
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                    >
+                    <span class="pick-play" :title="t('OpggChampion.plays')">
+                      {{
+                        t('OpggChampion.times', {
+                          times: a.play.toLocaleString()
+                        })
+                      }}</span
+                    >
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.winRate')">
+                    {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+            <NTabPane name="prism" v-if="augments && augments[8]">
+              <template #tab>
+                <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
+              </template>
+              <div
+                class="augments-group"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[8].augments)"
+                :key="i"
+              >
+                <div class="index">#{{ i + 1 }}</div>
+                <div class="image-name">
+                  <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                  <span class="name">{{ lcs.gameData.augments[a.id]?.nameTRA || a.id }}</span>
+                </div>
+                <div class="desc">
+                  <div class="pick">
+                    <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                    >
+                    <span class="pick-play" :title="t('OpggChampion.plays')">
+                      {{
+                        t('OpggChampion.times', {
+                          times: a.play.toLocaleString()
+                        })
+                      }}</span
+                    >
+                  </div>
+                  <div class="win-rate" :title="t('OpggChampion.winRate')">
+                    {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+          </template>
         </NTabs>
       </div>
       <div
@@ -777,7 +908,8 @@ const props = defineProps<{
   data?: any
   isAbleToAddToItemSet?: boolean
   isAramMayhem?: boolean
-  arenaAugmentsData?: any
+  aramAugmentsData?: any
+  arenaChampion?: any
 }>()
 
 const emits = defineEmits<{
@@ -835,17 +967,92 @@ const info = computed(() => {
 
 // OP.GG 使用 rarity 来表示三种不同的 augment 等级
 // 1 - silver, 4 - gold, 8 - prism
+// For ARAM: Mayhem, the API returns tier 0-5 in the augment data
 const augments = computed(() => {
-  // For ARAM: Mayhem mode, use Arena augments data
-  if (props.isAramMayhem && props.arenaAugmentsData) {
-    if (!props.arenaAugmentsData.data.augment_group) {
+  // For ARAM: Mayhem mode, use ARAM augments data with new structure
+  if (props.isAramMayhem && props.aramAugmentsData) {
+    if (!props.aramAugmentsData.data || props.aramAugmentsData.data.length === 0) {
       return null
     }
     
-    return props.arenaAugmentsData.data.augment_group.reduce((acc: any, cur: any) => {
-      acc[cur.rarity] = cur
-      return acc
-    }, {})
+    // Filter out augments that don't exist in game data
+    const validAugments = props.aramAugmentsData.data.filter((a: any) => {
+      return lcs.gameData.augments[a.id] !== undefined
+    })
+    
+    if (validAugments.length === 0) {
+      return null
+    }
+    
+    // Group augments for All, Silver, Gold, Prism tabs
+    // Based on actual augment rarity from lcs.gameData.augments[id].rarity
+    const groupedAugments: any = {
+      all: {
+        rarity: 'all',
+        augments: validAugments.map((a: any) => ({
+          id: a.id,
+          tier: a.tier,
+          performance: a.performance,
+          popular: a.popular,
+          // For compatibility with display template
+          pick_rate: a.popular,
+          play: a.popular,
+          win: a.performance
+        }))
+      }
+    }
+    
+    // Group by actual augment rarity from game data
+    const prismAugments: any[] = []
+    const goldAugments: any[] = []
+    const silverAugments: any[] = []
+    
+    validAugments.forEach((a: any) => {
+      const augmentData = lcs.gameData.augments[a.id]
+      const mappedAugment = {
+        id: a.id,
+        tier: a.tier,
+        performance: a.performance,
+        popular: a.popular,
+        pick_rate: a.popular,
+        play: a.popular,
+        win: a.performance
+      }
+      
+      if (augmentData?.rarity === 'kPrismatic') {
+        prismAugments.push(mappedAugment)
+      } else if (augmentData?.rarity === 'kGold') {
+        goldAugments.push(mappedAugment)
+      } else if (augmentData?.rarity === 'kSilver') {
+        silverAugments.push(mappedAugment)
+      }
+    })
+    
+    // Prism: kPrismatic rarity
+    if (prismAugments.length > 0) {
+      groupedAugments[8] = {
+        rarity: 8,
+        augments: prismAugments
+      }
+    }
+    
+    // Gold: kGold rarity
+    if (goldAugments.length > 0) {
+      groupedAugments[4] = {
+        rarity: 4,
+        augments: goldAugments
+      }
+    }
+    
+    // Silver: kSilver rarity
+    if (silverAugments.length > 0) {
+      groupedAugments[1] = {
+        rarity: 1,
+        augments: silverAugments
+      }
+    }
+    
+    return Object.keys(groupedAugments).length > 0 ? groupedAugments : null
   }
   
   // Regular mode: use augments from the main data
@@ -865,21 +1072,22 @@ const augments = computed(() => {
 
 // Combine Arena core_items with ARAM core_items in ARAM: Mayhem mode
 const coreItems = computed(() => {
-  // For ARAM: Mayhem mode, combine Arena and ARAM core_items
-  if (props.isAramMayhem && props.arenaAugmentsData && props.data) {
-    const aramCoreItems = props.data.data.core_items || []
-    const arenaCoreItems = props.arenaAugmentsData.data.core_items || []
-    
-    // Combine both arrays, Arena items first, then ARAM items
-    return [...arenaCoreItems, ...aramCoreItems]
-  }
-  
   // Regular mode: use core_items from the main data
   if (!props.data) {
     return []
   }
   
-  return props.data.data.core_items || []
+  const aramCoreItems = props.data.data.core_items || []
+  
+  // In ARAM: Mayhem mode, merge Arena core items with ARAM core items
+  if (props.isAramMayhem && props.arenaChampion?.data?.core_items) {
+    const arenaCoreItems = props.arenaChampion.data.core_items || []
+    
+    // Combine both arrays, Arena items first, then ARAM items
+    return [...arenaCoreItems, ...aramCoreItems]
+  }
+  
+  return aramCoreItems
 })
 
 const augmentTab = ref<string | undefined>('gold')
@@ -889,10 +1097,12 @@ watchEffect(() => {
     return
   }
 
+  // default to 'gold' tab
   if (augments.value[4]) {
     augmentTab.value = 'gold'
-  }
-  else if (augments.value[1]) {
+  } else if (props.isAramMayhem && augments.value['all']) {
+    augmentTab.value = 'all'
+  } else if (augments.value[1]) {
     augmentTab.value = 'silver'
   } else if (augments.value[8]) {
     augmentTab.value = 'prism'
@@ -920,7 +1130,7 @@ watchEffect(() => {
     isSummonerSpellsExpanded.value = false
     isRunesExpanded.value = false
     isSynergiesExpanded.value = false
-    isAugmentsExpanded.value = true
+    isAugmentsExpanded.value = !props.isAramMayhem
     isSkillMasteriesExpanded.value = false
     isStarterItemsExpanded.value = false
     isBootsExpanded.value = false
@@ -938,8 +1148,26 @@ const sortedData = (key: string, isExpanded: boolean, limit: number, customData:
   // Create a shallow copy of the data to preserve the original array
   let sortedItems = [...data]
 
-  // Apply sorting based on a selected criterion
-  if (opggChampionSortBy.value !== 'default') {
+  // For ARAM Mayhem augments, sort based on opggChampionSortBy
+  if (props.isAramMayhem && key === 'augments' && customData.length) {
+    if (opggChampionSortBy.value === 'pickRate') {
+      // Sort by popular (descending)
+      sortedItems.sort((a: any, b: any) => {
+        const popularA = a.popular || 0
+        const popularB = b.popular || 0
+        return popularB - popularA
+      })
+    } else if (opggChampionSortBy.value === 'winRate') {
+      // Sort by performance (descending)
+      sortedItems.sort((a: any, b: any) => {
+        const performanceA = a.performance || 0
+        const performanceB = b.performance || 0
+        return performanceB - performanceA
+      })
+    }
+    // If 'default', keep original order (no sorting)
+  } else if (opggChampionSortBy.value !== 'default') {
+    // Apply sorting based on a selected criterion for regular mode
     sortedItems.sort((a: any, b: any) => {
       switch (opggChampionSortBy.value) {
         case 'pickRate': {
@@ -960,6 +1188,12 @@ const sortedData = (key: string, isExpanded: boolean, limit: number, customData:
 
   // Slice the sorted array to get the first `limit` elements (or all if expanded)
   return sortedItems.slice(0, isExpanded ? Infinity : limit)
+}
+
+// Helper function to get tier label (S, A, B, C, D, E) from tier number (0-5)
+const getTierLabel = (tier: number): string => {
+  const labels = ['S', 'A', 'B', 'C', 'D', 'E']
+  return labels[tier] || 'E'
 }
 
 const tierText = computed(() => {
@@ -1749,6 +1983,7 @@ if (import.meta.env.DEV) {
 .augments-group {
   display: flex;
   align-items: center;
+  height: 30px;
   margin-bottom: 4px;
   gap: 4px;
 
@@ -1818,5 +2053,46 @@ if (import.meta.env.DEV) {
       text-align: center;
     }
   }
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.tier-badge.tier-s {
+  background-color: #ff7300;
+  color: white;
+}
+
+.tier-badge.tier-a {
+  background-color: #0093ff;
+  color: white;
+}
+
+.tier-badge.tier-b {
+  background-color: #00bba3;
+  color: white;
+}
+
+.tier-badge.tier-c {
+  background-color: #ffb900;
+  color: white;
+}
+
+.tier-badge.tier-d {
+  background-color: #9aa4af;
+  color: white;
+}
+
+.tier-badge.tier-e {
+  background-color: #a88a67;
+  color: white;
 }
 </style>
