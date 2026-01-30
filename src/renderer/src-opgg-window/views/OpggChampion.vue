@@ -1963,6 +1963,7 @@ if (import.meta.env.DEV) {
 .augments-group {
   display: flex;
   align-items: center;
+  height: 30px;
   margin-bottom: 4px;
   gap: 4px;
 
