@@ -859,7 +859,10 @@ const augments = computed(() => {
         augments: opTier.map((a: any) => ({
           id: a.id,
           pick_rate: a.popular / 100, // Convert percentage to decimal
-          performance: a.performance
+          performance: a.performance,
+          // ARAM augments don't have play/win data, use performance as proxy
+          play: Math.round(a.popular * 100), // Use popularity as play count proxy
+          win: Math.round(a.popular * a.performance) // Derive from popularity and performance
         }))
       }
     }
@@ -870,7 +873,10 @@ const augments = computed(() => {
         augments: goldTier.map((a: any) => ({
           id: a.id,
           pick_rate: a.popular / 100, // Convert percentage to decimal
-          performance: a.performance
+          performance: a.performance,
+          // ARAM augments don't have play/win data, use performance as proxy
+          play: Math.round(a.popular * 100), // Use popularity as play count proxy
+          win: Math.round(a.popular * a.performance) // Derive from popularity and performance
         }))
       }
     }
@@ -881,7 +887,10 @@ const augments = computed(() => {
         augments: silverTier.map((a: any) => ({
           id: a.id,
           pick_rate: a.popular / 100, // Convert percentage to decimal
-          performance: a.performance
+          performance: a.performance,
+          // ARAM augments don't have play/win data, use performance as proxy
+          play: Math.round(a.popular * 100), // Use popularity as play count proxy
+          win: Math.round(a.popular * a.performance) // Derive from popularity and performance
         }))
       }
     }

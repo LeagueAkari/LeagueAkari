@@ -2012,7 +2012,7 @@ OpggChampion:
   augmentGold: 黄金阶
   augmentSilver: 白银阶
   augmentPrism: 棱彩阶
-  aramMayhemAugments: 强化符文 (来自斗魂竞技场)
+  aramMayhemAugments: 强化符文
   synergies: 搭配
 
   writeToDisk: '[League Akari] 已写入到装备方案：{{name}}'

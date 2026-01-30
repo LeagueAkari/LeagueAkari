@@ -70,6 +70,14 @@ const eas = useExtraAssetsStore()
 
 const styles = useCssModule()
 
+// Detect if this is ARAM: Mayhem mode based on data structure
+const isAramMayhem = computed(() => {
+  return props.mode === 'aram' && 
+         props.data?.data && 
+         props.data.data.length > 0 && 
+         !props.data.data[0].average_stats
+})
+
 const rowProps: DataTableCreateRowProps<any> = (row) => {
   return {
     onClick: () => {
@@ -177,6 +185,9 @@ const columns: DataTableColumns<any> = [
       let tierText: string
       if (!row.average_stats) {
         tierText = '-'
+      } else if (isAramMayhem.value) {
+        // ARAM: Mayhem uses tier values 1-5 directly
+        tierText = row.average_stats.tier ? row.average_stats.tier.toString() : '-'
       } else if (row.average_stats.tier === 0) {
         tierText = 'OP'
       } else if (row.average_stats.tier) {
