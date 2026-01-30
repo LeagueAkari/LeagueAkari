@@ -339,7 +339,7 @@
               </template>
               <div
                 class="augments-group"
-                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 8, augments['all'].augments)"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments['all'].augments)"
                 :key="i"
               >
                 <div class="index">#{{ i + 1 }}</div>
@@ -363,14 +363,14 @@
               </div>
             </NTabPane>
             
-            <!-- Silver tab (Tier 3-5: C, D, E) -->
+            <!-- Silver tab -->
             <NTabPane name="silver" v-if="augments && augments[1]">
               <template #tab>
                 <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
               </template>
               <div
                 class="augments-group"
-                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 6, augments[1].augments)"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[1].augments)"
                 :key="i"
               >
                 <div class="index">#{{ i + 1 }}</div>
@@ -394,14 +394,14 @@
               </div>
             </NTabPane>
             
-            <!-- Gold tab (Tier 1-2: A, B) -->
+            <!-- Gold tab -->
             <NTabPane name="gold" v-if="augments && augments[4]">
               <template #tab>
                 <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
               </template>
               <div
                 class="augments-group"
-                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 6, augments[4].augments)"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[4].augments)"
                 :key="i"
               >
                 <div class="index">#{{ i + 1 }}</div>
@@ -425,14 +425,14 @@
               </div>
             </NTabPane>
             
-            <!-- Prism tab (Tier 0: S) -->
+            <!-- Prism tab -->
             <NTabPane name="prism" v-if="augments && augments[8]">
               <template #tab>
                 <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
               </template>
               <div
                 class="augments-group"
-                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 6, augments[8].augments)"
+                v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 15, augments[8].augments)"
                 :key="i"
               >
                 <div class="index">#{{ i + 1 }}</div>
@@ -1084,44 +1084,24 @@ const coreItems = computed(() => {
     const arenaCoreItems = props.arenaChampion.data.core_items || []
     
     // Combine both arrays, Arena items first, then ARAM items
-    // Use a Set to track item IDs we've already added to avoid duplicates
-    const seenItemIds = new Set<number>()
-    const combined: any[] = []
-    
-    // Add Arena core items first
-    for (const item of arenaCoreItems) {
-      if (!seenItemIds.has(item.ids[0])) {
-        combined.push(item)
-        seenItemIds.add(item.ids[0])
-      }
-    }
-    
-    // Add ARAM core items that aren't already included
-    for (const item of aramCoreItems) {
-      if (!seenItemIds.has(item.ids[0])) {
-        combined.push(item)
-        seenItemIds.add(item.ids[0])
-      }
-    }
-    
-    return combined
+    return [...arenaCoreItems, ...aramCoreItems]
   }
   
   return aramCoreItems
 })
 
-const augmentTab = ref<string | undefined>('all')
+const augmentTab = ref<string | undefined>('gold')
 watchEffect(() => {
   if (!augments.value) {
     augmentTab.value = undefined
     return
   }
 
-  // For ARAM Mayhem, default to 'all' tab
-  if (props.isAramMayhem && augments.value['all']) {
-    augmentTab.value = 'all'
-  } else if (augments.value[4]) {
+  // default to 'gold' tab
+  if (augments.value[4]) {
     augmentTab.value = 'gold'
+  } else if (props.isAramMayhem && augments.value['all']) {
+    augmentTab.value = 'all'
   } else if (augments.value[1]) {
     augmentTab.value = 'silver'
   } else if (augments.value[8]) {
@@ -1150,7 +1130,7 @@ watchEffect(() => {
     isSummonerSpellsExpanded.value = false
     isRunesExpanded.value = false
     isSynergiesExpanded.value = false
-    isAugmentsExpanded.value = true
+    isAugmentsExpanded.value = !props.isAramMayhem
     isSkillMasteriesExpanded.value = false
     isStarterItemsExpanded.value = false
     isBootsExpanded.value = false
