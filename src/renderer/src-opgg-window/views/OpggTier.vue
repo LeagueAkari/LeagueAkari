@@ -72,7 +72,7 @@ const styles = useCssModule()
 
 // Detect if this is ARAM: Mayhem mode based on data structure
 const isAramMayhem = computed(() => {
-  return props.mode === 'aram' && 
+  return (props.mode === 'aram' || props.mode === 'aram_mayhem') && 
          props.data?.data && 
          props.data.data.length > 0 && 
          !props.data.data[0].average_stats
@@ -448,7 +448,7 @@ const data = computed(() => {
 
   // ARAM: Mayhem tier list has a simpler structure
   // Transform it to match the expected format
-  if (props.mode === 'aram' && props.data.data && props.data.data.length > 0 && !props.data.data[0].average_stats) {
+  if ((props.mode === 'aram' || props.mode === 'aram_mayhem') && props.data.data && props.data.data.length > 0 && !props.data.data[0].average_stats) {
     // This is ARAM: Mayhem tier list format
     return props.data.data
       .map((item: any) => ({
