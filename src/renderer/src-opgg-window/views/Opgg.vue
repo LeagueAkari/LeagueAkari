@@ -326,7 +326,8 @@ const tier = ref<TierType>(savedPreferences.value.tier as TierType)
 const version = ref<string | null>(null)
 
 // Track if we're in ARAM: Mayhem mode (ARAM with augments)
-const isAramMayhem = ref(false)
+// Initialize based on saved mode preference
+const isAramMayhem = ref(savedPreferences.value.mode === 'aram_mayhem')
 
 // Compute the effective mode for API calls (aram_mayhem -> aram)
 const effectiveMode = computed(() => {
@@ -388,7 +389,7 @@ watchEffect(() => {
     position.value = savedPreferences.value.position as PositionType
   }
 
-  if (mode.value === 'arena') {
+  if (mode.value === 'arena' || mode.value === 'aram_mayhem') {
     tier.value = 'all'
   } else {
     tier.value = savedPreferences.value.tier as TierType
@@ -591,11 +592,6 @@ const handleModeChange = async (m: ModeType) => {
   // Set isAramMayhem flag based on selected mode
   isAramMayhem.value = (m === 'aram_mayhem')
   
-  // Set position to 'none' for ARAM modes
-  if (m === 'aram' || m === 'aram_mayhem') {
-    position.value = 'none'
-  }
-  
   await loadAll()
 }
 
@@ -797,6 +793,9 @@ watchDebounced(
       default:
         isModeMatch.value = false
     }
+
+    // Update saved preferences to reflect auto-detected mode
+    savedPreferences.value.mode = mode.value
 
     await loadAll()
 
@@ -1063,7 +1062,7 @@ const handleAddToItemSet = async () => {
     await lc.writeItemSetsToDisk([
       {
         uid: newUid,
-        title: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${mode.value === 'arena' || mode.value === 'nexus_blitz' ? ` ${t(`Opgg.modes.${position.value}`)}` : ''}`,
+        title: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${mode.value === 'arena' || mode.value === 'nexus_blitz' || mode.value === 'aram_mayhem' ? ` ${t(`Opgg.modes.${mode.value === 'aram_mayhem' ? 'aram_mayhem' : position.value}`)}` : ''}`,
         sortrank: 0,
         type: 'global',
         map: 'any',
