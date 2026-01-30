@@ -1091,14 +1091,6 @@ watchEffect(() => {
     augmentTab.value = undefined
   }
 })
-  else if (augments.value[1]) {
-    augmentTab.value = 'silver'
-  } else if (augments.value[8]) {
-    augmentTab.value = 'prism'
-  } else {
-    augmentTab.value = undefined
-  }
-})
 
 const isSummonerSpellsExpanded = ref(false)
 const isCountersExpanded = ref(false)
