@@ -81,7 +81,7 @@
         :render-label="renderLabel"
         style="width: 0; flex: 1"
         :consistent-menu-width="false"
-        :disabled="isLoading || mode === 'arena'"
+        :disabled="isLoading || mode === 'arena' || mode === 'aram_mayhem'"
       />
       <NSelect
         size="small"
@@ -328,6 +328,11 @@ const version = ref<string | null>(null)
 // Track if we're in ARAM: Mayhem mode (ARAM with augments)
 const isAramMayhem = ref(false)
 
+// Compute the effective mode for API calls (aram_mayhem -> aram)
+const effectiveMode = computed(() => {
+  return mode.value === 'aram_mayhem' ? 'aram' : mode.value
+})
+
 const versions = shallowRef<string[]>([])
 
 const api = new OpggDataApi()
@@ -407,7 +412,7 @@ const loadVersionsData = async () => {
     versions.value = (
       await api.getVersions({
         region: region.value,
-        mode: mode.value,
+        mode: effectiveMode.value,
         signal: loadVersionsController.signal
       })
     ).data
@@ -444,7 +449,7 @@ const loadTierData = async () => {
     } else {
       tierData.value = await api.getChampionsTier({
         region: region.value,
-        mode: mode.value,
+        mode: effectiveMode.value,
         tier: tier.value,
         version: version.value ?? undefined,
         signal: loadTierController.signal
@@ -477,7 +482,7 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
   try {
     champion.value = await api.getChampion({
       region: region.value,
-      mode: mode.value,
+      mode: effectiveMode.value,
       tier: tier.value,
       version: version.value ?? undefined,
       id: championId.value,
@@ -582,6 +587,15 @@ const handleVersionChange = async (v: string) => {
 const handleModeChange = async (m: ModeType) => {
   mode.value = m
   savedPreferences.value.mode = m
+  
+  // Set isAramMayhem flag based on selected mode
+  isAramMayhem.value = (m === 'aram_mayhem')
+  
+  // Set position to 'none' for ARAM modes
+  if (m === 'aram' || m === 'aram_mayhem') {
+    position.value = 'none'
+  }
+  
   await loadAll()
 }
 
@@ -643,6 +657,7 @@ const championItem = computed(() => {
 const modeOptions = computed(() => [
   { label: t('Opgg.modes.ranked'), value: 'ranked' },
   { label: t('Opgg.modes.aram'), value: 'aram' },
+  { label: t('Opgg.modes.aram_mayhem'), value: 'aram_mayhem' },
   { label: t('Opgg.modes.arena'), value: 'arena' },
   { label: t('Opgg.modes.nexus_blitz'), value: 'nexus_blitz' },
   { label: t('Opgg.modes.urf'), value: 'urf' }
@@ -765,7 +780,7 @@ watchDebounced(
         break
       case 'KIWI':
         // ARAM: Mayhem - combination of ARAM with Arena augments
-        mode.value = 'aram'
+        mode.value = 'aram_mayhem'
         position.value = 'none'
         isAramMayhem.value = true
         break
@@ -982,7 +997,7 @@ const handleAddToItemSet = async () => {
 
     const newUid = toItemSetsUid({
       championId: championItem.value?.id || -1,
-      mode: mode.value,
+      mode: effectiveMode.value,
       region: region.value,
       tier: tier.value,
       position: position.value,

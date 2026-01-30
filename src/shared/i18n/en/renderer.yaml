@@ -1921,6 +1921,7 @@ Opgg:
   modes:
     ranked: 'Ranked'
     aram: 'ARAM'
+    aram_mayhem: 'ARAM: Mayhem'
     arena: 'Arena'
     nexus_blitz: 'Nexus Blitz'
     urf: 'URF'

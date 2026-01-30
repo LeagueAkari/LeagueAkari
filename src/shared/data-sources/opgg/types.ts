@@ -243,7 +243,7 @@ export type RegionType =
   | 'tw'
   | 'me'
 
-export type ModeType = 'aram' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked'
+export type ModeType = 'aram' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked' | 'aram_mayhem'
 
 export type PositionType = 'mid' | 'jungle' | 'adc' | 'top' | 'support' | 'all' | 'none'
 
