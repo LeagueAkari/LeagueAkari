@@ -6,6 +6,8 @@ import {
   ModeType,
   OpggARAMBalance,
   OpggARAMChampionSummary,
+  OpggARAMAugments,
+  OpggARAMMayhemTierList,
   OpggArenaChampionSummary,
   OpggArenaModeChampion,
   OpggNormalModeChampion,
@@ -107,5 +109,25 @@ export class OpggDataApi {
 
   async getARAMBalance() {
     return (await this._http.get<OpggARAMBalance>('/api/contents/aram-balance')).data
+  }
+
+  async getARAMMayhemTierList(options: { signal?: AbortSignal }): Promise<OpggARAMMayhemTierList> {
+    const result = await this._http.get('/api/contents/tiers', {
+      params: {
+        type: 'aram_mayhem'
+      },
+      signal: options.signal
+    })
+    return result.data
+  }
+
+  async getARAMAugments(options: {
+    championId: number
+    signal?: AbortSignal
+  }): Promise<OpggARAMAugments> {
+    const result = await this._http.get(`/api/contents/stats/champions/${options.championId}/aram-augments`, {
+      signal: options.signal
+    })
+    return result.data
   }
 }

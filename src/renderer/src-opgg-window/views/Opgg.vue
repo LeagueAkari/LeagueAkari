@@ -132,7 +132,7 @@
         :version="version || undefined"
         :is-able-to-add-to-item-set="isAbleToAddToItemSet"
         :is-aram-mayhem="isAramMayhem"
-        :arena-augments-data="arenaAugmentsData"
+        :aram-augments-data="aramAugmentsData"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
@@ -239,7 +239,9 @@ import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store
 import { OpggDataApi } from '@shared/data-sources/opgg'
 import {
   ModeType,
+  OpggARAMAugments,
   OpggARAMChampionSummary,
+  OpggARAMMayhemTierList,
   OpggArenaChampionSummary,
   OpggArenaModeChampion,
   OpggNormalModeChampion,
@@ -352,11 +354,13 @@ watch(
 )
 
 const tierData = shallowRef<
-  OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | null
+  OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | OpggARAMMayhemTierList | null
 >(null)
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
 // Store Arena augments data separately for ARAM: Mayhem mode
 const arenaAugmentsData = shallowRef<OpggArenaModeChampion | null>(null)
+// Store ARAM augments data for ARAM: Mayhem mode
+const aramAugmentsData = shallowRef<OpggARAMAugments | null>(null)
 
 const message = useMessage()
 
@@ -434,13 +438,20 @@ const loadTierData = async () => {
   loadTierController = new AbortController()
 
   try {
-    tierData.value = await api.getChampionsTier({
-      region: region.value,
-      mode: mode.value,
-      tier: tier.value,
-      version: version.value ?? undefined,
-      signal: loadTierController.signal
-    })
+    // Use ARAM Mayhem tier list API if in ARAM Mayhem mode
+    if (isAramMayhem.value) {
+      tierData.value = await api.getARAMMayhemTierList({
+        signal: loadTierController.signal
+      })
+    } else {
+      tierData.value = await api.getChampionsTier({
+        region: region.value,
+        mode: mode.value,
+        tier: tier.value,
+        version: version.value ?? undefined,
+        signal: loadTierController.signal
+      })
+    }
   } catch (error) {
     if ((error as any).name === 'CanceledError') {
       return
@@ -476,25 +487,20 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       signal: loadChampionController.signal
     })
 
-    // If in ARAM: Mayhem mode, also fetch Arena augments data
+    // If in ARAM: Mayhem mode, fetch ARAM augments data instead of Arena augments
     if (isAramMayhem.value && championId.value) {
       try {
-        arenaAugmentsData.value = await api.getChampion({
-          region: region.value,
-          mode: 'arena',
-          tier: 'all', // Arena mode always uses 'all' tier
-          version: version.value ?? undefined,
-          id: championId.value,
-          position: position.value,
+        aramAugmentsData.value = await api.getARAMAugments({
+          championId: championId.value,
           signal: loadChampionController.signal
-        }) as OpggArenaModeChampion
+        })
       } catch (augmentError) {
-        log.warn('view:Opgg', `获取 Arena augments 数据失败: ${(augmentError as any).message}`, augmentError)
+        log.warn('view:Opgg', `获取 ARAM augments 数据失败: ${(augmentError as any).message}`, augmentError)
         // Don't fail the whole load if augments fail
-        arenaAugmentsData.value = null
+        aramAugmentsData.value = null
       }
     } else {
-      arenaAugmentsData.value = null
+      aramAugmentsData.value = null
     }
 
     // 这段逻辑先耦合在这里, 以后可能会被移除

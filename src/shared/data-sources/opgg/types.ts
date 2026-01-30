@@ -159,6 +159,30 @@ export interface OpggARAMChampionSummary {
   }
 }
 
+// ARAM: Mayhem tier list types
+export interface OpggARAMMayhemTierItem {
+  champion_id: number
+  id: number
+  rank: number
+  tier: number
+}
+
+export interface OpggARAMMayhemTierList {
+  data: OpggARAMMayhemTierItem[]
+}
+
+// ARAM: Mayhem augments types
+export interface OpggARAMAugmentItem {
+  id: number
+  performance: number
+  popular: number
+  tier: number
+}
+
+export interface OpggARAMAugments {
+  data: OpggARAMAugmentItem[]
+}
+
 export interface OpggArenaChampionSummary {
   data: OpggArenaDataItem[]
   meta: {

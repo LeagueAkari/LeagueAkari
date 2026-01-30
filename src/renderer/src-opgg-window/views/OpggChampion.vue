@@ -777,7 +777,7 @@ const props = defineProps<{
   data?: any
   isAbleToAddToItemSet?: boolean
   isAramMayhem?: boolean
-  arenaAugmentsData?: any
+  aramAugmentsData?: any
 }>()
 
 const emits = defineEmits<{
@@ -835,17 +835,58 @@ const info = computed(() => {
 
 // OP.GG 使用 rarity 来表示三种不同的 augment 等级
 // 1 - silver, 4 - gold, 8 - prism
+// For ARAM: Mayhem, the API returns tier 0-5 in the augment data
 const augments = computed(() => {
-  // For ARAM: Mayhem mode, use Arena augments data
-  if (props.isAramMayhem && props.arenaAugmentsData) {
-    if (!props.arenaAugmentsData.data.augment_group) {
+  // For ARAM: Mayhem mode, use ARAM augments data with new structure
+  if (props.isAramMayhem && props.aramAugmentsData) {
+    if (!props.aramAugmentsData.data || props.aramAugmentsData.data.length === 0) {
       return null
     }
     
-    return props.arenaAugmentsData.data.augment_group.reduce((acc: any, cur: any) => {
-      acc[cur.rarity] = cur
-      return acc
-    }, {})
+    // Group augments by tier
+    // tier 0 is special (OP tier), map to rarity 8 (prism)
+    // tier 1-2 map to rarity 4 (gold)
+    // tier 3-5 map to rarity 1 (silver)
+    const groupedAugments: any = {}
+    
+    const opTier = props.aramAugmentsData.data.filter((a: any) => a.tier === 0)
+    const goldTier = props.aramAugmentsData.data.filter((a: any) => a.tier === 1 || a.tier === 2)
+    const silverTier = props.aramAugmentsData.data.filter((a: any) => a.tier >= 3 && a.tier <= 5)
+    
+    if (opTier.length > 0) {
+      groupedAugments[8] = {
+        rarity: 8,
+        augments: opTier.map((a: any) => ({
+          id: a.id,
+          pick_rate: a.popular / 100, // Convert percentage to decimal
+          performance: a.performance
+        }))
+      }
+    }
+    
+    if (goldTier.length > 0) {
+      groupedAugments[4] = {
+        rarity: 4,
+        augments: goldTier.map((a: any) => ({
+          id: a.id,
+          pick_rate: a.popular / 100, // Convert percentage to decimal
+          performance: a.performance
+        }))
+      }
+    }
+    
+    if (silverTier.length > 0) {
+      groupedAugments[1] = {
+        rarity: 1,
+        augments: silverTier.map((a: any) => ({
+          id: a.id,
+          pick_rate: a.popular / 100, // Convert percentage to decimal
+          performance: a.performance
+        }))
+      }
+    }
+    
+    return Object.keys(groupedAugments).length > 0 ? groupedAugments : null
   }
   
   // Regular mode: use augments from the main data
@@ -865,15 +906,6 @@ const augments = computed(() => {
 
 // Combine Arena core_items with ARAM core_items in ARAM: Mayhem mode
 const coreItems = computed(() => {
-  // For ARAM: Mayhem mode, combine Arena and ARAM core_items
-  if (props.isAramMayhem && props.arenaAugmentsData && props.data) {
-    const aramCoreItems = props.data.data.core_items || []
-    const arenaCoreItems = props.arenaAugmentsData.data.core_items || []
-    
-    // Combine both arrays, Arena items first, then ARAM items
-    return [...arenaCoreItems, ...aramCoreItems]
-  }
-  
   // Regular mode: use core_items from the main data
   if (!props.data) {
     return []

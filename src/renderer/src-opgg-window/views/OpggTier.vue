@@ -435,6 +435,35 @@ const data = computed(() => {
     return []
   }
 
+  // ARAM: Mayhem tier list has a simpler structure
+  // Transform it to match the expected format
+  if (props.mode === 'aram' && props.data.data && props.data.data[0] && !props.data.data[0].average_stats) {
+    // This is ARAM: Mayhem tier list format
+    return props.data.data
+      .map((item: any) => ({
+        id: item.champion_id,
+        average_stats: {
+          rank: item.rank,
+          tier: item.tier,
+          win_rate: null,
+          pick_rate: null,
+          ban_rate: null,
+          kda: null
+        }
+      }))
+      .toSorted((a: any, b: any) => {
+        const aRank = a.average_stats?.rank || Infinity
+        const bRank = b.average_stats?.rank || Infinity
+        return aRank - bRank
+      })
+      .filter((value: any) => {
+        if (filterText.value === '') {
+          return true
+        }
+        return isNameMatch(filterText.value, lcs.gameData.champions[value.id]?.name, value.id)
+      })
+  }
+
   // 排位数据按照位置的 tier 排序
   if (props.mode === 'ranked' && props.position !== 'none') {
     const arr: any[] = []
