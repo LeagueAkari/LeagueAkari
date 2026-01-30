@@ -975,7 +975,7 @@ const augments = computed(() => {
     }
     
     // Group augments for All, Silver, Gold, Prism tabs
-    // Tier 0 = S = Prism, Tier 1-2 = A,B = Gold, Tier 3-5 = C,D,E = Silver
+    // Based on actual augment rarity from lcs.gameData.augments[id].rarity
     const groupedAugments: any = {
       all: {
         rarity: 'all',
@@ -992,54 +992,53 @@ const augments = computed(() => {
       }
     }
     
-    // Prism: Tier 0 (S)
-    const prismAugments = props.aramAugmentsData.data.filter((a: any) => a.tier === 0)
+    // Group by actual augment rarity from game data
+    const prismAugments: any[] = []
+    const goldAugments: any[] = []
+    const silverAugments: any[] = []
+    
+    props.aramAugmentsData.data.forEach((a: any) => {
+      const augmentData = lcs.gameData.augments[a.id]
+      const mappedAugment = {
+        id: a.id,
+        tier: a.tier,
+        performance: a.performance,
+        popular: a.popular,
+        pick_rate: a.popular,
+        play: a.popular,
+        win: a.performance
+      }
+      
+      if (augmentData?.rarity === 'kPrismatic') {
+        prismAugments.push(mappedAugment)
+      } else if (augmentData?.rarity === 'kGold') {
+        goldAugments.push(mappedAugment)
+      } else if (augmentData?.rarity === 'kSilver') {
+        silverAugments.push(mappedAugment)
+      }
+    })
+    
+    // Prism: kPrismatic rarity
     if (prismAugments.length > 0) {
       groupedAugments[8] = {
         rarity: 8,
-        augments: prismAugments.map((a: any) => ({
-          id: a.id,
-          tier: a.tier,
-          performance: a.performance,
-          popular: a.popular,
-          pick_rate: a.popular,
-          play: a.popular,
-          win: a.performance
-        }))
+        augments: prismAugments
       }
     }
     
-    // Gold: Tier 1-2 (A, B)
-    const goldAugments = props.aramAugmentsData.data.filter((a: any) => a.tier === 1 || a.tier === 2)
+    // Gold: kGold rarity
     if (goldAugments.length > 0) {
       groupedAugments[4] = {
         rarity: 4,
-        augments: goldAugments.map((a: any) => ({
-          id: a.id,
-          tier: a.tier,
-          performance: a.performance,
-          popular: a.popular,
-          pick_rate: a.popular,
-          play: a.popular,
-          win: a.performance
-        }))
+        augments: goldAugments
       }
     }
     
-    // Silver: Tier 3-5 (C, D, E)
-    const silverAugments = props.aramAugmentsData.data.filter((a: any) => a.tier >= 3 && a.tier <= 5)
+    // Silver: kSilver rarity
     if (silverAugments.length > 0) {
       groupedAugments[1] = {
         rarity: 1,
-        augments: silverAugments.map((a: any) => ({
-          id: a.id,
-          tier: a.tier,
-          performance: a.performance,
-          popular: a.popular,
-          pick_rate: a.popular,
-          play: a.popular,
-          win: a.performance
-        }))
+        augments: silverAugments
       }
     }
     
@@ -1129,13 +1128,24 @@ const sortedData = (key: string, isExpanded: boolean, limit: number, customData:
   // Create a shallow copy of the data to preserve the original array
   let sortedItems = [...data]
 
-  // For ARAM Mayhem augments, always sort by performance (descending)
+  // For ARAM Mayhem augments, sort based on opggChampionSortBy
   if (props.isAramMayhem && key === 'augments' && customData.length) {
-    sortedItems.sort((a: any, b: any) => {
-      const performanceA = a.performance || 0
-      const performanceB = b.performance || 0
-      return performanceB - performanceA // Sort by performance in descending order
-    })
+    if (opggChampionSortBy.value === 'pickRate') {
+      // Sort by popular (descending)
+      sortedItems.sort((a: any, b: any) => {
+        const popularA = a.popular || 0
+        const popularB = b.popular || 0
+        return popularB - popularA
+      })
+    } else if (opggChampionSortBy.value === 'winRate') {
+      // Sort by performance (descending)
+      sortedItems.sort((a: any, b: any) => {
+        const performanceA = a.performance || 0
+        const performanceB = b.performance || 0
+        return performanceB - performanceA
+      })
+    }
+    // If 'default', keep original order (no sorting)
   } else if (opggChampionSortBy.value !== 'default') {
     // Apply sorting based on a selected criterion for regular mode
     sortedItems.sort((a: any, b: any) => {
