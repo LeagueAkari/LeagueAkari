@@ -309,6 +309,11 @@ const columns: DataTableColumns<any> = [
         return '-'
       }
 
+      // For ARAM Mayhem, pick_rate is null, show "-" instead of 0.00%
+      if (!row.average_stats.pick_rate) {
+        return '-'
+      }
+
       return `${(row.average_stats.pick_rate * 100).toFixed(2)} %`
     }
   }
