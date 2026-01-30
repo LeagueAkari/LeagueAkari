@@ -974,12 +974,21 @@ const augments = computed(() => {
       return null
     }
     
+    // Filter out augments that don't exist in game data
+    const validAugments = props.aramAugmentsData.data.filter((a: any) => {
+      return lcs.gameData.augments[a.id] !== undefined
+    })
+    
+    if (validAugments.length === 0) {
+      return null
+    }
+    
     // Group augments for All, Silver, Gold, Prism tabs
     // Based on actual augment rarity from lcs.gameData.augments[id].rarity
     const groupedAugments: any = {
       all: {
         rarity: 'all',
-        augments: props.aramAugmentsData.data.map((a: any) => ({
+        augments: validAugments.map((a: any) => ({
           id: a.id,
           tier: a.tier,
           performance: a.performance,
@@ -997,7 +1006,7 @@ const augments = computed(() => {
     const goldAugments: any[] = []
     const silverAugments: any[] = []
     
-    props.aramAugmentsData.data.forEach((a: any) => {
+    validAugments.forEach((a: any) => {
       const augmentData = lcs.gameData.augments[a.id]
       const mappedAugment = {
         id: a.id,
