@@ -357,8 +357,6 @@ const tierData = shallowRef<
   OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | OpggARAMMayhemTierList | null
 >(null)
 const champion = shallowRef<OpggNormalModeChampion | OpggArenaModeChampion | null>(null)
-// Store Arena augments data separately for ARAM: Mayhem mode
-const arenaAugmentsData = shallowRef<OpggArenaModeChampion | null>(null)
 // Store ARAM augments data for ARAM: Mayhem mode
 const aramAugmentsData = shallowRef<OpggARAMAugments | null>(null)
 
@@ -549,6 +547,7 @@ const loadAll = async () => {
   try {
     champion.value = null
     tierData.value = null
+    aramAugmentsData.value = null
     versions.value = []
     shouldStopLoading = false
 
