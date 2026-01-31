@@ -3,11 +3,7 @@
     <SetupInAppScope />
     <AuxWindowTitlebar />
     <div class="content">
-      <RouterView v-slot="{ Component }">
-        <KeepAlive>
-          <component :is="Component" />
-        </KeepAlive>
-      </RouterView>
+      <IndicatorView />
     </div>
   </div>
 </template>
@@ -16,6 +12,7 @@
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 
 import AuxWindowTitlebar from './components/AuxWindowTitlebar.vue'
+import IndicatorView from './views/Indicator.vue'
 </script>
 
 <style>

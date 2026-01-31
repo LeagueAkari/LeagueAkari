@@ -4,6 +4,7 @@ import {
   OpggAramMayhemChampionAugmentsResponse,
   OpggChampionBuildResponse,
   OpggChampionsResponse,
+  OpggTiersResponse,
   OpggVersionsResponse,
   PositionType,
   RegionType,
@@ -81,5 +82,14 @@ export class OpggHttpApiAxiosHelper {
         signal: options.signal
       }
     )
+  }
+
+  getTiers(type: 'aram-mayhem', options: { signal?: AbortSignal } = {}) {
+    return this._http.get<OpggTiersResponse>(`/api/contents/tiers`, {
+      params: {
+        type
+      },
+      signal: options.signal
+    })
   }
 }

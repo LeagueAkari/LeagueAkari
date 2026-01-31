@@ -93,10 +93,12 @@
         :label="t('OngoingGameSettings.matchHistoryTagPreference.label')"
         :label-description="t('OngoingGameSettings.matchHistoryTagPreference.description')"
         :label-width="400"
+        :disabled="as.settings.preferredLolSource !== 'sgp'"
       >
         <NRadioGroup
           :value="ogs.settings.matchHistoryTagPreference"
           @update:value="(val) => og.setMatchHistoryTagPreference(val)"
+          :disabled="as.settings.preferredLolSource !== 'sgp'"
         >
           <NRadio value="all">
             {{ t('OngoingGameSettings.matchHistoryTagPreference.options.all') }}</NRadio

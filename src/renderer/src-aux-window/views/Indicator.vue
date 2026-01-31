@@ -1,7 +1,9 @@
 <template>
-  <ChampSelect v-if="currentPage === 'champ-select'" />
-  <Lounge v-else-if="currentPage === 'lounge'" />
-  <Placeholder v-else />
+  <KeepAlive>
+    <ChampSelect v-if="currentPage === 'champ-select'" />
+    <Lounge v-else-if="currentPage === 'lounge'" />
+    <Placeholder v-else />
+  </KeepAlive>
 </template>
 
 <script setup lang="ts">

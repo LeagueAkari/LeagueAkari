@@ -336,3 +336,14 @@ export interface OpggAramMayhemChampionAugmentItem {
   performance: number
   popular: number
 }
+
+export interface OpggTiersResponse {
+  data: OpggTiersItem[]
+}
+
+export interface OpggTiersItem {
+  champion_id: number
+  id: number
+  tier: number
+  rank: number
+}
