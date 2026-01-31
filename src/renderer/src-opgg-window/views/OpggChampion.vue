@@ -951,6 +951,12 @@ const info = computed(() => {
       position: position
     }
   }
+  else if(props.isAramMayhem) {
+    return {
+      id: props.champion.id,
+      tier: props.champion.tier,
+    }
+  }
 
   return {
     id: props.champion.id,
