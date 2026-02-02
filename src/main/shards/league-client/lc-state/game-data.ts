@@ -1,5 +1,6 @@
 import {
   Augment,
+  ChallengesJson,
   ChampionSimple,
   GameMap,
   GameModeMutator,
@@ -27,6 +28,7 @@ export class GameDataState {
   champions: Record<number, ChampionSimple> = {}
   gameModeMutators: Record<number, GameModeMutator> = {}
   maps: Record<number, GameMap> = {}
+  challenges: ChallengesJson | null = null
 
   championName(id: number) {
     return this.champions[id]?.name || id.toString()
@@ -42,7 +44,8 @@ export class GameDataState {
       perkstyles: observable.ref,
       queues: observable.ref,
       gameModeMutators: observable.ref,
-      maps: observable.ref
+      maps: observable.ref,
+      challenges: observable.ref
     })
   }
 
@@ -83,5 +86,9 @@ export class GameDataState {
 
   setMaps(value: Record<number, GameMap>) {
     this.maps = value
+  }
+
+  setChallenges(value: ChallengesJson | null) {
+    this.challenges = value
   }
 }

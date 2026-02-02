@@ -386,7 +386,7 @@
               class="h-[22px] w-[22px]"
               :champion-id="c.id"
             />
-            <div class="text-xs font-bold text-gray-200 dark:text-gray-200">
+            <div class="text-xs font-bold text-black/80 dark:text-white/80">
               {{ lcs.gameData.champions[c.id]?.name || c.id }}
             </div>
           </div>

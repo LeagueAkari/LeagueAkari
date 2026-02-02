@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios'
 
+import { ChallengesClientHttpApi } from './challenges-client'
 import { GsmHttpApi } from './gsm'
 import { LeaguesLedgeHttpApi } from './leagues-ledge'
 import { MatchHistoryQueryHttpApi } from './match-history-query'
@@ -19,6 +20,7 @@ export class SgpHttpApiAxiosHelper {
   public readonly leaguesLedge: LeaguesLedgeHttpApi
   public readonly stats: StatsHttpApi
   public readonly summonerLedge: SummonerLedgeHttpApi
+  public readonly challengesClient: ChallengesClientHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.matchHistoryQuery = new MatchHistoryQueryHttpApi(this._http)
@@ -26,5 +28,6 @@ export class SgpHttpApiAxiosHelper {
     this.leaguesLedge = new LeaguesLedgeHttpApi(this._http)
     this.stats = new StatsHttpApi(this._http)
     this.summonerLedge = new SummonerLedgeHttpApi(this._http)
+    this.challengesClient = new ChallengesClientHttpApi(this._http)
   }
 }

@@ -1199,6 +1199,16 @@ export class LeagueClientData {
       }
     }
 
+    const loadChallenges = async () => {
+      try {
+        const challenges = (await this._context.lc.api.gameData.getChallenges()).data
+        this.gameData.setChallenges(challenges)
+      } catch (error) {
+        this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-challenges')
+        this._context.log.warn(`Failed to get challenges`, error)
+      }
+    }
+
     this._stateInitializer.register('game-data-summoner-spells', loadSummonerSpells, {
       group: 'game-data'
     })
@@ -1212,6 +1222,7 @@ export class LeagueClientData {
       group: 'game-data'
     })
     this._stateInitializer.register('game-data-maps', loadMaps, { group: 'game-data' })
+    this._stateInitializer.register('game-data-challenges', loadChallenges, { group: 'game-data' })
 
     this._onLcuNotConnected(() => {
       // NO NEED TO CLEAR

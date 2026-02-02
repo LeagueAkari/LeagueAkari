@@ -1002,6 +1002,14 @@ RankedPane:
   crossRegion: Cross Region
   unavailable: Unavailable
 
+PlayerChallenges:
+  champions: Champions
+  championSkins: Champion Skins
+  wardSkins: Ward Skins
+  summonerIcons: Summoner Icons
+  emotes: Emotes
+  chromaSkins: Chroma Skins
+
 DamageMetricsBar:
   total: Total
   physical: Physical

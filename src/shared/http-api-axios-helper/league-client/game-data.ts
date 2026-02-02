@@ -1,5 +1,6 @@
 import {
   Augment,
+  ChallengesJson,
   ChampDetails,
   ChampionSimple,
   GameMap,
@@ -68,5 +69,9 @@ export class GameDataHttpApi {
 
   getLoots() {
     return this._http.get<LootMap>('/lol-game-data/assets/v1/loots.json')
+  }
+
+  getChallenges() {
+    return this._http.get<ChallengesJson>('/lol-game-data/assets/v1/challenges.json')
   }
 }

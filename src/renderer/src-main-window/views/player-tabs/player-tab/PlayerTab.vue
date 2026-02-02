@@ -38,6 +38,7 @@
             <RecentlyPlayers side="ally" />
             <RecentlyPlayers side="enemy" />
             <EncounteredGames />
+            <PlayerChallenges />
           </div>
 
           <!-- match history container -->
@@ -97,6 +98,7 @@ import { useFreezeValue } from './utils/freeze'
 import EncounteredGames from './widgets/EncounteredGames.vue'
 import MatchHistoryPagination from './widgets/MatchHistoryPagination.vue'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'
+import PlayerChallenges from './widgets/PlayerChallenges.vue'
 import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
 import SpectatorPane from './widgets/SpectatorPane.vue'
 import SummaryPane from './widgets/SummaryPane.vue'

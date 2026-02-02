@@ -17,6 +17,7 @@ import {
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
+import { provideChallengesPlayerData } from './data/challenges'
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
 import { provideMatchHistoryFilters } from './data/match-history-filters'
@@ -171,6 +172,11 @@ export function providePlayerTab(props: {
   provideSummonerProfile({
     puuid,
     isCrossRegion
+  })
+
+  provideChallengesPlayerData({
+    puuid,
+    sgpServerId
   })
 
   provideMatchHistoryFilters()

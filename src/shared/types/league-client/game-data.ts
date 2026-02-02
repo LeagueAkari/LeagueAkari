@@ -869,6 +869,118 @@ interface LootItem {
   recipeMenuSubtitle?: string
 }
 
+export interface ChallengesJson {
+  challenges: { [key: string]: ChallengeValue }
+  titles: { [key: string]: Title }
+  bannerAccents: any[]
+}
+
+export interface ChallengeValue {
+  name: string
+  description: string
+  descriptionShort: string
+  source: Source
+  tags: Tags
+  queueIds: number[]
+  seasons: number[]
+  endTimestamp: number
+  levelToIconPath: LevelToIconPath
+  thresholds: Thresholds
+  leaderboard: boolean
+  reverseDirection: boolean
+}
+
+export interface LevelToIconPath {
+  GRANDMASTER?: string
+  BRONZE?: string
+  MASTER?: string
+  IRON?: string
+  CHALLENGER?: string
+  SILVER?: string
+  DIAMOND?: string
+  GOLD?: string
+  PLATINUM?: string
+  NONE?: string
+}
+
+export enum Source {
+  CapInventory = 'CAP_INVENTORY',
+  Challenges = 'CHALLENGES',
+  Clash = 'CLASH',
+  Eogd = 'EOGD',
+  EogdChampionMastery = 'EOGD_CHAMPION_MASTERY',
+  EogdRankedLeagues = 'EOGD_RANKED_LEAGUES',
+  Eternals = 'ETERNALS',
+  Ranked = 'RANKED',
+  Summoner = 'SUMMONER'
+}
+
+export interface Tags {
+  isCapstone?: IsCapstone
+  isCategory?: string
+  parent?: string
+  priority?: string
+  championQuery?: string
+  valueMapping?: string
+  itemQuery?: string
+  championSkinQuery?: string
+  season?: string
+  seasonal?: string
+}
+
+export enum IsCapstone {
+  Y = 'Y'
+}
+
+export interface Thresholds {
+  IRON?: Bronze
+  BRONZE?: Bronze
+  SILVER?: Bronze
+  GOLD?: Bronze
+  PLATINUM?: Bronze
+  DIAMOND?: Bronze
+  MASTER?: Bronze
+  GRANDMASTER?: Challenger
+  CHALLENGER?: Challenger
+}
+
+export interface Bronze {
+  value: number
+  rewardGroupId?: string
+  rewards?: Reward[]
+}
+
+export interface Reward {
+  category: Category
+  id: string
+  quantity: number
+}
+
+export enum Category {
+  Title = 'TITLE'
+}
+
+export interface Challenger {
+  value: number
+}
+
+export interface Title {
+  name: string
+  itemId: number
+  titleAcquisitionName: string
+  titleRequirementDescription: string
+  isPermanentTitle: boolean
+  titleAcquisitionType: TitleAcquisitionType
+  iconPath?: string
+}
+
+export enum TitleAcquisitionType {
+  Challenge = 'CHALLENGE',
+  ChampionMastery = 'CHAMPION_MASTERY',
+  Default = 'DEFAULT',
+  Event = 'EVENT'
+}
+
 /**
  * 曾经用于判断是否是无限狂潮 (Swarm) 模式的英雄
  * @param id

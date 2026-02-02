@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 
+import { useChallengesPlayerData } from '../data/challenges'
 import { useEncounteredGames } from '../data/encountered-games'
 import { useMatchHistory } from '../data/match-history'
 import { useRankedStats } from '../data/ranked-stats'
@@ -16,6 +17,8 @@ export function useRefresh() {
   const { loadTags, isLoading: isLoadingPlayerTag } = useTags()
   const { loadSpectatorData, isLoading: isLoadingSpectator } = useSpectator()
   const { loadSummonerProfile, isLoading: isLoadingSummonerProfile } = useSummonerProfile()
+  const { loadChallengesPlayerData, isLoading: isLoadingChallengesPlayerData } =
+    useChallengesPlayerData()
 
   const isSomethingLoading = computed(() => {
     return (
@@ -25,7 +28,8 @@ export function useRefresh() {
       isLoadingRankedStats.value ||
       isLoadingPlayerTag.value ||
       isLoadingSpectator.value ||
-      isLoadingSummonerProfile.value
+      isLoadingSummonerProfile.value ||
+      isLoadingChallengesPlayerData.value
     )
   })
 
@@ -37,6 +41,7 @@ export function useRefresh() {
     loadTags()
     loadSpectatorData()
     loadSummonerProfile()
+    loadChallengesPlayerData()
   }
 
   return {
