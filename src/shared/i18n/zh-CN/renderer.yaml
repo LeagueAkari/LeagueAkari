@@ -1004,6 +1004,7 @@ RankedPane:
   unavailable: 无法获取排位队列信息
 
 PlayerChallenges:
+  titleAssets: 资产
   champions: 英雄
   championSkins: 皮肤
   wardSkins: 守卫皮肤

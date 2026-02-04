@@ -68,6 +68,7 @@
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
       :hide-privacy="as.settings.streamerMode"
+      @navigate-to-summoner-by-puuid="(puuid) => navigateToTabByPuuid(puuid)"
     />
 
     <!-- 这个组件不会生成 DOM，但用来保证全局状态同步 -->
@@ -78,6 +79,7 @@
 <script setup lang="ts">
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -87,6 +89,7 @@ import { NButton, NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef, watchEffect } from 'vue'
 
 import { useAppContext } from '@main-window/context'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import GlobalStateTracker from './GlobalStateTracker'
@@ -109,9 +112,13 @@ const { id, puuid, sgpServerId } = defineProps<{
   sgpServerId: string
 }>()
 
+const pt = useInstance(PlayerTabsRenderer)
+
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
 const pts = usePlayerTabsStore()
+
+const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const { contentWidth } = useAppContext()
 

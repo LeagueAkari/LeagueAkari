@@ -1003,6 +1003,7 @@ RankedPane:
   unavailable: Unavailable
 
 PlayerChallenges:
+  titleAssets: Assets
   champions: Champions
   championSkins: Champion Skins
   wardSkins: Ward Skins
