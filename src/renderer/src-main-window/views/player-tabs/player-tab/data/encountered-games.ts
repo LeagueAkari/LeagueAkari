@@ -26,9 +26,6 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { ENCOUNTERED_GAMES_PAGE_SIZE } from './constants'
 
-// Re-export for backward compatibility
-export type { EncounteredGame }
-
 export type EncounteredGameContext = {
   pagedGames: Readonly<Ref<PagedEncounteredGames | null>>
   gameMap: Readonly<Record<number, LcuOrSgpGameSummary>>

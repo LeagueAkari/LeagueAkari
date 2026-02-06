@@ -85,7 +85,7 @@
       </NButton>
 
       <!-- refresh -->
-      <NButton secondary class="size-[42px]!" :loading="somethingLoading" @click="refresh">
+      <NButton secondary class="size-[42px]!" :loading="isSomethingLoading" @click="refresh">
         <template #icon>
           <NIcon><RefreshSharp /></NIcon>
         </template>
@@ -107,49 +107,24 @@ import { RefreshSharp } from '@vicons/ionicons5'
 import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
-
 import { usePlayerTab } from './context'
-import { useEncounteredGames } from './data/encountered-games'
-import { useMatchHistory } from './data/match-history'
-import { useRankedStats } from './data/ranked-stats'
 import { useSpectator } from './data/spectator'
 import { useSummoner } from './data/summoner'
-import { useSummonerProfile } from './data/summoner-profile'
-import { useTags } from './data/tags'
+import { useRefresh } from './utils/refresh'
 import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import PlayerTagEditModal from './widgets/PlayerTagEditModal.vue'
 import RankedPane from './widgets/RankedPane.vue'
 import SpectatorPane from './widgets/SpectatorPane.vue'
 
-const { id, puuid, isSmallSize, isSelfTab, isCrossRegion } = usePlayerTab()
-const { summoner, loadSummoner } = useSummoner()
-const { loadGames } = useEncounteredGames()
-const { loadMatchHistory } = useMatchHistory()
-const { loadRankedStats } = useRankedStats()
-const { loadTags } = useTags()
-const { loadSpectatorData, spectatorData } = useSpectator()
-const { loadSummonerProfile } = useSummonerProfile()
+const { puuid, isSmallSize, isSelfTab, isCrossRegion } = usePlayerTab()
+const { summoner } = useSummoner()
+const { spectatorData } = useSpectator()
 
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
-const refresh = () => {
-  loadSummoner()
-  loadGames()
-  loadMatchHistory()
-  loadRankedStats()
-  loadTags()
-  loadSpectatorData()
-  loadSummonerProfile()
-}
+const { refresh, isSomethingLoading } = useRefresh()
 
 const isTagEditModalShowing = ref(false)
-
-const pts = usePlayerTabsStore()
-
-const somethingLoading = computed(() => {
-  return pts.getTab(id.value)?.isLoading ?? false
-})
 
 const maskedName = computed(() => {
   const seed = summoner.value?.gameName || summoner.value?.puuid || puuid.value
