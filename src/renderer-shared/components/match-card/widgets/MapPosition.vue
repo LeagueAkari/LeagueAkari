@@ -2,12 +2,12 @@
   <div class="relative" :style="{ width: `${size}px`, height: `${size}px` }">
     <div
       v-for="point of mappedPoints"
-      :key="point.left + point.top"
       class="absolute z-20 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-300"
       :style="{
         left: `${point.left}px`,
         top: `${point.top}px`
       }"
+      :class="{ 'transition-[left,top] duration-100': transition }"
     ></div>
 
     <!-- map bg -->
@@ -29,11 +29,13 @@ import { type MapId, mapToImagePosition } from '../utils/game-map'
 const {
   mapId = 11,
   points = [],
-  size = 350
+  size = 350,
+  transition = false
 } = defineProps<{
   size?: number
   mapId?: number
   points?: Coordinate[]
+  transition?: boolean
 }>()
 
 type Coordinate = {

@@ -106,9 +106,9 @@
           t('PlayerTab.stats.activeSession', 'active')
         }}</span>
         <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
-          {{ analysis.summary.activeSessionWins }} {{ t('PlayerTab.stats.win') }}
+          {{ analysis.summary.activeSessionWins }} {{ t('PlayerTab.stats.winShort') }}
           {{ analysis.summary.activeSessionLosses }}
-          {{ t('PlayerTab.stats.lose') }} ({{
+          {{ t('PlayerTab.stats.lossShort') }} ({{
             (
               (analysis.summary.activeSessionWins /
                 (analysis.summary.activeSessionWins + analysis.summary.activeSessionLosses)) *
@@ -124,8 +124,10 @@
           t('PlayerTab.stats.winLose')
         }}</span>
         <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
-          {{ analysis.summary.wins }} {{ t('PlayerTab.stats.win') }} {{ analysis.summary.losses }}
-          {{ t('PlayerTab.stats.lose') }} ({{ (analysis.summary.winRate * 100).toFixed() }}%)
+          {{ analysis.summary.wins }} {{ t('PlayerTab.stats.winShort') }}
+          {{ analysis.summary.losses }} {{ t('PlayerTab.stats.lossShort') }} ({{
+            (analysis.summary.winRate * 100).toFixed()
+          }}%)
         </span>
       </div>
 

@@ -1131,6 +1131,10 @@ MatchCard:
     filterPlaceholder: 筛选
     noFilterResult: 无筛选结果
 
+  timelineTab:
+    diffLineChart: 差距线图表
+    statsLine: 属性时间线
+
   diffLineChart:
     dataType: 数据类型
     gold: 金币
@@ -2102,6 +2106,8 @@ PlayerTab:
     times: 场
     teamSides: 阵营分布
     activeSession: 活跃时段胜负
+    winShort: 胜
+    lossShort: 负
 
   recentPlayers:
     teammatesTitle: 最近队友

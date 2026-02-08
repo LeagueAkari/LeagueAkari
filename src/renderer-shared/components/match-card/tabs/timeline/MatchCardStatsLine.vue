@@ -58,6 +58,7 @@
       <template v-if="selectedFrameParticipant && isSupportedMap(basicInfo.mapId)">
         <MapPosition
           :size="180"
+          transition
           :mapId="basicInfo.mapId"
           :points="[selectedFrameParticipant.position]"
         />
@@ -173,45 +174,8 @@ const displayedItems = computed(() => {
 
   const stats = selectedFrameParticipant.value.championStats
 
+  // 顺序：生命/资源 → 攻击 → 法术与冷却 → 防御 → 穿透 → 移速与吸血 → 控制减免
   return [
-    {
-      name: t('MatchCard.statsLine.stats.abilityHaste'),
-      formattedValue: stats.abilityHaste.toString()
-    },
-    {
-      name: t('MatchCard.statsLine.stats.abilityPower'),
-      formattedValue: stats.abilityPower.toString()
-    },
-    { name: t('MatchCard.statsLine.stats.armor'), formattedValue: stats.armor.toString() },
-    { name: t('MatchCard.statsLine.stats.armorPen'), formattedValue: stats.armorPen.toString() },
-    {
-      name: t('MatchCard.statsLine.stats.armorPenPercent'),
-      formattedValue: `${stats.armorPenPercent.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.attackDamage'),
-      formattedValue: stats.attackDamage.toString()
-    },
-    {
-      name: t('MatchCard.statsLine.stats.attackSpeed'),
-      formattedValue: `${stats.attackSpeed.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.bonusArmorPenPercent'),
-      formattedValue: `${stats.bonusArmorPenPercent.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.bonusMagicPenPercent'),
-      formattedValue: `${stats.bonusMagicPenPercent.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.ccReduction'),
-      formattedValue: `${stats.ccReduction.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.cooldownReduction'),
-      formattedValue: `${stats.cooldownReduction.toString()}%`
-    },
     {
       name: t('MatchCard.statsLine.stats.health'),
       formattedValue: `${stats.health.toString()} / ${stats.healthMax.toString()}`
@@ -219,31 +183,6 @@ const displayedItems = computed(() => {
     {
       name: t('MatchCard.statsLine.stats.healthRegen'),
       formattedValue: stats.healthRegen.toString()
-    },
-    {
-      name: t('MatchCard.statsLine.stats.lifesteal'),
-      formattedValue: `${stats.lifesteal.toString()}%`
-    },
-    { name: t('MatchCard.statsLine.stats.magicPen'), formattedValue: stats.magicPen.toString() },
-    {
-      name: t('MatchCard.statsLine.stats.magicPenPercent'),
-      formattedValue: `${stats.magicPenPercent.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.magicResist'),
-      formattedValue: stats.magicResist.toString()
-    },
-    {
-      name: t('MatchCard.statsLine.stats.movementSpeed'),
-      formattedValue: stats.movementSpeed.toString()
-    },
-    {
-      name: t('MatchCard.statsLine.stats.omnivamp'),
-      formattedValue: `${stats.omnivamp.toString()}%`
-    },
-    {
-      name: t('MatchCard.statsLine.stats.physicalVamp'),
-      formattedValue: `${stats.physicalVamp.toString()}%`
     },
     {
       name: t('MatchCard.statsLine.stats.power'),
@@ -254,8 +193,71 @@ const displayedItems = computed(() => {
       formattedValue: stats.powerRegen.toString()
     },
     {
+      name: t('MatchCard.statsLine.stats.attackDamage'),
+      formattedValue: stats.attackDamage.toString()
+    },
+    {
+      name: t('MatchCard.statsLine.stats.attackSpeed'),
+      formattedValue: `${stats.attackSpeed.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.abilityPower'),
+      formattedValue: stats.abilityPower.toString()
+    },
+    {
+      name: t('MatchCard.statsLine.stats.abilityHaste'),
+      formattedValue: stats.abilityHaste.toString()
+    },
+    {
+      name: t('MatchCard.statsLine.stats.cooldownReduction'),
+      formattedValue: `${stats.cooldownReduction.toString()}%`
+    },
+    { name: t('MatchCard.statsLine.stats.armor'), formattedValue: stats.armor.toString() },
+    {
+      name: t('MatchCard.statsLine.stats.magicResist'),
+      formattedValue: stats.magicResist.toString()
+    },
+    { name: t('MatchCard.statsLine.stats.armorPen'), formattedValue: stats.armorPen.toString() },
+    {
+      name: t('MatchCard.statsLine.stats.armorPenPercent'),
+      formattedValue: `${stats.armorPenPercent.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.bonusArmorPenPercent'),
+      formattedValue: `${stats.bonusArmorPenPercent.toString()}%`
+    },
+    { name: t('MatchCard.statsLine.stats.magicPen'), formattedValue: stats.magicPen.toString() },
+    {
+      name: t('MatchCard.statsLine.stats.magicPenPercent'),
+      formattedValue: `${stats.magicPenPercent.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.bonusMagicPenPercent'),
+      formattedValue: `${stats.bonusMagicPenPercent.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.movementSpeed'),
+      formattedValue: stats.movementSpeed.toString()
+    },
+    {
+      name: t('MatchCard.statsLine.stats.lifesteal'),
+      formattedValue: `${stats.lifesteal.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.physicalVamp'),
+      formattedValue: `${stats.physicalVamp.toString()}%`
+    },
+    {
       name: t('MatchCard.statsLine.stats.spellVamp'),
       formattedValue: `${stats.spellVamp.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.omnivamp'),
+      formattedValue: `${stats.omnivamp.toString()}%`
+    },
+    {
+      name: t('MatchCard.statsLine.stats.ccReduction'),
+      formattedValue: `${stats.ccReduction.toString()}%`
     }
   ]
 })

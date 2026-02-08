@@ -1131,6 +1131,10 @@ MatchCard:
     filterPlaceholder: Filter
     noFilterResult: No filter result
 
+  timelineTab:
+    diffLineChart: Difference Line Chart
+    statsLine: Stats Line
+
   diffLineChart:
     dataType: Data Type
     gold: Gold
@@ -2097,6 +2101,8 @@ PlayerTab:
     winLose: Wins & Losses
     win: Win
     lose: Loss
+    winShort: W
+    lossShort: L
     wr: Win Rate
     champions: Champion Usage
     times: Games

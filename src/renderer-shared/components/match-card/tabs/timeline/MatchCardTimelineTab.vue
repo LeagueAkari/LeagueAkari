@@ -3,8 +3,8 @@
     <!-- sub tab -->
     <div class="mb-2 box-border w-full px-2" v-if="details.source === 'sgp'">
       <NTabs size="small" type="line" v-model:value="currentSection">
-        <NTab name="diff-line-chart">差距线图表</NTab>
-        <NTab name="stats-line">属性时间线</NTab>
+        <NTab name="diff-line-chart">{{ t('MatchCard.timelineTab.diffLineChart') }}</NTab>
+        <NTab name="stats-line">{{ t('MatchCard.timelineTab.statsLine') }}</NTab>
       </NTabs>
     </div>
 
