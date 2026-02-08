@@ -21,7 +21,11 @@
                     <div>{{ frameEventType(e.type) }}</div>
 
                     <!-- view map position -->
-                    <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
+                    <NPopover
+                      v-if="isSupportedMap(basicInfo.mapId)"
+                      :show-arrow="false"
+                      placement="right"
+                    >
                       <template #trigger>
                         <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
                       </template>
@@ -90,7 +94,11 @@
                     <div v-else-if="e.killType === 'KILL_ACE'">
                       {{ t('MatchCard.eventsTab.ace') }}
                     </div>
-                    <NPopover v-if="canViewPosition" :show-arrow="false" placement="right">
+                    <NPopover
+                      v-if="isSupportedMap(basicInfo.mapId)"
+                      :show-arrow="false"
+                      placement="right"
+                    >
                       <template #trigger>
                         <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
                       </template>
@@ -260,6 +268,7 @@ import { computed, ref, watch } from 'vue'
 import { useMatchCard } from '../context'
 import Inhibitor from '../icons/Inhibitor.vue'
 import Tower from '../icons/Tower.vue'
+import { isSupportedMap } from '../utils/game-map'
 import { useBuildingType, useFrameEventType, useLaneType, useTowerType } from '../utils/text'
 import { useWinResultTagTheme } from '../utils/theme'
 import MapPosition from '../widgets/MapPosition.vue'
@@ -289,10 +298,6 @@ const formatDuration = (timestamp: number) => {
 
   return dayjs.duration(timestamp).format('mm:ss:SSS')
 }
-
-const canViewPosition = computed(() => {
-  return [12, 11, 21].includes(basicInfo.value.mapId)
-})
 
 const eventTypes = computed(() => {
   return [

@@ -50,3 +50,7 @@ export function mapToImagePosition(
 
   return { left, top }
 }
+
+export function isSupportedMap(mapId: number) {
+  return [12, 11, 21].includes(mapId)
+}

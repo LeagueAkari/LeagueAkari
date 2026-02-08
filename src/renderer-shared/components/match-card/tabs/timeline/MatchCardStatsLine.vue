@@ -42,52 +42,62 @@
       </div>
 
       <!-- items -->
-      <div class="min-h-0 flex-1">
-        <NScrollbar>
-          <div class="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-x-2 gap-y-4">
-            <div class="flex flex-col" v-for="item of displayedItems">
-              <div class="text-xs text-black/60 dark:text-white/60">{{ item.name }}</div>
-              <div class="text-lg font-bold whitespace-nowrap text-black dark:text-white">
-                {{ item.formattedValue }}
-              </div>
+      <NScrollbar class="min-h-0 flex-1">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-x-2 gap-y-4">
+          <div class="flex flex-col" v-for="item of displayedItems">
+            <div class="text-xs text-black/60 dark:text-white/60">{{ item.name }}</div>
+            <div class="text-lg font-bold whitespace-nowrap text-black dark:text-white">
+              {{ item.formattedValue }}
             </div>
           </div>
-        </NScrollbar>
-      </div>
+        </div>
+      </NScrollbar>
     </div>
 
-    <!-- 右侧控制面板 -->
-    <NScrollbar class="w-52!">
-      <div class="flex flex-col gap-3">
-        <!-- 玩家选择 -->
-        <div class="flex w-full flex-col gap-2">
-          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.statsLine.participant') }}
-          </div>
+    <div class="flex w-52 flex-col">
+      <template v-if="selectedFrameParticipant && isSupportedMap(basicInfo.mapId)">
+        <MapPosition
+          :size="180"
+          :mapId="basicInfo.mapId"
+          :points="[selectedFrameParticipant.position]"
+        />
 
-          <NRadioGroup v-model:value="selectedPlayer">
-            <div class="flex flex-col gap-1.5">
-              <NRadio
-                v-for="player in sortedPlayerOptions"
-                :key="player.value"
-                :value="player.value"
-              >
-                <template #default>
-                  <div class="flex w-48 items-center gap-2">
-                    <!-- 颜色方块 -->
-                    <div
-                      class="h-3 w-3 shrink-0 rounded-sm"
-                      :style="{ backgroundColor: player.color }"
-                    ></div>
-                    <span class="truncate">{{ player.label }}</span>
-                  </div>
-                </template>
-              </NRadio>
+        <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
+      </template>
+
+      <!-- 右侧控制面板 -->
+      <NScrollbar class="min-h-0 flex-1">
+        <div class="flex flex-col gap-3">
+          <!-- 玩家选择 -->
+          <div class="flex w-full flex-col gap-2">
+            <div class="text-xs font-semibold text-black/60 dark:text-white/60">
+              {{ t('MatchCard.statsLine.participant') }}
             </div>
-          </NRadioGroup>
+
+            <NRadioGroup v-model:value="selectedPlayer">
+              <div class="flex flex-col gap-1.5">
+                <NRadio
+                  v-for="player in sortedPlayerOptions"
+                  :key="player.value"
+                  :value="player.value"
+                >
+                  <template #default>
+                    <div class="flex w-48 items-center gap-2">
+                      <!-- 颜色方块 -->
+                      <div
+                        class="h-3 w-3 shrink-0 rounded-sm"
+                        :style="{ backgroundColor: player.color }"
+                      ></div>
+                      <span class="truncate">{{ player.label }}</span>
+                    </div>
+                  </template>
+                </NRadio>
+              </div>
+            </NRadioGroup>
+          </div>
         </div>
-      </div>
-    </NScrollbar>
+      </NScrollbar>
+    </div>
   </div>
 </template>
 
@@ -100,9 +110,11 @@ import { NRadio, NRadioGroup, NScrollbar, NSlider } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../../context'
+import { isSupportedMap } from '../../utils/game-map'
 import { usePosition } from '../../utils/text'
 import { getTeamColor, playerColors, useWinResultTagTheme } from '../../utils/theme'
 import { formatMilliseconds } from '../../utils/time'
+import MapPosition from '../../widgets/MapPosition.vue'
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()
