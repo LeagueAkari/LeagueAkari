@@ -1106,7 +1106,7 @@ MatchCard:
     runes: Runes
     events: Events
     builds: Builds
-    lineChart: Line Chart
+    timeline: Timeline
 
   replay:
     download: Download Replay
@@ -1136,6 +1136,8 @@ MatchCard:
     gold: Gold
     cs: CS
     exp: XP
+    damageDealt: Dealt Damage To Champions
+    damageTaken: Taken Damage
     teamAverage: Team Average
     players: Players
     selectAll: Select All
@@ -1155,6 +1157,42 @@ MatchCard:
         title: Player experience growth
         yAxis: Experience
         unit: EXP
+      damageDealt:
+        title: Player dealt damage
+        yAxis: Dealt Damage To Champions
+        unit: Damage
+      damageTaken:
+        title: Player taken damage
+        yAxis: Taken Damage
+        unit: Damage
+
+  statsLine:
+    participant: Participant
+    hint: Data is returned from the server; some fields may be incorrect.
+    stats:
+      abilityHaste: Ability Haste
+      abilityPower: Ability Power
+      armor: Armor
+      armorPen: Armor Pen
+      armorPenPercent: Armor Pen %
+      attackDamage: Attack Damage
+      attackSpeed: Attack Speed %
+      bonusArmorPenPercent: Bonus Armor Pen %
+      bonusMagicPenPercent: Bonus Magic Pen %
+      ccReduction: Tenacity %
+      cooldownReduction: Cooldown Reduction %
+      health: Health
+      healthRegen: Health Regen
+      lifesteal: Lifesteal %
+      magicPen: Magic Pen
+      magicPenPercent: Magic Pen %
+      magicResist: Magic Resist
+      movementSpeed: Movement Speed
+      omnivamp: Omnivamp %
+      physicalVamp: Physical Vamp %
+      power: Power
+      powerRegen: Power Regen
+      spellVamp: Spell Vamp %
 
   eventsTab:
     start: Game Start
@@ -1342,6 +1380,7 @@ MatchCard:
     twoWardsOneSweeperCount: Two Wards One Sweeper
     controlWardsPlaced: Control Wards Placed
     stealthWardsPlaced: Stealth Wards Placed
+    controlWardTimeCoverageInRiverOrEnemyHalf: Control Ward Time Coverage in River or Enemy Half
     # Buildings
     turretKills: Turret Kills
     turretTakedowns: Turret Takedowns

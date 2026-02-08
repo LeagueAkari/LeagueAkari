@@ -1,5 +1,5 @@
 <template>
-  <div v-if="frames.length > 0" class="flex h-142 w-full flex-1 gap-4">
+  <div class="flex size-full gap-4">
     <!-- 图表区域 -->
     <div class="min-w-0 flex-1">
       <Line :data="chartData" :options="chartOptions" />
@@ -18,6 +18,8 @@
               <NRadio value="gold" :label="t('MatchCard.diffLineChart.gold')" />
               <NRadio value="cs" :label="t('MatchCard.diffLineChart.cs')" />
               <NRadio value="exp" :label="t('MatchCard.diffLineChart.exp')" />
+              <NRadio value="damageDealt" :label="t('MatchCard.diffLineChart.damageDealt')" />
+              <NRadio value="damageTaken" :label="t('MatchCard.diffLineChart.damageTaken')" />
             </div>
           </NRadioGroup>
         </div>
@@ -86,46 +88,20 @@
       </div>
     </NScrollbar>
   </div>
-  <div
-    v-else
-    class="flex h-142 w-full items-center justify-center text-sm text-black/60 dark:text-white/60"
-  >
-    <template v-if="loadingDetails">
-      <div class="flex items-center gap-2">
-        <NSpin :size="16" />
-        <span>{{ t('MatchCard.common.loading') }}</span>
-      </div>
-    </template>
-    <template v-else>
-      <div class="flex items-center gap-2">
-        <span>{{ t('MatchCard.common.noData') }}</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
-          {{ t('MatchCard.common.refresh') }}
-        </NButton>
-      </div>
-    </template>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCheckbox,
-  NCheckboxGroup,
-  NRadio,
-  NRadioGroup,
-  NScrollbar,
-  NSpin
-} from 'naive-ui'
+import { NCheckbox, NCheckboxGroup, NRadio, NRadioGroup, NScrollbar } from 'naive-ui'
 import { computed, ref, watch, watchEffect } from 'vue'
 import { Line } from 'vue-chartjs'
 
-import { useMatchCard } from '../context'
-import { useTeamName } from '../utils/text'
-import { getTeamColor, playerColors } from '../utils/theme'
+import { useMatchCard } from '../../context'
+import { useTeamName } from '../../utils/text'
+import { getTeamColor, playerColors } from '../../utils/theme'
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()
@@ -144,7 +120,10 @@ const {
   hidePrivacy
 } = useMatchCard()
 
-const selectedMetric = ref<'gold' | 'cs' | 'exp'>('gold')
+// damageDealt 和 damageTaken 只在 sgp 中可用
+type Metric = 'gold' | 'cs' | 'exp' | 'damageDealt' | 'damageTaken'
+
+const selectedMetric = ref<Metric>('gold')
 
 // 检测当前主题（响应式）
 const isDark = computed(() => theme.value === 'dark')
@@ -171,11 +150,21 @@ const metricConfigs = computed(() => ({
     title: t('MatchCard.diffLineChart.metric.exp.title'),
     yAxisLabel: t('MatchCard.diffLineChart.metric.exp.yAxis'),
     unit: t('MatchCard.diffLineChart.metric.exp.unit')
+  },
+  damageDealt: {
+    title: t('MatchCard.diffLineChart.metric.damageDealt.title'),
+    yAxisLabel: t('MatchCard.diffLineChart.metric.damageDealt.yAxis'),
+    unit: t('MatchCard.diffLineChart.metric.damageDealt.unit')
+  },
+  damageTaken: {
+    title: t('MatchCard.diffLineChart.metric.damageTaken.title'),
+    yAxisLabel: t('MatchCard.diffLineChart.metric.damageTaken.yAxis'),
+    unit: t('MatchCard.diffLineChart.metric.damageTaken.unit')
   }
 }))
 
 // 从 timeline 中提取玩家数据
-const extractMetricData = (participantId: number, metric: 'gold' | 'cs' | 'exp') => {
+const extractMetricData = (participantId: number, metric: Metric) => {
   const data: number[] = []
 
   frames.value.forEach((frame) => {
@@ -191,6 +180,16 @@ const extractMetricData = (participantId: number, metric: 'gold' | 'cs' | 'exp')
         case 'exp':
           data.push(participantFrame.xp || 0)
           break
+        case 'damageDealt':
+          if (isSgpDetailedParticipantFrame(participantFrame)) {
+            data.push(participantFrame.damageStats.totalDamageDoneToChampions)
+          }
+          break
+        case 'damageTaken':
+          if (isSgpDetailedParticipantFrame(participantFrame)) {
+            data.push(participantFrame.damageStats.totalDamageTaken)
+          }
+          break
       }
     }
   })
@@ -199,7 +198,7 @@ const extractMetricData = (participantId: number, metric: 'gold' | 'cs' | 'exp')
 }
 
 // 计算队伍平均数据
-const extractTeamAverageData = (teamIdentifier: string, metric: 'gold' | 'cs' | 'exp') => {
+const extractTeamAverageData = (teamIdentifier: string, metric: Metric) => {
   const teamParticipants = participants.value
     .filter((p) => p.teamIdentifier === teamIdentifier)
     .map((p) => p.participantId)
@@ -222,6 +221,16 @@ const extractTeamAverageData = (teamIdentifier: string, metric: 'gold' | 'cs' | 
             break
           case 'exp':
             sum += participantFrame.xp
+            break
+          case 'damageDealt':
+            if (isSgpDetailedParticipantFrame(participantFrame)) {
+              sum += participantFrame.damageStats.totalDamageDoneToChampions
+            }
+            break
+          case 'damageTaken':
+            if (isSgpDetailedParticipantFrame(participantFrame)) {
+              sum += participantFrame.damageStats.totalDamageTaken
+            }
             break
         }
         count++
@@ -431,6 +440,18 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => details.value?.source,
+  (source) => {
+    if (
+      source === 'lcu' &&
+      (selectedMetric.value === 'damageDealt' || selectedMetric.value === 'damageTaken')
+    ) {
+      selectedMetric.value = 'gold'
+    }
+  }
 )
 </script>
 

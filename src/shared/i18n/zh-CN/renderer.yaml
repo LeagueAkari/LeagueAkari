@@ -1107,7 +1107,7 @@ MatchCard:
     runes: 符文
     events: 事件
     builds: 构建
-    lineChart: 线图
+    timeline: 时间线
 
   replay:
     download: 下载回放
@@ -1136,6 +1136,8 @@ MatchCard:
     gold: 金币
     cs: 补刀
     exp: 经验
+    damageDealt: 已造成英雄伤害
+    damageTaken: 已承受伤害
     teamAverage: 队伍平均
     players: 玩家
     selectAll: 全选
@@ -1155,6 +1157,42 @@ MatchCard:
         title: 玩家经验增长曲线
         yAxis: 经验值
         unit: 经验
+      damageDealt:
+        title: 玩家已造成伤害曲线
+        yAxis: 已造成英雄伤害
+        unit: 伤害
+      damageTaken:
+        title: 玩家已承受伤害曲线
+        yAxis: 已承受伤害
+        unit: 伤害
+
+  statsLine:
+    participant: 玩家
+    hint: 此为服务器返回之数据，部分字段可能存在错误。
+    stats:
+      abilityHaste: 技能急速
+      abilityPower: 法术强度
+      armor: 护甲
+      armorPen: 护甲穿透
+      armorPenPercent: 护甲穿透 %
+      attackDamage: 攻击力
+      attackSpeed: 攻击速度 %
+      bonusArmorPenPercent: 额外护甲穿透 %
+      bonusMagicPenPercent: 额外法术穿透 %
+      ccReduction: 韧性 %
+      cooldownReduction: 冷却缩减 %
+      health: 生命值
+      healthRegen: 生命回复
+      lifesteal: 生命偷取 %
+      magicPen: 法术穿透
+      magicPenPercent: 法术穿透 %
+      magicResist: 魔法抗性
+      movementSpeed: 移动速度
+      omnivamp: 全能吸血 %
+      physicalVamp: 物理吸血 %
+      power: 法力值
+      powerRegen: 法力回复
+      spellVamp: 法术吸血 %
 
   eventsTab:
     start: 开始游戏
@@ -1341,6 +1379,7 @@ MatchCard:
     twoWardsOneSweeperCount: 一次扫描清除两个眼
     controlWardsPlaced: 放置控制守卫
     stealthWardsPlaced: 放置隐形守卫
+    controlWardTimeCoverageInRiverOrEnemyHalf: 敌半区控制守卫时间
     # Buildings - 建筑
     turretKills: 防御塔击杀
     turretTakedowns: 防御塔摧毁

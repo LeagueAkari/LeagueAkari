@@ -53,7 +53,7 @@
       <MatchCardDetailsTab v-else-if="selectedTab === 'details'" />
       <MatchCardRunesTab v-else-if="selectedTab === 'runes'" />
       <MatchCardEventsTab v-else-if="selectedTab === 'events'" />
-      <MatchCardLineChartTab v-else-if="selectedTab === 'line-chart'" />
+      <MatchCardTimelineTab v-else-if="selectedTab === 'timeline'" />
       <MatchCardBuildsTab v-else-if="selectedTab === 'builds'" />
     </KeepAlive>
   </div>
@@ -69,10 +69,10 @@ import { computed, ref, watchEffect } from 'vue'
 import { useMatchCard } from './context'
 import MatchCardBuildsTab from './tabs/MatchCardBuildsTab.vue'
 import MatchCardDetailsTab from './tabs/MatchCardDetailsTab.vue'
-import MatchCardLineChartTab from './tabs/MatchCardDiffLineChartTab.vue'
 import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
 import MatchCardRunesTab from './tabs/MatchCardRunesTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
+import MatchCardTimelineTab from './tabs/timeline/MatchCardTimelineTab.vue'
 import { useCardBorderTheme } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
@@ -122,8 +122,8 @@ const tabs = computed(() => {
       show: basicInfo.value.dataSource === 'sgp'
     },
     {
-      label: t('MatchCard.tabs.lineChart'),
-      value: 'line-chart'
+      label: t('MatchCard.tabs.timeline'),
+      value: 'timeline'
     }
   ].filter((tab) => tab.show ?? true)
 })
