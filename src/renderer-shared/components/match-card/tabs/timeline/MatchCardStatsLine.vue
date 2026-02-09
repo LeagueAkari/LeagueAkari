@@ -46,7 +46,7 @@
         <div class="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-x-2 gap-y-4">
           <div class="flex flex-col" v-for="item of displayedItems">
             <div class="text-xs text-black/60 dark:text-white/60">{{ item.name }}</div>
-            <div class="text-lg font-bold whitespace-nowrap text-black dark:text-white">
+            <div class="text-base font-bold text-black dark:text-white">
               {{ item.formattedValue }}
             </div>
           </div>
