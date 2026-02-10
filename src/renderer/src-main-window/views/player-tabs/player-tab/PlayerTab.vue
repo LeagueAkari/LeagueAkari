@@ -24,22 +24,23 @@
         </div>
 
         <!-- main content: wide size -->
-        <div class="flex gap-3" v-else>
-          <!-- side -->
-          <div class="w-[300px] space-y-2">
-            <div ref="stickySentinelLeftSideEl" class="h-0 w-full"></div>
-            <MatchHistoryPagination
-              :is-floating="!frozenVisibleLeftSide"
-              class="sticky top-2 z-10 -mt-2"
-            />
-            <NormalTagBlock />
-            <SpectatorPane />
-            <SummaryPane />
-            <RecentlyPlayers side="ally" />
-            <RecentlyPlayers side="enemy" />
-            <EncounteredGames />
-            <PlayerChallenges />
-          </div>
+        <div class="flex items-start gap-3" v-else>
+          <!-- sentinel -->
+          <div ref="stickySentinelLeftSideEl" class="-ml-3 h-0"></div>
+
+          <!-- sticky box -->
+          <StickyBox class="w-[300px]" :offset-top="8" :offset-bottom="8">
+            <div class="space-y-2">
+              <MatchHistoryPagination />
+              <NormalTagBlock />
+              <SpectatorPane />
+              <SummaryPane />
+              <RecentlyPlayers side="ally" />
+              <RecentlyPlayers side="enemy" />
+              <EncounteredGames />
+              <PlayerChallenges />
+            </div>
+          </StickyBox>
 
           <!-- match history container -->
           <MatchHistoryList class="flex-1" />
@@ -78,6 +79,7 @@
 
 <script setup lang="ts">
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
+import StickyBox from '@renderer-shared/components/sticky-box/StickyBox.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
