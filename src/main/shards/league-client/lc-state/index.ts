@@ -301,11 +301,34 @@ export class LeagueClientData {
   private _syncLcuEntitlements() {
     this._context.mobx.propSync(this._context.namespace, 'entitlements', this.entitlements, 'token')
 
+    // 如果是 500 失败，会永远重试
+    let timer: NodeJS.Timeout | null = null
+    const cancelRetryTimer = () => {
+      if (timer) {
+        clearTimeout(timer)
+        timer = null
+      }
+    }
+
     const loadEntitlementsToken = async () => {
       try {
         const token = (await this._context.lc.api.entitlements.getEntitlementsToken()).data
+
+        cancelRetryTimer()
         this.entitlements.setToken(token)
       } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 404) {
+          cancelRetryTimer()
+          this.entitlements.setToken(null)
+          return
+        }
+
+        // retry in 5s
+        cancelRetryTimer()
+        timer = setTimeout(() => {
+          loadEntitlementsToken()
+        }, 5000)
+
         this._context.ipc.sendEvent(
           this._context.namespace,
           'error-sync-data',
@@ -318,10 +341,12 @@ export class LeagueClientData {
     this._stateInitializer.register('entitlements-token', loadEntitlementsToken, { priority: 200 })
 
     this._onLcuNotConnected(() => {
+      cancelRetryTimer()
       this.entitlements.setToken(null)
     })
 
     this._context.lc.events.on('/entitlements/v1/token', (event) => {
+      cancelRetryTimer()
       this.entitlements.setToken(event.data)
     })
   }
@@ -334,15 +359,32 @@ export class LeagueClientData {
       'token'
     )
 
+    let timer: NodeJS.Timeout | null = null
+    const cancelRetryTimer = () => {
+      if (timer) {
+        clearTimeout(timer)
+        timer = null
+      }
+    }
+
     const loadLeagueSessionToken = async () => {
       try {
         const token = (await this._context.lc.api.leagueSession.getLeagueSessionToken()).data
+
+        cancelRetryTimer()
         this.leagueSession.setToken(token)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
+          cancelRetryTimer()
           this.leagueSession.setToken(null)
           return
         }
+
+        // retry in 5s
+        cancelRetryTimer()
+        timer = setTimeout(() => {
+          loadLeagueSessionToken()
+        }, 5000)
 
         this._context.ipc.sendEvent(
           this._context.namespace,
@@ -358,10 +400,12 @@ export class LeagueClientData {
     })
 
     this._onLcuNotConnected(() => {
+      cancelRetryTimer()
       this.leagueSession.setToken(null)
     })
 
     this._context.lc.events.on('/lol-league-session/v1/league-session-token', (event) => {
+      cancelRetryTimer()
       this.leagueSession.setToken(event.data)
     })
   }
