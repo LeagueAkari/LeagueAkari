@@ -427,7 +427,7 @@ import {
 } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
-import OrderedChampionList from '@main-window/components/ordered-champion-list/OrderedChampionList.vue'
+import OrderedChampionList from './components/ordered-champion-list/OrderedChampionList.vue'
 import { useMapAssets } from '@main-window/composables/useMapAssets'
 
 const { t } = useTranslation()

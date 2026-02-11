@@ -39,7 +39,7 @@ import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-conf
 import { useTranslation } from 'i18next-vue'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
-import ChampionConfig from '@main-window/components/auto-champ-config/ChampionConfig.vue'
+import ChampionConfig from './components/auto-champ-config/ChampionConfig.vue'
 
 const { t } = useTranslation()
 

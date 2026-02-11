@@ -28,8 +28,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import StartupPane from './StartupPane.vue'
-import PlayerTab from './player-tab/PlayerTab.vue'
+import StartupPane from './components/StartupPane.vue'
+import PlayerTab from './components/player-tab/PlayerTab.vue'
 
 const { t } = useTranslation()
 
