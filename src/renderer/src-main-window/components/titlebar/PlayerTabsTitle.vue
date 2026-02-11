@@ -36,6 +36,7 @@
             }"
             @contextmenu="handleContextMenu($event, tab.id)"
             @click="handleTabChange(tab.id)"
+            @dblclick="pts.closeTab(tab.id)"
             @mouseup="handleMouseUp($event, tab.id)"
             @dragstart="handleTabDragStart($event, tab.id)"
             @drop="handleTabDrop($event, tab.id)"

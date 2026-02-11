@@ -166,13 +166,13 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
 <style scoped>
 .app-sidebar {
   --la-sidebar-width-collapsed: 52px;
-  --la-sidebar-width-expanded: 186px;
+  --la-sidebar-width-expanded: 176px;
 
   display: flex;
   flex-direction: column;
   height: 100%;
   width: var(--la-sidebar-width-expanded);
-  transition: width 0.2s;
+  transition: width 0.3s cubic-bezier(0, 0.9, 0.1, 1);
 
   &.collapsed {
     width: var(--la-sidebar-width-collapsed);

@@ -37,8 +37,8 @@
               <SummaryPane />
               <RecentlyPlayers side="ally" />
               <RecentlyPlayers side="enemy" />
-              <EncounteredGames />
               <PlayerChallenges />
+              <EncounteredGames />
             </div>
           </StickyBox>
 
