@@ -618,7 +618,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
-import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../../utils'
 
 const { puuid, analysis, premadeTeamId, summoner, savedInfo } = defineProps<{
   puuid: string

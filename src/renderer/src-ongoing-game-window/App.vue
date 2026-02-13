@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
-import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
+import OngoingGamePanel from '@renderer-shared/components/ongoing-game/panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'

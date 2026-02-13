@@ -144,13 +144,13 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import PlayerInfoCard from './PlayerInfoCard.vue'
+import PlayerInfoCard from '../info-card/PlayerInfoCard.vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   FIXED_CARD_WIDTH_PX_NUMBER,
   PREMADE_TEAMS,
   useIdleState
-} from './ongoing-game-utils'
+} from '../utils'
 import TeamTagsArea from './widgets/TeamTagsArea.vue'
 
 const props = defineProps<{

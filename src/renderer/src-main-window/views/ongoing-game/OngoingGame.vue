@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
-import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
+import OngoingGamePanel from '@renderer-shared/components/ongoing-game/panel/OngoingGamePanel.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'

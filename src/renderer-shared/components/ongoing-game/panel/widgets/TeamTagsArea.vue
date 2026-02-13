@@ -99,7 +99,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../ongoing-game-utils'
+import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../../utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
 const WIN_RATE_TEAM_MIN_MATCHES = 13

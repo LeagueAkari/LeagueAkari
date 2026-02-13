@@ -546,7 +546,7 @@ import {
   PREMADE_TEAM_COLORS,
   PREMADE_TEAM_COLORS_LIGHT,
   RANKED_MEDAL_MAP
-} from './ongoing-game-utils'
+} from '../utils'
 import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
 
 const {
