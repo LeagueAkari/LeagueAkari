@@ -19,7 +19,7 @@
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
     "gen-types": "tsc --declaration --emitDeclarationOnly --outDir ./out/types -p tsconfig.node.json",
-    "build:mac": "npm run build && electron-builder --mac --arm64 --config"
+    "build:mac": "npm run build && electron-builder --mac --arm64 --dir --config && node scripts/macos/ensure-codesign.cjs \"dist/mac-arm64/League Akari.app\" && electron-builder --mac --arm64 --config --prepackaged \"dist/mac-arm64/League Akari.app\""
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",

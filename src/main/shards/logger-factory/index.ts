@@ -51,7 +51,8 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
     private readonly _mobx: MobxUtilsMain
   ) {
     this._appDir = path.join(app.getPath('exe'), '..')
-    this._logsDir = path.join(this._appDir, 'logs')
+    // macOS 下写入 .app bundle 会导致权限/签名问题，日志目录应位于用户目录。
+    this._logsDir = process.platform === 'darwin' ? app.getPath('logs') : path.join(this._appDir, 'logs')
     this._logger = this._shared.global.logger
 
     this.state.setLogLevel(this._shared.global.getLogLevel())
