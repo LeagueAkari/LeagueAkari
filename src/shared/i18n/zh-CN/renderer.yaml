@@ -1640,6 +1640,7 @@ ShortcutSelector:
   unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认
   notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
+  nativeGlobalShortcutsWindowsOnly: macOS/Linux 版本暂不支持原生全局快捷键（仅 Windows）。
   ok: 确认
   cancel: 取消
   select: 选择
@@ -1681,6 +1682,8 @@ Client:
 
   gameClient:
     title: 游戏端
+
+    windowsOnlyNativeAddon: 仅支持 Windows（需要原生插件）。
 
     terminateGameClientWithShortcut:
       labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
@@ -2763,6 +2766,10 @@ StartupPane:
   newVersionAvailable: 新版本
 
 InGameSend:
+  windowsOnly:
+    title: 仅 Windows 功能
+    description: 游戏内发送和全局快捷键需要原生插件。本构建仅在 Windows 提供。
+
   settings:
     title: 发送设置
     cancelShortcut:

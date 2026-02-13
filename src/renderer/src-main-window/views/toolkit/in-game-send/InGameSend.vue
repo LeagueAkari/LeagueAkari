@@ -6,9 +6,9 @@
           v-if="!nativeAddonsSupported"
           type="warning"
           class="mb-2"
-          title="Windows-only feature"
+          :title="t('windowsOnly.title')"
         >
-          In-game send and global shortcuts require native addons. This build only ships them on Windows.
+          {{ t('windowsOnly.description') }}
         </NAlert>
 
         <template v-if="nativeAddonsSupported">

@@ -1638,6 +1638,7 @@ ShortcutSelector:
   unset: Unset
   tooComplicated: This shortcut combination is highly complex, please confirm
   notRunAsAdministrator: Not running as administrator, cannot use shortcut key
+  nativeGlobalShortcutsWindowsOnly: macOS/Linux builds currently do not support native global shortcuts (Windows only).
   reservedShortcut: This shortcut combination is reserved
   beingOccupied: This shortcut combination is already in use
   unchanged: (Unchanged)
@@ -1682,6 +1683,8 @@ Client:
 
   gameClient:
     title: Game Client
+
+    windowsOnlyNativeAddon: Windows only (requires native addon).
 
     terminateGameClientWithShortcut:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
@@ -2762,6 +2765,10 @@ StartupPane:
   newVersionAvailable: New
 
 InGameSend:
+  windowsOnly:
+    title: Windows-only feature
+    description: In-game send and global shortcuts require native addons. This build only ships them on Windows.
+
   settings:
     title: Settings
     cancelShortcut:

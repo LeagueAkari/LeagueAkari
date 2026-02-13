@@ -86,7 +86,7 @@
         </NButton>
       </template>
       <template v-if="!nativeAddonsSupported">
-        macOS/Linux builds currently do not support native global shortcuts (Windows only).
+        {{ t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly') }}
       </template>
       <template v-else>
         {{ t('ShortcutSelector.notRunAsAdministrator') }}

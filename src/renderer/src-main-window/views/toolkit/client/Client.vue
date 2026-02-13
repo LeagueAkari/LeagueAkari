@@ -22,7 +22,7 @@
                 v-if="!nativeAddonsSupported"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
               >
-                Windows only (requires native addon).
+                {{ t('Client.gameClient.windowsOnlyNativeAddon') }}
               </div>
             </template>
             <NSwitch
@@ -49,7 +49,7 @@
                 v-if="!nativeAddonsSupported"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
               >
-                Windows only (requires native addon).
+                {{ t('Client.gameClient.windowsOnlyNativeAddon') }}
               </div>
             </template>
             <ShortcutSelector
