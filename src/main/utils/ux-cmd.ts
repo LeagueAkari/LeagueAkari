@@ -120,23 +120,39 @@ export function parseCommandLine(s: string): UxCommandLine | null {
 }
 
 export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]> {
-  return new Promise((resolve, reject) => {
-    const task = runCommand(POWERSHELL_PATH, [
-      ...POWERSHELL_BASE_ARGS,
-      `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
-    ])
+  if (process.platform !== 'win32') {
+    try {
+      const out = runCommand('ps', ['axww', '-o', 'pid=,command='])
+      const text = await out
+      const needleA = clientName
+      const needleB = clientName.replace(/\.exe$/i, '')
 
-    task
-      .then((out) => {
-        const authObjects = out
-          .split('\n')
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .map(parseCommandLine)
-          .filter(Boolean) as UxCommandLine[]
+      const authObjects = text
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .filter((line) => line.includes(needleA) || (needleB && line.includes(needleB)))
+        .map((line) => line.replace(/^\d+\s+/, ''))
+        .map(parseCommandLine)
+        .filter(Boolean) as UxCommandLine[]
 
-        resolve(authObjects)
-      })
-      .catch((error) => reject(error))
-  })
+      return authObjects
+    } catch {
+      return []
+    }
+  }
+
+  const out = await runCommand(POWERSHELL_PATH, [
+    ...POWERSHELL_BASE_ARGS,
+    `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
+  ])
+
+  const authObjects = out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(parseCommandLine)
+    .filter(Boolean) as UxCommandLine[]
+
+  return authObjects
 }

@@ -5,14 +5,19 @@
   text-shadow: none;
 }
 
+:root[data-platform='darwin'] {
+  --la-mac-titlebar-safe-left: 76px;
+}
+
 :root {
+  --la-mac-titlebar-safe-left: 0px;
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
   --la-titlebar-height: 36px;
   --la-scrollbar-height: 6px;
   --la-scrollbar-width: 8px;
-  --n-option-padding: 0 4px;
-}
+  --n-option-padding: 0 4px;}
+
 
 [data-theme='dark'] {
   --la-background-color-primary: #1a1a1d;

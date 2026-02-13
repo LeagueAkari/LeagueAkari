@@ -1,4 +1,4 @@
-import { input } from '@leagueakari/league-akari-addons'
+import { input } from '@main/utils/addons'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { isBotQueue } from '@shared/types/league-client/game-data'

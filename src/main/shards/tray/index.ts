@@ -1,4 +1,5 @@
 import icon from '@resources/LA_ICON.ico?asset'
+import iconPng from '../../../../pictures/logo.png?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Menu, MenuItem, Tray } from 'electron'
 import i18next from 'i18next'
@@ -34,7 +35,8 @@ export class TrayMain implements IAkariShardInitDispose {
   ) {}
 
   private _buildTray() {
-    this._tray = new Tray(icon)
+    const trayIcon = process.platform === 'win32' ? icon : iconPng
+    this._tray = new Tray(trayIcon)
 
     this._auxWindowTrayItem = new MenuItem({
       label: i18next.t('tray.auxWindow'),

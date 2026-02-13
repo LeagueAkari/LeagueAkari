@@ -71,7 +71,7 @@ const shouldShowBottomBorder = computed(() => {
   align-items: center;
   -webkit-app-region: drag;
   z-index: 1000000;
-  padding-left: 8px;
+  padding-left: calc(8px + var(--la-mac-titlebar-safe-left));
 
   &.should-show-bottom-border {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);

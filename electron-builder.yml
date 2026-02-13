@@ -28,6 +28,14 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.utilities
+  icon: build/icon.png
+dmg:
+  artifactName: ${name}-${version}.${ext}
 asar: true
 electronFuses:
   enableEmbeddedAsarIntegrityValidation: true

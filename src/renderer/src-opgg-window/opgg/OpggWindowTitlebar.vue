@@ -4,6 +4,8 @@
     :class="{ blurred: ws.focus === 'blurred' }"
     style="-webkit-app-region: drag"
   >
+    <div class="h-full w-[var(--la-mac-titlebar-safe-left)] shrink-0 [-webkit-app-region:no-drag]" />
+
     <div
       class="box-border flex h-full flex-1 items-center pt-1 pr-1 pb-0.5 pl-2 transition-all duration-300"
       :class="{ 'brightness-80': ws.focus === 'blurred' }"

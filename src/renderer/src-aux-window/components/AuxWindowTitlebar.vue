@@ -3,6 +3,8 @@
     class="relative z-10000000 flex h-(--la-titlebar-height) items-center [-webkit-app-region:drag]"
     :class="{ 'brightness-80': aws.focus === 'blurred' }"
   >
+    <div class="h-full w-[var(--la-mac-titlebar-safe-left)] shrink-0 [-webkit-app-region:no-drag]" />
+
     <div
       class="flex h-full flex-1 items-center px-2 pt-1 pb-0.5 transition-all"
       :class="{ 'brightness-80': aws.focus === 'blurred' }"

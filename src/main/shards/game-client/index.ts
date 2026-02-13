@@ -1,4 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
+import { tools } from '@main/utils/addons'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'

@@ -8,8 +8,7 @@
           </template>
           <ControlItem
             class="control-item-margin"
-            :label-description="t('Client.gameClient.terminateGameClientWithShortcut.description')"
-            :disabled="!as.isAdministrator"
+            :disabled="!as.isAdministrator || !nativeAddonsSupported"
             :label="
               as.isAdministrator
                 ? t('Client.gameClient.terminateGameClientWithShortcut.label')
@@ -17,8 +16,17 @@
             "
             :label-width="320"
           >
+            <template #labelDescription>
+              <div>{{ t('Client.gameClient.terminateGameClientWithShortcut.description') }}</div>
+              <div
+                v-if="!nativeAddonsSupported"
+                class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
+              >
+                Windows only (requires native addon).
+              </div>
+            </template>
             <NSwitch
-              :disabled="!as.isAdministrator"
+              :disabled="!as.isAdministrator || !nativeAddonsSupported"
               size="small"
               type="warning"
               :value="gcs.settings.terminateGameClientWithShortcut"
@@ -27,8 +35,7 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :label-description="t('Client.gameClient.terminateShortcut.description')"
-            :disabled="!as.isAdministrator"
+            :disabled="!as.isAdministrator || !nativeAddonsSupported"
             :label="
               as.isAdministrator
                 ? t('Client.gameClient.terminateShortcut.label')
@@ -36,6 +43,15 @@
             "
             :label-width="320"
           >
+            <template #labelDescription>
+              <div>{{ t('Client.gameClient.terminateShortcut.description') }}</div>
+              <div
+                v-if="!nativeAddonsSupported"
+                class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
+              >
+                Windows only (requires native addon).
+              </div>
+            </template>
             <ShortcutSelector
               :target-id="GameClientRenderer.SHORTCUT_ID_TERMINATE_GAME_CLIENT"
               :shortcut-id="gcs.settings.terminateShortcut"
@@ -73,7 +89,7 @@
           </template>
           <ControlItem
             class="control-item-margin"
-            :disabled="!as.isAdministrator"
+            :disabled="!as.isAdministrator || !nativeAddonsSupported"
             :label="
               as.isAdministrator
                 ? t('Client.leagueClientUx.fixWindowMethodAOptions.label')
@@ -88,7 +104,7 @@
               <NInputNumber
                 style="width: 80px"
                 size="small"
-                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                :disabled="!as.isAdministrator || !nativeAddonsSupported || lcs.connectionState !== 'connected'"
                 :show-button="false"
                 :min="1"
                 @update:value="(val) => (fixWindowMethodAOptions.baseWidth = val || 0)"
@@ -100,7 +116,7 @@
               <NInputNumber
                 ref="input-2"
                 style="width: 80px"
-                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                :disabled="!as.isAdministrator || !nativeAddonsSupported || lcs.connectionState !== 'connected'"
                 size="small"
                 :show-button="false"
                 :min="1"
@@ -110,7 +126,7 @@
                 ><template #prefix>H</template>
               </NInputNumber>
               <NButton
-                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                :disabled="!as.isAdministrator || !nativeAddonsSupported || lcs.connectionState !== 'connected'"
                 size="small"
                 secondary
                 type="warning"
@@ -128,6 +144,7 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
@@ -140,6 +157,8 @@ import { reactive, ref, toRaw, useTemplateRef, watch } from 'vue'
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
 const { t } = useTranslation()
+
+const { nativeAddonsSupported } = usePlatform()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()

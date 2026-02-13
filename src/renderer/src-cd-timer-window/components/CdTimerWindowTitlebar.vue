@@ -1,5 +1,6 @@
 <template>
   <div class="titlebar">
+    <div class="mac-traffic-lights-spacer" />
     <div class="title-area">
       <span class="title">Akari Timer</span>
     </div>
@@ -32,6 +33,13 @@ const handleClose = () => {
   -webkit-app-region: drag;
 }
 
+.mac-traffic-lights-spacer {
+  width: var(--la-mac-titlebar-safe-left);
+  height: 100%;
+  flex: 0 0 var(--la-mac-titlebar-safe-left);
+  -webkit-app-region: no-drag;
+}
+
 .title-area {
   display: flex;
   align-items: center;
@@ -54,7 +62,7 @@ const handleClose = () => {
   transition: all 0.3s ease;
 
   .traffic-button {
-    display: flex;
+  display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;

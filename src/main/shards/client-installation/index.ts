@@ -1,4 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
+import { tools } from '@main/utils/addons'
 import { i18next } from '@main/i18n'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
