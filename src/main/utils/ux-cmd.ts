@@ -78,18 +78,14 @@ function runCommand(
         reject(new Error(`command failed with code ${code}: ${stderr}`))
       }
     })
-
-    child.on('rejected', (error) => {
-      console.log('an error occurred on executing command: ', error, command, args)
-      reject(error)
-    })
   })
 }
 
 const portRegex = /--app-port=([0-9]+)/
 const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
-const rsoPlatformIdRegex = /--rso_platform_id=([\w-_]+)/
+// Some clients use `--rso_platform_id`, others use `--rso-platform-id`.
+const rsoPlatformIdRegex = /--rso[_-]platform[_-]id=([\w-_]+)/i
 const regionRegex = /--region=([\w-_]+)/
 const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
 const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/

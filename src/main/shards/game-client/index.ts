@@ -309,11 +309,8 @@ export class GameClientMain implements IAkariShardInitDispose {
       })
 
       let hasError = false
-      p.on('rejected', (err) => {
-        reject(err)
-      })
-
       p.on('error', (err) => {
+        hasError = true
         reject(err)
       })
 

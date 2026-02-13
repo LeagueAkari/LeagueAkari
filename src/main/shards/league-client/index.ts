@@ -463,9 +463,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         resolve(ws)
       })
 
-      ws.on('rejected', (err) => {
+      ws.on('unexpected-response', (_req, res) => {
         clearTimeout(timer)
-        reject(err)
+        reject(new Error(`WebSocket unexpected response: ${res.statusCode} ${res.statusMessage}`))
       })
 
       ws.on('close', () => clearTimeout(timer))
