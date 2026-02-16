@@ -1,4 +1,5 @@
 import { is } from '@electron-toolkit/utils'
+import { capabilities } from '@main/utils/addons'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -128,35 +129,40 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
     this._mobx.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
-        if (shortcut) {
-          try {
-            this._keyboardShortcuts.register(
-              this.shortcutTargetId,
-              shortcut,
-              'stateful',
-              (event) => {
-                if (event.pressed) {
-                  if (is.dev || GameClientMain.isGameClientForeground()) {
-                    if (!this.state.show) {
-                      this.show()
-                    }
-
-                    this._window?.setIgnoreMouseEvents(false)
-                    this.state.setFakeShow(true)
-                  }
-                } else {
-                  this._window?.setIgnoreMouseEvents(true)
-                  this.state.setFakeShow(false)
-                }
-              }
-            )
-          } catch {
-            this._log.warn('Failed to register ongoing-game window shortcut')
-            this._setting.set('showShortcut', null)
-          }
-        } else {
+        if (!shortcut) {
           this._log.debug('Unregister ongoing-game window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
+          return
+        }
+
+        // Current global shortcut implementation requires admin on Windows.
+        const canUseShortcuts =
+          capabilities.input.hookSupported &&
+          (process.platform !== 'win32' || this._app.state.isAdministrator)
+
+        if (!canUseShortcuts) {
+          return
+        }
+
+        try {
+          this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'stateful', (event) => {
+            if (event.pressed) {
+              if (is.dev || GameClientMain.isGameClientForeground()) {
+                if (!this.state.show) {
+                  this.show()
+                }
+
+                this._window?.setIgnoreMouseEvents(false)
+                this.state.setFakeShow(true)
+              }
+            } else {
+              this._window?.setIgnoreMouseEvents(true)
+              this.state.setFakeShow(false)
+            }
+          })
+        } catch {
+          this._log.warn('Failed to register ongoing-game window shortcut')
+          this._setting.set('showShortcut', null)
         }
       },
       { fireImmediately: true }
@@ -169,11 +175,6 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
 
   override async onInit() {
     await super.onInit()
-
-    // 这个窗口仅仅在管理员权限下才会正常工作, 因为它依赖了全局钩子快捷键
-    if (!this._app.state.isAdministrator) {
-      return
-    }
 
     this._handleOngoingGameWindowLogics()
   }

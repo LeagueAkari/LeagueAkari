@@ -1638,7 +1638,7 @@ ShortcutSelector:
   unset: Unset
   tooComplicated: This shortcut combination is highly complex, please confirm
   notRunAsAdministrator: Not running as administrator, cannot use shortcut key
-  nativeGlobalShortcutsWindowsOnly: macOS/Linux builds currently do not support native global shortcuts (Windows only).
+  nativeGlobalShortcutsWindowsOnly: Native global shortcuts require native addons. This build currently ships them only on Windows.
   reservedShortcut: This shortcut combination is reserved
   beingOccupied: This shortcut combination is already in use
   unchanged: (Unchanged)
@@ -1684,7 +1684,7 @@ Client:
   gameClient:
     title: Game Client
 
-    windowsOnlyNativeAddon: Windows only (requires native addon).
+    windowsOnlyNativeAddon: Requires native addons (this build currently ships them only on Windows).
 
     terminateGameClientWithShortcut:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
@@ -2882,6 +2882,11 @@ LootTools:
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
   countup: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s used'
+  nativeInjectionUnsupported: Send-to-game is not supported in this environment (requires native input injection).
+  adminRequired: Send-to-game requires running as administrator.
+  gameNotForeground: Switch back to the game window (foreground) before sending.
+  alreadySending: Sending in progress. Please try again later.
+  sendFailed: 'Send failed: {{reason}}'
 
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{countV}})

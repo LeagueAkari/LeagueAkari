@@ -1640,7 +1640,7 @@ ShortcutSelector:
   unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认
   notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
-  nativeGlobalShortcutsWindowsOnly: macOS/Linux 版本暂不支持原生全局快捷键（仅 Windows）。
+  nativeGlobalShortcutsWindowsOnly: 原生全局快捷键需要原生插件。本构建目前仅在 Windows 提供。
   ok: 确认
   cancel: 取消
   select: 选择
@@ -1683,7 +1683,7 @@ Client:
   gameClient:
     title: 游戏端
 
-    windowsOnlyNativeAddon: 仅支持 Windows（需要原生插件）。
+    windowsOnlyNativeAddon: 需要原生插件（本构建目前仅在 Windows 提供）。
 
     terminateGameClientWithShortcut:
       labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
@@ -2882,6 +2882,11 @@ LootTools:
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
   countup: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时已使用'
+  nativeInjectionUnsupported: 当前环境不支持发送到游戏（需要原生插件的输入注入能力）。
+  adminRequired: 需要以管理员权限运行才能发送到游戏。
+  gameNotForeground: 请先切回到游戏窗口（前台）再发送。
+  alreadySending: 正在发送中，请稍后再试。
+  sendFailed: '发送失败：{{reason}}'
 
 BackgroundTasks:
   taskTitle: 正在进行 ({{countV}})

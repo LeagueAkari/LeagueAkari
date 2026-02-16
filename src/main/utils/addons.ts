@@ -4,12 +4,10 @@ import { EventEmitter } from 'node:events'
 type NativeAddons = typeof import('@leagueakari/league-akari-addons')
 
 function tryLoadNativeAddons(): NativeAddons | null {
-  if (process.platform !== 'win32') {
-    return null
-  }
-
   try {
-    // Keep this require win-only to avoid loading win64 .node on non-Windows.
+    // Note: older versions of @leagueakari/league-akari-addons only ship win64 .node.
+    // We still try to load it on every platform to allow future multi-platform builds,
+    // and rely on try/catch to prevent startup crashes on unsupported platforms.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require('@leagueakari/league-akari-addons') as NativeAddons
   } catch {
@@ -20,6 +18,27 @@ function tryLoadNativeAddons(): NativeAddons | null {
 const native = tryLoadNativeAddons()
 const nativeTools: any = native?.tools
 const nativeInput: any = native?.input
+
+export const capabilities = {
+  nativeLoaded: Boolean(native),
+  tools: {
+    nativeLoaded: Boolean(nativeTools),
+    foregroundSupported: typeof nativeTools?.isProcessForeground === 'function',
+    windowPlacementSupported: typeof nativeTools?.getLeagueClientWindowPlacementInfo === 'function',
+    fixWindowMethodASupported: typeof nativeTools?.fixWindowMethodA === 'function'
+  },
+  input: {
+    nativeLoaded: Boolean(nativeInput),
+    hookSupported:
+      typeof nativeInput?.instance?.install === 'function' &&
+      typeof nativeInput?.instance?.on === 'function' &&
+      typeof nativeInput?.instance?.uninstall === 'function',
+    injectSupported:
+      typeof nativeInput?.instance?.sendKey === 'function' &&
+      (typeof nativeInput?.instance?.sendString === 'function' ||
+        typeof nativeInput?.instance?.sendText === 'function')
+  }
+}
 
 function uniq(nums: number[]) {
   return Array.from(new Set(nums))

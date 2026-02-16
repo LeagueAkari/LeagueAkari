@@ -1,4 +1,4 @@
-import { input } from '@main/utils/addons'
+import { capabilities, input } from '@main/utils/addons'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -117,22 +117,32 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     this._mobx.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
-        if (shortcut) {
-          try {
-            this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'normal', () => {
-              if (this.state.show) {
-                this.hide()
-              } else {
-                this.show()
-              }
-            })
-          } catch {
-            this._log.warn('Failed to register cd-timer window shortcut')
-            this._setting.set('showShortcut', null)
-          }
-        } else {
+        if (!shortcut) {
           this._log.debug('Unregister cd-timer window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
+          return
+        }
+
+        // Current global shortcut implementation requires admin on Windows.
+        const canUseShortcuts =
+          capabilities.input.hookSupported &&
+          (process.platform !== 'win32' || this._app.state.isAdministrator)
+
+        if (!canUseShortcuts) {
+          return
+        }
+
+        try {
+          this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'normal', () => {
+            if (this.state.show) {
+              this.hide()
+            } else {
+              this.show()
+            }
+          })
+        } catch {
+          this._log.warn('Failed to register cd-timer window shortcut')
+          this._setting.set('showShortcut', null)
         }
       },
       { fireImmediately: true }
@@ -197,17 +207,32 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   private _handleIpcCall() {
     let isSending = false
     this._ipc.onCall(this._namespace, 'sendInGame', async (_, text: string) => {
-      if (!isSending && GameClientMain.isGameClientForeground()) {
-        isSending = true
+      if (isSending) {
+        throw new AkariIpcError('cd-timer is sending', 'AlreadySending')
+      }
+
+      if (!GameClientMain.isGameClientForeground()) {
+        throw new AkariIpcError('game client is not foreground', 'GameClientNotForeground')
+      }
+
+      const trimmed = typeof text === 'string' ? text.trim() : ''
+      if (!trimmed) return
+
+      isSending = true
+      try {
         await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
         await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await input.instance.sendString(text)
+        await input.instance.sendString(trimmed)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
         await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
         await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+      } catch (error) {
+        this._log.warn('sendInGame failed', error)
+        throw error
+      } finally {
         isSending = false
       }
     })
@@ -226,12 +251,14 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   override async onInit() {
     await super.onInit()
 
-    // 出于稳定性考虑, 仍要求管理员权限
-    if (!this._app.state.isAdministrator) {
-      return
+    // sendInGame 依赖原生输入注入；当前 Windows 实现要求管理员权限。
+    const canUseInjection =
+      capabilities.input.injectSupported &&
+      (process.platform !== 'win32' || this._app.state.isAdministrator)
+    if (canUseInjection) {
+      this._handleIpcCall()
     }
 
-    this._handleIpcCall()
     this._handleCdTimerWindowLogics()
   }
 

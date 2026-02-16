@@ -71,24 +71,24 @@
       </div>
     </NModal>
 
-    <NPopover :disabled="as.isAdministrator && nativeAddonsSupported">
+    <NPopover :disabled="globalShortcutsSupported">
       <template #trigger>
         <NButton
           size="tiny"
-          :disabled="!as.isAdministrator || !nativeAddonsSupported"
+          :disabled="!globalShortcutsSupported"
           type="primary"
           @click="() => {
-            if (!as.isAdministrator || !nativeAddonsSupported) return
+            if (!globalShortcutsSupported) return
             show = true
           }"
         >
           {{ t('ShortcutSelector.select') }}
         </NButton>
       </template>
-      <template v-if="!nativeAddonsSupported">
+      <template v-if="!nativeInputHookSupported">
         {{ t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly') }}
       </template>
-      <template v-else>
+      <template v-else-if="isWindows && !as.isAdministrator">
         {{ t('ShortcutSelector.notRunAsAdministrator') }}
       </template>
     </NPopover>
@@ -128,7 +128,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 
-const { nativeAddonsSupported } = usePlatform()
+const { globalShortcutsSupported, isWindows, nativeInputHookSupported } = usePlatform()
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
 

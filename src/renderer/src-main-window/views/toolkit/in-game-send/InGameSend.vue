@@ -3,7 +3,7 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NAlert
-          v-if="!nativeAddonsSupported"
+          v-if="!nativeInputHookSupported"
           type="warning"
           class="mb-2"
           :title="t('windowsOnly.title')"
@@ -11,7 +11,7 @@
           {{ t('windowsOnly.description') }}
         </NAlert>
 
-        <template v-if="nativeAddonsSupported">
+        <template v-if="nativeInputHookSupported">
           <SendableItemEdit />
           <TemplateEdit style="margin-top: 8px" />
         <NCard size="small" style="margin-top: 8px">
@@ -74,7 +74,7 @@ import TemplateEdit from './TemplateEdit.vue'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend' })
 
-const { nativeAddonsSupported } = usePlatform()
+const { nativeInputHookSupported } = usePlatform()
 
 const as = useAppCommonStore()
 const igs = useInGameSendStore()

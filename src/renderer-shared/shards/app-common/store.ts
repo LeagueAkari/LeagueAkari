@@ -47,6 +47,14 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
   const isRunInTempDir = ref(false)
+  const nativeAddons = shallowReactive({
+    nativeLoaded: false,
+    inputHookSupported: false,
+    inputInjectSupported: false,
+    toolsForegroundSupported: false,
+    toolsWindowPlacementSupported: false,
+    toolsFixWindowMethodASupported: false
+  })
 
   /* for fun only */
   const tempAkariSubscriptionInfo = shallowRef({
@@ -76,6 +84,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     startupDeepLink,
     isRunInTempDir,
     colorTheme,
+    nativeAddons,
 
     tempAkariSubscriptionInfo
   }

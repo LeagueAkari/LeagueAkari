@@ -1,5 +1,7 @@
 import { computed } from 'vue'
 
+import { useAppCommonStore } from '../shards/app-common/store'
+
 type Platform = 'win32' | 'darwin' | 'linux' | 'unknown'
 
 function readPlatformFromDom(): Platform {
@@ -16,13 +18,38 @@ export function usePlatform() {
   const isWindows = computed(() => platform.value === 'win32')
   const isMacOS = computed(() => platform.value === 'darwin')
 
-  // Native addons (input hook/window placement) are currently only shipped for Windows.
-  const nativeAddonsSupported = computed(() => isWindows.value)
+  const as = useAppCommonStore()
+
+  const nativeAddonsSupported = computed(() => as.nativeAddons.nativeLoaded)
+  const nativeInputHookSupported = computed(() => as.nativeAddons.inputHookSupported)
+  const nativeInputInjectSupported = computed(() => as.nativeAddons.inputInjectSupported)
+  const toolsForegroundSupported = computed(() => as.nativeAddons.toolsForegroundSupported)
+  const toolsWindowPlacementSupported = computed(() => as.nativeAddons.toolsWindowPlacementSupported)
+  const toolsFixWindowMethodASupported = computed(
+    () => as.nativeAddons.toolsFixWindowMethodASupported
+  )
+
+  const globalShortcutsSupported = computed(() => {
+    // Current implementation requires admin on Windows; non-Windows relies on native hook capability.
+    return nativeInputHookSupported.value && (!isWindows.value || as.isAdministrator)
+  })
+
+  const inGameInputInjectionSupported = computed(() => {
+    // sendKey/sendString is only wired when native input inject is available.
+    return nativeInputInjectSupported.value && (!isWindows.value || as.isAdministrator)
+  })
 
   return {
     platform,
     isWindows,
     isMacOS,
-    nativeAddonsSupported
+    nativeAddonsSupported,
+    nativeInputHookSupported,
+    nativeInputInjectSupported,
+    toolsForegroundSupported,
+    toolsWindowPlacementSupported,
+    toolsFixWindowMethodASupported,
+    globalShortcutsSupported,
+    inGameInputInjectionSupported
   }
 }
