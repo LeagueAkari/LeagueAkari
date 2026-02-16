@@ -1212,6 +1212,7 @@ MatchCard:
     plateLane: '{{lane}} 防御塔镀层'
     plate: 防御塔镀层
     filters: 筛选
+    filterByChampion: 按英雄筛选
     plateStats: 防御塔镀层统计
     plateCount: '{{count}} 层'
     viewVictimDamageDetails: 伤害明细

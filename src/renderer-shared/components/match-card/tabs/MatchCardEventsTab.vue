@@ -10,7 +10,7 @@
               :time="formatDuration(firstAndEndTime.firstTime)"
             />
 
-            <template v-for="e of events">
+            <template v-for="e of filteredEvents">
               <NTimelineItem
                 v-if="e.type === 'CHAMPION_KILL' && selectedFilters.includes('CHAMPION_KILL')"
                 type="success"
@@ -201,6 +201,31 @@
           </NCheckboxGroup>
         </div>
 
+        <div class="h-px bg-black/10 dark:bg-white/10"></div>
+
+        <!-- 按英雄筛选 -->
+        <div class="flex w-full flex-col gap-2">
+          <div class="text-xs font-semibold text-black/60 dark:text-white/60">
+            {{ t('MatchCard.eventsTab.filterByChampion') }}
+          </div>
+          <NCheckboxGroup v-model:value="selectedChampionIds">
+            <div class="flex flex-col gap-1.5">
+              <NCheckbox
+                v-for="opt of championFilterOptions"
+                :key="opt.championId"
+                :value="opt.championId"
+              >
+                <template #default>
+                  <div class="flex items-center gap-1.5">
+                    <ChampionIcon :champion-id="opt.championId" class="size-4 rounded" />
+                    <span class="text-sm">{{ opt.label }}</span>
+                  </div>
+                </template>
+              </NCheckbox>
+            </div>
+          </NCheckboxGroup>
+        </div>
+
         <!-- 展示防御塔镀层每人数量 -->
         <template v-if="platesTakeParticipants">
           <div class="h-px bg-black/10 dark:bg-white/10"></div>
@@ -298,6 +323,9 @@ const selectedFilters = ref<(typeof SUPPORTED_EVENT_TYPES)[number][]>([
   'BUILDING_KILL'
 ])
 
+/** 按英雄筛选：为空表示不过滤，否则只显示与所选英雄相关的事件 */
+const selectedChampionIds = ref<number[]>([])
+
 const formatDuration = (timestamp: number) => {
   if (timestamp > 60 * 60 * 1000) {
     return dayjs.duration(timestamp).format('HH:mm:ss:SSS')
@@ -320,6 +348,46 @@ const eventTypes = computed(() => {
 
 const events = computed(() => {
   return frames.value.map((frame) => frame.events).flat()
+})
+
+/** 获取事件涉及的 participantId 列表（击杀者、助攻、被击杀者等） */
+function getEventParticipantIds(e: (typeof events.value)[number]): number[] {
+  const ids: number[] = []
+  if ('killerId' in e && e.killerId) ids.push(e.killerId)
+  if ('victimId' in e && e.victimId) ids.push(e.victimId)
+  if ('assistingParticipantIds' in e && Array.isArray(e.assistingParticipantIds)) {
+    ids.push(...e.assistingParticipantIds)
+  }
+  return ids
+}
+
+const filteredEvents = computed(() => {
+  const championIds = selectedChampionIds.value
+  if (championIds.length === 0) return events.value
+  const map = participantMap.value
+  return events.value.filter((e) => {
+    const pids = getEventParticipantIds(e)
+    const involvedChampionIds = pids
+      .map((pid) => map[pid]?.championId)
+      .filter((id): id is number => id != null)
+    return involvedChampionIds.some((cid) => championIds.includes(cid))
+  })
+})
+
+/** 本局出现的英雄列表（按 championId 去重），用于按英雄筛选 */
+const championFilterOptions = computed(() => {
+  const seen = new Set<number>()
+  return participants.value
+    .filter((p) => {
+      if (seen.has(p.championId)) return false
+      seen.add(p.championId)
+      return true
+    })
+    .map((p) => ({
+      championId: p.championId,
+      label: lcs.gameData.championName(p.championId)
+    }))
+    .toSorted((a, b) => a.label.localeCompare(b.label))
 })
 
 const platesTakeParticipants = computed(() => {
