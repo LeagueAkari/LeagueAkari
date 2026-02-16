@@ -17,7 +17,6 @@ import { PlayerChallenge } from '@shared/types/sgp/challenges-client'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
-import { useChallengesPlayerData } from '../data/challenges'
 import {
   CHALLENGES_CHAMPIONS_ID,
   CHALLENGES_CHAMPION_SKINS_ID,
@@ -25,7 +24,8 @@ import {
   CHALLENGES_EMOTES_ID,
   CHALLENGES_SUMMONER_ICONS_ID,
   CHALLENGES_WARD_SKINS_ID
-} from '../data/constants'
+} from '../constants'
+import { useChallengesPlayerData } from '../data/challenges'
 
 const { t } = useTranslation()
 

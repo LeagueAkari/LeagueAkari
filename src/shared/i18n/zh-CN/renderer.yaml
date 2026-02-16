@@ -2437,7 +2437,7 @@ PlayerInfoCard:
 TeamTagsArea:
   winRateTeam: 胜率队
   loseRateTeam: 败率队
-  premade: '{{countV}} 黑'
+  premade: '{{size}} 黑'
   winRate: 胜率 {{rate}}%
   kda: KDA {{kda}}
 

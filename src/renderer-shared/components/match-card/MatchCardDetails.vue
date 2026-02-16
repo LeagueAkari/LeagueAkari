@@ -73,11 +73,18 @@ import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
 import MatchCardRunesTab from './tabs/MatchCardRunesTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
 import MatchCardTimelineTab from './tabs/timeline/MatchCardTimelineTab.vue'
-import { useCardBorderTheme } from './utils/theme'
+import { useCardBorderClasses } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
-const { basicInfo, teams, participants, puuid, replayState, onLoadReplay, onWatchReplay } =
-  useMatchCard()
+const {
+  basicInfo,
+  teams,
+  participants,
+  puuid,
+  replayState,
+  loadReplay: onLoadReplay,
+  watchReplay: onWatchReplay
+} = useMatchCard()
 const { t } = useTranslation()
 
 const selfStats = computed(() => {
@@ -155,7 +162,7 @@ const replayButtonTitle = computed(() => {
   }
 })
 
-const cardBorderClasses = useCardBorderTheme()
+const cardBorderClasses = useCardBorderClasses()
 </script>
 
 <style scoped>

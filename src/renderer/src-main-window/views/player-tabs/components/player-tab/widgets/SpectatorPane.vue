@@ -242,7 +242,7 @@ import {
   PREMADE_TEAMS,
   PREMADE_TEAM_COLORS,
   PREMADE_TEAM_COLORS_LIGHT
-} from '@renderer-shared/components/ongoing-game/utils'
+} from '@renderer-shared/components/ongoing-game-panel/constants'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'

@@ -1,50 +1,59 @@
 <template>
-  <div class="team-tags">
-    <template v-if="analysis">
+  <div class="flex items-end">
+    <template v-if="teamStats">
       <NPopover>
         <template #trigger>
           <div
-            class="normal-text win-rate"
-            :class="{
-              'gte-50': analysis.team.avgWinRate >= 0.5,
-              'lt-50': analysis.team.avgWinRate < 0.5
-            }"
+            class="text-sm font-bold"
+            :class="
+              teamStats.avgWinRate >= 0.5
+                ? WIN_RATE_GTE_50_TEXT_CLASSES
+                : WIN_RATE_LT_50_TEXT_CLASSES
+            "
           >
-            {{ (analysis.team.avgWinRate * 100).toFixed() }}%
+            {{ (teamStats.avgWinRate * 100).toFixed() }}%
           </div>
         </template>
         {{
           t('TeamTagsArea.winRate', {
-            rate: (analysis.team.avgWinRate * 100).toFixed(2)
+            rate: (teamStats.avgWinRate * 100).toFixed(2)
           })
         }}
-        ({{ analysis.team.wins.toLocaleString() }} / {{ analysis.team.games.toLocaleString() }})
+        ({{ teamStats.wins.toLocaleString() }} / {{ teamStats.games.toLocaleString() }})
       </NPopover>
-      <div class="divider"></div>
+
+      <div class="mx-2 box-border h-[0.9em] w-px self-center bg-black/15 dark:bg-white/15"></div>
+
       <NPopover>
         <template #trigger>
-          <div class="normal-text">
-            {{ analysis.team.avgKda.toFixed(2) }}
+          <div class="text-sm">
+            {{ teamStats.avgKda.toFixed(2) }}
           </div>
         </template>
         {{
           t('TeamTagsArea.kda', {
-            kda: analysis.team.avgKda.toFixed(4)
+            kda: teamStats.avgKda.toFixed(4)
           })
         }}
-        (K {{ analysis.team.kills.toLocaleString() }} / D
-        {{ analysis.team.deaths.toLocaleString() }} / A
-        {{ analysis.team.assists.toLocaleString() }})
+        (K {{ teamStats.kills.toLocaleString() }} / D {{ teamStats.deaths.toLocaleString() }} / A
+        {{ teamStats.assists.toLocaleString() }})
       </NPopover>
     </template>
-    <div class="divider" v-if="hasTags"></div>
-    <div class="tags-container">
-      <NPopover v-for="p of teamPremadeTeams">
+
+    <!-- 左右两边都有时给个分界线 -->
+    <div
+      v-if="teamStats && hasTags"
+      class="mx-2 box-border h-[0.9em] w-px self-center bg-black/15 dark:bg-white/15"
+    />
+
+    <div class="flex gap-2">
+      <NPopover v-for="p of teamPremadeTeams" :key="p.premadeId">
         <template #trigger>
+          <!-- 胜率队 / 败率队的特殊样式 -->
           <template v-if="p.winRateTeamInfo">
-            <div class="combined-tag">
+            <div class="flex items-center overflow-hidden rounded-sm">
               <div
-                class="tag"
+                class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
                 :style="{
                   backgroundColor: p.premadeId
                     ? premadeColors[p.premadeId]?.foregroundColor
@@ -54,21 +63,30 @@
               >
                 {{
                   t('TeamTagsArea.premade', {
-                    countV: p.players.length
+                    countV: p.puuids.length
                   })
                 }}
               </div>
-              <div class="tag win-rate-team" v-if="p.winRateTeamInfo.type === 'win-rate-team'">
+              <div
+                v-if="p.winRateTeamInfo.type === 'win-rate-team'"
+                class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
+                :class="WIN_RATE_TEAM_TAG_BG_CLASSES"
+              >
                 {{ t('TeamTagsArea.winRateTeam') }}
               </div>
-              <div class="tag lose-rate-team" v-else>
+              <div
+                v-else
+                class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
+                :class="LOSE_RATE_TEAM_TAG_BG_CLASSES"
+              >
                 {{ t('TeamTagsArea.loseRateTeam') }}
               </div>
             </div>
           </template>
+
           <template v-else>
             <div
-              class="tag"
+              class="rounded-sm px-1 py-0.5 text-xs leading-3 text-white"
               :style="{
                 backgroundColor: p.premadeId
                   ? premadeColors[p.premadeId]?.foregroundColor
@@ -78,13 +96,14 @@
             >
               {{
                 t('TeamTagsArea.premade', {
-                  countV: p.players.length
+                  size: p.puuids.length
                 })
               }}
             </div>
           </template>
         </template>
-        <TinyPlayerChampionList :list="p.players" @to-summoner="emits('toSummoner', $event)" />
+
+        <TinyPlayerChampionList :puuids="p.puuids" />
       </NPopover>
     </div>
   </div>
@@ -92,54 +111,54 @@
 
 <script setup lang="ts">
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
-import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../../utils'
+import {
+  LOSE_RATE_TEAM_MAX_WIN_RATE,
+  LOST_RATE_TEAM_MIN_SIZE,
+  PREMADE_TEAM_COLORS,
+  PREMADE_TEAM_COLORS_LIGHT,
+  WIN_RATE_TEAM_MIN_MATCHES,
+  WIN_RATE_TEAM_MIN_SIZE,
+  WIN_RATE_TEAM_MIN_WIN_RATE,
+  WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK
+} from '../constants'
+import { useOngoingGamePanel } from '../context'
+import {
+  LOSE_RATE_TEAM_TAG_BG_CLASSES,
+  WIN_RATE_GTE_50_TEXT_CLASSES,
+  WIN_RATE_LT_50_TEXT_CLASSES,
+  WIN_RATE_TEAM_TAG_BG_CLASSES
+} from '../utils/theme'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
-const WIN_RATE_TEAM_MIN_MATCHES = 13
-const WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK = 4
-const WIN_RATE_TEAM_MIN_SIZE = 3
-const LOST_RATE_TEAM_MIN_SIZE = 2
-const WIN_RATE_TEAM_MIN_WIN_RATE = 0.9
-const LOSE_RATE_TEAM_MAX_WIN_RATE = 0.25
-
-const {
-  analysis,
-  premadeInfo,
-  championSelections = {},
-  summoners = {}
-} = defineProps<{
-  sideId: string
-  analysis?: {
-    players: Record<string, MatchHistoryGamesAnalysisAll>
-    team: MatchHistoryGamesAnalysisTeamSide
-  }
-  premadeInfo?: {
-    groups: Record<string, string[]>
-    premadeTeamIdMap: Record<string, string>
-  }
-  summoners?: Record<string, SummonerInfo>
-  championSelections?: Record<string, number>
-}>()
-
-const emits = defineEmits<{
-  toSummoner: [puuid: string]
+const { teamIdentifier } = defineProps<{
+  teamIdentifier: string
 }>()
 
 interface WinRateTeamInfo {
   premadeId: string
   players: string[]
-  type: 'win-rate-team' | 'lose-rate-team'
+  type: 'win-rate-team' | 'loss-rate-team'
 }
 
 const { t } = useTranslation()
+
 const as = useAppCommonStore()
+const ogs = useOngoingGameStore()
+
+const { premadeTeamInfo } = useOngoingGamePanel()
+
+const teamStats = computed(() => {
+  if (!ogs.playerStats) {
+    return null
+  }
+
+  return ogs.playerStats.teams[teamIdentifier] ?? null
+})
 
 const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
@@ -153,13 +172,15 @@ const premadeColors = computed(() => {
 // 1. 2 人以上的预组队队伍
 // 2. 玩家胜率均低于特定值
 const winRateTeams = computed(() => {
-  if (!analysis || !premadeInfo) {
+  if (!ogs.playerStats || !premadeTeamInfo.value) {
     return {}
   }
 
+  const playerStats = ogs.playerStats.players
+
   const result: WinRateTeamInfo[] = []
 
-  Object.entries(premadeInfo.groups).forEach(([premadeId, players]) => {
+  Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, players]) => {
     if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length < LOST_RATE_TEAM_MIN_SIZE) {
       return
     }
@@ -168,7 +189,7 @@ const winRateTeams = computed(() => {
     let otherMembersWinTotalStreak = 0
 
     for (const p of players) {
-      const a = analysis.players[p]
+      const a = playerStats[p]
 
       if (!a) {
         break
@@ -199,7 +220,7 @@ const winRateTeams = computed(() => {
     let loseRateTeamQualified = true
 
     for (const p of players) {
-      const a = analysis.players[p]
+      const a = playerStats[p]
 
       if (!a) {
         loseRateTeamQualified = false
@@ -222,7 +243,7 @@ const winRateTeams = computed(() => {
       result.push({
         premadeId,
         players,
-        type: 'lose-rate-team'
+        type: 'loss-rate-team'
       })
     }
   })
@@ -237,27 +258,20 @@ const winRateTeams = computed(() => {
 })
 
 const teamPremadeTeams = computed(() => {
-  if (!premadeInfo) {
+  if (!premadeTeamInfo.value) {
     return []
   }
 
-  return Object.entries(premadeInfo.groups)
-    .map(([premadeId, players]) => {
+  return Object.entries(premadeTeamInfo.value.groups)
+    .map(([premadeId, puuids]) => {
       return {
         premadeId,
         winRateTeamInfo: winRateTeams.value[premadeId],
-        players: players.map((p) => {
-          return {
-            puuid: p,
-            championId: championSelections[p] || -1,
-            gameName: summoners[p]?.gameName,
-            tagLine: summoners[p]?.tagLine
-          }
-        })
+        puuids
       }
     })
     .toSorted((a, b) => {
-      return a.players.length - b.players.length
+      return a.puuids.length - b.puuids.length
     })
 })
 
@@ -265,86 +279,3 @@ const hasTags = computed(() => {
   return teamPremadeTeams.value.length > 0
 })
 </script>
-
-<style scoped>
-.team-tags {
-  display: flex;
-  align-items: flex-end;
-}
-
-.tags-container {
-  display: flex;
-  gap: 8px;
-}
-
-.combined-tag {
-  display: flex;
-  align-items: center;
-  border-radius: 2px;
-  overflow: hidden;
-
-  .tag {
-    border-radius: 0px;
-  }
-}
-
-.tag {
-  font-size: 12px;
-  line-height: 12px;
-  color: #ffffff;
-  padding: 2px 4px;
-  border-radius: 2px;
-
-  &.win-rate-team {
-    background-color: #7e2c85;
-  }
-
-  &.lose-rate-team {
-    background-color: #893b3b;
-  }
-}
-
-.normal-text {
-  font-size: 14px;
-}
-
-.win-rate {
-  font-weight: bold;
-}
-
-.divider {
-  width: 1px;
-  height: 0.9em;
-  box-sizing: border-box;
-  margin: 0 8px;
-  align-self: center;
-}
-
-[data-theme='dark'] {
-  .win-rate.gte-50 {
-    color: #4cc69d;
-  }
-
-  .win-rate.lt-50 {
-    color: #ff6161;
-  }
-
-  .divider {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-}
-
-[data-theme='light'] {
-  .win-rate.gte-50 {
-    color: rgb(44, 140, 108);
-  }
-
-  .win-rate.lt-50 {
-    color: rgb(204, 0, 0);
-  }
-
-  .divider {
-    background-color: rgba(0, 0, 0, 0.15);
-  }
-}
-</style>

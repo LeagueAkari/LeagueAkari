@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useWinResultTabSwitchTheme } from '../utils/theme'
+import { useWinResultTabSwitchClasses } from '../utils/theme'
 
 const { tabs = [], winResult } = defineProps<{
   tabs?: {
@@ -29,7 +29,7 @@ const handleTabClick = (tab: number | string) => {
   selectedTab.value = tab
 }
 
-const tabClass = useWinResultTabSwitchTheme(() => winResult)
+const tabClass = useWinResultTabSwitchClasses(() => winResult)
 </script>
 
 <style scoped></style>

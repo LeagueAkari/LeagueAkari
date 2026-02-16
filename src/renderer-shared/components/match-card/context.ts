@@ -35,10 +35,10 @@ export type MatchCardContext = {
   team: Readonly<Ref<ReturnType<typeof toTeams>['teamStatMap'][string] | null>>
 
   // events
-  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
-  onLoadReplay: (gameId: number) => void
-  onWatchReplay: (gameId: number) => void
-  onLoadDetails: (gameId: number) => void
+  navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
+  loadReplay: (gameId: number) => void
+  watchReplay: (gameId: number) => void
+  loadDetails: (gameId: number) => void
 }
 
 export const MatchCardContextKey: InjectionKey<MatchCardContext> = Symbol('MatchCardContext')
@@ -63,10 +63,10 @@ export function provideMatchCard(props: {
   loadingDetails: MaybeRefOrGetter<boolean>
   replayState: MaybeRefOrGetter<ReplayDownloadProgress | null>
 
-  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
-  onLoadReplay: (gameId: number) => void
-  onWatchReplay: (gameId: number) => void
-  onLoadDetails: (gameId: number) => void
+  navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
+  loadReplay: (gameId: number) => void
+  watchReplay: (gameId: number) => void
+  loadDetails: (gameId: number) => void
 }) {
   const basicInfo = computed(() => toBasicInfo(toValue(props.summary)))
   const participants = computed(() => toParticipants(toValue(props.summary), basicInfo.value))
@@ -110,9 +110,9 @@ export function provideMatchCard(props: {
     team,
 
     // events
-    onNavigateToSummonerByPuuid: props.onNavigateToSummonerByPuuid,
-    onLoadReplay: props.onLoadReplay,
-    onWatchReplay: props.onWatchReplay,
-    onLoadDetails: props.onLoadDetails
+    navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,
+    loadReplay: props.loadReplay,
+    watchReplay: props.watchReplay,
+    loadDetails: props.loadDetails
   })
 }

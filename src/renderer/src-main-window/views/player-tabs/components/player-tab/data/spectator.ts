@@ -24,7 +24,7 @@ import {
   watch
 } from 'vue'
 
-import { UPDATE_SPECTATOR_DATA_INTERVAL } from './constants'
+import { UPDATE_SPECTATOR_DATA_INTERVAL } from '../constants'
 
 export type SpectatorContext = {
   spectatorData: Readonly<Ref<SpectatorData | null>>

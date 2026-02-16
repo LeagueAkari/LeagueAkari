@@ -116,7 +116,7 @@ const {
   teams,
   theme,
   loadingDetails,
-  onLoadDetails,
+  loadDetails: onLoadDetails,
   hidePrivacy
 } = useMatchCard()
 

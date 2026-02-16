@@ -24,7 +24,7 @@ import { MaybeRefOrGetter } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import { ENCOUNTERED_GAMES_PAGE_SIZE } from './constants'
+import { ENCOUNTERED_GAMES_PAGE_SIZE } from '../constants'
 
 export type EncounteredGameContext = {
   pagedGames: Readonly<Ref<PagedEncounteredGames | null>>

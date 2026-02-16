@@ -1,13 +1,7 @@
 <template>
   <div
     :class="[
-      'relative box-border flex flex-col overflow-hidden rounded border border-neutral-900/20 bg-neutral-100/90 p-2 transition-[filter] dark:border-white/10 dark:bg-neutral-900/90',
-      currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId !== premadeTeamId
-        ? 'brightness-30'
-        : '',
-      currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
-        ? 'brightness-100'
-        : ''
+      'relative box-border flex flex-col overflow-hidden rounded border border-neutral-900/20 bg-neutral-100/90 p-2 transition-[filter] dark:border-white/10 dark:bg-neutral-900/90'
     ]"
     :style="{
       width: FIXED_CARD_WIDTH_PX_LITERAL,
@@ -29,7 +23,7 @@
           round
           ring
           ring-color="rgba(255, 255, 255, 0.31)"
-          class="h-[42px] w-[42px]"
+          class="size-[42px]"
         />
         <div
           v-if="summoner"
@@ -44,8 +38,7 @@
         <!-- name -->
         <div
           class="cursor-pointer transition-[filter] hover:brightness-125"
-          @click="() => emits('toSummoner', puuid)"
-          ref="premade-title-el"
+          @click="() => navigateToSummonerByPuuid(puuid)"
         >
           <NPopover
             :keep-alive-on-hover="false"
@@ -343,19 +336,7 @@
     </div>
 
     <!-- tags -->
-    <PlayerCardTagsArea
-      :analysis="analysis"
-      :puuid="puuid"
-      :is-self="isSelf"
-      :premade-team-id="premadeTeamId"
-      :current-highlighting-premade-team-id="currentHighlightingPremadeTeamId"
-      :saved-info="savedInfo"
-      :summoner="summoner"
-      @show-game="(game, puuid) => emits('showGame', game, puuid)"
-      @show-game-by-id="(gameId, puuid) => emits('showGameById', gameId, puuid)"
-      @highlight="(premadeTeamId, hovering) => emits('highlight', premadeTeamId, hovering)"
-      @to-summoner="emits('toSummoner', $event)"
-    />
+    <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
 
     <!-- champion usage -->
     <div v-if="championUsage.length" class="mb-1 flex w-full gap-1">
@@ -443,7 +424,7 @@
               getMatchItemThemeClasses(item).bg
             ]"
             :key="item.gameId"
-            @click="emits('showGame', item.game, puuid)"
+            @click="previewGame(item.game, puuid)"
           >
             <div
               class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
@@ -479,7 +460,7 @@
 
       <!-- loading -->
       <div
-        v-if="matchHistoryLoading === 'loading'"
+        v-if="matchHistoryLoadingState === 'loading'"
         class="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center gap-1 rounded text-xs text-black/60 dark:bg-white/5 dark:text-white/60"
       >
         <div class="flex items-center gap-1">
@@ -490,13 +471,13 @@
 
       <!-- error -->
       <div
-        v-else-if="matchHistoryLoading === 'error'"
+        v-else-if="matchHistoryLoadingState === 'error'"
         class="absolute inset-0 flex h-full w-full items-center justify-center gap-1 rounded text-xs text-orange-600 dark:bg-white/5 dark:text-orange-300"
       >
         <div class="flex flex-col items-center gap-2">
           <div>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</div>
 
-          <NButton size="tiny" @click="emits('reload', puuid)">
+          <NButton size="tiny" @click="og.reloadPlayer(puuid)">
             {{ t('PlayerInfoCard.reloadMatchHistory') }}
           </NButton>
         </div>
@@ -520,102 +501,58 @@ import PositionIcon from '@renderer-shared/components/icons/position-icons/Posit
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
-import { Mastery } from '@shared/types/league-client/champion-mastery'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { QueryStage } from '@shared/types/shards/ongoing-game'
-import { SavedInfo } from '@shared/types/shards/saved-player'
 import { ParsedRole } from '@shared/utils/ranked'
 import { StarRound as StarRoundIcon } from '@vicons/material'
-import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NPopover, NSpin, NVirtualList } from 'naive-ui'
-import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
+import { computed } from 'vue'
 
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
   PREMADE_TEAM_COLORS_LIGHT,
-  RANKED_MEDAL_MAP
-} from '../utils'
-import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
+  RANKED_MEDAL_MAP,
+  STARED_CHAMPION_LEVEL
+} from '../constants'
+import { useOngoingGamePanel } from '../context'
+import PlayerCardTagsArea from './PlayerCardTagsArea.vue'
 
-const {
-  puuid,
-  analysis,
-  matchHistory,
-  position,
-  premadeTeamId,
-  summoner,
-  rankedStats,
-  savedInfo,
-  championMastery,
-  queueType
-} = defineProps<{
+const { puuid } = defineProps<{
   puuid: string
-  championId?: number
-  isSelf?: boolean
-  premadeTeamId?: string
-  currentHighlightingPremadeTeamId?: string | null
-  team?: string
-  queueType?: string
-  kdaIqr?: 'below' | 'over' | null
-  position?: {
-    position: string
-    role: ParsedRole | null
-  }
-  summoner?: SummonerInfo
-  rankedStats?: RankedStats
-  championMastery?: Record<number, Mastery>
-  matchHistory?: LcuOrSgpGameSummary[]
-  matchHistoryLoading?: string
-  analysis?: MatchHistoryGamesAnalysisAll
-  savedInfo?: SavedInfo
-  queryStage: QueryStage
-}>()
-
-const emits = defineEmits<{
-  toSummoner: [puuid: string]
-  showGame: [game: LcuOrSgpGameSummary, puuid: string]
-  showGameById: [gameId: number, puuid: string]
-  showSavedInfo: [puuid: string]
-  highlight: [premadeTeamId: string, boolean]
-  reload: [puuid: string]
 }>()
 
 const { t } = useTranslation()
 
-const STARED_CHAMPION_LEVEL = 60
-
-const ogs = useOngoingGameStore()
-
-const premadeTitleElHovering = useElementHover(useTemplateRef('premade-title-el'))
-watch(
-  () => premadeTitleElHovering.value,
-  (hovering) => {
-    if (premadeTeamId) {
-      emits('highlight', premadeTeamId, hovering)
-    }
-  }
-)
-
-// 以防路由时高亮状态未清除
-onDeactivated(() => {
-  if (premadeTeamId) {
-    emits('highlight', premadeTeamId, false)
-  }
-})
+const og = useInstance(OngoingGameRenderer)
 
 const lcs = useLeagueClientStore()
+const ogs = useOngoingGameStore()
+
+const { premadeTeamInfo, kdaOutliers, previewGame, navigateToSummonerByPuuid } =
+  useOngoingGamePanel()
+
+const summoner = computed(() => ogs.summoner[puuid])
+const rankedStats = computed(() => ogs.rankedStats[puuid])
+const championMastery = computed(() => ogs.championMastery[puuid])
+const matchHistoryData = computed(() => ogs.matchHistory[puuid]?.data)
+const analysis = computed(() => ogs.playerStats?.players[puuid])
+const position = computed(() => ogs.positionAssignments?.[puuid])
+const matchHistoryLoadingState = computed(() => ogs.matchHistoryLoadingState[puuid])
+const queueType = computed(() => ogs.queryStage.gameInfo?.queueType)
+const championId = computed(() => ogs.championSelections?.[puuid])
+const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
+
+const premadeTeamId = computed(() => premadeTeamInfo.value.premadeTeamIdMap[puuid])
+
 const as = useAppCommonStore()
 
 const premadeColors = computed(() => {
@@ -629,15 +566,15 @@ const positionInfo = computed(() => {
     recent: [] as { position: string; count: number }[]
   }
 
-  if (!position?.position || position.position === 'NONE') {
+  if (!position.value?.position || position.value.position === 'NONE') {
     return null
   }
 
-  info.current = position.position
-  info.role = position.role
+  info.current = position.value.position
+  info.role = position.value.role
 
-  if (analysis?.positions) {
-    const recentPositions = Object.entries(analysis.positions)
+  if (analysis.value?.positions) {
+    const recentPositions = Object.entries(analysis.value.positions)
       .map(([position, count]) => ({ position, count }))
       .filter((p) => p.position !== 'NONE' && p.count > 0)
       .toSorted((a, b) => b.count - a.count)
@@ -652,11 +589,11 @@ const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const championUsage = computed(() => {
   if (ogs.settings.showChampionUsage === 'recent') {
-    if (!analysis) {
+    if (!analysis.value) {
       return []
     }
 
-    const truncated = Object.values(analysis.champions)
+    const truncated = Object.values(analysis.value.champions)
       .toSorted((a, b) => {
         return b.count - a.count
       })
@@ -664,23 +601,23 @@ const championUsage = computed(() => {
       .map((c) => ({
         id: c.id,
         analysis: c,
-        mastery: championMastery && championMastery[c.id]
+        mastery: championMastery.value && championMastery.value[c.id]
       }))
 
     return truncated
   } else if (ogs.settings.showChampionUsage === 'mastery') {
-    if (!championMastery) {
+    if (!championMastery.value) {
       return []
     }
 
-    const truncated = Object.values(championMastery)
+    const truncated = Object.values(championMastery.value)
       .toSorted((a, b) => {
         return b.championPoints - a.championPoints
       })
       .slice(0, FREQUENT_USED_CHAMPIONS_MAX_COUNT)
       .map((m) => ({
         id: m.championId,
-        analysis: analysis?.champions[m.championId],
+        analysis: analysis.value?.champions[m.championId],
         mastery: m
       }))
 
@@ -691,7 +628,7 @@ const championUsage = computed(() => {
 })
 
 const rankedSoloFlex = computed(() => {
-  if (!rankedStats) {
+  if (!rankedStats.value) {
     return {
       solo: null,
       flex: null,
@@ -701,9 +638,9 @@ const rankedSoloFlex = computed(() => {
 
   const result: Record<string, any> = {}
 
-  const solo = rankedStats.queueMap['RANKED_SOLO_5x5']
-  const flex = rankedStats.queueMap['RANKED_FLEX_SR']
-  const cherry = rankedStats.queueMap['CHERRY']
+  const solo = rankedStats.value.queueMap['RANKED_SOLO_5x5']
+  const flex = rankedStats.value.queueMap['RANKED_FLEX_SR']
+  const cherry = rankedStats.value.queueMap['CHERRY']
 
   if (solo) {
     const soloText =
@@ -895,11 +832,11 @@ const getMatchItemThemeClasses = (match: {
 }
 
 const matches = computed(() => {
-  if (!matchHistory) {
+  if (!matchHistoryData.value) {
     return []
   }
 
-  return matchHistory
+  return matchHistoryData.value
     .map((game) => {
       const basicInfo = toBasicInfo(game)
       const participant = toParticipants(game, basicInfo).find((p) => p.puuid === puuid)
