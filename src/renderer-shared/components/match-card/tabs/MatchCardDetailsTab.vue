@@ -1,5 +1,6 @@
 <template>
   <NScrollbar
+    ref="scrollbarRef"
     x-scrollable
     class="max-h-142 rounded border border-solid border-black/5 dark:border-white/5"
   >
@@ -18,11 +19,11 @@
     </div>
 
     <table class="w-full border-separate [border-spacing:0]">
-      <thead>
+      <thead @wheel="handleHeaderWheel">
         <tr>
           <!-- divider -->
           <th
-            class="sticky top-0 left-0 z-10 w-38 max-w-38 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-left transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
+            class="sticky top-0 left-0 z-10 w-30 max-w-30 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-left transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             <NInput
               size="small"
@@ -82,7 +83,7 @@
           <NPopover placement="right" v-if="row.chartData" :delay="200">
             <template #trigger>
               <td
-                class="sticky left-0 w-38 max-w-38 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
+                class="sticky left-0 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
               >
                 {{ getStatKeyTranslation(row.key) }}
               </td>
@@ -92,7 +93,7 @@
           <td
             v-else
             :title="getStatKeyTranslation(row.key)"
-            class="sticky left-0 w-38 max-w-38 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
+            class="sticky left-0 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             {{ getStatKeyTranslation(row.key) }}
           </td>
@@ -117,7 +118,7 @@ import { refDebounced } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NInput, NPopover, NScrollbar } from 'naive-ui'
-import { type VNodeChild, computed, createTextVNode, shallowRef } from 'vue'
+import { type VNodeChild, computed, createTextVNode, ref, shallowRef } from 'vue'
 
 import { useMatchCard } from '../context'
 import {
@@ -131,6 +132,20 @@ import { getTeamColor } from '../utils/theme'
 import StatsBarChart from '../widgets/StatsBarChart.vue'
 
 const { basicInfo, hidePrivacy } = useMatchCard()
+
+const scrollbarRef = ref<InstanceType<typeof NScrollbar> | null>(null)
+
+const handleHeaderWheel = (e: WheelEvent) => {
+  if (e.deltaY === 0) return
+
+  e.preventDefault()
+
+  scrollbarRef.value?.scrollBy?.({
+    left: e.deltaY,
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
 const lcs = useLeagueClientStore()
 const rawStats = useRawDetails()

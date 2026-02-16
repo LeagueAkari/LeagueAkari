@@ -1212,6 +1212,7 @@ MatchCard:
     plateLane: '{{lane}} Plate'
     plate: Turret Plate
     filters: Filters
+    filterByChampion: Filter by champion
     plateStats: Plate Stats
     plateCount_one: '{{count}} plate'
     plateCount_other: '{{count}} plates'

@@ -15,7 +15,7 @@
 
       <!-- btns (download replay) -->
       <div class="flex gap-1">
-        <NTooltip>
+        <NTooltip v-if="replayState">
           <template #trigger>
             <NButton
               :theme-overrides="{
