@@ -43,7 +43,7 @@ import MatchCardStatsLine from './MatchCardStatsLine.vue'
 
 const { t } = useTranslation()
 
-const { basicInfo, details, loadingDetails, onLoadDetails } = useMatchCard()
+const { basicInfo, details, loadingDetails, loadDetails: onLoadDetails } = useMatchCard()
 
 const currentSection = ref<'diff-line-chart' | 'stats-line'>('diff-line-chart')
 

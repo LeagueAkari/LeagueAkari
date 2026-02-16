@@ -12,16 +12,15 @@
     <OngoingGamePanel
       :content-width="contentWidth"
       :content-height="contentHeight"
-      @to-summoner="navigateToTabByPuuid"
-      @show-game="handleShowGame"
-      @show-game-by-id="handleShowGameById"
+      @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
+      @preview-game="handlePreviewGame"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
-import OngoingGamePanel from '@renderer-shared/components/ongoing-game/panel/OngoingGamePanel.vue'
+import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -46,23 +45,14 @@ const previewingGame = shallowRef({
   source: 'sgp' as 'sgp' | 'lcu'
 })
 
-const handleShowGame = (summary: LcuOrSgpGameSummary, puuid: string) => {
-  showPreviewModal.value = true
+const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
   previewingGame.value = {
-    gameId: summary.gameId,
-    summary,
+    gameId: typeof summary === 'object' ? summary.gameId : summary,
+    summary: typeof summary === 'object' ? summary : undefined,
     puuid,
-    source: summary.source
+    source: typeof summary === 'object' ? summary.source : as.settings.preferredLolSource
   }
-}
 
-const handleShowGameById = (id: number, puuid: string) => {
   showPreviewModal.value = true
-  previewingGame.value = {
-    gameId: id,
-    summary: undefined,
-    puuid,
-    source: as.settings.preferredLolSource
-  }
 }
 </script>

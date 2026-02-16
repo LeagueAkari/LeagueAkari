@@ -107,14 +107,14 @@ import { RefreshSharp } from '@vicons/ionicons5'
 import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { usePlayerTab } from './context'
-import { useSpectator } from './data/spectator'
-import { useSummoner } from './data/summoner'
-import { useRefresh } from './utils/refresh'
-import IndicatorPulse from './widgets/IndicatorPulse.vue'
-import PlayerTagEditModal from './widgets/PlayerTagEditModal.vue'
-import RankedPane from './widgets/RankedPane.vue'
-import SpectatorPane from './widgets/SpectatorPane.vue'
+import { usePlayerTab } from '../context'
+import { useSpectator } from '../data/spectator'
+import { useSummoner } from '../data/summoner'
+import { useRefresh } from '../utils/refresh'
+import IndicatorPulse from './IndicatorPulse.vue'
+import PlayerTagEditModal from './PlayerTagEditModal.vue'
+import RankedPane from './RankedPane.vue'
+import SpectatorPane from './SpectatorPane.vue'
 
 const { puuid, isSmallSize, isSelfTab, isCrossRegion } = usePlayerTab()
 const { summoner } = useSummoner()

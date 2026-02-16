@@ -8,8 +8,8 @@ import IronMedal from '@renderer-shared/assets/ranked-icons/iron.png'
 import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { computed } from 'vue'
+
+export const IQR_THRESHOLD = 0.65
 
 export const RANKED_MEDAL_MAP: Record<string, string> = {
   IRON: IronMedal,
@@ -22,12 +22,6 @@ export const RANKED_MEDAL_MAP: Record<string, string> = {
   MASTER: MasterMedal,
   GRANDMASTER: GrandmasterMedal,
   CHALLENGER: ChallengerMedal
-}
-
-export function useIdleState() {
-  const ogs = useOngoingGameStore()
-
-  return computed(() => ogs.queryStage.phase === 'unavailable')
 }
 
 export const CHINESE_NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
@@ -93,3 +87,21 @@ export const PREMADE_TEAM_COLORS_LIGHT = {
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'
 export const FIXED_CARD_WIDTH_PX_NUMBER = 240
+
+export const POSITION_ORDER = {
+  NONE: 0,
+  TOP: 1,
+  MIDDLE: 3,
+  JUNGLE: 2,
+  BOTTOM: 4,
+  UTILITY: 5
+}
+
+export const WIN_RATE_TEAM_MIN_MATCHES = 13
+export const WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK = 4
+export const WIN_RATE_TEAM_MIN_SIZE = 3
+export const LOST_RATE_TEAM_MIN_SIZE = 2
+export const WIN_RATE_TEAM_MIN_WIN_RATE = 0.9
+export const LOSE_RATE_TEAM_MAX_WIN_RATE = 0.25
+
+export const STARED_CHAMPION_LEVEL = 60

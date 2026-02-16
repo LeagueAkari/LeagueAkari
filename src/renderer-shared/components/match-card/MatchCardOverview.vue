@@ -404,7 +404,7 @@ import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 import { useMatchCard } from './context'
 import { useGameResultName } from './utils/text'
-import { useCardBorderTheme, useWinResultStyleType } from './utils/theme'
+import { useCardBorderClasses, useWinResultStyleType } from './utils/theme'
 import { formatSeconds } from './utils/time'
 import ManyTags from './widgets/ManyTags.vue'
 import RadarChart from './widgets/RadarChart.vue'
@@ -420,7 +420,7 @@ const {
   participants,
   isExpanded,
   hidePrivacy,
-  onNavigateToSummonerByPuuid
+  navigateToSummonerByPuuid: onNavigateToSummonerByPuuid
 } = useMatchCard()
 
 const { formatExtremeNumber } = useNumberFormatter()
@@ -520,7 +520,7 @@ const mapName = computed(() => {
 })
 
 const winStyleType = useWinResultStyleType()
-const cardBorderClasses = useCardBorderTheme()
+const cardBorderClasses = useCardBorderClasses()
 
 const formattedRelativeTime = ref('')
 const gameCreationTitle = computed(() => {

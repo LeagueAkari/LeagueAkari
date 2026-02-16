@@ -398,8 +398,14 @@ const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
 
-const { basicInfo, teams, participants, puuid, hidePrivacy, onNavigateToSummonerByPuuid } =
-  useMatchCard()
+const {
+  basicInfo,
+  teams,
+  participants,
+  puuid,
+  hidePrivacy,
+  navigateToSummonerByPuuid: onNavigateToSummonerByPuuid
+} = useMatchCard()
 
 const lcs = useLeagueClientStore()
 

@@ -270,12 +270,19 @@ import Inhibitor from '../icons/Inhibitor.vue'
 import Tower from '../icons/Tower.vue'
 import { isSupportedMap } from '../utils/game-map'
 import { useBuildingType, useFrameEventType, useLaneType, useTowerType } from '../utils/text'
-import { useWinResultTagTheme } from '../utils/theme'
+import { useWinResultTagClasses } from '../utils/theme'
 import MapPosition from '../widgets/MapPosition.vue'
 import VictimDamageDetails from '../widgets/VictimDamageDetails.vue'
 
-const { participants, details, basicInfo, frames, team, loadingDetails, onLoadDetails } =
-  useMatchCard()
+const {
+  participants,
+  details,
+  basicInfo,
+  frames,
+  team,
+  loadingDetails,
+  loadDetails: onLoadDetails
+} = useMatchCard()
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()
@@ -380,7 +387,7 @@ const buildingType = useBuildingType()
 const towerType = useTowerType()
 const laneType = useLaneType()
 
-const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
+const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
 
 watch(
   [details, loadingDetails, () => basicInfo.value.gameId],

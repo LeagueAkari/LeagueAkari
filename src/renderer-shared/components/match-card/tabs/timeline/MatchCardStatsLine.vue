@@ -113,7 +113,7 @@ import { computed, ref, watch } from 'vue'
 import { useMatchCard } from '../../context'
 import { isSupportedMap } from '../../utils/game-map'
 import { usePosition } from '../../utils/text'
-import { getTeamColor, playerColors, useWinResultTagTheme } from '../../utils/theme'
+import { getTeamColor, playerColors, useWinResultTagClasses } from '../../utils/theme'
 import { formatMilliseconds } from '../../utils/time'
 import MapPosition from '../../widgets/MapPosition.vue'
 
@@ -127,7 +127,7 @@ const {
   participants,
   team,
   loadingDetails,
-  onLoadDetails,
+  loadDetails: onLoadDetails,
   hidePrivacy
 } = useMatchCard()
 
@@ -135,7 +135,7 @@ const currentFrameIndex = ref(0)
 const selectedPlayer = ref(0)
 
 const position = usePosition()
-const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
+const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
 
 const formatTooltip = (index: number) => {
   return formatMilliseconds(frames.value[index]?.timestamp || 0)

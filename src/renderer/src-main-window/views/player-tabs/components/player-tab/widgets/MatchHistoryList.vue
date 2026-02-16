@@ -77,10 +77,10 @@ import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } fro
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import { usePlayerTab } from './context'
-import { useMatchHistory } from './data/match-history'
-import { useMatchHistoryFilters } from './data/match-history-filters'
-import { useSpectator } from './data/spectator'
+import { usePlayerTab } from '../context'
+import { useMatchHistory } from '../data/match-history'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
+import { useSpectator } from '../data/spectator'
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()

@@ -6,10 +6,10 @@
       class="box-border h-full rounded-lg bg-(--la-background-color-primary) opacity-90"
     >
       <MatchPreviewer
-        :summary="showingGame.game"
-        :game-id="showingGame.gameId"
-        :puuid="showingGame.puuid"
-        :source="showingGame.source"
+        :summary="previewingGame.summary"
+        :game-id="previewingGame.gameId"
+        :puuid="previewingGame.puuid"
+        :source="previewingGame.source"
         v-model:show="showPreviewModal"
         :hide-privacy="as.settings.streamerMode"
       />
@@ -17,8 +17,7 @@
       <OngoingGamePanel
         :content-width="containerWidth"
         :content-height="containerHeight"
-        @show-game="handleShowGame"
-        @show-game-by-id="handleShowGameById"
+        @preview-game="handlePreviewGame"
       />
     </div>
   </Transition>
@@ -26,7 +25,7 @@
 
 <script setup lang="ts">
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
-import OngoingGamePanel from '@renderer-shared/components/ongoing-game/panel/OngoingGamePanel.vue'
+import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
@@ -42,36 +41,22 @@ const { width: containerWidth, height: containerHeight } = useElementSize(contai
 
 const as = useAppCommonStore()
 
-const showingGame = shallowRef<{
-  gameId: number
-  game: LcuOrSgpGameSummary | undefined
-  puuid: string
-  source: 'lcu' | 'sgp'
-}>({
+const previewingGame = shallowRef({
   gameId: 0,
-  game: undefined,
-  puuid: '',
-  source: 'lcu'
+  summary: undefined as LcuOrSgpGameSummary | undefined,
+  puuid: undefined as string | undefined,
+  source: 'sgp' as 'sgp' | 'lcu'
 })
 
 const showPreviewModal = ref(false)
-const handleShowGame = (game: LcuOrSgpGameSummary, puuid: string) => {
-  showingGame.value = {
-    gameId: game.gameId,
-    game,
+const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
+  previewingGame.value = {
+    gameId: typeof summary === 'object' ? summary.gameId : summary,
+    summary: typeof summary === 'object' ? summary : undefined,
     puuid,
-    source: game.source
+    source: typeof summary === 'object' ? summary.source : as.settings.preferredLolSource
   }
-  showPreviewModal.value = true
-}
 
-const handleShowGameById = (id: number, selfPuuid: string) => {
-  showingGame.value = {
-    gameId: id,
-    game: undefined,
-    puuid: selfPuuid,
-    source: 'lcu'
-  }
   showPreviewModal.value = true
 }
 

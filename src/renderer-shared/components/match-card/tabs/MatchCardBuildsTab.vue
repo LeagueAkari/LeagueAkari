@@ -171,7 +171,7 @@ import { computed, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
-import { getClassBySkillSlot, getTeamColor, useWinResultTagTheme } from '../utils/theme'
+import { getClassBySkillSlot, getTeamColor, useWinResultTagClasses } from '../utils/theme'
 import { formatMilliseconds } from '../utils/time'
 
 const {
@@ -182,7 +182,7 @@ const {
   details,
   hidePrivacy,
   loadingDetails,
-  onLoadDetails
+  loadDetails: onLoadDetails
 } = useMatchCard()
 
 const lcs = useLeagueClientStore()
@@ -280,7 +280,7 @@ const collected = computed(() => {
 })
 
 const position = usePosition()
-const tagTheme = useWinResultTagTheme(() => team.value?.winResult)
+const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
 
 watch(
   [details, loadingDetails, () => basicInfo.value.gameId],

@@ -56,16 +56,16 @@ provideMatchCard({
   loadingDetails: () => loadingDetails,
   replayState: () => replayState,
 
-  onNavigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
+  navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
     emits('navigateToSummonerByPuuid', puuid, setCurrent)
   },
-  onLoadReplay: (gameId: number) => {
+  loadReplay: (gameId: number) => {
     emits('downloadReplay', gameId)
   },
-  onWatchReplay: (gameId: number) => {
+  watchReplay: (gameId: number) => {
     emits('watchReplay', gameId)
   },
-  onLoadDetails: (gameId: number) => {
+  loadDetails: (gameId: number) => {
     emits('loadDetails', gameId)
   }
 })
