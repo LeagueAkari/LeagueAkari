@@ -78,6 +78,13 @@
         </span>
         <NSwitch size="small" v-model:value="showPractice" />
       </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-black/80 dark:text-white/60">
+          {{ t('PlayerTab.filter.showIrregularGames') }}
+        </span>
+        <NSwitch size="small" v-model:value="showIrregularGames" />
+      </div>
     </div>
   </div>
 </template>
@@ -110,6 +117,7 @@ const { pagedMatchHistory } = useMatchHistory()
 
 const winLoss = ref<'all' | 'win' | 'loss'>('all')
 const showPractice = ref(false)
+const showIrregularGames = ref(false)
 
 const selectedChampions = ref<number[]>([])
 const championOptions = computed(() => {
@@ -314,6 +322,7 @@ const clearAllConditions = () => {
   selectedChampions.value = []
   selectedSummoners.value = []
   showPractice.value = false
+  showIrregularGames.value = false
   searchText.value = ''
   searchResult.value = []
 }
@@ -325,13 +334,15 @@ winLoss.value = filters.value.winLoss
 selectedChampions.value = filters.value.selectedChampions
 selectedSummoners.value = filters.value.selectedSummoners
 showPractice.value = filters.value.showPractice
+showIrregularGames.value = filters.value.showIrregularGames
 
 watchEffect(() => {
   setFilters({
     winLoss: winLoss.value,
     selectedChampions: selectedChampions.value,
     selectedSummoners: selectedSummoners.value,
-    showPractice: showPractice.value
+    showPractice: showPractice.value,
+    showIrregularGames: showIrregularGames.value
   })
 })
 </script>

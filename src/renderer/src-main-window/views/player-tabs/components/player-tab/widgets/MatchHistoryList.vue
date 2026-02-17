@@ -80,6 +80,7 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
+import { shouldHideMatchHistoryGame } from '../data/match-history-visibility'
 import { useSpectator } from '../data/spectator'
 
 const as = useAppCommonStore()
@@ -115,15 +116,20 @@ const gamesShouldHide = computed(() => {
     return new Set<number>()
   }
 
-  const { winLoss, selectedChampions, selectedSummoners, showPractice } = filters.value
+  const { winLoss, selectedChampions, selectedSummoners, showPractice, showIrregularGames } =
+    filters.value
 
   const shouldShow = (g: LcuOrSgpGameSummary) => {
-    const basicInfo = toBasicInfo(g)
-
-    // 默认隐藏训练模式，除非筛选器中勾选了显示
-    if (!showPractice && basicInfo.gameMode === 'PRACTICETOOL') {
+    if (
+      shouldHideMatchHistoryGame(g, puuid.value, {
+        showPractice,
+        showIrregularGames
+      })
+    ) {
       return false
     }
+
+    const basicInfo = toBasicInfo(g)
 
     if (!hasFilters.value) {
       return true

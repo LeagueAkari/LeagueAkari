@@ -148,7 +148,8 @@ export function providePlayerTab(props: {
     preferredSource,
     sgpServerId,
     isCrossRegion,
-    showPractice: () => matchHistoryFilters.filters.value.showPractice
+    showPractice: () => matchHistoryFilters.filters.value.showPractice,
+    showIrregularGames: () => matchHistoryFilters.filters.value.showIrregularGames
   })
 
   provideRankedStats({

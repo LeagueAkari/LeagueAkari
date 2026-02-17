@@ -223,6 +223,7 @@ import { computed } from 'vue'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
@@ -233,13 +234,16 @@ const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
 const { pagedMatchHistory } = useMatchHistory()
+const { filters } = useMatchHistoryFilters()
 
 const analysis = computed(() => {
   if (!pagedMatchHistory.value?.games) {
     return null
   }
 
-  return analyzeMatchHistory(pagedMatchHistory.value.games, puuid.value)
+  return analyzeMatchHistory(pagedMatchHistory.value.games, puuid.value, {
+    includeIrregularGames: filters.value.showIrregularGames
+  })
 })
 
 const currentStreak = computed(() => {

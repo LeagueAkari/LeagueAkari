@@ -2064,6 +2064,7 @@ PlayerTab:
     summoners: 涉及召唤师
     champions: 涉及英雄
     showPractice: 显示训练模式
+    showIrregularGames: 显示重开局等
   itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
 

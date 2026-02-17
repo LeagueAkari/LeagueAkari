@@ -4,7 +4,6 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
@@ -30,6 +29,8 @@ import {
 } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
+
+import { shouldHideMatchHistoryGame } from './match-history-visibility'
 
 export interface PagedMatchHistory {
   /** 战绩概览，应该是 raw */
@@ -74,12 +75,14 @@ export function provideMatchHistory(props: {
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
   showPractice?: MaybeRefOrGetter<boolean>
+  showIrregularGames?: MaybeRefOrGetter<boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
   const showPractice = toRef(props.showPractice ?? false)
+  const showIrregularGames = toRef(props.showIrregularGames ?? false)
 
   const componentName = useComponentName()
 
@@ -164,10 +167,12 @@ export function provideMatchHistory(props: {
 
     const visibleStartIndex = params.startIndex ?? 0
     const visibleCount = params.count ?? pts.frontendSettings.loadCount
-    const hidePractice = !showPractice.value
+    const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
     const pageFetchSize = Math.max(visibleCount, pts.frontendSettings.loadCount)
-
-    const isPracticeGame = (g: LcuOrSgpGameSummary) => toBasicInfo(g).gameMode === 'PRACTICETOOL'
+    const maxChunkRequests = Math.max(
+      80,
+      Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5
+    )
 
     const collectVisibleGames = async (
       fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>
@@ -178,7 +183,7 @@ export function provideMatchHistory(props: {
       let visibleSkipped = 0
       let guard = 0
 
-      while (games.length < visibleCount && guard < 80) {
+      while (games.length < visibleCount && guard < maxChunkRequests) {
         const chunk = await fetchChunk(rawCursor, pageFetchSize)
         if (chunk.length === 0) {
           break
@@ -189,7 +194,12 @@ export function provideMatchHistory(props: {
             continue
           }
 
-          if (hidePractice && isPracticeGame(g)) {
+          if (
+            shouldHideMatchHistoryGame(g, puuid.value, {
+              showPractice: showPractice.value,
+              showIrregularGames: showIrregularGames.value
+            })
+          ) {
             continue
           }
 
@@ -258,7 +268,7 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
         }
 
-        const games = hidePractice
+        const games = hideByVisibilityOptions
           ? await collectVisibleGames(fetchSgpChunk)
           : await fetchSgpChunk(visibleStartIndex, visibleCount)
 
@@ -282,7 +292,7 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
         }
 
-        const selectedGames = hidePractice
+        const selectedGames = hideByVisibilityOptions
           ? await collectVisibleGames(fetchLcuSummaryChunk)
           : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
 
@@ -405,7 +415,7 @@ export function provideMatchHistory(props: {
   )
 
   watch(
-    () => showPractice.value,
+    () => [showPractice.value, showIrregularGames.value],
     () => {
       if (!pagedMatchHistory.value) {
         return
