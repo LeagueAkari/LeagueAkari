@@ -2386,7 +2386,8 @@ JunglePathing:
   blueTeam: 蓝色方
   redTeam: 红色方
   earlyGank: 前期抓人
-  earlyGankLegend: 3/4级抓 (橙/紫)
+  level3KillLegend: 3级击杀
+  level4KillLegend: 4级击杀
   level3Gank: '3级抓 {{pct}}%'
   level4Gank: '4级抓 {{pct}}%'
   objectives: 野怪目标

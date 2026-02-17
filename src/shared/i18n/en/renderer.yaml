@@ -2385,7 +2385,8 @@ JunglePathing:
   blueTeam: Blue
   redTeam: Red
   earlyGank: Early Ganks
-  earlyGankLegend: Lv3/4 gank (org/pur)
+  level3KillLegend: Lv3 kills
+  level4KillLegend: Lv4 kills
   level3Gank: 'Lv3 gank {{pct}}%'
   level4Gank: 'Lv4 gank {{pct}}%'
   objectives: Objectives

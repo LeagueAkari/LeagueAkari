@@ -82,7 +82,7 @@ export interface JunglePathingStats {
     level3GankCount: number
     /** 3分钟击杀参与位置 */
     level3KillPositions: GankPoint[]
-    /** 4级抓人比例（3分钟无伤害，4分钟有） */
+    /** 4级抓人比例（4分钟有新增英雄伤害） */
     level4GankRate: number
     level4GankCount: number
     /** 4分钟击杀参与位置 */
@@ -227,7 +227,7 @@ interface SingleGameAnalysis {
     level3GankDetected: boolean
     /** 3分钟击杀参与位置 */
     level3KillPositions: GankPoint[]
-    /** 4级时有英雄伤害（3分钟无伤害，4分钟有） */
+    /** 4级时有新增英雄伤害（独立于3级抓） */
     level4GankDetected: boolean
     /** 4分钟击杀参与位置 */
     level4KillPositions: GankPoint[]
@@ -475,7 +475,7 @@ function analyzeOneGame(
     }
   }
 
-  // 3级抓人：3分钟帧 CS<20, level>=3, 有英雄伤害
+  // 3级抓人：3分钟帧 CS[12,20), level=3, 有英雄伤害
   if (frames.length > 3) {
     const pf3 = frames[3].participantFrames[pidKey]
     if (pf3) {
@@ -483,23 +483,27 @@ function analyzeOneGame(
       const level3 = pf3.level ?? 0
 
       let hasChampionDamageAt3 = false
+      let damageToChampionsAt3 = 0
       if (isSgpDetailedParticipantFrame(pf3)) {
-        hasChampionDamageAt3 = pf3.damageStats.totalDamageDoneToChampions > 0
+        damageToChampionsAt3 = pf3.damageStats.totalDamageDoneToChampions
+        hasChampionDamageAt3 = damageToChampionsAt3 > 0
       } else {
         hasChampionDamageAt3 = level3KillPositions.length > 0
       }
 
-      if (cs3 < 20 && level3 >= 3 && hasChampionDamageAt3) {
+      if (cs3 >= 12 && cs3 < 20 && level3 === 3 && hasChampionDamageAt3) {
         level3GankDetected = true
       }
 
-      // 4级抓人：3分钟无英雄伤害，4分钟有英雄伤害
-      if (!hasChampionDamageAt3 && frames.length > 4) {
+      // 4级抓人：独立于3级抓，4分钟存在新增英雄伤害（或3-4分钟有击杀参与）
+      if (frames.length > 4) {
         const pf4 = frames[4].participantFrames[pidKey]
         if (pf4) {
           let hasChampionDamageAt4 = false
           if (isSgpDetailedParticipantFrame(pf4)) {
-            hasChampionDamageAt4 = pf4.damageStats.totalDamageDoneToChampions > 0
+            hasChampionDamageAt4 =
+              pf4.damageStats.totalDamageDoneToChampions > damageToChampionsAt3 ||
+              level4KillPositions.length > 0
           } else {
             hasChampionDamageAt4 = level4KillPositions.length > 0
           }

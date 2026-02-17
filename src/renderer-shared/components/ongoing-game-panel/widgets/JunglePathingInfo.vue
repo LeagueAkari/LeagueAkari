@@ -189,18 +189,19 @@
             </div>
           </div>
           <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
-            <span class="inline-flex items-center gap-1 whitespace-nowrap">
-              <span class="grid w-[30px] grid-cols-2 place-items-center">
-                <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                </svg>
-                <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                </svg>
-              </span>
-              {{ t('JunglePathing.earlyGankLegend') }}
+            <span class="inline-flex items-center gap-1 whitespace-nowrap text-orange-400">
+              <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
+                <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+              </svg>
+              {{ t('JunglePathing.level3KillLegend') }}
+            </span>
+            <span class="inline-flex items-center gap-1 whitespace-nowrap text-purple-400">
+              <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
+                <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+              </svg>
+              {{ t('JunglePathing.level4KillLegend') }}
             </span>
           </div>
         </div>
