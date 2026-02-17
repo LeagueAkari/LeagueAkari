@@ -8,17 +8,15 @@
         <div class="relative flex-shrink-0" :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }">
           <img class="absolute h-full w-full rounded" :src="map11" />
           <svg class="absolute h-full w-full" viewBox="0 0 100 100">
-            <line x1="0" y1="100" x2="100" y2="0" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,2" />
+            <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,2" />
           </svg>
           <div
             v-for="(pt, i) of miniMapPoints.slice(0, 20)"
             :key="i"
-            class="absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2"
+            class="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/50"
+            :class="minuteDotColors[pt.lane]"
             :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-          >
-            <span class="absolute left-1/2 top-1/2 h-0.5 w-2 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm" :class="laneColors[pt.lane]" />
-            <span class="absolute left-1/2 top-1/2 h-0.5 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm" :class="laneColors[pt.lane]" />
-          </div>
+          />
         </div>
 
         <!-- text stats -->
@@ -72,61 +70,31 @@
         <div class="flex flex-shrink-0 flex-col gap-1">
           <div class="relative" :style="{ width: `${LARGE_SIZE}px`, height: `${LARGE_SIZE}px` }">
             <img class="absolute h-full w-full rounded" :src="map11" />
-            <svg class="absolute h-full w-full" viewBox="0 0 100 100">
-              <line x1="0" y1="100" x2="100" y2="0" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-dasharray="4,3" />
+            <!-- 红蓝方底色 -->
+            <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
+              <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
+              <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+              <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-dasharray="4,3" />
             </svg>
-            <svg class="absolute h-full w-full" viewBox="0 0 100 100">
-              <polygon
-                v-if="popoverOverlay.points"
-                :points="popoverOverlay.points"
-                :fill="popoverOverlay.fill"
-              />
-            </svg>
-            <div
-              v-for="(pt, i) of largeMinuteMapPoints"
-              :key="`m-${i}`"
-              class="absolute z-[2] h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
-              :class="minuteDotColors[pt.lane]"
-              :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-            />
             <div
               v-for="(pt, i) of largeMapPoints"
               :key="i"
-              class="absolute z-[4] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+              class="absolute z-[2] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
+              :class="minuteDotColors[pt.lane]"
               :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-            >
-              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm" :class="laneColors[pt.lane]" />
-              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm" :class="laneColors[pt.lane]" />
-            </div>
+            />
           </div>
           <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
             <span class="inline-flex items-center gap-1 whitespace-nowrap">
               <span class="grid w-[30px] grid-cols-3 place-items-center">
                 <svg class="h-2 w-2 text-red-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="1.6" fill="currentColor" />
+                  <circle cx="4" cy="4" r="2" fill="currentColor" />
                 </svg>
                 <svg class="h-2 w-2 text-yellow-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="1.6" fill="currentColor" />
+                  <circle cx="4" cy="4" r="2" fill="currentColor" />
                 </svg>
                 <svg class="h-2 w-2 text-blue-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="1.6" fill="currentColor" />
-                </svg>
-              </span>
-              {{ t('JunglePathing.minuteLegend') }}
-            </span>
-            <span class="inline-flex items-center gap-1 whitespace-nowrap">
-              <span class="grid w-[30px] grid-cols-3 place-items-center">
-                <svg class="h-2 w-2 text-red-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
-                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
-                </svg>
-                <svg class="h-2 w-2 text-yellow-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
-                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
-                </svg>
-                <svg class="h-2 w-2 text-blue-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
-                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+                  <circle cx="4" cy="4" r="2" fill="currentColor" />
                 </svg>
               </span>
               {{ t('JunglePathing.gankLegend') }}
@@ -145,18 +113,6 @@
               <span class="mx-1 text-black/40 dark:text-white/40">|</span>
               <span :class="topsideTextColor(popoverStats)">{{ topsideTextWithPct(popoverStats) }}</span>
             </div>
-          </div>
-          <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.firstClear') }}</div>
-            <div v-if="popoverStats.blueTeamGames > 0" class="flex items-center gap-1">
-              <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
-              <span>{{ firstClearTextForTeam(popoverStats, 100) }}</span>
-            </div>
-            <div v-if="popoverStats.redTeamGames > 0" class="flex items-center gap-1">
-              <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
-              <span>{{ firstClearTextForTeam(popoverStats, 200) }}</span>
-            </div>
-            <div v-if="popoverStats.blueTeamGames === 0 && popoverStats.redTeamGames === 0" class="text-black/50 dark:text-white/50">—</div>
           </div>
           <div>
             <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.objectives') }}</div>
@@ -203,6 +159,91 @@
           </div>
         </div>
       </div>
+
+      <!-- 首清营地 + 前期抓人地图 -->
+      <div class="flex gap-3">
+        <div class="flex flex-shrink-0 flex-col gap-1">
+          <div class="relative" :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }">
+            <img class="absolute h-full w-full rounded" :src="map11" />
+            <!-- 红蓝方底色 -->
+            <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
+              <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
+              <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+              <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-dasharray="4,3" />
+            </svg>
+            <div
+              v-for="(pt, i) of campMapPoints"
+              :key="`camp-${i}`"
+              class="absolute z-[1] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
+              :style="{ left: `${pt.left}px`, top: `${pt.top}px`, backgroundColor: campMarkerColors[pt.camp] }"
+            />
+            <!-- 3/4级抓人击杀位置（叉号标记） -->
+            <div
+              v-for="(pt, i) of earlyGankMapPoints"
+              :key="`eg-${i}`"
+              class="absolute z-[5] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+              :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
+            >
+              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm" :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'" />
+              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm" :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
+            <span class="inline-flex items-center gap-1 whitespace-nowrap">
+              <span class="grid w-[30px] grid-cols-2 place-items-center">
+                <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
+                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
+                  <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                  <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+              </span>
+              {{ t('JunglePathing.earlyGankLegend') }}
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-col justify-center gap-2 text-xs">
+          <div>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.firstClear') }}</div>
+            <div v-if="popoverStats.firstClearCamp.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_max-content] items-center gap-x-2">
+              <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
+              <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'blue') }}</span>
+              <span v-if="firstClearInvadeText(popoverStats, 'blue')" class="whitespace-nowrap text-amber-500">
+                {{ firstClearInvadeText(popoverStats, 'blue') }}
+              </span>
+            </div>
+            <div v-if="popoverStats.firstClearCamp.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_max-content] items-center gap-x-2">
+              <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
+              <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'red') }}</span>
+              <span v-if="firstClearInvadeText(popoverStats, 'red')" class="whitespace-nowrap text-amber-500">
+                {{ firstClearInvadeText(popoverStats, 'red') }}
+              </span>
+            </div>
+            <div v-if="popoverStats.firstClearCamp.blueGames === 0 && popoverStats.firstClearCamp.redGames === 0" class="text-black/50 dark:text-white/50">—</div>
+          </div>
+          <div>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.earlyGank') }}</div>
+            <div class="flex flex-col gap-0.5">
+              <div v-if="popoverStats.earlyGank.byTeam.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2">
+                <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-orange-400">{{ t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 3) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 3)) }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-purple-400">{{ t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 4) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 4)) }}</span>
+              </div>
+              <div v-if="popoverStats.earlyGank.byTeam.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2">
+                <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-orange-400">{{ t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 3) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 3)) }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-purple-400">{{ t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 4) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 4)) }}</span>
+              </div>
+              <div v-if="popoverStats.earlyGank.byTeam.blueGames === 0 && popoverStats.earlyGank.byTeam.redGames === 0" class="text-black/50 dark:text-white/50">—</div>
+            </div>
+          </div>
+          <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
+            {{ t('JunglePathing.description2') }}
+          </div>
+        </div>
+      </div>
     </div>
   </NPopover>
 </template>
@@ -210,7 +251,7 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { JunglePathingAnalysis, JunglePathingStats } from '@shared/data-adapter/analysis/jungle'
+import { GankPoint, JunglePathingAnalysis, JunglePathingStats } from '@shared/data-adapter/analysis/jungle'
 import { Copy as CopyIcon } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, useMessage } from 'naive-ui'
@@ -222,6 +263,7 @@ import RiftHeraldIcon from '@renderer-shared/components/match-card/icons/RiftHer
 import VoidGrubIcon from '@renderer-shared/components/match-card/icons/VoidGrub.vue'
 import map11 from '@renderer-shared/components/match-card/map-images/11.png'
 import { mapToImagePosition } from '@renderer-shared/components/match-card/utils/game-map'
+import { BLUE_SIDE_CAMPS, RED_SIDE_CAMPS, type JungleCamp } from '@shared/data-adapter/analysis/jungle'
 
 const { analysis } = defineProps<{
   analysis: JunglePathingAnalysis
@@ -234,12 +276,7 @@ const message = useMessage()
 
 const MINI_SIZE = 48
 const LARGE_SIZE = 140
-
-const laneColors: Record<string, string> = {
-  top: 'bg-red-400',
-  mid: 'bg-yellow-400',
-  bot: 'bg-blue-400'
-}
+const CAMP_MAP_SIZE = LARGE_SIZE
 
 const minuteDotColors: Record<string, string> = {
   top: 'bg-red-400/80',
@@ -293,11 +330,20 @@ const largeMapPoints = computed(() => {
   }))
 })
 
-const largeMinuteMapPoints = computed(() => {
-  return popoverStats.value.minutePositions.map((pt) => ({
-    ...mapToImagePosition(pt.x, pt.y, LARGE_SIZE, LARGE_SIZE, 11),
-    lane: pt.lane
-  }))
+const earlyGankMapPoints = computed(() => {
+  const eg = popoverStats.value.earlyGank
+  return [
+    ...eg.level3KillPositions.map((pt) => ({
+      ...mapToImagePosition(pt.x, pt.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
+      lane: pt.lane,
+      level: 3 as const
+    })),
+    ...eg.level4KillPositions.map((pt) => ({
+      ...mapToImagePosition(pt.x, pt.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
+      lane: pt.lane,
+      level: 4 as const
+    }))
+  ]
 })
 
 type MapPreferenceKind = 'top' | 'mid' | 'bot' | 'topMid' | 'midBot' | 'balanced'
@@ -366,21 +412,6 @@ function mapPreferenceColor(pref: MapPreference): string {
   }
 }
 
-function mapPreferenceOverlay(pref: MapPreference): { points: string | null; fill: string } {
-  switch (pref.kind) {
-    case 'top':
-    case 'topMid':
-      return { points: '0,100 0,0 100,0', fill: 'rgba(52,211,153,0.15)' }
-    case 'mid':
-      return { points: '50,10 90,50 50,90 10,50', fill: 'rgba(250,204,21,0.14)' }
-    case 'bot':
-    case 'midBot':
-      return { points: '0,100 100,100 100,0', fill: 'rgba(96,165,250,0.15)' }
-    default:
-      return { points: null, fill: 'transparent' }
-  }
-}
-
 function topsideTextShort(stats: JunglePathingStats) {
   return mapPreferenceText(resolveMapPreference(stats), true)
 }
@@ -404,10 +435,6 @@ function zoneWeightText(stats: JunglePathingStats) {
   return `${t('JunglePathing.top')}${formatWeightSum(stats.topZoneWeightSum)} ${t('JunglePathing.mid')}${formatWeightSum(stats.midZoneWeightSum)} ${t('JunglePathing.bot')}${formatWeightSum(stats.botZoneWeightSum)}`
 }
 
-const popoverOverlay = computed(() => {
-  return mapPreferenceOverlay(resolveMapPreference(popoverStats.value))
-})
-
 function roundToTenth(value: number): number {
   return Math.round(value * 10) / 10
 }
@@ -418,56 +445,100 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-function buffNameForSide(teamId: number, topside: boolean): string {
-  if (teamId === 100) {
-    return topside ? t('JunglePathing.blueBuff') : t('JunglePathing.redBuff')
-  }
-  return topside ? t('JunglePathing.redBuff') : t('JunglePathing.blueBuff')
+function killLaneText(positions: GankPoint[]): string {
+  if (positions.length === 0) return ''
+  const counts = { top: 0, mid: 0, bot: 0 }
+  for (const pt of positions) counts[pt.lane]++
+  const parts: string[] = []
+  if (counts.top > 0) parts.push(`${t('JunglePathing.topShort')}${counts.top}`)
+  if (counts.mid > 0) parts.push(`${t('JunglePathing.midShort')}${counts.mid}`)
+  if (counts.bot > 0) parts.push(`${t('JunglePathing.botShort')}${counts.bot}`)
+  return ` (${parts.join(' ')})`
 }
 
-function enemyBuffNameForSide(teamId: number, topside: boolean): string {
-  if (teamId === 100) {
-    return topside ? t('JunglePathing.redBuff') : t('JunglePathing.blueBuff')
-  }
-  return topside ? t('JunglePathing.blueBuff') : t('JunglePathing.redBuff')
+const campNames: Record<JungleCamp, () => string> = {
+  red: () => t('JunglePathing.campRed'),
+  blue: () => t('JunglePathing.campBlue'),
+  wolves: () => t('JunglePathing.campWolves'),
+  raptors: () => t('JunglePathing.campRaptors')
 }
 
-function firstClearTextForTeam(stats: JunglePathingStats, teamId: number) {
-  const isBlue = teamId === 100
-  const games = isBlue ? stats.blueTeamGames : stats.redTeamGames
-  const topsideStarts = isBlue ? stats.blueTeamTopsideStartCount : stats.redTeamTopsideStartCount
-  const invadeStarts = isBlue ? stats.blueTeamInvadeStartCount : stats.redTeamInvadeStartCount
-  const invadeTopsideStarts = isBlue
-    ? stats.blueTeamInvadeTopsideStartCount
-    : stats.redTeamInvadeTopsideStartCount
-  if (games === 0) return '—'
+function sumCampCount(camps: Record<JungleCamp, number>) {
+  return camps.red + camps.blue + camps.wolves + camps.raptors
+}
 
-  const botsideStarts = Math.max(0, games - invadeStarts - topsideStarts)
-  const topsidePct = Math.round((topsideStarts / games) * 100)
-  const botsidePct = Math.round((botsideStarts / games) * 100)
-  const invadePct = Math.round((invadeStarts / games) * 100)
+function firstClearCampParts(stats: JunglePathingStats, side: 'blue' | 'red'): { ownText: string; invadeText: string } {
+  const camps = stats.firstClearCamp[side]
+  const invadeCamps = side === 'blue' ? stats.firstClearCamp.blueInvade : stats.firstClearCamp.redInvade
+  const games = side === 'blue' ? stats.firstClearCamp.blueGames : stats.firstClearCamp.redGames
+  if (games === 0) return { ownText: '—', invadeText: '' }
 
-  let base = t('JunglePathing.balanced')
-  if (topsidePct >= 55) {
-    base = t('JunglePathing.topsideStart', { pct: topsidePct }) + `(${buffNameForSide(teamId, true)})`
-  } else if (topsidePct <= 45) {
-    base = t('JunglePathing.botsideStart', { pct: botsidePct }) + `(${buffNameForSide(teamId, false)})`
+  const ownStarts = sumCampCount(camps)
+  const ownEntries = (Object.keys(camps) as JungleCamp[])
+    .filter((c) => camps[c] > 0)
+    .sort((a, b) => camps[b] - camps[a])
+    .map((c) => t('JunglePathing.campStart', { camp: campNames[c](), pct: ownStarts > 0 ? Math.round((camps[c] / ownStarts) * 100) : 0 }))
+  const ownText = ownStarts > 0
+    ? `${t('JunglePathing.campOwnStart', { pct: Math.round((ownStarts / games) * 100) })} (${ownEntries.join(', ')})`
+    : t('JunglePathing.noData')
+
+  const invadeStarts = sumCampCount(invadeCamps)
+  if (invadeStarts <= 0) {
+    return { ownText, invadeText: '' }
   }
 
-  if (invadePct <= 0) return base
+  const invadeEntries = (Object.keys(invadeCamps) as JungleCamp[])
+    .filter((c) => invadeCamps[c] > 0)
+    .sort((a, b) => invadeCamps[b] - invadeCamps[a])
+    .map((c) => t('JunglePathing.campStart', { camp: campNames[c](), pct: Math.round((invadeCamps[c] / invadeStarts) * 100) }))
 
-  const invadeTopsidePct = invadeStarts > 0 ? Math.round((invadeTopsideStarts / invadeStarts) * 100) : 0
-  let invadeBuff = ''
-  if (invadeTopsidePct >= 55) {
-    invadeBuff = enemyBuffNameForSide(teamId, true)
-  } else if (invadeTopsidePct <= 45) {
-    invadeBuff = enemyBuffNameForSide(teamId, false)
-  } else {
-    invadeBuff = `${t('JunglePathing.redBuff')}/${t('JunglePathing.blueBuff')}`
+  const invadeText = `${t('JunglePathing.campInvadeStart', { pct: Math.round((invadeStarts / games) * 100) })} (${invadeEntries.join(', ')})`
+  return { ownText, invadeText }
+}
+
+function firstClearOwnText(stats: JunglePathingStats, side: 'blue' | 'red') {
+  return firstClearCampParts(stats, side).ownText
+}
+
+function firstClearInvadeText(stats: JunglePathingStats, side: 'blue' | 'red') {
+  return firstClearCampParts(stats, side).invadeText
+}
+
+function firstClearCampText(stats: JunglePathingStats, side: 'blue' | 'red'): string {
+  const { ownText, invadeText } = firstClearCampParts(stats, side)
+  if (!invadeText) return ownText
+  return `${ownText} | ${invadeText}`
+}
+
+function earlyGankRateByTeam(stats: JunglePathingStats, side: 'blue' | 'red', level: 3 | 4): number {
+  const byTeam = stats.earlyGank.byTeam
+  if (side === 'blue') {
+    return level === 3 ? byTeam.blueLevel3GankRate : byTeam.blueLevel4GankRate
   }
+  return level === 3 ? byTeam.redLevel3GankRate : byTeam.redLevel4GankRate
+}
 
-  const invadeText = `${t('JunglePathing.invadeStart', { pct: invadePct })}(${t('JunglePathing.enemyBuff', { buff: invadeBuff })})`
-  return `${base} | ${invadeText}`
+function earlyGankPositionsByTeam(stats: JunglePathingStats, side: 'blue' | 'red', level: 3 | 4): GankPoint[] {
+  const byTeam = stats.earlyGank.byTeam
+  if (side === 'blue') {
+    return level === 3 ? byTeam.blueLevel3KillPositions : byTeam.blueLevel4KillPositions
+  }
+  return level === 3 ? byTeam.redLevel3KillPositions : byTeam.redLevel4KillPositions
+}
+
+const campMapPoints = computed(() => {
+  const allCamps = [...BLUE_SIDE_CAMPS, ...RED_SIDE_CAMPS]
+  return allCamps.map((c) => ({
+    ...mapToImagePosition(c.x, c.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
+    camp: c.camp
+  }))
+})
+
+const campMarkerColors: Record<JungleCamp, string> = {
+  red: 'rgba(255,60,60,0.5)',
+  blue: 'rgba(60,140,255,0.5)',
+  wolves: 'rgba(180,180,180,0.5)',
+  raptors: 'rgba(200,120,255,0.5)'
 }
 
 function formatStatsText(stats: JunglePathingStats, label: string): string {
@@ -475,11 +546,11 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
   const weights = zoneWeightText(stats)
 
   const fcLines: string[] = []
-  if (stats.blueTeamGames > 0) {
-    fcLines.push(`  ${t('JunglePathing.blueTeam')}: ${firstClearTextForTeam(stats, 100)}`)
+  if (stats.firstClearCamp.blueGames > 0) {
+    fcLines.push(`  ${t('JunglePathing.blueTeam')}: ${firstClearCampText(stats, 'blue')}`)
   }
-  if (stats.redTeamGames > 0) {
-    fcLines.push(`  ${t('JunglePathing.redTeam')}: ${firstClearTextForTeam(stats, 200)}`)
+  if (stats.firstClearCamp.redGames > 0) {
+    fcLines.push(`  ${t('JunglePathing.redTeam')}: ${firstClearCampText(stats, 'red')}`)
   }
 
   const obj = stats.objectives
@@ -495,7 +566,23 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
   if (fcLines.length > 0) {
     text += `  ${t('JunglePathing.firstClear')}:\n${fcLines.join('\n')}\n`
   }
-  text += `  ${t('JunglePathing.objectives')}: ${objParts.join(', ')}`
+  text += `  ${t('JunglePathing.objectives')}: ${objParts.join(', ')}\n`
+  const egLines: string[] = []
+  if (stats.earlyGank.byTeam.blueGames > 0) {
+    egLines.push(
+      `  ${t('JunglePathing.blueTeam')}: ${t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(stats, 'blue', 3) * 100) })}${killLaneText(earlyGankPositionsByTeam(stats, 'blue', 3))}, ${t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(stats, 'blue', 4) * 100) })}${killLaneText(earlyGankPositionsByTeam(stats, 'blue', 4))}`
+    )
+  }
+  if (stats.earlyGank.byTeam.redGames > 0) {
+    egLines.push(
+      `  ${t('JunglePathing.redTeam')}: ${t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(stats, 'red', 3) * 100) })}${killLaneText(earlyGankPositionsByTeam(stats, 'red', 3))}, ${t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(stats, 'red', 4) * 100) })}${killLaneText(earlyGankPositionsByTeam(stats, 'red', 4))}`
+    )
+  }
+  if (egLines.length > 0) {
+    text += `  ${t('JunglePathing.earlyGank')}:\n${egLines.join('\n')}`
+  } else {
+    text += `  ${t('JunglePathing.earlyGank')}: ${t('JunglePathing.noData')}`
+  }
   return text
 }
 

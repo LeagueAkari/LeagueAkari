@@ -2376,12 +2376,19 @@ JunglePathing:
   firstClear: 首清
   topsideStart: '上开 {{pct}}%'
   botsideStart: '下开 {{pct}}%'
-  invadeStart: '入侵开 {{pct}}%'
-  enemyBuff: '敌方{{buff}}'
-  redBuff: 红buff
-  blueBuff: 蓝buff
+  campRed: 红buff
+  campBlue: 蓝buff
+  campWolves: 三狼
+  campRaptors: F6
+  campOwnStart: '常规开 {{pct}}%'
+  campStart: '{{camp}}开 {{pct}}%'
+  campInvadeStart: '入侵开 {{pct}}%'
   blueTeam: 蓝色方
   redTeam: 红色方
+  earlyGank: 前期抓人
+  earlyGankLegend: 3/4级抓 (橙/紫)
+  level3Gank: '3级抓 {{pct}}%'
+  level4Gank: '4级抓 {{pct}}%'
   objectives: 野怪目标
   firstDragonRate: '一龙率 {{pct}}%'
   avgDragons: '场均小龙 {{count}}'
@@ -2392,7 +2399,8 @@ JunglePathing:
   noData: '—'
   minuteLegend: 位置点
   gankLegend: GANK 点
-  description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟位置权重1，击杀参与权重5），上/中/下显示为权重和。首清方向根据1分钟时的位置判断，按红蓝方分别统计。
+  description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
+  description2: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开），按红蓝方分别统计。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断，并按红蓝方分别统计。
   gamesUnit: 局
   copyAll: 复制分析
   copied: 已复制分析

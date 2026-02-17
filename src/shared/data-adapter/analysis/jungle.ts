@@ -1,9 +1,10 @@
 import { toBasicInfo } from '../match-history/match-basic'
 import { toParticipants } from '../match-history/participants'
-import { toFrames } from '../match-history/frames'
+import { toFrames, isSgpDetailedParticipantFrame } from '../match-history/frames'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '../wrapper'
 
 export type GankLane = 'top' | 'mid' | 'bot'
+export type CampSide = 'blue' | 'red'
 
 export interface GankPoint {
   x: number
@@ -17,6 +18,8 @@ export interface MinutePositionPoint {
   lane: GankLane
   minute: number
 }
+
+export type JungleCamp = 'red' | 'blue' | 'wolves' | 'raptors'
 
 export interface JunglePathingStats {
   gamesAnalyzed: number
@@ -62,15 +65,45 @@ export interface JunglePathingStats {
     avgFirstBaronTime: number | null
   }
 
-  /** 按阵营分的首清统计 */
-  blueTeamGames: number
-  blueTeamTopsideStartCount: number
-  blueTeamInvadeStartCount: number
-  blueTeamInvadeTopsideStartCount: number
-  redTeamGames: number
-  redTeamTopsideStartCount: number
-  redTeamInvadeStartCount: number
-  redTeamInvadeTopsideStartCount: number
+  /** 按阵营分的首清营地统计 */
+  firstClearCamp: {
+    blue: Record<JungleCamp, number>
+    red: Record<JungleCamp, number>
+    blueInvade: Record<JungleCamp, number>
+    redInvade: Record<JungleCamp, number>
+    blueGames: number
+    redGames: number
+  }
+
+  /** 前期抓人统计 */
+  earlyGank: {
+    /** 3级抓人比例（有英雄伤害） */
+    level3GankRate: number
+    level3GankCount: number
+    /** 3分钟击杀参与位置 */
+    level3KillPositions: GankPoint[]
+    /** 4级抓人比例（3分钟无伤害，4分钟有） */
+    level4GankRate: number
+    level4GankCount: number
+    /** 4分钟击杀参与位置 */
+    level4KillPositions: GankPoint[]
+    byTeam: {
+      blueGames: number
+      redGames: number
+      blueLevel3GankRate: number
+      blueLevel3GankCount: number
+      blueLevel3KillPositions: GankPoint[]
+      blueLevel4GankRate: number
+      blueLevel4GankCount: number
+      blueLevel4KillPositions: GankPoint[]
+      redLevel3GankRate: number
+      redLevel3GankCount: number
+      redLevel3KillPositions: GankPoint[]
+      redLevel4GankRate: number
+      redLevel4GankCount: number
+      redLevel4KillPositions: GankPoint[]
+    }
+  }
 
   /** Gank 坐标点（用于地图可视化） */
   gankPositions: GankPoint[]
@@ -94,28 +127,45 @@ const FIRST_CLEAR_FRAME = 1
 /** 当前英雄分析最多局数 */
 const CURRENT_CHAMPION_MAX_GAMES = 20
 
-/**
- * 判断坐标是否在上半区
- * 蓝方(100): y > x 为上半区；红方(200): y < x 为上半区
- */
-function isTopside(x: number, y: number, teamId: number): boolean {
-  if (teamId === 100) {
-    return y > x
-  }
-  return y < x
+/** 营地坐标 */
+interface CampCoord {
+  x: number
+  y: number
+  camp: JungleCamp
+  side: CampSide
 }
 
-/**
- * 判断首清是否发生在对方半区（入侵开）
- * 使用 x+y 相对地图中心对角线的偏移做近似，并留出缓冲避免中路区域误判
- */
-function isInvadeStart(x: number, y: number, teamId: number): boolean {
-  const sideOffset = x + y - 15000
-  const threshold = 1800
-  if (teamId === 100) {
-    return sideOffset > threshold
+const BLUE_SIDE_CAMPS: CampCoord[] = [
+  { x: 3830, y: 7880, camp: 'blue', side: 'blue' },
+  { x: 3800, y: 6440, camp: 'wolves', side: 'blue' },
+  { x: 7760, y: 4010, camp: 'red', side: 'blue' },
+  { x: 6970, y: 5460, camp: 'raptors', side: 'blue' }
+]
+
+const RED_SIDE_CAMPS: CampCoord[] = [
+  { x: 10990, y: 7000, camp: 'blue', side: 'red' },
+  { x: 11020, y: 8440, camp: 'wolves', side: 'red' },
+  { x: 7060, y: 10870, camp: 'red', side: 'red' },
+  { x: 7850, y: 9420, camp: 'raptors', side: 'red' }
+]
+
+/** 导出营地坐标供 UI 地图可视化使用 */
+export { BLUE_SIDE_CAMPS, RED_SIDE_CAMPS }
+
+function detectStartCamp(x: number, y: number): { camp: JungleCamp; side: CampSide } {
+  const camps = [...BLUE_SIDE_CAMPS, ...RED_SIDE_CAMPS]
+  let minDist = Infinity
+  let nearest: CampCoord = camps[0]
+  for (const c of camps) {
+    const dx = x - c.x
+    const dy = y - c.y
+    const dist = dx * dx + dy * dy
+    if (dist < minDist) {
+      minDist = dist
+      nearest = c
+    }
   }
-  return sideOffset < -threshold
+  return { camp: nearest.camp, side: nearest.side }
 }
 
 /**
@@ -169,9 +219,19 @@ interface SingleGameAnalysis {
   botGanks: number
   /** 所在阵营 100=蓝 200=红 */
   teamId: number
-  /** 起手所在半区（按己方视角） */
-  topsideStart: boolean | null
-  invadeStart: boolean | null
+  /** 首清营地 */
+  startCamp: { camp: JungleCamp; side: CampSide } | null
+  /** 前期抓人 */
+  earlyGank: {
+    /** 3级时有英雄伤害（不一定击杀） */
+    level3GankDetected: boolean
+    /** 3分钟击杀参与位置 */
+    level3KillPositions: GankPoint[]
+    /** 4级时有英雄伤害（3分钟无伤害，4分钟有） */
+    level4GankDetected: boolean
+    /** 4分钟击杀参与位置 */
+    level4KillPositions: GankPoint[]
+  }
   /** 野怪目标统计 */
   objectives: {
     gotFirstDragon: boolean | null
@@ -371,14 +431,84 @@ function analyzeOneGame(
     }
   }
 
-  // 3. 首清方向（看第1帧位置）
-  let topsideStart: boolean | null = null
-  let invadeStart: boolean | null = null
+  // 3. 首清营地（看第1帧位置）
+  let startCamp: { camp: JungleCamp; side: CampSide } | null = null
   if (frames.length > FIRST_CLEAR_FRAME) {
     const pf = frames[FIRST_CLEAR_FRAME].participantFrames[pidKey]
     if (pf?.position) {
-      topsideStart = isTopside(pf.position.x, pf.position.y, teamId)
-      invadeStart = isInvadeStart(pf.position.x, pf.position.y, teamId)
+      startCamp = detectStartCamp(pf.position.x, pf.position.y)
+    }
+  }
+
+  // 4. 前期抓人检测
+  let level3GankDetected = false
+  const level3KillPositions: GankPoint[] = []
+  let level4GankDetected = false
+  const level4KillPositions: GankPoint[] = []
+
+  // 收集3分钟和4分钟内的击杀参与位置
+  for (const frame of frames) {
+    if (!frame.events) continue
+    for (const event of frame.events) {
+      if (event.type !== 'CHAMPION_KILL') continue
+      if (event.timestamp > 240000) continue
+      const ke = event as {
+        killerId: number
+        assistingParticipantIds?: number[]
+        position: { x: number; y: number }
+        timestamp: number
+      }
+      if (ke.killerId !== participantId && !ke.assistingParticipantIds?.includes(participantId)) continue
+
+      const lane = classifyGankLane(ke.position.x, ke.position.y)
+      const pt: GankPoint = {
+        x: ke.position.x,
+        y: ke.position.y,
+        lane: lane ?? classifyMapZone(ke.position.x, ke.position.y)
+      }
+
+      if (ke.timestamp <= 180000) {
+        level3KillPositions.push(pt)
+      } else {
+        level4KillPositions.push(pt)
+      }
+    }
+  }
+
+  // 3级抓人：3分钟帧 CS<20, level>=3, 有英雄伤害
+  if (frames.length > 3) {
+    const pf3 = frames[3].participantFrames[pidKey]
+    if (pf3) {
+      const cs3 = (pf3.minionsKilled ?? 0) + (pf3.jungleMinionsKilled ?? 0)
+      const level3 = pf3.level ?? 0
+
+      let hasChampionDamageAt3 = false
+      if (isSgpDetailedParticipantFrame(pf3)) {
+        hasChampionDamageAt3 = pf3.damageStats.totalDamageDoneToChampions > 0
+      } else {
+        hasChampionDamageAt3 = level3KillPositions.length > 0
+      }
+
+      if (cs3 < 20 && level3 >= 3 && hasChampionDamageAt3) {
+        level3GankDetected = true
+      }
+
+      // 4级抓人：3分钟无英雄伤害，4分钟有英雄伤害
+      if (!hasChampionDamageAt3 && frames.length > 4) {
+        const pf4 = frames[4].participantFrames[pidKey]
+        if (pf4) {
+          let hasChampionDamageAt4 = false
+          if (isSgpDetailedParticipantFrame(pf4)) {
+            hasChampionDamageAt4 = pf4.damageStats.totalDamageDoneToChampions > 0
+          } else {
+            hasChampionDamageAt4 = level4KillPositions.length > 0
+          }
+
+          if (hasChampionDamageAt4) {
+            level4GankDetected = true
+          }
+        }
+      }
     }
   }
 
@@ -397,8 +527,13 @@ function analyzeOneGame(
     midGanks,
     botGanks,
     teamId,
-    topsideStart,
-    invadeStart,
+    startCamp,
+    earlyGank: {
+      level3GankDetected,
+      level3KillPositions,
+      level4GankDetected,
+      level4KillPositions
+    },
     objectives: {
       gotFirstDragon: firstDragonTeam !== null ? firstDragonTeam === teamId : null,
       dragons,
@@ -427,14 +562,28 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   let totalTopGanks = 0
   let totalMidGanks = 0
   let totalBotGanks = 0
+  const emptyCampCount = (): Record<JungleCamp, number> => ({ red: 0, blue: 0, wolves: 0, raptors: 0 })
+  const blueCamps = emptyCampCount()
+  const redCamps = emptyCampCount()
+  const blueInvadeCamps = emptyCampCount()
+  const redInvadeCamps = emptyCampCount()
+  let blueGames = 0
+  let redGames = 0
+
+  let level3GankCount = 0
+  const level3KillPositions: GankPoint[] = []
+  let level4GankCount = 0
+  const level4KillPositions: GankPoint[] = []
+  let blueLevel3GankCount = 0
+  const blueLevel3KillPositions: GankPoint[] = []
+  let blueLevel4GankCount = 0
+  const blueLevel4KillPositions: GankPoint[] = []
+  let redLevel3GankCount = 0
+  const redLevel3KillPositions: GankPoint[] = []
+  let redLevel4GankCount = 0
+  const redLevel4KillPositions: GankPoint[] = []
   let blueTeamGames = 0
-  let blueTeamTopsideStartCount = 0
-  let blueTeamInvadeStartCount = 0
-  let blueTeamInvadeTopsideStartCount = 0
   let redTeamGames = 0
-  let redTeamTopsideStartCount = 0
-  let redTeamInvadeStartCount = 0
-  let redTeamInvadeTopsideStartCount = 0
   const gankPositions: GankPoint[] = []
   const minutePositions: MinutePositionPoint[] = []
 
@@ -459,26 +608,40 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     totalMidGanks += r.midGanks
     totalBotGanks += r.botGanks
 
+    if (r.startCamp !== null) {
+      if (r.teamId === 100) {
+        blueGames++
+        if (r.startCamp.side === 'blue') {
+          blueCamps[r.startCamp.camp]++
+        } else {
+          blueInvadeCamps[r.startCamp.camp]++
+        }
+      } else {
+        redGames++
+        if (r.startCamp.side === 'red') {
+          redCamps[r.startCamp.camp]++
+        } else {
+          redInvadeCamps[r.startCamp.camp]++
+        }
+      }
+    }
+
+    if (r.earlyGank.level3GankDetected) level3GankCount++
+    level3KillPositions.push(...r.earlyGank.level3KillPositions)
+    if (r.earlyGank.level4GankDetected) level4GankCount++
+    level4KillPositions.push(...r.earlyGank.level4KillPositions)
     if (r.teamId === 100) {
-      if (r.topsideStart !== null) {
-        blueTeamGames++
-      }
-      if (r.invadeStart) {
-        blueTeamInvadeStartCount++
-        if (r.topsideStart) blueTeamInvadeTopsideStartCount++
-      } else if (r.topsideStart) {
-        blueTeamTopsideStartCount++
-      }
+      blueTeamGames++
+      if (r.earlyGank.level3GankDetected) blueLevel3GankCount++
+      blueLevel3KillPositions.push(...r.earlyGank.level3KillPositions)
+      if (r.earlyGank.level4GankDetected) blueLevel4GankCount++
+      blueLevel4KillPositions.push(...r.earlyGank.level4KillPositions)
     } else {
-      if (r.topsideStart !== null) {
-        redTeamGames++
-      }
-      if (r.invadeStart) {
-        redTeamInvadeStartCount++
-        if (r.topsideStart) redTeamInvadeTopsideStartCount++
-      } else if (r.topsideStart) {
-        redTeamTopsideStartCount++
-      }
+      redTeamGames++
+      if (r.earlyGank.level3GankDetected) redLevel3GankCount++
+      redLevel3KillPositions.push(...r.earlyGank.level3KillPositions)
+      if (r.earlyGank.level4GankDetected) redLevel4GankCount++
+      redLevel4KillPositions.push(...r.earlyGank.level4KillPositions)
     }
 
     const obj = r.objectives
@@ -527,14 +690,38 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
       avgBarons: totalBarons / gamesAnalyzed,
       avgFirstBaronTime: avg(firstBaronTimes)
     },
-    blueTeamGames,
-    blueTeamTopsideStartCount,
-    blueTeamInvadeStartCount,
-    blueTeamInvadeTopsideStartCount,
-    redTeamGames,
-    redTeamTopsideStartCount,
-    redTeamInvadeStartCount,
-    redTeamInvadeTopsideStartCount,
+    firstClearCamp: {
+      blue: blueCamps,
+      red: redCamps,
+      blueInvade: blueInvadeCamps,
+      redInvade: redInvadeCamps,
+      blueGames,
+      redGames
+    },
+    earlyGank: {
+      level3GankRate: gamesAnalyzed > 0 ? level3GankCount / gamesAnalyzed : 0,
+      level3GankCount,
+      level3KillPositions,
+      level4GankRate: gamesAnalyzed > 0 ? level4GankCount / gamesAnalyzed : 0,
+      level4GankCount,
+      level4KillPositions,
+      byTeam: {
+        blueGames: blueTeamGames,
+        redGames: redTeamGames,
+        blueLevel3GankRate: blueTeamGames > 0 ? blueLevel3GankCount / blueTeamGames : 0,
+        blueLevel3GankCount,
+        blueLevel3KillPositions,
+        blueLevel4GankRate: blueTeamGames > 0 ? blueLevel4GankCount / blueTeamGames : 0,
+        blueLevel4GankCount,
+        blueLevel4KillPositions,
+        redLevel3GankRate: redTeamGames > 0 ? redLevel3GankCount / redTeamGames : 0,
+        redLevel3GankCount,
+        redLevel3KillPositions,
+        redLevel4GankRate: redTeamGames > 0 ? redLevel4GankCount / redTeamGames : 0,
+        redLevel4GankCount,
+        redLevel4KillPositions
+      }
+    },
     gankPositions,
     minutePositions
   }

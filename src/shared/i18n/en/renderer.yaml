@@ -2375,12 +2375,19 @@ JunglePathing:
   firstClear: 1st Clear
   topsideStart: 'Top {{pct}}%'
   botsideStart: 'Bot {{pct}}%'
-  invadeStart: 'Invade {{pct}}%'
-  enemyBuff: 'Enemy {{buff}}'
-  redBuff: Red Buff
-  blueBuff: Blue Buff
+  campRed: Red
+  campBlue: Blue
+  campWolves: Wolves
+  campRaptors: Raptors
+  campOwnStart: 'Normal {{pct}}%'
+  campStart: '{{camp}} {{pct}}%'
+  campInvadeStart: 'Invade {{pct}}%'
   blueTeam: Blue
   redTeam: Red
+  earlyGank: Early Ganks
+  earlyGankLegend: Lv3/4 gank (org/pur)
+  level3Gank: 'Lv3 gank {{pct}}%'
+  level4Gank: 'Lv4 gank {{pct}}%'
   objectives: Objectives
   firstDragonRate: '1st Drake {{pct}}%'
   avgDragons: 'Avg Drake {{count}}'
@@ -2391,7 +2398,8 @@ JunglePathing:
   noData: '—'
   minuteLegend: Position points
   gankLegend: Gank points
-  description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min positions weight 1, takedown participation weight 5), and Top/Mid/Bot are shown as weight sums. First clear direction is determined by position at 1min, tracked per team side.
+  description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
+  description2: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included), tracked per team side. Early ganks are detected by champion damage and kill participation at 3/4min frames, split by blue/red side.
   gamesUnit: ' games'
   copyAll: Copy Summary
   copied: Analysis copied
