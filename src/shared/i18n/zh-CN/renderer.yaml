@@ -2366,10 +2366,11 @@ JunglePathing:
   currentChampion: 本英雄
   mapPref: 地图偏好
   ganks: Gank
-  topsidePref: '偏上 {{pct}}%'
-  botsidePref: '偏下 {{pct}}%'
-  topMidPref: '偏中上 {{pct}}%'
-  midBotPref: '偏中下 {{pct}}%'
+  topsidePref: 偏上
+  midPref: 偏中
+  botsidePref: 偏下
+  topMidPref: 偏中上
+  midBotPref: 偏中下
   balanced: 均衡
   balancedShort: 均衡
   firstClear: 首清
@@ -2387,7 +2388,9 @@ JunglePathing:
   avgBarons: '场均大龙 {{count}}'
   firstTime: '首条 {{time}}'
   noData: '—'
-  description: 基于该玩家近期打野局的时间线数据分析。地图偏好综合前14分钟位置和击杀参与（击杀参与权重更高）。Gank 统计前14分钟的击杀和助攻。首清方向根据1分钟时的位置判断，按红蓝方分别统计。
+  minuteLegend: 位置点
+  gankLegend: GANK 点
+  description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 top/mid/bot 三分区加权（前14分钟位置权重1，击杀参与权重5），上/中/下显示为权重和。首清方向根据1分钟时的位置判断，按红蓝方分别统计。
   gamesUnit: 局
   copyAll: 复制分析
   copied: 已复制分析

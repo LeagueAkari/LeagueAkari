@@ -2365,10 +2365,11 @@ JunglePathing:
   currentChampion: This
   mapPref: Map Pref
   ganks: Ganks
-  topsidePref: 'Top {{pct}}%'
-  botsidePref: 'Bot {{pct}}%'
-  topMidPref: 'Top/Mid {{pct}}%'
-  midBotPref: 'Mid/Bot {{pct}}%'
+  topsidePref: Top
+  midPref: Mid
+  botsidePref: Bot
+  topMidPref: Top/Mid
+  midBotPref: Mid/Bot
   balanced: Balanced
   balancedShort: Bal.
   firstClear: 1st Clear
@@ -2386,7 +2387,9 @@ JunglePathing:
   avgBarons: 'Avg Baron {{count}}'
   firstTime: '1st {{time}}'
   noData: '—'
-  description: Based on recent jungle games timeline data. Map preference combines first 14min positions and kill participation (kills weighted higher). Gank stats count kills and assists in the first 14min. First clear direction is determined by position at 1min, tracked per team side.
+  minuteLegend: Position points
+  gankLegend: Gank points
+  description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min positions weight 1, takedown participation weight 5), and Top/Mid/Bot are shown as weight sums. First clear direction is determined by position at 1min, tracked per team side.
   gamesUnit: ' games'
   copyAll: Copy Summary
   copied: Analysis copied

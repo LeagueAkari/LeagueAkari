@@ -11,11 +11,26 @@ export interface GankPoint {
   lane: GankLane
 }
 
+export interface MinutePositionPoint {
+  x: number
+  y: number
+  lane: GankLane
+  minute: number
+}
+
 export interface JunglePathingStats {
   gamesAnalyzed: number
 
-  /** 上半区偏好比例 0-1, >0.5 偏上 */
-  avgTopsidePercentage: number
+  /** 地图三分区权重和（时间线位置权重1 + 击杀参与权重5） */
+  topZoneWeightSum: number
+  midZoneWeightSum: number
+  botZoneWeightSum: number
+  totalZoneWeightSum: number
+
+  /** 地图三分区偏好比例（由总权重和计算） */
+  avgTopZonePercentage: number
+  avgMidZonePercentage: number
+  avgBotZonePercentage: number
 
   /** 前14分钟 Gank 统计 */
   totalTopGanks: number
@@ -55,6 +70,8 @@ export interface JunglePathingStats {
 
   /** Gank 坐标点（用于地图可视化） */
   gankPositions: GankPoint[]
+  /** 前14分钟整分钟位置点（用于地图可视化） */
+  minutePositions: MinutePositionPoint[]
 }
 
 export interface JunglePathingAnalysis {
@@ -66,7 +83,7 @@ export interface JunglePathingAnalysis {
   currentChampionId: number
 }
 
-/** 前14分钟帧用于判断半区偏好和 Gank */
+/** 前14分钟帧用于判断地图偏好和 Gank */
 const ANALYSIS_MINUTES = 14
 /** 首清方向看第1帧（1分钟时的位置） */
 const FIRST_CLEAR_FRAME = 1
@@ -125,8 +142,11 @@ function isJungleInGame(summary: LcuOrSgpGameSummary, puuid: string): boolean {
 const KILL_WEIGHT = 5
 
 interface SingleGameAnalysis {
-  /** 加权后的上半区偏好 0-1 */
-  topsidePercent: number | null
+  /** 单局地图三分区权重和 */
+  topZoneWeightSum: number
+  midZoneWeightSum: number
+  botZoneWeightSum: number
+  totalZoneWeightSum: number
   topGanks: number
   midGanks: number
   botGanks: number
@@ -146,6 +166,20 @@ interface SingleGameAnalysis {
     firstBaronTime: number | null
   }
   gankPositions: GankPoint[]
+  minutePositions: MinutePositionPoint[]
+}
+
+/**
+ * 将地图坐标分类为 top / mid / bot 三分区
+ */
+function classifyMapZone(x: number, y: number): GankLane {
+  if (x < 5000 && y > 9000) return 'top'
+  if (x > 9000 && y < 5000) return 'bot'
+
+  const distFromDiag = Math.abs(y - x)
+  if (distFromDiag <= 3500) return 'mid'
+
+  return y > x ? 'top' : 'bot'
 }
 
 /**
@@ -169,9 +203,12 @@ function analyzeOneGame(
   const { participantId, teamId } = pInfo
   const pidKey = participantId.toString()
 
-  // 1. 半区偏好（前15分钟）
-  let topsideFrames = 0
+  // 1. 地图偏好（前14分钟，三分区）
   let totalFrames = 0
+  let topZoneFramesWeighted = 0
+  let midZoneFramesWeighted = 0
+  let botZoneFramesWeighted = 0
+  const minutePositions: MinutePositionPoint[] = []
   const pathingFrameLimit = Math.min(frames.length, ANALYSIS_MINUTES + 1)
 
   for (let i = 1; i < pathingFrameLimit; i++) {
@@ -180,12 +217,22 @@ function analyzeOneGame(
     if (!pf || !pf.position) continue
 
     totalFrames++
-    if (isTopside(pf.position.x, pf.position.y, teamId)) {
-      topsideFrames++
+    const zone = classifyMapZone(pf.position.x, pf.position.y)
+    minutePositions.push({ x: pf.position.x, y: pf.position.y, lane: zone, minute: i })
+    switch (zone) {
+      case 'top':
+        topZoneFramesWeighted += 1
+        break
+      case 'mid':
+        midZoneFramesWeighted += 1
+        break
+      case 'bot':
+        botZoneFramesWeighted += 1
+        break
     }
   }
 
-  // 2. Gank 分析（前14分钟）+ 击杀参与的半区加权 + 野怪目标统计
+  // 2. Gank 分析（前14分钟）+ 击杀参与的三分区加权 + 野怪目标统计
   const gankTimeLimitMs = ANALYSIS_MINUTES * 60 * 1000
   let topGanks = 0
   let midGanks = 0
@@ -193,8 +240,10 @@ function analyzeOneGame(
   const gankPositions: GankPoint[] = []
 
   // 击杀参与位置的加权统计（权重 KILL_WEIGHT）
-  let killTopsideWeighted = 0
   let killTotalWeighted = 0
+  let killTopZoneWeighted = 0
+  let killMidZoneWeighted = 0
+  let killBotZoneWeighted = 0
 
   // 野怪目标统计
   let firstDragonTeam: number | null = null
@@ -224,8 +273,17 @@ function analyzeOneGame(
         if (!isKiller && !isAssist) continue
 
         killTotalWeighted += KILL_WEIGHT
-        if (isTopside(killEvent.position.x, killEvent.position.y, teamId)) {
-          killTopsideWeighted += KILL_WEIGHT
+        const zone = classifyMapZone(killEvent.position.x, killEvent.position.y)
+        switch (zone) {
+          case 'top':
+            killTopZoneWeighted += KILL_WEIGHT
+            break
+          case 'mid':
+            killMidZoneWeighted += KILL_WEIGHT
+            break
+          case 'bot':
+            killBotZoneWeighted += KILL_WEIGHT
+            break
         }
 
         const lane = classifyGankLane(killEvent.position.x, killEvent.position.y)
@@ -303,12 +361,17 @@ function analyzeOneGame(
     }
   }
 
-  // 加权半区偏好 = (时间线位置权重1 + 击杀参与位置权重5) / 总权重
+  // 加权地图三分区偏好 = (时间线位置权重1 + 击杀参与位置权重5) / 总权重
   const combinedTotal = totalFrames + killTotalWeighted
-  const combinedTopside = topsideFrames + killTopsideWeighted
+  const combinedTopZone = topZoneFramesWeighted + killTopZoneWeighted
+  const combinedMidZone = midZoneFramesWeighted + killMidZoneWeighted
+  const combinedBotZone = botZoneFramesWeighted + killBotZoneWeighted
 
   return {
-    topsidePercent: combinedTotal > 0 ? combinedTopside / combinedTotal : null,
+    topZoneWeightSum: combinedTopZone,
+    midZoneWeightSum: combinedMidZone,
+    botZoneWeightSum: combinedBotZone,
+    totalZoneWeightSum: combinedTotal,
     topGanks,
     midGanks,
     botGanks,
@@ -325,16 +388,20 @@ function analyzeOneGame(
       barons,
       firstBaronTime
     },
-    gankPositions
+    gankPositions,
+    minutePositions
   }
 }
 
 function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | null {
-  const validResults = results.filter((r) => r.topsidePercent !== null)
+  const validResults = results.filter((r) => r.totalZoneWeightSum > 0)
   if (validResults.length === 0) return null
 
   const gamesAnalyzed = validResults.length
-  let totalTopsidePercent = 0
+  let totalTopZoneWeightSum = 0
+  let totalMidZoneWeightSum = 0
+  let totalBotZoneWeightSum = 0
+  let totalZoneWeightSum = 0
   let totalTopGanks = 0
   let totalMidGanks = 0
   let totalBotGanks = 0
@@ -343,6 +410,7 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   let redTeamGames = 0
   let redTeamTopsideStartCount = 0
   const gankPositions: GankPoint[] = []
+  const minutePositions: MinutePositionPoint[] = []
 
   // 野怪目标聚合
   let firstDragonCount = 0
@@ -357,7 +425,10 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   const firstBaronTimes: number[] = []
 
   for (const r of validResults) {
-    totalTopsidePercent += r.topsidePercent!
+    totalTopZoneWeightSum += r.topZoneWeightSum
+    totalMidZoneWeightSum += r.midZoneWeightSum
+    totalBotZoneWeightSum += r.botZoneWeightSum
+    totalZoneWeightSum += r.totalZoneWeightSum
     totalTopGanks += r.topGanks
     totalMidGanks += r.midGanks
     totalBotGanks += r.botGanks
@@ -387,13 +458,20 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     if (obj.firstBaronTime !== null) firstBaronTimes.push(obj.firstBaronTime)
 
     gankPositions.push(...r.gankPositions)
+    minutePositions.push(...r.minutePositions)
   }
 
   const avg = (arr: number[]) => (arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null)
 
   return {
     gamesAnalyzed,
-    avgTopsidePercentage: totalTopsidePercent / gamesAnalyzed,
+    topZoneWeightSum: totalTopZoneWeightSum,
+    midZoneWeightSum: totalMidZoneWeightSum,
+    botZoneWeightSum: totalBotZoneWeightSum,
+    totalZoneWeightSum,
+    avgTopZonePercentage: totalZoneWeightSum > 0 ? totalTopZoneWeightSum / totalZoneWeightSum : 0,
+    avgMidZonePercentage: totalZoneWeightSum > 0 ? totalMidZoneWeightSum / totalZoneWeightSum : 0,
+    avgBotZonePercentage: totalZoneWeightSum > 0 ? totalBotZoneWeightSum / totalZoneWeightSum : 0,
     totalTopGanks,
     totalMidGanks,
     totalBotGanks,
@@ -415,7 +493,8 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     blueTeamTopsideStartCount,
     redTeamGames,
     redTeamTopsideStartCount,
-    gankPositions
+    gankPositions,
+    minutePositions
   }
 }
 
