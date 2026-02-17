@@ -2112,6 +2112,8 @@ PlayerTab:
     activeSession: 活跃时段胜负
     winShort: 胜
     lossShort: 负
+    winningStreak: '{{countV}} 连胜'
+    losingStreak: '{{countV}} 连败'
 
   recentPlayers:
     teammatesTitle: 最近队友

@@ -2112,6 +2112,8 @@ PlayerTab:
     times: Games
     teamSides: Team Sides
     activeSession: Active Session Win/Lose
+    winningStreak: '{{countV}} Win Streak'
+    losingStreak: '{{countV}} Loss Streak'
 
   recentPlayers:
     teammatesTitle: Recent Teammates
