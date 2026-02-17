@@ -141,11 +141,14 @@ export function providePlayerTab(props: {
     isCrossRegion
   })
 
+  const matchHistoryFilters = provideMatchHistoryFilters()
+
   provideMatchHistory({
     puuid,
     preferredSource,
     sgpServerId,
-    isCrossRegion
+    isCrossRegion,
+    showPractice: () => matchHistoryFilters.filters.value.showPractice
   })
 
   provideRankedStats({
@@ -178,6 +181,4 @@ export function providePlayerTab(props: {
     puuid,
     sgpServerId
   })
-
-  provideMatchHistoryFilters()
 }

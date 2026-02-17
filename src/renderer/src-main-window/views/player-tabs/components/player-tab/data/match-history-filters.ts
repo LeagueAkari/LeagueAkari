@@ -40,6 +40,14 @@ export function provideMatchHistoryFilters() {
       filters.value = filters0
     }
   })
+
+  return {
+    filters,
+    hasFilters,
+    setFilters: (filters0: MatchHistoryFilters) => {
+      filters.value = filters0
+    }
+  }
 }
 
 export function useMatchHistoryFilters() {

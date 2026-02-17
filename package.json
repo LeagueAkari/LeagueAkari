@@ -1,9 +1,9 @@
 {
   "name": "league-akari",
-  "version": "1.4.4-rabi.2",
+  "version": "1.4.4-sky.20260217",
   "author": {
-    "name": "Hanxven",
-    "email": "hanxven@gmail.com"
+    "name": "sky",
+    "email": "realruitao@gmail.com"
   },
   "description": "League Akari",
   "main": "./out/main/main.js",

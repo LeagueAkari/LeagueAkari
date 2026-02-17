@@ -4,12 +4,14 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
   LcuOrSgpGameSummary
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import { Game } from '@shared/types/league-client/match-history'
 import { ReplayDownloadProgress, ReplayMetadata } from '@shared/types/league-client/replays'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
@@ -71,11 +73,13 @@ export function provideMatchHistory(props: {
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
+  showPractice?: MaybeRefOrGetter<boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
+  const showPractice = toRef(props.showPractice ?? false)
 
   const componentName = useComponentName()
 
@@ -158,6 +162,74 @@ export function provideMatchHistory(props: {
       ...params
     }
 
+    const visibleStartIndex = params.startIndex ?? 0
+    const visibleCount = params.count ?? pts.frontendSettings.loadCount
+    const hidePractice = !showPractice.value
+    const pageFetchSize = Math.max(visibleCount, pts.frontendSettings.loadCount)
+
+    const isPracticeGame = (g: LcuOrSgpGameSummary) => toBasicInfo(g).gameMode === 'PRACTICETOOL'
+
+    const collectVisibleGames = async (
+      fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>
+    ) => {
+      const games: LcuOrSgpGameSummary[] = []
+
+      let rawCursor = 0
+      let visibleSkipped = 0
+      let guard = 0
+
+      while (games.length < visibleCount && guard < 80) {
+        const chunk = await fetchChunk(rawCursor, pageFetchSize)
+        if (chunk.length === 0) {
+          break
+        }
+
+        for (const g of chunk) {
+          if (!g || typeof g.gameId !== 'number') {
+            continue
+          }
+
+          if (hidePractice && isPracticeGame(g)) {
+            continue
+          }
+
+          if (visibleSkipped < visibleStartIndex) {
+            visibleSkipped++
+            continue
+          }
+
+          games.push(g)
+
+          if (games.length >= visibleCount) {
+            break
+          }
+        }
+
+        rawCursor += chunk.length
+        guard++
+
+        if (chunk.length < pageFetchSize) {
+          break
+        }
+      }
+
+      return games
+    }
+
+    const toCompleteLcuGame = async (g: Game): Promise<LcuGameSummary> => {
+      const cached = pts.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
+      if (cached) {
+        return cached
+      }
+
+      try {
+        const { data } = await lcuLoadDetailedGameQueue.add(() => lc.api.matchHistory.getGame(g.gameId))
+        return { source: 'lcu', data: data, gameId: g.gameId }
+      } catch (error) {
+        return { source: 'lcu', data: g, gameId: g.gameId }
+      }
+    }
+
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
         // SGP API 需要 token 就绪
@@ -170,50 +242,66 @@ export function provideMatchHistory(props: {
           return
         }
 
-        const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
-          puuid.value,
-          {
-            ...params,
-            __sgpServerId: sgpServerId.value
-          }
-        )
+        const fetchSgpChunk = async (startIndex: number, count: number) => {
+          const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
+            puuid.value,
+            {
+              ...params,
+              startIndex,
+              count,
+              __sgpServerId: sgpServerId.value
+            }
+          )
 
-        const filtered = data.games.filter((g) => g.json)
+          return data.games
+            .filter((g) => g.json)
+            .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
+        }
+
+        const games = hidePractice
+          ? await collectVisibleGames(fetchSgpChunk)
+          : await fetchSgpChunk(visibleStartIndex, visibleCount)
 
         pagedMatchHistory.value = {
-          games: filtered.map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g })),
+          games: markRaw(games),
           replayMetadata: {}, // must be shallow
           details: {}, // must be shallow
           detailsLoading: {}, // must be shallow
           queryParams: params
         }
       } else {
-        const { data } = await lc.api.matchHistory.getMatchHistory(
-          puuid.value,
-          params.startIndex ?? 0,
-          (params.startIndex ?? 0) + (params.count ?? pts.frontendSettings.loadCount) - 1
+        const fetchLcuSummaryChunk = async (startIndex: number, count: number) => {
+          const { data } = await lc.api.matchHistory.getMatchHistory(
+            puuid.value,
+            startIndex,
+            startIndex + count - 1
+          )
+
+          return data.games.games
+            .filter((g) => !!g && typeof g.gameId === 'number')
+            .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
+        }
+
+        const selectedGames = hidePractice
+          ? await collectVisibleGames(fetchLcuSummaryChunk)
+          : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
+
+        const games = await Promise.all(
+          selectedGames.map(async (g) => {
+            if (g.source !== 'lcu') {
+              return g
+            }
+
+            const complete = await toCompleteLcuGame(g.data)
+            pts.detailedGameLruMap.set(`lcu:${complete.gameId}`, markRaw(complete))
+            return markRaw(complete) as LcuOrSgpGameSummary
+          })
         )
 
-        const loadCompleteGameTasks = data.games.games.map(async (g) => {
-          const cached = pts.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
-          if (cached) {
-            return cached
-          }
-
-          try {
-            const { data } = await lcuLoadDetailedGameQueue.add(() =>
-              lc.api.matchHistory.getGame(g.gameId)
-            )
-            return { source: 'lcu', data: data, gameId: g.gameId } as LcuGameSummary
-          } catch (error) {
-            return { source: 'lcu', data: g, gameId: g.gameId } as LcuGameSummary
-          }
-        })
-
-        const games = await Promise.all(loadCompleteGameTasks)
-
         games.forEach((g) => {
-          pts.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
+          if (g.source === 'lcu') {
+            pts.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
+          }
         })
 
         pagedMatchHistory.value = {
@@ -314,6 +402,17 @@ export function provideMatchHistory(props: {
       })
     },
     { immediate: true }
+  )
+
+  watch(
+    () => showPractice.value,
+    () => {
+      if (!pagedMatchHistory.value) {
+        return
+      }
+
+      loadMatchHistory(pagedMatchHistory.value.queryParams)
+    }
   )
 
   provide(MatchHistoryContextKey, {
