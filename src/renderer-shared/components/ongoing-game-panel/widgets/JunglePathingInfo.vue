@@ -381,10 +381,6 @@ function mapPreferenceOverlay(pref: MapPreference): { points: string | null; fil
   }
 }
 
-function topsideText(stats: JunglePathingStats) {
-  return mapPreferenceText(resolveMapPreference(stats))
-}
-
 function topsideTextShort(stats: JunglePathingStats) {
   return mapPreferenceText(resolveMapPreference(stats), true)
 }
