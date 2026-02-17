@@ -2354,6 +2354,33 @@ AugmentDisplay:
   prismatic: Prismatic
   rarity: '{{rarity}}'
 
+JunglePathing:
+  title: Jungle Pref
+  overall: Overall
+  currentChampion: This Champ
+  mapPref: Map Pref
+  ganks: Ganks
+  topsidePref: 'Top {{pct}}%'
+  botsidePref: 'Bot {{pct}}%'
+  balanced: Balanced
+  firstClear: 1st Clear
+  topsideStart: 'Top {{pct}}%'
+  botsideStart: 'Bot {{pct}}%'
+  redBuff: Red
+  blueBuff: Blue
+  blueTeam: Blue
+  redTeam: Red
+  description: Based on recent jungle games timeline data. Map preference combines first 15min positions and kill participation (kills weighted higher). Gank stats count kills and assists in the first 20min. First clear direction is determined by position at 1min, tracked per team side.
+  gamesUnit: ' games'
+  copyAll: Copy
+  copied: Jungle analysis copied
+  allyJungler: Ally Jungler
+  enemyJungler: Enemy Jungler
+  top: Top
+  mid: Mid
+  bot: Bot
+  gamesAnalyzed: '{{count}} jungle games'
+
 PlayerInfoCard:
   reload: Reload
   empty: No matches found for this queue

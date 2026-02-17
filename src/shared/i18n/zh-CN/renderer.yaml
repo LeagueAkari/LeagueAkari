@@ -2355,6 +2355,33 @@ SummonerSpellDisplay:
   cooldown: 冷却时间：{{time}} 秒
   levelRequirement: 等级需求：{{level}}
 
+JunglePathing:
+  title: 打野偏好
+  overall: 总体
+  currentChampion: 本英雄
+  mapPref: 地图偏好
+  ganks: Gank
+  topsidePref: '偏上 {{pct}}%'
+  botsidePref: '偏下 {{pct}}%'
+  balanced: 均衡
+  firstClear: 首清
+  topsideStart: '上开 {{pct}}%'
+  botsideStart: '下开 {{pct}}%'
+  redBuff: 红buff
+  blueBuff: 蓝buff
+  blueTeam: 蓝色方
+  redTeam: 红色方
+  description: 基于该玩家近期打野局的时间线数据分析。地图偏好综合前15分钟位置和击杀参与（击杀参与权重更高）。Gank 统计前20分钟的击杀和助攻。首清方向根据1分钟时的位置判断，按红蓝方分别统计。
+  gamesUnit: 局
+  copyAll: 复制
+  copied: 已复制打野分析
+  allyJungler: 我方打野
+  enemyJungler: 敌方打野
+  top: 上
+  mid: 中
+  bot: 下
+  gamesAnalyzed: '{{count}} 场打野局'
+
 # 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
   reload: 重新加载

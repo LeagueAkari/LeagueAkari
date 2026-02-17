@@ -342,6 +342,12 @@
       </NPopover>
     </div>
 
+    <!-- jungle pathing info -->
+    <JunglePathingInfo
+      v-if="jungleAnalysis"
+      :analysis="jungleAnalysis"
+    />
+
     <!-- tags -->
     <PlayerCardTagsArea
       :analysis="analysis"
@@ -519,6 +525,7 @@ import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
+import { JunglePathingAnalysis } from '@shared/data-adapter/analysis/jungle'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -547,11 +554,13 @@ import {
   PREMADE_TEAM_COLORS_LIGHT,
   RANKED_MEDAL_MAP
 } from '../utils'
+import JunglePathingInfo from './widgets/JunglePathingInfo.vue'
 import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
 
 const {
   puuid,
   analysis,
+  jungleAnalysis,
   matchHistory,
   position,
   premadeTeamId,
@@ -579,6 +588,7 @@ const {
   matchHistory?: LcuOrSgpGameSummary[]
   matchHistoryLoading?: string
   analysis?: MatchHistoryGamesAnalysisAll
+  jungleAnalysis?: JunglePathingAnalysis
   savedInfo?: SavedInfo
   queryStage: QueryStage
 }>()

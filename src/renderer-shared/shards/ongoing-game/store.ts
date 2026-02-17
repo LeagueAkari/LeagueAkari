@@ -1,3 +1,4 @@
+import { JunglePathingAnalysis } from '@shared/data-adapter/analysis/jungle'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -111,6 +112,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     }[]
   >([])
 
+  const jungleAnalysis = shallowRef<Record<string, JunglePathingAnalysis>>({})
+
   const draft = shallowRef<{
     teams: Record<string, string[]>
   } | null>(null)
@@ -148,6 +151,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     championMasteryLoadingState,
     teamParticipantGroups,
     additional,
+    jungleAnalysis,
     draft,
     calculatedPremadeTeamMap,
     inferredPremadeTeams

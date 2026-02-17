@@ -121,6 +121,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.championMastery = {}
       store.savedInfo = {}
       store.cachedGames = {}
+      store.jungleAnalysis = {}
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {

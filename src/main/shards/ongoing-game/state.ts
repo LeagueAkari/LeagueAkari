@@ -1,4 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { JunglePathingAnalysis } from '@shared/data-adapter/analysis/jungle'
 import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
 import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -611,6 +612,13 @@ export class OngoingGameState {
    */
   championMasteryLoadingState: Record<string, string> = {}
 
+  /** 打野玩家的路径偏好分析结果 */
+  jungleAnalysis: Record<string, JunglePathingAnalysis> = {}
+
+  setJungleAnalysis(value: Record<string, JunglePathingAnalysis>) {
+    this.jungleAnalysis = value
+  }
+
   /** 已经被记录在本地数据库中的信息 */
   savedInfo: Record<string, SavedPlayer> = {}
 
@@ -653,6 +661,7 @@ export class OngoingGameState {
     this.gameDetails = {}
     this.additionalGame = {}
     this.inferredPremadeTeams = []
+    this.jungleAnalysis = {}
 
     if (!options?.keepAdditionalInfo) {
       this.additional = {
@@ -769,6 +778,8 @@ export class OngoingGameState {
       rankedStatsLoadingState: observable.ref,
       savedInfoLoadingState: observable.ref,
       gameDetailsLoadingState: observable.ref,
+
+      jungleAnalysis: observable.struct,
 
       // structured data
       championSelections: computed.struct,

@@ -51,6 +51,7 @@
             :saved-info="ogs.savedInfo[player]"
             :champion-mastery="ogs.championMastery[player]"
             :analysis="ogs.playerStats?.players[player]"
+            :jungle-analysis="ogs.jungleAnalysis?.[player]"
             :position="ogs.positionAssignments?.[player]"
             :premade-team-id="premadeTeamInfo.premadeTeamIdMap[player]"
             :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
