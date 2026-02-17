@@ -407,8 +407,10 @@ export function provideMatchHistory(props: {
         return
       }
 
+      const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
       loadMatchHistory({
-        count: pts.frontendSettings.loadCount
+        count: pts.frontendSettings.loadCount,
+        tag: defaultTag.startsWith('<akari:') ? undefined : defaultTag
       })
     },
     { immediate: true }

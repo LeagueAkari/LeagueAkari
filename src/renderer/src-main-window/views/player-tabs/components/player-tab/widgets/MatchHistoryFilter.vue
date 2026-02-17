@@ -103,12 +103,14 @@ import { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 import { computed, h, ref, watchEffect } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const lcs = useLeagueClientStore()
+const pts = usePlayerTabsStore()
 const { t } = useTranslation()
 
 const { isCrossRegion, sgpServerId } = usePlayerTab()
@@ -344,5 +346,9 @@ watchEffect(() => {
     showPractice: showPractice.value,
     showIrregularGames: showIrregularGames.value
   })
+
+  // 持久化开关类筛选
+  pts.frontendSettings.defaultShowPractice = showPractice.value
+  pts.frontendSettings.defaultShowIrregularGames = showIrregularGames.value
 })
 </script>

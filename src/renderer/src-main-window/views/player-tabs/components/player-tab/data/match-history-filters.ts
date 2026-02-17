@@ -1,3 +1,4 @@
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { InjectionKey, Ref, computed, inject, provide, ref } from 'vue'
 
 export type MatchHistoryFilters = {
@@ -19,12 +20,14 @@ export const MatchHistoryFiltersContextKey: InjectionKey<MatchHistoryFiltersCont
 )
 
 export function provideMatchHistoryFilters() {
+  const pts = usePlayerTabsStore()
+
   const filters = ref<MatchHistoryFilters>({
     winLoss: 'all',
     selectedChampions: [],
     selectedSummoners: [],
-    showPractice: false,
-    showIrregularGames: false
+    showPractice: pts.frontendSettings.defaultShowPractice,
+    showIrregularGames: pts.frontendSettings.defaultShowIrregularGames
   })
 
   const hasFilters = computed(() => {

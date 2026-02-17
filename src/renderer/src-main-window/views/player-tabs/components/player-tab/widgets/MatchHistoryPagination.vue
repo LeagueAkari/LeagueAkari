@@ -13,9 +13,7 @@
     <NSelect
       v-if="preferredSource === 'sgp' || isCrossRegion"
       :value="selectedQueue"
-      @update:value="
-        loadMatchHistory({ tag: $event === ALL_SGPTAG_VALUE ? undefined : $event, startIndex: 0 })
-      "
+      @update:value="handleTagChange"
       size="small"
       :options="sgpTagOptions"
       :disabled="isLoading"
@@ -161,9 +159,7 @@
     <NSelect
       v-if="preferredSource === 'sgp' || isCrossRegion"
       :value="selectedQueue"
-      @update:value="
-        loadMatchHistory({ tag: $event === ALL_SGPTAG_VALUE ? undefined : $event, startIndex: 0 })
-      "
+      @update:value="handleTagChange"
       size="small"
       :options="sgpTagOptions"
       :disabled="isLoading"
@@ -355,6 +351,11 @@ const selectedQueue = computed(() => {
 })
 
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
+
+const handleTagChange = (tag: string) => {
+  pts.frontendSettings.defaultMatchHistoryTag = tag
+  loadMatchHistory({ tag: tag === ALL_SGPTAG_VALUE ? undefined : tag, startIndex: 0 })
+}
 
 const { hasFilters } = useMatchHistoryFilters()
 

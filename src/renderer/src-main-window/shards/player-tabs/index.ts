@@ -276,6 +276,24 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
     )
 
     await this._setting.savedPropVue(PlayerTabsRenderer.id, store.frontendSettings, 'loadCount')
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
+      'defaultMatchHistoryTag'
+    )
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
+      'defaultShowPractice'
+    )
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
+      'defaultShowIrregularGames'
+    )
   }
 }
 
