@@ -65,8 +65,12 @@ export interface JunglePathingStats {
   /** 按阵营分的首清统计 */
   blueTeamGames: number
   blueTeamTopsideStartCount: number
+  blueTeamInvadeStartCount: number
+  blueTeamInvadeTopsideStartCount: number
   redTeamGames: number
   redTeamTopsideStartCount: number
+  redTeamInvadeStartCount: number
+  redTeamInvadeTopsideStartCount: number
 
   /** Gank 坐标点（用于地图可视化） */
   gankPositions: GankPoint[]
@@ -99,6 +103,19 @@ function isTopside(x: number, y: number, teamId: number): boolean {
     return y > x
   }
   return y < x
+}
+
+/**
+ * 判断首清是否发生在对方半区（入侵开）
+ * 使用 x+y 相对地图中心对角线的偏移做近似，并留出缓冲避免中路区域误判
+ */
+function isInvadeStart(x: number, y: number, teamId: number): boolean {
+  const sideOffset = x + y - 15000
+  const threshold = 1800
+  if (teamId === 100) {
+    return sideOffset > threshold
+  }
+  return sideOffset < -threshold
 }
 
 /**
@@ -152,7 +169,9 @@ interface SingleGameAnalysis {
   botGanks: number
   /** 所在阵营 100=蓝 200=红 */
   teamId: number
+  /** 起手所在半区（按己方视角） */
   topsideStart: boolean | null
+  invadeStart: boolean | null
   /** 野怪目标统计 */
   objectives: {
     gotFirstDragon: boolean | null
@@ -354,10 +373,12 @@ function analyzeOneGame(
 
   // 3. 首清方向（看第1帧位置）
   let topsideStart: boolean | null = null
+  let invadeStart: boolean | null = null
   if (frames.length > FIRST_CLEAR_FRAME) {
     const pf = frames[FIRST_CLEAR_FRAME].participantFrames[pidKey]
     if (pf?.position) {
       topsideStart = isTopside(pf.position.x, pf.position.y, teamId)
+      invadeStart = isInvadeStart(pf.position.x, pf.position.y, teamId)
     }
   }
 
@@ -377,6 +398,7 @@ function analyzeOneGame(
     botGanks,
     teamId,
     topsideStart,
+    invadeStart,
     objectives: {
       gotFirstDragon: firstDragonTeam !== null ? firstDragonTeam === teamId : null,
       dragons,
@@ -407,8 +429,12 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   let totalBotGanks = 0
   let blueTeamGames = 0
   let blueTeamTopsideStartCount = 0
+  let blueTeamInvadeStartCount = 0
+  let blueTeamInvadeTopsideStartCount = 0
   let redTeamGames = 0
   let redTeamTopsideStartCount = 0
+  let redTeamInvadeStartCount = 0
+  let redTeamInvadeTopsideStartCount = 0
   const gankPositions: GankPoint[] = []
   const minutePositions: MinutePositionPoint[] = []
 
@@ -433,13 +459,25 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     totalMidGanks += r.midGanks
     totalBotGanks += r.botGanks
 
-    if (r.topsideStart !== null) {
-      if (r.teamId === 100) {
+    if (r.teamId === 100) {
+      if (r.topsideStart !== null) {
         blueTeamGames++
-        if (r.topsideStart) blueTeamTopsideStartCount++
-      } else {
+      }
+      if (r.invadeStart) {
+        blueTeamInvadeStartCount++
+        if (r.topsideStart) blueTeamInvadeTopsideStartCount++
+      } else if (r.topsideStart) {
+        blueTeamTopsideStartCount++
+      }
+    } else {
+      if (r.topsideStart !== null) {
         redTeamGames++
-        if (r.topsideStart) redTeamTopsideStartCount++
+      }
+      if (r.invadeStart) {
+        redTeamInvadeStartCount++
+        if (r.topsideStart) redTeamInvadeTopsideStartCount++
+      } else if (r.topsideStart) {
+        redTeamTopsideStartCount++
       }
     }
 
@@ -491,8 +529,12 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     },
     blueTeamGames,
     blueTeamTopsideStartCount,
+    blueTeamInvadeStartCount,
+    blueTeamInvadeTopsideStartCount,
     redTeamGames,
     redTeamTopsideStartCount,
+    redTeamInvadeStartCount,
+    redTeamInvadeTopsideStartCount,
     gankPositions,
     minutePositions
   }

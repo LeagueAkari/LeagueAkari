@@ -2376,6 +2376,8 @@ JunglePathing:
   firstClear: 首清
   topsideStart: '上开 {{pct}}%'
   botsideStart: '下开 {{pct}}%'
+  invadeStart: '入侵开 {{pct}}%'
+  enemyBuff: '敌方{{buff}}'
   redBuff: 红buff
   blueBuff: 蓝buff
   blueTeam: 蓝色方

@@ -2375,6 +2375,8 @@ JunglePathing:
   firstClear: 1st Clear
   topsideStart: 'Top {{pct}}%'
   botsideStart: 'Bot {{pct}}%'
+  invadeStart: 'Invade {{pct}}%'
+  enemyBuff: 'Enemy {{buff}}'
   redBuff: Red Buff
   blueBuff: Blue Buff
   blueTeam: Blue

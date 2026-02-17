@@ -418,21 +418,56 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function buffNameForSide(teamId: number, topside: boolean): string {
+  if (teamId === 100) {
+    return topside ? t('JunglePathing.blueBuff') : t('JunglePathing.redBuff')
+  }
+  return topside ? t('JunglePathing.redBuff') : t('JunglePathing.blueBuff')
+}
+
+function enemyBuffNameForSide(teamId: number, topside: boolean): string {
+  if (teamId === 100) {
+    return topside ? t('JunglePathing.redBuff') : t('JunglePathing.blueBuff')
+  }
+  return topside ? t('JunglePathing.blueBuff') : t('JunglePathing.redBuff')
+}
+
 function firstClearTextForTeam(stats: JunglePathingStats, teamId: number) {
   const isBlue = teamId === 100
   const games = isBlue ? stats.blueTeamGames : stats.redTeamGames
   const topsideStarts = isBlue ? stats.blueTeamTopsideStartCount : stats.redTeamTopsideStartCount
+  const invadeStarts = isBlue ? stats.blueTeamInvadeStartCount : stats.redTeamInvadeStartCount
+  const invadeTopsideStarts = isBlue
+    ? stats.blueTeamInvadeTopsideStartCount
+    : stats.redTeamInvadeTopsideStartCount
   if (games === 0) return '—'
+
+  const botsideStarts = Math.max(0, games - invadeStarts - topsideStarts)
   const topsidePct = Math.round((topsideStarts / games) * 100)
-  const topsideBuff = isBlue ? t('JunglePathing.blueBuff') : t('JunglePathing.redBuff')
-  const botsideBuff = isBlue ? t('JunglePathing.redBuff') : t('JunglePathing.blueBuff')
+  const botsidePct = Math.round((botsideStarts / games) * 100)
+  const invadePct = Math.round((invadeStarts / games) * 100)
+
+  let base = t('JunglePathing.balanced')
   if (topsidePct >= 55) {
-    return t('JunglePathing.topsideStart', { pct: topsidePct }) + `(${topsideBuff})`
+    base = t('JunglePathing.topsideStart', { pct: topsidePct }) + `(${buffNameForSide(teamId, true)})`
+  } else if (topsidePct <= 45) {
+    base = t('JunglePathing.botsideStart', { pct: botsidePct }) + `(${buffNameForSide(teamId, false)})`
   }
-  if (topsidePct <= 45) {
-    return t('JunglePathing.botsideStart', { pct: 100 - topsidePct }) + `(${botsideBuff})`
+
+  if (invadePct <= 0) return base
+
+  const invadeTopsidePct = invadeStarts > 0 ? Math.round((invadeTopsideStarts / invadeStarts) * 100) : 0
+  let invadeBuff = ''
+  if (invadeTopsidePct >= 55) {
+    invadeBuff = enemyBuffNameForSide(teamId, true)
+  } else if (invadeTopsidePct <= 45) {
+    invadeBuff = enemyBuffNameForSide(teamId, false)
+  } else {
+    invadeBuff = `${t('JunglePathing.redBuff')}/${t('JunglePathing.blueBuff')}`
   }
-  return t('JunglePathing.balanced')
+
+  const invadeText = `${t('JunglePathing.invadeStart', { pct: invadePct })}(${t('JunglePathing.enemyBuff', { buff: invadeBuff })})`
+  return `${base} | ${invadeText}`
 }
 
 function formatStatsText(stats: JunglePathingStats, label: string): string {
