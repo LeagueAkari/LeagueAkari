@@ -208,18 +208,18 @@
         <div class="flex flex-col justify-center gap-2 text-xs">
           <div>
             <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.firstClear') }}</div>
-            <div v-if="popoverStats.firstClearCamp.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_max-content] items-center gap-x-2">
-              <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
+            <div v-if="popoverStats.firstClearCamp.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2">
+              <span class="row-span-2 self-start text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
               <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'blue') }}</span>
-              <span v-if="firstClearInvadeText(popoverStats, 'blue')" class="whitespace-nowrap text-amber-500">
-                {{ firstClearInvadeText(popoverStats, 'blue') }}
+              <span class="min-w-0 truncate text-amber-500">
+                {{ firstClearInvadeText(popoverStats, 'blue') || t('JunglePathing.noData') }}
               </span>
             </div>
-            <div v-if="popoverStats.firstClearCamp.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_max-content] items-center gap-x-2">
-              <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
+            <div v-if="popoverStats.firstClearCamp.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2">
+              <span class="row-span-2 self-start text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
               <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'red') }}</span>
-              <span v-if="firstClearInvadeText(popoverStats, 'red')" class="whitespace-nowrap text-amber-500">
-                {{ firstClearInvadeText(popoverStats, 'red') }}
+              <span class="min-w-0 truncate text-amber-500">
+                {{ firstClearInvadeText(popoverStats, 'red') || t('JunglePathing.noData') }}
               </span>
             </div>
             <div v-if="popoverStats.firstClearCamp.blueGames === 0 && popoverStats.firstClearCamp.redGames === 0" class="text-black/50 dark:text-white/50">—</div>
