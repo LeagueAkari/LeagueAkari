@@ -12,7 +12,7 @@ export type OngoingGamePanelContext = {
   columnsNeed: Readonly<Ref<number>>
   linesPerTeam: Readonly<Ref<number>>
   isTwoTeamsMode: Readonly<Ref<boolean>>
-  premadeTeamInfo: Readonly<
+  mergedPremadeTeams: Readonly<
     Ref<{
       groups: Record<string, string[]>
       premadeTeamIdMap: Record<string, string>
@@ -46,7 +46,7 @@ export function provideOngoingGamePanel(props: {
   columnsNeed: MaybeRefOrGetter<number>
   linesPerTeam: MaybeRefOrGetter<number>
   isTwoTeamsMode: MaybeRefOrGetter<boolean>
-  premadeTeamInfo: MaybeRefOrGetter<{
+  mergedPremadeTeams: MaybeRefOrGetter<{
     groups: Record<string, string[]>
     premadeTeamIdMap: Record<string, string>
   }>
@@ -87,7 +87,7 @@ export function provideOngoingGamePanel(props: {
     columnsNeed: toRef(props.columnsNeed),
     linesPerTeam: toRef(props.linesPerTeam),
     isTwoTeamsMode: toRef(props.isTwoTeamsMode),
-    premadeTeamInfo: toRef(props.premadeTeamInfo),
+    mergedPremadeTeams: toRef(props.mergedPremadeTeams),
 
     kdaOutliers,
 

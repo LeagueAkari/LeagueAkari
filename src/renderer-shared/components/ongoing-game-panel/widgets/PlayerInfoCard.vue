@@ -537,8 +537,12 @@ const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 
-const { premadeTeamInfo, kdaOutliers, previewGame, navigateToSummonerByPuuid } =
-  useOngoingGamePanel()
+const {
+  mergedPremadeTeams: premadeTeamInfo,
+  kdaOutliers,
+  previewGame,
+  navigateToSummonerByPuuid
+} = useOngoingGamePanel()
 
 const summoner = computed(() => ogs.summoner[puuid])
 const rankedStats = computed(() => ogs.rankedStats[puuid])

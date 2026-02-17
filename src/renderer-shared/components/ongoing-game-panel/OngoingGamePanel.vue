@@ -98,7 +98,7 @@ const ogs = useOngoingGameStore()
 
 const isInIdleState = computed(() => ogs.queryStage.phase === 'unavailable')
 
-const premadeTeamInfo = computed(() => {
+const mergedPremadeTeams = computed(() => {
   if (ogs.queryStage.phase === 'lobby' || ogs.queryStage.phase === 'unavailable') {
     return {
       groups: {},
@@ -150,7 +150,7 @@ const sortedTeams = computed(() => {
       }
 
       if (ogs.settings.orderPlayerBy === 'premade-team') {
-        const info = premadeTeamInfo.value
+        const info = mergedPremadeTeams.value
         const idMap = info.premadeTeamIdMap
         const groups = info.groups
 
@@ -235,7 +235,7 @@ provideOngoingGamePanel({
   columnsNeed,
   linesPerTeam,
   isTwoTeamsMode,
-  premadeTeamInfo,
+  mergedPremadeTeams,
 
   navigateToSummonerByPuuid: (puuid: string) => {
     emits('navigateToSummonerByPuuid', puuid)

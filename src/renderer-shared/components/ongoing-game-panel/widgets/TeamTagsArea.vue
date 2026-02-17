@@ -150,7 +150,7 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 
-const { premadeTeamInfo } = useOngoingGamePanel()
+const { mergedPremadeTeams: premadeTeamInfo } = useOngoingGamePanel()
 
 const teamStats = computed(() => {
   if (!ogs.playerStats) {

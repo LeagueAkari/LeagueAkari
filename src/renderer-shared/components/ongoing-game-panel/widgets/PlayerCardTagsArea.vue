@@ -631,7 +631,11 @@ const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
 
-const { premadeTeamInfo, previewGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
+const {
+  mergedPremadeTeams: premadeTeamInfo,
+  previewGame,
+  navigateToSummonerByPuuid
+} = useOngoingGamePanel()
 
 const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
