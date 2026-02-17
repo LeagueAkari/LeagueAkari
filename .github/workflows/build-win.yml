@@ -38,5 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: dist/*.exe
+          path: |
+            dist/*.7z
+            dist/*.exe
           retention-days: 5
