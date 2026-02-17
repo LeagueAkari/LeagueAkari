@@ -2061,6 +2061,7 @@ PlayerTab:
     loss: Loss
     summoners: Summoners involved
     champions: Champions involved
+    showPractice: Show Practice Mode
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'

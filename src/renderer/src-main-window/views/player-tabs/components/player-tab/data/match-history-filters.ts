@@ -4,6 +4,7 @@ export type MatchHistoryFilters = {
   winLoss: 'all' | 'win' | 'loss'
   selectedChampions: number[]
   selectedSummoners: string[]
+  showPractice: boolean
 }
 
 export type MatchHistoryFiltersContext = {
@@ -20,7 +21,8 @@ export function provideMatchHistoryFilters() {
   const filters = ref<MatchHistoryFilters>({
     winLoss: 'all',
     selectedChampions: [],
-    selectedSummoners: []
+    selectedSummoners: [],
+    showPractice: false
   })
 
   const hasFilters = computed(() => {

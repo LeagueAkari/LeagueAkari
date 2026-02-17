@@ -115,14 +115,20 @@ const gamesShouldHide = computed(() => {
     return new Set<number>()
   }
 
-  if (!hasFilters.value) {
-    return new Set<number>()
-  }
-
-  const { winLoss, selectedChampions, selectedSummoners } = filters.value
+  const { winLoss, selectedChampions, selectedSummoners, showPractice } = filters.value
 
   const shouldShow = (g: LcuOrSgpGameSummary) => {
     const basicInfo = toBasicInfo(g)
+
+    // 默认隐藏训练模式，除非筛选器中勾选了显示
+    if (!showPractice && basicInfo.gameMode === 'PRACTICETOOL') {
+      return false
+    }
+
+    if (!hasFilters.value) {
+      return true
+    }
+
     const participants = toParticipants(g, basicInfo)
     const participant = participants.find((p) => p.puuid === puuid.value)
 
