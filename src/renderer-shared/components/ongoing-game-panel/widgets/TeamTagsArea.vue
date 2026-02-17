@@ -160,6 +160,14 @@ const teamStats = computed(() => {
   return ogs.playerStats.teams[teamIdentifier] ?? null
 })
 
+const teamMembers = computed(() => {
+  if (!ogs.playerStats) {
+    return []
+  }
+
+  return ogs.teams[teamIdentifier] ?? []
+})
+
 const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
@@ -263,6 +271,7 @@ const teamPremadeTeams = computed(() => {
   }
 
   return Object.entries(premadeTeamInfo.value.groups)
+    .filter(([_, puuids]) => puuids.every((p) => teamMembers.value.includes(p)))
     .map(([premadeId, puuids]) => {
       return {
         premadeId,
