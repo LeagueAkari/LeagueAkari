@@ -18,6 +18,7 @@ asarUnpack:
   - resources/**
 win:
   target:
+    - nsis
     - 7z
   executableName: LeagueAkari
   icon: resources/LA_ICON.ico
