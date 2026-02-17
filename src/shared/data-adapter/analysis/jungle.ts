@@ -17,13 +17,35 @@ export interface JunglePathingStats {
   /** 上半区偏好比例 0-1, >0.5 偏上 */
   avgTopsidePercentage: number
 
-  /** 前20分钟 Gank 统计 */
+  /** 前14分钟 Gank 统计 */
   totalTopGanks: number
   totalMidGanks: number
   totalBotGanks: number
   avgTopGanks: number
   avgMidGanks: number
   avgBotGanks: number
+
+  /** 野怪目标统计 */
+  objectives: {
+    /** 一龙率 */
+    firstDragonRate: number
+    /** 场均小龙数 */
+    avgDragons: number
+    /** 首条小龙平均时间（秒），null=无数据 */
+    avgFirstDragonTime: number | null
+    /** 场均潮虫数 */
+    avgVoidgrubs: number
+    /** 首条潮虫平均时间（秒） */
+    avgFirstVoidgrubTime: number | null
+    /** 场均先锋数 */
+    avgHeralds: number
+    /** 首条先锋平均时间（秒） */
+    avgFirstHeraldTime: number | null
+    /** 场均大龙数 */
+    avgBarons: number
+    /** 首条大龙平均时间（秒） */
+    avgFirstBaronTime: number | null
+  }
 
   /** 按阵营分的首清统计 */
   blueTeamGames: number
@@ -44,10 +66,8 @@ export interface JunglePathingAnalysis {
   currentChampionId: number
 }
 
-/** 前15分钟帧用于判断半区偏好 */
-const PATHING_MINUTES = 15
-/** 前20分钟击杀用于判断 Gank */
-const GANK_MINUTES = 20
+/** 前14分钟帧用于判断半区偏好和 Gank */
+const ANALYSIS_MINUTES = 14
 /** 首清方向看第1帧（1分钟时的位置） */
 const FIRST_CLEAR_FRAME = 1
 /** 当前英雄分析最多局数 */
@@ -113,6 +133,18 @@ interface SingleGameAnalysis {
   /** 所在阵营 100=蓝 200=红 */
   teamId: number
   topsideStart: boolean | null
+  /** 野怪目标统计 */
+  objectives: {
+    gotFirstDragon: boolean | null
+    dragons: number
+    firstDragonTime: number | null
+    voidgrubs: number
+    firstVoidgrubTime: number | null
+    heralds: number
+    firstHeraldTime: number | null
+    barons: number
+    firstBaronTime: number | null
+  }
   gankPositions: GankPoint[]
 }
 
@@ -140,7 +172,7 @@ function analyzeOneGame(
   // 1. 半区偏好（前15分钟）
   let topsideFrames = 0
   let totalFrames = 0
-  const pathingFrameLimit = Math.min(frames.length, PATHING_MINUTES + 1)
+  const pathingFrameLimit = Math.min(frames.length, ANALYSIS_MINUTES + 1)
 
   for (let i = 1; i < pathingFrameLimit; i++) {
     const frame = frames[i]
@@ -153,8 +185,8 @@ function analyzeOneGame(
     }
   }
 
-  // 2. Gank 分析（前20分钟）+ 击杀参与的半区加权
-  const gankTimeLimitMs = GANK_MINUTES * 60 * 1000
+  // 2. Gank 分析（前14分钟）+ 击杀参与的半区加权 + 野怪目标统计
+  const gankTimeLimitMs = ANALYSIS_MINUTES * 60 * 1000
   let topGanks = 0
   let midGanks = 0
   let botGanks = 0
@@ -164,45 +196,101 @@ function analyzeOneGame(
   let killTopsideWeighted = 0
   let killTotalWeighted = 0
 
+  // 野怪目标统计
+  let firstDragonTeam: number | null = null
+  let dragons = 0
+  let firstDragonTime: number | null = null
+  let voidgrubs = 0
+  let firstVoidgrubTime: number | null = null
+  let heralds = 0
+  let firstHeraldTime: number | null = null
+  let barons = 0
+  let firstBaronTime: number | null = null
+
   for (const frame of frames) {
     if (!frame.events) continue
     for (const event of frame.events) {
-      if (event.type !== 'CHAMPION_KILL') continue
-      if (event.timestamp > gankTimeLimitMs) continue
+      // 击杀参与 (前14分钟)
+      if (event.type === 'CHAMPION_KILL' && event.timestamp <= gankTimeLimitMs) {
+        const killEvent = event as {
+          killerId: number
+          victimId: number
+          assistingParticipantIds?: number[]
+          position: { x: number; y: number }
+        }
 
-      const killEvent = event as {
-        killerId: number
-        victimId: number
-        assistingParticipantIds?: number[]
-        position: { x: number; y: number }
+        const isKiller = killEvent.killerId === participantId
+        const isAssist = killEvent.assistingParticipantIds?.includes(participantId) ?? false
+        if (!isKiller && !isAssist) continue
+
+        killTotalWeighted += KILL_WEIGHT
+        if (isTopside(killEvent.position.x, killEvent.position.y, teamId)) {
+          killTopsideWeighted += KILL_WEIGHT
+        }
+
+        const lane = classifyGankLane(killEvent.position.x, killEvent.position.y)
+        if (!lane) continue
+
+        switch (lane) {
+          case 'top':
+            topGanks++
+            break
+          case 'mid':
+            midGanks++
+            break
+          case 'bot':
+            botGanks++
+            break
+        }
+
+        gankPositions.push({ x: killEvent.position.x, y: killEvent.position.y, lane })
       }
 
-      const isKiller = killEvent.killerId === participantId
-      const isAssist = killEvent.assistingParticipantIds?.includes(participantId) ?? false
-      if (!isKiller && !isAssist) continue
+      // 野怪目标统计（全场）
+      if ((event as { type?: string }).type === 'ELITE_MONSTER_KILL') {
+        const monsterEvent = event as {
+          monsterType: string
+          killerId: number
+          killerTeamId?: number
+          timestamp: number
+        }
 
-      // 击杀参与位置加权计入半区偏好
-      killTotalWeighted += KILL_WEIGHT
-      if (isTopside(killEvent.position.x, killEvent.position.y, teamId)) {
-        killTopsideWeighted += KILL_WEIGHT
+        const killerTeam =
+          monsterEvent.killerTeamId ??
+          (monsterEvent.killerId >= 1 && monsterEvent.killerId <= 5 ? 100 : 200)
+        const isOurTeam = killerTeam === teamId
+        const timeSec = monsterEvent.timestamp / 1000
+
+        switch (monsterEvent.monsterType) {
+          case 'DRAGON':
+            if (firstDragonTeam === null) {
+              firstDragonTeam = killerTeam
+            }
+            if (isOurTeam) {
+              dragons++
+              if (firstDragonTime === null) firstDragonTime = timeSec
+            }
+            break
+          case 'HORDE':
+            if (isOurTeam) {
+              voidgrubs++
+              if (firstVoidgrubTime === null) firstVoidgrubTime = timeSec
+            }
+            break
+          case 'RIFTHERALD':
+            if (isOurTeam) {
+              heralds++
+              if (firstHeraldTime === null) firstHeraldTime = timeSec
+            }
+            break
+          case 'BARON_NASHOR':
+            if (isOurTeam) {
+              barons++
+              if (firstBaronTime === null) firstBaronTime = timeSec
+            }
+            break
+        }
       }
-
-      const lane = classifyGankLane(killEvent.position.x, killEvent.position.y)
-      if (!lane) continue
-
-      switch (lane) {
-        case 'top':
-          topGanks++
-          break
-        case 'mid':
-          midGanks++
-          break
-        case 'bot':
-          botGanks++
-          break
-      }
-
-      gankPositions.push({ x: killEvent.position.x, y: killEvent.position.y, lane })
     }
   }
 
@@ -226,6 +314,17 @@ function analyzeOneGame(
     botGanks,
     teamId,
     topsideStart,
+    objectives: {
+      gotFirstDragon: firstDragonTeam !== null ? firstDragonTeam === teamId : null,
+      dragons,
+      firstDragonTime,
+      voidgrubs,
+      firstVoidgrubTime,
+      heralds,
+      firstHeraldTime,
+      barons,
+      firstBaronTime
+    },
     gankPositions
   }
 }
@@ -245,6 +344,18 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   let redTeamTopsideStartCount = 0
   const gankPositions: GankPoint[] = []
 
+  // 野怪目标聚合
+  let firstDragonCount = 0
+  let firstDragonTotal = 0
+  let totalDragons = 0
+  const firstDragonTimes: number[] = []
+  let totalVoidgrubs = 0
+  const firstVoidgrubTimes: number[] = []
+  let totalHeralds = 0
+  const firstHeraldTimes: number[] = []
+  let totalBarons = 0
+  const firstBaronTimes: number[] = []
+
   for (const r of validResults) {
     totalTopsidePercent += r.topsidePercent!
     totalTopGanks += r.topGanks
@@ -261,8 +372,24 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
       }
     }
 
+    const obj = r.objectives
+    if (obj.gotFirstDragon !== null) {
+      firstDragonTotal++
+      if (obj.gotFirstDragon) firstDragonCount++
+    }
+    totalDragons += obj.dragons
+    if (obj.firstDragonTime !== null) firstDragonTimes.push(obj.firstDragonTime)
+    totalVoidgrubs += obj.voidgrubs
+    if (obj.firstVoidgrubTime !== null) firstVoidgrubTimes.push(obj.firstVoidgrubTime)
+    totalHeralds += obj.heralds
+    if (obj.firstHeraldTime !== null) firstHeraldTimes.push(obj.firstHeraldTime)
+    totalBarons += obj.barons
+    if (obj.firstBaronTime !== null) firstBaronTimes.push(obj.firstBaronTime)
+
     gankPositions.push(...r.gankPositions)
   }
+
+  const avg = (arr: number[]) => (arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null)
 
   return {
     gamesAnalyzed,
@@ -273,6 +400,17 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     avgTopGanks: totalTopGanks / gamesAnalyzed,
     avgMidGanks: totalMidGanks / gamesAnalyzed,
     avgBotGanks: totalBotGanks / gamesAnalyzed,
+    objectives: {
+      firstDragonRate: firstDragonTotal > 0 ? firstDragonCount / firstDragonTotal : 0,
+      avgDragons: totalDragons / gamesAnalyzed,
+      avgFirstDragonTime: avg(firstDragonTimes),
+      avgVoidgrubs: totalVoidgrubs / gamesAnalyzed,
+      avgFirstVoidgrubTime: avg(firstVoidgrubTimes),
+      avgHeralds: totalHeralds / gamesAnalyzed,
+      avgFirstHeraldTime: avg(firstHeraldTimes),
+      avgBarons: totalBarons / gamesAnalyzed,
+      avgFirstBaronTime: avg(firstBaronTimes)
+    },
     blueTeamGames,
     blueTeamTopsideStartCount,
     redTeamGames,

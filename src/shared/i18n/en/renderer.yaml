@@ -2367,6 +2367,8 @@ JunglePathing:
   ganks: Ganks
   topsidePref: 'Top {{pct}}%'
   botsidePref: 'Bot {{pct}}%'
+  topMidPref: 'Top/Mid {{pct}}%'
+  midBotPref: 'Mid/Bot {{pct}}%'
   balanced: Balanced
   balancedShort: Bal.
   firstClear: 1st Clear
@@ -2376,10 +2378,18 @@ JunglePathing:
   blueBuff: Blue Buff
   blueTeam: Blue
   redTeam: Red
-  description: Based on recent jungle games timeline data. Map preference combines first 15min positions and kill participation (kills weighted higher). Gank stats count kills and assists in the first 20min. First clear direction is determined by position at 1min, tracked per team side.
+  objectives: Objectives
+  firstDragonRate: '1st Drake {{pct}}%'
+  avgDragons: 'Avg Drake {{count}}'
+  avgVoidgrubs: 'Avg Grubs {{count}}'
+  avgHeralds: 'Avg Herald {{count}}'
+  avgBarons: 'Avg Baron {{count}}'
+  firstTime: '1st {{time}}'
+  noData: '—'
+  description: Based on recent jungle games timeline data. Map preference combines first 14min positions and kill participation (kills weighted higher). Gank stats count kills and assists in the first 14min. First clear direction is determined by position at 1min, tracked per team side.
   gamesUnit: ' games'
-  copyAll: Copy
-  copied: Jungle analysis copied
+  copyAll: Copy Summary
+  copied: Analysis copied
   allyJungler: Ally Jungler
   enemyJungler: Enemy Jungler
   top: Top

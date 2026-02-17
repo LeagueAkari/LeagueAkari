@@ -37,18 +37,27 @@
 
     <!-- popover detail -->
     <div class="flex flex-col gap-2">
-      <!-- tab switch -->
-      <div v-if="analysis.currentChampion" class="flex gap-1 text-xs">
+      <!-- tab switch + copy -->
+      <div class="flex items-center gap-2" :class="analysis.currentChampion ? 'justify-between' : 'justify-end'">
+        <div v-if="analysis.currentChampion" class="flex gap-1 text-xs">
+          <button
+            v-for="tab of tabs"
+            :key="tab.key"
+            class="cursor-pointer rounded px-2 py-0.5 transition-colors"
+            :class="activeTab === tab.key
+              ? 'bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-300'
+              : 'text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5'"
+            @click="activeTab = tab.key"
+          >
+            {{ tab.label }} ({{ tab.stats.gamesAnalyzed }})
+          </button>
+        </div>
         <button
-          v-for="tab of tabs"
-          :key="tab.key"
-          class="cursor-pointer rounded px-2 py-0.5 transition-colors"
-          :class="activeTab === tab.key
-            ? 'bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-300'
-            : 'text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5'"
-          @click="activeTab = tab.key"
+          class="flex-shrink-0 cursor-pointer rounded px-2 py-1 text-[11px] text-black/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
+          @click="handleCopyAll"
         >
-          {{ tab.label }} ({{ tab.stats.gamesAnalyzed }})
+          <NIcon class="mr-0.5 align-middle" :component="CopyIcon" />
+          {{ t('JunglePathing.copyAll') }}
         </button>
       </div>
 
@@ -100,20 +109,50 @@
             </div>
             <div v-if="popoverStats.blueTeamGames === 0 && popoverStats.redTeamGames === 0" class="text-black/50 dark:text-white/50">—</div>
           </div>
+          <div>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.objectives') }}</div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-0.5"><DragonIcon class="size-3.5" />{{ t('JunglePathing.firstDragonRate', { pct: Math.round(popoverStats.objectives.firstDragonRate * 100) }) }}</div>
+              <div class="grid grid-cols-2 gap-x-3 gap-y-1">
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <DragonIcon class="size-3.5" />{{ t('JunglePathing.avgDragons', { count: roundToTenth(popoverStats.objectives.avgDragons) }) }}
+                  </span>
+                  <span v-if="popoverStats.objectives.avgFirstDragonTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
+                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstDragonTime) }) }}
+                  </span>
+                </div>
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <RiftHeraldIcon class="size-3.5" />{{ t('JunglePathing.avgHeralds', { count: roundToTenth(popoverStats.objectives.avgHeralds) }) }}
+                  </span>
+                  <span v-if="popoverStats.objectives.avgFirstHeraldTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
+                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstHeraldTime) }) }}
+                  </span>
+                </div>
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <VoidGrubIcon class="size-3.5" />{{ t('JunglePathing.avgVoidgrubs', { count: roundToTenth(popoverStats.objectives.avgVoidgrubs) }) }}
+                  </span>
+                  <span v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
+                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime) }) }}
+                  </span>
+                </div>
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <BaronIcon class="size-3.5" />{{ t('JunglePathing.avgBarons', { count: roundToTenth(popoverStats.objectives.avgBarons) }) }}
+                  </span>
+                  <span v-if="popoverStats.objectives.avgFirstBaronTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
+                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstBaronTime) }) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
+            {{ t('JunglePathing.description') }}
+          </div>
         </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <div class="max-w-[320px] flex-1 text-[11px] leading-relaxed text-black/40 dark:text-white/40">
-          {{ t('JunglePathing.description') }}
-        </div>
-        <button
-          class="flex-shrink-0 cursor-pointer rounded px-2 py-1 text-[11px] text-black/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
-          @click="handleCopyAll"
-        >
-          <NIcon class="mr-0.5 align-middle" :component="CopyIcon" />
-          {{ t('JunglePathing.copyAll') }}
-        </button>
       </div>
     </div>
   </NPopover>
@@ -128,6 +167,10 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
 
+import BaronIcon from '@renderer-shared/components/match-card/icons/Baron.vue'
+import DragonIcon from '@renderer-shared/components/match-card/icons/Dragon.vue'
+import RiftHeraldIcon from '@renderer-shared/components/match-card/icons/RiftHerald.vue'
+import VoidGrubIcon from '@renderer-shared/components/match-card/icons/VoidGrub.vue'
 import map11 from '@renderer-shared/components/match-card/map-images/11.png'
 import { mapToImagePosition } from '@renderer-shared/components/match-card/utils/game-map'
 
@@ -196,6 +239,16 @@ const largeMapPoints = computed(() => {
 })
 
 function topsideText(stats: JunglePathingStats) {
+  const laneBias = getLaneBias(stats)
+  if (laneBias === 'midBot') {
+    const pct = Math.round(((stats.totalMidGanks + stats.totalBotGanks) / totalGanks(stats)) * 100)
+    return t('JunglePathing.midBotPref', { pct })
+  }
+  if (laneBias === 'topMid') {
+    const pct = Math.round(((stats.totalTopGanks + stats.totalMidGanks) / totalGanks(stats)) * 100)
+    return t('JunglePathing.topMidPref', { pct })
+  }
+
   const pct = Math.round(stats.avgTopsidePercentage * 100)
   const botPct = 100 - pct
   if (pct >= 55) return t('JunglePathing.topsidePref', { pct })
@@ -204,6 +257,16 @@ function topsideText(stats: JunglePathingStats) {
 }
 
 function topsideTextShort(stats: JunglePathingStats) {
+  const laneBias = getLaneBias(stats)
+  if (laneBias === 'midBot') {
+    const pct = Math.round(((stats.totalMidGanks + stats.totalBotGanks) / totalGanks(stats)) * 100)
+    return t('JunglePathing.midBotPref', { pct })
+  }
+  if (laneBias === 'topMid') {
+    const pct = Math.round(((stats.totalTopGanks + stats.totalMidGanks) / totalGanks(stats)) * 100)
+    return t('JunglePathing.topMidPref', { pct })
+  }
+
   const pct = Math.round(stats.avgTopsidePercentage * 100)
   const botPct = 100 - pct
   if (pct >= 55) return t('JunglePathing.topsidePref', { pct })
@@ -212,10 +275,42 @@ function topsideTextShort(stats: JunglePathingStats) {
 }
 
 function topsideTextColor(stats: JunglePathingStats) {
+  const laneBias = getLaneBias(stats)
+  if (laneBias === 'topMid') return 'text-emerald-600 dark:text-emerald-400'
+  if (laneBias === 'midBot') return 'text-blue-600 dark:text-blue-400'
+
   const pct = Math.round(stats.avgTopsidePercentage * 100)
   if (pct >= 55) return 'text-emerald-600 dark:text-emerald-400'
   if (pct <= 45) return 'text-blue-600 dark:text-blue-400'
   return 'text-black/70 dark:text-white/70'
+}
+
+function totalGanks(stats: JunglePathingStats): number {
+  return stats.totalTopGanks + stats.totalMidGanks + stats.totalBotGanks
+}
+
+function getLaneBias(stats: JunglePathingStats): 'topMid' | 'midBot' | null {
+  const total = totalGanks(stats)
+  if (total < 8) return null
+
+  const topShare = stats.totalTopGanks / total
+  const botShare = stats.totalBotGanks / total
+  const topMidShare = (stats.totalTopGanks + stats.totalMidGanks) / total
+  const midBotShare = (stats.totalMidGanks + stats.totalBotGanks) / total
+
+  if (topShare <= 0.22 && midBotShare >= 0.65) return 'midBot'
+  if (botShare <= 0.22 && topMidShare >= 0.65) return 'topMid'
+  return null
+}
+
+function roundToTenth(value: number): number {
+  return Math.round(value * 10) / 10
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.round(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 function firstClearTextForTeam(stats: JunglePathingStats, teamId: number) {
@@ -247,12 +342,21 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
     fcLines.push(`  ${t('JunglePathing.redTeam')}: ${firstClearTextForTeam(stats, 200)}`)
   }
 
+  const obj = stats.objectives
+  const objParts: string[] = []
+  objParts.push(t('JunglePathing.firstDragonRate', { pct: Math.round(obj.firstDragonRate * 100) }))
+  objParts.push(t('JunglePathing.avgDragons', { count: roundToTenth(obj.avgDragons) }) + (obj.avgFirstDragonTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstDragonTime) })})` : ''))
+  objParts.push(t('JunglePathing.avgVoidgrubs', { count: roundToTenth(obj.avgVoidgrubs) }) + (obj.avgFirstVoidgrubTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstVoidgrubTime) })})` : ''))
+  objParts.push(t('JunglePathing.avgHeralds', { count: roundToTenth(obj.avgHeralds) }) + (obj.avgFirstHeraldTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstHeraldTime) })})` : ''))
+  objParts.push(t('JunglePathing.avgBarons', { count: roundToTenth(obj.avgBarons) }) + (obj.avgFirstBaronTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstBaronTime) })})` : ''))
+
   let text = `[${label}] ${stats.gamesAnalyzed}${t('JunglePathing.gamesUnit')}\n`
   text += `  ${t('JunglePathing.mapPref')}: ${mapPref}\n`
   text += `  ${t('JunglePathing.ganks')}: ${ganks}\n`
   if (fcLines.length > 0) {
-    text += `  ${t('JunglePathing.firstClear')}:\n${fcLines.join('\n')}`
+    text += `  ${t('JunglePathing.firstClear')}:\n${fcLines.join('\n')}\n`
   }
+  text += `  ${t('JunglePathing.objectives')}: ${objParts.join(', ')}`
   return text
 }
 
