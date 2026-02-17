@@ -25,12 +25,11 @@
             <span class="font-bold text-emerald-700 dark:text-emerald-300">{{ t('JunglePathing.title') }}</span>
             <span v-if="analysis.currentChampion" class="text-[10px] text-amber-600 dark:text-amber-400">{{ t('JunglePathing.currentChampion') }}</span>
             <span class="text-[10px] text-black/50 dark:text-white/50">{{ t('JunglePathing.gamesAnalyzed', { count: displayStats.gamesAnalyzed }) }}</span>
-            <NIcon class="ml-auto text-[12px] text-black/30 dark:text-white/30" :component="InformationFilled" />
           </div>
-          <div class="flex gap-2 text-black/80 dark:text-white/80">
-            <span :class="topsideTextColor(displayStats)">{{ topsideText(displayStats) }}</span>
+          <div class="flex gap-1 text-black/80 dark:text-white/80">
+            <span :class="topsideTextColor(displayStats)">{{ topsideTextShort(displayStats) }}</span>
             <span class="text-black/40 dark:text-white/40">|</span>
-            <span><span class="text-red-400">{{ t('JunglePathing.top') }}</span>{{ displayStats.totalTopGanks }} <span class="text-yellow-400">{{ t('JunglePathing.mid') }}</span>{{ displayStats.totalMidGanks }} <span class="text-blue-400">{{ t('JunglePathing.bot') }}</span>{{ displayStats.totalBotGanks }}</span>
+            <span><span class="text-red-400">{{ t('JunglePathing.topShort') }}</span>{{ displayStats.totalTopGanks }} <span class="text-yellow-400">{{ t('JunglePathing.midShort') }}</span>{{ displayStats.totalMidGanks }} <span class="text-blue-400">{{ t('JunglePathing.botShort') }}</span>{{ displayStats.totalBotGanks }}</span>
           </div>
         </div>
       </div>
@@ -124,7 +123,6 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { JunglePathingAnalysis, JunglePathingStats } from '@shared/data-adapter/analysis/jungle'
-import { InformationFilled } from '@vicons/carbon'
 import { Copy as CopyIcon } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, useMessage } from 'naive-ui'
@@ -203,6 +201,14 @@ function topsideText(stats: JunglePathingStats) {
   if (pct >= 55) return t('JunglePathing.topsidePref', { pct })
   if (botPct >= 55) return t('JunglePathing.botsidePref', { pct: botPct })
   return t('JunglePathing.balanced')
+}
+
+function topsideTextShort(stats: JunglePathingStats) {
+  const pct = Math.round(stats.avgTopsidePercentage * 100)
+  const botPct = 100 - pct
+  if (pct >= 55) return t('JunglePathing.topsidePref', { pct })
+  if (botPct >= 55) return t('JunglePathing.botsidePref', { pct: botPct })
+  return t('JunglePathing.balancedShort')
 }
 
 function topsideTextColor(stats: JunglePathingStats) {

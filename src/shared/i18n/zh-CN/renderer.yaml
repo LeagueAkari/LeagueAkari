@@ -2367,6 +2367,7 @@ JunglePathing:
   topsidePref: '偏上 {{pct}}%'
   botsidePref: '偏下 {{pct}}%'
   balanced: 均衡
+  balancedShort: 均衡
   firstClear: 首清
   topsideStart: '上开 {{pct}}%'
   botsideStart: '下开 {{pct}}%'
@@ -2383,7 +2384,10 @@ JunglePathing:
   top: 上
   mid: 中
   bot: 下
-  gamesAnalyzed: '{{count}} 场打野局'
+  topShort: 上
+  midShort: 中
+  botShort: 下
+  gamesAnalyzed: '{{count}} 场'
 
 # 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
