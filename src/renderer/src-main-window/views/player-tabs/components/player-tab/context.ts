@@ -154,7 +154,8 @@ export function providePlayerTab(props: {
 
   provideRankedStats({
     puuid,
-    isCrossRegion
+    isCrossRegion,
+    isSelfTab
   })
 
   provideEncounteredGames({
