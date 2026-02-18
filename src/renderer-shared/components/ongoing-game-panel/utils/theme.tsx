@@ -1,3 +1,5 @@
+// P.S. tsx 文件名用于保证 tailwind 自动扫描
+
 export function getTeamIndicatorColorClasses(team: string) {
   switch (team) {
     case 'TEAM-100':

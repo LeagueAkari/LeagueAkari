@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-end">
+  <div class="flex items-center">
     <template v-if="teamStats">
       <NPopover>
         <template #trigger>
@@ -117,8 +117,8 @@ import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
 import {
-  LOSE_RATE_TEAM_MAX_WIN_RATE,
-  LOST_RATE_TEAM_MIN_SIZE,
+  LOSS_RATE_TEAM_MAX_WIN_RATE,
+  LOSS_RATE_TEAM_MIN_SIZE,
   PREMADE_TEAM_COLORS,
   PREMADE_TEAM_COLORS_LIGHT,
   WIN_RATE_TEAM_MIN_MATCHES,
@@ -189,7 +189,7 @@ const winRateTeams = computed(() => {
   const result: WinRateTeamInfo[] = []
 
   Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, players]) => {
-    if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length < LOST_RATE_TEAM_MIN_SIZE) {
+    if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length < LOSS_RATE_TEAM_MIN_SIZE) {
       return
     }
 
@@ -225,29 +225,29 @@ const winRateTeams = computed(() => {
       })
     }
 
-    let loseRateTeamQualified = true
+    let lossRateTeamQualified = true
 
     for (const p of players) {
       const a = playerStats[p]
 
       if (!a) {
-        loseRateTeamQualified = false
+        lossRateTeamQualified = false
         break
       }
 
-      if (!loseRateTeamQualified) {
+      if (!lossRateTeamQualified) {
         break
       }
 
       if (
-        a.summary.count < LOST_RATE_TEAM_MIN_SIZE ||
-        a.summary.winRate > LOSE_RATE_TEAM_MAX_WIN_RATE
+        a.summary.count < LOSS_RATE_TEAM_MIN_SIZE ||
+        a.summary.winRate > LOSS_RATE_TEAM_MAX_WIN_RATE
       ) {
-        loseRateTeamQualified = false
+        lossRateTeamQualified = false
       }
     }
 
-    if (loseRateTeamQualified) {
+    if (lossRateTeamQualified) {
       result.push({
         premadeId,
         players,

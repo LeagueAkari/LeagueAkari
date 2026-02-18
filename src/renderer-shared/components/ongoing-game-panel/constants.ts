@@ -100,8 +100,8 @@ export const POSITION_ORDER = {
 export const WIN_RATE_TEAM_MIN_MATCHES = 13
 export const WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK = 4
 export const WIN_RATE_TEAM_MIN_SIZE = 3
-export const LOST_RATE_TEAM_MIN_SIZE = 2
+export const LOSS_RATE_TEAM_MIN_SIZE = 2
 export const WIN_RATE_TEAM_MIN_WIN_RATE = 0.9
-export const LOSE_RATE_TEAM_MAX_WIN_RATE = 0.25
+export const LOSS_RATE_TEAM_MAX_WIN_RATE = 0.25
 
 export const STARED_CHAMPION_LEVEL = 60

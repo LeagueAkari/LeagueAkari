@@ -35,6 +35,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "jsx": "preserve",
+    "jsxImportSource": "vue"
   }
 }
