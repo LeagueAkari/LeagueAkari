@@ -108,6 +108,17 @@ FeatureGuide:
       title: Show More Tags
       description: Enable more tags in `Settings` → `Game Analysis` → `Player Card Tags`.
 
+Ftue:
+  confirm: Got It
+  later: Later
+  junglePathing:
+    matchHistoryDetails:
+      title: Jungle Pathing in Match Details
+      description: In match summary details, hover over "Jungle Pathing" to view detailed analysis.
+    ongoingGameCard:
+      title: Jungle Pathing in Ongoing Game
+      description: The player card jungle pathing panel shows first clear, early ganks, and map preference insights.
+
 CommonButtons:
   announcement: Announcement
   announcementSummary: Announcement Summary
@@ -333,6 +344,12 @@ MatchHistorySettings:
     label: Enable Jungle Pathing
     description: Show jungle pathing entry and analysis card on match history pages.
 
+  junglePathingFtue:
+    label: Jungle Pathing Guide
+    description: Show the jungle pathing guide for match details again.
+    button: Show Guide Again
+    resetDone: Jungle pathing guide has been reset
+
 OngoingGameSettings:
   title: Ongoing Game
   titleCommon: Ongoing Game
@@ -388,6 +405,12 @@ OngoingGameSettings:
   showJunglePathing:
     label: Enable Jungle Pathing
     description: Show jungle pathing analysis in ongoing-game player cards.
+
+  junglePathingFtue:
+    label: Jungle Pathing Guide
+    description: Show the jungle pathing guide for ongoing-game again.
+    button: Show Guide Again
+    resetDone: Jungle pathing guide has been reset
 
   showMatchHistoryItemBorder:
     label: Show Match History Item Border
@@ -2369,6 +2392,8 @@ AugmentDisplay:
 
 JunglePathing:
   title: Jungle
+  thisGame: This Game
+  hero: Champion
   overall: Overall
   currentChampion: This
   mapPref: Map Pref
@@ -2399,6 +2424,10 @@ JunglePathing:
   level4Gank: 'Lv4 gank {{pct}}%'
   objectives: Objectives
   firstDragonRate: '1st Drake {{pct}}%'
+  dragons: 'Drake {{count}}'
+  voidgrubs: 'Grubs {{count}}'
+  heralds: 'Herald {{count}}'
+  barons: 'Baron {{count}}'
   avgDragons: 'Avg Drake {{count}}'
   avgVoidgrubs: 'Avg Grubs {{count}}'
   avgHeralds: 'Avg Herald {{count}}'
@@ -2407,6 +2436,8 @@ JunglePathing:
   noData: '—'
   minuteLegend: Position points
   gankLegend: Gank points
+  descriptionSingle: Based on this game's timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
+  description2Single: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included). Early ganks are detected by champion damage and kill participation at 3/4min frames.
   description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
   description2: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included), tracked per team side. Early ganks are detected by champion damage and kill participation at 3/4min frames, split by blue/red side.
   gamesUnit: ' games'

@@ -59,6 +59,7 @@
         :hide-privacy="as.settings.streamerMode"
         :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
         :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
+        :jungle-pathing-data-source="junglePathingDataSource"
       />
     </div>
   </div>
@@ -69,6 +70,10 @@ import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import {
+  getFtueTargetJunglePathingMatchHistory,
+  getFtueTargetSelector
+} from '@shared/constants/ftue'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -76,6 +81,8 @@ import { useTranslation } from 'i18next-vue'
 import { NSpin } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
+import { FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS } from '@main-window/shards/ftue/keys'
+import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
@@ -87,17 +94,40 @@ import { useSpectator } from '../data/spectator'
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const pts = usePlayerTabsStore()
+const ftue = useFtueStore()
 const ogs = useOngoingGameStore()
 
 const { t } = useTranslation()
 
-const { puuid, events, navigateToSummonerByPuuid, previewGame } = usePlayerTab()
-const { pagedMatchHistory, isLoading, loadDetails, downloadReplay, launchRelay, loadMatchHistory } =
-  useMatchHistory()
+const {
+  puuid,
+  events,
+  navigateToSummonerByPuuid,
+  previewGame,
+  preferredSource,
+  sgpServerId,
+  isCrossRegion
+} = usePlayerTab()
+const {
+  pagedMatchHistory,
+  isLoading,
+  loadDetails: rawLoadDetails,
+  downloadReplay,
+  launchRelay,
+  loadMatchHistory
+} = useMatchHistory()
 
 const { loadSpectatorData } = useSpectator()
 
 const { filters, hasFilters } = useMatchHistoryFilters()
+
+const junglePathingDataSource = computed(() => {
+  return {
+    preferredSource: preferredSource.value,
+    sgpServerId: sgpServerId.value,
+    isCrossRegion: isCrossRegion.value
+  }
+})
 
 const isSubset = <T = string | number,>(a: Set<T>, b: Set<T>) => {
   if (a.size > b.size) {
@@ -173,6 +203,66 @@ const gamesShouldHide = computed(() => {
     new Set<number>()
   )
 })
+
+const maybeEnqueueJunglePathingFtue = (gameId: number) => {
+  if (!pts.frontendSettings.showJunglePathing || !pagedMatchHistory.value) {
+    return
+  }
+
+  const summary = pagedMatchHistory.value.games.find((g) => g.gameId === gameId)
+
+  if (!summary) {
+    return
+  }
+
+  const participants = toParticipants(summary, toBasicInfo(summary))
+  const hasJungler = participants.some((p) => {
+    const position = (p.position || '').toUpperCase()
+    return position === 'JUNGLE' || position === 'JUG'
+  })
+
+  if (!hasJungler) {
+    return
+  }
+
+  const targetSelector = getFtueTargetSelector(getFtueTargetJunglePathingMatchHistory(gameId))
+
+  enqueueFtueWhenTargetReady({
+    id: FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS,
+    title: t('Ftue.junglePathing.matchHistoryDetails.title'),
+    description: t('Ftue.junglePathing.matchHistoryDetails.description'),
+    targetSelector,
+    placement: 'bottom'
+  })
+}
+
+const enqueueFtueWhenTargetReady = (task: FtueTask, retries = 40) => {
+  const tryEnqueue = (remaining: number) => {
+    if (ftue.isCompleted(task.id)) {
+      return
+    }
+
+    if (document.querySelector(task.targetSelector)) {
+      ftue.enqueue(task)
+      return
+    }
+
+    if (remaining <= 0) {
+      return
+    }
+
+    window.setTimeout(() => {
+      tryEnqueue(remaining - 1)
+    }, 80)
+  }
+
+  tryEnqueue(retries)
+}
+
+const loadDetails = (gameId: number) => {
+  rawLoadDetails(gameId)
+  maybeEnqueueJunglePathingFtue(gameId)
+}
 
 const isEndOfGame = computed(
   () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'

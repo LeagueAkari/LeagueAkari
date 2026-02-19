@@ -1,90 +1,104 @@
 <template>
-  <NPopover :keep-alive-on-hover="true" :delay="50">
+  <NPopover :keep-alive-on-hover="true" trigger="manual" :show="popoverShow">
     <template #trigger>
-      <span
-        v-if="triggerMode === 'text'"
-        class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
-      >
-        {{ triggerText || t('JunglePathing.title') }}
-      </span>
       <div
-        v-else
-        class="mb-1 flex cursor-pointer items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 transition-[filter] hover:brightness-110 dark:border-emerald-400/20 dark:bg-emerald-400/10"
+        class="inline-flex"
+        @mouseenter="handleTriggerMouseEnter"
+        @mouseleave="handleTriggerMouseLeave"
       >
-        <!-- mini map -->
-        <div
-          class="relative flex-shrink-0"
-          :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }"
+        <span
+          v-if="triggerMode === 'text'"
+          :data-ftue-target="ftueTarget || undefined"
+          class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
         >
-          <img class="absolute h-full w-full rounded" :src="map11" />
-          <svg class="absolute h-full w-full" viewBox="0 0 100 100">
-            <line
-              x1="0"
-              y1="0"
-              x2="100"
-              y2="100"
-              stroke="rgba(255,255,255,0.3)"
-              stroke-width="1"
-              stroke-dasharray="3,2"
-            />
-          </svg>
+          {{ triggerText || t('JunglePathing.title') }}
+        </span>
+        <div
+          v-else
+          :data-ftue-target="ftueTarget || undefined"
+          class="mb-1 flex cursor-pointer items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 transition-[filter] hover:brightness-110 dark:border-emerald-400/20 dark:bg-emerald-400/10"
+        >
+          <!-- mini map -->
           <div
-            v-for="(pt, i) of miniMapPoints.slice(0, 20)"
-            :key="i"
-            class="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/50"
-            :class="minuteDotColors[pt.lane]"
-            :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-          />
-        </div>
-
-        <!-- text stats -->
-        <div class="flex min-w-0 flex-1 flex-col gap-0.5 text-[11px]">
-          <div class="flex items-center gap-1">
-            <span class="font-bold text-emerald-700 dark:text-emerald-300">{{
-              t('JunglePathing.title')
-            }}</span>
-            <span
-              v-if="analysis.currentChampion"
-              class="text-[10px] text-amber-600 dark:text-amber-400"
-              >{{ t('JunglePathing.currentChampion') }}</span
-            >
-            <span class="text-[10px] text-black/50 dark:text-white/50">{{
-              t('JunglePathing.gamesAnalyzed', { count: displayStats.gamesAnalyzed })
-            }}</span>
+            class="relative flex-shrink-0"
+            :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }"
+          >
+            <img class="absolute h-full w-full rounded" :src="map11" />
+            <svg class="absolute h-full w-full" viewBox="0 0 100 100">
+              <line
+                x1="0"
+                y1="0"
+                x2="100"
+                y2="100"
+                stroke="rgba(255,255,255,0.3)"
+                stroke-width="1"
+                stroke-dasharray="3,2"
+              />
+            </svg>
+            <div
+              v-for="(pt, i) of miniMapPoints.slice(0, 20)"
+              :key="i"
+              class="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/50"
+              :class="minuteDotColors[pt.lane]"
+              :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
+            />
           </div>
-          <div class="flex gap-1 text-black/80 dark:text-white/80">
-            <span class="whitespace-nowrap" :class="topsideTextColor(displayStats)">{{
-              topsideTextShort(displayStats)
-            }}</span>
-            <span class="text-black/40 dark:text-white/40">|</span>
-            <span class="whitespace-nowrap">
-              <span class="text-red-400">{{ t('JunglePathing.topShort') }}</span
-              >{{ formatWeightSum(displayStats.topZoneWeightSum) }}
-              <span class="text-yellow-400">{{ t('JunglePathing.midShort') }}</span
-              >{{ formatWeightSum(displayStats.midZoneWeightSum) }}
-              <span class="text-blue-400">{{ t('JunglePathing.botShort') }}</span
-              >{{ formatWeightSum(displayStats.botZoneWeightSum) }}
-            </span>
+
+          <!-- text stats -->
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5 text-[11px]">
+            <div class="flex items-center gap-1">
+              <span class="font-bold text-emerald-700 dark:text-emerald-300">{{
+                t('JunglePathing.title')
+              }}</span>
+              <span
+                v-if="analysis.currentChampion"
+                class="text-[10px] text-amber-600 dark:text-amber-400"
+                >{{ t('JunglePathing.currentChampion') }}</span
+              >
+              <span class="text-[10px] text-black/50 dark:text-white/50">{{
+                t('JunglePathing.gamesAnalyzed', { count: displayStats.gamesAnalyzed })
+              }}</span>
+            </div>
+            <div class="flex gap-1 text-black/80 dark:text-white/80">
+              <span class="whitespace-nowrap" :class="topsideTextColor(displayStats)">{{
+                topsideTextShort(displayStats)
+              }}</span>
+              <span class="text-black/40 dark:text-white/40">|</span>
+              <span class="whitespace-nowrap">
+                <span class="text-red-400">{{ t('JunglePathing.topShort') }}</span
+                >{{ formatWeightSum(displayStats.topZoneWeightSum) }}
+                <span class="text-yellow-400">{{ t('JunglePathing.midShort') }}</span
+                >{{ formatWeightSum(displayStats.midZoneWeightSum) }}
+                <span class="text-blue-400">{{ t('JunglePathing.botShort') }}</span
+                >{{ formatWeightSum(displayStats.botZoneWeightSum) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </template>
 
     <!-- popover detail -->
-    <div class="flex flex-col gap-2">
+    <div
+      ref="popoverContentRef"
+      class="flex flex-col gap-2"
+      :style="popoverContentStyle"
+      @mouseenter="handlePopoverMouseEnter"
+      @mouseleave="handlePopoverMouseLeave"
+    >
       <!-- tab switch + copy -->
       <div
-        v-if="analysis.currentChampion || showCopyAll"
+        v-if="tabs.length > 1 || showCopyAll"
         class="flex items-center gap-2"
         :class="
-          analysis.currentChampion && showCopyAll
+          tabs.length > 1 && showCopyAll
             ? 'justify-between'
-            : analysis.currentChampion
+            : tabs.length > 1
               ? 'justify-start'
               : 'justify-end'
         "
       >
-        <div v-if="analysis.currentChampion" class="flex gap-1 text-xs">
+        <div v-if="tabs.length > 1" class="flex gap-1 text-xs">
           <button
             v-for="tab of tabs"
             :key="tab.key"
@@ -94,9 +108,9 @@
                 ? 'bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-300'
                 : 'text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5'
             "
-            @click="activeTab = tab.key"
+            @click="setActiveTab(tab.key)"
           >
-            {{ tab.label }} ({{ tab.stats.gamesAnalyzed }})
+            {{ tab.label }}<span v-if="tab.stats"> ({{ tab.stats.gamesAnalyzed }})</span>
           </button>
         </div>
         <button
@@ -109,366 +123,415 @@
         </button>
       </div>
 
-      <div class="flex gap-3">
-        <!-- larger map -->
-        <div class="flex flex-shrink-0 flex-col gap-1">
-          <div class="relative" :style="{ width: `${LARGE_SIZE}px`, height: `${LARGE_SIZE}px` }">
-            <img class="absolute h-full w-full rounded" :src="map11" />
-            <!-- 红蓝方底色 -->
-            <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
-              <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
-              <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
-              <line
-                x1="0"
-                y1="0"
-                x2="100"
-                y2="100"
-                stroke="rgba(255,255,255,0.4)"
-                stroke-width="0.8"
-                stroke-dasharray="4,3"
-              />
-            </svg>
-            <div
-              v-for="(pt, i) of largeMapPoints"
-              :key="i"
-              class="absolute z-[2] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
-              :class="minuteDotColors[pt.lane]"
-              :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-            />
-          </div>
-          <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
-            <span class="inline-flex items-center gap-1 whitespace-nowrap">
-              <span class="grid w-[30px] grid-cols-3 place-items-center">
-                <svg class="h-2 w-2 text-red-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="2" fill="currentColor" />
-                </svg>
-                <svg class="h-2 w-2 text-yellow-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="2" fill="currentColor" />
-                </svg>
-                <svg class="h-2 w-2 text-blue-400" viewBox="0 0 8 8" aria-hidden="true">
-                  <circle cx="4" cy="4" r="2" fill="currentColor" />
-                </svg>
-              </span>
-              {{ t('JunglePathing.gankLegend') }}
-            </span>
-          </div>
-        </div>
-
-        <!-- detail stats -->
-        <div class="flex flex-col justify-center gap-2 text-xs">
-          <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-              {{ t('JunglePathing.mapPref') }}
-            </div>
-            <div class="mt-0.5 text-[11px] whitespace-nowrap text-black/75 dark:text-white/75">
-              <span class="text-red-400">{{ t('JunglePathing.top') }}</span
-              >{{ formatWeightSum(popoverStats.topZoneWeightSum) }}
-              <span class="text-yellow-400">{{ t('JunglePathing.mid') }}</span
-              >{{ formatWeightSum(popoverStats.midZoneWeightSum) }}
-              <span class="text-blue-400">{{ t('JunglePathing.bot') }}</span
-              >{{ formatWeightSum(popoverStats.botZoneWeightSum) }}
-              <span class="mx-1 text-black/40 dark:text-white/40">|</span>
-              <span :class="topsideTextColor(popoverStats)">{{
-                topsideTextWithPct(popoverStats)
-              }}</span>
-            </div>
-          </div>
-          <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-              {{ t('JunglePathing.objectives') }}
-            </div>
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-0.5">
-                <DragonIcon class="size-3.5" />{{
-                  t('JunglePathing.firstDragonRate', {
-                    pct: Math.round(popoverStats.objectives.firstDragonRate * 100)
-                  })
-                }}
-              </div>
-              <div class="grid grid-cols-2 gap-x-3 gap-y-1">
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <DragonIcon class="size-3.5" />{{
-                      t('JunglePathing.avgDragons', {
-                        count: roundToTenth(popoverStats.objectives.avgDragons)
-                      })
-                    }}
-                  </span>
-                  <span
-                    v-if="popoverStats.objectives.avgFirstDragonTime !== null"
-                    class="flex-shrink-0 text-black/50 dark:text-white/50"
-                  >
-                    {{
-                      t('JunglePathing.firstTime', {
-                        time: formatTime(popoverStats.objectives.avgFirstDragonTime)
-                      })
-                    }}
-                  </span>
-                </div>
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <RiftHeraldIcon class="size-3.5" />{{
-                      t('JunglePathing.avgHeralds', {
-                        count: roundToTenth(popoverStats.objectives.avgHeralds)
-                      })
-                    }}
-                  </span>
-                  <span
-                    v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
-                    class="flex-shrink-0 text-black/50 dark:text-white/50"
-                  >
-                    {{
-                      t('JunglePathing.firstTime', {
-                        time: formatTime(popoverStats.objectives.avgFirstHeraldTime)
-                      })
-                    }}
-                  </span>
-                </div>
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <VoidGrubIcon class="size-3.5" />{{
-                      t('JunglePathing.avgVoidgrubs', {
-                        count: roundToTenth(popoverStats.objectives.avgVoidgrubs)
-                      })
-                    }}
-                  </span>
-                  <span
-                    v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
-                    class="flex-shrink-0 text-black/50 dark:text-white/50"
-                  >
-                    {{
-                      t('JunglePathing.firstTime', {
-                        time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime)
-                      })
-                    }}
-                  </span>
-                </div>
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <BaronIcon class="size-3.5" />{{
-                      t('JunglePathing.avgBarons', {
-                        count: roundToTenth(popoverStats.objectives.avgBarons)
-                      })
-                    }}
-                  </span>
-                  <span
-                    v-if="popoverStats.objectives.avgFirstBaronTime !== null"
-                    class="flex-shrink-0 text-black/50 dark:text-white/50"
-                  >
-                    {{
-                      t('JunglePathing.firstTime', {
-                        time: formatTime(popoverStats.objectives.avgFirstBaronTime)
-                      })
-                    }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
-            {{ t('JunglePathing.description') }}
-          </div>
-        </div>
+      <div
+        v-if="activeTabLoading"
+        class="flex items-center gap-2 rounded bg-black/5 p-2 text-xs text-black/70 dark:bg-white/5 dark:text-white/70"
+      >
+        <NSpin :size="14" />
+        <span>{{ t('PlayerTab.loading') }}</span>
       </div>
 
-      <!-- 首清营地 + 前期抓人地图 -->
-      <div class="flex gap-3">
-        <div class="flex flex-shrink-0 flex-col gap-1">
-          <div
-            class="relative"
-            :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }"
-          >
-            <img class="absolute h-full w-full rounded" :src="map11" />
-            <!-- 红蓝方底色 -->
-            <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
-              <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
-              <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
-              <line
-                x1="0"
-                y1="0"
-                x2="100"
-                y2="100"
-                stroke="rgba(255,255,255,0.4)"
-                stroke-width="0.8"
-                stroke-dasharray="4,3"
-              />
-            </svg>
-            <div
-              v-for="(pt, i) of campMapPoints"
-              :key="`camp-${i}`"
-              class="absolute z-[1] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
-              :style="{
-                left: `${pt.left}px`,
-                top: `${pt.top}px`,
-                backgroundColor: campMarkerColors[pt.camp]
-              }"
-            />
-            <!-- 3/4级抓人击杀位置（叉号标记） -->
-            <div
-              v-for="(pt, i) of earlyGankMapPoints"
-              :key="`eg-${i}`"
-              class="absolute z-[5] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
-              :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
-            >
-              <span
-                class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm"
-                :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
-              />
-              <span
-                class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm"
-                :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
+      <div
+        v-else-if="!hasPopoverStats"
+        class="rounded bg-black/5 p-2 text-xs text-black/70 dark:bg-white/5 dark:text-white/70"
+      >
+        {{ t('JunglePathing.noData') }}
+      </div>
+
+      <template v-else>
+        <div class="flex gap-3">
+          <!-- larger map -->
+          <div class="flex flex-shrink-0 flex-col gap-1">
+            <div class="relative" :style="{ width: `${LARGE_SIZE}px`, height: `${LARGE_SIZE}px` }">
+              <img class="absolute h-full w-full rounded" :src="map11" />
+              <!-- 红蓝方底色 -->
+              <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
+                <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
+                <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="100"
+                  y2="100"
+                  stroke="rgba(255,255,255,0.4)"
+                  stroke-width="0.8"
+                  stroke-dasharray="4,3"
+                />
+              </svg>
+              <div
+                v-for="(pt, i) of largeMapPoints"
+                :key="i"
+                class="absolute z-[2] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
+                :class="minuteDotColors[pt.lane]"
+                :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
               />
             </div>
+            <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
+              <span class="inline-flex items-center gap-1 whitespace-nowrap">
+                <span class="grid w-[30px] grid-cols-3 place-items-center">
+                  <svg class="h-2 w-2 text-red-400" viewBox="0 0 8 8" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2" fill="currentColor" />
+                  </svg>
+                  <svg class="h-2 w-2 text-yellow-400" viewBox="0 0 8 8" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2" fill="currentColor" />
+                  </svg>
+                  <svg class="h-2 w-2 text-blue-400" viewBox="0 0 8 8" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2" fill="currentColor" />
+                  </svg>
+                </span>
+                {{ t('JunglePathing.gankLegend') }}
+              </span>
+            </div>
           </div>
-          <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
-            <span class="inline-flex items-center gap-1 whitespace-nowrap text-orange-400">
-              <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
-                <line
-                  x1="2"
-                  y1="2"
-                  x2="6"
-                  y2="6"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linecap="round"
-                />
-                <line
-                  x1="2"
-                  y1="6"
-                  x2="6"
-                  y2="2"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              {{ t('JunglePathing.level3KillLegend') }}
-            </span>
-            <span class="inline-flex items-center gap-1 whitespace-nowrap text-purple-400">
-              <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
-                <line
-                  x1="2"
-                  y1="2"
-                  x2="6"
-                  y2="6"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linecap="round"
-                />
-                <line
-                  x1="2"
-                  y1="6"
-                  x2="6"
-                  y2="2"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              {{ t('JunglePathing.level4KillLegend') }}
-            </span>
+
+          <!-- detail stats -->
+          <div class="flex flex-col justify-center gap-2 text-xs">
+            <div>
+              <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+                {{ t('JunglePathing.mapPref') }}
+              </div>
+              <div class="mt-0.5 text-[11px] whitespace-nowrap text-black/75 dark:text-white/75">
+                <span class="text-red-400">{{ t('JunglePathing.top') }}</span
+                >{{ formatWeightSum(popoverStats.topZoneWeightSum) }}
+                <span class="text-yellow-400">{{ t('JunglePathing.mid') }}</span
+                >{{ formatWeightSum(popoverStats.midZoneWeightSum) }}
+                <span class="text-blue-400">{{ t('JunglePathing.bot') }}</span
+                >{{ formatWeightSum(popoverStats.botZoneWeightSum) }}
+                <span class="mx-1 text-black/40 dark:text-white/40">|</span>
+                <span :class="topsideTextColor(popoverStats)">{{
+                  topsideTextWithPct(popoverStats)
+                }}</span>
+              </div>
+            </div>
+            <div>
+              <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+                {{ t('JunglePathing.objectives') }}
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-0.5">
+                  <DragonIcon class="size-3.5" />{{
+                    t('JunglePathing.firstDragonRate', {
+                      pct: Math.round(popoverStats.objectives.firstDragonRate * 100)
+                    })
+                  }}
+                </div>
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1">
+                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                    <span class="inline-flex items-center gap-0.5">
+                      <DragonIcon class="size-3.5" />{{
+                        t(
+                          currentObjectiveTextMode === 'single'
+                            ? 'JunglePathing.dragons'
+                            : 'JunglePathing.avgDragons',
+                          {
+                            count: roundToTenth(popoverStats.objectives.avgDragons)
+                          }
+                        )
+                      }}
+                    </span>
+                    <span
+                      v-if="popoverStats.objectives.avgFirstDragonTime !== null"
+                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                    >
+                      {{
+                        t('JunglePathing.firstTime', {
+                          time: formatTime(popoverStats.objectives.avgFirstDragonTime)
+                        })
+                      }}
+                    </span>
+                  </div>
+                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                    <span class="inline-flex items-center gap-0.5">
+                      <RiftHeraldIcon class="size-3.5" />{{
+                        t(
+                          currentObjectiveTextMode === 'single'
+                            ? 'JunglePathing.heralds'
+                            : 'JunglePathing.avgHeralds',
+                          {
+                            count: roundToTenth(popoverStats.objectives.avgHeralds)
+                          }
+                        )
+                      }}
+                    </span>
+                    <span
+                      v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
+                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                    >
+                      {{
+                        t('JunglePathing.firstTime', {
+                          time: formatTime(popoverStats.objectives.avgFirstHeraldTime)
+                        })
+                      }}
+                    </span>
+                  </div>
+                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                    <span class="inline-flex items-center gap-0.5">
+                      <VoidGrubIcon class="size-3.5" />{{
+                        t(
+                          currentObjectiveTextMode === 'single'
+                            ? 'JunglePathing.voidgrubs'
+                            : 'JunglePathing.avgVoidgrubs',
+                          {
+                            count: roundToTenth(popoverStats.objectives.avgVoidgrubs)
+                          }
+                        )
+                      }}
+                    </span>
+                    <span
+                      v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
+                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                    >
+                      {{
+                        t('JunglePathing.firstTime', {
+                          time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime)
+                        })
+                      }}
+                    </span>
+                  </div>
+                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                    <span class="inline-flex items-center gap-0.5">
+                      <BaronIcon class="size-3.5" />{{
+                        t(
+                          currentObjectiveTextMode === 'single'
+                            ? 'JunglePathing.barons'
+                            : 'JunglePathing.avgBarons',
+                          {
+                            count: roundToTenth(popoverStats.objectives.avgBarons)
+                          }
+                        )
+                      }}
+                    </span>
+                    <span
+                      v-if="popoverStats.objectives.avgFirstBaronTime !== null"
+                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                    >
+                      {{
+                        t('JunglePathing.firstTime', {
+                          time: formatTime(popoverStats.objectives.avgFirstBaronTime)
+                        })
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
+              {{
+                t(
+                  currentObjectiveTextMode === 'single'
+                    ? 'JunglePathing.descriptionSingle'
+                    : 'JunglePathing.description'
+                )
+              }}
+            </div>
           </div>
         </div>
-        <div class="flex flex-col justify-center gap-2 text-xs">
-          <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-              {{ t('JunglePathing.firstClear') }}
-            </div>
+
+        <!-- 首清营地 + 前期抓人地图 -->
+        <div class="flex gap-3">
+          <div class="flex flex-shrink-0 flex-col gap-1">
             <div
-              v-if="popoverStats.firstClearCamp.blueGames > 0"
-              class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+              class="relative"
+              :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }"
             >
-              <span class="row-span-2 self-start text-[#40c1ff]">{{
-                t('JunglePathing.blueTeam')
-              }}</span>
-              <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'blue') }}</span>
-              <span class="min-w-0 truncate text-amber-500">
-                {{ firstClearInvadeText(popoverStats, 'blue') || t('JunglePathing.noData') }}
+              <img class="absolute h-full w-full rounded" :src="map11" />
+              <!-- 红蓝方底色 -->
+              <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
+                <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
+                <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="100"
+                  y2="100"
+                  stroke="rgba(255,255,255,0.4)"
+                  stroke-width="0.8"
+                  stroke-dasharray="4,3"
+                />
+              </svg>
+              <div
+                v-for="(pt, i) of campMapPoints"
+                :key="`camp-${i}`"
+                class="absolute z-[1] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
+                :style="{
+                  left: `${pt.left}px`,
+                  top: `${pt.top}px`,
+                  backgroundColor: campMarkerColors[pt.camp]
+                }"
+              />
+              <!-- 3/4级抓人击杀位置（叉号标记） -->
+              <div
+                v-for="(pt, i) of earlyGankMapPoints"
+                :key="`eg-${i}`"
+                class="absolute z-[5] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+                :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
+              >
+                <span
+                  class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm"
+                  :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
+                />
+                <span
+                  class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm"
+                  :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
+                />
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
+              <span class="inline-flex items-center gap-1 whitespace-nowrap text-orange-400">
+                <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
+                  <line
+                    x1="2"
+                    y1="2"
+                    x2="6"
+                    y2="6"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="2"
+                    y1="6"
+                    x2="6"
+                    y2="2"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                {{ t('JunglePathing.level3KillLegend') }}
               </span>
-            </div>
-            <div
-              v-if="popoverStats.firstClearCamp.redGames > 0"
-              class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
-            >
-              <span class="row-span-2 self-start text-[#ff3333]">{{
-                t('JunglePathing.redTeam')
-              }}</span>
-              <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'red') }}</span>
-              <span class="min-w-0 truncate text-amber-500">
-                {{ firstClearInvadeText(popoverStats, 'red') || t('JunglePathing.noData') }}
+              <span class="inline-flex items-center gap-1 whitespace-nowrap text-purple-400">
+                <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
+                  <line
+                    x1="2"
+                    y1="2"
+                    x2="6"
+                    y2="6"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="2"
+                    y1="6"
+                    x2="6"
+                    y2="2"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                {{ t('JunglePathing.level4KillLegend') }}
               </span>
-            </div>
-            <div
-              v-if="
-                popoverStats.firstClearCamp.blueGames === 0 &&
-                popoverStats.firstClearCamp.redGames === 0
-              "
-              class="text-black/50 dark:text-white/50"
-            >
-              —
             </div>
           </div>
-          <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-              {{ t('JunglePathing.earlyGank') }}
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <div
-                v-if="popoverStats.earlyGank.byTeam.blueGames > 0"
-                class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
-              >
-                <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
-                  >{{
-                    t('JunglePathing.level3Gank', {
-                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 3) * 100)
-                    })
-                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 3)) }}</span
-                >
-                <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
-                  >{{
-                    t('JunglePathing.level4Gank', {
-                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 4) * 100)
-                    })
-                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 4)) }}</span
-                >
+          <div class="flex flex-col justify-center gap-2 text-xs">
+            <div>
+              <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+                {{ t('JunglePathing.firstClear') }}
               </div>
               <div
-                v-if="popoverStats.earlyGank.byTeam.redGames > 0"
-                class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+                v-if="popoverStats.firstClearCamp.blueGames > 0"
+                class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
               >
-                <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
-                  >{{
-                    t('JunglePathing.level3Gank', {
-                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 3) * 100)
-                    })
-                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 3)) }}</span
-                >
-                <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
-                  >{{
-                    t('JunglePathing.level4Gank', {
-                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 4) * 100)
-                    })
-                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 4)) }}</span
-                >
+                <span class="row-span-2 self-start text-[#40c1ff]">{{
+                  t('JunglePathing.blueTeam')
+                }}</span>
+                <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'blue') }}</span>
+                <span class="min-w-0 truncate text-amber-500">
+                  {{ firstClearInvadeText(popoverStats, 'blue') || t('JunglePathing.noData') }}
+                </span>
+              </div>
+              <div
+                v-if="popoverStats.firstClearCamp.redGames > 0"
+                class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+              >
+                <span class="row-span-2 self-start text-[#ff3333]">{{
+                  t('JunglePathing.redTeam')
+                }}</span>
+                <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'red') }}</span>
+                <span class="min-w-0 truncate text-amber-500">
+                  {{ firstClearInvadeText(popoverStats, 'red') || t('JunglePathing.noData') }}
+                </span>
               </div>
               <div
                 v-if="
-                  popoverStats.earlyGank.byTeam.blueGames === 0 &&
-                  popoverStats.earlyGank.byTeam.redGames === 0
+                  popoverStats.firstClearCamp.blueGames === 0 &&
+                  popoverStats.firstClearCamp.redGames === 0
                 "
                 class="text-black/50 dark:text-white/50"
               >
                 —
               </div>
             </div>
-          </div>
-          <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
-            {{ t('JunglePathing.description2') }}
+            <div>
+              <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+                {{ t('JunglePathing.earlyGank') }}
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <div
+                  v-if="popoverStats.earlyGank.byTeam.blueGames > 0"
+                  class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+                >
+                  <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
+                  <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
+                    >{{
+                      t('JunglePathing.level3Gank', {
+                        pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 3) * 100)
+                      })
+                    }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 3)) }}</span
+                  >
+                  <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
+                    >{{
+                      t('JunglePathing.level4Gank', {
+                        pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 4) * 100)
+                      })
+                    }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 4)) }}</span
+                  >
+                </div>
+                <div
+                  v-if="popoverStats.earlyGank.byTeam.redGames > 0"
+                  class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+                >
+                  <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
+                  <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
+                    >{{
+                      t('JunglePathing.level3Gank', {
+                        pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 3) * 100)
+                      })
+                    }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 3)) }}</span
+                  >
+                  <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
+                    >{{
+                      t('JunglePathing.level4Gank', {
+                        pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 4) * 100)
+                      })
+                    }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 4)) }}</span
+                  >
+                </div>
+                <div
+                  v-if="
+                    popoverStats.earlyGank.byTeam.blueGames === 0 &&
+                    popoverStats.earlyGank.byTeam.redGames === 0
+                  "
+                  class="text-black/50 dark:text-white/50"
+                >
+                  —
+                </div>
+              </div>
+            </div>
+            <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
+              {{
+                t(
+                  currentObjectiveTextMode === 'single'
+                    ? 'JunglePathing.description2Single'
+                    : 'JunglePathing.description2'
+                )
+              }}
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </div>
   </NPopover>
 </template>
@@ -494,25 +557,180 @@ import {
 } from '@shared/data-adapter/analysis/jungle'
 import { Copy as CopyIcon } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, useMessage } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { NIcon, NPopover, NSpin, useMessage } from 'naive-ui'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+
+export interface JunglePathingCustomTab {
+  key: string
+  label: string
+  analysis: JunglePathingAnalysis | null
+  loading?: boolean
+  objectiveTextMode?: 'single' | 'average'
+}
+
+interface ResolvedJunglePathingTab {
+  key: string
+  label: string
+  stats: JunglePathingStats | null
+  analysis: JunglePathingAnalysis | null
+  loading: boolean
+  objectiveTextMode: 'single' | 'average'
+}
+
+const emits = defineEmits<{
+  tabChange: [key: string]
+}>()
 
 const {
   analysis,
   showCopyAll = true,
   triggerMode = 'default',
-  triggerText = ''
+  triggerText = '',
+  ftueTarget = '',
+  customTabs = []
 } = defineProps<{
   analysis: JunglePathingAnalysis
   showCopyAll?: boolean
   triggerMode?: 'default' | 'text'
   triggerText?: string
+  ftueTarget?: string
+  customTabs?: JunglePathingCustomTab[]
 }>()
 
 const { t } = useTranslation()
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
 const message = useMessage()
+const popoverShow = ref(false)
+const popoverContentRef = ref<HTMLElement | null>(null)
+
+const isTriggerHovered = ref(false)
+const isPopoverHovered = ref(false)
+const autoCloseBlockedUntil = ref(0)
+
+const maxPopoverWidth = ref(0)
+const maxPopoverHeight = ref(0)
+
+const AUTO_CLOSE_DELAY_MS = 160
+const TAB_SWITCH_GUARD_MS = 900
+
+let popoverCloseTimer: ReturnType<typeof setTimeout> | null = null
+let popoverResizeObserver: ResizeObserver | null = null
+
+const clearPopoverCloseTimer = () => {
+  if (popoverCloseTimer) {
+    clearTimeout(popoverCloseTimer)
+    popoverCloseTimer = null
+  }
+}
+
+const clearPopoverResizeObserver = () => {
+  if (popoverResizeObserver) {
+    popoverResizeObserver.disconnect()
+    popoverResizeObserver = null
+  }
+}
+
+const blockAutoClose = (duration = TAB_SWITCH_GUARD_MS) => {
+  autoCloseBlockedUntil.value = Date.now() + duration
+}
+
+const updateMaxPopoverSize = () => {
+  const el = popoverContentRef.value
+  if (!el) {
+    return
+  }
+
+  const rect = el.getBoundingClientRect()
+  maxPopoverWidth.value = Math.max(maxPopoverWidth.value, Math.ceil(rect.width))
+  maxPopoverHeight.value = Math.max(maxPopoverHeight.value, Math.ceil(rect.height))
+}
+
+const popoverContentStyle = computed(() => {
+  return {
+    minWidth: maxPopoverWidth.value > 0 ? `${maxPopoverWidth.value}px` : undefined,
+    minHeight: maxPopoverHeight.value > 0 ? `${maxPopoverHeight.value}px` : undefined
+  }
+})
+
+const tryClosePopover = () => {
+  if (isTriggerHovered.value || isPopoverHovered.value) {
+    return
+  }
+
+  const remaining = autoCloseBlockedUntil.value - Date.now()
+  if (remaining > 0) {
+    clearPopoverCloseTimer()
+    popoverCloseTimer = setTimeout(() => {
+      tryClosePopover()
+    }, remaining + 16)
+    return
+  }
+
+  popoverShow.value = false
+}
+
+const handleTriggerMouseEnter = () => {
+  isTriggerHovered.value = true
+  clearPopoverCloseTimer()
+  popoverShow.value = true
+}
+
+const handleTriggerMouseLeave = () => {
+  isTriggerHovered.value = false
+  schedulePopoverClose()
+}
+
+const handlePopoverMouseEnter = () => {
+  isPopoverHovered.value = true
+  clearPopoverCloseTimer()
+}
+
+const handlePopoverMouseLeave = () => {
+  isPopoverHovered.value = false
+  schedulePopoverClose()
+}
+
+const schedulePopoverClose = () => {
+  clearPopoverCloseTimer()
+  popoverCloseTimer = setTimeout(() => {
+    tryClosePopover()
+  }, AUTO_CLOSE_DELAY_MS)
+}
+
+watch(
+  () => popoverShow.value,
+  async (show) => {
+    if (show) {
+      maxPopoverWidth.value = 0
+      maxPopoverHeight.value = 0
+
+      await nextTick()
+      updateMaxPopoverSize()
+
+      clearPopoverResizeObserver()
+      const el = popoverContentRef.value
+      if (el) {
+        popoverResizeObserver = new ResizeObserver(() => {
+          updateMaxPopoverSize()
+        })
+        popoverResizeObserver.observe(el)
+      }
+
+      return
+    }
+
+    isTriggerHovered.value = false
+    isPopoverHovered.value = false
+    clearPopoverCloseTimer()
+    clearPopoverResizeObserver()
+  }
+)
+
+onUnmounted(() => {
+  clearPopoverCloseTimer()
+  clearPopoverResizeObserver()
+})
 
 const MINI_SIZE = 48
 const LARGE_SIZE = 140
@@ -526,14 +744,31 @@ const minuteDotColors: Record<string, string> = {
 
 /** 卡片上优先显示当前英雄数据，fallback 到总体 */
 const displayStats = computed<JunglePathingStats>(() => {
+  if (customTabs.length > 0) {
+    const firstStats = customTabs.find((tab) => !!tab.analysis)?.analysis?.overall
+    if (firstStats) {
+      return firstStats
+    }
+  }
+
   return analysis.currentChampion ?? analysis.overall
 })
 
-const activeTab = ref<'currentChampion' | 'overall'>('currentChampion')
+const activeTab = ref<string>('')
 
-const tabs = computed(() => {
-  const items: { key: 'currentChampion' | 'overall'; label: string; stats: JunglePathingStats }[] =
-    []
+const tabs = computed<ResolvedJunglePathingTab[]>(() => {
+  if (customTabs.length > 0) {
+    return customTabs.map((tab) => ({
+      key: tab.key,
+      label: tab.label,
+      stats: tab.analysis?.overall ?? null,
+      analysis: tab.analysis,
+      loading: !!tab.loading,
+      objectiveTextMode: tab.objectiveTextMode || 'average'
+    }))
+  }
+
+  const items: ResolvedJunglePathingTab[] = []
   if (analysis.currentChampion) {
     const currentChampionName = analysis.currentChampionId
       ? lcs.gameData.championName(analysis.currentChampionId)
@@ -542,24 +777,72 @@ const tabs = computed(() => {
     items.push({
       key: 'currentChampion',
       label: currentChampionName || t('JunglePathing.currentChampion'),
-      stats: analysis.currentChampion
+      stats: analysis.currentChampion,
+      analysis,
+      loading: false,
+      objectiveTextMode: 'average'
     })
   }
   items.push({
     key: 'overall',
     label: t('JunglePathing.overall'),
-    stats: analysis.overall
+    stats: analysis.overall,
+    analysis,
+    loading: false,
+    objectiveTextMode: 'average'
   })
   return items
 })
 
-/** popover 中显示当前 tab 对应的数据 */
-const popoverStats = computed<JunglePathingStats>(() => {
-  if (activeTab.value === 'currentChampion' && analysis.currentChampion) {
-    return analysis.currentChampion
-  }
-  return analysis.overall
+watch(
+  () => tabs.value,
+  (nextTabs) => {
+    if (nextTabs.length === 0) {
+      activeTab.value = ''
+      return
+    }
+
+    if (!nextTabs.some((tab) => tab.key === activeTab.value)) {
+      activeTab.value = nextTabs[0].key
+    }
+  },
+  { immediate: true }
+)
+
+const activeTabConfig = computed(() => {
+  return tabs.value.find((tab) => tab.key === activeTab.value) || null
 })
+
+const activeTabLoading = computed(() => {
+  return !!activeTabConfig.value?.loading
+})
+
+const hasPopoverStats = computed(() => {
+  return !!activeTabConfig.value?.stats
+})
+
+const currentObjectiveTextMode = computed<'single' | 'average'>(() => {
+  return activeTabConfig.value?.objectiveTextMode || 'average'
+})
+
+const popoverStats = computed<JunglePathingStats>(() => {
+  if (activeTabConfig.value?.stats) {
+    return activeTabConfig.value.stats
+  }
+
+  return displayStats.value
+})
+
+const setActiveTab = (key: string) => {
+  blockAutoClose()
+  popoverShow.value = true
+  activeTab.value = key
+  emits('tabChange', key)
+
+  nextTick(() => {
+    updateMaxPopoverSize()
+  })
+}
 
 const miniMapPoints = computed(() => {
   return displayStats.value.gankPositions.map((pt) => ({

@@ -109,6 +109,17 @@ FeatureGuide:
       title: 展示更多标签
       description: 在 `设置` → `对局` → `玩家卡片标签` 中，启用更多标签。
 
+Ftue:
+  confirm: 知道了
+  later: 稍后
+  junglePathing:
+    matchHistoryDetails:
+      title: 战绩详情支持打野偏好
+      description: 在对局详情总览中，看到“打野偏好”后可悬停查看详细分析。
+    ongoingGameCard:
+      title: 对局页支持打野偏好
+      description: 玩家卡片中的“打野偏好”可查看首清、前期抓人和地图偏好等分析。
+
 CommonButtons:
   announcement: 公告
   announcementSummary: 公告摘要
@@ -334,6 +345,12 @@ MatchHistorySettings:
     label: 启用打野偏好
     description: 在战绩页面展示打野偏好入口与分析卡片
 
+  junglePathingFtue:
+    label: 打野偏好引导
+    description: 重新显示战绩详情中的打野偏好引导
+    button: 再次显示引导
+    resetDone: 已重置打野偏好引导
+
 OngoingGameSettings:
   title: 对局
   titleCommon: 对局
@@ -389,6 +406,12 @@ OngoingGameSettings:
   showJunglePathing:
     label: 启用打野偏好
     description: 在对局玩家卡片中展示打野偏好分析
+
+  junglePathingFtue:
+    label: 打野偏好引导
+    description: 重新显示对局页面中的打野偏好引导
+    button: 再次显示引导
+    resetDone: 已重置打野偏好引导
 
   showMatchHistoryItemBorder:
     label: 战绩项显示边框
@@ -2370,6 +2393,8 @@ SummonerSpellDisplay:
 
 JunglePathing:
   title: 打野偏好
+  thisGame: 本局
+  hero: 英雄
   overall: 总体
   currentChampion: 本英雄
   mapPref: 地图偏好
@@ -2400,6 +2425,10 @@ JunglePathing:
   level4Gank: '4级抓 {{pct}}%'
   objectives: 野怪目标
   firstDragonRate: '一龙率 {{pct}}%'
+  dragons: '小龙 {{count}}'
+  voidgrubs: '潮虫 {{count}}'
+  heralds: '先锋 {{count}}'
+  barons: '大龙 {{count}}'
   avgDragons: '场均小龙 {{count}}'
   avgVoidgrubs: '场均潮虫 {{count}}'
   avgHeralds: '场均先锋 {{count}}'
@@ -2408,6 +2437,8 @@ JunglePathing:
   noData: '—'
   minuteLegend: 位置点
   gankLegend: GANK 点
+  descriptionSingle: 基于该局时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
+  description2Single: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开）。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断。
   description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
   description2: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开），按红蓝方分别统计。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断，并按红蓝方分别统计。
   gamesUnit: 局

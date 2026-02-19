@@ -339,6 +339,7 @@
     <JunglePathingInfo
       v-if="ogs.settings.showJunglePathing && jungleAnalysis"
       :analysis="jungleAnalysis"
+      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
     />
 
     <!-- tags -->
@@ -512,6 +513,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
