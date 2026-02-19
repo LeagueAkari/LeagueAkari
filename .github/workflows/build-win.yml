@@ -1,7 +1,7 @@
 name: Build Windows
 on:
   push:
-    branches: [ main, macos-port ]
+    branches: [ main, sky-dev ]
   workflow_dispatch:
 
 permissions:
