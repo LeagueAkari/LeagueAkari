@@ -24,6 +24,10 @@ export class FtueRenderer implements IAkariShardInitDispose {
       watchOptions: { deep: true }
     })
 
+    if (import.meta.env.DEV) {
+      console.info('[FTUE] loaded completed', Object.keys(store.completed || {}))
+    }
+
     this._setupInAppScope.addRenderVNode(() => h(FtueModal))
   }
 

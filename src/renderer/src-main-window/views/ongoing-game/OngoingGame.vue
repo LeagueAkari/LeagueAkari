@@ -72,10 +72,16 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string
 const enqueueFtueWhenTargetReady = (task: FtueTask, retries = 40) => {
   const tryEnqueue = (remaining: number) => {
     if (ftue.isCompleted(task.id)) {
+      if (import.meta.env.DEV) {
+        console.info('[FTUE] ongoing skip enqueue (completed)', task.id)
+      }
       return
     }
 
     if (document.querySelector(task.targetSelector)) {
+      if (import.meta.env.DEV) {
+        console.info('[FTUE] ongoing enqueue', task.id)
+      }
       ftue.enqueue(task)
       return
     }
@@ -100,6 +106,9 @@ watch(
   }),
   ({ route, enabled, count }) => {
     if (route !== 'ongoing-game' || !enabled || count <= 0) {
+      if (import.meta.env.DEV) {
+        console.info('[FTUE] ongoing watch skip', { route, enabled, count })
+      }
       return
     }
 
