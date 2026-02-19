@@ -25,6 +25,7 @@ export type MatchCardContext = {
 
   loadingDetails: Readonly<Ref<boolean>>
   replayState: Readonly<Ref<ReplayDownloadProgress | null | undefined>>
+  showJunglePathing: Readonly<Ref<boolean>>
 
   basicInfo: Readonly<Ref<ReturnType<typeof toBasicInfo>>>
   participants: Readonly<Ref<ReturnType<typeof toParticipants>>>
@@ -62,6 +63,7 @@ export function provideMatchCard(props: {
   hidePrivacy: MaybeRefOrGetter<boolean>
   loadingDetails: MaybeRefOrGetter<boolean>
   replayState: MaybeRefOrGetter<ReplayDownloadProgress | null>
+  showJunglePathing?: MaybeRefOrGetter<boolean>
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
   loadReplay: (gameId: number) => void
@@ -98,6 +100,7 @@ export function provideMatchCard(props: {
     puuid: toRef(props.puuid),
     loadingDetails: toRef(props.loadingDetails),
     replayState: toRef(props.replayState),
+    showJunglePathing: toRef(props.showJunglePathing ?? true),
     hidePrivacy: toRef(props.hidePrivacy),
 
     // computed states

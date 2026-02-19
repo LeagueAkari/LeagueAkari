@@ -209,9 +209,27 @@
           </NTooltip>
           <div
             v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
-            class="text-[11px] text-black/60 dark:text-white/60"
+            class="flex items-center gap-1 text-[11px] text-black/60 dark:text-white/60"
           >
-            {{ position(participant.position) }}
+            <span>{{ position(participant.position) }}</span>
+            <JunglePathingInfo
+              v-if="
+                showJunglePathing &&
+                isJunglePosition(participant.position) &&
+                jungleAnalysisByPuuid[participant.puuid]
+              "
+              :analysis="jungleAnalysisByPuuid[participant.puuid]"
+              trigger-mode="text"
+              :trigger-text="t('JunglePathing.title')"
+              :show-copy-all="false"
+            />
+            <span
+              v-else-if="showJunglePathing && isJunglePosition(participant.position)"
+              class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
+              @mouseenter="ensureJungleAnalysisReady"
+            >
+              {{ t('JunglePathing.title') }}
+            </span>
           </div>
         </div>
       </div>
@@ -298,6 +316,7 @@
 </template>
 
 <script setup lang="ts">
+import JunglePathingInfo from '@renderer-shared/components/ongoing-game-panel/widgets/JunglePathingInfo.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
@@ -307,10 +326,11 @@ import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSp
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { JunglePathingAnalysis, analyzeJunglePathing } from '@shared/data-adapter/analysis/jungle'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 
 import { useMatchCard } from '../context'
 import Atakhan from '../icons/Atakhan.vue'
@@ -400,9 +420,14 @@ const { teamIdentifier } = defineProps<{
 
 const {
   basicInfo,
+  details,
+  loadingDetails,
+  loadDetails: onLoadDetails,
   teams,
   participants,
   puuid,
+  summary,
+  showJunglePathing,
   hidePrivacy,
   navigateToSummonerByPuuid: onNavigateToSummonerByPuuid
 } = useMatchCard()
@@ -439,6 +464,49 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 const teamName = useTeamName()
 const gameResultName = useGameResultName()
 const position = usePosition()
+
+const isJunglePosition = (position: string) => {
+  const p = position.toUpperCase()
+  return p === 'JUNGLE' || p === 'JUG'
+}
+
+const ensureJungleAnalysisReady = () => {
+  if (!details.value && !loadingDetails.value) {
+    onLoadDetails(basicInfo.value.gameId)
+  }
+}
+
+const jungleAnalysisByPuuid = computed<Record<string, JunglePathingAnalysis>>(() => {
+  const d = details.value
+  if (!d) {
+    return {}
+  }
+
+  const result: Record<string, JunglePathingAnalysis> = {}
+
+  for (const p of participants.value) {
+    if (!p.puuid || p.puuid === EMPTY_PUUID || !isJunglePosition(p.position || '')) {
+      continue
+    }
+
+    const analysis = analyzeJunglePathing([d], [summary.value], p.puuid, p.championId)
+
+    if (analysis) {
+      result[p.puuid] = analysis
+    }
+  }
+
+  return result
+})
+
+watchEffect(() => {
+  if (
+    showJunglePathing.value &&
+    participants.value.some((p) => isJunglePosition(p.position || ''))
+  ) {
+    ensureJungleAnalysisReady()
+  }
+})
 </script>
 
 <style scoped>

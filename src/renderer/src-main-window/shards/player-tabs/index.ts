@@ -294,6 +294,12 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       store.frontendSettings,
       'defaultShowIrregularGames'
     )
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
+      'showJunglePathing'
+    )
   }
 }
 

@@ -64,7 +64,12 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     /**
      * 默认显示重开局等
      */
-    defaultShowIrregularGames: false
+    defaultShowIrregularGames: false,
+
+    /**
+     * 战绩页面是否启用打野偏好
+     */
+    showJunglePathing: true
   })
 
   const tabs = ref<TabState[]>([])

@@ -337,7 +337,7 @@
 
     <!-- jungle pathing info -->
     <JunglePathingInfo
-      v-if="jungleAnalysis"
+      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
       :analysis="jungleAnalysis"
     />
 

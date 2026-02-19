@@ -171,6 +171,20 @@
         </NRadioGroup>
       </ControlItem>
 
+      <!-- show jungle pathing -->
+      <ControlItem
+        class="control-item-margin"
+        :label-width="400"
+        :label="t('OngoingGameSettings.showJunglePathing.label')"
+        :label-description="t('OngoingGameSettings.showJunglePathing.description')"
+      >
+        <NSwitch
+          size="small"
+          :value="ogs.settings.showJunglePathing"
+          @update:value="(val) => og.setShowJunglePathing(val)"
+        />
+      </ControlItem>
+
       <!-- show match history item border -->
       <ControlItem
         class="control-item-margin"

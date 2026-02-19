@@ -36,6 +36,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       | 'premade-team',
 
     showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
+    showJunglePathing: true,
     showMatchHistoryItemBorder: false,
     autoRouteWhenGameStarts: false,
     playerCardTags: {

@@ -108,6 +108,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         gameDetailsLoadCount: { default: this.settings.matchHistoryLoadCount },
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
+        showJunglePathing: { default: this.settings.showJunglePathing },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
         playerCardTags: { default: this.settings.playerCardTags },
@@ -137,6 +138,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'gameDetailsLoadCount',
       'orderPlayerBy',
       'showChampionUsage',
+      'showJunglePathing',
       'showMatchHistoryItemBorder',
       'autoRouteWhenGameStarts',
       'playerCardTags',
@@ -1210,10 +1212,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const session = this._lc.data.gameflow.session
     if (session) {
       for (const p of session.gameData.playerChampionSelections) {
-        if (
-          p.puuid &&
-          (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)
-        ) {
+        if (p.puuid && (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)) {
           junglers.push(p.puuid)
         }
       }
@@ -1248,7 +1247,9 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info(`Jungle details: ${mh.data.length} games in history for ${puuid}, source=${mh.source}`)
+    this._log.info(
+      `Jungle details: ${mh.data.length} games in history for ${puuid}, source=${mh.source}`
+    )
 
     const jungleGameIds = filterJungleGames(mh.data, puuid)
     this._log.info(`Jungle details: found ${jungleGameIds.length} jungle games for ${puuid}`)
@@ -1282,7 +1283,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       if (relevantDetails.length === 0) continue
 
       const currentChampionId = this.state.championSelections[puuid] ?? 0
-      const analysis = analyzeJunglePathing(relevantDetails, relevantSummaries, puuid, currentChampionId)
+      const analysis = analyzeJunglePathing(
+        relevantDetails,
+        relevantSummaries,
+        puuid,
+        currentChampionId
+      )
       if (analysis) {
         result[puuid] = analysis
       }

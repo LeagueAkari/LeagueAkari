@@ -44,6 +44,7 @@ export class OngoingGameSettings {
     | 'premade-team'
 
   showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
+  showJunglePathing = true
   showMatchHistoryItemBorder = false
   autoRouteWhenGameStarts = false
   playerCardTags = {
@@ -90,6 +91,10 @@ export class OngoingGameSettings {
 
   setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
     this.showChampionUsage = value
+  }
+
+  setShowJunglePathing(value: boolean) {
+    this.showJunglePathing = value
   }
 
   setShowMatchHistoryItemBorder(value: boolean) {

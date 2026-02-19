@@ -329,6 +329,10 @@ MatchHistorySettings:
     label: Load Count
     description: Number of matches to load for each match history tab.
 
+  showJunglePathing:
+    label: Enable Jungle Pathing
+    description: Show jungle pathing entry and analysis card on match history pages.
+
 OngoingGameSettings:
   title: Ongoing Game
   titleCommon: Ongoing Game
@@ -380,6 +384,10 @@ OngoingGameSettings:
       none: None
       recent: Recently Used
       mastery: Mastery Level
+
+  showJunglePathing:
+    label: Enable Jungle Pathing
+    description: Show jungle pathing analysis in ongoing-game player cards.
 
   showMatchHistoryItemBorder:
     label: Show Match History Item Border

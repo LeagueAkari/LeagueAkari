@@ -58,6 +58,7 @@
         :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
         :hide-privacy="as.settings.streamerMode"
         :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
+        :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
       />
     </div>
   </div>

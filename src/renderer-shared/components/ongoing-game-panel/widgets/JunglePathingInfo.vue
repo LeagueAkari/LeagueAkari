@@ -1,14 +1,32 @@
 <template>
   <NPopover :keep-alive-on-hover="true" :delay="50">
     <template #trigger>
+      <span
+        v-if="triggerMode === 'text'"
+        class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
+      >
+        {{ triggerText || t('JunglePathing.title') }}
+      </span>
       <div
+        v-else
         class="mb-1 flex cursor-pointer items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 transition-[filter] hover:brightness-110 dark:border-emerald-400/20 dark:bg-emerald-400/10"
       >
         <!-- mini map -->
-        <div class="relative flex-shrink-0" :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }">
+        <div
+          class="relative flex-shrink-0"
+          :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }"
+        >
           <img class="absolute h-full w-full rounded" :src="map11" />
           <svg class="absolute h-full w-full" viewBox="0 0 100 100">
-            <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,2" />
+            <line
+              x1="0"
+              y1="0"
+              x2="100"
+              y2="100"
+              stroke="rgba(255,255,255,0.3)"
+              stroke-width="1"
+              stroke-dasharray="3,2"
+            />
           </svg>
           <div
             v-for="(pt, i) of miniMapPoints.slice(0, 20)"
@@ -22,17 +40,30 @@
         <!-- text stats -->
         <div class="flex min-w-0 flex-1 flex-col gap-0.5 text-[11px]">
           <div class="flex items-center gap-1">
-            <span class="font-bold text-emerald-700 dark:text-emerald-300">{{ t('JunglePathing.title') }}</span>
-            <span v-if="analysis.currentChampion" class="text-[10px] text-amber-600 dark:text-amber-400">{{ t('JunglePathing.currentChampion') }}</span>
-            <span class="text-[10px] text-black/50 dark:text-white/50">{{ t('JunglePathing.gamesAnalyzed', { count: displayStats.gamesAnalyzed }) }}</span>
+            <span class="font-bold text-emerald-700 dark:text-emerald-300">{{
+              t('JunglePathing.title')
+            }}</span>
+            <span
+              v-if="analysis.currentChampion"
+              class="text-[10px] text-amber-600 dark:text-amber-400"
+              >{{ t('JunglePathing.currentChampion') }}</span
+            >
+            <span class="text-[10px] text-black/50 dark:text-white/50">{{
+              t('JunglePathing.gamesAnalyzed', { count: displayStats.gamesAnalyzed })
+            }}</span>
           </div>
           <div class="flex gap-1 text-black/80 dark:text-white/80">
-            <span class="whitespace-nowrap" :class="topsideTextColor(displayStats)">{{ topsideTextShort(displayStats) }}</span>
+            <span class="whitespace-nowrap" :class="topsideTextColor(displayStats)">{{
+              topsideTextShort(displayStats)
+            }}</span>
             <span class="text-black/40 dark:text-white/40">|</span>
             <span class="whitespace-nowrap">
-              <span class="text-red-400">{{ t('JunglePathing.topShort') }}</span>{{ formatWeightSum(displayStats.topZoneWeightSum) }}
-              <span class="text-yellow-400">{{ t('JunglePathing.midShort') }}</span>{{ formatWeightSum(displayStats.midZoneWeightSum) }}
-              <span class="text-blue-400">{{ t('JunglePathing.botShort') }}</span>{{ formatWeightSum(displayStats.botZoneWeightSum) }}
+              <span class="text-red-400">{{ t('JunglePathing.topShort') }}</span
+              >{{ formatWeightSum(displayStats.topZoneWeightSum) }}
+              <span class="text-yellow-400">{{ t('JunglePathing.midShort') }}</span
+              >{{ formatWeightSum(displayStats.midZoneWeightSum) }}
+              <span class="text-blue-400">{{ t('JunglePathing.botShort') }}</span
+              >{{ formatWeightSum(displayStats.botZoneWeightSum) }}
             </span>
           </div>
         </div>
@@ -42,21 +73,34 @@
     <!-- popover detail -->
     <div class="flex flex-col gap-2">
       <!-- tab switch + copy -->
-      <div class="flex items-center gap-2" :class="analysis.currentChampion ? 'justify-between' : 'justify-end'">
+      <div
+        v-if="analysis.currentChampion || showCopyAll"
+        class="flex items-center gap-2"
+        :class="
+          analysis.currentChampion && showCopyAll
+            ? 'justify-between'
+            : analysis.currentChampion
+              ? 'justify-start'
+              : 'justify-end'
+        "
+      >
         <div v-if="analysis.currentChampion" class="flex gap-1 text-xs">
           <button
             v-for="tab of tabs"
             :key="tab.key"
             class="cursor-pointer rounded px-2 py-0.5 transition-colors"
-            :class="activeTab === tab.key
-              ? 'bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-300'
-              : 'text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5'"
+            :class="
+              activeTab === tab.key
+                ? 'bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-300'
+                : 'text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5'
+            "
             @click="activeTab = tab.key"
           >
             {{ tab.label }} ({{ tab.stats.gamesAnalyzed }})
           </button>
         </div>
         <button
+          v-if="showCopyAll"
           class="flex-shrink-0 cursor-pointer rounded px-2 py-1 text-[11px] text-black/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
           @click="handleCopyAll"
         >
@@ -74,7 +118,15 @@
             <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
               <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
               <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
-              <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-dasharray="4,3" />
+              <line
+                x1="0"
+                y1="0"
+                x2="100"
+                y2="100"
+                stroke="rgba(255,255,255,0.4)"
+                stroke-width="0.8"
+                stroke-dasharray="4,3"
+              />
             </svg>
             <div
               v-for="(pt, i) of largeMapPoints"
@@ -105,50 +157,109 @@
         <!-- detail stats -->
         <div class="flex flex-col justify-center gap-2 text-xs">
           <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.mapPref') }}</div>
-            <div class="mt-0.5 whitespace-nowrap text-[11px] text-black/75 dark:text-white/75">
-              <span class="text-red-400">{{ t('JunglePathing.top') }}</span>{{ formatWeightSum(popoverStats.topZoneWeightSum) }}
-              <span class="text-yellow-400">{{ t('JunglePathing.mid') }}</span>{{ formatWeightSum(popoverStats.midZoneWeightSum) }}
-              <span class="text-blue-400">{{ t('JunglePathing.bot') }}</span>{{ formatWeightSum(popoverStats.botZoneWeightSum) }}
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+              {{ t('JunglePathing.mapPref') }}
+            </div>
+            <div class="mt-0.5 text-[11px] whitespace-nowrap text-black/75 dark:text-white/75">
+              <span class="text-red-400">{{ t('JunglePathing.top') }}</span
+              >{{ formatWeightSum(popoverStats.topZoneWeightSum) }}
+              <span class="text-yellow-400">{{ t('JunglePathing.mid') }}</span
+              >{{ formatWeightSum(popoverStats.midZoneWeightSum) }}
+              <span class="text-blue-400">{{ t('JunglePathing.bot') }}</span
+              >{{ formatWeightSum(popoverStats.botZoneWeightSum) }}
               <span class="mx-1 text-black/40 dark:text-white/40">|</span>
-              <span :class="topsideTextColor(popoverStats)">{{ topsideTextWithPct(popoverStats) }}</span>
+              <span :class="topsideTextColor(popoverStats)">{{
+                topsideTextWithPct(popoverStats)
+              }}</span>
             </div>
           </div>
           <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.objectives') }}</div>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+              {{ t('JunglePathing.objectives') }}
+            </div>
             <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-0.5"><DragonIcon class="size-3.5" />{{ t('JunglePathing.firstDragonRate', { pct: Math.round(popoverStats.objectives.firstDragonRate * 100) }) }}</div>
+              <div class="flex items-center gap-0.5">
+                <DragonIcon class="size-3.5" />{{
+                  t('JunglePathing.firstDragonRate', {
+                    pct: Math.round(popoverStats.objectives.firstDragonRate * 100)
+                  })
+                }}
+              </div>
               <div class="grid grid-cols-2 gap-x-3 gap-y-1">
                 <div class="inline-flex min-w-0 items-center justify-between gap-1">
                   <span class="inline-flex items-center gap-0.5">
-                    <DragonIcon class="size-3.5" />{{ t('JunglePathing.avgDragons', { count: roundToTenth(popoverStats.objectives.avgDragons) }) }}
+                    <DragonIcon class="size-3.5" />{{
+                      t('JunglePathing.avgDragons', {
+                        count: roundToTenth(popoverStats.objectives.avgDragons)
+                      })
+                    }}
                   </span>
-                  <span v-if="popoverStats.objectives.avgFirstDragonTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
-                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstDragonTime) }) }}
-                  </span>
-                </div>
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <RiftHeraldIcon class="size-3.5" />{{ t('JunglePathing.avgHeralds', { count: roundToTenth(popoverStats.objectives.avgHeralds) }) }}
-                  </span>
-                  <span v-if="popoverStats.objectives.avgFirstHeraldTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
-                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstHeraldTime) }) }}
-                  </span>
-                </div>
-                <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                  <span class="inline-flex items-center gap-0.5">
-                    <VoidGrubIcon class="size-3.5" />{{ t('JunglePathing.avgVoidgrubs', { count: roundToTenth(popoverStats.objectives.avgVoidgrubs) }) }}
-                  </span>
-                  <span v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
-                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime) }) }}
+                  <span
+                    v-if="popoverStats.objectives.avgFirstDragonTime !== null"
+                    class="flex-shrink-0 text-black/50 dark:text-white/50"
+                  >
+                    {{
+                      t('JunglePathing.firstTime', {
+                        time: formatTime(popoverStats.objectives.avgFirstDragonTime)
+                      })
+                    }}
                   </span>
                 </div>
                 <div class="inline-flex min-w-0 items-center justify-between gap-1">
                   <span class="inline-flex items-center gap-0.5">
-                    <BaronIcon class="size-3.5" />{{ t('JunglePathing.avgBarons', { count: roundToTenth(popoverStats.objectives.avgBarons) }) }}
+                    <RiftHeraldIcon class="size-3.5" />{{
+                      t('JunglePathing.avgHeralds', {
+                        count: roundToTenth(popoverStats.objectives.avgHeralds)
+                      })
+                    }}
                   </span>
-                  <span v-if="popoverStats.objectives.avgFirstBaronTime !== null" class="flex-shrink-0 text-black/50 dark:text-white/50">
-                    {{ t('JunglePathing.firstTime', { time: formatTime(popoverStats.objectives.avgFirstBaronTime) }) }}
+                  <span
+                    v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
+                    class="flex-shrink-0 text-black/50 dark:text-white/50"
+                  >
+                    {{
+                      t('JunglePathing.firstTime', {
+                        time: formatTime(popoverStats.objectives.avgFirstHeraldTime)
+                      })
+                    }}
+                  </span>
+                </div>
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <VoidGrubIcon class="size-3.5" />{{
+                      t('JunglePathing.avgVoidgrubs', {
+                        count: roundToTenth(popoverStats.objectives.avgVoidgrubs)
+                      })
+                    }}
+                  </span>
+                  <span
+                    v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
+                    class="flex-shrink-0 text-black/50 dark:text-white/50"
+                  >
+                    {{
+                      t('JunglePathing.firstTime', {
+                        time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime)
+                      })
+                    }}
+                  </span>
+                </div>
+                <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                  <span class="inline-flex items-center gap-0.5">
+                    <BaronIcon class="size-3.5" />{{
+                      t('JunglePathing.avgBarons', {
+                        count: roundToTenth(popoverStats.objectives.avgBarons)
+                      })
+                    }}
+                  </span>
+                  <span
+                    v-if="popoverStats.objectives.avgFirstBaronTime !== null"
+                    class="flex-shrink-0 text-black/50 dark:text-white/50"
+                  >
+                    {{
+                      t('JunglePathing.firstTime', {
+                        time: formatTime(popoverStats.objectives.avgFirstBaronTime)
+                      })
+                    }}
                   </span>
                 </div>
               </div>
@@ -163,19 +274,34 @@
       <!-- 首清营地 + 前期抓人地图 -->
       <div class="flex gap-3">
         <div class="flex flex-shrink-0 flex-col gap-1">
-          <div class="relative" :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }">
+          <div
+            class="relative"
+            :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }"
+          >
             <img class="absolute h-full w-full rounded" :src="map11" />
             <!-- 红蓝方底色 -->
             <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
               <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
               <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
-              <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-dasharray="4,3" />
+              <line
+                x1="0"
+                y1="0"
+                x2="100"
+                y2="100"
+                stroke="rgba(255,255,255,0.4)"
+                stroke-width="0.8"
+                stroke-dasharray="4,3"
+              />
             </svg>
             <div
               v-for="(pt, i) of campMapPoints"
               :key="`camp-${i}`"
               class="absolute z-[1] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
-              :style="{ left: `${pt.left}px`, top: `${pt.top}px`, backgroundColor: campMarkerColors[pt.camp] }"
+              :style="{
+                left: `${pt.left}px`,
+                top: `${pt.top}px`,
+                backgroundColor: campMarkerColors[pt.camp]
+              }"
             />
             <!-- 3/4级抓人击杀位置（叉号标记） -->
             <div
@@ -184,22 +310,60 @@
               class="absolute z-[5] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
               :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
             >
-              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm" :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'" />
-              <span class="absolute left-1/2 top-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm" :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'" />
+              <span
+                class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-sm"
+                :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
+              />
+              <span
+                class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm"
+                :class="pt.level === 3 ? 'bg-orange-400' : 'bg-purple-400'"
+              />
             </div>
           </div>
           <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
             <span class="inline-flex items-center gap-1 whitespace-nowrap text-orange-400">
               <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
-                <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                <line
+                  x1="2"
+                  y1="2"
+                  x2="6"
+                  y2="6"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+                <line
+                  x1="2"
+                  y1="6"
+                  x2="6"
+                  y2="2"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
               </svg>
               {{ t('JunglePathing.level3KillLegend') }}
             </span>
             <span class="inline-flex items-center gap-1 whitespace-nowrap text-purple-400">
               <svg class="h-2.5 w-2.5 text-purple-400" viewBox="0 0 8 8" aria-hidden="true">
-                <line x1="2" y1="2" x2="6" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                <line x1="2" y1="6" x2="6" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                <line
+                  x1="2"
+                  y1="2"
+                  x2="6"
+                  y2="6"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+                <line
+                  x1="2"
+                  y1="6"
+                  x2="6"
+                  y2="2"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
               </svg>
               {{ t('JunglePathing.level4KillLegend') }}
             </span>
@@ -207,37 +371,97 @@
         </div>
         <div class="flex flex-col justify-center gap-2 text-xs">
           <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.firstClear') }}</div>
-            <div v-if="popoverStats.firstClearCamp.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2">
-              <span class="row-span-2 self-start text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+              {{ t('JunglePathing.firstClear') }}
+            </div>
+            <div
+              v-if="popoverStats.firstClearCamp.blueGames > 0"
+              class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+            >
+              <span class="row-span-2 self-start text-[#40c1ff]">{{
+                t('JunglePathing.blueTeam')
+              }}</span>
               <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'blue') }}</span>
               <span class="min-w-0 truncate text-amber-500">
                 {{ firstClearInvadeText(popoverStats, 'blue') || t('JunglePathing.noData') }}
               </span>
             </div>
-            <div v-if="popoverStats.firstClearCamp.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2">
-              <span class="row-span-2 self-start text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
+            <div
+              v-if="popoverStats.firstClearCamp.redGames > 0"
+              class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+            >
+              <span class="row-span-2 self-start text-[#ff3333]">{{
+                t('JunglePathing.redTeam')
+              }}</span>
               <span class="min-w-0 truncate">{{ firstClearOwnText(popoverStats, 'red') }}</span>
               <span class="min-w-0 truncate text-amber-500">
                 {{ firstClearInvadeText(popoverStats, 'red') || t('JunglePathing.noData') }}
               </span>
             </div>
-            <div v-if="popoverStats.firstClearCamp.blueGames === 0 && popoverStats.firstClearCamp.redGames === 0" class="text-black/50 dark:text-white/50">—</div>
+            <div
+              v-if="
+                popoverStats.firstClearCamp.blueGames === 0 &&
+                popoverStats.firstClearCamp.redGames === 0
+              "
+              class="text-black/50 dark:text-white/50"
+            >
+              —
+            </div>
           </div>
           <div>
-            <div class="mb-1 font-bold text-black/90 dark:text-white/90">{{ t('JunglePathing.earlyGank') }}</div>
+            <div class="mb-1 font-bold text-black/90 dark:text-white/90">
+              {{ t('JunglePathing.earlyGank') }}
+            </div>
             <div class="flex flex-col gap-0.5">
-              <div v-if="popoverStats.earlyGank.byTeam.blueGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2">
+              <div
+                v-if="popoverStats.earlyGank.byTeam.blueGames > 0"
+                class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+              >
                 <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-orange-400">{{ t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 3) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 3)) }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-purple-400">{{ t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 4) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 4)) }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
+                  >{{
+                    t('JunglePathing.level3Gank', {
+                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 3) * 100)
+                    })
+                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 3)) }}</span
+                >
+                <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
+                  >{{
+                    t('JunglePathing.level4Gank', {
+                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'blue', 4) * 100)
+                    })
+                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'blue', 4)) }}</span
+                >
               </div>
-              <div v-if="popoverStats.earlyGank.byTeam.redGames > 0" class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2">
+              <div
+                v-if="popoverStats.earlyGank.byTeam.redGames > 0"
+                class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+              >
                 <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-orange-400">{{ t('JunglePathing.level3Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 3) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 3)) }}</span>
-                <span class="min-w-0 truncate whitespace-nowrap text-purple-400">{{ t('JunglePathing.level4Gank', { pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 4) * 100) }) }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 4)) }}</span>
+                <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
+                  >{{
+                    t('JunglePathing.level3Gank', {
+                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 3) * 100)
+                    })
+                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 3)) }}</span
+                >
+                <span class="min-w-0 truncate whitespace-nowrap text-purple-400"
+                  >{{
+                    t('JunglePathing.level4Gank', {
+                      pct: Math.round(earlyGankRateByTeam(popoverStats, 'red', 4) * 100)
+                    })
+                  }}{{ killLaneText(earlyGankPositionsByTeam(popoverStats, 'red', 4)) }}</span
+                >
               </div>
-              <div v-if="popoverStats.earlyGank.byTeam.blueGames === 0 && popoverStats.earlyGank.byTeam.redGames === 0" class="text-black/50 dark:text-white/50">—</div>
+              <div
+                v-if="
+                  popoverStats.earlyGank.byTeam.blueGames === 0 &&
+                  popoverStats.earlyGank.byTeam.redGames === 0
+                "
+                class="text-black/50 dark:text-white/50"
+              >
+                —
+              </div>
             </div>
           </div>
           <div class="max-w-[360px] text-[11px] leading-relaxed text-black/40 dark:text-white/40">
@@ -250,24 +474,39 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { GankPoint, JunglePathingAnalysis, JunglePathingStats } from '@shared/data-adapter/analysis/jungle'
-import { Copy as CopyIcon } from '@vicons/tabler'
-import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, useMessage } from 'naive-ui'
-import { computed, ref } from 'vue'
-
 import BaronIcon from '@renderer-shared/components/match-card/icons/Baron.vue'
 import DragonIcon from '@renderer-shared/components/match-card/icons/Dragon.vue'
 import RiftHeraldIcon from '@renderer-shared/components/match-card/icons/RiftHerald.vue'
 import VoidGrubIcon from '@renderer-shared/components/match-card/icons/VoidGrub.vue'
 import map11 from '@renderer-shared/components/match-card/map-images/11.png'
 import { mapToImagePosition } from '@renderer-shared/components/match-card/utils/game-map'
-import { BLUE_SIDE_CAMPS, RED_SIDE_CAMPS, type JungleCamp } from '@shared/data-adapter/analysis/jungle'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import {
+  GankPoint,
+  JunglePathingAnalysis,
+  JunglePathingStats
+} from '@shared/data-adapter/analysis/jungle'
+import {
+  BLUE_SIDE_CAMPS,
+  type JungleCamp,
+  RED_SIDE_CAMPS
+} from '@shared/data-adapter/analysis/jungle'
+import { Copy as CopyIcon } from '@vicons/tabler'
+import { useTranslation } from 'i18next-vue'
+import { NIcon, NPopover, useMessage } from 'naive-ui'
+import { computed, ref } from 'vue'
 
-const { analysis } = defineProps<{
+const {
+  analysis,
+  showCopyAll = true,
+  triggerMode = 'default',
+  triggerText = ''
+} = defineProps<{
   analysis: JunglePathingAnalysis
+  showCopyAll?: boolean
+  triggerMode?: 'default' | 'text'
+  triggerText?: string
 }>()
 
 const { t } = useTranslation()
@@ -293,11 +532,16 @@ const displayStats = computed<JunglePathingStats>(() => {
 const activeTab = ref<'currentChampion' | 'overall'>('currentChampion')
 
 const tabs = computed(() => {
-  const items: { key: 'currentChampion' | 'overall'; label: string; stats: JunglePathingStats }[] = []
+  const items: { key: 'currentChampion' | 'overall'; label: string; stats: JunglePathingStats }[] =
+    []
   if (analysis.currentChampion) {
+    const currentChampionName = analysis.currentChampionId
+      ? lcs.gameData.championName(analysis.currentChampionId)
+      : ''
+
     items.push({
       key: 'currentChampion',
-      label: t('JunglePathing.currentChampion'),
+      label: currentChampionName || t('JunglePathing.currentChampion'),
       stats: analysis.currentChampion
     })
   }
@@ -468,9 +712,13 @@ function sumCampCount(camps: Record<JungleCamp, number>) {
   return camps.red + camps.blue + camps.wolves + camps.raptors
 }
 
-function firstClearCampParts(stats: JunglePathingStats, side: 'blue' | 'red'): { ownText: string; invadeText: string } {
+function firstClearCampParts(
+  stats: JunglePathingStats,
+  side: 'blue' | 'red'
+): { ownText: string; invadeText: string } {
   const camps = stats.firstClearCamp[side]
-  const invadeCamps = side === 'blue' ? stats.firstClearCamp.blueInvade : stats.firstClearCamp.redInvade
+  const invadeCamps =
+    side === 'blue' ? stats.firstClearCamp.blueInvade : stats.firstClearCamp.redInvade
   const games = side === 'blue' ? stats.firstClearCamp.blueGames : stats.firstClearCamp.redGames
   if (games === 0) return { ownText: '—', invadeText: '' }
 
@@ -478,10 +726,16 @@ function firstClearCampParts(stats: JunglePathingStats, side: 'blue' | 'red'): {
   const ownEntries = (Object.keys(camps) as JungleCamp[])
     .filter((c) => camps[c] > 0)
     .sort((a, b) => camps[b] - camps[a])
-    .map((c) => t('JunglePathing.campStart', { camp: campNames[c](), pct: ownStarts > 0 ? Math.round((camps[c] / ownStarts) * 100) : 0 }))
-  const ownText = ownStarts > 0
-    ? `${t('JunglePathing.campOwnStart', { pct: Math.round((ownStarts / games) * 100) })} (${ownEntries.join(', ')})`
-    : t('JunglePathing.noData')
+    .map((c) =>
+      t('JunglePathing.campStart', {
+        camp: campNames[c](),
+        pct: ownStarts > 0 ? Math.round((camps[c] / ownStarts) * 100) : 0
+      })
+    )
+  const ownText =
+    ownStarts > 0
+      ? `${t('JunglePathing.campOwnStart', { pct: Math.round((ownStarts / games) * 100) })} (${ownEntries.join(', ')})`
+      : t('JunglePathing.noData')
 
   const invadeStarts = sumCampCount(invadeCamps)
   if (invadeStarts <= 0) {
@@ -491,7 +745,12 @@ function firstClearCampParts(stats: JunglePathingStats, side: 'blue' | 'red'): {
   const invadeEntries = (Object.keys(invadeCamps) as JungleCamp[])
     .filter((c) => invadeCamps[c] > 0)
     .sort((a, b) => invadeCamps[b] - invadeCamps[a])
-    .map((c) => t('JunglePathing.campStart', { camp: campNames[c](), pct: Math.round((invadeCamps[c] / invadeStarts) * 100) }))
+    .map((c) =>
+      t('JunglePathing.campStart', {
+        camp: campNames[c](),
+        pct: Math.round((invadeCamps[c] / invadeStarts) * 100)
+      })
+    )
 
   const invadeText = `${t('JunglePathing.campInvadeStart', { pct: Math.round((invadeStarts / games) * 100) })} (${invadeEntries.join(', ')})`
   return { ownText, invadeText }
@@ -511,7 +770,11 @@ function firstClearCampText(stats: JunglePathingStats, side: 'blue' | 'red'): st
   return `${ownText} | ${invadeText}`
 }
 
-function earlyGankRateByTeam(stats: JunglePathingStats, side: 'blue' | 'red', level: 3 | 4): number {
+function earlyGankRateByTeam(
+  stats: JunglePathingStats,
+  side: 'blue' | 'red',
+  level: 3 | 4
+): number {
   const byTeam = stats.earlyGank.byTeam
   if (side === 'blue') {
     return level === 3 ? byTeam.blueLevel3GankRate : byTeam.blueLevel4GankRate
@@ -519,7 +782,11 @@ function earlyGankRateByTeam(stats: JunglePathingStats, side: 'blue' | 'red', le
   return level === 3 ? byTeam.redLevel3GankRate : byTeam.redLevel4GankRate
 }
 
-function earlyGankPositionsByTeam(stats: JunglePathingStats, side: 'blue' | 'red', level: 3 | 4): GankPoint[] {
+function earlyGankPositionsByTeam(
+  stats: JunglePathingStats,
+  side: 'blue' | 'red',
+  level: 3 | 4
+): GankPoint[] {
   const byTeam = stats.earlyGank.byTeam
   if (side === 'blue') {
     return level === 3 ? byTeam.blueLevel3KillPositions : byTeam.blueLevel4KillPositions
@@ -557,10 +824,30 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
   const obj = stats.objectives
   const objParts: string[] = []
   objParts.push(t('JunglePathing.firstDragonRate', { pct: Math.round(obj.firstDragonRate * 100) }))
-  objParts.push(t('JunglePathing.avgDragons', { count: roundToTenth(obj.avgDragons) }) + (obj.avgFirstDragonTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstDragonTime) })})` : ''))
-  objParts.push(t('JunglePathing.avgVoidgrubs', { count: roundToTenth(obj.avgVoidgrubs) }) + (obj.avgFirstVoidgrubTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstVoidgrubTime) })})` : ''))
-  objParts.push(t('JunglePathing.avgHeralds', { count: roundToTenth(obj.avgHeralds) }) + (obj.avgFirstHeraldTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstHeraldTime) })})` : ''))
-  objParts.push(t('JunglePathing.avgBarons', { count: roundToTenth(obj.avgBarons) }) + (obj.avgFirstBaronTime !== null ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstBaronTime) })})` : ''))
+  objParts.push(
+    t('JunglePathing.avgDragons', { count: roundToTenth(obj.avgDragons) }) +
+      (obj.avgFirstDragonTime !== null
+        ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstDragonTime) })})`
+        : '')
+  )
+  objParts.push(
+    t('JunglePathing.avgVoidgrubs', { count: roundToTenth(obj.avgVoidgrubs) }) +
+      (obj.avgFirstVoidgrubTime !== null
+        ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstVoidgrubTime) })})`
+        : '')
+  )
+  objParts.push(
+    t('JunglePathing.avgHeralds', { count: roundToTenth(obj.avgHeralds) }) +
+      (obj.avgFirstHeraldTime !== null
+        ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstHeraldTime) })})`
+        : '')
+  )
+  objParts.push(
+    t('JunglePathing.avgBarons', { count: roundToTenth(obj.avgBarons) }) +
+      (obj.avgFirstBaronTime !== null
+        ? ` (${t('JunglePathing.firstTime', { time: formatTime(obj.avgFirstBaronTime) })})`
+        : '')
+  )
 
   let text = `[${label}] ${stats.gamesAnalyzed}${t('JunglePathing.gamesUnit')}\n`
   text += `  ${t('JunglePathing.mapPref')}: ${mapPref} | ${weights}\n`
@@ -589,9 +876,7 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
 
 function formatPlayerText(puuid: string, a: JunglePathingAnalysis): string {
   const summoner = ogs.summoner[puuid]
-  const name = summoner
-    ? `${summoner.gameName}#${summoner.tagLine}`
-    : puuid.substring(0, 8)
+  const name = summoner ? `${summoner.gameName}#${summoner.tagLine}` : puuid.substring(0, 8)
 
   const champName = a.currentChampionId ? lcs.gameData.championName(a.currentChampionId) : ''
 

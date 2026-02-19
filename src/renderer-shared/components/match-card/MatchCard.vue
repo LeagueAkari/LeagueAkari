@@ -25,7 +25,8 @@ const {
   details = null,
   hidePrivacy = false,
   loadingDetails = false,
-  replayState = null
+  replayState = null,
+  showJunglePathing = true
 } = defineProps<{
   summary: LcuOrSgpGameSummary
   details?: LcuOrSgpGameDetails | null
@@ -35,6 +36,7 @@ const {
 
   loadingDetails?: boolean
   replayState?: ReplayDownloadProgress
+  showJunglePathing?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -55,6 +57,7 @@ provideMatchCard({
   hidePrivacy: () => hidePrivacy,
   loadingDetails: () => loadingDetails,
   replayState: () => replayState,
+  showJunglePathing: () => showJunglePathing,
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
     emits('navigateToSummonerByPuuid', puuid, setCurrent)

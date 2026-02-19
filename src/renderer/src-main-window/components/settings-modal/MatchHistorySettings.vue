@@ -25,6 +25,14 @@
           :options="pageSizeOptions"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MatchHistorySettings.showJunglePathing.label')"
+        :label-description="t('MatchHistorySettings.showJunglePathing.description')"
+        :label-width="400"
+      >
+        <NSwitch size="small" v-model:value="pts.frontendSettings.showJunglePathing" />
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>

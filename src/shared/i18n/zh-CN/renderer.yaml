@@ -330,6 +330,10 @@ MatchHistorySettings:
     label: 加载数量
     description: 每个战绩页面加载的战绩数量
 
+  showJunglePathing:
+    label: 启用打野偏好
+    description: 在战绩页面展示打野偏好入口与分析卡片
+
 OngoingGameSettings:
   title: 对局
   titleCommon: 对局
@@ -381,6 +385,10 @@ OngoingGameSettings:
       none: 不显示
       recent: 最近使用的英雄
       mastery: 成就点数最高的英雄
+
+  showJunglePathing:
+    label: 启用打野偏好
+    description: 在对局玩家卡片中展示打野偏好分析
 
   showMatchHistoryItemBorder:
     label: 战绩项显示边框
