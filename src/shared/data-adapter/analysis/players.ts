@@ -222,14 +222,24 @@ function toUnifiedGames(games: LcuOrSgpGameSummary[], puuid: string) {
     .filter((g) => g !== null)
 }
 
+export type AnalyzeMatchHistoryOptions = {
+  includeIrregularGames?: boolean
+}
+
 export function analyzeMatchHistory(
   games: LcuOrSgpGameSummary[],
-  puuid: string
+  puuid: string,
+  options: AnalyzeMatchHistoryOptions = {}
 ): MatchHistoryGamesAnalysisAll | null {
   const unified = toUnifiedGames(games, puuid)
+  const includeIrregularGames = options.includeIrregularGames ?? false
 
   // 过滤异常数据和重开数据，后面可以直接断言非空
   const filteredGames = unified.filter(({ participant, basicInfo }) => {
+    if (includeIrregularGames) {
+      return true
+    }
+
     if (isPveQueue(basicInfo.queueId)) {
       return false
     }

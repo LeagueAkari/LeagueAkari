@@ -62,13 +62,16 @@
 
 <script setup lang="ts">
 import { useAdditionalInfoStore } from '@cd-timer-window/shards/additional-info/store'
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useCdTimerWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { useTimeoutFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
+import { useMessage } from 'naive-ui'
 import { computed, shallowReactive, shallowRef, watch } from 'vue'
 
 import TimerItem from './TimerItem.vue'
@@ -77,6 +80,9 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const ctws = useCdTimerWindowStore()
+const as = useAppCommonStore()
+const { inGameInputInjectionSupported, isWindows } = usePlatform()
+const message = useMessage()
 
 const wm = useInstance(WindowManagerRenderer)
 
@@ -270,7 +276,7 @@ const items = computed(() => {
   }))
 })
 
-const sendInGameText = (
+const sendInGameText = async (
   id: string,
   timerType: string,
   championId: number | null,
@@ -313,7 +319,33 @@ const sendInGameText = (
   }
 
   if (text) {
-    wm.cdTimerWindow.sendInGame(text)
+    // Best-effort UX: show an explicit reason when injection is unavailable.
+    if (!inGameInputInjectionSupported.value) {
+      if (isWindows.value && !as.isAdministrator) {
+        message.warning(t('SummonerSpellsCdTimer.adminRequired'))
+      } else {
+        message.warning(t('SummonerSpellsCdTimer.nativeInjectionUnsupported'))
+      }
+      return
+    }
+
+    try {
+      await wm.cdTimerWindow.sendInGame(text)
+    } catch (error: any) {
+      const code = error?.code as string | undefined
+
+      if (code === 'AlreadySending') {
+        message.warning(t('SummonerSpellsCdTimer.alreadySending'))
+      } else if (code === 'GameClientNotForeground') {
+        message.warning(t('SummonerSpellsCdTimer.gameNotForeground'))
+      } else if (typeof error?.message === 'string' && error.message.includes('No function')) {
+        message.warning(t('SummonerSpellsCdTimer.nativeInjectionUnsupported'))
+      } else {
+        message.warning(
+          t('SummonerSpellsCdTimer.sendFailed', { reason: error?.message || String(error) })
+        )
+      }
+    }
   }
 }
 </script>

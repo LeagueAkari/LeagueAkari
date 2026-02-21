@@ -25,7 +25,9 @@ const {
   details = null,
   hidePrivacy = false,
   loadingDetails = false,
-  replayState = null
+  replayState = null,
+  showJunglePathing = true,
+  junglePathingDataSource = null
 } = defineProps<{
   summary: LcuOrSgpGameSummary
   details?: LcuOrSgpGameDetails | null
@@ -35,6 +37,12 @@ const {
 
   loadingDetails?: boolean
   replayState?: ReplayDownloadProgress
+  showJunglePathing?: boolean
+  junglePathingDataSource?: {
+    preferredSource: 'lcu' | 'sgp'
+    sgpServerId: string
+    isCrossRegion: boolean
+  } | null
 }>()
 
 const emits = defineEmits<{
@@ -55,6 +63,8 @@ provideMatchCard({
   hidePrivacy: () => hidePrivacy,
   loadingDetails: () => loadingDetails,
   replayState: () => replayState,
+  showJunglePathing: () => showJunglePathing,
+  junglePathingDataSource: () => junglePathingDataSource,
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
     emits('navigateToSummonerByPuuid', puuid, setCurrent)

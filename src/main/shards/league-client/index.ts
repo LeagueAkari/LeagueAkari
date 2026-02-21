@@ -1,4 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
+import { tools } from '@main/utils/addons'
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
@@ -463,9 +463,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         resolve(ws)
       })
 
-      ws.on('rejected', (err) => {
+      ws.on('unexpected-response', (_req, res) => {
         clearTimeout(timer)
-        reject(err)
+        reject(new Error(`WebSocket unexpected response: ${res.statusCode} ${res.statusMessage}`))
       })
 
       ws.on('close', () => clearTimeout(timer))

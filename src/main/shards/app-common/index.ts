@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { capabilities as nativeAddonsCapabilities } from '@main/utils/addons'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { app, nativeTheme, shell } from 'electron'
@@ -56,6 +57,14 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this.state.setAdministrator(this._shared.global.isAdministrator)
     this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
+    this.state.setNativeAddons({
+      nativeLoaded: nativeAddonsCapabilities.nativeLoaded,
+      inputHookSupported: nativeAddonsCapabilities.input.hookSupported,
+      inputInjectSupported: nativeAddonsCapabilities.input.injectSupported,
+      toolsForegroundSupported: nativeAddonsCapabilities.tools.foregroundSupported,
+      toolsWindowPlacementSupported: nativeAddonsCapabilities.tools.windowPlacementSupported,
+      toolsFixWindowMethodASupported: nativeAddonsCapabilities.tools.fixWindowMethodASupported
+    })
 
     this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {
       this._ipc.sendEvent(AppCommonMain.id, 'second-instance', commandLine, workingDirectory)
@@ -166,7 +175,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'disableHardwareAcceleration',
       'baseConfig',
       'startupDeepLink',
-      'isRunInTempDir'
+      'isRunInTempDir',
+      'nativeAddons'
     ])
 
     // 状态指示, 是否禁用硬件加速

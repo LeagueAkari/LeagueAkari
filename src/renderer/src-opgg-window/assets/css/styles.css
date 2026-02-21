@@ -3,7 +3,12 @@
   text-shadow: none;
 }
 
+:root[data-platform='darwin'] {
+  --la-mac-titlebar-safe-left: 76px;
+}
+
 :root {
+  --la-mac-titlebar-safe-left: 0px;
   color-scheme: dark;
   --la-background-dark-color-primary: #1a1a1d;
   --la-background-light-color-primary: #f9f9f9;
@@ -11,8 +16,8 @@
   --la-app-min-width: 200px;
   --la-titlebar-height: 28px;
   --la-scrollbar-height: 6px;
-  --la-scrollbar-width: 6px;
-}
+  --la-scrollbar-width: 6px;}
+
 
 ::-webkit-scrollbar {
   width: var(--la-scrollbar-width);

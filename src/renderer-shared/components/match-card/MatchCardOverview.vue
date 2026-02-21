@@ -274,7 +274,7 @@
                     'font-bold text-black/90 dark:text-white/90': player.puuid === puuid,
                     'text-black/80 dark:text-white/80': player.puuid !== puuid
                   }"
-                  @click="onNavigateToSummonerByPuuid(player.puuid)"
+                  @click="navigateToSummonerByPuuid(player.puuid)"
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
@@ -337,7 +337,7 @@
                     'font-bold text-black/90 dark:text-white/90': player.puuid === puuid,
                     'text-black/80 dark:text-white/80': player.puuid !== puuid
                   }"
-                  @click="onNavigateToSummonerByPuuid(player.puuid)"
+                  @click="navigateToSummonerByPuuid(player.puuid)"
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
@@ -420,7 +420,7 @@ const {
   participants,
   isExpanded,
   hidePrivacy,
-  navigateToSummonerByPuuid: onNavigateToSummonerByPuuid
+  navigateToSummonerByPuuid
 } = useMatchCard()
 
 const { formatExtremeNumber } = useNumberFormatter()
@@ -548,7 +548,7 @@ const handleMouseDown = (event: MouseEvent) => {
 
 const handleMouseUp = (event: MouseEvent, puuid: string) => {
   if (event.button === 1) {
-    onNavigateToSummonerByPuuid(puuid, false)
+    navigateToSummonerByPuuid(puuid, false)
   }
 }
 </script>

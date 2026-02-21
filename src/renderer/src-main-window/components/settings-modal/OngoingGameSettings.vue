@@ -171,6 +171,30 @@
         </NRadioGroup>
       </ControlItem>
 
+      <!-- show jungle pathing -->
+      <ControlItem
+        class="control-item-margin"
+        :label-width="400"
+        :label="t('OngoingGameSettings.showJunglePathing.label')"
+        :label-description="t('OngoingGameSettings.showJunglePathing.description')"
+      >
+        <NSwitch
+          size="small"
+          :value="ogs.settings.showJunglePathing"
+          @update:value="(val) => og.setShowJunglePathing(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label-width="400"
+        :label="t('OngoingGameSettings.junglePathingFtue.label')"
+        :label-description="t('OngoingGameSettings.junglePathingFtue.description')"
+      >
+        <NButton size="small" @click="resetJunglePathingFtue">
+          {{ t('OngoingGameSettings.junglePathingFtue.button') }}
+        </NButton>
+      </ControlItem>
+
       <!-- show match history item border -->
       <ControlItem
         class="control-item-margin"
@@ -393,6 +417,7 @@ import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
 import {
+  NButton,
   NCard,
   NCheckbox,
   NFlex,
@@ -400,14 +425,25 @@ import {
   NRadio,
   NRadioGroup,
   NScrollbar,
-  NSwitch
+  NSwitch,
+  useMessage
 } from 'naive-ui'
+
+import { FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD } from '@main-window/shards/ftue/keys'
+import { useFtueStore } from '@main-window/shards/ftue/store'
 
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)
+const ftue = useFtueStore()
+const message = useMessage()
+
+const resetJunglePathingFtue = () => {
+  ftue.reset(FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD)
+  message.success(() => t('OngoingGameSettings.junglePathingFtue.resetDone'))
+}
 </script>
 
 <style scoped>

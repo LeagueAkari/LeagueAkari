@@ -337,6 +337,15 @@
 
     <!-- tags -->
     <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
+    <!-- jungle pathing info -->
+    <JunglePathingInfo
+      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
+      :analysis="jungleAnalysis"
+      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
+    />
+
+    <!-- tags -->
+    <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
 
     <!-- champion usage -->
     <div v-if="championUsage.length" class="mb-1 flex w-full gap-1">
@@ -353,7 +362,7 @@
               class="h-full w-full rounded"
             />
             <StarRoundIcon
-              v-if="c.mastery && c.mastery.championLevel >= STARED_CHAMPION_LEVEL"
+              v-if="c.mastery && c.mastery.championLevel >= STARRED_CHAMPION_LEVEL"
               class="absolute -right-0.5 -bottom-0.5 h-3 w-3 text-[#fff838]"
             />
           </div>
@@ -506,6 +515,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -521,9 +531,10 @@ import {
   PREMADE_TEAM_COLORS,
   PREMADE_TEAM_COLORS_LIGHT,
   RANKED_MEDAL_MAP,
-  STARED_CHAMPION_LEVEL
+  STARRED_CHAMPION_LEVEL
 } from '../constants'
 import { useOngoingGamePanel } from '../context'
+import JunglePathingInfo from './JunglePathingInfo.vue'
 import PlayerCardTagsArea from './PlayerCardTagsArea.vue'
 
 const { puuid } = defineProps<{
@@ -537,12 +548,8 @@ const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 
-const {
-  mergedPremadeTeams: premadeTeamInfo,
-  kdaOutliers,
-  previewGame,
-  navigateToSummonerByPuuid
-} = useOngoingGamePanel()
+const { mergedPremadeTeams, kdaOutliers, previewGame, navigateToSummonerByPuuid } =
+  useOngoingGamePanel()
 
 const summoner = computed(() => ogs.summoner[puuid])
 const rankedStats = computed(() => ogs.rankedStats[puuid])
@@ -554,8 +561,9 @@ const matchHistoryLoadingState = computed(() => ogs.matchHistoryLoadingState[puu
 const queueType = computed(() => ogs.queryStage.gameInfo?.queueType)
 const championId = computed(() => ogs.championSelections?.[puuid])
 const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
+const jungleAnalysis = computed(() => ogs.jungleAnalysis?.[puuid])
 
-const premadeTeamId = computed(() => premadeTeamInfo.value.premadeTeamIdMap[puuid])
+const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
 const as = useAppCommonStore()
 

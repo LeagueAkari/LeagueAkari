@@ -71,13 +71,26 @@
       </div>
     </NModal>
 
-    <NPopover :disabled="as.isAdministrator">
+    <NPopover :disabled="globalShortcutsSupported">
       <template #trigger>
-        <NButton size="tiny" :disabled="!as.isAdministrator" type="primary" @click="show = true">
+        <NButton
+          size="tiny"
+          :disabled="!globalShortcutsSupported"
+          type="primary"
+          @click="() => {
+            if (!globalShortcutsSupported) return
+            show = true
+          }"
+        >
           {{ t('ShortcutSelector.select') }}
         </NButton>
       </template>
-      {{ t('ShortcutSelector.notRunAsAdministrator') }}
+      <template v-if="!nativeInputHookSupported">
+        {{ t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly') }}
+      </template>
+      <template v-else-if="isWindows && !as.isAdministrator">
+        {{ t('ShortcutSelector.notRunAsAdministrator') }}
+      </template>
     </NPopover>
 
     <div class="flex flex-wrap items-center gap-1">
@@ -101,6 +114,7 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NPopover } from 'naive-ui'
@@ -113,6 +127,8 @@ defineProps<{
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
+
+const { globalShortcutsSupported, isWindows, nativeInputHookSupported } = usePlatform()
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
 

@@ -109,6 +109,17 @@ FeatureGuide:
       title: 展示更多标签
       description: 在 `设置` → `对局` → `玩家卡片标签` 中，启用更多标签。
 
+Ftue:
+  confirm: 知道了
+  later: 稍后
+  junglePathing:
+    matchHistoryDetails:
+      title: 战绩详情支持打野偏好
+      description: 在对局详情总览中，看到“打野偏好”后可悬停查看详细分析。
+    ongoingGameCard:
+      title: 对局页支持打野偏好
+      description: 玩家卡片中的“打野偏好”可查看首清、前期抓人和地图偏好等分析。
+
 CommonButtons:
   announcement: 公告
   announcementSummary: 公告摘要
@@ -330,6 +341,16 @@ MatchHistorySettings:
     label: 加载数量
     description: 每个战绩页面加载的战绩数量
 
+  showJunglePathing:
+    label: 启用打野偏好
+    description: 在战绩页面展示打野偏好入口与分析卡片
+
+  junglePathingFtue:
+    label: 打野偏好引导
+    description: 重新显示战绩详情中的打野偏好引导
+    button: 再次显示引导
+    resetDone: 已重置打野偏好引导
+
 OngoingGameSettings:
   title: 对局
   titleCommon: 对局
@@ -381,6 +402,16 @@ OngoingGameSettings:
       none: 不显示
       recent: 最近使用的英雄
       mastery: 成就点数最高的英雄
+
+  showJunglePathing:
+    label: 启用打野偏好
+    description: 在对局玩家卡片中展示打野偏好分析
+
+  junglePathingFtue:
+    label: 打野偏好引导
+    description: 重新显示对局页面中的打野偏好引导
+    button: 再次显示引导
+    resetDone: 已重置打野偏好引导
 
   showMatchHistoryItemBorder:
     label: 战绩项显示边框
@@ -1641,6 +1672,7 @@ ShortcutSelector:
   unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认
   notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
+  nativeGlobalShortcutsWindowsOnly: 原生全局快捷键需要原生插件。本构建目前仅在 Windows 提供。
   ok: 确认
   cancel: 取消
   select: 选择
@@ -1682,6 +1714,8 @@ Client:
 
   gameClient:
     title: 游戏端
+
+    windowsOnlyNativeAddon: 需要原生插件（本构建目前仅在 Windows 提供）。
 
     terminateGameClientWithShortcut:
       labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
@@ -2060,6 +2094,8 @@ PlayerTab:
     loss: 失败
     summoners: 涉及召唤师
     champions: 涉及英雄
+    showPractice: 显示训练模式
+    showIrregularGames: 显示重开局等
   itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
 
@@ -2109,6 +2145,8 @@ PlayerTab:
     activeSession: 活跃时段胜负
     winShort: 胜
     lossShort: 负
+    winningStreak: '{{countV}} 连胜'
+    losingStreak: '{{countV}} 连败'
 
   recentPlayers:
     teammatesTitle: 最近队友
@@ -2352,6 +2390,69 @@ AugmentDisplay:
 SummonerSpellDisplay:
   cooldown: 冷却时间：{{time}} 秒
   levelRequirement: 等级需求：{{level}}
+
+JunglePathing:
+  title: 打野偏好
+  thisGame: 本局
+  hero: 英雄
+  overall: 总体
+  currentChampion: 本英雄
+  mapPref: 地图偏好
+  ganks: Gank
+  topsidePref: 偏上
+  midPref: 偏中
+  botsidePref: 偏下
+  topMidPref: 偏中上
+  midBotPref: 偏中下
+  balanced: 均衡
+  balancedShort: 均衡
+  firstClear: 首清
+  topsideStart: '上开 {{pct}}%'
+  botsideStart: '下开 {{pct}}%'
+  campRed: 红buff
+  campBlue: 蓝buff
+  campWolves: 三狼
+  campRaptors: F6
+  campOwnStart: '常规开 {{pct}}%'
+  campStart: '{{camp}}开 {{pct}}%'
+  campInvadeStart: '入侵开 {{pct}}%'
+  blueTeam: 蓝色方
+  redTeam: 红色方
+  earlyGank: 前期抓人
+  level3KillLegend: 3级击杀
+  level4KillLegend: 4级击杀
+  level3Gank: '3级抓 {{pct}}%'
+  level4Gank: '4级抓 {{pct}}%'
+  objectives: 野怪目标
+  firstDragonRate: '一龙率 {{pct}}%'
+  dragons: '小龙 {{count}}'
+  voidgrubs: '潮虫 {{count}}'
+  heralds: '先锋 {{count}}'
+  barons: '大龙 {{count}}'
+  avgDragons: '场均小龙 {{count}}'
+  avgVoidgrubs: '场均潮虫 {{count}}'
+  avgHeralds: '场均先锋 {{count}}'
+  avgBarons: '场均大龙 {{count}}'
+  firstTime: '首条 {{time}}'
+  noData: '—'
+  minuteLegend: 位置点
+  gankLegend: GANK 点
+  descriptionSingle: 基于该局时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
+  description2Single: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开）。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断。
+  description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
+  description2: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开），按红蓝方分别统计。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断，并按红蓝方分别统计。
+  gamesUnit: 局
+  copyAll: 复制分析
+  copied: 已复制分析
+  allyJungler: 我方打野
+  enemyJungler: 敌方打野
+  top: 上
+  mid: 中
+  bot: 下
+  topShort: 上
+  midShort: 中
+  botShort: 下
+  gamesAnalyzed: '{{count}} 场'
 
 # 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
@@ -2764,6 +2865,10 @@ StartupPane:
   newVersionAvailable: 新版本
 
 InGameSend:
+  windowsOnly:
+    title: 仅 Windows 功能
+    description: 游戏内发送和全局快捷键需要原生插件。本构建仅在 Windows 提供。
+
   settings:
     title: 发送设置
     cancelShortcut:
@@ -2876,6 +2981,11 @@ LootTools:
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
   countup: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时已使用'
+  nativeInjectionUnsupported: 当前环境不支持发送到游戏（需要原生插件的输入注入能力）。
+  adminRequired: 需要以管理员权限运行才能发送到游戏。
+  gameNotForeground: 请先切回到游戏窗口（前台）再发送。
+  alreadySending: 正在发送中，请稍后再试。
+  sendFailed: '发送失败：{{reason}}'
 
 BackgroundTasks:
   taskTitle: 正在进行 ({{countV}})

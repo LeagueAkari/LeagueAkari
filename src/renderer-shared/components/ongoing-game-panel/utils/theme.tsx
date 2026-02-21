@@ -1,5 +1,4 @@
 // P.S. tsx 文件名用于保证 tailwind 自动扫描
-
 export function getTeamIndicatorColorClasses(team: string) {
   switch (team) {
     case 'TEAM-100':
@@ -17,6 +16,6 @@ export function getTeamIndicatorColorClasses(team: string) {
 }
 
 export const WIN_RATE_TEAM_TAG_BG_CLASSES = 'bg-[#7e2c85]'
-export const LOSE_RATE_TEAM_TAG_BG_CLASSES = 'bg-[#893b3b]'
+export const LOSS_RATE_TEAM_TAG_BG_CLASSES = 'bg-[#893b3b]'
 export const WIN_RATE_GTE_50_TEXT_CLASSES = 'text-[#2c8c6c] dark:text-[#4cc69d]'
 export const WIN_RATE_LT_50_TEXT_CLASSES = 'text-[#cc0000] dark:text-[#ff6161]'

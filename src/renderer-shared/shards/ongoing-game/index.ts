@@ -59,6 +59,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
   }
 
+  setShowJunglePathing(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showJunglePathing', value)
+  }
+
   setShowMatchHistoryItemBorder(value: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
   }
@@ -121,6 +125,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.championMastery = {}
       store.savedInfo = {}
       store.cachedGames = {}
+      store.jungleAnalysis = {}
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {

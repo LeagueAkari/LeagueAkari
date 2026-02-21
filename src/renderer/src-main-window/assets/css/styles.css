@@ -5,7 +5,14 @@
   text-shadow: none;
 }
 
+:root[data-platform='darwin'] {
+  --la-mac-titlebar-safe-left: 76px;
+  --la-mac-sidebar-safe-top: 10px;
+}
+
 :root {
+  --la-mac-sidebar-safe-top: 0px;
+  --la-mac-titlebar-safe-left: 0px;
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
   --la-titlebar-height: 36px;
@@ -13,6 +20,7 @@
   --la-scrollbar-width: 8px;
   --n-option-padding: 0 4px;
 }
+
 
 [data-theme='dark'] {
   --la-background-color-primary: #1a1a1d;
@@ -103,7 +111,7 @@ body {
 }
 
 /* adjust for app title bar height */
-.n-notification-container > .n-scrollbar > .n-scrollbar-container {
+.n-notification-container>.n-scrollbar>.n-scrollbar-container {
   max-height: calc(100vh - var(--la-titlebar-height)) !important;
 }
 

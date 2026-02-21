@@ -41,6 +41,9 @@ export const SpectatorContextKey: InjectionKey<SpectatorContext> = Symbol(
   'PlayerTabSpectatorContext'
 )
 
+// Avoid repeated disabled warnings and useless retries for known unsupported spectator servers.
+const disabledSpectatorServers = new Set<string>()
+
 /**
  * 加载观战信息
  *
@@ -76,6 +79,11 @@ export function provideSpectator(props: {
   })
 
   const loadSpectatorData = async () => {
+    if (disabledSpectatorServers.has(sgpServerId.value)) {
+      isApiDisabled.value = true
+      return
+    }
+
     // 需要可用
     if (!sgpApiAvailable.value) {
       return
@@ -104,9 +112,11 @@ export function provideSpectator(props: {
 
         // 意外情况，直接不再进行请求
         if (status && status >= 400 && status < 500 && status !== 404) {
+          const serverId = sgpServerId.value
+          disabledSpectatorServers.add(serverId)
           isApiDisabled.value = true
           pause()
-          log.warn(componentName, `Spectator API disabled for server: ${sgpServerId.value}`)
+          log.warn(componentName, `Spectator API disabled for server: ${serverId}`)
           return
         }
 
@@ -177,6 +187,7 @@ export function provideSpectator(props: {
     () => {
       // 重置状态
       spectatorData.value = null
+      isApiDisabled.value = disabledSpectatorServers.has(sgpServerId.value)
 
       loadSpectatorData()
     },

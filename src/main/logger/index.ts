@@ -60,8 +60,12 @@ const LEVEL_COLORS = {
 }
 
 export function initAppLogger(level: string = 'info') {
-  const appDir = path.join(app.getPath('exe'), '..')
-  const logsDir = path.join(appDir, 'logs')
+  // macOS 下应用通常安装在 /Applications（对普通用户不可写），不能把日志写进 .app bundle 内。
+  // Windows（NSIS per-user）等场景下保留原逻辑：写到可执行文件目录旁的 logs。
+  const logsDir =
+    process.platform === 'darwin'
+      ? app.getPath('logs')
+      : path.join(path.join(app.getPath('exe'), '..'), 'logs')
 
   try {
     const stats = fs.statSync(logsDir)

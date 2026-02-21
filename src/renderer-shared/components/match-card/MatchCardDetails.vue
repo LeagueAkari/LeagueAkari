@@ -32,8 +32,8 @@
               :loading="replayState?.state === 'downloading'"
               @click="
                 replayState?.state === 'watch'
-                  ? onWatchReplay(basicInfo.gameId)
-                  : onLoadReplay(basicInfo.gameId)
+                  ? watchReplay(basicInfo.gameId)
+                  : loadReplay(basicInfo.gameId)
               "
             >
               <template #icon>
@@ -82,8 +82,8 @@ const {
   participants,
   puuid,
   replayState,
-  loadReplay: onLoadReplay,
-  watchReplay: onWatchReplay
+  loadReplay,
+  watchReplay
 } = useMatchCard()
 const { t } = useTranslation()
 

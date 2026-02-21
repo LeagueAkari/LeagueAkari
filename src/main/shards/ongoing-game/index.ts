@@ -2,6 +2,11 @@ import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import {
+  JunglePathingAnalysis,
+  analyzeJunglePathing,
+  filterJungleGames
+} from '@shared/data-adapter/analysis/jungle'
+import {
   MatchHistoryGamesAnalysisAll,
   analyzeMatchHistory
 } from '@shared/data-adapter/analysis/players'
@@ -103,6 +108,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         gameDetailsLoadCount: { default: this.settings.matchHistoryLoadCount },
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
+        showJunglePathing: { default: this.settings.showJunglePathing },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
         playerCardTags: { default: this.settings.playerCardTags },
@@ -132,6 +138,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'gameDetailsLoadCount',
       'orderPlayerBy',
       'showChampionUsage',
+      'showJunglePathing',
       'showMatchHistoryItemBorder',
       'autoRouteWhenGameStarts',
       'playerCardTags',
@@ -156,7 +163,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'draft',
       'additional',
       'calculatedPremadeTeamMap',
-      'inferredPremadeTeams'
+      'inferredPremadeTeams',
+      'jungleAnalysis'
     ])
 
     // 便于精准订阅
@@ -397,8 +405,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
   }
 
-  // 暂未使用此
-  // @ts-ignore
   private async _loadGameDetails(
     gameIds: number[],
     options: {
@@ -1173,6 +1179,124 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     return mergedOverlappingSets as string[][]
   }
 
+  private readonly SMITE_SPELL_ID = 11
+
+  /**
+   * 识别当前对局中的打野玩家
+   * 优先用 positionAssignments，回退到召唤师技能（惩戒）判断
+   */
+  private _getJunglerPuuids(): string[] {
+    const junglers: string[] = []
+    const positions = this.state.positionAssignments
+
+    // 1. 先从 positionAssignments 中找
+    for (const [puuid, pos] of Object.entries(positions)) {
+      if (pos.position && pos.position.toUpperCase() === 'JUNGLE') {
+        junglers.push(puuid)
+      }
+    }
+
+    if (junglers.length > 0) return junglers
+
+    // 2. 回退: 从当前对局的召唤师技能中找惩戒使用者
+    // 优先从 additional.spells (GSM/spectator 数据)
+    for (const [puuid, spells] of Object.entries(this.state.additional.spells)) {
+      if (spells.spell1Id === this.SMITE_SPELL_ID || spells.spell2Id === this.SMITE_SPELL_ID) {
+        junglers.push(puuid)
+      }
+    }
+
+    if (junglers.length > 0) return junglers
+
+    // 3. 再回退: 从 gameflow session 的 playerChampionSelections 中找
+    const session = this._lc.data.gameflow.session
+    if (session) {
+      for (const p of session.gameData.playerChampionSelections) {
+        if (p.puuid && (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)) {
+          junglers.push(p.puuid)
+        }
+      }
+    }
+
+    // 4. 最后回退: 从 champSelect session 中找
+    if (junglers.length === 0) {
+      const cs = this._lc.data.champSelect.session
+      if (cs) {
+        for (const p of [...cs.myTeam, ...cs.theirTeam]) {
+          if (
+            p.puuid &&
+            p.puuid !== EMPTY_PUUID &&
+            (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)
+          ) {
+            junglers.push(p.puuid)
+          }
+        }
+      }
+    }
+
+    return junglers
+  }
+
+  /**
+   * 为打野玩家加载 game details（时间线数据）
+   */
+  private _loadJungleGameDetails(puuid: string) {
+    const mh = this.state.matchHistory[puuid]
+    if (!mh) {
+      this._log.info(`Jungle details: no match history for ${puuid}`)
+      return
+    }
+
+    this._log.info(
+      `Jungle details: ${mh.data.length} games in history for ${puuid}, source=${mh.source}`
+    )
+
+    const jungleGameIds = filterJungleGames(mh.data, puuid)
+    this._log.info(`Jungle details: found ${jungleGameIds.length} jungle games for ${puuid}`)
+
+    const JUNGLE_DETAILS_MAX = 50
+    const toLoad = jungleGameIds.slice(0, JUNGLE_DETAILS_MAX)
+
+    if (toLoad.length === 0) return
+
+    this._log.info(`Loading ${toLoad.length} jungle game details for ${puuid}`)
+    this._loadGameDetails(toLoad, { apiSource: this.state.apiShouldUse })
+  }
+
+  /**
+   * 计算所有打野玩家的路径偏好分析
+   */
+  private _calcJungleAnalysis(): Record<string, JunglePathingAnalysis> {
+    const result: Record<string, JunglePathingAnalysis> = {}
+    const junglerPuuids = this._getJunglerPuuids()
+
+    for (const puuid of junglerPuuids) {
+      const mh = this.state.matchHistory[puuid]
+      if (!mh) continue
+
+      const jungleGameIds = new Set(filterJungleGames(mh.data, puuid))
+      const relevantDetails = Object.values(this.state.gameDetails).filter((d) =>
+        jungleGameIds.has(d.gameId)
+      )
+      const relevantSummaries = mh.data.filter((s) => jungleGameIds.has(s.gameId))
+
+      if (relevantDetails.length === 0) continue
+
+      const currentChampionId = this.state.championSelections[puuid] ?? 0
+      const analysis = analyzeJunglePathing(
+        relevantDetails,
+        relevantSummaries,
+        puuid,
+        currentChampionId
+      )
+      if (analysis) {
+        result[puuid] = analysis
+      }
+    }
+
+    return result
+  }
+
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
@@ -1197,6 +1321,46 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         this.state.setInferredPremadeTeams(this._calcPremade())
       },
       { delay: 200, equals: comparer.shallow }
+    )
+
+    // 当 matchHistory 就绪时，为打野玩家加载 game details
+    this._mobx.reaction(
+      () => ({
+        matchHistoryKeys: Object.keys(this.state.matchHistory),
+        junglerPuuids: this._getJunglerPuuids()
+      }),
+      ({ junglerPuuids, matchHistoryKeys }) => {
+        if (matchHistoryKeys.length === 0) return
+
+        this._log.info(
+          `Jungle details reaction: ${matchHistoryKeys.length} players, ` +
+            `${junglerPuuids.length} junglers: [${junglerPuuids.map((p) => p.substring(0, 8)).join(', ')}]`
+        )
+
+        for (const puuid of junglerPuuids) {
+          this._loadJungleGameDetails(puuid)
+        }
+      },
+      { delay: 500, equals: comparer.structural }
+    )
+
+    // 当 gameDetails 变化时，重新计算打野分析
+    this._mobx.reaction(
+      () => ({
+        detailKeys: Object.keys(this.state.gameDetails),
+        junglerPuuids: this._getJunglerPuuids(),
+        matchHistoryKeys: Object.keys(this.state.matchHistory)
+      }),
+      ({ detailKeys, junglerPuuids }) => {
+        if (junglerPuuids.length === 0) return
+
+        this._log.info(`Jungle analysis reaction: ${detailKeys.length} details loaded`)
+        const analysis = this._calcJungleAnalysis()
+        const count = Object.keys(analysis).length
+        this._log.info(`Jungle analysis computed for ${count} players`)
+        this.state.setJungleAnalysis(analysis)
+      },
+      { delay: 300, equals: comparer.structural }
     )
   }
 

@@ -71,6 +71,20 @@
           :render-label="renderChampionOption"
         />
       </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-black/80 dark:text-white/60">
+          {{ t('PlayerTab.filter.showPractice') }}
+        </span>
+        <NSwitch size="small" v-model:value="showPractice" />
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-black/80 dark:text-white/60">
+          {{ t('PlayerTab.filter.showIrregularGames') }}
+        </span>
+        <NSwitch size="small" v-model:value="showIrregularGames" />
+      </div>
     </div>
   </div>
 </template>
@@ -84,17 +98,19 @@ import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
 import { Delete20Regular, Filter20Regular } from '@vicons/fluent'
 import { useDebounceFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NRadio, NRadioGroup, NSelect, NTag, SelectOption } from 'naive-ui'
+import { NButton, NIcon, NRadio, NRadioGroup, NSelect, NSwitch, NTag, SelectOption } from 'naive-ui'
 import { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 import { computed, h, ref, watchEffect } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const lcs = useLeagueClientStore()
+const pts = usePlayerTabsStore()
 const { t } = useTranslation()
 
 const { isCrossRegion, sgpServerId } = usePlayerTab()
@@ -102,6 +118,8 @@ const { searchSummonerByAlias } = useSummonerFetch()
 const { pagedMatchHistory } = useMatchHistory()
 
 const winLoss = ref<'all' | 'win' | 'loss'>('all')
+const showPractice = ref(false)
+const showIrregularGames = ref(false)
 
 const selectedChampions = ref<number[]>([])
 const championOptions = computed(() => {
@@ -305,6 +323,8 @@ const clearAllConditions = () => {
   winLoss.value = 'all'
   selectedChampions.value = []
   selectedSummoners.value = []
+  showPractice.value = false
+  showIrregularGames.value = false
   searchText.value = ''
   searchResult.value = []
 }
@@ -315,12 +335,20 @@ const { setFilters, hasFilters, filters } = useMatchHistoryFilters()
 winLoss.value = filters.value.winLoss
 selectedChampions.value = filters.value.selectedChampions
 selectedSummoners.value = filters.value.selectedSummoners
+showPractice.value = filters.value.showPractice
+showIrregularGames.value = filters.value.showIrregularGames
 
 watchEffect(() => {
   setFilters({
     winLoss: winLoss.value,
     selectedChampions: selectedChampions.value,
-    selectedSummoners: selectedSummoners.value
+    selectedSummoners: selectedSummoners.value,
+    showPractice: showPractice.value,
+    showIrregularGames: showIrregularGames.value
   })
+
+  // 持久化开关类筛选
+  pts.frontendSettings.defaultShowPractice = showPractice.value
+  pts.frontendSettings.defaultShowIrregularGames = showIrregularGames.value
 })
 </script>

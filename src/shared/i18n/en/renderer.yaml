@@ -108,6 +108,17 @@ FeatureGuide:
       title: Show More Tags
       description: Enable more tags in `Settings` → `Game Analysis` → `Player Card Tags`.
 
+Ftue:
+  confirm: Got It
+  later: Later
+  junglePathing:
+    matchHistoryDetails:
+      title: Jungle Pathing in Match Details
+      description: In match summary details, hover over "Jungle Pathing" to view detailed analysis.
+    ongoingGameCard:
+      title: Jungle Pathing in Ongoing Game
+      description: The player card jungle pathing panel shows first clear, early ganks, and map preference insights.
+
 CommonButtons:
   announcement: Announcement
   announcementSummary: Announcement Summary
@@ -329,6 +340,16 @@ MatchHistorySettings:
     label: Load Count
     description: Number of matches to load for each match history tab.
 
+  showJunglePathing:
+    label: Enable Jungle Pathing
+    description: Show jungle pathing entry and analysis card on match history pages.
+
+  junglePathingFtue:
+    label: Jungle Pathing Guide
+    description: Show the jungle pathing guide for match details again.
+    button: Show Guide Again
+    resetDone: Jungle pathing guide has been reset
+
 OngoingGameSettings:
   title: Ongoing Game
   titleCommon: Ongoing Game
@@ -380,6 +401,16 @@ OngoingGameSettings:
       none: None
       recent: Recently Used
       mastery: Mastery Level
+
+  showJunglePathing:
+    label: Enable Jungle Pathing
+    description: Show jungle pathing analysis in ongoing-game player cards.
+
+  junglePathingFtue:
+    label: Jungle Pathing Guide
+    description: Show the jungle pathing guide for ongoing-game again.
+    button: Show Guide Again
+    resetDone: Jungle pathing guide has been reset
 
   showMatchHistoryItemBorder:
     label: Show Match History Item Border
@@ -1639,6 +1670,7 @@ ShortcutSelector:
   unset: Unset
   tooComplicated: This shortcut combination is highly complex, please confirm
   notRunAsAdministrator: Not running as administrator, cannot use shortcut key
+  nativeGlobalShortcutsWindowsOnly: Native global shortcuts require native addons. This build currently ships them only on Windows.
   reservedShortcut: This shortcut combination is reserved
   beingOccupied: This shortcut combination is already in use
   unchanged: (Unchanged)
@@ -1683,6 +1715,8 @@ Client:
 
   gameClient:
     title: Game Client
+
+    windowsOnlyNativeAddon: Requires native addons (this build currently ships them only on Windows).
 
     terminateGameClientWithShortcut:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
@@ -2059,6 +2093,8 @@ PlayerTab:
     loss: Loss
     summoners: Summoners involved
     champions: Champions involved
+    showPractice: Show Practice Mode
+    showIrregularGames: Show Remakes, Aborts, etc.
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'
@@ -2109,6 +2145,8 @@ PlayerTab:
     times: Games
     teamSides: Team Sides
     activeSession: Active Session Win/Lose
+    winningStreak: '{{countV}} Win Streak'
+    losingStreak: '{{countV}} Loss Streak'
 
   recentPlayers:
     teammatesTitle: Recent Teammates
@@ -2351,6 +2389,69 @@ AugmentDisplay:
   gold: Gold
   prismatic: Prismatic
   rarity: '{{rarity}}'
+
+JunglePathing:
+  title: Jungle
+  thisGame: This Game
+  hero: Champion
+  overall: Overall
+  currentChampion: This
+  mapPref: Map Pref
+  ganks: Ganks
+  topsidePref: Top
+  midPref: Mid
+  botsidePref: Bot
+  topMidPref: Top/Mid
+  midBotPref: Mid/Bot
+  balanced: Balanced
+  balancedShort: Bal.
+  firstClear: 1st Clear
+  topsideStart: 'Top {{pct}}%'
+  botsideStart: 'Bot {{pct}}%'
+  campRed: Red
+  campBlue: Blue
+  campWolves: Wolves
+  campRaptors: Raptors
+  campOwnStart: 'Normal {{pct}}%'
+  campStart: '{{camp}} {{pct}}%'
+  campInvadeStart: 'Invade {{pct}}%'
+  blueTeam: Blue
+  redTeam: Red
+  earlyGank: Early Ganks
+  level3KillLegend: Lv3 kills
+  level4KillLegend: Lv4 kills
+  level3Gank: 'Lv3 gank {{pct}}%'
+  level4Gank: 'Lv4 gank {{pct}}%'
+  objectives: Objectives
+  firstDragonRate: '1st Drake {{pct}}%'
+  dragons: 'Drake {{count}}'
+  voidgrubs: 'Grubs {{count}}'
+  heralds: 'Herald {{count}}'
+  barons: 'Baron {{count}}'
+  avgDragons: 'Avg Drake {{count}}'
+  avgVoidgrubs: 'Avg Grubs {{count}}'
+  avgHeralds: 'Avg Herald {{count}}'
+  avgBarons: 'Avg Baron {{count}}'
+  firstTime: '1st {{time}}'
+  noData: '—'
+  minuteLegend: Position points
+  gankLegend: Gank points
+  descriptionSingle: Based on this game's timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
+  description2Single: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included). Early ganks are detected by champion damage and kill participation at 3/4min frames.
+  description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
+  description2: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included), tracked per team side. Early ganks are detected by champion damage and kill participation at 3/4min frames, split by blue/red side.
+  gamesUnit: ' games'
+  copyAll: Copy Summary
+  copied: Analysis copied
+  allyJungler: Ally Jungler
+  enemyJungler: Enemy Jungler
+  top: Top
+  mid: Mid
+  bot: Bot
+  topShort: Top
+  midShort: Mid
+  botShort: Bot
+  gamesAnalyzed: '{{count}} games'
 
 PlayerInfoCard:
   reload: Reload
@@ -2763,6 +2864,10 @@ StartupPane:
   newVersionAvailable: New
 
 InGameSend:
+  windowsOnly:
+    title: Windows-only feature
+    description: In-game send and global shortcuts require native addons. This build only ships them on Windows.
+
   settings:
     title: Settings
     cancelShortcut:
@@ -2876,6 +2981,11 @@ LootTools:
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
   countup: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s used'
+  nativeInjectionUnsupported: Send-to-game is not supported in this environment (requires native input injection).
+  adminRequired: Send-to-game requires running as administrator.
+  gameNotForeground: Switch back to the game window (foreground) before sending.
+  alreadySending: Sending in progress. Please try again later.
+  sendFailed: 'Send failed: {{reason}}'
 
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{countV}})

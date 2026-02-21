@@ -78,18 +78,14 @@ function runCommand(
         reject(new Error(`command failed with code ${code}: ${stderr}`))
       }
     })
-
-    child.on('rejected', (error) => {
-      console.log('an error occurred on executing command: ', error, command, args)
-      reject(error)
-    })
   })
 }
 
 const portRegex = /--app-port=([0-9]+)/
 const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
-const rsoPlatformIdRegex = /--rso_platform_id=([\w-_]+)/
+// Some clients use `--rso_platform_id`, others use `--rso-platform-id`.
+const rsoPlatformIdRegex = /--rso[_-]platform[_-]id=([\w-_]+)/i
 const regionRegex = /--region=([\w-_]+)/
 const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
 const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
@@ -120,23 +116,39 @@ export function parseCommandLine(s: string): UxCommandLine | null {
 }
 
 export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]> {
-  return new Promise((resolve, reject) => {
-    const task = runCommand(POWERSHELL_PATH, [
-      ...POWERSHELL_BASE_ARGS,
-      `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
-    ])
+  if (process.platform !== 'win32') {
+    try {
+      const out = runCommand('ps', ['axww', '-o', 'pid=,command='])
+      const text = await out
+      const needleA = clientName
+      const needleB = clientName.replace(/\.exe$/i, '')
 
-    task
-      .then((out) => {
-        const authObjects = out
-          .split('\n')
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .map(parseCommandLine)
-          .filter(Boolean) as UxCommandLine[]
+      const authObjects = text
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .filter((line) => line.includes(needleA) || (needleB && line.includes(needleB)))
+        .map((line) => line.replace(/^\d+\s+/, ''))
+        .map(parseCommandLine)
+        .filter(Boolean) as UxCommandLine[]
 
-        resolve(authObjects)
-      })
-      .catch((error) => reject(error))
-  })
+      return authObjects
+    } catch {
+      return []
+    }
+  }
+
+  const out = await runCommand(POWERSHELL_PATH, [
+    ...POWERSHELL_BASE_ARGS,
+    `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
+  ])
+
+  const authObjects = out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(parseCommandLine)
+    .filter(Boolean) as UxCommandLine[]
+
+  return authObjects
 }

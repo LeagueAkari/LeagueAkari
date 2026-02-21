@@ -183,8 +183,9 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
     display: flex;
     align-items: center;
     padding: 4px 8px;
+    padding-top: calc(4px + var(--la-mac-sidebar-safe-top));
     gap: 4px;
-    height: 48px;
+    height: calc(48px + var(--la-mac-sidebar-safe-top));
     overflow: hidden;
   }
 

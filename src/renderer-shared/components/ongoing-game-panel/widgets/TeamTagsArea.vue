@@ -77,7 +77,7 @@
               <div
                 v-else
                 class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
-                :class="LOSE_RATE_TEAM_TAG_BG_CLASSES"
+                :class="LOSS_RATE_TEAM_TAG_BG_CLASSES"
               >
                 {{ t('TeamTagsArea.loseRateTeam') }}
               </div>
@@ -128,7 +128,7 @@ import {
 } from '../constants'
 import { useOngoingGamePanel } from '../context'
 import {
-  LOSE_RATE_TEAM_TAG_BG_CLASSES,
+  LOSS_RATE_TEAM_TAG_BG_CLASSES,
   WIN_RATE_GTE_50_TEXT_CLASSES,
   WIN_RATE_LT_50_TEXT_CLASSES,
   WIN_RATE_TEAM_TAG_BG_CLASSES
@@ -150,7 +150,7 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 
-const { mergedPremadeTeams: premadeTeamInfo } = useOngoingGamePanel()
+const { mergedPremadeTeams } = useOngoingGamePanel()
 
 const teamStats = computed(() => {
   if (!ogs.playerStats) {
@@ -180,7 +180,7 @@ const premadeColors = computed(() => {
 // 1. 2 人以上的预组队队伍
 // 2. 玩家胜率均低于特定值
 const winRateTeams = computed(() => {
-  if (!ogs.playerStats || !premadeTeamInfo.value) {
+  if (!ogs.playerStats || !mergedPremadeTeams.value) {
     return {}
   }
 
@@ -188,7 +188,7 @@ const winRateTeams = computed(() => {
 
   const result: WinRateTeamInfo[] = []
 
-  Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, players]) => {
+  Object.entries(mergedPremadeTeams.value.groups).forEach(([premadeId, players]) => {
     if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length < LOSS_RATE_TEAM_MIN_SIZE) {
       return
     }
@@ -266,11 +266,11 @@ const winRateTeams = computed(() => {
 })
 
 const teamPremadeTeams = computed(() => {
-  if (!premadeTeamInfo.value) {
+  if (!mergedPremadeTeams.value) {
     return []
   }
 
-  return Object.entries(premadeTeamInfo.value.groups)
+  return Object.entries(mergedPremadeTeams.value.groups)
     .filter(([_, puuids]) => puuids.every((p) => teamMembers.value.includes(p)))
     .map(([premadeId, puuids]) => {
       return {

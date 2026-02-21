@@ -1,4 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
+import { tools } from '@main/utils/addons'
 import { UxCommandLine, parseCommandLine, queryUxCommandLine } from '@main/utils/ux-cmd'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
@@ -23,7 +23,7 @@ const execAsync = util.promisify(cp.exec)
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
 
-  static UX_PROCESS_NAME = 'LeagueClientUx.exe'
+  static UX_PROCESS_NAME = process.platform === 'win32' ? 'LeagueClientUx.exe' : 'LeagueClientUx'
   static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
   static CLIENT_CMD_LONG_POLL_INTERVAL = 60 * 1000
 
@@ -117,7 +117,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   private async _updateUxCommandLine() {
-    if (this.settings.useWmi) {
+    if (process.platform === 'win32' && this.settings.useWmi) {
       if (!this._common.state.isAdministrator) {
         return []
       }

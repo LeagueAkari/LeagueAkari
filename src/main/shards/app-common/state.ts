@@ -20,6 +20,22 @@ export class AppCommonState {
 
   isRunInTempDir: boolean = false
 
+  nativeAddons: {
+    nativeLoaded: boolean
+    inputHookSupported: boolean
+    inputInjectSupported: boolean
+    toolsForegroundSupported: boolean
+    toolsWindowPlacementSupported: boolean
+    toolsFixWindowMethodASupported: boolean
+  } = {
+    nativeLoaded: false,
+    inputHookSupported: false,
+    inputInjectSupported: false,
+    toolsForegroundSupported: false,
+    toolsWindowPlacementSupported: false,
+    toolsFixWindowMethodASupported: false
+  }
+
   setAdministrator(s: boolean) {
     this.isAdministrator = s
   }
@@ -44,8 +60,12 @@ export class AppCommonState {
     this.isRunInTempDir = s
   }
 
+  setNativeAddons(s: AppCommonState['nativeAddons']) {
+    this.nativeAddons = s
+  }
+
   constructor() {
-    makeAutoObservable(this, { baseConfig: observable.ref })
+    makeAutoObservable(this, { baseConfig: observable.ref, nativeAddons: observable.ref })
   }
 }
 

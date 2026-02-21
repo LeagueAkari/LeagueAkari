@@ -49,7 +49,27 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     /**
      * 加载战绩数量
      */
-    loadCount: 20
+    loadCount: 20,
+
+    /**
+     * 默认战绩模式筛选 tag
+     */
+    defaultMatchHistoryTag: '<akari:all>' as string,
+
+    /**
+     * 默认显示训练模式
+     */
+    defaultShowPractice: false,
+
+    /**
+     * 默认显示重开局等
+     */
+    defaultShowIrregularGames: false,
+
+    /**
+     * 战绩页面是否启用打野偏好
+     */
+    showJunglePathing: true
   })
 
   const tabs = ref<TabState[]>([])

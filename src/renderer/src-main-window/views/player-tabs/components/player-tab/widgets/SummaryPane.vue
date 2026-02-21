@@ -128,6 +128,22 @@
           {{ analysis.summary.losses }} {{ t('PlayerTab.stats.lossShort') }} ({{
             (analysis.summary.winRate * 100).toFixed()
           }}%)
+          <span class="ml-1 inline-flex max-w-[220px] flex-wrap items-center justify-end gap-1">
+            <span
+              v-if="currentStreak"
+              class="rounded px-1 py-0.5 text-[12px] leading-none"
+              :class="getStreakBadgeClass(currentStreak.isWinning, currentStreak.count)"
+            >
+              {{
+                t(
+                  currentStreak.isWinning
+                    ? 'PlayerTab.stats.winningStreak'
+                    : 'PlayerTab.stats.losingStreak',
+                  { countV: currentStreak.count }
+                )
+              }}
+            </span>
+          </span>
         </span>
       </div>
 
@@ -207,6 +223,7 @@ import { computed } from 'vue'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
@@ -217,14 +234,51 @@ const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
 const { pagedMatchHistory } = useMatchHistory()
+const { filters } = useMatchHistoryFilters()
 
 const analysis = computed(() => {
   if (!pagedMatchHistory.value?.games) {
     return null
   }
 
-  return analyzeMatchHistory(pagedMatchHistory.value.games, puuid.value)
+  return analyzeMatchHistory(pagedMatchHistory.value.games, puuid.value, {
+    includeIrregularGames: filters.value.showIrregularGames
+  })
 })
+
+const currentStreak = computed(() => {
+  if (!analysis.value) {
+    return null
+  }
+
+  if (analysis.value.summary.winningStreak >= 2) {
+    return { isWinning: true, count: analysis.value.summary.winningStreak }
+  }
+
+  if (analysis.value.summary.losingStreak >= 2) {
+    return { isWinning: false, count: analysis.value.summary.losingStreak }
+  }
+
+  return null
+})
+
+const getStreakBadgeClass = (isWinning: boolean, count: number) => {
+  if (count >= 7) {
+    return isWinning
+      ? 'border border-emerald-500/60 bg-emerald-500/20 font-bold text-emerald-700 dark:border-emerald-300/65 dark:bg-emerald-300/20 dark:text-emerald-200'
+      : 'border border-red-500/60 bg-red-500/20 font-bold text-red-700 dark:border-red-300/65 dark:bg-red-300/20 dark:text-red-200'
+  }
+
+  if (count >= 4) {
+    return isWinning
+      ? 'border border-emerald-500/45 bg-emerald-500/12 font-semibold text-emerald-700 dark:border-emerald-300/55 dark:bg-emerald-300/15 dark:text-emerald-300'
+      : 'border border-red-500/45 bg-red-500/12 font-semibold text-red-700 dark:border-red-300/55 dark:bg-red-300/15 dark:text-red-300'
+  }
+
+  return isWinning
+    ? 'font-semibold text-emerald-600 dark:text-emerald-400'
+    : 'font-semibold text-red-600 dark:text-red-400'
+}
 
 const frequentlyUsedChampions = computed(() => {
   if (!analysis.value) {

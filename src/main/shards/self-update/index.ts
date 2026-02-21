@@ -355,10 +355,16 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
   private _handleIpcCall() {
     this._ipc.onCall(SelfUpdateMain.id, 'checkUpdates', async () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       return await this._checkUpdates()
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'startUpdate', async () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       if (
         this._rc.state.latestRelease &&
         this._rc.state.latestRelease.isNew &&
@@ -369,11 +375,17 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
             archiveFile: ReleaseArchiveFile
           }
         )
+        return { result: 'ok' }
       }
+
+      return { result: 'no-op' }
     })
 
     // 仅仅用于 debug
     this._ipc.onCall(SelfUpdateMain.id, 'forceStartUpdate', async () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       if (this._rc.state.latestRelease) {
         this._log.info(
           'Force start update, target:',
@@ -381,31 +393,50 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._rc.state.latestRelease.archiveFile.name
         )
         await this._startUpdateProcess(this._rc.state.latestRelease)
+        return { result: 'ok' }
       } else {
         this._log.warn('No latest release found, cannot force start update')
+        return { result: 'no-op' }
       }
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'cancelUpdate', () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       this._cancelUpdateProcess()
+      return { result: 'ok' }
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'openNewUpdatesDir', () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       const p = path.join(app.getPath('userData'), SelfUpdateMain.DOWNLOAD_DIR_NAME)
       return shell.openPath(p)
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'uninstallApp', () => {
+      if (process.platform !== 'win32') {
+        return { result: 'failed', reason: 'platform-unsupported' }
+      }
       this._uninstallApp()
+      return { result: 'ok' }
     })
   }
 
   async onInit() {
     await this._handleState()
+    this._handleIpcCall()
+
+    if (process.platform !== 'win32') {
+      this._log.info('Self-update is Windows-only; disabled on', process.platform)
+      return
+    }
+
     await this._checkLastFailedUpdate()
     this._handleUpdateHttpProxy()
     this._handleUpdateProcess()
-    this._handleIpcCall()
   }
 
   async onDispose() {

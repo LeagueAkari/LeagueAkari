@@ -27,6 +27,7 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { StorageRenderer } from '@renderer-shared/shards/storage'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
+import { FtueRenderer } from './ftue'
 import { LeagueClientPeekRenderer } from './league-client-peek'
 import { MainWindowUiRenderer } from './main-window-ui'
 import { PlayerTabsRenderer } from './player-tabs'
@@ -51,6 +52,7 @@ manager.use(LeagueClientRenderer)
 manager.use(LeagueClientUxRenderer)
 manager.use(LoggerRenderer)
 manager.use(MainWindowUiRenderer)
+manager.use(FtueRenderer)
 manager.use(PlayerTabsRenderer)
 manager.use(OngoingGameRenderer)
 manager.use(PiniaMobxUtilsRenderer)

@@ -14,6 +14,7 @@
         :theme="as.colorTheme"
         :loading-details="isLoadingDetails"
         :hide-privacy="hidePrivacy"
+        :show-jungle-pathing="showJunglePathing"
         is-expanded
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
         @load-details="loadDetails(summary?.source || 'lcu')"
@@ -43,12 +44,14 @@ const {
   details: propDetails,
   source,
   puuid,
-  hidePrivacy = false
+  hidePrivacy = false,
+  showJunglePathing = true
 } = defineProps<{
   gameId: number
   source: 'sgp' | 'lcu'
   puuid?: string
   hidePrivacy?: boolean
+  showJunglePathing?: boolean
   summary?: LcuOrSgpGameSummary // 如果提供了数据且和 gameId 一致，则优先使用 summary
   details?: LcuOrSgpGameDetails // 如果提供了数据且和 gameId 一致，则优先使用 details
 }>()

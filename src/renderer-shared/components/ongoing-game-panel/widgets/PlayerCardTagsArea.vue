@@ -631,11 +631,7 @@ const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const as = useAppCommonStore()
 
-const {
-  mergedPremadeTeams: premadeTeamInfo,
-  previewGame,
-  navigateToSummonerByPuuid
-} = useOngoingGamePanel()
+const { mergedPremadeTeams, previewGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
 
 const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
@@ -652,7 +648,7 @@ const playerStats = computed(() => {
 const summoner = computed(() => ogs.summoner[puuid])
 const savedInfo = computed(() => ogs.savedInfo[puuid])
 
-const premadeTeamId = computed(() => premadeTeamInfo.value.premadeTeamIdMap[puuid])
+const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
 const isSuspiciousFlashPosition = computed(() => {
   if (!playerStats.value) {

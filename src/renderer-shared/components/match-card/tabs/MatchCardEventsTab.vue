@@ -264,7 +264,7 @@
     <template v-else>
       <div class="flex items-center gap-2">
         <span>{{ t('MatchCard.common.noData') }}</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
+        <NButton type="primary" size="small" @click="loadDetails(basicInfo.gameId)">
           {{ t('MatchCard.common.refresh') }}
         </NButton>
       </div>
@@ -306,7 +306,7 @@ const {
   frames,
   team,
   loadingDetails,
-  loadDetails: onLoadDetails
+  loadDetails
 } = useMatchCard()
 
 const lcs = useLeagueClientStore()
@@ -461,7 +461,7 @@ watch(
   [details, loadingDetails, () => basicInfo.value.gameId],
   ([d, l, g]) => {
     if (!d && !l) {
-      onLoadDetails(g)
+      loadDetails(g)
     }
   },
   { immediate: true }

@@ -1,4 +1,4 @@
-import { input } from '@leagueakari/league-akari-addons'
+import { capabilities, input } from '@main/utils/addons'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import EventEmitter from 'node:events'
 
@@ -97,6 +97,17 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(KeyboardShortcutsMain.id)
+  }
+
+  private _canUseNativeGlobalShortcuts() {
+    if (!capabilities.input.hookSupported) return false
+
+    // Current implementation requires admin on Windows only.
+    if (process.platform === 'win32') {
+      return this._app.state.isAdministrator
+    }
+
+    return true
   }
 
   // fast equal for two arrays (shallow)
@@ -237,7 +248,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    if (this._app.state.isAdministrator) {
+    if (this._canUseNativeGlobalShortcuts()) {
       this._log.info('Listening for key events')
       input.instance.install()
       input.instance.on('keyEvent', (key) => {
@@ -279,9 +290,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     type: 'last-active' | 'normal' | 'stateful',
     cb: (details: ShortcutDetails) => void
   ) {
-    if (!this._app.state.isAdministrator) {
+    if (!this._canUseNativeGlobalShortcuts()) {
       this._log.info(
-        `Current in normal privilege, ignoring shortcut registration: ${shortcutId} (${type})`
+        `Native global shortcuts are unavailable, ignoring shortcut registration: ${shortcutId} (${type})`
       )
       return
     }
@@ -355,7 +366,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    if (this._app.state.isAdministrator) {
+    if (this._canUseNativeGlobalShortcuts()) {
       this._log.info('Stop listening for key events')
       input.instance.uninstall()
     }

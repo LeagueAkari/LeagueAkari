@@ -2,8 +2,18 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
-        <SendableItemEdit />
-        <TemplateEdit style="margin-top: 8px" />
+        <NAlert
+          v-if="!nativeInputHookSupported"
+          type="warning"
+          class="mb-2"
+          :title="t('windowsOnly.title')"
+        >
+          {{ t('windowsOnly.description') }}
+        </NAlert>
+
+        <template v-if="nativeInputHookSupported">
+          <SendableItemEdit />
+          <TemplateEdit style="margin-top: 8px" />
         <NCard size="small" style="margin-top: 8px">
           <template #header>
             <span class="card-header-title">{{ t('settings.title') }}</span>
@@ -41,6 +51,7 @@
             ></NInputNumber>
           </ControlItem>
         </NCard>
+        </template>
       </div>
     </NScrollbar>
   </div>
@@ -49,11 +60,12 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NInputNumber, NScrollbar } from 'naive-ui'
+import { NAlert, NCard, NInputNumber, NScrollbar } from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -61,6 +73,8 @@ import SendableItemEdit from './SendableItemEdit.vue'
 import TemplateEdit from './TemplateEdit.vue'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend' })
+
+const { nativeInputHookSupported } = usePlatform()
 
 const as = useAppCommonStore()
 const igs = useInGameSendStore()

@@ -20,6 +20,7 @@
             class="sticky top-2 z-10 mb-2 self-end"
           />
 
+          <JunglePathingPane class="mb-2" />
           <MatchHistoryList />
         </div>
 
@@ -35,6 +36,7 @@
               <NormalTagBlock />
               <SpectatorPane />
               <SummaryPane />
+              <JunglePathingPane />
               <RecentlyPlayers side="ally" />
               <RecentlyPlayers side="enemy" />
               <PlayerChallenges />
@@ -69,6 +71,7 @@
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
       :hide-privacy="as.settings.streamerMode"
+      :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
       @navigate-to-summoner-by-puuid="(puuid) => navigateToTabByPuuid(puuid)"
     />
 
@@ -99,6 +102,7 @@ import { SMALL_SIZE_THRESHOLD } from './constants'
 import { providePlayerTab } from './context'
 import { useFreezeValue } from './utils/freeze'
 import EncounteredGames from './widgets/EncounteredGames.vue'
+import JunglePathingPane from './widgets/JunglePathingPane.vue'
 import MatchHistoryList from './widgets/MatchHistoryList.vue'
 import MatchHistoryPagination from './widgets/MatchHistoryPagination.vue'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'

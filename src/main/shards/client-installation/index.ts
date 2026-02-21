@@ -1,4 +1,4 @@
-import { tools } from '@leagueakari/league-akari-addons'
+import { tools } from '@main/utils/addons'
 import { i18next } from '@main/i18n'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
@@ -9,7 +9,6 @@ import cp from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import util from 'node:util'
-import regedit from 'regedit'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
@@ -18,8 +17,15 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { ClientInstallationState } from './state'
 
 const execAsync = util.promisify(cp.exec)
+const execFileAsync = util.promisify(cp.execFile)
 
-regedit.setExternalVBSLocation(path.resolve(RES_POSITIONER, '..', 'regedit-vbs'))
+// regedit only works on Windows (depends on cscript/VBS). Avoid loading it on macOS/Linux.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const regedit: any | null = process.platform === 'win32' ? require('regedit') : null
+
+if (regedit) {
+  regedit.setExternalVBSLocation(path.resolve(RES_POSITIONER, '..', 'regedit-vbs'))
+}
 
 /**
  * 情报搜集模块
@@ -67,6 +73,12 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   async onInit() {
     this._handleState()
     this._handleIpcCall()
+
+    if (process.platform !== 'win32') {
+      await this._updateMacInstallationsByFile()
+      return
+    }
+
     this._updateTencentPathsByReg()
     this._updateTencentPathsByFile()
     this._updateLeagueClientInstallationByFile()
@@ -96,6 +108,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
    * @returns
    */
   private async _updateTencentPathsByReg() {
+    if (!regedit) {
+      return
+    }
+
     try {
       const list: string[] = []
 
@@ -176,6 +192,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private async _getDrives() {
+    if (process.platform !== 'win32') {
+      return []
+    }
+
     try {
       const { stdout } = await execAsync(
         'powershell -Command "Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object {$_.DriveType -eq 3} | Select-Object -ExpandProperty DeviceID"'
@@ -194,6 +214,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
    * 通过扫盘来更新腾讯服安装位置
    */
   private async _updateTencentPathsByFile() {
+    if (process.platform !== 'win32') {
+      return
+    }
+
     if (this.state.tencentInstallationPath) {
       return
     }
@@ -246,6 +270,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private async _updateLeagueClientInstallationByFile() {
+    if (process.platform !== 'win32') {
+      return
+    }
+
     if (!process.env['ProgramData']) {
       this._log.warn(
         'Failed to get ProgramData environment variable, cannot detect LeagueClient installation'
@@ -351,6 +379,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private _launchTencentTcls() {
+    if (process.platform !== 'win32') {
+      throw new Error('Tencent/TCLS launch is only supported on Windows')
+    }
+
     if (!this.state.tclsExecutablePath) {
       return
     }
@@ -365,10 +397,6 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       })
 
       let hasError = false
-      p.on('rejected', (err) => {
-        reject(err)
-      })
-
       p.on('error', (err) => {
         hasError = true
         this._log.error('Failed to launch TCLS client', location, err)
@@ -387,6 +415,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private _launchWeGameLeagueOfLegends() {
+    if (process.platform !== 'win32') {
+      throw new Error('WeGame launch is only supported on Windows')
+    }
+
     if (!this.state.weGameLauncherExecutablePath) {
       return
     }
@@ -397,10 +429,6 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       const child = cp.spawn(`"${location}"`, [], { detached: true, stdio: 'ignore', shell: true })
 
       let hasError = false
-      child.on('rejected', (err) => {
-        reject(err)
-      })
-
       child.on('error', (err) => {
         hasError = true
         this._log.warn('Failed to launch WeGame (LoL) client', location, err)
@@ -419,6 +447,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private _launchWeGame() {
+    if (process.platform !== 'win32') {
+      throw new Error('WeGame launch is only supported on Windows')
+    }
+
     if (!this.state.weGameExecutablePath) {
       return
     }
@@ -433,10 +465,6 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       })
 
       let hasError = false
-      p.on('rejected', (err) => {
-        reject(err)
-      })
-
       p.on('error', (err) => {
         hasError = true
         this._log.warn('Failed to launch WeGame client', executablePath, err)
@@ -454,47 +482,101 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     })
   }
 
-  private _launchDefaultRiotClient() {
+  private async _launchDefaultRiotClient() {
     if (!this.state.officialRiotClientExecutablePath) {
       return
     }
 
     const executablePath = this.state.officialRiotClientExecutablePath
+    const args = ['--launch-product=league_of_legends', '--launch-patchline=live']
 
-    return new Promise<void>((resolve, reject) => {
-      const p = cp.spawn(
-        `"${executablePath}"`,
-        ['--launch-product=league_of_legends', '--launch-patchline=live'],
-        {
+    // Windows: original behavior.
+    if (process.platform === 'win32') {
+      return new Promise<void>((resolve, reject) => {
+        const p = cp.spawn(`"${executablePath}"`, args, {
           detached: true,
           stdio: 'ignore',
           shell: true
-        }
-      )
+        })
 
-      let hasError = false
-      p.on('rejected', (err) => {
-        reject(err)
+        let hasError = false
+        p.on('error', (err) => {
+          hasError = true
+          this._log.warn('Failed to launch Riot client', executablePath, err)
+          reject(err)
+        })
+
+        setImmediate(() => {
+          if (hasError) return
+          p.unref()
+          resolve()
+        })
       })
+    }
 
-      p.on('error', (err) => {
-        hasError = true
-        this._log.warn('Failed to launch Riot client', executablePath, err)
-        reject(err)
-      })
+    // macOS/Linux: prefer `open -a <App>.app --args ...` when the path is an .app bundle.
+    if (process.platform === 'darwin' && executablePath.endsWith('.app')) {
+      await execFileAsync('open', ['-a', executablePath, '--args', ...args])
+      return
+    }
 
-      setImmediate(() => {
-        if (hasError) {
-          return
-        }
+    await execFileAsync(executablePath, args)
+  }
 
-        p.unref()
-        resolve()
-      })
-    })
+  private async _updateMacInstallationsByFile() {
+    // Best-effort: discover common Riot/League installation locations on macOS.
+    // These are only used for launching the client; LCU connection still comes from other shards.
+    if (process.platform !== 'darwin') {
+      return
+    }
+
+    const riotClientCandidates = [
+      '/Applications/Riot Client.app',
+      '/Users/Shared/Riot Games/Riot Client/Riot Client.app',
+      '/Applications/Riot Client.app/Contents/MacOS/Riot Client',
+      '/Users/Shared/Riot Games/Riot Client/Riot Client.app/Contents/MacOS/Riot Client'
+    ]
+
+    for (const p of riotClientCandidates) {
+      try {
+        await fs.promises.access(p)
+        this.state.setOfficialRiotClientExecutablePath(p)
+        this._log.info('Detected RiotClient installation on macOS', p)
+        break
+      } catch {}
+    }
+
+    const leagueCandidates = [
+      '/Applications/League of Legends.app/Contents/LoL/LeagueClient.app/Contents/MacOS/LeagueClient',
+      '/Applications/League of Legends.app/Contents/MacOS/LeagueofLegends',
+      '/Users/Shared/Riot Games/League of Legends.app/Contents/LoL/LeagueClient.app/Contents/MacOS/LeagueClient',
+      '/Users/Shared/Riot Games/League of Legends.app/Contents/MacOS/LeagueofLegends'
+    ]
+
+    const detectedLeagueClients: string[] = []
+    for (const p of leagueCandidates) {
+      try {
+        await fs.promises.access(p)
+        detectedLeagueClients.push(p)
+      } catch {}
+    }
+
+    if (detectedLeagueClients.length) {
+      this._log.info('Detected LeagueClient installations on macOS', detectedLeagueClients)
+    }
+
+    this.state.setLeagueClientExecutablePaths(detectedLeagueClients)
   }
 
   private _buildJumpList() {
+    if (process.platform !== 'win32') {
+      return
+    }
+
+    if (typeof (app as any).setJumpList !== 'function') {
+      return
+    }
+
     const jumpListItems: JumpListItem[] = []
     const t = i18next.getFixedT(null, 'main', 'client-installation-main.jumpList')
 
@@ -547,6 +629,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private _handleJumpList() {
+    if (process.platform !== 'win32') {
+      return
+    }
+
     let startupLaunch = false
 
     const handleDeepLink = (url: string, triggedBySecondInstance = false) => {

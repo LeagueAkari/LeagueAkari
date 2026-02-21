@@ -116,7 +116,7 @@ const {
   teams,
   theme,
   loadingDetails,
-  loadDetails: onLoadDetails,
+  loadDetails,
   hidePrivacy
 } = useMatchCard()
 
@@ -436,7 +436,7 @@ watch(
   [details, loadingDetails, () => basicInfo.value.gameId],
   ([d, l, g]) => {
     if (!d && !l) {
-      onLoadDetails(g)
+      loadDetails(g)
     }
   },
   { immediate: true }

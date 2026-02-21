@@ -7,7 +7,10 @@
       class="rounded-lg bg-black/3 p-3 not-last:mb-2 dark:bg-white/3"
     >
       <!-- Player Header -->
-      <div class="mb-3 flex items-center gap-2">
+      <div
+        class="mb-1 flex cursor-pointer items-center gap-2 select-none"
+        @click="toggleParticipantExpanded(p.participantId)"
+      >
         <ChampionIcon
           :champion-id="p.championId"
           class="size-7! shrink-0 border-2 border-solid"
@@ -17,6 +20,9 @@
           round
         />
         <div class="min-w-0 truncate text-sm font-medium">{{ p.gameName }} #{{ p.tagLine }}</div>
+        <div v-if="p.position && p.position.toLowerCase() !== 'invalid'" :class="tagTheme">
+          {{ position(p.position) }}
+        </div>
 
         <div v-if="playerPerks[p.participantId].statPerks" class="ml-2 flex gap-2">
           <PerkDisplay
@@ -27,61 +33,77 @@
             :size="16"
           />
         </div>
+
+        <NIcon
+          class="ml-auto transition-transform duration-150"
+          :class="{ 'rotate-90': isParticipantExpanded(p.participantId) }"
+          size="16"
+        >
+          <ChevronRight20Regular />
+        </NIcon>
       </div>
 
-      <!-- divider -->
-      <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
+      <NCollapseTransition :show="isParticipantExpanded(p.participantId)">
+        <!-- divider -->
+        <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
 
-      <!-- perks -->
-      <div
-        v-for="perk of playerPerks[p.participantId].perks"
-        :key="perk.perkId"
-        class="not-last:mb-4"
-      >
-        <div class="flex gap-4">
-          <PerkDisplay
-            :perk-id="perk.perkId"
-            :size="24"
-            class="rounded-full ring-2"
-            :class="getPerkStyleRingColor(perk.styleId)"
-          />
+        <!-- perks -->
+        <div
+          v-for="perk of playerPerks[p.participantId].perks"
+          :key="perk.perkId"
+          class="not-last:mb-4"
+        >
+          <div class="flex gap-4">
+            <PerkDisplay
+              :perk-id="perk.perkId"
+              :size="24"
+              class="rounded-full ring-2"
+              :class="getPerkStyleRingColor(perk.styleId)"
+            />
 
-          <div>
-            <div class="mb-2 text-sm font-bold text-black dark:text-white">
-              {{ lcs.gameData.perkName(perk.perkId) }}
-            </div>
+            <div>
+              <div class="mb-2 text-sm font-bold text-black dark:text-white">
+                {{ lcs.gameData.perkName(perk.perkId) }}
+              </div>
 
-            <div
-              v-for="desc of perk.descriptions"
-              :key="desc"
-              class="flex flex-wrap items-center text-sm text-black/80 not-last:mb-1 dark:text-white/80"
-            >
               <div
-                class="mr-2 size-2 rotate-45 rounded-sm"
-                :class="getPerkStyleIndicatorColor(perk.styleId)"
-              ></div>
-              <div class="text-sm!" lol-view v-html="desc" />
+                v-for="desc of perk.descriptions"
+                :key="desc"
+                class="flex flex-wrap items-center text-sm text-black/80 not-last:mb-1 dark:text-white/80"
+              >
+                <div
+                  class="mr-2 size-2 rotate-45 rounded-sm"
+                  :class="getPerkStyleIndicatorColor(perk.styleId)"
+                ></div>
+                <div class="text-sm!" lol-view v-html="desc" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </NCollapseTransition>
     </div>
   </NScrollbar>
 </template>
 
 <script lang="ts" setup>
+import { ChevronRight20Regular } from '@vicons/fluent'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { NScrollbar } from 'naive-ui'
-import { computed } from 'vue'
+import { NCollapseTransition, NIcon, NScrollbar } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../context'
-import { getTeamColor } from '../utils/theme'
+import { usePosition } from '../utils/text'
+import { getTeamColor, useWinResultTagClasses } from '../utils/theme'
 
-const { basicInfo, participants } = useMatchCard()
+const { basicInfo, participants, team } = useMatchCard()
 
 const lcs = useLeagueClientStore()
+const position = usePosition()
+const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
+
+const expandedParticipantIds = ref<number[]>([])
 
 const sortedParticipants = computed(() => {
   if (basicInfo.value.isCherrySubteam) {
@@ -188,4 +210,25 @@ const getPerkStyleIndicatorColor = (styleId: number) => {
       return 'bg-gray-500/80'
   }
 }
+
+const isParticipantExpanded = (participantId: number) => {
+  return expandedParticipantIds.value.includes(participantId)
+}
+
+const toggleParticipantExpanded = (participantId: number) => {
+  if (isParticipantExpanded(participantId)) {
+    expandedParticipantIds.value = expandedParticipantIds.value.filter((id) => id !== participantId)
+    return
+  }
+
+  expandedParticipantIds.value = [...expandedParticipantIds.value, participantId]
+}
+
+watch(
+  () => basicInfo.value.gameId,
+  () => {
+    expandedParticipantIds.value = []
+  },
+  { immediate: true }
+)
 </script>

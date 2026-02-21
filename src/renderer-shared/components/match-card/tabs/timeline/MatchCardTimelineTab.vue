@@ -24,7 +24,7 @@
     <template v-else>
       <div class="flex items-center gap-2">
         <span>{{ t('MatchCard.common.noData') }}</span>
-        <NButton type="primary" size="small" @click="onLoadDetails(basicInfo.gameId)">
+        <NButton type="primary" size="small" @click="loadDetails(basicInfo.gameId)">
           {{ t('MatchCard.common.refresh') }}
         </NButton>
       </div>
@@ -43,7 +43,7 @@ import MatchCardStatsLine from './MatchCardStatsLine.vue'
 
 const { t } = useTranslation()
 
-const { basicInfo, details, loadingDetails, loadDetails: onLoadDetails } = useMatchCard()
+const { basicInfo, details, loadingDetails, loadDetails } = useMatchCard()
 
 const currentSection = ref<'diff-line-chart' | 'stats-line'>('diff-line-chart')
 
@@ -51,7 +51,7 @@ watch(
   [details, loadingDetails, () => basicInfo.value.gameId],
   ([d, l, g]) => {
     if (!d && !l) {
-      onLoadDetails(g)
+      loadDetails(g)
     }
   },
   { immediate: true }

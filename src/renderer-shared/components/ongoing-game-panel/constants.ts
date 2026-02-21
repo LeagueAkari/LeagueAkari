@@ -104,4 +104,4 @@ export const LOSS_RATE_TEAM_MIN_SIZE = 2
 export const WIN_RATE_TEAM_MIN_WIN_RATE = 0.9
 export const LOSS_RATE_TEAM_MAX_WIN_RATE = 0.25
 
-export const STARED_CHAMPION_LEVEL = 60
+export const STARRED_CHAMPION_LEVEL = 60
