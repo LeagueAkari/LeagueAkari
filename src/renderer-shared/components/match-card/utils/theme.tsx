@@ -63,7 +63,7 @@ export const skillKeyColors: Record<
   }
 }
 
-export function getClassesBySkillKey(key: string) {
+export function getClassBySkillKey(key: string) {
   const base = 'border border-solid'
   const theme = skillKeyColors[key.toUpperCase()] ?? skillKeyColors['?']
   return `${base} ${theme.light} ${theme.dark}`
@@ -78,10 +78,10 @@ export function getClassBySkillSlot(slot: number) {
   }
 
   const key = map[slot] ?? '?'
-  return getClassesBySkillKey(key)
+  return getClassBySkillKey(key)
 }
 
-export function useWinResultTagClasses(result: MaybeRefOrGetter<string | undefined>) {
+export function useWinResultTagClass(result: MaybeRefOrGetter<string | undefined>) {
   return computed(() => {
     const r = toValue(result)
 
@@ -97,7 +97,7 @@ export function useWinResultTagClasses(result: MaybeRefOrGetter<string | undefin
   })
 }
 
-export function useWinResultTabSwitchClasses(result: MaybeRefOrGetter<string | undefined>) {
+export function useWinResultTabSwitchClass(result: MaybeRefOrGetter<string | undefined>) {
   return computed(() => {
     const r = toValue(result)
 
@@ -136,7 +136,7 @@ export function getTeamColor(teamIdentifier?: string) {
   return '#9CA3AF'
 }
 
-export function getDamageTextColorClasses(type: 'physical' | 'magic' | 'true' | (string & {})) {
+export function getDamageTextColorClass(type: 'physical' | 'magic' | 'true' | (string & {})) {
   if (type === 'physical') return 'text-[#e07856] dark:text-[#f08a6a]'
   if (type === 'magic') return 'text-[#5b9fd7] dark:text-[#6fb0e6]'
   if (type === 'true') return 'text-[#a8a8a8] dark:text-white'
@@ -168,7 +168,7 @@ export function useWinResultStyleType() {
   })
 }
 
-export function useCardBorderClasses() {
+export function useCardBorderClass() {
   const { basicInfo, team } = useMatchCard()
 
   return computed(() => {

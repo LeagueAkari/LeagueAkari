@@ -67,6 +67,12 @@
       </div>
     </NPopover>
 
+    <JunglePathingInfo
+      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
+      :analysis="jungleAnalysis"
+      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
+    />
+
     <NPopover
       :keep-alive-on-hover="false"
       :delay="50"
@@ -617,8 +623,11 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
+import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../constants'
 import { useOngoingGamePanel } from '../context'
+
+import JunglePathingInfo from './JunglePathingInfo.vue'
 
 const { puuid } = defineProps<{
   puuid: string
@@ -649,6 +658,8 @@ const summoner = computed(() => ogs.summoner[puuid])
 const savedInfo = computed(() => ogs.savedInfo[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
+
+const jungleAnalysis = computed(() => ogs.jungleAnalysis?.[puuid])
 
 const isSuspiciousFlashPosition = computed(() => {
   if (!playerStats.value) {

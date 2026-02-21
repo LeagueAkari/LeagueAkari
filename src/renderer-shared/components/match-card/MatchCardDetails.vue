@@ -2,7 +2,7 @@
   <!-- expanded details -->
   <div
     class="transition-width @container relative mt-1 box-border w-full overflow-hidden rounded border border-solid bg-neutral-100/95 p-2 dark:bg-neutral-900/95"
-    :class="cardBorderClasses"
+    :class="cardBorderClass"
   >
     <!-- header -->
     <div class="mb-2 flex items-center gap-1">
@@ -73,18 +73,11 @@ import MatchCardEventsTab from './tabs/MatchCardEventsTab.vue'
 import MatchCardRunesTab from './tabs/MatchCardRunesTab.vue'
 import MatchCardSummaryTab from './tabs/MatchCardSummaryTab.vue'
 import MatchCardTimelineTab from './tabs/timeline/MatchCardTimelineTab.vue'
-import { useCardBorderClasses } from './utils/theme'
+import { useCardBorderClass } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
-const {
-  basicInfo,
-  teams,
-  participants,
-  puuid,
-  replayState,
-  loadReplay,
-  watchReplay
-} = useMatchCard()
+const { basicInfo, teams, participants, puuid, replayState, loadReplay, watchReplay } =
+  useMatchCard()
 const { t } = useTranslation()
 
 const selfStats = computed(() => {
@@ -162,7 +155,7 @@ const replayButtonTitle = computed(() => {
   }
 })
 
-const cardBorderClasses = useCardBorderClasses()
+const cardBorderClass = useCardBorderClass()
 </script>
 
 <style scoped>

@@ -3,10 +3,10 @@
     <!-- header + tags -->
     <div class="flex items-end">
       <div
-        v-if="teamIndicatorColorClasses"
+        v-if="teamIndicatorColorClass"
         :class="[
           'mr-2 size-[10px] self-center rounded-full border border-white/20',
-          teamIndicatorColorClasses
+          teamIndicatorColorClass
         ]"
       ></div>
 
@@ -37,7 +37,7 @@ import { computed } from 'vue'
 
 import { FIXED_CARD_WIDTH_PX_LITERAL } from '../constants'
 import { useOngoingGamePanel } from '../context'
-import { getTeamIndicatorColorClasses } from '../utils/theme'
+import { getTeamIndicatorColorClass } from '../utils/theme'
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import TeamTagsArea from './TeamTagsArea.vue'
 
@@ -58,7 +58,7 @@ const playerCardStyles = computed(() => {
   }
 })
 
-const teamIndicatorColorClasses = computed(() => {
-  return getTeamIndicatorColorClasses(teamIdentifier)
+const teamIndicatorColorClass = computed(() => {
+  return getTeamIndicatorColorClass(teamIdentifier)
 })
 </script>

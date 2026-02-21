@@ -128,9 +128,11 @@
           {{ analysis.summary.losses }} {{ t('PlayerTab.stats.lossShort') }} ({{
             (analysis.summary.winRate * 100).toFixed()
           }}%)
-          <span class="ml-1 inline-flex max-w-[220px] flex-wrap items-center justify-end gap-1">
+          <span
+            v-if="currentStreak"
+            class="ml-1 inline-flex max-w-[220px] flex-wrap items-center justify-end gap-1"
+          >
             <span
-              v-if="currentStreak"
               class="rounded px-1 py-0.5 text-[12px] leading-none"
               :class="getStreakBadgeClass(currentStreak.isWinning, currentStreak.count)"
             >

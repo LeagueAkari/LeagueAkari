@@ -335,16 +335,6 @@
       </NPopover>
     </div>
 
-    <!-- tags -->
-    <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
-    <!-- jungle pathing info -->
-    <JunglePathingInfo
-      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
-      :analysis="jungleAnalysis"
-      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
-    />
-
-    <!-- tags -->
     <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
 
     <!-- champion usage -->
@@ -428,16 +418,16 @@
             :class="[
               'group relative mb-0.5 box-border flex h-[34px] cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-125',
               ogs.settings.showMatchHistoryItemBorder
-                ? `border ${getMatchItemThemeClasses(item).border}`
+                ? `border ${getMatchItemThemeClass(item).border}`
                 : '',
-              getMatchItemThemeClasses(item).bg
+              getMatchItemThemeClass(item).bg
             ]"
             :key="item.gameId"
             @click="previewGame(item.game, puuid)"
           >
             <div
               class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
-              :class="getMatchItemThemeClasses(item).resultText"
+              :class="getMatchItemThemeClass(item).resultText"
             >
               #{{ index + 1 }}
             </div>
@@ -448,18 +438,18 @@
             <div class="mr-1 w-[100px]">
               <div
                 class="overflow-hidden text-xs text-ellipsis whitespace-nowrap"
-                :class="getMatchItemThemeClasses(item).text"
+                :class="getMatchItemThemeClass(item).text"
               >
                 {{ lcs.gameData.queues[item.basicInfo.queueId]?.name || item.basicInfo.queueId }}
               </div>
-              <div class="text-[10px]" :class="getMatchItemThemeClasses(item).text">
+              <div class="text-[10px]" :class="getMatchItemThemeClass(item).text">
                 {{ dayjs(item.basicInfo.gameCreation).format('MM-DD HH:mm') }}
-                <span class="ml-1" :class="getMatchItemThemeClasses(item).resultText">
+                <span class="ml-1" :class="getMatchItemThemeClass(item).resultText">
                   {{ getWinResultText(item) }}
                 </span>
               </div>
             </div>
-            <div class="text-xs" :class="getMatchItemThemeClasses(item).text">
+            <div class="text-xs" :class="getMatchItemThemeClass(item).text">
               {{ item.participant.kills }} / {{ item.participant.deaths }} /
               {{ item.participant.assists }}
             </div>
@@ -515,7 +505,6 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -534,7 +523,6 @@ import {
   STARRED_CHAMPION_LEVEL
 } from '../constants'
 import { useOngoingGamePanel } from '../context'
-import JunglePathingInfo from './JunglePathingInfo.vue'
 import PlayerCardTagsArea from './PlayerCardTagsArea.vue'
 
 const { puuid } = defineProps<{
@@ -561,7 +549,6 @@ const matchHistoryLoadingState = computed(() => ogs.matchHistoryLoadingState[puu
 const queueType = computed(() => ogs.queryStage.gameInfo?.queueType)
 const championId = computed(() => ogs.championSelections?.[puuid])
 const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
-const jungleAnalysis = computed(() => ogs.jungleAnalysis?.[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
@@ -807,7 +794,7 @@ const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: Match
  * 获取战绩条目的主题类名，使用主页战绩卡片的 shadow 主颜色
  * 亮色和暗色模式都使用具体颜色，但更柔和
  */
-const getMatchItemThemeClasses = (match: {
+const getMatchItemThemeClass = (match: {
   basicInfo: MatchBasicInfo
   participant: MatchParticipant
 }) => {

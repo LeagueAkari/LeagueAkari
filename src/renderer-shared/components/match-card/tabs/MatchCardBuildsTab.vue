@@ -190,19 +190,11 @@ import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
-import { getClassBySkillSlot, getTeamColor, useWinResultTagClasses } from '../utils/theme'
+import { getClassBySkillSlot, getTeamColor, useWinResultTagClass } from '../utils/theme'
 import { formatMilliseconds } from '../utils/time'
 
-const {
-  basicInfo,
-  frames,
-  participants,
-  team,
-  details,
-  hidePrivacy,
-  loadingDetails,
-  loadDetails
-} = useMatchCard()
+const { basicInfo, frames, participants, team, details, hidePrivacy, loadingDetails, loadDetails } =
+  useMatchCard()
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()
@@ -300,7 +292,7 @@ const collected = computed(() => {
 })
 
 const position = usePosition()
-const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
+const tagTheme = useWinResultTagClass(() => team.value?.winResult)
 
 const isParticipantExpanded = (participantId: number) => {
   return expandedParticipantIds.value.includes(participantId)

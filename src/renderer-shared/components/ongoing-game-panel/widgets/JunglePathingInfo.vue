@@ -20,7 +20,7 @@
         >
           <!-- mini map -->
           <div
-            class="relative flex-shrink-0"
+            class="relative shrink-0"
             :style="{ width: `${MINI_SIZE}px`, height: `${MINI_SIZE}px` }"
           >
             <img class="absolute h-full w-full rounded" :src="map11" />
@@ -115,7 +115,7 @@
         </div>
         <button
           v-if="showCopyAll"
-          class="flex-shrink-0 cursor-pointer rounded px-2 py-1 text-[11px] text-black/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
+          class="shrink-0 cursor-pointer rounded px-2 py-1 text-[11px] text-black/60 transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
           @click="handleCopyAll"
         >
           <NIcon class="mr-0.5 align-middle" :component="CopyIcon" />
@@ -141,7 +141,7 @@
       <template v-else>
         <div class="flex gap-3">
           <!-- larger map -->
-          <div class="flex flex-shrink-0 flex-col gap-1">
+          <div class="flex shrink-0 flex-col gap-1">
             <div class="relative" :style="{ width: `${LARGE_SIZE}px`, height: `${LARGE_SIZE}px` }">
               <img class="absolute h-full w-full rounded" :src="map11" />
               <!-- 红蓝方底色 -->
@@ -161,7 +161,7 @@
               <div
                 v-for="(pt, i) of largeMapPoints"
                 :key="i"
-                class="absolute z-[2] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
+                class="absolute z-2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60"
                 :class="minuteDotColors[pt.lane]"
                 :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
               />
@@ -231,7 +231,7 @@
                     </span>
                     <span
                       v-if="popoverStats.objectives.avgFirstDragonTime !== null"
-                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                      class="shrink-0 text-black/50 dark:text-white/50"
                     >
                       {{
                         t('JunglePathing.firstTime', {
@@ -255,7 +255,7 @@
                     </span>
                     <span
                       v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
-                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                      class="shrink-0 text-black/50 dark:text-white/50"
                     >
                       {{
                         t('JunglePathing.firstTime', {
@@ -279,7 +279,7 @@
                     </span>
                     <span
                       v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
-                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                      class="shrink-0 text-black/50 dark:text-white/50"
                     >
                       {{
                         t('JunglePathing.firstTime', {
@@ -303,7 +303,7 @@
                     </span>
                     <span
                       v-if="popoverStats.objectives.avgFirstBaronTime !== null"
-                      class="flex-shrink-0 text-black/50 dark:text-white/50"
+                      class="shrink-0 text-black/50 dark:text-white/50"
                     >
                       {{
                         t('JunglePathing.firstTime', {
@@ -329,7 +329,7 @@
 
         <!-- 首清营地 + 前期抓人地图 -->
         <div class="flex gap-3">
-          <div class="flex flex-shrink-0 flex-col gap-1">
+          <div class="flex shrink-0 flex-col gap-1">
             <div
               class="relative"
               :style="{ width: `${CAMP_MAP_SIZE}px`, height: `${CAMP_MAP_SIZE}px` }"
@@ -352,7 +352,7 @@
               <div
                 v-for="(pt, i) of campMapPoints"
                 :key="`camp-${i}`"
-                class="absolute z-[1] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
+                class="absolute z-1 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
                 :style="{
                   left: `${pt.left}px`,
                   top: `${pt.top}px`,
@@ -363,7 +363,7 @@
               <div
                 v-for="(pt, i) of earlyGankMapPoints"
                 :key="`eg-${i}`"
-                class="absolute z-[5] h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+                class="absolute z-5 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
                 :style="{ left: `${pt.left}px`, top: `${pt.top}px` }"
               >
                 <span

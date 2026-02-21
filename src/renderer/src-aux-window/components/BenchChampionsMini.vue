@@ -14,7 +14,7 @@
             <ChampionIcon
               class="size-9 cursor-default rounded-full border border-black/10 dark:border-white/10"
               :class="
-                getChampionImageClasses(
+                getChampionImageClass(
                   championAdjustment(lcs.champSelect.currentChampion || -1)?.overallEffect
                 )
               "
@@ -31,7 +31,7 @@
               <span class="flex-1">{{ fandomBalanceTypes[b.type]?.name || b.type }}</span>
               <span
                 class="min-w-[36px] text-right whitespace-nowrap"
-                :class="getBalanceValueClasses(b.effect)"
+                :class="getBalanceValueClass(b.effect)"
                 >{{ b.formattedValue }}</span
               >
             </div>
@@ -96,9 +96,7 @@
             <ChampionIcon
               class="size-8 cursor-pointer rounded-sm border border-black/10 dark:border-white/10"
               :class="[
-                getChampionImageClasses(
-                  championAdjustment(c.championId)?.overallEffect || 'neutral'
-                ),
+                getChampionImageClass(championAdjustment(c.championId)?.overallEffect || 'neutral'),
                 {
                   'cursor-not-allowed grayscale-[0.8]':
                     !isChampionSwappable(c.championId) || !canUseBench
@@ -118,7 +116,7 @@
               <span class="flex-1">{{ b.name }}</span>
               <span
                 class="min-w-[36px] text-right whitespace-nowrap"
-                :class="getBalanceValueClasses(b.effect)"
+                :class="getBalanceValueClass(b.effect)"
                 >{{ b.formattedValue }}</span
               >
             </div>
@@ -378,7 +376,7 @@ const message = useMessage()
 const isRerolling = ref(false)
 const isSwappingOrPicking = ref(false)
 
-const getChampionImageClasses = (effect?: string) => {
+const getChampionImageClass = (effect?: string) => {
   switch (effect) {
     case 'buffed':
       return 'border-emerald-600 dark:border-emerald-400'
@@ -391,7 +389,7 @@ const getChampionImageClasses = (effect?: string) => {
   }
 }
 
-const getBalanceValueClasses = (effect?: string) => {
+const getBalanceValueClass = (effect?: string) => {
   switch (effect) {
     case 'buffed':
       return 'text-emerald-500 dark:text-emerald-300'

@@ -86,22 +86,22 @@
 </template>
 
 <script lang="ts" setup>
-import { ChevronRight20Regular } from '@vicons/fluent'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { ChevronRight20Regular } from '@vicons/fluent'
 import { NCollapseTransition, NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
-import { getTeamColor, useWinResultTagClasses } from '../utils/theme'
+import { getTeamColor, useWinResultTagClass } from '../utils/theme'
 
 const { basicInfo, participants, team } = useMatchCard()
 
 const lcs = useLeagueClientStore()
 const position = usePosition()
-const tagTheme = useWinResultTagClasses(() => team.value?.winResult)
+const tagTheme = useWinResultTagClass(() => team.value?.winResult)
 
 const expandedParticipantIds = ref<number[]>([])
 

@@ -35,7 +35,7 @@
             }}
           </span>
           (
-          <span :class="getDamageTextColorClasses('physical')">{{
+          <span :class="getDamageTextColorClass('physical')">{{
             formatExtremeNumber(
               group.type === 'received'
                 ? data.totalPhysicalDamageReceived
@@ -43,13 +43,13 @@
             )
           }}</span>
           /
-          <span :class="getDamageTextColorClasses('magic')">{{
+          <span :class="getDamageTextColorClass('magic')">{{
             formatExtremeNumber(
               group.type === 'received' ? data.totalMagicDamageReceived : data.totalMagicDamageDealt
             )
           }}</span>
           /
-          <span :class="getDamageTextColorClasses('true')">{{
+          <span :class="getDamageTextColorClass('true')">{{
             formatExtremeNumber(
               group.type === 'received' ? data.totalTrueDamageReceived : data.totalTrueDamageDealt
             )
@@ -155,15 +155,15 @@
                 }}
               </span>
               (
-              <span :class="getDamageTextColorClasses('physical')">{{
+              <span :class="getDamageTextColorClass('physical')">{{
                 formatExtremeNumber(item.totalPhysicalDamage)
               }}</span>
               /
-              <span :class="getDamageTextColorClasses('magic')">{{
+              <span :class="getDamageTextColorClass('magic')">{{
                 formatExtremeNumber(item.totalMagicDamage)
               }}</span>
               /
-              <span :class="getDamageTextColorClasses('true')">{{
+              <span :class="getDamageTextColorClass('true')">{{
                 formatExtremeNumber(item.totalTrueDamage)
               }}</span>
               )
@@ -187,14 +187,14 @@
                 <div>
                   <div
                     class="flex size-6 items-center justify-center rounded text-xs font-bold"
-                    :class="getClassesBySkillKey(type)"
+                    :class="getClassBySkillKey(type)"
                   >
                     {{ type }}
                   </div>
 
                   <div
                     class="text-center text-[10px]"
-                    :class="getDamageTextColorClasses(getDamageMostType(damage))"
+                    :class="getDamageTextColorClass(getDamageMostType(damage))"
                   >
                     {{
                       formatExtremeNumber(
@@ -204,15 +204,15 @@
                   </div>
                 </div>
               </template>
-              <span :class="getDamageTextColorClasses('physical')">{{
+              <span :class="getDamageTextColorClass('physical')">{{
                 formatExtremeNumber(damage.physicalDamage)
               }}</span>
               /
-              <span :class="getDamageTextColorClasses('magic')">{{
+              <span :class="getDamageTextColorClass('magic')">{{
                 formatExtremeNumber(damage.magicDamage)
               }}</span>
               /
-              <span :class="getDamageTextColorClasses('true')">{{
+              <span :class="getDamageTextColorClass('true')">{{
                 formatExtremeNumber(damage.trueDamage)
               }}</span>
             </NPopover>
@@ -235,7 +235,7 @@ import { computed } from 'vue'
 import { useMatchCard } from '../context'
 import DragonIcon from '../icons/Dragon.vue'
 import TowerIcon from '../icons/Tower.vue'
-import { getClassesBySkillKey, getDamageTextColorClasses, getTeamColor } from '../utils/theme'
+import { getClassBySkillKey, getDamageTextColorClass, getTeamColor } from '../utils/theme'
 import DamageBar from './DamageBar.vue'
 
 const { event } = defineProps<{

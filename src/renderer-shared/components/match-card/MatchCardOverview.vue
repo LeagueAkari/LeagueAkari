@@ -2,7 +2,7 @@
   <div
     v-if="participant && team"
     class="transition-width @container relative box-border flex h-29 w-full overflow-hidden rounded border border-solid bg-neutral-100/95 select-none dark:bg-neutral-900/95"
-    :class="cardBorderClasses"
+    :class="cardBorderClass"
   >
     <!-- main content -->
     <div class="z-1 flex min-w-0 flex-1 gap-2 px-4 py-1">
@@ -404,7 +404,7 @@ import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 import { useMatchCard } from './context'
 import { useGameResultName } from './utils/text'
-import { useCardBorderClasses, useWinResultStyleType } from './utils/theme'
+import { useCardBorderClass, useWinResultStyleType } from './utils/theme'
 import { formatSeconds } from './utils/time'
 import ManyTags from './widgets/ManyTags.vue'
 import RadarChart from './widgets/RadarChart.vue'
@@ -520,7 +520,7 @@ const mapName = computed(() => {
 })
 
 const winStyleType = useWinResultStyleType()
-const cardBorderClasses = useCardBorderClasses()
+const cardBorderClass = useCardBorderClass()
 
 const formattedRelativeTime = ref('')
 const gameCreationTitle = computed(() => {

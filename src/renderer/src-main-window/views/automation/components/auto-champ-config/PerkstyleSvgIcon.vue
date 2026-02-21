@@ -21,7 +21,7 @@
           }"
           class="perkstyle-icon"
           :class="{
-            [getSvgClasses(perkstyleId)]: true
+            [getSvgClass(perkstyleId)]: true
           }"
         />
       </div>
@@ -37,7 +37,7 @@
         }"
         class="perkstyle-icon"
         :class="{
-          [getSvgClasses(perkstyleId)]: true
+          [getSvgClass(perkstyleId)]: true
         }"
       />
       <div class="right-side">
@@ -79,7 +79,7 @@ const getIconPath = (perkstyleId: number) => {
   return lcs.gameData.perkstyles.styles[perkstyleId]?.assetMap.svg_icon
 }
 
-const getSvgClasses = (perkstyleId: number) => {
+const getSvgClass = (perkstyleId: number) => {
   const style = lcs.gameData.perkstyles.styles[perkstyleId]
   if (!style) return ''
 
