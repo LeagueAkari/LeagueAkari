@@ -86,6 +86,11 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       () => this.state.ready,
       (ready) => {
         if (ready) {
+          if (process.platform === 'darwin') {
+            // macOS 全屏游戏通常运行在独立 Space；仅 alwaysOnTop 不足以跨 Space 显示叠加层。
+            this._window?.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+          }
+
           this._window?.on('system-context-menu', (event) => {
             event.preventDefault()
           })
