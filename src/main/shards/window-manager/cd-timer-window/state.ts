@@ -68,6 +68,7 @@ export class CdTimerWindowState {
     abilityHaste: number
   }[] = [
     { gameMode: 'CLASSIC', abilityHaste: 0 },
+    { gameMode: 'PRACTICETOOL', abilityHaste: 0 },
     { gameMode: 'ARAM', abilityHaste: 70 },
     { gameMode: 'URF', abilityHaste: 300 },
     { gameMode: 'ONEFORALL', abilityHaste: 0 },

@@ -13,6 +13,8 @@ files:
   - '!docs'
   - '!pictures'
   - '!rabi-*'
+  - '!feedback-platform{,/**}'
+  - '!**/.venv/**'
 
 asarUnpack:
   - resources/**

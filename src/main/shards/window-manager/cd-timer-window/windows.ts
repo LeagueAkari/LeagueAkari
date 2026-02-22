@@ -27,6 +27,18 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
   private _gameStatsPollTimer: NodeJS.Timeout | null = null
 
+  private _applyOverlayWindowBehavior() {
+    if (!this._window || this._window.isDestroyed()) {
+      return
+    }
+
+    // 默认穿透给游戏；renderer 侧通过 mouseenter/mouseleave 动态切换 setIgnoreMouseEvents。
+    // focusable: true + type:'panel' 保证点击时 Windows 走正常激活序列（游戏仅失活，不最小化）。
+    this._window.setSkipTaskbar(true)
+    this._window.setAlwaysOnTop(true, 'screen-saver', 1)
+    this._window.setIgnoreMouseEvents(true, { forward: true })
+  }
+
   constructor(_context: WindowManagerMainContext) {
     const state = new CdTimerWindowState()
     const settings = new CdTimerWindowSettings()
@@ -52,7 +64,9 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         show: false,
         frame: false,
         resizable: false,
-        focusable: false,
+        focusable: true, // true + type:'panel' 保证点击时游戏走正常失活流程，不会最小化
+        type: 'panel',
+        alwaysOnTop: true,
         maximizable: false,
         minimizable: false,
         fullscreenable: false,
@@ -63,7 +77,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         autoHideMenuBar: true,
         backgroundColor: '#00000000',
         webPreferences: {
-          backgroundThrottling: true // focusable: false 和 backgroundThrottling: false 一起使用, 会出现莫名其妙的 BUG
+          backgroundThrottling: false
         }
       }
     })
@@ -86,10 +100,16 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       () => this.state.ready,
       (ready) => {
         if (ready) {
-          if (process.platform === 'darwin') {
-            // macOS 全屏游戏通常运行在独立 Space；仅 alwaysOnTop 不足以跨 Space 显示叠加层。
-            this._window?.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-          }
+          this._applyOverlayWindowBehavior()
+
+          this._window?.on('show', () => {
+            this._applyOverlayWindowBehavior()
+          })
+
+          this._window?.on('focus', () => {
+            // focusable: true 时可能正常获焦（如用户点击计时器区域），属预期行为
+            this._log.debug('cd-timer window focused')
+          })
 
           this._window?.on('system-context-menu', (event) => {
             event.preventDefault()
@@ -142,7 +162,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
             if (this.state.show) {
               this.hide()
             } else {
-              this.show()
+              this.show(true)
             }
           })
         } catch {
@@ -177,7 +197,8 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       () => shouldUseCdTimer.get(),
       (should) => {
         if (should) {
-          this.show()
+          this.show(true)
+          this._applyOverlayWindowBehavior()
         } else {
           this.hide()
         }
@@ -265,6 +286,16 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     }
 
     this._handleCdTimerWindowLogics()
+  }
+
+  override showOrRestore(_inactive = false) {
+    super.showOrRestore(true)
+    this._applyOverlayWindowBehavior()
+  }
+
+  override show(_inactive = false) {
+    super.show(true)
+    this._applyOverlayWindowBehavior()
   }
 
   protected override getStatePropKeys() {
