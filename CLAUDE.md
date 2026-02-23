@@ -149,3 +149,28 @@ If you add automated tests, colocate them with the feature or introduce a `tests
 - Keep commits focused and avoid mixing refactors with behavior changes unless tightly related.
 - PRs should include: what changed, why it changed, how it was tested, linked issues, and screenshots for UI updates.
 - Call out persistence/schema/config impacts explicitly (for example TypeORM entity changes or settings migration effects).
+
+## UI Design Standards
+
+To maintain visual consistency across the multi-window application, follow these Tailwind-based design tokens:
+
+### Border Radius (Common Tokens)
+- `rounded-sm` (2px): Small icons, tags, inner elements within cards.
+- `rounded` (4px): Default for images (`LcuImage`) and most UI elements.
+- `rounded-md` (6px): Medium containers.
+- `rounded-lg` (8px): **Primary container/card radius** (used for main feature cards, sidebar connections, etc.).
+- `rounded-full`: Circular avatars, status indicators.
+
+### Visual Styles
+- **Card Backgrounds**: `bg-black/5` (Light) / `bg-white/5` (Dark). Use `backdrop-blur-sm` for an elevated look.
+- **Interactions**: `hover:bg-black/10` / `hover:bg-white/10` for list items and clickable areas.
+- **Borders**: Standard borders use `border-black/10` or `border-white/10`.
+- **Typography**:
+  - Main titles: `text-xl font-bold text-black dark:text-white`
+  - Body: `text-base` or `text-sm`
+  - Secondary/Label: `text-xs` or `text-[11px] font-medium text-gray-500/80 dark:text-gray-400/80`
+  - Metadata: `text-[10px]` for density-heavy information.
+
+### Dark Mode
+- Always provide dark mode equivalents using `dark:` prefix.
+- Prefer `neutral-900` or `neutral-950` for deep backgrounds instead of pure black.

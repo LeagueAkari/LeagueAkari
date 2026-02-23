@@ -1,6 +1,6 @@
 <template>
   <table
-    class="w-min border-collapse border-spacing-0 border border-black/20 text-xs text-black dark:border-white/25 dark:text-gray-300"
+    class="w-full border-collapse border-spacing-0 border border-black/20 text-xs text-black dark:border-white/25 dark:text-gray-300"
   >
     <thead>
       <tr>

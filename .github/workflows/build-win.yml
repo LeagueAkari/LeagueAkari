@@ -51,4 +51,4 @@ jobs:
           path: |
             dist/*.7z
             dist/*.exe
-          retention-days: 5
+          retention-days: 1
