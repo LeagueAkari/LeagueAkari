@@ -86,6 +86,33 @@ const message = useMessage()
 
 const wm = useInstance(WindowManagerRenderer)
 
+const POSITION_ORDER: Record<string, number> = {
+  TOP: 0,
+  JUNGLE: 1,
+  MIDDLE: 2,
+  BOTTOM: 3,
+  UTILITY: 4
+}
+
+const normalizePosition = (position?: string) => {
+  const normalized = (position || '').toUpperCase()
+  if (normalized === 'MID') {
+    return 'MIDDLE'
+  }
+  if (normalized === 'BOT' || normalized === 'ADC') {
+    return 'BOTTOM'
+  }
+  if (normalized === 'SUP' || normalized === 'SUPPORT') {
+    return 'UTILITY'
+  }
+  return normalized
+}
+
+const getPositionOrder = (position?: string) => {
+  const normalized = normalizePosition(position)
+  return POSITION_ORDER[normalized] ?? Number.MAX_SAFE_INTEGER
+}
+
 const createEmptyTimer = (count: number) => {
   return Array.from({ length: count }, (_, i) => ({
     id: `default-${i}`,
@@ -235,6 +262,13 @@ const items = computed(() => {
   const selections = game.playerChampionSelections
   const selectionMap: Record<string, { championId: number; spell1Id: number; spell2Id: number }> =
     {}
+  const positionMap: Record<string, string> = {}
+
+  for (const player of [...game.teamOne, ...game.teamTwo]) {
+    if (player.puuid && player.puuid !== EMPTY_PUUID) {
+      positionMap[player.puuid] = player.selectedPosition || ''
+    }
+  }
 
   for (const selection of selections) {
     if (selection.puuid && selection.puuid !== EMPTY_PUUID) {
@@ -243,6 +277,12 @@ const items = computed(() => {
         spell1Id: selection.spell1Id,
         spell2Id: selection.spell2Id
       }
+    }
+  }
+
+  for (const [puuid, assignment] of Object.entries(ais.additional.positions || {})) {
+    if (assignment?.position) {
+      positionMap[puuid] = assignment.position
     }
   }
 
@@ -264,16 +304,32 @@ const items = computed(() => {
   }
 
   const theirTeamSelections = theirTeamPuuids
-    .map((puuid) => selectionMap[puuid])
-    .filter((p) => p !== undefined)
+    .map((puuid, index) => ({
+      puuid,
+      index,
+      position: positionMap[puuid] || '',
+      selection: selectionMap[puuid]
+    }))
+    .filter((p) => p.selection !== undefined)
+    .sort((a, b) => {
+      const positionDelta = getPositionOrder(a.position) - getPositionOrder(b.position)
+      if (positionDelta !== 0) {
+        return positionDelta
+      }
 
-  return theirTeamSelections.map((p, i) => ({
-    id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
-    type: 'summoner-spell',
-    timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
-    timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
-    ...p
-  }))
+      return a.index - b.index
+    })
+
+  return theirTeamSelections.map((entry) => {
+    const p = entry.selection!
+    return {
+      id: `champion-${entry.puuid}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
+      type: 'summoner-spell',
+      timer1Id: `champion-${entry.puuid}-${p.championId}-${p.spell1Id}`,
+      timer2Id: `champion-${entry.puuid}-${p.championId}-${p.spell2Id}`,
+      ...p
+    }
+  })
 })
 
 const sendInGameText = async (

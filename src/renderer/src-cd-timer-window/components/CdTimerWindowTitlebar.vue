@@ -2,7 +2,7 @@
   <div class="titlebar">
     <div class="mac-traffic-lights-spacer" />
     <div class="title-area">
-      <span class="title">Akari Timer</span>
+      <span class="title">Timer</span>
     </div>
     <div class="traffic">
       <div class="traffic-button close" @click="handleClose">

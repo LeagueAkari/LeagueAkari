@@ -12,7 +12,7 @@ import { CdTimerWindowSettings, CdTimerWindowState } from './state'
 export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTimerWindowSettings> {
   static readonly NAMESPACE_SUFFIX = 'cd-timer-window'
   static readonly HTML_ENTRY = 'cd-timer-window.html'
-  static readonly TITLE = 'Akari Timer'
+  static readonly TITLE = 'Timer'
   static readonly BASE_WIDTH = 100 // 100 for auto resize
   static readonly BASE_HEIGHT = 220 // 220 for 5 players (as default)
   static readonly MIN_WIDTH = 100
