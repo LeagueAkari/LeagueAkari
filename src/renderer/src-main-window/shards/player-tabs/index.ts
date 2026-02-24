@@ -286,6 +286,12 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
     await this._setting.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
+      'defaultMatchHistoryTimeRange'
+    )
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
       'defaultShowPractice'
     )
 
@@ -302,6 +308,9 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
     )
   }
 }
+
+export const MATCH_HISTORY_TIME_RANGES = ['all', '24h', '3d', '7d', '30d'] as const
+export type MatchHistoryTimeRange = (typeof MATCH_HISTORY_TIME_RANGES)[number]
 
 export function usePageSizeOptions() {
   const { t } = useTranslation()
@@ -338,4 +347,31 @@ export function usePageSizeOptions() {
   ])
 
   return pageSizeOptions
+}
+
+export function useMatchHistoryTimeRangeOptions() {
+  const { t } = useTranslation()
+
+  return computed(() => [
+    {
+      label: t('PlayerTab.timeRange.all'),
+      value: 'all' as MatchHistoryTimeRange
+    },
+    {
+      label: t('PlayerTab.timeRange.last24Hours'),
+      value: '24h' as MatchHistoryTimeRange
+    },
+    {
+      label: t('PlayerTab.timeRange.last3Days'),
+      value: '3d' as MatchHistoryTimeRange
+    },
+    {
+      label: t('PlayerTab.timeRange.last7Days'),
+      value: '7d' as MatchHistoryTimeRange
+    },
+    {
+      label: t('PlayerTab.timeRange.last30Days'),
+      value: '30d' as MatchHistoryTimeRange
+    }
+  ])
 }

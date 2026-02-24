@@ -57,6 +57,11 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     defaultMatchHistoryTag: '<akari:all>' as string,
 
     /**
+     * 默认战绩时间范围
+     */
+    defaultMatchHistoryTimeRange: 'all' as 'all' | '24h' | '3d' | '7d' | '30d',
+
+    /**
      * 默认显示训练模式
      */
     defaultShowPractice: false,

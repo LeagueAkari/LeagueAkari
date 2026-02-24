@@ -2084,6 +2084,8 @@ PlayerTab:
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
+  byCount: By Count
+  byTime: By Time
   filter:
     title: In-page Filters
     reset: Clear Filters
@@ -2097,6 +2099,12 @@ PlayerTab:
     showIrregularGames: Show Remakes, Aborts, etc.
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
+  timeRange:
+    all: All Time
+    last24Hours: Last 24 Hours
+    last3Days: Last 3 Days
+    last7Days: Last 7 Days
+    last30Days: Last 30 Days
   previousName: 'Previously Used Name: {{name}}'
 
   summonerNotFoundTitle: Summoner Not Found {{puuid}}

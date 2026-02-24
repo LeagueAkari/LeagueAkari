@@ -22,14 +22,14 @@
       :consistent-menu-width="false"
     />
 
-    <!-- 每页条数 -->
+    <!-- 互斥模式：按局数 / 按时间 -->
     <NSelect
       :disabled="isLoading"
-      :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
-      @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
+      :value="selectedModeValue"
+      @update:value="handleModeChange"
       size="small"
-      :options="pageSizeOptions"
-      class="w-28!"
+      :options="mutuallyExclusiveOptions"
+      class="w-40!"
     />
 
     <NPopover
@@ -56,7 +56,7 @@
     </NPopover>
 
     <!-- 翻页 -->
-    <div class="flex items-center gap-1">
+    <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
       <NButton
         size="small"
         tertiary
@@ -170,11 +170,12 @@
     <!-- 更多筛选 + 翻页 -->
     <div class="flex items-center justify-between gap-1">
       <NSelect
+        class="w-34!"
         :disabled="isLoading"
-        :value="pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount"
-        @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
+        :value="selectedModeValue"
+        @update:value="handleModeChange"
         size="small"
-        :options="pageSizeOptions"
+        :options="mutuallyExclusiveOptions"
       />
 
       <NPopover
@@ -201,7 +202,7 @@
       </NPopover>
 
       <!-- 翻页 -->
-      <div class="flex items-center gap-1">
+      <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
         <NButton
           size="small"
           tertiary
@@ -307,7 +308,10 @@ import { NButton, NIcon, NInputNumber, NPopover, NSelect, SelectOption } from 'n
 import { computed, h, ref, watchEffect } from 'vue'
 
 import { useMapAssets } from '@main-window/composables/useMapAssets'
-import { usePageSizeOptions } from '@main-window/shards/player-tabs'
+import {
+  type MatchHistoryTimeRange,
+  usePageSizeOptions
+} from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-data/store'
 
@@ -350,11 +354,90 @@ const selectedQueue = computed(() => {
   return tag
 })
 
+const selectedTimeRange = computed<MatchHistoryTimeRange>(() => {
+  return pagedMatchHistory.value?.queryParams.timeRange ?? pts.frontendSettings.defaultMatchHistoryTimeRange
+})
+
+const isTimeRangeMode = computed(() => selectedTimeRange.value !== 'all')
+
+const selectedModeValue = computed(() => {
+  if (isTimeRangeMode.value) {
+    return `time:${selectedTimeRange.value}`
+  }
+
+  const count = pagedMatchHistory.value?.queryParams.count ?? pts.frontendSettings.loadCount
+  return `count:${count}`
+})
+
+const mutuallyExclusiveOptions = computed<SelectOption[]>(() => [
+  {
+    type: 'group',
+    label: t('PlayerTab.byCount'),
+    key: 'by-count',
+    children: pageSizeOptions.value.map((o) => ({
+      label: o.label,
+      value: `count:${o.value}`
+    }))
+  },
+  {
+    type: 'group',
+    label: t('PlayerTab.byTime'),
+    key: 'by-time',
+    children: [
+      {
+        label: t('PlayerTab.timeRange.last24Hours'),
+        value: 'time:24h'
+      },
+      {
+        label: t('PlayerTab.timeRange.last3Days'),
+        value: 'time:3d'
+      },
+      {
+        label: t('PlayerTab.timeRange.last7Days'),
+        value: 'time:7d'
+      },
+      {
+        label: t('PlayerTab.timeRange.last30Days'),
+        value: 'time:30d'
+      }
+    ]
+  }
+])
+
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
 
 const handleTagChange = (tag: string) => {
   pts.frontendSettings.defaultMatchHistoryTag = tag
   loadMatchHistory({ tag: tag === ALL_SGPTAG_VALUE ? undefined : tag, startIndex: 0 })
+}
+
+const handleModeChange = (value: string | number | null) => {
+  if (!value || typeof value !== 'string') {
+    return
+  }
+
+  if (value.startsWith('count:')) {
+    const count = Number(value.slice('count:'.length))
+
+    if (!Number.isFinite(count) || count <= 0) {
+      return
+    }
+
+    pts.frontendSettings.defaultMatchHistoryTimeRange = 'all'
+    loadMatchHistory({ count, timeRange: 'all', startIndex: 0 })
+    return
+  }
+
+  if (value.startsWith('time:')) {
+    const timeRange = value.slice('time:'.length) as MatchHistoryTimeRange
+
+    if (timeRange === 'all') {
+      return
+    }
+
+    pts.frontendSettings.defaultMatchHistoryTimeRange = timeRange
+    loadMatchHistory({ timeRange, startIndex: 0 })
+  }
 }
 
 const { hasFilters } = useMatchHistoryFilters()

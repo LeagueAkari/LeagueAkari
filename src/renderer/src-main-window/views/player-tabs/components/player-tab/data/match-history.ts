@@ -28,9 +28,29 @@ import {
   watch
 } from 'vue'
 
+import type { MatchHistoryTimeRange } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { shouldHideMatchHistoryGame } from './match-history-visibility'
+
+export type MatchHistoryQueryState = MatchHistoryQueryParams & {
+  timeRange?: MatchHistoryTimeRange
+}
+
+const TIME_RANGE_MS_MAP: Record<Exclude<MatchHistoryTimeRange, 'all'>, number> = {
+  '24h': 24 * 60 * 60 * 1000,
+  '3d': 3 * 24 * 60 * 60 * 1000,
+  '7d': 7 * 24 * 60 * 60 * 1000,
+  '30d': 30 * 24 * 60 * 60 * 1000
+}
+
+function toGameCreationTimestamp(game: LcuOrSgpGameSummary): number {
+  if (game.source === 'sgp') {
+    return game.data.json.gameCreation
+  }
+
+  return game.data.gameCreation
+}
 
 export interface PagedMatchHistory {
   /** 战绩概览，应该是 raw */
@@ -46,13 +66,13 @@ export interface PagedMatchHistory {
   detailsLoading: Record<number, boolean>
 
   /** 战绩查询参数 */
-  queryParams: MatchHistoryQueryParams
+  queryParams: MatchHistoryQueryState
 }
 
 export type MatchHistoryContext = {
   pagedMatchHistory: Readonly<Ref<PagedMatchHistory | null>>
   isLoading: Readonly<Ref<boolean>>
-  loadMatchHistory: (params?: MatchHistoryQueryParams) => Promise<void>
+  loadMatchHistory: (params?: MatchHistoryQueryState) => Promise<void>
   loadDetails: (gameId: number) => Promise<void>
   downloadReplay: (gameId: number) => Promise<void>
   launchRelay: (gameId: number) => Promise<void>
@@ -154,25 +174,38 @@ export function provideMatchHistory(props: {
     await Promise.all(games.map((g) => lcuReplayMetadataQueue.add(() => task(g))))
   }
 
-  const loadMatchHistory = async (params: MatchHistoryQueryParams = {}) => {
+  const loadMatchHistory = async (params: MatchHistoryQueryState = {}) => {
     if (isLoading.value) return
 
     lcuLoadDetailedGameQueue.clear()
     isLoading.value = true
 
-    params = {
+    const queryParams: MatchHistoryQueryState = {
       ...pagedMatchHistory.value?.queryParams,
       ...params
     }
 
-    const visibleStartIndex = params.startIndex ?? 0
-    const visibleCount = params.count ?? pts.frontendSettings.loadCount
+    const currentTimeRange = queryParams.timeRange ?? 'all'
+    queryParams.timeRange = currentTimeRange
+
+    const isTimeRangeMode = currentTimeRange !== 'all'
+    queryParams.startIndex = isTimeRangeMode ? 0 : (queryParams.startIndex ?? 0)
+
+    const visibleStartIndex = queryParams.startIndex
+    const visibleCount = isTimeRangeMode
+      ? Number.POSITIVE_INFINITY
+      : (queryParams.count ?? pts.frontendSettings.loadCount)
     const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
-    const pageFetchSize = Math.max(visibleCount, pts.frontendSettings.loadCount)
-    const maxChunkRequests = Math.max(
-      80,
-      Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5
-    )
+    const shouldFilterByTimeRange = isTimeRangeMode
+    const timeRangeStartMs = shouldFilterByTimeRange
+      ? Date.now() - TIME_RANGE_MS_MAP[currentTimeRange]
+      : null
+    const pageFetchSize = isTimeRangeMode
+      ? Math.max(100, pts.frontendSettings.loadCount)
+      : Math.max(visibleCount, pts.frontendSettings.loadCount)
+    const maxChunkRequests = isTimeRangeMode
+      ? 500
+      : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
 
     const collectVisibleGames = async (
       fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>
@@ -183,11 +216,14 @@ export function provideMatchHistory(props: {
       let visibleSkipped = 0
       let guard = 0
 
-      while (games.length < visibleCount && guard < maxChunkRequests) {
+      while ((isTimeRangeMode || games.length < visibleCount) && guard < maxChunkRequests) {
         const chunk = await fetchChunk(rawCursor, pageFetchSize)
         if (chunk.length === 0) {
           break
         }
+
+        let hasTimeInRangeGameInChunk = false
+        let hasTimeOutOfRangeGameInChunk = false
 
         for (const g of chunk) {
           if (!g || typeof g.gameId !== 'number') {
@@ -203,20 +239,36 @@ export function provideMatchHistory(props: {
             continue
           }
 
-          if (visibleSkipped < visibleStartIndex) {
+          if (timeRangeStartMs !== null) {
+            const gameCreation = toGameCreationTimestamp(g)
+
+            if (gameCreation < timeRangeStartMs) {
+              hasTimeOutOfRangeGameInChunk = true
+              continue
+            }
+
+            hasTimeInRangeGameInChunk = true
+          }
+
+          if (!isTimeRangeMode && visibleSkipped < visibleStartIndex) {
             visibleSkipped++
             continue
           }
 
           games.push(g)
 
-          if (games.length >= visibleCount) {
+          if (!isTimeRangeMode && games.length >= visibleCount) {
             break
           }
         }
 
         rawCursor += chunk.length
         guard++
+
+        // 战绩按时间倒序，若整块均超出时间范围，则无需继续请求后续块
+        if (timeRangeStartMs !== null && !hasTimeInRangeGameInChunk && hasTimeOutOfRangeGameInChunk) {
+          break
+        }
 
         if (chunk.length < pageFetchSize) {
           break
@@ -253,10 +305,12 @@ export function provideMatchHistory(props: {
         }
 
         const fetchSgpChunk = async (startIndex: number, count: number) => {
+          const requestParams = { ...queryParams } as MatchHistoryQueryParams
+          delete (requestParams as MatchHistoryQueryState).timeRange
           const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
             puuid.value,
             {
-              ...params,
+              ...requestParams,
               startIndex,
               count,
               __sgpServerId: sgpServerId.value
@@ -268,7 +322,8 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
         }
 
-        const games = hideByVisibilityOptions
+        const shouldCollectGames = hideByVisibilityOptions || shouldFilterByTimeRange
+        const games = shouldCollectGames
           ? await collectVisibleGames(fetchSgpChunk)
           : await fetchSgpChunk(visibleStartIndex, visibleCount)
 
@@ -277,7 +332,7 @@ export function provideMatchHistory(props: {
           replayMetadata: {}, // must be shallow
           details: {}, // must be shallow
           detailsLoading: {}, // must be shallow
-          queryParams: params
+          queryParams
         }
       } else {
         const fetchLcuSummaryChunk = async (startIndex: number, count: number) => {
@@ -292,7 +347,8 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
         }
 
-        const selectedGames = hideByVisibilityOptions
+        const shouldCollectGames = hideByVisibilityOptions || shouldFilterByTimeRange
+        const selectedGames = shouldCollectGames
           ? await collectVisibleGames(fetchLcuSummaryChunk)
           : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
 
@@ -319,7 +375,7 @@ export function provideMatchHistory(props: {
           replayMetadata: {}, // must be shallow
           details: {}, // must be shallow
           detailsLoading: {}, // must be shallow
-          queryParams: params
+          queryParams
         }
       }
 
@@ -410,6 +466,7 @@ export function provideMatchHistory(props: {
       const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
       loadMatchHistory({
         count: pts.frontendSettings.loadCount,
+        timeRange: pts.frontendSettings.defaultMatchHistoryTimeRange,
         tag: defaultTag.startsWith('<akari:') ? undefined : defaultTag
       })
     },

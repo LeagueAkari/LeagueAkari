@@ -2085,6 +2085,8 @@ PlayerTab:
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家
+  byCount: 按局数
+  byTime: 按时间
   filter:
     title: 页内筛选
     reset: 重置条件
@@ -2097,6 +2099,12 @@ PlayerTab:
     showPractice: 显示训练模式
     showIrregularGames: 显示重开局等
   itemPerPage: '{{count}} 项'
+  timeRange:
+    all: 全部时间
+    last24Hours: 24 小时
+    last3Days: 3 天
+    last7Days: 7 天
+    last30Days: 30 天
   previousName: '曾使用的名字: {{name}}'
 
   summonerNotFoundTitle: 找不到召唤师 {{puuid}}
