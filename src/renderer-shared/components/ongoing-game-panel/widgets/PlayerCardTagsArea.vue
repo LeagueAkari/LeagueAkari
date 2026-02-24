@@ -71,6 +71,7 @@
       v-if="ogs.settings.showJunglePathing && jungleAnalysis"
       :analysis="jungleAnalysis"
       :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
+      :current-game-side="currentGameSide"
     />
 
     <NPopover
@@ -660,6 +661,23 @@ const savedInfo = computed(() => ogs.savedInfo[puuid])
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
 const jungleAnalysis = computed(() => ogs.jungleAnalysis?.[puuid])
+const currentGameSide = computed<'blue' | 'red' | null>(() => {
+  for (const [teamIdentifier, puuids] of Object.entries(ogs.teams)) {
+    if (!puuids.includes(puuid)) {
+      continue
+    }
+
+    if (teamIdentifier === 'TEAM-100') {
+      return 'blue'
+    }
+
+    if (teamIdentifier === 'TEAM-200') {
+      return 'red'
+    }
+  }
+
+  return null
+})
 
 const isSuspiciousFlashPosition = computed(() => {
   if (!playerStats.value) {

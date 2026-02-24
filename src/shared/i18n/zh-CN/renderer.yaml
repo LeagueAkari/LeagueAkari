@@ -2427,12 +2427,15 @@ JunglePathing:
   blueTeam: 蓝色方
   redTeam: 红色方
   earlyGank: 前期抓人
+  firstClearOwnLegend: 常规开
+  firstClearInvadeLegend: 入侵开
   level3KillLegend: 3级击杀
   level4KillLegend: 4级击杀
   level3Gank: '3级抓 {{pct}}%'
   level4Gank: '4级抓 {{pct}}%'
   objectives: 野怪目标
   firstDragonRate: '一龙率 {{pct}}%'
+  soloDragonRate: '小龙单刷率 {{pct}}%'
   dragons: '小龙 {{count}}'
   voidgrubs: '潮虫 {{count}}'
   heralds: '先锋 {{count}}'

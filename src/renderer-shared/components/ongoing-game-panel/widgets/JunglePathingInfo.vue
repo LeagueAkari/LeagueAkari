@@ -146,8 +146,8 @@
               <img class="absolute h-full w-full rounded" :src="map11" />
               <!-- 红蓝方底色 -->
               <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
-                <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
-                <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+                <polygon points="0,0 100,100 0,100" :fill="blueSideTriangleFill" />
+                <polygon points="0,0 100,100 100,0" :fill="redSideTriangleFill" />
                 <line
                   x1="0"
                   y1="0"
@@ -208,109 +208,120 @@
                 {{ t('JunglePathing.objectives') }}
               </div>
               <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-0.5">
-                  <DragonIcon class="size-3.5" />{{
-                    t('JunglePathing.firstDragonRate', {
-                      pct: Math.round(popoverStats.objectives.firstDragonRate * 100)
-                    })
-                  }}
-                </div>
                 <div class="grid grid-cols-2 gap-x-3 gap-y-1">
-                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                    <span class="inline-flex items-center gap-0.5">
+                  <div class="flex min-w-0 flex-col gap-1">
+                    <div class="inline-flex min-w-0 items-center gap-0.5">
                       <DragonIcon class="size-3.5" />{{
-                        t(
-                          currentObjectiveTextMode === 'single'
-                            ? 'JunglePathing.dragons'
-                            : 'JunglePathing.avgDragons',
-                          {
-                            count: roundToTenth(popoverStats.objectives.avgDragons)
-                          }
-                        )
-                      }}
-                    </span>
-                    <span
-                      v-if="popoverStats.objectives.avgFirstDragonTime !== null"
-                      class="shrink-0 text-black/50 dark:text-white/50"
-                    >
-                      {{
-                        t('JunglePathing.firstTime', {
-                          time: formatTime(popoverStats.objectives.avgFirstDragonTime)
+                        t('JunglePathing.firstDragonRate', {
+                          pct: Math.round(popoverStats.objectives.firstDragonRate * 100)
                         })
                       }}
-                    </span>
+                    </div>
+                    <div class="inline-flex min-w-0 items-center gap-0.5">
+                      <DragonIcon class="size-3.5" />{{
+                        t('JunglePathing.soloDragonRate', {
+                          pct: Math.round(popoverStats.objectives.soloDragonRate * 100)
+                        })
+                      }}
+                    </div>
+                    <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                      <span class="inline-flex items-center gap-0.5">
+                        <DragonIcon class="size-3.5" />{{
+                          t(
+                            currentObjectiveTextMode === 'single'
+                              ? 'JunglePathing.dragons'
+                              : 'JunglePathing.avgDragons',
+                            {
+                              count: roundToTenth(popoverStats.objectives.avgDragons)
+                            }
+                          )
+                        }}
+                      </span>
+                      <span
+                        v-if="popoverStats.objectives.avgFirstDragonTime !== null"
+                        class="shrink-0 text-black/50 dark:text-white/50"
+                      >
+                        {{
+                          t('JunglePathing.firstTime', {
+                            time: formatTime(popoverStats.objectives.avgFirstDragonTime)
+                          })
+                        }}
+                      </span>
+                    </div>
                   </div>
-                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                    <span class="inline-flex items-center gap-0.5">
-                      <RiftHeraldIcon class="size-3.5" />{{
-                        t(
-                          currentObjectiveTextMode === 'single'
-                            ? 'JunglePathing.heralds'
-                            : 'JunglePathing.avgHeralds',
-                          {
-                            count: roundToTenth(popoverStats.objectives.avgHeralds)
-                          }
-                        )
-                      }}
-                    </span>
-                    <span
-                      v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
-                      class="shrink-0 text-black/50 dark:text-white/50"
-                    >
-                      {{
-                        t('JunglePathing.firstTime', {
-                          time: formatTime(popoverStats.objectives.avgFirstHeraldTime)
-                        })
-                      }}
-                    </span>
-                  </div>
-                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                    <span class="inline-flex items-center gap-0.5">
-                      <VoidGrubIcon class="size-3.5" />{{
-                        t(
-                          currentObjectiveTextMode === 'single'
-                            ? 'JunglePathing.voidgrubs'
-                            : 'JunglePathing.avgVoidgrubs',
-                          {
-                            count: roundToTenth(popoverStats.objectives.avgVoidgrubs)
-                          }
-                        )
-                      }}
-                    </span>
-                    <span
-                      v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
-                      class="shrink-0 text-black/50 dark:text-white/50"
-                    >
-                      {{
-                        t('JunglePathing.firstTime', {
-                          time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime)
-                        })
-                      }}
-                    </span>
-                  </div>
-                  <div class="inline-flex min-w-0 items-center justify-between gap-1">
-                    <span class="inline-flex items-center gap-0.5">
-                      <BaronIcon class="size-3.5" />{{
-                        t(
-                          currentObjectiveTextMode === 'single'
-                            ? 'JunglePathing.barons'
-                            : 'JunglePathing.avgBarons',
-                          {
-                            count: roundToTenth(popoverStats.objectives.avgBarons)
-                          }
-                        )
-                      }}
-                    </span>
-                    <span
-                      v-if="popoverStats.objectives.avgFirstBaronTime !== null"
-                      class="shrink-0 text-black/50 dark:text-white/50"
-                    >
-                      {{
-                        t('JunglePathing.firstTime', {
-                          time: formatTime(popoverStats.objectives.avgFirstBaronTime)
-                        })
-                      }}
-                    </span>
+                  <div class="flex min-w-0 flex-col gap-1">
+                    <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                      <span class="inline-flex items-center gap-0.5">
+                        <VoidGrubIcon class="size-3.5" />{{
+                          t(
+                            currentObjectiveTextMode === 'single'
+                              ? 'JunglePathing.voidgrubs'
+                              : 'JunglePathing.avgVoidgrubs',
+                            {
+                              count: roundToTenth(popoverStats.objectives.avgVoidgrubs)
+                            }
+                          )
+                        }}
+                      </span>
+                      <span
+                        v-if="popoverStats.objectives.avgFirstVoidgrubTime !== null"
+                        class="shrink-0 text-black/50 dark:text-white/50"
+                      >
+                        {{
+                          t('JunglePathing.firstTime', {
+                            time: formatTime(popoverStats.objectives.avgFirstVoidgrubTime)
+                          })
+                        }}
+                      </span>
+                    </div>
+                    <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                      <span class="inline-flex items-center gap-0.5">
+                        <RiftHeraldIcon class="size-3.5" />{{
+                          t(
+                            currentObjectiveTextMode === 'single'
+                              ? 'JunglePathing.heralds'
+                              : 'JunglePathing.avgHeralds',
+                            {
+                              count: roundToTenth(popoverStats.objectives.avgHeralds)
+                            }
+                          )
+                        }}
+                      </span>
+                      <span
+                        v-if="popoverStats.objectives.avgFirstHeraldTime !== null"
+                        class="shrink-0 text-black/50 dark:text-white/50"
+                      >
+                        {{
+                          t('JunglePathing.firstTime', {
+                            time: formatTime(popoverStats.objectives.avgFirstHeraldTime)
+                          })
+                        }}
+                      </span>
+                    </div>
+                    <div class="inline-flex min-w-0 items-center justify-between gap-1">
+                      <span class="inline-flex items-center gap-0.5">
+                        <BaronIcon class="size-3.5" />{{
+                          t(
+                            currentObjectiveTextMode === 'single'
+                              ? 'JunglePathing.barons'
+                              : 'JunglePathing.avgBarons',
+                            {
+                              count: roundToTenth(popoverStats.objectives.avgBarons)
+                            }
+                          )
+                        }}
+                      </span>
+                      <span
+                        v-if="popoverStats.objectives.avgFirstBaronTime !== null"
+                        class="shrink-0 text-black/50 dark:text-white/50"
+                      >
+                        {{
+                          t('JunglePathing.firstTime', {
+                            time: formatTime(popoverStats.objectives.avgFirstBaronTime)
+                          })
+                        }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -337,8 +348,8 @@
               <img class="absolute h-full w-full rounded" :src="map11" />
               <!-- 红蓝方底色 -->
               <svg class="absolute h-full w-full rounded" viewBox="0 0 100 100">
-                <polygon points="0,0 100,100 0,100" fill="rgba(60,140,255,0.08)" />
-                <polygon points="0,0 100,100 100,0" fill="rgba(255,60,60,0.08)" />
+                <polygon points="0,0 100,100 0,100" :fill="blueSideTriangleFill" />
+                <polygon points="0,0 100,100 100,0" :fill="redSideTriangleFill" />
                 <line
                   x1="0"
                   y1="0"
@@ -350,13 +361,19 @@
                 />
               </svg>
               <div
-                v-for="(pt, i) of campMapPoints"
+                v-for="(pt, i) of firstClearCampMapPoints"
                 :key="`camp-${i}`"
-                class="absolute z-1 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
+                class="absolute z-1 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40"
+                :title="firstClearCampPointTitle(pt.kind, pt.camp, pt.pct)"
                 :style="{
                   left: `${pt.left}px`,
                   top: `${pt.top}px`,
-                  backgroundColor: campMarkerColors[pt.camp]
+                  width: `${pt.size}px`,
+                  height: `${pt.size}px`,
+                  backgroundColor: campMarkerColors[pt.camp],
+                  opacity: pt.opacity,
+                  borderColor:
+                    pt.kind === 'invade' ? 'rgba(251,191,36,0.85)' : 'rgba(255,255,255,0.4)'
                 }"
               />
               <!-- 3/4级抓人击杀位置（叉号标记） -->
@@ -377,6 +394,16 @@
               </div>
             </div>
             <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
+              <span class="inline-flex items-center gap-1 whitespace-nowrap">
+                <span class="inline-block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/40" />
+                {{ t('JunglePathing.firstClearOwnLegend') }}
+              </span>
+              <span class="inline-flex items-center gap-1 whitespace-nowrap text-amber-400">
+                <span
+                  class="inline-block h-2.5 w-2.5 rounded-full border border-amber-400/90 bg-white/20"
+                />
+                {{ t('JunglePathing.firstClearInvadeLegend') }}
+              </span>
               <span class="inline-flex items-center gap-1 whitespace-nowrap text-orange-400">
                 <svg class="h-2.5 w-2.5 text-orange-400" viewBox="0 0 8 8" aria-hidden="true">
                   <line
@@ -433,6 +460,7 @@
               <div
                 v-if="popoverStats.firstClearCamp.blueGames > 0"
                 class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+                :class="sideRowClass('blue')"
               >
                 <span class="row-span-2 self-start text-[#40c1ff]">{{
                   t('JunglePathing.blueTeam')
@@ -445,6 +473,7 @@
               <div
                 v-if="popoverStats.firstClearCamp.redGames > 0"
                 class="grid grid-cols-[42px_minmax(0,1fr)] items-center gap-x-2"
+                :class="sideRowClass('red')"
               >
                 <span class="row-span-2 self-start text-[#ff3333]">{{
                   t('JunglePathing.redTeam')
@@ -472,6 +501,7 @@
                 <div
                   v-if="popoverStats.earlyGank.byTeam.blueGames > 0"
                   class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+                  :class="sideRowClass('blue')"
                 >
                   <span class="text-[#40c1ff]">{{ t('JunglePathing.blueTeam') }}</span>
                   <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
@@ -492,6 +522,7 @@
                 <div
                   v-if="popoverStats.earlyGank.byTeam.redGames > 0"
                   class="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-2"
+                  :class="sideRowClass('red')"
                 >
                   <span class="text-[#ff3333]">{{ t('JunglePathing.redTeam') }}</span>
                   <span class="min-w-0 truncate whitespace-nowrap text-orange-400"
@@ -587,7 +618,8 @@ const {
   triggerMode = 'default',
   triggerText = '',
   ftueTarget = '',
-  customTabs = []
+  customTabs = [],
+  currentGameSide = null
 } = defineProps<{
   analysis: JunglePathingAnalysis
   showCopyAll?: boolean
@@ -595,6 +627,7 @@ const {
   triggerText?: string
   ftueTarget?: string
   customTabs?: JunglePathingCustomTab[]
+  currentGameSide?: 'blue' | 'red' | null
 }>()
 
 const { t } = useTranslation()
@@ -1077,19 +1110,109 @@ function earlyGankPositionsByTeam(
   return level === 3 ? byTeam.redLevel3KillPositions : byTeam.redLevel4KillPositions
 }
 
-const campMapPoints = computed(() => {
-  const allCamps = [...BLUE_SIDE_CAMPS, ...RED_SIDE_CAMPS]
-  return allCamps.map((c) => ({
-    ...mapToImagePosition(c.x, c.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
-    camp: c.camp
-  }))
-})
-
 const campMarkerColors: Record<JungleCamp, string> = {
   red: 'rgba(255,60,60,0.5)',
   blue: 'rgba(60,140,255,0.5)',
   wolves: 'rgba(180,180,180,0.5)',
   raptors: 'rgba(200,120,255,0.5)'
+}
+
+const blueSideTriangleFill = computed(() => {
+  if (currentGameSide === 'blue') {
+    return 'rgba(60,140,255,0.2)'
+  }
+  if (currentGameSide === 'red') {
+    return 'rgba(60,140,255,0.04)'
+  }
+  return 'rgba(60,140,255,0.08)'
+})
+
+const redSideTriangleFill = computed(() => {
+  if (currentGameSide === 'red') {
+    return 'rgba(255,60,60,0.2)'
+  }
+  if (currentGameSide === 'blue') {
+    return 'rgba(255,60,60,0.04)'
+  }
+  return 'rgba(255,60,60,0.08)'
+})
+
+function isHighlightedSide(side: 'blue' | 'red') {
+  return currentGameSide === side
+}
+
+function sideRowClass(side: 'blue' | 'red') {
+  if (!currentGameSide) {
+    return ''
+  }
+
+  if (isHighlightedSide(side)) {
+    return 'rounded-sm bg-amber-500/3 font-semibold text-black dark:bg-amber-300/5 dark:text-white'
+  }
+
+  return 'opacity-75'
+}
+
+const firstClearDisplaySide = computed<'blue' | 'red'>(() => {
+  if (currentGameSide) {
+    return currentGameSide
+  }
+
+  const fc = popoverStats.value.firstClearCamp
+  return fc.blueGames >= fc.redGames ? 'blue' : 'red'
+})
+
+const firstClearCampMapPoints = computed(() => {
+  const side = firstClearDisplaySide.value
+  const ownCampCoords = side === 'blue' ? BLUE_SIDE_CAMPS : RED_SIDE_CAMPS
+  const invadeCampCoords = side === 'blue' ? RED_SIDE_CAMPS : BLUE_SIDE_CAMPS
+  const ownCamps = side === 'blue' ? popoverStats.value.firstClearCamp.blue : popoverStats.value.firstClearCamp.red
+  const invadeCamps =
+    side === 'blue' ? popoverStats.value.firstClearCamp.blueInvade : popoverStats.value.firstClearCamp.redInvade
+  const ownStarts = sumCampCount(ownCamps)
+  const invadeStarts = sumCampCount(invadeCamps)
+  const totalStarts = ownStarts + invadeStarts
+
+  const ownPoints = ownCampCoords.map((camp) => {
+    const count = ownCamps[camp.camp] || 0
+    const pct = totalStarts > 0 ? count / totalStarts : 0
+    return {
+      ...mapToImagePosition(camp.x, camp.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
+      kind: 'own' as const,
+      camp: camp.camp,
+      pct,
+      size: 6 + pct * 16,
+      opacity: count > 0 ? 1 : 0.2
+    }
+  })
+
+  const invadePoints = invadeCampCoords
+    .map((camp) => {
+      const count = invadeCamps[camp.camp] || 0
+      const pct = totalStarts > 0 ? count / totalStarts : 0
+      return {
+        ...mapToImagePosition(camp.x, camp.y, CAMP_MAP_SIZE, CAMP_MAP_SIZE, 11),
+        kind: 'invade' as const,
+        camp: camp.camp,
+        pct,
+        size: 6 + pct * 16,
+        opacity: count > 0 ? 1 : 0
+      }
+    })
+    .filter((point) => point.opacity > 0)
+
+  return [...ownPoints, ...invadePoints]
+})
+
+function firstClearCampPointTitle(kind: 'own' | 'invade', camp: JungleCamp, pct: number) {
+  const pctValue = Math.round(pct * 100)
+  if (kind === 'invade') {
+    return `${campNames[camp]()} · ${t('JunglePathing.campInvadeStart', { pct: pctValue })}`
+  }
+  return t('JunglePathing.campStart', {
+    camp: campNames[camp](),
+    pct: pctValue
+  })
 }
 
 function formatStatsText(stats: JunglePathingStats, label: string): string {
@@ -1107,6 +1230,7 @@ function formatStatsText(stats: JunglePathingStats, label: string): string {
   const obj = stats.objectives
   const objParts: string[] = []
   objParts.push(t('JunglePathing.firstDragonRate', { pct: Math.round(obj.firstDragonRate * 100) }))
+  objParts.push(t('JunglePathing.soloDragonRate', { pct: Math.round(obj.soloDragonRate * 100) }))
   objParts.push(
     t('JunglePathing.avgDragons', { count: roundToTenth(obj.avgDragons) }) +
       (obj.avgFirstDragonTime !== null

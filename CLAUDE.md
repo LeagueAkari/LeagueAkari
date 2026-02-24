@@ -132,7 +132,7 @@ Defined in `electron.vite.config.ts`:
 
 ## Language
 
-Code comments and commit messages are primarily in **Chinese (zh-CN)**, with some English. The codebase is bilingual (zh-CN/en) for user-facing strings via i18n.
+Code comments are primarily in **Chinese (zh-CN)**. Commit messages should be written in **English**. The codebase is bilingual (zh-CN/en) for user-facing strings via i18n.
 
 ## Testing Expectations
 
@@ -145,7 +145,9 @@ If you add automated tests, colocate them with the feature or introduce a `tests
 
 ## Commit & PR Guidelines
 
-- Follow Conventional Commits used in history: `feat:`, `fix:`, `chore:`, `refactor:`, `style:` (optional scope is encouraged).
+- Follow Conventional Commits used in history: `feat:`, `fix:`, `chore:`, `refactor:`, `style:`.
+- Commit messages must be in English.
+- Include a scope whenever it is clear (for example: `feat(match-history): ...`).
 - Keep commits focused and avoid mixing refactors with behavior changes unless tightly related.
 - PRs should include: what changed, why it changed, how it was tested, linked issues, and screenshots for UI updates.
 - Call out persistence/schema/config impacts explicitly (for example TypeORM entity changes or settings migration effects).

@@ -47,6 +47,8 @@ export interface JunglePathingStats {
   objectives: {
     /** 一龙率 */
     firstDragonRate: number
+    /** 小龙单刷率（单刷小龙次数 / 小龙总击杀次数） */
+    soloDragonRate: number
     /** 场均小龙数 */
     avgDragons: number
     /** 首条小龙平均时间（秒），null=无数据 */
@@ -236,6 +238,7 @@ interface SingleGameAnalysis {
   objectives: {
     gotFirstDragon: boolean | null
     dragons: number
+    soloDragons: number
     firstDragonTime: number | null
     voidgrubs: number
     firstVoidgrubTime: number | null
@@ -327,6 +330,7 @@ function analyzeOneGame(
   // 野怪目标统计
   let firstDragonTeam: number | null = null
   let dragons = 0
+  let soloDragons = 0
   let firstDragonTime: number | null = null
   let voidgrubs = 0
   let firstVoidgrubTime: number | null = null
@@ -389,6 +393,7 @@ function analyzeOneGame(
           monsterType: string
           killerId: number
           killerTeamId?: number
+          assistingParticipantIds?: number[]
           timestamp: number
         }
 
@@ -405,6 +410,15 @@ function analyzeOneGame(
             }
             if (isOurTeam) {
               dragons++
+              const assistingParticipantIds = Array.isArray(monsterEvent.assistingParticipantIds)
+                ? monsterEvent.assistingParticipantIds
+                : []
+              if (
+                monsterEvent.killerId === participantId &&
+                assistingParticipantIds.length === 0
+              ) {
+                soloDragons++
+              }
               if (firstDragonTime === null) firstDragonTime = timeSec
             }
             break
@@ -541,6 +555,7 @@ function analyzeOneGame(
     objectives: {
       gotFirstDragon: firstDragonTeam !== null ? firstDragonTeam === teamId : null,
       dragons,
+      soloDragons,
       firstDragonTime,
       voidgrubs,
       firstVoidgrubTime,
@@ -595,6 +610,7 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
   let firstDragonCount = 0
   let firstDragonTotal = 0
   let totalDragons = 0
+  let totalSoloDragons = 0
   const firstDragonTimes: number[] = []
   let totalVoidgrubs = 0
   const firstVoidgrubTimes: number[] = []
@@ -654,6 +670,7 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
       if (obj.gotFirstDragon) firstDragonCount++
     }
     totalDragons += obj.dragons
+    totalSoloDragons += obj.soloDragons
     if (obj.firstDragonTime !== null) firstDragonTimes.push(obj.firstDragonTime)
     totalVoidgrubs += obj.voidgrubs
     if (obj.firstVoidgrubTime !== null) firstVoidgrubTimes.push(obj.firstVoidgrubTime)
@@ -685,6 +702,7 @@ function aggregateStats(results: SingleGameAnalysis[]): JunglePathingStats | nul
     avgBotGanks: totalBotGanks / gamesAnalyzed,
     objectives: {
       firstDragonRate: firstDragonTotal > 0 ? firstDragonCount / firstDragonTotal : 0,
+      soloDragonRate: totalDragons > 0 ? totalSoloDragons / totalDragons : 0,
       avgDragons: totalDragons / gamesAnalyzed,
       avgFirstDragonTime: avg(firstDragonTimes),
       avgVoidgrubs: totalVoidgrubs / gamesAnalyzed,

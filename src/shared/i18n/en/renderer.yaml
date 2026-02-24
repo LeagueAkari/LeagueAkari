@@ -2426,12 +2426,15 @@ JunglePathing:
   blueTeam: Blue
   redTeam: Red
   earlyGank: Early Ganks
+  firstClearOwnLegend: Normal start
+  firstClearInvadeLegend: Invade start
   level3KillLegend: Lv3 kills
   level4KillLegend: Lv4 kills
   level3Gank: 'Lv3 gank {{pct}}%'
   level4Gank: 'Lv4 gank {{pct}}%'
   objectives: Objectives
   firstDragonRate: '1st Drake {{pct}}%'
+  soloDragonRate: 'Solo Drake {{pct}}%'
   dragons: 'Drake {{count}}'
   voidgrubs: 'Grubs {{count}}'
   heralds: 'Herald {{count}}'

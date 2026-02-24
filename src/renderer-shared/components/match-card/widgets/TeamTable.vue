@@ -219,6 +219,7 @@
                 jungleAnalysisByPuuid[participant.puuid]
               "
               :analysis="jungleAnalysisByPuuid[participant.puuid]"
+              :current-game-side="currentTeamSide"
               trigger-mode="text"
               :trigger-text="t('JunglePathing.title')"
               :show-copy-all="false"
@@ -451,6 +452,18 @@ const tone = computed(() => {
 const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
+
+const currentTeamSide = computed<'blue' | 'red' | null>(() => {
+  if (teamIdentifier === 'TEAM-100') {
+    return 'blue'
+  }
+
+  if (teamIdentifier === 'TEAM-200') {
+    return 'red'
+  }
+
+  return null
+})
 
 const {
   basicInfo,
