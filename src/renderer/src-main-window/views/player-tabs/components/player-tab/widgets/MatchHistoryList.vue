@@ -45,6 +45,14 @@
         :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
         :jungle-pathing-data-source="junglePathingDataSource"
       />
+
+      <div
+        v-if="isLoading"
+        class="flex items-center justify-center gap-2 py-2 text-xs text-black/65 dark:text-white/50"
+      >
+        <NSpin :size="12" />
+        <span>{{ t('PlayerTab.loading') }}</span>
+      </div>
     </div>
   </div>
 </template>

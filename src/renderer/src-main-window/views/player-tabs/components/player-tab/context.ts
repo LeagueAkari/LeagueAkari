@@ -61,7 +61,7 @@ export type PlayerTabContext = {
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
-export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('PlayerTabContext')
+export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol.for('PlayerTabContext')
 
 export type PlayerTabEvents = {
   /**

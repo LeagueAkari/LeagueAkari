@@ -250,8 +250,63 @@ export function provideMatchHistory(props: {
       ? 500
       : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
 
+    const createEmptyPagedMatchHistory = () => {
+      return {
+        games: markRaw([] as LcuOrSgpGameSummary[]),
+        replayMetadata: {}, // must be shallow
+        details: {}, // must be shallow
+        detailsLoading: {}, // must be shallow
+        queryParams
+      } satisfies PagedMatchHistory
+    }
+
+    const appendGamesToCurrentList = (games: LcuOrSgpGameSummary[]) => {
+      if (!pagedMatchHistory.value || games.length === 0) {
+        return
+      }
+
+      pagedMatchHistory.value.games = markRaw([...pagedMatchHistory.value.games, ...games])
+    }
+
+    const appendLcuCompletedGames = async (games: LcuOrSgpGameSummary[]) => {
+      let nextAppendIndex = 0
+      const completedGames = new Map<number, LcuOrSgpGameSummary>()
+
+      const flushReadyGames = () => {
+        const toAppend: LcuOrSgpGameSummary[] = []
+
+        while (completedGames.has(nextAppendIndex)) {
+          toAppend.push(completedGames.get(nextAppendIndex)!)
+          completedGames.delete(nextAppendIndex)
+          nextAppendIndex++
+        }
+
+        if (toAppend.length > 0) {
+          appendGamesToCurrentList(toAppend)
+        }
+      }
+
+      await Promise.all(
+        games.map(async (g, index) => {
+          if (g.source !== 'lcu') {
+            completedGames.set(index, g)
+            flushReadyGames()
+            return
+          }
+
+          const complete = await toCompleteLcuGame(g.data)
+          const completeGame = markRaw(complete) as LcuOrSgpGameSummary
+
+          pts.detailedGameLruMap.set(`lcu:${complete.gameId}`, completeGame)
+          completedGames.set(index, completeGame)
+          flushReadyGames()
+        })
+      )
+    }
+
     const collectVisibleGames = async (
-      fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>
+      fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>,
+      onChunkCollected?: (games: LcuOrSgpGameSummary[]) => void
     ) => {
       const games: LcuOrSgpGameSummary[] = []
 
@@ -267,6 +322,7 @@ export function provideMatchHistory(props: {
 
         let hasTimeInRangeGameInChunk = false
         let hasTimeOutOfRangeGameInChunk = false
+        const collectedInChunk: LcuOrSgpGameSummary[] = []
 
         for (const g of chunk) {
           if (!g || typeof g.gameId !== 'number') {
@@ -332,10 +388,15 @@ export function provideMatchHistory(props: {
           }
 
           games.push(g)
+          collectedInChunk.push(g)
 
           if (!isTimeRangeMode && games.length >= visibleCount) {
             break
           }
+        }
+
+        if (collectedInChunk.length > 0) {
+          onChunkCollected?.(collectedInChunk)
         }
 
         rawCursor += chunk.length
@@ -369,6 +430,8 @@ export function provideMatchHistory(props: {
     }
 
     try {
+      pagedMatchHistory.value = createEmptyPagedMatchHistory()
+
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
         // SGP API 需要 token 就绪
         if (!sgps.isTokenReady) {
@@ -405,15 +468,11 @@ export function provideMatchHistory(props: {
           shouldFilterByWinLoss ||
           shouldFilterBySummoners
         const games = shouldCollectGames
-          ? await collectVisibleGames(fetchSgpChunk)
+          ? await collectVisibleGames(fetchSgpChunk, appendGamesToCurrentList)
           : await fetchSgpChunk(visibleStartIndex, visibleCount)
 
-        pagedMatchHistory.value = {
-          games: markRaw(games),
-          replayMetadata: {}, // must be shallow
-          details: {}, // must be shallow
-          detailsLoading: {}, // must be shallow
-          queryParams
+        if (!shouldCollectGames) {
+          appendGamesToCurrentList(games)
         }
       } else {
         const fetchLcuSummaryChunk = async (startIndex: number, count: number) => {
@@ -438,34 +497,10 @@ export function provideMatchHistory(props: {
           ? await collectVisibleGames(fetchLcuSummaryChunk)
           : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
 
-        const games = await Promise.all(
-          selectedGames.map(async (g) => {
-            if (g.source !== 'lcu') {
-              return g
-            }
-
-            const complete = await toCompleteLcuGame(g.data)
-            pts.detailedGameLruMap.set(`lcu:${complete.gameId}`, markRaw(complete))
-            return markRaw(complete) as LcuOrSgpGameSummary
-          })
-        )
-
-        games.forEach((g) => {
-          if (g.source === 'lcu') {
-            pts.detailedGameLruMap.set(`lcu:${g.gameId}`, markRaw(g))
-          }
-        })
-
-        pagedMatchHistory.value = {
-          games: markRaw(games),
-          replayMetadata: {}, // must be shallow
-          details: {}, // must be shallow
-          detailsLoading: {}, // must be shallow
-          queryParams
-        }
+        await appendLcuCompletedGames(selectedGames)
       }
 
-      if (!isCrossRegion.value) {
+      if (!isCrossRegion.value && pagedMatchHistory.value.games.length > 0) {
         loadReplayMetadata(pagedMatchHistory.value.games)
       }
     } catch (error: any) {
