@@ -1010,6 +1010,7 @@ RankedTable:
   ratedRating: 分数
   wins: 胜场
   losses: 负场
+  winRate: 胜率
   previousSeasonEndTier: 上赛季段位
   previousSeasonHighestTier: 上赛季最高段位
   highestTier: 历史最高段位
@@ -2088,8 +2089,9 @@ PlayerTab:
   byCount: 按局数
   byTime: 按时间
   filter:
-    title: 页内筛选
+    title: 筛选
     reset: 重置条件
+    sameChampionApplied: '已按英雄筛选：{{champion}}'
     winLoss: 胜负
     all: 全部
     win: 胜利
@@ -2482,6 +2484,7 @@ PlayerInfoCard:
   winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
   kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
+  sameChampionHistory: 英雄战绩
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
   teamDamageShare: 伤害 {{rate}}%
   teamDamageSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%

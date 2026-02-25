@@ -17,7 +17,11 @@
     />
 
     <div class="mb-1 flex">
-      <div class="relative mr-2">
+      <div
+        class="relative mr-2 cursor-pointer transition-[filter] hover:brightness-110"
+        :title="t('PlayerInfoCard.sameChampionHistory')"
+        @click.stop="navigateToChampionMatchHistory"
+      >
         <ChampionIcon
           :champion-id="championId || -1"
           round
@@ -36,40 +40,50 @@
       <!-- summoner info (name & ranked) -->
       <div class="flex w-0 flex-1 flex-col justify-center gap-1">
         <!-- name -->
-        <div
-          class="cursor-pointer transition-[filter] hover:brightness-125"
-          @click="() => navigateToSummonerByPuuid(puuid)"
-        >
-          <NPopover
-            :keep-alive-on-hover="false"
-            :delay="50"
-            :disabled="premadeTeamId === undefined"
+        <div class="flex items-center gap-1">
+          <div
+            class="min-w-0 flex-1 cursor-pointer transition-[filter] hover:brightness-125"
+            @click="() => navigateToSummonerByPuuid(puuid)"
           >
-            <template #trigger>
-              <div class="w-fit max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                <span
-                  class="text-[13px] font-bold text-black/80 dark:text-white/80"
-                  :style="{
-                    color: premadeTeamId ? premadeColors[premadeTeamId]?.foregroundColor : undefined
-                  }"
-                  >{{
-                    masked(
-                      summoner?.gameName || summoner?.displayName || '—',
-                      name(championId || -1)
-                    )
-                  }}</span
-                >
-                <span
-                  v-if="!as.settings.streamerMode"
-                  class="ml-1 text-xs text-gray-500 dark:text-gray-400"
-                  >#{{ summoner?.tagLine || '—' }}</span
-                >
+            <NPopover
+              :keep-alive-on-hover="false"
+              :delay="50"
+              :disabled="premadeTeamId === undefined"
+            >
+              <template #trigger>
+                <div class="w-fit max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span
+                    class="text-[13px] font-bold text-black/80 dark:text-white/80"
+                    :style="{
+                      color: premadeTeamId ? premadeColors[premadeTeamId]?.foregroundColor : undefined
+                    }"
+                    >{{
+                      masked(
+                        summoner?.gameName || summoner?.displayName || '—',
+                        name(championId || -1)
+                      )
+                    }}</span
+                  >
+                  <span
+                    v-if="!as.settings.streamerMode"
+                    class="ml-1 text-xs text-gray-500 dark:text-gray-400"
+                    >#{{ summoner?.tagLine || '—' }}</span
+                  >
+                </div>
+              </template>
+              <div class="max-w-[200px] text-xs">
+                {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
               </div>
-            </template>
-            <div class="max-w-[200px] text-xs">
-              {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
-            </div>
-          </NPopover>
+            </NPopover>
+          </div>
+          <button
+            v-if="championId && championId > 0"
+            class="shrink-0 cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
+            :title="t('PlayerInfoCard.sameChampionHistory')"
+            @click.stop="navigateToChampionMatchHistory"
+          >
+            {{ t('PlayerInfoCard.sameChampionHistory') }}
+          </button>
         </div>
 
         <!-- ranked -->
@@ -536,8 +550,13 @@ const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 
-const { mergedPremadeTeams, kdaOutliers, previewGame, navigateToSummonerByPuuid } =
-  useOngoingGamePanel()
+const {
+  mergedPremadeTeams,
+  kdaOutliers,
+  previewGame,
+  navigateToSummonerByPuuid,
+  navigateToSummonerByPuuidWithChampion
+} = useOngoingGamePanel()
 
 const summoner = computed(() => ogs.summoner[puuid])
 const rankedStats = computed(() => ogs.rankedStats[puuid])
@@ -551,6 +570,15 @@ const championId = computed(() => ogs.championSelections?.[puuid])
 const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
+
+const navigateToChampionMatchHistory = () => {
+  if (championId.value && championId.value > 0) {
+    navigateToSummonerByPuuidWithChampion(puuid, championId.value)
+    return
+  }
+
+  navigateToSummonerByPuuid(puuid)
+}
 
 const as = useAppCommonStore()
 

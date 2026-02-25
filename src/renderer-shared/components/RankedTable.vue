@@ -32,6 +32,11 @@
         <th
           class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
         >
+          {{ t('RankedTable.winRate') }}
+        </th>
+        <th
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
           {{ t('RankedTable.previousSeasonEndTier') }}
         </th>
         <th
@@ -80,6 +85,11 @@
           class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
         >
           {{ formatLosses(r.losses) }}
+        </td>
+        <td
+          class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
+        >
+          {{ formatWinRate(r) }}
         </td>
         <td
           class="border border-black/20 px-1 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
@@ -246,6 +256,23 @@ const formatTierDivision = (entry: RankedEntry, type: string) => {
 
 const formatLosses = (losses: number) => {
   return losses || '—'
+}
+
+const formatWinRate = (entry: RankedEntry) => {
+  const isUnavailable =
+    entry.queueType === 'CHERRY'
+      ? entry.ratedTier === 'NONE'
+      : !entry.tier || entry.tier === 'NA'
+  if (isUnavailable) {
+    return '—'
+  }
+
+  const total = entry.wins + entry.losses
+  if (total <= 0) {
+    return '—'
+  }
+
+  return `${Math.round((entry.wins / total) * 100)}%`
 }
 </script>
 

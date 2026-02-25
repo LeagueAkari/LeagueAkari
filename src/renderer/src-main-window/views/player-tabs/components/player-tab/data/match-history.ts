@@ -9,6 +9,8 @@ import {
   LcuOrSgpGameDetails,
   LcuOrSgpGameSummary
 } from '@shared/data-adapter/wrapper'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { Game } from '@shared/types/league-client/match-history'
 import { ReplayDownloadProgress, ReplayMetadata } from '@shared/types/league-client/replays'
@@ -50,6 +52,14 @@ function toGameCreationTimestamp(game: LcuOrSgpGameSummary): number {
   }
 
   return game.data.gameCreation
+}
+
+function normalizeChampionFilter(ids: number[]): number[] {
+  return [...new Set(ids.filter((id) => Number.isInteger(id) && id > 0))].sort((a, b) => a - b)
+}
+
+function normalizeSummonerFilter(puuids: string[]): string[] {
+  return [...new Set(puuids.filter((puuid) => !!puuid))].sort()
 }
 
 export interface PagedMatchHistory {
@@ -94,6 +104,9 @@ export function provideMatchHistory(props: {
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
+  winLoss?: MaybeRefOrGetter<'all' | 'win' | 'loss'>
+  selectedChampions?: MaybeRefOrGetter<number[]>
+  selectedSummoners?: MaybeRefOrGetter<string[]>
   showPractice?: MaybeRefOrGetter<boolean>
   showIrregularGames?: MaybeRefOrGetter<boolean>
 }) {
@@ -101,6 +114,9 @@ export function provideMatchHistory(props: {
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
+  const winLoss = toRef(props.winLoss ?? 'all')
+  const selectedChampions = toRef(props.selectedChampions ?? [])
+  const selectedSummoners = toRef(props.selectedSummoners ?? [])
   const showPractice = toRef(props.showPractice ?? false)
   const showIrregularGames = toRef(props.showIrregularGames ?? false)
 
@@ -116,11 +132,21 @@ export function provideMatchHistory(props: {
 
   const isLoading = ref(false)
   const pagedMatchHistory = ref<PagedMatchHistory | null>(null)
+  const pendingLoadParams = ref<MatchHistoryQueryState | null>(null)
 
   const notification = useNotification()
 
   const lcuLoadDetailedGameQueue = new PQueue({ concurrency: 10 })
   const lcuReplayMetadataQueue = new PQueue({ concurrency: 10 })
+
+  const getDefaultQueryParams = (): MatchHistoryQueryState => {
+    const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
+    return {
+      count: pts.frontendSettings.loadCount,
+      timeRange: pts.frontendSettings.defaultMatchHistoryTimeRange,
+      tag: defaultTag.startsWith('<akari:') ? undefined : defaultTag
+    }
+  }
 
   const sgpApiAvailable = computed(() => {
     return (
@@ -175,7 +201,13 @@ export function provideMatchHistory(props: {
   }
 
   const loadMatchHistory = async (params: MatchHistoryQueryState = {}) => {
-    if (isLoading.value) return
+    if (isLoading.value) {
+      pendingLoadParams.value = {
+        ...(pendingLoadParams.value ?? pagedMatchHistory.value?.queryParams ?? getDefaultQueryParams()),
+        ...params
+      }
+      return
+    }
 
     lcuLoadDetailedGameQueue.clear()
     isLoading.value = true
@@ -195,6 +227,13 @@ export function provideMatchHistory(props: {
     const visibleCount = isTimeRangeMode
       ? Number.POSITIVE_INFINITY
       : (queryParams.count ?? pts.frontendSettings.loadCount)
+    const shouldFilterByWinLoss = winLoss.value !== 'all'
+    const selectedChampionSet = new Set<number>(normalizeChampionFilter(selectedChampions.value))
+    const shouldFilterByChampion = selectedChampionSet.size > 0
+    const selectedSummonerSet = new Set<string>(normalizeSummonerFilter(selectedSummoners.value))
+    const shouldFilterBySummoners = selectedSummonerSet.size > 0
+    const needsParticipantFilters =
+      shouldFilterByChampion || shouldFilterByWinLoss || shouldFilterBySummoners
     const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
     const shouldFilterByTimeRange = isTimeRangeMode
     const timeRangeStartMs = shouldFilterByTimeRange
@@ -203,7 +242,11 @@ export function provideMatchHistory(props: {
     const pageFetchSize = isTimeRangeMode
       ? Math.max(100, pts.frontendSettings.loadCount)
       : Math.max(visibleCount, pts.frontendSettings.loadCount)
-    const maxChunkRequests = isTimeRangeMode
+    const maxChunkRequests =
+      isTimeRangeMode ||
+      shouldFilterByChampion ||
+      shouldFilterByWinLoss ||
+      shouldFilterBySummoners
       ? 500
       : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
 
@@ -248,6 +291,39 @@ export function provideMatchHistory(props: {
             }
 
             hasTimeInRangeGameInChunk = true
+          }
+
+          let participants: ReturnType<typeof toParticipants> | null = null
+          let selfParticipant: ReturnType<typeof toParticipants>[number] | undefined = undefined
+
+          if (needsParticipantFilters) {
+            participants = toParticipants(g, toBasicInfo(g))
+            selfParticipant = participants.find((p) => p.puuid === puuid.value)
+          }
+
+          if ((shouldFilterByChampion || shouldFilterByWinLoss) && !selfParticipant) {
+            continue
+          }
+
+          if (shouldFilterByChampion && selfParticipant) {
+            if (!selectedChampionSet.has(selfParticipant.championId)) {
+              continue
+            }
+          }
+
+          if (shouldFilterByWinLoss && selfParticipant && selfParticipant.winResult !== winLoss.value) {
+            continue
+          }
+
+          if (shouldFilterBySummoners && participants) {
+            const participantPuuidSet = new Set<string>(participants.map((p) => p.puuid))
+            const containsAllSelectedSummoners = [...selectedSummonerSet].every((targetPuuid) =>
+              participantPuuidSet.has(targetPuuid)
+            )
+
+            if (!containsAllSelectedSummoners) {
+              continue
+            }
           }
 
           if (!isTimeRangeMode && visibleSkipped < visibleStartIndex) {
@@ -322,7 +398,12 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
         }
 
-        const shouldCollectGames = hideByVisibilityOptions || shouldFilterByTimeRange
+        const shouldCollectGames =
+          hideByVisibilityOptions ||
+          shouldFilterByTimeRange ||
+          shouldFilterByChampion ||
+          shouldFilterByWinLoss ||
+          shouldFilterBySummoners
         const games = shouldCollectGames
           ? await collectVisibleGames(fetchSgpChunk)
           : await fetchSgpChunk(visibleStartIndex, visibleCount)
@@ -347,7 +428,12 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
         }
 
-        const shouldCollectGames = hideByVisibilityOptions || shouldFilterByTimeRange
+        const shouldCollectGames =
+          hideByVisibilityOptions ||
+          shouldFilterByTimeRange ||
+          shouldFilterByChampion ||
+          shouldFilterByWinLoss ||
+          shouldFilterBySummoners
         const selectedGames = shouldCollectGames
           ? await collectVisibleGames(fetchLcuSummaryChunk)
           : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
@@ -391,6 +477,12 @@ export function provideMatchHistory(props: {
       log.error(componentName, error)
     } finally {
       isLoading.value = false
+
+      const nextLoadParams = pendingLoadParams.value
+      if (nextLoadParams) {
+        pendingLoadParams.value = null
+        void loadMatchHistory(nextLoadParams)
+      }
     }
   }
 
@@ -463,24 +555,30 @@ export function provideMatchHistory(props: {
         return
       }
 
-      const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
-      loadMatchHistory({
-        count: pts.frontendSettings.loadCount,
-        timeRange: pts.frontendSettings.defaultMatchHistoryTimeRange,
-        tag: defaultTag.startsWith('<akari:') ? undefined : defaultTag
-      })
+      loadMatchHistory(getDefaultQueryParams())
     },
     { immediate: true }
   )
 
   watch(
-    () => [showPractice.value, showIrregularGames.value],
-    () => {
-      if (!pagedMatchHistory.value) {
+    () =>
+      [
+        winLoss.value,
+        showPractice.value,
+        showIrregularGames.value,
+        normalizeChampionFilter(selectedChampions.value).join(','),
+        normalizeSummonerFilter(selectedSummoners.value).join(',')
+      ].join('|'),
+    (current, previous) => {
+      if (current === previous) {
         return
       }
 
-      loadMatchHistory(pagedMatchHistory.value.queryParams)
+      const baseQueryParams = pagedMatchHistory.value?.queryParams ?? getDefaultQueryParams()
+      loadMatchHistory({
+        ...baseQueryParams,
+        startIndex: 0
+      })
     }
   )
 

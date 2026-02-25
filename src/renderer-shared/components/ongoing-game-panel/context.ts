@@ -23,6 +23,7 @@ export type OngoingGamePanelContext = {
   kdaOutliers: Readonly<Ref<Record<string, 'over' | 'below'>>>
 
   navigateToSummonerByPuuid: (puuid: string) => void
+  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
@@ -52,6 +53,7 @@ export function provideOngoingGamePanel(props: {
   }>
 
   navigateToSummonerByPuuid: (puuid: string) => void
+  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }) {
   const ogs = useOngoingGameStore()
@@ -92,6 +94,7 @@ export function provideOngoingGamePanel(props: {
     kdaOutliers,
 
     navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,
+    navigateToSummonerByPuuidWithChampion: props.navigateToSummonerByPuuidWithChampion,
     previewGame: props.previewGame
   })
 }

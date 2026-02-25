@@ -13,6 +13,7 @@
       :content-width="contentWidth"
       :content-height="contentHeight"
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
+      @navigate-to-summoner-by-puuid-with-champion="navigateToTabByPuuidWithChampionFilter"
       @preview-game="handlePreviewGame"
     />
   </div>
@@ -24,6 +25,7 @@ import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/Ong
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
   FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME,
   getFtueTargetSelector
@@ -32,11 +34,13 @@ import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { ref, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import { useAppContext } from '@main-window/context'
 import { FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD } from '@main-window/shards/ftue/keys'
 import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 const { contentWidth, contentHeight } = useAppContext()
 
@@ -44,11 +48,34 @@ const pt = useInstance(PlayerTabsRenderer)
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
+const sgps = useSgpStore()
+const pts = usePlayerTabsStore()
 const ftue = useFtueStore()
 const route = useRoute()
+const router = useRouter()
 const { t } = useTranslation()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
+
+const navigateToTabByPuuidWithChampionFilter = (puuid: string, championId: number) => {
+  if (!puuid || !championId || Number.isNaN(championId)) {
+    navigateToTabByPuuid(puuid)
+    return
+  }
+
+  const sgpServerId = sgps.availability.sgpServerId
+  if (!sgpServerId) {
+    navigateToTabByPuuid(puuid)
+    return
+  }
+
+  const tabId = pt.toUnionId(sgpServerId, puuid)
+  pts.setPendingChampionFilter(tabId, championId)
+  router.replace({
+    name: 'player-tabs',
+    params: { puuid, sgpServerId }
+  })
+}
 
 const showPreviewModal = ref(false)
 const previewingGame = shallowRef({

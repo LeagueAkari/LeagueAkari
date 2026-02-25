@@ -88,6 +88,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   navigateToSummonerByPuuid: [puuid: string]
+  navigateToSummonerByPuuidWithChampion: [puuid: string, championId: number]
   previewGame: [summary: LcuOrSgpGameSummary | number, puuid?: string]
 }>()
 
@@ -239,6 +240,9 @@ provideOngoingGamePanel({
 
   navigateToSummonerByPuuid: (puuid: string) => {
     emits('navigateToSummonerByPuuid', puuid)
+  },
+  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => {
+    emits('navigateToSummonerByPuuidWithChampion', puuid, championId)
   },
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
     emits('previewGame', summary, puuid)

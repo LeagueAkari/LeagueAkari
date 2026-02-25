@@ -181,7 +181,18 @@
             :keep-alive-on-hover="false"
           >
             <template #trigger>
-              <div class="relative h-5 w-5">
+              <div
+                class="relative h-5 w-5 cursor-pointer rounded transition-[filter] hover:brightness-110"
+                :class="{
+                  'ring-1 ring-sky-500/55 dark:ring-sky-400/50': selectedChampionIdSet.has(c.id)
+                }"
+                :title="
+                  t('PlayerTab.filter.sameChampionApplied', {
+                    champion: lcs.gameData.champions[c.id]?.name || `#${c.id}`
+                  })
+                "
+                @click.stop="applyChampionFilter(c.id)"
+              >
                 <LcuImage class="h-full w-full" :src="championIconUri(c.id)" />
                 <div
                   class="absolute -right-0.5 -bottom-1 rounded-sm bg-black/60 px-0.5 text-[10px] text-gray-200"
@@ -220,7 +231,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { analyzeMatchHistory } from '@shared/data-adapter/analysis/players'
 import { useTranslation } from 'i18next-vue'
-import { NPopover } from 'naive-ui'
+import { NPopover, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 
 import { usePlayerTab } from '../context'
@@ -230,13 +241,14 @@ import { useMatchHistoryFilters } from '../data/match-history-filters'
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
 const { t } = useTranslation()
+const message = useMessage()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
 const { pagedMatchHistory } = useMatchHistory()
-const { filters } = useMatchHistoryFilters()
+const { filters, setFilters } = useMatchHistoryFilters()
 
 const analysis = computed(() => {
   if (!pagedMatchHistory.value?.games) {
@@ -296,4 +308,19 @@ const frequentlyUsedChampions = computed(() => {
       return b.wins - a.wins
     })
 })
+
+const selectedChampionIdSet = computed(() => new Set(filters.value.selectedChampions))
+
+const applyChampionFilter = (championId: number) => {
+  setFilters({
+    ...filters.value,
+    selectedChampions: [championId]
+  })
+
+  const championName = lcs.gameData.champions?.[championId]?.name || `#${championId}`
+  message.info(t('PlayerTab.filter.sameChampionApplied', { champion: championName }), {
+    duration: 2400,
+    keepAliveOnHover: true
+  })
+}
 </script>

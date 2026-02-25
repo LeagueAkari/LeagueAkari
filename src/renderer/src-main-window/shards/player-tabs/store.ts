@@ -79,6 +79,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
 
   const tabs = ref<TabState[]>([])
   const currentTabId = ref<string | null>(null)
+  const pendingChampionFilterByTab = ref<Record<string, number>>({})
 
   const currentTab = computed(() => {
     return tabs.value.find((t) => t.id === currentTabId.value) || null
@@ -192,10 +193,35 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     }
   }
 
+  const setPendingChampionFilter = (tabId: string, championId: number) => {
+    if (!tabId || !Number.isInteger(championId) || championId <= 0) {
+      return
+    }
+
+    pendingChampionFilterByTab.value = {
+      ...pendingChampionFilterByTab.value,
+      [tabId]: championId
+    }
+  }
+
+  const consumePendingChampionFilter = (tabId: string) => {
+    const championId = pendingChampionFilterByTab.value[tabId]
+    if (championId === undefined) {
+      return null
+    }
+
+    const next = { ...pendingChampionFilterByTab.value }
+    delete next[tabId]
+    pendingChampionFilterByTab.value = next
+
+    return championId
+  }
+
   return {
     frontendSettings,
 
     detailedGameLruMap,
+    pendingChampionFilterByTab,
 
     tabs,
     currentTabId,
@@ -212,6 +238,8 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     canCloseOtherTabs,
     canCloseTabsToTheRight,
     moveTabBefore,
+    setPendingChampionFilter,
+    consumePendingChampionFilter,
 
     updateTabData
   }
