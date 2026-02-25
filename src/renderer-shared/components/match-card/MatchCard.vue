@@ -1,6 +1,9 @@
 <template>
   <div class="relative w-full min-w-[700px]">
-    <MatchCardOverview @toggle-expand="isExpanded = !isExpanded" />
+    <MatchCardOverview
+      @toggle-expand="isExpanded = !isExpanded"
+      @filter-by-champion="(championId) => emits('filterByChampion', championId)"
+    />
 
     <KeepAlive>
       <MatchCardDetails v-if="!puuid || isExpanded" />
@@ -50,6 +53,7 @@ const emits = defineEmits<{
   downloadReplay: [gameId: number]
   watchReplay: [gameId: number]
   navigateToSummonerByPuuid: [puuid: string, setCurrent?: boolean]
+  filterByChampion: [championId: number]
 }>()
 
 const isExpanded = defineModel<boolean>('isExpanded', { required: false, default: false })

@@ -12,7 +12,11 @@
         <div class="flex h-12 gap-2">
           <!-- champion icon -->
           <div class="flex w-[70px] shrink-0 items-center">
-            <div class="relative" :class="{ contents: !shouldShowCrown && !participant.position }">
+            <div
+              class="relative cursor-pointer transition-[filter] hover:brightness-110"
+              :class="{ contents: !shouldShowCrown && !participant.position }"
+              @click.stop="$emit('filter-by-champion', participant.championId)"
+            >
               <ChampionIcon
                 :champion-id="participant.championId"
                 class="relative -left-[2px] box-border size-11 rounded-lg border-2 border-solid"
@@ -411,6 +415,7 @@ import RadarChart from './widgets/RadarChart.vue'
 
 defineEmits<{
   'toggle-expand': []
+  'filter-by-champion': [championId: number]
 }>()
 
 const {

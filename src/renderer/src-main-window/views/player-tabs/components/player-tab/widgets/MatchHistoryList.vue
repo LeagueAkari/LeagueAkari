@@ -44,6 +44,7 @@
         :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
         :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
         :jungle-pathing-data-source="junglePathingDataSource"
+        @filter-by-champion="applyChampionFilter"
       />
 
       <div
@@ -122,6 +123,23 @@ const junglePathingDataSource = computed(() => {
   }
 })
 
+const applyChampionFilter = (championId: number) => {
+  if (!Number.isInteger(championId) || championId <= 0) {
+    return
+  }
+
+  setFilters({
+    ...filters.value,
+    selectedChampions: [championId]
+  })
+
+  const championName = lcs.gameData.champions?.[championId]?.name || `#${championId}`
+  message.info(t('PlayerTab.filter.sameChampionApplied', { champion: championName }), {
+    duration: 2400,
+    keepAliveOnHover: true
+  })
+}
+
 watch(
   () => pts.pendingChampionFilterByTab[id.value],
   (pendingChampionId) => {
@@ -129,16 +147,7 @@ watch(
       return
     }
 
-    setFilters({
-      ...filters.value,
-      selectedChampions: [pendingChampionId]
-    })
-
-    const championName = lcs.gameData.champions?.[pendingChampionId]?.name || `#${pendingChampionId}`
-    message.info(t('PlayerTab.filter.sameChampionApplied', { champion: championName }), {
-      duration: 2400,
-      keepAliveOnHover: true
-    })
+    applyChampionFilter(pendingChampionId)
 
     pts.consumePendingChampionFilter(id.value)
   },
