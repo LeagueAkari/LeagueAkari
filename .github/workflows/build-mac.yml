@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 jobs:
@@ -45,12 +45,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: macos-build
-          path: |
+          tag_name: ci-${{ github.sha }}
+          name: CI Build ${{ github.ref_name }} @ ${{ github.sha }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          generate_release_notes: false
+          overwrite_files: true
+          files: |
             dist/*.dmg
             dist/*.zip
-          if-no-files-found: error
-          retention-days: 1
+            dist/*.yml
+            dist/*.blockmap
+          fail_on_unmatched_files: true
