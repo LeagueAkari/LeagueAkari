@@ -32,7 +32,7 @@
 
 ::-webkit-scrollbar-thumb {
   background-color: #4c4c4c;
-  border-radius: 0px;
+  border-radius: 2px;
 
   &:hover {
     background-color: #626262;

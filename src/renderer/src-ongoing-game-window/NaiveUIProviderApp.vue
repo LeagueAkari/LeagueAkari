@@ -2,16 +2,18 @@
   <NConfigProvider
     :theme-overrides="themeOverrides"
     :theme="naiveUiTheme"
-    :locale="naiveUiLocale"
+    :locale="naiveUiLocale.locale"
     abstract
     inline-theme-disabled
-    :date-locale="dateZhCN"
+    :date-locale="naiveUiLocale.dateLocale"
   >
-    <NNotificationProvider>
-      <NMessageProvider>
-        <App />
-      </NMessageProvider>
-    </NNotificationProvider>
+    <NMessageProvider placement="bottom">
+      <NNotificationProvider>
+        <NDialogProvider>
+          <App />
+        </NDialogProvider>
+      </NNotificationProvider>
+    </NMessageProvider>
   </NConfigProvider>
 </template>
 
@@ -21,6 +23,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,
   NConfigProvider,
+  NDialogProvider,
   NMessageProvider,
   NNotificationProvider,
   darkTheme,

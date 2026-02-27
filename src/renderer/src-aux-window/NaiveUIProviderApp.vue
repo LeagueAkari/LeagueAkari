@@ -2,10 +2,10 @@
   <NConfigProvider
     :theme-overrides="themeOverrides"
     :theme="naiveUiTheme"
-    :locale="naiveUiLocale"
+    :locale="naiveUiLocale.locale"
     abstract
     inline-theme-disabled
-    :date-locale="dateZhCN"
+    :date-locale="naiveUiLocale.dateLocale"
   >
     <NMessageProvider placement="bottom">
       <NNotificationProvider>
