@@ -284,39 +284,39 @@ watch(
   font-size: 14px;
 }
 
-[data-theme-id='graphite'] {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
   .sidebar-menu .indicator-rail {
     &::before,
     &::after {
-      background-color: #4ec3ff;
+      background-color: var(--la-color-link);
     }
   }
 
   .menu-item {
     .menu-item__icon,
     .menu-item__label {
-      color: rgba(158, 178, 198, 0.86);
+      color: color-mix(in oklch, var(--la-color-text-themed) 84%, transparent);
     }
 
     &:hover:not(.disabled) {
       .menu-item__icon,
       .menu-item__label {
-        color: rgba(221, 231, 241, 1);
+        color: var(--la-color-text-themed);
       }
 
       .menu-item__inner {
-        background-color: rgba(78, 195, 255, 0.1);
+        background-color: color-mix(in oklch, var(--la-color-link) 12%, transparent);
       }
     }
 
     &.active {
       .menu-item__icon,
       .menu-item__label {
-        color: rgba(221, 231, 241, 1);
+        color: var(--la-color-text-themed);
       }
 
       .menu-item__inner {
-        background-color: rgba(78, 195, 255, 0.14);
+        background-color: color-mix(in oklch, var(--la-color-link) 18%, transparent);
       }
     }
   }

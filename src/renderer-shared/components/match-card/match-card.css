@@ -34,11 +34,7 @@
   );
 }
 
-[data-theme-id='graphite'] .shadow-win,
-[data-theme-id='sakura'] .shadow-win,
-[data-theme-id='mint'] .shadow-win,
-[data-theme-id='aurora'] .shadow-win,
-[data-theme-id='butter'] .shadow-win {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) .shadow-win {
   background-color: var(--la-match-win-solid);
   background: radial-gradient(
     96% 168% at 0% 0%,
@@ -47,11 +43,7 @@
   );
 }
 
-[data-theme-id='graphite'] .shadow-loss,
-[data-theme-id='sakura'] .shadow-loss,
-[data-theme-id='mint'] .shadow-loss,
-[data-theme-id='aurora'] .shadow-loss,
-[data-theme-id='butter'] .shadow-loss {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) .shadow-loss {
   background-color: var(--la-match-loss-solid);
   background: radial-gradient(
     96% 168% at 0% 0%,
@@ -60,11 +52,7 @@
   );
 }
 
-[data-theme-id='graphite'] .shadow-remake,
-[data-theme-id='sakura'] .shadow-remake,
-[data-theme-id='mint'] .shadow-remake,
-[data-theme-id='aurora'] .shadow-remake,
-[data-theme-id='butter'] .shadow-remake {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) .shadow-remake {
   background-color: var(--la-match-neutral-solid);
   background: radial-gradient(
     96% 168% at 0% 0%,

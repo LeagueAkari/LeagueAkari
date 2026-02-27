@@ -544,6 +544,12 @@ import {
   useMainWindowStore,
   useWindowManagerStore
 } from '@renderer-shared/shards/window-manager/store'
+import {
+  AppThemeId,
+  DAISY_DARK_THEME_IDS,
+  DAISY_LIGHT_THEME_IDS,
+  getThemeColorTheme
+} from '@shared/types/app-theme'
 import { formatSeconds } from '@shared/utils/format'
 import { Github as GithubIcon } from '@vicons/fa'
 import { useMediaQuery } from '@vueuse/core'
@@ -622,7 +628,19 @@ const lolSourceOptions = [
   { label: 'LCU', value: 'lcu' }
 ]
 
+const themeToneLabel = (id: AppThemeId) => {
+  const colorTheme = getThemeColorTheme(id)
+  return t(`AppSettings.basic.theme.tone.${colorTheme}`)
+}
+
+const themeLabel = (id: AppThemeId) => {
+  return `${t(`AppSettings.basic.theme.options.${id}`, { defaultValue: id })} · ${themeToneLabel(id)}`
+}
+
 const themes = computed(() => {
+  const brightCoreThemes: AppThemeId[] = ['light', 'sakura', 'butter', 'mint']
+  const darkCoreThemes: AppThemeId[] = ['dark', 'graphite', 'aurora']
+
   return [
     {
       type: 'group',
@@ -632,24 +650,27 @@ const themes = computed(() => {
     },
     {
       type: 'group',
-      key: 'bright',
-      label: t('AppSettings.basic.theme.groups.bright'),
-      children: [
-        { label: t('AppSettings.basic.theme.options.light'), value: 'light' },
-        { label: t('AppSettings.basic.theme.options.sakura'), value: 'sakura' },
-        { label: t('AppSettings.basic.theme.options.butter'), value: 'butter' },
-        { label: t('AppSettings.basic.theme.options.mint'), value: 'mint' }
-      ]
+      key: 'bright-core',
+      label: t('AppSettings.basic.theme.groups.brightBuiltin'),
+      children: brightCoreThemes.map((id) => ({ label: themeLabel(id), value: id }))
     },
     {
       type: 'group',
-      key: 'dark',
-      label: t('AppSettings.basic.theme.groups.dark'),
-      children: [
-        { label: t('AppSettings.basic.theme.options.dark'), value: 'dark' },
-        { label: t('AppSettings.basic.theme.options.graphite'), value: 'graphite' },
-        { label: t('AppSettings.basic.theme.options.aurora'), value: 'aurora' }
-      ]
+      key: 'bright-daisy',
+      label: t('AppSettings.basic.theme.groups.brightDaisy'),
+      children: DAISY_LIGHT_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
+    },
+    {
+      type: 'group',
+      key: 'dark-core',
+      label: t('AppSettings.basic.theme.groups.darkBuiltin'),
+      children: darkCoreThemes.map((id) => ({ label: themeLabel(id), value: id }))
+    },
+    {
+      type: 'group',
+      key: 'dark-daisy',
+      label: t('AppSettings.basic.theme.groups.darkDaisy'),
+      children: DAISY_DARK_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
     }
   ]
 })

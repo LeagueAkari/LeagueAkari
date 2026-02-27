@@ -238,9 +238,9 @@ const intelligence = computed(() => {
   }
 }
 
-[data-theme-id='graphite'] {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
   .ongoing-game-title {
-    color: rgba(221, 231, 241, 0.92);
+    color: color-mix(in oklch, var(--la-color-text-themed) 92%, transparent);
   }
 }
 </style>

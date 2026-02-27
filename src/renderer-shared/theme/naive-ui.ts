@@ -1,4 +1,9 @@
-import { AppColorTheme, AppThemeId } from '@shared/types/app-theme'
+import {
+  AppColorTheme,
+  AppThemeId,
+  DAISY_DARK_THEME_IDS,
+  DAISY_LIGHT_THEME_IDS
+} from '@shared/types/app-theme'
 import {
   GlobalTheme,
   GlobalThemeOverrides,
@@ -607,6 +612,14 @@ const BUTTER_OVERRIDES: GlobalThemeOverrides = {
   }
 }
 
+const DAISY_LIGHT_OVERRIDES: GlobalThemeOverrides = {
+  ...CLASSIC_OVERRIDES.light
+}
+
+const DAISY_DARK_OVERRIDES: GlobalThemeOverrides = {
+  ...CLASSIC_OVERRIDES.dark
+}
+
 const THEME_OVERRIDES: Record<AppThemeId, GlobalThemeOverrides> = {
   light: CLASSIC_OVERRIDES.light,
   dark: CLASSIC_OVERRIDES.dark,
@@ -614,7 +627,13 @@ const THEME_OVERRIDES: Record<AppThemeId, GlobalThemeOverrides> = {
   sakura: SAKURA_OVERRIDES,
   mint: MINT_OVERRIDES,
   aurora: AURORA_OVERRIDES,
-  butter: BUTTER_OVERRIDES
+  butter: BUTTER_OVERRIDES,
+  ...(Object.fromEntries(
+    DAISY_LIGHT_THEME_IDS.map((themeId) => [themeId, DAISY_LIGHT_OVERRIDES])
+  ) as Record<(typeof DAISY_LIGHT_THEME_IDS)[number], GlobalThemeOverrides>),
+  ...(Object.fromEntries(
+    DAISY_DARK_THEME_IDS.map((themeId) => [themeId, DAISY_DARK_OVERRIDES])
+  ) as Record<(typeof DAISY_DARK_THEME_IDS)[number], GlobalThemeOverrides>)
 }
 
 export function getNaiveUiLocale(locale: string) {

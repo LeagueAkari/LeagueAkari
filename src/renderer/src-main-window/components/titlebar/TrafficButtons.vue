@@ -214,19 +214,19 @@ watch(
   }
 }
 
-[data-theme-id='graphite'] {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
   .traffic-buttons {
     .traffic-button.minimize {
       &:hover {
-        background-color: rgba(78, 195, 255, 0.2);
-        color: #e5f4ff;
+        background-color: color-mix(in oklch, var(--la-color-link) 22%, transparent);
+        color: var(--la-color-text-themed);
       }
     }
 
     .traffic-button.maximize {
       &:hover {
-        background-color: rgba(78, 195, 255, 0.2);
-        color: #e5f4ff;
+        background-color: color-mix(in oklch, var(--la-color-link) 22%, transparent);
+        color: var(--la-color-text-themed);
       }
     }
 

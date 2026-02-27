@@ -2,7 +2,7 @@
   <!-- 横向布局模式 -->
   <div
     v-if="horizontal"
-    class="flex items-center gap-2 rounded px-2 py-1 transition-colors"
+    class="match-history-pagination flex items-center gap-2 rounded px-2 py-1 transition-colors"
     :class="{
       'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
         isFloating,
@@ -148,12 +148,12 @@
   <!-- 默认纵向布局模式 -->
   <div
     v-else
+    class="match-history-pagination space-y-2 rounded px-4 py-3 transition-colors"
     :class="{
       'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
         isFloating,
       'bg-black/5 dark:bg-white/5': !isFloating
     }"
-    class="space-y-2 rounded px-4 py-3 transition-colors"
   >
     <!-- 队列选择器 - 始终可见 -->
     <NSelect
@@ -527,4 +527,5 @@ const renderLabel = (option: SelectOption) => {
     ]
   )
 }
+
 </script>

@@ -135,15 +135,19 @@ const shouldShowBottomBorder = computed(() => {
   }
 }
 
-[data-theme-id='graphite'] {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
+  .app-name {
+    color: color-mix(in oklch, var(--la-color-text-themed) 84%, transparent);
+  }
+
   .app-titlebar {
     &.should-show-bottom-border {
-      border-bottom-color: rgba(148, 173, 197, 0.22);
+      border-bottom-color: rgb(var(--la-card-border-rgb) / 0.22);
     }
   }
 
   .divider {
-    background-color: rgba(148, 173, 197, 0.3);
+    background-color: rgb(var(--la-card-border-rgb) / 0.3);
   }
 }
 </style>

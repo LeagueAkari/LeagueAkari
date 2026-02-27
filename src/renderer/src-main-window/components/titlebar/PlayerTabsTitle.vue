@@ -648,72 +648,72 @@ const { summonerName } = useStreamerModeMaskedText()
   }
 }
 
-[data-theme-id='graphite'] {
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
   .tab {
-    background-color: rgba(148, 173, 197, 0.08);
-    border-color: rgba(148, 173, 197, 0);
+    background-color: rgb(var(--la-card-tint-rgb) / 0.08);
+    border-color: rgb(var(--la-card-border-rgb) / 0);
 
     &:hover {
-      background-color: rgba(78, 195, 255, 0.14);
+      background-color: color-mix(in oklch, var(--la-color-link) 18%, transparent);
     }
 
     .tab-icon-placeholder {
-      background-color: rgba(148, 173, 197, 0.18);
+      background-color: rgb(var(--la-card-tint-rgb) / 0.18);
     }
 
     .close-icon {
-      color: rgba(221, 231, 241, 0.86);
+      color: color-mix(in oklch, var(--la-color-text-themed) 86%, transparent);
 
       &:hover {
-        background-color: rgba(78, 195, 255, 0.2);
+        background-color: color-mix(in oklch, var(--la-color-link) 24%, transparent);
       }
     }
 
     .sgp-server {
-      color: rgba(120, 205, 248, 0.9);
+      color: color-mix(in oklch, var(--la-color-link) 90%, transparent);
     }
 
     .empty-placeholder-text {
-      color: rgba(221, 231, 241, 0.86);
+      color: color-mix(in oklch, var(--la-color-text-themed) 86%, transparent);
     }
 
     .game-name-line {
-      color: rgba(221, 231, 241, 1);
+      color: var(--la-color-text-themed);
     }
 
     .tag-line {
-      color: rgba(158, 178, 198, 0.95);
+      color: color-mix(in oklch, var(--la-color-text-themed) 74%, transparent);
     }
 
     &.active {
-      background-color: rgba(78, 195, 255, 0.16);
-      border-top: 1px solid rgba(148, 173, 197, 0.32);
-      border-left: 1px solid rgba(148, 173, 197, 0.32);
-      border-right: 1px solid rgba(148, 173, 197, 0.32);
+      background-color: color-mix(in oklch, var(--la-color-link) 22%, transparent);
+      border-top: 1px solid rgb(var(--la-card-border-rgb) / 0.32);
+      border-left: 1px solid rgb(var(--la-card-border-rgb) / 0.32);
+      border-right: 1px solid rgb(var(--la-card-border-rgb) / 0.32);
     }
 
     &.drag-hover {
-      background-color: rgba(78, 195, 255, 0.35);
+      background-color: color-mix(in oklch, var(--la-color-link) 35%, transparent);
     }
   }
 
   .search-area {
-    border-color: rgba(148, 173, 197, 0);
-    background-color: rgba(148, 173, 197, 0.12);
-    color: rgba(221, 231, 241, 0.9);
+    border-color: rgb(var(--la-card-border-rgb) / 0);
+    background-color: rgb(var(--la-card-tint-rgb) / 0.12);
+    color: color-mix(in oklch, var(--la-color-text-themed) 90%, transparent);
 
     &:hover {
-      border-color: rgba(148, 173, 197, 0.45);
-      color: rgba(221, 231, 241, 1);
+      border-color: rgb(var(--la-card-border-rgb) / 0.45);
+      color: var(--la-color-text-themed);
     }
 
     &:active {
-      background-color: rgba(78, 195, 255, 0.1);
+      background-color: color-mix(in oklch, var(--la-color-link) 18%, transparent);
     }
   }
 
   .divider {
-    background-color: rgba(148, 173, 197, 0.28);
+    background-color: rgb(var(--la-card-border-rgb) / 0.28);
   }
 }
 </style>

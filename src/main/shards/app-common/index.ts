@@ -2,6 +2,7 @@ import { i18next } from '@main/i18n'
 import { capabilities as nativeAddonsCapabilities } from '@main/utils/addons'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { getThemeColorTheme, isAppThemeSetting } from '@shared/types/app-theme'
 import { app, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 import { exec } from 'node:child_process'
@@ -200,27 +201,19 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.settings.theme,
       (theme) => {
-        switch (theme) {
-          case 'default':
-            nativeTheme.themeSource = 'system'
-            return
-          case 'light':
-          case 'sakura':
-          case 'butter':
-          case 'mint':
-            nativeTheme.themeSource = 'light'
-            return
-          case 'dark':
-          case 'graphite':
-          case 'aurora':
-            // Electron 原生主题仅支持 light/dark/system，其他暗色主题在渲染层做变体覆盖。
-            nativeTheme.themeSource = 'dark'
-            return
-          default:
-            this._log.warn('Invalid theme value, fallback to dark', theme)
-            nativeTheme.themeSource = 'dark'
-            return
+        if (theme === 'default') {
+          nativeTheme.themeSource = 'system'
+          return
         }
+
+        if (isAppThemeSetting(theme)) {
+          // Electron 原生主题仅支持 light/dark/system，其他主题在渲染层做 token 覆盖。
+          nativeTheme.themeSource = getThemeColorTheme(theme)
+          return
+        }
+
+        this._log.warn('Invalid theme value, fallback to dark', theme)
+        nativeTheme.themeSource = 'dark'
       },
       { fireImmediately: true }
     )

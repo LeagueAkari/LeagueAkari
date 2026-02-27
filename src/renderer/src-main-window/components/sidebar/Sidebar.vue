@@ -248,8 +248,8 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
       color: rgba(255, 255, 255, 1);
     }
 
-    [data-theme-id='graphite'] & {
-      color: #dff1ff;
+    [data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) & {
+      color: color-mix(in oklch, var(--la-color-text-themed) 92%, transparent);
     }
   }
 

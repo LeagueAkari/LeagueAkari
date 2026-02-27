@@ -132,7 +132,12 @@ CommonButtons:
     title: Theme Palette
     groups:
       system: System
-      bright: Bright
+      brightBuiltin: Bright · Built-in
+      brightDaisy: Bright · DaisyUI
+      darkBuiltin: Dark · Built-in
+      darkDaisy: Dark · DaisyUI
+    tone:
+      light: Light
       dark: Dark
     presets:
       followSystem: Follow System
@@ -143,10 +148,42 @@ CommonButtons:
       mint: Mint Green
       aurora: Aurora Violet
       butter: Butter Yellow
+      cupcake: Cupcake
+      bumblebee: Bumblebee
+      emerald: Emerald
+      corporate: Corporate
+      synthwave: Synthwave
+      retro: Retro
+      cyberpunk: Cyberpunk
+      valentine: Valentine
+      halloween: Halloween
+      garden: Garden
+      forest: Forest
+      aqua: Aqua
+      lofi: Lo-fi
+      pastel: Pastel
+      fantasy: Fantasy
+      wireframe: Wireframe
+      black: Black
+      luxury: Luxury
+      dracula: Dracula
+      cmyk: CMYK
+      autumn: Autumn
+      business: Business
+      acid: Acid
+      lemonade: Lemonade
+      night: Night
+      coffee: Coffee
+      winter: Winter
+      dim: Dim
+      nord: Nord
+      sunset: Sunset
+      caramellatte: Caramel Latte
+      abyss: Abyss
+      silk: Silk
   toggleTheme:
     toLight: Switch to Light
     toDark: Switch to Dark
-    toDark2: Switch to Dark 2
 
 TrafficButtons:
   minimize: Minimize
@@ -229,7 +266,12 @@ AppSettings:
       description: Theme color for $t(common:appName)
       groups:
         system: System
-        bright: Bright
+        brightBuiltin: Bright · Built-in
+        brightDaisy: Bright · DaisyUI
+        darkBuiltin: Dark · Built-in
+        darkDaisy: Dark · DaisyUI
+      tone:
+        light: Light
         dark: Dark
       options:
         default: Follow System
@@ -240,6 +282,39 @@ AppSettings:
         mint: Mint Green
         aurora: Aurora Violet
         butter: Butter Yellow
+        cupcake: Cupcake
+        bumblebee: Bumblebee
+        emerald: Emerald
+        corporate: Corporate
+        synthwave: Synthwave
+        retro: Retro
+        cyberpunk: Cyberpunk
+        valentine: Valentine
+        halloween: Halloween
+        garden: Garden
+        forest: Forest
+        aqua: Aqua
+        lofi: Lo-fi
+        pastel: Pastel
+        fantasy: Fantasy
+        wireframe: Wireframe
+        black: Black
+        luxury: Luxury
+        dracula: Dracula
+        cmyk: CMYK
+        autumn: Autumn
+        business: Business
+        acid: Acid
+        lemonade: Lemonade
+        night: Night
+        coffee: Coffee
+        winter: Winter
+        dim: Dim
+        nord: Nord
+        sunset: Sunset
+        caramellatte: Caramel Latte
+        abyss: Abyss
+        silk: Silk
 
   selfUpdate:
     title: Application Update

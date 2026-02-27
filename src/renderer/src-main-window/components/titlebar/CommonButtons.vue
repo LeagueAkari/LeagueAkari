@@ -95,20 +95,28 @@
       </template>
       <div class="theme-selector-panel">
         <div class="theme-selector-title">{{ t('CommonButtons.themeSelector.title') }}</div>
-        <div
-          v-for="group in themePresetGroups"
-          :key="group.key"
-          class="theme-selector-group"
-        >
-          <div class="theme-selector-group__label">{{ group.label }}</div>
+        <div class="theme-selector-columns">
           <div
-            v-for="option in group.options"
-            :key="option.key"
-            class="theme-selector-item"
-            :class="{ active: option.key === activeThemePresetKey }"
-            @click="handleApplyThemePreset(option.theme)"
+            v-for="column in themePresetColumns"
+            :key="column.key"
+            class="theme-selector-column"
           >
-            <div class="theme-selector-item__label">{{ option.label }}</div>
+            <div
+              v-for="group in column.groups"
+              :key="group.key"
+              class="theme-selector-group"
+            >
+              <div class="theme-selector-group__label">{{ group.label }}</div>
+              <div
+                v-for="option in group.options"
+                :key="option.key"
+                class="theme-selector-item"
+                :class="{ active: option.key === activeThemePresetKey }"
+                @click="handleApplyThemePreset(option.theme)"
+              >
+                <div class="theme-selector-item__label">{{ option.label }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -150,7 +158,13 @@ import {
   useOpggWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
-import { AppThemeSetting } from '@shared/types/app-theme'
+import {
+  AppThemeId,
+  AppThemeSetting,
+  DAISY_DARK_THEME_IDS,
+  DAISY_LIGHT_THEME_IDS,
+  getThemeColorTheme
+} from '@shared/types/app-theme'
 import { Notification } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
 import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
@@ -206,10 +220,23 @@ const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
 
+const themeToneLabel = (id: AppThemeId) => {
+  const colorTheme = getThemeColorTheme(id)
+  return t(`CommonButtons.themeSelector.tone.${colorTheme}`)
+}
+
+const themeLabel = (id: AppThemeId) => {
+  return `${t(`CommonButtons.themeSelector.presets.${id}`, { defaultValue: id })} · ${themeToneLabel(id)}`
+}
+
 const themePresetGroups = computed(() => {
+  const brightCoreThemes: AppThemeId[] = ['light', 'sakura', 'butter', 'mint']
+  const darkCoreThemes: AppThemeId[] = ['dark', 'graphite', 'aurora']
+
   return [
     {
       key: 'system',
+      column: 'base' as const,
       label: t('CommonButtons.themeSelector.groups.system'),
       options: [
         {
@@ -220,51 +247,57 @@ const themePresetGroups = computed(() => {
       ]
     },
     {
-      key: 'bright',
-      label: t('CommonButtons.themeSelector.groups.bright'),
-      options: [
-        {
-          key: 'light',
-          theme: 'light' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.light')
-        },
-        {
-          key: 'sakura',
-          theme: 'sakura' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.sakura')
-        },
-        {
-          key: 'butter',
-          theme: 'butter' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.butter')
-        },
-        {
-          key: 'mint',
-          theme: 'mint' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.mint')
-        }
-      ]
+      key: 'bright-core',
+      column: 'base' as const,
+      label: t('CommonButtons.themeSelector.groups.brightBuiltin'),
+      options: brightCoreThemes.map((id) => ({
+        key: id,
+        theme: id,
+        label: themeLabel(id)
+      }))
     },
     {
-      key: 'dark',
-      label: t('CommonButtons.themeSelector.groups.dark'),
-      options: [
-        {
-          key: 'dark',
-          theme: 'dark' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.dark')
-        },
-        {
-          key: 'graphite',
-          theme: 'graphite' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.graphite')
-        },
-        {
-          key: 'aurora',
-          theme: 'aurora' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.aurora')
-        }
-      ]
+      key: 'dark-core',
+      column: 'base' as const,
+      label: t('CommonButtons.themeSelector.groups.darkBuiltin'),
+      options: darkCoreThemes.map((id) => ({
+        key: id,
+        theme: id,
+        label: themeLabel(id)
+      }))
+    },
+    {
+      key: 'bright-daisy',
+      column: 'daisy' as const,
+      label: t('CommonButtons.themeSelector.groups.brightDaisy'),
+      options: DAISY_LIGHT_THEME_IDS.map((id) => ({
+        key: id,
+        theme: id,
+        label: themeLabel(id)
+      }))
+    },
+    {
+      key: 'dark-daisy',
+      column: 'daisy' as const,
+      label: t('CommonButtons.themeSelector.groups.darkDaisy'),
+      options: DAISY_DARK_THEME_IDS.map((id) => ({
+        key: id,
+        theme: id,
+        label: themeLabel(id)
+      }))
+    }
+  ]
+})
+
+const themePresetColumns = computed(() => {
+  return [
+    {
+      key: 'base',
+      groups: themePresetGroups.value.filter((group) => group.column === 'base')
+    },
+    {
+      key: 'daisy',
+      groups: themePresetGroups.value.filter((group) => group.column === 'daisy')
     }
   ]
 })
@@ -356,12 +389,24 @@ const setRead = () => {
 }
 
 .theme-selector-panel {
-  min-width: 188px;
+  min-width: 420px;
+  max-height: 72vh;
+  overflow: auto;
   padding: 6px;
   border-radius: 8px;
   backdrop-filter: blur(8px);
   background-color: rgba(22, 34, 49, 0.92);
   border: 1px solid rgba(148, 173, 197, 0.24);
+}
+
+.theme-selector-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.theme-selector-column {
+  min-width: 0;
 }
 
 .theme-selector-title {
@@ -523,6 +568,56 @@ const setRead = () => {
 
   .theme-selector-group__label {
     color: rgba(255, 255, 255, 0.58);
+  }
+}
+
+[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: color-mix(in oklch, var(--la-color-link) 18%, transparent);
+      color: var(--la-color-text-themed);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: color-mix(in oklch, var(--la-color-link) 12%, transparent);
+    }
+
+    .common-button-inner {
+      color: color-mix(in oklch, var(--la-color-text-themed) 92%, transparent);
+    }
+  }
+
+  .theme-selector-panel {
+    background-color: var(--la-color-select-menu-bg);
+    border: 1px solid var(--la-color-popover-border);
+  }
+
+  .theme-selector-title {
+    color: color-mix(in oklch, var(--la-color-text-themed) 78%, transparent);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgb(var(--la-card-tint-rgb) / 0.14);
+    }
+
+    &.active {
+      background-color: rgb(var(--la-card-tint-rgb) / 0.24);
+    }
+
+    .theme-selector-item__label {
+      color: var(--la-color-text-themed);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: color-mix(in oklch, var(--la-color-text-themed) 16%, transparent);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: color-mix(in oklch, var(--la-color-text-themed) 58%, transparent);
   }
 }
 
