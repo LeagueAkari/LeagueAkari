@@ -1,7 +1,5 @@
 name: Build macOS
 on:
-  push:
-    branches: [ main, sky-dev ]
   workflow_dispatch:
 
 permissions:

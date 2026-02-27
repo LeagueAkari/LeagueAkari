@@ -1,7 +1,5 @@
 name: Build Windows
 on:
-  push:
-    branches: [ main, sky-dev ]
   workflow_dispatch:
 
 permissions:
