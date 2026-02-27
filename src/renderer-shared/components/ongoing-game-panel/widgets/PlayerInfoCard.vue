@@ -19,6 +19,7 @@
     <div class="mb-1 flex">
       <div
         class="relative mr-2 cursor-pointer transition-[filter] hover:brightness-110"
+        v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR"
         :title="t('PlayerInfoCard.sameChampionHistory')"
         @click.stop="navigateToChampionMatchHistory"
       >
@@ -79,6 +80,7 @@
           <button
             v-if="championId && championId > 0"
             class="shrink-0 cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
+            v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON"
             :title="t('PlayerInfoCard.sameChampionHistory')"
             @click.stop="navigateToChampionMatchHistory"
           >
@@ -519,6 +521,11 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import {
+  FTUE_TARGET_ATTR,
+  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR,
+  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON
+} from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'

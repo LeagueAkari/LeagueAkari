@@ -64,6 +64,8 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import {
+  FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR,
+  FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON,
   getFtueTargetJunglePathingMatchHistory,
   getFtueTargetSelector
 } from '@shared/constants/ftue'
@@ -74,7 +76,11 @@ import { useTranslation } from 'i18next-vue'
 import { NSpin, useMessage } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
-import { FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS } from '@main-window/shards/ftue/keys'
+import {
+  FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_AVATAR,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_BUTTON
+} from '@main-window/shards/ftue/keys'
 import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -154,6 +160,28 @@ watch(
   { immediate: true }
 )
 
+const maybeEnqueueHeroFilterFtue = () => {
+  if (!pagedMatchHistory.value?.games?.length) {
+    return
+  }
+
+  enqueueFtueWhenTargetReady({
+    id: FTUE_KEY_MATCH_HISTORY_HERO_FILTER_AVATAR,
+    title: t('Ftue.heroFilter.avatar.title'),
+    description: t('Ftue.heroFilter.avatar.description'),
+    targetSelector: getFtueTargetSelector(FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR),
+    placement: 'left'
+  })
+
+  enqueueFtueWhenTargetReady({
+    id: FTUE_KEY_MATCH_HISTORY_HERO_FILTER_BUTTON,
+    title: t('Ftue.heroFilter.button.title'),
+    description: t('Ftue.heroFilter.button.description'),
+    targetSelector: getFtueTargetSelector(FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON),
+    placement: 'left'
+  })
+}
+
 const maybeEnqueueJunglePathingFtue = (gameId: number) => {
   if (!pts.frontendSettings.showJunglePathing || !pagedMatchHistory.value) {
     return
@@ -216,6 +244,16 @@ const loadDetails = (gameId: number) => {
 
 const isEndOfGame = computed(
   () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'
+)
+
+watch(
+  () => pagedMatchHistory.value?.games.length || 0,
+  (gameCount) => {
+    if (gameCount > 0) {
+      maybeEnqueueHeroFilterFtue()
+    }
+  },
+  { immediate: true }
 )
 
 // 页面在游戏结束后刷新对应 tab 的战绩

@@ -118,6 +118,23 @@ Ftue:
     ongoingGameCard:
       title: Jungle Pathing in Ongoing Game
       description: The player card jungle pathing panel shows first clear, early ganks, and map preference insights.
+  heroFilter:
+    avatar:
+      title: Filter by Champion from Avatar
+      description: Click a frequent champion avatar in Summary to quickly filter matches for that champion.
+    button:
+      title: More Filters Here
+      description: Click this button to open the full filter panel for champion, mode, time range, and more.
+    ongoingAvatar:
+      title: Ongoing Page Avatar Filter
+      description: Click a player's avatar to jump to that player with the current champion filter applied.
+    ongoingButton:
+      title: Same Champion Shortcut
+      description: Use the small button next to the player name for a quick same-champion match history view.
+  themeSystem:
+    button:
+      title: New Theme System Entry
+      description: Click the palette button to open theme presets, including built-in and DaisyUI styles.
 
 CommonButtons:
   announcement: Announcement
@@ -315,6 +332,11 @@ AppSettings:
         caramellatte: Caramel Latte
         abyss: Abyss
         silk: Silk
+    ftue:
+      label: Feature Guides
+      description: Re-show all in-app feature guide prompts globally
+      button: Show Guides Again
+      resetDone: All feature guides have been reset
 
   selfUpdate:
     title: Application Update

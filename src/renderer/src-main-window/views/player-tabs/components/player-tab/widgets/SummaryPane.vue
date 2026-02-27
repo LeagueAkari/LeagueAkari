@@ -175,7 +175,7 @@
         }}</span>
         <div class="ml-auto flex max-w-[110px] flex-wrap justify-end gap-0.5">
           <NPopover
-            v-for="c of frequentlyUsedChampions"
+            v-for="(c, index) of frequentlyUsedChampions"
             :key="c.id"
             :delay="50"
             :keep-alive-on-hover="false"
@@ -183,6 +183,9 @@
             <template #trigger>
               <div
                 class="relative h-5 w-5 cursor-pointer rounded transition-[filter] hover:brightness-110"
+                v-bind:[FTUE_TARGET_ATTR]="
+                  index === 0 ? FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR : undefined
+                "
                 :class="{
                   'ring-1 ring-sky-500/55 dark:ring-sky-400/50': selectedChampionIdSet.has(c.id)
                 }"
@@ -229,6 +232,10 @@ import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import {
+  FTUE_TARGET_ATTR,
+  FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR
+} from '@shared/constants/ftue'
 import { analyzeMatchHistory } from '@shared/data-adapter/analysis/players'
 import { useTranslation } from 'i18next-vue'
 import { NPopover, useMessage } from 'naive-ui'

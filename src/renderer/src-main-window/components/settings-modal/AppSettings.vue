@@ -126,6 +126,16 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        :label="t('AppSettings.basic.ftue.label')"
+        :label-description="t('AppSettings.basic.ftue.description')"
+        :label-width="400"
+      >
+        <NButton size="small" @click="resetFtueGuides">
+          {{ t('AppSettings.basic.ftue.button') }}
+        </NButton>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('AppSettings.basic.dataSource.label')"
         :label-description="t('AppSettings.basic.dataSource.description')"
         :label-width="400"
@@ -575,6 +585,16 @@ import {
 import { computed, ref } from 'vue'
 
 import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
+import {
+  FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS,
+  FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_AVATAR,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_BUTTON,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_BUTTON,
+  FTUE_KEY_THEME_SYSTEM_BUTTON
+} from '@main-window/shards/ftue/keys'
+import { useFtueStore } from '@main-window/shards/ftue/store'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
@@ -590,6 +610,7 @@ const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 const ls = useLoggerStore()
 const rcs = useRemoteConfigStore()
+const ftue = useFtueStore()
 
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
@@ -748,6 +769,24 @@ const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
 }
 
 const message = useMessage()
+
+const FTUE_KEYS = [
+  FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS,
+  FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_AVATAR,
+  FTUE_KEY_MATCH_HISTORY_HERO_FILTER_BUTTON,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_BUTTON,
+  FTUE_KEY_THEME_SYSTEM_BUTTON
+] as const
+
+const resetFtueGuides = () => {
+  for (const key of FTUE_KEYS) {
+    ftue.reset(key)
+  }
+
+  message.success(() => t('AppSettings.basic.ftue.resetDone'))
+}
 
 const UPDATE_SOURCE_MAP = {
   github: 'GitHub',

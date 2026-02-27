@@ -44,6 +44,7 @@
           :secondary="hasFilters"
           :tertiary="!hasFilters"
           circle
+          v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
           :type="hasFilters ? 'primary' : 'default'"
           :title="t('PlayerTab.filter.title')"
         >
@@ -190,6 +191,7 @@
             :secondary="hasFilters"
             :tertiary="!hasFilters"
             circle
+            v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
             :type="hasFilters ? 'primary' : 'default'"
             :title="t('PlayerTab.filter.title')"
           >
@@ -296,6 +298,7 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
+import { FTUE_TARGET_ATTR, FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON } from '@shared/constants/ftue'
 import {
   ArrowCircleRight32Filled,
   ChevronLeft20Regular,

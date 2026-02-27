@@ -119,6 +119,23 @@ Ftue:
     ongoingGameCard:
       title: 对局页支持打野偏好
       description: 玩家卡片中的“打野偏好”可查看首清、前期抓人和地图偏好等分析。
+  heroFilter:
+    avatar:
+      title: 点击头像快速按英雄筛选
+      description: 在总览右侧点击常用英雄头像，可直接筛选同英雄对局。
+    button:
+      title: 更多筛选在这里
+      description: 点击这个按钮可打开完整筛选面板，支持按英雄、模式、时间等条件组合筛选。
+    ongoingAvatar:
+      title: 对局页头像支持同英雄筛选
+      description: 点击玩家头像可直接跳转到该玩家，并自动按当前英雄筛选战绩。
+    ongoingButton:
+      title: 同英雄入口按钮
+      description: 玩家名旁的按钮也可快速进入同英雄筛选，适合精确查看某英雄表现。
+  themeSystem:
+    button:
+      title: 全新主题系统入口
+      description: 点击调色板按钮打开主题菜单，可切换内置与 DaisyUI 主题配色。
 
 CommonButtons:
   announcement: 公告
@@ -316,6 +333,11 @@ AppSettings:
         caramellatte: 焦糖拿铁
         abyss: 深渊
         silk: 丝绸米
+    ftue:
+      label: 功能引导
+      description: 全局重新显示应用内的功能引导提示
+      button: 再次显示引导
+      resetDone: 已重置所有功能引导
 
   selfUpdate:
     title: 应用更新

@@ -33,16 +33,6 @@
       >
         <NSwitch size="small" v-model:value="pts.frontendSettings.showJunglePathing" />
       </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('MatchHistorySettings.junglePathingFtue.label')"
-        :label-description="t('MatchHistorySettings.junglePathingFtue.description')"
-        :label-width="400"
-      >
-        <NButton size="small" @click="resetJunglePathingFtue">
-          {{ t('MatchHistorySettings.junglePathingFtue.button') }}
-        </NButton>
-      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -50,25 +40,16 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NScrollbar, NSelect, NSwitch, useMessage } from 'naive-ui'
+import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
-import { FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS } from '@main-window/shards/ftue/keys'
-import { useFtueStore } from '@main-window/shards/ftue/store'
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 const { t } = useTranslation()
 
-const ftue = useFtueStore()
 const pts = usePlayerTabsStore()
-const message = useMessage()
 
 const pageSizeOptions = usePageSizeOptions()
-
-const resetJunglePathingFtue = () => {
-  ftue.reset(FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS)
-  message.success(() => t('MatchHistorySettings.junglePathingFtue.resetDone'))
-}
 </script>
 
 <style scoped>

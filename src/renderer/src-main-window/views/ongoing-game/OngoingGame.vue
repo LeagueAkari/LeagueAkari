@@ -28,6 +28,8 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
   FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME,
+  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR,
+  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON,
   getFtueTargetSelector
 } from '@shared/constants/ftue'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
@@ -37,7 +39,11 @@ import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 
 import { useAppContext } from '@main-window/context'
-import { FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD } from '@main-window/shards/ftue/keys'
+import {
+  FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR,
+  FTUE_KEY_ONGOING_GAME_HERO_FILTER_BUTTON
+} from '@main-window/shards/ftue/keys'
 import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
@@ -145,6 +151,35 @@ watch(
       description: t('Ftue.junglePathing.ongoingGameCard.description'),
       targetSelector: getFtueTargetSelector(FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME),
       placement: 'right'
+    })
+  },
+  { immediate: true }
+)
+
+watch(
+  () => ({
+    route: route.name,
+    count: Object.keys(ogs.summoner || {}).length
+  }),
+  ({ route, count }) => {
+    if (route !== 'ongoing-game' || count <= 0) {
+      return
+    }
+
+    enqueueFtueWhenTargetReady({
+      id: FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR,
+      title: t('Ftue.heroFilter.ongoingAvatar.title'),
+      description: t('Ftue.heroFilter.ongoingAvatar.description'),
+      targetSelector: getFtueTargetSelector(FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR),
+      placement: 'right'
+    })
+
+    enqueueFtueWhenTargetReady({
+      id: FTUE_KEY_ONGOING_GAME_HERO_FILTER_BUTTON,
+      title: t('Ftue.heroFilter.ongoingButton.title'),
+      description: t('Ftue.heroFilter.ongoingButton.description'),
+      targetSelector: getFtueTargetSelector(FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON),
+      placement: 'bottom'
     })
   },
   { immediate: true }
