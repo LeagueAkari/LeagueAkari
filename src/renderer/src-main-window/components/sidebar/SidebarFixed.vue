@@ -420,4 +420,33 @@ watch(
     bottom: 0px;
   }
 }
+
+[data-theme-id='graphite'] {
+  .menu-item {
+    .menu-item__icon,
+    .menu-item__label,
+    .menu-item__label .menu-item__label-tag-line,
+    .menu-item__label.menu-item__label--not-connected {
+      color: rgba(158, 178, 198, 0.86);
+    }
+
+    &:hover {
+      .menu-item__icon,
+      .menu-item__label {
+        color: rgba(221, 231, 241, 1);
+      }
+
+      .menu-item__inner {
+        background-color: rgba(78, 195, 255, 0.1);
+      }
+    }
+
+    &:not(.menu-item-no-click):active {
+      .menu-item__icon,
+      .menu-item__label {
+        color: rgba(221, 231, 241, 0.9);
+      }
+    }
+  }
+}
 </style>

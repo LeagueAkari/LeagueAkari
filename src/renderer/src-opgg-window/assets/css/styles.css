@@ -9,14 +9,13 @@
 
 :root {
   --la-mac-titlebar-safe-left: 0px;
-  color-scheme: dark;
-  --la-background-dark-color-primary: #1a1a1d;
-  --la-background-light-color-primary: #f9f9f9;
+  --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 200px;
   --la-app-min-width: 200px;
   --la-titlebar-height: 28px;
   --la-scrollbar-height: 6px;
-  --la-scrollbar-width: 6px;}
+  --la-scrollbar-width: 6px;
+}
 
 
 ::-webkit-scrollbar {
@@ -25,11 +24,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #4c4c4c;
+  background-color: var(--la-color-scrollbar-thumb);
   border-radius: 2px;
 
   &:hover {
-    background-color: #626262;
+    background-color: var(--la-color-scrollbar-thumb-hover);
   }
 }
 
@@ -50,20 +49,14 @@ body {
 
 body {
   user-select: none;
-  background-color: var(--la-background-light-color-primary);
+  background-color: var(--la-background-color-primary);
+  color: var(--la-color-text-primary);
   line-height: normal;
-
-  [data-theme='dark'] & {
-    background-color: var(--la-background-dark-color-primary);
-  }
 }
 
-a {
-  color: rgb(144, 198, 166);
-}
-
+a,
 a:visited {
-  color: rgb(144, 198, 166);
+  color: var(--la-color-link);
 }
 
 .n-radio {

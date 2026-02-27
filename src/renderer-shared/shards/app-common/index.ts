@@ -1,4 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { AppThemeSetting } from '@shared/types/app-theme'
 import i18next from 'i18next'
 import { watch } from 'vue'
 
@@ -61,7 +62,7 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'locale', s)
   }
 
-  setTheme(s: 'default' | 'dark' | 'light') {
+  setTheme(s: AppThemeSetting) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'theme', s)
   }
 

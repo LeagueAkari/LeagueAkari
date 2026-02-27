@@ -134,4 +134,16 @@ const shouldShowBottomBorder = computed(() => {
     background-color: rgba(0, 0, 0, 0.15);
   }
 }
+
+[data-theme-id='graphite'] {
+  .app-titlebar {
+    &.should-show-bottom-border {
+      border-bottom-color: rgba(148, 173, 197, 0.22);
+    }
+  }
+
+  .divider {
+    background-color: rgba(148, 173, 197, 0.3);
+  }
+}
 </style>

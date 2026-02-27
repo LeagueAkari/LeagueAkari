@@ -1,4 +1,5 @@
 import { BaseConfig } from '@main/bootstrap/base-config'
+import { AppThemeSetting } from '@shared/types/app-theme'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class AppCommonState {
@@ -88,7 +89,7 @@ export class AppCommonSettings {
   /**
    * 主题色
    */
-  theme: 'default' | 'dark' | 'light' = 'dark'
+  theme: AppThemeSetting = 'dark'
 
   /**
    * HTTP 代理
@@ -129,7 +130,7 @@ export class AppCommonSettings {
     this.locale = s
   }
 
-  setTheme(s: 'default' | 'dark' | 'light') {
+  setTheme(s: AppThemeSetting) {
     this.theme = s
   }
 

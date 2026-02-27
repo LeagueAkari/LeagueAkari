@@ -213,4 +213,29 @@ watch(
     }
   }
 }
+
+[data-theme-id='graphite'] {
+  .traffic-buttons {
+    .traffic-button.minimize {
+      &:hover {
+        background-color: rgba(78, 195, 255, 0.2);
+        color: #e5f4ff;
+      }
+    }
+
+    .traffic-button.maximize {
+      &:hover {
+        background-color: rgba(78, 195, 255, 0.2);
+        color: #e5f4ff;
+      }
+    }
+
+    .traffic-button.close {
+      &:hover {
+        background-color: #cc3047;
+        color: #fff;
+      }
+    }
+  }
+}
 </style>

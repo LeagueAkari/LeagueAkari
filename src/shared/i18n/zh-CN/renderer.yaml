@@ -129,9 +129,25 @@ CommonButtons:
   auxWindow: 小窗口
   opggWindow: OP.GG
   backgroundTasks: 后台任务
+  themeSelector:
+    title: 主题配色
+    groups:
+      system: 系统
+      bright: 明亮
+      dark: 深色
+    presets:
+      followSystem: 跟随系统
+      light: 亮色
+      dark: 暗色
+      graphite: 石墨青蓝
+      sakura: 樱花粉
+      mint: 薄荷绿
+      aurora: 极光紫
+      butter: 奶油黄
   toggleTheme:
     toLight: 切换至亮色
     toDark: 切换至暗色
+    toDark2: 切换至暗色2
 
 TrafficButtons:
   minimize: 最小化
@@ -212,10 +228,19 @@ AppSettings:
     theme:
       label: 主题颜色
       description: $t(common:appName) 的主题颜色
+      groups:
+        system: 系统
+        bright: 明亮
+        dark: 深色
       options:
         default: 跟随系统
         light: 亮色
         dark: 暗色
+        graphite: 石墨青蓝
+        sakura: 樱花粉
+        mint: 薄荷绿
+        aurora: 极光紫
+        butter: 奶油黄
 
   selfUpdate:
     title: 应用更新

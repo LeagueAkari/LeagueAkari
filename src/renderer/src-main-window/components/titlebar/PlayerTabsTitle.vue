@@ -647,6 +647,75 @@ const { summonerName } = useStreamerModeMaskedText()
     background-color: rgba(255, 255, 255, 0.15);
   }
 }
+
+[data-theme-id='graphite'] {
+  .tab {
+    background-color: rgba(148, 173, 197, 0.08);
+    border-color: rgba(148, 173, 197, 0);
+
+    &:hover {
+      background-color: rgba(78, 195, 255, 0.14);
+    }
+
+    .tab-icon-placeholder {
+      background-color: rgba(148, 173, 197, 0.18);
+    }
+
+    .close-icon {
+      color: rgba(221, 231, 241, 0.86);
+
+      &:hover {
+        background-color: rgba(78, 195, 255, 0.2);
+      }
+    }
+
+    .sgp-server {
+      color: rgba(120, 205, 248, 0.9);
+    }
+
+    .empty-placeholder-text {
+      color: rgba(221, 231, 241, 0.86);
+    }
+
+    .game-name-line {
+      color: rgba(221, 231, 241, 1);
+    }
+
+    .tag-line {
+      color: rgba(158, 178, 198, 0.95);
+    }
+
+    &.active {
+      background-color: rgba(78, 195, 255, 0.16);
+      border-top: 1px solid rgba(148, 173, 197, 0.32);
+      border-left: 1px solid rgba(148, 173, 197, 0.32);
+      border-right: 1px solid rgba(148, 173, 197, 0.32);
+    }
+
+    &.drag-hover {
+      background-color: rgba(78, 195, 255, 0.35);
+    }
+  }
+
+  .search-area {
+    border-color: rgba(148, 173, 197, 0);
+    background-color: rgba(148, 173, 197, 0.12);
+    color: rgba(221, 231, 241, 0.9);
+
+    &:hover {
+      border-color: rgba(148, 173, 197, 0.45);
+      color: rgba(221, 231, 241, 1);
+    }
+
+    &:active {
+      background-color: rgba(78, 195, 255, 0.1);
+    }
+  }
+
+  .divider {
+    background-color: rgba(148, 173, 197, 0.28);
+  }
+}
 </style>
 
 <style module>

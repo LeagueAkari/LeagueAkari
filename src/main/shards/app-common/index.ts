@@ -160,6 +160,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   private async _handleState() {
     await this._setting.applyToState()
+
     this._mobx.propSync(AppCommonMain.id, 'settings', this.settings, [
       'isInKyokoMode',
       'showFreeSoftwareDeclaration',
@@ -199,10 +200,26 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.settings.theme,
       (theme) => {
-        if (theme === 'default') {
-          nativeTheme.themeSource = 'system'
-        } else {
-          nativeTheme.themeSource = theme
+        switch (theme) {
+          case 'default':
+            nativeTheme.themeSource = 'system'
+            return
+          case 'light':
+          case 'sakura':
+          case 'butter':
+          case 'mint':
+            nativeTheme.themeSource = 'light'
+            return
+          case 'dark':
+          case 'graphite':
+          case 'aurora':
+            // Electron 原生主题仅支持 light/dark/system，其他暗色主题在渲染层做变体覆盖。
+            nativeTheme.themeSource = 'dark'
+            return
+          default:
+            this._log.warn('Invalid theme value, fallback to dark', theme)
+            nativeTheme.themeSource = 'dark'
+            return
         }
       },
       { fireImmediately: true }

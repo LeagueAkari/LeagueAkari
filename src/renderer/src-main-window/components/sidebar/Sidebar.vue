@@ -247,6 +247,10 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
     [data-theme='dark'] & {
       color: rgba(255, 255, 255, 1);
     }
+
+    [data-theme-id='graphite'] & {
+      color: #dff1ff;
+    }
   }
 
   .app-sidebar__padding {

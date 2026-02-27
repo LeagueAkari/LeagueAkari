@@ -237,4 +237,10 @@ const intelligence = computed(() => {
     color: #000d;
   }
 }
+
+[data-theme-id='graphite'] {
+  .ongoing-game-title {
+    color: rgba(221, 231, 241, 0.92);
+  }
+}
 </style>

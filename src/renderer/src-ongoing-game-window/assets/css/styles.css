@@ -9,20 +9,13 @@
 
 :root {
   --la-mac-titlebar-safe-left: 0px;
+  --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
   --la-titlebar-height: 36px;
   --la-scrollbar-height: 6px;
   --la-scrollbar-width: 8px;
-  --n-option-padding: 0 4px;}
-
-
-[data-theme='dark'] {
-  --la-background-color-primary: #1a1a1d;
-}
-
-[data-theme='light'] {
-  --la-background-color-primary: #f9f9f9;
+  --n-option-padding: 0 4px;
 }
 
 ::-webkit-scrollbar {
@@ -31,11 +24,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #4c4c4c;
+  background-color: var(--la-color-scrollbar-thumb);
   border-radius: 2px;
 
   &:hover {
-    background-color: #626262;
+    background-color: var(--la-color-scrollbar-thumb-hover);
   }
 }
 
@@ -58,26 +51,6 @@ body {
 body {
   user-select: none;
   line-height: normal;
-}
-
-[data-theme='dark'] {
-  a {
-    color: rgb(144, 198, 166);
-  }
-
-  a:visited {
-    color: rgb(144, 198, 166);
-  }
-}
-
-[data-theme='light'] {
-  a {
-    color: rgb(88, 124, 102);
-  }
-
-  a:visited {
-    color: rgb(88, 124, 102);
-  }
 }
 
 .n-radio {
@@ -108,10 +81,6 @@ body {
 /* adjust for app title bar height */
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--la-titlebar-height)) !important;
-}
-
-[data-theme='dark'] .n-base-select-menu {
-  background-color: #383838f8;
 }
 
 .n-popover-shared.popover-transition-enter-from,

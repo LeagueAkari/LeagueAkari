@@ -128,9 +128,25 @@ CommonButtons:
   auxWindow: Auxiliary Window
   opggWindow: OP.GG
   backgroundTasks: Background Tasks
+  themeSelector:
+    title: Theme Palette
+    groups:
+      system: System
+      bright: Bright
+      dark: Dark
+    presets:
+      followSystem: Follow System
+      light: Light
+      dark: Dark
+      graphite: Graphite Blue
+      sakura: Sakura Pink
+      mint: Mint Green
+      aurora: Aurora Violet
+      butter: Butter Yellow
   toggleTheme:
     toLight: Switch to Light
     toDark: Switch to Dark
+    toDark2: Switch to Dark 2
 
 TrafficButtons:
   minimize: Minimize
@@ -211,10 +227,19 @@ AppSettings:
     theme:
       label: Theme Color
       description: Theme color for $t(common:appName)
+      groups:
+        system: System
+        bright: Bright
+        dark: Dark
       options:
         default: Follow System
         light: Light
         dark: Dark
+        graphite: Graphite Blue
+        sakura: Sakura Pink
+        mint: Mint Green
+        aurora: Aurora Violet
+        butter: Butter Yellow
 
   selfUpdate:
     title: Application Update

@@ -624,9 +624,33 @@ const lolSourceOptions = [
 
 const themes = computed(() => {
   return [
-    { label: t('AppSettings.basic.theme.options.default'), value: 'default' },
-    { label: t('AppSettings.basic.theme.options.light'), value: 'light' },
-    { label: t('AppSettings.basic.theme.options.dark'), value: 'dark' }
+    {
+      type: 'group',
+      key: 'system',
+      label: t('AppSettings.basic.theme.groups.system'),
+      children: [{ label: t('AppSettings.basic.theme.options.default'), value: 'default' }]
+    },
+    {
+      type: 'group',
+      key: 'bright',
+      label: t('AppSettings.basic.theme.groups.bright'),
+      children: [
+        { label: t('AppSettings.basic.theme.options.light'), value: 'light' },
+        { label: t('AppSettings.basic.theme.options.sakura'), value: 'sakura' },
+        { label: t('AppSettings.basic.theme.options.butter'), value: 'butter' },
+        { label: t('AppSettings.basic.theme.options.mint'), value: 'mint' }
+      ]
+    },
+    {
+      type: 'group',
+      key: 'dark',
+      label: t('AppSettings.basic.theme.groups.dark'),
+      children: [
+        { label: t('AppSettings.basic.theme.options.dark'), value: 'dark' },
+        { label: t('AppSettings.basic.theme.options.graphite'), value: 'graphite' },
+        { label: t('AppSettings.basic.theme.options.aurora'), value: 'aurora' }
+      ]
+    }
   ]
 })
 

@@ -114,6 +114,31 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
     [data-theme='dark'] & {
       background-color: rgba(0, 0, 0, 0.2);
     }
+
+    [data-theme-id='graphite'] & {
+      background-color: rgba(8, 17, 26, 0.52);
+      border-right: 1px solid rgba(148, 173, 197, 0.18);
+    }
+
+    [data-theme-id='sakura'] & {
+      background-color: rgba(255, 223, 239, 0.54);
+      border-right: 1px solid rgba(229, 119, 168, 0.2);
+    }
+
+    [data-theme-id='butter'] & {
+      background-color: rgba(255, 241, 210, 0.56);
+      border-right: 1px solid rgba(214, 151, 56, 0.22);
+    }
+
+    [data-theme-id='mint'] & {
+      background-color: rgba(213, 242, 227, 0.58);
+      border-right: 1px solid rgba(72, 170, 127, 0.22);
+    }
+
+    [data-theme-id='aurora'] & {
+      background-color: rgba(27, 20, 50, 0.55);
+      border-right: 1px solid rgba(158, 139, 218, 0.24);
+    }
   }
 
   .app-frame__right {
@@ -180,6 +205,52 @@ const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
       rgba(0, 0, 0, 0.85) 100%
     );
   }
+
+  [data-theme-id='graphite'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(9, 15, 24, 0.8) 0%,
+      rgba(10, 18, 28, 0.86) 72%,
+      rgba(11, 20, 31, 0.9) 100%
+    );
+  }
+
+  [data-theme-id='sakura'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 246, 251, 0.84) 0%,
+      rgba(255, 237, 246, 0.9) 72%,
+      rgba(255, 227, 240, 0.94) 100%
+    );
+  }
+
+  [data-theme-id='butter'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 250, 236, 0.84) 0%,
+      rgba(255, 246, 222, 0.9) 72%,
+      rgba(255, 241, 206, 0.94) 100%
+    );
+  }
+
+  [data-theme-id='mint'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 255, 250, 0.84) 0%,
+      rgba(235, 250, 242, 0.9) 72%,
+      rgba(224, 246, 234, 0.94) 100%
+    );
+  }
+
+  [data-theme-id='aurora'] &::before {
+    background: linear-gradient(
+      180deg,
+      rgba(20, 15, 38, 0.78) 0%,
+      rgba(30, 23, 56, 0.86) 72%,
+      rgba(38, 30, 70, 0.9) 100%
+    );
+  }
+
 }
 
 .app-background {

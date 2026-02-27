@@ -9,13 +9,13 @@
 
 :root {
   --la-mac-titlebar-safe-left: 0px;
-  color-scheme: dark;
-  --la-background-color-primary: #1a1a1d;
+  --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 200px;
   --la-app-min-width: 200px;
   --la-titlebar-height: 28px;
   --la-scrollbar-height: 6px;
-  --la-scrollbar-width: 6px;}
+  --la-scrollbar-width: 6px;
+}
 
 
 ::-webkit-scrollbar {
@@ -24,11 +24,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #4c4c4c;
+  background-color: var(--la-color-scrollbar-thumb);
   border-radius: 2px;
 
   &:hover {
-    background-color: #626262;
+    background-color: var(--la-color-scrollbar-thumb-hover);
   }
 }
 
@@ -50,14 +50,6 @@ body {
 body {
   user-select: none;
   line-height: normal;
-}
-
-a {
-  color: rgb(144, 198, 166);
-}
-
-a:visited {
-  color: rgb(144, 198, 166);
 }
 
 .n-radio {
@@ -94,7 +86,7 @@ a:visited {
 }
 
 .n-popover.n-popconfirm {
-  background-color: #2a2a2ad5;
+  background-color: var(--la-color-popconfirm-bg);
 }
 
 .n-base-select-menu .n-scrollbar {
@@ -131,12 +123,12 @@ a:visited {
 
 .n-base-select-menu {
   /* Keep a single source of truth for select menu background. */
-  background-color: #383838f8;
+  background-color: var(--la-color-select-menu-bg);
 }
 
 .n-message {
   /* Keep a single source of truth for message background. */
-  background-color: #2c2c2c;
+  background-color: var(--la-color-message-bg);
 }
 
 .n-checkbox.n-checkbox--show-label {
@@ -144,9 +136,9 @@ a:visited {
 }
 
 .n-popover .n-popover-arrow-wrapper .n-popover-arrow {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--la-color-popover-border);
 }
 
 .n-popover {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--la-color-popover-border);
 }

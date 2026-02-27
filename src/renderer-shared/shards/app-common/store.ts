@@ -1,7 +1,13 @@
+import {
+  AppThemeId,
+  AppThemeSetting,
+  isAppThemeSetting,
+  resolveThemeSetting
+} from '@shared/types/app-theme'
 import { usePreferredColorScheme } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowReactive, shallowRef } from 'vue'
+import { computed, ref, shallowReactive, shallowRef, watch } from 'vue'
 
 interface BaseConfig {
   disableHardwareAcceleration?: boolean
@@ -18,7 +24,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     showFreeSoftwareDeclaration: false,
     isInKyokoMode: false,
     locale: 'zh-CN',
-    theme: 'default' as 'default' | 'dark' | 'light',
+    theme: 'default' as AppThemeSetting,
     httpProxy: {
       strategy: 'disable' as 'auto' | 'force' | 'disable',
       port: 0,
@@ -63,13 +69,48 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   })
 
   const preferredColorScheme = usePreferredColorScheme()
+  const invalidThemeWarned = ref<string | null>(null)
+  const rawThemeSetting = computed(() => settings.theme as unknown as string)
 
-  const colorTheme = computed(() => {
-    if (settings.theme === 'default') {
-      return preferredColorScheme.value === 'dark' ? 'dark' : 'light'
+  const normalizedThemeSetting = computed<AppThemeSetting>(() => {
+    if (isAppThemeSetting(rawThemeSetting.value)) {
+      return rawThemeSetting.value
     }
 
-    return settings.theme
+    return 'dark'
+  })
+
+  watch(
+    rawThemeSetting,
+    (theme) => {
+      if (isAppThemeSetting(theme)) {
+        invalidThemeWarned.value = null
+        return
+      }
+
+      if (invalidThemeWarned.value === theme) {
+        return
+      }
+
+      invalidThemeWarned.value = theme
+      console.warn(`[app-common] invalid theme "${String(theme)}", fallback to "dark"`)
+    },
+    { immediate: true }
+  )
+
+  const resolvedTheme = computed(() => {
+    return resolveThemeSetting(
+      normalizedThemeSetting.value,
+      preferredColorScheme.value === 'dark' ? 'dark' : 'light'
+    )
+  })
+
+  const colorTheme = computed<'light' | 'dark'>(() => {
+    return resolvedTheme.value.colorTheme
+  })
+
+  const themeId = computed<AppThemeId>(() => {
+    return resolvedTheme.value.themeId
   })
 
   return {
@@ -83,9 +124,9 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     baseConfig,
     startupDeepLink,
     isRunInTempDir,
+    themeId,
     colorTheme,
     nativeAddons,
-
     tempAkariSubscriptionInfo
   }
 })

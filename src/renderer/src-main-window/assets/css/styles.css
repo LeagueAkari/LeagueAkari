@@ -13,6 +13,7 @@
 :root {
   --la-mac-sidebar-safe-top: 0px;
   --la-mac-titlebar-safe-left: 0px;
+  --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
   --la-titlebar-height: 36px;
@@ -21,26 +22,17 @@
   --n-option-padding: 0 4px;
 }
 
-
-[data-theme='dark'] {
-  --la-background-color-primary: #1a1a1d;
-}
-
-[data-theme='light'] {
-  --la-background-color-primary: #f9f9f9;
-}
-
 ::-webkit-scrollbar {
   width: var(--la-scrollbar-width);
   height: var(--la-scrollbar-height);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #4c4c4c;
+  background-color: var(--la-color-scrollbar-thumb);
   border-radius: 2px;
 
   &:hover {
-    background-color: #626262;
+    background-color: var(--la-color-scrollbar-thumb-hover);
   }
 }
 
@@ -62,27 +54,14 @@ body {
 
 body {
   user-select: none;
+  background-color: var(--la-background-color-primary);
+  color: var(--la-color-text-primary);
   line-height: normal;
 }
 
-[data-theme='dark'] {
-  a {
-    color: rgb(144, 198, 166);
-  }
-
-  a:visited {
-    color: rgb(144, 198, 166);
-  }
-}
-
-[data-theme='light'] {
-  a {
-    color: rgb(88, 124, 102);
-  }
-
-  a:visited {
-    color: rgb(88, 124, 102);
-  }
+a,
+a:visited {
+  color: var(--la-color-link);
 }
 
 .n-radio {
@@ -113,10 +92,6 @@ body {
 /* adjust for app title bar height */
 .n-notification-container>.n-scrollbar>.n-scrollbar-container {
   max-height: calc(100vh - var(--la-titlebar-height)) !important;
-}
-
-[data-theme='dark'] .n-base-select-menu {
-  background-color: #383838f8;
 }
 
 .n-popover-shared.popover-transition-enter-from,

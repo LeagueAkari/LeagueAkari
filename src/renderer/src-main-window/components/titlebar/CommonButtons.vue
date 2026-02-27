@@ -84,21 +84,35 @@
       </NTooltip>
     </HorizontalExpand>
 
-    <!-- toggle theme -->
-    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+    <!-- theme selector -->
+    <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
       <template #trigger>
-        <div class="common-button-outer" @click="handleToggleTheme">
+        <div class="common-button-outer">
           <div class="common-button-inner">
-            <NIcon><component :is="themeIcon" /></NIcon>
+            <NIcon><ColorPaletteOutline /></NIcon>
           </div>
         </div>
       </template>
-      {{
-        as.colorTheme === 'dark'
-          ? t('CommonButtons.toggleTheme.toLight')
-          : t('CommonButtons.toggleTheme.toDark')
-      }}
-    </NTooltip>
+      <div class="theme-selector-panel">
+        <div class="theme-selector-title">{{ t('CommonButtons.themeSelector.title') }}</div>
+        <div
+          v-for="group in themePresetGroups"
+          :key="group.key"
+          class="theme-selector-group"
+        >
+          <div class="theme-selector-group__label">{{ group.label }}</div>
+          <div
+            v-for="option in group.options"
+            :key="option.key"
+            class="theme-selector-item"
+            :class="{ active: option.key === activeThemePresetKey }"
+            @click="handleApplyThemePreset(option.theme)"
+          >
+            <div class="theme-selector-item__label">{{ option.label }}</div>
+          </div>
+        </div>
+      </div>
+    </NPopover>
 
     <!-- tasks -->
     <HorizontalExpand :show="bts.tasks.length !== 0" class="h-full">
@@ -136,9 +150,10 @@ import {
   useOpggWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
-import { Moon, Notification, Sun } from '@vicons/carbon'
+import { AppThemeSetting } from '@shared/types/app-theme'
+import { Notification } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
-import { LogoGithub } from '@vicons/ionicons5'
+import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NButton, NIcon, NPopover, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -191,15 +206,88 @@ const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
 
-const handleToggleTheme = () => {
-  const currentTheme = as.colorTheme
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-  app.setTheme(newTheme)
-}
-
-const themeIcon = computed(() => {
-  return as.colorTheme === 'dark' ? Moon : Sun
+const themePresetGroups = computed(() => {
+  return [
+    {
+      key: 'system',
+      label: t('CommonButtons.themeSelector.groups.system'),
+      options: [
+        {
+          key: 'default',
+          theme: 'default' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.followSystem')
+        }
+      ]
+    },
+    {
+      key: 'bright',
+      label: t('CommonButtons.themeSelector.groups.bright'),
+      options: [
+        {
+          key: 'light',
+          theme: 'light' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.light')
+        },
+        {
+          key: 'sakura',
+          theme: 'sakura' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.sakura')
+        },
+        {
+          key: 'butter',
+          theme: 'butter' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.butter')
+        },
+        {
+          key: 'mint',
+          theme: 'mint' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.mint')
+        }
+      ]
+    },
+    {
+      key: 'dark',
+      label: t('CommonButtons.themeSelector.groups.dark'),
+      options: [
+        {
+          key: 'dark',
+          theme: 'dark' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.dark')
+        },
+        {
+          key: 'graphite',
+          theme: 'graphite' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.graphite')
+        },
+        {
+          key: 'aurora',
+          theme: 'aurora' as AppThemeSetting,
+          label: t('CommonButtons.themeSelector.presets.aurora')
+        }
+      ]
+    }
+  ]
 })
+
+const themePresetOptions = computed(() => {
+  return themePresetGroups.value.flatMap((group) => group.options)
+})
+
+const activeThemePresetKey = computed(() => {
+  const current = themePresetOptions.value.find((option) => {
+    return option.theme === as.settings.theme
+  })
+
+  if (current) {
+    return current.key
+  }
+
+  return 'dark'
+})
+
+const handleApplyThemePreset = (theme: AppThemeSetting) => {
+  app.setTheme(theme)
+}
 
 const shouldShowAnnouncementBadge = computed(() => {
   return (
@@ -267,6 +355,67 @@ const setRead = () => {
   }
 }
 
+.theme-selector-panel {
+  min-width: 188px;
+  padding: 6px;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(22, 34, 49, 0.92);
+  border: 1px solid rgba(148, 173, 197, 0.24);
+}
+
+.theme-selector-title {
+  padding: 4px 6px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(158, 178, 198, 0.95);
+}
+
+.theme-selector-item {
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(78, 195, 255, 0.12);
+  }
+
+  &.active {
+    background-color: rgba(78, 195, 255, 0.22);
+  }
+
+  .theme-selector-item__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #dde7f1;
+    line-height: 1.15;
+  }
+
+  .theme-selector-item__desc {
+    margin-top: 2px;
+    font-size: 11px;
+    color: rgba(158, 178, 198, 0.95);
+    line-height: 1.15;
+  }
+}
+
+.theme-selector-group {
+  &:not(:first-of-type) {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(148, 173, 197, 0.18);
+  }
+}
+
+.theme-selector-group__label {
+  padding: 2px 6px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(158, 178, 198, 0.74);
+  opacity: 0.7;
+}
+
 [data-theme='dark'] {
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
@@ -285,6 +434,43 @@ const setRead = () => {
 }
 
 [data-theme='light'] {
+  .theme-selector-panel {
+    background-color: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.14);
+  }
+
+  .theme-selector-title {
+    color: rgba(0, 0, 0, 0.68);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    &.active {
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .theme-selector-item__label {
+      color: rgba(0, 0, 0, 0.9);
+    }
+
+    .theme-selector-item__desc {
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(0, 0, 0, 0.56);
+  }
+
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(0, 0, 0, 0.15);
@@ -297,6 +483,287 @@ const setRead = () => {
 
     .common-button-inner {
       color: rgba(0, 0, 0, 0.86);
+    }
+  }
+}
+
+[data-theme-id='dark'] {
+  .theme-selector-panel {
+    background-color: rgba(34, 34, 38, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .theme-selector-title {
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    &.active {
+      background-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .theme-selector-item__label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .theme-selector-item__desc {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(255, 255, 255, 0.58);
+  }
+}
+
+[data-theme-id='graphite'] {
+  .theme-selector-panel {
+    background-color: rgba(17, 26, 36, 0.95);
+    border: 1px solid rgba(148, 173, 197, 0.24);
+  }
+
+  .theme-selector-title {
+    color: rgba(191, 215, 235, 0.9);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(78, 195, 255, 0.12);
+    }
+
+    &.active {
+      background-color: rgba(78, 195, 255, 0.22);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(148, 173, 197, 0.2);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(191, 215, 235, 0.74);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(78, 195, 255, 0.2);
+      color: #dff1ff;
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(78, 195, 255, 0.14);
+    }
+
+    .common-button-inner {
+      color: rgba(221, 231, 241, 0.92);
+    }
+  }
+}
+
+[data-theme-id='sakura'] {
+  .theme-selector-panel {
+    background-color: rgba(255, 249, 252, 0.97);
+    border: 1px solid rgba(229, 119, 168, 0.28);
+  }
+
+  .theme-selector-title {
+    color: rgba(141, 66, 96, 0.9);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(255, 111, 167, 0.16);
+    }
+
+    &.active {
+      background-color: rgba(255, 111, 167, 0.26);
+    }
+
+    .theme-selector-item__label {
+      color: rgba(92, 37, 57, 0.92);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(229, 119, 168, 0.18);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(141, 66, 96, 0.72);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(255, 111, 167, 0.2);
+      color: rgba(92, 37, 57, 0.95);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(255, 111, 167, 0.14);
+    }
+
+    .common-button-inner {
+      color: rgba(92, 37, 57, 0.86);
+    }
+  }
+}
+
+[data-theme-id='mint'] {
+  .theme-selector-panel {
+    background-color: rgba(247, 255, 250, 0.97);
+    border: 1px solid rgba(72, 170, 127, 0.28);
+  }
+
+  .theme-selector-title {
+    color: rgba(35, 109, 78, 0.9);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(72, 170, 127, 0.14);
+    }
+
+    &.active {
+      background-color: rgba(72, 170, 127, 0.24);
+    }
+
+    .theme-selector-item__label {
+      color: rgba(20, 80, 56, 0.92);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(72, 170, 127, 0.18);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(35, 109, 78, 0.72);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(72, 170, 127, 0.18);
+      color: rgba(20, 80, 56, 0.95);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(72, 170, 127, 0.13);
+    }
+
+    .common-button-inner {
+      color: rgba(20, 80, 56, 0.86);
+    }
+  }
+}
+
+[data-theme-id='aurora'] {
+  .theme-selector-panel {
+    background-color: rgba(38, 31, 70, 0.95);
+    border: 1px solid rgba(158, 139, 218, 0.28);
+  }
+
+  .theme-selector-title {
+    color: rgba(220, 208, 250, 0.9);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(181, 150, 255, 0.14);
+    }
+
+    &.active {
+      background-color: rgba(181, 150, 255, 0.24);
+    }
+
+    .theme-selector-item__label {
+      color: #ece2ff;
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(158, 139, 218, 0.2);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(220, 208, 250, 0.74);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(181, 150, 255, 0.22);
+      color: #f0e7ff;
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(181, 150, 255, 0.15);
+    }
+  }
+}
+
+[data-theme-id='butter'] {
+  .theme-selector-panel {
+    background-color: rgba(255, 253, 244, 0.97);
+    border: 1px solid rgba(232, 169, 58, 0.28);
+  }
+
+  .theme-selector-title {
+    color: rgba(140, 86, 13, 0.9);
+  }
+
+  .theme-selector-item {
+    &:hover {
+      background-color: rgba(232, 169, 58, 0.14);
+    }
+
+    &.active {
+      background-color: rgba(232, 169, 58, 0.24);
+    }
+
+    .theme-selector-item__label {
+      color: rgba(82, 44, 1, 0.92);
+    }
+  }
+
+  .theme-selector-group {
+    &:not(:first-of-type) {
+      border-top-color: rgba(232, 169, 58, 0.18);
+    }
+  }
+
+  .theme-selector-group__label {
+    color: rgba(140, 86, 13, 0.72);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(232, 169, 58, 0.18);
+      color: rgba(82, 44, 1, 0.95);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(232, 169, 58, 0.13);
+    }
+
+    .common-button-inner {
+      color: rgba(82, 44, 1, 0.86);
     }
   }
 }
