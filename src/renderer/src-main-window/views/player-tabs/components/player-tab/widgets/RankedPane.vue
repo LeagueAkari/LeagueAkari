@@ -173,7 +173,7 @@
         </div>
       </div>
 
-      <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" />
+      <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" :region="lcs.auth?.region" />
     </div>
   </NModal>
 </template>
@@ -201,7 +201,12 @@ import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { RankedEntry } from '@shared/types/league-client/ranked'
+import {
+  RANKED_MASKED_PLACEHOLDER,
+  isTencentWinRateUnavailableBelowMaster
+} from '@shared/utils/ranked-display'
 import { MoreHorizFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
@@ -215,6 +220,7 @@ const { isCrossRegion, isSmallSize } = usePlayerTab()
 const { t } = useTranslation()
 const isShowingRankedModal = ref(false)
 
+const lcs = useLeagueClientStore()
 const { rankedStats, isLoading } = useRankedStats()
 
 // 只显示单双排和灵活组排
@@ -335,10 +341,18 @@ const formatRankPoints = (entry: Partial<RankedEntry>) => {
 }
 
 const formatWinLose = (entry: Partial<RankedEntry>) => {
+  if (isTencentWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
+    return RANKED_MASKED_PLACEHOLDER
+  }
+
   return `${entry.wins ?? 0} ${t('RankedPane.win')} ${entry.losses ?? 0} ${t('RankedPane.lose')}`
 }
 
 const formatWinRate = (entry: Partial<RankedEntry>) => {
+  if (isTencentWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
+    return RANKED_MASKED_PLACEHOLDER
+  }
+
   const wins = entry.wins ?? 0
   const losses = entry.losses ?? 0
   const totalGames = wins + losses

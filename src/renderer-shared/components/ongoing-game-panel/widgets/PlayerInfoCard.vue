@@ -144,7 +144,7 @@
             </div>
           </template>
 
-          <RankedTable v-if="rankedStats" :rankedStats="rankedStats" />
+          <RankedTable v-if="rankedStats" :rankedStats="rankedStats" :region="lcs.auth?.region" />
           <div v-else class="text-xs">{{ t('PlayerInfoCard.empty') }}</div>
         </NPopover>
       </div>
