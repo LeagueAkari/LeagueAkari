@@ -30,8 +30,6 @@ import {
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import { shouldHideMatchHistoryGame } from './match-history-visibility'
-
 export interface PagedMatchHistory {
   /** 战绩概览，应该是 raw */
   games: LcuOrSgpGameSummary[]
@@ -74,15 +72,11 @@ export function provideMatchHistory(props: {
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
-  showPractice?: MaybeRefOrGetter<boolean>
-  showIrregularGames?: MaybeRefOrGetter<boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
-  const showPractice = toRef(props.showPractice ?? false)
-  const showIrregularGames = toRef(props.showIrregularGames ?? false)
 
   const componentName = useComponentName()
 
@@ -165,66 +159,8 @@ export function provideMatchHistory(props: {
       ...params
     }
 
-    const visibleStartIndex = params.startIndex ?? 0
-    const visibleCount = params.count ?? pts.frontendSettings.loadCount
-    const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
-    const pageFetchSize = Math.max(visibleCount, pts.frontendSettings.loadCount)
-    const maxChunkRequests = Math.max(
-      80,
-      Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5
-    )
-
-    const collectVisibleGames = async (
-      fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>
-    ) => {
-      const games: LcuOrSgpGameSummary[] = []
-
-      let rawCursor = 0
-      let visibleSkipped = 0
-      let guard = 0
-
-      while (games.length < visibleCount && guard < maxChunkRequests) {
-        const chunk = await fetchChunk(rawCursor, pageFetchSize)
-        if (chunk.length === 0) {
-          break
-        }
-
-        for (const g of chunk) {
-          if (!g || typeof g.gameId !== 'number') {
-            continue
-          }
-
-          if (
-            shouldHideMatchHistoryGame(g, puuid.value, {
-              showPractice: showPractice.value,
-              showIrregularGames: showIrregularGames.value
-            })
-          ) {
-            continue
-          }
-
-          if (visibleSkipped < visibleStartIndex) {
-            visibleSkipped++
-            continue
-          }
-
-          games.push(g)
-
-          if (games.length >= visibleCount) {
-            break
-          }
-        }
-
-        rawCursor += chunk.length
-        guard++
-
-        if (chunk.length < pageFetchSize) {
-          break
-        }
-      }
-
-      return games
-    }
+    const startIndex = params.startIndex ?? 0
+    const count = params.count ?? pts.frontendSettings.loadCount
 
     const toCompleteLcuGame = async (g: Game): Promise<LcuGameSummary> => {
       const cached = pts.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
@@ -268,9 +204,7 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
         }
 
-        const games = hideByVisibilityOptions
-          ? await collectVisibleGames(fetchSgpChunk)
-          : await fetchSgpChunk(visibleStartIndex, visibleCount)
+        const games = await fetchSgpChunk(startIndex, count)
 
         pagedMatchHistory.value = {
           games: markRaw(games),
@@ -292,9 +226,7 @@ export function provideMatchHistory(props: {
             .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
         }
 
-        const selectedGames = hideByVisibilityOptions
-          ? await collectVisibleGames(fetchLcuSummaryChunk)
-          : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
+        const selectedGames = await fetchLcuSummaryChunk(startIndex, count)
 
         const games = await Promise.all(
           selectedGames.map(async (g) => {
@@ -414,17 +346,6 @@ export function provideMatchHistory(props: {
       })
     },
     { immediate: true }
-  )
-
-  watch(
-    () => [showPractice.value, showIrregularGames.value],
-    () => {
-      if (!pagedMatchHistory.value) {
-        return
-      }
-
-      loadMatchHistory(pagedMatchHistory.value.queryParams)
-    }
   )
 
   provide(MatchHistoryContextKey, {

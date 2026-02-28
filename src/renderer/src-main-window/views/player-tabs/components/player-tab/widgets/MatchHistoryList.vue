@@ -27,14 +27,18 @@
         }}</span>
       </div>
 
-      <!-- empty filtered games -->
+      <!-- empty filtered games: 本页有数据但在筛选下为空，提供清除筛选 -->
       <div
-        v-else-if="hasFilters && gamesShouldHide.size === pagedMatchHistory.games.length"
-        class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
+        v-else-if="rootHasCombinator && gamesShouldHide.size === pagedMatchHistory.games.length"
+        class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
       >
         <span class="text-sm text-black/80 dark:text-white/60">{{
           t('PlayerTab.noFilteredMatchHistory')
         }}</span>
+
+        <NButton size="small" tertiary @click="clearFilters">
+          {{ t('PlayerTab.clearFilters') }}
+        </NButton>
       </div>
     </template>
 
@@ -78,7 +82,7 @@ import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
-import { NSpin } from 'naive-ui'
+import { NButton, NSpin } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
 import { FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS } from '@main-window/shards/ftue/keys'
@@ -88,7 +92,6 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
-import { shouldHideMatchHistoryGame } from '../data/match-history-visibility'
 import { useSpectator } from '../data/spectator'
 
 const as = useAppCommonStore()
@@ -119,7 +122,7 @@ const {
 
 const { loadSpectatorData } = useSpectator()
 
-const { filters, hasFilters } = useMatchHistoryFilters()
+const { predicate, rootHasCombinator, clearFilters } = useMatchHistoryFilters()
 
 const junglePathingDataSource = computed(() => {
   return {
@@ -129,73 +132,17 @@ const junglePathingDataSource = computed(() => {
   }
 })
 
-const isSubset = <T = string | number,>(a: Set<T>, b: Set<T>) => {
-  if (a.size > b.size) {
-    return false
-  }
-
-  for (const item of a) {
-    if (!b.has(item)) {
-      return false
-    }
-  }
-  return true
-}
-
 const gamesShouldHide = computed(() => {
   if (!pagedMatchHistory.value) {
     return new Set<number>()
   }
 
-  const { winLoss, selectedChampions, selectedSummoners, showPractice, showIrregularGames } =
-    filters.value
-
   const shouldShow = (g: LcuOrSgpGameSummary) => {
-    if (
-      shouldHideMatchHistoryGame(g, puuid.value, {
-        showPractice,
-        showIrregularGames
-      })
-    ) {
-      return false
-    }
-
-    const basicInfo = toBasicInfo(g)
-
-    if (!hasFilters.value) {
+    if (!predicate.value) {
       return true
     }
 
-    const participants = toParticipants(g, basicInfo)
-    const participant = participants.find((p) => p.puuid === puuid.value)
-
-    if (!participant) {
-      return false
-    }
-
-    if (winLoss !== 'all' && participant.winResult !== winLoss) {
-      return false
-    }
-
-    if (selectedChampions.length > 0) {
-      const targetChampionIds = new Set<number>(selectedChampions)
-      const championIds = new Set<number>([...participants.map((p) => p.championId)])
-
-      if (!isSubset(targetChampionIds, championIds)) {
-        return false
-      }
-    }
-
-    if (selectedSummoners.length > 0) {
-      const targetSummoners = new Set<string>(selectedSummoners)
-      const summoners = new Set<string>([...participants.map((p) => p.puuid)])
-
-      if (!isSubset(targetSummoners, summoners)) {
-        return false
-      }
-    }
-
-    return true
+    return predicate.value(g)
   }
 
   return pagedMatchHistory.value.games.reduce(

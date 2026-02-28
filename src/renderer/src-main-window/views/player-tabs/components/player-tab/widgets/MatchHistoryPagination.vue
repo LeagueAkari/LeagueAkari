@@ -32,28 +32,19 @@
       class="w-28!"
     />
 
-    <NPopover
-      display-directive="show"
-      trigger="click"
-      placement="bottom"
-      :theme-overrides="{ padding: '0px' }"
+    <NButton
+      size="small"
+      :secondary="rootHasCombinator"
+      :tertiary="!rootHasCombinator"
+      circle
+      :type="rootHasCombinator ? 'primary' : 'default'"
+      :title="t('PlayerTab.filter.title')"
+      @click="handleOpenFilterModal"
     >
-      <template #trigger>
-        <NButton
-          size="small"
-          :secondary="hasFilters"
-          :tertiary="!hasFilters"
-          circle
-          :type="hasFilters ? 'primary' : 'default'"
-          :title="t('PlayerTab.filter.title')"
-        >
-          <template #icon>
-            <NIcon size="16"><Filter20Regular /></NIcon>
-          </template>
-        </NButton>
+      <template #icon>
+        <NIcon size="16"><Filter20Regular /></NIcon>
       </template>
-      <MatchHistoryFilter class="w-[300px]" />
-    </NPopover>
+    </NButton>
 
     <!-- 翻页 -->
     <div class="flex items-center gap-1">
@@ -143,6 +134,12 @@
         </template>
       </NButton>
     </div>
+
+    <NModal v-model:show="showFilterModal">
+      <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[800px] max-w-[90vw]">
+        <MatchHistoryFilters />
+      </div>
+    </NModal>
   </div>
 
   <!-- 默认纵向布局模式 -->
@@ -177,28 +174,19 @@
         :options="pageSizeOptions"
       />
 
-      <NPopover
-        display-directive="show"
-        trigger="click"
-        placement="bottom"
-        :theme-overrides="{ padding: '0px' }"
+      <NButton
+        size="small"
+        :secondary="rootHasCombinator"
+        :tertiary="!rootHasCombinator"
+        circle
+        :type="rootHasCombinator ? 'primary' : 'default'"
+        :title="t('PlayerTab.filter.title')"
+        @click="handleOpenFilterModal"
       >
-        <template #trigger>
-          <NButton
-            size="small"
-            :secondary="hasFilters"
-            :tertiary="!hasFilters"
-            circle
-            :type="hasFilters ? 'primary' : 'default'"
-            :title="t('PlayerTab.filter.title')"
-          >
-            <template #icon>
-              <NIcon size="16"><Filter20Regular /></NIcon>
-            </template>
-          </NButton>
+        <template #icon>
+          <NIcon size="16"><Filter20Regular /></NIcon>
         </template>
-        <MatchHistoryFilter class="w-[300px]" />
-      </NPopover>
+      </NButton>
 
       <!-- 翻页 -->
       <div class="flex items-center gap-1">
@@ -289,6 +277,12 @@
         </NButton>
       </div>
     </div>
+
+    <NModal v-model:show="showFilterModal">
+      <div class="h-[700px] max-h-[90vh] min-h-[75vh] w-[1000px] max-w-[90vw]">
+        <MatchHistoryFilters />
+      </div>
+    </NModal>
   </div>
 </template>
 
@@ -303,7 +297,7 @@ import {
   Previous20Filled
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber, NPopover, NSelect, SelectOption } from 'naive-ui'
+import { NButton, NIcon, NInputNumber, NModal, NPopover, NSelect, SelectOption } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
 
 import { useMapAssets } from '@main-window/composables/useMapAssets'
@@ -314,7 +308,7 @@ import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-d
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
-import MatchHistoryFilter from './MatchHistoryFilter.vue'
+import MatchHistoryFilters from './match-history-filters/MatchHistoryFilters.vue'
 
 const { isFloating = false, horizontal = false } = defineProps<{
   horizontal?: boolean
@@ -357,7 +351,7 @@ const handleTagChange = (tag: string) => {
   loadMatchHistory({ tag: tag === ALL_SGPTAG_VALUE ? undefined : tag, startIndex: 0 })
 }
 
-const { hasFilters } = useMatchHistoryFilters()
+const { rootHasCombinator } = useMatchHistoryFilters()
 
 const arbitraryPage = ref(computedCurrentPage.value)
 const isArbitraryPagePopupVisible = ref(false)
@@ -443,5 +437,10 @@ const renderLabel = (option: SelectOption) => {
       h('span', { class: 'text-sm' }, option.label as string)
     ]
   )
+}
+
+const showFilterModal = ref(false)
+const handleOpenFilterModal = () => {
+  showFilterModal.value = true
 }
 </script>

@@ -2110,6 +2110,7 @@ PlayerTab:
 
   noMatchHistory: No match history
   noFilteredMatchHistory: No filtered match history
+  clearFilters: Clear filter conditions
   loading: Loading...
 
   private:

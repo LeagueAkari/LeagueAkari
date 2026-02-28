@@ -67,7 +67,7 @@ const themeOverrides = computed(() => {
         width: '6px'
       },
       Dropdown: {
-        color: '#222e'
+        color: '#222f'
       }
     } as GlobalThemeOverrides
   } else {
@@ -98,7 +98,9 @@ const NAIVE_UI_LOCALE = {
 }
 
 const naiveUiLocale = computed(() => {
-  return NAIVE_UI_LOCALE[as.settings.locale] || NAIVE_UI_LOCALE['en']
+  return (
+    NAIVE_UI_LOCALE[as.settings.locale as keyof typeof NAIVE_UI_LOCALE] || NAIVE_UI_LOCALE['en']
+  )
 })
 
 const naiveUiTheme = computed(() => {

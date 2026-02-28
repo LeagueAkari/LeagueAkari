@@ -1,58 +1,136 @@
-import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
-import { InjectionKey, Ref, computed, inject, provide, ref } from 'vue'
+import { ComputedRef, InjectionKey, Ref, computed, inject, markRaw, provide, ref } from 'vue'
 
-export type MatchHistoryFilters = {
-  winLoss: 'all' | 'win' | 'loss'
-  selectedChampions: number[]
-  selectedSummoners: string[]
-  showPractice: boolean
-  showIrregularGames: boolean
+import {
+  CombinatorNode,
+  GameCombinator,
+  collectSubtreeNodeIds,
+  nodeArg
+} from '../widgets/match-history-filters/combinator-nodes'
+import { toPredicate } from '../widgets/match-history-filters/combinator-runtime'
+import { Predicate } from '../widgets/match-history-filters/combinators'
+
+export type SimpleSummonerResult = {
+  puuid: string
+  profileIconId: number
+  gameName: string
+  tagLine: string
 }
 
 export type MatchHistoryFiltersContext = {
-  filters: Readonly<Ref<MatchHistoryFilters>>
-  hasFilters: Readonly<Ref<boolean>>
-  setFilters: (filters: MatchHistoryFilters) => void
+  mode: Ref<'simple' | 'advanced'>
+  rootNode: ComputedRef<CombinatorNode>
+  nodeMap: Ref<Record<string, CombinatorNode>>
+  predicate: ComputedRef<Predicate<unknown> | null>
+  rootHasCombinator: ComputedRef<boolean>
+  cachedSummoners: Ref<Record<string, SimpleSummonerResult>>
+  addNode: (node: CombinatorNode) => void
+  updateNode: (id: string, node: CombinatorNode) => void
+  deleteNode: (id: string) => void
+  saveSummoner: (puuid: string, summoner: SimpleSummonerResult) => void
+  clearFilters: () => void
+  setMode: (mode: 'simple' | 'advanced') => void
 }
 
 export const MatchHistoryFiltersContextKey: InjectionKey<MatchHistoryFiltersContext> = Symbol(
   'PlayerTabMatchHistoryFiltersContext'
 )
 
+const ROOT_ID = 'game'
+
 export function provideMatchHistoryFilters() {
-  const pts = usePlayerTabsStore()
-
-  const filters = ref<MatchHistoryFilters>({
-    winLoss: 'all',
-    selectedChampions: [],
-    selectedSummoners: [],
-    showPractice: pts.frontendSettings.defaultShowPractice,
-    showIrregularGames: pts.frontendSettings.defaultShowIrregularGames
+  const nodeMap = ref<Record<string, CombinatorNode>>({
+    game: {
+      id: ROOT_ID,
+      type: ROOT_ID,
+      args: [nodeArg(null)],
+      parentId: null
+    }
   })
 
-  const hasFilters = computed(() => {
-    return (
-      filters.value.winLoss !== 'all' ||
-      filters.value.selectedChampions.length > 0 ||
-      filters.value.selectedSummoners.length > 0
-    )
+  const mode = ref<'simple' | 'advanced'>('advanced')
+  const rootNode = computed<GameCombinator>(() => nodeMap.value[ROOT_ID] as GameCombinator)
+  const predicate = computed(() => toPredicate(ROOT_ID, nodeMap.value) as Predicate<unknown>)
+
+  const rootHasCombinator = computed(() => {
+    return rootNode.value.args[0].value !== null
   })
+
+  const addNode = (node: CombinatorNode) => {
+    nodeMap.value[node.id] = node
+  }
+
+  const updateNode = (id: string, node: CombinatorNode) => {
+    nodeMap.value[id] = node
+  }
+
+  const deleteNode = (id: string) => {
+    const target = nodeMap.value[id]
+    if (!target) return
+
+    const ids = collectSubtreeNodeIds(id, nodeMap.value)
+
+    if (target.parentId) {
+      const parent = nodeMap.value[target.parentId]
+
+      if (parent) {
+        if (parent.argDeleteStrategy === 'remove-from-array') {
+          nodeMap.value[parent.id] = {
+            ...parent,
+            args: parent.args.filter((a) => !(a && a.kind === 'node' && a.value === id))
+          }
+        } else {
+          nodeMap.value[parent.id] = {
+            ...parent,
+            args: parent.args.map((a) =>
+              a && a.kind === 'node' && a.value === id ? nodeArg(null) : a
+            )
+          }
+        }
+      }
+    }
+
+    ids.forEach((nodeId) => {
+      delete nodeMap.value[nodeId]
+    })
+  }
+
+  const cachedSummoners = ref<Record<string, SimpleSummonerResult>>({})
+
+  const saveSummoner = (puuid: string, summoner: SimpleSummonerResult) => {
+    cachedSummoners.value[puuid] = markRaw(summoner)
+  }
+
+  const clearFilters = () => {
+    if (rootNode.value.args[0].value) {
+      deleteNode(rootNode.value.args[0].value)
+    }
+
+    cachedSummoners.value = {}
+  }
+
+  const setMode = (_mode: 'simple' | 'advanced') => {
+    mode.value = _mode
+    clearFilters()
+  }
 
   provide(MatchHistoryFiltersContextKey, {
-    filters,
-    hasFilters,
-    setFilters: (filters0: MatchHistoryFilters) => {
-      filters.value = filters0
-    }
-  })
+    mode,
 
-  return {
-    filters,
-    hasFilters,
-    setFilters: (filters0: MatchHistoryFilters) => {
-      filters.value = filters0
-    }
-  }
+    rootNode,
+    nodeMap,
+    rootHasCombinator,
+    predicate,
+
+    cachedSummoners,
+    saveSummoner,
+
+    addNode,
+    updateNode,
+    deleteNode,
+    clearFilters,
+
+    setMode
+  })
 }
 
 export function useMatchHistoryFilters() {

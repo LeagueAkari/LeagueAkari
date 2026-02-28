@@ -14,7 +14,7 @@ import {
   MatchHistoryGamesAnalysisTeamSide,
   analyzeTeamMatchHistory
 } from '@shared/data-adapter/analysis/teams'
-import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
+import { toIdentities } from '@shared/data-adapter/match-history/identities'
 import {
   LcuGameSummary,
   LcuGameTimeline,
