@@ -5,15 +5,15 @@
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'all'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><People20Regular /></NIcon>
-        对于所有成员
+        {{ t('PlayerTab.filter.forAllMembers') }}
       </div>
       <div v-else-if="node.type === 'allies'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleTeam20Regular /></NIcon>
-        对于其友方成员
+        {{ t('PlayerTab.filter.forAllies') }}
       </div>
       <div v-else-if="node.type === 'enemies'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleSwap20Regular /></NIcon>
-        对于其敌方成员
+        {{ t('PlayerTab.filter.forEnemies') }}
       </div>
 
       <div class="flex gap-1">
@@ -28,7 +28,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            选择条件
+            {{ t('PlayerTab.filter.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -36,13 +36,15 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          删除
+          {{ t('PlayerTab.filter.delete') }}
         </NButton>
       </div>
     </div>
 
     <div class="flex items-center gap-2" v-if="node.type === 'allies' || node.type === 'enemies'">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">相对于</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.relativeTo') }}
+      </div>
 
       <NSelectWithSummonerSearching
         size="small"
@@ -51,7 +53,9 @@
         class="w-60!"
       />
 
-      <div class="text-xs text-black/50 italic dark:text-white/50">(提供名称和编号将进行搜索)</div>
+      <div class="text-xs text-black/50 italic dark:text-white/50">
+        {{ t('PlayerTab.filter.searchHint') }}
+      </div>
     </div>
 
     <CombinatorComp v-if="childNode" :node="childNode" />
@@ -59,7 +63,7 @@
       v-else
       class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      需选择条件
+      {{ t('PlayerTab.filter.needSelectCondition') }}
     </div>
   </div>
 </template>
@@ -72,6 +76,7 @@ import {
   PeopleSwap20Regular,
   PeopleTeam20Regular
 } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -81,6 +86,8 @@ import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
 import { AllCombinator, AlliesCombinator, EnemiesCombinator, paramArg } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
 import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -116,7 +123,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })

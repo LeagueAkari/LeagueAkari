@@ -7,9 +7,9 @@
       <span class="text-base font-bold">{{ t('PlayerTab.filter.title') }}</span>
     </div>
 
-    <NTabs size="small" type="line" :value="mode" @update:value="setMode">
-      <!-- <NTab name="simple">简易筛选</NTab> -->
-      <NTab name="advanced">高级筛选</NTab>
+    <!-- TODO：实现两种模式 -->
+    <NTabs v-if="false" size="small" type="line" :value="mode" @update:value="setMode">
+      <NTab name="advanced">{{ t('PlayerTab.filter.advancedTab') }}</NTab>
     </NTabs>
 
     <div class="min-h-0 flex-1">

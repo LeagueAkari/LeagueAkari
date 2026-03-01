@@ -2087,15 +2087,92 @@ PlayerTab:
   tagPlayer: 标记玩家
   filter:
     title: 页内筛选
-    reset: 重置条件
-    winLoss: 胜负
-    all: 全部
-    win: 胜利
-    loss: 失败
-    summoners: 涉及召唤师
-    champions: 涉及英雄
-    showPractice: 显示训练模式
-    showIrregularGames: 显示重开局等
+    advancedTab: 高级筛选
+    resetAll: 重置所有条件
+    addCondition: 添加条件
+    addFirstConditionHint: 添加第一个条件以构建复杂判定式
+    and: 同时满足
+    or: 满足其一
+    add: 添加
+    switchToOr: 满足其一
+    switchToAnd: 同时满足
+    delete: 删除
+    needAddCondition: 需添加条件
+    anyone: 任意成员满足
+    everyone: 所有成员满足
+    selectCondition: 选择条件
+    needSelectCondition: 需选择条件
+    forPlayer: 对于玩家
+    searchHint: '(提供名称和编号将进行搜索)'
+    notMatch: 不满足
+    forAllMembers: 对于所有成员
+    forAllies: 对于其友方成员
+    forEnemies: 对于其敌方成员
+    relativeTo: 相对于
+    position: 位置
+    queue: 游戏模式队列
+    gameDuration: 游戏时长 (秒)
+    min: 最小
+    max: 最大
+    isWin: 是胜利对局
+    isLoss: 是失败对局
+    isAbort: 是终止对局
+    isRemake: 是重开对局
+    surrenderLoss: 以投降失败
+    kills: 击杀数
+    deaths: 死亡数
+    assists: 助攻数
+    gold: 金币
+    isMatchedGame: 是匹配对局
+    isPveGame: 是 PVE 对局
+    summonerSpell: 召唤师技能
+    hasItem: 拥有装备
+    augment: 海克斯
+    hasPlayer: 对局包含玩家
+    playerPuuid: 玩家
+    select: 选用
+    atPosition: 位于
+    have: 拥有
+    anyPosition: 任意位置
+    positionN: '第 {{n}} 个'
+    spellGroupNormal: 常规
+    spellGroupSpecial: 特殊
+    augmentGroupHextech: 海克斯大乱斗
+    augmentGroupArena: 斗魂竞技场
+    augmentGroupOther: 其他
+    augmentTypeHai: 海
+    augmentTypeDou: 斗
+    isChampion: 选用英雄
+    combinatorLabels:
+      game: 对局
+      and: 同时满足
+      or: 满足其一
+      not: 不满足
+      isQueue: 游戏模式队列
+      isAbort: 是终止对局
+      isRemake: 是重开对局
+      hasAugment: 海克斯
+      enemies: 对于其敌方成员
+      allies: 对于其友方成员
+      all: 对于所有成员
+      anyone: 任意成员满足
+      everyone: 所有成员满足
+      isChampion: 选用英雄
+      durationBetween: 游戏时长
+      kdaBetween: KDA
+      killsBetween: 击杀数
+      deathsBetween: 死亡数
+      assistsBetween: 助攻数
+      goldBetween: 金币
+      isWin: 是胜利对局
+      isLoss: 是失败对局
+      isMatchedGame: 是匹配对局
+      isPveGame: 是 PVE 对局
+      player: 对于玩家
+      hasPlayer: 对局包含玩家
+      hasSpell: 召唤师技能
+      isPosition: 位置
+      hasItem: 拥有装备
   itemPerPage: '{{count}} 项'
   previousName: '曾使用的名字: {{name}}'
 

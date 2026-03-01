@@ -5,14 +5,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <PositionIcon class="text-base" :position="node.args[0].value" />
-        位置
+        {{ t('PlayerTab.filter.position') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 

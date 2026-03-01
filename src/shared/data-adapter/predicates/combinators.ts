@@ -60,14 +60,18 @@ export const player = (puuid: string, predicate: Predicate<ParticipantScope>) =>
 }
 
 export const anyone = (predicate: Predicate<ParticipantScope>) => {
-  return (data: ParticipantsScope) => {
-    return data.participants.some((p) => predicate({ participant: p, context: data.context }))
+  return (data: ParticipantsScope | GameScope) => {
+    return data.participants.some((p) =>
+      predicate({ participant: p, context: 'context' in data ? data.context : data })
+    )
   }
 }
 
 export const everyone = (predicate: Predicate<ParticipantScope>) => {
-  return (data: ParticipantsScope) => {
-    return data.participants.every((p) => predicate({ participant: p, context: data.context }))
+  return (data: ParticipantsScope | GameScope) => {
+    return data.participants.every((p) =>
+      predicate({ participant: p, context: 'context' in data ? data.context : data })
+    )
   }
 }
 
@@ -115,6 +119,8 @@ export const enemies = (puuid: string | null, predicate: Predicate<ParticipantsS
 
 export const hasPlayer = (puuid: string) => {
   return (data: GameScope | ParticipantsScope) => {
+    if (puuid === null) return true
+
     return data.participants.some((p) => p.puuid === puuid)
   }
 }

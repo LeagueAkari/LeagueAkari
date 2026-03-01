@@ -5,7 +5,7 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Person20Regular /></NIcon>
-        对于玩家
+        {{ t('PlayerTab.filter.forPlayer') }}
       </div>
 
       <div class="flex gap-1">
@@ -20,7 +20,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            选择条件
+            {{ t('PlayerTab.filter.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -28,7 +28,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          删除
+          {{ t('PlayerTab.filter.delete') }}
         </NButton>
       </div>
     </div>
@@ -41,7 +41,9 @@
         class="w-60!"
       />
 
-      <div class="text-xs text-black/50 italic dark:text-white/50">(提供名称和编号将进行搜索)</div>
+      <div class="text-xs text-black/50 italic dark:text-white/50">
+        {{ t('PlayerTab.filter.searchHint') }}
+      </div>
     </div>
 
     <CombinatorComp v-if="childNode" :node="childNode" />
@@ -49,13 +51,14 @@
       v-else
       class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      需选择条件
+      {{ t('PlayerTab.filter.needSelectCondition') }}
     </div>
   </div>
 </template>
 
 <script setup lang="tsx">
 import { Add20Regular, Delete20Regular, Person20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -65,6 +68,8 @@ import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
 import { PlayerCombinator, paramArg } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
 import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -105,7 +110,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })

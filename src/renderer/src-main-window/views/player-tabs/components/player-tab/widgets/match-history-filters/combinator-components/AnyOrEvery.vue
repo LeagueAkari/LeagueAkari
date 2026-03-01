@@ -5,11 +5,11 @@
     <div class="mb-2 flex items-center gap-2">
       <div v-if="node.type === 'anyone'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleTeam20Regular /></NIcon>
-        对于其中的任意成员
+        {{ t('PlayerTab.filter.anyone') }}
       </div>
       <div v-else-if="node.type === 'everyone'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><People20Regular /></NIcon>
-        其中的所有成员都必须
+        {{ t('PlayerTab.filter.everyone') }}
       </div>
 
       <div class="flex gap-1">
@@ -24,7 +24,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            选择条件
+            {{ t('PlayerTab.filter.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -32,7 +32,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          删除
+          {{ t('PlayerTab.filter.delete') }}
         </NButton>
       </div>
     </div>
@@ -42,13 +42,14 @@
       v-else
       class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      需选择条件
+      {{ t('PlayerTab.filter.needSelectCondition') }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Add20Regular, Delete20Regular, People20Regular, PeopleTeam20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -57,6 +58,8 @@ import CombinatorComp from '../CombinatorComp.vue'
 import { AnyoneCombinator, EveryoneCombinator } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
 import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -80,7 +83,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })

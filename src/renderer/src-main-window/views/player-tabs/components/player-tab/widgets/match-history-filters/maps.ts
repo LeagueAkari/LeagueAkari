@@ -14,7 +14,7 @@ import OfMembers from './combinator-components/OfMembers.vue'
 import OfPlayer from './combinator-components/OfPlayer.vue'
 import WinResult from './combinator-components/WinResult.vue'
 import {
-  createAllCombinator,
+  // createAllCombinator,
   createAlliesCombinator,
   createAndCombinator,
   createAnyoneCombinator,
@@ -26,6 +26,7 @@ import {
   createGoldBetweenCombinator,
   createHasAugmentCombinator,
   createHasItemCombinator,
+  createHasPlayerCombinator,
   createHasSpellCombinator,
   createIsAbortCombinator,
   createIsChampionCombinator,
@@ -93,8 +94,8 @@ export const REQUIRE_SCOPE_MAP = {
   all: ['game'],
   player: ['game', 'participants'],
   hasPlayer: ['game', 'participants'],
-  anyone: ['participants'],
-  everyone: ['participants'],
+  anyone: ['game', 'participants'],
+  everyone: ['game', 'participants'],
   hasSpell: ['participant'],
   isPosition: ['participant'],
   hasItem: ['participant'],
@@ -112,40 +113,46 @@ export const REQUIRE_SCOPE_MAP = {
 }
 
 /**
- * combinator 被按照什么顺序排列
+ * combinator 在下拉列表中的显示顺序（数值越小越靠前）
  *
- * 用于下拉列表的排序规则
+ * 分组顺序：逻辑组合 → 对局属性 → 成员范围 → 胜负结果 → 参与者属性 → 数值范围
  */
 export const COMBINATOR_ORDER_MAP = {
+  // 逻辑组合
   game: 0,
   and: 1,
   or: 2,
   not: 3,
-  isQueue: 4,
-  isAbort: 5,
-  isRemake: 6,
-  hasAugment: 7,
-  enemies: 8,
-  allies: 9,
-  all: 10,
-  anyone: 11,
-  everyone: 12,
-  isChampion: 13,
-  durationBetween: 14,
-  kdaBetween: 15,
-  killsBetween: 16,
-  deathsBetween: 17,
-  assistsBetween: 18,
-  goldBetween: 19,
-  isWin: 20,
-  isLoss: 21,
-  isMatchedGame: 22,
-  isPveGame: 23,
-  player: 24,
-  hasPlayer: 25,
-  hasSpell: 26,
-  isPosition: 27,
-  hasItem: 28
+  // 对局属性
+  isQueue: 10,
+  isMatchedGame: 11,
+  isPveGame: 12,
+  isAbort: 13,
+  isRemake: 14,
+  durationBetween: 15,
+  // 成员范围
+  all: 20,
+  allies: 21,
+  enemies: 22,
+  anyone: 23,
+  everyone: 24,
+  player: 25,
+  hasPlayer: 26,
+  // 胜负结果
+  isWin: 30,
+  isLoss: 31,
+  // 参与者属性（英雄 / 位置 / 技能 / 装备等）
+  isChampion: 40,
+  isPosition: 41,
+  hasSpell: 42,
+  hasItem: 43,
+  hasAugment: 44,
+  // 数值范围
+  kdaBetween: 50,
+  killsBetween: 51,
+  deathsBetween: 52,
+  assistsBetween: 53,
+  goldBetween: 54
 }
 
 export const COMBINATOR_FACTORY_MAP = {
@@ -158,7 +165,7 @@ export const COMBINATOR_FACTORY_MAP = {
   hasAugment: createHasAugmentCombinator,
   enemies: createEnemiesCombinator,
   allies: createAlliesCombinator,
-  all: createAllCombinator,
+  // all: createAllCombinator, // 暂不需要
   anyone: createAnyoneCombinator,
   everyone: createEveryoneCombinator,
   hasSpell: createHasSpellCombinator,
@@ -174,6 +181,7 @@ export const COMBINATOR_FACTORY_MAP = {
   isWin: createIsWinCombinator,
   isLoss: createIsLossCombinator,
   player: createPlayerCombinator,
+  hasPlayer: createHasPlayerCombinator,
   isMatchedGame: createIsMatchedGameCombinator,
   isPveGame: createIsPveGameCombinator
 }

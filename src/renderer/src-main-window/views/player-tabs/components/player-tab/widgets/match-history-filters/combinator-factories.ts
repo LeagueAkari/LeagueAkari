@@ -12,6 +12,7 @@ import {
   GoldBetweenCombinator,
   HasAugmentCombinator,
   HasItemCombinator,
+  HasPlayerCombinator,
   HasSpellCombinator,
   IsAbortCombinator,
   IsChampionCombinator,
@@ -281,6 +282,15 @@ export const createPlayerCombinator = (
   parentId
 })
 
+export const createHasPlayerCombinator = (
+  parentId: string,
+  options?: { puuid?: string | null }
+): HasPlayerCombinator => ({
+  id: `hasPlayer-${crypto.randomUUID()}`,
+  type: 'hasPlayer',
+  args: [paramArg(options?.puuid ?? null)],
+  parentId
+})
 export const createIsMatchedGameCombinator = (
   parentId: string,
   _options?: unknown

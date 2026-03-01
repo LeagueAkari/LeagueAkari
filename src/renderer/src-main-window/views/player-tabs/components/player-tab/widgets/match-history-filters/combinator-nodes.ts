@@ -90,6 +90,7 @@ export type PlayerCombinator = CombinatorNode<
   'player',
   [CombinatorArgParam<string | null>, CombinatorArgNodeRef]
 >
+export type HasPlayerCombinator = CombinatorNode<'hasPlayer', [CombinatorArgParam<string | null>]>
 export type IsMatchedGameCombinator = CombinatorNode<'isMatchedGame', []>
 export type IsPveGameCombinator = CombinatorNode<'isPveGame', []>
 

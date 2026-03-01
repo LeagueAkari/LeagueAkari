@@ -8,54 +8,56 @@
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><AccessTime20Regular /></NIcon>
-        游戏时长 (秒)
+        {{ t('PlayerTab.filter.gameDuration') }}
       </div>
       <div
         v-else-if="node.type === 'kdaBetween'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><NumberSymbol20Regular /></NIcon>
-        KDA
+        {{ t('PlayerTab.filter.combinatorLabels.kdaBetween') }}
       </div>
       <div
         v-else-if="node.type === 'killsBetween'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Target20Regular /></NIcon>
-        击杀数
+        {{ t('PlayerTab.filter.kills') }}
       </div>
       <div
         v-else-if="node.type === 'deathsBetween'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Dismiss20Regular /></NIcon>
-        死亡数
+        {{ t('PlayerTab.filter.deaths') }}
       </div>
       <div
         v-else-if="node.type === 'assistsBetween'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Handshake20Regular /></NIcon>
-        助攻数
+        {{ t('PlayerTab.filter.assists') }}
       </div>
       <div
         v-else-if="node.type === 'goldBetween'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Money20Regular /></NIcon>
-        金币
+        {{ t('PlayerTab.filter.gold') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">最小</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.min') }}
+      </div>
 
       <NInputNumber
         :show-button="false"
@@ -67,7 +69,9 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">最大</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.max') }}
+      </div>
 
       <NInputNumber
         :show-button="false"
@@ -90,6 +94,7 @@ import {
   NumberSymbol20Regular,
   Target20Regular
 } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInputNumber } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -102,6 +107,8 @@ import {
   KdaBetweenCombinator,
   KillsBetweenCombinator
 } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string

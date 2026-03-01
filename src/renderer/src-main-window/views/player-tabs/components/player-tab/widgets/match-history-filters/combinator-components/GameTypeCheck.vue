@@ -5,21 +5,21 @@
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'isMatchedGame'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Games20Regular /></NIcon>
-        是匹配对局
+        {{ t('PlayerTab.filter.isMatchedGame') }}
       </div>
       <div
         v-else-if="node.type === 'isPveGame'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Games20Regular /></NIcon>
-        是 PVE 对局
+        {{ t('PlayerTab.filter.isPveGame') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
   </div>
@@ -27,10 +27,13 @@
 
 <script setup lang="ts">
 import { Delete20Regular, Games20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+
+const { t } = useTranslation()
 import type { CombinatorNode } from '../combinator-nodes'
 
 const { nodeId } = defineProps<{

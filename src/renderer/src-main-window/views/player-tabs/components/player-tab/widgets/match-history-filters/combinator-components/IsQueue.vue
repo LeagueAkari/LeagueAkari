@@ -5,14 +5,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Apps20Regular /></NIcon>
-        游戏模式队列
+        {{ t('PlayerTab.filter.queue') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
@@ -31,11 +31,14 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Apps20Regular, Delete20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import { IsQueueCombinator } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string

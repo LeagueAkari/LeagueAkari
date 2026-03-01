@@ -5,11 +5,11 @@
     <div class="mb-2 flex items-center gap-2">
       <div v-if="node.type === 'and'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Branch20Regular /></NIcon>
-        同时满足
+        {{ t('PlayerTab.filter.and') }}
       </div>
       <div v-else-if="node.type === 'or'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><BranchFork20Regular /></NIcon>
-        满足其一
+        {{ t('PlayerTab.filter.or') }}
       </div>
 
       <div class="flex gap-1">
@@ -18,7 +18,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            添加
+            {{ t('PlayerTab.filter.add') }}
           </NButton>
         </NDropdown>
 
@@ -26,14 +26,14 @@
           <template #icon>
             <NIcon size="14"><ExchangeAlt /></NIcon>
           </template>
-          更换为 {{ node.type === 'and' ? '满足其一' : '同时满足' }}
+          {{ node.type === 'and' ? t('PlayerTab.filter.switchToOr') : t('PlayerTab.filter.switchToAnd') }}
         </NButton>
 
         <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          删除
+          {{ t('PlayerTab.filter.delete') }}
         </NButton>
       </div>
     </div>
@@ -45,7 +45,7 @@
       v-else
       class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      需添加条件
+      {{ t('PlayerTab.filter.needAddCondition') }}
     </div>
   </div>
 </template>
@@ -53,6 +53,7 @@
 <script setup lang="ts">
 import { ExchangeAlt } from '@vicons/fa'
 import { Add20Regular, Branch20Regular, BranchFork20Regular, Delete20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -61,6 +62,8 @@ import CombinatorComp from '../CombinatorComp.vue'
 import { AndCombinator, OrCombinator } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
 import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -78,7 +81,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })

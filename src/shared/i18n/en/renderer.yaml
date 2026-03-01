@@ -2086,15 +2086,92 @@ PlayerTab:
   tagPlayer: Tag Player
   filter:
     title: In-page Filters
-    reset: Clear Filters
-    winLoss: Result
-    all: All
-    win: Win
-    loss: Loss
-    summoners: Summoners involved
-    champions: Champions involved
-    showPractice: Show Practice Mode
-    showIrregularGames: Show Remakes, Aborts, etc.
+    advancedTab: Advanced Filters
+    resetAll: Reset All Conditions
+    addCondition: Add Condition
+    addFirstConditionHint: Add the first condition to build a complex predicate
+    and: All of (AND)
+    or: Any of (OR)
+    add: Add
+    switchToOr: Any of (OR)
+    switchToAnd: All of (AND)
+    delete: Delete
+    needAddCondition: Add condition required
+    anyone: For any member
+    everyone: All members must
+    selectCondition: Select Condition
+    needSelectCondition: Select condition required
+    forPlayer: For player
+    searchHint: '(Name and tag will be used to search)'
+    notMatch: Not
+    forAllMembers: For all members
+    forAllies: For allies
+    forEnemies: For enemies
+    relativeTo: Relative to
+    position: Position
+    queue: Game Queue
+    gameDuration: Game duration (seconds)
+    min: Min
+    max: Max
+    isWin: Win
+    isLoss: Loss
+    isAbort: Aborted
+    isRemake: Remake
+    surrenderLoss: Lost by surrender
+    kills: Kills
+    deaths: Deaths
+    assists: Assists
+    gold: Gold
+    isMatchedGame: Matched game
+    isPveGame: PvE game
+    summonerSpell: Summoner spell
+    hasItem: Has item
+    augment: Augment
+    hasPlayer: Match includes player
+    playerPuuid: Player
+    select: Select
+    atPosition: At position
+    have: Have
+    anyPosition: Any position
+    positionN: 'Position {{n}}'
+    spellGroupNormal: Normal
+    spellGroupSpecial: Special
+    augmentGroupHextech: Hextech Arena
+    augmentGroupArena: Arena
+    augmentGroupOther: Other
+    augmentTypeHai: H
+    augmentTypeDou: A
+    isChampion: Champion
+    combinatorLabels:
+      game: Game
+      and: All of (AND)
+      or: Any of (OR)
+      not: Not
+      isQueue: Game queue
+      isAbort: Aborted
+      isRemake: Remake
+      hasAugment: Augment
+      enemies: For enemies
+      allies: For allies
+      all: For all members
+      anyone: For any member
+      everyone: All members must
+      isChampion: Champion
+      durationBetween: Game duration
+      kdaBetween: KDA
+      killsBetween: Kills
+      deathsBetween: Deaths
+      assistsBetween: Assists
+      goldBetween: Gold
+      isWin: Win
+      isLoss: Loss
+      isMatchedGame: Matched game
+      isPveGame: PvE game
+      player: For player
+      hasPlayer: Match includes player
+      hasSpell: Summoner spell
+      isPosition: Position
+      hasItem: Has item
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   previousName: 'Previously Used Name: {{name}}'

@@ -5,19 +5,21 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Box20Regular /></NIcon>
-        拥有装备
+        {{ t('PlayerTab.filter.hasItem') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">拥有</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.have') }}
+      </div>
       <NSelect
         :options="itemOptions"
         :render-label="renderLabel"
@@ -30,7 +32,9 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">位于</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.atPosition') }}
+      </div>
       <NSelect
         :options="orderOptions"
         size="small"
@@ -46,11 +50,14 @@
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Box20Regular, Delete20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import { HasItemCombinator } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -84,13 +91,13 @@ const itemOptions = computed(() => {
 })
 
 const orderOptions = computed(() => [
-  { label: '任意位置', value: -1 },
-  { label: '第 1 个', value: 0 },
-  { label: '第 2 个', value: 1 },
-  { label: '第 3 个', value: 2 },
-  { label: '第 4 个', value: 3 },
-  { label: '第 5 个', value: 4 },
-  { label: '第 6 个', value: 5 }
+  { label: t('PlayerTab.filter.anyPosition'), value: -1 },
+  { label: t('PlayerTab.filter.positionN', { n: 1 }), value: 0 },
+  { label: t('PlayerTab.filter.positionN', { n: 2 }), value: 1 },
+  { label: t('PlayerTab.filter.positionN', { n: 3 }), value: 2 },
+  { label: t('PlayerTab.filter.positionN', { n: 4 }), value: 3 },
+  { label: t('PlayerTab.filter.positionN', { n: 5 }), value: 4 },
+  { label: t('PlayerTab.filter.positionN', { n: 6 }), value: 5 }
 ])
 
 const handleUpdateItemId = (value: number) => {

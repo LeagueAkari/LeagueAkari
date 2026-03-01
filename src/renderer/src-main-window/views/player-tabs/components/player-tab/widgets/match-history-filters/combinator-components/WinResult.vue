@@ -5,26 +5,26 @@
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'isWin'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Trophy20Regular /></NIcon>
-        是胜利对局
+        {{ t('PlayerTab.filter.isWin') }}
       </div>
       <div v-else-if="node.type === 'isLoss'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Dismiss20Regular /></NIcon>
-        是失败对局
+        {{ t('PlayerTab.filter.isLoss') }}
       </div>
       <div v-else-if="node.type === 'isAbort'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Pause20Regular /></NIcon>
-        是终止对局
+        {{ t('PlayerTab.filter.isAbort') }}
       </div>
       <div v-else-if="node.type === 'isRemake'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><ArrowRepeatAll20Regular /></NIcon>
-        是重开对局
+        {{ t('PlayerTab.filter.isRemake') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
@@ -33,7 +33,7 @@
         size="small"
         :checked="node.args[0].value"
         @update:checked="handleUpdateIsSurrender"
-        >以投降失败</NCheckbox
+        >{{ t('PlayerTab.filter.surrenderLoss') }}</NCheckbox
       >
     </div>
   </div>
@@ -47,10 +47,13 @@ import {
   Pause20Regular,
   Trophy20Regular
 } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+
+const { t } = useTranslation()
 import {
   IsAbortCombinator,
   IsLossCombinator,

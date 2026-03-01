@@ -5,14 +5,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Games20Regular /></NIcon>
-        选用英雄
+        {{ t('PlayerTab.filter.isChampion') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
@@ -34,6 +34,7 @@
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Delete20Regular, Games20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -41,6 +42,8 @@ import { useChampionNameMatch } from '@main-window/composables/useChampionNameMa
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import { IsChampionCombinator } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string

@@ -8,7 +8,7 @@
         <template #icon>
           <NIcon size="14"><RefreshFilled /></NIcon>
         </template>
-        <span class="text-[11px]">重置所有条件</span>
+        <span class="text-[11px]">{{ t('PlayerTab.filter.resetAll') }}</span>
       </NButton>
     </div>
 
@@ -23,11 +23,13 @@
           <template #icon>
             <NIcon size="14"><Add20Regular /></NIcon>
           </template>
-          添加条件
+          {{ t('PlayerTab.filter.addCondition') }}
         </NButton>
       </NDropdown>
 
-      <span class="text-sm text-black/50 dark:text-white/50">添加第一个条件以构建复杂判定式</span>
+      <span class="text-sm text-black/50 dark:text-white/50">{{
+        t('PlayerTab.filter.addFirstConditionHint')
+      }}</span>
     </div>
   </div>
 </template>
@@ -35,6 +37,7 @@
 <script setup lang="ts">
 import { Add20Regular } from '@vicons/fluent'
 import { RefreshFilled } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -43,6 +46,8 @@ import CombinatorComp from '../CombinatorComp.vue'
 import { GameCombinator } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
 import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -63,7 +68,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })

@@ -5,19 +5,21 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Sparkle20Regular /></NIcon>
-        海克斯
+        {{ t('PlayerTab.filter.augment') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">拥有</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.have') }}
+      </div>
 
       <NSelect
         :options="augmentOptions"
@@ -31,7 +33,9 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">位于</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.atPosition') }}
+      </div>
 
       <NSelect
         :options="orderOptions"
@@ -49,11 +53,14 @@ import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.v
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Augment } from '@shared/types/league-client/game-data'
 import { Delete20Regular, Sparkle20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import { HasAugmentCombinator } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -101,7 +108,7 @@ const renderTypeBlock = (type: 'kiwi' | 'cherry' | 'others' | undefined) => {
           'flex size-4.5 shrink-0 items-center justify-center rounded bg-blue-500 text-[11px]'
         ]}
       >
-        海
+        {t('PlayerTab.filter.augmentTypeHai')}
       </div>
     )
   } else if (type === 'cherry') {
@@ -111,7 +118,7 @@ const renderTypeBlock = (type: 'kiwi' | 'cherry' | 'others' | undefined) => {
           'flex size-4.5 shrink-0 items-center justify-center rounded bg-red-500 text-[11px]'
         ]}
       >
-        斗
+        {t('PlayerTab.filter.augmentTypeDou')}
       </div>
     )
   } else {
@@ -141,7 +148,7 @@ const augmentOptions = computed(() => {
   return [
     {
       type: 'group',
-      label: '海克斯大乱斗',
+      label: t('PlayerTab.filter.augmentGroupHextech'),
       children: kiwi
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -151,7 +158,7 @@ const augmentOptions = computed(() => {
     },
     {
       type: 'group',
-      label: '斗魂竞技场',
+      label: t('PlayerTab.filter.augmentGroupArena'),
       children: cherry
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -161,7 +168,7 @@ const augmentOptions = computed(() => {
     },
     {
       type: 'group',
-      label: '其他',
+      label: t('PlayerTab.filter.augmentGroupOther'),
       children: others
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -174,13 +181,13 @@ const augmentOptions = computed(() => {
 
 const orderOptions = computed(() => {
   const oneToFive = Array.from({ length: 5 }, (_, index) => ({
-    label: `第 ${index + 1} 个`,
+    label: t('PlayerTab.filter.positionN', { n: index + 1 }),
     value: index
   }))
 
   return [
     {
-      label: '任意位置',
+      label: t('PlayerTab.filter.anyPosition'),
       value: -1
     },
     ...oneToFive

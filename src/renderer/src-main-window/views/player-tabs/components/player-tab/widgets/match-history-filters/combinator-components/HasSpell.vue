@@ -5,19 +5,21 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Flash20Regular /></NIcon>
-        召唤师技能
+        {{ t('PlayerTab.filter.summonerSpell') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        删除
+        {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">选用</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.select') }}
+      </div>
 
       <NSelect
         :options="spellOptions"
@@ -31,7 +33,9 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-12 text-sm text-black/80 dark:text-white/80">位于</div>
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.atPosition') }}
+      </div>
 
       <NSelect
         :options="orderOptions"
@@ -48,11 +52,14 @@
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Delete20Regular, Flash20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import { HasSpellCombinator } from '../combinator-nodes'
+
+const { t } = useTranslation()
 
 const { nodeId } = defineProps<{
   nodeId: string
@@ -88,7 +95,7 @@ const spellOptions = computed(() => {
   return [
     {
       type: 'group',
-      label: '常规',
+      label: t('PlayerTab.filter.spellGroupNormal'),
       children: normal
         .map((s) => ({
           label: s.name,
@@ -98,7 +105,7 @@ const spellOptions = computed(() => {
     },
     {
       type: 'group',
-      label: '特殊',
+      label: t('PlayerTab.filter.spellGroupSpecial'),
       children: special
         .map((s) => ({
           label: s.name,
@@ -111,9 +118,9 @@ const spellOptions = computed(() => {
 
 const orderOptions = computed(() => {
   return [
-    { label: '任意位置', value: -1 },
-    { label: '第 1 个', value: 0 },
-    { label: '第 2 个', value: 1 }
+    { label: t('PlayerTab.filter.anyPosition'), value: -1 },
+    { label: t('PlayerTab.filter.positionN', { n: 1 }), value: 0 },
+    { label: t('PlayerTab.filter.positionN', { n: 2 }), value: 1 }
   ]
 })
 

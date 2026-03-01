@@ -5,7 +5,7 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Prohibited20Regular /></NIcon>
-        不满足
+        {{ t('PlayerTab.filter.notMatch') }}
       </div>
 
       <div class="flex gap-1">
@@ -20,7 +20,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            选择条件
+            {{ t('PlayerTab.filter.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -28,7 +28,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          删除
+          {{ t('PlayerTab.filter.delete') }}
         </NButton>
       </div>
     </div>
@@ -38,17 +38,20 @@
       v-else
       class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      需添加条件
+      {{ t('PlayerTab.filter.needAddCondition') }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Add20Regular, Delete20Regular, Prohibited20Regular } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+
+const { t } = useTranslation()
 import CombinatorComp from '../CombinatorComp.vue'
 import { NotCombinator } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
@@ -76,7 +79,7 @@ const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
   return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: c,
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
     key: c
   }))
 })
