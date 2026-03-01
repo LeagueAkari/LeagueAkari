@@ -357,7 +357,10 @@
     <div v-if="championUsage.length" class="mb-1 flex w-full gap-1">
       <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :key="c.id" :delay="50">
         <template #trigger>
-          <div class="relative h-5 w-5">
+          <div
+            class="relative h-5 w-5 cursor-pointer transition-[filter] hover:brightness-110"
+            @click.stop="navigateToChampionMatchHistoryByChampionId(c.id)"
+          >
             <ChampionIcon
               :ring-color="
                 c.analysis ? (c.analysis.winRate >= 0.5 ? '#2368ca' : '#c94f4f') : undefined
@@ -581,6 +584,15 @@ const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[p
 const navigateToChampionMatchHistory = () => {
   if (championId.value && championId.value > 0) {
     navigateToSummonerByPuuidWithChampion(puuid, championId.value)
+    return
+  }
+
+  navigateToSummonerByPuuid(puuid)
+}
+
+const navigateToChampionMatchHistoryByChampionId = (targetChampionId: number) => {
+  if (targetChampionId > 0) {
+    navigateToSummonerByPuuidWithChampion(puuid, targetChampionId)
     return
   }
 
