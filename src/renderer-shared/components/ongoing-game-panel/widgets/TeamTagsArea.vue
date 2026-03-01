@@ -63,7 +63,7 @@
               >
                 {{
                   t('TeamTagsArea.premade', {
-                    countV: p.puuids.length
+                    size: p.puuids.length
                   })
                 }}
               </div>
