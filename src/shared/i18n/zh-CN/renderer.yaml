@@ -135,7 +135,7 @@ Ftue:
   themeSystem:
     button:
       title: 全新主题系统入口
-      description: 点击调色板按钮打开主题菜单，可切换 7 套内置主题配色。
+      description: 点击调色板按钮打开主题菜单，可切换 8 套内置主题配色。
 
 CommonButtons:
   announcement: 公告
@@ -160,6 +160,7 @@ CommonButtons:
       light: 亮色
       dark: 暗色
       graphite: 石墨青蓝
+      cyber: 赛博荧光
       sakura: 樱花粉
       mint: 薄荷绿
       aurora: 极光紫
@@ -259,6 +260,7 @@ AppSettings:
         light: 亮色
         dark: 暗色
         graphite: 石墨青蓝
+        cyber: 赛博荧光
         sakura: 樱花粉
         mint: 薄荷绿
         aurora: 极光紫

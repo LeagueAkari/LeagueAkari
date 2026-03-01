@@ -154,6 +154,37 @@
   --la-match-neutral-grad-end: rgba(148, 173, 197, 0.08);
 }
 
+:root[data-theme-id='cyber'] {
+  --la-color-bg-primary: #050505;
+  --la-color-text-primary: rgba(244, 255, 230, 0.96);
+  --la-color-link: #dfff00;
+  --la-color-scrollbar-thumb: #889900;
+  --la-color-scrollbar-thumb-hover: #dfff00;
+  --la-color-select-menu-bg: #0d0d0df6;
+  --la-color-message-bg: #0d0d0d;
+  --la-color-popconfirm-bg: #0a0a0af4;
+  --la-color-popover-border: rgba(223, 255, 0, 0.35);
+  --la-sidebar-bg: rgba(0, 0, 0, 0.88);
+  --la-sidebar-border: rgba(223, 255, 0, 0.2);
+  --la-wallpaper-overlay-start: rgba(0, 0, 0, 0.88);
+  --la-wallpaper-overlay-mid: rgba(0, 0, 0, 0.92);
+  --la-wallpaper-overlay-end: rgba(0, 0, 0, 0.96);
+  --la-card-tint-rgb: 223 255 0;
+  --la-card-border-rgb: 223 255 0;
+  --la-card-surface-95: rgba(15, 15, 15, 0.96);
+  --la-card-surface-90: rgba(20, 20, 20, 0.92);
+  --la-card-muted-surface: rgba(28, 28, 28, 0.92);
+  --la-match-win-solid: rgba(89, 177, 224, 0.24);
+  --la-match-win-grad-start: rgba(89, 177, 224, 0.28);
+  --la-match-win-grad-end: rgba(89, 177, 224, 0.12);
+  --la-match-loss-solid: rgba(229, 110, 129, 0.24);
+  --la-match-loss-grad-start: rgba(229, 110, 129, 0.28);
+  --la-match-loss-grad-end: rgba(229, 110, 129, 0.12);
+  --la-match-neutral-solid: rgba(223, 255, 0, 0.18);
+  --la-match-neutral-grad-start: rgba(223, 255, 0, 0.2);
+  --la-match-neutral-grad-end: rgba(223, 255, 0, 0.08);
+}
+
 :root[data-theme-id='sakura'] {
   --la-color-bg-primary: #fff4f6;
   --la-color-text-primary: rgba(49, 44, 52, 0.92);
@@ -502,6 +533,19 @@
   .n-checkbox.n-checkbox--checked .n-checkbox-box,
   .n-radio.n-radio--checked .n-radio__dot {
     box-shadow: 0 0 0 1px rgba(78, 195, 255, 0.45);
+  }
+}
+
+[data-theme-id='cyber'] {
+  .n-switch.n-switch--active .n-switch__rail {
+    box-shadow:
+      0 0 0 1px rgba(223, 255, 0, 0.46),
+      0 0 10px rgba(223, 255, 0, 0.34);
+  }
+
+  .n-checkbox.n-checkbox--checked .n-checkbox-box,
+  .n-radio.n-radio--checked .n-radio__dot {
+    box-shadow: 0 0 0 1px rgba(223, 255, 0, 0.46);
   }
 }
 

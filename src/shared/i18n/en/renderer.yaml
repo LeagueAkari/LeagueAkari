@@ -134,7 +134,7 @@ Ftue:
   themeSystem:
     button:
       title: New Theme System Entry
-      description: Click the palette button to open the 7 built-in theme presets.
+      description: Click the palette button to open the 8 built-in theme presets.
 
 CommonButtons:
   announcement: Announcement
@@ -159,6 +159,7 @@ CommonButtons:
       light: Light
       dark: Dark
       graphite: Graphite Blue
+      cyber: Cyber Neon
       sakura: Sakura Pink
       mint: Mint Green
       aurora: Aurora Violet
@@ -258,6 +259,7 @@ AppSettings:
         light: Light
         dark: Dark
         graphite: Graphite Blue
+        cyber: Cyber Neon
         sakura: Sakura Pink
         mint: Mint Green
         aurora: Aurora Violet
