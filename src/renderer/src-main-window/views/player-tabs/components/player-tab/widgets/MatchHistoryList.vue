@@ -137,16 +137,8 @@ const gamesShouldHide = computed(() => {
     return new Set<number>()
   }
 
-  const shouldShow = (g: LcuOrSgpGameSummary) => {
-    if (!predicate.value) {
-      return true
-    }
-
-    return predicate.value(g)
-  }
-
   return pagedMatchHistory.value.games.reduce(
-    (acc, g) => (shouldShow(g) ? acc : acc.add(g.gameId)),
+    (acc, g) => (predicate.value(g) ? acc : acc.add(g.gameId)),
     new Set<number>()
   )
 })

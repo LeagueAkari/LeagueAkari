@@ -1,6 +1,6 @@
 <template>
   <div
-    class="space-y-2 rounded border border-solid border-white/10 bg-black/2 px-4 py-2 dark:bg-white/2"
+    class="space-y-2 rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
   >
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'all'" class="flex items-center gap-1.5 text-sm font-bold">

@@ -1,29 +1,47 @@
 <template>
   <div
-    class="space-y-2 rounded border border-solid border-white/10 bg-black/2 px-4 py-2 dark:bg-white/2"
+    class="space-y-2 rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
   >
     <div class="flex items-center gap-2">
-      <div v-if="node.type === 'durationBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-if="node.type === 'durationBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><AccessTime20Regular /></NIcon>
         游戏时长 (秒)
       </div>
-      <div v-else-if="node.type === 'kdaBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-else-if="node.type === 'kdaBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><NumberSymbol20Regular /></NIcon>
         KDA
       </div>
-      <div v-else-if="node.type === 'killsBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-else-if="node.type === 'killsBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><Target20Regular /></NIcon>
         击杀数
       </div>
-      <div v-else-if="node.type === 'deathsBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-else-if="node.type === 'deathsBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><Dismiss20Regular /></NIcon>
         死亡数
       </div>
-      <div v-else-if="node.type === 'assistsBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-else-if="node.type === 'assistsBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><Handshake20Regular /></NIcon>
         助攻数
       </div>
-      <div v-else-if="node.type === 'goldBetween'" class="flex items-center gap-1.5 text-sm font-bold">
+      <div
+        v-else-if="node.type === 'goldBetween'"
+        class="flex items-center gap-1.5 text-sm font-bold"
+      >
         <NIcon size="16"><Money20Regular /></NIcon>
         金币
       </div>

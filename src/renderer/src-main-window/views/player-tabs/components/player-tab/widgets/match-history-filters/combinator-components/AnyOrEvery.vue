@@ -1,5 +1,7 @@
 <template>
-  <div class="rounded border border-solid border-white/10 bg-black/2 px-4 py-2 dark:bg-white/2">
+  <div
+    class="rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
+  >
     <div class="mb-2 flex items-center gap-2">
       <div v-if="node.type === 'anyone'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleTeam20Regular /></NIcon>

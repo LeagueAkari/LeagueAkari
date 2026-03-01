@@ -1,3 +1,4 @@
+import { Predicate } from '@shared/data-adapter/predicates/combinators'
 import { ComputedRef, InjectionKey, Ref, computed, inject, markRaw, provide, ref } from 'vue'
 
 import {
@@ -7,7 +8,6 @@ import {
   nodeArg
 } from '../widgets/match-history-filters/combinator-nodes'
 import { toPredicate } from '../widgets/match-history-filters/combinator-runtime'
-import { Predicate } from '../widgets/match-history-filters/combinators'
 
 export type SimpleSummonerResult = {
   puuid: string
@@ -20,7 +20,7 @@ export type MatchHistoryFiltersContext = {
   mode: Ref<'simple' | 'advanced'>
   rootNode: ComputedRef<CombinatorNode>
   nodeMap: Ref<Record<string, CombinatorNode>>
-  predicate: ComputedRef<Predicate<unknown> | null>
+  predicate: ComputedRef<Predicate<unknown>>
   rootHasCombinator: ComputedRef<boolean>
   cachedSummoners: Ref<Record<string, SimpleSummonerResult>>
   addNode: (node: CombinatorNode) => void

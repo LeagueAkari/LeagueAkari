@@ -1,4 +1,3 @@
-import { CombinatorNode, isNodeArg } from './combinator-nodes'
 import {
   Predicate,
   all,
@@ -30,7 +29,9 @@ import {
   not,
   or,
   player
-} from './combinators'
+} from '@shared/data-adapter/predicates/combinators'
+
+import { CombinatorNode, isNodeArg } from './combinator-nodes'
 
 export const COMBINATOR_MAP = {
   game: game,

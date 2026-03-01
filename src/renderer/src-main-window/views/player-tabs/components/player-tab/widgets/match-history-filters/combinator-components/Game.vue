@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="childNode"
-    class="rounded border border-solid border-white/10 bg-black/2 px-4 py-2 dark:bg-white/2"
+    class="rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
   >
     <div class="mb-2 flex gap-1">
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(childNode.id)">
