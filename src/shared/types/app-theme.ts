@@ -1,46 +1,8 @@
-export const DAISY_LIGHT_THEME_IDS = [
-  'cupcake',
-  'bumblebee',
-  'emerald',
-  'corporate',
-  'retro',
-  'valentine',
-  'garden',
-  'lofi',
-  'fantasy',
-  'autumn',
-  'acid',
-  'lemonade',
-  'winter',
-  'nord',
-  'caramellatte'
-] as const
+export const BUILTIN_LIGHT_THEME_IDS = ['light', 'sakura', 'butter', 'mint'] as const
 
-export const DAISY_DARK_THEME_IDS = [
-  'synthwave',
-  'halloween',
-  'forest',
-  'black',
-  'luxury',
-  'dracula',
-  'business',
-  'night',
-  'coffee',
-  'dim'
-] as const
+export const BUILTIN_DARK_THEME_IDS = ['dark', 'graphite', 'aurora'] as const
 
-export const DAISY_THEME_IDS = [...DAISY_LIGHT_THEME_IDS, ...DAISY_DARK_THEME_IDS] as const
-
-export const APP_THEME_IDS = [
-  'light',
-  'dark',
-  'graphite',
-  'sakura',
-  'mint',
-  'aurora',
-  'butter',
-  ...DAISY_THEME_IDS
-] as const
+export const APP_THEME_IDS = [...BUILTIN_LIGHT_THEME_IDS, ...BUILTIN_DARK_THEME_IDS] as const
 
 export const APP_THEME_VALUES = ['default', ...APP_THEME_IDS] as const
 
@@ -53,15 +15,8 @@ const toColorThemeMap = <T extends readonly string[]>(ids: T, colorTheme: AppCol
 }
 
 const THEME_COLOR_THEME_MAP: Record<AppThemeId, AppColorTheme> = {
-  light: 'light',
-  dark: 'dark',
-  graphite: 'dark',
-  sakura: 'light',
-  mint: 'light',
-  aurora: 'dark',
-  butter: 'light',
-  ...toColorThemeMap(DAISY_LIGHT_THEME_IDS, 'light'),
-  ...toColorThemeMap(DAISY_DARK_THEME_IDS, 'dark')
+  ...toColorThemeMap(BUILTIN_LIGHT_THEME_IDS, 'light'),
+  ...toColorThemeMap(BUILTIN_DARK_THEME_IDS, 'dark')
 }
 
 export function isAppThemeSetting(value: unknown): value is AppThemeSetting {

@@ -556,8 +556,8 @@ import {
 } from '@renderer-shared/shards/window-manager/store'
 import {
   AppThemeId,
-  DAISY_DARK_THEME_IDS,
-  DAISY_LIGHT_THEME_IDS,
+  BUILTIN_DARK_THEME_IDS,
+  BUILTIN_LIGHT_THEME_IDS,
   getThemeColorTheme
 } from '@shared/types/app-theme'
 import { formatSeconds } from '@shared/utils/format'
@@ -659,9 +659,6 @@ const themeLabel = (id: AppThemeId) => {
 }
 
 const themes = computed(() => {
-  const brightCoreThemes: AppThemeId[] = ['light', 'sakura', 'butter', 'mint']
-  const darkCoreThemes: AppThemeId[] = ['dark', 'graphite', 'aurora']
-
   return [
     {
       type: 'group',
@@ -673,25 +670,13 @@ const themes = computed(() => {
       type: 'group',
       key: 'bright-core',
       label: t('AppSettings.basic.theme.groups.brightBuiltin'),
-      children: brightCoreThemes.map((id) => ({ label: themeLabel(id), value: id }))
-    },
-    {
-      type: 'group',
-      key: 'bright-daisy',
-      label: t('AppSettings.basic.theme.groups.brightDaisy'),
-      children: DAISY_LIGHT_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
+      children: BUILTIN_LIGHT_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
     },
     {
       type: 'group',
       key: 'dark-core',
       label: t('AppSettings.basic.theme.groups.darkBuiltin'),
-      children: darkCoreThemes.map((id) => ({ label: themeLabel(id), value: id }))
-    },
-    {
-      type: 'group',
-      key: 'dark-daisy',
-      label: t('AppSettings.basic.theme.groups.darkDaisy'),
-      children: DAISY_DARK_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
+      children: BUILTIN_DARK_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
     }
   ]
 })

@@ -1,9 +1,4 @@
-import {
-  AppColorTheme,
-  AppThemeId,
-  DAISY_DARK_THEME_IDS,
-  DAISY_LIGHT_THEME_IDS
-} from '@shared/types/app-theme'
+import { AppColorTheme, AppThemeId } from '@shared/types/app-theme'
 import {
   GlobalTheme,
   GlobalThemeOverrides,
@@ -30,11 +25,17 @@ const CLASSIC_OVERRIDES = {
   light: {
     common: {
       popoverColor: '#ffffff',
-      primaryColor: '#0ea5e9',
-      primaryColorHover: '#0284c7',
-      successColor: '#3fa877',
-      warningColor: '#d79642',
-      errorColor: '#d95a6c'
+      primaryColor: '#3b6f98',
+      primaryColorHover: '#315f84',
+      primaryColorPressed: '#274c6b',
+      primaryColorSuppl: 'rgba(59, 111, 152, 0.16)',
+      infoColor: '#3b6f98',
+      infoColorHover: '#315f84',
+      infoColorPressed: '#274c6b',
+      infoColorSuppl: 'rgba(59, 111, 152, 0.16)',
+      successColor: '#2f926c',
+      warningColor: '#b7751e',
+      errorColor: '#ca4e68'
     },
     Notification: {
       padding: '12px',
@@ -45,8 +46,8 @@ const CLASSIC_OVERRIDES = {
     },
     Card: {
       color: '#0000',
-      borderColor: 'rgba(0, 0, 0, 0.1)',
-      borderColorModal: 'rgba(0, 0, 0, 0.16)',
+      borderColor: 'rgba(41, 57, 78, 0.12)',
+      borderColorModal: 'rgba(41, 57, 78, 0.16)',
       paddingSmall: '4px 12px'
     },
     Message: {
@@ -54,22 +55,22 @@ const CLASSIC_OVERRIDES = {
       fontSize: '12px',
       iconSize: '16px',
       iconMargin: '0 4px 0 0',
-      colorInfo: '#f5f5f5',
-      colorSuccess: '#f5f5f5',
-      colorWarning: '#f5f5f5',
-      colorError: '#f5f5f5'
+      colorInfo: '#eef3f8',
+      colorSuccess: '#eef3f8',
+      colorWarning: '#eef3f8',
+      colorError: '#eef3f8'
     },
-  Popover: {
-    fontSize: '12px',
-    borderColor: 'rgba(0, 0, 0, 0.2)'
-  },
-  Tooltip: {
-    color: 'rgba(34, 34, 41, 0.94)',
-    textColor: '#f7f7fa'
-  },
-  InternalSelectMenu: {
-    color: '#ffffff'
-  },
+    Popover: {
+      fontSize: '12px',
+      borderColor: 'rgba(41, 57, 78, 0.18)'
+    },
+    Tooltip: {
+      color: 'rgba(28, 38, 51, 0.96)',
+      textColor: '#f8fbff'
+    },
+    InternalSelectMenu: {
+      color: '#ffffff'
+    },
     Menu: {
       padding: '1px'
     },
@@ -82,12 +83,36 @@ const CLASSIC_OVERRIDES = {
   },
   dark: {
     common: {
-      popoverColor: '#383838f8',
-      primaryColor: '#54d399',
-      primaryColorHover: '#3fc28b',
-      successColor: '#4bc78f',
-      warningColor: '#e4ac5b',
-      errorColor: '#eb7485'
+      bodyColor: '#151a22',
+      cardColor: '#232c38',
+      modalColor: '#1f2632',
+      tableColor: '#1f2632',
+      popoverColor: '#212836f5',
+      primaryColor: '#67c6e3',
+      primaryColorHover: '#4fb4d4',
+      primaryColorPressed: '#379abb',
+      primaryColorSuppl: 'rgba(103, 198, 227, 0.16)',
+      infoColor: '#67c6e3',
+      infoColorHover: '#4fb4d4',
+      infoColorPressed: '#379abb',
+      infoColorSuppl: 'rgba(103, 198, 227, 0.16)',
+      successColor: '#67c06f',
+      warningColor: '#e0a861',
+      errorColor: '#e77a8f',
+      textColorBase: '#f1f6ff',
+      textColor1: '#f1f6ff',
+      textColor2: 'rgba(241, 246, 255, 0.88)',
+      textColor3: 'rgba(195, 208, 228, 0.88)',
+      textColorDisabled: 'rgba(195, 208, 228, 0.45)',
+      placeholderColor: 'rgba(195, 208, 228, 0.68)',
+      iconColor: 'rgba(195, 208, 228, 0.82)',
+      iconColorHover: '#f1f6ff',
+      borderColor: 'rgba(195, 208, 228, 0.18)',
+      dividerColor: 'rgba(195, 208, 228, 0.12)',
+      inputColor: 'rgba(195, 208, 228, 0.1)',
+      actionColor: 'rgba(195, 208, 228, 0.06)',
+      hoverColor: 'rgba(103, 198, 227, 0.1)',
+      pressedColor: 'rgba(103, 198, 227, 0.16)'
     },
     Notification: {
       padding: '12px',
@@ -95,11 +120,11 @@ const CLASSIC_OVERRIDES = {
       titleFontWeight: '700',
       descriptionFontSize: '13px',
       avatarSize: '20px',
-      color: '#313131fa'
+      color: '#293140f2'
     },
     Card: {
       color: '#0000',
-      colorModal: '#232329',
+      colorModal: '#232c38',
       paddingSmall: '4px 12px'
     },
     Message: {
@@ -107,22 +132,22 @@ const CLASSIC_OVERRIDES = {
       fontSize: '12px',
       iconSize: '16px',
       iconMargin: '0 4px 0 0',
-      colorInfo: '#2c2c2c',
-      colorSuccess: '#2c2c2c',
-      colorWarning: '#2c2c2c',
-      colorError: '#2c2c2c'
+      colorInfo: '#1e2531',
+      colorSuccess: '#1e2531',
+      colorWarning: '#1e2531',
+      colorError: '#1e2531'
     },
     Popover: {
-      color: '#1f1f1ffa',
-      arrowColor: '#1f1f1ffa',
-      borderColor: 'rgba(255, 255, 255, 0.2)',
+      color: '#212836f3',
+      arrowColor: '#212836f3',
+      borderColor: 'rgba(210, 223, 242, 0.18)',
       fontSize: '12px'
     },
     InternalSelectMenu: {
-      color: '#383838f8'
+      color: '#242c38f7'
     },
     Dropdown: {
-      color: '#222e'
+      color: '#1f2632ee'
     },
     Menu: {
       padding: '1px'
@@ -136,46 +161,46 @@ const CLASSIC_OVERRIDES = {
   },
   graphite: {
     common: {
-      bodyColor: '#0b1118',
-      cardColor: '#162231',
-      modalColor: '#111a24',
-      tableColor: '#111a24',
-      popoverColor: '#111a24f5',
-      primaryColor: '#4ec3ff',
-      primaryColorHover: '#2fadeb',
-      primaryColorPressed: '#1f97d6',
-      primaryColorSuppl: 'rgba(78, 195, 255, 0.16)',
-      infoColor: '#4ec3ff',
-      infoColorHover: '#2fadeb',
-      infoColorPressed: '#1f97d6',
-      infoColorSuppl: 'rgba(78, 195, 255, 0.16)',
-      successColor: '#4bcb98',
-      successColorHover: '#39b986',
-      successColorPressed: '#2f9f72',
-      successColorSuppl: 'rgba(75, 203, 152, 0.16)',
-      warningColor: '#f2b86a',
-      warningColorHover: '#e8aa57',
-      warningColorPressed: '#d8943f',
+      bodyColor: '#09121c',
+      cardColor: '#152436',
+      modalColor: '#101c2c',
+      tableColor: '#101c2c',
+      popoverColor: '#101c2cf5',
+      primaryColor: '#69caff',
+      primaryColorHover: '#4ebeff',
+      primaryColorPressed: '#2da6e6',
+      primaryColorSuppl: 'rgba(105, 202, 255, 0.16)',
+      infoColor: '#69caff',
+      infoColorHover: '#4ebeff',
+      infoColorPressed: '#2da6e6',
+      infoColorSuppl: 'rgba(105, 202, 255, 0.16)',
+      successColor: '#4cb882',
+      successColorHover: '#3ea571',
+      successColorPressed: '#338e61',
+      successColorSuppl: 'rgba(76, 184, 130, 0.16)',
+      warningColor: '#f0b36b',
+      warningColorHover: '#e2a35a',
+      warningColorPressed: '#c98a42',
       warningColorSuppl: 'rgba(242, 184, 106, 0.16)',
-      errorColor: '#ff7e92',
-      errorColorHover: '#f36f86',
-      errorColorPressed: '#df5d74',
-      errorColorSuppl: 'rgba(255, 126, 146, 0.16)',
-      textColorBase: '#dde7f1',
-      textColor1: '#dde7f1',
-      textColor2: 'rgba(221, 231, 241, 0.88)',
-      textColor3: 'rgba(158, 178, 198, 0.94)',
-      textColorDisabled: 'rgba(158, 178, 198, 0.45)',
-      placeholderColor: 'rgba(158, 178, 198, 0.7)',
-      iconColor: 'rgba(158, 178, 198, 0.85)',
-      iconColorHover: '#dde7f1',
-      iconColorPressed: 'rgba(221, 231, 241, 0.8)',
-      borderColor: 'rgba(148, 173, 197, 0.22)',
-      dividerColor: 'rgba(148, 173, 197, 0.16)',
-      inputColor: 'rgba(148, 173, 197, 0.12)',
+      errorColor: '#ff7c94',
+      errorColorHover: '#ef6d86',
+      errorColorPressed: '#d95c74',
+      errorColorSuppl: 'rgba(255, 124, 148, 0.16)',
+      textColorBase: '#e2edf7',
+      textColor1: '#e2edf7',
+      textColor2: 'rgba(226, 237, 247, 0.9)',
+      textColor3: 'rgba(162, 182, 204, 0.94)',
+      textColorDisabled: 'rgba(162, 182, 204, 0.45)',
+      placeholderColor: 'rgba(162, 182, 204, 0.7)',
+      iconColor: 'rgba(162, 182, 204, 0.85)',
+      iconColorHover: '#e2edf7',
+      iconColorPressed: 'rgba(226, 237, 247, 0.8)',
+      borderColor: 'rgba(148, 173, 197, 0.24)',
+      dividerColor: 'rgba(148, 173, 197, 0.18)',
+      inputColor: 'rgba(148, 173, 197, 0.13)',
       actionColor: 'rgba(148, 173, 197, 0.08)',
-      hoverColor: 'rgba(78, 195, 255, 0.11)',
-      pressedColor: 'rgba(78, 195, 255, 0.16)',
+      hoverColor: 'rgba(105, 202, 255, 0.11)',
+      pressedColor: 'rgba(105, 202, 255, 0.16)',
       buttonColor2: 'rgba(148, 173, 197, 0.12)',
       buttonColor2Hover: 'rgba(148, 173, 197, 0.18)',
       buttonColor2Pressed: 'rgba(148, 173, 197, 0.12)'
@@ -186,13 +211,13 @@ const CLASSIC_OVERRIDES = {
       titleFontWeight: '700',
       descriptionFontSize: '13px',
       avatarSize: '20px',
-      color: '#162231f2'
+      color: '#152436f2'
     },
     Card: {
       color: '#0000',
-      colorModal: '#162231',
-      borderColor: 'rgba(148, 173, 197, 0.22)',
-      borderColorModal: 'rgba(148, 173, 197, 0.22)',
+      colorModal: '#152436',
+      borderColor: 'rgba(148, 173, 197, 0.24)',
+      borderColorModal: 'rgba(148, 173, 197, 0.24)',
       paddingSmall: '4px 12px'
     },
     Button: {
@@ -211,7 +236,7 @@ const CLASSIC_OVERRIDES = {
     },
     Switch: {
       railColor: 'rgba(148, 173, 197, 0.32)',
-      railColorActive: '#4ec3ff',
+      railColorActive: '#69caff',
       buttonColor: '#e4f5ff',
       iconColor: '#07131d',
       textColor: 'rgba(158, 178, 198, 0.95)',
@@ -220,46 +245,46 @@ const CLASSIC_OVERRIDES = {
     },
     Checkbox: {
       color: 'rgba(148, 173, 197, 0.12)',
-      colorChecked: '#4ec3ff',
+      colorChecked: '#69caff',
       border: '1px solid rgba(148, 173, 197, 0.34)',
-      borderChecked: '1px solid #4ec3ff',
+      borderChecked: '1px solid #69caff',
       checkMarkColor: '#e6f4ff',
       textColor: '#dde7f1',
-      boxShadowFocus: '0 0 0 2px rgba(78, 195, 255, 0.3)',
+      boxShadowFocus: '0 0 0 2px rgba(105, 202, 255, 0.3)',
       fontSizeSmall: '13px'
     },
     Radio: {
       color: 'rgba(148, 173, 197, 0.28)',
-      colorActive: '#4ec3ff',
+      colorActive: '#69caff',
       buttonColor: 'rgba(148, 173, 197, 0.12)',
-      buttonColorActive: '#4ec3ff',
+      buttonColorActive: '#69caff',
       buttonBorderColor: 'rgba(148, 173, 197, 0.34)',
-      buttonBorderColorActive: '#4ec3ff',
+      buttonBorderColorActive: '#69caff',
       buttonTextColor: '#dde7f1',
       buttonTextColorActive: '#e6f4ff',
-      dotColorActive: '#4ec3ff'
+      dotColorActive: '#69caff'
     },
     Message: {
       padding: '4px 8px',
       fontSize: '12px',
       iconSize: '16px',
       iconMargin: '0 4px 0 0',
-      colorInfo: '#162231',
-      colorSuccess: '#162231',
-      colorWarning: '#162231',
-      colorError: '#162231'
+      colorInfo: '#152436',
+      colorSuccess: '#152436',
+      colorWarning: '#152436',
+      colorError: '#152436'
     },
     Popover: {
-      color: '#111a24f5',
-      arrowColor: '#111a24f5',
-      borderColor: 'rgba(148, 173, 197, 0.22)',
+      color: '#101c2cf5',
+      arrowColor: '#101c2cf5',
+      borderColor: 'rgba(148, 173, 197, 0.24)',
       fontSize: '12px'
     },
     InternalSelectMenu: {
-      color: '#162231f6'
+      color: '#152436f6'
     },
     Dropdown: {
-      color: '#111a24f5'
+      color: '#101c2cf5'
     },
     Menu: {
       padding: '1px'
@@ -272,31 +297,31 @@ const CLASSIC_OVERRIDES = {
 
 const SAKURA_OVERRIDES: GlobalThemeOverrides = {
   common: {
-    bodyColor: '#fff1f7',
-    cardColor: '#fff9fc',
-    modalColor: '#fff2f8',
-    tableColor: '#fff2f8',
-    popoverColor: '#fff9fcf5',
-    primaryColor: '#ff6fa7',
-    primaryColorHover: '#f95898',
-    primaryColorPressed: '#e34285',
-    infoColor: '#ff6fa7',
-    infoColorHover: '#f95898',
-    infoColorPressed: '#e34285',
-    successColor: '#42b67c',
-    warningColor: '#d48a1c',
-    errorColor: '#d95d7b',
-    textColorBase: 'rgba(0, 0, 0, 0.86)',
-    textColor1: 'rgba(0, 0, 0, 0.86)',
-    textColor2: 'rgba(0, 0, 0, 0.7)',
-    textColor3: 'rgba(0, 0, 0, 0.55)',
-    textColorDisabled: 'rgba(0, 0, 0, 0.35)',
-    placeholderColor: 'rgba(0, 0, 0, 0.45)',
-    borderColor: 'rgba(229, 119, 168, 0.24)',
-    dividerColor: 'rgba(229, 119, 168, 0.16)',
-    inputColor: 'rgba(229, 119, 168, 0.08)',
-    hoverColor: 'rgba(255, 111, 167, 0.14)',
-    pressedColor: 'rgba(255, 111, 167, 0.2)'
+    bodyColor: '#fff4f6',
+    cardColor: '#fffafb',
+    modalColor: '#fff6f8',
+    tableColor: '#fff6f8',
+    popoverColor: '#fffafbf5',
+    primaryColor: '#d45a86',
+    primaryColorHover: '#c24b74',
+    primaryColorPressed: '#aa3d63',
+    infoColor: '#d45a86',
+    infoColorHover: '#c24b74',
+    infoColorPressed: '#aa3d63',
+    successColor: '#7b9a55',
+    warningColor: '#be731a',
+    errorColor: '#cb4b6a',
+    textColorBase: 'rgba(49, 44, 52, 0.92)',
+    textColor1: 'rgba(49, 44, 52, 0.92)',
+    textColor2: 'rgba(76, 69, 78, 0.82)',
+    textColor3: 'rgba(108, 99, 109, 0.72)',
+    textColorDisabled: 'rgba(108, 99, 109, 0.4)',
+    placeholderColor: 'rgba(108, 99, 109, 0.52)',
+    borderColor: 'rgba(200, 88, 135, 0.24)',
+    dividerColor: 'rgba(200, 88, 135, 0.16)',
+    inputColor: 'rgba(200, 88, 135, 0.08)',
+    hoverColor: 'rgba(212, 90, 134, 0.12)',
+    pressedColor: 'rgba(212, 90, 134, 0.18)'
   },
   Notification: {
     padding: '12px',
@@ -304,13 +329,13 @@ const SAKURA_OVERRIDES: GlobalThemeOverrides = {
     titleFontWeight: '700',
     descriptionFontSize: '13px',
     avatarSize: '20px',
-    color: '#fff4faf2'
+    color: '#fff8f9f2'
   },
   Card: {
     color: '#0000',
-    colorModal: '#fff3f8',
-    borderColor: 'rgba(229, 119, 168, 0.24)',
-    borderColorModal: 'rgba(229, 119, 168, 0.24)',
+    colorModal: '#fff6f8',
+    borderColor: 'rgba(200, 88, 135, 0.24)',
+    borderColorModal: 'rgba(200, 88, 135, 0.24)',
     paddingSmall: '4px 12px'
   },
   Button: {
@@ -319,42 +344,42 @@ const SAKURA_OVERRIDES: GlobalThemeOverrides = {
     textColorPressedPrimary: '#fffafc'
   },
   Switch: {
-    railColorActive: '#ff6fa7'
+    railColorActive: '#d45a86'
   },
   Checkbox: {
-    colorChecked: '#ff6fa7',
-    borderChecked: '1px solid #ff6fa7',
+    colorChecked: '#d45a86',
+    borderChecked: '1px solid #d45a86',
     fontSizeSmall: '13px'
   },
   Radio: {
-    buttonColorActive: '#ff6fa7',
-    buttonBorderColorActive: '#ff6fa7'
+    buttonColorActive: '#d45a86',
+    buttonBorderColorActive: '#d45a86'
   },
   Message: {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0',
-    colorInfo: '#ffeaf4',
-    colorSuccess: '#ffeaf4',
-    colorWarning: '#ffeaf4',
-    colorError: '#ffeaf4'
+    colorInfo: '#fff0f4',
+    colorSuccess: '#fff0f4',
+    colorWarning: '#fff0f4',
+    colorError: '#fff0f4'
   },
   Popover: {
-    color: '#fff9fcf5',
-    arrowColor: '#fff9fcf5',
-    borderColor: 'rgba(229, 119, 168, 0.24)',
+    color: '#fffafbf5',
+    arrowColor: '#fffafbf5',
+    borderColor: 'rgba(200, 88, 135, 0.24)',
     fontSize: '12px'
   },
   Tooltip: {
-    color: 'rgba(255, 246, 251, 0.98)',
-    textColor: 'rgba(92, 37, 57, 0.92)'
+    color: 'rgba(255, 248, 250, 0.98)',
+    textColor: 'rgba(56, 47, 56, 0.92)'
   },
   InternalSelectMenu: {
-    color: '#fff9fcf6'
+    color: '#fffafbf6'
   },
   Dropdown: {
-    color: '#fff9fcf5'
+    color: '#fffafbf5'
   },
   Menu: {
     padding: '1px'
@@ -366,28 +391,31 @@ const SAKURA_OVERRIDES: GlobalThemeOverrides = {
 
 const MINT_OVERRIDES: GlobalThemeOverrides = {
   common: {
-    bodyColor: '#eafbf2',
-    cardColor: '#f7fff9',
-    modalColor: '#f1fcf6',
-    tableColor: '#f1fcf6',
-    popoverColor: '#f1fcf6f5',
-    primaryColor: '#48aa7f',
-    primaryColorHover: '#399b71',
-    primaryColorPressed: '#2f885f',
-    infoColor: '#48aa7f',
-    infoColorHover: '#399b71',
-    infoColorPressed: '#2f885f',
-    successColor: '#2ea46f',
-    warningColor: '#c08b2a',
-    errorColor: '#cb5f78',
-    textColor1: 'rgba(18, 74, 52, 0.92)',
-    textColor2: 'rgba(31, 95, 69, 0.84)',
-    textColor3: 'rgba(56, 121, 94, 0.76)',
-    borderColor: 'rgba(72, 170, 127, 0.24)',
-    dividerColor: 'rgba(72, 170, 127, 0.16)',
-    inputColor: 'rgba(72, 170, 127, 0.08)',
-    hoverColor: 'rgba(72, 170, 127, 0.12)',
-    pressedColor: 'rgba(72, 170, 127, 0.18)'
+    bodyColor: '#f3f8f5',
+    cardColor: '#fbfdfc',
+    modalColor: '#f6faf7',
+    tableColor: '#f6faf7',
+    popoverColor: '#f6faf7f5',
+    primaryColor: '#248873',
+    primaryColorHover: '#1c775f',
+    primaryColorPressed: '#165f4d',
+    infoColor: '#248873',
+    infoColorHover: '#1c775f',
+    infoColorPressed: '#165f4d',
+    successColor: '#5c9e4f',
+    warningColor: '#b07622',
+    errorColor: '#c85d79',
+    textColorBase: 'rgba(33, 45, 42, 0.94)',
+    textColor1: 'rgba(33, 45, 42, 0.94)',
+    textColor2: 'rgba(58, 70, 67, 0.84)',
+    textColor3: 'rgba(92, 104, 101, 0.74)',
+    textColorDisabled: 'rgba(92, 104, 101, 0.4)',
+    placeholderColor: 'rgba(92, 104, 101, 0.52)',
+    borderColor: 'rgba(50, 142, 108, 0.24)',
+    dividerColor: 'rgba(50, 142, 108, 0.16)',
+    inputColor: 'rgba(50, 142, 108, 0.08)',
+    hoverColor: 'rgba(36, 136, 115, 0.1)',
+    pressedColor: 'rgba(36, 136, 115, 0.16)'
   },
   Notification: {
     padding: '12px',
@@ -395,13 +423,13 @@ const MINT_OVERRIDES: GlobalThemeOverrides = {
     titleFontWeight: '700',
     descriptionFontSize: '13px',
     avatarSize: '20px',
-    color: '#f2fcf7f2'
+    color: '#f6f8f7f2'
   },
   Card: {
     color: '#0000',
-    colorModal: '#f7fff9',
-    borderColor: 'rgba(72, 170, 127, 0.24)',
-    borderColorModal: 'rgba(72, 170, 127, 0.24)',
+    colorModal: '#fbfdfc',
+    borderColor: 'rgba(50, 142, 108, 0.24)',
+    borderColorModal: 'rgba(50, 142, 108, 0.24)',
     paddingSmall: '4px 12px'
   },
   Button: {
@@ -410,42 +438,42 @@ const MINT_OVERRIDES: GlobalThemeOverrides = {
     textColorPressedPrimary: '#f8fffb'
   },
   Switch: {
-    railColorActive: '#48aa7f'
+    railColorActive: '#248873'
   },
   Checkbox: {
-    colorChecked: '#48aa7f',
-    borderChecked: '1px solid #48aa7f',
+    colorChecked: '#248873',
+    borderChecked: '1px solid #248873',
     fontSizeSmall: '13px'
   },
   Radio: {
-    buttonColorActive: '#48aa7f',
-    buttonBorderColorActive: '#48aa7f'
+    buttonColorActive: '#248873',
+    buttonBorderColorActive: '#248873'
   },
   Message: {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0',
-    colorInfo: '#e8f8ef',
-    colorSuccess: '#e8f8ef',
-    colorWarning: '#e8f8ef',
-    colorError: '#e8f8ef'
+    colorInfo: '#eef4f1',
+    colorSuccess: '#eef4f1',
+    colorWarning: '#eef4f1',
+    colorError: '#eef4f1'
   },
   Popover: {
-    color: '#f1fcf6f5',
-    arrowColor: '#f1fcf6f5',
-    borderColor: 'rgba(72, 170, 127, 0.24)',
+    color: '#f6faf7f5',
+    arrowColor: '#f6faf7f5',
+    borderColor: 'rgba(50, 142, 108, 0.24)',
     fontSize: '12px'
   },
   Tooltip: {
-    color: 'rgba(242, 252, 247, 0.98)',
-    textColor: 'rgba(23, 83, 58, 0.92)'
+    color: 'rgba(248, 250, 249, 0.98)',
+    textColor: 'rgba(38, 48, 45, 0.92)'
   },
   InternalSelectMenu: {
-    color: '#f7fff9'
+    color: '#fbfdfc'
   },
   Dropdown: {
-    color: '#f1fcf6f5'
+    color: '#f6faf7f5'
   },
   Menu: {
     padding: '1px'
@@ -457,28 +485,31 @@ const MINT_OVERRIDES: GlobalThemeOverrides = {
 
 const AURORA_OVERRIDES: GlobalThemeOverrides = {
   common: {
-    bodyColor: '#1f1738',
-    cardColor: '#2d2350',
-    modalColor: '#261f46',
-    tableColor: '#261f46',
-    popoverColor: '#261f46f5',
-    primaryColor: '#b596ff',
-    primaryColorHover: '#a17cf6',
-    primaryColorPressed: '#8b63e0',
-    infoColor: '#b596ff',
-    infoColorHover: '#a17cf6',
-    infoColorPressed: '#8b63e0',
-    successColor: '#74dbbf',
-    warningColor: '#f3c174',
-    errorColor: '#ff90bf',
-    textColor1: '#ece2ff',
-    textColor2: 'rgba(236, 226, 255, 0.9)',
-    textColor3: 'rgba(196, 182, 232, 0.92)',
-    borderColor: 'rgba(158, 139, 218, 0.27)',
-    dividerColor: 'rgba(158, 139, 218, 0.2)',
-    inputColor: 'rgba(158, 139, 218, 0.14)',
-    hoverColor: 'rgba(181, 150, 255, 0.12)',
-    pressedColor: 'rgba(181, 150, 255, 0.18)'
+    bodyColor: '#1e1b30',
+    cardColor: '#2d2a42',
+    modalColor: '#25233a',
+    tableColor: '#25233a',
+    popoverColor: '#25233af5',
+    primaryColor: '#c1a8ff',
+    primaryColorHover: '#ac8af5',
+    primaryColorPressed: '#956ce3',
+    infoColor: '#c1a8ff',
+    infoColorHover: '#ac8af5',
+    infoColorPressed: '#956ce3',
+    successColor: '#67c2d4',
+    warningColor: '#f0bb6d',
+    errorColor: '#ff8eb9',
+    textColorBase: '#f3f2f8',
+    textColor1: '#f3f2f8',
+    textColor2: 'rgba(243, 242, 248, 0.9)',
+    textColor3: 'rgba(201, 201, 210, 0.9)',
+    textColorDisabled: 'rgba(201, 201, 210, 0.46)',
+    placeholderColor: 'rgba(201, 201, 210, 0.66)',
+    borderColor: 'rgba(167, 149, 226, 0.28)',
+    dividerColor: 'rgba(167, 149, 226, 0.18)',
+    inputColor: 'rgba(167, 149, 226, 0.14)',
+    hoverColor: 'rgba(193, 168, 255, 0.12)',
+    pressedColor: 'rgba(193, 168, 255, 0.18)'
   },
   Notification: {
     padding: '12px',
@@ -486,13 +517,13 @@ const AURORA_OVERRIDES: GlobalThemeOverrides = {
     titleFontWeight: '700',
     descriptionFontSize: '13px',
     avatarSize: '20px',
-    color: '#2d2350f2'
+    color: '#2d2a42f2'
   },
   Card: {
     color: '#0000',
-    colorModal: '#2d2350',
-    borderColor: 'rgba(158, 139, 218, 0.27)',
-    borderColorModal: 'rgba(158, 139, 218, 0.27)',
+    colorModal: '#2d2a42',
+    borderColor: 'rgba(167, 149, 226, 0.28)',
+    borderColorModal: 'rgba(167, 149, 226, 0.28)',
     paddingSmall: '4px 12px'
   },
   Button: {
@@ -501,38 +532,38 @@ const AURORA_OVERRIDES: GlobalThemeOverrides = {
     textColorPressedPrimary: '#17122d'
   },
   Switch: {
-    railColorActive: '#b596ff'
+    railColorActive: '#c1a8ff'
   },
   Checkbox: {
-    colorChecked: '#b596ff',
-    borderChecked: '1px solid #b596ff',
+    colorChecked: '#c1a8ff',
+    borderChecked: '1px solid #c1a8ff',
     fontSizeSmall: '13px'
   },
   Radio: {
-    buttonColorActive: '#b596ff',
-    buttonBorderColorActive: '#b596ff'
+    buttonColorActive: '#c1a8ff',
+    buttonBorderColorActive: '#c1a8ff'
   },
   Message: {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0',
-    colorInfo: '#2d2350',
-    colorSuccess: '#2d2350',
-    colorWarning: '#2d2350',
-    colorError: '#2d2350'
+    colorInfo: '#29273d',
+    colorSuccess: '#29273d',
+    colorWarning: '#29273d',
+    colorError: '#29273d'
   },
   Popover: {
-    color: '#261f46f5',
-    arrowColor: '#261f46f5',
-    borderColor: 'rgba(158, 139, 218, 0.27)',
+    color: '#25233af5',
+    arrowColor: '#25233af5',
+    borderColor: 'rgba(167, 149, 226, 0.28)',
     fontSize: '12px'
   },
   InternalSelectMenu: {
-    color: '#2d2350f6'
+    color: '#2d2a42f6'
   },
   Dropdown: {
-    color: '#261f46f5'
+    color: '#25233af5'
   },
   Menu: {
     padding: '1px'
@@ -544,80 +575,94 @@ const AURORA_OVERRIDES: GlobalThemeOverrides = {
 
 const BUTTER_OVERRIDES: GlobalThemeOverrides = {
   common: {
-    bodyColor: '#fff9e8',
-    cardColor: '#fffef8',
-    modalColor: '#fff8eb',
-    tableColor: '#fff8eb',
-    popoverColor: '#fffef8',
-    primaryColor: '#e8a93a',
-    primaryColorHover: '#dc9723',
-    primaryColorPressed: '#c78310',
-    infoColor: '#e8a93a',
-    infoColorHover: '#dc9723',
-    infoColorPressed: '#c78310',
-    successColor: '#34b377',
-    warningColor: '#cf8618',
-    errorColor: '#d4545f',
-    textColor1: 'rgba(74, 52, 16, 0.92)',
-    textColor2: 'rgba(101, 70, 21, 0.86)',
-    textColor3: 'rgba(131, 95, 39, 0.78)',
-    borderColor: 'rgba(214, 151, 56, 0.24)',
-    dividerColor: 'rgba(214, 151, 56, 0.16)',
-    inputColor: 'rgba(214, 151, 56, 0.08)',
-    hoverColor: 'rgba(232, 169, 58, 0.12)',
-    pressedColor: 'rgba(232, 169, 58, 0.18)'
+    bodyColor: '#fdf7ea',
+    cardColor: '#fdfbf7',
+    modalColor: '#fcf6ed',
+    tableColor: '#fcf6ed',
+    popoverColor: '#fdfbf7',
+    primaryColor: '#c27f22',
+    primaryColorHover: '#ad6e18',
+    primaryColorPressed: '#935b10',
+    infoColor: '#c27f22',
+    infoColorHover: '#ad6e18',
+    infoColorPressed: '#935b10',
+    successColor: '#859851',
+    warningColor: '#ab6915',
+    errorColor: '#cf5f67',
+    textColorBase: 'rgba(66, 57, 48, 0.93)',
+    textColor1: 'rgba(66, 57, 48, 0.93)',
+    textColor2: 'rgba(89, 78, 68, 0.84)',
+    textColor3: 'rgba(120, 107, 94, 0.76)',
+    textColorDisabled: 'rgba(120, 107, 94, 0.4)',
+    placeholderColor: 'rgba(120, 107, 94, 0.52)',
+    borderColor: 'rgba(182, 121, 27, 0.24)',
+    dividerColor: 'rgba(182, 121, 27, 0.16)',
+    inputColor: 'rgba(182, 121, 27, 0.08)',
+    hoverColor: 'rgba(194, 127, 34, 0.1)',
+    pressedColor: 'rgba(194, 127, 34, 0.16)'
   },
   Notification: {
     padding: '12px',
     titleFontSize: '13px',
     titleFontWeight: '700',
     descriptionFontSize: '13px',
-    avatarSize: '20px'
+    avatarSize: '20px',
+    color: '#fdf8eff2'
   },
   Card: {
     color: '#0000',
-    borderColor: 'rgba(214, 151, 56, 0.24)',
-    borderColorModal: 'rgba(214, 151, 56, 0.24)',
+    colorModal: '#fcf6ed',
+    borderColor: 'rgba(182, 121, 27, 0.24)',
+    borderColorModal: 'rgba(182, 121, 27, 0.24)',
     paddingSmall: '4px 12px'
+  },
+  Button: {
+    textColorPrimary: '#fffaf5',
+    textColorHoverPrimary: '#fffaf5',
+    textColorPressedPrimary: '#fffaf5'
+  },
+  Switch: {
+    railColorActive: '#c27f22'
+  },
+  Checkbox: {
+    colorChecked: '#c27f22',
+    borderChecked: '1px solid #c27f22',
+    fontSizeSmall: '13px'
+  },
+  Radio: {
+    buttonColorActive: '#c27f22',
+    buttonBorderColorActive: '#c27f22'
   },
   Message: {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0',
-    colorInfo: '#fff4dc',
-    colorSuccess: '#fff4dc',
-    colorWarning: '#fff4dc',
-    colorError: '#fff4dc'
+    colorInfo: '#f9f0e2',
+    colorSuccess: '#f9f0e2',
+    colorWarning: '#f9f0e2',
+    colorError: '#f9f0e2'
   },
   Popover: {
     fontSize: '12px',
-    borderColor: 'rgba(214, 151, 56, 0.24)'
+    borderColor: 'rgba(182, 121, 27, 0.24)'
   },
   Tooltip: {
-    color: 'rgba(255, 248, 233, 0.98)',
-    textColor: 'rgba(75, 43, 8, 0.92)'
+    color: 'rgba(253, 250, 241, 0.98)',
+    textColor: 'rgba(66, 57, 48, 0.92)'
   },
   InternalSelectMenu: {
-    color: '#fffdf9'
+    color: '#fdfcf8'
+  },
+  Dropdown: {
+    color: '#fdfbf7'
   },
   Menu: {
     padding: '1px'
   },
-  Checkbox: {
-    fontSizeSmall: '13px'
-  },
   Scrollbar: {
     width: '6px'
   }
-}
-
-const DAISY_LIGHT_OVERRIDES: GlobalThemeOverrides = {
-  ...CLASSIC_OVERRIDES.light
-}
-
-const DAISY_DARK_OVERRIDES: GlobalThemeOverrides = {
-  ...CLASSIC_OVERRIDES.dark
 }
 
 const THEME_OVERRIDES: Record<AppThemeId, GlobalThemeOverrides> = {
@@ -627,13 +672,7 @@ const THEME_OVERRIDES: Record<AppThemeId, GlobalThemeOverrides> = {
   sakura: SAKURA_OVERRIDES,
   mint: MINT_OVERRIDES,
   aurora: AURORA_OVERRIDES,
-  butter: BUTTER_OVERRIDES,
-  ...(Object.fromEntries(
-    DAISY_LIGHT_THEME_IDS.map((themeId) => [themeId, DAISY_LIGHT_OVERRIDES])
-  ) as Record<(typeof DAISY_LIGHT_THEME_IDS)[number], GlobalThemeOverrides>),
-  ...(Object.fromEntries(
-    DAISY_DARK_THEME_IDS.map((themeId) => [themeId, DAISY_DARK_OVERRIDES])
-  ) as Record<(typeof DAISY_DARK_THEME_IDS)[number], GlobalThemeOverrides>)
+  butter: BUTTER_OVERRIDES
 }
 
 export function getNaiveUiLocale(locale: string) {

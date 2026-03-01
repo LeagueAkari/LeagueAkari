@@ -134,7 +134,7 @@ Ftue:
   themeSystem:
     button:
       title: New Theme System Entry
-      description: Click the palette button to open theme presets, including built-in and DaisyUI styles.
+      description: Click the palette button to open the 7 built-in theme presets.
 
 CommonButtons:
   announcement: Announcement
@@ -150,9 +150,7 @@ CommonButtons:
     groups:
       system: System
       brightBuiltin: Bright · Built-in
-      brightDaisy: Bright · DaisyUI
       darkBuiltin: Dark · Built-in
-      darkDaisy: Dark · DaisyUI
     tone:
       light: Light
       dark: Dark
@@ -165,31 +163,6 @@ CommonButtons:
       mint: Mint Green
       aurora: Aurora Violet
       butter: Butter Yellow
-      cupcake: Cupcake
-      bumblebee: Bumblebee
-      emerald: Emerald
-      corporate: Corporate
-      synthwave: Synthwave
-      retro: Retro
-      valentine: Valentine
-      halloween: Halloween
-      garden: Garden
-      forest: Forest
-      lofi: Lo-fi
-      fantasy: Fantasy
-      black: Black
-      luxury: Luxury
-      dracula: Dracula
-      autumn: Autumn
-      business: Business
-      acid: Acid
-      lemonade: Lemonade
-      night: Night
-      coffee: Coffee
-      winter: Winter
-      dim: Dim
-      nord: Nord
-      caramellatte: Caramel Latte
   toggleTheme:
     toLight: Switch to Light
     toDark: Switch to Dark
@@ -276,9 +249,7 @@ AppSettings:
       groups:
         system: System
         brightBuiltin: Bright · Built-in
-        brightDaisy: Bright · DaisyUI
         darkBuiltin: Dark · Built-in
-        darkDaisy: Dark · DaisyUI
       tone:
         light: Light
         dark: Dark
@@ -291,31 +262,6 @@ AppSettings:
         mint: Mint Green
         aurora: Aurora Violet
         butter: Butter Yellow
-        cupcake: Cupcake
-        bumblebee: Bumblebee
-        emerald: Emerald
-        corporate: Corporate
-        synthwave: Synthwave
-        retro: Retro
-        valentine: Valentine
-        halloween: Halloween
-        garden: Garden
-        forest: Forest
-        lofi: Lo-fi
-        fantasy: Fantasy
-        black: Black
-        luxury: Luxury
-        dracula: Dracula
-        autumn: Autumn
-        business: Business
-        acid: Acid
-        lemonade: Lemonade
-        night: Night
-        coffee: Coffee
-        winter: Winter
-        dim: Dim
-        nord: Nord
-        caramellatte: Caramel Latte
     ftue:
       label: Feature Guides
       description: Re-show all in-app feature guide prompts globally

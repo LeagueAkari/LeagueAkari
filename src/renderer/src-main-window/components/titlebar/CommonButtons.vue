@@ -99,16 +99,8 @@
       <div class="theme-selector-panel">
         <div class="theme-selector-title">{{ t('CommonButtons.themeSelector.title') }}</div>
         <div class="theme-selector-columns">
-          <div
-            v-for="column in themePresetColumns"
-            :key="column.key"
-            class="theme-selector-column"
-          >
-            <div
-              v-for="group in column.groups"
-              :key="group.key"
-              class="theme-selector-group"
-            >
+          <div v-for="column in themePresetColumns" :key="column.key" class="theme-selector-column">
+            <div v-for="group in column.groups" :key="group.key" class="theme-selector-group">
               <div class="theme-selector-group__label">{{ group.label }}</div>
               <div
                 v-for="option in group.options"
@@ -169,8 +161,8 @@ import {
 import {
   AppThemeId,
   AppThemeSetting,
-  DAISY_DARK_THEME_IDS,
-  DAISY_LIGHT_THEME_IDS,
+  BUILTIN_DARK_THEME_IDS,
+  BUILTIN_LIGHT_THEME_IDS,
   getThemeColorTheme
 } from '@shared/types/app-theme'
 import { Notification } from '@vicons/carbon'
@@ -274,13 +266,9 @@ const themeLabel = (id: AppThemeId) => {
 }
 
 const themePresetGroups = computed(() => {
-  const brightCoreThemes: AppThemeId[] = ['light', 'sakura', 'butter', 'mint']
-  const darkCoreThemes: AppThemeId[] = ['dark', 'graphite', 'aurora']
-
   return [
     {
       key: 'system',
-      column: 'base' as const,
       label: t('CommonButtons.themeSelector.groups.system'),
       options: [
         {
@@ -292,9 +280,8 @@ const themePresetGroups = computed(() => {
     },
     {
       key: 'bright-core',
-      column: 'base' as const,
       label: t('CommonButtons.themeSelector.groups.brightBuiltin'),
-      options: brightCoreThemes.map((id) => ({
+      options: BUILTIN_LIGHT_THEME_IDS.map((id) => ({
         key: id,
         theme: id,
         label: themeLabel(id)
@@ -302,29 +289,8 @@ const themePresetGroups = computed(() => {
     },
     {
       key: 'dark-core',
-      column: 'base' as const,
       label: t('CommonButtons.themeSelector.groups.darkBuiltin'),
-      options: darkCoreThemes.map((id) => ({
-        key: id,
-        theme: id,
-        label: themeLabel(id)
-      }))
-    },
-    {
-      key: 'bright-daisy',
-      column: 'daisy' as const,
-      label: t('CommonButtons.themeSelector.groups.brightDaisy'),
-      options: DAISY_LIGHT_THEME_IDS.map((id) => ({
-        key: id,
-        theme: id,
-        label: themeLabel(id)
-      }))
-    },
-    {
-      key: 'dark-daisy',
-      column: 'daisy' as const,
-      label: t('CommonButtons.themeSelector.groups.darkDaisy'),
-      options: DAISY_DARK_THEME_IDS.map((id) => ({
+      options: BUILTIN_DARK_THEME_IDS.map((id) => ({
         key: id,
         theme: id,
         label: themeLabel(id)
@@ -336,12 +302,8 @@ const themePresetGroups = computed(() => {
 const themePresetColumns = computed(() => {
   return [
     {
-      key: 'base',
-      groups: themePresetGroups.value.filter((group) => group.column === 'base')
-    },
-    {
-      key: 'daisy',
-      groups: themePresetGroups.value.filter((group) => group.column === 'daisy')
+      key: 'builtin',
+      groups: themePresetGroups.value
     }
   ]
 })
@@ -433,7 +395,8 @@ const setRead = () => {
 }
 
 .theme-selector-panel {
-  min-width: 420px;
+  width: 280px;
+  max-width: calc(100vw - 16px);
   max-height: 72vh;
   overflow: auto;
   padding: 6px;
@@ -445,7 +408,7 @@ const setRead = () => {
 
 .theme-selector-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -525,93 +488,108 @@ const setRead = () => {
 [data-theme='light'] {
   .theme-selector-panel {
     background-color: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(0, 0, 0, 0.14);
+    border: 1px solid rgba(41, 57, 78, 0.14);
   }
 
   .theme-selector-title {
-    color: rgba(0, 0, 0, 0.68);
+    color: rgba(41, 57, 78, 0.76);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(0, 0, 0, 0.08);
+      background-color: rgba(59, 111, 152, 0.08);
     }
 
     &.active {
-      background-color: rgba(0, 0, 0, 0.12);
+      background-color: rgba(59, 111, 152, 0.16);
     }
 
     .theme-selector-item__label {
-      color: rgba(0, 0, 0, 0.9);
+      color: rgba(26, 35, 48, 0.92);
     }
 
     .theme-selector-item__desc {
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(41, 57, 78, 0.62);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(0, 0, 0, 0.12);
+      border-top-color: rgba(41, 57, 78, 0.12);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(0, 0, 0, 0.56);
+    color: rgba(41, 57, 78, 0.58);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(0, 0, 0, 0.15);
-      color: rgba(0, 0, 0, 1);
+      background-color: rgba(59, 111, 152, 0.14);
+      color: rgba(26, 35, 48, 0.98);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: rgba(59, 111, 152, 0.1);
     }
 
     .common-button-inner {
-      color: rgba(0, 0, 0, 0.86);
+      color: rgba(26, 35, 48, 0.86);
     }
   }
 }
 
 [data-theme-id='dark'] {
   .theme-selector-panel {
-    background-color: rgba(34, 34, 38, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background-color: rgba(33, 40, 54, 0.95);
+    border: 1px solid rgba(210, 223, 242, 0.18);
   }
 
   .theme-selector-title {
-    color: rgba(255, 255, 255, 0.68);
+    color: rgba(195, 208, 228, 0.9);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
+      background-color: rgba(103, 198, 227, 0.1);
     }
 
     &.active {
-      background-color: rgba(255, 255, 255, 0.14);
+      background-color: rgba(103, 198, 227, 0.18);
     }
 
     .theme-selector-item__label {
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(241, 246, 255, 0.9);
     }
 
     .theme-selector-item__desc {
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(195, 208, 228, 0.68);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(255, 255, 255, 0.12);
+      border-top-color: rgba(210, 223, 242, 0.12);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(255, 255, 255, 0.58);
+    color: rgba(195, 208, 228, 0.72);
+  }
+
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(103, 198, 227, 0.14);
+      color: rgba(241, 246, 255, 0.96);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(103, 198, 227, 0.1);
+    }
+
+    .common-button-inner {
+      color: rgba(241, 246, 255, 0.86);
+    }
   }
 }
 
@@ -667,21 +645,21 @@ const setRead = () => {
 
 [data-theme-id='graphite'] {
   .theme-selector-panel {
-    background-color: rgba(17, 26, 36, 0.95);
+    background-color: rgba(16, 28, 44, 0.95);
     border: 1px solid rgba(148, 173, 197, 0.24);
   }
 
   .theme-selector-title {
-    color: rgba(191, 215, 235, 0.9);
+    color: rgba(226, 237, 247, 0.9);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(78, 195, 255, 0.12);
+      background-color: rgba(105, 202, 255, 0.12);
     }
 
     &.active {
-      background-color: rgba(78, 195, 255, 0.22);
+      background-color: rgba(105, 202, 255, 0.22);
     }
   }
 
@@ -692,217 +670,221 @@ const setRead = () => {
   }
 
   .theme-selector-group__label {
-    color: rgba(191, 215, 235, 0.74);
+    color: rgba(162, 182, 204, 0.78);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(78, 195, 255, 0.2);
-      color: #dff1ff;
+      background-color: rgba(105, 202, 255, 0.2);
+      color: #e2edf7;
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(78, 195, 255, 0.14);
+      background-color: rgba(105, 202, 255, 0.14);
     }
 
     .common-button-inner {
-      color: rgba(221, 231, 241, 0.92);
+      color: rgba(226, 237, 247, 0.9);
     }
   }
 }
 
 [data-theme-id='sakura'] {
   .theme-selector-panel {
-    background-color: rgba(255, 249, 252, 0.97);
-    border: 1px solid rgba(229, 119, 168, 0.28);
+    background-color: rgba(255, 250, 251, 0.97);
+    border: 1px solid rgba(200, 88, 135, 0.24);
   }
 
   .theme-selector-title {
-    color: rgba(141, 66, 96, 0.9);
+    color: rgba(76, 69, 78, 0.86);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(255, 111, 167, 0.16);
+      background-color: rgba(212, 90, 134, 0.14);
     }
 
     &.active {
-      background-color: rgba(255, 111, 167, 0.26);
+      background-color: rgba(212, 90, 134, 0.22);
     }
 
     .theme-selector-item__label {
-      color: rgba(92, 37, 57, 0.92);
+      color: rgba(49, 44, 52, 0.92);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(229, 119, 168, 0.18);
+      border-top-color: rgba(200, 88, 135, 0.16);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(141, 66, 96, 0.72);
+    color: rgba(108, 99, 109, 0.72);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(255, 111, 167, 0.2);
-      color: rgba(92, 37, 57, 0.95);
+      background-color: rgba(212, 90, 134, 0.18);
+      color: rgba(49, 44, 52, 0.95);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(255, 111, 167, 0.14);
+      background-color: rgba(212, 90, 134, 0.12);
     }
 
     .common-button-inner {
-      color: rgba(92, 37, 57, 0.86);
+      color: rgba(49, 44, 52, 0.86);
     }
   }
 }
 
 [data-theme-id='mint'] {
   .theme-selector-panel {
-    background-color: rgba(247, 255, 250, 0.97);
-    border: 1px solid rgba(72, 170, 127, 0.28);
+    background-color: rgba(251, 253, 252, 0.97);
+    border: 1px solid rgba(50, 142, 108, 0.24);
   }
 
   .theme-selector-title {
-    color: rgba(35, 109, 78, 0.9);
+    color: rgba(58, 70, 67, 0.86);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(72, 170, 127, 0.14);
+      background-color: rgba(36, 136, 115, 0.12);
     }
 
     &.active {
-      background-color: rgba(72, 170, 127, 0.24);
+      background-color: rgba(36, 136, 115, 0.2);
     }
 
     .theme-selector-item__label {
-      color: rgba(20, 80, 56, 0.92);
+      color: rgba(33, 45, 42, 0.94);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(72, 170, 127, 0.18);
+      border-top-color: rgba(50, 142, 108, 0.16);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(35, 109, 78, 0.72);
+    color: rgba(92, 104, 101, 0.72);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(72, 170, 127, 0.18);
-      color: rgba(20, 80, 56, 0.95);
+      background-color: rgba(36, 136, 115, 0.16);
+      color: rgba(33, 45, 42, 0.95);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(72, 170, 127, 0.13);
+      background-color: rgba(36, 136, 115, 0.12);
     }
 
     .common-button-inner {
-      color: rgba(20, 80, 56, 0.86);
+      color: rgba(33, 45, 42, 0.88);
     }
   }
 }
 
 [data-theme-id='aurora'] {
   .theme-selector-panel {
-    background-color: rgba(38, 31, 70, 0.95);
-    border: 1px solid rgba(158, 139, 218, 0.28);
+    background-color: rgba(45, 42, 66, 0.95);
+    border: 1px solid rgba(167, 149, 226, 0.28);
   }
 
   .theme-selector-title {
-    color: rgba(220, 208, 250, 0.9);
+    color: rgba(243, 242, 248, 0.88);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(181, 150, 255, 0.14);
+      background-color: rgba(193, 168, 255, 0.14);
     }
 
     &.active {
-      background-color: rgba(181, 150, 255, 0.24);
+      background-color: rgba(193, 168, 255, 0.22);
     }
 
     .theme-selector-item__label {
-      color: #ece2ff;
+      color: #f3f2f8;
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(158, 139, 218, 0.2);
+      border-top-color: rgba(167, 149, 226, 0.18);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(220, 208, 250, 0.74);
+    color: rgba(201, 201, 210, 0.78);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(181, 150, 255, 0.22);
-      color: #f0e7ff;
+      background-color: rgba(193, 168, 255, 0.2);
+      color: #f3f2f8;
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(181, 150, 255, 0.15);
+      background-color: rgba(193, 168, 255, 0.14);
+    }
+
+    .common-button-inner {
+      color: rgba(243, 242, 248, 0.88);
     }
   }
 }
 
 [data-theme-id='butter'] {
   .theme-selector-panel {
-    background-color: rgba(255, 253, 244, 0.97);
-    border: 1px solid rgba(232, 169, 58, 0.28);
+    background-color: rgba(253, 251, 247, 0.97);
+    border: 1px solid rgba(182, 121, 27, 0.24);
   }
 
   .theme-selector-title {
-    color: rgba(140, 86, 13, 0.9);
+    color: rgba(89, 78, 68, 0.84);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(232, 169, 58, 0.14);
+      background-color: rgba(194, 127, 34, 0.12);
     }
 
     &.active {
-      background-color: rgba(232, 169, 58, 0.24);
+      background-color: rgba(194, 127, 34, 0.2);
     }
 
     .theme-selector-item__label {
-      color: rgba(82, 44, 1, 0.92);
+      color: rgba(66, 57, 48, 0.93);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(232, 169, 58, 0.18);
+      border-top-color: rgba(182, 121, 27, 0.16);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(140, 86, 13, 0.72);
+    color: rgba(120, 107, 94, 0.72);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(232, 169, 58, 0.18);
-      color: rgba(82, 44, 1, 0.95);
+      background-color: rgba(194, 127, 34, 0.16);
+      color: rgba(66, 57, 48, 0.95);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(232, 169, 58, 0.13);
+      background-color: rgba(194, 127, 34, 0.12);
     }
 
     .common-button-inner {
-      color: rgba(82, 44, 1, 0.86);
+      color: rgba(66, 57, 48, 0.88);
     }
   }
 }
