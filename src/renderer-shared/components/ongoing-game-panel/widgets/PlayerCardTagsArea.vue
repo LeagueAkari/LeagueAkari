@@ -40,6 +40,13 @@
       </div>
     </NPopover>
 
+    <JunglePathingInfo
+      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
+      :analysis="jungleAnalysis"
+      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
+      :current-game-side="currentGameSide"
+    />
+
     <NPopover
       v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
       :delay="50"
@@ -66,13 +73,6 @@
         {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
       </div>
     </NPopover>
-
-    <JunglePathingInfo
-      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
-      :analysis="jungleAnalysis"
-      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
-      :current-game-side="currentGameSide"
-    />
 
     <NPopover
       :keep-alive-on-hover="false"
