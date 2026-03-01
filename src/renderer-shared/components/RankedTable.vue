@@ -136,10 +136,10 @@
     </table>
 
     <div
-      v-if="hasTencentWinRateUnavailableEntries"
+      v-if="hasWinRateUnavailableEntries"
       class="text-[11px] text-black/55 dark:text-white/55"
     >
-      {{ t('RankedTable.tencentWinRateUnavailableBelowMaster') }}
+      {{ t('RankedTable.winRateUnavailableBelowMaster') }}
     </div>
   </div>
 </template>
@@ -158,12 +158,12 @@ import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
 import {
   RANKED_MASKED_PLACEHOLDER,
-  isTencentWinRateUnavailableBelowMaster
+  isRankedWinRateUnavailableBelowMaster
 } from '@shared/utils/ranked-display'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
-const { rankedStats, region } = defineProps<{
+const props = defineProps<{
   rankedStats: RankedStats
   region?: string
 }>()
@@ -224,13 +224,13 @@ const formatPoints = (entry: RankedEntry) => {
 }
 
 const sortedQueues = computed(() =>
-  rankedStats.queues.toSorted((a, b) => {
+  props.rankedStats.queues.toSorted((a, b) => {
     return QUEUE_TYPE_ORDER[a.queueType] - QUEUE_TYPE_ORDER[b.queueType]
   })
 )
 
-const hasTencentWinRateUnavailableEntries = computed(() =>
-  sortedQueues.value.some((entry) => isTencentWinRateUnavailableBelowMaster(region, entry))
+const hasWinRateUnavailableEntries = computed(() =>
+  sortedQueues.value.some((entry) => isRankedWinRateUnavailableBelowMaster(props.region, entry))
 )
 
 const formatTierDivision = (entry: RankedEntry, type: string) => {
@@ -276,7 +276,7 @@ const formatTierDivision = (entry: RankedEntry, type: string) => {
 }
 
 const formatLosses = (entry: RankedEntry) => {
-  if (isTencentWinRateUnavailableBelowMaster(region, entry)) {
+  if (isRankedWinRateUnavailableBelowMaster(props.region, entry)) {
     return RANKED_MASKED_PLACEHOLDER
   }
 
@@ -284,7 +284,7 @@ const formatLosses = (entry: RankedEntry) => {
 }
 
 const formatWinRate = (entry: RankedEntry) => {
-  if (isTencentWinRateUnavailableBelowMaster(region, entry)) {
+  if (isRankedWinRateUnavailableBelowMaster(props.region, entry)) {
     return RANKED_MASKED_PLACEHOLDER
   }
 

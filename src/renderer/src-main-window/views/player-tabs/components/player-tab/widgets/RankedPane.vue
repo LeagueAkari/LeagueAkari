@@ -205,7 +205,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { RankedEntry } from '@shared/types/league-client/ranked'
 import {
   RANKED_MASKED_PLACEHOLDER,
-  isTencentWinRateUnavailableBelowMaster
+  isRankedWinRateUnavailableBelowMaster
 } from '@shared/utils/ranked-display'
 import { MoreHorizFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
@@ -341,7 +341,7 @@ const formatRankPoints = (entry: Partial<RankedEntry>) => {
 }
 
 const formatWinLose = (entry: Partial<RankedEntry>) => {
-  if (isTencentWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
+  if (isRankedWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
     return RANKED_MASKED_PLACEHOLDER
   }
 
@@ -349,7 +349,7 @@ const formatWinLose = (entry: Partial<RankedEntry>) => {
 }
 
 const formatWinRate = (entry: Partial<RankedEntry>) => {
-  if (isTencentWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
+  if (isRankedWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
     return RANKED_MASKED_PLACEHOLDER
   }
 

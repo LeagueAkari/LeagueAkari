@@ -1068,7 +1068,7 @@ RankedTable:
   previousSeasonEndTier: 上赛季段位
   previousSeasonHighestTier: 上赛季最高段位
   highestTier: 历史最高段位
-  tencentWinRateUnavailableBelowMaster: 国服大师以下不提供负场，胜率不可用
+  winRateUnavailableBelowMaster: 大师以下不提供负场，胜率不可用
 
 RankedDisplay:
   unranked: 未定级

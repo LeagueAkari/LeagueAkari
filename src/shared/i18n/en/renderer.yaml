@@ -1067,7 +1067,7 @@ RankedTable:
   previousSeasonEndTier: Previous Season Tier
   previousSeasonHighestTier: Previous Season Highest Tier
   highestTier: Highest Tier
-  tencentWinRateUnavailableBelowMaster: Tencent servers do not provide losses below Master, so win rate is unavailable.
+  winRateUnavailableBelowMaster: Losses are not provided below Master, so win rate is unavailable.
 
 RankedDisplay:
   unranked: Unranked
