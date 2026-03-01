@@ -172,20 +172,15 @@ CommonButtons:
       corporate: 商务蓝
       synthwave: 合成波
       retro: 复古棕
-      cyberpunk: 赛博朋克
       valentine: 情人节粉
       halloween: 万圣夜
       garden: 花园绿
       forest: 森林绿
-      aqua: 水色
       lofi: 极简黑白
-      pastel: 粉彩
       fantasy: 幻想
-      wireframe: 线框
       black: 纯黑
       luxury: 奢华金
       dracula: 德古拉
-      cmyk: 印刷四色
       autumn: 秋叶棕
       business: 商业灰
       acid: 酸性霓虹
@@ -195,10 +190,7 @@ CommonButtons:
       winter: 冬夜蓝
       dim: 微暗
       nord: 北境蓝
-      sunset: 落日橙
       caramellatte: 焦糖拿铁
-      abyss: 深渊
-      silk: 丝绸米
   toggleTheme:
     toLight: 切换至亮色
     toDark: 切换至暗色
@@ -306,20 +298,15 @@ AppSettings:
         corporate: 商务蓝
         synthwave: 合成波
         retro: 复古棕
-        cyberpunk: 赛博朋克
         valentine: 情人节粉
         halloween: 万圣夜
         garden: 花园绿
         forest: 森林绿
-        aqua: 水色
         lofi: 极简黑白
-        pastel: 粉彩
         fantasy: 幻想
-        wireframe: 线框
         black: 纯黑
         luxury: 奢华金
         dracula: 德古拉
-        cmyk: 印刷四色
         autumn: 秋叶棕
         business: 商业灰
         acid: 酸性霓虹
@@ -329,10 +316,7 @@ AppSettings:
         winter: 冬夜蓝
         dim: 微暗
         nord: 北境蓝
-        sunset: 落日橙
         caramellatte: 焦糖拿铁
-        abyss: 深渊
-        silk: 丝绸米
     ftue:
       label: 功能引导
       description: 全局重新显示应用内的功能引导提示

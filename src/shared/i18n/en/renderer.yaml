@@ -171,20 +171,15 @@ CommonButtons:
       corporate: Corporate
       synthwave: Synthwave
       retro: Retro
-      cyberpunk: Cyberpunk
       valentine: Valentine
       halloween: Halloween
       garden: Garden
       forest: Forest
-      aqua: Aqua
       lofi: Lo-fi
-      pastel: Pastel
       fantasy: Fantasy
-      wireframe: Wireframe
       black: Black
       luxury: Luxury
       dracula: Dracula
-      cmyk: CMYK
       autumn: Autumn
       business: Business
       acid: Acid
@@ -194,10 +189,7 @@ CommonButtons:
       winter: Winter
       dim: Dim
       nord: Nord
-      sunset: Sunset
       caramellatte: Caramel Latte
-      abyss: Abyss
-      silk: Silk
   toggleTheme:
     toLight: Switch to Light
     toDark: Switch to Dark
@@ -305,20 +297,15 @@ AppSettings:
         corporate: Corporate
         synthwave: Synthwave
         retro: Retro
-        cyberpunk: Cyberpunk
         valentine: Valentine
         halloween: Halloween
         garden: Garden
         forest: Forest
-        aqua: Aqua
         lofi: Lo-fi
-        pastel: Pastel
         fantasy: Fantasy
-        wireframe: Wireframe
         black: Black
         luxury: Luxury
         dracula: Dracula
-        cmyk: CMYK
         autumn: Autumn
         business: Business
         acid: Acid
@@ -328,10 +315,7 @@ AppSettings:
         winter: Winter
         dim: Dim
         nord: Nord
-        sunset: Sunset
         caramellatte: Caramel Latte
-        abyss: Abyss
-        silk: Silk
     ftue:
       label: Feature Guides
       description: Re-show all in-app feature guide prompts globally

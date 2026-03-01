@@ -4,37 +4,29 @@ export const DAISY_LIGHT_THEME_IDS = [
   'emerald',
   'corporate',
   'retro',
-  'cyberpunk',
   'valentine',
   'garden',
   'lofi',
-  'pastel',
   'fantasy',
-  'wireframe',
-  'cmyk',
   'autumn',
   'acid',
   'lemonade',
   'winter',
   'nord',
-  'caramellatte',
-  'silk'
+  'caramellatte'
 ] as const
 
 export const DAISY_DARK_THEME_IDS = [
   'synthwave',
   'halloween',
   'forest',
-  'aqua',
   'black',
   'luxury',
   'dracula',
   'business',
   'night',
   'coffee',
-  'dim',
-  'sunset',
-  'abyss'
+  'dim'
 ] as const
 
 export const DAISY_THEME_IDS = [...DAISY_LIGHT_THEME_IDS, ...DAISY_DARK_THEME_IDS] as const
