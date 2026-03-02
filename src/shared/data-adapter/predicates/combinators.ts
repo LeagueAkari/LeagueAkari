@@ -96,7 +96,9 @@ export const allies = (puuid: string | null, predicate: Predicate<ParticipantsSc
     if (!participant) return false
 
     return predicate({
-      participants: data.participants.filter((p) => p.teamId === participant.teamId),
+      participants: data.participants.filter(
+        (p) => p.teamIdentifier === participant.teamIdentifier
+      ),
       context: data
     })
   }
@@ -111,7 +113,9 @@ export const enemies = (puuid: string | null, predicate: Predicate<ParticipantsS
     if (!participant) return false
 
     return predicate({
-      participants: data.participants.filter((p) => p.teamId !== participant.teamId),
+      participants: data.participants.filter(
+        (p) => p.teamIdentifier !== participant.teamIdentifier
+      ),
       context: data
     })
   }
