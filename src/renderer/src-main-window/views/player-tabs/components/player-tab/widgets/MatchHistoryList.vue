@@ -2,9 +2,7 @@
   <div>
     <!-- loading state -->
     <div
-      v-if="
-        isLoading && (!pagedMatchHistory || pagedMatchHistory.games.length === 0)
-      "
+      v-if="isLoading && (!pagedMatchHistory || pagedMatchHistory.games.length === 0)"
       class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
     >
       <div class="flex items-center gap-2">
@@ -60,6 +58,7 @@
 
 <script setup lang="ts">
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
+import { usePosition } from '@renderer-shared/components/match-card/utils/text'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -70,7 +69,10 @@ import {
   getFtueTargetSelector
 } from '@shared/constants/ftue'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import {
+  MatchParticipantPosition,
+  toParticipants
+} from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { NSpin, useMessage } from 'naive-ui'
@@ -97,6 +99,7 @@ const ogs = useOngoingGameStore()
 const message = useMessage()
 
 const { t } = useTranslation()
+const positionText = usePosition()
 
 const {
   id,
@@ -146,6 +149,41 @@ const applyChampionFilter = (championId: number) => {
   })
 }
 
+const applyExclusiveChampionFilter = (championId: number) => {
+  if (!Number.isInteger(championId) || championId <= 0) {
+    return
+  }
+
+  setFilters({
+    ...filters.value,
+    selectedChampions: [championId],
+    selectedPositions: []
+  })
+
+  const championName = lcs.gameData.champions?.[championId]?.name || `#${championId}`
+  message.info(t('PlayerTab.filter.sameChampionApplied', { champion: championName }), {
+    duration: 2400,
+    keepAliveOnHover: true
+  })
+}
+
+const applyPositionFilter = (position: MatchParticipantPosition) => {
+  if (!position) {
+    return
+  }
+
+  setFilters({
+    ...filters.value,
+    selectedChampions: [],
+    selectedPositions: [position]
+  })
+
+  message.info(t('PlayerTab.filter.samePositionApplied', { position: positionText(position) }), {
+    duration: 2400,
+    keepAliveOnHover: true
+  })
+}
+
 watch(
   () => pts.pendingChampionFilterByTab[id.value],
   (pendingChampionId) => {
@@ -153,9 +191,23 @@ watch(
       return
     }
 
-    applyChampionFilter(pendingChampionId)
+    applyExclusiveChampionFilter(pendingChampionId)
 
     pts.consumePendingChampionFilter(id.value)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => pts.pendingPositionFilterByTab[id.value],
+  (pendingPosition) => {
+    if (!pendingPosition) {
+      return
+    }
+
+    applyPositionFilter(pendingPosition)
+
+    pts.consumePendingPositionFilter(id.value)
   },
   { immediate: true }
 )

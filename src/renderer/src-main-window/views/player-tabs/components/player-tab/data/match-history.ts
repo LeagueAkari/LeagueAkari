@@ -4,13 +4,17 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import {
+  MatchParticipantPosition,
+  normalizeMatchParticipantPosition,
+  toParticipants
+} from '@shared/data-adapter/match-history/participants'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
   LcuOrSgpGameSummary
 } from '@shared/data-adapter/wrapper'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { Game } from '@shared/types/league-client/match-history'
 import { ReplayDownloadProgress, ReplayMetadata } from '@shared/types/league-client/replays'
@@ -33,6 +37,7 @@ import {
 import type { MatchHistoryTimeRange } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
+import { MATCH_HISTORY_POSITIONS } from './match-history-filters'
 import { shouldHideMatchHistoryGame } from './match-history-visibility'
 
 export type MatchHistoryQueryState = MatchHistoryQueryParams & {
@@ -56,6 +61,22 @@ function toGameCreationTimestamp(game: LcuOrSgpGameSummary): number {
 
 function normalizeChampionFilter(ids: number[]): number[] {
   return [...new Set(ids.filter((id) => Number.isInteger(id) && id > 0))].sort((a, b) => a - b)
+}
+
+function isMatchHistoryPosition(
+  position: MatchParticipantPosition | null
+): position is MatchParticipantPosition {
+  return !!position && MATCH_HISTORY_POSITIONS.includes(position)
+}
+
+function normalizePositionFilter(positions: string[]): MatchParticipantPosition[] {
+  return [
+    ...new Set(
+      positions
+        .map((position) => normalizeMatchParticipantPosition(position))
+        .filter(isMatchHistoryPosition)
+    )
+  ].sort()
 }
 
 function normalizeSummonerFilter(puuids: string[]): string[] {
@@ -106,6 +127,7 @@ export function provideMatchHistory(props: {
   isCrossRegion: MaybeRefOrGetter<boolean>
   winLoss?: MaybeRefOrGetter<'all' | 'win' | 'loss'>
   selectedChampions?: MaybeRefOrGetter<number[]>
+  selectedPositions?: MaybeRefOrGetter<string[]>
   selectedSummoners?: MaybeRefOrGetter<string[]>
   showPractice?: MaybeRefOrGetter<boolean>
   showIrregularGames?: MaybeRefOrGetter<boolean>
@@ -116,6 +138,7 @@ export function provideMatchHistory(props: {
   const isCrossRegion = toRef(props.isCrossRegion)
   const winLoss = toRef(props.winLoss ?? 'all')
   const selectedChampions = toRef(props.selectedChampions ?? [])
+  const selectedPositions = toRef(props.selectedPositions ?? [])
   const selectedSummoners = toRef(props.selectedSummoners ?? [])
   const showPractice = toRef(props.showPractice ?? false)
   const showIrregularGames = toRef(props.showIrregularGames ?? false)
@@ -203,7 +226,9 @@ export function provideMatchHistory(props: {
   const loadMatchHistory = async (params: MatchHistoryQueryState = {}) => {
     if (isLoading.value) {
       pendingLoadParams.value = {
-        ...(pendingLoadParams.value ?? pagedMatchHistory.value?.queryParams ?? getDefaultQueryParams()),
+        ...(pendingLoadParams.value ??
+          pagedMatchHistory.value?.queryParams ??
+          getDefaultQueryParams()),
         ...params
       }
       return
@@ -230,10 +255,15 @@ export function provideMatchHistory(props: {
     const shouldFilterByWinLoss = winLoss.value !== 'all'
     const selectedChampionSet = new Set<number>(normalizeChampionFilter(selectedChampions.value))
     const shouldFilterByChampion = selectedChampionSet.size > 0
+    const selectedPositionSet = new Set<string>(normalizePositionFilter(selectedPositions.value))
+    const shouldFilterByPosition = selectedPositionSet.size > 0
     const selectedSummonerSet = new Set<string>(normalizeSummonerFilter(selectedSummoners.value))
     const shouldFilterBySummoners = selectedSummonerSet.size > 0
     const needsParticipantFilters =
-      shouldFilterByChampion || shouldFilterByWinLoss || shouldFilterBySummoners
+      shouldFilterByChampion ||
+      shouldFilterByWinLoss ||
+      shouldFilterByPosition ||
+      shouldFilterBySummoners
     const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
     const shouldFilterByTimeRange = isTimeRangeMode
     const timeRangeStartMs = shouldFilterByTimeRange
@@ -246,9 +276,10 @@ export function provideMatchHistory(props: {
       isTimeRangeMode ||
       shouldFilterByChampion ||
       shouldFilterByWinLoss ||
+      shouldFilterByPosition ||
       shouldFilterBySummoners
-      ? 500
-      : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
+        ? 500
+        : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
 
     const createEmptyPagedMatchHistory = () => {
       return {
@@ -357,7 +388,10 @@ export function provideMatchHistory(props: {
             selfParticipant = participants.find((p) => p.puuid === puuid.value)
           }
 
-          if ((shouldFilterByChampion || shouldFilterByWinLoss) && !selfParticipant) {
+          if (
+            (shouldFilterByChampion || shouldFilterByWinLoss || shouldFilterByPosition) &&
+            !selfParticipant
+          ) {
             continue
           }
 
@@ -367,7 +401,17 @@ export function provideMatchHistory(props: {
             }
           }
 
-          if (shouldFilterByWinLoss && selfParticipant && selfParticipant.winResult !== winLoss.value) {
+          if (shouldFilterByPosition && selfParticipant) {
+            if (!selfParticipant.position || !selectedPositionSet.has(selfParticipant.position)) {
+              continue
+            }
+          }
+
+          if (
+            shouldFilterByWinLoss &&
+            selfParticipant &&
+            selfParticipant.winResult !== winLoss.value
+          ) {
             continue
           }
 
@@ -403,7 +447,11 @@ export function provideMatchHistory(props: {
         guard++
 
         // 战绩按时间倒序，若整块均超出时间范围，则无需继续请求后续块
-        if (timeRangeStartMs !== null && !hasTimeInRangeGameInChunk && hasTimeOutOfRangeGameInChunk) {
+        if (
+          timeRangeStartMs !== null &&
+          !hasTimeInRangeGameInChunk &&
+          hasTimeOutOfRangeGameInChunk
+        ) {
           break
         }
 
@@ -422,7 +470,9 @@ export function provideMatchHistory(props: {
       }
 
       try {
-        const { data } = await lcuLoadDetailedGameQueue.add(() => lc.api.matchHistory.getGame(g.gameId))
+        const { data } = await lcuLoadDetailedGameQueue.add(() =>
+          lc.api.matchHistory.getGame(g.gameId)
+        )
         return { source: 'lcu', data: data, gameId: g.gameId }
       } catch (error) {
         return { source: 'lcu', data: g, gameId: g.gameId }
@@ -458,13 +508,17 @@ export function provideMatchHistory(props: {
 
           return data.games
             .filter((g) => g.json)
-            .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
+            .map(
+              (g) =>
+                markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary
+            )
         }
 
         const shouldCollectGames =
           hideByVisibilityOptions ||
           shouldFilterByTimeRange ||
           shouldFilterByChampion ||
+          shouldFilterByPosition ||
           shouldFilterByWinLoss ||
           shouldFilterBySummoners
         const games = shouldCollectGames
@@ -484,13 +538,16 @@ export function provideMatchHistory(props: {
 
           return data.games.games
             .filter((g) => !!g && typeof g.gameId === 'number')
-            .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
+            .map(
+              (g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary
+            )
         }
 
         const shouldCollectGames =
           hideByVisibilityOptions ||
           shouldFilterByTimeRange ||
           shouldFilterByChampion ||
+          shouldFilterByPosition ||
           shouldFilterByWinLoss ||
           shouldFilterBySummoners
         const selectedGames = shouldCollectGames
@@ -602,6 +659,7 @@ export function provideMatchHistory(props: {
         showPractice.value,
         showIrregularGames.value,
         normalizeChampionFilter(selectedChampions.value).join(','),
+        normalizePositionFilter(selectedPositions.value).join(','),
         normalizeSummonerFilter(selectedSummoners.value).join(',')
       ].join('|'),
     (current, previous) => {

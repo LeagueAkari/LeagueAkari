@@ -1,9 +1,20 @@
-import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
+import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { InjectionKey, Ref, computed, inject, provide, ref } from 'vue'
+
+import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
+
+export const MATCH_HISTORY_POSITIONS: MatchParticipantPosition[] = [
+  'TOP',
+  'JUNGLE',
+  'MIDDLE',
+  'BOTTOM',
+  'UTILITY'
+]
 
 export type MatchHistoryFilters = {
   winLoss: 'all' | 'win' | 'loss'
   selectedChampions: number[]
+  selectedPositions: MatchParticipantPosition[]
   selectedSummoners: string[]
   showPractice: boolean
   showIrregularGames: boolean
@@ -25,6 +36,7 @@ export function provideMatchHistoryFilters() {
   const filters = ref<MatchHistoryFilters>({
     winLoss: 'all',
     selectedChampions: [],
+    selectedPositions: [],
     selectedSummoners: [],
     showPractice: pts.frontendSettings.defaultShowPractice,
     showIrregularGames: pts.frontendSettings.defaultShowIrregularGames
@@ -34,6 +46,7 @@ export function provideMatchHistoryFilters() {
     return (
       filters.value.winLoss !== 'all' ||
       filters.value.selectedChampions.length > 0 ||
+      filters.value.selectedPositions.length > 0 ||
       filters.value.selectedSummoners.length > 0
     )
   })

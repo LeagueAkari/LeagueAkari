@@ -72,6 +72,25 @@
         />
       </div>
 
+      <div>
+        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
+          {{ t('PlayerTab.filter.position') }}
+        </div>
+        <NSelect
+          clearable
+          filterable
+          multiple
+          :options="positionOptions"
+          size="tiny"
+          v-model:value="selectedPositions"
+          :render-tag="renderPositionTag"
+          :render-label="renderPositionOption"
+        />
+        <div v-if="isPositionInferred" class="mt-1 text-[11px] text-black/55 dark:text-white/45">
+          {{ t('PlayerTab.filter.positionHint') }}
+        </div>
+      </div>
+
       <div class="flex items-center justify-between">
         <span class="text-xs text-black/80 dark:text-white/60">
           {{ t('PlayerTab.filter.showPractice') }}
@@ -91,6 +110,8 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { usePosition } from '@renderer-shared/components/match-card/utils/text'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -107,13 +128,18 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
-import { useMatchHistoryFilters } from '../data/match-history-filters'
+import {
+  MATCH_HISTORY_POSITIONS,
+  MatchHistoryFilters,
+  useMatchHistoryFilters
+} from '../data/match-history-filters'
 
 const lcs = useLeagueClientStore()
 const pts = usePlayerTabsStore()
 const { t } = useTranslation()
+const positionText = usePosition()
 
-const { isCrossRegion, sgpServerId } = usePlayerTab()
+const { isCrossRegion, preferredSource, sgpServerId } = usePlayerTab()
 const { searchSummonerByAlias } = useSummonerFetch()
 const { pagedMatchHistory } = useMatchHistory()
 
@@ -164,6 +190,42 @@ const renderChampionOption = (option: SelectBaseOption) => {
     ]
   )
 }
+
+const selectedPositions = ref<MatchHistoryFilters['selectedPositions']>([])
+const positionOptions = computed(() => {
+  return MATCH_HISTORY_POSITIONS.map((position) => {
+    return {
+      label: positionText(position),
+      value: position
+    }
+  })
+})
+
+const renderPositionTag = (props: { option: SelectOption; handleClose: () => void }) => {
+  return h(NTag, { size: 'tiny' }, () =>
+    h('div', { class: 'flex items-center gap-1' }, [
+      h(PositionIcon, { position: props.option.value as string }),
+      h('span', { class: 'text-xs' }, props.option.label as string)
+    ])
+  )
+}
+
+const renderPositionOption = (option: SelectBaseOption) => {
+  return h(
+    'div',
+    {
+      class: 'flex items-center gap-2'
+    },
+    [
+      h(PositionIcon, { position: option.value as string }),
+      h('span', { class: 'text-sm' }, option.label as string)
+    ]
+  )
+}
+
+const isPositionInferred = computed(() => {
+  return preferredSource.value !== 'sgp' && !isCrossRegion.value
+})
 
 type SearchSummonerResult = {
   puuid: string
@@ -322,6 +384,7 @@ const renderSummonerOption = (option: SelectBaseOption) => {
 const clearAllConditions = () => {
   winLoss.value = 'all'
   selectedChampions.value = []
+  selectedPositions.value = []
   selectedSummoners.value = []
   showPractice.value = false
   showIrregularGames.value = false
@@ -334,6 +397,7 @@ const { setFilters, hasFilters, filters } = useMatchHistoryFilters()
 
 winLoss.value = filters.value.winLoss
 selectedChampions.value = filters.value.selectedChampions
+selectedPositions.value = filters.value.selectedPositions
 selectedSummoners.value = filters.value.selectedSummoners
 showPractice.value = filters.value.showPractice
 showIrregularGames.value = filters.value.showIrregularGames
@@ -342,6 +406,7 @@ watchEffect(() => {
   setFilters({
     winLoss: winLoss.value,
     selectedChampions: selectedChampions.value,
+    selectedPositions: selectedPositions.value,
     selectedSummoners: selectedSummoners.value,
     showPractice: showPractice.value,
     showIrregularGames: showIrregularGames.value

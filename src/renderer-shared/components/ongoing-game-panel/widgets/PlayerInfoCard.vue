@@ -56,7 +56,9 @@
                   <span
                     class="text-[13px] font-bold text-black/80 dark:text-white/80"
                     :style="{
-                      color: premadeTeamId ? premadeColors[premadeTeamId]?.foregroundColor : undefined
+                      color: premadeTeamId
+                        ? premadeColors[premadeTeamId]?.foregroundColor
+                        : undefined
                     }"
                     >{{
                       masked(
@@ -77,15 +79,25 @@
               </div>
             </NPopover>
           </div>
-          <button
-            v-if="championId && championId > 0"
-            class="shrink-0 cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
-            v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON"
-            :title="t('PlayerInfoCard.sameChampionHistory')"
-            @click.stop="navigateToChampionMatchHistory"
-          >
-            {{ t('PlayerInfoCard.sameChampionHistory') }}
-          </button>
+          <div class="flex shrink-0 items-center gap-1">
+            <button
+              v-if="championId && championId > 0"
+              class="cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
+              v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON"
+              :title="t('PlayerInfoCard.byChampion')"
+              @click.stop="navigateToChampionMatchHistory"
+            >
+              {{ t('PlayerInfoCard.byChampion') }}
+            </button>
+            <button
+              v-if="currentPositionFilter"
+              class="cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
+              :title="t('PlayerInfoCard.byPosition')"
+              @click.stop="navigateToPositionMatchHistory"
+            >
+              {{ t('PlayerInfoCard.byPosition') }}
+            </button>
+          </div>
         </div>
 
         <!-- ranked -->
@@ -530,7 +542,12 @@ import {
   FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON
 } from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
+import {
+  MatchParticipant,
+  MatchParticipantPosition,
+  normalizeMatchParticipantPosition,
+  toParticipants
+} from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { ParsedRole } from '@shared/utils/ranked'
 import { StarRound as StarRoundIcon } from '@vicons/material'
@@ -565,7 +582,8 @@ const {
   kdaOutliers,
   previewGame,
   navigateToSummonerByPuuid,
-  navigateToSummonerByPuuidWithChampion
+  navigateToSummonerByPuuidWithChampion,
+  navigateToSummonerByPuuidWithPosition
 } = useOngoingGamePanel()
 
 const summoner = computed(() => ogs.summoner[puuid])
@@ -593,6 +611,15 @@ const navigateToChampionMatchHistory = () => {
 const navigateToChampionMatchHistoryByChampionId = (targetChampionId: number) => {
   if (targetChampionId > 0) {
     navigateToSummonerByPuuidWithChampion(puuid, targetChampionId)
+    return
+  }
+
+  navigateToSummonerByPuuid(puuid)
+}
+
+const navigateToPositionMatchHistory = () => {
+  if (currentPositionFilter.value) {
+    navigateToSummonerByPuuidWithPosition(puuid, currentPositionFilter.value)
     return
   }
 
@@ -629,6 +656,10 @@ const positionInfo = computed(() => {
   }
 
   return info
+})
+
+const currentPositionFilter = computed<MatchParticipantPosition | null>(() => {
+  return normalizeMatchParticipantPosition(positionInfo.value?.current)
 })
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9

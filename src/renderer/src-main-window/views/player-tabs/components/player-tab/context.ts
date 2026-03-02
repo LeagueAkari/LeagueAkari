@@ -150,6 +150,7 @@ export function providePlayerTab(props: {
     isCrossRegion,
     winLoss: () => matchHistoryFilters.filters.value.winLoss,
     selectedChampions: () => matchHistoryFilters.filters.value.selectedChampions,
+    selectedPositions: () => matchHistoryFilters.filters.value.selectedPositions,
     selectedSummoners: () => matchHistoryFilters.filters.value.selectedSummoners,
     showPractice: () => matchHistoryFilters.filters.value.showPractice,
     showIrregularGames: () => matchHistoryFilters.filters.value.showIrregularGames

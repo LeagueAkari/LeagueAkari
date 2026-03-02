@@ -1,3 +1,4 @@
+import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { Summoner } from '@shared/data-adapter/summoner'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerProfile } from '@shared/types/league-client/summoner'
@@ -80,6 +81,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
   const tabs = ref<TabState[]>([])
   const currentTabId = ref<string | null>(null)
   const pendingChampionFilterByTab = ref<Record<string, number>>({})
+  const pendingPositionFilterByTab = ref<Record<string, MatchParticipantPosition>>({})
 
   const currentTab = computed(() => {
     return tabs.value.find((t) => t.id === currentTabId.value) || null
@@ -217,11 +219,36 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     return championId
   }
 
+  const setPendingPositionFilter = (tabId: string, position: MatchParticipantPosition) => {
+    if (!tabId || !position) {
+      return
+    }
+
+    pendingPositionFilterByTab.value = {
+      ...pendingPositionFilterByTab.value,
+      [tabId]: position
+    }
+  }
+
+  const consumePendingPositionFilter = (tabId: string) => {
+    const position = pendingPositionFilterByTab.value[tabId]
+    if (position === undefined) {
+      return null
+    }
+
+    const next = { ...pendingPositionFilterByTab.value }
+    delete next[tabId]
+    pendingPositionFilterByTab.value = next
+
+    return position
+  }
+
   return {
     frontendSettings,
 
     detailedGameLruMap,
     pendingChampionFilterByTab,
+    pendingPositionFilterByTab,
 
     tabs,
     currentTabId,
@@ -240,6 +267,8 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     moveTabBefore,
     setPendingChampionFilter,
     consumePendingChampionFilter,
+    setPendingPositionFilter,
+    consumePendingPositionFilter,
 
     updateTabData
   }

@@ -14,6 +14,7 @@
       :content-height="contentHeight"
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
       @navigate-to-summoner-by-puuid-with-champion="navigateToTabByPuuidWithChampionFilter"
+      @navigate-to-summoner-by-puuid-with-position="navigateToTabByPuuidWithPositionFilter"
       @preview-game="handlePreviewGame"
     />
   </div>
@@ -32,6 +33,7 @@ import {
   FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON,
   getFtueTargetSelector
 } from '@shared/constants/ftue'
+import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
 import { ref, shallowRef, watch } from 'vue'
@@ -77,6 +79,29 @@ const navigateToTabByPuuidWithChampionFilter = (puuid: string, championId: numbe
 
   const tabId = pt.toUnionId(sgpServerId, puuid)
   pts.setPendingChampionFilter(tabId, championId)
+  router.replace({
+    name: 'player-tabs',
+    params: { puuid, sgpServerId }
+  })
+}
+
+const navigateToTabByPuuidWithPositionFilter = (
+  puuid: string,
+  position: MatchParticipantPosition
+) => {
+  if (!puuid || !position) {
+    navigateToTabByPuuid(puuid)
+    return
+  }
+
+  const sgpServerId = sgps.availability.sgpServerId
+  if (!sgpServerId) {
+    navigateToTabByPuuid(puuid)
+    return
+  }
+
+  const tabId = pt.toUnionId(sgpServerId, puuid)
+  pts.setPendingPositionFilter(tabId, position)
   router.replace({
     name: 'player-tabs',
     params: { puuid, sgpServerId }
