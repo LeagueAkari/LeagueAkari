@@ -2088,9 +2088,16 @@ PlayerTab:
   filter:
     title: 页内筛选
     advancedTab: 高级筛选
+    subtitle: 先添加条件；只有需要括号逻辑时再添加分组
     resetAll: 重置所有条件
     addCondition: 添加条件
+    addRule: 添加条件
+    addGroup: 添加分组
+    exclude: 排除
+    removeExclude: 取消排除
     addFirstConditionHint: 添加第一个条件以构建复杂判定式
+    addFirstRule: 从一条规则开始
+    addFirstRuleHint: 默认按“同时满足”组合；复杂场景再用分组和排除
     and: 同时满足
     or: 满足其一
     add: 添加
@@ -2098,17 +2105,31 @@ PlayerTab:
     switchToAnd: 同时满足
     delete: 删除
     needAddCondition: 需添加条件
+    addNestedRuleHint: 在当前分组中继续添加条件或子分组
+    matchAllRules: 匹配全部规则
+    matchAnyRules: 匹配任意规则
+    groupDescriptionAll: 组内所有规则都要满足
+    groupDescriptionAny: 组内任一规则满足即可
     anyone: 任意成员满足
     everyone: 所有成员满足
     selectCondition: 选择条件
     needSelectCondition: 需选择条件
     forPlayer: 对于玩家
+    targetPlayer: 检查指定玩家
+    targetPlayerTeam: 检查该玩家所在队伍
+    targetPlayerOpponents: 检查该玩家对面队伍
+    targetAnyMember: 检查任意玩家
+    targetEveryMember: 检查所有玩家
+    targetAllMembers: 检查全部玩家
     searchHint: '(提供名称和编号将进行搜索)'
     notMatch: 不满足
+    excludeRulesTitle: 排除以下规则
+    excludeRulesHint: 这组条件一旦满足，将从结果中排除
     forAllMembers: 对于所有成员
     forAllies: 对于其友方成员
     forEnemies: 对于其敌方成员
     relativeTo: 相对于
+    referencePlayer: 参考玩家
     position: 位置
     queue: 游戏模式队列
     gameDuration: 游戏时长 (秒)
@@ -2143,20 +2164,28 @@ PlayerTab:
     augmentTypeHai: 海
     augmentTypeDou: 斗
     isChampion: 选用英雄
+    sections:
+      logicGroups: 逻辑分组
+      scopeGroups: 检查对象
+      gameConditions: 对局条件
+      resultConditions: 胜负条件
+      matchConditions: 对局成员
+      participantConditions: 玩家条件
+      statConditions: 数值条件
     combinatorLabels:
       game: 对局
-      and: 同时满足
-      or: 满足其一
-      not: 不满足
+      and: 匹配全部规则
+      or: 匹配任意规则
+      not: 排除以下规则
       isQueue: 游戏模式队列
       isAbort: 是终止对局
       isRemake: 是重开对局
       hasAugment: 海克斯
-      enemies: 对于其敌方成员
-      allies: 对于其友方成员
-      all: 对于所有成员
-      anyone: 任意成员满足
-      everyone: 所有成员满足
+      enemies: 检查该玩家对面队伍
+      allies: 检查该玩家所在队伍
+      all: 检查全部玩家
+      anyone: 检查任意玩家
+      everyone: 检查所有玩家
       isChampion: 选用英雄
       durationBetween: 游戏时长
       kdaBetween: KDA
@@ -2168,7 +2197,7 @@ PlayerTab:
       isLoss: 是失败对局
       isMatchedGame: 是匹配对局
       isPveGame: 是 PVE 对局
-      player: 对于玩家
+      player: 检查指定玩家
       hasPlayer: 对局包含玩家
       hasSpell: 召唤师技能
       isPosition: 位置

@@ -8,12 +8,7 @@
         {{ t('PlayerTab.filter.isChampion') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
 
     <div class="flex w-60 items-center gap-2">
@@ -33,14 +28,15 @@
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { Delete20Regular, Games20Regular } from '@vicons/fluent'
+import { Games20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
+import { NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import { IsChampionCombinator } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -49,7 +45,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode } = useMatchHistoryFilters()
 
 const node = computed(() => nodeMap.value[nodeId] as IsChampionCombinator)
 

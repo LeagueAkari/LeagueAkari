@@ -8,12 +8,7 @@
         {{ t('PlayerTab.filter.position') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
 
     <div class="flex w-60 items-center gap-2">
@@ -29,19 +24,19 @@
 
 <script setup lang="tsx">
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
-import { Delete20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NSelect } from 'naive-ui'
+import { NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import { IsPositionCombinator } from '../combinator-nodes'
 
 const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode } = useMatchHistoryFilters()
 
 const { t } = useTranslation()
 

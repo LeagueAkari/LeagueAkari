@@ -46,12 +46,7 @@
         {{ t('PlayerTab.filter.gold') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
 
     <div class="flex items-center gap-2">
@@ -87,7 +82,6 @@
 <script setup lang="tsx">
 import {
   AccessTime20Regular,
-  Delete20Regular,
   Dismiss20Regular,
   Handshake20Regular,
   Money20Regular,
@@ -95,10 +89,11 @@ import {
   Target20Regular
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber } from 'naive-ui'
+import { NIcon, NInputNumber } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import {
   AssistsBetweenCombinator,
   DeathsBetweenCombinator,
@@ -114,7 +109,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode } = useMatchHistoryFilters()
 
 const node = computed(
   () =>

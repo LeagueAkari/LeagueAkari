@@ -8,12 +8,7 @@
         {{ t('PlayerTab.filter.hasItem') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
 
     <div class="flex items-center gap-2">
@@ -49,12 +44,13 @@
 <script setup lang="tsx">
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { Box20Regular, Delete20Regular } from '@vicons/fluent'
+import { Box20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
+import { NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import { HasItemCombinator } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -63,7 +59,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode } = useMatchHistoryFilters()
 
 const lcs = useLeagueClientStore()
 

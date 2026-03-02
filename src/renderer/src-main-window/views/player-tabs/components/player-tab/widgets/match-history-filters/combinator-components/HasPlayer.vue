@@ -8,12 +8,7 @@
         {{ t('PlayerTab.filter.hasPlayer') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
 
     <div class="flex items-center gap-2">
@@ -32,13 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { Delete20Regular, Person20Regular } from '@vicons/fluent'
+import { Person20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon } from 'naive-ui'
+import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import type { CombinatorNode } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -47,7 +43,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode } = useMatchHistoryFilters()
 
 const node = computed(
   () => nodeMap.value[nodeId] as CombinatorNode<'hasPlayer', [{ kind: 'param'; value: string }]>

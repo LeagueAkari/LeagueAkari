@@ -1,17 +1,23 @@
 <template>
   <div
-    class="space-y-2 rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
+    class="space-y-3 rounded-lg border border-solid border-black/10 bg-black/2 px-4 py-3 dark:border-white/10 dark:bg-white/2"
   >
-    <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1.5 text-sm font-bold">
-        <NIcon size="16"><Person20Regular /></NIcon>
-        {{ t('PlayerTab.filter.forPlayer') }}
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0 flex-1 space-y-1">
+        <div class="flex items-center gap-1.5 text-sm font-bold">
+          <NIcon size="16"><Person20Regular /></NIcon>
+          {{ t('PlayerTab.filter.targetPlayer') }}
+        </div>
+
+        <div class="text-xs text-black/55 dark:text-white/50">
+          {{ t('PlayerTab.filter.addNestedRuleHint') }}
+        </div>
       </div>
 
-      <div class="flex gap-1">
+      <div class="flex flex-wrap gap-1">
         <NDropdown
           trigger="click"
-          :options="combinators"
+          :options="ruleOptions"
           size="small"
           @select="handleAddNode"
           :disabled="childNode !== null"
@@ -20,44 +26,62 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.selectCondition') }}
+            {{ t('PlayerTab.filter.addRule') }}
           </NButton>
         </NDropdown>
 
-        <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-          <template #icon>
-            <NIcon size="14"><Delete20Regular /></NIcon>
-          </template>
-          {{ t('PlayerTab.filter.delete') }}
-        </NButton>
+        <NDropdown
+          trigger="click"
+          :options="groupOptions"
+          size="small"
+          @select="handleAddNode"
+          :disabled="childNode !== null"
+        >
+          <NButton tertiary size="tiny" :disabled="childNode !== null">
+            <template #icon>
+              <NIcon size="14"><Add20Regular /></NIcon>
+            </template>
+            {{ t('PlayerTab.filter.addGroup') }}
+          </NButton>
+        </NDropdown>
+
+        <NodeActionButtons :node-id="nodeId" />
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <NSelectWithSummonerSearching
-        size="small"
-        :puuid="node.args[0].value"
-        @update:puuid="handleUpdatePuuid"
-        class="w-60!"
-      />
+    <div
+      class="grid gap-2 rounded-lg border border-solid border-black/8 bg-black/2 px-3 py-2 md:grid-cols-[88px_minmax(0,1fr)] md:items-center dark:border-white/10 dark:bg-white/2"
+    >
+      <div class="text-xs font-medium text-black/65 dark:text-white/55">
+        {{ t('PlayerTab.filter.referencePlayer') }}
+      </div>
 
-      <div class="text-xs text-black/50 italic dark:text-white/50">
-        {{ t('PlayerTab.filter.searchHint') }}
+      <div class="flex min-w-0 flex-wrap items-center gap-2">
+        <NSelectWithSummonerSearching
+          size="small"
+          :puuid="node.args[0].value"
+          @update:puuid="handleUpdatePuuid"
+          class="min-w-[240px] flex-1"
+        />
+
+        <div class="text-xs text-black/50 italic dark:text-white/50">
+          {{ t('PlayerTab.filter.searchHint') }}
+        </div>
       </div>
     </div>
 
     <CombinatorComp v-if="childNode" :node="childNode" />
     <div
       v-else
-      class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
+      class="flex h-20 items-center justify-center rounded-lg border border-dashed border-black/10 bg-black/3 text-xs text-black/50 dark:border-white/10 dark:bg-white/3 dark:text-white/50"
     >
-      {{ t('PlayerTab.filter.needSelectCondition') }}
+      {{ t('PlayerTab.filter.addNestedRuleHint') }}
     </div>
   </div>
 </template>
 
 <script setup lang="tsx">
-import { Add20Regular, Delete20Regular, Person20Regular } from '@vicons/fluent'
+import { Add20Regular, Person20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon } from 'naive-ui'
 import { computed } from 'vue'
@@ -65,9 +89,10 @@ import { computed } from 'vue'
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import CombinatorComp from '../CombinatorComp.vue'
 import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
+import NodeActionButtons from '../NodeActionButtons.vue'
 import { PlayerCombinator, paramArg } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
-import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
+import { COMBINATOR_FACTORY_MAP, getBuilderConditionOptions, getBuilderGroupOptions } from '../maps'
 
 const { t } = useTranslation()
 
@@ -75,7 +100,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, addNode, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, addNode, updateNode } = useMatchHistoryFilters()
 
 const node = computed(() => nodeMap.value[nodeId] as PlayerCombinator)
 
@@ -106,12 +131,15 @@ const handleUpdatePuuid = (value: string | null) => {
   })
 }
 
-const combinators = computed(() => {
+const ruleOptions = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
-  return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
-    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
-    key: c
-  }))
+  return getBuilderConditionOptions(scope, t)
+})
+
+const groupOptions = computed(() => {
+  const scope = getScope(nodeId, nodeMap.value)
+
+  return getBuilderGroupOptions(scope, t)
 })
 </script>

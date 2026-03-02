@@ -15,32 +15,28 @@
         {{ t('PlayerTab.filter.isPveGame') }}
       </div>
 
-      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
-        <template #icon>
-          <NIcon size="14"><Delete20Regular /></NIcon>
-        </template>
-        {{ t('PlayerTab.filter.delete') }}
-      </NButton>
+      <NodeActionButtons :node-id="nodeId" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Delete20Regular, Games20Regular } from '@vicons/fluent'
+import { Games20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon } from 'naive-ui'
+import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import NodeActionButtons from '../NodeActionButtons.vue'
+import type { CombinatorNode } from '../combinator-nodes'
 
 const { t } = useTranslation()
-import type { CombinatorNode } from '../combinator-nodes'
 
 const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, deleteNode } = useMatchHistoryFilters()
+const { nodeMap } = useMatchHistoryFilters()
 
 const node = computed(
   () =>
