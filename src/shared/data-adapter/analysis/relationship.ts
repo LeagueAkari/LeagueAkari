@@ -45,8 +45,6 @@ export function analyzeRelationship(games: LcuOrSgpGameSummary[], puuid: string)
       continue
     }
 
-    const isCherryMode = basicInfo.isCherrySubteam || basicInfo.gameMode === 'CHERRY'
-
     for (const participant of participants) {
       if (participant.puuid === puuid) {
         continue
@@ -67,9 +65,7 @@ export function analyzeRelationship(games: LcuOrSgpGameSummary[], puuid: string)
       relationship[participant.puuid].games.push({
         gameId: basicInfo.gameId,
         win: participant.win,
-        isOpponent: isCherryMode
-          ? participant.playerSubteamId !== selfParticipant.playerSubteamId
-          : participant.teamId !== selfParticipant.teamId,
+        isOpponent: participant.teamIdentifier !== selfParticipant.teamIdentifier,
         selfChampionId: selfParticipant.championId,
         targetChampionId: participant.championId
       })

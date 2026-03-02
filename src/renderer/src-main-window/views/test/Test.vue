@@ -11,13 +11,19 @@
 
 <script setup lang="ts">
 import { ToolFilled } from '@vicons/antd'
-import { ArrowSync24Filled, DataUsage24Filled, DocumentText24Filled } from '@vicons/fluent'
+import {
+  ArrowSync24Filled,
+  DataUsage24Filled,
+  DocumentText24Filled,
+  Filter20Regular
+} from '@vicons/fluent'
 import { computed } from 'vue'
 
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
 import GameDataTest from './GameDataTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
+import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'
 import SelfUpdateTest from './SelfUpdateTest.vue'
 
 const tabs = computed<TabConfig[]>(() => [
@@ -38,6 +44,12 @@ const tabs = computed<TabConfig[]>(() => [
     name: 'GameData',
     icon: DataUsage24Filled,
     component: GameDataTest
+  },
+  {
+    key: 'match-history-filters',
+    name: '新过滤器',
+    icon: Filter20Regular,
+    component: MatchHistoryFiltersTest
   }
 ])
 </script>

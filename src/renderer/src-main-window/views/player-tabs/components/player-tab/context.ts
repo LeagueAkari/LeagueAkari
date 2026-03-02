@@ -61,7 +61,7 @@ export type PlayerTabContext = {
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
-export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol.for('PlayerTabContext')
+export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('PlayerTabContext')
 
 export type PlayerTabEvents = {
   /**
@@ -148,6 +148,7 @@ export function providePlayerTab(props: {
     preferredSource,
     sgpServerId,
     isCrossRegion,
+    filterMode: () => matchHistoryFilters.mode.value,
     winLoss: () => matchHistoryFilters.filters.value.winLoss,
     selectedChampions: () => matchHistoryFilters.filters.value.selectedChampions,
     selectedPositions: () => matchHistoryFilters.filters.value.selectedPositions,

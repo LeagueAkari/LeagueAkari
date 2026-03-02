@@ -1,8 +1,7 @@
 <template>
   <div>
-    <!-- loading state -->
     <div
-      v-if="isLoading && (!pagedMatchHistory || pagedMatchHistory.games.length === 0)"
+      v-if="isLoading && (!pagedMatchHistory || visibleGames.length === 0)"
       class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
     >
       <div class="flex items-center gap-2">
@@ -12,21 +11,32 @@
     </div>
 
     <template v-else-if="pagedMatchHistory">
-      <!-- empty placeholder -->
       <div
         v-if="pagedMatchHistory.games.length === 0"
         class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
       >
         <span class="text-sm text-black/80 dark:text-white/60">{{
-          hasFilters ? t('PlayerTab.noFilteredMatchHistory') : t('PlayerTab.noMatchHistory')
+          hasActiveFilters ? t('PlayerTab.noFilteredMatchHistory') : t('PlayerTab.noMatchHistory')
         }}</span>
+      </div>
+
+      <div
+        v-else-if="visibleGames.length === 0"
+        class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
+      >
+        <span class="text-sm text-black/80 dark:text-white/60">{{
+          t('PlayerTab.noFilteredMatchHistory')
+        }}</span>
+
+        <NButton size="small" tertiary @click="clearFilters">
+          {{ t('PlayerTab.clearFilters') }}
+        </NButton>
       </div>
     </template>
 
-    <!-- match history list -->
-    <div v-if="pagedMatchHistory && pagedMatchHistory.games.length > 0" class="space-y-1">
+    <div v-if="pagedMatchHistory && visibleGames.length > 0" class="space-y-1">
       <MatchCard
-        v-for="g of pagedMatchHistory.games"
+        v-for="g of visibleGames"
         ref="matchCardEls"
         :summary="g"
         :puuid="puuid"
@@ -36,13 +46,13 @@
         @load-details="loadDetails(g.gameId)"
         @download-replay="downloadReplay(g.gameId)"
         @watch-replay="launchRelay(g.gameId)"
+        @filter-by-champion="applyChampionFilter"
         :details="pagedMatchHistory.details[g.gameId]"
         :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
         :hide-privacy="as.settings.streamerMode"
         :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
         :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
         :jungle-pathing-data-source="junglePathingDataSource"
-        @filter-by-champion="applyChampionFilter"
       />
 
       <div
@@ -75,7 +85,7 @@ import {
 } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useTranslation } from 'i18next-vue'
-import { NSpin, useMessage } from 'naive-ui'
+import { NButton, NSpin, useMessage } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
 import {
@@ -122,7 +132,10 @@ const {
 
 const { loadSpectatorData } = useSpectator()
 
-const { filters, hasFilters, setFilters } = useMatchHistoryFilters()
+const { mode, filters, hasActiveFilters, predicate, setFilters, clearFilters, setMode } =
+  useMatchHistoryFilters()
+
+const isSimpleMode = computed(() => mode.value === 'simple')
 
 const junglePathingDataSource = computed(() => {
   return {
@@ -132,9 +145,25 @@ const junglePathingDataSource = computed(() => {
   }
 })
 
+const visibleGames = computed(() => {
+  if (!pagedMatchHistory.value) {
+    return []
+  }
+
+  if (mode.value === 'advanced') {
+    return pagedMatchHistory.value.games.filter((g) => predicate.value(g))
+  }
+
+  return pagedMatchHistory.value.games
+})
+
 const applyChampionFilter = (championId: number) => {
   if (!Number.isInteger(championId) || championId <= 0) {
     return
+  }
+
+  if (!isSimpleMode.value) {
+    setMode('simple')
   }
 
   setFilters({
@@ -154,6 +183,10 @@ const applyExclusiveChampionFilter = (championId: number) => {
     return
   }
 
+  if (!isSimpleMode.value) {
+    setMode('simple')
+  }
+
   setFilters({
     ...filters.value,
     selectedChampions: [championId],
@@ -170,6 +203,10 @@ const applyExclusiveChampionFilter = (championId: number) => {
 const applyPositionFilter = (position: MatchParticipantPosition) => {
   if (!position) {
     return
+  }
+
+  if (!isSimpleMode.value) {
+    setMode('simple')
   }
 
   setFilters({
@@ -213,7 +250,7 @@ watch(
 )
 
 const maybeEnqueueHeroFilterFtue = () => {
-  if (!pagedMatchHistory.value?.games?.length) {
+  if (!isSimpleMode.value || !pagedMatchHistory.value?.games?.length) {
     return
   }
 
@@ -299,7 +336,7 @@ const isEndOfGame = computed(
 )
 
 watch(
-  () => pagedMatchHistory.value?.games.length || 0,
+  () => visibleGames.value.length,
   (gameCount) => {
     if (gameCount > 0) {
       maybeEnqueueHeroFilterFtue()
@@ -308,11 +345,9 @@ watch(
   { immediate: true }
 )
 
-// 页面在游戏结束后刷新对应 tab 的战绩
-// 当该页面被 KeepAlive, 即使页面不可见也会触发
 watch(
   () => isEndOfGame.value,
-  (is, _prevP) => {
+  (is) => {
     if (pts.frontendSettings.refreshTabsAfterGameEnds && is) {
       if (!ogs.teams) {
         return

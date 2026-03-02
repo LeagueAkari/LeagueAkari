@@ -63,6 +63,11 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     defaultMatchHistoryTimeRange: 'all' as 'all' | '24h' | '3d' | '7d' | '30d',
 
     /**
+     * 默认战绩筛选模式
+     */
+    defaultMatchHistoryFilterMode: 'simple' as 'simple' | 'advanced',
+
+    /**
      * 默认显示训练模式
      */
     defaultShowPractice: false,

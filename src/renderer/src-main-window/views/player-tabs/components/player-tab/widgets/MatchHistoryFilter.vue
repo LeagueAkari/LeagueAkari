@@ -115,7 +115,7 @@ import { usePosition } from '@renderer-shared/components/match-card/utils/text'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
-import { toIdentities } from '@shared/data-adapter/match-history/toIdentities'
+import { toIdentities } from '@shared/data-adapter/match-history/identities'
 import { Delete20Regular, Filter20Regular } from '@vicons/fluent'
 import { useDebounceFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
@@ -130,7 +130,7 @@ import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import {
   MATCH_HISTORY_POSITIONS,
-  MatchHistoryFilters,
+  MatchHistorySimpleFilters,
   useMatchHistoryFilters
 } from '../data/match-history-filters'
 
@@ -191,7 +191,7 @@ const renderChampionOption = (option: SelectBaseOption) => {
   )
 }
 
-const selectedPositions = ref<MatchHistoryFilters['selectedPositions']>([])
+const selectedPositions = ref<MatchHistorySimpleFilters['selectedPositions']>([])
 const positionOptions = computed(() => {
   return MATCH_HISTORY_POSITIONS.map((position) => {
     return {

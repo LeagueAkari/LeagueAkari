@@ -292,6 +292,12 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
     await this._setting.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
+      'defaultMatchHistoryFilterMode'
+    )
+
+    await this._setting.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
       'defaultShowPractice'
     )
 

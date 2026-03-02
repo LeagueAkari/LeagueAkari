@@ -4,7 +4,6 @@
       {{ t('PlayerTab.stats.title') }}
     </div>
     <div class="flex flex-col gap-1">
-      <!-- Akari Score (Kyoko Mode Only) -->
       <div
         class="flex w-full items-center gap-2"
         v-if="as.settings.isInKyokoMode"
@@ -24,7 +23,6 @@
         </span>
       </div>
 
-      <!-- Average KDA -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgKda')
@@ -42,7 +40,6 @@
         </NPopover>
       </div>
 
-      <!-- Average Kill Participation -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgKp')
@@ -52,7 +49,6 @@
         </span>
       </div>
 
-      <!-- Average Damage -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmg')
@@ -62,7 +58,6 @@
         </span>
       </div>
 
-      <!-- Average Damage Taken -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgDmgTaken')
@@ -72,7 +67,6 @@
         </span>
       </div>
 
-      <!-- Average Gold -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgGold')
@@ -82,7 +76,6 @@
         </span>
       </div>
 
-      <!-- Average CS -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.avgCs')
@@ -92,7 +85,6 @@
         </span>
       </div>
 
-      <!-- Active Session -->
       <div
         class="flex w-full items-center gap-2"
         v-if="
@@ -118,7 +110,6 @@
         </span>
       </div>
 
-      <!-- Win/Lose -->
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.winLose')
@@ -149,7 +140,6 @@
         </span>
       </div>
 
-      <!-- Team Sides (Blue/Red) -->
       <div
         class="flex w-full items-center gap-2"
         v-if="analysis.summary.blueSideCount > 0 || analysis.summary.redSideCount > 0"
@@ -168,7 +158,6 @@
         </div>
       </div>
 
-      <!-- Frequently Used Champions -->
       <div class="flex w-full items-center gap-2" v-if="frequentlyUsedChampions.length">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.champions')
@@ -182,17 +171,21 @@
           >
             <template #trigger>
               <div
-                class="relative h-5 w-5 cursor-pointer rounded transition-[filter] hover:brightness-110"
-                v-bind:[FTUE_TARGET_ATTR]="
-                  index === 0 ? FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR : undefined
-                "
+                class="relative h-5 w-5 rounded transition-[filter]"
                 :class="{
-                  'ring-1 ring-sky-500/55 dark:ring-sky-400/50': selectedChampionIdSet.has(c.id)
+                  'cursor-pointer hover:brightness-110': isSimpleMode,
+                  'ring-1 ring-sky-500/55 dark:ring-sky-400/50':
+                    isSimpleMode && selectedChampionIdSet.has(c.id)
                 }"
+                v-bind:[FTUE_TARGET_ATTR]="
+                  isSimpleMode && index === 0 ? FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR : undefined
+                "
                 :title="
-                  t('PlayerTab.filter.sameChampionApplied', {
-                    champion: lcs.gameData.champions[c.id]?.name || `#${c.id}`
-                  })
+                  isSimpleMode
+                    ? t('PlayerTab.filter.sameChampionApplied', {
+                        champion: lcs.gameData.champions[c.id]?.name || `#${c.id}`
+                      })
+                    : undefined
                 "
                 @click.stop="applyChampionFilter(c.id)"
               >
@@ -255,15 +248,29 @@ const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
 const { pagedMatchHistory } = useMatchHistory()
-const { filters, setFilters } = useMatchHistoryFilters()
+const { mode, filters, predicate, setFilters, setMode } = useMatchHistoryFilters()
+
+const isSimpleMode = computed(() => mode.value === 'simple')
+
+const analysisGames = computed(() => {
+  if (!pagedMatchHistory.value?.games?.length) {
+    return []
+  }
+
+  if (mode.value === 'advanced') {
+    return pagedMatchHistory.value.games.filter((g) => predicate.value(g))
+  }
+
+  return pagedMatchHistory.value.games
+})
 
 const analysis = computed(() => {
-  if (!pagedMatchHistory.value?.games) {
+  if (!analysisGames.value.length) {
     return null
   }
 
-  return analyzeMatchHistory(pagedMatchHistory.value.games, puuid.value, {
-    includeIrregularGames: filters.value.showIrregularGames
+  return analyzeMatchHistory(analysisGames.value, puuid.value, {
+    includeIrregularGames: isSimpleMode.value ? filters.value.showIrregularGames : true
   })
 })
 
@@ -316,9 +323,15 @@ const frequentlyUsedChampions = computed(() => {
     })
 })
 
-const selectedChampionIdSet = computed(() => new Set(filters.value.selectedChampions))
+const selectedChampionIdSet = computed(() => {
+  return isSimpleMode.value ? new Set(filters.value.selectedChampions) : new Set<number>()
+})
 
 const applyChampionFilter = (championId: number) => {
+  if (!isSimpleMode.value) {
+    setMode('simple')
+  }
+
   setFilters({
     ...filters.value,
     selectedChampions: [championId]

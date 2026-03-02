@@ -19,7 +19,19 @@
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
         @load-details="loadDetails(summary?.source || 'lcu')"
       />
-      <div v-else>{{ $t('MatchPreviewer.noData') }}</div>
+      <div
+        class="flex h-50 w-[840px] items-center justify-center rounded border border-solid border-black/10 bg-neutral-100 dark:border-white/10 dark:bg-neutral-900"
+        v-else
+      >
+        <template v-if="isLoadingGameSummary">
+          <div class="flex items-center gap-2">
+            <NSpin :size="16" />
+            <span>{{ $t('MatchPreviewer.loading') }}</span>
+          </div>
+        </template>
+
+        <template v-else>{{ $t('MatchPreviewer.noData') }}</template>
+      </div>
     </div>
   </NModal>
 </template>
@@ -33,7 +45,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { NModal } from 'naive-ui'
+import { NModal, NSpin } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import MatchCard from './match-card/MatchCard.vue'
@@ -120,6 +132,7 @@ const loadGameSummary = async (source: 'sgp' | 'lcu') => {
       return
     }
 
+    _summary.value = null
     log.warn(componentName, error)
   } finally {
     isLoadingGameSummary.value = false
@@ -170,6 +183,7 @@ const loadDetails = async (source: 'sgp' | 'lcu') => {
       return
     }
 
+    _details.value = null
     log.warn(componentName, error)
   } finally {
     isLoadingDetails.value = false

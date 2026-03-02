@@ -2143,20 +2143,135 @@ PlayerTab:
   byCount: By Count
   byTime: By Time
   filter:
-    title: Filters
+    title: In-page Filters
+    simpleTab: Simple Filters
+    advancedTab: Advanced Filters
     reset: Clear Filters
+    subtitle: Add rules first; use groups only when you need nested logic
+    resetAll: Reset All Conditions
     sameChampionApplied: 'Filtered by champion: {{champion}}'
     samePositionApplied: 'Filtered by position: {{position}}'
     winLoss: Result
     all: All
     win: Win
     loss: Loss
-    position: Position
-    positionHint: When using the LCU source, positions are inferred from lane/role and are best-effort only
     summoners: Summoners involved
     champions: Champions involved
     showPractice: Show Practice Mode
     showIrregularGames: Show Remakes, Aborts, etc.
+    addCondition: Add Condition
+    addRule: Add Condition
+    addGroup: Add Group
+    exclude: Exclude
+    removeExclude: Stop Excluding
+    addFirstConditionHint: Add the first condition to build a complex predicate
+    addFirstRule: Start with one rule
+    addFirstRuleHint: Default to match-all; add groups only for nested logic or exclusions
+    and: All of (AND)
+    or: Any of (OR)
+    add: Add
+    switchToOr: Any of (OR)
+    switchToAnd: All of (AND)
+    delete: Delete
+    needAddCondition: Add condition required
+    addNestedRuleHint: Add another rule or subgroup inside the current group
+    matchAllRules: Match all rules
+    matchAnyRules: Match any rule
+    groupDescriptionAll: Every rule in this group must match
+    groupDescriptionAny: Any rule in this group can match
+    anyone: For any member
+    everyone: All members must
+    selectCondition: Select Condition
+    needSelectCondition: Select condition required
+    forPlayer: For player
+    targetPlayer: Check selected player
+    targetPlayerTeam: Check this player's team
+    targetPlayerOpponents: Check this player's opponents
+    targetAnyMember: Check any player
+    targetEveryMember: Check every player
+    targetAllMembers: Check all players
+    searchHint: '(Name and tag will be used to search)'
+    notMatch: Not
+    excludeRulesTitle: Exclude the following rules
+    excludeRulesHint: Results matching this group will be excluded
+    forAllMembers: For all members
+    forAllies: For allies
+    forEnemies: For enemies
+    relativeTo: Relative to
+    referencePlayer: Reference player
+    position: Position
+    queue: Game Queue
+    gameDuration: Game duration (seconds)
+    min: Min
+    max: Max
+    isWin: Win
+    isLoss: Loss
+    isAbort: Aborted
+    isRemake: Remake
+    surrenderLoss: Lost by surrender
+    kills: Kills
+    deaths: Deaths
+    assists: Assists
+    gold: Gold
+    isMatchedGame: Matched game
+    isPveGame: PvE game
+    summonerSpell: Summoner spell
+    hasItem: Has item
+    augment: Augment
+    hasPlayer: Match includes player
+    playerPuuid: Player
+    select: Select
+    atPosition: At position
+    have: Have
+    anyPosition: Any position
+    positionN: 'Position {{n}}'
+    spellGroupNormal: Normal
+    spellGroupSpecial: Special
+    augmentGroupHextech: Hextech Arena
+    augmentGroupArena: Arena
+    augmentGroupOther: Other
+    augmentTypeHai: H
+    augmentTypeDou: A
+    isChampion: Champion
+    sections:
+      logicGroups: Logic Groups
+      scopeGroups: Scope
+      gameConditions: Game Conditions
+      resultConditions: Result Conditions
+      matchConditions: Match Members
+      participantConditions: Player Conditions
+      statConditions: Stats Conditions
+    combinatorLabels:
+      game: Game
+      and: Match all rules
+      or: Match any rule
+      not: Exclude rules
+      isQueue: Game queue
+      isAbort: Aborted
+      isRemake: Remake
+      hasAugment: Augment
+      enemies: Check this player's opponents
+      allies: Check this player's team
+      all: Check all players
+      anyone: Check any player
+      everyone: Check every player
+      isChampion: Champion
+      durationBetween: Game duration
+      kdaBetween: KDA
+      killsBetween: Kills
+      deathsBetween: Deaths
+      assistsBetween: Assists
+      goldBetween: Gold
+      isWin: Win
+      isLoss: Loss
+      isMatchedGame: Matched game
+      isPveGame: PvE game
+      player: Check selected player
+      hasPlayer: Match includes player
+      hasSpell: Summoner spell
+      isPosition: Position
+      hasItem: Has item
+    positionHint: When using the LCU source, positions are inferred from lane/role and are best-effort only
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   timeRange:
@@ -2178,6 +2293,7 @@ PlayerTab:
 
   noMatchHistory: No match history
   noFilteredMatchHistory: No filtered match history
+  clearFilters: Clear filter conditions
   loading: Loading...
 
   private:

@@ -1,5 +1,4 @@
 <template>
-  <!-- 横向布局模式 -->
   <div
     v-if="horizontal"
     class="match-history-pagination flex items-center gap-2 rounded px-2 py-1 transition-colors"
@@ -9,7 +8,6 @@
       'bg-black/5 dark:bg-white/5': !isFloating
     }"
   >
-    <!-- 队列选择器 -->
     <NSelect
       v-if="preferredSource === 'sgp' || isCrossRegion"
       :value="selectedQueue"
@@ -22,7 +20,6 @@
       :consistent-menu-width="false"
     />
 
-    <!-- 互斥模式：按局数 / 按时间 -->
     <NSelect
       :disabled="isLoading"
       :value="selectedModeValue"
@@ -32,7 +29,14 @@
       class="w-40!"
     />
 
+    <NRadioGroup size="small" :value="filterMode" @update:value="handleFilterModeChange">
+      <NRadioButton value="simple">{{ t('PlayerTab.filter.simpleTab') }}</NRadioButton>
+      <NRadioButton value="advanced">{{ t('PlayerTab.filter.advancedTab') }}</NRadioButton>
+    </NRadioGroup>
+
     <NPopover
+      v-if="isSimpleMode"
+      v-model:show="showSimpleFilterPopover"
       display-directive="show"
       trigger="click"
       placement="bottom"
@@ -41,11 +45,11 @@
       <template #trigger>
         <NButton
           size="small"
-          :secondary="hasFilters"
-          :tertiary="!hasFilters"
+          :secondary="hasActiveFilters"
+          :tertiary="!hasActiveFilters"
           circle
           v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
-          :type="hasFilters ? 'primary' : 'default'"
+          :type="hasActiveFilters ? 'primary' : 'default'"
           :title="t('PlayerTab.filter.title')"
         >
           <template #icon>
@@ -56,7 +60,21 @@
       <MatchHistoryFilter class="w-[300px]" />
     </NPopover>
 
-    <!-- 翻页 -->
+    <NButton
+      v-else
+      size="small"
+      :secondary="hasActiveFilters"
+      :tertiary="!hasActiveFilters"
+      circle
+      :type="hasActiveFilters ? 'primary' : 'default'"
+      :title="t('PlayerTab.filter.title')"
+      @click="handleOpenAdvancedFilterModal"
+    >
+      <template #icon>
+        <NIcon size="16"><Filter20Regular /></NIcon>
+      </template>
+    </NButton>
+
     <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
       <NButton
         size="small"
@@ -144,9 +162,14 @@
         </template>
       </NButton>
     </div>
+
+    <NModal v-model:show="showAdvancedFilterModal">
+      <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
+        <MatchHistoryFilters />
+      </div>
+    </NModal>
   </div>
 
-  <!-- 默认纵向布局模式 -->
   <div
     v-else
     class="match-history-pagination space-y-2 rounded px-4 py-3 transition-colors"
@@ -156,7 +179,6 @@
       'bg-black/5 dark:bg-white/5': !isFloating
     }"
   >
-    <!-- 队列选择器 - 始终可见 -->
     <NSelect
       v-if="preferredSource === 'sgp' || isCrossRegion"
       :value="selectedQueue"
@@ -168,8 +190,7 @@
       :consistent-menu-width="false"
     />
 
-    <!-- 更多筛选 + 翻页 -->
-    <div class="flex items-center justify-between gap-1">
+    <div class="flex flex-wrap items-center justify-between gap-2">
       <NSelect
         class="w-34!"
         :disabled="isLoading"
@@ -179,7 +200,14 @@
         :options="mutuallyExclusiveOptions"
       />
 
+      <NRadioGroup size="small" :value="filterMode" @update:value="handleFilterModeChange">
+        <NRadioButton value="simple">{{ t('PlayerTab.filter.simpleTab') }}</NRadioButton>
+        <NRadioButton value="advanced">{{ t('PlayerTab.filter.advancedTab') }}</NRadioButton>
+      </NRadioGroup>
+
       <NPopover
+        v-if="isSimpleMode"
+        v-model:show="showSimpleFilterPopover"
         display-directive="show"
         trigger="click"
         placement="bottom"
@@ -188,11 +216,11 @@
         <template #trigger>
           <NButton
             size="small"
-            :secondary="hasFilters"
-            :tertiary="!hasFilters"
+            :secondary="hasActiveFilters"
+            :tertiary="!hasActiveFilters"
             circle
             v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
-            :type="hasFilters ? 'primary' : 'default'"
+            :type="hasActiveFilters ? 'primary' : 'default'"
             :title="t('PlayerTab.filter.title')"
           >
             <template #icon>
@@ -203,7 +231,21 @@
         <MatchHistoryFilter class="w-[300px]" />
       </NPopover>
 
-      <!-- 翻页 -->
+      <NButton
+        v-else
+        size="small"
+        :secondary="hasActiveFilters"
+        :tertiary="!hasActiveFilters"
+        circle
+        :type="hasActiveFilters ? 'primary' : 'default'"
+        :title="t('PlayerTab.filter.title')"
+        @click="handleOpenAdvancedFilterModal"
+      >
+        <template #icon>
+          <NIcon size="16"><Filter20Regular /></NIcon>
+        </template>
+      </NButton>
+
       <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
         <NButton
           size="small"
@@ -292,6 +334,12 @@
         </NButton>
       </div>
     </div>
+
+    <NModal v-model:show="showAdvancedFilterModal">
+      <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
+        <MatchHistoryFilters />
+      </div>
+    </NModal>
   </div>
 </template>
 
@@ -307,8 +355,18 @@ import {
   Previous20Filled
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber, NPopover, NSelect, SelectOption } from 'naive-ui'
-import { computed, h, ref, watchEffect } from 'vue'
+import {
+  NButton,
+  NIcon,
+  NInputNumber,
+  NModal,
+  NPopover,
+  NRadioButton,
+  NRadioGroup,
+  NSelect,
+  SelectOption
+} from 'naive-ui'
+import { computed, h, ref, watch, watchEffect } from 'vue'
 
 import { useMapAssets } from '@main-window/composables/useMapAssets'
 import {
@@ -322,6 +380,7 @@ import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
 import MatchHistoryFilter from './MatchHistoryFilter.vue'
+import MatchHistoryFilters from './match-history-filters/MatchHistoryFilters.vue'
 
 const { isFloating = false, horizontal = false } = defineProps<{
   horizontal?: boolean
@@ -336,6 +395,10 @@ const pageSizeOptions = usePageSizeOptions()
 
 const { preferredSource, isCrossRegion } = usePlayerTab()
 const { isLoading, loadMatchHistory, pagedMatchHistory } = useMatchHistory()
+const { mode, hasActiveFilters, setMode } = useMatchHistoryFilters()
+
+const isSimpleMode = computed(() => mode.value === 'simple')
+const filterMode = computed(() => mode.value)
 
 const computedCurrentPage = computed(() => {
   if (!pagedMatchHistory.value) return 1
@@ -443,7 +506,26 @@ const handleModeChange = (value: string | number | null) => {
   }
 }
 
-const { hasFilters } = useMatchHistoryFilters()
+const showSimpleFilterPopover = ref(false)
+const showAdvancedFilterModal = ref(false)
+
+const handleFilterModeChange = (value: 'simple' | 'advanced') => {
+  showSimpleFilterPopover.value = false
+  showAdvancedFilterModal.value = false
+  setMode(value)
+}
+
+const handleOpenAdvancedFilterModal = () => {
+  showAdvancedFilterModal.value = true
+}
+
+watch(
+  () => mode.value,
+  () => {
+    showSimpleFilterPopover.value = false
+    showAdvancedFilterModal.value = false
+  }
+)
 
 const arbitraryPage = ref(computedCurrentPage.value)
 const isArbitraryPagePopupVisible = ref(false)
@@ -530,5 +612,4 @@ const renderLabel = (option: SelectOption) => {
     ]
   )
 }
-
 </script>

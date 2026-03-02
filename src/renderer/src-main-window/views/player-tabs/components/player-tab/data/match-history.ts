@@ -37,7 +37,7 @@ import {
 import type { MatchHistoryTimeRange } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import { MATCH_HISTORY_POSITIONS } from './match-history-filters'
+import { MATCH_HISTORY_POSITIONS, MatchHistoryFilterMode } from './match-history-filters'
 import { shouldHideMatchHistoryGame } from './match-history-visibility'
 
 export type MatchHistoryQueryState = MatchHistoryQueryParams & {
@@ -125,6 +125,7 @@ export function provideMatchHistory(props: {
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
+  filterMode?: MaybeRefOrGetter<MatchHistoryFilterMode>
   winLoss?: MaybeRefOrGetter<'all' | 'win' | 'loss'>
   selectedChampions?: MaybeRefOrGetter<number[]>
   selectedPositions?: MaybeRefOrGetter<string[]>
@@ -136,6 +137,7 @@ export function provideMatchHistory(props: {
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
+  const filterMode = toRef(props.filterMode ?? 'simple')
   const winLoss = toRef(props.winLoss ?? 'all')
   const selectedChampions = toRef(props.selectedChampions ?? [])
   const selectedPositions = toRef(props.selectedPositions ?? [])
@@ -248,23 +250,33 @@ export function provideMatchHistory(props: {
     const isTimeRangeMode = currentTimeRange !== 'all'
     queryParams.startIndex = isTimeRangeMode ? 0 : (queryParams.startIndex ?? 0)
 
+    const useSimpleFilters = filterMode.value === 'simple'
+    const currentWinLoss = useSimpleFilters ? winLoss.value : 'all'
+    const currentShowPractice = useSimpleFilters ? showPractice.value : true
+    const currentShowIrregularGames = useSimpleFilters ? showIrregularGames.value : true
     const visibleStartIndex = queryParams.startIndex
     const visibleCount = isTimeRangeMode
       ? Number.POSITIVE_INFINITY
       : (queryParams.count ?? pts.frontendSettings.loadCount)
-    const shouldFilterByWinLoss = winLoss.value !== 'all'
-    const selectedChampionSet = new Set<number>(normalizeChampionFilter(selectedChampions.value))
+    const shouldFilterByWinLoss = currentWinLoss !== 'all'
+    const selectedChampionSet = new Set<number>(
+      useSimpleFilters ? normalizeChampionFilter(selectedChampions.value) : []
+    )
     const shouldFilterByChampion = selectedChampionSet.size > 0
-    const selectedPositionSet = new Set<string>(normalizePositionFilter(selectedPositions.value))
+    const selectedPositionSet = new Set<string>(
+      useSimpleFilters ? normalizePositionFilter(selectedPositions.value) : []
+    )
     const shouldFilterByPosition = selectedPositionSet.size > 0
-    const selectedSummonerSet = new Set<string>(normalizeSummonerFilter(selectedSummoners.value))
+    const selectedSummonerSet = new Set<string>(
+      useSimpleFilters ? normalizeSummonerFilter(selectedSummoners.value) : []
+    )
     const shouldFilterBySummoners = selectedSummonerSet.size > 0
     const needsParticipantFilters =
       shouldFilterByChampion ||
       shouldFilterByWinLoss ||
       shouldFilterByPosition ||
       shouldFilterBySummoners
-    const hideByVisibilityOptions = !showPractice.value || !showIrregularGames.value
+    const hideByVisibilityOptions = !currentShowPractice || !currentShowIrregularGames
     const shouldFilterByTimeRange = isTimeRangeMode
     const timeRangeStartMs = shouldFilterByTimeRange
       ? Date.now() - TIME_RANGE_MS_MAP[currentTimeRange]
@@ -284,9 +296,9 @@ export function provideMatchHistory(props: {
     const createEmptyPagedMatchHistory = () => {
       return {
         games: markRaw([] as LcuOrSgpGameSummary[]),
-        replayMetadata: {}, // must be shallow
-        details: {}, // must be shallow
-        detailsLoading: {}, // must be shallow
+        replayMetadata: {},
+        details: {},
+        detailsLoading: {},
         queryParams
       } satisfies PagedMatchHistory
     }
@@ -362,8 +374,8 @@ export function provideMatchHistory(props: {
 
           if (
             shouldHideMatchHistoryGame(g, puuid.value, {
-              showPractice: showPractice.value,
-              showIrregularGames: showIrregularGames.value
+              showPractice: currentShowPractice,
+              showIrregularGames: currentShowIrregularGames
             })
           ) {
             continue
@@ -407,11 +419,7 @@ export function provideMatchHistory(props: {
             }
           }
 
-          if (
-            shouldFilterByWinLoss &&
-            selfParticipant &&
-            selfParticipant.winResult !== winLoss.value
-          ) {
+          if (shouldFilterByWinLoss && selfParticipant && selfParticipant.winResult !== currentWinLoss) {
             continue
           }
 
@@ -446,7 +454,6 @@ export function provideMatchHistory(props: {
         rawCursor += chunk.length
         guard++
 
-        // 战绩按时间倒序，若整块均超出时间范围，则无需继续请求后续块
         if (
           timeRangeStartMs !== null &&
           !hasTimeInRangeGameInChunk &&
@@ -483,12 +490,10 @@ export function provideMatchHistory(props: {
       pagedMatchHistory.value = createEmptyPagedMatchHistory()
 
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-        // SGP API 需要 token 就绪
         if (!sgps.isTokenReady) {
           return
         }
 
-        // 检查 SGP 服务器支持
         if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
           return
         }
@@ -585,7 +590,6 @@ export function provideMatchHistory(props: {
 
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-        // SGP API 需要 token 就绪
         if (!sgps.isTokenReady) {
           return
         }
@@ -601,7 +605,6 @@ export function provideMatchHistory(props: {
         pagedMatchHistory.value.details[gameId] = markRaw({ source: 'lcu', gameId, data })
       }
     } catch (error) {
-      // ignore single detail loading error, just log it
       log.error(componentName, error)
     } finally {
       pagedMatchHistory.value.detailsLoading[gameId] = false
@@ -628,21 +631,18 @@ export function provideMatchHistory(props: {
     }
   }
 
-  // track replay download progress updates
   lc.onLcuEventVue<ReplayDownloadProgress>('/lol-replays/v1/metadata/:gameId', (data) => {
     if (data.eventType === 'Update' && pagedMatchHistory.value) {
       pagedMatchHistory.value.replayMetadata[data.data.gameId] = markRaw(data.data)
     }
   })
 
-  // 主要监听器：参数变化时加载
   watch(
     [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
     ([available]) => {
       lcuLoadDetailedGameQueue.clear()
       lcuReplayMetadataQueue.clear()
 
-      // 如果需要 SGP 但 token 未就绪，等待 token 就绪后再加载
       if ((preferredSource.value === 'sgp' || isCrossRegion.value) && !available) {
         return
       }
@@ -655,12 +655,19 @@ export function provideMatchHistory(props: {
   watch(
     () =>
       [
-        winLoss.value,
-        showPractice.value,
-        showIrregularGames.value,
-        normalizeChampionFilter(selectedChampions.value).join(','),
-        normalizePositionFilter(selectedPositions.value).join(','),
-        normalizeSummonerFilter(selectedSummoners.value).join(',')
+        filterMode.value,
+        filterMode.value === 'simple' ? winLoss.value : 'all',
+        filterMode.value === 'simple' ? showPractice.value : true,
+        filterMode.value === 'simple' ? showIrregularGames.value : true,
+        filterMode.value === 'simple'
+          ? normalizeChampionFilter(selectedChampions.value).join(',')
+          : '',
+        filterMode.value === 'simple'
+          ? normalizePositionFilter(selectedPositions.value).join(',')
+          : '',
+        filterMode.value === 'simple'
+          ? normalizeSummonerFilter(selectedSummoners.value).join(',')
+          : ''
       ].join('|'),
     (current, previous) => {
       if (current === previous) {
