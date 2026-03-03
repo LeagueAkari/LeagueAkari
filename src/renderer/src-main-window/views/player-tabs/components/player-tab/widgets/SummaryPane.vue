@@ -248,17 +248,13 @@ const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
 const { pagedMatchHistory } = useMatchHistory()
-const { mode, filters, predicate, setFilters, setMode } = useMatchHistoryFilters()
+const { mode, filters, setFilters, setMode } = useMatchHistoryFilters()
 
 const isSimpleMode = computed(() => mode.value === 'simple')
 
 const analysisGames = computed(() => {
   if (!pagedMatchHistory.value?.games?.length) {
     return []
-  }
-
-  if (mode.value === 'advanced') {
-    return pagedMatchHistory.value.games.filter((g) => predicate.value(g))
   }
 
   return pagedMatchHistory.value.games

@@ -488,107 +488,107 @@ const setRead = () => {
 [data-theme='light'] {
   .theme-selector-panel {
     background-color: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(41, 57, 78, 0.14);
+    border: 1px solid rgba(0, 0, 0, 0.14);
   }
 
   .theme-selector-title {
-    color: rgba(41, 57, 78, 0.76);
+    color: rgba(0, 0, 0, 0.68);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(59, 111, 152, 0.08);
+      background-color: rgba(0, 0, 0, 0.08);
     }
 
     &.active {
-      background-color: rgba(59, 111, 152, 0.16);
+      background-color: rgba(0, 0, 0, 0.12);
     }
 
     .theme-selector-item__label {
-      color: rgba(26, 35, 48, 0.92);
+      color: rgba(0, 0, 0, 0.9);
     }
 
     .theme-selector-item__desc {
-      color: rgba(41, 57, 78, 0.62);
+      color: rgba(0, 0, 0, 0.6);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(41, 57, 78, 0.12);
+      border-top-color: rgba(0, 0, 0, 0.12);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(41, 57, 78, 0.58);
+    color: rgba(0, 0, 0, 0.56);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(59, 111, 152, 0.14);
-      color: rgba(26, 35, 48, 0.98);
+      background-color: rgba(0, 0, 0, 0.15);
+      color: rgba(0, 0, 0, 1);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(59, 111, 152, 0.1);
+      background-color: rgba(0, 0, 0, 0.1);
     }
 
     .common-button-inner {
-      color: rgba(26, 35, 48, 0.86);
+      color: rgba(0, 0, 0, 0.86);
     }
   }
 }
 
 [data-theme-id='dark'] {
   .theme-selector-panel {
-    background-color: rgba(33, 40, 54, 0.95);
-    border: 1px solid rgba(210, 223, 242, 0.18);
+    background-color: rgba(34, 34, 38, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.14);
   }
 
   .theme-selector-title {
-    color: rgba(195, 208, 228, 0.9);
+    color: rgba(255, 255, 255, 0.68);
   }
 
   .theme-selector-item {
     &:hover {
-      background-color: rgba(103, 198, 227, 0.1);
+      background-color: rgba(255, 255, 255, 0.08);
     }
 
     &.active {
-      background-color: rgba(103, 198, 227, 0.18);
+      background-color: rgba(255, 255, 255, 0.14);
     }
 
     .theme-selector-item__label {
-      color: rgba(241, 246, 255, 0.9);
+      color: rgba(255, 255, 255, 0.9);
     }
 
     .theme-selector-item__desc {
-      color: rgba(195, 208, 228, 0.68);
+      color: rgba(255, 255, 255, 0.6);
     }
   }
 
   .theme-selector-group {
     &:not(:first-of-type) {
-      border-top-color: rgba(210, 223, 242, 0.12);
+      border-top-color: rgba(255, 255, 255, 0.12);
     }
   }
 
   .theme-selector-group__label {
-    color: rgba(195, 208, 228, 0.72);
+    color: rgba(255, 255, 255, 0.58);
   }
 
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
-      background-color: rgba(103, 198, 227, 0.14);
-      color: rgba(241, 246, 255, 0.96);
+      background-color: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 1);
     }
 
     .common-button-outer:active .common-button-inner {
-      background-color: rgba(103, 198, 227, 0.1);
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     .common-button-inner {
-      color: rgba(241, 246, 255, 0.86);
+      color: rgba(255, 255, 255, 0.86);
     }
   }
 }

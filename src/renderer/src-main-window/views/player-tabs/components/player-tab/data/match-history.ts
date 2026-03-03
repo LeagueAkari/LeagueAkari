@@ -31,6 +31,7 @@ import {
   provide,
   ref,
   toRef,
+  toValue,
   watch
 } from 'vue'
 
@@ -126,6 +127,8 @@ export function provideMatchHistory(props: {
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
   filterMode?: MaybeRefOrGetter<MatchHistoryFilterMode>
+  advancedFilterActive?: MaybeRefOrGetter<boolean>
+  advancedPredicate?: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
   winLoss?: MaybeRefOrGetter<'all' | 'win' | 'loss'>
   selectedChampions?: MaybeRefOrGetter<number[]>
   selectedPositions?: MaybeRefOrGetter<string[]>
@@ -138,6 +141,12 @@ export function provideMatchHistory(props: {
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
   const filterMode = toRef(props.filterMode ?? 'simple')
+  const advancedFilterActive = computed(() => {
+    return props.advancedFilterActive ? toValue(props.advancedFilterActive) : false
+  })
+  const advancedPredicate = computed(() => {
+    return props.advancedPredicate ? toValue(props.advancedPredicate) : () => true
+  })
   const winLoss = toRef(props.winLoss ?? 'all')
   const selectedChampions = toRef(props.selectedChampions ?? [])
   const selectedPositions = toRef(props.selectedPositions ?? [])
@@ -251,6 +260,8 @@ export function provideMatchHistory(props: {
     queryParams.startIndex = isTimeRangeMode ? 0 : (queryParams.startIndex ?? 0)
 
     const useSimpleFilters = filterMode.value === 'simple'
+    const useAdvancedFilters = filterMode.value === 'advanced' && advancedFilterActive.value
+    const currentAdvancedPredicate = useAdvancedFilters ? advancedPredicate.value : null
     const currentWinLoss = useSimpleFilters ? winLoss.value : 'all'
     const currentShowPractice = useSimpleFilters ? showPractice.value : true
     const currentShowIrregularGames = useSimpleFilters ? showIrregularGames.value : true
@@ -289,7 +300,8 @@ export function provideMatchHistory(props: {
       shouldFilterByChampion ||
       shouldFilterByWinLoss ||
       shouldFilterByPosition ||
-      shouldFilterBySummoners
+      shouldFilterBySummoners ||
+      useAdvancedFilters
         ? 500
         : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
 
@@ -434,6 +446,10 @@ export function provideMatchHistory(props: {
             }
           }
 
+          if (currentAdvancedPredicate && !currentAdvancedPredicate(g)) {
+            continue
+          }
+
           if (!isTimeRangeMode && visibleSkipped < visibleStartIndex) {
             visibleSkipped++
             continue
@@ -525,7 +541,8 @@ export function provideMatchHistory(props: {
           shouldFilterByChampion ||
           shouldFilterByPosition ||
           shouldFilterByWinLoss ||
-          shouldFilterBySummoners
+          shouldFilterBySummoners ||
+          useAdvancedFilters
         const games = shouldCollectGames
           ? await collectVisibleGames(fetchSgpChunk, appendGamesToCurrentList)
           : await fetchSgpChunk(visibleStartIndex, visibleCount)
@@ -554,7 +571,8 @@ export function provideMatchHistory(props: {
           shouldFilterByChampion ||
           shouldFilterByPosition ||
           shouldFilterByWinLoss ||
-          shouldFilterBySummoners
+          shouldFilterBySummoners ||
+          useAdvancedFilters
         const selectedGames = shouldCollectGames
           ? await collectVisibleGames(fetchLcuSummaryChunk)
           : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
@@ -653,27 +671,22 @@ export function provideMatchHistory(props: {
   )
 
   watch(
-    () =>
-      [
-        filterMode.value,
-        filterMode.value === 'simple' ? winLoss.value : 'all',
-        filterMode.value === 'simple' ? showPractice.value : true,
-        filterMode.value === 'simple' ? showIrregularGames.value : true,
-        filterMode.value === 'simple'
-          ? normalizeChampionFilter(selectedChampions.value).join(',')
-          : '',
-        filterMode.value === 'simple'
-          ? normalizePositionFilter(selectedPositions.value).join(',')
-          : '',
-        filterMode.value === 'simple'
-          ? normalizeSummonerFilter(selectedSummoners.value).join(',')
-          : ''
-      ].join('|'),
-    (current, previous) => {
-      if (current === previous) {
-        return
-      }
-
+    [
+      () => filterMode.value,
+      () => (filterMode.value === 'simple' ? winLoss.value : 'all'),
+      () => (filterMode.value === 'simple' ? showPractice.value : true),
+      () => (filterMode.value === 'simple' ? showIrregularGames.value : true),
+      () =>
+        filterMode.value === 'simple' ? normalizeChampionFilter(selectedChampions.value).join(',') : '',
+      () =>
+        filterMode.value === 'simple' ? normalizePositionFilter(selectedPositions.value).join(',') : '',
+      () =>
+        filterMode.value === 'simple' ? normalizeSummonerFilter(selectedSummoners.value).join(',') : '',
+      () => (filterMode.value === 'advanced' ? advancedFilterActive.value : false),
+      () =>
+        filterMode.value === 'advanced' && advancedFilterActive.value ? advancedPredicate.value : null
+    ],
+    () => {
       const baseQueryParams = pagedMatchHistory.value?.queryParams ?? getDefaultQueryParams()
       loadMatchHistory({
         ...baseQueryParams,

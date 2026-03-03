@@ -386,6 +386,13 @@ AppSettings:
 MatchHistorySettings:
   title: Match History Tabs
 
+  filterMode:
+    label: Filter Mode
+    description: Choose the default filtering mode for match history pages. Both simple and advanced modes now filter first and then fill the page size.
+    options:
+      simple: Simple Filters
+      advanced: Advanced Filters
+
   refreshTabsAfterGameEnds:
     label: Refresh Tabs After Game Ends
     description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
@@ -2143,7 +2150,7 @@ PlayerTab:
   byCount: By Count
   byTime: By Time
   filter:
-    title: In-page Filters
+    title: Filters
     simpleTab: Simple Filters
     advancedTab: Advanced Filters
     reset: Clear Filters

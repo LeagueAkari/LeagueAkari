@@ -387,6 +387,13 @@ AppSettings:
 MatchHistorySettings:
   title: 战绩页面
 
+  filterMode:
+    label: 筛选模式
+    description: 选择战绩页面默认使用的筛选方式。简单筛选和高级筛选都会先按条件过滤，再补满页面数量
+    options:
+      simple: 简单筛选
+      advanced: 高级筛选
+
   refreshTabsAfterGameEnds:
     label: 更新页面战绩
     description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
@@ -2144,7 +2151,7 @@ PlayerTab:
   byCount: 按局数
   byTime: 按时间
   filter:
-    title: 页内筛选
+    title: 筛选
     simpleTab: 简单筛选
     advancedTab: 高级筛选
     reset: 重置条件

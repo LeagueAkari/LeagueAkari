@@ -17,6 +17,8 @@ import {
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
+import type { Predicate } from '@shared/data-adapter/predicates/combinators'
+
 import { provideChallengesPlayerData } from './data/challenges'
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
@@ -149,6 +151,9 @@ export function providePlayerTab(props: {
     sgpServerId,
     isCrossRegion,
     filterMode: () => matchHistoryFilters.mode.value,
+    advancedFilterActive: () => matchHistoryFilters.rootHasCombinator.value,
+    advancedPredicate: () =>
+      matchHistoryFilters.predicate.value as Predicate<LcuOrSgpGameSummary>,
     winLoss: () => matchHistoryFilters.filters.value.winLoss,
     selectedChampions: () => matchHistoryFilters.filters.value.selectedChampions,
     selectedPositions: () => matchHistoryFilters.filters.value.selectedPositions,

@@ -1,6 +1,6 @@
 import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { Predicate } from '@shared/data-adapter/predicates/combinators'
-import { ComputedRef, InjectionKey, Ref, computed, inject, markRaw, provide, ref } from 'vue'
+import { ComputedRef, InjectionKey, Ref, computed, inject, markRaw, provide, ref, watch } from 'vue'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -48,7 +48,7 @@ export type MatchHistoryFiltersContext = {
   predicate: ComputedRef<Predicate<unknown>>
   rootHasCombinator: ComputedRef<boolean>
   cachedSummoners: Ref<Record<string, SimpleSummonerResult>>
-  setMode: (mode: MatchHistoryFilterMode) => void
+  setMode: (mode: MatchHistoryFilterMode, options?: { persist?: boolean }) => void
   setFilters: (filters: MatchHistorySimpleFilters) => void
   clearSimpleFilters: () => void
   addNode: (node: CombinatorNode) => void
@@ -182,9 +182,21 @@ export function provideMatchHistoryFilters() {
     cachedSummoners.value = {}
   }
 
-  const setMode = (_mode: MatchHistoryFilterMode) => {
+  watch(
+    () => pts.frontendSettings.defaultMatchHistoryFilterMode,
+    (nextMode) => {
+      if (mode.value !== nextMode) {
+        mode.value = nextMode
+      }
+    }
+  )
+
+  const setMode = (_mode: MatchHistoryFilterMode, options: { persist?: boolean } = {}) => {
     mode.value = _mode
-    pts.frontendSettings.defaultMatchHistoryFilterMode = _mode
+
+    if (options.persist) {
+      pts.frontendSettings.defaultMatchHistoryFilterMode = _mode
+    }
   }
 
   const clearFilters = () => {

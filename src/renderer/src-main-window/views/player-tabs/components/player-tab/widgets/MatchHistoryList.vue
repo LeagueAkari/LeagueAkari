@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-if="isLoading && (!pagedMatchHistory || visibleGames.length === 0)"
+      v-if="isLoading && (!pagedMatchHistory || displayedGames.length === 0)"
       class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
     >
       <div class="flex items-center gap-2">
@@ -13,30 +13,22 @@
     <template v-else-if="pagedMatchHistory">
       <div
         v-if="pagedMatchHistory.games.length === 0"
-        class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
+        class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
       >
         <span class="text-sm text-black/80 dark:text-white/60">{{
           hasActiveFilters ? t('PlayerTab.noFilteredMatchHistory') : t('PlayerTab.noMatchHistory')
         }}</span>
-      </div>
 
-      <div
-        v-else-if="visibleGames.length === 0"
-        class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
-      >
-        <span class="text-sm text-black/80 dark:text-white/60">{{
-          t('PlayerTab.noFilteredMatchHistory')
-        }}</span>
-
-        <NButton size="small" tertiary @click="clearFilters">
+        <NButton v-if="hasActiveFilters" size="small" tertiary @click="clearFilters">
           {{ t('PlayerTab.clearFilters') }}
         </NButton>
       </div>
+
     </template>
 
-    <div v-if="pagedMatchHistory && visibleGames.length > 0" class="space-y-1">
+    <div v-if="pagedMatchHistory && displayedGames.length > 0" class="space-y-1">
       <MatchCard
-        v-for="g of visibleGames"
+        v-for="g of displayedGames"
         ref="matchCardEls"
         :summary="g"
         :puuid="puuid"
@@ -132,7 +124,7 @@ const {
 
 const { loadSpectatorData } = useSpectator()
 
-const { mode, filters, hasActiveFilters, predicate, setFilters, clearFilters, setMode } =
+const { mode, filters, hasActiveFilters, clearFilters, setFilters, setMode } =
   useMatchHistoryFilters()
 
 const isSimpleMode = computed(() => mode.value === 'simple')
@@ -145,13 +137,9 @@ const junglePathingDataSource = computed(() => {
   }
 })
 
-const visibleGames = computed(() => {
+const displayedGames = computed(() => {
   if (!pagedMatchHistory.value) {
     return []
-  }
-
-  if (mode.value === 'advanced') {
-    return pagedMatchHistory.value.games.filter((g) => predicate.value(g))
   }
 
   return pagedMatchHistory.value.games
@@ -336,7 +324,7 @@ const isEndOfGame = computed(
 )
 
 watch(
-  () => visibleGames.value.length,
+  () => displayedGames.value.length,
   (gameCount) => {
     if (gameCount > 0) {
       maybeEnqueueHeroFilterFtue()

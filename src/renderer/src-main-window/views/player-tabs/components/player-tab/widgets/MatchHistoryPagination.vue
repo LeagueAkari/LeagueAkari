@@ -26,13 +26,9 @@
       @update:value="handleModeChange"
       size="small"
       :options="mutuallyExclusiveOptions"
-      class="w-40!"
+      class="w-28!"
+      :consistent-menu-width="false"
     />
-
-    <NRadioGroup size="small" :value="filterMode" @update:value="handleFilterModeChange">
-      <NRadioButton value="simple">{{ t('PlayerTab.filter.simpleTab') }}</NRadioButton>
-      <NRadioButton value="advanced">{{ t('PlayerTab.filter.advancedTab') }}</NRadioButton>
-    </NRadioGroup>
 
     <NPopover
       v-if="isSimpleMode"
@@ -43,37 +39,62 @@
       :theme-overrides="{ padding: '0px' }"
     >
       <template #trigger>
+        <NTooltip>
+          <template #trigger>
+            <NButton
+              size="small"
+              :secondary="hasActiveFilters"
+              :tertiary="!hasActiveFilters"
+              circle
+              v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
+              :type="hasActiveFilters ? 'primary' : 'default'"
+            >
+              <template #icon>
+                <NIcon size="16"><Filter20Regular /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('PlayerTab.filter.title') }}
+        </NTooltip>
+      </template>
+      <MatchHistoryFilter class="w-[300px]" />
+    </NPopover>
+
+    <NTooltip v-else>
+      <template #trigger>
         <NButton
           size="small"
           :secondary="hasActiveFilters"
           :tertiary="!hasActiveFilters"
           circle
-          v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
           :type="hasActiveFilters ? 'primary' : 'default'"
-          :title="t('PlayerTab.filter.title')"
+          @click="handleOpenAdvancedFilterModal"
         >
           <template #icon>
             <NIcon size="16"><Filter20Regular /></NIcon>
           </template>
         </NButton>
       </template>
-      <MatchHistoryFilter class="w-[300px]" />
-    </NPopover>
+      {{ t('PlayerTab.filter.title') }}
+    </NTooltip>
 
-    <NButton
-      v-else
-      size="small"
-      :secondary="hasActiveFilters"
-      :tertiary="!hasActiveFilters"
-      circle
-      :type="hasActiveFilters ? 'primary' : 'default'"
-      :title="t('PlayerTab.filter.title')"
-      @click="handleOpenAdvancedFilterModal"
-    >
-      <template #icon>
-        <NIcon size="16"><Filter20Regular /></NIcon>
+    <NTooltip>
+      <template #trigger>
+        <NButton
+          size="small"
+          circle
+          tertiary
+          :type="hasActiveFilters ? 'warning' : 'default'"
+          :disabled="!hasActiveFilters"
+          @click="handleClearFilters"
+        >
+          <template #icon>
+            <NIcon size="16"><Delete20Regular /></NIcon>
+          </template>
+        </NButton>
       </template>
-    </NButton>
+      {{ t('PlayerTab.clearFilters') }}
+    </NTooltip>
 
     <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
       <NButton
@@ -190,63 +211,86 @@
       :consistent-menu-width="false"
     />
 
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <NSelect
-        class="w-34!"
-        :disabled="isLoading"
-        :value="selectedModeValue"
-        @update:value="handleModeChange"
-        size="small"
-        :options="mutuallyExclusiveOptions"
-      />
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex min-w-0 flex-1 items-center gap-2">
+        <NSelect
+          class="w-24! shrink-0"
+          :disabled="isLoading"
+          :value="selectedModeValue"
+          @update:value="handleModeChange"
+          size="small"
+          :options="mutuallyExclusiveOptions"
+          :consistent-menu-width="false"
+        />
 
-      <NRadioGroup size="small" :value="filterMode" @update:value="handleFilterModeChange">
-        <NRadioButton value="simple">{{ t('PlayerTab.filter.simpleTab') }}</NRadioButton>
-        <NRadioButton value="advanced">{{ t('PlayerTab.filter.advancedTab') }}</NRadioButton>
-      </NRadioGroup>
+        <NPopover
+          v-if="isSimpleMode"
+          v-model:show="showSimpleFilterPopover"
+          display-directive="show"
+          trigger="click"
+          placement="bottom"
+          :theme-overrides="{ padding: '0px' }"
+        >
+          <template #trigger>
+            <NTooltip>
+              <template #trigger>
+                <NButton
+                  size="small"
+                  :secondary="hasActiveFilters"
+                  :tertiary="!hasActiveFilters"
+                  circle
+                  v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
+                  :type="hasActiveFilters ? 'primary' : 'default'"
+                >
+                  <template #icon>
+                    <NIcon size="16"><Filter20Regular /></NIcon>
+                  </template>
+                </NButton>
+              </template>
+              {{ t('PlayerTab.filter.title') }}
+            </NTooltip>
+          </template>
+          <MatchHistoryFilter class="w-[300px]" />
+        </NPopover>
 
-      <NPopover
-        v-if="isSimpleMode"
-        v-model:show="showSimpleFilterPopover"
-        display-directive="show"
-        trigger="click"
-        placement="bottom"
-        :theme-overrides="{ padding: '0px' }"
-      >
-        <template #trigger>
-          <NButton
-            size="small"
-            :secondary="hasActiveFilters"
-            :tertiary="!hasActiveFilters"
-            circle
-            v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
-            :type="hasActiveFilters ? 'primary' : 'default'"
-            :title="t('PlayerTab.filter.title')"
-          >
-            <template #icon>
-              <NIcon size="16"><Filter20Regular /></NIcon>
-            </template>
-          </NButton>
-        </template>
-        <MatchHistoryFilter class="w-[300px]" />
-      </NPopover>
+        <NTooltip v-else>
+          <template #trigger>
+            <NButton
+              size="small"
+              :secondary="hasActiveFilters"
+              :tertiary="!hasActiveFilters"
+              circle
+              :type="hasActiveFilters ? 'primary' : 'default'"
+              @click="handleOpenAdvancedFilterModal"
+            >
+              <template #icon>
+                <NIcon size="16"><Filter20Regular /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('PlayerTab.filter.title') }}
+        </NTooltip>
 
-      <NButton
-        v-else
-        size="small"
-        :secondary="hasActiveFilters"
-        :tertiary="!hasActiveFilters"
-        circle
-        :type="hasActiveFilters ? 'primary' : 'default'"
-        :title="t('PlayerTab.filter.title')"
-        @click="handleOpenAdvancedFilterModal"
-      >
-        <template #icon>
-          <NIcon size="16"><Filter20Regular /></NIcon>
-        </template>
-      </NButton>
+        <NTooltip>
+          <template #trigger>
+            <NButton
+              size="small"
+              circle
+              tertiary
+              :type="hasActiveFilters ? 'warning' : 'default'"
+              :disabled="!hasActiveFilters"
+              @click="handleClearFilters"
+            >
+              <template #icon>
+                <NIcon size="16"><Delete20Regular /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('PlayerTab.clearFilters') }}
+        </NTooltip>
+      </div>
 
-      <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
+      <div v-if="!isTimeRangeMode" class="flex shrink-0 items-center gap-1">
         <NButton
           size="small"
           tertiary
@@ -351,6 +395,7 @@ import {
   ArrowCircleRight32Filled,
   ChevronLeft20Regular,
   ChevronRight20Regular,
+  Delete20Regular,
   Filter20Regular,
   Previous20Filled
 } from '@vicons/fluent'
@@ -361,9 +406,8 @@ import {
   NInputNumber,
   NModal,
   NPopover,
-  NRadioButton,
-  NRadioGroup,
   NSelect,
+  NTooltip,
   SelectOption
 } from 'naive-ui'
 import { computed, h, ref, watch, watchEffect } from 'vue'
@@ -395,10 +439,9 @@ const pageSizeOptions = usePageSizeOptions()
 
 const { preferredSource, isCrossRegion } = usePlayerTab()
 const { isLoading, loadMatchHistory, pagedMatchHistory } = useMatchHistory()
-const { mode, hasActiveFilters, setMode } = useMatchHistoryFilters()
+const { mode, hasActiveFilters, clearFilters } = useMatchHistoryFilters()
 
 const isSimpleMode = computed(() => mode.value === 'simple')
-const filterMode = computed(() => mode.value)
 
 const computedCurrentPage = computed(() => {
   if (!pagedMatchHistory.value) return 1
@@ -509,14 +552,14 @@ const handleModeChange = (value: string | number | null) => {
 const showSimpleFilterPopover = ref(false)
 const showAdvancedFilterModal = ref(false)
 
-const handleFilterModeChange = (value: 'simple' | 'advanced') => {
-  showSimpleFilterPopover.value = false
-  showAdvancedFilterModal.value = false
-  setMode(value)
-}
-
 const handleOpenAdvancedFilterModal = () => {
   showAdvancedFilterModal.value = true
+}
+
+const handleClearFilters = () => {
+  showSimpleFilterPopover.value = false
+  showAdvancedFilterModal.value = false
+  clearFilters()
 }
 
 watch(

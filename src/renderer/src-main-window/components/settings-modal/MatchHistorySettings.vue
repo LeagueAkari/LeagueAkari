@@ -27,6 +27,19 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        :label="t('MatchHistorySettings.filterMode.label')"
+        :label-description="t('MatchHistorySettings.filterMode.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          v-model:value="pts.frontendSettings.defaultMatchHistoryFilterMode"
+          :options="filterModeOptions"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('MatchHistorySettings.showJunglePathing.label')"
         :label-description="t('MatchHistorySettings.showJunglePathing.description')"
         :label-width="400"
@@ -41,6 +54,7 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
+import { computed } from 'vue'
 
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
@@ -50,6 +64,16 @@ const { t } = useTranslation()
 const pts = usePlayerTabsStore()
 
 const pageSizeOptions = usePageSizeOptions()
+const filterModeOptions = computed(() => [
+  {
+    label: t('MatchHistorySettings.filterMode.options.simple'),
+    value: 'simple'
+  },
+  {
+    label: t('MatchHistorySettings.filterMode.options.advanced'),
+    value: 'advanced'
+  }
+])
 </script>
 
 <style scoped>
