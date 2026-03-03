@@ -852,6 +852,9 @@ AutoGameflow:
   autoMatchmakingWaitForInvitees:
     label: Wait for Invitees
     description: Automatically waits for all invited players to respond before starting matchmaking.
+  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
+    label: Cancel Auto Matchmaking After Champ Select Dodge
+    description: Cancels this auto matchmaking when champion select returns to the lobby or matchmaking because someone dodged.
   autoMatchmakingRematchStrategy:
     label: Stop Matchmaking Strategy
     description: Defines when to stop matchmaking automatically. Matchmaking will restart if auto matchmaking is enabled.
@@ -2838,6 +2841,9 @@ LoungeOperations:
   autoMatchmakingWaitForInvitees:
     label: Wait for Invitees
 
+  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
+    label: Cancel After Dodge
+
 SkinSelectionMini:
   skins: '{{countV}} skins available'
   button: Apply
@@ -2870,6 +2876,7 @@ Lounge:
     waitingForPenalty: Waiting for dodge timer {{seconds}} s
     waitingForMembers: Auto-matchmaking requires {{countV}} players
     waitingForInvitees: Waiting for invited members
+    cancelledAfterChampSelect: Auto matchmaking cancelled after a champion select dodge
 
 Placeholder:
   inProgress: In Progress

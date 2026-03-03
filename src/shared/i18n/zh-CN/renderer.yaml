@@ -853,6 +853,9 @@ AutoGameflow:
   autoMatchmakingWaitForInvitees:
     label: 等待邀请中成员
     description: 自动开启匹配将等待所有被邀请的玩家做出回应
+  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
+    label: 选人秒退后取消自动匹配
+    description: 在英雄选择阶段有人秒退并返回房间或重回匹配队列时，取消本次自动匹配
   autoMatchmakingRematchStrategy:
     label: 停止匹配策略
     description: 在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配
@@ -2839,6 +2842,9 @@ LoungeOperations:
   autoMatchmakingWaitForInvitees:
     label: 等待邀请中成员
 
+  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
+    label: 秒退后取消自动匹配
+
 SkinSelectionMini:
   skins: '{{countV}} 款皮肤可用'
   button: 应用
@@ -2871,6 +2877,7 @@ Lounge:
     waitingForPenalty: 等待秒退计时器 {{seconds}} s
     waitingForMembers: 自动匹配需达到 {{countV}} 人
     waitingForInvitees: 等待邀请中成员
+    cancelledAfterChampSelect: 选人有人秒退，已取消自动匹配
 
 Placeholder:
   inProgress: 游戏进行中

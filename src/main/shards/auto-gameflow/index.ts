@@ -31,6 +31,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
+  private _pendingCancelMatchmakingSearchAfterChampSelectReturn = false
+  private _isCancelingMatchmakingSearchAfterChampSelectReturn = false
 
   private _autoAcceptTask = new TimeoutTask(this._acceptMatch.bind(this))
   private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
@@ -64,6 +66,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           default: this.settings.autoMatchmakingMaximumMatchDuration
         },
         autoMatchmakingMinimumMembers: { default: this.settings.autoMatchmakingMinimumMembers },
+        cancelAutoMatchmakingAfterChampSelectReturnEnabled: {
+          default: this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled
+        },
         playAgainEnabled: { default: this.settings.playAgainEnabled },
         autoReconnectEnabled: { default: this.settings.autoReconnectEnabled },
         autoMatchmakingRematchFixedDuration: {
@@ -108,6 +113,115 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._log.info(`Gameflow phase changed: ${phase}`)
       }
     )
+  }
+
+  private _handleAutoMatchmakingCancelAfterChampSelectReturn() {
+    const clearBlock = (reason: string) => {
+      if (!this.state.preventAutoMatchmakingAfterChampSelectReturn) {
+        return
+      }
+
+      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
+      this.state.setPreventAutoMatchmakingAfterChampSelectReturn(false)
+      this._log.info(`Cleared auto-matchmaking block after champ-select return: ${reason}`)
+    }
+
+    this._mobx.reaction(
+      () => this._lc.data.gameflow.phase,
+      (phase, prevPhase) => {
+        if (!this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled) {
+          return
+        }
+
+        if (prevPhase === 'ChampSelect' && (phase === 'Lobby' || phase === 'Matchmaking')) {
+          this.state.setPreventAutoMatchmakingAfterChampSelectReturn(true)
+          this._pendingCancelMatchmakingSearchAfterChampSelectReturn = phase === 'Matchmaking'
+          this.cancelAutoMatchmaking('normal')
+          this._log.info(
+            `Left champ select for ${phase}, blocking auto-matchmaking for current lobby`
+          )
+          return
+        }
+
+        if (!phase) {
+          clearBlock('gameflow-unavailable')
+          return
+        }
+
+        if (
+          (phase === 'Matchmaking' || phase === 'ReadyCheck') &&
+          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
+          !this._pendingCancelMatchmakingSearchAfterChampSelectReturn
+        ) {
+          clearBlock(`phase=${phase}`)
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    this._mobx.reaction(
+      () => this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled,
+      (enabled) => {
+        if (!enabled) {
+          clearBlock('setting-disabled')
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    this._mobx.reaction(
+      () =>
+        [
+          Boolean(this._lc.data.lobby.lobby),
+          this._lc.data.matchmaking.search?.isCurrentlyInQueue,
+          this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled
+        ] as const,
+      ([hasLobby, isCurrentlyInQueue, enabled]) => {
+        if (!enabled) {
+          clearBlock('setting-disabled')
+          return
+        }
+
+        if (!hasLobby) {
+          clearBlock('lobby-unavailable')
+          return
+        }
+
+        if (
+          isCurrentlyInQueue &&
+          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
+          this._pendingCancelMatchmakingSearchAfterChampSelectReturn
+        ) {
+          this._cancelMatchmakingSearchAfterChampSelectReturn()
+          return
+        }
+
+        if (isCurrentlyInQueue) {
+          clearBlock('search-started')
+        }
+      },
+      { equals: comparer.shallow, fireImmediately: true }
+    )
+  }
+
+  private async _cancelMatchmakingSearchAfterChampSelectReturn() {
+    if (this._isCancelingMatchmakingSearchAfterChampSelectReturn) {
+      return
+    }
+
+    this._isCancelingMatchmakingSearchAfterChampSelectReturn = true
+
+    try {
+      this._log.info('Cancelling matchmaking search after returning from champ select due to dodge')
+      await this._lc.api.lobby.deleteSearchMatch()
+    } catch (error) {
+      this._log.warn(
+        `Failed to cancel matchmaking search after champ-select return: ${formatError(error)}`
+      )
+    } finally {
+      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
+      this._isCancelingMatchmakingSearchAfterChampSelectReturn = false
+    }
   }
 
   private _handleAutoAccept() {
@@ -771,6 +885,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoMatchmakingDelaySeconds',
       'autoMatchmakingEnabled',
       'autoMatchmakingMinimumMembers',
+      'cancelAutoMatchmakingAfterChampSelectReturnEnabled',
       'autoMatchmakingRematchFixedDuration',
       'autoMatchmakingRematchStrategy',
       'autoMatchmakingWaitForInvitees',
@@ -888,6 +1003,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoHandleInvitation()
     this._handleAutoSkipLeader()
     this._handleLogging()
+    this._handleAutoMatchmakingCancelAfterChampSelectReturn()
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
     this._handleSendARAMTeamSide()

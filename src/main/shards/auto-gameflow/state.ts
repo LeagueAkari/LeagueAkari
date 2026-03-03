@@ -29,6 +29,7 @@ export class AutoGameflowSettings {
   autoMatchmakingDelaySeconds: number = 5
   autoMatchmakingMinimumMembers = 1 // 最低满足人数
   autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
+  cancelAutoMatchmakingAfterChampSelectReturnEnabled: boolean = true
 
   autoSkipLeaderEnabled: boolean = false
 
@@ -78,6 +79,10 @@ export class AutoGameflowSettings {
 
   setAutoMatchmakingWaitForInvitees(yes: boolean) {
     this.autoMatchmakingWaitForInvitees = yes
+  }
+
+  setCancelAutoMatchmakingAfterChampSelectReturnEnabled(enabled: boolean) {
+    this.cancelAutoMatchmakingAfterChampSelectReturnEnabled = enabled
   }
 
   setAutoMatchmakingRematchStrategy(s: AutoMatchmakingStrategy) {
@@ -138,6 +143,11 @@ export class AutoGameflowState {
   willReconnectAt: number = -1
 
   /**
+   * 从英雄选择阶段返回房间后，阻止当前 lobby 继续自动排队
+   */
+  preventAutoMatchmakingAfterChampSelectReturn: boolean = false
+
+  /**
    * 即将被邀请的好友的 PUUID 列表
    */
   friendsToBeInvited: string[] = []
@@ -149,6 +159,10 @@ export class AutoGameflowState {
 
     if (this._lcData.gameflow.session?.gameData.isCustomGame) {
       return 'unavailable'
+    }
+
+    if (this.preventAutoMatchmakingAfterChampSelectReturn) {
+      return 'cancelled-after-champ-select'
     }
 
     const self = this._lcData.lobby.lobby.members.find(
@@ -215,6 +229,10 @@ export class AutoGameflowState {
 
   setReconnectAt(at: number) {
     this.willReconnectAt = at
+  }
+
+  setPreventAutoMatchmakingAfterChampSelectReturn(prevent: boolean) {
+    this.preventAutoMatchmakingAfterChampSelectReturn = prevent
   }
 
   setFriendsToBeInvited(puuids: string[]) {

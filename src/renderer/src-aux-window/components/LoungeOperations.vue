@@ -74,6 +74,16 @@
             size="small"
           />
         </NFlex>
+        <NFlex align="center" class="h-6 not-last:mb-0.5">
+          <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
+            t('LoungeOperations.cancelAutoMatchmakingAfterChampSelectReturnEnabled.label')
+          }}</span>
+          <NSwitch
+            :value="agfs.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled"
+            @update:value="(val) => agf.setCancelAutoMatchmakingAfterChampSelectReturnEnabled(val)"
+            size="small"
+          />
+        </NFlex>
       </NFlex>
     </NPopover>
   </NCard>
