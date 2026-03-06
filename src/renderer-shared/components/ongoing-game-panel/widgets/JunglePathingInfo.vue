@@ -2,7 +2,7 @@
   <NPopover :keep-alive-on-hover="true" trigger="manual" :show="popoverShow">
     <template #trigger>
       <div
-        class="inline-flex"
+        :class="fullWidth ? 'flex w-full' : 'inline-flex'"
         @mouseenter="handleTriggerMouseEnter"
         @mouseleave="handleTriggerMouseLeave"
       >
@@ -17,6 +17,7 @@
           v-else
           :data-ftue-target="ftueTarget || undefined"
           class="mb-1 flex cursor-pointer items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 transition-[filter] hover:brightness-110 dark:border-emerald-400/20 dark:bg-emerald-400/10"
+          :class="{ 'w-full': fullWidth }"
         >
           <!-- mini map -->
           <div
@@ -395,7 +396,9 @@
             </div>
             <div class="flex flex-col gap-1 pl-0.5 text-[10px] text-black/55 dark:text-white/55">
               <span class="inline-flex items-center gap-1 whitespace-nowrap">
-                <span class="inline-block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/40" />
+                <span
+                  class="inline-block h-2.5 w-2.5 rounded-full border border-white/40 bg-white/40"
+                />
                 {{ t('JunglePathing.firstClearOwnLegend') }}
               </span>
               <span class="inline-flex items-center gap-1 whitespace-nowrap text-amber-400">
@@ -619,7 +622,8 @@ const {
   triggerText = '',
   ftueTarget = '',
   customTabs = [],
-  currentGameSide = null
+  currentGameSide = null,
+  fullWidth = false
 } = defineProps<{
   analysis: JunglePathingAnalysis
   showCopyAll?: boolean
@@ -628,6 +632,7 @@ const {
   ftueTarget?: string
   customTabs?: JunglePathingCustomTab[]
   currentGameSide?: 'blue' | 'red' | null
+  fullWidth?: boolean
 }>()
 
 const { t } = useTranslation()
@@ -1166,9 +1171,12 @@ const firstClearCampMapPoints = computed(() => {
   const side = firstClearDisplaySide.value
   const ownCampCoords = side === 'blue' ? BLUE_SIDE_CAMPS : RED_SIDE_CAMPS
   const invadeCampCoords = side === 'blue' ? RED_SIDE_CAMPS : BLUE_SIDE_CAMPS
-  const ownCamps = side === 'blue' ? popoverStats.value.firstClearCamp.blue : popoverStats.value.firstClearCamp.red
+  const ownCamps =
+    side === 'blue' ? popoverStats.value.firstClearCamp.blue : popoverStats.value.firstClearCamp.red
   const invadeCamps =
-    side === 'blue' ? popoverStats.value.firstClearCamp.blueInvade : popoverStats.value.firstClearCamp.redInvade
+    side === 'blue'
+      ? popoverStats.value.firstClearCamp.blueInvade
+      : popoverStats.value.firstClearCamp.redInvade
   const ownStarts = sumCampCount(ownCamps)
   const invadeStarts = sumCampCount(invadeCamps)
   const totalStarts = ownStarts + invadeStarts

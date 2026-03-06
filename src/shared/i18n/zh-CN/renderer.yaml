@@ -452,6 +452,10 @@ OngoingGameSettings:
     label: 对局详情加载数量
     description: 会额外加载前 {{countV}} 场对局的详细信息，用于分析战绩
 
+  jungleAnalysisMatchHistoryLoadCount:
+    label: 打野分析拉取战绩数量
+    description: 打野分析在样本不足时会继续拉取战绩，最多到前 {{countV}} 场；其中同英雄需要 20 场、总体需要 50 场
+
   showRecentlyUsedChampions:
     label: 显示最近使用的英雄
     description: 在玩家卡片上展示最近使用的英雄
@@ -2703,6 +2707,11 @@ PlayerInfoCard:
   losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
   suspiciousFlashPosition: 闪现异位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
+  hardGank: 难抓
+  gankable: 可抓
+  easyGank: 好抓
+  veryEasyGank: 非常好抓
+  easyGankPopover: 在最近已分析的 {{countV}} 场召唤师峡谷对局中，该玩家 15 分钟前被敌方打野参与击杀的场均次数为 {{times}} 次
   soloKills: '{{times}} 单杀'
   soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家场均单杀 {{times}} 次
   akariLoved:

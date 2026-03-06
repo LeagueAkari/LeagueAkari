@@ -40,12 +40,14 @@
       </div>
     </NPopover>
 
-    <JunglePathingInfo
-      v-if="ogs.settings.showJunglePathing && jungleAnalysis"
-      :analysis="jungleAnalysis"
-      :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
-      :current-game-side="currentGameSide"
-    />
+    <div v-if="ogs.settings.showJunglePathing && jungleAnalysis" class="full-row-item">
+      <JunglePathingInfo
+        :analysis="jungleAnalysis"
+        :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
+        :current-game-side="currentGameSide"
+        full-width
+      />
+    </div>
 
     <NPopover
       v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
@@ -401,6 +403,20 @@
       </div>
     </NPopover>
 
+    <NPopover :keep-alive-on-hover="false" v-if="easyGankTag" :delay="50">
+      <template #trigger>
+        <div class="tag" :class="easyGankTag.className">{{ t(easyGankTag.labelKey) }}</div>
+      </template>
+      <div class="popover-text">
+        {{
+          t('PlayerInfoCard.easyGankPopover', {
+            times: easyGankTag.times.toFixed(2),
+            countV: easyGankTag.count
+          })
+        }}
+      </div>
+    </NPopover>
+
     <NPopover
       :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showSoloKillsTag && playerStats?.summary.avgSoloKills"
@@ -615,6 +631,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -624,10 +641,8 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../constants'
 import { useOngoingGamePanel } from '../context'
-
 import JunglePathingInfo from './JunglePathingInfo.vue'
 
 const { puuid } = defineProps<{
@@ -677,6 +692,74 @@ const currentGameSide = computed<'blue' | 'red' | null>(() => {
   }
 
   return null
+})
+const SMITE_SPELL_ID = 11
+
+const isCurrentJungler = computed(() => {
+  const assignedPosition = ogs.positionAssignments[puuid]?.position?.toUpperCase()
+
+  if (assignedPosition === 'JUNGLE') {
+    return true
+  }
+
+  const spells = ogs.additional.spells[puuid]
+
+  return spells?.spell1Id === SMITE_SPELL_ID || spells?.spell2Id === SMITE_SPELL_ID
+})
+
+const easyGankTag = computed<{
+  className: 'hard-gank' | 'gankable' | 'easy-gank' | 'very-easy-gank'
+  labelKey:
+    | 'PlayerInfoCard.hardGank'
+    | 'PlayerInfoCard.gankable'
+    | 'PlayerInfoCard.easyGank'
+    | 'PlayerInfoCard.veryEasyGank'
+  times: number
+  count: number
+} | null>(() => {
+  if (isCurrentJungler.value || !playerStats.value) {
+    return null
+  }
+
+  const times = playerStats.value.summary.avgEarlyDeathsWithEnemyJunglerInvolved
+
+  if (times === null) {
+    return null
+  }
+
+  if (times > 2) {
+    return {
+      className: 'very-easy-gank',
+      labelKey: 'PlayerInfoCard.veryEasyGank',
+      times,
+      count: playerStats.value.summary.earlyDeathsWithEnemyJunglerInvolvedGamesCount
+    }
+  }
+
+  if (times >= 1.5) {
+    return {
+      className: 'easy-gank',
+      labelKey: 'PlayerInfoCard.easyGank',
+      times,
+      count: playerStats.value.summary.earlyDeathsWithEnemyJunglerInvolvedGamesCount
+    }
+  }
+
+  if (times >= 1) {
+    return {
+      className: 'gankable',
+      labelKey: 'PlayerInfoCard.gankable',
+      times,
+      count: playerStats.value.summary.earlyDeathsWithEnemyJunglerInvolvedGamesCount
+    }
+  }
+
+  return {
+    className: 'hard-gank',
+    labelKey: 'PlayerInfoCard.hardGank',
+    times,
+    count: playerStats.value.summary.earlyDeathsWithEnemyJunglerInvolvedGamesCount
+  }
 })
 
 const isSuspiciousFlashPosition = computed(() => {
@@ -775,6 +858,11 @@ const { masked } = useStreamerModeMaskedText()
   gap: 4px;
   margin-bottom: 4px;
 
+  .full-row-item {
+    flex: 1 0 100%;
+    width: 100%;
+  }
+
   .tag {
     font-size: 11px;
     line-height: 11px;
@@ -830,6 +918,26 @@ const { masked } = useStreamerModeMaskedText()
     &.too-many-solo-kills {
       color: #ffffff;
       background-color: #9019a8;
+    }
+
+    &.easy-gank {
+      color: #ffffff;
+      background-color: #8f541e;
+    }
+
+    &.hard-gank {
+      color: #ffffff;
+      background-color: #24606d;
+    }
+
+    &.gankable {
+      color: #ffffff;
+      background-color: #64732a;
+    }
+
+    &.very-easy-gank {
+      color: #ffffff;
+      background-color: #a81919;
     }
 
     &.self {

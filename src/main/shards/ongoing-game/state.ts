@@ -28,6 +28,11 @@ export class OngoingGameSettings {
    * 会拉取战绩中前 n 局的时间线数量
    */
   gameDetailsLoadCount: number = 8
+
+  /**
+   * 打野分析最多会额外拉取前 n 局战绩，用于补足样本
+   */
+  jungleAnalysisMatchHistoryLoadCount: number = 100
   concurrency: number = 4
 
   /**
@@ -123,6 +128,10 @@ export class OngoingGameSettings {
 
   setGameDetailsLoadCount(value: number) {
     this.gameDetailsLoadCount = value
+  }
+
+  setJungleAnalysisMatchHistoryLoadCount(value: number) {
+    this.jungleAnalysisMatchHistoryLoadCount = value
   }
 
   setQueryInLobbyPhase(value: boolean) {

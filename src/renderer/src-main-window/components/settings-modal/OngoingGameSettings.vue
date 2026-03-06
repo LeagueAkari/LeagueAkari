@@ -87,6 +87,27 @@
         />
       </ControlItem>
 
+      <ControlItem
+        class="control-item-margin"
+        :label="t('OngoingGameSettings.jungleAnalysisMatchHistoryLoadCount.label')"
+        :label-description="
+          t('OngoingGameSettings.jungleAnalysisMatchHistoryLoadCount.description', {
+            countV: ogs.settings.jungleAnalysisMatchHistoryLoadCount
+          })
+        "
+        :label-width="400"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="small"
+          :min="50"
+          :max="100"
+          :step="5"
+          :value="ogs.settings.jungleAnalysisMatchHistoryLoadCount"
+          @update:value="(val) => og.setJungleAnalysisMatchHistoryLoadCount(val || 100)"
+        />
+      </ControlItem>
+
       <!-- match history tag preference -->
       <ControlItem
         class="control-item-margin"

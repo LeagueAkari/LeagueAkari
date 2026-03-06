@@ -1,12 +1,15 @@
 import { isPveQueue } from '@shared/types/league-client/match-history'
 
+import { toFrames } from '../match-history/frames'
 import { toBasicInfo } from '../match-history/match-basic'
 import { toParticipants } from '../match-history/participants'
 import { toTeams } from '../match-history/teams'
 import { calculateCoefficientOfVariation, noZero } from '../utils'
-import { LcuOrSgpGameSummary } from '../wrapper'
+import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '../wrapper'
 
 const SUMMONER_SPELL_FLASH_ID = 4
+const SUMMONER_SPELL_SMITE_ID = 11
+const EARLY_JUNGLE_INVOLVEMENT_LIMIT_MS = 15 * 60 * 1000
 
 export interface MatchHistoryGamesAnalysis {
   gameId: number
@@ -141,6 +144,9 @@ export interface MatchHistoryGamesAnalysisSummary {
   avgEnemyMissingPings: number | null
   avgPings: number | null
   avgSoloKills: number | null
+
+  avgEarlyDeathsWithEnemyJunglerInvolved: number | null
+  earlyDeathsWithEnemyJunglerInvolvedGamesCount: number
 }
 
 export interface MatchHistoryChampionPositionAnalysis {
@@ -220,6 +226,126 @@ function toUnifiedGames(games: LcuOrSgpGameSummary[], puuid: string) {
       return { basicInfo, participants, teams, team, participant }
     })
     .filter((g) => g !== null)
+}
+
+function isSummonersRiftClassicMatchedGame(summary: LcuOrSgpGameSummary) {
+  const basicInfo = toBasicInfo(summary)
+
+  return (
+    basicInfo.gameType === 'MATCHED_GAME' &&
+    basicInfo.mapId === 11 &&
+    basicInfo.gameMode === 'CLASSIC'
+  )
+}
+
+function getEnemyJunglerParticipantIds(summary: LcuOrSgpGameSummary, puuid: string) {
+  const basicInfo = toBasicInfo(summary)
+  const participants = toParticipants(summary, basicInfo)
+  const participant = participants.find((p) => p.puuid === puuid)
+
+  if (!participant) {
+    return []
+  }
+
+  const enemies = participants.filter((p) => p.teamId !== participant.teamId)
+  const byPosition = enemies.filter((p) => p.position === 'JUNGLE')
+
+  if (byPosition.length) {
+    return byPosition.map((p) => p.participantId)
+  }
+
+  const bySmite = enemies.filter((p) => p.spells.includes(SUMMONER_SPELL_SMITE_ID))
+
+  if (bySmite.length) {
+    return bySmite.map((p) => p.participantId)
+  }
+
+  return []
+}
+
+function isJunglerParticipant(participant: { position: string | null; spells: number[] }) {
+  return participant.position === 'JUNGLE' || participant.spells.includes(SUMMONER_SPELL_SMITE_ID)
+}
+
+export function analyzeEarlyDeathsWithEnemyJunglerInvolved(
+  games: LcuOrSgpGameSummary[],
+  detailsMap: Record<number, LcuOrSgpGameDetails>,
+  puuid: string
+) {
+  let totalEarlyDeathsWithEnemyJunglerInvolved = 0
+  let analyzedGamesCount = 0
+
+  for (const game of games) {
+    if (!isSummonersRiftClassicMatchedGame(game)) {
+      continue
+    }
+
+    const detail = detailsMap[game.gameId]
+
+    if (!detail) {
+      continue
+    }
+
+    const basicInfo = toBasicInfo(game)
+    const participants = toParticipants(game, basicInfo)
+    const participant = participants.find((p) => p.puuid === puuid)
+    const enemyJunglerIds = getEnemyJunglerParticipantIds(game, puuid)
+
+    if (!participant || isJunglerParticipant(participant) || !enemyJunglerIds.length) {
+      continue
+    }
+
+    const enemyJunglerIdSet = new Set(enemyJunglerIds)
+    const frames = toFrames(detail)
+
+    if (!frames.length) {
+      continue
+    }
+
+    let earlyDeathsWithEnemyJunglerInvolved = 0
+
+    for (const frame of frames) {
+      if (!frame.events) {
+        continue
+      }
+
+      for (const event of frame.events) {
+        if (event.type !== 'CHAMPION_KILL' || event.timestamp > EARLY_JUNGLE_INVOLVEMENT_LIMIT_MS) {
+          continue
+        }
+
+        const championKillEvent = event as {
+          killerId: number
+          victimId: number
+          assistingParticipantIds?: number[]
+        }
+
+        if (championKillEvent.victimId !== participant.participantId) {
+          continue
+        }
+
+        const enemyJunglerKilled = enemyJunglerIdSet.has(championKillEvent.killerId)
+        const enemyJunglerAssisted =
+          championKillEvent.assistingParticipantIds?.some((id) => enemyJunglerIdSet.has(id)) ??
+          false
+
+        if (enemyJunglerKilled || enemyJunglerAssisted) {
+          earlyDeathsWithEnemyJunglerInvolved += 1
+        }
+      }
+    }
+
+    totalEarlyDeathsWithEnemyJunglerInvolved += earlyDeathsWithEnemyJunglerInvolved
+    analyzedGamesCount += 1
+  }
+
+  return {
+    avgEarlyDeathsWithEnemyJunglerInvolved:
+      analyzedGamesCount > 0
+        ? totalEarlyDeathsWithEnemyJunglerInvolved / noZero(analyzedGamesCount)
+        : null,
+    earlyDeathsWithEnemyJunglerInvolvedGamesCount: analyzedGamesCount
+  }
 }
 
 export type AnalyzeMatchHistoryOptions = {
@@ -634,7 +760,9 @@ export function analyzeMatchHistory(
 
     avgEnemyMissingPings: null, // be assigned later
     avgPings: null, // be assigned later
-    avgSoloKills: null // be assigned later
+    avgSoloKills: null, // be assigned later
+    avgEarlyDeathsWithEnemyJunglerInvolved: null,
+    earlyDeathsWithEnemyJunglerInvolvedGamesCount: 0
   }
 
   // --- pings sgo only ---

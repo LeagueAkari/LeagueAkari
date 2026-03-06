@@ -49,6 +49,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
   }
 
+  setJungleAnalysisMatchHistoryLoadCount(value: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'jungleAnalysisMatchHistoryLoadCount', value)
+  }
+
   setOrderPlayerBy(
     value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
   ) {

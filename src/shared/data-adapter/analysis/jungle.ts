@@ -126,6 +126,8 @@ export interface JunglePathingAnalysis {
 const ANALYSIS_MINUTES = 14
 /** 首清方向看第1帧（1分钟时的位置） */
 const FIRST_CLEAR_FRAME = 1
+/** 总体打野分析最多局数 */
+const OVERALL_MAX_GAMES = 50
 /** 当前英雄分析最多局数 */
 const CURRENT_CHAMPION_MAX_GAMES = 20
 
@@ -759,14 +761,14 @@ export function analyzeJunglePathing(
   puuid: string,
   currentChampionId: number
 ): JunglePathingAnalysis | null {
-  const summaryMap = new Map(summaries.map((s) => [s.gameId, s]))
+  const detailMap = new Map(details.map((d) => [d.gameId, d]))
 
   const allResults: SingleGameAnalysis[] = []
   const champResults: SingleGameAnalysis[] = []
 
-  for (const detail of details) {
-    const summary = summaryMap.get(detail.gameId)
-    if (!summary) continue
+  for (const summary of summaries) {
+    const detail = detailMap.get(summary.gameId)
+    if (!detail) continue
 
     const pInfo = findParticipantInfo(summary, puuid)
     if (!pInfo) continue
@@ -774,7 +776,9 @@ export function analyzeJunglePathing(
     const result = analyzeOneGame(detail, summary, puuid)
     if (!result) continue
 
-    allResults.push(result)
+    if (allResults.length < OVERALL_MAX_GAMES) {
+      allResults.push(result)
+    }
 
     if (pInfo.championId === currentChampionId && champResults.length < CURRENT_CHAMPION_MAX_GAMES) {
       champResults.push(result)

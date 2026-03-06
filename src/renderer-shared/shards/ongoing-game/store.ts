@@ -25,6 +25,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     concurrency: 3,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
     gameDetailsLoadCount: 0,
+    jungleAnalysisMatchHistoryLoadCount: 100,
     premadeTeamInferMatchCountThreshold: 5,
 
     orderPlayerBy: 'default' as

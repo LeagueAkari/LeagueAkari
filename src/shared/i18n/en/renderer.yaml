@@ -451,6 +451,10 @@ OngoingGameSettings:
     label: Game Details Load Count
     description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
 
+  jungleAnalysisMatchHistoryLoadCount:
+    label: Jungle Analysis Match History Load Count
+    description: Jungle analysis can continue fetching match history until the first {{countV}} games to satisfy the 20 current-champion and 50 overall jungle samples.
+
   showRecentlyUsedChampions:
     label: Show Recently Used Champions
     description: Display the recently used champions in the player card.
@@ -2701,6 +2705,11 @@ PlayerInfoCard:
   losingStreakPopover: Currently on a losing streak of {{countV}} games.
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
+  hardGank: Hard to Gank
+  gankable: Gankable
+  easyGank: Easy Gank
+  veryEasyGank: Very Easy Gank
+  easyGankPopover: Across the latest {{countV}} analyzed Summoner's Rift games, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
   soloKills: '{{times}} Solo Kills'
   soloKillsPopover: In the recent {{countV}} games, this player get solo kills {{times}} times on average
   akariLoved:
