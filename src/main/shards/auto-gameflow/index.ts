@@ -33,6 +33,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
   private _pendingCancelMatchmakingSearchAfterChampSelectReturn = false
   private _isCancelingMatchmakingSearchAfterChampSelectReturn = false
+  private _cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId: NodeJS.Timeout | null = null
+  private _blockedAutoMatchmakingPartyId: string | null = null
+  private _lastKnownLobbyPartyId: string | null = null
 
   private _autoAcceptTask = new TimeoutTask(this._acceptMatch.bind(this))
   private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
@@ -121,10 +124,37 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         return
       }
 
+      if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
+        clearTimeout(this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId)
+        this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
+      }
+
       this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
+      this._blockedAutoMatchmakingPartyId = null
       this.state.setPreventAutoMatchmakingAfterChampSelectReturn(false)
       this._log.info(`Cleared auto-matchmaking block after champ-select return: ${reason}`)
     }
+
+    const markBlocked = (phase: string) => {
+      this.state.setPreventAutoMatchmakingAfterChampSelectReturn(true)
+      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = true
+      this._blockedAutoMatchmakingPartyId =
+        this._lc.data.lobby.lobby?.partyId || this._lastKnownLobbyPartyId
+      this.cancelAutoMatchmaking('normal')
+      this._log.info(
+        `Left champ select for ${phase}, blocking auto-matchmaking for current lobby (partyId=${this._blockedAutoMatchmakingPartyId || 'unknown'})`
+      )
+    }
+
+    this._mobx.reaction(
+      () => this._lc.data.lobby.lobby?.partyId,
+      (partyId) => {
+        if (partyId) {
+          this._lastKnownLobbyPartyId = partyId
+        }
+      },
+      { fireImmediately: true }
+    )
 
     this._mobx.reaction(
       () => this._lc.data.gameflow.phase,
@@ -134,12 +164,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         }
 
         if (prevPhase === 'ChampSelect' && (phase === 'Lobby' || phase === 'Matchmaking')) {
-          this.state.setPreventAutoMatchmakingAfterChampSelectReturn(true)
-          this._pendingCancelMatchmakingSearchAfterChampSelectReturn = phase === 'Matchmaking'
-          this.cancelAutoMatchmaking('normal')
-          this._log.info(
-            `Left champ select for ${phase}, blocking auto-matchmaking for current lobby`
-          )
+          markBlocked(phase)
           return
         }
 
@@ -173,17 +198,43 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       () =>
         [
           Boolean(this._lc.data.lobby.lobby),
+          this._lc.data.lobby.lobby?.partyId,
+          this._lc.data.lobby.lobby?.canStartActivity,
           this._lc.data.matchmaking.search?.isCurrentlyInQueue,
+          this._lc.data.gameflow.phase,
           this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled
         ] as const,
-      ([hasLobby, isCurrentlyInQueue, enabled]) => {
+      ([hasLobby, partyId, canStartActivity, isCurrentlyInQueue, phase, enabled]) => {
         if (!enabled) {
           clearBlock('setting-disabled')
           return
         }
 
         if (!hasLobby) {
-          clearBlock('lobby-unavailable')
+          return
+        }
+
+        if (
+          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
+          this._blockedAutoMatchmakingPartyId &&
+          partyId &&
+          this._blockedAutoMatchmakingPartyId !== partyId
+        ) {
+          clearBlock(`lobby-changed:${this._blockedAutoMatchmakingPartyId}->${partyId}`)
+          return
+        }
+
+        if (
+          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
+          this._pendingCancelMatchmakingSearchAfterChampSelectReturn &&
+          !isCurrentlyInQueue &&
+          phase === 'Lobby' &&
+          canStartActivity
+        ) {
+          this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
+          this._log.info(
+            'Returned to idle lobby after champ-select dodge, keeping block for auto-matchmaking only'
+          )
           return
         }
 
@@ -204,6 +255,25 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     )
   }
 
+  private _scheduleCancelMatchmakingSearchAfterChampSelectReturnRetry() {
+    if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
+      return
+    }
+
+    this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = setTimeout(() => {
+      this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
+
+      if (
+        this.state.preventAutoMatchmakingAfterChampSelectReturn &&
+        this._pendingCancelMatchmakingSearchAfterChampSelectReturn &&
+        this._lc.data.lobby.lobby &&
+        this._lc.data.matchmaking.search?.isCurrentlyInQueue
+      ) {
+        this._cancelMatchmakingSearchAfterChampSelectReturn()
+      }
+    }, 1000)
+  }
+
   private async _cancelMatchmakingSearchAfterChampSelectReturn() {
     if (this._isCancelingMatchmakingSearchAfterChampSelectReturn) {
       return
@@ -214,12 +284,17 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     try {
       this._log.info('Cancelling matchmaking search after returning from champ select due to dodge')
       await this._lc.api.lobby.deleteSearchMatch()
+
+      if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
+        clearTimeout(this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId)
+        this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
+      }
     } catch (error) {
       this._log.warn(
         `Failed to cancel matchmaking search after champ-select return: ${formatError(error)}`
       )
+      this._scheduleCancelMatchmakingSearchAfterChampSelectReturnRetry()
     } finally {
-      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
       this._isCancelingMatchmakingSearchAfterChampSelectReturn = false
     }
   }
