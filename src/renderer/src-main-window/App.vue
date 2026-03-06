@@ -56,7 +56,7 @@ import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { ref, useTemplateRef } from 'vue'
+import { onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
@@ -93,6 +93,19 @@ const settingModelTab = ref('basic')
 
 const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
+
+const toggleMicaClass = (enabled: boolean) => {
+  document.documentElement.classList.toggle('mica-enabled', enabled)
+  document.body.classList.toggle('mica-enabled', enabled)
+}
+
+watchEffect(() => {
+  toggleMicaClass(preferMica.value)
+})
+
+onBeforeUnmount(() => {
+  toggleMicaClass(false)
+})
 </script>
 
 <style scoped>

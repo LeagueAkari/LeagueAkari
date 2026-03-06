@@ -59,6 +59,12 @@ body {
   line-height: normal;
 }
 
+html.mica-enabled,
+body.mica-enabled,
+html.mica-enabled #app {
+  background-color: transparent !important;
+}
+
 a,
 a:visited {
   color: var(--la-color-link);
