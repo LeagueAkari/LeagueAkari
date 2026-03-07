@@ -33,6 +33,20 @@ export const or = <T>(...predicates: Predicate<T>[]) => {
   return (value: T) => predicates.some((predicate) => predicate(value))
 }
 
+/**
+ * 适用于通过描述树结构构建的 and
+ */
+export const singleArgAnd = <T>(predicates: Predicate<T>[]) => {
+  return (value: T) => predicates.every((predicate) => predicate(value))
+}
+
+/**
+ * 同 singleArgAnd，不过是 or 的版本
+ */
+export const singleArgOr = <T>(predicates: Predicate<T>[]) => {
+  return (value: T) => predicates.some((predicate) => predicate(value))
+}
+
 export const not = <T>(predicate: Predicate<T>) => {
   return (value: T) => !predicate(value)
 }
@@ -265,5 +279,43 @@ export const isMatchedGame = () => {
 export const isPveGame = () => {
   return (data: GameScope) => {
     return isPveQueue(data.basicInfo.queueId)
+  }
+}
+
+export const isMap = (mapId: number) => {
+  return (data: GameScope) => {
+    return data.basicInfo.mapId === mapId
+  }
+}
+
+/**
+ * Damage Gold Efficiency
+ * @param minDgr 最小转换率 (%)，如 50%，注意不是 0.50
+ * @param maxDgr 最大转换率 (%)，如 500%，注意不是 5.00
+ * @returns
+ */
+export const dgrBetween = (minDgr = 0, maxDgr = Infinity) => {
+  return (data: ParticipantScope) => {
+    return (
+      data.participant.damageGoldEfficiency >= minDgr / 100 &&
+      data.participant.damageGoldEfficiency <= maxDgr / 100
+    )
+  }
+}
+
+export const csBetween = (minCs = 0, maxCs = Infinity) => {
+  return (data: ParticipantScope) => {
+    return data.participant.cs >= minCs && data.participant.cs <= maxCs
+  }
+}
+
+/**
+ * 仅用于 SGP 数据源，LCU 数据源无此字段
+ */
+export const soloKillsBetween = (minSoloKills = 0, maxSoloKills = Infinity) => {
+  return (data: ParticipantScope) => {
+    if (data.participant.soloKills === null) return false
+
+    return data.participant.soloKills >= minSoloKills && data.participant.soloKills <= maxSoloKills
   }
 }

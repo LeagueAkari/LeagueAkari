@@ -23,14 +23,7 @@ export const NAIVE_UI_LOCALE_MAP = {
 
 const CLASSIC_OVERRIDES = {
   light: {
-    common: {
-      popoverColor: '#ffffff',
-      primaryColor: '#0ea5e9',
-      primaryColorHover: '#0284c7',
-      successColor: '#3fa877',
-      warningColor: '#d79642',
-      errorColor: '#d95a6c'
-    },
+    common: {},
     Notification: {
       padding: '12px',
       titleFontSize: '13px',
@@ -41,8 +34,7 @@ const CLASSIC_OVERRIDES = {
     Card: {
       color: '#0000',
       borderColor: 'rgba(0, 0, 0, 0.1)',
-      borderColorModal: 'rgba(0, 0, 0, 0.16)',
-      paddingSmall: '4px 12px'
+      borderColorModal: 'rgba(0, 0, 0, 0.16)'
     },
     Message: {
       padding: '4px 8px',
@@ -62,9 +54,6 @@ const CLASSIC_OVERRIDES = {
       color: 'rgba(34, 34, 41, 0.94)',
       textColor: '#f7f7fa'
     },
-    InternalSelectMenu: {
-      color: '#ffffff'
-    },
     Menu: {
       padding: '1px'
     },
@@ -76,14 +65,7 @@ const CLASSIC_OVERRIDES = {
     }
   },
   dark: {
-    common: {
-      popoverColor: '#383838f8',
-      primaryColor: '#54d399',
-      primaryColorHover: '#3fc28b',
-      successColor: '#4bc78f',
-      warningColor: '#e4ac5b',
-      errorColor: '#eb7485'
-    },
+    common: {},
     Notification: {
       padding: '12px',
       titleFontSize: '13px',
@@ -94,8 +76,7 @@ const CLASSIC_OVERRIDES = {
     },
     Card: {
       color: '#0000',
-      colorModal: '#232329',
-      paddingSmall: '4px 12px'
+      colorModal: '#232329'
     },
     Message: {
       padding: '4px 8px',
@@ -112,12 +93,6 @@ const CLASSIC_OVERRIDES = {
       arrowColor: '#1f1f1ffa',
       borderColor: 'rgba(255, 255, 255, 0.2)',
       fontSize: '12px'
-    },
-    InternalSelectMenu: {
-      color: '#383838f8'
-    },
-    Dropdown: {
-      color: '#222e'
     },
     Menu: {
       padding: '1px'
@@ -187,8 +162,7 @@ const CLASSIC_OVERRIDES = {
       color: '#0000',
       colorModal: '#152436',
       borderColor: 'rgba(148, 173, 197, 0.24)',
-      borderColorModal: 'rgba(148, 173, 197, 0.24)',
-      paddingSmall: '4px 12px'
+      borderColorModal: 'rgba(148, 173, 197, 0.24)'
     },
     Button: {
       colorSecondary: 'rgba(148, 173, 197, 0.12)',
@@ -305,8 +279,7 @@ const SAKURA_OVERRIDES: GlobalThemeOverrides = {
     color: '#0000',
     colorModal: '#fff6f8',
     borderColor: 'rgba(200, 88, 135, 0.24)',
-    borderColorModal: 'rgba(200, 88, 135, 0.24)',
-    paddingSmall: '4px 12px'
+    borderColorModal: 'rgba(200, 88, 135, 0.24)'
   },
   Button: {
     textColorPrimary: '#fffafc',
@@ -416,8 +389,7 @@ const CYBER_OVERRIDES: GlobalThemeOverrides = {
     color: '#0000',
     colorModal: '#0c0c0c',
     borderColor: 'rgba(223, 255, 0, 0.25)',
-    borderColorModal: 'rgba(223, 255, 0, 0.3)',
-    paddingSmall: '4px 12px'
+    borderColorModal: 'rgba(223, 255, 0, 0.3)'
   },
   Button: {
     colorSecondary: 'rgba(223, 255, 0, 0.08)',
@@ -537,8 +509,7 @@ const MINT_OVERRIDES: GlobalThemeOverrides = {
     color: '#0000',
     colorModal: '#fbfdfc',
     borderColor: 'rgba(50, 142, 108, 0.24)',
-    borderColorModal: 'rgba(50, 142, 108, 0.24)',
-    paddingSmall: '4px 12px'
+    borderColorModal: 'rgba(50, 142, 108, 0.24)'
   },
   Button: {
     textColorPrimary: '#f8fffb',
@@ -631,8 +602,7 @@ const AURORA_OVERRIDES: GlobalThemeOverrides = {
     color: '#0000',
     colorModal: '#2d2a42',
     borderColor: 'rgba(167, 149, 226, 0.28)',
-    borderColorModal: 'rgba(167, 149, 226, 0.28)',
-    paddingSmall: '4px 12px'
+    borderColorModal: 'rgba(167, 149, 226, 0.28)'
   },
   Button: {
     textColorPrimary: '#17122d',
@@ -721,8 +691,7 @@ const BUTTER_OVERRIDES: GlobalThemeOverrides = {
     color: '#0000',
     colorModal: '#fcf6ed',
     borderColor: 'rgba(182, 121, 27, 0.24)',
-    borderColorModal: 'rgba(182, 121, 27, 0.24)',
-    paddingSmall: '4px 12px'
+    borderColorModal: 'rgba(182, 121, 27, 0.24)'
   },
   Button: {
     textColorPrimary: '#fffaf5',
