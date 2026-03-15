@@ -41,6 +41,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const version = ref('0.0.0')
   const isRabiVersion = computed(() => version.value.includes('-rabi'))
   const isAdministrator = ref(false)
+  const platform = ref<'darwin' | 'win32' | 'unknown'>('unknown')
   const startupDeepLink = ref<string | null>(null)
   const overrideAppTitle = ref('') // 可以覆盖掉
   const appTitle = computed(
@@ -118,6 +119,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     appTitle,
     overrideAppTitle,
     isAdministrator,
+    platform,
     disableHardwareAcceleration,
     version,
     isRabiVersion,

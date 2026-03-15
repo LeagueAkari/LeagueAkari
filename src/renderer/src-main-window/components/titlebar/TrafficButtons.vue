@@ -36,22 +36,18 @@
         <span class="close-confirmation-header">{{ t('TrafficButtons.modal.title') }}</span>
       </template>
       <NRadioGroup v-model:value="closeStrategy" size="small">
-        <NFlex vertical>
+        <div class="flex flex-col">
           <NRadio value="minimize-to-tray">{{
             t('TrafficButtons.modal.options.minimize-to-tray')
           }}</NRadio>
           <NRadio value="quit">{{ t('TrafficButtons.modal.options.quit') }}</NRadio>
-        </NFlex>
+        </div>
       </NRadioGroup>
-      <NFlex align="center" justify="space-between" style="margin-top: 12px">
-        <NCheckbox
-          v-model:checked="isRememberCloseStrategy"
-          style="margin-right: auto"
-          size="small"
-        >
+      <div class="mt-3 flex items-center justify-between">
+        <NCheckbox v-model:checked="isRememberCloseStrategy" class="mr-auto" size="small">
           {{ t('TrafficButtons.modal.remember') }}
         </NCheckbox>
-        <NFlex style="gap: 4px">
+        <div class="flex gap-1">
           <NButton
             style="font-size: 13px"
             size="small"
@@ -62,8 +58,8 @@
           <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">
             {{ t('TrafficButtons.modal.ok') }}
           </NButton>
-        </NFlex>
-      </NFlex>
+        </div>
+      </div>
     </NModal>
   </div>
 </template>
@@ -78,7 +74,7 @@ import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/flue
 import { Maximize24Filled as Maximize24FilledIcon } from '@vicons/fluent'
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
+import { NButton, NCheckbox, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
 
 const { t } = useTranslation()

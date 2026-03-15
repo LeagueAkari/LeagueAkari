@@ -5,6 +5,8 @@ import { makeAutoObservable, observable } from 'mobx'
 export class AppCommonState {
   isAdministrator: boolean = false
 
+  platform: 'darwin' | 'win32' | 'unknown' = 'unknown'
+
   /**
    * 仅用于展示, 是否禁用硬件加速
    */
@@ -39,6 +41,10 @@ export class AppCommonState {
 
   setAdministrator(s: boolean) {
     this.isAdministrator = s
+  }
+
+  setPlatform(s: 'darwin' | 'win32' | 'unknown') {
+    this.platform = s
   }
 
   setDisableHardwareAcceleration(s: boolean) {

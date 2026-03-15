@@ -1,5 +1,4 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { tools } from '@main/utils/addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
@@ -32,6 +31,7 @@ import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
+import { tools } from '@main/utils/addons'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { AkariManager } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
@@ -78,6 +78,11 @@ declare module '@shared/akari-shard' {
      * 是否是管理员权限
      */
     isAdministrator: boolean
+
+    /**
+     * 平台，目前仅支持 win32 和 darwin
+     */
+    platform: 'darwin' | 'win32' | 'unknown'
 
     /**
      * 是否是 Windows 11 22H2 或更高版本
@@ -223,6 +228,7 @@ export function bootstrap() {
       write: (config: any) => writeBaseConfig(config)
     }
     manager.global.isAdministrator = isAdministrator
+    manager.global.platform = os.platform() as 'darwin' | 'win32'
     manager.global.version = app.getVersion()
     manager.global.isWindows11_22H2_OrHigher = isWindows11_22H2_OrHigher()
     manager.global.quit = () => app.quit()

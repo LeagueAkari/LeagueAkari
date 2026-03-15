@@ -24,7 +24,9 @@ export function usePlatform() {
   const nativeInputHookSupported = computed(() => as.nativeAddons.inputHookSupported)
   const nativeInputInjectSupported = computed(() => as.nativeAddons.inputInjectSupported)
   const toolsForegroundSupported = computed(() => as.nativeAddons.toolsForegroundSupported)
-  const toolsWindowPlacementSupported = computed(() => as.nativeAddons.toolsWindowPlacementSupported)
+  const toolsWindowPlacementSupported = computed(
+    () => as.nativeAddons.toolsWindowPlacementSupported
+  )
   const toolsFixWindowMethodASupported = computed(
     () => as.nativeAddons.toolsFixWindowMethodASupported
   )

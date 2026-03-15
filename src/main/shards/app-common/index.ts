@@ -57,6 +57,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     )
 
     this.state.setAdministrator(this._shared.global.isAdministrator)
+    this.state.setPlatform(this._shared.global.platform)
     this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
     this.state.setNativeAddons({
       nativeLoaded: nativeAddonsCapabilities.nativeLoaded,
@@ -174,6 +175,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',
+      'platform',
       'disableHardwareAcceleration',
       'baseConfig',
       'startupDeepLink',
