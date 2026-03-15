@@ -4,7 +4,10 @@
     :class="{ blurred: ws.focus === 'blurred' }"
     style="-webkit-app-region: drag"
   >
-    <div class="h-full w-[var(--la-mac-titlebar-safe-left)] shrink-0 [-webkit-app-region:no-drag]" />
+    <div
+      v-if="isMacOS"
+      class="h-full w-(--la-mac-titlebar-safe-left) shrink-0 [-webkit-app-region:no-drag]"
+    />
 
     <div
       class="box-border flex h-full flex-1 items-center pt-1 pr-1 pb-0.5 pl-2 transition-all duration-300"
@@ -51,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
@@ -64,6 +68,7 @@ const { t } = useTranslation()
 
 const wm = useInstance(WindowManagerRenderer)
 const ws = useOpggWindowStore()
+const { isMacOS } = usePlatform()
 
 const handleClose = () => {
   return wm.opggWindow.hide()

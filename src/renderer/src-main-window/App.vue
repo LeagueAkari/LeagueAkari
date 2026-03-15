@@ -207,7 +207,6 @@ onBeforeUnmount(() => {
       var(--la-wallpaper-overlay-end) 100%
     );
   }
-
 }
 
 .app-background {

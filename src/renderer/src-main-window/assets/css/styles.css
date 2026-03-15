@@ -5,14 +5,9 @@
   text-shadow: none;
 }
 
-:root[data-platform='darwin'] {
-  --la-mac-titlebar-safe-left: 76px;
-  --la-mac-sidebar-safe-top: 10px;
-}
-
 :root {
-  --la-mac-sidebar-safe-top: 0px;
-  --la-mac-titlebar-safe-left: 0px;
+  --la-mac-sidebar-safe-top: 10px;
+  --la-mac-titlebar-safe-left: 76px;
   --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;

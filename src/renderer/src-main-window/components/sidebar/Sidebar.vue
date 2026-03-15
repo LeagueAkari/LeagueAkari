@@ -7,7 +7,14 @@
       'is-hovered': isSidebarHoveredDebounced
     }"
   >
-    <div class="app-sidebar__head">
+    <div
+      class="app-sidebar__head"
+      :class="
+        isMacOS
+          ? 'pt-[calc(4px+var(--la-mac-sidebar-safe-top))] h-[calc(48px+var(--la-mac-sidebar-safe-top))]'
+          : 'pt-1 h-12'
+      "
+    >
       <div class="app-sidebar__logo" @click="toggleCollapse">
         <NIcon class="app-sidebar__logo-icon">
           <AkariLogo />
@@ -45,6 +52,7 @@
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import SidebarCollapseLeft from '@renderer-shared/assets/icon/SidebarCollapseLeft.vue'
 import SidebarCollapseRight from '@renderer-shared/assets/icon/SidebarCollapseRight.vue'
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -72,6 +80,7 @@ const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const mui = useMainWindowUiStore()
 const lcs = useLeagueClientStore()
+const { isMacOS } = usePlatform()
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -183,9 +192,7 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
     display: flex;
     align-items: center;
     padding: 4px 8px;
-    padding-top: calc(4px + var(--la-mac-sidebar-safe-top));
     gap: 4px;
-    height: calc(48px + var(--la-mac-sidebar-safe-top));
     overflow: hidden;
   }
 

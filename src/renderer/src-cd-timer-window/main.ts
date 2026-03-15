@@ -6,7 +6,6 @@ import '@renderer-shared/assets/css/base-styles.css'
 import '@renderer-shared/assets/css/lol-view.css'
 import '@renderer-shared/assets/css/theme-system.css'
 import { i18next } from '@renderer-shared/i18n'
-import { initRendererPlatformDataset } from '@renderer-shared/utils/platform-dataset'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
@@ -20,8 +19,6 @@ import './assets/css/styles.css'
 import { manager } from './shards'
 
 try {
-  initRendererPlatformDataset()
-
   dayjs.extend(relativeTime)
   dayjs.extend(duration)
 

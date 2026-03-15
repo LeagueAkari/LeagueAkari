@@ -80,7 +80,7 @@ declare module '@shared/akari-shard' {
     isAdministrator: boolean
 
     /**
-     * 平台，目前仅支持 win32 和 darwin
+     * 平台，目前仅支持 win32 和 darwin。仅完全支持 win32
      */
     platform: 'darwin' | 'win32' | 'unknown'
 

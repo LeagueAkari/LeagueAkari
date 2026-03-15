@@ -1,6 +1,9 @@
 <template>
   <div class="titlebar">
-    <div class="mac-traffic-lights-spacer" />
+    <div
+      v-if="isMacOS"
+      class="h-full w-(--la-mac-titlebar-safe-left) shrink-0 [-webkit-app-region:no-drag]"
+    />
     <div class="title-area">
       <span class="title">Timer</span>
     </div>
@@ -13,12 +16,14 @@
 </template>
 
 <script setup lang="ts">
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
 const wm = useInstance(WindowManagerRenderer)
+const { isMacOS } = usePlatform()
 
 const handleClose = () => {
   return wm.cdTimerWindow.hide()
@@ -31,13 +36,6 @@ const handleClose = () => {
   height: 20px;
   background-color: #fc82eaa0;
   -webkit-app-region: drag;
-}
-
-.mac-traffic-lights-spacer {
-  width: var(--la-mac-titlebar-safe-left);
-  height: 100%;
-  flex: 0 0 var(--la-mac-titlebar-safe-left);
-  -webkit-app-region: no-drag;
 }
 
 .title-area {

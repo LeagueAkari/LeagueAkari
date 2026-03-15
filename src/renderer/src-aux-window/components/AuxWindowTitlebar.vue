@@ -3,7 +3,10 @@
     class="relative z-10000000 flex h-(--la-titlebar-height) items-center [-webkit-app-region:drag]"
     :class="{ 'brightness-80': aws.focus === 'blurred' }"
   >
-    <div class="h-full w-[var(--la-mac-titlebar-safe-left)] shrink-0 [-webkit-app-region:no-drag]" />
+    <div
+      v-if="isMacOS"
+      class="h-full w-(--la-mac-titlebar-safe-left) shrink-0 [-webkit-app-region:no-drag]"
+    />
 
     <div
       class="flex h-full flex-1 items-center px-2 pt-1 pb-0.5 transition-all"
@@ -48,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
@@ -61,6 +65,7 @@ const { t } = useTranslation()
 
 const wm = useInstance(WindowManagerRenderer)
 const aws = useAuxWindowStore()
+const { isMacOS } = usePlatform()
 
 const handleClose = () => {
   return wm.auxWindow.hide()

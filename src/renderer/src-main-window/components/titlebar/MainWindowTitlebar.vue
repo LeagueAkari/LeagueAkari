@@ -1,5 +1,11 @@
 <template>
-  <div class="app-titlebar" :class="{ 'should-show-bottom-border': shouldShowBottomBorder }">
+  <div
+    class="app-titlebar"
+    :class="[
+      { 'should-show-bottom-border': shouldShowBottomBorder },
+      isMacOS ? 'pl-[calc(8px+var(--la-mac-titlebar-safe-left))]' : 'pl-2'
+    ]"
+  >
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
@@ -10,12 +16,17 @@
     </div>
     <div class="divider" :class="{ invisible: !shouldShowDivider }" />
     <CommonButtons />
-    <div class="divider" />
-    <TrafficButtons />
+
+    <!-- no duplicate traffic buttons on macOS xD -->
+    <template v-if="!isMacOS">
+      <div class="divider" />
+      <TrafficButtons />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
@@ -33,6 +44,7 @@ const route = useRoute()
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const pts = usePlayerTabsStore()
+const { isMacOS } = usePlatform()
 
 const shouldShowDivider = computed(() => {
   switch (route.name) {
@@ -71,7 +83,6 @@ const shouldShowBottomBorder = computed(() => {
   align-items: center;
   -webkit-app-region: drag;
   z-index: 1000000;
-  padding-left: calc(8px + var(--la-mac-titlebar-safe-left));
 
   &.should-show-bottom-border {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
