@@ -104,7 +104,9 @@
               <NInputNumber
                 style="width: 80px"
                 size="small"
-                :disabled="!as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'"
+                :disabled="
+                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                "
                 :show-button="false"
                 :min="1"
                 @update:value="(val) => (fixWindowMethodAOptions.baseWidth = val || 0)"
@@ -116,7 +118,9 @@
               <NInputNumber
                 ref="input-2"
                 style="width: 80px"
-                :disabled="!as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'"
+                :disabled="
+                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                "
                 size="small"
                 :show-button="false"
                 :min="1"
@@ -126,7 +130,9 @@
                 ><template #prefix>H</template>
               </NInputNumber>
               <NButton
-                :disabled="!as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'"
+                :disabled="
+                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                "
                 size="small"
                 secondary
                 type="warning"
@@ -143,8 +149,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { useInstance } from '@renderer-shared/shards'
 import { usePlatform } from '@renderer-shared/composables/usePlatform'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
@@ -158,7 +164,12 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
 const { t } = useTranslation()
 
-const { nativeInputHookSupported, toolsForegroundSupported, toolsFixWindowMethodASupported, toolsWindowPlacementSupported } = usePlatform()
+const {
+  nativeInputHookSupported,
+  toolsForegroundSupported,
+  toolsFixWindowMethodASupported,
+  toolsWindowPlacementSupported
+} = usePlatform()
 
 const terminateShortcutSupported = computed(() => {
   return nativeInputHookSupported.value && toolsForegroundSupported.value

@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@main/utils/ux-cmd'
+import { UxCommandLine } from '@main/utils/native-abilities'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'

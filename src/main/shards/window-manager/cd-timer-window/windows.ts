@@ -1,4 +1,7 @@
-import { capabilities, input } from '@main/utils/addons'
+import {
+  keyboardInput,
+  nativeAbilitiesCapabilities
+} from '@main/utils/native-abilities'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -150,7 +153,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
         // Current global shortcut implementation requires admin on Windows.
         const canUseShortcuts =
-          capabilities.input.hookSupported &&
+          nativeAbilitiesCapabilities.keyboard.hookSupported &&
           (process.platform !== 'win32' || this._app.state.isAdministrator)
 
         if (!canUseShortcuts) {
@@ -246,15 +249,15 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
       isSending = true
       try {
-        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await input.instance.sendString(trimmed)
+        await keyboardInput.instance.sendString(trimmed)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
       } catch (error) {
         this._log.warn('sendInGame failed', error)
         throw error
@@ -279,7 +282,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
     // sendInGame 依赖原生输入注入；当前 Windows 实现要求管理员权限。
     const canUseInjection =
-      capabilities.input.injectSupported &&
+      nativeAbilitiesCapabilities.keyboard.injectSupported &&
       (process.platform !== 'win32' || this._app.state.isAdministrator)
     if (canUseInjection) {
       this._handleIpcCall()

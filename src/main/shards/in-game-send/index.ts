@@ -1,4 +1,4 @@
-import { input } from '@main/utils/addons'
+import { keyboardInput } from '@main/utils/native-abilities'
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { isBotQueue } from '@shared/types/league-client/game-data'
@@ -253,15 +253,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
       for (let i = 0; i < strs.length; i++) {
         tasks.push(async () => {
-          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
+          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
+          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
           await sleep(interval)
-          await input.instance.sendString(strs[i])
+          await keyboardInput.instance.sendString(strs[i])
           await sleep(interval)
-          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
+          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
+          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
         })
 
         if (i !== strs.length - 1) {

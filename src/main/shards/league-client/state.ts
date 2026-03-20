@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@main/utils/ux-cmd'
+import { UxCommandLine } from '@main/utils/native-abilities'
 import { makeAutoObservable, observable } from 'mobx'
 
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'

@@ -67,7 +67,9 @@ function getPidsByNamePosix(processName: string): number[] {
 }
 
 function getCommandLine1Posix(pid: number): string {
-  const out = execFileSync('ps', ['-p', String(pid), '-o', 'command=', '-ww'], { encoding: 'utf-8' })
+  const out = execFileSync('ps', ['-p', String(pid), '-o', 'command=', '-ww'], {
+    encoding: 'utf-8'
+  })
   return out.trim()
 }
 

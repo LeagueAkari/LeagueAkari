@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { capabilities } from '@main/utils/addons'
+import { nativeAbilitiesCapabilities } from '@main/utils/native-abilities'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -137,7 +137,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
 
         // Current global shortcut implementation requires admin on Windows.
         const canUseShortcuts =
-          capabilities.input.hookSupported &&
+          nativeAbilitiesCapabilities.keyboard.hookSupported &&
           (process.platform !== 'win32' || this._app.state.isAdministrator)
 
         if (!canUseShortcuts) {

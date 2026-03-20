@@ -1,4 +1,9 @@
-import { tools } from '@main/utils/addons'
+import {
+  findProcessIdsByName,
+  isProcessInForeground,
+  isProcessRunning,
+  terminateProcess
+} from '@main/utils/native-abilities'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
@@ -157,15 +162,15 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private _terminateGameClient() {
     this._log.info('Try to terminate game client process')
-    tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+    findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
       this._log.info('Process exists', pid)
-      if (!tools.isProcessForeground(pid)) {
+      if (!isProcessInForeground(pid)) {
         this._log.info('Process is not in foreground', pid)
         return
       }
 
       this._log.info(`Terminate game client process ${pid}`)
-      tools.terminateProcess(pid)
+      terminateProcess(pid)
     })
   }
 
@@ -326,25 +331,25 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   static isGameClientForeground() {
-    return tools
-      .getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
-      .some((pid) => tools.isProcessForeground(pid))
+    return findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).some((pid) =>
+      isProcessInForeground(pid)
+    )
   }
 
   isGameClientForegroundCached() {
     if (this._gcCachedRunningPids.length === 0) {
-      this._gcCachedRunningPids = tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+      this._gcCachedRunningPids = findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
     } else {
       this._gcCachedRunningPids = this._gcCachedRunningPids.filter((pid) =>
-        tools.isProcessRunning(pid)
+        isProcessRunning(pid)
       )
 
       if (this._gcCachedRunningPids.length === 0) {
-        this._gcCachedRunningPids = tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+        this._gcCachedRunningPids = findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
       }
     }
 
-    return this._gcCachedRunningPids.some((pid) => tools.isProcessForeground(pid))
+    return this._gcCachedRunningPids.some((pid) => isProcessInForeground(pid))
   }
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {

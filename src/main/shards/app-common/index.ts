@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { capabilities as nativeAddonsCapabilities } from '@main/utils/addons'
+import { nativeAbilitiesCapabilities } from '@main/utils/native-abilities'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getThemeColorTheme, isAppThemeSetting } from '@shared/types/app-theme'
@@ -60,12 +60,12 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this.state.setPlatform(this._shared.global.platform)
     this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
     this.state.setNativeAddons({
-      nativeLoaded: nativeAddonsCapabilities.nativeLoaded,
-      inputHookSupported: nativeAddonsCapabilities.input.hookSupported,
-      inputInjectSupported: nativeAddonsCapabilities.input.injectSupported,
-      toolsForegroundSupported: nativeAddonsCapabilities.tools.foregroundSupported,
-      toolsWindowPlacementSupported: nativeAddonsCapabilities.tools.windowPlacementSupported,
-      toolsFixWindowMethodASupported: nativeAddonsCapabilities.tools.fixWindowMethodASupported
+      nativeLoaded: nativeAbilitiesCapabilities.nativeAddonsLoaded,
+      inputHookSupported: nativeAbilitiesCapabilities.keyboard.hookSupported,
+      inputInjectSupported: nativeAbilitiesCapabilities.keyboard.injectSupported,
+      toolsForegroundSupported: nativeAbilitiesCapabilities.process.foregroundTrackingSupported,
+      toolsWindowPlacementSupported: nativeAbilitiesCapabilities.process.leagueWindowPlacementSupported,
+      toolsFixWindowMethodASupported: nativeAbilitiesCapabilities.process.leagueWindowFixSupported
     })
 
     this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {

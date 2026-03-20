@@ -1,5 +1,8 @@
-import { tools } from '@main/utils/addons'
-import { UxCommandLine } from '@main/utils/ux-cmd'
+import {
+  applyLeagueClientWindowFix,
+  findProcessIdsByName,
+  UxCommandLine
+} from '@main/utils/native-abilities'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
@@ -158,8 +161,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     const lastConnectedClient = await this._setting._getFromStorage('lastConnectedClient')
 
     if (lastConnectedClient !== null) {
-      const p1 = tools.getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
-      const p2 = tools.getPidsByName(LeagueClientMain.PROCESS_NAME)
+      const p1 = findProcessIdsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const p2 = findProcessIdsByName(LeagueClientMain.PROCESS_NAME)
 
       if (p1.length === 0 && p2.length === 1) {
         const { certificate, ...rest } = lastConnectedClient
@@ -688,6 +691,6 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   async fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
     const { data: zoom } = await this.http.get<number>('/riotclient/zoom-scale')
 
-    tools.fixWindowMethodA(zoom, config)
+    applyLeagueClientWindowFix(zoom, config)
   }
 }

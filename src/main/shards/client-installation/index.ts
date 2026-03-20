@@ -1,4 +1,4 @@
-import { tools } from '@main/utils/addons'
+import { findProcessIdsByName } from '@main/utils/native-abilities'
 import { i18next } from '@main/i18n'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
@@ -351,7 +351,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     const result: string[] = []
 
     for (const client of ClientInstallationMain.LIVE_STREAMING_CLIENTS) {
-      const r = tools.getPidsByName(client)
+      const r = findProcessIdsByName(client)
       if (r.length) {
         result.push(client)
       }

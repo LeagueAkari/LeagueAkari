@@ -1,5 +1,10 @@
-import { tools } from '@main/utils/addons'
-import { UxCommandLine, parseCommandLine, queryUxCommandLine } from '@main/utils/ux-cmd'
+import {
+  UxCommandLine,
+  findProcessIdsByName,
+  getProcessCommandLine,
+  parseUxCommandLine,
+  queryUxCommandLines
+} from '@main/utils/native-abilities'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -122,20 +127,20 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
         return []
       }
 
-      const cmds = await queryUxCommandLine(LeagueClientUxMain.UX_PROCESS_NAME)
+      const cmds = await queryUxCommandLines(LeagueClientUxMain.UX_PROCESS_NAME)
 
       this.state.setHasClientButNoCommandLine(false)
       this._hasClientButNoCommandLineCount = 0
 
       return cmds
     } else {
-      const pids = tools.getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const pids = findProcessIdsByName(LeagueClientUxMain.UX_PROCESS_NAME)
       const auths: UxCommandLine[] = []
 
       for (const p of pids) {
         try {
-          const cmd = tools.getCommandLine1(p)
-          const parsed = parseCommandLine(cmd)
+          const cmd = getProcessCommandLine(p)
+          const parsed = parseUxCommandLine(cmd)
           if (parsed) {
             auths.push(parsed)
           }
