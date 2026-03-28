@@ -22,11 +22,8 @@ import { Lobby, ReceivedInvitation } from '@shared/types/league-client/lobby'
 import { LoginQueueState } from '@shared/types/league-client/login'
 import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
-import {
-  InitializationProgress,
-  LcConnectionStateType,
-  UxCommandLine
-} from '@shared/types/shards/league-client'
+import { InitializationProgress, LcConnectionStateType } from '@shared/types/shards/league-client'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive, shallowRef } from 'vue'
 

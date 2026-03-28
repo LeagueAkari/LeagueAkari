@@ -1,12 +1,8 @@
-import {
-  NativeKeyEvent,
-  keyboardInput,
-  nativeAbilitiesCapabilities
-} from '@main/utils/native-abilities'
+import type { KeyEvent } from '@leagueakari/league-akari-addons/dist/input'
+import { NATIVE_SUPPORT, nativeInput } from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import EventEmitter from 'node:events'
 
-import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 
@@ -96,22 +92,10 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   private _targetIdMap = new Map<string, string>()
 
   constructor(
-    private readonly _app: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._log = _loggerFactory.create(KeyboardShortcutsMain.id)
-  }
-
-  private _canUseNativeGlobalShortcuts() {
-    if (!nativeAbilitiesCapabilities.keyboard.hookSupported) return false
-
-    // Current implementation requires admin on Windows only.
-    if (process.platform === 'win32') {
-      return this._app.state.isAdministrator
-    }
-
-    return true
   }
 
   // fast equal for two arrays (shallow)
@@ -124,15 +108,19 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   private _buildShortcutDetails(keyCodes: number[], pressed: boolean): ShortcutDetails {
+    if (!NATIVE_SUPPORT.nativeInput.available) {
+      return { keyCodes, keys: [], id: '', unifiedId: '', pressed }
+    }
+
     const keys = keyCodes.map((k) => ({
-      keyId: keyboardInput.VKEY_MAP[k].keyId,
+      keyId: nativeInput.VKEY_MAP[k].keyId,
       keyCode: k,
-      isModifier: keyboardInput.isModifierKey(k)
+      isModifier: nativeInput.isModifierKey(k)
     }))
     const id = keys.map((k) => k.keyId).join('+')
     const unifiedId = [
       ...new Set(
-        keyCodes.map((k) => keyboardInput.UNIFIED_KEY_ID[k] || keyboardInput.VKEY_MAP[k].keyId)
+        keyCodes.map((k) => nativeInput.UNIFIED_KEY_ID[k] || nativeInput.VKEY_MAP[k].keyId)
       )
     ].join('+')
     return { keyCodes, keys, id, unifiedId, pressed }
@@ -157,7 +145,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理修饰键的按下和释放
-  private _handleModifierKey(event: NativeKeyEvent): void {
+  private _handleModifierKey(event: KeyEvent): void {
     if (this._pressedModifierKeys.has(event.keyCode) === event.isDown) {
       return
     }
@@ -229,7 +217,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _handleNativeKeyEvent(event: NativeKeyEvent): void {
+  private _handleNativeKeyEvent(event: KeyEvent): void {
     if (event.keyCode === 231) {
       return
     }
@@ -254,10 +242,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    if (this._canUseNativeGlobalShortcuts()) {
+    if (NATIVE_SUPPORT.nativeInput.available) {
       this._log.info('Listening for key events')
-      keyboardInput.instance.install()
-      keyboardInput.instance.on('keyEvent', (key) => {
+      nativeInput.instance.on('keyEvent', (key) => {
         this._handleNativeKeyEvent(key)
       })
     }
@@ -296,7 +283,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     type: 'last-active' | 'normal' | 'stateful',
     cb: (details: ShortcutDetails) => void
   ) {
-    if (!this._canUseNativeGlobalShortcuts()) {
+    if (!NATIVE_SUPPORT.nativeInput.available) {
       this._log.info(
         `Native global shortcuts are unavailable, ignoring shortcut registration: ${shortcutId} (${type})`
       )
@@ -344,7 +331,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   getRegistration(shortcutId: string) {
     const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map(
-      (k) => keyboardInput.VKEY_MAP[k].keyId
+      (k) => nativeInput.VKEY_MAP[k].keyId
     )
     if (reservedKeyIds.some((k) => shortcutId.includes(k))) {
       return {
@@ -374,10 +361,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    if (this._canUseNativeGlobalShortcuts()) {
-      this._log.info('Stop listening for key events')
-      keyboardInput.instance.uninstall()
-    }
     this.events.removeAllListeners()
     this._registrationMap.clear()
     this._targetIdMap.clear()

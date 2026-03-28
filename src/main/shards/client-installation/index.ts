@@ -1,5 +1,5 @@
-import { findProcessIdsByName } from '@main/utils/native-abilities'
 import { i18next } from '@main/i18n'
+import { getPidsByName } from '@main/native'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
@@ -347,11 +347,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   /**
    * try being a spyware 👁️👁️
    */
-  private _updateLiveStreamingClientsRunningInfo() {
+  private async _updateLiveStreamingClientsRunningInfo() {
     const result: string[] = []
 
     for (const client of ClientInstallationMain.LIVE_STREAMING_CLIENTS) {
-      const r = findProcessIdsByName(client)
+      const r = await getPidsByName(client)
       if (r.length) {
         result.push(client)
       }

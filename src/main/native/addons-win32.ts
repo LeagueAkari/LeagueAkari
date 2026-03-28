@@ -1,4 +1,4 @@
-type Win32Addons = typeof import('@leagueakari/league-akari-addons')
+export type Win32Addons = typeof import('@leagueakari/league-akari-addons')
 
 export let addons: Win32Addons
 

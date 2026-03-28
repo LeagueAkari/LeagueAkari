@@ -8,25 +8,25 @@
           </template>
           <ControlItem
             class="control-item-margin"
-            :disabled="!as.isAdministrator || !terminateShortcutSupported"
+            :disabled="!as.nativeSupport.nativeInput.available"
             :label="
-              as.isAdministrator
-                ? t('Client.gameClient.terminateGameClientWithShortcut.label')
-                : t('Client.gameClient.terminateGameClientWithShortcut.labelAdminRequired')
+              nativeInputRequiresElevation
+                ? t('Client.gameClient.terminateGameClientWithShortcut.labelAdminRequired')
+                : t('Client.gameClient.terminateGameClientWithShortcut.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
               <div>{{ t('Client.gameClient.terminateGameClientWithShortcut.description') }}</div>
               <div
-                v-if="!terminateShortcutSupported"
+                v-if="!as.nativeSupport.nativeInput.available"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
               >
-                {{ t('Client.gameClient.windowsOnlyNativeAddon') }}
+                {{ nativeInputStatusDescription }}
               </div>
             </template>
             <NSwitch
-              :disabled="!as.isAdministrator || !terminateShortcutSupported"
+              :disabled="!as.nativeSupport.nativeInput.available"
               size="small"
               type="warning"
               :value="gcs.settings.terminateGameClientWithShortcut"
@@ -35,21 +35,21 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :disabled="!as.isAdministrator || !terminateShortcutSupported"
+            :disabled="!as.nativeSupport.nativeInput.available"
             :label="
-              as.isAdministrator
-                ? t('Client.gameClient.terminateShortcut.label')
-                : t('Client.gameClient.terminateShortcut.labelAdminRequired')
+              nativeInputRequiresElevation
+                ? t('Client.gameClient.terminateShortcut.labelAdminRequired')
+                : t('Client.gameClient.terminateShortcut.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
               <div>{{ t('Client.gameClient.terminateShortcut.description') }}</div>
               <div
-                v-if="!terminateShortcutSupported"
+                v-if="!as.nativeSupport.nativeInput.available"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
               >
-                {{ t('Client.gameClient.windowsOnlyNativeAddon') }}
+                {{ nativeInputStatusDescription }}
               </div>
             </template>
             <ShortcutSelector
@@ -89,23 +89,29 @@
           </template>
           <ControlItem
             class="control-item-margin"
-            :disabled="!as.isAdministrator || !fixWindowSupported"
+            :disabled="!adjustLeagueClientWindowSizeSupported"
             :label="
-              as.isAdministrator
-                ? t('Client.leagueClientUx.fixWindowMethodAOptions.label')
-                : t('Client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
+              adjustWindowRequiresElevation
+                ? t('Client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
+                : t('Client.leagueClientUx.fixWindowMethodAOptions.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
               <div v-html="t('Client.leagueClientUx.fixWindowMethodAOptions.description')"></div>
+              <div
+                v-if="!adjustLeagueClientWindowSizeSupported"
+                class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
+              >
+                {{ adjustWindowStatusDescription }}
+              </div>
             </template>
             <div class="control" style="display: flex; gap: 4px; align-items: baseline">
               <NInputNumber
                 style="width: 80px"
                 size="small"
                 :disabled="
-                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
                 "
                 :show-button="false"
                 :min="1"
@@ -119,7 +125,7 @@
                 ref="input-2"
                 style="width: 80px"
                 :disabled="
-                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
                 "
                 size="small"
                 :show-button="false"
@@ -131,7 +137,7 @@
               </NInputNumber>
               <NButton
                 :disabled="
-                  !as.isAdministrator || !fixWindowSupported || lcs.connectionState !== 'connected'
+                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
                 "
                 size="small"
                 secondary
@@ -149,7 +155,6 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
@@ -164,21 +169,6 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
 const { t } = useTranslation()
 
-const {
-  nativeInputHookSupported,
-  toolsForegroundSupported,
-  toolsFixWindowMethodASupported,
-  toolsWindowPlacementSupported
-} = usePlatform()
-
-const terminateShortcutSupported = computed(() => {
-  return nativeInputHookSupported.value && toolsForegroundSupported.value
-})
-
-const fixWindowSupported = computed(() => {
-  return toolsFixWindowMethodASupported.value && toolsWindowPlacementSupported.value
-})
-
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const gcs = useGameClientStore()
@@ -187,6 +177,28 @@ const lc = useInstance(LeagueClientRenderer)
 const gc = useInstance(GameClientRenderer)
 
 const dialog = useDialog()
+
+const nativeInputRequiresElevation = computed(
+  () => as.nativeSupport.nativeInput.requiresElevation && !as.isElevated
+)
+const nativeInputStatusDescription = computed(() =>
+  as.nativeSupport.nativeInput.availableOnCurrentPlatform
+    ? t('Client.gameClient.nativeAddonRequiresAdministrator')
+    : t('Client.gameClient.windowsOnlyNativeAddon')
+)
+
+const adjustWindowRequirement = computed(() => as.nativeSupport.adjustLeagueClientWindowSize)
+const adjustWindowRequiresElevation = computed(
+  () => adjustWindowRequirement.value.requiresElevation && !as.isElevated
+)
+const adjustLeagueClientWindowSizeSupported = computed(
+  () => adjustWindowRequirement.value.available
+)
+const adjustWindowStatusDescription = computed(() =>
+  adjustWindowRequirement.value.availableOnCurrentPlatform
+    ? t('Client.leagueClientUx.fixWindowMethodAOptions.requiresAdministrator')
+    : t('Client.leagueClientUx.fixWindowMethodAOptions.unsupportedCurrentPlatform')
+)
 
 const fixWindowInputButton2 = useTemplateRef('input-2')
 

@@ -1,7 +1,7 @@
 <template>
   <div class="titlebar">
     <div
-      v-if="isMacOS"
+      v-if="as.isMacOS"
       class="h-full w-(--la-mac-titlebar-safe-left) shrink-0 [-webkit-app-region:no-drag]"
     />
     <div class="title-area">
@@ -16,14 +16,14 @@
 </template>
 
 <script setup lang="ts">
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
 const wm = useInstance(WindowManagerRenderer)
-const { isMacOS } = usePlatform()
+const as = useAppCommonStore()
 
 const handleClose = () => {
   return wm.cdTimerWindow.hide()
@@ -60,7 +60,7 @@ const handleClose = () => {
   transition: all 0.3s ease;
 
   .traffic-button {
-  display: flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;

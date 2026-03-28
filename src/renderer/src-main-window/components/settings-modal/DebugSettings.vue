@@ -171,7 +171,7 @@
       >
       <span class="text" v-else>{{ t('DebugSettings.gameflow.unavailable') }}</span>
     </NCard>
-    <NCard v-if="as.isAdministrator" size="small" style="margin-top: 8px">
+    <NCard v-if="as.isElevated" size="small" style="margin-top: 8px">
       <template #header>
         <LeagueAkariSpan class="card-header-title" text="League Akari X" />
       </template>

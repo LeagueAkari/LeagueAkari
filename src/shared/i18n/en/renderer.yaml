@@ -1764,6 +1764,10 @@ UpdateModal:
   ignoreThisVersion: Ignore This Version
 
 Client:
+  nativeSupport:
+    unsupportedCurrentPlatform: Unsupported on current platform
+    supportedButRequiresElevation: Supported on current platform but requires administrator privileges
+
   leagueClient:
     title: League Client
 
@@ -1787,6 +1791,7 @@ Client:
     title: Game Client
 
     windowsOnlyNativeAddon: Requires native addons (this build currently ships them only on Windows).
+    nativeAddonRequiresAdministrator: This capability is supported on the current platform, but requires running as administrator.
 
     terminateGameClientWithShortcut:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
@@ -1816,6 +1821,8 @@ Client:
       label: Adjust Window Size
       labelAdminRequired: Adjust Window Size (Admin Required)
       description: '<a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - Adjust the window size using WinAPI. This can be attempted when the client interface size is incorrect.'
+      unsupportedCurrentPlatform: Adjusting window size is not supported on the current platform.
+      requiresAdministrator: Adjusting window size is supported on the current platform, but requires running as administrator.
       button: Adjust
       dialog:
         title: Adjust Window Size
@@ -3080,6 +3087,9 @@ InGameSend:
   windowsOnly:
     title: Windows-only feature
     description: In-game send and global shortcuts require native addons. This build only ships them on Windows.
+  requiresAdministrator:
+    title: Administrator privileges required
+    description: This capability is supported on the current platform, but requires running as administrator to use in-game send and global shortcuts.
 
   settings:
     title: Settings

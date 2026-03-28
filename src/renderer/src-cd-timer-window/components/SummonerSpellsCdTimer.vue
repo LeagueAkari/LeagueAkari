@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import { useAdditionalInfoStore } from '@cd-timer-window/shards/additional-info/store'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -81,7 +80,6 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const ctws = useCdTimerWindowStore()
 const as = useAppCommonStore()
-const { inGameInputInjectionSupported, isWindows } = usePlatform()
 const message = useMessage()
 
 const wm = useInstance(WindowManagerRenderer)
@@ -376,8 +374,8 @@ const sendInGameText = async (
 
   if (text) {
     // Best-effort UX: show an explicit reason when injection is unavailable.
-    if (!inGameInputInjectionSupported.value) {
-      if (isWindows.value && !as.isAdministrator) {
+    if (!as.nativeSupport.nativeInput.available) {
+      if (as.nativeSupport.nativeInput.availableOnCurrentPlatform) {
         message.warning(t('SummonerSpellsCdTimer.adminRequired'))
       } else {
         message.warning(t('SummonerSpellsCdTimer.nativeInjectionUnsupported'))

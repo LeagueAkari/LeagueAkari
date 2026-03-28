@@ -1,5 +1,4 @@
 import { i18next } from '@main/i18n'
-import { nativeAbilitiesCapabilities } from '@main/utils/native-abilities'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { getThemeColorTheme, isAppThemeSetting } from '@shared/types/app-theme'
@@ -56,17 +55,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
       this.settings
     )
 
-    this.state.setAdministrator(this._shared.global.isAdministrator)
+    this.state.setElevated(this._shared.global.isElevated)
     this.state.setPlatform(this._shared.global.platform)
     this.state.setStartupDeepLink(this._shared.global.startupDeepLink)
-    this.state.setNativeAddons({
-      nativeLoaded: nativeAbilitiesCapabilities.nativeAddonsLoaded,
-      inputHookSupported: nativeAbilitiesCapabilities.keyboard.hookSupported,
-      inputInjectSupported: nativeAbilitiesCapabilities.keyboard.injectSupported,
-      toolsForegroundSupported: nativeAbilitiesCapabilities.process.foregroundTrackingSupported,
-      toolsWindowPlacementSupported: nativeAbilitiesCapabilities.process.leagueWindowPlacementSupported,
-      toolsFixWindowMethodASupported: nativeAbilitiesCapabilities.process.leagueWindowFixSupported
-    })
 
     this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {
       this._ipc.sendEvent(AppCommonMain.id, 'second-instance', commandLine, workingDirectory)
@@ -174,13 +165,13 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'preferredLolSource'
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
-      'isAdministrator',
+      'isElevated',
       'platform',
       'disableHardwareAcceleration',
       'baseConfig',
       'startupDeepLink',
       'isRunInTempDir',
-      'nativeAddons'
+      'nativeSupport'
     ])
 
     // 状态指示, 是否禁用硬件加速

@@ -1763,6 +1763,10 @@ UpdateModal:
   ignoreThisVersion: 忽略此版本
 
 Client:
+  nativeSupport:
+    unsupportedCurrentPlatform: 不支持当前平台
+    supportedButRequiresElevation: 支持当前平台，但需要管理员权限
+
   leagueClient:
     title: League Client
 
@@ -1786,6 +1790,7 @@ Client:
     title: 游戏端
 
     windowsOnlyNativeAddon: 需要原生插件（本构建目前仅在 Windows 提供）。
+    nativeAddonRequiresAdministrator: 当前平台支持该能力，但需要以管理员权限运行。
 
     terminateGameClientWithShortcut:
       labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
@@ -1815,6 +1820,8 @@ Client:
       label: 调整窗口大小
       labelAdminRequired: 调整窗口大小 (需要管理员权限)
       description: <a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作
+      unsupportedCurrentPlatform: 当前平台不支持调整窗口大小。
+      requiresAdministrator: 当前平台支持调整窗口大小，但需要以管理员权限运行。
       button: 调整
       dialog:
         title: 调整窗口大小
@@ -3081,6 +3088,9 @@ InGameSend:
   windowsOnly:
     title: 仅 Windows 功能
     description: 游戏内发送和全局快捷键需要原生插件。本构建仅在 Windows 提供。
+  requiresAdministrator:
+    title: 需要管理员权限
+    description: 当前平台支持该功能，但需要以管理员权限运行才能使用游戏内发送和全局快捷键。
 
   settings:
     title: 发送设置

@@ -1,23 +1,18 @@
-import {
-  UxCommandLine,
-  findProcessIdsByName,
-  getProcessCommandLine,
-  parseUxCommandLine,
-  queryUxCommandLines
-} from '@main/utils/native-abilities'
+import { getCommandLine, getPidsByName, isElevated } from '@main/native'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import cp from 'node:child_process'
 import util from 'node:util'
 
-import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { LeagueClientUxSettings, LeagueClientUxState } from './state'
+import { parseCommandLine } from './ux-cmd-utils'
 
 const execAsync = util.promisify(cp.exec)
 
@@ -44,7 +39,6 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _common: AppCommonMain,
     readonly _loggerFactory: LoggerFactoryMain,
     readonly _settingFactory: SettingFactoryMain,
     private readonly _mobx: MobxUtilsMain
@@ -122,25 +116,30 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   private async _updateUxCommandLine() {
-    if (process.platform === 'win32' && this.settings.useWmi) {
-      if (!this._common.state.isAdministrator) {
+    if (this.settings.useWmi) {
+      if (!isElevated) {
         return []
       }
 
-      const cmds = await queryUxCommandLines(LeagueClientUxMain.UX_PROCESS_NAME)
+      const pids = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+
+      const cmds = await Promise.all(
+        pids.map((pid) => getCommandLine(pid, { win32QueryType: 'shell' }))
+      )
 
       this.state.setHasClientButNoCommandLine(false)
       this._hasClientButNoCommandLineCount = 0
 
-      return cmds
+      return cmds.map((cmd) => parseCommandLine(cmd)).filter((cmd) => cmd !== null)
     } else {
-      const pids = findProcessIdsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const pids = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
       const auths: UxCommandLine[] = []
 
       for (const p of pids) {
         try {
-          const cmd = getProcessCommandLine(p)
-          const parsed = parseUxCommandLine(cmd)
+          const cmd = await getCommandLine(p, { win32QueryType: 'native' })
+
+          const parsed = parseCommandLine(cmd)
           if (parsed) {
             auths.push(parsed)
           }
@@ -159,7 +158,14 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
+  /**
+   * 仅限 win32
+   */
   private async _rebuildWmi() {
+    if (process.platform !== 'win32') {
+      return
+    }
+
     const cmd = `"${elevateExecutablePath}" cmd /c start cmd /k "${wmiRebuildScriptPath}"`
     this._log.info('Rebuilding WMI...', cmd)
     await execAsync(cmd, { shell: 'cmd', windowsHide: false })

@@ -1,5 +1,5 @@
-import { keyboardInput } from '@main/utils/native-abilities'
 import { i18next } from '@main/i18n'
+import { NATIVE_SUPPORT, nativeInput } from '@main/native'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
@@ -223,6 +223,12 @@ export class InGameSendMain implements IAkariShardInitDispose {
    * @param signal
    */
   private _sendTextToChatOrInGame(strs: string[], signal: AbortSignal) {
+    if (!NATIVE_SUPPORT.nativeInput.available) {
+      this._log.warn('Native input is not available')
+    }
+
+    const instance = nativeInput.instance
+
     let aborted = false
     signal.addEventListener('abort', () => {
       aborted = true
@@ -253,15 +259,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
       for (let i = 0; i < strs.length; i++) {
         tasks.push(async () => {
-          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
+          await instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
+          await instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
           await sleep(interval)
-          await keyboardInput.instance.sendString(strs[i])
+          await instance.sendString(strs[i])
           await sleep(interval)
-          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
+          await instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await keyboardInput.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
+          await instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
         })
 
         if (i !== strs.length - 1) {

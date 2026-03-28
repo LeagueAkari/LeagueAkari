@@ -3,54 +3,54 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NAlert
-          v-if="!nativeInputHookSupported"
+          v-if="!as.nativeSupport.nativeInput.available"
           type="warning"
           class="mb-2"
-          :title="t('windowsOnly.title')"
+          :title="nativeInputUnsupportedTitle"
         >
-          {{ t('windowsOnly.description') }}
+          {{ nativeInputUnsupportedDescription }}
         </NAlert>
 
-        <template v-if="nativeInputHookSupported">
+        <template v-if="as.nativeSupport.nativeInput.available">
           <SendableItemEdit />
           <TemplateEdit style="margin-top: 8px" />
-        <NCard size="small" style="margin-top: 8px">
-          <template #header>
-            <span class="card-header-title">{{ t('settings.title') }}</span>
-          </template>
-          <ControlItem
-            :label-width="260"
-            :disabled="!as.isAdministrator"
-            class="control-item-margin"
-            :label="t('settings.cancelShortcut.label')"
-            :label-description="t('settings.cancelShortcut.description')"
-          >
-            <ShortcutSelector
-              :shortcut-id="igs.settings.cancelShortcut"
-              :target-id="InGameSendRenderer.CANCEL_SHORTCUT_TARGET_ID"
-              @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
-            />
-          </ControlItem>
-          <ControlItem
-            :label-width="260"
-            class="control-item-margin"
-            :label="t('settings.sendInterval.label')"
-            :label-description="t('settings.sendInterval.description')"
-          >
-            <NInputNumber
-              @update:value="(val) => ig.setSendInterval(val || 65)"
-              :value="igs.settings.sendInterval"
-              size="small"
-              :disabled="!as.isAdministrator"
-              :min="10"
-              :max="3500"
-              :step="15"
-              style="width: 120px"
-              secondary
-              type="warning"
-            ></NInputNumber>
-          </ControlItem>
-        </NCard>
+          <NCard size="small" style="margin-top: 8px">
+            <template #header>
+              <span class="card-header-title">{{ t('settings.title') }}</span>
+            </template>
+            <ControlItem
+              :label-width="260"
+              :disabled="!as.isElevated"
+              class="control-item-margin"
+              :label="t('settings.cancelShortcut.label')"
+              :label-description="t('settings.cancelShortcut.description')"
+            >
+              <ShortcutSelector
+                :shortcut-id="igs.settings.cancelShortcut"
+                :target-id="InGameSendRenderer.CANCEL_SHORTCUT_TARGET_ID"
+                @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
+              />
+            </ControlItem>
+            <ControlItem
+              :label-width="260"
+              class="control-item-margin"
+              :label="t('settings.sendInterval.label')"
+              :label-description="t('settings.sendInterval.description')"
+            >
+              <NInputNumber
+                @update:value="(val) => ig.setSendInterval(val || 65)"
+                :value="igs.settings.sendInterval"
+                size="small"
+                :disabled="!as.isElevated"
+                :min="10"
+                :max="3500"
+                :step="15"
+                style="width: 120px"
+                secondary
+                type="warning"
+              ></NInputNumber>
+            </ControlItem>
+          </NCard>
         </template>
       </div>
     </NScrollbar>
@@ -60,12 +60,12 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useTranslation } from 'i18next-vue'
 import { NAlert, NCard, NInputNumber, NScrollbar } from 'naive-ui'
+import { computed } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -74,11 +74,20 @@ import TemplateEdit from './TemplateEdit.vue'
 
 const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend' })
 
-const { nativeInputHookSupported } = usePlatform()
-
 const as = useAppCommonStore()
 const igs = useInGameSendStore()
 const ig = useInstance(InGameSendRenderer)
+
+const nativeInputUnsupportedTitle = computed(() =>
+  as.nativeSupport.nativeInput.availableOnCurrentPlatform
+    ? t('requiresAdministrator.title')
+    : t('windowsOnly.title')
+)
+const nativeInputUnsupportedDescription = computed(() =>
+  as.nativeSupport.nativeInput.availableOnCurrentPlatform
+    ? t('requiresAdministrator.description')
+    : t('windowsOnly.description')
+)
 </script>
 
 <style scoped>

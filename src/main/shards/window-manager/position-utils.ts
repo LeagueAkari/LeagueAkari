@@ -1,4 +1,4 @@
-import { getLeagueClientWindowPlacement } from '@main/utils/native-abilities'
+import { NATIVE_SUPPORT, getLeagueClientWindowPlacement } from '@main/native'
 import { BrowserWindow, Display, Rectangle, screen } from 'electron'
 
 export function rectsIntersect(rect1: Rectangle, rect2: Rectangle) {
@@ -202,6 +202,8 @@ export function repositionToAlignLeagueClientUx(
   win: BrowserWindow,
   placement?: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right'
 ) {
+  if (!NATIVE_SUPPORT.getLeagueClientWindowPlacement) return
+
   const info = getLeagueClientWindowPlacement()
   if (info) {
     const { left, top, width, height } = info

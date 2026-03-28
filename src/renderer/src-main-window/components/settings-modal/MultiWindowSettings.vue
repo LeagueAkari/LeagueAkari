@@ -119,7 +119,7 @@
         />
       </ControlItem>
       <ControlItem
-        :disabled="!globalShortcutsSupported"
+        :disabled="!as.nativeSupport.nativeInput.available"
         :label-width="400"
         class="control-item-margin"
         :label="t('MultiWindowSettings.opggWindow.showShortcut.label')"
@@ -166,7 +166,7 @@
     <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{
-          as.isAdministrator
+          as.isElevated
             ? t('MultiWindowSettings.ongoingGameWindow.title')
             : t('MultiWindowSettings.ongoingGameWindow.titleRequireAdmin')
         }}</span>
@@ -184,7 +184,7 @@
         />
       </ControlItem>
       <ControlItem
-        :disabled="!globalShortcutsSupported"
+        :disabled="!as.nativeSupport.nativeInput.available"
         :label-width="400"
         class="control-item-margin"
         :label="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
@@ -200,7 +200,7 @@
     <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{
-          as.isAdministrator
+          as.isElevated
             ? t('MultiWindowSettings.cdTimerWindow.title')
             : t('MultiWindowSettings.cdTimerWindow.titleRequireAdmin')
         }}</span>
@@ -239,7 +239,7 @@
         />
       </ControlItem>
       <ControlItem
-        :disabled="!globalShortcutsSupported"
+        :disabled="!as.nativeSupport.nativeInput.available"
         :label-width="400"
         class="control-item-margin"
         :label="t('MultiWindowSettings.cdTimerWindow.showShortcut.label')"
@@ -291,7 +291,6 @@
 <script setup lang="ts">
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
@@ -315,7 +314,6 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
-const { globalShortcutsSupported } = usePlatform()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const ogws = useOngoingGameWindowStore()

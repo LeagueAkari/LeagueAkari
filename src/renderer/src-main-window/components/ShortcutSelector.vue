@@ -71,25 +71,28 @@
       </div>
     </NModal>
 
-    <NPopover :disabled="globalShortcutsSupported">
+    <NPopover :disabled="as.nativeSupport.nativeInput.available">
       <template #trigger>
         <NButton
           size="tiny"
-          :disabled="!globalShortcutsSupported"
+          :disabled="!as.nativeSupport.nativeInput.available"
           type="primary"
-          @click="() => {
-            if (!globalShortcutsSupported) return
-            show = true
-          }"
+          @click="
+            () => {
+              if (!as.nativeSupport.nativeInput.available) return
+              show = true
+            }
+          "
         >
           {{ t('ShortcutSelector.select') }}
         </NButton>
       </template>
-      <template v-if="!nativeInputHookSupported">
-        {{ t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly') }}
-      </template>
-      <template v-else-if="isWindows && !as.isAdministrator">
-        {{ t('ShortcutSelector.notRunAsAdministrator') }}
+      <template v-if="!as.nativeSupport.nativeInput.available">
+        {{
+          nativeInputRequiresElevation
+            ? t('ShortcutSelector.notRunAsAdministrator')
+            : t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly')
+        }}
       </template>
     </NPopover>
 
@@ -114,7 +117,6 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NPopover } from 'naive-ui'
@@ -128,7 +130,9 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 
-const { globalShortcutsSupported, isWindows, nativeInputHookSupported } = usePlatform()
+const nativeInputRequiresElevation = computed(
+  () => as.nativeSupport.nativeInput.requiresElevation && !as.isElevated
+)
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
 

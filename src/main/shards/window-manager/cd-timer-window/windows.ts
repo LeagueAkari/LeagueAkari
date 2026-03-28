@@ -1,7 +1,4 @@
-import {
-  keyboardInput,
-  nativeAbilitiesCapabilities
-} from '@main/utils/native-abilities'
+import { NATIVE_SUPPORT, nativeInput } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -151,12 +148,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           return
         }
 
-        // Current global shortcut implementation requires admin on Windows.
-        const canUseShortcuts =
-          nativeAbilitiesCapabilities.keyboard.hookSupported &&
-          (process.platform !== 'win32' || this._app.state.isAdministrator)
-
-        if (!canUseShortcuts) {
+        if (!NATIVE_SUPPORT.nativeInput.available) {
           return
         }
 
@@ -236,11 +228,15 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   private _handleIpcCall() {
     let isSending = false
     this._ipc.onCall(this._namespace, 'sendInGame', async (_, text: string) => {
+      if (!NATIVE_SUPPORT.nativeInput.available) {
+        throw new AkariIpcError('native input not supported', 'NativeInputNotSupported')
+      }
+
       if (isSending) {
         throw new AkariIpcError('cd-timer is sending', 'AlreadySending')
       }
 
-      if (!GameClientMain.isGameClientForeground()) {
+      if (!(await GameClientMain.isGameClientForeground())) {
         throw new AkariIpcError('game client is not foreground', 'GameClientNotForeground')
       }
 
@@ -249,15 +245,15 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
       isSending = true
       try {
-        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await nativeInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await nativeInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await keyboardInput.instance.sendString(trimmed)
+        await nativeInput.instance.sendString(trimmed)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await nativeInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await keyboardInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await nativeInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
       } catch (error) {
         this._log.warn('sendInGame failed', error)
         throw error
@@ -280,11 +276,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   override async onInit() {
     await super.onInit()
 
-    // sendInGame 依赖原生输入注入；当前 Windows 实现要求管理员权限。
-    const canUseInjection =
-      nativeAbilitiesCapabilities.keyboard.injectSupported &&
-      (process.platform !== 'win32' || this._app.state.isAdministrator)
-    if (canUseInjection) {
+    if (NATIVE_SUPPORT.nativeInput.available) {
       this._handleIpcCall()
     }
 

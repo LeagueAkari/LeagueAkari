@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@shared/types/shards/league-client'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import { defineStore } from 'pinia'
 import { shallowReactive, shallowRef } from 'vue'
 

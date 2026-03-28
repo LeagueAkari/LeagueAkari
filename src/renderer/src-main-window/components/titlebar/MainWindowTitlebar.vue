@@ -3,7 +3,7 @@
     class="app-titlebar"
     :class="[
       { 'should-show-bottom-border': shouldShowBottomBorder },
-      isMacOS ? 'pl-[calc(8px+var(--la-mac-titlebar-safe-left))]' : 'pl-2'
+      as.isMacOS ? 'pl-[calc(8px+var(--la-mac-titlebar-safe-left))]' : 'pl-2'
     ]"
   >
     <div class="shard-area">
@@ -18,7 +18,7 @@
     <CommonButtons />
 
     <!-- no duplicate traffic buttons on macOS xD -->
-    <template v-if="!isMacOS">
+    <template v-if="!as.isMacOS">
       <div class="divider" />
       <TrafficButtons />
     </template>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
@@ -44,7 +44,7 @@ const route = useRoute()
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 const pts = usePlayerTabsStore()
-const { isMacOS } = usePlatform()
+const as = useAppCommonStore()
 
 const shouldShowDivider = computed(() => {
   switch (route.name) {

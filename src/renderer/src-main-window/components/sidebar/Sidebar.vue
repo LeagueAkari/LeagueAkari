@@ -10,9 +10,9 @@
     <div
       class="app-sidebar__head"
       :class="
-        isMacOS
-          ? 'pt-[calc(4px+var(--la-mac-sidebar-safe-top))] h-[calc(48px+var(--la-mac-sidebar-safe-top))]'
-          : 'pt-1 h-12'
+        as.isMacOS
+          ? 'h-[calc(48px+var(--la-mac-sidebar-safe-top))] pt-[calc(4px+var(--la-mac-sidebar-safe-top))]'
+          : 'h-12 pt-1'
       "
     >
       <div class="app-sidebar__logo" @click="toggleCollapse">
@@ -27,7 +27,7 @@
         </NIcon>
       </div>
       <div class="app-sidebar__logo-text">
-        {{ t('appName', { ns: 'common' }) }}{{ as.isAdministrator ? ' X' : '' }}
+        {{ t('appName', { ns: 'common' }) }}{{ as.isElevated ? ' X' : '' }}
       </div>
 
       <!-- drag zone -->
@@ -52,7 +52,6 @@
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import SidebarCollapseLeft from '@renderer-shared/assets/icon/SidebarCollapseLeft.vue'
 import SidebarCollapseRight from '@renderer-shared/assets/icon/SidebarCollapseRight.vue'
-import { usePlatform } from '@renderer-shared/composables/usePlatform'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -80,7 +79,6 @@ const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const mui = useMainWindowUiStore()
 const lcs = useLeagueClientStore()
-const { isMacOS } = usePlatform()
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))

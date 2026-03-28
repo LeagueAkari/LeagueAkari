@@ -4,14 +4,11 @@ import {
   isAppThemeSetting,
   resolveThemeSetting
 } from '@shared/types/app-theme'
+import { AkariSupportedPlatform, BaseConfig, NativeSupport } from '@shared/types/common'
 import { usePreferredColorScheme } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { defineStore } from 'pinia'
 import { computed, ref, shallowReactive, shallowRef, watch } from 'vue'
-
-interface BaseConfig {
-  disableHardwareAcceleration?: boolean
-}
 
 export interface HttpProxySetting {
   strategy: 'auto' | 'force' | 'disable'
@@ -40,27 +37,42 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   const version = ref('0.0.0')
   const isRabiVersion = computed(() => version.value.includes('-rabi'))
-  const isAdministrator = ref(false)
-  const platform = ref<'darwin' | 'win32' | 'unknown'>('unknown')
+  const isElevated = ref(false)
+  const platform = ref<AkariSupportedPlatform>('unknown')
+  const isWindows = computed(() => platform.value === 'win32')
+  const isMacOS = computed(() => platform.value === 'darwin')
   const startupDeepLink = ref<string | null>(null)
   const overrideAppTitle = ref('') // 可以覆盖掉
   const appTitle = computed(
     () =>
       overrideAppTitle.value ||
-      (isAdministrator.value
-        ? `${t('appName', { ns: 'common' })} X`
-        : t('appName', { ns: 'common' }))
+      (isElevated.value ? `${t('appName', { ns: 'common' })} X` : t('appName', { ns: 'common' }))
   )
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
   const isRunInTempDir = ref(false)
-  const nativeAddons = shallowReactive({
-    nativeLoaded: false,
-    inputHookSupported: false,
-    inputInjectSupported: false,
-    toolsForegroundSupported: false,
-    toolsWindowPlacementSupported: false,
-    toolsFixWindowMethodASupported: false
+
+  const nativeSupport = shallowRef<NativeSupport>({
+    nativeInput: {
+      available: false,
+      availableOnCurrentPlatform: false,
+      requiresElevation: false
+    },
+    getLeagueClientWindowPlacement: {
+      available: false,
+      availableOnCurrentPlatform: false,
+      requiresElevation: false
+    },
+    adjustLeagueClientWindowSize: {
+      available: false,
+      availableOnCurrentPlatform: false,
+      requiresElevation: false
+    },
+    isProcessForeground: {
+      available: false,
+      availableOnCurrentPlatform: false,
+      requiresElevation: false
+    }
   })
 
   /* for fun only */
@@ -118,8 +130,10 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     settings,
     appTitle,
     overrideAppTitle,
-    isAdministrator,
+    isElevated,
     platform,
+    isWindows,
+    isMacOS,
     disableHardwareAcceleration,
     version,
     isRabiVersion,
@@ -128,7 +142,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     isRunInTempDir,
     themeId,
     colorTheme,
-    nativeAddons,
+    nativeSupport,
     tempAkariSubscriptionInfo
   }
 })

@@ -1,3 +1,4 @@
+import { NativeSupport } from '@shared/types/common'
 import { getuid } from 'node:process'
 
 import { addons } from './addons-win32'
@@ -5,6 +6,7 @@ import { NotSupportedPlatformError } from './errors'
 import {
   getCommandLinePosix,
   getPidsByNamePosix,
+  isProcessRunningPosix,
   terminateProcessPosix
 } from './process-utils-darwin'
 import { getCommandLinePowershell } from './process-utils-win32'
@@ -39,9 +41,9 @@ export async function getCommandLine(
     const { win32QueryType = 'native' } = options ?? {}
 
     if (win32QueryType === 'native') {
-      return await getCommandLinePowershell(pid)
-    } else {
       return addons.tools.getCommandLine1(pid)
+    } else {
+      return await getCommandLinePowershell(pid)
     }
   } else if (process.platform === 'darwin') {
     return await getCommandLinePosix(pid)
@@ -50,12 +52,7 @@ export async function getCommandLine(
   }
 }
 
-/**
- * 判断是否是提权运行
- *
- * @platform win32, darwin
- */
-export function isElevated() {
+function _isElevated() {
   if (process.platform === 'win32') {
     return addons.tools.isElevated()
   } else if (process.platform === 'darwin') {
@@ -64,6 +61,13 @@ export function isElevated() {
     throw new NotSupportedPlatformError('isElevated', process.platform)
   }
 }
+
+/**
+ * 判断是否是提权运行
+ *
+ * @platform win32, darwin
+ */
+export const isElevated = _isElevated()
 
 /**
  * 判断进程是否在前台运行
@@ -90,5 +94,64 @@ export function terminateProcess(pid: number) {
     return terminateProcessPosix(pid)
   } else {
     throw new NotSupportedPlatformError('terminateProcess', process.platform)
+  }
+}
+
+export function isProcessRunning(pid: number) {
+  if (process.platform === 'win32') {
+    return addons.tools.isProcessRunning(pid)
+  } else if (process.platform === 'darwin') {
+    return isProcessRunningPosix(pid)
+  } else {
+    throw new NotSupportedPlatformError('isProcessRunning', process.platform)
+  }
+}
+
+export function adjustLeagueClientWindowSize(
+  clientZoom: number,
+  config?: { baseHeight: number; baseWidth: number }
+) {
+  if (process.platform === 'win32') {
+    return addons.tools.fixWindowMethodA(clientZoom, config)
+  } else {
+    throw new NotSupportedPlatformError('adjustLeagueClient', process.platform)
+  }
+}
+
+export function getLeagueClientWindowPlacement() {
+  if (process.platform === 'win32') {
+    return addons.tools.getLeagueClientWindowPlacementInfo()
+  } else {
+    throw new NotSupportedPlatformError('getLeagueClientWindowPlacement', process.platform)
+  }
+}
+
+/**
+ * 仅限 Windows 平台可用的原生注入，若非 Windows 平台，为 undefined
+ *
+ * @platform win32
+ */
+export const nativeInput = addons?.input
+
+export const NATIVE_SUPPORT: NativeSupport = {
+  nativeInput: {
+    available: Boolean(nativeInput) && isElevated,
+    availableOnCurrentPlatform: Boolean(nativeInput),
+    requiresElevation: true
+  },
+  getLeagueClientWindowPlacement: {
+    available: process.platform === 'win32',
+    availableOnCurrentPlatform: process.platform === 'win32',
+    requiresElevation: false
+  },
+  adjustLeagueClientWindowSize: {
+    available: process.platform === 'win32' && isElevated,
+    availableOnCurrentPlatform: process.platform === 'win32',
+    requiresElevation: true
+  },
+  isProcessForeground: {
+    available: process.platform === 'win32' && isElevated,
+    availableOnCurrentPlatform: process.platform === 'win32',
+    requiresElevation: true
   }
 }

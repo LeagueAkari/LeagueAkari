@@ -507,7 +507,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
               current.value = item.id
 
               // 彩蛋环节
-              as.overrideAppTitle = `${t('appName', { ns: 'common' })} ${item.title} ${as.isAdministrator ? 'X' : ''}`
+              as.overrideAppTitle = `${t('appName', { ns: 'common' })} ${item.title} ${as.isElevated ? 'X' : ''}`
             }
           })
       }
@@ -548,7 +548,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     const app = useInstance(AppCommonRenderer)
 
     const shouldAsk = computed(() => {
-      return lcuxs.settings.useWmi && !as.isAdministrator
+      return lcuxs.settings.useWmi && !as.isElevated
     })
 
     watch(
@@ -611,14 +611,12 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
             title: () => t('title'),
             content: () =>
               h('div', [
-                h('div', as.isAdministrator ? t('withAdminContent') : t('noAdminContent')),
+                h('div', as.isElevated ? t('withAdminContent') : t('noAdminContent')),
                 h('div', { style: { marginTop: '8px', fontWeight: 'bold' } }, t('extraContent'))
               ]),
-            positiveText: as.isAdministrator
-              ? t('withAdminPositiveText')
-              : t('noAdminPositiveText'),
+            positiveText: as.isElevated ? t('withAdminPositiveText') : t('noAdminPositiveText'),
             onPositiveClick: () => {
-              if (as.isAdministrator) {
+              if (as.isElevated) {
                 lcux.setUseWmi(true).then(() => {
                   app.relaunchAsAdministrator()
                 })

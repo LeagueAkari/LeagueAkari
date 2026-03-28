@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { nativeAbilitiesCapabilities } from '@main/utils/native-abilities'
+import { NATIVE_SUPPORT } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
@@ -135,31 +135,31 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
           return
         }
 
-        // Current global shortcut implementation requires admin on Windows.
-        const canUseShortcuts =
-          nativeAbilitiesCapabilities.keyboard.hookSupported &&
-          (process.platform !== 'win32' || this._app.state.isAdministrator)
-
-        if (!canUseShortcuts) {
+        if (!NATIVE_SUPPORT.nativeInput.available) {
           return
         }
 
         try {
-          this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'stateful', (event) => {
-            if (event.pressed) {
-              if (is.dev || GameClientMain.isGameClientForeground()) {
-                if (!this.state.show) {
-                  this.show()
-                }
+          this._keyboardShortcuts.register(
+            this.shortcutTargetId,
+            shortcut,
+            'stateful',
+            async (event) => {
+              if (event.pressed) {
+                if (is.dev || (await GameClientMain.isGameClientForeground())) {
+                  if (!this.state.show) {
+                    this.show()
+                  }
 
-                this._window?.setIgnoreMouseEvents(false)
-                this.state.setFakeShow(true)
+                  this._window?.setIgnoreMouseEvents(false)
+                  this.state.setFakeShow(true)
+                }
+              } else {
+                this._window?.setIgnoreMouseEvents(true)
+                this.state.setFakeShow(false)
               }
-            } else {
-              this._window?.setIgnoreMouseEvents(true)
-              this.state.setFakeShow(false)
             }
-          })
+          )
         } catch {
           this._log.warn('Failed to register ongoing-game window shortcut')
           this._setting.set('showShortcut', null)

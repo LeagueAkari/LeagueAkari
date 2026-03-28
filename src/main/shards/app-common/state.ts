@@ -1,11 +1,12 @@
-import { BaseConfig } from '@main/bootstrap/base-config'
+import { NATIVE_SUPPORT } from '@main/native'
 import { AppThemeSetting } from '@shared/types/app-theme'
+import { AkariSupportedPlatform, BaseConfig, NativeSupport } from '@shared/types/common'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class AppCommonState {
-  isAdministrator: boolean = false
+  isElevated: boolean = false
 
-  platform: 'darwin' | 'win32' | 'unknown' = 'unknown'
+  platform: AkariSupportedPlatform = 'unknown'
 
   /**
    * 仅用于展示, 是否禁用硬件加速
@@ -23,27 +24,13 @@ export class AppCommonState {
 
   isRunInTempDir: boolean = false
 
-  nativeAddons: {
-    nativeLoaded: boolean
-    inputHookSupported: boolean
-    inputInjectSupported: boolean
-    toolsForegroundSupported: boolean
-    toolsWindowPlacementSupported: boolean
-    toolsFixWindowMethodASupported: boolean
-  } = {
-    nativeLoaded: false,
-    inputHookSupported: false,
-    inputInjectSupported: false,
-    toolsForegroundSupported: false,
-    toolsWindowPlacementSupported: false,
-    toolsFixWindowMethodASupported: false
+  nativeSupport: NativeSupport = NATIVE_SUPPORT
+
+  setElevated(s: boolean) {
+    this.isElevated = s
   }
 
-  setAdministrator(s: boolean) {
-    this.isAdministrator = s
-  }
-
-  setPlatform(s: 'darwin' | 'win32' | 'unknown') {
+  setPlatform(s: AkariSupportedPlatform) {
     this.platform = s
   }
 
@@ -67,12 +54,8 @@ export class AppCommonState {
     this.isRunInTempDir = s
   }
 
-  setNativeAddons(s: AppCommonState['nativeAddons']) {
-    this.nativeAddons = s
-  }
-
   constructor() {
-    makeAutoObservable(this, { baseConfig: observable.ref, nativeAddons: observable.ref })
+    makeAutoObservable(this, { baseConfig: observable.ref })
   }
 }
 

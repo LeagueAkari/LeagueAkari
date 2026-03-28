@@ -1,6 +1,7 @@
 import { optimizer } from '@electron-toolkit/utils'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
+import { isElevated } from '@main/native'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
@@ -31,9 +32,9 @@ import { StatisticsMain } from '@main/shards/statistics'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
-import { tools } from '@main/utils/addons'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { AkariManager } from '@shared/akari-shard'
+import { BaseConfig } from '@shared/types/common'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -47,7 +48,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { Logger } from 'winston'
 
-import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
+import { readBaseConfig, writeBaseConfig } from './base-config'
 
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
@@ -77,7 +78,7 @@ declare module '@shared/akari-shard' {
     /**
      * 是否是管理员权限
      */
-    isAdministrator: boolean
+    isElevated: boolean
 
     /**
      * 平台，目前仅支持 win32 和 darwin。仅完全支持 win32
@@ -161,8 +162,6 @@ export function isWindows11_22H2_OrHigher() {
   return false
 }
 
-export const isAdministrator = tools.isElevated()
-
 /**
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
  */
@@ -227,7 +226,7 @@ export function bootstrap() {
       value: baseConfig,
       write: (config: any) => writeBaseConfig(config)
     }
-    manager.global.isAdministrator = isAdministrator
+    manager.global.isElevated = isElevated
     manager.global.platform = os.platform() as 'darwin' | 'win32'
     manager.global.version = app.getVersion()
     manager.global.isWindows11_22H2_OrHigher = isWindows11_22H2_OrHigher()
@@ -243,7 +242,7 @@ export function bootstrap() {
       events.emit('log-level-changed', level)
     }
 
-    if (isAdministrator) {
+    if (isElevated) {
       logger.info({
         message: `Application started with administrator privileges`,
         namespace: 'app'

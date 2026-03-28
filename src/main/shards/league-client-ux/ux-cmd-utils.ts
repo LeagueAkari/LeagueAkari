@@ -1,4 +1,4 @@
-import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 
 /**
  * 来自 Riot 的证书文件
@@ -28,58 +28,6 @@ SvD2WV8gRYUnGmy/N0+u6ANq5EsbhZ548zZc+BI4upsWChTLyxt2RxR7+uGlS1+5
 EcGfKZ+g024k/J32XP4hdho7WYAS2xMiV83CfLR/MNi8oSMaVQTdKD8cpgiWJk3L
 XWehWA==
 -----END CERTIFICATE-----`
-
-export interface UxCommandLine {
-  port: number
-  pid: number
-  authToken: string
-  certificate: string
-  region: string
-  rsoPlatformId: string
-  riotClientPort: number
-  riotClientAuthToken: string
-}
-
-const POWERSHELL_PATH = 'powershell'
-const POWERSHELL_BASE_ARGS = [
-  '-NoProfile',
-  '-NonInteractive',
-  '-ExecutionPolicy',
-  'Bypass',
-  '-Command'
-]
-
-function runCommand(
-  command: string,
-  args: string[] = [],
-  options?: SpawnOptionsWithoutStdio
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, options)
-    let stdout = ''
-    let stderr = ''
-
-    child.stdout.on('data', (data) => {
-      stdout += data.toString()
-    })
-
-    child.stderr.on('data', (data) => {
-      stderr += data.toString()
-    })
-
-    child.on('error', (error) => {
-      reject(error)
-    })
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve(stdout)
-      } else {
-        reject(new Error(`command failed with code ${code}: ${stderr}`))
-      }
-    })
-  })
-}
 
 const portRegex = /--app-port=([0-9]+)/
 const remotingAuth = /--remoting-auth-token=([\w-_]+)/
@@ -113,42 +61,4 @@ export function parseCommandLine(s: string): UxCommandLine | null {
     riotClientPort: Number(riotClientPort),
     riotClientAuthToken: riotClientAuth
   }
-}
-
-export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]> {
-  if (process.platform !== 'win32') {
-    try {
-      const out = runCommand('ps', ['axww', '-o', 'pid=,command='])
-      const text = await out
-      const needleA = clientName
-      const needleB = clientName.replace(/\.exe$/i, '')
-
-      const authObjects = text
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean)
-        .filter((line) => line.includes(needleA) || (needleB && line.includes(needleB)))
-        .map((line) => line.replace(/^\d+\s+/, ''))
-        .map(parseCommandLine)
-        .filter(Boolean) as UxCommandLine[]
-
-      return authObjects
-    } catch {
-      return []
-    }
-  }
-
-  const out = await runCommand(POWERSHELL_PATH, [
-    ...POWERSHELL_BASE_ARGS,
-    `Get-CimInstance -ClassName Win32_Process -Filter "Name='${clientName}'" -Property CommandLine | Select-Object -ExpandProperty CommandLine`
-  ])
-
-  const authObjects = out
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map(parseCommandLine)
-    .filter(Boolean) as UxCommandLine[]
-
-  return authObjects
 }

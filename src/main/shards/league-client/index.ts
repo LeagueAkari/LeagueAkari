@@ -1,12 +1,9 @@
-import {
-  applyLeagueClientWindowFix,
-  findProcessIdsByName,
-  UxCommandLine
-} from '@main/utils/native-abilities'
+import { NATIVE_SUPPORT, adjustLeagueClientWindowSize, getPidsByName } from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
@@ -161,8 +158,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     const lastConnectedClient = await this._setting._getFromStorage('lastConnectedClient')
 
     if (lastConnectedClient !== null) {
-      const p1 = findProcessIdsByName(LeagueClientUxMain.UX_PROCESS_NAME)
-      const p2 = findProcessIdsByName(LeagueClientMain.PROCESS_NAME)
+      const p1 = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
+      const p2 = await getPidsByName(LeagueClientMain.PROCESS_NAME)
 
       if (p1.length === 0 && p2.length === 1) {
         const { certificate, ...rest } = lastConnectedClient
@@ -689,8 +686,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
    * 不知道现在是否需要
    */
   async fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
+    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize) {
+      return
+    }
+
     const { data: zoom } = await this.http.get<number>('/riotclient/zoom-scale')
 
-    applyLeagueClientWindowFix(zoom, config)
+    adjustLeagueClientWindowSize(zoom, config)
   }
 }

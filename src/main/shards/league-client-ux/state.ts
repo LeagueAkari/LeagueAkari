@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@main/utils/native-abilities'
+import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class LeagueClientUxSettings {

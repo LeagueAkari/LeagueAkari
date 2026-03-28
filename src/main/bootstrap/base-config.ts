@@ -1,11 +1,7 @@
+import { BaseConfig } from '@shared/types/common'
 import { app } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-
-export interface BaseConfig {
-  disableHardwareAcceleration?: boolean
-  logLevel?: string
-}
 
 /**
  * 读取基础配置, 这些配置左右了应用级别的行为

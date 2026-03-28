@@ -1,9 +1,10 @@
 import {
-  findProcessIdsByName,
-  isProcessInForeground,
+  NATIVE_SUPPORT,
+  getPidsByName,
+  isProcessForeground,
   isProcessRunning,
   terminateProcess
-} from '@main/utils/native-abilities'
+} from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
@@ -160,11 +161,13 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
   }
 
-  private _terminateGameClient() {
+  private async _terminateGameClient() {
     this._log.info('Try to terminate game client process')
-    findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+    const pids = await getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+
+    pids.forEach((pid) => {
       this._log.info('Process exists', pid)
-      if (!isProcessInForeground(pid)) {
+      if (NATIVE_SUPPORT.isProcessForeground && !isProcessForeground(pid)) {
         this._log.info('Process is not in foreground', pid)
         return
       }
@@ -330,26 +333,32 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
   }
 
-  static isGameClientForeground() {
-    return findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).some((pid) =>
-      isProcessInForeground(pid)
-    )
+  static async isGameClientForeground() {
+    if (!NATIVE_SUPPORT.isProcessForeground) {
+      return false
+    }
+
+    const pids = await getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+
+    return pids.some((pid) => isProcessForeground(pid))
   }
 
-  isGameClientForegroundCached() {
+  async isGameClientForegroundCached() {
+    if (!NATIVE_SUPPORT.isProcessForeground) {
+      return false
+    }
+
     if (this._gcCachedRunningPids.length === 0) {
-      this._gcCachedRunningPids = findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+      this._gcCachedRunningPids = await getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
     } else {
-      this._gcCachedRunningPids = this._gcCachedRunningPids.filter((pid) =>
-        isProcessRunning(pid)
-      )
+      this._gcCachedRunningPids = this._gcCachedRunningPids.filter((pid) => isProcessRunning(pid))
 
       if (this._gcCachedRunningPids.length === 0) {
-        this._gcCachedRunningPids = findProcessIdsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+        this._gcCachedRunningPids = await getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
       }
     }
 
-    return this._gcCachedRunningPids.some((pid) => isProcessInForeground(pid))
+    return this._gcCachedRunningPids.some((pid) => isProcessForeground(pid))
   }
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {
