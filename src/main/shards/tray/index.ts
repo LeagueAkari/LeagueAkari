@@ -1,7 +1,7 @@
 import icon from '@resources/LA_ICON.ico?asset'
 import iconPng from '../../../../pictures/logo.png?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { Menu, MenuItem, Tray } from 'electron'
+import { Menu, MenuItem, Tray, nativeImage } from 'electron'
 import i18next from 'i18next'
 import { comparer } from 'mobx'
 
@@ -35,7 +35,10 @@ export class TrayMain implements IAkariShardInitDispose {
   ) {}
 
   private _buildTray() {
-    const trayIcon = process.platform === 'win32' ? icon : iconPng
+    let trayIcon: string | Electron.NativeImage = process.platform === 'win32' ? icon : iconPng
+    if (process.platform === 'darwin') {
+      trayIcon = nativeImage.createFromPath(iconPng).resize({ width: 16, height: 16 })
+    }
     this._tray = new Tray(trayIcon)
 
     this._auxWindowTrayItem = new MenuItem({
