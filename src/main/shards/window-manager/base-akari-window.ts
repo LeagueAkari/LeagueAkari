@@ -101,7 +101,7 @@ export abstract class BaseAkariWindow<
   protected _log: AkariLogger
 
   protected _forceReadyTimerId: NodeJS.Timeout | null = null
-  protected _forceClose = false
+  protected _trueClose = false
 
   protected readonly _setting: SetterSettingService
 
@@ -649,11 +649,16 @@ export abstract class BaseAkariWindow<
     }
   }
 
-  close(force = false) {
+  /**
+   * 隐藏窗口或真正关闭窗口
+   *
+   * @param trueClose 否则为 hide
+   */
+  close(trueClose = false) {
     if (this._window) {
-      this._forceClose = force
+      this._trueClose = trueClose
       this._window.close()
-      this._forceClose = false
+      this._trueClose = false
     }
   }
 
@@ -706,7 +711,7 @@ export abstract class BaseAkariWindow<
    * 默认的关闭行为是隐藏窗口
    */
   protected handleClose(e: Event) {
-    if (this._forceClose) {
+    if (this._trueClose || this._context.shared.global.isReadyToQuit) {
       return
     }
 

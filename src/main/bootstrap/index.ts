@@ -106,6 +106,11 @@ declare module '@shared/akari-shard' {
     version: string
 
     /**
+     * 指示应用是否正在可以退出的流程中
+     */
+    isReadyToQuit: boolean
+
+    /**
      * 退出应用
      */
     quit: () => void
@@ -230,6 +235,7 @@ export function bootstrap() {
     manager.global.platform = os.platform() as 'darwin' | 'win32'
     manager.global.version = app.getVersion()
     manager.global.isWindows11_22H2_OrHigher = isWindows11_22H2_OrHigher()
+    manager.global.isReadyToQuit = false
     manager.global.quit = () => app.quit()
     manager.global.restart = () => {
       app.relaunch()
@@ -341,9 +347,21 @@ export function bootstrap() {
       }
     })
 
+    // 建立在如下假设：主窗口永远不会关闭（而是隐藏）
     app.on('window-all-closed', () => {
-      // hanxven's note: this is a Windows only app
       app.quit()
+    })
+
+    app.on('before-quit', () => {
+      manager.global.isReadyToQuit = true
+    })
+
+    app.on('activate', () => {
+      const wm = manager.getInstance(WindowManagerMain.id) as WindowManagerMain
+
+      if (wm) {
+        wm.mainWindow.showOrRestore()
+      }
     })
 
     app.whenReady().then(async () => {

@@ -105,14 +105,14 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   }
 
   protected override handleClose(event: Event) {
-    if (this._forceClose) {
-      this.emit('force-close') // when main window is closed, close aux window
+    if (this._trueClose || this._context.shared.global.isReadyToQuit) {
+      this.emit('main-window-close')
       return
     }
 
     const s = this._nextCloseAction || this.settings.closeAction
 
-    if (s === 'minimize-to-tray') {
+    if (s === 'minimize-to-tray' || process.platform === 'darwin') {
       event.preventDefault()
       this._window?.hide()
     } else if (s === 'ask') {

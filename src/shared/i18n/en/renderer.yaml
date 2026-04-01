@@ -174,14 +174,14 @@ TrafficButtons:
   restore: Restore
   close: Close
 
-  modal:
-    title: Quit $t(common:appName)
-    options:
-      minimize-to-tray: Minimize to tray
-      quit: Quit
-    remember: Remember
-    ok: OK
-    cancel: Cancel
+MainWindowCloseConfirmModal:
+  title: Quit $t(common:appName)
+  options:
+    minimize-to-tray: Minimize to tray
+    quit: Quit
+  remember: Remember
+  ok: OK
+  cancel: Cancel
 
 OngoingGameTitle:
   refresh: Refresh

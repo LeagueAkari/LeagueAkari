@@ -34,6 +34,7 @@ export interface WindowManagerMainContext {
   gameClient: GameClientMain
   keyboardShortcuts: KeyboardShortcutsMain
   selfUpdate: SelfUpdateMain
+  shared: SharedGlobalShard
 }
 
 @Shard(WindowManagerMain.id)
@@ -99,7 +100,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       log: this._log,
       gameClient: this._gc,
       keyboardShortcuts: this._kbd,
-      selfUpdate: this._selfUpdate
+      selfUpdate: this._selfUpdate,
+      shared: this._shared
     }
   }
 
@@ -119,11 +121,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       'contentProtection'
     ])
 
-    this.mainWindow.on('force-close', () => {
-      this.auxWindow.close(true)
-      this.opggWindow.close(true)
-      this.ongoingGameWindow.close(true)
-      this.cdTimerWindow.close(true)
+    this.mainWindow.on('main-window-close', () => {
+      this._shared.global.quit()
     })
 
     await this.mainWindow.onInit()

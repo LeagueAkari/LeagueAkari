@@ -93,7 +93,7 @@ import { useElementVisibility, useTimeoutFn } from '@vueuse/core'
 import { NButton, NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef, watchEffect } from 'vue'
 
-import { useAppContext } from '@main-window/context'
+import { useMainWindowAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -126,7 +126,7 @@ const pts = usePlayerTabsStore()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
-const { contentWidth } = useAppContext()
+const { contentWidth } = useMainWindowAppContext()
 
 const isSmallSize = computed(() => contentWidth.value < SMALL_SIZE_THRESHOLD)
 

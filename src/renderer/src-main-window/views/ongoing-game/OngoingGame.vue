@@ -40,7 +40,7 @@ import { ref, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 
-import { useAppContext } from '@main-window/context'
+import { useMainWindowAppContext } from '@main-window/context'
 import {
   FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD,
   FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR,
@@ -50,7 +50,7 @@ import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-const { contentWidth, contentHeight } = useAppContext()
+const { contentWidth, contentHeight } = useMainWindowAppContext()
 
 const pt = useInstance(PlayerTabsRenderer)
 

@@ -7,25 +7,25 @@ export type AppContext = {
   openSettingsModal: (tabName?: string) => void
 }
 
-export const AppContextKey: InjectionKey<AppContext> = Symbol('LeagueAkariAppContext')
+export const MainWindowAppContext: InjectionKey<AppContext> = Symbol('MainWindowAppContext')
 
-export function provideAppContext(props: {
+export function provideMainWindowAppContext(props: {
   contentWidth: MaybeRefOrGetter<number>
   contentHeight: MaybeRefOrGetter<number>
   openSettingsModal: (tabName?: string) => void
 }) {
-  provide(AppContextKey, {
+  provide(MainWindowAppContext, {
     contentWidth: toRef(props.contentWidth),
     contentHeight: toRef(props.contentHeight),
     openSettingsModal: props.openSettingsModal
   })
 }
 
-export function useAppContext() {
-  const context = inject(AppContextKey)
+export function useMainWindowAppContext() {
+  const context = inject(MainWindowAppContext)
 
   if (!context) {
-    throw new Error('useAppContext must be used within a app component')
+    throw new Error('useMainWindowAppContext must be used within a main window component')
   }
 
   return context

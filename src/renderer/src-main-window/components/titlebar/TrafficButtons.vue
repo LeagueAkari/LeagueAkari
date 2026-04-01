@@ -23,44 +23,6 @@
     <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
       <NIcon><CloseOutlinedIcon /></NIcon>
     </div>
-
-    <!-- quit 的时候的确认弹窗 -->
-    <NModal
-      style="width: 300px"
-      transform-origin="center"
-      preset="card"
-      v-model:show="isCloseConfirmationModelShow"
-      :z-index="10000000"
-    >
-      <template #header>
-        <span class="close-confirmation-header">{{ t('TrafficButtons.modal.title') }}</span>
-      </template>
-      <NRadioGroup v-model:value="closeStrategy" size="small">
-        <div class="flex flex-col">
-          <NRadio value="minimize-to-tray">{{
-            t('TrafficButtons.modal.options.minimize-to-tray')
-          }}</NRadio>
-          <NRadio value="quit">{{ t('TrafficButtons.modal.options.quit') }}</NRadio>
-        </div>
-      </NRadioGroup>
-      <div class="mt-3 flex items-center justify-between">
-        <NCheckbox v-model:checked="isRememberCloseStrategy" class="mr-auto" size="small">
-          {{ t('TrafficButtons.modal.remember') }}
-        </NCheckbox>
-        <div class="flex gap-1">
-          <NButton
-            style="font-size: 13px"
-            size="small"
-            @click="isCloseConfirmationModelShow = false"
-          >
-            {{ t('TrafficButtons.modal.cancel') }}
-          </NButton>
-          <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">
-            {{ t('TrafficButtons.modal.ok') }}
-          </NButton>
-        </div>
-      </div>
-    </NModal>
   </div>
 </template>
 
@@ -68,14 +30,12 @@
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
-import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Maximize24Filled as Maximize24FilledIcon } from '@vicons/fluent'
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCheckbox, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { ref, watch } from 'vue'
+import { NIcon } from 'naive-ui'
 
 const { t } = useTranslation()
 
@@ -95,38 +55,9 @@ const handleMaximize = async () => {
   }
 }
 
-const isCloseConfirmationModelShow = ref(false)
-const closeStrategy = ref<MainWindowCloseAction>('minimize-to-tray')
-const isRememberCloseStrategy = ref<boolean>(false)
-
 const handleClose = async () => {
   await wm.mainWindow.close()
 }
-
-wm.mainWindow.onAskClose(() => {
-  isCloseConfirmationModelShow.value = true
-})
-
-const handleReallyClose = async () => {
-  if (isRememberCloseStrategy.value) {
-    await wm.mainWindow.setCloseAction(closeStrategy.value)
-    await wm.mainWindow.close()
-  } else {
-    await wm.mainWindow.close(closeStrategy.value)
-  }
-
-  isCloseConfirmationModelShow.value = false
-}
-
-watch(
-  () => isCloseConfirmationModelShow.value,
-  (show) => {
-    if (show) {
-      closeStrategy.value = 'minimize-to-tray'
-      isRememberCloseStrategy.value = false
-    }
-  }
-)
 </script>
 
 <style scoped>

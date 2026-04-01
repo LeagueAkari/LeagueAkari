@@ -7,6 +7,8 @@
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
+    <MainWindowCloseConfirmModal />
+
     <SetupInAppScope />
 
     <div class="app-frame__left">
@@ -60,10 +62,11 @@ import { onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
+import MainWindowCloseConfirmModal from './components/MainWindowCloseConfirmModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
 import { useMicaAvailability } from './composables/useMicaAvailability'
-import { provideAppContext } from './context'
+import { provideMainWindowAppContext } from './context'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
@@ -77,7 +80,7 @@ greeting(as.version)
 const contentEl = useTemplateRef('contentEl')
 const { width, height } = useElementSize(contentEl)
 
-provideAppContext({
+provideMainWindowAppContext({
   contentWidth: width,
   contentHeight: height,
   openSettingsModal: (tabName?: string) => {

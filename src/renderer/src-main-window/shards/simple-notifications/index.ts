@@ -38,7 +38,7 @@ import { computed, defineComponent, h, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 import FeatureGuide from '@main-window/components/FeatureGuide.vue'
-import { useAppContext } from '@main-window/context'
+import { useMainWindowAppContext } from '@main-window/context'
 import moreTags from '@main-window/shards/simple-notifications/imgs/more-tags.png'
 import queryInLobby from '@main-window/shards/simple-notifications/imgs/query-in-lobby.png'
 
@@ -78,7 +78,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     const notification = useNotification()
     const installation = useClientInstallationStore()
     const app = useAppCommonStore()
-    const { openSettingsModal } = useAppContext()
+    const { openSettingsModal } = useMainWindowAppContext()
     const lcs = useLeagueClientStore()
     const { t } = useTranslation(undefined, {
       keyPrefix: 'simple-notifications-renderer.liveStreamingHints'
@@ -686,7 +686,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     const sgps = useSgpStore()
     const dialog = useDialog()
     const as = useAppCommonStore()
-    const { openSettingsModal } = useAppContext()
+    const { openSettingsModal } = useMainWindowAppContext()
 
     const { t } = useTranslation(undefined, {
       keyPrefix: 'simple-notifications-renderer.badSgpConnection'

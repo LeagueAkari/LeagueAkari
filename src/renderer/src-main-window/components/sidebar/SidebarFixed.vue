@@ -134,7 +134,7 @@ import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NProgress, NTooltip, useNotification } from 'naive-ui'
 import { computed, useTemplateRef, watch } from 'vue'
 
-import { useAppContext } from '@main-window/context'
+import { useMainWindowAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import ClientConnection from './ClientConnection.vue'
@@ -178,7 +178,7 @@ const handleSummonerClick = (summoner: SummonerInfo) => {
   navigateToTabByPuuid(summoner.puuid)
 }
 
-const { openSettingsModal } = useAppContext()
+const { openSettingsModal } = useMainWindowAppContext()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
