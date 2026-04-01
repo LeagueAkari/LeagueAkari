@@ -78,7 +78,9 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         backgroundColor: '#00000000',
         webPreferences: {
           backgroundThrottling: false
-        }
+        },
+        titleBarStyle: 'hidden',
+        trafficLightPosition: { x: 10, y: 8 }
       }
     })
 

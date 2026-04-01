@@ -7,14 +7,7 @@
       'is-hovered': isSidebarHoveredDebounced
     }"
   >
-    <div
-      class="app-sidebar__head"
-      :class="
-        as.isMacOS
-          ? 'h-[calc(48px+var(--la-mac-sidebar-safe-top))] pt-[calc(4px+var(--la-mac-sidebar-safe-top))]'
-          : 'h-12 pt-1'
-      "
-    >
+    <div class="app-sidebar__head" :class="as.isMacOS ? 'mt-4 h-12' : 'h-12'">
       <div class="app-sidebar__logo" @click="toggleCollapse">
         <NIcon class="app-sidebar__logo-icon">
           <AkariLogo />

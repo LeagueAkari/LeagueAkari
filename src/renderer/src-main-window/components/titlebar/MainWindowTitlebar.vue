@@ -14,8 +14,11 @@
         </KeepAlive>
       </Transition>
     </div>
+
     <div class="divider" :class="{ invisible: !shouldShowDivider }" />
     <CommonButtons />
+
+    <div class="w-1" v-if="as.isMacOS"></div>
 
     <!-- no duplicate traffic buttons on macOS xD -->
     <template v-if="!as.isMacOS">

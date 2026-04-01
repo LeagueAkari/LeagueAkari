@@ -86,6 +86,14 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }
 
+  onApplicationMenuAboutClick(fn: () => void) {
+    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'show-about-akari', fn)
+  }
+
+  onApplicationMenuSettingsClick(fn: () => void) {
+    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'show-settings', fn)
+  }
+
   async onInit() {
     const store = useAppCommonStore()
     store.version = await this.getVersion()

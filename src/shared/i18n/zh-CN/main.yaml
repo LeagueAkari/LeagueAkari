@@ -1,4 +1,6 @@
 tray:
+  about: 关于
+  settings: 设置
   quit: 退出
   auxWindow: 小窗口
   opggWindow: OP.GG 窗口

@@ -43,7 +43,9 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
         show: false,
         frame: false,
         fullscreenable: false,
-        maximizable: false
+        maximizable: false,
+        titleBarStyle: 'hidden',
+        trafficLightPosition: { x: 10, y: 8 }
       }
     })
   }

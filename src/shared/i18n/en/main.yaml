@@ -1,4 +1,6 @@
 tray:
+  about: About
+  settings: Settings
   quit: Quit
   auxWindow: Aux Window
   opggWindow: OP.GG Window

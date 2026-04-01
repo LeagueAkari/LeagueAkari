@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
@@ -71,6 +72,7 @@ import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
 
+const app = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
 
 const { t } = useTranslation()
@@ -108,6 +110,16 @@ watchEffect(() => {
 
 onBeforeUnmount(() => {
   toggleMicaClass(false)
+})
+
+app.onApplicationMenuAboutClick(() => {
+  isShowingSettingModal.value = true
+  settingModelTab.value = 'about'
+})
+
+app.onApplicationMenuSettingsClick(() => {
+  isShowingSettingModal.value = true
+  settingModelTab.value = 'basic'
 })
 </script>
 

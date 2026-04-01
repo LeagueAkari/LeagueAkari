@@ -1,11 +1,12 @@
 import icon from '@resources/LA_ICON.ico?asset'
-import iconPng from '../../../../pictures/logo.png?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { Menu, MenuItem, Tray, nativeImage } from 'electron'
+import { Menu, MenuItem, Tray, app, nativeImage } from 'electron'
 import i18next from 'i18next'
 import { comparer } from 'mobx'
 
+import iconPng from '../../../../pictures/logo.png?asset'
 import { AppCommonMain } from '../app-common'
+import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
 import { WindowManagerMain } from '../window-manager'
 
@@ -31,10 +32,11 @@ export class TrayMain implements IAkariShardInitDispose {
   constructor(
     private readonly _wm: WindowManagerMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _app: AppCommonMain
+    private readonly _app: AppCommonMain,
+    private readonly _ipc: AkariIpcMain
   ) {}
 
-  private _buildTray() {
+  private _buildMenus() {
     let trayIcon: string | Electron.NativeImage = process.platform === 'win32' ? icon : iconPng
     if (process.platform === 'darwin') {
       trayIcon = nativeImage.createFromPath(iconPng).resize({ width: 16, height: 16 })
@@ -140,13 +142,53 @@ export class TrayMain implements IAkariShardInitDispose {
       this._quitTrayItem
     ])
 
-    this._tray.setToolTip('League Akari')
-    this._tray.setContextMenu(this._contextMenu)
-    this._tray.addListener('click', () => this._wm.mainWindow.toggleMinimizedAndFocused())
+    // 全局标题栏
+    if (process.platform !== 'darwin') {
+      this._tray.setToolTip('League Akari')
+    }
+
+    this._tray.addListener('click', () => this._wm.mainWindow.showOrRestore())
+    this._tray.addListener('right-click', () => {
+      this._tray?.popUpContextMenu(this._contextMenu)
+    })
+
+    if (process.platform === 'darwin') {
+      const template = [
+        new MenuItem({
+          label: app.name,
+          submenu: [
+            {
+              label: i18next.t('tray.about'),
+              accelerator: 'Cmd+i',
+              click: () => {
+                // 这里的名称空间借用了 app-common-main
+                this._ipc.sendEvent(AppCommonMain.id, 'show-about-akari')
+                this._wm.mainWindow.showOrRestore()
+              }
+            },
+            { type: 'separator' },
+            {
+              label: i18next.t('tray.settings'),
+              accelerator: 'Cmd+,',
+              click: () => {
+                this._ipc.sendEvent(AppCommonMain.id, 'show-settings')
+                this._wm.mainWindow.showOrRestore()
+              }
+            },
+            { type: 'separator' },
+            { role: 'quit' }
+          ]
+        }),
+        new MenuItem({ role: 'editMenu' }),
+        new MenuItem({ role: 'windowMenu' })
+      ]
+
+      Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+    }
   }
 
   async onInit() {
-    this._buildTray()
+    this._buildMenus()
 
     this._mobx.reaction(
       () => [this._wm.auxWindow.settings.enabled, this._wm.auxWindow.state.ready],
@@ -207,12 +249,13 @@ export class TrayMain implements IAkariShardInitDispose {
           this._tray.destroy()
         }
 
-        this._buildTray()
+        this._buildMenus()
       }
     )
   }
 
   async onDispose() {
     this._tray?.destroy()
+    Menu.setApplicationMenu(null)
   }
 }

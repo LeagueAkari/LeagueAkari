@@ -34,6 +34,7 @@
         <NIcon><PinFilledIcon /></NIcon>
       </div>
       <div
+        v-if="!as.isMacOS"
         :title="t('OpggWindowTitlebar.minimize')"
         class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
         style="-webkit-app-region: no-drag"
@@ -42,6 +43,7 @@
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
       <div
+        v-if="!as.isMacOS"
         :title="t('OpggWindowTitlebar.close')"
         class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-red-600 hover:text-white active:brightness-80 dark:hover:bg-red-500"
         style="-webkit-app-region: no-drag"
