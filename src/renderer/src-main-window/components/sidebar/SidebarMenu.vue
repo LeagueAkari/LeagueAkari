@@ -110,7 +110,7 @@ watch(
   .indicator-rail {
     position: absolute;
     top: 0;
-    left: 4px;
+    left: var(--la-sidebar-icon-horizontal-padding);
     width: 4px;
     height: 100%;
     pointer-events: none;
@@ -158,7 +158,7 @@ watch(
 .menu-item {
   width: 100%;
   position: relative;
-  padding: 0 4px;
+  padding: 0 var(--la-sidebar-icon-horizontal-padding);
   box-sizing: border-box;
   cursor: pointer;
 
@@ -170,7 +170,6 @@ watch(
     align-items: center;
     border-radius: 8px;
     transition: background-color 0.2s;
-    padding: 0 4px;
     box-sizing: border-box;
   }
 
@@ -178,8 +177,8 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 36px;
-    width: 36px;
+    height: var(--la-sidebar-icon-height);
+    width: calc(var(--la-sidebar-width-collapsed) - var(--la-sidebar-icon-horizontal-padding) * 2);
     font-size: 16px;
     transition:
       color 0.2s,

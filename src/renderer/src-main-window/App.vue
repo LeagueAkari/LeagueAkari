@@ -137,7 +137,7 @@ app.onApplicationMenuSettingsClick(() => {
 
   .app-frame__left {
     background-color: rgba(189, 189, 189, 0.2);
-    z-index: 5;
+    z-index: 10;
 
     [data-theme='dark'] & {
       background-color: rgba(0, 0, 0, 0.2);

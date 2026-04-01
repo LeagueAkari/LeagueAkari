@@ -1,22 +1,22 @@
 <template>
   <div
     class="app-sidebar"
-    ref="sidebarEl"
     :class="{
-      collapsed: mui.frontendSettings.sidebarCollapsed,
-      'is-hovered': isSidebarHoveredDebounced
+      collapsed: mui.frontendSettings.sidebarCollapsed
+    }"
+    :style="{
+      '--la-sidebar-width-collapsed': as.isMacOS ? '68px' : '52px',
+      '--la-sidebar-width-expanded': as.isMacOS ? '192px' : '176px',
+      '--la-sidebar-icon-height': as.isMacOS ? '40px' : '36px',
+      '--la-sidebar-icon-horizontal-padding': as.isMacOS ? '8px' : '4px'
     }"
   >
-    <div class="app-sidebar__head" :class="as.isMacOS ? 'mt-4 h-12' : 'h-12'">
-      <div class="app-sidebar__logo" @click="toggleCollapse">
+    <!-- macOS 的 logo 区留给交通等 -->
+    <div class="app-sidebar__head-safe-area" v-if="as.isMacOS"></div>
+    <div class="app-sidebar__head" v-else>
+      <div class="app-sidebar__logo">
         <NIcon class="app-sidebar__logo-icon">
           <AkariLogo />
-        </NIcon>
-        <NIcon class="app-sidebar__logo-toggle">
-          <Transition name="fade">
-            <SidebarCollapseRight v-if="mui.frontendSettings.sidebarCollapsed" />
-            <SidebarCollapseLeft v-else />
-          </Transition>
         </NIcon>
       </div>
       <div class="app-sidebar__logo-text">
@@ -26,6 +26,7 @@
       <!-- drag zone -->
       <div class="absolute top-0 right-0 left-0 h-4 [-webkit-app-region:drag]"></div>
     </div>
+
     <SidebarMenu
       class="app-sidebar__menu"
       :items="menu"
@@ -33,18 +34,23 @@
       @update:current="(key) => handleMenuChange(key)"
       :is-collapsed="mui.frontendSettings.sidebarCollapsed"
     />
+
     <div class="app-sidebar__padding"></div>
+
     <SidebarFixed
       class="app-sidebar__fixed"
       :is-collapsed="mui.frontendSettings.sidebarCollapsed"
     />
+
+    <!-- 一个展开和缩小的按钮 -->
+    <div class="app-sidebar__expand-line" ref="expandLineEl" @mousedown="toggleCollapse">
+      <div class="app-sidebar__expand-line-inner"></div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
-import SidebarCollapseLeft from '@renderer-shared/assets/icon/SidebarCollapseLeft.vue'
-import SidebarCollapseRight from '@renderer-shared/assets/icon/SidebarCollapseRight.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -55,10 +61,9 @@ import {
   Games24Filled as Games24FilledIcon
 } from '@vicons/fluent'
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
-import { refDebounced, useElementHover } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
@@ -158,33 +163,35 @@ watch(
     }
   }
 )
-
-const isSidebarHovered = useElementHover(useTemplateRef('sidebarEl'))
-const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
 </script>
 
 <style scoped>
 .app-sidebar {
-  --la-sidebar-width-collapsed: 52px;
-  --la-sidebar-width-expanded: 176px;
+  --la-sidebar-macos-safe-top: 36px;
 
   display: flex;
   flex-direction: column;
   height: 100%;
   width: var(--la-sidebar-width-expanded);
   transition: width 0.3s cubic-bezier(0, 0.9, 0.1, 1);
+  position: relative;
 
   &.collapsed {
     width: var(--la-sidebar-width-collapsed);
+  }
+
+  .app-sidebar__head-safe-area {
+    height: var(--la-sidebar-macos-safe-top);
   }
 
   .app-sidebar__head {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 4px 8px;
+    padding: 4px var(--la-sidebar-icon-horizontal-padding);
     gap: 4px;
     overflow: hidden;
+    height: 48px;
   }
 
   .app-sidebar__logo {
@@ -192,21 +199,10 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: calc(var(--la-sidebar-width-collapsed) - var(--la-sidebar-icon-horizontal-padding) * 2);
+    height: var(--la-sidebar-icon-height);
     font-size: 20px;
     flex-shrink: 0;
-    cursor: pointer;
-  }
-
-  &.is-hovered {
-    .app-sidebar__logo-icon {
-      opacity: 0;
-    }
-
-    .app-sidebar__logo-toggle {
-      opacity: 1;
-    }
   }
 
   .app-sidebar__logo-icon {
@@ -256,7 +252,28 @@ const isSidebarHoveredDebounced = refDebounced(isSidebarHovered, 100)
   }
 
   .app-sidebar__fixed {
-    margin-bottom: 4px;
+    margin-bottom: var(--la-sidebar-icon-horizontal-padding);
+  }
+
+  .app-sidebar__expand-line {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 4px;
+    transform: translateX(50%);
+    cursor: ew-resize;
+
+    &:hover .app-sidebar__expand-line-inner {
+      background-color: #f83f6f;
+    }
+
+    .app-sidebar__expand-line-inner {
+      width: 2px;
+      height: 100%;
+      background-color: transparent;
+      transition: background-color 0.4s;
+    }
   }
 }
 </style>

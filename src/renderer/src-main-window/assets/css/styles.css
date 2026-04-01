@@ -6,8 +6,6 @@
 }
 
 :root {
-  --la-mac-sidebar-safe-top: 10px;
-  --la-mac-titlebar-safe-left: 76px;
   --la-background-color-primary: var(--la-color-bg-primary);
   --la-app-min-height: 520px;
   --la-app-min-width: 670px;
@@ -91,7 +89,7 @@ a:visited {
 }
 
 /* adjust for app title bar height */
-.n-notification-container>.n-scrollbar>.n-scrollbar-container {
+.n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--la-titlebar-height)) !important;
 }
 
