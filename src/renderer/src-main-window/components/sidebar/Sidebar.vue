@@ -167,7 +167,7 @@ watch(
 
 <style scoped>
 .app-sidebar {
-  --la-sidebar-macos-safe-top: 36px;
+  --la-sidebar-macos-safe-top: 42px;
 
   display: flex;
   flex-direction: column;

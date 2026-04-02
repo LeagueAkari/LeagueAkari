@@ -40,7 +40,11 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         frame: false,
         fullscreenable: false,
         maximizable: true,
-        titleBarStyle: 'hidden'
+        titleBarStyle: 'hidden',
+        trafficLightPosition: {
+          x: 6,
+          y: 12
+        }
       }
     })
   }
