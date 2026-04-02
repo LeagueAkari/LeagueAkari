@@ -1,10 +1,10 @@
 import icon from '@resources/LA_ICON.ico?asset'
+import macosTrayIcon from '@resources/iconTemplate.png?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Menu, MenuItem, Tray, app, nativeImage } from 'electron'
 import i18next from 'i18next'
 import { comparer } from 'mobx'
 
-import iconPng from '../../../../pictures/logo.png?asset'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -37,9 +37,13 @@ export class TrayMain implements IAkariShardInitDispose {
   ) {}
 
   private _buildMenus() {
-    let trayIcon: string | Electron.NativeImage = process.platform === 'win32' ? icon : iconPng
+    let trayIcon: string | Electron.NativeImage = icon
     if (process.platform === 'darwin') {
-      trayIcon = nativeImage.createFromPath(iconPng).resize({ width: 16, height: 16 })
+      const originalImage = nativeImage.createFromPath(macosTrayIcon)
+      const size = originalImage.getSize()
+      const aspectRatio = size.width / size.height
+      trayIcon = originalImage.resize({ width: Math.round(16 * aspectRatio), height: 16 })
+      trayIcon.setTemplateImage(true)
     }
     this._tray = new Tray(trayIcon)
 
