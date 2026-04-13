@@ -22,9 +22,6 @@
       <div class="app-sidebar__logo-text">
         {{ t('appName', { ns: 'common' }) }}{{ as.isElevated ? ' X' : '' }}
       </div>
-
-      <!-- drag zone -->
-      <div class="absolute top-0 right-0 left-0 h-4 [-webkit-app-region:drag]"></div>
     </div>
 
     <SidebarMenu
@@ -188,10 +185,10 @@ watch(
     position: relative;
     display: flex;
     align-items: center;
-    padding: 4px var(--la-sidebar-icon-horizontal-padding);
+    padding-inline: var(--la-sidebar-icon-horizontal-padding);
+    padding-block: 12px 8px;
     gap: 4px;
     overflow: hidden;
-    height: 48px;
   }
 
   .app-sidebar__logo {
@@ -203,6 +200,7 @@ watch(
     height: var(--la-sidebar-icon-height);
     font-size: 20px;
     flex-shrink: 0;
+    -webkit-app-region: drag;
   }
 
   .app-sidebar__logo-icon {

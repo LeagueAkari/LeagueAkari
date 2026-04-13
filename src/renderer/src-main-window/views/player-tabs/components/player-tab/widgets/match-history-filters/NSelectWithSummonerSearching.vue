@@ -28,7 +28,7 @@ import { SimpleSummonerResult, useMatchHistoryFilters } from '../../data/match-h
 
 const selectedPuuid = defineModel<string | null>('puuid', { required: true })
 
-const { pagedMatchHistory } = useMatchHistory()
+const { page: pagedMatchHistory } = useMatchHistory()
 const { searchSummonerByAlias } = useSummonerFetch()
 
 const { cachedSummoners, saveSummoner } = useMatchHistoryFilters()

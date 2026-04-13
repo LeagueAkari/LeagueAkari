@@ -1,7 +1,0 @@
-export const FTUE_KEY_JUNGLE_PATHING_MATCH_HISTORY_DETAILS = 'jungle-pathing-match-history-details'
-export const FTUE_KEY_JUNGLE_PATHING_ONGOING_GAME_CARD = 'jungle-pathing-ongoing-game-card'
-export const FTUE_KEY_MATCH_HISTORY_HERO_FILTER_AVATAR = 'match-history-hero-filter-avatar'
-export const FTUE_KEY_MATCH_HISTORY_HERO_FILTER_BUTTON = 'match-history-hero-filter-button'
-export const FTUE_KEY_ONGOING_GAME_HERO_FILTER_AVATAR = 'ongoing-game-hero-filter-avatar'
-export const FTUE_KEY_ONGOING_GAME_HERO_FILTER_BUTTON = 'ongoing-game-hero-filter-button'
-export const FTUE_KEY_THEME_SYSTEM_BUTTON = 'theme-system-button'

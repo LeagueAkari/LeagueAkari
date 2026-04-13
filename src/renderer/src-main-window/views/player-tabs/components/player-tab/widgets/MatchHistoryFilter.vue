@@ -71,39 +71,6 @@
           :render-label="renderChampionOption"
         />
       </div>
-
-      <div>
-        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.position') }}
-        </div>
-        <NSelect
-          clearable
-          filterable
-          multiple
-          :options="positionOptions"
-          size="tiny"
-          v-model:value="selectedPositions"
-          :render-tag="renderPositionTag"
-          :render-label="renderPositionOption"
-        />
-        <div v-if="isPositionInferred" class="mt-1 text-[11px] text-black/55 dark:text-white/45">
-          {{ t('PlayerTab.filter.positionHint') }}
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.showPractice') }}
-        </span>
-        <NSwitch size="small" v-model:value="showPractice" />
-      </div>
-
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.showIrregularGames') }}
-        </span>
-        <NSwitch size="small" v-model:value="showIrregularGames" />
-      </div>
     </div>
   </div>
 </template>
@@ -128,11 +95,7 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
-import {
-  MATCH_HISTORY_POSITIONS,
-  MatchHistorySimpleFilters,
-  useMatchHistoryFilters
-} from '../data/match-history-filters'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const lcs = useLeagueClientStore()
 const pts = usePlayerTabsStore()
@@ -141,7 +104,7 @@ const positionText = usePosition()
 
 const { isCrossRegion, preferredSource, sgpServerId } = usePlayerTab()
 const { searchSummonerByAlias } = useSummonerFetch()
-const { pagedMatchHistory } = useMatchHistory()
+const { page: pagedMatchHistory } = useMatchHistory()
 
 const winLoss = ref<'all' | 'win' | 'loss'>('all')
 const showPractice = ref(false)
@@ -186,38 +149,6 @@ const renderChampionOption = (option: SelectBaseOption) => {
         class: 'size-5 rounded',
         src: championIconUri(option.value as number)
       }),
-      h('span', { class: 'text-sm' }, option.label as string)
-    ]
-  )
-}
-
-const selectedPositions = ref<MatchHistorySimpleFilters['selectedPositions']>([])
-const positionOptions = computed(() => {
-  return MATCH_HISTORY_POSITIONS.map((position) => {
-    return {
-      label: positionText(position),
-      value: position
-    }
-  })
-})
-
-const renderPositionTag = (props: { option: SelectOption; handleClose: () => void }) => {
-  return h(NTag, { size: 'tiny' }, () =>
-    h('div', { class: 'flex items-center gap-1' }, [
-      h(PositionIcon, { position: props.option.value as string }),
-      h('span', { class: 'text-xs' }, props.option.label as string)
-    ])
-  )
-}
-
-const renderPositionOption = (option: SelectBaseOption) => {
-  return h(
-    'div',
-    {
-      class: 'flex items-center gap-2'
-    },
-    [
-      h(PositionIcon, { position: option.value as string }),
       h('span', { class: 'text-sm' }, option.label as string)
     ]
   )

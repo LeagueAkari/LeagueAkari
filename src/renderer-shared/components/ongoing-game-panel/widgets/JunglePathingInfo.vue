@@ -8,14 +8,12 @@
       >
         <span
           v-if="triggerMode === 'text'"
-          :data-ftue-target="ftueTarget || undefined"
           class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
         >
           {{ triggerText || t('JunglePathing.title') }}
         </span>
         <div
           v-else
-          :data-ftue-target="ftueTarget || undefined"
           class="mb-1 flex cursor-pointer items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 transition-[filter] hover:brightness-110 dark:border-emerald-400/20 dark:bg-emerald-400/10"
           :class="{ 'w-full': fullWidth }"
         >
@@ -620,7 +618,6 @@ const {
   showCopyAll = true,
   triggerMode = 'default',
   triggerText = '',
-  ftueTarget = '',
   customTabs = [],
   currentGameSide = null,
   fullWidth = false
@@ -629,7 +626,6 @@ const {
   showCopyAll?: boolean
   triggerMode?: 'default' | 'text'
   triggerText?: string
-  ftueTarget?: string
   customTabs?: JunglePathingCustomTab[]
   currentGameSide?: 'blue' | 'red' | null
   fullWidth?: boolean

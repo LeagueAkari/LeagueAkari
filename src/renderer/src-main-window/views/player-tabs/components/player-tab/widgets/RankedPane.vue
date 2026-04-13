@@ -15,11 +15,11 @@
       <div
         v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative flex h-27 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 border border-transparent dark:border-white/5 backdrop-blur-sm"
-        :class="isSmallSize ? 'w-30' : 'w-72'"
+        class="relative flex h-27 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5"
+        :class="isSmallSize ? 'w-30' : 'w-60'"
       >
         <!-- Queue Type Label -->
-        <div class="absolute top-0 left-0 px-2.5 py-1.5 text-[11px] font-medium text-gray-500/80 dark:text-gray-400/80">
+        <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
           {{
             t(`queueTypes.${entry.queueType}`, {
               defaultValue: entry.queueType,
@@ -29,52 +29,47 @@
         </div>
 
         <!-- Main Content -->
-        <div class="relative mt-3.5 flex w-full items-center pl-4 pr-3 gap-3">
+        <div class="relative top-1 flex w-full items-center justify-center gap-2">
           <!-- Image Container -->
-          <div v-if="!isSmallSize" class="relative h-16 w-16 shrink-0">
+          <div v-if="!isSmallSize" class="relative h-12 w-16">
             <img
-              class="absolute top-1/2 left-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 object-contain"
+              class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
               :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
-              :style="{ filter: `drop-shadow(0 0 6px ${TIER_COLORS[entry.tier || 'UNRANKED']}44)` }"
             />
           </div>
 
-          <!-- Info & Stats -->
-          <div class="flex min-w-0 flex-1 flex-col justify-center">
-            <!-- Row 1: Tier & Win/Lose -->
-            <div class="flex items-baseline justify-between gap-2">
-              <span class="truncate text-[17px] leading-tight font-bold text-gray-900 dark:text-gray-100">{{
-                formatTier(entry)
-              }}</span>
-              <span class="text-[11px] text-gray-500/90 dark:text-gray-400/90 whitespace-nowrap">{{ formatWinLose(entry) }}</span>
-            </div>
+          <!-- Info -->
+          <div class="flex min-w-16 flex-col">
+            <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
+              formatTier(entry)
+            }}</span>
+            <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
+              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
+              {{ t('RankedPane.point') }}
+            </span>
+            <span v-else class="text-xs text-gray-500 dark:text-gray-400">
+              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
+            </span>
 
-            <!-- Row 2: LP & Win Rate -->
-            <div class="flex items-baseline justify-between gap-2 mt-0.5">
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-tight opacity-90 truncate">{{ formatRankPoints(entry) }}</span>
-              <span class="text-[11px] text-gray-500/90 dark:text-gray-400/90 whitespace-nowrap">{{ t('PlayerTab.stats.wr') }} {{ formatWinRate(entry) }}</span>
-            </div>
-
-            <!-- Row 3: Highest Tier -->
+            <!-- Highest Previous Season -->
             <div
-              class="mt-1 flex items-center text-[10px] text-gray-500 dark:text-gray-400 min-w-0"
+              class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
               :class="{
-                'opacity-0': !entry.highestTier || entry.highestTier === 'NA'
+                'text-gray-400 dark:text-gray-500':
+                  !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
               }"
             >
-              <span class="mr-1 opacity-70 whitespace-nowrap">{{ t('RankedPane.highest') }}</span>
-              <div class="flex items-center min-w-0">
+              <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
+              <div class="flex items-center">
                 <img
                   v-if="
-                    entry.highestTier &&
-                    rankedMedalMap[entry.highestTier]
+                    entry.previousSeasonHighestTier &&
+                    rankedMedalMap[entry.previousSeasonHighestTier]
                   "
-                  :src="rankedMedalMap[entry.highestTier]"
-                  class="mr-0.5 h-3.5 w-3.5 shrink-0"
+                  :src="rankedMedalMap[entry.previousSeasonHighestTier]"
+                  class="mr-0.5 h-4 w-4"
                 />
-                <span class="font-bold truncate" :style="{ color: TIER_COLORS[entry.highestTier || 'UNRANKED'] }">
-                  {{ formatHighestTier(entry) }}
-                </span>
+                <span>{{ formatPreviousTier(entry) }}</span>
               </div>
             </div>
           </div>
@@ -107,10 +102,10 @@
         <div
           v-for="entry in displayedRankedEntries"
           :key="entry.queueType"
-          class="relative flex h-[108px] w-72 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 border border-transparent dark:border-white/5 backdrop-blur-sm"
+          class="relative flex h-[108px] w-60 items-center justify-center rounded bg-black/5 dark:bg-white/5"
         >
           <!-- Queue Type Label -->
-          <div class="absolute top-0 left-0 px-2.5 py-1.5 text-[11px] font-medium text-gray-500/80 dark:text-gray-400/80">
+          <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
             {{
               t(`queueTypes.${entry.queueType}`, {
                 defaultValue: entry.queueType,
@@ -120,52 +115,47 @@
           </div>
 
           <!-- Main Content -->
-          <div class="relative mt-3.5 flex w-full items-center pl-4 pr-3 gap-3">
+          <div class="relative top-1 flex w-full items-center justify-center gap-2">
             <!-- Image Container -->
-            <div class="relative h-16 w-16 shrink-0">
+            <div class="relative h-12 w-16">
               <img
-                class="absolute top-1/2 left-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 object-contain"
+                class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
                 :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
-                :style="{ filter: `drop-shadow(0 0 6px ${TIER_COLORS[entry.tier || 'UNRANKED']}44)` }"
               />
             </div>
 
-            <!-- Info & Stats -->
-            <div class="flex min-w-0 flex-1 flex-col justify-center">
-              <!-- Row 1: Tier & Win/Lose -->
-              <div class="flex items-baseline justify-between gap-2">
-                <span class="truncate text-[17px] leading-tight font-bold text-gray-900 dark:text-gray-100">{{
-                  formatTier(entry)
-                }}</span>
-                <span class="text-[11px] text-gray-500/90 dark:text-gray-400/90 whitespace-nowrap">{{ formatWinLose(entry) }}</span>
-              </div>
+            <!-- Info -->
+            <div class="flex min-w-16 flex-col">
+              <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
+                formatTier(entry)
+              }}</span>
+              <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
+                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
+                {{ t('RankedPane.point') }}
+              </span>
+              <span v-else class="text-xs text-gray-500 dark:text-gray-400">
+                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
+              </span>
 
-              <!-- Row 2: LP & Win Rate -->
-              <div class="flex items-baseline justify-between gap-2 mt-0.5">
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-tight opacity-90 truncate">{{ formatRankPoints(entry) }}</span>
-                <span class="text-[11px] text-gray-500/90 dark:text-gray-400/90 whitespace-nowrap">{{ t('PlayerTab.stats.wr') }} {{ formatWinRate(entry) }}</span>
-              </div>
-
-              <!-- Row 3: Highest Tier -->
+              <!-- Highest Previous Season -->
               <div
-                class="mt-1 flex items-center text-[10px] text-gray-500 dark:text-gray-400 min-w-0"
+                class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
                 :class="{
-                  'opacity-0': !entry.highestTier || entry.highestTier === 'NA'
+                  'text-gray-400 dark:text-gray-500':
+                    !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
                 }"
               >
-                <span class="mr-1 opacity-70 whitespace-nowrap">{{ t('RankedPane.highest') }}</span>
-                <div class="flex items-center min-w-0">
+                <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
+                <div class="flex items-center">
                   <img
                     v-if="
-                      entry.highestTier &&
-                      rankedMedalMap[entry.highestTier]
+                      entry.previousSeasonHighestTier &&
+                      rankedMedalMap[entry.previousSeasonHighestTier]
                     "
-                    :src="rankedMedalMap[entry.highestTier]"
-                    class="mr-0.5 h-3.5 w-3.5 shrink-0"
+                    :src="rankedMedalMap[entry.previousSeasonHighestTier]"
+                    class="mr-0.5 h-4 w-4"
                   />
-                  <span class="font-bold truncate" :style="{ color: TIER_COLORS[entry.highestTier || 'UNRANKED'] }">
-                    {{ formatHighestTier(entry) }}
-                  </span>
+                  <span>{{ formatPreviousTier(entry) }}</span>
                 </div>
               </div>
             </div>
@@ -173,7 +163,7 @@
         </div>
       </div>
 
-      <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" :region="lcs.auth?.region" />
+      <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" />
     </div>
   </NModal>
 </template>
@@ -201,12 +191,7 @@ import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { RankedEntry } from '@shared/types/league-client/ranked'
-import {
-  RANKED_MASKED_PLACEHOLDER,
-  isRankedWinRateUnavailableBelowMaster
-} from '@shared/utils/ranked-display'
 import { MoreHorizFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
@@ -220,7 +205,6 @@ const { isCrossRegion, isSmallSize } = usePlayerTab()
 const { t } = useTranslation()
 const isShowingRankedModal = ref(false)
 
-const lcs = useLeagueClientStore()
 const { rankedStats, isLoading } = useRankedStats()
 
 // 只显示单双排和灵活组排
@@ -265,20 +249,6 @@ const rankedMedalMap: Record<string, string> = {
   CHALLENGER: ChallengerMedal
 }
 
-const TIER_COLORS: Record<string, string> = {
-  IRON: '#8C8C8C',
-  BRONZE: '#AB5E3E',
-  SILVER: '#80989D',
-  GOLD: '#CD8837',
-  PLATINUM: '#4E9996',
-  EMERALD: '#2E8B57',
-  DIAMOND: '#576BCE',
-  MASTER: '#9D5ADE',
-  GRANDMASTER: '#D33C3C',
-  CHALLENGER: '#F4C330',
-  UNRANKED: '#999999'
-}
-
 const shouldRender = computed(() => {
   if (isCrossRegion.value) {
     return true
@@ -309,58 +279,26 @@ const formatTier = (entry: Partial<RankedEntry>) => {
   return `${tier} ${division}`
 }
 
-const formatHighestTier = (entry: Partial<RankedEntry>) => {
+const formatPreviousTier = (entry: Partial<RankedEntry>) => {
   if (!entry) return ''
 
-  const tier = entry.highestTier
-    ? t(`tiers.${entry.highestTier}`, {
-        defaultValue: entry.highestTier,
+  const tier = entry.previousSeasonHighestTier
+    ? t(`tiers.${entry.previousSeasonHighestTier}`, {
+        defaultValue: entry.previousSeasonHighestTier,
         ns: 'common'
       })
-    : entry.highestTier
+    : entry.previousSeasonHighestTier
 
   if (tier === '' || tier === 'NA') {
     return t('RankedPane.unranked', 'unranked')
   }
 
-  const division = entry.highestDivision
+  const division = entry.previousSeasonHighestDivision
 
   if (division === '' || division === 'NA') {
     return tier
   }
 
   return `${tier} ${division}`
-}
-
-const formatRankPoints = (entry: Partial<RankedEntry>) => {
-  if (entry.ratedRating) {
-    return `${entry.ratedRating} ${t('RankedPane.point')}`
-  }
-
-  return `${entry.leaguePoints ?? 0} LP`
-}
-
-const formatWinLose = (entry: Partial<RankedEntry>) => {
-  if (isRankedWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
-    return RANKED_MASKED_PLACEHOLDER
-  }
-
-  return `${entry.wins ?? 0} ${t('RankedPane.win')} ${entry.losses ?? 0} ${t('RankedPane.lose')}`
-}
-
-const formatWinRate = (entry: Partial<RankedEntry>) => {
-  if (isRankedWinRateUnavailableBelowMaster(lcs.auth?.region, entry)) {
-    return RANKED_MASKED_PLACEHOLDER
-  }
-
-  const wins = entry.wins ?? 0
-  const losses = entry.losses ?? 0
-  const totalGames = wins + losses
-
-  if (totalGames <= 0) {
-    return '0%'
-  }
-
-  return `${((wins / totalGames) * 100).toFixed()}%`
 }
 </script>

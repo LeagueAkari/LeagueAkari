@@ -164,31 +164,13 @@
         }}</span>
         <div class="ml-auto flex max-w-[110px] flex-wrap justify-end gap-0.5">
           <NPopover
-            v-for="(c, index) of frequentlyUsedChampions"
+            v-for="c of frequentlyUsedChampions"
             :key="c.id"
             :delay="50"
             :keep-alive-on-hover="false"
           >
             <template #trigger>
-              <div
-                class="relative h-5 w-5 rounded transition-[filter]"
-                :class="{
-                  'cursor-pointer hover:brightness-110': isSimpleMode,
-                  'ring-1 ring-sky-500/55 dark:ring-sky-400/50':
-                    isSimpleMode && selectedChampionIdSet.has(c.id)
-                }"
-                v-bind:[FTUE_TARGET_ATTR]="
-                  isSimpleMode && index === 0 ? FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR : undefined
-                "
-                :title="
-                  isSimpleMode
-                    ? t('PlayerTab.filter.sameChampionApplied', {
-                        champion: lcs.gameData.champions[c.id]?.name || `#${c.id}`
-                      })
-                    : undefined
-                "
-                @click.stop="applyChampionFilter(c.id)"
-              >
+              <div class="relative h-5 w-5 rounded transition-[filter]">
                 <LcuImage class="h-full w-full" :src="championIconUri(c.id)" />
                 <div
                   class="absolute -right-0.5 -bottom-1 rounded-sm bg-black/60 px-0.5 text-[10px] text-gray-200"
@@ -225,32 +207,22 @@ import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
-import {
-  FTUE_TARGET_ATTR,
-  FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_AVATAR
-} from '@shared/constants/ftue'
 import { analyzeMatchHistory } from '@shared/data-adapter/analysis/players'
 import { useTranslation } from 'i18next-vue'
-import { NPopover, useMessage } from 'naive-ui'
+import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
-import { useMatchHistoryFilters } from '../data/match-history-filters'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
 const { t } = useTranslation()
-const message = useMessage()
-
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
 const { puuid } = usePlayerTab()
-const { pagedMatchHistory } = useMatchHistory()
-const { mode, filters, setFilters, setMode } = useMatchHistoryFilters()
-
-const isSimpleMode = computed(() => mode.value === 'simple')
+const { page: pagedMatchHistory } = useMatchHistory()
 
 const analysisGames = computed(() => {
   if (!pagedMatchHistory.value?.games?.length) {
@@ -266,7 +238,7 @@ const analysis = computed(() => {
   }
 
   return analyzeMatchHistory(analysisGames.value, puuid.value, {
-    includeIrregularGames: isSimpleMode.value ? filters.value.showIrregularGames : true
+    includeIrregularGames: true
   })
 })
 
@@ -318,25 +290,4 @@ const frequentlyUsedChampions = computed(() => {
       return b.wins - a.wins
     })
 })
-
-const selectedChampionIdSet = computed(() => {
-  return isSimpleMode.value ? new Set(filters.value.selectedChampions) : new Set<number>()
-})
-
-const applyChampionFilter = (championId: number) => {
-  if (!isSimpleMode.value) {
-    setMode('simple')
-  }
-
-  setFilters({
-    ...filters.value,
-    selectedChampions: [championId]
-  })
-
-  const championName = lcs.gameData.champions?.[championId]?.name || `#${championId}`
-  message.info(t('PlayerTab.filter.sameChampionApplied', { champion: championName }), {
-    duration: 2400,
-    keepAliveOnHover: true
-  })
-}
 </script>

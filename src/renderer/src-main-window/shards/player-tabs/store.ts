@@ -1,4 +1,3 @@
-import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { Summoner } from '@shared/data-adapter/summoner'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerProfile } from '@shared/types/league-client/summoner'
@@ -7,17 +6,10 @@ import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
 
-export interface TabState {
-  id: string
-
-  /** 页面的 puuid */
-  puuid: string
-
-  /** 该玩家数据来源自哪个服务器 */
-  sgpServerId: string
-
-  // --- 以下数据通过 tab component -> store 同步
-
+/**
+ * 这些状态由 tab 自身去主动同步它
+ */
+export interface TabSelfSyncedState {
   /** 是否位于加载状态，这个状态由 tab 本身控制 */
   isLoading: boolean
 
@@ -31,6 +23,27 @@ export interface TabState {
   spectatorData: SpectatorData | null
 
   refresh: (() => void) | null
+}
+
+/**
+ * 在创建 tab 时，可以额外传递某些参数，以指导第一次的行为
+ */
+export interface TabInitParams {
+  /** 预设的收集模式下的英雄筛选 */
+  collectByChampionId?: number
+
+  /** 预设的收集模式下的位置筛选 */
+  collectByPosition?: string
+}
+
+export interface TabState extends TabSelfSyncedState, TabInitParams {
+  id: string
+
+  /** 页面的 puuid */
+  puuid: string
+
+  /** 该玩家数据来源自哪个服务器 */
+  sgpServerId: string
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
@@ -85,8 +98,6 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
 
   const tabs = ref<TabState[]>([])
   const currentTabId = ref<string | null>(null)
-  const pendingChampionFilterByTab = ref<Record<string, number>>({})
-  const pendingPositionFilterByTab = ref<Record<string, MatchParticipantPosition>>({})
 
   const currentTab = computed(() => {
     return tabs.value.find((t) => t.id === currentTabId.value) || null
@@ -188,7 +199,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
   }
 
   /** 避免太多的加载, 在所有的页面中可以共享 */
-  const detailedGameLruMap = new QuickLRU<string, LcuOrSgpGameSummary>({ maxSize: 128 })
+  const gameSummaryLruMap = new QuickLRU<string, LcuOrSgpGameSummary>({ maxSize: 128 })
 
   const updateTabData = (
     id: string,
@@ -200,60 +211,10 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     }
   }
 
-  const setPendingChampionFilter = (tabId: string, championId: number) => {
-    if (!tabId || !Number.isInteger(championId) || championId <= 0) {
-      return
-    }
-
-    pendingChampionFilterByTab.value = {
-      ...pendingChampionFilterByTab.value,
-      [tabId]: championId
-    }
-  }
-
-  const consumePendingChampionFilter = (tabId: string) => {
-    const championId = pendingChampionFilterByTab.value[tabId]
-    if (championId === undefined) {
-      return null
-    }
-
-    const next = { ...pendingChampionFilterByTab.value }
-    delete next[tabId]
-    pendingChampionFilterByTab.value = next
-
-    return championId
-  }
-
-  const setPendingPositionFilter = (tabId: string, position: MatchParticipantPosition) => {
-    if (!tabId || !position) {
-      return
-    }
-
-    pendingPositionFilterByTab.value = {
-      ...pendingPositionFilterByTab.value,
-      [tabId]: position
-    }
-  }
-
-  const consumePendingPositionFilter = (tabId: string) => {
-    const position = pendingPositionFilterByTab.value[tabId]
-    if (position === undefined) {
-      return null
-    }
-
-    const next = { ...pendingPositionFilterByTab.value }
-    delete next[tabId]
-    pendingPositionFilterByTab.value = next
-
-    return position
-  }
-
   return {
     frontendSettings,
 
-    detailedGameLruMap,
-    pendingChampionFilterByTab,
-    pendingPositionFilterByTab,
+    gameSummaryLruMap: gameSummaryLruMap,
 
     tabs,
     currentTabId,
@@ -270,10 +231,6 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     canCloseOtherTabs,
     canCloseTabsToTheRight,
     moveTabBefore,
-    setPendingChampionFilter,
-    consumePendingChampionFilter,
-    setPendingPositionFilter,
-    consumePendingPositionFilter,
 
     updateTabData
   }

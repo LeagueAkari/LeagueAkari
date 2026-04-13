@@ -1,5 +1,4 @@
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { InjectionKey, MaybeRefOrGetter, Ref, computed, inject, provide, toRef } from 'vue'
@@ -24,8 +23,6 @@ export type OngoingGamePanelContext = {
   kdaOutliers: Readonly<Ref<Record<string, 'over' | 'below'>>>
 
   navigateToSummonerByPuuid: (puuid: string) => void
-  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => void
-  navigateToSummonerByPuuidWithPosition: (puuid: string, position: MatchParticipantPosition) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }
 
@@ -55,8 +52,6 @@ export function provideOngoingGamePanel(props: {
   }>
 
   navigateToSummonerByPuuid: (puuid: string) => void
-  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => void
-  navigateToSummonerByPuuidWithPosition: (puuid: string, position: MatchParticipantPosition) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
 }) {
   const ogs = useOngoingGameStore()
@@ -97,8 +92,6 @@ export function provideOngoingGamePanel(props: {
     kdaOutliers,
 
     navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,
-    navigateToSummonerByPuuidWithChampion: props.navigateToSummonerByPuuidWithChampion,
-    navigateToSummonerByPuuidWithPosition: props.navigateToSummonerByPuuidWithPosition,
     previewGame: props.previewGame
   })
 }

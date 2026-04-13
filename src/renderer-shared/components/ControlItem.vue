@@ -96,7 +96,7 @@ defineOptions({
 
   .control-item-label {
     @apply text-sm font-bold transition-colors duration-300;
-    @apply text-black dark:text-white;
+    @apply text-black dark:text-gray-100;
   }
 
   .control-item-label-desc {

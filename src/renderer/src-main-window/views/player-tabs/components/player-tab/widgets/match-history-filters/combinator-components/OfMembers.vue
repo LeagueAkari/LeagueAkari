@@ -1,27 +1,25 @@
 <template>
   <div
-    class="space-y-3 rounded-lg border border-solid border-black/10 bg-black/2 px-4 py-3 dark:border-white/10 dark:bg-white/2"
+    class="space-y-2 rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
   >
-    <div class="flex flex-wrap items-start justify-between gap-3">
-      <div class="min-w-0 flex-1 space-y-1">
-        <div class="flex items-center gap-1.5 text-sm font-bold">
-          <NIcon size="16">
-            <People20Regular v-if="node.type === 'all'" />
-            <PeopleTeam20Regular v-else-if="node.type === 'allies'" />
-            <PeopleSwap20Regular v-else />
-          </NIcon>
-          {{ title }}
-        </div>
-
-        <div class="text-xs text-black/55 dark:text-white/50">
-          {{ t('PlayerTab.filter.addNestedRuleHint') }}
-        </div>
+    <div class="flex items-center gap-2">
+      <div v-if="node.type === 'all'" class="flex items-center gap-1.5 text-sm font-bold">
+        <NIcon size="16"><People20Regular /></NIcon>
+        {{ t('PlayerTab.filter.forAllMembers') }}
+      </div>
+      <div v-else-if="node.type === 'allies'" class="flex items-center gap-1.5 text-sm font-bold">
+        <NIcon size="16"><PeopleTeam20Regular /></NIcon>
+        {{ t('PlayerTab.filter.forAllies') }}
+      </div>
+      <div v-else-if="node.type === 'enemies'" class="flex items-center gap-1.5 text-sm font-bold">
+        <NIcon size="16"><PeopleSwap20Regular /></NIcon>
+        {{ t('PlayerTab.filter.forEnemies') }}
       </div>
 
-      <div class="flex flex-wrap gap-1">
+      <div class="flex gap-1">
         <NDropdown
           trigger="click"
-          :options="ruleOptions"
+          :options="combinators"
           size="small"
           @select="handleAddNode"
           :disabled="childNode !== null"
@@ -30,57 +28,42 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.addRule') }}
+            {{ t('PlayerTab.filter.selectCondition') }}
           </NButton>
         </NDropdown>
 
-        <NDropdown
-          trigger="click"
-          :options="groupOptions"
-          size="small"
-          @select="handleAddNode"
-          :disabled="childNode !== null"
-        >
-          <NButton tertiary size="tiny" :disabled="childNode !== null">
-            <template #icon>
-              <NIcon size="14"><Add20Regular /></NIcon>
-            </template>
-            {{ t('PlayerTab.filter.addGroup') }}
-          </NButton>
-        </NDropdown>
-
-        <NodeActionButtons :node-id="nodeId" />
+        <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
+          <template #icon>
+            <NIcon size="14"><Delete20Regular /></NIcon>
+          </template>
+          {{ t('PlayerTab.filter.delete') }}
+        </NButton>
       </div>
     </div>
 
-    <div
-      v-if="node.type === 'allies' || node.type === 'enemies'"
-      class="grid gap-2 rounded-lg border border-solid border-black/8 bg-black/2 px-3 py-2 md:grid-cols-[88px_minmax(0,1fr)] md:items-center dark:border-white/10 dark:bg-white/2"
-    >
-      <div class="text-xs font-medium text-black/65 dark:text-white/55">
-        {{ t('PlayerTab.filter.referencePlayer') }}
+    <div class="flex items-center gap-2" v-if="node.type === 'allies' || node.type === 'enemies'">
+      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.relativeTo') }}
       </div>
 
-      <div class="flex min-w-0 flex-wrap items-center gap-2">
-        <NSelectWithSummonerSearching
-          size="small"
-          :puuid="node.args[0].value"
-          @update:puuid="handleUpdatePuuid"
-          class="min-w-[240px] flex-1"
-        />
+      <NSelectWithSummonerSearching
+        size="small"
+        :puuid="node.args[0].value"
+        @update:puuid="handleUpdatePuuid"
+        class="w-60!"
+      />
 
-        <div class="text-xs text-black/50 italic dark:text-white/50">
-          {{ t('PlayerTab.filter.searchHint') }}
-        </div>
+      <div class="text-xs text-black/50 italic dark:text-white/50">
+        {{ t('PlayerTab.filter.searchHint') }}
       </div>
     </div>
 
     <CombinatorComp v-if="childNode" :node="childNode" />
     <div
       v-else
-      class="flex h-20 items-center justify-center rounded-lg border border-dashed border-black/10 bg-black/3 text-xs text-black/50 dark:border-white/10 dark:bg-white/3 dark:text-white/50"
+      class="bg flex h-16 items-center justify-center rounded bg-black/5 text-xs text-black/50 dark:bg-white/5 dark:text-white/50"
     >
-      {{ t('PlayerTab.filter.addNestedRuleHint') }}
+      {{ t('PlayerTab.filter.needSelectCondition') }}
     </div>
   </div>
 </template>
@@ -88,6 +71,7 @@
 <script setup lang="ts">
 import {
   Add20Regular,
+  Delete20Regular,
   People20Regular,
   PeopleSwap20Regular,
   PeopleTeam20Regular
@@ -99,10 +83,9 @@ import { computed } from 'vue'
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
 import CombinatorComp from '../CombinatorComp.vue'
 import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
-import NodeActionButtons from '../NodeActionButtons.vue'
 import { AllCombinator, AlliesCombinator, EnemiesCombinator, paramArg } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
-import { COMBINATOR_FACTORY_MAP, getBuilderConditionOptions, getBuilderGroupOptions } from '../maps'
+import { ALLOWED_COMBINATORS_MAP, COMBINATOR_FACTORY_MAP } from '../maps'
 
 const { t } = useTranslation()
 
@@ -110,7 +93,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, addNode, updateNode } = useMatchHistoryFilters()
+const { nodeMap, addNode, updateNode, deleteNode } = useMatchHistoryFilters()
 
 const node = computed(
   () => nodeMap.value[nodeId] as AllCombinator | AlliesCombinator | EnemiesCombinator
@@ -136,28 +119,13 @@ const childNode = computed(() => {
   return nodeMap.value[childRef.value]
 })
 
-const title = computed(() => {
-  if (node.value.type === 'all') {
-    return t('PlayerTab.filter.targetAllMembers')
-  }
-
-  if (node.value.type === 'allies') {
-    return t('PlayerTab.filter.targetPlayerTeam')
-  }
-
-  return t('PlayerTab.filter.targetPlayerOpponents')
-})
-
-const ruleOptions = computed(() => {
+const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
-  return getBuilderConditionOptions(scope, t)
-})
-
-const groupOptions = computed(() => {
-  const scope = getScope(nodeId, nodeMap.value)
-
-  return getBuilderGroupOptions(scope, t)
+  return ALLOWED_COMBINATORS_MAP[scope].map((c) => ({
+    label: t(`PlayerTab.filter.combinatorLabels.${c}`),
+    key: c
+  }))
 })
 
 const handleAddNode = (key: string) => {

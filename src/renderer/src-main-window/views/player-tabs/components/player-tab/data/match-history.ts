@@ -4,12 +4,7 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import {
-  MatchParticipantPosition,
-  normalizeMatchParticipantPosition,
-  toParticipants
-} from '@shared/data-adapter/match-history/participants'
+import { Predicate } from '@shared/data-adapter/predicates/combinators'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
@@ -31,60 +26,62 @@ import {
   provide,
   ref,
   toRef,
-  toValue,
   watch
 } from 'vue'
 
-import type { MatchHistoryTimeRange } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-import { MATCH_HISTORY_POSITIONS, MatchHistoryFilterMode } from './match-history-filters'
-import { shouldHideMatchHistoryGame } from './match-history-visibility'
+/**
+ * 收集模式下的状态指标
+ */
+export interface MatchHistoryCollectState {
+  /** 战绩页游标，会变化，从 0 开始 */
+  cursor: number
 
-export type MatchHistoryQueryState = MatchHistoryQueryParams & {
-  timeRange?: MatchHistoryTimeRange
+  /** 每次加载的战绩数量 */
+  countPerLoad: number
+
+  /** 战绩页加载最大数量，用于避免无限加载。这个值一次收集周期内不会变化 */
+  maxCount: number
+
+  /** 预期收集到的战绩数量，超过则立即停止收集。这个值一次收集周期内不会变化 */
+  expectedCount: number
+
+  /**
+   * 除了 count 和 startIndex 以外的查询参数，因为收集模式需要接管这两个参数
+   */
+  queryParams: Omit<MatchHistoryQueryParams, 'startIndex' | 'count'>
+
+  /** 本次收集模式下的筛选条件 */
+  predicate: Predicate<LcuOrSgpGameSummary>
 }
 
-const TIME_RANGE_MS_MAP: Record<Exclude<MatchHistoryTimeRange, 'all'>, number> = {
-  '24h': 24 * 60 * 60 * 1000,
-  '3d': 3 * 24 * 60 * 60 * 1000,
-  '7d': 7 * 24 * 60 * 60 * 1000,
-  '30d': 30 * 24 * 60 * 60 * 1000
+/** 
+收集模式下的参数
+*/
+export interface MatchHistoryCollectParams {
+  /** 每次加载的战绩数量 */
+  countPerIteration: number
+
+  /** 当达到多少次的时候 */
+  maxIteration: number
+
+  /** 预期需要凑齐的战绩数量 */
+  expectedCount: number
+
+  /** 服务器层面的查询参数 */
+  queryParams?: Omit<MatchHistoryQueryParams, 'startIndex' | 'count'>
+
+  /** 本次收集过滤依赖的筛选条件 */
+  predicate: Predicate<LcuOrSgpGameSummary>
 }
 
-function toGameCreationTimestamp(game: LcuOrSgpGameSummary): number {
-  if (game.source === 'sgp') {
-    return game.data.json.gameCreation
-  }
-
-  return game.data.gameCreation
-}
-
-function normalizeChampionFilter(ids: number[]): number[] {
-  return [...new Set(ids.filter((id) => Number.isInteger(id) && id > 0))].sort((a, b) => a - b)
-}
-
-function isMatchHistoryPosition(
-  position: MatchParticipantPosition | null
-): position is MatchParticipantPosition {
-  return !!position && MATCH_HISTORY_POSITIONS.includes(position)
-}
-
-function normalizePositionFilter(positions: string[]): MatchParticipantPosition[] {
-  return [
-    ...new Set(
-      positions
-        .map((position) => normalizeMatchParticipantPosition(position))
-        .filter(isMatchHistoryPosition)
-    )
-  ].sort()
-}
-
-function normalizeSummonerFilter(puuids: string[]): string[] {
-  return [...new Set(puuids.filter((puuid) => !!puuid))].sort()
-}
-
-export interface PagedMatchHistory {
+/**
+ * 一页战绩
+ *
+ * 在收集模式下仍然适用，但起始 index 固定为 0
+ */
+export interface MatchHistoryPage {
   /** 战绩概览，应该是 raw */
   games: LcuOrSgpGameSummary[]
 
@@ -97,14 +94,22 @@ export interface PagedMatchHistory {
   /** 加载状态图 */
   detailsLoading: Record<number, boolean>
 
-  /** 战绩查询参数 */
-  queryParams: MatchHistoryQueryState
+  /** 服务器查询参数 */
+  queryParams: MatchHistoryQueryParams
+
+  /**
+   * 这一页战绩是否是收集模式的战绩
+   */
+  isLoadedByCollectMode: boolean
 }
 
 export type MatchHistoryContext = {
-  pagedMatchHistory: Readonly<Ref<PagedMatchHistory | null>>
+  page: Readonly<Ref<MatchHistoryPage | null>>
+  filteredGames: Readonly<Ref<LcuOrSgpGameSummary[]>>
   isLoading: Readonly<Ref<boolean>>
-  loadMatchHistory: (params?: MatchHistoryQueryState) => Promise<void>
+  collectIteration: Readonly<Ref<number>>
+  loadMatchHistory: (params?: MatchHistoryQueryParams) => Promise<void>
+  collectMatchHistory: (params: MatchHistoryCollectParams) => Promise<void>
   loadDetails: (gameId: number) => Promise<void>
   downloadReplay: (gameId: number) => Promise<void>
   launchRelay: (gameId: number) => Promise<void>
@@ -126,33 +131,13 @@ export function provideMatchHistory(props: {
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
   isCrossRegion: MaybeRefOrGetter<boolean>
-  filterMode?: MaybeRefOrGetter<MatchHistoryFilterMode>
-  advancedFilterActive?: MaybeRefOrGetter<boolean>
-  advancedPredicate?: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
-  winLoss?: MaybeRefOrGetter<'all' | 'win' | 'loss'>
-  selectedChampions?: MaybeRefOrGetter<number[]>
-  selectedPositions?: MaybeRefOrGetter<string[]>
-  selectedSummoners?: MaybeRefOrGetter<string[]>
-  showPractice?: MaybeRefOrGetter<boolean>
-  showIrregularGames?: MaybeRefOrGetter<boolean>
+  predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
   const isCrossRegion = toRef(props.isCrossRegion)
-  const filterMode = toRef(props.filterMode ?? 'simple')
-  const advancedFilterActive = computed(() => {
-    return props.advancedFilterActive ? toValue(props.advancedFilterActive) : false
-  })
-  const advancedPredicate = computed(() => {
-    return props.advancedPredicate ? toValue(props.advancedPredicate) : () => true
-  })
-  const winLoss = toRef(props.winLoss ?? 'all')
-  const selectedChampions = toRef(props.selectedChampions ?? [])
-  const selectedPositions = toRef(props.selectedPositions ?? [])
-  const selectedSummoners = toRef(props.selectedSummoners ?? [])
-  const showPractice = toRef(props.showPractice ?? false)
-  const showIrregularGames = toRef(props.showIrregularGames ?? false)
+  const predicate = toRef(props.predicate)
 
   const componentName = useComponentName()
 
@@ -165,22 +150,33 @@ export function provideMatchHistory(props: {
   const { t } = useTranslation()
 
   const isLoading = ref(false)
-  const pagedMatchHistory = ref<PagedMatchHistory | null>(null)
-  const pendingLoadParams = ref<MatchHistoryQueryState | null>(null)
+
+  /**
+   * 从 0 开始（而不是 1，至于为什么提到这一点，是因为其他页面的分页逻辑，都是从 1 开始的）
+   *
+   * 其他时候为 -1
+   */
+  const collectIteration = ref(-1)
+
+  const page = ref<MatchHistoryPage | null>(null)
+
+  /**
+   * 被 predicate 过滤后的战绩列表
+   */
+  const filteredGames = computed(() => {
+    if (!page.value) return []
+
+    if (page.value.isLoadedByCollectMode) {
+      return page.value.games
+    }
+
+    return page.value.games.filter((g) => predicate.value(g))
+  })
 
   const notification = useNotification()
 
   const lcuLoadDetailedGameQueue = new PQueue({ concurrency: 10 })
   const lcuReplayMetadataQueue = new PQueue({ concurrency: 10 })
-
-  const getDefaultQueryParams = (): MatchHistoryQueryState => {
-    const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
-    return {
-      count: pts.frontendSettings.loadCount,
-      timeRange: pts.frontendSettings.defaultMatchHistoryTimeRange,
-      tag: defaultTag.startsWith('<akari:') ? undefined : defaultTag
-    }
-  }
 
   const sgpApiAvailable = computed(() => {
     return (
@@ -226,362 +222,119 @@ export function provideMatchHistory(props: {
 
       const { data } = await lc.api.replays.getMetadata(gameId)
 
-      if (pagedMatchHistory.value) {
-        pagedMatchHistory.value.replayMetadata[gameId] = markRaw(data)
+      if (page.value) {
+        page.value.replayMetadata[gameId] = markRaw(data)
       }
     }
 
     await Promise.all(games.map((g) => lcuReplayMetadataQueue.add(() => task(g))))
   }
 
-  const loadMatchHistory = async (params: MatchHistoryQueryState = {}) => {
-    if (isLoading.value) {
-      pendingLoadParams.value = {
-        ...(pendingLoadParams.value ??
-          pagedMatchHistory.value?.queryParams ??
-          getDefaultQueryParams()),
-        ...params
-      }
-      return
+  const completeLcuGame = async (g: Game): Promise<LcuGameSummary> => {
+    const cached = pts.gameSummaryLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
+    if (cached) {
+      return cached
     }
+
+    try {
+      const { data } = await lcuLoadDetailedGameQueue.add(() =>
+        lc.api.matchHistory.getGame(g.gameId)
+      )
+      return { source: 'lcu', data: data, gameId: g.gameId }
+    } catch (error) {
+      return { source: 'lcu', data: g, gameId: g.gameId }
+    }
+  }
+
+  const loadMatchHistory = async (params: MatchHistoryQueryParams = {}) => {
+    if (isLoading.value) return
 
     lcuLoadDetailedGameQueue.clear()
     isLoading.value = true
 
-    const queryParams: MatchHistoryQueryState = {
-      ...pagedMatchHistory.value?.queryParams,
+    params = {
+      ...page.value?.queryParams,
       ...params
     }
 
-    const currentTimeRange = queryParams.timeRange ?? 'all'
-    queryParams.timeRange = currentTimeRange
-
-    const isTimeRangeMode = currentTimeRange !== 'all'
-    queryParams.startIndex = isTimeRangeMode ? 0 : (queryParams.startIndex ?? 0)
-
-    const useSimpleFilters = filterMode.value === 'simple'
-    const useAdvancedFilters = filterMode.value === 'advanced' && advancedFilterActive.value
-    const currentAdvancedPredicate = useAdvancedFilters ? advancedPredicate.value : null
-    const currentWinLoss = useSimpleFilters ? winLoss.value : 'all'
-    const currentShowPractice = useSimpleFilters ? showPractice.value : true
-    const currentShowIrregularGames = useSimpleFilters ? showIrregularGames.value : true
-    const visibleStartIndex = queryParams.startIndex
-    const visibleCount = isTimeRangeMode
-      ? Number.POSITIVE_INFINITY
-      : (queryParams.count ?? pts.frontendSettings.loadCount)
-    const shouldFilterByWinLoss = currentWinLoss !== 'all'
-    const selectedChampionSet = new Set<number>(
-      useSimpleFilters ? normalizeChampionFilter(selectedChampions.value) : []
-    )
-    const shouldFilterByChampion = selectedChampionSet.size > 0
-    const selectedPositionSet = new Set<string>(
-      useSimpleFilters ? normalizePositionFilter(selectedPositions.value) : []
-    )
-    const shouldFilterByPosition = selectedPositionSet.size > 0
-    const selectedSummonerSet = new Set<string>(
-      useSimpleFilters ? normalizeSummonerFilter(selectedSummoners.value) : []
-    )
-    const shouldFilterBySummoners = selectedSummonerSet.size > 0
-    const needsParticipantFilters =
-      shouldFilterByChampion ||
-      shouldFilterByWinLoss ||
-      shouldFilterByPosition ||
-      shouldFilterBySummoners
-    const hideByVisibilityOptions = !currentShowPractice || !currentShowIrregularGames
-    const shouldFilterByTimeRange = isTimeRangeMode
-    const timeRangeStartMs = shouldFilterByTimeRange
-      ? Date.now() - TIME_RANGE_MS_MAP[currentTimeRange]
-      : null
-    const pageFetchSize = isTimeRangeMode
-      ? Math.max(100, pts.frontendSettings.loadCount)
-      : Math.max(visibleCount, pts.frontendSettings.loadCount)
-    const maxChunkRequests =
-      isTimeRangeMode ||
-      shouldFilterByChampion ||
-      shouldFilterByWinLoss ||
-      shouldFilterByPosition ||
-      shouldFilterBySummoners ||
-      useAdvancedFilters
-        ? 500
-        : Math.max(80, Math.ceil((visibleStartIndex + visibleCount) / pageFetchSize) + 5)
-
-    const createEmptyPagedMatchHistory = () => {
-      return {
-        games: markRaw([] as LcuOrSgpGameSummary[]),
-        replayMetadata: {},
-        details: {},
-        detailsLoading: {},
-        queryParams
-      } satisfies PagedMatchHistory
-    }
-
-    const appendGamesToCurrentList = (games: LcuOrSgpGameSummary[]) => {
-      if (!pagedMatchHistory.value || games.length === 0) {
-        return
-      }
-
-      pagedMatchHistory.value.games = markRaw([...pagedMatchHistory.value.games, ...games])
-    }
-
-    const appendLcuCompletedGames = async (games: LcuOrSgpGameSummary[]) => {
-      let nextAppendIndex = 0
-      const completedGames = new Map<number, LcuOrSgpGameSummary>()
-
-      const flushReadyGames = () => {
-        const toAppend: LcuOrSgpGameSummary[] = []
-
-        while (completedGames.has(nextAppendIndex)) {
-          toAppend.push(completedGames.get(nextAppendIndex)!)
-          completedGames.delete(nextAppendIndex)
-          nextAppendIndex++
-        }
-
-        if (toAppend.length > 0) {
-          appendGamesToCurrentList(toAppend)
-        }
-      }
-
-      await Promise.all(
-        games.map(async (g, index) => {
-          if (g.source !== 'lcu') {
-            completedGames.set(index, g)
-            flushReadyGames()
-            return
-          }
-
-          const complete = await toCompleteLcuGame(g.data)
-          const completeGame = markRaw(complete) as LcuOrSgpGameSummary
-
-          pts.detailedGameLruMap.set(`lcu:${complete.gameId}`, completeGame)
-          completedGames.set(index, completeGame)
-          flushReadyGames()
-        })
-      )
-    }
-
-    const collectVisibleGames = async (
-      fetchChunk: (startIndex: number, count: number) => Promise<LcuOrSgpGameSummary[]>,
-      onChunkCollected?: (games: LcuOrSgpGameSummary[]) => void
-    ) => {
-      const games: LcuOrSgpGameSummary[] = []
-
-      let rawCursor = 0
-      let visibleSkipped = 0
-      let guard = 0
-
-      while ((isTimeRangeMode || games.length < visibleCount) && guard < maxChunkRequests) {
-        const chunk = await fetchChunk(rawCursor, pageFetchSize)
-        if (chunk.length === 0) {
-          break
-        }
-
-        let hasTimeInRangeGameInChunk = false
-        let hasTimeOutOfRangeGameInChunk = false
-        const collectedInChunk: LcuOrSgpGameSummary[] = []
-
-        for (const g of chunk) {
-          if (!g || typeof g.gameId !== 'number') {
-            continue
-          }
-
-          if (
-            shouldHideMatchHistoryGame(g, puuid.value, {
-              showPractice: currentShowPractice,
-              showIrregularGames: currentShowIrregularGames
-            })
-          ) {
-            continue
-          }
-
-          if (timeRangeStartMs !== null) {
-            const gameCreation = toGameCreationTimestamp(g)
-
-            if (gameCreation < timeRangeStartMs) {
-              hasTimeOutOfRangeGameInChunk = true
-              continue
-            }
-
-            hasTimeInRangeGameInChunk = true
-          }
-
-          let participants: ReturnType<typeof toParticipants> | null = null
-          let selfParticipant: ReturnType<typeof toParticipants>[number] | undefined = undefined
-
-          if (needsParticipantFilters) {
-            participants = toParticipants(g, toBasicInfo(g))
-            selfParticipant = participants.find((p) => p.puuid === puuid.value)
-          }
-
-          if (
-            (shouldFilterByChampion || shouldFilterByWinLoss || shouldFilterByPosition) &&
-            !selfParticipant
-          ) {
-            continue
-          }
-
-          if (shouldFilterByChampion && selfParticipant) {
-            if (!selectedChampionSet.has(selfParticipant.championId)) {
-              continue
-            }
-          }
-
-          if (shouldFilterByPosition && selfParticipant) {
-            if (!selfParticipant.position || !selectedPositionSet.has(selfParticipant.position)) {
-              continue
-            }
-          }
-
-          if (shouldFilterByWinLoss && selfParticipant && selfParticipant.winResult !== currentWinLoss) {
-            continue
-          }
-
-          if (shouldFilterBySummoners && participants) {
-            const participantPuuidSet = new Set<string>(participants.map((p) => p.puuid))
-            const containsAllSelectedSummoners = [...selectedSummonerSet].every((targetPuuid) =>
-              participantPuuidSet.has(targetPuuid)
-            )
-
-            if (!containsAllSelectedSummoners) {
-              continue
-            }
-          }
-
-          if (currentAdvancedPredicate && !currentAdvancedPredicate(g)) {
-            continue
-          }
-
-          if (!isTimeRangeMode && visibleSkipped < visibleStartIndex) {
-            visibleSkipped++
-            continue
-          }
-
-          games.push(g)
-          collectedInChunk.push(g)
-
-          if (!isTimeRangeMode && games.length >= visibleCount) {
-            break
-          }
-        }
-
-        if (collectedInChunk.length > 0) {
-          onChunkCollected?.(collectedInChunk)
-        }
-
-        rawCursor += chunk.length
-        guard++
-
-        if (
-          timeRangeStartMs !== null &&
-          !hasTimeInRangeGameInChunk &&
-          hasTimeOutOfRangeGameInChunk
-        ) {
-          break
-        }
-
-        if (chunk.length < pageFetchSize) {
-          break
-        }
-      }
-
-      return games
-    }
-
-    const toCompleteLcuGame = async (g: Game): Promise<LcuGameSummary> => {
-      const cached = pts.detailedGameLruMap.get(`lcu:${g.gameId}`) as LcuGameSummary | undefined
-      if (cached) {
-        return cached
-      }
-
-      try {
-        const { data } = await lcuLoadDetailedGameQueue.add(() =>
-          lc.api.matchHistory.getGame(g.gameId)
-        )
-        return { source: 'lcu', data: data, gameId: g.gameId }
-      } catch (error) {
-        return { source: 'lcu', data: g, gameId: g.gameId }
-      }
-    }
+    const startIndex = params.startIndex ?? 0
+    const count = params.count ?? pts.frontendSettings.loadCount
 
     try {
-      pagedMatchHistory.value = createEmptyPagedMatchHistory()
-
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+        // SGP API 需要 token 就绪
         if (!sgps.isTokenReady) {
           return
         }
 
+        // 检查 SGP 服务器支持
         if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
           return
         }
 
-        const fetchSgpChunk = async (startIndex: number, count: number) => {
-          const requestParams = { ...queryParams } as MatchHistoryQueryParams
-          delete (requestParams as MatchHistoryQueryState).timeRange
-          const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
-            puuid.value,
-            {
-              ...requestParams,
-              startIndex,
-              count,
-              __sgpServerId: sgpServerId.value
-            }
+        const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
+          puuid.value,
+          {
+            ...params,
+            __sgpServerId: sgpServerId.value
+          }
+        )
+
+        const games = data.games
+          .filter((g) => g.json) // 有时候服务器内容错误，没有这个 json 字段，原因不明
+          .map(
+            (g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary
           )
 
-          return data.games
-            .filter((g) => g.json)
-            .map(
-              (g) =>
-                markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary
-            )
-        }
-
-        const shouldCollectGames =
-          hideByVisibilityOptions ||
-          shouldFilterByTimeRange ||
-          shouldFilterByChampion ||
-          shouldFilterByPosition ||
-          shouldFilterByWinLoss ||
-          shouldFilterBySummoners ||
-          useAdvancedFilters
-        const games = shouldCollectGames
-          ? await collectVisibleGames(fetchSgpChunk, appendGamesToCurrentList)
-          : await fetchSgpChunk(visibleStartIndex, visibleCount)
-
-        if (!shouldCollectGames) {
-          appendGamesToCurrentList(games)
+        page.value = {
+          games: markRaw(games),
+          replayMetadata: {}, // must be shallow
+          details: {}, // must be shallow
+          detailsLoading: {}, // must be shallow
+          queryParams: params,
+          isLoadedByCollectMode: false
         }
       } else {
-        const fetchLcuSummaryChunk = async (startIndex: number, count: number) => {
-          const { data } = await lc.api.matchHistory.getMatchHistory(
-            puuid.value,
-            startIndex,
-            startIndex + count - 1
-          )
+        const { data } = await lc.api.matchHistory.getMatchHistory(
+          puuid.value,
+          startIndex,
+          startIndex + count - 1
+        )
 
-          return data.games.games
-            .filter((g) => !!g && typeof g.gameId === 'number')
-            .map(
-              (g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary
-            )
+        const games = data.games.games
+          .filter((g) => !!g && typeof g.gameId === 'number')
+          .map((g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary)
+
+        const completedGames = await Promise.all(
+          games.map(async (g) => {
+            if (g.source !== 'lcu') {
+              return g
+            }
+
+            const complete = await completeLcuGame(g.data)
+            pts.gameSummaryLruMap.set(`lcu:${complete.gameId}`, markRaw(complete))
+            return markRaw(complete) as LcuOrSgpGameSummary
+          })
+        )
+
+        completedGames.forEach((g) => {
+          if (g.source === 'lcu') {
+            pts.gameSummaryLruMap.set(`lcu:${g.gameId}`, markRaw(g))
+          }
+        })
+
+        page.value = {
+          games: markRaw(games),
+          replayMetadata: {}, // must be shallow
+          details: {}, // must be shallow
+          detailsLoading: {}, // must be shallow
+          queryParams: params,
+          isLoadedByCollectMode: false
         }
-
-        const shouldCollectGames =
-          hideByVisibilityOptions ||
-          shouldFilterByTimeRange ||
-          shouldFilterByChampion ||
-          shouldFilterByPosition ||
-          shouldFilterByWinLoss ||
-          shouldFilterBySummoners ||
-          useAdvancedFilters
-        const selectedGames = shouldCollectGames
-          ? await collectVisibleGames(fetchLcuSummaryChunk)
-          : await fetchLcuSummaryChunk(visibleStartIndex, visibleCount)
-
-        await appendLcuCompletedGames(selectedGames)
       }
 
-      if (!isCrossRegion.value && pagedMatchHistory.value.games.length > 0) {
-        loadReplayMetadata(pagedMatchHistory.value.games)
+      if (!isCrossRegion.value) {
+        loadReplayMetadata(page.value.games)
       }
     } catch (error: any) {
       notification.error({
@@ -592,19 +345,136 @@ export function provideMatchHistory(props: {
       log.error(componentName, error)
     } finally {
       isLoading.value = false
+    }
+  }
 
-      const nextLoadParams = pendingLoadParams.value
-      if (nextLoadParams) {
-        pendingLoadParams.value = null
-        void loadMatchHistory(nextLoadParams)
+  const collectMatchHistory = async (params: MatchHistoryCollectParams) => {
+    if (isLoading.value) return
+
+    lcuLoadDetailedGameQueue.clear()
+    isLoading.value = true
+
+    const { countPerIteration, maxIteration, expectedCount, queryParams, predicate } = params
+
+    try {
+      if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+        // SGP API 需要 token 就绪
+        if (!sgps.isTokenReady) {
+          return
+        }
+
+        // 检查 SGP 服务器支持
+        if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
+          return
+        }
+
+        collectIteration.value = 0
+        page.value = {
+          games: markRaw([]),
+          replayMetadata: {},
+          details: {},
+          detailsLoading: {},
+          queryParams: queryParams ?? {},
+          isLoadedByCollectMode: true
+        }
+
+        while (
+          page.value.games.length < expectedCount &&
+          collectIteration.value < maxIteration &&
+          isLoading.value
+        ) {
+          const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
+            puuid.value,
+            {
+              ...queryParams,
+              startIndex: collectIteration.value * countPerIteration,
+              count: countPerIteration,
+              __sgpServerId: sgpServerId.value
+            }
+          )
+
+          const gamesToAppend = data.games
+            .filter((g) => g.json) // 有时候服务器内容错误，没有这个 json 字段，原因不明
+            .map((g) =>
+              markRaw({ source: 'sgp', gameId: g.json.gameId, data: g } as LcuOrSgpGameSummary)
+            )
+            .filter((g) => predicate(g))
+
+          page.value.games = markRaw([...page.value.games, ...gamesToAppend])
+
+          if (!isCrossRegion.value) {
+            loadReplayMetadata(gamesToAppend)
+          }
+
+          collectIteration.value++
+        }
+      } else {
+        collectIteration.value = 0
+        page.value = {
+          games: markRaw([]),
+          replayMetadata: {},
+          details: {},
+          detailsLoading: {},
+          queryParams: queryParams ?? {},
+          isLoadedByCollectMode: true
+        }
+
+        while (
+          page.value.games.length < expectedCount &&
+          collectIteration.value < maxIteration &&
+          isLoading.value
+        ) {
+          const { data } = await lc.api.matchHistory.getMatchHistory(
+            puuid.value,
+            collectIteration.value * countPerIteration,
+            (collectIteration.value + 1) * countPerIteration - 1
+          )
+
+          const games = data.games.games
+            .filter((g) => !!g && typeof g.gameId === 'number')
+            .map(
+              (g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary
+            )
+            .filter((g) => predicate(g))
+
+          const completedGamesToAppend = await Promise.all(
+            games.map(async (g) => {
+              if (g.source !== 'lcu') {
+                return g
+              }
+
+              const complete = await completeLcuGame(g.data)
+              pts.gameSummaryLruMap.set(`lcu:${complete.gameId}`, markRaw(complete))
+              return markRaw(complete) as LcuOrSgpGameSummary
+            })
+          )
+
+          page.value.games = markRaw([...page.value.games, ...completedGamesToAppend])
+
+          if (!isCrossRegion.value) {
+            loadReplayMetadata(completedGamesToAppend)
+          }
+
+          collectIteration.value++
+        }
       }
+    } catch (error: any) {
+      notification.error({
+        title: () => t('PlayerTab.failedToLoadMatchHistoryTitle'),
+        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message }),
+        duration: 4000
+      })
+      log.error(componentName, error)
+    } finally {
+      isLoading.value = false
+      collectIteration.value = -1
     }
   }
 
   const loadDetails = async (gameId: number) => {
-    if (!pagedMatchHistory.value || pagedMatchHistory.value.detailsLoading[gameId]) return
+    if (!page.value || page.value.detailsLoading[gameId]) return
 
-    pagedMatchHistory.value.detailsLoading[gameId] = true
+    page.value.detailsLoading[gameId] = true
 
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
@@ -616,16 +486,16 @@ export function provideMatchHistory(props: {
           __sgpServerId: sgpServerId.value
         })
 
-        pagedMatchHistory.value.details[gameId] = markRaw({ source: 'sgp', gameId, data })
+        page.value.details[gameId] = markRaw({ source: 'sgp', gameId, data })
       } else {
         const { data } = await lc.api.matchHistory.getTimeline(gameId)
 
-        pagedMatchHistory.value.details[gameId] = markRaw({ source: 'lcu', gameId, data })
+        page.value.details[gameId] = markRaw({ source: 'lcu', gameId, data })
       }
     } catch (error) {
       log.error(componentName, error)
     } finally {
-      pagedMatchHistory.value.detailsLoading[gameId] = false
+      page.value.detailsLoading[gameId] = false
     }
   }
 
@@ -650,8 +520,8 @@ export function provideMatchHistory(props: {
   }
 
   lc.onLcuEventVue<ReplayDownloadProgress>('/lol-replays/v1/metadata/:gameId', (data) => {
-    if (data.eventType === 'Update' && pagedMatchHistory.value) {
-      pagedMatchHistory.value.replayMetadata[data.data.gameId] = markRaw(data.data)
+    if (data.eventType === 'Update' && page.value) {
+      page.value.replayMetadata[data.data.gameId] = markRaw(data.data)
     }
   })
 
@@ -665,49 +535,33 @@ export function provideMatchHistory(props: {
         return
       }
 
-      loadMatchHistory(getDefaultQueryParams())
+      loadMatchHistory({
+        startIndex: 0,
+        count: pts.frontendSettings.loadCount
+      })
     },
     { immediate: true }
   )
 
-  watch(
-    [
-      () => filterMode.value,
-      () => (filterMode.value === 'simple' ? winLoss.value : 'all'),
-      () => (filterMode.value === 'simple' ? showPractice.value : true),
-      () => (filterMode.value === 'simple' ? showIrregularGames.value : true),
-      () =>
-        filterMode.value === 'simple' ? normalizeChampionFilter(selectedChampions.value).join(',') : '',
-      () =>
-        filterMode.value === 'simple' ? normalizePositionFilter(selectedPositions.value).join(',') : '',
-      () =>
-        filterMode.value === 'simple' ? normalizeSummonerFilter(selectedSummoners.value).join(',') : '',
-      () => (filterMode.value === 'advanced' ? advancedFilterActive.value : false),
-      () =>
-        filterMode.value === 'advanced' && advancedFilterActive.value ? advancedPredicate.value : null
-    ],
-    () => {
-      const baseQueryParams = pagedMatchHistory.value?.queryParams ?? getDefaultQueryParams()
-      loadMatchHistory({
-        ...baseQueryParams,
-        startIndex: 0
-      })
-    }
-  )
-
   provide(MatchHistoryContextKey, {
-    pagedMatchHistory,
+    page,
+    filteredGames,
     isLoading,
+    collectIteration,
     loadMatchHistory,
+    collectMatchHistory,
     loadDetails,
     downloadReplay,
     launchRelay
   })
 
   return {
-    pagedMatchHistory,
+    page,
+    filteredGames,
     isLoading,
+    collectIteration,
     loadMatchHistory,
+    collectMatchHistory,
     loadDetails,
     downloadReplay,
     launchRelay

@@ -40,7 +40,7 @@ const NO_CHAMPION_ID = -1
 const { t } = useTranslation()
 const pts = usePlayerTabsStore()
 const { puuid } = usePlayerTab()
-const { pagedMatchHistory, loadDetails } = useMatchHistory()
+const { page: pagedMatchHistory, loadDetails } = useMatchHistory()
 const requestedDetailGameIds = new Set<number>()
 
 const jungleGameIds = computed(() => {

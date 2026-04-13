@@ -1,13 +1,14 @@
 import { getCurrentInstance } from 'vue'
 
-const DEFAULT_NAME = 'AnonymousComponent'
+const NO_COMPONENT_NAME = 'NotAComponent'
+const DEFAULT_COMPONENT_NAME = 'AnonymousComponent'
 
 export function useComponentName() {
   const instance = getCurrentInstance()
 
   if (!instance) {
-    return DEFAULT_NAME
+    return NO_COMPONENT_NAME
   }
 
-  return instance.type.name || instance.type.__name || DEFAULT_NAME
+  return instance.type.name || instance.type.__name || DEFAULT_COMPONENT_NAME
 }

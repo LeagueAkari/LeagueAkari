@@ -33,7 +33,7 @@ import App from './App.vue'
 const as = useAppCommonStore()
 
 const themeOverrides = computed(() => {
-  return getNaiveUiThemeOverrides(as.themeId)
+  return getNaiveUiThemeOverrides(as.themeId, true)
 })
 
 const naiveUiLocale = computed(() => {
@@ -44,7 +44,10 @@ const naiveUiTheme = computed(() => {
   return getNaiveUiTheme(as.colorTheme)
 })
 
-useColorThemeAttr(() => as.colorTheme, () => as.themeId)
+useColorThemeAttr(
+  () => as.colorTheme,
+  () => as.themeId
+)
 </script>
 
 <style></style>

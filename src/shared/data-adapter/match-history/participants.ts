@@ -46,8 +46,6 @@ export type MatchParticipantPings = {
   visionClearedPings: number
 }
 
-export type MatchParticipantPosition = 'TOP' | 'JUNGLE' | 'MIDDLE' | 'BOTTOM' | 'UTILITY'
-
 export type MatchParticipant = {
   puuid: string
   participantId: number
@@ -55,7 +53,7 @@ export type MatchParticipant = {
   tagLine: string
   profileIconId: number
   championId: number
-  position: MatchParticipantPosition | null
+  position: string | null
   teamId: number
   playerSubteamId: number
   teamIdentifier: string
@@ -108,57 +106,6 @@ export type MatchParticipant = {
   tripleKills: number
   quadraKills: number
   pentaKills: number
-}
-
-const POSITION_ALIAS_MAP: Record<string, MatchParticipantPosition> = {
-  ADC: 'BOTTOM',
-  BOT: 'BOTTOM',
-  BOTTOM: 'BOTTOM',
-  JUG: 'JUNGLE',
-  JUNGLE: 'JUNGLE',
-  MID: 'MIDDLE',
-  MIDDLE: 'MIDDLE',
-  SUPPORT: 'UTILITY',
-  TOP: 'TOP',
-  UTILITY: 'UTILITY'
-}
-
-export function normalizeMatchParticipantPosition(
-  position: string | null | undefined
-): MatchParticipantPosition | null {
-  if (!position) {
-    return null
-  }
-
-  const normalized = POSITION_ALIAS_MAP[position.toUpperCase()]
-  return normalized ?? null
-}
-
-function inferLcuParticipantPosition(participant: Participant): MatchParticipantPosition | null {
-  const lane = normalizeMatchParticipantPosition(participant.timeline?.lane)
-  const role = participant.timeline?.role?.toUpperCase() || ''
-
-  if (lane === 'BOTTOM') {
-    if (role === 'DUO_SUPPORT' || role === 'SUPPORT') {
-      return 'UTILITY'
-    }
-
-    return 'BOTTOM'
-  }
-
-  if (lane) {
-    return lane
-  }
-
-  if (role === 'DUO_SUPPORT' || role === 'SUPPORT') {
-    return 'UTILITY'
-  }
-
-  if (role === 'DUO_CARRY' || role === 'CARRY') {
-    return 'BOTTOM'
-  }
-
-  return null
 }
 
 // 以 SGP 的格式为参照，将 LCU 数据映射为抽象格式
@@ -251,7 +198,7 @@ export function toParticipants(
         tagLine: p.riotIdTagline,
         profileIconId: p.profileIcon,
         championId: p.championId,
-        position: normalizeMatchParticipantPosition(p.individualPosition),
+        position: p.teamPosition,
         teamId: p.teamId,
         playerSubteamId: p.playerSubteamId,
         teamIdentifier,
@@ -365,8 +312,7 @@ export function toParticipants(
         tagLine: identity.player.tagLine,
         profileIconId: identity.player.profileIcon,
         championId: participant.championId,
-        // LCU 仅提供 lane / role，做 best-effort 推断以支持位置筛选
-        position: inferLcuParticipantPosition(participant),
+        position: null,
         teamId: participant.teamId,
         playerSubteamId: participant.stats.playerSubteamId,
         teamIdentifier,

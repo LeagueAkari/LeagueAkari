@@ -86,7 +86,7 @@ export function provideEncounteredGames(props: {
           }
 
           // use SGP API
-          const cached = pts.detailedGameLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
+          const cached = pts.gameSummaryLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
 
           if (cached) {
             gameMap[cached.gameId] = markRaw(cached)
@@ -101,13 +101,13 @@ export function provideEncounteredGames(props: {
             data: data
           })
 
-          pts.detailedGameLruMap.set(
+          pts.gameSummaryLruMap.set(
             `sgp:${gameId}`,
             markRaw({ source: 'sgp', gameId: data.json.gameId, data })
           )
         } else {
           // use LCU API
-          const cached = pts.detailedGameLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
+          const cached = pts.gameSummaryLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
 
           if (cached) {
             gameMap[cached.gameId] = markRaw(cached)
@@ -117,7 +117,7 @@ export function provideEncounteredGames(props: {
           const { data } = await lc.api.matchHistory.getGame(gameId)
           gameMap[gameId] = markRaw({ source: 'lcu', gameId: data.gameId, data: data })
 
-          pts.detailedGameLruMap.set(
+          pts.gameSummaryLruMap.set(
             `lcu:${gameId}`,
             markRaw({ source: 'lcu', gameId: data.gameId, data: data })
           )
