@@ -7,6 +7,7 @@ export class OpggWindowSettings {
   opacity: number = 1
   pinned: boolean = true
   showShortcut: string | null = null
+  snapToGame: boolean = false
 
   setOpacity(opacity: number) {
     this.opacity = opacity
@@ -22,6 +23,10 @@ export class OpggWindowSettings {
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled
+  }
+
+  setSnapToGame(snapToGame: boolean) {
+    this.snapToGame = snapToGame
   }
 
   setShowShortcut(showShortcut: string | null) {

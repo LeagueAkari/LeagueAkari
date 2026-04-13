@@ -78,6 +78,10 @@ class AkariAuxWindow extends BaseAkariWindowRenderer<
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
   }
 
+  setSnapToGame(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'snapToGame', value)
+  }
+
   repositionToAlignLeagueClientUx() {
     return this._context.ipc.call(
       MAIN_SHARD_NAMESPACE_AUX_WINDOW,
@@ -112,6 +116,10 @@ export class AkariOpggWindow extends BaseAkariWindowRenderer<
 
   setShowShortcut(value: string | null) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showShortcut', value)
+  }
+
+  setSnapToGame(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'snapToGame', value)
   }
 
   repositionToAlignLeagueClientUx() {

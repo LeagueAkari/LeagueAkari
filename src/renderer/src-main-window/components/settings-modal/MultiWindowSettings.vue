@@ -37,6 +37,18 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        :label="t('MultiWindowSettings.auxWindow.snapToGame.label')"
+        :label-description="t('MultiWindowSettings.auxWindow.snapToGame.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="aws.settings.snapToGame"
+          @update:value="(val) => wm.auxWindow.setSnapToGame(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('MultiWindowSettings.auxWindow.opacity.label')"
         :label-description="t('MultiWindowSettings.auxWindow.opacity.description')"
         :label-width="400"
@@ -113,6 +125,18 @@
           size="small"
           :value="ows.settings.autoShow"
           @update:value="(val) => wm.opggWindow.setAutoShow(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.opggWindow.snapToGame.label')"
+        :label-description="t('MultiWindowSettings.opggWindow.snapToGame.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="ows.settings.snapToGame"
+          @update:value="(val) => wm.opggWindow.setSnapToGame(val)"
         />
       </ControlItem>
       <ControlItem

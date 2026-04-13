@@ -371,6 +371,10 @@ MultiWindowSettings:
       label: 自动弹出和关闭
       description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
 
+    snapToGame:
+      label: 跟随客户端移动
+      description: 当英雄联盟客户端窗口移动时，自动将小窗口重新贴附到客户端左侧
+
     opacity:
       label: 小窗口不透明度
       description: 小窗口的半透明状态
@@ -396,6 +400,10 @@ MultiWindowSettings:
     autoShow:
       label: 自动弹出和关闭
       description: 在游戏流程的部分阶段，自动弹出或关闭 OP.GG 窗口
+
+    snapToGame:
+      label: 跟随客户端移动
+      description: 当英雄联盟客户端窗口移动时，自动将 OP.GG 窗口重新贴附到客户端右侧
 
     opacity:
       label: OP.GG 窗口不透明度

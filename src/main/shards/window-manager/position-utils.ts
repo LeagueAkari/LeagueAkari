@@ -199,19 +199,33 @@ export function getCenteredRectangle(width: number, height: number) {
   return { x, y, width, height }
 }
 
+export function getLeagueClientUxBounds() {
+  const info = tools.getLeagueClientWindowPlacementInfo()
+  if (!info) {
+    return null
+  }
+
+  const { left, top, width, height } = info
+
+  // League Client Ux 的窗口在最小化时会变为 { x: 0, y: 0, width: 134, height: 37 }
+  if (width < 200 && height < 50) {
+    return null
+  }
+
+  return {
+    x: left,
+    y: top,
+    width,
+    height
+  }
+}
+
 export function repositionToAlignLeagueClientUx(
   win: BrowserWindow,
   placement?: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right'
 ) {
-  const info = tools.getLeagueClientWindowPlacementInfo()
-  if (info) {
-    const { left, top, width, height } = info
-
-    // League Client Ux 的窗口在最小化时会变为 { x: 0, y: 0, width: 134, height: 37 }
-    if (width < 200 && height < 50) {
-      return
-    }
-
-    repositionWindowWithSnap(win, { x: left, y: top, width, height }, placement)
+  const bounds = getLeagueClientUxBounds()
+  if (bounds) {
+    repositionWindowWithSnap(win, bounds, placement)
   }
 }

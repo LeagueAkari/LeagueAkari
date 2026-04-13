@@ -7,6 +7,7 @@ export class AuxWindowSettings {
   opacity: number = 1
   pinned: boolean = true
   showSkinSelector: boolean = false
+  snapToGame: boolean = false
 
   setOpacity(opacity: number) {
     this.opacity = opacity
@@ -18,6 +19,10 @@ export class AuxWindowSettings {
 
   setShowSkinSelector(show: boolean) {
     this.showSkinSelector = show
+  }
+
+  setSnapToGame(snapToGame: boolean) {
+    this.snapToGame = snapToGame
   }
 
   setAutoShow(autoShow: boolean) {

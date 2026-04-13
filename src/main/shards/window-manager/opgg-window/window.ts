@@ -4,8 +4,27 @@ import { comparer, computed } from 'mobx'
 
 import type { WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
-import { repositionToAlignLeagueClientUx } from '../position-utils'
+import { getLeagueClientUxBounds, repositionToAlignLeagueClientUx } from '../position-utils'
 import { OpggWindowSettings, OpggWindowState } from './state'
+
+const SNAP_CHECK_INTERVAL = 500
+const POSITION_THRESHOLD = 5
+
+function hasClientBoundsChanged(
+  previous: ReturnType<typeof getLeagueClientUxBounds>,
+  next: NonNullable<ReturnType<typeof getLeagueClientUxBounds>>
+) {
+  if (!previous) {
+    return true
+  }
+
+  return (
+    Math.abs(previous.x - next.x) > POSITION_THRESHOLD ||
+    Math.abs(previous.y - next.y) > POSITION_THRESHOLD ||
+    Math.abs(previous.width - next.width) > POSITION_THRESHOLD ||
+    Math.abs(previous.height - next.height) > POSITION_THRESHOLD
+  )
+}
 
 export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindowSettings> {
   static readonly NAMESPACE_SUFFIX = 'opgg-window'
@@ -34,7 +53,8 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       settingSchema: {
         enabled: { default: settings.enabled },
         autoShow: { default: settings.autoShow },
-        showShortcut: { default: settings.showShortcut }
+        showShortcut: { default: settings.showShortcut },
+        snapToGame: { default: settings.snapToGame }
       },
       browserWindowOptions: {
         title: AkariOpggWindow.TITLE,
@@ -50,6 +70,30 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
   }
 
   private _handleOpggWindowLogics() {
+    let snapIntervalId: NodeJS.Timeout | null = null
+    let lastClientBounds: ReturnType<typeof getLeagueClientUxBounds> = null
+
+    const stopSnap = () => {
+      if (snapIntervalId) {
+        clearInterval(snapIntervalId)
+        snapIntervalId = null
+      }
+    }
+
+    const snapToLeagueClient = () => {
+      if (!this._window || this._window.isDestroyed() || !this.settings.snapToGame || !this.state.show) {
+        return
+      }
+
+      const clientBounds = getLeagueClientUxBounds()
+      if (!clientBounds || !hasClientBoundsChanged(lastClientBounds, clientBounds)) {
+        return
+      }
+
+      lastClientBounds = clientBounds
+      repositionToAlignLeagueClientUx(this._window, 'top-right')
+    }
+
     const showTiming = computed(() => {
       if (!this.settings.autoShow) {
         return 'ignore'
@@ -94,6 +138,31 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
     )
 
+    this._mobx.reaction(
+      () => [this.state.show, this.state.ready, this.state.status, this.settings.snapToGame] as const,
+      ([show, ready, status, snapToGame]) => {
+        stopSnap()
+
+        if (show && ready && status !== 'minimized' && snapToGame) {
+          lastClientBounds = null
+          snapToLeagueClient()
+          snapIntervalId = setInterval(snapToLeagueClient, SNAP_CHECK_INTERVAL)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => this._window,
+      (window) => {
+        if (window) {
+          window.once('closed', stopSnap)
+        } else {
+          stopSnap()
+        }
+      }
+    )
+
     this._ipc.onCall(this._namespace, 'repositionToAlignLeagueClientUx', (_, placement) => {
       if (this._window) {
         repositionToAlignLeagueClientUx(this._window, placement)
@@ -136,6 +205,6 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'autoShow', 'showShortcut'] as const
+    return ['enabled', 'autoShow', 'showShortcut', 'snapToGame'] as const
   }
 }

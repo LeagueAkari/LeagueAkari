@@ -5,8 +5,27 @@ import { comparer, computed } from 'mobx'
 
 import { WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
-import { repositionToAlignLeagueClientUx } from '../position-utils'
+import { getLeagueClientUxBounds, repositionToAlignLeagueClientUx } from '../position-utils'
 import { AuxWindowSettings, AuxWindowState } from './state'
+
+const SNAP_CHECK_INTERVAL = 500
+const POSITION_THRESHOLD = 5
+
+function hasClientBoundsChanged(
+  previous: ReturnType<typeof getLeagueClientUxBounds>,
+  next: NonNullable<ReturnType<typeof getLeagueClientUxBounds>>
+) {
+  if (!previous) {
+    return true
+  }
+
+  return (
+    Math.abs(previous.x - next.x) > POSITION_THRESHOLD ||
+    Math.abs(previous.y - next.y) > POSITION_THRESHOLD ||
+    Math.abs(previous.width - next.width) > POSITION_THRESHOLD ||
+    Math.abs(previous.height - next.height) > POSITION_THRESHOLD
+  )
+}
 
 export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSettings> {
   static readonly NAMESPACE_SUFFIX = 'aux-window'
@@ -35,7 +54,8 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       settingSchema: {
         enabled: { default: settings.enabled },
         autoShow: { default: settings.autoShow },
-        showSkinSelector: { default: settings.showSkinSelector }
+        showSkinSelector: { default: settings.showSkinSelector },
+        snapToGame: { default: settings.snapToGame }
       },
       browserWindowOptions: {
         title: AkariAuxWindow.TITLE,
@@ -49,6 +69,30 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   }
 
   private _handleAuxWindowLogics() {
+    let snapIntervalId: NodeJS.Timeout | null = null
+    let lastClientBounds: ReturnType<typeof getLeagueClientUxBounds> = null
+
+    const stopSnap = () => {
+      if (snapIntervalId) {
+        clearInterval(snapIntervalId)
+        snapIntervalId = null
+      }
+    }
+
+    const snapToLeagueClient = () => {
+      if (!this._window || this._window.isDestroyed() || !this.settings.snapToGame || !this.state.show) {
+        return
+      }
+
+      const clientBounds = getLeagueClientUxBounds()
+      if (!clientBounds || !hasClientBoundsChanged(lastClientBounds, clientBounds)) {
+        return
+      }
+
+      lastClientBounds = clientBounds
+      repositionToAlignLeagueClientUx(this._window, 'top-left')
+    }
+
     const showTiming = computed(() => {
       if (!this.settings.autoShow) {
         return 'ignore'
@@ -114,6 +158,31 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       }
     )
 
+    this._mobx.reaction(
+      () => [this.state.show, this.state.ready, this.state.status, this.settings.snapToGame] as const,
+      ([show, ready, status, snapToGame]) => {
+        stopSnap()
+
+        if (show && ready && status !== 'minimized' && snapToGame) {
+          lastClientBounds = null
+          snapToLeagueClient()
+          snapIntervalId = setInterval(snapToLeagueClient, SNAP_CHECK_INTERVAL)
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => this._window,
+      (window) => {
+        if (window) {
+          window.once('closed', stopSnap)
+        } else {
+          stopSnap()
+        }
+      }
+    )
+
     // 快速关闭会提供提示
     this._setting._getFromStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY).then((tip) => {
       if (!tip) {
@@ -164,6 +233,6 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'autoShow', 'showSkinSelector'] as const
+    return ['enabled', 'autoShow', 'showSkinSelector', 'snapToGame'] as const
   }
 }

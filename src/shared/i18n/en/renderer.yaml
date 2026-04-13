@@ -369,6 +369,10 @@ MultiWindowSettings:
       label: Auto Show and Close
       description: Automatically show or close the auxiliary window during specific game phases.
 
+    snapToGame:
+      label: Follow League Client Movement
+      description: Automatically keep the auxiliary window aligned to the left side of the League Client while it moves.
+
     opacity:
       label: Window Opacity
       description: Adjust the transparency level of the auxiliary window.
@@ -394,6 +398,10 @@ MultiWindowSettings:
     autoShow:
       label: Auto Show and Close
       description: Automatically show or close the OP.GG window during specific game phases.
+
+    snapToGame:
+      label: Follow League Client Movement
+      description: Automatically keep the OP.GG window aligned to the right side of the League Client while it moves.
 
     opacity:
       label: Window Opacity
