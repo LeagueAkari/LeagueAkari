@@ -19,9 +19,7 @@
     <div class="mb-1 flex">
       <div
         class="relative mr-2 cursor-pointer transition-[filter] hover:brightness-110"
-        v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR"
-        :title="t('PlayerInfoCard.sameChampionHistory')"
-        @click.stop="navigateToChampionMatchHistory"
+        @click.stop="() => navigateToSummonerByPuuid(puuid)"
       >
         <ChampionIcon
           :champion-id="championId || -1"
@@ -78,25 +76,6 @@
                 {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
               </div>
             </NPopover>
-          </div>
-          <div class="flex shrink-0 items-center gap-1">
-            <button
-              v-if="championId && championId > 0"
-              class="cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
-              v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON"
-              :title="t('PlayerInfoCard.byChampion')"
-              @click.stop="navigateToChampionMatchHistory"
-            >
-              {{ t('PlayerInfoCard.byChampion') }}
-            </button>
-            <button
-              v-if="currentPositionFilter"
-              class="cursor-pointer rounded bg-black/10 px-1.5 py-0.5 text-[10px] leading-[10px] whitespace-nowrap text-black/70 transition-colors hover:bg-black/15 hover:text-black dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/15 dark:hover:text-white"
-              :title="t('PlayerInfoCard.byPosition')"
-              @click.stop="navigateToPositionMatchHistory"
-            >
-              {{ t('PlayerInfoCard.byPosition') }}
-            </button>
           </div>
         </div>
 
@@ -371,7 +350,7 @@
         <template #trigger>
           <div
             class="relative h-5 w-5 cursor-pointer transition-[filter] hover:brightness-110"
-            @click.stop="navigateToChampionMatchHistoryByChampionId(c.id)"
+            @click.stop="() => navigateToSummonerByPuuid(puuid)"
           >
             <ChampionIcon
               :ring-color="
@@ -536,16 +515,9 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import {
-  FTUE_TARGET_ATTR,
-  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_AVATAR,
-  FTUE_TARGET_ONGOING_GAME_HERO_FILTER_BUTTON
-} from '@shared/constants/ftue'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import {
   MatchParticipant,
-  MatchParticipantPosition,
-  normalizeMatchParticipantPosition,
   toParticipants
 } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -581,9 +553,7 @@ const {
   mergedPremadeTeams,
   kdaOutliers,
   previewGame,
-  navigateToSummonerByPuuid,
-  navigateToSummonerByPuuidWithChampion,
-  navigateToSummonerByPuuidWithPosition
+  navigateToSummonerByPuuid
 } = useOngoingGamePanel()
 
 const summoner = computed(() => ogs.summoner[puuid])
@@ -598,33 +568,6 @@ const championId = computed(() => ogs.championSelections?.[puuid])
 const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
-
-const navigateToChampionMatchHistory = () => {
-  if (championId.value && championId.value > 0) {
-    navigateToSummonerByPuuidWithChampion(puuid, championId.value)
-    return
-  }
-
-  navigateToSummonerByPuuid(puuid)
-}
-
-const navigateToChampionMatchHistoryByChampionId = (targetChampionId: number) => {
-  if (targetChampionId > 0) {
-    navigateToSummonerByPuuidWithChampion(puuid, targetChampionId)
-    return
-  }
-
-  navigateToSummonerByPuuid(puuid)
-}
-
-const navigateToPositionMatchHistory = () => {
-  if (currentPositionFilter.value) {
-    navigateToSummonerByPuuidWithPosition(puuid, currentPositionFilter.value)
-    return
-  }
-
-  navigateToSummonerByPuuid(puuid)
-}
 
 const as = useAppCommonStore()
 
@@ -656,10 +599,6 @@ const positionInfo = computed(() => {
   }
 
   return info
-})
-
-const currentPositionFilter = computed<MatchParticipantPosition | null>(() => {
-  return normalizeMatchParticipantPosition(positionInfo.value?.current)
 })
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9

@@ -68,7 +68,6 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import type { MatchParticipantPosition } from '@shared/data-adapter/match-history/participants'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { GameController, TimeOutline } from '@vicons/ionicons5'
 import { Forbid, PlugConnected } from '@vicons/tabler'
@@ -89,8 +88,6 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   navigateToSummonerByPuuid: [puuid: string]
-  navigateToSummonerByPuuidWithChampion: [puuid: string, championId: number]
-  navigateToSummonerByPuuidWithPosition: [puuid: string, position: MatchParticipantPosition]
   previewGame: [summary: LcuOrSgpGameSummary | number, puuid?: string]
 }>()
 
@@ -242,12 +239,6 @@ provideOngoingGamePanel({
 
   navigateToSummonerByPuuid: (puuid: string) => {
     emits('navigateToSummonerByPuuid', puuid)
-  },
-  navigateToSummonerByPuuidWithChampion: (puuid: string, championId: number) => {
-    emits('navigateToSummonerByPuuidWithChampion', puuid, championId)
-  },
-  navigateToSummonerByPuuidWithPosition: (puuid: string, position: MatchParticipantPosition) => {
-    emits('navigateToSummonerByPuuidWithPosition', puuid, position)
   },
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
     emits('previewGame', summary, puuid)

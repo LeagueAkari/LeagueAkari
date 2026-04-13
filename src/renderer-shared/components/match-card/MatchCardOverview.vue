@@ -37,7 +37,7 @@
                 </NIcon>
               </div>
 
-              <!-- top1 头顶上方的皇冠 -->
+              <!-- position -->
               <div
                 v-if="participant.position"
                 class="absolute -right-px -bottom-[2px] rounded-sm bg-black/60 p-0.5 dark:bg-black/80"

@@ -108,35 +108,6 @@ FeatureGuide:
     item2:
       title: 展示更多标签
       description: 在 `设置` → `对局` → `玩家卡片标签` 中，启用更多标签。
-
-Ftue:
-  confirm: 知道了
-  later: 稍后
-  junglePathing:
-    matchHistoryDetails:
-      title: 战绩详情支持打野偏好
-      description: 在对局详情总览中，看到“打野偏好”后可悬停查看详细分析。
-    ongoingGameCard:
-      title: 对局页支持打野偏好
-      description: 玩家卡片中的“打野偏好”可查看首清、前期抓人和地图偏好等分析。
-  heroFilter:
-    avatar:
-      title: 点击头像快速按英雄筛选
-      description: 在总览右侧点击常用英雄头像，可直接筛选同英雄对局。
-    button:
-      title: 更多筛选在这里
-      description: 点击这个按钮可打开完整筛选面板，支持按英雄、模式、时间等条件组合筛选。
-    ongoingAvatar:
-      title: 对局页头像支持同英雄筛选
-      description: 点击玩家头像可直接跳转到该玩家，并自动按当前英雄筛选战绩。
-    ongoingButton:
-      title: 同英雄入口按钮
-      description: 玩家名旁的按钮也可快速进入同英雄筛选，适合精确查看某英雄表现。
-  themeSystem:
-    button:
-      title: 全新主题系统入口
-      description: 点击调色板按钮打开主题菜单，可切换 8 套内置主题配色。
-
 CommonButtons:
   announcement: 公告
   announcementSummary: 公告摘要
@@ -150,8 +121,8 @@ CommonButtons:
     title: 主题配色
     groups:
       system: 系统
-      brightBuiltin: 明亮 · 内置
-      darkBuiltin: 暗色 · 内置
+      brightBuiltin: 亮色
+      darkBuiltin: 暗色
     tone:
       light: 亮
       dark: 暗
@@ -250,8 +221,8 @@ AppSettings:
       description: $t(common:appName) 的主题颜色
       groups:
         system: 系统
-        brightBuiltin: 明亮 · 内置
-        darkBuiltin: 暗色 · 内置
+        brightBuiltin: 亮色
+        darkBuiltin: 暗色
       tone:
         light: 亮
         dark: 暗
@@ -265,11 +236,6 @@ AppSettings:
         mint: 薄荷绿
         aurora: 极光紫
         butter: 奶油黄
-    ftue:
-      label: 功能引导
-      description: 全局重新显示应用内的功能引导提示
-      button: 再次显示引导
-      resetDone: 已重置所有功能引导
 
   selfUpdate:
     title: 应用更新
@@ -406,12 +372,6 @@ MatchHistorySettings:
     label: 启用打野偏好
     description: 在战绩页面展示打野偏好入口与分析卡片
 
-  junglePathingFtue:
-    label: 打野偏好引导
-    description: 重新显示战绩详情中的打野偏好引导
-    button: 再次显示引导
-    resetDone: 已重置打野偏好引导
-
 OngoingGameSettings:
   title: 对局
   titleCommon: 对局
@@ -471,12 +431,6 @@ OngoingGameSettings:
   showJunglePathing:
     label: 启用打野偏好
     description: 在对局玩家卡片中展示打野偏好分析
-
-  junglePathingFtue:
-    label: 打野偏好引导
-    description: 重新显示对局页面中的打野偏好引导
-    button: 再次显示引导
-    resetDone: 已重置打野偏好引导
 
   showMatchHistoryItemBorder:
     label: 战绩项显示边框
@@ -1082,7 +1036,6 @@ RankedTable:
   previousSeasonEndTier: 上赛季段位
   previousSeasonHighestTier: 上赛季最高段位
   highestTier: 历史最高段位
-  winRateUnavailableBelowMaster: 大师以下不提供负场，胜率不可用
 
 RankedDisplay:
   unranked: 未定级
@@ -2192,8 +2145,8 @@ PlayerTab:
     and: 同时满足
     or: 满足其一
     add: 添加
-    switchToOr: 满足其一
-    switchToAnd: 同时满足
+    switchToOr: 切换为“或”
+    switchToAnd: 切换为“和”
     delete: 删除
     needAddCondition: 需添加条件
     addNestedRuleHint: 在当前分组中继续添加条件或子分组
@@ -2265,9 +2218,9 @@ PlayerTab:
       statConditions: 数值条件
     combinatorLabels:
       game: 对局
-      and: 匹配全部规则
-      or: 匹配任意规则
-      not: 排除以下规则
+      and: 和
+      or: 或
+      not: 非
       isQueue: 游戏模式队列
       isAbort: 是终止对局
       isRemake: 是重开对局
@@ -2680,8 +2633,6 @@ PlayerInfoCard:
   kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
   sameChampionHistory: 英雄战绩
-  byChampion: 按英雄
-  byPosition: 按位置
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
   teamDamageShare: 伤害 {{rate}}%
   teamDamageSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%

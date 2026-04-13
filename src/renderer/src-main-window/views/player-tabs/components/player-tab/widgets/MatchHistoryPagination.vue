@@ -20,55 +20,15 @@
       :consistent-menu-width="false"
     />
 
-    <NSelect
-      :disabled="isLoading"
-      :value="selectedModeValue"
-      @update:value="handleModeChange"
-      size="small"
-      :options="mutuallyExclusiveOptions"
-      class="w-28!"
-      :consistent-menu-width="false"
-    />
-
-    <NPopover
-      v-if="isSimpleMode"
-      v-model:show="showSimpleFilterPopover"
-      display-directive="show"
-      trigger="click"
-      placement="bottom"
-      :theme-overrides="{ padding: '0px' }"
-    >
-      <template #trigger>
-        <NTooltip>
-          <template #trigger>
-            <NButton
-              size="small"
-              :secondary="hasActiveFilters"
-              :tertiary="!hasActiveFilters"
-              circle
-              v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
-              :type="hasActiveFilters ? 'primary' : 'default'"
-            >
-              <template #icon>
-                <NIcon size="16"><Filter20Regular /></NIcon>
-              </template>
-            </NButton>
-          </template>
-          {{ t('PlayerTab.filter.title') }}
-        </NTooltip>
-      </template>
-      <MatchHistoryFilter class="w-[300px]" />
-    </NPopover>
-
-    <NTooltip v-else>
+    <NTooltip>
       <template #trigger>
         <NButton
           size="small"
-          :secondary="hasActiveFilters"
-          :tertiary="!hasActiveFilters"
+          :secondary="rootHasCombinator"
+          :tertiary="!rootHasCombinator"
           circle
-          :type="hasActiveFilters ? 'primary' : 'default'"
-          @click="handleOpenAdvancedFilterModal"
+          :type="rootHasCombinator ? 'primary' : 'default'"
+          @click="handleOpenFilterModal"
         >
           <template #icon>
             <NIcon size="16"><Filter20Regular /></NIcon>
@@ -84,8 +44,8 @@
           size="small"
           circle
           tertiary
-          :type="hasActiveFilters ? 'warning' : 'default'"
-          :disabled="!hasActiveFilters"
+          :type="rootHasCombinator ? 'warning' : 'default'"
+          :disabled="!rootHasCombinator"
           @click="handleClearFilters"
         >
           <template #icon>
@@ -96,95 +56,7 @@
       {{ t('PlayerTab.clearFilters') }}
     </NTooltip>
 
-    <div v-if="!isTimeRangeMode" class="flex items-center gap-1">
-      <NButton
-        size="small"
-        tertiary
-        circle
-        :disabled="isFirstPage || isLoading"
-        :title="t('PlayerTab.prevPage')"
-        @click="
-          loadMatchHistory({
-            startIndex:
-              (computedCurrentPage - 2) *
-              (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-          })
-        "
-      >
-        <template #icon>
-          <NIcon size="16"><ChevronLeft20Regular /></NIcon>
-        </template>
-      </NButton>
-
-      <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
-        <template #trigger>
-          <span
-            class="min-w-[24px] cursor-pointer text-center text-sm text-black dark:text-white/80"
-          >
-            {{ computedCurrentPage }}
-          </span>
-        </template>
-        <div class="flex flex-col gap-2 p-1">
-          <div class="text-xs text-black/60 dark:text-white/60">
-            {{ t('PlayerTab.goToPage') }}
-          </div>
-          <div class="flex items-center gap-2">
-            <NInputNumber
-              class="w-28!"
-              size="small"
-              v-model:value="arbitraryPage"
-              :disabled="isLoading"
-              :min="1"
-              @keyup.enter="handleGoToArbitraryPage"
-            />
-            <NButton
-              size="small"
-              secondary
-              circle
-              :disabled="isLoading"
-              @click="handleGoToArbitraryPage"
-            >
-              <template #icon>
-                <NIcon size="16"><ArrowCircleRight32Filled /></NIcon>
-              </template>
-            </NButton>
-            <NButton
-              size="small"
-              tertiary
-              circle
-              :disabled="isLoading || isFirstPage"
-              :title="t('PlayerTab.firstPage')"
-              @click="handleGoToFirstPage"
-            >
-              <template #icon>
-                <NIcon size="14"><Previous20Filled /></NIcon>
-              </template>
-            </NButton>
-          </div>
-        </div>
-      </NPopover>
-
-      <NButton
-        size="small"
-        tertiary
-        circle
-        :title="t('PlayerTab.nextPage')"
-        @click="
-          loadMatchHistory({
-            startIndex:
-              computedCurrentPage *
-              (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
-          })
-        "
-        :disabled="isLoading"
-      >
-        <template #icon>
-          <NIcon size="16"><ChevronRight20Regular /></NIcon>
-        </template>
-      </NButton>
-    </div>
-
-    <NModal v-model:show="showAdvancedFilterModal">
+    <NModal v-model:show="showFilterModal">
       <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
         <MatchHistoryFilters />
       </div>
@@ -193,104 +65,46 @@
 
   <div
     v-else
-    class="match-history-pagination space-y-2 rounded px-4 py-3 transition-colors"
+    class="match-history-pagination space-y-3 rounded px-4 py-3 transition-colors"
     :class="{
       'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
         isFloating,
       'bg-black/5 dark:bg-white/5': !isFloating
     }"
   >
-    <NSelect
-      v-if="preferredSource === 'sgp' || isCrossRegion"
-      :value="selectedQueue"
-      @update:value="handleTagChange"
-      size="small"
-      :options="sgpTagOptions"
-      :disabled="isLoading"
-      :render-label="renderLabel"
-      :consistent-menu-width="false"
-    />
+    <!-- sgp 情况下可用的特殊选项（秘传） -->
+    <div class="space-y-2">
+      <TooltipWithIcon
+        class="mb-2 text-xs text-black/60 dark:text-white/60"
+        tooltip="$此特性仅限使用 SGP 数据源时可用"
+      >
+        $队列
+      </TooltipWithIcon>
+      <NSelect
+        v-if="preferredSource === 'sgp' || isCrossRegion"
+        :value="selectedQueue"
+        @update:value="handleTagChange"
+        size="small"
+        :options="sgpTagOptions"
+        :disabled="isLoading"
+        :render-label="renderLabel"
+        :consistent-menu-width="false"
+      />
+    </div>
 
-    <div class="flex items-center justify-between gap-2">
-      <div class="flex min-w-0 flex-1 items-center gap-2">
+    <!-- 分页选项 -->
+    <div class="space-y-2">
+      <div class="text-xs text-black/60 dark:text-white/60">分页</div>
+      <div class="flex items-center gap-1">
         <NSelect
-          class="w-24! shrink-0"
           :disabled="isLoading"
-          :value="selectedModeValue"
-          @update:value="handleModeChange"
+          :value="page?.queryParams.count ?? pts.frontendSettings.loadCount"
+          @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
           size="small"
-          :options="mutuallyExclusiveOptions"
-          :consistent-menu-width="false"
+          :options="pageSizeOptions"
+          class="mr-2"
         />
 
-        <NPopover
-          v-if="isSimpleMode"
-          v-model:show="showSimpleFilterPopover"
-          display-directive="show"
-          trigger="click"
-          placement="bottom"
-          :theme-overrides="{ padding: '0px' }"
-        >
-          <template #trigger>
-            <NTooltip>
-              <template #trigger>
-                <NButton
-                  size="small"
-                  :secondary="hasActiveFilters"
-                  :tertiary="!hasActiveFilters"
-                  circle
-                  v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON"
-                  :type="hasActiveFilters ? 'primary' : 'default'"
-                >
-                  <template #icon>
-                    <NIcon size="16"><Filter20Regular /></NIcon>
-                  </template>
-                </NButton>
-              </template>
-              {{ t('PlayerTab.filter.title') }}
-            </NTooltip>
-          </template>
-          <MatchHistoryFilter class="w-[300px]" />
-        </NPopover>
-
-        <NTooltip v-else>
-          <template #trigger>
-            <NButton
-              size="small"
-              :secondary="hasActiveFilters"
-              :tertiary="!hasActiveFilters"
-              circle
-              :type="hasActiveFilters ? 'primary' : 'default'"
-              @click="handleOpenAdvancedFilterModal"
-            >
-              <template #icon>
-                <NIcon size="16"><Filter20Regular /></NIcon>
-              </template>
-            </NButton>
-          </template>
-          {{ t('PlayerTab.filter.title') }}
-        </NTooltip>
-
-        <NTooltip>
-          <template #trigger>
-            <NButton
-              size="small"
-              circle
-              tertiary
-              :type="hasActiveFilters ? 'warning' : 'default'"
-              :disabled="!hasActiveFilters"
-              @click="handleClearFilters"
-            >
-              <template #icon>
-                <NIcon size="16"><Delete20Regular /></NIcon>
-              </template>
-            </NButton>
-          </template>
-          {{ t('PlayerTab.clearFilters') }}
-        </NTooltip>
-      </div>
-
-      <div v-if="!isTimeRangeMode" class="flex shrink-0 items-center gap-1">
         <NButton
           size="small"
           tertiary
@@ -301,7 +115,7 @@
             loadMatchHistory({
               startIndex:
                 (computedCurrentPage - 2) *
-                (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
+                (page?.queryParams.count ?? pts.frontendSettings.loadCount)
             })
           "
         >
@@ -366,8 +180,7 @@
           @click="
             loadMatchHistory({
               startIndex:
-                computedCurrentPage *
-                (pagedMatchHistory?.queryParams.count ?? pts.frontendSettings.loadCount)
+                computedCurrentPage * (page?.queryParams.count ?? pts.frontendSettings.loadCount)
             })
           "
           :disabled="isLoading"
@@ -379,7 +192,48 @@
       </div>
     </div>
 
-    <NModal v-model:show="showAdvancedFilterModal">
+    <div class="space-y-2">
+      <div class="text-xs text-black/60 dark:text-white/60">筛选</div>
+      <div class="flex min-w-0 flex-1 items-center gap-2">
+        <NTooltip>
+          <template #trigger>
+            <NButton
+              size="small"
+              :secondary="rootHasCombinator"
+              :tertiary="!rootHasCombinator"
+              circle
+              :type="rootHasCombinator ? 'primary' : 'default'"
+              @click="handleOpenFilterModal"
+            >
+              <template #icon>
+                <NIcon size="16"><Filter20Regular /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('PlayerTab.filter.title') }}
+        </NTooltip>
+
+        <NTooltip>
+          <template #trigger>
+            <NButton
+              size="small"
+              circle
+              tertiary
+              :type="rootHasCombinator ? 'warning' : 'default'"
+              :disabled="!rootHasCombinator"
+              @click="handleClearFilters"
+            >
+              <template #icon>
+                <NIcon size="16"><Delete20Regular /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('PlayerTab.clearFilters') }}
+        </NTooltip>
+      </div>
+    </div>
+
+    <NModal v-model:show="showFilterModal">
       <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
         <MatchHistoryFilters />
       </div>
@@ -389,8 +243,8 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
-import { FTUE_TARGET_ATTR, FTUE_TARGET_MATCH_HISTORY_HERO_FILTER_BUTTON } from '@shared/constants/ftue'
 import {
   ArrowCircleRight32Filled,
   ChevronLeft20Regular,
@@ -410,20 +264,16 @@ import {
   NTooltip,
   SelectOption
 } from 'naive-ui'
-import { computed, h, ref, watch, watchEffect } from 'vue'
+import { computed, h, ref, watchEffect } from 'vue'
 
 import { useMapAssets } from '@main-window/composables/useMapAssets'
-import {
-  type MatchHistoryTimeRange,
-  usePageSizeOptions
-} from '@main-window/shards/player-tabs'
+import { usePageSizeOptions } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-data/store'
 
 import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
-import MatchHistoryFilter from './MatchHistoryFilter.vue'
 import MatchHistoryFilters from './match-history-filters/MatchHistoryFilters.vue'
 
 const { isFloating = false, horizontal = false } = defineProps<{
@@ -434,84 +284,33 @@ const { isFloating = false, horizontal = false } = defineProps<{
 const { t } = useTranslation()
 
 const pts = usePlayerTabsStore()
+
 const sgpTagOptions = useSgpTagOptions()
 const pageSizeOptions = usePageSizeOptions()
 
 const { preferredSource, isCrossRegion } = usePlayerTab()
-const { isLoading, loadMatchHistory, pagedMatchHistory } = useMatchHistory()
-const { mode, hasActiveFilters, clearFilters } = useMatchHistoryFilters()
-
-const isSimpleMode = computed(() => mode.value === 'simple')
+const { isLoading, loadMatchHistory, page, filteredGames } = useMatchHistory()
+const { rootHasCombinator, clearPredicate: clearFilters } = useMatchHistoryFilters()
 
 const computedCurrentPage = computed(() => {
-  if (!pagedMatchHistory.value) return 1
+  if (!page.value) return 1
 
   const {
     queryParams: { startIndex = 0, count = pts.frontendSettings.loadCount }
-  } = pagedMatchHistory.value
+  } = page.value
 
   return Math.floor(startIndex / count) + 1
 })
 
 const selectedQueue = computed(() => {
-  if (!pagedMatchHistory.value) return ALL_SGPTAG_VALUE
+  if (!page.value) return ALL_SGPTAG_VALUE
 
   const {
     queryParams: { tag = ALL_SGPTAG_VALUE }
-  } = pagedMatchHistory.value
+  } = page.value
 
   return tag
 })
-
-const selectedTimeRange = computed<MatchHistoryTimeRange>(() => {
-  return pagedMatchHistory.value?.queryParams.timeRange ?? pts.frontendSettings.defaultMatchHistoryTimeRange
-})
-
-const isTimeRangeMode = computed(() => selectedTimeRange.value !== 'all')
-
-const selectedModeValue = computed(() => {
-  if (isTimeRangeMode.value) {
-    return `time:${selectedTimeRange.value}`
-  }
-
-  const count = pagedMatchHistory.value?.queryParams.count ?? pts.frontendSettings.loadCount
-  return `count:${count}`
-})
-
-const mutuallyExclusiveOptions = computed<SelectOption[]>(() => [
-  {
-    type: 'group',
-    label: t('PlayerTab.byCount'),
-    key: 'by-count',
-    children: pageSizeOptions.value.map((o) => ({
-      label: o.label,
-      value: `count:${o.value}`
-    }))
-  },
-  {
-    type: 'group',
-    label: t('PlayerTab.byTime'),
-    key: 'by-time',
-    children: [
-      {
-        label: t('PlayerTab.timeRange.last24Hours'),
-        value: 'time:24h'
-      },
-      {
-        label: t('PlayerTab.timeRange.last3Days'),
-        value: 'time:3d'
-      },
-      {
-        label: t('PlayerTab.timeRange.last7Days'),
-        value: 'time:7d'
-      },
-      {
-        label: t('PlayerTab.timeRange.last30Days'),
-        value: 'time:30d'
-      }
-    ]
-  }
-])
 
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
 
@@ -520,55 +319,16 @@ const handleTagChange = (tag: string) => {
   loadMatchHistory({ tag: tag === ALL_SGPTAG_VALUE ? undefined : tag, startIndex: 0 })
 }
 
-const handleModeChange = (value: string | number | null) => {
-  if (!value || typeof value !== 'string') {
-    return
-  }
+const showFilterModal = ref(false)
 
-  if (value.startsWith('count:')) {
-    const count = Number(value.slice('count:'.length))
-
-    if (!Number.isFinite(count) || count <= 0) {
-      return
-    }
-
-    pts.frontendSettings.defaultMatchHistoryTimeRange = 'all'
-    loadMatchHistory({ count, timeRange: 'all', startIndex: 0 })
-    return
-  }
-
-  if (value.startsWith('time:')) {
-    const timeRange = value.slice('time:'.length) as MatchHistoryTimeRange
-
-    if (timeRange === 'all') {
-      return
-    }
-
-    pts.frontendSettings.defaultMatchHistoryTimeRange = timeRange
-    loadMatchHistory({ timeRange, startIndex: 0 })
-  }
-}
-
-const showSimpleFilterPopover = ref(false)
-const showAdvancedFilterModal = ref(false)
-
-const handleOpenAdvancedFilterModal = () => {
-  showAdvancedFilterModal.value = true
+const handleOpenFilterModal = () => {
+  showFilterModal.value = true
 }
 
 const handleClearFilters = () => {
-  showSimpleFilterPopover.value = false
-  showAdvancedFilterModal.value = false
+  showFilterModal.value = false
   clearFilters()
 }
-
-watch(
-  () => mode.value,
-  () => {
-    showSimpleFilterPopover.value = false
-    showAdvancedFilterModal.value = false
-  }
-)
 
 const arbitraryPage = ref(computedCurrentPage.value)
 const isArbitraryPagePopupVisible = ref(false)
@@ -582,8 +342,7 @@ watchEffect(() => {
 const handleGoToArbitraryPage = () => {
   loadMatchHistory({
     startIndex:
-      (arbitraryPage.value - 1) *
-      (pagedMatchHistory.value?.queryParams.count ?? pts.frontendSettings.loadCount)
+      (arbitraryPage.value - 1) * (page.value?.queryParams.count ?? pts.frontendSettings.loadCount)
   })
 }
 
@@ -655,4 +414,8 @@ const renderLabel = (option: SelectOption) => {
     ]
   )
 }
+
+watchEffect(() => {
+  console.log('filteredGames', filteredGames.value)
+})
 </script>

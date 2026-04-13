@@ -89,7 +89,6 @@
       <template #trigger>
         <div
           class="common-button-outer"
-          v-bind:[FTUE_TARGET_ATTR]="FTUE_TARGET_THEME_SYSTEM_BUTTON"
         >
           <div class="common-button-inner">
             <NIcon><ColorPaletteOutline /></NIcon>
@@ -154,11 +153,6 @@ import {
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import {
-  FTUE_TARGET_ATTR,
-  FTUE_TARGET_THEME_SYSTEM_BUTTON,
-  getFtueTargetSelector
-} from '@shared/constants/ftue'
-import {
   AppThemeId,
   AppThemeSetting,
   BUILTIN_DARK_THEME_IDS,
@@ -170,10 +164,8 @@ import { Window24Filled } from '@vicons/fluent'
 import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NButton, NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
-import { FTUE_KEY_THEME_SYSTEM_BUTTON } from '@main-window/shards/ftue/keys'
-import { FtueTask, useFtueStore } from '@main-window/shards/ftue/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifications/store'
 
@@ -187,8 +179,6 @@ const ows = useOpggWindowStore()
 const rcs = useRemoteConfigStore()
 const sns = useSimpleNotificationsStore()
 const as = useAppCommonStore()
-const ftue = useFtueStore()
-
 const wm = useInstance(WindowManagerRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
 const app = useInstance(AppCommonRenderer)
@@ -210,39 +200,6 @@ const overallProgress = computed(() => {
 })
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
-
-const enqueueFtueWhenTargetReady = (task: FtueTask, retries = 40) => {
-  const tryEnqueue = (remaining: number) => {
-    if (ftue.isCompleted(task.id)) {
-      return
-    }
-
-    if (document.querySelector(task.targetSelector)) {
-      ftue.enqueue(task)
-      return
-    }
-
-    if (remaining <= 0) {
-      return
-    }
-
-    window.setTimeout(() => {
-      tryEnqueue(remaining - 1)
-    }, 80)
-  }
-
-  tryEnqueue(retries)
-}
-
-onMounted(() => {
-  enqueueFtueWhenTargetReady({
-    id: FTUE_KEY_THEME_SYSTEM_BUTTON,
-    title: t('Ftue.themeSystem.button.title'),
-    description: t('Ftue.themeSystem.button.description'),
-    targetSelector: getFtueTargetSelector(FTUE_TARGET_THEME_SYSTEM_BUTTON),
-    placement: 'bottom'
-  })
-})
 
 const handleShowAuxWindow = () => {
   wm.auxWindow.show()

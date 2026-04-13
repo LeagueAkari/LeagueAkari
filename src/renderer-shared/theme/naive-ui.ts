@@ -21,7 +21,7 @@ export const NAIVE_UI_LOCALE_MAP = {
   }
 }
 
-const CLASSIC_OVERRIDES = {
+const CLASSIC_OVERRIDES: Record<string, GlobalThemeOverrides> = {
   light: {
     common: {},
     Notification: {
@@ -78,11 +78,10 @@ const CLASSIC_OVERRIDES = {
       color: '#0000',
       colorModal: '#232329'
     },
+    Dropdown: {
+      color: '#1f1f1ffa'
+    },
     Message: {
-      padding: '4px 8px',
-      fontSize: '12px',
-      iconSize: '16px',
-      iconMargin: '0 4px 0 0',
       colorInfo: '#2c2c2c',
       colorSuccess: '#2c2c2c',
       colorWarning: '#2c2c2c',
@@ -753,6 +752,18 @@ const THEME_OVERRIDES: Record<AppThemeId, GlobalThemeOverrides> = {
   butter: BUTTER_OVERRIDES
 }
 
+/**
+ * 为了适配小窗口相关的 UI 组件，在这里对部分组件进行**仅尺寸**的调整
+ */
+const THEME_OVERRIDES_SMALL_SIZED: GlobalThemeOverrides = {
+  Message: {
+    padding: '4px 8px',
+    fontSize: '12px',
+    iconSize: '16px',
+    iconMargin: '0 4px 0 0'
+  }
+}
+
 export function getNaiveUiLocale(locale: string) {
   return NAIVE_UI_LOCALE_MAP[locale as keyof typeof NAIVE_UI_LOCALE_MAP] || NAIVE_UI_LOCALE_MAP.en
 }
@@ -761,6 +772,10 @@ export function getNaiveUiTheme(colorTheme: AppColorTheme): GlobalTheme | null {
   return colorTheme === 'dark' ? darkTheme : lightTheme
 }
 
-export function getNaiveUiThemeOverrides(themeId: AppThemeId) {
+export function getNaiveUiThemeOverrides(themeId: AppThemeId, fitSmallSize = false) {
+  if (fitSmallSize) {
+    return Object.assign({}, THEME_OVERRIDES[themeId], THEME_OVERRIDES_SMALL_SIZED)
+  }
+
   return THEME_OVERRIDES[themeId]
 }

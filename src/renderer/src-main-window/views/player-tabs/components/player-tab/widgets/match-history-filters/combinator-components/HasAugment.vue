@@ -8,7 +8,12 @@
         {{ t('PlayerTab.filter.augment') }}
       </div>
 
-      <NodeActionButtons :node-id="nodeId" />
+      <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
+        <template #icon>
+          <NIcon size="14"><Delete20Regular /></NIcon>
+        </template>
+        {{ t('PlayerTab.filter.delete') }}
+      </NButton>
     </div>
 
     <div class="flex items-center gap-2">
@@ -47,13 +52,12 @@
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Augment } from '@shared/types/league-client/game-data'
-import { Sparkle20Regular } from '@vicons/fluent'
+import { Delete20Regular, Sparkle20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NSelect, SelectOption } from 'naive-ui'
+import { NButton, NIcon, NSelect, SelectOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchHistoryFilters } from '../../../data/match-history-filters'
-import NodeActionButtons from '../NodeActionButtons.vue'
 import { HasAugmentCombinator } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -62,7 +66,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
 
 const lcs = useLeagueClientStore()
 

@@ -223,13 +223,11 @@
               trigger-mode="text"
               :trigger-text="t('JunglePathing.title')"
               :show-copy-all="false"
-              :ftue-target="junglePathingFtueTarget"
               :custom-tabs="buildJunglePathingTabs(participant)"
               @tab-change="(tabKey) => handleJunglePathingTabChange(participant, tabKey)"
             />
             <span
               v-else-if="showJunglePathing && isJunglePosition(participant.position)"
-              :data-ftue-target="junglePathingFtueTarget"
               class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
               @mouseenter="ensureJungleAnalysisReady"
             >
@@ -337,7 +335,6 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { getFtueTargetJunglePathingMatchHistory } from '@shared/constants/ftue'
 import {
   JunglePathingAnalysis,
   analyzeJunglePathing,
@@ -500,10 +497,6 @@ const someTeamHasAtakhan = computed(() => {
 
 const teamParticipants = computed(() => {
   return participants.value.filter((p) => p.teamIdentifier === teamIdentifier)
-})
-
-const junglePathingFtueTarget = computed(() => {
-  return getFtueTargetJunglePathingMatchHistory(basicInfo.value.gameId)
 })
 
 const handleMouseDown = (event: MouseEvent) => {

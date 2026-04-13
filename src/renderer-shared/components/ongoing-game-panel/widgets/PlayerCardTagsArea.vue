@@ -43,7 +43,6 @@
     <div v-if="ogs.settings.showJunglePathing && jungleAnalysis" class="full-row-item">
       <JunglePathingInfo
         :analysis="jungleAnalysis"
-        :ftue-target="FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME"
         :current-game-side="currentGameSide"
         full-width
       />
@@ -631,7 +630,6 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { FTUE_TARGET_JUNGLE_PATHING_ONGOING_GAME } from '@shared/constants/ftue'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'

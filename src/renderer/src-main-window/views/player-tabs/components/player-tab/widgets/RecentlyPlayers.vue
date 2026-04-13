@@ -66,7 +66,7 @@ const props = defineProps<{
 const { t } = useTranslation()
 
 const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
-const { pagedMatchHistory } = useMatchHistory()
+const { page: pagedMatchHistory } = useMatchHistory()
 const { summonerName: maskedSummonerName } = useStreamerModeMaskedText()
 
 const relationship = computed(() => {

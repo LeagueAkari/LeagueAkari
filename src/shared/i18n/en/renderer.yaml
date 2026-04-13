@@ -108,34 +108,6 @@ FeatureGuide:
       title: Show More Tags
       description: Enable more tags in `Settings` → `Game Analysis` → `Player Card Tags`.
 
-Ftue:
-  confirm: Got It
-  later: Later
-  junglePathing:
-    matchHistoryDetails:
-      title: Jungle Pathing in Match Details
-      description: In match summary details, hover over "Jungle Pathing" to view detailed analysis.
-    ongoingGameCard:
-      title: Jungle Pathing in Ongoing Game
-      description: The player card jungle pathing panel shows first clear, early ganks, and map preference insights.
-  heroFilter:
-    avatar:
-      title: Filter by Champion from Avatar
-      description: Click a frequent champion avatar in Summary to quickly filter matches for that champion.
-    button:
-      title: More Filters Here
-      description: Click this button to open the full filter panel for champion, mode, time range, and more.
-    ongoingAvatar:
-      title: Ongoing Page Avatar Filter
-      description: Click a player's avatar to jump to that player with the current champion filter applied.
-    ongoingButton:
-      title: Same Champion Shortcut
-      description: Use the small button next to the player name for a quick same-champion match history view.
-  themeSystem:
-    button:
-      title: New Theme System Entry
-      description: Click the palette button to open the 8 built-in theme presets.
-
 CommonButtons:
   announcement: Announcement
   announcementSummary: Announcement Summary
@@ -149,8 +121,8 @@ CommonButtons:
     title: Theme Palette
     groups:
       system: System
-      brightBuiltin: Bright · Built-in
-      darkBuiltin: Dark · Built-in
+      brightBuiltin: Light
+      darkBuiltin: Dark
     tone:
       light: Light
       dark: Dark
@@ -249,8 +221,8 @@ AppSettings:
       description: Theme color for $t(common:appName)
       groups:
         system: System
-        brightBuiltin: Bright · Built-in
-        darkBuiltin: Dark · Built-in
+        brightBuiltin: Light
+        darkBuiltin: Dark
       tone:
         light: Light
         dark: Dark
@@ -264,11 +236,6 @@ AppSettings:
         mint: Mint Green
         aurora: Aurora Violet
         butter: Butter Yellow
-    ftue:
-      label: Feature Guides
-      description: Re-show all in-app feature guide prompts globally
-      button: Show Guides Again
-      resetDone: All feature guides have been reset
 
   selfUpdate:
     title: Application Update
@@ -405,12 +372,6 @@ MatchHistorySettings:
     label: Enable Jungle Pathing
     description: Show jungle pathing entry and analysis card on match history pages.
 
-  junglePathingFtue:
-    label: Jungle Pathing Guide
-    description: Show the jungle pathing guide for match details again.
-    button: Show Guide Again
-    resetDone: Jungle pathing guide has been reset
-
 OngoingGameSettings:
   title: Ongoing Game
   titleCommon: Ongoing Game
@@ -470,12 +431,6 @@ OngoingGameSettings:
   showJunglePathing:
     label: Enable Jungle Pathing
     description: Show jungle pathing analysis in ongoing-game player cards.
-
-  junglePathingFtue:
-    label: Jungle Pathing Guide
-    description: Show the jungle pathing guide for ongoing-game again.
-    button: Show Guide Again
-    resetDone: Jungle pathing guide has been reset
 
   showMatchHistoryItemBorder:
     label: Show Match History Item Border
@@ -1081,7 +1036,6 @@ RankedTable:
   previousSeasonEndTier: Previous Season Tier
   previousSeasonHighestTier: Previous Season Highest Tier
   highestTier: Highest Tier
-  winRateUnavailableBelowMaster: Losses are not provided below Master, so win rate is unavailable.
 
 RankedDisplay:
   unranked: Unranked
@@ -2264,9 +2218,9 @@ PlayerTab:
       statConditions: Stats Conditions
     combinatorLabels:
       game: Game
-      and: Match all rules
-      or: Match any rule
-      not: Exclude rules
+      and: And
+      or: Or
+      not: Not
       isQueue: Game queue
       isAbort: Aborted
       isRemake: Remake
@@ -2678,8 +2632,6 @@ PlayerInfoCard:
   kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: They are a premade team. Labeled as Team {{team}}.
   sameChampionHistory: Champion History
-  byChampion: By Champion
-  byPosition: By Position
   highWinRatePopover: This player's win rate is exceptionally high. In the recent {{countV}} games, they have won {{winCount}} games.
   teamDamageShare: Dmg {{rate}}%
   teamDamageSharePopover: In the recent {{countV}} games, this player's average team damage share is {{rate}}%
