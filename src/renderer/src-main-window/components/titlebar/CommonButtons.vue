@@ -22,7 +22,7 @@
             {{ t('CommonButtons.announcementSummary') }}
           </div>
           <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
-          <div class="mb-2 max-w-[400px] text-xs text-black/80 dark:text-white/80">
+          <div class="mb-2 max-w-100 text-xs text-black/80 dark:text-white/80">
             {{ sns.announcementSummary }}
           </div>
           <div class="flex justify-end gap-2">
@@ -87,9 +87,7 @@
     <!-- theme selector -->
     <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
       <template #trigger>
-        <div
-          class="common-button-outer"
-        >
+        <div class="common-button-outer">
           <div class="common-button-inner">
             <NIcon><ColorPaletteOutline /></NIcon>
           </div>
