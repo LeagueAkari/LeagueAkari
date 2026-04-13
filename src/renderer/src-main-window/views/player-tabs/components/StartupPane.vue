@@ -13,7 +13,7 @@
 
       <span
         v-if="showNewVersionBadge"
-        class="bg-akari-500 absolute top-0 right-0 translate-x-[120%] -translate-y-1/6 cursor-pointer rounded px-1 py-0.25 text-xs text-white transition-opacity hover:opacity-80"
+        class="bg-akari-500 absolute top-0 right-0 translate-x-[120%] -translate-y-1/6 cursor-pointer rounded px-1 py-px text-xs text-white transition-opacity hover:opacity-80"
         @click.stop="handleShowUpdateModal"
         >{{ t('StartupPane.newVersionAvailable') }}</span
       >
@@ -25,7 +25,7 @@
     <!-- spacer -->
     <div class="h-12"></div>
 
-    <NScrollbar class="h-fit! max-h-[232px] w-58!">
+    <NScrollbar class="h-fit! max-h-58 w-58!">
       <!-- summoner -->
       <div
         v-if="lcs.summoner.me"

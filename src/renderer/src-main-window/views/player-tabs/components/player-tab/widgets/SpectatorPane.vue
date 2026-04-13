@@ -68,9 +68,9 @@
       v-if="spectatorData.game.gameMode === 'CHERRY' && spectatorData.game.bannedChampions.length"
     >
       <span class="mr-1 text-[10px] text-gray-400">{{ t('SpectateStatus.bans') }}</span>
-      <div class="ml-auto flex max-w-[160px] flex-wrap items-end gap-0.5">
+      <div class="ml-auto flex max-w-40 flex-wrap items-end gap-0.5">
         <LcuImage
-          class="size-[18px]"
+          class="size-4.5"
           v-for="ban of spectatorData.game.bannedChampions"
           :key="ban.championId"
           :src="championIconUri(ban.championId)"
@@ -89,7 +89,7 @@
               t('SpectateStatus.bans')
             }}</span>
             <LcuImage
-              class="size-[18px]"
+              class="size-4.5"
               v-for="ban of teams.team1.bans"
               :key="ban.championId"
               :src="championIconUri(ban.championId)"
@@ -115,13 +115,13 @@
             />
             <LcuImage
               v-if="isTftMode"
-              class="size-[18px]"
+              class="size-4.5"
               :src="profileIconUri(player.profileIconId)"
             />
-            <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
+            <LcuImage v-else class="size-4.5" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="ml-1 min-w-3 rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-[11px] font-bold dark:bg-white/20"
+              class="ml-1 min-w-3 rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-2.75 font-bold dark:bg-white/20"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}
@@ -164,7 +164,7 @@
               t('SpectateStatus.bans')
             }}</span>
             <LcuImage
-              class="size-[18px]"
+              class="size-4.5"
               v-for="ban of teams.team2.bans"
               :key="ban.championId"
               :src="championIconUri(ban.championId)"
@@ -190,13 +190,13 @@
             />
             <LcuImage
               v-if="isTftMode"
-              class="size-[18px]"
+              class="size-4.5"
               :src="profileIconUri(player.profileIconId)"
             />
-            <LcuImage v-else class="size-[18px]" :src="championIconUri(player.championId)" />
+            <LcuImage v-else class="size-4.5" :src="championIconUri(player.championId)" />
             <div
               v-if="premadeInfo[player.puuid]"
-              class="ml-1 min-w-[12px] rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-[11px] font-bold dark:bg-white/20"
+              class="ml-1 min-w-3 rounded-sm bg-black/10 p-0.5 text-center text-[11px] leading-2.75 font-bold dark:bg-white/20"
               :style="{ color: premadeInfo[player.puuid].color.foregroundColor }"
             >
               {{ premadeInfo[player.puuid]?.teamName }}

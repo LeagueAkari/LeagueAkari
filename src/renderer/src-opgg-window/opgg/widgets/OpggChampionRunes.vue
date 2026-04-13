@@ -15,13 +15,13 @@
       class="mb-3 flex items-center gap-1 last:mb-0"
       v-for="(r, i) of champion.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
     >
-      <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+      <div class="min-w-4 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <div>
-        <div class="primary mb-1 flex items-end gap-[2px]">
+        <div class="primary mb-1 flex items-end gap-0.5">
           <PerkstyleDisplay class="mr-1" :size="24" :perkstyle-id="r.primary_page_id" />
           <PerkDisplay :max-width="280" :size="18" v-for="p of r.primary_rune_ids" :perk-id="p" />
         </div>
-        <div class="secondary flex items-end gap-[2px]">
+        <div class="secondary flex items-end gap-0.5">
           <PerkstyleDisplay
             class="secondary-style mr-1"
             :size="24"
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="desc ml-auto flex items-center">
-        <div class="pick flex min-w-[76px] flex-col items-center">
+        <div class="pick flex min-w-19 flex-col items-center">
           <span
             class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('OpggChampion.pickRate')"
@@ -51,12 +51,12 @@
           >
         </div>
         <div
-          class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
+          class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
           :title="t('OpggChampion.winRate')"
         >
           {{ ((r.win / (r.play || 1)) * 100).toFixed(2) }}%
         </div>
-        <div class="buttons flex min-w-[76px] justify-center">
+        <div class="buttons flex min-w-19 justify-center">
           <NButton
             @click="setRunes(r, { championId: champion.data.summary.id, position: position })"
             size="tiny"

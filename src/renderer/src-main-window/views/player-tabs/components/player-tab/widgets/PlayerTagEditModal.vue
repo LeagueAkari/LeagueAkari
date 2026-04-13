@@ -9,11 +9,11 @@
         <LcuImage class="size-6 rounded" :src="profileIconUri(summoner.profileIconId)" />
         <StreamerModeMaskedText>
           <template #masked>
-            <span class="ml-2 max-w-[300px] truncate text-sm font-bold">
+            <span class="ml-2 max-w-75 truncate text-sm font-bold">
               {{ maskedSummonerName }}
             </span>
           </template>
-          <span class="ml-2 max-w-[300px] truncate text-sm font-bold">
+          <span class="ml-2 max-w-75 truncate text-sm font-bold">
             {{ `${summoner.gameName} #${summoner.tagLine}` }}
           </span>
         </StreamerModeMaskedText>

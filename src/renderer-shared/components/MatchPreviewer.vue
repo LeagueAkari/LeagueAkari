@@ -5,7 +5,7 @@
       'shadow-none!': as.colorTheme === 'light' /* 亮色模式下阴影会非常诡异 */
     }"
   >
-    <div class="w-[840px] p-8">
+    <div class="w-210 p-8">
       <MatchCard
         v-if="summary"
         :summary="summary"
@@ -20,7 +20,7 @@
         @load-details="loadDetails(summary?.source || 'lcu')"
       />
       <div
-        class="flex h-50 w-[840px] items-center justify-center rounded border border-solid border-black/10 bg-neutral-100 dark:border-white/10 dark:bg-neutral-900"
+        class="flex h-50 w-210 items-center justify-center rounded border border-solid border-black/10 bg-neutral-100 dark:border-white/10 dark:bg-neutral-900"
         v-else
       >
         <template v-if="isLoadingGameSummary">

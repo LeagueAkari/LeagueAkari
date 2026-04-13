@@ -7,15 +7,15 @@
     >
       <div class="flex items-center">
         <div
-          class="w-[72px] rounded px-2 py-0.5 text-center text-sm text-black dark:text-white"
+          class="w-18 rounded px-2 py-0.5 text-center text-sm text-black dark:text-white"
           :class="group.themeColor"
         >
           {{ group.name }}
         </div>
-        <div class="h-px w-[24px] bg-black/20 dark:bg-white/20"></div>
+        <div class="h-px w-6 bg-black/20 dark:bg-white/20"></div>
       </div>
       <div
-        class="flex max-w-[240px] flex-wrap gap-1 rounded border border-solid border-black/20 px-2 py-1 text-xs text-white dark:border-white/20"
+        class="flex max-w-60 flex-wrap gap-1 rounded border border-solid border-black/20 px-2 py-1 text-xs text-white dark:border-white/20"
       >
         <div
           class="rounded bg-black/5 px-1 py-0.5 text-black dark:bg-white/10 dark:text-white"

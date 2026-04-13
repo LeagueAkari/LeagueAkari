@@ -19,15 +19,13 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-            #{{ i + 1 }}
-          </div>
+          <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
-            <div class="pick flex min-w-[76px] flex-col items-center">
+            <div class="pick flex min-w-19 flex-col items-center">
               <span
                 class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
                 :title="t('OpggChampion.pickRate')"
@@ -45,7 +43,7 @@
               >
             </div>
             <div
-              class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
+              class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
               :title="t('OpggChampion.winRate')"
             >
               {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
@@ -63,15 +61,13 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-            #{{ i + 1 }}
-          </div>
+          <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
-            <div class="pick flex min-w-[76px] flex-col items-center">
+            <div class="pick flex min-w-19 flex-col items-center">
               <span
                 class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
                 :title="t('OpggChampion.pickRate')"
@@ -89,7 +85,7 @@
               >
             </div>
             <div
-              class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
+              class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
               :title="t('OpggChampion.winRate')"
             >
               {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
@@ -108,15 +104,13 @@
           class="mb-1 flex items-center gap-1 last:mb-0"
           v-for="(a, i) of augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
         >
-          <div class="min-w-[24px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-            #{{ i + 1 }}
-          </div>
+          <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
             <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
-            <div class="pick flex min-w-[76px] flex-col items-center">
+            <div class="pick flex min-w-19 flex-col items-center">
               <span
                 class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
                 :title="t('OpggChampion.pickRate')"
@@ -134,7 +128,7 @@
               >
             </div>
             <div
-              class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
+              class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
               :title="t('OpggChampion.winRate')"
             >
               {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%

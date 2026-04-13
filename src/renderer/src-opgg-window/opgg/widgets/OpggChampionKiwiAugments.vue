@@ -32,7 +32,7 @@
             v-for="(a, i) of group.augments.slice(0, isAugmentsExpanded ? Infinity : 16)"
           >
             <!-- name -->
-            <div class="min-w-[24px] shrink-0 text-[10px] text-[#666666] dark:text-[#b2b2b2]">
+            <div class="min-w-6 shrink-0 text-[10px] text-[#666666] dark:text-[#b2b2b2]">
               #{{ i + 1 }}
             </div>
 

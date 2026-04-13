@@ -75,7 +75,7 @@
       <!-- tag edit -->
       <NButton
         secondary
-        class="size-[42px]!"
+        class="size-10.5!"
         @click="isTagEditModalShowing = true"
         v-if="!isSelfTab && !isCrossRegion"
       >
@@ -85,7 +85,7 @@
       </NButton>
 
       <!-- refresh -->
-      <NButton secondary class="size-[42px]!" :loading="isSomethingLoading" @click="refresh">
+      <NButton secondary class="size-10.5!" :loading="isSomethingLoading" @click="refresh">
         <template #icon>
           <NIcon><RefreshSharp /></NIcon>
         </template>

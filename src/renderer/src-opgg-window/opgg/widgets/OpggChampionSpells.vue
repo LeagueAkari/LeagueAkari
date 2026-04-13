@@ -19,12 +19,12 @@
         isSummonerSpellsExpanded ? Infinity : 2
       )"
     >
-      <div class="min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
+      <div class="min-w-4 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <div class="spells flex gap-1">
         <SummonerSpellDisplay :size="28" :spell-id="spell" v-for="spell of s.ids" />
       </div>
       <div class="desc flex flex-1 items-center justify-end">
-        <div class="pick flex min-w-[76px] flex-col items-center">
+        <div class="pick flex min-w-19 flex-col items-center">
           <span
             class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('OpggChampion.pickRate')"
@@ -42,12 +42,12 @@
           >
         </div>
         <div
-          class="win-rate min-w-[76px] text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
+          class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
           :title="t('OpggChampion.winRate')"
         >
           {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
         </div>
-        <div class="buttons flex min-w-[76px] justify-center">
+        <div class="buttons flex min-w-19 justify-center">
           <NButton
             @click="setSummonerSpells(s.ids, flashPosition)"
             size="tiny"

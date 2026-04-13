@@ -13,9 +13,7 @@
       class="mb-1 flex items-center gap-1 last:mb-0"
       v-for="(s, i) of champion.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
     >
-      <div class="mr-1 min-w-[16px] text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-        #{{ i + 1 }}
-      </div>
+      <div class="mr-1 min-w-4 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <div
         class="flex cursor-pointer items-center gap-1 text-xs transition-[filter] duration-200 hover:brightness-[1.2]"
         @click="setTab('champion', s.champion_id)"
@@ -24,7 +22,7 @@
         <span>{{ lcs.gameData.championName(s.champion_id) }}</span>
       </div>
       <div class="desc ml-auto flex items-center">
-        <div class="value-text flex min-w-[76px] flex-col items-center">
+        <div class="value-text flex min-w-19 flex-col items-center">
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]">{{
             (s.total_place / (s.play || 1)).toFixed(2)
           }}</span>
@@ -32,7 +30,7 @@
             >{{ t('OpggChampion.avgPlace') }}
           </span>
         </div>
-        <div class="value-text flex min-w-[76px] flex-col items-center">
+        <div class="value-text flex min-w-19 flex-col items-center">
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             >{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span
           >
@@ -40,7 +38,7 @@
             t('OpggChampion.1st')
           }}</span>
         </div>
-        <div class="value-text flex min-w-[76px] flex-col items-center">
+        <div class="value-text flex min-w-19 flex-col items-center">
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('OpggChampion.pickRate')"
@@ -57,7 +55,7 @@
             }}</span
           >
         </div>
-        <div class="value-text flex min-w-[76px] flex-col items-center">
+        <div class="value-text flex min-w-19 flex-col items-center">
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('OpggChampion.winRate')"

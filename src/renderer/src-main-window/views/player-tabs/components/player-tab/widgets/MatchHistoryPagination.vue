@@ -57,7 +57,7 @@
     </NTooltip>
 
     <NModal v-model:show="showFilterModal">
-      <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
+      <div class="h-187.5 max-h-[90vh] min-h-[75vh] w-225 max-w-[90vw]">
         <MatchHistoryFilters />
       </div>
     </NModal>
@@ -126,9 +126,7 @@
 
         <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
           <template #trigger>
-            <span
-              class="min-w-[24px] cursor-pointer text-center text-sm text-black dark:text-white/80"
-            >
+            <span class="min-w-6 cursor-pointer text-center text-sm text-black dark:text-white/80">
               {{ computedCurrentPage }}
             </span>
           </template>
@@ -234,7 +232,7 @@
     </div>
 
     <NModal v-model:show="showFilterModal">
-      <div class="h-[750px] max-h-[90vh] min-h-[75vh] w-[900px] max-w-[90vw]">
+      <div class="h-187.5 max-h-[90vh] min-h-[75vh] w-225 max-w-[90vw]">
         <MatchHistoryFilters />
       </div>
     </NModal>

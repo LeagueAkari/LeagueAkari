@@ -94,7 +94,7 @@
 
       <template v-else>
         <span
-          class="mb-2 block max-w-[280px] overflow-hidden text-base font-bold text-ellipsis whitespace-nowrap text-gray-900 dark:text-gray-100"
+          class="mb-2 block max-w-70 overflow-hidden text-base font-bold text-ellipsis whitespace-nowrap text-gray-900 dark:text-gray-100"
           :title="`${lcs.gameflow.session?.gameData.queue.name || t('Lounge.gameMode')} · ${lcs.gameflow.session?.map.name || t('Lounge.map')}`"
           >{{ formatMapModeText() }}</span
         >

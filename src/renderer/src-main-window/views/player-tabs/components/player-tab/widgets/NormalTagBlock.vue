@@ -33,13 +33,13 @@
           <StreamerModeMaskedText>
             <template #masked>
               <div
-                class="max-w-[160px] truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
+                class="max-w-40 truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
               >
                 {{ maskedMarkerName(tagInfo.selfPuuid, index) }}
               </div>
             </template>
             <div
-              class="max-w-[160px] truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
+              class="max-w-40 truncate text-[13px] text-white/80 transition-colors hover:text-gray-200 dark:text-gray-300"
             >
               {{ cachedSummoners[tagInfo.selfPuuid].gameName }} #{{
                 cachedSummoners[tagInfo.selfPuuid].tagLine
@@ -62,7 +62,7 @@
         {{ t('PlayerTab.tagged.deletePopconfirm') }}
       </NPopconfirm>
     </div>
-    <NScrollbar class="max-h-[100px]">
+    <NScrollbar class="max-h-25">
       <div class="text-[13px] whitespace-pre-wrap text-white dark:text-gray-200">
         {{ masked(tagInfo.tag || '') }}
       </div>

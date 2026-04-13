@@ -104,7 +104,7 @@
 
     <!-- settings modal -->
     <NModal v-model:show="isSettingsShow" transform-origin="center">
-      <div class="w-[500px] max-w-[90vw]">
+      <div class="w-125 max-w-[90vw]">
         <SettingsPane @close="isSettingsShow = false" />
       </div>
     </NModal>

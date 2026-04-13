@@ -9,7 +9,7 @@
     <div class="card-content">
       <div class="flex h-10 items-center justify-between">
         <span class="text-[13px]">{{ t('OpggChampion.applyRunes') }}</span>
-        <div class="flex min-w-[76px] justify-center">
+        <div class="flex min-w-19 justify-center">
           <NButton
             size="tiny"
             type="primary"

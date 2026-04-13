@@ -45,9 +45,9 @@
           </div>
 
           <!-- stats -->
-          <div class="flex w-[172px] flex-wrap justify-end gap-2 self-end" v-if="stats">
+          <div class="flex w-43 flex-wrap justify-end gap-2 self-end" v-if="stats">
             <!-- cherry 平均排名 -->
-            <div class="w-[50px]" v-if="stats.total_place && stats.play">
+            <div class="w-12.5" v-if="stats.total_place && stats.play">
               <div class="text-[11px] text-black/70 dark:text-white/70">
                 {{ t('OpggChampion.avgPlace') }}
               </div>
@@ -57,7 +57,7 @@
             </div>
 
             <!-- cherry 吃鸡率 -->
-            <div class="w-[50px]" v-if="stats.first_place && stats.play">
+            <div class="w-12.5" v-if="stats.first_place && stats.play">
               <div class="text-[11px] text-black/70 dark:text-white/70">
                 {{ t('OpggChampion.1st') }}
               </div>
@@ -67,7 +67,7 @@
             </div>
 
             <!-- 胜率 1 -->
-            <div class="w-[50px]" v-if="stats.win_rate">
+            <div class="w-12.5" v-if="stats.win_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
                 {{ t('OpggChampion.winRate') }}
               </div>
@@ -75,7 +75,7 @@
             </div>
 
             <!-- 选取率 -->
-            <div class="w-[50px]" v-if="stats.pick_rate">
+            <div class="w-12.5" v-if="stats.pick_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
                 {{ t('OpggChampion.pickRate') }}
               </div>
@@ -83,7 +83,7 @@
             </div>
 
             <!-- 禁用率 -->
-            <div class="w-[50px]" v-if="stats.ban_rate">
+            <div class="w-12.5" v-if="stats.ban_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
                 {{ t('OpggChampion.banRate') }}
               </div>

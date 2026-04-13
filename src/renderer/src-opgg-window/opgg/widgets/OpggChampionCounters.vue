@@ -25,7 +25,7 @@
     <!-- expanded (注意展开和没有展开，用的数据不同。但一般来说既然后 thatPosition 数据，那么 champion.data.counters 数据也应该存在) -->
     <div class="counters flex flex-wrap gap-2" v-if="isCountersExpanded">
       <div
-        class="counter flex w-[46px] cursor-pointer flex-col items-center transition-[filter] duration-200 hover:brightness-[1.2]"
+        class="counter flex w-11.5 cursor-pointer flex-col items-center transition-[filter] duration-200 hover:brightness-[1.2]"
         v-if="champion.data.counters"
         @click="setTab('champion', c.champion_id)"
         v-for="c of champion.data.counters?.toSorted(
@@ -65,7 +65,7 @@
     <!-- not expanded -->
     <div class="counters flex flex-wrap gap-2" v-else>
       <div
-        class="counter flex w-[46px] cursor-pointer flex-col items-center transition-[filter] duration-200 hover:brightness-[1.2]"
+        class="counter flex w-11.5 cursor-pointer flex-col items-center transition-[filter] duration-200 hover:brightness-[1.2]"
         v-if="thatPosition.counters"
         v-for="c of thatPosition.counters"
         :key="c.champion_id"

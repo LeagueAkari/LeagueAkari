@@ -30,7 +30,7 @@
             >
               <span class="flex-1">{{ fandomBalanceTypes[b.type]?.name || b.type }}</span>
               <span
-                class="min-w-[36px] text-right whitespace-nowrap"
+                class="min-w-9 text-right whitespace-nowrap"
                 :class="getBalanceValueClass(b.effect)"
                 >{{ b.formattedValue }}</span
               >
@@ -115,7 +115,7 @@
             >
               <span class="flex-1">{{ b.name }}</span>
               <span
-                class="min-w-[36px] text-right whitespace-nowrap"
+                class="min-w-9 text-right whitespace-nowrap"
                 :class="getBalanceValueClass(b.effect)"
                 >{{ b.formattedValue }}</span
               >

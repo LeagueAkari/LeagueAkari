@@ -1,11 +1,11 @@
 <template>
   <NModal :mask-closable="false" transform-origin="center" size="small" v-model:show="show">
     <div
-      class="flex h-[400px] w-[550px] overflow-hidden rounded bg-neutral-100 shadow-lg dark:bg-neutral-900"
+      class="flex h-100 w-137.5 overflow-hidden rounded bg-neutral-100 shadow-lg dark:bg-neutral-900"
     >
       <!-- left image  -->
       <div
-        class="relative w-[240px]! border-0 border-r border-solid border-r-black/10 bg-neutral-200 dark:border-r-white/10 dark:bg-neutral-800"
+        class="relative w-60! border-0 border-r border-solid border-r-black/10 bg-neutral-200 dark:border-r-white/10 dark:bg-neutral-800"
       >
         <NCarousel autoplay :show-arrow="currentItem.imageUrls.length > 1">
           <img

@@ -1,7 +1,7 @@
 <template>
   <!-- left sidebar -->
   <div
-    class="flex w-[240px] flex-col border-0 border-r border-solid border-white/10 bg-neutral-200 dark:bg-zinc-900"
+    class="flex w-60 flex-col border-0 border-r border-solid border-white/10 bg-neutral-200 dark:bg-zinc-900"
   >
     <!-- group: recent searches -->
     <div
@@ -10,7 +10,7 @@
       <NIcon><RecentlyViewed /></NIcon>
       <span class="whitespace-nowrap">{{ t('SearchPane.recentVisits') }}</span>
       <NInput
-        class="ml-auto max-w-[130px]!"
+        class="ml-auto max-w-32.5!"
         size="tiny"
         v-model:value="filterRecentVisits"
         :placeholder="t('SearchPane.search')"
@@ -182,7 +182,7 @@
         t('SearchPane.friends', { count: filteredSortedFriends.length })
       }}</span>
       <NInput
-        class="ml-auto max-w-[130px]!"
+        class="ml-auto max-w-32.5!"
         size="tiny"
         v-model:value="filterFriends"
         :placeholder="t('SearchPane.search')"

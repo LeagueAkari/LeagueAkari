@@ -102,7 +102,7 @@
         <div
           v-for="entry in displayedRankedEntries"
           :key="entry.queueType"
-          class="relative flex h-[108px] w-60 items-center justify-center rounded bg-black/5 dark:bg-white/5"
+          class="relative flex h-27 w-60 items-center justify-center rounded bg-black/5 dark:bg-white/5"
         >
           <!-- Queue Type Label -->
           <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">

@@ -28,11 +28,11 @@
       </template>
 
       <div
-        class="flex min-h-[28px] w-[400px] flex-wrap items-center justify-center gap-1 rounded border border-black/20 bg-gray-100 p-1 dark:border-white/10 dark:bg-black/60"
+        class="flex min-h-7 w-100 flex-wrap items-center justify-center gap-1 rounded border border-black/20 bg-gray-100 p-1 dark:border-white/10 dark:bg-black/60"
       >
         <template v-for="(key, index) of editingKeys" :key="key">
           <div
-            class="rounded-[2px] border-b border-black/40 bg-black/2 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
+            class="rounded-xs border-b border-black/40 bg-black/2 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
           >
             {{ key }}
           </div>
@@ -99,7 +99,7 @@
     <div class="flex flex-wrap items-center gap-1">
       <template v-for="(key, index) of keys" :key="key">
         <div
-          class="rounded-[2px] border-b border-black/40 bg-black/5 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
+          class="rounded-xs border-b border-black/40 bg-black/5 px-2 py-0.5 text-xs leading-none font-bold text-black/90 dark:border-white/40 dark:bg-white/10 dark:text-gray-300"
         >
           {{ key }}
         </div>

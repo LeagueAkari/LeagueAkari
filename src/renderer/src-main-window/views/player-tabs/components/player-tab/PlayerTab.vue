@@ -4,8 +4,8 @@
       <div
         class="mx-auto pt-10 pb-4"
         :class="{
-          'w-[1064px]': !isSmallSize,
-          'w-[764px]': isSmallSize
+          'w-266': !isSmallSize,
+          'w-191': isSmallSize
         }"
       >
         <!-- head -->
@@ -30,7 +30,7 @@
           <div ref="stickySentinelLeftSideEl" class="-ml-3 h-0"></div>
 
           <!-- sticky box -->
-          <StickyBox class="w-[300px]" :offset-top="8" :offset-bottom="8">
+          <StickyBox class="w-75" :offset-top="8" :offset-bottom="8">
             <div class="space-y-2">
               <MatchHistoryPagination />
               <NormalTagBlock />

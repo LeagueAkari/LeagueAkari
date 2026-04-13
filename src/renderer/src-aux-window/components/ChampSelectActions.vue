@@ -1,6 +1,6 @@
 <template>
   <NCard size="small" v-if="myActions && myActions.length">
-    <NScrollbar class="max-h-[240px]!" ref="scrollbar">
+    <NScrollbar class="max-h-60!" ref="scrollbar">
       <NTimeline>
         <NTimelineItem v-for="a of myActions" :type="getTimelineTypeByAction(a)">
           <template #header>

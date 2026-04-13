@@ -40,19 +40,19 @@
           <template #prefix>
             <div
               v-if="searchType === 'puuid'"
-              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
+              class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
               {{ t('SearchPane.searchTypePuuid') }}
             </div>
             <div
               v-else-if="searchType === 'exact'"
-              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1"
+              class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1"
             >
               {{ t('SearchPane.searchTypeExact') }}
             </div>
             <div
               v-else-if="searchType === 'fuzzy'"
-              class="flex h-[18px] items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
+              class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
               {{ t('SearchPane.searchTypeFuzzy') }}
             </div>
@@ -178,7 +178,7 @@
 
       <div
         v-if="searchProgress.isProcessing"
-        class="absolute top-0 right-0 left-0 h-[2px] before:block before:h-full before:w-(--progress-width) before:bg-green-600 before:transition-[width] before:content-[''] dark:before:bg-green-300"
+        class="absolute top-0 right-0 left-0 h-0.5 before:block before:h-full before:w-(--progress-width) before:bg-green-600 before:transition-[width] before:content-[''] dark:before:bg-green-300"
         :style="{
           '--progress-width': `${(searchProgress.finish / (searchProgress.total || 1)) * 100}%`
         }"

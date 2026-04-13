@@ -54,7 +54,7 @@
             </template>
             <div class="max-w-[320px]">
               <div class="mb-2">
-                <div class="flex h-[22px] items-center">
+                <div class="flex h-5.5 items-center">
                   <span class="text-xs font-bold">{{
                     t('AppSettings.basic.preferredLolSource.tip.sgp.title')
                   }}</span>
@@ -75,7 +75,7 @@
                 </div>
               </div>
               <div>
-                <div class="mb-1 flex h-[22px] items-center">
+                <div class="mb-1 flex h-5.5 items-center">
                   <span class="text-xs font-bold">{{
                     t('AppSettings.basic.preferredLolSource.tip.lcu.title')
                   }}</span>
@@ -145,7 +145,7 @@
               </div>
             </template>
             <div>
-              <div class="flex h-[22px] items-center">
+              <div class="flex h-5.5 items-center">
                 <NIcon class="mr-2">
                   <GiteeSvg />
                 </NIcon>
@@ -172,7 +172,7 @@
               <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
             </div>
             <div class="mt-2">
-              <div class="flex h-[22px] items-center">
+              <div class="flex h-5.5 items-center">
                 <NIcon class="mr-2">
                   <GithubIcon />
                 </NIcon>

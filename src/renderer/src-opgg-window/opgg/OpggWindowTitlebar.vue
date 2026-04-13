@@ -26,7 +26,7 @@
     >
       <div
         :title="ws.settings.pinned ? t('OpggWindowTitlebar.unpin') : t('OpggWindowTitlebar.pin')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
         :class="{ 'bg-black/15 dark:bg-white/15': ws.settings.pinned }"
         style="-webkit-app-region: no-drag"
         @click="() => handlePin(!ws.settings.pinned)"
@@ -36,7 +36,7 @@
       <div
         v-if="!as.isMacOS"
         :title="t('OpggWindowTitlebar.minimize')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
         style="-webkit-app-region: no-drag"
         @click="handleMinimize"
       >
@@ -45,7 +45,7 @@
       <div
         v-if="!as.isMacOS"
         :title="t('OpggWindowTitlebar.close')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-red-600 hover:text-white active:brightness-80 dark:hover:bg-red-500"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-red-600 hover:text-white active:brightness-80 dark:hover:bg-red-500"
         style="-webkit-app-region: no-drag"
         @click="handleClose"
       >

@@ -7,7 +7,7 @@
 
       <div class="flex flex-col gap-1">
         <div
-          class="relative flex w-[222px] flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 dark:bg-white/5"
+          class="relative flex w-55.5 flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 dark:bg-white/5"
         >
           <div class="flex">
             <LcuImage
@@ -121,7 +121,7 @@
           <div
             v-for="cmd of otherClients"
             :key="cmd.pid"
-            class="relative flex w-[222px] flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 transition-colors hover:cursor-pointer hover:bg-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+            class="relative flex w-55.5 flex-col rounded-lg border border-black/10 bg-black/5 px-3 py-2 transition-colors hover:cursor-pointer hover:bg-white/5 dark:bg-white/5 dark:hover:bg-white/10"
             @click="handleConnect(cmd)"
           >
             <div class="flex">

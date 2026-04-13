@@ -9,7 +9,7 @@
     </div>
     <div class="flex flex-col gap-1">
       <div class="flex items-center" v-for="(p, index) of players" :key="p.targetPuuid">
-        <LcuImage class="size-[18px] rounded-sm" :src="profileIconUri(p.targetProfileIconId)" />
+        <LcuImage class="size-4.5 rounded-sm" :src="profileIconUri(p.targetProfileIconId)" />
         <div
           class="group flex cursor-pointer items-end"
           @click="() => navigateToSummonerByPuuid(p.targetPuuid, true)"
@@ -19,13 +19,13 @@
           <StreamerModeMaskedText>
             <template #masked>
               <span
-                class="ml-1 max-w-[120px] truncate text-xs text-gray-900 transition-all group-hover:brightness-125 dark:text-white"
+                class="ml-1 max-w-30 truncate text-xs text-gray-900 transition-all group-hover:brightness-125 dark:text-white"
               >
                 {{ maskedSummonerName(p.targetPuuid, index) }}
               </span>
             </template>
             <span
-              class="ml-1 max-w-[120px] truncate text-xs text-gray-900 transition-all group-hover:brightness-125 dark:text-white"
+              class="ml-1 max-w-30 truncate text-xs text-gray-900 transition-all group-hover:brightness-125 dark:text-white"
             >
               {{ p.targetGameName }}
             </span>

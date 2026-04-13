@@ -22,7 +22,7 @@
     >
       <div
         :title="aws.settings.pinned ? t('AuxWindowTitlebar.unpin') : t('AuxWindowTitlebar.pin')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] active:brightness-80 dark:text-white/80"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] active:brightness-80 dark:text-white/80"
         :class="{
           'bg-black/15 dark:bg-white/15': aws.settings.pinned,
           'hover:bg-black/20 hover:text-black dark:hover:bg-white/20 dark:hover:text-white':
@@ -35,7 +35,7 @@
       <div
         v-if="!as.isMacOS"
         :title="t('AuxWindowTitlebar.minimize')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] hover:bg-black/20 hover:text-black active:brightness-80 dark:text-white/80 dark:hover:bg-white/20 dark:hover:text-white"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs text-black/80 transition-all [-webkit-app-region:no-drag] hover:bg-black/20 hover:text-black active:brightness-80 dark:text-white/80 dark:hover:bg-white/20 dark:hover:text-white"
         @click="handleMinimize"
       >
         <NIcon class="rotate-90"><DividerShort20RegularIcon /></NIcon>
@@ -43,7 +43,7 @@
       <div
         v-if="!as.isMacOS"
         :title="t('AuxWindowTitlebar.close')"
-        class="flex h-full w-[45px] cursor-pointer items-center justify-center text-xs transition-all [-webkit-app-region:no-drag] hover:bg-red-600 hover:text-white active:brightness-80"
+        class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all [-webkit-app-region:no-drag] hover:bg-red-600 hover:text-white active:brightness-80"
         @click="handleClose"
       >
         <NIcon><CloseIcon /></NIcon>
