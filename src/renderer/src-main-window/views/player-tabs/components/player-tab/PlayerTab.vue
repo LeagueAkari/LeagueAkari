@@ -50,6 +50,8 @@
       </div>
     </NScrollbar>
 
+    <CollectModeProgress />
+
     <div
       :class="{
         'pointer-events-auto opacity-80': shouldShowScrollToTopButton,
@@ -111,6 +113,7 @@ import PlayerTabHeader from './widgets/PlayerTabHeader.vue'
 import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
 import SpectatorPane from './widgets/SpectatorPane.vue'
 import SummaryPane from './widgets/SummaryPane.vue'
+import CollectModeProgress from './widgets/match-history-filters/CollectModeProgress.vue'
 
 const { id, puuid, sgpServerId } = defineProps<{
   id: string

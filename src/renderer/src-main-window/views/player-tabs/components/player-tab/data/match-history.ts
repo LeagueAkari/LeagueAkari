@@ -31,31 +31,6 @@ import {
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
-/**
- * 收集模式下的状态指标
- */
-export interface MatchHistoryCollectState {
-  /** 战绩页游标，会变化，从 0 开始 */
-  cursor: number
-
-  /** 每次加载的战绩数量 */
-  countPerLoad: number
-
-  /** 战绩页加载最大数量，用于避免无限加载。这个值一次收集周期内不会变化 */
-  maxCount: number
-
-  /** 预期收集到的战绩数量，超过则立即停止收集。这个值一次收集周期内不会变化 */
-  expectedCount: number
-
-  /**
-   * 除了 count 和 startIndex 以外的查询参数，因为收集模式需要接管这两个参数
-   */
-  queryParams: Omit<MatchHistoryQueryParams, 'startIndex' | 'count'>
-
-  /** 本次收集模式下的筛选条件 */
-  predicate: Predicate<LcuOrSgpGameSummary>
-}
-
 /** 
 收集模式下的参数
 */
@@ -74,6 +49,14 @@ export interface MatchHistoryCollectParams {
 
   /** 本次收集过滤依赖的筛选条件 */
   predicate: Predicate<LcuOrSgpGameSummary>
+}
+
+/**
+ * 收集模式下的状态指标
+ */
+export interface MatchHistoryCollectState {
+  currentIteration: number
+  params: MatchHistoryCollectParams
 }
 
 /**
@@ -107,7 +90,7 @@ export type MatchHistoryContext = {
   page: Readonly<Ref<MatchHistoryPage | null>>
   filteredGames: Readonly<Ref<LcuOrSgpGameSummary[]>>
   isLoading: Readonly<Ref<boolean>>
-  collectIteration: Readonly<Ref<number>>
+  collectState: Readonly<Ref<MatchHistoryCollectState | null>>
   loadMatchHistory: (params?: MatchHistoryQueryParams) => Promise<void>
   collectMatchHistory: (params: MatchHistoryCollectParams) => Promise<void>
   loadDetails: (gameId: number) => Promise<void>
@@ -156,7 +139,7 @@ export function provideMatchHistory(props: {
    *
    * 其他时候为 -1
    */
-  const collectIteration = ref(-1)
+  const collectState = ref<MatchHistoryCollectState | null>(null)
 
   const page = ref<MatchHistoryPage | null>(null)
 
@@ -354,7 +337,10 @@ export function provideMatchHistory(props: {
     lcuLoadDetailedGameQueue.clear()
     isLoading.value = true
 
-    const { countPerIteration, maxIteration, expectedCount, queryParams, predicate } = params
+    collectState.value = {
+      currentIteration: 0,
+      params
+    }
 
     try {
       if (preferredSource.value === 'sgp' || isCrossRegion.value) {
@@ -368,27 +354,28 @@ export function provideMatchHistory(props: {
           return
         }
 
-        collectIteration.value = 0
+        collectState.value.currentIteration = 0
         page.value = {
           games: markRaw([]),
           replayMetadata: {},
           details: {},
           detailsLoading: {},
-          queryParams: queryParams ?? {},
+          queryParams: params.queryParams ?? {},
           isLoadedByCollectMode: true
         }
 
         while (
-          page.value.games.length < expectedCount &&
-          collectIteration.value < maxIteration &&
+          page.value.games.length < params.expectedCount &&
+          collectState.value.currentIteration < collectState.value.params.maxIteration &&
           isLoading.value
         ) {
           const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
             puuid.value,
             {
-              ...queryParams,
-              startIndex: collectIteration.value * countPerIteration,
-              count: countPerIteration,
+              ...params.queryParams,
+              startIndex:
+                collectState.value.currentIteration * collectState.value.params.countPerIteration,
+              count: collectState.value.params.countPerIteration,
               __sgpServerId: sgpServerId.value
             }
           )
@@ -398,7 +385,7 @@ export function provideMatchHistory(props: {
             .map((g) =>
               markRaw({ source: 'sgp', gameId: g.json.gameId, data: g } as LcuOrSgpGameSummary)
             )
-            .filter((g) => predicate(g))
+            .filter((g) => params.predicate(g))
 
           page.value.games = markRaw([...page.value.games, ...gamesToAppend])
 
@@ -406,28 +393,30 @@ export function provideMatchHistory(props: {
             loadReplayMetadata(gamesToAppend)
           }
 
-          collectIteration.value++
+          collectState.value.currentIteration++
         }
       } else {
-        collectIteration.value = 0
+        collectState.value.currentIteration = 0
         page.value = {
           games: markRaw([]),
           replayMetadata: {},
           details: {},
           detailsLoading: {},
-          queryParams: queryParams ?? {},
+          queryParams: params.queryParams ?? {},
           isLoadedByCollectMode: true
         }
 
         while (
-          page.value.games.length < expectedCount &&
-          collectIteration.value < maxIteration &&
+          page.value.games.length < params.expectedCount &&
+          collectState.value.currentIteration < collectState.value.params.maxIteration &&
           isLoading.value
         ) {
           const { data } = await lc.api.matchHistory.getMatchHistory(
             puuid.value,
-            collectIteration.value * countPerIteration,
-            (collectIteration.value + 1) * countPerIteration - 1
+            collectState.value.currentIteration * collectState.value.params.countPerIteration,
+            (collectState.value.currentIteration + 1) *
+              collectState.value.params.countPerIteration -
+              1
           )
 
           const games = data.games.games
@@ -435,7 +424,7 @@ export function provideMatchHistory(props: {
             .map(
               (g) => markRaw({ source: 'lcu', data: g, gameId: g.gameId }) as LcuOrSgpGameSummary
             )
-            .filter((g) => predicate(g))
+            .filter((g) => params.predicate(g))
 
           const completedGamesToAppend = await Promise.all(
             games.map(async (g) => {
@@ -455,7 +444,7 @@ export function provideMatchHistory(props: {
             loadReplayMetadata(completedGamesToAppend)
           }
 
-          collectIteration.value++
+          collectState.value.currentIteration++
         }
       }
     } catch (error: any) {
@@ -467,7 +456,7 @@ export function provideMatchHistory(props: {
       log.error(componentName, error)
     } finally {
       isLoading.value = false
-      collectIteration.value = -1
+      collectState.value = null
     }
   }
 
@@ -547,7 +536,7 @@ export function provideMatchHistory(props: {
     page,
     filteredGames,
     isLoading,
-    collectIteration,
+    collectState,
     loadMatchHistory,
     collectMatchHistory,
     loadDetails,
@@ -559,7 +548,7 @@ export function provideMatchHistory(props: {
     page,
     filteredGames,
     isLoading,
-    collectIteration,
+    collectState,
     loadMatchHistory,
     collectMatchHistory,
     loadDetails,

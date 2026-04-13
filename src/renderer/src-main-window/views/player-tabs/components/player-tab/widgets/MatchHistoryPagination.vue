@@ -233,7 +233,7 @@
 
     <NModal v-model:show="showFilterModal">
       <div class="h-187.5 max-h-[90vh] min-h-[75vh] w-225 max-w-[90vw]">
-        <MatchHistoryFilters />
+        <MatchHistoryFilters @collect-begin="handleCollectBegin" />
       </div>
     </NModal>
   </div>
@@ -326,6 +326,10 @@ const handleOpenFilterModal = () => {
 const handleClearFilters = () => {
   showFilterModal.value = false
   clearFilters()
+}
+
+const handleCollectBegin = () => {
+  showFilterModal.value = false
 }
 
 const arbitraryPage = ref(computedCurrentPage.value)

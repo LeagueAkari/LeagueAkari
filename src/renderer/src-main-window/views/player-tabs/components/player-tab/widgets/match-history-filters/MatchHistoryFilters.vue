@@ -143,6 +143,10 @@ import { useMatchHistory } from '../../data/match-history'
 import { useMatchHistoryFilters } from '../../data/match-history-filters'
 import Game from './combinator-components/Game.vue'
 
+const emits = defineEmits<{
+  collectBegin: []
+}>()
+
 const { t } = useTranslation()
 
 const {
@@ -160,6 +164,8 @@ const collectModeSettings = ref({
   maxIteration: 10
 })
 
+const showCollectModeSettingsModal = ref(false)
+
 const handleCollect = () => {
   collectMatchHistory({
     predicate: predicate.value,
@@ -168,9 +174,10 @@ const handleCollect = () => {
     maxIteration: 10,
     queryParams: {}
   })
-}
 
-const showCollectModeSettingsModal = ref(false)
+  showCollectModeSettingsModal.value = false
+  emits('collectBegin')
+}
 
 const handleOpenCollectModeSettingsModal = () => {
   showCollectModeSettingsModal.value = true
