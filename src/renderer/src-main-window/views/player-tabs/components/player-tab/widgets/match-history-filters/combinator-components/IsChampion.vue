@@ -14,8 +14,9 @@
       </NButton>
     </div>
 
-    <div class="flex w-60 items-center gap-2">
+    <div class="flex w-60 max-w-full items-center gap-2">
       <NSelect
+        class="max-w-full"
         :options="championOptions"
         :render-label="renderLabel"
         :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"

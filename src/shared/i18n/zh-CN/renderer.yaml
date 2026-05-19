@@ -2145,6 +2145,7 @@ PlayerTab:
     reset: 重置条件
     resetAll: 重置所有条件
     winLoss: 胜负
+    timeRange: 时间范围
     all: 全部
     win: 胜利
     loss: 失败
@@ -2219,8 +2220,19 @@ PlayerTab:
     select: 选用
     atPosition: 位于
     have: 拥有
+    measureMode: 统计口径
+    minPercent: 最小 (%)
+    maxPercent: 最大 (%)
+    measureModes:
+      value: 具体值
+      teamShare: 占本队总量 (%)
+      teamMaxShare: 相对本队最高 (%)
+      gameShare: 占全员总量 (%)
+      gameMaxShare: 相对全员最高 (%)
     anyPosition: 任意位置
     positionN: '第 {{n}} 个'
+    primaryStyle: 主系
+    subStyle: 副系
     spellGroupNormal: 常规
     spellGroupSpecial: 特殊
     augmentGroupHextech: 海克斯大乱斗
@@ -2230,19 +2242,40 @@ PlayerTab:
     augmentTypeDou: 斗
     isChampion: 选用英雄
     sections:
-      logicGroups: 逻辑分组
-      scopeGroups: 检查对象
-      gameConditions: 对局条件
-      resultConditions: 胜负条件
-      matchConditions: 对局成员
-      participantConditions: 玩家条件
-      statConditions: 数值条件
+      logicGroups: 逻辑组合
+      scopeGroups: 检查对象与范围
+      gameConditions: 对局本身
+      resultConditions: 胜负与结算
+      matchConditions: 成员与范围
+      participantConditions: 玩家选择内容
+      statConditions: 玩家数值表现
     descriptions:
       isWin: 匹配胜利的玩家或成员组
       isAbort: 匹配未正常结算的终止对局
       isRemake: 匹配重开对局
       isMatchedGame: 仅匹配由匹配系统创建的对局
       isPveGame: 仅匹配人机或其他 PVE 队列
+    gameModes:
+      CLASSIC: 经典
+      ARAM: 极地大乱斗
+      URF: 无限火力
+      CHERRY: 斗魂竞技场
+      KIWI: 符文大乱斗
+      STRAWBERRY: 无尽狂潮
+      PRACTICETOOL: 训练模式
+      TUTORIAL: 新手教程
+      NEXUSBLITZ: 极限闪击
+      ULTBOOK: 终极魔典
+      ONEFORALL: 克隆大作战
+      SNOWURF: 冰雪无限火力
+      DOOMBOTSTEEMO: 末日人机
+      RUBY: 末日人机
+      ARSR: 随机轮换模式
+      ASSASSINATE: 血月杀
+      FIRSTBLOOD: 超载
+      PROJECT: 源计划
+      STARGUARDIAN: 星之守护者
+      BRAWL: 神木之门
     examples:
       title: 快速示例
       applyHint: 点击导入并替换当前高级筛选条件
@@ -2266,9 +2299,13 @@ PlayerTab:
       or: 或
       not: 非
       isQueue: 游戏模式队列
+      isGameMode: 游戏模式
+      isMap: 地图
       isAbort: 是终止对局
       isRemake: 是重开对局
       hasAugment: 海克斯
+      hasPerk: 符文
+      hasPerkStyle: 符文系
       enemies: 检查该玩家对面队伍
       allies: 检查该玩家所在队伍
       all: 检查全部玩家
@@ -2280,7 +2317,29 @@ PlayerTab:
       killsBetween: 击杀数
       deathsBetween: 死亡数
       assistsBetween: 助攻数
-      goldBetween: 金币
+      goldBetween: 获得金币
+      goldSpentBetween: 花费金币
+      levelBetween: 等级
+      csBetween: 补刀数
+      killParticipationBetween: 击杀参与率 (%)
+      damageDealtToChampionsBetween: 对英雄总伤害
+      physicalDamageDealtToChampionsBetween: 对英雄物理伤害
+      magicDamageDealtToChampionsBetween: 对英雄魔法伤害
+      trueDamageDealtToChampionsBetween: 对英雄真实伤害
+      damageTakenBetween: 承受总伤害
+      physicalDamageTakenBetween: 承受物理伤害
+      magicDamageTakenBetween: 承受魔法伤害
+      trueDamageTakenBetween: 承受真实伤害
+      damageToTowersBetween: 对防御塔伤害
+      healBetween: 治疗量
+      visionScoreBetween: 视野得分
+      timeCCingOthersBetween: 控制时长
+      dgrBetween: 伤害金币转化率 (%)
+      soloKillsBetween: 单杀数
+      doubleKillsBetween: 双杀数
+      tripleKillsBetween: 三杀数
+      quadraKillsBetween: 四杀数
+      pentaKillsBetween: 五杀数
       isWin: 是胜利对局
       isLoss: 是失败对局
       isMatchedGame: 是匹配对局
@@ -2295,6 +2354,8 @@ PlayerTab:
   itemPerPage: '{{count}} 项'
   timeRange:
     all: 全部时间
+    last3Hours: 3 小时
+    last12Hours: 半天
     last24Hours: 24 小时
     last3Days: 3 天
     last7Days: 7 天

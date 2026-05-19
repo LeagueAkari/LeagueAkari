@@ -1,47 +1,9 @@
 <template>
   <div class="space-y-2 rounded border border-solid border-black/10 px-4 py-2 dark:border-white/10">
     <div class="flex items-center gap-2">
-      <div
-        v-if="node.type === 'durationBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><AccessTime20Regular /></NIcon>
-        {{ t('PlayerTab.filter.gameDuration') }}
-      </div>
-      <div
-        v-else-if="node.type === 'kdaBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><NumberSymbol20Regular /></NIcon>
-        {{ t('PlayerTab.filter.combinatorLabels.kdaBetween') }}
-      </div>
-      <div
-        v-else-if="node.type === 'killsBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><Target20Regular /></NIcon>
-        {{ t('PlayerTab.filter.kills') }}
-      </div>
-      <div
-        v-else-if="node.type === 'deathsBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><Dismiss20Regular /></NIcon>
-        {{ t('PlayerTab.filter.deaths') }}
-      </div>
-      <div
-        v-else-if="node.type === 'assistsBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><Handshake20Regular /></NIcon>
-        {{ t('PlayerTab.filter.assists') }}
-      </div>
-      <div
-        v-else-if="node.type === 'goldBetween'"
-        class="flex items-center gap-1.5 text-sm font-bold"
-      >
-        <NIcon size="16"><Money20Regular /></NIcon>
-        {{ t('PlayerTab.filter.gold') }}
+      <div class="flex items-center gap-1.5 text-sm font-bold">
+        <NIcon size="16"><component :is="numberBetweenIcon" /></NIcon>
+        {{ t(`PlayerTab.filter.combinatorLabels.${node.type}`) }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
@@ -52,58 +14,81 @@
       </NButton>
     </div>
 
+    <div v-if="supportsMeasureMode" class="flex items-center gap-2">
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
+        {{ t('PlayerTab.filter.measureMode') }}
+      </div>
+
+      <NSelect
+        class="w-60! max-w-full"
+        :options="measureModeOptions"
+        size="small"
+        :value="measureMode"
+        @update:value="handleUpdateMeasureMode"
+      />
+    </div>
+
     <div class="flex items-center gap-2">
-      <div class="w-20 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.min') }}
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
+        {{ rangeLabel('min') }}
       </div>
 
       <NInputNumber
+        class="w-40! max-w-full"
         :show-button="false"
         size="small"
-        :value="node.args[0].value"
-        @update:value="(val) => handleUpdateDurationBetweenId(val ?? 0, node.args[1].value)"
+        :value="minValue"
+        @update:value="(val) => handleUpdateNumberBetween(val ?? 0, maxValue)"
         :status="isWrong ? 'warning' : 'success'"
       />
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-20 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.max') }}
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
+        {{ rangeLabel('max') }}
       </div>
 
       <NInputNumber
+        class="w-40! max-w-full"
         :show-button="false"
         size="small"
-        :value="node.args[1].value"
-        @update:value="(val) => handleUpdateDurationBetweenId(node.args[0].value, val ?? 0)"
+        :value="maxValue"
+        @update:value="(val) => handleUpdateNumberBetween(minValue, val ?? 0)"
         :status="isWrong ? 'warning' : 'success'"
       />
     </div>
   </div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import {
   AccessTime20Regular,
+  BuildingRetailShield20Regular,
+  CheckmarkStarburst20Regular,
+  DataBarVertical20Regular,
   Dismiss20Regular,
+  Eye20Regular,
+  FoodGrains20Regular,
+  Gauge20Regular,
   Handshake20Regular,
+  HeartPulse20Regular,
   Money20Regular,
+  MoneyHand20Regular,
   NumberSymbol20Regular,
+  PeopleTeam20Regular,
+  Shield20Regular,
   Target20Regular
 } from '@vicons/fluent'
 import { Delete20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber } from 'naive-ui'
-import { computed } from 'vue'
+import { NButton, NIcon, NInputNumber, NSelect } from 'naive-ui'
+import { type Component, computed } from 'vue'
 
 import { useMatchHistoryFilterEditor } from '../context'
 import {
-  AssistsBetweenCombinator,
-  DeathsBetweenCombinator,
-  DurationBetweenCombinator,
-  GoldBetweenCombinator,
-  KdaBetweenCombinator,
-  KillsBetweenCombinator
+  type NumberBetweenCombinator,
+  type NumberBetweenMeasureMode,
+  paramArg
 } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -114,28 +99,136 @@ const { nodeId } = defineProps<{
 
 const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilterEditor()
 
-const node = computed(
-  () =>
-    nodeMap.value[nodeId] as
-      | DurationBetweenCombinator
-      | KdaBetweenCombinator
-      | KillsBetweenCombinator
-      | DeathsBetweenCombinator
-      | AssistsBetweenCombinator
-      | GoldBetweenCombinator
+const NUMBER_BETWEEN_ICON_MAP = {
+  durationBetween: AccessTime20Regular,
+  kdaBetween: NumberSymbol20Regular,
+  killsBetween: Target20Regular,
+  deathsBetween: Dismiss20Regular,
+  assistsBetween: Handshake20Regular,
+  goldBetween: Money20Regular,
+  levelBetween: CheckmarkStarburst20Regular,
+  csBetween: FoodGrains20Regular,
+  killParticipationBetween: PeopleTeam20Regular,
+  damageDealtToChampionsBetween: Target20Regular,
+  physicalDamageDealtToChampionsBetween: DataBarVertical20Regular,
+  magicDamageDealtToChampionsBetween: DataBarVertical20Regular,
+  trueDamageDealtToChampionsBetween: DataBarVertical20Regular,
+  damageTakenBetween: Shield20Regular,
+  physicalDamageTakenBetween: Shield20Regular,
+  magicDamageTakenBetween: Shield20Regular,
+  trueDamageTakenBetween: Shield20Regular,
+  goldSpentBetween: MoneyHand20Regular,
+  damageToTowersBetween: BuildingRetailShield20Regular,
+  healBetween: HeartPulse20Regular,
+  visionScoreBetween: Eye20Regular,
+  timeCCingOthersBetween: AccessTime20Regular,
+  dgrBetween: Gauge20Regular,
+  soloKillsBetween: Target20Regular,
+  doubleKillsBetween: CheckmarkStarburst20Regular,
+  tripleKillsBetween: CheckmarkStarburst20Regular,
+  quadraKillsBetween: CheckmarkStarburst20Regular,
+  pentaKillsBetween: CheckmarkStarburst20Regular
+} satisfies Record<string, Component>
+
+const MEASURE_MODE_TYPES = new Set([
+  'killsBetween',
+  'deathsBetween',
+  'assistsBetween',
+  'goldBetween',
+  'csBetween',
+  'damageDealtToChampionsBetween',
+  'physicalDamageDealtToChampionsBetween',
+  'magicDamageDealtToChampionsBetween',
+  'trueDamageDealtToChampionsBetween',
+  'damageTakenBetween',
+  'physicalDamageTakenBetween',
+  'magicDamageTakenBetween',
+  'trueDamageTakenBetween',
+  'goldSpentBetween',
+  'damageToTowersBetween',
+  'healBetween',
+  'visionScoreBetween',
+  'timeCCingOthersBetween',
+  'soloKillsBetween',
+  'doubleKillsBetween',
+  'tripleKillsBetween',
+  'quadraKillsBetween',
+  'pentaKillsBetween'
+])
+
+const node = computed(() => nodeMap.value[nodeId] as NumberBetweenCombinator)
+
+const numberBetweenIcon = computed(
+  () => NUMBER_BETWEEN_ICON_MAP[node.value.type] ?? NumberSymbol20Regular
 )
 
-const handleUpdateDurationBetweenId = (min: number, max: number) => {
+const supportsMeasureMode = computed(() => MEASURE_MODE_TYPES.has(node.value.type))
+
+const hasMeasureModeArg = computed(() => typeof node.value.args[0]?.value === 'string')
+
+const measureMode = computed<NumberBetweenMeasureMode>(() => {
+  if (!supportsMeasureMode.value || !hasMeasureModeArg.value) {
+    return 'value'
+  }
+
+  return node.value.args[0].value as NumberBetweenMeasureMode
+})
+
+const minValue = computed<number>(() => {
+  return hasMeasureModeArg.value
+    ? Number(node.value.args[1]?.value ?? 0)
+    : Number(node.value.args[0]?.value ?? 0)
+})
+
+const maxValue = computed<number>(() => {
+  return hasMeasureModeArg.value
+    ? Number(node.value.args[2]?.value ?? 0)
+    : Number(node.value.args[1]?.value ?? 0)
+})
+
+const measureModeOptions = computed(() => [
+  { label: t('PlayerTab.filter.measureModes.value'), value: 'value' },
+  { label: t('PlayerTab.filter.measureModes.teamShare'), value: 'teamShare' },
+  { label: t('PlayerTab.filter.measureModes.teamMaxShare'), value: 'teamMaxShare' },
+  { label: t('PlayerTab.filter.measureModes.gameShare'), value: 'gameShare' },
+  { label: t('PlayerTab.filter.measureModes.gameMaxShare'), value: 'gameMaxShare' }
+])
+
+const rangeLabel = (type: 'min' | 'max') => {
+  if (measureMode.value === 'value') {
+    return t(`PlayerTab.filter.${type}`)
+  }
+
+  return t(`PlayerTab.filter.${type}Percent`)
+}
+
+const toArgs = (mode: NumberBetweenMeasureMode, min: number, max: number) => {
+  if (!supportsMeasureMode.value) {
+    return [paramArg(min), paramArg(max)]
+  }
+
+  return [paramArg(mode), paramArg(min), paramArg(max)]
+}
+
+const handleUpdateNumberBetween = (min: number, max: number) => {
   updateNode(nodeId, {
     ...node.value,
-    args: [
-      { kind: 'param', value: min },
-      { kind: 'param', value: max }
-    ]
+    args: toArgs(measureMode.value, min, max)
+  })
+}
+
+const handleUpdateMeasureMode = (mode: NumberBetweenMeasureMode) => {
+  updateNode(nodeId, {
+    ...node.value,
+    args: toArgs(
+      mode,
+      mode === 'value' ? minValue.value : 0,
+      mode === 'value' ? maxValue.value : 100
+    )
   })
 }
 
 const isWrong = computed(() => {
-  return node.value.args[0].value > node.value.args[1].value
+  return minValue.value > maxValue.value
 })
 </script>

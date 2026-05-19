@@ -15,7 +15,7 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
         {{ t('PlayerTab.filter.have') }}
       </div>
       <NSelect
@@ -25,12 +25,12 @@
         filterable
         :value="node.args[0].value"
         @update:value="handleUpdateItemId"
-        class="w-60!"
+        class="w-60! max-w-full"
       />
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
         {{ t('PlayerTab.filter.atPosition') }}
       </div>
       <NSelect
@@ -38,7 +38,7 @@
         size="small"
         :value="orderValue"
         @update:value="handleUpdateOrder"
-        class="w-60!"
+        class="w-60! max-w-full"
       />
     </div>
   </div>

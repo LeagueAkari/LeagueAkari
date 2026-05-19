@@ -24,6 +24,14 @@ export const SIMPLE_STATE_VERSION = 1
 
 export type MatchHistoryFilterMode = 'simple' | 'advanced'
 export type SimpleWinLossFilter = 'all' | 'win' | 'loss'
+export type SimpleTimeRangeFilter =
+  | 'all'
+  | 'last3Hours'
+  | 'last12Hours'
+  | 'last24Hours'
+  | 'last3Days'
+  | 'last7Days'
+  | 'last30Days'
 
 export type MatchHistoryFilterState = {
   version: typeof STATE_VERSION
@@ -35,6 +43,7 @@ export type MatchHistoryFilterState = {
 export type SimpleMatchHistoryFilterState = {
   version: typeof SIMPLE_STATE_VERSION
   winLoss: SimpleWinLossFilter
+  timeRange: SimpleTimeRangeFilter
   positions: string[]
   championIds: number[]
   summonerPuuids: string[]
@@ -62,6 +71,7 @@ export const createEmptyState = (): MatchHistoryFilterState => ({
 export const createEmptySimpleState = (): SimpleMatchHistoryFilterState => ({
   version: SIMPLE_STATE_VERSION,
   winLoss: 'all',
+  timeRange: 'all',
   positions: [],
   championIds: [],
   summonerPuuids: [],
@@ -76,8 +86,11 @@ export const hasSimplePredicate = (
   state: SimpleMatchHistoryFilterState,
   options: SimplePredicateOptions = {}
 ) => {
+  const timeRange = state.timeRange ?? 'all'
+
   return (
     state.winLoss !== 'all' ||
+    timeRange !== 'all' ||
     (options.enablePosition === true && state.positions.length > 0) ||
     state.championIds.length > 0 ||
     state.summonerPuuids.length > 0
@@ -314,6 +327,17 @@ export const toFilterState = (
   const addChild = (node: CombinatorNode) => {
     nodeMap[node.id] = node
     andNode.args.push(nodeArg(node.id) as NonNullCombinatorArgNodeRef)
+  }
+
+  const timeRange = state.timeRange ?? 'all'
+
+  if (timeRange !== 'all') {
+    addChild({
+      id: createSimpleNodeId('time-range'),
+      type: 'gameCreationInTimeRange',
+      args: [paramArg(timeRange)],
+      parentId: andNode.id
+    })
   }
 
   if (state.winLoss !== 'all') {

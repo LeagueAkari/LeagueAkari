@@ -36,7 +36,7 @@
         size="small"
         :puuid="node.args[0].value"
         @update:puuid="handleUpdatePuuid"
-        class="w-60!"
+        class="w-60! max-w-full"
       />
 
       <div class="text-xs text-black/50 italic dark:text-white/50">
@@ -72,11 +72,7 @@ import CombinatorComp from '../CombinatorComp.vue'
 import NSelectWithSummonerSearching from '../NSelectWithSummonerSearching.vue'
 import { PlayerCombinator, paramArg } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
-import {
-  ALLOWED_COMBINATORS_MAP,
-  COMBINATOR_FACTORY_MAP,
-  createCombinatorDropdownOptions
-} from '../maps'
+import { createCombinatorDropdownOptions, createCombinatorNode } from '../registry'
 
 const { t } = useTranslation()
 
@@ -99,7 +95,11 @@ const childNode = computed(() => {
 })
 
 const handleAddNode = (key: string) => {
-  const newNode = COMBINATOR_FACTORY_MAP[key as keyof typeof COMBINATOR_FACTORY_MAP](nodeId)
+  const newNode = createCombinatorNode(key, nodeId)
+
+  if (!newNode) {
+    return
+  }
 
   addNodeAndUpdateNode(newNode, nodeId, {
     ...node.value,
@@ -117,6 +117,6 @@ const handleUpdatePuuid = (value: string | null) => {
 const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
-  return createCombinatorDropdownOptions(ALLOWED_COMBINATORS_MAP[scope], t)
+  return createCombinatorDropdownOptions(scope, t)
 })
 </script>

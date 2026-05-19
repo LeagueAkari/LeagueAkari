@@ -1,10 +1,6 @@
 <template>
   <div>
-    <component
-      v-if="node.type in COMPONENT_MAP"
-      :is="COMPONENT_MAP[node.type]"
-      :node-id="node.id"
-    />
+    <component v-if="nodeComponent" :is="nodeComponent" :node-id="node.id" />
     <div class="rounded border border-solid border-black/10 p-2 dark:border-white/10" v-else>
       {{ node.type }}
     </div>
@@ -40,11 +36,10 @@ import { useMatchHistoryFilterEditor } from './context'
 import { CombinatorNode } from './combinator-nodes'
 import { getScope } from './combinator-runtime'
 import {
-  ALLOWED_COMBINATORS_MAP,
-  COMBINATOR_FACTORY_MAP,
-  COMPONENT_MAP,
+  createCombinatorNode,
+  getCombinatorComponent,
   createCombinatorDropdownOptions
-} from './maps'
+} from './registry'
 
 const props = defineProps<{
   node: CombinatorNode
@@ -52,6 +47,8 @@ const props = defineProps<{
 
 const { t } = useTranslation()
 const { nodeMap, insertSiblingWithOr } = useMatchHistoryFilterEditor()
+
+const nodeComponent = computed(() => getCombinatorComponent(props.node.type))
 
 const parentNode = computed(() => {
   if (!props.node.parentId) {
@@ -68,7 +65,7 @@ const siblingCombinators = computed(() => {
 
   const scope = getScope(parentNode.value.id, nodeMap.value)
 
-  return createCombinatorDropdownOptions(ALLOWED_COMBINATORS_MAP[scope], t)
+  return createCombinatorDropdownOptions(scope, t)
 })
 
 const canInsertSibling = computed(() => {
@@ -88,9 +85,11 @@ const handleInsertSibling = (key: string) => {
     return
   }
 
-  const newNode = COMBINATOR_FACTORY_MAP[key as keyof typeof COMBINATOR_FACTORY_MAP](
-    props.node.parentId
-  )
+  const newNode = createCombinatorNode(key, props.node.parentId)
+
+  if (!newNode) {
+    return
+  }
 
   insertSiblingWithOr(props.node.id, newNode)
 }

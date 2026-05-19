@@ -5,19 +5,32 @@ import {
   and,
   anyone,
   assistsBetween,
+  csBetween,
+  damageDealtToChampionsBetween,
+  damageTakenBetween,
+  damageToTowersBetween,
   deathsBetween,
+  dgrBetween,
+  doubleKillsBetween,
   durationBetween,
   enemies,
   everyone,
   game,
+  gameCreationInTimeRange,
   goldBetween,
+  goldSpentBetween,
   hasAugment,
   hasItem,
+  hasPerk,
+  hasPerkStyle,
   hasPlayer,
   hasSpell,
+  healBetween,
   isAbort,
   isChampion,
+  isGameMode,
   isLoss,
+  isMap,
   isMatchedGame,
   isPosition,
   isPveGame,
@@ -25,13 +38,28 @@ import {
   isRemake,
   isWin,
   kdaBetween,
+  killParticipationBetween,
   killsBetween,
+  levelBetween,
+  magicDamageDealtToChampionsBetween,
+  magicDamageTakenBetween,
   not,
   or,
-  player
+  pentaKillsBetween,
+  physicalDamageDealtToChampionsBetween,
+  physicalDamageTakenBetween,
+  player,
+  quadraKillsBetween,
+  soloKillsBetween,
+  timeCCingOthersBetween,
+  tripleKillsBetween,
+  trueDamageDealtToChampionsBetween,
+  trueDamageTakenBetween,
+  visionScoreBetween
 } from '@shared/data-adapter/predicates/combinators'
 
 import { CombinatorNode, isNodeArg } from './combinator-nodes'
+import { getCombinatorProvideScope } from './combinator-specs'
 
 export const COMBINATOR_MAP = {
   game: game,
@@ -39,9 +67,13 @@ export const COMBINATOR_MAP = {
   or: or,
   not: not,
   isQueue: isQueue,
+  isGameMode: isGameMode,
+  isMap: isMap,
   isAbort: isAbort,
   isRemake: isRemake,
   hasAugment: hasAugment,
+  hasPerk: hasPerk,
+  hasPerkStyle: hasPerkStyle,
   enemies: enemies,
   allies: allies,
   all: all,
@@ -59,45 +91,33 @@ export const COMBINATOR_MAP = {
   deathsBetween: deathsBetween,
   assistsBetween: assistsBetween,
   goldBetween: goldBetween,
+  levelBetween: levelBetween,
+  csBetween: csBetween,
+  killParticipationBetween: killParticipationBetween,
+  damageDealtToChampionsBetween: damageDealtToChampionsBetween,
+  physicalDamageDealtToChampionsBetween: physicalDamageDealtToChampionsBetween,
+  magicDamageDealtToChampionsBetween: magicDamageDealtToChampionsBetween,
+  trueDamageDealtToChampionsBetween: trueDamageDealtToChampionsBetween,
+  damageTakenBetween: damageTakenBetween,
+  physicalDamageTakenBetween: physicalDamageTakenBetween,
+  magicDamageTakenBetween: magicDamageTakenBetween,
+  trueDamageTakenBetween: trueDamageTakenBetween,
+  goldSpentBetween: goldSpentBetween,
+  damageToTowersBetween: damageToTowersBetween,
+  healBetween: healBetween,
+  visionScoreBetween: visionScoreBetween,
+  timeCCingOthersBetween: timeCCingOthersBetween,
+  dgrBetween: dgrBetween,
+  soloKillsBetween: soloKillsBetween,
+  doubleKillsBetween: doubleKillsBetween,
+  tripleKillsBetween: tripleKillsBetween,
+  quadraKillsBetween: quadraKillsBetween,
+  pentaKillsBetween: pentaKillsBetween,
   isWin: isWin,
   isLoss: isLoss,
   isMatchedGame: isMatchedGame,
-  isPveGame: isPveGame
-}
-
-/**
- * 一个 combinator 可以提供什么样的 scope
- */
-export const PROVIDE_SCOPE_MAP = {
-  game: 'game',
-  and: null,
-  or: null,
-  not: null,
-  isQueue: null,
-  isAbort: null,
-  isRemake: null,
-  hasAugment: null,
-  enemies: 'participants',
-  allies: 'participants',
-  all: 'participants',
-  player: 'participant',
-  hasPlayer: null,
-  anyone: 'participant',
-  everyone: 'participant',
-  hasSpell: null,
-  isPosition: null,
-  hasItem: null,
-  isChampion: null,
-  durationBetween: null,
-  kdaBetween: null,
-  killsBetween: null,
-  deathsBetween: null,
-  assistsBetween: null,
-  goldBetween: null,
-  isWin: null,
-  isLoss: null,
-  isMatchedGame: null,
-  isPveGame: null
+  isPveGame: isPveGame,
+  gameCreationInTimeRange: gameCreationInTimeRange
 }
 
 export const toPredicate = (rootId: string, nodeMap: Record<string, CombinatorNode>) => {
@@ -156,8 +176,10 @@ export const getScope = (rootId: string, nodeMap: Record<string, CombinatorNode>
       throw new Error(`Node not found: ${current}`)
     }
 
-    if (PROVIDE_SCOPE_MAP[node.type] !== null) {
-      return PROVIDE_SCOPE_MAP[node.type] as string
+    const provideScope = getCombinatorProvideScope(node.type)
+
+    if (provideScope !== null) {
+      return provideScope
     }
 
     current = node.parentId

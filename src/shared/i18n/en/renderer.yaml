@@ -2147,6 +2147,7 @@ PlayerTab:
     reset: Clear Filters
     resetAll: Reset All Conditions
     winLoss: Result
+    timeRange: Time Range
     all: All
     win: Win
     loss: Loss
@@ -2221,8 +2222,19 @@ PlayerTab:
     select: Select
     atPosition: At position
     have: Have
+    measureMode: Measure
+    minPercent: Min (%)
+    maxPercent: Max (%)
+    measureModes:
+      value: Raw value
+      teamShare: Team share (%)
+      teamMaxShare: Team-high share (%)
+      gameShare: All-player share (%)
+      gameMaxShare: Game-high share (%)
     anyPosition: Any position
     positionN: 'Position {{n}}'
+    primaryStyle: Primary style
+    subStyle: Secondary style
     spellGroupNormal: Normal
     spellGroupSpecial: Special
     augmentGroupHextech: Hextech Arena
@@ -2232,19 +2244,40 @@ PlayerTab:
     augmentTypeDou: A
     isChampion: Champion
     sections:
-      logicGroups: Logic Groups
-      scopeGroups: Scope
-      gameConditions: Game Conditions
-      resultConditions: Result Conditions
-      matchConditions: Match Members
-      participantConditions: Player Conditions
-      statConditions: Stats Conditions
+      logicGroups: Logic
+      scopeGroups: Scope & Targets
+      gameConditions: Match Details
+      resultConditions: Result & Finish
+      matchConditions: Members & Scope
+      participantConditions: Player Picks & Loadout
+      statConditions: Player Stats
     descriptions:
       isWin: Matches winning players or member groups
       isAbort: Matches games that did not finish normally
       isRemake: Matches remake games
       isMatchedGame: Matches games created by matchmaking only
       isPveGame: Matches bot or other PvE queues only
+    gameModes:
+      CLASSIC: Classic
+      ARAM: ARAM
+      URF: URF
+      CHERRY: Arena
+      KIWI: 'ARAM: Mayhem'
+      STRAWBERRY: Swarm
+      PRACTICETOOL: Practice Tool
+      TUTORIAL: Tutorial
+      NEXUSBLITZ: Nexus Blitz
+      ULTBOOK: Ultimate Spellbook
+      ONEFORALL: One for All
+      SNOWURF: Snow URF
+      DOOMBOTSTEEMO: Doom Bots
+      RUBY: Doom Bots
+      ARSR: Rotating Mode
+      ASSASSINATE: Blood Moon
+      FIRSTBLOOD: Overcharge
+      PROJECT: PROJECT
+      STARGUARDIAN: Star Guardian
+      BRAWL: Brawl
     examples:
       title: Quick Examples
       applyHint: Click to import and replace the current advanced filter
@@ -2268,9 +2301,13 @@ PlayerTab:
       or: Or
       not: Not
       isQueue: Game queue
+      isGameMode: Game mode
+      isMap: Map
       isAbort: Aborted
       isRemake: Remake
       hasAugment: Augment
+      hasPerk: Rune
+      hasPerkStyle: Rune style
       enemies: Check this player's opponents
       allies: Check this player's team
       all: Check all players
@@ -2282,7 +2319,29 @@ PlayerTab:
       killsBetween: Kills
       deathsBetween: Deaths
       assistsBetween: Assists
-      goldBetween: Gold
+      goldBetween: Gold earned
+      goldSpentBetween: Gold spent
+      levelBetween: Level
+      csBetween: CS
+      killParticipationBetween: Kill participation (%)
+      damageDealtToChampionsBetween: Damage to champions
+      physicalDamageDealtToChampionsBetween: Physical damage to champions
+      magicDamageDealtToChampionsBetween: Magic damage to champions
+      trueDamageDealtToChampionsBetween: True damage to champions
+      damageTakenBetween: Damage taken
+      physicalDamageTakenBetween: Physical damage taken
+      magicDamageTakenBetween: Magic damage taken
+      trueDamageTakenBetween: True damage taken
+      damageToTowersBetween: Tower damage
+      healBetween: Healing
+      visionScoreBetween: Vision score
+      timeCCingOthersBetween: Crowd-control time
+      dgrBetween: Damage-gold efficiency (%)
+      soloKillsBetween: Solo kills
+      doubleKillsBetween: Double kills
+      tripleKillsBetween: Triple kills
+      quadraKillsBetween: Quadra kills
+      pentaKillsBetween: Penta kills
       isWin: Win
       isLoss: Loss
       isMatchedGame: Matched game
@@ -2298,6 +2357,8 @@ PlayerTab:
   itemPerPage_other: '{{count}} items'
   timeRange:
     all: All Time
+    last3Hours: Last 3 Hours
+    last12Hours: Last 12 Hours
     last24Hours: Last 24 Hours
     last3Days: Last 3 Days
     last7Days: Last 7 Days

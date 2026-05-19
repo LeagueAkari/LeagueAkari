@@ -62,11 +62,7 @@ import { useMatchHistoryFilterEditor } from '../context'
 import CombinatorComp from '../CombinatorComp.vue'
 import { NotCombinator } from '../combinator-nodes'
 import { getScope } from '../combinator-runtime'
-import {
-  ALLOWED_COMBINATORS_MAP,
-  COMBINATOR_FACTORY_MAP,
-  createCombinatorDropdownOptions
-} from '../maps'
+import { createCombinatorDropdownOptions, createCombinatorNode } from '../registry'
 
 const { t } = useTranslation()
 
@@ -91,11 +87,15 @@ const childNode = computed(() => {
 const combinators = computed(() => {
   const scope = getScope(nodeId, nodeMap.value)
 
-  return createCombinatorDropdownOptions(ALLOWED_COMBINATORS_MAP[scope], t)
+  return createCombinatorDropdownOptions(scope, t)
 })
 
 const handleAddNode = (key: string) => {
-  const newNode = COMBINATOR_FACTORY_MAP[key as keyof typeof COMBINATOR_FACTORY_MAP](nodeId)
+  const newNode = createCombinatorNode(key, nodeId)
+
+  if (!newNode) {
+    return
+  }
 
   addNodeAndUpdateNode(newNode, nodeId, {
     ...node.value,

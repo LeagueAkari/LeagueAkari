@@ -15,7 +15,7 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="w-20 text-sm text-black/80 dark:text-white/80">
+      <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
         {{ t('PlayerTab.filter.playerPuuid') }}
       </div>
 
@@ -23,7 +23,7 @@
         size="small"
         :puuid="node.args[0].value"
         @update:puuid="handleUpdatePuuid"
-        class="w-60!"
+        class="w-60! max-w-full"
       />
     </div>
   </div>

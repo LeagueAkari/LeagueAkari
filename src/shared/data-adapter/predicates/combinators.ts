@@ -23,6 +23,13 @@ export type ParticipantsScope = {
   participants: MatchParticipant[]
 }
 
+export type ParticipantNumberMeasureMode =
+  | 'value'
+  | 'teamShare'
+  | 'teamMaxShare'
+  | 'gameShare'
+  | 'gameMaxShare'
+
 export const and = <T>(...predicates: Predicate<T>[]) => {
   return (value: T) => predicates.every((predicate) => predicate(value))
 }
@@ -95,6 +102,12 @@ export const isQueue = (queueId: number) => {
   }
 }
 
+export const isGameMode = (gameMode: string) => {
+  return (data: GameScope) => {
+    return data.basicInfo.gameMode === gameMode
+  }
+}
+
 export const all = (predicate: Predicate<ParticipantsScope>) => {
   return (data: GameScope) => {
     return predicate({ participants: data.participants, context: data })
@@ -155,6 +168,32 @@ export const hasAugment = (augmentId: number | null, order: number = -1) => {
   }
 }
 
+export const hasPerk = (perkId: number, order: number = -1) => {
+  return (data: ParticipantScope) => {
+    const perks = data.participant.perks.styles.flatMap((style) =>
+      style.selections.map((selection) => selection.perk)
+    )
+
+    if (order !== -1) {
+      return perks[order] === perkId
+    }
+
+    return perks.includes(perkId)
+  }
+}
+
+export const hasPerkStyle = (styleId: number, order: number = -1) => {
+  return (data: ParticipantScope) => {
+    const perkStyles = data.participant.perks.styles.map((style) => style.style)
+
+    if (order !== -1) {
+      return perkStyles[order] === styleId
+    }
+
+    return perkStyles.includes(styleId)
+  }
+}
+
 export const hasSpell = (spellId: number, order: number = -1) => {
   return (data: ParticipantScope) => {
     if (order !== -1) {
@@ -195,33 +234,45 @@ export const durationBetween = (minSeconds = 0, maxSeconds = Infinity) => {
   }
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+export const gameCreationInTimeRange = (range: string | null) => {
+  return (data: GameScope) => {
+    if (!range || range === 'all') return true
+
+    const now = Date.now()
+    let startAt: number
+
+    switch (range) {
+      case 'last3Hours':
+        startAt = now - 3 * 60 * 60 * 1000
+        break
+      case 'last12Hours':
+        startAt = now - 12 * 60 * 60 * 1000
+        break
+      case 'last24Hours':
+        startAt = now - DAY_MS
+        break
+      case 'last3Days':
+        startAt = now - 3 * DAY_MS
+        break
+      case 'last7Days':
+        startAt = now - 7 * DAY_MS
+        break
+      case 'last30Days':
+        startAt = now - 30 * DAY_MS
+        break
+      default:
+        return true
+    }
+
+    return data.basicInfo.gameCreation >= startAt && data.basicInfo.gameCreation <= now
+  }
+}
+
 export const kdaBetween = (minKda = 0, maxKda = Infinity) => {
   return (data: ParticipantScope) => {
     return data.participant.kda >= minKda && data.participant.kda <= maxKda
-  }
-}
-
-export const killsBetween = (minKills = 0, maxKills = Infinity) => {
-  return (data: ParticipantScope) => {
-    return data.participant.kills >= minKills && data.participant.kills <= maxKills
-  }
-}
-
-export const deathsBetween = (minDeaths = 0, maxDeaths = Infinity) => {
-  return (data: ParticipantScope) => {
-    return data.participant.deaths >= minDeaths && data.participant.deaths <= maxDeaths
-  }
-}
-
-export const assistsBetween = (minAssists = 0, maxAssists = Infinity) => {
-  return (data: ParticipantScope) => {
-    return data.participant.assists >= minAssists && data.participant.assists <= maxAssists
-  }
-}
-
-export const goldBetween = (minGold = 0, maxGold = Infinity) => {
-  return (data: ParticipantScope) => {
-    return data.participant.goldEarned >= minGold && data.participant.goldEarned <= maxGold
   }
 }
 
@@ -288,34 +339,95 @@ export const isMap = (mapId: number) => {
   }
 }
 
-/**
- * Damage Gold Efficiency
- * @param minDgr 最小转换率 (%)，如 50%，注意不是 0.50
- * @param maxDgr 最大转换率 (%)，如 500%，注意不是 5.00
- * @returns
- */
-export const dgrBetween = (minDgr = 0, maxDgr = Infinity) => {
-  return (data: ParticipantScope) => {
-    return (
-      data.participant.damageGoldEfficiency >= minDgr / 100 &&
-      data.participant.damageGoldEfficiency <= maxDgr / 100
-    )
+const participantNumberBetween = (
+  selector: (participant: MatchParticipant) => number | null,
+  nullValueMatches = false
+) => {
+  return (
+    modeOrMin: ParticipantNumberMeasureMode | number = 0,
+    minOrMax?: number,
+    maybeMax?: number
+  ) => {
+    return (data: ParticipantScope) => {
+      const value = selector(data.participant)
+
+      if (value === null) return nullValueMatches
+
+      if (typeof modeOrMin !== 'string') {
+        return value >= modeOrMin && value <= (minOrMax ?? Infinity)
+      }
+
+      const min = minOrMax ?? 0
+      const max = maybeMax ?? Infinity
+
+      if (modeOrMin === 'value') {
+        return value >= min && value <= max
+      }
+
+      const relatedParticipants = modeOrMin.startsWith('team')
+        ? data.context.participants.filter(
+            (p) => p.teamIdentifier === data.participant.teamIdentifier
+          )
+        : data.context.participants
+      const relatedValues = relatedParticipants.map(selector).filter((v): v is number => v !== null)
+
+      const baseline =
+        modeOrMin === 'teamShare' || modeOrMin === 'gameShare'
+          ? relatedValues.reduce((acc, current) => acc + current, 0)
+          : relatedValues.length
+            ? Math.max(...relatedValues)
+            : 0
+
+      const percent = baseline === 0 ? 0 : (value / baseline) * 100
+
+      return percent >= min && percent <= max
+    }
   }
 }
 
-export const csBetween = (minCs = 0, maxCs = Infinity) => {
-  return (data: ParticipantScope) => {
-    return data.participant.cs >= minCs && data.participant.cs <= maxCs
+const participantPercentBetween = (selector: (participant: MatchParticipant) => number | null) => {
+  return (minPercent = 0, maxPercent = Infinity) => {
+    return (data: ParticipantScope) => {
+      const value = selector(data.participant)
+
+      if (value === null) return false
+
+      return value >= minPercent / 100 && value <= maxPercent / 100
+    }
   }
 }
 
-/**
- * 仅用于 SGP 数据源，LCU 数据源无此字段
- */
-export const soloKillsBetween = (minSoloKills = 0, maxSoloKills = Infinity) => {
-  return (data: ParticipantScope) => {
-    if (data.participant.soloKills === null) return false
-
-    return data.participant.soloKills >= minSoloKills && data.participant.soloKills <= maxSoloKills
-  }
-}
+export const levelBetween = participantNumberBetween((p) => p.level)
+export const killsBetween = participantNumberBetween((p) => p.kills)
+export const deathsBetween = participantNumberBetween((p) => p.deaths)
+export const assistsBetween = participantNumberBetween((p) => p.assists)
+export const csBetween = participantNumberBetween((p) => p.cs)
+export const killParticipationBetween = participantPercentBetween((p) => p.killParticipation)
+export const goldBetween = participantNumberBetween((p) => p.goldEarned)
+export const damageDealtToChampionsBetween = participantNumberBetween(
+  (p) => p.totalDamageDealtToChampions
+)
+export const physicalDamageDealtToChampionsBetween = participantNumberBetween(
+  (p) => p.physicalDamageDealtToChampions
+)
+export const magicDamageDealtToChampionsBetween = participantNumberBetween(
+  (p) => p.magicDamageDealtToChampions
+)
+export const trueDamageDealtToChampionsBetween = participantNumberBetween(
+  (p) => p.trueDamageDealtToChampions
+)
+export const damageTakenBetween = participantNumberBetween((p) => p.totalDamageTaken)
+export const physicalDamageTakenBetween = participantNumberBetween((p) => p.physicalDamageTaken)
+export const magicDamageTakenBetween = participantNumberBetween((p) => p.magicDamageTaken)
+export const trueDamageTakenBetween = participantNumberBetween((p) => p.trueDamageTaken)
+export const goldSpentBetween = participantNumberBetween((p) => p.goldSpent)
+export const damageToTowersBetween = participantNumberBetween((p) => p.totalDamageToTowers)
+export const healBetween = participantNumberBetween((p) => p.totalHeal)
+export const visionScoreBetween = participantNumberBetween((p) => p.visionScore)
+export const timeCCingOthersBetween = participantNumberBetween((p) => p.timeCCingOthers)
+export const dgrBetween = participantPercentBetween((p) => p.damageGoldEfficiency)
+export const soloKillsBetween = participantNumberBetween((p) => p.soloKills)
+export const doubleKillsBetween = participantNumberBetween((p) => p.doubleKills)
+export const tripleKillsBetween = participantNumberBetween((p) => p.tripleKills)
+export const quadraKillsBetween = participantNumberBetween((p) => p.quadraKills)
+export const pentaKillsBetween = participantNumberBetween((p) => p.pentaKills)

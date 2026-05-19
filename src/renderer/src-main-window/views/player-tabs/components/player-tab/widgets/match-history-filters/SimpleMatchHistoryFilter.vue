@@ -12,6 +12,18 @@
         </NRadioGroup>
       </div>
 
+      <div class="min-w-0">
+        <div class="mb-2 text-xs text-black/80 dark:text-white/60">
+          {{ t('PlayerTab.filter.timeRange') }}
+        </div>
+        <NSelect
+          class="w-full min-w-0"
+          v-model:value="selectedTimeRange"
+          size="small"
+          :options="timeRangeOptions"
+        />
+      </div>
+
       <div v-if="isSgpMatchHistorySource" class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
           {{ t('PlayerTab.filter.position') }}
@@ -91,6 +103,7 @@ import { usePlayerTab } from '../../context'
 import { useMatchHistory } from '../../data/match-history'
 import {
   SimpleMatchHistoryFilterState,
+  SimpleTimeRangeFilter,
   SimpleSummonerResult,
   SimpleWinLossFilter,
   createEmptySimpleState
@@ -123,6 +136,11 @@ const winLoss = computed({
   set: (winLoss: SimpleWinLossFilter) => updateSimpleState({ winLoss })
 })
 
+const selectedTimeRange = computed({
+  get: () => simpleState.value.timeRange ?? 'all',
+  set: (timeRange: SimpleTimeRangeFilter) => updateSimpleState({ timeRange })
+})
+
 const selectedChampions = computed({
   get: () => simpleState.value.championIds,
   set: (championIds: number[]) => updateSimpleState({ championIds })
@@ -137,6 +155,16 @@ const cachedSummoners = computed(() => simpleState.value.cachedSummoners)
 const isSgpMatchHistorySource = computed(
   () => preferredSource.value === 'sgp' || isCrossRegion.value
 )
+
+const timeRangeOptions = computed<{ label: string; value: SimpleTimeRangeFilter }[]>(() => [
+  { label: t('PlayerTab.timeRange.all'), value: 'all' },
+  { label: t('PlayerTab.timeRange.last3Hours'), value: 'last3Hours' },
+  { label: t('PlayerTab.timeRange.last12Hours'), value: 'last12Hours' },
+  { label: t('PlayerTab.timeRange.last24Hours'), value: 'last24Hours' },
+  { label: t('PlayerTab.timeRange.last3Days'), value: 'last3Days' },
+  { label: t('PlayerTab.timeRange.last7Days'), value: 'last7Days' },
+  { label: t('PlayerTab.timeRange.last30Days'), value: 'last30Days' }
+])
 
 const positionOptions = computed(() => {
   return ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'].map((position) => ({
