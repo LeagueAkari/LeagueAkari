@@ -6,7 +6,7 @@
       'shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60': isFloating
     }"
   >
-    <div class="min-w-0 flex-1 truncate text-xs leading-5 text-gray-700 dark:text-gray-400">
+    <div class="min-w-0 flex-1 truncate text-sm leading-5 text-gray-700 dark:text-gray-400">
       <span class="font-bold text-gray-900 dark:text-white">
         {{ t('PlayerTab.collectMode.collectedPageTitle') }}
       </span>
@@ -112,7 +112,7 @@
       <div class="mb-3 text-base font-bold text-gray-900 dark:text-white">
         {{ t('PlayerTab.collectMode.collectedPageTitle') }}
       </div>
-      <div class="text-xs leading-relaxed text-gray-700 dark:text-gray-400">
+      <div class="text-sm leading-relaxed text-gray-700 dark:text-gray-400">
         {{
           t('PlayerTab.collectMode.collectedPageDescription', {
             count: collectedGamesCount

@@ -154,6 +154,18 @@ export function provideMatchHistory(props: {
     return !!page.value && !!collectState.value && !collectState.value.isStopping
   }
 
+  const remainingCollectCount = (expectedCount: number) => {
+    return Math.max(expectedCount - (page.value?.games.length ?? 0), 0)
+  }
+
+  const appendCollectedGames = (games: LcuOrSgpGameSummary[]) => {
+    if (!page.value || games.length === 0) {
+      return
+    }
+
+    page.value.games = markRaw([...page.value.games, ...games])
+  }
+
   /**
    * 被 predicate 过滤后的战绩列表
    */
@@ -376,7 +388,6 @@ export function provideMatchHistory(props: {
           }
         })
 
-        // 这里使用 games 而非 completedGames，games 已经包含了所需信息，因为只需要目标玩家自身是否是打野即可
         loadGameDetails(games)
 
         page.value = {
@@ -474,12 +485,12 @@ export function provideMatchHistory(props: {
             break
           }
 
-          const gamesToAppend = rawSummaryList.filter(
-            (g) => params.predicate(g) && !lastPageGameIds.has(g.gameId)
-          )
+          const gamesToAppend = rawSummaryList
+            .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))
+            .slice(0, remainingCollectCount(params.expectedCount))
 
           gamesToAppend.forEach((g) => lastPageGameIds.add(g.gameId))
-          page.value.games = markRaw([...page.value.games, ...gamesToAppend])
+          appendCollectedGames(gamesToAppend)
 
           loadGameDetails(gamesToAppend)
 
@@ -529,9 +540,9 @@ export function provideMatchHistory(props: {
             break
           }
 
-          const games = rawSummaryList.filter(
-            (g) => params.predicate(g) && !lastPageGameIds.has(g.gameId)
-          )
+          const games = rawSummaryList
+            .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))
+            .slice(0, remainingCollectCount(params.expectedCount))
 
           const completedGamesToAppend = await Promise.all(
             games.map(async (g) => {
@@ -550,7 +561,7 @@ export function provideMatchHistory(props: {
           }
 
           completedGamesToAppend.forEach((g) => lastPageGameIds.add(g.gameId))
-          page.value.games = markRaw([...page.value.games, ...completedGamesToAppend])
+          appendCollectedGames(completedGamesToAppend)
 
           loadGameDetails(completedGamesToAppend)
 

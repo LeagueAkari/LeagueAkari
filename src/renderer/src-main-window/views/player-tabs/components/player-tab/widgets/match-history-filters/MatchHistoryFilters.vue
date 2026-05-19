@@ -8,7 +8,9 @@
           <NIcon class="shrink-0 text-base"><Filter20Regular /></NIcon>
           <span class="truncate">{{ t('PlayerTab.filter.title') }}</span>
         </div>
+      </div>
 
+      <div class="ml-auto flex shrink-0 items-center gap-3">
         <NRadioGroup v-model:value="activeMode" size="small" :disabled="!!collectState">
           <NRadioButton value="simple">
             {{ t('PlayerTab.filter.simpleTab') }}
@@ -17,13 +19,13 @@
             {{ t('PlayerTab.filter.advancedTab') }}
           </NRadioButton>
         </NRadioGroup>
-      </div>
 
-      <div class="ml-auto flex shrink-0 items-center gap-3">
+        <div class="h-6 w-px bg-black/10 dark:bg-white/10"></div>
+
         <NButton
           :disabled="!rootHasCombinator || !!collectState"
           tertiary
-          size="tiny"
+          size="small"
           type="warning"
           @click="clearFilters"
         >
@@ -38,8 +40,7 @@
             <span>
               <NButton
                 :disabled="!rootHasCombinator || !!collectState"
-                tertiary
-                size="tiny"
+                size="small"
                 type="primary"
                 @click="handleOpenCollectModeSettingsModal"
               >
