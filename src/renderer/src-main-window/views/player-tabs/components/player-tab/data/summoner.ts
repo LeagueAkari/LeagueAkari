@@ -25,8 +25,8 @@ import {
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 export type SummonerContext = {
-  summoner: Readonly<Ref<Summoner | null>>
-  isLoading: Readonly<Ref<boolean>>
+  summoner: Ref<Summoner | null>
+  isLoading: Ref<boolean>
   loadSummoner: () => Promise<void>
 }
 

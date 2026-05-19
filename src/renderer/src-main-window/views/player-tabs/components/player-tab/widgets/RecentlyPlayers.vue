@@ -50,7 +50,6 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
-import { analyzeRelationship } from '@shared/data-adapter/analysis/relationship'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
@@ -65,22 +64,14 @@ const props = defineProps<{
 
 const { t } = useTranslation()
 
-const { puuid, navigateToSummonerByPuuid } = usePlayerTab()
-const { page: pagedMatchHistory } = useMatchHistory()
+const { navigateToSummonerByPuuid } = usePlayerTab()
+const { relationship } = useMatchHistory()
 const { summonerName: maskedSummonerName } = useStreamerModeMaskedText()
-
-const relationship = computed(() => {
-  if (!pagedMatchHistory.value?.games) {
-    return {}
-  }
-  return analyzeRelationship(pagedMatchHistory.value.games, puuid.value)
-})
 
 const players = computed(() => {
   const isOpponent = props.side === 'enemy'
 
   return Object.values(relationship.value)
-    .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
     .map((a) => {
       const filteredGames = a.games.filter((g) => g.isOpponent === isOpponent)
       return { ...a, games: filteredGames }

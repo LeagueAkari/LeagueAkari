@@ -7,7 +7,9 @@
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
       :hide-privacy="as.settings.streamerMode"
+      can-dry-run-ongoing-game
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
+      @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
     <OngoingGamePanel
       :content-width="contentWidth"
@@ -23,7 +25,9 @@ import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { ref, shallowRef } from 'vue'
 
 import { useMainWindowAppContext } from '@main-window/context'
@@ -32,6 +36,7 @@ import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 const { contentWidth, contentHeight } = useMainWindowAppContext()
 
 const pt = useInstance(PlayerTabsRenderer)
+const og = useInstance(OngoingGameRenderer)
 
 const as = useAppCommonStore()
 
@@ -56,5 +61,8 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string
   showPreviewModal.value = true
 }
 
-
+const handleDryRunOngoingGame = async (draft: DraftOptions) => {
+  await og.setDraft(draft)
+  showPreviewModal.value = false
+}
 </script>

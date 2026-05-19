@@ -23,7 +23,9 @@ export const NAIVE_UI_LOCALE_MAP = {
 
 const CLASSIC_OVERRIDES: Record<string, GlobalThemeOverrides> = {
   light: {
-    common: {},
+    common: {
+      modalColor: '#f5f5f6'
+    },
     Notification: {
       padding: '12px',
       titleFontSize: '13px',
@@ -33,8 +35,15 @@ const CLASSIC_OVERRIDES: Record<string, GlobalThemeOverrides> = {
     },
     Card: {
       color: '#0000',
+      colorModal: '#f5f5f6',
       borderColor: 'rgba(0, 0, 0, 0.1)',
       borderColorModal: 'rgba(0, 0, 0, 0.16)'
+    },
+    Dialog: {
+      color: '#f5f5f6'
+    },
+    Modal: {
+      color: '#f5f5f6'
     },
     Message: {
       padding: '4px 8px',
@@ -65,7 +74,9 @@ const CLASSIC_OVERRIDES: Record<string, GlobalThemeOverrides> = {
     }
   },
   dark: {
-    common: {},
+    common: {
+      modalColor: '#1e1e22'
+    },
     Notification: {
       padding: '12px',
       titleFontSize: '13px',
@@ -76,7 +87,13 @@ const CLASSIC_OVERRIDES: Record<string, GlobalThemeOverrides> = {
     },
     Card: {
       color: '#0000',
-      colorModal: '#232329'
+      colorModal: '#1e1e22'
+    },
+    Dialog: {
+      color: '#1e1e22'
+    },
+    Modal: {
+      color: '#1e1e22'
     },
     Dropdown: {
       color: '#1f1f1ffa'

@@ -24,26 +24,27 @@ import { computed, ref, watch } from 'vue'
 
 import { usePlayerTab } from '../../context'
 import { useMatchHistory } from '../../data/match-history'
-import { SimpleSummonerResult, useMatchHistoryFilters } from '../../data/match-history-filters'
+import { useMatchHistoryFilterEditor } from './context'
+import { SimpleSummonerResult } from './filter-state'
 
 const selectedPuuid = defineModel<string | null>('puuid', { required: true })
 
-const { page: pagedMatchHistory } = useMatchHistory()
+const { page } = useMatchHistory()
 const { searchSummonerByAlias } = useSummonerFetch()
 
-const { cachedSummoners, saveSummoner } = useMatchHistoryFilters()
+const { cachedSummoners, saveSummoner } = useMatchHistoryFilterEditor()
 
 const isSearchingSummoner = ref(false)
 const searchText = ref('')
 
-const { isCrossRegion, sgpServerId } = usePlayerTab()
+const { puuid, isCrossRegion, sgpServerId } = usePlayerTab()
 
 const summonerMapInPage = computed(() => {
-  if (!pagedMatchHistory.value) {
+  if (!page.value) {
     return new Map<string, SimpleSummonerResult>()
   }
 
-  const { games } = pagedMatchHistory.value
+  const { games } = page.value
   const playerMap = new Map<string, SimpleSummonerResult>()
 
   games.forEach((game) => {
@@ -69,13 +70,15 @@ const summonerOptions = computed(() => {
     }
   }
 
-  return Array.from(map.values()).map((summoner) => {
-    return {
-      label: `${summoner.gameName}#${summoner.tagLine}`,
-      value: summoner.puuid,
-      profileIconId: summoner.profileIconId
-    }
-  })
+  return Array.from(map.values())
+    .toSorted((a, b) => Number(b.puuid === puuid.value) - Number(a.puuid === puuid.value))
+    .map((summoner) => {
+      return {
+        label: `${summoner.gameName}#${summoner.tagLine}`,
+        value: summoner.puuid,
+        profileIconId: summoner.profileIconId
+      }
+    })
 })
 
 // 保证选择的召唤师被缓存

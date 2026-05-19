@@ -18,8 +18,8 @@ import {
 } from 'vue'
 
 export type TagsContext = {
-  tags: Readonly<Ref<PlayerTagDto[]>>
-  isLoading: Readonly<Ref<boolean>>
+  tags: Ref<PlayerTagDto[]>
+  isLoading: Ref<boolean>
   loadTags: () => Promise<void>
 
   /**

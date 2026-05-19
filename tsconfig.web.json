@@ -21,16 +21,15 @@
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
     "composite": true,
-    "baseUrl": ".",
     "types": ["@modyfi/vite-plugin-yaml/modules"],
     "paths": {
-      "@main-window/*": ["src/renderer/src-main-window/*"],
-      "@aux-window/*": ["src/renderer/src-aux-window/*"],
-      "@opgg-window/*": ["src/renderer/src-opgg-window/*"],
-      "@ongoing-game-window/*": ["src/renderer/src-ongoing-game-window/*"],
-      "@cd-timer-window/*": ["src/renderer/src-cd-timer-window/*"],
-      "@shared/*": ["src/shared/*"],
-      "@renderer-shared/*": ["src/renderer-shared/*"]
+      "@main-window/*": ["./src/renderer/src-main-window/*"],
+      "@aux-window/*": ["./src/renderer/src-aux-window/*"],
+      "@opgg-window/*": ["./src/renderer/src-opgg-window/*"],
+      "@ongoing-game-window/*": ["./src/renderer/src-ongoing-game-window/*"],
+      "@cd-timer-window/*": ["./src/renderer/src-cd-timer-window/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@renderer-shared/*": ["./src/renderer-shared/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,

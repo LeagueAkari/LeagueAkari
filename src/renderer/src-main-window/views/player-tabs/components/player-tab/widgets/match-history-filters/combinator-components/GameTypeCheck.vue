@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
-  >
+  <div class="rounded border border-solid border-black/10 px-4 py-2 dark:border-white/10">
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'isMatchedGame'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Games20Regular /></NIcon>
@@ -22,6 +20,10 @@
         {{ t('PlayerTab.filter.delete') }}
       </NButton>
     </div>
+
+    <div class="mt-2 text-xs text-black/50 dark:text-white/50">
+      {{ t(`PlayerTab.filter.descriptions.${node.type}`) }}
+    </div>
   </div>
 </template>
 
@@ -32,7 +34,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import { useMatchHistoryFilterEditor } from '../context'
 import type { CombinatorNode } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -41,7 +43,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, deleteNode } = useMatchHistoryFilterEditor()
 
 const node = computed(
   () =>

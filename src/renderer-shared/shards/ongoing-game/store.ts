@@ -1,12 +1,15 @@
-import { JunglePathingAnalysis } from '@shared/data-adapter/analysis/jungle'
-import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
-import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
+import { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
+import { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import {
+  AdditionalResult,
+  DraftOptions,
+  OngoingGameSimplifiedChampMastery,
+  QueryStage
+} from '@shared/types/shards/ongoing-game'
 import { SavedInfo } from '@shared/types/shards/saved-player'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
@@ -21,11 +24,10 @@ export interface MatchHistoryPlayer {
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
     enabled: true,
-    matchHistoryLoadCount: 20,
-    concurrency: 3,
+    matchHistoryLoadCount: 50,
+    concurrency: 4,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
-    gameDetailsLoadCount: 0,
-    jungleAnalysisMatchHistoryLoadCount: 100,
+    gameDetailsLoadCount: 20,
     premadeTeamInferMatchCountThreshold: 5,
 
     orderPlayerBy: 'default' as
@@ -37,15 +39,16 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       | 'premade-team',
 
     showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
-    showJunglePathing: true,
     showMatchHistoryItemBorder: false,
+    showJunglePathingForAllPlayers: false,
     autoRouteWhenGameStarts: false,
     playerCardTags: {
       showPremadeTeamTag: true,
       showSuspiciousFlashPositionTag: true,
       showWinningStreakTag: true,
       showLosingStreakTag: true,
-      showSoloKillsTag: false,
+      showSoloKillsTag: true,
+      showSoloDeathsTag: true,
       showGreatPerformanceTag: true,
       showAverageTeamDamageTag: false,
       showAverageTeamDamageTakenTag: false,
@@ -60,7 +63,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showPrivacyTag: true,
       showAkariScoreTag: false
     },
-    queryInLobbyPhase: false
+    queryInLobbyPhase: true
   })
 
   const championSelections = shallowRef<Record<string, number>>({})
@@ -79,20 +82,19 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const queryStage = shallowRef<QueryStage>({ phase: 'unavailable', gameInfo: null })
   const isInEog = shallowRef(false)
 
-  const playerStats = shallowRef<{
-    players: Record<string, MatchHistoryGamesAnalysisAll>
-    teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
+  const analysis = shallowRef<{
+    players: Record<string, AggregatedAnalysis>
+    teams: Record<string, AggregatedTeamAnalysis>
   } | null>(null)
 
-  const matchHistoryTagParams = shallowRef<Pick<
-    MatchHistoryQueryParams,
-    'tag' | 'tagsQueryType'
-  > | null>(null)
+  const matchHistoryTagParams = shallowRef<Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>>(
+    {}
+  )
 
   const matchHistory = ref<Record<string, MatchHistoryPlayer>>({})
   const summoner = ref<Record<string, SummonerInfo>>({})
   const rankedStats = ref<Record<string, RankedStats>>({})
-  const championMastery = ref<Record<string, Record<number, Mastery>>>({})
+  const championMastery = ref<Record<string, Record<number, OngoingGameSimplifiedChampMastery>>>({})
   const savedInfo = ref<Record<string, SavedInfo>>({})
 
   const cachedGames = ref<Record<number, LcuOrSgpGameSummary>>({})
@@ -105,20 +107,10 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const championMasteryLoadingState = ref<Record<string, string>>({}) // 未实装
 
   const teamParticipantGroups = shallowRef<Record<string, string[]>>({})
-  const calculatedPremadeTeamMap = shallowRef<Record<string, number>>({})
-  const inferredPremadeTeams = shallowRef<
-    {
-      puuids: string[]
-      times: number
-      gameIds: number[]
-    }[]
-  >([])
+  const mergedPremadeTeamMap = shallowRef<Record<string, number>>({})
+  const inferredPremadeTeams = shallowRef<string[][]>([])
 
-  const jungleAnalysis = shallowRef<Record<string, JunglePathingAnalysis>>({})
-
-  const draft = shallowRef<{
-    teams: Record<string, string[]>
-  } | null>(null)
+  const draft = shallowRef<DraftOptions | null>(null)
   const additional = shallowRef<AdditionalResult>({
     teams: {},
     selections: {},
@@ -135,7 +127,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     teams,
     queryStage,
     isInEog,
-    playerStats,
+    analysis,
     matchHistoryTagParams,
 
     matchHistory,
@@ -153,9 +145,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     championMasteryLoadingState,
     teamParticipantGroups,
     additional,
-    jungleAnalysis,
     draft,
-    calculatedPremadeTeamMap,
+    mergedPremadeTeamMap,
     inferredPremadeTeams
   }
 })

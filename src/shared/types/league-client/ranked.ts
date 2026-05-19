@@ -10,14 +10,16 @@ export interface AchievedTier {
 }
 
 export interface RankedStats {
+  currentSeasonSplitPoints: number
   earnedRegaliaRewardIds: any[]
   highestCurrentSeasonReachedTierSR: string
-  highestPreviousSeasonAchievedDivision: string
-  highestPreviousSeasonAchievedTier: string
+  highestPreviousSeasonAchievedDivision?: string
+  highestPreviousSeasonAchievedTier?: string
   highestPreviousSeasonEndDivision: string
   highestPreviousSeasonEndTier: string
   highestRankedEntry: RankedEntry
   highestRankedEntrySR: RankedEntry
+  previousSeasonSplitPoints: number
   queueMap: QueueMap
   queues: RankedEntry[]
   rankedRegaliaLevel: number
@@ -26,30 +28,30 @@ export interface RankedStats {
 }
 
 export interface Seasons {
-  CHERRY: CHERRY
-  RANKED_FLEX_SR: CHERRY
-  RANKED_SOLO_5x5: CHERRY
-  RANKED_TFT: CHERRY
-  RANKED_TFT_DOUBLE_UP: CHERRY
-  RANKED_TFT_TURBO: CHERRY
+  RANKED_FLEX_SR?: RankedSeasonInfo
+  RANKED_SOLO_5x5?: RankedSeasonInfo
+  RANKED_TFT?: RankedSeasonInfo
+  RANKED_TFT_DOUBLE_UP?: RankedSeasonInfo
+  RANKED_TFT_TURBO?: RankedSeasonInfo
 }
 
-export interface CHERRY {
+export interface RankedSeasonInfo {
   currentSeasonEnd: number
   currentSeasonId: number
   nextSeasonStart: number
 }
 
 interface QueueMap {
-  CHERRY: RankedEntry
-  RANKED_FLEX_SR: RankedEntry
-  RANKED_SOLO_5x5: RankedEntry
-  RANKED_TFT: RankedEntry
-  RANKED_TFT_DOUBLE_UP: RankedEntry
-  RANKED_TFT_TURBO: RankedEntry
+  RANKED_FLEX_SR?: RankedEntry
+  RANKED_SOLO_5x5?: RankedEntry
+  RANKED_TFT?: RankedEntry
+  RANKED_TFT_DOUBLE_UP?: RankedEntry
+  RANKED_TFT_TURBO?: RankedEntry
 }
 
 export interface RankedEntry {
+  climbingIndicatorActive?: boolean
+  currentSeasonWinsForRewards: number
   division: string
   highestDivision: string
   highestTier: string
@@ -57,10 +59,11 @@ export interface RankedEntry {
   leaguePoints: number
   losses: number
   miniSeriesProgress: string
-  previousSeasonAchievedDivision: string
-  previousSeasonAchievedTier: string
+  previousSeasonAchievedDivision?: string
+  previousSeasonAchievedTier?: string
   previousSeasonEndDivision: string
   previousSeasonEndTier: string
+  previousSeasonWinsForRewards: number
   provisionalGameThreshold: number
   provisionalGamesRemaining: number
   previousSeasonHighestTier: string

@@ -94,6 +94,8 @@ const dodgeLoop = async () => {
 
   const workers = Array.from({ length: DODGE_CONCURRENCY }, () => worker())
   await Promise.all(workers)
+
+  iteration.value = 0
 }
 </script>
 

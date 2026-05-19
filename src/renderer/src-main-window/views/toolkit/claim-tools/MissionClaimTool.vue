@@ -15,7 +15,7 @@
         @click="claim"
       >
         <template v-if="selectedMissionIds.length">{{
-          t('MissionClaimTool.claimButtonC', { countV: selectedMissionIds.length })
+          t('MissionClaimTool.claimButtonC', { count: selectedMissionIds.length })
         }}</template>
         <template v-else>
           {{ t('MissionClaimTool.claimButton') }}

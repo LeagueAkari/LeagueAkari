@@ -33,27 +33,27 @@ const AUTO_CHAMP_CONFIG_GAME_MODE_MAP: Record<string, string> = {
 export const OpggContextKey: InjectionKey<OpggContext> = Symbol('OpggContext')
 
 export type OpggContext = {
-  currentTab: Readonly<Ref<'champions' | 'champion'>>
+  currentTab: Ref<'champions' | 'champion'>
 
   setTab: (tab: 'champions' | 'champion', championId?: number) => void
 
-  flashPosition: Readonly<Ref<'auto' | 'd' | 'f'>>
+  flashPosition: Ref<'auto' | 'd' | 'f'>
 
-  championId: Readonly<Ref<number | null>>
-  mode: Readonly<Ref<ModeType>>
-  position: Readonly<Ref<PositionType>>
-  region: Readonly<Ref<RegionType>>
-  tier: Readonly<Ref<TierType>>
-  version: Readonly<Ref<string | null>>
+  championId: Ref<number | null>
+  mode: Ref<ModeType>
+  position: Ref<PositionType>
+  region: Ref<RegionType>
+  tier: Ref<TierType>
+  version: Ref<string | null>
   queueKeeper: Readonly<QueueKeeper>
 
-  versions: Readonly<Ref<string[]>>
-  champions: Readonly<Ref<OpggChampionsResponse | null>>
-  champion: Readonly<Ref<OpggChampionBuildResponse | null>>
+  versions: Ref<string[]>
+  champions: Ref<OpggChampionsResponse | null>
+  champion: Ref<OpggChampionBuildResponse | null>
 
-  kiwiAugments: Readonly<Ref<OpggAramMayhemChampionAugmentsResponse | null>>
+  kiwiAugments: Ref<OpggAramMayhemChampionAugmentsResponse | null>
 
-  isLoading: Readonly<Ref<boolean>>
+  isLoading: Ref<boolean>
 
   setFlashPosition: (flashPosition: 'auto' | 'd' | 'f') => void
 

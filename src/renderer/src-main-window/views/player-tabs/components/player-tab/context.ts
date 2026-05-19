@@ -18,6 +18,7 @@ import {
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import { provideChallengesPlayerData } from './data/challenges'
+import { provideChampionMastery } from './data/champion-mastery'
 import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
 import { provideMatchHistoryFilters } from './data/match-history-filters'
@@ -28,30 +29,30 @@ import { provideSummonerProfile } from './data/summoner-profile'
 import { provideTags } from './data/tags'
 
 export type PlayerTabContext = {
-  id: Readonly<Ref<string>>
+  id: Ref<string>
 
-  puuid: Readonly<Ref<string>>
+  puuid: Ref<string>
 
   /** 整个页面会使用哪个数据源
    * 对于可以 sgp 的数据源，那么就会使用 sgp，否则使用 lcu
    * 对于跨区查询，一定使用 sgp
    */
-  preferredSource: Readonly<Ref<'lcu' | 'sgp'>>
+  preferredSource: Ref<'lcu' | 'sgp'>
 
   /** 是否是自己 */
-  isSelfTab: Readonly<Ref<boolean>>
+  isSelfTab: Ref<boolean>
 
   /** 是否是当前 tab */
-  isCurrentTab: Readonly<Ref<boolean>>
+  isCurrentTab: Ref<boolean>
 
   /** 是否 TENCENT 跨区查询 */
-  isCrossRegion: Readonly<Ref<boolean>>
+  isCrossRegion: Ref<boolean>
 
   /** 该玩家数据来源自哪个服务器 */
-  sgpServerId: Readonly<Ref<string>>
+  sgpServerId: Ref<string>
 
   /** 是否小尺寸 */
-  isSmallSize: Readonly<Ref<boolean>>
+  isSmallSize: Ref<boolean>
 
   /** 松散事件 */
   events: Emitter<PlayerTabEvents>
@@ -141,7 +142,10 @@ export function providePlayerTab(props: {
     isCrossRegion
   })
 
-  const { predicate } = provideMatchHistoryFilters()
+  const { predicate } = provideMatchHistoryFilters({
+    puuid,
+    enablePositionFilter: computed(() => preferredSource.value === 'sgp' || isCrossRegion.value)
+  })
 
   provideMatchHistory({
     puuid,
@@ -155,6 +159,11 @@ export function providePlayerTab(props: {
     puuid,
     isCrossRegion,
     isSelfTab
+  })
+
+  provideChampionMastery({
+    puuid,
+    isCrossRegion
   })
 
   provideEncounteredGames({

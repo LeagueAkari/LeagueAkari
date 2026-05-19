@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-if="isLoading && (!pagedMatchHistory || displayedGames.length === 0)"
+      v-if="isLoading && (!page || visibleGamesCount === 0)"
       class="flex h-50 items-center justify-center rounded bg-black/5 dark:bg-white/5"
     >
       <div class="flex items-center gap-2">
@@ -10,62 +10,63 @@
       </div>
     </div>
 
-    <template v-else-if="pagedMatchHistory">
+    <template v-else-if="page">
       <div
-        v-if="pagedMatchHistory.games.length === 0"
+        v-if="visibleGamesCount === 0"
         class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
       >
         <span class="text-sm text-black/80 dark:text-white/60">{{
           rootHasCombinator ? t('PlayerTab.noFilteredMatchHistory') : t('PlayerTab.noMatchHistory')
         }}</span>
 
-        <NButton v-if="rootHasCombinator" size="small" tertiary @click="clearFilters">
+        <NButton
+          v-if="rootHasCombinator && !page.isLoadedByCollectMode"
+          size="small"
+          tertiary
+          @click="clearPredicate"
+        >
           {{ t('PlayerTab.clearFilters') }}
         </NButton>
       </div>
-    </template>
 
-    <div v-if="pagedMatchHistory && displayedGames.length > 0" class="space-y-1">
-      <MatchCard
-        v-for="g of displayedGames"
-        ref="matchCardEls"
-        :summary="g"
-        :puuid="puuid"
-        :key="`${g.source}${g.gameId}`"
-        :theme="as.colorTheme"
-        @navigate-to-summoner-by-puuid="navigateToSummonerByPuuid"
-        @load-details="loadDetails(g.gameId)"
-        @download-replay="downloadReplay(g.gameId)"
-        @watch-replay="launchRelay(g.gameId)"
-        @filter-by-champion="applyChampionFilter"
-        :details="pagedMatchHistory.details[g.gameId]"
-        :loading-details="pagedMatchHistory.detailsLoading[g.gameId]"
-        :hide-privacy="as.settings.streamerMode"
-        :replay-state="pagedMatchHistory.replayMetadata[g.gameId]"
-        :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
-        :jungle-pathing-data-source="junglePathingDataSource"
-      />
-
-      <div
-        v-if="isLoading"
-        class="flex items-center justify-center gap-2 py-2 text-xs text-black/65 dark:text-white/50"
-      >
-        <NSpin :size="12" />
-        <span>{{ t('PlayerTab.loading') }}</span>
+      <div v-if="page.games.length > 0" v-show="visibleGamesCount > 0" class="flex flex-col gap-1">
+        <MatchCard
+          v-for="g of page.games"
+          v-show="isGameVisible(g)"
+          ref="matchCardEls"
+          :summary="g"
+          :puuid="puuid"
+          :key="toGameKey(g)"
+          :theme="as.colorTheme"
+          @navigate-to-summoner-by-puuid="navigateToSummonerByPuuid"
+          @load-details="loadDetails(g.gameId)"
+          @download-replay="downloadReplay(g.gameId)"
+          @watch-replay="launchRelay(g.gameId)"
+          @dry-run-ongoing-game="handleDryRunOngoingGame"
+          :details="page.details[g.gameId]"
+          :loading-details="page.detailsLoading[g.gameId]"
+          :hide-privacy="as.settings.streamerMode"
+          :replay-state="page.replayMetadata[g.gameId]"
+          :can-dry-run-ongoing-game="canDryRunOngoingGame"
+        />
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NSpin } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
@@ -78,22 +79,17 @@ const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const pts = usePlayerTabsStore()
 const ogs = useOngoingGameStore()
+const og = useInstance(OngoingGameRenderer)
+const router = useRouter()
 
 const { t } = useTranslation()
 
+const { puuid, events, isCrossRegion, navigateToSummonerByPuuid, previewGame } = usePlayerTab()
 const {
-  puuid,
-  events,
-  navigateToSummonerByPuuid,
-  previewGame,
-  preferredSource,
-  sgpServerId,
-  isCrossRegion
-} = usePlayerTab()
-const {
-  page: pagedMatchHistory,
+  page,
   isLoading,
-  loadDetails: rawLoadDetails,
+  filteredGames,
+  loadDetails,
   downloadReplay,
   launchRelay,
   loadMatchHistory
@@ -101,30 +97,31 @@ const {
 
 const { loadSpectatorData } = useSpectator()
 
-const { rootHasCombinator, clearPredicate: clearFilters } = useMatchHistoryFilters()
+const { rootHasCombinator, clearPredicate } = useMatchHistoryFilters()
 
-const junglePathingDataSource = computed(() => {
-  return {
-    preferredSource: preferredSource.value,
-    sgpServerId: sgpServerId.value,
-    isCrossRegion: isCrossRegion.value
-  }
-})
-
-const displayedGames = computed(() => {
-  if (!pagedMatchHistory.value) {
-    return []
-  }
-
-  return pagedMatchHistory.value.games
-})
-
-const applyChampionFilter = (_championId: number) => {
-  // TODO: integrate with predicate-based filter system
+const toGameKey = (game: LcuOrSgpGameSummary) => {
+  return `${game.source}:${game.gameId}`
 }
 
-const loadDetails = (gameId: number) => {
-  rawLoadDetails(gameId)
+const visibleGameKeys = computed(() => {
+  return new Set(filteredGames.value.map(toGameKey))
+})
+
+const visibleGamesCount = computed(() => {
+  return filteredGames.value.length
+})
+
+const isGameVisible = (game: LcuOrSgpGameSummary) => {
+  return visibleGameKeys.value.has(toGameKey(game))
+}
+
+const handleDryRunOngoingGame = async (draft: DraftOptions) => {
+  if (!canDryRunOngoingGame.value) {
+    return
+  }
+
+  await og.setDraft(draft)
+  await router.replace({ name: 'ongoing-game' })
 }
 
 const isEndOfGame = computed(
@@ -144,10 +141,7 @@ watch(
       if (allPlayerPuuids.includes(puuid.value)) {
         loadSpectatorData()
 
-        if (
-          !pagedMatchHistory.value ||
-          (pagedMatchHistory.value.queryParams.startIndex || 0) === 0
-        ) {
+        if (!page.value || (page.value.queryParams.startIndex || 0) === 0) {
           loadMatchHistory({
             startIndex: 0,
             count: pts.frontendSettings.loadCount
@@ -160,9 +154,25 @@ watch(
 
 const matchCardEls = useTemplateRef('matchCardEls')
 
+watch(visibleGameKeys, () => {
+  nextTick(() => {
+    matchCardEls.value?.forEach((el) => {
+      const summary = el?.$props.summary as LcuOrSgpGameSummary | undefined
+
+      if (summary && !isGameVisible(summary)) {
+        el?.setExpanded(false)
+      }
+    })
+  })
+})
+
 const handleFocusGame = ({ summary }: { summary: LcuOrSgpGameSummary | number }) => {
   const extractedGameId = typeof summary === 'number' ? summary : summary.gameId
-  const el = matchCardEls.value?.find((el) => el?.$props.summary?.gameId === extractedGameId)
+  const el = matchCardEls.value?.find((el) => {
+    const cardSummary = el?.$props.summary as LcuOrSgpGameSummary | undefined
+
+    return cardSummary?.gameId === extractedGameId && isGameVisible(cardSummary)
+  })
 
   if (el) {
     el.setExpanded(true)
@@ -174,6 +184,11 @@ const handleFocusGame = ({ summary }: { summary: LcuOrSgpGameSummary | number })
     previewGame(summary)
   }
 }
+
+// 目前的对局分析模块强依赖当前大区的玩家数据，因此暂时只支持本区玩家模拟
+const canDryRunOngoingGame = computed(() => {
+  return !isCrossRegion.value
+})
 
 onMounted(() => {
   events.on('focusGame', handleFocusGame)

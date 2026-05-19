@@ -31,12 +31,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
-  private _pendingCancelMatchmakingSearchAfterChampSelectReturn = false
-  private _isCancelingMatchmakingSearchAfterChampSelectReturn = false
-  private _cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId: NodeJS.Timeout | null = null
-  private _blockedAutoMatchmakingPartyId: string | null = null
-  private _lastKnownLobbyPartyId: string | null = null
-
   private _autoAcceptTask = new TimeoutTask(this._acceptMatch.bind(this))
   private _playAgainTask = new TimeoutTask(this._playAgainFn.bind(this))
   private _reconnectTask = new TimeoutTask(this._reconnectFn.bind(this))
@@ -69,9 +63,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           default: this.settings.autoMatchmakingMaximumMatchDuration
         },
         autoMatchmakingMinimumMembers: { default: this.settings.autoMatchmakingMinimumMembers },
-        cancelAutoMatchmakingAfterChampSelectReturnEnabled: {
-          default: this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled
-        },
         playAgainEnabled: { default: this.settings.playAgainEnabled },
         autoReconnectEnabled: { default: this.settings.autoReconnectEnabled },
         autoMatchmakingRematchFixedDuration: {
@@ -116,187 +107,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._log.info(`Gameflow phase changed: ${phase}`)
       }
     )
-  }
-
-  private _handleAutoMatchmakingCancelAfterChampSelectReturn() {
-    const clearBlock = (reason: string) => {
-      if (!this.state.preventAutoMatchmakingAfterChampSelectReturn) {
-        return
-      }
-
-      if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
-        clearTimeout(this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId)
-        this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
-      }
-
-      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
-      this._blockedAutoMatchmakingPartyId = null
-      this.state.setPreventAutoMatchmakingAfterChampSelectReturn(false)
-      this._log.info(`Cleared auto-matchmaking block after champ-select return: ${reason}`)
-    }
-
-    const markBlocked = (phase: string) => {
-      this.state.setPreventAutoMatchmakingAfterChampSelectReturn(true)
-      this._pendingCancelMatchmakingSearchAfterChampSelectReturn = true
-      this._blockedAutoMatchmakingPartyId =
-        this._lc.data.lobby.lobby?.partyId || this._lastKnownLobbyPartyId
-      this.cancelAutoMatchmaking('normal')
-      this._log.info(
-        `Left champ select for ${phase}, blocking auto-matchmaking for current lobby (partyId=${this._blockedAutoMatchmakingPartyId || 'unknown'})`
-      )
-    }
-
-    this._mobx.reaction(
-      () => this._lc.data.lobby.lobby?.partyId,
-      (partyId) => {
-        if (partyId) {
-          this._lastKnownLobbyPartyId = partyId
-        }
-      },
-      { fireImmediately: true }
-    )
-
-    this._mobx.reaction(
-      () => this._lc.data.gameflow.phase,
-      (phase, prevPhase) => {
-        if (!this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled) {
-          return
-        }
-
-        if (prevPhase === 'ChampSelect' && (phase === 'Lobby' || phase === 'Matchmaking')) {
-          markBlocked(phase)
-          return
-        }
-
-        if (!phase) {
-          clearBlock('gameflow-unavailable')
-          return
-        }
-
-        if (
-          (phase === 'Matchmaking' || phase === 'ReadyCheck') &&
-          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
-          !this._pendingCancelMatchmakingSearchAfterChampSelectReturn
-        ) {
-          clearBlock(`phase=${phase}`)
-        }
-      },
-      { fireImmediately: true }
-    )
-
-    this._mobx.reaction(
-      () => this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled,
-      (enabled) => {
-        if (!enabled) {
-          clearBlock('setting-disabled')
-        }
-      },
-      { fireImmediately: true }
-    )
-
-    this._mobx.reaction(
-      () =>
-        [
-          Boolean(this._lc.data.lobby.lobby),
-          this._lc.data.lobby.lobby?.partyId,
-          this._lc.data.lobby.lobby?.canStartActivity,
-          this._lc.data.matchmaking.search?.isCurrentlyInQueue,
-          this._lc.data.gameflow.phase,
-          this.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled
-        ] as const,
-      ([hasLobby, partyId, canStartActivity, isCurrentlyInQueue, phase, enabled]) => {
-        if (!enabled) {
-          clearBlock('setting-disabled')
-          return
-        }
-
-        if (!hasLobby) {
-          return
-        }
-
-        if (
-          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
-          this._blockedAutoMatchmakingPartyId &&
-          partyId &&
-          this._blockedAutoMatchmakingPartyId !== partyId
-        ) {
-          clearBlock(`lobby-changed:${this._blockedAutoMatchmakingPartyId}->${partyId}`)
-          return
-        }
-
-        if (
-          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
-          this._pendingCancelMatchmakingSearchAfterChampSelectReturn &&
-          !isCurrentlyInQueue &&
-          phase === 'Lobby' &&
-          canStartActivity
-        ) {
-          this._pendingCancelMatchmakingSearchAfterChampSelectReturn = false
-          this._log.info(
-            'Returned to idle lobby after champ-select dodge, keeping block for auto-matchmaking only'
-          )
-          return
-        }
-
-        if (
-          isCurrentlyInQueue &&
-          this.state.preventAutoMatchmakingAfterChampSelectReturn &&
-          this._pendingCancelMatchmakingSearchAfterChampSelectReturn
-        ) {
-          this._cancelMatchmakingSearchAfterChampSelectReturn()
-          return
-        }
-
-        if (isCurrentlyInQueue) {
-          clearBlock('search-started')
-        }
-      },
-      { equals: comparer.shallow, fireImmediately: true }
-    )
-  }
-
-  private _scheduleCancelMatchmakingSearchAfterChampSelectReturnRetry() {
-    if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
-      return
-    }
-
-    this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = setTimeout(() => {
-      this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
-
-      if (
-        this.state.preventAutoMatchmakingAfterChampSelectReturn &&
-        this._pendingCancelMatchmakingSearchAfterChampSelectReturn &&
-        this._lc.data.lobby.lobby &&
-        this._lc.data.matchmaking.search?.isCurrentlyInQueue
-      ) {
-        this._cancelMatchmakingSearchAfterChampSelectReturn()
-      }
-    }, 1000)
-  }
-
-  private async _cancelMatchmakingSearchAfterChampSelectReturn() {
-    if (this._isCancelingMatchmakingSearchAfterChampSelectReturn) {
-      return
-    }
-
-    this._isCancelingMatchmakingSearchAfterChampSelectReturn = true
-
-    try {
-      this._log.info('Cancelling matchmaking search after returning from champ select due to dodge')
-      await this._lc.api.lobby.deleteSearchMatch()
-
-      if (this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId) {
-        clearTimeout(this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId)
-        this._cancelMatchmakingSearchAfterChampSelectReturnRetryTimerId = null
-      }
-    } catch (error) {
-      this._log.warn(
-        `Failed to cancel matchmaking search after champ-select return: ${formatError(error)}`
-      )
-      this._scheduleCancelMatchmakingSearchAfterChampSelectReturnRetry()
-    } finally {
-      this._isCancelingMatchmakingSearchAfterChampSelectReturn = false
-    }
   }
 
   private _handleAutoAccept() {
@@ -779,13 +589,41 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   }
 
   private _handleSendARAMTeamSide() {
+    // 仅仅支持大乱斗和海克斯大乱斗
+    const isAramLikeMode = computed(() => {
+      if (!this._lc.data.gameflow.session || !this._lc.data.champSelect.session) {
+        return false
+      }
+
+      return (
+        this._lc.data.champSelect.session.benchEnabled &&
+        (this._lc.data.gameflow.session.map.gameMode === 'ARAM' ||
+          this._lc.data.gameflow.session.map.gameMode === 'KIWI')
+      )
+    })
+
+    // 这里的 team 字段只有 1 和 2
+    // 题外话：teamId 则是 100 和 200
+    const localPlayerTeam = computed(() => {
+      const localPlayerCellId = this._lc.data.champSelect.session?.localPlayerCellId
+      const myTeam = this._lc.data.champSelect.session?.myTeam
+
+      if (!myTeam || !localPlayerCellId) {
+        return null
+      }
+
+      return myTeam.find((p) => p.cellId === localPlayerCellId)?.team ?? null
+    })
+
     this._mobx.reaction(
       () =>
         [
           this._lc.data.chat.conversations.championSelect?.id,
+          isAramLikeMode.get(),
+          localPlayerTeam.get(),
           this.settings.autoSendARAMTeamSideEnabled
         ] as const,
-      ([id, enabled]) => {
+      ([id, isAramLikeMode, localPlayerTeam, enabled]) => {
         if (!enabled) {
           return
         }
@@ -794,43 +632,35 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           return
         }
 
-        const localPlayerCellId = this._lc.data.champSelect.session?.localPlayerCellId
-        const myTeam = this._lc.data.champSelect.session?.myTeam
-        const gameData = this._lc.data.gameflow.session?.gameData
+        if (!localPlayerTeam) {
+          return
+        }
 
-        if (!gameData || !myTeam || !localPlayerCellId) {
+        if (localPlayerTeam !== 1 && localPlayerTeam !== 2) {
+          this._log.warn(`Invalid team: ${localPlayerTeam}, ignoring`)
+
+          return
+        }
+
+        if (!isAramLikeMode) {
           return
         }
 
         // 这些模式, ARAM / 海克斯大乱斗 等，使用 AllRandomPickStrategy 模式，需告知所属方
-        if (gameData.queue.gameTypeConfig.pickMode === 'AllRandomPickStrategy') {
-          const me = myTeam.find((p) => p.cellId === localPlayerCellId)
+        const isTw2 = this._lc.state.auth?.region === 'TW2'
+        const key = isTw2
+          ? `auto-gameflow-main.aram-team-side-${localPlayerTeam}-tw`
+          : `auto-gameflow-main.aram-team-side-${localPlayerTeam}`
 
-          if (!me) {
-            return
-          }
-
-          if (me.team !== 1 && me.team !== 2) {
-            this._log.warn(`Invalid team: ${me.team}, ignoring`)
-
-            return
-          }
-
-          const isTw2 = this._lc.state.auth?.region === 'TW2'
-          const key = isTw2
-            ? `auto-gameflow-main.aram-team-side-${me.team}-tw`
-            : `auto-gameflow-main.aram-team-side-${me.team}`
-
-          this._lc.api.chat
-            .chatSend(
-              id,
-              `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(key)}`,
-              this.settings.autoSendARAMTeamSideVisibleToTeam ? undefined : 'celebration'
-            )
-            .catch((error) => {
-              this._log.warn(`Failed to send ARAM team side`, error)
-            })
-        }
+        this._lc.api.chat
+          .chatSend(
+            id,
+            `${this.settings.autoSendARAMTeamSideVisibleToTeam ? '' : '[League Akari] '}${i18next.t(key)}`,
+            this.settings.autoSendARAMTeamSideVisibleToTeam ? undefined : 'celebration'
+          )
+          .catch((error) => {
+            this._log.warn(`Failed to send ARAM team side`, error)
+          })
       },
       { equals: comparer.shallow, fireImmediately: true }
     )
@@ -960,7 +790,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoMatchmakingDelaySeconds',
       'autoMatchmakingEnabled',
       'autoMatchmakingMinimumMembers',
-      'cancelAutoMatchmakingAfterChampSelectReturnEnabled',
       'autoMatchmakingRematchFixedDuration',
       'autoMatchmakingRematchStrategy',
       'autoMatchmakingWaitForInvitees',
@@ -1078,7 +907,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoHandleInvitation()
     this._handleAutoSkipLeader()
     this._handleLogging()
-    this._handleAutoMatchmakingCancelAfterChampSelectReturn()
     this._handleAutoSearchMatch()
     this._handlePreEndOfGame()
     this._handleSendARAMTeamSide()

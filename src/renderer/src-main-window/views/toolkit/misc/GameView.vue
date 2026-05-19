@@ -10,7 +10,9 @@
       :game-id="previewingGameId || 0"
       :source="as.settings.preferredLolSource"
       :hide-privacy="as.settings.streamerMode"
+      can-dry-run-ongoing-game
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
+      @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
     <ControlItem
       class="control-item-margin"
@@ -33,9 +35,12 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
@@ -53,8 +58,15 @@ const handleInspect = () => {
 }
 
 const pt = useInstance(PlayerTabsRenderer)
+const og = useInstance(OngoingGameRenderer)
+const router = useRouter()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
+
+const handleDryRunOngoingGame = async (draft: DraftOptions) => {
+  await og.setDraft(draft)
+  await router.replace({ name: 'ongoing-game' })
+}
 </script>
 
 <style scoped></style>

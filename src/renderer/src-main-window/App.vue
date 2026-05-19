@@ -195,9 +195,9 @@ app.onApplicationMenuSettingsClick(() => {
 
     background: linear-gradient(
       180deg,
-      oklch(98.5% 0.002 247.839 / 0.9) 0%,
-      oklch(98.5% 0.002 247.839 / 0.95) 75%,
-      oklch(98.5% 0.002 247.839 / 0.95) 100%
+      rgba(243, 243, 244, 0.9) 0%,
+      rgba(243, 243, 244, 0.95) 75%,
+      rgba(243, 243, 244, 0.95) 100%
     );
   }
 
@@ -208,9 +208,9 @@ app.onApplicationMenuSettingsClick(() => {
   [data-theme='dark'] &::before {
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.85) 75%,
-      rgba(0, 0, 0, 0.85) 100%
+      rgba(0, 0, 0, 0.84) 0%,
+      rgba(0, 0, 0, 0.88) 75%,
+      rgba(0, 0, 0, 0.88) 100%
     );
   }
 

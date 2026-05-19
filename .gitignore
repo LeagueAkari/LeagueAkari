@@ -2,6 +2,7 @@ node_modules
 dist
 out
 *.log*
+*.tsbuildinfo
 examples
 images
 addons/build
@@ -9,6 +10,8 @@ rabi-*
 todolist.md
 todolist.txt
 feedback-platform/
+.claude/settings.local.json
+.codex/
 
 # macOS
 .DS_Store
@@ -28,3 +31,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# others
+.playwright-mcp

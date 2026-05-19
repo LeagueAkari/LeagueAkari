@@ -1,6 +1,4 @@
-import { TaskOptions } from 'node_modules/p-queue/dist/options'
-import PriorityQueue from 'node_modules/p-queue/dist/priority-queue'
-import PQueue, { Options, QueueAddOptions } from 'p-queue'
+import PQueue, { Options, PriorityQueue, QueueAddOptions } from 'p-queue'
 
 const TASK_TAG = Symbol('task')
 
@@ -33,7 +31,7 @@ export class QueueKeeper {
   async add<T>(
     queueId: string,
     taskId: string,
-    task: (options: TaskOptions) => PromiseLike<T>,
+    task: (options: TaskAddOptions) => PromiseLike<T>,
     options?: TaskAddOptions
   ): Promise<T> {
     const queue = this._queues.get(queueId)

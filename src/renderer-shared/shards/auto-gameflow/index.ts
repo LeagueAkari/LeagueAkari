@@ -73,14 +73,6 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingWaitForInvitees', yes)
   }
 
-  setCancelAutoMatchmakingAfterChampSelectReturnEnabled(enabled: boolean) {
-    return this._setting.set(
-      MAIN_SHARD_NAMESPACE,
-      'cancelAutoMatchmakingAfterChampSelectReturnEnabled',
-      enabled
-    )
-  }
-
   setAutoMatchmakingRematchStrategy(s: string) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingRematchStrategy', s)
   }

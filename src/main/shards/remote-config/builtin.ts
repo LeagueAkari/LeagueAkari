@@ -223,8 +223,10 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
 
 export const BUILTIN_SUPPORTED_QUEUES: SupportedQueues = {
   version: 1,
-  lastUpdate: 1759568091535,
-  queues: [420, 440, 430, 450, 480, 1700, 490, 1900, 900, 2300, 2400, 4210, 4220, 4240, 4250, 4260]
+  lastUpdate: 1778862858129,
+  queues: [
+    420, 440, 430, 450, 480, 1700, 1750, 490, 1900, 900, 2300, 2400, 4210, 4220, 4240, 4250, 4260
+  ]
 }
 
 export const BUILTIN_AUTO_SELECT_GROUPS: AutoSelectGroups = {

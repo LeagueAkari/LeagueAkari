@@ -535,7 +535,7 @@ export interface Augment {
   id: number
   nameTRA: string
   augmentSmallIconPath: string
-  rarity: 'kSilver' | 'kGold' | 'kPrismatic' | 'kBronze'
+  rarity: 'kSilver' | 'kGold' | 'kPrismatic' | 'kBronze' | 'kEventChoice'
 }
 
 export interface StrawberryHub {

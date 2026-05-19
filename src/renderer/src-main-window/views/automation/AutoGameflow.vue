@@ -131,22 +131,6 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :label="t('AutoGameflow.cancelAutoMatchmakingAfterChampSelectReturnEnabled.label')"
-            :label-description="
-              t('AutoGameflow.cancelAutoMatchmakingAfterChampSelectReturnEnabled.description')
-            "
-            :label-width="260"
-          >
-            <NSwitch
-              :value="store.settings.cancelAutoMatchmakingAfterChampSelectReturnEnabled"
-              @update:value="
-                (val) => shard.setCancelAutoMatchmakingAfterChampSelectReturnEnabled(val)
-              "
-              size="small"
-            />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingRematchStrategy.label')"
             :label-description="t('AutoGameflow.autoMatchmakingRematchStrategy.description')"
             :label-width="260"

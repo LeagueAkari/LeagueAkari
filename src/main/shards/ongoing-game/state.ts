@@ -1,15 +1,14 @@
-import { EMPTY_PUUID } from '@shared/constants/common'
-import { JunglePathingAnalysis } from '@shared/data-adapter/analysis/jungle'
-import { MatchHistoryGamesAnalysisAll } from '@shared/data-adapter/analysis/players'
-import { MatchHistoryGamesAnalysisTeamSide } from '@shared/data-adapter/analysis/teams'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
-import { decryptUuid } from '@shared/utils/puuid-decrypt'
-import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
+import {
+  AdditionalResult,
+  DraftOptions,
+  OngoingGameAnalysis,
+  OngoingGameSimplifiedChampMastery
+} from '@shared/types/shards/ongoing-game'
+import { SavedInfo } from '@shared/types/shards/saved-player'
 import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -17,8 +16,17 @@ import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
 import { RemoteConfigMain } from '../remote-config'
 import { SgpMain } from '../sgp'
-import { SavedPlayer } from '../storage/entities/SavedPlayers'
-import { memberMerge } from './member-merge'
+import {
+  getDraftChampionSelections,
+  getDraftPositionAssignments,
+  getDraftQueryStage,
+  getDraftTeams,
+  getLiveChampionSelections,
+  getLivePositionAssignments,
+  getLiveQueryStage,
+  getLiveTeamParticipantGroups,
+  getLiveTeams
+} from './computed-state'
 
 export class OngoingGameSettings {
   enabled: boolean = true
@@ -27,12 +35,8 @@ export class OngoingGameSettings {
   /**
    * 会拉取战绩中前 n 局的时间线数量
    */
-  gameDetailsLoadCount: number = 8
+  gameDetailsLoadCount: number = 20
 
-  /**
-   * 打野分析最多会额外拉取前 n 局战绩，用于补足样本
-   */
-  jungleAnalysisMatchHistoryLoadCount: number = 100
   concurrency: number = 4
 
   /**
@@ -49,8 +53,8 @@ export class OngoingGameSettings {
     | 'premade-team'
 
   showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
-  showJunglePathing = true
   showMatchHistoryItemBorder = false
+  showJunglePathingForAllPlayers = false
   autoRouteWhenGameStarts = false
   playerCardTags = {
     showPremadeTeamTag: true,
@@ -77,7 +81,7 @@ export class OngoingGameSettings {
   /**
    * 是否在 lobby 阶段查询战绩
    */
-  queryInLobbyPhase = false
+  queryInLobbyPhase = true
 
   /**
    * 推测预组队时，需要至少多少局游戏才能被推测
@@ -98,12 +102,12 @@ export class OngoingGameSettings {
     this.showChampionUsage = value
   }
 
-  setShowJunglePathing(value: boolean) {
-    this.showJunglePathing = value
-  }
-
   setShowMatchHistoryItemBorder(value: boolean) {
     this.showMatchHistoryItemBorder = value
+  }
+
+  setShowJunglePathingForAllPlayers(value: boolean) {
+    this.showJunglePathingForAllPlayers = value
   }
 
   setAutoRouteWhenGameStarts(value: boolean) {
@@ -130,10 +134,6 @@ export class OngoingGameSettings {
     this.gameDetailsLoadCount = value
   }
 
-  setJungleAnalysisMatchHistoryLoadCount(value: number) {
-    this.jungleAnalysisMatchHistoryLoadCount = value
-  }
-
   setQueryInLobbyPhase(value: boolean) {
     this.queryInLobbyPhase = value
   }
@@ -150,343 +150,57 @@ export class OngoingGameSettings {
 }
 
 export class OngoingGameState {
-  /**
-   * 当前进行的英雄选择
-   */
   get championSelections() {
-    if (this.queryStage.phase === 'champ-select') {
-      if (!this._data.champSelect.session) {
-        return {}
-      }
-
-      const processMember = (p: ChampSelectTeam) => {
-        if (
-          p.nameVisibilityType === 'HIDDEN' &&
-          p.obfuscatedPuuid &&
-          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
-        ) {
-          const puuid = decryptUuid(p.obfuscatedPuuid)
-          selections[puuid] = p.championId || p.championPickIntent
-        }
-
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          selections[p.puuid] = p.championId || p.championPickIntent
-        }
-      }
-
-      const selections: Record<string, number> = {}
-      this._data.champSelect.session.myTeam.forEach(processMember)
-      this._data.champSelect.session.theirTeam.forEach(processMember)
-
-      return selections
-    } else if (this.queryStage.phase === 'in-game') {
-      if (!this._data.gameflow.session) {
-        return {}
-      }
-
-      const selections: Record<string, number> = {}
-      this._data.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          selections[p.puuid] = p.championId
-        }
-      })
-
-      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
-        if (p.championId) {
-          selections[p.puuid] = p.championId
-        }
-      })
-
-      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
-        if (p.championId) {
-          selections[p.puuid] = p.championId
-        }
-      })
-
-      Object.assign(selections, this.additional.selections)
-
-      return selections
+    if (this.draft) {
+      return getDraftChampionSelections(this.draft)
     }
 
-    return {}
+    return getLiveChampionSelections({
+      data: this._data,
+      queryStage: this.queryStage,
+      additional: this.additional,
+      config: this._rc.state.ongoingGameConfig
+    })
   }
 
   get positionAssignments() {
-    if (this.queryStage.phase === 'champ-select') {
-      if (!this._data.champSelect.session) {
-        return {}
-      }
-
-      const processMember = (p: ChampSelectTeam) => {
-        if (
-          p.nameVisibilityType === 'HIDDEN' &&
-          p.obfuscatedPuuid &&
-          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
-        ) {
-          const puuid = decryptUuid(p.obfuscatedPuuid)
-          assignments[puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.assignedPosition.toUpperCase(),
-            role: null
-          }
-        }
-      }
-
-      const assignments: Record<
-        string,
-        {
-          position: string
-          role: ParsedRole | null
-        }
-      > = {}
-
-      this._data.champSelect.session.myTeam.forEach(processMember)
-      this._data.champSelect.session.theirTeam.forEach(processMember)
-
-      return assignments
-    } else if (this.queryStage.phase === 'in-game') {
-      if (!this._data.gameflow.session) {
-        return {}
-      }
-
-      const assignments: Record<
-        string,
-        {
-          position: string
-          role: ParsedRole | null
-        }
-      > = {}
-
-      this._data.gameflow.session.gameData.teamOne.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.selectedPosition,
-            role: parseSelectedRole(p.selectedRole)
-          }
-        }
-      })
-
-      this._data.gameflow.session.gameData.teamTwo.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          assignments[p.puuid] = {
-            position: p.selectedPosition,
-            role: parseSelectedRole(p.selectedRole)
-          }
-        }
-      })
-
-      Object.assign(assignments, this.additional.positions)
-
-      return assignments
+    if (this.draft) {
+      return getDraftPositionAssignments(this.draft)
     }
 
-    return {}
+    return getLivePositionAssignments({
+      data: this._data,
+      queryStage: this.queryStage,
+      additional: this.additional,
+      config: this._rc.state.ongoingGameConfig
+    })
   }
 
-  /**
-   * 当前对局的队伍分配
-   */
   get teams() {
-    if (this.queryStage.phase === 'champ-select') {
-      if (!this._data.champSelect.session) {
-        return {}
-      }
-
-      if (this.queryStage.gameInfo.queueType === 'CHERRY') {
-        return {
-          'TEAM-ALL': [
-            ...this._data.champSelect.session.myTeam,
-            ...this._data.champSelect.session.theirTeam
-          ]
-            .map((p) => {
-              if (
-                p.nameVisibilityType === 'HIDDEN' &&
-                p.obfuscatedPuuid &&
-                this._rc.state.ongoingGameConfig.spotlight.deobfuscation
-              ) {
-                return decryptUuid(p.obfuscatedPuuid)
-              }
-
-              if (!p.puuid || p.puuid === EMPTY_PUUID) {
-                return null
-              }
-
-              return p.puuid
-            })
-            .filter((p) => p !== null)
-        }
-      }
-
-      const teams: Record<string, string[]> = {}
-
-      const processMember = (p: ChampSelectTeam) => {
-        if (
-          p.nameVisibilityType === 'HIDDEN' &&
-          p.obfuscatedPuuid &&
-          this._rc.state.ongoingGameConfig.spotlight.deobfuscation
-        ) {
-          p.puuid = decryptUuid(p.obfuscatedPuuid)
-        }
-
-        if (!p.puuid || p.puuid === EMPTY_PUUID) {
-          return
-        }
-
-        const teamIdentifier = p.team === 100 || p.team === 1 ? 'TEAM-100' : 'TEAM-200'
-
-        if (!teams[teamIdentifier]) {
-          teams[teamIdentifier] = []
-        }
-        teams[teamIdentifier].push(p.puuid)
-      }
-
-      this._data.champSelect.session.myTeam.forEach(processMember)
-      this._data.champSelect.session.theirTeam.forEach(processMember)
-
-      return teams
-    } else if (this.queryStage.phase === 'in-game') {
-      // hack for 避免数据残留
-      if (!this._data.gameflow.session || this._data.gameflow.session.phase === 'GameStart') {
-        return {}
-      }
-
-      if (this.queryStage.gameInfo.queueType === 'CHERRY') {
-        // sometimes teamOne and teamTwo will have fake players, need to filter out
-        const realPlayers = this._data.gameflow.session.gameData.playerChampionSelections.map(
-          (c) => c.puuid
-        )
-
-        return {
-          'TEAM-ALL': [
-            ...this._data.gameflow.session.gameData.teamOne,
-            ...this._data.gameflow.session.gameData.teamTwo
-          ]
-            .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-            .filter((p) => realPlayers.includes(p.puuid))
-            .map((p) => p.puuid)
-        }
-      }
-
-      const teams: Record<string, string[]> = {
-        'TEAM-100': [],
-        'TEAM-200': []
-      }
-
-      this._data.gameflow.session.gameData.teamOne
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          teams['TEAM-100'].push(p.puuid)
-        })
-
-      this._data.gameflow.session.gameData.teamTwo
-        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-        .forEach((p) => {
-          teams['TEAM-200'].push(p.puuid)
-        })
-
-      // experimental 特性
-      for (const [tI, m] of Object.entries(this.additional.teams)) {
-        if (teams[tI]) {
-          teams[tI] = memberMerge(teams[tI], m)
-        } else {
-          teams[tI] = m
-        }
-      }
-
-      return teams
-    } else if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
-      const teams: Record<string, string[]> = { LOBBY: [] }
-
-      this._data.lobby.lobby.members.forEach((p) => {
-        if (p.puuid && p.puuid !== EMPTY_PUUID) {
-          teams['LOBBY'].push(p.puuid)
-        }
-      })
-
-      return teams
+    if (this.draft) {
+      return getDraftTeams(this.draft)
     }
 
-    return {}
+    return getLiveTeams({
+      data: this._data,
+      settings: this._settings,
+      queryStage: this.queryStage,
+      additional: this.additional,
+      config: this._rc.state.ongoingGameConfig
+    })
   }
 
-  /**
-   * 当前游戏的进行状态简化，用于区分 League Akari 的几个主要阶段
-   *
-   * unavailable - 不需要介入的状态
-   *
-   * champ-select - 正在英雄选择阶段
-   *
-   * in-game - 在游戏中或游戏结算中
-   */
   get queryStage() {
-    if (!this._settings.enabled) {
-      return {
-        phase: 'unavailable',
-        gameInfo: null
-      } as QueryStage
+    if (this.draft) {
+      return getDraftQueryStage(this.draft)
     }
 
-    if (
-      this._data.gameflow.session &&
-      this._data.gameflow.session.phase === 'ChampSelect' &&
-      this._data.champSelect.session
-    ) {
-      return {
-        phase: 'champ-select',
-        gameInfo: {
-          queueId: this._data.gameflow.session.gameData.queue.id,
-          queueType: this._data.gameflow.session.gameData.queue.type,
-          gameId: this._data.gameflow.session.gameData.gameId,
-          gameMode: this._data.gameflow.session.gameData.queue.gameMode
-        }
-      } as QueryStage
-    }
-
-    if (
-      this._data.gameflow.session &&
-      (this._data.gameflow.session.phase === 'GameStart' ||
-        this._data.gameflow.session.phase === 'InProgress' ||
-        this._data.gameflow.session.phase === 'WaitingForStats' ||
-        this._data.gameflow.session.phase === 'PreEndOfGame' ||
-        this._data.gameflow.session.phase === 'EndOfGame' ||
-        this._data.gameflow.session.phase === 'Reconnect')
-    ) {
-      return {
-        phase: 'in-game',
-        gameInfo: {
-          queueId: this._data.gameflow.session.gameData.queue.id,
-          queueType: this._data.gameflow.session.gameData.queue.type,
-          gameId: this._data.gameflow.session.gameData.gameId,
-          gameMode: this._data.gameflow.session.gameData.queue.gameMode
-        }
-      } as QueryStage
-    }
-
-    if (this._settings.queryInLobbyPhase && this._data.lobby.lobby) {
-      return {
-        phase: 'lobby',
-        gameInfo: {
-          queueId: this._data.lobby.lobby.gameConfig.queueId,
-          queueType: this._data.lobby.lobby.gameConfig.gameMode
-        }
-      } as QueryStage
-    }
-
-    return {
-      phase: 'unavailable',
-      gameInfo: null
-    } as QueryStage
+    return getLiveQueryStage({
+      data: this._data,
+      settings: this._settings
+    })
   }
 
-  /**
-   * 在游戏结算时，League Akari 会额外进行一些操作
-   */
   get isInEog() {
     return (
       this._data.gameflow.phase === 'WaitingForStats' ||
@@ -495,63 +209,21 @@ export class OngoingGameState {
     )
   }
 
-  /**
-   * teamParticipantId -> puuids
-   *
-   * 更加精准的队伍预测
-   */
   get teamParticipantGroups() {
-    if (!this._data.gameflow.session) {
+    if (this.draft) {
       return {}
     }
 
-    const groups: Record<string, string[]> = {}
-    for (const p of [
-      ...this._data.gameflow.session.gameData.teamOne,
-      ...this._data.gameflow.session.gameData.teamTwo
-    ]) {
-      if (!p.teamParticipantId) {
-        continue
-      }
-
-      if (!groups[p.teamParticipantId]) {
-        groups[p.teamParticipantId] = []
-      }
-
-      groups[p.teamParticipantId].push(p.puuid)
-    }
-
-    for (const [puuid, teamParticipantId] of Object.entries(
-      this.additional.teamParticipantGroups
-    )) {
-      if (!groups[teamParticipantId]) {
-        groups[teamParticipantId] = [puuid]
-        continue
-      }
-
-      if (!groups[teamParticipantId].includes(puuid)) {
-        groups[teamParticipantId].push(puuid)
-      }
-    }
-
-    return groups
+    return getLiveTeamParticipantGroups({
+      data: this._data,
+      additional: this.additional
+    })
   }
 
-  /**
-   * 根据目前所有战绩计算出来的玩家分析数据
-   */
-  playerStats: {
-    players: Record<string, MatchHistoryGamesAnalysisAll>
-    teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
-  } | null = null
+  analysis: OngoingGameAnalysis | null = null
 
-  setPlayerStats(
-    value: {
-      players: Record<string, MatchHistoryGamesAnalysisAll>
-      teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
-    } | null
-  ) {
-    this.playerStats = value
+  setAnalysis(value: OngoingGameAnalysis | null) {
+    this.analysis = value
   }
 
   matchHistoryTagParams: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'> = {}
@@ -560,10 +232,6 @@ export class OngoingGameState {
     this.matchHistoryTagParams = value
   }
 
-  /**
-   * 每名玩家的战绩
-   * 手动同步
-   */
   matchHistory: Record<
     string,
     {
@@ -573,9 +241,6 @@ export class OngoingGameState {
     }
   > = {}
 
-  /**
-   * 玩家战绩加载情况, 可为 'loaded' | 'loading' | 'error'
-   */
   matchHistoryLoadingState: Record<string, string> = {}
 
   setMatchHistoryLoadingState(player: string, state: string) {
@@ -585,74 +250,17 @@ export class OngoingGameState {
     }
   }
 
-  /**
-   * 每名玩家的召唤师信息。目前一定是 LCU 格式
-   */
   summoner: Record<string, SummonerInfo> = {}
-
-  /**
-   * 玩家召唤师信息加载情况, 可为 'loaded' | 'loading' | 'error'
-   */
   summonerLoadingState: Record<string, string> = {}
-
-  /**
-   * 每名玩家的段位。目前一定是 LCU 格式
-   */
   rankedStats: Record<string, RankedStats> = {}
-
-  /**
-   * 玩家段位加载情况, 可为 'loaded' | 'loading' | 'error'
-   */
   rankedStatsLoadingState: Record<string, string> = {}
-
-  /**
-   * 每名玩家的段位
-   * 手动同步
-   */
-  championMastery: Record<
-    string,
-    Record<
-      number,
-      {
-        championId: number
-        championLevel: number
-        championPoints: number
-      }
-    >
-  > = {}
-
-  /**
-   * 英雄成就加载情况, 可为 'loaded' | 'loading' | 'error'
-   */
+  championMastery: Record<string, Record<number, OngoingGameSimplifiedChampMastery>> = {}
   championMasteryLoadingState: Record<string, string> = {}
-
-  /** 打野玩家的路径偏好分析结果 */
-  jungleAnalysis: Record<string, JunglePathingAnalysis> = {}
-
-  setJungleAnalysis(value: Record<string, JunglePathingAnalysis>) {
-    this.jungleAnalysis = value
-  }
-
-  /** 已经被记录在本地数据库中的信息 */
-  savedInfo: Record<string, SavedPlayer> = {}
-
-  /**
-   * 已记录信息加载情况, 可为 'loaded' | 'loading' | 'error'
-   */
+  savedInfo: Record<string, SavedInfo> = {}
   savedInfoLoadingState: Record<string, string> = {}
-
-  /** 或者说是 game 的 details，区分 summary (常见的战绩其实是 summary) */
   gameDetails: Record<number, LcuOrSgpGameDetails> = {}
-
-  /**
-   * 除了战绩中的对局外, 额外被加载的对局信息
-   */
   additionalGame: Record<number, LcuOrSgpGameSummary> = {}
-
-  // unused
   gameDetailsLoadingState: Record<number, string> = {}
-
-  // inferred premade
   inferredPremadeTeams: string[][] = []
 
   setInferredPremadeTeams(value: string[][]) {
@@ -660,7 +268,7 @@ export class OngoingGameState {
   }
 
   clear(options?: { keepTagParams?: boolean; keepAdditionalInfo?: boolean }) {
-    this.playerStats = null
+    this.analysis = null
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
@@ -675,16 +283,9 @@ export class OngoingGameState {
     this.gameDetails = {}
     this.additionalGame = {}
     this.inferredPremadeTeams = []
-    this.jungleAnalysis = {}
 
     if (!options?.keepAdditionalInfo) {
-      this.additional = {
-        teams: {},
-        selections: {},
-        teamParticipantGroups: {},
-        spells: {},
-        positions: {}
-      }
+      this.clearAdditional()
     }
 
     if (!options?.keepTagParams) {
@@ -692,31 +293,17 @@ export class OngoingGameState {
     }
   }
 
-  /**
-   * 暂未实装，需要测试
-   * 置于一个草稿模式。草稿模式可在 unavailable 阶段被设置，用于自定义加载任何玩家战绩
-   */
-  draft: {
-    teams: Record<string, string[]>
-  } | null = null
+  draft: DraftOptions | null = null
 
-  setDraft(
-    value: {
-      teams: Record<string, string[]>
-    } | null
-  ) {
+  setDraft(value: DraftOptions | null) {
     this.draft = value
   }
 
-  /**
-   * 现在由这里进行预组队合并
-   */
-  get calculatedPremadeTeamMap() {
-    // 成员打标记
+  get mergedPremadeTeamMap() {
     const teamIdentifierMap: Record<string, string> = {}
     for (const [teamIdentifier, puuids] of Object.entries(this.teams)) {
-      for (const p of puuids) {
-        teamIdentifierMap[p] = teamIdentifier
+      for (const puuid of puuids) {
+        teamIdentifierMap[puuid] = teamIdentifier
       }
     }
 
@@ -726,19 +313,18 @@ export class OngoingGameState {
     const inferredGroups = this.inferredPremadeTeams
 
     const simplified = removeSubsets(
-      [...participationGroups, ...inferredGroups].filter((t) => t.length > 1),
-      (t) => t
+      [...participationGroups, ...inferredGroups].filter((team) => team.length > 1),
+      (team) => team
     )
 
     for (const puuids of simplified) {
-      if (puuids.some((p) => teamIdentifierMap[p] !== teamIdentifierMap[puuids[0]])) {
+      if (puuids.some((puuid) => teamIdentifierMap[puuid] !== teamIdentifierMap[puuids[0]])) {
         continue
       }
 
       const index = ++assignedTeamIndex
-
-      for (const p of puuids) {
-        premadeTeamMap[p] = index
+      for (const puuid of puuids) {
+        premadeTeamMap[puuid] = index
       }
     }
 
@@ -756,7 +342,6 @@ export class OngoingGameState {
     return 'lcu'
   }
 
-  /** 结构同 teams  */
   additional: AdditionalResult = {
     teams: {},
     selections: {},
@@ -769,6 +354,16 @@ export class OngoingGameState {
     this.additional = value
   }
 
+  clearAdditional() {
+    this.additional = {
+      teams: {},
+      selections: {},
+      teamParticipantGroups: {},
+      spells: {},
+      positions: {}
+    }
+  }
+
   constructor(
     private readonly _data: LeagueClientData,
     private readonly _app: AppCommonMain,
@@ -777,7 +372,6 @@ export class OngoingGameState {
     private readonly _rc: RemoteConfigMain
   ) {
     makeAutoObservable(this, {
-      // shallow object
       matchHistory: observable.shallow,
       summoner: observable.shallow,
       rankedStats: observable.shallow,
@@ -785,28 +379,22 @@ export class OngoingGameState {
       championMastery: observable.shallow,
       gameDetails: observable.shallow,
       additionalGame: observable.shallow,
-
-      // ref object, override only, no modification
       matchHistoryLoadingState: observable.ref,
       summonerLoadingState: observable.ref,
       rankedStatsLoadingState: observable.ref,
       savedInfoLoadingState: observable.ref,
       gameDetailsLoadingState: observable.ref,
-
-      jungleAnalysis: observable.struct,
-
-      // structured data
       championSelections: computed.struct,
       positionAssignments: computed.struct,
       teams: computed.struct,
-      playerStats: observable.struct,
+      analysis: observable.struct,
       queryStage: computed.struct,
       teamParticipantGroups: computed.struct,
       draft: observable.struct,
       matchHistoryTagParams: observable.struct,
       additional: observable.struct,
       inferredPremadeTeams: observable.struct,
-      calculatedPremadeTeamMap: computed.struct
+      mergedPremadeTeamMap: computed.struct
     })
   }
 }

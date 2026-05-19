@@ -123,7 +123,7 @@ const createEmptyTimer = (count: number) => {
   }))
 }
 
-const timers: Record<string, ['countup' | 'countdown', number] | null> = shallowReactive({})
+const timers = shallowReactive<Record<string, ['countup' | 'countdown', number] | null>>({})
 
 const setTimer = (id: string, timerType: string, _championId: number | null, spellId: number) => {
   const record = timers[id] || null

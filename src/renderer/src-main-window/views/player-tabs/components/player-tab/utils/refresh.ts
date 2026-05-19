@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 
 import { useChallengesPlayerData } from '../data/challenges'
+import { useChampionMastery } from '../data/champion-mastery'
 import { useEncounteredGames } from '../data/encountered-games'
 import { useMatchHistory } from '../data/match-history'
 import { useRankedStats } from '../data/ranked-stats'
@@ -17,6 +18,7 @@ export function useRefresh() {
   const { loadTags, isLoading: isLoadingPlayerTag } = useTags()
   const { loadSpectatorData, isLoading: isLoadingSpectator } = useSpectator()
   const { loadSummonerProfile, isLoading: isLoadingSummonerProfile } = useSummonerProfile()
+  const { loadChampionMastery, isLoading: isLoadingChampionMastery } = useChampionMastery()
   const { loadChallengesPlayerData, isLoading: isLoadingChallengesPlayerData } =
     useChallengesPlayerData()
 
@@ -29,6 +31,7 @@ export function useRefresh() {
       isLoadingPlayerTag.value ||
       isLoadingSpectator.value ||
       isLoadingSummonerProfile.value ||
+      isLoadingChampionMastery.value ||
       isLoadingChallengesPlayerData.value
     )
   })
@@ -41,6 +44,7 @@ export function useRefresh() {
     loadTags()
     loadSpectatorData()
     loadSummonerProfile()
+    loadChampionMastery()
     loadChallengesPlayerData()
   }
 

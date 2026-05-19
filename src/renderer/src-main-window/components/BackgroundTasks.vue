@@ -3,7 +3,7 @@
     class="flex flex-col gap-2 rounded border border-black/10 bg-(--la-background-color-primary) p-2 dark:border-white/13"
   >
     <div class="mb-1 px-2 text-sm font-bold">
-      {{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}
+      {{ t('BackgroundTasks.taskTitle', { count: bts.tasks.length }) }}
     </div>
     <template v-if="bts.tasks.length > 0">
       <NScrollbar style="max-height: calc(100vh - 80px)">

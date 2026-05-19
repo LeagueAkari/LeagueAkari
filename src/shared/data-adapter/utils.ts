@@ -84,3 +84,43 @@ export function findOutliersByIqr<T>(
     over
   }
 }
+
+// aggregate 系列工具是测试特性
+
+export type Aggregator<T, R> = (items: T[]) => R
+
+export type Getter<T, R> = (item: T) => R
+
+export type MapRule<T, N extends string, GR, AR> = {
+  name: N
+  getter: Getter<T, GR>
+  aggregator: Aggregator<GR, AR>
+}
+
+/**
+ * 类型工具，用这个可以获得类型推导
+ */
+export function rule<T, const N extends string, GR, AR>(rule: {
+  name: N
+  getter: (item: T) => GR
+  aggregator: (values: GR[]) => AR
+}): MapRule<T, N, GR, AR> {
+  return rule
+}
+
+export function aggregate<T, R extends readonly MapRule<T, string, any, any>[]>(
+  items: T[],
+  rules: R
+): {
+  [K in R[number] as K['name']]: ReturnType<K['aggregator']>
+} {
+  return rules.reduce(
+    (acc, rule) => {
+      acc[rule.name] = rule.aggregator(items.map(rule.getter))
+      return acc
+    },
+    {} as {
+      [K in R[number] as K['name']]: ReturnType<K['aggregator']>
+    }
+  )
+}

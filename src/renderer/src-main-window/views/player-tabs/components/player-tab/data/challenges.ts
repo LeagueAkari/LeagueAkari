@@ -16,8 +16,8 @@ import {
 } from 'vue'
 
 export type ChallengesPlayerDataContext = {
-  challengesPlayerData: Readonly<Ref<AllPlayerData | null>>
-  isLoading: Readonly<Ref<boolean>>
+  challengesPlayerData: Ref<AllPlayerData | null>
+  isLoading: Ref<boolean>
   loadChallengesPlayerData: () => Promise<void>
 }
 

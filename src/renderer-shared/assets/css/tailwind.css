@@ -7,7 +7,6 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-@custom-variant graphite (&:where([data-theme-id=graphite], [data-theme-id=graphite] *));
 
 @theme inline {
   --color-akari-50: #fff0f3;

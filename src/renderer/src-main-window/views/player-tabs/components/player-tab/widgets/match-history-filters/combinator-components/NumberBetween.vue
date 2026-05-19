@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="space-y-2 rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
-  >
+  <div class="space-y-2 rounded border border-solid border-black/10 px-4 py-2 dark:border-white/10">
     <div class="flex items-center gap-2">
       <div
         v-if="node.type === 'durationBetween'"
@@ -98,7 +96,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInputNumber } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import { useMatchHistoryFilterEditor } from '../context'
 import {
   AssistsBetweenCombinator,
   DeathsBetweenCombinator,
@@ -114,7 +112,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilterEditor()
 
 const node = computed(
   () =>

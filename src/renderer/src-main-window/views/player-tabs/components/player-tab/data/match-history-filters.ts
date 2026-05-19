@@ -1,32 +1,38 @@
 import { Predicate } from '@shared/data-adapter/predicates/combinators'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { ComputedRef, InjectionKey, Ref, computed, inject, markRaw, provide, ref } from 'vue'
+import {
+  ComputedRef,
+  InjectionKey,
+  MaybeRefOrGetter,
+  Ref,
+  computed,
+  inject,
+  provide,
+  ref,
+  toRef
+} from 'vue'
 
 import {
-  CombinatorNode,
-  GameCombinator,
-  collectSubtreeNodeIds,
-  nodeArg
-} from '../widgets/match-history-filters/combinator-nodes'
-import { toPredicate } from '../widgets/match-history-filters/combinator-runtime'
-
-export type SimpleSummonerResult = {
-  puuid: string
-  profileIconId: number
-  gameName: string
-  tagLine: string
-}
+  MatchHistoryFilterMode,
+  MatchHistoryFilterState,
+  SimpleMatchHistoryFilterState,
+  clearSimplePredicate,
+  clearPredicate as clearStatePredicate,
+  createEmptySimpleState,
+  createEmptyState,
+  hasPredicate,
+  hasSimplePredicate,
+  toFilterState,
+  toPredicate
+} from '../widgets/match-history-filters/filter-state'
 
 export type MatchHistoryFiltersContext = {
-  rootNode: ComputedRef<CombinatorNode>
-  nodeMap: Ref<Record<string, CombinatorNode>>
+  filterState: ComputedRef<MatchHistoryFilterState>
+  simpleFilterState: Ref<SimpleMatchHistoryFilterState>
+  advancedFilterState: Ref<MatchHistoryFilterState>
+  activeMode: Ref<MatchHistoryFilterMode>
   predicate: ComputedRef<Predicate<LcuOrSgpGameSummary>>
   rootHasCombinator: ComputedRef<boolean>
-  cachedSummoners: Ref<Record<string, SimpleSummonerResult>>
-  addNode: (node: CombinatorNode) => void
-  updateNode: (id: string, node: CombinatorNode) => void
-  deleteNode: (id: string) => void
-  saveSummoner: (puuid: string, summoner: SimpleSummonerResult) => void
   clearPredicate: () => void
 }
 
@@ -34,101 +40,58 @@ export const MatchHistoryFiltersContextKey: InjectionKey<MatchHistoryFiltersCont
   'PlayerTabMatchHistoryFiltersContext'
 )
 
-const ROOT_ID = 'game'
+export function provideMatchHistoryFilters(props: {
+  puuid: MaybeRefOrGetter<string>
+  enablePositionFilter: MaybeRefOrGetter<boolean>
+}) {
+  const puuid = toRef(props.puuid)
+  const enablePositionFilter = toRef(props.enablePositionFilter)
+  const activeMode = ref<MatchHistoryFilterMode>('simple')
+  const simpleFilterState = ref(createEmptySimpleState())
+  const advancedFilterState = ref(createEmptyState())
 
-export function provideMatchHistoryFilters() {
-  const nodeMap = ref<Record<string, CombinatorNode>>({
-    game: {
-      id: ROOT_ID,
-      type: ROOT_ID,
-      args: [nodeArg(null)],
-      parentId: null
-    }
-  })
+  const filterState = computed(() =>
+    activeMode.value === 'simple'
+      ? toFilterState(simpleFilterState.value, puuid.value, {
+          enablePosition: enablePositionFilter.value
+        })
+      : advancedFilterState.value
+  )
 
-  const rootNode = computed<GameCombinator>(() => nodeMap.value[ROOT_ID] as GameCombinator)
-  const predicate = computed(() => toPredicate(ROOT_ID, nodeMap.value) as Predicate<unknown>)
-
-  const rootHasCombinator = computed(() => {
-    return rootNode.value.args[0].value !== null
-  })
-
-  const addNode = (node: CombinatorNode) => {
-    nodeMap.value[node.id] = node
-  }
-
-  const updateNode = (id: string, node: CombinatorNode) => {
-    nodeMap.value[id] = node
-  }
-
-  const deleteNode = (id: string) => {
-    const target = nodeMap.value[id]
-    if (!target) return
-
-    const ids = collectSubtreeNodeIds(id, nodeMap.value)
-
-    if (target.parentId) {
-      const parent = nodeMap.value[target.parentId]
-
-      if (parent) {
-        if (parent.argDeleteStrategy === 'remove-from-array') {
-          nodeMap.value[parent.id] = {
-            ...parent,
-            args: parent.args.filter((a) => !(a && a.kind === 'node' && a.value === id))
-          }
-        } else {
-          nodeMap.value[parent.id] = {
-            ...parent,
-            args: parent.args.map((a) =>
-              a && a.kind === 'node' && a.value === id ? nodeArg(null) : a
-            )
-          }
-        }
-      }
-    }
-
-    ids.forEach((nodeId) => {
-      delete nodeMap.value[nodeId]
-    })
-  }
-
-  const cachedSummoners = ref<Record<string, SimpleSummonerResult>>({})
-
-  const saveSummoner = (puuid: string, summoner: SimpleSummonerResult) => {
-    cachedSummoners.value[puuid] = markRaw(summoner)
-  }
+  const predicate = computed(() => toPredicate(filterState.value))
+  const rootHasCombinator = computed(() =>
+    activeMode.value === 'simple'
+      ? hasSimplePredicate(simpleFilterState.value, {
+          enablePosition: enablePositionFilter.value
+        })
+      : hasPredicate(advancedFilterState.value)
+  )
 
   const clearPredicate = () => {
-    if (rootNode.value.args[0].value) {
-      deleteNode(rootNode.value.args[0].value)
+    if (activeMode.value === 'simple') {
+      simpleFilterState.value = clearSimplePredicate(simpleFilterState.value)
+    } else {
+      advancedFilterState.value = clearStatePredicate(advancedFilterState.value)
     }
-
-    cachedSummoners.value = {}
   }
 
   provide(MatchHistoryFiltersContextKey, {
-    rootNode,
-    nodeMap,
+    filterState,
+    simpleFilterState,
+    advancedFilterState,
+    activeMode,
     rootHasCombinator,
     predicate,
-    cachedSummoners,
-    saveSummoner,
-    addNode,
-    updateNode,
-    deleteNode,
     clearPredicate
   })
 
   return {
-    rootNode,
-    nodeMap,
+    filterState,
+    simpleFilterState,
+    advancedFilterState,
+    activeMode,
     rootHasCombinator,
     predicate,
-    cachedSummoners,
-    saveSummoner,
-    addNode,
-    updateNode,
-    deleteNode,
     clearPredicate
   }
 }

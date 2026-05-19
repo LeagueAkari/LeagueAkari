@@ -14,7 +14,7 @@ import { OngoingGameSettings, OngoingGameState } from '@main/shards/ongoing-game
  * function getMessages(env) {
  *   // 获取目标玩家的战绩摘要
  *   return env.targetMembers.map(puuid => {
- *     const stats = env.playerStats?.players[puuid]?.summary
+ *     const stats = env.analysis?.players[puuid]?.summary
  *     const name = env.summoner[puuid]?.gameName || '未知'
  *     return `${name} 胜率: ${((stats?.winRate || 0) * 100).toFixed(0)}%`
  *   })
@@ -279,7 +279,7 @@ export interface TemplateEnv {
    * 整合了 `teamParticipantGroups`（权威数据）和战绩推测的结果
    *
    * ```typescript
-   * type CalculatedPremadeTeamMap = Record<string, number>
+   * type MergedPremadeTeamMap = Record<string, number>
    * ```
    *
    * @example
@@ -292,9 +292,9 @@ export interface TemplateEnv {
    * }
    *
    * // 判断两人是否预组队
-   * const isPremade = env.calculatedPremadeTeamMap[puuid1] === env.calculatedPremadeTeamMap[puuid2]
+   * const isPremade = env.mergedPremadeTeamMap[puuid1] === env.mergedPremadeTeamMap[puuid2]
    */
-  calculatedPremadeTeamMap: OngoingGameState['calculatedPremadeTeamMap']
+  mergedPremadeTeamMap: OngoingGameState['mergedPremadeTeamMap']
 
   // ============================================================================
   // 玩家基础信息
@@ -505,8 +505,8 @@ export interface TemplateEnv {
    * }
    * ```
    *
-   * **推荐使用 `playerStats` 而非直接使用 `matchHistory`**，
-   * `playerStats` 已经对战绩进行了统计分析
+   * **推荐使用 `analysis` 而非直接使用 `matchHistory`**，
+   * `analysis` 已经对战绩进行了统计分析
    *
    * @example
    * const history = env.matchHistory[puuid]
@@ -518,126 +518,123 @@ export interface TemplateEnv {
   /**
    * 玩家统计数据（核心数据，强烈推荐使用）
    *
-   * 基于 `matchHistory` 自动计算的综合统计数据
+   * 基于 `matchHistory` 和 `gameDetails` 自动计算的综合统计数据。
+   * 注意：这是 analysis 的结构，胜负、召唤师技能、队伍侧、详情分析等字段已拆分到独立分组。
    *
    * ```typescript
-   * type PlayerStats = {
-   *   players: Record<string, MatchHistoryGamesAnalysisAll>   // 单个玩家统计
-   *   teams: Record<string, MatchHistoryGamesAnalysisTeamSide> // 队伍整体统计
+   * type Analysis = {
+   *   players: Record<string, AggregatedAnalysis>   // 单个玩家统计
+   *   teams: Record<string, AggregatedTeamAnalysis> // 队伍整体统计
    * } | null
    *
-   * // ========== 单个玩家统计 ==========
-   * interface MatchHistoryGamesAnalysisAll {
-   *   games: Record<number, MatchHistoryGamesAnalysis>  // 每场对局的详细分析 (key: gameId)
-   *   summary: MatchHistoryGamesAnalysisSummary         // 汇总统计
-   *   champions: Record<number, MatchHistoryChampionAnalysis>  // 英雄使用统计 (key: championId)
-   *   akariScore: AkariScore                            // Akari 评分
-   *   positions: MatchHistoryChampionPositionAnalysis | null   // 位置统计 (SGP only)
+   * interface AggregatedAnalysis {
+   *   count: number                                  // 有效对局总数
+   *   summary: AggregatedSummaryAnalysis             // KDA、伤害、经济、视野等汇总
+   *   details: AggregatedDetailsAnalysis | null      // 依赖 timeline/details 的汇总，无 details 时为 null
+   *   detailsCount: number                           // 提供 details 的对局数量
+   *   akariScore: AkariScore                         // Akari 评分
+   *   map: Record<number, SingleAnalysis>            // 每场对局分析 (key: gameId)
+   *   teamSide: AggregatedTeamSideAnalysis           // 蓝/红方场次
+   *   winLoss: AggregatedWinLossAnalysisMap          // 胜负统计（all/normal/cherry）
+   *   spells: AggregatedSpellsAnalysis               // 召唤师技能统计
+   *   positions: AggregatedPositionAnalysis | null   // 位置统计，无法判断时为 null
+   *   champions: Record<number, AggregatedChampionAnalysis> // 英雄使用统计 (key: championId)
+   *   jungle: AggregatedJungleAnalysis | null        // 打野路径分析，非打野或缺少 details 时为 null
    * }
    *
-   * // ---------- 汇总统计 ----------
-   * interface MatchHistoryGamesAnalysisSummary {
-   *   // 基础统计
-   *   count: number              // 对局总数
-   *   wins: number               // 胜场数
-   *   losses: number             // 败场数
-   *   winRate: number            // 胜率 (0-1)
-   *
-   *   // KDA
-   *   kills: number              // 总击杀
-   *   deaths: number             // 总死亡
-   *   assists: number            // 总助攻
-   *   avgKda: number             // 平均 KDA = (kills + assists) / deaths
-   *   kdaCv: number              // KDA 变异系数 (稳定性指标)
-   *   avgKillParticipation: number  // 平均参团率 (0-1)
-   *
-   *   // 连胜/连败
-   *   winningStreak: number      // 当前连胜场数 (最近)
-   *   losingStreak: number       // 当前连败场数 (最近)
-   *
-   *   // 活跃时段 (3小时内的对局)
-   *   activeSessionWins: number  // 活跃时段胜场
-   *   activeSessionLosses: number // 活跃时段败场
-   *
-   *   // 伤害相关 (比值范围 0-1)
-   *   avgChampionDamageRatioToTeamMax: number   // 平均伤害占队伍最高的比例
-   *   avgChampionDamagePercentageOfTeam: number // 平均伤害占队伍总伤害比例
-   *   avgDamageTakenRatioToTeamMax: number      // 平均承伤占队伍最高的比例
-   *   avgDamageGoldEfficiency: number           // 平均伤害/金币效率
-   *
-   *   // 经济相关
-   *   avgGoldRatioToTeamMax: number      // 平均金币占队伍最高的比例
-   *   avgCsPerMinute: number             // 平均每分钟补刀
-   *
-   *   // 其他
-   *   avgVisionScore: number             // 平均视野得分
-   *   flashOnD: number                   // 闪现放 D 的场次
-   *   flashOnF: number                   // 闪现放 F 的场次
-   *
-   *   // 斗魂竞技场 (Arena)
-   *   cherry: {
-   *     count: number            // 斗魂竞技场对局数
-   *     top1s: number            // 第一名次数
-   *     top4s: number            // 前四名次数
-   *     winRate: number          // 胜率
-   *     top1Rate: number         // 第一名率
-   *   }
-   *
-   *   // SGP 数据源专有字段 (LCU 数据源为 null)
-   *   avgSoloKills: number | null        // 平均单杀数
-   *   avgEnemyMissingPings: number | null // 平均敌方消失信号
+   * interface AggregatedSummaryAnalysis {
+   *   kills: number
+   *   deaths: number
+   *   assists: number
+   *   avgKda: number
+   *   kdaCv: number
+   *   winRate: number                                // 与 winLoss.all.winRate 等价的汇总胜率
+   *   avgKillParticipation: number
+   *   avgChampionDamageRatioToTeamMax: number
+   *   avgChampionDamagePercentageOfTeam: number
+   *   avgDamageTakenRatioToTeamMax: number
+   *   avgDamageTakenPercentageOfTeam: number
+   *   avgGoldRatioToTeamMax: number
+   *   avgGoldPercentageOfTeam: number
+   *   avgCsPerMinute: number
+   *   avgVisionScore: number
+   *   avgDamageGoldEfficiency: number
+   *   avgSoloKills: number | null                    // SGP 数据源专有字段
+   *   avgEnemyMissingPings: number | null            // SGP 数据源专有字段
+   *   avgPings: number | null                        // SGP 数据源专有字段
    * }
    *
-   * // ---------- 英雄使用统计 ----------
-   * interface MatchHistoryChampionAnalysis {
-   *   id: number          // 英雄 ID
-   *   count: number       // 使用场次
-   *   wins: number        // 胜场
-   *   losses: number      // 败场
-   *   winRate: number     // 胜率 (0-1)
+   * interface AggregatedWinLossAnalysisMap {
+   *   all: AggregatedWinLossAnalysis                 // 全部模式
+   *   normal: AggregatedWinLossAnalysis              // 非斗魂模式
+   *   cherry: AggregatedCherryWinLossAnalysis        // 斗魂竞技场
    * }
    *
-   * // ---------- Akari 评分 ----------
-   * interface AkariScore {
-   *   total: number       // 综合评分 (越高越好)
-   *   kdaScore: number    // KDA 评分分项
-   *   winRateScore: number // 胜率评分分项
-   *   dmgScore: number    // 伤害评分分项
-   *   // ... 其他分项
-   *   outstanding: boolean   // 是否表现优秀 (total >= 26 且 count >= 5)
-   *   extraordinary: boolean // 是否表现卓越 (total >= 30 且 count >= 8)
+   * interface AggregatedWinLossAnalysis {
+   *   count: number
+   *   wins: number
+   *   losses: number
+   *   winRate: number
+   *   winningStreak: number
+   *   losingStreak: number
+   *   activeSessionWins: number
+   *   activeSessionLosses: number
    * }
    *
-   * // ========== 队伍统计 ==========
-   * interface MatchHistoryGamesAnalysisTeamSide {
-   *   avgWinRate: number     // 队伍平均胜率
-   *   wins: number           // 队伍总胜场
-   *   loses: number          // 队伍总败场
-   *   games: number          // 队伍总对局数
-   *   avgKda: number         // 队伍平均 KDA
-   *   avgAkariScore: number  // 队伍平均 Akari 评分
+   * interface AggregatedCherryWinLossAnalysis extends AggregatedWinLossAnalysis {
+   *   top1s: number
+   *   topHalfFinishes: number
+   *   top1Rate: number
+   *   topHalfRate: number
+   *   avgSubteamPlacement: number
+   * }
+   *
+   * interface AggregatedSpellsAnalysis {
+   *   flashOnD: number
+   *   flashOnF: number
+   * }
+   *
+   * interface AggregatedChampionAnalysis {
+   *   championId: number
+   *   winLoss: AggregatedWinLossAnalysisMap
+   *   jungle: AggregatedJungleAnalysis | null
+   * }
+   *
+   * interface AggregatedTeamAnalysis {
+   *   avgWinRate: number
+   *   wins: number
+   *   losses: number
+   *   games: number
+   *   kills: number
+   *   deaths: number
+   *   assists: number
+   *   avgKda: number
+   *   avgAkariScore: number
+   *   akariScoreCv: number
+   *   akariScoreBsi: number
    * }
    * ```
    *
    * @example
-   * if (!env.playerStats) return []
+   * if (!env.analysis) return []
    *
    * return env.targetMembers.map(puuid => {
-   *   const stats = env.playerStats.players[puuid]?.summary
-   *   if (!stats) return '无数据'
+   *   const analysis = env.analysis.players[puuid]
+   *   if (!analysis) return '无数据'
    *
-   *   const winRate = (stats.winRate * 100).toFixed(0)
-   *   const kda = stats.avgKda.toFixed(2)
-   *   return `近${stats.count}场: 胜率${winRate}% KDA${kda}`
+   *   const winLoss = analysis.winLoss.all
+   *   const winRate = (winLoss.winRate * 100).toFixed(0)
+   *   const kda = analysis.summary.avgKda.toFixed(2)
+   *   return `近${analysis.count}场: 胜率${winRate}% KDA${kda}`
    * })
    *
    * // 判断是否连败
-   * const isOnLosingStreak = stats.losingStreak >= 3
+   * const isOnLosingStreak = analysis.winLoss.all.losingStreak >= 3
    *
    * // 判断闪现位置
-   * const flashPosition = stats.flashOnD > stats.flashOnF ? 'D' : 'F'
+   * const flashPosition = analysis.spells.flashOnD > analysis.spells.flashOnF ? 'D' : 'F'
    */
-  playerStats: OngoingGameState['playerStats']
+  analysis: OngoingGameState['analysis']
 
   /**
    * 对局详情映射表（时间线数据）

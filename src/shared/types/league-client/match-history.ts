@@ -256,7 +256,7 @@ export interface Position {
   y: number
 }
 
-export type GameEventType = 'CHAMPION_KILL' | 'BUILDING_KILL'
+export type GameEventType = 'CHAMPION_KILL' | 'BUILDING_KILL' | 'ELITE_MONSTER_KILL'
 
 export interface BaseGameEvent {
   type: GameEventType
@@ -296,7 +296,16 @@ export interface BuildingKillEvent extends BaseGameEvent {
   monsterSubType: string
 }
 
-export type GameEvent = ChampionKillEvent | BuildingKillEvent
+export type GameEvent = ChampionKillEvent | BuildingKillEvent | EliteMonsterKillEvent
+
+// TODO：需要确认 LCU 数据源中是否存在这些内容
+export interface EliteMonsterKillEvent extends BaseGameEvent {
+  type: 'ELITE_MONSTER_KILL'
+  monsterType: 'DRAGON' | 'HORDE' | 'RIFTHERALD' | 'BARON_NASHOR' | (string & {})
+  killerId: number
+  killerTeamId?: number
+  assistingParticipantIds?: number[]
+}
 
 export interface ParticipantFrame {
   participantId: number

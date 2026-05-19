@@ -48,8 +48,8 @@ export interface CategorizedContentBundles {}
 
 export interface Assets {
   'champ-select-background-sound': string
+  'champ-select-banphase-background-sound': string
   'champ-select-flyout-background': string
-  'champ-select-planning-intro': string
   'game-select-icon-active': string
   'game-select-icon-active-video': string
   'game-select-icon-default': string
@@ -70,8 +70,6 @@ export interface Assets {
   'icon-v2': string
   'icon-victory': string
   'icon-victory-video': string
-  'map-north': string
-  'map-south': string
   'music-inqueue-loop-sound': string
   'parties-background': string
   'postgame-ambience-loop-sound': string
@@ -80,6 +78,7 @@ export interface Assets {
   'sfx-ambience-pregame-loop-sound': string
   'social-icon-leaver': string
   'social-icon-victory': string
+  'tutorial-bg': string
 }
 
 export interface GameDodge {
@@ -95,6 +94,7 @@ export interface GameData {
   password: string
   playerChampionSelections: PlayerChampionSelection[]
   queue: Queue
+  spectatorKey: string
   spectatorsAllowed: boolean
   teamOne: TeamPlayer[]
   teamTwo: TeamPlayer[]
@@ -102,34 +102,17 @@ export interface GameData {
 
 export interface PlayerChampionSelection {
   championId: number
+  puuid: string
   selectedSkinIndex: number
   spell1Id: number
   spell2Id: number
-  summonerId: number // 旧 ID 系统中，无该字段
-  puuid: string // 旧 ID 系统中，无该字段
-  summonerInternalName: string
 }
 
 export interface TeamPlayer {
   championId: number
-  accountId: number
-  adjustmentFlags: number
-  botDifficulty: string
-  clientInSynch: boolean
-  gameCustomization: GameCustomization
-  index: number
   lastSelectedSkinIndex: number
-  locale?: any
-  minor: boolean
-  originalAccountNumber: number
-  originalPlatformId?: any
-  partnerId: string
-  pickMode: number
-  pickTurn: number
   profileIconId: number
   puuid: string
-  queueRating: number
-  rankedTeamGuest: boolean
   selectedPosition: string
   selectedRole: string
   summonerId: number
@@ -137,30 +120,10 @@ export interface TeamPlayer {
   summonerName: string
   teamOwner: boolean
   teamParticipantId: number
-  teamRating: number
-  timeAddedToQueue: number
-  timeChampionSelectStart: number
-  timeGameCreated: number
-  timeMatchmakingStart: number
-  voterRating: number
-}
-
-interface GameCustomization {
-  Companions: string
-  GoldenSpatulaClub: string
-  Regalia: string
-  challenges: string
-  championOwned: string
-  perks: string
-  ranked: string
-  statstones: string
-  summonerEmotes: string
-  summonerTrophy: string
-  vintageSkin: string
 }
 
 export interface Queue {
-  allowablePremadeSizes: any[]
+  allowablePremadeSizes: number[]
   areFreeChampionsAllowed: boolean
   assetMutator: string
   category: string
@@ -170,6 +133,8 @@ export interface Queue {
   gameMode: string
   gameTypeConfig: GameTypeConfig
   id: number
+  isBotHonoringAllowed: boolean
+  isCustom: boolean
   isRanked: boolean
   isTeamBuilderManaged: boolean
   lastToggledOffTime: number
@@ -180,6 +145,7 @@ export interface Queue {
   minimumParticipantListSize: number
   name: string
   numPlayersPerTeam: number
+  pickMode: string
   queueAvailability: string
   queueRewards: QueueRewards
   removalFromGameAllowed: boolean

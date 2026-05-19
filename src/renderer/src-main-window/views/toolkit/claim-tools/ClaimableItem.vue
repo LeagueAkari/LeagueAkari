@@ -30,7 +30,7 @@ const translatedTitle = computed(() => {
   // "Placeholder Name for Reward Group DO NOT TRANSLATE"
   if (title.includes('DO NOT TRANSLATE')) {
     return t('ClaimableItem.untranslatedC', {
-      countV: items.length
+      count: items.length
     })
   }
 

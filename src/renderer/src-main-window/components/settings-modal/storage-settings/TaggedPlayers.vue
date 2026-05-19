@@ -161,7 +161,7 @@ const { getInteroperability } = useInteroperableSgpServers()
 
 const onlyCurrentAccount = ref(true)
 
-const summonerShallowMap: Record<string, SummonerInfo> = shallowReactive({})
+const summonerShallowMap = shallowReactive<Record<string, SummonerInfo>>({})
 
 const renderPlayer = (puuid: string, sgpServerId: string) => {
   const cached = summonerShallowMap[puuid]

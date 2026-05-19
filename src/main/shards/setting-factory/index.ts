@@ -3,7 +3,6 @@ import { Paths } from '@shared/utils/types'
 import { app, dialog } from 'electron'
 import fs from 'node:original-fs'
 import path from 'node:path'
-import { Raw } from 'typeorm'
 
 import { AkariIpcError, AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
@@ -102,22 +101,43 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
   }
 
   /**
-   * unused
+   * 获取指定前缀下的设置项
    */
-  async _getValuesFromStorage(namespace: string, keyPrefix: string) {
-    const prefix = `${namespace}/${keyPrefix}`
+  async _getByPrefixFromStorage(namespace: string, keyPrefix: string) {
+    const { lowerBound, upperBound } = this._getStorageKeyPrefixBounds(namespace, keyPrefix)
 
+    return this._storage.dataSource
+      .getRepository(Setting)
+      .createQueryBuilder('setting')
+      .where('setting.key >= :lowerBound AND setting.key < :upperBound', { lowerBound, upperBound })
+      .getMany()
+  }
+
+  /**
+   * 删除指定前缀下的设置项
+   */
+  async _removeByPrefixFromStorage(namespace: string, keyPrefix: string) {
+    const { lowerBound, upperBound } = this._getStorageKeyPrefixBounds(namespace, keyPrefix)
+
+    const result = await this._storage.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from(Setting)
+      .where('key >= :lowerBound AND key < :upperBound', { lowerBound, upperBound })
+      .execute()
+
+    return result.affected || 0
+  }
+
+  private _getStorageKeyPrefixBounds(namespace: string, keyPrefix: string) {
     if (keyPrefix.endsWith('/')) {
       keyPrefix = keyPrefix.slice(0, -1)
     }
 
-    const results = await this._storage.dataSource.getRepository(Setting).find({
-      where: {
-        key: Raw((a) => `${a} GLOB ${prefix}/*`)
-      }
-    })
+    const lowerBound = keyPrefix ? `${namespace}/${keyPrefix}/` : `${namespace}/`
+    const upperBound = `${lowerBound.slice(0, -1)}0`
 
-    return results
+    return { lowerBound, upperBound }
   }
 
   /**
@@ -289,6 +309,27 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
       return this._getFromStorage(namespace, key)
     })
+
+    this._ipc.onCall(
+      SettingFactoryMain.id,
+      'getByPrefix',
+      async (_, namespace: string, keyPrefix: string) => {
+        return this._getByPrefixFromStorage(namespace, keyPrefix)
+      }
+    )
+
+    this._ipc.onCall(
+      SettingFactoryMain.id,
+      'removeByPrefix',
+      async (_, namespace: string, keyPrefix: string) => {
+        const service = this._settings.get(namespace)
+        if (service) {
+          return service._removeByPrefixFromStorage(keyPrefix)
+        }
+
+        return this._removeByPrefixFromStorage(namespace, keyPrefix)
+      }
+    )
 
     this._ipc.onCall(SettingFactoryMain.id, 'exportSettingsToJsonFile', async () => {
       const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain

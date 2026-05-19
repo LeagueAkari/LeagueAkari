@@ -12,7 +12,7 @@
       @update:value="handleSetSkin"
       :placeholder="
         t('SkinSelectionMini.skins', {
-          countV: skinOptions.length
+          count: skinOptions.length
         })
       "
       :options="skinOptions"

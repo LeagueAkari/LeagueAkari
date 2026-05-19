@@ -1,0 +1,6239 @@
+{
+  "frames": [
+    {
+      "events": [],
+      "participantFrames": {
+        "1": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 2975,
+            "y": 2525
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "2": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 3075,
+            "y": 2525
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 3025,
+            "y": 2575
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "5": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "6": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "7": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "8": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "9": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "10": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "11": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "12": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 25,
+            "y": 25
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "13": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 2525,
+            "y": 3025
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "14": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 2575,
+            "y": 2975
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "15": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 2675,
+            "y": 2875
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        },
+        "16": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 2775,
+            "y": 2775
+          },
+          "teamScore": 0,
+          "totalGold": 0,
+          "xp": 2000
+        }
+      },
+      "timestamp": 0
+    },
+    {
+      "events": [],
+      "participantFrames": {
+        "1": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "2": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "5": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9463,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "6": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 9063,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "7": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 6741,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "8": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6341,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "9": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "10": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "11": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "13": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "14": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "15": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "16": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        }
+      },
+      "timestamp": 60006
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [9],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 11,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3890,
+            "y": 13390
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 95978,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 8
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3815,
+            "y": 14075
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 97681,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20561,
+            "y": 16954
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 112713,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 21096,
+            "y": 16774
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "2": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 20561,
+            "y": 16954
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 20120,
+            "y": 7153
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 19716,
+            "y": 7120
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2240
+        },
+        "5": {
+          "currentGold": 401,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 21379,
+            "y": 16826
+          },
+          "teamScore": 0,
+          "totalGold": 901,
+          "xp": 2000
+        },
+        "6": {
+          "currentGold": 400,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 20821,
+            "y": 17194
+          },
+          "teamScore": 0,
+          "totalGold": 900,
+          "xp": 2000
+        },
+        "7": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 4099,
+            "y": 14162
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 2000
+        },
+        "8": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 3476,
+            "y": 13784
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 2000
+        },
+        "9": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 4130,
+            "y": 14261
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 2000
+        },
+        "10": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 12320,
+            "y": 20435
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "11": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 3947,
+            "y": 14130
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 2000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 12978,
+            "y": 19908
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "13": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 12336,
+            "y": 20671
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "14": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 13196,
+            "y": 19695
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "15": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 20070,
+            "y": 7333
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        },
+        "16": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 3,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 19800,
+            "y": 7270
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 2000
+        }
+      },
+      "timestamp": 120034
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [16],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 15,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 19985,
+            "y": 7238
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 120539,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 4
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3971,
+            "y": 14058
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 122209,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [10],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 14,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12869,
+            "y": 19894
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 123144,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 12
+        },
+        {
+          "assistingParticipantIds": [13],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 12,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12221,
+            "y": 20545
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 126183,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        },
+        {
+          "assistingParticipantIds": [15],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 16,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20094,
+            "y": 7016
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 128320,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 3
+        },
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20500,
+            "y": 16674
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 130692,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 1
+        },
+        {
+          "assistingParticipantIds": [],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 0,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20530,
+            "y": 16807
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 133363,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3621,
+            "y": 14128
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 134666,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 11
+        },
+        {
+          "assistingParticipantIds": [],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12334,
+            "y": 20390
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 139709,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 14
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "2": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "5": {
+          "currentGold": 401,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9463,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 901,
+          "xp": 4000
+        },
+        "6": {
+          "currentGold": 400,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 9063,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 900,
+          "xp": 4000
+        },
+        "7": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 6741,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "8": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6341,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "9": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "10": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "11": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "12": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "13": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "14": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "15": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "16": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        }
+      },
+      "timestamp": 180054
+    },
+    {
+      "events": [],
+      "participantFrames": {
+        "1": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 4578,
+            "y": 4490
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "2": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 4079,
+            "y": 5039
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 20782,
+            "y": 17588
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 20906,
+            "y": 17389
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "5": {
+          "currentGold": 401,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 12582,
+            "y": 20139
+          },
+          "teamScore": 0,
+          "totalGold": 901,
+          "xp": 4000
+        },
+        "6": {
+          "currentGold": 400,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 12858,
+            "y": 21057
+          },
+          "teamScore": 0,
+          "totalGold": 900,
+          "xp": 4000
+        },
+        "7": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 4445,
+            "y": 20508
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "8": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 4662,
+            "y": 19554
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "9": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 4360,
+            "y": 3905
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "10": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 5558,
+            "y": 19869
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "11": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 4584,
+            "y": 4635
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "12": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 21647,
+            "y": 17700
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "13": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 20984,
+            "y": 17464
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "14": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 5379,
+            "y": 20220
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "15": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 12260,
+            "y": 20618
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "16": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 11999,
+            "y": 19887
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        }
+      },
+      "timestamp": 240082
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12842,
+            "y": 20668
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 241861,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 15
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 5108,
+            "y": 20681
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 259907,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 14
+        },
+        {
+          "assistingParticipantIds": [9],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 11,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 2976,
+            "y": 3576
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 260275,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 1
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 13614,
+            "y": 21613
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 261644,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 16
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 5395,
+            "y": 19292
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 267060,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        },
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 22096,
+            "y": 17688
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 267828,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 4
+        },
+        {
+          "assistingParticipantIds": [13],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 12,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 21912,
+            "y": 16757
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 290468,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 3
+        },
+        {
+          "assistingParticipantIds": [9],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 11,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3106,
+            "y": 3788
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 294910,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 1
+        },
+        {
+          "assistingParticipantIds": [1],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 2,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 2878,
+            "y": 3663
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 297648,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 11
+        },
+        {
+          "assistingParticipantIds": [11],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 9,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3081,
+            "y": 3647
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 299151,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 3106,
+            "y": 3788
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "2": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 3081,
+            "y": 3647
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 4000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 21912,
+            "y": 16757
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 22096,
+            "y": 17688
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 4160
+        },
+        "5": {
+          "currentGold": 802,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 11670,
+            "y": 21427
+          },
+          "teamScore": 0,
+          "totalGold": 1302,
+          "xp": 4000
+        },
+        "6": {
+          "currentGold": 800,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 13231,
+            "y": 20160
+          },
+          "teamScore": 0,
+          "totalGold": 1300,
+          "xp": 4000
+        },
+        "7": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 5332,
+            "y": 20459
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 4000
+        },
+        "8": {
+          "currentGold": 502,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 5473,
+            "y": 19270
+          },
+          "teamScore": 0,
+          "totalGold": 1002,
+          "xp": 4000
+        },
+        "9": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 3252,
+            "y": 3848
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 4000
+        },
+        "10": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 5395,
+            "y": 19292
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "11": {
+          "currentGold": 502,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 2878,
+            "y": 3663
+          },
+          "teamScore": 0,
+          "totalGold": 1002,
+          "xp": 4000
+        },
+        "12": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 21620,
+            "y": 16741
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 4000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 21875,
+            "y": 18015
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 4000
+        },
+        "14": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 5108,
+            "y": 20681
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "15": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 12842,
+            "y": 20668
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        },
+        "16": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 5,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 13614,
+            "y": 21613
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 4000
+        }
+      },
+      "timestamp": 300086
+    },
+    {
+      "events": [],
+      "participantFrames": {
+        "1": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 13811,
+            "y": 20414
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6000
+        },
+        "2": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 13834,
+            "y": 20777
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6000
+        },
+        "3": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 3936,
+            "y": 5355
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 6000
+        },
+        "4": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 3438,
+            "y": 5206
+          },
+          "teamScore": 0,
+          "totalGold": 500,
+          "xp": 6000
+        },
+        "5": {
+          "currentGold": 802,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 5389,
+            "y": 19056
+          },
+          "teamScore": 0,
+          "totalGold": 1302,
+          "xp": 6000
+        },
+        "6": {
+          "currentGold": 300,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 6023,
+            "y": 19284
+          },
+          "teamScore": 0,
+          "totalGold": 2300,
+          "xp": 6000
+        },
+        "7": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 11141,
+            "y": 20632
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "8": {
+          "currentGold": 502,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 11237,
+            "y": 20904
+          },
+          "teamScore": 0,
+          "totalGold": 1002,
+          "xp": 6000
+        },
+        "9": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 3123,
+            "y": 14036
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "10": {
+          "currentGold": 1250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 4068,
+            "y": 2791
+          },
+          "teamScore": 0,
+          "totalGold": 1750,
+          "xp": 6000
+        },
+        "11": {
+          "currentGold": 502,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 3118,
+            "y": 14374
+          },
+          "teamScore": 0,
+          "totalGold": 1002,
+          "xp": 6000
+        },
+        "12": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 4599,
+            "y": 21138
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 4003,
+            "y": 20756
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "14": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 4751,
+            "y": 3192
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 6000
+        },
+        "15": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 8,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 5771,
+            "y": 14176
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 7000
+        },
+        "16": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 5769,
+            "y": 14550
+          },
+          "teamScore": 0,
+          "totalGold": 750,
+          "xp": 6000
+        }
+      },
+      "timestamp": 360111
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 6355,
+            "y": 21104
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 375060,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 13
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 6132,
+            "y": 21115
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 387806,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 12
+        },
+        {
+          "assistingParticipantIds": [11],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 9,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4248,
+            "y": 13676
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 392693,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 16
+        },
+        {
+          "assistingParticipantIds": [4],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 3,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3302,
+            "y": 3862
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 397378,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 14
+        },
+        {
+          "assistingParticipantIds": [14],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 10,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 2601,
+            "y": 3936
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 400618,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 4
+        },
+        {
+          "assistingParticipantIds": [4],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 3,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3114,
+            "y": 3862
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 402354,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        },
+        {
+          "assistingParticipantIds": [7],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 8,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 11449,
+            "y": 19936
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 405995,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        },
+        {
+          "assistingParticipantIds": [15],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 16,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4878,
+            "y": 14410
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 410915,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 13015,
+            "y": 20298
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 413019,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 1
+        },
+        {
+          "assistingParticipantIds": [15],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 16,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4751,
+            "y": 14173
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 418679,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 11
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 13015,
+            "y": 20298
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6000
+        },
+        "2": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 11449,
+            "y": 19936
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6000
+        },
+        "3": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 4748,
+            "y": 3961
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6000
+        },
+        "4": {
+          "currentGold": 251,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 2601,
+            "y": 3936
+          },
+          "teamScore": 0,
+          "totalGold": 751,
+          "xp": 6169
+        },
+        "5": {
+          "currentGold": 1203,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 4974,
+            "y": 20398
+          },
+          "teamScore": 0,
+          "totalGold": 1703,
+          "xp": 6000
+        },
+        "6": {
+          "currentGold": 700,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 5200,
+            "y": 19826
+          },
+          "teamScore": 0,
+          "totalGold": 2700,
+          "xp": 6000
+        },
+        "7": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 11280,
+            "y": 20364
+          },
+          "teamScore": 0,
+          "totalGold": 1250,
+          "xp": 6000
+        },
+        "8": {
+          "currentGold": 753,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 12374,
+            "y": 19364
+          },
+          "teamScore": 0,
+          "totalGold": 1253,
+          "xp": 6000
+        },
+        "9": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 4878,
+            "y": 14410
+          },
+          "teamScore": 0,
+          "totalGold": 1250,
+          "xp": 6000
+        },
+        "10": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 3114,
+            "y": 3862
+          },
+          "teamScore": 0,
+          "totalGold": 2000,
+          "xp": 6000
+        },
+        "11": {
+          "currentGold": 753,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 4751,
+            "y": 14173
+          },
+          "teamScore": 0,
+          "totalGold": 1253,
+          "xp": 6000
+        },
+        "12": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6132,
+            "y": 21115
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6355,
+            "y": 21104
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "14": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 3302,
+            "y": 3862
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        },
+        "15": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 8,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 4550,
+            "y": 13994
+          },
+          "teamScore": 0,
+          "totalGold": 1500,
+          "xp": 7000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 7,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 5102,
+            "y": 14489
+          },
+          "teamScore": 0,
+          "totalGold": 1000,
+          "xp": 6000
+        }
+      },
+      "timestamp": 420115
+    },
+    {
+      "events": [],
+      "participantFrames": {
+        "1": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 10,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 20667,
+            "y": 17049
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 9000
+        },
+        "2": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 10,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 20573,
+            "y": 16930
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 9000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 18854,
+            "y": 8259
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 8000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 19871,
+            "y": 8737
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 8000
+        },
+        "5": {
+          "currentGold": 1553,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 15134,
+            "y": 13355
+          },
+          "teamScore": 0,
+          "totalGold": 4303,
+          "xp": 8000
+        },
+        "6": {
+          "currentGold": 200,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 14879,
+            "y": 13621
+          },
+          "teamScore": 0,
+          "totalGold": 5200,
+          "xp": 8000
+        },
+        "7": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 7,
+          "position": {
+            "x": 18739,
+            "y": 6473
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 8000
+        },
+        "8": {
+          "currentGold": 853,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 19471,
+            "y": 7109
+          },
+          "teamScore": 0,
+          "totalGold": 3853,
+          "xp": 8000
+        },
+        "9": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 12959,
+            "y": 21123
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 8000
+        },
+        "10": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 13766,
+            "y": 13340
+          },
+          "teamScore": 0,
+          "totalGold": 4500,
+          "xp": 8000
+        },
+        "11": {
+          "currentGold": 1103,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 11836,
+            "y": 21356
+          },
+          "teamScore": 0,
+          "totalGold": 3853,
+          "xp": 8000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 11935,
+            "y": 20301
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        },
+        "13": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 12027,
+            "y": 19931
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        },
+        "14": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 14129,
+            "y": 13684
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 21284,
+            "y": 17220
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 10000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 22090,
+            "y": 17078
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        }
+      },
+      "timestamp": 480146
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 13973,
+            "y": 13553
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 483586,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 14
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 14202,
+            "y": 13612
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 486351,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        },
+        {
+          "assistingParticipantIds": [7],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 8,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 18722,
+            "y": 7392
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 499583,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 4
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 19086,
+            "y": 7717
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 503647,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 3
+        },
+        {
+          "assistingParticipantIds": [13],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 12,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12424,
+            "y": 21162
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 504482,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 11988,
+            "y": 19368
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 529623,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [2],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 1,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 21821,
+            "y": 18222
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 534232,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 16
+        },
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 12745,
+            "y": 19740
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 537204,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 11
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 10,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 21265,
+            "y": 17896
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 9000
+        },
+        "2": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 10,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 21381,
+            "y": 18048
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 9000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 19086,
+            "y": 7717
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 8000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 18722,
+            "y": 7392
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 8092
+        },
+        "5": {
+          "currentGold": 1954,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 14748,
+            "y": 13910
+          },
+          "teamScore": 0,
+          "totalGold": 4704,
+          "xp": 8000
+        },
+        "6": {
+          "currentGold": 725,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 15574,
+            "y": 14124
+          },
+          "teamScore": 0,
+          "totalGold": 5725,
+          "xp": 8000
+        },
+        "7": {
+          "currentGold": 1175,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 19524,
+            "y": 6976
+          },
+          "teamScore": 0,
+          "totalGold": 4175,
+          "xp": 8000
+        },
+        "8": {
+          "currentGold": 1104,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 20024,
+            "y": 6952
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 8000
+        },
+        "9": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 11988,
+            "y": 19368
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 8000
+        },
+        "10": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 14202,
+            "y": 13612
+          },
+          "teamScore": 0,
+          "totalGold": 4500,
+          "xp": 8000
+        },
+        "11": {
+          "currentGold": 1103,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 12745,
+            "y": 19740
+          },
+          "teamScore": 0,
+          "totalGold": 3853,
+          "xp": 8000
+        },
+        "12": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 12240,
+            "y": 20589
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 8000
+        },
+        "13": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 12758,
+            "y": 19816
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 8000
+        },
+        "14": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 13973,
+            "y": 13553
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 21731,
+            "y": 17930
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 10000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 9,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 21821,
+            "y": 18222
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 8000
+        }
+      },
+      "timestamp": 540177
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [2],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 1,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 21687,
+            "y": 17992
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 548394,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 15
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9382,
+            "y": 9798
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 11000
+        },
+        "2": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 8723,
+            "y": 9638
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 11000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 8968,
+            "y": 9162
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 1954,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9367,
+            "y": 8337
+          },
+          "teamScore": 0,
+          "totalGold": 4704,
+          "xp": 10000
+        },
+        "6": {
+          "currentGold": 725,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 8876,
+            "y": 8446
+          },
+          "teamScore": 0,
+          "totalGold": 5725,
+          "xp": 10000
+        },
+        "7": {
+          "currentGold": 1175,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 7044,
+            "y": 9301
+          },
+          "teamScore": 0,
+          "totalGold": 4175,
+          "xp": 10000
+        },
+        "8": {
+          "currentGold": 1104,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6403,
+            "y": 9009
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "9": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8608,
+            "y": 7696
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6942,
+            "y": 8116
+          },
+          "teamScore": 0,
+          "totalGold": 4500,
+          "xp": 10000
+        },
+        "11": {
+          "currentGold": 1103,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8708,
+            "y": 7688
+          },
+          "teamScore": 0,
+          "totalGold": 3853,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "13": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 7019,
+            "y": 9929
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "14": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7330,
+            "y": 7627
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 12000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7046,
+            "y": 7730
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 600201
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4508,
+            "y": 19730
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 618196,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 3
+        },
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4876,
+            "y": 19658
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 619432,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 4
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 14600,
+            "y": 13058
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 639228,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 15
+        },
+        {
+          "assistingParticipantIds": [14],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 10,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3860,
+            "y": 13316
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 642005,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [8],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 7,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 15247,
+            "y": 13290
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 642139,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 16
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 3155,
+            "y": 4543
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 11000
+        },
+        "2": {
+          "currentGold": 602,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 4558,
+            "y": 3973
+          },
+          "teamScore": 0,
+          "totalGold": 3602,
+          "xp": 11000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 4508,
+            "y": 19730
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 4876,
+            "y": 19658
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 2505,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 5626,
+            "y": 20273
+          },
+          "teamScore": 0,
+          "totalGold": 5255,
+          "xp": 10000
+        },
+        "6": {
+          "currentGold": 1400,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 5626,
+            "y": 19124
+          },
+          "teamScore": 0,
+          "totalGold": 6400,
+          "xp": 10000
+        },
+        "7": {
+          "currentGold": 1675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 14728,
+            "y": 13965
+          },
+          "teamScore": 0,
+          "totalGold": 4675,
+          "xp": 10000
+        },
+        "8": {
+          "currentGold": 1355,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 14798,
+            "y": 13366
+          },
+          "teamScore": 0,
+          "totalGold": 4355,
+          "xp": 10000
+        },
+        "9": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 3501,
+            "y": 13514
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 375,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 3680,
+            "y": 14502
+          },
+          "teamScore": 0,
+          "totalGold": 4875,
+          "xp": 10000
+        },
+        "11": {
+          "currentGold": 1103,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 4339,
+            "y": 13977
+          },
+          "teamScore": 0,
+          "totalGold": 3853,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 0,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 3078,
+            "y": 4150
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "13": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 4582,
+            "y": 4084
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 4313,
+            "y": 14487
+          },
+          "teamScore": 0,
+          "totalGold": 3750,
+          "xp": 10000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 14600,
+            "y": 13058
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 12000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 15247,
+            "y": 13290
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 660214
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [14],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 10,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3441,
+            "y": 13863
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 667869,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 9
+        },
+        {
+          "assistingParticipantIds": [11],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 9,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3858,
+            "y": 14053
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 674731,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        },
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3872,
+            "y": 4264
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 675252,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        },
+        {
+          "assistingParticipantIds": [14],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 10,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4154,
+            "y": 14184
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 675419,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 11
+        },
+        {
+          "assistingParticipantIds": [2],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 1,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4082,
+            "y": 4162
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 679694,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 12
+        },
+        {
+          "assistingParticipantIds": [2],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 1,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 5234,
+            "y": 4266
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 684337,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 13
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 953,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9044,
+            "y": 9570
+          },
+          "teamScore": 0,
+          "totalGold": 6453,
+          "xp": 12000
+        },
+        "2": {
+          "currentGold": 953,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 8526,
+            "y": 9776
+          },
+          "teamScore": 0,
+          "totalGold": 6453,
+          "xp": 13000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 605,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9463,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 7855,
+          "xp": 11000
+        },
+        "6": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 9063,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 8900,
+          "xp": 11000
+        },
+        "7": {
+          "currentGold": 1675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 6472,
+            "y": 9459
+          },
+          "teamScore": 0,
+          "totalGold": 7175,
+          "xp": 11000
+        },
+        "8": {
+          "currentGold": 1455,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6577,
+            "y": 9145
+          },
+          "teamScore": 0,
+          "totalGold": 6955,
+          "xp": 11000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6821,
+            "y": 8219
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 2750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 7147,
+            "y": 9589
+          },
+          "teamScore": 0,
+          "totalGold": 6500,
+          "xp": 11000
+        },
+        "13": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6776,
+            "y": 9828
+          },
+          "teamScore": 0,
+          "totalGold": 6500,
+          "xp": 11000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 8842,
+            "y": 8909
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 13000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 720225
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 2547,
+            "y": 3870
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 748432,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 7
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 2702,
+            "y": 4305
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 749701,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 8
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 953,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 5753,
+            "y": 20252
+          },
+          "teamScore": 0,
+          "totalGold": 6453,
+          "xp": 13000
+        },
+        "2": {
+          "currentGold": 953,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 6041,
+            "y": 20113
+          },
+          "teamScore": 0,
+          "totalGold": 6453,
+          "xp": 14000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 1156,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 3942,
+            "y": 3237
+          },
+          "teamScore": 0,
+          "totalGold": 8406,
+          "xp": 11000
+        },
+        "6": {
+          "currentGold": 925,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 3891,
+            "y": 3307
+          },
+          "teamScore": 0,
+          "totalGold": 9575,
+          "xp": 11000
+        },
+        "7": {
+          "currentGold": 1675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 2547,
+            "y": 3870
+          },
+          "teamScore": 0,
+          "totalGold": 7175,
+          "xp": 11000
+        },
+        "8": {
+          "currentGold": 1455,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 2702,
+            "y": 4305
+          },
+          "teamScore": 0,
+          "totalGold": 6955,
+          "xp": 11000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6098,
+            "y": 20244
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 2250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 6500,
+          "xp": 11000
+        },
+        "13": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 6500,
+          "xp": 11000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 5442,
+            "y": 19984
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 13000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 780227
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [1],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 2,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4932,
+            "y": 18898
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 796892,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 14
+        },
+        {
+          "assistingParticipantIds": [1],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 2,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4890,
+            "y": 20503
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 804507,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 10
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9584,
+            "y": 9849
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 1156,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9463,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 8406,
+          "xp": 12000
+        },
+        "6": {
+          "currentGold": 925,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 9063,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 9575,
+          "xp": 12000
+        },
+        "7": {
+          "currentGold": 1675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 6741,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 7175,
+          "xp": 12000
+        },
+        "8": {
+          "currentGold": 1455,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6838,
+            "y": 9126
+          },
+          "teamScore": 0,
+          "totalGold": 6955,
+          "xp": 12000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 1750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 7500,
+          "xp": 12000
+        },
+        "13": {
+          "currentGold": 1500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 6500,
+          "xp": 12000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 13000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 840251
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4067,
+            "y": 13315
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 875055,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 1
+        },
+        {
+          "assistingParticipantIds": [5],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 3949,
+            "y": 13097
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 881148,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 2
+        },
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20644,
+            "y": 17271
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 892670,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 7
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 4067,
+            "y": 13315
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 3949,
+            "y": 13097
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 1707,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 4422,
+            "y": 14132
+          },
+          "teamScore": 0,
+          "totalGold": 8957,
+          "xp": 12000
+        },
+        "6": {
+          "currentGold": 1725,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 5726,
+            "y": 14874
+          },
+          "teamScore": 0,
+          "totalGold": 10375,
+          "xp": 12000
+        },
+        "7": {
+          "currentGold": 1675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 20644,
+            "y": 17271
+          },
+          "teamScore": 0,
+          "totalGold": 7175,
+          "xp": 12000
+        },
+        "8": {
+          "currentGold": 1455,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 21151,
+            "y": 16041
+          },
+          "teamScore": 0,
+          "totalGold": 6955,
+          "xp": 12000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 20563,
+            "y": 16099
+          },
+          "teamScore": 0,
+          "totalGold": 7750,
+          "xp": 12000
+        },
+        "13": {
+          "currentGold": 1750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 13,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 20378,
+            "y": 16518
+          },
+          "teamScore": 0,
+          "totalGold": 6750,
+          "xp": 12000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 13000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 900252
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [12],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 13,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 20667,
+            "y": 16131
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 901722,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 8
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 2207,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 9160,
+            "y": 8354
+          },
+          "teamScore": 0,
+          "totalGold": 9457,
+          "xp": 13000
+        },
+        "6": {
+          "currentGold": 975,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 9063,
+            "y": 8192
+          },
+          "teamScore": 0,
+          "totalGold": 10875,
+          "xp": 13000
+        },
+        "7": {
+          "currentGold": 675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 7009,
+            "y": 8998
+          },
+          "teamScore": 0,
+          "totalGold": 8675,
+          "xp": 13000
+        },
+        "8": {
+          "currentGold": 55,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6815,
+            "y": 9214
+          },
+          "teamScore": 0,
+          "totalGold": 7455,
+          "xp": 13000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6823,
+            "y": 9371
+          },
+          "teamScore": 0,
+          "totalGold": 8250,
+          "xp": 13000
+        },
+        "13": {
+          "currentGold": 2250,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 7250,
+          "xp": 13000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 14000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 960270
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [13],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 12,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 19500,
+            "y": 7453
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 1008665,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 6
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 19634,
+            "y": 7395
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 1012480,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 13
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 2608,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 19349,
+            "y": 7206
+          },
+          "teamScore": 0,
+          "totalGold": 9858,
+          "xp": 13000
+        },
+        "6": {
+          "currentGold": 925,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 19500,
+            "y": 7453
+          },
+          "teamScore": 0,
+          "totalGold": 11275,
+          "xp": 13000
+        },
+        "7": {
+          "currentGold": 675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 6741,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 8675,
+          "xp": 13000
+        },
+        "8": {
+          "currentGold": 55,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 6341,
+            "y": 9065
+          },
+          "teamScore": 0,
+          "totalGold": 7455,
+          "xp": 13000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 19986,
+            "y": 7176
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 19634,
+            "y": 7395
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 14000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 1020302
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 19697,
+            "y": 7088
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 1025879,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 12
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 208,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 4384,
+            "y": 15283
+          },
+          "teamScore": 0,
+          "totalGold": 12608,
+          "xp": 14000
+        },
+        "6": {
+          "currentGold": 375,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 4808,
+            "y": 15287
+          },
+          "teamScore": 0,
+          "totalGold": 13925,
+          "xp": 14000
+        },
+        "7": {
+          "currentGold": 675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 4014,
+            "y": 13056
+          },
+          "teamScore": 0,
+          "totalGold": 11175,
+          "xp": 14000
+        },
+        "8": {
+          "currentGold": 155,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 4326,
+            "y": 13032
+          },
+          "teamScore": 0,
+          "totalGold": 10055,
+          "xp": 14000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 14000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 1080306
+    },
+    {
+      "events": [
+        {
+          "assistingParticipantIds": [],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 6,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4613,
+            "y": 13148
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 1092126,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 8
+        },
+        {
+          "assistingParticipantIds": [6],
+          "buildingType": "",
+          "itemId": 0,
+          "killerId": 5,
+          "laneType": "",
+          "monsterSubType": "",
+          "monsterType": "",
+          "participantId": 0,
+          "position": {
+            "x": 4082,
+            "y": 13749
+          },
+          "skillSlot": 0,
+          "teamId": 0,
+          "timestamp": 1095632,
+          "towerType": "",
+          "type": "CHAMPION_KILL",
+          "victimId": 7
+        }
+      ],
+      "participantFrames": {
+        "1": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 1,
+          "position": {
+            "x": 9433,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 14000
+        },
+        "2": {
+          "currentGold": 1204,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 16,
+          "minionsKilled": 0,
+          "participantId": 2,
+          "position": {
+            "x": 9033,
+            "y": 9886
+          },
+          "teamScore": 0,
+          "totalGold": 6704,
+          "xp": 15000
+        },
+        "3": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 3,
+          "position": {
+            "x": 9687,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "4": {
+          "currentGold": 351,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 4,
+          "position": {
+            "x": 9287,
+            "y": 9074
+          },
+          "teamScore": 0,
+          "totalGold": 3351,
+          "xp": 10000
+        },
+        "5": {
+          "currentGold": 759,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 5,
+          "position": {
+            "x": 7853,
+            "y": 9333
+          },
+          "teamScore": 0,
+          "totalGold": 13159,
+          "xp": 14000
+        },
+        "6": {
+          "currentGold": 925,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 6,
+          "position": {
+            "x": 8195,
+            "y": 9333
+          },
+          "teamScore": 0,
+          "totalGold": 14475,
+          "xp": 14000
+        },
+        "7": {
+          "currentGold": 675,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 1,
+          "participantId": 7,
+          "position": {
+            "x": 4082,
+            "y": 13749
+          },
+          "teamScore": 0,
+          "totalGold": 11175,
+          "xp": 14000
+        },
+        "8": {
+          "currentGold": 155,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 8,
+          "position": {
+            "x": 4613,
+            "y": 13148
+          },
+          "teamScore": 0,
+          "totalGold": 10055,
+          "xp": 14000
+        },
+        "9": {
+          "currentGold": 1000,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 9,
+          "position": {
+            "x": 8708,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4000,
+          "xp": 10000
+        },
+        "10": {
+          "currentGold": 1125,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 10,
+          "position": {
+            "x": 6944,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 7625,
+          "xp": 11000
+        },
+        "11": {
+          "currentGold": 1354,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 11,
+          "position": {
+            "x": 8308,
+            "y": 7694
+          },
+          "teamScore": 0,
+          "totalGold": 4104,
+          "xp": 10000
+        },
+        "12": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 12,
+          "position": {
+            "x": 6985,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "13": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 14,
+          "minionsKilled": 0,
+          "participantId": 13,
+          "position": {
+            "x": 6585,
+            "y": 9860
+          },
+          "teamScore": 0,
+          "totalGold": 8500,
+          "xp": 13000
+        },
+        "14": {
+          "currentGold": 750,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 12,
+          "minionsKilled": 0,
+          "participantId": 14,
+          "position": {
+            "x": 6544,
+            "y": 8175
+          },
+          "teamScore": 0,
+          "totalGold": 6250,
+          "xp": 11000
+        },
+        "15": {
+          "currentGold": 1508,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 15,
+          "minionsKilled": 0,
+          "participantId": 15,
+          "position": {
+            "x": 7745,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 4258,
+          "xp": 14000
+        },
+        "16": {
+          "currentGold": 500,
+          "dominionScore": 0,
+          "jungleMinionsKilled": 0,
+          "level": 11,
+          "minionsKilled": 0,
+          "participantId": 16,
+          "position": {
+            "x": 7345,
+            "y": 7674
+          },
+          "teamScore": 0,
+          "totalGold": 3500,
+          "xp": 10000
+        }
+      },
+      "timestamp": 1101811
+    }
+  ]
+}

@@ -12,7 +12,7 @@ const TRANS = {
 }
 
 function getMessages(env) {
-  if (!env.playerStats) return []
+  if (!env.analysis) return []
 
   return env.targetMembers
     .map((puuid) => {
@@ -24,7 +24,7 @@ function getMessages(env) {
         name = env.gameData.champions[selection]?.name || TRANS[env.locale].unknownChampion
       }
 
-      const { avgKda = 0, count = 0, winRate = 0 } = env.playerStats.players[puuid]?.summary || {}
+      const { avgKda = 0, count = 0, winRate = 0 } = env.analysis.players[puuid]?.summary || {}
       return { puuid, name, avgKda, count, winRate }
     })
     .map(({ name, avgKda, count, winRate }) =>

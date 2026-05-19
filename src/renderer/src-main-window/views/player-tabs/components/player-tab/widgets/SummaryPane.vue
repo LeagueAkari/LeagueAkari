@@ -88,22 +88,23 @@
       <div
         class="flex w-full items-center gap-2"
         v-if="
-          (analysis.summary.activeSessionWins > 0 || analysis.summary.activeSessionLosses > 0) &&
-          pagedMatchHistory &&
-          (pagedMatchHistory.queryParams.startIndex === 0 ||
-            pagedMatchHistory.queryParams.startIndex === undefined)
+          (analysis.winLoss.all.activeSessionWins > 0 ||
+            analysis.winLoss.all.activeSessionLosses > 0) &&
+          page &&
+          (page.queryParams.startIndex === 0 || page.queryParams.startIndex === undefined)
         "
       >
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.activeSession', 'active')
         }}</span>
         <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
-          {{ analysis.summary.activeSessionWins }} {{ t('PlayerTab.stats.winShort') }}
-          {{ analysis.summary.activeSessionLosses }}
+          {{ analysis.winLoss.all.activeSessionWins }} {{ t('PlayerTab.stats.winShort') }}
+          {{ analysis.winLoss.all.activeSessionLosses }}
           {{ t('PlayerTab.stats.lossShort') }} ({{
             (
-              (analysis.summary.activeSessionWins /
-                (analysis.summary.activeSessionWins + analysis.summary.activeSessionLosses)) *
+              (analysis.winLoss.all.activeSessionWins /
+                (analysis.winLoss.all.activeSessionWins +
+                  analysis.winLoss.all.activeSessionLosses)) *
               100
             ).toFixed()
           }}%)
@@ -115,13 +116,13 @@
           t('PlayerTab.stats.winLose')
         }}</span>
         <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
-          {{ analysis.summary.wins }} {{ t('PlayerTab.stats.winShort') }}
-          {{ analysis.summary.losses }} {{ t('PlayerTab.stats.lossShort') }} ({{
-            (analysis.summary.winRate * 100).toFixed()
+          {{ analysis.winLoss.all.wins }} {{ t('PlayerTab.stats.winShort') }}
+          {{ analysis.winLoss.all.losses }} {{ t('PlayerTab.stats.lossShort') }} ({{
+            (analysis.winLoss.all.winRate * 100).toFixed()
           }}%)
           <span
             v-if="currentStreak"
-            class="ml-1 inline-flex max-w-[220px] flex-wrap items-center justify-end gap-1"
+            class="ml-1 inline-flex max-w-55 flex-wrap items-center justify-end gap-1"
           >
             <span
               class="rounded px-1 py-0.5 text-[12px] leading-none"
@@ -132,7 +133,7 @@
                   currentStreak.isWinning
                     ? 'PlayerTab.stats.winningStreak'
                     : 'PlayerTab.stats.losingStreak',
-                  { countV: currentStreak.count }
+                  { count: currentStreak.count }
                 )
               }}
             </span>
@@ -142,7 +143,7 @@
 
       <div
         class="flex w-full items-center gap-2"
-        v-if="analysis.summary.blueSideCount > 0 || analysis.summary.redSideCount > 0"
+        v-if="analysis.teamSide.blueSideCount > 0 || analysis.teamSide.redSideCount > 0"
       >
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.teamSides')
@@ -150,10 +151,10 @@
         <div class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
           <div class="flex items-center">
             <div class="mr-1 size-3 rounded-full bg-blue-500"></div>
-            <span>{{ analysis.summary.blueSideCount }}</span>
+            <span>{{ analysis.teamSide.blueSideCount }}</span>
             <span class="mx-2 text-xs text-gray-700 dark:text-gray-400">/</span>
             <div class="mr-1 size-3 rounded-full bg-red-400"></div>
-            <span>{{ analysis.summary.redSideCount }}</span>
+            <span>{{ analysis.teamSide.redSideCount }}</span>
           </div>
         </div>
       </div>
@@ -162,36 +163,39 @@
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.champions')
         }}</span>
-        <div class="ml-auto flex max-w-[110px] flex-wrap justify-end gap-0.5">
+        <div class="ml-auto flex max-w-27.5 flex-wrap justify-end gap-0.5">
           <NPopover
             v-for="c of frequentlyUsedChampions"
-            :key="c.id"
+            :key="c.championId"
             :delay="50"
             :keep-alive-on-hover="false"
           >
             <template #trigger>
               <div class="relative h-5 w-5 rounded transition-[filter]">
-                <LcuImage class="h-full w-full" :src="championIconUri(c.id)" />
+                <LcuImage class="h-full w-full" :src="championIconUri(c.championId)" />
                 <div
                   class="absolute -right-0.5 -bottom-1 rounded-sm bg-black/60 px-0.5 text-[10px] text-gray-200"
                 >
-                  {{ c.count }}
+                  {{ c.winLoss.all.count }}
                 </div>
               </div>
             </template>
             <div class="text-xs">
               <div>
-                {{ lcs.gameData.champions[c.id]?.name }} · {{ c.count }}
+                {{ lcs.gameData.champions[c.championId]?.name }} · {{ c.winLoss.all.count }}
                 {{ t('PlayerTab.stats.times') }}
               </div>
               <div class="mt-0.5 flex gap-1">
                 <span class="text-green-600 dark:text-green-400"
-                  >{{ c.wins }} {{ t('PlayerTab.stats.win') }}</span
+                  >{{ c.winLoss.all.wins }} {{ t('PlayerTab.stats.win') }}</span
                 >
                 <span class="text-orange-600 dark:text-orange-400"
-                  >{{ c.losses }} {{ t('PlayerTab.stats.lose') }}</span
+                  >{{ c.winLoss.all.losses }} {{ t('PlayerTab.stats.lose') }}</span
                 >
-                <span>({{ t('PlayerTab.stats.wr') }} {{ (c.winRate * 100).toFixed() }}%)</span>
+                <span
+                  >({{ t('PlayerTab.stats.wr') }}
+                  {{ (c.winLoss.all.winRate * 100).toFixed() }}%)</span
+                >
               </div>
             </div>
           </NPopover>
@@ -207,12 +211,10 @@ import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
-import { analyzeMatchHistory } from '@shared/data-adapter/analysis/players'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { usePlayerTab } from '../context'
 import { useMatchHistory } from '../data/match-history'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
@@ -221,59 +223,29 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
-const { puuid } = usePlayerTab()
-const { page: pagedMatchHistory } = useMatchHistory()
-
-const analysisGames = computed(() => {
-  if (!pagedMatchHistory.value?.games?.length) {
-    return []
-  }
-
-  return pagedMatchHistory.value.games
-})
-
-const analysis = computed(() => {
-  if (!analysisGames.value.length) {
-    return null
-  }
-
-  return analyzeMatchHistory(analysisGames.value, puuid.value, {
-    includeIrregularGames: true
-  })
-})
+const { page, analysis: analysis } = useMatchHistory()
 
 const currentStreak = computed(() => {
-  if (!analysis.value) {
+  // 连胜目前只统计第一页
+  if (!analysis.value || (page.value?.queryParams && page.value.queryParams.startIndex !== 0)) {
     return null
   }
 
-  if (analysis.value.summary.winningStreak >= 2) {
-    return { isWinning: true, count: analysis.value.summary.winningStreak }
+  if (analysis.value.winLoss.all.winningStreak >= 2) {
+    return { isWinning: true, count: analysis.value.winLoss.all.winningStreak }
   }
 
-  if (analysis.value.summary.losingStreak >= 2) {
-    return { isWinning: false, count: analysis.value.summary.losingStreak }
+  if (analysis.value.winLoss.all.losingStreak >= 2) {
+    return { isWinning: false, count: analysis.value.winLoss.all.losingStreak }
   }
 
   return null
 })
 
-const getStreakBadgeClass = (isWinning: boolean, count: number) => {
-  if (count >= 7) {
-    return isWinning
-      ? 'border border-emerald-500/60 bg-emerald-500/20 font-bold text-emerald-700 dark:border-emerald-300/65 dark:bg-emerald-300/20 dark:text-emerald-200'
-      : 'border border-red-500/60 bg-red-500/20 font-bold text-red-700 dark:border-red-300/65 dark:bg-red-300/20 dark:text-red-200'
-  }
-
-  if (count >= 4) {
-    return isWinning
-      ? 'border border-emerald-500/45 bg-emerald-500/12 font-semibold text-emerald-700 dark:border-emerald-300/55 dark:bg-emerald-300/15 dark:text-emerald-300'
-      : 'border border-red-500/45 bg-red-500/12 font-semibold text-red-700 dark:border-red-300/55 dark:bg-red-300/15 dark:text-red-300'
-  }
-
+const getStreakBadgeClass = (isWinning: boolean, _count: number) => {
   return isWinning
-    ? 'font-semibold text-emerald-600 dark:text-emerald-400'
-    : 'font-semibold text-red-600 dark:text-red-400'
+    ? 'border border-emerald-500/45 bg-emerald-500/12 font-semibold text-emerald-700 dark:border-emerald-300/55 dark:bg-emerald-300/15 dark:text-emerald-300'
+    : 'border border-red-500/45 bg-red-500/12 font-semibold text-red-700 dark:border-red-300/55 dark:bg-red-300/15 dark:text-red-300'
 }
 
 const frequentlyUsedChampions = computed(() => {
@@ -282,12 +254,12 @@ const frequentlyUsedChampions = computed(() => {
   }
 
   return Object.values(analysis.value.champions)
-    .filter((c) => c.count >= FREQUENT_USE_CHAMPION_THRESHOLD)
+    .filter((c) => c.winLoss.all.count >= FREQUENT_USE_CHAMPION_THRESHOLD)
     .sort((a, b) => {
-      if (a.count !== b.count) {
-        return b.count - a.count
+      if (a.winLoss.all.count !== b.winLoss.all.count) {
+        return b.winLoss.all.count - a.winLoss.all.count
       }
-      return b.wins - a.wins
+      return b.winLoss.all.wins - a.winLoss.all.wins
     })
 })
 </script>

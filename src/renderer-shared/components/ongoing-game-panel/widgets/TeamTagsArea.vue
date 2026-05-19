@@ -153,15 +153,15 @@ const ogs = useOngoingGameStore()
 const { mergedPremadeTeams } = useOngoingGamePanel()
 
 const teamStats = computed(() => {
-  if (!ogs.playerStats) {
+  if (!ogs.analysis) {
     return null
   }
 
-  return ogs.playerStats.teams[teamIdentifier] ?? null
+  return ogs.analysis.teams[teamIdentifier] ?? null
 })
 
 const teamMembers = computed(() => {
-  if (!ogs.playerStats) {
+  if (!ogs.analysis) {
     return []
   }
 
@@ -180,11 +180,11 @@ const premadeColors = computed(() => {
 // 1. 2 人以上的预组队队伍
 // 2. 玩家胜率均低于特定值
 const winRateTeams = computed(() => {
-  if (!ogs.playerStats || !mergedPremadeTeams.value) {
+  if (!ogs.analysis || !mergedPremadeTeams.value) {
     return {}
   }
 
-  const playerStats = ogs.playerStats.players
+  const playersAnalysis = ogs.analysis.players
 
   const result: WinRateTeamInfo[] = []
 
@@ -197,7 +197,7 @@ const winRateTeams = computed(() => {
     let otherMembersWinTotalStreak = 0
 
     for (const p of players) {
-      const a = playerStats[p]
+      const a = playersAnalysis[p]
 
       if (!a) {
         break
@@ -205,12 +205,12 @@ const winRateTeams = computed(() => {
 
       if (
         !hasOneHighWinRateMember &&
-        a.summary.winRate >= WIN_RATE_TEAM_MIN_WIN_RATE &&
-        a.summary.count >= WIN_RATE_TEAM_MIN_MATCHES
+        a.winLoss.all.winRate >= WIN_RATE_TEAM_MIN_WIN_RATE &&
+        a.winLoss.all.count >= WIN_RATE_TEAM_MIN_MATCHES
       ) {
         hasOneHighWinRateMember = true
       } else {
-        otherMembersWinTotalStreak += a.summary.winningStreak
+        otherMembersWinTotalStreak += a.winLoss.all.winningStreak
       }
     }
 
@@ -228,7 +228,7 @@ const winRateTeams = computed(() => {
     let lossRateTeamQualified = true
 
     for (const p of players) {
-      const a = playerStats[p]
+      const a = playersAnalysis[p]
 
       if (!a) {
         lossRateTeamQualified = false
@@ -240,8 +240,8 @@ const winRateTeams = computed(() => {
       }
 
       if (
-        a.summary.count < LOSS_RATE_TEAM_MIN_SIZE ||
-        a.summary.winRate > LOSS_RATE_TEAM_MAX_WIN_RATE
+        a.winLoss.all.count < LOSS_RATE_TEAM_MIN_SIZE ||
+        a.winLoss.all.winRate > LOSS_RATE_TEAM_MAX_WIN_RATE
       ) {
         lossRateTeamQualified = false
       }

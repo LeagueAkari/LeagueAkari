@@ -34,7 +34,7 @@
           <div v-if="!isSmallSize" class="relative h-12 w-16">
             <img
               class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
-              :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
+              :src="rankedImageMap[getCurrentTier(entry)] || rankedImageMap['UNRANKED']"
             />
           </div>
 
@@ -43,12 +43,8 @@
             <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
               formatTier(entry)
             }}</span>
-            <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
-              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
-              {{ t('RankedPane.point') }}
-            </span>
-            <span v-else class="text-xs text-gray-500 dark:text-gray-400">
-              {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              {{ formatEntryRecord(entry) }}
             </span>
 
             <!-- Highest Previous Season -->
@@ -63,10 +59,9 @@
               <div class="flex items-center">
                 <img
                   v-if="
-                    entry.previousSeasonHighestTier &&
-                    rankedMedalMap[entry.previousSeasonHighestTier]
+                    getPreviousHighestTier(entry) && rankedMedalMap[getPreviousHighestTier(entry)]
                   "
-                  :src="rankedMedalMap[entry.previousSeasonHighestTier]"
+                  :src="rankedMedalMap[getPreviousHighestTier(entry)]"
                   class="mr-0.5 h-4 w-4"
                 />
                 <span>{{ formatPreviousTier(entry) }}</span>
@@ -120,7 +115,7 @@
             <div class="relative h-12 w-16">
               <img
                 class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
-                :src="rankedImageMap[entry.tier || 'UNRANKED'] || rankedImageMap['UNRANKED']"
+                :src="rankedImageMap[getCurrentTier(entry)] || rankedImageMap['UNRANKED']"
               />
             </div>
 
@@ -129,12 +124,8 @@
               <span class="text-base font-bold text-gray-900 dark:text-gray-100">{{
                 formatTier(entry)
               }}</span>
-              <span v-if="entry.ratedRating" class="text-xs text-gray-500 dark:text-gray-400">
-                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.ratedRating }}
-                {{ t('RankedPane.point') }}
-              </span>
-              <span v-else class="text-xs text-gray-500 dark:text-gray-400">
-                {{ entry.wins }} {{ t('RankedPane.win') }} {{ entry.leaguePoints }} LP
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                {{ formatEntryRecord(entry) }}
               </span>
 
               <!-- Highest Previous Season -->
@@ -149,10 +140,9 @@
                 <div class="flex items-center">
                   <img
                     v-if="
-                      entry.previousSeasonHighestTier &&
-                      rankedMedalMap[entry.previousSeasonHighestTier]
+                      getPreviousHighestTier(entry) && rankedMedalMap[getPreviousHighestTier(entry)]
                     "
-                    :src="rankedMedalMap[entry.previousSeasonHighestTier]"
+                    :src="rankedMedalMap[getPreviousHighestTier(entry)]"
                     class="mr-0.5 h-4 w-4"
                   />
                   <span>{{ formatPreviousTier(entry) }}</span>
@@ -191,7 +181,7 @@ import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
-import { RankedEntry } from '@shared/types/league-client/ranked'
+import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
 import { MoreHorizFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
@@ -208,18 +198,20 @@ const isShowingRankedModal = ref(false)
 const { rankedStats, isLoading } = useRankedStats()
 
 // 只显示单双排和灵活组排
-const DISPLAY_QUEUE_TYPES = ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR']
+const DISPLAY_QUEUE_TYPES: Array<keyof RankedStats['queueMap']> = [
+  'RANKED_SOLO_5x5',
+  'RANKED_FLEX_SR'
+]
 
 const displayedRankedEntries = computed(() => {
-  if (!rankedStats.value?.queues) return []
+  if (!rankedStats.value) return []
 
-  return rankedStats.value.queues
-    .filter((entry) => DISPLAY_QUEUE_TYPES.includes(entry.queueType))
-    .sort((a, b) => {
-      const indexA = DISPLAY_QUEUE_TYPES.indexOf(a.queueType)
-      const indexB = DISPLAY_QUEUE_TYPES.indexOf(b.queueType)
-      return indexA - indexB
-    })
+  return DISPLAY_QUEUE_TYPES.map((queueType) => {
+    return (
+      rankedStats.value?.queueMap[queueType] ||
+      rankedStats.value?.queues.find((entry) => entry.queueType === queueType)
+    )
+  }).filter((entry): entry is RankedEntry => Boolean(entry))
 })
 
 const rankedImageMap: Record<string, string> = {
@@ -256,23 +248,49 @@ const shouldRender = computed(() => {
   return displayedRankedEntries.value.length > 0 || isLoading.value
 })
 
+const isUnrankedTier = (tier: string | undefined | null) => {
+  return !tier || tier === 'NA' || tier === 'NONE'
+}
+
+const isRankedEntry = (entry: Partial<RankedEntry>) => {
+  return !isUnrankedTier(entry.tier)
+}
+
+const getCurrentTier = (entry: Partial<RankedEntry>) => {
+  return isUnrankedTier(entry.tier) ? 'UNRANKED' : entry.tier!
+}
+
+const getPreviousHighestTier = (entry: Partial<RankedEntry>) => {
+  return isUnrankedTier(entry.previousSeasonHighestTier) ? '' : entry.previousSeasonHighestTier!
+}
+
+const formatEntryRecord = (entry: Partial<RankedEntry>) => {
+  if (isRankedEntry(entry)) {
+    const losses = entry.losses ? ` ${entry.losses} ${t('RankedPane.lose')}` : ''
+
+    return `${entry.wins} ${t('RankedPane.win')}${losses} ${entry.leaguePoints} LP`
+  }
+
+  return '—'
+}
+
 const formatTier = (entry: Partial<RankedEntry>) => {
   if (!entry) return ''
 
-  const tier = entry.tier
-    ? t(`tiers.${entry.tier}`, {
-        defaultValue: entry.tier,
-        ns: 'common'
-      })
-    : entry.tier
+  const rawTier = entry.tier
 
-  if (tier === '' || tier === 'NA') {
+  if (isUnrankedTier(rawTier)) {
     return t('RankedPane.unranked', 'unranked')
   }
 
+  const tier = t(`tiers.${rawTier}`, {
+    defaultValue: rawTier,
+    ns: 'common'
+  })
+
   const division = entry.division
 
-  if (division === '' || division === 'NA') {
+  if (isUnrankedTier(division)) {
     return tier
   }
 
@@ -282,20 +300,18 @@ const formatTier = (entry: Partial<RankedEntry>) => {
 const formatPreviousTier = (entry: Partial<RankedEntry>) => {
   if (!entry) return ''
 
-  const tier = entry.previousSeasonHighestTier
-    ? t(`tiers.${entry.previousSeasonHighestTier}`, {
-        defaultValue: entry.previousSeasonHighestTier,
-        ns: 'common'
-      })
-    : entry.previousSeasonHighestTier
-
-  if (tier === '' || tier === 'NA') {
+  if (isUnrankedTier(entry.previousSeasonHighestTier)) {
     return t('RankedPane.unranked', 'unranked')
   }
 
+  const tier = t(`tiers.${entry.previousSeasonHighestTier}`, {
+    defaultValue: entry.previousSeasonHighestTier,
+    ns: 'common'
+  })
+
   const division = entry.previousSeasonHighestDivision
 
-  if (division === '' || division === 'NA') {
+  if (isUnrankedTier(division)) {
     return tier
   }
 

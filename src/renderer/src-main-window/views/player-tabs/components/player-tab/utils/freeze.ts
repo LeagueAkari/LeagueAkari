@@ -1,8 +1,8 @@
 import { MaybeRefOrGetter, Ref, ref, shallowRef, toValue, watchEffect } from 'vue'
 
 export interface FreezeValueReturn<T> {
-  isFrozen: Readonly<Ref<boolean>>
-  value: Readonly<Ref<T>>
+  isFrozen: Ref<boolean>
+  value: Ref<T>
   freeze: () => void
   unfreeze: () => void
 }

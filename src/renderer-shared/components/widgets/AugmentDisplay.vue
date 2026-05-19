@@ -15,17 +15,19 @@
       />
     </template>
 
-    <div class="info max-w-[180px]">
+    <div class="info max-w-45">
       <LcuImage class="image" :src="lcs.gameData.augments[augmentId].augmentSmallIconPath" />
       <div class="right-side">{{ lcs.gameData.augments[augmentId].nameTRA }}</div>
     </div>
 
-    <div class="rarity max-w-[180px] text-xs">
+    <div class="rarity max-w-45 text-xs">
       <span
         :class="{
           prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
           gold: lcs.gameData.augments[augmentId].rarity === 'kGold',
-          silver: lcs.gameData.augments[augmentId].rarity === 'kSilver',
+          silver:
+            lcs.gameData.augments[augmentId].rarity === 'kSilver' ||
+            lcs.gameData.augments[augmentId].rarity === 'kEventChoice',
           bronze: lcs.gameData.augments[augmentId].rarity === 'kBronze'
         }"
         class="rarity-indicator"
@@ -36,7 +38,7 @@
     <!-- for gtimg source -->
     <template v-if="as.settings.locale === 'zh-CN' && es.kiwiAugmentsMap?.[augmentId]?.tooltip">
       <div class="my-2 h-px bg-black/10 dark:bg-white/10" />
-      <div class="max-w-[400px]" v-html="es.kiwiAugmentsMap[augmentId].tooltip" />
+      <div class="max-w-100" v-html="es.kiwiAugmentsMap[augmentId].tooltip" />
     </template>
   </NPopover>
   <div
@@ -73,7 +75,10 @@ const formatRarity = (r: string) => {
       return t('AugmentDisplay.bronze')
 
     case 'kSilver':
-      return t('AugmentDisplay.sliver')
+      return t('AugmentDisplay.silver')
+
+    case 'kEventChoice':
+      return t('AugmentDisplay.eventChoice')
 
     case 'kGold':
       return t('AugmentDisplay.gold')

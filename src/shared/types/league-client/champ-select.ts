@@ -1,15 +1,20 @@
 export interface ChampSelectSession extends ChampSelectSessionBase {
   allowDuplicatePicks: boolean
   allowLockedEvents: boolean
+  allowPlayerPickSameChampion: boolean
   benchChampions: BenchChampion[]
   benchEnabled: boolean
   boostableSkinCount: number
   counter: number
-  entitledFeatureState: EntitledFeatureState
+  disallowBanningTeammateHoveredChampions: boolean
   gameId: number
+  id: string
+  isLegacyChampSelect: boolean
   lockedEventIndex: number
   pickOrderSwaps: any[]
-  recoveryCounter: number
+  positionSwaps: any[]
+  queueId: number
+  showQuitButton: boolean
   skipChampionSelect: boolean
 }
 
@@ -100,23 +105,25 @@ export interface ChampSelectTeam {
   cellId: number
   championId: number
   championPickIntent: number
-  entitledFeatureType: string
+  gameName: string
+  internalName: string
+  isAutofilled: boolean
+  isHumanoid: boolean
   nameVisibilityType: string
   obfuscatedPuuid: string
   obfuscatedSummonerId: number
+  pickMode: number
+  pickTurn: number
+  playerAlias: string
   playerType: string
   puuid: string
   selectedSkinId: number
   spell1Id: number
   spell2Id: number
   summonerId: number
+  tagLine: string
   team: number
   wardSkinId: number
-}
-
-export interface EntitledFeatureState {
-  additionalRerolls: number
-  unlockedSkinIds: any[]
 }
 
 export interface BenchChampion {
@@ -170,30 +177,24 @@ export interface Timer {
   totalTimeInPhase: number
 }
 
-export interface ChampSelectTeam {
-  assignedPosition: string
-  cellId: number
-  championId: number
-  championPickIntent: number
-  playerType: string
-  selectedSkinId: number
-  spell1Id: number
-  spell2Id: number
-  summonerId: number
-  team: number
-  wardSkinId: number
+export interface ChatDetails {
+  mucJwtDto: MucJwtDto
+  multiUserChatId: string
+  multiUserChatPassword: string
 }
 
-export interface ChatDetails {
-  chatRoomName: string
-  chatRoomPassword: string
-  multiUserChatJWT: string
+export interface MucJwtDto {
+  channelClaim: string
+  domain: string
+  jwt: string
+  targetRegion: string
 }
 
 export interface Action {
   actorCellId: number
   championId: number
   completed: boolean
+  duration: number
   id: number
   isAllyAction: boolean
   isInProgress: boolean

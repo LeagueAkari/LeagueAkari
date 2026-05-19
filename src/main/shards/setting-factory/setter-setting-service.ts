@@ -43,8 +43,12 @@ export class SetterSettingService {
     return this._ins._removeFromStorage(this._namespace, key)
   }
 
-  _getValuesFromStorage(key: string) {
-    return this._ins._getValuesFromStorage(this._namespace, key)
+  _getByPrefixFromStorage(keyPrefix: string) {
+    return this._ins._getByPrefixFromStorage(this._namespace, keyPrefix)
+  }
+
+  _removeByPrefixFromStorage(keyPrefix: string) {
+    return this._ins._removeByPrefixFromStorage(this._namespace, keyPrefix)
   }
 
   _setJsonValue(key: string, path: string, value: any) {

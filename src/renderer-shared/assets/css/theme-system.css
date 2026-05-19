@@ -1,19 +1,19 @@
 :root {
-  --la-color-bg-primary: #f9f9f9;
+  --la-color-bg-primary: #f3f3f4;
   --la-color-text-primary: rgba(0, 0, 0, 0.86);
   --la-color-text-themed: rgba(0, 0, 0, 0.86);
   --la-color-link: rgb(88, 124, 102);
   --la-color-scrollbar-thumb: #c0c0c0;
   --la-color-scrollbar-thumb-hover: #a0a0a0;
-  --la-color-select-menu-bg: #ffffff;
-  --la-color-message-bg: #f5f5f5;
-  --la-color-popconfirm-bg: #ffffff;
+  --la-color-select-menu-bg: #fafafa;
+  --la-color-message-bg: #f7f7f8;
+  --la-color-popconfirm-bg: #f5f5f6;
   --la-color-popover-border: rgba(0, 0, 0, 0.2);
-  --la-sidebar-bg: rgba(189, 189, 189, 0.2);
+  --la-sidebar-bg: rgba(160, 160, 166, 0.22);
   --la-sidebar-border: transparent;
-  --la-wallpaper-overlay-start: rgba(248, 248, 248, 0.9);
-  --la-wallpaper-overlay-mid: rgba(248, 248, 248, 0.95);
-  --la-wallpaper-overlay-end: rgba(248, 248, 248, 0.95);
+  --la-wallpaper-overlay-start: rgba(243, 243, 244, 0.9);
+  --la-wallpaper-overlay-mid: rgba(243, 243, 244, 0.95);
+  --la-wallpaper-overlay-end: rgba(243, 243, 244, 0.95);
   --la-card-tint-rgb: 22 26 33;
   --la-card-border-rgb: 22 26 33;
   --la-card-surface-95: rgba(247, 248, 250, 0.95);
@@ -31,20 +31,20 @@
 }
 
 :root[data-theme-id='light'] {
-  --la-color-bg-primary: #f9f9f9;
+  --la-color-bg-primary: #f3f3f4;
   --la-color-text-primary: rgba(0, 0, 0, 0.86);
   --la-color-link: rgb(88, 124, 102);
   --la-color-scrollbar-thumb: #c0c0c0;
   --la-color-scrollbar-thumb-hover: #a0a0a0;
-  --la-color-select-menu-bg: #ffffff;
-  --la-color-message-bg: #f5f5f5;
-  --la-color-popconfirm-bg: #ffffff;
+  --la-color-select-menu-bg: #fafafa;
+  --la-color-message-bg: #f7f7f8;
+  --la-color-popconfirm-bg: #f5f5f6;
   --la-color-popover-border: rgba(0, 0, 0, 0.2);
-  --la-sidebar-bg: rgba(189, 189, 189, 0.2);
+  --la-sidebar-bg: rgba(160, 160, 166, 0.22);
   --la-sidebar-border: transparent;
-  --la-wallpaper-overlay-start: rgba(248, 248, 248, 0.9);
-  --la-wallpaper-overlay-mid: rgba(248, 248, 248, 0.95);
-  --la-wallpaper-overlay-end: rgba(248, 248, 248, 0.95);
+  --la-wallpaper-overlay-start: rgba(243, 243, 244, 0.9);
+  --la-wallpaper-overlay-mid: rgba(243, 243, 244, 0.95);
+  --la-wallpaper-overlay-end: rgba(243, 243, 244, 0.95);
   --la-card-tint-rgb: 22 26 33;
   --la-card-border-rgb: 22 26 33;
   --la-card-surface-95: rgba(247, 248, 250, 0.95);
@@ -93,25 +93,25 @@
 }
 
 :root[data-theme-id='dark'] {
-  --la-color-bg-primary: #1a1a1d;
+  --la-color-bg-primary: #141416;
   --la-color-text-primary: rgba(255, 255, 255, 0.86);
   --la-color-link: rgb(144, 198, 166);
   --la-color-scrollbar-thumb: #4c4c4c;
   --la-color-scrollbar-thumb-hover: #626262;
-  --la-color-select-menu-bg: #383838f8;
-  --la-color-message-bg: #2c2c2c;
-  --la-color-popconfirm-bg: #2a2a2ad5;
+  --la-color-select-menu-bg: #202024fa;
+  --la-color-message-bg: #252529;
+  --la-color-popconfirm-bg: #202024f5;
   --la-color-popover-border: rgba(255, 255, 255, 0.2);
-  --la-sidebar-bg: rgba(0, 0, 0, 0.2);
+  --la-sidebar-bg: rgba(0, 0, 0, 0.26);
   --la-sidebar-border: transparent;
-  --la-wallpaper-overlay-start: rgba(0, 0, 0, 0.8);
-  --la-wallpaper-overlay-mid: rgba(0, 0, 0, 0.85);
-  --la-wallpaper-overlay-end: rgba(0, 0, 0, 0.85);
+  --la-wallpaper-overlay-start: rgba(0, 0, 0, 0.84);
+  --la-wallpaper-overlay-mid: rgba(0, 0, 0, 0.88);
+  --la-wallpaper-overlay-end: rgba(0, 0, 0, 0.88);
   --la-card-tint-rgb: 255 255 255;
   --la-card-border-rgb: 255 255 255;
-  --la-card-surface-95: rgba(26, 26, 29, 0.95);
-  --la-card-surface-90: rgba(26, 26, 29, 0.9);
-  --la-card-muted-surface: rgba(40, 40, 44, 0.88);
+  --la-card-surface-95: rgba(20, 20, 22, 0.95);
+  --la-card-surface-90: rgba(20, 20, 22, 0.9);
+  --la-card-muted-surface: rgba(31, 31, 35, 0.88);
   --la-match-win-solid: rgba(96, 165, 250, 0.35);
   --la-match-win-grad-start: rgba(59, 130, 246, 0.25);
   --la-match-win-grad-end: rgba(59, 130, 246, 0.12);
@@ -143,13 +143,13 @@
   --la-card-surface-95: rgba(16, 31, 46, 0.95);
   --la-card-surface-90: rgba(18, 35, 52, 0.9);
   --la-card-muted-surface: rgba(25, 44, 63, 0.9);
-  --la-match-win-solid: rgba(74, 195, 255, 0.24);
+  --la-match-win-solid: rgba(42, 137, 191, 0.24);
   --la-match-win-grad-start: rgba(74, 195, 255, 0.3);
   --la-match-win-grad-end: rgba(74, 195, 255, 0.12);
-  --la-match-loss-solid: rgba(255, 124, 148, 0.24);
+  --la-match-loss-solid: rgba(190, 74, 96, 0.24);
   --la-match-loss-grad-start: rgba(255, 124, 148, 0.28);
   --la-match-loss-grad-end: rgba(255, 124, 148, 0.12);
-  --la-match-neutral-solid: rgba(148, 173, 197, 0.18);
+  --la-match-neutral-solid: rgba(96, 118, 139, 0.18);
   --la-match-neutral-grad-start: rgba(170, 190, 209, 0.2);
   --la-match-neutral-grad-end: rgba(148, 173, 197, 0.08);
 }
@@ -174,13 +174,13 @@
   --la-card-surface-95: rgba(15, 15, 15, 0.96);
   --la-card-surface-90: rgba(20, 20, 20, 0.92);
   --la-card-muted-surface: rgba(28, 28, 28, 0.92);
-  --la-match-win-solid: rgba(89, 177, 224, 0.24);
+  --la-match-win-solid: rgba(46, 130, 168, 0.24);
   --la-match-win-grad-start: rgba(89, 177, 224, 0.28);
   --la-match-win-grad-end: rgba(89, 177, 224, 0.12);
-  --la-match-loss-solid: rgba(229, 110, 129, 0.24);
+  --la-match-loss-solid: rgba(178, 74, 91, 0.24);
   --la-match-loss-grad-start: rgba(229, 110, 129, 0.28);
   --la-match-loss-grad-end: rgba(229, 110, 129, 0.12);
-  --la-match-neutral-solid: rgba(223, 255, 0, 0.18);
+  --la-match-neutral-solid: rgba(142, 162, 0, 0.18);
   --la-match-neutral-grad-start: rgba(223, 255, 0, 0.2);
   --la-match-neutral-grad-end: rgba(223, 255, 0, 0.08);
 }
@@ -267,13 +267,13 @@
   --la-card-surface-95: rgba(41, 39, 60, 0.95);
   --la-card-surface-90: rgba(45, 42, 66, 0.9);
   --la-card-muted-surface: rgba(53, 50, 72, 0.9);
-  --la-match-win-solid: rgba(110, 216, 245, 0.24);
+  --la-match-win-solid: rgba(55, 151, 179, 0.24);
   --la-match-win-grad-start: rgba(110, 216, 245, 0.32);
   --la-match-win-grad-end: rgba(110, 216, 245, 0.12);
-  --la-match-loss-solid: rgba(255, 124, 179, 0.24);
+  --la-match-loss-solid: rgba(190, 73, 125, 0.24);
   --la-match-loss-grad-start: rgba(255, 124, 179, 0.32);
   --la-match-loss-grad-end: rgba(255, 124, 179, 0.12);
-  --la-match-neutral-solid: rgba(167, 149, 226, 0.18);
+  --la-match-neutral-solid: rgba(104, 91, 153, 0.18);
   --la-match-neutral-grad-start: rgba(167, 149, 226, 0.22);
   --la-match-neutral-grad-end: rgba(167, 149, 226, 0.08);
 }

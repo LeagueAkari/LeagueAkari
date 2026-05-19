@@ -1,6 +1,38 @@
 <template>
   <div
-    v-if="horizontal"
+    v-if="horizontal && isCollectModePage"
+    class="match-history-pagination border-akari-500/30 bg-akari-500/10 dark:border-akari-400/25 dark:bg-akari-400/10 flex items-center gap-3 rounded border border-solid px-2 py-1 transition-colors"
+    :class="{
+      'shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60': isFloating
+    }"
+  >
+    <div class="min-w-0 flex-1 truncate text-xs leading-5 text-gray-700 dark:text-gray-400">
+      <span class="font-bold text-gray-900 dark:text-white">
+        {{ t('PlayerTab.collectMode.collectedPageTitle') }}
+      </span>
+      <span class="ml-2">
+        {{
+          t('PlayerTab.collectMode.collectedPageDescription', {
+            count: collectedGamesCount
+          })
+        }}
+      </span>
+    </div>
+
+    <NButton
+      class="shrink-0"
+      size="tiny"
+      secondary
+      type="primary"
+      :disabled="isCollectModeActionDisabled"
+      @click="handleExitCollectMode"
+    >
+      {{ t('PlayerTab.collectMode.reloadNormalPage') }}
+    </NButton>
+  </div>
+
+  <div
+    v-else-if="horizontal"
     class="match-history-pagination flex items-center gap-2 rounded px-2 py-1 transition-colors"
     :class="{
       'rounded bg-neutral-300 shadow-xl shadow-neutral-400 dark:bg-neutral-800 dark:shadow-neutral-800/60':
@@ -14,7 +46,7 @@
       @update:value="handleTagChange"
       size="small"
       :options="sgpTagOptions"
-      :disabled="isLoading"
+      :disabled="isPaginationDisabled"
       class="w-56!"
       :render-label="renderLabel"
       :consistent-menu-width="false"
@@ -28,6 +60,7 @@
           :tertiary="!rootHasCombinator"
           circle
           :type="rootHasCombinator ? 'primary' : 'default'"
+          :disabled="isPaginationDisabled"
           @click="handleOpenFilterModal"
         >
           <template #icon>
@@ -45,7 +78,7 @@
           circle
           tertiary
           :type="rootHasCombinator ? 'warning' : 'default'"
-          :disabled="!rootHasCombinator"
+          :disabled="!rootHasCombinator || isPaginationDisabled"
           @click="handleClearFilters"
         >
           <template #icon>
@@ -58,9 +91,47 @@
 
     <NModal v-model:show="showFilterModal">
       <div class="h-187.5 max-h-[90vh] min-h-[75vh] w-225 max-w-[90vw]">
-        <MatchHistoryFilters />
+        <MatchHistoryFilters
+          v-model:active-mode="activeMode"
+          v-model:simple-filter-state="simpleFilterState"
+          v-model:advanced-filter-state="advancedFilterState"
+          @collect-begin="handleCollectBegin"
+        />
       </div>
     </NModal>
+  </div>
+
+  <div
+    v-else-if="isCollectModePage"
+    class="match-history-pagination border-akari-500/30 bg-akari-500/10 dark:border-akari-400/25 dark:bg-akari-400/10 rounded border border-solid px-4 py-3 transition-colors"
+    :class="{
+      'shadow-xl shadow-neutral-400 dark:shadow-neutral-800/60': isFloating
+    }"
+  >
+    <div>
+      <div class="mb-3 text-base font-bold text-gray-900 dark:text-white">
+        {{ t('PlayerTab.collectMode.collectedPageTitle') }}
+      </div>
+      <div class="text-xs leading-relaxed text-gray-700 dark:text-gray-400">
+        {{
+          t('PlayerTab.collectMode.collectedPageDescription', {
+            count: collectedGamesCount
+          })
+        }}
+      </div>
+    </div>
+
+    <div class="mt-3 flex justify-end">
+      <NButton
+        size="small"
+        secondary
+        type="primary"
+        :disabled="isCollectModeActionDisabled"
+        @click="handleExitCollectMode"
+      >
+        {{ t('PlayerTab.collectMode.reloadNormalPage') }}
+      </NButton>
+    </div>
   </div>
 
   <div
@@ -73,20 +144,19 @@
     }"
   >
     <!-- sgp 情况下可用的特殊选项（秘传） -->
-    <div class="space-y-2">
+    <div class="space-y-2" v-if="preferredSource === 'sgp' || isCrossRegion">
       <TooltipWithIcon
         class="mb-2 text-xs text-black/60 dark:text-white/60"
-        tooltip="$此特性仅限使用 SGP 数据源时可用"
+        :tooltip="t('PlayerTab.sgpQueueOnlyTooltip')"
       >
-        $队列
+        {{ t('PlayerTab.queue') }}
       </TooltipWithIcon>
       <NSelect
-        v-if="preferredSource === 'sgp' || isCrossRegion"
         :value="selectedQueue"
         @update:value="handleTagChange"
         size="small"
         :options="sgpTagOptions"
-        :disabled="isLoading"
+        :disabled="isPaginationDisabled"
         :render-label="renderLabel"
         :consistent-menu-width="false"
       />
@@ -97,7 +167,7 @@
       <div class="text-xs text-black/60 dark:text-white/60">分页</div>
       <div class="flex items-center gap-1">
         <NSelect
-          :disabled="isLoading"
+          :disabled="isPaginationDisabled"
           :value="page?.queryParams.count ?? pts.frontendSettings.loadCount"
           @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
           size="small"
@@ -109,7 +179,7 @@
           size="small"
           tertiary
           circle
-          :disabled="isFirstPage || isLoading"
+          :disabled="isFirstPage || isPaginationDisabled"
           :title="t('PlayerTab.prevPage')"
           @click="
             loadMatchHistory({
@@ -124,7 +194,11 @@
           </template>
         </NButton>
 
-        <NPopover v-model:show="isArbitraryPagePopupVisible" trigger="click">
+        <NPopover
+          v-model:show="isArbitraryPagePopupVisible"
+          trigger="click"
+          :disabled="isPaginationDisabled"
+        >
           <template #trigger>
             <span class="min-w-6 cursor-pointer text-center text-sm text-black dark:text-white/80">
               {{ computedCurrentPage }}
@@ -139,7 +213,7 @@
                 class="w-28!"
                 size="small"
                 v-model:value="arbitraryPage"
-                :disabled="isLoading"
+                :disabled="isPaginationDisabled"
                 :min="1"
                 @keyup.enter="handleGoToArbitraryPage"
               />
@@ -147,7 +221,7 @@
                 size="small"
                 secondary
                 circle
-                :disabled="isLoading"
+                :disabled="isPaginationDisabled"
                 @click="handleGoToArbitraryPage"
               >
                 <template #icon>
@@ -158,7 +232,7 @@
                 size="small"
                 tertiary
                 circle
-                :disabled="isLoading || isFirstPage"
+                :disabled="isPaginationDisabled || isFirstPage"
                 :title="t('PlayerTab.firstPage')"
                 @click="handleGoToFirstPage"
               >
@@ -181,7 +255,7 @@
                 computedCurrentPage * (page?.queryParams.count ?? pts.frontendSettings.loadCount)
             })
           "
-          :disabled="isLoading"
+          :disabled="isPaginationDisabled"
         >
           <template #icon>
             <NIcon size="16"><ChevronRight20Regular /></NIcon>
@@ -201,6 +275,7 @@
               :tertiary="!rootHasCombinator"
               circle
               :type="rootHasCombinator ? 'primary' : 'default'"
+              :disabled="isPaginationDisabled"
               @click="handleOpenFilterModal"
             >
               <template #icon>
@@ -218,7 +293,7 @@
               circle
               tertiary
               :type="rootHasCombinator ? 'warning' : 'default'"
-              :disabled="!rootHasCombinator"
+              :disabled="!rootHasCombinator || isPaginationDisabled"
               @click="handleClearFilters"
             >
               <template #icon>
@@ -233,7 +308,12 @@
 
     <NModal v-model:show="showFilterModal">
       <div class="h-187.5 max-h-[90vh] min-h-[75vh] w-225 max-w-[90vw]">
-        <MatchHistoryFilters @collect-begin="handleCollectBegin" />
+        <MatchHistoryFilters
+          v-model:active-mode="activeMode"
+          v-model:simple-filter-state="simpleFilterState"
+          v-model:advanced-filter-state="advancedFilterState"
+          @collect-begin="handleCollectBegin"
+        />
       </div>
     </NModal>
   </div>
@@ -287,8 +367,9 @@ const sgpTagOptions = useSgpTagOptions()
 const pageSizeOptions = usePageSizeOptions()
 
 const { preferredSource, isCrossRegion } = usePlayerTab()
-const { isLoading, loadMatchHistory, page, filteredGames } = useMatchHistory()
-const { rootHasCombinator, clearPredicate: clearFilters } = useMatchHistoryFilters()
+const { isLoading, loadMatchHistory, page, collectState } = useMatchHistory()
+const { activeMode, simpleFilterState, advancedFilterState, rootHasCombinator, clearPredicate } =
+  useMatchHistoryFilters()
 
 const computedCurrentPage = computed(() => {
   if (!page.value) return 1
@@ -311,8 +392,18 @@ const selectedQueue = computed(() => {
 })
 
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
+const isCollectModePage = computed(() => page.value?.isLoadedByCollectMode ?? false)
+const collectedGamesCount = computed(() => page.value?.games.length ?? 0)
+const isCollectModeActionDisabled = computed(() => isLoading.value || !!collectState.value)
+const isPaginationDisabled = computed(
+  () => isLoading.value || !!collectState.value || isCollectModePage.value
+)
 
 const handleTagChange = (tag: string) => {
+  if (isPaginationDisabled.value) {
+    return
+  }
+
   pts.frontendSettings.defaultMatchHistoryTag = tag
   loadMatchHistory({ tag: tag === ALL_SGPTAG_VALUE ? undefined : tag, startIndex: 0 })
 }
@@ -320,16 +411,32 @@ const handleTagChange = (tag: string) => {
 const showFilterModal = ref(false)
 
 const handleOpenFilterModal = () => {
+  if (isPaginationDisabled.value) {
+    return
+  }
+
   showFilterModal.value = true
 }
 
 const handleClearFilters = () => {
+  if (isPaginationDisabled.value) {
+    return
+  }
+
   showFilterModal.value = false
-  clearFilters()
+  clearPredicate()
 }
 
 const handleCollectBegin = () => {
   showFilterModal.value = false
+}
+
+const handleExitCollectMode = () => {
+  if (isCollectModeActionDisabled.value) {
+    return
+  }
+
+  loadMatchHistory()
 }
 
 const arbitraryPage = ref(computedCurrentPage.value)
@@ -342,6 +449,10 @@ watchEffect(() => {
 })
 
 const handleGoToArbitraryPage = () => {
+  if (isPaginationDisabled.value) {
+    return
+  }
+
   loadMatchHistory({
     startIndex:
       (arbitraryPage.value - 1) * (page.value?.queryParams.count ?? pts.frontendSettings.loadCount)
@@ -349,6 +460,10 @@ const handleGoToArbitraryPage = () => {
 }
 
 const handleGoToFirstPage = () => {
+  if (isPaginationDisabled.value) {
+    return
+  }
+
   loadMatchHistory({ startIndex: 0 })
 }
 
@@ -416,8 +531,4 @@ const renderLabel = (option: SelectOption) => {
     ]
   )
 }
-
-watchEffect(() => {
-  console.log('filteredGames', filteredGames.value)
-})
 </script>

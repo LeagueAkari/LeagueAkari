@@ -11,15 +11,11 @@
         <!-- 上半部分：英雄头像 + stats line -->
         <div class="flex h-12 gap-2">
           <!-- champion icon -->
-          <div class="flex w-[70px] shrink-0 items-center">
-            <div
-              class="relative cursor-pointer transition-[filter] hover:brightness-110"
-              :class="{ contents: !shouldShowCrown && !participant.position }"
-              @click.stop="$emit('filter-by-champion', participant.championId)"
-            >
+          <div class="flex w-17.5 shrink-0 items-center">
+            <div class="relative" :class="{ contents: !shouldShowCrown && !participant.position }">
               <ChampionIcon
                 :champion-id="participant.championId"
-                class="relative -left-[2px] box-border size-11 rounded-lg border-2 border-solid"
+                class="relative -left-0.5 box-border size-11 rounded-lg border-2 border-solid"
                 :class="{
                   'border-blue-600/80 dark:border-blue-300/80': winStyleType === 'win',
                   'border-red-600/80 dark:border-red-300/80': winStyleType === 'loss',
@@ -40,7 +36,7 @@
               <!-- position -->
               <div
                 v-if="participant.position"
-                class="absolute -right-px -bottom-[2px] rounded-sm bg-black/60 p-0.5 dark:bg-black/80"
+                class="absolute right-0 bottom-0 rounded-sm bg-black/60 p-0.5 dark:bg-black/80"
               >
                 <PositionIcon
                   :position="participant.position"
@@ -93,11 +89,11 @@
                       <div class="text-base font-bold text-black dark:text-white">
                         {{ participant.kills }}
                       </div>
-                      <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
+                      <div class="mx-px text-xs text-black/60 dark:text-white/60">/</div>
                       <div class="text-base font-bold text-red-600 dark:text-red-300">
                         {{ participant.deaths }}
                       </div>
-                      <div class="mx-0.25 text-xs text-black/60 dark:text-white/60">/</div>
+                      <div class="mx-px text-xs text-black/60 dark:text-white/60">/</div>
                       <div class="text-base font-bold text-black dark:text-white">
                         {{ participant.assists }}
                       </div>
@@ -176,7 +172,7 @@
         <!-- 下半部分：胜利结果 + tags -->
         <div class="flex items-center gap-2">
           <!-- result -->
-          <div class="min-w-[70px] shrink-0">
+          <div class="min-w-17.5 shrink-0">
             <div
               :class="{
                 'text-blue-600 dark:text-blue-300': winStyleType === 'win',
@@ -301,12 +297,12 @@
       </div>
 
       <div
-        v-else-if="basicInfo.isCherrySubteam"
-        class="z-2 my-1 grid w-42 max-w-42 grid-cols-2 grid-rows-2 gap-x-2"
+        v-else-if="basicInfo.isCherrySubteam && !isThreePlayerCherryMode"
+        class="z-2 my-1 grid w-42 max-w-42 grid-flow-col grid-cols-2 grid-rows-2 gap-x-2"
       >
         <!-- teams -->
         <div
-          v-for="team of cherryTop4Teams"
+          v-for="team of cherryWinningTeams"
           :key="team[0].teamIdentifier"
           class="flex min-w-0 flex-col justify-center gap-1"
         >
@@ -359,6 +355,56 @@
           </div>
         </div>
       </div>
+
+      <div
+        v-else-if="basicInfo.isCherrySubteam"
+        class="z-2 my-3 grid w-42 max-w-42 grid-flow-col grid-cols-2 grid-rows-3 content-center gap-x-2 gap-y-1"
+      >
+        <!-- teams -->
+        <div
+          v-for="team of cherryTeams"
+          :key="team[0].teamIdentifier"
+          class="flex min-w-0 items-center gap-1"
+        >
+          <!-- placement -->
+          <div
+            class="size-4 shrink-0 rounded-full bg-black/10 text-center text-[11px] leading-4 text-black/80 dark:bg-white/10 dark:text-white/80"
+          >
+            {{ team[0].subteamPlacement }}
+          </div>
+
+          <!-- team players -->
+          <NTooltip v-for="player in team" :key="player.participantId" :keep-alive-on-hover="false">
+            <template #trigger>
+              <div
+                class="relative cursor-pointer transition-[filter] hover:brightness-110"
+                @click="navigateToSummonerByPuuid(player.puuid)"
+                @mousedown="handleMouseDown"
+                @mouseup="handleMouseUp($event, player.puuid)"
+              >
+                <ChampionIcon
+                  :champion-id="player.championId"
+                  class="size-4 shrink-0 rounded"
+                  :class="{ 'ring-1 ring-black/60 dark:ring-white/70': player.puuid === puuid }"
+                />
+                <NIcon
+                  class="absolute -right-1 -bottom-1 text-[10px] text-black/80 dark:text-white/80"
+                  v-if="!player.puuid || player.puuid === EMPTY_PUUID"
+                >
+                  <Robot />
+                </NIcon>
+              </div>
+            </template>
+            <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
+              <span class="font-bold">{{ player.gameName }}</span>
+              <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+            </div>
+            <div class="flex items-center gap-1 text-xs" v-else>
+              <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
+            </div>
+          </NTooltip>
+        </div>
+      </div>
     </div>
 
     <!-- right-end expand icon -->
@@ -392,6 +438,7 @@ import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormat
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { getCherryWinningTeamCount } from '@shared/data-adapter/match-history/cherry'
 import { Crown, Robot } from '@vicons/fa'
 import { ArrowBackIosFilled } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
@@ -415,7 +462,6 @@ import RadarChart from './widgets/RadarChart.vue'
 
 defineEmits<{
   'toggle-expand': []
-  'filter-by-champion': [championId: number]
 }>()
 
 const {
@@ -446,19 +492,32 @@ const twoTeams = computed(() => {
   })
 })
 
-const cherryTop4Teams = computed(() => {
+const cherryTeams = computed(() => {
   if (!basicInfo.value.isCherrySubteam) return []
 
   const teamIdentifiers = teams.value.teamStatsArr
-    .filter((t) => t.subteamPlacement <= 4)
     .toSorted((a, b) => a.subteamPlacement - b.subteamPlacement)
     .map((t) => t.teamIdentifier)
 
-    .slice(0, 4)
-
   return teamIdentifiers.map((i) => {
-    return participants.value.filter((s) => s.teamIdentifier === i).slice(0, 2)
+    return participants.value
+      .filter((s) => s.teamIdentifier === i)
+      .toSorted((a, b) => a.participantId - b.participantId)
   })
+})
+
+const cherryWinningTeams = computed(() => {
+  if (!basicInfo.value.isCherrySubteam) return []
+
+  const winningTeamCount = getCherryWinningTeamCount(teams.value.teamStatsArr.length)
+
+  return cherryTeams.value
+    .filter((team) => team[0]?.subteamPlacement <= winningTeamCount)
+    .slice(0, winningTeamCount)
+})
+
+const isThreePlayerCherryMode = computed(() => {
+  return cherryTeams.value.some((team) => team.length === 3)
 })
 
 const shouldShowCrown = computed(() => {

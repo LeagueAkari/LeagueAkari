@@ -73,6 +73,8 @@ export interface SgpParticipantLol {
   PlayerScore10: number
   PlayerScore11: number
 
+  PlayerBehavior: SgpPlayerBehavior
+
   // Ping 数据
   allInPings: number
   assistMePings: number
@@ -110,8 +112,14 @@ export interface SgpParticipantLol {
   firstTowerAssist: boolean
   firstTowerKill: boolean
   gameEndedInEarlySurrender: boolean
+  gameEndedInIGNBSurrender: boolean
   gameEndedInSurrender: boolean
+  causedGameEndFromIGNBSurrender: boolean
   teamEarlySurrendered: boolean
+  teamIGNBSurrendered: boolean
+  wasPremadeWithIGNBGameEndCauser: boolean
+  wasPremadeWithSevereTransgressor: boolean
+  wasSevereTransgressor: boolean
   win: boolean
 
   // 金币相关
@@ -232,6 +240,7 @@ export interface SgpParticipantLol {
   longestTimeSpentLiving: number
   timeCCingOthers: number
   timePlayed: number
+  totalTimeCCDealt: number
   totalTimeSpentDead: number
 
   // 治疗相关
@@ -243,6 +252,12 @@ export interface SgpParticipantLol {
   challenges?: Challenges
   missions: SgpMissions
   perks: Perks
+}
+
+export interface SgpPlayerBehavior {
+  [key: string]: number
+
+  PlayerBehavior_IsHeroInCombat: number
 }
 
 export interface Perks {
@@ -506,7 +521,7 @@ export interface DamageStats {
   trueDamageTaken: number
 }
 
-export type DamageDetailType = 'OTHER' | 'TOWER' | 'MINION'
+export type DamageDetailType = 'OTHER' | 'TOWER' | 'MINION' | 'MONSTER' | (string & {})
 
 export interface DamageDetail {
   basic: boolean
@@ -545,9 +560,14 @@ export type DetailedGameEventType =
   | 'ITEM_SOLD'
   | 'ITEM_DESTROYED'
   | 'ITEM_UNDO'
+  | 'WARD_PLACED'
+  | 'WARD_KILL'
   | 'CHAMPION_KILL'
   | 'CHAMPION_SPECIAL_KILL'
   | 'BUILDING_KILL'
+  | 'ELITE_MONSTER_KILL'
+  | 'DRAGON_SOUL_GIVEN'
+  | 'OBJECTIVE_BOUNTY_PRESTART'
   | 'GAME_END'
   | 'TURRET_PLATE_DESTROYED'
 
@@ -603,6 +623,18 @@ export interface DetailedItemUndoEvent extends BaseDetailedGameEvent {
   goldGain: number
 }
 
+export interface DetailedWardPlacedEvent extends BaseDetailedGameEvent {
+  type: 'WARD_PLACED'
+  creatorId: number
+  wardType: string
+}
+
+export interface DetailedWardKillEvent extends BaseDetailedGameEvent {
+  type: 'WARD_KILL'
+  killerId: number
+  wardType: string
+}
+
 export interface DetailedChampionKillEvent extends BaseDetailedGameEvent {
   type: 'CHAMPION_KILL'
   killerId: number
@@ -614,6 +646,8 @@ export interface DetailedChampionKillEvent extends BaseDetailedGameEvent {
   killStreakLength: number
   victimDamageDealt?: DamageDetail[]
   victimDamageReceived: DamageDetail[]
+  victimTeamfightDamageDealt?: DamageDetail[]
+  victimTeamfightDamageReceived?: DamageDetail[]
 }
 
 export type SpecialKillType = 'KILL_FIRST_BLOOD' | 'KILL_MULTI' | 'KILL_ACE'
@@ -628,14 +662,14 @@ export interface ChampionSpecialKillEvent extends BaseDetailedGameEvent {
 
 export type BuildingType = 'TOWER_BUILDING' | 'INHIBITOR_BUILDING'
 
-export type TowerType = 'OUTER_TURRET' | 'INNER_TURRET' | 'NEXUS_TURRET'
+export type TowerType = 'OUTER_TURRET' | 'INNER_TURRET' | 'BASE_TURRET' | 'NEXUS_TURRET'
 
-export type LaneType = 'MID_LANE'
+export type LaneType = 'TOP_LANE' | 'MID_LANE' | 'BOT_LANE'
 
 export interface DetailedBuildingKillEvent extends BaseDetailedGameEvent {
   type: 'BUILDING_KILL'
   killerId: number
-  assistingParticipantIds: number[]
+  assistingParticipantIds?: number[]
   position: Position
   bounty: number
   buildingType: BuildingType
@@ -659,6 +693,29 @@ export interface DetailedTurretPlateDestroyedEvent extends BaseDetailedGameEvent
   teamId: number
 }
 
+export interface DetailedEliteMonsterKillEvent extends BaseDetailedGameEvent {
+  type: 'ELITE_MONSTER_KILL'
+  monsterType: 'DRAGON' | 'HORDE' | 'RIFTHERALD' | 'BARON_NASHOR' | (string & {})
+  killerId: number
+  killerTeamId?: number
+  assistingParticipantIds?: number[]
+  position?: Position
+  bounty?: number
+  monsterSubType?: string
+}
+
+export interface DetailedDragonSoulGivenEvent extends BaseDetailedGameEvent {
+  type: 'DRAGON_SOUL_GIVEN'
+  name: string
+  teamId: number
+}
+
+export interface DetailedObjectiveBountyPrestartEvent extends BaseDetailedGameEvent {
+  type: 'OBJECTIVE_BOUNTY_PRESTART'
+  actualStartTime: number
+  teamId: number
+}
+
 export type DetailedGameEvent =
   | PauseEndEvent
   | DetailedLevelUpEvent
@@ -667,9 +724,14 @@ export type DetailedGameEvent =
   | DetailedItemSoldEvent
   | DetailedItemDestroyedEvent
   | DetailedItemUndoEvent
+  | DetailedWardPlacedEvent
+  | DetailedWardKillEvent
   | DetailedChampionKillEvent
   | ChampionSpecialKillEvent
   | DetailedBuildingKillEvent
+  | DetailedEliteMonsterKillEvent
+  | DetailedDragonSoulGivenEvent
+  | DetailedObjectiveBountyPrestartEvent
   | GameEndEvent
   | DetailedTurretPlateDestroyedEvent
 
@@ -685,6 +747,13 @@ export interface GameDetailsJson {
   endOfGameResult: EndOfGameResult
   frameInterval: number
   frames: DetailedTimelineFrame[]
+  gameId: number
+  participants: SgpGameDetailsParticipant[]
+}
+
+export interface SgpGameDetailsParticipant {
+  participantId: number
+  puuid: string
 }
 
 export interface SgpGameDetailsLol {

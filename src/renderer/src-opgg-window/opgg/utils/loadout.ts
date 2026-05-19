@@ -3,13 +3,12 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { SUMMONER_SPELL_FLASH_ID } from '@shared/constants/summoner-spells'
 import { OpggChampionBuildResponse } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 
 import { restoreRecipe } from './recipe-restore'
-
-const SUMMONER_SPELL_FLASH_ID = 4
 
 export function useLoadout() {
   const lc = useInstance(LeagueClientRenderer)

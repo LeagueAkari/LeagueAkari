@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
-  >
+  <div class="rounded border border-solid border-black/10 px-4 py-2 dark:border-white/10">
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Apps20Regular /></NIcon>
@@ -36,7 +34,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import { useMatchHistoryFilterEditor } from '../context'
 import { IsQueueCombinator } from '../combinator-nodes'
 
 const { t } = useTranslation()
@@ -45,7 +43,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilterEditor()
 
 const sgps = useSgpStore()
 

@@ -50,7 +50,7 @@
             size="tiny"
             :title="
               t('BenchChampionsMini.reroll', {
-                countV: rerollsRemaining
+                count: rerollsRemaining
               })
             "
             secondary
@@ -66,7 +66,7 @@
             @click="() => handleReroll(true)"
             :title="
               t('BenchChampionsMini.charity', {
-                countV: rerollsRemaining
+                count: rerollsRemaining
               })
             "
             secondary

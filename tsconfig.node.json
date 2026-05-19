@@ -14,10 +14,9 @@
     "lib": ["ESNext"],
     "composite": true,
     "types": ["electron-vite/node", "@modyfi/vite-plugin-yaml/modules"],
-    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@main/*": ["src/main/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@main/*": ["./src/main/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,

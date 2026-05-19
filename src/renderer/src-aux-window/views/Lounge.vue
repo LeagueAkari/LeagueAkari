@@ -110,7 +110,7 @@
           >
             {{
               t('Lounge.matchmaking.waitingForMembers', {
-                countV: agfs.settings.autoMatchmakingMinimumMembers
+                count: agfs.settings.autoMatchmakingMinimumMembers
               })
             }}
           </span>
@@ -118,11 +118,6 @@
             class="mb-2 text-[13px] text-gray-500 dark:text-gray-400"
             v-else-if="agfs.activityStartStatus === 'waiting-for-invitees'"
             >{{ t('Lounge.matchmaking.waitingForInvitees') }}</span
-          >
-          <span
-            class="mb-2 text-[13px] text-gray-500 dark:text-gray-400"
-            v-else-if="agfs.activityStartStatus === 'cancelled-after-champ-select'"
-            >{{ t('Lounge.matchmaking.cancelledAfterChampSelect') }}</span
           >
         </template>
       </template>

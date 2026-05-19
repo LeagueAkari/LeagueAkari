@@ -92,6 +92,10 @@ DeclarationModal:
 
     </div>
 
+Guide:
+  dismiss: Dismiss
+  confirm: Got it
+
 FeatureGuide:
   previous: Previous
   next: Next
@@ -156,8 +160,18 @@ MainWindowCloseConfirmModal:
   cancel: Cancel
 
 OngoingGameTitle:
+  draftMode: Draft Mode
+  exitDraft: Exit Draft Mode
   refresh: Refresh
   spectating: Spectating
+  settings:
+    title: Ongoing Game Display
+    orderPlayerBy:
+      label: Player order
+    showJunglePathingForAllPlayers:
+      label: Show jungle path samples for non-junglers
+      description: When enabled, non-junglers also show this section if their match history contains jungle path samples.
+    openOngoingGameSettings: More ongoing game settings
   orderOptions:
     default: Default
     position: Position
@@ -353,13 +367,6 @@ AppSettings:
 MatchHistorySettings:
   title: Match History Tabs
 
-  filterMode:
-    label: Filter Mode
-    description: Choose the default filtering mode for match history pages. Both simple and advanced modes now filter first and then fill the page size.
-    options:
-      simple: Simple Filters
-      advanced: Advanced Filters
-
   refreshTabsAfterGameEnds:
     label: Refresh Tabs After Game Ends
     description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
@@ -410,11 +417,13 @@ OngoingGameSettings:
 
   gameDetailsLoadCount:
     label: Game Details Load Count
-    description: Will additionally load the detailed information for the first {{countV}} matches for game analysis.
+    description_one: Will additionally load the detailed information for the first {{count}} match for game analysis.
+    description_other: Will additionally load the detailed information for the first {{count}} matches for game analysis.
 
   jungleAnalysisMatchHistoryLoadCount:
     label: Jungle Analysis Match History Load Count
-    description: Jungle analysis can continue fetching match history until the first {{countV}} games to satisfy the 20 current-champion and 50 overall jungle samples.
+    description_one: Jungle analysis can continue fetching match history until the first {{count}} game to satisfy the 20 current-champion and 50 overall jungle samples.
+    description_other: Jungle analysis can continue fetching match history until the first {{count}} games to satisfy the 20 current-champion and 50 overall jungle samples.
 
   showRecentlyUsedChampions:
     label: Show Recently Used Champions
@@ -764,7 +773,7 @@ AboutPane:
   title: About
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
   line2: Project Reference
-  copyright: © 2025 Hanxven. This software is open-source and follows the GPL-3.0 license.
+  copyright: © 2026 Hanxven. This software is open-source and follows the MIT license.
 
 Automation:
   title: Automation
@@ -811,9 +820,6 @@ AutoGameflow:
   autoMatchmakingWaitForInvitees:
     label: Wait for Invitees
     description: Automatically waits for all invited players to respond before starting matchmaking.
-  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
-    label: Cancel Auto Matchmaking After Champ Select Dodge
-    description: Cancels this auto matchmaking when champion select returns to the lobby or matchmaking because someone dodged.
   autoMatchmakingRematchStrategy:
     label: Stop Matchmaking Strategy
     description: Defines when to stop matchmaking automatically. Matchmaking will restart if auto matchmaking is enabled.
@@ -1102,6 +1108,10 @@ MatchCard:
     CHAMPION_KILL: Champion Kill
     CHAMPION_SPECIAL_KILL: Special Kill
     BUILDING_KILL: Building Destroyed
+    WARD_PLACED: Ward Placed
+    WARD_KILL: Ward Killed
+    DRAGON_SOUL_GIVEN: Dragon Soul Given
+    OBJECTIVE_BOUNTY_PRESTART: Objective Bounty Prestart
     TURRET_PLATE_DESTROYED: Turret Plate Destroyed
 
   buildingType:
@@ -1170,6 +1180,9 @@ MatchCard:
     label: Replay
     downloading: Downloading {{progress}}%
     checking: Checking
+
+  dryRun:
+    tooltip: Simulate ongoing game analysis
 
   buildsTab:
     anvils_one: '{{count}} anvil'
@@ -1616,12 +1629,20 @@ MatchCard:
     playedChampSelectPosition: Played Champ Select Position
     hadAfkTeammate: Had AFK Teammate
     highestChampionDamage: Highest Champion Damage
+    PlayerBehavior: Player Behavior
+    PlayerBehavior_IsHeroInCombat: Hero in Combat
     # Game State
     gameEndedInEarlySurrender: Ended in Early Surrender
+    gameEndedInIGNBSurrender: Ended in In-Game Surrender
     gameEndedInSurrender: Ended in Surrender
     causedEarlySurrender: Caused Early Surrender
+    causedGameEndFromIGNBSurrender: Caused In-Game Surrender End
     earlySurrenderAccomplice: Early Surrender Accomplice
     teamEarlySurrendered: Team Early Surrendered
+    teamIGNBSurrendered: Team In-Game Surrendered
+    wasPremadeWithIGNBGameEndCauser: Premade with In-Game Surrender Causer
+    wasPremadeWithSevereTransgressor: Premade with Severe Transgressor
+    wasSevereTransgressor: Severe Transgressor
     # Boolean values
     'true': 'Yes'
     'false': 'No'
@@ -2117,21 +2138,23 @@ PlayerTab:
   tagPlayer: Tag Player
   byCount: By Count
   byTime: By Time
+  queue: Queue
+  sgpQueueOnlyTooltip: This option is only available when using the SGP data source.
   filter:
     title: Filters
     simpleTab: Simple Filters
     advancedTab: Advanced Filters
     reset: Clear Filters
-    subtitle: Add rules first; use groups only when you need nested logic
     resetAll: Reset All Conditions
-    sameChampionApplied: 'Filtered by champion: {{champion}}'
-    samePositionApplied: 'Filtered by position: {{position}}'
     winLoss: Result
     all: All
     win: Win
     loss: Loss
     summoners: Summoners involved
     champions: Champions involved
+    searchResults: Search results
+    pageSummoners: Page summoners
+    selectedSummoners: Selected
     showPractice: Show Practice Mode
     showIrregularGames: Show Remakes, Aborts, etc.
     addCondition: Add Condition
@@ -2216,6 +2239,29 @@ PlayerTab:
       matchConditions: Match Members
       participantConditions: Player Conditions
       statConditions: Stats Conditions
+    descriptions:
+      isWin: Matches winning players or member groups
+      isAbort: Matches games that did not finish normally
+      isRemake: Matches remake games
+      isMatchedGame: Matches games created by matchmaking only
+      isPveGame: Matches bot or other PvE queues only
+    examples:
+      title: Quick Examples
+      applyHint: Click to import and replace the current advanced filter
+      cleanMatchSamples:
+        title: Keep only {matched} over {duration}, excluding {remake}, {abort}, and {pve}
+        matched: matchmaking games
+        duration: 10 minutes
+        remake: remakes
+        abort: aborted games
+        pve: PvE games
+      strongSelfPerformance:
+        title: Find clean games where you had {kda}, {deaths}, and {contribution}
+        kda: KDA ≥ 4
+        deaths: deaths ≤ 4
+        contribution: a win or high contribution
+      kiwiJayceSlowAndSteady:
+        title: Find {queue} games where an enemy {champion} used {augment}
     combinatorLabels:
       game: Game
       and: And
@@ -2247,6 +2293,7 @@ PlayerTab:
       isPosition: Position
       hasItem: Has item
     positionHint: When using the LCU source, positions are inferred from lane/role and are best-effort only
+    positionUnsupportedHint: The LCU API does not provide reliable position records. Switch to the SGP API to use this condition
   itemPerPage_one: '{{count}} item'
   itemPerPage_other: '{{count}} items'
   timeRange:
@@ -2269,6 +2316,26 @@ PlayerTab:
   noMatchHistory: No match history
   noFilteredMatchHistory: No filtered match history
   clearFilters: Clear filter conditions
+  collectMode:
+    collectedPageTitle: Collected Results
+    collectedPageDescription: This page is a collection-mode result with {{count}} collected matches.
+    reloadNormalPage: Back to normal pages
+    collectingProgress: Collecting ({{count}} / {{expected}})
+    stoppingProgress: Stopping collection ({{count}} / {{expected}})
+    roundProgress: Round {{current}} / {{max}}
+    stopCollect: Stop
+    tooltipDescription: Collection mode automatically scans match history pages from the first page using the current filters until it reaches the target count or the maximum pull limit.
+    tooltipUseCase: Use this to gather matching games that are scattered across multiple match history pages.
+    openSettings: Collect with Current Filters
+    settingsTitle: Collection Settings
+    countPerIterationLabel: Matches Loaded per Round
+    countPerIterationDescription: The collection process pulls match history pages one by one. This controls how many matches are loaded each time.
+    expectedCountLabel: Target Collection Count
+    expectedCountDescription: Stop collecting once this many matching games have been found. Avoid very large values because they may affect performance.
+    maxIterationLabel: Maximum Rounds
+    maxIterationDescription: The collection process will not run forever. If it reaches this many rounds before finding enough matches, it will stop.
+    cancel: Cancel
+    startCollect: Start Collection
   loading: Loading...
 
   private:
@@ -2304,8 +2371,33 @@ PlayerTab:
     times: Games
     teamSides: Team Sides
     activeSession: Active Session Win/Lose
-    winningStreak: '{{countV}} Win Streak'
-    losingStreak: '{{countV}} Loss Streak'
+    winningStreak_one: '{{count}} Win Streak'
+    winningStreak_other: '{{count}} Win Streak'
+    losingStreak_one: '{{count}} Loss Streak'
+    losingStreak_other: '{{count}} Loss Streak'
+
+  championMastery:
+    title: Champion Mastery
+    viewAll: More
+    modalTitle: All Champion Mastery
+    filteredChampions: '{{count}} / {{total}} champions'
+    filterPlaceholder: Filter by champion name, pinyin, or ID
+    score: 'Score {{score}}'
+    level: 'Lv. {{level}}'
+    levelLabel: Level
+    points: '{{points}} mastery points'
+    pointsLabel: Mastery Points
+    highestGrade: 'Highest grade {{grade}}'
+    highestGradeLabel: Highest Grade
+    seasonMilestone: 'Season milestone {{milestone}}'
+    seasonMilestoneLabel: Season Milestone
+    lastPlayTime: 'Last played {{time}}'
+    lastPlayTimeLabel: Last Played
+    progress: 'Progress {{since}} / +{{until}}'
+    tokensEarned: '{{count}} tokens'
+    noData: No champion mastery data
+    noFilterResult: No matching champions
+    loadFailed: 'Failed to load champion mastery: {{reason}}'
 
   recentPlayers:
     teammatesTitle: Recent Teammates
@@ -2518,8 +2610,8 @@ DetailedGame:
   win: Win
   lose: Loss
   controlWard: Control Wards
-  wardPlaced: Placed {{countV}}, Cleared {{cleared}}
-  csPerMinute: '{{countV}} / min'
+  wardPlaced: Placed {{count}}, Cleared {{cleared}}
+  csPerMinute: '{{count}} / min'
   bot: Bot
 
   header:
@@ -2544,18 +2636,38 @@ ItemDisplay:
 
 AugmentDisplay:
   bronze: Bronze
-  sliver: Silver
+  silver: Silver
   gold: Gold
   prismatic: Prismatic
+  eventChoice: Event Choice
   rarity: '{{rarity}}'
 
 JunglePathing:
   title: Jungle
   thisGame: This Game
   hero: Champion
-  overall: Overall
+  overall: All
   currentChampion: This
   mapPref: Map Pref
+  zoneWeight: Zone Weight
+  zoneWeightShort: Wt
+  positionWeight: position weight
+  takedownWeight: takedown-participation weight
+  first14Minutes: first 14 minutes
+  preferenceDecision: Preference decision
+  singleZone: Single-zone
+  firstClearDecision: First clear decision
+  oneMinutePosition: 1-minute position
+  level3Decision: Lv3 gank decision
+  level4Decision: Lv4 gank decision
+  threeMinuteFrame: 3-minute frame
+  fourMinuteFrame: 4-minute frame
+  championDamage: champion damage
+  championDamageIncrease: champion damage increase
+  takedownParticipation: takedown participation
+  aggregation: Aggregation
+  sampleScope: sample scope
+  blueRedSide: blue / red side
   ganks: Ganks
   topsidePref: Top
   midPref: Mid
@@ -2564,6 +2676,13 @@ JunglePathing:
   midBotPref: Mid/Bot
   balanced: Balanced
   balancedShort: Bal.
+  prefShort:
+    top: Top
+    mid: Mid
+    bot: Bot
+    topMid: T/M
+    midBot: M/B
+    balanced: Bal.
   firstClear: 1st Clear
   topsideStart: 'Top {{pct}}%'
   botsideStart: 'Bot {{pct}}%'
@@ -2571,9 +2690,15 @@ JunglePathing:
   campBlue: Blue
   campWolves: Wolves
   campRaptors: Raptors
-  campOwnStart: 'Normal {{pct}}%'
-  campStart: '{{camp}} {{pct}}%'
-  campInvadeStart: 'Invade {{pct}}%'
+  campOwnStart: 'Normal {pct}'
+  campStart: '{{camp}} {pct}'
+  campInvadeStart: 'Invade {pct}'
+  campPopoverCampGames_one: 'This camp: {count} game'
+  campPopoverCampGames_other: 'This camp: {count} games'
+  campPopoverKindGames_one: '{{kind}} samples: {count} game'
+  campPopoverKindGames_other: '{{kind}} samples: {count} games'
+  campPopoverSideGames_one: '{{side}} side total: {count} game'
+  campPopoverSideGames_other: '{{side}} side total: {count} games'
   blueTeam: Blue
   redTeam: Red
   earlyGank: Early Ganks
@@ -2581,27 +2706,54 @@ JunglePathing:
   firstClearInvadeLegend: Invade start
   level3KillLegend: Lv3 kills
   level4KillLegend: Lv4 kills
-  level3Gank: 'Lv3 gank {{pct}}%'
-  level4Gank: 'Lv4 gank {{pct}}%'
+  level3Gank: 'Lv3 ganks {count} / {total}'
+  level4Gank: 'Lv4 ganks {count} / {total}'
   objectives: Objectives
   firstDragonRate: '1st Drake {{pct}}%'
+  firstDragonRateLabel: 1st Drake
   soloDragonRate: 'Solo Drake {{pct}}%'
+  soloDragonRateLabel: Solo Drake
   dragons: 'Drake {{count}}'
   voidgrubs: 'Grubs {{count}}'
   heralds: 'Herald {{count}}'
   barons: 'Baron {{count}}'
   avgDragons: 'Avg Drake {{count}}'
+  avgDragonsLabel: Avg Drake
   avgVoidgrubs: 'Avg Grubs {{count}}'
+  avgVoidgrubsLabel: Avg Grubs
   avgHeralds: 'Avg Herald {{count}}'
+  avgHeraldsLabel: Avg Herald
   avgBarons: 'Avg Baron {{count}}'
+  avgBaronsLabel: Avg Baron
   firstTime: '1st {{time}}'
-  noData: '—'
+  noData: No samples
+  noDataShort: N/A
+  noSideData: No side samples
+  noOwnStartData: No normal-start samples
+  noInvadeData: No invade samples
+  noGankData: No gank samples
+  noLevel3GankData: No Lv3 gank samples
+  noLevel4GankData: No Lv4 gank samples
+  noCurrentChampion: No champion selected
+  noCurrentChampionData: No jungle samples for current champion
   minuteLegend: Position points
-  gankLegend: Gank points
-  descriptionSingle: Based on this game's timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
-  description2Single: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included). Early ganks are detected by champion damage and kill participation at 3/4min frames.
-  description: Based on recent jungle games timeline data. Map preference uses weighted top/mid/bot zones (first 14min per-minute positions weight 1, takedown participation weight 5).
-  description2: First clear camp is determined by nearest camp to jungler's position at 1min (invade starts included), tracked per team side. Early ganks are detected by champion damage and kill participation at 3/4min frames, split by blue/red side.
+  gankLegend: Takedown points
+  mapSemanticHint: Legend
+  mapSemanticDescription: Dots are minute-frame position samples from the first 14 minutes. Crosses are takedown-participation positions within 14 minutes. Mini-map points may be sampled; use Zone Weight for exact values.
+  algorithmSummaryZoneWeight: Zone Weight measures top / mid / bot activity intensity during the first 14 minutes.
+  algorithmSummaryPathing: First clear and early ganks are aggregated within the current sample scope and split by blue / red side.
+  loadedSamples: Loaded {{details}} for this player, including {{jungle}}.
+  loadedDetailedSamples_one: '{{count}} detailed match sample'
+  loadedDetailedSamples_other: '{{count}} detailed match samples'
+  loadedJungleSamples_one: '{{count}} jungle game'
+  loadedJungleSamples_other: '{{count}} jungle games'
+  algorithmDetails: Algorithm
+  algorithmDetailZoneWeight: "{zoneWeight} = Σ {positionWeight} + Σ {takedownWeight}. {positionWeight}: during the {first14Minutes}, each minute-frame adds {pointOne} to the jungler's current top / mid / bot zone. {takedownWeight}: each takedown participation within 14 minutes adds {pointFive} to the takedown-position zone."
+  algorithmDetailPreference: '{preferenceDecision}: mid + bot share ≥ 70% and top share ≤ 28% means {midBot}. Top + mid share ≥ 70% and bot share ≤ 28% means {topMid}. {singleZone} share ≥ 40% and at least 8 percentage points ahead of the second-highest zone means Top / Mid / Bot. Otherwise {balanced}.'
+  algorithmDetailFirstClear: '{firstClearDecision}: use the nearest jungle camp to the {oneMinutePosition}. If the camp is in the enemy half, it is counted as an {invadeStart}.'
+  algorithmDetailLevel3Gank: '{level3Decision}: at the {threeMinuteFrame}, CS (minion + jungle) is {csRange}, level is {level3}, and {championDamage} is detected. Without detailed damage data, {takedownParticipation} within 3 minutes is used as the damage condition.'
+  algorithmDetailLevel4Gank: '{level4Decision}: by the {fourMinuteFrame}, {championDamageIncrease} is detected compared with the 3-minute frame, or {takedownParticipation} occurred from 3-4 minutes. Without detailed damage data, only {takedownParticipation} is used.'
+  algorithmDetailAggregation: '{aggregation}: the active tab defines the {sampleScope} (current champion or all). First clear / early ganks are accumulated separately for {blueRedSide}.'
   gamesUnit: ' games'
   copyAll: Copy Summary
   copied: Analysis copied
@@ -2613,7 +2765,12 @@ JunglePathing:
   topShort: Top
   midShort: Mid
   botShort: Bot
-  gamesAnalyzed: '{{count}} games'
+  zoneTiny:
+    top: T
+    mid: M
+    bot: B
+  gamesAnalyzed_one: '{{count}} game'
+  gamesAnalyzed_other: '{{count}} games'
 
 PlayerInfoCard:
   reload: Reload
@@ -2627,26 +2784,40 @@ PlayerInfoCard:
     recentlyPlayed: 'Preference:'
     selection: 'Selection:'
 
-  cherryWinRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
-  winRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
-  kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+  cherryWinRatePopover_one: In the recent {{count}} game, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
+  cherryWinRatePopover_other: In the recent {{count}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
+  winRatePopover_one: In the recent {{count}} game, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
+  winRatePopover_other: In the recent {{count}} games, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
+  kdaPopover_one: In the recent {{count}} game, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+  kdaPopover_other: In the recent {{count}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: They are a premade team. Labeled as Team {{team}}.
+  collectByChampion: By champion ({{champion}})
+  collectByPosition: By position ({{position}})
   sameChampionHistory: Champion History
-  highWinRatePopover: This player's win rate is exceptionally high. In the recent {{countV}} games, they have won {{winCount}} games.
+  highWinRatePopover_one: This player's win rate is exceptionally high. In the recent {{count}} game, they have won {{winCount}} games.
+  highWinRatePopover_other: This player's win rate is exceptionally high. In the recent {{count}} games, they have won {{winCount}} games.
   teamDamageShare: Dmg {{rate}}%
-  teamDamageSharePopover: In the recent {{countV}} games, this player's average team damage share is {{rate}}%
+  teamDamageSharePopover_one: In the recent {{count}} game, this player's average team damage share is {{rate}}%
+  teamDamageSharePopover_other: In the recent {{count}} games, this player's average team damage share is {{rate}}%
   teamDamageTakenShare: Dmg Taken {{rate}}%
-  teamDamageTakenSharePopover: In the recent {{countV}} games, this player's average team damage taken share is {{rate}}%
+  teamDamageTakenSharePopover_one: In the recent {{count}} game, this player's average team damage taken share is {{rate}}%
+  teamDamageTakenSharePopover_other: In the recent {{count}} games, this player's average team damage taken share is {{rate}}%
   teamGoldShare: Gold {{rate}}%
-  teamGoldSharePopover: In the recent {{countV}} games, this player's average team gold share is {{rate}}%
+  teamGoldSharePopover_one: In the recent {{count}} game, this player's average team gold share is {{rate}}%
+  teamGoldSharePopover_other: In the recent {{count}} games, this player's average team gold share is {{rate}}%
   damageGoldEfficiency: Dmg-Gold {{rate}}%
-  damageGoldEfficiencyPopover: In the recent {{countV}} games, this player's average damage to gold efficiency is {{rate}}%
-  enemyMissingPings: Missing pings {{countV}}
-  enemyMissingPingsPopover: This player has sent enemy missing pings an average of {{countV}} times per game
-  visionScore: Vision Score {{countV}}
-  visionScorePopover: This player's average vision score is {{countV}}
+  damageGoldEfficiencyPopover_one: In the recent {{count}} game, this player's average damage to gold efficiency is {{rate}}%
+  damageGoldEfficiencyPopover_other: In the recent {{count}} games, this player's average damage to gold efficiency is {{rate}}%
+  enemyMissingPings: Missing pings {{count}}
+  enemyMissingPingsPopover_one: This player has sent enemy missing pings an average of {{count}} time per game
+  enemyMissingPingsPopover_other: This player has sent enemy missing pings an average of {{count}} times per game
+  visionScore: Vision Score {{count}}
+  visionScorePopover: This player's average vision score is {{count}}
   metPopover:
-    title: Last encountered this player on {{date}}. Met a total of {{countV}} times. Shows only the last {{countV2}} games.
+    title_one: Last encountered this player on {{date}}. Met a total of {{count}} time.
+    title_other: Last encountered this player on {{date}}. Met a total of {{count}} times.
+    titleNote_one: Shows only the last {{count}} game.
+    titleNote_other: Shows only the last {{count}} games.
     gameId: Game ID
     inspectByGameId: Inspect {{gameId}}
     date: Game Date
@@ -2660,26 +2831,30 @@ PlayerInfoCard:
       teammate: Ally
       opponent: Enemy
   privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
-  winningStreakPopover: Currently on a winning streak of {{countV}} games. Great job!
-  losingStreakPopover: Currently on a losing streak of {{countV}} games.
+  winningStreakPopover_one: Currently on a winning streak of {{count}} game. Great job!
+  winningStreakPopover_other: Currently on a winning streak of {{count}} games. Great job!
+  losingStreakPopover_one: Currently on a losing streak of {{count}} game.
+  losingStreakPopover_other: Currently on a losing streak of {{count}} games.
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
   hardGank: Hard to Gank
   gankable: Gankable
   easyGank: Easy Gank
   veryEasyGank: Very Easy Gank
-  easyGankPopover: Across the latest {{countV}} analyzed Summoner's Rift games, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
+  easyGankPopover_one: Across the latest {{count}} analyzed Summoner's Rift game, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
+  easyGankPopover_other: Across the latest {{count}} analyzed Summoner's Rift games, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
   soloKills: '{{times}} Solo Kills'
-  soloKillsPopover: In the recent {{countV}} games, this player get solo kills {{times}} times on average
+  soloKillsPopover_one: In the recent {{count}} game, this player get solo kills {{times}} times on average
+  soloKillsPopover_other: In the recent {{count}} games, this player get solo kills {{times}} times on average
   akariLoved:
     outstanding: Outstanding
     extraordinary: Extraordinary
     outstandingPopover: This player has performed well in recent games.
     extraordinaryPopover: This player has shown exceptional performance in recent games.
   champion:
-    winRate: 'Recent {{countV}} games, win rate {{winRate}}%'
-    level: 'Level {{level}}'
-    masteryPoints: '{{points}} mastery points'
+    recentStats: Recent Stats
+    winRate_one: 'Recent {{count}} game, win rate {{winRate}}%'
+    winRate_other: 'Recent {{count}} games, win rate {{winRate}}%'
   matchHistory:
     winResult:
       na: '-'
@@ -2697,8 +2872,10 @@ PlayerInfoCard:
   highWinRate: High W/R
   met: Met
   private: Private
-  winningStreak: '{{countV}} Wins'
-  losingStreak: '{{countV}} Losses'
+  winningStreak_one: '{{count}} Win'
+  winningStreak_other: '{{count}} Wins'
+  losingStreak_one: '{{count}} Loss'
+  losingStreak_other: '{{count}} Losses'
 
   reloadMatchHistory: Reload
 
@@ -2737,8 +2914,8 @@ OpggWindowTitlebar:
 
 BenchChampionsMini:
   title: Champion Bench
-  reroll: 'Reroll (Remaining: {{countV}})'
-  charity: 'Reroll and Take back (Remaining: {{countV}})'
+  reroll: 'Reroll (Remaining: {{count}})'
+  charity: 'Reroll and Take back (Remaining: {{count}})'
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
   rerollFailed: Failed to reroll {{reason}}
@@ -2809,11 +2986,9 @@ LoungeOperations:
   autoMatchmakingWaitForInvitees:
     label: Wait for Invitees
 
-  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
-    label: Cancel After Dodge
-
 SkinSelectionMini:
-  skins: '{{countV}} skins available'
+  skins_one: '{{count}} skin available'
+  skins_other: '{{count}} skins available'
   button: Apply
   success: Skin applied successfully
   failed: Skin application failed
@@ -2842,9 +3017,9 @@ Lounge:
     searching: Searching
     searchIn: Searching {{seconds}} s
     waitingForPenalty: Waiting for dodge timer {{seconds}} s
-    waitingForMembers: Auto-matchmaking requires {{countV}} players
+    waitingForMembers_one: Auto-matchmaking requires {{count}} player
+    waitingForMembers_other: Auto-matchmaking requires {{count}} players
     waitingForInvitees: Waiting for invited members
-    cancelledAfterChampSelect: Auto matchmaking cancelled after a champion select dodge
 
 Placeholder:
   inProgress: In Progress
@@ -3003,6 +3178,10 @@ OpggChampion:
   augmentPrism: Prism
   augmentPerformance: Perf.
   augmentPopular: Popular
+  augmentSort:
+    default: Default
+    performance: Performance
+    popular: Popularity
   showAdvancedStats: Show Advanced
   synergies: Synergies
   balance:
@@ -3102,7 +3281,7 @@ RewardClaimTool: &CommonClaimTool
 
   refreshButton: Refresh
   claimButton: Claim
-  claimButtonC: Claim ({{countV}})
+  claimButtonC: Claim ({{count}})
   cancelButton: Cancel
 
   refreshSuccess: Refreshed
@@ -3124,17 +3303,18 @@ MissionClaimTool:
   hint: Completing missions in advance may cause data inconsistency. Please use with caution.
 
 ClaimableItem:
-  untranslatedC: Unnamed Group ({{countV}})
+  untranslatedC: Unnamed Group ({{count}})
 
 FriendTools:
   title: Friends
   searchPlaceholder: Search friend name or tag
 
-  deleteButtonC: Delete ({{countV}})
+  deleteButtonC: Delete ({{count}})
   deleteButton: Delete
   cancelButton: Cancel
   refreshButton: Refresh
-  deleteSuccess: Deleted {{countV}} friends
+  deleteSuccess_one: Deleted {{count}} friend
+  deleteSuccess_other: Deleted {{count}} friends
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   refreshSuccess: Refreshed
   neverPlayed: No match data
@@ -3163,7 +3343,7 @@ SummonerSpellsCdTimer:
   sendFailed: 'Send failed: {{reason}}'
 
 BackgroundTasks:
-  taskTitle: Ongoing Tasks ({{countV}})
+  taskTitle: Ongoing Tasks ({{count}})
   emptyPlaceholder: No background tasks
 
 TemplateEdit:

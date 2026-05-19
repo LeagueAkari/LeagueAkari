@@ -1,23 +1,9 @@
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import {
-  JunglePathingAnalysis,
-  analyzeJunglePathing,
-  filterJungleGames
-} from '@shared/data-adapter/analysis/jungle'
-import {
-  MatchHistoryGamesAnalysisAll,
-  analyzeEarlyDeathsWithEnemyJunglerInvolved,
-  analyzeMatchHistory
-} from '@shared/data-adapter/analysis/players'
-import {
-  MatchHistoryGamesAnalysisTeamSide,
-  analyzeTeamMatchHistory
-} from '@shared/data-adapter/analysis/teams'
+import { AggregatedAnalysis, analyzeGames } from '@shared/data-adapter/analysis/player'
+import { AggregatedTeamAnalysis, analyzePlayers } from '@shared/data-adapter/analysis/team'
 import { toIdentities } from '@shared/data-adapter/match-history/identities'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import {
   LcuGameSummary,
   LcuGameTimeline,
@@ -27,7 +13,11 @@ import {
   SgpGameSummary
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { AdditionalResult } from '@shared/types/shards/ongoing-game'
+import {
+  AdditionalResult,
+  DraftOptions,
+  OngoingGameSimplifiedChampMastery
+} from '@shared/types/shards/ongoing-game'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import {
@@ -53,12 +43,6 @@ import { SgpMain } from '../sgp'
 import { memberMerge } from './member-merge'
 import { OngoingGameSettings, OngoingGameState } from './state'
 
-type LoadedMatchHistory = OngoingGameState['matchHistory'][string]
-type MatchHistoryLoadTarget = 'default' | 'jungle-analysis'
-
-const JUNGLE_ANALYSIS_OVERALL_TARGET_GAMES = 50
-const JUNGLE_ANALYSIS_CURRENT_CHAMPION_TARGET_GAMES = 20
-
 /**
  * 用于游戏过程中的对局分析, 包括在此期间的战绩查询, 计算等
  */
@@ -67,15 +51,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   static id = 'ongoing-game-main'
 
   static LOADING_PRIORITY = {
-    ADDITIONAL_INFO: 7,
+    ADDITIONAL_INFO: 50,
     ADDITIONAL_SUMMONER: -1,
-    SUMMONER: 6,
-    MATCH_HISTORY: 5,
-    SAVED_INFO: 4,
-    RANKED_STATS: 3,
-    CHAMPION_MASTERY: 2,
-    ADDITIONAL_GAME: 2,
-    GAME_DETAILS: 1
+    SUMMONER: 30,
+    MATCH_HISTORY: 25,
+    SAVED_INFO: 20,
+    RANKED_STATS: 15,
+    CHAMPION_MASTERY: 10,
+    GAME_DETAILS_JUNGLE: 10,
+    GAME_DETAILS: 5
   }
 
   private readonly _log: AkariLogger
@@ -85,8 +69,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   public readonly state: OngoingGameState
 
   private readonly _queueKeeper = new QueueKeeper([{ id: 'match-history' }, { id: 'misc' }])
-
-  private _jungleAnalysisMatchHistory: Record<string, OngoingGameState['matchHistory'][string]> = {}
 
   private _gameSummaryLruMap = new LRUMap<string, LcuOrSgpGameSummary>({
     maxSize: 256
@@ -117,13 +99,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         matchHistoryLoadCount: { default: this.settings.matchHistoryLoadCount },
         matchHistoryTagPreference: { default: this.settings.matchHistoryTagPreference },
         gameDetailsLoadCount: { default: this.settings.gameDetailsLoadCount },
-        jungleAnalysisMatchHistoryLoadCount: {
-          default: this.settings.jungleAnalysisMatchHistoryLoadCount
-        },
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
-        showJunglePathing: { default: this.settings.showJunglePathing },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
+        showJunglePathingForAllPlayers: {
+          default: this.settings.showJunglePathingForAllPlayers
+        },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
         playerCardTags: { default: this.settings.playerCardTags },
         queryInLobbyPhase: { default: this.settings.queryInLobbyPhase },
@@ -150,11 +131,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'matchHistoryLoadCount',
       'matchHistoryTagPreference',
       'gameDetailsLoadCount',
-      'jungleAnalysisMatchHistoryLoadCount',
       'orderPlayerBy',
       'showChampionUsage',
-      'showJunglePathing',
       'showMatchHistoryItemBorder',
+      'showJunglePathingForAllPlayers',
       'autoRouteWhenGameStarts',
       'playerCardTags',
       'queryInLobbyPhase',
@@ -164,10 +144,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._mobx.propSync(OngoingGameMain.id, 'state', this.state, [
       'championSelections',
       'positionAssignments',
-      'playerStats',
+      'analysis',
       'queryStage',
       'teams',
-      'matchHistoryTag',
+      'isInEog',
       'matchHistoryLoadingState',
       'summonerLoadingState',
       'savedInfoLoadingState',
@@ -177,9 +157,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'matchHistoryTagParams',
       'draft',
       'additional',
-      'calculatedPremadeTeamMap',
-      'inferredPremadeTeams',
-      'jungleAnalysis'
+      'mergedPremadeTeamMap',
+      'inferredPremadeTeams'
     ])
 
     // 便于精准订阅
@@ -191,7 +170,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     this._handleConcurrencyChange()
     this._handleIpcCall()
-    this._handleCalculation()
+    this._handleCalculateAnalysis()
     this._handleEndOfGameSave()
     this._handleRemindTaggedPlayers()
     this._handleLoad()
@@ -212,22 +191,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
 
       await setter(this.settings.matchHistoryLoadCount)
-    })
-
-    this._setting.onChange('jungleAnalysisMatchHistoryLoadCount', async (value, { setter }) => {
-      if (value >= 50 && value <= 100) {
-        await setter(value)
-      } else {
-        await setter(100)
-      }
-
-      this._jungleAnalysisMatchHistory = {}
-
-      for (const puuid of this._getJunglerPuuids()) {
-        this._loadJungleGameDetails(puuid)
-      }
-
-      this.state.setJungleAnalysis(this._calcJungleAnalysis())
     })
   }
 
@@ -254,10 +217,21 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         this._updateSavedInfo(puuids)
         this._updateChampionMasteries(puuids)
       },
-      { delay: 500, fireImmediately: true } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 500 ms，下同
+      { delay: 300, fireImmediately: true } // gameflow 的队伍信息可能是上局残留的，等待 lc 将其刷新，通常很快，这里留出 300 ms，下同
     )
 
     const currentQueueTagInfo = computed(() => {
+      if (this.state.draft) {
+        if (this.state.draft.queueId === 0 || this.state.draft.queueId === -1) {
+          return null
+        }
+
+        return {
+          queueId: this.state.draft.queueId,
+          from: 'draft'
+        }
+      }
+
       if (this._lc.data.lobby.lobby) {
         return {
           queueId: this._lc.data.lobby.lobby.gameConfig.queueId,
@@ -305,7 +279,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           apiShouldUse as 'sgp' | 'lcu'
         )
       },
-      { delay: 500 /* important! */, equals: comparer.structural, fireImmediately: true }
+      { delay: 300 /* important! */, equals: comparer.structural, fireImmediately: true }
     )
 
     this._mobx.reaction(
@@ -334,13 +308,38 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       { fireImmediately: true, equals: comparer.structural }
     )
 
+    // match history details，只会跟随已经加载好的 match history 而变化
+    // 同时也负责清理
+    this._mobx.reaction(
+      () =>
+        ({
+          apiSource: this.state.apiShouldUse,
+          gameIds: Object.values(this.state.matchHistory).flatMap((m) =>
+            m.data.map((g) => g.gameId).slice(0, this.settings.gameDetailsLoadCount)
+          )
+        }) as const,
+      ({ apiSource, gameIds }) => {
+        const whitelistGameIds = new Set<number>(gameIds)
+
+        for (const m of Object.values(this.state.gameDetails)) {
+          if (!whitelistGameIds.has(m.gameId)) {
+            delete this.state.gameDetails[m.gameId]
+            this._queueKeeper.cancelByTags([m.gameId.toString(), 'game-details'], 'and')
+            this._ipc.sendEvent(OngoingGameMain.id, 'game-details-removed', m.gameId)
+          }
+        }
+
+        this._loadGameDetails(gameIds, { apiSource })
+      },
+      { delay: 300, equals: comparer.structural, fireImmediately: true }
+    )
+
     this._mobx.reaction(
       () => this.state.queryStage.phase === 'unavailable',
       (isUnavailable) => {
         if (isUnavailable) {
           this._log.info('Clearing ongoing game state')
           this._queueKeeper.cancelAll()
-          this._jungleAnalysisMatchHistory = {}
           this.state.clear()
           this._ipc.sendEvent(OngoingGameMain.id, 'clear')
           return
@@ -426,7 +425,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       if (!puuids.includes(puuid)) {
         delete this.state.matchHistory[puuid]
         delete this.state.matchHistoryLoadingState[puuid]
-        delete this._jungleAnalysisMatchHistory[puuid]
 
         this._ipc.sendEvent(OngoingGameMain.id, 'match-history-removed', puuid)
       }
@@ -434,8 +432,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     for (const puuid of puuids) {
       this._queueKeeper.cancelByTags([puuid, 'match-history'], 'and')
-      this._queueKeeper.cancelByTags([puuid, 'jungle-analysis-match-history'], 'and')
-      delete this._jungleAnalysisMatchHistory[puuid]
       this._loadMatchHistory(puuid, { params, force, apiSource })
     }
   }
@@ -445,9 +441,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     options: {
       force?: boolean
       apiSource: 'sgp' | 'lcu'
+      priority?: number
     } = { apiSource: 'lcu' }
   ) {
-    const { force, apiSource } = options
+    const { force, apiSource, priority } = options
 
     const loadGameDetails = async (gameId: number) => {
       const current = this.state.gameDetails[gameId]
@@ -478,7 +475,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             `sgp-game-details:${gameId}`,
             () => this._sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId),
             {
-              priority: OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
+              priority: priority ?? OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
               tags: [gameId.toString(), 'game-details', 'sgp']
             }
           )
@@ -518,7 +515,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             `lcu-game-details:${gameId}`,
             () => this._lc.api.matchHistory.getTimeline(gameId),
             {
-              priority: OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
+              priority: priority ?? OngoingGameMain.LOADING_PRIORITY.GAME_DETAILS,
               tags: [gameId.toString(), 'game-details', 'lcu']
             }
           )
@@ -653,80 +650,64 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     await Promise.allSettled(gameIds.map((g) => loadGame(g)))
   }
 
-  private _isSameMatchHistoryQuery(
-    current: LoadedMatchHistory | undefined,
-    apiSource: 'sgp' | 'lcu',
-    params: MatchHistoryQueryParams
-  ) {
-    if (!current || current.source !== apiSource) {
-      return false
-    }
-
-    if (apiSource === 'sgp') {
-      return (
-        current.params.tag === params.tag &&
-        current.params.tagsQueryType === params.tagsQueryType &&
-        current.params.startIndex === params.startIndex &&
-        current.params.count === params.count
-      )
-    }
-
-    return (
-      current.params.startIndex === params.startIndex && current.params.count === params.count
-    )
-  }
-
   private async _loadMatchHistory(
     puuid: string,
     options: {
       params: MatchHistoryQueryParams
       force?: boolean
       apiSource: 'sgp' | 'lcu'
-      target?: MatchHistoryLoadTarget
     } = { params: { startIndex: 0, count: 20 }, apiSource: 'lcu' }
   ) {
-    const { params, force, apiSource, target = 'default' } = options
-    const current =
-      target === 'default' ? this.state.matchHistory[puuid] : this._jungleAnalysisMatchHistory[puuid]
-    const taskKeyPrefix = target === 'default' ? 'match-history' : 'jungle-analysis-match-history'
-    const targetLabel = target === 'default' ? 'player' : 'jungle analysis'
+    const { params, force, apiSource } = options
 
-    if (!force && this._isSameMatchHistoryQuery(current, apiSource, params)) {
-      this._log.debug(`Skip ${targetLabel} match history query because params are unchanged`, {
-        apiSource,
-        puuid,
-        target
-      })
-      return
+    const current = this.state.matchHistory[puuid]
+
+    if (current && !force) {
+      const sameSgpQuery = () =>
+        apiSource === 'sgp' &&
+        current.source === 'sgp' &&
+        current.params.tag === params.tag &&
+        current.params.tagsQueryType === params.tagsQueryType &&
+        current.params.startIndex === params.startIndex &&
+        current.params.count === params.count
+
+      const sameLcuQuery = () =>
+        apiSource === 'lcu' &&
+        current.source === 'lcu' &&
+        current.params.startIndex === params.startIndex &&
+        current.params.count === params.count
+
+      if (sameSgpQuery()) {
+        this._log.debug('Player match history query condition not changed, skip (SGP)', puuid)
+        return
+      }
+
+      if (sameLcuQuery()) {
+        this._log.debug('Player match history query condition not changed, skip (LCU)', puuid)
+        return
+      }
     }
 
     if (apiSource === 'sgp') {
       try {
-        if (this._queueKeeper.hasTask(`sgp-${taskKeyPrefix}:${puuid}`)) {
-          this._log.debug(`${targetLabel} match history already in queue`, 'sgp', puuid)
+        if (this._queueKeeper.hasTask(`sgp-match-history:${puuid}`)) {
+          this._log.debug('Player match history already in queue', 'sgp', puuid)
           return
         }
 
-        if (target === 'default') {
-          this.state.setMatchHistoryLoadingState(puuid, 'loading')
-        }
+        this.state.setMatchHistoryLoadingState(puuid, 'loading')
 
         const { data } = await this._queueKeeper.add(
           'match-history',
-          `sgp-${taskKeyPrefix}:${puuid}`,
+          `sgp-match-history:${puuid}`,
           () => this._sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(puuid, params),
           {
             priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY,
-            tags: [puuid, taskKeyPrefix, 'sgp']
+            tags: [puuid, 'match-history', 'sgp']
           }
         )
 
         const filtered = data.games.filter((g) => g.json)
-
-        // this._loadGameDetails(
-        //   filtered.map((g) => g.json.gameId).slice(0, this.settings.gameDetailsLoadCount),
-        //   { force, apiSource }
-        // )
 
         const toBeLoaded = {
           data: filtered.map(
@@ -736,49 +717,32 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           source: 'sgp' as const
         }
 
-        runInAction(() => {
-          if (target === 'default') {
-            this.state.matchHistory[puuid] = toBeLoaded
-          } else {
-            this._jungleAnalysisMatchHistory[puuid] = toBeLoaded
-          }
-        })
+        runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
+        this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+        this.state.setMatchHistoryLoadingState(puuid, 'loaded')
 
-        if (target === 'default') {
-          this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
-          this.state.setMatchHistoryLoadingState(puuid, 'loaded')
-        } else {
-          this._loadJungleGameDetails(puuid)
-          this.state.setJungleAnalysis(this._calcJungleAnalysis())
-        }
-
-        this._log.info(`Load ${targetLabel} match history completed: SGP API`, puuid)
+        this._log.info('Load player match history completed: SGP API', puuid)
       } catch (error) {
         if (isAbortError(error)) {
-          this._log.info(`${targetLabel} match history loading aborted`, puuid)
+          this._log.info('Player match history loading aborted', puuid)
           return
         }
 
-        this._log.warn(`Error loading ${targetLabel} match history`, error, puuid)
-
-        if (target === 'default') {
-          this.state.setMatchHistoryLoadingState(puuid, 'error')
-        }
+        this._log.warn('Error loading player match history', error, puuid)
+        this.state.setMatchHistoryLoadingState(puuid, 'error')
       }
     } else {
       try {
-        if (this._queueKeeper.hasTask(`lcu-${taskKeyPrefix}:${puuid}`)) {
-          this._log.debug(`${targetLabel} match history already in queue`, 'lcu', puuid)
+        if (this._queueKeeper.hasTask(`lcu-match-history:${puuid}`)) {
+          this._log.debug('Player match history already in queue', 'lcu', puuid)
           return
         }
 
-        if (target === 'default') {
-          this.state.setMatchHistoryLoadingState(puuid, 'loading')
-        }
+        this.state.setMatchHistoryLoadingState(puuid, 'loading')
 
         const { data } = await this._queueKeeper.add(
           'match-history',
-          `lcu-${taskKeyPrefix}:${puuid}`,
+          `lcu-match-history:${puuid}`,
           () =>
             this._lc.api.matchHistory.getMatchHistory(
               puuid,
@@ -787,12 +751,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             ),
           {
             priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY,
-            tags: [puuid, taskKeyPrefix, 'lcu']
+            tags: [puuid, 'match-history', 'lcu']
           }
         )
 
         const detailedGameMap: Record<number, LcuGameSummary> = {}
-        const loadGame = async (gameId: number) => {
+        const completeGame = async (gameId: number) => {
           const cached = this._gameSummaryLruMap.get(`lcu:${gameId}`) as LcuGameSummary | undefined
 
           if (cached) {
@@ -833,12 +797,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           }
         }
 
-        // this._loadGameDetails(
-        //   data.games.games.map((g) => g.gameId).slice(0, this.settings.gameDetailsLoadCount),
-        //   { force, apiSource }
-        // )
-
-        await Promise.allSettled(data.games.games.map((g) => loadGame(g.gameId)))
+        await Promise.allSettled(data.games.games.map((g) => completeGame(g.gameId)))
 
         const games = data.games.games.map(
           (g) => detailedGameMap[g.gameId] || { gameId: g.gameId, source: 'lcu', data: g }
@@ -850,34 +809,19 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           source: 'lcu' as 'sgp' | 'lcu'
         }
 
-        runInAction(() => {
-          if (target === 'default') {
-            this.state.matchHistory[puuid] = toBeLoaded
-          } else {
-            this._jungleAnalysisMatchHistory[puuid] = toBeLoaded
-          }
-        })
+        runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
+        this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+        this.state.setMatchHistoryLoadingState(puuid, 'loaded')
 
-        if (target === 'default') {
-          this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
-          this.state.setMatchHistoryLoadingState(puuid, 'loaded')
-        } else {
-          this._loadJungleGameDetails(puuid)
-          this.state.setJungleAnalysis(this._calcJungleAnalysis())
-        }
-
-        this._log.info(`Load ${targetLabel} match history completed: LCU API`, puuid)
+        this._log.info('Load player match history completed: LCU API', puuid)
       } catch (error) {
         if (isAbortError(error)) {
-          this._log.info(`${targetLabel} match history loading aborted`, puuid)
+          this._log.info('Player match history loading aborted', puuid)
           return
         }
 
-        this._log.warn(`Error loading ${targetLabel} match history`, error, puuid)
-
-        if (target === 'default') {
-          this.state.setMatchHistoryLoadingState(puuid, 'error')
-        }
+        this._log.warn('Error loading player match history', error, puuid)
+        this.state.setMatchHistoryLoadingState(puuid, 'error')
       }
     }
   }
@@ -1062,17 +1006,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           championId: m.championId,
           championLevel: m.championLevel,
           championPoints: m.championPoints,
-          milestoneGrades: m.milestoneGrades
+          championSeasonMilestone: m.championSeasonMilestone,
+          highestGrade: m.highestGrade,
+          lastPlayTime: m.lastPlayTime
         }))
         .reduce(
           (obj, cur) => {
             obj[cur.championId] = cur
             return obj
           },
-          {} as Record<
-            number,
-            { championId: number; championLevel: number; championPoints: number }
-          >
+          {} as Record<number, OngoingGameSimplifiedChampMastery>
         )
 
       runInAction(() => (this.state.championMastery[puuid] = simplifiedMastery))
@@ -1090,7 +1033,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   }
 
   private _clearAndReloadAll() {
-    this._jungleAnalysisMatchHistory = {}
     this.state.clear({ keepTagParams: true, keepAdditionalInfo: true })
     this._ipc.sendEvent(OngoingGameMain.id, 'clear')
 
@@ -1115,7 +1057,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   private _reloadPlayer(puuid: string) {
     this._queueKeeper.cancelByTags(puuid)
-    delete this._jungleAnalysisMatchHistory[puuid]
 
     this._loadMatchHistory(puuid, {
       params: {
@@ -1161,6 +1102,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
     )
 
+    this._ipc.onCall(OngoingGameMain.id, 'setDraft', (_, draft: DraftOptions) => {
+      this.state.setDraft(draft)
+    })
+
+    this._ipc.onCall(OngoingGameMain.id, 'clearDraft', () => {
+      this.state.setDraft(null)
+    })
+
     this._ipc.onCall(OngoingGameMain.id, 'reload', () => {
       this._clearAndReloadAll()
     })
@@ -1170,50 +1119,45 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
   }
 
-  private _calcAnalysis() {
+  private _computedAnalysis() {
     if (!this.state.teams) {
       return null
     }
 
     try {
-      const playerAnalyses: Record<string, MatchHistoryGamesAnalysisAll> = {}
-      const shouldCalculateEasyGank = this._shouldCalculateEasyGankTag()
+      const playerAnalyses: Record<string, AggregatedAnalysis> = {}
 
       for (const [puuid, matchHistory] of Object.entries(this.state.matchHistory)) {
         if (!matchHistory) {
           continue
         }
 
-        const analysis = analyzeMatchHistory(matchHistory.data, puuid)
+        const pairs = matchHistory.data.map((summary) => ({
+          gameId: summary.gameId,
+          summary: summary,
+          details: this.state.gameDetails[summary.gameId]
+        }))
+
+        const analysis = analyzeGames(pairs, puuid, {
+          previous: this.state.analysis?.players[puuid]
+        })
 
         if (analysis) {
-          if (shouldCalculateEasyGank) {
-            const easyGankGameIds = new Set(this._getEasyGankEligibleGameIds(matchHistory.data, puuid))
-            const easyGankAnalysis = analyzeEarlyDeathsWithEnemyJunglerInvolved(
-              matchHistory.data.filter((game) => easyGankGameIds.has(game.gameId)),
-              this.state.gameDetails,
-              puuid
-            )
-
-            analysis.summary.avgEarlyDeathsWithEnemyJunglerInvolved =
-              easyGankAnalysis.avgEarlyDeathsWithEnemyJunglerInvolved
-            analysis.summary.earlyDeathsWithEnemyJunglerInvolvedGamesCount =
-              easyGankAnalysis.earlyDeathsWithEnemyJunglerInvolvedGamesCount
-          }
-
           playerAnalyses[puuid] = analysis
         }
       }
 
-      const teamAnalyses: Record<string, MatchHistoryGamesAnalysisTeamSide> = {}
+      const teamAnalyses: Record<string, AggregatedTeamAnalysis> = {}
 
-      for (const [sideId, puuids] of Object.entries(this.state.teams)) {
+      for (const [teamIdentifier, puuids] of Object.entries(this.state.teams)) {
         const teamPlayerAnalyses = puuids.map((p) => playerAnalyses[p]).filter(Boolean)
-        const teamAnalysis = analyzeTeamMatchHistory(teamPlayerAnalyses)
+        const teamAnalysis = analyzePlayers(teamPlayerAnalyses)
+
         if (teamAnalysis) {
-          teamAnalyses[sideId] = teamAnalysis
+          teamAnalyses[teamIdentifier] = teamAnalysis
         }
       }
+
       return {
         players: playerAnalyses,
         teams: teamAnalyses
@@ -1224,7 +1168,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
   }
 
-  private _calcPremade() {
+  /**
+   * 根据战绩推测潜在的预组队队伍
+   *
+   * @returns puuids 的 list
+   */
+  private _inferPremadeTeams() {
     if (!Object.keys(this.state.matchHistory).length) {
       return []
     }
@@ -1274,401 +1223,56 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     return mergedOverlappingSets as string[][]
   }
 
-  private readonly SMITE_SPELL_ID = 11
-
-  /**
-   * 识别当前对局中的打野玩家
-   * 优先用 positionAssignments，回退到召唤师技能（惩戒）判断
-   */
-  private _getJunglerPuuids(): string[] {
-    const junglers: string[] = []
-    const positions = this.state.positionAssignments
-
-    // 1. 先从 positionAssignments 中找
-    for (const [puuid, pos] of Object.entries(positions)) {
-      if (pos.position && pos.position.toUpperCase() === 'JUNGLE') {
-        junglers.push(puuid)
-      }
-    }
-
-    if (junglers.length > 0) return junglers
-
-    // 2. 回退: 从当前对局的召唤师技能中找惩戒使用者
-    // 优先从 additional.spells (GSM/spectator 数据)
-    for (const [puuid, spells] of Object.entries(this.state.additional.spells)) {
-      if (spells.spell1Id === this.SMITE_SPELL_ID || spells.spell2Id === this.SMITE_SPELL_ID) {
-        junglers.push(puuid)
-      }
-    }
-
-    if (junglers.length > 0) return junglers
-
-    // 3. 再回退: 从 gameflow session 的 playerChampionSelections 中找
-    const session = this._lc.data.gameflow.session
-    if (session) {
-      for (const p of session.gameData.playerChampionSelections) {
-        if (p.puuid && (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)) {
-          junglers.push(p.puuid)
-        }
-      }
-    }
-
-    // 4. 最后回退: 从 champSelect session 中找
-    if (junglers.length === 0) {
-      const cs = this._lc.data.champSelect.session
-      if (cs) {
-        for (const p of [...cs.myTeam, ...cs.theirTeam]) {
-          if (
-            p.puuid &&
-            p.puuid !== EMPTY_PUUID &&
-            (p.spell1Id === this.SMITE_SPELL_ID || p.spell2Id === this.SMITE_SPELL_ID)
-          ) {
-            junglers.push(p.puuid)
-          }
-        }
-      }
-    }
-
-    return junglers
-  }
-
-  private _getCurrentChampionId(puuid: string) {
-    return this.state.championSelections[puuid] ?? 0
-  }
-
-  private _isJunglerInSummary(summary: LcuOrSgpGameSummary, puuid: string) {
-    const participant = toParticipants(summary, toBasicInfo(summary)).find((p) => p.puuid === puuid)
-
-    if (!participant) {
-      return false
-    }
-
-    return participant.position === 'JUNGLE' || participant.spells.includes(this.SMITE_SPELL_ID)
-  }
-
-  private _getJungleGameSummaries(summaries: LcuOrSgpGameSummary[], puuid: string) {
-    const jungleGameIds = new Set(filterJungleGames(summaries, puuid))
-    return summaries.filter((summary) => jungleGameIds.has(summary.gameId))
-  }
-
-  private _getJungleAnalysisSelectionFromSummaries(
-    summaries: LcuOrSgpGameSummary[],
-    puuid: string,
-    currentChampionId: number
-  ) {
-    const limitedSummaries = summaries.slice(0, this.settings.jungleAnalysisMatchHistoryLoadCount)
-    const jungleSummaries = this._getJungleGameSummaries(limitedSummaries, puuid)
-    const currentChampionSummaries = currentChampionId
-      ? jungleSummaries.filter((summary) => {
-          const participant = toParticipants(summary, toBasicInfo(summary)).find(
-            (p) => p.puuid === puuid
-          )
-
-          return participant?.championId === currentChampionId
-        })
-      : []
-
-    const selectedGameIds = new Set<number>()
-
-    jungleSummaries
-      .slice(0, JUNGLE_ANALYSIS_OVERALL_TARGET_GAMES)
-      .forEach((summary) => selectedGameIds.add(summary.gameId))
-    currentChampionSummaries
-      .slice(0, JUNGLE_ANALYSIS_CURRENT_CHAMPION_TARGET_GAMES)
-      .forEach((summary) => selectedGameIds.add(summary.gameId))
-
-    return {
-      selectedSummaries: jungleSummaries.filter((summary) => selectedGameIds.has(summary.gameId)),
-      overallJungleGamesCount: jungleSummaries.length,
-      currentChampionJungleGamesCount: currentChampionSummaries.length,
-      meetsOverallTarget: jungleSummaries.length >= JUNGLE_ANALYSIS_OVERALL_TARGET_GAMES,
-      meetsCurrentChampionTarget: currentChampionId
-        ? currentChampionSummaries.length >= JUNGLE_ANALYSIS_CURRENT_CHAMPION_TARGET_GAMES
-        : true
-    }
-  }
-
-  private _getJungleAnalysisSelection(puuid: string) {
-    const baseMatchHistory = this.state.matchHistory[puuid]
-
-    if (!baseMatchHistory) {
-      return null
-    }
-
-    const currentChampionId = this._getCurrentChampionId(puuid)
-    const baseSelection = this._getJungleAnalysisSelectionFromSummaries(
-      baseMatchHistory.data,
-      puuid,
-      currentChampionId
-    )
-    const needsExpandedHistory =
-      baseMatchHistory.data.length < this.settings.jungleAnalysisMatchHistoryLoadCount &&
-      (!baseSelection.meetsOverallTarget || !baseSelection.meetsCurrentChampionTarget)
-
-    const analysisMatchHistory =
-      needsExpandedHistory && this._jungleAnalysisMatchHistory[puuid]
-        ? this._jungleAnalysisMatchHistory[puuid]
-        : baseMatchHistory
-    const selection =
-      analysisMatchHistory === baseMatchHistory
-        ? baseSelection
-        : this._getJungleAnalysisSelectionFromSummaries(
-            analysisMatchHistory.data,
-            puuid,
-            currentChampionId
-          )
-
-    return {
-      matchHistory: analysisMatchHistory,
-      currentChampionId,
-      needsExpandedHistory,
-      usingExpandedHistory: analysisMatchHistory !== baseMatchHistory,
-      ...selection
-    }
-  }
-
-  private _ensureJungleAnalysisMatchHistory(puuid: string) {
-    const selection = this._getJungleAnalysisSelection(puuid)
-
-    if (!selection || !selection.needsExpandedHistory || selection.usingExpandedHistory) {
-      return
-    }
-
-    this._log.info(
-      `Jungle details: expanding match history to ${this.settings.jungleAnalysisMatchHistoryLoadCount} for ${puuid}`
-    )
-
-    this._loadMatchHistory(puuid, {
-      params: {
-        ...selection.matchHistory.params,
-        count: this.settings.jungleAnalysisMatchHistoryLoadCount
-      },
-      apiSource: selection.matchHistory.source,
-      target: 'jungle-analysis'
-    })
-  }
-
-  /**
-   * 为打野玩家加载 game details（时间线数据）
-   */
-  private _loadJungleGameDetails(puuid: string) {
-    const selection = this._getJungleAnalysisSelection(puuid)
-
-    if (!selection) {
-      this._log.info(`Jungle details: no match history for ${puuid}`)
-      return
-    }
-
-    this._ensureJungleAnalysisMatchHistory(puuid)
-
-    this._log.info(
-      `Jungle details: ${selection.matchHistory.data.length} games in history for ${puuid}, source=${selection.matchHistory.source}`
-    )
-    this._log.info(
-      `Jungle details: ${selection.overallJungleGamesCount} overall jungle games, ${selection.currentChampionJungleGamesCount} current-champion jungle games for ${puuid}`
-    )
-
-    const toLoad = selection.selectedSummaries.map((summary) => summary.gameId)
-
-    if (toLoad.length === 0) return
-
-    this._log.info(`Loading ${toLoad.length} jungle game details for ${puuid}`)
-    this._loadGameDetails(toLoad, { apiSource: this.state.apiShouldUse })
-  }
-
-  /**
-   * 计算所有打野玩家的路径偏好分析
-   */
-  private _calcJungleAnalysis(): Record<string, JunglePathingAnalysis> {
-    const result: Record<string, JunglePathingAnalysis> = {}
-    const junglerPuuids = this._getJunglerPuuids()
-
-    for (const puuid of junglerPuuids) {
-      const selection = this._getJungleAnalysisSelection(puuid)
-      if (!selection) continue
-
-      const selectedGameIds = new Set(selection.selectedSummaries.map((summary) => summary.gameId))
-      const relevantDetails = Object.values(this.state.gameDetails).filter((detail) =>
-        selectedGameIds.has(detail.gameId)
-      )
-
-      if (relevantDetails.length === 0) continue
-
-      const analysis = analyzeJunglePathing(
-        relevantDetails,
-        selection.selectedSummaries,
-        puuid,
-        selection.currentChampionId
-      )
-      if (analysis) {
-        result[puuid] = analysis
-      }
-    }
-
-    return result
-  }
-
-  private _shouldCalculateEasyGankTag() {
-    if (
-      this.state.queryStage.phase !== 'champ-select' &&
-      this.state.queryStage.phase !== 'in-game'
-    ) {
-      return false
-    }
-
-    const { gameMode, queueType } = this.state.queryStage.gameInfo
-
-    return gameMode === 'CLASSIC' && (queueType === 'NORMAL' || queueType.startsWith('RANKED_'))
-  }
-
-  private _getEasyGankEligibleGameIds(games: LcuOrSgpGameSummary[], puuid: string) {
-    return games
-      .filter((game) => {
-        const basicInfo = toBasicInfo(game)
-
-        return (
-          basicInfo.gameType === 'MATCHED_GAME' &&
-          basicInfo.mapId === 11 &&
-          basicInfo.gameMode === 'CLASSIC' &&
-          !this._isJunglerInSummary(game, puuid)
-        )
-      })
-      .map((game) => game.gameId)
-      .slice(0, this.settings.gameDetailsLoadCount)
-  }
-
-  private _loadEasyGankGameDetails(puuid: string) {
-    const matchHistory = this.state.matchHistory[puuid]
-
-    if (!matchHistory) {
-      return
-    }
-
-    const toLoad = this._getEasyGankEligibleGameIds(matchHistory.data, puuid)
-
-    if (!toLoad.length) {
-      return
-    }
-
-    this._log.info(`Loading ${toLoad.length} easy-gank game details for ${puuid}`)
-    this._loadGameDetails(toLoad, { apiSource: this.state.apiShouldUse })
-  }
-
-  private _handleCalculation() {
-    // 重新计算战绩信息
+  private _handleCalculateAnalysis() {
+    // 在所依赖的信息发生变化的时候，会立即重新评估分析
+    // 存在多个因素会导致分析结果发生变化
     this._mobx.reaction(
       () => ({
-        matchHistorySignatures: Object.entries(this.state.matchHistory)
+        // 玩家 + 战绩数据源 + 战绩 ID
+        summaryKeys: Object.entries(this.state.matchHistory)
           .map(
-            ([puuid, matchHistory]) =>
-              `${puuid}:${matchHistory.data.map((g) => g.gameId).join(',')}`
+            ([puuid, mh]) => `${puuid}:${mh.data.map((g) => `${g.source}:${g.gameId}`).join(',')}`
           )
-          .sort(),
-        teams: Object.values(this.state.teams).flat().sort(),
-        gameDetails: this._shouldCalculateEasyGankTag()
-          ? Object.values(this.state.gameDetails)
-              .map((detail) => `${detail.gameId}:${detail.source}`)
-              .sort()
-          : [],
-        shouldCalculateEasyGank: this._shouldCalculateEasyGankTag()
+          .toSorted(),
+
+        // 队伍标识符 + 队伍成员
+        teamKeys: Object.entries(this.state.teams)
+          .map(([teamIdentifier, puuids]) => `${teamIdentifier}:${puuids.join(',')}`)
+          .toSorted(),
+
+        // 详情数据源 + 详情 ID
+        detailsKeys: Object.values(this.state.gameDetails)
+          .map((detail) => `${detail.source}:${detail.gameId}`)
+          .toSorted()
       }),
       (_) => {
-        this.state.setPlayerStats(this._calcAnalysis())
-        this.state.setInferredPremadeTeams(this._calcPremade())
+        this.state.setAnalysis(this._computedAnalysis())
+        this.state.setInferredPremadeTeams(this._inferPremadeTeams())
       },
-      { delay: 200, equals: comparer.structural }
+      { delay: 300, equals: comparer.structural }
     )
 
     // 计算基于推测的组队信息
+    // 只有战绩 summary 的变化才会触发更新，因此条件松很多，只需要 gameId 的去重集合即可（数据源不影响）
     this._mobx.reaction(
       () => ({
-        matchHistory: Object.values(this.state.matchHistory),
+        // 只需要唯一标识的集合
+        summaryKeys: new Set(
+          Object.values(this.state.matchHistory)
+            .map((mh) => mh.data.map((g) => g.gameId))
+            .flat()
+        )
+          .values()
+          .toArray()
+          .toSorted(),
+
+        // 用户设置阈值会导致重计算
         threshold: this.settings.premadeTeamInferMatchCountThreshold
       }),
       (_changedV) => {
-        this.state.setInferredPremadeTeams(this._calcPremade())
+        this.state.setInferredPremadeTeams(this._inferPremadeTeams())
       },
-      { delay: 200, equals: comparer.shallow }
-    )
-
-    // 当 matchHistory 就绪且当前局适合显示时，为所有玩家加载 easy-gank 计算所需的 game details
-    this._mobx.reaction(
-      () => ({
-        shouldCalculateEasyGank: this._shouldCalculateEasyGankTag(),
-        matchHistorySignatures: Object.entries(this.state.matchHistory)
-          .map(([puuid, matchHistory]) => {
-            const gameIds = this._getEasyGankEligibleGameIds(matchHistory.data, puuid)
-            return `${puuid}:${gameIds.join(',')}`
-          })
-          .sort(),
-        apiSource: this.state.apiShouldUse
-      }),
-      ({ shouldCalculateEasyGank, matchHistorySignatures }) => {
-        if (!shouldCalculateEasyGank || matchHistorySignatures.length === 0) {
-          return
-        }
-
-        this._log.info(`Easy gank details reaction: ${matchHistorySignatures.length} players`)
-
-        for (const puuid of Object.keys(this.state.matchHistory)) {
-          this._loadEasyGankGameDetails(puuid)
-        }
-      },
-      { delay: 500, equals: comparer.structural }
-    )
-
-    // 当 matchHistory 就绪时，为打野玩家加载 game details
-    this._mobx.reaction(
-      () => ({
-        jungleDetailsSignatures: this._getJunglerPuuids()
-          .map((puuid) => {
-            const selection = this._getJungleAnalysisSelection(puuid)
-            const gameIds = selection?.selectedSummaries.map((summary) => summary.gameId) ?? []
-            return `${puuid}:${gameIds.join(',')}`
-          })
-          .sort(),
-        junglerPuuids: this._getJunglerPuuids().sort()
-      }),
-      ({ junglerPuuids, jungleDetailsSignatures }) => {
-        if (jungleDetailsSignatures.length === 0) return
-
-        this._log.info(
-          `Jungle details reaction: ${jungleDetailsSignatures.length} players, ` +
-            `${junglerPuuids.length} junglers: [${junglerPuuids.map((p) => p.substring(0, 8)).join(', ')}]`
-        )
-
-        for (const puuid of junglerPuuids) {
-          this._loadJungleGameDetails(puuid)
-        }
-      },
-      { delay: 500, equals: comparer.structural }
-    )
-
-    // 当 gameDetails 变化时，重新计算打野分析
-    this._mobx.reaction(
-      () => ({
-        detailKeys: Object.keys(this.state.gameDetails).sort(),
-        junglerPuuids: this._getJunglerPuuids().sort(),
-        jungleSummarySignatures: this._getJunglerPuuids()
-          .map((puuid) => {
-            const selection = this._getJungleAnalysisSelection(puuid)
-            const gameIds = selection?.selectedSummaries.map((summary) => summary.gameId) ?? []
-            return `${puuid}:${gameIds.join(',')}`
-          })
-          .sort()
-      }),
-      ({ detailKeys, junglerPuuids, jungleSummarySignatures }) => {
-        if (junglerPuuids.length === 0) return
-
-        this._log.info(
-          `Jungle analysis reaction: ${detailKeys.length} details loaded, ${jungleSummarySignatures.length} summary groups`
-        )
-        const analysis = this._calcJungleAnalysis()
-        const count = Object.keys(analysis).length
-        this._log.info(`Jungle analysis computed for ${count} players`)
-        this.state.setJungleAnalysis(analysis)
-      },
-      { delay: 300, equals: comparer.structural }
+      { delay: 300, equals: comparer.shallow }
     )
   }
 
@@ -1738,6 +1342,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     let reminded: string[] = []
 
     const itsTimeToSend = computed(() => {
+      if (this.state.draft) {
+        return null
+      }
+
       if (!this._lc.data.chat.conversations.championSelect) {
         return null
       }
@@ -1815,20 +1423,27 @@ export class OngoingGameMain implements IAkariShardInitDispose {
    */
   private _handleInformationCompletion() {
     this._mobx.reaction(
-      () => this.state.queryStage,
-      (_stage) => {
+      () => ({
+        queryStage: this.state.queryStage,
+        selfPuuid: this._lc.data.summoner.me?.puuid,
+        draft: this.state.draft
+      }),
+      () => {
         this._updateAdditionalInfo()
       },
-      { delay: 500, fireImmediately: true }
+      { delay: 300, equals: comparer.structural, fireImmediately: true }
     )
   }
 
   private _updateAdditionalInfo() {
     if (
+      this.state.draft ||
       !this.state.queryStage.gameInfo ||
       this.state.queryStage.phase !== 'in-game' ||
       !this._lc.data.summoner.me?.puuid
     ) {
+      this._queueKeeper.cancelByTags(['gsm-gameflow', 'spectator-gameflow'], 'or')
+      this.state.clearAdditional()
       return
     }
 
@@ -2034,7 +1649,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
 
     Promise.allSettled(tasks.map((t) => t())).then((results) => {
-      if (this.state.queryStage.phase !== 'in-game') {
+      if (this.state.draft || this.state.queryStage.phase !== 'in-game') {
         return
       }
 

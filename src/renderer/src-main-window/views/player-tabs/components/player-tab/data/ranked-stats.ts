@@ -21,8 +21,8 @@ import {
 } from 'vue'
 
 export type RankedStatsContext = {
-  rankedStats: Readonly<Ref<RankedStats | null>>
-  isLoading: Readonly<Ref<boolean>>
+  rankedStats: Ref<RankedStats | null>
+  isLoading: Ref<boolean>
   loadRankedStats: (options?: { silent?: boolean }) => Promise<void>
 }
 

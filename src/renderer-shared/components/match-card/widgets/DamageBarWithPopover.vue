@@ -13,7 +13,7 @@
         />
       </div>
     </template>
-    <div class="min-w-[204px] text-[11px]">
+    <div class="min-w-51 text-[11px]">
       <div class="flex items-center">
         <DamageBar
           :physical-damage="physicalDamage"

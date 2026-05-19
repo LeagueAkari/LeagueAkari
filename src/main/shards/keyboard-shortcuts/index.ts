@@ -1,18 +1,16 @@
 import type { KeyEvent } from '@leagueakari/league-akari-addons/dist/input'
 import { NATIVE_SUPPORT, nativeInput } from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import type {
+  KeyboardShortcutKeyState,
+  KeyboardShortcutsDebugState,
+  ShortcutDetails
+} from '@shared/types/shards/keyboard-shortcut'
+import { isStandardKeyboardKeyCode, isSupportedShortcutId } from '@shared/utils/keyboard-shortcuts'
 import EventEmitter from 'node:events'
 
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
-
-interface ShortcutDetails {
-  keyCodes: number[]
-  keys: { keyId: string; isModifier: boolean; keyCode: number }[]
-  id: string
-  unifiedId: string
-  pressed: boolean
-}
 
 /**
  * 管理员权限下, 处理全局范围的键盘快捷键的模块, 基于全局事件钩子
@@ -55,10 +53,17 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static readonly VK_CODE_F22 = 133
 
   static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
+  static DEBUG_STATEFUL_TEST_TARGET_ID = 'keyboard-shortcuts-main/debug-stateful-test'
   static DISABLED_KEYS = [
     133, // F22
     13 // Enter
   ]
+
+  private static readonly COMMON_MODIFIER_VARIANTS: Record<number, number[]> = {
+    16: [16, 160, 161],
+    17: [17, 162, 163],
+    18: [18, 164, 165]
+  }
 
   public readonly events = new EventEmitter<{
     /**
@@ -90,6 +95,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   >()
 
   private _targetIdMap = new Map<string, string>()
+
+  private _nativeKeyEventHandler: ((key: KeyEvent) => void) | null = null
 
   constructor(
     private readonly _ipc: AkariIpcMain,
@@ -126,6 +133,89 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     return { keyCodes, keys, id, unifiedId, pressed }
   }
 
+  private _buildShortcutDetailsOrNull(keyCodes: number[], pressed: boolean) {
+    return keyCodes.length ? this._buildShortcutDetails(keyCodes, pressed) : null
+  }
+
+  private _getSortedPressedKeyCodes() {
+    const modifiers = Array.from(this._pressedModifierKeys.values()).toSorted((a, b) => {
+      return (
+        KeyboardShortcutsMain.MODIFIER_READING_ORDER[a] -
+        KeyboardShortcutsMain.MODIFIER_READING_ORDER[b]
+      )
+    })
+
+    const otherKeys = Array.from(this._pressedOtherKeys.values()).toSorted((a, b) => a - b)
+    return [...modifiers, ...otherKeys]
+  }
+
+  private _hasPressedKeys() {
+    return this._pressedModifierKeys.size > 0 || this._pressedOtherKeys.size > 0
+  }
+
+  private _releaseActiveStatefulShortcut() {
+    if (!this._activeStatefulShortcut.length) {
+      return
+    }
+
+    const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
+    this.events.emit('stateful-shortcut-released', details)
+    const registration = this._registrationMap.get(details.id)
+    if (registration && registration.type === 'stateful') {
+      registration.cb(details)
+    }
+    this._activeStatefulShortcut = []
+  }
+
+  /**
+   * Reconcile lazily at real keyboard-event boundaries. This is intentionally not a periodic
+   * watchdog: unsupported virtual keys are filtered before entering the state machine, and stale
+   * state only needs cleanup before the next supported shortcut decision.
+   */
+  private _reconcilePressedStateFromNative() {
+    if (
+      !NATIVE_SUPPORT.nativeInput.available ||
+      !this._hasPressedKeys() ||
+      !nativeInput.instance.getKeyStates
+    ) {
+      return
+    }
+
+    let pressedNativeKeys: Set<number>
+    try {
+      pressedNativeKeys = new Set(
+        nativeInput.instance
+          .getKeyStates()
+          .filter((s) => s.pressed)
+          .map((s) => s.vkCode)
+      )
+    } catch (error) {
+      this._log.warn('Failed to reconcile native keyboard state', error)
+      return
+    }
+
+    for (const keyCode of this._pressedModifierKeys) {
+      if (!pressedNativeKeys.has(keyCode)) {
+        this._pressedModifierKeys.delete(keyCode)
+      }
+    }
+
+    for (const keyCode of this._pressedOtherKeys) {
+      if (!pressedNativeKeys.has(keyCode)) {
+        this._pressedOtherKeys.delete(keyCode)
+      }
+    }
+
+    if (
+      this._activeStatefulShortcut.length &&
+      this._activeStatefulShortcut.some((keyCode) => !pressedNativeKeys.has(keyCode))
+    ) {
+      this._releaseActiveStatefulShortcut()
+    }
+
+    this._emitLastActiveShortcutIfNeeded()
+  }
+
   // 当所有按键松开时，发送 last-active 快捷键信息
   private _emitLastActiveShortcutIfNeeded(): void {
     if (
@@ -147,6 +237,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   // 处理修饰键的按下和释放
   private _handleModifierKey(event: KeyEvent): void {
     if (this._pressedModifierKeys.has(event.keyCode) === event.isDown) {
+      if (!event.isDown && this._activeStatefulShortcut.includes(event.keyCode)) {
+        this._releaseActiveStatefulShortcut()
+      }
       return
     }
 
@@ -154,11 +247,40 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._pressedModifierKeys.add(event.keyCode)
     } else {
       this._pressedModifierKeys.delete(event.keyCode)
+      if (this._activeStatefulShortcut.includes(event.keyCode)) {
+        this._releaseActiveStatefulShortcut()
+      }
+    }
+  }
+
+  private _handleCommonModifierKey(event: KeyEvent): void {
+    if (event.isDown) {
+      return
+    }
+
+    const variants = KeyboardShortcutsMain.COMMON_MODIFIER_VARIANTS[event.keyCode] || [
+      event.keyCode
+    ]
+    let shouldReleaseStatefulShortcut = false
+
+    for (const keyCode of variants) {
+      this._pressedModifierKeys.delete(keyCode)
+      if (this._activeStatefulShortcut.includes(keyCode)) {
+        shouldReleaseStatefulShortcut = true
+      }
+    }
+
+    if (shouldReleaseStatefulShortcut) {
+      this._releaseActiveStatefulShortcut()
     }
   }
 
   // 处理非修饰键按下事件
   private _handleNonModifierKeyDown(keyCode: number): void {
+    if (this._pressedOtherKeys.has(keyCode)) {
+      return
+    }
+
     this._pressedOtherKeys.add(keyCode)
     const modifiers = Array.from(this._pressedModifierKeys.values())
     const sortedModifiers = modifiers.toSorted((a, b) => {
@@ -184,9 +306,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         // 如果 stateful 组合发生变化，则先触发之前的 released，再触发新的 pressed
         if (!this._areArraysEqual(this._activeStatefulShortcut, keyCodes)) {
           if (this._activeStatefulShortcut.length) {
-            const prevDetails = this._buildShortcutDetails(this._activeStatefulShortcut, false)
-            this.events.emit('stateful-shortcut-released', prevDetails)
-            registration.cb(prevDetails)
+            this._releaseActiveStatefulShortcut()
           }
           this._activeStatefulShortcut = keyCodes
           this.events.emit('stateful-shortcut-pressed', details)
@@ -207,23 +327,25 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._activeStatefulShortcut.length &&
       this._activeStatefulShortcut[this._activeStatefulShortcut.length - 1] === keyCode
     ) {
-      const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
-      this.events.emit('stateful-shortcut-released', details)
-      const registration = this._registrationMap.get(details.id)
-      if (registration && registration.type === 'stateful') {
-        registration.cb(details)
-      }
-      this._activeStatefulShortcut = []
+      this._releaseActiveStatefulShortcut()
     }
   }
 
   private _handleNativeKeyEvent(event: KeyEvent): void {
+    if (!isStandardKeyboardKeyCode(event.keyCode)) {
+      return
+    }
+
+    this._reconcilePressedStateFromNative()
+
     if (event.keyCode === 231) {
       return
     }
 
     // 如果是常见修饰键则不处理
     if (event.isCommonModifier) {
+      this._handleCommonModifierKey(event)
+      this._emitLastActiveShortcutIfNeeded()
       return
     }
 
@@ -244,9 +366,10 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   async onInit() {
     if (NATIVE_SUPPORT.nativeInput.available) {
       this._log.info('Listening for key events')
-      nativeInput.instance.on('keyEvent', (key) => {
+      this._nativeKeyEventHandler = (key) => {
         this._handleNativeKeyEvent(key)
-      })
+      }
+      nativeInput.instance.on('keyEvent', this._nativeKeyEventHandler)
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
@@ -255,6 +378,18 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       const { cb, ...rest } = r
       return rest
     })
+
+    this._ipc.onCall(KeyboardShortcutsMain.id, 'getDebugState', () => {
+      return this.getDebugState()
+    })
+
+    this._ipc.onCall(
+      KeyboardShortcutsMain.id,
+      'setDebugStatefulShortcut',
+      (_, shortcutId: string | null) => {
+        return this.setDebugStatefulShortcut(shortcutId)
+      }
+    )
 
     this._ipc.onCall(
       KeyboardShortcutsMain.id,
@@ -290,16 +425,20 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       return
     }
 
+    if (!isSupportedShortcutId(shortcutId)) {
+      throw new Error(`Shortcut ${shortcutId} contains unsupported keys`)
+    }
+
+    const existingShortcutRegistration = this._registrationMap.get(shortcutId)
+    if (existingShortcutRegistration && existingShortcutRegistration.targetId !== targetId) {
+      throw new Error(
+        `Shortcut ${shortcutId} is already registered for target ${existingShortcutRegistration.targetId}`
+      )
+    }
+
     const originShortcut = this._targetIdMap.get(targetId)
-    if (originShortcut) {
-      const options = this._registrationMap.get(originShortcut)
-      if (options) {
-        if (options.targetId === targetId) {
-          this._registrationMap.delete(originShortcut)
-        } else {
-          throw new Error(`Shortcut with targetId ${targetId} already exists`)
-        }
-      }
+    if (originShortcut && originShortcut !== shortcutId) {
+      this._registrationMap.delete(originShortcut)
     }
 
     this._registrationMap.set(shortcutId, { type, targetId, shortcutId, cb })
@@ -330,10 +469,14 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   getRegistration(shortcutId: string) {
+    if (!NATIVE_SUPPORT.nativeInput.available) {
+      return null
+    }
+
     const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map(
       (k) => nativeInput.VKEY_MAP[k].keyId
     )
-    if (reservedKeyIds.some((k) => shortcutId.includes(k))) {
+    if (reservedKeyIds.some((k) => shortcutId.includes(k)) || !isSupportedShortcutId(shortcutId)) {
       return {
         type: 'normal',
         targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
@@ -360,7 +503,102 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     return null
   }
 
+  setDebugStatefulShortcut(shortcutId: string | null) {
+    this.unregisterByTargetId(KeyboardShortcutsMain.DEBUG_STATEFUL_TEST_TARGET_ID)
+
+    if (!shortcutId) {
+      return null
+    }
+
+    this.register(
+      KeyboardShortcutsMain.DEBUG_STATEFUL_TEST_TARGET_ID,
+      shortcutId,
+      'stateful',
+      () => {}
+    )
+
+    return {
+      type: 'stateful',
+      targetId: KeyboardShortcutsMain.DEBUG_STATEFUL_TEST_TARGET_ID,
+      shortcutId
+    }
+  }
+
+  getDebugState(): KeyboardShortcutsDebugState {
+    if (!NATIVE_SUPPORT.nativeInput.available) {
+      return {
+        available: false,
+        keyStates: [],
+        pressedOtherKeys: [],
+        pressedModifierKeys: [],
+        activeShortcut: null,
+        lastActiveShortcut: null,
+        activeStatefulShortcut: null
+      }
+    }
+
+    const nativeStatesByCode = new Map<number, { pressed: boolean; scanCode?: number }>()
+
+    try {
+      for (const state of nativeInput.instance.getKeyStates?.() ?? []) {
+        nativeStatesByCode.set(state.vkCode, {
+          pressed: state.pressed,
+          scanCode: state.scanCode
+        })
+      }
+    } catch {
+      // Keep the debug page usable from the shard's own event-driven state.
+    }
+
+    const keyStates: KeyboardShortcutKeyState[] = []
+
+    for (const [rawKeyCode, definition] of Object.entries(nativeInput.VKEY_MAP)) {
+      const keyCode = Number(rawKeyCode)
+
+      if (!Number.isFinite(keyCode) || !isStandardKeyboardKeyCode(keyCode)) {
+        continue
+      }
+
+      const nativeState = nativeStatesByCode.get(keyCode)
+      const state: KeyboardShortcutKeyState = {
+        keyCode,
+        keyId: definition.keyId,
+        unifiedKeyId: nativeInput.UNIFIED_KEY_ID[keyCode] || definition.keyId,
+        name: definition.name,
+        standardName: definition.standardName,
+        isModifier: nativeInput.isModifierKey(keyCode),
+        pressed:
+          nativeState?.pressed ||
+          this._pressedModifierKeys.has(keyCode) ||
+          this._pressedOtherKeys.has(keyCode) ||
+          false
+      }
+
+      if (nativeState?.scanCode !== undefined) {
+        state.scanCode = nativeState.scanCode
+      }
+
+      keyStates.push(state)
+    }
+
+    keyStates.sort((a, b) => a.keyCode - b.keyCode)
+
+    return {
+      available: true,
+      keyStates,
+      pressedOtherKeys: Array.from(this._pressedOtherKeys.values()).toSorted((a, b) => a - b),
+      pressedModifierKeys: Array.from(this._pressedModifierKeys.values()).toSorted((a, b) => a - b),
+      activeShortcut: this._buildShortcutDetailsOrNull(this._getSortedPressedKeyCodes(), true),
+      lastActiveShortcut: this._buildShortcutDetailsOrNull(this._lastActiveShortcut, false),
+      activeStatefulShortcut: this._buildShortcutDetailsOrNull(this._activeStatefulShortcut, true)
+    }
+  }
+
   async onDispose() {
+    if (this._nativeKeyEventHandler) {
+      nativeInput.instance.off('keyEvent', this._nativeKeyEventHandler)
+      this._nativeKeyEventHandler = null
+    }
     this.events.removeAllListeners()
     this._registrationMap.clear()
     this._targetIdMap.clear()

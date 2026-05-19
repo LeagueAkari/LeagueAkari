@@ -73,7 +73,7 @@
         :label="t('OngoingGameSettings.gameDetailsLoadCount.label')"
         :label-description="
           t('OngoingGameSettings.gameDetailsLoadCount.description', {
-            countV: ogs.settings.gameDetailsLoadCount
+            count: ogs.settings.gameDetailsLoadCount
           })
         "
         :label-width="400"
@@ -84,27 +84,6 @@
           :min="0"
           :value="ogs.settings.gameDetailsLoadCount"
           @update:value="(val) => og.setGameDetailsLoadCount(val || 0)"
-        />
-      </ControlItem>
-
-      <ControlItem
-        class="control-item-margin"
-        :label="t('OngoingGameSettings.jungleAnalysisMatchHistoryLoadCount.label')"
-        :label-description="
-          t('OngoingGameSettings.jungleAnalysisMatchHistoryLoadCount.description', {
-            countV: ogs.settings.jungleAnalysisMatchHistoryLoadCount
-          })
-        "
-        :label-width="400"
-      >
-        <NInputNumber
-          style="width: 100px"
-          size="small"
-          :min="50"
-          :max="100"
-          :step="5"
-          :value="ogs.settings.jungleAnalysisMatchHistoryLoadCount"
-          @update:value="(val) => og.setJungleAnalysisMatchHistoryLoadCount(val || 100)"
         />
       </ControlItem>
 
@@ -190,20 +169,6 @@
             t('OngoingGameSettings.showChampionUsage.options.mastery')
           }}</NRadio>
         </NRadioGroup>
-      </ControlItem>
-
-      <!-- show jungle pathing -->
-      <ControlItem
-        class="control-item-margin"
-        :label-width="400"
-        :label="t('OngoingGameSettings.showJunglePathing.label')"
-        :label-description="t('OngoingGameSettings.showJunglePathing.description')"
-      >
-        <NSwitch
-          size="small"
-          :value="ogs.settings.showJunglePathing"
-          @update:value="(val) => og.setShowJunglePathing(val)"
-        />
       </ControlItem>
 
       <!-- show match history item border -->

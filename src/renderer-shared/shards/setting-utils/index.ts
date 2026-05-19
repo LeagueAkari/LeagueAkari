@@ -23,6 +23,14 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     return (await this._ipc.call(MAIN_SHARD_NAMESPACE, 'get', namespace, key)) ?? defaultValue
   }
 
+  getByPrefix(namespace: string, keyPrefix: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getByPrefix', namespace, keyPrefix)
+  }
+
+  removeByPrefix(namespace: string, keyPrefix: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeByPrefix', namespace, keyPrefix)
+  }
+
   exportSettingsToJsonFile() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exportSettingsToJsonFile')
   }

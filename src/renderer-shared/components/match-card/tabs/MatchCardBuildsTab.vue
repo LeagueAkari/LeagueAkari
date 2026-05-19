@@ -1,143 +1,204 @@
 <template>
-  <NScrollbar x-scrollable class="max-h-142" v-if="details">
-    <!-- Players -->
-    <div
-      v-for="p of sortedParticipants"
-      :key="p.puuid"
-      class="rounded-lg bg-black/3 p-3 not-last:mb-2 dark:bg-white/3"
-    >
-      <!-- Player Header -->
-      <div class="mb-1 flex items-center gap-2 select-none">
-        <ChampionIcon
-          :champion-id="p.championId"
-          class="size-7! shrink-0 border-2 border-solid"
-          :style="{
-            borderColor: getTeamColor(p.teamIdentifier)
-          }"
-          round
-        />
-        <div class="min-w-0 truncate text-sm font-medium text-black dark:text-white">
-          <template v-if="hidePrivacy">
-            {{ lcs.gameData.championName(p.championId) }}
-          </template>
-          <template v-else> {{ p.gameName }} #{{ p.tagLine }} </template>
-        </div>
-        <div v-if="p.position && p.position.toLowerCase() !== 'invalid'" :class="tagTheme">
-          {{ position(p.position) }}
-        </div>
-
-        <!-- anvil -->
+  <div v-if="details" class="relative">
+    <NScrollbar ref="scrollbarRef" x-scrollable class="max-h-142">
+      <div ref="contentRef">
+        <!-- Players -->
         <div
-          v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
-          class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/80 dark:bg-white/10 dark:text-white"
+          v-for="p of sortedParticipants"
+          :key="p.puuid"
+          :data-builds-participant-id="p.participantId"
+          class="rounded-lg bg-black/3 p-3 pr-12 not-last:mb-2 dark:bg-white/3"
         >
-          {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
-        </div>
-      </div>
+          <!-- Player Header -->
+          <div class="mb-1 flex items-center gap-2 select-none">
+            <ChampionIcon
+              :champion-id="p.championId"
+              class="size-7! shrink-0 border-2 border-solid"
+              :style="{
+                borderColor: getTeamColor(p.teamIdentifier)
+              }"
+              round
+            />
+            <div class="min-w-0 truncate text-sm font-medium text-black dark:text-white">
+              {{ participantName(p) }}
+            </div>
+            <div v-if="p.position && p.position.toLowerCase() !== 'invalid'" :class="tagTheme">
+              {{ position(p.position) }}
+            </div>
 
-      <!-- divider -->
-      <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
-
-      <!-- Skills Section -->
-      <div class="mb-3">
-        <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
-          {{ t('MatchCard.buildsTab.skillBuild') }}
-        </div>
-        <div class="flex flex-wrap items-center gap-1">
-          <div
-            v-for="(sk, idx) of collected.skillLevelUpEvents[p.participantId]"
-            :key="idx"
-            class="relative"
-          >
+            <!-- anvil -->
             <div
-              v-if="sk.levelUpType === 'EVOLVE'"
-              class="relative flex size-6 cursor-default items-center justify-center rounded-full border border-solid border-rose-500 bg-rose-500/60 text-xs font-bold dark:border-rose-400/60 dark:bg-rose-400/60"
-              :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (${t('MatchCard.buildsTab.evolved')}) - ${formatMilliseconds(sk.timestamp)}`"
+              v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
+              class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/80 dark:bg-white/10 dark:text-white"
             >
-              {{
-                SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
-              }}
+              {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
+            </div>
+          </div>
+
+          <!-- divider -->
+          <div class="my-3 h-px bg-black/10 dark:bg-white/10"></div>
+
+          <!-- Skills Section -->
+          <div class="mb-3">
+            <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
+              {{ t('MatchCard.buildsTab.skillBuild') }}
+            </div>
+            <div class="flex flex-wrap items-center gap-1">
               <div
-                class="absolute -top-1 -right-1 flex size-3 items-center justify-center rounded-full border border-solid border-white bg-amber-400 text-black shadow-sm dark:border-neutral-900 dark:bg-amber-500"
+                v-for="(sk, idx) of collected.skillLevelUpEvents[p.participantId]"
+                :key="idx"
+                class="relative"
               >
-                <NIcon size="10"><ArrowUp /></NIcon>
-              </div>
-            </div>
-            <div
-              v-else
-              class="flex size-6 cursor-default items-center justify-center rounded text-xs font-bold"
-              :class="getClassBySkillSlot(sk.skillSlot)"
-              :title="`${sk.displayLevel} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
-            >
-              {{
-                SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] || 'U'
-              }}
-            </div>
+                <div
+                  v-if="sk.levelUpType === 'EVOLVE'"
+                  class="relative flex size-6 cursor-default items-center justify-center rounded-full border border-solid border-rose-500 bg-rose-500/60 text-xs font-bold dark:border-rose-400/60 dark:bg-rose-400/60"
+                  :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (${t('MatchCard.buildsTab.evolved')}) - ${formatMilliseconds(sk.timestamp)}`"
+                >
+                  {{
+                    SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] ||
+                    'U'
+                  }}
+                  <div
+                    class="absolute -top-1 -right-1 flex size-3 items-center justify-center rounded-full border border-solid border-white bg-amber-400 text-black shadow-sm dark:border-neutral-900 dark:bg-amber-500"
+                  >
+                    <NIcon size="10"><ArrowUp /></NIcon>
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="flex size-6 cursor-default items-center justify-center rounded text-xs font-bold"
+                  :class="getClassBySkillSlot(sk.skillSlot)"
+                  :title="`${sk.displayLevel} - ${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} - ${formatMilliseconds(sk.timestamp)}`"
+                >
+                  {{
+                    SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] ||
+                    'U'
+                  }}
+                </div>
 
-            <div
-              v-if="sk.displayLevel"
-              class="absolute -right-1 -bottom-1 z-1 min-w-3 rounded bg-black/60 py-0.5 text-center text-[8px] leading-none text-white"
-            >
-              {{ sk.displayLevel }}
+                <div
+                  v-if="sk.displayLevel"
+                  class="absolute -right-1 -bottom-1 z-1 min-w-3 rounded bg-black/60 py-0.5 text-center text-[8px] leading-none text-white"
+                >
+                  {{ sk.displayLevel }}
+                </div>
+              </div>
+
+              <!-- Empty state -->
+              <div
+                v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
+                class="py-1 text-xs text-black/30 italic dark:text-white/30"
+              >
+                {{ t('MatchCard.buildsTab.noSkillUpgrades') }}
+              </div>
             </div>
           </div>
 
-          <!-- Empty state -->
-          <div
-            v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
-            class="py-1 text-xs text-black/30 italic dark:text-white/30"
-          >
-            {{ t('MatchCard.buildsTab.noSkillUpgrades') }}
+          <!-- Items Section -->
+          <div>
+            <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
+              {{ t('MatchCard.buildsTab.itemPurchases') }}
+            </div>
+            <div class="flex flex-wrap items-start gap-1">
+              <div
+                v-for="(item, idx) of collected.itemPurchaseEvents[p.participantId]?.filter(
+                  (x) => x.type === 'ITEM_PURCHASED' || x.type === 'LEAGUE_AKARI_ITEM_SPACER'
+                )"
+                :key="idx"
+                class="flex flex-col items-center gap-0.5"
+              >
+                <template v-if="item.type === 'ITEM_PURCHASED'">
+                  <!-- Item icon -->
+                  <ItemDisplay :item-id="item.itemId" :size="28" />
+
+                  <!-- Timestamp -->
+                  <div class="text-[9px] whitespace-nowrap text-black/80 dark:text-white/50">
+                    {{ formatMilliseconds(item.timestamp) }}
+                  </div>
+                </template>
+
+                <div
+                  v-else-if="item.type === 'LEAGUE_AKARI_ITEM_SPACER'"
+                  class="flex size-8 w-7 items-center justify-center text-black/50 dark:text-white/30"
+                >
+                  →
+                </div>
+              </div>
+
+              <!-- Empty state -->
+              <div
+                v-if="
+                  !collected.itemPurchaseEvents[p.participantId]?.filter(
+                    (x) => x.type === 'ITEM_PURCHASED'
+                  ).length
+                "
+                class="py-1 text-xs text-black/30 italic dark:text-white/30"
+              >
+                {{ t('MatchCard.buildsTab.noItemPurchases') }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </NScrollbar>
 
-      <!-- Items Section -->
-      <div>
-        <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
-          {{ t('MatchCard.buildsTab.itemPurchases') }}
-        </div>
-        <div class="flex flex-wrap items-start gap-1">
-          <div
-            v-for="(item, idx) of collected.itemPurchaseEvents[p.participantId]?.filter(
-              (x) => x.type === 'ITEM_PURCHASED' || x.type === 'LEAGUE_AKARI_ITEM_SPACER'
-            )"
-            :key="idx"
-            class="flex flex-col items-center gap-0.5"
-          >
-            <template v-if="item.type === 'ITEM_PURCHASED'">
-              <!-- Item icon -->
-              <ItemDisplay :item-id="item.itemId" :size="28" />
+    <div
+      class="absolute top-2 right-2 z-10 box-border flex max-h-[calc(100%-1rem)] flex-col overflow-hidden rounded border border-black/10 bg-neutral-100/95 p-1 opacity-45 shadow-lg shadow-black/10 transition-[width,opacity] focus-within:opacity-100 hover:opacity-100 dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-black/30"
+      :class="isNavigatorExpanded ? 'w-40' : 'w-11'"
+    >
+      <NButton
+        class="mb-2! self-center"
+        circle
+        secondary
+        size="tiny"
+        :focusable="false"
+        @click="isNavigatorExpanded = !isNavigatorExpanded"
+      >
+        <template #icon>
+          <NIcon>
+            <ChevronRight20Regular v-if="isNavigatorExpanded" />
+            <ChevronLeft20Regular v-else />
+          </NIcon>
+        </template>
+      </NButton>
 
-              <!-- Timestamp -->
-              <div class="text-[9px] whitespace-nowrap text-black/80 dark:text-white/50">
-                {{ formatMilliseconds(item.timestamp) }}
-              </div>
-            </template>
-
-            <div
-              v-else-if="item.type === 'LEAGUE_AKARI_ITEM_SPACER'"
-              class="flex size-8 w-7 items-center justify-center text-black/50 dark:text-white/30"
+      <div
+        class="match-card-participant-navigator-list min-h-0 space-y-1 overflow-x-hidden overflow-y-auto"
+      >
+        <NTooltip
+          v-for="p of sortedParticipants"
+          :key="p.puuid"
+          placement="left"
+          :disabled="isNavigatorExpanded"
+        >
+          <template #trigger>
+            <button
+              type="button"
+              class="box-border flex h-7 w-full cursor-pointer items-center gap-2 rounded border-0 p-0 text-left text-black/80 transition-colors dark:text-white/80"
+              :class="[
+                isNavigatorExpanded ? 'justify-start px-1' : 'justify-center',
+                'bg-transparent hover:bg-black/8 dark:hover:bg-white/10'
+              ]"
+              @click="scrollToParticipant(p.participantId)"
             >
-              →
-            </div>
-          </div>
-
-          <!-- Empty state -->
-          <div
-            v-if="
-              !collected.itemPurchaseEvents[p.participantId]?.filter(
-                (x) => x.type === 'ITEM_PURCHASED'
-              ).length
-            "
-            class="py-1 text-xs text-black/30 italic dark:text-white/30"
-          >
-            {{ t('MatchCard.buildsTab.noItemPurchases') }}
-          </div>
-        </div>
+              <ChampionIcon
+                :champion-id="p.championId"
+                class="size-6! shrink-0 border-2 border-solid"
+                :style="{
+                  borderColor: getTeamColor(p.teamIdentifier)
+                }"
+                round
+              />
+              <span v-if="isNavigatorExpanded" class="min-w-0 flex-1 truncate text-xs">
+                {{ participantName(p) }}
+              </span>
+            </button>
+          </template>
+          {{ participantName(p) }}
+        </NTooltip>
       </div>
     </div>
-  </NScrollbar>
+  </div>
   <div
     v-else
     class="flex h-142 w-full items-center justify-center text-sm text-black/60 dark:text-white/60"
@@ -167,10 +228,11 @@ import {
   DetailedItemPurchasedEvent,
   DetailedSkillLevelUpEvent
 } from '@shared/types/sgp/match-history'
+import { ChevronLeft20Regular, ChevronRight20Regular } from '@vicons/fluent'
 import { ArrowUp } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NScrollbar, NSpin } from 'naive-ui'
-import { computed, watch } from 'vue'
+import { NButton, NIcon, NScrollbar, NSpin, NTooltip } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
 
 import { useMatchCard } from '../context'
 import { usePosition } from '../utils/text'
@@ -182,6 +244,9 @@ const { basicInfo, frames, participants, team, details, hidePrivacy, loadingDeta
 
 const lcs = useLeagueClientStore()
 const { t } = useTranslation()
+const scrollbarRef = ref<InstanceType<typeof NScrollbar> | null>(null)
+const contentRef = ref<HTMLElement | null>(null)
+const isNavigatorExpanded = ref(false)
 
 type LASpacerEvent = {
   type: 'LEAGUE_AKARI_ITEM_SPACER'
@@ -277,6 +342,33 @@ const collected = computed(() => {
 const position = usePosition()
 const tagTheme = useWinResultTagClass(() => team.value?.winResult)
 
+type Participant = (typeof participants.value)[number]
+
+const participantName = (participant: Participant) => {
+  if (hidePrivacy.value) {
+    return lcs.gameData.championName(participant.championId)
+  }
+
+  return participant.tagLine
+    ? `${participant.gameName} #${participant.tagLine}`
+    : participant.gameName
+}
+
+const scrollToParticipant = (participantId: number) => {
+  const target = contentRef.value?.querySelector<HTMLElement>(
+    `[data-builds-participant-id="${participantId}"]`
+  )
+
+  if (!target) {
+    return
+  }
+
+  scrollbarRef.value?.scrollTo({
+    top: Math.max(target.offsetTop - 8, 0),
+    behavior: 'smooth'
+  })
+}
+
 watch(
   [details, loadingDetails, () => basicInfo.value.gameId],
   ([d, l, g]) => {
@@ -287,3 +379,31 @@ watch(
   { immediate: true }
 )
 </script>
+
+<style scoped>
+.match-card-participant-navigator-list {
+  scrollbar-color: rgba(0, 0, 0, 0.24) transparent;
+  scrollbar-width: thin;
+}
+
+.match-card-participant-navigator-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.match-card-participant-navigator-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.24);
+}
+
+.match-card-participant-navigator-list::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+:global([data-theme='dark']) .match-card-participant-navigator-list {
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+}
+
+:global([data-theme='dark']) .match-card-participant-navigator-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.24);
+}
+</style>

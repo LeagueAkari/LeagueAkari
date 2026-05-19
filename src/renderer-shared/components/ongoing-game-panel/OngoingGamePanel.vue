@@ -1,6 +1,7 @@
 <template>
   <div
-    class="h-(--la-ongoing-game-height) w-(--la-ongoing-game-width)"
+    class="ongoing-game-panel h-(--la-ongoing-game-height) w-(--la-ongoing-game-width)"
+    :class="{ 'ongoing-game-panel--draft': isDraftMode }"
     :style="{
       '--la-ongoing-game-height': contentHeight + 'px',
       '--la-ongoing-game-width': contentWidth + 'px'
@@ -96,6 +97,8 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 
+const isDraftMode = computed(() => Boolean(ogs.draft))
+
 const isInIdleState = computed(() => ogs.queryStage.phase === 'unavailable')
 
 const mergedPremadeTeams = computed(() => {
@@ -114,7 +117,7 @@ const mergedPremadeTeams = computed(() => {
     premadeTeamIdMap: {}
   }
 
-  for (const [puuid, premadeId] of Object.entries(ogs.calculatedPremadeTeamMap)) {
+  for (const [puuid, premadeId] of Object.entries(ogs.mergedPremadeTeamMap)) {
     const groupId = PREMADE_TEAMS[premadeId - 1]
 
     if (playerMap.groups[groupId]) {
@@ -169,8 +172,8 @@ const sortedTeams = computed(() => {
         return teamA.localeCompare(teamB)
       }
 
-      const statsA = ogs.playerStats?.players[a]
-      const statsB = ogs.playerStats?.players[b]
+      const statsA = ogs.analysis?.players[a]
+      const statsB = ogs.analysis?.players[b]
 
       if (ogs.settings.orderPlayerBy === 'akari-score') {
         return (statsB?.akariScore.total || 0) - (statsA?.akariScore.total || 0)
@@ -245,3 +248,37 @@ provideOngoingGamePanel({
   }
 })
 </script>
+
+<style scoped>
+.ongoing-game-panel {
+  position: relative;
+  isolation: isolate;
+  --draft-grid-bg-color: color-mix(in oklch, black 4%, transparent);
+  --draft-grid-line-color: color-mix(in oklch, var(--la-color-text-themed) 20%, transparent);
+
+  [data-theme='dark'] & {
+    --draft-grid-bg-color: color-mix(in oklch, white 5%, transparent);
+    --draft-grid-line-color: color-mix(in oklch, var(--la-color-text-themed) 60%, transparent);
+  }
+}
+
+.ongoing-game-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background-color: var(--draft-grid-bg-color);
+  background-image:
+    linear-gradient(var(--draft-grid-line-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--draft-grid-line-color) 1px, transparent 1px);
+  background-position: center top;
+  background-size: 28px 28px;
+  transition: opacity 0.2s ease;
+}
+
+.ongoing-game-panel--draft::before {
+  opacity: 1;
+}
+</style>

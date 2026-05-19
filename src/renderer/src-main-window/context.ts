@@ -1,8 +1,8 @@
 import { InjectionKey, MaybeRefOrGetter, Ref, inject, provide, toRef } from 'vue'
 
 export type AppContext = {
-  contentWidth: Readonly<Ref<number>>
-  contentHeight: Readonly<Ref<number>>
+  contentWidth: Ref<number>
+  contentHeight: Ref<number>
 
   openSettingsModal: (tabName?: string) => void
 }

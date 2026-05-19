@@ -1,9 +1,6 @@
 <template>
-  <div class="relative w-full min-w-[700px]">
-    <MatchCardOverview
-      @toggle-expand="isExpanded = !isExpanded"
-      @filter-by-champion="(championId) => emits('filterByChampion', championId)"
-    />
+  <div class="relative w-full min-w-175 [contain-intrinsic-size:116px] [content-visibility:auto]">
+    <MatchCardOverview @toggle-expand="isExpanded = !isExpanded" />
 
     <KeepAlive>
       <MatchCardDetails v-if="!puuid || isExpanded" />
@@ -14,6 +11,7 @@
 <script lang="ts" setup>
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { onErrorCaptured } from 'vue'
 
 import MatchCardDetails from './MatchCardDetails.vue'
@@ -29,23 +27,16 @@ const {
   hidePrivacy = false,
   loadingDetails = false,
   replayState = null,
-  showJunglePathing = true,
-  junglePathingDataSource = null
+  canDryRunOngoingGame = false
 } = defineProps<{
   summary: LcuOrSgpGameSummary
   details?: LcuOrSgpGameDetails | null
   theme?: 'light' | 'dark'
   puuid?: string
   hidePrivacy?: boolean
-
   loadingDetails?: boolean
   replayState?: ReplayDownloadProgress
-  showJunglePathing?: boolean
-  junglePathingDataSource?: {
-    preferredSource: 'lcu' | 'sgp'
-    sgpServerId: string
-    isCrossRegion: boolean
-  } | null
+  canDryRunOngoingGame?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -53,7 +44,7 @@ const emits = defineEmits<{
   downloadReplay: [gameId: number]
   watchReplay: [gameId: number]
   navigateToSummonerByPuuid: [puuid: string, setCurrent?: boolean]
-  filterByChampion: [championId: number]
+  dryRunOngoingGame: [draft: DraftOptions]
 }>()
 
 const isExpanded = defineModel<boolean>('isExpanded', { required: false, default: false })
@@ -67,8 +58,7 @@ provideMatchCard({
   hidePrivacy: () => hidePrivacy,
   loadingDetails: () => loadingDetails,
   replayState: () => replayState,
-  showJunglePathing: () => showJunglePathing,
-  junglePathingDataSource: () => junglePathingDataSource,
+  canDryRunOngoingGame: () => canDryRunOngoingGame,
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
     emits('navigateToSummonerByPuuid', puuid, setCurrent)
@@ -81,6 +71,9 @@ provideMatchCard({
   },
   loadDetails: (gameId: number) => {
     emits('loadDetails', gameId)
+  },
+  dryRunOngoingGame: (draft) => {
+    emits('dryRunOngoingGame', draft)
   }
 })
 

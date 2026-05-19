@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-05-16-tencent-hn10",
+  "capturedDate": "2026-05-16",
+  "timezone": "Asia/Shanghai",
+  "environment": {
+    "server": "TENCENT_HN10",
+    "regionFamily": "tencent",
+    "note": "Captured from a logged-in Tencent League client. These fixtures cover Tencent-reachable LCU and SGP paths only."
+  },
+  "players": [
+    {
+      "gameName": "白月光",
+      "tagLine": "91368",
+      "puuid": "7508051a-17f9-59cb-9468-7ddfaf49d142",
+      "purpose": "SGP Arena samples, including queue 1700 and 1750"
+    },
+    {
+      "gameName": "Konata",
+      "tagLine": "31459",
+      "puuid": "e51ec234-db07-587a-95e9-771145a7b620",
+      "purpose": "LCU current summoner match-history and multi-queue samples"
+    }
+  ],
+  "sgp": {
+    "matchHistoryQuery": {
+      "path": "sgp/match-history-query",
+      "endpoint": "getMatchHistorySummaryByPlayerPuuid",
+      "fixtures": [
+        "all",
+        "ranked",
+        "normal",
+        "q_420",
+        "q_430",
+        "q_440",
+        "q_450",
+        "q_480",
+        "q_900",
+        "q_1700",
+        "q_1750",
+        "q_2300",
+        "q_2400",
+        "q_4210",
+        "q_4220",
+        "q_4240",
+        "q_4250",
+        "q_4260"
+      ],
+      "missingQueuesSearched": [490, 1900]
+    }
+  },
+  "lcu": {
+    "matchHistory": {
+      "path": "lcu/match-history",
+      "currentSummonerMatches": "current-summoner-matches.json",
+      "gameFixtures": [
+        "q_420",
+        "q_430",
+        "q_440",
+        "q_450",
+        "q_480",
+        "q_900",
+        "q_1700",
+        "q_1750",
+        "q_2300",
+        "q_2400",
+        "q_4210",
+        "q_4220",
+        "q_4240",
+        "q_4250",
+        "q_4260"
+      ],
+      "timelineFixtures": [
+        "q_420",
+        "q_430",
+        "q_440",
+        "q_450",
+        "q_480",
+        "q_900",
+        "q_1700",
+        "q_1750",
+        "q_2300",
+        "q_2400",
+        "q_4210",
+        "q_4220",
+        "q_4240",
+        "q_4250",
+        "q_4260"
+      ]
+    }
+  }
+}

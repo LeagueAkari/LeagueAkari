@@ -17,8 +17,8 @@ import {
 } from 'vue'
 
 export type SummonerProfileContext = {
-  profile: Readonly<Ref<SummonerProfile | null>>
-  isLoading: Readonly<Ref<boolean>>
+  profile: Ref<SummonerProfile | null>
+  isLoading: Ref<boolean>
   loadSummonerProfile: () => Promise<void>
 }
 

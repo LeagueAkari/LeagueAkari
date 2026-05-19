@@ -24,14 +24,14 @@ import {
   watch
 } from 'vue'
 
-import { UPDATE_SPECTATOR_DATA_INTERVAL } from '../constants'
+import { IS_SPECTATOR_FEATURE_ENABLED, UPDATE_SPECTATOR_DATA_INTERVAL } from '../constants'
 
 export type SpectatorContext = {
-  spectatorData: Readonly<Ref<SpectatorData | null>>
-  isLoading: Readonly<Ref<boolean>>
+  spectatorData: Ref<SpectatorData | null>
+  isLoading: Ref<boolean>
 
   /** API 是否被禁用（409 Conflict） */
-  isApiDisabled: Readonly<Ref<boolean>>
+  isApiDisabled: Ref<boolean>
 
   loadSpectatorData: () => Promise<void>
   launchSpectator: (byLcuApi: boolean) => Promise<void>
@@ -49,7 +49,7 @@ const disabledSpectatorServers = new Set<string>()
  *
  * 此特性仅支持 SGP 数据源，支持跨区查询
  *
- * 如果返回 409 Conflict，停止所有轮询，因为该 API 在某些服务器上被禁用
+ * Spectator API 已不再可用，因此该功能保留上下文与组件，但不再主动加载数据。
  */
 export function provideSpectator(props: {
   puuid: MaybeRefOrGetter<string>
@@ -79,6 +79,12 @@ export function provideSpectator(props: {
   })
 
   const loadSpectatorData = async () => {
+    if (!IS_SPECTATOR_FEATURE_ENABLED) {
+      spectatorData.value = null
+      isApiDisabled.value = true
+      return
+    }
+
     if (disabledSpectatorServers.has(sgpServerId.value)) {
       isApiDisabled.value = true
       return
@@ -134,11 +140,15 @@ export function provideSpectator(props: {
   }
 
   const { pause, resume } = useIntervalFn(loadSpectatorData, UPDATE_SPECTATOR_DATA_INTERVAL, {
-    immediate: true,
-    immediateCallback: true
+    immediate: IS_SPECTATOR_FEATURE_ENABLED,
+    immediateCallback: IS_SPECTATOR_FEATURE_ENABLED
   })
 
   const launchSpectator = async (byLcuApi: boolean) => {
+    if (!IS_SPECTATOR_FEATURE_ENABLED) {
+      return
+    }
+
     if (!spectatorData.value) {
       return
     }
@@ -185,6 +195,13 @@ export function provideSpectator(props: {
   watch(
     [puuid, sgpServerId],
     () => {
+      if (!IS_SPECTATOR_FEATURE_ENABLED) {
+        spectatorData.value = null
+        isApiDisabled.value = true
+        pause()
+        return
+      }
+
       // 重置状态
       spectatorData.value = null
       isApiDisabled.value = disabledSpectatorServers.has(sgpServerId.value)

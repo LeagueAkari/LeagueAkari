@@ -6,21 +6,19 @@ import { InjectionKey, MaybeRefOrGetter, Ref, computed, inject, provide, toRef }
 import { IQR_THRESHOLD } from './constants'
 
 export type OngoingGamePanelContext = {
-  contentWidth: Readonly<Ref<number>>
-  contentHeight: Readonly<Ref<number>>
+  contentWidth: Ref<number>
+  contentHeight: Ref<number>
 
-  columnsNeed: Readonly<Ref<number>>
-  linesPerTeam: Readonly<Ref<number>>
-  isTwoTeamsMode: Readonly<Ref<boolean>>
-  mergedPremadeTeams: Readonly<
-    Ref<{
+  columnsNeed: Ref<number>
+  linesPerTeam: Ref<number>
+  isTwoTeamsMode: Ref<boolean>
+  mergedPremadeTeams: Ref<{
       groups: Record<string, string[]>
       premadeTeamIdMap: Record<string, string>
     }>
-  >
 
   /** 低于或高于平均 KDA 的玩家 */
-  kdaOutliers: Readonly<Ref<Record<string, 'over' | 'below'>>>
+  kdaOutliers: Ref<Record<string, 'over' | 'below'>>
 
   navigateToSummonerByPuuid: (puuid: string) => void
   previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
@@ -57,11 +55,11 @@ export function provideOngoingGamePanel(props: {
   const ogs = useOngoingGameStore()
 
   const kdaOutliers = computed(() => {
-    if (!ogs.playerStats || Object.keys(ogs.playerStats.players).length < 5) {
+    if (!ogs.analysis || Object.keys(ogs.analysis.players).length < 5) {
       return {}
     }
 
-    const kdaList = Object.entries(ogs.playerStats.players).map(([puuid, p]) => ({
+    const kdaList = Object.entries(ogs.analysis.players).map(([puuid, p]) => ({
       puuid,
       kda: p.summary.avgKda
     }))

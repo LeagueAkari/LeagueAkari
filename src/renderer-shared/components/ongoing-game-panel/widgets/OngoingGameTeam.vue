@@ -38,7 +38,7 @@ import { computed } from 'vue'
 import { FIXED_CARD_WIDTH_PX_LITERAL } from '../constants'
 import { useOngoingGamePanel } from '../context'
 import { getTeamIndicatorColorClass } from '../utils/theme'
-import PlayerInfoCard from './PlayerInfoCard.vue'
+import PlayerInfoCard from './player-info-card/PlayerInfoCard.vue'
 import TeamTagsArea from './TeamTagsArea.vue'
 
 const { teamIdentifier, puuids = [] } = defineProps<{

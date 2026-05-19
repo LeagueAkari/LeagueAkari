@@ -27,7 +27,7 @@
                   secondary
                 >
                   <template v-if="selectedItems.length">{{
-                    t('FriendTools.deleteButtonC', { countV: selectedFriendCount })
+                    t('FriendTools.deleteButtonC', { count: selectedFriendCount })
                   }}</template>
                   <template v-else>
                     {{ t('FriendTools.deleteButton') }}
@@ -432,7 +432,7 @@ const deleteSelectedFriends = async () => {
       log.infoRenderer('comp:FriendTools', 'deleted', friendId)
     }
 
-    message.success(() => t('FriendTools.deleteSuccess', { countV: filtered.length }))
+    message.success(() => t('FriendTools.deleteSuccess', { count: filtered.length }))
   } catch (error: any) {
     message.warning(() => t('MissionClaimTool.refreshFailed', { reason: error.message }))
   } finally {

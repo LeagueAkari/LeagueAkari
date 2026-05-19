@@ -3,9 +3,9 @@
     <template #header>
       <span class="card-header-title">{{ t('title') }}</span>
     </template>
-    <div class="flex h-[600px] border border-black/10 dark:border-[#fff1]">
+    <div class="flex h-150 border border-black/10 dark:border-[#fff1]">
       <div
-        class="flex h-full w-[200px] shrink-0 flex-col border-r border-black/10 p-2 dark:border-[#fff1]"
+        class="flex h-full w-50 shrink-0 flex-col border-r border-black/10 p-2 dark:border-[#fff1]"
       >
         <NDropdown
           trigger="click"
@@ -625,7 +625,7 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
   dialogRef.value?.destroy()
   dialogRef.value = dialog.create({
     type: 'info',
-    title: 'Dry Run',
+    title: t('dryRun.label'),
     content: () =>
       h(
         NScrollbar,

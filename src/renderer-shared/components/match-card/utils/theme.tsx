@@ -26,7 +26,7 @@ export const playerColors = [
   '#64B5F6' // 浅蓝色
 ]
 
-export const skillKeyColors: Record<
+const skillKeyColors: Record<
   string,
   {
     light: string

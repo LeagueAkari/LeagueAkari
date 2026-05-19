@@ -14,9 +14,10 @@
         :theme="as.colorTheme"
         :loading-details="isLoadingDetails"
         :hide-privacy="hidePrivacy"
-        :show-jungle-pathing="showJunglePathing"
+        :can-dry-run-ongoing-game="canDryRunOngoingGame"
         is-expanded
         @navigate-to-summoner-by-puuid="emits('navigateToSummonerByPuuid', $event)"
+        @dry-run-ongoing-game="emits('dryRunOngoingGame', $event)"
         @load-details="loadDetails(summary?.source || 'lcu')"
       />
       <div
@@ -45,6 +46,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { NModal, NSpin } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
@@ -57,19 +59,20 @@ const {
   source,
   puuid,
   hidePrivacy = false,
-  showJunglePathing = true
+  canDryRunOngoingGame = false
 } = defineProps<{
   gameId: number
   source: 'sgp' | 'lcu'
   puuid?: string
   hidePrivacy?: boolean
-  showJunglePathing?: boolean
+  canDryRunOngoingGame?: boolean
   summary?: LcuOrSgpGameSummary // 如果提供了数据且和 gameId 一致，则优先使用 summary
   details?: LcuOrSgpGameDetails // 如果提供了数据且和 gameId 一致，则优先使用 details
 }>()
 
 const emits = defineEmits<{
   navigateToSummonerByPuuid: [puuid: string]
+  dryRunOngoingGame: [draft: DraftOptions]
 }>()
 
 const componentName = useComponentName()

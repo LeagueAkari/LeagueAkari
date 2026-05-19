@@ -44,6 +44,24 @@
           </template>
           {{ replayButtonTitle }}
         </NTooltip>
+
+        <NTooltip v-if="canDryRunOngoingGame">
+          <template #trigger>
+            <NButton
+              :theme-overrides="{
+                heightMedium: '32px',
+                paddingMedium: '0 8px'
+              }"
+              secondary
+              @click="dryRunOngoingGame"
+            >
+              <template #icon>
+                <NIcon><Games24Filled /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('MatchCard.dryRun.tooltip') }}
+        </NTooltip>
       </div>
     </div>
 
@@ -60,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Replay20Filled, Replay20Regular } from '@vicons/fluent'
+import { Games24Filled, Replay20Filled, Replay20Regular } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon } from 'naive-ui'
 import { NTooltip } from 'naive-ui'
@@ -76,8 +94,17 @@ import MatchCardTimelineTab from './tabs/timeline/MatchCardTimelineTab.vue'
 import { useCardBorderClass } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
-const { basicInfo, teams, participants, puuid, replayState, loadReplay, watchReplay } =
-  useMatchCard()
+const {
+  basicInfo,
+  teams,
+  participants,
+  puuid,
+  replayState,
+  canDryRunOngoingGame,
+  loadReplay,
+  watchReplay,
+  dryRunOngoingGame
+} = useMatchCard()
 const { t } = useTranslation()
 
 const selfStats = computed(() => {

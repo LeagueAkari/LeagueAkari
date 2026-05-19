@@ -1,3 +1,34 @@
+import {
+  ArrowReset20Regular,
+  Bot20Regular,
+  Branch20Regular,
+  BranchFork20Regular,
+  CheckmarkCircle20Regular,
+  DismissCircle20Regular,
+  DocumentQueue20Regular,
+  Flash20Regular,
+  Games20Regular,
+  Money20Regular,
+  Navigation20Regular,
+  NumberSymbol20Regular,
+  People20Regular,
+  PeopleAdd20Regular,
+  PeopleSwap20Regular,
+  PeopleTeam20Regular,
+  Person20Regular,
+  PersonTag20Regular,
+  Prohibited20Regular,
+  PuzzlePiece20Regular,
+  ShoppingBagTag20Regular,
+  Star20Regular,
+  Target20Regular,
+  Timer20Regular,
+  Trophy20Regular
+} from '@vicons/fluent'
+import { NIcon } from 'naive-ui'
+import { type DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
+import { type Component, h } from 'vue'
+
 import AndOr from './combinator-components/AndOr.vue'
 import AnyOrEvery from './combinator-components/AnyOrEvery.vue'
 import GameTypeCheck from './combinator-components/GameTypeCheck.vue'
@@ -184,6 +215,73 @@ export const COMBINATOR_FACTORY_MAP = {
   hasPlayer: createHasPlayerCombinator,
   isMatchedGame: createIsMatchedGameCombinator,
   isPveGame: createIsPveGameCombinator
+}
+
+type CombinatorKey = keyof typeof REQUIRE_SCOPE_MAP
+
+const COMBINATOR_ICON_MAP: Record<CombinatorKey, Component> = {
+  game: Games20Regular,
+  and: Branch20Regular,
+  or: BranchFork20Regular,
+  not: Prohibited20Regular,
+  isQueue: DocumentQueue20Regular,
+  isAbort: DismissCircle20Regular,
+  isRemake: ArrowReset20Regular,
+  hasAugment: PuzzlePiece20Regular,
+  enemies: PeopleSwap20Regular,
+  allies: PeopleTeam20Regular,
+  all: People20Regular,
+  player: Person20Regular,
+  hasPlayer: PersonTag20Regular,
+  anyone: Person20Regular,
+  everyone: People20Regular,
+  hasSpell: Flash20Regular,
+  isPosition: Navigation20Regular,
+  hasItem: ShoppingBagTag20Regular,
+  isChampion: Star20Regular,
+  durationBetween: Timer20Regular,
+  kdaBetween: NumberSymbol20Regular,
+  killsBetween: Target20Regular,
+  deathsBetween: DismissCircle20Regular,
+  assistsBetween: PeopleAdd20Regular,
+  goldBetween: Money20Regular,
+  isWin: Trophy20Regular,
+  isLoss: DismissCircle20Regular,
+  isMatchedGame: CheckmarkCircle20Regular,
+  isPveGame: Bot20Regular
+}
+
+const getCombinatorGroup = (combinator: CombinatorKey) => {
+  return Math.floor(COMBINATOR_ORDER_MAP[combinator] / 10)
+}
+
+export const createCombinatorDropdownOptions = (
+  combinators: CombinatorKey[],
+  t: (key: string) => string
+): DropdownMixedOption[] => {
+  const options: DropdownMixedOption[] = []
+  let lastGroup: number | null = null
+
+  for (const combinator of combinators) {
+    const group = getCombinatorGroup(combinator)
+
+    if (lastGroup !== null && group !== lastGroup) {
+      options.push({
+        type: 'divider',
+        key: `divider-${lastGroup}-${group}`
+      })
+    }
+
+    options.push({
+      label: t(`PlayerTab.filter.combinatorLabels.${combinator}`),
+      key: combinator,
+      icon: () => h(NIcon, null, { default: () => h(COMBINATOR_ICON_MAP[combinator]) })
+    })
+
+    lastGroup = group
+  }
+
+  return options
 }
 
 function buildAllowedCombinatorsMap(): Record<string, (keyof typeof REQUIRE_SCOPE_MAP)[]> {

@@ -1,4 +1,4 @@
-import { optimizer } from '@electron-toolkit/utils'
+import { optimizer, is } from '@electron-toolkit/utils'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { isElevated } from '@main/native'
@@ -173,6 +173,10 @@ export function isWindows11_22H2_OrHigher() {
 export function bootstrap() {
   // transparent window 的 show 和 hide 会引起奇妙闪烁, 添加这个属性以禁用窗口动画
   app.commandLine.appendSwitch('wm-window-animations-disabled')
+
+  if (is.dev) {
+    app.commandLine.appendSwitch('remote-debugging-port', '8944')
+  }
 
   // 基础设置
   const baseConfig = readBaseConfig()

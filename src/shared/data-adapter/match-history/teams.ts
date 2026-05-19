@@ -6,6 +6,13 @@ import { MatchBasicInfo } from './match-basic'
 import { MatchParticipant } from './participants'
 import { WinResult, computeWinResult } from './win-result'
 
+export type TeamIdentifier =
+  | 'TEAM-200' // 红色方
+  | 'TEAM-100' // 蓝色方
+  | `CHERRY-${number}` // 斗魂 N 个队伍
+  | 'TEAM-ALL' // 当无法区分队伍的时候使用此占位符
+  | 'LOBBY' // 当位于房间内，且尚未进入游戏中时，使用此占位符
+
 export type MatchTeamBan = {
   championId: number
   pickTurn: number
@@ -236,7 +243,7 @@ export function toTeams(
   )
 
   const allTeamStats: AggregateTeamStats = {
-    teamIdentifier: 'ALL',
+    teamIdentifier: 'TEAM-ALL',
     bans: Object.values(primitiveTeamInfoMap).flatMap((team) => team.bans),
     maxDamageDealtToChampions: Math.max(...teamStatsArr.map((t) => t.maxDamageDealtToChampions)),
     totalDamageDealtToChampions: teamStatsArr.reduce(

@@ -188,7 +188,7 @@ const preventFn = (event: KeyboardEvent) => {
 }
 
 const isOccupiedBy = shallowRef<{
-  type: 'last-active' | 'normal'
+  type: 'last-active' | 'normal' | 'stateful'
   targetId: string
 } | null>(null)
 

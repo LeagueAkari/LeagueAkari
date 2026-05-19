@@ -4,21 +4,27 @@
     v-if="augments && Object.keys(augments).length"
   >
     <NTabs v-model:value="augmentTab" size="small" :animated="false">
-      <template #suffix>
-        <div>
+      <NTabPane v-for="group of augments" :key="group.rarity" :name="group.rarity">
+        <template #tab>
+          <span class="text-xs font-bold">{{ group.rarityName }}</span>
+        </template>
+
+        <div class="my-2 flex items-center gap-2">
           <NCheckbox size="small" v-model:checked="showAdvancedStats">
             {{ t('OpggChampion.showAdvancedStats') }}
           </NCheckbox>
           <NCheckbox size="small" v-model:checked="isAugmentsExpanded">
             {{ t('OpggChampion.showAll') }}
           </NCheckbox>
+          <NSelect
+            v-model:value="augmentSort"
+            size="tiny"
+            :options="augmentSortOptions"
+            class="w-22!"
+            :consistent-menu-width="false"
+            :render-label="renderLabel"
+          />
         </div>
-      </template>
-
-      <NTabPane v-for="group of augments" :key="group.rarity" :name="group.rarity">
-        <template #tab>
-          <span class="text-xs font-bold">{{ group.rarityName }}</span>
-        </template>
 
         <div
           class="grid gap-x-6 gap-y-1"
@@ -76,16 +82,18 @@ import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.v
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OpggAramMayhemChampionAugmentItem } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
-import { NCheckbox, NTabPane, NTabs } from 'naive-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { NCheckbox, NIcon, NSelect, NTabPane, NTabs, SelectOption } from 'naive-ui'
+import { computed, h, ref, watchEffect } from 'vue'
 
 import { useOpgg } from '../context'
+import { ArrowSort16Filled } from '@vicons/fluent'
 
 const { champion, kiwiAugments } = useOpgg()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 
 const augmentTab = ref<AugmentTab | undefined>(undefined)
+const augmentSort = ref<AugmentSort>('default')
 
 const enum AugmentTab {
   All = '<akari:all>',
@@ -114,6 +122,46 @@ const TIER_COLOR = {
   6: 'bg-gray-500 text-white dark:bg-gray-500 dark:text-white'
 }
 
+type AugmentSort = 'default' | 'performance' | 'popular'
+type KiwiAugmentWithRarity = OpggAramMayhemChampionAugmentItem & {
+  rarity: string | null
+}
+
+const augmentSortOptions = computed(() => [
+  { label: t('OpggChampion.augmentSort.default'), value: 'default' },
+  { label: t('OpggChampion.augmentSort.performance'), value: 'performance' },
+  { label: t('OpggChampion.augmentSort.popular'), value: 'popular' }
+])
+
+const renderLabel = (option: SelectOption) => {
+  return h('div', { class: 'flex items-center' }, [
+    h(NIcon, {}, () => h(ArrowSort16Filled)),
+    h('span', { class: 'ml-1' }, option.label as string)
+  ])
+}
+
+const sortAugments = (items: KiwiAugmentWithRarity[]) => {
+  if (augmentSort.value === 'performance') {
+    return items.toSorted((a, b) => {
+      if (a.popular === 0 && b.popular !== 0) {
+        return 1
+      }
+
+      if (a.popular !== 0 && b.popular === 0) {
+        return -1
+      }
+
+      return b.performance - a.performance
+    })
+  }
+
+  if (augmentSort.value === 'popular') {
+    return items.toSorted((a, b) => b.popular - a.popular)
+  }
+
+  return items.toSorted((a, b) => a.tier - b.tier)
+}
+
 const isAugmentsExpanded = ref(false)
 const showAdvancedStats = ref(false)
 
@@ -129,26 +177,24 @@ const augments = computed(() => {
     }
   })
 
-  const sortedByTierOrPerformance = mappedByRarity.toSorted((a, b) => {
-    return a.tier - b.tier
-  })
+  const sortedAugments = sortAugments(mappedByRarity)
 
-  const kSilver = sortedByTierOrPerformance.filter((item) => item.rarity === 'kSilver')
-  const kGold = sortedByTierOrPerformance.filter((item) => item.rarity === 'kGold')
-  const kPrismatic = sortedByTierOrPerformance.filter((item) => item.rarity === 'kPrismatic')
+  const kSilver = sortAugments(mappedByRarity.filter((item) => item.rarity === 'kSilver'))
+  const kGold = sortAugments(mappedByRarity.filter((item) => item.rarity === 'kGold'))
+  const kPrismatic = sortAugments(mappedByRarity.filter((item) => item.rarity === 'kPrismatic'))
 
   const groups: {
     rarity: 'kSilver' | 'kGold' | 'kPrismatic' | '<akari:all>'
     rarityName: string
-    augments: OpggAramMayhemChampionAugmentItem[]
+    augments: KiwiAugmentWithRarity[]
   }[] = []
 
   // all
-  if (sortedByTierOrPerformance.length) {
+  if (sortedAugments.length) {
     groups.push({
       rarity: '<akari:all>',
       rarityName: t('OpggChampion.augmentAll'),
-      augments: sortedByTierOrPerformance
+      augments: sortedAugments
     })
   }
 

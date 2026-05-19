@@ -93,6 +93,10 @@ DeclarationModal:
 
     </div>
 
+Guide:
+  dismiss: 关闭
+  confirm: 确认
+
 FeatureGuide:
   previous: 上一条
   next: 下一条
@@ -156,8 +160,18 @@ MainWindowCloseConfirmModal:
   cancel: 取消
 
 OngoingGameTitle:
+  draftMode: 草稿模式
+  exitDraft: 退出草稿模式
   refresh: 刷新对局页面
   spectating: 观战中
+  settings:
+    title: 对局页面显示
+    orderPlayerBy:
+      label: 玩家排序
+    showJunglePathingForAllPlayers:
+      label: 展示非打野玩家的打野路径样本
+      description: 开启后，若非打野玩家的历史战绩中存在打野路径样本，也会展示该信息。
+    openOngoingGameSettings: 更多对局设置
   orderOptions:
     default: 楼层顺序
     position: 分路顺序
@@ -353,13 +367,6 @@ AppSettings:
 MatchHistorySettings:
   title: 战绩页面
 
-  filterMode:
-    label: 筛选模式
-    description: 选择战绩页面默认使用的筛选方式。简单筛选和高级筛选都会先按条件过滤，再补满页面数量
-    options:
-      simple: 简单筛选
-      advanced: 高级筛选
-
   refreshTabsAfterGameEnds:
     label: 更新页面战绩
     description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
@@ -410,11 +417,11 @@ OngoingGameSettings:
 
   gameDetailsLoadCount:
     label: 对局详情加载数量
-    description: 会额外加载前 {{countV}} 场对局的详细信息，用于分析战绩
+    description: 会额外加载前 {{count}} 场对局的详细信息，用于分析战绩
 
   jungleAnalysisMatchHistoryLoadCount:
     label: 打野分析拉取战绩数量
-    description: 打野分析在样本不足时会继续拉取战绩，最多到前 {{countV}} 场；其中同英雄需要 20 场、总体需要 50 场
+    description: 打野分析在样本不足时会继续拉取战绩，最多到前 {{count}} 场；其中同英雄需要 20 场、总体需要 50 场
 
   showRecentlyUsedChampions:
     label: 显示最近使用的英雄
@@ -811,9 +818,6 @@ AutoGameflow:
   autoMatchmakingWaitForInvitees:
     label: 等待邀请中成员
     description: 自动开启匹配将等待所有被邀请的玩家做出回应
-  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
-    label: 选人秒退后取消自动匹配
-    description: 在英雄选择阶段有人秒退并返回房间或重回匹配队列时，取消本次自动匹配
   autoMatchmakingRematchStrategy:
     label: 停止匹配策略
     description: 在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配
@@ -1102,6 +1106,10 @@ MatchCard:
     CHAMPION_KILL: 英雄击杀
     CHAMPION_SPECIAL_KILL: 特殊击杀
     BUILDING_KILL: 摧毁建筑
+    WARD_PLACED: 放置守卫
+    WARD_KILL: 摧毁守卫
+    DRAGON_SOUL_GIVEN: 获得龙魂
+    OBJECTIVE_BOUNTY_PRESTART: 战略点赏金即将开始
     TURRET_PLATE_DESTROYED: 防御塔镀层摧毁
 
   buildingType:
@@ -1170,6 +1178,9 @@ MatchCard:
     label: 回放
     downloading: 下载中 {{progress}}%
     checking: 检查中
+
+  dryRun:
+    tooltip: 对局分析模拟
 
   buildsTab:
     anvils: '{{count}} 锻'
@@ -1614,12 +1625,20 @@ MatchCard:
     playedChampSelectPosition: 选择的英雄位置
     hadAfkTeammate: 队友挂机
     highestChampionDamage: 最高英雄伤害
+    PlayerBehavior: 玩家行为
+    PlayerBehavior_IsHeroInCombat: 英雄处于战斗状态
     # Game State - 游戏状态
     gameEndedInEarlySurrender: 重开投降
+    gameEndedInIGNBSurrender: 游戏以客户端内投降结束
     gameEndedInSurrender: 游戏以投降结束
     causedEarlySurrender: 导致提前投降
+    causedGameEndFromIGNBSurrender: 发起客户端内投降结束
     earlySurrenderAccomplice: 提前投降同谋
     teamEarlySurrendered: 队伍提前投降
+    teamIGNBSurrendered: 队伍客户端内投降
+    wasPremadeWithIGNBGameEndCauser: 与客户端内投降发起者预组队
+    wasPremadeWithSevereTransgressor: 与严重违规者预组队
+    wasSevereTransgressor: 严重违规者
     # Boolean values
     'true': 是
     'false': 否
@@ -2117,21 +2136,23 @@ PlayerTab:
   tagPlayer: 标记玩家
   byCount: 按局数
   byTime: 按时间
+  queue: 队列
+  sgpQueueOnlyTooltip: 此特性仅限使用 SGP 数据源时可用
   filter:
     title: 筛选
     simpleTab: 简单筛选
     advancedTab: 高级筛选
     reset: 重置条件
-    subtitle: 先添加条件；只有需要括号逻辑时再添加分组
     resetAll: 重置所有条件
-    sameChampionApplied: '已按英雄筛选：{{champion}}'
-    samePositionApplied: '已按位置筛选：{{position}}'
     winLoss: 胜负
     all: 全部
     win: 胜利
     loss: 失败
     summoners: 涉及召唤师
     champions: 涉及英雄
+    searchResults: 搜索结果
+    pageSummoners: 页内召唤师
+    selectedSummoners: 已选择
     showPractice: 显示训练模式
     showIrregularGames: 显示重开局等
     addCondition: 添加条件
@@ -2216,6 +2237,29 @@ PlayerTab:
       matchConditions: 对局成员
       participantConditions: 玩家条件
       statConditions: 数值条件
+    descriptions:
+      isWin: 匹配胜利的玩家或成员组
+      isAbort: 匹配未正常结算的终止对局
+      isRemake: 匹配重开对局
+      isMatchedGame: 仅匹配由匹配系统创建的对局
+      isPveGame: 仅匹配人机或其他 PVE 队列
+    examples:
+      title: 快速示例
+      applyHint: 点击导入并替换当前高级筛选条件
+      cleanMatchSamples:
+        title: 只保留 {matched} 中 {duration} 以上的对局，并排除 {remake}、{abort} 和 {pve}
+        matched: 匹配对局
+        duration: 10 分钟
+        remake: 重开
+        abort: 终止
+        pve: PVE
+      strongSelfPerformance:
+        title: 查找自己 {kda}、{deaths}，且有 {contribution} 的正常对局
+        kda: KDA ≥ 4
+        deaths: 死亡 ≤ 4
+        contribution: 胜利或高贡献
+      kiwiJayceSlowAndSteady:
+        title: 在 {queue} 中，查找对方有 {champion} 且选用了 {augment} 的对局
     combinatorLabels:
       game: 对局
       and: 和
@@ -2247,6 +2291,7 @@ PlayerTab:
       isPosition: 位置
       hasItem: 拥有装备
     positionHint: 当前为 LCU 数据源时，位置由 lane/role 推断，仅供参考
+    positionUnsupportedHint: LCU API 不提供可靠的位置记录，请切换到 SGP API 后使用此条件
   itemPerPage: '{{count}} 项'
   timeRange:
     all: 全部时间
@@ -2268,6 +2313,26 @@ PlayerTab:
   noMatchHistory: 暂无战绩
   noFilteredMatchHistory: 暂无符合条件的战绩
   clearFilters: 清除筛选条件
+  collectMode:
+    collectedPageTitle: 收集结果页
+    collectedPageDescription: 当前页为收集模式结果，共收集到 {{count}} 场战绩
+    reloadNormalPage: 返回普通分页
+    collectingProgress: 正在收集中 ({{count}} / {{expected}})
+    stoppingProgress: 正在停止收集 ({{count}} / {{expected}})
+    roundProgress: 第 {{current}} / {{max}} 轮
+    stopCollect: 停止
+    tooltipDescription: 收集模式会按照设定的筛选条件，自动从初始页开始收集数页战绩数据，直到满足预期数量或达到最大拉取限制。
+    tooltipUseCase: 这个功能适合将那些散落在多个战绩页的对局，集中收集在一起。
+    openSettings: 以当前筛选条件开始收集
+    settingsTitle: 收集设置
+    countPerIterationLabel: 每个轮次加载的战绩数量
+    countPerIterationDescription: 收集流程将依次拉取战绩页面，此处指定每次拉取的战绩数量
+    expectedCountLabel: 目标收集数量
+    expectedCountDescription: 当符合条件的战绩达到指定数量时停止收集。避免过大值，因为可能导致性能问题
+    maxIterationLabel: 最大轮次
+    maxIterationDescription: 收集流程不会永远进行下去，当轮次达到指定数量时仍未收集到预期数量，收集流程将被停止
+    cancel: 取消
+    startCollect: 开始收集
   loading: 加载中...
 
   private:
@@ -2303,8 +2368,31 @@ PlayerTab:
     activeSession: 活跃时段胜负
     winShort: 胜
     lossShort: 负
-    winningStreak: '{{countV}} 连胜'
-    losingStreak: '{{countV}} 连败'
+    winningStreak: '{{count}} 连胜'
+    losingStreak: '{{count}} 连败'
+
+  championMastery:
+    title: 英雄点数
+    viewAll: 查看更多
+    modalTitle: 全部英雄点数
+    filteredChampions: '{{count}} / {{total}} 个英雄'
+    filterPlaceholder: 按英雄名、拼音或 ID 筛选
+    score: '总分 {{score}}'
+    level: '{{level}} 级'
+    levelLabel: 等级
+    points: '{{points}} 英雄点数'
+    pointsLabel: 英雄点数
+    highestGrade: '最高评分 {{grade}}'
+    highestGradeLabel: 最高评分
+    seasonMilestone: '本季里程碑 {{milestone}}'
+    seasonMilestoneLabel: 本季里程碑
+    lastPlayTime: '最近使用 {{time}}'
+    lastPlayTimeLabel: 最近使用
+    progress: '进度 {{since}} / +{{until}}'
+    tokensEarned: '{{count}} 枚代币'
+    noData: 暂无英雄点数数据
+    noFilterResult: 无匹配英雄
+    loadFailed: '加载英雄点数失败：{{reason}}'
 
   recentPlayers:
     teammatesTitle: 最近队友
@@ -2517,8 +2605,8 @@ DetailedGame:
   win: 胜利
   lose: 失败
   controlWard: 控制守卫
-  wardPlaced: 放置 {{countV}} 个，排除 {{cleared}} 个
-  csPerMinute: 每分钟 {{countV}} 个
+  wardPlaced: 放置 {{count}} 个，排除 {{cleared}} 个
+  csPerMinute: 每分钟 {{count}} 个
 
   header:
     kda: KDA
@@ -2540,7 +2628,8 @@ ItemDisplay:
 
 AugmentDisplay:
   bronze: 青铜阶
-  sliver: 白银阶
+  silver: 白银阶
+  eventChoice: 事件选择
   gold: 黄金阶
   prismatic: 棱彩阶
   rarity: '{{rarity}}'
@@ -2553,9 +2642,28 @@ JunglePathing:
   title: 打野偏好
   thisGame: 本局
   hero: 英雄
-  overall: 总体
+  overall: 全部
   currentChampion: 本英雄
   mapPref: 地图偏好
+  zoneWeight: 分区权重
+  zoneWeightShort: 权重
+  positionWeight: 位置权重
+  takedownWeight: 击杀参与权重
+  first14Minutes: 前 14 分钟
+  preferenceDecision: 偏好判定
+  singleZone: 单分区
+  firstClearDecision: 首清判定
+  oneMinutePosition: 1 分钟位置
+  level3Decision: 3 级抓判定
+  level4Decision: 4 级抓判定
+  threeMinuteFrame: 3 分钟帧
+  fourMinuteFrame: 4 分钟帧
+  championDamage: 英雄伤害
+  championDamageIncrease: 新增英雄伤害
+  takedownParticipation: 击杀参与
+  aggregation: 汇总方式
+  sampleScope: 样本范围
+  blueRedSide: 蓝色方 / 红色方
   ganks: Gank
   topsidePref: 偏上
   midPref: 偏中
@@ -2564,44 +2672,79 @@ JunglePathing:
   midBotPref: 偏中下
   balanced: 均衡
   balancedShort: 均衡
+  prefShort:
+    top: 偏上
+    mid: 偏中
+    bot: 偏下
+    topMid: 偏中上
+    midBot: 偏中下
+    balanced: 均衡
   firstClear: 首清
   topsideStart: '上开 {{pct}}%'
   botsideStart: '下开 {{pct}}%'
-  campRed: 红buff
-  campBlue: 蓝buff
+  campRed: 红 buff
+  campBlue: 蓝 buff
   campWolves: 三狼
   campRaptors: F6
-  campOwnStart: '常规开 {{pct}}%'
-  campStart: '{{camp}}开 {{pct}}%'
-  campInvadeStart: '入侵开 {{pct}}%'
+  campOwnStart: '常规开 {pct}'
+  campStart: '{{camp}} 开 {pct}'
+  campInvadeStart: '入侵开 {pct}'
+  campPopoverCampGames: '该营地 {count} 局'
+  campPopoverKindGames: '{{kind}}样本 {count} 局'
+  campPopoverSideGames: '{{side}}总样本 {count} 局'
   blueTeam: 蓝色方
   redTeam: 红色方
   earlyGank: 前期抓人
   firstClearOwnLegend: 常规开
   firstClearInvadeLegend: 入侵开
-  level3KillLegend: 3级击杀
-  level4KillLegend: 4级击杀
-  level3Gank: '3级抓 {{pct}}%'
-  level4Gank: '4级抓 {{pct}}%'
+  level3KillLegend: 3 级击杀
+  level4KillLegend: 4 级击杀
+  level3Gank: '3 级抓 {count} / {total} 局'
+  level4Gank: '4 级抓 {count} / {total} 局'
   objectives: 野怪目标
   firstDragonRate: '一龙率 {{pct}}%'
+  firstDragonRateLabel: 一龙率
   soloDragonRate: '小龙单刷率 {{pct}}%'
+  soloDragonRateLabel: 小龙单刷率
   dragons: '小龙 {{count}}'
   voidgrubs: '潮虫 {{count}}'
   heralds: '先锋 {{count}}'
   barons: '大龙 {{count}}'
   avgDragons: '场均小龙 {{count}}'
+  avgDragonsLabel: 场均小龙
   avgVoidgrubs: '场均潮虫 {{count}}'
+  avgVoidgrubsLabel: 场均潮虫
   avgHeralds: '场均先锋 {{count}}'
+  avgHeraldsLabel: 场均先锋
   avgBarons: '场均大龙 {{count}}'
+  avgBaronsLabel: 场均大龙
   firstTime: '首条 {{time}}'
-  noData: '—'
+  noData: 无样本
+  noDataShort: 无
+  noSideData: 该方无样本
+  noOwnStartData: 无常规开样本
+  noInvadeData: 无入侵开样本
+  noGankData: 无抓人样本
+  noLevel3GankData: 无 3 级抓样本
+  noLevel4GankData: 无 4 级抓样本
+  noCurrentChampion: 未选择英雄
+  noCurrentChampionData: 当前英雄暂无打野样本
   minuteLegend: 位置点
-  gankLegend: GANK 点
-  descriptionSingle: 基于该局时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
-  description2Single: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开）。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断。
-  description: 基于该玩家近期打野局的时间线数据分析。地图偏好使用 上/中/下 三分区加权（前14分钟每整分钟的位置权重1，击杀参与权重5）。
-  description2: 首清根据1分钟时打野的位置判断最近的野怪营地（可识别入侵开），按红蓝方分别统计。前期抓人根据3/4分钟帧的英雄伤害和击杀参与判断，并按红蓝方分别统计。
+  gankLegend: 击杀参与点
+  mapSemanticHint: 图例说明
+  mapSemanticDescription: 圆点表示前 14 分钟整分钟位置样本。叉号表示 14 分钟内击杀参与位置。小地图点位可能经过抽样，精确数值以分区权重为准。
+  algorithmSummaryZoneWeight: 分区权重用于衡量前 14 分钟上 / 中 / 下半区活动强度。
+  algorithmSummaryPathing: 首清与前期抓人按当前样本范围统计，并区分蓝色方 / 红色方。
+  loadedSamples: 已加载该玩家 {{details}}，其中 {{jungle}}。
+  loadedDetailedSamples: '{{count}} 场详细对局样本'
+  loadedJungleSamples: '{{count}} 场为打野对局'
+  algorithmDetails: 算法说明
+  algorithmDetailZoneWeight: '{zoneWeight} = Σ{positionWeight} + Σ{takedownWeight}。{positionWeight}：{first14Minutes}每个整分钟按打野所在上 / 中 / 下分区 {pointOne}。{takedownWeight}：14 分钟内每次击杀参与按击杀位置分区 {pointFive}。'
+  algorithmDetailPreference: '{preferenceDecision}：中 + 下权重占比 ≥ 70% 且上权重占比 ≤ 28% 判为 {midBot}。上 + 中权重占比 ≥ 70% 且下权重占比 ≤ 28% 判为 {topMid}。{singleZone}权重占比 ≥ 40% 且领先第二高分区 ≥ 8 个百分点，判为偏上 / 偏中 / 偏下。其余判为 {balanced}。'
+  algorithmDetailFirstClear: '{firstClearDecision}：取 {oneMinutePosition} 最近的野怪营地。若该营地位于对方半区，则计为 {invadeStart}。'
+  algorithmDetailLevel3Gank: '{level3Decision}：{threeMinuteFrame}补刀数（小兵 + 野怪）为 {csRange}，等级为 {level3}，且检测到 {championDamage}。无详细伤害数据时，用 3 分钟内{takedownParticipation}替代英雄伤害条件。'
+  algorithmDetailLevel4Gank: '{level4Decision}：{fourMinuteFrame}相较 3 分钟帧检测到{championDamageIncrease}，或 3-4 分钟内存在{takedownParticipation}。无详细伤害数据时，仅使用{takedownParticipation}判定。'
+  algorithmDetailAggregation: '{aggregation}：当前标签页限定{sampleScope}（当前英雄或全部）。首清与前期抓人按{blueRedSide}分别累计。'
   gamesUnit: 局
   copyAll: 复制分析
   copied: 已复制分析
@@ -2613,6 +2756,10 @@ JunglePathing:
   topShort: 上
   midShort: 中
   botShort: 下
+  zoneTiny:
+    top: 上
+    mid: 中
+    bot: 下
   gamesAnalyzed: '{{count}} 场'
 
 # 这个命名空间下的很多条目对应了拆分后的组件
@@ -2628,26 +2775,29 @@ PlayerInfoCard:
     recentlyPlayed: 近期偏好：
     selection: 位置选择：
 
-  cherryWinRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
-  winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
-  kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+  cherryWinRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
+  winRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
+  kdaPopover: 在近期 {{count}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
+  collectByChampion: 以当前英雄 ({{champion}}) 收集战绩
+  collectByPosition: 以当前位置 ({{position}}) 收集战绩
   sameChampionHistory: 英雄战绩
-  highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
+  highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{count}} 场的对局中，赢了 {{winCount}} 场
   teamDamageShare: 伤害 {{rate}}%
-  teamDamageSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%
+  teamDamageSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%
   teamDamageTakenShare: 承伤 {{rate}}%
-  teamDamageTakenSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍承伤占比为 {{rate}}%
+  teamDamageTakenSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍承伤占比为 {{rate}}%
   teamGoldShare: 经济 {{rate}}%
-  teamGoldSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
+  teamGoldSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
   damageGoldEfficiency: 伤转率 {{rate}}%
-  damageGoldEfficiencyPopover: 在最近的 {{countV}} 场对局中，该玩家的平均伤害转化率为 {{rate}}%
-  enemyMissingPings: 问号 {{countV}} 次
-  enemyMissingPingsPopover: 该玩家平均每局发送敌方消失信号 {{countV}} 次
-  visionScore: 视野分 {{countV}}
-  visionScorePopover: 该玩家平均每局视野得分 {{countV}} 分
+  damageGoldEfficiencyPopover: 在最近的 {{count}} 场对局中，该玩家的平均伤害转化率为 {{rate}}%
+  enemyMissingPings: 问号 {{count}} 次
+  enemyMissingPingsPopover: 该玩家平均每局发送敌方消失信号 {{count}} 次
+  visionScore: 视野分 {{count}}
+  visionScorePopover: 该玩家平均每局视野得分 {{count}} 分
   metPopover:
-    title: 最近在 {{date}} 遇到过该玩家，共遇到过 {{countV}} 次
+    title: 最近在 {{date}} 遇到过该玩家，共遇到过 {{count}} 次
+    titleNote: 仅显示最近 {{count}} 场对局
     gameId: 对局 ID
     inspectByGameId: 查看 {{gameId}}
     date: 对局日期
@@ -2661,26 +2811,25 @@ PlayerInfoCard:
       teammate: 友
       opponent: 敌
   privatePopover: 该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
-  winningStreakPopover: 截止到现在，该玩家 {{countV}} 连胜，很棒
-  losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
+  winningStreakPopover: 截止到现在，该玩家 {{count}} 连胜，很棒
+  losingStreakPopover: 截止到现在，该玩家 {{count}} 连败
   suspiciousFlashPosition: 闪现异位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
   hardGank: 难抓
   gankable: 可抓
   easyGank: 好抓
   veryEasyGank: 非常好抓
-  easyGankPopover: 在最近已分析的 {{countV}} 场召唤师峡谷对局中，该玩家 15 分钟前被敌方打野参与击杀的场均次数为 {{times}} 次
+  easyGankPopover: 在最近已分析的 {{count}} 场召唤师峡谷对局中，该玩家 15 分钟前被敌方打野参与击杀的场均次数为 {{times}} 次
   soloKills: '{{times}} 单杀'
-  soloKillsPopover: 在近期 {{countV}} 场游戏中，该玩家场均单杀 {{times}} 次
+  soloKillsPopover: 在近期 {{count}} 场游戏中，该玩家场均单杀 {{times}} 次
   akariLoved:
     outstanding: 优异
     extraordinary: 通天代
     outstandingPopover: 该玩家在近期对局中表现优异
     extraordinaryPopover: 该玩家的水平远远超过当前段位
   champion:
-    winRate: 近期 {{countV}} 场，胜率为 {{winRate}}%
-    level: '{{level}} 级'
-    masteryPoints: '{{points}} 成就点数'
+    recentStats: 近期战绩
+    winRate: 近期 {{count}} 场，胜率为 {{winRate}}%
   matchHistory:
     winResult:
       na: '-'
@@ -2697,8 +2846,8 @@ PlayerInfoCard:
   highWinRate: 极高胜率
   met: 遇到过
   private: 生涯隐藏
-  winningStreak: '{{countV}} 连胜'
-  losingStreak: '{{countV}} 连败'
+  winningStreak: '{{count}} 连胜'
+  losingStreak: '{{count}} 连败'
   unknown: 未知
 
   reloadMatchHistory: 重新加载
@@ -2737,8 +2886,8 @@ OpggWindowTitlebar:
   repositionToAlignLeagueClientUx: 贴附到客户端
 
 BenchChampionsMini:
-  reroll: '重随 (剩余: {{countV}})'
-  charity: '重随并立即取回 (剩余: {{countV}})'
+  reroll: '重随 (剩余: {{count}})'
+  charity: '重随并立即取回 (剩余: {{count}})'
   notInBenchMode: 当前不在随机模式中
   notInPhase: 未处于英雄选择过程中
   rerollFailed: 重随失败 {{reason}}
@@ -2809,11 +2958,8 @@ LoungeOperations:
   autoMatchmakingWaitForInvitees:
     label: 等待邀请中成员
 
-  cancelAutoMatchmakingAfterChampSelectReturnEnabled:
-    label: 秒退后取消自动匹配
-
 SkinSelectionMini:
-  skins: '{{countV}} 款皮肤可用'
+  skins: '{{count}} 款皮肤可用'
   button: 应用
   success: 应用皮肤成功
   failed: 应用皮肤失败
@@ -2842,9 +2988,8 @@ Lounge:
     searching: 匹配中
     searchIn: 匹配中 {{seconds}} s
     waitingForPenalty: 等待秒退计时器 {{seconds}} s
-    waitingForMembers: 自动匹配需达到 {{countV}} 人
+    waitingForMembers: 自动匹配需达到 {{count}} 人
     waitingForInvitees: 等待邀请中成员
-    cancelledAfterChampSelect: 选人有人秒退，已取消自动匹配
 
 Placeholder:
   inProgress: 游戏进行中
@@ -3003,6 +3148,10 @@ OpggChampion:
   augmentPrism: 棱彩阶
   augmentPerformance: 强度
   augmentPopular: 欢迎度
+  augmentSort:
+    default: 默认
+    performance: 强度
+    popular: 欢迎度
   showAdvancedStats: 显示进阶数据
   synergies: 搭配
   balance:
@@ -3102,7 +3251,7 @@ RewardClaimTool: &CommonClaimTool
 
   refreshButton: 刷新
   claimButton: 领取
-  claimButtonC: 领取 ({{countV}})
+  claimButtonC: 领取 ({{count}})
   cancelButton: 取消
 
   refreshSuccess: 已刷新
@@ -3123,17 +3272,17 @@ MissionClaimTool:
   hint: 提前完成任务可能会导致数据不同步，使用时请斟酌可能的风险。
 
 ClaimableItem:
-  untranslatedC: 未命名奖励组 ({{countV}})
+  untranslatedC: 未命名奖励组 ({{count}})
 
 FriendTools:
   title: 好友
   searchPlaceholder: 搜索好友名称或标签
 
-  deleteButtonC: 删除 ({{countV}})
+  deleteButtonC: 删除 ({{count}})
   deleteButton: 删除
   cancelButton: 取消
   refreshButton: 刷新
-  deleteSuccess: 删除了 {{countV}} 个好友
+  deleteSuccess: 删除了 {{count}} 个好友
   deletePopconfirm: 这将执行删除操作，且不可恢复
   refreshSuccess: 已刷新
   neverPlayed: 无对局数据
@@ -3162,7 +3311,7 @@ SummonerSpellsCdTimer:
   sendFailed: '发送失败：{{reason}}'
 
 BackgroundTasks:
-  taskTitle: 正在进行 ({{countV}})
+  taskTitle: 正在进行 ({{count}})
   emptyPlaceholder: 无后台任务
 
 TemplateEdit:

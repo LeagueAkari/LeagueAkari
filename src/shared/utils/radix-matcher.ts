@@ -118,7 +118,7 @@ export class RadixMatcher {
       }
     }
 
-    if ((i !== parts.length && node.type !== RadixMatcherNodeType.WILDCARD) || !node.data) {
+    if ((i !== parts.length && node.type !== RadixMatcherNodeType.WILDCARD) || node.data === null) {
       return undefined
     }
 
@@ -133,6 +133,9 @@ export class RadixMatcher {
     RadixMatcher.validateRoute(route)
 
     if (!this._maybeDynamicRoute(route)) {
+      if (this._staticRouteMap.has(route)) {
+        throw new Error(`route '${route}' already exists`)
+      }
       this._staticRouteMap.set(route, data)
       return
     }
@@ -154,33 +157,27 @@ export class RadixMatcher {
           node = newNode
         }
       } else if (type === RadixMatcherNodeType.PLACEHOLDER) {
-        let childNode: RadixMatcherNode | undefined
-        if (parts[i] === '*') {
-          childNode = node.placeholderNodes.get(`_${nextUnnamedPartCount}`)
-        } else {
-          childNode = node.placeholderNodes.get(parts[i].slice(1))
-        }
+        const key = parts[i] === '*' ? `_${nextUnnamedPartCount++}` : parts[i].slice(1)
+        let childNode = node.placeholderNodes.get(key)
+
         if (childNode) {
-          nextUnnamedPartCount++
           node = childNode
         } else {
           const newNode = new RadixMatcherNode(type, node)
-          if (parts[i] === '*') {
-            node.placeholderNodes.set(`_${nextUnnamedPartCount++}`, newNode)
-          } else {
-            node.placeholderNodes.set(parts[i].slice(1), newNode)
-          }
+          node.placeholderNodes.set(key, newNode)
           node = newNode
         }
       } else if (type === RadixMatcherNodeType.WILDCARD) {
-        const newNode = new RadixMatcherNode(type, node)
-        node.wildcardNode = newNode
-        node.data = data
-        node = newNode
+        let childNode = node.wildcardNode
+        if (!childNode) {
+          childNode = new RadixMatcherNode(type, node)
+          node.wildcardNode = childNode
+        }
+        node = childNode
       }
     }
 
-    if (node.data) {
+    if (node.data !== null) {
       throw new Error(`route '${route}' already exists`)
     }
 
@@ -271,10 +268,9 @@ export class RadixMatcher {
       return
     }
 
-    // 如果当前节点有通配符节点，并且还未处理完所有部分，则匹配剩余所有部分
-    if (node.wildcardNode && index < parts.length) {
+    const pushWildcardMatch = (wildcardNode: RadixMatcherNode) => {
       result.push({
-        data: node.data,
+        data: wildcardNode.data,
         params: {
           __: parts.slice(index).join('/'),
           ...Object.fromEntries(params)
@@ -282,11 +278,27 @@ export class RadixMatcher {
       })
     }
 
+    // 如果当前节点有通配符节点，并且还未处理完所有部分，则匹配剩余所有部分
+    if (!onlyOne && node.wildcardNode && node.wildcardNode.data !== null && index < parts.length) {
+      pushWildcardMatch(node.wildcardNode)
+    }
+
     // 如果已处理完所有部分，且当前节点存在数据，则收集匹配结果
     if (index === parts.length) {
-      if (node.data) {
+      if (node.data !== null) {
         result.push({
           data: node.data,
+          params: Object.fromEntries(params)
+        })
+      }
+
+      if (onlyOne && result.length > 0) {
+        return
+      }
+
+      if (node.wildcardNode && node.wildcardNode.data !== null) {
+        result.push({
+          data: node.wildcardNode.data,
           params: Object.fromEntries(params)
         })
       }
@@ -300,12 +312,24 @@ export class RadixMatcher {
       this._findDynamic(normalNode, parts, index + 1, result, params, onlyOne)
     }
 
+    if (onlyOne && result.length > 0) {
+      return
+    }
+
     if (node.placeholderNodes.size) {
       for (const [key, childNode] of node.placeholderNodes) {
         params.push([key, part])
         this._findDynamic(childNode, parts, index + 1, result, params, onlyOne)
         params.pop()
+
+        if (onlyOne && result.length > 0) {
+          return
+        }
       }
+    }
+
+    if (onlyOne && node.wildcardNode && node.wildcardNode.data !== null) {
+      pushWildcardMatch(node.wildcardNode)
     }
   }
 

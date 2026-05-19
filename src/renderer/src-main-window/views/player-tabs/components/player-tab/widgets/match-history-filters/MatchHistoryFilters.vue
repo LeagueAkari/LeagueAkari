@@ -2,28 +2,26 @@
   <div
     class="box-border flex size-full flex-col gap-3 rounded-lg border border-solid border-white/10 bg-neutral-100 p-3 dark:bg-neutral-900"
   >
-    <div
-      class="flex items-center justify-between gap-3 rounded-lg border border-solid border-black/8 bg-black/2 px-3 py-2 dark:border-white/10 dark:bg-white/3"
-    >
-      <div class="flex min-w-0 items-start gap-3">
-        <NIcon class="mt-0.5 text-base"><Filter20Regular /></NIcon>
-        <div class="min-w-0 flex-1">
-          <div class="text-base font-bold">{{ t('PlayerTab.filter.title') }}</div>
-          <div class="mt-1 text-xs text-black/55 dark:text-white/50">
-            {{ t('PlayerTab.filter.subtitle') }}
-          </div>
+    <div class="mb-2 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="flex min-w-0 items-center gap-2 text-base font-bold">
+          <NIcon class="shrink-0 text-base"><Filter20Regular /></NIcon>
+          <span class="truncate">{{ t('PlayerTab.filter.title') }}</span>
         </div>
+
+        <NRadioGroup v-model:value="activeMode" size="small" :disabled="!!collectState">
+          <NRadioButton value="simple">
+            {{ t('PlayerTab.filter.simpleTab') }}
+          </NRadioButton>
+          <NRadioButton value="advanced">
+            {{ t('PlayerTab.filter.advancedTab') }}
+          </NRadioButton>
+        </NRadioGroup>
       </div>
 
-      <!-- 测试例子 -->
-      <!-- 例子：筛选【海克斯大乱斗中，对方阵营有“杰斯”，且它的第一个海克斯为“一板一眼”但最终我方胜利】的对局 -->
-      <!-- 例子：筛选【我作为打野，在对局前十分钟内击杀了超过 10 个人，且总补刀数量超过 300 个】的对局 -->
-      <!-- 例子：筛选【海克斯大乱斗中，整局四个海克斯都是彩色或都是金色，且任何一名玩家有装备“心之钢”】的对局 -->
-
-      <!-- 条件构建器  -->
-      <div class="ml-auto flex items-center gap-4">
+      <div class="ml-auto flex shrink-0 items-center gap-3">
         <NButton
-          :disabled="!rootHasCombinator"
+          :disabled="!rootHasCombinator || !!collectState"
           tertiary
           size="tiny"
           type="warning"
@@ -35,47 +33,51 @@
           {{ t('PlayerTab.filter.resetAll') }}
         </NButton>
 
-        <TooltipWithIcon class="text-black/60 dark:text-white/60">
-          <template #tooltip>
-            <div class="max-w-60 space-y-2">
-              <div>
-                $收集模式会按照设定的筛选条件，自动从初始页开始收集数页战绩数据，直到满足预期数量或达到最大拉取限制为止。
-              </div>
-              <div>$这个功能适合将那些散落在多个战绩页的对局，集中收集在一起。</div>
-            </div>
+        <NTooltip>
+          <template #trigger>
+            <span>
+              <NButton
+                :disabled="!rootHasCombinator || !!collectState"
+                tertiary
+                size="tiny"
+                type="primary"
+                @click="handleOpenCollectModeSettingsModal"
+              >
+                <span class="inline-flex items-center gap-1">
+                  <span>{{ t('PlayerTab.collectMode.openSettings') }}</span>
+                  <NIcon size="13" class="opacity-70"><Info16Regular /></NIcon>
+                </span>
+              </NButton>
+            </span>
           </template>
-
-          <NButton
-            :disabled="!rootHasCombinator"
-            tertiary
-            size="tiny"
-            type="primary"
-            @click="handleOpenCollectModeSettingsModal"
-          >
-            $以当前筛选条件开始收集
-          </NButton>
-        </TooltipWithIcon>
+          <div class="max-w-60 space-y-2">
+            <div>
+              {{ t('PlayerTab.collectMode.tooltipDescription') }}
+            </div>
+            <div>{{ t('PlayerTab.collectMode.tooltipUseCase') }}</div>
+          </div>
+        </NTooltip>
       </div>
     </div>
 
     <div class="min-h-0 flex-1">
-      <NScrollbar>
-        <Game :nodeId="rootNode.id" />
-      </NScrollbar>
+      <SimpleMatchHistoryFilter v-if="activeMode === 'simple'" v-model="simpleFilterState" />
+      <AdvancedMatchHistoryFilter v-else v-model="advancedFilterState" />
     </div>
 
-    <!-- 设置项 -->
     <NModal v-model:show="showCollectModeSettingsModal">
       <div
         class="rounded-lg border border-solid border-white/10 bg-neutral-100 p-3 dark:bg-neutral-900"
       >
-        <div class="mb-3 text-base font-bold text-black dark:text-white">$收集设置</div>
+        <div class="mb-3 text-base font-bold text-black dark:text-white">
+          {{ t('PlayerTab.collectMode.settingsTitle') }}
+        </div>
 
         <div class="mb-3">
           <ControlItem
             class="control-item-margin"
-            label="$每个轮次加载的战绩数量"
-            label-description="$收集流程将依次拉取战绩页面，此处指定每次拉取的战绩数量"
+            :label="t('PlayerTab.collectMode.countPerIterationLabel')"
+            :label-description="t('PlayerTab.collectMode.countPerIterationDescription')"
             :label-width="400"
           >
             <NInputNumber
@@ -89,8 +91,8 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="$目标收集数量"
-            label-description="$当符合条件的战绩达到指定数量时停止收集。避免过大值，因为可能导致性能问题"
+            :label="t('PlayerTab.collectMode.expectedCountLabel')"
+            :label-description="t('PlayerTab.collectMode.expectedCountDescription')"
             :label-width="400"
           >
             <NInputNumber
@@ -104,8 +106,8 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="$最大轮次"
-            label-description="$收集流程不会永远进行下去，当轮次达到达到指定数量时仍未收集到预期数量时，收集流程将被停止"
+            :label="t('PlayerTab.collectMode.maxIterationLabel')"
+            :label-description="t('PlayerTab.collectMode.maxIterationDescription')"
             :label-width="400"
           >
             <NInputNumber
@@ -120,10 +122,17 @@
         </div>
 
         <div class="flex justify-end gap-2">
-          <NButton size="small" tertiary @click="handleCloseCollectModeSettingsModal"
-            >$取消</NButton
+          <NButton size="small" tertiary @click="handleCloseCollectModeSettingsModal">
+            {{ t('PlayerTab.collectMode.cancel') }}
+          </NButton>
+          <NButton
+            type="primary"
+            size="small"
+            :disabled="isLoading || !!collectState"
+            @click="handleCollect"
           >
-          <NButton type="primary" size="small" @click="handleCollect">$开始收集</NButton>
+            {{ t('PlayerTab.collectMode.startCollect') }}
+          </NButton>
         </div>
       </div>
     </NModal>
@@ -132,16 +141,29 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
-import { Filter20Regular } from '@vicons/fluent'
+import { Filter20Regular, Info16Regular } from '@vicons/fluent'
 import { RefreshFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber, NModal, NScrollbar } from 'naive-ui'
-import { ref } from 'vue'
+import { NButton, NIcon, NInputNumber, NModal, NRadioButton, NRadioGroup, NTooltip } from 'naive-ui'
+import { computed, ref } from 'vue'
 
 import { useMatchHistory } from '../../data/match-history'
-import { useMatchHistoryFilters } from '../../data/match-history-filters'
-import Game from './combinator-components/Game.vue'
+import { usePlayerTab } from '../../context'
+import AdvancedMatchHistoryFilter from './AdvancedMatchHistoryFilter.vue'
+import SimpleMatchHistoryFilter from './SimpleMatchHistoryFilter.vue'
+import {
+  MatchHistoryFilterMode,
+  MatchHistoryFilterState,
+  SimpleMatchHistoryFilterState,
+  clearPredicate as clearStatePredicate,
+  clearSimplePredicate,
+  createEmptySimpleState,
+  createEmptyState,
+  hasPredicate,
+  hasSimplePredicate,
+  toFilterState,
+  toPredicate
+} from './filter-state'
 
 const emits = defineEmits<{
   collectBegin: []
@@ -149,32 +171,75 @@ const emits = defineEmits<{
 
 const { t } = useTranslation()
 
-const {
-  rootNode,
-  rootHasCombinator,
-  clearPredicate: clearFilters,
-  predicate
-} = useMatchHistoryFilters()
+const activeMode = defineModel<MatchHistoryFilterMode>('activeMode', {
+  default: 'simple'
+})
+const simpleFilterState = defineModel<SimpleMatchHistoryFilterState>('simpleFilterState', {
+  default: () => createEmptySimpleState()
+})
+const advancedFilterState = defineModel<MatchHistoryFilterState>('advancedFilterState', {
+  default: () => createEmptyState()
+})
 
-const { collectMatchHistory } = useMatchHistory()
+const { preferredSource, isCrossRegion, puuid, sgpServerId } = usePlayerTab()
+const isSgpMatchHistorySource = computed(
+  () => preferredSource.value === 'sgp' || isCrossRegion.value
+)
+
+const activeFilterState = computed(() =>
+  activeMode.value === 'simple'
+    ? toFilterState(simpleFilterState.value, puuid.value, {
+        enablePosition: isSgpMatchHistorySource.value
+      })
+    : advancedFilterState.value
+)
+
+const rootHasCombinator = computed(() =>
+  activeMode.value === 'simple'
+    ? hasSimplePredicate(simpleFilterState.value, {
+        enablePosition: isSgpMatchHistorySource.value
+      })
+    : hasPredicate(advancedFilterState.value)
+)
+
+const { page, collectMatchHistory, collectState, isLoading } = useMatchHistory()
 
 const collectModeSettings = ref({
   countPerIteration: 20,
-  expectedCount: 100,
-  maxIteration: 10
+  expectedCount: 20,
+  maxIteration: 20
 })
 
 const showCollectModeSettingsModal = ref(false)
 
+const clearFilters = () => {
+  if (activeMode.value === 'simple') {
+    simpleFilterState.value = clearSimplePredicate(simpleFilterState.value)
+  } else {
+    advancedFilterState.value = clearStatePredicate(advancedFilterState.value)
+  }
+}
+
 const handleCollect = () => {
+  if (isLoading.value || collectState.value) {
+    return
+  }
+
+  const collectPredicate = toPredicate(activeFilterState.value)
+
   collectMatchHistory({
-    predicate: predicate.value,
-    countPerIteration: 20,
-    expectedCount: 100,
-    maxIteration: 10,
-    queryParams: {}
+    predicate: collectPredicate,
+    countPerIteration: collectModeSettings.value.countPerIteration,
+    expectedCount: collectModeSettings.value.expectedCount,
+    maxIteration: collectModeSettings.value.maxIteration,
+    queryParams: {
+      __sgpServerId: sgpServerId.value,
+      tag: page.value?.queryParams.tag,
+      tagsQueryType: page.value?.queryParams.tagsQueryType
+    }
   })
 
+  clearFilters()
   showCollectModeSettingsModal.value = false
   emits('collectBegin')
 }

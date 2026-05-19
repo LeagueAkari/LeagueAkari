@@ -1,3 +1,4 @@
+import { is } from '@electron-toolkit/utils'
 import { i18next } from '@main/i18n'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
@@ -300,6 +301,35 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._log.info('instantiated shards', shards)
   }
 
+  private _evaluateMainProcess(code: string) {
+    if (!is.dev) {
+      this._log.warn('Blocked main-process evaluate outside dev mode')
+      return
+    }
+
+    this._log.warn('Evaluating code in main process')
+
+    try {
+      const fn = new Function(
+        'app',
+        'manager',
+        'shared',
+        'logger',
+        'process',
+        `"use strict";\nreturn (async () => {\n${code}\n})()`
+      )
+      const result = fn(app, this._shared.manager, this._shared, this._log, process)
+
+      if (result instanceof Promise) {
+        void result.catch((error) => {
+          this._log.error('Main-process evaluate failed', error)
+        })
+      }
+    } catch (error) {
+      this._log.error('Main-process evaluate failed', error)
+    }
+  }
+
   /**
    * execute code in certain renderer window
    * very dangerous, should be used only in some extreme cases. e.g opt-in bugfixes
@@ -308,6 +338,11 @@ export class AppCommonMain implements IAkariShardInitDispose {
    * @returns
    */
   evaluate(target: string, code: string) {
+    if (target === 'main') {
+      this._evaluateMainProcess(code)
+      return
+    }
+
     const wm = this._shared.manager.getInstance('window-manager-main')
 
     if (!wm) {

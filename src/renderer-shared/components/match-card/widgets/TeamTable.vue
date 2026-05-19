@@ -212,27 +212,6 @@
             class="flex items-center gap-1 text-[11px] text-black/60 dark:text-white/60"
           >
             <span>{{ position(participant.position) }}</span>
-            <JunglePathingInfo
-              v-if="
-                showJunglePathing &&
-                isJunglePosition(participant.position) &&
-                jungleAnalysisByPuuid[participant.puuid]
-              "
-              :analysis="jungleAnalysisByPuuid[participant.puuid]"
-              :current-game-side="currentTeamSide"
-              trigger-mode="text"
-              :trigger-text="t('JunglePathing.title')"
-              :show-copy-all="false"
-              :custom-tabs="buildJunglePathingTabs(participant)"
-              @tab-change="(tabKey) => handleJunglePathingTabChange(participant, tabKey)"
-            />
-            <span
-              v-else-if="showJunglePathing && isJunglePosition(participant.position)"
-              class="inline-flex cursor-default items-center rounded border border-emerald-600/35 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700 dark:border-emerald-300/40 dark:bg-emerald-400/15 dark:text-emerald-300"
-              @mouseenter="ensureJungleAnalysisReady"
-            >
-              {{ t('JunglePathing.title') }}
-            </span>
           </div>
         </div>
       </div>
@@ -319,34 +298,19 @@
 </template>
 
 <script setup lang="ts">
-import JunglePathingInfo from '@renderer-shared/components/ongoing-game-panel/widgets/JunglePathingInfo.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { useComponentName } from '@renderer-shared/composables/useComponentName'
-import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { SgpRenderer } from '@renderer-shared/shards/sgp'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import {
-  JunglePathingAnalysis,
-  analyzeJunglePathing,
-  filterJungleGames
-} from '@shared/data-adapter/analysis/jungle'
-import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { toParticipants } from '@shared/data-adapter/match-history/participants'
-import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed, markRaw, reactive, watchEffect } from 'vue'
+import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
 import Atakhan from '../icons/Atakhan.vue'
@@ -364,22 +328,6 @@ interface ColumnConfig {
   name: string
   class: string
 }
-
-type JunglePathingTabKey = 'game' | 'hero' | 'overall'
-
-interface LazyJunglePathingState {
-  loading: boolean
-  loaded: boolean
-  loadPromise: Promise<void> | null
-  summaries: LcuOrSgpGameSummary[]
-  details: Record<number, LcuOrSgpGameDetails>
-  overallAnalysis: JunglePathingAnalysis | null
-  heroAnalysisByChampionId: Record<number, JunglePathingAnalysis | null>
-}
-
-const JUNGLE_ANALYSIS_SUMMARY_MAX = 20
-const JUNGLE_ANALYSIS_DETAILS_MAX = 12
-const NO_CHAMPION_ID = -1
 
 const hasRoleBoundItems = computed(() => {
   return teamParticipants.value.some((p) => p.roleBoundItem)
@@ -450,39 +398,10 @@ const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
 
-const currentTeamSide = computed<'blue' | 'red' | null>(() => {
-  if (teamIdentifier === 'TEAM-100') {
-    return 'blue'
-  }
-
-  if (teamIdentifier === 'TEAM-200') {
-    return 'red'
-  }
-
-  return null
-})
-
-const {
-  basicInfo,
-  details,
-  loadingDetails,
-  loadDetails,
-  teams,
-  participants,
-  puuid,
-  summary,
-  showJunglePathing,
-  junglePathingDataSource,
-  hidePrivacy,
-  navigateToSummonerByPuuid
-} = useMatchCard()
+const { basicInfo, teams, participants, puuid, hidePrivacy, navigateToSummonerByPuuid } =
+  useMatchCard()
 
 const lcs = useLeagueClientStore()
-const sgps = useSgpStore()
-const componentName = useComponentName()
-const lc = useInstance(LeagueClientRenderer)
-const sgp = useInstance(SgpRenderer)
-const log = useInstance(LoggerRenderer)
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]
@@ -514,274 +433,6 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 const teamName = useTeamName()
 const gameResultName = useGameResultName()
 const position = usePosition()
-
-const isJunglePosition = (position: string) => {
-  const p = position.toUpperCase()
-  return p === 'JUNGLE' || p === 'JUG'
-}
-
-const ensureJungleAnalysisReady = () => {
-  if (!details.value && !loadingDetails.value) {
-    loadDetails(basicInfo.value.gameId)
-  }
-}
-
-const junglePathingSourceContext = computed(() => {
-  return {
-    preferredSource:
-      junglePathingDataSource.value?.preferredSource ||
-      (summary.value.source === 'sgp' ? 'sgp' : 'lcu'),
-    sgpServerId: junglePathingDataSource.value?.sgpServerId || sgps.availability.sgpServerId,
-    isCrossRegion: junglePathingDataSource.value?.isCrossRegion || false
-  }
-})
-
-const shouldUseSgpForJunglePathing = computed(() => {
-  const ctx = junglePathingSourceContext.value
-  return ctx.preferredSource === 'sgp' || ctx.isCrossRegion
-})
-
-const lazyJunglePathingByPuuid = reactive<Record<string, LazyJunglePathingState>>({})
-
-const createLazyJunglePathingState = (): LazyJunglePathingState => {
-  return {
-    loading: false,
-    loaded: false,
-    loadPromise: null,
-    summaries: [],
-    details: {},
-    overallAnalysis: null,
-    heroAnalysisByChampionId: {}
-  }
-}
-
-const getLazyJunglePathingState = (targetPuuid: string) => {
-  if (!lazyJunglePathingByPuuid[targetPuuid]) {
-    lazyJunglePathingByPuuid[targetPuuid] = createLazyJunglePathingState()
-  }
-
-  return lazyJunglePathingByPuuid[targetPuuid]
-}
-
-const findChampionIdByPuuid = (s: LcuOrSgpGameSummary, targetPuuid: string) => {
-  const participant = toParticipants(s, toBasicInfo(s)).find((p) => p.puuid === targetPuuid)
-  return participant?.championId
-}
-
-const fetchRecentMatchSummaries = async (targetPuuid: string): Promise<LcuOrSgpGameSummary[]> => {
-  if (shouldUseSgpForJunglePathing.value) {
-    const serverId = junglePathingSourceContext.value.sgpServerId
-    const isServerSupported = !!sgps.leagueServers.servers[serverId]?.matchHistory
-    if (!sgps.isTokenReady || !isServerSupported) {
-      return []
-    }
-
-    const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
-      targetPuuid,
-      {
-        startIndex: 0,
-        count: JUNGLE_ANALYSIS_SUMMARY_MAX,
-        __sgpServerId: serverId
-      }
-    )
-
-    return data.games
-      .filter((g) => g.json)
-      .map((g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary)
-  }
-
-  const { data } = await lc.api.matchHistory.getMatchHistory(
-    targetPuuid,
-    0,
-    JUNGLE_ANALYSIS_SUMMARY_MAX - 1
-  )
-
-  return data.games.games
-    .filter((g) => !!g && typeof g.gameId === 'number')
-    .map((g) => markRaw({ source: 'lcu', gameId: g.gameId, data: g }) as LcuOrSgpGameSummary)
-}
-
-const fetchMatchDetailByGameId = async (gameId: number): Promise<LcuOrSgpGameDetails | null> => {
-  try {
-    if (shouldUseSgpForJunglePathing.value) {
-      const { data } = await sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId, {
-        __sgpServerId: junglePathingSourceContext.value.sgpServerId
-      })
-
-      return markRaw({ source: 'sgp' as const, gameId, data })
-    }
-
-    const { data } = await lc.api.matchHistory.getTimeline(gameId)
-    return markRaw({ source: 'lcu' as const, gameId, data })
-  } catch (error) {
-    log.warn(componentName, error)
-    return null
-  }
-}
-
-const buildHeroAnalysisFromLazyState = (
-  state: LazyJunglePathingState,
-  targetPuuid: string,
-  championId: number
-) => {
-  if (state.heroAnalysisByChampionId[championId] !== undefined) {
-    return
-  }
-
-  const detailGameIdSet = new Set<number>(Object.keys(state.details).map((id) => Number(id)))
-  const detailSummaries = state.summaries.filter((s) => detailGameIdSet.has(s.gameId))
-  const heroSummaries = detailSummaries.filter(
-    (s) => findChampionIdByPuuid(s, targetPuuid) === championId
-  )
-  const heroDetails = heroSummaries
-    .map((s) => state.details[s.gameId])
-    .filter((d): d is LcuOrSgpGameDetails => !!d)
-
-  if (heroDetails.length === 0) {
-    state.heroAnalysisByChampionId[championId] = null
-    return
-  }
-
-  state.heroAnalysisByChampionId[championId] =
-    analyzeJunglePathing(heroDetails, heroSummaries, targetPuuid, championId) || null
-}
-
-const ensureExtendedJungleAnalysis = async (targetPuuid: string, championId?: number) => {
-  const state = getLazyJunglePathingState(targetPuuid)
-
-  if (!state.loaded) {
-    if (!state.loadPromise) {
-      state.loadPromise = (async () => {
-        state.loading = true
-
-        try {
-          const summaries = await fetchRecentMatchSummaries(targetPuuid)
-          const jungleGameIds = filterJungleGames(summaries, targetPuuid).slice(
-            0,
-            JUNGLE_ANALYSIS_DETAILS_MAX
-          )
-          const detailEntries = await Promise.all(
-            jungleGameIds.map(async (gameId) => {
-              return {
-                gameId,
-                detail: await fetchMatchDetailByGameId(gameId)
-              }
-            })
-          )
-
-          const details = detailEntries
-            .map((entry) => entry.detail)
-            .filter((d): d is LcuOrSgpGameDetails => !!d)
-          const detailsMap = detailEntries.reduce(
-            (acc, entry) => {
-              if (entry.detail) {
-                acc[entry.gameId] = entry.detail
-              }
-              return acc
-            },
-            {} as Record<number, LcuOrSgpGameDetails>
-          )
-          const detailGameIdSet = new Set(details.map((d) => d.gameId))
-          const detailSummaries = summaries.filter((s) => detailGameIdSet.has(s.gameId))
-
-          state.summaries = summaries
-          state.details = detailsMap
-          state.overallAnalysis =
-            details.length > 0
-              ? analyzeJunglePathing(details, detailSummaries, targetPuuid, NO_CHAMPION_ID)
-              : null
-          state.loaded = true
-        } catch (error) {
-          log.warn(componentName, error)
-        } finally {
-          state.loading = false
-          state.loadPromise = null
-        }
-      })()
-    }
-
-    await state.loadPromise
-  }
-
-  if (championId !== undefined && state.loaded) {
-    buildHeroAnalysisFromLazyState(state, targetPuuid, championId)
-  }
-}
-
-const jungleAnalysisByPuuid = computed<Record<string, JunglePathingAnalysis>>(() => {
-  const d = details.value
-  if (!d) {
-    return {}
-  }
-
-  const result: Record<string, JunglePathingAnalysis> = {}
-
-  for (const p of participants.value) {
-    if (!p.puuid || p.puuid === EMPTY_PUUID || !isJunglePosition(p.position || '')) {
-      continue
-    }
-
-    const analysis = analyzeJunglePathing([d], [summary.value], p.puuid, p.championId)
-
-    if (analysis) {
-      result[p.puuid] = analysis
-    }
-  }
-
-  return result
-})
-
-const buildJunglePathingTabs = (participant: (typeof participants.value)[number]) => {
-  const state = lazyJunglePathingByPuuid[participant.puuid]
-  const heroAnalysis = state?.heroAnalysisByChampionId[participant.championId]
-
-  return [
-    {
-      key: 'game' as JunglePathingTabKey,
-      label: t('JunglePathing.thisGame'),
-      analysis: jungleAnalysisByPuuid.value[participant.puuid] || null,
-      objectiveTextMode: 'single' as const
-    },
-    {
-      key: 'hero' as JunglePathingTabKey,
-      label: t('JunglePathing.hero'),
-      analysis: heroAnalysis === undefined ? null : heroAnalysis,
-      loading: !!state?.loading && heroAnalysis === undefined,
-      objectiveTextMode: 'average' as const
-    },
-    {
-      key: 'overall' as JunglePathingTabKey,
-      label: t('JunglePathing.overall'),
-      analysis: state?.overallAnalysis || null,
-      loading: !!state?.loading && !state?.overallAnalysis,
-      objectiveTextMode: 'average' as const
-    }
-  ]
-}
-
-const handleJunglePathingTabChange = (
-  participant: (typeof participants.value)[number],
-  tabKey: string
-) => {
-  if ((tabKey as JunglePathingTabKey) === 'game') {
-    return
-  }
-
-  if (!participant.puuid || participant.puuid === EMPTY_PUUID) {
-    return
-  }
-
-  void ensureExtendedJungleAnalysis(participant.puuid, participant.championId)
-}
-
-watchEffect(() => {
-  if (
-    showJunglePathing.value &&
-    participants.value.some((p) => isJunglePosition(p.position || ''))
-  ) {
-    ensureJungleAnalysisReady()
-  }
-})
 </script>
 
 <style scoped>

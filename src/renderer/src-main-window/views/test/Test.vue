@@ -15,7 +15,8 @@ import {
   ArrowSync24Filled,
   DataUsage24Filled,
   DocumentText24Filled,
-  Filter20Regular
+  Filter20Regular,
+  Keyboard24Regular
 } from '@vicons/fluent'
 import { computed } from 'vue'
 
@@ -25,6 +26,8 @@ import GameDataTest from './GameDataTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
 import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'
 import SelfUpdateTest from './SelfUpdateTest.vue'
+import GuideTest from './GuideTest.vue'
+import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 
 const tabs = computed<TabConfig[]>(() => [
   {
@@ -50,6 +53,18 @@ const tabs = computed<TabConfig[]>(() => [
     name: '新过滤器',
     icon: Filter20Regular,
     component: MatchHistoryFiltersTest
+  },
+  {
+    key: 'guide',
+    name: '引导系统',
+    icon: ToolFilled,
+    component: GuideTest
+  },
+  {
+    key: 'keyboard-shortcuts',
+    name: '快捷键系统',
+    icon: Keyboard24Regular,
+    component: KeyboardShortcutsTest
   }
 ])
 </script>

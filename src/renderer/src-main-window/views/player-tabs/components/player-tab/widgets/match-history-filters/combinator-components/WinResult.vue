@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="rounded border border-solid border-black/10 bg-black/2 px-4 py-2 dark:border-white/10 dark:bg-white/2"
-  >
+  <div class="rounded border border-solid border-black/10 px-4 py-2 dark:border-white/10">
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'isWin'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Trophy20Regular /></NIcon>
@@ -36,6 +34,9 @@
         >{{ t('PlayerTab.filter.surrenderLoss') }}</NCheckbox
       >
     </div>
+    <div v-else class="mt-2 text-xs text-black/50 dark:text-white/50">
+      {{ t(`PlayerTab.filter.descriptions.${node.type}`) }}
+    </div>
   </div>
 </template>
 
@@ -51,7 +52,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useMatchHistoryFilters } from '../../../data/match-history-filters'
+import { useMatchHistoryFilterEditor } from '../context'
 import {
   IsAbortCombinator,
   IsLossCombinator,
@@ -65,7 +66,7 @@ const { nodeId } = defineProps<{
   nodeId: string
 }>()
 
-const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilters()
+const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilterEditor()
 
 const node = computed(
   () =>

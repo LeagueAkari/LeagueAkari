@@ -20,7 +20,6 @@
             class="sticky top-2 z-10 mb-2 self-end"
           />
 
-          <JunglePathingPane class="mb-2" />
           <MatchHistoryList />
         </div>
 
@@ -36,7 +35,7 @@
               <NormalTagBlock />
               <SpectatorPane />
               <SummaryPane />
-              <JunglePathingPane />
+              <ChampionMasteryPane />
               <RecentlyPlayers side="ally" />
               <RecentlyPlayers side="enemy" />
               <PlayerChallenges />
@@ -73,8 +72,9 @@
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
       :hide-privacy="as.settings.streamerMode"
-      :show-jungle-pathing="pts.frontendSettings.showJunglePathing"
+      :can-dry-run-ongoing-game="canDryRunOngoingGame"
       @navigate-to-summoner-by-puuid="(puuid) => navigateToTabByPuuid(puuid)"
+      @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
 
     <!-- 这个组件不会生成 DOM，但用来保证全局状态同步 -->
@@ -89,11 +89,15 @@ import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { ArrowUp20Regular } from '@vicons/fluent'
 import { useElementVisibility, useTimeoutFn } from '@vueuse/core'
 import { NButton, NIcon, NScrollbar } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { useMainWindowAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
@@ -103,8 +107,8 @@ import GlobalStateTracker from './GlobalStateTracker'
 import { SMALL_SIZE_THRESHOLD } from './constants'
 import { providePlayerTab } from './context'
 import { useFreezeValue } from './utils/freeze'
+import ChampionMasteryPane from './widgets/ChampionMasteryPane.vue'
 import EncounteredGames from './widgets/EncounteredGames.vue'
-import JunglePathingPane from './widgets/JunglePathingPane.vue'
 import MatchHistoryList from './widgets/MatchHistoryList.vue'
 import MatchHistoryPagination from './widgets/MatchHistoryPagination.vue'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'
@@ -122,10 +126,13 @@ const { id, puuid, sgpServerId } = defineProps<{
 }>()
 
 const pt = useInstance(PlayerTabsRenderer)
+const og = useInstance(OngoingGameRenderer)
+const router = useRouter()
 
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
 const pts = usePlayerTabsStore()
+const sgps = useSgpStore()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
@@ -193,6 +200,18 @@ const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string
   }
 
   showPreviewModal.value = true
+}
+
+// The analysis draft relies on local-region data loaded by ongoing-game.
+const canDryRunOngoingGame = computed(() => sgpServerId === sgps.availability.sgpServerId)
+
+const handleDryRunOngoingGame = async (draft: DraftOptions) => {
+  if (!canDryRunOngoingGame.value) {
+    return
+  }
+
+  await og.setDraft(draft)
+  await router.replace({ name: 'ongoing-game' })
 }
 
 const scrollToTop = () => {

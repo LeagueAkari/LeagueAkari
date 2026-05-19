@@ -1,9 +1,9 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { DraftOptions, OngoingGameSimplifiedChampMastery } from '@shared/types/shards/ongoing-game'
 import { markRaw } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
@@ -41,16 +41,20 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'setMatchHistoryTagParams', value)
   }
 
+  setDraft(value: DraftOptions) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setDraft', value)
+  }
+
+  clearDraft() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'clearDraft')
+  }
+
   setMatchHistoryTagPreference(value: 'current' | 'all') {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
   setGameDetailsLoadCount(value: number) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
-  }
-
-  setJungleAnalysisMatchHistoryLoadCount(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'jungleAnalysisMatchHistoryLoadCount', value)
   }
 
   setOrderPlayerBy(
@@ -63,12 +67,12 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
   }
 
-  setShowJunglePathing(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showJunglePathing', value)
-  }
-
   setShowMatchHistoryItemBorder(value: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
+  }
+
+  setShowJunglePathingForAllPlayers(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showJunglePathingForAllPlayers', value)
   }
 
   setAutoRouteWhenGameStarts(value: boolean) {
@@ -100,7 +104,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       matchHistory: Record<string, MatchHistoryPlayer>
       summoner: Record<string, SummonerInfo>
       rankedStats: Record<string, RankedStats>
-      championMastery: Record<string, Record<number, Mastery>>
+      championMastery: Record<string, Record<number, OngoingGameSimplifiedChampMastery>>
       additionalGames: Record<number, any>
       savedInfo: any
     }>
@@ -129,7 +133,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.championMastery = {}
       store.savedInfo = {}
       store.cachedGames = {}
-      store.jungleAnalysis = {}
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {
