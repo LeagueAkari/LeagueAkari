@@ -41,7 +41,7 @@ export class LeagueClientRenderer {
   /** 这里只用于当作一个普通的静态事件分发器 */
   private readonly _emitter = new RadixEventEmitter()
 
-  public readonly _http = axios.create({
+  public readonly httpClient = axios.create({
     baseURL: 'akari://league-client',
     adapter: 'fetch',
     paramsSerializer: { indexes: null }
@@ -64,54 +64,58 @@ export class LeagueClientRenderer {
       lobbyTeamBuilder = true
     } = this._config?.subscribeState || {}
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'initialization', store.initialization)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'initialization', store.initialization)
 
     if (gameData) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)
     }
 
     if (honor) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'honor', store.honor)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'honor', store.honor)
     }
 
     if (champSelect) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'champSelect', store.champSelect)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'champSelect', store.champSelect)
     }
 
     if (chat) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'chat', store.chat)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'chat', store.chat)
     }
 
     if (matchmaking) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'matchmaking', store.matchmaking)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'matchmaking', store.matchmaking)
     }
 
     if (gameflow) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameflow', store.gameflow)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gameflow', store.gameflow)
     }
 
     if (lobby) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'lobby', store.lobby)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'lobby', store.lobby)
     }
 
     if (login) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'login', store.login)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'login', store.login)
     }
 
     if (summoner) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
+      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
     }
 
     if (lobbyTeamBuilder) {
-      await this._pm.sync(MAIN_SHARD_NAMESPACE, 'lobbyTeamBuilder', store.lobbyTeamBuilder)
+      await this._piniaMobxUtils.sync(
+        MAIN_SHARD_NAMESPACE,
+        'lobbyTeamBuilder',
+        store.lobbyTeamBuilder
+      )
     }
 
-    this._handleSubscribedLcuEventDispatch()
+    this._registerSubscribedLcuEventDispatch()
 
-    this._setup.addSetupFn(() => this._handleInitializationProgressShow())
+    this._setupInAppScope.addSetupFn(() => this._watchInitializationProgressShow())
 
     // @ts-ignore
     window.lcuApi = this.api
@@ -119,16 +123,16 @@ export class LeagueClientRenderer {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
     @Config() private _config?: LeagueClientRendererConfig
   ) {
-    axiosRetry(this._http, {
+    axiosRetry(this.httpClient, {
       retries: 2
     })
 
-    this.api = new LeagueClientHttpApiAxiosHelper(this._http)
+    this.api = new LeagueClientHttpApiAxiosHelper(this.httpClient)
   }
 
   private async _internalSubscribe(uri: string) {
@@ -142,7 +146,7 @@ export class LeagueClientRenderer {
     }
   }
 
-  private _handleSubscribedLcuEventDispatch() {
+  private _registerSubscribedLcuEventDispatch() {
     this._ipc.onEvent(
       MAIN_SHARD_NAMESPACE,
       'extra-lcu-event',
@@ -152,15 +156,15 @@ export class LeagueClientRenderer {
     )
   }
 
-  private _handleInitializationProgressShow() {
-    const lcStore = useLeagueClientStore()
+  private _watchInitializationProgressShow() {
+    const leagueClientStore = useLeagueClientStore()
     const taskStore = useBackgroundTasksStore()
     const { t } = useTranslation()
 
     const initTaskId = `${LeagueClientRenderer.id}/initialization`
 
     watch(
-      () => lcStore.initialization.progress,
+      () => leagueClientStore.initialization.progress,
       (progress) => {
         if (!progress) {
           taskStore.removeTask(initTaskId)
@@ -188,7 +192,7 @@ export class LeagueClientRenderer {
     const connectTaskId = `${LeagueClientRenderer.id}/connection`
 
     watch(
-      () => lcStore.connectingClient,
+      () => leagueClientStore.connectingClient,
       (client) => {
         if (!client) {
           taskStore.removeTask(connectTaskId)
@@ -252,7 +256,7 @@ export class LeagueClientRenderer {
   }
 
   setAutoConnect(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoConnect', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoConnect', enabled)
   }
 
   disconnect() {

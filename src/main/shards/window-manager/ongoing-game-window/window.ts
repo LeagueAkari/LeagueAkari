@@ -66,12 +66,12 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
     this.shortcutTargetId = `${this._namespace}/show`
   }
 
-  private _handleOngoingGameWindowLogics() {
+  private _watchOngoingGameWindow() {
     if (!this.settings.pinned) {
-      this._setting.set('pinned', true)
+      this._settingService.set('pinned', true)
     }
 
-    this._setting.onChange('pinned', (value: boolean) => {
+    this._settingService.onChange('pinned', (value: boolean) => {
       if (!value) {
         throw new AkariIpcError(
           'ongoing-game window must be topmost',
@@ -80,7 +80,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       }
     })
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit],
       ([enabled, finishedInit]) => {
         if (!finishedInit) {
@@ -100,7 +100,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.state.ready,
       (ready) => {
         if (!ready) {
@@ -114,7 +114,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.state.fakeShow,
       (fakeShow) => {
         if (fakeShow) {
@@ -126,11 +126,11 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       { fireImmediately: true }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
         if (!shortcut) {
-          this._log.debug('Unregister ongoing-game window shortcut')
+          this._logger.debug('Unregister ongoing-game window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
           return
         }
@@ -161,8 +161,8 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
             }
           )
         } catch {
-          this._log.warn('Failed to register ongoing-game window shortcut')
-          this._setting.set('showShortcut', null)
+          this._logger.warn('Failed to register ongoing-game window shortcut')
+          this._settingService.set('showShortcut', null)
         }
       },
       { fireImmediately: true }
@@ -176,7 +176,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
   override async onInit() {
     await super.onInit()
 
-    this._handleOngoingGameWindowLogics()
+    this._watchOngoingGameWindow()
   }
 
   protected override getSettingPropKeys() {

@@ -156,10 +156,10 @@ export class OngoingGameState {
     }
 
     return getLiveChampionSelections({
-      data: this._data,
+      data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._rc.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig
     })
   }
 
@@ -169,10 +169,10 @@ export class OngoingGameState {
     }
 
     return getLivePositionAssignments({
-      data: this._data,
+      data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._rc.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig
     })
   }
 
@@ -182,11 +182,11 @@ export class OngoingGameState {
     }
 
     return getLiveTeams({
-      data: this._data,
+      data: this._leagueClientData,
       settings: this._settings,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._rc.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig
     })
   }
 
@@ -196,16 +196,16 @@ export class OngoingGameState {
     }
 
     return getLiveQueryStage({
-      data: this._data,
+      data: this._leagueClientData,
       settings: this._settings
     })
   }
 
   get isInEog() {
     return (
-      this._data.gameflow.phase === 'WaitingForStats' ||
-      this._data.gameflow.phase === 'PreEndOfGame' ||
-      this._data.gameflow.phase === 'EndOfGame'
+      this._leagueClientData.gameflow.phase === 'WaitingForStats' ||
+      this._leagueClientData.gameflow.phase === 'PreEndOfGame' ||
+      this._leagueClientData.gameflow.phase === 'EndOfGame'
     )
   }
 
@@ -215,7 +215,7 @@ export class OngoingGameState {
     }
 
     return getLiveTeamParticipantGroups({
-      data: this._data,
+      data: this._leagueClientData,
       additional: this.additional
     })
   }
@@ -333,8 +333,8 @@ export class OngoingGameState {
 
   get apiShouldUse() {
     if (
-      this._app.settings.preferredLolSource === 'sgp' &&
-      this._sgp.state.availability.serversSupported.matchHistory
+      this._appCommon.settings.preferredLolSource === 'sgp' &&
+      this._sgpMain.state.availability.serversSupported.matchHistory
     ) {
       return 'sgp'
     }
@@ -365,11 +365,11 @@ export class OngoingGameState {
   }
 
   constructor(
-    private readonly _data: LeagueClientData,
-    private readonly _app: AppCommonMain,
-    private readonly _sgp: SgpMain,
+    private readonly _leagueClientData: LeagueClientData,
+    private readonly _appCommon: AppCommonMain,
+    private readonly _sgpMain: SgpMain,
     private readonly _settings: OngoingGameSettings,
-    private readonly _rc: RemoteConfigMain
+    private readonly _remoteConfig: RemoteConfigMain
   ) {
     makeAutoObservable(this, {
       matchHistory: observable.shallow,

@@ -5,7 +5,7 @@ import { Setting } from '../../storage/entities/Settings'
 
 export interface MigrationContext {
   manager: EntityManager
-  log: AkariLogger
+  logger: AkariLogger
 }
 
 export async function hasMigration(manager: EntityManager, key: string) {

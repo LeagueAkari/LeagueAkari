@@ -15,8 +15,8 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) readonly _setting: SettingUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) readonly _settingUtils: SettingUtilsRenderer
   ) {}
 
   setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
@@ -34,7 +34,7 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useAutoSelectStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 }

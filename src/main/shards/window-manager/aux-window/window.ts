@@ -50,7 +50,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
     })
   }
 
-  private _handleAuxWindowLogics() {
+  private _watchAuxWindow() {
     const showTiming = computed(() => {
       if (!this.settings.autoShow) {
         return 'ignore'
@@ -75,7 +75,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
     })
 
     // normally show & hide
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => showTiming.get(),
       (timing) => {
         if (timing === 'ignore') {
@@ -91,7 +91,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       { fireImmediately: true }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit] as const,
       ([enabled, finishedInit]) => {
         if (!finishedInit) {
@@ -107,7 +107,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this._leagueClient.state.connectionState,
       (state) => {
         if (state !== 'connected') {
@@ -117,12 +117,12 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
     )
 
     // 快速关闭会提供提示
-    this._setting._getFromStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY).then((tip) => {
+    this._settingService._getFromStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY).then((tip) => {
       if (!tip) {
         let _lastShow = -Infinity
         let inARow = 0
         let cb: Function | null = null
-        cb = this._mobx.reaction(
+        cb = this._mobxUtils.reaction(
           () => this.state.show,
           (show) => {
             if (show) {
@@ -141,7 +141,10 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
                   icon: icon
                 }).show()
 
-                this._setting._saveToStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY, true)
+                this._settingService._saveToStorage(
+                  AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY,
+                  true
+                )
                 cb?.()
               } else {
                 inARow = 0
@@ -162,7 +165,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   override async onInit() {
     await super.onInit()
 
-    this._handleAuxWindowLogics()
+    this._watchAuxWindow()
   }
 
   protected override getSettingPropKeys() {

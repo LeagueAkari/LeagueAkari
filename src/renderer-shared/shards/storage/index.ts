@@ -9,11 +9,13 @@ const MAIN_SHARD_NAMESPACE = 'storage-main'
 export class StorageRenderer implements IAkariShardInitDispose {
   static id = 'storage-renderer'
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useStorageStore()
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
   }
 
   async onDispose() {}

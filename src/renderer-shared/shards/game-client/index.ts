@@ -16,14 +16,14 @@ export class GameClientRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {}
 
   async onInit() {
     const store = useGameClientStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   launchSpectator(config: LaunchSpectatorConfig) {
@@ -31,11 +31,11 @@ export class GameClientRenderer implements IAkariShardInitDispose {
   }
 
   setTerminateGameClientWithShortcut(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateGameClientWithShortcut', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'terminateGameClientWithShortcut', value)
   }
 
   setTerminateShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateShortcut', shortcut)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'terminateShortcut', shortcut)
   }
 
   setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable') {

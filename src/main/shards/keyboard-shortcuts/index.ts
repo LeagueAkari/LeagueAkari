@@ -20,7 +20,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
   /** 除了修饰键之外的其他按键 */
   private readonly _pressedOtherKeys = new Set<number>()
@@ -102,7 +102,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain
   ) {
-    this._log = _loggerFactory.create(KeyboardShortcutsMain.id)
+    this._logger = _loggerFactory.create(KeyboardShortcutsMain.id)
   }
 
   // fast equal for two arrays (shallow)
@@ -190,7 +190,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
           .map((s) => s.vkCode)
       )
     } catch (error) {
-      this._log.warn('Failed to reconcile native keyboard state', error)
+      this._logger.warn('Failed to reconcile native keyboard state', error)
       return
     }
 
@@ -235,7 +235,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理修饰键的按下和释放
-  private _handleModifierKey(event: KeyEvent): void {
+  private _processModifierKey(event: KeyEvent): void {
     if (this._pressedModifierKeys.has(event.keyCode) === event.isDown) {
       if (!event.isDown && this._activeStatefulShortcut.includes(event.keyCode)) {
         this._releaseActiveStatefulShortcut()
@@ -253,7 +253,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _handleCommonModifierKey(event: KeyEvent): void {
+  private _processCommonModifierKey(event: KeyEvent): void {
     if (event.isDown) {
       return
     }
@@ -276,7 +276,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理非修饰键按下事件
-  private _handleNonModifierKeyDown(keyCode: number): void {
+  private _processNonModifierKeyDown(keyCode: number): void {
     if (this._pressedOtherKeys.has(keyCode)) {
       return
     }
@@ -320,7 +320,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理非修饰键释放事件
-  private _handleNonModifierKeyUp(keyCode: number): void {
+  private _processNonModifierKeyUp(keyCode: number): void {
     this._pressedOtherKeys.delete(keyCode)
     // 如果释放的键是当前 stateful 快捷键中的关键非修饰键，则发出 released 事件
     if (
@@ -331,7 +331,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _handleNativeKeyEvent(event: KeyEvent): void {
+  private _processNativeKeyEvent(event: KeyEvent): void {
     if (!isStandardKeyboardKeyCode(event.keyCode)) {
       return
     }
@@ -344,18 +344,18 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     // 如果是常见修饰键则不处理
     if (event.isCommonModifier) {
-      this._handleCommonModifierKey(event)
+      this._processCommonModifierKey(event)
       this._emitLastActiveShortcutIfNeeded()
       return
     }
 
     if (event.isModifier) {
-      this._handleModifierKey(event)
+      this._processModifierKey(event)
     } else {
       if (event.isDown) {
-        this._handleNonModifierKeyDown(event.keyCode)
+        this._processNonModifierKeyDown(event.keyCode)
       } else {
-        this._handleNonModifierKeyUp(event.keyCode)
+        this._processNonModifierKeyUp(event.keyCode)
       }
     }
 
@@ -365,9 +365,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onInit() {
     if (NATIVE_SUPPORT.nativeInput.available) {
-      this._log.info('Listening for key events')
+      this._logger.info('Listening for key events')
       this._nativeKeyEventHandler = (key) => {
-        this._handleNativeKeyEvent(key)
+        this._processNativeKeyEvent(key)
       }
       nativeInput.instance.on('keyEvent', this._nativeKeyEventHandler)
     }
@@ -419,7 +419,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     cb: (details: ShortcutDetails) => void
   ) {
     if (!NATIVE_SUPPORT.nativeInput.available) {
-      this._log.info(
+      this._logger.info(
         `Native global shortcuts are unavailable, ignoring shortcut registration: ${shortcutId} (${type})`
       )
       return
@@ -443,7 +443,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     this._registrationMap.set(shortcutId, { type, targetId, shortcutId, cb })
     this._targetIdMap.set(targetId, shortcutId)
-    this._log.info(`Register shortcut ${shortcutId} for target ${targetId} (${type})`)
+    this._logger.info(`Register shortcut ${shortcutId} for target ${targetId} (${type})`)
   }
 
   unregister(shortcutId: string) {
@@ -451,7 +451,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (options) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(options.targetId)
-      this._log.info(`Unregister shortcut ${shortcutId} for target ${options.targetId}`)
+      this._logger.info(`Unregister shortcut ${shortcutId} for target ${options.targetId}`)
       return true
     }
     return false
@@ -462,7 +462,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (shortcutId) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(targetId)
-      this._log.info(`Unregister shortcut ${shortcutId} for target ${targetId}`)
+      this._logger.info(`Unregister shortcut ${shortcutId} for target ${targetId}`)
       return true
     }
     return false

@@ -20,18 +20,18 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   async onInit() {
     const store = useRendererDebugStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
-    const savedRules = await this._setting.get(RendererDebugRenderer.id, 'savedRules')
+    const savedRules = await this._settingUtils.get(RendererDebugRenderer.id, 'savedRules')
 
     if (savedRules) {
       for (const rule of savedRules) {
@@ -48,7 +48,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
         () => store.rules.filter((r) => r.enabled).length,
         (length) => {
           if (length) {
-            this._log.info(RendererDebugRenderer.id, 'send all native lcu events')
+            this._logger.info(RendererDebugRenderer.id, 'send all native lcu events')
             this.setSendAllNativeLcuEvents(true)
           } else {
             this.setSendAllNativeLcuEvents(false)
@@ -62,7 +62,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
       watch(
         () => store.rules.map((r) => r.rule),
         (rules) => {
-          this._setting.set(RendererDebugRenderer.id, 'savedRules', rules)
+          this._settingUtils.set(RendererDebugRenderer.id, 'savedRules', rules)
         }
       )
     })
@@ -88,9 +88,9 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     if (enabled) {
       stopFn = this._matcher.on(rule, (data) => {
         if (store.logAllLcuEvents) {
-          this._log.info(data.uri, data.eventType, data.data)
+          this._logger.info(data.uri, data.eventType, data.data)
         } else {
-          this._log.infoRenderer(data.uri, data.eventType, data.data)
+          this._logger.infoRenderer(data.uri, data.eventType, data.data)
         }
       })
     }
@@ -112,9 +112,9 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
     const stopFn = this._matcher.on(rule, (data) => {
       if (store.logAllLcuEvents) {
-        this._log.info(data.uri, data.eventType, data.data)
+        this._logger.info(data.uri, data.eventType, data.data)
       } else {
-        this._log.infoRenderer(data.uri, data.eventType, data.data)
+        this._logger.infoRenderer(data.uri, data.eventType, data.data)
       }
     })
 

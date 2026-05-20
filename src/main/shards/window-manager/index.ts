@@ -22,15 +22,15 @@ export interface WindowManagerMainContext {
   namespace: string
   windowManagerClass: typeof WindowManagerMain
   windowManager: WindowManagerMain
-  app: AppCommonMain
+  appCommon: AppCommonMain
   ipc: AkariIpcMain
-  setting: SetterSettingService
+  settingService: SetterSettingService
   settingFactory: SettingFactoryMain
   loggerFactory: LoggerFactoryMain
   leagueClient: LeagueClientMain
   protocol: AkariProtocolMain
-  mobx: MobxUtilsMain
-  log: AkariLogger
+  mobxUtils: MobxUtilsMain
+  logger: AkariLogger
   gameClient: GameClientMain
   keyboardShortcuts: KeyboardShortcutsMain
   selfUpdate: SelfUpdateMain
@@ -41,8 +41,8 @@ export interface WindowManagerMainContext {
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
 
-  private readonly _log: AkariLogger
-  private readonly _setting: SetterSettingService
+  private readonly _logger: AkariLogger
+  private readonly _settingService: SetterSettingService
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -55,19 +55,19 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _mobx: MobxUtilsMain,
+    private readonly _mobxUtils: MobxUtilsMain,
     private readonly _loggerFactory: LoggerFactoryMain,
     private readonly _settingFactory: SettingFactoryMain,
-    private readonly _lc: LeagueClientMain,
+    private readonly _leagueClient: LeagueClientMain,
     private readonly _shared: SharedGlobalShard,
     private readonly _protocol: AkariProtocolMain,
-    private readonly _kbd: KeyboardShortcutsMain,
-    private readonly _app: AppCommonMain,
-    private readonly _gc: GameClientMain,
+    private readonly _keyboardShortcuts: KeyboardShortcutsMain,
+    private readonly _appCommon: AppCommonMain,
+    private readonly _gameClient: GameClientMain,
     private readonly _selfUpdate: SelfUpdateMain
   ) {
-    this._log = _loggerFactory.create(WindowManagerMain.id)
-    this._setting = _settingFactory.register(
+    this._logger = _loggerFactory.create(WindowManagerMain.id)
+    this._settingService = _settingFactory.register(
       WindowManagerMain.id,
       {
         backgroundMaterial: { default: this.settings.backgroundMaterial },
@@ -88,35 +88,35 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     return {
       namespace: WindowManagerMain.id,
       windowManagerClass: WindowManagerMain,
-      app: this._app,
+      appCommon: this._appCommon,
       windowManager: this,
       ipc: this._ipc,
-      setting: this._setting,
+      settingService: this._settingService,
       settingFactory: this._settingFactory,
       loggerFactory: this._loggerFactory,
-      leagueClient: this._lc,
+      leagueClient: this._leagueClient,
       protocol: this._protocol,
-      mobx: this._mobx,
-      log: this._log,
-      gameClient: this._gc,
-      keyboardShortcuts: this._kbd,
+      mobxUtils: this._mobxUtils,
+      logger: this._logger,
+      gameClient: this._gameClient,
+      keyboardShortcuts: this._keyboardShortcuts,
       selfUpdate: this._selfUpdate,
       shared: this._shared
     }
   }
 
   async onInit() {
-    await this._setting.applyToState()
+    await this._settingService.applyToState()
 
     if (this._shared.global.isWindows11_22H2_OrHigher) {
       this.state.setSupportsMica(true)
     }
 
-    this._mobx.propSync(WindowManagerMain.id, 'state', this.state, [
+    this._mobxUtils.propSync(WindowManagerMain.id, 'state', this.state, [
       'supportsMica',
       'downloadTasks'
     ])
-    this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, [
+    this._mobxUtils.propSync(WindowManagerMain.id, 'settings', this.settings, [
       'backgroundMaterial',
       'contentProtection'
     ])
@@ -146,7 +146,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   _settingToNativeBackgroundMaterial(material: string) {
     // fixed in v35.0.0, https://github.com/electron/electron/pull/45525
     // if (material === 'mica' && process.env['NODE_ENV'] !== 'development') {
-    //   this._log.warn(
+    //   this._logger.warn(
     //     'Mica is disabled in production mode. (https://github.com/electron/electron/issues/41824)'
     //   )
     //   return 'none'

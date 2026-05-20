@@ -59,12 +59,12 @@ export function sanitizeShortcutSettingRecord(record: Pick<Setting, 'key' | 'val
   return { changed, value: changed ? value : record.value }
 }
 
-export async function migrateFrom143({ manager, log }: MigrationContext) {
+export async function migrateFrom143({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_143)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_143)
+  logger.info('Start migrating settings', MIGRATION_FROM_143)
 
   for (const key of [...SCALAR_SHORTCUT_SETTING_KEYS, SENDABLE_ITEMS_SETTING_KEY]) {
     const setting = await manager.findOneBy(Setting, { key: Equal(key) })
@@ -79,5 +79,5 @@ export async function migrateFrom143({ manager, log }: MigrationContext) {
   }
 
   await markMigration(manager, MIGRATION_FROM_143)
-  log.info(`Migration completed, to ${MIGRATION_FROM_143}`)
+  logger.info(`Migration completed, to ${MIGRATION_FROM_143}`)
 }

@@ -37,7 +37,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
   ) {}
 
   async onInit() {
-    this._handleIpcCall()
+    this._registerIpcHandlers()
   }
 
   /**
@@ -377,7 +377,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     return path
   }
 
-  private _handleIpcCall() {
+  private _registerIpcHandlers() {
     this._ipc.onCall(SavedPlayerMain.id, 'querySavedPlayer', (_, query: SavedPlayerQueryDto) => {
       return this.querySavedPlayer(query)
     })
@@ -443,13 +443,15 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     )
 
     this._ipc.onCall(SavedPlayerMain.id, 'exportTaggedPlayersToJsonFile', async () => {
-      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+      const windowManager = this._shared.manager.getInstance(
+        'window-manager-main'
+      ) as WindowManagerMain
 
-      if (!w || !w.mainWindow.window) {
+      if (!windowManager || !windowManager.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
       }
 
-      const result = await dialog.showSaveDialog(w.mainWindow.window, {
+      const result = await dialog.showSaveDialog(windowManager.mainWindow.window, {
         defaultPath: 'league-akari-tagged-players.json',
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
@@ -463,13 +465,15 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SavedPlayerMain.id, 'importTaggedPlayersFromJsonFile', async () => {
-      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+      const windowManager = this._shared.manager.getInstance(
+        'window-manager-main'
+      ) as WindowManagerMain
 
-      if (!w || !w.mainWindow.window) {
+      if (!windowManager || !windowManager.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
       }
 
-      const result = await dialog.showOpenDialog(w.mainWindow.window, {
+      const result = await dialog.showOpenDialog(windowManager.mainWindow.window, {
         defaultPath: 'league-akari-tagged-players.json',
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })

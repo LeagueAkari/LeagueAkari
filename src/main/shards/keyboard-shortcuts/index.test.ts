@@ -86,7 +86,7 @@ function emitKey(kbd: KeyboardShortcutsMain, event: TestKeyEvent) {
     nativeInputMock.pressed.delete(event.keyCode)
   }
 
-  ;(kbd as any)._handleNativeKeyEvent({
+  ;(kbd as any)._processNativeKeyEvent({
     keyCode: event.keyCode,
     isDown: event.isDown,
     isModifier: event.isModifier ?? [17, 162, 163].includes(event.keyCode),

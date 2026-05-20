@@ -13,29 +13,29 @@ export class AutoReplyRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {}
 
   setEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'enabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enabled', enabled)
   }
 
   setText(text: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'text', text)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'text', text)
   }
 
   setEnableOnAway(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'enableOnAway', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enableOnAway', enabled)
   }
 
   setLockOfflineStatus(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lockOfflineStatus', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'lockOfflineStatus', enabled)
   }
 
   async onInit() {
     const store = useAutoReplyStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 }

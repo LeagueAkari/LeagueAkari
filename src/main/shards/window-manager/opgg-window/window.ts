@@ -51,7 +51,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
     this.shortcutTargetId = `${this._namespace}/show`
   }
 
-  private _handleOpggWindowLogics() {
+  private _watchOpggWindow() {
     const showTiming = computed(() => {
       if (!this.settings.autoShow) {
         return 'ignore'
@@ -70,7 +70,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
     })
 
     // 在英雄选择阶段会主动展示, 其他阶段不会主动关闭
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => showTiming.get(),
       (timing) => {
         if (timing === 'show') {
@@ -79,7 +79,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       }
     )
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () =>
         [this.settings.enabled, this._context.windowManager.state.isManagerFinishedInit] as const,
       ([enabled, finishedInit]) => {
@@ -102,7 +102,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       }
     })
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
         if (shortcut) {
@@ -124,11 +124,11 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
               }
             )
           } catch {
-            this._log.warn('Failed to register opgg window shortcut')
-            this._setting.set('showShortcut', null)
+            this._logger.warn('Failed to register opgg window shortcut')
+            this._settingService.set('showShortcut', null)
           }
         } else {
-          this._log.debug('Unregister opgg window shortcut')
+          this._logger.debug('Unregister opgg window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
         }
       },
@@ -139,7 +139,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
   override async onInit() {
     await super.onInit()
 
-    this._handleOpggWindowLogics()
+    this._watchOpggWindow()
   }
 
   protected override getSettingPropKeys() {

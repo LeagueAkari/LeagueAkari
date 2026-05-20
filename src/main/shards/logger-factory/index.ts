@@ -48,11 +48,12 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   constructor(
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
-    private readonly _mobx: MobxUtilsMain
+    private readonly _mobxUtils: MobxUtilsMain
   ) {
     this._appDir = path.join(app.getPath('exe'), '..')
     // macOS 下写入 .app bundle 会导致权限/签名问题，日志目录应位于用户目录。
-    this._logsDir = process.platform === 'darwin' ? app.getPath('logs') : path.join(this._appDir, 'logs')
+    this._logsDir =
+      process.platform === 'darwin' ? app.getPath('logs') : path.join(this._appDir, 'logs')
     this._logger = this._shared.global.logger
 
     this.state.setLogLevel(this._shared.global.getLogLevel())
@@ -149,7 +150,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._mobx.propSync(LoggerFactoryMain.id, 'state', this.state, 'logLevel')
+    this._mobxUtils.propSync(LoggerFactoryMain.id, 'state', this.state, 'logLevel')
 
     this._ipc.onCall(
       LoggerFactoryMain.id,

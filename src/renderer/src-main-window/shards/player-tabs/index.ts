@@ -43,27 +43,27 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
   static SEARCH_HISTORY_MAX_LENGTH = 20
 
   constructor(
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   async onInit() {
-    await this._handleSettings()
+    await this._setupSettings()
     this._setupInAppScope.addSetupFn(() => {
-      this._handlePlayerTabs()
+      this._watchPlayerTabs()
     })
   }
 
   async onDispose() {}
 
-  private _handlePlayerTabs() {
-    const pts = usePlayerTabsStore()
-    const lcs = useLeagueClientStore()
-    const sgps = useSgpStore()
+  private _watchPlayerTabs() {
+    const playerTabsStore = usePlayerTabsStore()
+    const leagueClientStore = useLeagueClientStore()
+    const sgpStore = useSgpStore()
 
     // 在玩家登录时立即创建一个页面
     watch(
-      [() => lcs.summoner.me, () => sgps.availability.sgpServerId],
+      [() => leagueClientStore.summoner.me, () => sgpStore.availability.sgpServerId],
       ([me, sgpServerId]) => {
         if (me && sgpServerId) {
           this.createTab(me.puuid, sgpServerId)
@@ -74,10 +74,10 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
 
     // 在断开连接后删除所有页面
     watch(
-      () => lcs.connectionState,
+      () => leagueClientStore.connectionState,
       (s) => {
         if (s === 'disconnected') {
-          pts.closeAllTabs()
+          playerTabsStore.closeAllTabs()
         }
       }
     )
@@ -87,7 +87,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
    * 获取搜索历史, 有数量限制
    */
   async getSearchHistory(): Promise<SearchHistoryItem[]> {
-    return this._setting.get(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, [])
+    return this._settingUtils.get(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, [])
   }
 
   /**
@@ -116,7 +116,11 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
 
     if (existed && wasPinned && finalPinned) {
       list[oldIdx] = newItem
-      return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, list)
+      return this._settingUtils.set(
+        PlayerTabsRenderer.id,
+        PlayerTabsRenderer.SEARCH_HISTORY_KEY,
+        list
+      )
     }
 
     if (existed) list.splice(oldIdx, 1)
@@ -135,7 +139,11 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       }
     }
 
-    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, list)
+    return this._settingUtils.set(
+      PlayerTabsRenderer.id,
+      PlayerTabsRenderer.SEARCH_HISTORY_KEY,
+      list
+    )
   }
 
   async deleteSearchHistory(puuid: string) {
@@ -146,7 +154,11 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       items.splice(index, 1)
     }
 
-    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, items)
+    return this._settingUtils.set(
+      PlayerTabsRenderer.id,
+      PlayerTabsRenderer.SEARCH_HISTORY_KEY,
+      items
+    )
   }
 
   async pinSearchHistory(puuid: string) {
@@ -167,13 +179,17 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       return 0
     })
 
-    return this._setting.set(PlayerTabsRenderer.id, PlayerTabsRenderer.SEARCH_HISTORY_KEY, items)
+    return this._settingUtils.set(
+      PlayerTabsRenderer.id,
+      PlayerTabsRenderer.SEARCH_HISTORY_KEY,
+      items
+    )
   }
 
   // 如果直接引用 router, 在热更新的时候会失效
   useNavigateToTab() {
     const router = useRouter()
-    const sgps = useSgpStore()
+    const sgpStore = useSgpStore()
 
     const navigateToTab = async (unionId: string) => {
       const { sgpServerId, puuid } = this.parseUnionId(unionId)
@@ -209,7 +225,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
 
       return router.replace({
         name: 'player-tabs',
-        params: { puuid, sgpServerId: sgps.availability.sgpServerId }
+        params: { puuid, sgpServerId: sgpStore.availability.sgpServerId }
       })
     }
 
@@ -228,13 +244,13 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
 
   /** 创建一个新的 Tab, 并设置一些初始值 */
   createTab(puuid: string, sgpServerId: string, setCurrent = true) {
-    const pts = usePlayerTabsStore()
+    const playerTabsStore = usePlayerTabsStore()
 
-    if (pts.getTab(this.toUnionId(sgpServerId, puuid))) {
+    if (playerTabsStore.getTab(this.toUnionId(sgpServerId, puuid))) {
       return
     }
 
-    pts.createTab(
+    playerTabsStore.createTab(
       {
         id: this.toUnionId(sgpServerId, puuid),
         puuid,
@@ -250,52 +266,56 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
   }
 
   setCurrentOrCreateTab(puuid: string, sgpServerId: string) {
-    const pts = usePlayerTabsStore()
-    const tab = pts.getTab(this.toUnionId(sgpServerId, puuid))
+    const playerTabsStore = usePlayerTabsStore()
+    const tab = playerTabsStore.getTab(this.toUnionId(sgpServerId, puuid))
 
     if (tab) {
-      pts.setCurrentTab(tab.id)
+      playerTabsStore.setCurrentTab(tab.id)
     } else {
       this.createTab(puuid, sgpServerId)
     }
   }
 
-  private async _handleSettings() {
+  private async _setupSettings() {
     const store = usePlayerTabsStore()
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'matchHistoryUseSgpApi'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'refreshTabsAfterGameEnds'
     )
 
-    await this._setting.savedPropVue(PlayerTabsRenderer.id, store.frontendSettings, 'loadCount')
+    await this._settingUtils.savedPropVue(
+      PlayerTabsRenderer.id,
+      store.frontendSettings,
+      'loadCount'
+    )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'defaultMatchHistoryTag'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'defaultMatchHistoryTimeRange'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'defaultShowPractice'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       PlayerTabsRenderer.id,
       store.frontendSettings,
       'defaultShowIrregularGames'

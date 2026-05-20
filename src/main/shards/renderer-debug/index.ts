@@ -13,48 +13,48 @@ export class RendererDebugMain {
 
   public readonly state = new RendererDebugState()
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _lc: LeagueClientMain,
-    private readonly _mobx: MobxUtilsMain,
+    private readonly _leagueClient: LeagueClientMain,
+    private readonly _mobxUtils: MobxUtilsMain,
     readonly _loggerFactory: LoggerFactoryMain
   ) {
-    this._log = _loggerFactory.create(RendererDebugMain.id)
+    this._logger = _loggerFactory.create(RendererDebugMain.id)
   }
 
   async onInit() {
-    this._mobx.propSync(RendererDebugMain.id, 'state', this.state, [
+    this._mobxUtils.propSync(RendererDebugMain.id, 'state', this.state, [
       'sendAllNativeLcuEvents',
       'logAllLcuEvents'
     ])
 
-    this._lc.events.on('/**', (data: LcuEvent) => {
+    this._leagueClient.events.on('/**', (data: LcuEvent) => {
       if (this.state.sendAllNativeLcuEvents) {
         this._ipc.sendEvent(RendererDebugMain.id, 'lc-event', data)
       }
 
       if (this.state.logAllLcuEvents) {
-        this._log.info(data.uri, data.eventType, data)
+        this._logger.info(data.uri, data.eventType, data)
       }
     })
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.state.logAllLcuEvents,
       (enabled) => {
         if (enabled) {
-          this._log.info('Logging all LCU events')
+          this._logger.info('Logging all LCU events')
         } else {
-          this._log.info('Stopped logging all LCU events')
+          this._logger.info('Stopped logging all LCU events')
         }
       }
     )
 
-    this._handleIpcCall()
+    this._registerIpcHandlers()
   }
 
-  private _handleIpcCall() {
+  private _registerIpcHandlers() {
     this._ipc.onCall(RendererDebugMain.id, 'setSendAllNativeLcuEvents', (_, enabled: boolean) => {
       this.state.setSendAllNativeLcuEvents(enabled)
     })

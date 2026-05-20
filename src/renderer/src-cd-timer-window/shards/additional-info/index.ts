@@ -9,11 +9,13 @@ const OG_MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
 export class AdditionalInfoShard implements IAkariShardInitDispose {
   static id = 'additional-info-renderer'
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useAdditionalInfoStore()
 
-    this._pm.sync(OG_MAIN_SHARD_NAMESPACE, 'additional', store)
+    this._piniaMobxUtils.sync(OG_MAIN_SHARD_NAMESPACE, 'additional', store)
   }
 }

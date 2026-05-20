@@ -35,7 +35,7 @@ export interface ReleaseRequest extends RepositoryRequest {
  * 连接到 LeagueAkari/LeagueAkari-Config 或 LeagueAkari/LeagueAkari 仓库
  */
 export class RemoteGitRepository {
-  private _http = axios.create({
+  private _httpClient = axios.create({
     headers: {
       'User-Agent': USER_AGENT
     }
@@ -84,7 +84,7 @@ export class RemoteGitRepository {
 
   async getAnnouncement(request: AnnouncementRequest) {
     const { locale, ...repoRequest } = request
-    const { data: rawData } = await this._http.get<string>(
+    const { data: rawData } = await this._httpClient.get<string>(
       this._rawContentUrl(`/announcement/${locale}.md`, repoRequest)
     )
 
@@ -98,31 +98,31 @@ export class RemoteGitRepository {
   }
 
   async getSgpLeagueServersConfig(request: RepositoryBranchRequest) {
-    return this._http.get<LeagueServersConfig>(
+    return this._httpClient.get<LeagueServersConfig>(
       this._rawContentUrl(`/config/sgp/league-servers.json`, request)
     )
   }
 
   async getInGameSendTemplateCatalog(request: RepositoryBranchRequest) {
-    return this._http.get<InGameSendTemplateCatalog>(
+    return this._httpClient.get<InGameSendTemplateCatalog>(
       this._rawContentUrl(`/config/in-game-send/templates/catalog.json`, request)
     )
   }
 
   async getSupportedQueues(request: RepositoryBranchRequest) {
-    return this._http.get<SupportedQueues>(
+    return this._httpClient.get<SupportedQueues>(
       this._rawContentUrl(`/config/sgp/supported-queues.json`, request)
     )
   }
 
   async getOngoingGameConfig(request: RepositoryBranchRequest) {
-    return this._http.get<OngoingGameConfig>(
+    return this._httpClient.get<OngoingGameConfig>(
       this._rawContentUrl(`/config/ongoing-game/config.json`, request)
     )
   }
 
   async getAutoSelectGroups(request: RepositoryBranchRequest) {
-    return this._http.get<AutoSelectGroups>(
+    return this._httpClient.get<AutoSelectGroups>(
       this._rawContentUrl(`/config/auto-select/groups.json`, request)
     )
   }
@@ -134,11 +134,11 @@ export class RemoteGitRepository {
    * @returns
    */
   getRawContent(uri: string, request: RepositoryBranchRequest) {
-    return this._http.get(this._rawContentUrl(uri, request))
+    return this._httpClient.get(this._rawContentUrl(uri, request))
   }
 
   getReleases({ page = 1, perPage = 20, ...request }: ReleaseRequest) {
-    return this._http.get<GithubApiLatestRelease[]>(this._apiUrl(`/releases`, request), {
+    return this._httpClient.get<GithubApiLatestRelease[]>(this._apiUrl(`/releases`, request), {
       params: {
         page,
         per_page: perPage
@@ -147,13 +147,13 @@ export class RemoteGitRepository {
   }
 
   getLatestRelease(request: RepositoryRequest) {
-    return this._http.get<GithubApiLatestRelease>(this._apiUrl(`/releases/latest`, request))
+    return this._httpClient.get<GithubApiLatestRelease>(this._apiUrl(`/releases/latest`, request))
   }
 
   async testGitHubLatency() {
     try {
       const start = Date.now()
-      await this._http.head('https://api.github.com', {
+      await this._httpClient.head('https://api.github.com', {
         timeout: 2000,
         validateStatus: () => true
       })
@@ -167,7 +167,7 @@ export class RemoteGitRepository {
   async testGiteeLatency() {
     try {
       const start = Date.now()
-      await this._http.head('https://gitee.com/api/v5', {
+      await this._httpClient.head('https://gitee.com/api/v5', {
         timeout: 2000,
         validateStatus: () => true
       })

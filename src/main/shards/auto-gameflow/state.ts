@@ -143,16 +143,16 @@ export class AutoGameflowState {
   friendsToBeInvited: string[] = []
 
   get activityStartStatus() {
-    if (!this._lcData.lobby.lobby) {
+    if (!this._leagueClientData.lobby.lobby) {
       return 'unavailable'
     }
 
-    if (this._lcData.gameflow.session?.gameData.isCustomGame) {
+    if (this._leagueClientData.gameflow.session?.gameData.isCustomGame) {
       return 'unavailable'
     }
 
-    const self = this._lcData.lobby.lobby.members.find(
-      (m) => m.puuid === this._lcData.summoner.me?.puuid
+    const self = this._leagueClientData.lobby.lobby.members.find(
+      (m) => m.puuid === this._leagueClientData.summoner.me?.puuid
     )
 
     if (self) {
@@ -163,8 +163,8 @@ export class AutoGameflowState {
       return 'unavailable'
     }
 
-    if (this._lcData.matchmaking.search) {
-      const errors = this._lcData.matchmaking.search.errors
+    if (this._leagueClientData.matchmaking.search) {
+      const errors = this._leagueClientData.matchmaking.search.errors
       const maxPenaltyTime = errors.reduce(
         (prev, cur) => Math.max(cur.penaltyTimeRemaining, prev),
         -Infinity
@@ -176,7 +176,7 @@ export class AutoGameflowState {
     }
 
     if (this.settings.autoMatchmakingWaitForInvitees) {
-      const hasPendingInvitation = this._lcData.lobby.lobby.invitations.some(
+      const hasPendingInvitation = this._leagueClientData.lobby.lobby.invitations.some(
         (i) => i.state === 'Pending'
       )
       if (hasPendingInvitation) {
@@ -184,11 +184,14 @@ export class AutoGameflowState {
       }
     }
 
-    if (this._lcData.lobby.lobby.members.length < this.settings.autoMatchmakingMinimumMembers) {
+    if (
+      this._leagueClientData.lobby.lobby.members.length <
+      this.settings.autoMatchmakingMinimumMembers
+    ) {
       return 'insufficient-members'
     }
 
-    if (this._lcData.lobby.lobby.canStartActivity) {
+    if (this._leagueClientData.lobby.lobby.canStartActivity) {
       return 'can-start-activity'
     } else {
       return 'cannot-start-activity'
@@ -222,7 +225,7 @@ export class AutoGameflowState {
   }
 
   constructor(
-    private readonly _lcData: LeagueClientData,
+    private readonly _leagueClientData: LeagueClientData,
     private readonly settings: AutoGameflowSettings
   ) {
     makeAutoObservable(this)

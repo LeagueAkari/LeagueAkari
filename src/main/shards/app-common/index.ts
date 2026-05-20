@@ -29,19 +29,19 @@ export class AppCommonMain implements IAkariShardInitDispose {
   public readonly state = new AppCommonState()
   public readonly settings = new AppCommonSettings()
 
-  private readonly _setting: SetterSettingService
-  private readonly _log: AkariLogger
+  private readonly _settingService: SetterSettingService
+  private readonly _logger: AkariLogger
 
   constructor(
     private readonly _shared: SharedGlobalShard,
     private readonly _ipc: AkariIpcMain,
-    private readonly _mobx: MobxUtilsMain,
+    private readonly _mobxUtils: MobxUtilsMain,
     private readonly _protocol: AkariProtocolMain,
     _settingFactory: SettingFactoryMain,
     _loggerFactory: LoggerFactoryMain
   ) {
-    this._log = _loggerFactory.create(AppCommonMain.id)
-    this._setting = _settingFactory.register(
+    this._logger = _loggerFactory.create(AppCommonMain.id)
+    this._settingService = _settingFactory.register(
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },
@@ -152,10 +152,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _handleState() {
-    await this._setting.applyToState()
+  private async _setupState() {
+    await this._settingService.applyToState()
 
-    this._mobx.propSync(AppCommonMain.id, 'settings', this.settings, [
+    this._mobxUtils.propSync(AppCommonMain.id, 'settings', this.settings, [
       'isInKyokoMode',
       'showFreeSoftwareDeclaration',
       'locale',
@@ -165,7 +165,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'streamerModeUseAkariStyledName',
       'preferredLolSource'
     ])
-    this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
+    this._mobxUtils.propSync(AppCommonMain.id, 'state', this.state, [
       'isElevated',
       'platform',
       'disableHardwareAcceleration',
@@ -182,9 +182,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._handleState()
+    await this._setupState()
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.settings.locale,
       (locale) => {
         i18next.changeLanguage(locale)
@@ -192,7 +192,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
       { fireImmediately: true }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.settings.theme,
       (theme) => {
         if (theme === 'default') {
@@ -206,7 +206,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
           return
         }
 
-        this._log.warn('Invalid theme value, fallback to dark', theme)
+        this._logger.warn('Invalid theme value, fallback to dark', theme)
         nativeTheme.themeSource = 'dark'
       },
       { fireImmediately: true }
@@ -266,22 +266,22 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._logInstantiatedShards()
 
     app.on('browser-window-created', (_, window) => {
-      this._log.info('browser-window-created', window.id, window.title)
+      this._logger.info('browser-window-created', window.id, window.title)
     })
 
-    this._handleCheckIfRunInTempDir()
+    this._checkIfRunInTempDir()
   }
 
-  private _handleCheckIfRunInTempDir() {
+  private _checkIfRunInTempDir() {
     // 主程序是否目录在 temp 下
     const exePath = app.getPath('exe')
     const tempPath = app.getPath('temp')
 
-    this._log.info('exePath', exePath, tempPath)
+    this._logger.info('exePath', exePath, tempPath)
 
     if (exePath.startsWith(tempPath)) {
       this.state.setRunInTempDir(true)
-      this._log.warn('run in temp dir warning', exePath, tempPath)
+      this._logger.warn('run in temp dir warning', exePath, tempPath)
     }
   }
 
@@ -298,16 +298,16 @@ export class AppCommonMain implements IAkariShardInitDispose {
       }
     }
 
-    this._log.info('instantiated shards', shards)
+    this._logger.info('instantiated shards', shards)
   }
 
   private _evaluateMainProcess(code: string) {
     if (!is.dev) {
-      this._log.warn('Blocked main-process evaluate outside dev mode')
+      this._logger.warn('Blocked main-process evaluate outside dev mode')
       return
     }
 
-    this._log.warn('Evaluating code in main process')
+    this._logger.warn('Evaluating code in main process')
 
     try {
       const fn = new Function(
@@ -318,15 +318,15 @@ export class AppCommonMain implements IAkariShardInitDispose {
         'process',
         `"use strict";\nreturn (async () => {\n${code}\n})()`
       )
-      const result = fn(app, this._shared.manager, this._shared, this._log, process)
+      const result = fn(app, this._shared.manager, this._shared, this._logger, process)
 
       if (result instanceof Promise) {
         void result.catch((error) => {
-          this._log.error('Main-process evaluate failed', error)
+          this._logger.error('Main-process evaluate failed', error)
         })
       }
     } catch (error) {
-      this._log.error('Main-process evaluate failed', error)
+      this._logger.error('Main-process evaluate failed', error)
     }
   }
 
@@ -343,31 +343,31 @@ export class AppCommonMain implements IAkariShardInitDispose {
       return
     }
 
-    const wm = this._shared.manager.getInstance('window-manager-main')
+    const windowManager = this._shared.manager.getInstance('window-manager-main')
 
-    if (!wm) {
+    if (!windowManager) {
       return
     }
 
     switch (target) {
       case 'main-window':
-        wm.mainWindow.window?.webContents.executeJavaScript(code)
+        windowManager.mainWindow.window?.webContents.executeJavaScript(code)
         break
 
       case 'aux-window':
-        wm.auxWindow.window?.webContents.executeJavaScript(code)
+        windowManager.auxWindow.window?.webContents.executeJavaScript(code)
         break
 
       case 'cd-timer-window':
-        wm.cdTimerWindow.window?.webContents.executeJavaScript(code)
+        windowManager.cdTimerWindow.window?.webContents.executeJavaScript(code)
         break
 
       case 'ongoing-game-window':
-        wm.ongoingGameWindow.window?.webContents.executeJavaScript(code)
+        windowManager.ongoingGameWindow.window?.webContents.executeJavaScript(code)
         break
 
       case 'opgg-window':
-        wm.opggWindow.window?.webContents.executeJavaScript(code)
+        windowManager.opggWindow.window?.webContents.executeJavaScript(code)
         break
     }
   }

@@ -23,11 +23,10 @@ import { computed } from 'vue'
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
 import GameDataTest from './GameDataTest.vue'
+import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
 import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'
 import SelfUpdateTest from './SelfUpdateTest.vue'
-import GuideTest from './GuideTest.vue'
-import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 
 const tabs = computed<TabConfig[]>(() => [
   {
@@ -53,12 +52,6 @@ const tabs = computed<TabConfig[]>(() => [
     name: '新过滤器',
     icon: Filter20Regular,
     component: MatchHistoryFiltersTest
-  },
-  {
-    key: 'guide',
-    name: '引导系统',
-    icon: ToolFilled,
-    component: GuideTest
   },
   {
     key: 'keyboard-shortcuts',

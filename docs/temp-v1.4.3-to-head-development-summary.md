@@ -247,7 +247,6 @@
 - FTUE/onboarding：
   - 增加 hero/theme onboarding。
   - 增加 spotlight FTUE。
-  - guide reset 统一。
   - 修复 FTUE completion 持久化。
 - UI token 与 provider locale 绑定修正。
 
@@ -256,19 +255,13 @@
 - 新增 `src/renderer-shared/assets/css/theme-system.css`。
 - 新增 `src/renderer-shared/theme/naive-ui.ts`。
 - `NaiveUIProviderApp.vue` 在多个窗口内改造，以统一主题接入。
-- `src/renderer-shared/shards/guide/` 新增 guide shard：
-  - `Guide.vue`
-  - `composables.ts`
-  - `index.ts`
-  - `store.ts`
-  - `types.ts`
 - main window 中 titlebar/sidebar/common buttons 等多个 UI 组件配合主题/窗口风格调整。
 
 代表提交：
 
 - `5f84e1b1`：统一主题系统和 preset palettes。
 - `0087b258`：主题系统大改和分组选择器。
-- `384cd733`：hero/theme onboarding 和 guide reset。
+- `384cd733`：hero/theme onboarding。
 - `dbc80414`：cyber neon 主题。
 - `621f21ab`：恢复战绩筛选流程与内置主题颜色。
 - `0f6c714e`：重置 Naive UI 默认亮/暗 preset。
@@ -629,7 +622,6 @@
 - `src/renderer-shared/assets/css/theme-system.css`
 - `src/renderer-shared/components/ongoing-game-panel/widgets/player-info-card/`
 - `src/renderer-shared/components/sticky-box/`
-- `src/renderer-shared/shards/guide/`
 - `src/renderer-shared/theme/naive-ui.ts`
 - `src/renderer/src-main-window/components/TabbedPage.vue`
 - `src/renderer/src-main-window/components/MainWindowCloseConfirmModal.vue`
@@ -647,7 +639,6 @@
 ### 5.2 新增测试/开发页面
 
 - `GameDataTest.vue`
-- `GuideTest.vue`
 - `MarkdownTest.vue`
 - `MatchHistoryFiltersTest.vue`
 - `SelfUpdateTest.vue`

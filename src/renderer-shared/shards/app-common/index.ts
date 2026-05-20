@@ -17,8 +17,8 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {
     this._setupInAppScope.addSetupFn(() => {
@@ -47,11 +47,11 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   }
 
   setInKyokoMode(s: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'isInKyokoMode', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'isInKyokoMode', s)
   }
 
   setShowFreeSoftwareDeclaration(s: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showFreeSoftwareDeclaration', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showFreeSoftwareDeclaration', s)
   }
 
   setDisableHardwareAcceleration(s: boolean) {
@@ -59,27 +59,27 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   }
 
   setLocale(s: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'locale', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'locale', s)
   }
 
   setTheme(s: AppThemeSetting) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'theme', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'theme', s)
   }
 
   setHttpProxy(s: HttpProxySetting | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'httpProxy', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'httpProxy', s)
   }
 
   setStreamerMode(s: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerMode', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'streamerMode', s)
   }
 
   setStreamerModeUseAkariStyledName(s: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
   }
 
   setPreferredLolSource(s: 'sgp' | 'lcu') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'preferredLolSource', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'preferredLolSource', s)
   }
 
   readClipboardText() {
@@ -98,15 +98,15 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     const store = useAppCommonStore()
     store.version = await this.getVersion()
 
-    await this._setting.savedGetterVue(
+    await this._settingUtils.savedGetterVue(
       AppCommonRenderer.id,
       'tempAkariSubscriptionInfo',
       () => store.tempAkariSubscriptionInfo,
       (v) => (store.tempAkariSubscriptionInfo = v)
     )
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   getRuntimeInfo() {

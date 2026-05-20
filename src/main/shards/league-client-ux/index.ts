@@ -30,8 +30,8 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
-  private readonly _log: AkariLogger
-  private readonly _setting: SetterSettingService
+  private readonly _logger: AkariLogger
+  private readonly _settingService: SetterSettingService
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
@@ -41,10 +41,10 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain,
     readonly _settingFactory: SettingFactoryMain,
-    private readonly _mobx: MobxUtilsMain
+    private readonly _mobxUtils: MobxUtilsMain
   ) {
-    this._log = _loggerFactory.create(LeagueClientUxMain.id)
-    this._setting = _settingFactory.register(
+    this._logger = _loggerFactory.create(LeagueClientUxMain.id)
+    this._settingService = _settingFactory.register(
       LeagueClientUxMain.id,
       {
         useWmi: { default: this.settings.useWmi }
@@ -54,12 +54,12 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._setting.applyToState()
+    await this._settingService.applyToState()
 
-    this._handlePollExistingUx()
+    this._watchExistingUx()
 
-    this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
-    this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, [
+    this._mobxUtils.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
+    this._mobxUtils.propSync(LeagueClientUxMain.id, 'state', this.state, [
       'launchedClients',
       'hasClientButNoCommandLine'
     ])
@@ -87,7 +87,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
-  private _handlePollExistingUx() {
+  private _watchExistingUx() {
     this.update()
     this._pollTimerId = setInterval(
       () => this.update(),
@@ -111,7 +111,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
-      this._log.error(`Failed to get Ux command line`, error)
+      this._logger.error(`Failed to get Ux command line`, error)
     }
   }
 
@@ -167,7 +167,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
 
     const cmd = `"${elevateExecutablePath}" cmd /c start cmd /k "${wmiRebuildScriptPath}"`
-    this._log.info('Rebuilding WMI...', cmd)
+    this._logger.info('Rebuilding WMI...', cmd)
     await execAsync(cmd, { shell: 'cmd', windowsHide: false })
   }
 }

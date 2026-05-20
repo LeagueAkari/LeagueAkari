@@ -13,8 +13,8 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {}
 
   cancelAutoAccept() {
@@ -26,83 +26,95 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
   }
 
   setAutoHonorEnabled(enabled: boolean) {
-    this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHonorEnabled', enabled)
+    this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoHonorEnabled', enabled)
   }
 
   setAutoHonorStrategy(strategy: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHonorStrategy', strategy)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoHonorStrategy', strategy)
   }
 
   setPlayAgainEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'playAgainEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'playAgainEnabled', enabled)
   }
 
   setAutoAcceptEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoAcceptEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoAcceptEnabled', enabled)
   }
 
   setAutoAcceptDelaySeconds(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoAcceptDelaySeconds', seconds)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoAcceptDelaySeconds', seconds)
   }
 
   setAutoReconnectEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoReconnectEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoReconnectEnabled', enabled)
   }
 
   setAutoSkipLeaderEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSkipLeaderEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoSkipLeaderEnabled', enabled)
   }
 
   setAutoMatchmakingEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingEnabled', enabled)
   }
 
   setAutoMatchmakingMaximumMatchDuration(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingMaximumMatchDuration', seconds)
+    return this._settingUtils.set(
+      MAIN_SHARD_NAMESPACE,
+      'autoMatchmakingMaximumMatchDuration',
+      seconds
+    )
   }
 
   setAutoMatchmakingDelaySeconds(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingDelaySeconds', seconds)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingDelaySeconds', seconds)
   }
 
   setAutoMatchmakingMinimumMembers(count: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingMinimumMembers', count)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingMinimumMembers', count)
   }
 
   setAutoMatchmakingWaitForInvitees(yes: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingWaitForInvitees', yes)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingWaitForInvitees', yes)
   }
 
   setAutoMatchmakingRematchStrategy(s: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingRematchStrategy', s)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingRematchStrategy', s)
   }
 
   setAutoMatchmakingRematchFixedDuration(seconds: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingRematchFixedDuration', seconds)
+    return this._settingUtils.set(
+      MAIN_SHARD_NAMESPACE,
+      'autoMatchmakingRematchFixedDuration',
+      seconds
+    )
   }
 
   setAutoHandleInvitationsEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHandleInvitationsEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoHandleInvitationsEnabled', enabled)
   }
 
   setRejectInvitationWhenAway(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'rejectInvitationWhenAway', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'rejectInvitationWhenAway', enabled)
   }
 
   setDodgeAtLastSecondThreshold(threshold: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'dodgeAtLastSecondThreshold', threshold)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'dodgeAtLastSecondThreshold', threshold)
   }
 
   setInvitationHandlingStrategies(strategies: Record<string, string>) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'invitationHandlingStrategies', strategies)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'invitationHandlingStrategies', strategies)
   }
 
   setAutoSendARAMTeamSideEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideEnabled', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideEnabled', enabled)
   }
 
   setAutoSendARAMTeamSideVisibleToTeam(visible: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSendARAMTeamSideVisibleToTeam', visible)
+    return this._settingUtils.set(
+      MAIN_SHARD_NAMESPACE,
+      'autoSendARAMTeamSideVisibleToTeam',
+      visible
+    )
   }
 
   setFriendsToBeInvited(puuids: string[]) {
@@ -112,7 +124,7 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useAutoGameflowStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 }

@@ -11,21 +11,23 @@ const MAIN_SHARD_NAMESPACE = 'sgp-main'
 export class SgpRenderer implements IAkariShardInitDispose {
   static id = 'sgp-renderer'
 
-  public readonly _http = axios.create({
+  public readonly httpClient = axios.create({
     baseURL: 'akari://sgp',
     adapter: 'fetch',
     paramsSerializer: { indexes: null }
   })
   public readonly api: SgpHttpApiAxiosHelper
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {
-    this.api = new SgpHttpApiAxiosHelper(this._http)
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
+  ) {
+    this.api = new SgpHttpApiAxiosHelper(this.httpClient)
   }
 
   async onInit() {
     const store = useSgpStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     // @ts-ignore
     window.sgpApi = this.api

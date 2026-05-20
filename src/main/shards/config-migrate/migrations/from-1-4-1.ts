@@ -2,12 +2,12 @@ import { MigrationContext, hasMigration, markMigration, moveSetting } from './co
 
 export const MIGRATION_FROM_141 = 'akari-migration-from-1.4.1_patch1'
 
-export async function migrateFrom141({ manager, log }: MigrationContext) {
+export async function migrateFrom141({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_141)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_141)
+  logger.info('Start migrating settings', MIGRATION_FROM_141)
 
   // Migrate normalBounds to trackedBounds
   await moveSetting(
@@ -37,5 +37,5 @@ export async function migrateFrom141({ manager, log }: MigrationContext) {
   )
 
   await markMigration(manager, MIGRATION_FROM_141)
-  log.info(`Migration completed, to ${MIGRATION_FROM_141}`)
+  logger.info(`Migration completed, to ${MIGRATION_FROM_141}`)
 }

@@ -5,12 +5,12 @@ import { MigrationContext, hasMigration, markMigration, moveSetting } from './co
 
 export const MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
 
-export async function migrateFrom134({ manager, log }: MigrationContext) {
+export async function migrateFrom134({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_134)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_134)
+  logger.info('Start migrating settings', MIGRATION_FROM_134)
 
   await manager.save(Setting, Setting.create('app-common-main/showFreeSoftwareDeclaration', true))
 
@@ -78,5 +78,5 @@ export async function migrateFrom134({ manager, log }: MigrationContext) {
   }
 
   await markMigration(manager, MIGRATION_FROM_134)
-  log.info(`Migration completed, to ${MIGRATION_FROM_134}`)
+  logger.info(`Migration completed, to ${MIGRATION_FROM_134}`)
 }

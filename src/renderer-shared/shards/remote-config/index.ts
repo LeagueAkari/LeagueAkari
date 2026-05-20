@@ -12,24 +12,24 @@ export class RemoteConfigRenderer {
   static readonly id = 'remote-config-renderer'
 
   constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer
   ) {}
 
   async onInit() {
     const store = useRemoteConfigStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   setPreferredSource(source: 'gitee' | 'github') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'preferredSource', source)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'preferredSource', source)
   }
 
   setUpdateLatestRelease(updateLatestRelease: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'updateLatestRelease', updateLatestRelease)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'updateLatestRelease', updateLatestRelease)
   }
 
   async testRepoLatency(): Promise<{ githubLatency: number; giteeLatency: number }> {

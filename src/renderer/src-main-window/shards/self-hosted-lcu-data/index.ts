@@ -22,23 +22,25 @@ import { useSelfHostedLcuDataStore } from './store'
 export class SelfHostedLcuDataRenderer {
   static id = 'self-hosted-lcu-data-renderer'
 
-  constructor(@Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer) {
-    this._setup.addSetupFn(() => this._handleFriendsUpdate())
-    this._setup.addSetupFn(() => this._handleQueuesUpdate())
+  constructor(
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
+  ) {
+    this._setupInAppScope.addSetupFn(() => this._watchFriendsUpdate())
+    this._setupInAppScope.addSetupFn(() => this._watchQueuesUpdate())
   }
 
-  private _handleFriendsUpdate = () => {
+  private _watchFriendsUpdate = () => {
     const store = useSelfHostedLcuDataStore()
 
-    const lc = useInstance(LeagueClientRenderer)
-    const log = useInstance(LoggerRenderer)
+    const leagueClient = useInstance(LeagueClientRenderer)
+    const logger = useInstance(LoggerRenderer)
 
-    const lcs = useLeagueClientStore()
+    const leagueClientStore = useLeagueClientStore()
 
     const message = useMessage()
     const { t } = useTranslation()
 
-    lc.onLcuEventVue<Friend[]>('/lol-chat/v1/friends', ({ eventType, data }) => {
+    leagueClient.onLcuEventVue<Friend[]>('/lol-chat/v1/friends', ({ eventType, data }) => {
       if (eventType === 'Delete') {
         store.friends = []
       }
@@ -46,7 +48,7 @@ export class SelfHostedLcuDataRenderer {
       store.friends = data
     })
 
-    lc.onLcuEventVue<Friend>('/lol-chat/v1/friends/:id', ({ eventType, data }) => {
+    leagueClient.onLcuEventVue<Friend>('/lol-chat/v1/friends/:id', ({ eventType, data }) => {
       if (eventType === 'Delete') {
         store.friends = store.friends.filter((friend) => friend.id !== data.id)
       } else {
@@ -58,7 +60,7 @@ export class SelfHostedLcuDataRenderer {
 
     const reloadFriends = async () => {
       try {
-        const { data } = await lc.api.chat.getFriends()
+        const { data } = await leagueClient.api.chat.getFriends()
         store.friends = data
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 503) {
@@ -66,12 +68,12 @@ export class SelfHostedLcuDataRenderer {
         }
 
         message.error(() => t('self-hosted-lcu-data-renderer.reloadFriendsFailed'))
-        log.error(SelfHostedLcuDataRenderer.id, 'Failed to reload friends', error)
+        logger.error(SelfHostedLcuDataRenderer.id, 'Failed to reload friends', error)
       }
     }
 
     watch(
-      () => lcs.isConnected,
+      () => leagueClientStore.isConnected,
       (isConnected) => {
         if (isConnected) {
           reloadFriends()
@@ -83,15 +85,15 @@ export class SelfHostedLcuDataRenderer {
     )
   }
 
-  private _handleQueuesUpdate = () => {
+  private _watchQueuesUpdate = () => {
     const store = useSelfHostedLcuDataStore()
 
-    const lc = useInstance(LeagueClientRenderer)
-    const log = useInstance(LoggerRenderer)
+    const leagueClient = useInstance(LeagueClientRenderer)
+    const logger = useInstance(LoggerRenderer)
 
-    const lcs = useLeagueClientStore()
+    const leagueClientStore = useLeagueClientStore()
 
-    lc.onLcuEventVue<GameQueue[]>('/lol-game-queues/v1/queues', ({ eventType, data }) => {
+    leagueClient.onLcuEventVue<GameQueue[]>('/lol-game-queues/v1/queues', ({ eventType, data }) => {
       if (eventType === 'Delete') {
         store.gameQueues = {}
       }
@@ -104,18 +106,18 @@ export class SelfHostedLcuDataRenderer {
 
     const reloadQueues = async () => {
       try {
-        const { data } = await lc.api.gameQueues.getQueues()
+        const { data } = await leagueClient.api.gameQueues.getQueues()
         store.gameQueues = data.reduce((prev, cur) => {
           prev[cur.id] = cur
           return prev
         }, {})
       } catch (error) {
-        log.error(SelfHostedLcuDataRenderer.id, 'Failed to reload queues', error)
+        logger.error(SelfHostedLcuDataRenderer.id, 'Failed to reload queues', error)
       }
     }
 
     watch(
-      () => lcs.isConnected,
+      () => leagueClientStore.isConnected,
       (isConnected) => {
         if (isConnected) {
           reloadQueues()

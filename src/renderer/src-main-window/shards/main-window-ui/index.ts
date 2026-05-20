@@ -21,16 +21,16 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private readonly _urlCache = new Map<number, string>()
 
   constructor(
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
-    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
+    @Dep(LeagueClientRenderer) private readonly _leagueClient: LeagueClientRenderer,
+    @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   async onInit() {
-    await this._handleSettings()
+    await this._setupSettings()
     this._setupInAppScope.addSetupFn(() => {
-      this._handleSyncProfileSkinUrl()
+      this._watchProfileSkinUrl()
       this._setupAutoRouteWhenGameStarts()
     })
   }
@@ -56,10 +56,10 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     )
   }
 
-  private _handleSyncProfileSkinUrl() {
-    const lcs = useLeagueClientStore()
-    const mui = useMainWindowUiStore()
-    const pts = usePlayerTabsStore()
+  private _watchProfileSkinUrl() {
+    const leagueClientStore = useLeagueClientStore()
+    const mainWindowUiStore = useMainWindowUiStore()
+    const playerTabsStore = usePlayerTabsStore()
 
     const preferMica = useMicaAvailability()
     let selfBackgroundRequestId = 0
@@ -67,16 +67,16 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
     watch(
       [
-        () => lcs.summoner.me?.puuid,
-        () => lcs.summoner.profile?.backgroundSkinId,
-        () => mui.frontendSettings.useProfileSkinAsBackground,
+        () => leagueClientStore.summoner.me?.puuid,
+        () => leagueClientStore.summoner.profile?.backgroundSkinId,
+        () => mainWindowUiStore.frontendSettings.useProfileSkinAsBackground,
         () => preferMica.value
       ],
       async ([puuid, backgroundSkinId, enabled, preferMica]) => {
         const requestId = ++selfBackgroundRequestId
 
         if (!enabled || preferMica) {
-          mui.backgroundSkinUrl = null
+          mainWindowUiStore.backgroundSkinUrl = null
           return
         }
 
@@ -87,7 +87,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
         )
 
         if (requestId === selfBackgroundRequestId) {
-          mui.backgroundSkinUrl = url
+          mainWindowUiStore.backgroundSkinUrl = url
         }
       },
       { immediate: true }
@@ -96,12 +96,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     const currentTabBackgroundInfo = computed(() => {
       if (
         router.currentRoute.value.name === 'player-tabs' &&
-        pts.currentTab &&
-        pts.currentTab.summonerProfile
+        playerTabsStore.currentTab &&
+        playerTabsStore.currentTab.summonerProfile
       ) {
         return {
-          puuid: pts.currentTab.puuid,
-          backgroundSkinId: pts.currentTab.summonerProfile.backgroundSkinId
+          puuid: playerTabsStore.currentTab.puuid,
+          backgroundSkinId: playerTabsStore.currentTab.summonerProfile.backgroundSkinId
         }
       }
 
@@ -109,12 +109,15 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     })
 
     watch(
-      [() => currentTabBackgroundInfo.value, () => mui.frontendSettings.useProfileSkinAsBackground],
+      [
+        () => currentTabBackgroundInfo.value,
+        () => mainWindowUiStore.frontendSettings.useProfileSkinAsBackground
+      ],
       async ([info, enabled]) => {
         const requestId = ++tabBackgroundRequestId
 
         if (!enabled || !info) {
-          mui.tabBackgroundSkinUrl = null
+          mainWindowUiStore.tabBackgroundSkinUrl = null
           return
         }
 
@@ -125,7 +128,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
         )
 
         if (requestId === tabBackgroundRequestId) {
-          mui.tabBackgroundSkinUrl = url
+          mainWindowUiStore.tabBackgroundSkinUrl = url
         }
       },
       { immediate: true }
@@ -142,12 +145,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
         const url = await this._getChampionSkinUrl(backgroundSkinId)
 
         if (url === null) {
-          this._log.warn(MainWindowUiRenderer.id, `Skin ${backgroundSkinId} not found`)
+          this._logger.warn(MainWindowUiRenderer.id, `Skin ${backgroundSkinId} not found`)
         }
 
         return url
       } catch (error) {
-        this._log.warn(MainWindowUiRenderer.id, 'Failed to get skin details', error)
+        this._logger.warn(MainWindowUiRenderer.id, 'Failed to get skin details', error)
         return null
       }
     }
@@ -157,7 +160,10 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     }
 
     try {
-      const { data } = await this._lc.api.championMastery.getPlayerChampionMasteryTopN(puuid, 1)
+      const { data } = await this._leagueClient.api.championMastery.getPlayerChampionMasteryTopN(
+        puuid,
+        1
+      )
       const topChampionId = data.masteries[0]?.championId
 
       if (!topChampionId || topChampionId <= 0) {
@@ -166,13 +172,17 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
       return await this._getChampionDefaultSkinUrl(topChampionId)
     } catch (error) {
-      this._log.warn(MainWindowUiRenderer.id, `Failed to get fallback mastery skin (${scope})`, error)
+      this._logger.warn(
+        MainWindowUiRenderer.id,
+        `Failed to get fallback mastery skin (${scope})`,
+        error
+      )
       return null
     }
   }
 
   private async _getChampionDefaultSkinUrl(championId: number) {
-    const { data } = await this._lc.api.gameData.getChampDetails(championId)
+    const { data } = await this._leagueClient.api.gameData.getChampDetails(championId)
 
     const skin = data.skins.find((s) => s.id === championId * 1000) || data.skins[0]
 
@@ -190,7 +200,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     }
 
     const championId = skinId.toString().slice(0, -3)
-    const { data } = await this._lc.api.gameData.getChampDetails(Number(championId))
+    const { data } = await this._leagueClient.api.gameData.getChampDetails(Number(championId))
 
     for (const skin of data.skins) {
       if (skin.id === skinId) {
@@ -211,22 +221,22 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     return null
   }
 
-  private async _handleSettings() {
+  private async _setupSettings() {
     const store = useMainWindowUiStore()
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       MainWindowUiRenderer.id,
       store.frontendSettings,
       'useProfileSkinAsBackground'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       MainWindowUiRenderer.id,
       store.frontendSettings,
       'sidebarCollapsed'
     )
 
-    await this._setting.savedPropVue(
+    await this._settingUtils.savedPropVue(
       MainWindowUiRenderer.id,
       store.frontendSettings,
       'showTestPage'

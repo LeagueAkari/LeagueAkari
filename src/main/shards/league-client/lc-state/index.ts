@@ -104,18 +104,18 @@ export class LeagueClientData {
   }
 
   private _syncLcuGameflow() {
-    this._context.mobx.propSync(this._context.namespace, 'gameflow', this.gameflow, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'gameflow', this.gameflow, [
       'phase',
       'session'
     ])
 
     const loadPhase = async () => {
-      const phase = await this._context.lc.api.gameflow.getGameflowPhase()
+      const phase = await this._context.leagueClient.api.gameflow.getGameflowPhase()
       this.gameflow.setPhase(phase.data)
     }
 
     const loadSession = async () => {
-      const session = await this._context.lc.api.gameflow.getGameflowSession()
+      const session = await this._context.leagueClient.api.gameflow.getGameflowSession()
       this.gameflow.setSession(session.data)
     }
 
@@ -127,24 +127,24 @@ export class LeagueClientData {
       this.gameflow.setSession(null)
     })
 
-    this._context.lc.events.on('/lol-gameflow/v1/gameflow-phase', (event) => {
+    this._context.leagueClient.events.on('/lol-gameflow/v1/gameflow-phase', (event) => {
       this.gameflow.setPhase(event.data)
     })
 
-    this._context.lc.events.on('/lol-gameflow/v1/session', (event) => {
+    this._context.leagueClient.events.on('/lol-gameflow/v1/session', (event) => {
       this.gameflow.setSession(event.data)
     })
   }
 
   private _syncLcuLobby() {
-    this._context.mobx.propSync(this._context.namespace, 'lobby', this.lobby, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'lobby', this.lobby, [
       'lobby',
       'receivedInvitations'
     ])
 
     const loadLobby = async () => {
       try {
-        const lb = (await this._context.lc.api.lobby.getLobby()).data
+        const lb = (await this._context.leagueClient.api.lobby.getLobby()).data
         this.lobby.setLobby(lb)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -153,13 +153,13 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-lobby')
-        this._context.log.warn(`Failed to get lobby`, error)
+        this._context.logger.warn(`Failed to get lobby`, error)
       }
     }
 
     const loadReceivedInvitations = async () => {
       try {
-        const inv = (await this._context.lc.api.lobby.getReceivedInvitations()).data
+        const inv = (await this._context.leagueClient.api.lobby.getReceivedInvitations()).data
         this.lobby.setReceivedInvitations(inv)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -172,7 +172,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-received-invitations'
         )
-        this._context.log.warn(`Failed to get received invitations`, error)
+        this._context.logger.warn(`Failed to get received invitations`, error)
       }
     }
 
@@ -184,21 +184,26 @@ export class LeagueClientData {
       this.lobby.setReceivedInvitations([])
     })
 
-    this._context.lc.events.on('/lol-lobby/v2/lobby', (event) => {
+    this._context.leagueClient.events.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
     })
 
-    this._context.lc.events.on('/lol-lobby/v2/received-invitations', (event) => {
+    this._context.leagueClient.events.on('/lol-lobby/v2/received-invitations', (event) => {
       this.lobby.setReceivedInvitations(event.data)
     })
   }
 
   private _syncLcuLogin() {
-    this._context.mobx.propSync(this._context.namespace, 'login', this.login, 'loginQueueState')
+    this._context.mobxUtils.propSync(
+      this._context.namespace,
+      'login',
+      this.login,
+      'loginQueueState'
+    )
 
     const loadLoginQueueState = async () => {
       try {
-        const q = (await this._context.lc.api.login.getLoginQueueState()).data
+        const q = (await this._context.leagueClient.api.login.getLoginQueueState()).data
         this.login.setLoginQueueState(q)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -211,7 +216,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-login-queue-state'
         )
-        this._context.log.warn(`Failed to get login queue state`, error)
+        this._context.logger.warn(`Failed to get login queue state`, error)
       }
     }
 
@@ -221,15 +226,15 @@ export class LeagueClientData {
       this.login.setLoginQueueState(null)
     })
 
-    this._context.lc.events.on('/lol-login/v1/login-queue-state', (event) => {
+    this._context.leagueClient.events.on('/lol-login/v1/login-queue-state', (event) => {
       this.login.setLoginQueueState(event.data)
     })
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => !!this.login.loginQueueState,
       (isQueueing) => {
         if (isQueueing) {
-          this._context.log.debug(`正在登录排队中`)
+          this._context.logger.debug(`正在登录排队中`)
         }
       },
       { fireImmediately: true }
@@ -237,14 +242,14 @@ export class LeagueClientData {
   }
 
   private _syncLcuSummoner() {
-    this._context.mobx.propSync(this._context.namespace, 'summoner', this.summoner, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'summoner', this.summoner, [
       'me',
       'profile'
     ])
 
     const loadCurrentSummoner = async () => {
       try {
-        const data = (await this._context.lc.api.summoner.getCurrentSummoner()).data
+        const data = (await this._context.leagueClient.api.summoner.getCurrentSummoner()).data
         this.summoner.setMe(data)
         this.summoner.setNewIdSystemEnabled(Boolean(data.tagLine))
       } catch (error) {
@@ -255,7 +260,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-summoner')
-        this._context.log.warn(`Failed to get summoner`, error)
+        this._context.logger.warn(`Failed to get summoner`, error)
       }
     }
 
@@ -269,12 +274,13 @@ export class LeagueClientData {
     })
 
     // 此部分仅跟随 current-summoner 之后加载. 因为它不重要
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.summoner.me,
       async (me) => {
         if (me && !this.summoner.profile) {
           try {
-            const { data } = await this._context.lc.api.summoner.getCurrentSummonerProfile()
+            const { data } =
+              await this._context.leagueClient.api.summoner.getCurrentSummonerProfile()
             this.summoner.setProfile(data)
           } catch (error) {
             this._context.ipc.sendEvent(
@@ -282,24 +288,32 @@ export class LeagueClientData {
               'error-sync-data',
               'get-summoner-profile'
             )
-            this._context.log.warn(`Failed to get summoner profile`, error)
+            this._context.logger.warn(`Failed to get summoner profile`, error)
           }
         }
       }
     )
 
-    this._context.lc.events.on('/lol-summoner/v1/current-summoner', (event) => {
+    this._context.leagueClient.events.on('/lol-summoner/v1/current-summoner', (event) => {
       this.summoner.setMe(event.data)
       this.summoner.setNewIdSystemEnabled(Boolean(event.data?.tagLine))
     })
 
-    this._context.lc.events.on('/lol-summoner/v1/current-summoner/summoner-profile', (event) => {
-      this.summoner.setProfile(event.data)
-    })
+    this._context.leagueClient.events.on(
+      '/lol-summoner/v1/current-summoner/summoner-profile',
+      (event) => {
+        this.summoner.setProfile(event.data)
+      }
+    )
   }
 
   private _syncLcuEntitlements() {
-    this._context.mobx.propSync(this._context.namespace, 'entitlements', this.entitlements, 'token')
+    this._context.mobxUtils.propSync(
+      this._context.namespace,
+      'entitlements',
+      this.entitlements,
+      'token'
+    )
 
     // 如果是 500 失败，会永远重试
     let timer: NodeJS.Timeout | null = null
@@ -312,7 +326,8 @@ export class LeagueClientData {
 
     const loadEntitlementsToken = async () => {
       try {
-        const token = (await this._context.lc.api.entitlements.getEntitlementsToken()).data
+        const token = (await this._context.leagueClient.api.entitlements.getEntitlementsToken())
+          .data
 
         cancelRetryTimer()
         this.entitlements.setToken(token)
@@ -334,7 +349,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-entitlements-token'
         )
-        this._context.log.warn(`Failed to get entitlements token`, error)
+        this._context.logger.warn(`Failed to get entitlements token`, error)
       }
     }
 
@@ -345,14 +360,14 @@ export class LeagueClientData {
       this.entitlements.setToken(null)
     })
 
-    this._context.lc.events.on('/entitlements/v1/token', (event) => {
+    this._context.leagueClient.events.on('/entitlements/v1/token', (event) => {
       cancelRetryTimer()
       this.entitlements.setToken(event.data)
     })
   }
 
   private _syncLcuLeagueSession() {
-    this._context.mobx.propSync(
+    this._context.mobxUtils.propSync(
       this._context.namespace,
       'leagueSession',
       this.leagueSession,
@@ -369,7 +384,8 @@ export class LeagueClientData {
 
     const loadLeagueSessionToken = async () => {
       try {
-        const token = (await this._context.lc.api.leagueSession.getLeagueSessionToken()).data
+        const token = (await this._context.leagueClient.api.leagueSession.getLeagueSessionToken())
+          .data
 
         cancelRetryTimer()
         this.leagueSession.setToken(token)
@@ -391,7 +407,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-league-session-token'
         )
-        this._context.log.warn(`Failed to get league session token`, error)
+        this._context.logger.warn(`Failed to get league session token`, error)
       }
     }
 
@@ -404,7 +420,7 @@ export class LeagueClientData {
       this.leagueSession.setToken(null)
     })
 
-    this._context.lc.events.on('/lol-league-session/v1/league-session-token', (event) => {
+    this._context.leagueClient.events.on('/lol-league-session/v1/league-session-token', (event) => {
       cancelRetryTimer()
       this.leagueSession.setToken(event.data)
     })
@@ -412,7 +428,7 @@ export class LeagueClientData {
 
   // 这里并没有主动初始化的逻辑, 因为目前并没有使用到
   private _syncLcuMatchmaking() {
-    this._context.mobx.propSync(this._context.namespace, 'matchmaking', this.matchmaking, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'matchmaking', this.matchmaking, [
       'readyCheck',
       'search'
     ])
@@ -422,17 +438,17 @@ export class LeagueClientData {
       this.matchmaking.setSearch(null)
     })
 
-    this._context.lc.events.on('/lol-matchmaking/v1/ready-check', (event) => {
+    this._context.leagueClient.events.on('/lol-matchmaking/v1/ready-check', (event) => {
       this.matchmaking.setReadyCheck(event.data)
     })
 
-    this._context.lc.events.on('/lol-matchmaking/v1/search', (event) => {
+    this._context.leagueClient.events.on('/lol-matchmaking/v1/search', (event) => {
       this.matchmaking.setSearch(event.data)
     })
   }
 
   private _syncLcuChat() {
-    this._context.mobx.propSync(this._context.namespace, 'chat', this.chat, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'chat', this.chat, [
       'me',
       'participants.postGame',
       'participants.customGame',
@@ -444,17 +460,17 @@ export class LeagueClientData {
 
     const loadMe = async () => {
       try {
-        const me = (await this._context.lc.api.chat.getMe()).data
+        const me = (await this._context.leagueClient.api.chat.getMe()).data
         this.chat.setMe(me)
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-me')
-        this._context.log.warn(`Failed to get me`, error)
+        this._context.logger.warn(`Failed to get me`, error)
       }
     }
 
     const loadConversation = async () => {
       try {
-        const cvs = (await this._context.lc.api.chat.getConversations()).data
+        const cvs = (await this._context.leagueClient.api.chat.getConversations()).data
 
         const t: Promise<any>[] = []
         for (const c of cvs) {
@@ -466,23 +482,23 @@ export class LeagueClientData {
                 }
 
                 this.chat.setConversationChampSelect(c)
-                const ids1 = (await this._context.lc.api.chat.getChatParticipants(c.id)).data.map(
-                  (cc) => cc.summonerId
-                )
+                const ids1 = (
+                  await this._context.leagueClient.api.chat.getChatParticipants(c.id)
+                ).data.map((cc) => cc.summonerId)
                 runInAction(() => this.chat.setParticipantsChampSelect(ids1))
                 break
               case 'postGame':
                 this.chat.setConversationPostGame(c)
-                const ids2 = (await this._context.lc.api.chat.getChatParticipants(c.id)).data.map(
-                  (cc) => cc.summonerId
-                )
+                const ids2 = (
+                  await this._context.leagueClient.api.chat.getChatParticipants(c.id)
+                ).data.map((cc) => cc.summonerId)
                 runInAction(() => this.chat.setParticipantsPostGame(ids2))
                 break
               case 'customGame':
                 this.chat.setConversationCustomGame(c)
-                const ids3 = (await this._context.lc.api.chat.getChatParticipants(c.id)).data.map(
-                  (cc) => cc.summonerId
-                )
+                const ids3 = (
+                  await this._context.leagueClient.api.chat.getChatParticipants(c.id)
+                ).data.map((cc) => cc.summonerId)
                 runInAction(() => this.chat.setParticipantsCustomGame(ids3))
             }
           }
@@ -497,7 +513,7 @@ export class LeagueClientData {
             'error-sync-data',
             'get-conversations'
           )
-          this._context.log.warn(`Failed to get conversations`, error)
+          this._context.logger.warn(`Failed to get conversations`, error)
         }
       }
     }
@@ -515,7 +531,7 @@ export class LeagueClientData {
       this.chat.setParticipantsPostGame(null)
     })
 
-    this._context.lc.events.on<LcuEvent<Conversation>>(
+    this._context.leagueClient.events.on<LcuEvent<Conversation>>(
       '/lol-chat/v1/conversations/:id',
       (event, { id }) => {
         if (event.eventType === 'Delete') {
@@ -580,7 +596,7 @@ export class LeagueClientData {
     )
 
     // 监测用户进入房间
-    this._context.lc.events.on(
+    this._context.leagueClient.events.on(
       '/lol-chat/v1/conversations/:conversationId/messages/:messageId',
       (event, param) => {
         if (event.data && event.data.type === 'system' && event.data.body === 'joined_room') {
@@ -617,7 +633,7 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on('/lol-chat/v1/me', (event) => {
+    this._context.leagueClient.events.on('/lol-chat/v1/me', (event) => {
       if (event.eventType === 'Update' || event.eventType === 'Create') {
         this.chat.setMe(event.data)
         return
@@ -628,7 +644,7 @@ export class LeagueClientData {
   }
 
   private _syncLcuChampSelect() {
-    this._context.mobx.propSync(this._context.namespace, 'champSelect', this.champSelect, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'champSelect', this.champSelect, [
       'session',
       'currentPickableChampionIds',
       'currentBannableChampionIds',
@@ -638,7 +654,7 @@ export class LeagueClientData {
       'skinSelectorInfo'
     ])
 
-    this._context.mobx.propSync(
+    this._context.mobxUtils.propSync(
       this._context.namespace,
       'champSelect',
       this.champSelect,
@@ -648,7 +664,7 @@ export class LeagueClientData {
 
     const loadSession = async () => {
       try {
-        const session = (await this._context.lc.api.champSelect.getSession()).data
+        const session = (await this._context.leagueClient.api.champSelect.getSession()).data
         this.champSelect.setSession(session)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -661,15 +677,16 @@ export class LeagueClientData {
           'error-sync-data',
           'get-champ-select-session'
         )
-        this._context.log.warn(`Failed to get champ-select session`, error)
+        this._context.logger.warn(`Failed to get champ-select session`, error)
       }
     }
 
     const loadPickables = async () => {
       try {
-        const pickables = (await this._context.lc.api.champSelect.getPickableChampIds()).data
+        const pickables = (await this._context.leagueClient.api.champSelect.getPickableChampIds())
+          .data
         this.champSelect.setCurrentPickableChampionArray(pickables)
-        this._context.log.debug(`Load pickable champion list, ${pickables.length} champions`)
+        this._context.logger.debug(`Load pickable champion list, ${pickables.length} champions`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentPickableChampionArray([])
@@ -681,15 +698,16 @@ export class LeagueClientData {
           'error-sync-data',
           'get-pickable-champ-ids'
         )
-        this._context.log.warn(`Failed to get pickable champion list`, error)
+        this._context.logger.warn(`Failed to get pickable champion list`, error)
       }
     }
 
     const loadBannables = async () => {
       try {
-        const bannables = (await this._context.lc.api.champSelect.getBannableChampIds()).data
+        const bannables = (await this._context.leagueClient.api.champSelect.getBannableChampIds())
+          .data
         this.champSelect.setCurrentBannableChampionArray(bannables)
-        this._context.log.debug(`Load bannable champion list, ${bannables.length} champions`)
+        this._context.logger.debug(`Load bannable champion list, ${bannables.length} champions`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentBannableChampionArray([])
@@ -701,20 +719,20 @@ export class LeagueClientData {
           'error-sync-data',
           'get-bannable-champ-ids'
         )
-        this._context.log.warn(`Failed to get bannable champion list`, error)
+        this._context.logger.warn(`Failed to get bannable champion list`, error)
       }
     }
 
     // 尝试在之后加载, 包含比较绕的初始化逻辑
     let isCellSummonerUpdated = false
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.champSelect.session,
       async (session) => {
         if (!isCellSummonerUpdated && session) {
           const self = session.myTeam.find((t) => t.cellId === session.localPlayerCellId)
           if (self) {
             try {
-              const s = await this._context.lc.api.champSelect.getSummoner(self.cellId)
+              const s = await this._context.leagueClient.api.champSelect.getSummoner(self.cellId)
 
               // 如果没有被更新，用于区分首次加载的情况
               if (!isCellSummonerUpdated) {
@@ -727,7 +745,7 @@ export class LeagueClientData {
                 'error-sync-data',
                 'get-self-summoner'
               )
-              this._context.log.warn(`Failed to get self summoner`, error)
+              this._context.logger.warn(`Failed to get self summoner`, error)
             }
           }
         }
@@ -750,10 +768,10 @@ export class LeagueClientData {
       }
     })
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => selfSummonerExtracted.get(),
       (s) => {
-        this._context.log.debug(`Self Summoner Cell: ${JSON.stringify(s)}`)
+        this._context.logger.debug(`Self Summoner Cell: ${JSON.stringify(s)}`)
       },
       { equals: comparer.structural }
     )
@@ -768,15 +786,15 @@ export class LeagueClientData {
 
     const loadCurrentChampion = async () => {
       try {
-        const c = (await this._context.lc.api.champSelect.getCurrentChamp()).data
+        const c = (await this._context.leagueClient.api.champSelect.getCurrentChamp()).data
         this.champSelect.setCurrentChampion(c)
-        this._context.log.debug(
+        this._context.logger.debug(
           `Current selected champion: ${this.gameData.champions[c]?.name || c}`
         )
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setCurrentChampion(null)
-          this._context.log.debug(`Current selected champion: none`)
+          this._context.logger.debug(`Current selected champion: none`)
           return
         }
 
@@ -785,20 +803,20 @@ export class LeagueClientData {
           'error-sync-data',
           'get-current-champion'
         )
-        this._context.log.warn(`Failed to get current selected champion`, error)
+        this._context.logger.warn(`Failed to get current selected champion`, error)
       }
     }
 
     // 在无尽狂潮 (SWARM) 模式后, 这个端点出现了
     const loadDisabledChampions = async () => {
       try {
-        const c = (await this._context.lc.api.champSelect.getDisabledChampions()).data
+        const c = (await this._context.leagueClient.api.champSelect.getDisabledChampions()).data
         this.champSelect.setDisabledChampionIds(c)
-        this._context.log.debug(`Disabled champions: ${c}`)
+        this._context.logger.debug(`Disabled champions: ${c}`)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.champSelect.setDisabledChampionIds([])
-          this._context.log.debug(`Disabled champions: none`)
+          this._context.logger.debug(`Disabled champions: none`)
           return
         }
 
@@ -807,13 +825,14 @@ export class LeagueClientData {
           'error-sync-data',
           'get-disabled-champions'
         )
-        this._context.log.warn(`Failed to get disabled champions`, error)
+        this._context.logger.warn(`Failed to get disabled champions`, error)
       }
     }
 
     const loadOngoingChampionSwap = async () => {
       try {
-        const trade = (await this._context.lc.api.champSelect.getOngoingChampionSwap()).data
+        const trade = (await this._context.leagueClient.api.champSelect.getOngoingChampionSwap())
+          .data
         this.champSelect.setOngoingChampionSwap(trade)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -826,7 +845,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-ongoing-champion-swap'
         )
-        this._context.log.warn(`Failed to get ongoing champion swap`, error)
+        this._context.logger.warn(`Failed to get ongoing champion swap`, error)
       }
     }
 
@@ -834,9 +853,9 @@ export class LeagueClientData {
       for (const champ of champs) {
         gridChampionsQueue.add(async () => {
           try {
-            const { data } = await this._context.lc.api.champSelect.getGridChamp(champ.id)
+            const { data } = await this._context.leagueClient.api.champSelect.getGridChamp(champ.id)
             this.champSelect.setGridChampion(data)
-            this._context.mobx.notifyStatePropChange(
+            this._context.mobxUtils.notifyStatePropChange(
               this._context.namespace,
               'champSelect',
               `gridChampions[${champ.id}]`,
@@ -845,7 +864,7 @@ export class LeagueClientData {
             )
           } catch (error) {
             // just skip
-            this._context.log.warn(`Failed to load grid champions: ${champ.id}`, error)
+            this._context.logger.warn(`Failed to load grid champions: ${champ.id}`, error)
           }
         })
       }
@@ -855,16 +874,16 @@ export class LeagueClientData {
 
     const loadAllGridChampionsAndFillGridChampions = async () => {
       try {
-        const champs = (await this._context.lc.api.champSelect.getAllGridChamps()).data
+        const champs = (await this._context.leagueClient.api.champSelect.getAllGridChamps()).data
         await fillGridChampions(champs)
       } catch (error) {
-        this._context.log.warn(`Failed to get all grid champions`, error)
+        this._context.logger.warn(`Failed to get all grid champions`, error)
       }
     }
 
     const loadSkinSelectorInfo = async () => {
       try {
-        const info = (await this._context.lc.api.champSelect.getSkinSelectorInfo()).data
+        const info = (await this._context.leagueClient.api.champSelect.getSkinSelectorInfo()).data
         this.champSelect.setSkinSelectorInfo(info)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
@@ -877,7 +896,7 @@ export class LeagueClientData {
           'error-sync-data',
           'get-skin-selector-info'
         )
-        this._context.log.warn(`Failed to get skin selector info`, error)
+        this._context.logger.warn(`Failed to get skin selector info`, error)
       }
     }
 
@@ -905,14 +924,14 @@ export class LeagueClientData {
     })
 
     // 额外的检查步骤, 下同
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.gameflow.session?.phase,
       async (phase) => {
         if (
           phase === 'ChampSelect' &&
           this.champSelect.currentPickableChampionIdArray.length === 0
         ) {
-          const { data } = await this._context.lc.api.champSelect.getPickableChampIds()
+          const { data } = await this._context.leagueClient.api.champSelect.getPickableChampIds()
           if (data.length) {
             this.champSelect.setCurrentPickableChampionArray(data)
           }
@@ -921,14 +940,14 @@ export class LeagueClientData {
     )
 
     // 额外的检查步骤
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.gameflow.session?.phase,
       async (phase) => {
         if (
           phase === 'ChampSelect' &&
           this.champSelect.currentPickableChampionIdArray.length === 0
         ) {
-          const { data } = await this._context.lc.api.champSelect.getBannableChampIds()
+          const { data } = await this._context.leagueClient.api.champSelect.getBannableChampIds()
           if (data.length) {
             this.champSelect.setCurrentBannableChampionArray(data)
           }
@@ -936,19 +955,21 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on<LcuEvent<number[]>>(
+    this._context.leagueClient.events.on<LcuEvent<number[]>>(
       '/lol-champ-select/v1/bannable-champion-ids',
       (event) => {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentBannableChampionArray([])
         } else {
-          this._context.log.debug(`Update bannable champion list, ${event.data?.length} champions`)
+          this._context.logger.debug(
+            `Update bannable champion list, ${event.data?.length} champions`
+          )
           this.champSelect.setCurrentBannableChampionArray(event.data)
         }
       }
     )
 
-    this._context.lc.events.on<LcuEvent<ChampSelectSummoner>>(
+    this._context.leagueClient.events.on<LcuEvent<ChampSelectSummoner>>(
       '/lol-champ-select/v1/summoners/*',
       (event) => {
         if (event.data && event.data.isSelf) {
@@ -958,7 +979,7 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on('/lol-champ-select/v1/session', (event) => {
+    this._context.leagueClient.events.on('/lol-champ-select/v1/session', (event) => {
       if (event.eventType === 'Delete') {
         this.champSelect.setSession(null)
         this.champSelect.setSelfSummoner(null)
@@ -967,22 +988,24 @@ export class LeagueClientData {
       }
     })
 
-    this._context.lc.events.on<LcuEvent<number[]>>(
+    this._context.leagueClient.events.on<LcuEvent<number[]>>(
       '/lol-champ-select/v1/pickable-champion-ids',
       (event) => {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentPickableChampionArray([])
         } else {
-          this._context.log.debug(`Update pickable champion list, ${event.data?.length} champions`)
+          this._context.logger.debug(
+            `Update pickable champion list, ${event.data?.length} champions`
+          )
           this.champSelect.setCurrentPickableChampionArray(event.data)
         }
       }
     )
 
-    this._context.lc.events.on<LcuEvent<number>>(
+    this._context.leagueClient.events.on<LcuEvent<number>>(
       '/lol-champ-select/v1/current-champion',
       (event) => {
-        this._context.log.debug(
+        this._context.logger.debug(
           `Current selected champion: ${this.gameData.champions[event.data]?.name || event.data}`
         )
 
@@ -994,9 +1017,9 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
+    this._context.leagueClient.events.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
       if (event.data?.length !== 0) {
-        this._context.log.debug(`Disabled champions: ${event.data?.length}`)
+        this._context.logger.debug(`Disabled champions: ${event.data?.length}`)
       }
 
       if (event.eventType === 'Delete') {
@@ -1006,7 +1029,7 @@ export class LeagueClientData {
       }
     })
 
-    this._context.lc.events.on<LcuEvent<OngoingChampionSwap>>(
+    this._context.leagueClient.events.on<LcuEvent<OngoingChampionSwap>>(
       '/lol-champ-select/v1/ongoing-champion-swap',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -1018,11 +1041,11 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on<LcuEvent<GridChamp>>(
+    this._context.leagueClient.events.on<LcuEvent<GridChamp>>(
       '/lol-champ-select/v1/grid-champions/*',
       (event) => {
         this.champSelect.setGridChampion(event.data)
-        this._context.mobx.notifyStatePropChange(
+        this._context.mobxUtils.notifyStatePropChange(
           this._context.namespace,
           'champSelect',
           `gridChampions[${event.data.id}]`,
@@ -1032,7 +1055,7 @@ export class LeagueClientData {
       }
     )
 
-    this._context.lc.events.on<LcuEvent<SkinSelectorInfo>>(
+    this._context.leagueClient.events.on<LcuEvent<SkinSelectorInfo>>(
       '/lol-champ-select/v1/skin-selector-info',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -1046,11 +1069,11 @@ export class LeagueClientData {
   }
 
   private _syncLcuHonor() {
-    this._context.mobx.propSync(this._context.namespace, 'honor', this.honor, 'ballot')
+    this._context.mobxUtils.propSync(this._context.namespace, 'honor', this.honor, 'ballot')
 
     const loadBallot = async () => {
       try {
-        this.honor.setBallot((await this._context.lc.api.honor.getV2Ballot()).data)
+        this.honor.setBallot((await this._context.leagueClient.api.honor.getV2Ballot()).data)
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           this.honor.setBallot(null)
@@ -1058,7 +1081,7 @@ export class LeagueClientData {
         }
 
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-honor-ballot')
-        this._context.log.warn(`Failed to get honor ballot`, error)
+        this._context.logger.warn(`Failed to get honor ballot`, error)
       }
     }
 
@@ -1068,18 +1091,21 @@ export class LeagueClientData {
       this.honor.setBallot(null)
     })
 
-    this._context.lc.events.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
-      if (event.eventType === 'Delete') {
-        this.honor.setBallot(null)
-        return
-      }
+    this._context.leagueClient.events.on<LcuEvent<Ballot>>(
+      '/lol-honor-v2/v1/ballot',
+      async (event) => {
+        if (event.eventType === 'Delete') {
+          this.honor.setBallot(null)
+          return
+        }
 
-      this.honor.setBallot(event.data)
-    })
+        this.honor.setBallot(event.data)
+      }
+    )
   }
 
   private _syncLcuGameData() {
-    this._context.mobx.propSync(this._context.namespace, 'gameData', this.gameData, [
+    this._context.mobxUtils.propSync(this._context.namespace, 'gameData', this.gameData, [
       'champions',
       'items',
       'perks',
@@ -1093,7 +1119,7 @@ export class LeagueClientData {
 
     const loadSummonerSpells = async () => {
       try {
-        const spells = (await this._context.lc.api.gameData.getSummonerSpells()).data
+        const spells = (await this._context.leagueClient.api.gameData.getSummonerSpells()).data
         this.gameData.setSummonerSpells(
           spells.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1106,13 +1132,13 @@ export class LeagueClientData {
           'error-sync-data',
           'get-summoner-spells'
         )
-        this._context.log.warn(`Failed to get summoner spells`, error)
+        this._context.logger.warn(`Failed to get summoner spells`, error)
       }
     }
 
     const loadItems = async () => {
       try {
-        const items = (await this._context.lc.api.gameData.getItems()).data
+        const items = (await this._context.leagueClient.api.gameData.getItems()).data
         this.gameData.setItems(
           items.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1121,13 +1147,13 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-items')
-        this._context.log.warn(`Failed to get items`)
+        this._context.logger.warn(`Failed to get items`)
       }
     }
 
     const loadQueues = async () => {
       try {
-        const queues = (await this._context.lc.api.gameData.getQueues()).data
+        const queues = (await this._context.leagueClient.api.gameData.getQueues()).data
         if (Array.isArray(queues)) {
           const obj = queues.reduce((prev, cur) => {
             // 有多个队列 ID 为 0，忽略除第一个外的其他队列，第一个是自定义队列
@@ -1144,13 +1170,13 @@ export class LeagueClientData {
         }
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-queues')
-        this._context.log.warn(`Failed to get queues`)
+        this._context.logger.warn(`Failed to get queues`)
       }
     }
 
     const loadPerks = async () => {
       try {
-        const perks = (await this._context.lc.api.gameData.getPerks()).data
+        const perks = (await this._context.leagueClient.api.gameData.getPerks()).data
         this.gameData.setPerks(
           perks.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1159,13 +1185,13 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-perks')
-        this._context.log.warn(`Failed to get perks`, error)
+        this._context.logger.warn(`Failed to get perks`, error)
       }
     }
 
     const loadPerkstyles = async () => {
       try {
-        const perkstyles = (await this._context.lc.api.gameData.getPerkstyles()).data
+        const perkstyles = (await this._context.leagueClient.api.gameData.getPerkstyles()).data
         this.gameData.setPerkStyles({
           schemaVersion: perkstyles.schemaVersion,
           styles: perkstyles.styles.reduce((prev, cur) => {
@@ -1175,13 +1201,13 @@ export class LeagueClientData {
         })
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-perkstyles')
-        this._context.log.warn(`Failed to get perkstyles`, error)
+        this._context.logger.warn(`Failed to get perkstyles`, error)
       }
     }
 
     const loadAugments = async () => {
       try {
-        const augments = (await this._context.lc.api.gameData.getAugments()).data
+        const augments = (await this._context.leagueClient.api.gameData.getAugments()).data
         this.gameData.setAugments(
           augments.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1190,13 +1216,13 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-augments')
-        this._context.log.warn(`Failed to get augments`, error)
+        this._context.logger.warn(`Failed to get augments`, error)
       }
     }
 
     const loadChampions = async () => {
       try {
-        const champions = (await this._context.lc.api.gameData.getChampionSummary()).data
+        const champions = (await this._context.leagueClient.api.gameData.getChampionSummary()).data
         this.gameData.setChampions(
           champions.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1205,13 +1231,13 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-champions')
-        this._context.log.warn(`Failed to get champions`, error)
+        this._context.logger.warn(`Failed to get champions`, error)
       }
     }
 
     const loadMaps = async () => {
       try {
-        const maps = (await this._context.lc.api.gameData.getMaps()).data
+        const maps = (await this._context.leagueClient.api.gameData.getMaps()).data
         this.gameData.setMaps(
           maps.reduce((prev, cur) => {
             prev[cur.id] = cur
@@ -1220,13 +1246,15 @@ export class LeagueClientData {
         )
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-maps')
-        this._context.log.warn(`Failed to get maps`, error)
+        this._context.logger.warn(`Failed to get maps`, error)
       }
     }
 
     const loadGameModeMutators = async () => {
       try {
-        const gameModeMutators = (await this._context.lc.api.gameData.getGameModeMutators()).data
+        const gameModeMutators = (
+          await this._context.leagueClient.api.gameData.getGameModeMutators()
+        ).data
         this.gameData.setGameModeMutators(
           gameModeMutators.reduce((prev, cur) => {
             prev[cur.MapId] = cur
@@ -1239,17 +1267,17 @@ export class LeagueClientData {
           'error-sync-data',
           'get-game-mode-mutators'
         )
-        this._context.log.warn(`Failed to get game mode mutators`, error)
+        this._context.logger.warn(`Failed to get game mode mutators`, error)
       }
     }
 
     const loadChallenges = async () => {
       try {
-        const challenges = (await this._context.lc.api.gameData.getChallenges()).data
+        const challenges = (await this._context.leagueClient.api.gameData.getChallenges()).data
         this.gameData.setChallenges(challenges)
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-challenges')
-        this._context.log.warn(`Failed to get challenges`, error)
+        this._context.logger.warn(`Failed to get challenges`, error)
       }
     }
 
@@ -1274,7 +1302,7 @@ export class LeagueClientData {
   }
 
   private _syncLcuLobbyTeamBuilder() {
-    this._context.mobx.propSync(
+    this._context.mobxUtils.propSync(
       this._context.namespace,
       'lobbyTeamBuilder',
       this.lobbyTeamBuilder,
@@ -1284,7 +1312,7 @@ export class LeagueClientData {
     const loadSubsetChampionList = async () => {
       try {
         const { data } =
-          await this._context.lc.api.lobbyTeamBuilder.getChampSelectSubsetChampionList()
+          await this._context.leagueClient.api.lobbyTeamBuilder.getChampSelectSubsetChampionList()
         this.lobbyTeamBuilder.champSelect.setSubsetChampionList(data)
       } catch (error) {
         this._context.ipc.sendEvent(
@@ -1304,7 +1332,7 @@ export class LeagueClientData {
       this.lobbyTeamBuilder.champSelect.setSubsetChampionList([])
     })
 
-    this._context.lc.events.on<LcuEvent<number[]>>(
+    this._context.leagueClient.events.on<LcuEvent<number[]>>(
       '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -1317,9 +1345,12 @@ export class LeagueClientData {
   }
 
   init() {
-    this._context.mobx.propSync(this._context.namespace, 'initialization', this.initialization, [
-      'progress'
-    ])
+    this._context.mobxUtils.propSync(
+      this._context.namespace,
+      'initialization',
+      this.initialization,
+      ['progress']
+    )
 
     this._syncLcuGameflow()
     this._syncLcuChampSelect()
@@ -1334,12 +1365,12 @@ export class LeagueClientData {
     this._syncLcuLeagueSession()
     this._syncLcuLobbyTeamBuilder()
 
-    this._handleLcuConnectionStateChange()
+    this._watchLcuConnectionStateChange()
   }
 
-  private _handleLcuConnectionStateChange() {
-    this._context.mobx.reaction(
-      () => this._context.lc.state.isConnected,
+  private _watchLcuConnectionStateChange() {
+    this._context.mobxUtils.reaction(
+      () => this._context.leagueClient.state.isConnected,
       (connected) => {
         if (connected) {
           this._stateInitializer.start()

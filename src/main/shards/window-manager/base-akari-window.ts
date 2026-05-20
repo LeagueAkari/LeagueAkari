@@ -98,20 +98,20 @@ export abstract class BaseAkariWindow<
   protected _window: BrowserWindow | null = null
   protected _namespace: string
   protected _partition: string
-  protected _log: AkariLogger
+  protected _logger: AkariLogger
 
   protected _forceReadyTimerId: NodeJS.Timeout | null = null
   protected _trueClose = false
 
-  protected readonly _setting: SetterSettingService
+  protected readonly _settingService: SetterSettingService
 
-  protected readonly _app: AppCommonMain
+  protected readonly _appCommon: AppCommonMain
 
   /** an alias for this._context.ipc */
   protected readonly _ipc: AkariIpcMain
 
-  /** an alias for this._context.mobx */
-  protected readonly _mobx: MobxUtilsMain
+  /** an alias for this._context.mobxUtils */
+  protected readonly _mobxUtils: MobxUtilsMain
 
   /** an alias for this._context.leagueClient */
   protected readonly _leagueClient: LeagueClientMain
@@ -157,17 +157,17 @@ export abstract class BaseAkariWindow<
 
     this._namespace = `${_context.namespace}/${_namespaceSuffix}`
     this._partition = `persist:${_namespaceSuffix}`
-    this._log = _context.loggerFactory.create(this._namespace)
-    this._app = _context.app
+    this._logger = _context.loggerFactory.create(this._namespace)
+    this._appCommon = _context.appCommon
     this._ipc = _context.ipc
-    this._mobx = _context.mobx
+    this._mobxUtils = _context.mobxUtils
     this._leagueClient = _context.leagueClient
     this._gameClient = _context.gameClient
     this._windowManager = _context.windowManager
     this._loggerFactory = _context.loggerFactory
     this._protocol = _context.protocol
     this._keyboardShortcuts = _context.keyboardShortcuts
-    this._setting = _context.settingFactory.register(
+    this._settingService = _context.settingFactory.register(
       this._namespace,
       {
         // @ts-ignore
@@ -259,7 +259,7 @@ export abstract class BaseAkariWindow<
   }
 
   protected _baseWindowObservations() {
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.settings.opacity,
       (o) => {
         this._window?.setOpacity(o)
@@ -267,7 +267,7 @@ export abstract class BaseAkariWindow<
       { fireImmediately: true }
     )
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.settings.pinned,
       (pinned) => {
         this._window?.setAlwaysOnTop(pinned, 'screen-saver')
@@ -275,17 +275,17 @@ export abstract class BaseAkariWindow<
       { fireImmediately: true }
     )
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this.state.trackedBounds,
       (bounds) => {
         if (bounds) {
-          this._setting._saveToStorage('trackedBounds', bounds)
+          this._settingService._saveToStorage('trackedBounds', bounds)
         }
       },
       { delay: 1000, equals: comparer.shallow }
     )
 
-    this._context.mobx.reaction(
+    this._context.mobxUtils.reaction(
       () => this._windowManager.settings.contentProtection,
       (enabled) => {
         this._window?.setContentProtection(enabled)
@@ -316,7 +316,7 @@ export abstract class BaseAkariWindow<
     })
 
     this._window.once('ready-to-show', () => {
-      this._log.info(`BrowserWindow ready-to-show (${this._namespace})`)
+      this._logger.info(`BrowserWindow ready-to-show (${this._namespace})`)
 
       if (this._forceReadyTimerId) {
         clearTimeout(this._forceReadyTimerId)
@@ -372,13 +372,13 @@ export abstract class BaseAkariWindow<
     }
 
     this._window.webContents.on('dom-ready', () => {
-      this._log.info(`WebContents dom-ready (${this._namespace})`)
+      this._logger.info(`WebContents dom-ready (${this._namespace})`)
     })
 
     this._window.webContents.on('did-finish-load', () => {
       this._window?.webContents.setZoomFactor(1.0)
 
-      this._log.info(`WebContents did-finish-load (${this._namespace})`)
+      this._logger.info(`WebContents did-finish-load (${this._namespace})`)
 
       if (this._forceReadyTimerId) {
         clearTimeout(this._forceReadyTimerId)
@@ -390,7 +390,7 @@ export abstract class BaseAkariWindow<
       }
 
       this._forceReadyTimerId = setTimeout(() => {
-        this._log.warn(`WebContents force-ready (${this._namespace})`)
+        this._logger.warn(`WebContents force-ready (${this._namespace})`)
         runInAction(() => (this.state.ready = true))
       }, 5000)
     })
@@ -398,7 +398,7 @@ export abstract class BaseAkariWindow<
     this._window.webContents.on(
       'did-fail-load',
       (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
-        this._log.error(`WebContents did-fail-load (${this._namespace})`, {
+        this._logger.error(`WebContents did-fail-load (${this._namespace})`, {
           errorCode,
           errorDescription,
           validatedURL,
@@ -408,15 +408,15 @@ export abstract class BaseAkariWindow<
     )
 
     this._window.webContents.on('render-process-gone', (_event, details) => {
-      this._log.warn(`WebContents render-process-gone (${this._namespace})`, details)
+      this._logger.warn(`WebContents render-process-gone (${this._namespace})`, details)
     })
 
     this._window.on('unresponsive', () => {
-      this._log.warn(`BrowserWindow unresponsive (${this._namespace})`)
+      this._logger.warn(`BrowserWindow unresponsive (${this._namespace})`)
     })
 
     this._window.on('responsive', () => {
-      this._log.info(`BrowserWindow responsive (${this._namespace})`)
+      this._logger.info(`BrowserWindow responsive (${this._namespace})`)
     })
 
     this._window.webContents.setWindowOpenHandler((details) => {
@@ -467,17 +467,17 @@ export abstract class BaseAkariWindow<
     })
 
     this._window.on('show', () => {
-      this._log.info(`BrowserWindow show (${this._namespace})`)
+      this._logger.info(`BrowserWindow show (${this._namespace})`)
       runInAction(() => (this.state.show = true))
     })
 
     this._window.on('hide', () => {
-      this._log.info(`BrowserWindow hide (${this._namespace})`)
+      this._logger.info(`BrowserWindow hide (${this._namespace})`)
       runInAction(() => (this.state.show = false))
     })
 
     this._window.on('closed', () => {
-      this._log.info(`BrowserWindow closed (${this._namespace})`)
+      this._logger.info(`BrowserWindow closed (${this._namespace})`)
       runInAction(() => (this.state.ready = false))
       this._window = null
     })
@@ -573,9 +573,9 @@ export abstract class BaseAkariWindow<
         const savePath = item.getSavePath()
 
         if (state === 'completed') {
-          this._log.info(`Download completed: ${savePath}`)
+          this._logger.info(`Download completed: ${savePath}`)
         } else {
-          this._log.info(`Download ended with state: ${state}`)
+          this._logger.info(`Download ended with state: ${state}`)
         }
 
         runInAction(() => {
@@ -590,7 +590,7 @@ export abstract class BaseAkariWindow<
       })
     })
 
-    this._log.info(`Create ${this._namespace}`)
+    this._logger.info(`Create ${this._namespace}`)
   }
 
   setOpacity(opacity: number) {
@@ -667,7 +667,7 @@ export abstract class BaseAkariWindow<
       this._window.center()
     }
 
-    this._log.info(`Reset ${this._namespace} position to main display center`)
+    this._logger.info(`Reset ${this._namespace} position to main display center`)
   }
 
   repositionWindowIfInvisible() {
@@ -675,7 +675,7 @@ export abstract class BaseAkariWindow<
       repositionWindowIfInvisible(this._window)
     }
 
-    this._log.info(`Reposition ${this._namespace} window if invisible`)
+    this._logger.info(`Reposition ${this._namespace} window if invisible`)
   }
 
   toggleDevtools() {
@@ -720,12 +720,12 @@ export abstract class BaseAkariWindow<
   }
 
   async onInit() {
-    await this._setting.applyToState()
+    await this._settingService.applyToState()
 
     this._protocol.registerPartition(this._partition)
 
     // @ts-ignore
-    this._context.mobx.propSync(this._namespace, 'state', this.state, [
+    this._context.mobxUtils.propSync(this._namespace, 'state', this.state, [
       'focus',
       'ready',
       'status',
@@ -735,13 +735,13 @@ export abstract class BaseAkariWindow<
     ])
 
     // @ts-ignore
-    this._context.mobx.propSync(this._namespace, 'settings', this.settings, [
+    this._context.mobxUtils.propSync(this._namespace, 'settings', this.settings, [
       'opacity',
       'pinned',
       ...this.getSettingPropKeys()
     ])
 
-    const bounds = await this._setting._getFromStorage('trackedBounds')
+    const bounds = await this._settingService._getFromStorage('trackedBounds')
     if (bounds) {
       runInAction(() => (this.state.trackedBounds = bounds))
     }

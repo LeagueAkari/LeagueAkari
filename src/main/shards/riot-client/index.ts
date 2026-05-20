@@ -23,37 +23,37 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   static REQUEST_TIMEOUT_MS = 17500
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
-  private _api: RiotClientHttpApiAxiosHelper | null = null
+  private _riotClientApi: RiotClientHttpApiAxiosHelper | null = null
 
-  private _http: AxiosInstance | null = null
+  private _httpClient: AxiosInstance | null = null
 
   // Riot Client 的事件推送格式和 League Client 完全相同, 但由于当前应用暂未使用, 所以不实现
-  // private _ws: WebSocket | null = null
+  // private _webSocket: WebSocket | null = null
   // private _eventBus = new RadixEventEmitter()
 
   constructor(
     private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _mobx: MobxUtilsMain,
-    private readonly _lc: LeagueClientMain,
+    private readonly _mobxUtils: MobxUtilsMain,
+    private readonly _leagueClient: LeagueClientMain,
     private readonly _protocol: AkariProtocolMain
   ) {
-    this._log = _loggerFactory.create(RiotClientMain.id)
+    this._logger = _loggerFactory.create(RiotClientMain.id)
 
-    this._handleProtocol()
+    this._registerProtocol()
   }
 
   get api() {
-    if (!this._api) {
+    if (!this._riotClientApi) {
       throw new RiotClientRcuUninitializedError()
     }
 
-    return this._api
+    return this._riotClientApi
   }
 
-  private _handleProtocol() {
+  private _registerProtocol() {
     this._protocol.registerDomain('riot-client', async (uri, req) => {
       const reqHeaders: Record<string, string> = {}
       req.headers.forEach((value, key) => {
@@ -82,7 +82,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
           status: res.status
         })
       } catch (error) {
-        this._log.warn(`Failed to RiotClient request`, error)
+        this._logger.warn(`Failed to RiotClient request`, error)
 
         if (error instanceof RiotClientRcuUninitializedError) {
           return new Response(JSON.stringify({ error: error.name }), {
@@ -99,10 +99,10 @@ export class RiotClientMain implements IAkariShardInitDispose {
     })
   }
 
-  private _handleCall() {
+  private _registerIpcHandlers() {
     this._ipc.onCall(RiotClientMain.id, 'http-request', async (_, config) => {
       try {
-        const { config: c, request, ...rest } = await this._http!.request(config)
+        const { config: c, request, ...rest } = await this._httpClient!.request(config)
 
         return {
           ...rest,
@@ -117,7 +117,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
           }
         }
 
-        this._log.warn(`RiotClient HTTP client error`, error)
+        this._logger.warn(`RiotClient HTTP client error`, error)
 
         throw error
       }
@@ -125,7 +125,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
   }
 
   private _initHttpInstance(auth: UxCommandLine) {
-    this._http = axios.create({
+    this._httpClient = axios.create({
       baseURL: `https://127.0.0.1:${auth.riotClientPort}`,
       headers: {
         Authorization: `Basic ${Buffer.from(`riot:${auth.riotClientAuthToken}`).toString('base64')}`
@@ -141,31 +141,31 @@ export class RiotClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    this._api = new RiotClientHttpApiAxiosHelper(this._http)
+    this._riotClientApi = new RiotClientHttpApiAxiosHelper(this._httpClient)
   }
 
   /**
    * RC 的请求, 🐰
    */
   async request<T = any, D = any>(config: AxiosRequestConfig<D>) {
-    if (!this._http) {
+    if (!this._httpClient) {
       throw new Error('RC Uninitialized')
     }
 
-    return this._http.request<T>(config)
+    return this._httpClient.request<T>(config)
   }
 
   async onInit() {
-    this._handleCall()
+    this._registerIpcHandlers()
 
-    this._mobx.reaction(
-      () => this._lc.state.auth,
+    this._mobxUtils.reaction(
+      () => this._leagueClient.state.auth,
       async (auth) => {
         if (auth) {
           this._initHttpInstance(auth)
         } else {
-          this._http = null
-          this._api = null
+          this._httpClient = null
+          this._riotClientApi = null
         }
       },
       { fireImmediately: true }
@@ -173,8 +173,8 @@ export class RiotClientMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    this._http = null
-    this._api = null
+    this._httpClient = null
+    this._riotClientApi = null
     this._protocol.unregisterDomain('riot-client')
   }
 }

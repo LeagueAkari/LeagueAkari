@@ -32,31 +32,31 @@ export class SgpMain implements IAkariShardInitDispose {
 
   public readonly state: SgpState
 
-  private readonly _log: AkariLogger
-  private readonly _api: SgpHttpApiAxiosHelper
-  private readonly _http = axios.create()
+  private readonly _logger: AkariLogger
+  private readonly _sgpApi: SgpHttpApiAxiosHelper
+  private readonly _httpClient = axios.create()
 
   get api() {
-    return this._api
+    return this._sgpApi
   }
 
   constructor(
-    private readonly _app: AppCommonMain,
+    private readonly _appCommon: AppCommonMain,
     _loggerFactory: LoggerFactoryMain,
     private readonly _protocol: AkariProtocolMain,
-    private readonly _mobx: MobxUtilsMain,
-    private readonly _lc: LeagueClientMain,
+    private readonly _mobxUtils: MobxUtilsMain,
+    private readonly _leagueClient: LeagueClientMain,
     private readonly _remoteConfig: RemoteConfigMain
   ) {
-    this._log = _loggerFactory.create(SgpMain.id)
-    axiosRetry(this._http, { retries: 2 })
+    this._logger = _loggerFactory.create(SgpMain.id)
+    axiosRetry(this._httpClient, { retries: 2 })
 
-    this.state = new SgpState(this._lc.state, this._remoteConfig)
-    this._api = new SgpHttpApiAxiosHelper(this._http)
+    this.state = new SgpState(this._leagueClient.state, this._remoteConfig)
+    this._sgpApi = new SgpHttpApiAxiosHelper(this._httpClient)
   }
 
   async onInit() {
-    this._mobx.propSync(SgpMain.id, 'state', this.state, [
+    this._mobxUtils.propSync(SgpMain.id, 'state', this.state, [
       'availability',
       'isTokenReady',
       'leagueServers',
@@ -65,17 +65,17 @@ export class SgpMain implements IAkariShardInitDispose {
       'connectionFailuresCounted'
     ])
 
-    this._handleUpdateHttpProxy()
+    this._registerHttpProxy()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
     this._initHttpInstance()
-    this._handleProtocol()
-    this._handleResetConnectionCount()
+    this._registerProtocol()
+    this._watchConnectionCountReset()
   }
 
   private _maintainEntitlementsToken() {
-    this._mobx.reaction(
-      () => this._lc.data.entitlements.token,
+    this._mobxUtils.reaction(
+      () => this._leagueClient.data.entitlements.token,
       (token) => {
         if (!token) {
           this.state.setEntitlementsTokenSet(false)
@@ -87,7 +87,7 @@ export class SgpMain implements IAkariShardInitDispose {
         copiedToken.accessToken = copiedToken.accessToken?.slice(0, 24) + '...'
         copiedToken.token = copiedToken.token?.slice(0, 24) + '...'
 
-        this._log.info(`Update Entitlements Token: ${JSON.stringify(copiedToken)}`)
+        this._logger.info(`Update Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
         this.state.setEntitlementsTokenSet(true)
       },
@@ -96,8 +96,8 @@ export class SgpMain implements IAkariShardInitDispose {
   }
 
   private _maintainLeagueSessionToken() {
-    this._mobx.reaction(
-      () => this._lc.data.leagueSession.token,
+    this._mobxUtils.reaction(
+      () => this._leagueClient.data.leagueSession.token,
       (token) => {
         if (!token) {
           this.state.setLeagueSessionTokenSet(false)
@@ -105,24 +105,24 @@ export class SgpMain implements IAkariShardInitDispose {
         }
 
         const copied = token.slice(0, 24) + '...'
-        this._log.info(`Update Lol League Session Token: ${copied}`)
+        this._logger.info(`Update Lol League Session Token: ${copied}`)
         this.state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }
     )
   }
 
-  private _handleUpdateHttpProxy() {
-    this._mobx.reaction(
-      () => this._app.settings.httpProxy,
+  private _registerHttpProxy() {
+    this._mobxUtils.reaction(
+      () => this._appCommon.settings.httpProxy,
       (httpProxy) => {
         if (httpProxy.strategy === 'force') {
-          this._http.defaults.proxy = {
+          this._httpClient.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
         } else if (httpProxy.strategy === 'disable') {
-          this._http.defaults.proxy = false
+          this._httpClient.defaults.proxy = false
         }
       },
       { fireImmediately: true }
@@ -130,7 +130,7 @@ export class SgpMain implements IAkariShardInitDispose {
   }
 
   private _initHttpInstance() {
-    this._http.interceptors.request.use(async (config) => {
+    this._httpClient.interceptors.request.use(async (config) => {
       const preferredSgpServerId =
         (config.headers.get(AKARI_HEADER_SGP_SERVER_ID) as string | null) ||
         this.state.availability.sgpServerId
@@ -185,7 +185,7 @@ export class SgpMain implements IAkariShardInitDispose {
     })
 
     // check network connectivity
-    this._http.interceptors.response.use(
+    this._httpClient.interceptors.response.use(
       (response) => {
         this.state.setConnectionSuccessesCount(this.state.connectionSuccessesCounted + 1)
         return response
@@ -210,14 +210,14 @@ export class SgpMain implements IAkariShardInitDispose {
 
   private _getToken(tokenType: string) {
     if (tokenType === 'entitlements') {
-      return this._lc.data.entitlements.token?.accessToken ?? null
+      return this._leagueClient.data.entitlements.token?.accessToken ?? null
     } else if (tokenType === 'league-session') {
-      return this._lc.data.leagueSession.token ?? null
+      return this._leagueClient.data.leagueSession.token ?? null
     }
     return null
   }
 
-  private _handleProtocol() {
+  private _registerProtocol() {
     this._protocol.registerDomain('sgp', async (uri, req) => {
       const reqHeaders: Record<string, string> = {}
       req.headers.forEach((value, key) => {
@@ -234,7 +234,7 @@ export class SgpMain implements IAkariShardInitDispose {
           responseType: 'stream'
         }
 
-        const res = await this._http.request(config)
+        const res = await this._httpClient.request(config)
 
         const resHeaders = Object.fromEntries(
           Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
@@ -246,7 +246,7 @@ export class SgpMain implements IAkariShardInitDispose {
           status: res.status
         })
       } catch (error) {
-        this._log.warn(`Failed to proxy SGP request`, error)
+        this._logger.warn(`Failed to proxy SGP request`, error)
 
         return new Response(formatError(error), {
           headers: { 'Content-Type': 'text/plain' },
@@ -256,8 +256,8 @@ export class SgpMain implements IAkariShardInitDispose {
     })
   }
 
-  private _handleResetConnectionCount() {
-    this._mobx.reaction(
+  private _watchConnectionCountReset() {
+    this._mobxUtils.reaction(
       () => this.state.availability.sgpServerId,
       (id) => {
         if (!id) {

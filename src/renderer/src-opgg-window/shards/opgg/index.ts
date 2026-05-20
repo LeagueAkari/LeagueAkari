@@ -23,62 +23,66 @@ import { useOpggStore } from './store'
 export class OpggRenderer {
   static id = 'opgg-renderer'
 
-  private _http = axios.create()
+  private _httpClient = axios.create()
 
-  public readonly api = new OpggHttpApiAxiosHelper(this._http)
+  public readonly api = new OpggHttpApiAxiosHelper(this._httpClient)
 
   constructor(
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
+    @Dep(LeagueClientRenderer) private readonly _leagueClient: LeagueClientRenderer,
     @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer
   ) {}
 
   async onInit() {
     const store = useOpggStore()
 
-    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyItems')
-    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyRunes')
-    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplySpells')
+    await this._settingUtils.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyItems')
+    await this._settingUtils.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyRunes')
+    await this._settingUtils.savedPropVue(
+      OpggRenderer.id,
+      store.frontendSettings,
+      'autoApplySpells'
+    )
 
     await this._migratePreferences()
 
-    const savedPreferences = await this._setting.get(OpggRenderer.id, 'savedPreferences')
+    const savedPreferences = await this._settingUtils.get(OpggRenderer.id, 'savedPreferences')
     if (savedPreferences) {
       store.savedPreferences = savedPreferences
     }
 
-    this._handleRestoreItemSet()
-    this._handleUpdateAramBalance()
-    this._handleHttpProxy()
+    this._restoreItemSet()
+    this._watchAramBalance()
+    this._registerHttpProxy()
   }
 
-  private _handleRestoreItemSet() {
-    const lcs = useLeagueClientStore()
+  private _restoreItemSet() {
+    const leagueClientStore = useLeagueClientStore()
 
     watch(
-      () => lcs.gameflow.phase === 'EndOfGame',
+      () => leagueClientStore.gameflow.phase === 'EndOfGame',
       (isEndOfGame) => {
         if (isEndOfGame) {
-          this._lc.writeItemSetsToDisk(null)
+          this._leagueClient.writeItemSetsToDisk(null)
         }
       }
     )
   }
 
-  private _handleHttpProxy() {
-    const as = useAppCommonStore()
+  private _registerHttpProxy() {
+    const appCommonStore = useAppCommonStore()
 
     watch(
-      () => as.settings.httpProxy,
+      () => appCommonStore.settings.httpProxy,
       (httpProxy) => {
         if (httpProxy.strategy === 'force') {
-          this._http.defaults.proxy = {
+          this._httpClient.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
         } else if (httpProxy.strategy === 'disable') {
-          this._http.defaults.proxy = false
+          this._httpClient.defaults.proxy = false
         }
       },
       { immediate: true }
@@ -96,7 +100,11 @@ export class OpggRenderer {
   ) {
     const store = useOpggStore()
     store.savedPreferences = { ...store.savedPreferences, ...options }
-    return this._setting.set(OpggRenderer.id, 'savedPreferences', toRaw(store.savedPreferences))
+    return this._settingUtils.set(
+      OpggRenderer.id,
+      'savedPreferences',
+      toRaw(store.savedPreferences)
+    )
   }
 
   private async _migratePreferences() {
@@ -125,8 +133,8 @@ export class OpggRenderer {
     }
   }
 
-  private _handleUpdateAramBalance() {
-    this._setup.addSetupFn(() => {
+  private _watchAramBalance() {
+    this._setupInAppScope.addSetupFn(() => {
       const store = useOpggStore()
 
       useIntervalFn(

@@ -14,7 +14,7 @@ export class LoggerRenderer {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
   ) {}
 
   // same as main shard
@@ -46,7 +46,7 @@ export class LoggerRenderer {
       .join(' ')
   }
 
-  private _log(level: string, namespace: string, ...args: any[]) {
+  private _emitLog(level: string, namespace: string, ...args: any[]) {
     const fn = {
       info: console.info,
       warn: console.warn,
@@ -68,7 +68,7 @@ export class LoggerRenderer {
   }
 
   info(namespace: string, ...args: any[]) {
-    this._log('info', namespace, ...args)
+    this._emitLog('info', namespace, ...args)
 
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
@@ -80,7 +80,7 @@ export class LoggerRenderer {
   }
 
   warn(namespace: string, ...args: any[]) {
-    this._log('warn', namespace, ...args)
+    this._emitLog('warn', namespace, ...args)
 
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
@@ -92,7 +92,7 @@ export class LoggerRenderer {
   }
 
   error(namespace: string, ...args: any[]) {
-    this._log('error', namespace, ...args)
+    this._emitLog('error', namespace, ...args)
 
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
@@ -104,7 +104,7 @@ export class LoggerRenderer {
   }
 
   debug(namespace: string, ...args: any[]) {
-    this._log('debug', namespace, ...args)
+    this._emitLog('debug', namespace, ...args)
 
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
@@ -116,19 +116,19 @@ export class LoggerRenderer {
   }
 
   infoRenderer(namespace: string, ...args: any[]) {
-    this._log('info', namespace, ...args)
+    this._emitLog('info', namespace, ...args)
   }
 
   warnRenderer(namespace: string, ...args: any[]) {
-    this._log('warn', namespace, ...args)
+    this._emitLog('warn', namespace, ...args)
   }
 
   errorRenderer(namespace: string, ...args: any[]) {
-    this._log('error', namespace, ...args)
+    this._emitLog('error', namespace, ...args)
   }
 
   debugRenderer(namespace: string, ...args: any[]) {
-    this._log('debug', namespace, ...args)
+    this._emitLog('debug', namespace, ...args)
   }
 
   private _getColorScheme() {
@@ -203,6 +203,6 @@ export class LoggerRenderer {
   async onInit() {
     const store = useLoggerStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
   }
 }

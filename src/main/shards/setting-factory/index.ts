@@ -332,13 +332,15 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     )
 
     this._ipc.onCall(SettingFactoryMain.id, 'exportSettingsToJsonFile', async () => {
-      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+      const windowManager = this._shared.manager.getInstance(
+        'window-manager-main'
+      ) as WindowManagerMain
 
-      if (!w || !w.mainWindow.window) {
+      if (!windowManager || !windowManager.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
       }
 
-      const result = await dialog.showSaveDialog(w.mainWindow.window, {
+      const result = await dialog.showSaveDialog(windowManager.mainWindow.window, {
         defaultPath: 'league-akari-settings.json',
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
@@ -352,13 +354,15 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SettingFactoryMain.id, 'importSettingsFromJsonFile', async () => {
-      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+      const windowManager = this._shared.manager.getInstance(
+        'window-manager-main'
+      ) as WindowManagerMain
 
-      if (!w || !w.mainWindow.window) {
+      if (!windowManager || !windowManager.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
       }
 
-      const result = await dialog.showOpenDialog(w.mainWindow.window, {
+      const result = await dialog.showOpenDialog(windowManager.mainWindow.window, {
         defaultPath: 'league-akari-settings.json',
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })

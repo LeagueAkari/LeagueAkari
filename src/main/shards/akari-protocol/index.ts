@@ -83,7 +83,7 @@ export class AkariProtocolMain {
     session.fromPartition(partition).protocol.unhandle(AkariProtocolMain.AKARI_PROXY_PROTOCOL)
   }
 
-  private _handlePartitionAkariProtocol(partition: string) {
+  private _registerPartitionAkariProtocol(partition: string) {
     session
       .fromPartition(partition)
       .protocol.handle(AkariProtocolMain.AKARI_PROXY_PROTOCOL, async (req) => {
@@ -144,7 +144,7 @@ export class AkariProtocolMain {
     }
 
     this._partitionRegistry.add(partition)
-    this._handlePartitionAkariProtocol(partition)
+    this._registerPartitionAkariProtocol(partition)
   }
 
   unregisterPartition(partition: string) {

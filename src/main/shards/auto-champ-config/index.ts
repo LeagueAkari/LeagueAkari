@@ -25,18 +25,18 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
   public readonly settings = new AutoChampConfigSettings()
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
   constructor(
     readonly _loggerFactory: LoggerFactoryMain,
     readonly _settingFactory: SettingFactoryMain,
-    private readonly _lc: LeagueClientMain,
-    private readonly _setting: SetterSettingService,
-    private readonly _mobx: MobxUtilsMain,
+    private readonly _leagueClient: LeagueClientMain,
+    private readonly _settingService: SetterSettingService,
+    private readonly _mobxUtils: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain
   ) {
-    this._log = _loggerFactory.create(AutoChampionConfigMain.id)
-    this._setting = _settingFactory.register(
+    this._logger = _loggerFactory.create(AutoChampionConfigMain.id)
+    this._settingService = _settingFactory.register(
       AutoChampionConfigMain.id,
       {
         enabled: { default: this.settings.enabled },
@@ -47,13 +47,13 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     )
   }
 
-  private _handleIpcCall() {
+  private _registerIpcHandlers() {
     this._ipc.onCall(
       AutoChampionConfigMain.id,
       'updateRunes',
       async (_, championId: number, key: string, runes: ChampionRunesConfig | null) => {
         this.settings.updateRunes(championId, key, runes)
-        await this._setting.set('runesV2', this.settings.runesV2)
+        await this._settingService.set('runesV2', this.settings.runesV2)
       }
     )
 
@@ -62,25 +62,28 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       'updateSummonerSpells',
       async (_, championId: number, key: string, spells: SummonerSpellsConfig | null) => {
         this.settings.updateSummonerSpells(championId, key, spells)
-        await this._setting.set('summonerSpells', this.settings.summonerSpells)
+        await this._settingService.set('summonerSpells', this.settings.summonerSpells)
       }
     )
   }
 
-  private _handleAutoConfig() {
-    this._mobx.reaction(
-      () => [this._lc.data.champSelect.currentChampion, this.settings.enabled] as const,
+  private _watchAutoConfig() {
+    this._mobxUtils.reaction(
+      () => [this._leagueClient.data.champSelect.currentChampion, this.settings.enabled] as const,
       ([championId, enabled]) => {
         if (!enabled || !championId) {
           return
         }
 
-        if (!this._lc.data.gameflow.session || !this._lc.data.champSelect.session) {
+        if (
+          !this._leagueClient.data.gameflow.session ||
+          !this._leagueClient.data.champSelect.session
+        ) {
           return
         }
 
-        const localPlayerCellId = this._lc.data.champSelect.session.localPlayerCellId
-        const self = this._lc.data.champSelect.session.myTeam.find(
+        const localPlayerCellId = this._leagueClient.data.champSelect.session.localPlayerCellId
+        const self = this._leagueClient.data.champSelect.session.myTeam.find(
           (player) => player.cellId === localPlayerCellId
         )
 
@@ -88,8 +91,8 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           return
         }
 
-        const gameMode = this._lc.data.gameflow.session.gameData.queue.gameMode
-        const queueType = this._lc.data.gameflow.session.gameData.queue.type
+        const gameMode = this._leagueClient.data.gameflow.session.gameData.queue.gameMode
+        const queueType = this._leagueClient.data.gameflow.session.gameData.queue.type
         const selfPosition = self.assignedPosition
 
         let configKey: string
@@ -132,23 +135,23 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () =>
         [
-          this._lc.data.chat.conversations.championSelect?.id,
-          Boolean(this._lc.data.gameflow.session),
-          Boolean(this._lc.data.champSelect.session)
+          this._leagueClient.data.chat.conversations.championSelect?.id,
+          Boolean(this._leagueClient.data.gameflow.session),
+          Boolean(this._leagueClient.data.champSelect.session)
         ] as const,
       ([id, g, c]) => {
         if (
           this.settings.enabled &&
           id &&
-          this._lc.data.gameflow.phase === 'ChampSelect' &&
+          this._leagueClient.data.gameflow.phase === 'ChampSelect' &&
           g &&
           c
         ) {
-          const gSession = this._lc.data.gameflow.session!
-          const cSession = this._lc.data.champSelect.session!
+          const gSession = this._leagueClient.data.gameflow.session!
+          const cSession = this._leagueClient.data.champSelect.session!
 
           const localPlayerCellId = cSession.localPlayerCellId
           const self = cSession.myTeam.find((player) => player.cellId === localPlayerCellId)
@@ -204,7 +207,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
           const unionChampionIds = Array.from(new Set([...runesChampionIds, ...spellsChampionIds]))
           const names = unionChampionIds
-            .map((id) => this._lc.data.gameData.champions[id]?.name || id)
+            .map((id) => this._leagueClient.data.gameData.champions[id]?.name || id)
             .slice(0, 16)
 
           if (names.length) {
@@ -231,15 +234,17 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
   ) {
     const { championId, position } = meta
 
-    const championName = this._lc.data.gameData.champions[championId]?.name || championId
+    const championName = this._leagueClient.data.gameData.champions[championId]?.name || championId
     const positionName = position ? i18next.t(`positions.${position}`, { ns: 'common' }) : null
 
     const primaryStyleName =
-      this._lc.data.gameData.perkstyles.styles[config.primaryStyleId]?.name || config.primaryStyleId
+      this._leagueClient.data.gameData.perkstyles.styles[config.primaryStyleId]?.name ||
+      config.primaryStyleId
     const subStyleName =
-      this._lc.data.gameData.perkstyles.styles[config.subStyleId]?.name || config.subStyleId
+      this._leagueClient.data.gameData.perkstyles.styles[config.subStyleId]?.name ||
+      config.subStyleId
     const perkNames = config.selectedPerkIds.map(
-      (id) => this._lc.data.gameData.perks[id]?.name || id
+      (id) => this._leagueClient.data.gameData.perks[id]?.name || id
     )
 
     if (positionName) {
@@ -287,13 +292,13 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
   ) {
     const { championId, position } = meta
 
-    const championName = this._lc.data.gameData.champions[championId]?.name || championId
+    const championName = this._leagueClient.data.gameData.champions[championId]?.name || championId
     const positionName = position ? i18next.t(`positions.${position}`, { ns: 'common' }) : null
 
     const spell1Name =
-      this._lc.data.gameData.summonerSpells[config.spell1Id]?.name || config.spell1Id
+      this._leagueClient.data.gameData.summonerSpells[config.spell1Id]?.name || config.spell1Id
     const spell2Name =
-      this._lc.data.gameData.summonerSpells[config.spell2Id]?.name || config.spell2Id
+      this._leagueClient.data.gameData.summonerSpells[config.spell2Id]?.name || config.spell2Id
 
     if (positionName) {
       return {
@@ -332,14 +337,14 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     const { message, pageName, errorMessage } = this._getRunesName(config, meta)
 
     try {
-      const inventory = (await this._lc.api.perks.getPerkInventory()).data
+      const inventory = (await this._leagueClient.api.perks.getPerkInventory()).data
       if (inventory.canAddCustomPage) {
-        const { data: added } = await this._lc.api.perks.postPerkPage({
+        const { data: added } = await this._leagueClient.api.perks.postPerkPage({
           name: pageName,
           isEditable: true,
           primaryStyleId: config.primaryStyleId.toString()
         })
-        await this._lc.api.perks.putPage({
+        await this._leagueClient.api.perks.putPage({
           id: added.id,
           isRecommendationOverride: false,
           isTemporary: false,
@@ -348,15 +353,15 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           selectedPerkIds: config.selectedPerkIds,
           subStyleId: config.subStyleId
         })
-        await this._lc.api.perks.putCurrentPage(added.id)
+        await this._leagueClient.api.perks.putCurrentPage(added.id)
       } else {
-        const pages = (await this._lc.api.perks.getPerkPages()).data
+        const pages = (await this._leagueClient.api.perks.getPerkPages()).data
         if (!pages.length) {
           return
         }
 
         const page1 = pages[0]
-        await this._lc.api.perks.putPage({
+        await this._leagueClient.api.perks.putPage({
           id: page1.id,
           isRecommendationOverride: false,
           isTemporary: false,
@@ -365,14 +370,14 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           selectedPerkIds: config.selectedPerkIds,
           subStyleId: config.subStyleId
         })
-        await this._lc.api.perks.putCurrentPage(page1.id)
+        await this._leagueClient.api.perks.putCurrentPage(page1.id)
       }
 
       await this._sendInChat(message)
-      this._log.info(`Runes page updated`, config, meta)
+      this._logger.info(`Runes page updated`, config, meta)
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-runes-update', formatError(error))
-      this._log.warn(`Unable to update runes page`, error)
+      this._logger.warn(`Unable to update runes page`, error)
       await this._sendInChat(errorMessage)
     }
   }
@@ -387,7 +392,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     const { message, errorMessage } = this._getSummonerSpellsName(config, meta)
 
     try {
-      await this._lc.api.champSelect.setSummonerSpells({
+      await this._leagueClient.api.champSelect.setSummonerSpells({
         spell1Id: config.spell1Id,
         spell2Id: config.spell2Id
       })
@@ -395,38 +400,38 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       await this._sendInChat(message)
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-spells-update', formatError(error))
-      this._log.warn(`Unable to update summoner spells`, error)
+      this._logger.warn(`Unable to update summoner spells`, error)
       await this._sendInChat(errorMessage)
     }
   }
 
   private async _sendInChat(message: string) {
-    if (!this._lc.data.chat.conversations.championSelect) {
+    if (!this._leagueClient.data.chat.conversations.championSelect) {
       return
     }
 
     try {
-      await this._lc.api.chat.chatSend(
-        this._lc.data.chat.conversations.championSelect.id,
+      await this._leagueClient.api.chat.chatSend(
+        this._leagueClient.data.chat.conversations.championSelect.id,
         `[League Akari] ${message}`,
         'celebration'
       )
     } catch (error) {
       this._ipc.sendEvent(AutoChampionConfigMain.id, 'error-chat-send', formatError(error))
-      this._log.warn(`Unable to send message`, error)
+      this._logger.warn(`Unable to send message`, error)
     }
   }
 
   async onInit() {
-    await this._setting.applyToState()
+    await this._settingService.applyToState()
 
-    this._mobx.propSync(AutoChampionConfigMain.id, 'settings', this.settings, [
+    this._mobxUtils.propSync(AutoChampionConfigMain.id, 'settings', this.settings, [
       'enabled',
       'runesV2',
       'summonerSpells'
     ])
 
-    this._handleIpcCall()
-    this._handleAutoConfig()
+    this._registerIpcHandlers()
+    this._watchAutoConfig()
   }
 }

@@ -1,6 +1,5 @@
 import { createManager } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
-import { GuideRenderer } from '@renderer-shared/shards/guide'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
@@ -45,7 +44,6 @@ manager.use(AutoReplyRenderer)
 manager.use(ClientInstallationRenderer)
 manager.use(ExtraAssetsRenderer)
 manager.use(GameClientRenderer)
-manager.use(GuideRenderer)
 manager.use(InGameSendRenderer)
 manager.use(KeyboardShortcutsRenderer)
 manager.use(LeagueClientPeekRenderer)

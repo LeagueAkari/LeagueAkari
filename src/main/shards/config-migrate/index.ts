@@ -31,24 +31,24 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
    * 设置较高优先级, 以优先加载
    */
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
   constructor(
-    private readonly _st: StorageMain,
+    private readonly _storage: StorageMain,
     readonly _loggerFactory: LoggerFactoryMain
   ) {
-    this._log = _loggerFactory.create(ConfigMigrateMain.id)
+    this._logger = _loggerFactory.create(ConfigMigrateMain.id)
   }
 
   async onInit() {
     try {
-      await this._st.dataSource.transaction(async (manager) => {
+      await this._storage.dataSource.transaction(async (manager) => {
         for (const migrate of MIGRATIONS) {
-          await migrate({ manager, log: this._log })
+          await migrate({ manager, logger: this._logger })
         }
       })
     } catch (error) {
-      this._log.error('Failed to migrate settings', error)
+      this._logger.error('Failed to migrate settings', error)
     }
   }
 }

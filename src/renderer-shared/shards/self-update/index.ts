@@ -23,20 +23,20 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
-    @Dep(RemoteConfigRenderer) readonly _rc: RemoteConfigRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
+    @Dep(RemoteConfigRenderer) readonly _remoteConfig: RemoteConfigRenderer
   ) {
     // @ts-ignore
     window.selfUpdateShard = this
   }
 
-  private _handleUpdateProgressShow() {
+  private _watchUpdateProgressShow() {
     const store = useSelfUpdateStore()
     const taskStore = useBackgroundTasksStore()
 
-    const wm = useInstance(WindowManagerRenderer)
+    const windowManager = useInstance(WindowManagerRenderer)
 
     const { t } = useTranslation()
     const taskId = `${SelfUpdateRenderer.id}/update`
@@ -102,7 +102,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
                 {
                   label: () => t('self-update-renderer.self-update-task.closeButton'),
                   callback: () => {
-                    wm.mainWindow.closeForce()
+                    windowManager.mainWindow.closeForce()
                   },
                   buttonProps: { type: 'primary' }
                 }
@@ -114,20 +114,20 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     )
   }
 
-  private _handleLastUpdateResult() {
-    const as = useAppCommonStore()
-    const s = useSelfUpdateStore()
+  private _watchLastUpdateResult() {
+    const appCommonStore = useAppCommonStore()
+    const selfUpdateStore = useSelfUpdateStore()
     const { t } = useTranslation()
     const notification = useNotification()
 
     watchEffect(() => {
-      if (s.lastUpdateResult) {
-        if (s.lastUpdateResult.success) {
+      if (selfUpdateStore.lastUpdateResult) {
+        if (selfUpdateStore.lastUpdateResult.success) {
           notification.success({
             title: () => t('self-update-renderer.title'),
             content: () =>
               t('self-update-renderer.lastUpdateSuccess', {
-                version: as.version
+                version: appCommonStore.version
               }),
             duration: 4000,
             closable: true
@@ -165,11 +165,11 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
   }
 
   setAutoDownloadUpdates(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
   }
 
   setIgnoreVersion(version: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'ignoreVersion', version)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'ignoreVersion', version)
   }
 
   uninstallApp() {
@@ -179,10 +179,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useSelfUpdateStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
-    this._setup.addSetupFn(() => this._handleUpdateProgressShow())
-    this._setup.addSetupFn(() => this._handleLastUpdateResult())
+    this._setupInAppScope.addSetupFn(() => this._watchUpdateProgressShow())
+    this._setupInAppScope.addSetupFn(() => this._watchLastUpdateResult())
   }
 }

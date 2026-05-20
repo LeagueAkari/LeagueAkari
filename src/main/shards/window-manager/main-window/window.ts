@@ -49,8 +49,8 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
     })
   }
 
-  private _handleMainWindowLogics() {
-    this._mobx.reaction(
+  private _watchMainWindow() {
+    this._mobxUtils.reaction(
       () => this.state.ready,
       (ready) => {
         if (ready) {
@@ -59,7 +59,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => [this._windowManager.settings.backgroundMaterial, this.state.ready] as const,
       ([material, ready]) => {
         if (ready) {
@@ -71,7 +71,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       { fireImmediately: true, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this._context.selfUpdate.state.updateProgressInfo,
       (info) => {
         if (!this._window) {
@@ -97,7 +97,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
     )
   }
 
-  private _handleMainWindowIpcCall() {
+  private _registerMainWindowIpcHandlers() {
     this._ipc.onCall(this._namespace, 'closeMainWindow', async (_, strategy) => {
       this._nextCloseAction = strategy
       this._window?.close()
@@ -142,7 +142,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   override async onInit() {
     await super.onInit()
 
-    this._handleMainWindowLogics()
-    this._handleMainWindowIpcCall()
+    this._watchMainWindow()
+    this._registerMainWindowIpcHandlers()
   }
 }

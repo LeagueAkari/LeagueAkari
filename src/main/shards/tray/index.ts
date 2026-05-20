@@ -17,7 +17,7 @@ import { WindowManagerMain } from '../window-manager'
 export class TrayMain implements IAkariShardInitDispose {
   static id = 'tray-main'
 
-  private _tray: Tray | null = null
+  private _trayIcon: Tray | null = null
   private _mainWindowDevTrayItem: MenuItem
   private _auxWindowTrayItem: MenuItem
   private _auxWindowDevTrayItem: MenuItem
@@ -30,9 +30,9 @@ export class TrayMain implements IAkariShardInitDispose {
   private _adjustAllWindowPositionsTrayItem: MenuItem
 
   constructor(
-    private readonly _wm: WindowManagerMain,
-    private readonly _mobx: MobxUtilsMain,
-    private readonly _app: AppCommonMain,
+    private readonly _windowManager: WindowManagerMain,
+    private readonly _mobxUtils: MobxUtilsMain,
+    private readonly _appCommon: AppCommonMain,
     private readonly _ipc: AkariIpcMain
   ) {}
 
@@ -45,80 +45,80 @@ export class TrayMain implements IAkariShardInitDispose {
       trayIcon = originalImage.resize({ width: Math.round(16 * aspectRatio), height: 16 })
       trayIcon.setTemplateImage(true)
     }
-    this._tray = new Tray(trayIcon)
+    this._trayIcon = new Tray(trayIcon)
 
     this._auxWindowTrayItem = new MenuItem({
       label: i18next.t('tray.auxWindow'),
       type: 'normal',
-      click: () => this._wm.auxWindow.showOrRestore(),
-      enabled: this._wm.auxWindow.settings.enabled
+      click: () => this._windowManager.auxWindow.showOrRestore(),
+      enabled: this._windowManager.auxWindow.settings.enabled
     })
 
     this._auxWindowDevTrayItem = new MenuItem({
       id: 'aux-window-dev',
       label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.auxWindow.toggleDevtools(),
-      enabled: this._wm.auxWindow.settings.enabled
+      click: () => this._windowManager.auxWindow.toggleDevtools(),
+      enabled: this._windowManager.auxWindow.settings.enabled
     })
 
     this._mainWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleMainWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.mainWindow.toggleDevtools()
+      click: () => this._windowManager.mainWindow.toggleDevtools()
     })
 
     this._opggWindowTrayItem = new MenuItem({
       label: i18next.t('tray.opggWindow'),
       type: 'normal',
-      click: () => this._wm.opggWindow.showOrRestore(),
-      enabled: this._wm.opggWindow.settings.enabled
+      click: () => this._windowManager.opggWindow.showOrRestore(),
+      enabled: this._windowManager.opggWindow.settings.enabled
     })
 
     this._opggWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOpggWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.opggWindow.toggleDevtools(),
-      enabled: this._wm.opggWindow.settings.enabled
+      click: () => this._windowManager.opggWindow.toggleDevtools(),
+      enabled: this._windowManager.opggWindow.settings.enabled
     })
 
     this._ongoingGameWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOngoingGameWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.ongoingGameWindow?.toggleDevtools(),
-      enabled: this._wm.ongoingGameWindow.settings.enabled
+      click: () => this._windowManager.ongoingGameWindow?.toggleDevtools(),
+      enabled: this._windowManager.ongoingGameWindow.settings.enabled
     })
 
     this._cdTimerWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleCdTimerWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.cdTimerWindow.toggleDevtools(),
-      enabled: this._wm.cdTimerWindow.settings.enabled
+      click: () => this._windowManager.cdTimerWindow.toggleDevtools(),
+      enabled: this._windowManager.cdTimerWindow.settings.enabled
     })
 
     this._adjustAllWindowPositionsTrayItem = new MenuItem({
       label: i18next.t('tray.adjustAllWindowPositions'),
       type: 'normal',
       click: () => {
-        this._wm.mainWindow.repositionWindowIfInvisible()
-        this._wm.auxWindow.repositionWindowIfInvisible()
-        this._wm.opggWindow.repositionWindowIfInvisible()
-        this._wm.ongoingGameWindow.repositionWindowIfInvisible()
-        this._wm.cdTimerWindow.repositionWindowIfInvisible()
+        this._windowManager.mainWindow.repositionWindowIfInvisible()
+        this._windowManager.auxWindow.repositionWindowIfInvisible()
+        this._windowManager.opggWindow.repositionWindowIfInvisible()
+        this._windowManager.ongoingGameWindow.repositionWindowIfInvisible()
+        this._windowManager.cdTimerWindow.repositionWindowIfInvisible()
       }
     })
 
     this._quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
-      click: () => this._wm.mainWindow.close(true)
+      click: () => this._windowManager.mainWindow.close(true)
     })
 
     this._contextMenu = Menu.buildFromTemplate([
       {
         label: 'League Akari',
         type: 'normal',
-        click: () => this._wm.mainWindow.showOrRestore()
+        click: () => this._windowManager.mainWindow.showOrRestore()
       },
       {
         type: 'separator'
@@ -148,12 +148,12 @@ export class TrayMain implements IAkariShardInitDispose {
 
     // 全局标题栏
     if (process.platform !== 'darwin') {
-      this._tray.setToolTip('League Akari')
+      this._trayIcon.setToolTip('League Akari')
     }
 
-    this._tray.addListener('click', () => this._wm.mainWindow.showOrRestore())
-    this._tray.addListener('right-click', () => {
-      this._tray?.popUpContextMenu(this._contextMenu)
+    this._trayIcon.addListener('click', () => this._windowManager.mainWindow.showOrRestore())
+    this._trayIcon.addListener('right-click', () => {
+      this._trayIcon?.popUpContextMenu(this._contextMenu)
     })
 
     if (process.platform === 'darwin') {
@@ -167,7 +167,7 @@ export class TrayMain implements IAkariShardInitDispose {
               click: () => {
                 // 这里的名称空间借用了 app-common-main
                 this._ipc.sendEvent(AppCommonMain.id, 'show-about-akari')
-                this._wm.mainWindow.showOrRestore()
+                this._windowManager.mainWindow.showOrRestore()
               }
             },
             { type: 'separator' },
@@ -176,7 +176,7 @@ export class TrayMain implements IAkariShardInitDispose {
               accelerator: 'Cmd+,',
               click: () => {
                 this._ipc.sendEvent(AppCommonMain.id, 'show-settings')
-                this._wm.mainWindow.showOrRestore()
+                this._windowManager.mainWindow.showOrRestore()
               }
             },
             { type: 'separator' },
@@ -194,8 +194,11 @@ export class TrayMain implements IAkariShardInitDispose {
   async onInit() {
     this._buildMenus()
 
-    this._mobx.reaction(
-      () => [this._wm.auxWindow.settings.enabled, this._wm.auxWindow.state.ready],
+    this._mobxUtils.reaction(
+      () => [
+        this._windowManager.auxWindow.settings.enabled,
+        this._windowManager.auxWindow.state.ready
+      ],
       ([enabled, ready]) => {
         if (enabled && ready) {
           this._auxWindowDevTrayItem.enabled = true
@@ -208,8 +211,11 @@ export class TrayMain implements IAkariShardInitDispose {
       { fireImmediately: true, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
-      () => [this._wm.opggWindow.settings.enabled, this._wm.opggWindow.state.ready],
+    this._mobxUtils.reaction(
+      () => [
+        this._windowManager.opggWindow.settings.enabled,
+        this._windowManager.opggWindow.state.ready
+      ],
       ([enabled, ready]) => {
         if (enabled && ready) {
           this._opggWindowDevTrayItem.enabled = true
@@ -222,8 +228,11 @@ export class TrayMain implements IAkariShardInitDispose {
       { fireImmediately: true, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
-      () => [this._wm.ongoingGameWindow.settings.enabled, this._wm.ongoingGameWindow.state.ready],
+    this._mobxUtils.reaction(
+      () => [
+        this._windowManager.ongoingGameWindow.settings.enabled,
+        this._windowManager.ongoingGameWindow.state.ready
+      ],
       ([enabled, ready]) => {
         if (enabled && ready) {
           this._ongoingGameWindowDevTrayItem.enabled = true
@@ -234,8 +243,11 @@ export class TrayMain implements IAkariShardInitDispose {
       { fireImmediately: true, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
-      () => [this._wm.cdTimerWindow.settings.enabled, this._wm.cdTimerWindow.state.ready],
+    this._mobxUtils.reaction(
+      () => [
+        this._windowManager.cdTimerWindow.settings.enabled,
+        this._windowManager.cdTimerWindow.state.ready
+      ],
       ([enabled, ready]) => {
         if (enabled && ready) {
           this._cdTimerWindowDevTrayItem.enabled = true
@@ -246,11 +258,11 @@ export class TrayMain implements IAkariShardInitDispose {
       { fireImmediately: true }
     )
 
-    this._mobx.reaction(
-      () => this._app.settings.locale,
+    this._mobxUtils.reaction(
+      () => this._appCommon.settings.locale,
       (_locale) => {
-        if (this._tray) {
-          this._tray.destroy()
+        if (this._trayIcon) {
+          this._trayIcon.destroy()
         }
 
         this._buildMenus()
@@ -259,7 +271,7 @@ export class TrayMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    this._tray?.destroy()
+    this._trayIcon?.destroy()
     Menu.setApplicationMenu(null)
   }
 }

@@ -22,7 +22,7 @@ export class SetterSettingService {
   static CONFIG_DIR_NAME = 'AkariConfig'
 
   constructor(
-    private readonly _ins: SettingFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
     readonly _C: typeof SettingFactoryMain,
     private readonly _namespace: string,
     // for accessibility
@@ -32,31 +32,31 @@ export class SetterSettingService {
   ) {}
 
   _getFromStorage(key: string, defaultValue?: any) {
-    return this._ins._getFromStorage(this._namespace, key, defaultValue)
+    return this._settingFactory._getFromStorage(this._namespace, key, defaultValue)
   }
 
   _saveToStorage(key: string, value: any) {
-    return this._ins._saveToStorage(this._namespace, key, value)
+    return this._settingFactory._saveToStorage(this._namespace, key, value)
   }
 
   _removeFromStorage(key: string) {
-    return this._ins._removeFromStorage(this._namespace, key)
+    return this._settingFactory._removeFromStorage(this._namespace, key)
   }
 
   _getByPrefixFromStorage(keyPrefix: string) {
-    return this._ins._getByPrefixFromStorage(this._namespace, keyPrefix)
+    return this._settingFactory._getByPrefixFromStorage(this._namespace, keyPrefix)
   }
 
   _removeByPrefixFromStorage(keyPrefix: string) {
-    return this._ins._removeByPrefixFromStorage(this._namespace, keyPrefix)
+    return this._settingFactory._removeByPrefixFromStorage(this._namespace, keyPrefix)
   }
 
   _setJsonValue(key: string, path: string, value: any) {
-    return this._ins._setJsonValue(this._namespace, key, path, value)
+    return this._settingFactory._setJsonValue(this._namespace, key, path, value)
   }
 
   _removeJsonValue(key: string, path: string) {
-    return this._ins._removeJsonValue(this._namespace, key, path)
+    return this._settingFactory._removeJsonValue(this._namespace, key, path)
   }
 
   /**
@@ -65,7 +65,11 @@ export class SetterSettingService {
   async _getAllFromStorage() {
     const items: Record<string, any> = {}
     const jobs = Object.entries(this._schema).map(async ([key, schema]) => {
-      const value = await this._ins._getFromStorage(this._namespace, key as any, schema.default)
+      const value = await this._settingFactory._getFromStorage(
+        this._namespace,
+        key as any,
+        schema.default
+      )
       items[key] = value
     })
     await Promise.all(jobs)
@@ -87,15 +91,15 @@ export class SetterSettingService {
   }
 
   async readFromJsonConfigFile<T = any>(filename: string): Promise<T> {
-    return this._ins.readFromJsonConfigFile(this._namespace, filename)
+    return this._settingFactory.readFromJsonConfigFile(this._namespace, filename)
   }
 
   async writeToJsonConfigFile(filename: string, data: any) {
-    return this._ins.writeToJsonConfigFile(this._namespace, filename, data)
+    return this._settingFactory.writeToJsonConfigFile(this._namespace, filename, data)
   }
 
   async jsonConfigFileExists(filename: string) {
-    return this._ins.jsonConfigFileExists(this._namespace, filename)
+    return this._settingFactory.jsonConfigFileExists(this._namespace, filename)
   }
 
   /**
@@ -137,24 +141,24 @@ export class SetterSettingService {
             runInAction(() => _.set(this._obj, key, newValue))
 
             if (newValue === null) {
-              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-                this._ins._removeFromStorage(this._namespace, key)
+              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+                this._settingFactory._removeFromStorage(this._namespace, key)
               )
             } else {
-              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-                this._ins._saveToStorage(this._namespace, key as any, newValue)
+              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+                this._settingFactory._saveToStorage(this._namespace, key as any, newValue)
               )
             }
           } else {
             runInAction(() => _.set(this._obj, key, v))
 
             if (v === null) {
-              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-                this._ins._removeFromStorage(this._namespace, key)
+              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+                this._settingFactory._removeFromStorage(this._namespace, key)
               )
             } else {
-              this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-                this._ins._saveToStorage(this._namespace, key as any, v)
+              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+                this._settingFactory._saveToStorage(this._namespace, key as any, v)
               )
             }
           }
@@ -164,12 +168,12 @@ export class SetterSettingService {
       runInAction(() => _.set(this._obj, key, newValue))
 
       if (newValue === null) {
-        this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-          this._ins._removeFromStorage(this._namespace, key)
+        this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+          this._settingFactory._removeFromStorage(this._namespace, key)
         )
       } else {
-        this._ins._delayed.add(`${this._namespace}/${key}`, () =>
-          this._ins._saveToStorage(this._namespace, key, newValue)
+        this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+          this._settingFactory._saveToStorage(this._namespace, key, newValue)
         )
       }
     }

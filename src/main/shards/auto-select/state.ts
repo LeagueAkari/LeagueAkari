@@ -159,11 +159,11 @@ export class AutoSelectState {
   temporarilyDisabled = false
 
   get csSession() {
-    return this._lcData.champSelect.session
+    return this._leagueClientData.champSelect.session
   }
 
   get gfSession() {
-    return this._lcData.gameflow.session
+    return this._leagueClientData.gameflow.session
   }
 
   get inChampSelect() {
@@ -171,7 +171,7 @@ export class AutoSelectState {
   }
 
   get chatId() {
-    return this._lcData.chat.conversations.championSelect?.id || null
+    return this._leagueClientData.chat.conversations.championSelect?.id || null
   }
 
   get inBanPickPhase() {
@@ -227,7 +227,7 @@ export class AutoSelectState {
   }
 
   get ongoingChampionSwap() {
-    return this._lcData.champSelect.ongoingChampionSwap
+    return this._leagueClientData.champSelect.ongoingChampionSwap
   }
 
   get myTeam() {
@@ -311,23 +311,23 @@ export class AutoSelectState {
   }
 
   get subsetChampionList() {
-    return this._lcData.lobbyTeamBuilder.champSelect.subsetChampionList
+    return this._leagueClientData.lobbyTeamBuilder.champSelect.subsetChampionList
   }
 
   get currentBannableChampionIds() {
-    return this._lcData.champSelect.currentBannableChampionIds
+    return this._leagueClientData.champSelect.currentBannableChampionIds
   }
 
   get currentPickableChampionIds() {
-    return this._lcData.champSelect.currentPickableChampionIds
+    return this._leagueClientData.champSelect.currentPickableChampionIds
   }
 
   get gameMode() {
-    return this._lcData.gameflow.session?.gameData.queue.gameMode || null
+    return this._leagueClientData.gameflow.session?.gameData.queue.gameMode || null
   }
 
   get queueType() {
-    return this._lcData.gameflow.session?.gameData.queue.type || null
+    return this._leagueClientData.gameflow.session?.gameData.queue.type || null
   }
 
   get currentSessionChampionId() {
@@ -399,7 +399,7 @@ export class AutoSelectState {
       activeGroupConfig: this.activeGroupConfig,
       assignedPosition: this.assignedPosition,
       gameMode: this.gameMode,
-      gridChampions: this._lcData.champSelect.gridChampions,
+      gridChampions: this._leagueClientData.champSelect.gridChampions,
       currentPickableChampionIds: this.currentPickableChampionIds,
       allowDuplicatePicks: this.allowDuplicatePicks,
       allowSubsetChampionPicks: this.allowSubsetChampionPicks,
@@ -432,7 +432,7 @@ export class AutoSelectState {
     return getExpectedBans({
       activeGroupConfig: this.activeGroupConfig,
       assignedPosition: this.assignedPosition,
-      gridChampions: this._lcData.champSelect.gridChampions,
+      gridChampions: this._leagueClientData.champSelect.gridChampions,
       currentBannableChampionIds: this.currentBannableChampionIds
     })
   }
@@ -442,12 +442,12 @@ export class AutoSelectState {
    *
    * 被读取，或仅被自动禁用相关的 reaction 写入
    */
-  _delayedBan: DelayedBanPick | null = null
+  delayedBanTask: DelayedBanPick | null = null
 
   /** 仅被读取的副本 */
   get delayedBan() {
-    if (this._delayedBan) {
-      const { timerId, ...rest } = this._delayedBan
+    if (this.delayedBanTask) {
+      const { timerId, ...rest } = this.delayedBanTask
       return rest
     }
 
@@ -459,12 +459,12 @@ export class AutoSelectState {
    *
    * 被读取，或仅被自动禁用相关的 reaction 写入
    */
-  _delayedPick: DelayedBanPick | null = null
+  delayedPickTask: DelayedBanPick | null = null
 
   /** 仅被读取的副本 */
   get delayedPick() {
-    if (this._delayedPick) {
-      const { timerId, ...rest } = this._delayedPick
+    if (this.delayedPickTask) {
+      const { timerId, ...rest } = this.delayedPickTask
       return rest
     }
 
@@ -474,12 +474,12 @@ export class AutoSelectState {
   /**
    * 准备 swap 哪个英雄
    */
-  _delayedBenchSwap: DelayedBenchSwap | null = null
+  delayedBenchSwapTask: DelayedBenchSwap | null = null
 
   /** 仅被读取的副本 */
   get delayedBenchSwap() {
-    if (this._delayedBenchSwap) {
-      const { timerId, ...rest } = this._delayedBenchSwap
+    if (this.delayedBenchSwapTask) {
+      const { timerId, ...rest } = this.delayedBenchSwapTask
       return rest
     }
 
@@ -489,12 +489,12 @@ export class AutoSelectState {
   /**
    * 交易 trade 的 champion swap
    */
-  _delayedChampionSwap: DelayedChampionSwap | null = null
+  delayedChampionSwapTask: DelayedChampionSwap | null = null
 
   /** 仅被读取的副本 */
   get delayedChampionSwap() {
-    if (this._delayedChampionSwap) {
-      const { timerId, ...rest } = this._delayedChampionSwap
+    if (this.delayedChampionSwapTask) {
+      const { timerId, ...rest } = this.delayedChampionSwapTask
       return rest
     }
 
@@ -515,19 +515,19 @@ export class AutoSelectState {
   }
 
   setDelayedBan(config: DelayedBanPick | null) {
-    this._delayedBan = config
+    this.delayedBanTask = config
   }
 
   setDelayedPick(config: DelayedBanPick | null) {
-    this._delayedPick = config
+    this.delayedPickTask = config
   }
 
   setDelayedBenchSwap(config: DelayedBenchSwap | null) {
-    this._delayedBenchSwap = config
+    this.delayedBenchSwapTask = config
   }
 
   setDelayedChampionSwap(config: DelayedChampionSwap | null) {
-    this._delayedChampionSwap = config
+    this.delayedChampionSwapTask = config
   }
 
   setOngoingChampionSwapCreatedAt(value: number | null) {
@@ -535,7 +535,7 @@ export class AutoSelectState {
   }
 
   constructor(
-    private readonly _lcData: LeagueClientData,
+    private readonly _leagueClientData: LeagueClientData,
     private readonly _settings: AutoSelectSettings,
     private readonly _remoteConfigState: RemoteConfigState
   ) {
@@ -551,10 +551,10 @@ export class AutoSelectState {
       benchChampions: computed.struct,
       scopedBenchChampions: computed.struct,
 
-      _delayedBan: observable.struct,
-      _delayedPick: observable.struct,
-      _delayedBenchSwap: observable.struct,
-      _delayedChampionSwap: observable.struct
+      delayedBanTask: observable.struct,
+      delayedPickTask: observable.struct,
+      delayedBenchSwapTask: observable.struct,
+      delayedChampionSwapTask: observable.struct
     })
   }
 }

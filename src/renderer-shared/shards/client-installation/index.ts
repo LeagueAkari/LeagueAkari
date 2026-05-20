@@ -13,33 +13,33 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer
+    @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
   ) {}
 
   async onInit() {
     const store = useClientInstallationStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
   }
 
   launchTencentTcls() {
-    this._log.info(ClientInstallationRenderer.id, 'Launch TCLS client')
+    this._logger.info(ClientInstallationRenderer.id, 'Launch TCLS client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchTencentTcls')
   }
 
   launchWeGameLeagueOfLegends() {
-    this._log.info(ClientInstallationRenderer.id, 'Launch WeGame client')
+    this._logger.info(ClientInstallationRenderer.id, 'Launch WeGame client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGameLeagueOfLegends')
   }
 
   launchWeGame() {
-    this._log.info(ClientInstallationRenderer.id, 'Launch WeGame client')
+    this._logger.info(ClientInstallationRenderer.id, 'Launch WeGame client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGame')
   }
 
   launchDefaultRiotClient() {
-    this._log.info(ClientInstallationRenderer.id, 'Launch default RiotClient client')
+    this._logger.info(ClientInstallationRenderer.id, 'Launch default RiotClient client')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchDefaultRiotClient')
   }
 }

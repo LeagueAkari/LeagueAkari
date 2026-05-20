@@ -9,12 +9,14 @@ const MAIN_SHARD_NAMESPACE = 'extra-assets-main'
 export class ExtraAssetsRenderer implements IAkariShardInitDispose {
   static id = 'extra-assets-renderer'
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useExtraAssetsStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gtimg', store.gtimg)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'fandom', store.fandom)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gtimg', store.gtimg)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'fandom', store.fandom)
   }
 }

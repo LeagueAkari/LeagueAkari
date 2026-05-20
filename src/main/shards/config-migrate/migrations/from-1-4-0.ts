@@ -5,12 +5,12 @@ import { MigrationContext, hasMigration, markMigration, moveSetting } from './co
 
 export const MIGRATION_FROM_140 = 'akari-migration-from-1.4.0_patch1'
 
-export async function migrateFrom140({ manager, log }: MigrationContext) {
+export async function migrateFrom140({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_140)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_140)
+  logger.info('Start migrating settings', MIGRATION_FROM_140)
 
   // Migrate preferredLolSource
   try {
@@ -44,7 +44,7 @@ export async function migrateFrom140({ manager, log }: MigrationContext) {
       await manager.remove(ongoingSgpSetting)
     }
   } catch (error) {
-    log.error('Failed to migrate preferredLolSource', error)
+    logger.error('Failed to migrate preferredLolSource', error)
   }
 
   await moveSetting(

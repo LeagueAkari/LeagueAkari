@@ -20,21 +20,21 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) readonly _setup: SetupInAppScopeRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
   setConcurrency(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'concurrency', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'concurrency', value)
   }
 
   setEnabled(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'enabled', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enabled', value)
   }
 
   setMatchHistoryLoadCount(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryLoadCount', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryLoadCount', value)
   }
 
   setMatchHistoryTagParams(value: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) {
@@ -50,45 +50,49 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   }
 
   setMatchHistoryTagPreference(value: 'current' | 'all') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
   setGameDetailsLoadCount(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
   }
 
   setOrderPlayerBy(
     value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
   ) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'orderPlayerBy', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'orderPlayerBy', value)
   }
 
   setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
   }
 
   setShowMatchHistoryItemBorder(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
   }
 
   setShowJunglePathingForAllPlayers(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'showJunglePathingForAllPlayers', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showJunglePathingForAllPlayers', value)
   }
 
   setAutoRouteWhenGameStarts(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoRouteWhenGameStarts', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoRouteWhenGameStarts', value)
   }
 
   setPlayerCardTags(value: object) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
   }
 
   setQueryInLobbyPhase(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'queryInLobbyPhase', value)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'queryInLobbyPhase', value)
   }
 
   setPremadeTeamInferMatchCountThreshold(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'premadeTeamInferMatchCountThreshold', value)
+    return this._settingUtils.set(
+      MAIN_SHARD_NAMESPACE,
+      'premadeTeamInferMatchCountThreshold',
+      value
+    )
   }
 
   reload() {
@@ -123,8 +127,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useOngoingGameStore()
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
       store.summoner = {}

@@ -19,21 +19,21 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   public readonly settings = new RespawnTimerSettings()
   public readonly state: RespawnTimerState
 
-  private readonly _log: AkariLogger
-  private readonly _setting: SetterSettingService
+  private readonly _logger: AkariLogger
+  private readonly _settingService: SetterSettingService
 
-  private _timer: NodeJS.Timeout
+  private _timerId: NodeJS.Timeout
   private _isStarted = false
 
   constructor(
     private readonly _gameClient: GameClientMain,
     readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _lc: LeagueClientMain,
-    private readonly _mobx: MobxUtilsMain,
+    private readonly _leagueClient: LeagueClientMain,
+    private readonly _mobxUtils: MobxUtilsMain,
     readonly _settingFactory: SettingFactoryMain
   ) {
-    this._log = _loggerFactory.create(RespawnTimerMain.id)
-    this._setting = _settingFactory.register(
+    this._logger = _loggerFactory.create(RespawnTimerMain.id)
+    this._settingService = _settingFactory.register(
       RespawnTimerMain.id,
       {
         enabled: { default: false }
@@ -44,10 +44,10 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._setting.applyToState()
+    await this._settingService.applyToState()
 
-    this._setting.onChange('enabled', async (v, { setter }) => {
-      if (v && this._lc.data.gameflow.phase === 'InProgress') {
+    this._settingService.onChange('enabled', async (v, { setter }) => {
+      if (v && this._leagueClient.data.gameflow.phase === 'InProgress') {
         this._startRespawnTimerPoll()
       } else if (v === false) {
         this._stopRespawnTimerPoll()
@@ -57,11 +57,11 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       await setter()
     })
 
-    this._mobx.propSync(RespawnTimerMain.id, 'state', this.state, ['info'])
-    this._mobx.propSync(RespawnTimerMain.id, 'settings', this.settings, ['enabled'])
+    this._mobxUtils.propSync(RespawnTimerMain.id, 'state', this.state, ['info'])
+    this._mobxUtils.propSync(RespawnTimerMain.id, 'settings', this.settings, ['enabled'])
 
-    this._mobx.reaction(
-      () => [this._lc.data.gameflow.phase, this.settings.enabled],
+    this._mobxUtils.reaction(
+      () => [this._leagueClient.data.gameflow.phase, this.settings.enabled],
       ([phase, enabled]) => {
         if (phase === 'InProgress') {
           if (enabled) {
@@ -87,8 +87,8 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   }
 
   private async _queryRespawnTime() {
-    if (!this._lc.data.summoner.me) {
-      this._log.warn('Seems like summoner info is not loaded')
+    if (!this._leagueClient.data.summoner.me) {
+      this._logger.warn('Seems like summoner info is not loaded')
       return
     }
 
@@ -96,14 +96,14 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       const playerList = (await this._gameClient.api.getLiveClientDataPlayerList()).data
       const self = playerList.find((p) => {
         if (p.riotId) {
-          return p.riotId === riotId(this._lc.data.summoner.me)
+          return p.riotId === riotId(this._leagueClient.data.summoner.me)
         }
 
         if (p.summonerName) {
-          return summonerName(p.summonerName) === riotId(this._lc.data.summoner.me)
+          return summonerName(p.summonerName) === riotId(this._leagueClient.data.summoner.me)
         }
 
-        return p.summonerName === this._lc.data.summoner.me?.internalName
+        return p.summonerName === this._leagueClient.data.summoner.me?.internalName
       })
 
       if (self) {
@@ -127,11 +127,11 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('Respawn timer polling started')
+    this._logger.info('Respawn timer polling started')
 
     this._isStarted = true
     this._queryRespawnTime()
-    this._timer = setInterval(() => this._queryRespawnTime(), RespawnTimerMain.POLL_INTERVAL)
+    this._timerId = setInterval(() => this._queryRespawnTime(), RespawnTimerMain.POLL_INTERVAL)
   }
 
   private _stopRespawnTimerPoll() {
@@ -139,10 +139,10 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('Respawn timer polling stopped')
+    this._logger.info('Respawn timer polling stopped')
 
     this._isStarted = false
-    clearInterval(this._timer)
+    clearInterval(this._timerId)
 
     runInAction(() => {
       this.state.info = {

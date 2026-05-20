@@ -25,7 +25,7 @@ export class StorageMain implements IAkariShardInitDispose {
   static LEAGUE_AKARI_DB_CURRENT_VERSION = 15
   static LEAGUE_AKARI_DB_FILENAME = 'LeagueAkari.db'
 
-  private readonly _log: AkariLogger
+  private readonly _logger: AkariLogger
 
   private readonly _dataSource: DataSource
 
@@ -44,9 +44,9 @@ export class StorageMain implements IAkariShardInitDispose {
 
   constructor(
     readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _mobx: MobxUtilsMain
+    private readonly _mobxUtils: MobxUtilsMain
   ) {
-    this._log = _loggerFactory.create(StorageMain.id)
+    this._logger = _loggerFactory.create(StorageMain.id)
 
     this._dataSource = new DataSource({
       type: 'sqlite',
@@ -57,7 +57,7 @@ export class StorageMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._mobx.propSync(StorageMain.id, 'state', this.state, ['usingHigherVersionDb'])
+    this._mobxUtils.propSync(StorageMain.id, 'state', this.state, ['usingHigherVersionDb'])
     await this._checkAndInitializeDatabase(this._dataSource)
   }
 
@@ -72,34 +72,37 @@ export class StorageMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info(`Current database file located at ${dbPath}`)
+    this._logger.info(`Current database file located at ${dbPath}`)
 
     const { needToRecreateDatabase, needToPerformUpgrade, currentVersion } =
       await this._checkDatabaseVersion(dataSource)
 
-    this._log.info(`Current version ${currentVersion}`)
+    this._logger.info(`Current version ${currentVersion}`)
 
     let cv = currentVersion
 
     if (!needToPerformUpgrade && !needToRecreateDatabase) {
-      this._log.info(`Current version database does not need to be migrated`)
+      this._logger.info(`Current version database does not need to be migrated`)
     }
 
     if (needToRecreateDatabase) {
-      this._log.warn(`Invalid database format, need to recreate database`)
+      this._logger.warn(`Invalid database format, need to recreate database`)
       await this._recreateDatabase(dataSource, dbPath)
       cv = 0
     }
 
     if (needToPerformUpgrade) {
-      this._log.info(`Database needs to be upgraded from ${cv} version`)
+      this._logger.info(`Database needs to be upgraded from ${cv} version`)
 
       try {
         await this._runMigrationsInTransaction(dataSource, cv)
       } catch (error) {
         // Retry once by recreating the database to avoid infinite loops
         if (!this._rebuildOnUpgradeFailedAttempted) {
-          this._log.error('Database upgrade failed, will recreate database once and retry', error)
+          this._logger.error(
+            'Database upgrade failed, will recreate database once and retry',
+            error
+          )
           this._rebuildOnUpgradeFailedAttempted = true
 
           await this._recreateDatabase(dataSource, dbPath)
@@ -121,14 +124,14 @@ export class StorageMain implements IAkariShardInitDispose {
       .filter(([v]) => Number(v) > currentVersion)
       .toSorted(([v1], [v2]) => Number(v1) - Number(v2))
 
-    this._log.info(`Number of database upgrades to be performed: ${pendingUpgrades.length}`)
+    this._logger.info(`Number of database upgrades to be performed: ${pendingUpgrades.length}`)
 
     for (const [v, fn] of pendingUpgrades) {
-      this._log.info(`Executing => version ${v} migration`)
+      this._logger.info(`Executing => version ${v} migration`)
       await fn(r)
     }
 
-    this._log.info(`All database migrations completed`)
+    this._logger.info(`All database migrations completed`)
   }
 
   private async _initializeDatabase(dataSource: DataSource) {
@@ -142,7 +145,7 @@ export class StorageMain implements IAkariShardInitDispose {
       const backupPath = join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
 
       renameSync(dbPath, backupPath)
-      this._log.info(`Original database cannot be used, backed up to ${backupPath}`)
+      this._logger.info(`Original database cannot be used, backed up to ${backupPath}`)
     }
 
     await dataSource.initialize()
@@ -168,7 +171,7 @@ export class StorageMain implements IAkariShardInitDispose {
           currentVersion = parseInt(versionResult[0].value, 10)
           if (currentVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
             // Higher version DB detected: use as-is, do not migrate/recreate, and set warning flag
-            this._log.warn(
+            this._logger.warn(
               `Database version (${currentVersion}) is higher than supported (${StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION}). Using higher version database as-is.`
             )
             this.state.setUsingHigherVersionDb(true)

@@ -39,11 +39,11 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   private _renderers = new Set<number>()
 
   constructor() {
-    this._handleRendererInvocation = this._handleRendererInvocation.bind(this)
-    this._handleRendererRegister = this._handleRendererRegister.bind(this)
+    this._processRendererInvocation = this._processRendererInvocation.bind(this)
+    this._processRendererRegister = this._processRendererRegister.bind(this)
   }
 
-  private _handleRendererInvocation(
+  private _processRendererInvocation(
     event: IpcMainInvokeEvent,
     namespace: string,
     fnName: string,
@@ -64,7 +64,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
    * @param event
    * @param action 可选值 register / unregister
    */
-  private _handleRendererRegister(event: IpcMainInvokeEvent, action = 'register') {
+  private _processRendererRegister(event: IpcMainInvokeEvent, action = 'register') {
     const id = event.sender.id
 
     if (action === 'register' && !this._renderers.has(id)) {
@@ -85,18 +85,18 @@ export class AkariIpcMain implements IAkariShardInitDispose {
       if (result instanceof Promise) {
         return result
           .then((res) => ({ success: true, data: res }))
-          .catch((error: any) => AkariIpcMain._handleError(error))
+          .catch((error: any) => AkariIpcMain._toErrorResponse(error))
       } else {
         return { success: true, data: result }
       }
     } catch (error) {
-      return AkariIpcMain._handleError(error)
+      return AkariIpcMain._toErrorResponse(error)
     }
   }
 
   async onInit() {
-    ipcMain.handle('akariCall', this._handleRendererInvocation)
-    ipcMain.handle('akariRendererRegister', this._handleRendererRegister)
+    ipcMain.handle('akariCall', this._processRendererInvocation)
+    ipcMain.handle('akariRendererRegister', this._processRendererRegister)
   }
 
   async onDispose() {
@@ -148,7 +148,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
    * @param error
    * @returns
    */
-  private static _handleError(error: any): IpcMainDataType {
+  private static _toErrorResponse(error: any): IpcMainDataType {
     if (isAxiosError(error)) {
       const errorWithResponse = {
         response: error.response

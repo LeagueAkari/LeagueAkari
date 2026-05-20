@@ -13,7 +13,7 @@ export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
   static id = 'league-client-peek-renderer'
 
   constructor(
-    @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
+    @Dep(LeagueClientRenderer) private readonly _leagueClient: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {}
 
@@ -26,16 +26,18 @@ export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
   async onDispose() {}
 
   private _setupPeekTasks() {
-    const lcs = useLeagueClientStore()
-    const lcuxs = useLeagueClientUxStore()
-    const lcps = useLeagueClientPeekStore()
+    const leagueClientStore = useLeagueClientStore()
+    const leagueClientUxStore = useLeagueClientUxStore()
+    const leagueClientPeekStore = useLeagueClientPeekStore()
 
     const otherClients = computed(() => {
-      return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)
+      return leagueClientUxStore.launchedClients.filter(
+        (c) => c.pid !== leagueClientStore.auth?.pid
+      )
     })
 
     const updateConnectableClientExtraInfo = async () => {
-      const info = lcps.connectableClientExtraInfo
+      const info = leagueClientPeekStore.connectableClientExtraInfo
 
       for (const pid of Object.keys(info)) {
         if (!otherClients.value.find((cmd) => cmd?.pid.toString() === pid)) {
@@ -46,7 +48,7 @@ export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
       await Promise.all(
         otherClients.value.map(async (cmd) => {
           const prev = info[cmd.pid]
-          const data = await this._lc.peekClient(cmd)
+          const data = await this._leagueClient.peekClient(cmd)
 
           if (prev) {
             if (!data) {

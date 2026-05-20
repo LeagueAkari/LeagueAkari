@@ -93,25 +93,6 @@ DeclarationModal:
 
     </div>
 
-Guide:
-  dismiss: 关闭
-  confirm: 确认
-
-FeatureGuide:
-  previous: 上一条
-  next: 下一条
-  confirm: 确认
-
-  ongoingGameNewFeatures20251225:
-    item1:
-      title: 房间内查询
-      description: |
-        除了英雄选择和游戏中阶段，现在也可以展示房间内所有成员的数据。
-
-        在 `设置` → `对局` → `在房间阶段内生效`，启用此功能。
-    item2:
-      title: 展示更多标签
-      description: 在 `设置` → `对局` → `玩家卡片标签` 中，启用更多标签。
 CommonButtons:
   announcement: 公告
   announcementSummary: 公告摘要

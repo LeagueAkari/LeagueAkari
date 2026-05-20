@@ -3,12 +3,12 @@ import { MigrationContext, hasMigration, markMigration, moveSetting } from './co
 export const MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
 
 // NOTE: drop support before League Akari 1.1.x
-export async function migrateFrom126({ manager, log }: MigrationContext) {
+export async function migrateFrom126({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_126)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_126)
+  logger.info('Start migrating settings', MIGRATION_FROM_126)
 
   await moveSetting(manager, 'auxiliary-window/opacity', 'window-manager-main/auxWindowOpacity')
   await moveSetting(manager, 'auxiliary-window/enabled', 'window-manager-main/auxWindowEnabled')
@@ -166,5 +166,5 @@ export async function migrateFrom126({ manager, log }: MigrationContext) {
   )
 
   await markMigration(manager, MIGRATION_FROM_126)
-  log.info(`Migration completed, to ${MIGRATION_FROM_126}`)
+  logger.info(`Migration completed, to ${MIGRATION_FROM_126}`)
 }

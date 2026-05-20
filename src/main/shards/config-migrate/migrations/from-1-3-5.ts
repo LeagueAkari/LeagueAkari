@@ -5,12 +5,12 @@ import { MigrationContext, hasMigration, markMigration, moveSetting } from './co
 
 export const MIGRATION_FROM_135 = 'akari-migration-from-1.3.5_patch1'
 
-export async function migrateFrom135({ manager, log }: MigrationContext) {
+export async function migrateFrom135({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_135)) {
     return
   }
 
-  log.info('Start migrating settings', MIGRATION_FROM_135)
+  logger.info('Start migrating settings', MIGRATION_FROM_135)
 
   await manager.save(Setting.create('app-common-main/showFreeSoftwareDeclaration', true))
 
@@ -50,7 +50,7 @@ export async function migrateFrom135({ manager, log }: MigrationContext) {
         ])
       )
     } catch (error) {
-      log.error('Failed to migrate former sendable items', error)
+      logger.error('Failed to migrate former sendable items', error)
     }
   }
 

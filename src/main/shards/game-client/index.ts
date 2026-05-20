@@ -43,10 +43,10 @@ export class GameClientMain implements IAkariShardInitDispose {
   static GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
 
-  private readonly _log: AkariLogger
-  private readonly _setting: SetterSettingService
+  private readonly _logger: AkariLogger
+  private readonly _settingService: SetterSettingService
 
-  private readonly _http = axios.create({
+  private readonly _httpClient = axios.create({
     baseURL: GameClientMain.GAME_CLIENT_BASE_URL,
     httpsAgent: new https.Agent({
       rejectUnauthorized: false,
@@ -55,7 +55,7 @@ export class GameClientMain implements IAkariShardInitDispose {
       maxCachedSessions: 2048
     })
   })
-  private readonly _api: GameClientHttpApiAxiosHelper
+  private readonly _gameClientApi: GameClientHttpApiAxiosHelper
 
   public readonly settings = new GameClientSettings()
 
@@ -65,15 +65,15 @@ export class GameClientMain implements IAkariShardInitDispose {
     private readonly _ipc: AkariIpcMain,
     readonly _loggerFactory: LoggerFactoryMain,
     readonly _settingFactory: SettingFactoryMain,
-    private readonly _lc: LeagueClientMain,
-    private readonly _kbd: KeyboardShortcutsMain,
-    private readonly _mobx: MobxUtilsMain,
-    private readonly _ci: ClientInstallationMain
+    private readonly _leagueClient: LeagueClientMain,
+    private readonly _keyboardShortcuts: KeyboardShortcutsMain,
+    private readonly _mobxUtils: MobxUtilsMain,
+    private readonly _clientInstallation: ClientInstallationMain
   ) {
-    this._log = _loggerFactory.create(GameClientMain.id)
-    this._api = new GameClientHttpApiAxiosHelper(this._http)
+    this._logger = _loggerFactory.create(GameClientMain.id)
+    this._gameClientApi = new GameClientHttpApiAxiosHelper(this._httpClient)
 
-    this._setting = _settingFactory.register(
+    this._settingService = _settingFactory.register(
       GameClientMain.id,
       {
         terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },
@@ -84,27 +84,27 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   get http() {
-    return this._http
+    return this._httpClient
   }
 
   get api() {
-    return this._api
+    return this._gameClientApi
   }
 
   async onInit() {
-    await this._setting.applyToState()
-    this._mobx.propSync(GameClientMain.id, 'settings', this.settings, [
+    await this._settingService.applyToState()
+    this._mobxUtils.propSync(GameClientMain.id, 'settings', this.settings, [
       'terminateGameClientWithShortcut',
       'terminateShortcut'
     ])
-    this._handleIpcCall()
-    this._handleShortcuts()
+    this._registerIpcHandlers()
+    this._watchShortcuts()
   }
 
-  private _handleShortcuts() {
+  private _watchShortcuts() {
     if (this.settings.terminateShortcut) {
       try {
-        this._kbd.register(
+        this._keyboardShortcuts.register(
           `${GameClientMain.id}/terminate-game-client`,
           this.settings.terminateShortcut,
           'normal',
@@ -115,22 +115,27 @@ export class GameClientMain implements IAkariShardInitDispose {
           }
         )
       } catch (error) {
-        this._log.warn('Failed to initialize register shortcut', this.settings.terminateShortcut)
+        this._logger.warn('Failed to initialize register shortcut', this.settings.terminateShortcut)
       }
     }
 
-    this._setting.onChange('terminateShortcut', async (value, { setter }) => {
+    this._settingService.onChange('terminateShortcut', async (value, { setter }) => {
       if (value === null) {
-        this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
+        this._keyboardShortcuts.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
       } else {
         try {
-          this._kbd.register(`${GameClientMain.id}/terminate-game-client`, value, 'normal', () => {
-            if (this.settings.terminateGameClientWithShortcut) {
-              this._terminateGameClient()
+          this._keyboardShortcuts.register(
+            `${GameClientMain.id}/terminate-game-client`,
+            value,
+            'normal',
+            () => {
+              if (this.settings.terminateGameClientWithShortcut) {
+                this._terminateGameClient()
+              }
             }
-          })
+          )
         } catch (error) {
-          this._log.warn('Failed to register shortcut', value)
+          this._logger.warn('Failed to register shortcut', value)
           await setter(null)
         }
       }
@@ -139,7 +144,7 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
   }
 
-  private _handleIpcCall() {
+  private _registerIpcHandlers() {
     this._ipc.onCall(GameClientMain.id, 'terminateGameClient', () => {
       this._terminateGameClient()
     })
@@ -162,17 +167,17 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   private async _terminateGameClient() {
-    this._log.info('Try to terminate game client process')
+    this._logger.info('Try to terminate game client process')
     const pids = await getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
 
     pids.forEach((pid) => {
-      this._log.info('Process exists', pid)
+      this._logger.info('Process exists', pid)
       if (NATIVE_SUPPORT.isProcessForeground && !isProcessForeground(pid)) {
-        this._log.info('Process is not in foreground', pid)
+        this._logger.info('Process is not in foreground', pid)
         return
       }
 
-      this._log.info(`Terminate game client process ${pid}`)
+      this._logger.info(`Terminate game client process ${pid}`)
       terminateProcess(pid)
     })
   }
@@ -194,9 +199,9 @@ export class GameClientMain implements IAkariShardInitDispose {
       observerServerPort
     } = config
 
-    if (this._lc.state.connectionState === 'connected') {
+    if (this._leagueClient.state.connectionState === 'connected') {
       try {
-        const { data: location } = await this._lc.http.get<{
+        const { data: location } = await this._leagueClient.http.get<{
           gameExecutablePath: string
           gameInstallRoot: string
         }>('/lol-patch/v1/products/league_of_legends/install-location')
@@ -218,14 +223,17 @@ export class GameClientMain implements IAkariShardInitDispose {
         throw err
       }
     } else {
-      if (this._ci.state.tencentInstallationPath) {
+      if (this._clientInstallation.state.tencentInstallationPath) {
         const gameExecutablePath = path.resolve(
-          this._ci.state.tencentInstallationPath,
+          this._clientInstallation.state.tencentInstallationPath,
           'Game',
           GameClientMain.GAME_CLIENT_PROCESS_NAME
         )
 
-        const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
+        const gameInstallRoot = path.resolve(
+          this._clientInstallation.state.tencentInstallationPath,
+          'Game'
+        )
 
         return {
           sgpServerId,
@@ -238,9 +246,9 @@ export class GameClientMain implements IAkariShardInitDispose {
           gameInstallRoot,
           gameExecutablePath
         }
-      } else if (this._ci.state.leagueClientExecutablePaths.length) {
+      } else if (this._clientInstallation.state.leagueClientExecutablePaths.length) {
         const gameExecutablePath = path.resolve(
-          this._ci.state.leagueClientExecutablePaths[0],
+          this._clientInstallation.state.leagueClientExecutablePaths[0],
           '..',
           'Game',
           GameClientMain.GAME_CLIENT_PROCESS_NAME
@@ -363,7 +371,7 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {
     const settingsPath = path.join(await this._getConfigPathByLcuApi(), 'PersistedSettings.json')
-    this._log.info(`Set file ${settingsPath} to ${mode}`)
+    this._logger.info(`Set file ${settingsPath} to ${mode}`)
 
     if (mode === 'readonly') {
       await ofs.promises.chmod(settingsPath, 0o444)
@@ -379,13 +387,15 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   private async _getConfigPathByLcuApi() {
-    if (!this._lc.state.auth) {
+    if (!this._leagueClient.state.auth) {
       throw new Error('LC Not connected')
     }
 
-    const { data: gameInstallRoot } = await this._lc.http.get<string>('/data-store/v1/install-dir')
+    const { data: gameInstallRoot } = await this._leagueClient.http.get<string>(
+      '/data-store/v1/install-dir'
+    )
 
-    if (this._lc.state.auth.region === 'TENCENT') {
+    if (this._leagueClient.state.auth.region === 'TENCENT') {
       return path.resolve(gameInstallRoot, '..', 'Game', 'Config')
     } else {
       return path.resolve(gameInstallRoot, 'Config')

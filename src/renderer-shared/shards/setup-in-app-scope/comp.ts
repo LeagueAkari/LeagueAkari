@@ -7,14 +7,14 @@ import { SetupInAppScopeRenderer } from '.'
 export const SetupInAppScope = defineComponent({
   name: '__AkariSetupInAppScope',
   setup() {
-    const inst = useInstance(SetupInAppScopeRenderer)
+    const setupInAppScope = useInstance(SetupInAppScopeRenderer)
 
-    inst._setup()
+    setupInAppScope.runSetupFns()
 
     return () =>
       h(
         Fragment,
-        inst.renderVNodes.map((fn) => fn())
+        setupInAppScope.renderVNodes.map((fn) => fn())
       )
   }
 })

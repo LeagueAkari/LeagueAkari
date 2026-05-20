@@ -14,7 +14,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 export class StatisticsMain implements IAkariShardInitDispose {
   static readonly id = 'statistics-main'
 
-  private _api = new AkariApiHttpApiAxiosHelper(
+  private _akariApi = new AkariApiHttpApiAxiosHelper(
     axios.create({
       headers: {
         'User-Agent': `LeagueAkari/${app.getVersion()}`,
@@ -23,12 +23,12 @@ export class StatisticsMain implements IAkariShardInitDispose {
     })
   )
 
-  private _log: AkariLogger
-  private _setting: SetterSettingService
+  private _logger: AkariLogger
+  private _settingService: SetterSettingService
 
   constructor(_loggerFactory: LoggerFactoryMain, _settingFactory: SettingFactoryMain) {
-    this._log = _loggerFactory.create(StatisticsMain.id)
-    this._setting = _settingFactory.register(StatisticsMain.id, {})
+    this._logger = _loggerFactory.create(StatisticsMain.id)
+    this._settingService = _settingFactory.register(StatisticsMain.id, {})
   }
 
   /**
@@ -38,7 +38,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
   private async _recordVersionUsageOnce() {
     try {
       const version = app.getVersion()
-      let countedVersions = await this._setting._getFromStorage('alreadyCounted')
+      let countedVersions = await this._settingService._getFromStorage('alreadyCounted')
 
       if (!Array.isArray(countedVersions)) {
         countedVersions = null
@@ -49,24 +49,24 @@ export class StatisticsMain implements IAkariShardInitDispose {
           return
         }
 
-        const { data } = await this._api.postStatisticsRecord(version)
-        await this._setting._saveToStorage('alreadyCounted', [...countedVersions, version])
-        this._log.info('Counter increment success', data)
+        const { data } = await this._akariApi.postStatisticsRecord(version)
+        await this._settingService._saveToStorage('alreadyCounted', [...countedVersions, version])
+        this._logger.info('Counter increment success', data)
       } else {
-        const { data: aka } = await this._api.postStatisticsRecord('v0.0.0')
-        const { data: ri } = await this._api.postStatisticsRecord(version)
-        await this._setting._saveToStorage('alreadyCounted', [version])
-        this._log.info('Counter increment success', aka, ri)
+        const { data: aka } = await this._akariApi.postStatisticsRecord('v0.0.0')
+        const { data: ri } = await this._akariApi.postStatisticsRecord(version)
+        await this._settingService._saveToStorage('alreadyCounted', [version])
+        this._logger.info('Counter increment success', aka, ri)
       }
     } catch (error) {
-      this._log.error('Counter increment failed', error)
+      this._logger.error('Counter increment failed', error)
     }
   }
 
   async onInit() {
     this._recordVersionUsageOnce().catch((e) => {
       // normally it should not happen
-      this._log.error('Oops... Something went wrong when counting visitors', e)
+      this._logger.error('Oops... Something went wrong when counting visitors', e)
     })
   }
 }

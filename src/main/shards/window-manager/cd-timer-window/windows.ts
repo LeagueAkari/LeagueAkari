@@ -87,18 +87,18 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     this.shortcutTargetId = `${this._namespace}/show`
   }
 
-  private _handleCdTimerWindowLogics() {
+  private _watchCdTimerWindow() {
     if (!this.settings.pinned) {
-      this._setting.set('pinned', true)
+      this._settingService.set('pinned', true)
     }
 
-    this._setting.onChange('pinned', (value: boolean) => {
+    this._settingService.onChange('pinned', (value: boolean) => {
       if (!value) {
         throw new AkariIpcError('cd-timer window must be topmost', 'UnsupportedActionNotTopmost')
       }
     })
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.state.ready,
       (ready) => {
         if (ready) {
@@ -110,7 +110,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
           this._window?.on('focus', () => {
             // focusable: true 时可能正常获焦（如用户点击计时器区域），属预期行为
-            this._log.debug('cd-timer window focused')
+            this._logger.debug('cd-timer window focused')
           })
 
           this._window?.on('system-context-menu', (event) => {
@@ -121,7 +121,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       { fireImmediately: true, equals: comparer.shallow }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit],
       ([enabled, finishedInit]) => {
         if (!finishedInit) {
@@ -141,11 +141,11 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
         if (!shortcut) {
-          this._log.debug('Unregister cd-timer window shortcut')
+          this._logger.debug('Unregister cd-timer window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
           return
         }
@@ -163,8 +163,8 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
             }
           })
         } catch {
-          this._log.warn('Failed to register cd-timer window shortcut')
-          this._setting.set('showShortcut', null)
+          this._logger.warn('Failed to register cd-timer window shortcut')
+          this._settingService.set('showShortcut', null)
         }
       },
       { fireImmediately: true }
@@ -190,7 +190,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       return false
     })
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => shouldUseCdTimer.get(),
       (should) => {
         if (should) {
@@ -203,11 +203,11 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       { fireImmediately: true }
     )
 
-    this._mobx.reaction(
+    this._mobxUtils.reaction(
       () => shouldUseCdTimer.get(),
       (should) => {
         if (should) {
-          this._log.info('Game stats polling started')
+          this._logger.info('Game stats polling started')
           this._updateGameStats()
           this._gameStatsPollTimer = setInterval(
             () => this._updateGameStats(),
@@ -215,7 +215,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           )
         } else {
           if (this._gameStatsPollTimer) {
-            this._log.info('Game stats polling stopped')
+            this._logger.info('Game stats polling stopped')
             clearInterval(this._gameStatsPollTimer)
             this._gameStatsPollTimer = null
           }
@@ -227,7 +227,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     )
   }
 
-  private _handleIpcCall() {
+  private _registerIpcHandlers() {
     let isSending = false
     this._ipc.onCall(this._namespace, 'sendInGame', async (_, text: string) => {
       if (!NATIVE_SUPPORT.nativeInput.available) {
@@ -257,7 +257,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
         await nativeInput.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
       } catch (error) {
-        this._log.warn('sendInGame failed', error)
+        this._logger.warn('sendInGame failed', error)
         throw error
       } finally {
         isSending = false
@@ -271,7 +271,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       this.state.setGameTime(data.gameTime)
     } catch (error) {
       this.state.setGameTime(null)
-      this._log.warn('Failed to get game data', error)
+      this._logger.warn('Failed to get game data', error)
     }
   }
 
@@ -279,10 +279,10 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     await super.onInit()
 
     if (NATIVE_SUPPORT.nativeInput.available) {
-      this._handleIpcCall()
+      this._registerIpcHandlers()
     }
 
-    this._handleCdTimerWindowLogics()
+    this._watchCdTimerWindow()
   }
 
   override showOrRestore(_inactive = false) {

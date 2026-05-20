@@ -16,14 +16,14 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {}
 
   async onInit() {
     const store = useInGameSendStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   getSendableItemShortcutTargetId(id: string) {
@@ -35,7 +35,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   setCancelShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'cancelShortcut', shortcut)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'cancelShortcut', shortcut)
   }
 
   createSendableItem(data?: Partial<SendableItem>): Promise<SendableItem | undefined> {
@@ -55,7 +55,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   setSendInterval(interval: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
   }
 
   dryRunStatsSend(target = 'all'): Promise<
