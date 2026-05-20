@@ -50,16 +50,19 @@
           <div class="flex flex-wrap gap-0.5">
             <!-- display only one group of it -->
             <div
-              class="skill relative box-border flex h-4 min-w-6 items-center justify-center rounded-xs px-0.5 text-[10px]"
-              :class="{
-                'bg-gray-200 text-[#00a085] dark:bg-[#3f3f46] dark:text-[#00d7b0]':
-                  s.startsWith('W'),
-                'bg-gray-200 text-[#0178c4] dark:bg-[#3f3f46] dark:text-[#01a8fb]':
-                  s.startsWith('Q'),
-                'bg-gray-200 text-[#cc6600] dark:bg-[#3f3f46] dark:text-[#ff8200]':
-                  s.startsWith('E'),
-                'bg-[#5f32e6] text-white': s.startsWith('R')
-              }"
+              class="skill relative box-border flex h-4 items-center justify-center rounded-xs text-[10px]"
+              :class="[
+                isSingleLetterAbilityName(s) ? 'w-4 min-w-4 px-0' : 'min-w-6 px-0.5',
+                {
+                  'bg-gray-200 text-[#00a085] dark:bg-[#3f3f46] dark:text-[#00d7b0]':
+                    s.startsWith('W'),
+                  'bg-gray-200 text-[#0178c4] dark:bg-[#3f3f46] dark:text-[#01a8fb]':
+                    s.startsWith('Q'),
+                  'bg-gray-200 text-[#cc6600] dark:bg-[#3f3f46] dark:text-[#ff8200]':
+                    s.startsWith('E'),
+                  'bg-[#5f32e6] text-white': s.startsWith('R')
+                }
+              ]"
               v-for="s of m.builds[0].order"
             >
               {{ s }}
@@ -108,6 +111,7 @@ const { champion } = useOpgg()
 const { t } = useTranslation()
 
 const isSkillMasteriesExpanded = ref(false)
+const isSingleLetterAbilityName = (name: string) => /^[QWER]$/.test(name)
 
 watchEffect(() => {
   if (!champion.value) {

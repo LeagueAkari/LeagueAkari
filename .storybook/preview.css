@@ -1,0 +1,34 @@
+html,
+body,
+.sb-show-main {
+  min-height: 100%;
+  margin: 0;
+  --la-background-color-primary: var(--la-color-bg-primary);
+  background: var(--la-color-bg-primary);
+  color: var(--la-color-text-primary);
+}
+
+#storybook-root {
+  min-height: 100vh;
+}
+
+.akari-story-shell {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: clamp(12px, 2.5vw, 32px);
+  background: var(--la-color-bg-primary);
+  color: var(--la-color-text-primary);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.akari-story-panel {
+  width: min(100%, 1120px);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.akari-story-panel > * {
+  min-width: 0;
+}

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full max-w-full overflow-x-auto rounded-md border border-black/10 bg-white/55 text-xs text-black shadow-sm shadow-black/5 dark:border-white/10 dark:bg-white/4 dark:text-gray-300 dark:shadow-black/20"
+    class="w-fit max-w-full overflow-x-auto rounded-md border border-black/10 bg-white/55 text-xs text-black shadow-sm shadow-black/5 dark:border-white/10 dark:bg-white/4 dark:text-gray-300 dark:shadow-black/20"
   >
     <table class="min-w-max border-collapse border-spacing-0">
       <thead class="bg-black/4 dark:bg-white/6">
