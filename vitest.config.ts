@@ -1,10 +1,16 @@
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [vue(), vueJsx()],
+  plugins: [
+    vue(),
+    vueJsx({
+      tsTransform: 'built-in',
+      babelPlugins: [['@babel/plugin-syntax-decorators', { legacy: true }]]
+    })
+  ],
   resolve: {
     alias: {
       '@main-window': resolve('src/renderer/src-main-window'),

@@ -95,7 +95,10 @@ export default defineConfig({
       }),
       tailwindcss(),
       vueDevTools(),
-      vueJsx({})
+      vueJsx({
+        tsTransform: 'built-in',
+        babelPlugins: [['@babel/plugin-syntax-decorators', { legacy: true }]]
+      })
     ],
     build: {
       minify,
