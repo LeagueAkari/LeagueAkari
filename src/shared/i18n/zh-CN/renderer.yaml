@@ -2357,7 +2357,11 @@ PlayerTab:
   clearFilters: 清除筛选条件
   collectMode:
     collectedPageTitle: 收集结果页
-    collectedPageDescription: 当前页为收集模式结果，共收集到 {{count}} 场战绩
+    collectedPageDescription: 当前页为收集模式结果，共筛选 {scanned}，收集到 {collected}
+    scannedMatches_one: '{count} 场战绩'
+    scannedMatches_other: '{count} 场战绩'
+    collectedMatches_one: '{count} 场'
+    collectedMatches_other: '{count} 场'
     reloadNormalPage: 返回普通分页
     collectingProgress: 正在收集中 ({{count}} / {{expected}})
     stoppingProgress: 正在停止收集 ({{count}} / {{expected}})

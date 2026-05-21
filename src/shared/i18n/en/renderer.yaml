@@ -2359,7 +2359,11 @@ PlayerTab:
   clearFilters: Clear filter conditions
   collectMode:
     collectedPageTitle: Collected Results
-    collectedPageDescription: This page is a collection-mode result with {{count}} collected matches.
+    collectedPageDescription: This page is a collection-mode result with {collected} from {scanned}.
+    scannedMatches_one: '{count} scanned match'
+    scannedMatches_other: '{count} scanned matches'
+    collectedMatches_one: '{count} collected match'
+    collectedMatches_other: '{count} collected matches'
     reloadNormalPage: Back to normal pages
     collectingProgress: Collecting ({{count}} / {{expected}})
     stoppingProgress: Stopping collection ({{count}} / {{expected}})

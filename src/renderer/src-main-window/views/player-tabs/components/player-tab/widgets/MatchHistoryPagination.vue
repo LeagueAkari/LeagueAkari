@@ -11,11 +11,34 @@
         {{ t('PlayerTab.collectMode.collectedPageTitle') }}
       </span>
       <span class="ml-2">
-        {{
-          t('PlayerTab.collectMode.collectedPageDescription', {
-            count: collectedGamesCount
-          })
-        }}
+        <TranslationComponent :translation="t('PlayerTab.collectMode.collectedPageDescription')">
+          <template #scanned>
+            <TranslationComponent
+              :translation="
+                t('PlayerTab.collectMode.scannedMatches', {
+                  count: scannedCount
+                })
+              "
+            >
+              <template #count>
+                <span class="collect-mode-count">{{ scannedCount }}</span>
+              </template>
+            </TranslationComponent>
+          </template>
+          <template #collected>
+            <TranslationComponent
+              :translation="
+                t('PlayerTab.collectMode.collectedMatches', {
+                  count: collectedGamesCount
+                })
+              "
+            >
+              <template #count>
+                <span class="collect-mode-count">{{ collectedGamesCount }}</span>
+              </template>
+            </TranslationComponent>
+          </template>
+        </TranslationComponent>
       </span>
     </div>
 
@@ -113,11 +136,34 @@
         {{ t('PlayerTab.collectMode.collectedPageTitle') }}
       </div>
       <div class="text-sm leading-relaxed text-gray-700 dark:text-gray-400">
-        {{
-          t('PlayerTab.collectMode.collectedPageDescription', {
-            count: collectedGamesCount
-          })
-        }}
+        <TranslationComponent :translation="t('PlayerTab.collectMode.collectedPageDescription')">
+          <template #scanned>
+            <TranslationComponent
+              :translation="
+                t('PlayerTab.collectMode.scannedMatches', {
+                  count: scannedCount
+                })
+              "
+            >
+              <template #count>
+                <span class="collect-mode-count">{{ scannedCount }}</span>
+              </template>
+            </TranslationComponent>
+          </template>
+          <template #collected>
+            <TranslationComponent
+              :translation="
+                t('PlayerTab.collectMode.collectedMatches', {
+                  count: collectedGamesCount
+                })
+              "
+            >
+              <template #count>
+                <span class="collect-mode-count">{{ collectedGamesCount }}</span>
+              </template>
+            </TranslationComponent>
+          </template>
+        </TranslationComponent>
       </div>
     </div>
 
@@ -331,7 +377,7 @@ import {
   Filter20Regular,
   Previous20Filled
 } from '@vicons/fluent'
-import { useTranslation } from 'i18next-vue'
+import { TranslationComponent, useTranslation } from 'i18next-vue'
 import {
   NButton,
   NIcon,
@@ -394,6 +440,9 @@ const selectedQueue = computed(() => {
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
 const isCollectModePage = computed(() => page.value?.isLoadedByCollectMode ?? false)
 const collectedGamesCount = computed(() => page.value?.games.length ?? 0)
+const scannedCount = computed(
+  () => page.value?.collectModeStats?.scannedGamesCount ?? collectedGamesCount.value
+)
 const isCollectModeActionDisabled = computed(() => isLoading.value || !!collectState.value)
 const isPaginationDisabled = computed(
   () => isLoading.value || !!collectState.value || isCollectModePage.value
@@ -528,3 +577,11 @@ const renderLabel = (option: SelectOption) => {
   )
 }
 </script>
+
+<style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+.collect-mode-count {
+  @apply text-akari-700 dark:text-akari-300 font-bold;
+}
+</style>

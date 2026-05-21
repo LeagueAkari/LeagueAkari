@@ -88,6 +88,10 @@ export interface MatchHistoryPage {
    * 这一页战绩是否是收集模式的战绩
    */
   isLoadedByCollectMode: boolean
+
+  collectModeStats?: {
+    scannedGamesCount: number
+  }
 }
 
 export type MatchHistoryContext = {
@@ -452,7 +456,10 @@ export function provideMatchHistory(props: {
           details: {},
           detailsLoading: {},
           queryParams: collectPageQueryParams,
-          isLoadedByCollectMode: true
+          isLoadedByCollectMode: true,
+          collectModeStats: {
+            scannedGamesCount: 0
+          }
         }
 
         while (
@@ -485,6 +492,8 @@ export function provideMatchHistory(props: {
             break
           }
 
+          page.value.collectModeStats!.scannedGamesCount += rawSummaryList.length
+
           const gamesToAppend = rawSummaryList
             .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))
             .slice(0, remainingCollectCount(params.expectedCount))
@@ -510,7 +519,10 @@ export function provideMatchHistory(props: {
           details: {},
           detailsLoading: {},
           queryParams: collectPageQueryParams,
-          isLoadedByCollectMode: true
+          isLoadedByCollectMode: true,
+          collectModeStats: {
+            scannedGamesCount: 0
+          }
         }
 
         while (
@@ -539,6 +551,8 @@ export function provideMatchHistory(props: {
           if (rawSummaryList.length === 0) {
             break
           }
+
+          page.value.collectModeStats!.scannedGamesCount += rawSummaryList.length
 
           const games = rawSummaryList
             .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))

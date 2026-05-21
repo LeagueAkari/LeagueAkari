@@ -14,7 +14,7 @@
       />
     </template>
 
-    <div class="info">
+    <div class="info item-display-popover">
       <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
         <div class="name">
@@ -56,7 +56,7 @@
 
     <div
       :style="{ maxWidth: `${maxWidth}px` }"
-      class="text-xs"
+      class="item-display-description text-xs"
       lol-view
       v-html="lcs.gameData.items[itemId].description"
     />
@@ -128,11 +128,16 @@ const lcs = useLeagueClientStore()
 
   .from,
   .to {
-    @apply flex max-w-[460px] flex-wrap items-center gap-0.5 before:mr-1 before:text-xs before:text-white/50 before:italic before:dark:text-black/50;
+    @apply flex max-w-[460px] flex-wrap items-center gap-0.5 before:mr-1 before:text-xs before:text-black/50 before:italic before:dark:text-white/50;
 
     .image {
       @apply size-5 rounded-xs;
     }
+  }
+
+  .item-display-popover,
+  .item-display-description {
+    color: var(--la-color-text-primary);
   }
 
   .item.trinket,
