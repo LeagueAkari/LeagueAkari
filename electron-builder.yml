@@ -15,6 +15,7 @@ files:
   - '!rabi-*'
   - '!feedback-platform{,/**}'
   - '!**/.venv/**'
+  - '!node_modules/electron{,/**}'
 
 asarUnpack:
   - resources/**

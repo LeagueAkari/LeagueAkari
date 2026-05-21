@@ -6,9 +6,8 @@ import { defineConfig, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const SHOULD_COMPILE_TO_BYTECODE = true
-
 const minify = process.env.NODE_ENV === 'production'
+const MAIN_EXTERNALS = ['electron', 'typeorm', 'better-sqlite3']
 
 // 在解析 League Client 的标签时，需要考虑到这些自创的元素
 // 作为参考，列在下面，同时供模板使用
@@ -50,9 +49,8 @@ export default defineConfig({
     plugins: [swcPlugin(), yaml()],
     build: {
       minify,
-      bytecode: SHOULD_COMPILE_TO_BYTECODE ? { transformArrowFunctions: false } : false,
       rollupOptions: {
-        external: ['electron']
+        external: MAIN_EXTERNALS
       }
     },
     resolve: {

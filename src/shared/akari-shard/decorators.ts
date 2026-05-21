@@ -1,3 +1,5 @@
+import 'reflect-metadata'
+
 export type Constructor = new (...args: any[]) => any
 
 export type DepType = string | Constructor

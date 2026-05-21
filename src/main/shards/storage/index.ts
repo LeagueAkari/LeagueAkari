@@ -49,7 +49,7 @@ export class StorageMain implements IAkariShardInitDispose {
     this._logger = _loggerFactory.create(StorageMain.id)
 
     this._dataSource = new DataSource({
-      type: 'sqlite',
+      type: 'better-sqlite3',
       database: join(app.getPath('userData'), StorageMain.LEAGUE_AKARI_DB_FILENAME),
       synchronize: false,
       entities: [Metadata, SavedPlayer, Setting, EncounteredGame]
