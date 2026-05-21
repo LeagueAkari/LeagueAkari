@@ -1,15 +1,15 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { ChampSelectTeam } from '@shared/types/league-client/champ-select'
 import {
   AdditionalResult,
   DraftOptions,
   QueryStage,
   QueryStageDraft
 } from '@shared/types/shards/ongoing-game'
-import { decryptUuid } from '@shared/utils/puuid-decrypt'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 
 import { LeagueClientData } from '../league-client/lc-state'
+import type { ChampSelectHandoffSnapshot } from './champ-select-handoff'
+import { collectVisibleChampSelectMembers } from './champ-select-members'
 import { memberMerge } from './member-merge'
 
 type OngoingGameSettingsLike = {
@@ -30,26 +30,6 @@ export type PositionAssignments = Record<
     role: ParsedRole | null
   }
 >
-
-function shouldUseDeobfuscatedPuuid(member: ChampSelectTeam, config: OngoingGameConfigLike) {
-  return (
-    member.nameVisibilityType === 'HIDDEN' &&
-    member.obfuscatedPuuid &&
-    config.spotlight.deobfuscation
-  )
-}
-
-function getVisibleChampSelectPuuid(member: ChampSelectTeam, config: OngoingGameConfigLike) {
-  if (shouldUseDeobfuscatedPuuid(member, config)) {
-    return decryptUuid(member.obfuscatedPuuid!)
-  }
-
-  if (!member.puuid || member.puuid === EMPTY_PUUID) {
-    return null
-  }
-
-  return member.puuid
-}
 
 export function getDraftQueryStage(draft: DraftOptions): QueryStageDraft {
   return {
@@ -90,35 +70,38 @@ export function getLiveChampionSelections(args: {
   queryStage: QueryStage
   additional: AdditionalResult
   config: OngoingGameConfigLike
+  champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }) {
-  const { data, queryStage, additional, config } = args
+  const { data, queryStage, additional, config, champSelectHandoffSnapshot } = args
 
   if (queryStage.phase === 'champ-select') {
     return getChampSelectChampionSelections(data, config)
   }
 
   if (queryStage.phase === 'in-game') {
-    return getInGameChampionSelections(data, additional)
+    const selections = getInGameChampionSelections(data, additional)
+    mergeChampSelectHandoffChampionSelections(
+      selections,
+      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+    )
+
+    return selections
   }
 
   return {}
 }
 
 function getChampSelectChampionSelections(data: LeagueClientData, config: OngoingGameConfigLike) {
-  if (!data.champSelect.session) {
+  const session = data.champSelect.session
+
+  if (!session) {
     return {}
   }
 
   const selections: Record<string, number> = {}
-  const processMember = (member: ChampSelectTeam) => {
-    const puuid = getVisibleChampSelectPuuid(member, config)
-    if (puuid) {
-      selections[puuid] = member.championId || member.championPickIntent
-    }
+  for (const member of collectVisibleChampSelectMembers(session, config)) {
+    selections[member.puuid] = member.championId
   }
-
-  data.champSelect.session.myTeam.forEach(processMember)
-  data.champSelect.session.theirTeam.forEach(processMember)
 
   return selections
 }
@@ -156,15 +139,22 @@ export function getLivePositionAssignments(args: {
   queryStage: QueryStage
   additional: AdditionalResult
   config: OngoingGameConfigLike
+  champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }): PositionAssignments {
-  const { data, queryStage, additional, config } = args
+  const { data, queryStage, additional, config, champSelectHandoffSnapshot } = args
 
   if (queryStage.phase === 'champ-select') {
     return getChampSelectPositionAssignments(data, config)
   }
 
   if (queryStage.phase === 'in-game') {
-    return getInGamePositionAssignments(data, additional)
+    const assignments = getInGamePositionAssignments(data, additional)
+    mergeChampSelectHandoffPositionAssignments(
+      assignments,
+      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+    )
+
+    return assignments
   }
 
   return {}
@@ -174,23 +164,19 @@ function getChampSelectPositionAssignments(
   data: LeagueClientData,
   config: OngoingGameConfigLike
 ): PositionAssignments {
-  if (!data.champSelect.session) {
+  const session = data.champSelect.session
+
+  if (!session) {
     return {}
   }
 
   const assignments: PositionAssignments = {}
-  const processMember = (member: ChampSelectTeam) => {
-    const puuid = getVisibleChampSelectPuuid(member, config)
-    if (puuid) {
-      assignments[puuid] = {
-        position: member.assignedPosition.toUpperCase(),
-        role: null
-      }
+  for (const member of collectVisibleChampSelectMembers(session, config)) {
+    assignments[member.puuid] = {
+      position: member.position,
+      role: null
     }
   }
-
-  data.champSelect.session.myTeam.forEach(processMember)
-  data.champSelect.session.theirTeam.forEach(processMember)
 
   return assignments
 }
@@ -232,15 +218,23 @@ export function getLiveTeams(args: {
   queryStage: QueryStage
   additional: AdditionalResult
   config: OngoingGameConfigLike
+  champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }) {
-  const { data, settings, queryStage, additional, config } = args
+  const { data, settings, queryStage, additional, config, champSelectHandoffSnapshot } = args
 
   if (queryStage.phase === 'champ-select') {
     return getChampSelectTeams(data, queryStage, config)
   }
 
   if (queryStage.phase === 'in-game') {
-    return getInGameTeams(data, queryStage, additional)
+    const teams = getInGameTeams(data, queryStage, additional)
+    mergeChampSelectHandoffTeams(
+      teams,
+      queryStage,
+      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+    )
+
+    return teams
   }
 
   if (settings.queryInLobbyPhase && data.lobby.lobby) {
@@ -255,32 +249,26 @@ function getChampSelectTeams(
   queryStage: Extract<QueryStage, { phase: 'champ-select' }>,
   config: OngoingGameConfigLike
 ) {
-  if (!data.champSelect.session) {
+  const session = data.champSelect.session
+
+  if (!session) {
     return {}
   }
 
+  const members = collectVisibleChampSelectMembers(session, config)
+
   if (queryStage.gameInfo.queueType === 'CHERRY') {
     return {
-      'TEAM-ALL': [...data.champSelect.session.myTeam, ...data.champSelect.session.theirTeam]
-        .map((member) => getVisibleChampSelectPuuid(member, config))
-        .filter((puuid) => puuid !== null)
+      'TEAM-ALL': members.map((member) => member.puuid)
     }
   }
 
   const teams: Record<string, string[]> = {}
-  const processMember = (member: ChampSelectTeam) => {
-    const puuid = getVisibleChampSelectPuuid(member, config)
-    if (!puuid) {
-      return
-    }
-
-    const teamIdentifier = member.team === 100 || member.team === 1 ? 'TEAM-100' : 'TEAM-200'
+  for (const member of members) {
+    const { teamIdentifier, puuid } = member
     teams[teamIdentifier] ??= []
     teams[teamIdentifier].push(puuid)
   }
-
-  data.champSelect.session.myTeam.forEach(processMember)
-  data.champSelect.session.theirTeam.forEach(processMember)
 
   return teams
 }
@@ -340,6 +328,84 @@ function getLobbyTeams(data: LeagueClientData) {
   })
 
   return teams
+}
+
+function getUsableChampSelectHandoffSnapshot(
+  queryStage: QueryStage,
+  config: OngoingGameConfigLike,
+  snapshot?: ChampSelectHandoffSnapshot | null
+) {
+  if (!config.spotlight.deobfuscation || queryStage.phase !== 'in-game' || !snapshot) {
+    return null
+  }
+
+  return snapshot.gameId === queryStage.gameInfo.gameId ? snapshot : null
+}
+
+function mergeChampSelectHandoffChampionSelections(
+  selections: Record<string, number>,
+  snapshot: ChampSelectHandoffSnapshot | null
+) {
+  if (!snapshot) {
+    return
+  }
+
+  for (const [puuid, player] of Object.entries(snapshot.players)) {
+    selections[puuid] ??= player.championId
+  }
+}
+
+function mergeChampSelectHandoffPositionAssignments(
+  assignments: PositionAssignments,
+  snapshot: ChampSelectHandoffSnapshot | null
+) {
+  if (!snapshot) {
+    return
+  }
+
+  for (const [puuid, player] of Object.entries(snapshot.players)) {
+    assignments[puuid] ??= {
+      position: player.position || 'NONE',
+      role: null
+    }
+  }
+}
+
+function mergeChampSelectHandoffTeams(
+  teams: Record<string, string[]>,
+  queryStage: Extract<QueryStage, { phase: 'in-game' }>,
+  snapshot: ChampSelectHandoffSnapshot | null
+) {
+  if (!snapshot) {
+    return
+  }
+
+  const existingMembers = new Set(Object.values(teams).flat())
+
+  if (queryStage.gameInfo.queueType === 'CHERRY') {
+    const members = Object.keys(snapshot.players).filter((puuid) => !existingMembers.has(puuid))
+    if (members.length) {
+      teams['TEAM-ALL'] = memberMerge(teams['TEAM-ALL'] ?? [], members)
+    }
+
+    return
+  }
+
+  for (const [teamIdentifier, members] of Object.entries(snapshot.teams)) {
+    const missingMembers = members.filter(
+      (puuid) => snapshot.players[puuid] && !existingMembers.has(puuid)
+    )
+
+    if (!missingMembers.length) {
+      continue
+    }
+
+    teams[teamIdentifier] = teams[teamIdentifier]
+      ? memberMerge(teams[teamIdentifier], missingMembers)
+      : missingMembers
+
+    missingMembers.forEach((puuid) => existingMembers.add(puuid))
+  }
 }
 
 export function getLiveQueryStage(args: {

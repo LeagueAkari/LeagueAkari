@@ -14,6 +14,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { SgpMain } from '../sgp'
 import { OngoingGameAdditionalInfoController } from './additional-info-controller'
 import { OngoingGameAnalysisController } from './analysis-controller'
+import { OngoingGameChampSelectHandoffController } from './champ-select-handoff-controller'
 import {
   ONGOING_GAME_LOADING_PRIORITY,
   ONGOING_GAME_MAIN_NAMESPACE,
@@ -47,6 +48,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private readonly _analysis: OngoingGameAnalysisController
   private readonly _additionalInfo: OngoingGameAdditionalInfoController
   private readonly _sideEffects: OngoingGameSideEffectsController
+  private readonly _champSelectHandoff: OngoingGameChampSelectHandoffController
   private readonly _ipcHandlers: OngoingGameIpcHandlers
 
   constructor(
@@ -101,6 +103,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       logger: this._logger,
       ipc: this._ipc,
       mobxUtils: this._mobxUtils,
+      settingService: this._settingService,
       leagueClient: this._leagueClient,
       sgp: this._sgpMain,
       savedPlayer: this._savedPlayer,
@@ -112,6 +115,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._analysis = new OngoingGameAnalysisController(this._context)
     this._additionalInfo = new OngoingGameAdditionalInfoController(this._context)
     this._sideEffects = new OngoingGameSideEffectsController(this._context)
+    this._champSelectHandoff = new OngoingGameChampSelectHandoffController(this._context)
     this._ipcHandlers = new OngoingGameIpcHandlers(
       this._context,
       this._matchHistory,
@@ -164,9 +168,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._setupState()
+    await this._champSelectHandoff.init()
 
     this._watchConcurrencyChange()
     this._ipcHandlers.register()
+    this._champSelectHandoff.watch()
     this._analysis.watch()
     this._sideEffects.watch()
     this._playerData.watch()

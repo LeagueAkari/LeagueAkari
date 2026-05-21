@@ -16,6 +16,7 @@ import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
 import { RemoteConfigMain } from '../remote-config'
 import { SgpMain } from '../sgp'
+import type { ChampSelectHandoffSnapshot } from './champ-select-handoff'
 import {
   getDraftChampionSelections,
   getDraftPositionAssignments,
@@ -159,7 +160,8 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig,
+      champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
 
@@ -172,7 +174,8 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig,
+      champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
 
@@ -186,7 +189,8 @@ export class OngoingGameState {
       settings: this._settings,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig
+      config: this._remoteConfig.state.ongoingGameConfig,
+      champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
 
@@ -265,6 +269,12 @@ export class OngoingGameState {
 
   setInferredPremadeTeams(value: string[][]) {
     this.inferredPremadeTeams = value
+  }
+
+  champSelectHandoffSnapshot: ChampSelectHandoffSnapshot | null = null
+
+  setChampSelectHandoffSnapshot(value: ChampSelectHandoffSnapshot | null) {
+    this.champSelectHandoffSnapshot = value
   }
 
   clear(options?: { keepTagParams?: boolean; keepAdditionalInfo?: boolean }) {
@@ -394,6 +404,7 @@ export class OngoingGameState {
       matchHistoryTagParams: observable.struct,
       additional: observable.struct,
       inferredPremadeTeams: observable.struct,
+      champSelectHandoffSnapshot: observable.struct,
       mergedPremadeTeamMap: computed.struct
     })
   }

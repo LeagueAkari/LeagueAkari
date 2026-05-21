@@ -6,6 +6,7 @@ import type { AkariLogger } from '../logger-factory'
 import type { MobxUtilsMain } from '../mobx-utils'
 import type { RemoteConfigMain } from '../remote-config'
 import type { SavedPlayerMain } from '../saved-player'
+import type { SetterSettingService } from '../setting-factory/setter-setting-service'
 import type { SgpMain } from '../sgp'
 import type { OngoingGameSettings, OngoingGameState } from './state'
 
@@ -31,6 +32,7 @@ export interface OngoingGameMainContext {
   logger: AkariLogger
   ipc: AkariIpcMain
   mobxUtils: MobxUtilsMain
+  settingService: SetterSettingService
   leagueClient: LeagueClientMain
   sgp: SgpMain
   savedPlayer: SavedPlayerMain
