@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -46,7 +46,7 @@ import {
   NInput,
   NSpin
 } from 'naive-ui'
-import { computed, h, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
@@ -95,24 +95,13 @@ const columns: DataTableColumns<OpggChampionItem> = [
       return a.id - b.id
     },
     render: (row) => {
-      return h(
-        'div',
-        {
-          class: 'flex items-center justify-center overflow-hidden'
-        },
-        [
-          h(LcuImage, {
-            class: 'size-8 shrink-0',
-            src: championIconUri(row.id)
-          }),
-          h(
-            'div',
-            {
-              class: 'text-left ml-2 text-[13px] dark:text-white/80 text-black/80 w-25 truncate'
-            },
-            lcs.gameData.champions[row.id]?.name || row.id
-          )
-        ]
+      return (
+        <div class="flex items-center justify-center overflow-hidden">
+          <LcuImage class="size-8 shrink-0" src={championIconUri(row.id)} />
+          <div class="ml-2 w-25 truncate text-left text-[13px] text-black/80 dark:text-white/80">
+            {lcs.gameData.champions[row.id]?.name || row.id}
+          </div>
+        </div>
       )
     }
   },
@@ -142,10 +131,10 @@ const columns: DataTableColumns<OpggChampionItem> = [
           tierText = '-'
         }
 
-        return h(
-          'span',
-          { class: getTierTextColorClass(positionData?.stats?.tier_data?.tier) },
-          tierText
+        return (
+          <span class={getTierTextColorClass(positionData?.stats?.tier_data?.tier)}>
+            {tierText}
+          </span>
         )
       }
 
@@ -160,7 +149,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
         tierText = '-'
       }
 
-      return h('span', { class: getTierTextColorClass(row.average_stats?.tier) }, tierText)
+      return <span class={getTierTextColorClass(row.average_stats?.tier)}>{tierText}</span>
     }
   },
   {
@@ -276,17 +265,12 @@ const countersColumn: DataTableColumn<OpggChampionItem> = {
         return '-'
       }
 
-      return h(
-        'div',
-        {
-          class: 'flex items-center justify-center gap-0.5'
-        },
-        positionData.counters.slice(0, 3).map((c) => {
-          return h(LcuImage, {
-            class: 'size-[18px]',
-            src: championIconUri(c.champion_id)
-          })
-        })
+      return (
+        <div class="flex items-center justify-center gap-0.5">
+          {positionData.counters.slice(0, 3).map((c) => (
+            <LcuImage class="size-[18px]" src={championIconUri(c.champion_id)} />
+          ))}
+        </div>
       )
     }
 

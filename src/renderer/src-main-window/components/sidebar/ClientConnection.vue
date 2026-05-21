@@ -189,7 +189,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
@@ -210,7 +210,7 @@ import {
 } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NEllipsis, NIcon, NScrollbar, NSpin } from 'naive-ui'
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 
 import { useLeagueClientPeekStore } from '@main-window/shards/league-client-peek/store'
 
@@ -236,12 +236,20 @@ const actions = computed(() => {
     {
       label: t('ClientConnection.launchUx'),
       key: 'start-ux',
-      icon: () => h(NIcon, () => h(RocketLaunchRoundIcon))
+      icon: () => (
+        <NIcon>
+          <RocketLaunchRoundIcon />
+        </NIcon>
+      )
     },
     {
       label: t('ClientConnection.killUx'),
       key: 'close-ux',
-      icon: () => h(NIcon, () => h(CloseFilledIcon))
+      icon: () => (
+        <NIcon>
+          <CloseFilledIcon />
+        </NIcon>
+      )
     },
     {
       type: 'divider'
@@ -249,7 +257,11 @@ const actions = computed(() => {
     {
       label: t('ClientConnection.quitClient'),
       key: 'quit-client',
-      icon: () => h(NIcon, () => h(CloseFilledIcon))
+      icon: () => (
+        <NIcon>
+          <CloseFilledIcon />
+        </NIcon>
+      )
     }
   ]
 })

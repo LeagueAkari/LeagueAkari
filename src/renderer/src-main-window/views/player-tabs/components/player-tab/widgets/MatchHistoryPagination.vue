@@ -319,7 +319,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
@@ -342,7 +342,7 @@ import {
   NTooltip,
   SelectOption
 } from 'naive-ui'
-import { computed, h, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 
 import { useMapAssets } from '@main-window/composables/useMapAssets'
 import { usePageSizeOptions } from '@main-window/shards/player-tabs'
@@ -511,24 +511,20 @@ const getQueueMapIconUri = (queueId: number | undefined) => {
 
 const renderLabel = (option: SelectOption) => {
   if (option.type === 'group') {
-    return h('span', option.label as string)
+    return <span>{option.label as string}</span>
   }
 
   const value = option.value as string
   const [_, queueId] = value.split('q_')
 
-  return h(
-    'div',
-    {
-      class: 'flex items-center gap-2'
-    },
-    [
-      h(LcuImage, {
-        src: getQueueMapIconUri(queueId ? parseInt(queueId) : undefined),
-        class: 'size-5 rounded'
-      }),
-      h('span', { class: 'text-sm' }, option.label as string)
-    ]
+  return (
+    <div class="flex items-center gap-2">
+      <LcuImage
+        src={getQueueMapIconUri(queueId ? parseInt(queueId) : undefined)}
+        class="size-5 rounded"
+      />
+      <span class="text-sm">{option.label as string}</span>
+    </div>
   )
 }
 </script>

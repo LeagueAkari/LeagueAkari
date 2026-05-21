@@ -9,9 +9,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ButtonProps, NButton } from 'naive-ui'
-import { VNodeChild, createTextVNode } from 'vue'
+import { VNodeChild } from 'vue'
 
 const { buttons = [] } = defineProps<{
   buttons?: (ButtonProps & {
@@ -21,10 +21,10 @@ const { buttons = [] } = defineProps<{
 
 const renderText = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return createTextVNode(node)
+    return () => <>{node}</>
   }
 
-  return { render: node }
+  return node
 }
 </script>
 

@@ -52,7 +52,7 @@
   </NCard>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -63,7 +63,7 @@ import { RewardsGrant } from '@shared/types/league-client/rewards'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
-import { computed, h, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
@@ -118,10 +118,7 @@ const columns = computed<DataTableColumns<RewardsGrant>>(() => [
         }
       })
 
-      return h(ClaimableItem, {
-        items,
-        title: row.rewardGroup.localizations.title
-      })
+      return <ClaimableItem items={items} title={row.rewardGroup.localizations.title} />
     }
   }
 ])

@@ -111,14 +111,14 @@
   </NScrollbar>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { refDebounced } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NInput, NPopover, NScrollbar } from 'naive-ui'
-import { type VNodeChild, computed, createTextVNode, ref, shallowRef } from 'vue'
+import { type VNodeChild, computed, ref, shallowRef } from 'vue'
 
 import { useMatchCard } from '../context'
 import {
@@ -165,10 +165,10 @@ const gameCreationText = computed(() => {
 
 const renderFn = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return createTextVNode(node)
+    return () => <>{node}</>
   }
 
-  return { render: node }
+  return node
 }
 
 const groups = computed(() => {

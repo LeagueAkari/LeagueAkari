@@ -132,7 +132,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
@@ -148,7 +148,7 @@ import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NDropdown, NIcon, NModal, NPopconfirm, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
-import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
@@ -302,7 +302,11 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
 
       return true
     }),
-    icon: () => h(NIcon, null, { default: () => h(RefreshRoundIcon) })
+    icon: () => (
+      <NIcon>
+        <RefreshRoundIcon />
+      </NIcon>
+    )
   },
   {
     type: 'divider',
@@ -311,7 +315,11 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
   {
     label: computed(() => t('PlayerTabsTitle.close')),
     key: 'close',
-    icon: () => h(NIcon, null, { default: () => h(CloseRoundIcon) })
+    icon: () => (
+      <NIcon>
+        <CloseRoundIcon />
+      </NIcon>
+    )
   },
   {
     label: computed(() => t('PlayerTabsTitle.closeOthers')),

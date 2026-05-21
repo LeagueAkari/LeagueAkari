@@ -83,7 +83,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
@@ -110,7 +110,7 @@ import {
   NScrollbar,
   useMessage
 } from 'naive-ui'
-import { computed, h, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
@@ -149,15 +149,14 @@ const extraInfoMap = ref<
 >({})
 
 const renderFormattedDate = (date: number) => {
-  return h('span', { class: 'text-xs text-black/80 dark:text-white/80' }, [
-    dayjs(date).locale(as.settings.locale.toLowerCase()).format('YYYY-MM-DD HH:mm:ss'),
-    ' ',
-    h('span', { class: 'text-[11px] text-black/45 dark:text-white/60' }, [
-      '(',
-      dayjs(date).locale(as.settings.locale.toLowerCase()).fromNow(),
-      ')'
-    ])
-  ])
+  return (
+    <span class="text-xs text-black/80 dark:text-white/80">
+      {dayjs(date).locale(as.settings.locale.toLowerCase()).format('YYYY-MM-DD HH:mm:ss')}{' '}
+      <span class="text-[11px] text-black/45 dark:text-white/60">
+        ({dayjs(date).locale(as.settings.locale.toLowerCase()).fromNow()})
+      </span>
+    </span>
+  )
 }
 
 const renderDateField = (
@@ -172,33 +171,28 @@ const renderDateField = (
     return renderFormattedDate(extraInfo[field])
   }
 
-  return h('span', { class: 'text-xs text-black/45 dark:text-white/65' }, fallbackText)
+  return <span class="text-xs text-black/45 dark:text-white/65">{fallbackText}</span>
 }
 
 const renderGroupName = (row: any) => {
   if (row.children) {
-    return h('span', { style: { fontWeight: 'bold' } }, row.name)
+    return <span style={{ fontWeight: 'bold' }}>{row.name}</span>
   }
 
-  return h(
-    'div',
-    {
-      style: {
+  return (
+    <div
+      style={{
         display: 'inline-flex',
         gap: '4px',
         fontSize: '14px',
         alignItems: 'center',
         cursor: 'pointer'
-      },
-      onClick: () => navigateToTabByPuuid(row.puuid)
-    },
-    [
-      h(LcuImage, {
-        style: { width: '18px', height: '18px' },
-        src: profileIconUri(row.icon)
-      }),
-      h(NEllipsis, { style: { maxWidth: '160px' } }, () => row.name)
-    ]
+      }}
+      onClick={() => navigateToTabByPuuid(row.puuid)}
+    >
+      <LcuImage style={{ width: '18px', height: '18px' }} src={profileIconUri(row.icon)} />
+      <NEllipsis style={{ maxWidth: '160px' }}>{row.name}</NEllipsis>
+    </div>
   )
 }
 

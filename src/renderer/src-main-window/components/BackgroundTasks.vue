@@ -55,21 +55,21 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NProgress, NScrollbar } from 'naive-ui'
-import { VNodeChild, h } from 'vue'
+import { VNodeChild } from 'vue'
 
 const { t } = useTranslation()
 const bts = useBackgroundTasksStore()
 
 const renderText = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return h('span', node)
+    return () => <span>{node}</span>
   }
 
-  return { render: node }
+  return node
 }
 </script>
 

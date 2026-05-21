@@ -52,7 +52,7 @@
   </NCard>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -61,7 +61,7 @@ import { EventHubEvents } from '@shared/types/league-client/event-hub'
 import { sleep } from '@shared/utils/sleep'
 import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
-import { computed, h, markRaw, ref, shallowRef, watch } from 'vue'
+import { computed, markRaw, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
@@ -120,10 +120,7 @@ const columns = computed<DataTableColumns<EventHubEvents>>(() => [
         }
       })
 
-      return h(ClaimableItem, {
-        title: row.eventInfo.eventName,
-        items
-      })
+      return <ClaimableItem title={row.eventInfo.eventName} items={items} />
     }
   }
 ])

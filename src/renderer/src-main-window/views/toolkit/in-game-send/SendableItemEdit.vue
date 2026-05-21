@@ -344,7 +344,7 @@
   </NCard>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -379,7 +379,7 @@ import {
   useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, h, nextTick, ref, shallowReactive, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowReactive, shallowRef, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -626,31 +626,19 @@ const handleDryRun = async (id: string, templateId: string, target: 'ally' | 'en
   dialogRef.value = dialog.create({
     type: 'info',
     title: t('dryRun.label'),
-    content: () =>
-      h(
-        NScrollbar,
-        {
-          style: { maxHeight: '80vh' }
-        },
-        () =>
-          result.messages.length > 0
-            ? h(
-                'div',
-                {
-                  style: { userSelect: 'text' }
-                },
-                result.messages.map((line) => h('div', line))
-              )
-            : h(
-                'div',
-                {
-                  style: {
-                    color: '#fff8'
-                  }
-                },
-                '(' + t('dryRunEmpty') + ')'
-              )
-      )
+    content: () => (
+      <NScrollbar style={{ maxHeight: '80vh' }}>
+        {result.messages.length > 0 ? (
+          <div style={{ userSelect: 'text' }}>
+            {result.messages.map((line) => (
+              <div>{line}</div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ color: '#fff8' }}>{`(${t('dryRunEmpty')})`}</div>
+        )}
+      </NScrollbar>
+    )
   })
 }
 </script>

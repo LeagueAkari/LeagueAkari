@@ -49,13 +49,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar, useMessage } from 'naive-ui'
-import { h } from 'vue'
 
 const { t } = useTranslation()
 
@@ -64,7 +63,7 @@ const as = useAppCommonStore()
 const message = useMessage()
 
 const handleClickEasterEgg = () => {
-  message.create(() => h(LeagueAkariSpan, { bold: true }), {
+  message.create(() => <LeagueAkariSpan bold />, {
     type: 'success',
     keepAliveOnHover: true
   })

@@ -111,7 +111,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import {
   useModeOptions,
   usePositionOptions,
@@ -124,7 +124,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { RefreshSharp, Settings } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal, NSelect, NTab, NTabs, SelectRenderLabel } from 'naive-ui'
-import { computed, h, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useOpgg } from './context'
 import SettingsPane from './widgets/Settings.vue'
@@ -163,6 +163,6 @@ const versionOptions = computed(() =>
 )
 
 const renderLabel: SelectRenderLabel = (option) => {
-  return h('span', { class: 'text-xs' }, option.label as string)
+  return <span class="text-xs">{option.label as string}</span>
 }
 </script>

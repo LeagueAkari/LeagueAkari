@@ -261,7 +261,7 @@
   </NScrollbar>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
@@ -293,7 +293,7 @@ import {
   NSwitch,
   NTable
 } from 'naive-ui'
-import { computed, h, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
@@ -334,30 +334,28 @@ const columns: DataTableColumn<any>[] = [
     width: 84,
     fixed: 'left',
     render: (row) => {
-      return h(NCheckbox, {
-        'onUpdate:checked': (val: boolean) => {
-          if (val) {
-            rd.enableRule(row.data.rule)
-          } else {
-            rd.disableRule(row.data.rule)
-          }
-        },
-        checked: row.data.enabled,
-        size: 'small'
-      })
+      return (
+        <NCheckbox
+          {...{
+            'onUpdate:checked': (val: boolean) => {
+              if (val) {
+                rd.enableRule(row.data.rule)
+              } else {
+                rd.disableRule(row.data.rule)
+              }
+            },
+            checked: row.data.enabled,
+            size: 'small'
+          }}
+        />
+      )
     }
   },
   {
     title: t('DebugSettings.lcuEvent.rule'),
     key: 'rule',
     render: (row) => {
-      return h(
-        'code',
-        {
-          style: { userSelect: 'text' }
-        },
-        row.data.rule
-      )
+      return <code style={{ userSelect: 'text' }}>{row.data.rule}</code>
     }
   },
   {
@@ -365,18 +363,18 @@ const columns: DataTableColumn<any>[] = [
     fixed: 'right',
     width: 50,
     render: (row) => {
-      return h(NFlex, { size: 4 }, () => [
-        h(
-          NButton,
-          {
-            size: 'tiny',
-            type: 'error',
-            secondary: true,
-            onClick: () => handleRemoveEditRule(row.data.rule)
-          },
-          { default: () => t('DebugSettings.lcuEvent.delete') }
-        )
-      ])
+      return (
+        <NFlex size={4}>
+          <NButton
+            size="tiny"
+            type="error"
+            secondary
+            onClick={() => handleRemoveEditRule(row.data.rule)}
+          >
+            {t('DebugSettings.lcuEvent.delete')}
+          </NButton>
+        </NFlex>
+      )
     }
   }
 ]

@@ -128,7 +128,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
@@ -142,7 +142,7 @@ import {
 } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon, NPopover } from 'naive-ui'
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT, RANKED_MEDAL_MAP } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
@@ -187,12 +187,20 @@ const matchCollectionOptions = computed(() => [
   {
     label: t('PlayerInfoCard.collectByChampion', { champion: championName.value }),
     key: 'collect-by-champion',
-    icon: () => h(NIcon, () => h(SportsEsportsRoundIcon))
+    icon: () => (
+      <NIcon>
+        <SportsEsportsRoundIcon />
+      </NIcon>
+    )
   },
   {
     label: t('PlayerInfoCard.collectByPosition', { position: currentPositionName.value }),
     key: 'collect-by-position',
-    icon: () => h(NIcon, () => h(PlaceRoundIcon))
+    icon: () => (
+      <NIcon>
+        <PlaceRoundIcon />
+      </NIcon>
+    )
   }
 ])
 

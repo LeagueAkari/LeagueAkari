@@ -55,19 +55,19 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import { useResizeObserver } from '@vueuse/core'
 import { NPopover } from 'naive-ui'
-import { VNodeChild, h, shallowRef, useTemplateRef } from 'vue'
+import { VNodeChild, shallowRef, useTemplateRef } from 'vue'
 
 import { usePlayerTags } from '../utils/tags'
 
 const renderChild = (node: string | (() => VNodeChild)) => {
   if (typeof node === 'string') {
-    return h('span', { class: 'text-xs' }, node)
+    return () => <span class="text-xs">{node}</span>
   }
 
-  return { render: node }
+  return node
 }
 
 const containerEl = useTemplateRef('container')

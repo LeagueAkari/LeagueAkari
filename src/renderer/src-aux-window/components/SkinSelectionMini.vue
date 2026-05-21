@@ -21,7 +21,7 @@
   </NCard>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -31,7 +31,7 @@ import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NSelect, SelectRenderLabel, SelectRenderTag, useMessage } from 'naive-ui'
-import { computed, h, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
 
@@ -44,32 +44,27 @@ const currentSkinId = ref<number>()
 const isSettingSkin = ref(false)
 
 const renderLabel: SelectRenderLabel = (option) => {
-  return h(
-    'div',
-    {
-      class: 'flex items-center justify-center px-1 py-0.5 gap-2'
-    },
-    [
-      h(LcuImage, {
-        src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
-        cache: false,
-        class: 'h-5 w-9 rounded-[2px] object-contain'
-      }),
-      h(
-        'div',
-        {
-          class:
-            'overflow-hidden text-xs whitespace-nowrap text-ellipsis text-black/70 dark:text-white/70',
-          title: option.label as string
-        },
-        option.label as string
-      )
-    ]
+  return (
+    <div class="flex items-center justify-center gap-2 px-1 py-0.5">
+      <LcuImage
+        {...({
+          src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
+          cache: false,
+          class: 'h-5 w-9 rounded-[2px] object-contain'
+        } as any)}
+      />
+      <div
+        class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-black/70 dark:text-white/70"
+        title={option.label as string}
+      >
+        {option.label as string}
+      </div>
+    </div>
   )
 }
 
 const renderTag: SelectRenderTag = ({ option }) => {
-  return h('span', { class: 'text-xs text-black/70 dark:text-white/70' }, option.label as string)
+  return <span class="text-xs text-black/70 dark:text-white/70">{option.label as string}</span>
 }
 
 const carouselSkins = shallowRef<CarouselSkins[]>([])

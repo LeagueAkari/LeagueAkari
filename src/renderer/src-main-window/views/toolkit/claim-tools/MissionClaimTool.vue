@@ -52,7 +52,7 @@
   </NCard>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -63,7 +63,7 @@ import { Mission } from '@shared/types/league-client/missions'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
-import { computed, h, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
@@ -103,10 +103,7 @@ const columns = computed<DataTableColumns<Mission>>(() => [
         }
       })
 
-      return h(ClaimableItem, {
-        items,
-        title: row.internalName
-      })
+      return <ClaimableItem items={items} title={row.internalName} />
     }
   }
 ])

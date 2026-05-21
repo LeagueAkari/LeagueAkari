@@ -95,7 +95,7 @@ import { useDebounceFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NRadio, NRadioGroup, NSelect, NTag, SelectOption } from 'naive-ui'
 import { SelectBaseOption } from 'naive-ui/es/select/src/interface'
-import { computed, h, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
@@ -355,26 +355,24 @@ const renderPositionOption = (option: SelectBaseOption) => {
 }
 
 const renderPositionTag = (props: { option: SelectOption; handleClose: () => void }) => {
-  return h(NTag, { size: 'small', closable: true, onClose: props.handleClose }, () =>
-    h('div', { class: 'flex items-center gap-1' }, [
-      h(PositionIcon, {
-        class: 'text-4',
-        position: props.option.value as string
-      }),
-      h('span', { class: 'text-xs' }, props.option.label as string)
-    ])
+  return (
+    <NTag size="small" closable onClose={props.handleClose}>
+      <div class="flex items-center gap-1">
+        <PositionIcon class="text-4" position={props.option.value as string} />
+        <span class="text-xs">{props.option.label as string}</span>
+      </div>
+    </NTag>
   )
 }
 
 const renderChampionTag = (props: { option: SelectOption; handleClose: () => void }) => {
-  return h(NTag, { size: 'small', closable: true, onClose: props.handleClose }, () =>
-    h('div', { class: 'flex items-center gap-1' }, [
-      h(ChampionIcon, {
-        class: 'size-4 rounded',
-        championId: props.option.value as number
-      }),
-      h('span', { class: 'text-xs' }, props.option.label as string)
-    ])
+  return (
+    <NTag size="small" closable onClose={props.handleClose}>
+      <div class="flex items-center gap-1">
+        <ChampionIcon class="size-4 rounded" championId={props.option.value as number} />
+        <span class="text-xs">{props.option.label as string}</span>
+      </div>
+    </NTag>
   )
 }
 
@@ -392,14 +390,16 @@ const renderChampionOption = (option: SelectBaseOption) => {
 }
 
 const renderSummonerTag = (props: { option: SelectOption; handleClose: () => void }) => {
-  return h(NTag, { size: 'small', closable: true, onClose: props.handleClose }, () =>
-    h('div', { class: 'flex items-center gap-1' }, [
-      h(LcuImage, {
-        class: 'size-4 rounded',
-        src: profileIconUri(props.option.profileIconId as number)
-      }),
-      h('span', { class: 'text-xs' }, props.option.label as string)
-    ])
+  return (
+    <NTag size="small" closable onClose={props.handleClose}>
+      <div class="flex items-center gap-1">
+        <LcuImage
+          class="size-4 rounded"
+          src={profileIconUri(props.option.profileIconId as number)}
+        />
+        <span class="text-xs">{props.option.label as string}</span>
+      </div>
+    </NTag>
   )
 }
 

@@ -80,7 +80,7 @@
   </NCard>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
 import { useInteroperableSgpServers } from '@renderer-shared/composables/useInteroperableSgpServers'
@@ -114,7 +114,6 @@ import {
 } from 'naive-ui'
 import {
   computed,
-  h,
   nextTick,
   reactive,
   ref,
@@ -167,108 +166,61 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
   const cached = summonerShallowMap[puuid]
 
   if (cached) {
-    return h(
-      'div',
-      {
-        class: 'flex w-fit cursor-pointer items-center gap-2',
-        onClick: () => {
+    return (
+      <div
+        class="flex w-fit cursor-pointer items-center gap-2"
+        onClick={() => {
           navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
-        }
-      },
-      [
-        h(LcuImage, {
-          class: 'h-4 w-4 rounded-sm',
-          src: profileIconUri(cached.profileIconId)
-        }),
-        h(
-          'span',
-          {
-            class: 'text-xs'
-          },
-          `${cached.gameName}#${cached.tagLine}`
-        )
-      ]
+        }}
+      >
+        <LcuImage class="h-4 w-4 rounded-sm" src={profileIconUri(cached.profileIconId)} />
+        <span class="text-xs">{`${cached.gameName}#${cached.tagLine}`}</span>
+      </div>
     )
   }
 
-  return h(
-    NTooltip,
-    {
-      keepAliveOnHover: false
-    },
-    {
-      trigger: () =>
-        h(
-          'span',
-          {
-            class: 'text-xs text-black/60 dark:text-white/60'
-          },
-          t('TaggedPlayers.na', {
-            truncatedPuuid: puuid.slice(0, 8)
-          })
+  return (
+    <NTooltip keepAliveOnHover={false}>
+      {{
+        trigger: () => (
+          <span class="text-xs text-black/60 dark:text-white/60">
+            {t('TaggedPlayers.na', {
+              truncatedPuuid: puuid.slice(0, 8)
+            })}
+          </span>
         ),
-      default: () => {
-        return h('div', [
-          h(
-            'div',
-            {
-              class: 'mb-1'
-            },
-            t('TaggedPlayers.naPopoverContent')
-          ),
-          h(
-            'div',
-            t('TaggedPlayers.player', {
-              puuid
-            })
-          )
-        ])
-      }
-    }
+        default: () => (
+          <div>
+            <div class="mb-1">{t('TaggedPlayers.naPopoverContent')}</div>
+            <div>{t('TaggedPlayers.player', { puuid })}</div>
+          </div>
+        )
+      }}
+    </NTooltip>
   )
 }
 
 const renderSgpServerTag = (sgpServerId: string) => {
-  return h(
-    NTag,
-    {
-      size: 'tiny',
-      bordered: false,
-      type: isTencentServer(sgpServerId) ? 'success' : 'info'
-    },
-    () =>
-      t(`sgpServers.${sgpServerId}`, {
+  return (
+    <NTag size="tiny" bordered={false} type={isTencentServer(sgpServerId) ? 'success' : 'info'}>
+      {t(`sgpServers.${sgpServerId}`, {
         defaultValue: sgpServerId,
         ns: 'common'
-      })
+      })}
+    </NTag>
   )
 }
 
 const renderLinedText = (text: string) => {
-  return h(
-    NScrollbar,
-    {
-      class: 'max-h-[100px]'
-    },
-    () =>
-      h(
-        'div',
-        {
-          class: 'whitespace-pre-wrap text-xs'
-        },
-        text
-      )
+  return (
+    <NScrollbar class="max-h-[100px]">
+      <div class="text-xs whitespace-pre-wrap">{text}</div>
+    </NScrollbar>
   )
 }
 
 const renderBoldTitle = (text: string) => {
-  return h(
-    'span',
-    {
-      class: 'text-xs font-bold'
-    },
-    text
-  )
+  return <span class="text-xs font-bold">{text}</span>
 }
 
 const isLoading = ref(false)
@@ -278,12 +230,10 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
     title: () => renderBoldTitle('#'),
     key: 'ordinal',
     render: (_row, index: number) => {
-      return h(
-        'span',
-        {
-          class: 'text-xs'
-        },
-        ((pagination.page || 1) - 1) * (pagination.pageSize || 20) + index + 1
+      return (
+        <span class="text-xs">
+          {((pagination.page || 1) - 1) * (pagination.pageSize || 20) + index + 1}
+        </span>
       )
     },
     width: 68
@@ -320,49 +270,44 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
     title: '',
     key: 'operations',
     render: (row) => {
-      return h(
-        'div',
-        {
-          class: 'flex items-center gap-1'
-        },
-        [
-          h(
-            NButton,
-            {
-              size: 'tiny',
-              type: 'info',
-              onClick: () => {
-                currentEditing.value = row
-                currentEditingTag.value = row.tag
-                showEditModal.value = true
-                nextTick(() => inputEl.value?.focus())
-              }
-            },
-            () => t('TaggedPlayers.editButton')
-          ),
-          h(
-            NPopconfirm,
-            {
-              positiveText: t('TaggedPlayers.deleteButton'),
-              negativeText: t('TaggedPlayers.cancelButton'),
-              positiveButtonProps: {
-                type: 'error',
-                size: 'tiny'
-              },
-              negativeButtonProps: {
-                size: 'tiny'
-              },
-              onPositiveClick: () => {
-                updateTag(row.puuid, row.selfPuuid, null)
-              }
-            },
-            {
-              trigger: () =>
-                h(NButton, { size: 'tiny', type: 'error' }, () => t('TaggedPlayers.deleteButton')),
+      return (
+        <div class="flex items-center gap-1">
+          <NButton
+            size="tiny"
+            type="info"
+            onClick={() => {
+              currentEditing.value = row
+              currentEditingTag.value = row.tag
+              showEditModal.value = true
+              nextTick(() => inputEl.value?.focus())
+            }}
+          >
+            {t('TaggedPlayers.editButton')}
+          </NButton>
+          <NPopconfirm
+            positiveText={t('TaggedPlayers.deleteButton')}
+            negativeText={t('TaggedPlayers.cancelButton')}
+            positiveButtonProps={{
+              type: 'error',
+              size: 'tiny'
+            }}
+            negativeButtonProps={{
+              size: 'tiny'
+            }}
+            onPositiveClick={() => {
+              updateTag(row.puuid, row.selfPuuid, null)
+            }}
+          >
+            {{
+              trigger: () => (
+                <NButton size="tiny" type="error">
+                  {t('TaggedPlayers.deleteButton')}
+                </NButton>
+              ),
               default: () => t('TaggedPlayers.deletePopconfirmContent')
-            }
-          )
-        ]
+            }}
+          </NPopconfirm>
+        </div>
       )
     }
   }

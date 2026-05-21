@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Edit20Filled as Edit20FilledIcon } from '@vicons/fluent'
@@ -63,7 +63,7 @@ import {
   TransferRenderSourceLabel,
   TransferRenderTargetLabel
 } from 'naive-ui'
-import { computed, h, ref, useCssModule, watch } from 'vue'
+import { computed, ref, useCssModule, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 import { useRecommendedChampionPositions } from '@main-window/composables/useRecommendedChampionPositions'
@@ -145,22 +145,18 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
     }
   }
 
-  return h(
-    'div',
-    {
-      style: { display: 'flex', 'align-items': 'center', gap: '4px' },
-      class: {
-        [styles['not-pickable']]: !pickable
-      }
-    },
-    [
-      h(ChampionIcon, {
-        championId: option.value as number,
-        stretched: false,
-        style: { width: '18px', height: '18px' }
-      }),
-      h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label)
-    ]
+  return (
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+      class={{ [styles['not-pickable']]: !pickable }}
+    >
+      <ChampionIcon
+        championId={option.value as number}
+        stretched={false}
+        style={{ width: '18px', height: '18px' }}
+      />
+      <span style={{ marginLeft: '4px', fontSize: '13px' }}>{option.label}</span>
+    </div>
   )
 }
 
@@ -174,56 +170,50 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
     }
   }
 
-  return h(
-    'div',
-    {
-      style: { display: 'flex', 'align-items': 'center', gap: '4px', cursor: 'grab' },
-      class: {
+  return (
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'grab' }}
+      class={{
         [styles['target-item']]: true,
         [styles['not-pickable']]: !pickable
-      },
-      draggable: true,
-      onDragover: (e) => e.preventDefault(),
-      onDragstart: () => handleDragStart(option.value as number),
-      onDragenter: () => handleDragEnter(option.value as number),
-      onDragleave: () => handleDragLeaveOrEnd(option.value as number),
-      onDragend: () => handleDragLeaveOrEnd(option.value as number),
-      onDrop: () => handleDrop(option.value as number)
-    },
-    [
-      h(ChampionIcon, {
-        championId: option.value as number,
-        stretched: false,
-        style: { width: '18px', height: '18px' }
-      }),
-      h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label),
-      h(
-        NButton,
-        {
-          size: 'tiny',
-          quaternary: true,
-          style: { 'margin-left': 'auto' },
-          focusable: false,
-          class: styles['move-btn'],
-          onClick: () => moveUp(option.value as number),
-          disabled: champions.value.indexOf(option.value as number) === 0
-        },
-        () => t('OrderedChampionList.moveUp')
-      ),
-      h(
-        NButton,
-        {
-          size: 'tiny',
-          quaternary: true,
-          style: { 'margin-left': '2px', 'margin-right': '2px' },
-          focusable: false,
-          class: styles['move-btn'],
-          onClick: () => moveDown(option.value as number),
-          disabled: champions.value.indexOf(option.value as number) === champions.value.length - 1
-        },
-        () => t('OrderedChampionList.moveDown')
-      )
-    ]
+      }}
+      draggable
+      onDragover={(e) => e.preventDefault()}
+      onDragstart={() => handleDragStart(option.value as number)}
+      onDragenter={() => handleDragEnter(option.value as number)}
+      onDragleave={() => handleDragLeaveOrEnd(option.value as number)}
+      onDragend={() => handleDragLeaveOrEnd(option.value as number)}
+      onDrop={() => handleDrop(option.value as number)}
+    >
+      <ChampionIcon
+        championId={option.value as number}
+        stretched={false}
+        style={{ width: '18px', height: '18px' }}
+      />
+      <span style={{ marginLeft: '4px', fontSize: '13px' }}>{option.label}</span>
+      <NButton
+        size="tiny"
+        quaternary
+        style={{ marginLeft: 'auto' }}
+        focusable={false}
+        class={styles['move-btn']}
+        onClick={() => moveUp(option.value as number)}
+        disabled={champions.value.indexOf(option.value as number) === 0}
+      >
+        {t('OrderedChampionList.moveUp')}
+      </NButton>
+      <NButton
+        size="tiny"
+        quaternary
+        style={{ marginLeft: '2px', marginRight: '2px' }}
+        focusable={false}
+        class={styles['move-btn']}
+        onClick={() => moveDown(option.value as number)}
+        disabled={champions.value.indexOf(option.value as number) === champions.value.length - 1}
+      >
+        {t('OrderedChampionList.moveDown')}
+      </NButton>
+    </div>
   )
 }
 
@@ -281,12 +271,16 @@ const handleDrop = (id: number) => {
 }
 
 const renderPositionFilter = () => {
-  return h(PositionFilter, {
-    position: selectedPosition.value,
-    'onUpdate:position': (value: string | null) => {
-      selectedPosition.value = value
-    }
-  })
+  return (
+    <PositionFilter
+      {...{
+        position: selectedPosition.value,
+        'onUpdate:position': (value: string | null) => {
+          selectedPosition.value = value
+        }
+      }}
+    />
+  )
 }
 
 const selectedPosition = ref<string | null>(null)

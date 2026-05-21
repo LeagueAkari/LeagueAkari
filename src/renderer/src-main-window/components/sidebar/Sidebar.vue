@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -60,7 +60,7 @@ import {
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
+import { Component as ComponentC, computed, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
@@ -76,7 +76,12 @@ const mui = useMainWindowUiStore()
 const lcs = useLeagueClientStore()
 
 const renderIcon = (icon: ComponentC) => {
-  return () => h(NIcon, null, () => h(icon))
+  const Icon = icon as any
+  return () => (
+    <NIcon>
+      <Icon />
+    </NIcon>
+  )
 }
 
 const router = useRouter()

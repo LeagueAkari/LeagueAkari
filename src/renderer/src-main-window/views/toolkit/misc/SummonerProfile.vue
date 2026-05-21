@@ -133,7 +133,7 @@
   </NCard>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
@@ -143,7 +143,7 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
-import { VNode, computed, h, ref, watch } from 'vue'
+import { VNode, computed, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
@@ -282,35 +282,28 @@ const currentAugmentOptions = computed(() => {
 
 const renderLabel = (option: SelectOption) => {
   if (option.type === 'group') {
-    return h('span', option.label as string)
+    return <span>{option.label as string}</span>
   }
 
-  return h(
-    'div',
-    {
-      style: { display: 'flex', alignItems: 'center', gap: '8px' }
-    },
-    [
-      h(LcuImage, {
-        src: championIconUri(option.value as number),
-        style: { width: '20px', height: '20px' }
-      }),
-      h('span', option.label as string)
-    ]
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <LcuImage
+        src={championIconUri(option.value as number)}
+        style={{ width: '20px', height: '20px' }}
+      />
+      <span>{option.label as string}</span>
+    </div>
   )
 }
 
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
-  return h(
-    NTooltip,
-    { placement: 'right', delay: 300, animated: true, raw: true, disabled: !option.imgUrl },
-    {
-      trigger: () => node,
-      default: () =>
-        h(
-          'div',
-          {
-            style: {
+  return (
+    <NTooltip placement="right" delay={300} animated raw disabled={!option.imgUrl}>
+      {{
+        trigger: () => node,
+        default: () => (
+          <div
+            style={{
               position: 'relative',
               height: '160px',
               minWidth: '280px',
@@ -318,25 +311,11 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
               borderRadius: '4px',
               boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
               backgroundColor: 'rgba(0, 0, 0, 0.3)'
-            }
-          },
-          [
-            h(LcuImage, {
-              src: option.imgUrl as string,
-              cache: false,
-              style: {
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                overflow: 'hidden'
-              }
-            }),
-            ((option.overlays as AugmentOverlay[]) || []).map((o) =>
-              h(LcuImage, {
-                src: o.uncenteredLCOverlayPath,
+            }}
+          >
+            <LcuImage
+              {...({
+                src: option.imgUrl as string,
                 cache: false,
                 style: {
                   position: 'absolute',
@@ -347,11 +326,29 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
                   objectFit: 'cover',
                   overflow: 'hidden'
                 }
-              })
-            )
-          ]
+              } as any)}
+            />
+            {((option.overlays as AugmentOverlay[]) || []).map((o) => (
+              <LcuImage
+                {...({
+                  src: o.uncenteredLCOverlayPath,
+                  cache: false,
+                  style: {
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    overflow: 'hidden'
+                  }
+                } as any)}
+              />
+            ))}
+          </div>
         )
-    }
+      }}
+    </NTooltip>
   )
 }
 

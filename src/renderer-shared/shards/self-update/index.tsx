@@ -2,7 +2,7 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatBytes, formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
-import { h, watch, watchEffect } from 'vue'
+import { watch, watchEffect } from 'vue'
 
 import { useInstance } from '..'
 import { useAppCommonStore } from '../app-common/store'
@@ -135,7 +135,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
         } else {
           notification.warning({
             title: () => t('self-update-renderer.title'),
-            content: () => h('div', t('self-update-renderer.lastUpdateFailed')),
+            content: () => <div>{t('self-update-renderer.lastUpdateFailed')}</div>,
             duration: 1e10,
             closable: true
           })

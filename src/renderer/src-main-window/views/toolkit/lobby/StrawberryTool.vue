@@ -86,7 +86,7 @@
   </NCard>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
@@ -102,7 +102,7 @@ import {
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
-import { h, shallowRef, watchEffect } from 'vue'
+import { shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()
@@ -142,27 +142,17 @@ const doIfNotInitialized = async () => {
 
 const renderLabel: SelectRenderLabel = (option) => {
   if (option.type === 'group') {
-    return h('span', option.label as string)
+    return <span>{option.label as string}</span>
   }
 
-  return h(
-    'div',
-    {
-      style: {
-        display: 'flex',
-        gap: '8px'
-      }
-    },
-    [
-      h(LcuImage, {
-        src: championIconUri(option.value as number),
-        style: {
-          width: '18px',
-          height: '18px'
-        }
-      }),
-      h('span', option.label as string)
-    ]
+  return (
+    <div style={{ display: 'flex', gap: '8px' }}>
+      <LcuImage
+        src={championIconUri(option.value as number)}
+        style={{ width: '18px', height: '18px' }}
+      />
+      <span>{option.label as string}</span>
+    </div>
   )
 }
 

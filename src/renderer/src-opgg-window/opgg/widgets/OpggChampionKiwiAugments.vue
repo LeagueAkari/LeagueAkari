@@ -77,13 +77,13 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OpggAramMayhemChampionAugmentItem } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox, NIcon, NSelect, NTabPane, NTabs, SelectOption } from 'naive-ui'
-import { computed, h, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 
 import { useOpgg } from '../context'
 import { ArrowSort16Filled } from '@vicons/fluent'
@@ -134,10 +134,14 @@ const augmentSortOptions = computed(() => [
 ])
 
 const renderLabel = (option: SelectOption) => {
-  return h('div', { class: 'flex items-center' }, [
-    h(NIcon, {}, () => h(ArrowSort16Filled)),
-    h('span', { class: 'ml-1' }, option.label as string)
-  ])
+  return (
+    <div class="flex items-center">
+      <NIcon>
+        <ArrowSort16Filled />
+      </NIcon>
+      <span class="ml-1">{option.label as string}</span>
+    </div>
+  )
 }
 
 const sortAugments = (items: KiwiAugmentWithRarity[]) => {
