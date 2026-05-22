@@ -32,6 +32,29 @@ export interface ShardMetadata {
   ctorParamDepIds: (string | symbol | null)[]
 }
 
+export interface ShardInitializationTiming {
+  id: string | symbol
+  startedAt: number
+  endedAt: number
+  durationMs: number
+  ok: boolean
+  error?: string
+}
+
+export interface ShardInitializationTimingSummary {
+  startedAt: number
+  endedAt: number
+  totalDurationMs: number
+  shardCount: number
+  slowestShard: ShardInitializationTiming | null
+}
+
+export interface ShardInitializationReport {
+  order: (string | symbol)[]
+  timings: ShardInitializationTiming[]
+  summary: ShardInitializationTimingSummary
+}
+
 export type CtorParamType =
   | {
       type: 'depId'
@@ -59,7 +82,7 @@ export class AkariManager {
   private _instances: Map<string | symbol, any> = new Map()
 
   private _isSetup = false
-  private _initializationOrder: string[] = []
+  private _initialization: ShardInitializationReport = this._createEmptyInitializationReport()
 
   // @ts-ignore
   public readonly global: AkariSharedGlobal = {}
@@ -133,25 +156,44 @@ export class AkariManager {
     // shared global shard is a singleton
     this._instances.set(AkariManager.SHARED_GLOBAL_ID, new SharedGlobalShard(this))
 
-    this._initializationOrder = []
+    this._initialization = this._createEmptyInitializationReport()
     this._initializeShard(
       AkariManager.INTERNAL_RUNNER_ID,
       new Set<string>(),
-      this._initializationOrder
+      this._initialization.order
     )
 
-    for (const id of this._initializationOrder) {
+    const setupStartedAt = Date.now()
+
+    for (const id of this._initialization.order) {
       const instance = this._instances.get(id)
       if (instance && instance.onInit) {
+        const startedAt = Date.now()
         try {
           await instance.onInit()
+          const endedAt = Date.now()
+          const timing = this._createInitializationTiming(id, startedAt, endedAt, true)
+          this._initialization.timings.push(timing)
         } catch (error) {
+          const endedAt = Date.now()
+          const timing = this._createInitializationTiming(id, startedAt, endedAt, false, error)
+          this._initialization.timings.push(timing)
+          this._initialization.summary = this._createInitializationTimingSummary(
+            setupStartedAt,
+            endedAt
+          )
           throw new Error(`Failed to initialize shard ${id.toString()}`, { cause: error })
         }
       }
     }
 
-    for (const id of this._initializationOrder) {
+    const setupEndedAt = Date.now()
+    this._initialization.summary = this._createInitializationTimingSummary(
+      setupStartedAt,
+      setupEndedAt
+    )
+
+    for (const id of this._initialization.order) {
       const instance = this._instances.get(id)
       if (instance && instance.onFinish) {
         try {
@@ -172,7 +214,7 @@ export class AkariManager {
       throw new Error('Not setup yet')
     }
 
-    const reversed = this._initializationOrder.toReversed()
+    const reversed = this._initialization.order.toReversed()
     for (const id of reversed) {
       const instance = this._instances.get(id)
       if (instance && instance.onDispose) {
@@ -187,7 +229,7 @@ export class AkariManager {
     }
 
     this._instances.clear()
-    this._initializationOrder = []
+    this._initialization = this._createEmptyInitializationReport()
     this._isSetup = false
   }
 
@@ -207,11 +249,19 @@ export class AkariManager {
   }
 
   /**
-   * 仅用于调试：返回模块初始化顺序
-   * 仅在 setup 后有效
+   * 仅用于调试：返回最近一次 setup 的初始化顺序和耗时摘要。
    */
-  _getInitializationOrder() {
-    return this._initializationOrder
+  _getInitializationReport() {
+    return {
+      order: [...this._initialization.order],
+      timings: this._initialization.timings.map((timing) => ({ ...timing })),
+      summary: {
+        ...this._initialization.summary,
+        slowestShard: this._initialization.summary.slowestShard
+          ? { ...this._initialization.summary.slowestShard }
+          : null
+      }
+    }
   }
 
   private _initializeShard(
@@ -271,6 +321,55 @@ export class AkariManager {
     this._instances.set(id, instance)
 
     return instance
+  }
+
+  private _createEmptyInitializationReport(): ShardInitializationReport {
+    return {
+      order: [],
+      timings: [],
+      summary: {
+        startedAt: 0,
+        endedAt: 0,
+        totalDurationMs: 0,
+        shardCount: 0,
+        slowestShard: null
+      }
+    }
+  }
+
+  private _createInitializationTiming(
+    id: string | symbol,
+    startedAt: number,
+    endedAt: number,
+    ok: boolean,
+    error?: unknown
+  ): ShardInitializationTiming {
+    return {
+      id,
+      startedAt,
+      endedAt,
+      durationMs: Math.max(0, endedAt - startedAt),
+      ok,
+      error: error instanceof Error ? error.message : error ? String(error) : undefined
+    }
+  }
+
+  private _createInitializationTimingSummary(
+    startedAt: number,
+    endedAt: number
+  ): ShardInitializationTimingSummary {
+    const slowestShard =
+      this._initialization.timings
+        .filter((timing) => timing.ok)
+        .toSorted((a, b) => b.durationMs - a.durationMs)[0] ?? null
+
+    return {
+      startedAt,
+      endedAt,
+      totalDurationMs: Math.max(0, endedAt - startedAt),
+      shardCount: this._initialization.timings.length,
+      slowestShard
+    }
   }
 
   private _extractMetadata(target: Constructor): ShardMetadata {

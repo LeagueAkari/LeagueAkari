@@ -1,4 +1,4 @@
-import { optimizer, is } from '@electron-toolkit/utils'
+import { is, optimizer } from '@electron-toolkit/utils'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { isElevated } from '@main/native'
@@ -150,6 +150,41 @@ function handleUnhandledErrors(logger: Logger) {
       message: `Unexpected Rejection ${formatError(error)}`,
       namespace: 'error-handling'
     })
+  })
+}
+
+function formatShardInitializationReport(manager: AkariManager) {
+  const report = manager._getInitializationReport()
+  const { order, summary, timings } = report
+  const timingById = new Map(timings.map((timing) => [timing.id, timing]))
+
+  const orderText = order
+    .map((id) => {
+      const timing = timingById.get(id)
+      if (!timing) {
+        return `${id.toString()}(-)`
+      }
+
+      const status = timing.ok ? '' : ' failed'
+      return `${id.toString()}(${timing.durationMs.toFixed(2)}ms${status})`
+    })
+    .join(' -> ')
+
+  const slowestText = summary.slowestShard
+    ? `${summary.slowestShard.id.toString()}(${summary.slowestShard.durationMs.toFixed(2)}ms)`
+    : 'none'
+
+  return [
+    `Shard initialization report: ${summary.shardCount} initialized shards in ${summary.totalDurationMs.toFixed(2)}ms`,
+    `Initialization order: ${orderText}`,
+    `Slowest shard initialization: ${slowestText}`
+  ].join('\n')
+}
+
+function logShardInitializationReport(logger: Logger, manager: AkariManager) {
+  logger.info({
+    message: formatShardInitializationReport(manager),
+    namespace: 'akari-shard-manager'
   })
 }
 
@@ -371,7 +406,9 @@ export function bootstrap() {
     app.whenReady().then(async () => {
       try {
         await manager.setup()
+        logShardInitializationReport(logger, manager)
       } catch (error) {
+        logShardInitializationReport(logger, manager)
         logger.error({
           message: `[10002] Error occurred during feature initialization ${formatError(error)}`,
           namespace: 'akari-shard-manager'
