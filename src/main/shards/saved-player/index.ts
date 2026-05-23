@@ -52,23 +52,24 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     const take = pageSize
     const skip = (page - 1) * pageSize
 
+    const whereClause: FindOptionsWhere<EncounteredGame> = {
+      selfPuuid: Equal(query.selfPuuid),
+      puuid: Equal(query.puuid)
+    }
+
+    if (query.queueType) {
+      whereClause.queueType = Equal(query.queueType)
+    }
+
     const encounteredGames = await this._storage.dataSource.manager.find(EncounteredGame, {
-      where: {
-        selfPuuid: Equal(query.selfPuuid),
-        puuid: Equal(query.puuid),
-        queueType: query.queueType ? Equal(query.queueType) : undefined
-      },
+      where: whereClause,
       order: { updateAt: query.timeOrder || 'desc' },
       take,
       skip
     })
 
     const total = await this._storage.dataSource.manager.count(EncounteredGame, {
-      where: {
-        selfPuuid: Equal(query.selfPuuid),
-        puuid: Equal(query.puuid),
-        queueType: query.queueType ? Equal(query.queueType) : undefined
-      }
+      where: whereClause
     })
 
     return {

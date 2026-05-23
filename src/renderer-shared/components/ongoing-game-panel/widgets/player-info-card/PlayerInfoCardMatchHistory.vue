@@ -165,7 +165,7 @@ const getMatchItemThemeClass = (match: {
     return {
       bg: 'bg-[rgba(96,165,250,0.35)] dark:bg-[rgba(59,130,246,0.25)]',
       border: 'border-[rgba(96,165,250,1)] dark:border-[rgba(59,130,246,0.6)]',
-      text: 'text-black dark:text-white',
+      text: 'text-black/80 dark:text-white/80',
       resultText: 'text-blue-600 dark:text-blue-300'
     }
   }
@@ -173,7 +173,7 @@ const getMatchItemThemeClass = (match: {
   return {
     bg: 'bg-[rgba(243,73,72,0.3)] dark:bg-[rgba(243,73,72,0.25)]',
     border: 'border-[rgba(243,73,72,1)] dark:border-[rgba(243,73,72,0.6)]',
-    text: 'text-black dark:text-white',
+    text: 'text-black/80 dark:text-white/80',
     resultText: 'text-red-700 dark:text-red-300'
   }
 }

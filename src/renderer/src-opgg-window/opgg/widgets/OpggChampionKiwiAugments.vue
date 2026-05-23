@@ -81,12 +81,12 @@
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OpggAramMayhemChampionAugmentItem } from '@shared/types/opgg'
+import { ArrowSort16Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox, NIcon, NSelect, NTabPane, NTabs, SelectOption } from 'naive-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 
 import { useOpgg } from '../context'
-import { ArrowSort16Filled } from '@vicons/fluent'
 
 const { champion, kiwiAugments } = useOpgg()
 const { t } = useTranslation()
@@ -188,7 +188,7 @@ const augments = computed(() => {
   const kPrismatic = sortAugments(mappedByRarity.filter((item) => item.rarity === 'kPrismatic'))
 
   const groups: {
-    rarity: 'kSilver' | 'kGold' | 'kPrismatic' | '<akari:all>'
+    rarity: AugmentTab
     rarityName: string
     augments: KiwiAugmentWithRarity[]
   }[] = []
@@ -196,7 +196,7 @@ const augments = computed(() => {
   // all
   if (sortedAugments.length) {
     groups.push({
-      rarity: '<akari:all>',
+      rarity: AugmentTab.All,
       rarityName: t('OpggChampion.augmentAll'),
       augments: sortedAugments
     })
@@ -205,7 +205,7 @@ const augments = computed(() => {
   // kSilver
   if (kSilver.length) {
     groups.push({
-      rarity: 'kSilver',
+      rarity: AugmentTab.kSilver,
       rarityName: t('OpggChampion.augmentSilver'),
       augments: kSilver
     })
@@ -214,7 +214,7 @@ const augments = computed(() => {
   // kGold
   if (kGold.length) {
     groups.push({
-      rarity: 'kGold',
+      rarity: AugmentTab.kGold,
       rarityName: t('OpggChampion.augmentGold'),
       augments: kGold
     })
@@ -223,7 +223,7 @@ const augments = computed(() => {
   // kPrismatic
   if (kPrismatic.length) {
     groups.push({
-      rarity: 'kPrismatic',
+      rarity: AugmentTab.kPrismatic,
       rarityName: t('OpggChampion.augmentPrism'),
       augments: kPrismatic
     })
@@ -232,14 +232,21 @@ const augments = computed(() => {
   return groups
 })
 
-watchEffect(() => {
-  if (!augments.value) {
-    augmentTab.value = undefined
-    return
-  }
+watch(
+  () => augments.value?.map((group) => group.rarity) ?? [],
+  (tabs) => {
+    if (!tabs.length) {
+      augmentTab.value = undefined
+      return
+    }
 
-  augmentTab.value = AugmentTab.All
-})
+    const activeTab = augmentTab.value
+    if (!activeTab || !tabs.includes(activeTab)) {
+      augmentTab.value = tabs[0]
+    }
+  },
+  { immediate: true }
+)
 
 watchEffect(() => {
   if (!champion.value) {
