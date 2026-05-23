@@ -13,6 +13,7 @@ export const NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY =
   'neverShowLiveStreamingStreamerMode'
 export const LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY =
   'lastDismissLiveStreamingStreamerMode'
+export const NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY = 'neverShowBadSgpConnection'
 
 export interface SimpleNotificationsRendererContext {
   clientInstallation: ClientInstallationRenderer

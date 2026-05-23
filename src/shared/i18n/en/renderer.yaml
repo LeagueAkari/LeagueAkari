@@ -3548,6 +3548,7 @@ simple-notifications-renderer:
       vpnReason: This may be caused by network instability when using VPN to access cross-region servers.
     positiveText: Go to Settings
     negativeText: Dismiss
+    neverShowAgain: Do Not Remind Again
 
   replay-download-progress-task:
     name: Replay Download

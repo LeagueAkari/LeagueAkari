@@ -12,6 +12,7 @@ import { registerAnnouncementModal } from './announcement-modal'
 import { watchAutoReconnectNotification } from './connection-notifications'
 import {
   LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
+  NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
   NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
   SIMPLE_NOTIFICATIONS_RENDERER_ID,
   type SimpleNotificationsRendererContext
@@ -41,6 +42,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
   static NEVER_SHOW_SETTING_KEY = NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY
   static LAST_DISMISS_SETTING_KEY = LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY
+  static NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY = NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY
 
   private readonly context: SimpleNotificationsRendererContext
 
@@ -86,7 +88,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this.setupInAppScope.addSetupFn(() => watchAskUserToRunAsAdministrator())
     this.setupInAppScope.addSetupFn(() => watchCannotGetUxCommandLine())
     this.setupInAppScope.addSetupFn(() => watchHigherVersionDbWarning())
-    this.setupInAppScope.addSetupFn(() => watchBadSgpConnectionWarning())
+    this.setupInAppScope.addSetupFn(() => watchBadSgpConnectionWarning(this.context))
     this.setupInAppScope.addSetupFn(() => watchAutoReconnectNotification())
     this.setupInAppScope.addSetupFn(() => watchRunInTempDirWarning())
     this.setupInAppScope.addSetupFn(() => watchUpdateDownloadFailed(this.context))

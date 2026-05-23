@@ -8,11 +8,16 @@ import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/stor
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useStorageStore } from '@renderer-shared/shards/storage/store'
 import { useTranslation } from 'i18next-vue'
-import { DialogReactive, useDialog } from 'naive-ui'
-import { computed, watch } from 'vue'
+import { DialogReactive, NCheckbox, useDialog } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
 
 import { useMainWindowAppContext } from '@main-window/context'
 
+import {
+  NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
+  SIMPLE_NOTIFICATIONS_RENDERER_ID,
+  type SimpleNotificationsRendererContext
+} from './context'
 import { useSimpleNotificationsStore } from './store'
 
 export function watchAskUserToRunAsAdministrator() {
@@ -162,11 +167,12 @@ export function watchHigherVersionDbWarning() {
   )
 }
 
-export function watchBadSgpConnectionWarning() {
+export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendererContext) {
   const sgpStore = useSgpStore()
   const dialog = useDialog()
   const appCommonStore = useAppCommonStore()
   const { openSettingsModal } = useMainWindowAppContext()
+  const neverShowAgainChecked = ref(false)
 
   const { t } = useTranslation(undefined, {
     keyPrefix: 'simple-notifications-renderer.badSgpConnection'
@@ -187,10 +193,32 @@ export function watchBadSgpConnectionWarning() {
 
   let inst: ReturnType<typeof dialog.warning> | null = null
 
+  const saveNeverShowAgain = () => {
+    if (neverShowAgainChecked.value) {
+      context.settingUtils.set(
+        SIMPLE_NOTIFICATIONS_RENDERER_ID,
+        NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
+        true
+      )
+    }
+  }
+
   watch(
     () => isBadSgp.value,
-    (isBad) => {
+    async (isBad) => {
       if (isBad) {
+        const neverShow = await context.settingUtils.get(
+          SIMPLE_NOTIFICATIONS_RENDERER_ID,
+          NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
+          false
+        )
+
+        if (!isBadSgp.value || neverShow || inst) {
+          return
+        }
+
+        neverShowAgainChecked.value = false
+
         inst = dialog.warning({
           style: { width: '600px' },
           closable: true,
@@ -200,18 +228,39 @@ export function watchBadSgpConnectionWarning() {
               <div>{t('content.usingSgp')}</div>
               <div>{t('content.recommendation')}</div>
               <div>{t('content.vpnReason')}</div>
+              <NCheckbox
+                {...{
+                  checked: neverShowAgainChecked.value,
+                  'onUpdate:checked': (checked: boolean) => {
+                    neverShowAgainChecked.value = checked
+                  }
+                }}
+              >
+                {t('neverShowAgain')}
+              </NCheckbox>
             </div>
           ),
           positiveText: t('positiveText'),
           negativeText: t('negativeText'),
           onPositiveClick: () => {
+            saveNeverShowAgain()
             openSettingsModal('basic')
             inst?.destroy()
+            inst = null
           },
           onNegativeClick: () => {
+            saveNeverShowAgain()
             inst?.destroy()
+            inst = null
+          },
+          onClose: () => {
+            saveNeverShowAgain()
+            inst = null
           }
         })
+      } else {
+        inst?.destroy()
+        inst = null
       }
     }
   )
