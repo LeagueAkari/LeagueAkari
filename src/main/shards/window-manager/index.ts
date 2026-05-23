@@ -12,37 +12,23 @@ import { SelfUpdateMain } from '../self-update'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
+import { settingToNativeBackgroundMaterial } from './background-material'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
+import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
+import { WindowManagerLifecycleController } from './lifecycle-controller'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
-export interface WindowManagerMainContext {
-  namespace: string
-  windowManagerClass: typeof WindowManagerMain
-  windowManager: WindowManagerMain
-  appCommon: AppCommonMain
-  ipc: AkariIpcMain
-  settingService: SetterSettingService
-  settingFactory: SettingFactoryMain
-  loggerFactory: LoggerFactoryMain
-  leagueClient: LeagueClientMain
-  protocol: AkariProtocolMain
-  mobxUtils: MobxUtilsMain
-  logger: AkariLogger
-  gameClient: GameClientMain
-  keyboardShortcuts: KeyboardShortcutsMain
-  selfUpdate: SelfUpdateMain
-  shared: SharedGlobalShard
-}
-
 @Shard(WindowManagerMain.id)
 export class WindowManagerMain implements IAkariShardInitDispose {
-  static id = 'window-manager-main'
+  static id = WINDOW_MANAGER_MAIN_NAMESPACE
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
+  private readonly _context: WindowManagerMainContext
+  private readonly _lifecycleController: WindowManagerLifecycleController
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -76,12 +62,19 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.settings
     )
 
-    const wContext = this.getContext()
-    this.mainWindow = new AkariMainWindow(wContext)
-    this.auxWindow = new AkariAuxWindow(wContext)
-    this.opggWindow = new AkariOpggWindow(wContext)
-    this.ongoingGameWindow = new AkariOngoingGameWindow(wContext)
-    this.cdTimerWindow = new AkariCdTimerWindow(wContext)
+    this._context = this.getContext()
+    this.mainWindow = new AkariMainWindow(this._context)
+    this.auxWindow = new AkariAuxWindow(this._context)
+    this.opggWindow = new AkariOpggWindow(this._context)
+    this.ongoingGameWindow = new AkariOngoingGameWindow(this._context)
+    this.cdTimerWindow = new AkariCdTimerWindow(this._context)
+    this._lifecycleController = new WindowManagerLifecycleController(this._context, {
+      mainWindow: this.mainWindow,
+      auxWindow: this.auxWindow,
+      opggWindow: this.opggWindow,
+      ongoingGameWindow: this.ongoingGameWindow,
+      cdTimerWindow: this.cdTimerWindow
+    })
   }
 
   getContext(): WindowManagerMainContext {
@@ -106,38 +99,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._settingService.applyToState()
-
-    if (this._shared.global.isWindows11_22H2_OrHigher) {
-      this.state.setSupportsMica(true)
-    }
-
-    this._mobxUtils.propSync(WindowManagerMain.id, 'state', this.state, [
-      'supportsMica',
-      'downloadTasks'
-    ])
-    this._mobxUtils.propSync(WindowManagerMain.id, 'settings', this.settings, [
-      'backgroundMaterial',
-      'contentProtection'
-    ])
-
-    this.mainWindow.on('main-window-close', () => {
-      this._shared.global.quit()
-    })
-
-    await this.mainWindow.onInit()
-    await this.auxWindow.onInit()
-    await this.opggWindow.onInit()
-    await this.ongoingGameWindow.onInit()
-    await this.cdTimerWindow.onInit()
+    await this._lifecycleController.init()
   }
 
   async onFinish() {
-    this._shared.global.events.on('second-instance', () => {
-      this.mainWindow.showOrRestore()
-    })
-    this.state.setManagerFinishedInit(true)
-    this.mainWindow.createWindow()
+    this._lifecycleController.finish()
   }
 
   /**
@@ -152,14 +118,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     //   return 'none'
     // }
 
-    if (!this.state.supportsMica) {
-      return 'none'
-    }
-
-    if (material === 'mica') {
-      return 'mica'
-    }
-
-    return 'none'
+    return settingToNativeBackgroundMaterial(material, this.state.supportsMica)
   }
 }

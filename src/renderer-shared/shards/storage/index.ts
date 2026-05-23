@@ -1,21 +1,21 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { useStorageStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'storage-main'
+import { STORAGE_RENDERER_NAMESPACE, type StorageRendererContext } from './context'
+import { syncStorageState } from './state-sync'
 
 @Shard(StorageRenderer.id)
 export class StorageRenderer implements IAkariShardInitDispose {
-  static id = 'storage-renderer'
+  static id = STORAGE_RENDERER_NAMESPACE
 
-  constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
-  ) {}
+  private readonly _context: StorageRendererContext
+
+  constructor(@Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer) {
+    this._context = { piniaMobxUtils }
+  }
 
   async onInit() {
-    const store = useStorageStore()
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await syncStorageState(this._context)
   }
 
   async onDispose() {}

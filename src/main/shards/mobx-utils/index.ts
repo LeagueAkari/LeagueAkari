@@ -1,9 +1,12 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Paths } from '@shared/utils/types'
+import type { WebContents } from 'electron'
 import _ from 'lodash'
 import { IReactionOptions, IReactionPublic, isObservable, reaction, toJS } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
+import { MOBX_UTILS_MAIN_NAMESPACE, type MobxUtilsMainContext } from './context'
+import { MobxUtilsIpcHandlers } from './ipc-handlers'
 
 interface PropConfig {
   /**
@@ -24,7 +27,7 @@ interface RegisteredState {
  */
 @Shard(MobxUtilsMain.id)
 export class MobxUtilsMain implements IAkariShardInitDispose {
-  static id = 'mobx-utils-main'
+  static id = MOBX_UTILS_MAIN_NAMESPACE
 
   private readonly _disposables = new Set<Function>()
   protected readonly _registeredStates = new Map<string, RegisteredState>()
@@ -34,46 +37,20 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
    * uniqueId (namespace:stateId) -> webContentsIds
    */
   private readonly _rendererSubscription = new Map<string, Set<number>>()
+  private readonly _context: MobxUtilsMainContext
+  private readonly _ipcHandlers: MobxUtilsIpcHandlers
 
-  constructor(private readonly _ipc: AkariIpcMain) {}
+  constructor(private readonly _ipc: AkariIpcMain) {
+    this._context = {
+      namespace: MobxUtilsMain.id,
+      ipc: this._ipc,
+      mobxUtils: this
+    }
+    this._ipcHandlers = new MobxUtilsIpcHandlers(this._context)
+  }
 
   async onInit() {
-    this._ipc.onCall(
-      MobxUtilsMain.id,
-      'subscribeAndGetInitialState',
-      (event, namespace: string, stateId: string) => {
-        const key = `${namespace}:${stateId}`
-        if (!this._registeredStates.has(key) || !this._rendererSubscription.has(key)) {
-          throw new Error(`State ${key} not found`)
-        }
-
-        const subs = this._rendererSubscription.get(key)!
-        if (!subs.has(event.sender.id)) {
-          subs.add(event.sender.id)
-          event.sender.on('destroyed', () => subs.delete(event.sender.id))
-        }
-
-        const state = this._registeredStates.get(key)!
-        const props = Array.from(state.props.entries()).map(([path, config]) => ({
-          path,
-          config
-        }))
-
-        const statePlainObject = props.reduce(
-          (acc, { path, config }) => {
-            const _value = _.get(state.object, path)
-            acc[path] = {
-              value: isObservable(_value) ? toJS(_value) : _value,
-              config
-            }
-            return acc
-          },
-          {} as Record<string, { value: any; config: PropConfig }>
-        )
-
-        return statePlainObject
-      }
-    )
+    this._ipcHandlers.register()
   }
 
   async onDispose() {
@@ -178,6 +155,37 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
         { action, raw }
       )
     })
+  }
+
+  subscribeAndGetInitialState(sender: WebContents, namespace: string, stateId: string) {
+    const key = `${namespace}:${stateId}`
+    if (!this._registeredStates.has(key) || !this._rendererSubscription.has(key)) {
+      throw new Error(`State ${key} not found`)
+    }
+
+    const subs = this._rendererSubscription.get(key)!
+    if (!subs.has(sender.id)) {
+      subs.add(sender.id)
+      sender.on('destroyed', () => subs.delete(sender.id))
+    }
+
+    const state = this._registeredStates.get(key)!
+    const props = Array.from(state.props.entries()).map(([path, config]) => ({
+      path,
+      config
+    }))
+
+    return props.reduce(
+      (acc, { path, config }) => {
+        const _value = _.get(state.object, path)
+        acc[path] = {
+          value: isObservable(_value) ? toJS(_value) : _value,
+          config
+        }
+        return acc
+      },
+      {} as Record<string, { value: any; config: PropConfig }>
+    )
   }
 
   /**

@@ -1,8 +1,6 @@
-import { getCommandLine, getPidsByName, isElevated } from '@main/native'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import cp from 'node:child_process'
 import util from 'node:util'
 
@@ -11,8 +9,16 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import {
+  CLIENT_CMD_DEFAULT_POLL_INTERVAL as DEFAULT_POLL_INTERVAL,
+  LEAGUE_CLIENT_UX_MAIN_NAMESPACE,
+  LEAGUE_CLIENT_UX_PROCESS_NAME,
+  CLIENT_CMD_LONG_POLL_INTERVAL as LONG_POLL_INTERVAL,
+  type LeagueClientUxMainContext
+} from './context'
+import { LeagueClientUxIpcHandlers } from './ipc-handlers'
 import { LeagueClientUxSettings, LeagueClientUxState } from './state'
-import { parseCommandLine } from './ux-cmd-utils'
+import { LeagueClientUxCommandLineReader } from './ux-command-line-reader'
 
 const execAsync = util.promisify(cp.exec)
 
@@ -21,26 +27,27 @@ const execAsync = util.promisify(cp.exec)
  */
 @Shard(LeagueClientUxMain.id)
 export class LeagueClientUxMain implements IAkariShardInitDispose {
-  static id = 'league-client-ux-main'
+  static id = LEAGUE_CLIENT_UX_MAIN_NAMESPACE
 
-  static UX_PROCESS_NAME = process.platform === 'win32' ? 'LeagueClientUx.exe' : 'LeagueClientUx'
-  static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
-  static CLIENT_CMD_LONG_POLL_INTERVAL = 60 * 1000
+  static UX_PROCESS_NAME = LEAGUE_CLIENT_UX_PROCESS_NAME
+  static CLIENT_CMD_DEFAULT_POLL_INTERVAL = DEFAULT_POLL_INTERVAL
+  static CLIENT_CMD_LONG_POLL_INTERVAL = LONG_POLL_INTERVAL
 
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
+  private readonly _context: LeagueClientUxMainContext
+  private readonly _ipcHandlers: LeagueClientUxIpcHandlers
+  private readonly _commandLineReader: LeagueClientUxCommandLineReader
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
-  private _hasClientButNoCommandLineCount = 0
-
   constructor(
     private readonly _ipc: AkariIpcMain,
-    readonly _loggerFactory: LoggerFactoryMain,
-    readonly _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
     private readonly _mobxUtils: MobxUtilsMain
   ) {
     this._logger = _loggerFactory.create(LeagueClientUxMain.id)
@@ -51,21 +58,24 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       },
       this.settings
     )
+
+    this._context = {
+      namespace: LeagueClientUxMain.id,
+      ipc: this._ipc,
+      logger: this._logger,
+      mobxUtils: this._mobxUtils,
+      settings: this.settings,
+      settingService: this._settingService,
+      state: this.state
+    }
+    this._ipcHandlers = new LeagueClientUxIpcHandlers(this._context, this)
+    this._commandLineReader = new LeagueClientUxCommandLineReader(this._context)
   }
 
   async onInit() {
-    await this._settingService.applyToState()
-
+    await this._setupState()
     this._watchExistingUx()
-
-    this._mobxUtils.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
-    this._mobxUtils.propSync(LeagueClientUxMain.id, 'state', this.state, [
-      'launchedClients',
-      'hasClientButNoCommandLine'
-    ])
-
-    this._ipc.onCall(LeagueClientUxMain.id, 'update', () => this.update())
-    this._ipc.onCall(LeagueClientUxMain.id, 'rebuildWmi', () => this._rebuildWmi())
+    this._ipcHandlers.register()
   }
 
   async onDispose() {
@@ -87,20 +97,12 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
-  private _watchExistingUx() {
-    this.update()
-    this._pollTimerId = setInterval(
-      () => this.update(),
-      LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
-    )
-  }
-
   /**
    * 立即更新状态
    */
   async update() {
     try {
-      this.state.setLaunchedClients(await this._updateUxCommandLine())
+      this.state.setLaunchedClients(await this._commandLineReader.read())
 
       if (this._pollTimerId) {
         clearInterval(this._pollTimerId)
@@ -115,53 +117,10 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _updateUxCommandLine() {
-    if (this.settings.useWmi) {
-      if (!isElevated) {
-        return []
-      }
-
-      const pids = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
-
-      const cmds = await Promise.all(
-        pids.map((pid) => getCommandLine(pid, { win32QueryType: 'shell' }))
-      )
-
-      this.state.setHasClientButNoCommandLine(false)
-      this._hasClientButNoCommandLineCount = 0
-
-      return cmds.map((cmd) => parseCommandLine(cmd)).filter((cmd) => cmd !== null)
-    } else {
-      const pids = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
-      const auths: UxCommandLine[] = []
-
-      for (const p of pids) {
-        try {
-          const cmd = await getCommandLine(p, { win32QueryType: 'native' })
-
-          const parsed = parseCommandLine(cmd)
-          if (parsed) {
-            auths.push(parsed)
-          }
-        } catch {}
-      }
-
-      if (pids.length !== 0 && auths.length === 0) {
-        this._hasClientButNoCommandLineCount++
-      }
-
-      if (this._hasClientButNoCommandLineCount >= 5) {
-        this.state.setHasClientButNoCommandLine(true)
-      }
-
-      return auths
-    }
-  }
-
   /**
    * 仅限 win32
    */
-  private async _rebuildWmi() {
+  async rebuildWmi() {
     if (process.platform !== 'win32') {
       return
     }
@@ -169,5 +128,23 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     const cmd = `"${elevateExecutablePath}" cmd /c start cmd /k "${wmiRebuildScriptPath}"`
     this._logger.info('Rebuilding WMI...', cmd)
     await execAsync(cmd, { shell: 'cmd', windowsHide: false })
+  }
+
+  private async _setupState() {
+    await this._settingService.applyToState()
+
+    this._mobxUtils.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmi'])
+    this._mobxUtils.propSync(LeagueClientUxMain.id, 'state', this.state, [
+      'launchedClients',
+      'hasClientButNoCommandLine'
+    ])
+  }
+
+  private _watchExistingUx() {
+    this.update()
+    this._pollTimerId = setInterval(
+      () => this.update(),
+      LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
+    )
   }
 }

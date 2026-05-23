@@ -1,7 +1,4 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { ChatMessage } from '@shared/types/league-client/chat'
-import { LcuEvent } from '@shared/types/league-client/event'
-import { formatError } from '@shared/utils/errors'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -9,6 +6,8 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { AutoReplyController } from './auto-reply-controller'
+import { AUTO_REPLY_MAIN_NAMESPACE, type AutoReplyMainContext } from './context'
 import { AutoReplySettings } from './state'
 
 /**
@@ -16,16 +15,18 @@ import { AutoReplySettings } from './state'
  */
 @Shard(AutoReplyMain.id)
 export class AutoReplyMain implements IAkariShardInitDispose {
-  static id = 'auto-reply-main'
+  static id = AUTO_REPLY_MAIN_NAMESPACE
 
   public readonly settings = new AutoReplySettings()
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
+  private readonly _context: AutoReplyMainContext
+  private readonly _controller: AutoReplyController
 
   constructor(
-    readonly _loggerFactory: LoggerFactoryMain,
-    readonly _settingFactory: SettingFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
     private readonly _leagueClient: LeagueClientMain,
     private readonly _mobxUtils: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain
@@ -41,6 +42,17 @@ export class AutoReplyMain implements IAkariShardInitDispose {
       },
       this.settings
     )
+
+    this._context = {
+      namespace: AutoReplyMain.id,
+      ipc: this._ipc,
+      leagueClient: this._leagueClient,
+      logger: this._logger,
+      mobxUtils: this._mobxUtils,
+      settings: this.settings,
+      settingService: this._settingService
+    }
+    this._controller = new AutoReplyController(this._context)
   }
 
   async onInit() {
@@ -52,52 +64,6 @@ export class AutoReplyMain implements IAkariShardInitDispose {
       'lockOfflineStatus'
     ])
 
-    // 原始人的方法！
-    this._leagueClient.events.on<LcuEvent<ChatMessage>>(
-      '/lol-chat/v1/conversations/:fromId/messages/:messageId',
-      async (event, { fromId }) => {
-        if (
-          this.settings.enabled &&
-          event.data &&
-          this._leagueClient.data.summoner.me &&
-          event.data.type === 'chat' &&
-          event.data.fromSummonerId !== this._leagueClient.data.summoner.me.summonerId &&
-          this.settings.text
-        ) {
-          if (
-            this.settings.enableOnAway &&
-            this._leagueClient.data.chat.me?.availability !== 'away'
-          ) {
-            return
-          }
-
-          try {
-            await this._leagueClient.api.chat.chatSend(fromId, this.settings.text)
-            this._logger.info(`Auto-replied to ${fromId}, content: ${this.settings.text}`)
-          } catch (error) {
-            this._ipc.sendEvent(AutoReplyMain.id, 'error-send-failed', {
-              error: formatError(error)
-            })
-            this._logger.warn(`Failed to auto-reply`, formatError(error))
-          }
-        }
-      }
-    )
-
-    this._mobxUtils.reaction(
-      () => this._leagueClient.data.chat.me?.availability,
-      (availability, prev) => {
-        if (!availability || !this.settings.lockOfflineStatus) {
-          return
-        }
-
-        if (prev === 'offline' && (availability === 'away' || availability === 'chat')) {
-          this._logger.info('Correcting to offline status')
-          this._leagueClient.api.chat.changeAvailability('offline').catch((error) => {
-            this._logger.warn(`Failed to change status`, error)
-          })
-        }
-      }
-    )
+    this._controller.watch()
   }
 }

@@ -11,29 +11,34 @@ import {
 import LRUMap from 'quick-lru'
 
 import { AkariIpcRenderer } from '../ipc'
-
-const MAIN_SHARD_NAMESPACE = 'saved-player-main'
+import { SAVED_PLAYER_RENDERER_NAMESPACE, type SavedPlayerRendererContext } from './context'
+import { SavedPlayerRendererApi } from './saved-player-api'
 
 @Shard(SavedPlayerRenderer.id)
 export class SavedPlayerRenderer {
-  static id = 'saved-player-renderer'
+  static id = SAVED_PLAYER_RENDERER_NAMESPACE
 
   public readonly summonerLruMap = new LRUMap<string, SummonerInfo>({
     maxSize: 200
   })
 
-  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
+  private readonly _api: SavedPlayerRendererApi
+
+  constructor(@Dep(AkariIpcRenderer) ipc: AkariIpcRenderer) {
+    const context: SavedPlayerRendererContext = { ipc }
+    this._api = new SavedPlayerRendererApi(context)
+  }
 
   querySavedPlayerWithGames(dto: SavedPlayerQueryDto) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'querySavedPlayerWithGames', dto)
+    return this._api.querySavedPlayerWithGames(dto)
   }
 
   getAllPlayerTags(dto: Partial<AllTaggedPlayerQueryDto> = {}) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAllPlayerTags', dto)
+    return this._api.getAllPlayerTags(dto)
   }
 
   getPlayerTags(dto: SavedPlayerQueryDto): Promise<PlayerTagDto[]> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getPlayerTags', dto)
+    return this._api.getPlayerTags(dto)
   }
 
   queryEncounteredGames(dto: EncounteredGameQueryDto): Promise<{
@@ -42,19 +47,19 @@ export class SavedPlayerRenderer {
     pageSize: number
     total: number
   }> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryEncounteredGames', dto)
+    return this._api.queryEncounteredGames(dto)
   }
 
   deleteEncounteredGame(recordId: number) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteEncounteredGame', recordId)
+    return this._api.deleteEncounteredGame(recordId)
   }
 
   updatePlayerTag<T extends UpdateTagDto>(dto: T) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePlayerTag', dto)
+    return this._api.updatePlayerTag(dto)
   }
 
   deleteSavedPlayer(dto: SavedPlayerQueryDto) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteSavedPlayer', dto)
+    return this._api.deleteSavedPlayer(dto)
   }
 
   queryAllSavedPlayers(dto: object): Promise<{
@@ -63,14 +68,14 @@ export class SavedPlayerRenderer {
     pageSize: number
     data: any[]
   }> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryAllSavedPlayers', dto)
+    return this._api.queryAllSavedPlayers(dto)
   }
 
   exportTaggedPlayersToJsonFile() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exportTaggedPlayersToJsonFile')
+    return this._api.exportTaggedPlayersToJsonFile()
   }
 
   importTaggedPlayersFromJsonFile() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'importTaggedPlayersFromJsonFile')
+    return this._api.importTaggedPlayersFromJsonFile()
   }
 }

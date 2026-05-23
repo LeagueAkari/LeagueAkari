@@ -6,11 +6,24 @@ import type {
   KeyboardShortcutsDebugState,
   ShortcutDetails
 } from '@shared/types/shards/keyboard-shortcut'
-import { isStandardKeyboardKeyCode, isSupportedShortcutId } from '@shared/utils/keyboard-shortcuts'
+import { isStandardKeyboardKeyCode } from '@shared/utils/keyboard-shortcuts'
 import EventEmitter from 'node:events'
 
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
+import {
+  COMMON_MODIFIER_VARIANTS,
+  DEBUG_STATEFUL_TEST_TARGET_ID,
+  DISABLED_KEYS,
+  DISABLED_KEYS_TARGET_ID,
+  KEYBOARD_SHORTCUTS_MAIN_NAMESPACE,
+  type KeyboardShortcutRegistrationType,
+  type KeyboardShortcutsMainContext,
+  MODIFIER_READING_ORDER,
+  VK_CODE_F22
+} from './context'
+import { KeyboardShortcutsIpcHandlers } from './ipc-handlers'
+import { ShortcutRegistry } from './shortcut-registry'
 
 /**
  * 管理员权限下, 处理全局范围的键盘快捷键的模块, 基于全局事件钩子
@@ -18,9 +31,12 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
  */
 @Shard(KeyboardShortcutsMain.id)
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
-  static id = 'keyboard-shortcuts-main'
+  static id = KEYBOARD_SHORTCUTS_MAIN_NAMESPACE
 
   private readonly _logger: AkariLogger
+  private readonly _context: KeyboardShortcutsMainContext
+  private readonly _registry: ShortcutRegistry
+  private readonly _ipcHandlers: KeyboardShortcutsIpcHandlers
 
   /** 除了修饰键之外的其他按键 */
   private readonly _pressedOtherKeys = new Set<number>()
@@ -37,33 +53,11 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   /**
    * 修饰键的惯例可读顺序, 用于组合成好看的字符串
    */
-  static readonly MODIFIER_READING_ORDER = {
-    162: 0,
-    163: 1,
-    16: 2,
-    160: 3,
-    161: 4,
-    18: 5,
-    164: 6,
-    165: 7,
-    91: 8,
-    92: 9
-  }
-
-  static readonly VK_CODE_F22 = 133
-
-  static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
-  static DEBUG_STATEFUL_TEST_TARGET_ID = 'keyboard-shortcuts-main/debug-stateful-test'
-  static DISABLED_KEYS = [
-    133, // F22
-    13 // Enter
-  ]
-
-  private static readonly COMMON_MODIFIER_VARIANTS: Record<number, number[]> = {
-    16: [16, 160, 161],
-    17: [17, 162, 163],
-    18: [18, 164, 165]
-  }
+  static readonly MODIFIER_READING_ORDER = MODIFIER_READING_ORDER
+  static readonly VK_CODE_F22 = VK_CODE_F22
+  static DISABLED_KEYS_TARGET_ID = DISABLED_KEYS_TARGET_ID
+  static DEBUG_STATEFUL_TEST_TARGET_ID = DEBUG_STATEFUL_TEST_TARGET_ID
+  static DISABLED_KEYS = DISABLED_KEYS
 
   public readonly events = new EventEmitter<{
     /**
@@ -84,18 +78,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     'stateful-shortcut-released': [details: ShortcutDetails]
   }>()
 
-  private _registrationMap = new Map<
-    string,
-    {
-      type: 'last-active' | 'normal' | 'stateful'
-      targetId: string
-      shortcutId: string
-      cb: (details: ShortcutDetails) => void
-    }
-  >()
-
-  private _targetIdMap = new Map<string, string>()
-
   private _nativeKeyEventHandler: ((key: KeyEvent) => void) | null = null
 
   constructor(
@@ -103,6 +85,13 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     readonly _loggerFactory: LoggerFactoryMain
   ) {
     this._logger = _loggerFactory.create(KeyboardShortcutsMain.id)
+    this._context = {
+      namespace: KeyboardShortcutsMain.id,
+      ipc: _ipc,
+      logger: this._logger
+    }
+    this._registry = new ShortcutRegistry(this._logger)
+    this._ipcHandlers = new KeyboardShortcutsIpcHandlers(this._context, this)
   }
 
   // fast equal for two arrays (shallow)
@@ -160,7 +149,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
     this.events.emit('stateful-shortcut-released', details)
-    const registration = this._registrationMap.get(details.id)
+    const registration = this._registry.getActiveRegistration(details.id)
     if (registration && registration.type === 'stateful') {
       registration.cb(details)
     }
@@ -226,7 +215,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       const details = this._buildShortcutDetails(this._lastActiveShortcut, false)
       this.events.emit('last-active-shortcut', details)
       this._ipc.sendEvent(KeyboardShortcutsMain.id, 'last-active-shortcut', details)
-      const registration = this._registrationMap.get(details.id)
+      const registration = this._registry.getActiveRegistration(details.id)
       if (registration && registration.type === 'last-active') {
         registration.cb(details)
       }
@@ -258,9 +247,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       return
     }
 
-    const variants = KeyboardShortcutsMain.COMMON_MODIFIER_VARIANTS[event.keyCode] || [
-      event.keyCode
-    ]
+    const variants = COMMON_MODIFIER_VARIANTS[event.keyCode] || [event.keyCode]
     let shouldReleaseStatefulShortcut = false
 
     for (const keyCode of variants) {
@@ -298,7 +285,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     // 触发普通快捷键事件
     this.events.emit('shortcut', details)
 
-    const registration = this._registrationMap.get(details.id)
+    const registration = this._registry.getActiveRegistration(details.id)
     if (registration) {
       if (registration.type === 'normal') {
         registration.cb(details)
@@ -372,135 +359,41 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       nativeInput.instance.on('keyEvent', this._nativeKeyEventHandler)
     }
 
-    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
-      const r = this.getRegistration(shortcutId)
-      if (!r) return null
-      const { cb, ...rest } = r
-      return rest
-    })
-
-    this._ipc.onCall(KeyboardShortcutsMain.id, 'getDebugState', () => {
-      return this.getDebugState()
-    })
-
-    this._ipc.onCall(
-      KeyboardShortcutsMain.id,
-      'setDebugStatefulShortcut',
-      (_, shortcutId: string | null) => {
-        return this.setDebugStatefulShortcut(shortcutId)
-      }
-    )
-
-    this._ipc.onCall(
-      KeyboardShortcutsMain.id,
-      'getRegistrationByTargetId',
-      (_, targetId: string) => {
-        const r = this.getRegistrationByTargetId(targetId)
-        if (!r) return null
-        const { cb, ...rest } = r
-        return rest
-      }
-    )
-
-    this._ipc.onCall(KeyboardShortcutsMain.id, '_getInternalVars', () => {
-      return {
-        _pressedOtherKeys: this._pressedOtherKeys,
-        _pressedModifierKeys: this._pressedModifierKeys,
-        _lastActiveShortcut: this._lastActiveShortcut,
-        _activeStatefulShortcut: this._activeStatefulShortcut
-      }
-    })
+    this._ipcHandlers.register()
   }
 
   register(
     targetId: string,
     shortcutId: string,
-    type: 'last-active' | 'normal' | 'stateful',
+    type: KeyboardShortcutRegistrationType,
     cb: (details: ShortcutDetails) => void
   ) {
-    if (!NATIVE_SUPPORT.nativeInput.available) {
-      this._logger.info(
-        `Native global shortcuts are unavailable, ignoring shortcut registration: ${shortcutId} (${type})`
-      )
-      return
-    }
-
-    if (!isSupportedShortcutId(shortcutId)) {
-      throw new Error(`Shortcut ${shortcutId} contains unsupported keys`)
-    }
-
-    const existingShortcutRegistration = this._registrationMap.get(shortcutId)
-    if (existingShortcutRegistration && existingShortcutRegistration.targetId !== targetId) {
-      throw new Error(
-        `Shortcut ${shortcutId} is already registered for target ${existingShortcutRegistration.targetId}`
-      )
-    }
-
-    const originShortcut = this._targetIdMap.get(targetId)
-    if (originShortcut && originShortcut !== shortcutId) {
-      this._registrationMap.delete(originShortcut)
-    }
-
-    this._registrationMap.set(shortcutId, { type, targetId, shortcutId, cb })
-    this._targetIdMap.set(targetId, shortcutId)
-    this._logger.info(`Register shortcut ${shortcutId} for target ${targetId} (${type})`)
+    return this._registry.register(targetId, shortcutId, type, cb)
   }
 
   unregister(shortcutId: string) {
-    const options = this._registrationMap.get(shortcutId)
-    if (options) {
-      this._registrationMap.delete(shortcutId)
-      this._targetIdMap.delete(options.targetId)
-      this._logger.info(`Unregister shortcut ${shortcutId} for target ${options.targetId}`)
-      return true
-    }
-    return false
+    return this._registry.unregister(shortcutId)
   }
 
   unregisterByTargetId(targetId: string) {
-    const shortcutId = this._targetIdMap.get(targetId)
-    if (shortcutId) {
-      this._registrationMap.delete(shortcutId)
-      this._targetIdMap.delete(targetId)
-      this._logger.info(`Unregister shortcut ${shortcutId} for target ${targetId}`)
-      return true
-    }
-    return false
+    return this._registry.unregisterByTargetId(targetId)
   }
 
   getRegistration(shortcutId: string) {
-    if (!NATIVE_SUPPORT.nativeInput.available) {
-      return null
-    }
-
-    const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map(
-      (k) => nativeInput.VKEY_MAP[k].keyId
-    )
-    if (reservedKeyIds.some((k) => shortcutId.includes(k)) || !isSupportedShortcutId(shortcutId)) {
-      return {
-        type: 'normal',
-        targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
-        shortcutId,
-        cb: () => {}
-      }
-    }
-    return this._registrationMap.get(shortcutId) || null
+    return this._registry.getRegistration(shortcutId)
   }
 
   getRegistrationByTargetId(targetId: string) {
-    if (targetId === KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID) {
-      return {
-        type: 'normal',
-        targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
-        shortcutId: '',
-        cb: () => {}
-      }
+    return this._registry.getRegistrationByTargetId(targetId)
+  }
+
+  _getInternalVars() {
+    return {
+      _pressedOtherKeys: this._pressedOtherKeys,
+      _pressedModifierKeys: this._pressedModifierKeys,
+      _lastActiveShortcut: this._lastActiveShortcut,
+      _activeStatefulShortcut: this._activeStatefulShortcut
     }
-    const shortcutId = this._targetIdMap.get(targetId)
-    if (shortcutId) {
-      return this._registrationMap.get(shortcutId) || null
-    }
-    return null
   }
 
   setDebugStatefulShortcut(shortcutId: string | null) {
@@ -600,7 +493,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._nativeKeyEventHandler = null
     }
     this.events.removeAllListeners()
-    this._registrationMap.clear()
-    this._targetIdMap.clear()
+    this._registry.clear()
   }
 }

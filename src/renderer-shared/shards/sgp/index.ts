@@ -1,35 +1,35 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
-import axios from 'axios'
+import type { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
+import type { AxiosInstance } from 'axios'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { useSgpStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'sgp-main'
+import { SGP_RENDERER_NAMESPACE, type SgpRendererContext } from './context'
+import { exposeSgpApiForDebugging } from './dev-exposure'
+import { createSgpApi } from './http-api'
+import { syncSgpState } from './state-sync'
 
 @Shard(SgpRenderer.id)
 export class SgpRenderer implements IAkariShardInitDispose {
-  static id = 'sgp-renderer'
+  static id = SGP_RENDERER_NAMESPACE
 
-  public readonly httpClient = axios.create({
-    baseURL: 'akari://sgp',
-    adapter: 'fetch',
-    paramsSerializer: { indexes: null }
-  })
+  public readonly httpClient: AxiosInstance
   public readonly api: SgpHttpApiAxiosHelper
+  private readonly _context: SgpRendererContext
 
-  constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
-  ) {
-    this.api = new SgpHttpApiAxiosHelper(this.httpClient)
+  constructor(@Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer) {
+    const { httpClient, api } = createSgpApi()
+
+    this.httpClient = httpClient
+    this.api = api
+    this._context = {
+      api,
+      httpClient,
+      piniaMobxUtils
+    }
   }
 
   async onInit() {
-    const store = useSgpStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-
-    // @ts-ignore
-    window.sgpApi = this.api
+    await syncSgpState(this._context)
+    exposeSgpApiForDebugging(this._context)
   }
 }

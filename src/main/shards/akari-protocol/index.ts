@@ -1,8 +1,14 @@
 import { Shard } from '@shared/akari-shard'
-import { protocol, session } from 'electron'
-import ofs from 'node:original-fs'
-import path from 'node:path'
+import { protocol } from 'electron'
 import { Readable } from 'node:stream'
+
+import {
+  AKARI_PROTOCOL_MAIN_NAMESPACE,
+  AKARI_PROXY_PROTOCOL,
+  type AkariProtocolDomainHandler
+} from './context'
+import { createLocalFileDomainHandler } from './local-file-domain'
+import { AkariProtocolRouter } from './protocol-router'
 
 /**
  * 实现 `akari://` 协议, 用户特殊资源的代理
@@ -12,97 +18,14 @@ import { Readable } from 'node:stream'
  */
 @Shard(AkariProtocolMain.id)
 export class AkariProtocolMain {
-  static id = 'akari-protocol-main'
+  static id = AKARI_PROTOCOL_MAIN_NAMESPACE
 
-  static AKARI_PROXY_PROTOCOL = 'akari'
+  static AKARI_PROXY_PROTOCOL = AKARI_PROXY_PROTOCOL
 
-  private readonly _domainRegistry = new Map<
-    string,
-    (uri: string, req: Request) => Promise<Response> | Response
-  >()
-
-  private readonly _partitionRegistry = new Set<string>()
+  private readonly _router = new AkariProtocolRouter()
 
   onInit() {
-    const mime = require('mime-types')
-
-    this.registerDomain('local', async (uri: string, _req: Request) => {
-      const filePath = decodeURIComponent(uri)
-      try {
-        await ofs.promises.access(filePath, ofs.constants.R_OK)
-        const stream = ofs.createReadStream(path.normalize(filePath))
-        const contentType = mime.lookup(filePath) || 'application/octet-stream'
-        return new Response(stream, {
-          status: 200,
-          headers: { 'Content-Type': contentType }
-        })
-      } catch (error: any) {
-        switch (error.code) {
-          case 'ENOENT':
-            return new Response(
-              JSON.stringify({
-                error: error.message,
-                filepath: filePath
-              }),
-              {
-                statusText: 'Not Found',
-                headers: { 'Content-Type': 'application/json' },
-                status: 404
-              }
-            )
-          case 'EACCES':
-            return new Response(
-              JSON.stringify({
-                error: error.message,
-                filepath: filePath
-              }),
-              {
-                statusText: 'Forbidden',
-                headers: { 'Content-Type': 'application/json' },
-                status: 403
-              }
-            )
-          default:
-            return new Response(
-              JSON.stringify({
-                error: error.message,
-                filepath: filePath
-              }),
-              {
-                statusText: 'Internal Server Error',
-                headers: { 'Content-Type': 'application/json' },
-                status: 500
-              }
-            )
-        }
-      }
-    })
-  }
-
-  private _unhandlePartitionAkariProtocol(partition: string) {
-    session.fromPartition(partition).protocol.unhandle(AkariProtocolMain.AKARI_PROXY_PROTOCOL)
-  }
-
-  private _registerPartitionAkariProtocol(partition: string) {
-    session
-      .fromPartition(partition)
-      .protocol.handle(AkariProtocolMain.AKARI_PROXY_PROTOCOL, async (req) => {
-        const path1 = req.url.slice(`${AkariProtocolMain.AKARI_PROXY_PROTOCOL}://`.length)
-        const index = path1.indexOf('/')
-        const domain = path1.slice(0, index).trim()
-        const uri = path1.slice(index + 1).trim()
-
-        const handler = this._domainRegistry.get(domain)
-        if (handler) {
-          return handler(uri, req)
-        }
-
-        return new Response(`No handler for ${req.url}`, {
-          statusText: 'Not Found',
-          headers: { 'Content-Type': 'text/plain' },
-          status: 404
-        })
-      })
+    this.registerDomain('local', createLocalFileDomainHandler())
   }
 
   static convertWebStreamToNodeStream(readableStream: ReadableStream): Readable {
@@ -139,40 +62,19 @@ export class AkariProtocolMain {
   }
 
   registerPartition(partition: string) {
-    if (this._partitionRegistry.has(partition)) {
-      throw new Error(`Partition ${partition} is already registered`)
-    }
-
-    this._partitionRegistry.add(partition)
-    this._registerPartitionAkariProtocol(partition)
+    this._router.registerPartition(partition)
   }
 
   unregisterPartition(partition: string) {
-    if (!this._partitionRegistry.has(partition)) {
-      throw new Error(`Partition ${partition} is not registered`)
-    }
-
-    this._partitionRegistry.delete(partition)
-    this._unhandlePartitionAkariProtocol(partition)
+    this._router.unregisterPartition(partition)
   }
 
-  registerDomain(
-    domain: string,
-    handler: (uri: string, req: Request) => Promise<Response> | Response
-  ) {
-    if (this._domainRegistry.has(domain)) {
-      throw new Error(`Domain ${domain} is already registered`)
-    }
-
-    this._domainRegistry.set(domain, handler)
+  registerDomain(domain: string, handler: AkariProtocolDomainHandler) {
+    this._router.registerDomain(domain, handler)
   }
 
   unregisterDomain(domain: string) {
-    if (!this._domainRegistry.has(domain)) {
-      throw new Error(`Domain ${domain} is not registered`)
-    }
-
-    this._domainRegistry.delete(domain)
+    this._router.unregisterDomain(domain)
   }
 
   static shouldNotHaveBody(code: number) {

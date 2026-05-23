@@ -1,45 +1,37 @@
 import { Config, Dep, Shard } from '@shared/akari-shard'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
-import { LcuEvent } from '@shared/types/league-client/event'
+import type { LcuEvent } from '@shared/types/league-client/event'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { UxCommandLine } from '@shared/types/shards/league-client-ux'
 import { RadixEventEmitter } from '@shared/utils/event-emitter'
-import { getSgpServerId } from '@shared/utils/sgp'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { useTranslation } from 'i18next-vue'
-import { getCurrentScope, onScopeDispose, watch } from 'vue'
 
-import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
-import { useLeagueClientStore } from './store'
+import {
+  LEAGUE_CLIENT_RENDERER_NAMESPACE,
+  type LeagueClientRendererConfig,
+  type LeagueClientRendererContext,
+  MAIN_SHARD_NAMESPACE
+} from './context'
+import { watchLeagueClientInitializationProgress } from './initialization-progress-watcher'
+import { LeagueClientLcuEventSubscription } from './lcu-event-subscription'
+import { syncLeagueClientState } from './state-sync'
 
-export const MAIN_SHARD_NAMESPACE = 'league-client-main'
-
-export interface LeagueClientRendererConfig {
-  subscribeState?: {
-    gameData?: boolean
-    honor?: boolean
-    champSelect?: boolean
-    chat?: boolean
-    matchmaking?: boolean
-    gameflow?: boolean
-    lobby?: boolean
-    login?: boolean
-    summoner?: boolean
-    lobbyTeamBuilder?: boolean
-  }
-}
+export { MAIN_SHARD_NAMESPACE }
+export type { LeagueClientRendererConfig }
 
 @Shard(LeagueClientRenderer.id)
 export class LeagueClientRenderer {
-  static id = 'league-client-renderer'
+  static id = LEAGUE_CLIENT_RENDERER_NAMESPACE
 
   /** 这里只用于当作一个普通的静态事件分发器 */
   private readonly _emitter = new RadixEventEmitter()
+  private readonly _context: LeagueClientRendererContext
+  private readonly _lcuEventSubscription: LeagueClientLcuEventSubscription
 
   public readonly httpClient = axios.create({
     baseURL: 'akari://league-client',
@@ -47,79 +39,6 @@ export class LeagueClientRenderer {
     paramsSerializer: { indexes: null }
   })
   public readonly api: LeagueClientHttpApiAxiosHelper
-
-  async onInit() {
-    const store = useLeagueClientStore()
-
-    const {
-      gameData = true,
-      honor = true,
-      champSelect = true,
-      chat = true,
-      matchmaking = true,
-      gameflow = true,
-      lobby = true,
-      login = true,
-      summoner = true,
-      lobbyTeamBuilder = true
-    } = this._config?.subscribeState || {}
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'initialization', store.initialization)
-
-    if (gameData) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)
-    }
-
-    if (honor) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'honor', store.honor)
-    }
-
-    if (champSelect) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'champSelect', store.champSelect)
-    }
-
-    if (chat) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'chat', store.chat)
-    }
-
-    if (matchmaking) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'matchmaking', store.matchmaking)
-    }
-
-    if (gameflow) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gameflow', store.gameflow)
-    }
-
-    if (lobby) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'lobby', store.lobby)
-    }
-
-    if (login) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'login', store.login)
-    }
-
-    if (summoner) {
-      await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
-    }
-
-    if (lobbyTeamBuilder) {
-      await this._piniaMobxUtils.sync(
-        MAIN_SHARD_NAMESPACE,
-        'lobbyTeamBuilder',
-        store.lobbyTeamBuilder
-      )
-    }
-
-    this._registerSubscribedLcuEventDispatch()
-
-    this._setupInAppScope.addSetupFn(() => this._watchInitializationProgressShow())
-
-    // @ts-ignore
-    window.lcuApi = this.api
-  }
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
@@ -133,122 +52,35 @@ export class LeagueClientRenderer {
     })
 
     this.api = new LeagueClientHttpApiAxiosHelper(this.httpClient)
-  }
-
-  private async _internalSubscribe(uri: string) {
-    const subId = await this._ipc.call<string>(MAIN_SHARD_NAMESPACE, 'subscribeLcuEndpoint', uri)
-
-    return {
-      subId,
-      unsubscribe: () => {
-        return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'unsubscribeLcuEndpoint', subId)
-      }
+    this._context = {
+      namespace: LeagueClientRenderer.id,
+      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      ipc: this._ipc,
+      piniaMobxUtils: this._piniaMobxUtils,
+      settingUtils: this._settingUtils,
+      setupInAppScope: this._setupInAppScope,
+      emitter: this._emitter,
+      httpClient: this.httpClient,
+      api: this.api,
+      config: this._config
     }
+    this._lcuEventSubscription = new LeagueClientLcuEventSubscription(this._context)
   }
 
-  private _registerSubscribedLcuEventDispatch() {
-    this._ipc.onEvent(
-      MAIN_SHARD_NAMESPACE,
-      'extra-lcu-event',
-      (subId: string, event: LcuEvent, params) => {
-        this._emitter.emit(subId, { event, params })
-      }
-    )
-  }
+  async onInit() {
+    await syncLeagueClientState(this._context)
+    this._lcuEventSubscription.registerDispatch()
+    this._setupInAppScope.addSetupFn(() => watchLeagueClientInitializationProgress())
 
-  private _watchInitializationProgressShow() {
-    const leagueClientStore = useLeagueClientStore()
-    const taskStore = useBackgroundTasksStore()
-    const { t } = useTranslation()
-
-    const initTaskId = `${LeagueClientRenderer.id}/initialization`
-
-    watch(
-      () => leagueClientStore.initialization.progress,
-      (progress) => {
-        if (!progress) {
-          taskStore.removeTask(initTaskId)
-          return
-        }
-
-        if (!taskStore.hasTask(initTaskId)) {
-          taskStore.createTask(initTaskId, {
-            name: () => t('league-client-renderer.initialization-task.name')
-          })
-        }
-
-        taskStore.updateTask(initTaskId, {
-          description: () =>
-            t('league-client-renderer.initialization-task.current', {
-              finishedCount: progress.finished.length,
-              allCount: progress.all.length
-            }),
-          progress: progress.finished.length / progress.all.length
-        })
-      },
-      { immediate: true }
-    )
-
-    const connectTaskId = `${LeagueClientRenderer.id}/connection`
-
-    watch(
-      () => leagueClientStore.connectingClient,
-      (client) => {
-        if (!client) {
-          taskStore.removeTask(connectTaskId)
-          return
-        }
-
-        if (!taskStore.hasTask(connectTaskId)) {
-          taskStore.createTask(connectTaskId, {
-            name: () => t('league-client-renderer.connection-task.name'),
-            description: () =>
-              t('league-client-renderer.connection-task.target', {
-                target: getSgpServerId(client.region, client.rsoPlatformId)
-              })
-          })
-        }
-      },
-      { immediate: true }
-    )
+    // @ts-ignore
+    window.lcuApi = this.api
   }
 
   onLcuEventVue<T = any, P = Record<string, any>>(
     uri: string,
     listener: (data: LcuEvent<T>, params: P) => void
   ) {
-    let disposed = false
-    let unsubscribeFn: (() => Promise<boolean>) | null = null
-    let offFn: (() => void) | null = null
-
-    this._internalSubscribe(uri).then(({ subId, unsubscribe }) => {
-      if (disposed) {
-        unsubscribe()
-        return
-      }
-
-      unsubscribeFn = unsubscribe
-      offFn = this._emitter.on(subId, ({ event, params }) => listener(event, params))
-    })
-
-    const dispose = () => {
-      if (disposed) {
-        return
-      }
-
-      if (offFn) {
-        offFn()
-      }
-
-      if (unsubscribeFn) {
-        unsubscribeFn().catch(console.error)
-      }
-
-      disposed = true
-    }
-
-    getCurrentScope() && onScopeDispose(() => dispose())
-    return dispose
+    return this._lcuEventSubscription.onLcuEventVue(uri, listener)
   }
 
   static url(uri: string) {

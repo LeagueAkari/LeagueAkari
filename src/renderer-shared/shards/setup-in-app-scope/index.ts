@@ -1,6 +1,9 @@
 import { Shard } from '@shared/akari-shard'
 import { VNode } from 'vue'
 
+import { SETUP_IN_APP_SCOPE_RENDERER_NAMESPACE } from './context'
+import { SetupInAppScopeRegistry } from './scope-registry'
+
 /**
  * 用于处理作用域问题
  *
@@ -8,46 +11,39 @@ import { VNode } from 'vue'
  */
 @Shard(SetupInAppScopeRenderer.id)
 export class SetupInAppScopeRenderer {
-  static id = 'setup-in-app-scope-renderer'
+  static id = SETUP_IN_APP_SCOPE_RENDERER_NAMESPACE
 
-  private _renderVNodes: (() => VNode)[] = []
-  private _setupFns: (() => void)[] = []
+  private readonly _registry = new SetupInAppScopeRegistry()
 
   runSetupFns() {
-    this._setupFns.forEach((fn) => fn())
+    this._registry.runSetupFns()
   }
 
   get renderVNodes() {
-    return this._renderVNodes
+    return this._registry.renderVNodes
   }
 
   addRenderVNode(comp: () => VNode) {
-    this._renderVNodes.push(comp)
+    this._registry.addRenderVNode(comp)
   }
 
   addSetupFn(fn: () => void) {
-    this._setupFns.push(fn)
+    this._registry.addSetupFn(fn)
   }
 
   removeSetupFn(fn: () => void) {
-    const index = this._setupFns.indexOf(fn)
-    if (index !== -1) {
-      this._setupFns.splice(index, 1)
-    }
+    this._registry.removeSetupFn(fn)
   }
 
   removeRenderVNode(comp: () => VNode) {
-    const index = this._renderVNodes.indexOf(comp)
-    if (index !== -1) {
-      this._renderVNodes.splice(index, 1)
-    }
+    this._registry.removeRenderVNode(comp)
   }
 
   clearSetupFns() {
-    this._setupFns = []
+    this._registry.clearSetupFns()
   }
 
   clearRenderVNodes() {
-    this._renderVNodes = []
+    this._registry.clearRenderVNodes()
   }
 }

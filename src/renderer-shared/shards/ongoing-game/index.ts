@@ -1,29 +1,43 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { DraftOptions, OngoingGameSimplifiedChampMastery } from '@shared/types/shards/ongoing-game'
-import { markRaw } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
-import { MatchHistoryPlayer, useOngoingGameStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
+import {
+  type DraftOptions,
+  MAIN_SHARD_NAMESPACE,
+  ONGOING_GAME_RENDERER_NAMESPACE,
+  type OngoingGameAllData,
+  type OngoingGameMatchHistoryQueryTagParams,
+  type OngoingGameRendererContext
+} from './context'
+import { useOngoingGameStore } from './store'
+import { OngoingGameStoreEventHandlers } from './store-event-handlers'
 
 @Shard(OngoingGameRenderer.id)
 export class OngoingGameRenderer implements IAkariShardInitDispose {
-  static id = 'ongoing-game-renderer'
+  static id = ONGOING_GAME_RENDERER_NAMESPACE
+
+  private readonly _context: OngoingGameRendererContext
+  private readonly _storeEventHandlers: OngoingGameStoreEventHandlers
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) readonly _setupInAppScope: SetupInAppScopeRenderer
-  ) {}
+  ) {
+    this._context = {
+      namespace: OngoingGameRenderer.id,
+      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      ipc: this._ipc,
+      piniaMobxUtils: this._piniaMobxUtils,
+      settingUtils: this._settingUtils,
+      setupInAppScope: this._setupInAppScope
+    }
+    this._storeEventHandlers = new OngoingGameStoreEventHandlers(this._context)
+  }
 
   setConcurrency(value: number) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'concurrency', value)
@@ -37,7 +51,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryLoadCount', value)
   }
 
-  setMatchHistoryTagParams(value: Pick<MatchHistoryQueryParams, 'tag' | 'tagsQueryType'>) {
+  setMatchHistoryTagParams(value: OngoingGameMatchHistoryQueryTagParams) {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'setMatchHistoryTagParams', value)
   }
 
@@ -104,24 +118,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   }
 
   getAll() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<{
-      matchHistory: Record<string, MatchHistoryPlayer>
-      summoner: Record<string, SummonerInfo>
-      rankedStats: Record<string, RankedStats>
-      championMastery: Record<string, Record<number, OngoingGameSimplifiedChampMastery>>
-      additionalGames: Record<number, any>
-      savedInfo: any
-    }>
-  }
-
-  private _toShallowedMarkRaw<T extends object>(obj: T) {
-    return Object.entries(obj).reduce(
-      (acc, [key, value]) => {
-        acc[key] = markRaw(value)
-        return acc
-      },
-      {} as Record<keyof T, any>
-    )
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<OngoingGameAllData>
   }
 
   async onInit() {
@@ -130,86 +127,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
-      store.summoner = {}
-      store.matchHistory = {}
-      store.rankedStats = {}
-      store.championMastery = {}
-      store.savedInfo = {}
-      store.cachedGames = {}
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {
-      delete store.summoner[puuid]
-      delete store.matchHistory[puuid]
-      delete store.rankedStats[puuid]
-      delete store.championMastery[puuid]
-      delete store.savedInfo[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-removed', (puuid: string) => {
-      delete store.summoner[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-removed', (puuid: string) => {
-      delete store.rankedStats[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-removed', (puuid: string) => {
-      delete store.championMastery[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-removed', (puuid: string) => {
-      delete store.matchHistory[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-removed', (puuid: string) => {
-      delete store.savedInfo[puuid]
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
-      store.matchHistory[puuid] = markRaw(data)
-
-      const games = data.data as LcuOrSgpGameSummary[]
-      games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'additional-game-loaded', (gameId: number, data) => {
-      store.cachedGames[gameId] = markRaw(data)
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
-      store.summoner[puuid] = markRaw(data)
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-loaded', (puuid: string, data) => {
-      store.rankedStats[puuid] = markRaw(data)
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-loaded', (puuid: string, data) => {
-      store.championMastery[puuid] = markRaw(data)
-    })
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-loaded', (puuid: string, data) => {
-      store.savedInfo[puuid] = markRaw(data)
-    })
-
-    const { championMastery, matchHistory, rankedStats, savedInfo, summoner, additionalGames } =
-      await this.getAll()
-    store.championMastery = this._toShallowedMarkRaw(championMastery)
-    store.matchHistory = this._toShallowedMarkRaw(matchHistory)
-    store.rankedStats = this._toShallowedMarkRaw(rankedStats)
-    store.savedInfo = this._toShallowedMarkRaw(savedInfo)
-    store.summoner = this._toShallowedMarkRaw(summoner)
-
-    Object.values(matchHistory).forEach((data) => {
-      const games = data.data as LcuOrSgpGameSummary[]
-      games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
-    })
-
-    Object.values(additionalGames).forEach((data) => {
-      store.cachedGames[data.data.gameId] = markRaw(data.data)
-    })
+    this._storeEventHandlers.register()
+    await this._storeEventHandlers.loadInitialData(await this.getAll())
   }
 
   async onDispose() {}

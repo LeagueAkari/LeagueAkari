@@ -48,6 +48,15 @@ export interface UpdateTagDto {
   region?: string
 }
 
+export interface EncounteredGameSaveDto {
+  selfPuuid: string
+  puuid: string
+  region: string
+  rsoPlatformId: string
+  gameId: number
+  queueType: string
+}
+
 export interface EncounteredGameQueryDto {
   selfPuuid: string
   puuid: string
@@ -57,6 +66,31 @@ export interface EncounteredGameQueryDto {
   pageSize?: number
   page?: number
   timeOrder?: 'desc' | 'asc'
+}
+
+export interface PaginationDto {
+  page: number
+  pageSize: number
+}
+
+export interface OrderByDto {
+  timeOrder: 'desc' | 'asc'
+}
+
+export interface WithEncounteredGamesQueryDto {
+  queueType?: string
+}
+
+export interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
+  rsoPlatformId: string
+  region: string
+  tag?: string
+  encountered: boolean
+}
+
+export interface QueryAllSavedPlayersDto {
+  page: number
+  pageSize: number
 }
 
 export interface SavedInfo {

@@ -1,19 +1,18 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AppThemeSetting } from '@shared/types/app-theme'
-import i18next from 'i18next'
-import { watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
-import { HttpProxySetting, useAppCommonStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'app-common-main'
+import { APP_COMMON_RENDERER_NAMESPACE, MAIN_SHARD_NAMESPACE } from './context'
+import { watchAppLocale } from './locale-watcher'
+import { syncAppCommonRendererState } from './settings-sync'
+import { HttpProxySetting } from './store'
 
 @Shard(AppCommonRenderer.id)
 export class AppCommonRenderer implements IAkariShardInitDispose {
-  static id = 'app-common-renderer'
+  static id = APP_COMMON_RENDERER_NAMESPACE
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
@@ -21,17 +20,7 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {
-    this._setupInAppScope.addSetupFn(() => {
-      const store = useAppCommonStore()
-
-      watch(
-        () => store.settings.locale,
-        (lo) => {
-          i18next.changeLanguage(lo)
-        },
-        { immediate: true }
-      )
-    })
+    this._setupInAppScope.addSetupFn(() => watchAppLocale())
   }
 
   onSecondInstance(fn: (commandLine: string[], workingDirectory: string) => void) {
@@ -95,18 +84,9 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    const store = useAppCommonStore()
-    store.version = await this.getVersion()
-
-    await this._settingUtils.savedGetterVue(
-      AppCommonRenderer.id,
-      'tempAkariSubscriptionInfo',
-      () => store.tempAkariSubscriptionInfo,
-      (v) => (store.tempAkariSubscriptionInfo = v)
+    await syncAppCommonRendererState(this._piniaMobxUtils, this._settingUtils, () =>
+      this.getVersion()
     )
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   getRuntimeInfo() {

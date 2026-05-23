@@ -1,10 +1,6 @@
-import { is } from '@electron-toolkit/utils'
-import { i18next } from '@main/i18n'
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { getThemeColorTheme, isAppThemeSetting } from '@shared/types/app-theme'
-import { app, nativeTheme, shell } from 'electron'
-import { clipboard } from 'electron'
+import { app, clipboard, shell } from 'electron'
 import { exec } from 'node:child_process'
 import os from 'node:os'
 import { promisify } from 'node:util'
@@ -15,7 +11,12 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { APP_COMMON_MAIN_NAMESPACE, type AppCommonMainContext } from './context'
+import { AppCommonDiagnosticsController } from './diagnostics-controller'
+import { AppCommonIpcHandlers } from './ipc-handlers'
+import { RendererLinkProtocol } from './renderer-link-protocol'
 import { AppCommonSettings, AppCommonState } from './state'
+import { AppCommonThemeController } from './theme-controller'
 
 const execAsync = promisify(exec)
 
@@ -24,13 +25,18 @@ const execAsync = promisify(exec)
  */
 @Shard(AppCommonMain.id)
 export class AppCommonMain implements IAkariShardInitDispose {
-  static id = 'app-common-main'
+  static id = APP_COMMON_MAIN_NAMESPACE
 
   public readonly state = new AppCommonState()
   public readonly settings = new AppCommonSettings()
 
   private readonly _settingService: SetterSettingService
   private readonly _logger: AkariLogger
+  private readonly _context: AppCommonMainContext
+  private readonly _ipcHandlers: AppCommonIpcHandlers
+  private readonly _themeController: AppCommonThemeController
+  private readonly _rendererLinkProtocol: RendererLinkProtocol
+  private readonly _diagnosticsController: AppCommonDiagnosticsController
 
   constructor(
     private readonly _shared: SharedGlobalShard,
@@ -69,6 +75,21 @@ export class AppCommonMain implements IAkariShardInitDispose {
     })
 
     this.state.setBaseConfig(this._shared.global.baseConfig.value)
+
+    this._context = {
+      namespace: AppCommonMain.id,
+      shared: this._shared,
+      ipc: this._ipc,
+      mobxUtils: this._mobxUtils,
+      protocol: this._protocol,
+      logger: this._logger,
+      state: this.state,
+      settings: this.settings
+    }
+    this._ipcHandlers = new AppCommonIpcHandlers(this._context, this)
+    this._themeController = new AppCommonThemeController(this._context)
+    this._rendererLinkProtocol = new RendererLinkProtocol(this._context)
+    this._diagnosticsController = new AppCommonDiagnosticsController(this._context)
   }
 
   private _getSystemLocale() {
@@ -81,8 +102,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     return 'en'
   }
 
-  private _setDisableHardwareAccelerationAndRelaunch(s: boolean) {
-    if (s) {
+  setDisableHardwareAccelerationAndRelaunch(disabled: boolean) {
+    if (disabled) {
       if (this.state.disableHardwareAcceleration) {
         return
       }
@@ -105,6 +126,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   openUserDataDir() {
     return shell.openPath(app.getPath('userData'))
+  }
+
+  readClipboardText() {
+    return clipboard.readText()
   }
 
   async relaunchAsAdministrator() {
@@ -152,6 +177,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
     }
   }
 
+  evaluate(target: string, code: string) {
+    this._rendererLinkProtocol.evaluate(target, code)
+  }
+
   private async _setupState() {
     await this._settingService.applyToState()
 
@@ -184,191 +213,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setupState()
 
-    this._mobxUtils.reaction(
-      () => this.settings.locale,
-      (locale) => {
-        i18next.changeLanguage(locale)
-      },
-      { fireImmediately: true }
-    )
-
-    this._mobxUtils.reaction(
-      () => this.settings.theme,
-      (theme) => {
-        if (theme === 'default') {
-          nativeTheme.themeSource = 'system'
-          return
-        }
-
-        if (isAppThemeSetting(theme)) {
-          // Electron 原生主题仅支持 light/dark/system，其他主题在渲染层做 token 覆盖。
-          nativeTheme.themeSource = getThemeColorTheme(theme)
-          return
-        }
-
-        this._logger.warn('Invalid theme value, fallback to dark', theme)
-        nativeTheme.themeSource = 'dark'
-      },
-      { fireImmediately: true }
-    )
-
-    nativeTheme.on('updated', () => {
-      this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
-    })
-
-    this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
-
-    this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (_, s: boolean) => {
-      this._setDisableHardwareAccelerationAndRelaunch(s)
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'relaunchAsAdministrator', () => {
-      return this.relaunchAsAdministrator()
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'getVersion', () => {
-      return this._shared.global.version
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'openUserDataDir', () => {
-      return this.openUserDataDir()
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'readClipboardText', () => {
-      return clipboard.readText()
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {
-      return this.getRuntimeInfo()
-    })
-
-    this._ipc.onCall(AppCommonMain.id, 'exit', () => {
-      app.exit()
-    })
-
-    this._protocol.registerDomain('renderer-link', (_uri: string, req: Request) => {
-      this._ipc.sendEvent(AppCommonMain.id, 'renderer-link', req.url)
-
-      const u = new URL(req.url)
-
-      if (u.pathname === '/evaluate') {
-        const target = u.searchParams.get('target')
-        const code = u.searchParams.get('code')
-
-        if (target && code) {
-          this.evaluate(target, code)
-        }
-      }
-
-      return new Response(null, { status: 204 })
-    })
-
-    this._logInstantiatedShards()
-
-    app.on('browser-window-created', (_, window) => {
-      this._logger.info('browser-window-created', window.id, window.title)
-    })
-
-    this._checkIfRunInTempDir()
-  }
-
-  private _checkIfRunInTempDir() {
-    // 主程序是否目录在 temp 下
-    const exePath = app.getPath('exe')
-    const tempPath = app.getPath('temp')
-
-    this._logger.info('exePath', exePath, tempPath)
-
-    if (exePath.startsWith(tempPath)) {
-      this.state.setRunInTempDir(true)
-      this._logger.warn('run in temp dir warning', exePath, tempPath)
-    }
-  }
-
-  private _logInstantiatedShards() {
-    // @ts-ignore
-    const loadedShards = this._shared.manager._instances.keys()
-
-    const shards: string[] = []
-    for (const shard of loadedShards) {
-      if (typeof shard === 'symbol') {
-        shards.push(shard.description || '[unknown]')
-      } else {
-        shards.push(shard)
-      }
-    }
-
-    this._logger.info('instantiated shards', shards)
-  }
-
-  private _evaluateMainProcess(code: string) {
-    if (!is.dev) {
-      this._logger.warn('Blocked main-process evaluate outside dev mode')
-      return
-    }
-
-    this._logger.warn('Evaluating code in main process')
-
-    try {
-      const fn = new Function(
-        'app',
-        'manager',
-        'shared',
-        'logger',
-        'process',
-        `"use strict";\nreturn (async () => {\n${code}\n})()`
-      )
-      const result = fn(app, this._shared.manager, this._shared, this._logger, process)
-
-      if (result instanceof Promise) {
-        void result.catch((error) => {
-          this._logger.error('Main-process evaluate failed', error)
-        })
-      }
-    } catch (error) {
-      this._logger.error('Main-process evaluate failed', error)
-    }
-  }
-
-  /**
-   * execute code in certain renderer window
-   * very dangerous, should be used only in some extreme cases. e.g opt-in bugfixes
-   * @param target certain renderer window
-   * @param code pure js code
-   * @returns
-   */
-  evaluate(target: string, code: string) {
-    if (target === 'main') {
-      this._evaluateMainProcess(code)
-      return
-    }
-
-    const windowManager = this._shared.manager.getInstance('window-manager-main')
-
-    if (!windowManager) {
-      return
-    }
-
-    switch (target) {
-      case 'main-window':
-        windowManager.mainWindow.window?.webContents.executeJavaScript(code)
-        break
-
-      case 'aux-window':
-        windowManager.auxWindow.window?.webContents.executeJavaScript(code)
-        break
-
-      case 'cd-timer-window':
-        windowManager.cdTimerWindow.window?.webContents.executeJavaScript(code)
-        break
-
-      case 'ongoing-game-window':
-        windowManager.ongoingGameWindow.window?.webContents.executeJavaScript(code)
-        break
-
-      case 'opgg-window':
-        windowManager.opggWindow.window?.webContents.executeJavaScript(code)
-        break
-    }
+    this._themeController.watch()
+    this._ipcHandlers.register()
+    this._rendererLinkProtocol.register()
+    this._diagnosticsController.start()
   }
 }

@@ -1,6 +1,6 @@
 import type { IgnoreMouseEventsOptions } from 'electron'
 
-import { WindowManagerRendererContext } from '.'
+import type { WindowManagerRendererContext } from './context'
 
 export interface AkariBaseWindowRendererBasicState {
   status: 'normal' | 'maximized' | 'minimized'

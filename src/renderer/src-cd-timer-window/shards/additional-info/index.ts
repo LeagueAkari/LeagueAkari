@@ -1,21 +1,20 @@
 import { PiniaMobxUtilsRenderer } from '@renderer-shared/shards/pinia-mobx-utils'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
-import { useAdditionalInfoStore } from './store'
-
-const OG_MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
+import { ADDITIONAL_INFO_RENDERER_NAMESPACE, type AdditionalInfoRendererContext } from './context'
+import { syncAdditionalInfoState } from './state-sync'
 
 @Shard(AdditionalInfoShard.id)
 export class AdditionalInfoShard implements IAkariShardInitDispose {
-  static id = 'additional-info-renderer'
+  static id = ADDITIONAL_INFO_RENDERER_NAMESPACE
 
-  constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
-  ) {}
+  private readonly _context: AdditionalInfoRendererContext
+
+  constructor(@Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer) {
+    this._context = { piniaMobxUtils }
+  }
 
   async onInit() {
-    const store = useAdditionalInfoStore()
-
-    this._piniaMobxUtils.sync(OG_MAIN_SHARD_NAMESPACE, 'additional', store)
+    syncAdditionalInfoState(this._context)
   }
 }

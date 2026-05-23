@@ -2,8 +2,8 @@ import icon from '@resources/LA_ICON.ico?asset'
 import { Event } from 'electron'
 import { comparer } from 'mobx'
 
-import type { WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
+import type { WindowManagerMainContext } from '../context'
 import { MainWindowSettings, MainWindowState } from './state'
 
 export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindowSettings> {

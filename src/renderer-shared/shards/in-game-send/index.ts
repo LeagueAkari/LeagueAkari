@@ -4,26 +4,38 @@ import { InGameSendTemplateCatalog, SendableItem } from '@shared/types/shards/in
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { TemplateDef, useInGameSendStore } from './store'
+import {
+  IN_GAME_SEND_MAIN_NAMESPACE,
+  IN_GAME_SEND_RENDERER_NAMESPACE,
+  type InGameSendRendererContext
+} from './context'
+import { syncInGameSendSettings } from './settings-sync'
+import { TemplateDef } from './store'
 
-const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
+const MAIN_SHARD_NAMESPACE = IN_GAME_SEND_MAIN_NAMESPACE
 
 @Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {
-  static id = 'in-game-send-renderer'
+  static id = IN_GAME_SEND_RENDERER_NAMESPACE
 
-  static CANCEL_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE}/cancel`
+  static CANCEL_SHORTCUT_TARGET_ID = `${IN_GAME_SEND_MAIN_NAMESPACE}/cancel`
+
+  private readonly _context: InGameSendRendererContext
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
-  ) {}
+  ) {
+    this._context = {
+      ipc: _ipc,
+      piniaMobxUtils,
+      settingUtils: _settingUtils
+    }
+  }
 
   async onInit() {
-    const store = useInGameSendStore()
-
-    this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    syncInGameSendSettings(this._context)
   }
 
   getSendableItemShortcutTargetId(id: string) {

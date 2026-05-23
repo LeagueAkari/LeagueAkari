@@ -2,8 +2,8 @@ import { GameClientMain } from '@main/shards/game-client'
 import icon from '@resources/OPGG_ICON.ico?asset'
 import { comparer, computed } from 'mobx'
 
-import type { WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
+import type { WindowManagerMainContext } from '../context'
 import { repositionToAlignLeagueClientUx } from '../position-utils'
 import { OpggWindowSettings, OpggWindowState } from './state'
 

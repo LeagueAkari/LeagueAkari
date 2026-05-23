@@ -3,8 +3,8 @@ import icon from '@resources/LA_ICON.ico?asset'
 import { Notification } from 'electron'
 import { comparer, computed } from 'mobx'
 
-import { WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
+import type { WindowManagerMainContext } from '../context'
 import { repositionToAlignLeagueClientUx } from '../position-utils'
 import { AuxWindowSettings, AuxWindowState } from './state'
 

@@ -15,7 +15,7 @@ import { comparer, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
 import path from 'node:path'
 
-import { WindowManagerMain, type WindowManagerMainContext } from '.'
+import type { WindowManagerMain } from '.'
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
@@ -26,6 +26,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import type { WindowManagerMainContext } from './context'
 import { repositionWindowIfInvisible } from './position-utils'
 
 /**

@@ -1,22 +1,28 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LcuEvent } from '@shared/types/league-client/event'
 import { RadixEventEmitter } from '@shared/utils/event-emitter'
-import { watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
+import {
+  MAIN_SHARD_NAMESPACE,
+  RENDERER_DEBUG_RENDERER_NAMESPACE,
+  type RendererDebugRendererContext
+} from './context'
+import { RendererDebugWatchers } from './debug-watchers'
+import { RendererDebugRuleManager } from './rule-manager'
 import { useRendererDebugStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
 
 @Shard(RendererDebugRenderer.id)
 export class RendererDebugRenderer implements IAkariShardInitDispose {
-  static id = 'renderer-debug-renderer'
+  static id = RENDERER_DEBUG_RENDERER_NAMESPACE
 
   private readonly _matcher = new RadixEventEmitter()
+  private readonly _context: RendererDebugRendererContext
+  private readonly _ruleManager: RendererDebugRuleManager
+  private readonly _watchers: RendererDebugWatchers
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
@@ -24,128 +30,42 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
-  ) {}
+  ) {
+    this._context = {
+      namespace: RendererDebugRenderer.id,
+      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      ipc: this._ipc,
+      piniaMobxUtils: this._piniaMobxUtils,
+      logger: this._logger,
+      settingUtils: this._settingUtils,
+      setupInAppScope: this._setupInAppScope,
+      matcher: this._matcher
+    }
+    this._ruleManager = new RendererDebugRuleManager(this._context)
+    this._watchers = new RendererDebugWatchers(this._context, this._ruleManager)
+  }
 
   async onInit() {
     const store = useRendererDebugStore()
 
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-
-    const savedRules = await this._settingUtils.get(RendererDebugRenderer.id, 'savedRules')
-
-    if (savedRules) {
-      for (const rule of savedRules) {
-        this.addRule(rule, false)
-      }
-    }
-
-    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'lc-event', (data: LcuEvent) => {
-      this._matcher.emit(data.uri, data)
-    })
-
-    this._setupInAppScope.addSetupFn(() => {
-      watch(
-        () => store.rules.filter((r) => r.enabled).length,
-        (length) => {
-          if (length) {
-            this._logger.info(RendererDebugRenderer.id, 'send all native lcu events')
-            this.setSendAllNativeLcuEvents(true)
-          } else {
-            this.setSendAllNativeLcuEvents(false)
-          }
-        },
-        { immediate: true }
-      )
-    })
-
-    this._setupInAppScope.addSetupFn(() => {
-      watch(
-        () => store.rules.map((r) => r.rule),
-        (rules) => {
-          this._settingUtils.set(RendererDebugRenderer.id, 'savedRules', rules)
-        }
-      )
-    })
-  }
-
-  private _sanitizeRule(rule: string) {
-    return rule
-      .replace(/\/+$/, '') // 去除结尾的斜杠
-      .replace(/^([^/])/, '/$1') // 补足前面的斜杠
-      .replace(/\/{2,}/g, '/')
+    await this._watchers.init()
   }
 
   addRule(rule: string, enabled = true) {
-    const store = useRendererDebugStore()
-
-    if (store.rules.some((r) => r.rule === rule)) {
-      return
-    }
-
-    rule = this._sanitizeRule(rule)
-
-    let stopFn: (() => void) | null = null
-    if (enabled) {
-      stopFn = this._matcher.on(rule, (data) => {
-        if (store.logAllLcuEvents) {
-          this._logger.info(data.uri, data.eventType, data.data)
-        } else {
-          this._logger.infoRenderer(data.uri, data.eventType, data.data)
-        }
-      })
-    }
-
-    store.rules.push({ rule, stopFn, enabled })
+    return this._ruleManager.addRule(rule, enabled)
   }
 
   enableRule(rule: string) {
-    const store = useRendererDebugStore()
-
-    const ruleO = store.rules.find((r) => r.rule === rule)
-
-    if (!ruleO) {
-      return
-    }
-
-    ruleO.stopFn?.()
-    ruleO.enabled = true
-
-    const stopFn = this._matcher.on(rule, (data) => {
-      if (store.logAllLcuEvents) {
-        this._logger.info(data.uri, data.eventType, data.data)
-      } else {
-        this._logger.infoRenderer(data.uri, data.eventType, data.data)
-      }
-    })
-
-    ruleO.stopFn = stopFn
+    return this._ruleManager.enableRule(rule)
   }
 
   disableRule(rule: string) {
-    const store = useRendererDebugStore()
-
-    const ruleO = store.rules.find((r) => r.rule === rule)
-
-    if (!ruleO) {
-      return
-    }
-
-    ruleO.enabled = false
-    ruleO.stopFn?.()
-    ruleO.stopFn = null
+    return this._ruleManager.disableRule(rule)
   }
 
   removeRule(rule: string) {
-    const store = useRendererDebugStore()
-
-    const i = store.rules.findIndex((r) => r.rule === rule)
-
-    if (i === -1) {
-      return
-    }
-
-    store.rules[i].stopFn?.()
-    store.rules.splice(i, 1)
+    return this._ruleManager.removeRule(rule)
   }
 
   async onDispose() {}

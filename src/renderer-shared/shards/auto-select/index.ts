@@ -5,36 +5,48 @@ import { DeepPartialObject } from '@shared/utils/types'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAutoSelectStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'auto-select-main'
+import {
+  AUTO_SELECT_MAIN_NAMESPACE,
+  AUTO_SELECT_RENDERER_NAMESPACE,
+  type AutoSelectRendererContext
+} from './context'
+import { syncAutoSelectState } from './state-sync'
 
 @Shard(AutoSelectRenderer.id)
 export class AutoSelectRenderer implements IAkariShardInitDispose {
-  static id = 'auto-select-renderer'
+  static id = AUTO_SELECT_RENDERER_NAMESPACE
+
+  private readonly _context: AutoSelectRendererContext
 
   constructor(
-    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) readonly _settingUtils: SettingUtilsRenderer
-  ) {}
+    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) settingUtils: SettingUtilsRenderer
+  ) {
+    this._context = {
+      ipc,
+      piniaMobxUtils,
+      settingUtils
+    }
+  }
 
   setPickConfig(groupId: string, config: DeepPartialObject<PickChampionConfig>) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPickConfig', groupId, config)
+    return this._context.ipc.call(AUTO_SELECT_MAIN_NAMESPACE, 'setPickConfig', groupId, config)
   }
 
   setBanConfig(groupId: string, config: DeepPartialObject<BanChampionConfig>) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setBanConfig', groupId, config)
+    return this._context.ipc.call(AUTO_SELECT_MAIN_NAMESPACE, 'setBanConfig', groupId, config)
   }
 
   setTemporarilyDisabled(temporarilyDisabled: boolean) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setTemporarilyDisabled', temporarilyDisabled)
+    return this._context.ipc.call(
+      AUTO_SELECT_MAIN_NAMESPACE,
+      'setTemporarilyDisabled',
+      temporarilyDisabled
+    )
   }
 
   async onInit() {
-    const store = useAutoSelectStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await syncAutoSelectState(this._context)
   }
 }

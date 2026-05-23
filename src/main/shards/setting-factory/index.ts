@@ -1,15 +1,14 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { Paths } from '@shared/utils/types'
-import { app, dialog } from 'electron'
-import fs from 'node:original-fs'
-import path from 'node:path'
 
-import { AkariIpcError, AkariIpcMain } from '../ipc'
+import { AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
-import { type WindowManagerMain } from '../window-manager'
+import { SETTING_FACTORY_MAIN_NAMESPACE, type SettingFactoryMainContext } from './context'
 import { DelayedTaskScheduler } from './delayed-task-scheduler'
+import { SettingFactoryIpcHandlers } from './ipc-handlers'
 import { SetterSettingService } from './setter-setting-service'
+import { SettingsJsonFileService } from './settings-json-file-service'
 
 export type OnChangeCallback<T = any> = (
   newValue: T,
@@ -42,9 +41,12 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
  */
 @Shard(SettingFactoryMain.id)
 export class SettingFactoryMain implements IAkariShardInitDispose {
-  static id = 'setting-factory-main'
+  static id = SETTING_FACTORY_MAIN_NAMESPACE
 
   private readonly _settings: Map<string, SetterSettingService> = new Map()
+  private readonly _context: SettingFactoryMainContext
+  private readonly _settingsJsonFileService: SettingsJsonFileService
+  private readonly _ipcHandlers: SettingFactoryIpcHandlers
 
   readonly _delayed = new DelayedTaskScheduler()
 
@@ -52,7 +54,20 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     private readonly _ipc: AkariIpcMain,
     private readonly _storage: StorageMain,
     private readonly _shared: SharedGlobalShard
-  ) {}
+  ) {
+    this._context = {
+      namespace: SettingFactoryMain.id,
+      ipc: this._ipc,
+      storage: this._storage,
+      shared: this._shared
+    }
+    this._settingsJsonFileService = new SettingsJsonFileService(this._context)
+    this._ipcHandlers = new SettingFactoryIpcHandlers(
+      this._context,
+      this,
+      this._settingsJsonFileService
+    )
+  }
 
   register<T extends object = any>(
     namespace: string,
@@ -69,6 +84,42 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
     this._settings.set(namespace, service)
     return service
+  }
+
+  getSettingService(namespace: string) {
+    return this._settings.get(namespace)
+  }
+
+  async setSetting(namespace: string, key: string, newValue: any) {
+    const service = this._settings.get(namespace)
+
+    if (service) {
+      await service.set(key, newValue)
+    } else {
+      await this._saveToStorage(namespace, key, newValue)
+    }
+  }
+
+  async getSetting(namespace: string, key: string) {
+    const service = this._settings.get(namespace)
+    if (service) {
+      return service.get(key)
+    }
+
+    return this._getFromStorage(namespace, key)
+  }
+
+  async getSettingsByPrefix(namespace: string, keyPrefix: string) {
+    return this._getByPrefixFromStorage(namespace, keyPrefix)
+  }
+
+  async removeSettingsByPrefix(namespace: string, keyPrefix: string) {
+    const service = this._settings.get(namespace)
+    if (service) {
+      return service._removeByPrefixFromStorage(keyPrefix)
+    }
+
+    return this._removeByPrefixFromStorage(namespace, keyPrefix)
   }
 
   /**
@@ -223,206 +274,25 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
    * 从应用目录读取某个 JSON 文件，提供一个文件名
    */
   async readFromJsonConfigFile<T = any>(namespace: string, filename: string): Promise<T> {
-    if (!namespace) {
-      throw new Error('domain is required')
-    }
-
-    const jsonPath = path.join(
-      app.getPath('userData'),
-      SetterSettingService.CONFIG_DIR_NAME,
-      namespace,
-      filename
-    )
-
-    if (!fs.existsSync(jsonPath)) {
-      throw new Error(`config file ${filename} does not exist`)
-    }
-
-    // 读取 UTF-8 格式的 JSON 文件
-    const content = await fs.promises.readFile(jsonPath, 'utf-8')
-    return JSON.parse(content)
+    return this._settingsJsonFileService.readConfigFile(namespace, filename)
   }
 
   /**
    * 将某个东西写入到 JSON 文件中，提供一个文件名
    */
   async writeToJsonConfigFile(namespace: string, filename: string, data: any) {
-    if (!namespace) {
-      throw new Error('domain is required')
-    }
-
-    const jsonPath = path.join(
-      app.getPath('userData'),
-      SetterSettingService.CONFIG_DIR_NAME,
-      namespace,
-      filename
-    )
-
-    await fs.promises.mkdir(path.dirname(jsonPath), { recursive: true })
-    await fs.promises.writeFile(jsonPath, JSON.stringify(data, null, 2), 'utf-8')
+    return this._settingsJsonFileService.writeConfigFile(namespace, filename, data)
   }
 
   /**
    * 检查某个 json 配置文件是否存在
    */
   async jsonConfigFileExists(namespace: string, filename: string) {
-    if (!namespace) {
-      throw new Error('domain is required')
-    }
-
-    const jsonPath = path.join(
-      app.getPath('userData'),
-      SetterSettingService.CONFIG_DIR_NAME,
-      namespace,
-      filename
-    )
-
-    return fs.promises
-      .access(jsonPath, fs.constants.F_OK)
-      .then(() => true)
-      .catch(() => false)
+    return this._settingsJsonFileService.configFileExists(namespace, filename)
   }
 
   async onInit() {
-    /**
-     * 渲染进程请求获取设置项
-     */
-    this._ipc.onCall(
-      SettingFactoryMain.id,
-      'set',
-      async (_, namespace: string, key: string, newValue: any) => {
-        const service = this._settings.get(namespace)
-
-        if (service) {
-          await service.set(key, newValue)
-        } else {
-          await this._saveToStorage(namespace, key, newValue)
-        }
-      }
-    )
-
-    this._ipc.onCall(SettingFactoryMain.id, 'get', async (_, namespace: string, key: string) => {
-      const service = this._settings.get(namespace)
-      if (service) {
-        return service.get(key)
-      }
-
-      return this._getFromStorage(namespace, key)
-    })
-
-    this._ipc.onCall(
-      SettingFactoryMain.id,
-      'getByPrefix',
-      async (_, namespace: string, keyPrefix: string) => {
-        return this._getByPrefixFromStorage(namespace, keyPrefix)
-      }
-    )
-
-    this._ipc.onCall(
-      SettingFactoryMain.id,
-      'removeByPrefix',
-      async (_, namespace: string, keyPrefix: string) => {
-        const service = this._settings.get(namespace)
-        if (service) {
-          return service._removeByPrefixFromStorage(keyPrefix)
-        }
-
-        return this._removeByPrefixFromStorage(namespace, keyPrefix)
-      }
-    )
-
-    this._ipc.onCall(SettingFactoryMain.id, 'exportSettingsToJsonFile', async () => {
-      const windowManager = this._shared.manager.getInstance(
-        'window-manager-main'
-      ) as WindowManagerMain
-
-      if (!windowManager || !windowManager.mainWindow.window) {
-        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
-      }
-
-      const result = await dialog.showSaveDialog(windowManager.mainWindow.window, {
-        defaultPath: 'league-akari-settings.json',
-        filters: [{ name: 'JSON', extensions: ['json'] }]
-      })
-
-      if (result.canceled) {
-        return
-      }
-
-      const filePath = result.filePath
-      return await this._writeSettingsToJsonFile(filePath)
-    })
-
-    this._ipc.onCall(SettingFactoryMain.id, 'importSettingsFromJsonFile', async () => {
-      const windowManager = this._shared.manager.getInstance(
-        'window-manager-main'
-      ) as WindowManagerMain
-
-      if (!windowManager || !windowManager.mainWindow.window) {
-        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
-      }
-
-      const result = await dialog.showOpenDialog(windowManager.mainWindow.window, {
-        defaultPath: 'league-akari-settings.json',
-        filters: [{ name: 'JSON', extensions: ['json'] }]
-      })
-
-      if (result.canceled) {
-        return
-      }
-
-      const filePath = result.filePaths[0]
-      return await this._readSettingsFromJsonFile(filePath)
-    })
-  }
-
-  private async _writeSettingsToJsonFile(path: string) {
-    const all = await this._storage.dataSource.manager.find(Setting)
-
-    const jsonContent = {
-      databaseVersion: StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION,
-      type: 'league-akari-settings',
-      data: all
-    }
-
-    await fs.promises.writeFile(path, JSON.stringify(jsonContent), 'utf-8')
-
-    return path
-  }
-
-  private async _readSettingsFromJsonFile(path: string) {
-    await fs.promises.access(path, fs.constants.F_OK)
-
-    const content = JSON.parse(await fs.promises.readFile(path, 'utf-8'))
-
-    // 检查文件类型
-    if (content.type !== 'league-akari-settings') {
-      throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsFile')
-    }
-
-    // 检查数据库版本
-    if (content.databaseVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
-      throw new AkariIpcError(
-        `The file is from a newer version of the application, please update the application first`,
-        'InvalidDatabaseVersion'
-      )
-    }
-
-    // 检查字段类型
-    if (
-      !Array.isArray(content.data) ||
-      !content.data.every(
-        (v: any) =>
-          typeof v === 'object' && typeof v.key === 'string' && typeof v.value !== 'undefined'
-      )
-    ) {
-      throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsData')
-    }
-
-    // 替换数据库中上述提到的设置项
-    await this._storage.dataSource.manager.save(Setting, content.data)
-
-    this._shared.global.restart()
+    this._ipcHandlers.register()
   }
 
   async onDispose() {

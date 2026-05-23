@@ -4,28 +4,43 @@ import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAutoChampConfigStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'auto-champ-config-main'
+import {
+  AUTO_CHAMP_CONFIG_MAIN_NAMESPACE,
+  AUTO_CHAMP_CONFIG_RENDERER_NAMESPACE,
+  type AutoChampConfigRendererContext
+} from './context'
+import { syncAutoChampConfigSettings } from './settings-sync'
 
 @Shard(AutoChampConfigRenderer.id)
 export class AutoChampConfigRenderer implements IAkariShardInitDispose {
-  static id = 'auto-champ-config-renderer'
+  static id = AUTO_CHAMP_CONFIG_RENDERER_NAMESPACE
+
+  private readonly _context: AutoChampConfigRendererContext
 
   constructor(
-    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
-  ) {}
+    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) settingUtils: SettingUtilsRenderer
+  ) {
+    this._context = {
+      ipc,
+      piniaMobxUtils,
+      settingUtils
+    }
+  }
 
   async onInit() {
-    const store = useAutoChampConfigStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await syncAutoChampConfigSettings(this._context)
   }
 
   updateRunes(championId: number, mode: string, runes: ChampionRunesConfig | null) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateRunes', championId, mode, runes)
+    return this._context.ipc.call(
+      AUTO_CHAMP_CONFIG_MAIN_NAMESPACE,
+      'updateRunes',
+      championId,
+      mode,
+      runes
+    )
   }
 
   updatePositionRunes(
@@ -34,8 +49,8 @@ export class AutoChampConfigRenderer implements IAkariShardInitDispose {
     position: string,
     runes: ChampionRunesConfig | null
   ) {
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
+    return this._context.ipc.call(
+      AUTO_CHAMP_CONFIG_MAIN_NAMESPACE,
       'updateRunes',
       championId,
       `${mode}-${position}`,
@@ -44,7 +59,13 @@ export class AutoChampConfigRenderer implements IAkariShardInitDispose {
   }
 
   updateSummonerSpells(championId: number, mode: string, spells: SummonerSpellsConfig | null) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateSummonerSpells', championId, mode, spells)
+    return this._context.ipc.call(
+      AUTO_CHAMP_CONFIG_MAIN_NAMESPACE,
+      'updateSummonerSpells',
+      championId,
+      mode,
+      spells
+    )
   }
 
   updatePositionSummonerSpells(
@@ -53,8 +74,8 @@ export class AutoChampConfigRenderer implements IAkariShardInitDispose {
     position: string,
     spells: SummonerSpellsConfig | null
   ) {
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
+    return this._context.ipc.call(
+      AUTO_CHAMP_CONFIG_MAIN_NAMESPACE,
       'updateSummonerSpells',
       championId,
       `${mode}-${position}`,
@@ -63,7 +84,7 @@ export class AutoChampConfigRenderer implements IAkariShardInitDispose {
   }
 
   setEnabled(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enabled', enabled)
+    return this._context.settingUtils.set(AUTO_CHAMP_CONFIG_MAIN_NAMESPACE, 'enabled', enabled)
   }
 
   async onDispose() {}

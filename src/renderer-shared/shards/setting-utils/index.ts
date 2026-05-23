@@ -1,42 +1,64 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Paths } from '@shared/utils/types'
-import _ from 'lodash'
-import { WatchOptions, toRaw, watch } from 'vue'
+import { WatchOptions } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
+import {
+  SETTING_FACTORY_MAIN_NAMESPACE,
+  SETTING_UTILS_RENDERER_NAMESPACE,
+  type SettingUtilsRendererContext
+} from './context'
+import { SavedSettingWatcher } from './saved-setting-watcher'
 
-export const MAIN_SHARD_NAMESPACE = 'setting-factory-main'
+export { SETTING_FACTORY_MAIN_NAMESPACE as MAIN_SHARD_NAMESPACE } from './context'
 
 @Shard(SettingUtilsRenderer.id)
 export class SettingUtilsRenderer implements IAkariShardInitDispose {
-  static id = 'setting-utils-renderer'
+  static id = SETTING_UTILS_RENDERER_NAMESPACE
 
-  private _stopHandles = new Set<Function>()
+  private readonly _context: SettingUtilsRendererContext
+  private readonly _savedSettingWatcher: SavedSettingWatcher
 
-  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
+  constructor(@Dep(AkariIpcRenderer) ipc: AkariIpcRenderer) {
+    this._context = { ipc }
+    this._savedSettingWatcher = new SavedSettingWatcher(this)
+  }
 
   set(namespace: string, key: string, value: any) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'set', namespace, key, value)
+    return this._context.ipc.call(SETTING_FACTORY_MAIN_NAMESPACE, 'set', namespace, key, value)
   }
 
   async get(namespace: string, key: string, defaultValue?: any) {
-    return (await this._ipc.call(MAIN_SHARD_NAMESPACE, 'get', namespace, key)) ?? defaultValue
+    return (
+      (await this._context.ipc.call(SETTING_FACTORY_MAIN_NAMESPACE, 'get', namespace, key)) ??
+      defaultValue
+    )
   }
 
   getByPrefix(namespace: string, keyPrefix: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getByPrefix', namespace, keyPrefix)
+    return this._context.ipc.call(
+      SETTING_FACTORY_MAIN_NAMESPACE,
+      'getByPrefix',
+      namespace,
+      keyPrefix
+    )
   }
 
   removeByPrefix(namespace: string, keyPrefix: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeByPrefix', namespace, keyPrefix)
+    return this._context.ipc.call(
+      SETTING_FACTORY_MAIN_NAMESPACE,
+      'removeByPrefix',
+      namespace,
+      keyPrefix
+    )
   }
 
   exportSettingsToJsonFile() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exportSettingsToJsonFile')
+    return this._context.ipc.call(SETTING_FACTORY_MAIN_NAMESPACE, 'exportSettingsToJsonFile')
   }
 
   importSettingsFromJsonFile() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'importSettingsFromJsonFile')
+    return this._context.ipc.call(SETTING_FACTORY_MAIN_NAMESPACE, 'importSettingsFromJsonFile')
   }
 
   /**
@@ -49,11 +71,7 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     getter: () => any,
     initValueSetter: (value: any) => void
   ) {
-    initValueSetter(await this.get(namespace, key, getter()))
-    const stopHandle = watch(getter, (value) => {
-      this.set(namespace, key, toRaw(value))
-    })
-    this._stopHandles.add(stopHandle)
+    await this._savedSettingWatcher.savedGetterVue(namespace, key, getter, initValueSetter)
   }
 
   /**
@@ -68,27 +86,10 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
       watchOptions?: WatchOptions
     } = {}
   ) {
-    const { savePropKey, watchOptions } = options
-
-    const value = await this.get(
-      namespace,
-      savePropKey ? savePropKey : propKey,
-      _.get(object, propKey)
-    )
-    _.set(object, propKey, value)
-    const stopHandle = watch(
-      () => _.get(object, propKey),
-      (value) => {
-        this.set(namespace, savePropKey ? savePropKey : propKey, toRaw(value))
-      },
-      watchOptions
-    )
-    this._stopHandles.add(stopHandle)
+    await this._savedSettingWatcher.savedPropVue(namespace, object, propKey, options)
   }
 
   async onDispose() {
-    for (const stopHandle of this._stopHandles) {
-      stopHandle()
-    }
+    this._savedSettingWatcher.dispose()
   }
 }

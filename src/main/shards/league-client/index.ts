@@ -23,35 +23,26 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import {
+  LEAGUE_CLIENT_MAIN_NAMESPACE,
+  LeagueClientLcuUninitializedError,
+  type LeagueClientMainContext
+} from './context'
+import { LeagueClientIpcHandlers } from './ipc-handlers'
 import { LeagueClientData } from './lc-state'
 import { LeagueClientSettings, LeagueClientState } from './state'
 
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
-export interface LeagueClientMainContext {
-  namespace: string
-  mobxUtils: MobxUtilsMain
-  ipc: AkariIpcMain
-  logger: AkariLogger
-  leagueClient: LeagueClientMain
-}
-
-export interface LaunchSpectatorConfig {
-  locale?: string
-  region: string
-  puuid: string
-}
-
-export class LeagueClientLcuUninitializedError extends Error {
-  name = 'LeagueClientLcuUninitializedError'
-}
+export { LeagueClientLcuUninitializedError }
+export type { LeagueClientMainContext }
 
 /**
  * League Client 相关功能, 包括与 LeagueClient.exe 的连接, 封装的 HTTP 请求, 以及 WebSocket 通信
  */
 @Shard(LeagueClientMain.id)
 export class LeagueClientMain implements IAkariShardInitDispose {
-  static id = 'league-client-main'
+  static id = LEAGUE_CLIENT_MAIN_NAMESPACE
 
   static CONNECT_TO_LC_RETRY_INTERVAL = 2000
   static HTTP_PING_URL = '/riotclient/auth-token'
@@ -65,6 +56,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
+  private readonly _context: LeagueClientMainContext
+  private readonly _ipcHandlers: LeagueClientIpcHandlers
 
   private _httpClient: AxiosInstance | null = null
   private _webSocket: WebSocket | null = null
@@ -124,13 +117,15 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       this.settings
     )
 
-    this._leagueClientData = new LeagueClientData({
+    this._context = {
       ipc: this._ipc,
       leagueClient: this,
       logger: this._logger,
       mobxUtils: this._mobxUtils,
       namespace: LeagueClientMain.id
-    })
+    }
+    this._ipcHandlers = new LeagueClientIpcHandlers(this._context)
+    this._leagueClientData = new LeagueClientData(this._context)
 
     this._registerProtocol()
   }
@@ -138,7 +133,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   async onInit() {
     this._leagueClientData.init()
     this._setupState()
-    this._registerIpcHandlers()
+    this._ipcHandlers.register()
     this._watchConnection()
   }
 
@@ -230,90 +225,68 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._mobxUtils.propSync(LeagueClientMain.id, 'settings', this.settings, ['autoConnect'])
   }
 
-  private _registerIpcHandlers() {
-    this._ipc.onCall(LeagueClientMain.id, 'http-request', async (_, config) => {
-      if (this.state.connectionState !== 'connected') {
-        throw new LeagueClientLcuUninitializedError()
-      }
+  async requestForRenderer(config: AxiosRequestConfig) {
+    if (this.state.connectionState !== 'connected') {
+      throw new LeagueClientLcuUninitializedError()
+    }
 
-      // 通过 IPC 调用的网络请求，则是不完整的可序列化信息
-      try {
-        const { config: c, request, ...rest } = await this._httpClient!.request(config)
+    // 通过 IPC 调用的网络请求，则是不完整的可序列化信息
+    try {
+      const { config: c, request, ...rest } = await this._httpClient!.request(config)
+      return { ...rest, config: { data: c.data, url: c.url } }
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        const { config: c, request, ...rest } = error.response
         return { ...rest, config: { data: c.data, url: c.url } }
-      } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          const { config: c, request, ...rest } = error.response
-          return { ...rest, config: { data: c.data, url: c.url } }
-        }
-
-        this._logger.warn('LeagueClient HTTP Client Error', error)
-        throw error
       }
-    })
 
-    this._ipc.onCall(
-      LeagueClientMain.id,
-      'connect',
-      async (_, auth: UxCommandLine & { force?: boolean }) => {
-        if (this.state.connectionState === 'connected') {
-          this._disconnect()
-        }
+      this._logger.warn('LeagueClient HTTP Client Error', error)
+      throw error
+    }
+  }
 
-        if (auth.force) {
-          this._shouldHaveOneAttempt = true
-        }
-
-        await this._leagueClientUx.update()
-        this.state.setConnectingClient(auth)
-      }
-    )
-
-    this._ipc.onCall(LeagueClientMain.id, 'disconnect', async () => {
-      this._manuallyDisconnected = true
+  async connect(auth: UxCommandLine & { force?: boolean }) {
+    if (this.state.connectionState === 'connected') {
       this._disconnect()
+    }
+
+    if (auth.force) {
+      this._shouldHaveOneAttempt = true
+    }
+
+    await this._leagueClientUx.update()
+    this.state.setConnectingClient(auth)
+  }
+
+  disconnect() {
+    this._manuallyDisconnected = true
+    this._disconnect()
+  }
+
+  subscribeLcuEndpoint(uri: string) {
+    const newId = `__${this._rendererSubIncrement++}`
+    const dispose = this._eventBus.on(uri, (data, params) => {
+      this._ipc.sendEvent(LeagueClientMain.id, 'extra-lcu-event', newId, data, params)
     })
+    this._rendererSubMap.set(newId, dispose)
 
-    this._ipc.onCall(
-      LeagueClientMain.id,
-      'writeItemSetsToDisk',
-      async (_, itemSets: any[] | null, clearPrevious: boolean) => {
-        await this.writeItemSetsToDisk(itemSets, clearPrevious)
-      }
-    )
+    this._logger.debug(`Renderer subscribed to LCU event ${uri}, ID: ${newId}`)
 
-    this._ipc.onCall(LeagueClientMain.id, 'fixWindowMethodA', async (_, config) => {
-      await this.fixWindowMethodA(config)
-    })
+    return newId
+  }
 
-    this._ipc.onCall(LeagueClientMain.id, 'subscribeLcuEndpoint', async (_, uri: string) => {
-      const newId = `__${this._rendererSubIncrement++}`
-      const dispose = this._eventBus.on(uri, (data, params) => {
-        this._ipc.sendEvent(LeagueClientMain.id, 'extra-lcu-event', newId, data, params)
-      })
-      this._rendererSubMap.set(newId, dispose)
+  unsubscribeLcuEndpoint(subId: string) {
+    const dispose = this._rendererSubMap.get(subId)
+    if (dispose) {
+      dispose()
+      this._rendererSubMap.delete(subId)
 
-      this._logger.debug(`Renderer subscribed to LCU event ${uri}, ID: ${newId}`)
+      this._logger.debug(`Renderer unsubscribed from LCU event, ID: ${subId}`)
 
-      return newId
-    })
+      return true
+    }
 
-    this._ipc.onCall(LeagueClientMain.id, 'unsubscribeLcuEndpoint', async (_, subId: string) => {
-      const dispose = this._rendererSubMap.get(subId)
-      if (dispose) {
-        dispose()
-        this._rendererSubMap.delete(subId)
-
-        this._logger.debug(`Renderer unsubscribed from LCU event, ID: ${subId}`)
-
-        return true
-      }
-
-      return false
-    })
-
-    this._ipc.onCall(LeagueClientMain.id, 'peekClient', async (_, auth: UxCommandLine) => {
-      return await this._peekClient(auth)
-    })
+    return false
   }
 
   /**
@@ -656,7 +629,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   /**
    * 在连接之前, 先尝试获取一些召唤师信息
    */
-  private async _peekClient(auth: UxCommandLine) {
+  async peekClient(auth: UxCommandLine) {
     const c = axios.create({
       baseURL: `https://127.0.0.1:${auth.port}`,
       headers: {

@@ -9,21 +9,30 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import {
+  RIOT_CLIENT_MAIN_NAMESPACE,
+  RIOT_CLIENT_REQUEST_TIMEOUT_MS,
+  type RiotClientMainContext,
+  RiotClientRcuUninitializedError
+} from './context'
+import { RiotClientIpcHandlers } from './ipc-handlers'
+import { RiotClientProtocolController } from './protocol-controller'
 
-export class RiotClientRcuUninitializedError extends Error {
-  name = 'RiotClientRcuUninitializedError'
-}
+export { RiotClientRcuUninitializedError }
 
 /**
  * Riot Client 相关封装
  */
 @Shard(RiotClientMain.id)
 export class RiotClientMain implements IAkariShardInitDispose {
-  static id = 'riot-client-main'
+  static id = RIOT_CLIENT_MAIN_NAMESPACE
 
-  static REQUEST_TIMEOUT_MS = 17500
+  static REQUEST_TIMEOUT_MS = RIOT_CLIENT_REQUEST_TIMEOUT_MS
 
   private readonly _logger: AkariLogger
+  private readonly _context: RiotClientMainContext
+  private readonly _ipcHandlers: RiotClientIpcHandlers
+  private readonly _protocolController: RiotClientProtocolController
 
   private _riotClientApi: RiotClientHttpApiAxiosHelper | null = null
 
@@ -35,14 +44,25 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    readonly _loggerFactory: LoggerFactoryMain,
+    _loggerFactory: LoggerFactoryMain,
     private readonly _mobxUtils: MobxUtilsMain,
     private readonly _leagueClient: LeagueClientMain,
     private readonly _protocol: AkariProtocolMain
   ) {
     this._logger = _loggerFactory.create(RiotClientMain.id)
+    this._context = {
+      namespace: RiotClientMain.id,
+      ipc: this._ipc,
+      leagueClient: this._leagueClient,
+      logger: this._logger,
+      mobxUtils: this._mobxUtils,
+      protocol: this._protocol,
+      riotClient: this
+    }
+    this._ipcHandlers = new RiotClientIpcHandlers(this._context)
+    this._protocolController = new RiotClientProtocolController(this._context)
 
-    this._registerProtocol()
+    this._protocolController.register()
   }
 
   get api() {
@@ -53,75 +73,61 @@ export class RiotClientMain implements IAkariShardInitDispose {
     return this._riotClientApi
   }
 
-  private _registerProtocol() {
-    this._protocol.registerDomain('riot-client', async (uri, req) => {
-      const reqHeaders: Record<string, string> = {}
-      req.headers.forEach((value, key) => {
-        reqHeaders[key] = value
-      })
+  async requestForRenderer(config: AxiosRequestConfig) {
+    try {
+      const { config: c, request, ...rest } = await this._httpClient!.request(config)
 
-      try {
-        const config: AxiosRequestConfig = {
-          method: req.method,
-          url: uri,
-          data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
-          validateStatus: () => true,
-          responseType: 'stream',
-          headers: reqHeaders
-        }
-
-        const res = await this.request(config)
-
-        const resHeaders = Object.fromEntries(
-          Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
-        )
-
-        return new Response(AkariProtocolMain.shouldNotHaveBody(res.status) ? null : res.data, {
-          statusText: res.statusText,
-          headers: resHeaders,
-          status: res.status
-        })
-      } catch (error) {
-        this._logger.warn(`Failed to RiotClient request`, error)
-
-        if (error instanceof RiotClientRcuUninitializedError) {
-          return new Response(JSON.stringify({ error: error.name }), {
-            headers: { 'Content-Type': 'application/json' },
-            status: 503
-          })
-        }
-
-        return new Response((error as Error).message, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 500
-        })
+      return {
+        ...rest,
+        config: { data: c.data, url: c.url }
       }
-    })
-  }
-
-  private _registerIpcHandlers() {
-    this._ipc.onCall(RiotClientMain.id, 'http-request', async (_, config) => {
-      try {
-        const { config: c, request, ...rest } = await this._httpClient!.request(config)
-
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        const { config: c, request, ...rest } = error.response
         return {
           ...rest,
           config: { data: c.data, url: c.url }
         }
-      } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          const { config: c, request, ...rest } = error.response
-          return {
-            ...rest,
-            config: { data: c.data, url: c.url }
-          }
-        }
-
-        this._logger.warn(`RiotClient HTTP client error`, error)
-
-        throw error
       }
-    })
+
+      this._logger.warn(`RiotClient HTTP client error`, error)
+
+      throw error
+    }
+  }
+
+  /**
+   * RC 的请求, 🐰
+   */
+  async request<T = any, D = any>(config: AxiosRequestConfig<D>) {
+    if (!this._httpClient) {
+      throw new Error('RC Uninitialized')
+    }
+
+    return this._httpClient.request<T>(config)
+  }
+
+  async onInit() {
+    this._ipcHandlers.register()
+
+    this._mobxUtils.reaction(
+      () => this._leagueClient.state.auth,
+      async (auth) => {
+        if (auth) {
+          this._initHttpInstance(auth)
+        } else {
+          this._httpClient = null
+          this._riotClientApi = null
+        }
+      },
+      { fireImmediately: true }
+    )
+  }
+
+  async onDispose() {
+    this._httpClient = null
+    this._riotClientApi = null
+    this._protocol.unregisterDomain('riot-client')
   }
 
   private _initHttpInstance(auth: UxCommandLine) {
@@ -142,39 +148,5 @@ export class RiotClientMain implements IAkariShardInitDispose {
     })
 
     this._riotClientApi = new RiotClientHttpApiAxiosHelper(this._httpClient)
-  }
-
-  /**
-   * RC 的请求, 🐰
-   */
-  async request<T = any, D = any>(config: AxiosRequestConfig<D>) {
-    if (!this._httpClient) {
-      throw new Error('RC Uninitialized')
-    }
-
-    return this._httpClient.request<T>(config)
-  }
-
-  async onInit() {
-    this._registerIpcHandlers()
-
-    this._mobxUtils.reaction(
-      () => this._leagueClient.state.auth,
-      async (auth) => {
-        if (auth) {
-          this._initHttpInstance(auth)
-        } else {
-          this._httpClient = null
-          this._riotClientApi = null
-        }
-      },
-      { fireImmediately: true }
-    )
-  }
-
-  async onDispose() {
-    this._httpClient = null
-    this._riotClientApi = null
-    this._protocol.unregisterDomain('riot-client')
   }
 }

@@ -1,186 +1,56 @@
 import { Dep, Shard } from '@shared/akari-shard'
-import { formatError } from '@shared/utils/errors'
-import dayjs from 'dayjs'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { RendererConsoleLogEmitter } from './console-log-emitter'
+import { LOGGER_RENDERER_NAMESPACE, MAIN_SHARD_NAMESPACE, type RendererLogLevel } from './context'
+import { RendererLogMessageFormatter } from './log-message-formatter'
 import { useLoggerStore } from './store'
 
-export const MAIN_SHARD_NAMESPACE = 'logger-factory-main'
+export { MAIN_SHARD_NAMESPACE }
 
 @Shard(LoggerRenderer.id)
 export class LoggerRenderer {
-  static id = 'logger-renderer'
+  static id = LOGGER_RENDERER_NAMESPACE
+
+  private readonly _formatter = new RendererLogMessageFormatter()
+  private readonly _consoleEmitter = new RendererConsoleLogEmitter()
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
   ) {}
 
-  // same as main shard
-  private _objectsToString(...args: any[]) {
-    return args
-      .map((arg) => {
-        if (arg instanceof Error) {
-          return formatError(arg)
-        }
-
-        if (typeof arg === 'undefined') {
-          return 'undefined'
-        }
-
-        if (typeof arg === 'function') {
-          return arg.toString()
-        }
-
-        if (typeof arg === 'object') {
-          try {
-            return JSON.stringify(arg, null, 2)
-          } catch (error) {
-            return arg.toString()
-          }
-        }
-
-        return arg
-      })
-      .join(' ')
-  }
-
-  private _emitLog(level: string, namespace: string, ...args: any[]) {
-    const fn = {
-      info: console.info,
-      warn: console.warn,
-      error: console.error,
-      debug: console.debug
-    }
-
-    const scheme = this._getColorScheme()
-
-    fn[level]?.(
-      `%c[${dayjs().format('HH:mm:ss:SSS')}] %c[%c${namespace}%c] %c[${level}]`,
-      scheme[level].timestamp,
-      'color: inherit;',
-      scheme[level].namespace,
-      'color: inherit;',
-      scheme[level].level,
-      ...args
-    )
-  }
-
   info(namespace: string, ...args: any[]) {
-    this._emitLog('info', namespace, ...args)
-
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
-      'log',
-      namespace,
-      'info',
-      this._objectsToString(...args)
-    )
+    return this._log('info', namespace, ...args)
   }
 
   warn(namespace: string, ...args: any[]) {
-    this._emitLog('warn', namespace, ...args)
-
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
-      'log',
-      namespace,
-      'warn',
-      this._objectsToString(...args)
-    )
+    return this._log('warn', namespace, ...args)
   }
 
   error(namespace: string, ...args: any[]) {
-    this._emitLog('error', namespace, ...args)
-
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
-      'log',
-      namespace,
-      'error',
-      this._objectsToString(...args)
-    )
+    return this._log('error', namespace, ...args)
   }
 
   debug(namespace: string, ...args: any[]) {
-    this._emitLog('debug', namespace, ...args)
-
-    return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
-      'log',
-      namespace,
-      'debug',
-      this._objectsToString(...args)
-    )
+    return this._log('debug', namespace, ...args)
   }
 
   infoRenderer(namespace: string, ...args: any[]) {
-    this._emitLog('info', namespace, ...args)
+    this._consoleEmitter.emit('info', namespace, ...args)
   }
 
   warnRenderer(namespace: string, ...args: any[]) {
-    this._emitLog('warn', namespace, ...args)
+    this._consoleEmitter.emit('warn', namespace, ...args)
   }
 
   errorRenderer(namespace: string, ...args: any[]) {
-    this._emitLog('error', namespace, ...args)
+    this._consoleEmitter.emit('error', namespace, ...args)
   }
 
   debugRenderer(namespace: string, ...args: any[]) {
-    this._emitLog('debug', namespace, ...args)
-  }
-
-  private _getColorScheme() {
-    const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-    const darkColors = {
-      debug: {
-        timestamp: 'color: #9aa0a6; font-weight: bold;',
-        namespace: 'color: #b39ddb; font-weight: bold;',
-        level: 'color: #26a69a; font-weight: bold;'
-      },
-      info: {
-        timestamp: 'color: #9aa0a6; font-weight: bold;',
-        namespace: 'color: #b39ddb; font-weight: bold;',
-        level: 'color: #42a5f5; font-weight: bold;'
-      },
-      warn: {
-        timestamp: 'color: #9aa0a6; font-weight: bold;',
-        namespace: 'color: #b39ddb; font-weight: bold;',
-        level: 'color: #ffc107; font-weight: bold;'
-      },
-      error: {
-        timestamp: 'color: #9aa0a6; font-weight: bold;',
-        namespace: 'color: #b39ddb; font-weight: bold;',
-        level: 'color: #ef5350; font-weight: bold;'
-      }
-    }
-
-    const lightColors = {
-      debug: {
-        timestamp: 'color: #555; font-weight: bold;',
-        namespace: 'color: #7e57c2; font-weight: bold;',
-        level: 'color: #00897b; font-weight: bold;'
-      },
-      info: {
-        timestamp: 'color: #555; font-weight: bold;',
-        namespace: 'color: #7e57c2; font-weight: bold;',
-        level: 'color: #1565c0; font-weight: bold;'
-      },
-      warn: {
-        timestamp: 'color: #555; font-weight: bold;',
-        namespace: 'color: #7e57c2; font-weight: bold;',
-        level: 'color: #fb8c00; font-weight: bold;'
-      },
-      error: {
-        timestamp: 'color: #555; font-weight: bold;',
-        namespace: 'color: #7e57c2; font-weight: bold;',
-        level: 'color: #d32f2f; font-weight: bold;'
-      }
-    }
-
-    return preferDark ? darkColors : lightColors
+    this._consoleEmitter.emit('debug', namespace, ...args)
   }
 
   createLogger(namespace: string) {
@@ -204,5 +74,17 @@ export class LoggerRenderer {
     const store = useLoggerStore()
 
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+  }
+
+  private _log(level: RendererLogLevel, namespace: string, ...args: any[]) {
+    this._consoleEmitter.emit(level, namespace, ...args)
+
+    return this._ipc.call(
+      MAIN_SHARD_NAMESPACE,
+      'log',
+      namespace,
+      level,
+      this._formatter.objectsToString(...args)
+    )
   }
 }

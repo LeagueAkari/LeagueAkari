@@ -3,32 +3,40 @@ import { Dep, Shard } from '@shared/akari-shard'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useLeagueClientUxStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'league-client-ux-main'
+import {
+  LEAGUE_CLIENT_UX_MAIN_NAMESPACE,
+  LEAGUE_CLIENT_UX_RENDERER_NAMESPACE,
+  type LeagueClientUxRendererContext
+} from './context'
+import { syncLeagueClientUxState } from './state-sync'
 
 @Shard(LeagueClientUxRenderer.id)
 export class LeagueClientUxRenderer {
-  static id = 'league-client-ux-renderer'
+  static id = LEAGUE_CLIENT_UX_RENDERER_NAMESPACE
+
+  private readonly _context: LeagueClientUxRendererContext
 
   constructor(
-    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
-  ) {}
+    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) settingUtils: SettingUtilsRenderer
+  ) {
+    this._context = {
+      ipc,
+      piniaMobxUtils,
+      settingUtils
+    }
+  }
 
   setUseWmi(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'useWmi', enabled)
+    return this._context.settingUtils.set(LEAGUE_CLIENT_UX_MAIN_NAMESPACE, 'useWmi', enabled)
   }
 
   rebuildWmi() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'rebuildWmi')
+    return this._context.ipc.call(LEAGUE_CLIENT_UX_MAIN_NAMESPACE, 'rebuildWmi')
   }
 
   async onInit() {
-    const store = useLeagueClientUxStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await syncLeagueClientUxState(this._context)
   }
 }

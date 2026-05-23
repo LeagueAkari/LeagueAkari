@@ -1,22 +1,22 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { useExtraAssetsStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'extra-assets-main'
+import { EXTRA_ASSETS_RENDERER_NAMESPACE, type ExtraAssetsRendererContext } from './context'
+import { syncExtraAssetsState } from './state-sync'
 
 @Shard(ExtraAssetsRenderer.id)
 export class ExtraAssetsRenderer implements IAkariShardInitDispose {
-  static id = 'extra-assets-renderer'
+  static id = EXTRA_ASSETS_RENDERER_NAMESPACE
 
-  constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
-  ) {}
+  private readonly _context: ExtraAssetsRendererContext
+
+  constructor(@Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer) {
+    this._context = {
+      piniaMobxUtils
+    }
+  }
 
   async onInit() {
-    const store = useExtraAssetsStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'gtimg', store.gtimg)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'fandom', store.fandom)
+    await syncExtraAssetsState(this._context)
   }
 }

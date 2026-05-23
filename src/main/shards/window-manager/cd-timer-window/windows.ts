@@ -5,8 +5,8 @@ import icon from '@resources/LA_ICON.ico?asset'
 import { sleep } from '@shared/utils/sleep'
 import { comparer, computed } from 'mobx'
 
-import { type WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
+import type { WindowManagerMainContext } from '../context'
 import { CdTimerWindowSettings, CdTimerWindowState } from './state'
 
 export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTimerWindowSettings> {

@@ -2,27 +2,34 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useRespawnTimerStore } from './store'
-
-const MAIN_SHARD_NAMESPACE = 'respawn-timer-main'
+import {
+  RESPAWN_TIMER_MAIN_NAMESPACE,
+  RESPAWN_TIMER_RENDERER_NAMESPACE,
+  type RespawnTimerRendererContext
+} from './context'
+import { syncRespawnTimerState } from './state-sync'
 
 @Shard(RespawnTimerRenderer.id)
 export class RespawnTimerRenderer implements IAkariShardInitDispose {
-  static id = 'respawn-timer-renderer'
+  static id = RESPAWN_TIMER_RENDERER_NAMESPACE
+
+  private readonly _context: RespawnTimerRendererContext
 
   constructor(
-    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
-  ) {}
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) settingUtils: SettingUtilsRenderer
+  ) {
+    this._context = {
+      piniaMobxUtils,
+      settingUtils
+    }
+  }
 
   async onInit() {
-    const store = useRespawnTimerStore()
-
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await syncRespawnTimerState(this._context)
   }
 
   setEnabled(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enabled', value)
+    return this._context.settingUtils.set(RESPAWN_TIMER_MAIN_NAMESPACE, 'enabled', value)
   }
 }

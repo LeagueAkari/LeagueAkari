@@ -4,201 +4,30 @@ import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { BaseAkariWindowRenderer } from './base-akari-window'
 import {
-  useAuxWindowStore,
-  useCdTimerWindowStore,
-  useMainWindowStore,
-  useOngoingGameWindowStore,
-  useOpggWindowStore,
-  useWindowManagerStore
-} from './store'
+  MAIN_SHARD_NAMESPACE,
+  WINDOW_MANAGER_RENDERER_NAMESPACE,
+  type WindowManagerRendererContext
+} from './context'
+import { useWindowManagerStore } from './store'
+import {
+  AkariAuxWindow,
+  AkariCdTimerWindow,
+  AkariMainWindow,
+  AkariOngoingGameWindow,
+  AkariOpggWindow
+} from './windows'
 
-const MAIN_SHARD_NAMESPACE = 'window-manager-main'
-const MAIN_SHARD_NAMESPACE_MAIN_WINDOW = 'window-manager-main/main-window'
-const MAIN_SHARD_NAMESPACE_AUX_WINDOW = 'window-manager-main/aux-window'
-const MAIN_SHARD_NAMESPACE_OPGG_WINDOW = 'window-manager-main/opgg-window'
-const MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW = 'window-manager-main/ongoing-game-window'
-const MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW = 'window-manager-main/cd-timer-window'
-
-export interface WindowManagerRendererContext {
-  ipc: AkariIpcRenderer
-  setting: SettingUtilsRenderer
-  pm: PiniaMobxUtilsRenderer
-}
-
-class AkariMainWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useMainWindowStore>,
-  ReturnType<typeof useMainWindowStore>['settings']
-> {
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      MAIN_SHARD_NAMESPACE_MAIN_WINDOW,
-      () => useMainWindowStore(),
-      () => useMainWindowStore().settings
-    )
-  }
-
-  onAskClose(fn: (...args: any[]) => void) {
-    return this._context.ipc.onEventVue(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'close-asking', fn)
-  }
-
-  setCloseAction(value: string) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeAction', value)
-  }
-
-  override close(strategy?: string) {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindow', strategy)
-  }
-
-  closeForce() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindowForce')
-  }
-}
-
-class AkariAuxWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useAuxWindowStore>,
-  ReturnType<typeof useAuxWindowStore>['settings']
-> {
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
-      () => useAuxWindowStore(),
-      () => useAuxWindowStore().settings
-    )
-  }
-
-  setAutoShow(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'autoShow', value)
-  }
-
-  setEnabled(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'enabled', value)
-  }
-
-  setShowSkinSelector(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
-  }
-
-  repositionToAlignLeagueClientUx() {
-    return this._context.ipc.call(
-      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
-      'repositionToAlignLeagueClientUx',
-      'top-right'
-    )
-  }
-}
-
-export class AkariOpggWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useOpggWindowStore>,
-  ReturnType<typeof useOpggWindowStore>['settings']
-> {
-  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_OPGG_WINDOW}/show`
-
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      MAIN_SHARD_NAMESPACE_OPGG_WINDOW,
-      () => useOpggWindowStore(),
-      () => useOpggWindowStore().settings
-    )
-  }
-
-  setAutoShow(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'autoShow', value)
-  }
-
-  setEnabled(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'enabled', value)
-  }
-
-  setShowShortcut(value: string | null) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showShortcut', value)
-  }
-
-  repositionToAlignLeagueClientUx() {
-    return this._context.ipc.call(
-      MAIN_SHARD_NAMESPACE_OPGG_WINDOW,
-      'repositionToAlignLeagueClientUx',
-      'top-left'
-    )
-  }
-}
-
-export class AkariOngoingGameWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useOngoingGameWindowStore>,
-  ReturnType<typeof useOngoingGameWindowStore>['settings']
-> {
-  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW}/show`
-
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW,
-      () => useOngoingGameWindowStore(),
-      () => useOngoingGameWindowStore().settings
-    )
-  }
-
-  setEnabled(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW, 'enabled', value)
-  }
-
-  setShowShortcut(value: string | null) {
-    return this._context.setting.set(
-      MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW,
-      'showShortcut',
-      value
-    )
-  }
-}
-
-export class AkariCdTimerWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useCdTimerWindowStore>,
-  ReturnType<typeof useCdTimerWindowStore>['settings']
-> {
-  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW}/show`
-
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW,
-      () => useCdTimerWindowStore(),
-      () => useCdTimerWindowStore().settings
-    )
-  }
-
-  setEnabled(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'enabled', value)
-  }
-
-  setShowShortcut(value: string | null) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'showShortcut', value)
-  }
-
-  setTimerType(value: 'countdown' | 'countup') {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'timerType', value)
-  }
-
-  setReverseAdjustmentDirection(value: boolean) {
-    return this._context.setting.set(
-      MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW,
-      'reverseAdjustmentDirection',
-      value
-    )
-  }
-
-  // 一份复制后的逻辑, 嗯. 就这样吧
-  sendInGame(text: string) {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'sendInGame', text)
-  }
+export {
+  AkariCdTimerWindow,
+  AkariOngoingGameWindow,
+  AkariOpggWindow,
+  type WindowManagerRendererContext
 }
 
 @Shard(WindowManagerRenderer.id)
 export class WindowManagerRenderer implements IAkariShardInitDispose {
-  static id = 'window-manager-renderer'
+  static id = WINDOW_MANAGER_RENDERER_NAMESPACE
 
   private context: WindowManagerRendererContext
 

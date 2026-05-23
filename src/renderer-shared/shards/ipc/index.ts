@@ -1,10 +1,11 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { Dep, IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { formatError } from '@shared/utils/errors'
 import { IpcRendererEvent } from 'electron'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
-import type { LoggerRenderer } from '../logger'
+import { AkariIpcRendererCallService } from './call-service'
+import { AKARI_IPC_RENDERER_NAMESPACE, type AkariIpcRendererContext } from './context'
+import { AkariIpcRendererEventRegistry } from './event-registry'
 
 declare global {
   interface Window {
@@ -12,30 +13,18 @@ declare global {
   }
 }
 
-export interface IpcMainSuccessDataType<T = any> {
-  success: true
-  data: T
-}
-
-export interface IpcMainErrorDataType {
-  success: false
-  isAxiosError?: boolean
-  error: any
-}
-
-const LOGGER_SHARD_NAMESPACE = 'logger-renderer'
-
-export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorDataType
+export type { IpcMainDataType, IpcMainErrorDataType, IpcMainSuccessDataType } from './types'
 
 /**
  * 渲染进程 IPC 工具, 同时杂糅了一点 Vue 的支持
  */
 @Shard(AkariIpcRenderer.id)
 export class AkariIpcRenderer implements IAkariShardInitDispose {
-  static id = 'akari-ipc-renderer'
+  static id = AKARI_IPC_RENDERER_NAMESPACE
 
-  private _eventMap = new Map<string, Set<Function>>()
   private _cancelFn: (() => void) | null = null
+  private readonly _eventRegistry = new AkariIpcRendererEventRegistry()
+  private readonly _callService: AkariIpcRendererCallService
 
   private _dispatchEvent(
     _event: IpcRendererEvent,
@@ -43,14 +32,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
     eventName: string,
     ...args: any[]
   ) {
-    const key = `${namespace}:${eventName}`
-    const functions = this._eventMap.get(key)
-
-    if (functions) {
-      for (const fn of functions) {
-        fn(...args)
-      }
-    }
+    this._eventRegistry.dispatch(_event, namespace, eventName, ...args)
   }
 
   async onInit() {
@@ -61,7 +43,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
   async onDispose() {
     this._cancelFn?.()
     this._cancelFn = null
-    this._eventMap.clear()
+    this._eventRegistry.clear()
     await window.electron.ipcRenderer.invoke('akariRendererRegister', 'unregister')
   }
 
@@ -73,29 +55,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @returns
    */
   async call<T = any>(namespace: string, fnName: string, ...args: any[]) {
-    const result: IpcMainDataType<T> = await window.electron.ipcRenderer.invoke(
-      'akariCall',
-      namespace,
-      fnName,
-      ...args
-    )
-
-    if (result.success) {
-      return result.data as T
-    } else {
-      // axios 错误将不会触发特殊日志
-      if (result.isAxiosError) {
-        throw result.error
-      }
-
-      if (import.meta.env.DEV) {
-        // for lazy loading
-        const logger = this._shared.manager.getInstance(LOGGER_SHARD_NAMESPACE) as LoggerRenderer
-        logger?.warn(`ipc call: ${namespace}`, fnName, args, formatError(result.error))
-      }
-
-      throw result.error
-    }
+    return this._callService.call<T>(namespace, fnName, ...args)
   }
 
   /**
@@ -106,17 +66,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @returns 取消订阅函数
    */
   onEvent(namespace: string, eventName: string, fn: (...args: any[]) => void) {
-    const key = `${namespace}:${eventName}`
-
-    if (!this._eventMap.has(key)) {
-      this._eventMap.set(key, new Set())
-    }
-
-    this._eventMap.get(key)!.add(fn)
-
-    return () => {
-      this._eventMap.get(key)!.delete(fn)
-    }
+    return this._eventRegistry.onEvent(namespace, eventName, fn)
   }
 
   /**
@@ -135,15 +85,12 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @param fn
    */
   offEvent(namespace: string, eventName: string, fn: (...args: any[]) => void) {
-    const key = `${namespace}:${eventName}`
-    const functions = this._eventMap.get(key)
-
-    if (functions) {
-      functions.delete(fn)
-    }
+    this._eventRegistry.offEvent(namespace, eventName, fn)
   }
 
-  constructor(@Dep(SharedGlobalShard) private readonly _shared: SharedGlobalShard) {
+  constructor(@Dep(SharedGlobalShard) shared: SharedGlobalShard) {
+    const context: AkariIpcRendererContext = { shared }
+    this._callService = new AkariIpcRendererCallService(context)
     this._dispatchEvent = this._dispatchEvent.bind(this)
   }
 }
