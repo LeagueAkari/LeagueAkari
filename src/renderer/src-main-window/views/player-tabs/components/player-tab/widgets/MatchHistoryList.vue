@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import MatchCard from '@renderer-shared/components/match-card/MatchCard.vue'
+import type { MatchPreviewPayload } from '@renderer-shared/components/match-preview'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -166,7 +167,8 @@ watch(visibleGameKeys, () => {
   })
 })
 
-const handleFocusGame = ({ summary }: { summary: LcuOrSgpGameSummary | number }) => {
+const handleFocusGame = (payload: MatchPreviewPayload) => {
+  const { summary } = payload
   const extractedGameId = typeof summary === 'number' ? summary : summary.gameId
   const el = matchCardEls.value?.find((el) => {
     const cardSummary = el?.$props.summary as LcuOrSgpGameSummary | undefined
@@ -181,7 +183,17 @@ const handleFocusGame = ({ summary }: { summary: LcuOrSgpGameSummary | number })
       ;(el.$el as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
   } else {
-    previewGame(summary)
+    const localSummary =
+      typeof summary === 'number'
+        ? page.value?.games.find((game) => game.gameId === summary)
+        : summary
+
+    previewGame({
+      ...payload,
+      summary: localSummary ?? summary,
+      details:
+        payload.details ?? (localSummary ? page.value?.details[localSummary.gameId] : undefined)
+    })
   }
 }
 

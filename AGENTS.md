@@ -69,6 +69,24 @@ materially participated in the content of the commit.
 
 ---
 
+## File Organization
+
+Prefer a single file for small, self-contained units. Once a component, feature, shard, composable,
+or utility needs more than one dedicated source file, create a feature directory and keep its private
+supporting files there.
+
+- Do not leave pairs like `SomeComponent.vue` and `some-component.ts` side by side in a broad shared
+  directory when the second file only serves that component.
+- Use a directory such as `some-component/` with the component, local helpers, types, styles, and
+  tests inside it. Export the public contract through `index.ts` when another module needs shared
+  types or helpers.
+- Apply this rule across the project, including renderer components, composables, shards, shared
+  utilities, tests, and docs-adjacent implementation files.
+- Keep broadly reusable primitives in the broad shared directory only when they are genuinely shared
+  by multiple unrelated features.
+
+---
+
 ## Core Architecture: Shards
 
 Everything is organized as **shards** — dependency-injected, lifecycle-managed modules.

@@ -1,6 +1,6 @@
 import { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
 import { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -98,6 +98,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const savedInfo = ref<Record<string, SavedInfo>>({})
 
   const cachedGames = ref<Record<number, LcuOrSgpGameSummary>>({})
+  const gameDetails = ref<Record<number, LcuOrSgpGameDetails>>({})
 
   const matchHistoryLoadingState = ref<Record<string, string>>({})
 
@@ -137,6 +138,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     savedInfo,
 
     cachedGames,
+    gameDetails,
 
     matchHistoryLoadingState,
     summonerLoadingState,

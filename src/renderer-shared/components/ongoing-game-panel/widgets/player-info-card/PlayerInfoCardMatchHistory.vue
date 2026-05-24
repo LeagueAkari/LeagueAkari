@@ -10,14 +10,14 @@
       <template #default="{ item, index }">
         <div
           :class="[
-            'group relative mb-0.5 box-border flex h-8.5 cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-125',
+            'group relative mb-0.5 box-border flex h-8.5 cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-110',
             ogs.settings.showMatchHistoryItemBorder
               ? `border ${getMatchItemThemeClass(item).border}`
               : '',
             getMatchItemThemeClass(item).bg
           ]"
           :key="item.gameId"
-          @click="previewGame(item.game, puuid)"
+          @click="previewGame({ summary: item.game, details: ogs.gameDetails[item.gameId], puuid })"
         >
           <div
             class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"

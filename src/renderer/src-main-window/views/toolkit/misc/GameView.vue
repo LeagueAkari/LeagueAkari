@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
+import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'

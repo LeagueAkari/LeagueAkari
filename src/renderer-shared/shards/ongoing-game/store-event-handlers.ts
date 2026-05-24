@@ -22,6 +22,7 @@ export class OngoingGameStoreEventHandlers {
       store.championMastery = {}
       store.savedInfo = {}
       store.cachedGames = {}
+      store.gameDetails = {}
     })
 
     ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {
@@ -63,6 +64,14 @@ export class OngoingGameStoreEventHandlers {
       store.cachedGames[gameId] = markRaw(data)
     })
 
+    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'game-details-loaded', (gameId: number, data) => {
+      store.gameDetails[gameId] = markRaw(data)
+    })
+
+    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'game-details-removed', (gameId: number) => {
+      delete store.gameDetails[gameId]
+    })
+
     ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
       store.summoner[puuid] = markRaw(data)
     })
@@ -82,14 +91,22 @@ export class OngoingGameStoreEventHandlers {
 
   async loadInitialData(data: OngoingGameAllData) {
     const store = useOngoingGameStore()
-    const { championMastery, matchHistory, rankedStats, savedInfo, summoner, additionalGames } =
-      data
+    const {
+      championMastery,
+      matchHistory,
+      rankedStats,
+      savedInfo,
+      summoner,
+      additionalGames,
+      gameDetails
+    } = data
 
     store.championMastery = this._toShallowedMarkRaw(championMastery)
     store.matchHistory = this._toShallowedMarkRaw(matchHistory)
     store.rankedStats = this._toShallowedMarkRaw(rankedStats)
     store.savedInfo = this._toShallowedMarkRaw(savedInfo)
     store.summoner = this._toShallowedMarkRaw(summoner)
+    store.gameDetails = this._toShallowedMarkRaw(gameDetails)
 
     Object.values(matchHistory).forEach((entry) => {
       const games = entry.data as LcuOrSgpGameSummary[]

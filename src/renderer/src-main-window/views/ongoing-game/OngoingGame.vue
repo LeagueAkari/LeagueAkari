@@ -6,6 +6,7 @@
       :source="previewingGame.source"
       :puuid="previewingGame.puuid"
       :summary="previewingGame.summary"
+      :details="previewingGame.details"
       :hide-privacy="as.settings.streamerMode"
       can-dry-run-ongoing-game
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
@@ -21,12 +22,16 @@
 </template>
 
 <script lang="ts" setup>
-import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
+import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
+import {
+  type MatchPreviewPayload,
+  type MatchPreviewState,
+  toMatchPreviewState
+} from '@renderer-shared/components/match-preview'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { ref, shallowRef } from 'vue'
 
@@ -43,21 +48,13 @@ const as = useAppCommonStore()
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const showPreviewModal = ref(false)
-const previewingGame = shallowRef({
+const previewingGame = shallowRef<MatchPreviewState>({
   gameId: 0,
-  summary: undefined as LcuOrSgpGameSummary | undefined,
-  puuid: undefined as string | undefined,
-  source: 'sgp' as 'sgp' | 'lcu'
+  source: 'sgp'
 })
 
-const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
-  previewingGame.value = {
-    gameId: typeof summary === 'object' ? summary.gameId : summary,
-    summary: typeof summary === 'object' ? summary : undefined,
-    puuid,
-    source: typeof summary === 'object' ? summary.source : as.settings.preferredLolSource
-  }
-
+const handlePreviewGame = (payload: MatchPreviewPayload) => {
+  previewingGame.value = toMatchPreviewState(payload, as.settings.preferredLolSource)
   showPreviewModal.value = true
 }
 

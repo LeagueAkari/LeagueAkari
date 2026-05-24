@@ -69,13 +69,13 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { GameController, TimeOutline } from '@vicons/ionicons5'
 import { Forbid, PlugConnected } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
+import type { MatchPreviewPayload } from '../match-preview'
 import { FIXED_CARD_WIDTH_PX_NUMBER, POSITION_ORDER, PREMADE_TEAMS } from './constants'
 import { provideOngoingGamePanel } from './context'
 import OngoingGameTeam from './widgets/OngoingGameTeam.vue'
@@ -89,7 +89,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   navigateToSummonerByPuuid: [puuid: string]
-  previewGame: [summary: LcuOrSgpGameSummary | number, puuid?: string]
+  previewGame: [payload: MatchPreviewPayload]
 }>()
 
 const { t } = useTranslation()
@@ -243,8 +243,8 @@ provideOngoingGamePanel({
   navigateToSummonerByPuuid: (puuid: string) => {
     emits('navigateToSummonerByPuuid', puuid)
   },
-  previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
-    emits('previewGame', summary, puuid)
+  previewGame: (payload: MatchPreviewPayload) => {
+    emits('previewGame', payload)
   }
 })
 </script>

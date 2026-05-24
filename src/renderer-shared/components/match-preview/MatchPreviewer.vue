@@ -50,7 +50,7 @@ import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { NModal, NSpin } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import MatchCard from './match-card/MatchCard.vue'
+import MatchCard from '../match-card/MatchCard.vue'
 
 const {
   gameId,

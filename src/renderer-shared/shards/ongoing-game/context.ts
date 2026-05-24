@@ -1,4 +1,4 @@
-import type { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -30,6 +30,7 @@ export interface OngoingGameAllData {
   summoner: Record<string, SummonerInfo>
   rankedStats: Record<string, RankedStats>
   championMastery: Record<string, Record<number, OngoingGameSimplifiedChampMastery>>
+  gameDetails: Record<number, LcuOrSgpGameDetails>
   additionalGames: Record<number, any>
   savedInfo: any
 }
@@ -41,6 +42,7 @@ export type OngoingGameMatchHistoryQueryTagParams = Pick<
 
 export type {
   DraftOptions,
+  LcuOrSgpGameDetails,
   LcuOrSgpGameSummary,
   MatchHistoryPlayer,
   OngoingGameSimplifiedChampMastery,

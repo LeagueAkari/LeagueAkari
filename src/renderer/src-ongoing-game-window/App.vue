@@ -10,6 +10,7 @@
         :game-id="previewingGame.gameId"
         :puuid="previewingGame.puuid"
         :source="previewingGame.source"
+        :details="previewingGame.details"
         v-model:show="showPreviewModal"
         :hide-privacy="as.settings.streamerMode"
       />
@@ -24,13 +25,17 @@
 </template>
 
 <script setup lang="ts">
-import MatchPreviewer from '@renderer-shared/components/MatchPreviewer.vue'
+import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
+import {
+  type MatchPreviewPayload,
+  type MatchPreviewState,
+  toMatchPreviewState
+} from '@renderer-shared/components/match-preview'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { useElementSize } from '@vueuse/core'
 import { ref, shallowRef, useTemplateRef, watch } from 'vue'
 
@@ -41,22 +46,14 @@ const { width: containerWidth, height: containerHeight } = useElementSize(contai
 
 const as = useAppCommonStore()
 
-const previewingGame = shallowRef({
+const previewingGame = shallowRef<MatchPreviewState>({
   gameId: 0,
-  summary: undefined as LcuOrSgpGameSummary | undefined,
-  puuid: undefined as string | undefined,
-  source: 'sgp' as 'sgp' | 'lcu'
+  source: 'sgp'
 })
 
 const showPreviewModal = ref(false)
-const handlePreviewGame = (summary: LcuOrSgpGameSummary | number, puuid?: string) => {
-  previewingGame.value = {
-    gameId: typeof summary === 'object' ? summary.gameId : summary,
-    summary: typeof summary === 'object' ? summary : undefined,
-    puuid,
-    source: typeof summary === 'object' ? summary.source : as.settings.preferredLolSource
-  }
-
+const handlePreviewGame = (payload: MatchPreviewPayload) => {
+  previewingGame.value = toMatchPreviewState(payload, as.settings.preferredLolSource)
   showPreviewModal.value = true
 }
 

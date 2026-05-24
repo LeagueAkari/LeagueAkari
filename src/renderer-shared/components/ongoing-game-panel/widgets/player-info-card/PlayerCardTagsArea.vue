@@ -147,12 +147,7 @@
             <tr v-for="(item, index) in encounteredGames" :key="item.gameId">
               <td
                 class="cursor-pointer border border-black/20 px-2 py-0.5 text-center whitespace-nowrap transition-colors hover:text-black/70 dark:border-white/25 dark:text-gray-300 dark:hover:text-white"
-                @click="
-                  () =>
-                    ogs.cachedGames[item.gameId]
-                      ? previewGame(ogs.cachedGames[item.gameId], puuid)
-                      : previewGame(item.gameId, puuid)
-                "
+                @click="previewEncounteredGame(item.gameId)"
               >
                 <div
                   class="inline-block rounded bg-black/10 px-1 py-0.5 text-xs leading-3 whitespace-nowrap text-black dark:bg-white/12 dark:text-gray-100"
@@ -801,6 +796,23 @@ const encounteredGames = computed(() => {
 
   return mapped
 })
+
+const previewEncounteredGame = (gameId: number) => {
+  const summary = ogs.cachedGames[gameId]
+
+  previewGame(
+    summary
+      ? {
+          summary,
+          details: ogs.gameDetails[gameId],
+          puuid
+        }
+      : {
+          summary: gameId,
+          puuid
+        }
+  )
+}
 
 const sortedTags = computed(() => {
   if (!savedInfo.value) {

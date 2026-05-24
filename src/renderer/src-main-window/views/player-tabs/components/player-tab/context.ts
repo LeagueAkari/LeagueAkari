@@ -1,8 +1,8 @@
+import type { MatchPreviewPayload } from '@renderer-shared/components/match-preview'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import mitt, { Emitter } from 'mitt'
 import {
   type InjectionKey,
@@ -59,7 +59,7 @@ export type PlayerTabContext = {
 
   // events
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
-  previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
+  previewGame: (payload: MatchPreviewPayload) => void
 }
 
 export const PlayerTabContextKey: InjectionKey<PlayerTabContext> = Symbol('PlayerTabContext')
@@ -68,7 +68,7 @@ export type PlayerTabEvents = {
   /**
    * 一些预览战绩的组件需要和 MatchHistoryList 组件联动
    */
-  focusGame: { summary: LcuOrSgpGameSummary | number; puuid?: string }
+  focusGame: MatchPreviewPayload
 }
 
 export function usePlayerTab(): PlayerTabContext {
@@ -87,7 +87,7 @@ export function providePlayerTab(props: {
   sgpServerId: MaybeRefOrGetter<string>
   isCurrentTab: MaybeRefOrGetter<boolean>
   isSmallSize: MaybeRefOrGetter<boolean>
-  previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
+  previewGame: (payload: MatchPreviewPayload) => void
 }) {
   const sgps = useSgpStore()
   const lcs = useLeagueClientStore()

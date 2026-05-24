@@ -1,8 +1,8 @@
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
-import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { InjectionKey, MaybeRefOrGetter, Ref, computed, inject, provide, toRef } from 'vue'
 
+import type { MatchPreviewPayload } from '../match-preview'
 import { IQR_THRESHOLD } from './constants'
 
 export type OngoingGamePanelContext = {
@@ -13,15 +13,15 @@ export type OngoingGamePanelContext = {
   linesPerTeam: Ref<number>
   isTwoTeamsMode: Ref<boolean>
   mergedPremadeTeams: Ref<{
-      groups: Record<string, string[]>
-      premadeTeamIdMap: Record<string, string>
-    }>
+    groups: Record<string, string[]>
+    premadeTeamIdMap: Record<string, string>
+  }>
 
   /** 低于或高于平均 KDA 的玩家 */
   kdaOutliers: Ref<Record<string, 'over' | 'below'>>
 
   navigateToSummonerByPuuid: (puuid: string) => void
-  previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
+  previewGame: (payload: MatchPreviewPayload) => void
 }
 
 export const OngoingGamePanelContextKey: InjectionKey<OngoingGamePanelContext> =
@@ -50,7 +50,7 @@ export function provideOngoingGamePanel(props: {
   }>
 
   navigateToSummonerByPuuid: (puuid: string) => void
-  previewGame: (summary: LcuOrSgpGameSummary | number, puuid?: string) => void
+  previewGame: (payload: MatchPreviewPayload) => void
 }) {
   const ogs = useOngoingGameStore()
 
