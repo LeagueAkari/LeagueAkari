@@ -16,6 +16,39 @@ AI agent onboarding guide. Describes the project layout and architecture at a hi
 
 ---
 
+## Agent Workflow Requirements
+
+Before touching project-specific architecture, use the relevant local skill and mention it in the
+working update:
+
+- **Shard work**: use `.agents/skills/league-akari-shard-development/SKILL.md` when creating,
+  extending, refactoring, splitting, or reviewing any main or renderer shard.
+- **Renderer UI work**: use `.agents/skills/league-akari-ui-components/SKILL.md` when implementing
+  or reviewing renderer UI components, especially i18n interpolation, pluralization, Tailwind usage
+  in SFC styles, or native semantic elements inside the Naive UI renderer.
+- **Dev-window debugging**: use `.agents/skills/league-akari-mcp-debug/SKILL.md` when debugging
+  League Akari dev windows through the configured Playwright MCP connection.
+
+Do not rely on memory for these areas; read the skill first and follow its current rules.
+
+---
+
+## Git Attribution
+
+When the user asks an agent to commit changes, add co-author attribution only if that agent
+materially participated in the content of the commit.
+
+- For Codex-authored or Codex-assisted commits, add
+  `Co-authored-by: Codex <noreply@openai.com>`.
+- For Claude-authored or Claude-assisted commits, add
+  `Co-authored-by: Claude <noreply@anthropic.com>`.
+- For other agents, attribution is optional and can be omitted unless the user or project policy
+  asks for it.
+- Do not add an agent co-author trailer when merely committing changes that were already fully
+  authored by the user.
+
+---
+
 ## Repository Layout
 
 ```
@@ -49,16 +82,19 @@ Everything is organized as **shards** — dependency-injected, lifecycle-managed
 
 ~30 shards, roughly grouped as:
 
-| Group              | Examples                                                                                                                          |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| Infrastructure     | `ipc`, `logger-factory`, `mobx-utils`, `setting-factory`, `storage`                                                               |
-| Client connections | `league-client`, `riot-client`, `game-client`                                                                                     |
-| Windows & UI       | `window-manager`, `tray`, `keyboard-shortcuts`                                                                                    |
-| Features           | `auto-select`, `auto-gameflow`, `auto-reply`, `ongoing-game`, `saved-player`, `statistics`, `sgp`, `remote-config`, `self-update` |
+| Group              | Examples                                                                                                                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Infrastructure     | `ipc`, `logger-factory`, `mobx-utils`, `setting-factory`, `storage`, `config-migrate`                                                                                                   |
+| Client connections | `league-client`, `league-client-ux`, `riot-client`, `game-client`, `client-installation`                                                                                                |
+| Windows & UI       | `window-manager`, `tray`, `keyboard-shortcuts`, `akari-protocol`                                                                                                                        |
+| Features           | `auto-champ-config`, `auto-select`, `auto-gameflow`, `auto-reply`, `in-game-send`, `ongoing-game`, `respawn-timer`, `saved-player`, `statistics`, `sgp`, `remote-config`, `self-update` |
+| Support/debug      | `app-common`, `extra-assets`, `renderer-debug`                                                                                                                                          |
 
 ### Renderer Shards (`src/renderer-shared/shards/`)
 
-Mirror shards on the renderer side that communicate with main via IPC and expose state to Vue components.
+Mirror shards on the renderer side communicate with main via IPC and expose synced state to Vue
+components. Some window-specific renderer shards live under that window's own `shards/` directory
+such as `src/renderer/src-opgg-window/shards/`.
 
 ---
 
@@ -74,7 +110,8 @@ There are **5 renderer windows**, each an independent Vite entry:
 | Ongoing Game | `src/renderer/src-ongoing-game-window/` | Real-time in-game display                      |
 | CD Timer     | `src/renderer/src-cd-timer-window/`     | Floating cooldown tracker                      |
 
-Each window follows the same pattern: `main.ts` → `App.vue` → Vue Router → views.
+Each window has its own HTML entry, `main.ts`, `NaiveUIProviderApp.vue`, `App.vue`, and shard
+manager. The main window uses Vue Router; the smaller windows usually compose their views directly.
 
 ---
 
@@ -121,11 +158,16 @@ Tailwind usage:
 
 - `dark:*` utilities are allowed in templates because `src/renderer-shared/assets/css/tailwind.css`
   defines the `dark` variant as `[data-theme=dark]`.
+- Tailwind is provided through `@tailwindcss/vite`, but the app does not use Tailwind's base/preflight
+  as the renderer foundation. Native elements such as `button`, `input`, `ul`, `p`, and headings
+  keep browser defaults unless styled or replaced with Naive UI components.
 - Do not add or depend on a `.dark` class in Vue, CSS, tests, or debugging snippets.
 
 Plain CSS / scoped CSS usage:
 
 - Use `[data-theme='dark'] ...` when writing manual dark-mode selectors.
+- When an SFC `<style>` block uses Tailwind-only syntax such as `@apply`, add
+  `@reference '@renderer-shared/assets/css/tailwind.css';` before using it.
 - For themed variants beyond classic light/dark, prefer the CSS variables in
   `src/renderer-shared/assets/css/theme-system.css`, especially for surfaces, borders, and text.
 
@@ -133,20 +175,27 @@ Plain CSS / scoped CSS usage:
 
 ## State Management
 
-| Layer                | Tool                       | Where                        |
-| -------------------- | -------------------------- | ---------------------------- |
-| Main process         | MobX (observable + action) | `src/main/shards/**`         |
-| Renderer             | Pinia stores               | per-window `stores/` folders |
-| Persistence          | SQLite via TypeORM         | `src/main/shards/storage/`   |
-| Main → Renderer sync | IPC + MobX reactions       | renderer shards              |
+| Layer                | Tool                       | Where                                                   |
+| -------------------- | -------------------------- | ------------------------------------------------------- |
+| Main process         | MobX (observable + action) | `src/main/shards/**`                                    |
+| Renderer             | Pinia stores               | renderer shard `store.ts` files and window-local stores |
+| Persistence          | SQLite via TypeORM         | `src/main/shards/storage/`                              |
+| Main → Renderer sync | IPC + MobX reactions       | renderer shards                                         |
 
 ---
 
 ## IPC Pattern
 
-- Main-side shard exposes handlers; renderer-side shard calls them
-- Standard response envelope: `{ success: boolean; data?: T; error?: string }`
-- Types defined in `src/shared/types/ipc/`
+- Main-side shards expose thin handlers with `AkariIpcMain.onCall(namespace, fnName, handler)`.
+- Renderer-side shards call through `AkariIpcRenderer.call(...)`; callers receive the unwrapped
+  return value or a thrown error.
+- The internal IPC envelope is `{ success: true; data: T }` or `{ success: false; error: any }`.
+  Do not hand-roll that envelope in feature shards; return real controller/service results and let
+  the IPC router standardize the response.
+- IPC handler names use camelCase. Renderer events sent through `sendEvent(...)` use kebab-case.
+- IPC helper types are duplicated near the IPC shards (`src/main/shards/ipc/types.ts` and
+  `src/renderer-shared/shards/ipc/types.ts`); shared domain payload types live under
+  `src/shared/types/`.
 
 ---
 
@@ -168,6 +217,8 @@ Plain CSS / scoped CSS usage:
 
 ### Add a main-process feature
 
+Use the `league-akari-shard-development` skill first.
+
 1. Create `src/main/shards/{name}/index.ts` with `@Shard('id')` class
 2. Inject needed shards as constructor params
 3. Implement `onInit` / `onDispose` as needed
@@ -175,10 +226,20 @@ Plain CSS / scoped CSS usage:
 
 ### Add a renderer-facing feature
 
+Use the `league-akari-shard-development` skill first.
+
 - Mirror the main shard with a renderer shard in `src/renderer-shared/shards/`
 - Expose data via IPC and consume in a Vue composable or Pinia store
 
+### Change renderer UI
+
+Use the `league-akari-ui-components` skill first. Prefer Naive UI primitives for interactive
+controls, keep i18n sentence structure in YAML, and do not assume browser defaults are reset.
+
 ### Add a new window
+
+Use the `league-akari-shard-development` skill first because new windows touch renderer shards,
+window-manager contracts, and build entries.
 
 1. Add HTML file under `src/renderer/`
 2. Create `src/renderer/src-{name}/` with Vue 3 app
@@ -196,7 +257,11 @@ yarn build        # Production build (current platform)
 yarn build:win    # Windows build
 yarn build:mac    # macOS build
 yarn typecheck    # Type check (Node + Web)
+yarn test         # Vitest test suite
+yarn storybook    # Component/story preview
 yarn format       # Prettier
 ```
 
-Logs are written to `./logs/` via Winston. The SQLite database lives at `<userData>/LeagueAkari.db`.
+Logs are written via Winston. On macOS they use Electron's `app.getPath('logs')`; on other packaged
+builds they are written beside the executable under `logs/`. The SQLite database lives at
+`<userData>/LeagueAkari.db`.
