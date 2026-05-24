@@ -6,7 +6,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AutoGameflowActions } from './actions'
+import { AutoGameflowActionController } from './action-controller'
 import { AutoGameflowAramTeamSideController } from './aram-team-side-controller'
 import {
   AUTO_GAMEFLOW_HONOR_CATEGORY,
@@ -43,7 +43,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   private readonly _settingService: SetterSettingService
   private readonly _context: AutoGameflowMainContext
 
-  private readonly _actions: AutoGameflowActions
+  private readonly _actionController: AutoGameflowActionController
   private readonly _matchmaking: AutoGameflowMatchmakingController
   private readonly _lobbyFlow: AutoGameflowLobbyFlowController
   private readonly _invitations: AutoGameflowInvitationController
@@ -105,13 +105,17 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       ipc: this._ipc
     }
 
-    this._actions = new AutoGameflowActions(this._context)
+    this._actionController = new AutoGameflowActionController(this._context)
     this._matchmaking = new AutoGameflowMatchmakingController(this._context)
-    this._lobbyFlow = new AutoGameflowLobbyFlowController(this._context, this._actions)
+    this._lobbyFlow = new AutoGameflowLobbyFlowController(this._context, this._actionController)
     this._invitations = new AutoGameflowInvitationController(this._context)
-    this._honorController = new AutoGameflowHonorController(this._context, this._actions)
+    this._honorController = new AutoGameflowHonorController(this._context, this._actionController)
     this._aramTeamSide = new AutoGameflowAramTeamSideController(this._context)
-    this._ipcHandlers = new AutoGameflowIpcHandlers(this._context, this._actions, this._matchmaking)
+    this._ipcHandlers = new AutoGameflowIpcHandlers(
+      this._context,
+      this._actionController,
+      this._matchmaking
+    )
   }
 
   private _watchLogging() {
@@ -129,7 +133,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
     this._settingService.onChange('autoAcceptEnabled', async (value, { setter }) => {
       if (!value) {
-        this._actions.cancelAutoAccept('normal')
+        this._actionController.cancelAutoAccept('normal')
       }
 
       this.settings.setAutoAcceptEnabled(value)
@@ -168,7 +172,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   }
 
   cancelAutoAccept(reason?: string) {
-    this._actions.cancelAutoAccept(reason)
+    this._actionController.cancelAutoAccept(reason)
   }
 
   cancelAutoMatchmaking(reason?: string) {

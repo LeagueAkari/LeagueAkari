@@ -31,7 +31,7 @@ import {
   watchHigherVersionDbWarning,
   watchRunInTempDirWarning
 } from './system-warning-dialogs'
-import { watchUpdateDownloadFailed } from './update-download-failed'
+import { watchUpdateDownloadFailed } from './update-download-failed-notification'
 
 /**
  * 主窗口常驻通知中心。

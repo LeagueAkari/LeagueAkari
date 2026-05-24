@@ -6,7 +6,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { RENDERER_DEBUG_MAIN_NAMESPACE, type RendererDebugMainContext } from './context'
 import { RendererDebugIpcHandlers } from './ipc-handlers'
-import { LcuEventDebugger } from './lcu-event-debugger'
+import { LcuEventDebuggerController } from './lcu-event-debugger-controller'
 import { RendererDebugState } from './state'
 
 @Shard(RendererDebugMain.id)
@@ -18,7 +18,7 @@ export class RendererDebugMain {
   private readonly _logger: AkariLogger
   private readonly _context: RendererDebugMainContext
   private readonly _ipcHandlers: RendererDebugIpcHandlers
-  private readonly _lcuEventDebugger: LcuEventDebugger
+  private readonly _lcuEventDebugger: LcuEventDebuggerController
 
   constructor(
     private readonly _ipc: AkariIpcMain,
@@ -36,7 +36,7 @@ export class RendererDebugMain {
       state: this.state
     }
     this._ipcHandlers = new RendererDebugIpcHandlers(this._context)
-    this._lcuEventDebugger = new LcuEventDebugger(this._context)
+    this._lcuEventDebugger = new LcuEventDebuggerController(this._context)
   }
 
   async onInit() {

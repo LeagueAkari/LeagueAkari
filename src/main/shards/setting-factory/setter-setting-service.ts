@@ -187,8 +187,7 @@ export class SetterSettingService {
    * placeholder
    * @param key
    */
-  remove(key: string): never {
-    console.error(`Deemo will finally find his ${key}, not Celia but Alice`)
+  remove(_key: string): never {
     throw new Error('not implemented')
   }
 }

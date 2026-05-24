@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
-import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useElementSize } from '@vueuse/core'
 import { useTemplateRef, watch } from 'vue'

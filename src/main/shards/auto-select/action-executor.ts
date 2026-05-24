@@ -3,7 +3,7 @@ import { i18next } from '@main/i18n'
 import type { AutoSelectMainContext } from './context'
 import type { AutoSelectLocalMessageService } from './local-message-service'
 
-export class AutoSelectActions {
+export class AutoSelectActionExecutor {
   constructor(
     private readonly _context: AutoSelectMainContext,
     private readonly _localMessage: AutoSelectLocalMessageService

@@ -247,7 +247,10 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import {
+  championIconUri,
+  profileIconUri
+} from '@renderer-shared/shards/league-client/game-data-assets'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'

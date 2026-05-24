@@ -4,7 +4,7 @@ import type { AxiosInstance } from 'axios'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SGP_RENDERER_NAMESPACE, type SgpRendererContext } from './context'
-import { exposeSgpApiForDebugging } from './dev-exposure'
+import { exposeSgpApiForDebugging } from './debug-api-exposure'
 import { createSgpApi } from './http-api'
 import { syncSgpState } from './state-sync'
 

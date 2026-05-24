@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 
 import OpggView from './opgg/OpggView.vue'
 import OpggWindowTitlebar from './opgg/OpggWindowTitlebar.vue'

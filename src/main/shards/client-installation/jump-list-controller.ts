@@ -3,11 +3,11 @@ import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { JumpListItem, app } from 'electron'
 import { comparer } from 'mobx'
 
+import type { ClientInstallationLauncher } from './client-launcher'
 import { CLIENT_INSTALLATION_MAIN_NAMESPACE, type ClientInstallationMainContext } from './context'
-import type { ClientInstallationLauncher } from './launcher'
 import { shouldRegisterJumpList } from './platform'
 
-export class ClientInstallationJumpList {
+export class ClientInstallationJumpListController {
   private _startupLaunch = false
 
   constructor(

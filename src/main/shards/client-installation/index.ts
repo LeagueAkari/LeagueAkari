@@ -4,6 +4,7 @@ import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { ClientInstallationLauncher } from './client-launcher'
 import {
   CLIENT_INSTALLATION_MAIN_NAMESPACE,
   LIVE_STREAMING_CLIENTS as CLIENT_LIVE_STREAMING_CLIENTS,
@@ -17,8 +18,7 @@ import {
 } from './context'
 import { ClientInstallationDetector } from './installation-detector'
 import { ClientInstallationIpcHandlers } from './ipc-handlers'
-import { ClientInstallationJumpList } from './jump-list'
-import { ClientInstallationLauncher } from './launcher'
+import { ClientInstallationJumpListController } from './jump-list-controller'
 import { LiveStreamingDetector } from './live-streaming-detector'
 import { ClientInstallationState } from './state'
 
@@ -45,7 +45,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   private readonly _installationDetector: ClientInstallationDetector
   private readonly _launcher: ClientInstallationLauncher
   private readonly _ipcHandlers: ClientInstallationIpcHandlers
-  private readonly _jumpList: ClientInstallationJumpList
+  private readonly _jumpListController: ClientInstallationJumpListController
   private readonly _liveStreamingDetector: LiveStreamingDetector
 
   private _liveStreamingTimer: NodeJS.Timeout | null = null
@@ -71,7 +71,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._installationDetector = new ClientInstallationDetector(this._context)
     this._launcher = new ClientInstallationLauncher(this._context)
     this._ipcHandlers = new ClientInstallationIpcHandlers(this._context, this._launcher)
-    this._jumpList = new ClientInstallationJumpList(this._context, this._launcher)
+    this._jumpListController = new ClientInstallationJumpListController(
+      this._context,
+      this._launcher
+    )
     this._liveStreamingDetector = new LiveStreamingDetector(this._context)
   }
 
@@ -79,7 +82,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._setupState()
     this._ipcHandlers.register()
     await this._installationDetector.runPlatformDetection()
-    this._jumpList.register()
+    this._jumpListController.register()
     this._liveStreamingTimer = this._liveStreamingDetector.watch()
   }
 

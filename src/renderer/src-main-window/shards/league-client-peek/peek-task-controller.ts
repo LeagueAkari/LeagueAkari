@@ -6,7 +6,7 @@ import { computed, watch } from 'vue'
 import type { LeagueClientPeekRendererContext } from './context'
 import { useLeagueClientPeekStore } from './store'
 
-export function setupLeagueClientPeekTasks(context: LeagueClientPeekRendererContext) {
+export function setupLeagueClientPeekTaskController(context: LeagueClientPeekRendererContext) {
   const leagueClientStore = useLeagueClientStore()
   const leagueClientUxStore = useLeagueClientUxStore()
   const leagueClientPeekStore = useLeagueClientPeekStore()

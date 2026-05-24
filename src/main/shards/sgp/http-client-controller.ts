@@ -7,7 +7,7 @@ import {
 import { isAxiosError } from 'axios'
 
 import type { SgpMainContext } from './context'
-import { isNodeReadableStream, readNodeStreamToBuffer } from './stream-utils'
+import { isNodeReadableStream, readNodeStreamToBuffer } from './node-stream-reader'
 
 export class SgpHttpClientController {
   constructor(private readonly context: SgpMainContext) {}

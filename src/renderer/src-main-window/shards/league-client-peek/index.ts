@@ -6,7 +6,7 @@ import {
   LEAGUE_CLIENT_PEEK_RENDERER_NAMESPACE,
   type LeagueClientPeekRendererContext
 } from './context'
-import { setupLeagueClientPeekTasks } from './peek-tasks'
+import { setupLeagueClientPeekTaskController } from './peek-task-controller'
 
 @Shard(LeagueClientPeekRenderer.id)
 export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
@@ -26,7 +26,7 @@ export class LeagueClientPeekRenderer implements IAkariShardInitDispose {
 
   async onInit() {
     this._setupInAppScope.addSetupFn(() => {
-      setupLeagueClientPeekTasks(this._context)
+      setupLeagueClientPeekTaskController(this._context)
     })
   }
 

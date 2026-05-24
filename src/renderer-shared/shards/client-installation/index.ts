@@ -7,7 +7,7 @@ import {
   CLIENT_INSTALLATION_RENDERER_NAMESPACE,
   type ClientInstallationRendererContext
 } from './context'
-import { ClientInstallationLauncherActions } from './launcher-actions'
+import { ClientInstallationLauncherService } from './launcher-service'
 import { syncClientInstallationState } from './state-sync'
 
 @Shard(ClientInstallationRenderer.id)
@@ -15,7 +15,7 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
   static id = CLIENT_INSTALLATION_RENDERER_NAMESPACE
 
   private readonly _context: ClientInstallationRendererContext
-  private readonly _launcherActions: ClientInstallationLauncherActions
+  private readonly _launcherService: ClientInstallationLauncherService
 
   constructor(
     @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
@@ -27,7 +27,7 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
       logger,
       piniaMobxUtils
     }
-    this._launcherActions = new ClientInstallationLauncherActions(this._context)
+    this._launcherService = new ClientInstallationLauncherService(this._context)
   }
 
   async onInit() {
@@ -35,18 +35,18 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
   }
 
   launchTencentTcls() {
-    return this._launcherActions.launchTencentTcls()
+    return this._launcherService.launchTencentTcls()
   }
 
   launchWeGameLeagueOfLegends() {
-    return this._launcherActions.launchWeGameLeagueOfLegends()
+    return this._launcherService.launchWeGameLeagueOfLegends()
   }
 
   launchWeGame() {
-    return this._launcherActions.launchWeGame()
+    return this._launcherService.launchWeGame()
   }
 
   launchDefaultRiotClient() {
-    return this._launcherActions.launchDefaultRiotClient()
+    return this._launcherService.launchDefaultRiotClient()
   }
 }

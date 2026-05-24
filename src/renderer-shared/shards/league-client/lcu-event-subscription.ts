@@ -50,7 +50,7 @@ export class LeagueClientLcuEventSubscription {
       }
 
       if (unsubscribeFn) {
-        unsubscribeFn().catch(console.error)
+        unsubscribeFn().catch(() => {})
       }
 
       disposed = true

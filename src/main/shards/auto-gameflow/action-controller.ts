@@ -3,7 +3,7 @@ import { formatError } from '@shared/utils/errors'
 
 import type { AutoGameflowMainContext } from './context'
 
-export class AutoGameflowActions {
+export class AutoGameflowActionController {
   private readonly _autoAcceptTask = new TimeoutTask(this._acceptMatch.bind(this))
   private readonly _playAgainTask = new TimeoutTask(this._playAgain.bind(this))
   private readonly _reconnectTask = new TimeoutTask(this._reconnect.bind(this))

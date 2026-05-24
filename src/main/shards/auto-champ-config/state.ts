@@ -48,7 +48,6 @@ export class AutoChampConfigSettings {
   }
 
   updateSummonerSpells(championId: number, key: string, spellConfig: SummonerSpellsConfig | null) {
-    console.log('updateSummonerSpells', championId, key, spellConfig)
     const newObj = { ...this.summonerSpells[championId], [key]: spellConfig }
     this.summonerSpells = { ...this.summonerSpells, [championId]: newObj }
   }

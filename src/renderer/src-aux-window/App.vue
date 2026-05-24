@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 
 import AuxWindowTitlebar from './components/AuxWindowTitlebar.vue'
 import IndicatorView from './views/Indicator.vue'

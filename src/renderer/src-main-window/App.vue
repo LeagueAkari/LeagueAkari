@@ -55,7 +55,7 @@
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'

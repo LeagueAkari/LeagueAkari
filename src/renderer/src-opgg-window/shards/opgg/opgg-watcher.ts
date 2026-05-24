@@ -7,7 +7,7 @@ import { watch } from 'vue'
 import { OPGG_RENDERER_NAMESPACE, type OpggRendererContext } from './context'
 import { useOpggStore } from './store'
 
-export class OpggWatchers {
+export class OpggWatcher {
   constructor(private readonly context: OpggRendererContext) {}
 
   start() {

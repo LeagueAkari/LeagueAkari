@@ -140,7 +140,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'

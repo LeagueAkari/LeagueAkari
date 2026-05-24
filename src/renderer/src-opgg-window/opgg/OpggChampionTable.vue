@@ -33,7 +33,7 @@
 <script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { OpggChampionItem } from '@shared/types/opgg'
 import { useMediaQuery } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'

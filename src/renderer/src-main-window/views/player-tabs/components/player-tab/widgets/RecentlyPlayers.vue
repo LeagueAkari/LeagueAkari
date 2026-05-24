@@ -49,7 +49,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 

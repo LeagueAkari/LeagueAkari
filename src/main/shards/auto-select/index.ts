@@ -7,7 +7,7 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AutoSelectActions } from './actions'
+import { AutoSelectActionExecutor } from './action-executor'
 import { AutoSelectBanPickController } from './ban-pick-controller'
 import { AutoSelectBenchController } from './bench-controller'
 import { AutoSelectConfigManager } from './config-manager'
@@ -29,7 +29,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private readonly _context: AutoSelectMainContext
 
   private readonly _localMessage: AutoSelectLocalMessageService
-  private readonly _actions: AutoSelectActions
+  private readonly _actionExecutor: AutoSelectActionExecutor
   private readonly _configManager: AutoSelectConfigManager
   private readonly _ipcHandlers: AutoSelectIpcHandlers
   private readonly _banPick: AutoSelectBanPickController
@@ -71,23 +71,23 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     }
 
     this._localMessage = new AutoSelectLocalMessageService(this._context)
-    this._actions = new AutoSelectActions(this._context, this._localMessage)
+    this._actionExecutor = new AutoSelectActionExecutor(this._context, this._localMessage)
     this._configManager = new AutoSelectConfigManager(this._context)
     this._ipcHandlers = new AutoSelectIpcHandlers(this._context)
     this._banPick = new AutoSelectBanPickController(
       this._context,
       this._localMessage,
-      this._actions
+      this._actionExecutor
     )
     this._benchController = new AutoSelectBenchController(
       this._context,
       this._localMessage,
-      this._actions
+      this._actionExecutor
     )
     this._tradeController = new AutoSelectTradeController(
       this._context,
       this._localMessage,
-      this._actions
+      this._actionExecutor
     )
   }
 

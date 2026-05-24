@@ -31,7 +31,8 @@ The goal is stable shard architecture: clear responsibilities, boring public con
   - `settingService`, not `setting`
   - `logger`, not `log`
   - `ipc`, not `ipcMain`
-- Avoid leading underscores in new code unless matching an unavoidable local convention.
+- In League Akari shard classes, private fields and methods use a leading `_` prefix.
+  Keep injected constructor properties private and underscored unless they are intentionally public.
 - Keep platform-specific side effects behind explicit platform guard helpers.
 - Renderer VNode-heavy modules should be `.tsx`; avoid large `h(...)` chains.
 - Use project loggers, not `console`.
@@ -117,7 +118,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private readonly ipcHandlers: SelfUpdateIpcHandlers
 
   constructor(/* injected shards */) {
-    this.context = { namespace: SelfUpdateMain.id, settings: this.settings, state: this.state /* ... */ }
+    this.context = {
+      namespace: SelfUpdateMain.id,
+      settings: this.settings,
+      state: this.state /* ... */
+    }
     this.executor = new SelfUpdateExecutor(this.context)
     this.ipcHandlers = new SelfUpdateIpcHandlers(this.context, this.executor)
   }
@@ -148,10 +153,36 @@ private _doEverything() { /* still owns IPC, watchers, fetching, cache, side eff
 - `*-executor.ts`: imperative operation that may fail or be canceled.
 - `*-watcher.ts`: reactive observers without owning the core action.
 - `*-manager.ts`: registry/config collection ownership.
+- `*-service.ts`: stable service boundary, local persistence, renderer IPC facade, file IO, or reusable capability.
+- `*-registry.ts`: owns a map/set of registrations and lookup/unregister semantics.
+- `*-router.ts`: routes protocol/IPC/domain requests by explicit keys.
+- `*-parser.ts`: converts strings or untyped payloads into typed values.
+- `*-reader.ts`: reads streams/files/process output and normalizes the result.
+- `*-formatter.ts`: formats messages or display/log payloads without side effects.
+- `*-emitter.ts`: wraps event emission/logging behavior.
+- `*-detector.ts`: discovers external installations, processes, or environment facts.
+- `*-launcher.ts`: starts external applications/processes.
+- `*-resolver.ts`: maps setting/domain values to concrete runtime values.
+- `*-factory.ts`: constructs response/client/helper objects without owning lifecycle.
+- `*-provider.ts`: supplies derived option lists or data for UI consumption.
+- `*-subscription.ts`: owns subscribe/unsubscribe flow around an external event source.
+- `*-component.tsx`: renderer component colocated with a shard. Do not use `comp.tsx`.
+- `*-notification.tsx`, `*-modal.tsx`, `*-dialogs.tsx`: renderer notification/modal modules.
 - `*.test.ts`: pure helpers, guards, races, migrations.
 - `*.tsx`: renderer modules that return JSX or compose VNodes.
 
-Avoid vague names like `utils.ts`, `helpers.ts`, or `misc.ts` unless the code is genuinely generic and small.
+Avoid vague names like `utils.ts`, `helpers.ts`, `misc.ts`, `actions.ts`, or `comp.tsx`.
+In shard directories, prefer a concrete role even for small helpers: for example
+`window-position-service.ts`, `game-data-assets.ts`, `node-stream-reader.ts`, or
+`ux-command-line-parser.ts`.
+
+Project-specific exceptions:
+
+- `state.ts` and `store.ts` are fixed names for MobX state/settings and Pinia stores.
+- TypeORM entities keep their entity names under `storage/entities/`.
+- Storage upgrades and config migrations keep versioned names such as `version-15.ts` and `from-1-4-3.ts`.
+- `league-client/lc-state/` may use LCU endpoint domain names such as `champ-select.ts` and `gameflow.ts`
+  because that directory is a coherent state-sync pipeline.
 
 ## Context Pattern
 
@@ -196,6 +227,21 @@ Stable suffix meanings:
 - `Watcher`: registers reactive observers.
 - `Handlers`: registers IPC/event handlers.
 - `Manager`: owns a registry or configuration collection.
+- `Service`: exposes a focused reusable capability behind a stable boundary.
+- `Detector`: discovers external state and writes the discovered result into state.
+- `Launcher`: starts an external process/application.
+- `Parser`: turns strings or untyped input into typed data.
+- `Reader`: reads streams/files/process output into a normalized value.
+- `Resolver`: maps app settings or domain identifiers to runtime values.
+- `Factory`: creates response/client/helper objects and does not own lifecycle.
+- `Provider`: supplies derived UI options or catalog-like data.
+- `Subscription`: owns subscribe/unsubscribe lifecycle for external event streams.
+- `Registry`: owns keyed registration/unregistration.
+- `Router`: dispatches a request by domain/path/protocol key.
+- `Formatter`: formats log/display strings without side effects.
+
+Avoid `Actions` as a class or file suffix. Use `Executor` for direct side effects and
+`Controller` when the module also schedules, cancels, or coordinates those side effects.
 
 Do not rename public contracts only for style. `ongoing-game-main` is a contract, not a naming cleanup target.
 
@@ -206,6 +252,8 @@ Renderer shard entries follow the same orchestration rules.
 - Keep composables (`useDialog`, `useNotification`, `useTranslation`, Pinia stores) inside setup functions or functions called from `setupInAppScope.addSetupFn(...)`, not at module top level.
 - Render-heavy notification/modal modules should be `.tsx`.
 - Pure watcher modules without JSX can stay `.ts`.
+- Colocated renderer components should use `*-component.tsx` or a descriptive `.vue` filename.
+  Do not add vague files like `comp.tsx`.
 - Preserve store fields and modal state shape.
 
 Good TSX:
@@ -213,7 +261,9 @@ Good TSX:
 ```tsx
 export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererContext) {
   const notification = useNotification()
-  const { t } = useTranslation(undefined, { keyPrefix: 'simple-notifications-renderer.updateDownloadFailed' })
+  const { t } = useTranslation(undefined, {
+    keyPrefix: 'simple-notifications-renderer.updateDownloadFailed'
+  })
 
   context.ipc.onEventVue(SelfUpdateRenderer.id, 'error-download-update', (error) => {
     const item = notification.warning({
@@ -222,7 +272,9 @@ export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererCo
         <div>
           {t('content', { error: error.message })}
           <div class="flex justify-end gap-2">
-            <NButton size="tiny" onClick={() => item.destroy()}>{t('negativeText')}</NButton>
+            <NButton size="tiny" onClick={() => item.destroy()}>
+              {t('negativeText')}
+            </NButton>
           </div>
         </div>
       )

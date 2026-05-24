@@ -1,6 +1,6 @@
 import type { RendererDebugLcuEvent, RendererDebugMainContext } from './context'
 
-export class LcuEventDebugger {
+export class LcuEventDebuggerController {
   constructor(private readonly context: RendererDebugMainContext) {}
 
   watch() {

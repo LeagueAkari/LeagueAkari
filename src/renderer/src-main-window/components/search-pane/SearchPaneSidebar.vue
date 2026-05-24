@@ -231,7 +231,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close, RecentlyViewed } from '@vicons/carbon'
 import { Pin16Filled } from '@vicons/fluent'

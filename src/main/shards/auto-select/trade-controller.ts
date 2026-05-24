@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { comparer, computed } from 'mobx'
 
-import type { AutoSelectActions } from './actions'
+import type { AutoSelectActionExecutor } from './action-executor'
 import type { AutoSelectMainContext } from './context'
 import type { AutoSelectLocalMessageService } from './local-message-service'
 
@@ -9,7 +9,7 @@ export class AutoSelectTradeController {
   constructor(
     private readonly _context: AutoSelectMainContext,
     private readonly _localMessage: AutoSelectLocalMessageService,
-    private readonly _actions: AutoSelectActions
+    private readonly _actionExecutor: AutoSelectActionExecutor
   ) {}
 
   watch() {
@@ -128,7 +128,7 @@ export class AutoSelectTradeController {
           this._localMessage.send(
             i18next.t(`auto-select-main.${action}-champion-swap`, {
               seconds: (delayMs / 1e3).toFixed(1),
-              champion: this._actions.championNameWithId(requesterChampionId)
+              champion: this._actionExecutor.championNameWithId(requesterChampionId)
             })
           )
         }
@@ -143,7 +143,7 @@ export class AutoSelectTradeController {
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
               () =>
-                this._actions
+                this._actionExecutor
                   .acceptChampionSwap(tradeId)
                   .finally(() => state.setDelayedChampionSwap(null)),
               delayMs
@@ -159,7 +159,7 @@ export class AutoSelectTradeController {
             requesterChampionId: requesterChampionId,
             timerId: setTimeout(
               () =>
-                this._actions
+                this._actionExecutor
                   .declineChampionSwap(tradeId)
                   .finally(() => state.setDelayedChampionSwap(null)),
               delayMs

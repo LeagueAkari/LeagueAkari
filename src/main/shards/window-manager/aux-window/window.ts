@@ -5,7 +5,7 @@ import { comparer, computed } from 'mobx'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
-import { repositionToAlignLeagueClientUx } from '../position-utils'
+import { repositionToAlignLeagueClientUx } from '../window-position-service'
 import { AuxWindowSettings, AuxWindowState } from './state'
 
 export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSettings> {

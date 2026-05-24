@@ -16,7 +16,7 @@
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { toIdentities } from '@shared/data-adapter/match-history/identities'
 import { useDebounceFn } from '@vueuse/core'
 import { NSelect, SelectOption } from 'naive-ui'

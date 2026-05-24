@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { comparer, computed } from 'mobx'
 
-import type { AutoSelectActions } from './actions'
+import type { AutoSelectActionExecutor } from './action-executor'
 import type { AutoSelectMainContext } from './context'
 import type { AutoSelectLocalMessageService } from './local-message-service'
 
@@ -9,7 +9,7 @@ export class AutoSelectBanPickController {
   constructor(
     private readonly _context: AutoSelectMainContext,
     private readonly _localMessage: AutoSelectLocalMessageService,
-    private readonly _actions: AutoSelectActions
+    private readonly _actionExecutor: AutoSelectActionExecutor
   ) {}
 
   watch() {
@@ -84,7 +84,7 @@ export class AutoSelectBanPickController {
 
               if (activeAction.championId !== expectedBan.id) {
                 logger.info(
-                  `Already banned ${this._actions.championNameWithId(activeAction.championId)}, didn't change it, move=${move}`
+                  `Already banned ${this._actionExecutor.championNameWithId(activeAction.championId)}, didn't change it, move=${move}`
                 )
               }
 
@@ -120,16 +120,16 @@ export class AutoSelectBanPickController {
             completed
               ? i18next.t('auto-select-main.complete-ban', {
                   seconds: (delayMs / 1e3).toFixed(1),
-                  champion: this._actions.championNameWithId(expectedBan.id)
+                  champion: this._actionExecutor.championNameWithId(expectedBan.id)
                 })
               : i18next.t('auto-select-main.show-ban', {
                   seconds: (delayMs / 1e3).toFixed(1),
-                  champion: this._actions.championNameWithId(expectedBan.id)
+                  champion: this._actionExecutor.championNameWithId(expectedBan.id)
                 })
           )
 
           logger.info(
-            `Delayed ban champion=${this._actions.championNameWithId(expectedBan.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
+            `Delayed ban champion=${this._actionExecutor.championNameWithId(expectedBan.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
           )
         }
 
@@ -142,7 +142,7 @@ export class AutoSelectBanPickController {
           finishAt: Date.now() + delayMs,
           timerId: setTimeout(
             () =>
-              this._actions
+              this._actionExecutor
                 .ban(expectedBan.id, activeAction.id, completed)
                 .finally(() => state.setDelayedBan(null)),
             delayMs
@@ -240,7 +240,7 @@ export class AutoSelectBanPickController {
 
             if (activeAction.championId !== expectedPick.id) {
               logger.info(
-                `Already picked ${this._actions.championNameWithId(activeAction.championId)}, didn't change it, move=${move}`
+                `Already picked ${this._actionExecutor.championNameWithId(activeAction.championId)}, didn't change it, move=${move}`
               )
             }
 
@@ -287,28 +287,28 @@ export class AutoSelectBanPickController {
             this._localMessage.send(
               i18next.t('auto-select-main.intent-pick', {
                 seconds: (delayMs / 1e3).toFixed(1),
-                champion: this._actions.championNameWithId(expectedPick.id)
+                champion: this._actionExecutor.championNameWithId(expectedPick.id)
               })
             )
 
             logger.info(
-              `Delayed pick intent champion=${this._actions.championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
+              `Delayed pick intent champion=${this._actionExecutor.championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
             )
           } else {
             this._localMessage.send(
               completed
                 ? i18next.t('auto-select-main.complete-pick', {
                     seconds: (delayMs / 1e3).toFixed(1),
-                    champion: this._actions.championNameWithId(expectedPick.id)
+                    champion: this._actionExecutor.championNameWithId(expectedPick.id)
                   })
                 : i18next.t('auto-select-main.show-pick', {
                     seconds: (delayMs / 1e3).toFixed(1),
-                    champion: this._actions.championNameWithId(expectedPick.id)
+                    champion: this._actionExecutor.championNameWithId(expectedPick.id)
                   })
             )
 
             logger.info(
-              `Delayed pick champion=${this._actions.championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
+              `Delayed pick champion=${this._actionExecutor.championNameWithId(expectedPick.id)} completed=${completed} move=${move} strategy=${strategy} delayedMs=${delayMs}`
             )
           }
         }
@@ -328,7 +328,7 @@ export class AutoSelectBanPickController {
             finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
-                this._actions
+                this._actionExecutor
                   .intent(expectedPick.id, firstUnfinishedPickAction.id)
                   .finally(() => state.setDelayedPick(null)),
               delayMs
@@ -344,7 +344,7 @@ export class AutoSelectBanPickController {
             finishAt: Date.now() + delayMs,
             timerId: setTimeout(
               () =>
-                this._actions
+                this._actionExecutor
                   .pick(expectedPick.id, activeAction.id, completed)
                   .finally(() => state.setDelayedPick(null)),
               delayMs

@@ -1,5 +1,5 @@
+import type { ClientInstallationLauncher } from './client-launcher'
 import type { ClientInstallationMainContext } from './context'
-import type { ClientInstallationLauncher } from './launcher'
 
 export class ClientInstallationIpcHandlers {
   constructor(

@@ -121,7 +121,7 @@ import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMask
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'

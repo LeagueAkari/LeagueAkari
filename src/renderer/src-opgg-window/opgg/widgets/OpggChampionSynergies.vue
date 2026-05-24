@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox } from 'naive-ui'
 import { ref, watchEffect } from 'vue'

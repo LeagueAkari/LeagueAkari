@@ -8,7 +8,7 @@ import { AkariSupportedPlatform, BaseConfig, NativeSupport } from '@shared/types
 import { usePreferredColorScheme } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowReactive, shallowRef, watch } from 'vue'
+import { computed, ref, shallowReactive, shallowRef } from 'vue'
 
 export interface HttpProxySetting {
   strategy: 'auto' | 'force' | 'disable'
@@ -82,7 +82,6 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   })
 
   const preferredColorScheme = usePreferredColorScheme()
-  const invalidThemeWarned = ref<string | null>(null)
   const rawThemeSetting = computed(() => settings.theme as unknown as string)
 
   const normalizedThemeSetting = computed<AppThemeSetting>(() => {
@@ -92,24 +91,6 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
     return 'dark'
   })
-
-  watch(
-    rawThemeSetting,
-    (theme) => {
-      if (isAppThemeSetting(theme)) {
-        invalidThemeWarned.value = null
-        return
-      }
-
-      if (invalidThemeWarned.value === theme) {
-        return
-      }
-
-      invalidThemeWarned.value = theme
-      console.warn(`[app-common] invalid theme "${String(theme)}", fallback to "dark"`)
-    },
-    { immediate: true }
-  )
 
   const resolvedTheme = computed(() => {
     return resolveThemeSetting(

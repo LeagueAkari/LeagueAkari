@@ -621,7 +621,7 @@ import PositionIcon from '@renderer-shared/components/icons/position-icons/Posit
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'

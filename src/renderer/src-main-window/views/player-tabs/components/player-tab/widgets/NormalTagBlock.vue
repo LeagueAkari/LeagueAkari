@@ -78,7 +78,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { Summoner } from '@shared/data-adapter/summoner'
 import { DismissCircle16Regular as DeleteIcon } from '@vicons/fluent'

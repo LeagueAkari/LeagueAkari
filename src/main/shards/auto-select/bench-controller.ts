@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { comparer, computed, observable } from 'mobx'
 
-import type { AutoSelectActions } from './actions'
+import type { AutoSelectActionExecutor } from './action-executor'
 import type { AutoSelectMainContext } from './context'
 import type { AutoSelectLocalMessageService } from './local-message-service'
 
@@ -9,7 +9,7 @@ export class AutoSelectBenchController {
   constructor(
     private readonly _context: AutoSelectMainContext,
     private readonly _localMessage: AutoSelectLocalMessageService,
-    private readonly _actions: AutoSelectActions
+    private readonly _actionExecutor: AutoSelectActionExecutor
   ) {}
 
   watch() {
@@ -136,7 +136,7 @@ export class AutoSelectBenchController {
           this._localMessage.send(
             i18next.t('auto-select-main.bench-swap', {
               seconds: (delayMs / 1e3).toFixed(1),
-              champion: this._actions.championNameWithId(id)
+              champion: this._actionExecutor.championNameWithId(id)
             })
           )
         }
@@ -147,7 +147,7 @@ export class AutoSelectBenchController {
           finishAt: Date.now() + delayMs,
           startAt: state.delayedBenchSwap?.startAt ?? Date.now(),
           timerId: setTimeout(
-            () => this._actions.benchSwap(id).finally(() => state.setDelayedBenchSwap(null)),
+            () => this._actionExecutor.benchSwap(id).finally(() => state.setDelayedBenchSwap(null)),
             delayMs
           )
         })

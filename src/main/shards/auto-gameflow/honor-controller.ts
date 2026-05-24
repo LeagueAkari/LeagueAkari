@@ -3,13 +3,13 @@ import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
 import { comparer, computed } from 'mobx'
 
-import type { AutoGameflowActions } from './actions'
+import type { AutoGameflowActionController } from './action-controller'
 import { AUTO_GAMEFLOW_HONOR_CATEGORY, type AutoGameflowMainContext } from './context'
 
 export class AutoGameflowHonorController {
   constructor(
     private readonly _context: AutoGameflowMainContext,
-    private readonly _actions: AutoGameflowActions
+    private readonly _actionController: AutoGameflowActionController
   ) {}
 
   watch() {
@@ -41,7 +41,7 @@ export class AutoGameflowHonorController {
       () => [honorables.get(), settings.autoHonorEnabled] as const,
       async ([honorablePlayers, enabled]) => {
         if (honorablePlayers && honorablePlayers.gameId) {
-          this._actions.cancelPlayAgain()
+          this._actionController.cancelPlayAgain()
         }
 
         if (honorablePlayers && honorablePlayers.gameId && enabled) {

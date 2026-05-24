@@ -9,7 +9,7 @@ import {
 import type { RendererDebugRuleManager } from './rule-manager'
 import { useRendererDebugStore } from './store'
 
-export class RendererDebugWatchers {
+export class RendererDebugWatcher {
   constructor(
     private readonly context: RendererDebugRendererContext,
     private readonly ruleManager: RendererDebugRuleManager

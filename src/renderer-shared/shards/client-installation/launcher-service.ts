@@ -4,7 +4,7 @@ import {
   type ClientInstallationRendererContext
 } from './context'
 
-export class ClientInstallationLauncherActions {
+export class ClientInstallationLauncherService {
   constructor(private readonly _context: ClientInstallationRendererContext) {}
 
   launchTencentTcls() {

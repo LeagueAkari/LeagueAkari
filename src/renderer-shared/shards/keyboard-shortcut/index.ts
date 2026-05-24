@@ -10,7 +10,7 @@ import {
   KEYBOARD_SHORTCUTS_RENDERER_NAMESPACE,
   type KeyboardShortcutsRendererContext
 } from './context'
-import { KeyboardShortcutEvents } from './shortcut-events'
+import { KeyboardShortcutEventService } from './shortcut-event-service'
 
 /**
  * 连接到主进程的快捷键服务
@@ -23,19 +23,19 @@ export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
   static DEBUG_STATEFUL_TEST_TARGET_ID = 'keyboard-shortcuts-main/debug-stateful-test'
 
   private readonly _context: KeyboardShortcutsRendererContext
-  private readonly _events: KeyboardShortcutEvents
+  private readonly _eventService: KeyboardShortcutEventService
 
   constructor(@Dep(AkariIpcRenderer) ipc: AkariIpcRenderer) {
     this._context = { ipc }
-    this._events = new KeyboardShortcutEvents(this._context)
+    this._eventService = new KeyboardShortcutEventService(this._context)
   }
 
   onShortcut(fn: (event: ShortcutDetails) => void) {
-    return this._events.onShortcut(fn)
+    return this._eventService.onShortcut(fn)
   }
 
   onLastActiveShortcut(fn: (event: ShortcutDetails) => void) {
-    return this._events.onLastActiveShortcut(fn)
+    return this._eventService.onLastActiveShortcut(fn)
   }
 
   getDebugState() {

@@ -191,7 +191,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useScrollFollow } from '@renderer-shared/composables/useScrollFollow'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close, Search } from '@vicons/carbon'
 import { Info24Regular } from '@vicons/fluent'

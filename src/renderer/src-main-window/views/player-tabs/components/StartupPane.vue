@@ -139,7 +139,7 @@ import { useClientInstallationStore } from '@renderer-shared/shards/client-insta
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'

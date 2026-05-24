@@ -2,7 +2,7 @@ import type { ShortcutDetails } from '@shared/types/shards/keyboard-shortcut'
 
 import { KEYBOARD_SHORTCUTS_MAIN_NAMESPACE, type KeyboardShortcutsRendererContext } from './context'
 
-export class KeyboardShortcutEvents {
+export class KeyboardShortcutEventService {
   constructor(private readonly _context: KeyboardShortcutsRendererContext) {}
 
   onShortcut(fn: (event: ShortcutDetails) => void) {

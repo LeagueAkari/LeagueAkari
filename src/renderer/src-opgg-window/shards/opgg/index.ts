@@ -11,9 +11,9 @@ import {
   type OpggPreferenceUpdate,
   type OpggRendererContext
 } from './context'
+import { OpggWatcher } from './opgg-watcher'
 import { OpggPreferencesService } from './preferences-service'
 import { syncOpggSettings } from './settings-sync'
-import { OpggWatchers } from './watchers'
 
 @Shard(OpggRenderer.id)
 export class OpggRenderer {
@@ -25,7 +25,7 @@ export class OpggRenderer {
 
   private readonly _context: OpggRendererContext
   private readonly _preferencesService: OpggPreferencesService
-  private readonly _watchers: OpggWatchers
+  private readonly _watcher: OpggWatcher
 
   constructor(
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
@@ -43,14 +43,14 @@ export class OpggRenderer {
       api: this.api
     }
     this._preferencesService = new OpggPreferencesService(this._context)
-    this._watchers = new OpggWatchers(this._context)
+    this._watcher = new OpggWatcher(this._context)
   }
 
   async onInit() {
     await syncOpggSettings(this._context)
     await this._preferencesService.migrate()
     await this._preferencesService.restore()
-    this._watchers.start()
+    this._watcher.start()
   }
 
   async updatePreferences(options: OpggPreferenceUpdate) {

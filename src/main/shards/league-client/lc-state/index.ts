@@ -12,7 +12,7 @@ import { comparer, computed, makeAutoObservable, observable, runInAction } from 
 import PQueue from 'p-queue'
 
 import type { LeagueClientMainContext } from '..'
-import { TaskRunner } from '../utils/task-runner'
+import { TaskRunner } from '../task-runner'
 import { ChampSelectState } from './champ-select'
 import { ChatState } from './chat'
 import { EntitlementsState } from './entitlements'

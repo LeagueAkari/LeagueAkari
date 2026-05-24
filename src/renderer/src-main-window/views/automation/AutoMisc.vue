@@ -155,7 +155,7 @@ import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/stor
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
 import { useAutoReplyStore } from '@renderer-shared/shards/auto-reply/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { Search as SearchIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NIcon, NInput, NScrollbar, NSwitch, useMessage } from 'naive-ui'

@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent, WebContents, ipcMain, webContents } from 'electron'
 
-import { toIpcErrorResponse } from './error-response'
+import { toIpcErrorResponse } from './error-response-factory'
 
 export class AkariIpcInvocationRouter {
   /**

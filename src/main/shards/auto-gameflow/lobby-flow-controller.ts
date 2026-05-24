@@ -1,7 +1,7 @@
 import { formatError } from '@shared/utils/errors'
 import { comparer } from 'mobx'
 
-import type { AutoGameflowActions } from './actions'
+import type { AutoGameflowActionController } from './action-controller'
 import {
   AUTO_GAMEFLOW_PLAY_AGAIN_BUFFER_TIMEOUT,
   AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT,
@@ -12,7 +12,7 @@ import {
 export class AutoGameflowLobbyFlowController {
   constructor(
     private readonly _context: AutoGameflowMainContext,
-    private readonly _actions: AutoGameflowActions
+    private readonly _actionController: AutoGameflowActionController
   ) {}
 
   watch() {
@@ -35,13 +35,13 @@ export class AutoGameflowLobbyFlowController {
         if (phase === 'ReadyCheck') {
           const delay = settings.autoAcceptDelaySeconds * 1e3
           state.setAcceptAt(Date.now() + delay)
-          this._actions.startAutoAccept(delay)
+          this._actionController.startAutoAccept(delay)
 
           logger.info(`ReadyCheck! Will accept in ${settings.autoAcceptDelaySeconds} seconds`)
         } else {
-          if (this._actions.isAutoAcceptStarted) {
+          if (this._actionController.isAutoAcceptStarted) {
             logger.info(`Cancelled upcoming auto-accept - not in ReadyCheck phase`)
-            this._actions.cancelAutoAcceptTask()
+            this._actionController.cancelAutoAcceptTask()
           }
           state.clearAutoAccept()
         }
@@ -53,7 +53,7 @@ export class AutoGameflowLobbyFlowController {
       () => settings.autoAcceptEnabled,
       (enabled) => {
         if (!enabled) {
-          this._actions.cancelAutoAccept('normal')
+          this._actionController.cancelAutoAccept('normal')
         }
       },
       { fireImmediately: true }
@@ -64,7 +64,7 @@ export class AutoGameflowLobbyFlowController {
         event.data &&
         (event.data.playerResponse === 'Declined' || event.data.playerResponse === 'Accepted')
       ) {
-        this._actions.cancelAutoAccept(event.data.playerResponse.toLowerCase())
+        this._actionController.cancelAutoAccept(event.data.playerResponse.toLowerCase())
       }
     })
   }
@@ -79,7 +79,7 @@ export class AutoGameflowLobbyFlowController {
           !enabled ||
           (phase !== 'WaitingForStats' && phase !== 'PreEndOfGame' && phase !== 'EndOfGame')
         ) {
-          this._actions.cancelPlayAgain()
+          this._actionController.cancelPlayAgain()
           return
         }
 
@@ -88,7 +88,7 @@ export class AutoGameflowLobbyFlowController {
           logger.info(
             `In WaitingForStats, waiting for ${AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
           )
-          this._actions.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
+          this._actionController.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
           return
         }
 
@@ -97,13 +97,13 @@ export class AutoGameflowLobbyFlowController {
           logger.info(
             `Waiting for ballot event ${AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`
           )
-          this._actions.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
+          this._actionController.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
           return
         }
 
         if (phase === 'EndOfGame' && enabled) {
           logger.info(`Will return to lobby in ${AUTO_GAMEFLOW_PLAY_AGAIN_BUFFER_TIMEOUT} ms`)
-          this._actions.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_BUFFER_TIMEOUT)
+          this._actionController.startPlayAgain(AUTO_GAMEFLOW_PLAY_AGAIN_BUFFER_TIMEOUT)
           return
         }
       },
@@ -119,9 +119,9 @@ export class AutoGameflowLobbyFlowController {
       ([phase, enabled]) => {
         if (phase === 'Reconnect' && enabled) {
           logger.info('Will attempt to reconnect in a short delay')
-          this._actions.scheduleReconnect(10000)
+          this._actionController.scheduleReconnect(10000)
         } else {
-          this._actions.cancelReconnect()
+          this._actionController.cancelReconnect()
         }
       }
     )

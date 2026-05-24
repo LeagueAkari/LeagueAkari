@@ -92,7 +92,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import {
   AccountScopeLoadouts,
   ChampionSimple,

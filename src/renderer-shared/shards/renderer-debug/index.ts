@@ -11,7 +11,7 @@ import {
   RENDERER_DEBUG_RENDERER_NAMESPACE,
   type RendererDebugRendererContext
 } from './context'
-import { RendererDebugWatchers } from './debug-watchers'
+import { RendererDebugWatcher } from './debug-watcher'
 import { RendererDebugRuleManager } from './rule-manager'
 import { useRendererDebugStore } from './store'
 
@@ -22,7 +22,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   private readonly _matcher = new RadixEventEmitter()
   private readonly _context: RendererDebugRendererContext
   private readonly _ruleManager: RendererDebugRuleManager
-  private readonly _watchers: RendererDebugWatchers
+  private readonly _watcher: RendererDebugWatcher
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
@@ -42,14 +42,14 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
       matcher: this._matcher
     }
     this._ruleManager = new RendererDebugRuleManager(this._context)
-    this._watchers = new RendererDebugWatchers(this._context, this._ruleManager)
+    this._watcher = new RendererDebugWatcher(this._context, this._ruleManager)
   }
 
   async onInit() {
     const store = useRendererDebugStore()
 
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._watchers.init()
+    await this._watcher.init()
   }
 
   addRule(rule: string, enabled = true) {
