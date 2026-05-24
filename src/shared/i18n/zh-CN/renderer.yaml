@@ -1756,15 +1756,15 @@ Client:
       description: 设置快捷键
 
     settingsFileMode:
-      label: 锁定设置项
-      description: 更改客户端设置文件属性，以避免游戏内设置项被更改。只读为锁定，可写为解锁
-      setReadonlyButton: 设置只读
-      setWritableButton: 设置可写
-      setToReadonly: 已设置为只读
-      setToWritable: 已设置为可写
-      failedToSet: 设置失败 {{reason}}
-      readonly: '当前：只读'
-      writable: '当前：可写'
+      label: 锁定游戏设置
+      description: 防止游戏内改动覆盖你已经调好的设置。需要调整设置时，可临时解除锁定
+      details:
+        readonly: 锁定后，League Akari 会把英雄联盟的设置文件设为只读。游戏仍会读取现有设置，但新的改动不会写回。
+        writable: 解除锁定会恢复写入。之后在游戏内调整画质、热键等设置时，会正常保存。
+        scope: 只影响当前连接的客户端安装目录。
+      setToReadonly: 已锁定游戏设置
+      setToWritable: 已解除游戏设置锁定
+      failedToSet: 切换锁定状态失败 {{reason}}
 
   leagueClientUx:
     title: League Client UX

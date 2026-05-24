@@ -1759,15 +1759,15 @@ Client:
       description: Set a custom shortcut to forcibly terminate the game client process.
 
     settingsFileMode:
-      label: Lock Settings
-      description: Change the settings file attributes to prevent the game client from modifying the settings. Read-only is locked, writable is unlocked.
-      setReadonlyButton: Set to Read-Only
-      setWritableButton: Set to Writable
-      setToReadonly: Set to Read-Only
-      setToWritable: Set to Writable
-      failedToSet: 'Failed to set the settings file mode: {{reason}}'
-      readonly: 'Current: Read-Only'
-      writable: 'Current: Writable'
+      label: Lock Game Settings
+      description: Prevent in-game changes from overwriting the settings you already use. Unlock them when you need to edit settings.
+      details:
+        readonly: When locked, League Akari makes the League settings file read-only. The game can still read your current settings, but new changes will not be saved over them.
+        writable: Unlocking restores write access, so graphics, hotkeys, and other in-game changes save normally again.
+        scope: This only affects the settings file for the currently connected client installation.
+      setToReadonly: Game settings locked
+      setToWritable: Game settings unlocked
+      failedToSet: 'Failed to switch settings lock: {{reason}}'
 
   leagueClientUx:
     title: League Client UX

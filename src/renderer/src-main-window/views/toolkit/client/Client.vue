@@ -60,27 +60,30 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :label="t('Client.gameClient.settingsFileMode.label')"
             :label-description="t('Client.gameClient.settingsFileMode.description')"
             :label-width="320"
           >
-            <div style="display: flex; gap: 4px; align-items: center">
-              <NButton
-                :disabled="lcs.connectionState !== 'connected'"
-                size="small"
-                @click="() => handleSetSettingsFileMode('readonly')"
-                >{{ t('Client.gameClient.settingsFileMode.setReadonlyButton') }}</NButton
-              >
-              <NButton
-                :disabled="lcs.connectionState !== 'connected'"
-                size="small"
-                @click="() => handleSetSettingsFileMode('writable')"
-                >{{ t('Client.gameClient.settingsFileMode.setWritableButton') }}</NButton
-              >
-              <div class="settings-file-mode-indicator" v-if="settingFileMode !== 'unavailable'">
-                {{ t(`Client.gameClient.settingsFileMode.${settingFileMode}`) }}
-              </div>
-            </div>
+            <template #label>
+              <TooltipWithIcon>
+                <span>{{ t('Client.gameClient.settingsFileMode.label') }}</span>
+                <template #tooltip>
+                  <div class="max-w-70 text-xs leading-relaxed font-normal">
+                    <div class="space-y-1.5">
+                      <div>{{ t('Client.gameClient.settingsFileMode.details.readonly') }}</div>
+                      <div>{{ t('Client.gameClient.settingsFileMode.details.writable') }}</div>
+                      <div>{{ t('Client.gameClient.settingsFileMode.details.scope') }}</div>
+                    </div>
+                  </div>
+                </template>
+              </TooltipWithIcon>
+            </template>
+            <NSwitch
+              size="small"
+              :value="isSettingsFileLocked"
+              :loading="settingFileModeChanging"
+              :disabled="lcs.connectionState !== 'connected'"
+              @update:value="handleSettingsFileModeSwitch"
+            />
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
@@ -155,6 +158,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
@@ -226,6 +230,8 @@ const handleFixWindowMethodA = async () => {
 const message = useMessage()
 
 const settingFileMode = ref<'readonly' | 'writable' | 'unavailable'>('unavailable')
+const settingFileModeChanging = ref(false)
+const isSettingsFileLocked = computed(() => settingFileMode.value === 'readonly')
 
 watch(
   () => lcs.isConnected,
@@ -243,6 +249,7 @@ watch(
 
 const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
   try {
+    settingFileModeChanging.value = true
     await gc.setSettingsFileReadonlyOrWritable(mode)
     settingFileMode.value = await gc.getSettingsFileReadonlyOrWritable()
 
@@ -258,7 +265,13 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
       })
     )
     settingFileMode.value = 'unavailable'
+  } finally {
+    settingFileModeChanging.value = false
   }
+}
+
+const handleSettingsFileModeSwitch = (locked: boolean) => {
+  return handleSetSettingsFileMode(locked ? 'readonly' : 'writable')
 }
 </script>
 
@@ -278,24 +291,6 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
 
   :deep(.n-card) {
     background-color: transparent;
-  }
-}
-
-.settings-file-mode-indicator {
-  font-size: 12px;
-  font-weight: bold;
-  margin-left: 8px;
-}
-
-[data-theme='dark'] {
-  .settings-file-mode-indicator {
-    color: #46ff90d0;
-  }
-}
-
-[data-theme='light'] {
-  .settings-file-mode-indicator {
-    color: rgba(0, 122, 49, 0.816);
   }
 }
 </style>
