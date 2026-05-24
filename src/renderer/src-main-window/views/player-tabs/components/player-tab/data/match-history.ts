@@ -270,6 +270,13 @@ export function provideMatchHistory(props: {
         return
       }
 
+      if (
+        page.value.details[game.gameId] &&
+        page.value.details[game.gameId].source === game.source
+      ) {
+        return
+      }
+
       try {
         let wrappedGame: LcuOrSgpGameDetails
 
@@ -353,16 +360,29 @@ export function provideMatchHistory(props: {
             (g) => markRaw({ source: 'sgp', gameId: g.json.gameId, data: g }) as LcuOrSgpGameSummary
           )
 
-        loadGameDetails(games)
+        const prevDetails = games.reduce(
+          (acc, g) => {
+            const details = page.value?.details[g.gameId]
+
+            if (details && details.source === g.source) {
+              acc[g.gameId] = markRaw(details)
+            }
+
+            return acc
+          },
+          {} as Record<number, LcuOrSgpGameDetails>
+        )
 
         page.value = {
           games: markRaw(games),
           replayMetadata: {}, // must be shallow
-          details: {}, // must be shallow
+          details: prevDetails,
           detailsLoading: {}, // must be shallow
           queryParams: params,
           isLoadedByCollectMode: false
         }
+
+        loadGameDetails(games)
       } else {
         const { data } = await lc.api.matchHistory.getMatchHistory(
           puuid.value,
@@ -392,16 +412,27 @@ export function provideMatchHistory(props: {
           }
         })
 
-        loadGameDetails(games)
+        const prevDetails = completedGames.reduce(
+          (acc, g) => {
+            const details = page.value?.details[g.gameId]
+            if (details && details.source === g.source) {
+              acc[g.gameId] = markRaw(details)
+            }
+            return acc
+          },
+          {} as Record<number, LcuOrSgpGameDetails>
+        )
 
         page.value = {
           games: markRaw(completedGames),
           replayMetadata: {}, // must be shallow
-          details: {}, // must be shallow
+          details: prevDetails,
           detailsLoading: {}, // must be shallow
           queryParams: params,
           isLoadedByCollectMode: false
         }
+
+        loadGameDetails(games)
       }
 
       if (!isCrossRegion.value) {
