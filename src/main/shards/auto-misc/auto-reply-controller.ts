@@ -2,10 +2,10 @@ import type { ChatMessage } from '@shared/types/league-client/chat'
 import type { LcuEvent } from '@shared/types/league-client/event'
 import { formatError } from '@shared/utils/errors'
 
-import type { AutoReplyMainContext } from './context'
+import type { AutoMiscMainContext } from './context'
 
-export class AutoReplyController {
-  constructor(private readonly context: AutoReplyMainContext) {}
+export class AutoMiscAutoReplyController {
+  constructor(private readonly _context: AutoMiscMainContext) {}
 
   watch() {
     this._watchIncomingMessages()
@@ -13,27 +13,31 @@ export class AutoReplyController {
   }
 
   private _watchIncomingMessages() {
-    const { ipc, leagueClient, logger, namespace, settings } = this.context
+    const { leagueClient } = this._context
 
-    // 原始人的方法！
     leagueClient.events.on<LcuEvent<ChatMessage>>(
       '/lol-chat/v1/conversations/:fromId/messages/:messageId',
       async (event, { fromId }) => {
+        const { ipc, logger, namespace, settings } = this._context
+
         if (
-          settings.enabled &&
+          settings.autoReplyEnabled &&
           event.data &&
           leagueClient.data.summoner.me &&
           event.data.type === 'chat' &&
           event.data.fromSummonerId !== leagueClient.data.summoner.me.summonerId &&
-          settings.text
+          settings.autoReplyText
         ) {
-          if (settings.enableOnAway && leagueClient.data.chat.me?.availability !== 'away') {
+          if (
+            settings.autoReplyEnableOnAway &&
+            leagueClient.data.chat.me?.availability !== 'away'
+          ) {
             return
           }
 
           try {
-            await leagueClient.api.chat.chatSend(fromId, settings.text)
-            logger.info(`Auto-replied to ${fromId}, content: ${settings.text}`)
+            await leagueClient.api.chat.chatSend(fromId, settings.autoReplyText)
+            logger.info(`Auto-replied to ${fromId}, content: ${settings.autoReplyText}`)
           } catch (error) {
             ipc.sendEvent(namespace, 'error-send-failed', {
               error: formatError(error)
@@ -46,11 +50,13 @@ export class AutoReplyController {
   }
 
   private _watchOfflineStatusLock() {
-    const { leagueClient, logger, mobxUtils, settings } = this.context
+    const { leagueClient, mobxUtils, settings } = this._context
 
     mobxUtils.reaction(
       () => leagueClient.data.chat.me?.availability,
       (availability, prev) => {
+        const { logger } = this._context
+
         if (!availability || !settings.lockOfflineStatus) {
           return
         }

@@ -953,6 +953,27 @@ AutoMisc:
       label: 回复内容
       description: 将作为自动回复的内容词
 
+  autoStatusMessage:
+    updated: 已更新
+    title: 自动设置个性签名
+
+    enabled:
+      label: 开启
+
+    text:
+      label: 个性签名
+      description: 登录后自动设置的聊天个性签名
+
+  autoRankedStatus:
+    title: 自动设置虚假段位
+
+    enabled:
+      label: 开启
+
+    queue: 队列
+    tier: 段位
+    division: 分段
+
   autoInvitation:
     title: 邀请好友进入房间
     description: 进行一次性的监听，当指定好友空闲时，发出房间邀请。

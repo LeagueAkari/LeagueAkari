@@ -6,7 +6,7 @@ import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
 import { AutoGameflowMain } from '@main/shards/auto-gameflow'
-import { AutoReplyMain } from '@main/shards/auto-reply'
+import { AutoMiscMain } from '@main/shards/auto-misc'
 import { AutoSelectMain } from '@main/shards/auto-select'
 import { ClientInstallationMain } from '@main/shards/client-installation'
 import { ConfigMigrateMain } from '@main/shards/config-migrate'
@@ -321,7 +321,7 @@ export function bootstrap() {
     // functional shards
     manager.use(AutoChampionConfigMain)
     manager.use(AutoGameflowMain)
-    manager.use(AutoReplyMain)
+    manager.use(AutoMiscMain)
     manager.use(AutoSelectMain)
     manager.use(InGameSendMain)
     manager.use(OngoingGameMain)

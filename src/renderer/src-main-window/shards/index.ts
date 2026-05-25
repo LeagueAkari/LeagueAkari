@@ -2,7 +2,7 @@ import { createManager } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
-import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
+import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
@@ -40,7 +40,7 @@ manager.use(AppCommonRenderer)
 manager.use(AutoChampConfigRenderer)
 manager.use(AutoGameflowRenderer)
 manager.use(AutoSelectRenderer)
-manager.use(AutoReplyRenderer)
+manager.use(AutoMiscRenderer)
 manager.use(ClientInstallationRenderer)
 manager.use(ExtraAssetsRenderer)
 manager.use(GameClientRenderer)

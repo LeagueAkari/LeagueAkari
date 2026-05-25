@@ -2,11 +2,17 @@ import 'reflect-metadata'
 
 import { describe, expect, it } from 'vitest'
 
-import { MIGRATION_FROM_143, sanitizeShortcutSettingRecord } from './migrations/from-1-4-3'
+import {
+  MIGRATION_FROM_143,
+  MIGRATION_FROM_143_AUTO_MISC,
+  getAutoMiscSettingMigrationTarget,
+  sanitizeShortcutSettingRecord
+} from './migrations/from-1-4-3'
 
 describe('from 1.4.3 migration', () => {
   it('uses the 1.4.3 migration marker', () => {
     expect(MIGRATION_FROM_143).toBe('akari-migration-from-1.4.3_patch1')
+    expect(MIGRATION_FROM_143_AUTO_MISC).toBe('akari-migration-from-1.4.3_patch2')
   })
 })
 
@@ -75,5 +81,26 @@ describe('sanitizeShortcutSettingRecord', () => {
         }
       ]
     })
+  })
+})
+
+describe('getAutoMiscSettingMigrationTarget', () => {
+  it('moves existing auto reply settings into the auto misc shard namespace', () => {
+    expect(getAutoMiscSettingMigrationTarget('auto-reply-main/enabled')).toBe(
+      'auto-misc-main/autoReplyEnabled'
+    )
+    expect(getAutoMiscSettingMigrationTarget('auto-reply-main/enableOnAway')).toBe(
+      'auto-misc-main/autoReplyEnableOnAway'
+    )
+    expect(getAutoMiscSettingMigrationTarget('auto-reply-main/text')).toBe(
+      'auto-misc-main/autoReplyText'
+    )
+    expect(getAutoMiscSettingMigrationTarget('auto-reply-main/lockOfflineStatus')).toBe(
+      'auto-misc-main/lockOfflineStatus'
+    )
+  })
+
+  it('ignores unrelated setting keys', () => {
+    expect(getAutoMiscSettingMigrationTarget('auto-select-main/enabled')).toBeNull()
   })
 })

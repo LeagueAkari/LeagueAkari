@@ -9,6 +9,18 @@ Use this skill for any League Akari shard work: creating a new shard, adding a f
 
 The goal is stable shard architecture: clear responsibilities, boring public contracts, platform-safe side effects, and minimal behavior drift.
 
+## Enforcement Scope
+
+These rules are hard requirements for any newly created shard and for any feature migration into a shard. Do not treat them as optional style guidance.
+
+- Existing shards do not need retroactive cleanup just because they predate this skill.
+- When creating a new shard, moving a feature into another shard, or consolidating several features under one shard, follow Create Mode / Refactor Mode structure from the start.
+- Do not dump migrated feature logic directly into `index.ts`, even if the old shard was small. `index.ts` should stay an entrypoint for DI, settings registration, state sync, controller construction, lifecycle orchestration, and thin compatibility methods.
+- For a local change inside an old shard that is not already organized this way, ask the user whether to:
+  - make a narrow in-place change; or
+  - first reorganize the touched area according to this skill, then apply the change.
+- If the user explicitly requests a fast or narrow fix, keep the edit local but do not make the old structure worse. Add a controller/context split only when the requested change itself creates or migrates a functional module boundary.
+
 ## Core Rules
 
 - Preserve public contracts unless the user explicitly asks to change them:
@@ -64,7 +76,11 @@ node -e "const fs=require('node:fs');const path=require('node:path');const roots
    - platform assumptions
    - pure helpers worth testing
 
-4. Choose one of two modes:
+4. Decide whether the task touches a new/migrated feature or an old shard local edit:
+   - New shard or feature migration: follow the hard structure rules without asking.
+   - Old shard local edit: if the user did not specify architecture scope, ask whether to change in place or reorganize the touched area first.
+
+5. Choose one of two modes:
    - **Create mode**: design the minimal shard shape before coding.
    - **Refactor mode**: preserve behavior first, then split by actual responsibilities.
 

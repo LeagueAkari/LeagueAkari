@@ -954,6 +954,27 @@ AutoMisc:
       label: Reply Text
       description: The content to be used as the auto-reply message.
 
+  autoStatusMessage:
+    updated: Updated
+    title: Auto Status Message
+
+    enabled:
+      label: Enable
+
+    text:
+      label: Status Message
+      description: Chat status message to set after login.
+
+  autoRankedStatus:
+    title: Auto Fake Ranked Status
+
+    enabled:
+      label: Enable
+
+    queue: Queue
+    tier: Tier
+    division: Division
+
   autoInvitation:
     title: Invite Friends to Room
     description: 'One-time monitoring: when specified friends become available, send room invitations.'
