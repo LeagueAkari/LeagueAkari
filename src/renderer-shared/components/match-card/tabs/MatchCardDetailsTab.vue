@@ -83,7 +83,7 @@
           <NPopover placement="right" v-if="row.chartData" :delay="200">
             <template #trigger>
               <td
-                class="sticky left-0 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
+                class="sticky left-0 z-2 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
               >
                 {{ getStatKeyTranslation(row.key) }}
               </td>
@@ -93,7 +93,7 @@
           <td
             v-else
             :title="getStatKeyTranslation(row.key)"
-            class="sticky left-0 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
+            class="sticky left-0 z-2 w-30 max-w-30 truncate border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 bg-[#e5e5e5] p-2 text-center text-xs font-bold transition-colors dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:bg-[#1a1a1a]"
           >
             {{ getStatKeyTranslation(row.key) }}
           </td>
@@ -123,6 +123,7 @@ import { type VNodeChild, computed, ref, shallowRef } from 'vue'
 import { useMatchCard } from '../context'
 import {
   MAPPED_RENDER_GROUP_OPTIONS,
+  RENDER_GROUP_DISPLAY_ORDER,
   RENDER_GROUPS,
   RenderGroupOptions,
   useRawDetails,
@@ -152,6 +153,7 @@ const rawStats = useRawDetails()
 const valueRenderer = useValueRenderer()
 const filterText = shallowRef('')
 const filterTextDebounced = refDebounced(filterText, 250)
+const groupDisplayOrder = new Map(RENDER_GROUP_DISPLAY_ORDER.map((group, index) => [group, index]))
 
 const { t } = useTranslation()
 
@@ -199,6 +201,12 @@ const groups = computed(() => {
   }
 
   return [...RENDER_GROUPS, undocumentedGroup]
+    .toSorted((a, b) => {
+      const orderA = groupDisplayOrder.get(a.group) ?? Number.MAX_SAFE_INTEGER
+      const orderB = groupDisplayOrder.get(b.group) ?? Number.MAX_SAFE_INTEGER
+
+      return orderA - orderB
+    })
     .map((group) => {
       return {
         group: group.group,

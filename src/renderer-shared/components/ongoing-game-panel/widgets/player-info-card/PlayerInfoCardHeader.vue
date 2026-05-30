@@ -58,10 +58,11 @@
         </div>
 
         <NDropdown
+          v-if="matchCollectionOptions.length"
           trigger="click"
           size="small"
+          placement="bottom-start"
           :options="matchCollectionOptions"
-          placement="top-start"
         >
           <NButton
             quaternary
@@ -130,18 +131,15 @@
 
 <script setup lang="tsx">
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import {
-  MoreVertFilled as MoreVertFilledIcon,
-  PlaceRound as PlaceRoundIcon,
-  SportsEsportsRound as SportsEsportsRoundIcon
-} from '@vicons/material'
+import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NDropdown, NIcon, NPopover } from 'naive-ui'
+import { NButton, NDropdown, NIcon, NPopover, type DropdownOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT, RANKED_MEDAL_MAP } from '../../constants'
@@ -171,38 +169,47 @@ const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
 
-const championName = computed(() => name(championId.value || -1))
+const currentChampionId = computed(() => championId.value || -1)
+
+const hasCurrentChampion = computed(() => currentChampionId.value > 0)
+
+const championName = computed(() => name(currentChampionId.value))
+
+const currentPosition = computed(() => position.value?.position)
+
+const hasCurrentPosition = computed(() => {
+  return !!currentPosition.value && currentPosition.value !== 'NONE'
+})
 
 const currentPositionName = computed(() => {
-  const p = position.value?.position
-
-  if (!p || p === 'NONE') {
+  if (!hasCurrentPosition.value) {
     return t('positions.ALL', { ns: 'common' })
   }
 
-  return t(`positions.${p}`, { ns: 'common' })
+  return t(`positions.${currentPosition.value}`, { ns: 'common' })
 })
 
-const matchCollectionOptions = computed(() => [
-  {
-    label: t('PlayerInfoCard.collectByChampion', { champion: championName.value }),
-    key: 'collect-by-champion',
-    icon: () => (
-      <NIcon>
-        <SportsEsportsRoundIcon />
-      </NIcon>
-    )
-  },
-  {
-    label: t('PlayerInfoCard.collectByPosition', { position: currentPositionName.value }),
-    key: 'collect-by-position',
-    icon: () => (
-      <NIcon>
-        <PlaceRoundIcon />
-      </NIcon>
-    )
+const matchCollectionOptions = computed(() => {
+  const options: DropdownOption[] = []
+
+  if (hasCurrentChampion.value) {
+    options.push({
+      label: t('PlayerInfoCard.collectByChampion', { champion: championName.value }),
+      key: 'collect-by-champion',
+      icon: () => <ChampionIcon class="size-4 rounded" championId={currentChampionId.value} />
+    })
   }
-])
+
+  if (hasCurrentPosition.value) {
+    options.push({
+      label: t('PlayerInfoCard.collectByPosition', { position: currentPositionName.value }),
+      key: 'collect-by-position',
+      icon: () => <PositionIcon position={currentPosition.value} />
+    })
+  }
+
+  return options
+})
 
 const rankedSoloFlex = computed(() => {
   if (!rankedStats.value) {

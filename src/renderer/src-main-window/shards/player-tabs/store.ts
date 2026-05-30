@@ -5,6 +5,7 @@ import { SpectatorData } from '@shared/types/sgp/gsm'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
+import { CreateTabOptions, InitParams } from './context'
 
 /**
  * 这些状态由 tab 自身去主动同步它
@@ -23,20 +24,11 @@ export interface TabSelfSyncedState {
   spectatorData: SpectatorData | null
 
   refresh: (() => void) | null
+
+  applyInitParams?: (initParams: InitParams) => void
 }
 
-/**
- * 在创建 tab 时，可以额外传递某些参数，以指导第一次的行为
- */
-export interface TabInitParams {
-  /** 预设的收集模式下的英雄筛选 */
-  collectByChampionId?: number
-
-  /** 预设的收集模式下的位置筛选 */
-  collectByPosition?: string
-}
-
-export interface TabState extends TabSelfSyncedState, TabInitParams {
+export interface TabState extends TabSelfSyncedState {
   id: string
 
   /** 页面的 puuid */
@@ -44,6 +36,9 @@ export interface TabState extends TabSelfSyncedState, TabInitParams {
 
   /** 该玩家数据来源自哪个服务器 */
   sgpServerId: string
+
+  /** 页面初始化参数 */
+  initParams: InitParams
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
@@ -116,12 +111,12 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     }
   }
 
-  const createTab = (data: TabState, setCurrent = true) => {
+  const createTab = (data: TabState, options: CreateTabOptions = {}) => {
     if (tabs.value.some((t) => t.id === data.id)) {
       return
     }
 
-    if (setCurrent) {
+    if (options.setCurrent) {
       currentTabId.value = data.id
     }
 

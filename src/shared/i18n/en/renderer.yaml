@@ -1628,6 +1628,8 @@ MatchCard:
     HealFromMapSources: Heal from Map Sources
     gameLength: Game Length
     playedChampSelectPosition: Played Champ Select Position
+    positionAssignedByMatchmaking: Position Assigned by Matchmaking
+    selectedRolePreferences: Selected Role Preferences
     hadAfkTeammate: Had AFK Teammate
     highestChampionDamage: Highest Champion Damage
     PlayerBehavior: Player Behavior
@@ -2857,8 +2859,8 @@ PlayerInfoCard:
   kdaPopover_one: In the recent {{count}} game, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   kdaPopover_other: In the recent {{count}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: They are a premade team. Labeled as Team {{team}}.
-  collectByChampion: By champion ({{champion}})
-  collectByPosition: By position ({{position}})
+  collectByChampion: Collect {{champion}} matches
+  collectByPosition: Collect {{position}} matches
   sameChampionHistory: Champion History
   highWinRatePopover_one: This player's win rate is exceptionally high. In the recent {{count}} game, they have won {{winCount}} games.
   highWinRatePopover_other: This player's win rate is exceptionally high. In the recent {{count}} games, they have won {{winCount}} games.

@@ -10,7 +10,9 @@ import {
   SEARCH_HISTORY_KEY,
   SEARCH_HISTORY_MAX_LENGTH,
   type SearchHistoryItem,
-  type SearchResult
+  type SearchResult,
+  type InitParams,
+  type CreateTabOptions
 } from './context'
 import { usePageSizeOptions } from './page-size-options'
 import { watchPlayerTabs } from './player-tabs-watcher'
@@ -18,7 +20,13 @@ import { PlayerTabsSearchHistoryService } from './search-history-service'
 import { syncPlayerTabsSettings } from './settings-sync'
 import { usePlayerTabsStore } from './store'
 
-export { usePageSizeOptions, type SearchHistoryItem, type SearchResult }
+export {
+  usePageSizeOptions,
+  type SearchHistoryItem,
+  type SearchResult,
+  type InitParams,
+  type CreateTabOptions
+}
 
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
@@ -72,7 +80,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
     const router = useRouter()
     const sgpStore = useSgpStore()
 
-    const navigateToTab = async (unionId: string) => {
+    const navigateToTab = async (unionId: string, initParams: InitParams = {}) => {
       const { sgpServerId, puuid } = this.parseUnionId(unionId)
 
       if (!puuid || puuid === EMPTY_PUUID) {
@@ -81,18 +89,24 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
 
       return router.replace({
         name: 'player-tabs',
-        params: { puuid, sgpServerId }
+        params: { puuid, sgpServerId },
+        query: { ...initParams }
       })
     }
 
-    const navigateToTabByPuuidAndSgpServerId = async (puuid: string, sgpServerId: string) => {
+    const navigateToTabByPuuidAndSgpServerId = async (
+      puuid: string,
+      sgpServerId: string,
+      initParams: InitParams = {}
+    ) => {
       if (!puuid || puuid === EMPTY_PUUID) {
         return
       }
 
       return router.replace({
         name: 'player-tabs',
-        params: { puuid, sgpServerId }
+        params: { puuid, sgpServerId },
+        query: { ...initParams }
       })
     }
 
@@ -124,7 +138,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
   }
 
   /** 创建一个新的 Tab, 并设置一些初始值 */
-  createTab(puuid: string, sgpServerId: string, setCurrent = true) {
+  createTab(puuid: string, sgpServerId: string, options: CreateTabOptions = {}) {
     const playerTabsStore = usePlayerTabsStore()
 
     if (playerTabsStore.getTab(this.toUnionId(sgpServerId, puuid))) {
@@ -140,20 +154,25 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
         summoner: null,
         summonerProfile: null,
         spectatorData: null,
-        refresh: null
+        refresh: null,
+        initParams: options.initParams || {}
       },
-      setCurrent
+      options
     )
   }
 
-  setCurrentOrCreateTab(puuid: string, sgpServerId: string) {
+  /**
+   * 如果不存在页面，则创建一个页面并将其设置为当前页面；如果存在页面，则只设置为当前页面
+   */
+  createTabAndSetCurrent(puuid: string, sgpServerId: string, initParams: InitParams = {}) {
     const playerTabsStore = usePlayerTabsStore()
     const tab = playerTabsStore.getTab(this.toUnionId(sgpServerId, puuid))
 
     if (tab) {
       playerTabsStore.setCurrentTab(tab.id)
+      playerTabsStore.updateTabData(tab.id, { initParams })
     } else {
-      this.createTab(puuid, sgpServerId)
+      this.createTab(puuid, sgpServerId, { initParams, setCurrent: true })
     }
   }
 }

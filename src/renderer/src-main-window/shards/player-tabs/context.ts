@@ -23,3 +23,13 @@ export interface SearchResult {
   privacy: string
   summonerLevel: number
 }
+
+export interface InitParams {
+  collectByChampionId?: number
+  collectByPosition?: string
+}
+
+export interface CreateTabOptions {
+  setCurrent?: boolean
+  initParams?: InitParams
+}

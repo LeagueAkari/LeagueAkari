@@ -25,7 +25,7 @@ import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { InitParams, PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import StartupPane from './components/StartupPane.vue'
@@ -46,9 +46,12 @@ const playerTabRoute = computed(() => {
 
   const puuid = route.params.puuid as string
   const sgpServerId = route.params.sgpServerId as string
+  const query = route.query as InitParams
+
+  console.log('[debug] playerTabRoute', { puuid, sgpServerId, query })
 
   if (typeof puuid === 'string' && typeof sgpServerId === 'string' && puuid && sgpServerId) {
-    return { puuid, sgpServerId }
+    return { puuid, sgpServerId, initParams: query }
   }
 
   return null
@@ -62,7 +65,9 @@ watch(
       return
     }
 
-    pt.setCurrentOrCreateTab(route.puuid, route.sgpServerId)
+    // clear query
+
+    pt.createTabAndSetCurrent(route.puuid, route.sgpServerId, route.initParams)
   },
   { immediate: true }
 )

@@ -1625,6 +1625,8 @@ MatchCard:
     HealFromMapSources: 地图资源治疗
     gameLength: 游戏总时长
     playedChampSelectPosition: 选择的英雄位置
+    positionAssignedByMatchmaking: 匹配系统分配位置
+    selectedRolePreferences: 选择的位置偏好
     hadAfkTeammate: 队友挂机
     highestChampionDamage: 最高英雄伤害
     PlayerBehavior: 玩家行为
@@ -2846,8 +2848,8 @@ PlayerInfoCard:
   winRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
   kdaPopover: 在近期 {{count}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
-  collectByChampion: 以当前英雄 ({{champion}}) 收集战绩
-  collectByPosition: 以当前位置 ({{position}}) 收集战绩
+  collectByChampion: 收集「{{champion}}」的战绩
+  collectByPosition: 收集「{{position}}」的战绩
   sameChampionHistory: 英雄战绩
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{count}} 场的对局中，赢了 {{winCount}} 场
   teamDamageShare: 伤害 {{rate}}%
