@@ -3,17 +3,20 @@ import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-sc
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 
 import {
+  type CreateTabOptions,
+  type InitParams,
+  type MatchHistoryInitParams,
   PLAYER_TABS_RENDERER_NAMESPACE,
   SEARCH_HISTORY_KEY,
   SEARCH_HISTORY_MAX_LENGTH,
   type SearchHistoryItem,
-  type SearchResult,
-  type InitParams,
-  type CreateTabOptions
+  type SearchResult
 } from './context'
+import { hasInitParams, serializeInitParamsToQuery } from './init-params'
 import { usePageSizeOptions } from './page-size-options'
 import { watchPlayerTabs } from './player-tabs-watcher'
 import { PlayerTabsSearchHistoryService } from './search-history-service'
@@ -25,7 +28,12 @@ export {
   type SearchHistoryItem,
   type SearchResult,
   type InitParams,
+  type MatchHistoryInitParams,
   type CreateTabOptions
+}
+
+const toStoredInitParams = (initParams?: InitParams): InitParams | null => {
+  return hasInitParams(initParams) ? (markRaw(initParams) as InitParams) : null
 }
 
 /**
@@ -90,7 +98,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       return router.replace({
         name: 'player-tabs',
         params: { puuid, sgpServerId },
-        query: { ...initParams }
+        query: serializeInitParamsToQuery(initParams)
       })
     }
 
@@ -106,21 +114,22 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
       return router.replace({
         name: 'player-tabs',
         params: { puuid, sgpServerId },
-        query: { ...initParams }
+        query: serializeInitParamsToQuery(initParams)
       })
     }
 
     /**
      * 以当前大区为准跳转到指定 puuid 的战绩页面
      */
-    const navigateToTabByPuuid = async (puuid: string) => {
+    const navigateToTabByPuuid = async (puuid: string, initParams: InitParams = {}) => {
       if (!puuid || puuid === EMPTY_PUUID) {
         return
       }
 
       return router.replace({
         name: 'player-tabs',
-        params: { puuid, sgpServerId: sgpStore.availability.sgpServerId }
+        params: { puuid, sgpServerId: sgpStore.availability.sgpServerId },
+        query: serializeInitParamsToQuery(initParams)
       })
     }
 
@@ -155,7 +164,7 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
         summonerProfile: null,
         spectatorData: null,
         refresh: null,
-        initParams: options.initParams || {}
+        initParams: toStoredInitParams(options.initParams)
       },
       options
     )
@@ -164,13 +173,16 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
   /**
    * 如果不存在页面，则创建一个页面并将其设置为当前页面；如果存在页面，则只设置为当前页面
    */
-  createTabAndSetCurrent(puuid: string, sgpServerId: string, initParams: InitParams = {}) {
+  createTabAndSetCurrent(puuid: string, sgpServerId: string, initParams?: InitParams) {
     const playerTabsStore = usePlayerTabsStore()
     const tab = playerTabsStore.getTab(this.toUnionId(sgpServerId, puuid))
 
     if (tab) {
       playerTabsStore.setCurrentTab(tab.id)
-      playerTabsStore.updateTabData(tab.id, { initParams })
+
+      if (hasInitParams(initParams)) {
+        playerTabsStore.updateTabData(tab.id, { initParams: toStoredInitParams(initParams) })
+      }
     } else {
       this.createTab(puuid, sgpServerId, { initParams, setCurrent: true })
     }

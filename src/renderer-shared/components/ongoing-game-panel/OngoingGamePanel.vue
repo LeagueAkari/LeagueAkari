@@ -77,7 +77,7 @@ import { computed } from 'vue'
 
 import type { MatchPreviewPayload } from '../match-preview'
 import { FIXED_CARD_WIDTH_PX_NUMBER, POSITION_ORDER, PREMADE_TEAMS } from './constants'
-import { provideOngoingGamePanel } from './context'
+import { type OngoingGamePanelPlayerTabInitParams, provideOngoingGamePanel } from './context'
 import OngoingGameTeam from './widgets/OngoingGameTeam.vue'
 
 const props = defineProps<{
@@ -88,7 +88,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  navigateToSummonerByPuuid: [puuid: string]
+  navigateToSummonerByPuuid: [puuid: string, initParams?: OngoingGamePanelPlayerTabInitParams]
   previewGame: [payload: MatchPreviewPayload]
 }>()
 
@@ -240,8 +240,8 @@ provideOngoingGamePanel({
   isTwoTeamsMode,
   mergedPremadeTeams,
 
-  navigateToSummonerByPuuid: (puuid: string) => {
-    emits('navigateToSummonerByPuuid', puuid)
+  navigateToSummonerByPuuid: (puuid: string, initParams?: OngoingGamePanelPlayerTabInitParams) => {
+    emits('navigateToSummonerByPuuid', puuid, initParams)
   },
   previewGame: (payload: MatchPreviewPayload) => {
     emits('previewGame', payload)

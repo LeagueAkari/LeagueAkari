@@ -25,6 +25,9 @@ export interface TabSelfSyncedState {
 
   refresh: (() => void) | null
 
+  /** 页面初始化参数，注意这个参数在页面初始化时会被立即消费，因此无需响应式 */
+  initParams: InitParams | null
+
   applyInitParams?: (initParams: InitParams) => void
 }
 
@@ -36,9 +39,6 @@ export interface TabState extends TabSelfSyncedState {
 
   /** 该玩家数据来源自哪个服务器 */
   sgpServerId: string
-
-  /** 页面初始化参数 */
-  initParams: InitParams
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */

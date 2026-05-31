@@ -5,6 +5,16 @@ import { InjectionKey, MaybeRefOrGetter, Ref, computed, inject, provide, toRef }
 import type { MatchPreviewPayload } from '../match-preview'
 import { IQR_THRESHOLD } from './constants'
 
+export interface OngoingGamePanelMatchHistoryInitParams {
+  collectByChampionId?: number
+  collectByPosition?: string
+  expectedCount?: number
+}
+
+export interface OngoingGamePanelPlayerTabInitParams {
+  matchHistory?: OngoingGamePanelMatchHistoryInitParams
+}
+
 export type OngoingGamePanelContext = {
   contentWidth: Ref<number>
   contentHeight: Ref<number>
@@ -20,7 +30,10 @@ export type OngoingGamePanelContext = {
   /** 低于或高于平均 KDA 的玩家 */
   kdaOutliers: Ref<Record<string, 'over' | 'below'>>
 
-  navigateToSummonerByPuuid: (puuid: string) => void
+  navigateToSummonerByPuuid: (
+    puuid: string,
+    initParams?: OngoingGamePanelPlayerTabInitParams
+  ) => void
   previewGame: (payload: MatchPreviewPayload) => void
 }
 
@@ -49,7 +62,10 @@ export function provideOngoingGamePanel(props: {
     premadeTeamIdMap: Record<string, string>
   }>
 
-  navigateToSummonerByPuuid: (puuid: string) => void
+  navigateToSummonerByPuuid: (
+    puuid: string,
+    initParams?: OngoingGamePanelPlayerTabInitParams
+  ) => void
   previewGame: (payload: MatchPreviewPayload) => void
 }) {
   const ogs = useOngoingGameStore()

@@ -25,7 +25,8 @@ import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { InitParams, PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import { parseInitParamsFromQuery } from '@main-window/shards/player-tabs/init-params'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import StartupPane from './components/StartupPane.vue'
@@ -46,12 +47,10 @@ const playerTabRoute = computed(() => {
 
   const puuid = route.params.puuid as string
   const sgpServerId = route.params.sgpServerId as string
-  const query = route.query as InitParams
-
-  console.log('[debug] playerTabRoute', { puuid, sgpServerId, query })
+  const initParams = parseInitParamsFromQuery(route.query)
 
   if (typeof puuid === 'string' && typeof sgpServerId === 'string' && puuid && sgpServerId) {
-    return { puuid, sgpServerId, initParams: query }
+    return { puuid, sgpServerId, initParams }
   }
 
   return null
@@ -60,14 +59,20 @@ const playerTabRoute = computed(() => {
 // 路由 ==> 页面
 watch(
   () => playerTabRoute.value,
-  (route) => {
-    if (!route) {
+  (targetRoute) => {
+    if (!targetRoute) {
       return
     }
 
-    // clear query
+    pt.createTabAndSetCurrent(targetRoute.puuid, targetRoute.sgpServerId, targetRoute.initParams)
 
-    pt.createTabAndSetCurrent(route.puuid, route.sgpServerId, route.initParams)
+    // route query 只作为一次性 initParams 通道，交给 tab 后立即清掉。
+    if (targetRoute.initParams) {
+      void router.replace({
+        name: 'player-tabs',
+        params: { puuid: targetRoute.puuid, sgpServerId: targetRoute.sgpServerId }
+      })
+    }
   },
   { immediate: true }
 )

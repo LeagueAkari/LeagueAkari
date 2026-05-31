@@ -24,9 +24,14 @@ export interface SearchResult {
   summonerLevel: number
 }
 
-export interface InitParams {
+export interface MatchHistoryInitParams {
   collectByChampionId?: number
   collectByPosition?: string
+  expectedCount?: number
+}
+
+export interface InitParams {
+  matchHistory?: MatchHistoryInitParams
 }
 
 export interface CreateTabOptions {

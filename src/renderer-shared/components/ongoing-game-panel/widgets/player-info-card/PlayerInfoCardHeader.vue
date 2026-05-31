@@ -63,6 +63,7 @@
           size="small"
           placement="bottom-start"
           :options="matchCollectionOptions"
+          @select="handleMatchCollectionSelect"
         >
           <NButton
             quaternary
@@ -210,6 +211,25 @@ const matchCollectionOptions = computed(() => {
 
   return options
 })
+
+const handleMatchCollectionSelect = (key: string | number) => {
+  switch (key) {
+    case 'collect-by-champion':
+      if (hasCurrentChampion.value) {
+        navigateToSummonerByPuuid(puuid, {
+          matchHistory: { collectByChampionId: currentChampionId.value }
+        })
+      }
+      break
+    case 'collect-by-position':
+      if (hasCurrentPosition.value && currentPosition.value) {
+        navigateToSummonerByPuuid(puuid, {
+          matchHistory: { collectByPosition: currentPosition.value }
+        })
+      }
+      break
+  }
+}
 
 const rankedSoloFlex = computed(() => {
   if (!rankedStats.value) {

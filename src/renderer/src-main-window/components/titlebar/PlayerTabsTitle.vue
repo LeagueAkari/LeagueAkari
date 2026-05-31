@@ -415,7 +415,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string | null, setCurrent 
     navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
   } else {
     // 先路由
-    pt.createTab(puuid, sgpServerId, false)
+    pt.createTab(puuid, sgpServerId, { setCurrent: false })
   }
 }
 

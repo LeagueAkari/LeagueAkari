@@ -32,7 +32,15 @@ import {
   watch
 } from 'vue'
 
+import type { MatchHistoryInitParams } from '@main-window/shards/player-tabs/context'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
+
+import { InitParamsContext } from '../init-params'
+import { toPredicate } from '../widgets/match-history-filters/filter-state'
+import {
+  createInitParamCollectFilterState,
+  createInitParamCollectSettings
+} from './match-history-init-param-collect'
 
 /**
 收集模式下的参数
@@ -120,13 +128,16 @@ export const MatchHistoryContextKey: InjectionKey<MatchHistoryContext> = Symbol(
  *
  * - 目前战绩录像下载只支持 lcu 数据源
  */
-export function provideMatchHistory(props: {
-  puuid: MaybeRefOrGetter<string>
-  preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
-  sgpServerId: MaybeRefOrGetter<string>
-  isCrossRegion: MaybeRefOrGetter<boolean>
-  predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
-}) {
+export function provideMatchHistory(
+  props: {
+    puuid: MaybeRefOrGetter<string>
+    preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
+    sgpServerId: MaybeRefOrGetter<string>
+    isCrossRegion: MaybeRefOrGetter<boolean>
+    predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
+  },
+  initParamsTool: InitParamsContext
+): MatchHistoryContext {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
@@ -216,6 +227,14 @@ export function provideMatchHistory(props: {
     return (
       sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.matchHistory ?? false)
     )
+  })
+
+  const isMatchHistorySourceReady = computed(() => {
+    if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+      return sgpApiAvailable.value
+    }
+
+    return true
   })
 
   const loadReplayMetadata = async (games: LcuOrSgpGameSummary[]) => {
@@ -694,16 +713,47 @@ export function provideMatchHistory(props: {
     }
   })
 
+  const collectByInitParams = (initParams: MatchHistoryInitParams | null) => {
+    if (!initParams || isLoading.value || !isMatchHistorySourceReady.value) {
+      return false
+    }
+
+    const filterState = createInitParamCollectFilterState(initParams, puuid.value)
+
+    if (!filterState) {
+      return false
+    }
+
+    log.info(componentName, 'Starting match history collection from init params', initParams)
+
+    collectMatchHistory({
+      ...createInitParamCollectSettings(initParams),
+      predicate: toPredicate(filterState),
+      queryParams: {
+        __sgpServerId: sgpServerId.value
+      }
+    })
+
+    return true
+  }
+
   watch(
     [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
-    ([available]) => {
+    () => {
       lcuCompleteGameQueue.clear()
       lcuReplayMetadataQueue.clear()
 
-      if ((preferredSource.value === 'sgp' || isCrossRegion.value) && !available) {
+      if (!isMatchHistorySourceReady.value) {
         return
       }
 
+      const initParams = initParamsTool.consumeMatchHistoryInitParams()
+
+      if (collectByInitParams(initParams)) {
+        return
+      }
+
+      // default approach
       loadMatchHistory({
         startIndex: 0,
         count: pts.frontendSettings.loadCount
@@ -711,6 +761,11 @@ export function provideMatchHistory(props: {
     },
     { immediate: true }
   )
+
+  initParamsTool.onMatchHistoryInitParamsUpdate((newParams) => {
+    log.info(componentName, 'Received updated init params', newParams)
+    collectByInitParams(newParams)
+  })
 
   provide(MatchHistoryContextKey, {
     page,

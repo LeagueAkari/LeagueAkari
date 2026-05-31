@@ -27,6 +27,7 @@ import { provideSpectator } from './data/spectator'
 import { provideSummoner } from './data/summoner'
 import { provideSummonerProfile } from './data/summoner-profile'
 import { provideTags } from './data/tags'
+import { provideInitParamsTool } from './init-params'
 
 export type PlayerTabContext = {
   id: Ref<string>
@@ -112,6 +113,7 @@ export function providePlayerTab(props: {
     return toValue(props.sgpServerId) !== sgps.availability.sgpServerId
   })
 
+  // basics and top-level states and methods
   provide(PlayerTabContextKey, {
     id,
     puuid,
@@ -129,12 +131,15 @@ export function providePlayerTab(props: {
       if (setCurrent) {
         navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId.value)
       } else {
-        pt.createTab(puuid, sgpServerId.value, false)
+        pt.createTab(puuid, sgpServerId.value, { setCurrent: false })
       }
     },
     previewGame: props.previewGame
   })
 
+  const initParamsTool = provideInitParamsTool({ id })
+
+  // data
   provideSummoner({
     puuid,
     preferredSource,
@@ -147,13 +152,16 @@ export function providePlayerTab(props: {
     enablePositionFilter: computed(() => preferredSource.value === 'sgp' || isCrossRegion.value)
   })
 
-  provideMatchHistory({
-    puuid,
-    preferredSource,
-    sgpServerId,
-    isCrossRegion,
-    predicate
-  })
+  provideMatchHistory(
+    {
+      puuid,
+      preferredSource,
+      sgpServerId,
+      isCrossRegion,
+      predicate
+    },
+    initParamsTool
+  )
 
   provideRankedStats({
     puuid,
