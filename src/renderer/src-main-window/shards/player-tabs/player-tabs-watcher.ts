@@ -12,10 +12,10 @@ export function watchPlayerTabs(playerTabs: PlayerTabsRenderer) {
 
   // 在玩家登录时立即创建一个页面
   watch(
-    [() => leagueClientStore.summoner.me, () => sgpStore.availability.sgpServerId],
-    ([me, sgpServerId]) => {
-      if (me && sgpServerId) {
-        playerTabs.createTab(me.puuid, sgpServerId)
+    [() => leagueClientStore.summoner.me?.puuid, () => sgpStore.availability.sgpServerId],
+    ([mePuuid, sgpServerId]) => {
+      if (mePuuid && sgpServerId) {
+        playerTabs.createTab(mePuuid, sgpServerId, { setCurrent: true })
       }
     },
     { immediate: true }

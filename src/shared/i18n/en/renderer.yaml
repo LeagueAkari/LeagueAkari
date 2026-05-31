@@ -2387,7 +2387,7 @@ PlayerTab:
     scannedMatches_other: '{count} scanned matches'
     collectedMatches_one: '{count} collected match'
     collectedMatches_other: '{count} collected matches'
-    reloadNormalPage: Back to normal pages
+    reloadNormalPage: Exit Collection Mode
     collectingProgress: Collecting ({{count}} / {{expected}})
     stoppingProgress: Stopping collection ({{count}} / {{expected}})
     roundProgress: Round {{current}} / {{max}}

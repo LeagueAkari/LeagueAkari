@@ -51,6 +51,15 @@
         />
       </div>
     </template>
+
+    <div
+      v-else-if="!page"
+      class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
+    >
+      <span class="text-sm text-black/80 dark:text-white/60">{{
+        t('PlayerTab.noMatchHistory')
+      }}</span>
+    </div>
   </div>
 </template>
 

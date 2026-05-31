@@ -9,6 +9,7 @@ import {
   inject,
   provide,
   ref,
+  shallowRef,
   toRef
 } from 'vue'
 
@@ -33,6 +34,9 @@ export type MatchHistoryFiltersContext = {
   activeMode: Ref<MatchHistoryFilterMode>
   predicate: ComputedRef<Predicate<LcuOrSgpGameSummary>>
   rootHasCombinator: ComputedRef<boolean>
+  setActiveMode: (mode: MatchHistoryFilterMode) => void
+  setSimpleFilterState: (state: SimpleMatchHistoryFilterState) => void
+  setAdvancedFilterState: (state: MatchHistoryFilterState) => void
   clearPredicate: () => void
 }
 
@@ -47,8 +51,8 @@ export function provideMatchHistoryFilters(props: {
   const puuid = toRef(props.puuid)
   const enablePositionFilter = toRef(props.enablePositionFilter)
   const activeMode = ref<MatchHistoryFilterMode>('simple')
-  const simpleFilterState = ref(createEmptySimpleState())
-  const advancedFilterState = ref(createEmptyState())
+  const simpleFilterState = shallowRef(createEmptySimpleState())
+  const advancedFilterState = shallowRef(createEmptyState())
 
   const filterState = computed(() =>
     activeMode.value === 'simple'
@@ -67,6 +71,18 @@ export function provideMatchHistoryFilters(props: {
       : hasPredicate(advancedFilterState.value)
   )
 
+  const setActiveMode = (mode: MatchHistoryFilterMode) => {
+    activeMode.value = mode
+  }
+
+  const setSimpleFilterState = (state: SimpleMatchHistoryFilterState) => {
+    simpleFilterState.value = state
+  }
+
+  const setAdvancedFilterState = (state: MatchHistoryFilterState) => {
+    advancedFilterState.value = state
+  }
+
   const clearPredicate = () => {
     if (activeMode.value === 'simple') {
       simpleFilterState.value = clearSimplePredicate(simpleFilterState.value)
@@ -82,6 +98,9 @@ export function provideMatchHistoryFilters(props: {
     activeMode,
     rootHasCombinator,
     predicate,
+    setActiveMode,
+    setSimpleFilterState,
+    setAdvancedFilterState,
     clearPredicate
   })
 
@@ -92,6 +111,9 @@ export function provideMatchHistoryFilters(props: {
     activeMode,
     rootHasCombinator,
     predicate,
+    setActiveMode,
+    setSimpleFilterState,
+    setAdvancedFilterState,
     clearPredicate
   }
 }

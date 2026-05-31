@@ -199,7 +199,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
   return {
     frontendSettings,
 
-    gameSummaryLruMap: gameSummaryLruMap,
+    gameSummaryLruMap,
 
     tabs,
     currentTabId,

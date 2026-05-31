@@ -2385,7 +2385,7 @@ PlayerTab:
     scannedMatches_other: '{count} 场战绩'
     collectedMatches_one: '{count} 场'
     collectedMatches_other: '{count} 场'
-    reloadNormalPage: 返回普通分页
+    reloadNormalPage: 退出收集模式
     collectingProgress: 正在收集中 ({{count}} / {{expected}})
     stoppingProgress: 正在停止收集 ({{count}} / {{expected}})
     roundProgress: 第 {{current}} / {{max}} 轮

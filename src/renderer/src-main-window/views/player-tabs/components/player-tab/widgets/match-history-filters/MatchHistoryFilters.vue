@@ -240,7 +240,6 @@ const handleCollect = () => {
     }
   })
 
-  clearFilters()
   showCollectModeSettingsModal.value = false
   emits('collectBegin')
 }

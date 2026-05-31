@@ -33,6 +33,13 @@ Do not rely on memory for these areas; read the skill first and follow its curre
 
 ---
 
+## PR Workflow
+
+When preparing or updating a pull request, follow the requirements in `PR_REQUIREMENTS.md` first.
+This applies especially when the work was authored or reviewed with AI assistance.
+
+---
+
 ## Git Attribution
 
 When the user asks an agent to commit changes, add co-author attribution only if that agent
