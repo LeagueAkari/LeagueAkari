@@ -217,14 +217,20 @@ const handleMatchCollectionSelect = (key: string | number) => {
     case 'collect-by-champion':
       if (hasCurrentChampion.value) {
         navigateToSummonerByPuuid(puuid, {
-          matchHistory: { collectByChampionId: currentChampionId.value }
+          matchHistory: {
+            collectByChampionId: currentChampionId.value,
+            expectedCount: ogs.settings.matchHistoryLoadCount
+          }
         })
       }
       break
     case 'collect-by-position':
       if (hasCurrentPosition.value && currentPosition.value) {
         navigateToSummonerByPuuid(puuid, {
-          matchHistory: { collectByPosition: currentPosition.value }
+          matchHistory: {
+            collectByPosition: currentPosition.value,
+            expectedCount: ogs.settings.matchHistoryLoadCount
+          }
         })
       }
       break
