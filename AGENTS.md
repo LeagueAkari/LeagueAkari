@@ -26,6 +26,9 @@ working update:
 - **Renderer UI work**: use `.agents/skills/league-akari-ui-components/SKILL.md` when implementing
   or reviewing renderer UI components, especially i18n interpolation, pluralization, Tailwind usage
   in SFC styles, or native semantic elements inside the Naive UI renderer.
+- **SGP/LCU data-source work**: use `.agents/skills/league-akari-sgp-data-source/SKILL.md` when
+  implementing or reviewing SGP API clients, LCU-vs-SGP source selection, League Servers remote
+  config, Tencent cross-region behavior, token handling, or per-feature SGP interoperability.
 - **Dev-window debugging**: use `.agents/skills/league-akari-mcp-debug/SKILL.md` when debugging
   League Akari dev windows through the configured Playwright MCP connection.
 
