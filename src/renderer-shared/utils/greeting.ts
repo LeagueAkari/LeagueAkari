@@ -1,25 +1,25 @@
-const gochiusaHeroineColors = [
-  { name: 'Cocoa', color: '#f4a7b9' },
-  { name: 'Chino', color: '#8ecae6' },
-  { name: 'Rize', color: '#8e6bbf' },
-  { name: 'Chiya', color: '#87c36b' },
-  { name: 'Syaro', color: '#f2d36b' },
-  { name: 'Maya', color: '#f39b5f' },
-  { name: 'Megu', color: '#f0a9d8' }
+const gochiusaEasterEggSegments = [
+  { text: 'is', color: '#fdd5d5' }, // Cocoa / ココア
+  { text: 'the', color: '#cad8f5' }, // Chino / チノ
+  { text: 'order', color: '#e6aee6' }, // Rize / リゼ
+  { text: 'a', color: '#cfea89' }, // Chiya / 千夜
+  { text: 'Ra', color: '#f5d292' }, // Syaro / シャロ
+  { text: 'bb', color: '#a0ecd9' }, // Maya / マヤ
+  { text: 'it', color: '#f1bca5' } // Megu / メグ
 ]
 
 const createGochiusaGreetingLog = (version: string) => {
-  const blockFormat = gochiusaHeroineColors.map(() => '%c■').join('')
-  const blockStyles = gochiusaHeroineColors.map(
-    ({ color }) => `color: ${color}; font-size: 16px; margin-left: 4px;`
+  const easterEggFormat = gochiusaEasterEggSegments
+    .map(({ text }, index) => `%c${index > 0 && index < 5 ? ' ' : ''}${text}`)
+    .join('')
+  const sharedStyle = 'font-weight: bold;'
+  const easterEggStyles = gochiusaEasterEggSegments.map(
+    ({ color }) => `${sharedStyle} color: ${color};`
   )
 
   return {
-    format: `%cLeague Akari v${version}, is the order a Rabbit?${blockFormat}`,
-    styles: [
-      'border-radius: 4px; background: #f9ceeb; color: #ff59cb; font-size: 16px; font-weight: bold; padding: 4px;',
-      ...blockStyles
-    ]
+    format: `League Akari v${version}, ${easterEggFormat}%c?`,
+    styles: [...easterEggStyles, '']
   }
 }
 
