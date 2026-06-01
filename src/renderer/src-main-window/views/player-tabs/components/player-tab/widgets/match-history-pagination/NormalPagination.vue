@@ -91,11 +91,11 @@ defineEmits<{
 
 const { t } = useTranslation()
 
-const { preferredSource, isCrossRegion } = usePlayerTab()
+const { preferredSource, isCrossRegion, sgpApiStatus } = usePlayerTab()
 const { isLoading, collectState } = useMatchHistory()
 
 const isPaginationDisabled = computed(() => isLoading.value || !!collectState.value)
 const isSgpMatchHistorySource = computed(
-  () => preferredSource.value === 'sgp' || isCrossRegion.value
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
 )
 </script>

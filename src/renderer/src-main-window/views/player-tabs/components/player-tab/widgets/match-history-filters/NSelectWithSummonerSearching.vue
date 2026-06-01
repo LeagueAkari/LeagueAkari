@@ -15,8 +15,11 @@
 
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
+import { useInstance } from '@renderer-shared/shards'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { toIdentities } from '@shared/data-adapter/match-history/identities'
 import { useDebounceFn } from '@vueuse/core'
 import { NSelect, SelectOption } from 'naive-ui'
@@ -37,7 +40,13 @@ const { cachedSummoners, saveSummoner } = useMatchHistoryFilterEditor()
 const isSearchingSummoner = ref(false)
 const searchText = ref('')
 
-const { puuid, isCrossRegion, sgpServerId } = usePlayerTab()
+const { puuid, preferredSource, isCrossRegion, sgpServerId, sgpApiStatus } = usePlayerTab()
+
+const componentName = useComponentName()
+const log = useInstance(LoggerRenderer)
+const isSgpMatchHistorySource = computed(
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
+)
 
 const summonerMapInPage = computed(() => {
   if (!page.value) {
@@ -92,6 +101,37 @@ watch(
   { immediate: true }
 )
 
+const resolveSummonerSearchSource = () => {
+  if (isSgpMatchHistorySource.value) {
+    if (!sgpApiStatus.value.isReady) {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before searching summoners from ${sgpServerId.value}`
+      )
+      return null
+    }
+
+    return 'sgp'
+  }
+
+  if (isCrossRegion.value) {
+    log.warn(
+      componentName,
+      `Cannot search summoners: SGP API is unavailable for ${sgpServerId.value}`
+    )
+    return null
+  }
+
+  if (preferredSource.value === 'sgp') {
+    log.warn(
+      componentName,
+      `Falling back to LCU summoner search: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  }
+
+  return 'lcu'
+}
+
 const handleSearchSummoner = async (value: string) => {
   const [gameName = '', tagLine = ''] = value.split('#')
 
@@ -103,14 +143,20 @@ const handleSearchSummoner = async (value: string) => {
     return
   }
 
+  const source = resolveSummonerSearchSource()
+
+  if (!source) {
+    return
+  }
+
   isSearchingSummoner.value = true
 
   try {
     const summoner = await searchSummonerByAlias(
       gameName.trim(),
       tagLine.trim(),
-      isCrossRegion.value ? 'sgp' : 'lcu',
-      sgpServerId.value
+      source,
+      source === 'sgp' ? sgpServerId.value : undefined
     )
 
     if (summoner) {

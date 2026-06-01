@@ -182,9 +182,9 @@ const advancedFilterState = defineModel<MatchHistoryFilterState>('advancedFilter
   default: () => createEmptyState()
 })
 
-const { preferredSource, isCrossRegion, puuid, sgpServerId } = usePlayerTab()
+const { preferredSource, isCrossRegion, sgpApiStatus, puuid, sgpServerId } = usePlayerTab()
 const isSgpMatchHistorySource = computed(
-  () => preferredSource.value === 'sgp' || isCrossRegion.value
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
 )
 
 const activeFilterState = computed(() =>

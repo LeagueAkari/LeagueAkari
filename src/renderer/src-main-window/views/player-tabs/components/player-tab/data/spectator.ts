@@ -1,10 +1,10 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import type { SgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
 import { useInstance } from '@renderer-shared/shards'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { SpectatorData } from '@shared/types/sgp/gsm'
 import { useIntervalFn } from '@vueuse/core'
 import { isAxiosError } from 'axios'
@@ -25,6 +25,7 @@ import {
 } from 'vue'
 
 import { IS_SPECTATOR_FEATURE_ENABLED, UPDATE_SPECTATOR_DATA_INTERVAL } from '../constants'
+import { type PlayerTabDataSourceDecision, toRequiredSgpLoadStatus } from './source-selection'
 
 export type SpectatorContext = {
   spectatorData: Ref<SpectatorData | null>
@@ -54,14 +55,15 @@ const disabledSpectatorServers = new Set<string>()
 export function provideSpectator(props: {
   puuid: MaybeRefOrGetter<string>
   sgpServerId: MaybeRefOrGetter<string>
+  sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
 }) {
   const puuid = toRef(props.puuid)
   const sgpServerId = toRef(props.sgpServerId)
+  const sgpApiStatus = toRef(props.sgpApiStatus)
 
   const componentName = useComponentName()
 
   const sgp = useInstance(SgpRenderer)
-  const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
   const gc = useInstance(GameClientRenderer)
   const log = useInstance(LoggerRenderer)
@@ -74,9 +76,23 @@ export function provideSpectator(props: {
 
   const notification = useNotification()
 
-  const sgpApiAvailable = computed(() => {
-    return sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.common ?? false)
-  })
+  const dataSourceStatus = computed<PlayerTabDataSourceDecision>(() =>
+    toRequiredSgpLoadStatus(sgpApiStatus.value)
+  )
+
+  const logDataSourceStatus = (status: PlayerTabDataSourceDecision) => {
+    if (status.type === 'unavailable') {
+      log.warn(
+        componentName,
+        `Cannot load spectator data: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    } else if (status.type === 'wait') {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before loading spectator data from ${sgpServerId.value}`
+      )
+    }
+  }
 
   const loadSpectatorData = async () => {
     if (!IS_SPECTATOR_FEATURE_ENABLED) {
@@ -90,8 +106,9 @@ export function provideSpectator(props: {
       return
     }
 
-    // 需要可用
-    if (!sgpApiAvailable.value) {
+    const status = dataSourceStatus.value
+    if (status.type !== 'load') {
+      logDataSourceStatus(status)
       return
     }
 
@@ -193,7 +210,7 @@ export function provideSpectator(props: {
 
   // 监听参数变化，重新加载
   watch(
-    [puuid, sgpServerId],
+    [puuid, sgpServerId, dataSourceStatus],
     () => {
       if (!IS_SPECTATOR_FEATURE_ENABLED) {
         spectatorData.value = null
@@ -206,17 +223,24 @@ export function provideSpectator(props: {
       spectatorData.value = null
       isApiDisabled.value = disabledSpectatorServers.has(sgpServerId.value)
 
+      if (dataSourceStatus.value.type !== 'load') {
+        logDataSourceStatus(dataSourceStatus.value)
+        pause()
+        return
+      }
+
       loadSpectatorData()
     },
     { immediate: true }
   )
 
   watch(
-    sgpApiAvailable,
-    (available) => {
-      if (available && !isApiDisabled.value) {
+    dataSourceStatus,
+    (status) => {
+      if (status.type === 'load' && !isApiDisabled.value) {
         resume()
       } else {
+        logDataSourceStatus(status)
         pause()
       }
     },

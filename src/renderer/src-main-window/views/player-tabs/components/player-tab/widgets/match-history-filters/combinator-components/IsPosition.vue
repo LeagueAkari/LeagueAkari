@@ -50,13 +50,13 @@ const { nodeId } = defineProps<{
 }>()
 
 const { nodeMap, updateNode, deleteNode } = useMatchHistoryFilterEditor()
-const { preferredSource, isCrossRegion } = usePlayerTab()
+const { preferredSource, isCrossRegion, sgpApiStatus } = usePlayerTab()
 
 const { t } = useTranslation()
 
 const node = computed(() => nodeMap.value[nodeId] as IsPositionCombinator)
 const isSgpMatchHistorySource = computed(
-  () => preferredSource.value === 'sgp' || isCrossRegion.value
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
 )
 
 const positionOptions = computed(() => {

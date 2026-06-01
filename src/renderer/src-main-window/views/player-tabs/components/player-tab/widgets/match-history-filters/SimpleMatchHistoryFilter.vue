@@ -87,9 +87,12 @@
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
+import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { toIdentities } from '@shared/data-adapter/match-history/identities'
 import { useDebounceFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
@@ -117,8 +120,10 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const { match: isNameMatch } = useChampionNameMatch()
 const { page } = useMatchHistory()
-const { puuid, preferredSource, isCrossRegion, sgpServerId } = usePlayerTab()
+const { puuid, preferredSource, isCrossRegion, sgpServerId, sgpApiStatus } = usePlayerTab()
 const { searchSummonerByAlias } = useSummonerFetch()
+const componentName = useComponentName()
+const log = useInstance(LoggerRenderer)
 
 const searchText = ref('')
 const searchResults = ref<SimpleSummonerResult[]>([])
@@ -153,7 +158,7 @@ const selectedSummoners = computed({
 
 const cachedSummoners = computed(() => simpleState.value.cachedSummoners)
 const isSgpMatchHistorySource = computed(
-  () => preferredSource.value === 'sgp' || isCrossRegion.value
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
 )
 
 const timeRangeOptions = computed<{ label: string; value: SimpleTimeRangeFilter }[]>(() => [
@@ -211,6 +216,37 @@ const saveSummoner = (summoner: SimpleSummonerResult) => {
       [summoner.puuid]: summoner
     }
   })
+}
+
+const resolveSummonerSearchSource = () => {
+  if (isSgpMatchHistorySource.value) {
+    if (!sgpApiStatus.value.isReady) {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before searching summoners from ${sgpServerId.value}`
+      )
+      return null
+    }
+
+    return 'sgp'
+  }
+
+  if (isCrossRegion.value) {
+    log.warn(
+      componentName,
+      `Cannot search summoners: SGP API is unavailable for ${sgpServerId.value}`
+    )
+    return null
+  }
+
+  if (preferredSource.value === 'sgp') {
+    log.warn(
+      componentName,
+      `Falling back to LCU summoner search: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  }
+
+  return 'lcu'
 }
 
 watch(
@@ -300,14 +336,20 @@ const handleSearchSummoner = async (value: string) => {
     return
   }
 
+  const source = resolveSummonerSearchSource()
+
+  if (!source) {
+    return
+  }
+
   isSearchingSummoner.value = true
 
   try {
     const summoner = await searchSummonerByAlias(
       gameName.trim(),
       tagLine.trim(),
-      isCrossRegion.value ? 'sgp' : 'lcu',
-      sgpServerId.value
+      source,
+      source === 'sgp' ? sgpServerId.value : undefined
     )
 
     if (summoner) {

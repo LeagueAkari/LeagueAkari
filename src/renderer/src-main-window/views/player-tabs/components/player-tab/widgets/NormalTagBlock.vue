@@ -84,9 +84,10 @@ import { Summoner } from '@shared/data-adapter/summoner'
 import { DismissCircle16Regular as DeleteIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopconfirm, NScrollbar, useMessage } from 'naive-ui'
-import { markRaw, ref, watch } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 
 import { usePlayerTab } from '../context'
+import { type PlayerTabDataSourceDecision, toLoadStatus } from '../data/source-selection'
 import { useSummoner } from '../data/summoner'
 import { useTags } from '../data/tags'
 
@@ -99,10 +100,10 @@ const message = useMessage()
 const componentName = useComponentName()
 const log = useInstance(LoggerRenderer)
 
-const { preferredSource } = usePlayerTab()
+const { preferredSource, isCrossRegion, sgpServerId, sgpApiStatus, navigateToSummonerByPuuid } =
+  usePlayerTab()
 const { summoner } = useSummoner()
 const { tags, removeTag, loadTags } = useTags()
-const { navigateToSummonerByPuuid } = usePlayerTab()
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const handleToSummoner = (puuid: string) => {
@@ -126,8 +127,35 @@ const cachedSummoners = ref<Record<string, Summoner>>({})
 
 const maskedMarkerName = (puuid: string, index: number) => streamerSummonerName(puuid, index)
 
+const dataSourceDecision = computed(() =>
+  toLoadStatus({
+    preferredSource: preferredSource.value,
+    isCrossRegion: isCrossRegion.value,
+    sgpApiStatus: sgpApiStatus.value
+  })
+)
+
+const logDataSourceDecision = (decision: PlayerTabDataSourceDecision) => {
+  if (decision.type === 'unavailable') {
+    log.warn(
+      componentName,
+      `Cannot load tag marker summoner data: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  } else if (decision.type === 'wait') {
+    log.info(
+      componentName,
+      `Waiting for SGP API token readiness before loading tag marker summoner data from ${sgpServerId.value}`
+    )
+  } else if (decision.fallbackReason === 'sgp-api-unavailable') {
+    log.warn(
+      componentName,
+      `Falling back to LCU tag marker summoner data: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  }
+}
+
 watch(
-  tags,
+  [tags, dataSourceDecision],
   async () => {
     const markerPuuids = tags.value
       .map((tag) => tag.selfPuuid)
@@ -139,8 +167,19 @@ watch(
       return
     }
 
+    const decision = dataSourceDecision.value
+    logDataSourceDecision(decision)
+
+    if (decision.type !== 'load') {
+      return
+    }
+
     try {
-      const summoners = await getSummoners(markerPuuids, preferredSource.value)
+      const summoners = await getSummoners(
+        markerPuuids,
+        decision.source,
+        decision.source === 'sgp' ? sgpServerId.value : undefined
+      )
 
       for (const summoner of summoners) {
         cachedSummoners.value[summoner.puuid] = markRaw(summoner)

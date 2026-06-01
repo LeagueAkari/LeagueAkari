@@ -1,16 +1,17 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import type { SgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuGameSummary, LcuOrSgpGameSummary, SgpGameSummary } from '@shared/data-adapter/wrapper'
 import { EncounteredGame } from '@shared/types/shards/saved-player'
 import {
   InjectionKey,
   Ref,
+  computed,
   inject,
   markRaw,
   provide,
@@ -25,6 +26,7 @@ import { MaybeRefOrGetter } from 'vue'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { ENCOUNTERED_GAMES_PAGE_SIZE } from '../constants'
+import { type PlayerTabDataSourceDecision, toLoadStatus } from './source-selection'
 
 export type EncounteredGameContext = {
   pagedGames: Ref<PagedEncounteredGames | null>
@@ -53,17 +55,20 @@ export interface PagedEncounteredGames {
 export function provideEncounteredGames(props: {
   puuid: MaybeRefOrGetter<string>
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
+  sgpServerId: MaybeRefOrGetter<string>
+  sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
   isSelfTab: MaybeRefOrGetter<boolean>
   isCrossRegion: MaybeRefOrGetter<boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
+  const sgpServerId = toRef(props.sgpServerId)
+  const sgpApiStatus = toRef(props.sgpApiStatus)
   const isSelfTab = toRef(props.isSelfTab)
   const isCrossRegion = toRef(props.isCrossRegion)
 
   const lcs = useLeagueClientStore()
   const pts = usePlayerTabsStore()
-  const sgps = useSgpStore()
 
   const lc = useInstance(LeagueClientRenderer)
   const sgp = useInstance(SgpRenderer)
@@ -76,15 +81,44 @@ export function provideEncounteredGames(props: {
   const pagedGames = shallowRef<PagedEncounteredGames | null>(null)
   const gameMap = reactive<Record<number, LcuOrSgpGameSummary>>({})
 
+  const dataSourceStatus = computed<PlayerTabDataSourceDecision>(() =>
+    toLoadStatus({
+      preferredSource: preferredSource.value,
+      isCrossRegion: isCrossRegion.value,
+      sgpApiStatus: sgpApiStatus.value
+    })
+  )
+
+  const logDataSourceStatus = (status: PlayerTabDataSourceDecision) => {
+    if (status.type === 'unavailable') {
+      log.warn(
+        componentName,
+        `Cannot load encountered game summaries: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    } else if (status.type === 'wait') {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before loading encountered game summaries from ${sgpServerId.value}`
+      )
+    } else if (status.fallbackReason === 'sgp-api-unavailable') {
+      log.warn(
+        componentName,
+        `Falling back to LCU encountered game summaries: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    }
+  }
+
   const loadPageGames = async (gameIds: number[]) => {
+    const status = dataSourceStatus.value
+    logDataSourceStatus(status)
+
+    if (status.type !== 'load') {
+      return
+    }
+
     const task = async (gameId: number) => {
       try {
-        if (preferredSource.value === 'sgp') {
-          // SGP API 需要 token 就绪
-          if (!sgps.isTokenReady) {
-            return
-          }
-
+        if (status.source === 'sgp') {
           // use SGP API
           const cached = pts.gameSummaryLruMap.get(`sgp:${gameId}`) as SgpGameSummary | undefined
 
@@ -93,7 +127,9 @@ export function provideEncounteredGames(props: {
             return
           }
 
-          const { data } = await sgp.api.matchHistoryQuery.getGameSummaryByGameId(gameId)
+          const { data } = await sgp.api.matchHistoryQuery.getGameSummaryByGameId(gameId, {
+            __sgpServerId: sgpServerId.value
+          })
 
           gameMap[gameId] = markRaw({
             source: 'sgp',
@@ -160,11 +196,15 @@ export function provideEncounteredGames(props: {
 
   // 主要监听器
   watch(
-    [isSelfTab, preferredSource, puuid, isCrossRegion],
-    ([isSelfTab, _preferredSource, _puuid, isCrossRegion]) => {
+    [isSelfTab, dataSourceStatus, puuid, isCrossRegion],
+    ([isSelfTab, status, _puuid, isCrossRegion]) => {
       if (isCrossRegion) {
         pagedGames.value = null
         return
+      }
+
+      if (status.type !== 'load') {
+        logDataSourceStatus(status)
       }
 
       if (!isSelfTab) {
@@ -172,21 +212,6 @@ export function provideEncounteredGames(props: {
       }
     },
     { immediate: true }
-  )
-
-  // 监听 SGP token 就绪状态（仅在使用 SGP 加载游戏详情时需要）
-  watch(
-    () => sgps.isTokenReady,
-    (ready) => {
-      // 当 token 就绪且使用 SGP 源时，重新加载游戏详情
-      if (ready && preferredSource.value === 'sgp' && pagedGames.value) {
-        const gameIds = pagedGames.value.data.map((g) => g.gameId).filter((id) => !gameMap[id])
-
-        if (gameIds.length > 0) {
-          loadPageGames(gameIds)
-        }
-      }
-    }
   )
 
   provide(EncounteredGameContextKey, {

@@ -1,9 +1,9 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import type { SgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { AggregatedAnalysis, analyzeGames } from '@shared/data-adapter/analysis/player'
 import { GameRelationship, analyzeRelationship } from '@shared/data-adapter/analysis/relationship'
 import { Predicate } from '@shared/data-adapter/predicates/combinators'
@@ -41,6 +41,7 @@ import {
   createInitParamCollectFilterState,
   createInitParamCollectSettings
 } from './match-history-init-param-collect'
+import { type PlayerTabDataSourceDecision, toLoadStatus } from './source-selection'
 
 /**
 收集模式下的参数
@@ -134,6 +135,7 @@ export function provideMatchHistory(
     preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
     sgpServerId: MaybeRefOrGetter<string>
     isCrossRegion: MaybeRefOrGetter<boolean>
+    sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
     predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
   },
   initParamsTool: InitParamsContext
@@ -141,13 +143,13 @@ export function provideMatchHistory(
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
+  const sgpApiStatus = toRef(props.sgpApiStatus)
   const isCrossRegion = toRef(props.isCrossRegion)
   const predicate = toRef(props.predicate)
 
   const componentName = useComponentName()
 
   const sgp = useInstance(SgpRenderer)
-  const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
   const pts = usePlayerTabsStore()
   const log = useInstance(LoggerRenderer)
@@ -223,19 +225,35 @@ export function provideMatchHistory(
   const lcuReplayMetadataQueue = new PQueue({ concurrency: 5 })
   const gameDetailsQueue = new PQueue({ concurrency: 5 })
 
-  const sgpApiAvailable = computed(() => {
-    return (
-      sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.matchHistory ?? false)
-    )
-  })
+  const dataSourceDecision = computed<PlayerTabDataSourceDecision>(() =>
+    toLoadStatus({
+      preferredSource: preferredSource.value,
+      isCrossRegion: isCrossRegion.value,
+      sgpApiStatus: sgpApiStatus.value
+    })
+  )
 
-  const isMatchHistorySourceReady = computed(() => {
-    if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-      return sgpApiAvailable.value
+  const logDataSourceDecision = (
+    decision: PlayerTabDataSourceDecision,
+    actionName = 'match history'
+  ) => {
+    if (decision.type === 'unavailable') {
+      log.warn(
+        componentName,
+        `Cannot load ${actionName}: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    } else if (decision.type === 'wait') {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before loading ${actionName} from ${sgpServerId.value}`
+      )
+    } else if (decision.fallbackReason === 'sgp-api-unavailable') {
+      log.warn(
+        componentName,
+        `Falling back to LCU ${actionName}: SGP API is unavailable for ${sgpServerId.value}`
+      )
     }
-
-    return true
-  })
+  }
 
   const loadReplayMetadata = async (games: LcuOrSgpGameSummary[]) => {
     const { data: conf } = await lc.api.replays.getConfiguration()
@@ -342,6 +360,13 @@ export function provideMatchHistory(
   const loadMatchHistory = async (params: MatchHistoryQueryParams = {}) => {
     if (isLoading.value) return
 
+    const decision = dataSourceDecision.value
+    logDataSourceDecision(decision)
+
+    if (decision.type !== 'load') {
+      return
+    }
+
     lcuCompleteGameQueue.clear()
     isLoading.value = true
 
@@ -354,17 +379,7 @@ export function provideMatchHistory(
     const count = params.count ?? pts.frontendSettings.loadCount
 
     try {
-      if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-        // SGP API 需要 token 就绪
-        if (!sgps.isTokenReady) {
-          return
-        }
-
-        // 检查 SGP 服务器支持
-        if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
-          return
-        }
-
+      if (decision.source === 'sgp') {
         const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(
           puuid.value,
           {
@@ -472,6 +487,13 @@ export function provideMatchHistory(
   const collectMatchHistory = async (params: MatchHistoryCollectParams) => {
     if (isLoading.value) return
 
+    const decision = dataSourceDecision.value
+    logDataSourceDecision(decision, 'match history collection')
+
+    if (decision.type !== 'load') {
+      return
+    }
+
     lcuCompleteGameQueue.clear()
     isLoading.value = true
     const collectPageQueryParams = {
@@ -486,17 +508,7 @@ export function provideMatchHistory(
     }
 
     try {
-      if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-        // SGP API 需要 token 就绪
-        if (!sgps.isTokenReady) {
-          return
-        }
-
-        // 检查 SGP 服务器支持
-        if (!sgps.leagueServers.servers[sgpServerId.value]?.matchHistory) {
-          return
-        }
-
+      if (decision.source === 'sgp') {
         const lastPageGameIds = new Set<number>()
 
         collectState.value.currentIteration = 0
@@ -662,14 +674,17 @@ export function provideMatchHistory(
   const loadDetails = async (gameId: number) => {
     if (!page.value || page.value.detailsLoading[gameId]) return
 
+    const decision = dataSourceDecision.value
+    logDataSourceDecision(decision, 'match history details')
+
+    if (decision.type !== 'load') {
+      return
+    }
+
     page.value.detailsLoading[gameId] = true
 
     try {
-      if (preferredSource.value === 'sgp' || isCrossRegion.value) {
-        if (!sgps.isTokenReady) {
-          return
-        }
-
+      if (decision.source === 'sgp') {
         const { data } = await sgp.api.matchHistoryQuery.getGameDetailsByGameId(gameId, {
           __sgpServerId: sgpServerId.value
         })
@@ -714,7 +729,7 @@ export function provideMatchHistory(
   })
 
   const collectByInitParams = (initParams: MatchHistoryInitParams | null) => {
-    if (!initParams || isLoading.value || !isMatchHistorySourceReady.value) {
+    if (!initParams || isLoading.value) {
       return false
     }
 
@@ -738,12 +753,15 @@ export function provideMatchHistory(
   }
 
   watch(
-    [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
+    [dataSourceDecision, puuid, sgpServerId],
     () => {
       lcuCompleteGameQueue.clear()
       lcuReplayMetadataQueue.clear()
 
-      if (!isMatchHistorySourceReady.value) {
+      const decision = dataSourceDecision.value
+
+      if (decision.type !== 'load') {
+        logDataSourceDecision(decision)
         return
       }
 
@@ -764,6 +782,13 @@ export function provideMatchHistory(
 
   initParamsTool.onMatchHistoryInitParamsUpdate((newParams) => {
     log.info(componentName, 'Received updated init params', newParams)
+    const decision = dataSourceDecision.value
+
+    if (decision.type !== 'load') {
+      logDataSourceDecision(decision, 'match history collection from init params')
+      return
+    }
+
     collectByInitParams(newParams)
   })
 

@@ -52,7 +52,7 @@ const { isFloating = false, horizontal = false } = defineProps<{
   isFloating?: boolean
 }>()
 
-const { preferredSource, isCrossRegion } = usePlayerTab()
+const { preferredSource, isCrossRegion, sgpApiStatus } = usePlayerTab()
 const { isLoading, loadMatchHistory, page, collectState } = useMatchHistory()
 const {
   activeMode,
@@ -73,7 +73,7 @@ const scannedCount = computed(
 const isCollectModeActionDisabled = computed(() => isLoading.value || !!collectState.value)
 const isFilterActionDisabled = computed(() => isLoading.value || !!collectState.value)
 const isSgpMatchHistorySource = computed(
-  () => preferredSource.value === 'sgp' || isCrossRegion.value
+  () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
 )
 
 const {

@@ -1,4 +1,5 @@
 import type { MatchPreviewPayload } from '@renderer-shared/components/match-preview'
+import { type SgpApiStatus, useSgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -52,6 +53,9 @@ export type PlayerTabContext = {
   /** 该玩家数据来源自哪个服务器 */
   sgpServerId: Ref<string>
 
+  /** 该玩家数据来源的服务器是否可用 */
+  sgpApiStatus: Ref<SgpApiStatus>
+
   /** 是否小尺寸 */
   isSmallSize: Ref<boolean>
 
@@ -104,6 +108,7 @@ export function providePlayerTab(props: {
   const puuid = toRef(props.puuid)
   const preferredSource = computed(() => as.settings.preferredLolSource)
   const sgpServerId = toRef(props.sgpServerId)
+  const sgpApiStatus = useSgpApiStatus(sgpServerId)
 
   const isSelfTab = computed(() => {
     return puuid.value === lcs.summoner.me?.puuid
@@ -119,6 +124,7 @@ export function providePlayerTab(props: {
     puuid,
     preferredSource,
     sgpServerId,
+    sgpApiStatus,
 
     isSmallSize: toRef(props.isSmallSize),
     isCurrentTab: toRef(props.isCurrentTab),
@@ -144,12 +150,15 @@ export function providePlayerTab(props: {
     puuid,
     preferredSource,
     sgpServerId,
+    sgpApiStatus,
     isCrossRegion
   })
 
   const { predicate } = provideMatchHistoryFilters({
     puuid,
-    enablePositionFilter: computed(() => preferredSource.value === 'sgp' || isCrossRegion.value)
+    enablePositionFilter: computed(
+      () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
+    )
   })
 
   provideMatchHistory(
@@ -157,6 +166,7 @@ export function providePlayerTab(props: {
       puuid,
       preferredSource,
       sgpServerId,
+      sgpApiStatus,
       isCrossRegion,
       predicate
     },
@@ -177,6 +187,8 @@ export function providePlayerTab(props: {
   provideEncounteredGames({
     puuid,
     preferredSource,
+    sgpServerId,
+    sgpApiStatus,
     isSelfTab,
     isCrossRegion
   })
@@ -187,7 +199,8 @@ export function providePlayerTab(props: {
 
   provideSpectator({
     puuid,
-    sgpServerId
+    sgpServerId,
+    sgpApiStatus
   })
 
   provideSummonerProfile({
@@ -197,6 +210,7 @@ export function providePlayerTab(props: {
 
   provideChallengesPlayerData({
     puuid,
-    sgpServerId
+    sgpServerId,
+    sgpApiStatus
   })
 }

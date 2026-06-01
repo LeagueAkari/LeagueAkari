@@ -20,7 +20,7 @@ const cloneState = <T>(state: T): T => structuredClone(state)
 
 export function useCollectModeFilterDraft(props: {
   isCollectModePage: ComputedRef<boolean>
-  isSgpMatchHistorySource: ComputedRef<boolean>
+  isSgpMatchHistorySource: Readonly<Ref<boolean>>
   activeMode: Readonly<Ref<MatchHistoryFilterMode>>
   simpleFilterState: Readonly<Ref<SimpleMatchHistoryFilterState>>
   advancedFilterState: Readonly<Ref<MatchHistoryFilterState>>

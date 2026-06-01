@@ -65,6 +65,7 @@ import { NButton, NInput, NModal, useMessage } from 'naive-ui'
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { usePlayerTab } from '../context'
+import { type PlayerTabDataSourceDecision, toLoadStatus } from '../data/source-selection'
 import { useTags } from '../data/tags'
 
 const { t } = useTranslation()
@@ -74,7 +75,7 @@ const show = defineModel<boolean>('show', { default: false })
 
 const inputEl = useTemplateRef('input')
 
-const { puuid, preferredSource, isCrossRegion, sgpServerId } = usePlayerTab()
+const { puuid, preferredSource, isCrossRegion, sgpServerId, sgpApiStatus } = usePlayerTab()
 const { tags, loadTags, editTag, removeTag } = useTags()
 
 const selfTagged = computed(() => {
@@ -106,9 +107,43 @@ const maskedSummonerName = computed(() => {
   return streamerSummonerName(seed, 0)
 })
 
+const dataSourceDecision = computed(() =>
+  toLoadStatus({
+    preferredSource: preferredSource.value,
+    isCrossRegion: isCrossRegion.value,
+    sgpApiStatus: sgpApiStatus.value
+  })
+)
+
+const logDataSourceDecision = (decision: PlayerTabDataSourceDecision) => {
+  if (decision.type === 'unavailable') {
+    log.warn(
+      componentName,
+      `Cannot load tag modal summoner data: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  } else if (decision.type === 'wait') {
+    log.info(
+      componentName,
+      `Waiting for SGP API token readiness before loading tag modal summoner data from ${sgpServerId.value}`
+    )
+  } else if (decision.fallbackReason === 'sgp-api-unavailable') {
+    log.warn(
+      componentName,
+      `Falling back to LCU tag modal summoner data: SGP API is unavailable for ${sgpServerId.value}`
+    )
+  }
+}
+
 const loadSummoner = async () => {
+  const decision = dataSourceDecision.value
+  logDataSourceDecision(decision)
+
+  if (decision.type !== 'load') {
+    return
+  }
+
   try {
-    if (preferredSource.value === 'sgp' || isCrossRegion.value) {
+    if (decision.source === 'sgp') {
       const summoners = await getSummoners([puuid.value], 'sgp', sgpServerId.value)
 
       if (summoners.length && summoners[0]) {
@@ -151,9 +186,16 @@ watch(
   (show) => {
     if (show) {
       text.value = selfTagged.value?.tag || ''
+      summoner.value = null
       nextTick(() => inputEl.value?.focus())
       loadSummoner()
     }
   }
 )
+
+watch(dataSourceDecision, (decision) => {
+  if (show.value && !summoner.value && decision.type === 'load') {
+    loadSummoner()
+  }
+})
 </script>

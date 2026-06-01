@@ -1,11 +1,11 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import type { SgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Summoner, toSummoner } from '@shared/data-adapter/summoner'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
@@ -24,6 +24,8 @@ import {
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
+import { type PlayerTabDataSourceDecision, toLoadStatus } from './source-selection'
+
 export type SummonerContext = {
   summoner: Ref<Summoner | null>
   isLoading: Ref<boolean>
@@ -41,17 +43,18 @@ export function provideSummoner(props: {
   puuid: MaybeRefOrGetter<string>
   preferredSource: MaybeRefOrGetter<'lcu' | 'sgp'>
   sgpServerId: MaybeRefOrGetter<string>
+  sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
   isCrossRegion: MaybeRefOrGetter<boolean>
 }) {
   const puuid = toRef(props.puuid)
   const preferredSource = toRef(props.preferredSource)
   const sgpServerId = toRef(props.sgpServerId)
+  const sgpApiStatus = toRef(props.sgpApiStatus)
   const isCrossRegion = toRef(props.isCrossRegion)
 
   const componentName = useComponentName()
 
   const sgp = useInstance(SgpRenderer)
-  const sgps = useSgpStore()
   const lc = useInstance(LeagueClientRenderer)
   const rc = useInstance(RiotClientRenderer)
   const log = useInstance(LoggerRenderer)
@@ -64,23 +67,47 @@ export function provideSummoner(props: {
   const { t } = useTranslation()
   const notification = useNotification()
 
-  const sgpApiAvailable = computed(() => {
-    return sgps.isTokenReady && (sgps.leagueServers.servers[sgpServerId.value]?.common ?? false)
-  })
+  const dataSourceDecision = computed<PlayerTabDataSourceDecision>(() =>
+    toLoadStatus({
+      preferredSource: preferredSource.value,
+      isCrossRegion: isCrossRegion.value,
+      sgpApiStatus: sgpApiStatus.value
+    })
+  )
+
+  const logDataSourceDecision = (decision: PlayerTabDataSourceDecision) => {
+    if (decision.type === 'unavailable') {
+      log.warn(
+        componentName,
+        `Cannot load summoner data: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    } else if (decision.type === 'wait') {
+      log.info(
+        componentName,
+        `Waiting for SGP API token readiness before loading summoner data from ${sgpServerId.value}`
+      )
+    } else if (decision.fallbackReason === 'sgp-api-unavailable') {
+      log.warn(
+        componentName,
+        `Falling back to LCU summoner data: SGP API is unavailable for ${sgpServerId.value}`
+      )
+    }
+  }
 
   const loadSummoner = async () => {
     if (isLoading.value) return
 
+    const decision = dataSourceDecision.value
+    logDataSourceDecision(decision)
+
+    if (decision.type !== 'load') {
+      return
+    }
+
     isLoading.value = true
 
     try {
-      // 仅在跨区时考虑 sgp 数据源
-      if (isCrossRegion.value) {
-        // 需要可用
-        if (!sgpApiAvailable.value) {
-          return
-        }
-
+      if (decision.source === 'sgp') {
         const { data: summoners } = await sgp.api.summonerLedge.postSummonersByPuuids(
           [puuid.value],
           {
@@ -137,10 +164,12 @@ export function provideSummoner(props: {
 
   // 主要监听器：参数变化时加载
   watch(
-    [sgpApiAvailable, preferredSource, puuid, sgpServerId, isCrossRegion],
-    ([available]) => {
-      // 如果需要 SGP 但 token 未就绪，等待 token 就绪后再加载
-      if ((preferredSource.value === 'sgp' || isCrossRegion.value) && !available) {
+    [dataSourceDecision, puuid, sgpServerId],
+    () => {
+      const decision = dataSourceDecision.value
+
+      if (decision.type !== 'load') {
+        logDataSourceDecision(decision)
         return
       }
 
@@ -153,7 +182,9 @@ export function provideSummoner(props: {
   watch(
     () => lcs.summoner.me,
     (me) => {
-      if (me && me.puuid === puuid.value) {
+      const decision = dataSourceDecision.value
+
+      if (me && me.puuid === puuid.value && decision.type === 'load' && decision.source === 'lcu') {
         summoner.value = toSummoner({ source: 'lcu', data: me, puuid: me.puuid })
       }
     }
