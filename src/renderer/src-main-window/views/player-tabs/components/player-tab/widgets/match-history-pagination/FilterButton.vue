@@ -27,7 +27,11 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
-const { size = 'small', active = false, disabled = false } = defineProps<{
+const {
+  size = 'small',
+  active = false,
+  disabled = false
+} = defineProps<{
   size?: 'tiny' | 'small'
   active?: boolean
   disabled?: boolean

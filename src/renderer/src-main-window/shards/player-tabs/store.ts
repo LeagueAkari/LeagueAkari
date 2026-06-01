@@ -5,6 +5,7 @@ import { SpectatorData } from '@shared/types/sgp/gsm'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
+
 import { CreateTabOptions, InitParams } from './context'
 
 /**

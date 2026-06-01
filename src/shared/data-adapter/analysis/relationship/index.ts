@@ -33,7 +33,11 @@ export function analyzeRelationship(games: LcuOrSgpGameSummary[], puuid: string)
     }
 
     for (const participant of participants) {
-      if (!participant.puuid || participant.puuid === EMPTY_PUUID || participant.puuid === self.puuid) {
+      if (
+        !participant.puuid ||
+        participant.puuid === EMPTY_PUUID ||
+        participant.puuid === self.puuid
+      ) {
         continue
       }
 

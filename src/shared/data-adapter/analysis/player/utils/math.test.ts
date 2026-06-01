@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { avgOrZero, avgOrNull, avgIfAllNonNull } from './math'
+
+import { avgIfAllNonNull, avgOrNull, avgOrZero } from './math'
 
 describe('avgOrZero', () => {
   it('空样本（玩家无有效对局）→ 0', () => {
@@ -19,7 +20,7 @@ describe('avgOrZero', () => {
   })
 
   it('伤害占比（百分比小数）：0.25, 0.30, 0.20 → 0.25', () => {
-    expect(avgOrZero([0.25, 0.30, 0.20])).toBeCloseTo(0.25)
+    expect(avgOrZero([0.25, 0.3, 0.2])).toBeCloseTo(0.25)
   })
 })
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { mapToImagePosition, isSupportedMap, LOL_MAP_DOMAINS } from './game-map'
+
+import { LOL_MAP_DOMAINS, isSupportedMap, mapToImagePosition } from './game-map'
 
 // 真实的游戏内坐标 → 图片像素映射场景
 // JunglePathingInfo 中地图尺寸常用 48px（mini）和 140px（detail）

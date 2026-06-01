@@ -121,7 +121,9 @@ const computedCurrentPage = computed(() => {
   return Math.floor(startIndex / count) + 1
 })
 
-const currentPageSize = computed(() => page.value?.queryParams.count ?? pts.frontendSettings.loadCount)
+const currentPageSize = computed(
+  () => page.value?.queryParams.count ?? pts.frontendSettings.loadCount
+)
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
 
 const handlePrevPage = () => {

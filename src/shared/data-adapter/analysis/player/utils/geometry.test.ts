@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { classifyMapZone, classifyGankLane, detectStartCamp } from './geometry'
+
 import { BLUE_SIDE_CAMPS, RED_SIDE_CAMPS } from '../constants'
+import { classifyGankLane, classifyMapZone, detectStartCamp } from './geometry'
 
 // 真实召唤师峡谷坐标 (map 11: 0~14820 x, 0~14881 y)
 // 上路三角草: ~(2000, 12500)

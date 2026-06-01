@@ -47,5 +47,8 @@ const naiveUiTheme = computed(() => {
   return getNaiveUiTheme(as.colorTheme)
 })
 
-useColorThemeAttr(() => as.colorTheme, () => as.themeId)
+useColorThemeAttr(
+  () => as.colorTheme,
+  () => as.themeId
+)
 </script>

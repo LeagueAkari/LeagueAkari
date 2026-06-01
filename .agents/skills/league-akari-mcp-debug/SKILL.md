@@ -60,13 +60,13 @@ League Akari exposes several project-specific globals in renderer windows:
 
 Window-specific availability:
 
-| Window | Always useful globals / shards |
-| ------ | ------------------------------ |
-| Main | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
-| Aux | `window.akariManager`, `window.lcuApi`, `window-manager-renderer`, automation shards |
-| OP.GG | `window.akariManager`, `window.lcuApi`, `opgg-renderer`, `auto-champ-config-renderer` |
-| Ongoing Game | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer` |
-| CD Timer | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer` |
+| Window       | Always useful globals / shards                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Main         | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
+| Aux          | `window.akariManager`, `window.lcuApi`, `window-manager-renderer`, automation shards                                              |
+| OP.GG        | `window.akariManager`, `window.lcuApi`, `opgg-renderer`, `auto-champ-config-renderer`                                             |
+| Ongoing Game | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer`                                                  |
+| CD Timer     | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer`                       |
 
 Convenient console helper:
 
@@ -112,14 +112,15 @@ When a renderer error appears immediately after editing a Vue component, reload 
 Prefer serializable, normalized comparisons for API shape checks:
 
 ```js
-const compactRanked = (stats) => stats?.queues?.map((q) => ({
-  queueType: q.queueType,
-  tier: q.tier,
-  division: q.division,
-  leaguePoints: q.leaguePoints,
-  wins: q.wins,
-  losses: q.losses
-}))
+const compactRanked = (stats) =>
+  stats?.queues?.map((q) => ({
+    queueType: q.queueType,
+    tier: q.tier,
+    division: q.division,
+    leaguePoints: q.leaguePoints,
+    wins: q.wins,
+    losses: q.losses
+  }))
 ```
 
 Useful renderer logging probes:
@@ -168,9 +169,12 @@ await shard('renderer-debug-renderer').setLogAllLcuEvents(false)
 Direct subscription from any window with `LeagueClientRenderer`:
 
 ```js
-const stop = shard('league-client-renderer').onLcuEventVue('/lol-gameflow/v1/**', (event, params) => {
-  console.log('[LCU]', event.uri, event.eventType, params, event.data)
-})
+const stop = shard('league-client-renderer').onLcuEventVue(
+  '/lol-gameflow/v1/**',
+  (event, params) => {
+    console.log('[LCU]', event.uri, event.eventType, params, event.data)
+  }
+)
 // Later:
 stop()
 ```
@@ -216,9 +220,7 @@ Example:
 
 ```js
 const code = `console.log('[mcp cross-window]', window.akariWindowType)`
-await fetch(
-  `akari://renderer-link/evaluate?target=aux-window&code=${encodeURIComponent(code)}`
-)
+await fetch(`akari://renderer-link/evaluate?target=aux-window&code=${encodeURIComponent(code)}`)
 ```
 
 This is powerful and intentionally dangerous. Prefer selecting the target tab through MCP when possible.
@@ -227,9 +229,7 @@ Dev-only main process example:
 
 ```js
 const code = `logger.info('mcp', 'main process eval', process.type); return app.getVersion()`
-await fetch(
-  `akari://renderer-link/evaluate?target=main&code=${encodeURIComponent(code)}`
-)
+await fetch(`akari://renderer-link/evaluate?target=main&code=${encodeURIComponent(code)}`)
 ```
 
 ## Built-In Debug UI

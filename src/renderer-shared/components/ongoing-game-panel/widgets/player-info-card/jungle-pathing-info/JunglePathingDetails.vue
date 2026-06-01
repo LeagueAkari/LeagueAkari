@@ -14,5 +14,4 @@ import GankPreferenceSummary from './GankPreferenceSummary.vue'
 defineProps<{
   stats: AggregatedJungleAnalysis
 }>()
-
 </script>

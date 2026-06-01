@@ -7,10 +7,10 @@ import { RankedStats } from '@shared/types/league-client/ranked'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import {
-  computed,
   InjectionKey,
   MaybeRefOrGetter,
   Ref,
+  computed,
   inject,
   onUnmounted,
   provide,
@@ -42,10 +42,7 @@ export function provideRankedStats(props: {
 }) {
   const DISPLAY_QUEUE_TYPES = ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR'] as const
   const SUPPORTED_AUTO_REFRESH_QUEUE_IDS = new Set<number>([420, 440])
-  const SUPPORTED_AUTO_REFRESH_QUEUE_TYPES = new Set<string>([
-    'RANKED_SOLO_5x5',
-    'RANKED_FLEX_SR'
-  ])
+  const SUPPORTED_AUTO_REFRESH_QUEUE_TYPES = new Set<string>(['RANKED_SOLO_5x5', 'RANKED_FLEX_SR'])
 
   const puuid = toRef(props.puuid)
   const isCrossRegion = toRef(props.isCrossRegion)
@@ -93,8 +90,7 @@ export function provideRankedStats(props: {
     }
 
     return DISPLAY_QUEUE_TYPES.map((queueType) => {
-      const entry =
-        stats.queueMap[queueType] || stats.queues.find((q) => q.queueType === queueType)
+      const entry = stats.queueMap[queueType] || stats.queues.find((q) => q.queueType === queueType)
 
       if (!entry) {
         return `${queueType}:N/A`

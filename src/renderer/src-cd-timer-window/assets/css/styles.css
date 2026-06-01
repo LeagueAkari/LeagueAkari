@@ -13,7 +13,6 @@
   --la-scrollbar-width: 6px;
 }
 
-
 ::-webkit-scrollbar {
   width: var(--la-scrollbar-width);
   height: var(--la-scrollbar-height);
