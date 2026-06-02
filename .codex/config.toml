@@ -1,0 +1,10 @@
+[mcp_servers.playwright]
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@latest",
+  "--cdp-endpoint=http://127.0.0.1:8944",
+  "--init-page",
+  "./scripts/playwright-mcp-init-page.cjs",
+]
+enabled = true
