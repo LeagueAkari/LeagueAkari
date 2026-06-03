@@ -38,7 +38,7 @@ window.akariWindowType
 ```
 
 ```js
-window.akariManager?._getInitializationOrder?.()
+window.akariManager?._getInitializationReport?.()
 ```
 
 ```js
