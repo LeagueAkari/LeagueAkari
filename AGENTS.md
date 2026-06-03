@@ -21,15 +21,15 @@ AI agent onboarding guide. Describes the project layout and architecture at a hi
 Before touching project-specific architecture, use the relevant local skill and mention it in the
 working update:
 
-- **Shard work**: use `.agents/skills/league-akari-shard-development/SKILL.md` when creating,
+- **Shard work**: use the `league-akari-shard-development` skill when creating,
   extending, refactoring, splitting, or reviewing any main or renderer shard.
-- **Renderer UI work**: use `.agents/skills/league-akari-ui-components/SKILL.md` when implementing
+- **Renderer UI work**: use the `league-akari-ui-components` skill when implementing
   or reviewing renderer UI components, especially i18n interpolation, pluralization, Tailwind usage
   in SFC styles, or native semantic elements inside the Naive UI renderer.
-- **SGP/LCU data-source work**: use `.agents/skills/league-akari-sgp-data-source/SKILL.md` when
+- **SGP/LCU data-source work**: use the `league-akari-sgp-data-source` skill when
   implementing or reviewing SGP API clients, LCU-vs-SGP source selection, League Servers remote
   config, Tencent cross-region behavior, token handling, or per-feature SGP interoperability.
-- **Dev-window debugging**: use `.agents/skills/league-akari-mcp-debug/SKILL.md` when debugging
+- **Dev-window debugging**: use the `league-akari-mcp-debug` skill when debugging
   League Akari dev windows through the configured Playwright MCP connection.
 
 Do not rely on memory for these areas; read the skill first and follow its current rules.
