@@ -62,7 +62,8 @@ describe('extractTeamMembers', () => {
             current: 'TOP',
             assignmentReason: 'PRIMARY',
             primary: 'TOP',
-            secondary: 'JUNGLE'
+            secondary: 'JUNGLE',
+            fill: 'NONE'
           }
         },
         p2: {
@@ -71,7 +72,8 @@ describe('extractTeamMembers', () => {
             current: 'MIDDLE',
             assignmentReason: 'PRIMARY',
             primary: 'MIDDLE',
-            secondary: 'BOTTOM'
+            secondary: 'BOTTOM',
+            fill: 'NONE'
           }
         }
       }

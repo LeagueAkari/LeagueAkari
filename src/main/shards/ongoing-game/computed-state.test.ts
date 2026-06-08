@@ -128,7 +128,8 @@ describe('champ-select handoff state merge', () => {
           current: 'JUNGLE',
           assignmentReason: 'PRIMARY',
           primary: 'JUNGLE',
-          secondary: 'TOP'
+          secondary: 'TOP',
+          fill: 'NONE'
         }
       },
       handoff1: {
