@@ -1,7 +1,6 @@
 import { USER_AGENT } from '@shared/constants/common'
 import {
   AutoSelectGroups,
-  InGameSendTemplateCatalog,
   LeagueServersConfig,
   OngoingGameConfig,
   SupportedQueues
@@ -100,12 +99,6 @@ export class RemoteGitRepository {
   async getSgpLeagueServersConfig(request: RepositoryBranchRequest) {
     return this._httpClient.get<LeagueServersConfig>(
       this._rawContentUrl(`/config/sgp/league-servers.json`, request)
-    )
-  }
-
-  async getInGameSendTemplateCatalog(request: RepositoryBranchRequest) {
-    return this._httpClient.get<InGameSendTemplateCatalog>(
-      this._rawContentUrl(`/config/in-game-send/templates/catalog.json`, request)
     )
   }
 

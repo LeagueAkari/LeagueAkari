@@ -22,16 +22,18 @@ const SCALAR_SHORTCUT_SETTING_KEYS = new Set([
   'window-manager-main/cd-timer-window/showShortcut'
 ])
 
-const SENDABLE_ITEMS_SETTING_KEY = 'in-game-send-main/sendableItems'
-
-const SENDABLE_ITEM_SHORTCUT_FIELDS = [
-  'sendAllShortcut',
-  'sendAllyShortcut',
-  'sendEnemyShortcut'
-] as const
+const IN_GAME_SEND_RESET_SETTING_KEYS = new Set([
+  'in-game-send-main/sendableItems',
+  'in-game-send-main/templates',
+  'in-game-send-main/autoTemplateBootstrap'
+])
 
 export function getAutoMiscSettingMigrationTarget(key: string) {
   return AUTO_MISC_SETTING_MIGRATION_TARGETS[key] ?? null
+}
+
+export function shouldResetInGameSendSetting(key: string) {
+  return IN_GAME_SEND_RESET_SETTING_KEYS.has(key)
 }
 
 export function sanitizeShortcutSettingRecord(record: Pick<Setting, 'key' | 'value'>) {
@@ -43,32 +45,7 @@ export function sanitizeShortcutSettingRecord(record: Pick<Setting, 'key' | 'val
     return { changed: false, value: record.value }
   }
 
-  if (record.key !== SENDABLE_ITEMS_SETTING_KEY || !Array.isArray(record.value)) {
-    return { changed: false, value: record.value }
-  }
-
-  let changed = false
-  const value = record.value.map((item) => {
-    if (!item || typeof item !== 'object') {
-      return item
-    }
-
-    let nextItem = item
-    for (const field of SENDABLE_ITEM_SHORTCUT_FIELDS) {
-      if (typeof item[field] === 'string' && !isSupportedShortcutId(item[field])) {
-        if (nextItem === item) {
-          nextItem = { ...item }
-        }
-
-        nextItem[field] = null
-        changed = true
-      }
-    }
-
-    return nextItem
-  })
-
-  return { changed, value: changed ? value : record.value }
+  return { changed: false, value: record.value }
 }
 
 async function migrateAutoMiscSettings(manager: MigrationContext['manager']) {
@@ -87,6 +64,15 @@ async function migrateAutoMiscSettings(manager: MigrationContext['manager']) {
   }
 }
 
+async function resetInGameSendSettings(manager: MigrationContext['manager']) {
+  for (const key of IN_GAME_SEND_RESET_SETTING_KEYS) {
+    const setting = await manager.findOneBy(Setting, { key: Equal(key) })
+    if (setting) {
+      await manager.remove(setting)
+    }
+  }
+}
+
 async function migrateShortcutSettingsFrom143({ manager, logger }: MigrationContext) {
   if (await hasMigration(manager, MIGRATION_FROM_143)) {
     return
@@ -94,7 +80,7 @@ async function migrateShortcutSettingsFrom143({ manager, logger }: MigrationCont
 
   logger.info('Start migrating settings', MIGRATION_FROM_143)
 
-  for (const key of [...SCALAR_SHORTCUT_SETTING_KEYS, SENDABLE_ITEMS_SETTING_KEY]) {
+  for (const key of SCALAR_SHORTCUT_SETTING_KEYS) {
     const setting = await manager.findOneBy(Setting, { key: Equal(key) })
     if (!setting) {
       continue
@@ -105,6 +91,8 @@ async function migrateShortcutSettingsFrom143({ manager, logger }: MigrationCont
       await manager.save(Setting.create(key, sanitized.value))
     }
   }
+
+  await resetInGameSendSettings(manager)
 
   await markMigration(manager, MIGRATION_FROM_143)
   logger.info(`Migration completed, to ${MIGRATION_FROM_143}`)

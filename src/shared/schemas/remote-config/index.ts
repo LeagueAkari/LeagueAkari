@@ -22,23 +22,6 @@ export const LeagueServersConfigV2Schema = z.object({
 
 export type LeagueServersConfig = z.infer<typeof LeagueServersConfigV2Schema>
 
-export const InGameSendTemplateCatalogV1Schema = z.object({
-  templates: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.string(),
-      description: z.string(),
-      version: z.number(),
-      path: z.string()
-    })
-  ),
-  version: z.number().lte(1),
-  lastUpdate: z.number()
-})
-
-export type InGameSendTemplateCatalog = z.infer<typeof InGameSendTemplateCatalogV1Schema>
-
 export const SupportedQueuesV1Schema = z.object({
   queues: z.array(z.number()),
   version: z.number().lte(1),

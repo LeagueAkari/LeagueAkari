@@ -3254,13 +3254,6 @@ StartupPane:
   newVersionAvailable: 新版本
 
 InGameSend:
-  windowsOnly:
-    title: 仅 Windows 功能
-    description: 游戏内发送和全局快捷键需要原生插件。本构建仅在 Windows 提供。
-  requiresAdministrator:
-    title: 需要管理员权限
-    description: 当前平台支持该功能，但需要以管理员权限运行才能使用游戏内发送和全局快捷键。
-
   settings:
     title: 发送设置
     cancelShortcut:
@@ -3382,111 +3375,6 @@ SummonerSpellsCdTimer:
 BackgroundTasks:
   taskTitle: 正在进行 ({{count}})
   emptyPlaceholder: 无后台任务
-
-TemplateEdit:
-  newButton: 新模板
-  errorTitle: 这个模板存在问题，请检查其是否符合模板定义
-  noTemplate: 无模板
-  revertButton: 还原
-  saveButton: 保存
-  deleteButton: 删除
-  saveSuccess: 已保存 {{name}}
-  deleteSuccess: 已删除 {{name}}
-  deletePopconfirm: 这将执行删除操作，且不可恢复
-  noTemplateSelected: 未选中模板
-  filterPlaceholder: 查找模板
-  title: 模板定义
-  hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有完全的系统权限，请<span style="font-weight: bold">始终</span>确认其安全性'
-
-  templateTypes:
-    ongoing-game: 对局模板
-    unknown: 未知类型
-
-  templatePresets:
-    empty: 空白模板
-    ongoing-game: 默认对局模板
-    remote: 云端模板
-
-  templateErrorTypes:
-    'not-an-object': 模板不是一个对象
-    'no-getMetadata': 模板缺少 getMetadata 方法
-    'no-metadata': getMetadata 方法未返回元数据对象
-    'unsupported-version': 模板版本不受支持
-    'wrong-template-type': 模板类型不正确
-    'no-getMessages': 模板缺少 getMessages 方法
-
-SendableItemEdit:
-  title: 发送项
-  newButton: 新发送项
-  errorTitle: 这个发送项存在问题，请检查其是否符合发送项定义
-  noSendableItem: 无发送项
-  noSendableItemSelected: 未选中发送项
-  filterPlaceholder: 查找发送项
-  revertButton: 还原
-  saveButton: 保存
-  deleteButton: 删除
-  errorTemplateInvalid: 使用了无效的模板
-  errorTemplateExecutionFailed: 上一次执行次模板时出现错误
-
-  templateErrorTypes:
-    'not-an-object': 模板不是一个对象
-    'no-getMetadata': 模板缺少 getMetadata 方法
-    'no-metadata': getMetadata 方法未返回元数据对象
-    'unsupported-version': 模板版本不受支持
-    'wrong-template-type': 模板类型不正确
-    'no-getMessages': 模板缺少 getMessages 方法
-  plaintextPlaceholder: |
-    在这里提供按行分割的文本，比如：
-    第一行
-    第二行
-    第三行
-  itemEnabled: 已启用
-  deleteSuccess: 已删除 {{name}}
-  deletePopconfirm: 这将执行删除操作，且不可恢复
-  saveSuccess: 已保存 {{name}}
-  dryRunError: 试运行失败
-  dryRunEmpty: 试运行结果为空
-
-  enabled:
-    label: 启用此发送项
-  contentType:
-    label: 发送项类型
-    description:
-      plaintext: 纯文本类型会发送按行分割的内容
-      template: 动态模板将使用 JavaScript 脚本生成发送内容
-  template:
-    label: 使用此模板
-    description: 使用此模板生成发送内容
-  sendShortcut:
-    label: 发送快捷键
-  sendAllShortcut:
-    label: 发送所有玩家快捷键
-    description: 发送内容是本局中所有的玩家信息
-  sendEnemyShortcut:
-    label: 发送敌人快捷键
-    description: 发送内容是本局中所有的敌人信息
-  sendAllyShortcut:
-    label: 发送队友快捷键
-    description: 发送内容是本局中所有的队友信息
-  dryRun:
-    label: 试运行
-    description: 试运行发送内容，不会实际发送
-    all: 全部
-    ally: 友方
-    enemy: 敌方
-
-  sendableItemPresets:
-    plaintext: 纯文本
-    template: 动态模板
-
-RemoteTemplatesModal:
-  title: 云端模板
-  downloadButton: 下载
-  downloadSuccess: 下载成功 {{name}}
-  downloadFailed: 下载失败 {{name}}：{{reason}}
-  loadTemplatesFailed: 加载远程模板失败
-  noTemplates: 暂无模板
-  noTemplateDescription: 暂无描述
 
 AutomationPlan:
   autoPick:

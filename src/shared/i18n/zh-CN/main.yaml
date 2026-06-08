@@ -84,44 +84,6 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: 已标记的玩家
 
-in-game-send-main:
-  templateSuffix: 模板
-  newTemplate: 新模板 {{index}}
-  exampleTemplate: |
-    // 定义模板元数据
-    function getMetadata() {
-      return {
-        version: 10,
-        type: 'ongoing-game'
-      }
-    }
-
-    // 定义模板消息
-    function getMessages(env) {
-      return [
-        '消息 1',
-        '消息 2',
-        '消息 3',
-        '消息 4',
-        '消息 5'
-      ]
-    }
-
-  templateTypes:
-    ongoing-game: 对局模板
-    unknown: 未知类型
-
-  templatePresets:
-    empty: 空白模板
-    ongoing-game: 默认对局模板
-    remote: 云端模板
-
-  sendableItemPresets:
-    plaintext: 纯文本
-    template: 基于模板
-
-  newSendableItem: 新发送项 {{index}}
-
 client-installation-main:
   jumpList:
     launchTcls:

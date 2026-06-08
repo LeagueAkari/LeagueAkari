@@ -6,7 +6,8 @@ import {
   MIGRATION_FROM_143,
   MIGRATION_FROM_143_AUTO_MISC,
   getAutoMiscSettingMigrationTarget,
-  sanitizeShortcutSettingRecord
+  sanitizeShortcutSettingRecord,
+  shouldResetInGameSendSetting
 } from './migrations/from-1-4-3'
 
 describe('from 1.4.3 migration', () => {
@@ -40,47 +41,18 @@ describe('sanitizeShortcutSettingRecord', () => {
       value: 'LeftControl+F12'
     })
   })
+})
 
-  it('clears unsupported sendable item shortcuts while preserving valid shortcuts', () => {
-    expect(
-      sanitizeShortcutSettingRecord({
-        key: 'in-game-send-main/sendableItems',
-        value: [
-          {
-            id: '1',
-            name: 'Valid',
-            sendAllShortcut: 'A',
-            sendAllyShortcut: 'LeftControl+Q',
-            sendEnemyShortcut: null
-          },
-          {
-            id: '2',
-            name: 'Invalid',
-            sendAllShortcut: 'F24',
-            sendAllyShortcut: 'LeftControl+F24',
-            sendEnemyShortcut: 'F12'
-          }
-        ]
-      })
-    ).toEqual({
-      changed: true,
-      value: [
-        {
-          id: '1',
-          name: 'Valid',
-          sendAllShortcut: 'A',
-          sendAllyShortcut: 'LeftControl+Q',
-          sendEnemyShortcut: null
-        },
-        {
-          id: '2',
-          name: 'Invalid',
-          sendAllShortcut: null,
-          sendAllyShortcut: null,
-          sendEnemyShortcut: 'F12'
-        }
-      ]
-    })
+describe('shouldResetInGameSendSetting', () => {
+  it('resets in-game-send templates and sendable items', () => {
+    expect(shouldResetInGameSendSetting('in-game-send-main/templates')).toBe(true)
+    expect(shouldResetInGameSendSetting('in-game-send-main/sendableItems')).toBe(true)
+    expect(shouldResetInGameSendSetting('in-game-send-main/autoTemplateBootstrap')).toBe(true)
+  })
+
+  it('keeps unrelated in-game-send settings', () => {
+    expect(shouldResetInGameSendSetting('in-game-send-main/sendInterval')).toBe(false)
+    expect(shouldResetInGameSendSetting('in-game-send-main/cancelShortcut')).toBe(false)
   })
 })
 

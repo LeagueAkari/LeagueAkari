@@ -15,26 +15,24 @@ import {
   IN_GAME_SEND_ENTER_KEY_CODE,
   IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY,
   IN_GAME_SEND_MAIN_NAMESPACE,
-  IN_GAME_SEND_MAX_ITEMS,
   type InGameSendMainContext
 } from './context'
-import { InGameSendIpcHandlers } from './ipc-handlers'
 import { InGameSendExecutor } from './send-executor'
-import { InGameSendSendableItemManager } from './sendable-item-manager'
 import { InGameSendSettings, InGameSendState } from './state'
-import { InGameSendTemplateManager } from './template-manager'
 
 /**
  * 用于在游戏中模拟发送的相关功能
  *  - 游戏内发送消息
  *  - 英雄选择阶段发送消息
  *  - 一些其他的发送场景
+ *
+ * 模板（template）/ 用户可自定义 sendable item 设计已废弃，后续以固定预设
+ * （preset）替代。预设的注册表与触发器尚未实现。
  */
 @Shard(InGameSendMain.id)
 export class InGameSendMain implements IAkariShardInitDispose {
   static id = IN_GAME_SEND_MAIN_NAMESPACE
 
-  static MAX_ITEMS = IN_GAME_SEND_MAX_ITEMS
   static ENTER_KEY_CODE = IN_GAME_SEND_ENTER_KEY_CODE
   static ENTER_KEY_INTERNAL_DELAY = IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY
 
@@ -45,10 +43,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private readonly _settingService: SetterSettingService
   private readonly _context: InGameSendMainContext
 
-  private readonly _templates: InGameSendTemplateManager
   private readonly _sendExecutor: InGameSendExecutor
-  private readonly _sendableItems: InGameSendSendableItemManager
-  private readonly _ipcHandlers: InGameSendIpcHandlers
 
   constructor(
     settingFactory: SettingFactoryMain,
@@ -66,9 +61,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       InGameSendMain.id,
       {
-        sendableItems: { default: this.settings.sendableItems },
         sendInterval: { default: this.settings.sendInterval },
-        templates: { default: this.settings.templates },
         cancelShortcut: { default: this.settings.cancelShortcut }
       },
       this.settings
@@ -91,15 +84,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       gameClientClass: GameClientMain
     }
 
-    this._templates = new InGameSendTemplateManager(this._context)
-    this._sendExecutor = new InGameSendExecutor(this._context, this._templates)
-    this._sendableItems = new InGameSendSendableItemManager(this._context, this._sendExecutor)
-    this._ipcHandlers = new InGameSendIpcHandlers(
-      this._context,
-      this._sendableItems,
-      this._templates,
-      this._sendExecutor
-    )
+    this._sendExecutor = new InGameSendExecutor(this._context)
   }
 
   private async _setupState() {
@@ -107,8 +92,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     this._mobxUtils.propSync(InGameSendMain.id, 'settings', this.settings, [
       'sendInterval',
-      'templates',
-      'sendableItems',
       'cancelShortcut'
     ])
 
@@ -124,14 +107,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setupState()
 
-    this._templates.checkAndInitTemplates()
-    this._sendableItems.checkAndInitShortcuts()
-    this._templates.watchTemplateAutoDeprecation()
     this._sendExecutor.watchCancelShortcut()
-    this._ipcHandlers.register()
-
-    this._templates.autoBootstrapTemplatesIfNeeded((data) =>
-      this._sendableItems.createSendableItem(data)
-    )
   }
 }

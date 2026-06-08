@@ -84,44 +84,6 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: Tagged Player
 
-in-game-send-main:
-  templateSuffix: Template
-  newTemplate: New Template {{index}}
-  exampleTemplate: |
-    // Define the metadata of the template
-    function getMetadata() {
-      return {
-        version: 10,
-        type: 'ongoing-game'
-      }
-    }
-
-    // Define the messages of the template
-    function getMessages(env) {
-      return [
-        'Message 1',
-        'Message 2',
-        'Message 3',
-        'Message 4',
-        'Message 5'
-      ]
-    }
-
-  templateTypes:
-    ongoing-game: Ongoing Game Template
-    unknown: Unknown Type
-
-  templatePresets:
-    empty: Empty Template
-    ongoing-game: Default Ongoing Game Template
-    remote: Remote Template
-
-  sendableItemPresets:
-    plaintext: Plain Text
-    template: Template
-
-  newSendableItem: New Sendable Item {{index}}
-
 client-installation-main:
   jumpList:
     launchTcls:

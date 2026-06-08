@@ -3283,13 +3283,6 @@ StartupPane:
   newVersionAvailable: New
 
 InGameSend:
-  windowsOnly:
-    title: Windows-only feature
-    description: In-game send and global shortcuts require native addons. This build only ships them on Windows.
-  requiresAdministrator:
-    title: Administrator privileges required
-    description: This capability is supported on the current platform, but requires running as administrator to use in-game send and global shortcuts.
-
   settings:
     title: Settings
     cancelShortcut:
@@ -3413,111 +3406,6 @@ SummonerSpellsCdTimer:
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{count}})
   emptyPlaceholder: No background tasks
-
-TemplateEdit:
-  newButton: New Template
-  errorTitle: This template is invalid. Please check its validity
-  noTemplate: No Template
-  revertButton: Revert
-  saveButton: Save
-  deleteButton: Delete
-  saveSuccess: Saved {{name}}
-  deleteSuccess: Deleted {{name}}
-  deletePopconfirm: This will perform a deletion operation and cannot be undone
-  noTemplateSelected: No template selected
-  filterPlaceholder: Search templates
-  hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
-  title: Template Definitions
-
-  templateTypes:
-    ongoing-game: Ongoing Game Template
-    unknown: Unknown Type
-
-  templatePresets:
-    empty: Empty Template
-    ongoing-game: Default Ongoing Game Template
-    remote: Remote Template
-
-  templateErrorTypes:
-    'not-an-object': Template is not an object
-    'no-getMetadata': Template is missing getMetadata method
-    'no-metadata': getMetadata method did not return a metadata object
-    'unsupported-version': Template version is not supported
-    'wrong-template-type': Template type is incorrect
-    'no-getMessages': Template is missing getMessages method
-
-SendableItemEdit:
-  title: Sendable Item
-  newButton: New Sendable Item
-  errorTitle: This sendable item is invalid. Please check its validity
-  noSendableItem: No Sendable Item
-  noSendableItemSelected: No sendable item selected
-  filterPlaceholder: Search sendable items
-  revertButton: Revert
-  saveButton: Save
-  deleteButton: Delete
-  errorTemplateInvalid: Invalid template used
-  errorTemplateExecutionFailed: An error occurred when executing the template last time
-
-  templateErrorTypes:
-    'not-an-object': Template is not an object
-    'no-getMetadata': Template is missing getMetadata method
-    'no-metadata': getMetadata method did not return a metadata object
-    'unsupported-version': Template version is not supported
-    'wrong-template-type': Template type is incorrect
-    'no-getMessages': Template is missing getMessages method
-  plaintextPlaceholder: |
-    Provide the text split by lines here, like:
-    First line
-    Second line
-    Third line
-  itemEnabled: Enabled
-  deleteSuccess: Deleted {{name}}
-  deletePopconfirm: This will perform a deletion operation and cannot be undone
-  saveSuccess: Saved {{name}}
-  dryRunEmpty: Dry run result is empty
-  dryRunError: 'Dry run failed'
-
-  contentType:
-    label: Content Type
-    description:
-      plaintext: Plain text type will send the content split by lines
-      template: Dynamic template will use JavaScript script to generate sending content
-  enabled:
-    label: Enable This Sendable Item
-  template:
-    label: Use Template
-    description: Use this template to generate sending content
-  sendShortcut:
-    label: Send Shortcut
-  sendAllShortcut:
-    label: Send All Shortcut
-    description: Send content to all players in the game
-  sendAllyShortcut:
-    label: Send Allies Shortcut
-    description: Send content to all allies in the game
-  sendEnemyShortcut:
-    label: Send Enemies Shortcut
-    description: Send content to all enemies in the game
-  dryRun:
-    label: Dry Run
-    description: Dry run the sending content, will not actually send
-    all: All
-    ally: Allies
-    enemy: Enemies
-
-  sendableItemPresets:
-    plaintext: Plain Text
-    template: Template
-
-RemoteTemplatesModal:
-  title: Remote Templates
-  downloadButton: Download
-  downloadSuccess: Downloaded {{name}}
-  downloadFailed: 'Failed to download {{name}}: {{reason}}'
-  loadTemplatesFailed: Failed to load remote templates
-  noTemplates: No templates
-  noTemplateDescription: No description
 
 AutomationPlan:
   autoPick:
