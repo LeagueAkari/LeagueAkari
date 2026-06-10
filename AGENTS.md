@@ -45,8 +45,6 @@ This applies especially when the work was authored or reviewed with AI assistanc
 
 ## Git Attribution
 
-Before each commit, run `yarn format` so formatting changes are included intentionally.
-
 When the user asks an agent to commit changes, add co-author attribution only if that agent
 materially participated in the content of the commit.
 
