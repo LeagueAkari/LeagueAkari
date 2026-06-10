@@ -17,6 +17,8 @@ import {
   IN_GAME_SEND_MAIN_NAMESPACE,
   type InGameSendMainContext
 } from './context'
+import { InGameSendIpcHandlers } from './ipc-handlers'
+import { InGameSendPresetSelectionController } from './preset-selection-controller'
 import { InGameSendExecutor } from './send-executor'
 import { InGameSendSettings, InGameSendState } from './state'
 
@@ -44,6 +46,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private readonly _context: InGameSendMainContext
 
   private readonly _sendExecutor: InGameSendExecutor
+  private readonly _presetSelectionController: InGameSendPresetSelectionController
+  private readonly _ipcHandlers: InGameSendIpcHandlers
 
   constructor(
     settingFactory: SettingFactoryMain,
@@ -81,10 +85,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
       shared: this._shared,
       appCommon: this._appCommon,
       remoteConfig: this._remoteConfig,
-      gameClientClass: GameClientMain
+
+      isGameClientForeground: () => {
+        return GameClientMain.isGameClientForeground()
+      }
     }
 
     this._sendExecutor = new InGameSendExecutor(this._context)
+    this._presetSelectionController = new InGameSendPresetSelectionController(this._context)
+    this._ipcHandlers = new InGameSendIpcHandlers(this._context)
   }
 
   private async _setupState() {
@@ -93,6 +102,12 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._mobxUtils.propSync(InGameSendMain.id, 'settings', this.settings, [
       'sendInterval',
       'cancelShortcut'
+    ])
+
+    this._mobxUtils.propSync(InGameSendMain.id, 'state', this.state, [
+      'ratingPuuids',
+      'junglePuuids',
+      'premadeIndices'
     ])
 
     this._settingService.onChange('sendInterval', (value, { setter }) => {
@@ -108,5 +123,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
     await this._setupState()
 
     this._sendExecutor.watchCancelShortcut()
+    this._presetSelectionController.start()
+    this._ipcHandlers.register()
   }
+
+  async onDispose() {}
 }

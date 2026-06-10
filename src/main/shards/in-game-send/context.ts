@@ -1,7 +1,6 @@
 import type { SharedGlobalShard } from '@shared/akari-shard'
 
 import type { AppCommonMain } from '../app-common'
-import type { GameClientMain } from '../game-client'
 import type { AkariIpcMain } from '../ipc'
 import type { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import type { LeagueClientMain } from '../league-client'
@@ -30,5 +29,6 @@ export interface InGameSendMainContext {
   shared: SharedGlobalShard
   appCommon: AppCommonMain
   remoteConfig: RemoteConfigMain
-  gameClientClass: typeof GameClientMain
+
+  isGameClientForeground(): Promise<boolean>
 }

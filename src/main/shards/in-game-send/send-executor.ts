@@ -46,8 +46,8 @@ export class InGameSendExecutor {
    *
    * 给后续预设（preset）执行使用。
    */
-  sendLines(lines: string[]) {
-    const { gameClientClass, logger, ongoingGame } = this._context
+  async sendLines(lines: string[]) {
+    const { isGameClientForeground, logger, ongoingGame } = this._context
 
     if (this._currentSendController) {
       logger.info('Existing task in progress, cancelling')
@@ -65,10 +65,7 @@ export class InGameSendExecutor {
       return
     }
 
-    if (
-      ongoingGame.state.queryStage.phase === 'in-game' &&
-      !gameClientClass.isGameClientForeground()
-    ) {
+    if (ongoingGame.state.queryStage.phase === 'in-game' && !(await isGameClientForeground())) {
       logger.warn('Game client is not foreground')
       return
     }

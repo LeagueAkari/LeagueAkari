@@ -8,7 +8,7 @@ import {
   IN_GAME_SEND_RENDERER_NAMESPACE,
   type InGameSendRendererContext
 } from './context'
-import { syncInGameSendSettings } from './settings-sync'
+import { syncInGameSendSettings, syncInGameSendState } from './settings-sync'
 
 const MAIN_SHARD_NAMESPACE = IN_GAME_SEND_MAIN_NAMESPACE
 
@@ -21,19 +21,20 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   private readonly _context: InGameSendRendererContext
 
   constructor(
-    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {
     this._context = {
-      ipc,
+      ipc: this._ipc,
       piniaMobxUtils,
       settingUtils: _settingUtils
     }
   }
 
   async onInit() {
-    syncInGameSendSettings(this._context)
+    await syncInGameSendSettings(this._context)
+    await syncInGameSendState(this._context)
   }
 
   setCancelShortcut(shortcut: string | null) {
@@ -42,5 +43,21 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   setSendInterval(interval: number) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
+  }
+
+  setRatingPuuids(puuids: string[]) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setRatingPuuids', puuids)
+  }
+
+  setJunglePuuids(puuids: string[]) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setJunglePuuids', puuids)
+  }
+
+  setPremadeIndices(indices: number[]) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPremadeIndices', indices)
+  }
+
+  clearPresetSelections() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'clearPresetSelections')
   }
 }

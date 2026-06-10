@@ -6,3 +6,9 @@ export function syncInGameSendSettings(context: InGameSendRendererContext) {
 
   return context.piniaMobxUtils.sync(IN_GAME_SEND_MAIN_NAMESPACE, 'settings', store.settings)
 }
+
+export function syncInGameSendState(context: InGameSendRendererContext) {
+  const store = useInGameSendStore()
+
+  return context.piniaMobxUtils.sync(IN_GAME_SEND_MAIN_NAMESPACE, 'state', store.state)
+}
