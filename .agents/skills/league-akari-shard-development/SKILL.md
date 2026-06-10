@@ -1,6 +1,6 @@
 ---
 name: league-akari-shard-development
-description: Use when creating, extending, refactoring, splitting, or reviewing League Akari main or renderer shards, including shard file organization, controller/loader/handler boundaries, naming conventions, renderer TSX usage, platform guards, and public contract compatibility.
+description: Use when creating, extending, refactoring, splitting, or reviewing League Akari main or renderer shards, including shard file organization, controller/loader/executor/handler boundaries, naming conventions, renderer TSX usage, platform guards, and public contract compatibility.
 ---
 
 # League Akari Shard Development
@@ -40,7 +40,7 @@ These rules are hard requirements for any newly created shard and for any featur
   - `remoteConfig`, not `rc`
   - `leagueClient`, not `lc`
   - `savedPlayer`, not `sp`
-  - `settingService`, not `setting`
+  - `settingFactory`, not `setting`
   - `logger`, not `log`
   - `ipc`, not `ipcMain`
 - In League Akari shard classes, private fields and methods use a leading `_` prefix.
@@ -71,7 +71,7 @@ node -e "const fs=require('node:fs');const path=require('node:path');const roots
    - propSync/store shape
    - IPC registration
    - lifecycle hooks
-   - watchers/reactions
+   - reactions or subscriptions that must be owned by a controller
    - side effects
    - platform assumptions
    - pure helpers worth testing
@@ -158,39 +158,42 @@ private _ipcMain: AkariIpcMain
 private _doEverything() { /* still owns IPC, watchers, fetching, cache, side effects */ }
 ```
 
-## Standard Files
+## Allowed Shard Modules
 
-- `context.ts`: namespace/id constants, settings keys, loading priorities, context interface, shared result types.
+Use a deliberately small set of module shapes for shard feature organization. For newly created
+shards and migrated feature code, choose from this list when a file owns shard lifecycle, IPC,
+state/store wiring, feature coordination, data loading, command-like side effects, platform guards,
+or renderer UI tied to the shard.
+
+- `index.ts`: the shard entrypoint. Owns `@Shard`, DI, settings registration, state sync, lifecycle
+  orchestration, internal module construction, and thin compatibility methods.
+- `context.ts`: shared internal dependencies, namespace/id constants, settings keys, loading
+  priorities, and shard-local result types. Add it only when more than one internal module needs the
+  same dependencies or constants.
 - `state.ts`: MobX state/settings classes.
+- `store.ts`: Pinia store for renderer shards.
 - `ipc-handlers.ts`: IPC `onCall` / `onEvent` registration and thin delegation.
 - `platform.ts`: pure platform guard helpers.
-- `*-controller.ts`: feature coordination, lifecycle, watchers.
-- `*-loader.ts`: data loading, caching, queue tags, reload methods.
-- `*-executor.ts`: imperative operation that may fail or be canceled.
-- `*-watcher.ts`: reactive observers without owning the core action.
-- `*-manager.ts`: registry/config collection ownership.
-- `*-service.ts`: stable service boundary, local persistence, renderer IPC facade, file IO, or reusable capability.
-- `*-registry.ts`: owns a map/set of registrations and lookup/unregister semantics.
-- `*-router.ts`: routes protocol/IPC/domain requests by explicit keys.
-- `*-parser.ts`: converts strings or untyped payloads into typed values.
-- `*-reader.ts`: reads streams/files/process output and normalizes the result.
-- `*-formatter.ts`: formats messages or display/log payloads without side effects.
-- `*-emitter.ts`: wraps event emission/logging behavior.
-- `*-detector.ts`: discovers external installations, processes, or environment facts.
-- `*-launcher.ts`: starts external applications/processes.
-- `*-resolver.ts`: maps setting/domain values to concrete runtime values.
-- `*-factory.ts`: constructs response/client/helper objects without owning lifecycle.
-- `*-provider.ts`: supplies derived option lists or data for UI consumption.
-- `*-subscription.ts`: owns subscribe/unsubscribe flow around an external event source.
-- `*-component.tsx`: renderer component colocated with a shard. Do not use `comp.tsx`.
-- `*-notification.tsx`, `*-modal.tsx`, `*-dialogs.tsx`: renderer notification/modal modules.
-- `*.test.ts`: pure helpers, guards, races, migrations.
-- `*.tsx`: renderer modules that return JSX or compose VNodes.
+- `*-controller.ts`: feature flow coordination. Use this for lifecycle, reactions, watchers,
+  subscriptions, routing, registries, configuration collections, derived UI options, settings
+  resolution, and any glue code that does not fit `loader` or `executor`.
+- `*-loader.ts`: data loading and refresh. Use this for remote/local fetches, cache reads/writes,
+  queue tags, reload methods, and normalizing loaded data before handing it to a controller.
+- `*-executor.ts`: one imperative operation that may fail, be canceled, or need a structured result.
+  Use this for process launches, filesystem writes, downloads, apply/uninstall actions, and other
+  command-like side effects.
+- `*-component.tsx` or a descriptive `.vue` file: renderer component colocated with a shard. Do not
+  use `comp.tsx`.
+- `*-notification.tsx`, `*-modal.tsx`, `*-dialogs.tsx`: renderer notification/modal/dialog modules
+  that compose VNodes or JSX.
+- `*.test.ts`: focused tests for pure helpers, guards, races, migrations, and normalization.
 
-Avoid vague names like `utils.ts`, `helpers.ts`, `misc.ts`, `actions.ts`, or `comp.tsx`.
-In shard directories, prefer a concrete role even for small helpers: for example
-`window-position-service.ts`, `game-data-assets.ts`, `node-stream-reader.ts`, or
-`ux-command-line-parser.ts`.
+Utility modules are outside the shard-organization suffix rules. If a file is pure support code and
+does not express a shard feature boundary, name it naturally for what it contains. Examples include
+domain constants, schemas, mapping tables, parsers, formatters, tiny calculation helpers, and
+test-only builders. These files must not own IPC, lifecycle, timers, reactions, IO, mutable state, or
+feature coordination. If they start owning one of those responsibilities, move the behavior into one
+of the fixed shard module shapes above.
 
 Project-specific exceptions:
 
@@ -231,35 +234,34 @@ Use role-based, fully spelled names:
 - `playerDataLoader`
 - `additionalInfoController`
 - `sideEffectsController`
-- `settingService`
+- `settingsController`
 - `logger`
 - `ipc`
 
-Stable suffix meanings:
+Choose names in this order:
 
-- `Loader`: loads remote/local data and may cache.
-- `Controller`: coordinates one feature area.
-- `Executor`: performs one imperative side effect.
-- `Watcher`: registers reactive observers.
-- `Handlers`: registers IPC/event handlers.
-- `Manager`: owns a registry or configuration collection.
-- `Service`: exposes a focused reusable capability behind a stable boundary.
-- `Detector`: discovers external state and writes the discovered result into state.
-- `Launcher`: starts an external process/application.
-- `Parser`: turns strings or untyped input into typed data.
-- `Reader`: reads streams/files/process output into a normalized value.
-- `Resolver`: maps app settings or domain identifiers to runtime values.
-- `Factory`: creates response/client/helper objects and does not own lifecycle.
-- `Provider`: supplies derived UI options or catalog-like data.
-- `Subscription`: owns subscribe/unsubscribe lifecycle for external event streams.
-- `Registry`: owns keyed registration/unregistration.
-- `Router`: dispatches a request by domain/path/protocol key.
-- `Formatter`: formats log/display strings without side effects.
+1. If it is the shard entry, use `index.ts`.
+2. If it owns MobX state/settings or a Pinia store, use `state.ts` or `store.ts`.
+3. If it only registers IPC, use `ipc-handlers.ts`.
+4. If it only contains platform predicates, use `platform.ts`.
+5. If it loads, refreshes, caches, or normalizes data, use `*-loader.ts`.
+6. If it performs one command-like side effect, use `*-executor.ts`.
+7. If it coordinates a feature flow, owns reactions/subscriptions, routes by domain keys, manages
+   registrations, resolves settings into runtime choices, or prepares derived UI options, use
+   `*-controller.ts`.
+8. If it renders notification/modal/dialog/component UI, use the renderer UI suffixes above.
+9. If it is pure utility/support code and does not express shard feature organization, use any clear
+   descriptive file name.
 
-Avoid `Actions` as a class or file suffix. Use `Executor` for direct side effects and
-`Controller` when the module also schedules, cancels, or coordinates those side effects.
+When two role names seem plausible, choose the narrower allowed role first: `loader` for data
+loading, `executor` for imperative commands, then `controller` for coordination. For example, a
+module that "watches state and starts a reload" is a controller; the reload implementation itself
+can live in a loader. A module that "resolves settings and launches a process" is usually a
+controller plus an executor.
 
-Do not rename public contracts only for style. `ongoing-game-main` is a contract, not a naming cleanup target.
+Do not rename public contracts only for style.
+
+`ongoing-game-main` is a contract, not a naming cleanup target.
 
 ## Renderer Rules
 
@@ -267,7 +269,7 @@ Renderer shard entries follow the same orchestration rules.
 
 - Keep composables (`useDialog`, `useNotification`, `useTranslation`, Pinia stores) inside setup functions or functions called from `setupInAppScope.addSetupFn(...)`, not at module top level.
 - Render-heavy notification/modal modules should be `.tsx`.
-- Pure watcher modules without JSX can stay `.ts`.
+- Reactive setup without JSX should live in a controller module.
 - Colocated renderer components should use `*-component.tsx` or a descriptive `.vue` filename.
   Do not add vague files like `comp.tsx`.
 - Preserve store fields and modal state shape.
@@ -275,7 +277,9 @@ Renderer shard entries follow the same orchestration rules.
 Good TSX:
 
 ```tsx
-export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererContext) {
+export function registerUpdateDownloadFailedNotification(
+  context: SimpleNotificationsRendererContext
+) {
   const notification = useNotification()
   const { t } = useTranslation(undefined, {
     keyPrefix: 'simple-notifications-renderer.updateDownloadFailed'
@@ -400,142 +404,28 @@ git diff --check
 
 If the repo supports a single aggregate command, `yarn typecheck` is also acceptable. Report exact commands that were actually run.
 
-## Few-Shot Examples
+## Examples
 
-### Example 1: Create A Renderer-Facing Main Shard
-
-User asks:
-
-> 新增一个 feature toggle shard，renderer 能读状态并切换开关。
-
-Good response:
-
-- Add `src/main/shards/feature-toggle/index.ts` with `@Shard('feature-toggle-main')`.
-- Add `state.ts` for observable settings/state.
-- Register settings with `SettingFactoryMain`.
-- Sync state/settings with `MobxUtilsMain.propSync(...)`.
-- Add `ipc-handlers.ts` only if calls are more than trivial.
-- Register main shard in bootstrap.
-- Add renderer shard and Pinia store under `src/renderer-shared/shards/feature-toggle/`.
-- Keep IPC namespace `feature-toggle-main` stable.
-
-Bad response:
-
-- Store settings only in a renderer store.
-- Use `console.log`.
-- Name dependencies `ipcMain`, `rc`, or `m`.
-- Skip bootstrap registration.
-
-### Example 2: Split A Large Main Feature Shard
-
-User asks:
-
-> 拆 `ongoing-game-main`，只做结构拆分，不改变 IPC 和 renderer 数据形状。
-
-Good response:
-
-- Keep `src/main/shards/ongoing-game/index.ts` as the only `@Shard('ongoing-game-main')`.
-- Add `context.ts`, `match-history-loader.ts`, `player-data-loader.ts`, `analysis-controller.ts`, `additional-info-controller.ts`, `side-effects-controller.ts`, `ipc-handlers.ts`.
-- Keep settings keys, IPC names, propSync shape, and renderer store shape unchanged.
-- Extract pure team mapping and test it if mode-specific.
-
-Bad response:
-
-- Rename shard id to `ongoing-game`.
-- Change renderer `getAll()` shape.
-- Rewrite queue/cache policy while moving code.
-
-### Example 3: Respect A Coherent Flow
-
-User says:
-
-> banpick 是一个流程，将它们放在一个文件里吧。
-
-Good response:
-
-- Keep ban and pick handling together in `ban-pick-controller.ts`.
-- Split unrelated bench/trade/config/local-message code elsewhere.
-
-Bad response:
-
-- Create separate `ban-controller.ts` and `pick-controller.ts` just for symmetry.
-
-### Example 4: Declarative Remote Config
-
-User says:
-
-> remote-config 不要硬编码每个配置，希望显式配置声明远端配置和刷新间隔。
-
-Good response:
-
-- Group resources by behavior:
-  - cached and periodically fetched
-  - volatile/realtime fetched
-  - special update logic
-- Put resource specs in `cached-resources.ts`.
-- Put common sync orchestration in `cached-sync.ts`.
-- Keep special release/announcement logic in dedicated controllers.
-- Generate repetitive status messages from a fixed template.
-
-Bad response:
-
-- Replace many `if`s with one huge `switch`.
-- Hide all behavior in untyped string maps.
-
-### Example 5: Windows-Only Updater
-
-User says:
-
-> self-update 在 macOS 下下载更新并解压可以直接短路。
-
-Good response:
-
-- Add `platform.ts`.
-- Guard lifecycle, IPC, download, apply, and uninstall.
-- Split executor/watcher/IPC/uninstaller/checker.
-- Test platform guards and cancellation/race behavior.
-- Return executor results from IPC.
-
-Bad response:
-
-- Only guard `onInit()`.
-- Leave `forceStartUpdate` able to copy `.exe` on macOS/Linux.
-- Swallow update errors and leave UI state stuck.
-
-### Example 6: Renderer Notification Center
-
-User says:
-
-> simple-notifications 已经变成常驻通知中心，拆它，并把 h 硬拼结构改成 vue-tsx。
-
-Good response:
-
-- Keep `SimpleNotificationsRenderer` as the entry.
-- Add focused modules such as `announcement-modal.tsx`, `new-release-modal.tsx`, `system-warning-dialogs.tsx`, `update-download-failed.tsx`, `queueing-progress-task.ts`.
-- Keep pure non-JSX modules as `.ts`.
-- Preserve `lastAnnouncementUniqueId`, modal store fields, and setup order.
-
-Bad response:
-
-- Move all notification state into a new store shape.
-- Keep huge `h(...)` trees in `.ts`.
-- Call `useNotification()` at module top level.
-
-### Example 7: Do Not Split Just Because It Is Long
-
-Candidate:
-
-> `league-client/lc-state/index.ts` is very long.
-
-Good response:
-
-- Recognize it is mostly a clear LCU state-sync pipeline.
-- Split only if the user explicitly wants it or if endpoint domains become hard to maintain.
-- Preserve initial fetch, websocket event update, disconnect cleanup, and MobX reactions per state group.
-
-Bad response:
-
-- Split every `_syncLcu*` method without checking whether lifecycle coupling becomes harder to reason about.
+- New renderer-facing shard: create the main `index.ts`, add `state.ts` only when it owns
+  observable state/settings, register settings with `SettingFactoryMain`, sync with
+  `MobxUtilsMain.propSync(...)`, register the shard in bootstrap, and add the renderer shard/store
+  only when renderer access is required.
+- Large feature split: keep the original shard id, IPC names, settings keys, propSync shape, and
+  renderer store shape unchanged. Extract `context.ts`, loaders, controllers, executors, and
+  `ipc-handlers.ts` only around actual responsibilities.
+- Coherent flow: keep related steps such as ban and pick together in one controller when they form
+  one business flow. Split unrelated bench, trade, config, or local-message behavior elsewhere.
+- Declarative remote config: put resource declarations in a pure data file such as
+  `cached-resources.ts`, put common sync orchestration in `cached-sync-controller.ts`, and keep
+  special release or announcement behavior in dedicated controllers.
+- Windows-only updater: add `platform.ts`, guard lifecycle, IPC, download, apply, and uninstall
+  side-effect boundaries, and put download/apply work in executors that return structured results.
+- Renderer notification center: keep the renderer shard entry as orchestration, use `.tsx` for
+  VNode-heavy notification/modal/dialog modules, and keep composables inside setup functions or
+  setup-registered functions.
+- Long coherent state sync: do not split `league-client/lc-state/index.ts` just because it is long.
+  Preserve initial fetch, websocket event updates, disconnect cleanup, and MobX reaction coupling
+  unless the user explicitly asks for a split or the endpoint domains become hard to maintain.
 
 ## Final Checklist
 
