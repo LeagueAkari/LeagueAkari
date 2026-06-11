@@ -157,6 +157,7 @@ export interface AggregatedJungleAnalysis {
 export interface AggregatedChampionAnalysis {
   championId: number
 
+  summary: AggregatedSummaryAnalysis
   winLoss: AggregatedWinLossAnalysisMap
 
   // 该英雄的打野多场聚合；非打野英雄 / 无打野场次为 null

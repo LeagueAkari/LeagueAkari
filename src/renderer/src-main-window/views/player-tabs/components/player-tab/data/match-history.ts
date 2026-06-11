@@ -36,7 +36,10 @@ import type { MatchHistoryInitParams } from '@main-window/shards/player-tabs/con
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { InitParamsContext } from '../init-params'
-import { toPredicate } from '../widgets/match-history-filters/filter-state'
+import {
+  type MatchHistoryFilterState,
+  toPredicate
+} from '../widgets/match-history-filters/filter-state'
 import {
   createInitParamCollectFilterState,
   createInitParamCollectSettings
@@ -137,6 +140,7 @@ export function provideMatchHistory(
     isCrossRegion: MaybeRefOrGetter<boolean>
     sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
     predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
+    syncCollectFilterState?: (filterState: MatchHistoryFilterState) => void
   },
   initParamsTool: InitParamsContext
 ): MatchHistoryContext {
@@ -738,6 +742,8 @@ export function provideMatchHistory(
     if (!filterState) {
       return false
     }
+
+    props.syncCollectFilterState?.(filterState)
 
     log.info(componentName, 'Starting match history collection from init params', initParams)
 

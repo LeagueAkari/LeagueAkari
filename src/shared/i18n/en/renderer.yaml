@@ -2429,6 +2429,10 @@ PlayerTab:
     avgDmgTaken: Damage Taken Share
     avgGold: Gold Share
     avgCs: CS Share
+    avgCsPerMinute: CS/min
+    perMinuteValue: '{{value}}/min'
+    teamShare: 'Share {{value}}'
+    collectChampionMatches: Collect {{champion}} matches
     winLose: Wins & Losses
     win: Win
     lose: Loss
@@ -2439,6 +2443,8 @@ PlayerTab:
     times: Games
     teamSides: Team Sides
     activeSession: Active Session Win/Lose
+    level3Short: Lv3
+    level4Short: Lv4
     winningStreak_one: '{{count}} Win Streak'
     winningStreak_other: '{{count}} Win Streak'
     losingStreak_one: '{{count}} Loss Streak'

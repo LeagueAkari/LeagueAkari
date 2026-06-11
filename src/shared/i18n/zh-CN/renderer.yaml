@@ -2427,6 +2427,10 @@ PlayerTab:
     avgDmgTaken: 承伤比
     avgGold: 经济比
     avgCs: 补刀比
+    avgCsPerMinute: 补刀 / 分
+    perMinuteValue: '{{value}} / 分'
+    teamShare: '占比 {{value}}'
+    collectChampionMatches: 收集「{{champion}}」战绩
     winLose: 胜负
     win: 胜
     lose: 负
@@ -2437,6 +2441,8 @@ PlayerTab:
     activeSession: 活跃时段胜负
     winShort: 胜
     lossShort: 负
+    level3Short: 3 级
+    level4Short: 4 级
     winningStreak: '{{count}} 连胜'
     losingStreak: '{{count}} 连败'
 

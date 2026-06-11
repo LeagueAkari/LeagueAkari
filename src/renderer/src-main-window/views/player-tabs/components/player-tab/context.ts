@@ -154,7 +154,7 @@ export function providePlayerTab(props: {
     isCrossRegion
   })
 
-  const { predicate } = provideMatchHistoryFilters({
+  const { predicate, setActiveMode, setAdvancedFilterState } = provideMatchHistoryFilters({
     puuid,
     enablePositionFilter: computed(
       () => (preferredSource.value === 'sgp' || isCrossRegion.value) && sgpApiStatus.value.canUse
@@ -168,7 +168,11 @@ export function providePlayerTab(props: {
       sgpServerId,
       sgpApiStatus,
       isCrossRegion,
-      predicate
+      predicate,
+      syncCollectFilterState: (filterState) => {
+        setActiveMode('advanced')
+        setAdvancedFilterState(filterState)
+      }
     },
     initParamsTool
   )

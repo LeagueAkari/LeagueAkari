@@ -1,6 +1,7 @@
 import type { AggregatedChampionAnalysis } from '../types/aggregated'
 import type { PreparedGame } from '../types/helpers'
 import { computeAggregatedJungle } from './jungle'
+import { computeAggregatedSummary } from './summary'
 import { computeAggregatedWinLossMap } from './win-loss'
 
 export function computeAggregatedChampions(
@@ -19,6 +20,7 @@ export function computeAggregatedChampions(
   for (const [id, list] of byChampion) {
     out[id] = {
       championId: id,
+      summary: computeAggregatedSummary(list),
       winLoss: computeAggregatedWinLossMap(list),
       jungle: computeAggregatedJungle(list)
     }

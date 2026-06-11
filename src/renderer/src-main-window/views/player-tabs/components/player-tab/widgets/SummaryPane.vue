@@ -168,10 +168,10 @@
             v-for="c of frequentlyUsedChampions"
             :key="c.championId"
             :delay="50"
-            :keep-alive-on-hover="false"
+            :keep-alive-on-hover="true"
           >
             <template #trigger>
-              <div class="relative h-5 w-5 rounded transition-[filter]">
+              <div class="relative h-5 w-5 cursor-default rounded transition-[filter]">
                 <LcuImage class="h-full w-full" :src="championIconUri(c.championId)" />
                 <div
                   class="absolute -right-0.5 -bottom-1 rounded-sm bg-black/60 px-0.5 text-[10px] text-gray-200"
@@ -180,22 +180,159 @@
                 </div>
               </div>
             </template>
-            <div class="text-xs">
-              <div>
-                {{ lcs.gameData.champions[c.championId]?.name }} · {{ c.winLoss.all.count }}
-                {{ t('PlayerTab.stats.times') }}
+            <div class="w-88 text-xs">
+              <div class="mb-2 flex items-center gap-2">
+                <LcuImage class="size-7 shrink-0 rounded" :src="championIconUri(c.championId)" />
+                <div class="min-w-0 flex-1">
+                  <div class="truncate font-semibold text-gray-900 dark:text-white">
+                    {{ championName(c.championId) }}
+                  </div>
+                  <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">
+                    {{ c.winLoss.all.count }} {{ t('PlayerTab.stats.times') }}
+                  </div>
+                </div>
+                <div class="shrink-0 text-right">
+                  <div
+                    class="font-semibold tabular-nums"
+                    :class="getWinRateTextClass(c.winLoss.all.winRate)"
+                  >
+                    {{ formatPercent(c.winLoss.all.winRate) }}
+                  </div>
+                  <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">
+                    {{ c.winLoss.all.wins }} {{ t('PlayerTab.stats.winShort') }}
+                    {{ c.winLoss.all.losses }} {{ t('PlayerTab.stats.lossShort') }}
+                  </div>
+                </div>
               </div>
-              <div class="mt-0.5 flex gap-1">
-                <span class="text-green-600 dark:text-green-400"
-                  >{{ c.winLoss.all.wins }} {{ t('PlayerTab.stats.win') }}</span
+
+              <div class="grid grid-cols-3 gap-1.5">
+                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgKda') }}
+                  </div>
+                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
+                    {{ c.summary.avgKda.toFixed(2) }}
+                  </div>
+                  <div
+                    class="mt-0.5 text-[10px] whitespace-nowrap text-gray-500 tabular-nums dark:text-gray-400"
+                  >
+                    {{ formatAverageKdaLine(c) }}
+                  </div>
+                </div>
+                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgKp') }}
+                  </div>
+                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
+                    {{ formatPercent(c.summary.avgKillParticipation) }}
+                  </div>
+                </div>
+                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgCsPerMinute') }}
+                  </div>
+                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
+                    {{
+                      t('PlayerTab.stats.perMinuteValue', {
+                        value: c.summary.avgCsPerMinute.toFixed(1)
+                      })
+                    }}
+                  </div>
+                  <div class="mt-0.5 text-[10px] text-gray-500 tabular-nums dark:text-gray-400">
+                    {{
+                      t('PlayerTab.stats.teamShare', {
+                        value: formatPercent(c.summary.avgCsPercentageOfTeam)
+                      })
+                    }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 text-[11px]">
+                <div>
+                  <div class="text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgDmg') }}
+                  </div>
+                  <div class="text-gray-900 tabular-nums dark:text-white">
+                    {{ formatPercent(c.summary.avgChampionDamagePercentageOfTeam) }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgDmgTaken') }}
+                  </div>
+                  <div class="text-gray-900 tabular-nums dark:text-white">
+                    {{ formatPercent(c.summary.avgDamageTakenPercentageOfTeam) }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-gray-500 dark:text-gray-400">
+                    {{ t('PlayerTab.stats.avgGold') }}
+                  </div>
+                  <div class="text-gray-900 tabular-nums dark:text-white">
+                    {{ formatPercent(c.summary.avgGoldPercentageOfTeam) }}
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="c.jungle" class="mt-2 border-t border-black/10 pt-2 dark:border-white/10">
+                <div class="mb-1 flex items-center justify-between gap-3">
+                  <div class="font-semibold text-gray-800 dark:text-gray-100">
+                    {{ t('JunglePathing.title') }} ·
+                    {{ t('JunglePathing.gamesAnalyzed', { count: c.jungle.gamesAnalyzed }) }}
+                  </div>
+                  <div class="tabular-nums" :class="topsideTextColor(c.jungle)">
+                    {{ topsideTextTrigger(t, c.jungle) }}
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                  <div class="rounded bg-indigo-500/8 px-2 py-1">
+                    <div class="text-gray-500 dark:text-gray-400">
+                      {{ t('PlayerTab.stats.level3Short') }}
+                    </div>
+                    <div class="text-gray-900 tabular-nums dark:text-white">
+                      {{ c.jungle.earlyGank.level3GankCount }}/{{ c.jungle.gamesAnalyzed }}
+                    </div>
+                  </div>
+                  <div class="rounded bg-indigo-500/8 px-2 py-1">
+                    <div class="text-gray-500 dark:text-gray-400">
+                      {{ t('PlayerTab.stats.level4Short') }}
+                    </div>
+                    <div class="text-gray-900 tabular-nums dark:text-white">
+                      {{ c.jungle.earlyGank.level4GankCount }}/{{ c.jungle.gamesAnalyzed }}
+                    </div>
+                  </div>
+                  <div class="rounded bg-indigo-500/8 px-2 py-1">
+                    <div class="text-gray-500 dark:text-gray-400">
+                      {{ t('JunglePathing.firstDragonRateLabel') }}
+                    </div>
+                    <div class="text-gray-900 tabular-nums dark:text-white">
+                      {{ formatPercent(c.jungle.objectives.firstDragonRate) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-2 border-t border-black/10 pt-2 dark:border-white/10">
+                <NButton
+                  block
+                  secondary
+                  size="tiny"
+                  type="primary"
+                  :loading="isLoading"
+                  @click="collectChampionMatches(c.championId)"
                 >
-                <span class="text-orange-600 dark:text-orange-400"
-                  >{{ c.winLoss.all.losses }} {{ t('PlayerTab.stats.lose') }}</span
-                >
-                <span
-                  >({{ t('PlayerTab.stats.wr') }}
-                  {{ (c.winLoss.all.winRate * 100).toFixed() }}%)</span
-                >
+                  <template #icon>
+                    <NIcon>
+                      <ManageSearchFilledIcon />
+                    </NIcon>
+                  </template>
+                  {{
+                    t('PlayerTab.stats.collectChampionMatches', {
+                      champion: championName(c.championId)
+                    })
+                  }}
+                </NButton>
               </div>
             </div>
           </NPopover>
@@ -208,22 +345,39 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import {
+  topsideTextColor,
+  topsideTextTrigger
+} from '@renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/preference'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import type { AggregatedChampionAnalysis } from '@shared/data-adapter/analysis/player'
+import { ManageSearchFilled as ManageSearchFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NPopover } from 'naive-ui'
+import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
+import {
+  createInitParamCollectFilterState,
+  createInitParamCollectSettings
+} from '../data/match-history-init-param-collect'
 import { useMatchHistory } from '../data/match-history'
+import { useMatchHistoryFilters } from '../data/match-history-filters'
+import { usePlayerTab } from '../context'
+import { toPredicate } from './match-history-filters/filter-state'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
 const { t } = useTranslation()
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
+const ogs = useOngoingGameStore()
 
-const { page, analysis: analysis } = useMatchHistory()
+const { page, analysis: analysis, collectMatchHistory, isLoading } = useMatchHistory()
+const { puuid, sgpServerId } = usePlayerTab()
+const { setActiveMode, setAdvancedFilterState } = useMatchHistoryFilters()
 
 const currentStreak = computed(() => {
   // 连胜目前只统计第一页
@@ -246,6 +400,58 @@ const getStreakBadgeClass = (isWinning: boolean, _count: number) => {
   return isWinning
     ? 'border border-emerald-500/45 bg-emerald-500/12 font-semibold text-emerald-700 dark:border-emerald-300/55 dark:bg-emerald-300/15 dark:text-emerald-300'
     : 'border border-red-500/45 bg-red-500/12 font-semibold text-red-700 dark:border-red-300/55 dark:bg-red-300/15 dark:text-red-300'
+}
+
+const championName = (championId: number) => {
+  return lcs.gameData.champions[championId]?.name || championId.toString()
+}
+
+const formatPercent = (value: number, digits = 0) => {
+  return `${(value * 100).toFixed(digits)}%`
+}
+
+const formatAverageKdaLine = (champion: AggregatedChampionAnalysis) => {
+  const count = Math.max(champion.winLoss.all.count, 1)
+  const kills = champion.summary.kills / count
+  const deaths = champion.summary.deaths / count
+  const assists = champion.summary.assists / count
+
+  return `${kills.toFixed(1)} / ${deaths.toFixed(1)} / ${assists.toFixed(1)}`
+}
+
+const getWinRateTextClass = (winRate: number) => {
+  if (winRate >= 0.53) {
+    return 'text-green-700 dark:text-green-300'
+  }
+
+  if (winRate <= 0.47) {
+    return 'text-red-700 dark:text-red-400'
+  }
+
+  return 'text-gray-800 dark:text-gray-100'
+}
+
+const collectChampionMatches = (championId: number) => {
+  const initParams = {
+    collectByChampionId: championId,
+    expectedCount: ogs.settings.matchHistoryLoadCount
+  }
+  const filterState = createInitParamCollectFilterState(initParams, puuid.value)
+
+  if (!filterState) {
+    return
+  }
+
+  setActiveMode('advanced')
+  setAdvancedFilterState(filterState)
+
+  void collectMatchHistory({
+    ...createInitParamCollectSettings(initParams),
+    predicate: toPredicate(filterState),
+    queryParams: {
+      __sgpServerId: sgpServerId.value
+    }
+  })
 }
 
 const frequentlyUsedChampions = computed(() => {
