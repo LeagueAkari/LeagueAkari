@@ -37,6 +37,7 @@
         :key="mastery.championId"
         :delay="50"
         :keep-alive-on-hover="false"
+        placement="right"
       >
         <template #trigger>
           <div
