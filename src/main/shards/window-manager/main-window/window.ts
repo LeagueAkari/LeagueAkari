@@ -10,7 +10,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   static readonly NAMESPACE_SUFFIX = 'main-window'
   static readonly HTML_ENTRY = 'main-window.html'
   static readonly TITLE = 'League Akari'
-  static readonly BASE_WIDTH = 1480
+  static readonly BASE_WIDTH = 1440
   static readonly BASE_HEIGHT = 860
   static readonly MIN_WIDTH = 840
   static readonly MIN_HEIGHT = 600
