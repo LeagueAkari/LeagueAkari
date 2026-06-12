@@ -12,6 +12,7 @@ import {
   AUTO_MISC_SETTING_KEYS,
   type AutoMiscMainContext
 } from './context'
+import { AutoMiscIpcHandlers } from './ipc-handlers'
 import { AutoMiscLoginAutomationController } from './login-automation-controller'
 import { AutoMiscSettings } from './state'
 
@@ -26,6 +27,7 @@ export class AutoMiscMain implements IAkariShardInitDispose {
   private readonly _context: AutoMiscMainContext
   private readonly _autoReplyController: AutoMiscAutoReplyController
   private readonly _loginAutomationController: AutoMiscLoginAutomationController
+  private readonly _ipcHandlers: AutoMiscIpcHandlers
 
   constructor(
     loggerFactory: LoggerFactoryMain,
@@ -59,6 +61,7 @@ export class AutoMiscMain implements IAkariShardInitDispose {
     }
     this._autoReplyController = new AutoMiscAutoReplyController(this._context)
     this._loginAutomationController = new AutoMiscLoginAutomationController(this._context)
+    this._ipcHandlers = new AutoMiscIpcHandlers(this._context, this._loginAutomationController)
   }
 
   async onInit() {
@@ -67,6 +70,7 @@ export class AutoMiscMain implements IAkariShardInitDispose {
       ...AUTO_MISC_SETTING_KEYS
     ])
 
+    this._ipcHandlers.register()
     this._autoReplyController.watch()
     this._loginAutomationController.watch()
   }

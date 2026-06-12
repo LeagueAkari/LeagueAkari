@@ -953,27 +953,6 @@ AutoMisc:
       label: 回复内容
       description: 将作为自动回复的内容词
 
-  autoStatusMessage:
-    updated: 已更新
-    title: 自动设置个性签名
-
-    enabled:
-      label: 开启
-
-    text:
-      label: 个性签名
-      description: 登录后自动设置的聊天个性签名
-
-  autoRankedStatus:
-    title: 自动设置虚假段位
-
-    enabled:
-      label: 开启
-
-    queue: 队列
-    tier: 段位
-    division: 分段
-
   autoInvitation:
     title: 邀请好友进入房间
     description: 进行一次性的监听，当指定好友空闲时，发出房间邀请。
@@ -1950,18 +1929,22 @@ ChatStatusMessage:
   title: 聊天签名
 
   message:
-    label: 设置聊天签名
-    button: 设置
-    success: 设置聊天签名成功
+    saved: 已保存
+    success: 已保存并应用
 
     failedNotification:
       title: 设置聊天签名
       description: 设置聊天签名失败 {{reason}}
 
+  resetOnLogin:
+    label: 登录时重设
+    description: 开启后，每次客户端登录时重新应用上一次保存的签名
+
   text:
-    label: 文本行
-    description: 聊天状态文本。设置空值则为删除
+    label: 个性签名
+    description: 保存时会立即设置聊天签名；设置空值则为删除
     placeholder: 输入签名
+    save: 保存
 
 SummonerProfile:
   title: 召唤师
@@ -2026,13 +2009,18 @@ GameView:
     button: 查看
 
 FakeRanked:
-  title: 聊天卡片伪造段位
-  commonSuccess: 操作成功
+  title: 段位伪造
+  commonSuccess: 已保存并应用
+  saved: 已保存
+
+  resetOnLogin:
+    label: 登录时重设
+    description: 开启后，每次客户端登录时重新应用上一次保存的段位
 
   set:
-    label: 立即使生效
-    description: 立即修改聊天卡片状态，在下一次客户端启动前有效
-    button: 修改
+    label: 保存段位
+    description: 保存当前聊天卡片段位
+    button: 保存
 
     failedNotification:
       title: 伪造段位

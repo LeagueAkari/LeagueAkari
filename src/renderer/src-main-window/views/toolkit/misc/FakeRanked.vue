@@ -5,6 +5,18 @@
     </template>
     <ControlItem
       class="control-item-margin"
+      :label="t('FakeRanked.resetOnLogin.label')"
+      :label-description="t('FakeRanked.resetOnLogin.description')"
+      :label-width="260"
+    >
+      <NSwitch
+        size="small"
+        :value="ams.settings.autoSetRankedStatusEnabled"
+        @update:value="(value) => am.setAutoSetRankedStatusEnabled(value)"
+      ></NSwitch>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
       :label="t('FakeRanked.set.label')"
       :label-description="t('FakeRanked.set.description')"
       :label-width="260"
@@ -12,7 +24,8 @@
       <NButton
         size="small"
         type="primary"
-        :disabled="lcs.connectionState !== 'connected'"
+        :loading="isSetting"
+        :disabled="isSetting"
         @click="() => handleSet()"
         >{{ t('FakeRanked.set.button') }}</NButton
       >
@@ -21,6 +34,7 @@
       <NSelect
         :options="queueOptions"
         style="width: 180px"
+        :disabled="isSetting"
         v-model:value="state.queue"
         size="small"
       ></NSelect>
@@ -29,6 +43,7 @@
       <NSelect
         :options="tierOptions"
         style="width: 180px"
+        :disabled="isSetting"
         v-model:value="state.tier"
         size="small"
       ></NSelect>
@@ -37,7 +52,10 @@
       <NSelect
         :options="divisionOptions"
         :disabled="
-          state.tier === 'MASTER' || state.tier === 'GRANDMASTER' || state.tier === 'CHALLENGER'
+          isSetting ||
+          state.tier === 'MASTER' ||
+          state.tier === 'GRANDMASTER' ||
+          state.tier === 'CHALLENGER'
         "
         style="width: 180px"
         v-model:value="state.division"
@@ -50,36 +68,57 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
+import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import type {
+  AutoMiscRankedDivision,
+  AutoMiscRankedStatus,
+  AutoMiscRankedTier
+} from '@shared/types/shards/auto-misc'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, useMessage, useNotification } from 'naive-ui'
-import { computed, reactive } from 'vue'
+import { NButton, NCard, NSelect, NSwitch, useMessage, useNotification } from 'naive-ui'
+import { computed, reactive, ref, watchEffect } from 'vue'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance(LeagueClientRenderer)
+const ams = useAutoMiscStore()
+const am = useInstance(AutoMiscRenderer)
 
 const notification = useNotification()
 
-const state = reactive({
+const state = reactive<AutoMiscRankedStatus>({
   queue: 'RANKED_SOLO_5x5',
   tier: 'CHALLENGER',
   division: 'I'
 })
 
 const message = useMessage()
+const isSetting = ref(false)
+
+watchEffect(() => {
+  state.queue = ams.settings.rankedStatus.queue
+  state.tier = ams.settings.rankedStatus.tier
+  state.division = ams.settings.rankedStatus.division
+})
 
 const handleSet = async () => {
+  if (isSetting.value) {
+    return
+  }
+
   try {
-    await lc.api.chat.changeRanked(
-      state.queue,
-      state.tier,
-      state.tier === 'MASTER' || state.tier === 'GRANDMASTER' || state.tier === 'CHALLENGER'
-        ? undefined
-        : state.division
-    )
+    isSetting.value = true
+    const rankedStatus = { ...state }
+    await am.setRankedStatus(rankedStatus)
+
+    if (lcs.connectionState !== 'connected') {
+      message.success(t('FakeRanked.saved'), { duration: 1000 })
+      return
+    }
+
+    await am.applyRankedStatus(rankedStatus)
     message.success(t('FakeRanked.commonSuccess'), { duration: 1000 })
   } catch (error) {
     notification.warning({
@@ -89,6 +128,8 @@ const handleSet = async () => {
           reason: (error as Error).message
         })
     })
+  } finally {
+    isSetting.value = false
   }
 }
 
@@ -134,7 +175,7 @@ const tierOptions = computed(() => {
       label: t('tiers.CHALLENGER', { ns: 'common' }),
       value: 'CHALLENGER'
     }
-  ]
+  ] satisfies { label: string; value: AutoMiscRankedTier }[]
 })
 
 const divisionOptions = [
@@ -154,7 +195,7 @@ const divisionOptions = [
     label: 'IV',
     value: 'IV'
   }
-]
+] satisfies { label: string; value: AutoMiscRankedDivision }[]
 
 const queueOptions = computed(() => {
   return [

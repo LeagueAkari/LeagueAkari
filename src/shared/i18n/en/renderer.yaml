@@ -954,27 +954,6 @@ AutoMisc:
       label: Reply Text
       description: The content to be used as the auto-reply message.
 
-  autoStatusMessage:
-    updated: Updated
-    title: Auto Status Message
-
-    enabled:
-      label: Enable
-
-    text:
-      label: Status Message
-      description: Chat status message to set after login.
-
-  autoRankedStatus:
-    title: Auto Fake Ranked Status
-
-    enabled:
-      label: Enable
-
-    queue: Queue
-    tier: Tier
-    division: Division
-
   autoInvitation:
     title: Invite Friends to Room
     description: 'One-time monitoring: when specified friends become available, send room invitations.'
@@ -1951,21 +1930,25 @@ ChatAvailability:
     button: Set
 
 ChatStatusMessage:
-  title: Chat Status Message
+  title: Chat Signature
 
   message:
-    label: Set Chat Message
-    button: Set
-    success: Chat message set successfully
+    saved: Saved
+    success: Saved and applied
 
     failedNotification:
-      title: Set Chat Message
-      description: 'Failed to set chat message: {{reason}}'
+      title: Set Chat Signature
+      description: 'Failed to set chat signature: {{reason}}'
+
+  resetOnLogin:
+    label: Reset On Login
+    description: Reapply the last saved signature every time the client signs in.
 
   text:
-    label: Text Line
-    description: Chat status text. Setting an empty value will delete the message.
-    placeholder: Enter message
+    label: Signature
+    description: Save and apply the chat signature. Set an empty value to delete it.
+    placeholder: Enter signature
+    save: Save
 
 SummonerProfile:
   title: Summoner
@@ -2030,13 +2013,18 @@ GameView:
     button: View
 
 FakeRanked:
-  title: Fake Ranked Chat Card
-  commonSuccess: Action Successful
+  title: Fake Ranked Status
+  commonSuccess: Saved and applied
+  saved: Saved
+
+  resetOnLogin:
+    label: Reset On Login
+    description: Reapply the last saved ranked status every time the client signs in.
 
   set:
-    label: Apply Immediately
-    description: Modify the chat card status immediately, effective until the next client restart.
-    button: Fake it
+    label: Save Ranked Status
+    description: Save the chat card ranked status
+    button: Save
 
     failedNotification:
       title: Fake Ranked

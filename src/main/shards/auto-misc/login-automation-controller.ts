@@ -1,3 +1,5 @@
+import type { AutoMiscRankedStatus } from '@shared/types/shards/auto-misc'
+
 import type { AutoMiscMainContext } from './context'
 
 export class AutoMiscLoginAutomationController {
@@ -7,9 +9,9 @@ export class AutoMiscLoginAutomationController {
     const { leagueClient, mobxUtils } = this._context
 
     mobxUtils.reaction(
-      () => leagueClient.state.connectionState,
-      (connectionState) => {
-        if (connectionState !== 'connected') {
+      () => Boolean(leagueClient.data.summoner.me),
+      (isSummonerReady, wasSummonerReady) => {
+        if (!isSummonerReady || wasSummonerReady) {
           return
         }
 
@@ -19,28 +21,55 @@ export class AutoMiscLoginAutomationController {
     )
   }
 
+  async applyStatusMessage(message = this._context.settings.statusMessage) {
+    await this._context.leagueClient.api.chat.setChatStatusMessage(message)
+    this._context.logger.info('Applied chat status message')
+  }
+
+  async applyRankedStatus(
+    rankedStatus: AutoMiscRankedStatus = this._context.settings.rankedStatus
+  ) {
+    await this._context.leagueClient.api.chat.changeRanked(
+      rankedStatus.queue,
+      rankedStatus.tier,
+      this._isApexRankedTier(rankedStatus.tier) ? undefined : rankedStatus.division
+    )
+    this._context.logger.info('Applied ranked status')
+  }
+
   private async _applyLoginAutomations() {
-    await this._applyStatusMessageOnLogin()
-    await this._applyRankedStatusOnLogin()
+    await Promise.allSettled([this._applyStatusMessageOnLogin(), this._applyRankedStatusOnLogin()])
   }
 
   private async _applyStatusMessageOnLogin() {
-    const { settings } = this._context
+    const { logger, settings } = this._context
 
-    if (!settings.autoSetStatusMessageEnabled || !settings.statusMessage) {
+    if (!settings.autoSetStatusMessageEnabled) {
       return
     }
 
-    // The concrete LCU operation is intentionally left for the watcher implementation pass.
+    try {
+      await this.applyStatusMessage()
+    } catch (error) {
+      logger.warn('Failed to apply chat status message on summoner ready', error)
+    }
   }
 
   private async _applyRankedStatusOnLogin() {
-    const { settings } = this._context
+    const { logger, settings } = this._context
 
     if (!settings.autoSetRankedStatusEnabled) {
       return
     }
 
-    // The concrete LCU operation is intentionally left for the watcher implementation pass.
+    try {
+      await this.applyRankedStatus()
+    } catch (error) {
+      logger.warn('Failed to apply ranked status on summoner ready', error)
+    }
+  }
+
+  private _isApexRankedTier(tier: AutoMiscRankedStatus['tier']) {
+    return tier === 'MASTER' || tier === 'GRANDMASTER' || tier === 'CHALLENGER'
   }
 }

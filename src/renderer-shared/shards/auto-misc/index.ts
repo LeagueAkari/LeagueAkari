@@ -5,6 +5,7 @@ import type {
   AutoMiscRankedTier
 } from '@shared/types/shards/auto-misc'
 
+import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import {
@@ -24,10 +25,12 @@ export class AutoMiscRenderer implements IAkariShardInitDispose {
   private readonly _context: AutoMiscRendererContext
 
   constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {
     this._context = {
+      ipc: this._ipc,
       piniaMobxUtils,
       settingUtils: this._settingUtils
     }
@@ -78,6 +81,14 @@ export class AutoMiscRenderer implements IAkariShardInitDispose {
   setRankedDivision(division: AutoMiscRankedDivision) {
     const store = useAutoMiscStore()
     return this.setRankedStatus({ ...store.settings.rankedStatus, division })
+  }
+
+  applyStatusMessage(message?: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'applyStatusMessage', message)
+  }
+
+  applyRankedStatus(rankedStatus?: AutoMiscRankedStatus) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'applyRankedStatus', rankedStatus)
   }
 
   async onInit() {
