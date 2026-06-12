@@ -43,6 +43,14 @@ This applies especially when the work was authored or reviewed with AI assistanc
 
 ---
 
+## Commit Workflow
+
+- Format every file included in a commit before committing it. Prefer formatting only the files
+  touched by the commit to avoid unrelated churn.
+- Use a scoped commit message, such as `feat(match-card): update team labels`.
+
+---
+
 ## Git Attribution
 
 When the user asks an agent to commit changes, add co-author attribution only if that agent

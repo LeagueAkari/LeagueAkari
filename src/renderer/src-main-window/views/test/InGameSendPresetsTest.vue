@@ -109,11 +109,15 @@
               <div v-if="preset.hasTeamSelection && totalCount > 0" class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
                   <div class="text-xs font-semibold text-black/70 dark:text-white/70">
-                    发送的目标 ({{ selectedCount }} / {{ totalCount }})
+                    发送的目标 ({{ selectedPlayerCount(preset.id) }} / {{ totalCount }})
                   </div>
                   <div class="flex items-center gap-1">
-                    <NButton size="tiny" quaternary @click="setAllSelected(true)">全选</NButton>
-                    <NButton size="tiny" quaternary @click="setAllSelected(false)">清空</NButton>
+                    <NButton size="tiny" quaternary @click="setAllSelected(preset.id, true)">
+                      全选
+                    </NButton>
+                    <NButton size="tiny" quaternary @click="setAllSelected(preset.id, false)">
+                      清空
+                    </NButton>
                   </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -139,14 +143,14 @@
                           · {{ team.secondaryLabel }}
                         </span>
                         <span class="font-normal text-black/45 dark:text-white/45">
-                          ({{ selectedInTeam(team.id) }}/{{ team.players.length }})
+                          ({{ selectedInTeam(preset.id, team.id) }}/{{ team.players.length }})
                         </span>
                       </div>
                       <NCheckbox
                         size="small"
-                        :checked="isTeamAllSelected(team.id)"
-                        :indeterminate="isTeamIndeterminate(team.id)"
-                        @update:checked="(v) => setTeamSelected(team.id, v)"
+                        :checked="isTeamAllSelected(preset.id, team.id)"
+                        :indeterminate="isTeamIndeterminate(preset.id, team.id)"
+                        @update:checked="(v) => setTeamSelected(preset.id, team.id, v)"
                       >
                         <span class="text-[11px] text-black/55 dark:text-white/55">全选</span>
                       </NCheckbox>
@@ -156,13 +160,19 @@
                         v-for="p of team.players"
                         :key="p.puuid"
                         class="flex cursor-pointer items-center gap-2 rounded px-1 py-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                        @click="setPlayerSelected(p.puuid, !selectedPuuids.has(p.puuid))"
+                        @click="
+                          setPlayerSelected(
+                            preset.id,
+                            p.puuid,
+                            !isPlayerSelected(preset.id, p.puuid)
+                          )
+                        "
                       >
                         <span @click.stop>
                           <NCheckbox
                             size="small"
-                            :checked="selectedPuuids.has(p.puuid)"
-                            @update:checked="(v) => setPlayerSelected(p.puuid, v)"
+                            :checked="isPlayerSelected(preset.id, p.puuid)"
+                            @update:checked="(v) => setPlayerSelected(preset.id, p.puuid, v)"
                           />
                         </span>
                         <ChampionIcon class="size-6 shrink-0" round :champion-id="p.championId" />
@@ -263,16 +273,16 @@
                         }"
                         @click.stop="
                           setPremadeBucketSelected(
-                            bucket.key,
-                            !selectedPremadeBuckets.has(bucket.key)
+                            bucket.groupIndex,
+                            !isPremadeBucketSelected(bucket.groupIndex)
                           )
                         "
                       >
                         <div class="flex items-center gap-2" @click.stop>
                           <NCheckbox
                             size="small"
-                            :checked="selectedPremadeBuckets.has(bucket.key)"
-                            @update:checked="(v) => setPremadeBucketSelected(bucket.key, v)"
+                            :checked="isPremadeBucketSelected(bucket.groupIndex)"
+                            @update:checked="(v) => setPremadeBucketSelected(bucket.groupIndex, v)"
                           />
                           <div
                             class="rounded-sm px-1 py-0.5 text-[10px] leading-3 font-semibold"
@@ -391,7 +401,10 @@ import {
 } from '@renderer-shared/components/ongoing-game-panel/constants'
 import { getTeamIndicatorColorClass } from '@renderer-shared/components/ongoing-game-panel/utils/theme'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
+import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { DocumentText24Regular as DryRunIcon, Send24Filled as SendIcon } from '@vicons/fluent'
@@ -415,8 +428,9 @@ import {
   NTag,
   useMessage
 } from 'naive-ui'
+import i18next from 'i18next'
 import { useTranslation } from 'i18next-vue'
-import { computed, reactive, ref, shallowRef, watch, type Component } from 'vue'
+import { computed, reactive, ref, shallowRef, type Component } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -430,8 +444,11 @@ interface PresetTarget {
   icon: Component
 }
 
+type PresetId = 'rating' | 'jungle' | 'premade'
+type PlayerSelectionPresetId = Extract<PresetId, 'rating' | 'jungle'>
+
 interface Preset {
-  id: string
+  id: PresetId
   label: string
   description: string
   sample: Record<PresetTarget['id'], string[]>
@@ -614,15 +631,9 @@ interface DemoTeam {
 
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
-
-const CLASSIC_TEAM_SIDE_LABELS: Record<string, string> = {
-  'TEAM-100': '蓝方',
-  'TEAM-200': '红方'
-}
-
-function isClassicTeamId(teamId: string) {
-  return teamId === 'TEAM-100' || teamId === 'TEAM-200'
-}
+const as = useAppCommonStore()
+const ig = useInstance(InGameSendRenderer)
+const igs = useInGameSendStore()
 
 function getTeamSortValue(teamId: string) {
   if (teamId === 'TEAM-100') return 100
@@ -653,11 +664,12 @@ function compareTeamIds(teamIdA: string, teamIdB: string, selfTeamId: string | n
 }
 
 function getTeamName(teamId: string) {
-  if (isClassicTeamId(teamId)) {
-    return CLASSIC_TEAM_SIDE_LABELS[teamId]
+  const commonTeamKey = `teams.${teamId}`
+  if (i18next.exists(commonTeamKey, { ns: 'common' })) {
+    return t(commonTeamKey, { ns: 'common' })
   }
 
-  return t(`MatchCard.teamName.${teamId}`, { defaultValue: teamId })
+  return teamId
 }
 
 function getTeamLabels(teamId: string, selfTeamId: string | null) {
@@ -723,84 +735,115 @@ const allPuuids = computed(() =>
 )
 const totalCount = computed(() => allPuuids.value.length)
 
-const selectedPuuids = reactive(new Set<string>())
+const selectedPlayerPuuidSets = computed<Record<PlayerSelectionPresetId, Set<string>>>(() => ({
+  rating: new Set(igs.state.ratingPuuids),
+  jungle: new Set(igs.state.junglePuuids)
+}))
 
-// 新出现的 puuid 默认勾选; 不再存在的 puuid 移除
-watch(
-  allPuuids,
-  (next, prev) => {
-    const nextSet = new Set(next)
-    if (prev) {
-      for (const p of prev) {
-        if (!nextSet.has(p)) selectedPuuids.delete(p)
-      }
-    }
-    const prevSet = new Set(prev ?? [])
-    for (const p of next) {
-      if (!prevSet.has(p)) selectedPuuids.add(p)
-    }
-  },
-  { immediate: true }
-)
+function isPlayerSelectionPresetId(presetId: PresetId): presetId is PlayerSelectionPresetId {
+  return presetId === 'rating' || presetId === 'jungle'
+}
 
-const selectedCount = computed(() => {
-  let n = 0
-  for (const p of allPuuids.value) {
-    if (selectedPuuids.has(p)) n++
+function selectedPlayerPuuidSet(presetId: PresetId) {
+  return isPlayerSelectionPresetId(presetId)
+    ? selectedPlayerPuuidSets.value[presetId]
+    : new Set<string>()
+}
+
+function normalizeSelectedPuuids(puuids: Iterable<string>) {
+  const selected = new Set(puuids)
+  return allPuuids.value.filter((puuid) => selected.has(puuid))
+}
+
+function commitSelectedPuuids(presetId: PresetId, puuids: Iterable<string>) {
+  if (!isPlayerSelectionPresetId(presetId)) {
+    return
   }
-  return n
-})
 
-function setPlayerSelected(puuid: string, selected: boolean) {
-  if (selected) {
-    selectedPuuids.add(puuid)
+  const normalized = normalizeSelectedPuuids(puuids)
+
+  if (presetId === 'jungle') {
+    void ig.setJunglePuuids(normalized)
   } else {
-    selectedPuuids.delete(puuid)
+    void ig.setRatingPuuids(normalized)
   }
+}
+
+function selectedPlayerCount(presetId: PresetId) {
+  const selected = selectedPlayerPuuidSet(presetId)
+  return allPuuids.value.reduce((acc, puuid) => acc + (selected.has(puuid) ? 1 : 0), 0)
+}
+
+function isPlayerSelected(presetId: PresetId, puuid: string) {
+  return selectedPlayerPuuidSet(presetId).has(puuid)
+}
+
+function setPlayerSelected(presetId: PresetId, puuid: string, selected: boolean) {
+  const next = new Set(selectedPlayerPuuidSet(presetId))
+
+  if (selected) {
+    next.add(puuid)
+  } else {
+    next.delete(puuid)
+  }
+
+  commitSelectedPuuids(presetId, next)
 }
 
 function teamOf(teamId: string) {
   return teams.value.find((t) => t.id === teamId)
 }
 
-function selectedInTeam(teamId: string) {
+function selectedInTeam(presetId: PresetId, teamId: string) {
   const team = teamOf(teamId)
   if (!team) return 0
-  return team.players.reduce((acc, p) => acc + (selectedPuuids.has(p.puuid) ? 1 : 0), 0)
+  const selected = selectedPlayerPuuidSet(presetId)
+  return team.players.reduce((acc, p) => acc + (selected.has(p.puuid) ? 1 : 0), 0)
 }
 
-function isTeamAllSelected(teamId: string) {
+function isTeamAllSelected(presetId: PresetId, teamId: string) {
   const team = teamOf(teamId)
-  return !!team && team.players.length > 0 && team.players.every((p) => selectedPuuids.has(p.puuid))
+  if (!team || team.players.length === 0) {
+    return false
+  }
+
+  const selected = selectedPlayerPuuidSet(presetId)
+  return team.players.every((p) => selected.has(p.puuid))
 }
 
-function isTeamIndeterminate(teamId: string) {
+function isTeamIndeterminate(presetId: PresetId, teamId: string) {
   const team = teamOf(teamId)
   if (!team) return false
-  const n = selectedInTeam(teamId)
+  const n = selectedInTeam(presetId, teamId)
   return n > 0 && n < team.players.length
 }
 
-function setTeamSelected(teamId: string, selected: boolean) {
+function setTeamSelected(presetId: PresetId, teamId: string, selected: boolean) {
   const team = teamOf(teamId)
   if (!team) return
+
+  const next = new Set(selectedPlayerPuuidSet(presetId))
   for (const p of team.players) {
-    setPlayerSelected(p.puuid, selected)
+    if (selected) {
+      next.add(p.puuid)
+    } else {
+      next.delete(p.puuid)
+    }
   }
+
+  commitSelectedPuuids(presetId, next)
 }
 
-function setAllSelected(selected: boolean) {
-  if (selected) {
-    for (const puuid of allPuuids.value) selectedPuuids.add(puuid)
-  } else {
-    selectedPuuids.clear()
-  }
+function setAllSelected(presetId: PresetId, selected: boolean) {
+  commitSelectedPuuids(presetId, selected ? allPuuids.value : [])
 }
 
 // --- 开黑小队：按开黑组为单位的勾选, 单排不参与发送, 颜色复用 ongoing-game 的 premade 配色 ---
 interface PremadeBucket {
   /** 唯一 key, 用于勾选集合 */
   key: string
+  /** ongoing-game 生成的 1-based 开黑组编号 */
+  groupIndex: number
   /** 该队内的开黑字母编号 (A/B/…) */
   groupLetter: string
   players: DemoPlayer[]
@@ -810,7 +853,6 @@ interface PremadeTeamView {
   groups: PremadeBucket[]
 }
 
-const as = useAppCommonStore()
 const premadeColors = computed(() => {
   return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
@@ -830,6 +872,7 @@ const premadeView = computed<PremadeTeamView[]>(() => {
       if (players.length < 2) continue
       groups.push({
         key: `${team.id}:g:${gid}`,
+        groupIndex: gid,
         groupLetter: PREMADE_TEAMS[gid - 1],
         players
       })
@@ -838,74 +881,75 @@ const premadeView = computed<PremadeTeamView[]>(() => {
   })
 })
 
-const allPremadeBucketKeys = computed(() =>
-  premadeView.value.flatMap((tv) => tv.groups.map((b) => b.key))
+const allPremadeGroupIndices = computed(() =>
+  premadeView.value.flatMap((tv) => tv.groups.map((b) => b.groupIndex))
 )
-const totalPremadeGroupCount = computed(() => allPremadeBucketKeys.value.length)
+const totalPremadeGroupCount = computed(() => allPremadeGroupIndices.value.length)
 
-const selectedPremadeBuckets = reactive(new Set<string>())
+const selectedPremadeIndexSet = computed(() => new Set(igs.state.premadeIndices))
 
-// 新出现的开黑组默认勾选; 不再存在的移除
-watch(
-  allPremadeBucketKeys,
-  (next, prev) => {
-    const nextSet = new Set(next)
-    if (prev) {
-      for (const k of prev) {
-        if (!nextSet.has(k)) selectedPremadeBuckets.delete(k)
-      }
-    }
-    const prevSet = new Set(prev ?? [])
-    for (const k of next) {
-      if (!prevSet.has(k)) selectedPremadeBuckets.add(k)
-    }
-  },
-  { immediate: true }
-)
+function normalizeSelectedPremadeIndices(indices: Iterable<number>) {
+  const selected = new Set(indices)
+  return allPremadeGroupIndices.value.filter((index) => selected.has(index))
+}
+
+function commitSelectedPremadeIndices(indices: Iterable<number>) {
+  void ig.setPremadeIndices(normalizeSelectedPremadeIndices(indices))
+}
+
 const selectedPremadeGroupCount = computed(() => {
-  let n = 0
-  for (const k of allPremadeBucketKeys.value) {
-    if (selectedPremadeBuckets.has(k)) n++
-  }
-  return n
+  const selected = selectedPremadeIndexSet.value
+  return allPremadeGroupIndices.value.reduce((acc, index) => acc + (selected.has(index) ? 1 : 0), 0)
 })
 
-function setPremadeBucketSelected(key: string, selected: boolean) {
+function isPremadeBucketSelected(groupIndex: number) {
+  return selectedPremadeIndexSet.value.has(groupIndex)
+}
+
+function setPremadeBucketSelected(groupIndex: number, selected: boolean) {
+  const next = new Set(selectedPremadeIndexSet.value)
+
   if (selected) {
-    selectedPremadeBuckets.add(key)
+    next.add(groupIndex)
   } else {
-    selectedPremadeBuckets.delete(key)
+    next.delete(groupIndex)
   }
+
+  commitSelectedPremadeIndices(next)
 }
 
 function setAllPremadeSelected(selected: boolean) {
-  if (selected) {
-    for (const k of allPremadeBucketKeys.value) selectedPremadeBuckets.add(k)
-  } else {
-    selectedPremadeBuckets.clear()
-  }
+  commitSelectedPremadeIndices(selected ? allPremadeGroupIndices.value : [])
 }
 
-function premadeKeysOfTeam(teamId: string) {
+function premadeIndicesOfTeam(teamId: string) {
   const tv = premadeView.value.find((t) => t.team.id === teamId)
-  return tv ? tv.groups.map((g) => g.key) : []
+  return tv ? tv.groups.map((g) => g.groupIndex) : []
 }
 
 function isPremadeTeamAllSelected(teamId: string) {
-  const keys = premadeKeysOfTeam(teamId)
-  return keys.length > 0 && keys.every((k) => selectedPremadeBuckets.has(k))
+  const indices = premadeIndicesOfTeam(teamId)
+  const selected = selectedPremadeIndexSet.value
+  return indices.length > 0 && indices.every((index) => selected.has(index))
 }
 
 function isPremadeTeamIndeterminate(teamId: string) {
-  const keys = premadeKeysOfTeam(teamId)
-  const n = keys.reduce((acc, k) => acc + (selectedPremadeBuckets.has(k) ? 1 : 0), 0)
-  return n > 0 && n < keys.length
+  const indices = premadeIndicesOfTeam(teamId)
+  const selected = selectedPremadeIndexSet.value
+  const n = indices.reduce((acc, index) => acc + (selected.has(index) ? 1 : 0), 0)
+  return n > 0 && n < indices.length
 }
 
 function setPremadeTeamSelected(teamId: string, selected: boolean) {
-  for (const k of premadeKeysOfTeam(teamId)) {
-    setPremadeBucketSelected(k, selected)
+  const next = new Set(selectedPremadeIndexSet.value)
+  for (const index of premadeIndicesOfTeam(teamId)) {
+    if (selected) {
+      next.add(index)
+    } else {
+      next.delete(index)
+    }
   }
+  commitSelectedPremadeIndices(next)
 }
 
 function premadeSelectionSummaryLine() {
@@ -914,7 +958,7 @@ function premadeSelectionSummaryLine() {
   for (const tv of premadeView.value) {
     const groupParts: string[] = []
     for (const g of tv.groups) {
-      if (selectedPremadeBuckets.has(g.key)) {
+      if (isPremadeBucketSelected(g.groupIndex)) {
         groupParts.push(`${g.groupLetter}(${g.players.length})`)
       }
     }
@@ -925,9 +969,11 @@ function premadeSelectionSummaryLine() {
   return `[选中: ${parts.join(' | ')}]`
 }
 
-function selectionSummaryLine() {
-  if (selectedCount.value === 0) return '[选中: 无]'
-  const parts = teamsWithPlayers.value.map((team) => `${team.label} ${selectedInTeam(team.id)}`)
+function selectionSummaryLine(presetId: PresetId) {
+  if (selectedPlayerCount(presetId) === 0) return '[选中: 无]'
+  const parts = teamsWithPlayers.value.map(
+    (team) => `${team.label} ${selectedInTeam(presetId, team.id)}`
+  )
   return `[选中: ${parts.join(' / ')}]`
 }
 
@@ -942,7 +988,7 @@ function onDryRun(preset: Preset, target: PresetTarget) {
   if (preset.id === 'premade') {
     lines = [premadeSelectionSummaryLine(), ...base]
   } else if (preset.hasTeamSelection) {
-    lines = [selectionSummaryLine(), ...base]
+    lines = [selectionSummaryLine(preset.id), ...base]
   } else {
     lines = base
   }

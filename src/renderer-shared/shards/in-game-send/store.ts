@@ -13,7 +13,8 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
    * - rating/jungle 以 puuid 为 key 标识每位玩家的选中
    * - premade 以预组队 index (1-based, 对应字母 A/B/C...) 为 key
    *
-   * 写入通过 `InGameSendRenderer.setRating/Jungle/PremadeSelection(...)` 发回主进程。
+   * 写入通过 `InGameSendRenderer.setRatingPuuids/setJunglePuuids/setPremadeIndices(...)`
+   * 发回主进程。
    */
   const state = shallowReactive({
     ratingPuuids: [] as string[],

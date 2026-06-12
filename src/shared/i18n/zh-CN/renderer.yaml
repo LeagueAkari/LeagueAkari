@@ -1091,19 +1091,6 @@ MatchCard:
     loss: 失败
     surrender: 投降
 
-  teamName:
-    TEAM-100: 蓝队
-    TEAM-200: 红队
-    CHERRY-0: '?'
-    CHERRY-1: 魄罗
-    CHERRY-2: 小兵
-    CHERRY-3: 迅捷蟹
-    CHERRY-4: 石甲虫
-    CHERRY-5: 锋喙鸟
-    CHERRY-6: 哨卫
-    CHERRY-7: 狼
-    CHERRY-8: 魔沼蛙
-
   frameEventType:
     CHAMPION_KILL: 英雄击杀
     CHAMPION_SPECIAL_KILL: 特殊击杀

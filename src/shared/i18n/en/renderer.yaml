@@ -1092,19 +1092,6 @@ MatchCard:
     loss: Defeat
     surrender: Surrender
 
-  teamName:
-    TEAM-100: Blue Team
-    TEAM-200: Red Team
-    CHERRY-0: '?'
-    CHERRY-1: Poro
-    CHERRY-2: Minion
-    CHERRY-3: Rift Scuttler
-    CHERRY-4: Krugs
-    CHERRY-5: Raptors
-    CHERRY-6: Sentinel
-    CHERRY-7: Wolves
-    CHERRY-8: Gromp
-
   frameEventType:
     CHAMPION_KILL: Champion Kill
     CHAMPION_SPECIAL_KILL: Special Kill

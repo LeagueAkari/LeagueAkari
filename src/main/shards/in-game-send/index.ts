@@ -93,7 +93,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     this._sendExecutor = new InGameSendExecutor(this._context)
     this._presetSelectionController = new InGameSendPresetSelectionController(this._context)
-    this._ipcHandlers = new InGameSendIpcHandlers(this._context)
+    this._ipcHandlers = new InGameSendIpcHandlers(this._context, this._presetSelectionController)
   }
 
   private async _setupState() {

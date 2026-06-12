@@ -1,4 +1,5 @@
 import { formatI18nOrdinal } from '@shared/i18n'
+import i18next from 'i18next'
 import { useTranslation } from 'i18next-vue'
 
 export function useGameResultName() {
@@ -21,7 +22,13 @@ export function useTeamName() {
   const { t } = useTranslation()
 
   return (teamIdentifier: string) => {
-    return t(`MatchCard.teamName.${teamIdentifier}`, { defaultValue: teamIdentifier })
+    const key = `teams.${teamIdentifier}`
+
+    if (i18next.exists(key, { ns: 'common' })) {
+      return t(key, { ns: 'common' })
+    }
+
+    return teamIdentifier
   }
 }
 
