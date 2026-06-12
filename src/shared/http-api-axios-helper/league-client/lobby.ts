@@ -1,5 +1,4 @@
 import {
-  AvailableBot,
   EogStatus,
   Lobby,
   LobbyMember,
@@ -41,10 +40,6 @@ export class LobbyHttpApi {
     return this._http.post('/lol-lobby/v2/lobby', { queueId })
   }
 
-  createPractice5x5(name = 'League Akari Room', password = '') {
-    return this.createCustomLobby('PRACTICETOOL', 11, 'AllAllowed', name, password, true)
-  }
-
   /**
    * 提升为房主
    * @param summonerId 目标召唤师 ID
@@ -68,28 +63,6 @@ export class LobbyHttpApi {
 
   deleteLobby() {
     return this._http.delete('/lol-lobby/v2/lobby')
-  }
-
-  /**
-   * 可以选择的人机种类
-   */
-  getAvailableBots() {
-    return this._http.get<AvailableBot[]>('/lol-lobby/v2/lobby/custom/available-bots')
-  }
-
-  /**
-   * 是否可以添加人机
-   */
-  isBotEnabled() {
-    return this._http.get<boolean>('/lol-lobby/v2/lobby/custom/bots-enabled')
-  }
-
-  addBot(botDifficulty: string, champId: number, teamId: '100' | '200') {
-    return this._http.post('/lol-lobby/v1/lobby/custom/bots', {
-      botDifficulty,
-      championId: champId,
-      teamId
-    })
   }
 
   searchMatch() {

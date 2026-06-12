@@ -1881,20 +1881,6 @@ GameflowInProgress:
 LobbyTool:
   title: Lobby Tool
 
-  addBot:
-    label: Add Bot
-    description: Add a bot to the current custom or practice lobby.
-    button: Add
-    failedNotification:
-      title: Add Bot
-      description: 'Failed to add bot: {{reason}}'
-
-  loadBots:
-    firstUseNote: To fetch the custom bot list, you need to enter a custom lobby once.
-    failedNotification:
-      title: Load Bot List
-      description: 'Failed to load bot list: {{reason}}'
-
   createIdLobby:
     label: Create Queue Lobby
     description: Create a lobby for a specific queue ID, subject to server availability for the target queue.
@@ -1905,14 +1891,6 @@ LobbyTool:
       title: Create Queue Lobby
       description: 'Failed to create queue lobby: {{reason}}'
 
-  create5x5PracticeLobby:
-    label: Create 5v5 Practice Lobby
-    button: Create
-
-    failedNotification:
-      title: Create 5v5 Practice Lobby
-      description: 'Failed to create 5v5 practice lobby: {{reason}}'
-
   loadEligibleQueuesFailedNotification:
     title: Load Queues Failed
     description: 'Failed to load the list of available queues: {{reason}}'
@@ -1920,11 +1898,6 @@ LobbyTool:
   queueOptions:
     available: Available Queues
     unavailable: Currently Disabled Queues
-
-  difficultyOptions:
-    RSINTRO: Beginner
-    RSBEGINNER: Intermediate
-    RSINTERMEDIATE: Standard
 
 StrawberryTool:
   title: Swarm
