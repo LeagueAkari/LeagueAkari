@@ -861,6 +861,8 @@ AutoGameflow:
   autoSendARAMTeamSideEnabled:
     label: 发送地图位置信息
     description: 在如极地大乱斗、海克斯大乱斗等模式中，进入英雄选择时，将告知当前阵营所处地图的位置（蓝色方或红色方）
+    tooltipBody: 在聊天室中发送本局阵营的地图位置信息
+    tooltipImageAlt: 地图位置信息在聊天框中的发送效果示例
   autoSendARAMTeamSideVisibleToTeam:
     label: 发送地图位置信息队友可见
     checkboxLabel: 队友可见

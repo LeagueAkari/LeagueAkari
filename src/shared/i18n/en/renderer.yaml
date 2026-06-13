@@ -862,6 +862,8 @@ AutoGameflow:
   autoSendARAMTeamSideEnabled:
     label: Send Team Side Information
     description: 'In modes like ARAM or ARAM: Mayhem, when entering champion select, the current team side (blue or red) will be notified.'
+    tooltipBody: Send your current team side information in the chat room.
+    tooltipImageAlt: Example of the team side information message in chat
   autoSendARAMTeamSideVisibleToTeam:
     label: Send Team Side Information Visible to Team
     checkboxLabel: Visible to team

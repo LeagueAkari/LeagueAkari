@@ -273,7 +273,24 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.aramTeamSide')">
+        <SettingsSection>
+          <template #header>
+            <TooltipWithIcon>
+              <span class="text-sm leading-5 font-bold text-black/80 dark:text-white/90">
+                {{ t('AutoGameflow.sections.aramTeamSide') }}
+              </span>
+              <template #tooltip>
+                <div class="max-w-90 text-xs leading-relaxed font-normal">
+                  <img
+                    :src="aramTeamSideMessageImage"
+                    :alt="t('AutoGameflow.autoSendARAMTeamSideEnabled.tooltipImageAlt')"
+                    class="mb-2 aspect-[1680/935] w-90 max-w-full rounded border border-black/10 object-cover dark:border-white/10"
+                  />
+                  <div>{{ t('AutoGameflow.autoSendARAMTeamSideEnabled.tooltipBody') }}</div>
+                </div>
+              </template>
+            </TooltipWithIcon>
+          </template>
           <SettingsRow
             :label="t('AutoGameflow.common.enabled')"
             :label-description="t('AutoGameflow.autoSendARAMTeamSideEnabled.description')"
@@ -305,6 +322,8 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
+import aramTeamSideMessageImage from '@renderer-shared/assets/automation/aram-team-side-message.webp'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
