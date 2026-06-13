@@ -1,8 +1,8 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <GameflowInProcess class="tool" />
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <GameflowInProcess />
       </div>
     </NScrollbar>
   </div>
@@ -13,7 +13,3 @@ import { NScrollbar } from 'naive-ui'
 
 import GameflowInProcess from './GameflowInProcess.vue'
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-</style>

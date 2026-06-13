@@ -1,12 +1,6 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">
-        {{ t('GameflowInProgress.title') }}
-      </span>
-    </template>
-    <ControlItem
-      class="control-item-margin"
+  <SettingsSection :title="t('GameflowInProgress.title')">
+    <SettingsRow
       :label="t('GameflowInProgress.playAgain.label')"
       :label-description="t('GameflowInProgress.playAgain.description')"
       :label-width="260"
@@ -14,9 +8,8 @@
       <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small">{{
         t('GameflowInProgress.playAgain.button')
       }}</NButton>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+    </SettingsRow>
+    <SettingsRow
       :label="t('GameflowInProgress.leaveLobby.label')"
       :label-description="t('GameflowInProgress.leaveLobby.description')"
       :label-width="260"
@@ -27,17 +20,18 @@
         size="small"
         >{{ t('GameflowInProgress.leaveLobby.button') }}</NButton
       >
-    </ControlItem>
-  </NCard>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, useNotification } from 'naive-ui'
+import { NButton, useNotification } from 'naive-ui'
 import { computed } from 'vue'
 
 const { t } = useTranslation()
@@ -69,5 +63,3 @@ const handlePlayAgain = async () => {
   }
 }
 </script>
-
-<style scoped></style>

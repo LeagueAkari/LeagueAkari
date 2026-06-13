@@ -1,16 +1,16 @@
 <template>
-  <NScrollbar style="height: 65vh">
-    <NModal preset="card" size="small" v-model:show="editRuleModalShow" style="max-width: 500px">
+  <NScrollbar class="h-full">
+    <NModal preset="card" size="small" v-model:show="editRuleModalShow" class="max-w-[500px]">
       <template #header>{{ t('DebugSettings.lcuEvent.modal.title') }}</template>
       <template #footer>
-        <div class="right-side">
+        <div class="flex w-full justify-end">
           <NButton
             size="small"
             type="primary"
             secondary
             :disabled="!editRuleValid"
             @click="handleAddRule"
-            style="margin-left: auto"
+            class="ml-auto"
           >
             {{ t('DebugSettings.lcuEvent.modal.button') }}
           </NButton>
@@ -25,246 +25,241 @@
         :status="editRuleValid ? 'success' : 'error'"
       />
     </NModal>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header>
-        <span class="card-header-title">{{ t('DebugSettings.files.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.files.logs.label')"
-        :label-description="t('DebugSettings.files.logs.description')"
-        :label-width="400"
-      >
-        <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
-          >{{ t('DebugSettings.files.logs.button') }}
-        </NButton>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.files.appData.label')"
-        :label-width="400"
-      >
-        <template #labelDescription>
-          <i18next :translation="t('DebugSettings.files.appData.description.full')">
-            <template #details>
-              <NPopover :delay="50">
-                <template #trigger>
-                  <span style="font-weight: bold; color: #fff">
-                    {{ t('DebugSettings.files.appData.popoverTrigger') }}
-                  </span>
-                </template>
-                <table>
-                  <colgroup>
-                    <col style="width: 100px" />
-                  </colgroup>
-                  <tbody style="font-size: 12px">
-                    <tr>
-                      <td>LeagueAkari.db</td>
-                      <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
-                    </tr>
-                    <tr>
-                      <td>NewUpdates/</td>
-                      <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
-                    </tr>
-                    <tr>
-                      <td>AkariConfig/</td>
-                      <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
-                    </tr>
-                    <tr>
-                      <td>base-config.json</td>
-                      <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </NPopover>
-            </template>
-          </i18next>
-        </template>
-        <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()">{{
-          t('DebugSettings.files.appData.button')
-        }}</NButton>
-      </ControlItem>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header>
-        <span class="card-header-title">{{ t('DebugSettings.lcuEvent.label') }}</span>
-      </template>
-      <div class="operations">
-        <NCheckbox
-          size="small"
-          class="check-box"
-          :checked="rds.logAllLcuEvents"
-          @update:checked="(val) => rd.setLogAllLcuEvents(val)"
-          >{{ t('DebugSettings.lcuEvent.logAll') }}</NCheckbox
+    <div class="flex flex-col gap-6">
+      <SettingsSection :title="t('DebugSettings.files.title')">
+        <SettingsRow
+          :label="t('DebugSettings.files.logs.label')"
+          :label-description="t('DebugSettings.files.logs.description')"
+          :label-width="400"
         >
-        <NButton size="tiny" @click="handleShowAddModal" secondary type="primary">{{
-          t('DebugSettings.lcuEvent.addRule')
-        }}</NButton>
-      </div>
-      <NCollapseTransition>
-        <NDataTable
-          :class="$style.table"
-          :columns="columns"
-          :data="printRulesArr"
-          size="small"
-          bordered
-        >
-          <template #empty>{{ t('DebugSettings.lcuEvent.empty') }}</template>
-        </NDataTable>
-      </NCollapseTransition>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header>
-        <span class="card-header-title">{{
-          lc.connectionState === 'connected'
+          <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
+            >{{ t('DebugSettings.files.logs.button') }}
+          </NButton>
+        </SettingsRow>
+        <SettingsRow :label="t('DebugSettings.files.appData.label')" :label-width="400">
+          <template #labelDescription>
+            <TranslationComponent :translation="t('DebugSettings.files.appData.description.full')">
+              <template #details>
+                <NPopover :delay="50">
+                  <template #trigger>
+                    <span class="cursor-pointer font-bold text-black/80 dark:text-white">
+                      {{ t('DebugSettings.files.appData.popoverTrigger') }}
+                    </span>
+                  </template>
+                  <table>
+                    <colgroup>
+                      <col class="w-25" />
+                    </colgroup>
+                    <tbody class="text-xs">
+                      <tr>
+                        <td>LeagueAkari.db</td>
+                        <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
+                      </tr>
+                      <tr>
+                        <td>NewUpdates/</td>
+                        <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
+                      </tr>
+                      <tr>
+                        <td>AkariConfig/</td>
+                        <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
+                      </tr>
+                      <tr>
+                        <td>base-config.json</td>
+                        <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </NPopover>
+              </template>
+            </TranslationComponent>
+          </template>
+          <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()">{{
+            t('DebugSettings.files.appData.button')
+          }}</NButton>
+        </SettingsRow>
+      </SettingsSection>
+      <SettingsSection :title="t('DebugSettings.lcuEvent.label')">
+        <div class="max-w-full overflow-x-auto p-3">
+          <div class="mb-2 flex items-center gap-1">
+            <NCheckbox
+              size="small"
+              class="text-[13px]"
+              :checked="rds.logAllLcuEvents"
+              @update:checked="(val) => rd.setLogAllLcuEvents(val)"
+              >{{ t('DebugSettings.lcuEvent.logAll') }}</NCheckbox
+            >
+            <NButton size="tiny" @click="handleShowAddModal" secondary type="primary">{{
+              t('DebugSettings.lcuEvent.addRule')
+            }}</NButton>
+          </div>
+          <NCollapseTransition>
+            <NDataTable
+              :class="$style.table"
+              :columns="columns"
+              :data="printRulesArr"
+              size="small"
+              bordered
+            >
+              <template #empty>{{ t('DebugSettings.lcuEvent.empty') }}</template>
+            </NDataTable>
+          </NCollapseTransition>
+        </div>
+      </SettingsSection>
+      <SettingsSection
+        :title="
+          lc.isConnected
             ? t('DebugSettings.lcuConnection.titleConnected')
             : t('DebugSettings.lcuConnection.titleDisconnected')
-        }}</span>
-      </template>
-      <NTable size="small" bordered>
-        <colgroup>
-          <col style="width: 120px" />
-          <col />
-        </colgroup>
-        <tbody>
-          <tr>
-            <td>{{ t('DebugSettings.lcuConnection.port') }}</td>
-            <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
-          </tr>
-          <tr>
-            <td>{{ t('DebugSettings.lcuConnection.pid') }}</td>
-            <td><CopyableText :text="lc.auth?.pid ?? '-'" /></td>
-          </tr>
-          <tr>
-            <td>{{ t('DebugSettings.lcuConnection.auth') }}</td>
-            <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
-          </tr>
-          <tr>
-            <td>{{ t('DebugSettings.lcuConnection.rsoPlatform') }}</td>
-            <td>
-              <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
-                (lc.auth?.rsoPlatformId
-                  ? TENCENT_RSO_PLATFORM_NAME[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
-                  : lc.auth?.rsoPlatformId) || '-'
-              }}</CopyableText>
-            </td>
-          </tr>
-          <tr>
-            <td>{{ t('DebugSettings.lcuConnection.region') }}</td>
-            <td>
-              <CopyableText :text="lc.auth?.region ?? '-'">{{
-                lc.auth?.region
-                  ? REGION_NAME[lc.auth.region] || lc.auth.region
-                  : lc.auth?.region || '-'
-              }}</CopyableText>
-            </td>
-          </tr>
-        </tbody>
-      </NTable>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header>
-        <span class="card-header-title">{{ t('DebugSettings.gameflow.title') }}</span>
-      </template>
-      <span class="text" v-if="lc.connectionState === 'connected'"
-        >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
+        "
       >
-      <span class="text" v-else>{{ t('DebugSettings.gameflow.unavailable') }}</span>
-    </NCard>
-    <NCard v-if="as.isElevated" size="small" style="margin-top: 8px">
-      <template #header>
-        <LeagueAkariSpan class="card-header-title" text="League Akari X" />
-      </template>
-      <span class="text">{{ t('DebugSettings.inAdministrator.description') }}</span>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header>
-        <span class="card-header-title">Runtime Info</span>
-      </template>
-      <NDescriptions
-        v-if="runtimeInfo"
-        bordered
-        size="small"
-        :columns="6"
-        label-placement="top"
-        style="user-select: text"
-      >
-        <NDescriptionsItem label="League Akari Version">{{
-          runtimeInfo.version
-        }}</NDescriptionsItem>
-        <NDescriptionsItem label="PID">{{ runtimeInfo.pid }}</NDescriptionsItem>
-        <NDescriptionsItem label="Platform">{{ runtimeInfo.platform }}</NDescriptionsItem>
-        <NDescriptionsItem label="Arch">{{ runtimeInfo.arch }}</NDescriptionsItem>
-        <NDescriptionsItem label="Uptime">{{ runtimeInfo.uptime.toFixed(2) }} s</NDescriptionsItem>
-        <NDescriptionsItem label="CPUs">
-          {{ runtimeInfo.os.cpus.length }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="OS Type">
-          {{ runtimeInfo.os.type }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="OS Release">
-          {{ runtimeInfo.os.release }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="Memory">
-          {{ runtimeInfo.os.totalmem }} ({{ (runtimeInfo.os.totalmem / 1073741824).toFixed(2) }}
-          GB)
-        </NDescriptionsItem>
-        <NDescriptionsItem label="NODE_ENV" :span="3">
-          {{ runtimeInfo.env.NODE_ENV }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="Argv" :span="6">
-          <span style="font-family: monospace">{{
-            runtimeInfo.argv.map((a: string) => (a.includes(' ') ? `"${a}"` : a)).join(' ')
-          }}</span>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="Electron">
-          {{ runtimeInfo.versions.electron }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="Node">
-          {{ runtimeInfo.versions.node }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="Chrome">
-          {{ runtimeInfo.versions.chrome }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="V8">
-          {{ runtimeInfo.versions.v8 }}
-        </NDescriptionsItem>
-      </NDescriptions>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">Akari Zone</span></template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.testPage.label')"
-        :label-description="t('DebugSettings.testPage.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="mui.frontendSettings.showTestPage"
-          @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.kyokoMode.label')"
-        :label-description="t('DebugSettings.kyokoMode.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="as.settings.isInKyokoMode"
-          @update:value="(val: boolean) => app.setInKyokoMode(val)"
-        />
-      </ControlItem>
-    </NCard>
+        <div class="max-w-full overflow-x-auto p-3">
+          <NTable size="small" bordered>
+            <colgroup>
+              <col class="w-30" />
+              <col />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td>{{ t('DebugSettings.lcuConnection.port') }}</td>
+                <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
+              </tr>
+              <tr>
+                <td>{{ t('DebugSettings.lcuConnection.pid') }}</td>
+                <td><CopyableText :text="lc.auth?.pid ?? '-'" /></td>
+              </tr>
+              <tr>
+                <td>{{ t('DebugSettings.lcuConnection.auth') }}</td>
+                <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
+              </tr>
+              <tr>
+                <td>{{ t('DebugSettings.lcuConnection.rsoPlatform') }}</td>
+                <td>
+                  <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
+                    (lc.auth?.rsoPlatformId
+                      ? TENCENT_RSO_PLATFORM_NAME[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
+                      : lc.auth?.rsoPlatformId) || '-'
+                  }}</CopyableText>
+                </td>
+              </tr>
+              <tr>
+                <td>{{ t('DebugSettings.lcuConnection.region') }}</td>
+                <td>
+                  <CopyableText :text="lc.auth?.region ?? '-'">{{
+                    lc.auth?.region
+                      ? REGION_NAME[lc.auth.region] || lc.auth.region
+                      : lc.auth?.region || '-'
+                  }}</CopyableText>
+                </td>
+              </tr>
+            </tbody>
+          </NTable>
+        </div>
+      </SettingsSection>
+      <SettingsSection :title="t('DebugSettings.gameflow.title')">
+        <div class="p-3 text-[13px]">
+          <span v-if="lc.isConnected"
+            >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
+          >
+          <span v-else>{{ t('DebugSettings.gameflow.unavailable') }}</span>
+        </div>
+      </SettingsSection>
+      <SettingsSection v-if="as.isElevated">
+        <template #header>
+          <LeagueAkariSpan
+            class="text-sm leading-5 font-bold text-black/80 dark:text-white/90"
+            text="League Akari X"
+          />
+        </template>
+        <div class="p-3 text-[13px]">{{ t('DebugSettings.inAdministrator.description') }}</div>
+      </SettingsSection>
+      <SettingsSection title="Runtime Info">
+        <div class="max-w-full overflow-x-auto p-3">
+          <NDescriptions
+            v-if="runtimeInfo"
+            bordered
+            size="small"
+            :columns="6"
+            label-placement="top"
+            class="select-text"
+          >
+            <NDescriptionsItem label="League Akari Version">{{
+              runtimeInfo.version
+            }}</NDescriptionsItem>
+            <NDescriptionsItem label="PID">{{ runtimeInfo.pid }}</NDescriptionsItem>
+            <NDescriptionsItem label="Platform">{{ runtimeInfo.platform }}</NDescriptionsItem>
+            <NDescriptionsItem label="Arch">{{ runtimeInfo.arch }}</NDescriptionsItem>
+            <NDescriptionsItem label="Uptime"
+              >{{ runtimeInfo.uptime.toFixed(2) }} s</NDescriptionsItem
+            >
+            <NDescriptionsItem label="CPUs">
+              {{ runtimeInfo.os.cpus.length }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="OS Type">
+              {{ runtimeInfo.os.type }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="OS Release">
+              {{ runtimeInfo.os.release }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="Memory">
+              {{ runtimeInfo.os.totalmem }} ({{ (runtimeInfo.os.totalmem / 1073741824).toFixed(2) }}
+              GB)
+            </NDescriptionsItem>
+            <NDescriptionsItem label="NODE_ENV" :span="3">
+              {{ runtimeInfo.env.NODE_ENV }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="Argv" :span="6">
+              <span class="font-mono">{{
+              runtimeInfo.argv.map((a: string) => (a.includes(' ') ? `"${a}"` : a)).join(' ')
+              }}</span>
+            </NDescriptionsItem>
+            <NDescriptionsItem label="Electron">
+              {{ runtimeInfo.versions.electron }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="Node">
+              {{ runtimeInfo.versions.node }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="Chrome">
+              {{ runtimeInfo.versions.chrome }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="V8">
+              {{ runtimeInfo.versions.v8 }}
+            </NDescriptionsItem>
+          </NDescriptions>
+        </div>
+      </SettingsSection>
+      <SettingsSection title="Akari Zone">
+        <SettingsRow
+          :label="t('DebugSettings.testPage.label')"
+          :label-description="t('DebugSettings.testPage.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="mui.frontendSettings.showTestPage"
+            @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('DebugSettings.kyokoMode.label')"
+          :label-description="t('DebugSettings.kyokoMode.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="as.settings.isInKyokoMode"
+            @update:value="(val: boolean) => app.setInKyokoMode(val)"
+          />
+        </SettingsRow>
+      </SettingsSection>
+    </div>
   </NScrollbar>
 </template>
 
 <script setup lang="tsx">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -275,12 +270,11 @@ import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/st
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { useIntervalFn } from '@vueuse/core'
-import { useTranslation } from 'i18next-vue'
+import { TranslationComponent, useTranslation } from 'i18next-vue'
 import {
   DataTableColumn,
   NAutoComplete,
   NButton,
-  NCard,
   NCheckbox,
   NCollapseTransition,
   NDataTable,
@@ -355,7 +349,7 @@ const columns: DataTableColumn<any>[] = [
     title: t('DebugSettings.lcuEvent.rule'),
     key: 'rule',
     render: (row) => {
-      return <code style={{ userSelect: 'text' }}>{row.data.rule}</code>
+      return <code class="select-text">{row.data.rule}</code>
     }
   },
   {
@@ -467,34 +461,6 @@ useIntervalFn(
   { immediateCallback: true }
 )
 </script>
-
-<style scoped>
-.operations {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.check-box {
-  font-size: 13px;
-}
-
-.right-side {
-  display: flex;
-  justify-content: end;
-  width: 100%;
-}
-
-.buttons {
-  display: flex;
-  gap: 4px;
-}
-
-.text {
-  font-size: 13px;
-}
-</style>
 
 <style module>
 .table :global(.n-data-table-empty) {

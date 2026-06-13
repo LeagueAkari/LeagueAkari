@@ -274,6 +274,18 @@ AppSettings:
   mainWindowUi:
     title: 主界面
 
+    background:
+      label: 背景
+      description: 设置主界面的背景显示方式
+      options:
+        profileSkin: 英雄背景
+        none: 无
+        mica: Mica
+      tooltips:
+        profileSkin: 使用当前玩家的生涯背景皮肤作为主界面背景
+        mica: 仅 Windows 高版本系统可用。如果当前平台不可用，会回退到“无”
+        micaUnsupported: 当前平台不支持 Mica，会回退到“无”
+
     useProfileSkinAsBackground:
       label: 使用生涯皮肤背景
       description: $t(common:appName) 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
@@ -282,7 +294,7 @@ AppSettings:
       label: 背景材质
       description: 设置应用界面的背景材质，需特定系统版本支持
       options:
-        none: 默认
+        none: 无
         mica: Mica
         micaUnsupported: 'Mica (不支持)'
 
@@ -538,13 +550,13 @@ MultiWindowSettings:
     titleRequireAdmin: 计时器叠加窗口 (管理员权限)
 
     description:
-      lineA: 标记敌方英雄召唤师计时器仅当当前模式受支持时可用
-      leftClick1: · 左键
-      leftClick2: ' - 开始或关闭此计时器'
-      rightDoubleClick1: · 右键双击
-      rightDoubleClick2: ' - 若此计时器为已开始的英雄技能计时器，模拟输入发送到聊天框中'
-      wheel1: · 滑轮
-      wheel2: ' - 调整已开始计时器的时间'
+      lineA: 敌方召唤师技能计时仅在支持的模式中可用
+      leftClick1: 左键
+      leftClick2: 开始或关闭计时器
+      rightDoubleClick1: 右键双击
+      rightDoubleClick2: 已开始的英雄技能计时器会模拟输入到聊天框
+      wheel1: 滑轮
+      wheel2: 调整已开始计时器的时间
 
     enabled:
       label: 启用计时器窗口
@@ -764,6 +776,19 @@ Automation:
 AutoGameflow:
   title: 游戏流
 
+  common:
+    enabled: 开启
+
+  sections:
+    readyCheck: 队列确认
+    autoHonor: 自动点赞
+    playAgain: 返回房间
+    autoMatchmaking: 自动匹配
+    autoReconnect: 重新连接
+    leader: 房主转交
+    invitations: 房间邀请
+    aramTeamSide: 地图位置信息
+
   autoAcceptEnabled:
     label: 自动接受对局开启
     description: 当匹配到玩家时，自动确认
@@ -838,6 +863,7 @@ AutoGameflow:
     description: 在如极地大乱斗、海克斯大乱斗等模式中，进入英雄选择时，将告知当前阵营所处地图的位置（蓝色方或红色方）
   autoSendARAMTeamSideVisibleToTeam:
     label: 发送地图位置信息队友可见
+    checkboxLabel: 队友可见
     description: “发送地图位置信息”的内容将对队伍内成员可见。
 
 AutoSelect:

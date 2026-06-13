@@ -1,9 +1,9 @@
 <template>
-  <div class="claimable-item">
-    <div class="header">
-      <span class="title">{{ translatedTitle }}</span>
+  <div class="flex flex-col">
+    <div class="mb-3">
+      <span class="text-sm font-bold">{{ translatedTitle }}</span>
     </div>
-    <div class="items">
+    <div class="flex flex-wrap gap-1">
       <RewardItem v-for="item of items" :key="item.id" :iconUrl="item.iconUrl" :name="item.name" />
     </div>
   </div>
@@ -37,25 +37,3 @@ const translatedTitle = computed(() => {
   return title
 })
 </script>
-
-<style scoped>
-.claimable-item {
-  display: flex;
-  flex-direction: column;
-
-  .header {
-    margin-bottom: 12px;
-
-    .title {
-      font-size: 14px;
-      font-weight: bold;
-    }
-  }
-
-  .items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-}
-</style>

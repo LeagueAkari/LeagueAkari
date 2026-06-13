@@ -6,10 +6,8 @@
   >
     <template #trigger>
       <div
-        class="ring-wrapper"
-        :class="{
-          selected: selected
-        }"
+        class="cursor-pointer rounded-full border-2 border-transparent p-0.5 transition-colors duration-200"
+        :class="selected ? 'border-[#c8aa6e]' : 'hover:border-[#c8aa6e80]'"
         @click="emits('itemClick', perkstyleId)"
       >
         <div
@@ -26,7 +24,7 @@
         />
       </div>
     </template>
-    <div style="width: 180px" class="info">
+    <div class="mb-2 flex w-45 items-center">
       <div
         v-bind="$attrs"
         :style="{
@@ -40,22 +38,23 @@
           [getSvgClass(perkstyleId)]: true
         }"
       />
-      <div class="right-side">
+      <div class="ml-2 text-xs font-bold">
         ({{ perkstyleId || '-' }}) {{ lcs.gameData.perkstyles.styles[perkstyleId].name }}
       </div>
     </div>
-    <div style="max-width: 180px; font-size: 12px">
+    <div class="max-w-45 text-xs">
       {{ lcs.gameData.perkstyles.styles[perkstyleId].tooltip }}
     </div>
   </NPopover>
   <div
     v-else
-    class="ring-wrapper"
-    :class="{
-      selected: selected
-    }"
+    class="cursor-pointer rounded-full border-2 border-transparent p-0.5 transition-colors duration-200"
+    :class="selected ? 'border-[#c8aa6e]' : 'hover:border-[#c8aa6e80]'"
   >
-    <div :style="{ width: `${size}px`, height: `${size}px` }" class="empty"></div>
+    <div
+      :style="{ width: `${size}px`, height: `${size}px` }"
+      class="rounded-full bg-[#353535]"
+    ></div>
   </div>
 </template>
 
@@ -101,44 +100,6 @@ const getSvgClass = (perkstyleId: number) => {
 </script>
 
 <style scoped>
-.ring-wrapper {
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 2px;
-  border: 2px solid #0000;
-  transition: border-color 0.2s;
-
-  &:not(.selected):hover {
-    border: 2px solid #c8aa6e80;
-  }
-
-  &.selected {
-    border: 2px solid #c8aa6e;
-  }
-}
-
-.info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-
-  .image {
-    border-radius: 2px;
-    height: 28px;
-  }
-
-  .right-side {
-    margin-left: 8px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-}
-
-.empty {
-  border-radius: 50%;
-  background-color: #353535;
-}
-
 .perkstyle-icon {
   mask-position: 50% 50%;
   mask-repeat: no-repeat;

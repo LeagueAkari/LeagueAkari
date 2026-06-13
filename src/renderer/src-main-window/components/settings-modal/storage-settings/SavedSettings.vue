@@ -1,11 +1,7 @@
 <template>
-  <NScrollbar>
-    <NCard size="small">
-      <template #header>
-        <span class="card-header-title">{{ t('SavedSettings.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
+  <NScrollbar class="h-full">
+    <SettingsSection :title="t('SavedSettings.title')">
+      <SettingsRow
         :label="t('SavedSettings.export.label')"
         :label-description="t('SavedSettings.export.description')"
         :label-width="400"
@@ -13,9 +9,8 @@
         <NButton type="primary" secondary size="small" @click="handleExportSettings">
           {{ t('SavedSettings.export.button') }}
         </NButton>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
+      </SettingsRow>
+      <SettingsRow
         :label="t('SavedSettings.import.label')"
         :label-description="t('SavedSettings.import.description')"
         :label-width="400"
@@ -23,17 +18,18 @@
         <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
           t('SavedSettings.import.button')
         }}</NButton>
-      </ControlItem>
-    </NCard>
+      </SettingsRow>
+    </SettingsSection>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NScrollbar, useDialog, useMessage } from 'naive-ui'
+import { NButton, NScrollbar, useDialog, useMessage } from 'naive-ui'
 
 const { t } = useTranslation()
 const s = useInstance(SettingUtilsRenderer)
@@ -87,5 +83,3 @@ const handleImportSettings = async () => {
   })
 }
 </script>
-
-<style scoped></style>

@@ -124,14 +124,14 @@
                   <div
                     v-for="team of teamsWithPlayers"
                     :key="team.id"
-                    class="rounded border border-black/10 bg-black/[0.03] p-2 dark:border-white/10 dark:bg-white/[0.03]"
+                    class="rounded border border-black/10 bg-black/3 p-2 dark:border-white/10 dark:bg-white/3"
                   >
                     <div class="mb-1.5 flex items-center justify-between gap-2">
                       <div class="flex items-center gap-1.5 text-xs font-semibold">
                         <div
                           v-if="team.indicatorColorClass"
                           :class="[
-                            'size-[10px] shrink-0 rounded-full border border-white/20',
+                            'size-2.5 shrink-0 rounded-full border border-white/20',
                             team.indicatorColorClass
                           ]"
                         />
@@ -224,14 +224,14 @@
                   <div
                     v-for="tv of premadeView"
                     :key="tv.team.id"
-                    class="rounded border border-black/10 bg-black/[0.03] p-2 dark:border-white/10 dark:bg-white/[0.03]"
+                    class="rounded border border-black/10 bg-black/3 p-2 dark:border-white/10 dark:bg-white/3"
                   >
                     <div class="mb-1.5 flex items-center justify-between gap-2">
                       <div class="flex items-center gap-1.5 text-xs font-semibold">
                         <div
                           v-if="tv.team.indicatorColorClass"
                           :class="[
-                            'size-[10px] shrink-0 rounded-full border border-white/20',
+                            'size-2.5 shrink-0 rounded-full border border-white/20',
                             tv.team.indicatorColorClass
                           ]"
                         />
@@ -267,7 +267,7 @@
                       <div
                         v-for="bucket of tv.groups"
                         :key="bucket.key"
-                        class="flex cursor-pointer flex-col gap-1 rounded border px-1.5 py-1.5 transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+                        class="flex cursor-pointer flex-col gap-1 rounded border px-1.5 py-1.5 transition-colors hover:bg-black/4 dark:hover:bg-white/4"
                         :style="{
                           borderColor: premadeColors[bucket.groupLetter!]?.foregroundColor + '55'
                         }"

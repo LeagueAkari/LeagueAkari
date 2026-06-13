@@ -23,9 +23,9 @@ export function watchPlayerTabs(playerTabs: PlayerTabsRenderer) {
 
   // 在断开连接后删除所有页面
   watch(
-    () => leagueClientStore.connectionState,
-    (s) => {
-      if (s === 'disconnected') {
+    () => leagueClientStore.isDisconnected,
+    (isDisconnected) => {
+      if (isDisconnected) {
         playerTabsStore.closeAllTabs()
       }
     }

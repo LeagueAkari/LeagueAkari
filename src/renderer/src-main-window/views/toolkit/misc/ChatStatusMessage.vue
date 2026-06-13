@@ -1,29 +1,14 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('ChatStatusMessage.title') }}</span>
-    </template>
-    <ControlItem
-      :label="t('ChatStatusMessage.resetOnLogin.label')"
-      class="control-item-margin"
-      :label-description="t('ChatStatusMessage.resetOnLogin.description')"
-      :label-width="260"
-    >
-      <NSwitch
-        size="small"
-        :value="ams.settings.autoSetStatusMessageEnabled"
-        @update:value="(value) => am.setAutoSetStatusMessageEnabled(value)"
-      ></NSwitch>
-    </ControlItem>
-    <ControlItem
+  <SettingsSection :title="t('ChatStatusMessage.title')">
+    <SettingsRow
       :label="t('ChatStatusMessage.text.label')"
-      class="control-item-margin"
       :label-description="t('ChatStatusMessage.text.description')"
       :label-width="260"
+      align="start"
     >
-      <div style="width: 360px">
+      <div class="w-90 max-w-full">
         <NInput
-          style="width: 100%; font-family: monospace"
+          class="w-full! font-mono"
           type="textarea"
           v-model:value="text"
           :disabled="isSetting"
@@ -32,30 +17,45 @@
           @blur="handleSetChatStatusMessage"
           size="small"
         ></NInput>
-        <div class="mt-1 flex justify-end">
+        <div class="mt-1 flex items-center justify-between gap-2">
+          <NTooltip>
+            <template #trigger>
+              <NCheckbox
+                size="small"
+                :checked="ams.settings.autoSetStatusMessageEnabled"
+                @update:checked="(value) => am.setAutoSetStatusMessageEnabled(value)"
+              >
+                {{ t('ChatStatusMessage.resetOnLogin.label') }}
+              </NCheckbox>
+            </template>
+            <div class="max-w-64 text-xs">
+              {{ t('ChatStatusMessage.resetOnLogin.description') }}
+            </div>
+          </NTooltip>
           <NButton
             :loading="isSetting"
             @mousedown.prevent
             @click="handleSetChatStatusMessage"
             type="primary"
-            size="tiny"
+            size="small"
             :disabled="isSetting"
             >{{ t('ChatStatusMessage.text.save') }}</NButton
           >
         </div>
       </div>
-    </ControlItem>
-  </NCard>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NInput, NSwitch, useMessage, useNotification } from 'naive-ui'
+import { NButton, NCheckbox, NInput, NTooltip, useMessage, useNotification } from 'naive-ui'
 import { ref, watchEffect } from 'vue'
 
 const { t } = useTranslation()
@@ -74,15 +74,22 @@ watchEffect(() => {
 })
 
 const handleSetChatStatusMessage = async () => {
-  if (isSetting.value || text.value === ams.settings.statusMessage) {
+  if (isSetting.value) {
+    return
+  }
+
+  if (!lcs.isConnected && text.value === ams.settings.statusMessage) {
     return
   }
 
   try {
     isSetting.value = true
-    await am.setStatusMessage(text.value)
 
-    if (lcs.connectionState !== 'connected') {
+    if (text.value !== ams.settings.statusMessage) {
+      await am.setStatusMessage(text.value)
+    }
+
+    if (!lcs.isConnected) {
       message.success(t('ChatStatusMessage.message.saved'))
       return
     }
@@ -102,5 +109,3 @@ const handleSetChatStatusMessage = async () => {
   }
 }
 </script>
-
-<style scoped></style>

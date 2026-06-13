@@ -1,9 +1,9 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <LobbyTool class="tool" />
-        <StrawberryTool class="tool" />
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
+        <LobbyTool />
+        <StrawberryTool />
       </div>
     </NScrollbar>
   </div>
@@ -15,7 +15,3 @@ import { NScrollbar } from 'naive-ui'
 import LobbyTool from './LobbyTool.vue'
 import StrawberryTool from './StrawberryTool.vue'
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-</style>

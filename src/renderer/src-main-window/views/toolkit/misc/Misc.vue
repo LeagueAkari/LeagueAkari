@@ -1,12 +1,12 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <SummonerProfile class="tool" />
-        <ChatAvailability class="tool" />
-        <FakeRanked class="tool" />
-        <ChatStatusMessage class="tool" />
-        <GameView class="tool" />
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto flex max-w-200 flex-col gap-6 p-6">
+        <SummonerProfile />
+        <ChatAvailability />
+        <FakeRanked />
+        <ChatStatusMessage />
+        <GameView />
       </div>
     </NScrollbar>
   </div>
@@ -21,7 +21,3 @@ import FakeRanked from './FakeRanked.vue'
 import GameView from './GameView.vue'
 import SummonerProfile from './SummonerProfile.vue'
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-</style>

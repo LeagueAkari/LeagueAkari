@@ -19,7 +19,7 @@ watchEffect(() => {
     const resolvedUrl = new URL(props.src, 'akari://league-client').href
 
     if (resolvedUrl.startsWith('akari://')) {
-      if (lcs.connectionState === 'connected') {
+      if (lcs.isConnected) {
         url.value = resolvedUrl
       } else {
         url.value = null

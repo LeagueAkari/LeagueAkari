@@ -85,34 +85,22 @@
     </HorizontalExpand>
 
     <!-- theme selector -->
-    <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
-      <template #trigger>
-        <div class="common-button-outer">
-          <div class="common-button-inner">
-            <NIcon><ColorPaletteOutline /></NIcon>
-          </div>
-        </div>
-      </template>
-      <div class="theme-selector-panel">
-        <div class="theme-selector-title">{{ t('CommonButtons.themeSelector.title') }}</div>
-        <div class="theme-selector-columns">
-          <div v-for="column in themePresetColumns" :key="column.key" class="theme-selector-column">
-            <div v-for="group in column.groups" :key="group.key" class="theme-selector-group">
-              <div class="theme-selector-group__label">{{ group.label }}</div>
-              <div
-                v-for="option in group.options"
-                :key="option.key"
-                class="theme-selector-item"
-                :class="{ active: option.key === activeThemePresetKey }"
-                @click="handleApplyThemePreset(option.theme)"
-              >
-                <div class="theme-selector-item__label">{{ option.label }}</div>
-              </div>
-            </div>
-          </div>
+    <NDropdown
+      trigger="click"
+      placement="bottom-end"
+      size="small"
+      :width="180"
+      :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
+      :options="themeDropdownOptions"
+      :theme-overrides="{ fontSizeSmall: '12px', optionHeightSmall: '28px' }"
+      @select="handleThemeSelect"
+    >
+      <div class="common-button-outer">
+        <div class="common-button-inner">
+          <NIcon><ColorPaletteOutline /></NIcon>
         </div>
       </div>
-    </NPopover>
+    </NDropdown>
 
     <!-- tasks -->
     <HorizontalExpand :show="bts.tasks.length !== 0" class="h-full">
@@ -155,14 +143,16 @@ import {
   AppThemeSetting,
   BUILTIN_DARK_THEME_IDS,
   BUILTIN_LIGHT_THEME_IDS,
-  getThemeColorTheme
+  getThemeColorTheme,
+  isAppThemeSetting
 } from '@shared/types/app-theme'
-import { Notification } from '@vicons/carbon'
+import { Checkmark, Notification } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
 import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NButton, NIcon, NPopover, NTooltip } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { NBadge, NButton, NDropdown, NIcon, NPopover, NTag, NTooltip } from 'naive-ui'
+import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
+import { computed, h, ref } from 'vue'
 
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifications/store'
@@ -216,71 +206,85 @@ const themeToneLabel = (id: AppThemeId) => {
   return t(`CommonButtons.themeSelector.tone.${colorTheme}`)
 }
 
-const themeLabel = (id: AppThemeId) => {
-  return `${t(`CommonButtons.themeSelector.presets.${id}`, { defaultValue: id })} · ${themeToneLabel(id)}`
+const selectedThemeIcon = (key: AppThemeSetting) => {
+  if (activeThemePresetKey.value !== key) {
+    return undefined
+  }
+
+  return () =>
+    h(NIcon, null, {
+      default: () => h(Checkmark)
+    })
 }
 
-const themePresetGroups = computed(() => {
-  return [
-    {
-      key: 'system',
-      label: t('CommonButtons.themeSelector.groups.system'),
-      options: [
-        {
-          key: 'default',
-          theme: 'default' as AppThemeSetting,
-          label: t('CommonButtons.themeSelector.presets.followSystem')
-        }
-      ]
-    },
-    {
-      key: 'bright-core',
-      label: t('CommonButtons.themeSelector.groups.brightBuiltin'),
-      options: BUILTIN_LIGHT_THEME_IDS.map((id) => ({
-        key: id,
-        theme: id,
-        label: themeLabel(id)
-      }))
-    },
-    {
-      key: 'dark-core',
-      label: t('CommonButtons.themeSelector.groups.darkBuiltin'),
-      options: BUILTIN_DARK_THEME_IDS.map((id) => ({
-        key: id,
-        theme: id,
-        label: themeLabel(id)
-      }))
-    }
-  ]
-})
-
-const themePresetColumns = computed(() => {
-  return [
-    {
-      key: 'builtin',
-      groups: themePresetGroups.value
-    }
-  ]
-})
-
-const themePresetOptions = computed(() => {
-  return themePresetGroups.value.flatMap((group) => group.options)
-})
-
 const activeThemePresetKey = computed(() => {
-  const current = themePresetOptions.value.find((option) => {
-    return option.theme === as.settings.theme
-  })
-
-  if (current) {
-    return current.key
+  if (isAppThemeSetting(as.settings.theme)) {
+    return as.settings.theme
   }
 
   return 'dark'
 })
 
-const handleApplyThemePreset = (theme: AppThemeSetting) => {
-  app.setTheme(theme)
+const themeToneTag = (id: AppThemeId) => {
+  const colorTheme = getThemeColorTheme(id)
+
+  return () =>
+    h(
+      NTag,
+      {
+        bordered: false,
+        round: true,
+        size: 'tiny',
+        type: colorTheme === 'light' ? 'success' : 'info'
+      },
+      {
+        default: () => themeToneLabel(id)
+      }
+    )
+}
+
+const createThemeDropdownOption = (id: AppThemeId): DropdownMixedOption => {
+  return {
+    key: id,
+    label: t(`CommonButtons.themeSelector.presets.${id}`, { defaultValue: id }),
+    icon: selectedThemeIcon(id),
+    extra: themeToneTag(id)
+  }
+}
+
+const themeDropdownOptions = computed<DropdownMixedOption[]>(() => {
+  return [
+    {
+      type: 'group',
+      key: 'system',
+      label: t('CommonButtons.themeSelector.groups.system'),
+      children: [
+        {
+          key: 'default',
+          label: t('CommonButtons.themeSelector.presets.followSystem'),
+          icon: selectedThemeIcon('default')
+        }
+      ]
+    },
+    {
+      type: 'group',
+      key: 'bright-core',
+      label: t('CommonButtons.themeSelector.groups.brightBuiltin'),
+      children: BUILTIN_LIGHT_THEME_IDS.map(createThemeDropdownOption)
+    },
+    {
+      type: 'group',
+      key: 'dark-core',
+      label: t('CommonButtons.themeSelector.groups.darkBuiltin'),
+      children: BUILTIN_DARK_THEME_IDS.map(createThemeDropdownOption)
+    }
+  ]
+})
+
+const handleThemeSelect = (key: string | number) => {
+  if (isAppThemeSetting(key)) {
+    app.setTheme(key)
+  }
 }
 
 const shouldShowAnnouncementBadge = computed(() => {
@@ -349,80 +353,6 @@ const setRead = () => {
   }
 }
 
-.theme-selector-panel {
-  width: 280px;
-  max-width: calc(100vw - 16px);
-  max-height: 72vh;
-  overflow: auto;
-  padding: 6px;
-  border-radius: 8px;
-  backdrop-filter: blur(8px);
-  background-color: rgba(22, 34, 49, 0.92);
-  border: 1px solid rgba(148, 173, 197, 0.24);
-}
-
-.theme-selector-columns {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-}
-
-.theme-selector-column {
-  min-width: 0;
-}
-
-.theme-selector-title {
-  padding: 4px 6px 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(158, 178, 198, 0.95);
-}
-
-.theme-selector-item {
-  padding: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: rgba(78, 195, 255, 0.12);
-  }
-
-  &.active {
-    background-color: rgba(78, 195, 255, 0.22);
-  }
-
-  .theme-selector-item__label {
-    font-size: 12px;
-    font-weight: 700;
-    color: #dde7f1;
-    line-height: 1.15;
-  }
-
-  .theme-selector-item__desc {
-    margin-top: 2px;
-    font-size: 11px;
-    color: rgba(158, 178, 198, 0.95);
-    line-height: 1.15;
-  }
-}
-
-.theme-selector-group {
-  &:not(:first-of-type) {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px solid rgba(148, 173, 197, 0.18);
-  }
-}
-
-.theme-selector-group__label {
-  padding: 2px 6px 4px;
-  font-size: 10px;
-  font-weight: 700;
-  color: rgba(158, 178, 198, 0.74);
-  opacity: 0.7;
-}
-
 [data-theme='dark'] {
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
@@ -441,43 +371,6 @@ const setRead = () => {
 }
 
 [data-theme='light'] {
-  .theme-selector-panel {
-    background-color: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(0, 0, 0, 0.14);
-  }
-
-  .theme-selector-title {
-    color: rgba(0, 0, 0, 0.68);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.08);
-    }
-
-    &.active {
-      background-color: rgba(0, 0, 0, 0.12);
-    }
-
-    .theme-selector-item__label {
-      color: rgba(0, 0, 0, 0.9);
-    }
-
-    .theme-selector-item__desc {
-      color: rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(0, 0, 0, 0.56);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(0, 0, 0, 0.15);
@@ -495,43 +388,6 @@ const setRead = () => {
 }
 
 [data-theme-id='dark'] {
-  .theme-selector-panel {
-    background-color: rgba(34, 34, 38, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-  }
-
-  .theme-selector-title {
-    color: rgba(255, 255, 255, 0.68);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-
-    &.active {
-      background-color: rgba(255, 255, 255, 0.14);
-    }
-
-    .theme-selector-item__label {
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .theme-selector-item__desc {
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(255, 255, 255, 0.12);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(255, 255, 255, 0.58);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(255, 255, 255, 0.15);
@@ -563,71 +419,9 @@ const setRead = () => {
       color: color-mix(in oklch, var(--la-color-text-themed) 92%, transparent);
     }
   }
-
-  .theme-selector-panel {
-    background-color: var(--la-color-select-menu-bg);
-    border: 1px solid var(--la-color-popover-border);
-  }
-
-  .theme-selector-title {
-    color: color-mix(in oklch, var(--la-color-text-themed) 78%, transparent);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgb(var(--la-card-tint-rgb) / 0.14);
-    }
-
-    &.active {
-      background-color: rgb(var(--la-card-tint-rgb) / 0.24);
-    }
-
-    .theme-selector-item__label {
-      color: var(--la-color-text-themed);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: color-mix(in oklch, var(--la-color-text-themed) 16%, transparent);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: color-mix(in oklch, var(--la-color-text-themed) 58%, transparent);
-  }
 }
 
 [data-theme-id='graphite'] {
-  .theme-selector-panel {
-    background-color: rgba(16, 28, 44, 0.95);
-    border: 1px solid rgba(148, 173, 197, 0.24);
-  }
-
-  .theme-selector-title {
-    color: rgba(226, 237, 247, 0.9);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(105, 202, 255, 0.12);
-    }
-
-    &.active {
-      background-color: rgba(105, 202, 255, 0.22);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(148, 173, 197, 0.2);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(162, 182, 204, 0.78);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(105, 202, 255, 0.2);
@@ -645,39 +439,6 @@ const setRead = () => {
 }
 
 [data-theme-id='sakura'] {
-  .theme-selector-panel {
-    background-color: rgba(255, 250, 251, 0.97);
-    border: 1px solid rgba(200, 88, 135, 0.24);
-  }
-
-  .theme-selector-title {
-    color: rgba(76, 69, 78, 0.86);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(212, 90, 134, 0.14);
-    }
-
-    &.active {
-      background-color: rgba(212, 90, 134, 0.22);
-    }
-
-    .theme-selector-item__label {
-      color: rgba(49, 44, 52, 0.92);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(200, 88, 135, 0.16);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(108, 99, 109, 0.72);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(212, 90, 134, 0.18);
@@ -695,39 +456,6 @@ const setRead = () => {
 }
 
 [data-theme-id='mint'] {
-  .theme-selector-panel {
-    background-color: rgba(251, 253, 252, 0.97);
-    border: 1px solid rgba(50, 142, 108, 0.24);
-  }
-
-  .theme-selector-title {
-    color: rgba(58, 70, 67, 0.86);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(36, 136, 115, 0.12);
-    }
-
-    &.active {
-      background-color: rgba(36, 136, 115, 0.2);
-    }
-
-    .theme-selector-item__label {
-      color: rgba(33, 45, 42, 0.94);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(50, 142, 108, 0.16);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(92, 104, 101, 0.72);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(36, 136, 115, 0.16);
@@ -745,39 +473,6 @@ const setRead = () => {
 }
 
 [data-theme-id='aurora'] {
-  .theme-selector-panel {
-    background-color: rgba(45, 42, 66, 0.95);
-    border: 1px solid rgba(167, 149, 226, 0.28);
-  }
-
-  .theme-selector-title {
-    color: rgba(243, 242, 248, 0.88);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(193, 168, 255, 0.14);
-    }
-
-    &.active {
-      background-color: rgba(193, 168, 255, 0.22);
-    }
-
-    .theme-selector-item__label {
-      color: #f3f2f8;
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(167, 149, 226, 0.18);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(201, 201, 210, 0.78);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(193, 168, 255, 0.2);
@@ -795,39 +490,6 @@ const setRead = () => {
 }
 
 [data-theme-id='butter'] {
-  .theme-selector-panel {
-    background-color: rgba(253, 251, 247, 0.97);
-    border: 1px solid rgba(182, 121, 27, 0.24);
-  }
-
-  .theme-selector-title {
-    color: rgba(89, 78, 68, 0.84);
-  }
-
-  .theme-selector-item {
-    &:hover {
-      background-color: rgba(194, 127, 34, 0.12);
-    }
-
-    &.active {
-      background-color: rgba(194, 127, 34, 0.2);
-    }
-
-    .theme-selector-item__label {
-      color: rgba(66, 57, 48, 0.93);
-    }
-  }
-
-  .theme-selector-group {
-    &:not(:first-of-type) {
-      border-top-color: rgba(182, 121, 27, 0.16);
-    }
-  }
-
-  .theme-selector-group__label {
-    color: rgba(120, 107, 94, 0.72);
-  }
-
   .common-buttons {
     .common-button-outer:hover .common-button-inner {
       background-color: rgba(194, 127, 34, 0.16);

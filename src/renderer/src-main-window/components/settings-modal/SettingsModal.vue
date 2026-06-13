@@ -11,6 +11,7 @@
     </template>
     <NTabs
       ref="tabs"
+      class="settings-modal-tabs"
       type="line"
       animated
       size="medium"
@@ -189,6 +190,48 @@ watch(
 .settings-modal {
   width: 90%;
   min-width: 720px;
-  max-width: 1106px;
+  max-width: 920px;
+  height: min(84vh, 760px);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-modal :global(.n-card-header) {
+  flex-shrink: 0;
+}
+
+.settings-modal :global(.n-card-content) {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-modal :global(.settings-modal-tabs) {
+  flex: 1 1 0;
+  height: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-modal :global(.settings-modal-tabs > .n-tabs-nav) {
+  flex-shrink: 0;
+}
+
+.settings-modal :global(.settings-modal-tabs > .n-tabs-pane-wrapper) {
+  flex: 1 1 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.settings-modal :global(.settings-modal-tabs > .n-tabs-pane-wrapper > .n-tab-pane) {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 </style>

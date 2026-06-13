@@ -1,15 +1,11 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('AutoChampConfig.title') }}</span>
-          </template>
-          <ControlItem
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <SettingsSection :title="t('AutoChampConfig.title')">
+          <SettingsRow
             :label="t('AutoChampConfig.enabled.label')"
             :label-description="t('AutoChampConfig.enabled.description')"
-            class="control-item-margin"
             :label-width="260"
           >
             <NSwitch
@@ -17,27 +13,28 @@
               :value="acs.settings.enabled"
               size="small"
             ></NSwitch>
-          </ControlItem>
-          <ControlItem
+          </SettingsRow>
+          <SettingsRow
             :label="t('AutoChampConfig.configure.label')"
-            class="control-item-margin"
             :label-width="260"
+            align="start"
           >
             <ChampionConfig />
-          </ControlItem>
-        </NCard>
+          </SettingsRow>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { NScrollbar, NSwitch } from 'naive-ui'
 
 import ChampionConfig from './components/auto-champ-config/ChampionConfig.vue'
 
@@ -46,7 +43,3 @@ const { t } = useTranslation()
 const acs = useAutoChampConfigStore()
 const ac = useInstance(AutoChampConfigRenderer)
 </script>
-
-<style scoped>
-@import './automation-styles.css';
-</style>

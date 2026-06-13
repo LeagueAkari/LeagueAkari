@@ -1,529 +1,505 @@
 <template>
-  <NScrollbar style="height: 65vh">
-    <NCard size="small">
-      <template #header>
-        <span class="card-header-title">{{ t('AppSettings.basic.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.basic.mainWindowCloseAction.label')"
-        :label-description="t('AppSettings.basic.mainWindowCloseAction.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="mws.settings.closeAction"
-          @update:value="(val) => wm.mainWindow.setCloseAction(val)"
-          :options="closeActions"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="语言 / Language"
-        label-description="设置应用的主语言 / Set primary language for League Akari"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="as.settings.locale"
-          @update:value="(val) => app.setLocale(val)"
-          :options="locales"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.basic.preferredLolSource.label')"
-        :label-description="t('AppSettings.basic.preferredLolSource.description')"
-        :label-width="400"
-      >
-        <div class="flex items-center gap-3">
+  <NScrollbar class="h-full">
+    <div class="flex flex-col gap-6">
+      <SettingsSection :title="t('AppSettings.basic.title')">
+        <SettingsRow
+          :label="t('AppSettings.basic.mainWindowCloseAction.label')"
+          :label-description="t('AppSettings.basic.mainWindowCloseAction.description')"
+          :label-width="400"
+        >
           <NSelect
-            style="width: 160px"
+            class="w-40!"
             size="small"
-            :value="as.settings.preferredLolSource"
-            @update:value="(val) => app.setPreferredLolSource(val)"
-            :options="lolSourceOptions"
+            :value="mws.settings.closeAction"
+            @update:value="(val) => wm.mainWindow.setCloseAction(val)"
+            :options="closeActions"
           />
-          <NPopover>
-            <template #trigger>
-              <div class="hover-text">
-                {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
+        </SettingsRow>
+        <SettingsRow
+          label="语言 / Language"
+          label-description="设置应用的主语言 / Set primary language for League Akari"
+          :label-width="400"
+        >
+          <NSelect
+            class="w-40!"
+            size="small"
+            :value="as.settings.locale"
+            @update:value="(val) => app.setLocale(val)"
+            :options="locales"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.basic.preferredLolSource.label')"
+          :label-description="t('AppSettings.basic.preferredLolSource.description')"
+          :label-width="400"
+          align="start"
+        >
+          <div class="flex max-w-full flex-col items-end gap-2">
+            <NSelect
+              class="w-40!"
+              size="small"
+              :value="as.settings.preferredLolSource"
+              @update:value="(val) => app.setPreferredLolSource(val)"
+              :options="lolSourceOptions"
+            />
+            <NPopover>
+              <template #trigger>
+                <div class="hover-text">
+                  {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
+                </div>
+              </template>
+              <div class="max-w-[320px]">
+                <div class="mb-2">
+                  <div class="flex h-5.5 items-center">
+                    <span class="text-xs font-bold">{{
+                      t('AppSettings.basic.preferredLolSource.tip.sgp.title')
+                    }}</span>
+                  </div>
+                  <div class="text-[11px] leading-relaxed">
+                    <div class="text-neutral-600 dark:text-gray-200">
+                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
+                    </div>
+                    <div class="text-neutral-600 dark:text-gray-200">
+                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
+                    </div>
+                    <div class="text-neutral-600 dark:text-gray-200">
+                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
+                    </div>
+                  </div>
+                  <div class="mt-1 text-[11px] text-orange-600 dark:text-orange-400">
+                    ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
+                  </div>
+                </div>
+                <div>
+                  <div class="mb-1 flex h-5.5 items-center">
+                    <span class="text-xs font-bold">{{
+                      t('AppSettings.basic.preferredLolSource.tip.lcu.title')
+                    }}</span>
+                  </div>
+                  <div class="text-[11px] leading-relaxed">
+                    <div class="text-neutral-600 dark:text-gray-200">
+                      · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
+                    </div>
+                    <div class="text-neutral-600 dark:text-gray-200">
+                      · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
+                    </div>
+                  </div>
+                  <div class="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
+                    ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
+                  </div>
+                </div>
               </div>
-            </template>
-            <div class="max-w-[320px]">
-              <div class="mb-2">
-                <div class="flex h-5.5 items-center">
-                  <span class="text-xs font-bold">{{
-                    t('AppSettings.basic.preferredLolSource.tip.sgp.title')
-                  }}</span>
+            </NPopover>
+            <div
+              v-if="
+                sgps.availability.sgpServerId &&
+                as.settings.preferredLolSource === 'sgp' &&
+                !sgps.availability.serversSupported.matchHistory
+              "
+              class="max-w-[320px] text-right text-sm font-bold text-orange-500 dark:text-orange-300"
+            >
+              {{
+                t('AppSettings.basic.preferredLolSource.unsupported', {
+                  server: sgps.availability.sgpServerId
+                })
+              }}
+            </div>
+          </div>
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.basic.theme.label')"
+          :label-description="t('AppSettings.basic.theme.description')"
+          :label-width="400"
+        >
+          <NSelect
+            class="w-40!"
+            size="small"
+            :value="as.settings.theme"
+            @update:value="(val) => app.setTheme(val)"
+            :options="themes"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.basic.dataSource.label')"
+          :label-description="t('AppSettings.basic.dataSource.description')"
+          :label-width="400"
+        >
+          <div class="flex max-w-full flex-col items-end gap-2">
+            <NSelect
+              class="w-40!"
+              size="small"
+              :value="rcs.settings.preferredSource"
+              @update:value="(val) => rc.setPreferredSource(val)"
+              :options="remoteConfigSource"
+            />
+            <NPopover>
+              <template #trigger>
+                <div class="hover-text">
+                  {{ t('AppSettings.basic.dataSource.howToChoose') }}
                 </div>
-                <div class="text-[11px] leading-relaxed">
-                  <div class="text-neutral-600 dark:text-gray-200">
-                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
-                  </div>
-                  <div class="text-neutral-600 dark:text-gray-200">
-                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
-                  </div>
-                  <div class="text-neutral-600 dark:text-gray-200">
-                    · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
-                  </div>
-                </div>
-                <div class="mt-1 text-[11px] text-orange-600 dark:text-orange-400">
-                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
-                </div>
-              </div>
+              </template>
               <div>
-                <div class="mb-1 flex h-5.5 items-center">
-                  <span class="text-xs font-bold">{{
-                    t('AppSettings.basic.preferredLolSource.tip.lcu.title')
-                  }}</span>
+                <div class="flex h-5.5 items-center">
+                  <NIcon class="mr-2">
+                    <GiteeSvg />
+                  </NIcon>
+                  <span class="text-xs font-bold">Gitee</span>
+                  <span class="ml-1">
+                    <template v-if="isTestingLatency">
+                      {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                    </template>
+                    <template v-else-if="latency">
+                      ({{
+                        latency.giteeLatency === -1
+                          ? t('AppSettings.basic.dataSource.timeout')
+                          : `${latency.giteeLatency.toFixed(1)} ms`
+                      }})
+
+                      <span
+                        class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                        v-if="latency.giteeLatency < latency.githubLatency"
+                        >{{ t('AppSettings.basic.dataSource.better') }}</span
+                      >
+                    </template>
+                  </span>
                 </div>
-                <div class="text-[11px] leading-relaxed">
-                  <div class="text-neutral-600 dark:text-gray-200">
-                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
-                  </div>
-                  <div class="text-neutral-600 dark:text-gray-200">
-                    · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
-                  </div>
-                </div>
-                <div class="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
-                  ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
-                </div>
+                <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
               </div>
-            </div>
-          </NPopover>
-        </div>
-        <div
-          v-if="
-            sgps.availability.sgpServerId &&
-            as.settings.preferredLolSource === 'sgp' &&
-            !sgps.availability.serversSupported.matchHistory
-          "
-          class="mt-2 text-sm font-bold text-orange-500 dark:text-orange-300"
+              <div class="mt-2">
+                <div class="flex h-5.5 items-center">
+                  <NIcon class="mr-2">
+                    <GithubIcon />
+                  </NIcon>
+                  <span class="text-xs font-bold">GitHub</span>
+                  <span class="ml-1">
+                    <template v-if="isTestingLatency">
+                      {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                    </template>
+                    <template v-else-if="latency">
+                      ({{
+                        latency.githubLatency === -1
+                          ? t('AppSettings.basic.dataSource.timeout')
+                          : `${latency.githubLatency.toFixed(1)} ms`
+                      }})
+
+                      <span
+                        class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
+                        v-if="latency.githubLatency < latency.giteeLatency"
+                        >{{ t('AppSettings.basic.dataSource.better') }}</span
+                      >
+                    </template>
+                  </span>
+                </div>
+                <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
+              </div>
+              <div class="mt-2 flex justify-center">
+                <NButton
+                  size="tiny"
+                  secondary
+                  @click="() => handleTestRepoLatency()"
+                  :loading="isTestingLatency"
+                >
+                  {{ t('AppSettings.basic.dataSource.testButton') }}
+                </NButton>
+              </div>
+            </NPopover>
+          </div>
+        </SettingsRow>
+      </SettingsSection>
+      <SettingsSection :title="t('AppSettings.selfUpdate.title')">
+        <SettingsRow
+          :label="t('AppSettings.selfUpdate.updateLatestRelease.label')"
+          :label-description="t('AppSettings.selfUpdate.updateLatestRelease.description')"
+          :label-width="400"
         >
-          {{
-            t('AppSettings.basic.preferredLolSource.unsupported', {
-              server: sgps.availability.sgpServerId
+          <NSwitch
+            size="small"
+            :value="rcs.settings.updateLatestRelease"
+            @update:value="(val: boolean) => rc.setUpdateLatestRelease(val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
+          :label-description="t('AppSettings.selfUpdate.autoDownloadUpdates.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="sus.settings.autoDownloadUpdates"
+            @update:value="(val: boolean) => su.setAutoDownloadUpdates(val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.selfUpdate.checkUpdates')"
+          :label-description="
+            t('AppSettings.selfUpdate.checkFrom', {
+              source: UPDATE_SOURCE_MAP[rcs.settings.preferredSource]
             })
-          }}
-        </div>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.basic.theme.label')"
-        :label-description="t('AppSettings.basic.theme.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="as.settings.theme"
-          @update:value="(val) => app.setTheme(val)"
-          :options="themes"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.basic.dataSource.label')"
-        :label-description="t('AppSettings.basic.dataSource.description')"
-        :label-width="400"
-      >
-        <div class="flex items-center gap-3">
-          <NSelect
-            style="width: 160px"
+          "
+          :label-width="400"
+        >
+          <NFlex align="center" class="max-w-full justify-end">
+            <NButton
+              size="small"
+              :loading="rcs.isUpdatingLatestRelease"
+              secondary
+              type="primary"
+              @click="() => handleCheckUpdates()"
+              >{{ t('AppSettings.selfUpdate.checkUpdates') }}</NButton
+            >
+            <NButton
+              size="small"
+              v-if="rcs.latestRelease"
+              secondary
+              @click="() => handleShowUpdateModal()"
+            >
+              <template v-if="rcs.latestRelease.isNew">
+                {{ t('AppSettings.selfUpdate.newRelease') }}
+              </template>
+              <template v-else>
+                {{ t('AppSettings.selfUpdate.currentRelease') }}
+              </template>
+            </NButton>
+            <NButton
+              size="small"
+              v-if="rcs.latestRelease && rcs.latestRelease.isNew"
+              :disabled="sus.updateProgressInfo !== null"
+              secondary
+              @click="() => su.startUpdate()"
+            >
+              {{ t('AppSettings.selfUpdate.downloadRelease') }}
+            </NButton>
+            <NButton
+              size="small"
+              v-if="sus.updateProgressInfo"
+              secondary
+              type="warning"
+              @click="() => su.cancelUpdate()"
+            >
+              {{ t('AppSettings.selfUpdate.cancelUpdate') }}
+            </NButton>
+            <span v-if="sus.lastCheckAt" class="text-xs"
+              >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
+              {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
+            >
+          </NFlex>
+        </SettingsRow>
+        <SettingsRow
+          v-if="sus.updateProgressInfo"
+          :label="t('AppSettings.selfUpdate.updateProgress.label')"
+          :label-description="t('AppSettings.selfUpdate.updateProgress.description')"
+          :label-width="400"
+          align="start"
+        >
+          <NSteps
+            class="w-full"
+            :vertical="lessThan1024px"
             size="small"
-            :value="rcs.settings.preferredSource"
-            @update:value="(val) => rc.setPreferredSource(val)"
-            :options="remoteConfigSource"
-          />
-          <NPopover>
-            <template #trigger>
-              <div class="hover-text">
-                {{ t('AppSettings.basic.dataSource.howToChoose') }}
+            :current="processStatus.current"
+            :status="processStatus.status"
+          >
+            <NStep>
+              <template #title>
+                <span class="step-title">{{
+                  t('AppSettings.selfUpdate.updateProgress.downloading')
+                }}</span>
+              </template>
+              <div class="step-description">
+                {{
+                  t('AppSettings.selfUpdate.updateProgress.finished', {
+                    progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
+                  })
+                }}
               </div>
-            </template>
-            <div>
-              <div class="flex h-5.5 items-center">
-                <NIcon class="mr-2">
-                  <GiteeSvg />
-                </NIcon>
-                <span class="text-xs font-bold">Gitee</span>
-                <span class="ml-1">
-                  <template v-if="isTestingLatency">
-                    {{ t('AppSettings.basic.dataSource.testingSpeed') }}
-                  </template>
-                  <template v-else-if="latency">
-                    ({{
-                      latency.giteeLatency === -1
-                        ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.giteeLatency.toFixed(1)} ms`
-                    }})
-
-                    <span
-                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
-                      v-if="latency.giteeLatency < latency.githubLatency"
-                      >{{ t('AppSettings.basic.dataSource.better') }}</span
-                    >
-                  </template>
-                </span>
+              <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
+                {{
+                  t('AppSettings.selfUpdate.updateProgress.remain', {
+                    time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
+                  })
+                }}
               </div>
-              <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
-            </div>
-            <div class="mt-2">
-              <div class="flex h-5.5 items-center">
-                <NIcon class="mr-2">
-                  <GithubIcon />
-                </NIcon>
-                <span class="text-xs font-bold">GitHub</span>
-                <span class="ml-1">
-                  <template v-if="isTestingLatency">
-                    {{ t('AppSettings.basic.dataSource.testingSpeed') }}
-                  </template>
-                  <template v-else-if="latency">
-                    ({{
-                      latency.githubLatency === -1
-                        ? t('AppSettings.basic.dataSource.timeout')
-                        : `${latency.githubLatency.toFixed(1)} ms`
-                    }})
-
-                    <span
-                      class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
-                      v-if="latency.githubLatency < latency.giteeLatency"
-                      >{{ t('AppSettings.basic.dataSource.better') }}</span
-                    >
-                  </template>
-                </span>
-              </div>
-              <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
-            </div>
-            <div class="mt-2 flex justify-center">
-              <NButton
-                size="tiny"
-                secondary
-                @click="() => handleTestRepoLatency()"
-                :loading="isTestingLatency"
+              <div
+                class="step-description"
+                v-if="sus.updateProgressInfo.phase === 'download-failed'"
               >
-                {{ t('AppSettings.basic.dataSource.testButton') }}
-              </NButton>
-            </div>
-          </NPopover>
-        </div>
-      </ControlItem>
-    </NCard>
-    <NCard size="small" class="mt-2">
-      <template #header>
-        <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.updateLatestRelease.label')"
-        :label-description="t('AppSettings.selfUpdate.updateLatestRelease.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="rcs.settings.updateLatestRelease"
-          @update:value="(val: boolean) => rc.setUpdateLatestRelease(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
-        :label-description="t('AppSettings.selfUpdate.autoDownloadUpdates.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="sus.settings.autoDownloadUpdates"
-          @update:value="(val: boolean) => su.setAutoDownloadUpdates(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.checkUpdates')"
-        :label-description="
-          t('AppSettings.selfUpdate.checkFrom', {
-            source: UPDATE_SOURCE_MAP[rcs.settings.preferredSource]
-          })
-        "
-        :label-width="400"
-      >
-        <NFlex align="center">
-          <NButton
-            size="small"
-            :loading="rcs.isUpdatingLatestRelease"
-            secondary
-            type="primary"
-            @click="() => handleCheckUpdates()"
-            >{{ t('AppSettings.selfUpdate.checkUpdates') }}</NButton
-          >
-          <NButton
-            size="small"
-            v-if="rcs.latestRelease"
-            secondary
-            @click="() => handleShowUpdateModal()"
-          >
-            <template v-if="rcs.latestRelease.isNew">
-              {{ t('AppSettings.selfUpdate.newRelease') }}
-            </template>
-            <template v-else>
-              {{ t('AppSettings.selfUpdate.currentRelease') }}
-            </template>
-          </NButton>
-          <NButton
-            size="small"
-            v-if="rcs.latestRelease && rcs.latestRelease.isNew"
-            :disabled="sus.updateProgressInfo !== null"
-            secondary
-            @click="() => su.startUpdate()"
-          >
-            {{ t('AppSettings.selfUpdate.downloadRelease') }}
-          </NButton>
-          <NButton
-            size="small"
-            v-if="sus.updateProgressInfo"
-            secondary
-            type="warning"
-            @click="() => su.cancelUpdate()"
-          >
-            {{ t('AppSettings.selfUpdate.cancelUpdate') }}
-          </NButton>
-          <span v-if="sus.lastCheckAt" class="text-xs"
-            >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
-            {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
-          >
-        </NFlex>
-      </ControlItem>
-      <ControlItem
-        v-if="sus.updateProgressInfo"
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.updateProgress.label')"
-        :label-description="t('AppSettings.selfUpdate.updateProgress.description')"
-        :label-width="400"
-      >
-        <NSteps
-          :vertical="lessThan1024px"
-          size="small"
-          :current="processStatus.current"
-          :status="processStatus.status"
+                {{ t('AppSettings.selfUpdate.updateProgress.downloadFailed') }}
+              </div>
+            </NStep>
+            <NStep>
+              <template #title>
+                <span class="step-title">{{
+                  t('AppSettings.selfUpdate.updateProgress.waitingForRestart')
+                }}</span>
+              </template>
+              <div class="step-description">
+                {{ t('AppSettings.selfUpdate.updateProgress.waitingForRestartDescription') }}
+              </div>
+            </NStep>
+          </NSteps>
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.selfUpdate.updateDir.label')"
+          :label-description="t('AppSettings.selfUpdate.updateDir.description')"
+          :label-width="400"
+          v-if="processStatus.current === 1 && processStatus.status !== 'error'"
         >
-          <NStep>
-            <template #title>
-              <span class="step-title">{{
-                t('AppSettings.selfUpdate.updateProgress.downloading')
-              }}</span>
-            </template>
-            <div class="step-description">
-              {{
-                t('AppSettings.selfUpdate.updateProgress.finished', {
-                  progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
-                })
-              }}
-            </div>
-            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
-              {{
-                t('AppSettings.selfUpdate.updateProgress.remain', {
-                  time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
-                })
-              }}
-            </div>
-            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'download-failed'">
-              {{ t('AppSettings.selfUpdate.updateProgress.downloadFailed') }}
-            </div>
-          </NStep>
-          <NStep>
-            <template #title>
-              <span class="step-title">{{
-                t('AppSettings.selfUpdate.updateProgress.waitingForRestart')
-              }}</span>
-            </template>
-            <div class="step-description">
-              {{ t('AppSettings.selfUpdate.updateProgress.waitingForRestartDescription') }}
-            </div>
-          </NStep>
-        </NSteps>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.selfUpdate.updateDir.label')"
-        :label-description="t('AppSettings.selfUpdate.updateDir.description')"
-        :label-width="400"
-        v-if="processStatus.current === 1 && processStatus.status !== 'error'"
-      >
-        <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
-          t('AppSettings.selfUpdate.updateDir.open')
-        }}</NButton>
-      </ControlItem>
-    </NCard>
-    <NCard size="small" class="mt-2">
-      <template #header>
-        <span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.mainWindowUi.backgroundMaterial.label')"
-        :label-description="t('AppSettings.mainWindowUi.backgroundMaterial.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="wms.settings.backgroundMaterial"
-          @update:value="(val) => wm.setBackgroundMaterial(val)"
-          :options="backgroundMaterials"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
-        :label-description="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.description')"
-        :label-width="400"
-        :disabled="preferMica"
-      >
-        <NSwitch
-          :disabled="preferMica"
-          size="small"
-          v-model:value="muis.frontendSettings.useProfileSkinAsBackground"
-        />
-      </ControlItem>
-    </NCard>
-    <NCard size="small" class="mt-2">
-      <template #header>
-        <span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.lcConnection.autoConnect.label')"
-        :label-description="t('AppSettings.lcConnection.autoConnect.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="lcs.settings.autoConnect"
-          @update:value="(val: boolean) => lc.setAutoConnect(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.lcConnection.useWmi.label')"
-        :label-description="t('AppSettings.lcConnection.useWmi.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="lcus.settings.useWmi"
-          @update:value="(val: boolean) => lcu.setUseWmi(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.lcConnection.rebuildWmi.label')"
-        :label-description="t('AppSettings.lcConnection.rebuildWmi.description')"
-        :label-width="400"
-      >
-        <NButton size="small" @click="() => lcu.rebuildWmi()" type="warning">
-          {{ t('AppSettings.lcConnection.rebuildWmi.rebuildButton') }}
-        </NButton>
-      </ControlItem>
-    </NCard>
-    <NCard size="small" class="mt-2">
-      <template #header>
-        <span class="card-header-title">{{ t('AppSettings.misc.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.misc.logLevel.label')"
-        :label-description="t('AppSettings.misc.logLevel.description')"
-        :label-width="400"
-      >
-        <NSelect
-          style="width: 160px"
-          size="small"
-          :value="ls.logLevel"
-          @update:value="(val) => lg.setLogLevel(val)"
-          :options="logLevels"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.misc.httpProxy.strategy.label')"
-        :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
-        :label-width="400"
-      >
-        <NSelect
-          :options="httpProxyStrategies"
-          style="width: 160px"
-          size="small"
-          :value="as.settings.httpProxy.strategy"
-          @update:value="(val) => updateHttpProxySettings({ strategy: val })"
-        />
-      </ControlItem>
-      <NCollapseTransition
-        class="control-item-margin"
-        :show="as.settings.httpProxy.strategy === 'force'"
-      >
-        <ControlItem
-          class="control-item-margin"
-          :label="t('AppSettings.misc.httpProxy.host.label')"
-          :label-description="t('AppSettings.misc.httpProxy.host.description')"
+          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
+            t('AppSettings.selfUpdate.updateDir.open')
+          }}</NButton>
+        </SettingsRow>
+      </SettingsSection>
+      <SettingsSection :title="t('AppSettings.mainWindowUi.title')">
+        <SettingsRow
+          :label="t('AppSettings.mainWindowUi.background.label')"
+          :label-description="t('AppSettings.mainWindowUi.background.description')"
           :label-width="400"
         >
-          <NInput
-            :value="as.settings.httpProxy.host"
-            style="width: 160px"
+          <NRadioGroup
             size="small"
-            placeholder="Host"
-            :status="as.settings.httpProxy.host.trim() ? 'success' : 'warning'"
-            @update:value="(val) => updateHttpProxySettings({ host: val })"
-          />
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          :label="t('AppSettings.misc.httpProxy.port.label')"
-          :label-description="t('AppSettings.misc.httpProxy.port.description')"
+            :value="mainWindowBackgroundMode"
+            @update:value="handleMainWindowBackgroundModeUpdate"
+          >
+            <NFlex :size="12">
+              <NTooltip
+                v-for="option in mainWindowBackgroundModeOptions"
+                :key="option.value"
+                placement="top"
+                :disabled="!option.tooltip"
+              >
+                <template #trigger>
+                  <span class="inline-flex">
+                    <NRadio :value="option.value" :disabled="option.disabled">{{
+                      option.label
+                    }}</NRadio>
+                  </span>
+                </template>
+                <div v-if="option.tooltip" class="max-w-64 text-xs">
+                  {{ option.tooltip }}
+                </div>
+              </NTooltip>
+            </NFlex>
+          </NRadioGroup>
+        </SettingsRow>
+      </SettingsSection>
+      <SettingsSection :title="t('AppSettings.lcConnection.title')">
+        <SettingsRow
+          :label="t('AppSettings.lcConnection.autoConnect.label')"
+          :label-description="t('AppSettings.lcConnection.autoConnect.description')"
           :label-width="400"
         >
-          <NInputNumber
-            :show-button="false"
-            :min="1"
-            :max="65535"
-            :value="as.settings.httpProxy.port"
-            style="width: 160px"
+          <NSwitch
             size="small"
-            @update:value="(val) => updateHttpProxySettings({ port: val || 1 })"
+            :value="lcs.settings.autoConnect"
+            @update:value="(val: boolean) => lc.setAutoConnect(val)"
           />
-        </ControlItem>
-      </NCollapseTransition>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
-        :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
-        :label-width="400"
-      >
-        <NSwitch
-          size="small"
-          :value="as.baseConfig?.disableHardwareAcceleration ?? false"
-          @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('AppSettings.misc.uninstallApp.label')"
-        :label-description="t('AppSettings.misc.uninstallApp.description')"
-        :label-width="400"
-      >
-        <NButton size="small" type="error" @click="() => handleUninstallApp()">
-          {{ t('AppSettings.misc.uninstallApp.button') }}
-        </NButton>
-      </ControlItem>
-    </NCard>
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.lcConnection.useWmi.label')"
+          :label-description="t('AppSettings.lcConnection.useWmi.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="lcus.settings.useWmi"
+            @update:value="(val: boolean) => lcu.setUseWmi(val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.lcConnection.rebuildWmi.label')"
+          :label-description="t('AppSettings.lcConnection.rebuildWmi.description')"
+          :label-width="400"
+        >
+          <NButton size="small" @click="() => lcu.rebuildWmi()" type="warning">
+            {{ t('AppSettings.lcConnection.rebuildWmi.rebuildButton') }}
+          </NButton>
+        </SettingsRow>
+      </SettingsSection>
+      <SettingsSection :title="t('AppSettings.misc.title')">
+        <SettingsRow
+          :label="t('AppSettings.misc.logLevel.label')"
+          :label-description="t('AppSettings.misc.logLevel.description')"
+          :label-width="400"
+        >
+          <NSelect
+            class="w-40!"
+            size="small"
+            :value="ls.logLevel"
+            @update:value="(val) => lg.setLogLevel(val)"
+            :options="logLevels"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.misc.httpProxy.strategy.label')"
+          :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
+          :label-width="400"
+        >
+          <NSelect
+            :options="httpProxyStrategies"
+            class="w-40!"
+            size="small"
+            :value="as.settings.httpProxy.strategy"
+            @update:value="(val) => updateHttpProxySettings({ strategy: val })"
+          />
+        </SettingsRow>
+        <NCollapseTransition :show="as.settings.httpProxy.strategy === 'force'">
+          <SettingsRow
+            :label="t('AppSettings.misc.httpProxy.host.label')"
+            :label-description="t('AppSettings.misc.httpProxy.host.description')"
+            :label-width="400"
+          >
+            <NInput
+              :value="as.settings.httpProxy.host"
+              class="w-40!"
+              size="small"
+              placeholder="Host"
+              :status="as.settings.httpProxy.host.trim() ? 'success' : 'warning'"
+              @update:value="(val) => updateHttpProxySettings({ host: val })"
+            />
+          </SettingsRow>
+          <SettingsRow
+            :label="t('AppSettings.misc.httpProxy.port.label')"
+            :label-description="t('AppSettings.misc.httpProxy.port.description')"
+            :label-width="400"
+          >
+            <NInputNumber
+              :show-button="false"
+              :min="1"
+              :max="65535"
+              :value="as.settings.httpProxy.port"
+              class="w-40!"
+              size="small"
+              @update:value="(val) => updateHttpProxySettings({ port: val || 1 })"
+            />
+          </SettingsRow>
+        </NCollapseTransition>
+        <SettingsRow
+          :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
+          :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="as.baseConfig?.disableHardwareAcceleration ?? false"
+            @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          :label="t('AppSettings.misc.uninstallApp.label')"
+          :label-description="t('AppSettings.misc.uninstallApp.description')"
+          :label-width="400"
+        >
+          <NButton size="small" type="error" @click="() => handleUninstallApp()">
+            {{ t('AppSettings.misc.uninstallApp.button') }}
+          </NButton>
+        </SettingsRow>
+      </SettingsSection>
+    </div>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import GiteeSvg from '@renderer-shared/components/icons/GiteeSvg.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
@@ -557,24 +533,25 @@ import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
-  NCard,
   NCollapseTransition,
   NFlex,
   NIcon,
   NInput,
   NInputNumber,
   NPopover,
+  NRadio,
+  NRadioGroup,
   NScrollbar,
   NSelect,
   NStep,
   NSteps,
   NSwitch,
+  NTooltip,
   useDialog,
   useMessage
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-import { useMicaAvailability } from '@main-window/composables/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
@@ -598,8 +575,6 @@ const lc = useInstance(LeagueClientRenderer)
 const lg = useInstance(LoggerRenderer)
 const rc = useInstance(RemoteConfigRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
-
-const preferMica = useMicaAvailability()
 
 const closeActions = computed(() => {
   return [
@@ -666,18 +641,52 @@ const logLevels = [
   { label: 'Debug', value: 'debug' }
 ]
 
-const backgroundMaterials = computed(() => {
+type MainWindowBackgroundMode = 'profile-skin' | 'none' | 'mica'
+
+const mainWindowBackgroundMode = computed<MainWindowBackgroundMode>(() => {
+  if (wms.settings.backgroundMaterial === 'mica') {
+    return 'mica'
+  }
+
+  if (muis.frontendSettings.useProfileSkinAsBackground) {
+    return 'profile-skin'
+  }
+
+  return 'none'
+})
+
+const mainWindowBackgroundModeOptions = computed(() => {
   return [
-    { label: t('AppSettings.mainWindowUi.backgroundMaterial.options.none'), value: 'none' },
     {
-      label: wms.supportsMica
-        ? t('AppSettings.mainWindowUi.backgroundMaterial.options.mica')
-        : t('AppSettings.mainWindowUi.backgroundMaterial.options.micaUnsupported'),
+      label: t('AppSettings.mainWindowUi.background.options.profileSkin'),
+      value: 'profile-skin',
+      tooltip: t('AppSettings.mainWindowUi.background.tooltips.profileSkin')
+    },
+    {
+      label: t('AppSettings.mainWindowUi.background.options.none'),
+      value: 'none'
+    },
+    {
+      label: t('AppSettings.mainWindowUi.background.options.mica'),
       value: 'mica',
+      tooltip: t('AppSettings.mainWindowUi.background.tooltips.mica'),
       disabled: !wms.supportsMica
     }
   ]
 })
+
+const handleMainWindowBackgroundModeUpdate = (value: string | number | boolean) => {
+  const mode = value as MainWindowBackgroundMode
+
+  if (mode === 'profile-skin') {
+    muis.frontendSettings.useProfileSkinAsBackground = true
+    void wm.setBackgroundMaterial('none')
+    return
+  }
+
+  muis.frontendSettings.useProfileSkinAsBackground = false
+  void wm.setBackgroundMaterial(mode === 'mica' ? 'mica' : 'none')
+}
 
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {

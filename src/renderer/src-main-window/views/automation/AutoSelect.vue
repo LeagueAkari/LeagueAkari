@@ -1,28 +1,20 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ $t('AutoSelect.title') }}</span>
-          </template>
-          <AutoSelectEditor class="auto-select-editor" />
-        </NCard>
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <SettingsSection :title="$t('AutoSelect.title')">
+          <div class="p-3">
+            <AutoSelectEditor class="transition-opacity duration-200" />
+          </div>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import { NCard, NScrollbar } from 'naive-ui'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { NScrollbar } from 'naive-ui'
 
 import AutoSelectEditor from './AutoSelectEditor.vue'
 </script>
-
-<style scoped>
-@import './automation-styles.css';
-
-.auto-select-editor {
-  transition: opacity 0.2s;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <NCard size="small" class="h-full">
+  <div class="box-border h-full rounded-lg bg-black/5 p-3 dark:bg-white/5">
     <NModal
       v-model:show="showEditModal"
       preset="card"
@@ -77,7 +77,7 @@
         />
       </MaskedComponent>
     </div>
-  </NCard>
+  </div>
 </template>
 
 <script lang="tsx" setup>
@@ -100,7 +100,6 @@ import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
   NButton,
-  NCard,
   NCheckbox,
   NDataTable,
   NInput,
@@ -498,5 +497,3 @@ const handleImportTaggedPlayers = async () => {
   }
 }
 </script>
-
-<style scoped></style>

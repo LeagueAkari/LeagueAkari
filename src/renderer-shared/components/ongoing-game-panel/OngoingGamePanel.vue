@@ -33,7 +33,7 @@
         class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
       >
         <template v-if="ogs.settings.enabled">
-          <template v-if="lcs.connectionState !== 'connected'">
+          <template v-if="!lcs.isConnected">
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="PlugConnected" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
               {{ t('OngoingGame.disconnected') }}

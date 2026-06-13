@@ -1,58 +1,58 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('RewardClaimTool.title') }}</span>
-    </template>
-    <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-      <span>{{ t('RewardClaimTool.hint') }}</span>
+  <SettingsSection :title="t('RewardClaimTool.title')">
+    <div class="p-3">
+      <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
+        <span>{{ t('RewardClaimTool.hint') }}</span>
+      </div>
+      <div class="mb-2 flex flex-wrap gap-1">
+        <NButton
+          :disabled="isLoading || !selectedGrantIds.length || !lcs.isConnected"
+          size="small"
+          type="primary"
+          secondary
+          @click="claim"
+        >
+          <template v-if="selectedGrantIds.length">
+            {{ t('RewardClaimTool.claimButtonC', { count: selectedGrantIds.length }) }}
+          </template>
+          <template v-else>
+            {{ t('RewardClaimTool.claimButton') }}
+          </template>
+        </NButton>
+        <NButton
+          v-show="isClaiming"
+          size="small"
+          type="warning"
+          secondary
+          @click="isClaiming = false"
+        >
+          {{ t('RewardClaimTool.cancelButton') }}
+        </NButton>
+        <NButton
+          :disabled="isLoading || !lcs.isConnected"
+          size="small"
+          secondary
+          @click="updateClaimableRewardGrants(true)"
+        >
+          {{ t('RewardClaimTool.refreshButton') }}
+        </NButton>
+      </div>
+      <NDataTable
+        :theme-overrides="dataTableThemeOverrides"
+        :loading="isLoading"
+        size="small"
+        :columns="columns"
+        :data="grants"
+        :row-key="(row) => row.info.id"
+        v-model:checked-row-keys="selectedGrantIds"
+        :max-height="600"
+      ></NDataTable>
     </div>
-    <div class="button-group">
-      <NButton
-        :disabled="isLoading || !selectedGrantIds.length || !lcs.isConnected"
-        size="small"
-        type="primary"
-        secondary
-        @click="claim"
-      >
-        <template v-if="selectedGrantIds.length">
-          {{ t('RewardClaimTool.claimButtonC', { count: selectedGrantIds.length }) }}
-        </template>
-        <template v-else>
-          {{ t('RewardClaimTool.claimButton') }}
-        </template>
-      </NButton>
-      <NButton
-        v-show="isClaiming"
-        size="small"
-        type="warning"
-        secondary
-        @click="isClaiming = false"
-      >
-        {{ t('RewardClaimTool.cancelButton') }}
-      </NButton>
-      <NButton
-        :disabled="isLoading || !lcs.isConnected"
-        size="small"
-        secondary
-        @click="updateClaimableRewardGrants(true)"
-      >
-        {{ t('RewardClaimTool.refreshButton') }}
-      </NButton>
-    </div>
-    <NDataTable
-      :theme-overrides="dataTableThemeOverrides"
-      :loading="isLoading"
-      size="small"
-      :columns="columns"
-      :data="grants"
-      :row-key="(row) => row.info.id"
-      v-model:checked-row-keys="selectedGrantIds"
-      :max-height="600"
-    ></NDataTable>
-  </NCard>
+  </SettingsSection>
 </template>
 
 <script lang="tsx" setup>
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -62,7 +62,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RewardsGrant } from '@shared/types/league-client/rewards'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { useTranslation } from 'i18next-vue'
-import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
+import { DataTableColumns, NButton, NDataTable, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
@@ -216,11 +216,3 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped>
-.button-group {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-</style>

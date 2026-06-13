@@ -1,21 +1,17 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('StrawberryTool.title') }}</span>
-    </template>
-    <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" style="font-size: 13px">
+  <SettingsSection :title="t('StrawberryTool.title')">
+    <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" class="p-3 text-[13px]">
       {{ t('StrawberryTool.unavailable') }}
     </div>
     <template v-else>
-      <ControlItem
-        class="control-item-margin"
+      <SettingsRow
         :label="t('StrawberryTool.champion.label')"
         :label-description="t('StrawberryTool.champion.description')"
         :label-width="260"
       >
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <div class="flex max-w-full flex-wrap items-center gap-2">
           <NSelect
-            style="width: 180px"
+            class="w-45!"
             size="small"
             v-model:value="currentChampionId"
             filterable
@@ -31,16 +27,15 @@
             >{{ t('StrawberryTool.champion.button') }}</NButton
           >
         </div>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
+      </SettingsRow>
+      <SettingsRow
         :label="t('StrawberryTool.map.label')"
         :label-description="t('StrawberryTool.map.description')"
         :label-width="260"
       >
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <div class="flex max-w-full flex-wrap items-center gap-2">
           <NSelect
-            style="width: 180px"
+            class="w-45!"
             size="small"
             v-model:value="currentMapUnionId"
             filterable
@@ -56,16 +51,15 @@
             >{{ t('StrawberryTool.map.button') }}</NButton
           >
         </div>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
+      </SettingsRow>
+      <SettingsRow
         :label="t('StrawberryTool.difficulty.label')"
         :label-description="t('StrawberryTool.difficulty.description')"
         :label-width="260"
       >
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <div class="flex max-w-full flex-wrap items-center gap-2">
           <NSelect
-            style="width: 180px"
+            class="w-45!"
             size="small"
             v-model:value="currentDifficulty"
             filterable
@@ -81,14 +75,15 @@
             {{ t('StrawberryTool.difficulty.button') }}</NButton
           >
         </div>
-      </ControlItem>
+      </SettingsRow>
     </template>
-  </NCard>
+  </SettingsSection>
 </template>
 
 <script setup lang="tsx">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -101,7 +96,7 @@ import {
 } from '@shared/types/league-client/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
+import { NButton, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
 import { shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
 
@@ -113,7 +108,7 @@ const lc = useInstance(LeagueClientRenderer)
 let isInitialized = false
 
 watchEffect(() => {
-  if (lcs.connectionState !== 'connected') {
+  if (!lcs.isConnected) {
     isInitialized = false
   }
 })
@@ -146,11 +141,8 @@ const renderLabel: SelectRenderLabel = (option) => {
   }
 
   return (
-    <div style={{ display: 'flex', gap: '8px' }}>
-      <LcuImage
-        src={championIconUri(option.value as number)}
-        style={{ width: '18px', height: '18px' }}
-      />
+    <div class="flex gap-2">
+      <LcuImage src={championIconUri(option.value as number)} class="size-4.5" />
       <span>{option.label as string}</span>
     </div>
   )
@@ -312,5 +304,3 @@ const setDifficulty = async () => {
   }
 }
 </script>
-
-<style scoped></style>

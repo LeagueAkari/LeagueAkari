@@ -1,15 +1,11 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('settings.title') }}</span>
-          </template>
-          <ControlItem
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <SettingsSection :title="t('settings.title')">
+          <SettingsRow
             :label-width="260"
             :disabled="!as.isElevated"
-            class="control-item-margin"
             :label="t('settings.cancelShortcut.label')"
             :label-description="t('settings.cancelShortcut.description')"
           >
@@ -18,10 +14,9 @@
               :target-id="InGameSendRenderer.CANCEL_SHORTCUT_TARGET_ID"
               @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
             />
-          </ControlItem>
-          <ControlItem
+          </SettingsRow>
+          <SettingsRow
             :label-width="260"
-            class="control-item-margin"
             :label="t('settings.sendInterval.label')"
             :label-description="t('settings.sendInterval.description')"
           >
@@ -32,25 +27,26 @@
               :min="10"
               :max="3500"
               :step="15"
-              style="width: 120px"
+              class="w-30!"
               secondary
               type="warning"
             ></NInputNumber>
-          </ControlItem>
-        </NCard>
+          </SettingsRow>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NInputNumber, NScrollbar } from 'naive-ui'
+import { NInputNumber, NScrollbar } from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -60,44 +56,3 @@ const as = useAppCommonStore()
 const igs = useInGameSendStore()
 const ig = useInstance(InGameSendRenderer)
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-
-.padding {
-  padding: 8px 12px;
-}
-
-.addable-tab {
-  font-size: 13px;
-
-  .empty {
-    filter: opacity(0.8);
-  }
-}
-
-.empty-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
-  padding: 16px;
-  border-radius: 4px;
-}
-
-[data-theme='dark'] {
-  .empty-placeholder {
-    color: #fff8;
-    background-color: #ffffff05;
-  }
-}
-
-[data-theme='light'] {
-  .empty-placeholder {
-    color: #0008;
-    background-color: #00000005;
-  }
-}
-</style>

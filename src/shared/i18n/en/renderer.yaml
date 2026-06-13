@@ -273,6 +273,18 @@ AppSettings:
   mainWindowUi:
     title: Main Window UI
 
+    background:
+      label: Background
+      description: Set the main window background mode
+      options:
+        profileSkin: Champion Background
+        none: None
+        mica: Mica
+      tooltips:
+        profileSkin: Use the current player's profile background skin as the main window background
+        mica: Available only on newer Windows versions. If unsupported on the current platform, it falls back to None
+        micaUnsupported: Mica is not supported on the current platform and will fall back to None
+
     useProfileSkinAsBackground:
       label: Use Profile Skin as Background
       description: $t(common:appName) will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
@@ -281,7 +293,7 @@ AppSettings:
       label: Background Material
       description: Set the background material of the application interface, requires specific system version support
       options:
-        none: Default
+        none: None
         mica: Mica
         micaUnsupported: 'Mica (Unsupported)'
 
@@ -539,13 +551,13 @@ MultiWindowSettings:
     titleRequireAdmin: Timer Overlay Window (Admin Required)
 
     description:
-      lineA: Marking the enemy champion summoner spell timer is only available when the current game mode is supported
-      leftClick1: · Left Click
-      leftClick2: ' - Start or stop this timer'
-      rightDoubleClick1: · Right Double Click
-      rightDoubleClick2: ' - If this timer is a started champion spell timer, simulate input sent to the in-game chat'
-      wheel1: · Wheel
-      wheel2: ' - Adjust the time of the started timer'
+      lineA: Enemy summoner spell timers are available only in supported modes
+      leftClick1: Left click
+      leftClick2: Start or stop this timer
+      rightDoubleClick1: Right double click
+      rightDoubleClick2: Send a started champion spell timer to in-game chat
+      wheel1: Wheel
+      wheel2: Adjust the time of a started timer
 
     enabled:
       label: Enable Timer Window
@@ -765,6 +777,19 @@ Automation:
 AutoGameflow:
   title: Gameflow
 
+  common:
+    enabled: Enable
+
+  sections:
+    readyCheck: Ready Check
+    autoHonor: Auto Honor
+    playAgain: Play Again
+    autoMatchmaking: Auto Matchmaking
+    autoReconnect: Reconnect
+    leader: Leader Transfer
+    invitations: Invitations
+    aramTeamSide: Team Side Message
+
   autoAcceptEnabled:
     label: Auto-Accept Enabled
     description: Automatically accepts the match when players are found.
@@ -839,6 +864,7 @@ AutoGameflow:
     description: 'In modes like ARAM or ARAM: Mayhem, when entering champion select, the current team side (blue or red) will be notified.'
   autoSendARAMTeamSideVisibleToTeam:
     label: Send Team Side Information Visible to Team
+    checkboxLabel: Visible to team
     description: The content of "Send Team Side Information" will be visible to team.
 
 AutoSelect:

@@ -1,19 +1,9 @@
 <template>
-  <div
-    style="
-      height: 65vh;
-      padding: 16px 16px 8px;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-    "
-  >
-    <NScrollbar style="flex-grow: 1">
-      <div
-        style="display: flex; justify-content: center; vertical-align: bottom; margin-bottom: 16px"
-      >
+  <div class="box-border flex h-full flex-col px-4 pt-4 pb-2">
+    <NScrollbar class="min-h-0 flex-1">
+      <div class="mb-4 flex justify-center align-bottom">
         <img
-          style="height: 160px; width: 160px"
+          class="size-40"
           src="@renderer-shared/assets/logo/logo-hollow.svg"
           alt="Logo of League Akari"
         />
@@ -32,10 +22,8 @@
         >.
       </div>
       <div class="about-para-2">
-        <span style="margin-right: 4px">GitHub: </span>
-        <a target="_blank" :href="LEAGUE_AKARI_GITHUB" style="text-indent: 0; margin-right: 8px"
-          >League Akari</a
-        >
+        <span class="mr-1">GitHub: </span>
+        <a target="_blank" :href="LEAGUE_AKARI_GITHUB" class="mr-2">League Akari</a>
         <a target="_blank" :href="LEAGUE_AKARI_GITHUB">
           <img
             alt="GitHub Repo stars"
@@ -71,15 +59,14 @@ const handleClickEasterEgg = () => {
 </script>
 
 <style scoped>
+@reference '@renderer-shared/assets/css/tailwind.css';
+
 .about-para {
-  font-size: 13px;
+  @apply text-[13px];
 }
 
 .about-para-2 {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-  font-size: 13px;
+  @apply mt-1 flex items-center text-[13px];
 
   img {
     display: block;
@@ -87,26 +74,6 @@ const handleClickEasterEgg = () => {
 }
 
 .copyright {
-  margin-top: 8px;
-  font-size: 12px;
-  color: rgb(87, 87, 87);
-}
-
-.divider {
-  height: 1px;
-  background-color: rgb(54, 54, 54);
-  margin: 12px 0px;
-}
-
-[data-theme='dark'] {
-  .divider {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
-[data-theme='light'] {
-  .divider {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
+  @apply mt-2 text-xs text-black/55 dark:text-white/55;
 }
 </style>

@@ -1,24 +1,24 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('SummonerProfile.title') }}</span>
-    </template>
+  <SettingsSection :title="t('SummonerProfile.title')">
     <NModal
-      style="width: fit-content"
+      class="w-fit!"
       preset="card"
       size="small"
       :title="t('SummonerProfile.skinSelectModal.title')"
       v-model:show="isModalShow"
     >
-      <div style="display: flex; gap: 4px; margin-bottom: 8px; width: 340px">
-        <NSelect
-          filterable
-          :options="championOptions"
-          v-model:value="currentChampionId"
-          :render-label="renderLabel"
-          size="small"
-          :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
-        ></NSelect>
+      <div class="mb-2 flex w-85 max-w-full gap-1">
+        <div class="min-w-0 flex-1">
+          <NSelect
+            class="w-full! max-w-full"
+            filterable
+            :options="championOptions"
+            v-model:value="currentChampionId"
+            :render-label="renderLabel"
+            size="small"
+            :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
+          ></NSelect>
+        </div>
         <NButton
           type="primary"
           size="small"
@@ -30,8 +30,8 @@
         </NButton>
       </div>
       <NSelect
+        class="mb-2 w-85! max-w-full"
         filterable
-        style="width: 340px; margin-bottom: 8px"
         :options="skinOptions"
         :render-option="renderOption"
         v-model:value="currentSkinId"
@@ -39,8 +39,8 @@
         :filter="(a, b) => isNameMatch(a, b.label as string)"
       />
       <NSelect
+        class="w-85! max-w-full"
         filterable
-        style="width: 340px"
         :render-option="renderOption"
         v-if="currentAugmentOptions.length >= 1"
         :options="currentAugmentOptions"
@@ -48,38 +48,30 @@
         size="small"
       />
     </NModal>
-    <ControlItem
-      class="control-item-margin"
+    <SettingsRow
       :label="t('SummonerProfile.profileBackground.label')"
       :label-description="t('SummonerProfile.profileBackground.description')"
       :label-width="260"
     >
-      <NButton
-        size="small"
-        type="primary"
-        @click="isModalShow = true"
-        :disabled="lcs.connectionState !== 'connected'"
-      >
+      <NButton size="small" type="primary" @click="isModalShow = true" :disabled="!lcs.isConnected">
         {{ t('SummonerProfile.profileBackground.button') }}
       </NButton>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+    </SettingsRow>
+    <SettingsRow
       :label="t('SummonerProfile.bannerAccent.label')"
       :label-description="t('SummonerProfile.bannerAccent.description')"
       :label-width="260"
     >
       <NButton
-        :disabled="lcs.connectionState !== 'connected'"
+        :disabled="!lcs.isConnected"
         @click="handleUpdatePr"
         :loading="isUpdating"
         size="small"
       >
         {{ t('SummonerProfile.bannerAccent.button') }}
       </NButton>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+    </SettingsRow>
+    <SettingsRow
       :label-description="
         lcs.summoner.me &&
         lcs.summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
@@ -92,57 +84,56 @@
       :label-width="260"
     >
       <NButton
-        :disabled="lcs.connectionState !== 'connected'"
+        :disabled="!lcs.isConnected"
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
         size="small"
       >
         {{ t('SummonerProfile.prestigeCrest.button') }}
       </NButton>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+    </SettingsRow>
+    <SettingsRow
       :label-description="t('SummonerProfile.token.description')"
       :label="t('SummonerProfile.token.label')"
       :label-width="260"
     >
       <NButton
-        :disabled="lcs.connectionState !== 'connected'"
+        :disabled="!lcs.isConnected"
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
         size="small"
       >
         {{ t('SummonerProfile.token.button') }}
       </NButton>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+    </SettingsRow>
+    <SettingsRow
       :label-description="t('SummonerProfile.emotes.description')"
       :label="t('SummonerProfile.emotes.label')"
       :label-width="260"
     >
       <NButton
-        :disabled="lcs.connectionState !== 'connected'"
+        :disabled="!lcs.isConnected"
         @click="handleClearEmotes"
         :loading="isClearingEmotes"
         size="small"
       >
         {{ t('SummonerProfile.emotes.button') }}
       </NButton>
-    </ControlItem>
-  </NCard>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="tsx">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
+import { NButton, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
@@ -286,11 +277,8 @@ const renderLabel = (option: SelectOption) => {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <LcuImage
-        src={championIconUri(option.value as number)}
-        style={{ width: '20px', height: '20px' }}
-      />
+    <div class="flex items-center gap-2">
+      <LcuImage src={championIconUri(option.value as number)} class="h-5 w-5" />
       <span>{option.label as string}</span>
     </div>
   )
@@ -302,30 +290,12 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
       {{
         trigger: () => node,
         default: () => (
-          <div
-            style={{
-              position: 'relative',
-              height: '160px',
-              minWidth: '280px',
-              overflow: 'hidden',
-              borderRadius: '4px',
-              boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)'
-            }}
-          >
+          <div class="relative h-40 min-w-70 overflow-hidden rounded bg-black/30 shadow-sm">
             <LcuImage
               {...({
                 src: option.imgUrl as string,
                 cache: false,
-                style: {
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  overflow: 'hidden'
-                }
+                class: 'absolute inset-0 h-full w-full overflow-hidden object-cover'
               } as any)}
             />
             {((option.overlays as AugmentOverlay[]) || []).map((o) => (
@@ -333,15 +303,7 @@ const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) =
                 {...({
                   src: o.uncenteredLCOverlayPath,
                   cache: false,
-                  style: {
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    overflow: 'hidden'
-                  }
+                  class: 'absolute inset-0 h-full w-full overflow-hidden object-cover'
                 } as any)}
               />
             ))}
@@ -508,5 +470,3 @@ const handleClearEmotes = async () => {
   }
 }
 </script>
-
-<style scoped></style>

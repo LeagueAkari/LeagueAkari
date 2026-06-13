@@ -71,8 +71,7 @@
         v-model:value="banPick"
       >
         <NTabPane name="pick" :tab="t('AutoSelect.pick.title')">
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.enabled.label')"
             :label-description="t('AutoSelect.pick.enabled.description')"
             :label-width="260"
@@ -82,13 +81,13 @@
               :value="currentPickConfig.enabled"
               @update:value="(val) => as.setPickConfig(currentGroup!.groupId, { enabled: val })"
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.expectedChampions.label')"
             :label-description="t('AutoSelect.pick.expectedChampions.description')"
             :label-width="260"
+            align="start"
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
               <div
@@ -143,10 +142,9 @@
                 />
               </div>
             </NCollapseTransition>
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.showIntent.label')"
             :label-description="t('AutoSelect.pick.showIntent.description')"
             :label-width="260"
@@ -156,10 +154,9 @@
               :value="currentPickConfig.showIntent"
               @update:value="(val) => as.setPickConfig(currentGroup!.groupId, { showIntent: val })"
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.ignoreIntent.label')"
             :label-description="t('AutoSelect.pick.ignoreIntent.description')"
             :label-width="260"
@@ -171,13 +168,13 @@
                 (val) => as.setPickConfig(currentGroup!.groupId, { ignoreIntent: val })
               "
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.strategy.label')"
             :label-description="t('AutoSelect.pick.strategy.description')"
             :label-width="260"
+            align="start"
           >
             <NRadioGroup
               size="small"
@@ -196,10 +193,9 @@
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.delaySeconds.label')"
             :label-description="t('AutoSelect.pick.delaySeconds.description')"
             :label-width="260"
@@ -207,30 +203,31 @@
             <NInputNumber
               size="small"
               :value="currentPickConfig.delaySeconds"
-              class="w-28"
+              class="w-28!"
               @update:value="
                 (val) => as.setPickConfig(currentGroup!.groupId, { delaySeconds: val || 0 })
               "
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <div class="mb-3 border-t border-gray-200 dark:border-white/20"></div>
+          <div
+            class="[margin-inline:var(--settings-row-x-padding)] mb-3 border-t border-gray-200 dark:border-white/20"
+          ></div>
           <TooltipWithIcon
-            class="mb-2 text-xs text-gray-600 dark:text-gray-300"
+            class="[margin-inline:var(--settings-row-x-padding)] mb-2 text-xs text-gray-600 dark:text-gray-300"
             :tooltip="t('AutoSelect.pick.benchMode.tooltip')"
           >
             <div>{{ t('AutoSelect.pick.benchMode.title') }}</div>
           </TooltipWithIcon>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.label')"
             :label-description="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
               size="small"
-              class="w-28"
+              class="w-28!"
               :value="currentPickConfig.benchSwapAccumulatedDelaySeconds"
               @update:value="
                 (val) =>
@@ -239,10 +236,9 @@
                   })
               "
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.benchSelectFirstAvailableChampion.label')"
             :label-description="t('AutoSelect.pick.benchSelectFirstAvailableChampion.description')"
             :label-width="260"
@@ -257,10 +253,9 @@
                   })
               "
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.pick.benchHandleTradeEnabled.label')"
             :label-description="t('AutoSelect.pick.benchHandleTradeEnabled.description')"
             :label-width="260"
@@ -272,12 +267,11 @@
                 (val) => as.setPickConfig(currentGroup!.groupId, { benchHandleTradeEnabled: val })
               "
             />
-          </ControlItem>
+          </SettingsRow>
         </NTabPane>
 
         <NTabPane name="ban" :tab="t('AutoSelect.ban.title')">
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.ban.enabled.label')"
             :label-description="t('AutoSelect.ban.enabled.description')"
             :label-width="260"
@@ -287,13 +281,13 @@
               :value="currentBanConfig.enabled"
               @update:value="(val) => as.setBanConfig(currentGroup!.groupId, { enabled: val })"
             />
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.ban.expectedChampions.label')"
             :label-description="t('AutoSelect.ban.expectedChampions.description')"
             :label-width="260"
+            align="start"
           >
             <NCollapseTransition :show="currentGroup.positions.length > 1">
               <div
@@ -348,13 +342,13 @@
                 />
               </div>
             </NCollapseTransition>
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.ban.strategy.label')"
             :label-description="t('AutoSelect.ban.strategy.description')"
             :label-width="260"
+            align="start"
           >
             <NRadioGroup
               size="small"
@@ -373,23 +367,22 @@
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>
-          </ControlItem>
+          </SettingsRow>
 
-          <ControlItem
-            class="control-item-margin"
+          <SettingsRow
             :label="t('AutoSelect.ban.delaySeconds.label')"
             :label-description="t('AutoSelect.ban.delaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
               size="small"
-              class="w-28"
+              class="w-28!"
               :value="currentBanConfig.delaySeconds"
               @update:value="
                 (val) => as.setBanConfig(currentGroup!.groupId, { delaySeconds: val || 0 })
               "
             />
-          </ControlItem>
+          </SettingsRow>
         </NTabPane>
       </NTabs>
 
@@ -402,7 +395,7 @@
 </template>
 
 <script lang="ts" setup>
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
@@ -500,5 +493,3 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped></style>

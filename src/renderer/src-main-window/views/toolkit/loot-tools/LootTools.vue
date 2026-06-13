@@ -1,62 +1,63 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">(UNDER DEVELOPMENT) {{ t('LootTools.title') }}</span>
-          </template>
-          <div class="actions">
-            <div class="actions__label">Target</div>
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <SettingsSection :title="`(UNDER DEVELOPMENT) ${t('LootTools.title')}`">
+          <SettingsRow label="Target" :label-width="260" align="start">
             <NRadioGroup :disabled="isLoading || !lcs.isConnected" v-model:value="target">
-              <NRadio value="open-chests-1">Open Chests</NRadio>
-              <NRadio value="disenchant-champions">Disenchant Champions</NRadio>
-              <NRadio value="disenchant-skins">Disenchant Skins</NRadio>
+              <div class="flex flex-wrap justify-end gap-x-3 gap-y-1">
+                <NRadio value="open-chests-1">Open Chests</NRadio>
+                <NRadio value="disenchant-champions">Disenchant Champions</NRadio>
+                <NRadio value="disenchant-skins">Disenchant Skins</NRadio>
+              </div>
             </NRadioGroup>
-          </div>
-          <div class="actions">
-            <div class="actions__label">Actions</div>
-            <NButton
-              :disabled="isLoading || !lcs.isConnected"
-              size="small"
-              type="primary"
-              secondary
-              @click="craft"
-            >
-              Execute
-            </NButton>
-            <NButton
-              v-show="isCrafting"
-              size="small"
-              type="warning"
-              secondary
-              @click="isCrafting = false"
-            >
-              Cancel
-            </NButton>
-            <NButton
-              :disabled="isLoading || !lcs.isConnected"
-              size="small"
-              secondary
-              @click="updatePlayerLootMap(true)"
-            >
-              Refresh
-            </NButton>
-          </div>
-        </NCard>
+          </SettingsRow>
+          <SettingsRow label="Actions" :label-width="260">
+            <div class="flex flex-wrap justify-end gap-1">
+              <NButton
+                :disabled="isLoading || !lcs.isConnected"
+                size="small"
+                type="primary"
+                secondary
+                @click="craft"
+              >
+                Execute
+              </NButton>
+              <NButton
+                v-show="isCrafting"
+                size="small"
+                type="warning"
+                secondary
+                @click="isCrafting = false"
+              >
+                Cancel
+              </NButton>
+              <NButton
+                :disabled="isLoading || !lcs.isConnected"
+                size="small"
+                secondary
+                @click="updatePlayerLootMap(true)"
+              >
+                Refresh
+              </NButton>
+            </div>
+          </SettingsRow>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { PlayerLootMap } from '@shared/types/league-client/loot'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NRadio, NRadioGroup, NScrollbar, useMessage } from 'naive-ui'
+import { NButton, NRadio, NRadioGroup, NScrollbar, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
@@ -130,25 +131,3 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-
-.actions {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  margin-bottom: 8px;
-
-  .actions__label {
-    color: rgb(0, 0, 0, 0.8);
-    font-size: 12px;
-    font-weight: bold;
-    width: 80px;
-
-    [data-theme='dark'] & {
-      color: rgb(255, 255, 255, 0.8);
-    }
-  }
-}
-</style>

@@ -1,11 +1,11 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
         <RewardClaimTool />
-        <MissionClaimTool style="margin-top: 8px" />
+        <MissionClaimTool />
         <!-- 和 Rewards 里面重叠, 因此只需要一个就行了 -->
-        <EventHubClaimTool style="margin-top: 8px" v-if="as.settings.isInKyokoMode" />
+        <EventHubClaimTool v-if="as.settings.isInKyokoMode" />
       </div>
     </NScrollbar>
   </div>
@@ -21,7 +21,3 @@ import RewardClaimTool from './RewardClaimTool.vue'
 
 const as = useAppCommonStore()
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-</style>

@@ -1,26 +1,17 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <!-- auto reply -->
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('AutoMisc.autoReply.title') }}</span>
-          </template>
-          <ControlItem
-            :label="t('AutoMisc.autoReply.enabled.label')"
-            class="control-item-margin"
-            :label-width="260"
-          >
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
+        <SettingsSection :title="t('AutoMisc.autoReply.title')">
+          <SettingsRow :label="t('AutoMisc.autoReply.enabled.label')" :label-width="260">
             <NSwitch
               @update:value="(v) => am.setAutoReplyEnabled(v)"
               :value="ams.settings.autoReplyEnabled"
               size="small"
             ></NSwitch>
-          </ControlItem>
-          <ControlItem
+          </SettingsRow>
+          <SettingsRow
             :label="t('AutoMisc.autoReply.enableOnAway.label')"
-            class="control-item-margin"
             :label-description="t('AutoMisc.autoReply.enableOnAway.description')"
             :label-width="260"
           >
@@ -29,12 +20,12 @@
               :value="ams.settings.autoReplyEnableOnAway"
               size="small"
             ></NSwitch>
-          </ControlItem>
-          <ControlItem
+          </SettingsRow>
+          <SettingsRow
             :label="t('AutoMisc.autoReply.text.label')"
-            class="control-item-margin"
             :label-description="t('AutoMisc.autoReply.text.description')"
             :label-width="260"
+            align="start"
           >
             <NInput
               :status="
@@ -42,7 +33,7 @@
                   ? 'warning'
                   : 'success'
               "
-              style="max-width: 360px; width: 360px"
+              class="w-90!"
               v-model:value="tempText"
               @blur="handleSaveText"
               :autosize="{
@@ -52,105 +43,103 @@
               type="textarea"
               size="small"
             ></NInput>
-          </ControlItem>
-        </NCard>
+          </SettingsRow>
+        </SettingsSection>
 
-        <!-- auto invitation -->
-        <NCard size="small" class="mt-2">
-          <template #header>
-            <span class="card-header-title">{{ t('AutoMisc.autoInvitation.title') }}</span>
-          </template>
+        <SettingsSection :title="t('AutoMisc.autoInvitation.title')">
+          <div class="p-3">
+            <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
+              <span>{{ t('AutoMisc.autoInvitation.description') }}</span>
+            </div>
 
-          <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-            <span>{{ t('AutoMisc.autoInvitation.description') }}</span>
-          </div>
-
-          <div
-            v-if="!lcs.isConnected"
-            class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
-          >
-            <span>{{ t('AutoMisc.autoInvitation.unavailable') }}</span>
-          </div>
-
-          <div
-            v-else-if="!isInLobby"
-            class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
-          >
-            <span>{{ t('AutoMisc.autoInvitation.notInLobby') }}</span>
-          </div>
-
-          <div v-else>
-            <NInput
-              v-model:value="friendSearchInput"
-              clearable
-              size="small"
-              :placeholder="t('AutoMisc.autoInvitation.searchPlaceholder')"
-              class="mb-3 w-72!"
+            <div
+              v-if="!lcs.isConnected"
+              class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
             >
-              <template #prefix>
-                <NIcon><SearchIcon /></NIcon>
-              </template>
-            </NInput>
+              <span>{{ t('AutoMisc.autoInvitation.unavailable') }}</span>
+            </div>
 
-            <NScrollbar style="max-height: 400px">
-              <div class="space-y-2">
-                <div
-                  v-for="friend in filteredSortedFriends"
-                  :key="friend.puuid"
-                  class="flex items-center gap-3 rounded-md border border-black/10 p-2 pr-5 pl-3 dark:border-white/10"
-                >
-                  <div class="relative">
-                    <LcuImage
-                      class="size-10 rounded-full"
-                      :src="profileIconUri(friend.icon || 29)"
-                    />
-                    <div
-                      class="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-white dark:border-neutral-900"
-                      :class="{
-                        'bg-green-500': friend.availability === 'chat',
-                        'bg-cyan-500': friend.availability === 'dnd',
-                        'bg-red-500': friend.availability === 'away',
-                        'bg-gray-400': friend.availability === 'offline'
-                      }"
-                    ></div>
-                  </div>
-                  <div class="flex min-w-0 flex-1 items-end gap-1">
-                    <div class="truncate text-sm font-medium">{{ friend.gameName }}</div>
-                    <div class="truncate text-xs text-black/60 dark:text-white/60">
-                      #{{ friend.gameTag }}
-                    </div>
-                  </div>
-                  <NButton
-                    size="small"
-                    :type="isScheduled(friend.puuid) ? 'warning' : 'default'"
-                    :disabled="!lcs.isConnected"
-                    @click="toggleInvitation(friend.puuid)"
+            <div
+              v-else-if="!isInLobby"
+              class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
+            >
+              <span>{{ t('AutoMisc.autoInvitation.notInLobby') }}</span>
+            </div>
+
+            <div v-else>
+              <NInput
+                v-model:value="friendSearchInput"
+                clearable
+                size="small"
+                :placeholder="t('AutoMisc.autoInvitation.searchPlaceholder')"
+                class="mb-3 w-72!"
+              >
+                <template #prefix>
+                  <NIcon><SearchIcon /></NIcon>
+                </template>
+              </NInput>
+
+              <NScrollbar class="max-h-[400px]">
+                <div class="space-y-2">
+                  <div
+                    v-for="friend in filteredSortedFriends"
+                    :key="friend.puuid"
+                    class="flex items-center gap-3 rounded-md border border-black/10 p-2 pr-5 pl-3 dark:border-white/10"
                   >
-                    {{
-                      isScheduled(friend.puuid)
-                        ? t('AutoMisc.autoInvitation.cancelSchedule')
-                        : t('AutoMisc.autoInvitation.scheduleInvite')
-                    }}
-                  </NButton>
+                    <div class="relative">
+                      <LcuImage
+                        class="size-10 rounded-full"
+                        :src="profileIconUri(friend.icon || 29)"
+                      />
+                      <div
+                        class="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-white dark:border-neutral-900"
+                        :class="{
+                          'bg-green-500': friend.availability === 'chat',
+                          'bg-cyan-500': friend.availability === 'dnd',
+                          'bg-red-500': friend.availability === 'away',
+                          'bg-gray-400': friend.availability === 'offline'
+                        }"
+                      ></div>
+                    </div>
+                    <div class="flex min-w-0 flex-1 items-end gap-1">
+                      <div class="truncate text-sm font-medium">{{ friend.gameName }}</div>
+                      <div class="truncate text-xs text-black/60 dark:text-white/60">
+                        #{{ friend.gameTag }}
+                      </div>
+                    </div>
+                    <NButton
+                      size="small"
+                      :type="isScheduled(friend.puuid) ? 'warning' : 'default'"
+                      :disabled="!lcs.isConnected"
+                      @click="toggleInvitation(friend.puuid)"
+                    >
+                      {{
+                        isScheduled(friend.puuid)
+                          ? t('AutoMisc.autoInvitation.cancelSchedule')
+                          : t('AutoMisc.autoInvitation.scheduleInvite')
+                      }}
+                    </NButton>
+                  </div>
+                  <div
+                    v-if="filteredSortedFriends.length === 0"
+                    class="py-8 text-center text-[13px] text-black/50 dark:text-white/50"
+                  >
+                    <span>{{ t('AutoMisc.autoInvitation.noFriends') }}</span>
+                  </div>
                 </div>
-                <div
-                  v-if="filteredSortedFriends.length === 0"
-                  class="py-8 text-center text-[13px] text-black/50 dark:text-white/50"
-                >
-                  <span>{{ t('AutoMisc.autoInvitation.noFriends') }}</span>
-                </div>
-              </div>
-            </NScrollbar>
+              </NScrollbar>
+            </div>
           </div>
-        </NCard>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
@@ -160,7 +149,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { Search as SearchIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NIcon, NInput, NScrollbar, NSwitch, useMessage } from 'naive-ui'
+import { NButton, NIcon, NInput, NScrollbar, NSwitch, useMessage } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-data/store'
@@ -246,7 +235,3 @@ const isInLobby = computed(() => {
   return lcs.lobby.lobby !== null
 })
 </script>
-
-<style scoped>
-@import './automation-styles.css';
-</style>

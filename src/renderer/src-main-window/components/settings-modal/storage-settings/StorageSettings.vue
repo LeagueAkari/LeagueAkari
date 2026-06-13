@@ -1,7 +1,7 @@
 <template>
   <NTabs
     size="small"
-    style="height: 65vh"
+    class="h-full"
     placement="left"
     :tabs-padding="4"
     :tab-style="{
@@ -34,20 +34,3 @@ import TaggedPlayers from './TaggedPlayers.vue'
 
 const { t } = useTranslation()
 </script>
-
-<style scoped>
-.operations {
-  display: flex;
-  margin-bottom: 8px;
-}
-</style>
-
-<style module>
-.row-base {
-  font-size: 12px;
-}
-
-.empty {
-  color: #ffffff80;
-}
-</style>

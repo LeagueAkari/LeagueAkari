@@ -1,18 +1,14 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('LobbyTool.title') }}</span>
-    </template>
-    <ControlItem
-      class="control-item-margin"
+  <SettingsSection :title="t('LobbyTool.title')">
+    <SettingsRow
       :label="t('LobbyTool.createIdLobby.label')"
       :label-description="t('LobbyTool.createIdLobby.description')"
       :label-width="260"
     >
-      <div style="display: flex; align-items: center; gap: 8px">
+      <div class="flex max-w-full items-center gap-2">
         <NSelect
           :placeholder="t('LobbyTool.createIdLobby.selectPlaceholder')"
-          style="width: 180px"
+          class="w-45!"
           @update:show="handleLoadEligibleQueues"
           size="small"
           filterable
@@ -23,7 +19,7 @@
         ></NSelect>
         <NButton
           :disabled="
-            lcs.connectionState !== 'connected' ||
+            !lcs.isConnected ||
             queueLobbySettings.queueId === null ||
             Number.isNaN(Number(queueLobbySettings.queueId))
           "
@@ -32,18 +28,19 @@
           >{{ t('LobbyTool.createIdLobby.button') }}</NButton
         >
       </div>
-    </ControlItem>
-  </NCard>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import type { QueueEligibility } from '@shared/types/league-client/lobby'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, useNotification } from 'naive-ui'
+import { NButton, NSelect, useNotification } from 'naive-ui'
 import { computed, reactive, shallowRef } from 'vue'
 
 const { t } = useTranslation()
@@ -57,7 +54,7 @@ const eligiblePartyQueues = shallowRef<QueueEligibility[]>([])
 const eligibleSelfQueues = shallowRef<QueueEligibility[]>([])
 
 const handleLoadEligibleQueues = async (show: boolean) => {
-  if (show && lcs.connectionState === 'connected') {
+  if (show && lcs.isConnected) {
     try {
       const { data: d1 } = await lc.api.lobby.getEligiblePartyQueues()
       const { data: d2 } = await lc.api.lobby.getEligibleSelfQueues()
@@ -146,5 +143,3 @@ const handleCreateQueueLobby = async () => {
   }
 }
 </script>
-
-<style scoped></style>

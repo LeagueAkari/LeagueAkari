@@ -1,58 +1,58 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('EventHubClaimTool.title') }}</span>
-    </template>
-    <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-      <span>{{ t('EventHubClaimTool.hint') }}</span>
+  <SettingsSection :title="t('EventHubClaimTool.title')">
+    <div class="p-3">
+      <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
+        <span>{{ t('EventHubClaimTool.hint') }}</span>
+      </div>
+      <div class="mb-2 flex flex-wrap gap-1">
+        <NButton
+          :disabled="isLoading || !selectedEventIds.length || !lcs.isConnected"
+          size="small"
+          type="primary"
+          secondary
+          @click="claim"
+        >
+          <template v-if="selectedEventIds.length">{{
+            t('EventHubClaimTool.claimButtonC', { count: selectedEventIds.length })
+          }}</template>
+          <template v-else>
+            {{ t('EventHubClaimTool.claimButton') }}
+          </template>
+        </NButton>
+        <NButton
+          v-show="isClaiming"
+          size="small"
+          type="warning"
+          secondary
+          @click="isClaiming = false"
+        >
+          {{ t('EventHubClaimTool.cancelButton') }}
+        </NButton>
+        <NButton
+          :disabled="isLoading || !lcs.isConnected"
+          size="small"
+          secondary
+          @click="updateClaimableEventHubEvents(true)"
+        >
+          {{ t('EventHubClaimTool.refreshButton') }}
+        </NButton>
+      </div>
+      <NDataTable
+        :theme-overrides="dataTableThemeOverrides"
+        :loading="isLoading"
+        size="small"
+        :columns="columns"
+        :data="events"
+        :row-key="(row) => row.eventId"
+        v-model:checked-row-keys="selectedEventIds"
+        :max-height="600"
+      ></NDataTable>
     </div>
-    <div class="button-group">
-      <NButton
-        :disabled="isLoading || !selectedEventIds.length || !lcs.isConnected"
-        size="small"
-        type="primary"
-        secondary
-        @click="claim"
-      >
-        <template v-if="selectedEventIds.length">{{
-          t('EventHubClaimTool.claimButtonC', { count: selectedEventIds.length })
-        }}</template>
-        <template v-else>
-          {{ t('EventHubClaimTool.claimButton') }}
-        </template>
-      </NButton>
-      <NButton
-        v-show="isClaiming"
-        size="small"
-        type="warning"
-        secondary
-        @click="isClaiming = false"
-      >
-        {{ t('EventHubClaimTool.cancelButton') }}
-      </NButton>
-      <NButton
-        :disabled="isLoading || !lcs.isConnected"
-        size="small"
-        secondary
-        @click="updateClaimableEventHubEvents(true)"
-      >
-        {{ t('EventHubClaimTool.refreshButton') }}
-      </NButton>
-    </div>
-    <NDataTable
-      :theme-overrides="dataTableThemeOverrides"
-      :loading="isLoading"
-      size="small"
-      :columns="columns"
-      :data="events"
-      :row-key="(row) => row.eventId"
-      v-model:checked-row-keys="selectedEventIds"
-      :max-height="600"
-    ></NDataTable>
-  </NCard>
+  </SettingsSection>
 </template>
 
 <script lang="tsx" setup>
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -60,7 +60,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { EventHubEvents } from '@shared/types/league-client/event-hub'
 import { sleep } from '@shared/utils/sleep'
 import { useTranslation } from 'i18next-vue'
-import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
+import { DataTableColumns, NButton, NDataTable, useMessage } from 'naive-ui'
 import { computed, markRaw, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
@@ -218,11 +218,3 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped>
-.button-group {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-</style>

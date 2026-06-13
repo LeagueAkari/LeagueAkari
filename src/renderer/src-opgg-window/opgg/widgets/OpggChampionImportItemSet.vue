@@ -15,7 +15,7 @@
             type="primary"
             secondary
             @click="writeItemSets(champion, { position, mode, region, tier })"
-            :disabled="lcs.connectionState !== 'connected'"
+            :disabled="!lcs.isConnected"
           >
             {{ t('OpggChampion.apply') }}
           </NButton>

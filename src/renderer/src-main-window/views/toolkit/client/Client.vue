@@ -1,13 +1,9 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('Client.gameClient.title') }}</span>
-          </template>
-          <ControlItem
-            class="control-item-margin"
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
+        <SettingsSection :title="t('Client.gameClient.title')">
+          <SettingsRow
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
@@ -32,9 +28,8 @@
               :value="gcs.settings.terminateGameClientWithShortcut"
               @update:value="(v) => gc.setTerminateGameClientWithShortcut(v)"
             />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
+          </SettingsRow>
+          <SettingsRow
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
@@ -57,9 +52,8 @@
               :shortcut-id="gcs.settings.terminateShortcut"
               @update:shortcut-id="(v) => gc.setTerminateShortcut(v)"
             />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
+          </SettingsRow>
+          <SettingsRow
             :label-description="t('Client.gameClient.settingsFileMode.description')"
             :label-width="320"
           >
@@ -81,17 +75,13 @@
               size="small"
               :value="isSettingsFileLocked"
               :loading="settingFileModeChanging"
-              :disabled="lcs.connectionState !== 'connected'"
+              :disabled="!lcs.isConnected"
               @update:value="handleSettingsFileModeSwitch"
             />
-          </ControlItem>
-        </NCard>
-        <NCard size="small" style="margin-top: 8px">
-          <template #header>
-            <span class="card-header-title">{{ t('Client.leagueClientUx.title') }}</span>
-          </template>
-          <ControlItem
-            class="control-item-margin"
+          </SettingsRow>
+        </SettingsSection>
+        <SettingsSection :title="t('Client.leagueClientUx.title')">
+          <SettingsRow
             :disabled="!adjustLeagueClientWindowSizeSupported"
             :label="
               adjustWindowRequiresElevation
@@ -109,13 +99,11 @@
                 {{ adjustWindowStatusDescription }}
               </div>
             </template>
-            <div class="control" style="display: flex; gap: 4px; align-items: baseline">
+            <div class="flex max-w-full items-baseline gap-1">
               <NInputNumber
-                style="width: 80px"
+                class="w-20!"
                 size="small"
-                :disabled="
-                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
-                "
+                :disabled="!adjustLeagueClientWindowSizeSupported || !lcs.isConnected"
                 :show-button="false"
                 :min="1"
                 @update:value="(val) => (fixWindowMethodAOptions.baseWidth = val || 0)"
@@ -126,10 +114,8 @@
               </NInputNumber>
               <NInputNumber
                 ref="input-2"
-                style="width: 80px"
-                :disabled="
-                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
-                "
+                class="w-20!"
+                :disabled="!adjustLeagueClientWindowSizeSupported || !lcs.isConnected"
                 size="small"
                 :show-button="false"
                 :min="1"
@@ -139,9 +125,7 @@
                 ><template #prefix>H</template>
               </NInputNumber>
               <NButton
-                :disabled="
-                  !adjustLeagueClientWindowSizeSupported || lcs.connectionState !== 'connected'
-                "
+                :disabled="!adjustLeagueClientWindowSizeSupported || !lcs.isConnected"
                 size="small"
                 secondary
                 type="warning"
@@ -149,15 +133,16 @@
                 >{{ t('Client.leagueClientUx.fixWindowMethodAOptions.button') }}</NButton
               >
             </div>
-          </ControlItem>
-        </NCard>
+          </SettingsRow>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -166,7 +151,7 @@ import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog, useMessage } from 'naive-ui'
+import { NButton, NInputNumber, NScrollbar, NSwitch, useDialog, useMessage } from 'naive-ui'
 import { computed, reactive, ref, toRaw, useTemplateRef, watch } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -274,23 +259,3 @@ const handleSettingsFileModeSwitch = (locked: boolean) => {
   return handleSetSettingsFileMode(locked ? 'readonly' : 'writable')
 }
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-
-.outer-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-}
-
-.inner-wrapper {
-  padding: 24px;
-  margin: 0 auto;
-  max-width: 800px;
-
-  :deep(.n-card) {
-    background-color: transparent;
-  }
-}
-</style>

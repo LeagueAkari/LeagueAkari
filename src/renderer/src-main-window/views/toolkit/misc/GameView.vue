@@ -1,9 +1,5 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('GameView.title') }}</span>
-    </template>
-
+  <SettingsSection :title="t('GameView.title')">
     <!-- 年久失修，暂时用这个凑合着用 -->
     <MatchPreviewer
       v-model:show="showPreviewModal"
@@ -14,31 +10,36 @@
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
       @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
-    <ControlItem
-      class="control-item-margin"
+    <SettingsRow
       :label="t('GameView.game.label')"
       :label-description="t('GameView.game.description')"
       :label-width="260"
     >
-      <div style="display: flex; align-items: center; gap: 8px">
-        <NInputNumber :show-button="false" v-model:value="gameId" size="small" />
+      <div class="flex max-w-full flex-wrap items-center justify-end gap-2">
+        <NInputNumber
+          class="w-50! max-w-full"
+          :show-button="false"
+          v-model:value="gameId"
+          size="small"
+        />
         <NButton :disabled="!gameId" @click="handleInspect" size="small" type="primary">{{
           t('GameView.game.button')
         }}</NButton>
       </div>
-    </ControlItem>
-  </NCard>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NInputNumber } from 'naive-ui'
+import { NButton, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -68,5 +69,3 @@ const handleDryRunOngoingGame = async (draft: DraftOptions) => {
   await router.replace({ name: 'ongoing-game' })
 }
 </script>
-
-<style scoped></style>

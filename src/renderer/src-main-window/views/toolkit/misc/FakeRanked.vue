@@ -1,72 +1,87 @@
 <template>
-  <NCard size="small">
-    <template #header>
-      <span class="card-header-title">{{ t('FakeRanked.title') }}</span>
-    </template>
-    <ControlItem
-      class="control-item-margin"
-      :label="t('FakeRanked.resetOnLogin.label')"
-      :label-description="t('FakeRanked.resetOnLogin.description')"
-      :label-width="260"
-    >
-      <NSwitch
-        size="small"
-        :value="ams.settings.autoSetRankedStatusEnabled"
-        @update:value="(value) => am.setAutoSetRankedStatusEnabled(value)"
-      ></NSwitch>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
+  <SettingsSection :title="t('FakeRanked.title')">
+    <SettingsRow
       :label="t('FakeRanked.set.label')"
       :label-description="t('FakeRanked.set.description')"
       :label-width="260"
+      :label-min-width="160"
+      align="start"
     >
-      <NButton
-        size="small"
-        type="primary"
-        :loading="isSetting"
-        :disabled="isSetting"
-        @click="() => handleSet()"
-        >{{ t('FakeRanked.set.button') }}</NButton
-      >
-    </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.queue')" :label-width="260">
-      <NSelect
-        :options="queueOptions"
-        style="width: 180px"
-        :disabled="isSetting"
-        v-model:value="state.queue"
-        size="small"
-      ></NSelect>
-    </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.tier')" :label-width="260">
-      <NSelect
-        :options="tierOptions"
-        style="width: 180px"
-        :disabled="isSetting"
-        v-model:value="state.tier"
-        size="small"
-      ></NSelect>
-    </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.division')" :label-width="260">
-      <NSelect
-        :options="divisionOptions"
-        :disabled="
-          isSetting ||
-          state.tier === 'MASTER' ||
-          state.tier === 'GRANDMASTER' ||
-          state.tier === 'CHALLENGER'
-        "
-        style="width: 180px"
-        v-model:value="state.division"
-        size="small"
-      ></NSelect>
-    </ControlItem>
-  </NCard>
+      <div class="flex w-115 max-w-full flex-wrap items-end justify-end gap-2">
+        <div class="min-w-0 flex-[1_1_170px]">
+          <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
+            {{ t('FakeRanked.queue') }}
+          </div>
+          <NSelect
+            class="w-full! max-w-full"
+            :options="queueOptions"
+            :disabled="isSetting"
+            v-model:value="state.queue"
+            size="small"
+          ></NSelect>
+        </div>
+        <div class="min-w-0 flex-[1_1_112px]">
+          <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
+            {{ t('FakeRanked.tier') }}
+          </div>
+          <NSelect
+            class="w-full! max-w-full"
+            :options="tierOptions"
+            :disabled="isSetting"
+            v-model:value="state.tier"
+            size="small"
+          ></NSelect>
+        </div>
+        <div class="min-w-0 flex-[0_1_88px]">
+          <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
+            {{ t('FakeRanked.division') }}
+          </div>
+          <NSelect
+            class="w-full! max-w-full"
+            :options="divisionOptions"
+            :disabled="
+              isSetting ||
+              state.tier === 'MASTER' ||
+              state.tier === 'GRANDMASTER' ||
+              state.tier === 'CHALLENGER'
+            "
+            v-model:value="state.division"
+            size="small"
+          ></NSelect>
+        </div>
+        <NButton
+          class="min-w-16 flex-none"
+          size="small"
+          type="primary"
+          :loading="isSetting"
+          :disabled="isSetting"
+          @click="() => handleSet()"
+          >{{ t('FakeRanked.set.button') }}</NButton
+        >
+        <div class="flex basis-full justify-end">
+          <NTooltip>
+            <template #trigger>
+              <NCheckbox
+                size="small"
+                :checked="ams.settings.autoSetRankedStatusEnabled"
+                @update:checked="(value) => am.setAutoSetRankedStatusEnabled(value)"
+              >
+                {{ t('FakeRanked.resetOnLogin.label') }}
+              </NCheckbox>
+            </template>
+            <div class="max-w-64 text-xs">
+              {{ t('FakeRanked.resetOnLogin.description') }}
+            </div>
+          </NTooltip>
+        </div>
+      </div>
+    </SettingsRow>
+  </SettingsSection>
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'
@@ -77,7 +92,7 @@ import type {
   AutoMiscRankedTier
 } from '@shared/types/shards/auto-misc'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, NSwitch, useMessage, useNotification } from 'naive-ui'
+import { NButton, NCheckbox, NSelect, NTooltip, useMessage, useNotification } from 'naive-ui'
 import { computed, reactive, ref, watchEffect } from 'vue'
 
 const { t } = useTranslation()
@@ -113,7 +128,7 @@ const handleSet = async () => {
     const rankedStatus = { ...state }
     await am.setRankedStatus(rankedStatus)
 
-    if (lcs.connectionState !== 'connected') {
+    if (!lcs.isConnected) {
       message.success(t('FakeRanked.saved'), { duration: 1000 })
       return
     }
@@ -230,15 +245,3 @@ const queueOptions = computed(() => {
   ]
 })
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

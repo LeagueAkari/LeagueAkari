@@ -1,83 +1,82 @@
 <template>
-  <div class="single-root">
-    <NScrollbar class="outer-wrapper">
-      <div class="inner-wrapper">
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('FriendTools.title') }}</span>
-          </template>
-          <div class="button-group">
-            <NPopconfirm
-              @positive-click="deleteSelectedFriends"
-              :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
-              :positive-text="t('FriendTools.deleteButton')"
-              :positive-button-props="{
-                size: 'tiny',
-                type: 'error'
-              }"
-              :negative-button-props="{
-                size: 'tiny'
-              }"
-            >
-              <template #trigger>
-                <NButton
-                  :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
-                  size="small"
-                  type="error"
-                  secondary
-                >
-                  <template v-if="selectedItems.length">{{
-                    t('FriendTools.deleteButtonC', { count: selectedFriendCount })
-                  }}</template>
-                  <template v-else>
-                    {{ t('FriendTools.deleteButton') }}
-                  </template>
-                </NButton>
-              </template>
-              {{ t('FriendTools.deletePopconfirm') }}
-            </NPopconfirm>
-            <NButton
+  <div class="h-full w-full">
+    <NScrollbar class="relative h-full max-w-full">
+      <div class="mx-auto max-w-[800px] p-6">
+        <SettingsSection :title="t('FriendTools.title')">
+          <div class="p-3">
+            <div class="mb-2 flex flex-wrap gap-1">
+              <NPopconfirm
+                @positive-click="deleteSelectedFriends"
+                :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
+                :positive-text="t('FriendTools.deleteButton')"
+                :positive-button-props="{
+                  size: 'tiny',
+                  type: 'error'
+                }"
+                :negative-button-props="{
+                  size: 'tiny'
+                }"
+              >
+                <template #trigger>
+                  <NButton
+                    :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
+                    size="small"
+                    type="error"
+                    secondary
+                  >
+                    <template v-if="selectedItems.length">{{
+                      t('FriendTools.deleteButtonC', { count: selectedFriendCount })
+                    }}</template>
+                    <template v-else>
+                      {{ t('FriendTools.deleteButton') }}
+                    </template>
+                  </NButton>
+                </template>
+                {{ t('FriendTools.deletePopconfirm') }}
+              </NPopconfirm>
+              <NButton
+                size="small"
+                type="warning"
+                secondary
+                v-show="isDeleting"
+                @click="isDeleting = false"
+              >
+                {{ t('FriendTools.cancelButton') }}
+              </NButton>
+              <NButton
+                :disabled="isLoading || !lcs.isConnected"
+                size="small"
+                secondary
+                @click="updateFriends(true)"
+              >
+                {{ t('FriendTools.refreshButton') }}
+              </NButton>
+              <NInput
+                v-model:value="friendSearchInput"
+                clearable
+                size="small"
+                :placeholder="t('FriendTools.searchPlaceholder')"
+                class="w-72!"
+              >
+                <template #prefix>
+                  <NIcon><SearchIcon /></NIcon>
+                </template>
+              </NInput>
+            </div>
+            <NDataTable
+              :theme-overrides="dataTableThemeOverrides"
+              :loading="isLoading"
+              :columns="columns"
+              :data="tableData"
+              :virtual-scroll="shouldUseVirtualScroll"
+              :row-key="(row) => row.id"
+              v-model:checked-row-keys="selectedItems"
+              v-model:expanded-row-keys="expandedRowKeys"
               size="small"
-              type="warning"
-              secondary
-              v-show="isDeleting"
-              @click="isDeleting = false"
-            >
-              {{ t('FriendTools.cancelButton') }}
-            </NButton>
-            <NButton
-              :disabled="isLoading || !lcs.isConnected"
-              size="small"
-              secondary
-              @click="updateFriends(true)"
-            >
-              {{ t('FriendTools.refreshButton') }}
-            </NButton>
-            <NInput
-              v-model:value="friendSearchInput"
-              clearable
-              size="small"
-              :placeholder="t('FriendTools.searchPlaceholder')"
-              class="w-72!"
-            >
-              <template #prefix>
-                <NIcon><SearchIcon /></NIcon>
-              </template>
-            </NInput>
+              :max-height="600"
+            />
           </div>
-          <NDataTable
-            :theme-overrides="dataTableThemeOverrides"
-            :loading="isLoading"
-            :columns="columns"
-            :data="tableData"
-            :virtual-scroll="shouldUseVirtualScroll"
-            :row-key="(row) => row.id"
-            v-model:checked-row-keys="selectedItems"
-            v-model:expanded-row-keys="expandedRowKeys"
-            size="small"
-            :max-height="600"
-          />
-        </NCard>
+        </SettingsSection>
       </div>
     </NScrollbar>
   </div>
@@ -85,6 +84,7 @@
 
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -101,7 +101,6 @@ import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
   NButton,
-  NCard,
   NDataTable,
   NEllipsis,
   NIcon,
@@ -176,22 +175,16 @@ const renderDateField = (
 
 const renderGroupName = (row: any) => {
   if (row.children) {
-    return <span style={{ fontWeight: 'bold' }}>{row.name}</span>
+    return <span class="font-bold">{row.name}</span>
   }
 
   return (
     <div
-      style={{
-        display: 'inline-flex',
-        gap: '4px',
-        fontSize: '14px',
-        alignItems: 'center',
-        cursor: 'pointer'
-      }}
+      class="inline-flex cursor-pointer items-center gap-1 text-sm"
       onClick={() => navigateToTabByPuuid(row.puuid)}
     >
-      <LcuImage style={{ width: '18px', height: '18px' }} src={profileIconUri(row.icon)} />
-      <NEllipsis style={{ maxWidth: '160px' }}>{row.name}</NEllipsis>
+      <LcuImage class="size-[18px]" src={profileIconUri(row.icon)} />
+      <NEllipsis class="max-w-40">{row.name}</NEllipsis>
     </div>
   )
 }
@@ -459,13 +452,3 @@ watch(
   { immediate: true }
 )
 </script>
-
-<style scoped>
-@import '../toolkit-styles.css';
-
-.button-group {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-</style>

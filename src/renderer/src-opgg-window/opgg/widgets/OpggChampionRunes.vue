@@ -61,7 +61,7 @@
             @click="setRunes(r, { championId: champion.data.summary.id, position: position })"
             size="tiny"
             type="primary"
-            :disabled="lcs.connectionState !== 'connected'"
+            :disabled="!lcs.isConnected"
             secondary
           >
             {{ t('OpggChampion.apply') }}

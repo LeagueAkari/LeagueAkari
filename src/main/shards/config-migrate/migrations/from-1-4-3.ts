@@ -6,6 +6,7 @@ import { MigrationContext, hasMigration, markMigration } from './context'
 
 export const MIGRATION_FROM_143 = 'akari-migration-from-1.4.3_patch1'
 export const MIGRATION_FROM_143_AUTO_MISC = 'akari-migration-from-1.4.3_patch2'
+export const MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND = 'akari-migration-from-1.4.3_patch3'
 
 const AUTO_MISC_SETTING_MIGRATION_TARGETS: Record<string, string> = {
   'auto-reply-main/enabled': 'auto-misc-main/autoReplyEnabled',
@@ -111,7 +112,22 @@ async function migrateAutoMiscSettingsFrom143({ manager, logger }: MigrationCont
   logger.info(`Migration completed, to ${MIGRATION_FROM_143_AUTO_MISC}`)
 }
 
+async function migrateMainWindowBackgroundSettingsFrom143({ manager, logger }: MigrationContext) {
+  if (await hasMigration(manager, MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND)) {
+    return
+  }
+
+  logger.info('Start migrating settings', MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND)
+
+  await manager.save(Setting.create('main-window-ui-renderer/useProfileSkinAsBackground', false))
+  await manager.save(Setting.create('window-manager-main/backgroundMaterial', 'none'))
+
+  await markMigration(manager, MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND)
+  logger.info(`Migration completed, to ${MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND}`)
+}
+
 export async function migrateFrom143(context: MigrationContext) {
   await migrateShortcutSettingsFrom143(context)
   await migrateAutoMiscSettingsFrom143(context)
+  await migrateMainWindowBackgroundSettingsFrom143(context)
 }
