@@ -31,6 +31,7 @@
             :label="t('MiscSettings.streamerMode.useAkariStyledName.label')"
             :label-description="t('MiscSettings.streamerMode.useAkariStyledName.description')"
             :label-width="400"
+            style="border-bottom-width: 1px"
           >
             <NSwitch
               size="small"
