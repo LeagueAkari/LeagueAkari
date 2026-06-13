@@ -1,4 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import type { InGameSendPresetId, InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -43,6 +44,18 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   setSendInterval(interval: number) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
+  }
+
+  sendLines(lines: string[]) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendLines', lines)
+  }
+
+  generatePresetLines(presetId: InGameSendPresetId, target: InGameSendPresetTarget) {
+    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generatePresetLines', presetId, target)
+  }
+
+  sendPreset(presetId: InGameSendPresetId, target: InGameSendPresetTarget) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendPreset', presetId, target)
   }
 
   setRatingPuuids(puuids: string[]) {

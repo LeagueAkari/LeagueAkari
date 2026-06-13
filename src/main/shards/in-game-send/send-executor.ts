@@ -8,6 +8,12 @@ import {
   type InGameSendMainContext
 } from './context'
 
+type SendablePhase = 'champ-select' | 'lobby' | 'in-game'
+
+export function normalizeInGameSendLines(lines: string[]) {
+  return lines.filter((line) => line.trim().length > 0)
+}
+
 export class InGameSendExecutor {
   private _currentSendController: AbortController | null = null
 
@@ -41,8 +47,9 @@ export class InGameSendExecutor {
   }
 
   /**
-   * 触发一次发送任务：根据当前 phase（champ-select / in-game）把 `lines` 逐行
-   * 发送到对应通道。任何正在进行的发送任务都会先被 abort。
+   * 触发一次发送任务：根据当前 phase 把 `lines` 发送到对应通道。
+   * 选人 / 房间阶段合并为一条 LCU 聊天消息；游戏内逐条模拟发送。
+   * 任何正在进行的发送任务都会先被 abort。
    *
    * 给后续预设（preset）执行使用。
    */
@@ -54,97 +61,99 @@ export class InGameSendExecutor {
       this._currentSendController.abort()
     }
 
+    const normalizedLines = normalizeInGameSendLines(lines)
+    if (!normalizedLines.length) {
+      return false
+    }
+
     if (
       ongoingGame.state.queryStage.phase !== 'champ-select' &&
+      ongoingGame.state.queryStage.phase !== 'lobby' &&
       ongoingGame.state.queryStage.phase !== 'in-game'
     ) {
-      logger.warn(
-        'Current phase does not support sending messages',
-        ongoingGame.state.queryStage.phase
-      )
-      return
+      return false
     }
 
-    if (ongoingGame.state.queryStage.phase === 'in-game' && !(await isGameClientForeground())) {
+    const phase = ongoingGame.state.queryStage.phase
+
+    if (phase === 'in-game' && !(await isGameClientForeground())) {
       logger.warn('Game client is not foreground')
-      return
+      return false
     }
 
-    this._currentSendController = new AbortController()
-    this._sendTextToChatOrInGame(lines, this._currentSendController.signal)
+    const controller = new AbortController()
+    this._currentSendController = controller
+
+    try {
+      return await this._sendTextToChatOrInGame(phase, normalizedLines, controller.signal)
+    } finally {
+      if (this._currentSendController === controller) {
+        this._currentSendController = null
+      }
+    }
   }
 
-  private _sendTextToChatOrInGame(strs: string[], signal: AbortSignal) {
-    const { leagueClient, logger, ongoingGame, settings } = this._context
+  private async _sendTextToChatOrInGame(
+    phase: SendablePhase,
+    lines: string[],
+    signal: AbortSignal
+  ) {
+    const { leagueClient, logger, settings } = this._context
 
-    let aborted = false
-    signal.addEventListener('abort', () => {
-      aborted = true
-    })
-
-    const interval = settings.sendInterval
-    const tasks: (() => Promise<any>)[] = []
-
-    if (ongoingGame.state.queryStage.phase === 'champ-select') {
-      const conversation = leagueClient.data.chat.conversations.championSelect
+    if (phase === 'champ-select' || phase === 'lobby') {
+      const conversation =
+        phase === 'champ-select'
+          ? leagueClient.data.chat.conversations.championSelect
+          : leagueClient.data.chat.conversations.customGame
 
       if (!conversation) {
-        logger.warn('Champion select chat not found')
-        return
+        return false
       }
 
-      logger.info('Sending message during champion select', strs)
-
-      for (let index = 0; index < strs.length; index++) {
-        tasks.push(() =>
-          leagueClient.api.chat.chatSend(conversation.id, strs[index]).catch(() => {})
-        )
-
-        if (index !== strs.length - 1) {
-          tasks.push(() => sleep(interval))
-        }
+      if (signal.aborted) {
+        return false
       }
-    } else if (ongoingGame.state.queryStage.phase === 'in-game') {
+
+      logger.info('Sending message through LCU chat', phase, lines)
+      return await leagueClient.api.chat
+        .chatSend(conversation.id, lines.join('\n'))
+        .then(() => true)
+        .catch(() => false)
+    } else if (phase === 'in-game') {
       if (!NATIVE_SUPPORT.nativeInput.available) {
         logger.warn('Native input is not available')
-        return
+        return false
       }
 
       const instance = nativeInput.instance
 
-      logger.info('Sending message in-game', strs)
+      logger.info('Sending messages in-game', lines)
 
-      for (let index = 0; index < strs.length; index++) {
-        tasks.push(async () => {
-          await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, true)
-          await sleep(IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY)
-          await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, false)
-          await sleep(interval)
-          await instance.sendString(strs[index])
-          await sleep(interval)
-          await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, true)
-          await sleep(IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY)
-          await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, false)
-        })
-
-        if (index !== strs.length - 1) {
-          tasks.push(() => sleep(interval))
-        }
+      const pressEnter = async () => {
+        await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, true)
+        await sleep(IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY)
+        await instance.sendKey(IN_GAME_SEND_ENTER_KEY_CODE, false)
       }
-    } else {
-      return
-    }
 
-    const runTasks = async () => {
-      for (const task of tasks) {
-        if (aborted) {
+      for (let index = 0; index < lines.length; index++) {
+        if (signal.aborted) {
           break
         }
 
-        await task()
+        await pressEnter()
+        await sleep(IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY)
+        await instance.sendString(lines[index])
+        await sleep(IN_GAME_SEND_ENTER_KEY_INTERNAL_DELAY)
+        await pressEnter()
+
+        if (index !== lines.length - 1) {
+          await sleep(settings.sendInterval)
+        }
       }
+
+      return !signal.aborted
     }
 
-    runTasks()
+    return false
   }
 }

@@ -24,7 +24,7 @@ import { computed } from 'vue'
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
 import GameDataTest from './GameDataTest.vue'
-import InGameSendPresetsTest from './InGameSendPresetsTest.vue'
+import InGameSendPresetsTest from './in-game-send-presets-test'
 import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
 import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'

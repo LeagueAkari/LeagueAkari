@@ -18,6 +18,7 @@ import {
   type InGameSendMainContext
 } from './context'
 import { InGameSendIpcHandlers } from './ipc-handlers'
+import { InGameSendPresetController } from './preset-controller'
 import { InGameSendPresetSelectionController } from './preset-selection-controller'
 import { InGameSendExecutor } from './send-executor'
 import { InGameSendSettings, InGameSendState } from './state'
@@ -46,6 +47,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private readonly _context: InGameSendMainContext
 
   private readonly _sendExecutor: InGameSendExecutor
+  private readonly _presetController: InGameSendPresetController
   private readonly _presetSelectionController: InGameSendPresetSelectionController
   private readonly _ipcHandlers: InGameSendIpcHandlers
 
@@ -92,8 +94,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     this._sendExecutor = new InGameSendExecutor(this._context)
+    this._presetController = new InGameSendPresetController(this._context, this._sendExecutor)
     this._presetSelectionController = new InGameSendPresetSelectionController(this._context)
-    this._ipcHandlers = new InGameSendIpcHandlers(this._context, this._presetSelectionController)
+    this._ipcHandlers = new InGameSendIpcHandlers(
+      this._context,
+      this._sendExecutor,
+      this._presetController,
+      this._presetSelectionController
+    )
   }
 
   private async _setupState() {
