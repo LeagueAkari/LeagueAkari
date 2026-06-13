@@ -2,7 +2,10 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full" ref="el">
       <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
-        <SettingsSection :title="t('AutoGameflow.sections.readyCheck')">
+        <SettingsSection
+          :title="t('AutoGameflow.sections.readyCheck')"
+          :footer="t('AutoGameflow.autoAcceptEnabled.footer')"
+        >
           <SettingsRow
             :label="t('AutoGameflow.common.enabled')"
             :label-description="t('AutoGameflow.autoAcceptEnabled.description')"
@@ -51,12 +54,14 @@
                 :translation="t('AutoGameflow.playAgainEnabled.description.full')"
               >
                 <template #autoHonor>
-                  <span
-                    class="cursor-pointer font-bold"
-                    @click="() => shard.setAutoHonorEnabled(true)"
+                  <NCheckbox
+                    class="mx-0.5 text-[13px]"
+                    size="small"
+                    :checked="store.settings.autoHonorEnabled"
+                    @update:checked="(val) => shard.setAutoHonorEnabled(val)"
                   >
                     {{ t('AutoGameflow.playAgainEnabled.description.part2') }}
-                  </span>
+                  </NCheckbox>
                 </template>
               </TranslationComponent>
             </template>

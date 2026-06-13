@@ -780,7 +780,7 @@ AutoGameflow:
     enabled: 开启
 
   sections:
-    readyCheck: 队列确认
+    readyCheck: 自动接受对局
     autoHonor: 自动点赞
     playAgain: 返回房间
     autoMatchmaking: 自动匹配
@@ -792,6 +792,7 @@ AutoGameflow:
   autoAcceptEnabled:
     label: 自动接受对局开启
     description: 当匹配到玩家时，自动确认
+    footer: 部分服务器或排位赛分段根据服务器策略，可能已经强制启用自动接受，和 League Akari 无关
   autoAcceptDelaySeconds:
     label: 自动接受对局延时 (s)
     description: 在可接受时延迟执行接受操作的时间，单位为秒
@@ -810,7 +811,7 @@ AutoGameflow:
   playAgainEnabled:
     label: 自动回到房间
     description:
-      full: 对局结束时回到房间。可能需要先启用 {autoHonor} 以完成点赞投票阶段
+      full: 对局结束时回到房间。可能需要先启用 {autoHonor}以完成点赞投票阶段
       part2: 自动点赞
   autoMatchmakingEnabled:
     label: 自动匹配对局

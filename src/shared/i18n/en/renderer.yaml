@@ -781,7 +781,7 @@ AutoGameflow:
     enabled: Enable
 
   sections:
-    readyCheck: Ready Check
+    readyCheck: Auto-Accept Match
     autoHonor: Auto Honor
     playAgain: Play Again
     autoMatchmaking: Auto Matchmaking
@@ -793,6 +793,7 @@ AutoGameflow:
   autoAcceptEnabled:
     label: Auto-Accept Enabled
     description: Automatically accepts the match when players are found.
+    footer: Some servers or ranked tiers may already enforce auto-accept by server policy. This is unrelated to League Akari.
   autoAcceptDelaySeconds:
     label: Auto-Accept Delay (s)
     description: Delay in seconds before accepting the match after it becomes available.
@@ -811,7 +812,7 @@ AutoGameflow:
   playAgainEnabled:
     label: Auto Play Again
     description:
-      full: Automatically returns to the lobby after a match. {autoHonor} to complete the honor voting phase.
+      full: Automatically returns to the lobby after a match. You may need to enable {autoHonor} to complete the honor voting phase.
       part2: Auto-Honor
   autoMatchmakingEnabled:
     label: Auto Matchmaking
