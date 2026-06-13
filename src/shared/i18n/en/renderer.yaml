@@ -981,6 +981,7 @@ AutoMisc:
     text:
       label: Reply Text
       description: The content to be used as the auto-reply message.
+      save: Save
 
   autoInvitation:
     title: Invite Friends to Room

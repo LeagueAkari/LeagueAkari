@@ -4,22 +4,27 @@
       <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
         <SettingsSection :title="t('AutoMisc.autoReply.title')">
           <SettingsRow :label="t('AutoMisc.autoReply.enabled.label')" :label-width="260">
-            <NSwitch
-              @update:value="(v) => am.setAutoReplyEnabled(v)"
-              :value="ams.settings.autoReplyEnabled"
-              size="small"
-            ></NSwitch>
-          </SettingsRow>
-          <SettingsRow
-            :label="t('AutoMisc.autoReply.enableOnAway.label')"
-            :label-description="t('AutoMisc.autoReply.enableOnAway.description')"
-            :label-width="260"
-          >
-            <NSwitch
-              @update:value="(v) => am.setAutoReplyEnableOnAway(v)"
-              :value="ams.settings.autoReplyEnableOnAway"
-              size="small"
-            ></NSwitch>
+            <div class="flex flex-col items-end gap-1">
+              <NSwitch
+                @update:value="(v) => am.setAutoReplyEnabled(v)"
+                :value="ams.settings.autoReplyEnabled"
+                size="small"
+              ></NSwitch>
+              <NTooltip>
+                <template #trigger>
+                  <NCheckbox
+                    size="small"
+                    :checked="ams.settings.autoReplyEnableOnAway"
+                    @update:checked="(value) => am.setAutoReplyEnableOnAway(value)"
+                  >
+                    {{ t('AutoMisc.autoReply.enableOnAway.label') }}
+                  </NCheckbox>
+                </template>
+                <div class="max-w-64 text-xs">
+                  {{ t('AutoMisc.autoReply.enableOnAway.description') }}
+                </div>
+              </NTooltip>
+            </div>
           </SettingsRow>
           <SettingsRow
             :label="t('AutoMisc.autoReply.text.label')"
@@ -27,22 +32,34 @@
             :label-width="260"
             align="start"
           >
-            <NInput
-              :status="
-                ams.settings.autoReplyText.length === 0 && ams.settings.autoReplyEnabled
-                  ? 'warning'
-                  : 'success'
-              "
-              class="w-90!"
-              v-model:value="tempText"
-              @blur="handleSaveText"
-              :autosize="{
-                minRows: 2,
-                maxRows: 4
-              }"
-              type="textarea"
-              size="small"
-            ></NInput>
+            <div class="w-90 max-w-full">
+              <NInput
+                :status="
+                  tempText.length === 0 && ams.settings.autoReplyEnabled ? 'warning' : 'success'
+                "
+                class="w-full!"
+                v-model:value="tempText"
+                :disabled="isSavingAutoReplyText"
+                @blur="handleSaveText"
+                :autosize="{
+                  minRows: 2,
+                  maxRows: 4
+                }"
+                type="textarea"
+                size="small"
+              ></NInput>
+              <div class="mt-1 flex justify-end">
+                <NButton
+                  :loading="isSavingAutoReplyText"
+                  @mousedown.prevent
+                  @click="handleSaveText"
+                  type="primary"
+                  size="small"
+                  :disabled="isSavingAutoReplyText || !isAutoReplyTextDirty"
+                  >{{ t('AutoMisc.autoReply.text.save') }}</NButton
+                >
+              </div>
+            </div>
           </SettingsRow>
         </SettingsSection>
 
@@ -149,7 +166,16 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { Search as SearchIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInput, NScrollbar, NSwitch, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NCheckbox,
+  NIcon,
+  NInput,
+  NScrollbar,
+  NSwitch,
+  NTooltip,
+  useMessage
+} from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-data/store'
@@ -166,10 +192,21 @@ const lcs = useLeagueClientStore()
 
 const message = useMessage()
 const tempText = ref('')
+const isSavingAutoReplyText = ref(false)
+const isAutoReplyTextDirty = computed(() => tempText.value !== ams.settings.autoReplyText)
 
 const handleSaveText = async () => {
-  await am.setAutoReplyText(tempText.value)
-  message.success(() => t('AutoMisc.autoReply.updated'))
+  if (isSavingAutoReplyText.value || !isAutoReplyTextDirty.value) {
+    return
+  }
+
+  try {
+    isSavingAutoReplyText.value = true
+    await am.setAutoReplyText(tempText.value)
+    message.success(() => t('AutoMisc.autoReply.updated'))
+  } finally {
+    isSavingAutoReplyText.value = false
+  }
 }
 
 watchEffect(() => {

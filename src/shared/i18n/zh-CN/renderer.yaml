@@ -980,6 +980,7 @@ AutoMisc:
     text:
       label: 回复内容
       description: 将作为自动回复的内容词
+      save: 保存
 
   autoInvitation:
     title: 邀请好友进入房间
