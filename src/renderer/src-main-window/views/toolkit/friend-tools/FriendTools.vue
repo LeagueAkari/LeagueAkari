@@ -180,11 +180,11 @@ const renderGroupName = (row: any) => {
 
   return (
     <div
-      class="inline-flex cursor-pointer items-center gap-1 text-sm"
+      class="inline-flex max-w-[calc(100%-40px)] cursor-pointer items-center gap-1 overflow-hidden align-middle text-sm"
       onClick={() => navigateToTabByPuuid(row.puuid)}
     >
-      <LcuImage class="size-[18px]" src={profileIconUri(row.icon)} />
-      <NEllipsis class="max-w-40">{row.name}</NEllipsis>
+      <LcuImage class="size-[18px] shrink-0" src={profileIconUri(row.icon)} />
+      <NEllipsis class="max-w-40 min-w-0">{row.name}</NEllipsis>
     </div>
   )
 }
@@ -210,6 +210,7 @@ const columns = computed<DataTableColumns<any>>(() => [
   {
     title: () => t('FriendTools.columns.groupName'),
     key: 'name',
+    className: 'whitespace-nowrap',
     render: (row) => renderGroupName(row)
   },
   {
