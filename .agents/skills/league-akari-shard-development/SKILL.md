@@ -35,6 +35,11 @@ These rules are hard requirements for any newly created shard and for any featur
 - For refactors, do not split files under 500 lines unless the user explicitly asks or there is a correctness reason.
 - For new shards, do not start with a giant `index.ts`. Add structure only where it has a real boundary.
 - Do not split a coherent flow just because it is long. A clear state-sync pipeline can stay together.
+- Do not create tiny `*-controller.ts`, `*-executor.ts`, or helper files merely because two branches
+  have different conceptual responsibilities. When the code is still small and tightly owned by one
+  feature, keep the distinction as clearly named private methods in the existing module. Extract a
+  new file only when it owns enough behavior, lifecycle, state, platform guarding, or tests to be
+  worth the extra navigation.
 - Prefer mechanical extraction before behavior changes.
 - Use full descriptive names:
   - `remoteConfig`, not `rc`
@@ -181,7 +186,9 @@ or renderer UI tied to the shard.
   queue tags, reload methods, and normalizing loaded data before handing it to a controller.
 - `*-executor.ts`: one imperative operation that may fail, be canceled, or need a structured result.
   Use this for process launches, filesystem writes, downloads, apply/uninstall actions, and other
-  command-like side effects.
+  command-like side effects. Do not extract a separate executor for a few lines of implementation
+  that are only called by one existing executor; prefer a private method unless the extracted
+  operation has meaningful independent size, ownership, or focused tests.
 - `*-component.tsx` or a descriptive `.vue` file: renderer component colocated with a shard. Do not
   use `comp.tsx`.
 - `*-notification.tsx`, `*-modal.tsx`, `*-dialogs.tsx`: renderer notification/modal/dialog modules
@@ -240,6 +247,8 @@ Use role-based, fully spelled names:
 
 Choose names in this order:
 
+0. First decide whether a new file is warranted. A small, single-owner branch inside an existing
+   executor/controller should usually become a private method, not a new module.
 1. If it is the shard entry, use `index.ts`.
 2. If it owns MobX state/settings or a Pinia store, use `state.ts` or `store.ts`.
 3. If it only registers IPC, use `ipc-handlers.ts`.
