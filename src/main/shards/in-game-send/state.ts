@@ -1,8 +1,15 @@
+import {
+  type InGameSendPresetOptions,
+  type InGameSendPresetOptionsPatch,
+  createDefaultInGameSendPresetOptions,
+  normalizeInGameSendPresetOptions
+} from '@shared/types/shards/in-game-send'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class InGameSendSettings {
   cancelShortcut: string | null = null
   sendInterval: number = 65
+  presetOptions: InGameSendPresetOptions = createDefaultInGameSendPresetOptions()
 
   setCancelShortcut(shortcut: string | null) {
     this.cancelShortcut = shortcut
@@ -12,8 +19,14 @@ export class InGameSendSettings {
     this.sendInterval = interval
   }
 
+  setPresetOptions(options: InGameSendPresetOptionsPatch | null | undefined) {
+    this.presetOptions = normalizeInGameSendPresetOptions(options)
+  }
+
   constructor() {
-    makeAutoObservable(this, {})
+    makeAutoObservable(this, {
+      presetOptions: observable.ref
+    })
   }
 }
 

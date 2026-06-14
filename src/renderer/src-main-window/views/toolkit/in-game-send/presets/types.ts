@@ -1,61 +1,48 @@
-import type { InGameSendPresetId, InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
-import type { Component } from 'vue'
+import type { InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
 
 export type GamePhase = 'none' | 'lobby' | 'champ-select' | 'in-game' | 'draft'
-export type PresetId = InGameSendPresetId
+export type PresetSlot = 'rating' | 'jungle' | 'premade'
 export type PresetTargetId = InGameSendPresetTarget
-export type PlayerSelectionPresetId = Extract<PresetId, 'rating' | 'jungle'>
 
-export interface PresetTarget {
-  id: PresetTargetId
+export interface PresetDisplayOption<T extends string> {
   label: string
+  value: T
   description: string
-  buttonType: 'error' | 'primary' | 'default'
-  icon: Component
-}
-
-export interface Preset {
-  id: PresetId
-  label: string
-  description: string
-  hasTeamSelection?: boolean
 }
 
 export interface PreviewedLines {
-  presetId: PresetId
-  preset: string
-  target: string
+  targetId: PresetTargetId
   lines: string[]
 }
 
-export type PreviewedLinesByPresetId = Record<PresetId, PreviewedLines | null>
-
-export interface DemoPlayer {
+export interface InGameSendPlayer {
   puuid: string
   championId: number
+  hasChampionSelection: boolean
+  profileIconId: number
   gameName: string
   tagLine: string
   premadeGroup?: number
 }
 
-export interface DemoTeam {
+export interface InGameSendTeam {
   id: string
   label: string
   primaryLabel: string
   secondaryLabel?: string
   indicatorColorClass: string | null
-  players: DemoPlayer[]
+  players: InGameSendPlayer[]
 }
 
 export interface PremadeBucket {
   key: string
   groupIndex: number
   groupLetter: string
-  players: DemoPlayer[]
+  players: InGameSendPlayer[]
 }
 
 export interface PremadeTeamView {
-  team: DemoTeam
+  team: InGameSendTeam
   groups: PremadeBucket[]
 }
 

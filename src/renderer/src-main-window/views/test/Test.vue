@@ -13,7 +13,6 @@
 import { ToolFilled } from '@vicons/antd'
 import {
   ArrowSync24Filled,
-  ChatMultiple24Filled,
   DataUsage24Filled,
   DocumentText24Filled,
   Filter20Regular,
@@ -24,7 +23,6 @@ import { computed } from 'vue'
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
 import GameDataTest from './GameDataTest.vue'
-import InGameSendPresetsTest from './in-game-send-presets-test'
 import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
 import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'
@@ -60,12 +58,6 @@ const tabs = computed<TabConfig[]>(() => [
     name: '快捷键系统',
     icon: Keyboard24Regular,
     component: KeyboardShortcutsTest
-  },
-  {
-    key: 'in-game-send-presets',
-    name: '预设发送',
-    icon: ChatMultiple24Filled,
-    component: InGameSendPresetsTest
   }
 ])
 </script>

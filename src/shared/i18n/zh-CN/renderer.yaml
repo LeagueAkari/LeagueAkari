@@ -792,7 +792,7 @@ AutoGameflow:
   autoAcceptEnabled:
     label: 自动接受对局开启
     description: 当匹配到玩家时，自动确认
-    footer: 部分服务器或排位赛分段根据服务器策略，可能已经强制启用自动接受，和 League Akari 无关
+    footer: 部分服务器或排位赛分段根据服务器策略，可能已经强制启用自动接受，和 $t(common:appName) 无关
   autoAcceptDelaySeconds:
     label: 自动接受对局延时 (s)
     description: 在可接受时延迟执行接受操作的时间，单位为秒
@@ -3246,6 +3246,114 @@ InGameSend:
     sendInterval:
       label: 发送间隔 (ms)
       description: 模拟发送时的间隔时间
+  presets:
+    title: 预设发送
+    footer:
+      shortcutUnavailable: 当前「快捷键」不可用，{{reason}}。
+      shortcutUsage: 如果设置了「快捷键」，则可在英雄选择 / 房间阶段发送在聊天中，或在游戏进行阶段且位于前台时以模拟键盘输入的方式发送在游戏中。
+      draftOnly: 草稿模式仅支持试运行，不会发送到聊天或游戏。
+    nativeInput:
+      needAdmin: 请以管理员权限启动
+      unsupported: 当前平台不支持
+      unavailable: 当前不可用
+    teams:
+      friendly: 我方
+      enemy: 敌方
+      labelWithName: '{{side}} · {{team}}'
+    targets:
+      friendly:
+        label: 发送我方
+        description: 发送的对象是我方已选成员
+      enemy:
+        label: 发送敌方
+        description: 发送的对象是敌方已选成员
+      all:
+        label: 发送全体
+        description: 发送的对象是双方已选成员
+    controls:
+      shortcut: 快捷键
+      sendToGame: 发送到游戏
+      sendToChat: 发送到聊天
+      send: 发送
+      dryRun: 试运行
+      dryRunDescription: 生成发送内容并在下方预览，不会写入客户端
+      sendSucceeded: 已提交发送 ({{preset}} → {{target}})
+      disabled:
+        draftOnly: 草稿模式仅支持试运行
+        unavailable: 仅可在英雄选择、房间或游戏内使用
+    preview:
+      title: 试运行 ({{preset}} → {{target}})
+      close: 关闭
+    selection:
+      playersTitle: 发送的目标 ({{selected}} / {{total}})
+      premadeTitle: 选中的小队 ({{selected}} / {{total}})
+      selectAll: 全选
+      clear: 清空
+      groupCount_one: '{{count}} 组开黑'
+      groupCount_other: '{{count}} 组开黑'
+      emptyPremadeGroups: 无开黑组合
+      bucketSize: '{{count}} 黑'
+    rating:
+      label: 表现评分
+      description: 统计每位玩家近期表现，输出 KDA/胜率/评分综合数据。
+      displayOptionsTitle: 展示元素
+      displayOptions:
+        kda:
+          label: KDA
+          description: 击杀 / 死亡 / 助攻表现
+        winRate:
+          label: 胜率
+          description: 近期对局胜率
+        akariScore:
+          label: Akari Score
+          description: Akari 综合评分
+        gameCount:
+          label: 统计场次
+          description: 纳入统计的对局数量
+        soloKills:
+          label: 单杀次数
+          description: 近期单杀表现
+        killParticipation:
+          label: 参团率
+          description: 团战参与程度
+        damagePerMinute:
+          label: 分均伤害
+          description: 输出能力概览
+        damageTakenShare:
+          label: 承伤占比
+          description: 前排与抗压指标
+    jungle:
+      label: 打野偏好
+      description: 展示打野选手的偏好路径、入侵倾向与开野侧。
+      displayOptionsTitle: 展示模块
+      displayOptions:
+        firstClearRoute:
+          label: 开野路线
+          description: 首轮刷野路线
+        firstClearSide:
+          label: 首轮野区
+          description: 偏上半区或下半区
+        gankLanes:
+          label: Gank 偏好
+          description: 常照顾的分路
+        invadeTendency:
+          label: 入侵倾向
+          description: 主动进野区频率
+        scuttleControl:
+          label: 河蟹控制
+          description: 前期河道控制情况
+        objectivePriority:
+          label: 资源优先级
+          description: 小龙 / 虚空资源偏好
+        counterJungleRisk:
+          label: 反野风险
+          description: 容易被入侵的时间窗
+        duoLaneLink:
+          label: 联动对象
+          description: 常联动队友
+    premade:
+      label: 组队状况
+      description: 识别队伍内开黑组合，按组别展示成员。
 
 ChampionConfig:
   targetMode: 目标模式

@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
-      <div class="mx-auto max-w-[800px] p-6">
+      <div class="mx-auto max-w-200 p-6">
         <SettingsSection :title="t('FriendTools.title')">
           <div class="p-3">
             <div class="mb-2 flex flex-wrap gap-1">
@@ -183,7 +183,7 @@ const renderGroupName = (row: any) => {
       class="inline-flex max-w-[calc(100%-40px)] cursor-pointer items-center gap-1 overflow-hidden align-middle text-sm"
       onClick={() => navigateToTabByPuuid(row.puuid)}
     >
-      <LcuImage class="size-[18px] shrink-0" src={profileIconUri(row.icon)} />
+      <LcuImage class="size-4.5 shrink-0" src={profileIconUri(row.icon)} />
       <NEllipsis class="max-w-40 min-w-0">{row.name}</NEllipsis>
     </div>
   )

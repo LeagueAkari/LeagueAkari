@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { normalizeInGameSendPresetOptions } from '@shared/types/shards/in-game-send'
 
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
@@ -68,7 +69,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       InGameSendMain.id,
       {
         sendInterval: { default: this.settings.sendInterval },
-        cancelShortcut: { default: this.settings.cancelShortcut }
+        cancelShortcut: { default: this.settings.cancelShortcut },
+        presetOptions: { default: this.settings.presetOptions }
       },
       this.settings
     )
@@ -106,10 +108,12 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
   private async _setupState() {
     await this._settingService.applyToState()
+    this.settings.setPresetOptions(this.settings.presetOptions)
 
     this._mobxUtils.propSync(InGameSendMain.id, 'settings', this.settings, [
       'sendInterval',
-      'cancelShortcut'
+      'cancelShortcut',
+      'presetOptions'
     ])
 
     this._mobxUtils.propSync(InGameSendMain.id, 'state', this.state, [
@@ -125,12 +129,17 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
       return setter(value)
     })
+
+    this._settingService.onChange('presetOptions', (value, { setter }) => {
+      return setter(normalizeInGameSendPresetOptions(value))
+    })
   }
 
   async onInit() {
     await this._setupState()
 
     this._sendExecutor.watchCancelShortcut()
+    this._presetController.start()
     this._presetSelectionController.start()
     this._ipcHandlers.register()
   }

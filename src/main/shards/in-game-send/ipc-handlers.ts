@@ -1,4 +1,9 @@
-import type { InGameSendPresetId, InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
+import type {
+  InGameSendPresetId,
+  InGameSendPresetOptionPatch,
+  InGameSendPresetOptions,
+  InGameSendPresetTarget
+} from '@shared/types/shards/in-game-send'
 
 import { IN_GAME_SEND_MAIN_NAMESPACE, type InGameSendMainContext } from './context'
 import type { InGameSendPresetController } from './preset-controller'
@@ -43,6 +48,22 @@ export class InGameSendIpcHandlers {
       'sendPreset',
       (_, presetId: InGameSendPresetId, target: InGameSendPresetTarget) => {
         return this._presetController.sendPreset(presetId, target)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'setPresetOptions',
+      (_, options: InGameSendPresetOptions) => {
+        return this._presetController.setPresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updatePresetOptions',
+      (_, presetId: InGameSendPresetId, options: InGameSendPresetOptionPatch) => {
+        return this._presetController.updatePresetOptions(presetId, options)
       }
     )
 

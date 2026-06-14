@@ -6,9 +6,14 @@
       >
         <div class="mb-1.5 flex items-center justify-between">
           <div class="font-semibold opacity-80">
-            试运行 ({{ previewedLines?.preset }} → {{ previewedLines?.target }})
+            {{
+              t('title', {
+                preset: props.presetLabel,
+                target: previewTargetLabel
+              })
+            }}
           </div>
-          <NButton size="tiny" quaternary @click="closePreview()">关闭</NButton>
+          <NButton size="tiny" quaternary @click="closePreview()">{{ t('close') }}</NButton>
         </div>
         <div class="flex flex-col gap-1 font-mono">
           <div
@@ -28,9 +33,27 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCollapseTransition } from 'naive-ui'
+import { computed } from 'vue'
 
-import { useCurrentPreset } from './context'
+import type { PresetScopeContext } from '../data/shared'
+import { usePresetTargets } from './usePresetTargets'
 
-const { previewedLines, closePreview } = useCurrentPreset()
+const props = defineProps<{
+  preset: PresetScopeContext
+  presetLabel: string
+}>()
+
+const { previewedLines, closePreview } = props.preset
+const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.preview' })
+
+const targets = usePresetTargets()
+
+const previewTargetLabel = computed(() => {
+  const preview = previewedLines.value
+  if (!preview) return ''
+
+  return targets.value.find((target) => target.id === preview.targetId)?.label ?? preview.targetId
+})
 </script>

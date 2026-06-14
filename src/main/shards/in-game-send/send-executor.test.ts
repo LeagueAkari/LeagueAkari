@@ -124,6 +124,9 @@ describe('InGameSendExecutor', () => {
 
     expect(chatSend).toHaveBeenCalledTimes(1)
     expect(chatSend).toHaveBeenCalledWith('champ-select-chat', 'one\ntwo')
+    expect(context.isGameClientForeground).not.toHaveBeenCalled()
+    expect(nativeInputMock.instance.sendString).not.toHaveBeenCalled()
+    expect(sleepMock.sleep).not.toHaveBeenCalled()
   })
 
   it('sends one newline-joined message during lobby phase', async () => {
@@ -134,6 +137,9 @@ describe('InGameSendExecutor', () => {
 
     expect(chatSend).toHaveBeenCalledTimes(1)
     expect(chatSend).toHaveBeenCalledWith('lobby-chat', 'one\ntwo')
+    expect(context.isGameClientForeground).not.toHaveBeenCalled()
+    expect(nativeInputMock.instance.sendString).not.toHaveBeenCalled()
+    expect(sleepMock.sleep).not.toHaveBeenCalled()
   })
 
   it('silently skips lobby sending when there is no lobby chat room', async () => {

@@ -1,5 +1,14 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import type { InGameSendPresetId, InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
+import {
+  type InGameSendJunglePresetOptions,
+  type InGameSendPremadePresetOptions,
+  type InGameSendPresetId,
+  type InGameSendPresetOptionPatch,
+  type InGameSendPresetOptions,
+  type InGameSendPresetTarget,
+  type InGameSendRatingPresetOptions,
+  getInGameSendPresetShortcutTargetId
+} from '@shared/types/shards/in-game-send'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -18,6 +27,18 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   static id = IN_GAME_SEND_RENDERER_NAMESPACE
 
   static CANCEL_SHORTCUT_TARGET_ID = `${IN_GAME_SEND_MAIN_NAMESPACE}/cancel`
+
+  static getRatingPresetShortcutTargetId(target: InGameSendPresetTarget) {
+    return getInGameSendPresetShortcutTargetId('rating', target)
+  }
+
+  static getJunglePresetShortcutTargetId(target: InGameSendPresetTarget) {
+    return getInGameSendPresetShortcutTargetId('jungle', target)
+  }
+
+  static getPremadePresetShortcutTargetId(target: InGameSendPresetTarget) {
+    return getInGameSendPresetShortcutTargetId('premade', target)
+  }
 
   private readonly _context: InGameSendRendererContext
 
@@ -54,8 +75,67 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generatePresetLines', presetId, target)
   }
 
+  generateRatingPresetLines(target: InGameSendPresetTarget) {
+    return this.generatePresetLines('rating', target)
+  }
+
+  generateJunglePresetLines(target: InGameSendPresetTarget) {
+    return this.generatePresetLines('jungle', target)
+  }
+
+  generatePremadePresetLines(target: InGameSendPresetTarget) {
+    return this.generatePresetLines('premade', target)
+  }
+
   sendPreset(presetId: InGameSendPresetId, target: InGameSendPresetTarget) {
     return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendPreset', presetId, target)
+  }
+
+  sendRatingPreset(target: InGameSendPresetTarget) {
+    return this.sendPreset('rating', target)
+  }
+
+  sendJunglePreset(target: InGameSendPresetTarget) {
+    return this.sendPreset('jungle', target)
+  }
+
+  sendPremadePreset(target: InGameSendPresetTarget) {
+    return this.sendPreset('premade', target)
+  }
+
+  setPresetOptions(options: InGameSendPresetOptions) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPresetOptions', options)
+  }
+
+  updatePresetOptions<P extends InGameSendPresetId>(
+    presetId: P,
+    options: InGameSendPresetOptionPatch<P>
+  ) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePresetOptions', presetId, options)
+  }
+
+  updateRatingPresetOptions(options: InGameSendPresetOptionPatch<'rating'>) {
+    return this.updatePresetOptions('rating', options)
+  }
+
+  updateJunglePresetOptions(options: InGameSendPresetOptionPatch<'jungle'>) {
+    return this.updatePresetOptions('jungle', options)
+  }
+
+  updatePremadePresetOptions(options: InGameSendPresetOptionPatch<'premade'>) {
+    return this.updatePresetOptions('premade', options)
+  }
+
+  setRatingPresetOptions(options: InGameSendRatingPresetOptions) {
+    return this.updateRatingPresetOptions(options)
+  }
+
+  setJunglePresetOptions(options: InGameSendJunglePresetOptions) {
+    return this.updateJunglePresetOptions(options)
+  }
+
+  setPremadePresetOptions(options: InGameSendPremadePresetOptions) {
+    return this.updatePremadePresetOptions(options)
   }
 
   setRatingPuuids(puuids: string[]) {

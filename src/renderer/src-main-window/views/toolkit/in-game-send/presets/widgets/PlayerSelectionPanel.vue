@@ -2,13 +2,18 @@
   <div v-if="totalCount > 0" class="flex flex-col gap-2 pt-3">
     <div class="flex items-center justify-between">
       <div class="text-xs font-semibold text-black/70 dark:text-white/70">
-        发送的目标 ({{ selectedCount }} / {{ totalCount }})
+        {{ t('playersTitle', { selected: selectedCount, total: totalCount }) }}
       </div>
       <div class="flex items-center gap-1">
-        <NButton size="tiny" quaternary @click="setAllSelected(true)"> 全选 </NButton>
-        <NButton size="tiny" quaternary @click="setAllSelected(false)"> 清空 </NButton>
+        <NButton size="tiny" quaternary @click="setAllSelected(true)">
+          {{ t('selectAll') }}
+        </NButton>
+        <NButton size="tiny" quaternary @click="setAllSelected(false)">
+          {{ t('clear') }}
+        </NButton>
       </div>
     </div>
+
     <div class="grid grid-cols-2 gap-3">
       <div
         v-for="team of teams"
@@ -32,15 +37,19 @@
               ({{ selectedInTeam(team.id) }}/{{ team.players.length }})
             </span>
           </div>
+
           <NCheckbox
             size="small"
             :checked="isTeamAllSelected(team.id)"
             :indeterminate="isTeamIndeterminate(team.id)"
             @update:checked="(value) => setTeamSelected(team.id, value)"
           >
-            <span class="text-[11px] text-black/55 dark:text-white/55">全选</span>
+            <span class="text-[11px] text-black/55 dark:text-white/55">
+              {{ t('selectAll') }}
+            </span>
           </NCheckbox>
         </div>
+
         <div class="flex flex-col gap-1">
           <div
             v-for="player of team.players"
@@ -55,7 +64,19 @@
                 @update:checked="(value) => setPlayerSelected(player.puuid, value)"
               />
             </span>
-            <ChampionIcon class="size-6 shrink-0" round :champion-id="player.championId" />
+
+            <ChampionIcon
+              v-if="player.hasChampionSelection"
+              class="size-6 shrink-0"
+              round
+              :champion-id="player.championId"
+            />
+            <LcuImage
+              v-else
+              class="size-6 shrink-0 rounded-full"
+              :src="profileIconUri(player.profileIconId)"
+            />
+
             <div class="flex min-w-0 flex-1 items-baseline gap-0.5 text-[12px] leading-none">
               <span class="truncate font-medium text-black/85 dark:text-white/85">
                 {{ player.gameName }}
@@ -75,10 +96,19 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox } from 'naive-ui'
 
-import { usePlayerSelectionPreset } from './context'
+import type { PlayerSelectionPresetContext } from '../composables/usePresetSelections'
+
+const props = defineProps<{
+  selection: PlayerSelectionPresetContext
+}>()
+
+const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.selection' })
 
 const {
   totalCount,
@@ -91,5 +121,5 @@ const {
   setTeamSelected,
   setPlayerSelected,
   setAllSelected
-} = usePlayerSelectionPreset()
+} = props.selection
 </script>

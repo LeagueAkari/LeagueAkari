@@ -3275,6 +3275,114 @@ InGameSend:
     sendInterval:
       label: Send Interval (ms)
       description: Set the interval between each simulated sending action
+  presets:
+    title: Preset Send
+    footer:
+      shortcutUnavailable: Shortcuts are currently unavailable, {{reason}}.
+      shortcutUsage: When a shortcut is configured, it can send to chat during champion select or lobby, or simulate keyboard input in-game while the game is in the foreground.
+      draftOnly: Draft mode only supports dry run and will not send to chat or game.
+    nativeInput:
+      needAdmin: start as administrator
+      unsupported: unsupported on the current platform
+      unavailable: currently unavailable
+    teams:
+      friendly: Allied
+      enemy: Enemy
+      labelWithName: '{{side}} · {{team}}'
+    targets:
+      friendly:
+        label: Send Allies
+        description: Send selected allied players
+      enemy:
+        label: Send Enemies
+        description: Send selected enemy players
+      all:
+        label: Send All
+        description: Send selected players from both teams
+    controls:
+      shortcut: Shortcut
+      sendToGame: Send to Game
+      sendToChat: Send to Chat
+      send: Send
+      dryRun: Dry Run
+      dryRunDescription: Generate lines and preview them below without writing to the client.
+      sendSucceeded: Submitted send ({{preset}} → {{target}})
+      disabled:
+        draftOnly: Draft mode only supports dry run.
+        unavailable: Available only in champion select, lobby, or in-game.
+    preview:
+      title: Dry Run ({{preset}} → {{target}})
+      close: Close
+    selection:
+      playersTitle: Send targets ({{selected}} / {{total}})
+      premadeTitle: Selected premade groups ({{selected}} / {{total}})
+      selectAll: Select All
+      clear: Clear
+      groupCount_one: '{{count}} premade group'
+      groupCount_other: '{{count}} premade groups'
+      emptyPremadeGroups: No premade groups
+      bucketSize: '{{count}}-stack'
+    rating:
+      label: Performance Rating
+      description: Summarize recent performance for each player with KDA, win rate, and Akari Score.
+      displayOptionsTitle: Display Items
+      displayOptions:
+        kda:
+          label: KDA
+          description: Kills / deaths / assists performance
+        winRate:
+          label: Win Rate
+          description: Recent match win rate
+        akariScore:
+          label: Akari Score
+          description: Akari composite score
+        gameCount:
+          label: Game Count
+          description: Number of matches included
+        soloKills:
+          label: Solo Kills
+          description: Recent solo-kill performance
+        killParticipation:
+          label: Kill Participation
+          description: Teamfight participation
+        damagePerMinute:
+          label: Damage Per Minute
+          description: Damage output overview
+        damageTakenShare:
+          label: Damage Taken Share
+          description: Frontline and pressure indicator
+    jungle:
+      label: Jungle Preference
+      description: Show jungler pathing preference, invade tendency, and first-clear side.
+      displayOptionsTitle: Display Modules
+      displayOptions:
+        firstClearRoute:
+          label: First Clear Route
+          description: First clear path
+        firstClearSide:
+          label: First Clear Side
+          description: Upper-side or lower-side preference
+        gankLanes:
+          label: Gank Preference
+          description: Frequently visited lanes
+        invadeTendency:
+          label: Invade Tendency
+          description: Enemy jungle invade frequency
+        scuttleControl:
+          label: Scuttle Control
+          description: Early river control
+        objectivePriority:
+          label: Objective Priority
+          description: Dragon / Void objective preference
+        counterJungleRisk:
+          label: Counter-Jungle Risk
+          description: Windows vulnerable to invades
+        duoLaneLink:
+          label: Linked Teammate
+          description: Commonly linked teammate
+    premade:
+      label: Premade Status
+      description: Identify premade groups in each team and show members by group.
 
 ChampionConfig:
   targetMode: Target Mode

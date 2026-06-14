@@ -1,5 +1,8 @@
 import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
-import type { InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
+import type {
+  InGameSendPresetOptions,
+  InGameSendPresetTarget
+} from '@shared/types/shards/in-game-send'
 import type { AdditionalResult } from '@shared/types/shards/ongoing-game'
 
 import type { InGameSendMainContext } from '../context'
@@ -24,5 +27,6 @@ export interface InGameSendPresetTeam {
 
 export interface InGameSendPresetContext {
   target: InGameSendPresetTarget
+  presetOptions: InGameSendPresetOptions
   mainContext: InGameSendMainContext
 }

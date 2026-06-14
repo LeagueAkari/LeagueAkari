@@ -1,3 +1,4 @@
+import { createDefaultInGameSendPresetOptions } from '@shared/types/shards/in-game-send'
 import { describe, expect, it } from 'vitest'
 
 import { buildInGameSendPresetLines } from './index'
@@ -6,6 +7,7 @@ import type { InGameSendPresetContext } from './types'
 function createContext(): InGameSendPresetContext {
   return {
     target: 'friendly',
+    presetOptions: createDefaultInGameSendPresetOptions(),
     mainContext: {
       state: {
         ratingPuuids: ['p1', 'p2'],
