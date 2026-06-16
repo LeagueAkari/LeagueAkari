@@ -1,13 +1,6 @@
+import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
 import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
-
-/**
- * 主窗口关闭策略
- * - minimize-to-tray: 最小化到托盘
- * - quit: 退出应用
- * - ask: 询问用户
- */
-export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
 
 /**
  * 分离设置项到独立的类
