@@ -1,5 +1,10 @@
 <template>
-  <section class="settings-section">
+  <section
+    class="settings-section"
+    :class="{
+      'settings-section--no-bg': noBg
+    }"
+  >
     <header class="settings-section-header">
       <slot name="header">
         <span class="settings-section-title">{{ title }}</span>
@@ -16,6 +21,7 @@
 
 <script setup lang="ts">
 defineProps<{
+  noBg?: boolean
   title?: string
   footer?: string
 }>()
@@ -33,6 +39,7 @@ defineProps<{
 
   .settings-section-header {
     padding-left: var(--settings-row-x-padding);
+    padding-right: var(--settings-row-x-padding);
 
     @apply mb-2;
   }
@@ -42,7 +49,11 @@ defineProps<{
   }
 
   .settings-section-body {
-    @apply w-full max-w-full overflow-hidden rounded-lg bg-black/5 dark:bg-white/8;
+    @apply w-full max-w-full overflow-hidden rounded-lg;
+  }
+
+  .settings-section:not(.settings-section--no-bg) .settings-section-body {
+    @apply bg-black/5 dark:bg-white/8;
   }
 
   .settings-section-footer {

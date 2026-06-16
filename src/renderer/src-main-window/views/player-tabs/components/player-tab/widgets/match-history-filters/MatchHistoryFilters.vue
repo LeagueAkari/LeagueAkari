@@ -75,51 +75,50 @@
         </div>
 
         <div class="mb-3">
-          <ControlItem
-            class="control-item-margin"
-            :label="t('PlayerTab.collectMode.countPerIterationLabel')"
-            :label-description="t('PlayerTab.collectMode.countPerIterationDescription')"
-            :label-width="400"
-          >
-            <NInputNumber
-              :step="5"
-              :max="200"
-              :min="1"
-              style="width: 160px"
-              size="small"
-              v-model:value="collectModeSettings.countPerIteration"
-            />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('PlayerTab.collectMode.expectedCountLabel')"
-            :label-description="t('PlayerTab.collectMode.expectedCountDescription')"
-            :label-width="400"
-          >
-            <NInputNumber
-              :step="5"
-              :max="1000"
-              :min="1"
-              style="width: 160px"
-              size="small"
-              v-model:value="collectModeSettings.expectedCount"
-            />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('PlayerTab.collectMode.maxIterationLabel')"
-            :label-description="t('PlayerTab.collectMode.maxIterationDescription')"
-            :label-width="400"
-          >
-            <NInputNumber
-              :step="1"
-              :max="100"
-              :min="1"
-              style="width: 160px"
-              size="small"
-              v-model:value="collectModeSettings.maxIteration"
-            />
-          </ControlItem>
+          <SettingsSection>
+            <SettingsRow
+              :label="t('PlayerTab.collectMode.countPerIterationLabel')"
+              :label-description="t('PlayerTab.collectMode.countPerIterationDescription')"
+              :label-width="400"
+            >
+              <NInputNumber
+                :step="5"
+                :max="200"
+                :min="1"
+                style="width: 160px"
+                size="small"
+                v-model:value="collectModeSettings.countPerIteration"
+              />
+            </SettingsRow>
+            <SettingsRow
+              :label="t('PlayerTab.collectMode.expectedCountLabel')"
+              :label-description="t('PlayerTab.collectMode.expectedCountDescription')"
+              :label-width="400"
+            >
+              <NInputNumber
+                :step="5"
+                :max="1000"
+                :min="1"
+                style="width: 160px"
+                size="small"
+                v-model:value="collectModeSettings.expectedCount"
+              />
+            </SettingsRow>
+            <SettingsRow
+              :label="t('PlayerTab.collectMode.maxIterationLabel')"
+              :label-description="t('PlayerTab.collectMode.maxIterationDescription')"
+              :label-width="400"
+            >
+              <NInputNumber
+                :step="1"
+                :max="100"
+                :min="1"
+                style="width: 160px"
+                size="small"
+                v-model:value="collectModeSettings.maxIteration"
+              />
+            </SettingsRow>
+          </SettingsSection>
         </div>
 
         <div class="flex justify-end gap-2">
@@ -141,7 +140,8 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { Filter20Regular, Info16Regular } from '@vicons/fluent'
 import { RefreshFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'

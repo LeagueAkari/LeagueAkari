@@ -1,41 +1,35 @@
 <template>
   <div
-    class="box-border size-full overflow-hidden rounded-lg bg-neutral-100 p-5 dark:bg-neutral-800"
+    class="box-border size-full overflow-hidden rounded-lg bg-neutral-100 py-4 px-2 dark:bg-neutral-800"
   >
-    <!-- header -->
-    <div class="flex items-center justify-between">
-      <span class="text-2xl font-bold text-black dark:text-white">{{
-        t('OpggView.settings.title')
-      }}</span>
-      <div
-        class="flex size-9 cursor-pointer items-center justify-center rounded-md text-[22px] transition-colors hover:bg-black/10 active:bg-black/8 dark:hover:bg-white/10 dark:active:bg-white/8"
-        @click="emits('close')"
-      >
-        <NIcon>
-          <Close />
-        </NIcon>
-      </div>
-    </div>
-
-    <!-- settings -->
-    <div class="mt-6">
-      <ControlItem
-        class="control-item-margin justify-between"
+    <SettingsSection no-bg>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold text-black/80 dark:text-white/90">
+            {{ t('OpggView.settings.title') }}
+          </span>
+          <NIcon
+            class="cursor-pointer rounded text-lg text-black/50 transition-colors hover:bg-black/8 hover:text-black/80 dark:text-white/50 hover:dark:bg-white/8 dark:hover:text-white/80"
+            @click="$emit('close')"
+          >
+            <Close />
+          </NIcon>
+        </div>
+      </template>
+      <SettingsRow
         :label="t('OpggView.settings.enabled.label')"
         :label-description="t('OpggView.settings.enabled.description')"
-        :label-width="300"
       >
         <NSwitch
           @update:value="(val) => wm.opggWindow.setEnabled(val)"
           :value="ows.settings.enabled"
           size="small"
         />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin justify-between"
+      </SettingsRow>
+      <SettingsRow
         :label="t('OpggView.settings.flashPosition.label')"
         :label-description="t('OpggView.settings.flashPosition.description')"
-        :label-width="300"
+        align="start"
       >
         <NRadioGroup size="small" :value="flashPosition" @update:value="setFlashPosition">
           <div class="flex flex-col gap-1">
@@ -46,38 +40,33 @@
             </NRadio>
           </div>
         </NRadioGroup>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin justify-between"
+      </SettingsRow>
+      <SettingsRow
         :label="t('OpggView.settings.autoApplyRunes.label')"
         :label-description="t('OpggView.settings.autoApplyRunes.description')"
-        :label-width="300"
       >
         <NSwitch v-model:value="os.frontendSettings.autoApplyRunes" size="small" />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin justify-between"
+      </SettingsRow>
+      <SettingsRow
         :label="t('OpggView.settings.autoApplySpells.label')"
         :label-description="t('OpggView.settings.autoApplySpells.description')"
-        :label-width="300"
       >
         <NSwitch v-model:value="os.frontendSettings.autoApplySpells" size="small" />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin justify-between"
+      </SettingsRow>
+      <SettingsRow
         :label="t('OpggView.settings.autoApplyItems.label')"
         :label-description="t('OpggView.settings.autoApplyItems.description')"
-        :label-width="300"
       >
         <NSwitch v-model:value="os.frontendSettings.autoApplyItems" size="small" />
-      </ControlItem>
-    </div>
+      </SettingsRow>
+    </SettingsSection>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
