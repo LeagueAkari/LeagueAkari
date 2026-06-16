@@ -50,7 +50,6 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       AppCommonMain.id,
       {
-        isInKyokoMode: { default: this.settings.isInKyokoMode },
         showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
         locale: { default: this._getSystemLocale() },
         theme: { default: this.settings.theme },
@@ -185,7 +184,6 @@ export class AppCommonMain implements IAkariShardInitDispose {
     await this._settingService.applyToState()
 
     this._mobxUtils.propSync(AppCommonMain.id, 'settings', this.settings, [
-      'isInKyokoMode',
       'showFreeSoftwareDeclaration',
       'locale',
       'theme',

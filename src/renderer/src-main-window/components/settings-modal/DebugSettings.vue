@@ -239,17 +239,6 @@
             @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
           />
         </SettingsRow>
-        <SettingsRow
-          :label="t('DebugSettings.kyokoMode.label')"
-          :label-description="t('DebugSettings.kyokoMode.description')"
-          :label-width="400"
-        >
-          <NSwitch
-            size="small"
-            :value="as.settings.isInKyokoMode"
-            @update:value="(val: boolean) => app.setInKyokoMode(val)"
-          />
-        </SettingsRow>
       </SettingsSection>
     </div>
   </NScrollbar>

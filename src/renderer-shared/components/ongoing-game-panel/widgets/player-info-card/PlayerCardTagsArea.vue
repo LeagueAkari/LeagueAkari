@@ -580,7 +580,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="as.settings.isInKyokoMode && ogs.settings.playerCardTags.showAkariScoreTag && analysis"
+      v-if="ogs.settings.playerCardTags.showAkariScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>

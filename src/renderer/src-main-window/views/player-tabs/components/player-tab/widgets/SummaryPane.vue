@@ -4,11 +4,7 @@
       {{ t('PlayerTab.stats.title') }}
     </div>
     <div class="flex flex-col gap-1">
-      <div
-        class="flex w-full items-center gap-2"
-        v-if="as.settings.isInKyokoMode"
-        title="Akari's insight"
-      >
+      <div class="flex w-full items-center gap-2" title="Akari's insight">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('PlayerTab.stats.akariScore')
         }}</span>
@@ -349,7 +345,6 @@ import {
   topsideTextColor,
   topsideTextTrigger
 } from '@renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/preference'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -371,7 +366,6 @@ import { toPredicate } from './match-history-filters/filter-state'
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
 const { t } = useTranslation()
-const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 

@@ -77,7 +77,6 @@ export async function migrateFrom126({ manager, logger }: MigrationContext) {
     'app-common-main/showFreeSoftwareDeclaration'
   )
   await moveSetting(manager, 'app/useWmic', 'league-client-ux-main/useWmic')
-  await moveSetting(manager, 'app/isInKyokoMode', 'app-common-main/isInKyokoMode')
   await moveSetting(manager, 'auto-update/autoCheckUpdates', 'self-update-main/autoCheckUpdates')
   await moveSetting(manager, 'auto-update/downloadSource', 'self-update-main/downloadSource')
   await moveSetting(manager, 'auxiliary-window/isPinned', 'window-manager-main/auxWindowPinned')

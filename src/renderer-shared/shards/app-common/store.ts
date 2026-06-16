@@ -19,7 +19,6 @@ export interface HttpProxySetting {
 export const useAppCommonStore = defineStore('shard:app-common-renderer', () => {
   const settings = shallowReactive({
     showFreeSoftwareDeclaration: false,
-    isInKyokoMode: false,
     locale: 'zh-CN',
     theme: 'default' as AppThemeSetting,
     httpProxy: {

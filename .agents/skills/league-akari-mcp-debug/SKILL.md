@@ -243,7 +243,7 @@ The main window has a Settings > Debug page. It can:
 - Show current LCU connection port, PID, auth token, region, and platform.
 - Show current gameflow phase.
 - Show runtime information from the main process.
-- Toggle the test page and Kyoko mode.
+- Toggle the test page.
 
 Use the UI when the user needs a reproducible manual path; use console/evaluate when you need faster inspection or a one-off probe.
 

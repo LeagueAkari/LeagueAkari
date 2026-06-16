@@ -66,11 +66,6 @@ export class AppCommonSettings {
   showFreeSoftwareDeclaration: boolean = true
 
   /**
-   * 是否位于调试模式
-   */
-  isInKyokoMode: boolean = false
-
-  /**
    * 语言
    */
   locale: string = 'zh-CN'
@@ -109,10 +104,6 @@ export class AppCommonSettings {
 
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
-  }
-
-  setIsInKyokoMode(s: boolean) {
-    this.isInKyokoMode = s
   }
 
   setLocale(s: string) {

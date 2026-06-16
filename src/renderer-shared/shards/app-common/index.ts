@@ -35,10 +35,6 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openUserDataDir')
   }
 
-  setInKyokoMode(s: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'isInKyokoMode', s)
-  }
-
   setShowFreeSoftwareDeclaration(s: boolean) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showFreeSoftwareDeclaration', s)
   }

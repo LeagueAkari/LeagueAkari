@@ -356,7 +356,6 @@
               {{ t('OngoingGameSettings.playerCardTags.tags.showAverageVisionScoreTag.label') }}
             </NCheckbox>
             <NCheckbox
-              v-if="as.settings.isInKyokoMode"
               :checked="ogs.settings.playerCardTags.showAkariScoreTag"
               @update:checked="
                 (val) =>
