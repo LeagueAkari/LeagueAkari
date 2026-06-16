@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
-      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
+      <div class="mx-auto flex max-w-200 flex-col gap-6 p-6">
         <SettingsSection :title="t('AutoMisc.autoReply.title')">
           <SettingsRow :label="t('AutoMisc.autoReply.enabled.label')" :label-width="260">
             <div class="flex flex-col items-end gap-1">
@@ -96,7 +96,7 @@
                 </template>
               </NInput>
 
-              <NScrollbar class="max-h-[400px]">
+              <NScrollbar class="max-h-100">
                 <div class="space-y-2">
                   <div
                     v-for="friend in filteredSortedFriends"

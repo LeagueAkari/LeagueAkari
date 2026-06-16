@@ -21,7 +21,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style>
 @reference '@renderer-shared/assets/css/tailwind.css';
 
 @layer components {
@@ -42,7 +42,7 @@ defineProps<{
   }
 
   .settings-section-body {
-    @apply w-full max-w-full overflow-hidden rounded-lg bg-black/5 dark:bg-white/5;
+    @apply w-full max-w-full overflow-hidden rounded-lg bg-black/5 dark:bg-white/8;
   }
 
   .settings-section-footer {

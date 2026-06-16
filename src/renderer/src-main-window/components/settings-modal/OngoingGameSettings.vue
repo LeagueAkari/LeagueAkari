@@ -166,8 +166,9 @@
           :label="t('OngoingGameSettings.playerCardTags.label')"
           align="start"
           :label-description="t('OngoingGameSettings.playerCardTags.description')"
+          control-full-line
         >
-          <NFlex vertical align="start" class="max-w-full">
+          <div class="grid w-full grid-cols-3 gap-y-1">
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showPremadeTeamTag"
               @update:checked="
@@ -364,7 +365,7 @@
             >
               {{ t('OngoingGameSettings.playerCardTags.tags.showAkariScoreTag.label') }}
             </NCheckbox>
-          </NFlex>
+          </div>
         </SettingsRow>
       </SettingsSection>
     </div>
@@ -379,7 +380,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
-import { NCheckbox, NFlex, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
+import { NCheckbox, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 

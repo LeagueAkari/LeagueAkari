@@ -46,7 +46,7 @@ const { align = 'center' } = defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style>
 @reference '@renderer-shared/assets/css/tailwind.css';
 
 @layer components {
@@ -106,9 +106,11 @@ const { align = 'center' } = defineProps<{
   }
 
   .settings-row--control-full-line .settings-row-control {
-    max-width: 100%;
+    @apply justify-start;
+  }
 
-    @apply basis-full;
+  .settings-row--control-full-line .settings-row-control {
+    @apply max-w-full basis-full;
   }
 
   .settings-row-control > * {

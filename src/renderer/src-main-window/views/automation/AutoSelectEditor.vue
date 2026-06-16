@@ -87,9 +87,10 @@
             :label="t('AutoSelect.pick.expectedChampions.label')"
             :label-description="t('AutoSelect.pick.expectedChampions.description')"
             :label-width="260"
+            control-full-line
             align="start"
           >
-            <NCollapseTransition :show="currentGroup.positions.length > 1">
+            <div v-if="currentGroup.positions.length > 1">
               <div
                 class="mb-1 flex items-center gap-2"
                 v-for="position in currentGroup.positions"
@@ -121,9 +122,9 @@
                   "
                 />
               </div>
-            </NCollapseTransition>
-            <NCollapseTransition
-              :show="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
+            </div>
+            <div
+              v-if="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
             >
               <div class="mb-1 flex items-center gap-2">
                 <PositionIcon
@@ -141,7 +142,7 @@
                   "
                 />
               </div>
-            </NCollapseTransition>
+            </div>
           </SettingsRow>
 
           <SettingsRow
@@ -211,10 +212,10 @@
           </SettingsRow>
 
           <div
-            class="[margin-inline:var(--settings-row-x-padding)] mb-3 border-t border-gray-200 dark:border-white/20"
+            class="mx-(--settings-row-x-padding) mb-3 border-t border-gray-200 dark:border-white/20"
           ></div>
           <TooltipWithIcon
-            class="[margin-inline:var(--settings-row-x-padding)] mb-2 text-xs text-gray-600 dark:text-gray-300"
+            class="mx-(--settings-row-x-padding) mb-2 text-xs text-gray-600 dark:text-gray-300"
             :tooltip="t('AutoSelect.pick.benchMode.tooltip')"
           >
             <div>{{ t('AutoSelect.pick.benchMode.title') }}</div>

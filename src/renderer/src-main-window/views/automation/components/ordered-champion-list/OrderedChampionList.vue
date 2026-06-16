@@ -2,7 +2,7 @@
   <div class="flex h-6 items-center">
     <NModal v-model:show="show">
       <NTransfer
-        class="h-[65vh]! w-[600px]! rounded bg-white/95 dark:bg-neutral-900/95"
+        class="h-[65vh]! w-150! rounded bg-white/95 dark:bg-neutral-900/95"
         size="small"
         v-model:value="champions"
         virtual-scroll

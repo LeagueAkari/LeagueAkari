@@ -208,9 +208,9 @@ app.onApplicationMenuSettingsClick(() => {
   [data-theme='dark'] &::before {
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.84) 0%,
-      rgba(0, 0, 0, 0.88) 75%,
-      rgba(0, 0, 0, 0.88) 100%
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.92) 75%,
+      rgba(0, 0, 0, 0.92) 100%
     );
   }
 
