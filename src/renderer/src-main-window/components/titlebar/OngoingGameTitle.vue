@@ -66,37 +66,35 @@
           </template>
 
           <div class="title-settings-panel">
-            <ControlItem
-              class="title-settings-item"
-              :label="t('OngoingGameTitle.settings.orderPlayerBy.label')"
-              :label-width="240"
-            >
-              <NSelect
-                class="title-settings-control"
-                size="small"
-                :consistent-menu-width="false"
-                :options="orderOptions"
-                :value="ogs.settings.orderPlayerBy"
-                @update:value="(val) => og.setOrderPlayerBy(val)"
-              />
-            </ControlItem>
+            <SettingsSection no-bg>
+              <SettingsRow
+                :label="t('OngoingGameTitle.settings.orderPlayerBy.label')"
+                :label-width="200"
+              >
+                <NSelect
+                  class="title-settings-control"
+                  size="small"
+                  :consistent-menu-width="false"
+                  :options="orderOptions"
+                  :value="ogs.settings.orderPlayerBy"
+                  @update:value="(val) => og.setOrderPlayerBy(val)"
+                />
+              </SettingsRow>
 
-            <ControlItem
-              class="title-settings-item"
-              :label="t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.label')"
-              :label-description="
-                t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.description')
-              "
-              :label-width="240"
-            >
-              <NSwitch
-                size="small"
-                :value="ogs.settings.showJunglePathingForAllPlayers"
-                @update:value="(val) => og.setShowJunglePathingForAllPlayers(val)"
-              />
-            </ControlItem>
-
-            <div class="border-b dark:border-white/10"></div>
+              <SettingsRow
+                :label="t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.label')"
+                :label-description="
+                  t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.description')
+                "
+                :label-width="200"
+              >
+                <NSwitch
+                  size="small"
+                  :value="ogs.settings.showJunglePathingForAllPlayers"
+                  @update:value="(val) => og.setShowJunglePathingForAllPlayers(val)"
+                />
+              </SettingsRow>
+            </SettingsSection>
 
             <div class="title-settings-actions">
               <NButton size="small" secondary type="primary" @click="handleOpenOngoingGameSettings">
@@ -112,8 +110,9 @@
 
 <script setup lang="ts">
 import { useMainWindowAppContext } from '@main-window/context'
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useOverflow } from '@renderer-shared/composables/useOverflowDetection'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useInstance } from '@renderer-shared/shards'
@@ -331,10 +330,6 @@ const titleModel = computed(() => {
   color: rgb(0 0 0 / 0.86);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
   -webkit-app-region: no-drag;
-}
-
-.title-settings-item + .title-settings-item {
-  margin-top: 10px;
 }
 
 .title-settings-actions {
