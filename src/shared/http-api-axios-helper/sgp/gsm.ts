@@ -1,4 +1,4 @@
-import { SgpGsmLedgeRegion, SgpGsmLedgeRegionGame, SpectatorData } from '@shared/types/sgp/gsm'
+import { SgpGsmLedgeRegion, SgpGsmLedgeRegionGame } from '@shared/types/sgp/gsm'
 import { AxiosInstance } from 'axios'
 
 import { SgpRegionParam } from './dto'
@@ -10,18 +10,6 @@ import {
 
 export class GsmHttpApi {
   constructor(private _http: AxiosInstance) {}
-
-  getSpectatorByPuuid(puuid: string, options: SgpRegionParam = {}) {
-    return this._http.get<SpectatorData>(
-      `/gsm/v1/ledge/spectator/region/${URL_PLACEHOLDER_SUB_ID}/puuid/${puuid}`,
-      {
-        headers: {
-          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
-          [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
-        }
-      }
-    )
-  }
 
   getByPuuid(puuid: string, options: SgpRegionParam = {}) {
     return this._http.get<SgpGsmLedgeRegion>(

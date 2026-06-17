@@ -162,7 +162,6 @@ export class PlayerTabsRenderer implements IAkariShardInitDispose {
         isLoading: false,
         summoner: null,
         summonerProfile: null,
-        spectatorData: null,
         refresh: null,
         initParams: toStoredInitParams(options.initParams)
       },

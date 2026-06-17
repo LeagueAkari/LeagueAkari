@@ -20,7 +20,6 @@ const createLeagueServers = () => ({
   },
   serverNames: {},
   tencentServerMatchHistoryInteroperability: [],
-  tencentServerSpectatorInteroperability: [],
   tencentServerSummonerInteroperability: []
 })
 

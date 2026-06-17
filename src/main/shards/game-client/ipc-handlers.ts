@@ -1,5 +1,3 @@
-import type { LaunchSpectatorConfig } from '@shared/types/shards/game-client'
-
 import type { GameClientMainContext, SettingsFileMode } from './context'
 import type { GameClientMain } from './index'
 
@@ -14,10 +12,6 @@ export class GameClientIpcHandlers {
 
     ipc.onCall(namespace, 'terminateGameClient', () => {
       return this.gameClient.terminateGameClient()
-    })
-
-    ipc.onCall(namespace, 'launchSpectator', (_, config: LaunchSpectatorConfig) => {
-      return this.gameClient.launchSpectator(config)
     })
 
     ipc.onCall(

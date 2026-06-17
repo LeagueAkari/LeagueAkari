@@ -7,7 +7,6 @@ import {
 } from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
-import type { LaunchSpectatorConfig } from '@shared/types/shards/game-client'
 import axios from 'axios'
 import https from 'https'
 
@@ -29,7 +28,6 @@ import {
 import { GameClientIpcHandlers } from './ipc-handlers'
 import { GameClientSettingsFileController } from './settings-file-controller'
 import { GameClientShortcutController } from './shortcut-controller'
-import { SpectatorLauncher } from './spectator-launcher'
 import { GameClientSettings } from './state'
 
 /**
@@ -48,7 +46,6 @@ export class GameClientMain implements IAkariShardInitDispose {
   private readonly _ipcHandlers: GameClientIpcHandlers
   private readonly _shortcutController: GameClientShortcutController
   private readonly _settingsFileController: GameClientSettingsFileController
-  private readonly _spectatorLauncher: SpectatorLauncher
 
   private readonly _httpClient = axios.create({
     baseURL: GameClientMain.GAME_CLIENT_BASE_URL,
@@ -101,7 +98,6 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._ipcHandlers = new GameClientIpcHandlers(this._context, this)
     this._shortcutController = new GameClientShortcutController(this._context)
     this._settingsFileController = new GameClientSettingsFileController(this._context)
-    this._spectatorLauncher = new SpectatorLauncher(this._context)
   }
 
   get http() {
@@ -132,10 +128,6 @@ export class GameClientMain implements IAkariShardInitDispose {
       this._logger.info(`Terminate game client process ${pid}`)
       terminateProcess(pid)
     })
-  }
-
-  async launchSpectator(config: LaunchSpectatorConfig) {
-    return this._spectatorLauncher.launch(config)
   }
 
   async setSettingsFileReadonlyOrWritable(mode: SettingsFileMode = 'readonly') {

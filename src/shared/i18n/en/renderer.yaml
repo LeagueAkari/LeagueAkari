@@ -1642,24 +1642,6 @@ MatchCard:
     'true': 'Yes'
     'false': 'No'
 
-SpectateStatus:
-  button: Spectate
-  bans: Bans
-  startFrom: Started from {{date}} ({{relativeTime}})
-
-  lcuSpectate:
-    label: Using LCU API (Optional)
-    description: Use the LCU API to start spectating on the same server instead of using a process call.
-    descriptionNotIdle: Spectating using the LCU API requires being in an idle state. You are not currently idle. Please leave the lobby first.
-    button: Spectate
-
-  tokenSpectate:
-    label: Copy Token
-    description: Can be used to start the spectate process in another instance of $t(common:appName).
-    button: Copy
-    copied: Spectate token copied
-    copyFailed: Failed to copy spectate token
-
 PlayerTabsTitle:
   loading: Loading...
   search: Search
@@ -2470,9 +2452,6 @@ PlayerTab:
   failedToDeleteTag: 'Unable to delete player tag: {{reason}}'
   operationSuccessTitle: Operation Successful
   operationFailedTitle: Operation Failed
-  spectatorCalledUp: Spectator mode initiated
-  spectatorCalledUpByCmd: 'Process initiated. Note: Starting spectator mode may result in a black screen. If it persists, please manually terminate the process.'
-  failedToCallUpSpectator: 'Failed to initiate spectator mode: {{reason}}'
   failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
   failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
   copiedToClipboard: Copied to clipboard

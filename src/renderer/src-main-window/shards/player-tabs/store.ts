@@ -1,7 +1,6 @@
 import { Summoner } from '@shared/data-adapter/summoner'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { SummonerProfile } from '@shared/types/league-client/summoner'
-import { SpectatorData } from '@shared/types/sgp/gsm'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
@@ -20,9 +19,6 @@ export interface TabSelfSyncedState {
 
   /** 玩家 profile 信息 */
   summonerProfile: SummonerProfile | null
-
-  /** 玩家 spectator 信息 */
-  spectatorData: SpectatorData | null
 
   refresh: (() => void) | null
 

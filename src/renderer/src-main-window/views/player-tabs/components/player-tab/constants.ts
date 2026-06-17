@@ -2,8 +2,6 @@ export const SMALL_SIZE_THRESHOLD = 1064
 
 export const ENCOUNTERED_GAMES_PAGE_SIZE = 10
 
-export const UPDATE_SPECTATOR_DATA_INTERVAL = 60000
-
 export const CHAMPION_MASTERY_TOP_COUNT = 8
 
 export const CHAMPION_MASTERY_SKELETON_COUNT = 4
@@ -35,6 +33,3 @@ export const CHALLENGES_SUMMONER_ICONS_ID = 504002
 export const CHALLENGES_EMOTES_ID = 504004
 
 export const CHALLENGES_PEKTAKILLS_ID = 402106
-
-// 历史上这个功能十分好用，但是被 Riot 的大手制裁了
-export const IS_SPECTATOR_FEATURE_ENABLED = false

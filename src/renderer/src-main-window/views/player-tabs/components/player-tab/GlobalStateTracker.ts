@@ -4,7 +4,6 @@ import { markRaw, watch } from 'vue'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { usePlayerTab } from './context'
-import { useSpectator } from './data/spectator'
 import { useSummoner } from './data/summoner'
 import { useSummonerProfile } from './data/summoner-profile'
 import { useRefresh } from './utils/refresh'
@@ -14,7 +13,6 @@ export default defineComponent({
   setup() {
     const { id } = usePlayerTab()
     const { summoner } = useSummoner()
-    const { spectatorData } = useSpectator()
     const { profile } = useSummonerProfile()
 
     const pts = usePlayerTabsStore()
@@ -33,14 +31,6 @@ export default defineComponent({
       [id, summoner],
       ([id, summoner]) => {
         pts.updateTabData(id, { summoner: summoner ? markRaw(summoner) : null })
-      },
-      { immediate: true }
-    )
-
-    watch(
-      [id, spectatorData],
-      ([id, spectatorData]) => {
-        pts.updateTabData(id, { spectatorData: spectatorData ? markRaw(spectatorData) : null })
       },
       { immediate: true }
     )

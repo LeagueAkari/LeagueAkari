@@ -22,17 +22,6 @@
           <div class="ml-3 flex flex-col gap-1 self-center">
             <div class="flex items-center gap-1">
               <span class="text-xl font-bold text-black dark:text-white">{{ maskedName }}</span>
-              <NPopover
-                v-if="showSpectatorIndicator"
-                trigger="hover"
-                placement="bottom-start"
-                :style="{ width: '300px' }"
-              >
-                <template #trigger>
-                  <IndicatorPulse class="text-green-500" />
-                </template>
-                <SpectatorPane />
-              </NPopover>
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400">
               {{ maskedTagLine }}
@@ -48,17 +37,6 @@
             >
               {{ summoner?.gameName || '—' }}
             </CopyableText>
-            <NPopover
-              v-if="showSpectatorIndicator"
-              trigger="hover"
-              placement="bottom-start"
-              :style="{ width: '300px' }"
-            >
-              <template #trigger>
-                <IndicatorPulse class="ml-1 text-green-500" />
-              </template>
-              <SpectatorPane />
-            </NPopover>
           </div>
           <div class="text-sm text-gray-500 dark:text-gray-400">
             {{ summoner ? `#${summoner.tagLine}` : '—' }}
@@ -104,21 +82,17 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { Edit20Filled } from '@vicons/fluent'
 import { RefreshSharp } from '@vicons/ionicons5'
-import { NButton, NIcon, NPopover } from 'naive-ui'
+import { NButton, NIcon } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { usePlayerTab } from '../context'
-import { useSpectator } from '../data/spectator'
 import { useSummoner } from '../data/summoner'
 import { useRefresh } from '../utils/refresh'
-import IndicatorPulse from './IndicatorPulse.vue'
 import PlayerTagEditModal from './PlayerTagEditModal.vue'
 import RankedPane from './RankedPane.vue'
-import SpectatorPane from './SpectatorPane.vue'
 
-const { puuid, isSmallSize, isSelfTab, isCrossRegion } = usePlayerTab()
+const { puuid, isSelfTab, isCrossRegion } = usePlayerTab()
 const { summoner } = useSummoner()
-const { spectatorData } = useSpectator()
 
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
@@ -132,6 +106,4 @@ const maskedName = computed(() => {
 })
 
 const maskedTagLine = computed(() => masked(summoner.value?.tagLine || '—', '#####'))
-
-const showSpectatorIndicator = computed(() => isSmallSize.value && !!spectatorData.value)
 </script>

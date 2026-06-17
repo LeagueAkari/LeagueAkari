@@ -11,7 +11,6 @@ export const LeagueServersConfigV2Schema = z.object({
   ),
 
   tencentServerMatchHistoryInteroperability: z.array(z.string()),
-  tencentServerSpectatorInteroperability: z.array(z.string()),
   tencentServerSummonerInteroperability: z.array(z.string()),
 
   serverNames: z.record(z.string(), z.record(z.string(), z.string())),
@@ -37,10 +36,7 @@ export const OngoingGameConfigV1Schema = z.object({
     deobfuscation: z.boolean(),
 
     /** 使用 puuid 查询 gameflow */
-    gsmByPuuid: z.boolean(),
-
-    /** 使用 puuid 查询 spectator data */
-    spectatorByPuuid: z.boolean()
+    gsmByPuuid: z.boolean()
   }),
 
   version: z.number().lte(1),

@@ -24,7 +24,6 @@ import { provideEncounteredGames } from './data/encountered-games'
 import { provideMatchHistory } from './data/match-history'
 import { provideMatchHistoryFilters } from './data/match-history-filters'
 import { provideRankedStats } from './data/ranked-stats'
-import { provideSpectator } from './data/spectator'
 import { provideSummoner } from './data/summoner'
 import { provideSummonerProfile } from './data/summoner-profile'
 import { provideTags } from './data/tags'
@@ -199,12 +198,6 @@ export function providePlayerTab(props: {
 
   provideTags({
     puuid
-  })
-
-  provideSpectator({
-    puuid,
-    sgpServerId,
-    sgpApiStatus
   })
 
   provideSummonerProfile({

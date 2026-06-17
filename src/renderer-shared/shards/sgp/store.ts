@@ -27,7 +27,6 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
     servers: {},
     serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
     tencentServerSummonerInteroperability: []
   })
 

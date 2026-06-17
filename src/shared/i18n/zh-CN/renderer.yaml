@@ -1639,24 +1639,6 @@ MatchCard:
     'true': 是
     'false': 否
 
-SpectateStatus:
-  button: 观战
-  bans: 禁用
-  startFrom: 于 {{date}} 开始 ({{relativeTime}})
-
-  lcuSpectate:
-    label: 使用 LCU API 观战 (可选)
-    description: 使用 LCU API 调起同大区观战流程，而非通过进程调用
-    descriptionNotIdle: 使用 LCU API 观战需要退出房间到空闲状态，当前不是空闲状态。请先退出房间
-    button: LCU API 观战
-
-  tokenSpectate:
-    label: 分享观战信息
-    description: 可以在另一个 $t(common:appName) 或其他应用中调起观战进程
-    button: 复制
-    copied: 对局密钥已复制
-    copyFailed: 复制观战信息失败
-
 PlayerTabsTitle:
   loading: 加载中...
   search: 搜索玩家
@@ -2466,9 +2448,6 @@ PlayerTab:
   failedToDeleteTag: 无法更新玩家标记：{{reason}}
   operationSuccessTitle: 操作成功
   operationFailedTitle: 操作失败
-  spectatorCalledUp: 已拉起观战
-  spectatorCalledUpByCmd: 已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程
-  failedToCallUpSpectator: 观战调起失败：{{reason}}
   failedToTakeScreenshotNoData: 尝试截图失败，未获取到图片信息
   failedToTakeScreenshot: 尝试截图失败：{{reason}}
   copiedToClipboard: 已复制到剪贴板

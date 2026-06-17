@@ -32,7 +32,6 @@ import { ReplaysHttpApi } from './replays'
 import { RewardTrackHttpApi } from './reward-track'
 import { RewardsHttpApi } from './rewards'
 import { RiotClientHttpApi } from './riotclient'
-import { SpectatorHttpApi } from './spectator'
 import { StoreHttpApi } from './store'
 import { SummonerHttpApi } from './summoner'
 
@@ -57,7 +56,6 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly processControl: ProcessControlHttpApi
   public readonly ranked: RankedHttpApi
   public readonly riotclient: RiotClientHttpApi
-  public readonly spectator: SpectatorHttpApi
   public readonly summoner: SummonerHttpApi
   public readonly regalia: RegaliaHttpApi
   public readonly loadouts: LoadoutsHttpApi
@@ -94,7 +92,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.processControl = new ProcessControlHttpApi(this._http)
     this.ranked = new RankedHttpApi(this._http)
     this.riotclient = new RiotClientHttpApi(this._http)
-    this.spectator = new SpectatorHttpApi(this._http)
     this.summoner = new SummonerHttpApi(this._http)
     this.regalia = new RegaliaHttpApi(this._http)
     this.loadouts = new LoadoutsHttpApi(this._http)

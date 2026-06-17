@@ -18,7 +18,6 @@ export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', 
     servers: {},
     serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
     tencentServerSummonerInteroperability: []
   })
 
@@ -33,8 +32,7 @@ export const useRemoteConfigStore = defineStore('shard:remote-config-renderer', 
     lastUpdate: 0,
     spotlight: {
       deobfuscation: false,
-      gsmByPuuid: false,
-      spectatorByPuuid: false
+      gsmByPuuid: false
     }
   })
 

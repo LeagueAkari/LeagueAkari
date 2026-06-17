@@ -144,12 +144,12 @@ export class OngoingGameAdditionalInfoController {
       state.queryStage.phase !== 'in-game' ||
       !leagueClient.data.summoner.me?.puuid
     ) {
-      queueKeeper.cancelByTags(['gsm-gameflow', 'spectator-gameflow'], 'or')
+      queueKeeper.cancelByTags(['gsm-gameflow'], 'or')
       state.clearAdditional()
       return
     }
 
-    queueKeeper.cancelByTags(['gsm-gameflow', 'spectator-gameflow'], 'or')
+    queueKeeper.cancelByTags(['gsm-gameflow'], 'or')
 
     const puuid = leagueClient.data.summoner.me.puuid
 
@@ -157,10 +157,6 @@ export class OngoingGameAdditionalInfoController {
 
     if (remoteConfig.state.ongoingGameConfig.spotlight.gsmByPuuid) {
       tasks.push(() => this._getGsmGameMembers(puuid))
-    }
-
-    if (remoteConfig.state.ongoingGameConfig.spotlight.spectatorByPuuid) {
-      tasks.push(() => this._getSpectator(puuid))
     }
 
     Promise.allSettled(tasks.map((t) => t())).then((results) => {
@@ -252,50 +248,6 @@ export class OngoingGameAdditionalInfoController {
       }
 
       logger.warn('Error getting game members', error)
-      return null
-    }
-  }
-
-  private async _getSpectator(puuid: string): Promise<AdditionalInfoQueryResult | null> {
-    const { logger, queueKeeper, sgp } = this._context
-
-    try {
-      if (queueKeeper.hasTask('spectator-gameflow')) {
-        logger.debug('Spectator already in queue', puuid)
-        return null
-      }
-
-      const {
-        data: {
-          game: { teamOne, teamTwo, gameMode, playerChampionSelections }
-        }
-      } = await queueKeeper.add(
-        'misc',
-        `spectator-gameflow:${puuid}`,
-        () => sgp.api.gsm.getSpectatorByPuuid(puuid),
-        {
-          priority: ONGOING_GAME_LOADING_PRIORITY.ADDITIONAL_INFO,
-          tags: [puuid, 'spectator-gameflow']
-        }
-      )
-
-      logger.info('additional team info by spectator data')
-
-      return { teamOne, teamTwo, gameMode, spells: playerChampionSelections }
-    } catch (error) {
-      if (isAbortError(error)) {
-        logger.info('Abort error getting spectator', error)
-        return null
-      }
-
-      if (
-        isAxiosError(error) &&
-        (error.response?.status === 404 || error.response?.status === 409)
-      ) {
-        return null
-      }
-
-      logger.warn('Error getting spectator', error)
       return null
     }
   }

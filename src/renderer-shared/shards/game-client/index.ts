@@ -1,5 +1,4 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LaunchSpectatorConfig } from '@shared/types/shards/game-client'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -33,10 +32,6 @@ export class GameClientRenderer implements IAkariShardInitDispose {
 
   async onInit() {
     await syncGameClientSettings(this._context)
-  }
-
-  launchSpectator(config: LaunchSpectatorConfig) {
-    return this._context.ipc.call(GAME_CLIENT_MAIN_NAMESPACE, 'launchSpectator', config)
   }
 
   setTerminateGameClientWithShortcut(value: boolean) {

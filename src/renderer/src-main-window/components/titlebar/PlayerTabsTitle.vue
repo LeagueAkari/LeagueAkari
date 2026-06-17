@@ -44,30 +44,21 @@
             @dragleave="handleTagDragLeave($event, tab.id)"
             @dragend="handleTagDragEnd($event, tab.id)"
           >
-            <NBadge
-              dot
-              :show="tab.spectatorData !== null"
-              :size="4"
-              color="#00ff00"
-              processing
-              :offset="[-20, 2]"
-            >
-              <Transition name="fade" mode="out-in">
-                <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
-                <ChampionIcon
-                  class="tab-icon"
-                  v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
-                  :stretched="false"
-                  :champion-id="ogs.championSelections[tab.puuid]"
-                />
-                <LcuImage
-                  class="tab-icon"
-                  v-else-if="tab.summoner"
-                  :src="profileIconUri(tab.summoner.profileIconId)"
-                />
-                <div v-else class="tab-icon tab-icon-placeholder"></div>
-              </Transition>
-            </NBadge>
+            <Transition name="fade" mode="out-in">
+              <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
+              <ChampionIcon
+                class="tab-icon"
+                v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
+                :stretched="false"
+                :champion-id="ogs.championSelections[tab.puuid]"
+              />
+              <LcuImage
+                class="tab-icon"
+                v-else-if="tab.summoner"
+                :src="profileIconUri(tab.summoner.profileIconId)"
+              />
+              <div v-else class="tab-icon tab-icon-placeholder"></div>
+            </Transition>
             <div class="sgp-server" v-if="isNeedToShowSgpServer">
               {{
                 sgps.leagueServers.serverNames[as.settings.locale]?.[tab.sgpServerId] ||
@@ -146,7 +137,7 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NDropdown, NIcon, NModal, NPopconfirm, NScrollbar, NSpin } from 'naive-ui'
+import { NDropdown, NIcon, NModal, NPopconfirm, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 

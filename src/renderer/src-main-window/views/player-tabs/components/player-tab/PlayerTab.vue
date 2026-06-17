@@ -33,7 +33,6 @@
             <div class="space-y-2">
               <MatchHistoryPagination />
               <NormalTagBlock />
-              <SpectatorPane />
               <SummaryPane />
               <ChampionMasteryPane />
               <RecentlyPlayers side="ally" />
@@ -120,7 +119,6 @@ import NormalTagBlock from './widgets/NormalTagBlock.vue'
 import PlayerChallenges from './widgets/PlayerChallenges.vue'
 import PlayerTabHeader from './widgets/PlayerTabHeader.vue'
 import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
-import SpectatorPane from './widgets/SpectatorPane.vue'
 import SummaryPane from './widgets/SummaryPane.vue'
 import CollectModeProgress from './widgets/match-history-filters/CollectModeProgress.vue'
 

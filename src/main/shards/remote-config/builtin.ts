@@ -10,8 +10,7 @@ export const BUILTIN_ONGOING_GAME_CONFIG: OngoingGameConfig = {
   lastUpdate: 1759568091535,
   spotlight: {
     deobfuscation: true,
-    gsmByPuuid: true,
-    spectatorByPuuid: true
+    gsmByPuuid: true
   }
 }
 
@@ -126,18 +125,6 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
     }
   },
   tencentServerMatchHistoryInteroperability: [
-    'TENCENT_HN1',
-    'TENCENT_HN10',
-    'TENCENT_NJ100',
-    'TENCENT_GZ100',
-    'TENCENT_CQ100',
-    'TENCENT_TJ100',
-    'TENCENT_TJ101',
-    'TENCENT_BGP2',
-    'TENCENT_PBE',
-    'TENCENT_PREPBE'
-  ],
-  tencentServerSpectatorInteroperability: [
     'TENCENT_HN1',
     'TENCENT_HN10',
     'TENCENT_NJ100',
