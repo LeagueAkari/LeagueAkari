@@ -81,7 +81,10 @@ export class ShortcutRegistry {
       return null
     }
 
-    const reservedKeyIds = DISABLED_KEYS.map((keyCode) => nativeInput.VKEY_MAP[keyCode].keyId)
+    const reservedKeyIds = DISABLED_KEYS.map(
+      (keyCode) => nativeInput.VKEY_MAP[keyCode]?.keyId
+    ).filter((keyId): keyId is string => Boolean(keyId))
+
     if (
       reservedKeyIds.some((keyId) => shortcutId.includes(keyId)) ||
       !isSupportedShortcutId(shortcutId)

@@ -11,6 +11,8 @@ import {
 } from './process-utils-darwin'
 import { getCommandLinePowershell } from './process-utils-win32'
 
+export type { KeyEvent as NativeInputKeyEvent } from 'league-akari-native-win32/input'
+
 /**
  * 通过进程名搜索匹配的 pid 列表
  *
@@ -112,7 +114,7 @@ export function adjustLeagueClientWindowSize(
   config?: { baseHeight: number; baseWidth: number }
 ) {
   if (process.platform === 'win32') {
-    return addons.tools.fixWindowMethodA(clientZoom, config)
+    return addons.tools.fixWindowMethodA(clientZoom, config ?? {})
   } else {
     throw new NotSupportedPlatformError('adjustLeagueClient', process.platform)
   }

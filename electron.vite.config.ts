@@ -7,7 +7,7 @@ import { resolve } from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 const minify = process.env.NODE_ENV === 'production'
-const MAIN_EXTERNALS = ['electron', 'typeorm', 'better-sqlite3']
+const MAIN_EXTERNALS = ['electron', 'typeorm', 'better-sqlite3', 'league-akari-native-win32']
 
 // 在解析 League Client 的标签时，需要考虑到这些自创的元素
 // 作为参考，列在下面，同时供模板使用

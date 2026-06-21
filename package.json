@@ -19,9 +19,10 @@
     "dev:no-watch": "electron-vite dev -- --inspect",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
+    "build:native": "node native/scripts/build.js",
     "build": "npm run typecheck && electron-vite build",
     "benchmark:radix": "vitest bench src/shared/utils/radix-matcher.bench.ts",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && node native/scripts/build.js",
     "build:win": "npm run build && electron-builder --win --config",
     "gen-types": "tsc --declaration --emitDeclarationOnly --outDir ./out/types -p tsconfig.node.json",
     "build:mac": "npm run build && electron-builder --mac --arm64 --dir --config && node scripts/macos/ensure-codesign.cjs \"dist/mac-arm64/League Akari.app\" && electron-builder --mac --arm64 --config --prepackaged \"dist/mac-arm64/League Akari.app\""
@@ -30,9 +31,9 @@
     "@babel/runtime": "^7.29.2",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "@leagueakari/league-akari-addons": "^1.0.0",
     "axios-retry": "^4.5.0",
     "better-sqlite3": "^12.10.0",
+    "league-akari-native-win32": "workspace:*",
     "luaparse": "^0.3.1",
     "mime-types": "^3.0.2",
     "mobx": "^6.15.3",
@@ -55,7 +56,7 @@
     "@types/lodash": "^4.17.24",
     "@types/luaparse": "^0.2.13",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.0.0",
     "@types/semver": "^7.7.1",
     "@types/ws": "^8.18.1",
     "@uiw/codemirror-theme-vscode": "^4.25.9",
@@ -109,5 +110,8 @@
     "vue-router": "^5.0.7",
     "vue-tsc": "^3.3.1"
   },
-  "packageManager": "yarn@4.14.1+sha512.64df448055b2d37ba269d7db535a469b8da93f8ef1140c25fd7a83c00a8fbaacb214ca0e02553b92a2c54cef78bb67d0b4817fab02001df0e24fac0faccc3b42"
+  "packageManager": "yarn@4.14.1+sha512.64df448055b2d37ba269d7db535a469b8da93f8ef1140c25fd7a83c00a8fbaacb214ca0e02553b92a2c54cef78bb67d0b4817fab02001df0e24fac0faccc3b42",
+  "workspaces": [
+    "native"
+  ]
 }

@@ -1670,15 +1670,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@leagueakari/league-akari-addons@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@leagueakari/league-akari-addons@npm:1.0.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40leagueakari%2Fleague-akari-addons%2F1.0.0%2F159166a0b7969912ec4fadb7a25e34e59033a352"
-  dependencies:
-    node-addon-api: "npm:^8.3.1"
-  checksum: 10c0/f19546283f2634ebad01dcfdb764c982d6993110c918d7cd67e977fa70322f56ca88f88f496d6a2ec015c1d67869f6d557b3576ed8fa713464d532de2ee5a2b2
-  languageName: node
-  linkType: hard
-
 "@lezer/common@npm:^1.0.0, @lezer/common@npm:^1.1.0, @lezer/common@npm:^1.2.0":
   version: 1.2.3
   resolution: "@lezer/common@npm:1.2.3"
@@ -3099,12 +3090,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.9.1":
-  version: 25.9.1
-  resolution: "@types/node@npm:25.9.1"
+"@types/node@npm:^26.0.0":
+  version: 26.0.0
+  resolution: "@types/node@npm:26.0.0"
   dependencies:
-    undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/9a04682842bebbcf21a1779dfeab9aa733d7bd7bbc0a0edb641ab3a9a3d43eac543225acf669c334f458f1956443ebc072bc3c72840c543b8b356cab5c82d456
+    undici-types: "npm:~8.3.0"
+  checksum: 10c0/f36e21634fd8e8ded162ca486508bd8bb229d398a8d5541f6d8c1255968d4464e53327a77f403b216ef98e3b6f6956882eef83e4857d4bc2be9569dd55d37aae
   languageName: node
   linkType: hard
 
@@ -6800,6 +6791,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"league-akari-native-win32@workspace:*, league-akari-native-win32@workspace:native":
+  version: 0.0.0-use.local
+  resolution: "league-akari-native-win32@workspace:native"
+  dependencies:
+    node-addon-api: "npm:^8.3.1"
+  languageName: unknown
+  linkType: soft
+
 "league-akari@workspace:.":
   version: 0.0.0-use.local
   resolution: "league-akari@workspace:."
@@ -6810,7 +6809,6 @@ __metadata:
     "@electron-toolkit/tsconfig": "npm:^2.0.0"
     "@electron-toolkit/utils": "npm:^4.0.0"
     "@electron/notarize": "npm:^3.1.1"
-    "@leagueakari/league-akari-addons": "npm:^1.0.0"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.1"
     "@storybook/vue3-vite": "npm:^10.4.0"
     "@swc/core": "npm:^1.15.33"
@@ -6819,7 +6817,7 @@ __metadata:
     "@types/lodash": "npm:^4.17.24"
     "@types/luaparse": "npm:^0.2.13"
     "@types/markdown-it": "npm:^14.1.2"
-    "@types/node": "npm:^25.9.1"
+    "@types/node": "npm:^26.0.0"
     "@types/semver": "npm:^7.7.1"
     "@types/ws": "npm:^8.18.1"
     "@uiw/codemirror-theme-vscode": "npm:^4.25.9"
@@ -6850,6 +6848,7 @@ __metadata:
     gray-matter: "npm:^4.0.3"
     i18next: "npm:^26.2.0"
     i18next-vue: "npm:^5.4.0"
+    league-akari-native-win32: "workspace:*"
     lodash: "npm:^4.18.1"
     luaparse: "npm:^0.3.1"
     markdown-it: "npm:^14.1.1"
@@ -9719,13 +9718,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:>=7.24.0 <7.24.7":
-  version: 7.24.6
-  resolution: "undici-types@npm:7.24.6"
-  checksum: 10c0/d9cd8befb643ac904615c280a095ba4240531f6bb4a5e75a22a7483630ca8d3f1016d2ab6ace6ceda1f63b3a2db2fe037fafe121d6917a0187573aa548ff78ca
-  languageName: node
-  linkType: hard
-
 "undici-types@npm:~6.21.0":
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
@@ -9737,6 +9729,13 @@ __metadata:
   version: 7.16.0
   resolution: "undici-types@npm:7.16.0"
   checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~8.3.0":
+  version: 8.3.0
+  resolution: "undici-types@npm:8.3.0"
+  checksum: 10c0/c8aa7e2fbebfce519654dafadc0ece59be888d2ccaf180fb4495da875e7b536d2456345c384069c7e6f3e9c9ab7435f074957da306f142343eee86ff8048855a
   languageName: node
   linkType: hard
 

@@ -1,5 +1,4 @@
-import type { KeyEvent } from '@leagueakari/league-akari-addons/dist/input'
-import { NATIVE_SUPPORT, nativeInput } from '@main/native'
+import { NATIVE_SUPPORT, type NativeInputKeyEvent, nativeInput } from '@main/native'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import type {
   KeyboardShortcutKeyState,
@@ -78,7 +77,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     'stateful-shortcut-released': [details: ShortcutDetails]
   }>()
 
-  private _nativeKeyEventHandler: ((key: KeyEvent) => void) | null = null
+  private _nativeKeyEventHandler: ((key: NativeInputKeyEvent) => void) | null = null
 
   constructor(
     private readonly _ipc: AkariIpcMain,
@@ -109,14 +108,17 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
 
     const keys = keyCodes.map((k) => ({
-      keyId: nativeInput.VKEY_MAP[k].keyId,
+      keyId: KeyboardShortcutsMain.getNativeKeyDefinition(k).keyId,
       keyCode: k,
       isModifier: nativeInput.isModifierKey(k)
     }))
     const id = keys.map((k) => k.keyId).join('+')
     const unifiedId = [
       ...new Set(
-        keyCodes.map((k) => nativeInput.UNIFIED_KEY_ID[k] || nativeInput.VKEY_MAP[k].keyId)
+        keyCodes.map(
+          (k) =>
+            nativeInput.UNIFIED_KEY_ID[k] || KeyboardShortcutsMain.getNativeKeyDefinition(k).keyId
+        )
       )
     ].join('+')
     return { keyCodes, keys, id, unifiedId, pressed }
@@ -224,7 +226,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理修饰键的按下和释放
-  private _processModifierKey(event: KeyEvent): void {
+  private _processModifierKey(event: NativeInputKeyEvent): void {
     if (this._pressedModifierKeys.has(event.keyCode) === event.isDown) {
       if (!event.isDown && this._activeStatefulShortcut.includes(event.keyCode)) {
         this._releaseActiveStatefulShortcut()
@@ -242,7 +244,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _processCommonModifierKey(event: KeyEvent): void {
+  private _processCommonModifierKey(event: NativeInputKeyEvent): void {
     if (event.isDown) {
       return
     }
@@ -318,7 +320,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _processNativeKeyEvent(event: KeyEvent): void {
+  private _processNativeKeyEvent(event: NativeInputKeyEvent): void {
     if (!isStandardKeyboardKeyCode(event.keyCode)) {
       return
     }
@@ -448,17 +450,19 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     for (const [rawKeyCode, definition] of Object.entries(nativeInput.VKEY_MAP)) {
       const keyCode = Number(rawKeyCode)
 
-      if (!Number.isFinite(keyCode) || !isStandardKeyboardKeyCode(keyCode)) {
+      if (!definition || !Number.isFinite(keyCode) || !isStandardKeyboardKeyCode(keyCode)) {
         continue
       }
 
       const nativeState = nativeStatesByCode.get(keyCode)
       const state: KeyboardShortcutKeyState = {
         keyCode,
-        keyId: definition.keyId,
-        unifiedKeyId: nativeInput.UNIFIED_KEY_ID[keyCode] || definition.keyId,
-        name: definition.name,
-        standardName: definition.standardName,
+        keyId: KeyboardShortcutsMain.getNativeKeyDefinition(keyCode).keyId,
+        unifiedKeyId:
+          nativeInput.UNIFIED_KEY_ID[keyCode] ||
+          KeyboardShortcutsMain.getNativeKeyDefinition(keyCode).keyId,
+        name: KeyboardShortcutsMain.getNativeKeyDefinition(keyCode).name,
+        standardName: KeyboardShortcutsMain.getNativeKeyDefinition(keyCode).standardName,
         isModifier: nativeInput.isModifierKey(keyCode),
         pressed:
           nativeState?.pressed ||
@@ -494,5 +498,15 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
     this.events.removeAllListeners()
     this._registry.clear()
+  }
+
+  static getNativeKeyDefinition(keyCode: number) {
+    const definition = nativeInput.VKEY_MAP[keyCode]
+
+    if (!definition) {
+      throw new Error(`Unknown native key code: ${keyCode}`)
+    }
+
+    return definition
   }
 }
