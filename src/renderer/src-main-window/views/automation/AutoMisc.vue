@@ -63,22 +63,21 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoMisc.autoInvitation.title')">
+        <SettingsSection
+          :title="t('AutoMisc.autoInvitation.title')"
+          :footer="t('AutoMisc.autoInvitation.description')"
+        >
           <div class="p-3">
-            <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-              <span>{{ t('AutoMisc.autoInvitation.description') }}</span>
-            </div>
-
             <div
               v-if="!lcs.isConnected"
-              class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
+              class="flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
             >
               <span>{{ t('AutoMisc.autoInvitation.unavailable') }}</span>
             </div>
 
             <div
               v-else-if="!isInLobby"
-              class="mb-3 flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
+              class="flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
             >
               <span>{{ t('AutoMisc.autoInvitation.notInLobby') }}</span>
             </div>
@@ -89,7 +88,7 @@
                 clearable
                 size="small"
                 :placeholder="t('AutoMisc.autoInvitation.searchPlaceholder')"
-                class="mb-3 w-72!"
+                class="w-72!"
               >
                 <template #prefix>
                   <NIcon><SearchIcon /></NIcon>
