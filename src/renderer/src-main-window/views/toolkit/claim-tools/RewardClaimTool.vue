@@ -1,9 +1,6 @@
 <template>
-  <SettingsSection :title="t('RewardClaimTool.title')">
+  <SettingsSection :title="t('RewardClaimTool.title')" :footer="t('RewardClaimTool.hint')">
     <div class="p-3">
-      <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-        <span>{{ t('RewardClaimTool.hint') }}</span>
-      </div>
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
           :disabled="isLoading || !selectedGrantIds.length || !lcs.isConnected"

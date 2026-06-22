@@ -1,9 +1,6 @@
 <template>
-  <SettingsSection :title="t('MissionClaimTool.title')">
+  <SettingsSection :title="t('MissionClaimTool.title')" :footer="t('MissionClaimTool.hint')">
     <div class="p-3">
-      <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-        <span>{{ t('MissionClaimTool.hint') }}</span>
-      </div>
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
           :disabled="isLoading || !selectedMissionIds.length || !lcs.isConnected"

@@ -1,9 +1,6 @@
 <template>
-  <SettingsSection :title="t('EventHubClaimTool.title')">
+  <SettingsSection :title="t('EventHubClaimTool.title')" :footer="t('EventHubClaimTool.hint')">
     <div class="p-3">
-      <div class="mb-3 text-[13px] text-black/60 italic dark:text-white/70">
-        <span>{{ t('EventHubClaimTool.hint') }}</span>
-      </div>
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
           :disabled="isLoading || !selectedEventIds.length || !lcs.isConnected"
