@@ -137,7 +137,7 @@ export const nativeInput = addons?.input
 
 export const NATIVE_SUPPORT: NativeSupport = {
   nativeInput: {
-    available: Boolean(nativeInput) && isElevated,
+    available: Boolean(nativeInput?.instance.isInstalled) && isElevated,
     availableOnCurrentPlatform: Boolean(nativeInput),
     requiresElevation: true
   },

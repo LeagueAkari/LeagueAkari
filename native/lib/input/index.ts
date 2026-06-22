@@ -43,9 +43,14 @@ export class AkariNativeInput extends EventEmitter<{
       return
     }
 
-    addon.install()
-    addon.onKeyEvent(this._handleNativeKeyEvent.bind(this))
-    this.installed = true
+    try {
+      addon.install()
+      addon.onKeyEvent(this._handleNativeKeyEvent.bind(this))
+      this.installed = true
+    } catch (error) {
+      addon.uninstall()
+      throw error
+    }
   }
 
   private _handleNativeKeyEvent(rawData: string): void {
@@ -86,6 +91,10 @@ export class AkariNativeInput extends EventEmitter<{
   }
 
   sendKey(key: number, press: boolean): Promise<void> {
+    if (!Number.isInteger(key) || key < 0 || key > 255) {
+      return Promise.reject(new RangeError('Virtual key code must be an integer between 0 and 255'))
+    }
+
     return addon.sendKey(key, press)
   }
 
@@ -94,7 +103,6 @@ export class AkariNativeInput extends EventEmitter<{
   }
 }
 
-// 可选择导出单例实例，便于其他模块直接使用
 export const instance = AkariNativeInput.getInstance()
 
 export * from './definitions'

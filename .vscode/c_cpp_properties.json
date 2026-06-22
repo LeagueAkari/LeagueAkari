@@ -1,0 +1,38 @@
+{
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "${workspaceFolder}/native/src",
+        "${workspaceFolder}/node_modules/node-addon-api",
+        "${env:LOCALAPPDATA}/node-gyp/Cache/**",
+        "${env:ProgramFiles}/Microsoft Visual Studio/2022/**/VC/Tools/MSVC/**/include",
+        "${env:ProgramFiles(x86)}/Microsoft Visual Studio/2022/**/VC/Tools/MSVC/**/include",
+        "${env:ProgramFiles(x86)}/Windows Kits/10/Include/**"
+      ],
+      "defines": [
+        "NAPI_DISABLE_CPP_EXCEPTIONS",
+        "BUILDING_NODE_EXTENSION",
+        "USING_UV_SHARED=1",
+        "USING_V8_SHARED=1",
+        "V8_DEPRECATION_WARNINGS=1",
+        "_FILE_OFFSET_BITS=64",
+        "_CRT_SECURE_NO_DEPRECATE",
+        "_CRT_NONSTDC_NO_DEPRECATE",
+        "_HAS_EXCEPTIONS=0",
+        "NOMINMAX",
+        "OPENSSL_NO_PINSHARED",
+        "OPENSSL_THREADS",
+        "WIN32",
+        "WIN64",
+        "_WIN64",
+        "_M_X64=100",
+        "_WINDOWS"
+      ],
+      "cStandard": "c17",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ],
+  "version": 4
+}

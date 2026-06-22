@@ -1,4 +1,4 @@
-﻿#ifndef INPUT_H
+#ifndef INPUT_H
 #define INPUT_H
 
 #include <napi.h>
@@ -12,7 +12,6 @@ Napi::Value SendString(const Napi::CallbackInfo& info);
 Napi::Value SendKey(const Napi::CallbackInfo& info);
 Napi::Value GetKeyStates(const Napi::CallbackInfo& info);
 
-// 异步 Worker 类声明
 class SendKeysWorker : public Napi::AsyncWorker {
 public:
   SendKeysWorker(const Napi::Env& env, const std::u16string& msg);

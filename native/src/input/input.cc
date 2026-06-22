@@ -1,38 +1,64 @@
-﻿#include "input.h"
+#include "input.h"
+#include <atomic>
 #include <condition_variable>
-#include <functional>
+#include <cstdint>
+#include <limits>
 #include <mutex>
-#include <queue>
+#include <string>
 #include <thread>
 #include <vector>
 
 #include <windows.h>
 
-static HHOOK hKeyboardHook;
-static std::mutex mtx;
-static std::condition_variable cv;
-static bool running = true;
+static HHOOK hKeyboardHook = nullptr;
+static DWORD keyboardThreadId = 0;
+static std::thread keyboardThread;
+static std::mutex lifecycleMtx;
+static std::condition_variable hookSetupCv;
+static bool hookSetupComplete = false;
+static DWORD hookSetupError = ERROR_SUCCESS;
+static bool inputInstalled = false;
+static std::atomic<bool> running{false};
+
 static Napi::ThreadSafeFunction tsfn;
 static bool tsfnInitialized = false;
+static std::mutex tsfnMtx;
 
-static std::queue<std::function<void()>> taskQueue;
-static bool sendingThreadRunning = true;
-static std::condition_variable taskCv;
-static std::mutex taskMtx;
-
-// 全局键状态追踪（0～255）
+// Global key state tracking for virtual-key codes 0-255.
 static std::mutex keyStateMtx;
 static bool keyStates[256] = {false};
 
-// 内部实现函数
+static void ResetKeyStates() {
+  std::lock_guard<std::mutex> lock(keyStateMtx);
+  for (bool& keyState : keyStates) {
+    keyState = false;
+  }
+}
+
+static std::string FormatWindowsError(const char* operation, DWORD errorCode) {
+  return std::string(operation) + " failed with Windows error " + std::to_string(errorCode);
+}
+
+static std::string FormatSendInputError(UINT expected, UINT actual, DWORD errorCode) {
+  return "SendInput inserted " + std::to_string(actual) + " of " + std::to_string(expected) +
+         " inputs, Windows error " + std::to_string(errorCode);
+}
+
+static void ReleaseKeyEventCallback() {
+  std::lock_guard<std::mutex> lock(tsfnMtx);
+  if (tsfnInitialized) {
+    tsfn.Release();
+    tsfnInitialized = false;
+  }
+}
+
 static LRESULT CALLBACK KeyboardEvent(int nCode, WPARAM wParam, LPARAM lParam) {
   if (nCode == HC_ACTION) {
     KBDLLHOOKSTRUCT* pKeyBoard = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
-    int key = pKeyBoard->vkCode;
+    DWORD key = pKeyBoard->vkCode;
     std::string action = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? "DOWN" : "UP";
 
-    // 更新全局键状态
-    {
+    if (key < 256) {
       std::lock_guard<std::mutex> lock(keyStateMtx);
       if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
         keyStates[key] = true;
@@ -42,8 +68,9 @@ static LRESULT CALLBACK KeyboardEvent(int nCode, WPARAM wParam, LPARAM lParam) {
     }
 
     std::string keyEventOutput = std::to_string(key) + "," + action;
+    std::lock_guard<std::mutex> lock(tsfnMtx);
     if (tsfnInitialized) {
-      tsfn.BlockingCall([keyEventOutput](Napi::Env env, Napi::Function jsCallback) {
+      tsfn.NonBlockingCall([keyEventOutput](Napi::Env env, Napi::Function jsCallback) {
         jsCallback.Call({Napi::String::New(env, keyEventOutput)});
       });
     }
@@ -52,33 +79,95 @@ static LRESULT CALLBACK KeyboardEvent(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 
 static void KeyboardHookThread() {
-  HINSTANCE hInstance = GetModuleHandle(NULL);
-  hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardEvent, hInstance, 0);
   MSG message;
-  while (GetMessage(&message, NULL, 0, 0) && running) {
+  DWORD threadId = GetCurrentThreadId();
+
+  // Force creation of this thread's message queue before install() returns.
+  PeekMessage(&message, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
+
+  HINSTANCE hInstance = GetModuleHandle(nullptr);
+  HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardEvent, hInstance, 0);
+  DWORD setupError = hook == nullptr ? GetLastError() : ERROR_SUCCESS;
+
+  {
+    std::lock_guard<std::mutex> lock(lifecycleMtx);
+    keyboardThreadId = threadId;
+    hKeyboardHook = hook;
+    hookSetupError = setupError;
+    hookSetupComplete = true;
+  }
+  hookSetupCv.notify_one();
+
+  if (hook == nullptr) {
+    return;
+  }
+
+  while (running.load()) {
+    BOOL result = GetMessage(&message, nullptr, 0, 0);
+    if (result <= 0) {
+      break;
+    }
+
     TranslateMessage(&message);
     DispatchMessage(&message);
   }
-  UnhookWindowsHookEx(hKeyboardHook);
-}
 
-static void SendTaskThread() {
-  while (sendingThreadRunning) {
-    std::function<void()> task;
-    {
-      std::unique_lock<std::mutex> lock(taskMtx);
-      taskCv.wait(lock, [] { return !taskQueue.empty() || !sendingThreadRunning; });
-      if (!sendingThreadRunning && taskQueue.empty()) {
-        return;
-      }
-      task = std::move(taskQueue.front());
-      taskQueue.pop();
-    }
-    task();
+  UnhookWindowsHookEx(hook);
+
+  {
+    std::lock_guard<std::mutex> lock(lifecycleMtx);
+    hKeyboardHook = nullptr;
+    keyboardThreadId = 0;
   }
 }
 
-static void SendUnicodeString(const std::u16string& msg) {
+static void StopKeyboardHookThread() {
+  std::thread threadToJoin;
+
+  {
+    std::lock_guard<std::mutex> lock(lifecycleMtx);
+    running.store(false);
+
+    if (keyboardThreadId != 0) {
+      PostThreadMessage(keyboardThreadId, WM_QUIT, 0, 0);
+    }
+
+    if (keyboardThread.joinable()) {
+      threadToJoin = std::move(keyboardThread);
+    }
+  }
+
+  if (threadToJoin.joinable()) {
+    threadToJoin.join();
+  }
+
+  {
+    std::lock_guard<std::mutex> lock(lifecycleMtx);
+    hKeyboardHook = nullptr;
+    keyboardThreadId = 0;
+    hookSetupComplete = false;
+    hookSetupError = ERROR_SUCCESS;
+    inputInstalled = false;
+  }
+
+  ResetKeyStates();
+}
+
+static void CleanupInputResources() {
+  StopKeyboardHookThread();
+  ReleaseKeyEventCallback();
+}
+
+static bool SendUnicodeString(const std::u16string& msg, std::string* errorMessage) {
+  if (msg.empty()) {
+    return true;
+  }
+
+  if (msg.length() > static_cast<size_t>(std::numeric_limits<UINT>::max() / 2)) {
+    *errorMessage = "Input string is too long";
+    return false;
+  }
+
   size_t inputCount = msg.length() * 2;
   std::vector<INPUT> inputs(inputCount);
   for (size_t i = 0, j = 0; i < msg.length(); ++i, j += 2) {
@@ -96,14 +185,22 @@ static void SendUnicodeString(const std::u16string& msg) {
     inputs[j + 1].ki.time = 0;
     inputs[j + 1].ki.dwExtraInfo = 0;
   }
-  SendInput(static_cast<UINT>(inputs.size()), &inputs[0], sizeof(INPUT));
+
+  UINT expected = static_cast<UINT>(inputs.size());
+  UINT actual = SendInput(expected, inputs.data(), sizeof(INPUT));
+  if (actual != expected) {
+    *errorMessage = FormatSendInputError(expected, actual, GetLastError());
+    return false;
+  }
+
+  return true;
 }
 
 static WORD GetScanCode(WORD virtualKeyCode) {
   return static_cast<WORD>(MapVirtualKey(virtualKeyCode, MAPVK_VK_TO_VSC));
 }
 
-static void PressKey(WORD key, bool press) {
+static bool PressKey(WORD key, bool press, std::string* errorMessage) {
   INPUT input = {0};
   input.type = INPUT_KEYBOARD;
   input.ki.wVk = key;
@@ -111,47 +208,95 @@ static void PressKey(WORD key, bool press) {
   if (!press) {
     input.ki.dwFlags = KEYEVENTF_KEYUP;
   }
-  SendInput(1, &input, sizeof(INPUT));
-}
 
-// 对外 API 函数实现
+  UINT actual = SendInput(1, &input, sizeof(INPUT));
+  if (actual != 1) {
+    *errorMessage = FormatSendInputError(1, actual, GetLastError());
+    return false;
+  }
+
+  return true;
+}
 
 Napi::Value InstallHook(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
-  std::thread(KeyboardHookThread).detach();
-  std::thread(SendTaskThread).detach();
+
+  {
+    std::lock_guard<std::mutex> lock(lifecycleMtx);
+    if (inputInstalled) {
+      return env.Undefined();
+    }
+
+    if (keyboardThread.joinable()) {
+      Napi::Error::New(env, "Input hook is already starting").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    running.store(true);
+    hookSetupComplete = false;
+    hookSetupError = ERROR_SUCCESS;
+    keyboardThread = std::thread(KeyboardHookThread);
+  }
+
+  DWORD setupError = ERROR_SUCCESS;
+  std::thread failedThread;
+  {
+    std::unique_lock<std::mutex> lock(lifecycleMtx);
+    hookSetupCv.wait(lock, [] { return hookSetupComplete; });
+    setupError = hookSetupError;
+
+    if (setupError == ERROR_SUCCESS) {
+      inputInstalled = true;
+    } else {
+      running.store(false);
+      if (keyboardThread.joinable()) {
+        failedThread = std::move(keyboardThread);
+      }
+    }
+  }
+
+  if (failedThread.joinable()) {
+    failedThread.join();
+  }
+
+  if (setupError != ERROR_SUCCESS) {
+    Napi::Error::New(env, FormatWindowsError("SetWindowsHookEx", setupError)).ThrowAsJavaScriptException();
+  }
+
   return env.Undefined();
 }
 
 Napi::Value UninstallHook(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
-  {
-    std::lock_guard<std::mutex> lock(mtx);
-    running = false;
-  }
-  {
-    std::lock_guard<std::mutex> lock(taskMtx);
-    sendingThreadRunning = false;
-  }
-  taskCv.notify_all();
-  cv.notify_one();
+  CleanupInputResources();
   return env.Undefined();
 }
 
 Napi::Value OnKeyEvent(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
-  if (!info[0].IsFunction()) {
+  if (info.Length() < 1 || !info[0].IsFunction()) {
     Napi::TypeError::New(env, "Expected a function as the first argument").ThrowAsJavaScriptException();
     return env.Undefined();
   }
+
   Napi::Function callback = info[0].As<Napi::Function>();
-  tsfn = Napi::ThreadSafeFunction::New(
-      env,
-      callback,
-      "KeyEventCallback",
-      0,
-      1);
-  tsfnInitialized = true;
+  {
+    std::lock_guard<std::mutex> lock(tsfnMtx);
+    if (tsfnInitialized) {
+      tsfn.Release();
+      tsfnInitialized = false;
+    }
+
+    tsfn = Napi::ThreadSafeFunction::New(
+        env,
+        callback,
+        "KeyEventCallback",
+        0,
+        1);
+    tsfn.Unref(env);
+    tsfnInitialized = true;
+  }
+
   return env.Undefined();
 }
 
@@ -174,7 +319,14 @@ Napi::Value SendKey(const Napi::CallbackInfo& info) {
     Napi::TypeError::New(env, "Expected arguments: [uint32, bool]").ThrowAsJavaScriptException();
     return env.Undefined();
   }
-  WORD key = static_cast<WORD>(info[0].As<Napi::Number>().Uint32Value());
+
+  uint32_t keyCode = info[0].As<Napi::Number>().Uint32Value();
+  if (keyCode > 255) {
+    Napi::RangeError::New(env, "Virtual key code must be between 0 and 255").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  WORD key = static_cast<WORD>(keyCode);
   bool press = info[1].As<Napi::Boolean>().Value();
   auto* worker = new SendKeyWorker(env, key, press);
   Napi::Promise promise = worker->GetPromise();
@@ -196,15 +348,15 @@ Napi::Value GetKeyStates(const Napi::CallbackInfo& info) {
   return arr;
 }
 
-// 异步 Worker 类实现
-
-// SendKeysWorker 实现
 SendKeysWorker::SendKeysWorker(const Napi::Env& env, const std::u16string& msg)
     : Napi::AsyncWorker(env), msg(msg), deferred(Napi::Promise::Deferred::New(env)) {
 }
 
 void SendKeysWorker::Execute() {
-  SendUnicodeString(msg);
+  std::string errorMessage;
+  if (!SendUnicodeString(msg, &errorMessage)) {
+    SetError(errorMessage);
+  }
 }
 
 void SendKeysWorker::OnOK() {
@@ -219,13 +371,15 @@ Napi::Promise SendKeysWorker::GetPromise() {
   return deferred.Promise();
 }
 
-// SendKeyWorker 实现
 SendKeyWorker::SendKeyWorker(const Napi::Env& env, WORD key, bool press)
     : Napi::AsyncWorker(env), key(key), press(press), deferred(Napi::Promise::Deferred::New(env)) {
 }
 
 void SendKeyWorker::Execute() {
-  PressKey(key, press);
+  std::string errorMessage;
+  if (!PressKey(key, press, &errorMessage)) {
+    SetError(errorMessage);
+  }
 }
 
 void SendKeyWorker::OnOK() {
@@ -241,6 +395,8 @@ Napi::Promise SendKeyWorker::GetPromise() {
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  env.AddCleanupHook(CleanupInputResources);
+
   exports.Set("install", Napi::Function::New(env, InstallHook));
   exports.Set("uninstall", Napi::Function::New(env, UninstallHook));
   exports.Set("onKeyEvent", Napi::Function::New(env, OnKeyEvent));

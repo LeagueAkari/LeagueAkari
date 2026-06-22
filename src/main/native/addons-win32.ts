@@ -6,10 +6,14 @@ if (process.platform === 'win32') {
   addons = require('league-akari-native-win32') as Win32Addons
 
   if (addons.tools.isElevated()) {
-    addons.input.instance.install()
+    try {
+      addons.input.instance.install()
 
-    process.on('exit', () => {
-      addons.input.instance.uninstall()
-    })
+      process.on('exit', () => {
+        addons.input.instance.uninstall()
+      })
+    } catch (error) {
+      console.warn('Failed to install native input hook:', error)
+    }
   }
 }
