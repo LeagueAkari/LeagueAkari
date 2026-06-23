@@ -11,6 +11,10 @@
   ],
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
+  "files": [
+    "addons/*.node",
+    "dist/**/*"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -38,6 +42,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "node-addon-api": "^8.3.1"
+    "node-addon-api": "^8.8.0"
   }
 }

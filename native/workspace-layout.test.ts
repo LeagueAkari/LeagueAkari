@@ -71,6 +71,7 @@ describe('native workspace layout', () => {
   test('defaults package entrypoints to the checked-in build artifact location', () => {
     const nativePackage = readJson<{
       cpu?: string[]
+      files?: string[]
       main: string
       os?: string[]
       types: string
@@ -81,6 +82,7 @@ describe('native workspace layout', () => {
     expect(nativePackage.cpu).toEqual(['x64'])
     expect(nativePackage.main).toBe('dist/index.js')
     expect(nativePackage.types).toBe('dist/index.d.ts')
+    expect(nativePackage.files).toEqual(['addons/*.node', 'dist/**/*'])
     expect(nativePackage.exports['.']).toMatchObject({
       types: './dist/index.d.ts',
       require: './dist/index.js',
