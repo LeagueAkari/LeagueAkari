@@ -16,7 +16,9 @@
     "types": ["electron-vite/node", "@modyfi/vite-plugin-yaml/modules"],
     "paths": {
       "@shared/*": ["./src/shared/*"],
-      "@main/*": ["./src/main/*"]
+      "@main/*": ["./src/main/*"],
+      "league-akari-native-win32": ["./native/win32-x64/lib/index.ts"],
+      "league-akari-native-win32/*": ["./native/win32-x64/lib/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,

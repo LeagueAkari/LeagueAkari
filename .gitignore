@@ -8,10 +8,8 @@ examples
 images
 addons/build
 .yarn/install-state*.gz
-native/build/
-native/addons/
-native/dist/
-native/*.tgz
+native/*/build/
+native/*/*.tgz
 rabi-*
 todolist.md
 todolist.txt

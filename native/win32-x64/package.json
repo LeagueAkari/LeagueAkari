@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "description": "Internal Windows native bindings for League Akari",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "exports": {
@@ -33,6 +39,5 @@
   "license": "MIT",
   "dependencies": {
     "node-addon-api": "^8.3.1"
-  },
-  "gypfile": true
+  }
 }

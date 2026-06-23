@@ -8,7 +8,7 @@
       "path": "./tsconfig.web.json"
     },
     {
-      "path": "./native/tsconfig.json"
+      "path": "./native/win32-x64/tsconfig.json"
     }
   ],
   "compilerOptions": {

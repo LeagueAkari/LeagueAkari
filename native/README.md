@@ -1,3 +1,5 @@
-# League Akari Native Win32
+# League Akari Native Packages
 
-Internal Windows-only native bindings for League Akari.
+Native packages live under platform-architecture directories, for example `native/win32-x64`.
+
+Each directory is an independent workspace package for one native target.

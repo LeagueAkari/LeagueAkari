@@ -6791,9 +6791,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"league-akari-native-win32@workspace:*, league-akari-native-win32@workspace:native":
+"league-akari-native-win32@workspace:*, league-akari-native-win32@workspace:native/win32-x64":
   version: 0.0.0-use.local
-  resolution: "league-akari-native-win32@workspace:native"
+  resolution: "league-akari-native-win32@workspace:native/win32-x64"
   dependencies:
     node-addon-api: "npm:^8.3.1"
   languageName: unknown
@@ -6882,6 +6882,9 @@ __metadata:
     winston: "npm:^3.19.0"
     ws: "npm:^8.20.1"
     zod: "npm:^4.4.3"
+  dependenciesMeta:
+    league-akari-native-win32:
+      optional: true
   languageName: unknown
   linkType: soft
 
