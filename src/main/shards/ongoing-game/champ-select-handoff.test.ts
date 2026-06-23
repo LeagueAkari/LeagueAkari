@@ -1,6 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { ChampSelectSession, ChampSelectTeam } from '@shared/types/league-client/champ-select'
-import { encryptUuid } from '@shared/utils/puuid-decrypt'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -11,6 +10,16 @@ import {
 import { OngoingGameChampSelectHandoffController } from './champ-select-handoff-controller'
 import { collectVisibleChampSelectMembers } from './champ-select-members'
 import type { OngoingGameMainContext } from './context'
+
+vi.mock('@main/native', () => ({
+  magic: (value: string) => {
+    if (value === '906167b8-d673-63a8-d1dc-3d469bc442b2') {
+      return '11111111-2222-3333-4444-555555555555'
+    }
+
+    return ''
+  }
+}))
 
 const SNAPSHOT_STORAGE_KEY = 'champSelectHandoffSnapshot'
 
@@ -185,7 +194,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
       theirTeam: [
         createMember({
           nameVisibilityType: 'HIDDEN',
-          obfuscatedPuuid: encryptUuid(hiddenPuuid),
+          obfuscatedPuuid: '906167b8-d673-63a8-d1dc-3d469bc442b2',
           championId: 0,
           championPickIntent: 99,
           assignedPosition: 'middle',

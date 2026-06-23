@@ -1,6 +1,6 @@
+import { magic } from '@main/native'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { ChampSelectSession, ChampSelectTeam } from '@shared/types/league-client/champ-select'
-import { decryptUuid } from '@shared/utils/puuid-decrypt'
 
 export interface ChampSelectVisibilityConfigLike {
   spotlight: {
@@ -55,7 +55,7 @@ export function getVisibleChampSelectPuuid(
     member.obfuscatedPuuid &&
     config.spotlight.deobfuscation
   ) {
-    return decryptUuid(member.obfuscatedPuuid) || null
+    return magic(member.obfuscatedPuuid) || null
   }
 
   if (!member.puuid || member.puuid === EMPTY_PUUID) {

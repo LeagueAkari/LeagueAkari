@@ -12,6 +12,7 @@ import {
 import { getCommandLinePowershell } from './process-utils-win32'
 
 export type { KeyEvent as NativeInputKeyEvent } from 'league-akari-native-win32/input'
+export { magic } from './magic'
 
 /**
  * 通过进程名搜索匹配的 pid 列表
