@@ -10,6 +10,14 @@ addons/build
 .yarn/install-state*.gz
 native/*/build/
 native/*/*.tgz
+
+# Keep native package bootstrap artifacts checked in.
+!native/*/addons/
+!native/*/addons/*.node
+!native/*/dist/
+!native/*/dist/**/*.js
+!native/*/dist/**/*.d.ts
+native/*/dist/*.tsbuildinfo
 rabi-*
 todolist.md
 todolist.txt

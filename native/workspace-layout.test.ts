@@ -37,6 +37,10 @@ describe('native workspace layout', () => {
     expect(rootPackage.scripts['build:win:skip-native']).toBe(
       'npm run build && electron-builder --win --config'
     )
+    expect(rootPackage.scripts.postinstall).toBe(
+      'node scripts/clear-electron-rebuild-metadata.cjs'
+    )
+    expect(rootPackage.scripts.postinstall).not.toContain('-f')
     expect(rootPackage.scripts.postinstall).not.toContain('native/win32-x64/scripts/build.js')
     expect(rootTsconfig.references).toContainEqual({ path: './native/win32-x64/tsconfig.json' })
     expect(nodeTsconfig.compilerOptions.paths['league-akari-native-win32']).toEqual([
@@ -45,6 +49,7 @@ describe('native workspace layout', () => {
     expect(nodeTsconfig.compilerOptions.paths['league-akari-native-win32/*']).toEqual([
       './native/win32-x64/lib/*'
     ])
+    expect(nodeTsconfig.include).toContain('native/**/*.ts')
     expect(fs.existsSync(path.join(repoRoot, 'native/win32-x64/package.json'))).toBe(true)
     expect(fs.existsSync(path.join(repoRoot, 'native/win32-x64/binding.gyp'))).toBe(true)
     expect(fs.existsSync(path.join(repoRoot, 'native/win32-x64/gyp/binding.gyp'))).toBe(false)

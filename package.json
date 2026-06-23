@@ -22,7 +22,7 @@
     "build:native:win": "node native/win32-x64/scripts/build.js",
     "build": "npm run typecheck && electron-vite build",
     "benchmark:radix": "vitest bench src/shared/utils/radix-matcher.bench.ts",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "node scripts/clear-electron-rebuild-metadata.cjs",
     "build:win": "npm run build:native:win && npm run build:win:skip-native",
     "build:win:skip-native": "npm run build && electron-builder --win --config",
     "gen-types": "tsc --declaration --emitDeclarationOnly --outDir ./out/types -p tsconfig.node.json",

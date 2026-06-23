@@ -5,7 +5,7 @@
     "src/main/**/*",
     "src/preload/*",
     "src/shared/**/*",
-    "src/main/shards/game-client"
+    "native/**/*.ts"
   ],
   "compilerOptions": {
     "moduleResolution": "NodeNext",
