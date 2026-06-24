@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const { spawnSync } = require('node:child_process')
 const fs = require('node:fs')
+const path = require('node:path')
 
 function run(cmd, args) {
   const res = spawnSync(cmd, args, { stdio: 'inherit' })
@@ -8,10 +9,9 @@ function run(cmd, args) {
   return res.status ?? 1
 }
 
-function main() {
+function ensureCodesign(appPath) {
   if (process.platform !== 'darwin') return
 
-  const appPath = process.argv[2]
   if (!appPath) {
     console.error('Usage: node scripts/macos/ensure-codesign.cjs "<path-to-app>"')
     process.exit(2)
@@ -43,4 +43,13 @@ function main() {
   console.log('[ensure-codesign] ad-hoc signature applied and verified')
 }
 
-main()
+module.exports = async function ensureCodesignHook(context) {
+  if (process.platform !== 'darwin') return
+
+  const productFilename = context.packager.appInfo.productFilename
+  ensureCodesign(path.join(context.appOutDir, `${productFilename}.app`))
+}
+
+if (require.main === module) {
+  ensureCodesign(process.argv[2])
+}

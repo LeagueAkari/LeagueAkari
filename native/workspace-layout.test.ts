@@ -37,9 +37,7 @@ describe('native workspace layout', () => {
     expect(rootPackage.scripts['build:win:skip-native']).toBe(
       'npm run build && electron-builder --win --config'
     )
-    expect(rootPackage.scripts.postinstall).toBe(
-      'node scripts/clear-electron-rebuild-metadata.cjs'
-    )
+    expect(rootPackage.scripts.postinstall).toBe('node scripts/clear-electron-rebuild-metadata.cjs')
     expect(rootPackage.scripts.postinstall).not.toContain('-f')
     expect(rootPackage.scripts.postinstall).not.toContain('native/win32-x64/scripts/build.js')
     expect(rootTsconfig.references).toContainEqual({ path: './native/win32-x64/tsconfig.json' })
@@ -59,13 +57,17 @@ describe('native workspace layout', () => {
     const rootPackage = readJson<{
       scripts: Record<string, string>
     }>('package.json')
+    const electronBuilderConfig = fs.readFileSync(
+      path.join(repoRoot, 'electron-builder.yml'),
+      'utf8'
+    )
 
     expect(rootPackage.scripts['build:mac']).toBe(
       'npm run build && electron-builder --mac --config'
     )
     expect(rootPackage.scripts['build:mac:dir']).toBeUndefined()
-    expect(rootPackage.scripts['build:mac:ensure-codesign']).toBeUndefined()
     expect(rootPackage.scripts['build:mac:package']).toBeUndefined()
+    expect(electronBuilderConfig).toContain('afterSign: ./scripts/macos/ensure-codesign.cjs')
   })
 
   test('defaults package entrypoints to the checked-in build artifact location', () => {

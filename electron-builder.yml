@@ -36,6 +36,7 @@ electronLanguages:
   - en-US
 
 afterPack: ./scripts/trim-packaged-app.cjs
+afterSign: ./scripts/macos/ensure-codesign.cjs
 
 asarUnpack:
   - resources/**
