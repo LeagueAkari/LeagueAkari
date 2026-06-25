@@ -1,20 +1,12 @@
 export class DelayedTaskScheduler {
-  private _tasks: Map<
-    string,
-    {
-      delay: number
-      fn: () => Promise<any> | any
-      timerId: NodeJS.Timeout
-      onComplete?: (ret: any) => void
-      onError?: (error: any) => void
-    }
-  > = new Map()
+  private _tasks = new Map<string, DelayedTask>()
+  private _drains = new Map<string, Promise<void>>()
 
-  async add(
+  add(
     key: string,
-    fn: () => Promise<any> | any,
+    fn: () => Promise<unknown> | unknown,
     delay = 1000,
-    config?: { onComplete?: (ret: any) => void; onError?: (error: any) => void }
+    config?: { onComplete?: (ret: unknown) => void; onError?: (error: unknown) => void }
   ) {
     const task = this._tasks.get(key)
 
@@ -22,16 +14,13 @@ export class DelayedTaskScheduler {
       clearTimeout(task.timerId)
     }
 
-    const timerId = setTimeout(async () => {
-      try {
-        const ret = await fn()
-        config?.onComplete?.(ret)
-      } catch (error) {
-        config?.onError?.(error)
-      }
+    let pendingTask: DelayedTask
+    const timerId = setTimeout(() => {
+      this._markDueAndDrain(key, pendingTask)
     }, delay)
 
-    this._tasks.set(key, { delay, fn, timerId, ...config })
+    pendingTask = { delay, due: false, fn, timerId, ...config }
+    this._tasks.set(key, pendingTask)
   }
 
   /**
@@ -58,23 +47,71 @@ export class DelayedTaskScheduler {
   }
 
   async flush() {
-    const tasks = Array.from(this._tasks.values())
+    const tasks = Array.from(this._tasks.entries())
 
-    for (const task of tasks) {
+    for (const [, task] of tasks) {
       clearTimeout(task.timerId)
+      task.due = true
     }
 
-    this._tasks.clear()
-
-    await Promise.all(
-      tasks.map(async ({ fn, onComplete, onError }) => {
-        try {
-          const ret = await fn()
-          onComplete?.(ret)
-        } catch (error) {
-          onError?.(error)
-        }
-      })
-    )
+    await Promise.all(tasks.map(([key]) => this._ensureDrain(key)))
+    await Promise.all(this._drains.values())
   }
+
+  private _markDueAndDrain(key: string, task: DelayedTask) {
+    if (this._tasks.get(key) !== task) {
+      return
+    }
+
+    task.due = true
+    void this._ensureDrain(key)
+  }
+
+  private async _ensureDrain(key: string) {
+    const existingDrain = this._drains.get(key)
+    if (existingDrain) {
+      return existingDrain
+    }
+
+    const drain = (async () => {
+      while (true) {
+        const task = this._tasks.get(key)
+        if (!task?.due) {
+          return
+        }
+
+        this._tasks.delete(key)
+        clearTimeout(task.timerId)
+        await this._runTask(task)
+      }
+    })()
+
+    this._drains.set(key, drain)
+
+    try {
+      return await drain
+    } finally {
+      if (this._drains.get(key) === drain) {
+        this._drains.delete(key)
+      }
+    }
+  }
+
+  private async _runTask(task: DelayedTask) {
+    try {
+      const ret = await task.fn()
+      task.onComplete?.(ret)
+    } catch (error) {
+      task.onError?.(error)
+    }
+  }
+}
+
+interface DelayedTask {
+  delay: number
+  due: boolean
+  fn: () => Promise<unknown> | unknown
+  timerId: NodeJS.Timeout
+  onComplete?: (ret: unknown) => void
+  onError?: (error: unknown) => void
 }
