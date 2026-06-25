@@ -23,8 +23,8 @@
     "build": "npm run typecheck && electron-vite build",
     "benchmark:radix": "vitest bench src/shared/utils/radix-matcher.bench.ts",
     "postinstall": "node scripts/clear-electron-rebuild-metadata.cjs",
-    "build:win": "npm run build:native:win && npm run build:win:skip-native",
-    "build:win:skip-native": "npm run build && electron-builder --win --config",
+    "build:win": "npm run build && electron-builder --win --config",
+    "build:win:native": "npm run build:native:win && npm run build:win",
     "gen-types": "tsc --declaration --emitDeclarationOnly --outDir ./out/types -p tsconfig.node.json",
     "build:mac": "npm run build && electron-builder --mac --config"
   },

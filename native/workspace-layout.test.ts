@@ -32,11 +32,12 @@ describe('native workspace layout', () => {
     expect(rootPackage.scripts['build:native:win']).toBe('node native/win32-x64/scripts/build.js')
     expect(rootPackage.scripts['build:native:win32-x64']).toBeUndefined()
     expect(rootPackage.scripts['build:win']).toBe(
-      'npm run build:native:win && npm run build:win:skip-native'
-    )
-    expect(rootPackage.scripts['build:win:skip-native']).toBe(
       'npm run build && electron-builder --win --config'
     )
+    expect(rootPackage.scripts['build:win:native']).toBe(
+      'npm run build:native:win && npm run build:win'
+    )
+    expect(rootPackage.scripts['build:win:skip-native']).toBeUndefined()
     expect(rootPackage.scripts.postinstall).toBe('node scripts/clear-electron-rebuild-metadata.cjs')
     expect(rootPackage.scripts.postinstall).not.toContain('-f')
     expect(rootPackage.scripts.postinstall).not.toContain('native/win32-x64/scripts/build.js')
