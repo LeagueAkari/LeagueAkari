@@ -1,5 +1,4 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { Paths } from '@shared/utils/types'
 
 import { AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
@@ -10,16 +9,19 @@ import { SettingFactoryIpcHandlers } from './ipc-handlers'
 import { SetterSettingService } from './setter-setting-service'
 import { SettingsJsonFileService } from './settings-json-file-service'
 
-export type OnChangeCallback<T = any> = (
-  newValue: T,
-  extra: {
-    oldValue: T
-    key: string
+export interface SettingChangeContext<T = any> {
+  namespace: string
+  key: string
+  oldValue: T
+  value: T
+}
 
-    /** 提交到状态变更和数据库存储, 空值为继承 */
-    setter: (newValue?: T) => void | Promise<void>
-  }
-) => void | Promise<void>
+export interface SettingRestoreContext<T = any> {
+  namespace: string
+  key: string
+  value: unknown
+  defaultValue: T
+}
 
 export interface SettingConfig<T = any> {
   /**
@@ -28,12 +30,31 @@ export interface SettingConfig<T = any> {
   default: T
 
   /**
-   * 实现该设置项的类型, 不提供将会直接修改状态值
+   * 从持久化存储恢复到运行时状态前处理旧数据或不兼容数据
    */
-  onChange?: OnChangeCallback<T>
+  restore?: (context: SettingRestoreContext<T>) => T | Promise<T>
+
+  /**
+   * 在提交前归一化设置项的值
+   */
+  transform?: (context: SettingChangeContext<T>) => T | Promise<T>
+
+  /**
+   * 在提交前执行必要副作用, 抛错时不会提交
+   */
+  sideEffect?: (context: SettingChangeContext<T>) => void | Promise<void>
 }
 
-export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingConfig>>
+export type SettingPath<T extends object> = Extract<
+  {
+    [K in keyof T]-?: T[K] extends (...args: any[]) => any ? never : K
+  }[keyof T],
+  string
+>
+
+export type SettingSchema<T extends object> = Partial<{
+  [K in SettingPath<T>]: SettingConfig<T[K]>
+}>
 
 /**
  * 创建日志记录器的工厂, 供给其他模块使用
@@ -43,7 +64,7 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = SETTING_FACTORY_MAIN_NAMESPACE
 
-  private readonly _settings: Map<string, SetterSettingService> = new Map()
+  private readonly _settings: Map<string, SetterSettingService<any>> = new Map()
   private readonly _context: SettingFactoryMainContext
   private readonly _settingsJsonFileService: SettingsJsonFileService
   private readonly _ipcHandlers: SettingFactoryIpcHandlers
@@ -73,14 +94,12 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     namespace: string,
     schema: SettingSchema<T> = {},
     obj: T = {} as T
-  ) {
+  ): SetterSettingService<T> {
     if (this._settings.has(namespace)) {
       throw new Error(`namespace ${namespace} already created`)
     }
 
-    const service = new SetterSettingService(this, SettingFactoryMain, namespace, schema, obj, {
-      storage: this._storage
-    })
+    const service = new SetterSettingService(this, namespace, schema, obj)
 
     this._settings.set(namespace, service)
     return service

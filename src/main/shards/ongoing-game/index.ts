@@ -22,6 +22,7 @@ import {
 } from './context'
 import { OngoingGameIpcHandlers } from './ipc-handlers'
 import { OngoingGameMatchHistoryLoader } from './match-history-loader'
+import { restorePlayerCardTagsSetting } from './player-card-tags'
 import { OngoingGamePlayerDataLoader } from './player-data-loader'
 import { OngoingGameSideEffectsController } from './side-effects-controller'
 import { OngoingGameSettings, OngoingGameState } from './state'
@@ -35,7 +36,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   static LOADING_PRIORITY = ONGOING_GAME_LOADING_PRIORITY
 
   private readonly _logger: AkariLogger
-  private readonly _settingService: SetterSettingService
+  private readonly _settingService: SetterSettingService<OngoingGameSettings>
 
   public readonly settings: OngoingGameSettings
   public readonly state: OngoingGameState
@@ -69,9 +70,33 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       {
         concurrency: { default: this.settings.concurrency },
         enabled: { default: this.settings.enabled },
-        matchHistoryLoadCount: { default: this.settings.matchHistoryLoadCount },
+        matchHistoryLoadCount: {
+          default: this.settings.matchHistoryLoadCount,
+          transform: ({ value, oldValue }) => {
+            if (value >= 1 && value <= 200) {
+              return value
+            }
+
+            return oldValue
+          },
+          sideEffect: ({ value }) => {
+            return this._settingService.set(
+              'gameDetailsLoadCount',
+              Math.min(value, this.settings.gameDetailsLoadCount)
+            )
+          }
+        },
         matchHistoryTagPreference: { default: this.settings.matchHistoryTagPreference },
-        gameDetailsLoadCount: { default: this.settings.gameDetailsLoadCount },
+        gameDetailsLoadCount: {
+          default: this.settings.gameDetailsLoadCount,
+          transform: ({ value }) => {
+            if (value >= 0 && value <= this.settings.matchHistoryLoadCount) {
+              return value
+            }
+
+            return this.settings.matchHistoryLoadCount
+          }
+        },
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
@@ -79,7 +104,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           default: this.settings.showJunglePathingForAllPlayers
         },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
-        playerCardTags: { default: this.settings.playerCardTags },
+        playerCardTags: {
+          default: this.settings.playerCardTags,
+          restore: ({ value, defaultValue }) => restorePlayerCardTagsSetting(value, defaultValue)
+        },
         queryInLobbyPhase: { default: this.settings.queryInLobbyPhase },
         premadeTeamInferMatchCountThreshold: {
           default: this.settings.premadeTeamInferMatchCountThreshold
@@ -179,7 +207,6 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._matchHistory.watch()
     this._watchUnavailableState()
     this._additionalInfo.watch()
-    this._watchSettingValidation()
   }
 
   private _watchConcurrencyChange() {
@@ -207,27 +234,5 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       },
       { equals: comparer.shallow }
     )
-  }
-
-  private _watchSettingValidation() {
-    this._settingService.onChange('matchHistoryLoadCount', async (value, { setter }) => {
-      if (value >= 1 && value <= 200) {
-        await setter(value)
-      }
-
-      this._settingService.set(
-        'gameDetailsLoadCount',
-        Math.min(value, this.settings.gameDetailsLoadCount)
-      )
-    })
-
-    this._settingService.onChange('gameDetailsLoadCount', async (value, { setter }) => {
-      if (value >= 0 && value <= this.settings.matchHistoryLoadCount) {
-        await setter(value)
-        return
-      }
-
-      await setter(this.settings.matchHistoryLoadCount)
-    })
   }
 }

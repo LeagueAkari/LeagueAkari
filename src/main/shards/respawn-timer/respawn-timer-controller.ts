@@ -10,7 +10,6 @@ export class RespawnTimerController {
   constructor(private readonly context: RespawnTimerMainContext) {}
 
   watch() {
-    this._watchEnabledSetting()
     this._watchGameflow()
   }
 
@@ -18,19 +17,12 @@ export class RespawnTimerController {
     this._stopRespawnTimerPoll()
   }
 
-  private _watchEnabledSetting() {
-    const { leagueClient, settingService, settings } = this.context
-
-    settingService.onChange('enabled', async (v, { setter }) => {
-      if (v && leagueClient.data.gameflow.phase === 'InProgress') {
-        this._startRespawnTimerPoll()
-      } else if (v === false) {
-        this._stopRespawnTimerPoll()
-      }
-
-      settings.setEnabled(v)
-      await setter()
-    })
+  applyEnabledSettingSideEffect(enabled: boolean) {
+    if (enabled && this.context.leagueClient.data.gameflow.phase === 'InProgress') {
+      this._startRespawnTimerPoll()
+    } else if (enabled === false) {
+      this._stopRespawnTimerPoll()
+    }
   }
 
   private _watchGameflow() {

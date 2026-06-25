@@ -53,6 +53,10 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       rememberSize: false,
       repositionWindowIfInvisible: true,
       settingSchema: {
+        pinned: {
+          default: settings.pinned,
+          transform: () => true
+        },
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut },
         timerType: { default: settings.timerType },
@@ -91,12 +95,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     if (!this.settings.pinned) {
       this._settingService.set('pinned', true)
     }
-
-    this._settingService.onChange('pinned', (value: boolean) => {
-      if (!value) {
-        throw new AkariIpcError('cd-timer window must be topmost', 'UnsupportedActionNotTopmost')
-      }
-    })
 
     this._mobxUtils.reaction(
       () => this.state.ready,

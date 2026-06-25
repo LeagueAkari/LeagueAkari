@@ -20,7 +20,7 @@ export interface InGameSendMainContext {
   settings: InGameSendSettings
   state: InGameSendState
   logger: AkariLogger
-  settingService: SetterSettingService
+  settingService: SetterSettingService<InGameSendSettings>
   mobxUtils: MobxUtilsMain
   ipc: AkariIpcMain
   keyboardShortcuts: KeyboardShortcutsMain

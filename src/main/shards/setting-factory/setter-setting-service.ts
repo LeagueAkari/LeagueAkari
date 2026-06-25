@@ -1,7 +1,13 @@
 import _ from 'lodash'
 import { runInAction } from 'mobx'
 
-import { OnChangeCallback, SettingFactoryMain } from '.'
+import type {
+  SettingChangeContext,
+  SettingFactoryMain,
+  SettingPath,
+  SettingRestoreContext,
+  SettingSchema
+} from '.'
 
 export interface SetterSettingServiceSetConfig {
   /**
@@ -18,17 +24,15 @@ export interface SetterSettingServiceSetConfig {
  * 在更新设置时同时更改状态, 状态同步的设置项服务
  * 耦合了状态和设置项读写的功能, 顺便还能读写 JSON 文件
  */
-export class SetterSettingService {
+export class SetterSettingService<TSettings extends object = any> {
   static CONFIG_DIR_NAME = 'AkariConfig'
 
   constructor(
     private readonly _settingFactory: SettingFactoryMain,
-    readonly _C: typeof SettingFactoryMain,
     private readonly _namespace: string,
     // for accessibility
-    public readonly _schema: Record<string, any>,
-    public readonly _obj: object,
-    _deps: any
+    public readonly _schema: SettingSchema<TSettings>,
+    public readonly _obj: TSettings
   ) {}
 
   _getFromStorage(key: string, defaultValue?: any) {
@@ -64,13 +68,20 @@ export class SetterSettingService {
    */
   async _getAllFromStorage() {
     const items: Record<string, any> = {}
-    const jobs = Object.entries(this._schema).map(async ([key, schema]) => {
+    const entries = Object.entries(this._schema) as Array<
+      [SettingPath<TSettings>, { default: TSettings[SettingPath<TSettings>] }]
+    >
+    const jobs = entries.map(async ([key, schema]) => {
+      if (!schema) {
+        return
+      }
+
       const value = await this._settingFactory._getFromStorage(
         this._namespace,
         key as any,
         schema.default
       )
-      items[key] = value
+      items[key] = await this._restoreSettingConfig(key, value)
     })
     await Promise.all(jobs)
     return items
@@ -103,83 +114,18 @@ export class SetterSettingService {
   }
 
   /**
-   * 当某个设置项发生变化时, 拦截此行为
-   * @param newValue
-   * @param extra
-   */
-  onChange(key: string, fn: OnChangeCallback) {
-    if (!this._schema[key]) {
-      throw new Error(`key ${key} not found in schema`)
-    }
-
-    const _fn = this._schema[key].onChange
-    // 重复设置, 会报错
-    if (_fn) {
-      throw new Error(`onChange for key ${key} already set`)
-    }
-
-    this._schema[key].onChange = fn
-  }
-
-  /**
    * 设置设置项的新值, 并**更新状态**
    *
    * 会被延迟写入
    * @param key
    * @param newValue
    */
-  async set(key: string, newValue: any) {
-    const fn = this._schema[key]?.onChange
-
-    if (fn) {
-      const oldValue = this._obj[key as any]
-      await fn(newValue, {
-        oldValue,
-        key,
-        setter: async (v?: any) => {
-          if (v === undefined) {
-            runInAction(() => _.set(this._obj, key, newValue))
-
-            if (newValue === null) {
-              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-                this._settingFactory._removeFromStorage(this._namespace, key)
-              )
-            } else {
-              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-                this._settingFactory._saveToStorage(this._namespace, key as any, newValue)
-              )
-            }
-          } else {
-            runInAction(() => _.set(this._obj, key, v))
-
-            if (v === null) {
-              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-                this._settingFactory._removeFromStorage(this._namespace, key)
-              )
-            } else {
-              this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-                this._settingFactory._saveToStorage(this._namespace, key as any, v)
-              )
-            }
-          }
-        }
-      })
-    } else {
-      runInAction(() => _.set(this._obj, key, newValue))
-
-      if (newValue === null) {
-        this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-          this._settingFactory._removeFromStorage(this._namespace, key)
-        )
-      } else {
-        this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-          this._settingFactory._saveToStorage(this._namespace, key, newValue)
-        )
-      }
-    }
+  async set<K extends SettingPath<TSettings>>(key: K, newValue: TSettings[K]) {
+    const value = await this._applySettingConfig(key, newValue)
+    this._commitSetting(key, value)
   }
 
-  async get(key: string) {
+  async get<K extends SettingPath<TSettings>>(key: K): Promise<TSettings[K]> {
     return _.get(this._obj, key)
   }
 
@@ -189,5 +135,75 @@ export class SetterSettingService {
    */
   remove(_key: string): never {
     throw new Error('not implemented')
+  }
+
+  private async _applySettingConfig<K extends SettingPath<TSettings>>(
+    key: K,
+    newValue: TSettings[K]
+  ) {
+    const schema = this._schema[key]
+    if (!schema) {
+      return newValue
+    }
+
+    const oldValue = _.get(this._obj, key) as TSettings[K]
+    let value = newValue
+
+    if (schema.transform) {
+      value = await schema.transform(this._createChangeContext(key, oldValue, value))
+    }
+
+    const context = this._createChangeContext(key, oldValue, value)
+    await schema.sideEffect?.(context)
+
+    return value
+  }
+
+  private async _restoreSettingConfig<K extends SettingPath<TSettings>>(
+    key: K,
+    value: unknown
+  ): Promise<TSettings[K]> {
+    const schema = this._schema[key]
+    if (!schema?.restore) {
+      return value as TSettings[K]
+    }
+
+    return schema.restore(this._createRestoreContext(key, value, schema.default as TSettings[K]))
+  }
+
+  private _createChangeContext<T>(key: string, oldValue: T, value: T): SettingChangeContext<T> {
+    return {
+      namespace: this._namespace,
+      key,
+      oldValue,
+      value
+    }
+  }
+
+  private _createRestoreContext<T>(
+    key: string,
+    value: unknown,
+    defaultValue: T
+  ): SettingRestoreContext<T> {
+    return {
+      namespace: this._namespace,
+      key,
+      value,
+      defaultValue
+    }
+  }
+
+  private _commitSetting<K extends SettingPath<TSettings>>(key: K, value: TSettings[K]) {
+    runInAction(() => _.set(this._obj, key, value))
+
+    if (value === null) {
+      this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+        this._settingFactory._removeFromStorage(this._namespace, key)
+      )
+    } else {
+      this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
+        this._settingFactory._saveToStorage(this._namespace, key, value)
+      )
+    }
   }
 }

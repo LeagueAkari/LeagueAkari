@@ -44,7 +44,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
   public readonly state = new InGameSendState()
 
   private readonly _logger: AkariLogger
-  private readonly _settingService: SetterSettingService
+  private readonly _settingService: SetterSettingService<InGameSendSettings>
   private readonly _context: InGameSendMainContext
 
   private readonly _sendExecutor: InGameSendExecutor
@@ -68,9 +68,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       InGameSendMain.id,
       {
-        sendInterval: { default: this.settings.sendInterval },
+        sendInterval: {
+          default: this.settings.sendInterval,
+          transform: ({ value }) => Math.max(0, value)
+        },
         cancelShortcut: { default: this.settings.cancelShortcut },
-        presetOptions: { default: this.settings.presetOptions }
+        presetOptions: {
+          default: this.settings.presetOptions,
+          transform: ({ value }) => normalizeInGameSendPresetOptions(value)
+        }
       },
       this.settings
     )
@@ -121,18 +127,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
       'junglePuuids',
       'premadeIndices'
     ])
-
-    this._settingService.onChange('sendInterval', (value, { setter }) => {
-      if (value < 0) {
-        return setter(0)
-      }
-
-      return setter(value)
-    })
-
-    this._settingService.onChange('presetOptions', (value, { setter }) => {
-      return setter(normalizeInGameSendPresetOptions(value))
-    })
   }
 
   async onInit() {

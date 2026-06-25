@@ -32,7 +32,7 @@ export interface OngoingGameMainContext {
   logger: AkariLogger
   ipc: AkariIpcMain
   mobxUtils: MobxUtilsMain
-  settingService: SetterSettingService
+  settingService: SetterSettingService<OngoingGameSettings>
   leagueClient: LeagueClientMain
   sgp: SgpMain
   savedPlayer: SavedPlayerMain

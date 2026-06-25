@@ -24,7 +24,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   public readonly state: RespawnTimerState
 
   private readonly _logger: AkariLogger
-  private readonly _settingService: SetterSettingService
+  private readonly _settingService: SetterSettingService<RespawnTimerSettings>
   private readonly _context: RespawnTimerMainContext
   private readonly _controller: RespawnTimerController
 
@@ -39,7 +39,10 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       RespawnTimerMain.id,
       {
-        enabled: { default: false }
+        enabled: {
+          default: false,
+          sideEffect: ({ value }) => this._controller.applyEnabledSettingSideEffect(value)
+        }
       },
       this.settings
     )

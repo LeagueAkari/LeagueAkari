@@ -104,7 +104,7 @@ export abstract class BaseAkariWindow<
   protected _forceReadyTimerId: NodeJS.Timeout | null = null
   protected _trueClose = false
 
-  protected readonly _settingService: SetterSettingService
+  protected readonly _settingService: SetterSettingService<TSettings>
 
   protected readonly _appCommon: AppCommonMain
 

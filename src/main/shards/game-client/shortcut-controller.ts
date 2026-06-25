@@ -9,23 +9,20 @@ export class GameClientShortcutController {
     if (settings.terminateShortcut) {
       this._registerTerminateShortcut(settings.terminateShortcut, 'initialize')
     }
+  }
 
-    this.context.settingService.onChange('terminateShortcut', async (value, { setter }) => {
-      if (value === null) {
-        this.context.keyboardShortcuts.unregisterByTargetId(
-          TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID
-        )
-      } else {
-        try {
-          this._registerTerminateShortcut(value, 'setting-change')
-        } catch {
-          this.context.logger.warn('Failed to register shortcut', value)
-          await setter(null)
-        }
-      }
+  applyTerminateShortcutSettingSideEffect(shortcut: string | null) {
+    if (shortcut === null) {
+      this.context.keyboardShortcuts.unregisterByTargetId(TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID)
+      return
+    }
 
-      await setter()
-    })
+    try {
+      this._registerTerminateShortcut(shortcut, 'setting-change')
+    } catch {
+      this.context.logger.warn('Failed to register shortcut', shortcut)
+      throw new Error('Failed to register shortcut')
+    }
   }
 
   private _registerTerminateShortcut(shortcut: string, stage: 'initialize' | 'setting-change') {

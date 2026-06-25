@@ -15,6 +15,6 @@ export interface RespawnTimerMainContext {
   logger: AkariLogger
   mobxUtils: MobxUtilsMain
   settings: RespawnTimerSettings
-  settingService: SetterSettingService
+  settingService: SetterSettingService<RespawnTimerSettings>
   state: RespawnTimerState
 }

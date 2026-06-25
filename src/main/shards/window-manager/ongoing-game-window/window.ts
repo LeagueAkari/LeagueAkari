@@ -1,7 +1,6 @@
 import { is } from '@electron-toolkit/utils'
 import { NATIVE_SUPPORT } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
-import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
 import { comparer } from 'mobx'
 
@@ -37,6 +36,10 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       rememberSize: false,
       repositionWindowIfInvisible: true,
       settingSchema: {
+        pinned: {
+          default: settings.pinned,
+          transform: () => true
+        },
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut }
       },
@@ -70,15 +73,6 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
     if (!this.settings.pinned) {
       this._settingService.set('pinned', true)
     }
-
-    this._settingService.onChange('pinned', (value: boolean) => {
-      if (!value) {
-        throw new AkariIpcError(
-          'ongoing-game window must be topmost',
-          'UnsupportedActionNotTopmost'
-        )
-      }
-    })
 
     this._mobxUtils.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit],

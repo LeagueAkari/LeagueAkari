@@ -40,7 +40,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   public readonly state: AutoGameflowState
 
   private readonly _logger: AkariLogger
-  private readonly _settingService: SetterSettingService
+  private readonly _settingService: SetterSettingService<AutoGameflowSettings>
   private readonly _context: AutoGameflowMainContext
 
   private readonly _actionController: AutoGameflowActionController
@@ -64,7 +64,14 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       AutoGameflowMain.id,
       {
         autoAcceptDelaySeconds: { default: this.settings.autoAcceptDelaySeconds },
-        autoAcceptEnabled: { default: this.settings.autoAcceptEnabled },
+        autoAcceptEnabled: {
+          default: this.settings.autoAcceptEnabled,
+          sideEffect: ({ value }) => {
+            if (!value) {
+              this._actionController.cancelAutoAccept('normal')
+            }
+          }
+        },
         autoHonorEnabled: { default: this.settings.autoHonorEnabled },
         autoHonorStrategy: { default: this.settings.autoHonorStrategy },
         autoMatchmakingDelaySeconds: { default: this.settings.autoMatchmakingDelaySeconds },
@@ -130,15 +137,6 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
 
   private async _setupState() {
     await this._settingService.applyToState()
-
-    this._settingService.onChange('autoAcceptEnabled', async (value, { setter }) => {
-      if (!value) {
-        this._actionController.cancelAutoAccept('normal')
-      }
-
-      this.settings.setAutoAcceptEnabled(value)
-      await setter()
-    })
 
     this._mobxUtils.propSync(AutoGameflowMain.id, 'settings', this.settings, [
       'autoAcceptDelaySeconds',

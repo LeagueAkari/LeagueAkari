@@ -25,5 +25,5 @@ export interface GameClientMainContext {
   mobxUtils: MobxUtilsMain
   ipc: AkariIpcMain
   settings: GameClientSettings
-  settingService: SetterSettingService
+  settingService: SetterSettingService<GameClientSettings>
 }

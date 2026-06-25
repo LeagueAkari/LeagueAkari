@@ -41,7 +41,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   static GAME_CLIENT_BASE_URL = GAME_CLIENT_BASE_URL
 
   private readonly _logger: AkariLogger
-  private readonly _settingService: SetterSettingService
+  private readonly _settingService: SetterSettingService<GameClientSettings>
   private readonly _context: GameClientMainContext
   private readonly _ipcHandlers: GameClientIpcHandlers
   private readonly _shortcutController: GameClientShortcutController
@@ -78,7 +78,11 @@ export class GameClientMain implements IAkariShardInitDispose {
       GameClientMain.id,
       {
         terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },
-        terminateShortcut: { default: this.settings.terminateShortcut }
+        terminateShortcut: {
+          default: this.settings.terminateShortcut,
+          sideEffect: ({ value }) =>
+            this._shortcutController.applyTerminateShortcutSettingSideEffect(value)
+        }
       },
       this.settings
     )

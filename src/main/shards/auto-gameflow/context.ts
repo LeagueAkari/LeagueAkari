@@ -17,7 +17,7 @@ export interface AutoGameflowMainContext {
   settings: AutoGameflowSettings
   state: AutoGameflowState
   logger: AkariLogger
-  settingService: SetterSettingService
+  settingService: SetterSettingService<AutoGameflowSettings>
   leagueClient: LeagueClientMain
   mobxUtils: MobxUtilsMain
   ipc: AkariIpcMain
