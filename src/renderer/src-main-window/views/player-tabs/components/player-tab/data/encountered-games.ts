@@ -7,7 +7,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { LcuGameSummary, LcuOrSgpGameSummary, SgpGameSummary } from '@shared/data-adapter/wrapper'
-import { EncounteredGame } from '@shared/types/shards/saved-player'
+import { EncounteredGame } from '@shared/shards/saved-player'
 import {
   InjectionKey,
   Ref,

@@ -1,7 +1,30 @@
+import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
+
 import { calculateCoefficientOfVariation, noZero } from '../../../utils'
 import type { AggregatedSummaryAnalysis } from '../types/aggregated'
 import type { PreparedGame } from '../types/helpers'
-import { avgIfAllNonNull, avgOrZero, sumPings } from '../utils/math'
+import { avgIfAllNonNull, avgOrOne, avgOrZero } from '../utils/math'
+
+/** 把 pings 各字段相加；pings 为 null 时返回 null（LCU 不提供） */
+export function sumPings(pings: MatchParticipant['pings']): number | null {
+  if (!pings) return null
+  return (
+    pings.allInPings +
+    pings.assistMePings +
+    pings.basicPings +
+    pings.commandPings +
+    pings.dangerPings +
+    pings.enemyMissingPings +
+    pings.enemyVisionPings +
+    pings.getBackPings +
+    pings.holdPings +
+    pings.needVisionPings +
+    pings.onMyWayPings +
+    pings.pushPings +
+    pings.retreatPings +
+    pings.visionClearedPings
+  )
+}
 
 export function computeAggregatedSummary(games: PreparedGame[]): AggregatedSummaryAnalysis {
   const summaries = games.map((g) => g.single.summary)
@@ -19,6 +42,7 @@ export function computeAggregatedSummary(games: PreparedGame[]): AggregatedSumma
     avgChampionDamagePercentageOfTeam: avgOrZero(
       summaries.map((s) => s.championDamagePercentageOfTeam)
     ),
+    avgChampionDamagePerMinute: avgOrZero(summaries.map((s) => s.championDamagePerMinute)),
     avgDamageTakenRatioToTeamMax: avgOrZero(summaries.map((s) => s.damageTakenRatioToTeamMax)),
     avgDamageTakenRatioToMax: avgOrZero(summaries.map((s) => s.damageTakenRatioToMax)),
     avgDamageTakenPercentageOfTeam: avgOrZero(summaries.map((s) => s.damageTakenPercentageOfTeam)),
@@ -47,6 +71,8 @@ export function computeAggregatedSummary(games: PreparedGame[]): AggregatedSumma
     avgEnemyMissingPings: avgIfAllNonNull(
       participants.map((p) => p.pings?.enemyMissingPings ?? null)
     ),
-    avgPings: avgIfAllNonNull(participants.map((p) => sumPings(p.pings)))
+    avgPings: avgIfAllNonNull(participants.map((p) => sumPings(p.pings))),
+
+    avgKillDamageEfficiency: avgOrOne(summaries.map((s) => s.killDamageEfficiency))
   }
 }

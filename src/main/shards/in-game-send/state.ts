@@ -1,15 +1,20 @@
 import {
-  type InGameSendPresetOptions,
-  type InGameSendPresetOptionsPatch,
-  createDefaultInGameSendPresetOptions,
-  normalizeInGameSendPresetOptions
-} from '@shared/types/shards/in-game-send'
+  type InGameSendJunglePresetOptions,
+  type InGameSendPremadePresetOptions,
+  type InGameSendRatingPresetOptions,
+  createDefaultInGameSendJunglePresetOptions,
+  createDefaultInGameSendPremadePresetOptions,
+  createDefaultInGameSendRatingPresetOptions
+} from '@shared/shards/in-game-send'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class InGameSendSettings {
   cancelShortcut: string | null = null
   sendInterval: number = 65
-  presetOptions: InGameSendPresetOptions = createDefaultInGameSendPresetOptions()
+  ratingPresetOptions: InGameSendRatingPresetOptions = createDefaultInGameSendRatingPresetOptions()
+  junglePresetOptions: InGameSendJunglePresetOptions = createDefaultInGameSendJunglePresetOptions()
+  premadePresetOptions: InGameSendPremadePresetOptions =
+    createDefaultInGameSendPremadePresetOptions()
 
   setCancelShortcut(shortcut: string | null) {
     this.cancelShortcut = shortcut
@@ -19,13 +24,11 @@ export class InGameSendSettings {
     this.sendInterval = interval
   }
 
-  setPresetOptions(options: InGameSendPresetOptionsPatch | null | undefined) {
-    this.presetOptions = normalizeInGameSendPresetOptions(options)
-  }
-
   constructor() {
     makeAutoObservable(this, {
-      presetOptions: observable.ref
+      ratingPresetOptions: observable.ref,
+      junglePresetOptions: observable.ref,
+      premadePresetOptions: observable.ref
     })
   }
 }

@@ -49,7 +49,9 @@ export function useInGameSendPresetsPanel() {
     return gamePhase.value === 'in-game' && appCommonStore.nativeSupport.nativeInput.available
   })
 
-  const presetOptions = computed(() => inGameSendStore.settings.presetOptions)
+  const ratingPresetOptions = computed(() => inGameSendStore.settings.ratingPresetOptions)
+  const junglePresetOptions = computed(() => inGameSendStore.settings.junglePresetOptions)
+  const premadePresetOptions = computed(() => inGameSendStore.settings.premadePresetOptions)
 
   const ratingContext = useRatingPresetData({
     inGameSend,
@@ -59,7 +61,7 @@ export function useInGameSendPresetsPanel() {
     teamsWithPlayers,
     allPuuids,
     totalCount,
-    presetOptions
+    ratingPresetOptions
   })
 
   const jungleContext = useJunglePresetData({
@@ -70,7 +72,7 @@ export function useInGameSendPresetsPanel() {
     teamsWithPlayers,
     allPuuids,
     totalCount,
-    presetOptions
+    junglePresetOptions
   })
 
   const premadeContext = usePremadePresetData({
@@ -80,7 +82,7 @@ export function useInGameSendPresetsPanel() {
     canSend,
     teamsWithPlayers,
     totalCount,
-    presetOptions
+    premadePresetOptions
   })
 
   provideRatingPreset(ratingContext)

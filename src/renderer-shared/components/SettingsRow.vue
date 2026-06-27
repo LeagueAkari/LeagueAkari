@@ -5,7 +5,8 @@
       'settings-row--center': align === 'center',
       'settings-row--start': align === 'start',
       'settings-row--disabled': disabled,
-      'settings-row--control-full-line': controlFullLine
+      'settings-row--control-full-line': controlFullLine,
+      'settings-row--no-x-padding': noXPadding
     }"
     :style="{
       '--settings-row-label-width': labelWidth ? `${labelWidth}px` : '220px',
@@ -40,6 +41,7 @@ const { align = 'center' } = defineProps<{
   labelWidth?: number
   labelMinWidth?: number
   gap?: number
+  noXPadding?: boolean
   controlFullLine?: boolean
   align?: 'center' | 'start'
   disabled?: boolean
@@ -56,6 +58,10 @@ const { align = 'center' } = defineProps<{
     column-gap: var(--settings-row-gap);
 
     @apply box-border flex min-h-13 w-full max-w-full border-b border-black/5 py-3 dark:border-white/10;
+  }
+
+  .settings-row.settings-row--no-x-padding {
+    @apply px-0;
   }
 
   .settings-row:last-child {

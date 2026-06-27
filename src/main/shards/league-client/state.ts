@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@shared/types/shards/league-client-ux'
+import { UxCommandLine } from '@shared/shards/league-client-ux'
 import { makeAutoObservable, observable } from 'mobx'
 
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'

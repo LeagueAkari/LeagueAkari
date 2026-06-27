@@ -1,22 +1,19 @@
-import type { InGameSendPresetId } from '@shared/types/shards/in-game-send'
-
-import { buildJunglePresetLines } from './jungle'
-import { buildPremadePresetLines } from './premade'
-import { buildRatingPresetLines } from './rating'
-import type { InGameSendPresetContext } from './types'
-
-export function buildInGameSendPresetLines(
-  presetId: InGameSendPresetId,
-  context: InGameSendPresetContext
-) {
-  switch (presetId) {
-    case 'rating':
-      return buildRatingPresetLines(context)
-    case 'jungle':
-      return buildJunglePresetLines(context)
-    case 'premade':
-      return buildPremadePresetLines(context)
-  }
-}
-
-export type { InGameSendPresetContext }
+export {
+  buildJunglePresetLines,
+  buildJunglePresetLinesFromMainContext,
+  getJunglePresetShortcutTargetId
+} from './jungle'
+export {
+  buildPremadePresetLines,
+  buildPremadePresetLinesFromMainContext,
+  getPremadePresetShortcutTargetId
+} from './premade'
+export {
+  buildRatingPresetLines,
+  buildRatingPresetLinesFromMainContext,
+  getRatingPresetShortcutTargetId
+} from './rating'
+export type { InGameSendJunglePresetLineOptions } from './jungle'
+export type { InGameSendPremadePresetLineOptions } from './premade'
+export type { InGameSendRatingPresetLineOptions } from './rating'
+export type { InGameSendPresetContext } from './types'

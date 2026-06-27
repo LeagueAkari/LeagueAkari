@@ -90,7 +90,7 @@ import type {
   AutoMiscRankedDivision,
   AutoMiscRankedStatus,
   AutoMiscRankedTier
-} from '@shared/types/shards/auto-misc'
+} from '@shared/shards/auto-misc'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NSelect, NTooltip, useMessage, useNotification } from 'naive-ui'
 import { computed, reactive, ref, watchEffect } from 'vue'

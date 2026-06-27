@@ -27,7 +27,7 @@
     <div class="grid grid-cols-2 gap-3">
       <div
         v-for="teamView of teams"
-        :key="teamView.team.id"
+        :key="teamView.team.teamIdentifier"
         class="rounded border border-black/10 bg-black/3 p-2 dark:border-white/10 dark:bg-white/3"
       >
         <div class="mb-1.5 flex items-center justify-between gap-2">
@@ -54,9 +54,9 @@
           <NCheckbox
             v-if="teamView.groups.length > 0"
             size="small"
-            :checked="isTeamAllSelected(teamView.team.id)"
-            :indeterminate="isTeamIndeterminate(teamView.team.id)"
-            @update:checked="(value) => setTeamSelected(teamView.team.id, value)"
+            :checked="isTeamAllSelected(teamView.team.teamIdentifier)"
+            :indeterminate="isTeamIndeterminate(teamView.team.teamIdentifier)"
+            @update:checked="(value) => setTeamSelected(teamView.team.teamIdentifier, value)"
           >
             <span class="text-[11px] text-black/55 dark:text-white/55">
               {{ t('selectAll') }}

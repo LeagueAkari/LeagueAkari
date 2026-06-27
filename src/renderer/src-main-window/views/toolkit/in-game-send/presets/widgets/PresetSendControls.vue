@@ -6,6 +6,7 @@
       :label-width="160"
       :label-description="target.description"
       align="center"
+      no-x-padding
     >
       <template #label>
         <div class="flex items-center gap-1.5">
@@ -53,6 +54,9 @@
         </NPopover>
       </div>
     </SettingsRow>
+
+    <!-- 仅用于触发上面的 border-b -->
+    <span hidden aria-hidden="true"></span>
   </div>
 </template>
 

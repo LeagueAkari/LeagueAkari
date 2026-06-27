@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
+import { MainWindowCloseAction } from '@shared/shards/window-manager'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'

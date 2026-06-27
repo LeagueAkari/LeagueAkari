@@ -1,4 +1,4 @@
-import { OngoingGameSimplifiedChampMastery } from '@shared/types/shards/ongoing-game'
+import { OngoingGameSimplifiedChampMastery } from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
 import { runInAction } from 'mobx'
 

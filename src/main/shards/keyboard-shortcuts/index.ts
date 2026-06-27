@@ -4,7 +4,7 @@ import type {
   KeyboardShortcutKeyState,
   KeyboardShortcutsDebugState,
   ShortcutDetails
-} from '@shared/types/shards/keyboard-shortcut'
+} from '@shared/shards/keyboard-shortcut'
 import { isStandardKeyboardKeyCode } from '@shared/utils/keyboard-shortcuts'
 import EventEmitter from 'node:events'
 

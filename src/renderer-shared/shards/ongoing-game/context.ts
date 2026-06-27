@@ -1,11 +1,8 @@
 import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import type { DraftOptions, OngoingGameSimplifiedChampMastery } from '@shared/shards/ongoing-game'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
-import type {
-  DraftOptions,
-  OngoingGameSimplifiedChampMastery
-} from '@shared/types/shards/ongoing-game'
 
 import type { AkariIpcRenderer } from '../ipc'
 import type { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'

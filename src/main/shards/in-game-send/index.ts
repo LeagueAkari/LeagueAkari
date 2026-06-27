@@ -1,5 +1,4 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { normalizeInGameSendPresetOptions } from '@shared/types/shards/in-game-send'
 
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
@@ -30,8 +29,6 @@ import { InGameSendSettings, InGameSendState } from './state'
  *  - 英雄选择阶段发送消息
  *  - 一些其他的发送场景
  *
- * 模板（template）/ 用户可自定义 sendable item 设计已废弃，后续以固定预设
- * （preset）替代。预设的注册表与触发器尚未实现。
  */
 @Shard(InGameSendMain.id)
 export class InGameSendMain implements IAkariShardInitDispose {
@@ -73,9 +70,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
           transform: ({ value }) => Math.max(0, value)
         },
         cancelShortcut: { default: this.settings.cancelShortcut },
-        presetOptions: {
-          default: this.settings.presetOptions,
-          transform: ({ value }) => normalizeInGameSendPresetOptions(value)
+        ratingPresetOptions: {
+          default: this.settings.ratingPresetOptions
+        },
+        junglePresetOptions: {
+          default: this.settings.junglePresetOptions
+        },
+        premadePresetOptions: {
+          default: this.settings.premadePresetOptions
         }
       },
       this.settings
@@ -114,12 +116,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
   private async _setupState() {
     await this._settingService.applyToState()
-    this.settings.setPresetOptions(this.settings.presetOptions)
 
     this._mobxUtils.propSync(InGameSendMain.id, 'settings', this.settings, [
       'sendInterval',
       'cancelShortcut',
-      'presetOptions'
+      'ratingPresetOptions',
+      'junglePresetOptions',
+      'premadePresetOptions'
     ])
 
     this._mobxUtils.propSync(InGameSendMain.id, 'state', this.state, [

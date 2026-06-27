@@ -1,4 +1,4 @@
-import { MainWindowCloseAction } from '@shared/types/shards/window-manager'
+import { MainWindowCloseAction } from '@shared/shards/window-manager'
 import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 

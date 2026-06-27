@@ -9,7 +9,7 @@ import {
   SavedPlayerSaveDto,
   UpdateTagDto,
   WithEncounteredGamesQueryDto
-} from '@shared/types/shards/saved-player'
+} from '@shared/shards/saved-player'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'

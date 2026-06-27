@@ -46,7 +46,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { NModal, NSpin } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 

@@ -1,28 +1,26 @@
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import type { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import type {
-  InGameSendPremadePresetOptions,
-  InGameSendPresetOptionPatch,
-  InGameSendPresetOptions
-} from '@shared/types/shards/in-game-send'
-import { type ComputedRef, type InjectionKey, computed, provide, ref } from 'vue'
+  InGameSendPremadePresetOptionPatch,
+  InGameSendPremadePresetOptions
+} from '@shared/shards/in-game-send'
+import { type ComputedRef, type InjectionKey, computed, provide } from 'vue'
 
 import {
   type PremadeSelectionPresetContext,
   usePremadeSelection
 } from '../composables/usePresetSelections'
-import type { GamePhase, InGameSendTeam, PresetSlot, PreviewedLines } from '../types'
+import type { GamePhase, InGameSendTeam, PresetSlot } from '../types'
 import {
   type PresetScopeContext,
-  createPreviewedLines,
   createShortcutTargetIds,
-  createTargetShortcutPatch,
-  injectRequired
+  injectRequired,
+  usePresetScopeData
 } from './shared'
 
 export interface PremadePresetContext extends PresetScopeContext {
   options: ComputedRef<InGameSendPremadePresetOptions>
-  updateOptions: (options: InGameSendPresetOptionPatch<'premade'>) => Promise<void>
+  updateOptions: (options: InGameSendPremadePresetOptionPatch) => Promise<void>
   premadeSelection: PremadeSelectionPresetContext
 }
 
@@ -46,7 +44,7 @@ interface PremadePresetDataOptions {
   canSend: ComputedRef<boolean>
   teamsWithPlayers: ComputedRef<InGameSendTeam[]>
   totalCount: ComputedRef<number>
-  presetOptions: ComputedRef<InGameSendPresetOptions>
+  premadePresetOptions: ComputedRef<InGameSendPremadePresetOptions>
 }
 
 export function usePremadePresetData({
@@ -56,10 +54,24 @@ export function usePremadePresetData({
   canSend,
   teamsWithPlayers,
   totalCount,
-  presetOptions
+  premadePresetOptions
 }: PremadePresetDataOptions): PremadePresetContext {
-  const previewedLines = ref<PreviewedLines | null>(null)
-
+  const scope = usePresetScopeData({
+    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getPremadePresetShortcutTargetId),
+    shortcuts: computed(() => premadePresetOptions.value.targetShortcuts),
+    gamePhase,
+    canSend,
+    options: premadePresetOptions,
+    updateOptions: (options: InGameSendPremadePresetOptionPatch) =>
+      inGameSend.updatePremadePresetOptions(options),
+    createShortcutPatch: (targetId, shortcutId): InGameSendPremadePresetOptionPatch => ({
+      targetShortcuts: {
+        [targetId]: shortcutId
+      }
+    }),
+    send: (targetId) => inGameSend.sendPremadePreset(targetId),
+    generateLines: (targetId) => inGameSend.generatePremadePresetLines(targetId)
+  })
   const premadeSelection = usePremadeSelection({
     teamsWithPlayers,
     totalCount,
@@ -68,33 +80,7 @@ export function usePremadePresetData({
   })
 
   return {
-    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getPremadePresetShortcutTargetId),
-    shortcuts: computed(() => presetOptions.value.premade.targetShortcuts),
-
-    gamePhase,
-    canSend,
-
-    previewedLines: computed(() => previewedLines.value),
-
-    setShortcut: (targetId, shortcutId) =>
-      inGameSend.updatePremadePresetOptions({
-        targetShortcuts: createTargetShortcutPatch(targetId, shortcutId)
-      }),
-
-    send: (targetId) => inGameSend.sendPremadePreset(targetId),
-
-    dryRun: async (targetId) => {
-      const lines = await inGameSend.generatePremadePresetLines(targetId)
-      previewedLines.value = createPreviewedLines(targetId, lines)
-    },
-
-    closePreview: () => {
-      previewedLines.value = null
-    },
-
-    options: computed(() => presetOptions.value.premade),
-    updateOptions: (options) => inGameSend.updatePremadePresetOptions(options),
-
+    ...scope,
     premadeSelection
   }
 }

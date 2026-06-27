@@ -1,4 +1,4 @@
-import { AutoHonorStrategy, AutoMatchmakingStrategy } from '@shared/types/shards/auto-gameflow'
+import { AutoHonorStrategy, AutoMatchmakingStrategy } from '@shared/shards/auto-gameflow'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 

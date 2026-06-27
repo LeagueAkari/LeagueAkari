@@ -46,6 +46,7 @@ export function computeSingleSummary(
     championDamageRatioToMax: participant.totalDamageDealtToChampions / noZero(maxChampionDmg),
     championDamagePercentageOfTeam:
       participant.totalDamageDealtToChampions / noZero(teamTotalChampionDmg),
+    championDamagePerMinute: participant.totalDamageDealtToChampions / (basic.gameDuration / 60),
     damageTakenRatioToTeamMax: participant.totalDamageTaken / noZero(teamMaxDmgTaken),
     damageTakenRatioToMax: participant.totalDamageTaken / noZero(maxDmgTaken),
     damageTakenPercentageOfTeam: participant.totalDamageTaken / noZero(teamTotalDmgTaken),
@@ -74,6 +75,12 @@ export function computeSingleSummary(
     kda: participant.kda,
     win: participant.winResult === 'win',
     killParticipation: (participant.kills + participant.assists) / noZero(teamTotalKills),
-    damageGoldEfficiency: participant.totalDamageDealtToChampions / noZero(participant.goldEarned)
+    damageGoldEfficiency: participant.totalDamageDealtToChampions / noZero(participant.goldEarned),
+    killDamageEfficiency:
+      teamTotalKills === 0 || teamTotalChampionDmg === 0
+        ? 1
+        : participant.kills /
+          teamTotalKills /
+          (participant.totalDamageDealtToChampions / noZero(teamTotalChampionDmg))
   }
 }

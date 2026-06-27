@@ -1,5 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { BanChampionConfig, PickChampionConfig } from '@shared/types/shards/auto-select'
+import { BanChampionConfig, PickChampionConfig } from '@shared/shards/auto-select'
 import { DeepPartialObject } from '@shared/utils/types'
 
 import { AkariIpcRenderer } from '../ipc'

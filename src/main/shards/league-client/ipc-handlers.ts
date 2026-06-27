@@ -1,4 +1,4 @@
-import type { UxCommandLine } from '@shared/types/shards/league-client-ux'
+import type { UxCommandLine } from '@shared/shards/league-client-ux'
 import type { AxiosRequestConfig } from 'axios'
 
 import type { LeagueClientMainContext } from './context'

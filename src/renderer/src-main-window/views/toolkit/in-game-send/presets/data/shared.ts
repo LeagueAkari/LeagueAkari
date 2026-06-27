@@ -1,6 +1,6 @@
-import type { InGameSendPresetTargetShortcuts } from '@shared/types/shards/in-game-send'
+import type { InGameSendPresetTargetShortcuts } from '@shared/shards/in-game-send'
 import type { ComputedRef, InjectionKey } from 'vue'
-import { inject } from 'vue'
+import { computed, inject, ref } from 'vue'
 
 import type { GamePhase, PresetTargetId, PreviewedLines } from '../types'
 
@@ -19,6 +19,18 @@ export interface PresetScopeContext {
   closePreview: () => void
 }
 
+export interface PresetScopeDataOptions<Options, OptionsPatch> {
+  shortcutTargetIds: ShortcutTargetIds
+  shortcuts: ComputedRef<InGameSendPresetTargetShortcuts>
+  gamePhase: ComputedRef<GamePhase>
+  canSend: ComputedRef<boolean>
+  options: ComputedRef<Options>
+  updateOptions: (options: OptionsPatch) => Promise<void>
+  createShortcutPatch: (targetId: PresetTargetId, shortcutId: string | null) => OptionsPatch
+  send: (targetId: PresetTargetId) => Promise<boolean>
+  generateLines: (targetId: PresetTargetId) => Promise<string[]>
+}
+
 export type ShortcutTargetIds = Record<PresetTargetId, string>
 
 export function createShortcutTargetIds(
@@ -31,19 +43,48 @@ export function createShortcutTargetIds(
   }
 }
 
-export function createTargetShortcutPatch(
-  targetId: PresetTargetId,
-  shortcutId: string | null
-): Partial<InGameSendPresetTargetShortcuts> {
-  return {
-    [targetId]: shortcutId
-  }
-}
+export function usePresetScopeData<Options, OptionsPatch>({
+  shortcutTargetIds,
+  shortcuts,
+  gamePhase,
+  canSend,
+  options,
+  updateOptions,
+  createShortcutPatch,
+  send,
+  generateLines
+}: PresetScopeDataOptions<Options, OptionsPatch>): PresetScopeContext & {
+  options: ComputedRef<Options>
+  updateOptions: (options: OptionsPatch) => Promise<void>
+} {
+  const previewedLines = ref<PreviewedLines | null>(null)
 
-export function createPreviewedLines(targetId: PresetTargetId, lines: string[]): PreviewedLines {
   return {
-    targetId,
-    lines
+    shortcutTargetIds,
+    shortcuts,
+
+    gamePhase,
+    canSend,
+
+    previewedLines: computed(() => previewedLines.value),
+
+    setShortcut: (targetId, shortcutId) => {
+      return updateOptions(createShortcutPatch(targetId, shortcutId))
+    },
+
+    send,
+
+    dryRun: async (targetId) => {
+      const lines = await generateLines(targetId)
+      previewedLines.value = { targetId, createdAt: Date.now(), lines }
+    },
+
+    closePreview: () => {
+      previewedLines.value = null
+    },
+
+    options,
+    updateOptions
   }
 }
 

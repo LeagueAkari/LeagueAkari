@@ -4,7 +4,7 @@ import {
   DraftOptions,
   QueryStage,
   QueryStageDraft
-} from '@shared/types/shards/ongoing-game'
+} from '@shared/shards/ongoing-game'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 
 import { LeagueClientData } from '../league-client/lc-state'

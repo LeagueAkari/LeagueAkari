@@ -17,7 +17,7 @@
     <div class="grid grid-cols-2 gap-3">
       <div
         v-for="team of teams"
-        :key="team.id"
+        :key="team.teamIdentifier"
         class="rounded border border-black/10 bg-black/3 p-2 dark:border-white/10 dark:bg-white/3"
       >
         <div class="mb-1.5 flex items-center justify-between gap-2">
@@ -34,15 +34,15 @@
               · {{ team.secondaryLabel }}
             </span>
             <span class="font-normal text-black/45 dark:text-white/45">
-              ({{ selectedInTeam(team.id) }}/{{ team.players.length }})
+              ({{ selectedInTeam(team.teamIdentifier) }}/{{ team.players.length }})
             </span>
           </div>
 
           <NCheckbox
             size="small"
-            :checked="isTeamAllSelected(team.id)"
-            :indeterminate="isTeamIndeterminate(team.id)"
-            @update:checked="(value) => setTeamSelected(team.id, value)"
+            :checked="isTeamAllSelected(team.teamIdentifier)"
+            :indeterminate="isTeamIndeterminate(team.teamIdentifier)"
+            @update:checked="(value) => setTeamSelected(team.teamIdentifier, value)"
           >
             <span class="text-[11px] text-black/55 dark:text-white/55">
               {{ t('selectAll') }}

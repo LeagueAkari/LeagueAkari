@@ -2,15 +2,15 @@ import { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
 import { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   AdditionalResult,
   DraftOptions,
   OngoingGameSimplifiedChampMastery,
   QueryStage
-} from '@shared/types/shards/ongoing-game'
-import { SavedInfo } from '@shared/types/shards/saved-player'
+} from '@shared/shards/ongoing-game'
+import { SavedInfo } from '@shared/shards/saved-player'
+import { RankedStats } from '@shared/types/league-client/ranked'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
@@ -56,6 +56,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showAverageDamageGoldEfficiencyTag: false,
       showAverageEnemyMissingPingsTag: false,
       showAverageVisionScoreTag: false,
+      showAverageKillDamageEfficiencyTag: true,
       showSelfTag: true,
       showMetTag: true,
       showTaggedTag: true,

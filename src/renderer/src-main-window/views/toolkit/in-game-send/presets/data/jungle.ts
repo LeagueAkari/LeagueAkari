@@ -1,28 +1,26 @@
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import type { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import type {
-  InGameSendJunglePresetOptions,
-  InGameSendPresetOptionPatch,
-  InGameSendPresetOptions
-} from '@shared/types/shards/in-game-send'
-import { type ComputedRef, type InjectionKey, computed, provide, ref } from 'vue'
+  InGameSendJunglePresetOptionPatch,
+  InGameSendJunglePresetOptions
+} from '@shared/shards/in-game-send'
+import { type ComputedRef, type InjectionKey, computed, provide } from 'vue'
 
 import {
   type PlayerSelectionPresetContext,
   usePlayerSelection
 } from '../composables/usePresetSelections'
-import type { GamePhase, InGameSendTeam, PresetSlot, PreviewedLines } from '../types'
+import type { GamePhase, InGameSendTeam, PresetSlot } from '../types'
 import {
   type PresetScopeContext,
-  createPreviewedLines,
   createShortcutTargetIds,
-  createTargetShortcutPatch,
-  injectRequired
+  injectRequired,
+  usePresetScopeData
 } from './shared'
 
 export interface JunglePresetContext extends PresetScopeContext {
   options: ComputedRef<InGameSendJunglePresetOptions>
-  updateOptions: (options: InGameSendPresetOptionPatch<'jungle'>) => Promise<void>
+  updateOptions: (options: InGameSendJunglePresetOptionPatch) => Promise<void>
   playerSelection: PlayerSelectionPresetContext
 }
 
@@ -47,7 +45,7 @@ interface JunglePresetDataOptions {
   teamsWithPlayers: ComputedRef<InGameSendTeam[]>
   allPuuids: ComputedRef<string[]>
   totalCount: ComputedRef<number>
-  presetOptions: ComputedRef<InGameSendPresetOptions>
+  junglePresetOptions: ComputedRef<InGameSendJunglePresetOptions>
 }
 
 export function useJunglePresetData({
@@ -58,10 +56,24 @@ export function useJunglePresetData({
   teamsWithPlayers,
   allPuuids,
   totalCount,
-  presetOptions
+  junglePresetOptions
 }: JunglePresetDataOptions): JunglePresetContext {
-  const previewedLines = ref<PreviewedLines | null>(null)
-
+  const scope = usePresetScopeData({
+    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getJunglePresetShortcutTargetId),
+    shortcuts: computed(() => junglePresetOptions.value.targetShortcuts),
+    gamePhase,
+    canSend,
+    options: junglePresetOptions,
+    updateOptions: (options: InGameSendJunglePresetOptionPatch) =>
+      inGameSend.updateJunglePresetOptions(options),
+    createShortcutPatch: (targetId, shortcutId): InGameSendJunglePresetOptionPatch => ({
+      targetShortcuts: {
+        [targetId]: shortcutId
+      }
+    }),
+    send: (targetId) => inGameSend.sendJunglePreset(targetId),
+    generateLines: (targetId) => inGameSend.generateJunglePresetLines(targetId)
+  })
   const playerSelection = usePlayerSelection({
     teamsWithPlayers,
     allPuuids,
@@ -71,33 +83,7 @@ export function useJunglePresetData({
   })
 
   return {
-    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getJunglePresetShortcutTargetId),
-    shortcuts: computed(() => presetOptions.value.jungle.targetShortcuts),
-
-    gamePhase,
-    canSend,
-
-    previewedLines: computed(() => previewedLines.value),
-
-    setShortcut: (targetId, shortcutId) =>
-      inGameSend.updateJunglePresetOptions({
-        targetShortcuts: createTargetShortcutPatch(targetId, shortcutId)
-      }),
-
-    send: (targetId) => inGameSend.sendJunglePreset(targetId),
-
-    dryRun: async (targetId) => {
-      const lines = await inGameSend.generateJunglePresetLines(targetId)
-      previewedLines.value = createPreviewedLines(targetId, lines)
-    },
-
-    closePreview: () => {
-      previewedLines.value = null
-    },
-
-    options: computed(() => presetOptions.value.jungle),
-    updateOptions: (options) => inGameSend.updateJunglePresetOptions(options),
-
+    ...scope,
     playerSelection
   }
 }

@@ -3,8 +3,8 @@ import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
 import { toTeams } from '@shared/data-adapter/match-history/teams'
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
 import {
   type InjectionKey,
   type MaybeRefOrGetter,

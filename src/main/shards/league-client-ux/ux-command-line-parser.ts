@@ -1,4 +1,4 @@
-import { UxCommandLine } from '@shared/types/shards/league-client-ux'
+import { UxCommandLine } from '@shared/shards/league-client-ux'
 
 /**
  * 来自 Riot 的证书文件

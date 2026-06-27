@@ -1,9 +1,12 @@
 import type {
-  InGameSendPresetId,
-  InGameSendPresetOptionPatch,
-  InGameSendPresetOptions,
-  InGameSendPresetTarget
-} from '@shared/types/shards/in-game-send'
+  InGameSendJunglePresetOptionPatch,
+  InGameSendJunglePresetOptions,
+  InGameSendPremadePresetOptionPatch,
+  InGameSendPremadePresetOptions,
+  InGameSendPresetTarget,
+  InGameSendRatingPresetOptionPatch,
+  InGameSendRatingPresetOptions
+} from '@shared/shards/in-game-send'
 
 import { IN_GAME_SEND_MAIN_NAMESPACE, type InGameSendMainContext } from './context'
 import type { InGameSendPresetController } from './preset-controller'
@@ -37,33 +40,97 @@ export class InGameSendIpcHandlers {
 
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
-      'generatePresetLines',
-      (_, presetId: InGameSendPresetId, target: InGameSendPresetTarget) => {
-        return this._presetController.generateLines(presetId, target)
+      'generateRatingPresetLines',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.generateRatingLines(target)
       }
     )
 
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
-      'sendPreset',
-      (_, presetId: InGameSendPresetId, target: InGameSendPresetTarget) => {
-        return this._presetController.sendPreset(presetId, target)
+      'generateJunglePresetLines',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.generateJungleLines(target)
       }
     )
 
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
-      'setPresetOptions',
-      (_, options: InGameSendPresetOptions) => {
-        return this._presetController.setPresetOptions(options)
+      'generatePremadePresetLines',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.generatePremadeLines(target)
       }
     )
 
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
-      'updatePresetOptions',
-      (_, presetId: InGameSendPresetId, options: InGameSendPresetOptionPatch) => {
-        return this._presetController.updatePresetOptions(presetId, options)
+      'sendRatingPreset',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.sendRatingPreset(target)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'sendJunglePreset',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.sendJunglePreset(target)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'sendPremadePreset',
+      (_, target: InGameSendPresetTarget) => {
+        return this._presetController.sendPremadePreset(target)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'setRatingPresetOptions',
+      (_, options: InGameSendRatingPresetOptions) => {
+        return this._presetController.setRatingPresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'setJunglePresetOptions',
+      (_, options: InGameSendJunglePresetOptions) => {
+        return this._presetController.setJunglePresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'setPremadePresetOptions',
+      (_, options: InGameSendPremadePresetOptions) => {
+        return this._presetController.setPremadePresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updateRatingPresetOptions',
+      (_, options: InGameSendRatingPresetOptionPatch) => {
+        return this._presetController.updateRatingPresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updateJunglePresetOptions',
+      (_, options: InGameSendJunglePresetOptionPatch) => {
+        return this._presetController.updateJunglePresetOptions(options)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updatePremadePresetOptions',
+      (_, options: InGameSendPremadePresetOptionPatch) => {
+        return this._presetController.updatePremadePresetOptions(options)
       }
     )
 

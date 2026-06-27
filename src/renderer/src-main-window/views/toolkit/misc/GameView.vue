@@ -37,7 +37,7 @@ import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPrevi
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'

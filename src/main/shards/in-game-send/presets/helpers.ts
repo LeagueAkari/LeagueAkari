@@ -1,19 +1,16 @@
-import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
-import type { InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
+import type { InGameSendPresetTarget } from '@shared/shards/in-game-send'
 
 import type { InGameSendPresetContext, InGameSendPresetPlayer, InGameSendPresetTeam } from './types'
-
-export const PREMADE_TEAM_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
 export function formatRate(rate: number) {
   return `${(rate * 100).toFixed(0)}%`
 }
 
-export function playerRiotId(player: InGameSendPresetPlayer) {
+function playerRiotId(player: InGameSendPresetPlayer) {
   return player.tagLine ? `${player.gameName}#${player.tagLine}` : player.gameName
 }
 
-export function playerPositionLabel(player: InGameSendPresetPlayer) {
+function playerPositionLabel(player: InGameSendPresetPlayer) {
   if (!player.position || player.position === 'NONE') {
     return '位置未知'
   }
@@ -37,11 +34,11 @@ export function targetTeamLabel(target: InGameSendPresetTarget) {
   }
 }
 
-export function getTeamSortValue(teamId: string) {
-  if (teamId === 'TEAM-100') return 100
-  if (teamId === 'TEAM-200') return 200
+function getTeamIdentifierSortValue(teamIdentifier: string) {
+  if (teamIdentifier === 'TEAM-100') return 100
+  if (teamIdentifier === 'TEAM-200') return 200
 
-  const cherrySubteam = teamId.match(/^CHERRY-(\d+)$/)
+  const cherrySubteam = teamIdentifier.match(/^CHERRY-(\d+)$/)
   if (cherrySubteam) {
     return 1000 + Number(cherrySubteam[1])
   }
@@ -49,34 +46,38 @@ export function getTeamSortValue(teamId: string) {
   return Number.MAX_SAFE_INTEGER
 }
 
-export function compareTeamIds(teamIdA: string, teamIdB: string, selfTeamId: string | null) {
-  if (selfTeamId) {
-    if (teamIdA === selfTeamId) return -1
-    if (teamIdB === selfTeamId) return 1
+function compareTeamIdentifiers(
+  teamIdentifierA: string,
+  teamIdentifierB: string,
+  selfTeamIdentifier: string | null
+) {
+  if (selfTeamIdentifier) {
+    if (teamIdentifierA === selfTeamIdentifier) return -1
+    if (teamIdentifierB === selfTeamIdentifier) return 1
   }
 
-  const sortA = getTeamSortValue(teamIdA)
-  const sortB = getTeamSortValue(teamIdB)
+  const sortA = getTeamIdentifierSortValue(teamIdentifierA)
+  const sortB = getTeamIdentifierSortValue(teamIdentifierB)
 
   if (sortA !== sortB) {
     return sortA - sortB
   }
 
-  return teamIdA.localeCompare(teamIdB)
+  return teamIdentifierA.localeCompare(teamIdentifierB)
 }
 
-export function getTeamLabels(teamId: string, selfTeamId: string | null) {
-  if (!selfTeamId) {
+function getTeamLabels(teamIdentifier: string, selfTeamIdentifier: string | null) {
+  if (!selfTeamIdentifier) {
     return {
-      label: teamId,
-      primaryLabel: teamId
+      label: teamIdentifier,
+      primaryLabel: teamIdentifier
     }
   }
 
-  const primaryLabel = teamId === selfTeamId ? '我方' : '敌方'
+  const primaryLabel = teamIdentifier === selfTeamIdentifier ? '我方' : '敌方'
 
   return {
-    label: `${primaryLabel} · ${teamId}`,
+    label: `${primaryLabel} · ${teamIdentifier}`,
     primaryLabel
   }
 }
@@ -88,17 +89,17 @@ export function createPresetTeams(context: InGameSendPresetContext) {
   const selfTeamEntry = selfPuuid
     ? Object.entries(ongoingGameState.teams).find(([, puuids]) => puuids.includes(selfPuuid))
     : null
-  const selfTeamId = selfTeamEntry?.[0] ?? null
+  const selfTeamIdentifier = selfTeamEntry?.[0] ?? null
 
   const teams: InGameSendPresetTeam[] = Object.entries(ongoingGameState.teams)
-    .toSorted(([teamIdA], [teamIdB]) => {
-      return compareTeamIds(teamIdA, teamIdB, selfTeamId)
+    .toSorted(([teamIdentifierA], [teamIdentifierB]) => {
+      return compareTeamIdentifiers(teamIdentifierA, teamIdentifierB, selfTeamIdentifier)
     })
-    .map(([teamId, puuids]) => {
-      const labels = getTeamLabels(teamId, selfTeamId)
+    .map(([teamIdentifier, puuids]) => {
+      const labels = getTeamLabels(teamIdentifier, selfTeamIdentifier)
 
       return {
-        id: teamId,
+        teamIdentifier,
         ...labels,
         players: puuids.map((puuid) => {
           const summoner = ongoingGameState.summoner[puuid]
@@ -120,15 +121,6 @@ export function createPresetTeams(context: InGameSendPresetContext) {
   return teams.filter((team) => team.players.length > 0)
 }
 
-export function selectedPuuids(context: InGameSendPresetContext, presetId: 'rating' | 'jungle') {
-  const { state } = context.mainContext
-  return presetId === 'rating' ? state.ratingPuuids : state.junglePuuids
-}
-
-export function selectedPremadeIndices(context: InGameSendPresetContext) {
-  return context.mainContext.state.premadeIndices
-}
-
 export function targetTeams(context: InGameSendPresetContext, teams = createPresetTeams(context)) {
   if (context.target === 'all') {
     return teams
@@ -143,24 +135,23 @@ export function targetTeams(context: InGameSendPresetContext, teams = createPres
   return context.target === 'friendly' ? teams.slice(0, 1) : teams.slice(1)
 }
 
-export function selectedPlayers(
+export function selectedPlayersByPuuids(
   context: InGameSendPresetContext,
-  presetId: 'rating' | 'jungle',
+  selectedPuuids: string[],
   teams = createPresetTeams(context)
 ) {
-  const selected = new Set(selectedPuuids(context, presetId))
+  const selected = new Set(selectedPuuids)
 
   return targetTeams(context, teams)
     .flatMap((team) => team.players.map((player) => ({ team, player })))
     .filter(({ player }) => selected.has(player.puuid))
 }
 
-export function selectionSummaryLine(
-  context: InGameSendPresetContext,
-  presetId: 'rating' | 'jungle',
-  teams = createPresetTeams(context)
+export function selectionSummaryLineByPuuids(
+  selectedPuuids: string[],
+  teams: InGameSendPresetTeam[]
 ) {
-  const selected = new Set(selectedPuuids(context, presetId))
+  const selected = new Set(selectedPuuids)
   const count = teams
     .flatMap((team) => team.players)
     .reduce((acc, player) => acc + (selected.has(player.puuid) ? 1 : 0), 0)
@@ -178,65 +169,4 @@ export function selectionSummaryLine(
   })
 
   return `[选中: ${parts.join(' / ')}]`
-}
-
-export function isCurrentJungler(player: InGameSendPresetPlayer) {
-  const position = player.position?.toUpperCase()
-
-  return (
-    position === 'JUNGLE' ||
-    player.spells?.spell1Id === SUMMONER_SPELL_SMITE_ID ||
-    player.spells?.spell2Id === SUMMONER_SPELL_SMITE_ID
-  )
-}
-
-export function premadeGroupsOfTeam(team: InGameSendPresetTeam) {
-  const byGroup = new Map<number, InGameSendPresetPlayer[]>()
-
-  for (const player of team.players) {
-    if (player.premadeGroup == null) {
-      continue
-    }
-
-    const players = byGroup.get(player.premadeGroup) ?? []
-    players.push(player)
-    byGroup.set(player.premadeGroup, players)
-  }
-
-  return [...byGroup.entries()]
-    .toSorted(([a], [b]) => a - b)
-    .filter(([, players]) => players.length >= 2)
-    .map(([groupIndex, players]) => ({
-      groupIndex,
-      groupLetter: PREMADE_TEAM_LETTERS[groupIndex - 1] ?? String(groupIndex),
-      players
-    }))
-}
-
-export function premadeSelectionSummaryLine(
-  context: InGameSendPresetContext,
-  teams = createPresetTeams(context)
-) {
-  const selected = new Set(selectedPremadeIndices(context))
-  const selectedCount = [...selected].filter((index) =>
-    teams.some((team) => premadeGroupsOfTeam(team).some((group) => group.groupIndex === index))
-  ).length
-
-  if (selectedCount === 0) {
-    return '[选中: 无]'
-  }
-
-  const parts: string[] = []
-
-  for (const team of teams) {
-    const groupParts = premadeGroupsOfTeam(team)
-      .filter((group) => selected.has(group.groupIndex))
-      .map((group) => `${group.groupLetter}(${group.players.length})`)
-
-    if (groupParts.length) {
-      parts.push(`${team.label} 组 ${groupParts.join('+')}`)
-    }
-  }
-
-  return `[选中: ${parts.join(' | ')}]`
 }

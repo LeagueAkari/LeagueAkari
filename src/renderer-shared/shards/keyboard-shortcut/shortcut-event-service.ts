@@ -1,4 +1,4 @@
-import type { ShortcutDetails } from '@shared/types/shards/keyboard-shortcut'
+import type { ShortcutDetails } from '@shared/shards/keyboard-shortcut'
 
 import { KEYBOARD_SHORTCUTS_MAIN_NAMESPACE, type KeyboardShortcutsRendererContext } from './context'
 

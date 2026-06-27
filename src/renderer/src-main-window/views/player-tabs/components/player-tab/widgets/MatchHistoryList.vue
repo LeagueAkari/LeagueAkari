@@ -72,7 +72,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NSpin } from 'naive-ui'
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'

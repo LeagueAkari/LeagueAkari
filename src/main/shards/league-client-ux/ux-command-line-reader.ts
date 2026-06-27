@@ -1,5 +1,5 @@
 import { getCommandLine, getPidsByName, isElevated } from '@main/native'
-import type { UxCommandLine } from '@shared/types/shards/league-client-ux'
+import type { UxCommandLine } from '@shared/shards/league-client-ux'
 
 import { LEAGUE_CLIENT_UX_PROCESS_NAME, type LeagueClientUxMainContext } from './context'
 import { parseCommandLine } from './ux-command-line-parser'

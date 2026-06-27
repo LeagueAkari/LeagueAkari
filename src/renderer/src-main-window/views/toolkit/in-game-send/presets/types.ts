@@ -1,4 +1,4 @@
-import type { InGameSendPresetTarget } from '@shared/types/shards/in-game-send'
+import type { InGameSendPresetTarget } from '@shared/shards/in-game-send'
 
 export type GamePhase = 'none' | 'lobby' | 'champ-select' | 'in-game' | 'draft'
 export type PresetSlot = 'rating' | 'jungle' | 'premade'
@@ -12,6 +12,7 @@ export interface PresetDisplayOption<T extends string> {
 
 export interface PreviewedLines {
   targetId: PresetTargetId
+  createdAt: number
   lines: string[]
 }
 
@@ -26,7 +27,7 @@ export interface InGameSendPlayer {
 }
 
 export interface InGameSendTeam {
-  id: string
+  teamIdentifier: string
   label: string
   primaryLabel: string
   secondaryLabel?: string

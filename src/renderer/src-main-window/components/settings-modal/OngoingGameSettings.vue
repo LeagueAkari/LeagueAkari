@@ -364,6 +364,22 @@
             >
               {{ t('OngoingGameSettings.playerCardTags.tags.showAkariScoreTag.label') }}
             </NCheckbox>
+            <NCheckbox
+              :checked="ogs.settings.playerCardTags.showAverageKillDamageEfficiencyTag"
+              @update:checked="
+                (val) =>
+                  og.setPlayerCardTags({
+                    ...ogs.settings.playerCardTags,
+                    showAverageKillDamageEfficiencyTag: val
+                  })
+              "
+            >
+              {{
+                t(
+                  'OngoingGameSettings.playerCardTags.tags.showAverageKillDamageEfficiencyTag.label'
+                )
+              }}
+            </NCheckbox>
           </div>
         </SettingsRow>
       </SettingsSection>

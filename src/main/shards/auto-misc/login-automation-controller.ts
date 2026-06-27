@@ -1,5 +1,5 @@
 import { TimeoutTask } from '@main/utils/timer'
-import type { AutoMiscRankedStatus } from '@shared/types/shards/auto-misc'
+import type { AutoMiscRankedStatus } from '@shared/shards/auto-misc'
 
 import type { AutoMiscMainContext } from './context'
 

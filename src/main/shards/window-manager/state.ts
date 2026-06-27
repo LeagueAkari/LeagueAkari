@@ -1,4 +1,4 @@
-import { DownloadTask } from '@shared/types/shards/window-manager'
+import { DownloadTask } from '@shared/shards/window-manager'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class WindowManagerSettings {

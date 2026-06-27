@@ -1,4 +1,4 @@
-import { AutoMiscRankedStatus } from '@shared/types/shards/auto-misc'
+import { AutoMiscRankedStatus } from '@shared/shards/auto-misc'
 import { makeAutoObservable } from 'mobx'
 
 export class AutoMiscSettings {

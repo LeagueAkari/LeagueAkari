@@ -5,7 +5,7 @@ import type {
   PlayerTagDto,
   SavedPlayerQueryDto,
   UpdateTagDto
-} from '@shared/types/shards/saved-player'
+} from '@shared/shards/saved-player'
 
 import { SAVED_PLAYER_MAIN_NAMESPACE, type SavedPlayerRendererContext } from './context'
 

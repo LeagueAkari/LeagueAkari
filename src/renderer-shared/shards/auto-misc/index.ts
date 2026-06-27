@@ -3,7 +3,7 @@ import type {
   AutoMiscRankedDivision,
   AutoMiscRankedStatus,
   AutoMiscRankedTier
-} from '@shared/types/shards/auto-misc'
+} from '@shared/shards/auto-misc'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'

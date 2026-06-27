@@ -1,14 +1,14 @@
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   AdditionalResult,
   DraftOptions,
   OngoingGameAnalysis,
   OngoingGameSimplifiedChampMastery
-} from '@shared/types/shards/ongoing-game'
-import { SavedInfo } from '@shared/types/shards/saved-player'
+} from '@shared/shards/ongoing-game'
+import { SavedInfo } from '@shared/shards/saved-player'
+import { RankedStats } from '@shared/types/league-client/ranked'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -76,7 +76,8 @@ export class OngoingGameSettings {
     showTaggedTag: true,
     showWinRateTeamTag: true,
     showPrivacyTag: true,
-    showAkariScoreTag: false
+    showAkariScoreTag: false,
+    showAverageKillDamageEfficiencyTag: true
   }
 
   /**

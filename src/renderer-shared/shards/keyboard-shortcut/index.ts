@@ -1,8 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import type {
-  KeyboardShortcutsDebugState,
-  ShortcutDetails
-} from '@shared/types/shards/keyboard-shortcut'
+import type { KeyboardShortcutsDebugState, ShortcutDetails } from '@shared/shards/keyboard-shortcut'
 
 import { AkariIpcRenderer } from '../ipc'
 import {

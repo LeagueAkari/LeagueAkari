@@ -1,5 +1,4 @@
 import { Dep, Shard } from '@shared/akari-shard'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   AllTaggedPlayerQueryDto,
   EncounteredGame,
@@ -7,7 +6,8 @@ import {
   PlayerTagDto,
   SavedPlayerQueryDto,
   UpdateTagDto
-} from '@shared/types/shards/saved-player'
+} from '@shared/shards/saved-player'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import LRUMap from 'quick-lru'
 
 import { AkariIpcRenderer } from '../ipc'

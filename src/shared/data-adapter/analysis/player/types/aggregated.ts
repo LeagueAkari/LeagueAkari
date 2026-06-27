@@ -6,6 +6,7 @@ export interface AggregatedSummaryAnalysis {
   avgChampionDamageRatioToTeamMax: number
   avgChampionDamageRatioToMax: number
   avgChampionDamagePercentageOfTeam: number
+  avgChampionDamagePerMinute: number
   avgDamageTakenRatioToTeamMax: number
   avgDamageTakenRatioToMax: number
   avgDamageTakenPercentageOfTeam: number
@@ -22,6 +23,8 @@ export interface AggregatedSummaryAnalysis {
   avgVisionScore: number
   avgDamageGoldEfficiency: number
   avgKillParticipation: number
+
+  avgKillDamageEfficiency: number
 
   kills: number
   deaths: number
@@ -159,6 +162,7 @@ export interface AggregatedChampionAnalysis {
 
   summary: AggregatedSummaryAnalysis
   winLoss: AggregatedWinLossAnalysisMap
+  positions: AggregatedPositionAnalysis | null
 
   // 该英雄的打野多场聚合；非打野英雄 / 无打野场次为 null
   jungle: AggregatedJungleAnalysis | null

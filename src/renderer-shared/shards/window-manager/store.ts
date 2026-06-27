@@ -1,4 +1,4 @@
-import { DownloadTask, MainWindowCloseAction } from '@shared/types/shards/window-manager'
+import { DownloadTask, MainWindowCloseAction } from '@shared/shards/window-manager'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 

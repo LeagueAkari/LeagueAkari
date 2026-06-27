@@ -1,25 +1,39 @@
 import {
   IN_GAME_SEND_PRESET_TARGETS,
-  type InGameSendPresetId,
-  type InGameSendPresetOptionPatch,
-  type InGameSendPresetOptions,
-  type InGameSendPresetOptionsPatch,
+  type InGameSendJunglePresetOptionPatch,
+  type InGameSendJunglePresetOptions,
+  type InGameSendPremadePresetOptionPatch,
+  type InGameSendPremadePresetOptions,
   type InGameSendPresetTarget,
-  getInGameSendPresetShortcutTargetId,
-  mergeInGameSendPresetOptions,
-  normalizeInGameSendPresetOptions
-} from '@shared/types/shards/in-game-send'
+  type InGameSendPresetTargetShortcuts,
+  type InGameSendRatingPresetOptionPatch,
+  type InGameSendRatingPresetOptions
+} from '@shared/shards/in-game-send'
 
 import type { InGameSendMainContext } from './context'
-import { buildInGameSendPresetLines } from './presets'
-import type { InGameSendPresetContext } from './presets'
+import {
+  buildJunglePresetLinesFromMainContext,
+  buildPremadePresetLinesFromMainContext,
+  buildRatingPresetLinesFromMainContext,
+  getJunglePresetShortcutTargetId,
+  getPremadePresetShortcutTargetId,
+  getRatingPresetShortcutTargetId
+} from './presets'
 import type { InGameSendExecutor } from './send-executor'
+import type { InGameSendSettings } from './state'
 
-const IN_GAME_SEND_PRESET_IDS = [
-  'rating',
-  'jungle',
-  'premade'
-] as const satisfies readonly InGameSendPresetId[]
+type InGameSendPresetOptionsSettingKey =
+  | 'ratingPresetOptions'
+  | 'junglePresetOptions'
+  | 'premadePresetOptions'
+
+type InGameSendPresetOptionsValue = InGameSendSettings[InGameSendPresetOptionsSettingKey]
+
+type InGameSendPresetOptionsPatch<TOptions extends InGameSendPresetOptionsValue> = Partial<
+  Omit<TOptions, 'targetShortcuts'>
+> & {
+  targetShortcuts?: Partial<InGameSendPresetTargetShortcuts>
+}
 
 export class InGameSendPresetController {
   constructor(
@@ -31,7 +45,11 @@ export class InGameSendPresetController {
     const { mobxUtils, settings } = this._context
 
     mobxUtils.reaction(
-      () => settings.presetOptions,
+      () => [
+        settings.ratingPresetOptions,
+        settings.junglePresetOptions,
+        settings.premadePresetOptions
+      ],
       () => {
         this._syncPresetShortcuts()
       },
@@ -39,68 +57,142 @@ export class InGameSendPresetController {
     )
   }
 
-  generateLines(presetId: InGameSendPresetId, target: InGameSendPresetTarget) {
-    return buildInGameSendPresetLines(presetId, this._createPresetContext(target))
+  generateRatingLines(target: InGameSendPresetTarget) {
+    return buildRatingPresetLinesFromMainContext(this._context, target)
   }
 
-  sendPreset(presetId: InGameSendPresetId, target: InGameSendPresetTarget) {
-    return this._sendExecutor.sendLines(this.generateLines(presetId, target))
+  generateJungleLines(target: InGameSendPresetTarget) {
+    return buildJunglePresetLinesFromMainContext(this._context, target)
   }
 
-  setPresetOptions(options: InGameSendPresetOptions) {
-    return this._context.settingService.set(
-      'presetOptions',
-      normalizeInGameSendPresetOptions(options)
-    )
+  generatePremadeLines(target: InGameSendPresetTarget) {
+    return buildPremadePresetLinesFromMainContext(this._context, target)
   }
 
-  updatePresetOptions<P extends InGameSendPresetId>(
-    presetId: P,
-    options: InGameSendPresetOptionPatch<P>
-  ) {
-    const patch = {
-      [presetId]: options
-    } as InGameSendPresetOptionsPatch
+  sendRatingPreset(target: InGameSendPresetTarget) {
+    return this._sendExecutor.sendLines(this.generateRatingLines(target))
+  }
 
-    return this.setPresetOptions(
-      mergeInGameSendPresetOptions(this._context.settings.presetOptions, patch)
-    )
+  sendJunglePreset(target: InGameSendPresetTarget) {
+    return this._sendExecutor.sendLines(this.generateJungleLines(target))
+  }
+
+  sendPremadePreset(target: InGameSendPresetTarget) {
+    return this._sendExecutor.sendLines(this.generatePremadeLines(target))
+  }
+
+  setRatingPresetOptions(options: InGameSendRatingPresetOptions) {
+    return this._setPresetOptions('ratingPresetOptions', options)
+  }
+
+  setJunglePresetOptions(options: InGameSendJunglePresetOptions) {
+    return this._setPresetOptions('junglePresetOptions', options)
+  }
+
+  setPremadePresetOptions(options: InGameSendPremadePresetOptions) {
+    return this._setPresetOptions('premadePresetOptions', options)
+  }
+
+  updateRatingPresetOptions(options: InGameSendRatingPresetOptionPatch) {
+    return this._updatePresetOptions('ratingPresetOptions', options)
+  }
+
+  updateJunglePresetOptions(options: InGameSendJunglePresetOptionPatch) {
+    return this._updatePresetOptions('junglePresetOptions', options)
+  }
+
+  updatePremadePresetOptions(options: InGameSendPremadePresetOptionPatch) {
+    return this._updatePresetOptions('premadePresetOptions', options)
   }
 
   private _syncPresetShortcuts() {
-    const { keyboardShortcuts, logger, settings } = this._context
+    const { settings } = this._context
 
-    for (const presetId of IN_GAME_SEND_PRESET_IDS) {
-      for (const target of IN_GAME_SEND_PRESET_TARGETS) {
-        const targetId = getInGameSendPresetShortcutTargetId(presetId, target)
-        const shortcut = settings.presetOptions[presetId].targetShortcuts[target]
+    this._syncTargetShortcuts(
+      settings.ratingPresetOptions.targetShortcuts,
+      getRatingPresetShortcutTargetId,
+      (target) => this.sendRatingPreset(target),
+      (target) =>
+        this.updateRatingPresetOptions({
+          targetShortcuts: {
+            [target]: null
+          }
+        })
+    )
 
-        if (!shortcut) {
-          keyboardShortcuts.unregisterByTargetId(targetId)
-          continue
-        }
+    this._syncTargetShortcuts(
+      settings.junglePresetOptions.targetShortcuts,
+      getJunglePresetShortcutTargetId,
+      (target) => this.sendJunglePreset(target),
+      (target) =>
+        this.updateJunglePresetOptions({
+          targetShortcuts: {
+            [target]: null
+          }
+        })
+    )
 
-        try {
-          keyboardShortcuts.register(targetId, shortcut, 'last-active', () => {
-            void this.sendPreset(presetId, target)
-          })
-        } catch (error) {
-          logger.warn('Failed to register in-game-send preset shortcut', presetId, target, error)
-          void this.updatePresetOptions(presetId, {
-            targetShortcuts: {
-              [target]: null
-            }
-          })
-        }
+    this._syncTargetShortcuts(
+      settings.premadePresetOptions.targetShortcuts,
+      getPremadePresetShortcutTargetId,
+      (target) => this.sendPremadePreset(target),
+      (target) =>
+        this.updatePremadePresetOptions({
+          targetShortcuts: {
+            [target]: null
+          }
+        })
+    )
+  }
+
+  private _syncTargetShortcuts(
+    shortcuts: InGameSendPresetTargetShortcuts,
+    getTargetId: (target: InGameSendPresetTarget) => string,
+    send: (target: InGameSendPresetTarget) => Promise<boolean>,
+    clearShortcut: (target: InGameSendPresetTarget) => Promise<void>
+  ) {
+    const { keyboardShortcuts, logger } = this._context
+
+    for (const target of IN_GAME_SEND_PRESET_TARGETS) {
+      const targetId = getTargetId(target)
+      const shortcut = shortcuts[target]
+
+      if (!shortcut) {
+        keyboardShortcuts.unregisterByTargetId(targetId)
+        continue
+      }
+
+      try {
+        keyboardShortcuts.register(targetId, shortcut, 'last-active', () => {
+          void send(target)
+        })
+      } catch (error) {
+        logger.warn('Failed to register in-game-send preset shortcut', targetId, error)
+        void clearShortcut(target)
       }
     }
   }
 
-  private _createPresetContext(target: InGameSendPresetTarget): InGameSendPresetContext {
-    return {
-      target,
-      presetOptions: this._context.settings.presetOptions,
-      mainContext: this._context
-    }
+  private _setPresetOptions<Key extends InGameSendPresetOptionsSettingKey>(
+    key: Key,
+    options: InGameSendSettings[Key]
+  ) {
+    return this._context.settingService.set(key, options)
+  }
+
+  private _updatePresetOptions<Key extends InGameSendPresetOptionsSettingKey>(
+    key: Key,
+    options: InGameSendPresetOptionsPatch<InGameSendSettings[Key]>
+  ) {
+    const current = this._context.settings[key]
+
+    return this._setPresetOptions(key, {
+      ...current,
+      ...options,
+      targetShortcuts: {
+        ...current.targetShortcuts,
+        ...(options.targetShortcuts ?? {})
+      }
+    } as InGameSendSettings[Key])
   }
 }

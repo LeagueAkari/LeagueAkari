@@ -1,4 +1,8 @@
-import { createDefaultInGameSendPresetOptions } from '@shared/types/shards/in-game-send'
+import {
+  createDefaultInGameSendJunglePresetOptions,
+  createDefaultInGameSendPremadePresetOptions,
+  createDefaultInGameSendRatingPresetOptions
+} from '@shared/shards/in-game-send'
 import { defineStore } from 'pinia'
 import { shallowReactive } from 'vue'
 
@@ -6,7 +10,9 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
   const settings = shallowReactive({
     cancelShortcut: null as string | null,
     sendInterval: 65,
-    presetOptions: createDefaultInGameSendPresetOptions()
+    ratingPresetOptions: createDefaultInGameSendRatingPresetOptions(),
+    junglePresetOptions: createDefaultInGameSendJunglePresetOptions(),
+    premadePresetOptions: createDefaultInGameSendPremadePresetOptions()
   })
 
   /**

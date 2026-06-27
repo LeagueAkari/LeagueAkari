@@ -479,6 +479,8 @@ OngoingGameSettings:
         label: 场均视野得分
       showAkariScoreTag:
         label: Akari Score
+      showAverageKillDamageEfficiencyTag:
+        label: 场均击杀伤害效率
 
 MultiWindowSettings:
   title: 窗口管理
@@ -2823,6 +2825,10 @@ PlayerInfoCard:
   enemyMissingPingsPopover: 该玩家平均每局发送敌方消失信号 {{count}} 次
   visionScore: 视野分 {{count}}
   visionScorePopover: 该玩家平均每局视野得分 {{count}} 分
+  killDamageEfficiencyHigh: K 头
+  killDamageEfficiencyLow: 打工
+  killDamageEfficiencyHighPopover: 在最近的 {{count}} 场对局中，该玩家的平均击杀伤害比率为 {{rate}}%，以较少的队伍伤害换取了较多的击杀数
+  killDamageEfficiencyLowPopover: 在最近的 {{count}} 场对局中，该玩家的平均击杀伤害比率为 {{rate}}%，以较多的队伍伤害换取了较少的击杀数
   metPopover:
     title: 最近在 {{date}} 遇到过该玩家，共遇到过 {{count}} 次
     titleNote: 仅显示最近 {{count}} 场对局
@@ -3257,7 +3263,11 @@ InGameSend:
         draftOnly: 草稿模式仅支持试运行
         unavailable: 仅可在英雄选择、房间或游戏内使用
     preview:
-      title: 试运行 ({{preset}} → {{target}})
+      title: 试运行
+      empty: 无可发送内容
+      copy: 复制
+      copied: 已复制到剪贴板
+      copyFailed: 复制失败
       close: 关闭
     selection:
       playersTitle: 发送的目标 ({{selected}} / {{total}})
@@ -3270,65 +3280,99 @@ InGameSend:
       bucketSize: '{{count}} 黑'
     rating:
       label: 表现评分
-      description: 统计每位玩家近期表现，输出 KDA/胜率/评分综合数据。
+      description: 统计每位玩家近期表现，输出胜率/KDA/常玩英雄。
       displayOptionsTitle: 展示元素
       displayOptions:
-        kda:
-          label: KDA
-          description: 击杀 / 死亡 / 助攻表现
         winRate:
           label: 胜率
           description: 近期对局胜率
-        akariScore:
-          label: Akari Score
-          description: Akari 综合评分
-        gameCount:
-          label: 统计场次
-          description: 纳入统计的对局数量
-        soloKills:
-          label: 单杀次数
-          description: 近期单杀表现
-        killParticipation:
-          label: 参团率
-          description: 团战参与程度
-        damagePerMinute:
-          label: 分均伤害
-          description: 输出能力概览
-        damageTakenShare:
-          label: 承伤占比
-          description: 前排与抗压指标
+        kda:
+          label: KDA
+          description: 击杀 / 死亡 / 助攻表现
+        avgSoloKills:
+          label: 场均单杀
+          description: 场均单杀次数，需使用 SGP 数据源
+        avgVisionScore:
+          label: 场均视野得分
+          description: 近期对局的场均视野得分
+        mainChampions:
+          label: 主玩英雄
+          description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
+        mainPositions:
+          label: 主玩位置
+          description: 当近期战绩中存在明确位置信息和主玩位置时展示最多两个位置
+      configOptionsTitle: 配置
+      configOptions:
+        showCurrentChampion:
+          label: 按当前英雄筛选
+          description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄的玩家不会发送
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为每行开头
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
     jungle:
       label: 打野偏好
-      description: 展示打野选手的偏好路径、入侵倾向与开野侧。
+      description: 展示打野选手的前期活动、开野分布和资源控制倾向。
       displayOptionsTitle: 展示模块
       displayOptions:
-        firstClearRoute:
-          label: 开野路线
-          description: 首轮刷野路线
-        firstClearSide:
-          label: 首轮野区
-          description: 偏上半区或下半区
-        gankLanes:
-          label: Gank 偏好
-          description: 常照顾的分路
-        invadeTendency:
-          label: 入侵倾向
-          description: 主动进野区频率
-        scuttleControl:
-          label: 河蟹控制
-          description: 前期河道控制情况
-        objectivePriority:
-          label: 资源优先级
-          description: 小龙 / 虚空资源偏好
-        counterJungleRisk:
-          label: 反野风险
-          description: 容易被入侵的时间窗
-        duoLaneLink:
-          label: 联动对象
-          description: 常联动队友
+        activityPreference:
+          label: 活动偏好
+          description: 展示前期更偏向照顾的地图分区，并附上上中下分布
+        firstClearDistribution:
+          label: 开野分布
+          description: 展示蓝方和红方的常规开、入侵开比例及首营分布，仅按当前英雄筛选时生效
+        earlyGank:
+          label: 早抓倾向
+          description: 展示 3 级和 4 级抓人触发概率
+        dragonControl:
+          label: 控龙
+          description: 展示一龙率、平均首龙时间和场均小龙数
+        monsterControl:
+          label: 野怪资源
+          description: 展示场均巢虫、先锋和大龙数量
+        mainChampions:
+          label: 主玩英雄
+          description: 展示打野样本中明显更多的最多三个英雄，仅未按当前英雄筛选时生效
+      configOptionsTitle: 配置
+      configOptions:
+        showCurrentChampion:
+          label: 按当前英雄筛选
+          description: 仅统计每名玩家当前已选择英雄的打野明细，尚未选择英雄的玩家不会发送，默认开启
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为每行开头
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
     premade:
       label: 组队状况
       description: 识别队伍内开黑组合，按组别展示成员。
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为开黑组成员名称
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）展示开黑组成员，括号内为玩家名
 
 ChampionConfig:
   targetMode: 目标模式

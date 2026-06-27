@@ -1,4 +1,5 @@
 import type { AutoSelectGroup } from '@shared/schemas/remote-config'
+import type { ExpectedChampionStatus } from '@shared/shards/auto-select'
 import type {
   Action,
   BenchChampion,
@@ -6,7 +7,6 @@ import type {
   GridChamp,
   Timer
 } from '@shared/types/league-client/champ-select'
-import type { ExpectedChampionStatus } from '@shared/types/shards/auto-select'
 
 import type { AutoSelectSettings, BanChampionConfig, PickChampionConfig } from './state'
 

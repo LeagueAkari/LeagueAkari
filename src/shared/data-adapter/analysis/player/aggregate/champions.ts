@@ -1,6 +1,7 @@
 import type { AggregatedChampionAnalysis } from '../types/aggregated'
 import type { PreparedGame } from '../types/helpers'
 import { computeAggregatedJungle } from './jungle'
+import { computeAggregatedPositions } from './positions'
 import { computeAggregatedSummary } from './summary'
 import { computeAggregatedWinLossMap } from './win-loss'
 
@@ -22,6 +23,7 @@ export function computeAggregatedChampions(
       championId: id,
       summary: computeAggregatedSummary(list),
       winLoss: computeAggregatedWinLossMap(list),
+      positions: computeAggregatedPositions(list),
       jungle: computeAggregatedJungle(list)
     }
   }

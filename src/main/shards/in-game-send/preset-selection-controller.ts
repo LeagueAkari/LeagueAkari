@@ -1,6 +1,11 @@
+import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import { comparer } from 'mobx'
 
 import type { InGameSendMainContext } from './context'
+
+type PresetSelectionTeams = Record<string, string[]>
+type PresetSelectionPositionAssignments = Record<string, { position: string | null }>
+type PresetSelectionSpells = Record<string, { spell1Id: number; spell2Id: number }>
 
 export class InGameSendPresetSelectionController {
   constructor(private readonly _context: InGameSendMainContext) {}
@@ -9,11 +14,15 @@ export class InGameSendPresetSelectionController {
     const { ongoingGame, mobxUtils } = this._context
 
     mobxUtils.reaction(
-      () => ongoingGame.state.teams,
-      (teams) => {
+      () => ({
+        teams: ongoingGame.state.teams,
+        positionAssignments: ongoingGame.state.positionAssignments,
+        spells: ongoingGame.state.additional.spells
+      }),
+      ({ teams, positionAssignments, spells }) => {
         const all = Object.values(teams).flat()
         this.setRatingPuuids(all)
-        this.setJunglePuuids(all)
+        this.setJunglePuuids(this._defaultJunglePuuids(teams, positionAssignments, spells))
       },
       { equals: comparer.structural, fireImmediately: true }
     )
@@ -48,6 +57,33 @@ export class InGameSendPresetSelectionController {
     const currentPuuids = new Set(Object.values(this._context.ongoingGame.state.teams).flat())
 
     return [...new Set(puuids)].filter((puuid) => currentPuuids.has(puuid))
+  }
+
+  private _defaultJunglePuuids(
+    teams: PresetSelectionTeams,
+    positionAssignments: PresetSelectionPositionAssignments,
+    spells: PresetSelectionSpells
+  ) {
+    return Object.values(teams)
+      .flat()
+      .filter((puuid) => this._isJunglerPuuid(puuid, positionAssignments, spells))
+  }
+
+  private _isJunglerPuuid(
+    puuid: string,
+    positionAssignments: PresetSelectionPositionAssignments,
+    spells: PresetSelectionSpells
+  ) {
+    const assignedPosition = positionAssignments[puuid]?.position
+    if (assignedPosition?.toUpperCase() === 'JUNGLE') {
+      return true
+    }
+
+    const playerSpells = spells[puuid]
+    return (
+      playerSpells?.spell1Id === SUMMONER_SPELL_SMITE_ID ||
+      playerSpells?.spell2Id === SUMMONER_SPELL_SMITE_ID
+    )
   }
 
   private _filterCurrentPremadeIndices(indices: number[]) {

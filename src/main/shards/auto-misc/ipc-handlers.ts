@@ -1,4 +1,4 @@
-import type { AutoMiscRankedStatus } from '@shared/types/shards/auto-misc'
+import type { AutoMiscRankedStatus } from '@shared/shards/auto-misc'
 
 import type { AutoMiscMainContext } from './context'
 import type { AutoMiscLoginAutomationController } from './login-automation-controller'

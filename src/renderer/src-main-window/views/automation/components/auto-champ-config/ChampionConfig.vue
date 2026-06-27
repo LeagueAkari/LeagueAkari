@@ -474,7 +474,7 @@ import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-conf
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
-import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/auto-champ-config'
+import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 import { Search as SearchIcon } from '@vicons/carbon'
 import {
   CheckmarkCircle16Regular as CheckmarkCircle16RegularIcon,

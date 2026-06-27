@@ -1,5 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { AdditionalResult } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult } from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { isAxiosError } from 'axios'

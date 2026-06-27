@@ -23,11 +23,11 @@ export interface PlayerSelectionPresetContext {
   teams: ComputedRef<InGameSendTeam[]>
   totalCount: ComputedRef<number>
   selectedCount: ComputedRef<number>
-  selectedInTeam: (teamId: string) => number
-  isTeamAllSelected: (teamId: string) => boolean
-  isTeamIndeterminate: (teamId: string) => boolean
+  selectedInTeam: (teamIdentifier: string) => number
+  isTeamAllSelected: (teamIdentifier: string) => boolean
+  isTeamIndeterminate: (teamIdentifier: string) => boolean
   isPlayerSelected: (puuid: string) => boolean
-  setTeamSelected: (teamId: string, selected: boolean) => void
+  setTeamSelected: (teamIdentifier: string, selected: boolean) => void
   setPlayerSelected: (puuid: string, selected: boolean) => void
   setAllSelected: (selected: boolean) => void
 }
@@ -41,16 +41,16 @@ export interface PremadeSelectionPresetContext {
   isBucketSelected: (groupIndex: number) => boolean
   setBucketSelected: (groupIndex: number, selected: boolean) => void
   setAllSelected: (selected: boolean) => void
-  isTeamAllSelected: (teamId: string) => boolean
-  isTeamIndeterminate: (teamId: string) => boolean
-  setTeamSelected: (teamId: string, selected: boolean) => void
+  isTeamAllSelected: (teamIdentifier: string) => boolean
+  isTeamIndeterminate: (teamIdentifier: string) => boolean
+  setTeamSelected: (teamIdentifier: string, selected: boolean) => void
 }
 
-function getTeamSortValue(teamId: string) {
-  if (teamId === 'TEAM-100') return 100
-  if (teamId === 'TEAM-200') return 200
+function getTeamIdentifierSortValue(teamIdentifier: string) {
+  if (teamIdentifier === 'TEAM-100') return 100
+  if (teamIdentifier === 'TEAM-200') return 200
 
-  const cherrySubteam = teamId.match(/^CHERRY-(\d+)$/)
+  const cherrySubteam = teamIdentifier.match(/^CHERRY-(\d+)$/)
   if (cherrySubteam) {
     return 1000 + Number(cherrySubteam[1])
   }
@@ -58,20 +58,24 @@ function getTeamSortValue(teamId: string) {
   return Number.MAX_SAFE_INTEGER
 }
 
-function compareTeamIds(teamIdA: string, teamIdB: string, selfTeamId: string | null) {
-  if (selfTeamId) {
-    if (teamIdA === selfTeamId) return -1
-    if (teamIdB === selfTeamId) return 1
+function compareTeamIdentifiers(
+  teamIdentifierA: string,
+  teamIdentifierB: string,
+  selfTeamIdentifier: string | null
+) {
+  if (selfTeamIdentifier) {
+    if (teamIdentifierA === selfTeamIdentifier) return -1
+    if (teamIdentifierB === selfTeamIdentifier) return 1
   }
 
-  const sortA = getTeamSortValue(teamIdA)
-  const sortB = getTeamSortValue(teamIdB)
+  const sortA = getTeamIdentifierSortValue(teamIdentifierA)
+  const sortB = getTeamIdentifierSortValue(teamIdentifierB)
 
   if (sortA !== sortB) {
     return sortA - sortB
   }
 
-  return teamIdA.localeCompare(teamIdB)
+  return teamIdentifierA.localeCompare(teamIdentifierB)
 }
 
 export function useInGameSendTeams() {
@@ -79,20 +83,20 @@ export function useInGameSendTeams() {
   const ongoingGameStore = useOngoingGameStore()
   const leagueClientStore = useLeagueClientStore()
 
-  function getTeamName(teamId: string) {
-    const commonTeamKey = `teams.${teamId}`
+  function getTeamName(teamIdentifier: string) {
+    const commonTeamKey = `teams.${teamIdentifier}`
 
     if (i18next.exists(commonTeamKey, { ns: 'common' })) {
       return t(commonTeamKey, { ns: 'common' })
     }
 
-    return teamId
+    return teamIdentifier
   }
 
-  function getTeamLabels(teamId: string, selfTeamId: string | null) {
-    const teamName = getTeamName(teamId)
+  function getTeamLabels(teamIdentifier: string, selfTeamIdentifier: string | null) {
+    const teamName = getTeamName(teamIdentifier)
 
-    if (!selfTeamId) {
+    if (!selfTeamIdentifier) {
       return {
         label: teamName,
         primaryLabel: teamName
@@ -100,7 +104,7 @@ export function useInGameSendTeams() {
     }
 
     const primaryLabel =
-      teamId === selfTeamId
+      teamIdentifier === selfTeamIdentifier
         ? t('InGameSend.presets.teams.friendly', { ns: 'renderer' })
         : t('InGameSend.presets.teams.enemy', { ns: 'renderer' })
 
@@ -121,7 +125,7 @@ export function useInGameSendTeams() {
     const selfTeamEntry = selfPuuid
       ? Object.entries(ongoingGameTeams).find(([, puuids]) => puuids.includes(selfPuuid))
       : null
-    const selfTeamId = selfTeamEntry?.[0] ?? null
+    const selfTeamIdentifier = selfTeamEntry?.[0] ?? null
     const championSelections = ongoingGameStore.championSelections
 
     const buildPlayer = (puuid: string): InGameSendPlayer => {
@@ -142,16 +146,16 @@ export function useInGameSendTeams() {
     }
 
     return Object.entries(ongoingGameTeams)
-      .toSorted(([teamIdA], [teamIdB]) => {
-        return compareTeamIds(teamIdA, teamIdB, selfTeamId)
+      .toSorted(([teamIdentifierA], [teamIdentifierB]) => {
+        return compareTeamIdentifiers(teamIdentifierA, teamIdentifierB, selfTeamIdentifier)
       })
-      .map(([teamId, puuids]) => {
-        const labels = getTeamLabels(teamId, selfTeamId)
+      .map(([teamIdentifier, puuids]) => {
+        const labels = getTeamLabels(teamIdentifier, selfTeamIdentifier)
 
         return {
-          id: teamId,
+          teamIdentifier,
           ...labels,
-          indicatorColorClass: getTeamIndicatorColorClass(teamId),
+          indicatorColorClass: getTeamIndicatorColorClass(teamIdentifier),
           players: puuids.map(buildPlayer)
         }
       })
@@ -201,12 +205,12 @@ export function usePlayerSelection({
     return allPuuids.value.reduce((acc, puuid) => acc + (selected.has(puuid) ? 1 : 0), 0)
   })
 
-  function teamOf(teamId: string) {
-    return teamsWithPlayers.value.find((team) => team.id === teamId)
+  function teamOf(teamIdentifier: string) {
+    return teamsWithPlayers.value.find((team) => team.teamIdentifier === teamIdentifier)
   }
 
-  function selectedInTeam(teamId: string) {
-    const team = teamOf(teamId)
+  function selectedInTeam(teamIdentifier: string) {
+    const team = teamOf(teamIdentifier)
     if (!team) return 0
 
     const selected = selectedPlayerPuuidSet.value
@@ -214,8 +218,8 @@ export function usePlayerSelection({
     return team.players.reduce((acc, player) => acc + (selected.has(player.puuid) ? 1 : 0), 0)
   }
 
-  function isTeamAllSelected(teamId: string) {
-    const team = teamOf(teamId)
+  function isTeamAllSelected(teamIdentifier: string) {
+    const team = teamOf(teamIdentifier)
     if (!team || team.players.length === 0) {
       return false
     }
@@ -224,11 +228,11 @@ export function usePlayerSelection({
     return team.players.every((player) => selected.has(player.puuid))
   }
 
-  function isTeamIndeterminate(teamId: string) {
-    const team = teamOf(teamId)
+  function isTeamIndeterminate(teamIdentifier: string) {
+    const team = teamOf(teamIdentifier)
     if (!team) return false
 
-    const teamSelectedCount = selectedInTeam(teamId)
+    const teamSelectedCount = selectedInTeam(teamIdentifier)
 
     return teamSelectedCount > 0 && teamSelectedCount < team.players.length
   }
@@ -249,8 +253,8 @@ export function usePlayerSelection({
     commitSelectedPuuids(next)
   }
 
-  function setTeamSelected(teamId: string, selected: boolean) {
-    const team = teamOf(teamId)
+  function setTeamSelected(teamIdentifier: string, selected: boolean) {
+    const team = teamOf(teamIdentifier)
     if (!team) return
 
     const next = new Set(selectedPlayerPuuidSet.value)
@@ -320,7 +324,7 @@ export function usePremadeSelection({
         if (players.length < 2) continue
 
         groups.push({
-          key: `${team.id}:g:${groupIndex}`,
+          key: `${team.teamIdentifier}:g:${groupIndex}`,
           groupIndex,
           groupLetter: PREMADE_TEAMS[groupIndex - 1],
           players
@@ -371,29 +375,29 @@ export function usePremadeSelection({
     commitSelectedIndices(selected ? allGroupIndices.value : [])
   }
 
-  function indicesOfTeam(teamId: string) {
-    const teamView = teams.value.find((item) => item.team.id === teamId)
+  function indicesOfTeam(teamIdentifier: string) {
+    const teamView = teams.value.find((item) => item.team.teamIdentifier === teamIdentifier)
     return teamView ? teamView.groups.map((group) => group.groupIndex) : []
   }
 
-  function isTeamAllSelected(teamId: string) {
-    const indices = indicesOfTeam(teamId)
+  function isTeamAllSelected(teamIdentifier: string) {
+    const indices = indicesOfTeam(teamIdentifier)
     const selected = selectedIndexSet.value
 
     return indices.length > 0 && indices.every((index) => selected.has(index))
   }
 
-  function isTeamIndeterminate(teamId: string) {
-    const indices = indicesOfTeam(teamId)
+  function isTeamIndeterminate(teamIdentifier: string) {
+    const indices = indicesOfTeam(teamIdentifier)
     const selected = selectedIndexSet.value
     const teamSelectedCount = indices.reduce((acc, index) => acc + (selected.has(index) ? 1 : 0), 0)
 
     return teamSelectedCount > 0 && teamSelectedCount < indices.length
   }
 
-  function setTeamSelected(teamId: string, selected: boolean) {
+  function setTeamSelected(teamIdentifier: string, selected: boolean) {
     const next = new Set(selectedIndexSet.value)
-    for (const index of indicesOfTeam(teamId)) {
+    for (const index of indicesOfTeam(teamIdentifier)) {
       if (selected) {
         next.add(index)
       } else {

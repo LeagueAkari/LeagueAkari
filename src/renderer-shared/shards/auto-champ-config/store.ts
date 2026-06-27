@@ -1,4 +1,4 @@
-import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/auto-champ-config'
+import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 import { defineStore } from 'pinia'
 import { shallowReactive } from 'vue'
 

@@ -65,7 +65,7 @@
 import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { LatestReleaseInfo } from '@shared/types/akari'
-import { UpdateProgressInfo } from '@shared/types/shards/self-update'
+import { UpdateProgressInfo } from '@shared/shards/self-update'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'

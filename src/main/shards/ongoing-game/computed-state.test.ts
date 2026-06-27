@@ -1,4 +1,4 @@
-import { AdditionalResult, QueryStage } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult, QueryStage } from '@shared/shards/ongoing-game'
 import { describe, expect, it } from 'vitest'
 
 import { LeagueClientData } from '../league-client/lc-state'

@@ -1,5 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/types/shards/auto-champ-config'
+import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'

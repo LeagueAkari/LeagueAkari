@@ -1,4 +1,4 @@
-import { LastUpdateResult, UpdateProgressInfo } from '@shared/types/shards/self-update'
+import { LastUpdateResult, UpdateProgressInfo } from '@shared/shards/self-update'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class SelfUpdateSettings {

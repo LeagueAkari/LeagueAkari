@@ -3,8 +3,8 @@ import {
   OngoingGameConfig,
   SupportedQueues
 } from '@shared/schemas/remote-config'
+import { Announcement } from '@shared/shards/remote-config'
 import { LatestReleaseInfo } from '@shared/types/akari'
-import { Announcement } from '@shared/types/shards/remote-config'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 

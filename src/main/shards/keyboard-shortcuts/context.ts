@@ -1,4 +1,4 @@
-import type { ShortcutDetails } from '@shared/types/shards/keyboard-shortcut'
+import type { ShortcutDetails } from '@shared/shards/keyboard-shortcut'
 
 import type { AkariIpcMain } from '../ipc'
 import type { AkariLogger } from '../logger-factory'

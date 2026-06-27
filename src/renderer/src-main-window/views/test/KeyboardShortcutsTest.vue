@@ -236,7 +236,7 @@ import type {
   KeyboardShortcutKeyState,
   KeyboardShortcutsDebugState,
   ShortcutDetails
-} from '@shared/types/shards/keyboard-shortcut'
+} from '@shared/shards/keyboard-shortcut'
 import { Shield24Regular } from '@vicons/fluent'
 import { useIntervalFn } from '@vueuse/core'
 import { NAlert, NButton, NIcon, NScrollbar, NTag } from 'naive-ui'

@@ -1,4 +1,4 @@
-import { AdditionalResult } from '@shared/types/shards/ongoing-game'
+import { AdditionalResult } from '@shared/shards/ongoing-game'
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 

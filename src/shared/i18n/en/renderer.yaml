@@ -480,6 +480,8 @@ OngoingGameSettings:
         label: Average Vision Score
       showAkariScoreTag:
         label: Akari Score
+      showAverageKillDamageEfficiencyTag:
+        label: Average Kill Damage Efficiency
 
 MultiWindowSettings:
   title: Multi-Window
@@ -2840,6 +2842,10 @@ PlayerInfoCard:
   enemyMissingPingsPopover_other: This player has sent enemy missing pings an average of {{count}} times per game
   visionScore: Vision Score {{count}}
   visionScorePopover: This player's average vision score is {{count}}
+  killDamageEfficiencyHigh: KS
+  killDamageEfficiencyLow: Damage Dealer
+  killDamageEfficiencyHighPopover: In the recent {{count}} games, this player's average kill damage efficiency is {{rate}}%, achieving more kills with less team damage.
+  killDamageEfficiencyLowPopover: In the recent {{count}} games, this player's average kill damage efficiency is {{rate}}%, achieving fewer kills with more team damage.
   metPopover:
     title_one: Last encountered this player on {{date}}. Met a total of {{count}} time.
     title_other: Last encountered this player on {{date}}. Met a total of {{count}} times.
@@ -3286,7 +3292,11 @@ InGameSend:
         draftOnly: Draft mode only supports dry run.
         unavailable: Available only in champion select, lobby, or in-game.
     preview:
-      title: Dry Run ({{preset}} → {{target}})
+      title: Dry Run
+      empty: No sendable content
+      copy: Copy
+      copied: Copied to clipboard
+      copyFailed: Copy failed
       close: Close
     selection:
       playersTitle: Send targets ({{selected}} / {{total}})
@@ -3299,65 +3309,99 @@ InGameSend:
       bucketSize: '{{count}}-stack'
     rating:
       label: Performance Rating
-      description: Summarize recent performance for each player with KDA, win rate, and Akari Score.
+      description: 统计每位玩家近期表现，输出胜率/KDA/常玩英雄。
       displayOptionsTitle: Display Items
       displayOptions:
-        kda:
-          label: KDA
-          description: Kills / deaths / assists performance
         winRate:
           label: Win Rate
           description: Recent match win rate
-        akariScore:
-          label: Akari Score
-          description: Akari composite score
-        gameCount:
-          label: Game Count
-          description: Number of matches included
-        soloKills:
-          label: Solo Kills
-          description: Recent solo-kill performance
-        killParticipation:
-          label: Kill Participation
-          description: Teamfight participation
-        damagePerMinute:
-          label: Damage Per Minute
-          description: Damage output overview
-        damageTakenShare:
-          label: Damage Taken Share
-          description: Frontline and pressure indicator
+        kda:
+          label: KDA
+          description: Kills / deaths / assists performance
+        avgSoloKills:
+          label: 场均单杀
+          description: 场均单杀次数，需使用 SGP 数据源
+        avgVisionScore:
+          label: Average Vision Score
+          description: Average vision score in recent matches
+        mainChampions:
+          label: 主玩英雄
+          description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
+        mainPositions:
+          label: 主玩位置
+          description: 当近期战绩中存在明确位置信息和主玩位置时展示最多两个位置
+      configOptionsTitle: Configuration
+      configOptions:
+        showCurrentChampion:
+          label: 按当前英雄筛选
+          description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄的玩家不会发送
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为每行开头
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
     jungle:
       label: Jungle Preference
-      description: Show jungler pathing preference, invade tendency, and first-clear side.
+      description: Show early activity, first-clear distribution, and objective control tendencies.
       displayOptionsTitle: Display Modules
       displayOptions:
-        firstClearRoute:
-          label: First Clear Route
-          description: First clear path
-        firstClearSide:
-          label: First Clear Side
-          description: Upper-side or lower-side preference
-        gankLanes:
-          label: Gank Preference
-          description: Frequently visited lanes
-        invadeTendency:
-          label: Invade Tendency
-          description: Enemy jungle invade frequency
-        scuttleControl:
-          label: Scuttle Control
-          description: Early river control
-        objectivePriority:
-          label: Objective Priority
-          description: Dragon / Void objective preference
-        counterJungleRisk:
-          label: Counter-Jungle Risk
-          description: Windows vulnerable to invades
-        duoLaneLink:
-          label: Linked Teammate
-          description: Commonly linked teammate
+        activityPreference:
+          label: Activity Preference
+          description: Show which early-map zones the jungler tends to visit, with top/mid/bot distribution
+        firstClearDistribution:
+          label: First-Clear Distribution
+          description: Show blue-side and red-side standard/invade start rates and camp distribution, only when filtering by current champion
+        earlyGank:
+          label: Early Gank
+          description: Show level 3 and level 4 gank trigger rates
+        dragonControl:
+          label: Dragon Control
+          description: Show first dragon rate, average first dragon time, and average dragons
+        monsterControl:
+          label: Monster Objectives
+          description: Show average voidgrubs, heralds, and barons
+        mainChampions:
+          label: Main Champions
+          description: Show up to three champions with clearly more jungle-detail samples, only when current champion filtering is off
+      configOptionsTitle: Configuration
+      configOptions:
+        showCurrentChampion:
+          label: Filter By Current Champion
+          description: Only use jungle details for each player's currently selected champion, players without a champion selection are skipped, enabled by default
+      nameDisplayStrategy:
+        title: Name Display
+        options:
+          preferName:
+            label: Prefer Player Name
+            description: Use the player name at the start of each line
+          preferChampionName:
+            label: Prefer Champion Name
+            description: Use player names when no champion is selected or duplicate champions exist
+          championNameWithName:
+            label: Champion With Player
+            description: Use champion name with the player name in parentheses
     premade:
       label: Premade Status
       description: Identify premade groups in each team and show members by group.
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为开黑组成员名称
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）展示开黑组成员，括号内为玩家名
 
 ChampionConfig:
   targetMode: Target Mode

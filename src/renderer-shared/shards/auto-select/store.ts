@@ -6,7 +6,7 @@ import {
   DelayedChampionSwap,
   ExpectedChampionStatus,
   PickChampionConfig
-} from '@shared/types/shards/auto-select'
+} from '@shared/shards/auto-select'
 import { defineStore } from 'pinia'
 import { shallowReactive, shallowRef } from 'vue'
 

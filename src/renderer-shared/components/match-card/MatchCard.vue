@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { onErrorCaptured } from 'vue'
 
 import MatchCardDetails from './MatchCardDetails.vue'

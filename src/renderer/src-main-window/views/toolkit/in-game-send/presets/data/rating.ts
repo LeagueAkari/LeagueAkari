@@ -1,28 +1,26 @@
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import type { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import type {
-  InGameSendPresetOptionPatch,
-  InGameSendPresetOptions,
+  InGameSendRatingPresetOptionPatch,
   InGameSendRatingPresetOptions
-} from '@shared/types/shards/in-game-send'
-import { type ComputedRef, type InjectionKey, computed, provide, ref } from 'vue'
+} from '@shared/shards/in-game-send'
+import { type ComputedRef, type InjectionKey, computed, provide } from 'vue'
 
 import {
   type PlayerSelectionPresetContext,
   usePlayerSelection
 } from '../composables/usePresetSelections'
-import type { GamePhase, InGameSendTeam, PresetSlot, PreviewedLines } from '../types'
+import type { GamePhase, InGameSendTeam, PresetSlot } from '../types'
 import {
   type PresetScopeContext,
-  createPreviewedLines,
   createShortcutTargetIds,
-  createTargetShortcutPatch,
-  injectRequired
+  injectRequired,
+  usePresetScopeData
 } from './shared'
 
 export interface RatingPresetContext extends PresetScopeContext {
   options: ComputedRef<InGameSendRatingPresetOptions>
-  updateOptions: (options: InGameSendPresetOptionPatch<'rating'>) => Promise<void>
+  updateOptions: (options: InGameSendRatingPresetOptionPatch) => Promise<void>
   playerSelection: PlayerSelectionPresetContext
 }
 
@@ -47,7 +45,7 @@ interface RatingPresetDataOptions {
   teamsWithPlayers: ComputedRef<InGameSendTeam[]>
   allPuuids: ComputedRef<string[]>
   totalCount: ComputedRef<number>
-  presetOptions: ComputedRef<InGameSendPresetOptions>
+  ratingPresetOptions: ComputedRef<InGameSendRatingPresetOptions>
 }
 
 export function useRatingPresetData({
@@ -58,10 +56,24 @@ export function useRatingPresetData({
   teamsWithPlayers,
   allPuuids,
   totalCount,
-  presetOptions
+  ratingPresetOptions
 }: RatingPresetDataOptions): RatingPresetContext {
-  const previewedLines = ref<PreviewedLines | null>(null)
-
+  const scope = usePresetScopeData({
+    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getRatingPresetShortcutTargetId),
+    shortcuts: computed(() => ratingPresetOptions.value.targetShortcuts),
+    gamePhase,
+    canSend,
+    options: ratingPresetOptions,
+    updateOptions: (options: InGameSendRatingPresetOptionPatch) =>
+      inGameSend.updateRatingPresetOptions(options),
+    createShortcutPatch: (targetId, shortcutId): InGameSendRatingPresetOptionPatch => ({
+      targetShortcuts: {
+        [targetId]: shortcutId
+      }
+    }),
+    send: (targetId) => inGameSend.sendRatingPreset(targetId),
+    generateLines: (targetId) => inGameSend.generateRatingPresetLines(targetId)
+  })
   const playerSelection = usePlayerSelection({
     teamsWithPlayers,
     allPuuids,
@@ -71,33 +83,7 @@ export function useRatingPresetData({
   })
 
   return {
-    shortcutTargetIds: createShortcutTargetIds(InGameSendRenderer.getRatingPresetShortcutTargetId),
-    shortcuts: computed(() => presetOptions.value.rating.targetShortcuts),
-
-    gamePhase,
-    canSend,
-
-    previewedLines: computed(() => previewedLines.value),
-
-    setShortcut: (targetId, shortcutId) =>
-      inGameSend.updateRatingPresetOptions({
-        targetShortcuts: createTargetShortcutPatch(targetId, shortcutId)
-      }),
-
-    send: (targetId) => inGameSend.sendRatingPreset(targetId),
-
-    dryRun: async (targetId) => {
-      const lines = await inGameSend.generateRatingPresetLines(targetId)
-      previewedLines.value = createPreviewedLines(targetId, lines)
-    },
-
-    closePreview: () => {
-      previewedLines.value = null
-    },
-
-    options: computed(() => presetOptions.value.rating),
-    updateOptions: (options) => inGameSend.updateRatingPresetOptions(options),
-
+    ...scope,
     playerSelection
   }
 }

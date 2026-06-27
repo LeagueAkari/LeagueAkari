@@ -1,5 +1,5 @@
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { DraftOptions } from '@shared/types/shards/ongoing-game'
+import { DraftOptions } from '@shared/shards/ongoing-game'
 import { toJS } from 'mobx'
 
 import type { OngoingGameAdditionalInfoController } from './additional-info-controller'

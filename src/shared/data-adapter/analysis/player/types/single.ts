@@ -35,6 +35,7 @@ export interface SingleSummaryAnalysis {
   championDamageRatioToTeamMax: number
   championDamageRatioToMax: number
   championDamagePercentageOfTeam: number
+  championDamagePerMinute: number
   damageTakenRatioToTeamMax: number
   damageTakenRatioToMax: number
   damageTakenPercentageOfTeam: number
@@ -51,7 +52,7 @@ export interface SingleSummaryAnalysis {
   totalDamageShieldedOnTeammatesRatioToTeamMax: number | null
   totalDamageShieldedOnTeammatesRatioToMax: number | null
   totalDamageShieldedOnTeammatesPercentageOfTeam: number | null
-
+  killDamageEfficiency: number
   kda: number
   win: boolean
   killParticipation: number

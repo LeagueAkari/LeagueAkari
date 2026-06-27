@@ -5,39 +5,63 @@
     </div>
 
     <PresetSendControls :preset="ratingPreset" :preset-label="presetLabel" />
+    <PreviewPanel :preset="ratingPreset" />
+
+    <PresetDisplayOptionsPanel
+      :title="t('displayOptionsTitle')"
+      :options="displayOptions"
+      :selected-options="options"
+      @update:selected-options="updateDisplayOptions"
+    />
+
+    <PresetDisplayOptionsPanel
+      :title="t('configOptionsTitle')"
+      :options="configOptions"
+      :selected-options="options"
+      @update:selected-options="updateConfigOptions"
+    />
 
     <div class="pt-3">
       <div class="mb-2 text-xs font-semibold text-black/70 dark:text-white/70">
-        {{ t('displayOptionsTitle') }}
+        {{ t('nameDisplayStrategy.title') }}
       </div>
-      <NCheckboxGroup v-model:value="selectedDisplayItems">
-        <div class="grid grid-cols-2 gap-2">
-          <NCheckbox v-for="option of displayOptions" :key="option.value" :value="option.value">
+      <NRadioGroup :value="options.nameDisplayStrategy" @update:value="updateNameDisplayStrategy">
+        <div class="grid gap-2">
+          <NRadio
+            v-for="option of nameDisplayStrategyOptions"
+            :key="option.value"
+            :value="option.value"
+          >
             <div class="flex flex-col leading-tight">
               <span class="text-xs">{{ option.label }}</span>
               <span class="text-[11px] text-black/45 dark:text-white/45">
                 {{ option.description }}
               </span>
             </div>
-          </NCheckbox>
+          </NRadio>
         </div>
-      </NCheckboxGroup>
+      </NRadioGroup>
     </div>
 
     <PlayerSelectionPanel :selection="ratingPreset.playerSelection" />
-    <PreviewPanel :preset="ratingPreset" :preset-label="presetLabel" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { InGameSendRatingOptionId } from '@shared/types/shards/in-game-send'
+import type {
+  InGameSendRatingPresetConfigOptionKey,
+  InGameSendRatingPresetDisplayOptionKey,
+  InGameSendRatingPresetNameDisplayStrategy,
+  InGameSendRatingPresetOptionPatch
+} from '@shared/shards/in-game-send'
 import { useTranslation } from 'i18next-vue'
-import { NCheckbox, NCheckboxGroup } from 'naive-ui'
+import { NRadio, NRadioGroup } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useRatingPreset } from '../data/rating'
 import type { PresetDisplayOption } from '../types'
 import PlayerSelectionPanel from '../widgets/PlayerSelectionPanel.vue'
+import PresetDisplayOptionsPanel from '../widgets/PresetDisplayOptionsPanel.vue'
 import PresetSendControls from '../widgets/PresetSendControls.vue'
 import PreviewPanel from '../widgets/PreviewPanel.vue'
 
@@ -48,53 +72,93 @@ const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.rating
 
 const presetLabel = computed(() => t('label'))
 
-const displayOptions = computed<PresetDisplayOption<InGameSendRatingOptionId>[]>(() => [
+const displayOptions = computed<PresetDisplayOption<InGameSendRatingPresetDisplayOptionKey>[]>(
+  () => [
+    {
+      label: t('displayOptions.winRate.label'),
+      value: 'winRate',
+      description: t('displayOptions.winRate.description')
+    },
+    {
+      label: t('displayOptions.kda.label'),
+      value: 'kda',
+      description: t('displayOptions.kda.description')
+    },
+    {
+      label: t('displayOptions.avgSoloKills.label'),
+      value: 'avgSoloKills',
+      description: t('displayOptions.avgSoloKills.description')
+    },
+    {
+      label: t('displayOptions.avgVisionScore.label'),
+      value: 'avgVisionScore',
+      description: t('displayOptions.avgVisionScore.description')
+    },
+    {
+      label: t('displayOptions.mainChampions.label'),
+      value: 'mainChampions',
+      description: t('displayOptions.mainChampions.description')
+    },
+    {
+      label: t('displayOptions.mainPositions.label'),
+      value: 'mainPositions',
+      description: t('displayOptions.mainPositions.description')
+    }
+  ]
+)
+
+const configOptions = computed<PresetDisplayOption<InGameSendRatingPresetConfigOptionKey>[]>(() => [
   {
-    label: t('displayOptions.kda.label'),
-    value: 'kda',
-    description: t('displayOptions.kda.description')
-  },
-  {
-    label: t('displayOptions.winRate.label'),
-    value: 'win-rate',
-    description: t('displayOptions.winRate.description')
-  },
-  {
-    label: t('displayOptions.akariScore.label'),
-    value: 'akari-score',
-    description: t('displayOptions.akariScore.description')
-  },
-  {
-    label: t('displayOptions.gameCount.label'),
-    value: 'game-count',
-    description: t('displayOptions.gameCount.description')
-  },
-  {
-    label: t('displayOptions.soloKills.label'),
-    value: 'solo-kills',
-    description: t('displayOptions.soloKills.description')
-  },
-  {
-    label: t('displayOptions.killParticipation.label'),
-    value: 'kill-participation',
-    description: t('displayOptions.killParticipation.description')
-  },
-  {
-    label: t('displayOptions.damagePerMinute.label'),
-    value: 'damage-per-minute',
-    description: t('displayOptions.damagePerMinute.description')
-  },
-  {
-    label: t('displayOptions.damageTakenShare.label'),
-    value: 'damage-taken-share',
-    description: t('displayOptions.damageTakenShare.description')
+    label: t('configOptions.showCurrentChampion.label'),
+    value: 'showCurrentChampion',
+    description: t('configOptions.showCurrentChampion.description')
   }
 ])
 
-const selectedDisplayItems = computed({
-  get: () => options.value.enabledMetrics,
-  set: (value) => {
-    void updateOptions({ enabledMetrics: [...value] })
+const nameDisplayStrategyOptions = computed<
+  PresetDisplayOption<InGameSendRatingPresetNameDisplayStrategy>[]
+>(() => [
+  {
+    label: t('nameDisplayStrategy.options.preferChampionName.label'),
+    value: 'preferChampionName',
+    description: t('nameDisplayStrategy.options.preferChampionName.description')
+  },
+  {
+    label: t('nameDisplayStrategy.options.preferName.label'),
+    value: 'preferName',
+    description: t('nameDisplayStrategy.options.preferName.description')
+  },
+  {
+    label: t('nameDisplayStrategy.options.championNameWithName.label'),
+    value: 'championNameWithName',
+    description: t('nameDisplayStrategy.options.championNameWithName.description')
   }
-})
+])
+
+function updateDisplayOptions(value: Record<string, boolean>) {
+  const patch: InGameSendRatingPresetOptionPatch = {
+    winRate: value.winRate,
+    kda: value.kda,
+    avgSoloKills: value.avgSoloKills,
+    avgVisionScore: value.avgVisionScore,
+    mainChampions: value.mainChampions,
+    mainPositions: value.mainPositions
+  }
+
+  void updateOptions(patch)
+}
+
+function updateConfigOptions(value: Record<string, boolean>) {
+  const patch: InGameSendRatingPresetOptionPatch = {
+    showCurrentChampion: value.showCurrentChampion
+  }
+
+  void updateOptions(patch)
+}
+
+function updateNameDisplayStrategy(value: string | number) {
+  void updateOptions({
+    nameDisplayStrategy: value as InGameSendRatingPresetNameDisplayStrategy
+  })
+}
 </script>

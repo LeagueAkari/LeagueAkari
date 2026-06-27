@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { Announcement } from '@shared/types/shards/remote-config'
+import { Announcement } from '@shared/shards/remote-config'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'

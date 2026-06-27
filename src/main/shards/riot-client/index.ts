@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
-import { UxCommandLine } from '@shared/types/shards/league-client-ux'
+import { UxCommandLine } from '@shared/shards/league-client-ux'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 

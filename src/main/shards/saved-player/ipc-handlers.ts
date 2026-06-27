@@ -8,7 +8,7 @@ import type {
   SavedPlayerSaveDto,
   UpdateTagDto,
   WithEncounteredGamesQueryDto
-} from '@shared/types/shards/saved-player'
+} from '@shared/shards/saved-player'
 import { dialog } from 'electron'
 
 import { AkariIpcError } from '../ipc'

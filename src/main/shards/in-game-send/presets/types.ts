@@ -1,9 +1,6 @@
 import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
-import type {
-  InGameSendPresetOptions,
-  InGameSendPresetTarget
-} from '@shared/types/shards/in-game-send'
-import type { AdditionalResult } from '@shared/types/shards/ongoing-game'
+import type { InGameSendPresetTarget } from '@shared/shards/in-game-send'
+import type { AdditionalResult } from '@shared/shards/ongoing-game'
 
 import type { InGameSendMainContext } from '../context'
 
@@ -19,7 +16,7 @@ export interface InGameSendPresetPlayer {
 }
 
 export interface InGameSendPresetTeam {
-  id: string
+  teamIdentifier: string
   label: string
   primaryLabel: string
   players: InGameSendPresetPlayer[]
@@ -27,6 +24,5 @@ export interface InGameSendPresetTeam {
 
 export interface InGameSendPresetContext {
   target: InGameSendPresetTarget
-  presetOptions: InGameSendPresetOptions
   mainContext: InGameSendMainContext
 }

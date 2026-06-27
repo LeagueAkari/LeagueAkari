@@ -580,6 +580,42 @@
 
     <NPopover
       :keep-alive-on-hover="false"
+      v-if="
+        ogs.settings.playerCardTags.showAverageKillDamageEfficiencyTag &&
+        analysis &&
+        killDamageEfficiencyTag &&
+        killDamageEfficiencyTag.kind !== 'normal'
+      "
+      :delay="50"
+    >
+      <template #trigger>
+        <div class="tag kill-damage-efficiency">
+          <template v-if="killDamageEfficiencyTag.kind === 'high'">{{
+            t('PlayerInfoCard.killDamageEfficiencyHigh')
+          }}</template>
+          <template v-else-if="killDamageEfficiencyTag.kind === 'low'">{{
+            t('PlayerInfoCard.killDamageEfficiencyLow')
+          }}</template>
+        </div>
+      </template>
+      <div class="popover-text">
+        <template v-if="killDamageEfficiencyTag.kind === 'high'">{{
+          t('PlayerInfoCard.killDamageEfficiencyHighPopover', {
+            rate: (killDamageEfficiencyTag.value * 100).toFixed(2),
+            count: analysis.count
+          })
+        }}</template>
+        <template v-else-if="killDamageEfficiencyTag.kind === 'low'">{{
+          t('PlayerInfoCard.killDamageEfficiencyLowPopover', {
+            rate: (killDamageEfficiencyTag.value * 100).toFixed(2),
+            count: analysis.count
+          })
+        }}</template>
+      </div>
+    </NPopover>
+
+    <NPopover
+      :keep-alive-on-hover="false"
       v-if="ogs.settings.playerCardTags.showAkariScoreTag && analysis"
       :delay="50"
     >
@@ -797,6 +833,33 @@ const encounteredGames = computed(() => {
   return mapped
 })
 
+const killDamageEfficiencyTag = computed(() => {
+  if (!analysis.value) {
+    return null
+  }
+
+  const kde = analysis.value.summary.avgKillDamageEfficiency
+
+  if (kde > 1.2) {
+    return {
+      kind: 'high',
+      value: kde
+    }
+  }
+
+  if (kde < 0.8) {
+    return {
+      kind: 'low',
+      value: kde
+    }
+  }
+
+  return {
+    kind: 'normal',
+    value: kde
+  }
+})
+
 const previewEncounteredGame = (gameId: number) => {
   const summary = ogs.cachedGames[gameId]
 
@@ -956,6 +1019,10 @@ const { masked } = useStreamerModeMaskedText()
 
     &.vision-score {
       background-color: #2451a6;
+    }
+
+    &.kill-damage-efficiency {
+      background-color: #04614b;
     }
   }
 }
