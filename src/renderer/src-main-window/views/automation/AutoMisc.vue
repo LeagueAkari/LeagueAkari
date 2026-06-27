@@ -88,7 +88,7 @@
                 clearable
                 size="small"
                 :placeholder="t('AutoMisc.autoInvitation.searchPlaceholder')"
-                class="w-72!"
+                class="mb-2 w-72!"
               >
                 <template #prefix>
                   <NIcon><SearchIcon /></NIcon>

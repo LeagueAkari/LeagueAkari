@@ -2,6 +2,7 @@ node_modules
 dist
 out
 storybook-static
+bench-results/
 *.log*
 *.tsbuildinfo
 examples

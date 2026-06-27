@@ -21,7 +21,7 @@
     "build:storybook": "storybook build",
     "build:native:win": "node native/win32-x64/scripts/build.js",
     "build": "npm run typecheck && electron-vite build",
-    "benchmark:radix": "vitest bench src/shared/utils/radix-matcher.bench.ts",
+    "benchmark:radix": "node scripts/run-radix-benchmark.mjs",
     "postinstall": "node scripts/clear-electron-rebuild-metadata.cjs",
     "build:win": "npm run build && electron-builder --win --config",
     "build:win:native": "npm run build:native:win && npm run build:win",

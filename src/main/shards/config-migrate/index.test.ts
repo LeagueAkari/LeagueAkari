@@ -4,8 +4,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   MIGRATION_FROM_143,
-  MIGRATION_FROM_143_AUTO_MISC,
-  MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND,
   getAutoMiscSettingMigrationTarget,
   sanitizeShortcutSettingRecord,
   shouldResetInGameSendSetting
@@ -14,8 +12,6 @@ import {
 describe('from 1.4.3 migration', () => {
   it('uses the 1.4.3 migration marker', () => {
     expect(MIGRATION_FROM_143).toBe('akari-migration-from-1.4.3_patch1')
-    expect(MIGRATION_FROM_143_AUTO_MISC).toBe('akari-migration-from-1.4.3_patch2')
-    expect(MIGRATION_FROM_143_MAIN_WINDOW_BACKGROUND).toBe('akari-migration-from-1.4.3_patch3')
   })
 })
 

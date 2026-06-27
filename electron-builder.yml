@@ -13,6 +13,7 @@ files:
   - '!{.agents,.agents/**,.claude,.claude/**,.codex,.codex/**,.mcp.json,opencode.json}'
   - '!.playwright-mcp{,/**}'
   - '!.storybook{,/**}'
+  - '!bench-results{,/**}'
   - '!examples'
   - '!docs'
   - '!pictures'
