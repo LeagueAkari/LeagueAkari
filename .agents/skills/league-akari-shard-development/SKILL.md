@@ -34,13 +34,15 @@ These rules are hard requirements for any newly created shard and for any featur
   - persisted data shape
 - For refactors, do not split files under 500 lines unless the user explicitly asks or there is a correctness reason.
 - For new shards, do not start with a giant `index.ts`. Add structure only where it has a real boundary.
-- Do not split a coherent flow just because it is long. A clear state-sync pipeline can stay together.
+- Do not split a coherent flow just because it is long. A clear state-sync pipeline can stay together. If a shared abstraction accumulates many feature-specific flags, hooks, or exceptions, prefer feature-owned paths that make the business behavior explicit.
 - Do not create tiny `*-controller.ts`, `*-executor.ts`, or helper files merely because two branches
   have different conceptual responsibilities. When the code is still small and tightly owned by one
   feature, keep the distinction as clearly named private methods in the existing module. Extract a
   new file only when it owns enough behavior, lifecycle, state, platform guarding, or tests to be
   worth the extra navigation.
 - Prefer mechanical extraction before behavior changes.
+- For persisted state or settings that are still changing during active development, manually inspect and align local DB/state instead of adding config migrations immediately. Add migrations when the shape is stable enough for production compatibility.
+- Before adding defensive checks, inspect the authoritative type, schema, or data adapter. Handle documented nullability and failure states, but avoid guards for states the contract does not allow.
 - Use full descriptive names:
   - `remoteConfig`, not `rc`
   - `leagueClient`, not `lc`
