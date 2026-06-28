@@ -1,5 +1,6 @@
 import type { InGameSendPresetTarget } from '@shared/shards/in-game-send'
 
+import { presetCommonT, presetPositionName } from './i18n'
 import type { InGameSendPresetContext, InGameSendPresetPlayer, InGameSendPresetTeam } from './types'
 
 export function formatRate(rate: number) {
@@ -12,25 +13,32 @@ function playerRiotId(player: InGameSendPresetPlayer) {
 
 function playerPositionLabel(player: InGameSendPresetPlayer) {
   if (!player.position || player.position === 'NONE') {
-    return '位置未知'
+    return presetCommonT('unknownPosition')
   }
 
-  return player.position
+  return presetPositionName(player.position)
 }
 
 export function playerBaseLine(player: InGameSendPresetPlayer) {
-  const champion = player.championId ? `英雄 ${player.championId}` : '英雄未定'
-  return `${playerPositionLabel(player)} ${playerRiotId(player)} | ${champion}`
+  const champion = player.championId
+    ? presetCommonT('championId', { id: player.championId })
+    : presetCommonT('unsetChampion')
+
+  return presetCommonT('playerBaseLine', {
+    position: playerPositionLabel(player),
+    player: playerRiotId(player),
+    champion
+  })
 }
 
 export function targetTeamLabel(target: InGameSendPresetTarget) {
   switch (target) {
     case 'friendly':
-      return '我方'
+      return presetCommonT('target.friendly')
     case 'enemy':
-      return '敌方'
+      return presetCommonT('target.enemy')
     case 'all':
-      return '全体'
+      return presetCommonT('target.all')
   }
 }
 
@@ -74,10 +82,16 @@ function getTeamLabels(teamIdentifier: string, selfTeamIdentifier: string | null
     }
   }
 
-  const primaryLabel = teamIdentifier === selfTeamIdentifier ? '我方' : '敌方'
+  const primaryLabel =
+    teamIdentifier === selfTeamIdentifier
+      ? presetCommonT('team.friendly')
+      : presetCommonT('team.enemy')
 
   return {
-    label: `${primaryLabel} · ${teamIdentifier}`,
+    label: presetCommonT('team.labelWithName', {
+      side: primaryLabel,
+      team: teamIdentifier
+    }),
     primaryLabel
   }
 }
@@ -126,7 +140,8 @@ export function targetTeams(context: InGameSendPresetContext, teams = createPres
     return teams
   }
 
-  const primaryLabel = context.target === 'friendly' ? '我方' : '敌方'
+  const primaryLabel =
+    context.target === 'friendly' ? presetCommonT('team.friendly') : presetCommonT('team.enemy')
   const matched = teams.filter((team) => team.primaryLabel === primaryLabel)
   if (matched.length) {
     return matched
@@ -157,7 +172,7 @@ export function selectionSummaryLineByPuuids(
     .reduce((acc, player) => acc + (selected.has(player.puuid) ? 1 : 0), 0)
 
   if (count === 0) {
-    return '[选中: 无]'
+    return presetCommonT('selection.empty')
   }
 
   const parts = teams.map((team) => {
@@ -165,8 +180,13 @@ export function selectionSummaryLineByPuuids(
       (acc, player) => acc + (selected.has(player.puuid) ? 1 : 0),
       0
     )
-    return `${team.label} ${teamCount}`
+    return presetCommonT('selection.teamPart', {
+      team: team.label,
+      count: teamCount
+    })
   })
 
-  return `[选中: ${parts.join(' / ')}]`
+  return presetCommonT('selection.summary', {
+    parts: parts.join(presetCommonT('selection.partSeparator'))
+  })
 }

@@ -1,5 +1,6 @@
 import type { InGameSendPresetNameDisplayStrategy } from '@shared/shards/in-game-send'
 
+import { presetCommonT } from './i18n'
 import type { InGameSendPresetContext, InGameSendPresetPlayer } from './types'
 
 export function playerRiotId(player: InGameSendPresetPlayer) {
@@ -44,7 +45,10 @@ export function playerDisplayName(
 
   if (playerDisplayNameUsesChampionName(player, strategy, selectedChampionIdCounts)) {
     if (strategy === 'championNameWithName') {
-      return `${selectedChampionName}（${riotId}）`
+      return presetCommonT('championWithPlayer', {
+        champion: selectedChampionName,
+        player: riotId
+      })
     }
 
     return selectedChampionName!

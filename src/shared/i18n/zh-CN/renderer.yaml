@@ -3278,6 +3278,18 @@ InGameSend:
       groupCount_other: '{{count}} 组开黑'
       emptyPremadeGroups: 无开黑组合
       bucketSize: '{{count}} 黑'
+    nameDisplayStrategy:
+      title: 名字展示
+      options:
+        preferName:
+          label: 优先展示玩家名
+          description: 使用玩家名作为输出中的玩家标识
+        preferChampionName:
+          label: 优先展示英雄名
+          description: 没选英雄或存在重复英雄时展示玩家名
+        championNameWithName:
+          label: 英雄名附带玩家名
+          description: 使用英雄名（玩家名）作为输出中的玩家标识，括号内为玩家名
     rating:
       label: 表现评分
       description: 统计每位玩家近期表现，输出胜率/KDA/常玩英雄。
@@ -3295,6 +3307,24 @@ InGameSend:
         avgVisionScore:
           label: 场均视野得分
           description: 近期对局的场均视野得分
+        avgChampionDamage:
+          label: 场均伤害
+          description: 展示平均队伍伤害占比
+        avgDamageTaken:
+          label: 场均承伤
+          description: 展示平均队伍承伤占比
+        avgGold:
+          label: 经济
+          description: 展示平均队伍经济占比
+        avgCsPerMinute:
+          label: 补兵
+          description: 展示平均每分钟补兵数
+        avgKillParticipation:
+          label: 参团率
+          description: 展示平均击杀参与率
+        avgDamageGoldEfficiency:
+          label: 伤转比
+          description: 展示平均伤害经济转化比例
         mainChampions:
           label: 主玩英雄
           description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
@@ -3305,19 +3335,7 @@ InGameSend:
       configOptions:
         showCurrentChampion:
           label: 按当前英雄筛选
-          description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄的玩家不会发送
-      nameDisplayStrategy:
-        title: 名字展示
-        options:
-          preferName:
-            label: 优先展示玩家名
-            description: 使用玩家名作为每行开头
-          preferChampionName:
-            label: 优先展示英雄名
-            description: 没选英雄或存在重复英雄时展示玩家名
-          championNameWithName:
-            label: 英雄名附带玩家名
-            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
+          description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄时会输出提示
     jungle:
       label: 打野偏好
       description: 展示打野选手的前期活动、开野分布和资源控制倾向。
@@ -3345,34 +3363,41 @@ InGameSend:
       configOptions:
         showCurrentChampion:
           label: 按当前英雄筛选
-          description: 仅统计每名玩家当前已选择英雄的打野明细，尚未选择英雄的玩家不会发送，默认开启
-      nameDisplayStrategy:
-        title: 名字展示
-        options:
-          preferName:
-            label: 优先展示玩家名
-            description: 使用玩家名作为每行开头
-          preferChampionName:
-            label: 优先展示英雄名
-            description: 没选英雄或存在重复英雄时展示玩家名
-          championNameWithName:
-            label: 英雄名附带玩家名
-            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
+          description: 仅统计每名玩家当前已选择英雄的打野明细，尚未选择英雄时会输出提示，默认开启
     premade:
       label: 组队状况
       description: 识别队伍内开黑组合，按组别展示成员。
-      nameDisplayStrategy:
-        title: 名字展示
-        options:
-          preferName:
-            label: 优先展示玩家名
-            description: 使用玩家名作为开黑组成员名称
-          preferChampionName:
-            label: 优先展示英雄名
-            description: 没选英雄或存在重复英雄时展示玩家名
-          championNameWithName:
-            label: 英雄名附带玩家名
-            description: 使用英雄名（玩家名）展示开黑组成员，括号内为玩家名
+    fixedText:
+      label: 固定文案
+      empty:
+        description: 还没有固定文案。新增一条后，设置标题、快捷键和多行内容即可发送。
+        action: 新增固定文案
+      listTitle: 文案列表
+      addLimitReached: 最多只能创建 {{count}} 条固定文案
+      unnamed: 未命名
+      editTitle: 编辑标题
+      shortcutLabel: 快捷键
+      shortcutDescription: 按下后发送此条已保存的固定文案
+      save: 保存
+      saved: 已保存
+      saveFailed: 保存失败
+      createFailed: 新增失败
+      delete: 删除
+      deleted: 已删除
+      deleteFailed: 删除失败
+      deleteConfirm: 确认删除？
+      moveUp: 上移
+      moveDown: 下移
+      sendToGame: 发送到游戏
+      sendToChat: 发送到聊天
+      send: 发送
+      sendSucceeded: 已提交发送
+      sendSucceededWithTitle: 已提交发送（固定文案：{{title}}）
+      disabled:
+        noSelection: 请选择一条固定文案
+        saveFirst: 请先保存当前修改
+        draftOnly: 草稿模式不可发送
+        unavailable: 仅可在英雄选择、房间或游戏内使用
 
 ChampionConfig:
   targetMode: 目标模式

@@ -95,3 +95,97 @@ client-installation-main:
     launchWeGame:
       title: 启动 WeGame
       description: 启动 League Akari 并启动 WeGame
+
+in-game-send-main:
+  presets:
+    punctuation:
+      lineSeparator: '：'
+      listSeparator: '，'
+      memberSeparator: ', '
+      groupSeparator: ' '
+    common:
+      unknownPosition: 位置未知
+      unsetChampion: 英雄未定
+      championId: 英雄 {{id}}
+      playerBaseLine: '{{position}} {{player}} | {{champion}}'
+      currentChampion: 当前英雄
+      thisChampion: 本英雄
+      noChampionSelected: 尚未选择英雄
+      championWithPlayer: '{{champion}}（{{player}}）'
+      target:
+        friendly: 我方
+        enemy: 敌方
+        all: 全体
+      team:
+        friendly: 我方
+        enemy: 敌方
+        labelWithName: '{{side}} · {{team}}'
+      selection:
+        empty: '[选中: 无]'
+        summary: '[选中: {{parts}}]'
+        teamPart: '{{team}} {{count}}'
+        partSeparator: ' / '
+    rating:
+      noRecentMatches: 近期没有对局记录
+      noChampionMatches: 近期没有{{champion}}对局记录
+      matchCount_one: 统计{{count}}场对局
+      matchCount_other: 统计{{count}}场对局
+      championMatchCount_one: 统计{{champion}}{{count}}场
+      championMatchCount_other: 统计{{champion}}{{count}}场
+      countWithStats: '{{countText}}，{{stats}}'
+      metrics:
+        winRate: 胜率{{value}}
+        kda: KDA{{value}}
+        avgSoloKills: 场均单杀{{value}}
+        avgVisionScore: 场均视野得分{{value}}
+        avgChampionDamage: 伤害{{value}}
+        avgDamageTaken: 承伤{{value}}
+        avgGold: 经济{{value}}
+        avgCsPerMinute: 补兵{{value}}/分
+        avgKillParticipation: 参团率{{value}}
+        avgDamageGoldEfficiency: 伤转比{{value}}
+        mainChampions: 主玩英雄[{{champions}}]
+        mainPositions: 主玩位置[{{positions}}]
+    jungle:
+      noRecords: 没有打野明细记录
+      noChampionRecords: 没有{{champion}}打野明细记录
+      sampleCount_one: 打野样本{{count}}场
+      sampleCount_other: 打野样本{{count}}场
+      championSampleCount_one: '{{champion}}打野样本{{count}}场'
+      championSampleCount_other: '{{champion}}打野样本{{count}}场'
+      firstDragonAverageTime: ，首龙均时{{time}}
+      camps:
+        blue: 蓝Buff
+        red: 红Buff
+        wolves: 三狼
+        raptors: 锋喙鸟
+      campRate: '{{camp}}{{rate}}'
+      lanes:
+        top: 上
+        mid: 中
+        bot: 下
+      lanePreference:
+        unclear: 分布不明显
+        single: 偏{{lane}}
+        double: 偏{{first}}{{second}}
+      firstClear:
+        normal: 常规开
+        invade: 入侵开
+        blue: 蓝方
+        red: 红方
+        pattern: '{{side}}{{kind}}{{rate}}{{distribution}}'
+      metrics:
+        activityPreference: 前期{{preference}}，上{{top}}中{{mid}}下{{bot}}
+        level3Gank: 3级抓{{value}}
+        level4Gank: 4级抓{{value}}
+        firstDragon: 一龙率{{value}}{{time}}
+        avgDragons: 场均小龙{{value}}
+        monsterControl: 野怪资源巢虫{{voidgrubs}}/先锋{{heralds}}/大龙{{barons}}
+        mainChampions: 主玩英雄[{{champions}}]
+    premade:
+      blueTeamTitle: 蓝方开黑
+      redTeamTitle: 红方开黑
+      teamTitle: 开黑
+      blueTeamEmpty: 蓝方无开黑
+      redTeamEmpty: 红方无开黑
+      empty: 无开黑小队

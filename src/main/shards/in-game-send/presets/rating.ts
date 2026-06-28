@@ -12,6 +12,13 @@ import { getInGameSendRatingPresetShortcutTargetId } from '@shared/shards/in-gam
 import type { InGameSendMainContext } from '../context'
 import { createPresetTeams, formatRate, selectedPlayersByPuuids } from './helpers'
 import {
+  joinPresetList,
+  presetCommonT,
+  presetPositionName,
+  presetPunctuation,
+  presetT
+} from './i18n'
+import {
   countSelectedChampionIds,
   playerDisplayName,
   playerDisplayNameUsesChampionName
@@ -22,14 +29,6 @@ const MAX_MAIN_CHAMPION_COUNT = 3
 const MAX_MAIN_POSITION_COUNT = 2
 const MIN_MAIN_CHAMPION_MATCH_COUNT = 2
 const MAIN_USAGE_DROP_RATIO = 1.5
-
-const POSITION_NAMES: Record<string, string> = {
-  TOP: '上路',
-  JUNGLE: '打野',
-  MIDDLE: '中路',
-  BOTTOM: '下路',
-  UTILITY: '辅助'
-}
 
 const POSITION_ORDER = ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']
 
@@ -63,6 +62,12 @@ export function createRatingPresetLineOptions(
     winRate: options.winRate,
     avgSoloKills: options.avgSoloKills,
     avgVisionScore: options.avgVisionScore,
+    avgChampionDamage: options.avgChampionDamage,
+    avgDamageTaken: options.avgDamageTaken,
+    avgGold: options.avgGold,
+    avgCsPerMinute: options.avgCsPerMinute,
+    avgKillParticipation: options.avgKillParticipation,
+    avgDamageGoldEfficiency: options.avgDamageGoldEfficiency,
     mainChampions: options.mainChampions,
     mainPositions: options.mainPositions,
     nameDisplayStrategy: options.nameDisplayStrategy,
@@ -80,7 +85,7 @@ function formatNullableRate(value: number | null) {
 
 function currentChampionName(context: InGameSendPresetContext, player: InGameSendPresetPlayer) {
   if (!player.championId) {
-    return '当前英雄'
+    return presetCommonT('currentChampion')
   }
 
   return context.mainContext.leagueClient.data.gameData.championName(player.championId)
@@ -144,7 +149,7 @@ function mainPositionNames(positions: AggregatedPositionAnalysis | null, useDomi
       count
     }))
     .filter((position) => {
-      return Boolean(POSITION_NAMES[position.position]) && position.count > 0
+      return POSITION_ORDER.includes(position.position) && position.count > 0
     })
     .toSorted((a, b) => {
       if (a.count !== b.count) {
@@ -156,7 +161,7 @@ function mainPositionNames(positions: AggregatedPositionAnalysis | null, useDomi
 
   const selected = useDominance ? selectMainItems(candidates, MAX_MAIN_POSITION_COUNT) : candidates
 
-  return selected.map((position) => POSITION_NAMES[position.position])
+  return selected.map((position) => presetPositionName(position.position))
 }
 
 function resolveRatingStatsSource(
@@ -228,20 +233,22 @@ function buildRatingStats(
   displayNameUsesChampionName: boolean
 ) {
   if (options.showCurrentChampion && player.championId <= 0) {
-    return '尚未选择英雄'
+    return presetCommonT('noChampionSelected')
   }
 
   const statsSource = resolveRatingStatsSource(context, options, player)
 
   if (!statsSource) {
-    return '近期没有对局记录'
+    return presetT('rating.noRecentMatches')
   }
 
-  const currentChampionSubject = displayNameUsesChampionName ? '本英雄' : statsSource.championName
+  const currentChampionSubject = displayNameUsesChampionName
+    ? presetCommonT('thisChampion')
+    : statsSource.championName
   const noRecordText =
     statsSource.championName && currentChampionSubject
-      ? `近期没有${currentChampionSubject}对局记录`
-      : '近期没有对局记录'
+      ? presetT('rating.noChampionMatches', { champion: currentChampionSubject })
+      : presetT('rating.noRecentMatches')
 
   if (statsSource.matchCount !== null && statsSource.matchCount <= 0) {
     return noRecordText
@@ -256,28 +263,90 @@ function buildRatingStats(
 
   if (options.winRate) {
     const winRate = statsSource.winLoss === null ? null : statsSource.winLoss.all.winRate
-    parts.push(`胜率${formatNullableRate(winRate)}`)
+    parts.push(presetT('rating.metrics.winRate', { value: formatNullableRate(winRate) }))
   }
 
   if (options.kda) {
     const avgKda = summary === null ? null : summary.avgKda
-    parts.push(`KDA${formatNullableNumber(avgKda, 2)}`)
+    parts.push(presetT('rating.metrics.kda', { value: formatNullableNumber(avgKda, 2) }))
   }
 
   const avgSoloKills = summary === null ? null : summary.avgSoloKills
   if (options.avgSoloKills && avgSoloKills !== null && Number.isFinite(avgSoloKills)) {
-    parts.push(`场均单杀${formatNullableNumber(avgSoloKills, 1)}`)
+    parts.push(
+      presetT('rating.metrics.avgSoloKills', {
+        value: formatNullableNumber(avgSoloKills, 1)
+      })
+    )
   }
 
   if (options.avgVisionScore && summary !== null) {
-    parts.push(`场均视野得分${formatNullableNumber(summary.avgVisionScore, 1)}`)
+    parts.push(
+      presetT('rating.metrics.avgVisionScore', {
+        value: formatNullableNumber(summary.avgVisionScore, 1)
+      })
+    )
+  }
+
+  if (summary !== null) {
+    if (options.avgChampionDamage) {
+      parts.push(
+        presetT('rating.metrics.avgChampionDamage', {
+          value: formatNullableRate(summary.avgChampionDamagePercentageOfTeam)
+        })
+      )
+    }
+
+    if (options.avgDamageTaken) {
+      parts.push(
+        presetT('rating.metrics.avgDamageTaken', {
+          value: formatNullableRate(summary.avgDamageTakenPercentageOfTeam)
+        })
+      )
+    }
+
+    if (options.avgGold) {
+      parts.push(
+        presetT('rating.metrics.avgGold', {
+          value: formatNullableRate(summary.avgGoldPercentageOfTeam)
+        })
+      )
+    }
+
+    if (options.avgCsPerMinute) {
+      parts.push(
+        presetT('rating.metrics.avgCsPerMinute', {
+          value: formatNullableNumber(summary.avgCsPerMinute, 1)
+        })
+      )
+    }
+
+    if (options.avgKillParticipation) {
+      parts.push(
+        presetT('rating.metrics.avgKillParticipation', {
+          value: formatNullableRate(summary.avgKillParticipation)
+        })
+      )
+    }
+
+    if (options.avgDamageGoldEfficiency) {
+      parts.push(
+        presetT('rating.metrics.avgDamageGoldEfficiency', {
+          value: formatNullableRate(summary.avgDamageGoldEfficiency)
+        })
+      )
+    }
   }
 
   if (options.mainChampions && !statsSource.isChampionStats) {
     const names = mainChampionNames(context, player)
 
     if (names.length) {
-      parts.push(`主玩英雄[${names.join('，')}]`)
+      parts.push(
+        presetT('rating.metrics.mainChampions', {
+          champions: joinPresetList(names)
+        })
+      )
     }
   }
 
@@ -285,17 +354,26 @@ function buildRatingStats(
     const names = mainPositionNames(statsSource.positions, !statsSource.isChampionStats)
 
     if (names.length) {
-      parts.push(`主玩位置[${names.join('，')}]`)
+      parts.push(
+        presetT('rating.metrics.mainPositions', {
+          positions: joinPresetList(names)
+        })
+      )
     }
   }
 
   if (count !== null) {
     const prefix =
       statsSource.championName && currentChampionSubject
-        ? `统计${currentChampionSubject}${count}场`
-        : `统计${count}场对局`
+        ? presetT('rating.championMatchCount', {
+            champion: currentChampionSubject,
+            count
+          })
+        : presetT('rating.matchCount', { count })
 
-    return parts.length ? `${prefix}，${parts.join(' ')}` : prefix
+    return parts.length
+      ? presetT('rating.countWithStats', { countText: prefix, stats: parts.join(' ') })
+      : prefix
   }
 
   return parts.length ? parts.join(' ') : noRecordText
@@ -324,7 +402,7 @@ export function buildRatingPresetLines(
       selectedChampionIdCounts
     )
     const stats = buildRatingStats(context, options, player, displayNameUsesChampionName)
-    return [`${name}：${stats}`]
+    return [`${name}${presetPunctuation('lineSeparator')}${stats}`]
   })
 }
 

@@ -6,6 +6,7 @@ import { getInGameSendPremadePresetShortcutTargetId } from '@shared/shards/in-ga
 
 import type { InGameSendMainContext } from '../context'
 import { createPresetTeams, targetTeams } from './helpers'
+import { joinPresetMembers, presetPunctuation, presetT } from './i18n'
 import { countSelectedChampionIds, playerDisplayName } from './name-display'
 import type { InGameSendPresetContext, InGameSendPresetPlayer, InGameSendPresetTeam } from './types'
 
@@ -56,26 +57,26 @@ function premadeGroupsOfTeam(team: InGameSendPresetTeam) {
 
 function premadeTeamTitle(team: InGameSendPresetTeam) {
   if (team.teamIdentifier === 'TEAM-100') {
-    return '蓝方开黑'
+    return presetT('premade.blueTeamTitle')
   }
 
   if (team.teamIdentifier === 'TEAM-200') {
-    return '红方开黑'
+    return presetT('premade.redTeamTitle')
   }
 
-  return '开黑'
+  return presetT('premade.teamTitle')
 }
 
 function premadeNoGroupText(team: InGameSendPresetTeam) {
   if (team.teamIdentifier === 'TEAM-100') {
-    return '蓝方无开黑'
+    return presetT('premade.blueTeamEmpty')
   }
 
   if (team.teamIdentifier === 'TEAM-200') {
-    return '红方无开黑'
+    return presetT('premade.redTeamEmpty')
   }
 
-  return '无开黑小队'
+  return presetT('premade.empty')
 }
 
 export function buildPremadePresetLines(
@@ -101,16 +102,16 @@ export function buildPremadePresetLines(
     }
 
     const groupParts = groups.map((group) => {
-      const members = group.players
-        .map((player) =>
+      const members = joinPresetMembers(
+        group.players.map((player) =>
           playerDisplayName(context, player, options.nameDisplayStrategy, selectedChampionIdCounts)
         )
-        .join(', ')
+      )
 
       return `[${members}]`
     })
 
-    return `${premadeTeamTitle(team)}：${groupParts.join(' ')}`
+    return `${premadeTeamTitle(team)}${presetPunctuation('lineSeparator')}${groupParts.join(presetPunctuation('groupSeparator'))}`
   })
 }
 

@@ -1,5 +1,8 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import {
+  type InGameSendFixedTextPresetItem,
+  type InGameSendFixedTextPresetItemMoveDirection,
+  type InGameSendFixedTextPresetItemPatch,
   type InGameSendJunglePresetOptionPatch,
   type InGameSendJunglePresetOptions,
   type InGameSendPremadePresetOptionPatch,
@@ -7,6 +10,7 @@ import {
   type InGameSendPresetTarget,
   type InGameSendRatingPresetOptionPatch,
   type InGameSendRatingPresetOptions,
+  getInGameSendFixedTextPresetShortcutTargetId,
   getInGameSendJunglePresetShortcutTargetId,
   getInGameSendPremadePresetShortcutTargetId,
   getInGameSendRatingPresetShortcutTargetId
@@ -40,6 +44,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   static getPremadePresetShortcutTargetId(target: InGameSendPresetTarget) {
     return getInGameSendPremadePresetShortcutTargetId(target)
+  }
+
+  static getFixedTextPresetShortcutTargetId(id: string) {
+    return getInGameSendFixedTextPresetShortcutTargetId(id)
   }
 
   private readonly _context: InGameSendRendererContext
@@ -97,6 +105,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendPremadePreset', target)
   }
 
+  sendFixedTextPreset(id: string) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendFixedTextPreset', id)
+  }
+
   updateRatingPresetOptions(options: InGameSendRatingPresetOptionPatch) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateRatingPresetOptions', options)
   }
@@ -119,6 +131,30 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   setPremadePresetOptions(options: InGameSendPremadePresetOptions) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPremadePresetOptions', options)
+  }
+
+  createFixedTextPresetItem() {
+    return this._ipc.call<InGameSendFixedTextPresetItem>(
+      MAIN_SHARD_NAMESPACE,
+      'createFixedTextPresetItem'
+    )
+  }
+
+  updateFixedTextPresetItem(id: string, patch: InGameSendFixedTextPresetItemPatch) {
+    return this._ipc.call<InGameSendFixedTextPresetItem>(
+      MAIN_SHARD_NAMESPACE,
+      'updateFixedTextPresetItem',
+      id,
+      patch
+    )
+  }
+
+  deleteFixedTextPresetItem(id: string) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'deleteFixedTextPresetItem', id)
+  }
+
+  moveFixedTextPresetItem(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'moveFixedTextPresetItem', id, direction)
   }
 
   setRatingPuuids(puuids: string[]) {

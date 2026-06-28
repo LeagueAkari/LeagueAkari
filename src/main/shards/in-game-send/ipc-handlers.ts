@@ -1,4 +1,6 @@
 import type {
+  InGameSendFixedTextPresetItemMoveDirection,
+  InGameSendFixedTextPresetItemPatch,
   InGameSendJunglePresetOptionPatch,
   InGameSendJunglePresetOptions,
   InGameSendPremadePresetOptionPatch,
@@ -86,6 +88,10 @@ export class InGameSendIpcHandlers {
       }
     )
 
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'sendFixedTextPreset', (_, id: string) => {
+      return this._presetController.sendFixedTextPreset(id)
+    })
+
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
       'setRatingPresetOptions',
@@ -131,6 +137,30 @@ export class InGameSendIpcHandlers {
       'updatePremadePresetOptions',
       (_, options: InGameSendPremadePresetOptionPatch) => {
         return this._presetController.updatePremadePresetOptions(options)
+      }
+    )
+
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'createFixedTextPresetItem', () => {
+      return this._presetController.createFixedTextPresetItem()
+    })
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updateFixedTextPresetItem',
+      (_, id: string, patch: InGameSendFixedTextPresetItemPatch) => {
+        return this._presetController.updateFixedTextPresetItem(id, patch)
+      }
+    )
+
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'deleteFixedTextPresetItem', (_, id: string) => {
+      return this._presetController.deleteFixedTextPresetItem(id)
+    })
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'moveFixedTextPresetItem',
+      (_, id: string, direction: InGameSendFixedTextPresetItemMoveDirection) => {
+        return this._presetController.moveFixedTextPresetItem(id, direction)
       }
     )
 

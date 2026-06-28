@@ -6,6 +6,7 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed, ref } from 'vue'
 
 import { useInGameSendTeams } from './composables/usePresetSelections'
+import { provideFixedTextPreset, useFixedTextPresetData } from './data/fixed-text'
 import { provideJunglePreset, useJunglePresetData } from './data/jungle'
 import { providePremadePreset, usePremadePresetData } from './data/premade'
 import { provideRatingPreset, ratingPresetSlot, useRatingPresetData } from './data/rating'
@@ -52,6 +53,7 @@ export function useInGameSendPresetsPanel() {
   const ratingPresetOptions = computed(() => inGameSendStore.settings.ratingPresetOptions)
   const junglePresetOptions = computed(() => inGameSendStore.settings.junglePresetOptions)
   const premadePresetOptions = computed(() => inGameSendStore.settings.premadePresetOptions)
+  const fixedTextPresetItems = computed(() => inGameSendStore.settings.fixedTextPresetItems)
 
   const ratingContext = useRatingPresetData({
     inGameSend,
@@ -85,9 +87,18 @@ export function useInGameSendPresetsPanel() {
     premadePresetOptions
   })
 
+  const fixedTextContext = useFixedTextPresetData({
+    inGameSend,
+    inGameSendStore,
+    gamePhase,
+    canSend,
+    fixedTextPresetItems
+  })
+
   provideRatingPreset(ratingContext)
   provideJunglePreset(jungleContext)
   providePremadePreset(premadeContext)
+  provideFixedTextPreset(fixedTextContext)
 
   return {
     activePreset

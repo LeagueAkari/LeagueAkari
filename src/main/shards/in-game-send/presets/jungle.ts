@@ -11,6 +11,7 @@ import { getInGameSendJunglePresetShortcutTargetId } from '@shared/shards/in-gam
 
 import type { InGameSendMainContext } from '../context'
 import { createPresetTeams, formatRate, selectedPlayersByPuuids } from './helpers'
+import { joinPresetList, presetCommonT, presetPunctuation, presetT } from './i18n'
 import {
   countSelectedChampionIds,
   playerDisplayName,
@@ -82,19 +83,21 @@ function formatFirstDragonTimeText(seconds: number | null) {
   const minutes = Math.floor(totalSeconds / 60)
   const remainingSeconds = (totalSeconds % 60).toString().padStart(2, '0')
 
-  return `，首龙均时${minutes}:${remainingSeconds}`
+  return presetT('jungle.firstDragonAverageTime', {
+    time: `${minutes}:${remainingSeconds}`
+  })
 }
 
 function formatCampName(camp: string) {
   switch (camp) {
     case 'blue':
-      return '蓝Buff'
+      return presetT('jungle.camps.blue')
     case 'red':
-      return '红Buff'
+      return presetT('jungle.camps.red')
     case 'wolves':
-      return '三狼'
+      return presetT('jungle.camps.wolves')
     case 'raptors':
-      return '锋喙鸟'
+      return presetT('jungle.camps.raptors')
     default:
       return camp
   }
@@ -115,15 +118,15 @@ function currentChampionName(context: InGameSendPresetContext, player: InGameSen
 function lanePreference(jungle: AggregatedJungleAnalysis) {
   const lanes = [
     {
-      label: '上',
+      label: presetT('jungle.lanes.top'),
       rate: jungle.avgTopZonePercentage
     },
     {
-      label: '中',
+      label: presetT('jungle.lanes.mid'),
       rate: jungle.avgMidZonePercentage
     },
     {
-      label: '下',
+      label: presetT('jungle.lanes.bot'),
       rate: jungle.avgBotZonePercentage
     }
   ].toSorted((a, b) => b.rate - a.rate)
@@ -131,14 +134,19 @@ function lanePreference(jungle: AggregatedJungleAnalysis) {
   const [first, second] = lanes
 
   if (first.rate === 0) {
-    return '分布不明显'
+    return presetT('jungle.lanePreference.unclear')
   }
 
   if (second.rate >= first.rate * 0.65) {
-    return `偏${first.label}${second.label}`
+    return presetT('jungle.lanePreference.double', {
+      first: first.label,
+      second: second.label
+    })
   }
 
-  return `偏${first.label}`
+  return presetT('jungle.lanePreference.single', {
+    lane: first.label
+  })
 }
 
 function selectMainItems<T extends { count: number }>(candidates: T[], maxCount: number) {
@@ -221,11 +229,13 @@ function firstClearTeamSideGames(
 }
 
 function firstClearKindLabel(kind: FirstClearKind) {
-  return kind === 'normal' ? '常规开' : '入侵开'
+  return kind === 'normal'
+    ? presetT('jungle.firstClear.normal')
+    : presetT('jungle.firstClear.invade')
 }
 
 function firstClearTeamSideLabel(side: FirstClearTeamSide) {
-  return side === 'blue' ? '蓝方' : '红方'
+  return side === 'blue' ? presetT('jungle.firstClear.blue') : presetT('jungle.firstClear.red')
 }
 
 function createFirstClearPattern(
@@ -253,7 +263,12 @@ function createFirstClearPattern(
         ? Object.entries(record)
             .filter(([, campCount]) => campCount > 0)
             .toSorted(([, countA], [, countB]) => countB - countA)
-            .map(([camp, campCount]) => `${formatCampName(camp)}${formatRate(campCount / count)}`)
+            .map(([camp, campCount]) =>
+              presetT('jungle.campRate', {
+                camp: formatCampName(camp),
+                rate: formatRate(campCount / count)
+              })
+            )
         : []
   }
 }
@@ -261,13 +276,23 @@ function createFirstClearPattern(
 function formatFirstClearPattern(pattern: FirstClearPattern) {
   const rate = pattern.rate === null ? '-' : formatRate(pattern.rate)
   const distribution = pattern.rate !== null && pattern.rate > 0 ? pattern.distribution : []
-  const distributionText = distribution.length ? `[${distribution.join('，')}]` : ''
+  const distributionText = distribution.length ? `[${joinPresetList(distribution)}]` : ''
 
-  return `${firstClearTeamSideLabel(pattern.side)}${firstClearKindLabel(pattern.kind)}${rate}${distributionText}`
+  return presetT('jungle.firstClear.pattern', {
+    side: firstClearTeamSideLabel(pattern.side),
+    kind: firstClearKindLabel(pattern.kind),
+    rate,
+    distribution: distributionText
+  })
 }
 
 function formatActivityPreference(jungle: AggregatedJungleAnalysis) {
-  return `前期${lanePreference(jungle)}，上${formatRate(jungle.avgTopZonePercentage)}中${formatRate(jungle.avgMidZonePercentage)}下${formatRate(jungle.avgBotZonePercentage)}`
+  return presetT('jungle.metrics.activityPreference', {
+    preference: lanePreference(jungle),
+    top: formatRate(jungle.avgTopZonePercentage),
+    mid: formatRate(jungle.avgMidZonePercentage),
+    bot: formatRate(jungle.avgBotZonePercentage)
+  })
 }
 
 function formatJungleNoRecordText(
@@ -275,11 +300,13 @@ function formatJungleNoRecordText(
   displayNameUsesChampionName: boolean
 ) {
   if (!statsSource.isChampionStats || !statsSource.championName) {
-    return '没有打野明细记录'
+    return presetT('jungle.noRecords')
   }
 
-  const subject = displayNameUsesChampionName ? '本英雄' : statsSource.championName
-  return `没有${subject}打野明细记录`
+  const subject = displayNameUsesChampionName
+    ? presetCommonT('thisChampion')
+    : statsSource.championName
+  return presetT('jungle.noChampionRecords', { champion: subject })
 }
 
 function formatJungleSamplePrefix(
@@ -287,11 +314,18 @@ function formatJungleSamplePrefix(
   displayNameUsesChampionName: boolean
 ) {
   if (!statsSource.isChampionStats || !statsSource.championName) {
-    return `打野样本${statsSource.jungle?.gamesAnalyzed ?? 0}场`
+    return presetT('jungle.sampleCount', {
+      count: statsSource.jungle?.gamesAnalyzed ?? 0
+    })
   }
 
-  const subject = displayNameUsesChampionName ? '本英雄' : statsSource.championName
-  return `${subject}打野样本${statsSource.jungle?.gamesAnalyzed ?? 0}场`
+  const subject = displayNameUsesChampionName
+    ? presetCommonT('thisChampion')
+    : statsSource.championName
+  return presetT('jungle.championSampleCount', {
+    champion: subject,
+    count: statsSource.jungle?.gamesAnalyzed ?? 0
+  })
 }
 
 function buildGlobalJungleStats(
@@ -302,7 +336,7 @@ function buildGlobalJungleStats(
 ) {
   const jungle = statsSource.jungle
   if (!jungle) {
-    return '没有打野明细记录'
+    return presetT('jungle.noRecords')
   }
 
   const mainChampions = mainJungleChampionNames(context, player)
@@ -314,26 +348,43 @@ function buildGlobalJungleStats(
 
   if (options.earlyGank) {
     parts.push(
-      `3级抓${formatRate(jungle.earlyGank.level3GankRate)}`,
-      `4级抓${formatRate(jungle.earlyGank.level4GankRate)}`
+      presetT('jungle.metrics.level3Gank', {
+        value: formatRate(jungle.earlyGank.level3GankRate)
+      }),
+      presetT('jungle.metrics.level4Gank', {
+        value: formatRate(jungle.earlyGank.level4GankRate)
+      })
     )
   }
 
   if (options.dragonControl) {
     parts.push(
-      `一龙率${formatRate(jungle.objectives.firstDragonRate)}${formatFirstDragonTimeText(jungle.objectives.avgFirstDragonTime)}`,
-      `场均小龙${formatFixedNumber(jungle.objectives.avgDragons, 1)}`
+      presetT('jungle.metrics.firstDragon', {
+        value: formatRate(jungle.objectives.firstDragonRate),
+        time: formatFirstDragonTimeText(jungle.objectives.avgFirstDragonTime)
+      }),
+      presetT('jungle.metrics.avgDragons', {
+        value: formatFixedNumber(jungle.objectives.avgDragons, 1)
+      })
     )
   }
 
   if (options.monsterControl) {
     parts.push(
-      `野怪资源巢虫${formatFixedNumber(jungle.objectives.avgVoidgrubs, 1)}/先锋${formatFixedNumber(jungle.objectives.avgHeralds, 1)}/大龙${formatFixedNumber(jungle.objectives.avgBarons, 1)}`
+      presetT('jungle.metrics.monsterControl', {
+        voidgrubs: formatFixedNumber(jungle.objectives.avgVoidgrubs, 1),
+        heralds: formatFixedNumber(jungle.objectives.avgHeralds, 1),
+        barons: formatFixedNumber(jungle.objectives.avgBarons, 1)
+      })
     )
   }
 
   if (options.mainChampions && mainChampions.length) {
-    parts.push(`主玩英雄[${mainChampions.join('，')}]`)
+    parts.push(
+      presetT('jungle.metrics.mainChampions', {
+        champions: joinPresetList(mainChampions)
+      })
+    )
   }
 
   return parts.join(' ')
@@ -366,21 +417,34 @@ function buildChampionJungleStats(
 
   if (options.earlyGank) {
     parts.push(
-      `3级抓${formatRate(jungle.earlyGank.level3GankRate)}`,
-      `4级抓${formatRate(jungle.earlyGank.level4GankRate)}`
+      presetT('jungle.metrics.level3Gank', {
+        value: formatRate(jungle.earlyGank.level3GankRate)
+      }),
+      presetT('jungle.metrics.level4Gank', {
+        value: formatRate(jungle.earlyGank.level4GankRate)
+      })
     )
   }
 
   if (options.dragonControl) {
     parts.push(
-      `一龙率${formatRate(jungle.objectives.firstDragonRate)}${formatFirstDragonTimeText(jungle.objectives.avgFirstDragonTime)}`,
-      `场均小龙${formatFixedNumber(jungle.objectives.avgDragons, 1)}`
+      presetT('jungle.metrics.firstDragon', {
+        value: formatRate(jungle.objectives.firstDragonRate),
+        time: formatFirstDragonTimeText(jungle.objectives.avgFirstDragonTime)
+      }),
+      presetT('jungle.metrics.avgDragons', {
+        value: formatFixedNumber(jungle.objectives.avgDragons, 1)
+      })
     )
   }
 
   if (options.monsterControl) {
     parts.push(
-      `野怪资源巢虫${formatFixedNumber(jungle.objectives.avgVoidgrubs, 1)}/先锋${formatFixedNumber(jungle.objectives.avgHeralds, 1)}/大龙${formatFixedNumber(jungle.objectives.avgBarons, 1)}`
+      presetT('jungle.metrics.monsterControl', {
+        voidgrubs: formatFixedNumber(jungle.objectives.avgVoidgrubs, 1),
+        heralds: formatFixedNumber(jungle.objectives.avgHeralds, 1),
+        barons: formatFixedNumber(jungle.objectives.avgBarons, 1)
+      })
     )
   }
 
@@ -394,13 +458,13 @@ function buildJungleStats(
   displayNameUsesChampionName: boolean
 ) {
   if (options.showCurrentChampion && player.championId <= 0) {
-    return '尚未选择英雄'
+    return presetCommonT('noChampionSelected')
   }
 
   const statsSource = resolveJungleStatsSource(context, options, player)
 
   if (!statsSource) {
-    return '尚未选择英雄'
+    return presetCommonT('noChampionSelected')
   }
 
   if (!statsSource.isChampionStats) {
@@ -434,7 +498,7 @@ export function buildJunglePresetLines(
     )
     const stats = buildJungleStats(context, options, player, displayNameUsesChampionName)
 
-    return `${name}：${stats}`
+    return `${name}${presetPunctuation('lineSeparator')}${stats}`
   })
 }
 

@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { normalizeInGameSendFixedTextPresetItems } from '@shared/shards/in-game-send'
 
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
@@ -78,6 +79,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
         },
         premadePresetOptions: {
           default: this.settings.premadePresetOptions
+        },
+        fixedTextPresetItems: {
+          default: this.settings.fixedTextPresetItems,
+          transform: ({ value }) => normalizeInGameSendFixedTextPresetItems(value)
         }
       },
       this.settings
@@ -122,7 +127,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       'cancelShortcut',
       'ratingPresetOptions',
       'junglePresetOptions',
-      'premadePresetOptions'
+      'premadePresetOptions',
+      'fixedTextPresetItems'
     ])
 
     this._mobxUtils.propSync(InGameSendMain.id, 'state', this.state, [

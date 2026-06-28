@@ -95,3 +95,97 @@ client-installation-main:
     launchWeGame:
       title: Launch WeGame
       description: Open League Akari and launch WeGame
+
+in-game-send-main:
+  presets:
+    punctuation:
+      lineSeparator: ': '
+      listSeparator: ', '
+      memberSeparator: ', '
+      groupSeparator: ' '
+    common:
+      unknownPosition: Unknown Position
+      unsetChampion: Champion Pending
+      championId: Champion {{id}}
+      playerBaseLine: '{{position}} {{player}} | {{champion}}'
+      currentChampion: Current Champion
+      thisChampion: this champion
+      noChampionSelected: No champion selected
+      championWithPlayer: '{{champion}} ({{player}})'
+      target:
+        friendly: Allied
+        enemy: Enemy
+        all: All
+      team:
+        friendly: Allied
+        enemy: Enemy
+        labelWithName: '{{side}} · {{team}}'
+      selection:
+        empty: '[Selected: none]'
+        summary: '[Selected: {{parts}}]'
+        teamPart: '{{team}} {{count}}'
+        partSeparator: ' / '
+    rating:
+      noRecentMatches: No recent matches
+      noChampionMatches: No recent matches on {{champion}}
+      matchCount_one: '{{count}} recent match'
+      matchCount_other: '{{count}} recent matches'
+      championMatchCount_one: '{{count}} match on {{champion}}'
+      championMatchCount_other: '{{count}} matches on {{champion}}'
+      countWithStats: '{{countText}}, {{stats}}'
+      metrics:
+        winRate: Win Rate {{value}}
+        kda: KDA {{value}}
+        avgSoloKills: Avg Solo Kills {{value}}
+        avgVisionScore: Vision {{value}}
+        avgChampionDamage: Damage {{value}}
+        avgDamageTaken: Taken {{value}}
+        avgGold: Gold {{value}}
+        avgCsPerMinute: CS {{value}}/min
+        avgKillParticipation: KP {{value}}
+        avgDamageGoldEfficiency: Damage/Gold {{value}}
+        mainChampions: Main Champions [{{champions}}]
+        mainPositions: Main Positions [{{positions}}]
+    jungle:
+      noRecords: No jungle-detail records
+      noChampionRecords: No jungle-detail records on {{champion}}
+      sampleCount_one: '{{count}} jungle sample'
+      sampleCount_other: '{{count}} jungle samples'
+      championSampleCount_one: '{{count}} jungle sample on {{champion}}'
+      championSampleCount_other: '{{count}} jungle samples on {{champion}}'
+      firstDragonAverageTime: ', first dragon avg {{time}}'
+      camps:
+        blue: Blue Buff
+        red: Red Buff
+        wolves: Wolves
+        raptors: Raptors
+      campRate: '{{camp}} {{rate}}'
+      lanes:
+        top: top
+        mid: mid
+        bot: bot
+      lanePreference:
+        unclear: no clear lane preference
+        single: favors {{lane}}
+        double: favors {{first}}/{{second}}
+      firstClear:
+        normal: standard
+        invade: invade
+        blue: blue-side
+        red: red-side
+        pattern: '{{side}} {{kind}} {{rate}}{{distribution}}'
+      metrics:
+        activityPreference: Early {{preference}}, top {{top}} mid {{mid}} bot {{bot}}
+        level3Gank: Lv3 gank {{value}}
+        level4Gank: Lv4 gank {{value}}
+        firstDragon: First dragon {{value}}{{time}}
+        avgDragons: Avg dragons {{value}}
+        monsterControl: Objectives voidgrubs {{voidgrubs}}/heralds {{heralds}}/barons {{barons}}
+        mainChampions: Main Champions [{{champions}}]
+    premade:
+      blueTeamTitle: Blue premades
+      redTeamTitle: Red premades
+      teamTitle: Premades
+      blueTeamEmpty: No blue premades
+      redTeamEmpty: No red premades
+      empty: No premade groups

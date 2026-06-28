@@ -3,13 +3,38 @@ import {
   createDefaultInGameSendPremadePresetOptions,
   createDefaultInGameSendRatingPresetOptions
 } from '@shared/shards/in-game-send'
-import { describe, expect, it } from 'vitest'
+import i18next from 'i18next'
+import fs from 'node:fs'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import YAML from 'yaml'
 
 import { buildJunglePresetLines, buildPremadePresetLines, buildRatingPresetLines } from './index'
 import type { InGameSendJunglePresetLineOptions } from './jungle'
 import type { InGameSendPremadePresetLineOptions } from './premade'
 import type { InGameSendRatingPresetLineOptions } from './rating'
 import type { InGameSendPresetContext } from './types'
+
+beforeAll(async () => {
+  await i18next.init({
+    lng: 'zh-CN',
+    fallbackLng: 'zh-CN',
+    interpolation: {
+      escapeValue: false
+    },
+    ns: ['main', 'common'],
+    defaultNS: 'main',
+    resources: {
+      en: {
+        common: YAML.parse(fs.readFileSync('src/shared/i18n/en/common.yaml', 'utf8')),
+        main: YAML.parse(fs.readFileSync('src/shared/i18n/en/main.yaml', 'utf8'))
+      },
+      'zh-CN': {
+        common: YAML.parse(fs.readFileSync('src/shared/i18n/zh-CN/common.yaml', 'utf8')),
+        main: YAML.parse(fs.readFileSync('src/shared/i18n/zh-CN/main.yaml', 'utf8'))
+      }
+    }
+  })
+})
 
 function createMainContext() {
   return {
@@ -99,7 +124,13 @@ function createMainContext() {
               summary: {
                 avgKda: 2.34,
                 avgSoloKills: 0.8,
-                avgVisionScore: 26.4
+                avgVisionScore: 26.4,
+                avgChampionDamagePercentageOfTeam: 0.3,
+                avgDamageTakenPercentageOfTeam: 0.27,
+                avgGoldPercentageOfTeam: 0.24,
+                avgCsPerMinute: 7.1,
+                avgKillParticipation: 0.62,
+                avgDamageGoldEfficiency: 1.18
               },
               positions: {
                 TOP: 4,
@@ -120,7 +151,13 @@ function createMainContext() {
                   summary: {
                     avgKda: 4.321,
                     avgSoloKills: 1.2,
-                    avgVisionScore: 24.7
+                    avgVisionScore: 24.7,
+                    avgChampionDamagePercentageOfTeam: 0.34,
+                    avgDamageTakenPercentageOfTeam: 0.21,
+                    avgGoldPercentageOfTeam: 0.28,
+                    avgCsPerMinute: 7.8,
+                    avgKillParticipation: 0.71,
+                    avgDamageGoldEfficiency: 1.32
                   },
                   positions: {
                     TOP: 1,
@@ -141,7 +178,13 @@ function createMainContext() {
                   summary: {
                     avgKda: 2.4,
                     avgSoloKills: 0.6,
-                    avgVisionScore: 18.3
+                    avgVisionScore: 18.3,
+                    avgChampionDamagePercentageOfTeam: 0.22,
+                    avgDamageTakenPercentageOfTeam: 0.31,
+                    avgGoldPercentageOfTeam: 0.2,
+                    avgCsPerMinute: 5.4,
+                    avgKillParticipation: 0.58,
+                    avgDamageGoldEfficiency: 0.94
                   },
                   positions: {
                     TOP: 0,
@@ -162,7 +205,13 @@ function createMainContext() {
                   summary: {
                     avgKda: 2.1,
                     avgSoloKills: 0.3,
-                    avgVisionScore: 31.2
+                    avgVisionScore: 31.2,
+                    avgChampionDamagePercentageOfTeam: 0.17,
+                    avgDamageTakenPercentageOfTeam: 0.35,
+                    avgGoldPercentageOfTeam: 0.18,
+                    avgCsPerMinute: 1.2,
+                    avgKillParticipation: 0.66,
+                    avgDamageGoldEfficiency: 0.8
                   },
                   positions: {
                     TOP: 0,
@@ -183,7 +232,13 @@ function createMainContext() {
                   summary: {
                     avgKda: 1.8,
                     avgSoloKills: 0.1,
-                    avgVisionScore: 16.1
+                    avgVisionScore: 16.1,
+                    avgChampionDamagePercentageOfTeam: 0.26,
+                    avgDamageTakenPercentageOfTeam: 0.19,
+                    avgGoldPercentageOfTeam: 0.23,
+                    avgCsPerMinute: 6.6,
+                    avgKillParticipation: 0.54,
+                    avgDamageGoldEfficiency: 1.03
                   },
                   positions: {
                     TOP: 0,
@@ -209,6 +264,20 @@ function createContext(): InGameSendPresetContext {
   }
 }
 
+function useEnglishChampionNames(mainContext: ReturnType<typeof createMainContext>) {
+  mainContext.leagueClient.data.gameData.championName = (id: number) => {
+    return (
+      {
+        64: 'Lee Sin',
+        99: 'Lux',
+        103: 'Master Yi',
+        111: 'Nautilus',
+        222: 'Jinx'
+      }[id] ?? id.toString()
+    )
+  }
+}
+
 function createRatingOptions(): InGameSendRatingPresetLineOptions {
   const defaults = createDefaultInGameSendRatingPresetOptions()
 
@@ -218,6 +287,12 @@ function createRatingOptions(): InGameSendRatingPresetLineOptions {
     winRate: defaults.winRate,
     avgSoloKills: defaults.avgSoloKills,
     avgVisionScore: defaults.avgVisionScore,
+    avgChampionDamage: defaults.avgChampionDamage,
+    avgDamageTaken: defaults.avgDamageTaken,
+    avgGold: defaults.avgGold,
+    avgCsPerMinute: defaults.avgCsPerMinute,
+    avgKillParticipation: defaults.avgKillParticipation,
+    avgDamageGoldEfficiency: defaults.avgDamageGoldEfficiency,
     mainChampions: defaults.mainChampions,
     mainPositions: defaults.mainPositions,
     nameDisplayStrategy: defaults.nameDisplayStrategy,
@@ -368,12 +443,35 @@ function createPremadeOptions(): InGameSendPremadePresetLineOptions {
 }
 
 describe('in-game-send presets', () => {
+  beforeEach(async () => {
+    await i18next.changeLanguage('zh-CN')
+  })
+
   it('builds rating lines from provided ongoing-game data', () => {
     const lines = buildRatingPresetLines(createContext(), createRatingOptions())
 
     expect(lines).toEqual([
       '无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
       '盲僧：近期没有对局记录'
+    ])
+  })
+
+  it('builds rating lines in English when main language is English', async () => {
+    await i18next.changeLanguage('en')
+    const mainContext = createMainContext()
+    useEnglishChampionNames(mainContext)
+
+    const lines = buildRatingPresetLines(
+      {
+        target: 'friendly',
+        mainContext
+      },
+      createRatingOptions()
+    )
+
+    expect(lines).toEqual([
+      'Master Yi: 50 recent matches, Win Rate 59% KDA 2.34 Avg Solo Kills 0.8 Main Champions [Master Yi, Lee Sin, Nautilus] Main Positions [Middle, Jungle]',
+      'Lee Sin: No recent matches'
     ])
   })
 
@@ -387,6 +485,26 @@ describe('in-game-send presets', () => {
     })
 
     expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4'])
+  })
+
+  it('shows optional rating metrics after average vision score when enabled', () => {
+    const lines = buildRatingPresetLines(createContext(), {
+      ...createRatingOptions(),
+      selectedPuuids: ['p1'],
+      avgVisionScore: true,
+      avgChampionDamage: true,
+      avgDamageTaken: true,
+      avgGold: true,
+      avgCsPerMinute: true,
+      avgKillParticipation: true,
+      avgDamageGoldEfficiency: true,
+      mainChampions: false,
+      mainPositions: false
+    } as InGameSendRatingPresetLineOptions)
+
+    expect(lines).toEqual([
+      '无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4 伤害30% 承伤27% 经济24% 补兵7.1/分 参团率62% 伤转比118%'
+    ])
   })
 
   it('shows player names when name display strategy prefers names', () => {
@@ -676,6 +794,18 @@ describe('in-game-send presets', () => {
     ])
   })
 
+  it('builds jungle lines in English when main language is English', async () => {
+    await i18next.changeLanguage('en')
+    const context = createJungleContext()
+    useEnglishChampionNames(context.mainContext)
+
+    const lines = buildJunglePresetLines(context, createJungleOptions())
+
+    expect(lines).toEqual([
+      'Master Yi: 16 jungle samples on this champion Early favors mid/bot, top 22% mid 46% bot 32% blue-side standard 75%[Red Buff 67%, Blue Buff 33%] blue-side invade 25%[Blue Buff 100%] red-side standard 100%[Blue Buff 75%, Red Buff 25%] red-side invade 0% Lv3 gank 31% Lv4 gank 50% First dragon 63%, first dragon avg 6:12 Avg dragons 1.9 Objectives voidgrubs 2.4/heralds 0.5/barons 0.3'
+    ])
+  })
+
   it('builds global jungle preference lines when current champion filtering is disabled', () => {
     const lines = buildJunglePresetLines(createJungleContext(), {
       ...createJungleOptions(),
@@ -730,6 +860,16 @@ describe('in-game-send presets', () => {
     const lines = buildPremadePresetLines(createContext(), createPremadeOptions())
 
     expect(lines).toEqual(['蓝方开黑：[无极剑圣, 盲僧] [深海泰坦, 暴走萝莉]'])
+  })
+
+  it('builds premade lines in English when main language is English', async () => {
+    await i18next.changeLanguage('en')
+    const context = createContext()
+    useEnglishChampionNames(context.mainContext)
+
+    const lines = buildPremadePresetLines(context, createPremadeOptions())
+
+    expect(lines).toEqual(['Blue premades: [Master Yi, Lee Sin] [Nautilus, Jinx]'])
   })
 
   it('uses red side label for TEAM-200 premade lines', () => {

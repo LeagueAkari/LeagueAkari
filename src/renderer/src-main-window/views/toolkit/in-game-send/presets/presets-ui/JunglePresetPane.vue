@@ -22,27 +22,10 @@
       @update:selected-options="updateConfigOptions"
     />
 
-    <div class="pt-3">
-      <div class="mb-2 text-xs font-semibold text-black/70 dark:text-white/70">
-        {{ t('nameDisplayStrategy.title') }}
-      </div>
-      <NRadioGroup :value="options.nameDisplayStrategy" @update:value="updateNameDisplayStrategy">
-        <div class="grid gap-2">
-          <NRadio
-            v-for="option of nameDisplayStrategyOptions"
-            :key="option.value"
-            :value="option.value"
-          >
-            <div class="flex flex-col leading-tight">
-              <span class="text-xs">{{ option.label }}</span>
-              <span class="text-[11px] text-black/45 dark:text-white/45">
-                {{ option.description }}
-              </span>
-            </div>
-          </NRadio>
-        </div>
-      </NRadioGroup>
-    </div>
+    <NameDisplayStrategySelector
+      :value="options.nameDisplayStrategy"
+      @update:value="updateNameDisplayStrategy"
+    />
 
     <PlayerSelectionPanel :selection="junglePreset.playerSelection" />
   </div>
@@ -52,15 +35,15 @@
 import type {
   InGameSendJunglePresetConfigOptionKey,
   InGameSendJunglePresetDisplayOptionKey,
-  InGameSendJunglePresetNameDisplayStrategy,
-  InGameSendJunglePresetOptionPatch
+  InGameSendJunglePresetOptionPatch,
+  InGameSendPresetNameDisplayStrategy
 } from '@shared/shards/in-game-send'
 import { useTranslation } from 'i18next-vue'
-import { NRadio, NRadioGroup } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useJunglePreset } from '../data/jungle'
 import type { PresetDisplayOption } from '../types'
+import NameDisplayStrategySelector from '../widgets/NameDisplayStrategySelector.vue'
 import PlayerSelectionPanel from '../widgets/PlayerSelectionPanel.vue'
 import PresetDisplayOptionsPanel from '../widgets/PresetDisplayOptionsPanel.vue'
 import PresetSendControls from '../widgets/PresetSendControls.vue'
@@ -116,26 +99,6 @@ const configOptions = computed<PresetDisplayOption<InGameSendJunglePresetConfigO
   }
 ])
 
-const nameDisplayStrategyOptions = computed<
-  PresetDisplayOption<InGameSendJunglePresetNameDisplayStrategy>[]
->(() => [
-  {
-    label: t('nameDisplayStrategy.options.preferChampionName.label'),
-    value: 'preferChampionName',
-    description: t('nameDisplayStrategy.options.preferChampionName.description')
-  },
-  {
-    label: t('nameDisplayStrategy.options.preferName.label'),
-    value: 'preferName',
-    description: t('nameDisplayStrategy.options.preferName.description')
-  },
-  {
-    label: t('nameDisplayStrategy.options.championNameWithName.label'),
-    value: 'championNameWithName',
-    description: t('nameDisplayStrategy.options.championNameWithName.description')
-  }
-])
-
 function updateDisplayOptions(value: Record<string, boolean>) {
   const patch: InGameSendJunglePresetOptionPatch = {
     activityPreference: value.activityPreference,
@@ -157,9 +120,9 @@ function updateConfigOptions(value: Record<string, boolean>) {
   void updateOptions(patch)
 }
 
-function updateNameDisplayStrategy(value: string | number) {
+function updateNameDisplayStrategy(value: InGameSendPresetNameDisplayStrategy) {
   void updateOptions({
-    nameDisplayStrategy: value as InGameSendJunglePresetNameDisplayStrategy
+    nameDisplayStrategy: value
   })
 }
 </script>

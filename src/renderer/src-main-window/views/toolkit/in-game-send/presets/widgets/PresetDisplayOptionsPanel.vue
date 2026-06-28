@@ -1,10 +1,10 @@
 <template>
-  <div class="pt-3">
+  <div class="preset-display-options-panel pt-3">
     <div class="mb-2 text-xs font-semibold text-black/70 dark:text-white/70">
       {{ title }}
     </div>
     <NCheckboxGroup :value="selectedValues" @update:value="handleUpdate">
-      <div class="grid grid-cols-2 gap-2">
+      <div class="preset-display-options-grid grid grid-cols-3 gap-2">
         <NCheckbox v-for="option of options" :key="option.value" :value="option.value">
           <div class="flex flex-col leading-tight">
             <span class="text-xs">{{ option.label }}</span>
@@ -53,3 +53,15 @@ function handleUpdate(value: (string | number)[]) {
   emit('update:selectedOptions', next)
 }
 </script>
+
+<style scoped>
+.preset-display-options-panel {
+  container-type: inline-size;
+}
+
+@container (max-width: 419px) {
+  .preset-display-options-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+</style>

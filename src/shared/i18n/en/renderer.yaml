@@ -3307,9 +3307,21 @@ InGameSend:
       groupCount_other: '{{count}} premade groups'
       emptyPremadeGroups: No premade groups
       bucketSize: '{{count}}-stack'
+    nameDisplayStrategy:
+      title: Name Display
+      options:
+        preferName:
+          label: Prefer Player Name
+          description: Use player names for player identifiers in the output
+        preferChampionName:
+          label: Prefer Champion Name
+          description: Use player names when no champion is selected or duplicate champions exist
+        championNameWithName:
+          label: Champion With Player
+          description: Use champion names with player names in parentheses
     rating:
       label: Performance Rating
-      description: 统计每位玩家近期表现，输出胜率/KDA/常玩英雄。
+      description: Summarize each player's recent performance, including win rate, KDA, and main champions.
       displayOptionsTitle: Display Items
       displayOptions:
         winRate:
@@ -3319,34 +3331,40 @@ InGameSend:
           label: KDA
           description: Kills / deaths / assists performance
         avgSoloKills:
-          label: 场均单杀
-          description: 场均单杀次数，需使用 SGP 数据源
+          label: Avg Solo Kills
+          description: Average solo kills; requires the SGP data source
         avgVisionScore:
           label: Average Vision Score
           description: Average vision score in recent matches
+        avgChampionDamage:
+          label: Damage
+          description: Show average share of team champion damage
+        avgDamageTaken:
+          label: Damage Taken
+          description: Show average share of team damage taken
+        avgGold:
+          label: Gold
+          description: Show average share of team gold
+        avgCsPerMinute:
+          label: CS
+          description: Show average CS per minute
+        avgKillParticipation:
+          label: Kill Participation
+          description: Show average kill participation
+        avgDamageGoldEfficiency:
+          label: Damage / Gold
+          description: Show average damage-to-gold efficiency
         mainChampions:
-          label: 主玩英雄
-          description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
+          label: Main Champions
+          description: Show up to three clearly preferred champions from recent match stats; hidden when filtering by current champion
         mainPositions:
-          label: 主玩位置
-          description: 当近期战绩中存在明确位置信息和主玩位置时展示最多两个位置
+          label: Main Positions
+          description: Show up to two main positions when recent match stats include clear position data
       configOptionsTitle: Configuration
       configOptions:
         showCurrentChampion:
-          label: 按当前英雄筛选
-          description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄的玩家不会发送
-      nameDisplayStrategy:
-        title: 名字展示
-        options:
-          preferName:
-            label: 优先展示玩家名
-            description: 使用玩家名作为每行开头
-          preferChampionName:
-            label: 优先展示英雄名
-            description: 没选英雄或存在重复英雄时展示玩家名
-          championNameWithName:
-            label: 英雄名附带玩家名
-            description: 使用英雄名（玩家名）作为每行开头，括号内为玩家名
+          label: Filter By Current Champion
+          description: Only include recent matches on each player's currently selected champion; shows a prompt when no champion is selected
     jungle:
       label: Jungle Preference
       description: Show early activity, first-clear distribution, and objective control tendencies.
@@ -3374,34 +3392,41 @@ InGameSend:
       configOptions:
         showCurrentChampion:
           label: Filter By Current Champion
-          description: Only use jungle details for each player's currently selected champion, players without a champion selection are skipped, enabled by default
-      nameDisplayStrategy:
-        title: Name Display
-        options:
-          preferName:
-            label: Prefer Player Name
-            description: Use the player name at the start of each line
-          preferChampionName:
-            label: Prefer Champion Name
-            description: Use player names when no champion is selected or duplicate champions exist
-          championNameWithName:
-            label: Champion With Player
-            description: Use champion name with the player name in parentheses
+          description: Only include jungle details for each player's currently selected champion; shows a prompt when no champion is selected. Enabled by default.
     premade:
       label: Premade Status
       description: Identify premade groups in each team and show members by group.
-      nameDisplayStrategy:
-        title: 名字展示
-        options:
-          preferName:
-            label: 优先展示玩家名
-            description: 使用玩家名作为开黑组成员名称
-          preferChampionName:
-            label: 优先展示英雄名
-            description: 没选英雄或存在重复英雄时展示玩家名
-          championNameWithName:
-            label: 英雄名附带玩家名
-            description: 使用英雄名（玩家名）展示开黑组成员，括号内为玩家名
+    fixedText:
+      label: Fixed Text
+      empty:
+        description: No fixed text yet. Add one, then set its title, shortcut, and multiline content.
+        action: Add Fixed Text
+      listTitle: Fixed Text
+      addLimitReached: Up to {{count}} fixed text items can be created.
+      unnamed: Untitled
+      editTitle: Edit title
+      shortcutLabel: Shortcut
+      shortcutDescription: Sends this saved fixed text item.
+      save: Save
+      saved: Saved
+      saveFailed: Failed to save
+      createFailed: Failed to create
+      delete: Delete
+      deleted: Deleted
+      deleteFailed: Failed to delete
+      deleteConfirm: Delete?
+      moveUp: Move up
+      moveDown: Move down
+      sendToGame: Send to Game
+      sendToChat: Send to Chat
+      send: Send
+      sendSucceeded: Submitted send
+      sendSucceededWithTitle: 'Submitted send (Fixed Text: {{title}})'
+      disabled:
+        noSelection: Select a fixed text item
+        saveFirst: Save current edits first
+        draftOnly: Draft mode cannot send.
+        unavailable: Available only in champion select, lobby, or in-game.
 
 ChampionConfig:
   targetMode: Target Mode

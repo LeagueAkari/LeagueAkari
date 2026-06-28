@@ -1,4 +1,5 @@
 import {
+  createDefaultInGameSendFixedTextPresetItems,
   createDefaultInGameSendJunglePresetOptions,
   createDefaultInGameSendPremadePresetOptions,
   createDefaultInGameSendRatingPresetOptions
@@ -12,7 +13,8 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
     sendInterval: 65,
     ratingPresetOptions: createDefaultInGameSendRatingPresetOptions(),
     junglePresetOptions: createDefaultInGameSendJunglePresetOptions(),
-    premadePresetOptions: createDefaultInGameSendPremadePresetOptions()
+    premadePresetOptions: createDefaultInGameSendPremadePresetOptions(),
+    fixedTextPresetItems: createDefaultInGameSendFixedTextPresetItems()
   })
 
   /**

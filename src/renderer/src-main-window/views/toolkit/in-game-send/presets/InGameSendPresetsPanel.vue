@@ -17,6 +17,9 @@
       <NTabPane :name="premadePresetSlot" :tab="t('premade.label')">
         <PremadePresetPane />
       </NTabPane>
+      <NTabPane :name="fixedTextPresetSlot" :tab="t('fixedText.label')">
+        <FixedTextPresetPane />
+      </NTabPane>
     </NTabs>
   </div>
 </template>
@@ -25,9 +28,11 @@
 import { useTranslation } from 'i18next-vue'
 import { NTabPane, NTabs } from 'naive-ui'
 
+import { fixedTextPresetSlot } from './data/fixed-text'
 import { junglePresetSlot } from './data/jungle'
 import { premadePresetSlot } from './data/premade'
 import { ratingPresetSlot } from './data/rating'
+import FixedTextPresetPane from './presets-ui/FixedTextPresetPane.vue'
 import JunglePresetPane from './presets-ui/JunglePresetPane.vue'
 import PremadePresetPane from './presets-ui/PremadePresetPane.vue'
 import RatingPresetPane from './presets-ui/RatingPresetPane.vue'

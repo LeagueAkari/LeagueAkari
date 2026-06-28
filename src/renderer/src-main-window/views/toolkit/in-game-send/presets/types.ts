@@ -1,7 +1,7 @@
 import type { InGameSendPresetTarget } from '@shared/shards/in-game-send'
 
 export type GamePhase = 'none' | 'lobby' | 'champ-select' | 'in-game' | 'draft'
-export type PresetSlot = 'rating' | 'jungle' | 'premade'
+export type PresetSlot = 'rating' | 'jungle' | 'premade' | 'fixedText'
 export type PresetTargetId = InGameSendPresetTarget
 
 export interface PresetDisplayOption<T extends string> {

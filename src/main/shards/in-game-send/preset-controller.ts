@@ -1,5 +1,9 @@
 import {
+  IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS,
   IN_GAME_SEND_PRESET_TARGETS,
+  type InGameSendFixedTextPresetItem,
+  type InGameSendFixedTextPresetItemMoveDirection,
+  type InGameSendFixedTextPresetItemPatch,
   type InGameSendJunglePresetOptionPatch,
   type InGameSendJunglePresetOptions,
   type InGameSendPremadePresetOptionPatch,
@@ -7,8 +11,12 @@ import {
   type InGameSendPresetTarget,
   type InGameSendPresetTargetShortcuts,
   type InGameSendRatingPresetOptionPatch,
-  type InGameSendRatingPresetOptions
+  type InGameSendRatingPresetOptions,
+  getInGameSendFixedTextPresetShortcutTargetId,
+  normalizeInGameSendFixedTextPresetItem,
+  normalizeInGameSendFixedTextPresetItems
 } from '@shared/shards/in-game-send'
+import { randomUUID } from 'node:crypto'
 
 import type { InGameSendMainContext } from './context'
 import {
@@ -36,6 +44,8 @@ type InGameSendPresetOptionsPatch<TOptions extends InGameSendPresetOptionsValue>
 }
 
 export class InGameSendPresetController {
+  private readonly _fixedTextShortcutTargetIds = new Set<string>()
+
   constructor(
     private readonly _context: InGameSendMainContext,
     private readonly _sendExecutor: InGameSendExecutor
@@ -48,7 +58,8 @@ export class InGameSendPresetController {
       () => [
         settings.ratingPresetOptions,
         settings.junglePresetOptions,
-        settings.premadePresetOptions
+        settings.premadePresetOptions,
+        settings.fixedTextPresetItems
       ],
       () => {
         this._syncPresetShortcuts()
@@ -69,6 +80,16 @@ export class InGameSendPresetController {
     return buildPremadePresetLinesFromMainContext(this._context, target)
   }
 
+  generateFixedTextPresetLines(id: string) {
+    const item = this._context.settings.fixedTextPresetItems.find((item) => item.id === id)
+
+    if (!item) {
+      return []
+    }
+
+    return item.content.split(/\r\n|\n|\r/).filter((line) => line.trim().length > 0)
+  }
+
   sendRatingPreset(target: InGameSendPresetTarget) {
     return this._sendExecutor.sendLines(this.generateRatingLines(target))
   }
@@ -79,6 +100,10 @@ export class InGameSendPresetController {
 
   sendPremadePreset(target: InGameSendPresetTarget) {
     return this._sendExecutor.sendLines(this.generatePremadeLines(target))
+  }
+
+  sendFixedTextPreset(id: string) {
+    return this._sendExecutor.sendLines(this.generateFixedTextPresetLines(id))
   }
 
   setRatingPresetOptions(options: InGameSendRatingPresetOptions) {
@@ -103,6 +128,81 @@ export class InGameSendPresetController {
 
   updatePremadePresetOptions(options: InGameSendPremadePresetOptionPatch) {
     return this._updatePresetOptions('premadePresetOptions', options)
+  }
+
+  async createFixedTextPresetItem() {
+    const currentItems = this._context.settings.fixedTextPresetItems
+
+    if (currentItems.length >= IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS) {
+      throw new Error('Fixed text preset item limit reached')
+    }
+
+    const item: InGameSendFixedTextPresetItem = {
+      id: randomUUID(),
+      title: '',
+      shortcut: null,
+      content: ''
+    }
+
+    await this._setFixedTextPresetItems([...currentItems, item])
+
+    return item
+  }
+
+  async updateFixedTextPresetItem(id: string, patch: InGameSendFixedTextPresetItemPatch) {
+    const currentItems = this._context.settings.fixedTextPresetItems
+    const itemIndex = currentItems.findIndex((item) => item.id === id)
+
+    if (itemIndex === -1) {
+      throw new Error('Fixed text preset item not found')
+    }
+
+    const nextItems = [...currentItems]
+    const nextItem = normalizeInGameSendFixedTextPresetItem({
+      ...nextItems[itemIndex],
+      ...patch,
+      id
+    })
+
+    nextItems[itemIndex] = nextItem
+    await this._setFixedTextPresetItems(nextItems)
+
+    return nextItem
+  }
+
+  async deleteFixedTextPresetItem(id: string) {
+    const currentItems = this._context.settings.fixedTextPresetItems
+    const nextItems = currentItems.filter((item) => item.id !== id)
+
+    if (nextItems.length === currentItems.length) {
+      return false
+    }
+
+    await this._setFixedTextPresetItems(nextItems)
+    return true
+  }
+
+  async moveFixedTextPresetItem(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
+    const currentItems = this._context.settings.fixedTextPresetItems
+    const itemIndex = currentItems.findIndex((item) => item.id === id)
+
+    if (itemIndex === -1) {
+      return false
+    }
+
+    const nextIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1
+
+    if (nextIndex < 0 || nextIndex >= currentItems.length) {
+      return false
+    }
+
+    const nextItems = [...currentItems]
+    const movedItem = nextItems[itemIndex]
+    nextItems[itemIndex] = nextItems[nextIndex]
+    nextItems[nextIndex] = movedItem
+    await this._setFixedTextPresetItems(nextItems)
+
+    return true
   }
 
   private _syncPresetShortcuts() {
@@ -143,6 +243,8 @@ export class InGameSendPresetController {
           }
         })
     )
+
+    this._syncFixedTextShortcuts(settings.fixedTextPresetItems)
   }
 
   private _syncTargetShortcuts(
@@ -194,5 +296,51 @@ export class InGameSendPresetController {
         ...(options.targetShortcuts ?? {})
       }
     } as InGameSendSettings[Key])
+  }
+
+  private _syncFixedTextShortcuts(items: InGameSendFixedTextPresetItem[]) {
+    const { keyboardShortcuts, logger } = this._context
+    const nextTargetIds = new Set<string>()
+
+    for (const item of items) {
+      nextTargetIds.add(getInGameSendFixedTextPresetShortcutTargetId(item.id))
+    }
+
+    for (const targetId of this._fixedTextShortcutTargetIds) {
+      if (!nextTargetIds.has(targetId)) {
+        keyboardShortcuts.unregisterByTargetId(targetId)
+      }
+    }
+
+    this._fixedTextShortcutTargetIds.clear()
+
+    for (const item of items) {
+      const targetId = getInGameSendFixedTextPresetShortcutTargetId(item.id)
+
+      this._fixedTextShortcutTargetIds.add(targetId)
+
+      if (!item.shortcut) {
+        keyboardShortcuts.unregisterByTargetId(targetId)
+        continue
+      }
+
+      try {
+        keyboardShortcuts.register(targetId, item.shortcut, 'last-active', () => {
+          void this.sendFixedTextPreset(item.id)
+        })
+      } catch (error) {
+        logger.warn('Failed to register in-game-send fixed text preset shortcut', targetId, error)
+        void this.updateFixedTextPresetItem(item.id, {
+          shortcut: null
+        })
+      }
+    }
+  }
+
+  private _setFixedTextPresetItems(items: InGameSendFixedTextPresetItem[]) {
+    return this._context.settingService.set(
+      'fixedTextPresetItems',
+      normalizeInGameSendFixedTextPresetItems(items)
+    )
   }
 }

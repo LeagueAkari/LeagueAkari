@@ -1,7 +1,9 @@
 import {
+  type InGameSendFixedTextPresetItem,
   type InGameSendJunglePresetOptions,
   type InGameSendPremadePresetOptions,
   type InGameSendRatingPresetOptions,
+  createDefaultInGameSendFixedTextPresetItems,
   createDefaultInGameSendJunglePresetOptions,
   createDefaultInGameSendPremadePresetOptions,
   createDefaultInGameSendRatingPresetOptions
@@ -15,6 +17,8 @@ export class InGameSendSettings {
   junglePresetOptions: InGameSendJunglePresetOptions = createDefaultInGameSendJunglePresetOptions()
   premadePresetOptions: InGameSendPremadePresetOptions =
     createDefaultInGameSendPremadePresetOptions()
+  fixedTextPresetItems: InGameSendFixedTextPresetItem[] =
+    createDefaultInGameSendFixedTextPresetItems()
 
   setCancelShortcut(shortcut: string | null) {
     this.cancelShortcut = shortcut
@@ -28,7 +32,8 @@ export class InGameSendSettings {
     makeAutoObservable(this, {
       ratingPresetOptions: observable.ref,
       junglePresetOptions: observable.ref,
-      premadePresetOptions: observable.ref
+      premadePresetOptions: observable.ref,
+      fixedTextPresetItems: observable.ref
     })
   }
 }
