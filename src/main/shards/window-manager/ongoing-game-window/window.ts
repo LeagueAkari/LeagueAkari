@@ -164,7 +164,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
   }
 
   override hide() {
-    this.state.setFakeShow(true)
+    this.state.setFakeShow(false)
   }
 
   override async onInit() {

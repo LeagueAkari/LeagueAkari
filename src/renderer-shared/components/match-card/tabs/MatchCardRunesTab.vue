@@ -309,11 +309,11 @@ const getPerkStyleIndicatorColor = (styleId: number) => {
   background-color: transparent;
 }
 
-:global([data-theme='dark']) .match-card-participant-navigator-list {
+:global([data-theme='dark'] .match-card-participant-navigator-list) {
   scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
 }
 
-:global([data-theme='dark']) .match-card-participant-navigator-list::-webkit-scrollbar-thumb {
+:global([data-theme='dark'] .match-card-participant-navigator-list::-webkit-scrollbar-thumb) {
   background-color: rgba(255, 255, 255, 0.24);
 }
 </style>
