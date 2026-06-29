@@ -3,12 +3,12 @@
     <NModal
       v-model:show="showEditModal"
       preset="card"
-      :title="t('TaggedPlayers.editModal.title')"
+      :title="t('settings.taggedPlayers.editModal.title')"
       class="max-w-[60vw]"
     >
       <NInput
         v-model:value="currentEditingTag"
-        :placeholder="t('TaggedPlayers.editModal.inputPlaceholder')"
+        :placeholder="t('settings.taggedPlayers.editModal.inputPlaceholder')"
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
@@ -16,7 +16,7 @@
 
       <div class="mt-3 flex justify-end gap-1">
         <NButton size="small" @click="showEditModal = false">{{
-          t('TaggedPlayers.cancelButton')
+          t('settings.taggedPlayers.cancelButton')
         }}</NButton>
 
         <NButton
@@ -30,7 +30,7 @@
               }
             }
           "
-          >{{ t('TaggedPlayers.saveButton') }}</NButton
+          >{{ t('settings.taggedPlayers.saveButton') }}</NButton
         >
       </div>
     </NModal>
@@ -38,29 +38,29 @@
     <div class="flex h-full flex-col">
       <div class="mb-2 flex items-center gap-2">
         <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
-          {{ t('TaggedPlayers.exportButton') }}
+          {{ t('settings.taggedPlayers.exportButton') }}
         </NButton>
         <NButton size="small" secondary @click="handleImportTaggedPlayers">
-          {{ t('TaggedPlayers.importButton') }}
+          {{ t('settings.taggedPlayers.importButton') }}
         </NButton>
         <NButton
           type="primary"
           size="small"
           @click="() => loadPage(pagination.page || 1, pagination.pageSize || 20)"
         >
-          {{ t('TaggedPlayers.refreshButton') }}
+          {{ t('settings.taggedPlayers.refreshButton') }}
         </NButton>
         <NCheckbox v-model:checked="onlyCurrentAccount" :disabled="!lcs.summoner.me">
-          {{ t('TaggedPlayers.onlyCurrentAccountCheckbox') }}
+          {{ t('settings.taggedPlayers.onlyCurrentAccountCheckbox') }}
         </NCheckbox>
       </div>
 
       <MaskedComponent :show-mask="showMask">
         <template #mask>
           <div class="flex h-full w-full flex-col items-center justify-center gap-4">
-            <span>{{ t('TaggedPlayers.streamerModeWarning') }}</span>
+            <span>{{ t('settings.taggedPlayers.streamerModeWarning') }}</span>
             <NButton type="warning" size="small" @click="showMask = false">{{
-              t('TaggedPlayers.showButton')
+              t('settings.taggedPlayers.showButton')
             }}</NButton>
           </div>
         </template>
@@ -183,15 +183,15 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
       {{
         trigger: () => (
           <span class="text-xs text-black/60 dark:text-white/60">
-            {t('TaggedPlayers.na', {
+            {t('settings.taggedPlayers.na', {
               truncatedPuuid: puuid.slice(0, 8)
             })}
           </span>
         ),
         default: () => (
           <div>
-            <div class="mb-1">{t('TaggedPlayers.naPopoverContent')}</div>
-            <div>{t('TaggedPlayers.player', { puuid })}</div>
+            <div class="mb-1">{t('settings.taggedPlayers.naPopoverContent')}</div>
+            <div>{t('settings.taggedPlayers.player', { puuid })}</div>
           </div>
         )
       }}
@@ -238,27 +238,27 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
     width: 68
   },
   {
-    title: () => renderBoldTitle(t('TaggedPlayers.columns.tagger')),
+    title: () => renderBoldTitle(t('settings.taggedPlayers.columns.tagger')),
     key: 'selfPuuid',
     render: (row) => {
       return renderPlayer(row.selfPuuid, row.sgpServerId)
     }
   },
   {
-    title: () => renderBoldTitle(t('TaggedPlayers.columns.tagged')),
+    title: () => renderBoldTitle(t('settings.taggedPlayers.columns.tagged')),
     key: 'puuid',
     render: (row: any) => {
       return renderPlayer(row.puuid, row.sgpServerId)
     }
   },
   {
-    title: () => renderBoldTitle(t('TaggedPlayers.columns.sgpServer')),
+    title: () => renderBoldTitle(t('settings.taggedPlayers.columns.sgpServer')),
     key: 'sgpServerId',
     render: (row: any) => renderSgpServerTag(row.sgpServerId),
     width: 100
   },
   {
-    title: () => renderBoldTitle(t('TaggedPlayers.columns.tag')),
+    title: () => renderBoldTitle(t('settings.taggedPlayers.columns.tag')),
     key: 'tag',
     render: (row: any) => {
       return renderLinedText(row.tag)
@@ -281,11 +281,11 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
               nextTick(() => inputEl.value?.focus())
             }}
           >
-            {t('TaggedPlayers.editButton')}
+            {t('settings.taggedPlayers.editButton')}
           </NButton>
           <NPopconfirm
-            positiveText={t('TaggedPlayers.deleteButton')}
-            negativeText={t('TaggedPlayers.cancelButton')}
+            positiveText={t('settings.taggedPlayers.deleteButton')}
+            negativeText={t('settings.taggedPlayers.cancelButton')}
             positiveButtonProps={{
               type: 'error',
               size: 'tiny'
@@ -300,10 +300,10 @@ const columns = computed<DataTableColumns<MappedRecordType>>(() => [
             {{
               trigger: () => (
                 <NButton size="tiny" type="error">
-                  {t('TaggedPlayers.deleteButton')}
+                  {t('settings.taggedPlayers.deleteButton')}
                 </NButton>
               ),
-              default: () => t('TaggedPlayers.deletePopconfirmContent')
+              default: () => t('settings.taggedPlayers.deletePopconfirmContent')
             }}
           </NPopconfirm>
         </div>
@@ -319,11 +319,11 @@ const updateTag = async (puuid: string, selfPuuid: string, tag: string | null) =
       selfPuuid,
       tag
     })
-    message.success(() => t('TaggedPlayers.updated'))
+    message.success(() => t('settings.taggedPlayers.updated'))
     loadPage(pagination.page || 1, pagination.pageSize || 20)
   } catch (error: any) {
     message.error(() =>
-      t('TaggedPlayers.updateFailed', {
+      t('settings.taggedPlayers.updateFailed', {
         reason: error.message
       })
     )
@@ -462,10 +462,10 @@ const handleExportTaggedPlayers = async () => {
     const exportPath = await sp.exportTaggedPlayersToJsonFile()
 
     if (exportPath) {
-      message.success(() => t('TaggedPlayers.exported', { path: exportPath }))
+      message.success(() => t('settings.taggedPlayers.exported', { path: exportPath }))
     }
   } catch (error: any) {
-    message.error(() => t('TaggedPlayers.errorExport', { reason: error.message }))
+    message.error(() => t('settings.taggedPlayers.errorExport', { reason: error.message }))
   }
 }
 
@@ -474,7 +474,7 @@ const handleImportTaggedPlayers = async () => {
     const importPath = await sp.importTaggedPlayersFromJsonFile()
 
     if (importPath) {
-      message.success(() => t('TaggedPlayers.imported', { path: importPath }))
+      message.success(() => t('settings.taggedPlayers.imported', { path: importPath }))
       await loadPage(pagination.page || 1, pagination.pageSize || 20)
     }
   } catch (error: any) {
@@ -482,17 +482,21 @@ const handleImportTaggedPlayers = async () => {
       switch (error.code) {
         case 'InvalidTaggedPlayersFile':
         case 'InvalidTaggedPlayersData':
-          message.error(() => t('TaggedPlayers.errorCode.InvalidTaggedPlayersFile'))
+          message.error(() => t('settings.taggedPlayers.errorCode.InvalidTaggedPlayersFile'))
           break
         case 'InvalidDatabaseVersion':
-          message.error(() => t('TaggedPlayers.errorCode.InvalidDatabaseVersion'))
+          message.error(() => t('settings.taggedPlayers.errorCode.InvalidDatabaseVersion'))
           break
         default:
-          message.error(() => t('TaggedPlayers.errorCode.importDefault', { reason: error.message }))
+          message.error(() =>
+            t('settings.taggedPlayers.errorCode.importDefault', { reason: error.message })
+          )
           break
       }
     } else {
-      message.error(() => t('TaggedPlayers.errorCode.importDefault', { reason: error.message }))
+      message.error(() =>
+        t('settings.taggedPlayers.errorCode.importDefault', { reason: error.message })
+      )
     }
   }
 }

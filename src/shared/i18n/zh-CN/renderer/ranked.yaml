@@ -1,0 +1,20 @@
+ranked:
+  table:
+    queueType: 队列
+    tier: 当前段位
+    leaguePoints: 胜点
+    ratedRating: 分数
+    wins: 胜场
+    losses: 负场
+    winRate: 胜率
+    previousSeasonEndTier: 上赛季段位
+    previousSeasonHighestTier: 上赛季最高段位
+    highestTier: 历史最高段位
+  display:
+    unranked: 未定级
+    win: 胜
+    lose: 负
+    point: 分
+    leaguePoint: 胜点
+    highest: 最高
+    empty: 无内容

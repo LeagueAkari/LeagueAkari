@@ -31,7 +31,7 @@
               v-if="collected.anvils[p.participantId] && collected.anvils[p.participantId] > 0"
               class="rounded bg-black/20 px-1 py-0.5 text-xs text-black/80 dark:bg-white/10 dark:text-white"
             >
-              {{ t('MatchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
+              {{ t('matchCard.buildsTab.anvils', { count: collected.anvils[p.participantId] }) }}
             </div>
           </div>
 
@@ -41,7 +41,7 @@
           <!-- Skills Section -->
           <div class="mb-3">
             <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
-              {{ t('MatchCard.buildsTab.skillBuild') }}
+              {{ t('matchCard.buildsTab.skillBuild') }}
             </div>
             <div class="flex flex-wrap items-center gap-1">
               <div
@@ -52,7 +52,7 @@
                 <div
                   v-if="sk.levelUpType === 'EVOLVE'"
                   class="relative flex size-6 cursor-default items-center justify-center rounded-full border border-solid border-rose-500 bg-rose-500/60 text-xs font-bold dark:border-rose-400/60 dark:bg-rose-400/60"
-                  :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (${t('MatchCard.buildsTab.evolved')}) - ${formatMilliseconds(sk.timestamp)}`"
+                  :title="`${sk.displayLevel ? sk.displayLevel + ' - ' : ''}${SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS]} (${t('matchCard.buildsTab.evolved')}) - ${formatMilliseconds(sk.timestamp)}`"
                 >
                   {{
                     SKILL_SLOT_TRANSLATIONS[sk.skillSlot as keyof typeof SKILL_SLOT_TRANSLATIONS] ||
@@ -89,7 +89,7 @@
                 v-if="!collected.skillLevelUpEvents[p.participantId]?.length"
                 class="py-1 text-xs text-black/30 italic dark:text-white/30"
               >
-                {{ t('MatchCard.buildsTab.noSkillUpgrades') }}
+                {{ t('matchCard.buildsTab.noSkillUpgrades') }}
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@
           <!-- Items Section -->
           <div>
             <div class="mb-1.5 text-xs text-black/80 dark:text-white/50">
-              {{ t('MatchCard.buildsTab.itemPurchases') }}
+              {{ t('matchCard.buildsTab.itemPurchases') }}
             </div>
             <div class="flex flex-wrap items-start gap-1">
               <div
@@ -134,7 +134,7 @@
                 "
                 class="py-1 text-xs text-black/30 italic dark:text-white/30"
               >
-                {{ t('MatchCard.buildsTab.noItemPurchases') }}
+                {{ t('matchCard.buildsTab.noItemPurchases') }}
               </div>
             </div>
           </div>
@@ -206,14 +206,14 @@
     <template v-if="loadingDetails">
       <div class="flex items-center gap-2">
         <NSpin :size="16" />
-        <span>{{ t('MatchCard.common.loading') }}</span>
+        <span>{{ t('matchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex items-center gap-2">
-        <span>{{ t('MatchCard.common.noData') }}</span>
+        <span>{{ t('matchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="loadDetails(basicInfo.gameId)">
-          {{ t('MatchCard.common.refresh') }}
+          {{ t('matchCard.common.refresh') }}
         </NButton>
       </div>
     </template>

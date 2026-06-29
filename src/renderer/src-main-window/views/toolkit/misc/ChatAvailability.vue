@@ -1,8 +1,8 @@
 <template>
-  <SettingsSection :title="t('ChatAvailability.title')">
+  <SettingsSection :title="t('toolkit.chatAvailability.title')">
     <SettingsRow
-      :label="t('ChatAvailability.availability.label')"
-      :label-description="t('ChatAvailability.availability.description')"
+      :label="t('toolkit.chatAvailability.availability.label')"
+      :label-description="t('toolkit.chatAvailability.availability.description')"
       :label-width="260"
     >
       <NRadioGroup
@@ -14,21 +14,27 @@
         @update:value="(a) => handleChangeAvailability(a)"
       >
         <NFlex :size="4" class="justify-end">
-          <NRadio value="chat">{{ t('ChatAvailability.availability.radio.chat') }}</NRadio>
-          <NRadio value="mobile">{{ t('ChatAvailability.availability.radio.mobile') }}</NRadio>
-          <NRadio value="away">{{ t('ChatAvailability.availability.radio.away') }}</NRadio>
-          <NRadio value="offline">{{ t('ChatAvailability.availability.radio.offline') }}</NRadio>
-          <NRadio value="dnd">{{ t('ChatAvailability.availability.radio.dnd') }}</NRadio>
-          <NRadio value="spectating">{{
-            t('ChatAvailability.availability.radio.spectating')
+          <NRadio value="chat">{{ t('toolkit.chatAvailability.availability.radio.chat') }}</NRadio>
+          <NRadio value="mobile">{{
+            t('toolkit.chatAvailability.availability.radio.mobile')
           }}</NRadio>
-          <NRadio value="online">{{ t('ChatAvailability.availability.radio.online') }}</NRadio>
+          <NRadio value="away">{{ t('toolkit.chatAvailability.availability.radio.away') }}</NRadio>
+          <NRadio value="offline">{{
+            t('toolkit.chatAvailability.availability.radio.offline')
+          }}</NRadio>
+          <NRadio value="dnd">{{ t('toolkit.chatAvailability.availability.radio.dnd') }}</NRadio>
+          <NRadio value="spectating">{{
+            t('toolkit.chatAvailability.availability.radio.spectating')
+          }}</NRadio>
+          <NRadio value="online">{{
+            t('toolkit.chatAvailability.availability.radio.online')
+          }}</NRadio>
         </NFlex>
       </NRadioGroup>
     </SettingsRow>
     <SettingsRow
-      :label="t('ChatAvailability.lockOfflineStatus.label')"
-      :label-description="t('ChatAvailability.lockOfflineStatus.description')"
+      :label="t('toolkit.chatAvailability.lockOfflineStatus.label')"
+      :label-description="t('toolkit.chatAvailability.lockOfflineStatus.description')"
       :label-width="260"
     >
       <NSwitch
@@ -70,9 +76,9 @@ const handleChangeAvailability = async (availability: string) => {
     await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {
     notification.warning({
-      title: () => t('ChatAvailability.availability.failedNotification.title'),
+      title: () => t('toolkit.chatAvailability.availability.failedNotification.title'),
       content: () =>
-        t('ChatAvailability.availability.failedNotification.description', {
+        t('toolkit.chatAvailability.availability.failedNotification.description', {
           reason: (error as Error).message
         })
     })

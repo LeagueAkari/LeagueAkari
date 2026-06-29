@@ -7,7 +7,7 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold text-rose-700 dark:text-rose-300">
         <NIcon size="16"><Prohibited20Regular /></NIcon>
-        {{ t('PlayerTab.filter.notMatch') }}
+        {{ t('playerTabs.matchHistory.filters.notMatch') }}
       </div>
 
       <div class="flex gap-1">
@@ -22,7 +22,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.selectCondition') }}
+            {{ t('playerTabs.matchHistory.filters.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -30,7 +30,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.delete') }}
+          {{ t('playerTabs.matchHistory.filters.delete') }}
         </NButton>
       </div>
     </div>
@@ -45,7 +45,7 @@
           <template #icon>
             <NIcon size="14"><Add20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.selectCondition') }}
+          {{ t('playerTabs.matchHistory.filters.selectCondition') }}
         </NButton>
       </NDropdown>
     </div>

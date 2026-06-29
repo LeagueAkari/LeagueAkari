@@ -1,10 +1,10 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('OngoingGameSettings.titleCommon')">
+      <SettingsSection :title="t('settings.ongoingGame.titleCommon')">
         <SettingsRow
-          :label="t('OngoingGameSettings.enabled.label')"
-          :label-description="t('OngoingGameSettings.enabled.description')"
+          :label="t('settings.ongoingGame.enabled.label')"
+          :label-description="t('settings.ongoingGame.enabled.description')"
           :label-width="400"
         >
           <NSwitch
@@ -15,8 +15,8 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.autoRouteWhenGameStarts.label')"
-          :label-description="t('OngoingGameSettings.autoRouteWhenGameStarts.description')"
+          :label="t('settings.ongoingGame.autoRouteWhenGameStarts.label')"
+          :label-description="t('settings.ongoingGame.autoRouteWhenGameStarts.description')"
           :label-width="400"
         >
           <NSwitch
@@ -27,8 +27,8 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.matchHistoryLoadCount.label')"
-          :label-description="t('OngoingGameSettings.matchHistoryLoadCount.description')"
+          :label="t('settings.ongoingGame.matchHistoryLoadCount.label')"
+          :label-description="t('settings.ongoingGame.matchHistoryLoadCount.description')"
           :label-width="400"
         >
           <NInputNumber
@@ -43,8 +43,8 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.concurrency.label')"
-          :label-description="t('OngoingGameSettings.concurrency.description')"
+          :label="t('settings.ongoingGame.concurrency.label')"
+          :label-description="t('settings.ongoingGame.concurrency.description')"
           :label-width="400"
         >
           <NInputNumber
@@ -57,9 +57,9 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.gameDetailsLoadCount.label')"
+          :label="t('settings.ongoingGame.gameDetailsLoadCount.label')"
           :label-description="
-            t('OngoingGameSettings.gameDetailsLoadCount.description', {
+            t('settings.ongoingGame.gameDetailsLoadCount.description', {
               count: ogs.settings.gameDetailsLoadCount
             })
           "
@@ -75,8 +75,8 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.matchHistoryTagPreference.label')"
-          :label-description="t('OngoingGameSettings.matchHistoryTagPreference.description')"
+          :label="t('settings.ongoingGame.matchHistoryTagPreference.label')"
+          :label-description="t('settings.ongoingGame.matchHistoryTagPreference.description')"
           :label-width="400"
           :disabled="as.settings.preferredLolSource !== 'sgp'"
         >
@@ -87,18 +87,18 @@
           >
             <div class="flex flex-wrap justify-end gap-x-3 gap-y-1">
               <NRadio value="all">
-                {{ t('OngoingGameSettings.matchHistoryTagPreference.options.all') }}</NRadio
+                {{ t('settings.ongoingGame.matchHistoryTagPreference.options.all') }}</NRadio
               >
               <NRadio value="current">{{
-                t('OngoingGameSettings.matchHistoryTagPreference.options.current')
+                t('settings.ongoingGame.matchHistoryTagPreference.options.current')
               }}</NRadio>
             </div>
           </NRadioGroup>
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.queryInLobbyPhase.label')"
-          :label-description="t('OngoingGameSettings.queryInLobbyPhase.description')"
+          :label="t('settings.ongoingGame.queryInLobbyPhase.label')"
+          :label-description="t('settings.ongoingGame.queryInLobbyPhase.description')"
           :label-width="400"
         >
           <NSwitch
@@ -109,9 +109,9 @@
         </SettingsRow>
 
         <SettingsRow
-          :label="t('OngoingGameSettings.premadeTeamInferMatchCountThreshold.label')"
+          :label="t('settings.ongoingGame.premadeTeamInferMatchCountThreshold.label')"
           :label-description="
-            t('OngoingGameSettings.premadeTeamInferMatchCountThreshold.description')
+            t('settings.ongoingGame.premadeTeamInferMatchCountThreshold.description')
           "
           :label-width="400"
         >
@@ -125,11 +125,11 @@
         </SettingsRow>
       </SettingsSection>
 
-      <SettingsSection :title="t('OngoingGameSettings.titlePlayerCard')">
+      <SettingsSection :title="t('settings.ongoingGame.titlePlayerCard')">
         <SettingsRow
           :label-width="400"
-          :label="t('OngoingGameSettings.showChampionUsage.label')"
-          :label-description="t('OngoingGameSettings.showChampionUsage.description')"
+          :label="t('settings.ongoingGame.showChampionUsage.label')"
+          :label-description="t('settings.ongoingGame.showChampionUsage.description')"
         >
           <NRadioGroup
             :value="ogs.settings.showChampionUsage"
@@ -137,13 +137,13 @@
           >
             <div class="flex flex-wrap justify-end gap-x-3 gap-y-1">
               <NRadio value="none">
-                {{ t('OngoingGameSettings.showChampionUsage.options.none') }}</NRadio
+                {{ t('settings.ongoingGame.showChampionUsage.options.none') }}</NRadio
               >
               <NRadio value="recent">{{
-                t('OngoingGameSettings.showChampionUsage.options.recent')
+                t('settings.ongoingGame.showChampionUsage.options.recent')
               }}</NRadio>
               <NRadio value="mastery">{{
-                t('OngoingGameSettings.showChampionUsage.options.mastery')
+                t('settings.ongoingGame.showChampionUsage.options.mastery')
               }}</NRadio>
             </div>
           </NRadioGroup>
@@ -151,8 +151,8 @@
 
         <SettingsRow
           :label-width="400"
-          :label="t('OngoingGameSettings.showMatchHistoryItemBorder.label')"
-          :label-description="t('OngoingGameSettings.showMatchHistoryItemBorder.description')"
+          :label="t('settings.ongoingGame.showMatchHistoryItemBorder.label')"
+          :label-description="t('settings.ongoingGame.showMatchHistoryItemBorder.description')"
         >
           <NSwitch
             size="small"
@@ -163,9 +163,9 @@
 
         <SettingsRow
           :label-width="400"
-          :label="t('OngoingGameSettings.playerCardTags.label')"
+          :label="t('settings.ongoingGame.playerCardTags.label')"
           align="start"
-          :label-description="t('OngoingGameSettings.playerCardTags.description')"
+          :label-description="t('settings.ongoingGame.playerCardTags.description')"
           control-full-line
         >
           <div class="grid w-full grid-cols-3 gap-y-1">
@@ -176,7 +176,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showPremadeTeamTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showPremadeTeamTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showPremadeTeamTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showWinningStreakTag"
@@ -188,7 +188,7 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showWinningStreakTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showWinningStreakTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showLosingStreakTag"
@@ -197,7 +197,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showLosingStreakTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showLosingStreakTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showLosingStreakTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showSoloKillsTag"
@@ -206,7 +206,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSoloKillsTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showSoloKillsTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageTeamDamageTag"
@@ -218,7 +218,7 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showAverageTeamDamageTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageTeamDamageTakenTag"
@@ -230,7 +230,9 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTakenTag.label') }}
+              {{
+                t('settings.ongoingGame.playerCardTags.tags.showAverageTeamDamageTakenTag.label')
+              }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showSuspiciousFlashPositionTag"
@@ -243,7 +245,7 @@
               "
             >
               {{
-                t('OngoingGameSettings.playerCardTags.tags.showSuspiciousFlashPositionTag.label')
+                t('settings.ongoingGame.playerCardTags.tags.showSuspiciousFlashPositionTag.label')
               }}
             </NCheckbox>
             <NCheckbox
@@ -256,7 +258,7 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamGoldTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showAverageTeamGoldTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag"
@@ -270,7 +272,7 @@
             >
               {{
                 t(
-                  'OngoingGameSettings.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label'
+                  'settings.ongoingGame.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label'
                 )
               }}
             </NCheckbox>
@@ -284,7 +286,7 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showGreatPerformanceTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showGreatPerformanceTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showMetTag"
@@ -292,7 +294,7 @@
                 (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showMetTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showMetTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showMetTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showTaggedTag"
@@ -301,7 +303,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showTaggedTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showTaggedTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showTaggedTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showSelfTag"
@@ -309,7 +311,7 @@
                 (val) => og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showSelfTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showSelfTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showSelfTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showWinRateTeamTag"
@@ -318,7 +320,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showWinRateTeamTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showWinRateTeamTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showWinRateTeamTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showPrivacyTag"
@@ -327,7 +329,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showPrivacyTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showPrivacyTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showPrivacyTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag"
@@ -340,7 +342,7 @@
               "
             >
               {{
-                t('OngoingGameSettings.playerCardTags.tags.showAverageEnemyMissingPingsTag.label')
+                t('settings.ongoingGame.playerCardTags.tags.showAverageEnemyMissingPingsTag.label')
               }}
             </NCheckbox>
             <NCheckbox
@@ -353,7 +355,7 @@
                   })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showAverageVisionScoreTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showAverageVisionScoreTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAkariScoreTag"
@@ -362,7 +364,7 @@
                   og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showAkariScoreTag: val })
               "
             >
-              {{ t('OngoingGameSettings.playerCardTags.tags.showAkariScoreTag.label') }}
+              {{ t('settings.ongoingGame.playerCardTags.tags.showAkariScoreTag.label') }}
             </NCheckbox>
             <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageKillDamageEfficiencyTag"
@@ -376,7 +378,7 @@
             >
               {{
                 t(
-                  'OngoingGameSettings.playerCardTags.tags.showAverageKillDamageEfficiencyTag.label'
+                  'settings.ongoingGame.playerCardTags.tags.showAverageKillDamageEfficiencyTag.label'
                 )
               }}
             </NCheckbox>

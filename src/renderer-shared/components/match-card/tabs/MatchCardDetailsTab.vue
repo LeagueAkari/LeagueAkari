@@ -6,14 +6,14 @@
   >
     <div class="mb-1 flex items-center gap-4 bg-black/5 px-2 py-1 dark:bg-white/5">
       <div class="text-[11px] text-black/80 dark:text-white/60" v-if="!hidePrivacy">
-        {{ t('MatchCard.detailsTab.gameId') }}:
+        {{ t('matchCard.detailsTab.gameId') }}:
         <span class="select-text">{{ basicInfo.gameId }}</span> ({{ basicInfo.dataSource }})
       </div>
       <div class="text-[11px] text-black/80 dark:text-white/60">
         {{ gameCreationText }}
       </div>
       <div class="text-[11px] text-black/80 dark:text-white/60">
-        {{ t('MatchCard.detailsTab.gameVersion') }}:
+        {{ t('matchCard.detailsTab.gameVersion') }}:
         <span class="select-text">{{ basicInfo.gameVersion }}</span>
       </div>
     </div>
@@ -27,7 +27,7 @@
           >
             <NInput
               size="small"
-              :placeholder="t('MatchCard.detailsTab.filterPlaceholder')"
+              :placeholder="t('matchCard.detailsTab.filterPlaceholder')"
               v-model:value="filterText"
               clearable
             />
@@ -66,7 +66,7 @@
             :colspan="rawStats.length + 1"
             class="h-16 border-t-0 border-r-0 border-b border-l-0 border-solid border-b-black/5 p-2 text-center text-xs text-black/60 dark:border-t-0 dark:border-r-0 dark:border-l-0 dark:border-b-white/5 dark:text-white/60"
           >
-            {{ t('MatchCard.detailsTab.noFilterResult') }}
+            {{ t('matchCard.detailsTab.noFilterResult') }}
           </td>
         </tr>
       </tbody>
@@ -158,7 +158,7 @@ const groupDisplayOrder = new Map(RENDER_GROUP_DISPLAY_ORDER.map((group, index) 
 const { t } = useTranslation()
 
 const getStatKeyTranslation = (key: string) => {
-  return t(`MatchCard.statKeys.${key}`, { defaultValue: key })
+  return t(`matchCard.statKeys.${key}`, { defaultValue: key })
 }
 
 const gameCreationText = computed(() => {

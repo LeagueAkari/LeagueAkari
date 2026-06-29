@@ -102,7 +102,7 @@
       </div>
     </div>
   </div>
-  <div class="main-body" v-else>{{ t('RuneEditV2.unsupported') }}</div>
+  <div class="main-body" v-else>{{ t('automation.champConfig.runeEditor.unsupported') }}</div>
 </template>
 
 <script setup lang="ts">

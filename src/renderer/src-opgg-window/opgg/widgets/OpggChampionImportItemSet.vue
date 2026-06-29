@@ -4,11 +4,11 @@
     v-if="champion && canAddItemSet"
   >
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
-      {{ t('OpggChampion.applyRunesText') }}
+      {{ t('opgg.champion.applyRunesText') }}
     </div>
     <div class="card-content">
       <div class="flex h-10 items-center justify-between">
-        <span class="text-[13px]">{{ t('OpggChampion.applyRunes') }}</span>
+        <span class="text-[13px]">{{ t('opgg.champion.applyRunes') }}</span>
         <div class="flex min-w-19 justify-center">
           <NButton
             size="tiny"
@@ -17,7 +17,7 @@
             @click="writeItemSets(champion, { position, mode, region, tier })"
             :disabled="!lcs.isConnected"
           >
-            {{ t('OpggChampion.apply') }}
+            {{ t('opgg.champion.apply') }}
           </NButton>
         </div>
       </div>

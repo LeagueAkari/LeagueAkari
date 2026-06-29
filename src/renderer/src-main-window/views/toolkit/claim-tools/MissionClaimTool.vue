@@ -1,5 +1,8 @@
 <template>
-  <SettingsSection :title="t('MissionClaimTool.title')" :footer="t('MissionClaimTool.hint')">
+  <SettingsSection
+    :title="t('toolkit.claim.missions.title')"
+    :footer="t('toolkit.claim.missions.hint')"
+  >
     <div class="p-3">
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
@@ -10,10 +13,10 @@
           @click="claim"
         >
           <template v-if="selectedMissionIds.length">{{
-            t('MissionClaimTool.claimButtonC', { count: selectedMissionIds.length })
+            t('toolkit.claim.missions.claimButtonC', { count: selectedMissionIds.length })
           }}</template>
           <template v-else>
-            {{ t('MissionClaimTool.claimButton') }}
+            {{ t('toolkit.claim.missions.claimButton') }}
           </template>
         </NButton>
         <NButton
@@ -23,7 +26,7 @@
           secondary
           @click="isClaiming = false"
         >
-          {{ t('MissionClaimTool.cancelButton') }}
+          {{ t('toolkit.claim.missions.cancelButton') }}
         </NButton>
         <NButton
           :disabled="isLoading || !lcs.isConnected"
@@ -31,7 +34,7 @@
           secondary
           @click="updateClaimableMissions(true)"
         >
-          {{ t('MissionClaimTool.refreshButton') }}
+          {{ t('toolkit.claim.missions.refreshButton') }}
         </NButton>
       </div>
       <NDataTable
@@ -89,7 +92,7 @@ const columns = computed<DataTableColumns<Mission>>(() => [
     type: 'selection'
   },
   {
-    title: () => t('MissionClaimTool.columns.rewardList'),
+    title: () => t('toolkit.claim.missions.columns.rewardList'),
     key: 'rewardList',
     render: (row) => {
       const items = row.rewards.map((reward) => {
@@ -138,14 +141,14 @@ const updateClaimableMissions = async (manually = false) => {
     )
 
     if (manually) {
-      message.success(() => t('MissionClaimTool.refreshSuccess'))
+      message.success(() => t('toolkit.claim.missions.refreshSuccess'))
     }
 
     if (!missions.value.length) {
       return
     }
   } catch (error: any) {
-    message.warning(() => t('MissionClaimTool.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.missions.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -180,14 +183,14 @@ const claim = async () => {
         log.info(COMP_NAMESPACE, `claimed ${chosen.map((c) => c.description).join(', ')}`)
 
         message.success(() =>
-          t('RewardClaimTool.claimed', {
+          t('toolkit.claim.rewards.claimed', {
             item: chosen.map((c) => c.description).join(', ')
           })
         )
       }
     }
   } catch (error: any) {
-    message.warning(() => t('RewardClaimTool.claimFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.rewards.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isClaiming.value = false

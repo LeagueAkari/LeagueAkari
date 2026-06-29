@@ -40,17 +40,19 @@ export function resolveMapPreference(stats: AggregatedJungleAnalysis): MapPrefer
 export function mapPreferenceText(t: Translate, pref: MapPreference, short = false): string {
   switch (pref.kind) {
     case 'top':
-      return t('JunglePathing.topsidePref')
+      return t('ongoingGame.junglePathing.topsidePref')
     case 'mid':
-      return t('JunglePathing.midPref')
+      return t('ongoingGame.junglePathing.midPref')
     case 'bot':
-      return t('JunglePathing.botsidePref')
+      return t('ongoingGame.junglePathing.botsidePref')
     case 'topMid':
-      return t('JunglePathing.topMidPref')
+      return t('ongoingGame.junglePathing.topMidPref')
     case 'midBot':
-      return t('JunglePathing.midBotPref')
+      return t('ongoingGame.junglePathing.midBotPref')
     default:
-      return short ? t('JunglePathing.balancedShort') : t('JunglePathing.balanced')
+      return short
+        ? t('ongoingGame.junglePathing.balancedShort')
+        : t('ongoingGame.junglePathing.balanced')
   }
 }
 
@@ -86,7 +88,7 @@ export function topsideTextWithPct(t: Translate, stats: AggregatedJungleAnalysis
 
 export function topsideTextTrigger(t: Translate, stats: AggregatedJungleAnalysis) {
   const pref = resolveMapPreference(stats)
-  const base = t(`JunglePathing.prefShort.${pref.kind}`)
+  const base = t(`ongoingGame.junglePathing.prefShort.${pref.kind}`)
 
   if (pref.pct === null) {
     return base

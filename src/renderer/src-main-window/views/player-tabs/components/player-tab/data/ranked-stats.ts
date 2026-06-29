@@ -114,8 +114,9 @@ export function provideRankedStats(props: {
     } catch (error: any) {
       if (!silent) {
         notification.error({
-          title: () => t('PlayerTab.failedToLoadRankedStatsTitle'),
-          content: () => t('PlayerTab.failedToLoadRankedStatsContent', { reason: error.message }),
+          title: () => t('playerTabs.profile.failedToLoadRankedStatsTitle'),
+          content: () =>
+            t('playerTabs.profile.failedToLoadRankedStatsContent', { reason: error.message }),
           duration: 4000
         })
       }

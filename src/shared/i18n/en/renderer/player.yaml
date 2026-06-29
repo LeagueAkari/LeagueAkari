@@ -1,0 +1,613 @@
+playerSearch:
+  title: Summoner Search
+  combinedServersReference: Combined Servers Reference
+  searchTypePuuid: PUUID
+  searchTypeExact: Exact
+  searchTypeFuzzy: Fuzzy
+  cancel: Cancel
+  search: Search
+  resultCount: 'Search Results: {{count}}'
+  privacy: Private
+  searching: Searching
+  noResult: No Search Results
+  noResultHintFuzzy: Search by name only, e.g.
+  noResultHintExact: Search by name and tagline exactly, e.g.
+  noResultHintPuuid: Search by PUUID, e.g.
+  noResultHintFuzzyExample: Yui Fumani
+  noResultHintExactExample: 'Akari #Akaza'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: Recent Visits
+  pinned: Pinned ({{count}})
+  recent: Recent ({{count}})
+  noRecentVisits: No Recent Visits
+  friends: Friends ({{count}})
+  noFriends: No Friends
+  getFriendsFailed: Failed to get friend list
+playerTags:
+  editModal:
+    title: Edit Player Tag
+    loading: Loading...
+    save: Save
+    cancel: Cancel
+    placeholder: Enter the tag for player {{name}}
+playerTabs:
+  ranked:
+    unranked: Unranked
+    win: W
+    lose: L
+    point: P
+    leaguePoint: LP
+    highest: Highest
+    empty: No Content
+    crossRegion: Cross Region
+    unavailable: Unavailable
+  challenges:
+    titleAssets: Assets
+    champions: Champions
+    championSkins: Champion Skins
+    wardSkins: Ward Skins
+    summonerIcons: Summoner Icons
+    emotes: Emotes
+    chromaSkins: Chroma Skins
+  titlebar:
+    loading: Loading...
+    search: Search
+    refresh: Refresh
+    close: Close
+    closeOthers: Close Others
+    closeToTheRight: Close to the Right
+    screenshot: Screenshot Tab
+    searchButtonStreamerModeWarning: Searching for players will expose sensitive information, continue?
+  shell:
+    disconnected: Not connected to the client
+    queueing: Logging in...
+    noActiveTab: No active match history tab
+    copiedToClipboard: Copied to clipboard
+    dropZoneRosterMember: Drop here to navigate to the player's profile
+  profile:
+    prevPage: Previous
+    nextPage: Next
+    firstPage: Go to First Page
+    goToPage: Go to Page
+    refreshPage: Refresh Page
+    rankedMore: More
+    tagPlayer: Tag Player
+    byCount: By Count
+    byTime: By Time
+    queue: Queue
+    sgpQueueOnlyTooltip: This option is only available when using the SGP data source.
+    itemPerPage_one: '{{count}} item'
+    itemPerPage_other: '{{count}} items'
+    previousName: 'Previously Used Name: {{name}}'
+    summonerNotFoundTitle: Summoner Not Found {{puuid}}
+    summonerNotFoundContent: The summoner you are looking for does not exist
+    failedToLoadSummonerTitle: Failed to Load Summoner
+    failedToLoadSummonerContent: 'Unable to load summoner information: {{reason}}'
+    failedToLoadMatchHistoryTitle: Failed to Load Match History
+    failedToLoadMatchHistoryContent: 'Unable to load match history: {{reason}}'
+    failedToLoadRankedStatsTitle: Failed to Load Ranked Stats
+    failedToLoadRankedStatsContent: 'Unable to load ranked stats: {{reason}}'
+    noMatchHistory: No match history
+    noFilteredMatchHistory: No filtered match history
+    clearFilters: Clear filter conditions
+    loading: Loading...
+    summoner404: Summoner not found
+    failedToLoadTitle: Failed to Load
+    failedToLoadSummoner: 'Unable to load summoner information: {{reason}}'
+    failedToLoadSummonerProfile: 'Unable to load summoner profile: {{reason}}'
+    failedToLoadRankedStats: 'Unable to load ranked stats: {{reason}}'
+    failedToLoadMatchHistory: 'Unable to load match history: {{reason}}'
+    failedToLoadEncounteredGames: 'Unable to load encountered games: {{reason}}'
+    failedToLoadMatchHistoryHN1: |
+      Unable to load match history: {{reason}}
+      The current region on this page is Ionia. Please note that during certain times (especially in the evening), match history data may not be returned properly.
+    failedToLoadMatchHistoryGame: 'Unable to load match: {{reason}}'
+    failedToLoadTags: 'Unable to load player tags: {{reason}}'
+    failedToUpdateTag: 'Unable to update player tag: {{reason}}'
+    failedToDeleteTag: 'Unable to delete player tag: {{reason}}'
+    operationSuccessTitle: Operation Successful
+    operationFailedTitle: Operation Failed
+    failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
+    failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
+    copiedToClipboard: Copied to clipboard
+    failedToLaunchReplay: 'Failed to launch replay: {{reason}}'
+    failedToDownloadReplay: 'Failed to download replay: {{reason}}'
+  matchHistory:
+    filters:
+      title: Filters
+      simpleTab: Simple Filters
+      advancedTab: Advanced Filters
+      reset: Clear Filters
+      resetAll: Reset All Conditions
+      winLoss: Result
+      timeRange: Time Range
+      all: All
+      win: Win
+      loss: Loss
+      summoners: Summoners involved
+      champions: Champions involved
+      searchResults: Search results
+      pageSummoners: Page summoners
+      selectedSummoners: Selected
+      showPractice: Show Practice Mode
+      showIrregularGames: Show Remakes, Aborts, etc.
+      addCondition: Add Condition
+      addRule: Add Condition
+      addGroup: Add Group
+      exclude: Exclude
+      removeExclude: Stop Excluding
+      addFirstConditionHint: Add the first condition to build a complex predicate
+      addFirstRule: Start with one rule
+      addFirstRuleHint: Default to match-all; add groups only for nested logic or exclusions
+      and: All of (AND)
+      or: Any of (OR)
+      add: Add
+      switchToOr: Any of (OR)
+      switchToAnd: All of (AND)
+      delete: Delete
+      needAddCondition: Add condition required
+      addNestedRuleHint: Add another rule or subgroup inside the current group
+      matchAllRules: Match all rules
+      matchAnyRules: Match any rule
+      groupDescriptionAll: Every rule in this group must match
+      groupDescriptionAny: Any rule in this group can match
+      anyone: For any member
+      everyone: All members must
+      selectCondition: Select Condition
+      needSelectCondition: Select condition required
+      forPlayer: For player
+      targetPlayer: Check selected player
+      targetPlayerTeam: Check this player's team
+      targetPlayerOpponents: Check this player's opponents
+      targetAnyMember: Check any player
+      targetEveryMember: Check every player
+      targetAllMembers: Check all players
+      searchHint: (Name and tag will be used to search)
+      notMatch: Not
+      excludeRulesTitle: Exclude the following rules
+      excludeRulesHint: Results matching this group will be excluded
+      forAllMembers: For all members
+      forAllies: For allies
+      forEnemies: For enemies
+      relativeTo: Relative to
+      referencePlayer: Reference player
+      position: Position
+      queue: Game Queue
+      gameDuration: Game duration (seconds)
+      min: Min
+      max: Max
+      isWin: Win
+      isLoss: Loss
+      isAbort: Aborted
+      isRemake: Remake
+      surrenderLoss: Lost by surrender
+      kills: Kills
+      deaths: Deaths
+      assists: Assists
+      gold: Gold
+      isMatchedGame: Matched game
+      isPveGame: PvE game
+      summonerSpell: Summoner spell
+      hasItem: Has item
+      augment: Augment
+      hasPlayer: Match includes player
+      playerPuuid: Player
+      select: Select
+      atPosition: At position
+      have: Have
+      measureMode: Measure
+      minPercent: Min (%)
+      maxPercent: Max (%)
+      measureModes:
+        value: Raw value
+        teamShare: Team share (%)
+        teamMaxShare: Team-high share (%)
+        gameShare: All-player share (%)
+        gameMaxShare: Game-high share (%)
+      anyPosition: Any position
+      positionN: Position {{n}}
+      primaryStyle: Primary style
+      subStyle: Secondary style
+      spellGroupNormal: Normal
+      spellGroupSpecial: Special
+      augmentGroupHextech: Hextech Arena
+      augmentGroupArena: Arena
+      augmentGroupOther: Other
+      augmentTypeHai: H
+      augmentTypeDou: A
+      isChampion: Champion
+      sections:
+        logicGroups: Logic
+        scopeGroups: Scope & Targets
+        gameConditions: Match Details
+        resultConditions: Result & Finish
+        matchConditions: Members & Scope
+        participantConditions: Player Picks & Loadout
+        statConditions: Player Stats
+      descriptions:
+        isWin: Matches winning players or member groups
+        isAbort: Matches games that did not finish normally
+        isRemake: Matches remake games
+        isMatchedGame: Matches games created by matchmaking only
+        isPveGame: Matches bot or other PvE queues only
+      gameModes:
+        CLASSIC: Classic
+        ARAM: ARAM
+        URF: URF
+        CHERRY: Arena
+        KIWI: 'ARAM: Mayhem'
+        STRAWBERRY: Swarm
+        PRACTICETOOL: Practice Tool
+        TUTORIAL: Tutorial
+        NEXUSBLITZ: Nexus Blitz
+        ULTBOOK: Ultimate Spellbook
+        ONEFORALL: One for All
+        SNOWURF: Snow URF
+        DOOMBOTSTEEMO: Doom Bots
+        RUBY: Doom Bots
+        ARSR: Rotating Mode
+        ASSASSINATE: Blood Moon
+        FIRSTBLOOD: Overcharge
+        PROJECT: PROJECT
+        STARGUARDIAN: Star Guardian
+        BRAWL: Brawl
+      examples:
+        title: Quick Examples
+        applyHint: Click to import and replace the current advanced filter
+        cleanMatchSamples:
+          title: Keep only {matched} over {duration}, excluding {remake}, {abort}, and {pve}
+          matched: matchmaking games
+          duration: 10 minutes
+          remake: remakes
+          abort: aborted games
+          pve: PvE games
+        strongSelfPerformance:
+          title: Find clean games where you had {kda}, {deaths}, and {contribution}
+          kda: KDA ≥ 4
+          deaths: deaths ≤ 4
+          contribution: a win or high contribution
+        kiwiJayceSlowAndSteady:
+          title: Find {queue} games where an enemy {champion} used {augment}
+      combinatorLabels:
+        game: Game
+        and: And
+        or: Or
+        not: Not
+        isQueue: Game queue
+        isGameMode: Game mode
+        isMap: Map
+        isAbort: Aborted
+        isRemake: Remake
+        hasAugment: Augment
+        hasPerk: Rune
+        hasPerkStyle: Rune style
+        enemies: Check this player's opponents
+        allies: Check this player's team
+        all: Check all players
+        anyone: Check any player
+        everyone: Check every player
+        isChampion: Champion
+        durationBetween: Game duration
+        kdaBetween: KDA
+        killsBetween: Kills
+        deathsBetween: Deaths
+        assistsBetween: Assists
+        goldBetween: Gold earned
+        goldSpentBetween: Gold spent
+        levelBetween: Level
+        csBetween: CS
+        killParticipationBetween: Kill participation (%)
+        damageDealtToChampionsBetween: Damage to champions
+        physicalDamageDealtToChampionsBetween: Physical damage to champions
+        magicDamageDealtToChampionsBetween: Magic damage to champions
+        trueDamageDealtToChampionsBetween: True damage to champions
+        damageTakenBetween: Damage taken
+        physicalDamageTakenBetween: Physical damage taken
+        magicDamageTakenBetween: Magic damage taken
+        trueDamageTakenBetween: True damage taken
+        damageToTowersBetween: Tower damage
+        healBetween: Healing
+        visionScoreBetween: Vision score
+        timeCCingOthersBetween: Crowd-control time
+        dgrBetween: Damage-gold efficiency (%)
+        soloKillsBetween: Solo kills
+        doubleKillsBetween: Double kills
+        tripleKillsBetween: Triple kills
+        quadraKillsBetween: Quadra kills
+        pentaKillsBetween: Penta kills
+        isWin: Win
+        isLoss: Loss
+        isMatchedGame: Matched game
+        isPveGame: PvE game
+        player: Check selected player
+        hasPlayer: Match includes player
+        hasSpell: Summoner spell
+        isPosition: Position
+        hasItem: Has item
+      positionHint: When using the LCU source, positions are inferred from lane/role and are best-effort only
+      positionUnsupportedHint: The LCU API does not provide reliable position records. Switch to the SGP API to use this condition
+    timeRange:
+      all: All Time
+      last3Hours: Last 3 Hours
+      last12Hours: Last 12 Hours
+      last24Hours: Last 24 Hours
+      last3Days: Last 3 Days
+      last7Days: Last 7 Days
+      last30Days: Last 30 Days
+    collectMode:
+      collectedPageTitle: Collected Results
+      collectedPageDescription: This page is a collection-mode result with {collected} from {scanned}.
+      scannedMatches_one: '{count} scanned match'
+      scannedMatches_other: '{count} scanned matches'
+      collectedMatches_one: '{count} collected match'
+      collectedMatches_other: '{count} collected matches'
+      reloadNormalPage: Exit Collection Mode
+      collectingProgress: Collecting ({{count}} / {{expected}})
+      stoppingProgress: Stopping collection ({{count}} / {{expected}})
+      roundProgress: Round {{current}} / {{max}}
+      stopCollect: Stop
+      tooltipDescription: Collection mode automatically scans match history pages from the first page using the current filters until it reaches the target count or the maximum pull limit.
+      tooltipUseCase: Use this to gather matching games that are scattered across multiple match history pages.
+      openSettings: Collect with Current Filters
+      settingsTitle: Collection Settings
+      countPerIterationLabel: Matches Loaded per Round
+      countPerIterationDescription: The collection process pulls match history pages one by one. This controls how many matches are loaded each time.
+      expectedCountLabel: Target Collection Count
+      expectedCountDescription: Stop collecting once this many matching games have been found. Avoid very large values because they may affect performance.
+      maxIterationLabel: Maximum Rounds
+      maxIterationDescription: The collection process will not run forever. If it reaches this many rounds before finding enough matches, it will stop.
+      cancel: Cancel
+      startCollect: Start Collection
+    list:
+      empty: No data available.
+    card:
+      kprTitle: 'Kill participation in team: {{rate}}%'
+      ddrTitle: 'Damage dealt to champions: {{rate}}%'
+      dtrTitle: 'Damage taken in team: {{rate}}%'
+      grTitle: 'Team gold share: {{rate}}%'
+      kpr: KPR {{rate}}%
+      ddr: DMG {{rate}}%
+      dtr: DMG Taken {{rate}}%
+      gr: Gold {{rate}}%
+      misc: Misc
+      perfect: Perfect
+      expand: Expand
+      collapse: Collapse
+      loading: Loading...
+      error: Failed to load
+      practiceTool: Practice
+      win: Win
+      lose: Loss
+      remake: Remake
+      abort: Aborted
+      surrender: Surrender
+    previewer:
+      noData: No data available.
+      notFound: Game not found
+      error: Failed to load game
+      reload: Reload
+      loading: Loading...
+      errorNotification:
+        title: Error loading {{gameId}}
+        description: 'Cannot fetch game: {{reason}}'
+    miscellaneous:
+      gameId: Game ID {{gameId}}
+      gameDate: Game Date {{date}}
+      server: 'Server: {{server}}'
+      bans: 'Bans:'
+      replay:
+        download: Download Replay
+        watch: Watch Replay
+        incompatible: Replay Incompatible
+        downloading: Downloading Replay
+      stats:
+        championId: Champion
+        spells: Summoner Spells
+        teams: Team
+        assists: Assists
+        causedEarlySurrender: Early Surrender Initiator
+        champLevel: Champion Level
+        combatPlayerScore: Combat Player Score
+        damageDealtToObjectives: Damage to Objectives
+        damageDealtToTurrets: Damage to Turrets
+        damageSelfMitigated: Damage Self Mitigated
+        deaths: Deaths
+        doubleKills: Double Kills
+        earlySurrenderAccomplice: Early Surrender Accomplice
+        firstBloodAssist: First Blood Assist
+        firstBloodKill: First Blood
+        firstInhibitorAssist: First Inhibitor Assist
+        firstInhibitorKill: First Inhibitor Destroyed
+        firstTowerAssist: First Tower Assist
+        firstTowerKill: First Tower Destroyed
+        gameEndedInEarlySurrender: Ended in Early Surrender
+        gameEndedInSurrender: Ended in Surrender
+        goldEarned: Gold Earned
+        goldSpent: Gold Spent
+        inhibitorKills: Inhibitors Destroyed
+        item0: Item 0
+        item1: Item 1
+        item2: Item 2
+        item3: Item 3
+        item4: Item 4
+        item5: Item 5
+        item6: Item 6
+        killingSprees: Killing Sprees
+        kills: Kills
+        largestCriticalStrike: Largest Critical Strike
+        largestKillingSpree: Largest Killing Spree
+        largestMultiKill: Largest Multi Kill
+        longestTimeSpentLiving: Longest Time Alive
+        magicDamageDealt: Magic Damage Dealt
+        magicDamageDealtToChampions: Magic Damage to Champions
+        magicalDamageTaken: Magic Damage Taken
+        neutralMinionsKilled: Neutral Minions Killed
+        neutralMinionsKilledEnemyJungle: Neutral Minions Killed (Enemy Jungle)
+        neutralMinionsKilledTeamJungle: Neutral Minions Killed (Team Jungle)
+        objectivePlayerScore: Objective Player Score
+        participantId: Participant ID
+        pentaKills: Penta Kills
+        perk0: Perk 0
+        perk0Var1: Perk 0 Var 1
+        perk0Var2: Perk 0 Var 2
+        perk0Var3: Perk 0 Var 3
+        perk1: Perk 1
+        perk1Var1: Perk 1 Var 1
+        perk1Var2: Perk 1 Var 2
+        perk1Var3: Perk 1 Var 3
+        perk2: Perk 2
+        perk2Var1: Perk 2 Var 1
+        perk2Var2: Perk 2 Var 2
+        perk2Var3: Perk 2 Var 3
+        perk3: Perk 3
+        perk3Var1: Perk 3 Var 1
+        perk3Var2: Perk 3 Var 2
+        perk3Var3: Perk 3 Var 3
+        perk4: Perk 4
+        perk4Var1: Perk 4 Var 1
+        perk4Var2: Perk 4 Var 2
+        perk4Var3: Perk 4 Var 3
+        perk5: Perk 5
+        perk5Var1: Perk 5 Var 1
+        perk5Var2: Perk 5 Var 2
+        perk5Var3: Perk 5 Var 3
+        perkPrimaryStyle: Primary Perk Style
+        perkSubStyle: Secondary Perk Style
+        physicalDamageDealt: Physical Damage Dealt
+        physicalDamageDealtToChampions: Physical Damage to Champions
+        physicalDamageTaken: Physical Damage Taken
+        playerAugment1: Augment 1
+        playerAugment2: Augment 2
+        playerAugment3: Augment 3
+        playerAugment4: Augment 4
+        playerAugment5: Augment 5
+        playerAugment6: Augment 6
+        playerScore0: Player Score 0
+        playerScore1: Player Score 1
+        playerScore2: Player Score 2
+        playerScore3: Player Score 3
+        playerScore4: Player Score 4
+        playerScore5: Player Score 5
+        playerScore6: Player Score 6
+        playerScore7: Player Score 7
+        playerScore8: Player Score 8
+        playerScore9: Player Score 9
+        playerSubteamId: Subteam ID
+        quadraKills: Quadra Kills
+        sightWardsBoughtInGame: Sight Wards Bought
+        subteamPlacement: Subteam Placement
+        teamEarlySurrendered: Team Early Surrendered
+        timeCCingOthers: Time CCing Others
+        totalDamageDealt: Total Damage Dealt
+        totalDamageDealtToChampions: Total Damage to Champions
+        totalDamageTaken: Total Damage Taken
+        totalHeal: Total Healing
+        totalMinionsKilled: Total Minions Killed
+        totalPlayerScore: Total Player Score
+        totalScoreRank: Total Score Rank
+        totalTimeCrowdControlDealt: Total Crowd Control Time
+        totalUnitsHealed: Total Units Healed
+        tripleKills: Triple Kills
+        trueDamageDealt: True Damage Dealt
+        trueDamageDealtToChampions: True Damage to Champions
+        trueDamageTaken: True Damage Taken
+        turretKills: Turrets Destroyed
+        unrealKills: Unreal Kills
+        visionScore: Vision Score
+        visionWardsBoughtInGame: Control Wards Bought
+        wardsKilled: Wards Killed
+        wardsPlaced: Wards Placed
+        win: Win
+        currentPlatformId: Current Server
+        platformId: Platform ID
+    details:
+      win: Win
+      lose: Loss
+      controlWard: Control Wards
+      wardPlaced: Placed {{count}}, Cleared {{cleared}}
+      csPerMinute: '{{count}} / min'
+      bot: Bot
+      header:
+        kda: KDA
+        dmg: Damage / Taken
+        ward: Wards
+        cs: CS
+        gold: Gold
+        item: Items
+        augment: Augments
+  profilePrivacy:
+    title: Profile Hidden
+    content: This player has set his/her profile to be private.
+  taggedStatus:
+    title: Tagged
+    content: This player has been tagged.
+    taggedByOther: Tagged by another account.
+    deletePopconfirm: Confirm to delete this tag?
+  summary:
+    title: Overview
+    akariScore: Akari Score
+    na: N/A
+    avgKda: Average KDA
+    avgKp: Kill Participation
+    avgDmg: Damage Share
+    avgDmgTaken: Damage Taken Share
+    avgGold: Gold Share
+    avgCs: CS Share
+    avgCsPerMinute: CS/min
+    perMinuteValue: '{{value}}/min'
+    teamShare: Share {{value}}
+    collectChampionMatches: Collect {{champion}} matches
+    winLose: Wins & Losses
+    win: Win
+    lose: Loss
+    winShort: W
+    lossShort: L
+    wr: Win Rate
+    champions: Champion Usage
+    times: Games
+    teamSides: Team Sides
+    activeSession: Active Session Win/Lose
+    level3Short: Lv3
+    level4Short: Lv4
+    winningStreak_one: '{{count}} Win Streak'
+    winningStreak_other: '{{count}} Win Streak'
+    losingStreak_one: '{{count}} Loss Streak'
+    losingStreak_other: '{{count}} Loss Streak'
+  championMastery:
+    title: Champion Mastery
+    viewAll: More
+    modalTitle: All Champion Mastery
+    filteredChampions: '{{count}} / {{total}} champions'
+    filterPlaceholder: Filter by champion name, pinyin, or ID
+    score: Score {{score}}
+    level: Lv. {{level}}
+    levelLabel: Level
+    points: '{{points}} mastery points'
+    pointsLabel: Mastery Points
+    highestGrade: Highest grade {{grade}}
+    highestGradeLabel: Highest Grade
+    seasonMilestone: Season milestone {{milestone}}
+    seasonMilestoneLabel: Season Milestone
+    lastPlayTime: Last played {{time}}
+    lastPlayTimeLabel: Last Played
+    progress: Progress {{since}} / +{{until}}
+    tokensEarned: '{{count}} tokens'
+    noData: No champion mastery data
+    noFilterResult: No matching champions
+    loadFailed: 'Failed to load champion mastery: {{reason}}'
+  recentPlayers:
+    teammatesTitle: Recent Teammates
+    opponentsTitle: Recent Opponents
+    noRecentPlayers: No recent players
+    win: Win
+    lose: Loss
+  encounteredGames:
+    title: History Games
+    pageInfo: '{{page}} / {{totalPage}}'
+    noData: No data available.
+    deletePopconfirm: Confirm to delete this game record?
+    loading: Loading...
+    opponent: Enemy
+    teammate: Ally
+    win: Win
+    lose: Lose

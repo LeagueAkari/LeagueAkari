@@ -1,0 +1,9 @@
+cdTimer:
+  window:
+    countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
+    countup: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时已使用'
+    nativeInjectionUnsupported: 当前环境不支持发送到游戏（需要原生插件的输入注入能力）。
+    adminRequired: 需要以管理员权限运行才能发送到游戏。
+    gameNotForeground: 请先切回到游戏窗口（前台）再发送。
+    alreadySending: 正在发送中，请稍后再试。
+    sendFailed: 发送失败：{{reason}}

@@ -1,0 +1,610 @@
+playerSearch:
+  title: 搜索召唤师
+  combinedServersReference: 合区参照
+  searchTypePuuid: PUUID
+  searchTypeExact: 精确
+  searchTypeFuzzy: 模糊
+  cancel: 取消
+  search: 搜索
+  resultCount: 搜索结果共 {{count}} 个
+  privacy: 生涯隐藏
+  searching: 查询中
+  noResult: 暂无搜索结果
+  noResultHintFuzzy: 搜索名称，如
+  noResultHintExact: 按照名称和标签精确搜索，如
+  noResultHintPuuid: 按照 PUUID 搜索，如
+  noResultHintFuzzyExample: 船见结衣
+  noResultHintExactExample: '岁纳京子 #12345'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: 最近访问
+  pinned: 置顶 ({{count}})
+  recent: 近期 ({{count}})
+  noRecentVisits: 暂无最近访问
+  friends: 好友 ({{count}})
+  noFriends: 暂无好友
+  getFriendsFailed: 获取好友列表失败
+playerTags:
+  editModal:
+    title: 编辑玩家标记
+    loading: 加载中...
+    save: 保存
+    cancel: 取消
+    placeholder: 输入对 {{name}} 的标记
+playerTabs:
+  ranked:
+    unranked: 未定级
+    win: 胜
+    lose: 负
+    point: 分
+    leaguePoint: 胜点
+    highest: 最高
+    empty: 无内容
+    crossRegion: 跨区环境
+    unavailable: 无法获取排位队列信息
+  challenges:
+    titleAssets: 资产
+    champions: 英雄
+    championSkins: 皮肤
+    wardSkins: 守卫皮肤
+    summonerIcons: 召唤师图标
+    emotes: 表情
+    chromaSkins: 炫彩皮肤
+  titlebar:
+    loading: 加载中...
+    search: 搜索玩家
+    refresh: 刷新
+    close: 关闭
+    closeOthers: 关闭其他页面
+    closeToTheRight: 关闭右侧页面
+    screenshot: 截图当前页面
+    searchButtonStreamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
+  shell:
+    disconnected: 未连接到客户端
+    queueing: 正在进行登录排队
+    noActiveTab: 当前没有活跃的战绩页面
+    copiedToClipboard: 已复制到剪贴板
+    dropZoneRosterMember: 投放以转到该玩家
+  profile:
+    prevPage: 上一页
+    nextPage: 下一页
+    firstPage: 跳到第一页
+    goToPage: 跳转到指定页
+    refreshPage: 刷新页面
+    rankedMore: 更多
+    tagPlayer: 标记玩家
+    byCount: 按局数
+    byTime: 按时间
+    queue: 队列
+    sgpQueueOnlyTooltip: 此特性仅限使用 SGP 数据源时可用
+    itemPerPage: '{{count}} 项'
+    previousName: '曾使用的名字: {{name}}'
+    summonerNotFoundTitle: 找不到召唤师 {{puuid}}
+    summonerNotFoundContent: 您正在寻找的召唤师不存在
+    failedToLoadSummonerTitle: 加载召唤师失败
+    failedToLoadSummonerContent: 无法加载召唤师信息：{{reason}}
+    failedToLoadMatchHistoryTitle: 加载战绩失败
+    failedToLoadMatchHistoryContent: 无法加载战绩：{{reason}}
+    failedToLoadRankedStatsTitle: 加载排位统计失败
+    failedToLoadRankedStatsContent: 无法加载排位统计：{{reason}}
+    noMatchHistory: 暂无战绩
+    noFilteredMatchHistory: 暂无符合条件的战绩
+    clearFilters: 清除筛选条件
+    loading: 加载中...
+    summoner404: 未找到召唤师
+    failedToLoadTitle: 加载失败
+    failedToLoadSummoner: 无法加载召唤师信息：{{reason}}
+    failedToLoadSummonerProfile: 无法加载召唤师信息：{{reason}}
+    failedToLoadRankedStats: 无法加载排位信息：{{reason}}
+    failedToLoadMatchHistory: 无法加载战绩：{{reason}}
+    failedToLoadEncounteredGames: 无法加载最近遇到过的对局：{{reason}}
+    failedToLoadMatchHistoryHN1: |
+      无法加载战绩：{{reason}}
+      注意：当前页面的大区为艾欧尼亚。该大区在某些时间段（尤其是晚间）可能无法正常返回战绩数据
+    failedToLoadMatchHistoryGame: 无法加载对局：{{reason}}
+    failedToLoadTags: 无法加载玩家标记：{{reason}}
+    failedToUpdateTag: 无法更新玩家标记：{{reason}}
+    failedToDeleteTag: 无法更新玩家标记：{{reason}}
+    operationSuccessTitle: 操作成功
+    operationFailedTitle: 操作失败
+    failedToTakeScreenshotNoData: 尝试截图失败，未获取到图片信息
+    failedToTakeScreenshot: 尝试截图失败：{{reason}}
+    copiedToClipboard: 已复制到剪贴板
+    failedToLaunchReplay: 无法拉起回放：{{reason}}
+    failedToDownloadReplay: 无法下载回放：{{reason}}
+  matchHistory:
+    filters:
+      title: 筛选
+      simpleTab: 简单筛选
+      advancedTab: 高级筛选
+      reset: 重置条件
+      resetAll: 重置所有条件
+      winLoss: 胜负
+      timeRange: 时间范围
+      all: 全部
+      win: 胜利
+      loss: 失败
+      summoners: 涉及召唤师
+      champions: 涉及英雄
+      searchResults: 搜索结果
+      pageSummoners: 页内召唤师
+      selectedSummoners: 已选择
+      showPractice: 显示训练模式
+      showIrregularGames: 显示重开局等
+      addCondition: 添加条件
+      addRule: 添加条件
+      addGroup: 添加分组
+      exclude: 排除
+      removeExclude: 取消排除
+      addFirstConditionHint: 添加第一个条件以构建复杂判定式
+      addFirstRule: 从一条规则开始
+      addFirstRuleHint: 默认按“同时满足”组合；复杂场景再用分组和排除
+      and: 同时满足
+      or: 满足其一
+      add: 添加
+      switchToOr: 切换为“或”
+      switchToAnd: 切换为“和”
+      delete: 删除
+      needAddCondition: 需添加条件
+      addNestedRuleHint: 在当前分组中继续添加条件或子分组
+      matchAllRules: 匹配全部规则
+      matchAnyRules: 匹配任意规则
+      groupDescriptionAll: 组内所有规则都要满足
+      groupDescriptionAny: 组内任一规则满足即可
+      anyone: 任意成员满足
+      everyone: 所有成员满足
+      selectCondition: 选择条件
+      needSelectCondition: 需选择条件
+      forPlayer: 对于玩家
+      targetPlayer: 检查指定玩家
+      targetPlayerTeam: 检查该玩家所在队伍
+      targetPlayerOpponents: 检查该玩家对面队伍
+      targetAnyMember: 检查任意玩家
+      targetEveryMember: 检查所有玩家
+      targetAllMembers: 检查全部玩家
+      searchHint: (提供名称和编号将进行搜索)
+      notMatch: 不满足
+      excludeRulesTitle: 排除以下规则
+      excludeRulesHint: 这组条件一旦满足，将从结果中排除
+      forAllMembers: 对于所有成员
+      forAllies: 对于其友方成员
+      forEnemies: 对于其敌方成员
+      relativeTo: 相对于
+      referencePlayer: 参考玩家
+      position: 位置
+      queue: 游戏模式队列
+      gameDuration: 游戏时长 (秒)
+      min: 最小
+      max: 最大
+      isWin: 是胜利对局
+      isLoss: 是失败对局
+      isAbort: 是终止对局
+      isRemake: 是重开对局
+      surrenderLoss: 以投降失败
+      kills: 击杀数
+      deaths: 死亡数
+      assists: 助攻数
+      gold: 金币
+      isMatchedGame: 是匹配对局
+      isPveGame: 是 PVE 对局
+      summonerSpell: 召唤师技能
+      hasItem: 拥有装备
+      augment: 海克斯
+      hasPlayer: 对局包含玩家
+      playerPuuid: 玩家
+      select: 选用
+      atPosition: 位于
+      have: 拥有
+      measureMode: 统计口径
+      minPercent: 最小 (%)
+      maxPercent: 最大 (%)
+      measureModes:
+        value: 具体值
+        teamShare: 占本队总量 (%)
+        teamMaxShare: 相对本队最高 (%)
+        gameShare: 占全员总量 (%)
+        gameMaxShare: 相对全员最高 (%)
+      anyPosition: 任意位置
+      positionN: 第 {{n}} 个
+      primaryStyle: 主系
+      subStyle: 副系
+      spellGroupNormal: 常规
+      spellGroupSpecial: 特殊
+      augmentGroupHextech: 海克斯大乱斗
+      augmentGroupArena: 斗魂竞技场
+      augmentGroupOther: 其他
+      augmentTypeHai: 海
+      augmentTypeDou: 斗
+      isChampion: 选用英雄
+      sections:
+        logicGroups: 逻辑组合
+        scopeGroups: 检查对象与范围
+        gameConditions: 对局本身
+        resultConditions: 胜负与结算
+        matchConditions: 成员与范围
+        participantConditions: 玩家选择内容
+        statConditions: 玩家数值表现
+      descriptions:
+        isWin: 匹配胜利的玩家或成员组
+        isAbort: 匹配未正常结算的终止对局
+        isRemake: 匹配重开对局
+        isMatchedGame: 仅匹配由匹配系统创建的对局
+        isPveGame: 仅匹配人机或其他 PVE 队列
+      gameModes:
+        CLASSIC: 经典
+        ARAM: 极地大乱斗
+        URF: 无限火力
+        CHERRY: 斗魂竞技场
+        KIWI: 符文大乱斗
+        STRAWBERRY: 无尽狂潮
+        PRACTICETOOL: 训练模式
+        TUTORIAL: 新手教程
+        NEXUSBLITZ: 极限闪击
+        ULTBOOK: 终极魔典
+        ONEFORALL: 克隆大作战
+        SNOWURF: 冰雪无限火力
+        DOOMBOTSTEEMO: 末日人机
+        RUBY: 末日人机
+        ARSR: 随机轮换模式
+        ASSASSINATE: 血月杀
+        FIRSTBLOOD: 超载
+        PROJECT: 源计划
+        STARGUARDIAN: 星之守护者
+        BRAWL: 神木之门
+      examples:
+        title: 快速示例
+        applyHint: 点击导入并替换当前高级筛选条件
+        cleanMatchSamples:
+          title: 只保留 {matched} 中 {duration} 以上的对局，并排除 {remake}、{abort} 和 {pve}
+          matched: 匹配对局
+          duration: 10 分钟
+          remake: 重开
+          abort: 终止
+          pve: PVE
+        strongSelfPerformance:
+          title: 查找自己 {kda}、{deaths}，且有 {contribution} 的正常对局
+          kda: KDA ≥ 4
+          deaths: 死亡 ≤ 4
+          contribution: 胜利或高贡献
+        kiwiJayceSlowAndSteady:
+          title: 在 {queue} 中，查找对方有 {champion} 且选用了 {augment} 的对局
+      combinatorLabels:
+        game: 对局
+        and: 和
+        or: 或
+        not: 非
+        isQueue: 游戏模式队列
+        isGameMode: 游戏模式
+        isMap: 地图
+        isAbort: 是终止对局
+        isRemake: 是重开对局
+        hasAugment: 海克斯
+        hasPerk: 符文
+        hasPerkStyle: 符文系
+        enemies: 检查该玩家对面队伍
+        allies: 检查该玩家所在队伍
+        all: 检查全部玩家
+        anyone: 检查任意玩家
+        everyone: 检查所有玩家
+        isChampion: 选用英雄
+        durationBetween: 游戏时长
+        kdaBetween: KDA
+        killsBetween: 击杀数
+        deathsBetween: 死亡数
+        assistsBetween: 助攻数
+        goldBetween: 获得金币
+        goldSpentBetween: 花费金币
+        levelBetween: 等级
+        csBetween: 补刀数
+        killParticipationBetween: 击杀参与率 (%)
+        damageDealtToChampionsBetween: 对英雄总伤害
+        physicalDamageDealtToChampionsBetween: 对英雄物理伤害
+        magicDamageDealtToChampionsBetween: 对英雄魔法伤害
+        trueDamageDealtToChampionsBetween: 对英雄真实伤害
+        damageTakenBetween: 承受总伤害
+        physicalDamageTakenBetween: 承受物理伤害
+        magicDamageTakenBetween: 承受魔法伤害
+        trueDamageTakenBetween: 承受真实伤害
+        damageToTowersBetween: 对防御塔伤害
+        healBetween: 治疗量
+        visionScoreBetween: 视野得分
+        timeCCingOthersBetween: 控制时长
+        dgrBetween: 伤害金币转化率 (%)
+        soloKillsBetween: 单杀数
+        doubleKillsBetween: 双杀数
+        tripleKillsBetween: 三杀数
+        quadraKillsBetween: 四杀数
+        pentaKillsBetween: 五杀数
+        isWin: 是胜利对局
+        isLoss: 是失败对局
+        isMatchedGame: 是匹配对局
+        isPveGame: 是 PVE 对局
+        player: 检查指定玩家
+        hasPlayer: 对局包含玩家
+        hasSpell: 召唤师技能
+        isPosition: 位置
+        hasItem: 拥有装备
+      positionHint: 当前为 LCU 数据源时，位置由 lane/role 推断，仅供参考
+      positionUnsupportedHint: LCU API 不提供可靠的位置记录，请切换到 SGP API 后使用此条件
+    timeRange:
+      all: 全部时间
+      last3Hours: 3 小时
+      last12Hours: 半天
+      last24Hours: 24 小时
+      last3Days: 3 天
+      last7Days: 7 天
+      last30Days: 30 天
+    collectMode:
+      collectedPageTitle: 收集结果页
+      collectedPageDescription: 当前页为收集模式结果，共筛选 {scanned}，收集到 {collected}
+      scannedMatches_one: '{count} 场战绩'
+      scannedMatches_other: '{count} 场战绩'
+      collectedMatches_one: '{count} 场'
+      collectedMatches_other: '{count} 场'
+      reloadNormalPage: 退出收集模式
+      collectingProgress: 正在收集中 ({{count}} / {{expected}})
+      stoppingProgress: 正在停止收集 ({{count}} / {{expected}})
+      roundProgress: 第 {{current}} / {{max}} 轮
+      stopCollect: 停止
+      tooltipDescription: 收集模式会按照设定的筛选条件，自动从初始页开始收集数页战绩数据，直到满足预期数量或达到最大拉取限制。
+      tooltipUseCase: 这个功能适合将那些散落在多个战绩页的对局，集中收集在一起。
+      openSettings: 以当前筛选条件开始收集
+      settingsTitle: 收集设置
+      countPerIterationLabel: 每个轮次加载的战绩数量
+      countPerIterationDescription: 收集流程将依次拉取战绩页面，此处指定每次拉取的战绩数量
+      expectedCountLabel: 目标收集数量
+      expectedCountDescription: 当符合条件的战绩达到指定数量时停止收集。避免过大值，因为可能导致性能问题
+      maxIterationLabel: 最大轮次
+      maxIterationDescription: 收集流程不会永远进行下去，当轮次达到指定数量时仍未收集到预期数量，收集流程将被停止
+      cancel: 取消
+      startCollect: 开始收集
+    list:
+      empty: 暂无数据
+    card:
+      kprTitle: 在队伍中参与了击杀的程度 {{rate}}%
+      ddrTitle: 在队伍中对英雄造成的伤害占比 {{rate}}%
+      dtrTitle: 在队伍中的承受所有伤害占比  {{rate}}%
+      grTitle: 队伍经济比 {{rate}}%
+      kpr: 击杀参与率 {{rate}}%
+      ddr: 队伍伤害 {{rate}}%
+      dtr: 队伍承伤比 {{rate}}%
+      gr: 队伍经济 {{rate}}%
+      misc: 杂项
+      perfect: Perfect
+      expand: 展开
+      collapse: 收起
+      loading: 加载中...
+      error: 无法加载
+      practiceTool: 训练模式
+      win: 胜利
+      lose: 失败
+      remake: 重开
+      abort: 被终止
+      surrender: 投降
+    previewer:
+      noData: 暂无数据
+      notFound: 未找到对局
+      error: 加载对局失败
+      reload: 重新拉取
+      loading: 加载中...
+      errorNotification:
+        title: 加载对局失败 {{gameId}}
+        description: 无法加载对局信息 {{reason}}
+    miscellaneous:
+      gameId: 对局 ID {{gameId}}
+      gameDate: 对局日期 {{date}}
+      server: 区服：{{server}}
+      bans: 禁用：
+      replay:
+        download: 下载回放
+        watch: 观看回放
+        incompatible: 回放不可用
+        downloading: 回放下载中
+      stats:
+        championId: 英雄
+        spells: 召唤师技能
+        teams: 阵营
+        assists: 助攻
+        causedEarlySurrender: 是重开发起者
+        champLevel: 英雄等级
+        combatPlayerScore: 战斗玩家得分
+        damageDealtToObjectives: 对战略点造成的伤害
+        damageDealtToTurrets: 对防御塔造成的伤害
+        damageSelfMitigated: 自我缓和的伤害
+        deaths: 死亡
+        doubleKills: 双杀
+        earlySurrenderAccomplice: 重开支持者
+        firstBloodAssist: 一血助攻
+        firstBloodKill: 一血
+        firstInhibitorAssist: 首个水晶助攻
+        firstInhibitorKill: 首个水晶摧毁
+        firstTowerAssist: 首座防御塔助攻
+        firstTowerKill: 首座防御塔摧毁
+        gameEndedInEarlySurrender: 重开局
+        gameEndedInSurrender: 游戏以一方投降结束
+        goldEarned: 获得金币
+        goldSpent: 花费金币
+        inhibitorKills: 水晶摧毁
+        item0: 装备0
+        item1: 装备1
+        item2: 装备2
+        item3: 装备3
+        item4: 装备4
+        item5: 装备5
+        item6: 装备6
+        killingSprees: Killing Sprees
+        kills: 击杀
+        largestCriticalStrike: 最大暴击伤害
+        largestKillingSpree: 最大连杀
+        largestMultiKill: 最大多杀
+        longestTimeSpentLiving: 最长存活时间
+        magicDamageDealt: 造成的魔法伤害
+        magicDamageDealtToChampions: 对英雄造成的魔法伤害
+        magicalDamageTaken: 承受的魔法伤害
+        neutralMinionsKilled: 击杀中立单位
+        neutralMinionsKilledEnemyJungle: 击杀敌方野区中立单位
+        neutralMinionsKilledTeamJungle: 击杀己方野区中立单位
+        objectivePlayerScore: 目标玩家得分
+        participantId: 参与者 ID
+        pentaKills: 五杀
+        perk0: 符文0
+        perk0Var1: 符文0变量1
+        perk0Var2: 符文0变量2
+        perk0Var3: 符文0变量3
+        perk1: 符文1
+        perk1Var1: 符文1变量1
+        perk1Var2: 符文1变量2
+        perk1Var3: 符文1变量3
+        perk2: 符文2
+        perk2Var1: 符文2变量1
+        perk2Var2: 符文2变量2
+        perk2Var3: 符文2变量3
+        perk3: 符文3
+        perk3Var1: 符文3变量1
+        perk3Var2: 符文3变量2
+        perk3Var3: 符文3变量3
+        perk4: 符文4
+        perk4Var1: 符文4变量1
+        perk4Var2: 符文4变量2
+        perk4Var3: 符文4变量3
+        perk5: 符文5
+        perk5Var1: 符文5变量1
+        perk5Var2: 符文5变量2
+        perk5Var3: 符文5变量3
+        perkPrimaryStyle: 主要符文风格
+        perkSubStyle: 次要符文风格
+        physicalDamageDealt: 造成的物理伤害
+        physicalDamageDealtToChampions: 对英雄造成的物理伤害
+        physicalDamageTaken: 承受的物理伤害
+        playerAugment1: 强化1
+        playerAugment2: 强化2
+        playerAugment3: 强化3
+        playerAugment4: 强化4
+        playerAugment5: 强化5
+        playerAugment6: 强化6
+        playerScore0: 玩家得分0
+        playerScore1: 玩家得分1
+        playerScore2: 玩家得分2
+        playerScore3: 玩家得分3
+        playerScore4: 玩家得分4
+        playerScore5: 玩家得分5
+        playerScore6: 玩家得分6
+        playerScore7: 玩家得分7
+        playerScore8: 玩家得分8
+        playerScore9: 玩家得分9
+        playerSubteamId: 子队阵营
+        quadraKills: 四杀
+        sightWardsBoughtInGame: 视野守卫
+        subteamPlacement: 子队位次
+        teamEarlySurrendered: 团队重开
+        timeCCingOthers: 控制时间
+        totalDamageDealt: 造成的总伤害
+        totalDamageDealtToChampions: 对英雄造成的总伤害
+        totalDamageTaken: 承受的总伤害
+        totalHeal: 总治疗量
+        totalMinionsKilled: 击杀的小兵总数
+        totalPlayerScore: 总玩家得分
+        totalScoreRank: 总分排名
+        totalTimeCrowdControlDealt: 总控制时间
+        totalUnitsHealed: 治疗单位总数
+        tripleKills: 三杀
+        trueDamageDealt: 造成的真实伤害
+        trueDamageDealtToChampions: 对英雄造成的真实伤害
+        trueDamageTaken: 承受的真实伤害
+        turretKills: 防御塔摧毁
+        unrealKills: 虚幻击杀
+        visionScore: 视野得分
+        visionWardsBoughtInGame: 控制守卫
+        wardsKilled: 破坏的守卫
+        wardsPlaced: 放置的守卫
+        win: 胜利
+        currentPlatformId: 当前区服
+        platformId: 区服
+    details:
+      win: 胜利
+      lose: 失败
+      controlWard: 控制守卫
+      wardPlaced: 放置 {{count}} 个，排除 {{cleared}} 个
+      csPerMinute: 每分钟 {{count}} 个
+      header:
+        kda: KDA
+        dmg: 伤害 / 承受
+        ward: 眼
+        cs: 补兵数
+        gold: 金币
+        item: 物品
+        augment: 强化
+      bot: 人机
+  profilePrivacy:
+    title: 生涯隐藏
+    content: 该玩家设置了生涯不可见
+  taggedStatus:
+    title: 被标记
+    content: 该玩家已被标记
+    taggedByOther: 来自其他账号
+    deletePopconfirm: 确认删除该标记？
+  summary:
+    title: 总览
+    akariScore: Akari Score
+    na: N/A
+    avgKda: 平均 KDA
+    avgKp: 参团率
+    avgDmg: 伤害比
+    avgDmgTaken: 承伤比
+    avgGold: 经济比
+    avgCs: 补刀比
+    avgCsPerMinute: 补刀 / 分
+    perMinuteValue: '{{value}} / 分'
+    teamShare: 占比 {{value}}
+    collectChampionMatches: 收集「{{champion}}」战绩
+    winLose: 胜负
+    win: 胜
+    lose: 负
+    wr: 胜率
+    champions: 英雄使用
+    times: 场
+    teamSides: 阵营分布
+    activeSession: 活跃时段胜负
+    winShort: 胜
+    lossShort: 负
+    level3Short: 3 级
+    level4Short: 4 级
+    winningStreak: '{{count}} 连胜'
+    losingStreak: '{{count}} 连败'
+  championMastery:
+    title: 英雄点数
+    viewAll: 查看更多
+    modalTitle: 全部英雄点数
+    filteredChampions: '{{count}} / {{total}} 个英雄'
+    filterPlaceholder: 按英雄名、拼音或 ID 筛选
+    score: 总分 {{score}}
+    level: '{{level}} 级'
+    levelLabel: 等级
+    points: '{{points}} 英雄点数'
+    pointsLabel: 英雄点数
+    highestGrade: 最高评分 {{grade}}
+    highestGradeLabel: 最高评分
+    seasonMilestone: 本季里程碑 {{milestone}}
+    seasonMilestoneLabel: 本季里程碑
+    lastPlayTime: 最近使用 {{time}}
+    lastPlayTimeLabel: 最近使用
+    progress: 进度 {{since}} / +{{until}}
+    tokensEarned: '{{count}} 枚代币'
+    noData: 暂无英雄点数数据
+    noFilterResult: 无匹配英雄
+    loadFailed: 加载英雄点数失败：{{reason}}
+  recentPlayers:
+    teammatesTitle: 最近队友
+    opponentsTitle: 最近对手
+    noRecentPlayers: 无最近玩家
+    win: 胜
+    lose: 负
+  encounteredGames:
+    title: 历史对局
+    pageInfo: '{{page}} / {{totalPage}}'
+    noData: 暂无数据
+    deletePopconfirm: 确认删除该对局记录？
+    loading: 加载中...
+    opponent: 对手
+    teammate: 队友
+    win: 胜
+    lose: 败

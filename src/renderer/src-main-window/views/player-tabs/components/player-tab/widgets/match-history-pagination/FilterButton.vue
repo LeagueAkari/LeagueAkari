@@ -17,7 +17,7 @@
         </template>
       </NButton>
     </template>
-    {{ t('PlayerTab.filter.title') }}
+    {{ t('playerTabs.matchHistory.filters.title') }}
   </NTooltip>
 </template>
 

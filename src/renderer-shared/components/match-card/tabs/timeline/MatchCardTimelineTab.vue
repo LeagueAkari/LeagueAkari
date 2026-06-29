@@ -3,8 +3,8 @@
     <!-- sub tab -->
     <div class="mb-2 box-border w-full px-2" v-if="details.source === 'sgp'">
       <NTabs size="small" type="line" v-model:value="currentSection">
-        <NTab name="diff-line-chart">{{ t('MatchCard.timelineTab.diffLineChart') }}</NTab>
-        <NTab name="stats-line">{{ t('MatchCard.timelineTab.statsLine') }}</NTab>
+        <NTab name="diff-line-chart">{{ t('matchCard.timelineTab.diffLineChart') }}</NTab>
+        <NTab name="stats-line">{{ t('matchCard.timelineTab.statsLine') }}</NTab>
       </NTabs>
     </div>
 
@@ -18,14 +18,14 @@
     <template v-if="loadingDetails">
       <div class="flex items-center gap-2">
         <NSpin :size="16" />
-        <span>{{ t('MatchCard.common.loading') }}</span>
+        <span>{{ t('matchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex items-center gap-2">
-        <span>{{ t('MatchCard.common.noData') }}</span>
+        <span>{{ t('matchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="loadDetails(basicInfo.gameId)">
-          {{ t('MatchCard.common.refresh') }}
+          {{ t('matchCard.common.refresh') }}
         </NButton>
       </div>
     </template>

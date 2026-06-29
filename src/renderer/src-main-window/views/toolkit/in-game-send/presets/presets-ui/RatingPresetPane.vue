@@ -51,7 +51,7 @@ import PreviewPanel from '../widgets/PreviewPanel.vue'
 const ratingPreset = useRatingPreset()
 
 const { options, updateOptions } = ratingPreset
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.rating' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.rating' })
 
 const presetLabel = computed(() => t('label'))
 

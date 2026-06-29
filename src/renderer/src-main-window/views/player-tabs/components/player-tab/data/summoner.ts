@@ -117,8 +117,8 @@ export function provideSummoner(props: {
 
         if (summoners.length === 0) {
           notification.error({
-            title: () => t('PlayerTab.summonerNotFoundTitle', { puuid: puuid.value }),
-            content: () => t('PlayerTab.summonerNotFoundContent'),
+            title: () => t('playerTabs.profile.summonerNotFoundTitle', { puuid: puuid.value }),
+            content: () => t('playerTabs.profile.summonerNotFoundContent'),
             duration: 4000
           })
           return
@@ -130,8 +130,8 @@ export function provideSummoner(props: {
 
         if (namesets.namesets.length === 0) {
           notification.error({
-            title: () => t('PlayerTab.summonerNotFoundTitle', { puuid: puuid.value }),
-            content: () => t('PlayerTab.summonerNotFoundContent'),
+            title: () => t('playerTabs.profile.summonerNotFoundTitle', { puuid: puuid.value }),
+            content: () => t('playerTabs.profile.summonerNotFoundContent'),
             duration: 4000
           })
           return
@@ -152,8 +152,9 @@ export function provideSummoner(props: {
       }
     } catch (error: any) {
       notification.error({
-        title: () => t('PlayerTab.failedToLoadSummonerTitle'),
-        content: () => t('PlayerTab.failedToLoadSummonerContent', { reason: error.message }),
+        title: () => t('playerTabs.profile.failedToLoadSummonerTitle'),
+        content: () =>
+          t('playerTabs.profile.failedToLoadSummonerContent', { reason: error.message }),
         duration: 4000
       })
       log.error(componentName, error)

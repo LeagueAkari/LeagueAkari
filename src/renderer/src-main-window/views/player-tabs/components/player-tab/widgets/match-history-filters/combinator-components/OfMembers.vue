@@ -3,15 +3,15 @@
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'all'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><People20Regular /></NIcon>
-        {{ t('PlayerTab.filter.forAllMembers') }}
+        {{ t('playerTabs.matchHistory.filters.forAllMembers') }}
       </div>
       <div v-else-if="node.type === 'allies'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleTeam20Regular /></NIcon>
-        {{ t('PlayerTab.filter.forAllies') }}
+        {{ t('playerTabs.matchHistory.filters.forAllies') }}
       </div>
       <div v-else-if="node.type === 'enemies'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleSwap20Regular /></NIcon>
-        {{ t('PlayerTab.filter.forEnemies') }}
+        {{ t('playerTabs.matchHistory.filters.forEnemies') }}
       </div>
 
       <div class="flex gap-1">
@@ -26,7 +26,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.selectCondition') }}
+            {{ t('playerTabs.matchHistory.filters.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -34,14 +34,14 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.delete') }}
+          {{ t('playerTabs.matchHistory.filters.delete') }}
         </NButton>
       </div>
     </div>
 
     <div class="flex items-center gap-2" v-if="node.type === 'allies' || node.type === 'enemies'">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.relativeTo') }}
+        {{ t('playerTabs.matchHistory.filters.relativeTo') }}
       </div>
 
       <NSelectWithSummonerSearching
@@ -52,7 +52,7 @@
       />
 
       <div class="text-xs text-black/50 italic dark:text-white/50">
-        {{ t('PlayerTab.filter.searchHint') }}
+        {{ t('playerTabs.matchHistory.filters.searchHint') }}
       </div>
     </div>
 
@@ -66,7 +66,7 @@
           <template #icon>
             <NIcon size="14"><Add20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.selectCondition') }}
+          {{ t('playerTabs.matchHistory.filters.selectCondition') }}
         </NButton>
       </NDropdown>
     </div>

@@ -3,14 +3,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Apps20Regular /></NIcon>
-        {{ t('PlayerTab.filter.queue') }}
+        {{ t('playerTabs.matchHistory.filters.queue') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 

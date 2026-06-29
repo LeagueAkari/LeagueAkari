@@ -5,7 +5,7 @@
       <template #description>
         <div class="flex flex-col items-center gap-2">
           <NButton size="tiny" secondary @click="cancel">
-            {{ t('OpggChampion.cancel') }}
+            {{ t('opgg.champion.cancel') }}
           </NButton>
         </div>
       </template>
@@ -39,7 +39,7 @@
                 class="text-[13px] text-black/80 dark:text-white/80"
                 v-if="position && position !== 'none'"
               >
-                {{ t(`OpggTabAndFilters.positions.${position}`) || position }}
+                {{ t(`opgg.filters.positions.${position}`) || position }}
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@
             <!-- cherry 平均排名 -->
             <div class="w-12.5" v-if="stats.total_place && stats.play">
               <div class="text-[11px] text-black/70 dark:text-white/70">
-                {{ t('OpggChampion.avgPlace') }}
+                {{ t('opgg.champion.avgPlace') }}
               </div>
               <div class="text-[13px] font-bold">
                 {{ (stats.total_place / (stats.play || 1)).toFixed(2) }}
@@ -59,7 +59,7 @@
             <!-- cherry 吃鸡率 -->
             <div class="w-12.5" v-if="stats.first_place && stats.play">
               <div class="text-[11px] text-black/70 dark:text-white/70">
-                {{ t('OpggChampion.1st') }}
+                {{ t('opgg.champion.1st') }}
               </div>
               <div class="text-[13px] font-bold">
                 {{ ((stats.first_place / (stats.play || 1)) * 100).toFixed(2) }}%
@@ -69,7 +69,7 @@
             <!-- 胜率 1 -->
             <div class="w-12.5" v-if="stats.win_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
-                {{ t('OpggChampion.winRate') }}
+                {{ t('opgg.champion.winRate') }}
               </div>
               <div class="text-[13px] font-bold">{{ (stats.win_rate * 100).toFixed(2) }}%</div>
             </div>
@@ -77,7 +77,7 @@
             <!-- 选取率 -->
             <div class="w-12.5" v-if="stats.pick_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
-                {{ t('OpggChampion.pickRate') }}
+                {{ t('opgg.champion.pickRate') }}
               </div>
               <div class="text-[13px] font-bold">{{ (stats.pick_rate * 100).toFixed(2) }}%</div>
             </div>
@@ -85,7 +85,7 @@
             <!-- 禁用率 -->
             <div class="w-12.5" v-if="stats.ban_rate">
               <div class="text-[11px] text-black/70 dark:text-white/70">
-                {{ t('OpggChampion.banRate') }}
+                {{ t('opgg.champion.banRate') }}
               </div>
               <div class="text-[13px] font-bold">{{ (stats.ban_rate * 100).toFixed(2) }}%</div>
             </div>
@@ -112,7 +112,7 @@
           <div
             class="rounded border border-black/10 p-2 py-14 text-center text-sm font-bold text-black/60 last:mb-0 dark:border-[#37373c] dark:text-white/60"
           >
-            {{ t('OpggChampion.empty') }}
+            {{ t('opgg.champion.empty') }}
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const tierText = computed(() => {
     return 'OP'
   }
 
-  return t('OpggChampion.tierText', {
+  return t('opgg.champion.tierText', {
     tier: tierData.tier
   })
 })

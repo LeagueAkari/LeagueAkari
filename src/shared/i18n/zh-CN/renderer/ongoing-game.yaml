@@ -1,0 +1,246 @@
+ongoingGame:
+  titlebar:
+    draftMode: 草稿模式
+    exitDraft: 退出草稿模式
+    refresh: 刷新对局页面
+    spectating: 观战中
+    settings:
+      title: 对局页面显示
+      orderPlayerBy:
+        label: 玩家排序
+      showJunglePathingForAllPlayers:
+        label: 展示非打野玩家的打野路径样本
+        description: 开启后，若非打野玩家的历史战绩中存在打野路径样本，也会展示该信息。
+      openOngoingGameSettings: 更多对局设置
+    orderOptions:
+      default: 楼层顺序
+      position: 分路顺序
+      premade-team: 预组队
+      win-rate: 胜率降序
+      kda: KDA 降序
+      akari-score: 综合降序
+  junglePathing:
+    title: 打野偏好
+    thisGame: 本局
+    hero: 英雄
+    overall: 全部
+    currentChampion: 本英雄
+    mapPref: 地图偏好
+    zoneWeight: 分区权重
+    zoneWeightShort: 权重
+    positionWeight: 位置权重
+    takedownWeight: 击杀参与权重
+    first14Minutes: 前 14 分钟
+    preferenceDecision: 偏好判定
+    singleZone: 单分区
+    firstClearDecision: 首清判定
+    oneMinutePosition: 1 分钟位置
+    level3Decision: 3 级抓判定
+    level4Decision: 4 级抓判定
+    threeMinuteFrame: 3 分钟帧
+    fourMinuteFrame: 4 分钟帧
+    championDamage: 英雄伤害
+    championDamageIncrease: 新增英雄伤害
+    takedownParticipation: 击杀参与
+    aggregation: 汇总方式
+    sampleScope: 样本范围
+    blueRedSide: 蓝色方 / 红色方
+    ganks: Gank
+    topsidePref: 偏上
+    midPref: 偏中
+    botsidePref: 偏下
+    topMidPref: 偏中上
+    midBotPref: 偏中下
+    balanced: 均衡
+    balancedShort: 均衡
+    prefShort:
+      top: 偏上
+      mid: 偏中
+      bot: 偏下
+      topMid: 偏中上
+      midBot: 偏中下
+      balanced: 均衡
+    firstClear: 首清
+    topsideStart: 上开 {{pct}}%
+    botsideStart: 下开 {{pct}}%
+    campRed: 红 buff
+    campBlue: 蓝 buff
+    campWolves: 三狼
+    campRaptors: F6
+    campOwnStart: 常规开 {pct}
+    campStart: '{{camp}} 开 {pct}'
+    campInvadeStart: 入侵开 {pct}
+    campPopoverCampGames: 该营地 {count} 局
+    campPopoverKindGames: '{{kind}}样本 {count} 局'
+    campPopoverSideGames: '{{side}}总样本 {count} 局'
+    blueTeam: 蓝色方
+    redTeam: 红色方
+    earlyGank: 前期抓人
+    firstClearOwnLegend: 常规开
+    firstClearInvadeLegend: 入侵开
+    level3KillLegend: 3 级击杀
+    level4KillLegend: 4 级击杀
+    level3Gank: 3 级抓 {count} / {total} 局
+    level4Gank: 4 级抓 {count} / {total} 局
+    objectives: 野怪目标
+    firstDragonRate: 一龙率 {{pct}}%
+    firstDragonRateLabel: 一龙率
+    soloDragonRate: 小龙单刷率 {{pct}}%
+    soloDragonRateLabel: 小龙单刷率
+    dragons: 小龙 {{count}}
+    voidgrubs: 潮虫 {{count}}
+    heralds: 先锋 {{count}}
+    barons: 大龙 {{count}}
+    avgDragons: 场均小龙 {{count}}
+    avgDragonsLabel: 场均小龙
+    avgVoidgrubs: 场均潮虫 {{count}}
+    avgVoidgrubsLabel: 场均潮虫
+    avgHeralds: 场均先锋 {{count}}
+    avgHeraldsLabel: 场均先锋
+    avgBarons: 场均大龙 {{count}}
+    avgBaronsLabel: 场均大龙
+    firstTime: 首条 {{time}}
+    noData: 无样本
+    noDataShort: 无
+    noSideData: 该方无样本
+    noOwnStartData: 无常规开样本
+    noInvadeData: 无入侵开样本
+    noGankData: 无抓人样本
+    noLevel3GankData: 无 3 级抓样本
+    noLevel4GankData: 无 4 级抓样本
+    noCurrentChampion: 未选择英雄
+    noCurrentChampionData: 当前英雄暂无打野样本
+    minuteLegend: 位置点
+    gankLegend: 击杀参与点
+    mapSemanticHint: 图例说明
+    mapSemanticDescription: 圆点表示前 14 分钟整分钟位置样本。叉号表示 14 分钟内击杀参与位置。小地图点位可能经过抽样，精确数值以分区权重为准。
+    algorithmSummaryZoneWeight: 分区权重用于衡量前 14 分钟上 / 中 / 下半区活动强度。
+    algorithmSummaryPathing: 首清与前期抓人按当前样本范围统计，并区分蓝色方 / 红色方。
+    loadedSamples: 已加载该玩家 {{details}}，其中 {{jungle}}。
+    loadedDetailedSamples: '{{count}} 场详细对局样本'
+    loadedJungleSamples: '{{count}} 场为打野对局'
+    algorithmDetails: 算法说明
+    algorithmDetailZoneWeight: '{zoneWeight} = Σ{positionWeight} + Σ{takedownWeight}。{positionWeight}：{first14Minutes}每个整分钟按打野所在上 / 中 / 下分区 {pointOne}。{takedownWeight}：14 分钟内每次击杀参与按击杀位置分区 {pointFive}。'
+    algorithmDetailPreference: '{preferenceDecision}：中 + 下权重占比 ≥ 70% 且上权重占比 ≤ 28% 判为 {midBot}。上 + 中权重占比 ≥ 70% 且下权重占比 ≤ 28% 判为 {topMid}。{singleZone}权重占比 ≥ 40% 且领先第二高分区 ≥ 8 个百分点，判为偏上 / 偏中 / 偏下。其余判为 {balanced}。'
+    algorithmDetailFirstClear: '{firstClearDecision}：取 {oneMinutePosition} 最近的野怪营地。若该营地位于对方半区，则计为 {invadeStart}。'
+    algorithmDetailLevel3Gank: '{level3Decision}：{threeMinuteFrame}补刀数（小兵 + 野怪）为 {csRange}，等级为 {level3}，且检测到 {championDamage}。无详细伤害数据时，用 3 分钟内{takedownParticipation}替代英雄伤害条件。'
+    algorithmDetailLevel4Gank: '{level4Decision}：{fourMinuteFrame}相较 3 分钟帧检测到{championDamageIncrease}，或 3-4 分钟内存在{takedownParticipation}。无详细伤害数据时，仅使用{takedownParticipation}判定。'
+    algorithmDetailAggregation: '{aggregation}：当前标签页限定{sampleScope}（当前英雄或全部）。首清与前期抓人按{blueRedSide}分别累计。'
+    gamesUnit: 局
+    copyAll: 复制分析
+    copied: 已复制分析
+    allyJungler: 我方打野
+    enemyJungler: 敌方打野
+    top: 上
+    mid: 中
+    bot: 下
+    topShort: 上
+    midShort: 中
+    botShort: 下
+    zoneTiny:
+      top: 上
+      mid: 中
+      bot: 下
+    gamesAnalyzed: '{{count}} 场'
+  playerCard:
+    reload: 重新加载
+    empty: 无此队列对局记录
+    loadingMatchHistory: 加载中...
+    errorLoadingMatchHistory: 无法加载
+    top4Rate: 前四率
+    1stRate: 第一率
+    1st: '{{rate}}%'
+    position:
+      recentlyPlayed: 近期偏好：
+      selection: 位置选择：
+    cherryWinRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
+    winRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
+    kdaPopover: 在近期 {{count}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+    premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
+    collectByChampion: 收集「{{champion}}」的战绩
+    collectByPosition: 收集「{{position}}」的战绩
+    sameChampionHistory: 英雄战绩
+    highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{count}} 场的对局中，赢了 {{winCount}} 场
+    teamDamageShare: 伤害 {{rate}}%
+    teamDamageSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%
+    teamDamageTakenShare: 承伤 {{rate}}%
+    teamDamageTakenSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍承伤占比为 {{rate}}%
+    teamGoldShare: 经济 {{rate}}%
+    teamGoldSharePopover: 在最近的 {{count}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
+    damageGoldEfficiency: 伤转率 {{rate}}%
+    damageGoldEfficiencyPopover: 在最近的 {{count}} 场对局中，该玩家的平均伤害转化率为 {{rate}}%
+    enemyMissingPings: 问号 {{count}} 次
+    enemyMissingPingsPopover: 该玩家平均每局发送敌方消失信号 {{count}} 次
+    visionScore: 视野分 {{count}}
+    visionScorePopover: 该玩家平均每局视野得分 {{count}} 分
+    killDamageEfficiencyHigh: K 头
+    killDamageEfficiencyLow: 打工
+    killDamageEfficiencyHighPopover: 在最近的 {{count}} 场对局中，该玩家的平均击杀伤害比率为 {{rate}}%，以较少的队伍伤害换取了较多的击杀数
+    killDamageEfficiencyLowPopover: 在最近的 {{count}} 场对局中，该玩家的平均击杀伤害比率为 {{rate}}%，以较多的队伍伤害换取了较少的击杀数
+    metPopover:
+      title: 最近在 {{date}} 遇到过该玩家，共遇到过 {{count}} 次
+      titleNote: 仅显示最近 {{count}} 场对局
+      gameId: 对局 ID
+      inspectByGameId: 查看 {{gameId}}
+      date: 对局日期
+      gameStats: 对局详情
+      winResult:
+        abort: 终止
+        loss: 失败
+        remake: 重开
+        win: 胜利
+      team:
+        teammate: 友
+        opponent: 敌
+    privatePopover: 该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
+    winningStreakPopover: 截止到现在，该玩家 {{count}} 连胜，很棒
+    losingStreakPopover: 截止到现在，该玩家 {{count}} 连败
+    suspiciousFlashPosition: 闪现异位
+    suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
+    hardGank: 难抓
+    gankable: 可抓
+    easyGank: 好抓
+    veryEasyGank: 非常好抓
+    easyGankPopover: 在最近已分析的 {{count}} 场召唤师峡谷对局中，该玩家 15 分钟前被敌方打野参与击杀的场均次数为 {{times}} 次
+    soloKills: '{{times}} 单杀'
+    soloKillsPopover: 在近期 {{count}} 场游戏中，该玩家场均单杀 {{times}} 次
+    akariLoved:
+      outstanding: 优异
+      extraordinary: 通天代
+      outstandingPopover: 该玩家在近期对局中表现优异
+      extraordinaryPopover: 该玩家的水平远远超过当前段位
+    champion:
+      recentStats: 近期战绩
+      winRate: 近期 {{count}} 场，胜率为 {{winRate}}%
+    matchHistory:
+      winResult:
+        na: '-'
+        win: 胜
+        loss: 负
+        remake: 重
+        abort: 终
+    self: 自己
+    tagged: 已标记
+    taggedBySelf: 已标记
+    taggedByOther: 来自
+    premade: 小队 {{team}}
+    highWinRate: 极高胜率
+    met: 遇到过
+    private: 生涯隐藏
+    winningStreak: '{{count}} 连胜'
+    losingStreak: '{{count}} 连败'
+    unknown: 未知
+    reloadMatchHistory: 重新加载
+  teamTags:
+    winRateTeam: 胜率队
+    loseRateTeam: 败率队
+    premade: '{{size}} 黑'
+    winRate: 胜率 {{rate}}%
+    kda: KDA {{kda}}
+  panel:
+    disconnected: 未连接到客户端
+    waitingForSpectate: 等待观战延迟
+    noOngoingGame: 没有正在进行中的游戏
+    disabled: 对局页面已禁用，请在设置中重新启用此功能
+    avgTeamWinRate: 队伍平均胜率
+    avgTeamKda: 队伍平均 KDA

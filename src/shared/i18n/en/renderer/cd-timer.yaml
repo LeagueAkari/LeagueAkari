@@ -1,0 +1,9 @@
+cdTimer:
+  window:
+    countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
+    countup: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s used'
+    nativeInjectionUnsupported: Send-to-game is not supported in this environment (requires native input injection).
+    adminRequired: Send-to-game requires running as administrator.
+    gameNotForeground: Switch back to the game window (foreground) before sending.
+    alreadySending: Sending in progress. Please try again later.
+    sendFailed: 'Send failed: {{reason}}'

@@ -1,0 +1,20 @@
+ranked:
+  table:
+    queueType: Queue Type
+    tier: Tier
+    leaguePoints: LP
+    ratedRating: Rating
+    wins: Wins
+    losses: Losses
+    winRate: WR
+    previousSeasonEndTier: Previous Season Tier
+    previousSeasonHighestTier: Previous Season Highest Tier
+    highestTier: Highest Tier
+  display:
+    unranked: Unranked
+    win: W
+    lose: L
+    point: P
+    leaguePoint: LP
+    highest: Highest
+    empty: No Content

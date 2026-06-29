@@ -17,12 +17,12 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.addCondition') }}
+            {{ t('playerTabs.matchHistory.filters.addCondition') }}
           </NButton>
         </NDropdown>
 
         <span class="text-sm text-black/50 dark:text-white/50">{{
-          t('PlayerTab.filter.addFirstConditionHint')
+          t('playerTabs.matchHistory.filters.addFirstConditionHint')
         }}</span>
       </div>
 

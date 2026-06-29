@@ -3,20 +3,20 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Box20Regular /></NIcon>
-        {{ t('PlayerTab.filter.hasItem') }}
+        {{ t('playerTabs.matchHistory.filters.hasItem') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.have') }}
+        {{ t('playerTabs.matchHistory.filters.have') }}
       </div>
       <NSelect
         :options="itemOptions"
@@ -31,7 +31,7 @@
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.atPosition') }}
+        {{ t('playerTabs.matchHistory.filters.atPosition') }}
       </div>
       <NSelect
         :options="orderOptions"
@@ -90,13 +90,13 @@ const itemOptions = computed(() => {
 })
 
 const orderOptions = computed(() => [
-  { label: t('PlayerTab.filter.anyPosition'), value: -1 },
-  { label: t('PlayerTab.filter.positionN', { n: 1 }), value: 0 },
-  { label: t('PlayerTab.filter.positionN', { n: 2 }), value: 1 },
-  { label: t('PlayerTab.filter.positionN', { n: 3 }), value: 2 },
-  { label: t('PlayerTab.filter.positionN', { n: 4 }), value: 3 },
-  { label: t('PlayerTab.filter.positionN', { n: 5 }), value: 4 },
-  { label: t('PlayerTab.filter.positionN', { n: 6 }), value: 5 }
+  { label: t('playerTabs.matchHistory.filters.anyPosition'), value: -1 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 1 }), value: 0 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 2 }), value: 1 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 3 }), value: 2 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 4 }), value: 3 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 5 }), value: 4 },
+  { label: t('playerTabs.matchHistory.filters.positionN', { n: 6 }), value: 5 }
 ])
 
 const handleUpdateItemId = (value: number) => {

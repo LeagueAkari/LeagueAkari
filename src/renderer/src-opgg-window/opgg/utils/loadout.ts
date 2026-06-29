@@ -54,13 +54,13 @@ export function useLoadout() {
         spell2Id: newSpell2Id
       })
 
-      message.success(() => t('OpggView.success', { reason: t('OpggView.summonerSpells') }))
+      message.success(() => t('opgg.view.success', { reason: t('opgg.view.summonerSpells') }))
 
       if (lcs.chat.conversations.championSelect) {
         lc.api.chat
           .chatSend(
             lcs.chat.conversations.championSelect.id,
-            t('OpggView.spellsSet', {
+            t('opgg.view.spellsSet', {
               spell1: lcs.gameData.summonerSpellName(newSpell1Id),
               spell2: lcs.gameData.summonerSpellName(newSpell2Id)
             }),
@@ -70,7 +70,7 @@ export function useLoadout() {
       }
     } catch (error) {
       log.warn(componentName, '	set summoner spells failed', error)
-      message.warning(t('OpggView.setSpellsFailedMessage', { reason: (error as any).message }))
+      message.warning(t('opgg.view.setSpellsFailedMessage', { reason: (error as any).message }))
     }
   }
 
@@ -81,7 +81,7 @@ export function useLoadout() {
     }
 
     return `[OP.GG] ${lcs.gameData.championName(championId)} - ${t(
-      `OpggTabAndFilters.positions.${position}`
+      `opgg.filters.positions.${position}`
     )}`
   }
 
@@ -150,21 +150,21 @@ export function useLoadout() {
         await lc.api.perks.putCurrentPage(page1.id)
       }
 
-      message.success(() => t('OpggView.success', { reason: t('OpggView.runes') }))
+      message.success(() => t('opgg.view.success', { reason: t('opgg.view.runes') }))
 
       if (lcs.chat.conversations.championSelect) {
         lc.api.chat.chatSend(
           lcs.chat.conversations.championSelect.id,
-          t('OpggView.runesSet', {
+          t('opgg.view.runesSet', {
             name: getRunePageName(championId, position),
-            action: newRunePageAdded ? t('OpggView.create') : t('OpggView.replace')
+            action: newRunePageAdded ? t('opgg.view.create') : t('opgg.view.replace')
           }),
           'celebration'
         )
       }
     } catch (error) {
       log.warn(componentName, 'set runes failed', error)
-      message.warning(t('OpggView.setRunesFailedMessage', { reason: (error as any).message }))
+      message.warning(t('opgg.view.setRunesFailedMessage', { reason: (error as any).message }))
     }
   }
 
@@ -186,13 +186,13 @@ export function useLoadout() {
     let title = `[OP.GG] ${championName}`
 
     if (mode) {
-      const modeName = t(`OpggTabAndFilters.modes.${mode}`)
+      const modeName = t(`opgg.filters.modes.${mode}`)
       title += ` - ${modeName || mode}`
     }
 
     const hasPosition = position && position !== 'none'
     if (hasPosition) {
-      const positionName = t(`OpggTabAndFilters.positions.${position}`)
+      const positionName = t(`opgg.filters.positions.${position}`)
       title += ` - ${positionName || position}`
     }
 
@@ -207,7 +207,7 @@ export function useLoadout() {
 
     const hasPosition = position && position !== 'none'
     if (hasPosition) {
-      const positionName = t(`OpggTabAndFilters.positions.${position}`)
+      const positionName = t(`opgg.filters.positions.${position}`)
       name += ` - ${positionName || position}`
     }
 
@@ -239,7 +239,7 @@ export function useLoadout() {
       if (champion.data.starter_items && champion.data.starter_items.length) {
         champion.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
           itemGroups.push({
-            title: t('OpggChampion.starterItem', {
+            title: t('opgg.champion.starterItem', {
               index: i + 1,
               pickRate: (s.pick_rate * 100).toFixed(2)
             }),
@@ -250,7 +250,7 @@ export function useLoadout() {
 
       if (champion.data.boots && champion.data.boots.length) {
         itemGroups.push({
-          title: t('OpggChampion.bootsDesc'),
+          title: t('opgg.champion.bootsDesc'),
           items: champion.data.boots.reduce((acc: number[], cur: any) => {
             acc.push(...cur.ids)
             return acc
@@ -261,7 +261,7 @@ export function useLoadout() {
       // @ts-ignore
       if (champion.data?.prism_items && champion.data?.prism_items.length) {
         itemGroups.push({
-          title: t('OpggChampion.prismItemsDesc'),
+          title: t('opgg.champion.prismItemsDesc'),
           items: champion.data?.prism_items.reduce((acc: number[], cur: any) => {
             acc.push(...cur.ids)
             return acc
@@ -272,7 +272,7 @@ export function useLoadout() {
       if (champion.data.core_items && champion.data.core_items.length) {
         champion.data.core_items.slice(0, 4).forEach((s: any, i: number) => {
           itemGroups.push({
-            title: t('OpggChampion.coreItem', {
+            title: t('opgg.champion.coreItem', {
               index: i + 1,
               pickRate: (s.pick_rate * 100).toFixed(2)
             }),
@@ -283,7 +283,7 @@ export function useLoadout() {
 
       if (champion.data.last_items && champion.data.last_items.length) {
         itemGroups.push({
-          title: t('OpggChampion.itemsDesc'),
+          title: t('opgg.champion.itemsDesc'),
           items: champion.data.last_items.reduce((acc: number[], cur: any) => {
             acc.push(...cur.ids)
             return acc
@@ -316,13 +316,13 @@ export function useLoadout() {
         }
       ])
 
-      message.success(t('OpggChampion.writtenToDisk'))
+      message.success(t('opgg.champion.writtenToDisk'))
 
       if (lcs.chat.conversations.championSelect) {
         lc.api.chat
           .chatSend(
             lcs.chat.conversations.championSelect.id,
-            t('OpggChampion.writeToDisk', {
+            t('opgg.champion.writeToDisk', {
               name: getItemSetsChatName({
                 championId,
                 position: meta.position
@@ -336,7 +336,7 @@ export function useLoadout() {
       log.warn(componentName, 'write item sets failed', error)
 
       message.warning(
-        t('OpggChampion.writeFileFailedMessage', {
+        t('opgg.champion.writeFileFailedMessage', {
           error: (error as any).message
         })
       )

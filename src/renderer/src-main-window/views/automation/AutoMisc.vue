@@ -2,8 +2,8 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto flex max-w-200 flex-col gap-6 p-6">
-        <SettingsSection :title="t('AutoMisc.autoReply.title')">
-          <SettingsRow :label="t('AutoMisc.autoReply.enabled.label')" :label-width="260">
+        <SettingsSection :title="t('automation.misc.autoReply.title')">
+          <SettingsRow :label="t('automation.misc.autoReply.enabled.label')" :label-width="260">
             <div class="flex flex-col items-end gap-1">
               <NSwitch
                 @update:value="(v) => am.setAutoReplyEnabled(v)"
@@ -17,18 +17,18 @@
                     :checked="ams.settings.autoReplyEnableOnAway"
                     @update:checked="(value) => am.setAutoReplyEnableOnAway(value)"
                   >
-                    {{ t('AutoMisc.autoReply.enableOnAway.label') }}
+                    {{ t('automation.misc.autoReply.enableOnAway.label') }}
                   </NCheckbox>
                 </template>
                 <div class="max-w-64 text-xs">
-                  {{ t('AutoMisc.autoReply.enableOnAway.description') }}
+                  {{ t('automation.misc.autoReply.enableOnAway.description') }}
                 </div>
               </NTooltip>
             </div>
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoMisc.autoReply.text.label')"
-            :label-description="t('AutoMisc.autoReply.text.description')"
+            :label="t('automation.misc.autoReply.text.label')"
+            :label-description="t('automation.misc.autoReply.text.description')"
             :label-width="260"
             align="start"
           >
@@ -56,7 +56,7 @@
                   type="primary"
                   size="small"
                   :disabled="isSavingAutoReplyText || !isAutoReplyTextDirty"
-                  >{{ t('AutoMisc.autoReply.text.save') }}</NButton
+                  >{{ t('automation.misc.autoReply.text.save') }}</NButton
                 >
               </div>
             </div>
@@ -64,22 +64,22 @@
         </SettingsSection>
 
         <SettingsSection
-          :title="t('AutoMisc.autoInvitation.title')"
-          :footer="t('AutoMisc.autoInvitation.description')"
+          :title="t('automation.misc.autoInvitation.title')"
+          :footer="t('automation.misc.autoInvitation.description')"
         >
           <div class="p-3">
             <div
               v-if="!lcs.isConnected"
               class="flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
             >
-              <span>{{ t('AutoMisc.autoInvitation.unavailable') }}</span>
+              <span>{{ t('automation.misc.autoInvitation.unavailable') }}</span>
             </div>
 
             <div
               v-else-if="!isInLobby"
               class="flex h-24 items-center justify-center rounded-md bg-black/5 p-2 text-center text-[13px] text-black/50 dark:bg-white/5 dark:text-white/50"
             >
-              <span>{{ t('AutoMisc.autoInvitation.notInLobby') }}</span>
+              <span>{{ t('automation.misc.autoInvitation.notInLobby') }}</span>
             </div>
 
             <div v-else>
@@ -87,7 +87,7 @@
                 v-model:value="friendSearchInput"
                 clearable
                 size="small"
-                :placeholder="t('AutoMisc.autoInvitation.searchPlaceholder')"
+                :placeholder="t('automation.misc.autoInvitation.searchPlaceholder')"
                 class="mb-2 w-72!"
               >
                 <template #prefix>
@@ -131,8 +131,8 @@
                     >
                       {{
                         isScheduled(friend.puuid)
-                          ? t('AutoMisc.autoInvitation.cancelSchedule')
-                          : t('AutoMisc.autoInvitation.scheduleInvite')
+                          ? t('automation.misc.autoInvitation.cancelSchedule')
+                          : t('automation.misc.autoInvitation.scheduleInvite')
                       }}
                     </NButton>
                   </div>
@@ -140,7 +140,7 @@
                     v-if="filteredSortedFriends.length === 0"
                     class="py-8 text-center text-[13px] text-black/50 dark:text-white/50"
                   >
-                    <span>{{ t('AutoMisc.autoInvitation.noFriends') }}</span>
+                    <span>{{ t('automation.misc.autoInvitation.noFriends') }}</span>
                   </div>
                 </div>
               </NScrollbar>
@@ -202,7 +202,7 @@ const handleSaveText = async () => {
   try {
     isSavingAutoReplyText.value = true
     await am.setAutoReplyText(tempText.value)
-    message.success(() => t('AutoMisc.autoReply.updated'))
+    message.success(() => t('automation.misc.autoReply.updated'))
   } finally {
     isSavingAutoReplyText.value = false
   }

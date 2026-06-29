@@ -1,40 +1,40 @@
 <template>
   <div>
     <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-      {{ t('JunglePathing.objectives') }}
+      {{ t('ongoingGame.junglePathing.objectives') }}
     </div>
     <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
       <ObjectiveLine
         icon="dragon"
-        :label="t('JunglePathing.firstDragonRateLabel')"
+        :label="t('ongoingGame.junglePathing.firstDragonRateLabel')"
         :value="`${Math.round(stats.objectives.firstDragonRate * 100)}%`"
       />
       <ObjectiveLine
         icon="dragon"
-        :label="t('JunglePathing.soloDragonRateLabel')"
+        :label="t('ongoingGame.junglePathing.soloDragonRateLabel')"
         :value="`${Math.round(stats.objectives.soloDragonRate * 100)}%`"
       />
       <ObjectiveLine
         icon="dragon"
-        :label="t('JunglePathing.avgDragonsLabel')"
+        :label="t('ongoingGame.junglePathing.avgDragonsLabel')"
         :value="roundToTenth(stats.objectives.avgDragons).toString()"
         :time="stats.objectives.avgFirstDragonTime ?? undefined"
       />
       <ObjectiveLine
         icon="voidgrub"
-        :label="t('JunglePathing.avgVoidgrubsLabel')"
+        :label="t('ongoingGame.junglePathing.avgVoidgrubsLabel')"
         :value="roundToTenth(stats.objectives.avgVoidgrubs).toString()"
         :time="stats.objectives.avgFirstVoidgrubTime ?? undefined"
       />
       <ObjectiveLine
         icon="herald"
-        :label="t('JunglePathing.avgHeraldsLabel')"
+        :label="t('ongoingGame.junglePathing.avgHeraldsLabel')"
         :value="roundToTenth(stats.objectives.avgHeralds).toString()"
         :time="stats.objectives.avgFirstHeraldTime ?? undefined"
       />
       <ObjectiveLine
         icon="baron"
-        :label="t('JunglePathing.avgBaronsLabel')"
+        :label="t('ongoingGame.junglePathing.avgBaronsLabel')"
         :value="roundToTenth(stats.objectives.avgBarons).toString()"
         :time="stats.objectives.avgFirstBaronTime ?? undefined"
       />
@@ -84,7 +84,7 @@ const ObjectiveLine = defineComponent({
           <span class="font-semibold text-black/75 dark:text-white/75">{props.value}</span>
           {props.time != null ? (
             <span class="text-black/40 dark:text-white/40">
-              ({t('JunglePathing.firstTime', { time: formatTime(props.time) })})
+              ({t('ongoingGame.junglePathing.firstTime', { time: formatTime(props.time) })})
             </span>
           ) : null}
         </div>

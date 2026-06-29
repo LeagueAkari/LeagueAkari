@@ -1,5 +1,5 @@
 <template>
-  <SettingsSection :title="t('GameView.title')">
+  <SettingsSection :title="t('toolkit.gameView.title')">
     <!-- 年久失修，暂时用这个凑合着用 -->
     <MatchPreviewer
       v-model:show="showPreviewModal"
@@ -11,8 +11,8 @@
       @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
     <SettingsRow
-      :label="t('GameView.game.label')"
-      :label-description="t('GameView.game.description')"
+      :label="t('toolkit.gameView.game.label')"
+      :label-description="t('toolkit.gameView.game.description')"
       :label-width="260"
     >
       <div class="flex max-w-full flex-wrap items-center justify-end gap-2">
@@ -23,7 +23,7 @@
           size="small"
         />
         <NButton :disabled="!gameId" @click="handleInspect" size="small" type="primary">{{
-          t('GameView.game.button')
+          t('toolkit.gameView.game.button')
         }}</NButton>
       </div>
     </SettingsRow>

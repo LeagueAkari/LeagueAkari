@@ -49,7 +49,7 @@
             :disabled="rerollsRemaining === 0 || isRerolling"
             size="tiny"
             :title="
-              t('BenchChampionsMini.reroll', {
+              t('auxWindow.championBench.reroll', {
                 count: rerollsRemaining
               })
             "
@@ -65,7 +65,7 @@
             :disabled="rerollsRemaining === 0 || isRerolling"
             @click="() => handleReroll(true)"
             :title="
-              t('BenchChampionsMini.charity', {
+              t('auxWindow.championBench.charity', {
                 count: rerollsRemaining
               })
             "
@@ -168,43 +168,43 @@ const gameMode = computed(() => {
 const fandomBalanceTypes = computed(() => {
   return {
     'damage-dealt': {
-      name: t('BenchChampionsMini.balanceTypes.damage-dealt'),
+      name: t('auxWindow.championBench.balanceTypes.damage-dealt'),
       order: 0
     },
     'damage-taken': {
-      name: t('BenchChampionsMini.balanceTypes.damage-taken'),
+      name: t('auxWindow.championBench.balanceTypes.damage-taken'),
       order: 1
     },
     healing: {
-      name: t('BenchChampionsMini.balanceTypes.healing'),
+      name: t('auxWindow.championBench.balanceTypes.healing'),
       order: 2
     },
     shielding: {
-      name: t('BenchChampionsMini.balanceTypes.shielding'),
+      name: t('auxWindow.championBench.balanceTypes.shielding'),
       order: 3
     },
     'ability-haste': {
-      name: t('BenchChampionsMini.balanceTypes.ability-haste'),
+      name: t('auxWindow.championBench.balanceTypes.ability-haste'),
       order: 4
     },
     'mana-regen': {
-      name: t('BenchChampionsMini.balanceTypes.mana-regen'),
+      name: t('auxWindow.championBench.balanceTypes.mana-regen'),
       order: 5
     },
     'energy-regen': {
-      name: t('BenchChampionsMini.balanceTypes.energy-regen'),
+      name: t('auxWindow.championBench.balanceTypes.energy-regen'),
       order: 6
     },
     'attack-speed': {
-      name: t('BenchChampionsMini.balanceTypes.attack-speed'),
+      name: t('auxWindow.championBench.balanceTypes.attack-speed'),
       order: 7
     },
     'movement-speed': {
-      name: t('BenchChampionsMini.balanceTypes.movement-speed'),
+      name: t('auxWindow.championBench.balanceTypes.movement-speed'),
       order: 8
     },
     tenacity: {
-      name: t('BenchChampionsMini.balanceTypes.tenacity'),
+      name: t('auxWindow.championBench.balanceTypes.tenacity'),
       order: 9
     }
   }
@@ -432,7 +432,7 @@ const handleBenchSwapOrPick = async (championId: number, complete = true) => {
   } catch (error: any) {
     console.error(error)
     message.warning(
-      t('BenchChampionsMini.swapFailed', {
+      t('auxWindow.championBench.swapFailed', {
         reason: error.message
       })
     )
@@ -462,7 +462,7 @@ const handleReroll = async (grabBack = false) => {
     }
   } catch (error: any) {
     message.warning(
-      t('BenchChampionsMini.rerollFailed', {
+      t('auxWindow.championBench.rerollFailed', {
         reason: error.message
       })
     )

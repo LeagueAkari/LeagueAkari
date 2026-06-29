@@ -1,0 +1,17 @@
+gameAssets:
+  item:
+    combinePrice: 合成 {{gold}} G
+  augment:
+    bronze: 青铜阶
+    silver: 白银阶
+    eventChoice: 事件选择
+    gold: 黄金阶
+    prismatic: 棱彩阶
+    rarity: '{{rarity}}'
+  summonerSpell:
+    cooldown: 冷却时间：{{time}} 秒
+    levelRequirement: 等级需求：{{level}}
+sharedUi:
+  copyableText:
+    copy: 复制
+    copied: 已复制到剪贴板

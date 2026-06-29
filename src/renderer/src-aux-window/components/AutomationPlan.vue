@@ -2,12 +2,12 @@
   <NCard size="small" v-if="hasDelayedItems">
     <div v-if="as2.delayedPick" class="flex flex-col gap-1 not-last:mb-1">
       <div class="text-sm font-bold text-black/90 dark:text-white">
-        {{ t('AutomationPlan.autoPick.title') }}
+        {{ t('auxWindow.automationPlan.autoPick.title') }}
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-1">
           <span class="text-xs text-black/90 dark:text-white">{{
-            t('AutomationPlan.autoPick.willPick')
+            t('auxWindow.automationPlan.autoPick.willPick')
           }}</span>
           <div class="flex items-center gap-1">
             <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedPick.championId" />
@@ -25,12 +25,12 @@
 
     <div v-if="as2.delayedBan" class="flex flex-col gap-1 not-last:mb-1">
       <div class="text-sm font-bold text-black/90 dark:text-white">
-        {{ t('AutomationPlan.autoBan.title') }}
+        {{ t('auxWindow.automationPlan.autoBan.title') }}
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-1">
           <span class="text-xs text-black/90 dark:text-white">{{
-            t('AutomationPlan.autoBan.willBan')
+            t('auxWindow.automationPlan.autoBan.willBan')
           }}</span>
           <div class="flex items-center gap-1">
             <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBan.championId" />
@@ -48,12 +48,12 @@
 
     <div v-if="as2.delayedBenchSwap" class="flex flex-col gap-1 not-last:mb-1">
       <div class="text-sm font-bold text-black/90 dark:text-white">
-        {{ t('AutomationPlan.autoBenchSwap.title') }}
+        {{ t('auxWindow.automationPlan.autoBenchSwap.title') }}
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-1">
           <span class="text-xs text-black/90 dark:text-white">{{
-            t('AutomationPlan.autoBenchSwap.willSwap')
+            t('auxWindow.automationPlan.autoBenchSwap.willSwap')
           }}</span>
           <div class="flex items-center gap-1">
             <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBenchSwap.championId" />
@@ -76,12 +76,12 @@
 
     <div v-if="as2.delayedChampionSwap" class="flex flex-col gap-1 not-last:mb-1">
       <div class="text-sm font-bold text-black/90 dark:text-white">
-        {{ t('AutomationPlan.autoChampionSwap.title') }}
+        {{ t('auxWindow.automationPlan.autoChampionSwap.title') }}
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-1">
           <span class="text-xs text-black/90 dark:text-white">{{
-            t('AutomationPlan.autoChampionSwap.willAccept')
+            t('auxWindow.automationPlan.autoChampionSwap.willAccept')
           }}</span>
           <div class="flex items-center gap-1">
             <ChampionIcon

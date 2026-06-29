@@ -1,13 +1,13 @@
 <template>
-  <SettingsSection :title="t('LobbyTool.title')">
+  <SettingsSection :title="t('toolkit.lobby.title')">
     <SettingsRow
-      :label="t('LobbyTool.createIdLobby.label')"
-      :label-description="t('LobbyTool.createIdLobby.description')"
+      :label="t('toolkit.lobby.createIdLobby.label')"
+      :label-description="t('toolkit.lobby.createIdLobby.description')"
       :label-width="260"
     >
       <div class="flex max-w-full items-center gap-2">
         <NSelect
-          :placeholder="t('LobbyTool.createIdLobby.selectPlaceholder')"
+          :placeholder="t('toolkit.lobby.createIdLobby.selectPlaceholder')"
           class="w-45!"
           @update:show="handleLoadEligibleQueues"
           size="small"
@@ -25,7 +25,7 @@
           "
           @click="handleCreateQueueLobby"
           size="small"
-          >{{ t('LobbyTool.createIdLobby.button') }}</NButton
+          >{{ t('toolkit.lobby.createIdLobby.button') }}</NButton
         >
       </div>
     </SettingsRow>
@@ -63,9 +63,9 @@ const handleLoadEligibleQueues = async (show: boolean) => {
       eligibleSelfQueues.value = d2
     } catch (error) {
       notification.warning({
-        title: () => t('LobbyTool.loadEligibleQueuesFailedNotification.title'),
+        title: () => t('toolkit.lobby.loadEligibleQueuesFailedNotification.title'),
         content: () =>
-          t('LobbyTool.loadEligibleQueuesFailedNotification.description', {
+          t('toolkit.lobby.loadEligibleQueuesFailedNotification.description', {
             reason: (error as Error).message
           })
       })
@@ -97,7 +97,7 @@ const queueOptions = computed(() => {
   if (availableQueues.length > 0) {
     options.push({
       key: 'akari',
-      label: t('LobbyTool.queueOptions.available'),
+      label: t('toolkit.lobby.queueOptions.available'),
       type: 'group',
       children: availableQueues.map((k) => ({
         value: k,
@@ -109,7 +109,7 @@ const queueOptions = computed(() => {
   if (unavailableQueues.length > 0) {
     options.push({
       key: 'kyoko',
-      label: t('LobbyTool.queueOptions.unavailable'),
+      label: t('toolkit.lobby.queueOptions.unavailable'),
       type: 'group',
       children: unavailableQueues.map((k) => ({
         value: k,
@@ -134,9 +134,9 @@ const handleCreateQueueLobby = async () => {
     await lc.api.lobby.createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
     notification.warning({
-      title: () => t('LobbyTool.createIdLobby.failedNotification.title'),
+      title: () => t('toolkit.lobby.createIdLobby.failedNotification.title'),
       content: () =>
-        t('LobbyTool.createIdLobby.failedNotification.description', {
+        t('toolkit.lobby.createIdLobby.failedNotification.description', {
           reason: (error as Error).message
         })
     })

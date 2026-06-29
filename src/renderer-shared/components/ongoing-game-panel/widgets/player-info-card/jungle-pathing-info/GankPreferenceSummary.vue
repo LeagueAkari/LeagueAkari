@@ -37,7 +37,7 @@
               <circle cx="4" cy="4" r="2" fill="currentColor" />
             </svg>
           </span>
-          {{ t('JunglePathing.minuteLegend') }}
+          {{ t('ongoingGame.junglePathing.minuteLegend') }}
         </span>
         <span class="inline-flex items-center gap-1 whitespace-nowrap">
           <span class="grid w-7.5 grid-cols-3 place-items-center">
@@ -52,7 +52,7 @@
               />
             </span>
           </span>
-          {{ t('JunglePathing.gankLegend') }}
+          {{ t('ongoingGame.junglePathing.gankLegend') }}
         </span>
         <NPopover :delay="50" :keep-alive-on-hover="false" :show-arrow="false">
           <template #trigger>
@@ -62,12 +62,12 @@
               <span class="rounded border border-current/25 px-1 leading-3" aria-hidden="true"
                 >?</span
               >
-              {{ t('JunglePathing.mapSemanticHint') }}
+              {{ t('ongoingGame.junglePathing.mapSemanticHint') }}
             </span>
           </template>
 
           <div class="max-w-64 text-xs leading-relaxed text-black/65 dark:text-white/65">
-            {{ t('JunglePathing.mapSemanticDescription') }}
+            {{ t('ongoingGame.junglePathing.mapSemanticDescription') }}
           </div>
         </NPopover>
       </div>

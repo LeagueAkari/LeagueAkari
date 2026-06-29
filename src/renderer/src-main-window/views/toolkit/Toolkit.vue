@@ -1,7 +1,7 @@
 <template>
   <TabbedPage
     :icon="ToolFilled"
-    :title="t('Toolkit.title')"
+    :title="t('toolkit.home.title')"
     :tabs="tabs"
     route-name="toolkit"
     default-tab="client"
@@ -31,37 +31,37 @@ const { t } = useTranslation()
 const tabs = computed<TabConfig[]>(() => [
   {
     key: 'client',
-    name: t('Toolkit.client'),
+    name: t('toolkit.home.client'),
     icon: Apps24Filled,
     component: Client
   },
   {
     key: 'in-game-send',
-    name: t('Toolkit.in-game-send'),
+    name: t('toolkit.home.in-game-send'),
     icon: Chat,
     component: InGameSend
   },
   {
     key: 'in-process',
-    name: t('Toolkit.in-process'),
+    name: t('toolkit.home.in-process'),
     icon: Play24Filled,
     component: InProcess
   },
   {
     key: 'lobby',
-    name: t('Toolkit.lobby'),
+    name: t('toolkit.home.lobby'),
     icon: MessageFilled,
     component: Lobby
   },
   {
     key: 'misc',
-    name: t('Toolkit.misc'),
+    name: t('toolkit.home.misc'),
     icon: SettingFilled,
     component: Misc
   },
   {
     key: 'claim-tools',
-    name: t('Toolkit.claim-tools'),
+    name: t('toolkit.home.claim-tools'),
     icon: GiftFilled,
     component: ClaimTools
   },
@@ -69,7 +69,7 @@ const tabs = computed<TabConfig[]>(() => [
     ? [
         {
           key: 'loot-tools',
-          name: t('Toolkit.loot-tools'),
+          name: t('toolkit.home.loot-tools'),
           icon: Box,
           component: LootTools
         }
@@ -77,7 +77,7 @@ const tabs = computed<TabConfig[]>(() => [
     : []),
   {
     key: 'friend-tools',
-    name: t('Toolkit.friend-tools'),
+    name: t('toolkit.home.friend-tools'),
     icon: UserMultiple,
     component: FriendTools
   }

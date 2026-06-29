@@ -6,17 +6,17 @@
       <div class="flex min-w-0 items-center gap-3">
         <div class="flex min-w-0 items-center gap-2 text-base font-bold">
           <NIcon class="shrink-0 text-base"><Filter20Regular /></NIcon>
-          <span class="truncate">{{ t('PlayerTab.filter.title') }}</span>
+          <span class="truncate">{{ t('playerTabs.matchHistory.filters.title') }}</span>
         </div>
       </div>
 
       <div class="ml-auto flex shrink-0 items-center gap-3">
         <NRadioGroup v-model:value="activeMode" size="small" :disabled="!!collectState">
           <NRadioButton value="simple">
-            {{ t('PlayerTab.filter.simpleTab') }}
+            {{ t('playerTabs.matchHistory.filters.simpleTab') }}
           </NRadioButton>
           <NRadioButton value="advanced">
-            {{ t('PlayerTab.filter.advancedTab') }}
+            {{ t('playerTabs.matchHistory.filters.advancedTab') }}
           </NRadioButton>
         </NRadioGroup>
 
@@ -32,7 +32,7 @@
           <template #icon>
             <NIcon size="14"><RefreshFilled /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.resetAll') }}
+          {{ t('playerTabs.matchHistory.filters.resetAll') }}
         </NButton>
 
         <NTooltip>
@@ -45,7 +45,7 @@
                 @click="handleOpenCollectModeSettingsModal"
               >
                 <span class="inline-flex items-center gap-1">
-                  <span>{{ t('PlayerTab.collectMode.openSettings') }}</span>
+                  <span>{{ t('playerTabs.matchHistory.collectMode.openSettings') }}</span>
                   <NIcon size="13" class="opacity-70"><Info16Regular /></NIcon>
                 </span>
               </NButton>
@@ -53,9 +53,9 @@
           </template>
           <div class="max-w-60 space-y-2">
             <div>
-              {{ t('PlayerTab.collectMode.tooltipDescription') }}
+              {{ t('playerTabs.matchHistory.collectMode.tooltipDescription') }}
             </div>
-            <div>{{ t('PlayerTab.collectMode.tooltipUseCase') }}</div>
+            <div>{{ t('playerTabs.matchHistory.collectMode.tooltipUseCase') }}</div>
           </div>
         </NTooltip>
       </div>
@@ -71,14 +71,16 @@
         class="rounded-lg border border-solid border-white/10 bg-neutral-100 p-3 dark:bg-neutral-900"
       >
         <div class="mb-3 text-base font-bold text-black dark:text-white">
-          {{ t('PlayerTab.collectMode.settingsTitle') }}
+          {{ t('playerTabs.matchHistory.collectMode.settingsTitle') }}
         </div>
 
         <div class="mb-3">
           <SettingsSection>
             <SettingsRow
-              :label="t('PlayerTab.collectMode.countPerIterationLabel')"
-              :label-description="t('PlayerTab.collectMode.countPerIterationDescription')"
+              :label="t('playerTabs.matchHistory.collectMode.countPerIterationLabel')"
+              :label-description="
+                t('playerTabs.matchHistory.collectMode.countPerIterationDescription')
+              "
               :label-width="400"
             >
               <NInputNumber
@@ -91,8 +93,8 @@
               />
             </SettingsRow>
             <SettingsRow
-              :label="t('PlayerTab.collectMode.expectedCountLabel')"
-              :label-description="t('PlayerTab.collectMode.expectedCountDescription')"
+              :label="t('playerTabs.matchHistory.collectMode.expectedCountLabel')"
+              :label-description="t('playerTabs.matchHistory.collectMode.expectedCountDescription')"
               :label-width="400"
             >
               <NInputNumber
@@ -105,8 +107,8 @@
               />
             </SettingsRow>
             <SettingsRow
-              :label="t('PlayerTab.collectMode.maxIterationLabel')"
-              :label-description="t('PlayerTab.collectMode.maxIterationDescription')"
+              :label="t('playerTabs.matchHistory.collectMode.maxIterationLabel')"
+              :label-description="t('playerTabs.matchHistory.collectMode.maxIterationDescription')"
               :label-width="400"
             >
               <NInputNumber
@@ -123,7 +125,7 @@
 
         <div class="flex justify-end gap-2">
           <NButton size="small" tertiary @click="handleCloseCollectModeSettingsModal">
-            {{ t('PlayerTab.collectMode.cancel') }}
+            {{ t('playerTabs.matchHistory.collectMode.cancel') }}
           </NButton>
           <NButton
             type="primary"
@@ -131,7 +133,7 @@
             :disabled="isLoading || !!collectState"
             @click="handleCollect"
           >
-            {{ t('PlayerTab.collectMode.startCollect') }}
+            {{ t('playerTabs.matchHistory.collectMode.startCollect') }}
           </NButton>
         </div>
       </div>

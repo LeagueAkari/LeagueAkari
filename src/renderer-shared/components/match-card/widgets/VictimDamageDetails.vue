@@ -16,7 +16,7 @@
           />
 
           <span class="text-sm font-bold text-black dark:text-white">{{
-            $t(`MatchCard.eventsTab.victimDamageDetails.${group.type}`)
+            $t(`matchCard.eventsTab.victimDamageDetails.${group.type}`)
           }}</span>
         </div>
 
@@ -63,7 +63,7 @@
         <div v-if="item.type === 'champion'" class="relative shrink-0">
           <template v-if="group.type === 'received'">
             <ChampionIcon
-              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
               class="size-8 rounded-full border-2 border-solid"
               :style="{
                 borderColor: getTeamColor(participantMap[item.participantId]?.teamIdentifier)
@@ -75,7 +75,7 @@
           <!-- 对 dealt 使用更加直观的方式 -->
           <template v-else>
             <ChampionIcon
-              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
               class="size-8 rounded-full border-2 border-solid"
               :style="{
                 borderColor: getTeamColor(participantMap[event.victimId]?.teamIdentifier)
@@ -84,7 +84,7 @@
             />
 
             <ChampionIcon
-              :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+              :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
               class="absolute right-0 bottom-0 size-1/2 translate-x-1/4 translate-y-1/4 rounded-full border-2 border-solid"
               :style="{
                 borderColor: getTeamColor(participantMap[item.participantId]?.teamIdentifier)
@@ -95,7 +95,7 @@
         </div>
 
         <ChampionIcon
-          :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
+          :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.${item.type}`)"
           v-else-if="item.type === 'minion' || item.type === 'other'"
           class="size-8 rounded-full border-2 border-solid"
           :style="{
@@ -107,7 +107,7 @@
         <!-- tower -->
         <div
           v-if="item.type === 'tower'"
-          :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.tower`)"
+          :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.tower`)"
         >
           <TowerIcon
             class="size-6 rounded-full border-solid border-black/40 p-1 dark:border-white/40"
@@ -117,7 +117,7 @@
         <!-- monster -->
         <div
           v-if="item.type === 'monster'"
-          :title="$t(`MatchCard.eventsTab.victimDamageDetails.damageDealerNames.monster`)"
+          :title="$t(`matchCard.eventsTab.victimDamageDetails.damageDealerNames.monster`)"
         >
           <NIcon
             v-if="item.name === CHERRY_SHOPKEEPER_NAME"

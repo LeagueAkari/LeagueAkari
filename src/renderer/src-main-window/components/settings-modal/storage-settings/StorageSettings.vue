@@ -13,13 +13,13 @@
     }"
   >
     <NTabPane
-      :tab="t('StorageSettings.tabs.tagged-players')"
+      :tab="t('settings.storage.tabs.tagged-players')"
       name="tagged-players"
       display-directive="show"
     >
       <TaggedPlayers />
     </NTabPane>
-    <NTabPane :tab="t('StorageSettings.tabs.settings')" name="settings" display-directive="show">
+    <NTabPane :tab="t('settings.storage.tabs.settings')" name="settings" display-directive="show">
       <SavedSettings />
     </NTabPane>
   </NTabs>

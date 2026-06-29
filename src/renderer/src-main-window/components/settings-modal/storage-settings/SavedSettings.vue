@@ -1,22 +1,22 @@
 <template>
   <NScrollbar class="h-full">
-    <SettingsSection :title="t('SavedSettings.title')">
+    <SettingsSection :title="t('settings.savedSettings.title')">
       <SettingsRow
-        :label="t('SavedSettings.export.label')"
-        :label-description="t('SavedSettings.export.description')"
+        :label="t('settings.savedSettings.export.label')"
+        :label-description="t('settings.savedSettings.export.description')"
         :label-width="400"
       >
         <NButton type="primary" secondary size="small" @click="handleExportSettings">
-          {{ t('SavedSettings.export.button') }}
+          {{ t('settings.savedSettings.export.button') }}
         </NButton>
       </SettingsRow>
       <SettingsRow
-        :label="t('SavedSettings.import.label')"
-        :label-description="t('SavedSettings.import.description')"
+        :label="t('settings.savedSettings.import.label')"
+        :label-description="t('settings.savedSettings.import.description')"
         :label-width="400"
       >
         <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
-          t('SavedSettings.import.button')
+          t('settings.savedSettings.import.button')
         }}</NButton>
       </SettingsRow>
     </SettingsSection>
@@ -42,20 +42,20 @@ const handleExportSettings = async () => {
     const exportPath = await s.exportSettingsToJsonFile()
 
     if (exportPath) {
-      message.success(() => t('SavedSettings.exported', { path: exportPath }))
+      message.success(() => t('settings.savedSettings.exported', { path: exportPath }))
     }
   } catch (error: any) {
-    message.error(() => t('SavedSettings.errorExport', { reason: error.message }))
+    message.error(() => t('settings.savedSettings.errorExport', { reason: error.message }))
   }
 }
 
 // TODO I18N
 const handleImportSettings = async () => {
   dialog.warning({
-    title: () => t('SavedSettings.import.label'),
-    content: () => t('SavedSettings.import.dialogWarning'),
-    positiveText: t('SavedSettings.import.dialogPositiveText'),
-    negativeText: t('SavedSettings.import.dialogNegativeText'),
+    title: () => t('settings.savedSettings.import.label'),
+    content: () => t('settings.savedSettings.import.dialogWarning'),
+    positiveText: t('settings.savedSettings.import.dialogPositiveText'),
+    negativeText: t('settings.savedSettings.import.dialogNegativeText'),
     onPositiveClick: async () => {
       try {
         await s.importSettingsFromJsonFile()
@@ -64,19 +64,21 @@ const handleImportSettings = async () => {
           switch (error.code) {
             case 'InvalidSettingsFile':
             case 'InvalidSettingsData':
-              message.error(() => t('SavedSettings.errorCode.InvalidSettingsFile'))
+              message.error(() => t('settings.savedSettings.errorCode.InvalidSettingsFile'))
               break
             case 'InvalidDatabaseVersion':
-              message.error(() => t('SavedSettings.errorCode.InvalidDatabaseVersion'))
+              message.error(() => t('settings.savedSettings.errorCode.InvalidDatabaseVersion'))
               break
             default:
               message.error(() =>
-                t('SavedSettings.errorCode.importDefault', { reason: error.message })
+                t('settings.savedSettings.errorCode.importDefault', { reason: error.message })
               )
               break
           }
         } else {
-          message.error(() => t('SavedSettings.errorCode.importDefault', { reason: error.message }))
+          message.error(() =>
+            t('settings.savedSettings.errorCode.importDefault', { reason: error.message })
+          )
         }
       }
     }

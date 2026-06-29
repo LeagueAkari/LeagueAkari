@@ -1,0 +1,25 @@
+leagueClient:
+  connection:
+    noClientGroup: 无可用客户端
+    noClient: 当前无可用客户端，请启动游戏
+    connectedGroup: 已连接
+    launchedClientsGroup: 已启动的客户端
+    launchedOtherClientsGroup: 其他已启动的客户端
+    noData: 暂无数据
+    connecting: 连接中...
+    restartUx: 重启 UX
+    killUx: 结束 UX
+    launchUx: 启动 UX
+    quitClient: 退出客户端进程
+    disconnect: 断开
+    more: 更多
+    playAgain: 回到房间
+  tasks:
+    initialization-task:
+      name: LCU 初始化
+      current: 已完成  {{finishedCount}}/{{allCount}}
+    connection-task:
+      name: 连接到 LCU
+      target: 尝试连接到 {{target}}...
+selfHostedLcuData:
+  reloadFriendsFailed: 加载好友列表失败

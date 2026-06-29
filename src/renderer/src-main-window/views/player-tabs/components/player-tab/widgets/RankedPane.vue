@@ -6,8 +6,8 @@
       class="relative flex h-27 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-400"
       :class="isSmallSize ? 'w-30' : 'w-60'"
     >
-      <div>{{ t('RankedPane.crossRegion', 'Cross Region') }}</div>
-      <div>{{ t('RankedPane.unavailable', 'Unavailable') }}</div>
+      <div>{{ t('playerTabs.ranked.crossRegion', 'Cross Region') }}</div>
+      <div>{{ t('playerTabs.ranked.unavailable', 'Unavailable') }}</div>
     </div>
 
     <!-- Ranked Cards -->
@@ -55,7 +55,7 @@
                   !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
               }"
             >
-              <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
+              <span class="mr-0.5">{{ t('playerTabs.ranked.highest') }}</span>
               <div class="flex items-center">
                 <img
                   v-if="
@@ -78,7 +78,7 @@
       >
         <NButton
           :focusable="false"
-          :title="t('PlayerTab.rankedMore', '更多排位信息')"
+          :title="t('playerTabs.profile.rankedMore', '更多排位信息')"
           size="small"
           secondary
           @click="isShowingRankedModal = true"
@@ -136,7 +136,7 @@
                     !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
                 }"
               >
-                <span class="mr-0.5">{{ t('RankedPane.highest') }}</span>
+                <span class="mr-0.5">{{ t('playerTabs.ranked.highest') }}</span>
                 <div class="flex items-center">
                   <img
                     v-if="
@@ -266,9 +266,9 @@ const getPreviousHighestTier = (entry: Partial<RankedEntry>) => {
 
 const formatEntryRecord = (entry: Partial<RankedEntry>) => {
   if (isRankedEntry(entry)) {
-    const losses = entry.losses ? ` ${entry.losses} ${t('RankedPane.lose')}` : ''
+    const losses = entry.losses ? ` ${entry.losses} ${t('playerTabs.ranked.lose')}` : ''
 
-    return `${entry.wins} ${t('RankedPane.win')}${losses} ${entry.leaguePoints} LP`
+    return `${entry.wins} ${t('playerTabs.ranked.win')}${losses} ${entry.leaguePoints} LP`
   }
 
   return '—'
@@ -280,7 +280,7 @@ const formatTier = (entry: Partial<RankedEntry>) => {
   const rawTier = entry.tier
 
   if (isUnrankedTier(rawTier)) {
-    return t('RankedPane.unranked', 'unranked')
+    return t('playerTabs.ranked.unranked', 'unranked')
   }
 
   const tier = t(`tiers.${rawTier}`, {
@@ -301,7 +301,7 @@ const formatPreviousTier = (entry: Partial<RankedEntry>) => {
   if (!entry) return ''
 
   if (isUnrankedTier(entry.previousSeasonHighestTier)) {
-    return t('RankedPane.unranked', 'unranked')
+    return t('playerTabs.ranked.unranked', 'unranked')
   }
 
   const tier = t(`tiers.${entry.previousSeasonHighestTier}`, {

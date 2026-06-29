@@ -17,14 +17,14 @@
       <div class="name">{{ lcs.gameData.summonerSpells[spellId].name }}</div>
       <div class="cooldown">
         {{
-          t('SummonerSpellDisplay.cooldown', {
+          t('gameAssets.summonerSpell.cooldown', {
             time: lcs.gameData.summonerSpells[spellId].cooldown
           })
         }}
       </div>
       <div class="level">
         {{
-          t('SummonerSpellDisplay.levelRequirement', {
+          t('gameAssets.summonerSpell.levelRequirement', {
             level: lcs.gameData.summonerSpells[spellId].summonerLevel
           })
         }}

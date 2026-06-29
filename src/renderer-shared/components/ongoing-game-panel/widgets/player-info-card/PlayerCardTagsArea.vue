@@ -1,7 +1,7 @@
 <template>
   <div class="tags">
     <div class="tag self" v-if="isSelf && ogs.settings.playerCardTags.showSelfTag">
-      {{ t('PlayerInfoCard.self') }}
+      {{ t('ongoingGame.playerCard.self') }}
     </div>
 
     <NPopover
@@ -13,15 +13,17 @@
       scrollable
     >
       <template #trigger>
-        <div class="tag tagged">{{ t('PlayerInfoCard.tagged') }}</div>
+        <div class="tag tagged">{{ t('ongoingGame.playerCard.tagged') }}</div>
       </template>
       <div class="tagged-text-list">
         <div class="tagged-item" v-for="tag in sortedTags" :key="tag.selfPuuid">
           <div class="tag-source" v-if="tag.markedBySelf">
-            {{ t('PlayerInfoCard.taggedBySelf') }}
+            {{ t('ongoingGame.playerCard.taggedBySelf') }}
           </div>
           <div class="tag-source" v-else>
-            <span class="tagged-by-other-text">{{ t('PlayerInfoCard.taggedByOther') }}</span>
+            <span class="tagged-by-other-text">{{
+              t('ongoingGame.playerCard.taggedByOther')
+            }}</span>
             <span
               v-if="ogs.summoner[tag.selfPuuid]"
               class="tagged-by-other-name"
@@ -30,7 +32,7 @@
               {{ riotId(ogs.summoner[tag.selfPuuid]) }}
             </span>
             <span v-else class="tagged-by-other-name unknown">
-              {{ t('PlayerInfoCard.unknown') }}
+              {{ t('ongoingGame.playerCard.unknown') }}
             </span>
           </div>
           <div class="tagged-text">
@@ -56,14 +58,14 @@
           }"
         >
           {{
-            t('PlayerInfoCard.premade', {
+            t('ongoingGame.playerCard.premade', {
               team: premadeTeamId
             })
           }}
         </div>
       </template>
       <div class="popover-text">
-        {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
+        {{ t('ongoingGame.playerCard.premadePopover', { team: premadeTeamId }) }}
       </div>
     </NPopover>
 
@@ -78,11 +80,11 @@
       "
     >
       <template #trigger>
-        <div class="tag win-rate-team">{{ t('PlayerInfoCard.highWinRate') }}</div>
+        <div class="tag win-rate-team">{{ t('ongoingGame.playerCard.highWinRate') }}</div>
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.highWinRatePopover', {
+          t('ongoingGame.playerCard.highWinRatePopover', {
             count: analysis.winLoss.all.count,
             winCount: analysis.winLoss.all.wins
           })
@@ -97,12 +99,12 @@
       style="max-height: 240px"
     >
       <template #trigger>
-        <div class="tag have-met">{{ t('PlayerInfoCard.met') }}</div>
+        <div class="tag have-met">{{ t('ongoingGame.playerCard.met') }}</div>
       </template>
       <div class="w-min max-w-none text-xs">
         <div class="mb-1 text-gray-900 dark:text-gray-100">
           {{
-            t('PlayerInfoCard.metPopover.title', {
+            t('ongoingGame.playerCard.metPopover.title', {
               date: dayjs(savedInfo.lastMetAt)
                 .locale(as.settings.locale.toLowerCase())
                 .format('YYYY-MM-DD HH:mm:ss'),
@@ -111,7 +113,7 @@
           }}
           <br />
           {{
-            t('PlayerInfoCard.metPopover.titleNote', {
+            t('ongoingGame.playerCard.metPopover.titleNote', {
               count: savedInfo.encounteredGames.data.length
             })
           }}
@@ -129,17 +131,17 @@
               <th
                 class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
               >
-                {{ t('PlayerInfoCard.metPopover.gameId') }}
+                {{ t('ongoingGame.playerCard.metPopover.gameId') }}
               </th>
               <th
                 class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
               >
-                {{ t('PlayerInfoCard.metPopover.date') }}
+                {{ t('ongoingGame.playerCard.metPopover.date') }}
               </th>
               <th
                 class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
               >
-                {{ t('PlayerInfoCard.metPopover.gameStats') }}
+                {{ t('ongoingGame.playerCard.metPopover.gameStats') }}
               </th>
             </tr>
           </thead>
@@ -153,7 +155,7 @@
                   class="inline-block rounded bg-black/10 px-1 py-0.5 text-xs leading-3 whitespace-nowrap text-black dark:bg-white/12 dark:text-gray-100"
                 >
                   {{
-                    t('PlayerInfoCard.metPopover.inspectByGameId', {
+                    t('ongoingGame.playerCard.metPopover.inspectByGameId', {
                       gameId: masked(
                         item.gameId.toString(),
                         (index + 1).toString().padStart(6, '●')
@@ -185,7 +187,11 @@
                           item.gameStats.selfWinResult === 'remake'
                       }"
                     >
-                      {{ t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`) }}
+                      {{
+                        t(
+                          `ongoingGame.playerCard.metPopover.winResult.${item.gameStats.selfWinResult}`
+                        )
+                      }}
                     </span>
                     <span
                       v-if="item.gameStats.myPlacement"
@@ -210,8 +216,8 @@
                     >
                       {{
                         item.gameStats.isSameTeam
-                          ? t(`PlayerInfoCard.metPopover.team.teammate`)
-                          : t(`PlayerInfoCard.metPopover.team.opponent`)
+                          ? t(`ongoingGame.playerCard.metPopover.team.teammate`)
+                          : t(`ongoingGame.playerCard.metPopover.team.opponent`)
                       }}
                     </span>
                     <PositionIcon
@@ -284,10 +290,10 @@
       :delay="50"
     >
       <template #trigger>
-        <div class="tag privacy-private">{{ t('PlayerInfoCard.private') }}</div>
+        <div class="tag privacy-private">{{ t('ongoingGame.playerCard.private') }}</div>
       </template>
       <div class="popover-text">
-        {{ t('PlayerInfoCard.privatePopover') }}
+        {{ t('ongoingGame.playerCard.privatePopover') }}
       </div>
     </NPopover>
 
@@ -303,7 +309,7 @@
       <template #trigger>
         <div class="tag winning-streak">
           {{
-            t('PlayerInfoCard.winningStreak', {
+            t('ongoingGame.playerCard.winningStreak', {
               count: analysis.winLoss.all.winningStreak
             })
           }}
@@ -311,7 +317,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.winningStreakPopover', {
+          t('ongoingGame.playerCard.winningStreakPopover', {
             count: analysis.winLoss.all.winningStreak
           })
         }}
@@ -330,7 +336,7 @@
       <template #trigger>
         <div class="tag losing-streak">
           {{
-            t('PlayerInfoCard.losingStreak', {
+            t('ongoingGame.playerCard.losingStreak', {
               count: analysis.winLoss.all.losingStreak
             })
           }}
@@ -338,7 +344,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.losingStreakPopover', {
+          t('ongoingGame.playerCard.losingStreakPopover', {
             count: analysis.winLoss.all.losingStreak
           })
         }}
@@ -356,17 +362,17 @@
     >
       <template #trigger>
         <div class="tag akari-loved" v-if="analysis.akariScore.extraordinary">
-          {{ t('PlayerInfoCard.akariLoved.extraordinary') }}
+          {{ t('ongoingGame.playerCard.akariLoved.extraordinary') }}
         </div>
         <div class="tag akari-loved" v-else-if="analysis.akariScore.outstanding">
-          {{ t('PlayerInfoCard.akariLoved.outstanding') }}
+          {{ t('ongoingGame.playerCard.akariLoved.outstanding') }}
         </div>
       </template>
       <div class="popover-text" v-if="analysis.akariScore.extraordinary">
-        {{ t('PlayerInfoCard.akariLoved.extraordinaryPopover') }}
+        {{ t('ongoingGame.playerCard.akariLoved.extraordinaryPopover') }}
       </div>
       <div class="popover-text" v-else-if="analysis.akariScore.outstanding">
-        {{ t('PlayerInfoCard.akariLoved.outstandingPopover') }}
+        {{ t('ongoingGame.playerCard.akariLoved.outstandingPopover') }}
       </div>
     </NPopover>
 
@@ -381,12 +387,12 @@
     >
       <template #trigger>
         <div class="tag sus-flash">
-          {{ t('PlayerInfoCard.suspiciousFlashPosition') }}
+          {{ t('ongoingGame.playerCard.suspiciousFlashPosition') }}
         </div>
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.suspiciousFlashPositionPopover', {
+          t('ongoingGame.playerCard.suspiciousFlashPositionPopover', {
             dCount: isSuspiciousFlashPosition.flashOnD,
             fCount: isSuspiciousFlashPosition.flashOnF
           })
@@ -400,7 +406,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.easyGankPopover', {
+          t('ongoingGame.playerCard.easyGankPopover', {
             times: easyGankTag.times.toFixed(2),
             count: easyGankTag.count
           })
@@ -416,7 +422,7 @@
       <template #trigger>
         <div class="tag too-many-solo-kills">
           {{
-            t('PlayerInfoCard.soloKills', {
+            t('ongoingGame.playerCard.soloKills', {
               times: analysis.summary.avgSoloKills.toFixed(1)
             })
           }}
@@ -424,7 +430,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.soloKillsPopover', {
+          t('ongoingGame.playerCard.soloKillsPopover', {
             times: analysis.summary.avgSoloKills.toFixed(2),
             count: analysis.count
           })
@@ -440,7 +446,7 @@
       <template #trigger>
         <div class="tag team-damage-share">
           {{
-            t('PlayerInfoCard.teamDamageShare', {
+            t('ongoingGame.playerCard.teamDamageShare', {
               rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(0)
             })
           }}
@@ -448,7 +454,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.teamDamageSharePopover', {
+          t('ongoingGame.playerCard.teamDamageSharePopover', {
             rate: (analysis.summary.avgChampionDamagePercentageOfTeam * 100).toFixed(2),
             count: analysis.count
           })
@@ -464,7 +470,7 @@
       <template #trigger>
         <div class="tag team-damage-taken-share">
           {{
-            t('PlayerInfoCard.teamDamageTakenShare', {
+            t('ongoingGame.playerCard.teamDamageTakenShare', {
               rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(0)
             })
           }}
@@ -472,7 +478,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.teamDamageTakenSharePopover', {
+          t('ongoingGame.playerCard.teamDamageTakenSharePopover', {
             rate: (analysis.summary.avgDamageTakenPercentageOfTeam * 100).toFixed(2),
             count: analysis.count
           })
@@ -488,7 +494,7 @@
       <template #trigger>
         <div class="tag team-gold-share">
           {{
-            t('PlayerInfoCard.teamGoldShare', {
+            t('ongoingGame.playerCard.teamGoldShare', {
               rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(0)
             })
           }}
@@ -496,7 +502,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.teamGoldSharePopover', {
+          t('ongoingGame.playerCard.teamGoldSharePopover', {
             rate: (analysis.summary.avgGoldPercentageOfTeam * 100).toFixed(2),
             count: analysis.count
           })
@@ -512,7 +518,7 @@
       <template #trigger>
         <div class="tag damage-gold-efficiency">
           {{
-            t('PlayerInfoCard.damageGoldEfficiency', {
+            t('ongoingGame.playerCard.damageGoldEfficiency', {
               rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(0)
             })
           }}
@@ -520,7 +526,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.damageGoldEfficiencyPopover', {
+          t('ongoingGame.playerCard.damageGoldEfficiencyPopover', {
             rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(2),
             count: analysis.count
           })
@@ -540,7 +546,7 @@
       <template #trigger>
         <div class="tag enemy-missing-pings">
           {{
-            t('PlayerInfoCard.enemyMissingPings', {
+            t('ongoingGame.playerCard.enemyMissingPings', {
               count: truncateTailingZeros(analysis.summary.avgEnemyMissingPings)
             })
           }}
@@ -548,7 +554,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.enemyMissingPingsPopover', {
+          t('ongoingGame.playerCard.enemyMissingPingsPopover', {
             count: analysis.summary.avgEnemyMissingPings.toFixed(3)
           })
         }}
@@ -563,7 +569,7 @@
       <template #trigger>
         <div class="tag vision-score">
           {{
-            t('PlayerInfoCard.visionScore', {
+            t('ongoingGame.playerCard.visionScore', {
               count: truncateTailingZeros(analysis.summary.avgVisionScore)
             })
           }}
@@ -571,7 +577,7 @@
       </template>
       <div class="popover-text">
         {{
-          t('PlayerInfoCard.visionScorePopover', {
+          t('ongoingGame.playerCard.visionScorePopover', {
             count: analysis.summary.avgVisionScore.toFixed(3)
           })
         }}
@@ -591,22 +597,22 @@
       <template #trigger>
         <div class="tag kill-damage-efficiency">
           <template v-if="killDamageEfficiencyTag.kind === 'high'">{{
-            t('PlayerInfoCard.killDamageEfficiencyHigh')
+            t('ongoingGame.playerCard.killDamageEfficiencyHigh')
           }}</template>
           <template v-else-if="killDamageEfficiencyTag.kind === 'low'">{{
-            t('PlayerInfoCard.killDamageEfficiencyLow')
+            t('ongoingGame.playerCard.killDamageEfficiencyLow')
           }}</template>
         </div>
       </template>
       <div class="popover-text">
         <template v-if="killDamageEfficiencyTag.kind === 'high'">{{
-          t('PlayerInfoCard.killDamageEfficiencyHighPopover', {
+          t('ongoingGame.playerCard.killDamageEfficiencyHighPopover', {
             rate: (killDamageEfficiencyTag.value * 100).toFixed(2),
             count: analysis.count
           })
         }}</template>
         <template v-else-if="killDamageEfficiencyTag.kind === 'low'">{{
-          t('PlayerInfoCard.killDamageEfficiencyLowPopover', {
+          t('ongoingGame.playerCard.killDamageEfficiencyLowPopover', {
             rate: (killDamageEfficiencyTag.value * 100).toFixed(2),
             count: analysis.count
           })
@@ -714,10 +720,10 @@ const isCurrentJungler = computed(() => {
 const easyGankTag = computed<{
   className: 'hard-gank' | 'gankable' | 'easy-gank' | 'very-easy-gank'
   labelKey:
-    | 'PlayerInfoCard.hardGank'
-    | 'PlayerInfoCard.gankable'
-    | 'PlayerInfoCard.easyGank'
-    | 'PlayerInfoCard.veryEasyGank'
+    | 'ongoingGame.playerCard.hardGank'
+    | 'ongoingGame.playerCard.gankable'
+    | 'ongoingGame.playerCard.easyGank'
+    | 'ongoingGame.playerCard.veryEasyGank'
   times: number
   count: number
 } | null>(() => {
@@ -738,7 +744,7 @@ const easyGankTag = computed<{
   if (times > 2) {
     return {
       className: 'very-easy-gank',
-      labelKey: 'PlayerInfoCard.veryEasyGank',
+      labelKey: 'ongoingGame.playerCard.veryEasyGank',
       times,
       count: analysis.value.detailsCount
     }
@@ -747,7 +753,7 @@ const easyGankTag = computed<{
   if (times >= 1.5) {
     return {
       className: 'easy-gank',
-      labelKey: 'PlayerInfoCard.easyGank',
+      labelKey: 'ongoingGame.playerCard.easyGank',
       times,
       count: analysis.value.detailsCount
     }
@@ -756,7 +762,7 @@ const easyGankTag = computed<{
   if (times >= 1) {
     return {
       className: 'gankable',
-      labelKey: 'PlayerInfoCard.gankable',
+      labelKey: 'ongoingGame.playerCard.gankable',
       times,
       count: analysis.value.detailsCount
     }
@@ -764,7 +770,7 @@ const easyGankTag = computed<{
 
   return {
     className: 'hard-gank',
-    labelKey: 'PlayerInfoCard.hardGank',
+    labelKey: 'ongoingGame.playerCard.hardGank',
     times,
     count: analysis.value.detailsCount
   }

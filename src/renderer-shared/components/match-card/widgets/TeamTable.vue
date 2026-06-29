@@ -38,49 +38,49 @@
       <div v-if="team.teamInfo" class="flex gap-2">
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.tower')"
+          :title="t('matchCard.teamTable.objectives.tower')"
         >
           <Tower class="size-3.5" />
           <span>{{ team.teamInfo.objectives.tower.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.inhibitor')"
+          :title="t('matchCard.teamTable.objectives.inhibitor')"
         >
           <Inhibitor class="size-3.5" />
           <span>{{ team.teamInfo.objectives.inhibitor.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.dragon')"
+          :title="t('matchCard.teamTable.objectives.dragon')"
         >
           <Dragon class="size-3.5" />
           <span>{{ team.teamInfo.objectives.dragon.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.baron')"
+          :title="t('matchCard.teamTable.objectives.baron')"
         >
           <Baron class="size-3.5" />
           <span>{{ team.teamInfo.objectives.baron.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.voidGrub')"
+          :title="t('matchCard.teamTable.objectives.voidGrub')"
         >
           <VoidGrub class="size-3.5" />
           <span>{{ team.teamInfo.objectives.horde.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.riftHerald')"
+          :title="t('matchCard.teamTable.objectives.riftHerald')"
         >
           <RiftHerald class="size-3.5" />
           <span>{{ team.teamInfo.objectives.riftHerald.kills }}</span>
         </div>
         <div
           class="flex items-center gap-1 text-black/60 dark:text-white/60"
-          :title="t('MatchCard.teamTable.objectives.atakhan')"
+          :title="t('matchCard.teamTable.objectives.atakhan')"
           v-if="someTeamHasAtakhan && team.teamInfo.objectives.atakhan"
         >
           <Atakhan class="size-3.5" />
@@ -91,7 +91,7 @@
       <!-- bans -->
       <div class="ml-auto flex" v-if="team.teamInfo && team.teamInfo.bans.length > 0">
         <div class="mr-1 text-xs text-black/60 dark:text-white/60">
-          {{ t('MatchCard.teamTable.bans') }}
+          {{ t('matchCard.teamTable.bans') }}
         </div>
         <div class="flex gap-0.5">
           <ChampionIcon
@@ -259,10 +259,10 @@
 
         <!-- cs -->
         <div v-else-if="column.name === 'cs'" :class="column.class">
-          <div class="text-xs">{{ participant.cs }} {{ t('MatchCard.teamTable.cs') }}</div>
+          <div class="text-xs">{{ participant.cs }} {{ t('matchCard.teamTable.cs') }}</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
-            {{ t('MatchCard.teamTable.perMinuteSuffix') }}
+            {{ t('matchCard.teamTable.perMinuteSuffix') }}
           </div>
         </div>
 
@@ -271,7 +271,7 @@
           <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }}k</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }}
-            {{ t('MatchCard.teamTable.perMinuteSuffix') }}
+            {{ t('matchCard.teamTable.perMinuteSuffix') }}
           </div>
         </div>
 

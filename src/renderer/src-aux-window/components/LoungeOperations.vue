@@ -2,9 +2,9 @@
   <NCard size="small">
     <NFlex align="center" class="h-6 not-last:mb-0.5">
       <span class="flex-1 text-xs text-gray-600 dark:text-gray-400"
-        >{{ t('LoungeOperations.autoAccept.label') }} ({{
+        >{{ t('auxWindow.lounge.operations.autoAccept.label') }} ({{
           isCustomGame
-            ? t('LoungeOperations.autoAccept.unavailable')
+            ? t('auxWindow.lounge.operations.autoAccept.unavailable')
             : formatDelayText(agfs.settings.autoAcceptDelaySeconds)
         }})</span
       >
@@ -20,9 +20,9 @@
         <NFlex align="center" class="h-6 not-last:mb-0.5">
           <div class="flex flex-1 items-center justify-start">
             <span class="text-xs text-gray-600 dark:text-gray-400"
-              >{{ t('LoungeOperations.autoMatchmaking.label') }} ({{
+              >{{ t('auxWindow.lounge.operations.autoMatchmaking.label') }} ({{
                 isCustomGame
-                  ? t('LoungeOperations.autoMatchmaking.unavailable')
+                  ? t('auxWindow.lounge.operations.autoMatchmaking.unavailable')
                   : formatDelayText(agfs.settings.autoMatchmakingDelaySeconds)
               }})</span
             >
@@ -40,7 +40,7 @@
       <NFlex class="w-[82vw] text-[11px]" vertical>
         <NFlex align="center" class="h-6 not-last:mb-0.5">
           <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
-            t('LoungeOperations.autoMatchmakingMinimumMembers.label')
+            t('auxWindow.lounge.operations.autoMatchmakingMinimumMembers.label')
           }}</span>
           <NInputNumber
             :value="agfs.settings.autoMatchmakingMinimumMembers"
@@ -53,12 +53,12 @@
         </NFlex>
         <NFlex align="center" class="h-6 not-last:mb-0.5">
           <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
-            t('LoungeOperations.autoMatchmakingDelaySeconds.label')
+            t('auxWindow.lounge.operations.autoMatchmakingDelaySeconds.label')
           }}</span>
           <NInputNumber
             :value="agfs.settings.autoMatchmakingDelaySeconds"
             @update:value="(value) => agf.setAutoMatchmakingDelaySeconds(value || 0)"
-            :placeholder="t('LoungeOperations.second')"
+            :placeholder="t('auxWindow.lounge.operations.second')"
             :min="0"
             size="tiny"
             class="w-20"
@@ -66,7 +66,7 @@
         </NFlex>
         <NFlex align="center" class="h-6 not-last:mb-0.5">
           <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{
-            t('LoungeOperations.autoMatchmakingWaitForInvitees.label')
+            t('auxWindow.lounge.operations.autoMatchmakingWaitForInvitees.label')
           }}</span>
           <NSwitch
             :value="agfs.settings.autoMatchmakingWaitForInvitees"
@@ -106,7 +106,7 @@ const isCustomGame = computed(() => {
 
 const formatDelayText = (d: number) => {
   if (d <= 0.05) {
-    return t('LoungeOperations.immediately')
+    return t('auxWindow.lounge.operations.immediately')
   }
   return `${d.toFixed(1)} s`
 }

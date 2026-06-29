@@ -149,7 +149,7 @@ const props = defineProps<{
   selection: PremadeSelectionPresetContext
 }>()
 
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.selection' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.selection' })
 
 const {
   totalCount,

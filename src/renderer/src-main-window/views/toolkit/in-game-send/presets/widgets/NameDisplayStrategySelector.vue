@@ -35,7 +35,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useTranslation('renderer', {
-  keyPrefix: 'InGameSend.presets.nameDisplayStrategy'
+  keyPrefix: 'toolkit.inGameSend.presets.nameDisplayStrategy'
 })
 
 const options = computed<PresetDisplayOption<InGameSendPresetNameDisplayStrategy>[]>(() => [

@@ -17,7 +17,7 @@
           </template>
           <template v-else>
             <span class="text-sm font-medium text-black dark:text-white">
-              {{ t('ChampionConfig.configure') }}
+              {{ t('automation.champConfig.championConfig.configure') }}
             </span>
           </template>
         </div>
@@ -29,7 +29,7 @@
           <NInput
             clearable
             size="small"
-            :placeholder="t('ChampionConfig.searchPlaceholder')"
+            :placeholder="t('automation.champConfig.championConfig.searchPlaceholder')"
             v-model:value="filterInput"
           >
             <template #prefix>
@@ -78,9 +78,11 @@
                     </template>
                   </template>
                   <template v-if="item.hasRunes">{{
-                    t('ChampionConfig.runesConfigured')
+                    t('automation.champConfig.championConfig.runesConfigured')
                   }}</template>
-                  <template v-else>{{ t('ChampionConfig.runesUnconfigured') }}</template>
+                  <template v-else>{{
+                    t('automation.champConfig.championConfig.runesUnconfigured')
+                  }}</template>
                 </NPopover>
 
                 <!-- spells configuration status -->
@@ -98,9 +100,11 @@
                     </template>
                   </template>
                   <template v-if="item.hasSpells">{{
-                    t('ChampionConfig.spellsConfigured')
+                    t('automation.champConfig.championConfig.spellsConfigured')
                   }}</template>
-                  <template v-else>{{ t('ChampionConfig.spellsUnconfigured') }}</template>
+                  <template v-else>{{
+                    t('automation.champConfig.championConfig.spellsUnconfigured')
+                  }}</template>
                 </NPopover>
               </div>
             </template>
@@ -114,7 +118,7 @@
           <!-- modes -->
           <div class="mb-2">
             <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
-              {{ t('ChampionConfig.targetMode') }}
+              {{ t('automation.champConfig.championConfig.targetMode') }}
             </div>
 
             <NRadioGroup
@@ -127,7 +131,7 @@
               <NRadioButton value="ranked">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['CLASSIC']" />
-                  <span>{{ t('ChampionConfig.ranked') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.ranked') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.some((r) => r.startsWith('ranked')) ||
@@ -142,7 +146,7 @@
               <NRadioButton value="normal">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['CLASSIC']" />
-                  <span>{{ t('ChampionConfig.normal') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.normal') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('normal') ||
@@ -157,7 +161,7 @@
               <NRadioButton value="aram">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['ARAM']" />
-                  <span>{{ t('ChampionConfig.aram') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.aram') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('aram') ||
@@ -172,7 +176,7 @@
               <NRadioButton value="urf">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['URF']" />
-                  <span>{{ t('ChampionConfig.urf') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.urf') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('urf') ||
@@ -187,7 +191,7 @@
               <NRadioButton value="nexusblitz">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['NEXUSBLITZ']" />
-                  <span>{{ t('ChampionConfig.nexusblitz') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.nexusblitz') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('nexusblitz') ||
@@ -202,7 +206,7 @@
               <NRadioButton value="ultbook">
                 <div class="flex h-full items-center gap-1 text-xs">
                   <LcuImage class="h-4 w-4" :src="gameModeIconUri['ULTBOOK']" />
-                  <span>{{ t('ChampionConfig.ultbook') }}</span>
+                  <span>{{ t('automation.champConfig.championConfig.ultbook') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('ultbook') ||
@@ -222,7 +226,7 @@
             <!-- group: configure -->
             <div class="mb-2">
               <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
-                {{ t('ChampionConfig.configure') }}
+                {{ t('automation.champConfig.championConfig.configure') }}
               </div>
 
               <NRadioGroup
@@ -234,7 +238,7 @@
               >
                 <NRadioButton value="runes">
                   <div class="flex h-full items-center gap-1 text-xs">
-                    <span>{{ t('ChampionConfig.runes') }}</span>
+                    <span>{{ t('automation.champConfig.championConfig.runes') }}</span>
                     <NIcon
                       v-if="configExistence.runes.some((r) => r.startsWith(currentType))"
                       class="text-sm"
@@ -245,7 +249,7 @@
                 </NRadioButton>
                 <NRadioButton value="spells">
                   <div class="flex h-full items-center gap-1 text-xs">
-                    <span>{{ t('ChampionConfig.spells') }}</span>
+                    <span>{{ t('automation.champConfig.championConfig.spells') }}</span>
                     <NIcon
                       v-if="configExistence.spells.some((r) => r.startsWith(currentType))"
                       class="text-sm"
@@ -260,7 +264,7 @@
             <!-- group: position -->
             <div class="mb-2" v-if="currentType === 'ranked'">
               <div class="mb-1 text-xs font-medium text-black/60 dark:text-white/60">
-                {{ t('ChampionConfig.position') }}
+                {{ t('automation.champConfig.championConfig.position') }}
               </div>
 
               <NRadioGroup
@@ -274,7 +278,7 @@
                 <NRadioButton value="default">
                   <div class="flex h-full items-center gap-1 text-xs">
                     <PositionIcon position="all" />
-                    <span>{{ t('ChampionConfig.default') }}</span>
+                    <span>{{ t('automation.champConfig.championConfig.default') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -382,10 +386,10 @@
               v-else
             >
               <span>
-                {{ t('ChampionConfig.runesUnconfigured') }}
+                {{ t('automation.champConfig.championConfig.runesUnconfigured') }}
               </span>
               <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig">{{
-                t('ChampionConfig.configureRunes')
+                t('automation.champConfig.championConfig.configureRunes')
               }}</NButton>
             </div>
           </div>
@@ -405,10 +409,10 @@
               v-else
             >
               <span>
-                {{ t('ChampionConfig.spellsUnconfigured') }}
+                {{ t('automation.champConfig.championConfig.spellsUnconfigured') }}
               </span>
               <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig">{{
-                t('ChampionConfig.configureSpells')
+                t('automation.champConfig.championConfig.configureSpells')
               }}</NButton>
             </div>
           </div>
@@ -417,33 +421,33 @@
           <div class="flex justify-end gap-1">
             <template v-if="currentConfig === 'runes'">
               <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes">{{
-                t('ChampionConfig.clear')
+                t('automation.champConfig.championConfig.clear')
               }}</NButton>
 
               <NButton size="small" :disabled="isRunesUnchanged" @click="handleRestoreRunes">{{
-                t('ChampionConfig.restore')
+                t('automation.champConfig.championConfig.restore')
               }}</NButton>
               <NButton
                 size="small"
                 type="primary"
                 :disabled="isRunesUnchanged || !isRunesValid"
                 @click="handleSaveRunes"
-                >{{ t('ChampionConfig.save') }}</NButton
+                >{{ t('automation.champConfig.championConfig.save') }}</NButton
               >
             </template>
             <template v-else-if="currentConfig === 'spells'">
               <NButton size="small" @click="handleClearSpells" :disabled="!tempEditingSpells">{{
-                t('ChampionConfig.clear')
+                t('automation.champConfig.championConfig.clear')
               }}</NButton>
               <NButton size="small" @click="handleRestoreSpells" :disabled="isSpellsUnchanged">{{
-                t('ChampionConfig.restore')
+                t('automation.champConfig.championConfig.restore')
               }}</NButton>
               <NButton
                 size="small"
                 type="primary"
                 @click="handleSaveSpells"
                 :disabled="isSpellsUnchanged"
-                >{{ t('ChampionConfig.save') }}</NButton
+                >{{ t('automation.champConfig.championConfig.save') }}</NButton
               >
             </template>
           </div>
@@ -454,13 +458,13 @@
           v-else
           class="flex h-full min-w-[540px] items-center justify-center text-sm text-black/60 dark:text-white/60"
         >
-          <span>{{ t('ChampionConfig.noChampionPlaceholder') }}</span>
+          <span>{{ t('automation.champConfig.championConfig.noChampionPlaceholder') }}</span>
         </div>
       </div>
     </NModal>
 
     <NButton size="tiny" type="primary" @click="show = true">{{
-      t('ChampionConfig.configure')
+      t('automation.champConfig.championConfig.configure')
     }}</NButton>
   </div>
 </template>
@@ -684,7 +688,7 @@ const handleSaveRunes = async () => {
     await ac.updateRunes(selectedId.value, currentType.value, toRaw(tempEditingRunes.value))
   }
 
-  message.success(() => t('ChampionConfig.runesSaved'))
+  message.success(() => t('automation.champConfig.championConfig.runesSaved'))
 }
 
 const handleClearRunes = () => {
@@ -726,7 +730,7 @@ const handleSaveSpells = async () => {
     )
   }
 
-  message.success(() => t('ChampionConfig.spellsSaved'))
+  message.success(() => t('automation.champConfig.championConfig.spellsSaved'))
 }
 
 const handleClearSpells = () => {
@@ -754,7 +758,7 @@ const handleRestoreSpells = () => {
     )
   }
 
-  message.success(() => t('ChampionConfig.spellsRestored'))
+  message.success(() => t('automation.champConfig.championConfig.spellsRestored'))
 }
 
 const handleRestoreRunes = () => {
@@ -773,7 +777,7 @@ const handleRestoreRunes = () => {
     )
   }
 
-  message.success(() => t('ChampionConfig.runesRestored'))
+  message.success(() => t('automation.champConfig.championConfig.runesRestored'))
 }
 
 // 在可用时始终选择一个英雄

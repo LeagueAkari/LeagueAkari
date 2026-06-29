@@ -478,8 +478,9 @@ export function provideMatchHistory(
       }
     } catch (error: any) {
       notification.error({
-        title: () => t('PlayerTab.failedToLoadMatchHistoryTitle'),
-        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message }),
+        title: () => t('playerTabs.profile.failedToLoadMatchHistoryTitle'),
+        content: () =>
+          t('playerTabs.profile.failedToLoadMatchHistoryContent', { reason: error.message }),
         duration: 4000
       })
       log.error(componentName, error)
@@ -654,8 +655,9 @@ export function provideMatchHistory(
       }
     } catch (error: any) {
       notification.error({
-        title: () => t('PlayerTab.failedToLoadMatchHistoryTitle'),
-        content: () => t('PlayerTab.failedToLoadMatchHistoryContent', { reason: error.message }),
+        title: () => t('playerTabs.profile.failedToLoadMatchHistoryTitle'),
+        content: () =>
+          t('playerTabs.profile.failedToLoadMatchHistoryContent', { reason: error.message }),
         duration: 4000
       })
       log.error(componentName, error)
@@ -712,7 +714,7 @@ export function provideMatchHistory(
     try {
       await lc.api.replays.downloadRofl(gameId)
     } catch (error: any) {
-      message.error(() => t('PlayerTab.failedToDownloadReplay', { reason: error.message }))
+      message.error(() => t('playerTabs.profile.failedToDownloadReplay', { reason: error.message }))
     }
   }
 
@@ -720,9 +722,9 @@ export function provideMatchHistory(
     try {
       await lc.api.replays.watchRofl(gameId)
 
-      message.success(() => t('PlayerTab.operationSuccessTitle'))
+      message.success(() => t('playerTabs.profile.operationSuccessTitle'))
     } catch (error: any) {
-      message.error(() => t('PlayerTab.failedToLaunchReplay', { reason: error.message }))
+      message.error(() => t('playerTabs.profile.failedToLaunchReplay', { reason: error.message }))
     }
   }
 

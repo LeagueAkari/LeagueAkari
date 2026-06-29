@@ -2,10 +2,10 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto max-w-[800px] p-6">
-        <SettingsSection :title="t('AutoChampConfig.title')">
+        <SettingsSection :title="t('automation.champConfig.title')">
           <SettingsRow
-            :label="t('AutoChampConfig.enabled.label')"
-            :label-description="t('AutoChampConfig.enabled.description')"
+            :label="t('automation.champConfig.enabled.label')"
+            :label-description="t('automation.champConfig.enabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -15,7 +15,7 @@
             ></NSwitch>
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoChampConfig.configure.label')"
+            :label="t('automation.champConfig.configure.label')"
             :label-width="260"
             align="start"
           >

@@ -1,5 +1,8 @@
 <template>
-  <SettingsSection :title="t('RewardClaimTool.title')" :footer="t('RewardClaimTool.hint')">
+  <SettingsSection
+    :title="t('toolkit.claim.rewards.title')"
+    :footer="t('toolkit.claim.rewards.hint')"
+  >
     <div class="p-3">
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
@@ -10,10 +13,10 @@
           @click="claim"
         >
           <template v-if="selectedGrantIds.length">
-            {{ t('RewardClaimTool.claimButtonC', { count: selectedGrantIds.length }) }}
+            {{ t('toolkit.claim.rewards.claimButtonC', { count: selectedGrantIds.length }) }}
           </template>
           <template v-else>
-            {{ t('RewardClaimTool.claimButton') }}
+            {{ t('toolkit.claim.rewards.claimButton') }}
           </template>
         </NButton>
         <NButton
@@ -23,7 +26,7 @@
           secondary
           @click="isClaiming = false"
         >
-          {{ t('RewardClaimTool.cancelButton') }}
+          {{ t('toolkit.claim.rewards.cancelButton') }}
         </NButton>
         <NButton
           :disabled="isLoading || !lcs.isConnected"
@@ -31,7 +34,7 @@
           secondary
           @click="updateClaimableRewardGrants(true)"
         >
-          {{ t('RewardClaimTool.refreshButton') }}
+          {{ t('toolkit.claim.rewards.refreshButton') }}
         </NButton>
       </div>
       <NDataTable
@@ -104,7 +107,7 @@ const columns = computed<DataTableColumns<RewardsGrant>>(() => [
   },
 
   {
-    title: () => t('RewardClaimTool.columns.rewardList'),
+    title: () => t('toolkit.claim.rewards.columns.rewardList'),
     key: 'rewardList',
     render: (row) => {
       const items = row.rewardGroup.rewards.map((reward) => {
@@ -136,10 +139,10 @@ const updateClaimableRewardGrants = async (manually = false) => {
     )
 
     if (manually) {
-      message.success(() => t('RewardClaimTool.refreshSuccess'))
+      message.success(() => t('toolkit.claim.rewards.refreshSuccess'))
     }
   } catch (error: any) {
-    message.warning(() => t('RewardClaimTool.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.rewards.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -178,14 +181,14 @@ const claim = async () => {
         log.info(COMP_NAMESPACE, `claimed ${chosen.map((c) => c.localizations.title).join(', ')}`)
 
         message.success(() =>
-          t('RewardClaimTool.claimed', {
+          t('toolkit.claim.rewards.claimed', {
             item: chosen.map((c) => c.localizations.title).join(', ')
           })
         )
       }
     }
   } catch (error: any) {
-    message.warning(() => t('RewardClaimTool.claimFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.rewards.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isClaiming.value = false

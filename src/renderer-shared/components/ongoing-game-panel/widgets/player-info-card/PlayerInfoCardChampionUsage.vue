@@ -36,11 +36,11 @@
         <div class="space-y-1.5 text-xs">
           <div v-if="c.analysis">
             <div class="mb-0.5 text-[11px] font-bold text-black/80 dark:text-white/80">
-              {{ t('PlayerInfoCard.champion.recentStats') }}
+              {{ t('ongoingGame.playerCard.champion.recentStats') }}
             </div>
             <div class="text-black/85 dark:text-white/85">
               {{
-                t('PlayerInfoCard.champion.winRate', {
+                t('ongoingGame.playerCard.champion.winRate', {
                   count: c.analysis.winLoss.all.count,
                   winRate: (c.analysis.winLoss.all.winRate * 100).toFixed()
                 })
@@ -52,22 +52,22 @@
 
           <div v-if="c.mastery">
             <div class="mb-1 text-[11px] font-bold text-black/80 dark:text-white/80">
-              {{ t('PlayerTab.championMastery.title') }}
+              {{ t('playerTabs.championMastery.title') }}
             </div>
             <div class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-3 gap-y-1">
               <div class="text-black/60 dark:text-white/60">
-                {{ t('PlayerTab.championMastery.levelLabel') }}
+                {{ t('playerTabs.championMastery.levelLabel') }}
               </div>
               <div class="text-right text-black/85 dark:text-white/85">
                 {{
-                  t('PlayerTab.championMastery.level', {
+                  t('playerTabs.championMastery.level', {
                     level: c.mastery.championLevel
                   })
                 }}
               </div>
 
               <div class="text-black/60 dark:text-white/60">
-                {{ t('PlayerTab.championMastery.pointsLabel') }}
+                {{ t('playerTabs.championMastery.pointsLabel') }}
               </div>
               <div class="text-right text-black/85 tabular-nums dark:text-white/85">
                 {{ formatExtremeNumber(c.mastery.championPoints) }}
@@ -75,7 +75,7 @@
 
               <template v-if="c.mastery.highestGrade">
                 <div class="text-black/60 dark:text-white/60">
-                  {{ t('PlayerTab.championMastery.highestGradeLabel') }}
+                  {{ t('playerTabs.championMastery.highestGradeLabel') }}
                 </div>
                 <div class="text-right text-black/85 dark:text-white/85">
                   {{ c.mastery.highestGrade }}
@@ -84,7 +84,7 @@
 
               <template v-if="c.mastery.championSeasonMilestone">
                 <div class="text-black/60 dark:text-white/60">
-                  {{ t('PlayerTab.championMastery.seasonMilestoneLabel') }}
+                  {{ t('playerTabs.championMastery.seasonMilestoneLabel') }}
                 </div>
                 <div class="text-right text-black/85 tabular-nums dark:text-white/85">
                   {{ c.mastery.championSeasonMilestone }}
@@ -93,7 +93,7 @@
 
               <template v-if="c.mastery.lastPlayTime">
                 <div class="text-black/60 dark:text-white/60">
-                  {{ t('PlayerTab.championMastery.lastPlayTimeLabel') }}
+                  {{ t('playerTabs.championMastery.lastPlayTimeLabel') }}
                 </div>
                 <div class="text-right text-black/85 tabular-nums dark:text-white/85">
                   {{ formatMasteryTime(c.mastery.lastPlayTime) }}

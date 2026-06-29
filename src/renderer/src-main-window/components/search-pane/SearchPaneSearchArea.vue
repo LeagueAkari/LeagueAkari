@@ -6,14 +6,14 @@
       <!-- big title -->
 
       <div class="mb-4 flex items-center gap-2">
-        <div class="mr-auto text-base font-bold">{{ t('SearchPane.title') }}</div>
+        <div class="mr-auto text-base font-bold">{{ t('playerSearch.title') }}</div>
         <NPopover v-if="isTencentRegion">
           <template #trigger>
             <div
               class="flex cursor-pointer items-center gap-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] text-white dark:bg-amber-700"
             >
               <NIcon><Info24Regular /></NIcon>
-              <span>{{ t('SearchPane.combinedServersReference') }}</span>
+              <span>{{ t('playerSearch.combinedServersReference') }}</span>
             </div>
           </template>
           <CombinedTencentServers />
@@ -42,19 +42,19 @@
               v-if="searchType === 'puuid'"
               class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
-              {{ t('SearchPane.searchTypePuuid') }}
+              {{ t('playerSearch.searchTypePuuid') }}
             </div>
             <div
               v-else-if="searchType === 'exact'"
               class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1"
             >
-              {{ t('SearchPane.searchTypeExact') }}
+              {{ t('playerSearch.searchTypeExact') }}
             </div>
             <div
               v-else-if="searchType === 'fuzzy'"
               class="flex h-4.5 items-center rounded bg-sky-500 px-1 font-sans text-[10px] text-white not-last:mr-1 dark:bg-sky-700"
             >
-              {{ t('SearchPane.searchTypeFuzzy') }}
+              {{ t('playerSearch.searchTypeFuzzy') }}
             </div>
           </template>
         </NInput>
@@ -63,7 +63,7 @@
           <template #icon>
             <Close />
           </template>
-          {{ t('SearchPane.cancel') }}
+          {{ t('playerSearch.cancel') }}
         </NButton>
 
         <NButton
@@ -75,7 +75,7 @@
           <template #icon>
             <Search />
           </template>
-          {{ t('SearchPane.search') }}
+          {{ t('playerSearch.search') }}
         </NButton>
       </div>
     </div>
@@ -84,7 +84,7 @@
     <div class="@container relative flex min-h-0 flex-1 flex-col">
       <template v-if="searchResult.length > 0">
         <div class="mx-3 mt-3 mb-1 font-bold text-black/80 dark:text-white/80">
-          {{ t('SearchPane.resultCount', { count: searchResult.length }) }}
+          {{ t('playerSearch.resultCount', { count: searchResult.length }) }}
         </div>
 
         <NScrollbar ref="scrollbarEl" class="flex-1">
@@ -126,7 +126,7 @@
                       class="rounded-xs bg-red-800 px-1 text-[10px] text-white"
                       v-if="result.privacy === 'PRIVATE'"
                     >
-                      {{ t('SearchPane.privacy') }}
+                      {{ t('playerSearch.privacy') }}
                     </div>
                     <span class="text-[11px] text-black/60 dark:text-white/60"
                       >Lv. {{ result.summonerLevel }}</span
@@ -145,32 +145,34 @@
       >
         <div class="flex items-center gap-2">
           <NSpin :size="12" />
-          <span>{{ t('SearchPane.searching') }}</span>
+          <span>{{ t('playerSearch.searching') }}</span>
         </div>
       </div>
 
       <div class="flex h-full items-center justify-center" v-else>
         <div class="flex flex-col items-center gap-2">
-          <span class="mb-6 text-black/60 dark:text-white/60">{{ t('SearchPane.noResult') }}</span>
+          <span class="mb-6 text-black/60 dark:text-white/60">{{
+            t('playerSearch.noResult')
+          }}</span>
           <span class="text-xs text-black/50 dark:text-white/50"
-            >{{ t('SearchPane.noResultHintFuzzy') }}
+            >{{ t('playerSearch.noResultHintFuzzy') }}
             <span
               class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
-              >{{ t('SearchPane.noResultHintFuzzyExample') }}</span
+              >{{ t('playerSearch.noResultHintFuzzyExample') }}</span
             ></span
           >
           <span class="text-xs text-black/50 dark:text-white/50"
-            >{{ t('SearchPane.noResultHintExact') }}
+            >{{ t('playerSearch.noResultHintExact') }}
             <span
               class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
-              >{{ t('SearchPane.noResultHintExactExample') }}</span
+              >{{ t('playerSearch.noResultHintExactExample') }}</span
             ></span
           >
           <span class="text-xs text-black/50 dark:text-white/50"
-            >{{ t('SearchPane.noResultHintPuuid') }}
+            >{{ t('playerSearch.noResultHintPuuid') }}
             <span
               class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-black dark:bg-white/10 dark:text-white"
-              >{{ t('SearchPane.noResultHintPuuidExample') }}</span
+              >{{ t('playerSearch.noResultHintPuuidExample') }}</span
             ></span
           >
         </div>

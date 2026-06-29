@@ -9,7 +9,7 @@
         :options="championOptions"
         :render-source-label="renderSourceLabel"
         :render-target-label="renderTargetLabel"
-        :source-filter-placeholder="t('OrderedChampionList.searchForChampion')"
+        :source-filter-placeholder="t('automation.orderedChampionList.searchForChampion')"
         :filter="(a, b) => filterChampions(a, b as any)"
         :source-title="renderPositionFilter"
         source-filterable
@@ -44,7 +44,7 @@
         +{{ champions.length - maxShow }}
       </div>
       <div class="text-xs text-black/60 dark:text-white/60" v-if="champions.length === 0">
-        {{ t('OrderedChampionList.unselected') }}
+        {{ t('automation.orderedChampionList.unselected') }}
       </div>
     </div>
   </div>
@@ -200,7 +200,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
         onClick={() => moveUp(option.value as number)}
         disabled={champions.value.indexOf(option.value as number) === 0}
       >
-        {t('OrderedChampionList.moveUp')}
+        {t('automation.orderedChampionList.moveUp')}
       </NButton>
       <NButton
         size="tiny"
@@ -211,7 +211,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
         onClick={() => moveDown(option.value as number)}
         disabled={champions.value.indexOf(option.value as number) === champions.value.length - 1}
       >
-        {t('OrderedChampionList.moveDown')}
+        {t('automation.orderedChampionList.moveDown')}
       </NButton>
     </div>
   )

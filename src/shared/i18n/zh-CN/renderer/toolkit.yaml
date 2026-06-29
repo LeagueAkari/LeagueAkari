@@ -1,0 +1,541 @@
+toolkit:
+  client:
+    nativeSupport:
+      unsupportedCurrentPlatform: 不支持当前平台
+      supportedButRequiresElevation: 支持当前平台，但需要管理员权限
+    leagueClient:
+      title: League Client
+      disconnect:
+        label: 断开连接
+        description: 断开 $t(common:appName) 与 League Client 的连接
+        button: 断开
+      quitClient:
+        label: 关闭客户端进程
+        description: 关闭 League Client
+        button: 关闭 Client 进程
+        dialog:
+          title: 退出客户端进程
+          content: 是否退出客户端进程？这将直接关闭游戏。
+          positiveText: 退出
+          negativeText: 取消
+    gameClient:
+      title: 游戏端
+      windowsOnlyNativeAddon: 需要原生插件（本构建目前仅在 Windows 提供）。
+      nativeAddonRequiresAdministrator: 当前平台支持该能力，但需要以管理员权限运行。
+      terminateGameClientWithShortcut:
+        labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
+        label: 启用结束游戏端快捷键
+        description: 当游戏端正在运行且在前台时，使用快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用
+      terminateShortcut:
+        label: 结束游戏端快捷键
+        labelAdminRequired: 结束游戏端快捷键 (需要管理员权限)
+        description: 设置快捷键
+      settingsFileMode:
+        label: 锁定游戏设置
+        description: 防止游戏内改动覆盖你已经调好的设置。需要调整设置时，可临时解除锁定
+        details:
+          readonly: 锁定后，League Akari 会把英雄联盟的设置文件设为只读。游戏仍会读取现有设置，但新的改动不会写回。
+          writable: 解除锁定会恢复写入。之后在游戏内调整画质、热键等设置时，会正常保存。
+          scope: 只影响当前连接的客户端安装目录。
+        setToReadonly: 已锁定游戏设置
+        setToWritable: 已解除游戏设置锁定
+        failedToSet: 切换锁定状态失败 {{reason}}
+    leagueClientUx:
+      title: League Client UX
+      fixWindowMethodAOptions:
+        label: 调整窗口大小
+        labelAdminRequired: 调整窗口大小 (需要管理员权限)
+        description: <a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作
+        unsupportedCurrentPlatform: 当前平台不支持调整窗口大小。
+        requiresAdministrator: 当前平台支持调整窗口大小，但需要以管理员权限运行。
+        button: 调整
+        dialog:
+          title: 调整窗口大小
+          content: 是否调整窗口大小？当客户端无法正常显示时，可尝试执行此操作。
+          positiveText: 调整
+          negativeText: 取消
+      restartUx:
+        label: 重启客户端界面
+        description: 立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误
+        button: 重启 UX 进程
+        dialog:
+          title: 重启 UX 进程
+          content: 是否重启 UX 进程？当客户端无法正常显示时，可尝试执行此操作。
+          positiveText: 重启
+          negativeText: 取消
+      killUx:
+        label: 结束 UX 进程
+        description: 立即关闭渲染进程。该操作不会影响正在进行中的活动
+        button: 结束 UX 进程
+        dialog:
+          title: 结束 UX 进程
+          content: 是否结束 UX 进程？你可能需要重新启动此进程。结束 UX 进程并不会导致游戏退出，但可以显著减少性能占用。
+          positiveText: 结束
+          negativeText: 取消
+      launchUx:
+        label: 启动 UX 进程
+        description: 如果渲染进程已经关闭，则立即启动渲染进程
+        button: 启动 UX 进程
+        dialog:
+          title: 启动 UX 进程
+          content: 是否启动 UX 进程？
+          positiveText: 启动
+          negativeText: 取消
+  home:
+    title: 工具集
+    client: 客户端 / 游戏端
+    in-process: 过程中
+    in-game-send: 游戏内发送
+    lobby: 房间工具
+    misc: 百宝箱
+    claim-tools: 领取工具
+    friend-tools: 好友工具
+    loot-tools: 战利品工具
+  championBench:
+    title: 英雄选择台
+    reroll: 重随
+    charity: 慈善
+    charityTitle: 进行一次重新随机，但立即拿回之前的英雄
+    notInBenchMode: 当前不在随机模式中
+    notInPhase: 未处于英雄选择过程中
+    swapFailedNotification:
+      title: 英雄选择台
+      description: 交换失败，目标英雄可能已经不存在
+    rerollFailedNotification:
+      title: 英雄选择台
+      description: 重随失败，重新随机失败
+  gameflowInProgress:
+    title: 进行时
+    dodge:
+      label: 英雄选择秒退
+      description: 立即退出当前英雄选择阶段，但不会关闭客户端
+      button: 秒退
+      failedNotification:
+        title: 英雄选择秒退
+        description: 尝试秒退失败 {{reason}}
+    playAgain:
+      label: 退出结算页面
+      description: 立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况
+      button: 回到房间
+      failedNotification:
+        title: 退出结算页面
+        description: 尝试退出结算页面失败 {{reason}}
+    leaveLobby:
+      label: 退出房间
+      description: 立即退出当前房间
+      button: 退出房间
+  lobby:
+    title: 房间工具
+    createIdLobby:
+      label: 创建队列房间
+      description: 创建一个指定队列 ID 的房间，受制于服务器是否开启目标队列
+      button: 创建
+      selectPlaceholder: 选择或指定 ID
+      failedNotification:
+        title: 创建队列房间
+        description: 创建队列房间失败 {{reason}}
+    loadEligibleQueuesFailedNotification:
+      title: 加载队列失败
+      description: 尝试加载可用队列列表失败 {{reason}}
+    queueOptions:
+      available: 可用队列
+      unavailable: 当前已禁用队列
+  strawberry:
+    title: 无尽狂潮
+    unavailable: 当前不在无尽狂潮模式中
+    champion:
+      label: 设置为当前英雄
+      description: 你可以尝试尝试其他英雄
+      button: 设置
+      failedMessage: 设置当前英雄失败 {{reason}}
+    championOptions:
+      modeSpecific: 模式英雄
+      other: 其他英雄
+    map:
+      label: 选择地图"
+      description: 目前可用的地图
+      button: 设置
+      failedMessage: 设置地图失败 {{reason}}
+    difficulty:
+      label: 设置难度
+      description: 目前预设的难度包括 [故事]、[困难] 和 [极难], 目前无法设置未解锁的难度等级"
+      button: 设置
+      failedMessage: 设置难度失败 {{reason}}
+    requestSent: 请求已发送
+  chatAvailability:
+    title: 聊天状态
+    availability:
+      label: 聊天状态
+      description: 展示或设置当前聊天状态。部分状态仅在特定情况下可用
+      radio:
+        chat: 聊天
+        mobile: 在线分组
+        away: 离开
+        dnd: 游戏中
+        offline: 离线
+        spectating: 观战中
+        online: 在线
+      failedNotification:
+        title: 设置聊天状态
+        description: 设置聊天状态失败 {{reason}}
+    lockOfflineStatus:
+      label: 尝试锁定离线状态
+      description: 设置离线状态后，尝试纠正客户端自动设置的离开状态
+      button: 设置
+  chatStatusMessage:
+    title: 聊天签名
+    message:
+      saved: 已保存
+      success: 已保存并应用
+      failedNotification:
+        title: 设置聊天签名
+        description: 设置聊天签名失败 {{reason}}
+    resetOnLogin:
+      label: 登录时重设
+      description: 开启后，每次客户端登录时重新应用上一次保存的签名
+    text:
+      label: 个性签名
+      description: 保存时会立即设置聊天签名；设置空值则为删除
+      placeholder: 输入签名
+      save: 保存
+  summonerProfile:
+    title: 召唤师
+    commonSuccess: 操作成功
+    commonFailed: 无法设置
+    skinSelectModal:
+      title: 皮肤选择
+      button: 设置为当前皮肤
+      augment: 装饰
+      unset: 不设置
+      failedNotification:
+        title: 生涯背景
+        description: 无法应用当前皮肤 {{reason}}
+    profileBackground:
+      label: 选择召唤师背景
+      description: 查找目标英雄或皮肤
+      button: 选择
+    bannerAccent:
+      label: 切换为上赛季旗帜
+      description: 切换为上赛季旗帜，可能会导致旗帜消失
+      button: 执行
+      failedNotification:
+        title: 切换为上赛季旗帜
+        description: 切换旗帜失败 {{reason}}
+    prestigeCrest:
+      label: 卸下头像框
+      description: 卸下头像框
+      descriptionInsufficientLevel: 卸下头像框 (召唤师等级需大于等于 525, 当前等级为 {{level}})
+      button: 执行
+      failedNotification:
+        title: 卸下头像框
+        description: 卸下头像框失败 {{reason}}
+    token:
+      label: 卸下所有勋章
+      description: 卸下所有勋章
+      button: 执行
+      failedNotification:
+        title: 卸下所有勋章
+        description: 卸下所有勋章失败 {{reason}}
+    emotes:
+      label: 卸下所有表情
+      description: 卸下所有表情，包括表情轮盘以及事件回应
+      button: 执行
+  gameView:
+    title: 查看游戏
+    game:
+      label: 游戏 ID
+      description: 按照游戏的 ID 拉取并查看对局
+      button: 查看
+  fakeRanked:
+    title: 段位伪造
+    commonSuccess: 已保存并应用
+    saved: 已保存
+    resetOnLogin:
+      label: 登录时重设
+      description: 开启后，每次客户端登录时重新应用上一次保存的段位
+    set:
+      label: 保存段位
+      description: 保存当前聊天卡片段位
+      button: 保存
+      failedNotification:
+        title: 伪造段位
+        description: 伪造段位失败 {{reason}}
+    queue: 队列
+    tier: 段位
+    division: 分段
+  spectate:
+    title: 观战
+    leaveButton: 离开房间
+    needToLeaveLobby: 你需要离开当前房间才能观战
+    spectate:
+      label: 召唤师观战
+      description: 通过 PUUID 或召唤师名称观战当前大区玩家，前提是玩家正在可观战的对局中
+      button: 调起观战
+      placeholder: 召唤师名称 / PUUID
+      errorNoPlayer: 玩家不存在
+      notFoundNotification:
+        title: 观战
+        description: 目标玩家 {{name}} 未找到
+      failedNotification:
+        title: 观战
+        description: 尝试观战失败，该玩家可能不在对局中或目标模式不可观战 {{reason}}
+      successNotification:
+        title: 观战
+        description: 已拉起观战
+    token:
+      label: 口令观战
+      description: 通过符合格式的特殊口令，调起游戏端观战进程
+      button: 调起观战
+      placeholder: 令牌
+      successNotification:
+        title: 观战
+        description: 已拉起观战
+        useRememberedInstallLocation: 已拉起观战，使用检测到的客户端位置
+      failedNotification:
+        title: 观战
+        description: 观战失败 {{reason}}
+    failedToLoadFriends: 无法加载好友列表
+  inGameSend:
+    settings:
+      title: 发送设置
+      cancelShortcut:
+        label: 取消发送
+        description: 设置快捷键，以取消发送当前的任何发送任务
+      sendInterval:
+        label: 发送间隔 (ms)
+        description: 模拟发送时的间隔时间
+    presets:
+      title: 预设发送
+      footer:
+        shortcutUnavailable: 当前「快捷键」不可用，{{reason}}。
+        shortcutUsage: 如果设置了「快捷键」，则可在英雄选择 / 房间阶段发送在聊天中，或在游戏进行阶段且位于前台时以模拟键盘输入的方式发送在游戏中。
+        draftOnly: 草稿模式仅支持试运行，不会发送到聊天或游戏。
+      nativeInput:
+        needAdmin: 请以管理员权限启动
+        unsupported: 当前平台不支持
+        unavailable: 当前不可用
+      teams:
+        friendly: 我方
+        enemy: 敌方
+        labelWithName: '{{side}} · {{team}}'
+      targets:
+        friendly:
+          label: 发送我方
+          description: 发送的对象是我方已选成员
+        enemy:
+          label: 发送敌方
+          description: 发送的对象是敌方已选成员
+        all:
+          label: 发送全体
+          description: 发送的对象是双方已选成员
+      controls:
+        shortcut: 快捷键
+        sendToGame: 发送到游戏
+        sendToChat: 发送到聊天
+        send: 发送
+        dryRun: 试运行
+        dryRunDescription: 生成发送内容并在下方预览，不会写入客户端
+        sendSucceeded: 已提交发送 ({{preset}} → {{target}})
+        disabled:
+          draftOnly: 草稿模式仅支持试运行
+          unavailable: 仅可在英雄选择、房间或游戏内使用
+      preview:
+        title: 试运行
+        empty: 无可发送内容
+        copy: 复制
+        copied: 已复制到剪贴板
+        copyFailed: 复制失败
+        close: 关闭
+      selection:
+        playersTitle: 发送的目标 ({{selected}} / {{total}})
+        premadeTitle: 选中的小队 ({{selected}} / {{total}})
+        selectAll: 全选
+        clear: 清空
+        groupCount_one: '{{count}} 组开黑'
+        groupCount_other: '{{count}} 组开黑'
+        emptyPremadeGroups: 无开黑组合
+        bucketSize: '{{count}} 黑'
+      nameDisplayStrategy:
+        title: 名字展示
+        options:
+          preferName:
+            label: 优先展示玩家名
+            description: 使用玩家名作为输出中的玩家标识
+          preferChampionName:
+            label: 优先展示英雄名
+            description: 没选英雄或存在重复英雄时展示玩家名
+          championNameWithName:
+            label: 英雄名附带玩家名
+            description: 使用英雄名（玩家名）作为输出中的玩家标识，括号内为玩家名
+      rating:
+        label: 表现评分
+        description: 统计每位玩家近期表现，输出胜率/KDA/常玩英雄。
+        displayOptionsTitle: 展示元素
+        displayOptions:
+          winRate:
+            label: 胜率
+            description: 近期对局胜率
+          kda:
+            label: KDA
+            description: 击杀 / 死亡 / 助攻表现
+          avgSoloKills:
+            label: 场均单杀
+            description: 场均单杀次数，需使用 SGP 数据源
+          avgVisionScore:
+            label: 场均视野得分
+            description: 近期对局的场均视野得分
+          avgChampionDamage:
+            label: 场均伤害
+            description: 展示平均队伍伤害占比
+          avgDamageTaken:
+            label: 场均承伤
+            description: 展示平均队伍承伤占比
+          avgGold:
+            label: 经济
+            description: 展示平均队伍经济占比
+          avgCsPerMinute:
+            label: 补兵
+            description: 展示平均每分钟补兵数
+          avgKillParticipation:
+            label: 参团率
+            description: 展示平均击杀参与率
+          avgDamageGoldEfficiency:
+            label: 伤转比
+            description: 展示平均伤害经济转化比例
+          mainChampions:
+            label: 主玩英雄
+            description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
+          mainPositions:
+            label: 主玩位置
+            description: 当近期战绩中存在明确位置信息和主玩位置时展示最多两个位置
+        configOptionsTitle: 配置
+        configOptions:
+          showCurrentChampion:
+            label: 按当前英雄筛选
+            description: 仅统计每名玩家当前已选择英雄的近期对局，尚未选择英雄时会输出提示
+      jungle:
+        label: 打野偏好
+        description: 展示打野选手的前期活动、开野分布和资源控制倾向。
+        displayOptionsTitle: 展示模块
+        displayOptions:
+          activityPreference:
+            label: 活动偏好
+            description: 展示前期更偏向照顾的地图分区，并附上上中下分布
+          firstClearDistribution:
+            label: 开野分布
+            description: 展示蓝方和红方的常规开、入侵开比例及首营分布，仅按当前英雄筛选时生效
+          earlyGank:
+            label: 早抓倾向
+            description: 展示 3 级和 4 级抓人触发概率
+          dragonControl:
+            label: 控龙
+            description: 展示一龙率、平均首龙时间和场均小龙数
+          monsterControl:
+            label: 野怪资源
+            description: 展示场均巢虫、先锋和大龙数量
+          mainChampions:
+            label: 主玩英雄
+            description: 展示打野样本中明显更多的最多三个英雄，仅未按当前英雄筛选时生效
+        configOptionsTitle: 配置
+        configOptions:
+          showCurrentChampion:
+            label: 按当前英雄筛选
+            description: 仅统计每名玩家当前已选择英雄的打野明细，尚未选择英雄时会输出提示，默认开启
+      premade:
+        label: 组队状况
+        description: 识别队伍内开黑组合，按组别展示成员。
+      fixedText:
+        label: 固定文案
+        empty:
+          description: 还没有固定文案。新增一条后，设置标题、快捷键和多行内容即可发送。
+          action: 新增固定文案
+        listTitle: 文案列表
+        addLimitReached: 最多只能创建 {{count}} 条固定文案
+        unnamed: 未命名
+        editTitle: 编辑标题
+        shortcutLabel: 快捷键
+        shortcutDescription: 按下后发送此条已保存的固定文案
+        save: 保存
+        saved: 已保存
+        saveFailed: 保存失败
+        createFailed: 新增失败
+        delete: 删除
+        deleted: 已删除
+        deleteFailed: 删除失败
+        deleteConfirm: 确认删除？
+        moveUp: 上移
+        moveDown: 下移
+        sendToGame: 发送到游戏
+        sendToChat: 发送到聊天
+        send: 发送
+        sendSucceeded: 已提交发送
+        sendSucceededWithTitle: 已提交发送（固定文案：{{title}}）
+        disabled:
+          noSelection: 请选择一条固定文案
+          saveFirst: 请先保存当前修改
+          draftOnly: 草稿模式不可发送
+          unavailable: 仅可在英雄选择、房间或游戏内使用
+  claim:
+    rewards:
+      title: 奖励
+      hint: 找回一些遗忘的东西。
+      columns:
+        rewardList: 可领取物品
+      refreshButton: 刷新
+      claimButton: 领取
+      claimButtonC: 领取 ({{count}})
+      cancelButton: 取消
+      refreshSuccess: 已刷新
+      refreshFailed: 拉取失败 {{reason}}
+      claimFailed: 领取失败 {{reason}}
+      claimed: 已领取 {{item}}
+    eventHub:
+      title: 事件中心
+      hint: 此栏目中的可领取条目可能与 “奖励” 中部分条目重叠，任意领取其一即可。
+      columns:
+        rewardList: 可领取物品
+      refreshButton: 刷新
+      claimButton: 领取
+      claimButtonC: 领取 ({{count}})
+      cancelButton: 取消
+      refreshSuccess: 已刷新
+      refreshFailed: 拉取失败 {{reason}}
+      claimFailed: 领取失败 {{reason}}
+      claimed: 已领取 {{item}}
+    missions:
+      title: 任务
+      hint: 提前完成任务可能会导致数据不同步，使用时请斟酌可能的风险。
+      columns:
+        rewardList: 可领取物品
+      refreshButton: 刷新
+      claimButton: 领取
+      claimButtonC: 领取 ({{count}})
+      cancelButton: 取消
+      refreshSuccess: 已刷新
+      refreshFailed: 拉取失败 {{reason}}
+      claimFailed: 领取失败 {{reason}}
+      claimed: 已领取 {{item}}
+    item:
+      untranslatedC: 未命名奖励组 ({{count}})
+  friends:
+    title: 好友
+    searchPlaceholder: 搜索好友名称或标签
+    deleteButtonC: 删除 ({{count}})
+    deleteButton: 删除
+    cancelButton: 取消
+    refreshButton: 刷新
+    deleteSuccess: 删除了 {{count}} 个好友
+    deletePopconfirm: 这将执行删除操作，且不可恢复
+    refreshSuccess: 已刷新
+    neverPlayed: 无对局数据
+    unknown: 未知
+    groupNames:
+      '**Default': 综合
+    columns:
+      groupName: 好友分组
+      lastGameDate: 最后对局日期
+      friendSince: 成为好友时间
+  loot:
+    title: 战利品工具
+    refreshSuccess: 已刷新
+    refreshFailed: 拉取失败 {{reason}}

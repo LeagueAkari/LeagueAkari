@@ -25,7 +25,7 @@
       :class="{ 'brightness-80': ws.focus === 'blurred' }"
     >
       <div
-        :title="ws.settings.pinned ? t('OpggWindowTitlebar.unpin') : t('OpggWindowTitlebar.pin')"
+        :title="ws.settings.pinned ? t('opgg.titlebar.unpin') : t('opgg.titlebar.pin')"
         class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
         :class="{ 'bg-black/15 dark:bg-white/15': ws.settings.pinned }"
         style="-webkit-app-region: no-drag"
@@ -35,7 +35,7 @@
       </div>
       <div
         v-if="!as.isMacOS"
-        :title="t('OpggWindowTitlebar.minimize')"
+        :title="t('opgg.titlebar.minimize')"
         class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-black/10 active:brightness-80 dark:hover:bg-white/10"
         style="-webkit-app-region: no-drag"
         @click="handleMinimize"
@@ -44,7 +44,7 @@
       </div>
       <div
         v-if="!as.isMacOS"
-        :title="t('OpggWindowTitlebar.close')"
+        :title="t('opgg.titlebar.close')"
         class="flex h-full w-11.25 cursor-pointer items-center justify-center text-xs transition-all duration-300 hover:bg-red-600 hover:text-white active:brightness-80 dark:hover:bg-red-500"
         style="-webkit-app-region: no-drag"
         @click="handleClose"

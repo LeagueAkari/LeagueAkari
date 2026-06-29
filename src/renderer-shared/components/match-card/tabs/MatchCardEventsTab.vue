@@ -6,7 +6,7 @@
         <div class="pt-2 pl-4">
           <NTimeline>
             <NTimelineItem
-              :title="t('MatchCard.eventsTab.start')"
+              :title="t('matchCard.eventsTab.start')"
               :time="formatDuration(firstAndEndTime.firstTime)"
             />
 
@@ -27,7 +27,7 @@
                       placement="right"
                     >
                       <template #trigger>
-                        <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
+                        <div :class="tagTheme">{{ t('matchCard.eventsTab.viewPosition') }}</div>
                       </template>
                       <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
@@ -40,7 +40,7 @@
                     >
                       <template #trigger>
                         <div :class="tagTheme">
-                          {{ t('MatchCard.eventsTab.viewVictimDamageDetails') }}
+                          {{ t('matchCard.eventsTab.viewVictimDamageDetails') }}
                         </div>
                       </template>
                       <VictimDamageDetails :event="e" />
@@ -61,7 +61,7 @@
                     />
                   </div>
                   <div class="text-sm text-black/80 dark:text-white/80">
-                    {{ t('MatchCard.eventsTab.kill') }}
+                    {{ t('matchCard.eventsTab.kill') }}
                   </div>
                   <ChampionIcon
                     :champion-id="participantMap[e.victimId].championId"
@@ -86,13 +86,13 @@
                       class="size-5 rounded"
                     />
                     <div v-if="e.killType === 'KILL_FIRST_BLOOD'">
-                      {{ t('MatchCard.eventsTab.firstBlood') }}
+                      {{ t('matchCard.eventsTab.firstBlood') }}
                     </div>
                     <div v-else-if="e.killType === 'KILL_MULTI'">
-                      {{ t('MatchCard.eventsTab.multiKill', { count: e.multiKillLength }) }}
+                      {{ t('matchCard.eventsTab.multiKill', { count: e.multiKillLength }) }}
                     </div>
                     <div v-else-if="e.killType === 'KILL_ACE'">
-                      {{ t('MatchCard.eventsTab.ace') }}
+                      {{ t('matchCard.eventsTab.ace') }}
                     </div>
                     <NPopover
                       v-if="isSupportedMap(basicInfo.mapId)"
@@ -100,7 +100,7 @@
                       placement="right"
                     >
                       <template #trigger>
-                        <div :class="tagTheme">{{ t('MatchCard.eventsTab.viewPosition') }}</div>
+                        <div :class="tagTheme">{{ t('matchCard.eventsTab.viewPosition') }}</div>
                       </template>
                       <MapPosition :mapId="basicInfo.mapId" :points="[e.position]" />
                     </NPopover>
@@ -110,7 +110,7 @@
 
               <NTimelineItem
                 v-if="e.type === 'BUILDING_KILL' && selectedFilters.includes('BUILDING_KILL')"
-                :title="t('MatchCard.eventsTab.destroyBuilding')"
+                :title="t('matchCard.eventsTab.destroyBuilding')"
                 type="warning"
                 :time="formatDuration(e.timestamp)"
               >
@@ -122,7 +122,7 @@
                         class="size-5 rounded"
                       />
                       <div class="text-black/60 dark:text-white/60">
-                        {{ t('MatchCard.eventsTab.destroyed') }}
+                        {{ t('matchCard.eventsTab.destroyed') }}
                       </div>
                       <template v-if="e.buildingType === 'TOWER_BUILDING'">
                         <Tower class="size-4" />
@@ -149,7 +149,7 @@
                   e.killerId !== 0 &&
                   selectedFilters.includes('TURRET_PLATE_DESTROYED')
                 "
-                :title="t('MatchCard.eventsTab.destroyPlateTitle')"
+                :title="t('matchCard.eventsTab.destroyPlateTitle')"
                 type="warning"
                 :time="formatDuration(e.timestamp)"
               >
@@ -159,13 +159,13 @@
                     class="size-5 rounded"
                   />
                   <div class="text-black/60 dark:text-white/60">
-                    {{ t('MatchCard.eventsTab.destroyed') }}
+                    {{ t('matchCard.eventsTab.destroyed') }}
                   </div>
                   <div class="font-bold">
                     {{
                       e.laneType
-                        ? t('MatchCard.eventsTab.plateLane', { lane: laneType(e.laneType) })
-                        : t('MatchCard.eventsTab.plate')
+                        ? t('matchCard.eventsTab.plateLane', { lane: laneType(e.laneType) })
+                        : t('matchCard.eventsTab.plate')
                     }}
                   </div>
                 </div>
@@ -173,7 +173,7 @@
             </template>
 
             <NTimelineItem
-              :title="t('MatchCard.eventsTab.end')"
+              :title="t('matchCard.eventsTab.end')"
               :time="formatDuration(firstAndEndTime.endTime)"
             />
           </NTimeline>
@@ -187,7 +187,7 @@
         <!-- 筛选器 -->
         <div class="flex w-full flex-col gap-2">
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.eventsTab.filters') }}
+            {{ t('matchCard.eventsTab.filters') }}
           </div>
           <NCheckboxGroup v-model:value="selectedFilters">
             <div class="flex flex-col gap-1.5">
@@ -206,7 +206,7 @@
         <!-- 按英雄筛选 -->
         <div class="flex w-full flex-col gap-2">
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.eventsTab.filterByChampion') }}
+            {{ t('matchCard.eventsTab.filterByChampion') }}
           </div>
           <NCheckboxGroup v-model:value="selectedChampionIds">
             <div class="flex flex-col gap-1.5">
@@ -231,7 +231,7 @@
           <div class="h-px bg-black/10 dark:bg-white/10"></div>
 
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.eventsTab.plateStats') }}
+            {{ t('matchCard.eventsTab.plateStats') }}
           </div>
 
           <div class="flex flex-col gap-1">
@@ -242,7 +242,7 @@
                   {{ lcs.gameData.championName(k.championId) }}
                 </div>
                 <div :class="tagTheme">
-                  {{ t('MatchCard.eventsTab.plateCount', { count: k.platesTake }) }}
+                  {{ t('matchCard.eventsTab.plateCount', { count: k.platesTake }) }}
                 </div>
               </div>
             </div>
@@ -258,14 +258,14 @@
     <template v-if="loadingDetails">
       <div class="flex items-center gap-2">
         <NSpin :size="16" />
-        <span>{{ t('MatchCard.common.loading') }}</span>
+        <span>{{ t('matchCard.common.loading') }}</span>
       </div>
     </template>
     <template v-else>
       <div class="flex items-center gap-2">
-        <span>{{ t('MatchCard.common.noData') }}</span>
+        <span>{{ t('matchCard.common.noData') }}</span>
         <NButton type="primary" size="small" @click="loadDetails(basicInfo.gameId)">
-          {{ t('MatchCard.common.refresh') }}
+          {{ t('matchCard.common.refresh') }}
         </NButton>
       </div>
     </template>

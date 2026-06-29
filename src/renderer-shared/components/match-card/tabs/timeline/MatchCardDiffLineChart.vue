@@ -11,15 +11,15 @@
         <!-- 数据类型选择器 -->
         <div class="flex flex-col gap-2">
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.diffLineChart.dataType') }}
+            {{ t('matchCard.diffLineChart.dataType') }}
           </div>
           <NRadioGroup v-model:value="selectedMetric">
             <div class="flex flex-col gap-1.5">
-              <NRadio value="gold" :label="t('MatchCard.diffLineChart.gold')" />
-              <NRadio value="cs" :label="t('MatchCard.diffLineChart.cs')" />
-              <NRadio value="exp" :label="t('MatchCard.diffLineChart.exp')" />
-              <NRadio value="damageDealt" :label="t('MatchCard.diffLineChart.damageDealt')" />
-              <NRadio value="damageTaken" :label="t('MatchCard.diffLineChart.damageTaken')" />
+              <NRadio value="gold" :label="t('matchCard.diffLineChart.gold')" />
+              <NRadio value="cs" :label="t('matchCard.diffLineChart.cs')" />
+              <NRadio value="exp" :label="t('matchCard.diffLineChart.exp')" />
+              <NRadio value="damageDealt" :label="t('matchCard.diffLineChart.damageDealt')" />
+              <NRadio value="damageTaken" :label="t('matchCard.diffLineChart.damageTaken')" />
             </div>
           </NRadioGroup>
         </div>
@@ -30,7 +30,7 @@
         <!-- 队伍平均选择 -->
         <div class="flex flex-col gap-2">
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.diffLineChart.teamAverage') }}
+            {{ t('matchCard.diffLineChart.teamAverage') }}
           </div>
           <NCheckboxGroup v-model:value="selectedTeams">
             <div class="flex flex-col gap-1.5">
@@ -50,7 +50,7 @@
         <!-- 玩家选择 -->
         <div class="flex w-full flex-col gap-2">
           <div class="text-xs font-semibold text-black/60 dark:text-white/60">
-            {{ t('MatchCard.diffLineChart.players') }}
+            {{ t('matchCard.diffLineChart.players') }}
           </div>
           <!-- 全选 / 半选 / 全不选 -->
           <NCheckbox
@@ -60,7 +60,7 @@
           >
             <template #default>
               <div class="flex items-center gap-2">
-                <span>{{ t('MatchCard.diffLineChart.selectAll') }}</span>
+                <span>{{ t('matchCard.diffLineChart.selectAll') }}</span>
               </div>
             </template>
           </NCheckbox>
@@ -137,29 +137,29 @@ watchEffect(() => {
 
 const metricConfigs = computed(() => ({
   gold: {
-    title: t('MatchCard.diffLineChart.metric.gold.title'),
-    yAxisLabel: t('MatchCard.diffLineChart.metric.gold.yAxis'),
-    unit: t('MatchCard.diffLineChart.metric.gold.unit')
+    title: t('matchCard.diffLineChart.metric.gold.title'),
+    yAxisLabel: t('matchCard.diffLineChart.metric.gold.yAxis'),
+    unit: t('matchCard.diffLineChart.metric.gold.unit')
   },
   cs: {
-    title: t('MatchCard.diffLineChart.metric.cs.title'),
-    yAxisLabel: t('MatchCard.diffLineChart.metric.cs.yAxis'),
-    unit: t('MatchCard.diffLineChart.metric.cs.unit')
+    title: t('matchCard.diffLineChart.metric.cs.title'),
+    yAxisLabel: t('matchCard.diffLineChart.metric.cs.yAxis'),
+    unit: t('matchCard.diffLineChart.metric.cs.unit')
   },
   exp: {
-    title: t('MatchCard.diffLineChart.metric.exp.title'),
-    yAxisLabel: t('MatchCard.diffLineChart.metric.exp.yAxis'),
-    unit: t('MatchCard.diffLineChart.metric.exp.unit')
+    title: t('matchCard.diffLineChart.metric.exp.title'),
+    yAxisLabel: t('matchCard.diffLineChart.metric.exp.yAxis'),
+    unit: t('matchCard.diffLineChart.metric.exp.unit')
   },
   damageDealt: {
-    title: t('MatchCard.diffLineChart.metric.damageDealt.title'),
-    yAxisLabel: t('MatchCard.diffLineChart.metric.damageDealt.yAxis'),
-    unit: t('MatchCard.diffLineChart.metric.damageDealt.unit')
+    title: t('matchCard.diffLineChart.metric.damageDealt.title'),
+    yAxisLabel: t('matchCard.diffLineChart.metric.damageDealt.yAxis'),
+    unit: t('matchCard.diffLineChart.metric.damageDealt.unit')
   },
   damageTaken: {
-    title: t('MatchCard.diffLineChart.metric.damageTaken.title'),
-    yAxisLabel: t('MatchCard.diffLineChart.metric.damageTaken.yAxis'),
-    unit: t('MatchCard.diffLineChart.metric.damageTaken.unit')
+    title: t('matchCard.diffLineChart.metric.damageTaken.title'),
+    yAxisLabel: t('matchCard.diffLineChart.metric.damageTaken.yAxis'),
+    unit: t('matchCard.diffLineChart.metric.damageTaken.unit')
   }
 }))
 
@@ -257,7 +257,7 @@ const teamOptions = computed(() => {
     const name = teamName(team.teamIdentifier)
     return {
       value: team.teamIdentifier,
-      label: t('MatchCard.diffLineChart.teamAverageSuffix', { name }),
+      label: t('matchCard.diffLineChart.teamAverageSuffix', { name }),
       color: getTeamColor(team.teamIdentifier)
     }
   })
@@ -311,7 +311,7 @@ const chartData = computed(() => {
     participant?: MatchParticipant,
     hidePrivacy: boolean = false
   ) => {
-    if (!participant) return t('MatchCard.diffLineChart.playerLabel', { id: participantId })
+    if (!participant) return t('matchCard.diffLineChart.playerLabel', { id: participantId })
 
     if (hidePrivacy) return lcs.gameData.championName(participant.championId)
 
@@ -342,7 +342,7 @@ const chartData = computed(() => {
     const color = getTeamColor(team.teamIdentifier)
 
     return {
-      label: t('MatchCard.diffLineChart.teamAverageSuffix', { name }),
+      label: t('matchCard.diffLineChart.teamAverageSuffix', { name }),
       data: extractTeamAverageData(team.teamIdentifier, selectedMetric.value),
       borderColor: color,
       backgroundColor: color + '40',
@@ -396,7 +396,7 @@ const chartOptions = computed(() => {
         display: true,
         title: {
           display: true,
-          text: t('MatchCard.diffLineChart.gameTime')
+          text: t('matchCard.diffLineChart.gameTime')
         },
         ticks: {
           maxTicksLimit: 10

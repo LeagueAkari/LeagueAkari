@@ -113,29 +113,29 @@ const menu = computed(() => {
     {
       key: 'player-tabs',
       icon: renderIcon(AnalyticsRoundIcon),
-      name: t('SideBarMenu.match-history')
+      name: t('navigation.sidebar.menu.match-history')
     },
     {
       key: 'ongoing-game',
       icon: renderIcon(Games24FilledIcon),
-      name: t('SideBarMenu.ongoing-game'),
+      name: t('navigation.sidebar.menu.ongoing-game'),
       inProgress: shouldShowOngoingGameBadge.value,
       isDisabled: !lcs.isConnected
     },
     {
       key: 'automation',
       icon: renderIcon(AiStatusIcon),
-      name: t('SideBarMenu.automation')
+      name: t('navigation.sidebar.menu.automation')
     },
     {
       key: 'toolkit',
       icon: renderIcon(ToolFilledIcon),
-      name: t('SideBarMenu.toolkit')
+      name: t('navigation.sidebar.menu.toolkit')
     },
     {
       key: 'test',
       icon: renderIcon(AnimalRabbit28FilledIcon),
-      name: t('SideBarMenu.test'),
+      name: t('navigation.sidebar.menu.test'),
       show: mui.frontendSettings.showTestPage
     }
   ]

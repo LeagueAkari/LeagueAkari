@@ -107,7 +107,7 @@
                         (participant.kills > 0 || participant.assists > 0)
                       "
                     >
-                      {{ t('MatchCard.overview.perfect') }}
+                      {{ t('matchCard.overview.perfect') }}
                       ({{ (participant.killParticipation * 100).toFixed(0) }}%)
                     </div>
 
@@ -139,7 +139,7 @@
                         {{ formatExtremeNumber(participant.totalDamageDealtToChampions) }}
                       </div>
                       <div class="text-xs text-black/60 dark:text-white/60">
-                        {{ t('MatchCard.overview.damage') }}
+                        {{ t('matchCard.overview.damage') }}
                       </div>
                     </div>
                   </div>
@@ -149,7 +149,7 @@
                     <div class="text-center text-base font-bold">
                       {{ formatExtremeNumber(participant.cs) }}
                       <span class="text-[11px] font-normal text-black/60 dark:text-white/60">{{
-                        t('MatchCard.overview.cs')
+                        t('matchCard.overview.cs')
                       }}</span>
                     </div>
 
@@ -158,7 +158,7 @@
                         {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
                       </div>
                       <div class="text-xs text-black/60 dark:text-white/60">
-                        {{ t('MatchCard.overview.csPerMin') }}
+                        {{ t('matchCard.overview.csPerMin') }}
                       </div>
                     </div>
                   </div>

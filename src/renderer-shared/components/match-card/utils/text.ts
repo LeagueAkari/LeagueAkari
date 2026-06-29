@@ -11,10 +11,10 @@ export function useGameResultName() {
     }
 
     if (isSurrender && result !== 'remake') {
-      return t('MatchCard.result.surrender')
+      return t('matchCard.result.surrender')
     }
 
-    return t(`MatchCard.result.${result}`, { defaultValue: result })
+    return t(`matchCard.result.${result}`, { defaultValue: result })
   }
 }
 
@@ -36,7 +36,7 @@ export function useFrameEventType() {
   const { t } = useTranslation()
 
   return (type: string) => {
-    return t(`MatchCard.frameEventType.${type}`, { defaultValue: type })
+    return t(`matchCard.frameEventType.${type}`, { defaultValue: type })
   }
 }
 
@@ -44,7 +44,7 @@ export function useBuildingType() {
   const { t } = useTranslation()
 
   return (type: string) => {
-    return t(`MatchCard.buildingType.${type}`, { defaultValue: type })
+    return t(`matchCard.buildingType.${type}`, { defaultValue: type })
   }
 }
 
@@ -52,7 +52,7 @@ export function useTowerType() {
   const { t } = useTranslation()
 
   return (type: string) => {
-    return t(`MatchCard.towerType.${type}`, { defaultValue: type })
+    return t(`matchCard.towerType.${type}`, { defaultValue: type })
   }
 }
 
@@ -60,7 +60,7 @@ export function useLaneType() {
   const { t } = useTranslation()
 
   return (type: string) => {
-    return t(`MatchCard.laneType.${type}`, { defaultValue: type })
+    return t(`matchCard.laneType.${type}`, { defaultValue: type })
   }
 }
 
@@ -68,6 +68,6 @@ export function usePosition() {
   const { t } = useTranslation()
 
   return (position: string) => {
-    return t(`MatchCard.position.${position}`, { defaultValue: position })
+    return t(`matchCard.position.${position}`, { defaultValue: position })
   }
 }

@@ -18,7 +18,7 @@
           <template #icon>
             <NIcon size="14"><Add20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.add') }}
+          {{ t('playerTabs.matchHistory.filters.add') }}
         </NButton>
         <div class="min-w-0 flex-1 border-t border-black/10 dark:border-white/10" />
       </div>

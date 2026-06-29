@@ -184,15 +184,15 @@ const percentage = computed(() => {
 const data = computed<ChartData<'radar'>>(() => {
   return {
     labels: [
-      t('MatchCard.radar.damage', {
+      t('matchCard.radar.damage', {
         value: percentage.value.damageDealtToChampions.toLocaleString()
       }),
-      t('MatchCard.radar.taken', { value: percentage.value.damageTaken.toLocaleString() }),
-      t('MatchCard.radar.gold', { value: percentage.value.goldEarned.toLocaleString() }),
-      t('MatchCard.radar.cs', { value: percentage.value.cs.toLocaleString() }),
-      t('MatchCard.radar.kda', { value: percentage.value.kda.toFixed(2) }),
-      t('MatchCard.radar.kp', { value: (percentage.value.killParticipation * 100).toFixed(0) }),
-      t('MatchCard.radar.heal', { value: percentage.value.totalHeal.toLocaleString() })
+      t('matchCard.radar.taken', { value: percentage.value.damageTaken.toLocaleString() }),
+      t('matchCard.radar.gold', { value: percentage.value.goldEarned.toLocaleString() }),
+      t('matchCard.radar.cs', { value: percentage.value.cs.toLocaleString() }),
+      t('matchCard.radar.kda', { value: percentage.value.kda.toFixed(2) }),
+      t('matchCard.radar.kp', { value: (percentage.value.killParticipation * 100).toFixed(0) }),
+      t('matchCard.radar.heal', { value: percentage.value.totalHeal.toLocaleString() })
     ],
     datasets: [
       {
@@ -215,7 +215,7 @@ const data = computed<ChartData<'radar'>>(() => {
         ]
       },
       {
-        label: t('MatchCard.radar.teamAvg'),
+        label: t('matchCard.radar.teamAvg'),
         backgroundColor: chartColors.value.team.background,
         borderColor: chartColors.value.team.border,
         borderWidth: 2,

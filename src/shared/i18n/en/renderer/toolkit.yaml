@@ -1,0 +1,542 @@
+toolkit:
+  client:
+    nativeSupport:
+      unsupportedCurrentPlatform: Unsupported on current platform
+      supportedButRequiresElevation: Supported on current platform but requires administrator privileges
+    leagueClient:
+      title: League Client
+      disconnect:
+        label: Disconnect
+        description: Disconnect $t(common:appName) from the League Client.
+        button: Disconnect
+      quitClient:
+        label: Quit Client Process
+        description: Close the League Client.
+        button: Quit Client Process
+        dialog:
+          title: Quit Client Process
+          content: Are you sure you want to quit the client process? This will directly close the game.
+          positiveText: Quit
+          negativeText: Cancel
+    gameClient:
+      title: Game Client
+      windowsOnlyNativeAddon: Requires native addons (this build currently ships them only on Windows).
+      nativeAddonRequiresAdministrator: This capability is supported on the current platform, but requires running as administrator.
+      terminateGameClientWithShortcut:
+        labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
+        label: Enable Terminate Game Client Shortcut
+        description: When the game client is running and in the foreground, using the shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
+      terminateShortcut:
+        label: Terminate Shortcut
+        labelAdminRequired: Terminate Shortcut (Admin Required)
+        description: Set a custom shortcut to forcibly terminate the game client process.
+      settingsFileMode:
+        label: Lock Game Settings
+        description: Prevent in-game changes from overwriting the settings you already use. Unlock them when you need to edit settings.
+        details:
+          readonly: When locked, League Akari makes the League settings file read-only. The game can still read your current settings, but new changes will not be saved over them.
+          writable: Unlocking restores write access, so graphics, hotkeys, and other in-game changes save normally again.
+          scope: This only affects the settings file for the currently connected client installation.
+        setToReadonly: Game settings locked
+        setToWritable: Game settings unlocked
+        failedToSet: 'Failed to switch settings lock: {{reason}}'
+    leagueClientUx:
+      title: League Client UX
+      fixWindowMethodAOptions:
+        label: Adjust Window Size
+        labelAdminRequired: Adjust Window Size (Admin Required)
+        description: <a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - Adjust the window size using WinAPI. This can be attempted when the client interface size is incorrect.
+        unsupportedCurrentPlatform: Adjusting window size is not supported on the current platform.
+        requiresAdministrator: Adjusting window size is supported on the current platform, but requires running as administrator.
+        button: Adjust
+        dialog:
+          title: Adjust Window Size
+          content: Do you want to adjust the window size? Try this operation if the client is not displaying properly.
+          positiveText: Adjust
+          negativeText: Cancel
+      restartUx:
+        label: Restart Client UI
+        description: Immediately restart the rendering process. This operation does not affect ongoing activities and can be used to fix client UI errors.
+        button: Restart UX Process
+        dialog:
+          title: Restart UX Process
+          content: Do you want to restart the UX process? Try this operation if the client is not displaying properly.
+          positiveText: Restart
+          negativeText: Cancel
+      killUx:
+        label: Kill UX Process
+        description: Immediately terminate the rendering process. This operation does not affect ongoing activities.
+        button: Kill UX Process
+        dialog:
+          title: Kill UX Process
+          content: Are you sure you want to kill the UX process? You might need to restart this process. Killing the UX process will not cause the game to exit but can significantly reduce resource usage.
+          positiveText: Kill
+          negativeText: Cancel
+      launchUx:
+        label: Launch UX Process
+        description: Immediately launch the rendering process if it has been closed.
+        button: Launch UX Process
+        dialog:
+          title: Launch UX Process
+          content: Do you want to launch the UX process?
+          positiveText: Launch
+          negativeText: Cancel
+  home:
+    title: Toolkit
+    client: League Client / Game Client
+    in-process: In Process
+    in-game-send: In-Game Send
+    lobby: Lobby Tools
+    misc: Misc
+    claim-tools: Claim Tools
+    friend-tools: Friend Tools
+    loot-tools: Loot Tools
+  championBench:
+    title: Champion Bench
+    reroll: Reroll
+    charity: Charity
+    charityTitle: Perform a reroll but immediately reclaim the previously assigned champion
+    notInBenchMode: Not currently in a random mode
+    notInPhase: Not in the champion selection phase
+    swapFailedNotification:
+      title: Champion Bench
+      description: Failed to swap champions, maybe the champion is no longer available
+    rerollFailedNotification:
+      title: Champion Bench
+      description: Failed to reroll, maybe the champion is no longer available
+  gameflowInProgress:
+    title: In Progress
+    dodge:
+      label: Dodge Champion Select
+      description: Immediately exit the current champion selection phase without closing the client.
+      button: Dodge
+      failedNotification:
+        title: Dodge Champion Select
+        description: 'Failed to dodge champion select: {{reason}}'
+    playAgain:
+      label: Exit Post-Game Screen
+      description: Immediately exit the post-game screen. Useful when the client cannot exit the post-game screen properly.
+      button: Return to Lobby
+      failedNotification:
+        title: Exit Post-Game Screen
+        description: 'Failed to exit the post-game screen: {{reason}}'
+    leaveLobby:
+      label: Leave Lobby
+      description: Immediately leave the current lobby.
+      button: Leave Lobby
+  lobby:
+    title: Lobby Tool
+    createIdLobby:
+      label: Create Queue Lobby
+      description: Create a lobby for a specific queue ID, subject to server availability for the target queue.
+      button: Create
+      selectPlaceholder: Select or specify ID
+      failedNotification:
+        title: Create Queue Lobby
+        description: 'Failed to create queue lobby: {{reason}}'
+    loadEligibleQueuesFailedNotification:
+      title: Load Queues Failed
+      description: 'Failed to load the list of available queues: {{reason}}'
+    queueOptions:
+      available: Available Queues
+      unavailable: Currently Disabled Queues
+  strawberry:
+    title: Swarm
+    unavailable: Currently not in Swarm mode
+    champion:
+      label: Set as Current Champion
+      description: You can try selecting other champions.
+      button: Set
+      failedMessage: 'Failed to set the current champion: {{reason}}'
+    championOptions:
+      modeSpecific: Mode-Specific Champions
+      other: Other Champions
+    map:
+      label: Select Map
+      description: Maps currently available.
+      button: Set
+      failedMessage: 'Failed to set map: {{reason}}'
+    difficulty:
+      label: Set Difficulty
+      description: The preset difficulty levels include [Story], [Hard], and [Extreme]. Currently, you cannot set an unlocked difficulty level.
+      button: Set
+      failedMessage: 'Failed to set difficulty: {{reason}}'
+    requestSent: Request sent
+  chatAvailability:
+    title: Chat Status
+    availability:
+      label: Chat Status
+      description: Display or set the current chat status. Some statuses are only available under specific conditions.
+      radio:
+        chat: Chat
+        mobile: Online (Mobile)
+        away: Away
+        dnd: DND
+        offline: Offline
+        spectating: Spectating
+        online: Online
+      failedNotification:
+        title: Set Chat Status
+        description: 'Failed to set chat status: {{reason}}'
+    lockOfflineStatus:
+      label: Try Locking Offline Status
+      description: Set the offline status and try to correct the client's automatic away status.
+      button: Set
+  chatStatusMessage:
+    title: Chat Signature
+    message:
+      saved: Saved
+      success: Saved and applied
+      failedNotification:
+        title: Set Chat Signature
+        description: 'Failed to set chat signature: {{reason}}'
+    resetOnLogin:
+      label: Reset On Login
+      description: Reapply the last saved signature every time the client signs in.
+    text:
+      label: Signature
+      description: Save and apply the chat signature. Set an empty value to delete it.
+      placeholder: Enter signature
+      save: Save
+  summonerProfile:
+    title: Summoner
+    commonSuccess: Action Successful
+    commonFailed: Unable to Apply
+    skinSelectModal:
+      title: Skin Selection
+      button: Set as Current Skin
+      augment: Augment
+      unset: Unset
+      failedNotification:
+        title: Profile Background
+        description: 'Failed to apply the current skin: {{reason}}'
+    profileBackground:
+      label: Select Summoner Background
+      description: Search for the target champion or skin.
+      button: Select
+    bannerAccent:
+      label: Switch to Last Season's Banner
+      description: Switch to last season's banner; this may cause the banner to disappear.
+      button: Execute
+      failedNotification:
+        title: Switch to Last Season's Banner
+        description: 'Failed to switch banner: {{reason}}'
+    prestigeCrest:
+      label: Remove Prestige Frame
+      description: Remove the prestige frame.
+      descriptionInsufficientLevel: 'Remove the prestige frame (Summoner level must be 525 or higher; current level: {{level}})'
+      button: Execute
+      failedNotification:
+        title: Remove Prestige Frame
+        description: 'Failed to remove prestige frame: {{reason}}'
+    token:
+      label: Remove All Tokens
+      description: Remove all tokens.
+      button: Execute
+      failedNotification:
+        title: Remove All Tokens
+        description: 'Failed to remove all tokens: {{reason}}'
+    emotes:
+      label: Remove All Emotes
+      description: Remove all emotes, including emote wheel and event responses.
+      button: Execute
+  gameView:
+    title: View Game
+    game:
+      label: Game ID
+      description: Fetch and view the game using its ID.
+      button: View
+  fakeRanked:
+    title: Fake Ranked Status
+    commonSuccess: Saved and applied
+    saved: Saved
+    resetOnLogin:
+      label: Reset On Login
+      description: Reapply the last saved ranked status every time the client signs in.
+    set:
+      label: Save Ranked Status
+      description: Save the chat card ranked status
+      button: Save
+      failedNotification:
+        title: Fake Ranked
+        description: 'Failed to fake ranked status: {{reason}}'
+    queue: Queue
+    tier: Tier
+    division: Division
+  spectate:
+    title: Spectate
+    leaveButton: Leave Lobby
+    needToLeaveLobby: You need to leave the current lobby to spectate.
+    spectate:
+      label: Summoner Spectate
+      description: Spectate a player on the current server by PUUID or summoner name, provided the player is in a spectatable game.
+      button: Start Spectating
+      placeholder: Summoner Name / PUUID
+      errorNoPlayer: Player does not exist.
+      notFoundNotification:
+        title: Spectate
+        description: Target player {{name}} not found.
+      failedNotification:
+        title: Spectate
+        description: 'Failed to start spectating. The player may not be in a game or the target mode is unspectatable: {{reason}}'
+      successNotification:
+        title: Spectate
+        description: Spectating has started.
+    token:
+      label: Token Spectate
+      description: Use a special token in the correct format to launch the spectate process in the game client.
+      button: Start Spectating
+      placeholder: Token
+      successNotification:
+        title: Spectate
+        description: Spectating has started.
+        useRememberedInstallLocation: Spectating has started, using the detected client location.
+      failedNotification:
+        title: Spectate
+        description: 'Failed to start spectating: {{reason}}'
+    failedToLoadFriends: Failed to load friends list
+  inGameSend:
+    settings:
+      title: Settings
+      cancelShortcut:
+        label: Cancel Shortcut
+        description: Set a shortcut key to cancel any sending action
+      sendInterval:
+        label: Send Interval (ms)
+        description: Set the interval between each simulated sending action
+    presets:
+      title: Preset Send
+      footer:
+        shortcutUnavailable: Shortcuts are currently unavailable, {{reason}}.
+        shortcutUsage: When a shortcut is configured, it can send to chat during champion select or lobby, or simulate keyboard input in-game while the game is in the foreground.
+        draftOnly: Draft mode only supports dry run and will not send to chat or game.
+      nativeInput:
+        needAdmin: start as administrator
+        unsupported: unsupported on the current platform
+        unavailable: currently unavailable
+      teams:
+        friendly: Allied
+        enemy: Enemy
+        labelWithName: '{{side}} · {{team}}'
+      targets:
+        friendly:
+          label: Send Allies
+          description: Send selected allied players
+        enemy:
+          label: Send Enemies
+          description: Send selected enemy players
+        all:
+          label: Send All
+          description: Send selected players from both teams
+      controls:
+        shortcut: Shortcut
+        sendToGame: Send to Game
+        sendToChat: Send to Chat
+        send: Send
+        dryRun: Dry Run
+        dryRunDescription: Generate lines and preview them below without writing to the client.
+        sendSucceeded: Submitted send ({{preset}} → {{target}})
+        disabled:
+          draftOnly: Draft mode only supports dry run.
+          unavailable: Available only in champion select, lobby, or in-game.
+      preview:
+        title: Dry Run
+        empty: No sendable content
+        copy: Copy
+        copied: Copied to clipboard
+        copyFailed: Copy failed
+        close: Close
+      selection:
+        playersTitle: Send targets ({{selected}} / {{total}})
+        premadeTitle: Selected premade groups ({{selected}} / {{total}})
+        selectAll: Select All
+        clear: Clear
+        groupCount_one: '{{count}} premade group'
+        groupCount_other: '{{count}} premade groups'
+        emptyPremadeGroups: No premade groups
+        bucketSize: '{{count}}-stack'
+      nameDisplayStrategy:
+        title: Name Display
+        options:
+          preferName:
+            label: Prefer Player Name
+            description: Use player names for player identifiers in the output
+          preferChampionName:
+            label: Prefer Champion Name
+            description: Use player names when no champion is selected or duplicate champions exist
+          championNameWithName:
+            label: Champion With Player
+            description: Use champion names with player names in parentheses
+      rating:
+        label: Performance Rating
+        description: Summarize each player's recent performance, including win rate, KDA, and main champions.
+        displayOptionsTitle: Display Items
+        displayOptions:
+          winRate:
+            label: Win Rate
+            description: Recent match win rate
+          kda:
+            label: KDA
+            description: Kills / deaths / assists performance
+          avgSoloKills:
+            label: Avg Solo Kills
+            description: Average solo kills; requires the SGP data source
+          avgVisionScore:
+            label: Average Vision Score
+            description: Average vision score in recent matches
+          avgChampionDamage:
+            label: Damage
+            description: Show average share of team champion damage
+          avgDamageTaken:
+            label: Damage Taken
+            description: Show average share of team damage taken
+          avgGold:
+            label: Gold
+            description: Show average share of team gold
+          avgCsPerMinute:
+            label: CS
+            description: Show average CS per minute
+          avgKillParticipation:
+            label: Kill Participation
+            description: Show average kill participation
+          avgDamageGoldEfficiency:
+            label: Damage / Gold
+            description: Show average damage-to-gold efficiency
+          mainChampions:
+            label: Main Champions
+            description: Show up to three clearly preferred champions from recent match stats; hidden when filtering by current champion
+          mainPositions:
+            label: Main Positions
+            description: Show up to two main positions when recent match stats include clear position data
+        configOptionsTitle: Configuration
+        configOptions:
+          showCurrentChampion:
+            label: Filter By Current Champion
+            description: Only include recent matches on each player's currently selected champion; shows a prompt when no champion is selected
+      jungle:
+        label: Jungle Preference
+        description: Show early activity, first-clear distribution, and objective control tendencies.
+        displayOptionsTitle: Display Modules
+        displayOptions:
+          activityPreference:
+            label: Activity Preference
+            description: Show which early-map zones the jungler tends to visit, with top/mid/bot distribution
+          firstClearDistribution:
+            label: First-Clear Distribution
+            description: Show blue-side and red-side standard/invade start rates and camp distribution, only when filtering by current champion
+          earlyGank:
+            label: Early Gank
+            description: Show level 3 and level 4 gank trigger rates
+          dragonControl:
+            label: Dragon Control
+            description: Show first dragon rate, average first dragon time, and average dragons
+          monsterControl:
+            label: Monster Objectives
+            description: Show average voidgrubs, heralds, and barons
+          mainChampions:
+            label: Main Champions
+            description: Show up to three champions with clearly more jungle-detail samples, only when current champion filtering is off
+        configOptionsTitle: Configuration
+        configOptions:
+          showCurrentChampion:
+            label: Filter By Current Champion
+            description: Only include jungle details for each player's currently selected champion; shows a prompt when no champion is selected. Enabled by default.
+      premade:
+        label: Premade Status
+        description: Identify premade groups in each team and show members by group.
+      fixedText:
+        label: Fixed Text
+        empty:
+          description: No fixed text yet. Add one, then set its title, shortcut, and multiline content.
+          action: Add Fixed Text
+        listTitle: Fixed Text
+        addLimitReached: Up to {{count}} fixed text items can be created.
+        unnamed: Untitled
+        editTitle: Edit title
+        shortcutLabel: Shortcut
+        shortcutDescription: Sends this saved fixed text item.
+        save: Save
+        saved: Saved
+        saveFailed: Failed to save
+        createFailed: Failed to create
+        delete: Delete
+        deleted: Deleted
+        deleteFailed: Failed to delete
+        deleteConfirm: Delete?
+        moveUp: Move up
+        moveDown: Move down
+        sendToGame: Send to Game
+        sendToChat: Send to Chat
+        send: Send
+        sendSucceeded: Submitted send
+        sendSucceededWithTitle: 'Submitted send (Fixed Text: {{title}})'
+        disabled:
+          noSelection: Select a fixed text item
+          saveFirst: Save current edits first
+          draftOnly: Draft mode cannot send.
+          unavailable: Available only in champion select, lobby, or in-game.
+  claim:
+    rewards:
+      title: Rewards
+      hint: To find something forgotten.
+      columns:
+        rewardList: Claimable Items
+      refreshButton: Refresh
+      claimButton: Claim
+      claimButtonC: Claim ({{count}})
+      cancelButton: Cancel
+      refreshSuccess: Refreshed
+      refreshFailed: Failed to fetch {{reason}}
+      claimFailed: Failed to claim {{reason}}
+      claimed: Claimed {{item}}
+    eventHub:
+      title: Event Hub
+      hint: Items in this column may overlap with some items in "Rewards". Claiming any one of them is sufficient.
+      columns:
+        rewardList: Claimable Items
+      refreshButton: Refresh
+      claimButton: Claim
+      claimButtonC: Claim ({{count}})
+      cancelButton: Cancel
+      refreshSuccess: Refreshed
+      refreshFailed: Failed to fetch {{reason}}
+      claimFailed: Failed to claim {{reason}}
+      claimed: Claimed {{item}}
+    missions:
+      title: Missions
+      hint: Completing missions in advance may cause data inconsistency. Please use with caution.
+      columns:
+        rewardList: Claimable Items
+      refreshButton: Refresh
+      claimButton: Claim
+      claimButtonC: Claim ({{count}})
+      cancelButton: Cancel
+      refreshSuccess: Refreshed
+      refreshFailed: Failed to fetch {{reason}}
+      claimFailed: Failed to claim {{reason}}
+      claimed: Claimed {{item}}
+    item:
+      untranslatedC: Unnamed Group ({{count}})
+  friends:
+    title: Friends
+    searchPlaceholder: Search friend name or tag
+    deleteButtonC: Delete ({{count}})
+    deleteButton: Delete
+    cancelButton: Cancel
+    refreshButton: Refresh
+    deleteSuccess_one: Deleted {{count}} friend
+    deleteSuccess_other: Deleted {{count}} friends
+    deletePopconfirm: This will perform a deletion operation and cannot be undone
+    refreshSuccess: Refreshed
+    neverPlayed: No match data
+    unknown: Unknown
+    groupNames:
+      '**Default': General
+    columns:
+      groupName: Friend Group
+      lastGameDate: Last Game Date
+      friendSince: Friend Since
+  loot:
+    title: Loot Tools
+    refreshSuccess: Refreshed
+    refreshFailed: Failed to fetch {{reason}}

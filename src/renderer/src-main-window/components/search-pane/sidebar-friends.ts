@@ -32,7 +32,7 @@ export function useSearchPaneFriends() {
       const { data } = await lc.api.chat.getFriends()
       friends.value = data
     } catch (error) {
-      message.error(() => t('SearchPane.getFriendsFailed'))
+      message.error(() => t('playerSearch.getFriendsFailed'))
     }
   }
 

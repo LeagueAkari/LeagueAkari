@@ -11,7 +11,7 @@
       :value="lcs.champSelect.skinSelectorInfo?.selectedSkinId"
       @update:value="handleSetSkin"
       :placeholder="
-        t('SkinSelectionMini.skins', {
+        t('auxWindow.skinSelection.skins', {
           count: skinOptions.length
         })
       "
@@ -169,9 +169,9 @@ const handleSetSkin = async (skinId: number) => {
 
   try {
     await lc.api.champSelect.setSkin(skinId)
-    message.success(t('SkinSelectionMini.success'))
+    message.success(t('auxWindow.skinSelection.success'))
   } catch (error) {
-    message.warning(t('SkinSelectionMini.failed'))
+    message.warning(t('auxWindow.skinSelection.failed'))
   } finally {
     isSettingSkin.value = false
   }

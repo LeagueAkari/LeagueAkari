@@ -35,9 +35,9 @@
     <div class="space-y-2" v-if="isSgpMatchHistorySource">
       <TooltipWithIcon
         class="mb-2 text-xs text-black/60 dark:text-white/60"
-        :tooltip="t('PlayerTab.sgpQueueOnlyTooltip')"
+        :tooltip="t('playerTabs.profile.sgpQueueOnlyTooltip')"
       >
-        {{ t('PlayerTab.queue') }}
+        {{ t('playerTabs.profile.queue') }}
       </TooltipWithIcon>
       <QueueSelect :disabled="isPaginationDisabled" />
     </div>

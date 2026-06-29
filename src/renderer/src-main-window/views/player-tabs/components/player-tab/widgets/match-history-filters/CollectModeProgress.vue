@@ -10,8 +10,8 @@
           {{
             t(
               collectState.isStopping
-                ? 'PlayerTab.collectMode.stoppingProgress'
-                : 'PlayerTab.collectMode.collectingProgress',
+                ? 'playerTabs.matchHistory.collectMode.stoppingProgress'
+                : 'playerTabs.matchHistory.collectMode.collectingProgress',
               {
                 count: page.games.length,
                 expected: collectState.params.expectedCount
@@ -21,7 +21,7 @@
         </span>
         <span class="text-[11px] whitespace-nowrap text-gray-600 dark:text-gray-400">
           {{
-            t('PlayerTab.collectMode.roundProgress', {
+            t('playerTabs.matchHistory.collectMode.roundProgress', {
               current: currentRound,
               max: collectState.params.maxIteration
             })
@@ -40,7 +40,7 @@
       <template #icon>
         <NIcon size="14"><Stop20Regular /></NIcon>
       </template>
-      {{ t('PlayerTab.collectMode.stopCollect') }}
+      {{ t('playerTabs.matchHistory.collectMode.stopCollect') }}
     </NButton>
   </div>
 </template>

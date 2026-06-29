@@ -106,7 +106,7 @@
           <span
             class="inline-block h-2.5 w-2.5 rounded-full border border-black/30 bg-black/35 dark:border-white/40 dark:bg-white/40"
           />
-          {{ t('JunglePathing.firstClearOwnLegend') }}
+          {{ t('ongoingGame.junglePathing.firstClearOwnLegend') }}
         </span>
         <span
           class="inline-flex items-center gap-1 whitespace-nowrap text-amber-600 dark:text-amber-400"
@@ -114,7 +114,7 @@
           <span
             class="inline-block h-2.5 w-2.5 rounded-full border border-amber-600/80 bg-amber-500/15 dark:border-amber-400/90 dark:bg-white/20"
           />
-          {{ t('JunglePathing.firstClearInvadeLegend') }}
+          {{ t('ongoingGame.junglePathing.firstClearInvadeLegend') }}
         </span>
         <span
           class="inline-flex items-center gap-1 whitespace-nowrap text-orange-600 dark:text-orange-400"
@@ -127,7 +127,7 @@
               class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm bg-orange-600 dark:bg-orange-400"
             />
           </span>
-          {{ t('JunglePathing.level3KillLegend') }}
+          {{ t('ongoingGame.junglePathing.level3KillLegend') }}
         </span>
         <span
           class="inline-flex items-center gap-1 whitespace-nowrap text-purple-600 dark:text-purple-400"
@@ -140,7 +140,7 @@
               class="absolute top-1/2 left-1/2 h-0.5 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm bg-purple-600 dark:bg-purple-400"
             />
           </span>
-          {{ t('JunglePathing.level4KillLegend') }}
+          {{ t('ongoingGame.junglePathing.level4KillLegend') }}
         </span>
       </div>
     </template>
@@ -148,7 +148,7 @@
     <template #content>
       <div>
         <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-          {{ t('JunglePathing.firstClear') }}
+          {{ t('ongoingGame.junglePathing.firstClear') }}
         </div>
         <div class="flex flex-col gap-1 text-black/75 dark:text-white/75">
           <div
@@ -186,7 +186,7 @@
 
       <div>
         <div class="mb-1 font-bold text-black/90 dark:text-white/90">
-          {{ t('JunglePathing.earlyGank') }}
+          {{ t('ongoingGame.junglePathing.earlyGank') }}
         </div>
         <div class="flex flex-col gap-1 text-black/75 dark:text-white/75">
           <div
@@ -287,13 +287,13 @@ const sideIndicatorColorClass = (side: TeamSide) =>
   getTeamIndicatorColorClass(side === 'blue' ? 'TEAM-100' : 'TEAM-200') ?? ''
 
 const sideLabel = (side: TeamSide) =>
-  side === 'blue' ? t('JunglePathing.blueTeam') : t('JunglePathing.redTeam')
+  side === 'blue' ? t('ongoingGame.junglePathing.blueTeam') : t('ongoingGame.junglePathing.redTeam')
 
 const campNames: Record<JungleCamp, () => string> = {
-  red: () => t('JunglePathing.campRed'),
-  blue: () => t('JunglePathing.campBlue'),
-  wolves: () => t('JunglePathing.campWolves'),
-  raptors: () => t('JunglePathing.campRaptors')
+  red: () => t('ongoingGame.junglePathing.campRed'),
+  blue: () => t('ongoingGame.junglePathing.campBlue'),
+  wolves: () => t('ongoingGame.junglePathing.campWolves'),
+  raptors: () => t('ongoingGame.junglePathing.campRaptors')
 }
 
 const campMarkerColors: Record<JungleCamp, string> = {
@@ -330,7 +330,7 @@ const campStartEntries = (camps: Record<JungleCamp, number>, total: number, slot
       values[slotName] = `${Math.round((camps[camp] / total) * 100)}%`
 
       return replaceComponentSlot(
-        t('JunglePathing.campStart', { camp: campNames[camp]() }),
+        t('ongoingGame.junglePathing.campStart', { camp: campNames[camp]() }),
         'pct',
         slotName
       )
@@ -345,14 +345,18 @@ const createOwnStartCell = (
   starts: number
 ): HighlightedTranslationData => {
   if (games <= 0 || starts <= 0) {
-    return highlightedText(t('JunglePathing.noOwnStartData'), {}, PLACEHOLDER_TEXT_CLASS)
+    return highlightedText(
+      t('ongoingGame.junglePathing.noOwnStartData'),
+      {},
+      PLACEHOLDER_TEXT_CLASS
+    )
   }
 
   const pctSlot = 'own-pct'
   const entries = campStartEntries(camps, starts, 'own-camp')
 
   return highlightedText(
-    `${replaceComponentSlot(t('JunglePathing.campOwnStart'), 'pct', pctSlot)} (${entries.translations.join(', ')})`,
+    `${replaceComponentSlot(t('ongoingGame.junglePathing.campOwnStart'), 'pct', pctSlot)} (${entries.translations.join(', ')})`,
     {
       [pctSlot]: `${Math.round((starts / games) * 100)}%`,
       ...entries.values
@@ -366,14 +370,14 @@ const createInvadeStartCell = (
   starts: number
 ): HighlightedTranslationData => {
   if (games <= 0 || starts <= 0) {
-    return highlightedText(t('JunglePathing.noInvadeData'), {}, PLACEHOLDER_TEXT_CLASS)
+    return highlightedText(t('ongoingGame.junglePathing.noInvadeData'), {}, PLACEHOLDER_TEXT_CLASS)
   }
 
   const pctSlot = 'invade-pct'
   const entries = campStartEntries(camps, starts, 'invade-camp')
 
   return highlightedText(
-    `${replaceComponentSlot(t('JunglePathing.campInvadeStart'), 'pct', pctSlot)} (${entries.translations.join(', ')})`,
+    `${replaceComponentSlot(t('ongoingGame.junglePathing.campInvadeStart'), 'pct', pctSlot)} (${entries.translations.join(', ')})`,
     {
       [pctSlot]: `${Math.round((starts / games) * 100)}%`,
       ...entries.values
@@ -419,13 +423,16 @@ const createEarlyGankCell = (side: TeamSide, level: EarlyGankLevel): EarlyGankCe
 
   if (count <= 0) {
     return highlightedText(
-      level === 3 ? t('JunglePathing.noLevel3GankData') : t('JunglePathing.noLevel4GankData'),
+      level === 3
+        ? t('ongoingGame.junglePathing.noLevel3GankData')
+        : t('ongoingGame.junglePathing.noLevel4GankData'),
       {},
       PLACEHOLDER_TEXT_CLASS
     )
   }
 
-  const key = level === 3 ? 'JunglePathing.level3Gank' : 'JunglePathing.level4Gank'
+  const key =
+    level === 3 ? 'ongoingGame.junglePathing.level3Gank' : 'ongoingGame.junglePathing.level4Gank'
 
   return highlightedText(t(key), {
     count: count.toString(),
@@ -448,14 +455,20 @@ const campPopoverLines = (
   kindTotal: number,
   sideTotal: number
 ) => [
-  highlightedText(t('JunglePathing.campPopoverCampGames', { count }), {
+  highlightedText(t('ongoingGame.junglePathing.campPopoverCampGames', { count }), {
     count: count.toString()
   }),
-  highlightedText(t('JunglePathing.campPopoverKindGames', { count: kindTotal, kind: kindLabel }), {
-    count: kindTotal.toString()
-  }),
   highlightedText(
-    t('JunglePathing.campPopoverSideGames', { count: sideTotal, side: sideLabel(side) }),
+    t('ongoingGame.junglePathing.campPopoverKindGames', { count: kindTotal, kind: kindLabel }),
+    {
+      count: kindTotal.toString()
+    }
+  ),
+  highlightedText(
+    t('ongoingGame.junglePathing.campPopoverSideGames', {
+      count: sideTotal,
+      side: sideLabel(side)
+    }),
     {
       count: sideTotal.toString()
     }
@@ -486,8 +499,8 @@ const firstClearRows = computed<FirstClearRow[]>(() => TEAM_SIDES.map(createFirs
 const earlyGankRows = computed<EarlyGankRow[]>(() => TEAM_SIDES.map(createEarlyGankRow))
 
 const firstClearCampMapPoints = computed<FirstClearCampMapPoint[]>(() => {
-  const ownKindLabel = t('JunglePathing.firstClearOwnLegend')
-  const invadeKindLabel = t('JunglePathing.firstClearInvadeLegend')
+  const ownKindLabel = t('ongoingGame.junglePathing.firstClearOwnLegend')
+  const invadeKindLabel = t('ongoingGame.junglePathing.firstClearInvadeLegend')
   const blueOwnStarts = sumCampCount(stats.firstClearCamp.blue)
   const redOwnStarts = sumCampCount(stats.firstClearCamp.red)
   const blueInvadeStarts = sumCampCount(stats.firstClearCamp.blueInvade)

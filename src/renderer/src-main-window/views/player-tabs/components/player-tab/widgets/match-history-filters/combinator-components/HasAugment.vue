@@ -3,20 +3,20 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Sparkle20Regular /></NIcon>
-        {{ t('PlayerTab.filter.augment') }}
+        {{ t('playerTabs.matchHistory.filters.augment') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.have') }}
+        {{ t('playerTabs.matchHistory.filters.have') }}
       </div>
 
       <NSelect
@@ -32,7 +32,7 @@
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.atPosition') }}
+        {{ t('playerTabs.matchHistory.filters.atPosition') }}
       </div>
 
       <NSelect
@@ -106,7 +106,7 @@ const renderTypeBlock = (type: 'kiwi' | 'cherry' | 'others' | undefined) => {
           'flex size-4.5 shrink-0 items-center justify-center rounded bg-blue-500 text-[11px]'
         ]}
       >
-        {t('PlayerTab.filter.augmentTypeHai')}
+        {t('playerTabs.matchHistory.filters.augmentTypeHai')}
       </div>
     )
   } else if (type === 'cherry') {
@@ -116,7 +116,7 @@ const renderTypeBlock = (type: 'kiwi' | 'cherry' | 'others' | undefined) => {
           'flex size-4.5 shrink-0 items-center justify-center rounded bg-red-500 text-[11px]'
         ]}
       >
-        {t('PlayerTab.filter.augmentTypeDou')}
+        {t('playerTabs.matchHistory.filters.augmentTypeDou')}
       </div>
     )
   } else {
@@ -146,7 +146,7 @@ const augmentOptions = computed(() => {
   return [
     {
       type: 'group',
-      label: t('PlayerTab.filter.augmentGroupHextech'),
+      label: t('playerTabs.matchHistory.filters.augmentGroupHextech'),
       children: kiwi
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -156,7 +156,7 @@ const augmentOptions = computed(() => {
     },
     {
       type: 'group',
-      label: t('PlayerTab.filter.augmentGroupArena'),
+      label: t('playerTabs.matchHistory.filters.augmentGroupArena'),
       children: cherry
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -166,7 +166,7 @@ const augmentOptions = computed(() => {
     },
     {
       type: 'group',
-      label: t('PlayerTab.filter.augmentGroupOther'),
+      label: t('playerTabs.matchHistory.filters.augmentGroupOther'),
       children: others
         .toSorted((a, b) => (a.nameTRA as string).localeCompare(b.nameTRA as string))
         .map((augment) => ({
@@ -179,13 +179,13 @@ const augmentOptions = computed(() => {
 
 const orderOptions = computed(() => {
   const oneToFive = Array.from({ length: 5 }, (_, index) => ({
-    label: t('PlayerTab.filter.positionN', { n: index + 1 }),
+    label: t('playerTabs.matchHistory.filters.positionN', { n: index + 1 }),
     value: index
   }))
 
   return [
     {
-      label: t('PlayerTab.filter.anyPosition'),
+      label: t('playerTabs.matchHistory.filters.anyPosition'),
       value: -1
     },
     ...oneToFive

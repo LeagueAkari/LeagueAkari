@@ -27,11 +27,11 @@
         <template v-if="isLoadingGameSummary">
           <div class="flex items-center gap-2">
             <NSpin :size="16" />
-            <span>{{ $t('MatchPreviewer.loading') }}</span>
+            <span>{{ $t('playerTabs.matchHistory.previewer.loading') }}</span>
           </div>
         </template>
 
-        <template v-else>{{ $t('MatchPreviewer.noData') }}</template>
+        <template v-else>{{ $t('playerTabs.matchHistory.previewer.noData') }}</template>
       </div>
     </div>
   </NModal>

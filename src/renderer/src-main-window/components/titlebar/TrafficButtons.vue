@@ -3,7 +3,7 @@
     <!-- 目前仍存在的绝赞 bug，最小化的时候无法清除 hover 状态 -->
     <!-- 其他 electron 应用中多少也发现了类似的情况 -->
     <div
-      :title="t('TrafficButtons.minimize')"
+      :title="t('titlebar.windowControls.minimize')"
       class="traffic-button minimize"
       @click="handleMinimize"
     >
@@ -11,7 +11,11 @@
       <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
     </div>
     <div
-      :title="mws.status === 'normal' ? t('TrafficButtons.maximize') : t('TrafficButtons.restore')"
+      :title="
+        mws.status === 'normal'
+          ? t('titlebar.windowControls.maximize')
+          : t('titlebar.windowControls.restore')
+      "
       class="traffic-button maximize"
       @click="handleMaximize"
     >
@@ -20,7 +24,11 @@
         <WindowMultiple16FilledIcon v-else />
       </NIcon>
     </div>
-    <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
+    <div
+      :title="t('titlebar.windowControls.close')"
+      class="traffic-button close"
+      @click="handleClose"
+    >
       <NIcon><CloseOutlinedIcon /></NIcon>
     </div>
   </div>

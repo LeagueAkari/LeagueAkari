@@ -3,14 +3,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <PositionIcon class="text-base" :position="node.args[0].value" />
-        {{ t('PlayerTab.filter.position') }}
+        {{ t('playerTabs.matchHistory.filters.position') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
@@ -29,7 +29,7 @@
       class="mt-2 flex items-center gap-1.5 rounded border border-solid border-amber-500/20 bg-amber-500/8 px-2 py-1 text-xs text-amber-700 dark:text-amber-300"
     >
       <NIcon class="shrink-0 text-sm"><Info16Regular /></NIcon>
-      <span>{{ t('PlayerTab.filter.positionUnsupportedHint') }}</span>
+      <span>{{ t('playerTabs.matchHistory.filters.positionUnsupportedHint') }}</span>
     </div>
   </div>
 </template>

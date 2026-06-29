@@ -9,7 +9,7 @@ export function watchAutoReconnectNotification() {
   const autoGameflowStore = useAutoGameflowStore()
   const notification = useNotification()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.autoReconnect'
+    keyPrefix: 'notifications.simple.autoReconnect'
   })
 
   const { timeLeft } = useTimeLeft(() => autoGameflowStore.willReconnectAt, null)

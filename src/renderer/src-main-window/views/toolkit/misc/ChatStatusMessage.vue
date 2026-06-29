@@ -1,8 +1,8 @@
 <template>
-  <SettingsSection :title="t('ChatStatusMessage.title')">
+  <SettingsSection :title="t('toolkit.chatStatusMessage.title')">
     <SettingsRow
-      :label="t('ChatStatusMessage.text.label')"
-      :label-description="t('ChatStatusMessage.text.description')"
+      :label="t('toolkit.chatStatusMessage.text.label')"
+      :label-description="t('toolkit.chatStatusMessage.text.description')"
       :label-width="260"
       align="start"
     >
@@ -13,7 +13,7 @@
           v-model:value="text"
           :disabled="isSetting"
           :autosize="{ maxRows: 6, minRows: 3 }"
-          :placeholder="t('ChatStatusMessage.text.placeholder')"
+          :placeholder="t('toolkit.chatStatusMessage.text.placeholder')"
           @blur="handleSetChatStatusMessage"
           size="small"
         ></NInput>
@@ -25,11 +25,11 @@
                 :checked="ams.settings.autoSetStatusMessageEnabled"
                 @update:checked="(value) => am.setAutoSetStatusMessageEnabled(value)"
               >
-                {{ t('ChatStatusMessage.resetOnLogin.label') }}
+                {{ t('toolkit.chatStatusMessage.resetOnLogin.label') }}
               </NCheckbox>
             </template>
             <div class="max-w-64 text-xs">
-              {{ t('ChatStatusMessage.resetOnLogin.description') }}
+              {{ t('toolkit.chatStatusMessage.resetOnLogin.description') }}
             </div>
           </NTooltip>
           <NButton
@@ -39,7 +39,7 @@
             type="primary"
             size="small"
             :disabled="isSetting"
-            >{{ t('ChatStatusMessage.text.save') }}</NButton
+            >{{ t('toolkit.chatStatusMessage.text.save') }}</NButton
           >
         </div>
       </div>
@@ -90,17 +90,17 @@ const handleSetChatStatusMessage = async () => {
     }
 
     if (!lcs.isConnected) {
-      message.success(t('ChatStatusMessage.message.saved'))
+      message.success(t('toolkit.chatStatusMessage.message.saved'))
       return
     }
 
     await am.applyStatusMessage(text.value)
-    message.success(t('ChatStatusMessage.message.success'))
+    message.success(t('toolkit.chatStatusMessage.message.success'))
   } catch (error) {
     notification.warning({
-      title: () => t('ChatStatusMessage.message.failedNotification.title'),
+      title: () => t('toolkit.chatStatusMessage.message.failedNotification.title'),
       content: () =>
-        t('ChatStatusMessage.message.failedNotification.description', {
+        t('toolkit.chatStatusMessage.message.failedNotification.description', {
           reason: (error as Error).message
         })
     })

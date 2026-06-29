@@ -9,18 +9,22 @@
     <template #header>
       <span class="card-header-title">
         <template v-if="release">
-          {{ release.isNew ? t('UpdateModal.newVersion') : t('UpdateModal.versionFeatures') }}
+          {{
+            release.isNew
+              ? t('notifications.updateModal.newVersion')
+              : t('notifications.updateModal.versionFeatures')
+          }}
           {{ release.version }}
         </template>
         <template v-else>
-          {{ t('UpdateModal.noUpdate') }}
+          {{ t('notifications.updateModal.noUpdate') }}
         </template>
       </span>
     </template>
     <div v-if="release">
       <div v-if="release.isNew" class="para">
         {{
-          t('UpdateModal.newVersionAvailable', {
+          t('notifications.updateModal.newVersionAvailable', {
             version: release.version,
             currentVersion: release.currentVersion
           })
@@ -35,7 +39,7 @@
       </NScrollbar>
       <div class="button-group">
         <ExternalLink class="small-link" v-if="externalDownloadUrl" :href="externalDownloadUrl">
-          {{ t('UpdateModal.externalDownload') }}
+          {{ t('notifications.updateModal.externalDownload') }}
         </ExternalLink>
         <NCheckbox
           v-if="release.isNew"
@@ -44,7 +48,7 @@
           :checked="props.release?.version === props.ignoreVersion"
           size="small"
         >
-          {{ t('UpdateModal.ignoreThisVersion') }}
+          {{ t('notifications.updateModal.ignoreThisVersion') }}
         </NCheckbox>
         <NButton
           v-if="release.isNew && release.archiveFile"
@@ -86,8 +90,8 @@ const { t } = useTranslation()
 const markdownHtmlText = computed(() => {
   return markdownIt.render(
     props.release
-      ? props.release.description || t('UpdateModal.noUpdateMd')
-      : t('UpdateModal.noUpdateMd')
+      ? props.release.description || t('notifications.updateModal.noUpdateMd')
+      : t('notifications.updateModal.noUpdateMd')
   )
 })
 
@@ -95,20 +99,20 @@ const isUpdating = computed(() => props.updateProgressInfo !== null)
 
 const updateButtonText = computed(() => {
   if (!props.updateProgressInfo) {
-    return t('UpdateModal.startUpdate')
+    return t('notifications.updateModal.startUpdate')
   }
 
   switch (props.updateProgressInfo.phase) {
     case 'downloading':
-      return t('UpdateModal.downloading', {
+      return t('notifications.updateModal.downloading', {
         progress: (props.updateProgressInfo.downloadingProgress * 100).toFixed(0)
       })
     case 'waiting-for-restart':
-      return t('UpdateModal.waitingForRestart')
+      return t('notifications.updateModal.waitingForRestart')
     case 'download-failed':
-      return t('UpdateModal.downloadFailed')
+      return t('notifications.updateModal.downloadFailed')
     default:
-      return t('UpdateModal.startUpdate')
+      return t('notifications.updateModal.startUpdate')
   }
 })
 

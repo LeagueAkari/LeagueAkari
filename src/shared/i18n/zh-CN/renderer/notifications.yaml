@@ -1,0 +1,94 @@
+notifications:
+  updateModal:
+    newVersion: 新版本
+    versionFeatures: 版本特性
+    newVersionAvailable: 新版本可用：{{version}} (当前版本：{{currentVersion}})
+    currentVersion: 当前版本：{{version}}
+    releasePage: 发布页面
+    externalDownload: 外链下载
+    startUpdate: 立即更新
+    downloading: 正在下载 {{progress}}%
+    unpacking: 正在解压 {{progress}}%
+    waitingForRestart: 关闭后更新
+    downloadFailed: 下载失败
+    noUpdateMd: 无发布说明
+    ignoreThisVersion: 忽略此版本
+    noUpdate: 无更新
+  simple:
+    newReleaseHints:
+      title: 新版本可用
+      content: 新版本 {{version}} 已经发布
+      takeALook: 查看
+      dismiss: 关闭
+    liveStreamingHints:
+      dismiss: 关闭
+      neverShowAgain: 不再显示
+      toSettings: 到设置项
+      detected:
+        title: 在直播吗？
+        liveTools: $t(common:appName) 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
+        bySettings: $t(common:appName) 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
+    login-queue-task:
+      name: 登录排队
+      description: '排队中: {{position}} / {{maxPosition}} (预计 {{waitTime}})'
+    higherVersionDb:
+      title: 检测到降级版本
+      content: 当前已有的数据库版本高于此应用支持的版本。请更新 $t(common:appName) 到最新版本以获得最佳兼容性
+      positiveText: 查看更新
+    badSgpConnection:
+      title: SGP 数据源网络连接质量差
+      content:
+        usingSgp: 当前正在使用 SGP 数据源，但检测到网络连接质量很差，可能会影响数据获取和功能使用。
+        recommendation: 建议前往"设置 → $t(settings.app.title) → $t(settings.app.basic.title) → $t(settings.app.basic.preferredLolSource.label)"，将数据源更改为 LCU，以获得更稳定的体验。
+        vpnReason: 此现象可能是由于使用加速器访问跨国服务器导致的网络不稳定。
+      positiveText: 前往设置
+      negativeText: 关闭
+      neverShowAgain: 不再提醒
+    replay-download-progress-task:
+      name: 录像下载
+      checking: 正在检查对局 ID {{gameId}} 的录像...
+      found: 已找到对局 ID {{gameId}} 的录像
+      downloading: 正在下载对局 ID {{gameId}} 的录像...
+      watch: 对局 ID {{gameId}} 的录像已下载完成
+      incompatible: 对局 ID {{gameId}} 的录像不兼容当前版本
+      closeButton: 关闭
+      watchButton: 观看录像
+    wmiRequiresAdministrator:
+      title: 需要管理员权限
+      content: 当前使用 WMI 方式获取 League Client 命令行信息，需要以管理员权限运行此应用
+      positiveText: 以管理员权限重新启动
+      negativeText: 取消
+    cannotGetUxCommandLine:
+      title: 无法获取客户端命令行信息
+      alreadyUseWmi: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。可能在此计算机上无法使用 $t(common:appName)
+      noAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请尝试以管理员权限重新启动此应用，之后在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+      withAdminContent: 已检测到英雄联盟客户端运行，但无法获取其命令行信息。请在设置中启用或关闭“以 WMI 查询命令行”以尝试解决该问题。若持续不可连接，请反馈此问题到开发团队
+      extraContent: 请知晓：部分精简系统或网吧环境中，由于一些存在限制，$t(common:appName) 可能无法正常工作
+      withAdminPositiveText: 确认
+      noAdminPositiveText: 以管理员权限重新启动
+    autoReconnect:
+      title: 自动重连
+      content: 将在 {{timeLeft}} 后重连
+    runInTempDirWarning:
+      title: 运行在临时目录警告
+      content: 应用程序运行在临时目录，可能会导致安全问题。这可能是程序没有位于正确的安装位置，或未被妥善解压。
+      negativeText: 关闭
+    updateDownloadFailed:
+      title: 更新下载失败
+      content: 尝试下载更新时出现错误：{{error}}。请检查网络连接，或查看公告获取更多信息以获取可能的解决方案。
+      positiveText: 前往公告
+      negativeText: 关闭
+selfUpdate:
+  tasks:
+    self-update-task:
+      name: $t(common:appName) 更新
+      downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
+      download-failed: 下载更新包失败
+      waiting-for-restart: 更新包下载完成，关闭应用后将自动应用更新流程
+      cancelButton: 取消
+      closeButton: 关闭应用并开始更新
+    title: 自动更新
+    start-update: $t(common:appName) 更新已开始
+    updateOnQuit: 更新已下载完成，关闭应用后执行更新流程
+    lastUpdateFailed: 上一次自动更新没有成功，请检查相关日志，并尝试在仓库重新下载最新版本
+    lastUpdateSuccess: 已成功更新到 {{version}}

@@ -7,7 +7,7 @@
     :class="$style['ann-modal']"
   >
     <template #header>
-      <span class="card-header-title">{{ t('AnnouncementModal.title') }}</span>
+      <span class="card-header-title">{{ t('announcements.modal.title') }}</span>
     </template>
     <div>
       <NScrollbar
@@ -19,10 +19,10 @@
       </NScrollbar>
       <div style="display: flex; justify-content: flex-end" v-if="announcement">
         <NButton type="primary" v-if="hasRead" @click="show = false" size="small">{{
-          t('AnnouncementModal.close')
+          t('announcements.modal.close')
         }}</NButton>
         <NButton type="primary" v-else @click="emits('read', announcement.uniqueId)" size="small">{{
-          t('AnnouncementModal.read')
+          t('announcements.modal.read')
         }}</NButton>
       </div>
     </div>
@@ -48,7 +48,7 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(props.announcement?.content || t('AnnouncementModal.noAnnouncementMd'))
+  return markdownIt.render(props.announcement?.content || t('announcements.modal.noAnnouncementMd'))
 })
 
 const show = defineModel<boolean>('show', { default: false })

@@ -60,7 +60,7 @@
               </template>
             </NButton>
           </template>
-          {{ t('MatchCard.dryRun.tooltip') }}
+          {{ t('matchCard.dryRun.tooltip') }}
         </NTooltip>
       </div>
     </div>
@@ -127,29 +127,29 @@ const selectedTab = ref('summary')
 const tabs = computed(() => {
   return [
     {
-      label: t('MatchCard.tabs.summary'),
+      label: t('matchCard.tabs.summary'),
       value: 'summary'
     },
     {
-      label: t('MatchCard.tabs.details'),
+      label: t('matchCard.tabs.details'),
       value: 'details'
     },
     {
-      label: t('MatchCard.tabs.runes'),
+      label: t('matchCard.tabs.runes'),
       value: 'runes',
       show: perksAvailable.value
     },
     {
-      label: t('MatchCard.tabs.events'),
+      label: t('matchCard.tabs.events'),
       value: 'events'
     },
     {
-      label: t('MatchCard.tabs.builds'),
+      label: t('matchCard.tabs.builds'),
       value: 'builds',
       show: basicInfo.value.dataSource === 'sgp'
     },
     {
-      label: t('MatchCard.tabs.timeline'),
+      label: t('matchCard.tabs.timeline'),
       value: 'timeline'
     }
   ].filter((tab) => tab.show ?? true)
@@ -163,22 +163,22 @@ watchEffect(() => {
 
 const replayButtonTitle = computed(() => {
   if (!replayState.value) {
-    return t('MatchCard.replay.label')
+    return t('matchCard.replay.label')
   }
 
   switch (replayState.value.state) {
     case 'download':
-      return t('MatchCard.replay.download')
+      return t('matchCard.replay.download')
     case 'watch':
-      return t('MatchCard.replay.watch')
+      return t('matchCard.replay.watch')
     case 'incompatible':
-      return t('MatchCard.replay.unavailable')
+      return t('matchCard.replay.unavailable')
     case 'downloading':
-      return t('MatchCard.replay.downloading', { progress: replayState.value.downloadProgress })
+      return t('matchCard.replay.downloading', { progress: replayState.value.downloadProgress })
     case 'checking':
-      return t('MatchCard.replay.checking')
+      return t('matchCard.replay.checking')
     default:
-      return t('MatchCard.replay.label')
+      return t('matchCard.replay.label')
   }
 })
 

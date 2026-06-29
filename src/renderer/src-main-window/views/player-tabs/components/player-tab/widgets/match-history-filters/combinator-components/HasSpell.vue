@@ -3,20 +3,20 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Flash20Regular /></NIcon>
-        {{ t('PlayerTab.filter.summonerSpell') }}
+        {{ t('playerTabs.matchHistory.filters.summonerSpell') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.select') }}
+        {{ t('playerTabs.matchHistory.filters.select') }}
       </div>
 
       <NSelect
@@ -32,7 +32,7 @@
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.atPosition') }}
+        {{ t('playerTabs.matchHistory.filters.atPosition') }}
       </div>
 
       <NSelect
@@ -93,7 +93,7 @@ const spellOptions = computed(() => {
   return [
     {
       type: 'group',
-      label: t('PlayerTab.filter.spellGroupNormal'),
+      label: t('playerTabs.matchHistory.filters.spellGroupNormal'),
       children: normal
         .map((s) => ({
           label: s.name,
@@ -103,7 +103,7 @@ const spellOptions = computed(() => {
     },
     {
       type: 'group',
-      label: t('PlayerTab.filter.spellGroupSpecial'),
+      label: t('playerTabs.matchHistory.filters.spellGroupSpecial'),
       children: special
         .map((s) => ({
           label: s.name,
@@ -116,9 +116,9 @@ const spellOptions = computed(() => {
 
 const orderOptions = computed(() => {
   return [
-    { label: t('PlayerTab.filter.anyPosition'), value: -1 },
-    { label: t('PlayerTab.filter.positionN', { n: 1 }), value: 0 },
-    { label: t('PlayerTab.filter.positionN', { n: 2 }), value: 1 }
+    { label: t('playerTabs.matchHistory.filters.anyPosition'), value: -1 },
+    { label: t('playerTabs.matchHistory.filters.positionN', { n: 1 }), value: 0 },
+    { label: t('playerTabs.matchHistory.filters.positionN', { n: 2 }), value: 1 }
   ]
 })
 

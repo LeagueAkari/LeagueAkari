@@ -12,7 +12,7 @@
           </div>
           <div class="mt-3 max-w-xl text-[13px] leading-6 text-black/60 dark:text-white/60">
             <LeagueAkariSpan bold @click="handleClickEasterEgg" />{{
-              t('AboutPane.descriptionBefore', { version: as.version })
+              t('settings.about.descriptionBefore', { version: as.version })
             }}
             <a
               class="text-green-700 underline decoration-green-700/30 underline-offset-2 transition-colors hover:text-green-600 dark:text-green-300 dark:decoration-green-300/30 dark:hover:text-green-200"
@@ -25,7 +25,7 @@
 
         <section class="grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2">
           <div class="min-h-16 p-2 text-center text-yellow-600 dark:text-yellow-300">
-            <NStatistic :label="t('AboutPane.stats.stars')" tabular-nums>
+            <NStatistic :label="t('settings.about.stats.stars')" tabular-nums>
               <template #prefix>
                 <NIcon class="mr-1 text-yellow-500"><StarIcon /></NIcon>
               </template>
@@ -41,10 +41,10 @@
             </NStatistic>
           </div>
           <div class="min-h-16 p-2 text-center">
-            <NStatistic :label="t('AboutPane.stats.version')" :value="as.version" />
+            <NStatistic :label="t('settings.about.stats.version')" :value="as.version" />
           </div>
           <div class="min-h-16 p-2 text-center">
-            <NStatistic :label="t('AboutPane.stats.license')" value="MIT" />
+            <NStatistic :label="t('settings.about.stats.license')" value="MIT" />
           </div>
         </section>
 
@@ -61,13 +61,13 @@
             <template #icon>
               <NIcon><GithubIcon /></NIcon>
             </template>
-            {{ t('AboutPane.actions.github') }}
+            {{ t('settings.about.actions.github') }}
           </NButton>
         </div>
       </div>
     </NScrollbar>
     <div class="mt-2 text-xs text-black/55 dark:text-white/55">
-      {{ t('AboutPane.copyright') }}
+      {{ t('settings.about.copyright') }}
     </div>
   </div>
 </template>

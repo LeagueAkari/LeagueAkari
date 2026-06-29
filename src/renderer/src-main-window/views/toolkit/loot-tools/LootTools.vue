@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto max-w-[800px] p-6">
-        <SettingsSection :title="`(UNDER DEVELOPMENT) ${t('LootTools.title')}`">
+        <SettingsSection :title="`(UNDER DEVELOPMENT) ${t('toolkit.loot.title')}`">
           <SettingsRow label="Target" :label-width="260" align="start">
             <NRadioGroup :disabled="isLoading || !lcs.isConnected" v-model:value="target">
               <div class="flex flex-wrap justify-end gap-x-3 gap-y-1">
@@ -106,10 +106,10 @@ const updatePlayerLootMap = async (manually = false) => {
     console.log(lootMap.value)
 
     if (manually) {
-      message.success(() => t('LootTools.refreshSuccess'))
+      message.success(() => t('toolkit.loot.refreshSuccess'))
     }
   } catch (error: any) {
-    message.warning(() => t('LootTools.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.loot.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }

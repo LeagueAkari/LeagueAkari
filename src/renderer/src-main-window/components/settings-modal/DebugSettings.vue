@@ -1,7 +1,7 @@
 <template>
   <NScrollbar class="h-full">
     <NModal preset="card" size="small" v-model:show="editRuleModalShow" class="max-w-[500px]">
-      <template #header>{{ t('DebugSettings.lcuEvent.modal.title') }}</template>
+      <template #header>{{ t('settings.debug.lcuEvent.modal.title') }}</template>
       <template #footer>
         <div class="flex w-full justify-end">
           <NButton
@@ -12,13 +12,13 @@
             @click="handleAddRule"
             class="ml-auto"
           >
-            {{ t('DebugSettings.lcuEvent.modal.button') }}
+            {{ t('settings.debug.lcuEvent.modal.button') }}
           </NButton>
         </div>
       </template>
       <NAutoComplete
         ref="edit-rule-input"
-        :placeholder="t('DebugSettings.lcuEvent.modal.placeholder')"
+        :placeholder="t('settings.debug.lcuEvent.modal.placeholder')"
         v-model:value="editRuleText"
         :options="options"
         size="small"
@@ -26,24 +26,24 @@
       />
     </NModal>
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('DebugSettings.files.title')">
+      <SettingsSection :title="t('settings.debug.files.title')">
         <SettingsRow
-          :label="t('DebugSettings.files.logs.label')"
-          :label-description="t('DebugSettings.files.logs.description')"
+          :label="t('settings.debug.files.logs.label')"
+          :label-description="t('settings.debug.files.logs.description')"
           :label-width="400"
         >
           <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
-            >{{ t('DebugSettings.files.logs.button') }}
+            >{{ t('settings.debug.files.logs.button') }}
           </NButton>
         </SettingsRow>
-        <SettingsRow :label="t('DebugSettings.files.appData.label')" :label-width="400">
+        <SettingsRow :label="t('settings.debug.files.appData.label')" :label-width="400">
           <template #labelDescription>
-            <TranslationComponent :translation="t('DebugSettings.files.appData.description.full')">
+            <TranslationComponent :translation="t('settings.debug.files.appData.description.full')">
               <template #details>
                 <NPopover :delay="50">
                   <template #trigger>
                     <span class="cursor-pointer font-bold text-black/80 dark:text-white">
-                      {{ t('DebugSettings.files.appData.popoverTrigger') }}
+                      {{ t('settings.debug.files.appData.popoverTrigger') }}
                     </span>
                   </template>
                   <table>
@@ -53,19 +53,19 @@
                     <tbody class="text-xs">
                       <tr>
                         <td>LeagueAkari.db</td>
-                        <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
+                        <td>{{ t('settings.debug.files.appData.description.part2') }}</td>
                       </tr>
                       <tr>
                         <td>NewUpdates/</td>
-                        <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
+                        <td>{{ t('settings.debug.files.appData.description.part3') }}</td>
                       </tr>
                       <tr>
                         <td>AkariConfig/</td>
-                        <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
+                        <td>{{ t('settings.debug.files.appData.description.part4') }}</td>
                       </tr>
                       <tr>
                         <td>base-config.json</td>
-                        <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
+                        <td>{{ t('settings.debug.files.appData.description.part5') }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -74,11 +74,11 @@
             </TranslationComponent>
           </template>
           <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()">{{
-            t('DebugSettings.files.appData.button')
+            t('settings.debug.files.appData.button')
           }}</NButton>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('DebugSettings.lcuEvent.label')">
+      <SettingsSection :title="t('settings.debug.lcuEvent.label')">
         <div class="max-w-full overflow-x-auto p-3">
           <div class="mb-2 flex items-center gap-1">
             <NCheckbox
@@ -86,10 +86,10 @@
               class="text-[13px]"
               :checked="rds.logAllLcuEvents"
               @update:checked="(val) => rd.setLogAllLcuEvents(val)"
-              >{{ t('DebugSettings.lcuEvent.logAll') }}</NCheckbox
+              >{{ t('settings.debug.lcuEvent.logAll') }}</NCheckbox
             >
             <NButton size="tiny" @click="handleShowAddModal" secondary type="primary">{{
-              t('DebugSettings.lcuEvent.addRule')
+              t('settings.debug.lcuEvent.addRule')
             }}</NButton>
           </div>
           <NCollapseTransition>
@@ -100,7 +100,7 @@
               size="small"
               bordered
             >
-              <template #empty>{{ t('DebugSettings.lcuEvent.empty') }}</template>
+              <template #empty>{{ t('settings.debug.lcuEvent.empty') }}</template>
             </NDataTable>
           </NCollapseTransition>
         </div>
@@ -108,8 +108,8 @@
       <SettingsSection
         :title="
           lc.isConnected
-            ? t('DebugSettings.lcuConnection.titleConnected')
-            : t('DebugSettings.lcuConnection.titleDisconnected')
+            ? t('settings.debug.lcuConnection.titleConnected')
+            : t('settings.debug.lcuConnection.titleDisconnected')
         "
       >
         <div class="max-w-full overflow-x-auto p-3">
@@ -120,19 +120,19 @@
             </colgroup>
             <tbody>
               <tr>
-                <td>{{ t('DebugSettings.lcuConnection.port') }}</td>
+                <td>{{ t('settings.debug.lcuConnection.port') }}</td>
                 <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
               </tr>
               <tr>
-                <td>{{ t('DebugSettings.lcuConnection.pid') }}</td>
+                <td>{{ t('settings.debug.lcuConnection.pid') }}</td>
                 <td><CopyableText :text="lc.auth?.pid ?? '-'" /></td>
               </tr>
               <tr>
-                <td>{{ t('DebugSettings.lcuConnection.auth') }}</td>
+                <td>{{ t('settings.debug.lcuConnection.auth') }}</td>
                 <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
               </tr>
               <tr>
-                <td>{{ t('DebugSettings.lcuConnection.rsoPlatform') }}</td>
+                <td>{{ t('settings.debug.lcuConnection.rsoPlatform') }}</td>
                 <td>
                   <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
                     (lc.auth?.rsoPlatformId
@@ -142,7 +142,7 @@
                 </td>
               </tr>
               <tr>
-                <td>{{ t('DebugSettings.lcuConnection.region') }}</td>
+                <td>{{ t('settings.debug.lcuConnection.region') }}</td>
                 <td>
                   <CopyableText :text="lc.auth?.region ?? '-'">{{
                     lc.auth?.region
@@ -155,12 +155,12 @@
           </NTable>
         </div>
       </SettingsSection>
-      <SettingsSection :title="t('DebugSettings.gameflow.title')">
+      <SettingsSection :title="t('settings.debug.gameflow.title')">
         <div class="p-3 text-[13px]">
           <span v-if="lc.isConnected"
             >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
           >
-          <span v-else>{{ t('DebugSettings.gameflow.unavailable') }}</span>
+          <span v-else>{{ t('settings.debug.gameflow.unavailable') }}</span>
         </div>
       </SettingsSection>
       <SettingsSection v-if="as.isElevated">
@@ -170,7 +170,7 @@
             text="League Akari X"
           />
         </template>
-        <div class="p-3 text-[13px]">{{ t('DebugSettings.inAdministrator.description') }}</div>
+        <div class="p-3 text-[13px]">{{ t('settings.debug.inAdministrator.description') }}</div>
       </SettingsSection>
       <SettingsSection title="Runtime Info">
         <div class="max-w-full overflow-x-auto p-3">
@@ -229,8 +229,8 @@
       </SettingsSection>
       <SettingsSection title="Akari Zone">
         <SettingsRow
-          :label="t('DebugSettings.testPage.label')"
-          :label-description="t('DebugSettings.testPage.description')"
+          :label="t('settings.debug.testPage.label')"
+          :label-description="t('settings.debug.testPage.description')"
           :label-width="400"
         >
           <NSwitch
@@ -295,24 +295,24 @@ const rd = useInstance(RendererDebugRenderer)
 
 const gameflowText = computed(() => {
   return {
-    Matchmaking: t('DebugSettings.gameflow.Matchmaking'),
-    ChampSelect: t('DebugSettings.gameflow.ChampSelect'),
-    ReadyCheck: t('DebugSettings.gameflow.ReadyCheck'),
-    InProgress: t('DebugSettings.gameflow.InProgress'),
-    EndOfGame: t('DebugSettings.gameflow.EndOfGame'),
-    Lobby: t('DebugSettings.gameflow.Lobby'),
-    GameStart: t('DebugSettings.gameflow.GameStart'),
-    None: t('DebugSettings.gameflow.None'),
-    Reconnect: t('DebugSettings.gameflow.Reconnect'),
-    WaitingForStats: t('DebugSettings.gameflow.WaitingForStats'),
-    PreEndOfGame: t('DebugSettings.gameflow.PreEndOfGame'),
-    WatchInProgress: t('DebugSettings.gameflow.WatchInProgress')
+    Matchmaking: t('settings.debug.gameflow.Matchmaking'),
+    ChampSelect: t('settings.debug.gameflow.ChampSelect'),
+    ReadyCheck: t('settings.debug.gameflow.ReadyCheck'),
+    InProgress: t('settings.debug.gameflow.InProgress'),
+    EndOfGame: t('settings.debug.gameflow.EndOfGame'),
+    Lobby: t('settings.debug.gameflow.Lobby'),
+    GameStart: t('settings.debug.gameflow.GameStart'),
+    None: t('settings.debug.gameflow.None'),
+    Reconnect: t('settings.debug.gameflow.Reconnect'),
+    WaitingForStats: t('settings.debug.gameflow.WaitingForStats'),
+    PreEndOfGame: t('settings.debug.gameflow.PreEndOfGame'),
+    WatchInProgress: t('settings.debug.gameflow.WatchInProgress')
   }
 })
 
 const columns: DataTableColumn<any>[] = [
   {
-    title: t('DebugSettings.lcuEvent.enable'),
+    title: t('settings.debug.lcuEvent.enable'),
     key: 'enable',
     width: 84,
     fixed: 'left',
@@ -335,7 +335,7 @@ const columns: DataTableColumn<any>[] = [
     }
   },
   {
-    title: t('DebugSettings.lcuEvent.rule'),
+    title: t('settings.debug.lcuEvent.rule'),
     key: 'rule',
     render: (row) => {
       return <code class="select-text">{row.data.rule}</code>
@@ -354,7 +354,7 @@ const columns: DataTableColumn<any>[] = [
             secondary
             onClick={() => handleRemoveEditRule(row.data.rule)}
           >
-            {t('DebugSettings.lcuEvent.delete')}
+            {t('settings.debug.lcuEvent.delete')}
           </NButton>
         </NFlex>
       )

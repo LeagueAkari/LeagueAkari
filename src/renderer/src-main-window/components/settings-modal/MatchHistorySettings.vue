@@ -1,16 +1,16 @@
 <template>
   <NScrollbar class="h-full">
-    <SettingsSection :title="t('MatchHistorySettings.title')">
+    <SettingsSection :title="t('settings.matchHistory.title')">
       <SettingsRow
-        :label="t('MatchHistorySettings.refreshTabsAfterGameEnds.label')"
-        :label-description="t('MatchHistorySettings.refreshTabsAfterGameEnds.description')"
+        :label="t('settings.matchHistory.refreshTabsAfterGameEnds.label')"
+        :label-description="t('settings.matchHistory.refreshTabsAfterGameEnds.description')"
         :label-width="400"
       >
         <NSwitch size="small" v-model:value="pts.frontendSettings.refreshTabsAfterGameEnds" />
       </SettingsRow>
       <SettingsRow
-        :label="t('MatchHistorySettings.loadCount.label')"
-        :label-description="t('MatchHistorySettings.loadCount.description')"
+        :label="t('settings.matchHistory.loadCount.label')"
+        :label-description="t('settings.matchHistory.loadCount.description')"
         :label-width="400"
       >
         <NSelect

@@ -1,5 +1,8 @@
 <template>
-  <SettingsSection :title="t('EventHubClaimTool.title')" :footer="t('EventHubClaimTool.hint')">
+  <SettingsSection
+    :title="t('toolkit.claim.eventHub.title')"
+    :footer="t('toolkit.claim.eventHub.hint')"
+  >
     <div class="p-3">
       <div class="mb-2 flex flex-wrap gap-1">
         <NButton
@@ -10,10 +13,10 @@
           @click="claim"
         >
           <template v-if="selectedEventIds.length">{{
-            t('EventHubClaimTool.claimButtonC', { count: selectedEventIds.length })
+            t('toolkit.claim.eventHub.claimButtonC', { count: selectedEventIds.length })
           }}</template>
           <template v-else>
-            {{ t('EventHubClaimTool.claimButton') }}
+            {{ t('toolkit.claim.eventHub.claimButton') }}
           </template>
         </NButton>
         <NButton
@@ -23,7 +26,7 @@
           secondary
           @click="isClaiming = false"
         >
-          {{ t('EventHubClaimTool.cancelButton') }}
+          {{ t('toolkit.claim.eventHub.cancelButton') }}
         </NButton>
         <NButton
           :disabled="isLoading || !lcs.isConnected"
@@ -31,7 +34,7 @@
           secondary
           @click="updateClaimableEventHubEvents(true)"
         >
-          {{ t('EventHubClaimTool.refreshButton') }}
+          {{ t('toolkit.claim.eventHub.refreshButton') }}
         </NButton>
       </div>
       <NDataTable
@@ -106,7 +109,7 @@ const columns = computed<DataTableColumns<EventHubEvents>>(() => [
     type: 'selection'
   },
   {
-    title: () => t('EventHubClaimTool.columns.rewardList'),
+    title: () => t('toolkit.claim.eventHub.columns.rewardList'),
     key: 'rewardList',
     render: (row) => {
       const items = (cachedEventHubRewardGroups.value[row.eventId] || []).map((reward) => {
@@ -138,7 +141,7 @@ const updateClaimableEventHubEvents = async (manually = false) => {
     )
 
     if (manually) {
-      message.success(() => t('EventHubClaimTool.refreshSuccess'))
+      message.success(() => t('toolkit.claim.eventHub.refreshSuccess'))
     }
 
     if (!events.value.length) {
@@ -164,7 +167,7 @@ const updateClaimableEventHubEvents = async (manually = false) => {
 
     Promise.allSettled(events.value.map((event) => updateTrackItems(event.eventId)))
   } catch (error: any) {
-    message.warning(() => t('EventHubClaimTool.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.eventHub.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -190,12 +193,12 @@ const claim = async () => {
 
       if (eventInfo) {
         message.success(() =>
-          t('EventHubClaimTool.claimed', { item: eventInfo.eventInfo.eventName })
+          t('toolkit.claim.eventHub.claimed', { item: eventInfo.eventInfo.eventName })
         )
       }
     }
   } catch (error: any) {
-    message.warning(() => t('EventHubClaimTool.claimFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.eventHub.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isClaiming.value = false

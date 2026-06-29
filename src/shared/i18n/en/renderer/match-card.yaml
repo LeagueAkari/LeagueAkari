@@ -1,0 +1,523 @@
+matchCard:
+  damageMetrics:
+    total: Total
+    physical: Physical
+    magic: Magic
+    'true': 'True'
+  common:
+    loading: Loading...
+    noData: No data
+    refresh: Refresh
+  result:
+    abort: Aborted
+    remake: Remake
+    win: Victory
+    loss: Defeat
+    surrender: Surrender
+  frameEventType:
+    CHAMPION_KILL: Champion Kill
+    CHAMPION_SPECIAL_KILL: Special Kill
+    BUILDING_KILL: Building Destroyed
+    WARD_PLACED: Ward Placed
+    WARD_KILL: Ward Killed
+    DRAGON_SOUL_GIVEN: Dragon Soul Given
+    OBJECTIVE_BOUNTY_PRESTART: Objective Bounty Prestart
+    TURRET_PLATE_DESTROYED: Turret Plate Destroyed
+  buildingType:
+    TOWER_BUILDING: Turret
+    INHIBITOR_BUILDING: Inhibitor
+  towerType:
+    OUTER_TURRET: Outer Turret
+    INNER_TURRET: Inner Turret
+    BASE_TURRET: Base Turret
+    NEXUS_TURRET: Nexus Turret
+  laneType:
+    MID_LANE: Mid Lane
+    TOP_LANE: Top Lane
+    BOT_LANE: Bot Lane
+  position:
+    TOP: Top
+    JUNGLE: Jungle
+    MIDDLE: Mid
+    BOTTOM: Bot
+    UTILITY: Support
+  teamTable:
+    objectives:
+      tower: Turret
+      inhibitor: Inhibitor
+      dragon: Dragon
+      baron: Baron Nashor
+      voidGrub: Voidgrub
+      riftHerald: Rift Herald
+      atakhan: Atakhan
+    bans: Bans
+    perMinuteSuffix: / min
+    cs: CS
+  overview:
+    perfect: Perfect
+    damage: Dmg.
+    cs: CS
+    csPerMin: / Min
+  radar:
+    damage: Damage ({{value}})
+    taken: Damage Taken ({{value}})
+    gold: Gold ({{value}})
+    cs: CS ({{value}})
+    kda: KDA ({{value}})
+    kp: KP ({{value}}%)
+    heal: Healing ({{value}})
+    teamAvg: Team Average
+  tabs:
+    summary: Overview
+    details: Detailed Table
+    runes: Runes
+    events: Events
+    builds: Builds
+    timeline: Timeline
+  replay:
+    download: Download Replay
+    watch: Watch Replay
+    unavailable: Replay Unavailable
+    label: Replay
+    downloading: Downloading {{progress}}%
+    checking: Checking
+  dryRun:
+    tooltip: Simulate ongoing game analysis
+  buildsTab:
+    anvils_one: '{{count}} anvil'
+    anvils_other: '{{count}} anvils'
+    skillBuild: Skill Build
+    noSkillUpgrades: No skill upgrades
+    itemPurchases: Item Purchases
+    noItemPurchases: No item purchases
+    evolved: Evolved
+  detailsTab:
+    gameId: Game ID
+    gameVersion: Game Version
+    filterPlaceholder: Filter
+    noFilterResult: No filter result
+  timelineTab:
+    diffLineChart: Difference Line Chart
+    statsLine: Stats Line
+  diffLineChart:
+    dataType: Data Type
+    gold: Gold
+    cs: CS
+    exp: XP
+    damageDealt: Dealt Damage To Champions
+    damageTaken: Taken Damage
+    teamAverage: Team Average
+    players: Players
+    selectAll: Select All
+    teamAverageSuffix: '{{name}} Avg'
+    playerLabel: Player {{id}}
+    gameTime: Game Time
+    metric:
+      gold:
+        title: Player gold growth
+        yAxis: Gold
+        unit: Gold
+      cs:
+        title: Player CS growth
+        yAxis: CS
+        unit: CS
+      exp:
+        title: Player experience growth
+        yAxis: Experience
+        unit: EXP
+      damageDealt:
+        title: Player dealt damage
+        yAxis: Dealt Damage To Champions
+        unit: Damage
+      damageTaken:
+        title: Player taken damage
+        yAxis: Taken Damage
+        unit: Damage
+  statsLine:
+    participant: Participant
+    hint: Data is returned from the server; some fields may be incorrect.
+    stats:
+      abilityHaste: Ability Haste
+      abilityPower: Ability Power
+      armor: Armor
+      armorPen: Armor Pen
+      armorPenPercent: Armor Pen %
+      attackDamage: Attack Damage
+      attackSpeed: Attack Speed %
+      bonusArmorPenPercent: Bonus Armor Pen %
+      bonusMagicPenPercent: Bonus Magic Pen %
+      ccReduction: Tenacity %
+      cooldownReduction: Cooldown Reduction %
+      health: Health
+      healthRegen: Health Regen
+      lifesteal: Lifesteal %
+      magicPen: Magic Pen
+      magicPenPercent: Magic Pen %
+      magicResist: Magic Resist
+      movementSpeed: Movement Speed
+      omnivamp: Omnivamp %
+      physicalVamp: Physical Vamp %
+      power: Power
+      powerRegen: Power Regen
+      spellVamp: Spell Vamp %
+  eventsTab:
+    start: Game Start
+    end: Game End
+    viewPosition: View Position
+    kill: Kill
+    firstBlood: First Blood
+    multiKill: '{{count}} Kill(s)'
+    ace: Ace
+    destroyBuilding: Destroy Building
+    destroyed: Destroyed
+    destroyPlateTitle: Destroy Turret Plate
+    plateLane: '{{lane}} Plate'
+    plate: Turret Plate
+    filters: Filters
+    filterByChampion: Filter by champion
+    plateStats: Plate Stats
+    plateCount_one: '{{count}} plate'
+    plateCount_other: '{{count}} plates'
+    viewVictimDamageDetails: Damage Details
+    victimDamageDetails:
+      received: Received From
+      dealt: Dealt To
+      damageDealerNames:
+        champion: Champion
+        tower: Tower
+        minion: Minion
+        monster: Monster
+        other: Other
+  tags:
+    times: '{{label}}×{{count}}'
+    multiKill:
+      penta: Pentakill
+      quadra: Quadrakill
+      triple: Triple Kill
+      double: Double Kill
+    damage:
+      bestLabel: ★ Damage
+      teamLabel: Damage
+      bestContent: 'Highest damage: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-best damage: {{value}}, {{rate}}% of team'
+    taken:
+      bestLabel: ★ Damage Taken
+      teamLabel: Damage Taken
+      bestContent: 'Most damage taken: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most damage taken: {{value}}, {{rate}}% of team'
+    heal:
+      bestLabel: ★ Healing
+      teamLabel: Healing
+      bestContent: 'Highest healing: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most healing: {{value}}, {{rate}}% of team'
+    tower:
+      bestLabel: ★ Tower Damage
+      teamLabel: Tower Damage
+      bestContent: 'Highest turret damage: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-best turret damage: {{value}}, {{rate}}% of team'
+    shield:
+      bestLabel: ★ Shielding
+      teamLabel: Shielding
+      bestContent: 'Highest shielding: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most shielding: {{value}}, {{rate}}% of team'
+    solo:
+      label: Solo Kill
+      content: Secured {{value}} solo kills
+    gold:
+      bestLabel: ★ Gold
+      teamLabel: Gold
+      bestContent: 'Highest gold: {{value}}, {{rate}}% of team'
+      teamContent: 'Team-most gold: {{value}}, {{rate}}% of team'
+    damageGoldEfficiency:
+      bestLabel: ★ Dmg-Gold
+      teamLabel: Dmg-Gold
+      bestContent: 'Best damage-gold efficiency: {{rate}}%'
+      teamContent: 'Team-best damage-gold efficiency: {{rate}}%'
+    cs:
+      bestLabel: ★ CS
+      bestContent: 'Highest CS: {{value}}'
+    csAdvantage:
+      label: CS Lead
+      content: Largest lane CS lead {{value}}
+    kills:
+      bestLabel: ★ Kills
+      teamLabel: Kills
+      bestContent: 'Most kills: {{value}}'
+      teamContent: 'Team-most kills: {{value}}'
+    kp:
+      bestLabel: ★ KP
+      teamLabel: KP
+      bestContent: 'Highest kill participation: {{value}}%'
+      teamContent: 'Team-high kill participation: {{value}}%'
+    knockUp:
+      label: Knock Up
+      content: Knocked or pulled enemies into team {{value}} times
+    cc:
+      bestLabel: ★ CC
+      teamLabel: CC
+      bestContent: 'Most crowd control: {{value}}s'
+      teamContent: 'Team-most crowd control: {{value}}s'
+    towerKill:
+      diveLabel: Dives
+      underLabel: Under Tower
+      diveContent: Kills under enemy turret {{value}} times
+      underContent: Kills under own turret {{value}} times
+    none:
+      label: Nothing Special
+      content: No standout moments this game
+  groups:
+    combat-stats: Combat Stats
+    damage: Damage
+    cc: Crowd Control
+    vision: Vision
+    buildings: Buildings
+    economy: Economy
+    healing: Healing
+    pings: Pings
+    combat-advanced: Combat Advanced
+    objectives: Objectives
+    statistics: Statistics
+    abilities: Abilities
+    survival-skills: Survival Skills
+    teamfight: Teamfight
+    misc: Miscellaneous
+    ignored: Ignored
+    game-state: Game State
+  statKeys:
+    kills: Kills
+    deaths: Deaths
+    assists: Assists
+    doubleKills: Double Kills
+    tripleKills: Triple Kills
+    quadraKills: Quadra Kills
+    pentaKills: Penta Kills
+    unrealKills: Unreal Kills
+    killingSprees: Killing Sprees
+    largestKillingSpree: Largest Killing Spree
+    largestMultiKill: Largest Multi Kill
+    longestTimeSpentLiving: Longest Time Spent Living
+    largestCriticalStrike: Largest Critical Strike
+    damageGoldEfficiency: Damage Gold Efficiency
+    totalDamageDealtToChampions: Total Damage to Champions
+    physicalDamageDealtToChampions: Physical Damage to Champions
+    magicDamageDealtToChampions: Magic Damage to Champions
+    trueDamageDealtToChampions: True Damage to Champions
+    totalDamageDealt: Total Damage Dealt
+    physicalDamageDealt: Physical Damage Dealt
+    magicDamageDealt: Magic Damage Dealt
+    trueDamageDealt: True Damage Dealt
+    damageDealtToObjectives: Damage to Objectives
+    damageDealtToTurrets: Damage to Turrets
+    damageDealtToBuildings: Damage to Buildings
+    damageDealtToEpicMonsters: Damage to Epic Monsters
+    totalDamageTaken: Total Damage Taken
+    physicalDamageTaken: Physical Damage Taken
+    magicDamageTaken: Magic Damage Taken
+    magicalDamageTaken: Magical Damage Taken
+    trueDamageTaken: True Damage Taken
+    damageSelfMitigated: Damage Self Mitigated
+    totalDamageShieldedOnTeammates: Total Shield on Teammates
+    timeCCingOthers: Time CCing Others
+    totalTimeCCDealt: Total CC Time Dealt
+    totalTimeCrowdControlDealt: Total Crowd Control Time
+    enemyChampionImmobilizations: Enemy Champion Immobilizations
+    immobilizeAndKillWithAlly: Immobilize and Kill with Ally
+    knockEnemyIntoTeamAndKill: Knock Enemy into Team and Kill
+    survivedThreeImmobilizesInFight: Survived Three Immobilizes
+    highestCrowdControlScore: Highest Crowd Control Score
+    visionScore: Vision Score
+    wardsPlaced: Wards Placed
+    wardsKilled: Wards Killed
+    sightWardsBoughtInGame: Sight Wards Bought
+    visionWardsBoughtInGame: Vision Wards Bought
+    detectorWardsPlaced: Detector Wards Placed
+    visionScorePerMinute: Vision Score Per Minute
+    visionScoreAdvantageLaneOpponent: Vision Score Advantage vs Lane Opponent
+    wardTakedowns: Ward Takedowns
+    wardTakedownsBefore20M: Ward Takedowns Before 20 Min
+    wardsGuarded: Wards Guarded
+    twoWardsOneSweeperCount: Two Wards One Sweeper
+    controlWardsPlaced: Control Wards Placed
+    stealthWardsPlaced: Stealth Wards Placed
+    controlWardTimeCoverageInRiverOrEnemyHalf: Control Ward Time Coverage in River or Enemy Half
+    turretKills: Turret Kills
+    turretTakedowns: Turret Takedowns
+    soloTurretsLategame: Solo Turrets Late Game
+    turretsLost: Turrets Lost
+    firstTowerKill: First Tower Kill
+    firstTowerAssist: First Tower Assist
+    firstTurretKilled: First Turret Killed
+    firstTurretKilledTime: First Turret Kill Time
+    turretPlatesTaken: Turret Plates Taken
+    kTurretsDestroyedBeforePlatesFall: Turrets Destroyed Before Plates Fall
+    outerTurretExecutesBefore10Minutes: Outer Turret Kills Before 10 Min
+    quickFirstTurret: Quick First Turret
+    takedownOnFirstTurret: First Turret Takedown
+    turretsTakenWithRiftHerald: Turrets Taken with Rift Herald
+    multiTurretRiftHeraldCount: Multi Turret Rift Herald
+    inhibitorKills: Inhibitor Kills
+    inhibitorTakedowns: Inhibitor Takedowns
+    inhibitorsLost: Inhibitors Lost
+    firstInhibitorKill: First Inhibitor Kill
+    firstInhibitorAssist: First Inhibitor Assist
+    lostAnInhibitor: Lost an Inhibitor
+    nexusKills: Nexus Kills
+    nexusLost: Nexus Lost
+    nexusTakedowns: Nexus Takedowns
+    hadOpenNexus: Had Open Nexus
+    outnumberedNexusKill: Outnumbered Nexus Kill
+    objectivesStolen: Objectives Stolen
+    objectivesStolenAssists: Objectives Stolen Assists
+    goldEarned: Gold Earned
+    goldSpent: Gold Spent
+    totalMinionsKilled: Total Minions Killed
+    neutralMinionsKilled: Neutral Minions Killed
+    neutralMinionsKilledEnemyJungle: Enemy Jungle Minions
+    neutralMinionsKilledTeamJungle: Team Jungle Minions
+    totalAllyJungleMinionsKilled: Ally Jungle Minions Killed
+    totalEnemyJungleMinionsKilled: Enemy Jungle Minions Killed
+    consumablesPurchased: Consumables Purchased
+    itemsPurchased: Items Purchased
+    earlyLaningPhaseGoldExpAdvantage: Early Laning Gold/XP Advantage
+    laningPhaseGoldExpAdvantage: Laning Phase Gold/XP Advantage
+    maxCsAdvantageOnLaneOpponent: Max CS Advantage vs Lane Opponent
+    totalHeal: Total Healing
+    totalUnitsHealed: Total Units Healed
+    totalHealsOnTeammates: Total Heals on Teammates
+    allInPings: All-In Pings
+    assistMePings: Assist Me Pings
+    basicPings: Basic Pings
+    commandPings: Command Pings
+    dangerPings: Danger Pings
+    enemyMissingPings: Enemy Missing Pings
+    enemyVisionPings: Enemy Vision Pings
+    getBackPings: Get Back Pings
+    holdPings: Hold Pings
+    needVisionPings: Need Vision Pings
+    onMyWayPings: On My Way Pings
+    pushPings: Push Pings
+    retreatPings: Retreat Pings
+    visionClearedPings: Vision Cleared Pings
+    soloKills: Solo Kills
+    quickSoloKills: Quick Solo Kills
+    takedowns: Takedowns
+    outnumberedKills: Outnumbered Kills
+    multikills: Multikills
+    multikillsAfterAggressiveFlash: Multikills After Aggressive Flash
+    multiKillOneSpell: Multi Kill One Spell
+    killAfterHiddenWithAlly: Kill After Hidden with Ally
+    pickKillWithAlly: Pick Kill with Ally
+    killsWithHelpFromEpicMonster: Kills with Epic Monster Help
+    takedownsBeforeJungleMinionSpawn: Takedowns Before Jungle Spawn
+    takedownsFirstXMinutes: Takedowns First X Minutes
+    takedownsAfterGainingLevelAdvantage: Takedowns After Level Advantage
+    takedownsInAlcove: Takedowns in Alcove
+    takedownsInEnemyFountain: Takedowns in Enemy Fountain
+    killsOnOtherLanesEarlyJungleAsLaner: Early Roam Kills as Laner
+    getTakedownsInAllLanesEarlyJungleAsLaner: Early All Lane Roams
+    killsOnRecentlyHealedByAramPack: Kills on Recently Healed (ARAM)
+    fastestLegendary: Fastest Legendary
+    baronTakedowns: Baron Takedowns
+    dragonTakedowns: Dragon Takedowns
+    riftHeraldTakedowns: Rift Herald Takedowns
+    teamBaronKills: Team Baron Kills
+    teamElderDragonKills: Team Elder Dragon Kills
+    teamRiftHeraldKills: Team Rift Herald Kills
+    soloBaronKills: Solo Baron Kills
+    baronBuffGoldAdvantageOverThreshold: Baron Buff Gold Advantage
+    earliestBaron: Earliest Baron
+    earliestDragonTakedown: Earliest Dragon Takedown
+    elderDragonKillsWithOpposingSoul: Elder Dragon vs Opposing Soul
+    elderDragonMultikills: Elder Dragon Multikills
+    perfectDragonSoulsTaken: Perfect Dragon Souls
+    epicMonsterSteals: Epic Monster Steals
+    epicMonsterStolenWithoutSmite: Epic Monster Stolen Without Smite
+    epicMonsterKillsNearEnemyJungler: Epic Monster Kills Near Enemy Jungler
+    epicMonsterKillsWithin30SecondsOfSpawn: Epic Monster Kills Within 30s of Spawn
+    junglerTakedownsNearDamagedEpicMonster: Jungler Takedowns Near Damaged Epic Monster
+    voidMonsterKill: Void Monster Kill
+    alliedJungleMonsterKills: Allied Jungle Monster Kills
+    enemyJungleMonsterKills: Enemy Jungle Monster Kills
+    scuttleCrabKills: Scuttle Crab Kills
+    buffsStolen: Buffs Stolen
+    jungleCsBefore10Minutes: Jungle CS Before 10 Min
+    initialBuffCount: Initial Buff Count
+    initialCrabCount: Initial Crab Count
+    moreEnemyJungleThanOpponent: More Enemy Jungle Than Opponent
+    kda: KDA
+    killParticipation: Kill Participation
+    damagePerMinute: Damage Per Minute
+    goldPerMinute: Gold Per Minute
+    damageTakenOnTeamPercentage: Team Damage Taken %
+    teamDamagePercentage: Team Damage %
+    abilityUses: Ability Uses
+    spell1Casts: Q Casts
+    spell2Casts: W Casts
+    spell3Casts: E Casts
+    spell4Casts: R Casts
+    summoner1Casts: Summoner Spell 1 Casts
+    summoner2Casts: Summoner Spell 2 Casts
+    deathsByEnemyChamps: Deaths by Enemy Champions
+    survivedSingleDigitHpCount: Survived with Single Digit HP
+    tookLargeDamageSurvived: Took Large Damage and Survived
+    killedChampTookFullTeamDamageSurvived: Killed Champ and Survived Full Team Damage
+    saveAllyFromDeath: Saved Ally from Death
+    skillshotsDodged: Skillshots Dodged
+    skillshotsHit: Skillshots Hit
+    snowballsHit: Snowballs Hit
+    dodgeSkillShotsSmallWindow: Dodge Skillshots in Small Window
+    landSkillShotsEarlyGame: Land Skillshots Early Game
+    blastConeOppositeOpponentCount: Blast Cone Knockback Count
+    quickCleanse: Quick Cleanse
+    dancedWithRiftHerald: Danced with Rift Herald
+    fistBumpParticipation: Fist Bump Participation
+    flawlessAces: Flawless Aces
+    doubleAces: Double Aces
+    acesBefore15Minutes: Aces Before 15 Minutes
+    fullTeamTakedown: Full Team Takedown
+    shortestTimeToAceFromFirstTakedown: Shortest Time to Ace
+    12AssistStreakCount: 12 Assist Streak
+    teleportTakedowns: Teleport Takedowns
+    champLevel: Champion Level
+    champExperience: Champion Experience
+    timePlayed: Time Played
+    totalTimeSpentDead: Time Spent Dead
+    firstBloodKill: First Blood
+    firstBloodAssist: First Blood Assist
+    baronKills: Baron Kills
+    dragonKills: Dragon Kills
+    killsNearEnemyTurret: Kills Near Enemy Turret
+    killsUnderOwnTurret: Kills Under Own Turret
+    unseenRecalls: Unseen Recalls
+    effectiveHealAndShielding: Effective Heal and Shield
+    bountyGold: Bounty Gold
+    laneMinionsFirst10Minutes: Lane Minions First 10 Min
+    twentyMinionsIn3SecondsCount: 20 Minions in 3 Seconds
+    legendaryCount: Legendary Count
+    perfectGame: Perfect Game
+    maxKillDeficit: Max Kill Deficit
+    maxLevelLeadLaneOpponent: Max Level Lead vs Lane Opponent
+    completeSupportQuestInTime: Complete Support Quest in Time
+    mejaisFullStackInTime: Mejai's Full Stack in Time
+    HealFromMapSources: Heal from Map Sources
+    gameLength: Game Length
+    playedChampSelectPosition: Played Champ Select Position
+    positionAssignedByMatchmaking: Position Assigned by Matchmaking
+    selectedRolePreferences: Selected Role Preferences
+    hadAfkTeammate: Had AFK Teammate
+    highestChampionDamage: Highest Champion Damage
+    PlayerBehavior: Player Behavior
+    PlayerBehavior_IsHeroInCombat: Hero in Combat
+    gameEndedInEarlySurrender: Ended in Early Surrender
+    gameEndedInIGNBSurrender: Ended in In-Game Surrender
+    gameEndedInSurrender: Ended in Surrender
+    causedEarlySurrender: Caused Early Surrender
+    causedGameEndFromIGNBSurrender: Caused In-Game Surrender End
+    earlySurrenderAccomplice: Early Surrender Accomplice
+    teamEarlySurrendered: Team Early Surrendered
+    teamIGNBSurrendered: Team In-Game Surrendered
+    wasPremadeWithIGNBGameEndCauser: Premade with In-Game Surrender Causer
+    wasPremadeWithSevereTransgressor: Premade with Severe Transgressor
+    wasSevereTransgressor: Severe Transgressor
+    'true': Yes
+    'false': No

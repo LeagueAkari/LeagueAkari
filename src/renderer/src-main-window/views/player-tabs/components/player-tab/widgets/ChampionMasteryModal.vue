@@ -6,19 +6,19 @@
       <div class="mb-4 flex items-center justify-between gap-3">
         <div>
           <div class="text-lg font-bold text-gray-900 dark:text-white">
-            {{ t('PlayerTab.championMastery.modalTitle') }}
+            {{ t('playerTabs.championMastery.modalTitle') }}
           </div>
           <div
             class="text-xs text-gray-500 dark:text-gray-400"
             v-if="score !== undefined || masteries.length"
           >
             <template v-if="score !== undefined">
-              {{ t('PlayerTab.championMastery.score', { score }) }}
+              {{ t('playerTabs.championMastery.score', { score }) }}
             </template>
             <template v-if="score !== undefined && masteries.length"> · </template>
             <template v-if="masteries.length">
               {{
-                t('PlayerTab.championMastery.filteredChampions', {
+                t('playerTabs.championMastery.filteredChampions', {
                   count: filteredMasteries.length,
                   total: masteries.length
                 })
@@ -32,7 +32,7 @@
             size="small"
             :focusable="false"
             :loading="isRefreshing"
-            :title="t('PlayerTab.refreshPage')"
+            :title="t('playerTabs.profile.refreshPage')"
             @click="reloadChampionMastery"
           >
             <template #icon>
@@ -52,7 +52,7 @@
         clearable
         size="small"
         class="mb-3"
-        :placeholder="t('PlayerTab.championMastery.filterPlaceholder')"
+        :placeholder="t('playerTabs.championMastery.filterPlaceholder')"
       >
         <template #prefix>
           <NIcon :component="SearchIcon" />
@@ -67,7 +67,7 @@
         v-else-if="error"
         class="flex h-80 items-center justify-center text-sm text-red-600 dark:text-red-300"
       >
-        {{ t('PlayerTab.championMastery.loadFailed', { reason: error }) }}
+        {{ t('playerTabs.championMastery.loadFailed', { reason: error }) }}
       </div>
 
       <div
@@ -76,8 +76,8 @@
       >
         {{
           masteries.length
-            ? t('PlayerTab.championMastery.noFilterResult')
-            : t('PlayerTab.championMastery.noData')
+            ? t('playerTabs.championMastery.noFilterResult')
+            : t('playerTabs.championMastery.noData')
         }}
       </div>
 
@@ -115,11 +115,11 @@
                 <div
                   class="text-[11px] font-semibold text-gray-800 tabular-nums dark:text-gray-100"
                 >
-                  {{ t('PlayerTab.championMastery.level', { level: mastery.championLevel }) }}
+                  {{ t('playerTabs.championMastery.level', { level: mastery.championLevel }) }}
                 </div>
                 <div class="text-[11px] text-gray-500 tabular-nums dark:text-gray-400">
                   {{
-                    t('PlayerTab.championMastery.points', {
+                    t('playerTabs.championMastery.points', {
                       points: formatExtremeNumber(mastery.championPoints)
                     })
                   }}
@@ -258,14 +258,14 @@ const secondaryText = (mastery: Mastery) => {
   }
 
   parts.push(
-    t('PlayerTab.championMastery.progress', {
+    t('playerTabs.championMastery.progress', {
       since: formatExtremeNumber(mastery.championPointsSinceLastLevel),
       until: formatExtremeNumber(mastery.championPointsUntilNextLevel)
     })
   )
 
   if (mastery.tokensEarned) {
-    parts.push(t('PlayerTab.championMastery.tokensEarned', { count: mastery.tokensEarned }))
+    parts.push(t('playerTabs.championMastery.tokensEarned', { count: mastery.tokensEarned }))
   }
 
   return parts.join(' · ')
@@ -275,12 +275,12 @@ const masteryMetaText = (mastery: Mastery) => {
   const parts: string[] = []
 
   if (mastery.highestGrade) {
-    parts.push(t('PlayerTab.championMastery.highestGrade', { grade: mastery.highestGrade }))
+    parts.push(t('playerTabs.championMastery.highestGrade', { grade: mastery.highestGrade }))
   }
 
   if (mastery.championSeasonMilestone) {
     parts.push(
-      t('PlayerTab.championMastery.seasonMilestone', {
+      t('playerTabs.championMastery.seasonMilestone', {
         milestone: mastery.championSeasonMilestone
       })
     )

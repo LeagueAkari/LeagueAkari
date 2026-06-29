@@ -2,7 +2,7 @@
   <div>
     <!-- buttons + tabs -->
     <div class="mb-1 flex items-center gap-1">
-      <a href="https://op.gg" :title="t('OpggTabAndFilters.toOpgg')" target="_blank">
+      <a href="https://op.gg" :title="t('opgg.filters.toOpgg')" target="_blank">
         <OpggIcon class="block size-8 text-blue-500 dark:text-white" />
       </a>
 
@@ -10,7 +10,7 @@
       <NButton
         secondary
         class="size-8!"
-        :title="t('OpggTabAndFilters.refresh')"
+        :title="t('opgg.filters.refresh')"
         :loading="isLoading"
         @click="() => refresh()"
       >
@@ -23,7 +23,7 @@
       <NButton
         secondary
         class="size-8!"
-        :title="t('OpggTabAndFilters.settings.button')"
+        :title="t('opgg.filters.settings.button')"
         @click="isSettingsShow = true"
       >
         <template #icon>
@@ -32,13 +32,13 @@
       </NButton>
 
       <NTabs class="tabs" :value="currentTab" type="segment" size="small" @update:value="setTab">
-        <NTab name="champions" :tab="t('OpggTabAndFilters.champions')" />
-        <NTab :title="t('OpggTabAndFilters.champion')" name="champion" :disabled="!championId">
+        <NTab name="champions" :tab="t('opgg.filters.champions')" />
+        <NTab :title="t('opgg.filters.champion')" name="champion" :disabled="!championId">
           <div v-if="championId" class="flex items-center gap-2">
             <ChampionIcon round class="size-5" :champion-id="championId" />
             <span>{{ lcs.gameData.championName(championId) }}</span>
           </div>
-          <div v-else>{{ t('OpggTabAndFilters.empty') }}</div>
+          <div v-else>{{ t('opgg.filters.empty') }}</div>
         </NTab>
       </NTabs>
     </div>
@@ -47,7 +47,7 @@
     <div class="flex gap-1">
       <NSelect
         size="small"
-        :placeholder="t('OpggTabAndFilters.mode')"
+        :placeholder="t('opgg.filters.mode')"
         :options="modeOptions"
         :value="mode"
         @update:value="changeMode"
@@ -58,7 +58,7 @@
       />
       <NSelect
         size="small"
-        :placeholder="t('OpggTabAndFilters.region')"
+        :placeholder="t('opgg.filters.region')"
         :options="regionOptions"
         :value="region"
         @update:value="changeRegion"
@@ -69,7 +69,7 @@
       />
       <NSelect
         size="small"
-        :placeholder="t('OpggTabAndFilters.rankTier')"
+        :placeholder="t('opgg.filters.rankTier')"
         :options="tierOptions"
         :value="tier"
         @update:value="changeTier"
@@ -80,7 +80,7 @@
       />
       <NSelect
         size="small"
-        :placeholder="t('OpggTabAndFilters.position')"
+        :placeholder="t('opgg.filters.position')"
         :options="positionOptions"
         :value="position"
         @update:value="changePosition"
@@ -91,7 +91,7 @@
       />
       <NSelect
         size="small"
-        :placeholder="t('OpggTabAndFilters.version')"
+        :placeholder="t('opgg.filters.version')"
         :value="version"
         :options="versionOptions"
         @update:value="changeVersion"

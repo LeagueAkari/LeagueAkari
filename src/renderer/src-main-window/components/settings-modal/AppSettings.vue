@@ -1,10 +1,10 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('AppSettings.basic.title')">
+      <SettingsSection :title="t('settings.app.basic.title')">
         <SettingsRow
-          :label="t('AppSettings.basic.mainWindowCloseAction.label')"
-          :label-description="t('AppSettings.basic.mainWindowCloseAction.description')"
+          :label="t('settings.app.basic.mainWindowCloseAction.label')"
+          :label-description="t('settings.app.basic.mainWindowCloseAction.description')"
           :label-width="400"
         >
           <NSelect
@@ -29,8 +29,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.basic.preferredLolSource.label')"
-          :label-description="t('AppSettings.basic.preferredLolSource.description')"
+          :label="t('settings.app.basic.preferredLolSource.label')"
+          :label-description="t('settings.app.basic.preferredLolSource.description')"
           :label-width="400"
           align="start"
         >
@@ -45,47 +45,47 @@
             <NPopover>
               <template #trigger>
                 <div class="hover-text">
-                  {{ t('AppSettings.basic.preferredLolSource.howToChoose') }}
+                  {{ t('settings.app.basic.preferredLolSource.howToChoose') }}
                 </div>
               </template>
               <div class="max-w-[320px]">
                 <div class="mb-2">
                   <div class="flex h-5.5 items-center">
                     <span class="text-xs font-bold">{{
-                      t('AppSettings.basic.preferredLolSource.tip.sgp.title')
+                      t('settings.app.basic.preferredLolSource.tip.sgp.title')
                     }}</span>
                   </div>
                   <div class="text-[11px] leading-relaxed">
                     <div class="text-neutral-600 dark:text-gray-200">
-                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature1') }}
+                      · {{ t('settings.app.basic.preferredLolSource.tip.sgp.feature1') }}
                     </div>
                     <div class="text-neutral-600 dark:text-gray-200">
-                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature2') }}
+                      · {{ t('settings.app.basic.preferredLolSource.tip.sgp.feature2') }}
                     </div>
                     <div class="text-neutral-600 dark:text-gray-200">
-                      · {{ t('AppSettings.basic.preferredLolSource.tip.sgp.feature3') }}
+                      · {{ t('settings.app.basic.preferredLolSource.tip.sgp.feature3') }}
                     </div>
                   </div>
                   <div class="mt-1 text-[11px] text-orange-600 dark:text-orange-400">
-                    ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.sgp.warning') }}
+                    ⚠️ {{ t('settings.app.basic.preferredLolSource.tip.sgp.warning') }}
                   </div>
                 </div>
                 <div>
                   <div class="mb-1 flex h-5.5 items-center">
                     <span class="text-xs font-bold">{{
-                      t('AppSettings.basic.preferredLolSource.tip.lcu.title')
+                      t('settings.app.basic.preferredLolSource.tip.lcu.title')
                     }}</span>
                   </div>
                   <div class="text-[11px] leading-relaxed">
                     <div class="text-neutral-600 dark:text-gray-200">
-                      · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature1') }}
+                      · {{ t('settings.app.basic.preferredLolSource.tip.lcu.feature1') }}
                     </div>
                     <div class="text-neutral-600 dark:text-gray-200">
-                      · {{ t('AppSettings.basic.preferredLolSource.tip.lcu.feature2') }}
+                      · {{ t('settings.app.basic.preferredLolSource.tip.lcu.feature2') }}
                     </div>
                   </div>
                   <div class="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
-                    ⚠️ {{ t('AppSettings.basic.preferredLolSource.tip.lcu.warning') }}
+                    ⚠️ {{ t('settings.app.basic.preferredLolSource.tip.lcu.warning') }}
                   </div>
                 </div>
               </div>
@@ -99,7 +99,7 @@
               class="max-w-[320px] text-right text-sm font-bold text-orange-500 dark:text-orange-300"
             >
               {{
-                t('AppSettings.basic.preferredLolSource.unsupported', {
+                t('settings.app.basic.preferredLolSource.unsupported', {
                   server: sgps.availability.sgpServerId
                 })
               }}
@@ -107,8 +107,8 @@
           </div>
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.basic.theme.label')"
-          :label-description="t('AppSettings.basic.theme.description')"
+          :label="t('settings.app.basic.theme.label')"
+          :label-description="t('settings.app.basic.theme.description')"
           :label-width="400"
         >
           <NSelect
@@ -120,8 +120,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.basic.dataSource.label')"
-          :label-description="t('AppSettings.basic.dataSource.description')"
+          :label="t('settings.app.basic.dataSource.label')"
+          :label-description="t('settings.app.basic.dataSource.description')"
           :label-width="400"
         >
           <div class="flex max-w-full flex-col items-end gap-2">
@@ -135,7 +135,7 @@
             <NPopover>
               <template #trigger>
                 <div class="hover-text">
-                  {{ t('AppSettings.basic.dataSource.howToChoose') }}
+                  {{ t('settings.app.basic.dataSource.howToChoose') }}
                 </div>
               </template>
               <div>
@@ -146,24 +146,24 @@
                   <span class="text-xs font-bold">Gitee</span>
                   <span class="ml-1">
                     <template v-if="isTestingLatency">
-                      {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                      {{ t('settings.app.basic.dataSource.testingSpeed') }}
                     </template>
                     <template v-else-if="latency">
                       ({{
                         latency.giteeLatency === -1
-                          ? t('AppSettings.basic.dataSource.timeout')
+                          ? t('settings.app.basic.dataSource.timeout')
                           : `${latency.giteeLatency.toFixed(1)} ms`
                       }})
 
                       <span
                         class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
                         v-if="latency.giteeLatency < latency.githubLatency"
-                        >{{ t('AppSettings.basic.dataSource.better') }}</span
+                        >{{ t('settings.app.basic.dataSource.better') }}</span
                       >
                     </template>
                   </span>
                 </div>
-                <div>{{ t('AppSettings.basic.dataSource.tip.gitee') }}</div>
+                <div>{{ t('settings.app.basic.dataSource.tip.gitee') }}</div>
               </div>
               <div class="mt-2">
                 <div class="flex h-5.5 items-center">
@@ -173,24 +173,24 @@
                   <span class="text-xs font-bold">GitHub</span>
                   <span class="ml-1">
                     <template v-if="isTestingLatency">
-                      {{ t('AppSettings.basic.dataSource.testingSpeed') }}
+                      {{ t('settings.app.basic.dataSource.testingSpeed') }}
                     </template>
                     <template v-else-if="latency">
                       ({{
                         latency.githubLatency === -1
-                          ? t('AppSettings.basic.dataSource.timeout')
+                          ? t('settings.app.basic.dataSource.timeout')
                           : `${latency.githubLatency.toFixed(1)} ms`
                       }})
 
                       <span
                         class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
                         v-if="latency.githubLatency < latency.giteeLatency"
-                        >{{ t('AppSettings.basic.dataSource.better') }}</span
+                        >{{ t('settings.app.basic.dataSource.better') }}</span
                       >
                     </template>
                   </span>
                 </div>
-                <div>{{ t('AppSettings.basic.dataSource.tip.github') }}</div>
+                <div>{{ t('settings.app.basic.dataSource.tip.github') }}</div>
               </div>
               <div class="mt-2 flex justify-center">
                 <NButton
@@ -199,17 +199,17 @@
                   @click="() => handleTestRepoLatency()"
                   :loading="isTestingLatency"
                 >
-                  {{ t('AppSettings.basic.dataSource.testButton') }}
+                  {{ t('settings.app.basic.dataSource.testButton') }}
                 </NButton>
               </div>
             </NPopover>
           </div>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('AppSettings.selfUpdate.title')">
+      <SettingsSection :title="t('settings.app.selfUpdate.title')">
         <SettingsRow
-          :label="t('AppSettings.selfUpdate.updateLatestRelease.label')"
-          :label-description="t('AppSettings.selfUpdate.updateLatestRelease.description')"
+          :label="t('settings.app.selfUpdate.updateLatestRelease.label')"
+          :label-description="t('settings.app.selfUpdate.updateLatestRelease.description')"
           :label-width="400"
         >
           <NSwitch
@@ -219,8 +219,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
-          :label-description="t('AppSettings.selfUpdate.autoDownloadUpdates.description')"
+          :label="t('settings.app.selfUpdate.autoDownloadUpdates.label')"
+          :label-description="t('settings.app.selfUpdate.autoDownloadUpdates.description')"
           :label-width="400"
         >
           <NSwitch
@@ -230,9 +230,9 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.selfUpdate.checkUpdates')"
+          :label="t('settings.app.selfUpdate.checkUpdates')"
           :label-description="
-            t('AppSettings.selfUpdate.checkFrom', {
+            t('settings.app.selfUpdate.checkFrom', {
               source: UPDATE_SOURCE_MAP[rcs.settings.preferredSource]
             })
           "
@@ -245,7 +245,7 @@
               secondary
               type="primary"
               @click="() => handleCheckUpdates()"
-              >{{ t('AppSettings.selfUpdate.checkUpdates') }}</NButton
+              >{{ t('settings.app.selfUpdate.checkUpdates') }}</NButton
             >
             <NButton
               size="small"
@@ -254,10 +254,10 @@
               @click="() => handleShowUpdateModal()"
             >
               <template v-if="rcs.latestRelease.isNew">
-                {{ t('AppSettings.selfUpdate.newRelease') }}
+                {{ t('settings.app.selfUpdate.newRelease') }}
               </template>
               <template v-else>
-                {{ t('AppSettings.selfUpdate.currentRelease') }}
+                {{ t('settings.app.selfUpdate.currentRelease') }}
               </template>
             </NButton>
             <NButton
@@ -267,7 +267,7 @@
               secondary
               @click="() => su.startUpdate()"
             >
-              {{ t('AppSettings.selfUpdate.downloadRelease') }}
+              {{ t('settings.app.selfUpdate.downloadRelease') }}
             </NButton>
             <NButton
               size="small"
@@ -276,18 +276,18 @@
               type="warning"
               @click="() => su.cancelUpdate()"
             >
-              {{ t('AppSettings.selfUpdate.cancelUpdate') }}
+              {{ t('settings.app.selfUpdate.cancelUpdate') }}
             </NButton>
             <span v-if="sus.lastCheckAt" class="text-xs"
-              >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
+              >{{ t('settings.app.selfUpdate.lastCheckAt') }}
               {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
             >
           </NFlex>
         </SettingsRow>
         <SettingsRow
           v-if="sus.updateProgressInfo"
-          :label="t('AppSettings.selfUpdate.updateProgress.label')"
-          :label-description="t('AppSettings.selfUpdate.updateProgress.description')"
+          :label="t('settings.app.selfUpdate.updateProgress.label')"
+          :label-description="t('settings.app.selfUpdate.updateProgress.description')"
           :label-width="400"
           align="start"
         >
@@ -301,19 +301,19 @@
             <NStep>
               <template #title>
                 <span class="step-title">{{
-                  t('AppSettings.selfUpdate.updateProgress.downloading')
+                  t('settings.app.selfUpdate.updateProgress.downloading')
                 }}</span>
               </template>
               <div class="step-description">
                 {{
-                  t('AppSettings.selfUpdate.updateProgress.finished', {
+                  t('settings.app.selfUpdate.updateProgress.finished', {
                     progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
                   })
                 }}
               </div>
               <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
                 {{
-                  t('AppSettings.selfUpdate.updateProgress.remain', {
+                  t('settings.app.selfUpdate.updateProgress.remain', {
                     time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
                   })
                 }}
@@ -322,36 +322,36 @@
                 class="step-description"
                 v-if="sus.updateProgressInfo.phase === 'download-failed'"
               >
-                {{ t('AppSettings.selfUpdate.updateProgress.downloadFailed') }}
+                {{ t('settings.app.selfUpdate.updateProgress.downloadFailed') }}
               </div>
             </NStep>
             <NStep>
               <template #title>
                 <span class="step-title">{{
-                  t('AppSettings.selfUpdate.updateProgress.waitingForRestart')
+                  t('settings.app.selfUpdate.updateProgress.waitingForRestart')
                 }}</span>
               </template>
               <div class="step-description">
-                {{ t('AppSettings.selfUpdate.updateProgress.waitingForRestartDescription') }}
+                {{ t('settings.app.selfUpdate.updateProgress.waitingForRestartDescription') }}
               </div>
             </NStep>
           </NSteps>
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.selfUpdate.updateDir.label')"
-          :label-description="t('AppSettings.selfUpdate.updateDir.description')"
+          :label="t('settings.app.selfUpdate.updateDir.label')"
+          :label-description="t('settings.app.selfUpdate.updateDir.description')"
           :label-width="400"
           v-if="processStatus.current === 1 && processStatus.status !== 'error'"
         >
           <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
-            t('AppSettings.selfUpdate.updateDir.open')
+            t('settings.app.selfUpdate.updateDir.open')
           }}</NButton>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('AppSettings.mainWindowUi.title')">
+      <SettingsSection :title="t('settings.app.mainWindowUi.title')">
         <SettingsRow
-          :label="t('AppSettings.mainWindowUi.background.label')"
-          :label-description="t('AppSettings.mainWindowUi.background.description')"
+          :label="t('settings.app.mainWindowUi.background.label')"
+          :label-description="t('settings.app.mainWindowUi.background.description')"
           :label-width="400"
         >
           <NRadioGroup
@@ -381,10 +381,10 @@
           </NRadioGroup>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('AppSettings.lcConnection.title')">
+      <SettingsSection :title="t('settings.app.lcConnection.title')">
         <SettingsRow
-          :label="t('AppSettings.lcConnection.autoConnect.label')"
-          :label-description="t('AppSettings.lcConnection.autoConnect.description')"
+          :label="t('settings.app.lcConnection.autoConnect.label')"
+          :label-description="t('settings.app.lcConnection.autoConnect.description')"
           :label-width="400"
         >
           <NSwitch
@@ -395,8 +395,8 @@
         </SettingsRow>
         <SettingsRow
           v-if="as.isWindows"
-          :label="t('AppSettings.lcConnection.useWmi.label')"
-          :label-description="t('AppSettings.lcConnection.useWmi.description')"
+          :label="t('settings.app.lcConnection.useWmi.label')"
+          :label-description="t('settings.app.lcConnection.useWmi.description')"
           :label-width="400"
         >
           <NSwitch
@@ -407,19 +407,19 @@
         </SettingsRow>
         <SettingsRow
           v-if="as.isWindows"
-          :label="t('AppSettings.lcConnection.rebuildWmi.label')"
-          :label-description="t('AppSettings.lcConnection.rebuildWmi.description')"
+          :label="t('settings.app.lcConnection.rebuildWmi.label')"
+          :label-description="t('settings.app.lcConnection.rebuildWmi.description')"
           :label-width="400"
         >
           <NButton size="small" @click="() => lcu.rebuildWmi()" type="warning">
-            {{ t('AppSettings.lcConnection.rebuildWmi.rebuildButton') }}
+            {{ t('settings.app.lcConnection.rebuildWmi.rebuildButton') }}
           </NButton>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('AppSettings.misc.title')">
+      <SettingsSection :title="t('settings.app.misc.title')">
         <SettingsRow
-          :label="t('AppSettings.misc.logLevel.label')"
-          :label-description="t('AppSettings.misc.logLevel.description')"
+          :label="t('settings.app.misc.logLevel.label')"
+          :label-description="t('settings.app.misc.logLevel.description')"
           :label-width="400"
         >
           <NSelect
@@ -431,8 +431,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.misc.httpProxy.strategy.label')"
-          :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
+          :label="t('settings.app.misc.httpProxy.strategy.label')"
+          :label-description="t('settings.app.misc.httpProxy.strategy.description')"
           :label-width="400"
         >
           <NSelect
@@ -445,8 +445,8 @@
         </SettingsRow>
         <NCollapseTransition :show="as.settings.httpProxy.strategy === 'force'">
           <SettingsRow
-            :label="t('AppSettings.misc.httpProxy.host.label')"
-            :label-description="t('AppSettings.misc.httpProxy.host.description')"
+            :label="t('settings.app.misc.httpProxy.host.label')"
+            :label-description="t('settings.app.misc.httpProxy.host.description')"
             :label-width="400"
           >
             <NInput
@@ -459,8 +459,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AppSettings.misc.httpProxy.port.label')"
-            :label-description="t('AppSettings.misc.httpProxy.port.description')"
+            :label="t('settings.app.misc.httpProxy.port.label')"
+            :label-description="t('settings.app.misc.httpProxy.port.description')"
             :label-width="400"
           >
             <NInputNumber
@@ -475,8 +475,8 @@
           </SettingsRow>
         </NCollapseTransition>
         <SettingsRow
-          :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
-          :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
+          :label="t('settings.app.misc.disableHardwareAcceleration.label')"
+          :label-description="t('settings.app.misc.disableHardwareAcceleration.description')"
           :label-width="400"
         >
           <NSwitch
@@ -486,12 +486,12 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('AppSettings.misc.uninstallApp.label')"
-          :label-description="t('AppSettings.misc.uninstallApp.description')"
+          :label="t('settings.app.misc.uninstallApp.label')"
+          :label-description="t('settings.app.misc.uninstallApp.description')"
           :label-width="400"
         >
           <NButton size="small" type="error" @click="() => handleUninstallApp()">
-            {{ t('AppSettings.misc.uninstallApp.button') }}
+            {{ t('settings.app.misc.uninstallApp.button') }}
           </NButton>
         </SettingsRow>
       </SettingsSection>
@@ -581,11 +581,11 @@ const sn = useInstance(SimpleNotificationsRenderer)
 const closeActions = computed(() => {
   return [
     {
-      label: t('AppSettings.basic.mainWindowCloseAction.options.minimize-to-tray'),
+      label: t('settings.app.basic.mainWindowCloseAction.options.minimize-to-tray'),
       value: 'minimize-to-tray'
     },
-    { label: t('AppSettings.basic.mainWindowCloseAction.options.quit'), value: 'quit' },
-    { label: t('AppSettings.basic.mainWindowCloseAction.options.ask'), value: 'ask' }
+    { label: t('settings.app.basic.mainWindowCloseAction.options.quit'), value: 'quit' },
+    { label: t('settings.app.basic.mainWindowCloseAction.options.ask'), value: 'ask' }
   ]
 })
 
@@ -606,11 +606,11 @@ const lolSourceOptions = [
 
 const themeToneLabel = (id: AppThemeId) => {
   const colorTheme = getThemeColorTheme(id)
-  return t(`AppSettings.basic.theme.tone.${colorTheme}`)
+  return t(`settings.app.basic.theme.tone.${colorTheme}`)
 }
 
 const themeLabel = (id: AppThemeId) => {
-  return `${t(`AppSettings.basic.theme.options.${id}`, { defaultValue: id })} · ${themeToneLabel(id)}`
+  return `${t(`settings.app.basic.theme.options.${id}`, { defaultValue: id })} · ${themeToneLabel(id)}`
 }
 
 const themes = computed(() => {
@@ -618,19 +618,19 @@ const themes = computed(() => {
     {
       type: 'group',
       key: 'system',
-      label: t('AppSettings.basic.theme.groups.system'),
-      children: [{ label: t('AppSettings.basic.theme.options.default'), value: 'default' }]
+      label: t('settings.app.basic.theme.groups.system'),
+      children: [{ label: t('settings.app.basic.theme.options.default'), value: 'default' }]
     },
     {
       type: 'group',
       key: 'bright-core',
-      label: t('AppSettings.basic.theme.groups.brightBuiltin'),
+      label: t('settings.app.basic.theme.groups.brightBuiltin'),
       children: BUILTIN_LIGHT_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
     },
     {
       type: 'group',
       key: 'dark-core',
-      label: t('AppSettings.basic.theme.groups.darkBuiltin'),
+      label: t('settings.app.basic.theme.groups.darkBuiltin'),
       children: BUILTIN_DARK_THEME_IDS.map((id) => ({ label: themeLabel(id), value: id }))
     }
   ]
@@ -660,18 +660,18 @@ const mainWindowBackgroundMode = computed<MainWindowBackgroundMode>(() => {
 const mainWindowBackgroundModeOptions = computed(() => {
   return [
     {
-      label: t('AppSettings.mainWindowUi.background.options.profileSkin'),
+      label: t('settings.app.mainWindowUi.background.options.profileSkin'),
       value: 'profile-skin',
-      tooltip: t('AppSettings.mainWindowUi.background.tooltips.profileSkin')
+      tooltip: t('settings.app.mainWindowUi.background.tooltips.profileSkin')
     },
     {
-      label: t('AppSettings.mainWindowUi.background.options.none'),
+      label: t('settings.app.mainWindowUi.background.options.none'),
       value: 'none'
     },
     {
-      label: t('AppSettings.mainWindowUi.background.options.mica'),
+      label: t('settings.app.mainWindowUi.background.options.mica'),
       value: 'mica',
-      tooltip: t('AppSettings.mainWindowUi.background.tooltips.mica'),
+      tooltip: t('settings.app.mainWindowUi.background.tooltips.mica'),
       disabled: !wms.supportsMica
     }
   ]
@@ -694,13 +694,13 @@ const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({
     title: val
-      ? t('AppSettings.misc.disableHardwareAccelerationDialog.disableText')
-      : t('AppSettings.misc.disableHardwareAccelerationDialog.enableText'),
+      ? t('settings.app.misc.disableHardwareAccelerationDialog.disableText')
+      : t('settings.app.misc.disableHardwareAccelerationDialog.enableText'),
     content: val
-      ? t('AppSettings.misc.disableHardwareAccelerationDialog.disableConfirmation')
-      : t('AppSettings.misc.disableHardwareAccelerationDialog.enableConfirmation'),
-    positiveText: t('AppSettings.misc.disableHardwareAccelerationDialog.positiveText'),
-    negativeText: t('AppSettings.misc.disableHardwareAccelerationDialog.negativeText'),
+      ? t('settings.app.misc.disableHardwareAccelerationDialog.disableConfirmation')
+      : t('settings.app.misc.disableHardwareAccelerationDialog.enableConfirmation'),
+    positiveText: t('settings.app.misc.disableHardwareAccelerationDialog.positiveText'),
+    negativeText: t('settings.app.misc.disableHardwareAccelerationDialog.negativeText'),
     onPositiveClick: async () => {
       await app.setDisableHardwareAcceleration(val)
     }
@@ -709,10 +709,10 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
 
 const handleUninstallApp = () => {
   dialog.warning({
-    title: t('AppSettings.misc.uninstallApp.title'),
-    content: t('AppSettings.misc.uninstallApp.content'),
-    positiveText: t('AppSettings.misc.uninstallApp.positiveText'),
-    negativeText: t('AppSettings.misc.uninstallApp.negativeText'),
+    title: t('settings.app.misc.uninstallApp.title'),
+    content: t('settings.app.misc.uninstallApp.content'),
+    positiveText: t('settings.app.misc.uninstallApp.positiveText'),
+    negativeText: t('settings.app.misc.uninstallApp.negativeText'),
     onPositiveClick: async () => {
       if (!import.meta.env.DEV) {
         await su.uninstallApp()
@@ -724,15 +724,15 @@ const handleUninstallApp = () => {
 const httpProxyStrategies = computed(() => {
   return [
     // {
-    //   label: t('AppSettings.misc.httpProxy.strategy.options.auto'),
+    //   label: t('settings.app.misc.httpProxy.strategy.options.auto'),
     //   value: 'auto'
     // },
     {
-      label: t('AppSettings.misc.httpProxy.strategy.options.disable'),
+      label: t('settings.app.misc.httpProxy.strategy.options.disable'),
       value: 'disable'
     },
     {
-      label: t('AppSettings.misc.httpProxy.strategy.options.force'),
+      label: t('settings.app.misc.httpProxy.strategy.options.force'),
       value: 'force'
     }
   ]
@@ -753,13 +753,13 @@ const handleCheckUpdates = async () => {
   const { result, reason } = await su.checkUpdates()
   switch (result) {
     case 'no-updates':
-      message.success(() => t('AppSettings.selfUpdate.checkUpdatesResult.no-updates'))
+      message.success(() => t('settings.app.selfUpdate.checkUpdatesResult.no-updates'))
       break
     case 'new-updates':
-      message.success(() => t('AppSettings.selfUpdate.checkUpdatesResult.new-updates'))
+      message.success(() => t('settings.app.selfUpdate.checkUpdatesResult.new-updates'))
       break
     case 'failed':
-      message.warning(() => t('AppSettings.selfUpdate.checkUpdatesResult.failed', { reason }))
+      message.warning(() => t('settings.app.selfUpdate.checkUpdatesResult.failed', { reason }))
       break
   }
 }

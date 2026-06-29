@@ -2,7 +2,7 @@
   <div class="rounded bg-black/5 px-4 py-2 dark:bg-white/5" v-if="shouldRender">
     <div class="mb-2 flex items-center justify-between gap-2">
       <div class="text-base font-bold text-gray-900 dark:text-white">
-        {{ t('PlayerTab.championMastery.title') }}
+        {{ t('playerTabs.championMastery.title') }}
       </div>
       <div>
         <NButton
@@ -12,13 +12,13 @@
           :focusable="false"
           @click="isShowingAllModal = true"
         >
-          {{ t('PlayerTab.championMastery.viewAll') }}
+          {{ t('playerTabs.championMastery.viewAll') }}
         </NButton>
       </div>
     </div>
 
     <div class="mb-2 text-xs text-gray-500 dark:text-gray-400" v-if="championMastery">
-      {{ t('PlayerTab.championMastery.score', { score: championMastery.score }) }}
+      {{ t('playerTabs.championMastery.score', { score: championMastery.score }) }}
     </div>
 
     <div class="flex flex-col gap-2" v-if="isLoading">
@@ -49,12 +49,12 @@
                 {{ championName(mastery.championId) }}
               </div>
               <div class="text-[10px] text-gray-500 dark:text-gray-400">
-                {{ t('PlayerTab.championMastery.level', { level: mastery.championLevel }) }}
+                {{ t('playerTabs.championMastery.level', { level: mastery.championLevel }) }}
               </div>
             </div>
             <div class="text-right">
               <div class="text-[10px] text-gray-500 dark:text-gray-400">
-                {{ t('PlayerTab.championMastery.pointsLabel') }}
+                {{ t('playerTabs.championMastery.pointsLabel') }}
               </div>
               <div class="text-[11px] text-gray-700 tabular-nums dark:text-gray-200">
                 {{ formatExtremeNumber(mastery.championPoints) }}
@@ -72,14 +72,14 @@
           </div>
           <div class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-3 gap-y-1">
             <div class="text-black/60 dark:text-white/60">
-              {{ t('PlayerTab.championMastery.levelLabel') }}
+              {{ t('playerTabs.championMastery.levelLabel') }}
             </div>
             <div class="text-right text-black/85 dark:text-white/85">
-              {{ t('PlayerTab.championMastery.level', { level: mastery.championLevel }) }}
+              {{ t('playerTabs.championMastery.level', { level: mastery.championLevel }) }}
             </div>
 
             <div class="text-black/60 dark:text-white/60">
-              {{ t('PlayerTab.championMastery.pointsLabel') }}
+              {{ t('playerTabs.championMastery.pointsLabel') }}
             </div>
             <div class="text-right text-black/85 tabular-nums dark:text-white/85">
               {{ formatExtremeNumber(mastery.championPoints) }}
@@ -87,7 +87,7 @@
 
             <template v-if="mastery.highestGrade">
               <div class="text-black/60 dark:text-white/60">
-                {{ t('PlayerTab.championMastery.highestGradeLabel') }}
+                {{ t('playerTabs.championMastery.highestGradeLabel') }}
               </div>
               <div class="text-right text-black/85 dark:text-white/85">
                 {{ mastery.highestGrade }}
@@ -96,7 +96,7 @@
 
             <template v-if="mastery.championSeasonMilestone">
               <div class="text-black/60 dark:text-white/60">
-                {{ t('PlayerTab.championMastery.seasonMilestoneLabel') }}
+                {{ t('playerTabs.championMastery.seasonMilestoneLabel') }}
               </div>
               <div class="text-right text-black/85 tabular-nums dark:text-white/85">
                 {{ mastery.championSeasonMilestone }}
@@ -105,7 +105,7 @@
 
             <template v-if="mastery.lastPlayTime">
               <div class="text-black/60 dark:text-white/60">
-                {{ t('PlayerTab.championMastery.lastPlayTimeLabel') }}
+                {{ t('playerTabs.championMastery.lastPlayTimeLabel') }}
               </div>
               <div class="text-right text-black/85 tabular-nums dark:text-white/85">
                 {{ formatTime(mastery.lastPlayTime) }}

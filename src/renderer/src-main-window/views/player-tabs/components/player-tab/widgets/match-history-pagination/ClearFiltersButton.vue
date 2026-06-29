@@ -14,7 +14,7 @@
         </template>
       </NButton>
     </template>
-    {{ t('PlayerTab.clearFilters') }}
+    {{ t('playerTabs.profile.clearFilters') }}
   </NTooltip>
 </template>
 

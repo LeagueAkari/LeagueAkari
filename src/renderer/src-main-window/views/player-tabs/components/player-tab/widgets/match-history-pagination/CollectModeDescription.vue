@@ -1,9 +1,11 @@
 <template>
-  <TranslationComponent :translation="t('PlayerTab.collectMode.collectedPageDescription')">
+  <TranslationComponent
+    :translation="t('playerTabs.matchHistory.collectMode.collectedPageDescription')"
+  >
     <template #scanned>
       <TranslationComponent
         :translation="
-          t('PlayerTab.collectMode.scannedMatches', {
+          t('playerTabs.matchHistory.collectMode.scannedMatches', {
             count: scannedCount
           })
         "
@@ -16,7 +18,7 @@
     <template #collected>
       <TranslationComponent
         :translation="
-          t('PlayerTab.collectMode.collectedMatches', {
+          t('playerTabs.matchHistory.collectMode.collectedMatches', {
             count: collectedGamesCount
           })
         "

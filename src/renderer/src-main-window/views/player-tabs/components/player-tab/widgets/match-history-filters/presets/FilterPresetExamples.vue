@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-full flex-col">
     <div class="mb-2 text-center text-xs font-bold text-black/70 dark:text-white/70">
-      {{ t('PlayerTab.filter.examples.title') }}
+      {{ t('playerTabs.matchHistory.filters.examples.title') }}
     </div>
 
     <div
@@ -19,13 +19,17 @@
       <span
         class="example-text inline-flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5"
       >
-        <TranslationComponent :translation="t('PlayerTab.filter.examples.cleanMatchSamples.title')">
+        <TranslationComponent
+          :translation="t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.title')"
+        >
           <template #matched>
             <span
               class="inline-flex items-center gap-1 align-middle font-bold text-teal-700 dark:text-teal-300"
             >
               <NIcon class="shrink-0 text-base"><CheckmarkCircle20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.cleanMatchSamples.matched') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.matched')
+              }}</span>
             </span>
           </template>
 
@@ -34,7 +38,9 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-sky-700 dark:text-sky-300"
             >
               <NIcon class="shrink-0 text-base"><ArrowReset20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.cleanMatchSamples.remake') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.remake')
+              }}</span>
             </span>
           </template>
 
@@ -43,7 +49,9 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-rose-700 dark:text-rose-300"
             >
               <NIcon class="shrink-0 text-base"><DismissCircle20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.cleanMatchSamples.abort') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.abort')
+              }}</span>
             </span>
           </template>
 
@@ -52,7 +60,7 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-purple-700 dark:text-purple-300"
             >
               <NIcon class="shrink-0 text-base"><Bot20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.cleanMatchSamples.pve') }}</span>
+              <span>{{ t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.pve') }}</span>
             </span>
           </template>
 
@@ -61,7 +69,9 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-amber-700 dark:text-amber-300"
             >
               <NIcon class="shrink-0 text-base"><Timer20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.cleanMatchSamples.duration') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.cleanMatchSamples.duration')
+              }}</span>
             </span>
           </template>
         </TranslationComponent>
@@ -84,7 +94,7 @@
         class="example-text inline-flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5"
       >
         <TranslationComponent
-          :translation="t('PlayerTab.filter.examples.kiwiJayceSlowAndSteady.title')"
+          :translation="t('playerTabs.matchHistory.filters.examples.kiwiJayceSlowAndSteady.title')"
         >
           <template #queue>
             <span
@@ -143,14 +153,16 @@
         class="example-text inline-flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5"
       >
         <TranslationComponent
-          :translation="t('PlayerTab.filter.examples.strongSelfPerformance.title')"
+          :translation="t('playerTabs.matchHistory.filters.examples.strongSelfPerformance.title')"
         >
           <template #kda>
             <span
               class="inline-flex items-center gap-1 align-middle font-bold text-teal-700 dark:text-teal-300"
             >
               <NIcon class="shrink-0 text-base"><Star20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.strongSelfPerformance.kda') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.strongSelfPerformance.kda')
+              }}</span>
             </span>
           </template>
 
@@ -159,7 +171,9 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-rose-700 dark:text-rose-300"
             >
               <NIcon class="shrink-0 text-base"><DismissCircle20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.strongSelfPerformance.deaths') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.strongSelfPerformance.deaths')
+              }}</span>
             </span>
           </template>
 
@@ -168,7 +182,9 @@
               class="inline-flex items-center gap-1 align-middle font-bold text-amber-700 dark:text-amber-300"
             >
               <NIcon class="shrink-0 text-base"><Target20Regular /></NIcon>
-              <span>{{ t('PlayerTab.filter.examples.strongSelfPerformance.contribution') }}</span>
+              <span>{{
+                t('playerTabs.matchHistory.filters.examples.strongSelfPerformance.contribution')
+              }}</span>
             </span>
           </template>
         </TranslationComponent>

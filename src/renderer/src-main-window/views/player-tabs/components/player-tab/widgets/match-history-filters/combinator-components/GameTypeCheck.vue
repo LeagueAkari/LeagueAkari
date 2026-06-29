@@ -3,26 +3,26 @@
     <div class="flex items-center gap-2">
       <div v-if="node.type === 'isMatchedGame'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Games20Regular /></NIcon>
-        {{ t('PlayerTab.filter.isMatchedGame') }}
+        {{ t('playerTabs.matchHistory.filters.isMatchedGame') }}
       </div>
       <div
         v-else-if="node.type === 'isPveGame'"
         class="flex items-center gap-1.5 text-sm font-bold"
       >
         <NIcon size="16"><Games20Regular /></NIcon>
-        {{ t('PlayerTab.filter.isPveGame') }}
+        {{ t('playerTabs.matchHistory.filters.isPveGame') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div class="mt-2 text-xs text-black/50 dark:text-white/50">
-      {{ t(`PlayerTab.filter.descriptions.${node.type}`) }}
+      {{ t(`playerTabs.matchHistory.filters.descriptions.${node.type}`) }}
     </div>
   </div>
 </template>

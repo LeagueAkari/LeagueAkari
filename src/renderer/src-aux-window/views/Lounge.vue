@@ -10,45 +10,45 @@
       <template v-if="lcs.gameflow.phase === 'ReadyCheck'">
         <template v-if="agfs.willAcceptAt > 0">
           <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
-            t('Lounge.autoAccept.acceptIn', { seconds: willAcceptIn.toFixed(1) })
+            t('auxWindow.lounge.panel.autoAccept.acceptIn', { seconds: willAcceptIn.toFixed(1) })
           }}</span>
           <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoAccept()">{{
-            t('Lounge.autoAccept.cancelButton')
+            t('auxWindow.lounge.panel.autoAccept.cancelButton')
           }}</NButton>
         </template>
         <template v-else-if="lcs.matchmaking.readyCheck?.playerResponse === 'Accepted'">
           <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
-            t('Lounge.autoAccept.accepted')
+            t('auxWindow.lounge.panel.autoAccept.accepted')
           }}</span>
           <span class="mb-2 text-[13px] text-gray-500 dark:text-gray-400">{{
-            t('Lounge.autoAccept.subtitle1')
+            t('auxWindow.lounge.panel.autoAccept.subtitle1')
           }}</span>
           <NButton type="warning" secondary size="tiny" @click="() => handleDecline()">{{
-            t('Lounge.autoAccept.declineButton')
+            t('auxWindow.lounge.panel.autoAccept.declineButton')
           }}</NButton>
         </template>
 
         <template v-else-if="lcs.matchmaking.readyCheck?.playerResponse === 'Declined'">
           <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
-            t('Lounge.autoAccept.declined')
+            t('auxWindow.lounge.panel.autoAccept.declined')
           }}</span>
           <span class="mb-2 text-[13px] text-gray-500 dark:text-gray-400">{{
-            t('Lounge.autoAccept.subtitle2')
+            t('auxWindow.lounge.panel.autoAccept.subtitle2')
           }}</span>
           <NButton type="primary" secondary size="tiny" @click="() => handleAccept()">{{
-            t('Lounge.autoAccept.acceptButton')
+            t('auxWindow.lounge.panel.autoAccept.acceptButton')
           }}</NButton>
         </template>
         <template v-else>
           <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
-            t('Lounge.autoAccept.pending')
+            t('auxWindow.lounge.panel.autoAccept.pending')
           }}</span>
           <div class="flex gap-1">
             <NButton type="primary" secondary size="tiny" @click="() => handleAccept()">{{
-              t('Lounge.autoAccept.acceptButton')
+              t('auxWindow.lounge.panel.autoAccept.acceptButton')
             }}</NButton>
             <NButton type="warning" secondary size="tiny" @click="() => handleDecline()">{{
-              t('Lounge.autoAccept.declineButton')
+              t('auxWindow.lounge.panel.autoAccept.declineButton')
             }}</NButton>
           </div>
         </template>
@@ -56,7 +56,7 @@
 
       <template v-else-if="lcs.gameflow.phase === 'Matchmaking'">
         <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">{{
-          t('Lounge.matchmaking.searching')
+          t('auxWindow.lounge.panel.matchmaking.searching')
         }}</span>
         <span
           class="mb-2 text-[13px] text-gray-500 dark:text-gray-400"
@@ -70,15 +70,15 @@
           size="tiny"
           @click="() => handleCancelSearching()"
           ><template v-if="agfs.settings.autoMatchmakingEnabled">{{
-            t('Lounge.matchmaking.stopAndDisable')
+            t('auxWindow.lounge.panel.matchmaking.stopAndDisable')
           }}</template
-          ><template v-else>{{ t('Lounge.matchmaking.stop') }}</template></NButton
+          ><template v-else>{{ t('auxWindow.lounge.panel.matchmaking.stop') }}</template></NButton
         >
       </template>
       <template v-else-if="agfs.willSearchMatch">
         <span class="mb-2 text-base font-bold text-gray-900 dark:text-gray-100">
           {{
-            t('Lounge.matchmaking.searchIn', {
+            t('auxWindow.lounge.panel.matchmaking.searchIn', {
               seconds: willSearchMatchIn.toFixed(1)
             })
           }}
@@ -88,19 +88,19 @@
           secondary
           size="tiny"
           @click="() => handleCancelAutoSearchMatch()"
-          >{{ t('Lounge.matchmaking.cancel') }}</NButton
+          >{{ t('auxWindow.lounge.panel.matchmaking.cancel') }}</NButton
         >
       </template>
 
       <template v-else>
         <span
           class="mb-2 block max-w-70 overflow-hidden text-base font-bold text-ellipsis whitespace-nowrap text-gray-900 dark:text-gray-100"
-          :title="`${lcs.gameflow.session?.gameData.queue.name || t('Lounge.gameMode')} · ${lcs.gameflow.session?.map.name || t('Lounge.map')}`"
+          :title="`${lcs.gameflow.session?.gameData.queue.name || t('auxWindow.lounge.panel.gameMode')} · ${lcs.gameflow.session?.map.name || t('auxWindow.lounge.panel.map')}`"
           >{{ formatMapModeText() }}</span
         >
         <template v-if="agfs.settings.autoMatchmakingEnabled">
           <span class="mb-2 text-[13px] text-gray-500 dark:text-gray-400" v-if="penaltyTime">{{
-            t('Lounge.matchmaking.waitingForPenalty', {
+            t('auxWindow.lounge.panel.matchmaking.waitingForPenalty', {
               seconds: penaltyTime.toFixed()
             })
           }}</span>
@@ -109,7 +109,7 @@
             v-else-if="agfs.activityStartStatus === 'insufficient-members'"
           >
             {{
-              t('Lounge.matchmaking.waitingForMembers', {
+              t('auxWindow.lounge.panel.matchmaking.waitingForMembers', {
                 count: agfs.settings.autoMatchmakingMinimumMembers
               })
             }}
@@ -117,7 +117,7 @@
           <span
             class="mb-2 text-[13px] text-gray-500 dark:text-gray-400"
             v-else-if="agfs.activityStartStatus === 'waiting-for-invitees'"
-            >{{ t('Lounge.matchmaking.waitingForInvitees') }}</span
+            >{{ t('auxWindow.lounge.panel.matchmaking.waitingForInvitees') }}</span
           >
         </template>
       </template>
@@ -242,8 +242,9 @@ watch(
 )
 
 const formatMapModeText = () => {
-  const gameModeName = lcs.gameflow.session?.gameData.queue.name || t('Lounge.gameMode')
-  const mapName = lcs.gameflow.session?.map.name || t('Lounge.map')
+  const gameModeName =
+    lcs.gameflow.session?.gameData.queue.name || t('auxWindow.lounge.panel.gameMode')
+  const mapName = lcs.gameflow.session?.map.name || t('auxWindow.lounge.panel.map')
 
   if (gameModeName === mapName) {
     return gameModeName
@@ -260,11 +261,11 @@ const formatNumber = (num: number, precision = 1) => {
 
 const formatMatchmakingSearchText = (search: GetSearch) => {
   if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {
-    return `${t('Lounge.wait')} ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
+    return `${t('auxWindow.lounge.panel.wait')} ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
   }
 
   if (agfs.settings.autoMatchmakingRematchStrategy === 'fixed-duration') {
-    return `${search.timeInQueue.toFixed(1)} s (${t('Lounge.atMost')} ${agfs.settings.autoMatchmakingRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
+    return `${search.timeInQueue.toFixed(1)} s (${t('auxWindow.lounge.panel.atMost')} ${agfs.settings.autoMatchmakingRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
   }
 
   return `${search.timeInQueue.toFixed(1)} s / ${search.estimatedQueueTime.toFixed(1)} s`

@@ -1,0 +1,169 @@
+opgg:
+  titlebar:
+    close: Close
+    minimize: Minimize
+    pin: Pin
+    unpin: Unpin
+    repositionToAlignLeagueClientUx: Align with League Client UX
+  filters:
+    toOpgg: Go to OP.GG
+    refresh: Refresh
+    champions: Tier
+    champion: Champion
+    empty: None
+    mode: Mode
+    region: Region
+    rankTier: Rank Tier
+    position: Position
+    version: Version
+    modes:
+      ranked: Ranked
+      aram: ARAM
+      arena: Arena
+      nexus_blitz: Nexus Blitz
+      urf: URF
+      none: None
+    positions:
+      top: Top
+      jungle: Jungle
+      mid: Mid
+      adc: Adc
+      support: Support
+      none: None
+    regions:
+      global: Global
+      na: North America
+      euw: Europe West
+      kr: Korea
+      br: Brazil
+      eune: Europe Nordic & East
+      jp: Japan
+      lan: Latin America North
+      las: Latin America South
+      oce: Oceania
+      tr: Turkey
+      ru: Russia
+      sg: Singapore
+      id: Indonesia
+      ph: Philippines
+      th: Thailand
+      vn: Vietnam
+      tw: Taiwan
+      me: Middle East
+    tiers:
+      all: All Tiers
+      ibsg: Gold -
+      gold_plus: Gold +
+      platinum_plus: Platinum +
+      emerald_plus: Emerald +
+      diamond_plus: Diamond +
+      master: Master
+      master_plus: Master +
+      grandmaster: Grandmaster
+      challenger: Challenger
+    settings:
+      button: Settings
+  championTable:
+    searchPlaceholder: Search for name
+    columns:
+      champion: Name
+      tier: Tier
+      winRate: W/R
+      pickRate: P/R
+      counter: Counters
+      banRate: B/R
+    cancel: Cancel
+  view:
+    replace: Provide
+    create: Create
+    noVersionFound: No version found
+    settings:
+      title: OP.GG Settings
+      enabled:
+        label: Enable
+        description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+      flashPosition:
+        label: Flash Position Preference
+        description: The position for Flash when setting summoner spells
+        auto: Current position
+        options:
+          d: Default Flash position is D
+          f: Default Flash position is F
+          auto: Decide based on the current Flash position
+      autoApplyRunes:
+        label: Auto Apply Runes
+        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+      autoApplySpells:
+        label: Auto Apply Summoner Spells
+        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+      autoApplyItems:
+        label: Auto Apply Item Builds
+        description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+    success: 'Request sent: {{reason}}'
+    summonerSpells: Summoner Spells
+    runes: Rune Builds
+    setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
+    setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
+    spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+    runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
+    sessionChampions:
+      title: Session Champions
+  champion:
+    boots: Boots
+    adorableRabi: Kawaii Bunny
+    avgPlace: Avg. Rank
+    1st: 1st Place
+    winRate: Win Rate
+    pickRate: Pick Rate
+    plays: Total Games
+    banRate: Ban Rate
+    counter: Counter
+    allCounters: All
+    counterC: Counter
+    allC: All
+    empty: No Data Available
+    times: '{{times}} Games'
+    showAll: Show All
+    spells: Summoner Spells
+    apply: Apply
+    runes: Rune Builds
+    abilityBuild: Ability Leveling
+    starterItemText: Starting Items
+    prismItemText: Prism Tier Items
+    coreItemText: Core Items
+    itemText: Items
+    tierText: T{{tier}}
+    applyRunes: Import Current Item Build
+    applyRunesText: Build Applied
+    augmentAll: All
+    augmentGold: Gold
+    augmentSilver: Silver
+    augmentPrism: Prism
+    augmentPerformance: Perf.
+    augmentPopular: Popular
+    augmentSort:
+      default: Default
+      performance: Performance
+      popular: Popularity
+    showAdvancedStats: Show Advanced
+    synergies: Synergies
+    balance:
+      title: Balance
+      attack_speed: Attack Speed
+      damage_dealt: Damage Dealt
+      damage_taken: Damage Taken
+      cooldown_reduction: CDR
+      healing: Healing
+      tenacity: Tenacity
+      shield_amount: Shield Amount
+      energy_regen: Energy Regen
+      area_of_effect_damage: AoE Damage
+    writeToDisk: '[$t(common:appName)] Written to item build: {{name}}'
+    writtenToDisk: Successfully written to file
+    writeFileFailedMessage: Failed to write file {{reason}}
+    bootsDesc: Boots (sorted by pick rate)
+    prismItemsDesc: Prism Tier Items (sorted by pick rate)
+    itemsDesc: Items (sorted by pick rate)
+    coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
+    starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
+    cancel: Cancel

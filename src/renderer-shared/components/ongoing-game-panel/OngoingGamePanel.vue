@@ -36,21 +36,21 @@
           <template v-if="!lcs.isConnected">
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="PlugConnected" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
-              {{ t('OngoingGame.disconnected') }}
+              {{ t('ongoingGame.panel.disconnected') }}
             </div>
           </template>
 
           <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="TimeOutline" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
-              {{ t('OngoingGame.waitingForSpectate') }}
+              {{ t('ongoingGame.panel.waitingForSpectate') }}
             </div>
           </template>
 
           <template v-else>
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="GameController" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
-              {{ t('OngoingGame.noOngoingGame') }}
+              {{ t('ongoingGame.panel.noOngoingGame') }}
             </div>
           </template>
         </template>
@@ -58,7 +58,7 @@
         <template v-else>
           <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="Forbid" />
           <div class="text-base font-normal text-black/60 dark:text-white/80">
-            {{ t('OngoingGame.disabled') }}
+            {{ t('ongoingGame.panel.disabled') }}
           </div>
         </template>
       </div>

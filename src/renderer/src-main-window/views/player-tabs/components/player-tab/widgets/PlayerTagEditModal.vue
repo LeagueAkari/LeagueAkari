@@ -1,7 +1,7 @@
 <template>
   <NModal v-model:show="show" preset="card" class="max-w-[60vw]">
     <template #header>
-      <span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span>
+      <span class="card-header-title">{{ t('playerTags.editModal.title') }}</span>
     </template>
 
     <template v-if="summoner">
@@ -22,14 +22,14 @@
 
     <!-- loading summoner... -->
     <template v-else>
-      <span class="text-xs">{{ t('PlayerTagEditModal.loading') }}</span>
+      <span class="text-xs">{{ t('playerTags.editModal.loading') }}</span>
     </template>
 
     <div class="mt-3">
       <NInput
         v-model:value="text"
         :placeholder="
-          t('PlayerTagEditModal.placeholder', {
+          t('playerTags.editModal.placeholder', {
             name: masked(displayName, t('summoner', { ns: 'common' }))
           })
         "
@@ -41,9 +41,9 @@
 
     <!-- buttons -->
     <div class="mt-3 flex justify-end gap-1">
-      <NButton size="small" @click="show = false">{{ t('PlayerTagEditModal.cancel') }}</NButton>
+      <NButton size="small" @click="show = false">{{ t('playerTags.editModal.cancel') }}</NButton>
       <NButton size="small" type="primary" @click="handleSaveTag">
-        {{ t('PlayerTagEditModal.save') }}
+        {{ t('playerTags.editModal.save') }}
       </NButton>
     </div>
   </NModal>
@@ -171,9 +171,9 @@ const handleSaveTag = async () => {
     : await removeTag(puuid.value, lcs.summoner.me.puuid)
 
   if (success) {
-    message.success(() => t('PlayerTab.operationSuccessTitle'))
+    message.success(() => t('playerTabs.profile.operationSuccessTitle'))
   } else {
-    message.warning(() => t('PlayerTab.failedToLoadTitle'))
+    message.warning(() => t('playerTabs.profile.failedToLoadTitle'))
   }
 
   show.value = false

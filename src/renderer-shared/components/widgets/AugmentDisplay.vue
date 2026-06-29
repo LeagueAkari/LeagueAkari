@@ -72,22 +72,22 @@ const { t } = useTranslation()
 const formatRarity = (r: string) => {
   switch (r) {
     case 'kBronze':
-      return t('AugmentDisplay.bronze')
+      return t('gameAssets.augment.bronze')
 
     case 'kSilver':
-      return t('AugmentDisplay.silver')
+      return t('gameAssets.augment.silver')
 
     case 'kEventChoice':
-      return t('AugmentDisplay.eventChoice')
+      return t('gameAssets.augment.eventChoice')
 
     case 'kGold':
-      return t('AugmentDisplay.gold')
+      return t('gameAssets.augment.gold')
 
     case 'kPrismatic':
-      return t('AugmentDisplay.prismatic')
+      return t('gameAssets.augment.prismatic')
 
     default:
-      return t('AugmentDisplay.rarity', { rarity: r })
+      return t('gameAssets.augment.rarity', { rarity: r })
   }
 }
 </script>

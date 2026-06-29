@@ -6,15 +6,15 @@
     <span
       class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400"
       v-if="lcs.gameflow.phase === 'InProgress'"
-      >{{ t('Placeholder.inProgress') }}</span
+      >{{ t('auxWindow.placeholder.inProgress') }}</span
     >
     <span
       class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400"
       v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating"
-      >{{ t('Placeholder.idle') }}</span
+      >{{ t('auxWindow.placeholder.idle') }}</span
     >
     <span class="mt-2 text-sm font-normal text-gray-500 dark:text-gray-400" v-else>{{
-      t('Placeholder.idle')
+      t('auxWindow.placeholder.idle')
     }}</span>
   </div>
 </template>

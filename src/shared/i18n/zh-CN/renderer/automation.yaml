@@ -1,0 +1,241 @@
+automation:
+  home:
+    title: 自动化
+    autoGameflow: 自动游戏流程
+    autoSelect: 自动选择 / 禁用
+    autoMisc: 其他
+    autoChampConfig: 自动英雄配置
+  gameflow:
+    title: 游戏流
+    common:
+      enabled: 开启
+    sections:
+      readyCheck: 自动接受对局
+      autoHonor: 自动点赞
+      playAgain: 返回房间
+      autoMatchmaking: 自动匹配
+      autoReconnect: 重新连接
+      leader: 房主转交
+      invitations: 房间邀请
+      aramTeamSide: 地图位置信息
+    autoAcceptEnabled:
+      label: 自动接受对局开启
+      description: 当匹配到玩家时，自动确认
+      footer: 部分服务器或排位赛分段根据服务器策略，可能已经强制启用自动接受，和 $t(common:appName) 无关
+    autoAcceptDelaySeconds:
+      label: 自动接受对局延时 (s)
+      description: 在可接受时延迟执行接受操作的时间，单位为秒
+    autoHonorEnabled:
+      label: 自动点赞开启
+      description: 在游戏结束时，自动用尽票数点赞。
+    autoHonorStrategy:
+      label: 点赞选择策略
+      description: 这将决定具体给哪位玩家点赞
+      options:
+        prefer-lobby-member: 优先选择房间内的人员，若有剩余票数，则选择其他队友
+        only-lobby-member: 仅预组队成员
+        all-member: 所有队友
+        all-member-including-opponent: 考虑本局游戏所有玩家
+        opt-out: 不点赞
+    playAgainEnabled:
+      label: 自动回到房间
+      description:
+        full: 对局结束时回到房间。可能需要先启用 {autoHonor}以完成点赞投票阶段
+        part2: 自动点赞
+    autoMatchmakingEnabled:
+      label: 自动匹配对局
+      description: 在可匹配对局时，将自动开始匹配对局
+    autoMatchmakingMinimumMembers:
+      label: 最低人数
+      description: 自动开始匹配需满足人数达到 {{members}} 人
+    autoMatchmakingDelaySeconds:
+      label: 匹配前等待时间 (s)
+      description: 在可匹配对局时，预留的等待时间，单位为秒
+    autoMatchmakingWaitForInvitees:
+      label: 等待邀请中成员
+      description: 自动开启匹配将等待所有被邀请的玩家做出回应
+    autoMatchmakingRematchStrategy:
+      label: 停止匹配策略
+      description: 在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配
+      options:
+        never: 永不
+        fixed-duration: 固定时间
+        estimated-duration: 超过队列预估时间
+    autoMatchmakingRematchFixedDuration:
+      label: 退出匹配时间 (s)
+      description:
+        fixed-duration: 在超过该时间后，将停止匹配，单位为秒
+        no-fixed-duration: 该选项仅当停止匹配策略为固定时间时生效
+    autoReconnectEnabled:
+      label: 自动重新连接
+      description: 当位于可重新连接状态时，尝试重新连接
+    autoSkipLeaderEnabled:
+      label: 不当房主
+      description: 当自己是房主时，将房主转交到房间内的其他成员
+    autoHandleInvitationsEnabled:
+      label: 自动处理房间邀请
+      description: 按照设定的策略处理房间邀请
+    invitationHandlingStrategies:
+      label: 房间邀请接受策略
+      description: 当收到房间邀请时，将根据不同的队列模式进行处理
+      options:
+        accept: 接受
+        decline: 拒绝
+        ignore: 不处理
+      button: 配置
+      queueTypes:
+        default: 默认
+    rejectInvitationWhenAway:
+      label: 离开时拒绝邀请
+      description: 当游戏状态为离开时，将拒绝所有房间邀请
+    autoSendARAMTeamSideEnabled:
+      label: 发送地图位置信息
+      description: 在如极地大乱斗、海克斯大乱斗等模式中，进入英雄选择时，将告知当前阵营所处地图的位置（蓝色方或红色方）
+      tooltipBody: 在聊天室中发送本局阵营的地图位置信息
+      tooltipImageAlt: 地图位置信息在聊天框中的发送效果示例
+    autoSendARAMTeamSideVisibleToTeam:
+      label: 发送地图位置信息队友可见
+      checkboxLabel: 队友可见
+      description: “发送地图位置信息”的内容将对队伍内成员可见。
+  champSelect:
+    title: 自动英雄选择和禁用
+    temporarilyDisabled:
+      label: 临时禁用
+      button: 重新启用
+      description: 在本次英雄选择中，相关功能已被临时禁用。
+    groupTitle: 生效模式
+    groupEmpty: 暂无分组
+    groups:
+      ranked: 排位模式
+      normal: 普通模式
+      aram: 大乱斗类
+      cherry: 斗魂竞技场
+      urf: 无限火力
+      oneforall: 克隆模式
+      ultbook: 终极魔典
+      bot: 人机模式
+      custom: 自定义对局
+      ruby: 末日人工智能
+    pick:
+      title: 英雄选择
+      enabled:
+        label: 启用
+        description: 启用该模式的自动选择
+      expectedChampions:
+        label: 意向英雄
+        description: 自动选择将选择这些英雄，优先选择列表靠前的英雄
+        fragment1: 当分配到
+        fragment2: 位置时
+      showIntent:
+        label: 提前预选
+        description: 提前预选目标英雄
+      ignoreIntent:
+        label: 无视队友预选
+        description: 开启后将不会考虑队友的预选英雄，反之会避免冲突
+      strategy:
+        label: 锁定策略
+        description: 按照预设的策略执行自动选择流程
+        options:
+          just-show: 仅亮出
+          show-and-lock-in: 亮出后延迟锁定
+          lock-in-immediately: 立即锁定
+      delaySeconds:
+        label: 延时 (s)
+        description: 自动选择相关功能将根据预设的延时规划时间，包括预选、亮出、锁定或处理交换等。该功能会将延时强制限定在本阶段可操作的最晚时间点
+      benchMode:
+        title: 英雄备战席模式特定 (如果有)
+        tooltip: 如极地大乱斗、无限乱斗等拥有英雄备战席的模式
+      benchSwapAccumulatedDelaySeconds:
+        label: 选用最低累积时间 (s)
+        description: 仅当目标英雄出现在备战席上的累计时长超过此值时，才会执行交换操作
+      benchSelectFirstAvailableChampion:
+        label: 优先选择首位
+        description: 在目标英雄存在于备战席时，优先选择列表靠前的英雄
+      benchHandleTradeEnabled:
+        label: 自动处理交换请求
+        description: 当收到交换请求时，若满足预期英雄设置，则接受交换请求。否则会拒绝交换请求
+    ban:
+      title: 英雄禁用
+      enabled:
+        label: 启用
+        description: 启用该模式的自动禁用
+      expectedChampions:
+        label: 意向英雄
+        description: 自动禁用将选择这些英雄，优先选择列表靠前的英雄
+        fragment1: 当分配到
+        fragment2: 位置时
+      strategy:
+        label: 锁定策略
+        description: 按照预设的策略执行自动禁用流程
+        options:
+          just-show: 仅亮出
+          show-and-lock-in: 亮出后延迟锁定
+          lock-in-immediately: 立即锁定
+      delaySeconds:
+        label: 延时 (s)
+        description: 自动禁用相关功能将根据预设的延时规划时间，包括亮出、锁定或处理交换等。该功能会将延时强制限定在本阶段可操作的最晚时间点
+  misc:
+    autoReply:
+      updated: 已更新
+      title: 自动回复
+      enabled:
+        label: 开启
+      enableOnAway:
+        label: 仅在离开时
+        description: 仅在游戏状态为离开时，自动回复才会生效
+      text:
+        label: 回复内容
+        description: 将作为自动回复的内容词
+        save: 保存
+    autoInvitation:
+      title: 邀请好友进入房间
+      description: 进行一次性的监听，当指定好友空闲时，发出房间邀请。
+      unavailable: 当前不可用
+      scheduleInvite: 预约邀请
+      cancelSchedule: 取消预约
+      noFriends: 暂无好友
+      notInLobby: 不在房间内
+      searchPlaceholder: 搜索好友名称或标签
+  orderedChampionList:
+    searchForChampion: 搜索英雄
+    edit: 编辑
+    unselected: 未选择
+    moveUp: 上移
+    moveDown: 下移
+  champConfig:
+    championConfig:
+      targetMode: 目标模式
+      ranked: 排位
+      normal: 普通
+      aram: 大乱斗
+      urf: 无限火力
+      nexusblitz: 极限闪击
+      ultbook: 终极魔典
+      runes: 符文
+      configure: 配置
+      spells: 技能
+      position: 位置
+      default: 默认
+      runesConfigured: 存在符文配置
+      spellsConfigured: 存在召唤师技能配置
+      runesUnconfigured: 尚未配置符文
+      spellsUnconfigured: 未设置召唤师技能
+      configureRunes: 配置符文
+      configureSpells: 设置召唤师技能
+      clear: 清空
+      restore: 还原
+      save: 保存
+      noChampionPlaceholder: 选择英雄以查看配置
+      runesSaved: 符文配置已保存
+      runesRestored: 符文配置已还原
+      spellsSaved: 召唤师技能配置已保存
+      spellsRestored: 召唤师技能配置已还原
+      searchPlaceholder: 查找英雄
+    runeEditor:
+      unsupported: 当前符文构型未支持
+    title: 自动英雄配置
+    enabled:
+      label: 启用
+      description: 在英雄选择阶段锁定英雄后，按照预设配置符文或召唤师技能
+    configure:
+      label: 配置

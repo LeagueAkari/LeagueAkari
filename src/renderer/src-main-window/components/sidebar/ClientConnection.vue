@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <div v-if="lcs.auth" class="mb-4 last:mb-0">
       <div class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
-        {{ $t('ClientConnection.connectedGroup') }}
+        {{ $t('leagueClient.connection.connectedGroup') }}
       </div>
 
       <div class="flex flex-col gap-1">
@@ -34,7 +34,7 @@
               </NEllipsis>
 
               <div v-else class="text-xs text-black/60 italic dark:text-white/85">
-                {{ $t('ClientConnection.noData') }}
+                {{ $t('leagueClient.connection.noData') }}
               </div>
 
               <StreamerModeMaskedText>
@@ -62,7 +62,7 @@
                   <RefreshIcon />
                 </NIcon>
               </template>
-              {{ $t('ClientConnection.restartUx') }}
+              {{ $t('leagueClient.connection.restartUx') }}
             </NButton>
 
             <NButton v-if="isInEndgamePhase" size="tiny" secondary @click="handlePlayAgain">
@@ -71,7 +71,7 @@
                   <RefreshIcon />
                 </NIcon>
               </template>
-              {{ $t('ClientConnection.playAgain') }}
+              {{ $t('leagueClient.connection.playAgain') }}
             </NButton>
 
             <NButton size="tiny" secondary @click="() => lc.disconnect()">
@@ -80,7 +80,7 @@
                   <PlugDisconnected24FilledIcon />
                 </NIcon>
               </template>
-              {{ $t('ClientConnection.disconnect') }}
+              {{ $t('leagueClient.connection.disconnect') }}
             </NButton>
 
             <NDropdown
@@ -100,7 +100,7 @@
                     <MoreHorizFilledIcon />
                   </NIcon>
                 </template>
-                {{ $t('ClientConnection.more') }}
+                {{ $t('leagueClient.connection.more') }}
               </NButton>
             </NDropdown>
           </div>
@@ -110,10 +110,10 @@
 
     <div v-if="otherClients.length > 0" class="mb-4 last:mb-0">
       <div v-if="lcs.auth" class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
-        {{ $t('ClientConnection.launchedOtherClientsGroup') }}
+        {{ $t('leagueClient.connection.launchedOtherClientsGroup') }}
       </div>
       <div v-else class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
-        {{ $t('ClientConnection.launchedClientsGroup') }}
+        {{ $t('leagueClient.connection.launchedClientsGroup') }}
       </div>
 
       <NScrollbar style="max-height: 240px">
@@ -149,7 +149,7 @@
                 </NEllipsis>
 
                 <div v-else class="text-xs text-black/60 italic dark:text-white/85">
-                  {{ $t('ClientConnection.noData') }}
+                  {{ $t('leagueClient.connection.noData') }}
                 </div>
 
                 <div class="text-[10px] text-black/60 dark:text-white/85">
@@ -168,7 +168,7 @@
               >
                 <NSpin :size="10" />
                 <span class="text-[10px]">
-                  {{ $t('ClientConnection.connecting') }}
+                  {{ $t('leagueClient.connection.connecting') }}
                 </span>
               </div>
             </div>
@@ -179,11 +179,11 @@
 
     <div v-if="!lcs.auth && otherClients.length === 0" class="mb-4 last:mb-0">
       <div class="mb-2 text-sm font-semibold text-black/70 dark:text-white/80">
-        {{ $t('ClientConnection.noClientGroup') }}
+        {{ $t('leagueClient.connection.noClientGroup') }}
       </div>
 
       <div class="text-xs text-black/70 italic dark:text-white/80">
-        {{ $t('ClientConnection.noClient') }}
+        {{ $t('leagueClient.connection.noClient') }}
       </div>
     </div>
   </div>
@@ -234,7 +234,7 @@ const clientExtraInfo = lcps.connectableClientExtraInfo
 const actions = computed(() => {
   return [
     {
-      label: t('ClientConnection.launchUx'),
+      label: t('leagueClient.connection.launchUx'),
       key: 'start-ux',
       icon: () => (
         <NIcon>
@@ -243,7 +243,7 @@ const actions = computed(() => {
       )
     },
     {
-      label: t('ClientConnection.killUx'),
+      label: t('leagueClient.connection.killUx'),
       key: 'close-ux',
       icon: () => (
         <NIcon>
@@ -255,7 +255,7 @@ const actions = computed(() => {
       type: 'divider'
     },
     {
-      label: t('ClientConnection.quitClient'),
+      label: t('leagueClient.connection.quitClient'),
       key: 'quit-client',
       icon: () => (
         <NIcon>

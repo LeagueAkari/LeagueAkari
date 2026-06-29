@@ -611,7 +611,7 @@ export const createCombinatorDropdownOptions = (
   for (const [key, definition] of getDropdownCombinators(scope)) {
     const category = definition.category
     const option: DropdownMixedOption = {
-      label: t(`PlayerTab.filter.combinatorLabels.${key}`),
+      label: t(`playerTabs.matchHistory.filters.combinatorLabels.${key}`),
       key,
       icon: renderIcon(definition.icon)
     }
@@ -645,7 +645,9 @@ export const createCombinatorDropdownOptions = (
 
       return [
         {
-          label: t(`PlayerTab.filter.sections.${COMBINATOR_CATEGORY_LABEL_KEY_MAP[typedCategory]}`),
+          label: t(
+            `playerTabs.matchHistory.filters.sections.${COMBINATOR_CATEGORY_LABEL_KEY_MAP[typedCategory]}`
+          ),
           key: `category-${typedCategory}`,
           icon: renderIcon(COMBINATOR_CATEGORY_ICON_MAP[typedCategory]),
           children

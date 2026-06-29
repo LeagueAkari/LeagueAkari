@@ -38,7 +38,7 @@ import PremadePresetPane from './presets-ui/PremadePresetPane.vue'
 import RatingPresetPane from './presets-ui/RatingPresetPane.vue'
 import { useInGameSendPresetsPanel } from './provider'
 
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets' })
 const { activePreset } = useInGameSendPresetsPanel()
 </script>
 

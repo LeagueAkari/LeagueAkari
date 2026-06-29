@@ -105,11 +105,11 @@ export function useInGameSendTeams() {
 
     const primaryLabel =
       teamIdentifier === selfTeamIdentifier
-        ? t('InGameSend.presets.teams.friendly', { ns: 'renderer' })
-        : t('InGameSend.presets.teams.enemy', { ns: 'renderer' })
+        ? t('toolkit.inGameSend.presets.teams.friendly', { ns: 'renderer' })
+        : t('toolkit.inGameSend.presets.teams.enemy', { ns: 'renderer' })
 
     return {
-      label: t('InGameSend.presets.teams.labelWithName', {
+      label: t('toolkit.inGameSend.presets.teams.labelWithName', {
         ns: 'renderer',
         side: primaryLabel,
         team: teamName

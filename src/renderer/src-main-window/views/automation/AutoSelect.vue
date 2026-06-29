@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto max-w-[800px] p-6">
-        <SettingsSection :title="$t('AutoSelect.title')">
+        <SettingsSection :title="$t('automation.champSelect.title')">
           <div class="p-3">
             <AutoSelectEditor class="transition-opacity duration-200" />
           </div>

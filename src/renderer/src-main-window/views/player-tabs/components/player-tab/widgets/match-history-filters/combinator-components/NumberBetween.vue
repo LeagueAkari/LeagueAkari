@@ -3,20 +3,20 @@
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><component :is="numberBetweenIcon" /></NIcon>
-        {{ t(`PlayerTab.filter.combinatorLabels.${node.type}`) }}
+        {{ t(`playerTabs.matchHistory.filters.combinatorLabels.${node.type}`) }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div v-if="supportsMeasureMode" class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.measureMode') }}
+        {{ t('playerTabs.matchHistory.filters.measureMode') }}
       </div>
 
       <NSelect
@@ -187,19 +187,19 @@ const maxValue = computed<number>(() => {
 })
 
 const measureModeOptions = computed(() => [
-  { label: t('PlayerTab.filter.measureModes.value'), value: 'value' },
-  { label: t('PlayerTab.filter.measureModes.teamShare'), value: 'teamShare' },
-  { label: t('PlayerTab.filter.measureModes.teamMaxShare'), value: 'teamMaxShare' },
-  { label: t('PlayerTab.filter.measureModes.gameShare'), value: 'gameShare' },
-  { label: t('PlayerTab.filter.measureModes.gameMaxShare'), value: 'gameMaxShare' }
+  { label: t('playerTabs.matchHistory.filters.measureModes.value'), value: 'value' },
+  { label: t('playerTabs.matchHistory.filters.measureModes.teamShare'), value: 'teamShare' },
+  { label: t('playerTabs.matchHistory.filters.measureModes.teamMaxShare'), value: 'teamMaxShare' },
+  { label: t('playerTabs.matchHistory.filters.measureModes.gameShare'), value: 'gameShare' },
+  { label: t('playerTabs.matchHistory.filters.measureModes.gameMaxShare'), value: 'gameMaxShare' }
 ])
 
 const rangeLabel = (type: 'min' | 'max') => {
   if (measureMode.value === 'value') {
-    return t(`PlayerTab.filter.${type}`)
+    return t(`playerTabs.matchHistory.filters.${type}`)
   }
 
-  return t(`PlayerTab.filter.${type}Percent`)
+  return t(`playerTabs.matchHistory.filters.${type}Percent`)
 }
 
 const toArgs = (mode: NumberBetweenMeasureMode, min: number, max: number) => {

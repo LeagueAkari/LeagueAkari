@@ -8,12 +8,12 @@
       class="flex items-center gap-2 border-b border-black/10 px-2 py-1 text-xs text-black/50 dark:border-white/10 dark:text-white/50"
     >
       <NIcon><RecentlyViewed /></NIcon>
-      <span class="whitespace-nowrap">{{ t('SearchPane.recentVisits') }}</span>
+      <span class="whitespace-nowrap">{{ t('playerSearch.recentVisits') }}</span>
       <NInput
         class="ml-auto max-w-32.5!"
         size="tiny"
         v-model:value="filterRecentVisits"
-        :placeholder="t('SearchPane.search')"
+        :placeholder="t('playerSearch.search')"
       />
     </div>
 
@@ -26,7 +26,7 @@
           <div
             class="sticky top-0 bg-neutral-200 p-2 text-xs font-bold text-black/60 dark:bg-zinc-900 dark:text-white/60"
           >
-            {{ t('SearchPane.pinned', { count: filteredPinnedSearchHistory.length }) }}
+            {{ t('playerSearch.pinned', { count: filteredPinnedSearchHistory.length }) }}
           </div>
 
           <div class="space-y-1 pb-1">
@@ -99,7 +99,7 @@
           <div
             class="group sticky top-0 border-black/10 bg-neutral-200 p-2 text-xs font-bold text-black/60 dark:border-b dark:bg-zinc-900 dark:text-white/60"
           >
-            {{ t('SearchPane.recent', { count: filteredUnpinnedSearchHistory.length }) }}
+            {{ t('playerSearch.recent', { count: filteredUnpinnedSearchHistory.length }) }}
           </div>
 
           <div class="space-y-1 pb-1">
@@ -169,7 +169,7 @@
       </NScrollbar>
 
       <div class="flex h-full items-center justify-center text-black/50 dark:text-white/50" v-else>
-        {{ t('SearchPane.noRecentVisits') }}
+        {{ t('playerSearch.noRecentVisits') }}
       </div>
     </div>
 
@@ -179,13 +179,13 @@
     >
       <NIcon><GroupFilled /></NIcon>
       <span class="whitespace-nowrap">{{
-        t('SearchPane.friends', { count: filteredSortedFriends.length })
+        t('playerSearch.friends', { count: filteredSortedFriends.length })
       }}</span>
       <NInput
         class="ml-auto max-w-32.5!"
         size="tiny"
         v-model:value="filterFriends"
-        :placeholder="t('SearchPane.search')"
+        :placeholder="t('playerSearch.search')"
       />
     </div>
 
@@ -223,7 +223,7 @@
       </NScrollbar>
 
       <div class="flex h-full items-center justify-center text-black/50 dark:text-white/50" v-else>
-        {{ t('SearchPane.noFriends') }}
+        {{ t('playerSearch.noFriends') }}
       </div>
     </div>
   </div>

@@ -23,7 +23,9 @@
             </div>
             <div class="menu-item__label">
               {{
-                t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) })
+                t('navigation.sidebar.status.respawnTimer.timeLeft', {
+                  seconds: rts.info.timeLeft.toFixed(0)
+                })
               }}
               ({{ rts.info.totalTime.toFixed(0) }}
               s)
@@ -32,9 +34,12 @@
         </div>
       </template>
       <div>
-        {{ t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) }) }} ({{
-          rts.info.totalTime.toFixed(0)
+        {{
+          t('navigation.sidebar.status.respawnTimer.timeLeft', {
+            seconds: rts.info.timeLeft.toFixed(0)
+          })
         }}
+        ({{ rts.info.totalTime.toFixed(0) }}
         s)
       </div>
     </NPopover>
@@ -81,15 +86,19 @@
                   <span class="menu-item__label-game-name">{{ lcs.summoner.me.gameName }}</span>
                   <span class="menu-item__label-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
                 </div>
-                <div class="menu-item__label" v-else>{{ t('SideBarFixed.unknown') }}</div>
+                <div class="menu-item__label" v-else>
+                  {{ t('navigation.sidebar.status.unknown') }}
+                </div>
               </StreamerModeMaskedText>
             </template>
             <template v-else-if="lcs.isInConnectionLoop">
-              <div class="menu-item__label">{{ t('SideBarFixed.inConnectionLoop') }}</div>
+              <div class="menu-item__label">
+                {{ t('navigation.sidebar.status.inConnectionLoop') }}
+              </div>
             </template>
             <template v-else>
               <div class="menu-item__label menu-item__label--not-connected">
-                {{ t('SideBarFixed.notConnected') }}
+                {{ t('navigation.sidebar.status.notConnected') }}
               </div>
             </template>
           </div>
@@ -104,12 +113,12 @@
         <div class="menu-item" @click="() => openSettingsModal()">
           <div class="menu-item__inner">
             <NIcon class="menu-item__icon"><Settings28FilledIcon /></NIcon>
-            <div class="menu-item__label">{{ t('SideBarFixed.settings') }}</div>
+            <div class="menu-item__label">{{ t('navigation.sidebar.status.settings') }}</div>
           </div>
         </div>
       </template>
       <span class="menu-item-popover">
-        {{ t('SideBarFixed.settings') }}
+        {{ t('navigation.sidebar.status.settings') }}
       </span>
     </NTooltip>
   </div>
@@ -164,8 +173,8 @@ watch(
   (isDead, prevIsDead) => {
     if (!isDead && prevIsDead && mws.focus === 'focused') {
       notification.success({
-        title: () => t('SideBarFixed.respawned'),
-        content: () => t('SideBarFixed.respawnedContent'),
+        title: () => t('navigation.sidebar.status.respawned'),
+        content: () => t('navigation.sidebar.status.respawnedContent'),
         duration: 4000
       })
     }

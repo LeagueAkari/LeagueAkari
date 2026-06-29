@@ -1,12 +1,12 @@
 <template>
-  <SettingsSection :title="t('StrawberryTool.title')">
+  <SettingsSection :title="t('toolkit.strawberry.title')">
     <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" class="p-3 text-[13px]">
-      {{ t('StrawberryTool.unavailable') }}
+      {{ t('toolkit.strawberry.unavailable') }}
     </div>
     <template v-else>
       <SettingsRow
-        :label="t('StrawberryTool.champion.label')"
-        :label-description="t('StrawberryTool.champion.description')"
+        :label="t('toolkit.strawberry.champion.label')"
+        :label-description="t('toolkit.strawberry.champion.description')"
         :label-width="260"
       >
         <div class="flex max-w-full flex-wrap items-center gap-2">
@@ -24,13 +24,13 @@
             size="small"
             :loading="isSettingChampion"
             :disabled="!currentChampionId"
-            >{{ t('StrawberryTool.champion.button') }}</NButton
+            >{{ t('toolkit.strawberry.champion.button') }}</NButton
           >
         </div>
       </SettingsRow>
       <SettingsRow
-        :label="t('StrawberryTool.map.label')"
-        :label-description="t('StrawberryTool.map.description')"
+        :label="t('toolkit.strawberry.map.label')"
+        :label-description="t('toolkit.strawberry.map.description')"
         :label-width="260"
       >
         <div class="flex max-w-full flex-wrap items-center gap-2">
@@ -48,13 +48,13 @@
             size="small"
             :loading="isSettingMap"
             :disabled="!currentMapUnionId"
-            >{{ t('StrawberryTool.map.button') }}</NButton
+            >{{ t('toolkit.strawberry.map.button') }}</NButton
           >
         </div>
       </SettingsRow>
       <SettingsRow
-        :label="t('StrawberryTool.difficulty.label')"
-        :label-description="t('StrawberryTool.difficulty.description')"
+        :label="t('toolkit.strawberry.difficulty.label')"
+        :label-description="t('toolkit.strawberry.difficulty.description')"
         :label-width="260"
       >
         <div class="flex max-w-full flex-wrap items-center gap-2">
@@ -72,7 +72,7 @@
             :loading="isSettingDifficulty"
             :disabled="!currentDifficulty"
           >
-            {{ t('StrawberryTool.difficulty.button') }}</NButton
+            {{ t('toolkit.strawberry.difficulty.button') }}</NButton
           >
         </div>
       </SettingsRow>
@@ -166,7 +166,7 @@ const strawberryChampions = computed(() => {
   return [
     {
       type: 'group',
-      label: t('StrawberryTool.champion.modeSpecific'),
+      label: t('toolkit.strawberry.championOptions.modeSpecific'),
       children: strawberryChampions.map((c) => ({
         label: c.name,
         value: c.id,
@@ -175,7 +175,7 @@ const strawberryChampions = computed(() => {
     },
     {
       type: 'group',
-      label: t('StrawberryTool.champion.other'),
+      label: t('toolkit.strawberry.championOptions.other'),
       children: otherChampions.map((c) => ({
         label: c.name,
         value: c.id,
@@ -228,9 +228,11 @@ const setChampion = async () => {
       mapId || 1,
       difficulty || 1
     )
-    message.success(t('StrawberryTool.requestSent'))
+    message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
-    message.warning(t('StrawberryTool.champion.failedMessage', { reason: (error as any).message }))
+    message.warning(
+      t('toolkit.strawberry.champion.failedMessage', { reason: (error as any).message })
+    )
   } finally {
     isSettingChampion.value = false
   }
@@ -250,9 +252,9 @@ const setMap = async () => {
   try {
     const [contentId, itemIdRaw] = currentMapUnionId.value.split(',')
     await lc.api.lobby.setStrawberryMapId({ contentId, itemId: Number(itemIdRaw) })
-    message.success(t('StrawberryTool.requestSent'))
+    message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
-    message.warning(t('StrawberryTool.map.failedMessage', { reason: (error as any).message }))
+    message.warning(t('toolkit.strawberry.map.failedMessage', { reason: (error as any).message }))
   } finally {
     isSettingMap.value = false
   }
@@ -294,10 +296,10 @@ const setDifficulty = async () => {
   try {
     const loadoutsContentId = accountScopeLoadouts.value[0].id
     await lc.api.loadouts.setStrawberryDifficulty(loadoutsContentId, currentDifficulty.value)
-    message.success(t('StrawberryTool.requestSent'))
+    message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
     message.warning(
-      t('StrawberryTool.difficulty.failedMessage', { reason: (error as any).message })
+      t('toolkit.strawberry.difficulty.failedMessage', { reason: (error as any).message })
     )
   } finally {
     isSettingDifficulty.value = false

@@ -3,14 +3,14 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><component :is="titleIcon" /></NIcon>
-        {{ t(`PlayerTab.filter.combinatorLabels.${node.type}`) }}
+        {{ t(`playerTabs.matchHistory.filters.combinatorLabels.${node.type}`) }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
@@ -84,7 +84,7 @@ const selectOptions = computed(() => {
   }
 
   return GAME_MODE_OPTIONS.map((gameMode) => ({
-    label: `${t(`PlayerTab.filter.gameModes.${gameMode}`, { defaultValue: gameMode })} (${gameMode})`,
+    label: `${t(`playerTabs.matchHistory.filters.gameModes.${gameMode}`, { defaultValue: gameMode })} (${gameMode})`,
     value: gameMode
   }))
 })

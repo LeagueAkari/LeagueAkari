@@ -1,0 +1,125 @@
+auxWindow:
+  titlebar:
+    opgg: OP.GG View
+    opggTitle: View on OP.GG
+    close: Close
+    minimize: Minimize
+    indicator: Aux Win.
+    indicatorTitle: Auxiliary Window of $t(common:appName)
+    pin: Pin
+    unpin: Unpin
+    repositionToAlignLeagueClientUx: Align with League Client UX
+  championBench:
+    title: Champion Bench
+    reroll: 'Reroll (Remaining: {{count}})'
+    charity: 'Reroll and Take back (Remaining: {{count}})'
+    notInBenchMode: Not currently in a bench mode
+    notInPhase: Not in the champion selection phase
+    rerollFailed: Failed to reroll {{reason}}
+    swapFailed: Failed to swap {{reason}}
+    balanceTypes:
+      damage-dealt: Damage Dealt
+      damage-taken: Damage Taken
+      healing: Healing
+      shielding: Shielding
+      ability-haste: Ability Haste
+      mana-regen: Mana Regen
+      health-regen: Health Regen
+      attack-speed: Attack Speed
+      movement-speed: Movement Speed
+      tenacity: Tenacity
+      energy-regen: Energy Regen
+  champSelect:
+    actions:
+      picked: Picked
+      voted: Voted
+      banned: Banned
+      autoPick: Auto Pick
+      autoBan: Auto Ban
+      picking: Picking
+      banning: Banning
+      voting: Voting
+      tenBansRevealing: bans Revealing
+      inProgress: In Progress
+      completed: Completed
+      ceremonies:
+        ten_bans_reveal: 10 Bans Reveal
+        TEN_BANS_REVEAL: 10 Bans Reveal
+        phase_transition: Phase Transition
+        vote_transition: Vote Transition
+        team_vote_reveal: Team Vote Reveal
+    operations:
+      dodge:
+        label: Exit Champion Select
+        button: Dodge Now
+        popconfirm: This will exit the champion select phase.
+        positiveText: Exit
+        negativeText: Cancel
+        cancel: Cancel
+      temporarilyDisabled:
+        label: Temporarily Disable Auto Ban/Pick
+  lounge:
+    operations:
+      immediately: Immediately
+      second: s
+      autoAccept:
+        label: Auto Accept
+        unavailable: Unavailable
+      autoMatchmaking:
+        label: Auto Matchmaking
+        unavailable: Unavailable
+      autoMatchmakingMinimumMembers:
+        label: Minimum Members
+      autoMatchmakingDelaySeconds:
+        label: Pre-Matchmaking Delay
+      autoMatchmakingWaitForInvitees:
+        label: Wait for Invitees
+    panel:
+      map: Map
+      gameMode: Mode
+      wait: Waiting
+      atMost: At Most
+      autoAccept:
+        acceptIn: Auto-accept in {{seconds}} s
+        cancelButton: Cancel this auto-accept
+        declineButton: Decline Match
+        acceptButton: Accept Match
+        accepted: Accepted
+        pending: Waiting to accept match
+        subtitle1: Matches already accepted can still be declined
+        subtitle2: Matches already canceled can still be accepted
+        declined: Declined
+      matchmaking:
+        stopAndDisable: Stop matchmaking and disable auto-matchmaking
+        stop: Stop matchmaking
+        cancel: Cancel this auto-matchmaking
+        searching: Searching
+        searchIn: Searching {{seconds}} s
+        waitingForPenalty: Waiting for dodge timer {{seconds}} s
+        waitingForMembers_one: Auto-matchmaking requires {{count}} player
+        waitingForMembers_other: Auto-matchmaking requires {{count}} players
+        waitingForInvitees: Waiting for invited members
+  skinSelection:
+    skins_one: '{{count}} skin available'
+    skins_other: '{{count}} skins available'
+    button: Apply
+    success: Skin applied successfully
+    failed: Skin application failed
+  placeholder:
+    inProgress: In Progress
+    idle: No active activities
+    spectating: Spectating
+  automationPlan:
+    autoPick:
+      title: Auto Pick
+      willPick: Will Pick
+    autoBan:
+      title: Auto Ban
+      willBan: Will Ban
+    autoBenchSwap:
+      title: Auto Bench Swap
+      willSwap: Will Swap
+    autoChampionSwap:
+      title: Auto Champion Swap
+      willAccept: Will Accept
+      willDecline: Will Decline

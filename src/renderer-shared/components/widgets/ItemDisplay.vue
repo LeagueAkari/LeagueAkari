@@ -25,7 +25,7 @@
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
             lcs.gameData.items[itemId].price !== lcs.gameData.items[itemId].priceTotal
-              ? `(${t('ItemDisplay.combinePrice', {
+              ? `(${t('gameAssets.item.combinePrice', {
                   gold: lcs.gameData.items[itemId].price
                 })})`
               : ''

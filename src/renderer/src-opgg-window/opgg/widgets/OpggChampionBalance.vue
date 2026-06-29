@@ -6,7 +6,7 @@
     <div
       class="mb-2 flex items-center justify-between text-[13px] font-bold text-black dark:text-white"
     >
-      {{ t('OpggChampion.balance.title') }}
+      {{ t('opgg.champion.balance.title') }}
     </div>
 
     <div class="grid grid-cols-4 gap-y-2">
@@ -15,7 +15,7 @@
         class="relative flex flex-col pl-2 before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px before:bg-black/10 before:content-[''] dark:before:bg-white/10"
       >
         <div class="truncate text-xs text-black/60 dark:text-white/60">
-          {{ t(`OpggChampion.balance.${item.key}`) }}
+          {{ t(`opgg.champion.balance.${item.key}`) }}
         </div>
         <div
           class="text-sm font-bold"

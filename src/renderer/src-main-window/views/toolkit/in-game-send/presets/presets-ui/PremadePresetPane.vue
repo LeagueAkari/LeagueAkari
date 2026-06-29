@@ -32,7 +32,7 @@ import PreviewPanel from '../widgets/PreviewPanel.vue'
 
 const premadePreset = usePremadePreset()
 const { options, updateOptions } = premadePreset
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.premade' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.premade' })
 const presetLabel = computed(() => t('label'))
 
 function updateNameDisplayStrategy(value: InGameSendPresetNameDisplayStrategy) {

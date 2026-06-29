@@ -292,7 +292,7 @@ import { useFixedTextPreset } from '../data/fixed-text'
 const fixedTextPreset = useFixedTextPreset()
 const appCommonStore = useAppCommonStore()
 const message = useMessage()
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.fixedText' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.fixedText' })
 const { unavailableReason: nativeInputUnavailableMessage } = useNativeInputStatus()
 
 const maxItems = IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS

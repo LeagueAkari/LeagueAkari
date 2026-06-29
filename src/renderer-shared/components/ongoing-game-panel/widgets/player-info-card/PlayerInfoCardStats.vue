@@ -17,7 +17,7 @@
             <span class="text-[11px] font-normal"
               >/
               {{
-                t('PlayerInfoCard.1st', {
+                t('ongoingGame.playerCard.1st', {
                   rate: (analysis.winLoss.cherry.top1Rate * 100).toFixed()
                 })
               }}</span
@@ -30,7 +30,7 @@
         </template>
         <div class="max-w-50 text-xs" v-if="analysis">
           {{
-            t('PlayerInfoCard.cherryWinRatePopover', {
+            t('ongoingGame.playerCard.cherryWinRatePopover', {
               count: analysis.count,
               winRate: (analysis.winLoss.all.winRate * 100).toFixed(2),
               cherryCount: analysis.winLoss.cherry.count,
@@ -63,7 +63,7 @@
         </template>
         <div class="max-w-50 text-xs" v-if="analysis">
           {{
-            t('PlayerInfoCard.winRatePopover', {
+            t('ongoingGame.playerCard.winRatePopover', {
               count: analysis.count,
               winRate: (analysis.winLoss.all.winRate * 100).toFixed(),
               wins: analysis.winLoss.all.wins,
@@ -89,7 +89,7 @@
       </template>
       <div class="max-w-50 text-xs" v-if="analysis">
         {{
-          t('PlayerInfoCard.kdaPopover', {
+          t('ongoingGame.playerCard.kdaPopover', {
             count: analysis.count,
             kda: analysis.summary.avgKda.toFixed(2),
             kills: (analysis.summary.kills / analysis.count || 1).toFixed(2),
@@ -174,7 +174,9 @@
           </div>
         </div>
         <div v-if="positionInfo.recent && positionInfo.recent.length" class="flex items-center">
-          <span class="mr-2 w-16 text-xs">{{ t('PlayerInfoCard.position.recentlyPlayed') }}</span>
+          <span class="mr-2 w-16 text-xs">{{
+            t('ongoingGame.playerCard.position.recentlyPlayed')
+          }}</span>
           <PositionIcon
             class="text-lg text-black dark:text-white"
             v-for="p of positionInfo.recent"
@@ -183,7 +185,9 @@
           />
         </div>
         <div v-if="positionInfo.role" class="flex items-center">
-          <span class="mr-2 w-16 text-xs">{{ t('PlayerInfoCard.position.selection') }}</span>
+          <span class="mr-2 w-16 text-xs">{{
+            t('ongoingGame.playerCard.position.selection')
+          }}</span>
           <PositionIcon
             class="text-lg text-black dark:text-white"
             :position="positionInfo.role.primary"

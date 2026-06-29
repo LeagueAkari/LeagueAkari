@@ -2,13 +2,13 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto max-w-200 p-6">
-        <SettingsSection :title="t('FriendTools.title')">
+        <SettingsSection :title="t('toolkit.friends.title')">
           <div class="p-3">
             <div class="mb-2 flex flex-wrap gap-1">
               <NPopconfirm
                 @positive-click="deleteSelectedFriends"
                 :disabled="isLoading || !selectedFriendCount || !lcs.isConnected"
-                :positive-text="t('FriendTools.deleteButton')"
+                :positive-text="t('toolkit.friends.deleteButton')"
                 :positive-button-props="{
                   size: 'tiny',
                   type: 'error'
@@ -25,14 +25,14 @@
                     secondary
                   >
                     <template v-if="selectedItems.length">{{
-                      t('FriendTools.deleteButtonC', { count: selectedFriendCount })
+                      t('toolkit.friends.deleteButtonC', { count: selectedFriendCount })
                     }}</template>
                     <template v-else>
-                      {{ t('FriendTools.deleteButton') }}
+                      {{ t('toolkit.friends.deleteButton') }}
                     </template>
                   </NButton>
                 </template>
-                {{ t('FriendTools.deletePopconfirm') }}
+                {{ t('toolkit.friends.deletePopconfirm') }}
               </NPopconfirm>
               <NButton
                 size="small"
@@ -41,7 +41,7 @@
                 v-show="isDeleting"
                 @click="isDeleting = false"
               >
-                {{ t('FriendTools.cancelButton') }}
+                {{ t('toolkit.friends.cancelButton') }}
               </NButton>
               <NButton
                 :disabled="isLoading || !lcs.isConnected"
@@ -49,13 +49,13 @@
                 secondary
                 @click="updateFriends(true)"
               >
-                {{ t('FriendTools.refreshButton') }}
+                {{ t('toolkit.friends.refreshButton') }}
               </NButton>
               <NInput
                 v-model:value="friendSearchInput"
                 clearable
                 size="small"
-                :placeholder="t('FriendTools.searchPlaceholder')"
+                :placeholder="t('toolkit.friends.searchPlaceholder')"
                 class="w-72!"
               >
                 <template #prefix>
@@ -208,20 +208,20 @@ const columns = computed<DataTableColumns<any>>(() => [
     type: 'selection'
   },
   {
-    title: () => t('FriendTools.columns.groupName'),
+    title: () => t('toolkit.friends.columns.groupName'),
     key: 'name',
     className: 'whitespace-nowrap',
     render: (row) => renderGroupName(row)
   },
   {
-    title: () => t('FriendTools.columns.lastGameDate'),
+    title: () => t('toolkit.friends.columns.lastGameDate'),
     key: 'lastGameDate',
-    render: (row) => renderDateField(row, 'lastGameDate', t('FriendTools.neverPlayed'))
+    render: (row) => renderDateField(row, 'lastGameDate', t('toolkit.friends.neverPlayed'))
   },
   {
-    title: () => t('FriendTools.columns.friendSince'),
+    title: () => t('toolkit.friends.columns.friendSince'),
     key: 'friendSince',
-    render: (row) => renderDateField(row, 'friendsSince', t('FriendTools.unknown'))
+    render: (row) => renderDateField(row, 'friendsSince', t('toolkit.friends.unknown'))
   }
 ])
 
@@ -243,7 +243,7 @@ const tableData = computed(() => {
 
       return {
         id: group.id,
-        name: t(`FriendTools.groupNames.${group.name}`, group.name),
+        name: t(`toolkit.friends.groupNames.${group.name}`, group.name),
         children: filteredFriends
           .map((friend) => {
             return {
@@ -390,10 +390,10 @@ const updateFriends = async (manually = false) => {
     updateFriendSince().catch(() => {})
 
     if (manually) {
-      message.success(() => t('FriendTools.refreshSuccess'))
+      message.success(() => t('toolkit.friends.refreshSuccess'))
     }
   } catch (error: any) {
-    message.warning(() => t('MissionClaimTool.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.missions.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -420,9 +420,9 @@ const deleteSelectedFriends = async () => {
       log.infoRenderer('comp:FriendTools', 'deleted', friendId)
     }
 
-    message.success(() => t('FriendTools.deleteSuccess', { count: filtered.length }))
+    message.success(() => t('toolkit.friends.deleteSuccess', { count: filtered.length }))
   } catch (error: any) {
-    message.warning(() => t('MissionClaimTool.refreshFailed', { reason: error.message }))
+    message.warning(() => t('toolkit.claim.missions.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isDeleting.value = false

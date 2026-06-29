@@ -79,7 +79,7 @@
               </StreamerModeMaskedText>
             </template>
             <template v-else-if="tabLoadingStateMap[tab.id]">
-              <span class="empty-placeholder-text">{{ t('PlayerTabsTitle.loading') }}.</span>
+              <span class="empty-placeholder-text">{{ t('playerTabs.titlebar.loading') }}.</span>
             </template>
             <template v-else>
               <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
@@ -108,10 +108,10 @@
             @click="(!as.settings.streamerMode || warningShown) && (searchPaneShow = true)"
           >
             <NIcon class="search-icon"><SearchIcon /></NIcon>
-            <span class="search-label">{{ t('PlayerTabsTitle.search') }}</span>
+            <span class="search-label">{{ t('playerTabs.titlebar.search') }}</span>
           </div>
         </template>
-        {{ t('PlayerTabsTitle.searchButtonStreamerModeWarning') }}
+        {{ t('playerTabs.titlebar.searchButtonStreamerModeWarning') }}
       </NPopconfirm>
     </template>
 
@@ -283,7 +283,7 @@ const contextMenuState = reactive({
 
 const contextMenuOptions: DropdownMixedOption[] = reactive([
   {
-    label: computed(() => t('PlayerTabsTitle.refresh')),
+    label: computed(() => t('playerTabs.titlebar.refresh')),
     key: 'refresh',
     disabled: computed(() => {
       const tab = pts.tabs.find((t) => t.id === contextMenuState.id)
@@ -304,7 +304,7 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     key: 'divider-1'
   },
   {
-    label: computed(() => t('PlayerTabsTitle.close')),
+    label: computed(() => t('playerTabs.titlebar.close')),
     key: 'close',
     icon: () => (
       <NIcon>
@@ -313,12 +313,12 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     )
   },
   {
-    label: computed(() => t('PlayerTabsTitle.closeOthers')),
+    label: computed(() => t('playerTabs.titlebar.closeOthers')),
     key: 'close-others',
     disabled: computed(() => !pts.canCloseOtherTabs(contextMenuState.id))
   },
   {
-    label: computed(() => t('PlayerTabsTitle.closeToTheRight')),
+    label: computed(() => t('playerTabs.titlebar.closeToTheRight')),
     key: 'close-to-the-right',
     disabled: computed(() => !pts.canCloseTabsToTheRight(contextMenuState.id))
   }

@@ -1,13 +1,13 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('MultiWindowSettings.auxWindow.title')">
-        <SettingsRow :label="t('MultiWindowSettings.auxWindow.enabled.label')" :label-width="400">
+      <SettingsSection :title="t('settings.multiWindow.auxWindow.title')">
+        <SettingsRow :label="t('settings.multiWindow.auxWindow.enabled.label')" :label-width="400">
           <template #labelDescription>
-            <div>{{ t('MultiWindowSettings.auxWindow.enabled.description') }}</div>
+            <div>{{ t('settings.multiWindow.auxWindow.enabled.description') }}</div>
             <div>
               <TranslationComponent
-                :translation="t('MultiWindowSettings.auxWindow.enabled.descriptionWithIcon')"
+                :translation="t('settings.multiWindow.auxWindow.enabled.descriptionWithIcon')"
               >
                 <template #icon>
                   <NIcon class="inline-block size-4 align-middle text-black dark:text-white">
@@ -24,8 +24,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.auxWindow.autoShow.label')"
-          :label-description="t('MultiWindowSettings.auxWindow.autoShow.description')"
+          :label="t('settings.multiWindow.auxWindow.autoShow.label')"
+          :label-description="t('settings.multiWindow.auxWindow.autoShow.description')"
           :label-width="400"
         >
           <NSwitch
@@ -35,8 +35,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.auxWindow.opacity.label')"
-          :label-description="t('MultiWindowSettings.auxWindow.opacity.description')"
+          :label="t('settings.multiWindow.auxWindow.opacity.label')"
+          :label-description="t('settings.multiWindow.auxWindow.opacity.description')"
           :label-width="400"
         >
           <NSlider
@@ -51,8 +51,8 @@
           ></NSlider>
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.auxWindow.showSkinSelector.label')"
-          :label-description="t('MultiWindowSettings.auxWindow.showSkinSelector.description')"
+          :label="t('settings.multiWindow.auxWindow.showSkinSelector.label')"
+          :label-description="t('settings.multiWindow.auxWindow.showSkinSelector.description')"
           :label-width="400"
         >
           <NSwitch
@@ -62,8 +62,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.auxWindow.resetWindowPosition.label')"
-          :label-description="t('MultiWindowSettings.auxWindow.resetWindowPosition.description')"
+          :label="t('settings.multiWindow.auxWindow.resetWindowPosition.label')"
+          :label-description="t('settings.multiWindow.auxWindow.resetWindowPosition.description')"
           :label-width="400"
         >
           <NButton
@@ -71,17 +71,17 @@
             type="warning"
             secondary
             @click="() => wm.auxWindow.resetPosition()"
-            >{{ t('MultiWindowSettings.auxWindow.resetWindowPosition.button') }}</NButton
+            >{{ t('settings.multiWindow.auxWindow.resetWindowPosition.button') }}</NButton
           >
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('MultiWindowSettings.opggWindow.title')">
-        <SettingsRow :label="t('MultiWindowSettings.opggWindow.enabled.label')" :label-width="400">
+      <SettingsSection :title="t('settings.multiWindow.opggWindow.title')">
+        <SettingsRow :label="t('settings.multiWindow.opggWindow.enabled.label')" :label-width="400">
           <template #labelDescription>
-            <div>{{ t('MultiWindowSettings.opggWindow.enabled.description') }}</div>
+            <div>{{ t('settings.multiWindow.opggWindow.enabled.description') }}</div>
             <div>
               <TranslationComponent
-                :translation="t('MultiWindowSettings.opggWindow.enabled.descriptionWithIcon')"
+                :translation="t('settings.multiWindow.opggWindow.enabled.descriptionWithIcon')"
               >
                 <template #icon>
                   <OpggIcon class="inline-block size-4 align-middle text-black dark:text-white" />
@@ -96,8 +96,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.opggWindow.autoShow.label')"
-          :label-description="t('MultiWindowSettings.opggWindow.autoShow.description')"
+          :label="t('settings.multiWindow.opggWindow.autoShow.label')"
+          :label-description="t('settings.multiWindow.opggWindow.autoShow.description')"
           :label-width="400"
         >
           <NSwitch
@@ -109,8 +109,8 @@
         <SettingsRow
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
-          :label="t('MultiWindowSettings.opggWindow.showShortcut.label')"
-          :label-description="t('MultiWindowSettings.opggWindow.showShortcut.description')"
+          :label="t('settings.multiWindow.opggWindow.showShortcut.label')"
+          :label-description="t('settings.multiWindow.opggWindow.showShortcut.description')"
         >
           <ShortcutSelector
             :target-id="AkariOpggWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
@@ -119,8 +119,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.opggWindow.opacity.label')"
-          :label-description="t('MultiWindowSettings.opggWindow.opacity.description')"
+          :label="t('settings.multiWindow.opggWindow.opacity.label')"
+          :label-description="t('settings.multiWindow.opggWindow.opacity.description')"
           :label-width="400"
         >
           <NSlider
@@ -135,8 +135,8 @@
           ></NSlider>
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.opggWindow.resetWindowPosition.label')"
-          :label-description="t('MultiWindowSettings.opggWindow.resetWindowPosition.description')"
+          :label="t('settings.multiWindow.opggWindow.resetWindowPosition.label')"
+          :label-description="t('settings.multiWindow.opggWindow.resetWindowPosition.description')"
           :label-width="400"
         >
           <NButton
@@ -144,20 +144,20 @@
             type="warning"
             secondary
             @click="() => wm.opggWindow.resetPosition()"
-            >{{ t('MultiWindowSettings.opggWindow.resetWindowPosition.button') }}</NButton
+            >{{ t('settings.multiWindow.opggWindow.resetWindowPosition.button') }}</NButton
           >
         </SettingsRow>
       </SettingsSection>
       <SettingsSection
         :title="
           as.isElevated
-            ? t('MultiWindowSettings.ongoingGameWindow.title')
-            : t('MultiWindowSettings.ongoingGameWindow.titleRequireAdmin')
+            ? t('settings.multiWindow.ongoingGameWindow.title')
+            : t('settings.multiWindow.ongoingGameWindow.titleRequireAdmin')
         "
       >
         <SettingsRow
-          :label="t('MultiWindowSettings.ongoingGameWindow.enabled.label')"
-          :label-description="t('MultiWindowSettings.ongoingGameWindow.enabled.description')"
+          :label="t('settings.multiWindow.ongoingGameWindow.enabled.label')"
+          :label-description="t('settings.multiWindow.ongoingGameWindow.enabled.description')"
           :label-width="400"
         >
           <NSwitch
@@ -169,8 +169,8 @@
         <SettingsRow
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
-          :label="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
-          :label-description="t('MultiWindowSettings.ongoingGameWindow.showShortcut.description')"
+          :label="t('settings.multiWindow.ongoingGameWindow.showShortcut.label')"
+          :label-description="t('settings.multiWindow.ongoingGameWindow.showShortcut.description')"
         >
           <ShortcutSelector
             :target-id="AkariOngoingGameWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
@@ -182,13 +182,13 @@
       <SettingsSection
         :title="
           as.isElevated
-            ? t('MultiWindowSettings.cdTimerWindow.title')
-            : t('MultiWindowSettings.cdTimerWindow.titleRequireAdmin')
+            ? t('settings.multiWindow.cdTimerWindow.title')
+            : t('settings.multiWindow.cdTimerWindow.titleRequireAdmin')
         "
       >
         <SettingsRow
-          :label="t('MultiWindowSettings.cdTimerWindow.enabled.label')"
-          :label-description="t('MultiWindowSettings.cdTimerWindow.enabled.description')"
+          :label="t('settings.multiWindow.cdTimerWindow.enabled.label')"
+          :label-description="t('settings.multiWindow.cdTimerWindow.enabled.description')"
           :label-width="400"
         >
           <NSwitch
@@ -200,8 +200,8 @@
         <SettingsRow
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
-          :label="t('MultiWindowSettings.cdTimerWindow.showShortcut.label')"
-          :label-description="t('MultiWindowSettings.cdTimerWindow.showShortcut.description')"
+          :label="t('settings.multiWindow.cdTimerWindow.showShortcut.label')"
+          :label-description="t('settings.multiWindow.cdTimerWindow.showShortcut.description')"
         >
           <ShortcutSelector
             :target-id="AkariCdTimerWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
@@ -210,8 +210,8 @@
           />
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.cdTimerWindow.timerType.label')"
-          :label-description="t('MultiWindowSettings.cdTimerWindow.timerType.description')"
+          :label="t('settings.multiWindow.cdTimerWindow.timerType.label')"
+          :label-description="t('settings.multiWindow.cdTimerWindow.timerType.description')"
           :label-width="400"
         >
           <NRadioGroup
@@ -221,18 +221,18 @@
           >
             <div class="flex flex-wrap justify-end gap-x-3 gap-y-1">
               <NRadio value="countdown">{{
-                t('MultiWindowSettings.cdTimerWindow.timerType.options.countdown')
+                t('settings.multiWindow.cdTimerWindow.timerType.options.countdown')
               }}</NRadio>
               <NRadio value="countup">{{
-                t('MultiWindowSettings.cdTimerWindow.timerType.options.countup')
+                t('settings.multiWindow.cdTimerWindow.timerType.options.countup')
               }}</NRadio>
             </div>
           </NRadioGroup>
         </SettingsRow>
         <SettingsRow
-          :label="t('MultiWindowSettings.cdTimerWindow.reverseAdjustmentDirection.label')"
+          :label="t('settings.multiWindow.cdTimerWindow.reverseAdjustmentDirection.label')"
           :label-description="
-            t('MultiWindowSettings.cdTimerWindow.reverseAdjustmentDirection.description')
+            t('settings.multiWindow.cdTimerWindow.reverseAdjustmentDirection.description')
           "
           :label-width="400"
         >
@@ -244,23 +244,23 @@
         </SettingsRow>
         <template #footer>
           <div class="text-[11px] leading-4 text-black/50 dark:text-white/50">
-            {{ t('MultiWindowSettings.cdTimerWindow.description.lineA') }}
+            {{ t('settings.multiWindow.cdTimerWindow.description.lineA') }}
           </div>
           <div
             class="mt-0.5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5 text-[11px] leading-4"
           >
             <span class="font-medium text-black/65 dark:text-white/65">{{
-              t('MultiWindowSettings.cdTimerWindow.description.leftClick1')
+              t('settings.multiWindow.cdTimerWindow.description.leftClick1')
             }}</span>
-            <span>{{ t('MultiWindowSettings.cdTimerWindow.description.leftClick2') }}</span>
+            <span>{{ t('settings.multiWindow.cdTimerWindow.description.leftClick2') }}</span>
             <span class="font-medium text-black/65 dark:text-white/65">{{
-              t('MultiWindowSettings.cdTimerWindow.description.rightDoubleClick1')
+              t('settings.multiWindow.cdTimerWindow.description.rightDoubleClick1')
             }}</span>
-            <span>{{ t('MultiWindowSettings.cdTimerWindow.description.rightDoubleClick2') }}</span>
+            <span>{{ t('settings.multiWindow.cdTimerWindow.description.rightDoubleClick2') }}</span>
             <span class="font-medium text-black/65 dark:text-white/65">{{
-              t('MultiWindowSettings.cdTimerWindow.description.wheel1')
+              t('settings.multiWindow.cdTimerWindow.description.wheel1')
             }}</span>
-            <span>{{ t('MultiWindowSettings.cdTimerWindow.description.wheel2') }}</span>
+            <span>{{ t('settings.multiWindow.cdTimerWindow.description.wheel2') }}</span>
           </div>
         </template>
       </SettingsSection>

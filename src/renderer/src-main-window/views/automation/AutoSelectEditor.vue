@@ -3,10 +3,10 @@
     <NCollapseTransition :show="as2.temporarilyDisabled" class="mb-4">
       <NAlert type="warning">
         <div class="mb-1 text-sm text-gray-700 dark:text-gray-200">
-          {{ t('AutoSelect.temporarilyDisabled.description') }}
+          {{ t('automation.champSelect.temporarilyDisabled.description') }}
         </div>
         <NButton size="small" type="primary" @click="as.setTemporarilyDisabled(false)">
-          {{ t('AutoSelect.temporarilyDisabled.button') }}
+          {{ t('automation.champSelect.temporarilyDisabled.button') }}
         </NButton>
       </NAlert>
     </NCollapseTransition>
@@ -15,7 +15,7 @@
     <div class="flex gap-4">
       <div class="flex shrink-0 flex-col" v-if="as2.groups.length > 0">
         <div class="mb-1 ml-2 text-xs text-gray-600 dark:text-gray-300">
-          {{ t('AutoSelect.groupTitle') }}
+          {{ t('automation.champSelect.groupTitle') }}
         </div>
         <div class="flex flex-col gap-0.5">
           <div
@@ -34,7 +34,7 @@
               :src="gameModeIconUri[group.targetGameModes[0].gameMode]"
             />
             <span class="flex-1 truncate">{{
-              t(`AutoSelect.groups.${group.groupId}`, { defaultValue: group.groupId })
+              t(`automation.champSelect.groups.${group.groupId}`, { defaultValue: group.groupId })
             }}</span>
             <div class="ml-auto flex gap-1">
               <NIcon
@@ -57,7 +57,7 @@
       <!-- 一般来说这里不会抵达 -->
       <div class="flex h-full items-center justify-center" v-else>
         <div class="text-xs text-gray-500 dark:text-gray-400">
-          {{ t('AutoSelect.groupEmpty') }}
+          {{ t('automation.champSelect.groupEmpty') }}
         </div>
       </div>
 
@@ -70,10 +70,10 @@
         v-if="currentGroup && currentPickConfig"
         v-model:value="banPick"
       >
-        <NTabPane name="pick" :tab="t('AutoSelect.pick.title')">
+        <NTabPane name="pick" :tab="t('automation.champSelect.pick.title')">
           <SettingsRow
-            :label="t('AutoSelect.pick.enabled.label')"
-            :label-description="t('AutoSelect.pick.enabled.description')"
+            :label="t('automation.champSelect.pick.enabled.label')"
+            :label-description="t('automation.champSelect.pick.enabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -84,8 +84,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.expectedChampions.label')"
-            :label-description="t('AutoSelect.pick.expectedChampions.description')"
+            :label="t('automation.champSelect.pick.expectedChampions.label')"
+            :label-description="t('automation.champSelect.pick.expectedChampions.description')"
             :label-width="260"
             control-full-line
             align="start"
@@ -104,11 +104,11 @@
                     />
                   </template>
                   <span
-                    >{{ t('AutoSelect.pick.expectedChampions.fragment1') }}
+                    >{{ t('automation.champSelect.pick.expectedChampions.fragment1') }}
                     <span class="font-semibold">{{
                       t(`positions.${position}`, { ns: 'common' })
                     }}</span>
-                    {{ t('AutoSelect.pick.expectedChampions.fragment2') }}</span
+                    {{ t('automation.champSelect.pick.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>
                 <OrderedChampionList
@@ -146,8 +146,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.showIntent.label')"
-            :label-description="t('AutoSelect.pick.showIntent.description')"
+            :label="t('automation.champSelect.pick.showIntent.label')"
+            :label-description="t('automation.champSelect.pick.showIntent.description')"
             :label-width="260"
           >
             <NSwitch
@@ -158,8 +158,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.ignoreIntent.label')"
-            :label-description="t('AutoSelect.pick.ignoreIntent.description')"
+            :label="t('automation.champSelect.pick.ignoreIntent.label')"
+            :label-description="t('automation.champSelect.pick.ignoreIntent.description')"
             :label-width="260"
           >
             <NSwitch
@@ -172,8 +172,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.strategy.label')"
-            :label-description="t('AutoSelect.pick.strategy.description')"
+            :label="t('automation.champSelect.pick.strategy.label')"
+            :label-description="t('automation.champSelect.pick.strategy.description')"
             :label-width="260"
             align="start"
           >
@@ -184,21 +184,21 @@
             >
               <NFlex vertical :size="2">
                 <NRadio value="just-show">{{
-                  t('AutoSelect.pick.strategy.options.just-show')
+                  t('automation.champSelect.pick.strategy.options.just-show')
                 }}</NRadio>
                 <NRadio value="show-and-lock-in">{{
-                  t('AutoSelect.pick.strategy.options.show-and-lock-in')
+                  t('automation.champSelect.pick.strategy.options.show-and-lock-in')
                 }}</NRadio>
                 <NRadio value="lock-in-immediately">{{
-                  t('AutoSelect.pick.strategy.options.lock-in-immediately')
+                  t('automation.champSelect.pick.strategy.options.lock-in-immediately')
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.delaySeconds.label')"
-            :label-description="t('AutoSelect.pick.delaySeconds.description')"
+            :label="t('automation.champSelect.pick.delaySeconds.label')"
+            :label-description="t('automation.champSelect.pick.delaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -216,14 +216,16 @@
           ></div>
           <TooltipWithIcon
             class="mx-(--settings-row-x-padding) mb-2 text-xs text-gray-600 dark:text-gray-300"
-            :tooltip="t('AutoSelect.pick.benchMode.tooltip')"
+            :tooltip="t('automation.champSelect.pick.benchMode.tooltip')"
           >
-            <div>{{ t('AutoSelect.pick.benchMode.title') }}</div>
+            <div>{{ t('automation.champSelect.pick.benchMode.title') }}</div>
           </TooltipWithIcon>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.label')"
-            :label-description="t('AutoSelect.pick.benchSwapAccumulatedDelaySeconds.description')"
+            :label="t('automation.champSelect.pick.benchSwapAccumulatedDelaySeconds.label')"
+            :label-description="
+              t('automation.champSelect.pick.benchSwapAccumulatedDelaySeconds.description')
+            "
             :label-width="260"
           >
             <NInputNumber
@@ -240,8 +242,10 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.benchSelectFirstAvailableChampion.label')"
-            :label-description="t('AutoSelect.pick.benchSelectFirstAvailableChampion.description')"
+            :label="t('automation.champSelect.pick.benchSelectFirstAvailableChampion.label')"
+            :label-description="
+              t('automation.champSelect.pick.benchSelectFirstAvailableChampion.description')
+            "
             :label-width="260"
           >
             <NSwitch
@@ -257,8 +261,10 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.pick.benchHandleTradeEnabled.label')"
-            :label-description="t('AutoSelect.pick.benchHandleTradeEnabled.description')"
+            :label="t('automation.champSelect.pick.benchHandleTradeEnabled.label')"
+            :label-description="
+              t('automation.champSelect.pick.benchHandleTradeEnabled.description')
+            "
             :label-width="260"
           >
             <NSwitch
@@ -271,10 +277,10 @@
           </SettingsRow>
         </NTabPane>
 
-        <NTabPane name="ban" :tab="t('AutoSelect.ban.title')">
+        <NTabPane name="ban" :tab="t('automation.champSelect.ban.title')">
           <SettingsRow
-            :label="t('AutoSelect.ban.enabled.label')"
-            :label-description="t('AutoSelect.ban.enabled.description')"
+            :label="t('automation.champSelect.ban.enabled.label')"
+            :label-description="t('automation.champSelect.ban.enabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -285,8 +291,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.ban.expectedChampions.label')"
-            :label-description="t('AutoSelect.ban.expectedChampions.description')"
+            :label="t('automation.champSelect.ban.expectedChampions.label')"
+            :label-description="t('automation.champSelect.ban.expectedChampions.description')"
             :label-width="260"
             align="start"
           >
@@ -304,11 +310,11 @@
                     />
                   </template>
                   <span
-                    >{{ t('AutoSelect.ban.expectedChampions.fragment1') }}
+                    >{{ t('automation.champSelect.ban.expectedChampions.fragment1') }}
                     <span class="font-semibold">{{
                       t(`positions.${position}`, { ns: 'common' })
                     }}</span>
-                    {{ t('AutoSelect.ban.expectedChampions.fragment2') }}</span
+                    {{ t('automation.champSelect.ban.expectedChampions.fragment2') }}</span
                   >
                 </NTooltip>
                 <OrderedChampionList
@@ -346,8 +352,8 @@
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.ban.strategy.label')"
-            :label-description="t('AutoSelect.ban.strategy.description')"
+            :label="t('automation.champSelect.ban.strategy.label')"
+            :label-description="t('automation.champSelect.ban.strategy.description')"
             :label-width="260"
             align="start"
           >
@@ -358,21 +364,21 @@
             >
               <NFlex vertical :size="2">
                 <NRadio value="just-show">{{
-                  t('AutoSelect.ban.strategy.options.just-show')
+                  t('automation.champSelect.ban.strategy.options.just-show')
                 }}</NRadio>
                 <NRadio value="show-and-lock-in">{{
-                  t('AutoSelect.ban.strategy.options.show-and-lock-in')
+                  t('automation.champSelect.ban.strategy.options.show-and-lock-in')
                 }}</NRadio>
                 <NRadio value="lock-in-immediately">{{
-                  t('AutoSelect.ban.strategy.options.lock-in-immediately')
+                  t('automation.champSelect.ban.strategy.options.lock-in-immediately')
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </SettingsRow>
 
           <SettingsRow
-            :label="t('AutoSelect.ban.delaySeconds.label')"
-            :label-description="t('AutoSelect.ban.delaySeconds.description')"
+            :label="t('automation.champSelect.ban.delaySeconds.label')"
+            :label-description="t('automation.champSelect.ban.delaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -389,7 +395,9 @@
 
       <!-- 一般来说这里不会抵达 -->
       <div class="as-editor__empty-selected-group" v-else>
-        <div class="as-editor__empty-selected-group-title">{{ t('AutoSelect.groupEmpty') }}</div>
+        <div class="as-editor__empty-selected-group-title">
+          {{ t('automation.champSelect.groupEmpty') }}
+        </div>
       </div>
     </div>
   </div>

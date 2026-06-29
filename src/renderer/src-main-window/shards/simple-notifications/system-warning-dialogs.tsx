@@ -25,7 +25,7 @@ export function watchAskUserToRunAsAdministrator() {
   const appCommonStore = useAppCommonStore()
   const dialog = useDialog()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.wmiRequiresAdministrator'
+    keyPrefix: 'notifications.simple.wmiRequiresAdministrator'
   })
 
   const appCommon = useInstance(AppCommonRenderer)
@@ -63,7 +63,7 @@ export function watchCannotGetUxCommandLine() {
   const appCommonStore = useAppCommonStore()
   const dialog = useDialog()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.cannotGetUxCommandLine'
+    keyPrefix: 'notifications.simple.cannotGetUxCommandLine'
   })
 
   const appCommon = useInstance(AppCommonRenderer)
@@ -125,7 +125,7 @@ export function watchHigherVersionDbWarning() {
   const dialog = useDialog()
   const simpleNotificationsStore = useSimpleNotificationsStore()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.higherVersionDb'
+    keyPrefix: 'notifications.simple.higherVersionDb'
   })
 
   const hasNewRelease = computed(
@@ -175,7 +175,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
   const neverShowAgainChecked = ref(false)
 
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.badSgpConnection'
+    keyPrefix: 'notifications.simple.badSgpConnection'
   })
 
   const isBadSgp = computed(() => {
@@ -271,7 +271,7 @@ export function watchRunInTempDirWarning() {
 
   const dialog = useDialog()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.runInTempDirWarning'
+    keyPrefix: 'notifications.simple.runInTempDirWarning'
   })
 
   let inst: ReturnType<typeof dialog.warning> | null = null

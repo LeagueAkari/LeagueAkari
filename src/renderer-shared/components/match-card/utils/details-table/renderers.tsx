@@ -142,7 +142,7 @@ export function useValueRenderer() {
       ) {
         return emptyValue()
       }
-      return value ? t('MatchCard.statKeys.true') : t('MatchCard.statKeys.false')
+      return value ? t('matchCard.statKeys.true') : t('matchCard.statKeys.false')
     },
     percentage: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {
@@ -232,7 +232,7 @@ export function useValueRenderer() {
       }
 
       if (typeof value === 'boolean') {
-        return value ? t('MatchCard.statKeys.true') : t('MatchCard.statKeys.false')
+        return value ? t('matchCard.statKeys.true') : t('matchCard.statKeys.false')
       }
 
       return <span class="text-black/50 dark:text-white/50">N/A</span>

@@ -15,7 +15,7 @@
           </div>
         </template>
         {{
-          t('TeamTagsArea.winRate', {
+          t('ongoingGame.teamTags.winRate', {
             rate: (teamStats.avgWinRate * 100).toFixed(2)
           })
         }}
@@ -31,7 +31,7 @@
           </div>
         </template>
         {{
-          t('TeamTagsArea.kda', {
+          t('ongoingGame.teamTags.kda', {
             kda: teamStats.avgKda.toFixed(4)
           })
         }}
@@ -62,7 +62,7 @@
                 }"
               >
                 {{
-                  t('TeamTagsArea.premade', {
+                  t('ongoingGame.teamTags.premade', {
                     size: p.puuids.length
                   })
                 }}
@@ -72,14 +72,14 @@
                 class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
                 :class="WIN_RATE_TEAM_TAG_BG_CLASSES"
               >
-                {{ t('TeamTagsArea.winRateTeam') }}
+                {{ t('ongoingGame.teamTags.winRateTeam') }}
               </div>
               <div
                 v-else
                 class="rounded-none px-1 py-0.5 text-xs leading-3 text-white"
                 :class="LOSS_RATE_TEAM_TAG_BG_CLASSES"
               >
-                {{ t('TeamTagsArea.loseRateTeam') }}
+                {{ t('ongoingGame.teamTags.loseRateTeam') }}
               </div>
             </div>
           </template>
@@ -95,7 +95,7 @@
               }"
             >
               {{
-                t('TeamTagsArea.premade', {
+                t('ongoingGame.teamTags.premade', {
                   size: p.puuids.length
                 })
               }}

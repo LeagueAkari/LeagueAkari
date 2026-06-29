@@ -1,10 +1,10 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('MiscSettings.respawnTimer.title')">
+      <SettingsSection :title="t('settings.misc.respawnTimer.title')">
         <SettingsRow
-          :label="t('MiscSettings.respawnTimer.enabled.label')"
-          :label-description="t('MiscSettings.respawnTimer.enabled.description')"
+          :label="t('settings.misc.respawnTimer.enabled.label')"
+          :label-description="t('settings.misc.respawnTimer.enabled.description')"
           :label-width="400"
         >
           <NSwitch
@@ -14,10 +14,10 @@
           />
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('MiscSettings.streamerMode.title')">
+      <SettingsSection :title="t('settings.misc.streamerMode.title')">
         <SettingsRow
-          :label="t('MiscSettings.streamerMode.streamerMode.label')"
-          :label-description="t('MiscSettings.streamerMode.streamerMode.description')"
+          :label="t('settings.misc.streamerMode.streamerMode.label')"
+          :label-description="t('settings.misc.streamerMode.streamerMode.description')"
           :label-width="400"
         >
           <NSwitch
@@ -28,8 +28,8 @@
         </SettingsRow>
         <NCollapseTransition :show="as.settings.streamerMode">
           <SettingsRow
-            :label="t('MiscSettings.streamerMode.useAkariStyledName.label')"
-            :label-description="t('MiscSettings.streamerMode.useAkariStyledName.description')"
+            :label="t('settings.misc.streamerMode.useAkariStyledName.label')"
+            :label-description="t('settings.misc.streamerMode.useAkariStyledName.description')"
             :label-width="400"
             style="border-bottom-width: 1px"
           >
@@ -41,8 +41,8 @@
           </SettingsRow>
         </NCollapseTransition>
         <SettingsRow
-          :label="t('MiscSettings.streamerMode.contentProtection.label')"
-          :label-description="t('MiscSettings.streamerMode.contentProtection.description')"
+          :label="t('settings.misc.streamerMode.contentProtection.label')"
+          :label-description="t('settings.misc.streamerMode.contentProtection.description')"
           :label-width="400"
         >
           <NSwitch

@@ -5,7 +5,7 @@
   >
     <!-- title line (title + expand) -->
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
-      {{ isCountersExpanded ? t('OpggChampion.allCounters') : t('OpggChampion.counter') }}
+      {{ isCountersExpanded ? t('opgg.champion.allCounters') : t('opgg.champion.counter') }}
       <NSwitch
         size="small"
         v-model:value="isCountersExpanded"
@@ -17,8 +17,8 @@
           })
         "
       >
-        <template #checked>{{ t('OpggChampion.allC') }}</template>
-        <template #unchecked>{{ t('OpggChampion.counterC') }}</template>
+        <template #checked>{{ t('opgg.champion.allC') }}</template>
+        <template #unchecked>{{ t('opgg.champion.counterC') }}</template>
       </NSwitch>
     </div>
 
@@ -36,7 +36,7 @@
         <LcuImage class="image mb-1 h-8 w-8" :src="championIconUri(c.champion_id)" />
         <div
           class="win-rate text-[11px] font-bold"
-          :title="t('OpggChampion.winRate')"
+          :title="t('opgg.champion.winRate')"
           :class="
             c.win / (c.play || 1) > 0.5
               ? 'text-[#2563eb] dark:text-[#a0c6f8]'
@@ -47,7 +47,7 @@
         </div>
         <div class="play text-center text-[10px] text-[#666666] dark:text-[#a4a4a4]">
           {{
-            t('OpggChampion.times', {
+            t('opgg.champion.times', {
               times: c.play.toLocaleString()
             })
           }}
@@ -58,7 +58,7 @@
         class="flex h-16 w-full items-center justify-center text-sm text-white/50 dark:text-white/50"
         v-else
       >
-        {{ t('OpggChampion.empty') }}
+        {{ t('opgg.champion.empty') }}
       </div>
     </div>
 
@@ -74,13 +74,13 @@
         <LcuImage class="image mb-1 h-8 w-8" :src="championIconUri(c.champion_id)" />
         <div
           class="win-rate text-[11px] font-bold text-[#dc2626] dark:text-[#d75a5a]"
-          :title="t('OpggChampion.winRate')"
+          :title="t('opgg.champion.winRate')"
         >
           {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
         </div>
         <div class="play text-center text-[10px] text-[#666666] dark:text-[#a4a4a4]">
           {{
-            t('OpggChampion.times', {
+            t('opgg.champion.times', {
               times: c.play.toLocaleString()
             })
           }}
@@ -92,7 +92,7 @@
         class="flex h-16 w-full items-center justify-center text-sm text-black/50 dark:text-white/50"
         v-else
       >
-        {{ t('OpggChampion.empty') }}
+        {{ t('opgg.champion.empty') }}
       </div>
     </div>
   </div>

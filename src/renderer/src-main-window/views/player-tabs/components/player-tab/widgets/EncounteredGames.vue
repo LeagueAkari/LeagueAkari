@@ -6,7 +6,7 @@
     <!-- Header Section -->
     <div class="mb-3 flex items-center justify-between">
       <span class="text-base font-bold text-gray-900 dark:text-white"
-        >{{ t('EncounteredGames.title') }} ({{ pagedGames.total }})</span
+        >{{ t('playerTabs.encounteredGames.title') }} ({{ pagedGames.total }})</span
       >
 
       <!-- Pagination Controls -->
@@ -64,8 +64,8 @@
             >
               {{
                 game.type === 'enemy'
-                  ? t('EncounteredGames.opponent')
-                  : t('EncounteredGames.teammate')
+                  ? t('playerTabs.encounteredGames.opponent')
+                  : t('playerTabs.encounteredGames.teammate')
               }}
             </div>
 
@@ -96,8 +96,8 @@
                   game.p1.placement
                     ? formatI18nOrdinal(game.p1.placement, as.settings.locale, true)
                     : game.p1.win
-                      ? t('EncounteredGames.win')
-                      : t('EncounteredGames.lose')
+                      ? t('playerTabs.encounteredGames.win')
+                      : t('playerTabs.encounteredGames.lose')
                 }}
               </div>
               <div class="text-[11px] text-gray-500 dark:text-white/70">
@@ -122,8 +122,8 @@
                   game.p2.placement
                     ? formatI18nOrdinal(game.p2.placement, as.settings.locale, true)
                     : game.p2.win
-                      ? t('EncounteredGames.win')
-                      : t('EncounteredGames.lose')
+                      ? t('playerTabs.encounteredGames.win')
+                      : t('playerTabs.encounteredGames.lose')
                 }}
               </div>
               <div class="text-[11px] text-gray-500 dark:text-white/70">
@@ -147,7 +147,7 @@
               </template>
             </NButton>
           </template>
-          {{ t('EncounteredGames.deletePopconfirm') }}
+          {{ t('playerTabs.encounteredGames.deletePopconfirm') }}
         </NPopconfirm>
       </div>
     </div>
@@ -157,7 +157,7 @@
       class="flex h-20 items-center justify-center text-xs text-gray-500 dark:text-white/70"
       v-else
     >
-      <span>{{ t('EncounteredGames.noData') }}</span>
+      <span>{{ t('playerTabs.encounteredGames.noData') }}</span>
     </div>
   </div>
 </template>

@@ -9,20 +9,22 @@
       :close-on-esc="false"
       @keydown.enter.prevent
       @keydown.space.prevent
-      :title="t('ShortcutSelector.title')"
+      :title="t('settings.shortcutSelector.title')"
     >
       <template #footer>
         <div class="flex justify-end gap-1">
-          <NButton size="small" @click="show = false">{{ t('ShortcutSelector.cancel') }}</NButton>
+          <NButton size="small" @click="show = false">{{
+            t('settings.shortcutSelector.cancel')
+          }}</NButton>
           <NButton size="small" type="warning" @click="currentShortcutId = null">{{
-            t('ShortcutSelector.clear')
+            t('settings.shortcutSelector.clear')
           }}</NButton>
           <NButton
             size="small"
             type="primary"
             @click="handleSubmit"
             :disabled="isOccupiedBy !== null"
-            >{{ t('ShortcutSelector.ok') }}</NButton
+            >{{ t('settings.shortcutSelector.ok') }}</NButton
           >
         </div>
       </template>
@@ -45,7 +47,7 @@
         <span
           class="text-xs leading-none text-black/40 dark:text-white/40"
           v-if="!editingKeys.length"
-          >{{ t('ShortcutSelector.hint') }}</span
+          >{{ t('settings.shortcutSelector.hint') }}</span
         >
       </div>
 
@@ -56,10 +58,10 @@
         <template
           v-if="isOccupiedBy.targetId === KeyboardShortcutsRenderer.DISABLED_KEYS_TARGET_ID"
         >
-          {{ t('ShortcutSelector.reservedShortcut') }}
+          {{ t('settings.shortcutSelector.reservedShortcut') }}
         </template>
         <template v-else>
-          {{ t('ShortcutSelector.beingOccupied') }}
+          {{ t('settings.shortcutSelector.beingOccupied') }}
         </template>
       </div>
 
@@ -67,7 +69,7 @@
         v-if="editingKeys.length > 4"
         class="mt-1 text-xs text-yellow-500/80 dark:text-yellow-400/80"
       >
-        {{ t('ShortcutSelector.tooComplicated') }}
+        {{ t('settings.shortcutSelector.tooComplicated') }}
       </div>
     </NModal>
 
@@ -84,14 +86,14 @@
             }
           "
         >
-          {{ t('ShortcutSelector.select') }}
+          {{ t('settings.shortcutSelector.select') }}
         </NButton>
       </template>
       <template v-if="!as.nativeSupport.nativeInput.available">
         {{
           nativeInputRequiresElevation
-            ? t('ShortcutSelector.notRunAsAdministrator')
-            : t('ShortcutSelector.nativeGlobalShortcutsWindowsOnly')
+            ? t('settings.shortcutSelector.notRunAsAdministrator')
+            : t('settings.shortcutSelector.nativeGlobalShortcutsWindowsOnly')
         }}
       </template>
     </NPopover>
@@ -108,7 +110,7 @@
         >
       </template>
       <span class="text-xs leading-none text-black/40 dark:text-white/40" v-if="!keys.length">{{
-        t('ShortcutSelector.unset')
+        t('settings.shortcutSelector.unset')
       }}</span>
     </div>
   </div>

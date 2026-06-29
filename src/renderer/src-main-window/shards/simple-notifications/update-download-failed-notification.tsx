@@ -7,7 +7,7 @@ import { useSimpleNotificationsStore } from './store'
 
 export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererContext) {
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.updateDownloadFailed'
+    keyPrefix: 'notifications.simple.updateDownloadFailed'
   })
 
   const notification = useNotification()

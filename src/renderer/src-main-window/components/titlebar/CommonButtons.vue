@@ -19,7 +19,7 @@
       <template v-if="sns.announcementSummary">
         <div>
           <div class="font-bold text-black/80 dark:text-white/80">
-            {{ t('CommonButtons.announcementSummary') }}
+            {{ t('titlebar.actions.announcementSummary') }}
           </div>
           <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
           <div class="mb-2 max-w-100 text-xs text-black/80 dark:text-white/80">
@@ -33,16 +33,16 @@
                 rcs.announcement?.frontMatter.alertLevel !== 'low' &&
                 sns.lastAnnouncementUniqueId !== rcs.announcement?.uniqueId
               "
-              >{{ t('CommonButtons.announcementOk') }}</NButton
+              >{{ t('titlebar.actions.announcementOk') }}</NButton
             >
             <NButton size="tiny" type="primary" @click="sn.showAnnouncementModal()">{{
-              t('CommonButtons.announcementSeeMore')
+              t('titlebar.actions.announcementSeeMore')
             }}</NButton>
           </div>
         </div>
       </template>
       <template v-else>
-        {{ t('CommonButtons.announcement') }}
+        {{ t('titlebar.actions.announcement') }}
       </template>
     </NPopover>
 
@@ -55,7 +55,7 @@
           </div>
         </div>
       </template>
-      {{ t('CommonButtons.github') }}
+      {{ t('titlebar.actions.github') }}
     </NTooltip>
 
     <!-- aux window -->
@@ -68,7 +68,7 @@
             </div>
           </div>
         </template>
-        {{ t('CommonButtons.auxWindow') }}
+        {{ t('titlebar.actions.auxWindow') }}
       </NTooltip>
     </HorizontalExpand>
 
@@ -80,7 +80,7 @@
             <OpggIcon class="common-button-inner common-button-inner-img" />
           </div>
         </template>
-        {{ t('CommonButtons.opggWindow') }}
+        {{ t('titlebar.actions.opggWindow') }}
       </NTooltip>
     </HorizontalExpand>
 
@@ -203,7 +203,7 @@ const handleToGithub = () => {
 
 const themeToneLabel = (id: AppThemeId) => {
   const colorTheme = getThemeColorTheme(id)
-  return t(`CommonButtons.themeSelector.tone.${colorTheme}`)
+  return t(`titlebar.actions.themeSelector.tone.${colorTheme}`)
 }
 
 const selectedThemeIcon = (key: AppThemeSetting) => {
@@ -246,7 +246,7 @@ const themeToneTag = (id: AppThemeId) => {
 const createThemeDropdownOption = (id: AppThemeId): DropdownMixedOption => {
   return {
     key: id,
-    label: t(`CommonButtons.themeSelector.presets.${id}`, { defaultValue: id }),
+    label: t(`titlebar.actions.themeSelector.presets.${id}`, { defaultValue: id }),
     icon: selectedThemeIcon(id),
     extra: themeToneTag(id)
   }
@@ -257,11 +257,11 @@ const themeDropdownOptions = computed<DropdownMixedOption[]>(() => {
     {
       type: 'group',
       key: 'system',
-      label: t('CommonButtons.themeSelector.groups.system'),
+      label: t('titlebar.actions.themeSelector.groups.system'),
       children: [
         {
           key: 'default',
-          label: t('CommonButtons.themeSelector.presets.followSystem'),
+          label: t('titlebar.actions.themeSelector.presets.followSystem'),
           icon: selectedThemeIcon('default')
         }
       ]
@@ -269,13 +269,13 @@ const themeDropdownOptions = computed<DropdownMixedOption[]>(() => {
     {
       type: 'group',
       key: 'bright-core',
-      label: t('CommonButtons.themeSelector.groups.brightBuiltin'),
+      label: t('titlebar.actions.themeSelector.groups.brightBuiltin'),
       children: BUILTIN_LIGHT_THEME_IDS.map(createThemeDropdownOption)
     },
     {
       type: 'group',
       key: 'dark-core',
-      label: t('CommonButtons.themeSelector.groups.darkBuiltin'),
+      label: t('titlebar.actions.themeSelector.groups.darkBuiltin'),
       children: BUILTIN_DARK_THEME_IDS.map(createThemeDropdownOption)
     }
   ]

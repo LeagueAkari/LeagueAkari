@@ -2,23 +2,23 @@
   <NCard v-if="!isCustomGame" size="small">
     <div class="flex h-6 items-center not-last:mb-0.5" v-if="!isCustomGame">
       <span class="flex-1 text-xs text-black/70 dark:text-white/70">{{
-        t('ChampSelectOperations.dodge.label')
+        t('auxWindow.champSelect.operations.dodge.label')
       }}</span>
       <NPopconfirm
         :disabled="isLoopingDodge"
-        :negative-text="t('ChampSelectOperations.dodge.negativeText')"
-        :positive-text="t('ChampSelectOperations.dodge.positiveText')"
+        :negative-text="t('auxWindow.champSelect.operations.dodge.negativeText')"
+        :positive-text="t('auxWindow.champSelect.operations.dodge.positiveText')"
         :negative-button-props="{ size: 'tiny' }"
         :positive-button-props="{ size: 'tiny', type: 'warning' }"
         @positive-click="dodgeLoop"
       >
         <template #trigger>
           <NButton size="tiny" type="primary" secondary :disabled="isLoopingDodge">
-            {{ t('ChampSelectOperations.dodge.button') }}
+            {{ t('auxWindow.champSelect.operations.dodge.button') }}
             <template v-if="iteration">({{ iteration >= 1000 ? '999+' : iteration }})</template>
           </NButton>
         </template>
-        {{ t('ChampSelectOperations.dodge.popconfirm') }}
+        {{ t('auxWindow.champSelect.operations.dodge.popconfirm') }}
       </NPopconfirm>
       <NButton
         v-if="isLoopingDodge"
@@ -27,13 +27,13 @@
         secondary
         @click="isLoopingDodge = false"
       >
-        {{ t('ChampSelectOperations.dodge.cancel') }}
+        {{ t('auxWindow.champSelect.operations.dodge.cancel') }}
       </NButton>
     </div>
 
     <div class="flex h-6 items-center not-last:mb-0.5" v-if="!isCustomGame">
       <span class="flex-1 text-xs text-black/70 dark:text-white/70">{{
-        t('ChampSelectOperations.temporarilyDisabled.label')
+        t('auxWindow.champSelect.operations.temporarilyDisabled.label')
       }}</span>
       <NSwitch
         :value="as2.temporarilyDisabled"

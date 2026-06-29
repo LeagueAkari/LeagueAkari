@@ -4,9 +4,9 @@
     v-if="champion && champion.data.synergies && champion.data.synergies.length"
   >
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
-      {{ t('OpggChampion.synergies')
+      {{ t('opgg.champion.synergies')
       }}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
-        t('OpggChampion.showAll')
+        t('opgg.champion.showAll')
       }}</NCheckbox>
     </div>
     <div
@@ -27,7 +27,7 @@
             (s.total_place / (s.play || 1)).toFixed(2)
           }}</span>
           <span class="text text-xs text-[#666666] dark:text-[#bebebe]"
-            >{{ t('OpggChampion.avgPlace') }}
+            >{{ t('opgg.champion.avgPlace') }}
           </span>
         </div>
         <div class="value-text flex min-w-19 flex-col items-center">
@@ -35,21 +35,21 @@
             >{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span
           >
           <span class="text text-xs text-[#666666] dark:text-[#bebebe]">{{
-            t('OpggChampion.1st')
+            t('opgg.champion.1st')
           }}</span>
         </div>
         <div class="value-text flex min-w-19 flex-col items-center">
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
-            :title="t('OpggChampion.pickRate')"
+            :title="t('opgg.champion.pickRate')"
             >{{ (s.pick_rate * 100).toFixed(2) }}%</span
           >
           <span
             class="text text-xs text-[#666666] dark:text-[#bebebe]"
-            :title="t('OpggChampion.plays')"
+            :title="t('opgg.champion.plays')"
           >
             {{
-              t('OpggChampion.times', {
+              t('opgg.champion.times', {
                 times: s.play.toLocaleString()
               })
             }}</span
@@ -58,13 +58,13 @@
         <div class="value-text flex min-w-19 flex-col items-center">
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
-            :title="t('OpggChampion.winRate')"
+            :title="t('opgg.champion.winRate')"
             >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
           >
           <span
             class="text text-xs text-[#666666] dark:text-[#bebebe]"
-            :title="t('OpggChampion.winRate')"
-            >{{ t('OpggChampion.winRate') }}</span
+            :title="t('opgg.champion.winRate')"
+            >{{ t('opgg.champion.winRate') }}</span
           >
         </div>
       </div>

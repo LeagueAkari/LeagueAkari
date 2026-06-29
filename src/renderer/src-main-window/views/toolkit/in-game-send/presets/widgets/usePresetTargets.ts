@@ -18,7 +18,7 @@ export interface PresetTarget {
 }
 
 export function usePresetTargets() {
-  const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.targets' })
+  const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.targets' })
 
   return computed<PresetTarget[]>(() => [
     {

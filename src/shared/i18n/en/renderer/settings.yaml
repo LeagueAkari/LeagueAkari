@@ -1,0 +1,523 @@
+settings:
+  modal:
+    title: Settings
+  app:
+    title: Application
+    basic:
+      title: Basic
+      mainWindowCloseAction:
+        label: Main Window Close Action
+        description: The action to be executed when the main window is closed
+        options:
+          minimize-to-tray: Minimize to tray
+          quit: Quit
+          ask: Ask every time
+      preferredLolSource:
+        label: Preferred Data Source
+        description: Select the preferred League of Legends API data source
+        howToChoose: How to choose?
+        unsupported: 'Unsupported SGP API: {{server}}'
+        options:
+          sgp: SGP API
+          lcu: LCU API
+        tip:
+          sgp:
+            title: SGP API
+            feature1: Fast query performance with quick response
+            feature2: Provides more detailed match data
+            feature3: Supports cross-region match history lookup on mainland servers
+            warning: When using VPN/accelerator to play on foreign servers, connection may fail or be extremely slow
+          lcu:
+            title: LCU API (Client Local)
+            feature1: High stability, unaffected by network conditions
+            feature2: Reliable even when using VPN/accelerator
+            warning: 'Known issue: Querying match history during champion select may cause the game client to crash'
+      dataSource:
+        label: Git Repository Source
+        description: Set the Git repository source of the application, get or update data from GitHub / Gitee
+        options:
+          gitee: Gitee
+          github: GitHub
+        howToChoose: How to choose?
+        testingSpeed: Testing speed...
+        timeout: Timeout
+        testButton: Re-test
+        tip:
+          gitee: Better response speed in mainland China
+          github: Better response speed outside mainland China
+        better: Faster
+      theme:
+        label: Theme Color
+        description: Theme color for $t(common:appName)
+        groups:
+          system: System
+          brightBuiltin: Light
+          darkBuiltin: Dark
+        tone:
+          light: Light
+          dark: Dark
+        options:
+          default: Follow System
+          light: Light
+          dark: Dark
+          graphite: Graphite Blue
+          cyber: Cyber Neon
+          sakura: Sakura Pink
+          mint: Mint Green
+          aurora: Aurora Violet
+          butter: Butter Yellow
+    selfUpdate:
+      title: Application Update
+      updateLatestRelease:
+        label: Auto Check Updates
+        description: Periodically check for new versions
+      autoDownloadUpdates:
+        label: Auto Download Updates
+        description: Automatically start the update process when a new release is detected
+      checkFrom: Check updates from data source ({{source}})
+      checkUpdates: Check Updates
+      currentRelease: Current Release
+      downloadRelease: Download Release
+      newRelease: New Release
+      lastCheckAt: Last Check at
+      cancelUpdate: Cancel Update
+      updateProgress:
+        label: Update Process
+        description: The ongoing update process
+        downloading: Downloading update package
+        finished: Completed {{progress}}%
+        remain: Remaining {{time}}
+        downloadFailed: Download failed
+        waitingForRestart: Waiting for restart
+        waitingForRestartDescription: The auto-update process will be performed after closing the application
+      checkUpdatesResult:
+        no-updates: No new version available
+        new-updates: New version available
+        failed: Failed to check for updates {{reason}}
+      updateDir:
+        label: Update Directory
+        description: The current location of the downloaded update. If the complete auto-update process cannot be executed, manual update is required
+        open: Open
+    mainWindowUi:
+      title: Main Window UI
+      background:
+        label: Background
+        description: Set the main window background mode
+        options:
+          profileSkin: Champion Background
+          none: None
+          mica: Mica
+        tooltips:
+          profileSkin: Use the current player's profile background skin as the main window background
+          mica: Available only on newer Windows versions. If unsupported on the current platform, it falls back to None
+          micaUnsupported: Mica is not supported on the current platform and will fall back to None
+      useProfileSkinAsBackground:
+        label: Use Profile Skin as Background
+        description: $t(common:appName) will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+      backgroundMaterial:
+        label: Background Material
+        description: Set the background material of the application interface, requires specific system version support
+        options:
+          none: None
+          mica: Mica
+          micaUnsupported: Mica (Unsupported)
+    lcConnection:
+      title: LCU Connection
+      autoConnect:
+        label: Auto Connect
+        description: Automatically connect to the client when there is a unique client
+      useWmi:
+        label: Use WMIC
+        description: Use WMIC to get client command line information instead of the default Win32 API method. Requires administrator privileges
+      rebuildWmi:
+        label: Rebuild WMI
+        description: If WMIC does not work properly, try this
+        rebuildButton: Rebuild WMI
+    misc:
+      title: Misc
+      logLevel:
+        label: Log Level
+        description: Set the log level of the application
+      disableHardwareAcceleration:
+        label: Disable Hardware Acceleration
+        description: Disables hardware acceleration, which may solve some rendering issues, such as font blur
+      disableHardwareAccelerationDialog:
+        enableText: Enable Hardware Acceleration
+        disableText: Disable Hardware Acceleration
+        disableConfirmation: Will disable hardware acceleration, restart the application to apply changes
+        enableConfirmation: Will enable hardware acceleration, restart the application to apply changes
+        positiveText: Restart and Quit
+        negativeText: Cancel
+      httpProxy:
+        strategy:
+          label: HTTP Proxy
+          description: Set the HTTP proxy. All network requests except LCU HTTP will be routed through this proxy
+          options:
+            force: Use Proxy
+            auto: Auto
+            disable: Disable
+        host:
+          label: Proxy Host
+          description: The host of the proxy server
+        port:
+          label: Proxy Port
+          description: The port of the proxy server
+      uninstallApp:
+        label: Uninstall Application
+        description: Uninstall the application, which will delete all data and configurations
+        button: Uninstall Application
+        title: Uninstall Application
+        content: Are you sure you want to uninstall $t(common:appName)? This will also remove all application data.
+        positiveText: Uninstall
+        negativeText: Cancel
+  matchHistory:
+    title: Match History Tabs
+    refreshTabsAfterGameEnds:
+      label: Refresh Tabs After Game Ends
+      description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
+    loadCount:
+      label: Load Count
+      description: Number of matches to load for each match history tab.
+    showJunglePathing:
+      label: Enable Jungle Pathing
+      description: Show jungle pathing entry and analysis card on match history pages.
+  ongoingGame:
+    title: Ongoing Game
+    titleCommon: Ongoing Game
+    titlePlayerCard: Player Card
+    enabled:
+      label: Enable
+      description: Perform match analysis when entering champion selection or during a match.
+    autoRouteWhenGameStarts:
+      label: Auto Route to Ongoing-Game
+      description: Automatically switch to the ongoing-game page when entering the champion selection phase or when the game starts. Excluded in the lobby phase.
+    matchHistoryLoadCount:
+      label: Match History Load Count
+      description: Number of matches to fetch for analyzing each player's performance on the match page.
+    concurrency:
+      label: Concurrent Request Limit
+      description: Limits the total number of concurrent network requests during match analysis. This does not affect the concurrency limits of other modules.
+    matchHistoryTagPreference:
+      label: Queue Filter Preference
+      description: Queue filter preference when loading match history using the SGP API.
+      options:
+        all: All Modes
+        current: Current Mode
+    queryInLobbyPhase:
+      label: Query in Lobby Phase
+      description: In addition to champion select and in-game phases, you can now also view data for all members in the lobby.
+    premadeTeamInferMatchCountThreshold:
+      label: Premade Team Inference Match Count Threshold
+      description: Minimum number of games required to confirm premade teams.
+    gameDetailsLoadCount:
+      label: Game Details Load Count
+      description_one: Will additionally load the detailed information for the first {{count}} match for game analysis.
+      description_other: Will additionally load the detailed information for the first {{count}} matches for game analysis.
+    jungleAnalysisMatchHistoryLoadCount:
+      label: Jungle Analysis Match History Load Count
+      description_one: Jungle analysis can continue fetching match history until the first {{count}} game to satisfy the 20 current-champion and 50 overall jungle samples.
+      description_other: Jungle analysis can continue fetching match history until the first {{count}} games to satisfy the 20 current-champion and 50 overall jungle samples.
+    showRecentlyUsedChampions:
+      label: Show Recently Used Champions
+      description: Display the recently used champions in the player card.
+    showChampionUsage:
+      label: Show Champion Usage
+      description: Display the champion usage on the player card.
+      options:
+        none: None
+        recent: Recently Used
+        mastery: Mastery Level
+    showJunglePathing:
+      label: Enable Jungle Pathing
+      description: Show jungle pathing analysis in ongoing-game player cards.
+    showMatchHistoryItemBorder:
+      label: Show Match History Item Border
+      description: Display a border around the match history item.
+    playerCardTags:
+      label: Player Card Tags
+      description: These tags will be displayed on the player cards
+      tags:
+        showPremadeTeamTag:
+          label: Premade Team Text
+        showWinningStreakTag:
+          label: Winning Streak
+        showLosingStreakTag:
+          label: Losing Streak
+        showSoloKillsTag:
+          label: Average Solo Kills Per Game
+        showSoloDeathsTag:
+          label: Average Solo Deaths Per Game
+        showAverageTeamDamageTag:
+          label: Average Team Damage
+        showAverageTeamDamageTakenTag:
+          label: Average Team Damage Taken
+        showSuspiciousFlashPositionTag:
+          label: Flash Position Anomaly Detection
+        showAverageTeamGoldTag:
+          label: Average Team Gold
+        showGreatPerformanceTag:
+          label: Outstanding Performance Tag
+        showMetTag:
+          label: Previously Encountered Players
+        showTaggedTag:
+          label: Tagged Players
+        showSelfTag:
+          label: Self Tag
+        showWinRateTeamTag:
+          label: High Win Rate Tag
+        showAverageDamageGoldEfficiencyTag:
+          label: Damage-Gold Efficiency Tag
+        showPrivacyTag:
+          label: Career Hidden Tag
+        showAverageEnemyMissingPingsTag:
+          label: Average Enemy Missing Pings
+        showAverageVisionScoreTag:
+          label: Average Vision Score
+        showAkariScoreTag:
+          label: Akari Score
+        showAverageKillDamageEfficiencyTag:
+          label: Average Kill Damage Efficiency
+  multiWindow:
+    title: Multi-Window
+    auxWindow:
+      title: Auxiliary Window
+      enabled:
+        label: Enable Auxiliary Window
+        description: Use a small window during certain game phases to display status and provide additional actions.
+        descriptionWithIcon: Can be opened by clicking the quick icon on the right side of the title bar ({icon}) or by right-clicking the tray icon and selecting "Aux Window").
+      autoShow:
+        label: Auto Show and Close
+        description: Automatically show or close the auxiliary window during specific game phases.
+      opacity:
+        label: Window Opacity
+        description: Adjust the transparency level of the auxiliary window.
+      showSkinSelector:
+        label: Skin Selector
+        description: Display a quick access skin selection tool in the auxiliary window.
+      resetWindowPosition:
+        label: Reset Window Position
+        description: Reset the position of the auxiliary window to its default location in the center of the main screen.
+        button: Reset
+    opggWindow:
+      title: OP.GG Window
+      enabled:
+        label: Enable OP.GG Features
+        description: Use the OP.GG window to view detailed player information and match history
+        descriptionWithIcon: Can be opened by clicking the quick icon on the right side of the title bar ({icon}) or by right-clicking the tray icon and selecting "OP.GG Window").
+      autoShow:
+        label: Auto Show and Close
+        description: Automatically show or close the OP.GG window during specific game phases.
+      opacity:
+        label: Window Opacity
+        description: Adjust the transparency level of the OP.GG window.
+      resetWindowPosition:
+        label: Reset Window Position
+        description: Reset the position of the OP.GG window to its default location in the center of the main screen.
+        button: Reset
+      showShortcut:
+        label: Show Shortcut
+        description: Use the shortcut key to show or hide the OP.GG window. If the game is in the foreground, it will automatically get pinned. Make sure the game is in borderless or windowed mode for this window to display correctly.
+    ongoingGameWindow:
+      title: Ongoing Game Overlay Window
+      titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)
+      enabled:
+        label: Enable Ongoing Game Window
+        description: Display an overlay window during the game to show ongoing game information. This feature requires the game client to be in windowed or borderless mode.
+      showShortcut:
+        label: Show Shortcut
+        description: Hold the shortcut key to show the overlay window during the game
+    cdTimerWindow:
+      title: Timer Overlay Window
+      titleRequireAdmin: Timer Overlay Window (Admin Required)
+      description:
+        lineA: Enemy summoner spell timers are available only in supported modes
+        leftClick1: Left click
+        leftClick2: Start or stop this timer
+        rightDoubleClick1: Right double click
+        rightDoubleClick2: Send a started champion spell timer to in-game chat
+        wheel1: Wheel
+        wheel2: Adjust the time of a started timer
+      enabled:
+        label: Enable Timer Window
+        description: Display an overlay window during the game to show timers. This feature requires the game client to be in windowed or borderless mode.
+      showShortcut:
+        label: Show Shortcut
+        description: Use the shortcut key to show or hide the overlay window
+      timerType:
+        label: Timer Type
+        description: Select the type of timer. The countdown mode will use the preset summoner spell time (has errors), while the count-up mode will start from 0. Note that the custom timers are always in countup mode.
+        options:
+          countdown: Countdown Mode
+          countup: Count-Up Mode
+      reverseAdjustmentDirection:
+        label: Reverse Adjustment Direction
+        description: Reverse the direction of the timer adjustment. When the wheel is moved up, the time decreases, and when the wheel is moved down, the time increases. This only takes effect when the timer type is count-up mode.
+  misc:
+    title: Misc
+    respawnTimer:
+      title: Respawn Timer
+      enabled:
+        label: Enable
+        description: Display an indicator in the side bar showing the remaining time until respawn.
+    streamerMode:
+      title: Streamer Mode
+      streamerMode:
+        label: Hide Sensitive Information
+        description: Hide sensitive information, such as the player's name, in the application interface.
+      useAkariStyledName:
+        label: Use Akari-Styled Name
+        description: Use the Akari-styled names in summoner placeholder.
+      contentProtection:
+        label: Content Protection
+        description: Enable content protection, which will prevent other applications from capturing the window content. Note that this may affect the normal use of some screen recording tools.
+  debug:
+    title: Debug
+    electron:
+      title: Akari's Electron
+      devTools:
+        label: Developer Tools
+        description: Toggle DevTools
+        button: Toggle DevTools
+      reload:
+        label: Reload Page
+        description: Refresh the $t(common:appName) user interface.
+        button: Reload Page
+    files:
+      title: File Directories
+      logs:
+        label: Logs Directory
+        description: Open the logs directory.
+        button: Logs Directory
+      appData:
+        label: Application Data Directory
+        popoverTrigger: Details
+        button: Open Directory
+        description:
+          full: Open the $t(common:appName) application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content. {details}
+          part2: Contains user settings, marked players, and other information.
+          part3: Temporary files for upcoming automatic updates.
+          part4: Configurable setting files.
+          part5: Special configuration files.
+    lcuEvent:
+      label: Print LCU Events to Console
+      printAll: Print All Events
+      logAll: Log All Events Into File
+      addRule: Add Rule
+      empty: No Rules
+      enable: Enable
+      rule: Rule
+      delete: Delete
+      modal:
+        title: Add Rule
+        button: Add
+        placeholder: Enter a matching rule, such as /path/:name/to
+    lcuConnection:
+      titleConnected: LCU
+      titleDisconnected: LCU (Disconnected)
+      port: Port
+      pid: Process ID
+      auth: Auth Key
+      rsoPlatform: Platform
+      region: Region
+    gameflow:
+      title: Gameflow
+      unavailable: Unavailable (Disconnected)
+      Matchmaking: Matchmaking
+      ChampSelect: In Champion Select
+      ReadyCheck: In Ready Check
+      InProgress: Game In Progress
+      EndOfGame: Game End
+      Lobby: Lobby
+      GameStart: Game Start
+      None: None
+      Reconnect: Reconnecting
+      WaitingForStats: Waiting for Stats
+      PreEndOfGame: Before Game End
+      WatchInProgress: Spectating
+      TerminatedInError: Terminated in Error
+    inAdministrator:
+      description: $t(common:appName) is currently running with administrator privileges. Now, it is $t(common:appName) X.
+    testPage:
+      label: Test Page
+      description: Show the "Test" page entry in the sidebar for developers to test various features
+  storage:
+    title: Storage
+    tabs:
+      settings: Settings
+      tagged-players: Tagged Players
+  savedSettings:
+    title: Settings
+    export:
+      label: Export Settings
+      description: Export the current application settings to a JSON file
+      button: Export
+    import:
+      label: Import Settings
+      description: Import settings from a JSON file
+      dialogWarning: Importing settings will overwrite the current settings and restart the application. Continue?
+      dialogPositiveText: Import
+      dialogNegativeText: Cancel
+      button: Import
+    errorCode:
+      InvalidSettingsFile: Invalid settings file
+      InvalidDatabaseVersion: The target version of the settings file is not supported
+      importDefault: 'Failed to import settings: {{reason}}'
+    exported: 'Settings exported: {{path}}'
+    errorExport: 'Failed to export settings: {{reason}}'
+  taggedPlayers:
+    editModal:
+      title: Edit Tagged Player
+      inputPlaceholder: Edit this tag
+    columns:
+      tagger: Tagger
+      tagged: Tagged
+      tag: Tag
+      sgpServer: Server
+    refreshButton: Refresh
+    onlyCurrentAccountCheckbox: Only Current Account
+    na: (Unavailable) {{truncatedPuuid}}...
+    player: 'Player: {{puuid}}'
+    empty: (Empty)
+    naPopoverContent: Unable to retrieve information for this summoner due to the server being unavailable or not loaded
+    saveButton: Save
+    cancelButton: Cancel
+    editButton: Edit
+    deleteButton: Delete
+    importButton: Import
+    exportButton: Export
+    streamerModeWarning: Some sensitive information will be exposed
+    showButton: Show
+    deletePopconfirmContent: Confirm deletion? This operation cannot be undone
+    updated: Updated
+    updateFailed: Update failed {{reason}}
+    errorCode:
+      InvalidTaggedPlayersFile: Invalid file
+      InvalidDatabaseVersion: The target version of the file is not supported
+      importDefault: 'Failed to import tagged players: {{reason}}'
+    exported: 'Exported tagged players: {{path}}'
+    imported: 'Imported tagged players: {{path}}'
+    errorExport: 'Failed to export tagged players: {{reason}}'
+  about:
+    title: About
+    descriptionBefore: ' is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
+    actions:
+      github: GitHub
+    stats:
+      stars: GitHub Stars
+      version: Version
+      license: License
+    copyright: © 2026 Hanxven. This software is open-source and follows the MIT license.
+  shortcutSelector:
+    title: Shortcut Recording
+    hint: Press keys to record the shortcut
+    clear: Clear
+    unset: Unset
+    tooComplicated: This shortcut combination is highly complex, please confirm
+    notRunAsAdministrator: Not running as administrator, cannot use shortcut key
+    nativeGlobalShortcutsWindowsOnly: Native global shortcuts require native addons. This build currently ships them only on Windows.
+    reservedShortcut: This shortcut combination is reserved
+    beingOccupied: This shortcut combination is already in use
+    unchanged: (Unchanged)
+    ok: Confirm
+    cancel: Cancel
+    select: Select

@@ -4,7 +4,7 @@ import { computed } from 'vue'
 
 export function useNativeInputStatus() {
   const appCommonStore = useAppCommonStore()
-  const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.nativeInput' })
+  const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.nativeInput' })
 
   const unavailableReason = computed(() => {
     const nativeInput = appCommonStore.nativeSupport.nativeInput

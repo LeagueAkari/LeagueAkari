@@ -3,20 +3,20 @@
     <div class="mb-2 flex items-center gap-2">
       <div class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><Person20Regular /></NIcon>
-        {{ t('PlayerTab.filter.hasPlayer') }}
+        {{ t('playerTabs.matchHistory.filters.hasPlayer') }}
       </div>
 
       <NButton tertiary size="tiny" type="warning" @click="deleteNode(nodeId)">
         <template #icon>
           <NIcon size="14"><Delete20Regular /></NIcon>
         </template>
-        {{ t('PlayerTab.filter.delete') }}
+        {{ t('playerTabs.matchHistory.filters.delete') }}
       </NButton>
     </div>
 
     <div class="flex items-center gap-2">
       <div class="w-20 shrink-0 text-sm text-black/80 dark:text-white/80">
-        {{ t('PlayerTab.filter.playerPuuid') }}
+        {{ t('playerTabs.matchHistory.filters.playerPuuid') }}
       </div>
 
       <NSelectWithSummonerSearching

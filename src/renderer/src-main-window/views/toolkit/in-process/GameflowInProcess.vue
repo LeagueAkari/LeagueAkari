@@ -1,24 +1,24 @@
 <template>
-  <SettingsSection :title="t('GameflowInProgress.title')">
+  <SettingsSection :title="t('toolkit.gameflowInProgress.title')">
     <SettingsRow
-      :label="t('GameflowInProgress.playAgain.label')"
-      :label-description="t('GameflowInProgress.playAgain.description')"
+      :label="t('toolkit.gameflowInProgress.playAgain.label')"
+      :label-description="t('toolkit.gameflowInProgress.playAgain.description')"
       :label-width="260"
     >
       <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small">{{
-        t('GameflowInProgress.playAgain.button')
+        t('toolkit.gameflowInProgress.playAgain.button')
       }}</NButton>
     </SettingsRow>
     <SettingsRow
-      :label="t('GameflowInProgress.leaveLobby.label')"
-      :label-description="t('GameflowInProgress.leaveLobby.description')"
+      :label="t('toolkit.gameflowInProgress.leaveLobby.label')"
+      :label-description="t('toolkit.gameflowInProgress.leaveLobby.description')"
       :label-width="260"
     >
       <NButton
         :disabled="lcs.gameflow.phase !== 'Lobby'"
         @click="() => lc.api.lobby.deleteLobby()"
         size="small"
-        >{{ t('GameflowInProgress.leaveLobby.button') }}</NButton
+        >{{ t('toolkit.gameflowInProgress.leaveLobby.button') }}</NButton
       >
     </SettingsRow>
   </SettingsSection>
@@ -54,9 +54,9 @@ const handlePlayAgain = async () => {
     await lc.api.lobby.playAgain()
   } catch (error) {
     notification.warning({
-      title: () => t('GameflowInProgress.playAgain.failedNotification.title'),
+      title: () => t('toolkit.gameflowInProgress.playAgain.failedNotification.title'),
       content: () =>
-        t('GameflowInProgress.playAgain.failedNotification.description', {
+        t('toolkit.gameflowInProgress.playAgain.failedNotification.description', {
           reason: (error as Error).message
         })
     })

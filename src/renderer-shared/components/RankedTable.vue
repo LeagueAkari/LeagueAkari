@@ -6,28 +6,28 @@
       <thead class="bg-black/4 dark:bg-white/6">
         <tr>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.queueType') }}
+            {{ t('ranked.table.queueType') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.tier') }}
+            {{ t('ranked.table.tier') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.leaguePoints') }}
+            {{ t('ranked.table.leaguePoints') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.wins') }}
+            {{ t('ranked.table.wins') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.losses') }}
+            {{ t('ranked.table.losses') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.previousSeasonEndTier') }}
+            {{ t('ranked.table.previousSeasonEndTier') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.previousSeasonHighestTier') }}
+            {{ t('ranked.table.previousSeasonHighestTier') }}
           </th>
           <th class="ranked-table-header-cell">
-            {{ t('RankedTable.highestTier') }}
+            {{ t('ranked.table.highestTier') }}
           </th>
         </tr>
       </thead>

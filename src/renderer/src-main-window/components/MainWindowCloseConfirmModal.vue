@@ -7,26 +7,26 @@
     :z-index="10000000"
   >
     <template #header>
-      <span class="close-confirmation-header">{{ t('MainWindowCloseConfirmModal.title') }}</span>
+      <span class="close-confirmation-header">{{ t('window.closeConfirm.title') }}</span>
     </template>
     <NRadioGroup v-model:value="closeStrategy" size="small">
       <div class="flex flex-col">
         <NRadio value="minimize-to-tray">{{
-          t('MainWindowCloseConfirmModal.options.minimize-to-tray')
+          t('window.closeConfirm.options.minimize-to-tray')
         }}</NRadio>
-        <NRadio value="quit">{{ t('MainWindowCloseConfirmModal.options.quit') }}</NRadio>
+        <NRadio value="quit">{{ t('window.closeConfirm.options.quit') }}</NRadio>
       </div>
     </NRadioGroup>
     <div class="mt-3 flex items-center justify-between">
       <NCheckbox v-model:checked="isRememberCloseStrategy" class="mr-auto" size="small">
-        {{ t('MainWindowCloseConfirmModal.remember') }}
+        {{ t('window.closeConfirm.remember') }}
       </NCheckbox>
       <div class="flex gap-1">
         <NButton style="font-size: 13px" size="small" @click="isCloseConfirmationModelShow = false">
-          {{ t('MainWindowCloseConfirmModal.cancel') }}
+          {{ t('window.closeConfirm.cancel') }}
         </NButton>
         <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">
-          {{ t('MainWindowCloseConfirmModal.ok') }}
+          {{ t('window.closeConfirm.ok') }}
         </NButton>
       </div>
     </div>

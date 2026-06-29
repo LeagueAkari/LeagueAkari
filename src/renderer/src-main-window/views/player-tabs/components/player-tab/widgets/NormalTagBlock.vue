@@ -4,9 +4,9 @@
     v-if="summoner?.privacy === 'PRIVATE'"
     class="rounded bg-red-800 px-4 py-2 text-white dark:bg-red-800/20"
   >
-    <div class="mb-2 text-base font-bold">{{ t('PlayerTab.private.title') }}</div>
+    <div class="mb-2 text-base font-bold">{{ t('playerTabs.profilePrivacy.title') }}</div>
     <div class="text-[13px]">
-      {{ t('PlayerTab.private.content') }}
+      {{ t('playerTabs.profilePrivacy.content') }}
     </div>
   </div>
 
@@ -17,7 +17,9 @@
     class="rounded bg-blue-800/90 px-4 py-2 dark:bg-blue-800/30"
   >
     <div class="mb-2 flex items-center text-base">
-      <span class="font-bold text-white dark:text-white">{{ t('PlayerTab.tagged.title') }}</span>
+      <span class="font-bold text-white dark:text-white">{{
+        t('playerTabs.taggedStatus.title')
+      }}</span>
       <div
         v-if="!tagInfo.markedBySelf"
         class="ml-2 cursor-pointer"
@@ -59,7 +61,7 @@
             <DeleteIcon />
           </NIcon>
         </template>
-        {{ t('PlayerTab.tagged.deletePopconfirm') }}
+        {{ t('playerTabs.taggedStatus.deletePopconfirm') }}
       </NPopconfirm>
     </div>
     <NScrollbar class="max-h-25">
@@ -114,10 +116,10 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
   const success = await removeTag(puuid, selfPuuid)
 
   if (success) {
-    message.success(() => t('PlayerTab.operationSuccessTitle'))
+    message.success(() => t('playerTabs.profile.operationSuccessTitle'))
     await loadTags()
   } else {
-    message.warning(() => t('PlayerTab.failedToLoadTitle'))
+    message.warning(() => t('playerTabs.profile.failedToLoadTitle'))
   }
 }
 

@@ -5,7 +5,7 @@
         class="absolute right-5 bottom-5 flex cursor-pointer items-center gap-1 rounded-full bg-blue-400 py-1 pr-2 pl-1 text-white transition-opacity hover:opacity-20 dark:bg-neutral-600"
       >
         <ChampionIcon class="size-6" :champion-id="-1" ring :ring-color="triggerRingColor" round />
-        <div class="text-sm">{{ $t('OpggView.sessionChampions.title') }}</div>
+        <div class="text-sm">{{ $t('opgg.view.sessionChampions.title') }}</div>
       </div>
     </template>
     <div

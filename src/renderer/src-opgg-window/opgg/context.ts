@@ -228,7 +228,7 @@ export function provideOpgg() {
       )
 
       if (!nextVersion) {
-        message.warning(() => t('OpggView.noVersionFound'))
+        message.warning(() => t('opgg.view.noVersionFound'))
         return
       }
 

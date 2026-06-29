@@ -3,11 +3,11 @@
     <div class="mb-2 flex items-center gap-2">
       <div v-if="node.type === 'anyone'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><PeopleTeam20Regular /></NIcon>
-        {{ t('PlayerTab.filter.anyone') }}
+        {{ t('playerTabs.matchHistory.filters.anyone') }}
       </div>
       <div v-else-if="node.type === 'everyone'" class="flex items-center gap-1.5 text-sm font-bold">
         <NIcon size="16"><People20Regular /></NIcon>
-        {{ t('PlayerTab.filter.everyone') }}
+        {{ t('playerTabs.matchHistory.filters.everyone') }}
       </div>
 
       <div class="flex gap-1">
@@ -22,7 +22,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.selectCondition') }}
+            {{ t('playerTabs.matchHistory.filters.selectCondition') }}
           </NButton>
         </NDropdown>
 
@@ -30,7 +30,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.delete') }}
+          {{ t('playerTabs.matchHistory.filters.delete') }}
         </NButton>
       </div>
     </div>
@@ -45,7 +45,7 @@
           <template #icon>
             <NIcon size="14"><Add20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.selectCondition') }}
+          {{ t('playerTabs.matchHistory.filters.selectCondition') }}
         </NButton>
       </NDropdown>
     </div>

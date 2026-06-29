@@ -5,9 +5,9 @@
   >
     <!-- title line (title + expand) -->
     <div class="mb-2 flex items-center justify-between text-[13px] font-bold">
-      {{ t('OpggChampion.spells') }}
+      {{ t('opgg.champion.spells') }}
       <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">
-        {{ t('OpggChampion.showAll') }}
+        {{ t('opgg.champion.showAll') }}
       </NCheckbox>
     </div>
 
@@ -27,15 +27,15 @@
         <div class="pick flex min-w-19 flex-col items-center">
           <span
             class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
-            :title="t('OpggChampion.pickRate')"
+            :title="t('opgg.champion.pickRate')"
             >{{ (s.pick_rate * 100).toFixed(2) }}%</span
           >
           <span
             class="pick-play text-center text-xs text-[#666666] dark:text-[#bebebe]"
-            :title="t('OpggChampion.plays')"
+            :title="t('opgg.champion.plays')"
           >
             {{
-              t('OpggChampion.times', {
+              t('opgg.champion.times', {
                 times: s.play.toLocaleString()
               })
             }}</span
@@ -43,7 +43,7 @@
         </div>
         <div
           class="win-rate min-w-19 text-center text-xs font-bold text-[#2563eb] dark:text-[#a0c6f8]"
-          :title="t('OpggChampion.winRate')"
+          :title="t('opgg.champion.winRate')"
         >
           {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
         </div>
@@ -55,7 +55,7 @@
             secondary
             :disabled="lcs.gameflow.phase !== 'ChampSelect'"
           >
-            {{ t('OpggChampion.apply') }}
+            {{ t('opgg.champion.apply') }}
           </NButton>
         </div>
       </div>

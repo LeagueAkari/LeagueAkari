@@ -1,0 +1,521 @@
+settings:
+  modal:
+    title: 设置
+  app:
+    title: 应用
+    basic:
+      title: 基础
+      mainWindowCloseAction:
+        label: 主窗口关闭策略
+        description: 当关闭主窗口时所执行的行为
+        options:
+          minimize-to-tray: 最小化到托盘
+          quit: 退出应用
+          ask: 每次询问
+      preferredLolSource:
+        label: 首选数据源
+        description: 选择英雄联盟 API 数据源
+        unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
+        howToChoose: 如何选择？
+        options:
+          sgp: SGP API
+          lcu: LCU API
+        tip:
+          sgp:
+            title: SGP API
+            feature1: 查询速度快，响应迅速
+            feature2: 提供更详细的对局数据
+            feature3: 支持大陆服务器跨大区查询战绩
+            warning: 在中国大陆使用加速器游玩外服时，可能无法连接或响应缓慢
+          lcu:
+            title: LCU API (客户端本地)
+            feature1: 稳定性高，不受网络环境影响
+            feature2: 使用加速器时依然可靠
+            warning: 已知问题：在英雄选择阶段查询战绩可能导致游戏客户端崩溃
+      dataSource:
+        label: Git 仓库源
+        description: 设置应用的 Git 仓库源，通过 GitHub / Gitee 获取或更新数据
+        options:
+          gitee: Gitee
+          github: GitHub
+        howToChoose: 如何选择？
+        testingSpeed: 测速中...
+        timeout: 超时
+        testButton: 重新测速
+        tip:
+          gitee: 在中国大陆内拥有较好的响应速度
+          github: 在中国大陆外拥有较好的响应速度
+        better: 更快
+      theme:
+        label: 主题颜色
+        description: $t(common:appName) 的主题颜色
+        groups:
+          system: 系统
+          brightBuiltin: 亮色
+          darkBuiltin: 暗色
+        tone:
+          light: 亮
+          dark: 暗
+        options:
+          default: 跟随系统
+          light: 亮色
+          dark: 暗色
+          graphite: 石墨青蓝
+          cyber: 赛博荧光
+          sakura: 樱花粉
+          mint: 薄荷绿
+          aurora: 极光紫
+          butter: 奶油黄
+    selfUpdate:
+      title: 应用更新
+      updateLatestRelease:
+        label: 自动检查更新
+        description: 周期性检查是否有新版本
+      autoDownloadUpdates:
+        label: 自动下载更新
+        description: 检测到有新版本可用时，自动开始更新流程
+      checkFrom: 从数据源中 ({{ source }}) 检查更新
+      checkUpdates: 检查更新
+      currentRelease: 当前版本内容
+      downloadRelease: 下载更新包
+      newRelease: 新版本内容
+      lastCheckAt: 上次检查
+      cancelUpdate: 取消更新
+      updateProgress:
+        label: 更新流程
+        description: 正在进行的更新流程
+        downloading: 下载更新包
+        finished: 已完成 {{progress}}%
+        remain: 剩余 {{time}}
+        downloadFailed: 下载出错
+        waitingForRestart: 等待重新启动
+        waitingForRestartDescription: 关闭应用后将进行自动更新流程
+      checkUpdatesResult:
+        no-updates: 当前没有可用更新
+        new-updates: 发现新版本
+        failed: 检查更新失败 {{reason}}
+      updateDir:
+        label: 更新目录
+        description: 当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新
+        open: 打开
+    mainWindowUi:
+      title: 主界面
+      background:
+        label: 背景
+        description: 设置主界面的背景显示方式
+        options:
+          profileSkin: 英雄背景
+          none: 无
+          mica: Mica
+        tooltips:
+          profileSkin: 使用当前玩家的生涯背景皮肤作为主界面背景
+          mica: 仅 Windows 高版本系统可用。如果当前平台不可用，会回退到“无”
+          micaUnsupported: 当前平台不支持 Mica，会回退到“无”
+      useProfileSkinAsBackground:
+        label: 使用生涯皮肤背景
+        description: $t(common:appName) 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
+      backgroundMaterial:
+        label: 背景材质
+        description: 设置应用界面的背景材质，需特定系统版本支持
+        options:
+          none: 无
+          mica: Mica
+          micaUnsupported: Mica (不支持)
+    lcConnection:
+      title: LCU 连接
+      autoConnect:
+        label: 自动连接
+        description: 存在唯一的客户端时，则自动连接该客户端
+      useWmi:
+        label: 使用 WMI 查询命令行
+        description: 使用 WMI 获取客户端命令行信息，而不是默认的 Win32 API 方式。使用 WMI 方式需要管理员权限
+      rebuildWmi:
+        label: 重建 WMI
+        description: 如果 WMI 无法正常使用，可尝试此修复选项
+        rebuildButton: 重建 WMI
+    misc:
+      title: 其他
+      logLevel:
+        label: 日志级别
+        description: 设置应用的日志级别
+      disableHardwareAcceleration:
+        label: 禁用硬件加速
+        description: 禁用硬件加速，可能会解决一些渲染问题，如字体模糊
+      disableHardwareAccelerationDialog:
+        enableText: 启用硬件加速
+        disableText: 禁用硬件加速
+        disableConfirmation: 是否确认禁用硬件加速？将重启应用以应用更改
+        enableConfirmation: 将启用硬件加速，重启应用以应用更改
+        positiveText: 重启应用并退出
+        negativeText: 取消
+      httpProxy:
+        strategy:
+          label: HTTP 代理
+          description: 设置 HTTP 代理，除 LCU HTTP 之外的所有网络请求都将通过该代理
+          options:
+            force: 使用代理
+            auto: 跟随系统
+            disable: 不使用代理
+        host:
+          label: 代理主机
+          description: 代理服务器的主机地址
+        port:
+          label: 代理端口
+          description: 代理服务器的端口
+      uninstallApp:
+        label: 卸载应用
+        description: 卸载应用，将删除所有数据和配置
+        button: 卸载应用
+        title: 卸载应用
+        content: 确定要卸载 $t(common:appName) 吗？将同时移除所有应用数据。
+        positiveText: 卸载
+        negativeText: 取消
+  matchHistory:
+    title: 战绩页面
+    refreshTabsAfterGameEnds:
+      label: 更新页面战绩
+      description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
+    loadCount:
+      label: 加载数量
+      description: 每个战绩页面加载的战绩数量
+    showJunglePathing:
+      label: 启用打野偏好
+      description: 在战绩页面展示打野偏好入口与分析卡片
+  ongoingGame:
+    title: 对局
+    titleCommon: 对局
+    titlePlayerCard: 玩家卡片
+    enabled:
+      label: 启用
+      description: 在进入英雄选择中或对局时，将展示房间内或对局内的所有玩家信息
+    autoRouteWhenGameStarts:
+      label: 自动切换到对局页面
+      description: 在进入英雄选择阶段或对局开始时，自动切换到对局页面。在房间阶段时除外
+    matchHistoryLoadCount:
+      label: 对局战绩分析数量
+      description: 在对局页面中，用于展示每名玩家的战绩拉取对局数量
+    concurrency:
+      label: 并发请求数量
+      description: 在对局页面中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数
+    matchHistoryTagPreference:
+      label: 队列筛选偏好
+      description: 使用 SGP API 时，加载战绩时的队列筛选偏好
+      options:
+        all: 所有模式
+        current: 当前模式
+    queryInLobbyPhase:
+      label: 在房间阶段生效
+      description: 除了在英雄选择阶段和游戏进行中阶段之外，当位于房间阶段时，也查询房间内所有玩家的数据
+    premadeTeamInferMatchCountThreshold:
+      label: 预组队推测对局数阈值
+      description: $t(common:appName) 同时会收集战绩数据，用于推测玩家是否为预组队（开黑）。该数值用于确定：多名玩家在同一队伍中累计出现多少场对局，才会被判定为预组队
+    gameDetailsLoadCount:
+      label: 对局详情加载数量
+      description: 会额外加载前 {{count}} 场对局的详细信息，用于分析战绩
+    jungleAnalysisMatchHistoryLoadCount:
+      label: 打野分析拉取战绩数量
+      description: 打野分析在样本不足时会继续拉取战绩，最多到前 {{count}} 场；其中同英雄需要 20 场、总体需要 50 场
+    showRecentlyUsedChampions:
+      label: 显示最近使用的英雄
+      description: 在玩家卡片上展示最近使用的英雄
+    showChampionUsage:
+      label: 显示英雄使用情况
+      description: 在玩家卡片上展示英雄的使用情况
+      options:
+        none: 不显示
+        recent: 最近使用的英雄
+        mastery: 成就点数最高的英雄
+    showJunglePathing:
+      label: 启用打野偏好
+      description: 在对局玩家卡片中展示打野偏好分析
+    showMatchHistoryItemBorder:
+      label: 战绩项显示边框
+      description: 玩家卡片的战绩条目是否显示边框
+    playerCardTags:
+      label: 玩家卡片标签
+      description: 这些标签将被展示在玩家卡片上
+      tags:
+        showPremadeTeamTag:
+          label: 预组队文本
+        showWinningStreakTag:
+          label: 连胜场次
+        showLosingStreakTag:
+          label: 连败场次
+        showSoloKillsTag:
+          label: 场均单杀次数
+        showSoloDeathsTag:
+          label: 场均被单杀次数
+        showAverageTeamDamageTag:
+          label: 场均队伍伤害
+        showAverageTeamDamageTakenTag:
+          label: 场均队伍承伤
+        showSuspiciousFlashPositionTag:
+          label: 闪现异常位置检测
+        showAverageTeamGoldTag:
+          label: 场均队伍经济
+        showGreatPerformanceTag:
+          label: 优异标记
+        showMetTag:
+          label: 遇到过的玩家
+        showTaggedTag:
+          label: 已标记的玩家
+        showSelfTag:
+          label: 自己标记
+        showWinRateTeamTag:
+          label: 超高胜率标记
+        showAverageDamageGoldEfficiencyTag:
+          label: 伤害经济效率
+        showPrivacyTag:
+          label: 生涯隐藏标记
+        showAverageEnemyMissingPingsTag:
+          label: 场均敌方消失信号数
+        showAverageVisionScoreTag:
+          label: 场均视野得分
+        showAkariScoreTag:
+          label: Akari Score
+        showAverageKillDamageEfficiencyTag:
+          label: 场均击杀伤害效率
+  multiWindow:
+    title: 窗口管理
+    auxWindow:
+      title: 小窗口
+      enabled:
+        label: 启用小窗口
+        description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
+        descriptionWithIcon: 可通过标题栏右侧的快捷图标 ({icon})，或托盘区右键菜单中的 "小窗口" 打开小窗口
+      autoShow:
+        label: 自动弹出和关闭
+        description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
+      opacity:
+        label: 小窗口不透明度
+        description: 小窗口的半透明状态
+      showSkinSelector:
+        label: 皮肤设置器
+        description: 在小窗口展示一个设置皮肤的快捷入口
+      resetWindowPosition:
+        label: 重置小窗口位置
+        description: 重新设置小窗口的位置，还原到默认主屏幕正中心
+        button: 重置
+    opggWindow:
+      title: OP.GG 窗口
+      enabled:
+        label: 启用 OP.GG 特性
+        description: 启用 OP.GG 相关功能
+        descriptionWithIcon: 可通过标题栏右侧的快捷图标 ({icon})，或托盘区右键菜单中的 "OP.GG 窗口" 打开 OP.GG 窗口
+      autoShow:
+        label: 自动弹出和关闭
+        description: 在游戏流程的部分阶段，自动弹出或关闭 OP.GG 窗口
+      opacity:
+        label: OP.GG 窗口不透明度
+        description: OP.GG 窗口的半透明状态
+      resetWindowPosition:
+        label: 重置 OP.GG 窗口位置
+        description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
+        button: 重置
+      showShortcut:
+        label: 显示快捷键
+        description: 使用快捷键以显示或关闭 OP.GG 窗口。当游戏位于前台时，将自动转为置顶状态。请确保开启了游戏的无边框或窗口模式，以便此窗口正常显示
+    ongoingGameWindow:
+      title: 对局叠加窗口
+      titleRequireAdmin: 对局叠加窗口 (管理员权限)
+      enabled:
+        label: 启用对局窗口
+        description: 在游戏中时，通过叠加窗口展示对局信息。若无法正常显示，需启用游戏的无边框或窗口模式
+      showShortcut:
+        label: 显示快捷键
+        description: 在游戏中，长按快捷键以展示叠加对局窗口
+    cdTimerWindow:
+      title: 计时器叠加窗口
+      titleRequireAdmin: 计时器叠加窗口 (管理员权限)
+      description:
+        lineA: 敌方召唤师技能计时仅在支持的模式中可用
+        leftClick1: 左键
+        leftClick2: 开始或关闭计时器
+        rightDoubleClick1: 右键双击
+        rightDoubleClick2: 已开始的英雄技能计时器会模拟输入到聊天框
+        wheel1: 滑轮
+        wheel2: 调整已开始计时器的时间
+      enabled:
+        label: 启用计时器窗口
+        description: 在游戏中时，通过叠加窗口提供便捷计时器。若无法正常显示，需启用游戏的无边框或窗口模式
+      showShortcut:
+        label: 显示快捷键
+        description: 在游戏中，使用快捷键以打开或关闭计时器窗口
+      timerType:
+        label: 计时器类型
+        description: 选择计时器的类型。倒计时模式将使用预设的技能时间 (存在误差)，计时模式则从 0 开始。自定义计时器则固定为计时模式
+        options:
+          countdown: 倒计时模式
+          countup: 计时模式
+      reverseAdjustmentDirection:
+        label: 反转时间调整方向
+        description: 调整计时器时间时，反转方向。滑轮上移减少，下移增加
+  misc:
+    title: 其他
+    respawnTimer:
+      title: 重生倒计时
+      enabled:
+        label: 启用
+        description: 在侧边栏展示一个距离重生剩余时间的指示器
+    streamerMode:
+      title: 直播模式
+      streamerMode:
+        label: 隐藏敏感信息
+        description: 隐藏所有敏感信息 (玩家 ID，区服等)
+      useAkariStyledName:
+        label: 使用 Akari 风格的名字
+        description: 使用 Akari 风格的占位名字
+      contentProtection:
+        label: 内容保护
+        description: 启用内容保护，将禁止其他应用捕获窗口内容。注意，这可能会影响一些屏幕录制工具的正常使用
+  debug:
+    title: 调试
+    electron:
+      title: Akari's Electron
+      devTools:
+        label: 开发者工具
+        description: Toggle DevTools
+        button: Toggle DevTools
+      reload:
+        label: 页面重载
+        description: 刷新 $t(common:appName) 用户界面
+        button: 重新加载页面
+    files:
+      title: 文件目录
+      logs:
+        label: 日志目录
+        description: 打开日志目录
+        button: 日志目录
+      appData:
+        label: 应用数据目录
+        popoverTrigger: 详情
+        button: 应用目录
+        description:
+          full: 打开 $t(common:appName) 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容 {details}
+          part2: 存储用户设置、已标记的玩家等信息
+          part3: 即将进行的自动更新临时文件
+          part4: 一些可以替换的设置项文件
+          part5: 特殊配置文件
+    lcuEvent:
+      label: 在控制台打印 LCU 事件
+      printAll: 打印全部事件
+      logAll: 写入到日志文件中
+      addRule: 添加规则
+      empty: 无规则
+      enable: 启用
+      rule: 规则
+      delete: 删除
+      modal:
+        title: 添加
+        button: 添加
+        placeholder: 输入匹配规则，如 /path/:name/to
+    lcuConnection:
+      titleConnected: LCU
+      titleDisconnected: LCU (未连接)
+      port: 端口
+      pid: 进程 ID
+      auth: 密钥
+      rsoPlatform: 区服
+      region: 地区
+    gameflow:
+      title: 游戏流
+      unavailable: 不可用 (未连接)
+      Matchmaking: 正在匹配
+      ChampSelect: 英雄选择中
+      ReadyCheck: 等待接受状态中
+      InProgress: 游戏进行中
+      EndOfGame: 游戏结算
+      Lobby: 房间
+      GameStart: 游戏开始
+      None: 无
+      Reconnect: 重新连接
+      WaitingForStats: 等待结果
+      PreEndOfGame: 结束游戏之前
+      WatchInProgress: 在观战中
+      TerminatedInError: 错误终止
+    inAdministrator:
+      description: $t(common:appName) 目前以管理员权限运行。现在，它是 $t(common:appName) X
+    testPage:
+      label: 测试页面
+      description: 在侧边栏中显示测试页面入口，用于测试各种功能
+  storage:
+    title: 存储
+    tabs:
+      settings: 设置项
+      tagged-players: 标记的玩家
+  savedSettings:
+    title: 设置项
+    export:
+      label: 导出设置项
+      description: 将应用目前的设置项导出为 JSON 文件
+      button: 导出
+    import:
+      label: 导入设置项
+      description: 从 JSON 文件导入设置项
+      dialogWarning: 导入设置项将会覆盖当前已有的设置项，并重启应用。是否继续？
+      dialogPositiveText: 导入
+      dialogNegativeText: 取消
+      button: 导入
+    errorCode:
+      InvalidSettingsFile: 无效的设置文件
+      InvalidDatabaseVersion: 目标版本的设置文件不受支持
+      importDefault: 无法导入设置项：{{reason}}
+    exported: 已导出设置项：{{path}}
+    errorExport: 导出设置项失败：{{reason}}
+  taggedPlayers:
+    editModal:
+      title: 编辑标记玩家
+      inputPlaceholder: 编辑此标记
+    columns:
+      tagger: 标记者
+      tagged: 被标记者
+      tag: 标记
+      sgpServer: 区服
+    refreshButton: 刷新
+    onlyCurrentAccountCheckbox: 仅当前账户
+    na: (不可用) {{truncatedPuuid}}...
+    player: '玩家: {{puuid}}'
+    empty: (空)
+    naPopoverContent: 由于未加载或未位于可加载服务器，无法获取该召唤师的信息
+    saveButton: 保存
+    cancelButton: 取消
+    editButton: 编辑
+    deleteButton: 删除
+    importButton: 导入
+    exportButton: 导出
+    streamerModeWarning: 当前位于直播模式，将暴露敏感信息
+    showButton: 显示
+    deletePopconfirmContent: 确认删除？此操作无法恢复
+    updated: 已更新
+    updateFailed: 更新失败 {{reason}}
+    errorCode:
+      InvalidTaggedPlayersFile: 无效的文件
+      InvalidDatabaseVersion: 目标版本的文件不受支持
+      importDefault: 无法导入标记的玩家：{{reason}}
+    exported: 已导出被标记的玩家：{{path}}
+    imported: 已导入被标记的玩家：{{path}}
+    errorExport: 导出被标记玩家失败：{{reason}}
+  about:
+    title: 关于
+    descriptionBefore: ' 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
+    actions:
+      github: GitHub
+    stats:
+      stars: GitHub Stars
+      version: Version
+      license: License
+    copyright: © 2026 Hanxven. 本软件为开源软件，遵循 MIT 许可证。
+  shortcutSelector:
+    title: 快捷键设定
+    hint: 按下按键以记录快捷键
+    clear: 清除
+    unset: 未设置
+    reservedShortcut: 此快捷键不可用
+    beingOccupied: 此快捷键被占用
+    unchanged: (未变化)
+    tooComplicated: 该快捷键组合具有较高复杂度，请确认
+    notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
+    nativeGlobalShortcutsWindowsOnly: 原生全局快捷键需要原生插件。本构建目前仅在 Windows 提供。
+    ok: 确认
+    cancel: 取消
+    select: 选择

@@ -19,26 +19,26 @@
           :disabled="countdown > 0"
         >
           <template v-if="countdown > 0">
-            <i18next :translation="`${t('DeclarationModal.ok')} (${countdown})`">
+            <i18next :translation="`${t('legal.declaration.ok')} (${countdown})`">
               <template #isFree>
                 <span class="font-bold text-amber-200 dark:text-red-800">{{
-                  t('DeclarationModal.isFree')
+                  t('legal.declaration.isFree')
                 }}</span>
               </template>
             </i18next>
           </template>
           <template v-else>
-            <i18next :translation="$t('DeclarationModal.ok')">
+            <i18next :translation="$t('legal.declaration.ok')">
               <template #isFree>
                 <span class="font-bold text-amber-200 dark:text-red-800">{{
-                  t('DeclarationModal.isFree')
+                  t('legal.declaration.isFree')
                 }}</span>
               </template>
             </i18next>
           </template>
         </NButton>
         <NButton @click="() => emits('exit')" size="small">
-          {{ t('DeclarationModal.quit') }}
+          {{ t('legal.declaration.quit') }}
         </NButton>
       </NFlex>
     </template>
@@ -70,7 +70,7 @@ const emits = defineEmits<{
 }>()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(t('DeclarationModal.newContent'))
+  return markdownIt.render(t('legal.declaration.newContent'))
 })
 
 const show = defineModel<boolean>('show', { default: false })

@@ -29,7 +29,7 @@ const { items = [], title = '' } = defineProps<{
 const translatedTitle = computed(() => {
   // "Placeholder Name for Reward Group DO NOT TRANSLATE"
   if (title.includes('DO NOT TRANSLATE')) {
-    return t('ClaimableItem.untranslatedC', {
+    return t('toolkit.claim.item.untranslatedC', {
       count: items.length
     })
   }

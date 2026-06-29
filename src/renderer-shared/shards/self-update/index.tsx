@@ -51,13 +51,13 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
 
         if (!taskStore.hasTask(taskId)) {
           taskStore.createTask(taskId, {
-            name: () => t('self-update-renderer.self-update-task.name'),
+            name: () => t('selfUpdate.tasks.self-update-task.name'),
             description: '',
             createAt: Date.now(),
             progress: 0,
             actions: [
               {
-                label: () => t('self-update-renderer.self-update-task.cancelButton'),
+                label: () => t('selfUpdate.tasks.self-update-task.cancelButton'),
                 callback: () => {
                   this.cancelUpdate()
                 },
@@ -72,7 +72,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
             taskStore.updateTask(taskId, {
               progress: info.downloadingProgress,
               description: () =>
-                t('self-update-renderer.self-update-task.downloading', {
+                t('selfUpdate.tasks.self-update-task.downloading', {
                   progress: (info.downloadingProgress * 100).toFixed(2),
                   eta: formatSeconds(info.downloadTimeLeft),
                   avgSpeed: formatBytes(info.averageDownloadSpeed)
@@ -83,24 +83,24 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
             taskStore.updateTask(taskId, {
               progress: null,
               status: 'error',
-              description: () => t('self-update-renderer.self-update-task.download-failed')
+              description: () => t('selfUpdate.tasks.self-update-task.download-failed')
             })
             break
           case 'waiting-for-restart':
             taskStore.updateTask(taskId, {
               progress: 1,
               status: 'success',
-              description: () => t('self-update-renderer.self-update-task.waiting-for-restart'),
+              description: () => t('selfUpdate.tasks.self-update-task.waiting-for-restart'),
               actions: [
                 {
-                  label: () => t('self-update-renderer.self-update-task.cancelButton'),
+                  label: () => t('selfUpdate.tasks.self-update-task.cancelButton'),
                   callback: () => {
                     this.cancelUpdate()
                   },
                   buttonProps: { type: 'warning' }
                 },
                 {
-                  label: () => t('self-update-renderer.self-update-task.closeButton'),
+                  label: () => t('selfUpdate.tasks.self-update-task.closeButton'),
                   callback: () => {
                     windowManager.mainWindow.closeForce()
                   },
@@ -124,9 +124,9 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
       if (selfUpdateStore.lastUpdateResult) {
         if (selfUpdateStore.lastUpdateResult.success) {
           notification.success({
-            title: () => t('self-update-renderer.title'),
+            title: () => t('selfUpdate.tasks.title'),
             content: () =>
-              t('self-update-renderer.lastUpdateSuccess', {
+              t('selfUpdate.tasks.lastUpdateSuccess', {
                 version: appCommonStore.version
               }),
             duration: 4000,
@@ -134,8 +134,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
           })
         } else {
           notification.warning({
-            title: () => t('self-update-renderer.title'),
-            content: () => <div>{t('self-update-renderer.lastUpdateFailed')}</div>,
+            title: () => t('selfUpdate.tasks.title'),
+            content: () => <div>{t('selfUpdate.tasks.lastUpdateFailed')}</div>,
             duration: 1e10,
             closable: true
           })

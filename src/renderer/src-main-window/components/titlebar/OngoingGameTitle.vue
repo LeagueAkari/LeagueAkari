@@ -39,10 +39,10 @@
               <template #icon>
                 <NIcon><CloseRoundIcon /></NIcon>
               </template>
-              {{ t('OngoingGameTitle.exitDraft') }}
+              {{ t('ongoingGame.titlebar.exitDraft') }}
             </NButton>
           </template>
-          {{ t('OngoingGameTitle.exitDraft') }}
+          {{ t('ongoingGame.titlebar.exitDraft') }}
         </NTooltip>
 
         <NTooltip :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
@@ -53,7 +53,7 @@
               </template>
             </NButton>
           </template>
-          {{ t('OngoingGameTitle.refresh') }}
+          {{ t('ongoingGame.titlebar.refresh') }}
         </NTooltip>
 
         <NPopover trigger="click" placement="bottom-end" :z-index="TITLEBAR_TOOLTIP_Z_INDEX" raw>
@@ -68,7 +68,7 @@
           <div class="title-settings-panel">
             <SettingsSection no-bg>
               <SettingsRow
-                :label="t('OngoingGameTitle.settings.orderPlayerBy.label')"
+                :label="t('ongoingGame.titlebar.settings.orderPlayerBy.label')"
                 :label-width="200"
               >
                 <NSelect
@@ -82,9 +82,9 @@
               </SettingsRow>
 
               <SettingsRow
-                :label="t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.label')"
+                :label="t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.label')"
                 :label-description="
-                  t('OngoingGameTitle.settings.showJunglePathingForAllPlayers.description')
+                  t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.description')
                 "
                 :label-width="200"
               >
@@ -98,7 +98,7 @@
 
             <div class="title-settings-actions">
               <NButton size="small" secondary type="primary" @click="handleOpenOngoingGameSettings">
-                {{ t('OngoingGameTitle.settings.openOngoingGameSettings') }}
+                {{ t('ongoingGame.titlebar.settings.openOngoingGameSettings') }}
               </NButton>
             </div>
           </div>
@@ -156,27 +156,27 @@ const isCsSpectateWait = computed(() => {
 const orderOptions = computed(() => {
   return [
     {
-      label: t('OngoingGameTitle.orderOptions.default'),
+      label: t('ongoingGame.titlebar.orderOptions.default'),
       value: 'default'
     },
     {
-      label: t('OngoingGameTitle.orderOptions.position'),
+      label: t('ongoingGame.titlebar.orderOptions.position'),
       value: 'position'
     },
     {
-      label: t('OngoingGameTitle.orderOptions.premade-team'),
+      label: t('ongoingGame.titlebar.orderOptions.premade-team'),
       value: 'premade-team'
     },
     {
-      label: t('OngoingGameTitle.orderOptions.win-rate'),
+      label: t('ongoingGame.titlebar.orderOptions.win-rate'),
       value: 'win-rate'
     },
     {
-      label: t('OngoingGameTitle.orderOptions.kda'),
+      label: t('ongoingGame.titlebar.orderOptions.kda'),
       value: 'kda'
     },
     {
-      label: t('OngoingGameTitle.orderOptions.akari-score'),
+      label: t('ongoingGame.titlebar.orderOptions.akari-score'),
       value: 'akari-score'
     }
   ]
@@ -204,7 +204,7 @@ const teamNameMap = computed(() => ({
   'TEAM-100': t('teams.TEAM-100', { ns: 'common' }),
   'TEAM-200': t('teams.TEAM-200', { ns: 'common' }),
   'TEAM-ALL': t('teams.TEAM-ALL', { ns: 'common' }),
-  spectating: t('OngoingGameTitle.spectating')
+  spectating: t('ongoingGame.titlebar.spectating')
 }))
 
 type TitleItem = {
@@ -264,7 +264,7 @@ const liveTitleItems = computed<TitleItem[]>(() => {
 })
 
 const draftTitleItems = computed<TitleItem[]>(() => {
-  const items = [createTitleItem('draft', t('OngoingGameTitle.draftMode'))]
+  const items = [createTitleItem('draft', t('ongoingGame.titlebar.draftMode'))]
 
   if (draftTeamName.value) {
     items.push(createTitleItem('team', draftTeamName.value))

@@ -1,7 +1,7 @@
 <template>
   <div class="rounded bg-black/5 px-4 py-2 dark:bg-white/5" v-if="items.length > 0">
     <div class="mb-3 text-base font-bold text-gray-900 dark:text-white">
-      {{ t('PlayerChallenges.titleAssets') }}
+      {{ t('playerTabs.challenges.titleAssets') }}
     </div>
     <div class="grid grid-cols-2 gap-2">
       <div class="flex flex-col" v-for="item of items" :key="item.id">
@@ -62,7 +62,7 @@ const items = computed(() => {
       return {
         id: challenge.id,
         currentValue: challenge.currentValue,
-        name: t(`PlayerChallenges.${nameKey}`)
+        name: t(`playerTabs.challenges.${nameKey}`)
       }
     })
     .filter((i) => i !== null)

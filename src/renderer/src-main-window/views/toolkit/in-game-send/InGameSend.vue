@@ -73,7 +73,7 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import InGameSendPresetsPanel from './presets/InGameSendPresetsPanel.vue'
 import { useNativeInputStatus } from './presets/composables/useNativeInputStatus'
 
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend' })
 
 const as = useAppCommonStore()
 const igs = useInGameSendStore()

@@ -8,7 +8,7 @@
       :style="{
         '--la-copyable-icon-size': iconSize + 'px'
       }"
-      :title="t('CopyableText.copy')"
+      :title="t('sharedUi.copyableText.copy')"
       class="copyable__icon"
       @click.stop="handleCopy"
     >

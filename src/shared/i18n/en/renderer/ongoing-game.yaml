@@ -1,0 +1,270 @@
+ongoingGame:
+  titlebar:
+    draftMode: Draft Mode
+    exitDraft: Exit Draft Mode
+    refresh: Refresh
+    spectating: Spectating
+    settings:
+      title: Ongoing Game Display
+      orderPlayerBy:
+        label: Player order
+      showJunglePathingForAllPlayers:
+        label: Show jungle path samples for non-junglers
+        description: When enabled, non-junglers also show this section if their match history contains jungle path samples.
+      openOngoingGameSettings: More ongoing game settings
+    orderOptions:
+      default: Default
+      position: Position
+      premade-team: Premade Team
+      win-rate: W/R Desc
+      kda: KDA Desc
+      akari-score: Score Desc
+  junglePathing:
+    title: Jungle
+    thisGame: This Game
+    hero: Champion
+    overall: All
+    currentChampion: This
+    mapPref: Map Pref
+    zoneWeight: Zone Weight
+    zoneWeightShort: Wt
+    positionWeight: position weight
+    takedownWeight: takedown-participation weight
+    first14Minutes: first 14 minutes
+    preferenceDecision: Preference decision
+    singleZone: Single-zone
+    firstClearDecision: First clear decision
+    oneMinutePosition: 1-minute position
+    level3Decision: Lv3 gank decision
+    level4Decision: Lv4 gank decision
+    threeMinuteFrame: 3-minute frame
+    fourMinuteFrame: 4-minute frame
+    championDamage: champion damage
+    championDamageIncrease: champion damage increase
+    takedownParticipation: takedown participation
+    aggregation: Aggregation
+    sampleScope: sample scope
+    blueRedSide: blue / red side
+    ganks: Ganks
+    topsidePref: Top
+    midPref: Mid
+    botsidePref: Bot
+    topMidPref: Top/Mid
+    midBotPref: Mid/Bot
+    balanced: Balanced
+    balancedShort: Bal.
+    prefShort:
+      top: Top
+      mid: Mid
+      bot: Bot
+      topMid: T/M
+      midBot: M/B
+      balanced: Bal.
+    firstClear: 1st Clear
+    topsideStart: Top {{pct}}%
+    botsideStart: Bot {{pct}}%
+    campRed: Red
+    campBlue: Blue
+    campWolves: Wolves
+    campRaptors: Raptors
+    campOwnStart: Normal {pct}
+    campStart: '{{camp}} {pct}'
+    campInvadeStart: Invade {pct}
+    campPopoverCampGames_one: 'This camp: {count} game'
+    campPopoverCampGames_other: 'This camp: {count} games'
+    campPopoverKindGames_one: '{{kind}} samples: {count} game'
+    campPopoverKindGames_other: '{{kind}} samples: {count} games'
+    campPopoverSideGames_one: '{{side}} side total: {count} game'
+    campPopoverSideGames_other: '{{side}} side total: {count} games'
+    blueTeam: Blue
+    redTeam: Red
+    earlyGank: Early Ganks
+    firstClearOwnLegend: Normal start
+    firstClearInvadeLegend: Invade start
+    level3KillLegend: Lv3 kills
+    level4KillLegend: Lv4 kills
+    level3Gank: Lv3 ganks {count} / {total}
+    level4Gank: Lv4 ganks {count} / {total}
+    objectives: Objectives
+    firstDragonRate: 1st Drake {{pct}}%
+    firstDragonRateLabel: 1st Drake
+    soloDragonRate: Solo Drake {{pct}}%
+    soloDragonRateLabel: Solo Drake
+    dragons: Drake {{count}}
+    voidgrubs: Grubs {{count}}
+    heralds: Herald {{count}}
+    barons: Baron {{count}}
+    avgDragons: Avg Drake {{count}}
+    avgDragonsLabel: Avg Drake
+    avgVoidgrubs: Avg Grubs {{count}}
+    avgVoidgrubsLabel: Avg Grubs
+    avgHeralds: Avg Herald {{count}}
+    avgHeraldsLabel: Avg Herald
+    avgBarons: Avg Baron {{count}}
+    avgBaronsLabel: Avg Baron
+    firstTime: 1st {{time}}
+    noData: No samples
+    noDataShort: N/A
+    noSideData: No side samples
+    noOwnStartData: No normal-start samples
+    noInvadeData: No invade samples
+    noGankData: No gank samples
+    noLevel3GankData: No Lv3 gank samples
+    noLevel4GankData: No Lv4 gank samples
+    noCurrentChampion: No champion selected
+    noCurrentChampionData: No jungle samples for current champion
+    minuteLegend: Position points
+    gankLegend: Takedown points
+    mapSemanticHint: Legend
+    mapSemanticDescription: Dots are minute-frame position samples from the first 14 minutes. Crosses are takedown-participation positions within 14 minutes. Mini-map points may be sampled; use Zone Weight for exact values.
+    algorithmSummaryZoneWeight: Zone Weight measures top / mid / bot activity intensity during the first 14 minutes.
+    algorithmSummaryPathing: First clear and early ganks are aggregated within the current sample scope and split by blue / red side.
+    loadedSamples: Loaded {{details}} for this player, including {{jungle}}.
+    loadedDetailedSamples_one: '{{count}} detailed match sample'
+    loadedDetailedSamples_other: '{{count}} detailed match samples'
+    loadedJungleSamples_one: '{{count}} jungle game'
+    loadedJungleSamples_other: '{{count}} jungle games'
+    algorithmDetails: Algorithm
+    algorithmDetailZoneWeight: "{zoneWeight} = Σ {positionWeight} + Σ {takedownWeight}. {positionWeight}: during the {first14Minutes}, each minute-frame adds {pointOne} to the jungler's current top / mid / bot zone. {takedownWeight}: each takedown participation within 14 minutes adds {pointFive} to the takedown-position zone."
+    algorithmDetailPreference: '{preferenceDecision}: mid + bot share ≥ 70% and top share ≤ 28% means {midBot}. Top + mid share ≥ 70% and bot share ≤ 28% means {topMid}. {singleZone} share ≥ 40% and at least 8 percentage points ahead of the second-highest zone means Top / Mid / Bot. Otherwise {balanced}.'
+    algorithmDetailFirstClear: '{firstClearDecision}: use the nearest jungle camp to the {oneMinutePosition}. If the camp is in the enemy half, it is counted as an {invadeStart}.'
+    algorithmDetailLevel3Gank: '{level3Decision}: at the {threeMinuteFrame}, CS (minion + jungle) is {csRange}, level is {level3}, and {championDamage} is detected. Without detailed damage data, {takedownParticipation} within 3 minutes is used as the damage condition.'
+    algorithmDetailLevel4Gank: '{level4Decision}: by the {fourMinuteFrame}, {championDamageIncrease} is detected compared with the 3-minute frame, or {takedownParticipation} occurred from 3-4 minutes. Without detailed damage data, only {takedownParticipation} is used.'
+    algorithmDetailAggregation: '{aggregation}: the active tab defines the {sampleScope} (current champion or all). First clear / early ganks are accumulated separately for {blueRedSide}.'
+    gamesUnit: ' games'
+    copyAll: Copy Summary
+    copied: Analysis copied
+    allyJungler: Ally Jungler
+    enemyJungler: Enemy Jungler
+    top: Top
+    mid: Mid
+    bot: Bot
+    topShort: Top
+    midShort: Mid
+    botShort: Bot
+    zoneTiny:
+      top: T
+      mid: M
+      bot: B
+    gamesAnalyzed_one: '{{count}} game'
+    gamesAnalyzed_other: '{{count}} games'
+  playerCard:
+    reload: Reload
+    empty: No matches found for this queue
+    loadingMatchHistory: Loading...
+    errorLoadingMatchHistory: Unable to load
+    top4Rate: Top 4 Rate
+    1stRate: First Place Rate
+    1st: '{{rate}}%'
+    position:
+      recentlyPlayed: 'Preference:'
+      selection: 'Selection:'
+    cherryWinRatePopover_one: In the recent {{count}} game, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
+    cherryWinRatePopover_other: In the recent {{count}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
+    winRatePopover_one: In the recent {{count}} game, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
+    winRatePopover_other: In the recent {{count}} games, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
+    kdaPopover_one: In the recent {{count}} game, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+    kdaPopover_other: In the recent {{count}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+    premadePopover: They are a premade team. Labeled as Team {{team}}.
+    collectByChampion: Collect {{champion}} matches
+    collectByPosition: Collect {{position}} matches
+    sameChampionHistory: Champion History
+    highWinRatePopover_one: This player's win rate is exceptionally high. In the recent {{count}} game, they have won {{winCount}} games.
+    highWinRatePopover_other: This player's win rate is exceptionally high. In the recent {{count}} games, they have won {{winCount}} games.
+    teamDamageShare: Dmg {{rate}}%
+    teamDamageSharePopover_one: In the recent {{count}} game, this player's average team damage share is {{rate}}%
+    teamDamageSharePopover_other: In the recent {{count}} games, this player's average team damage share is {{rate}}%
+    teamDamageTakenShare: Dmg Taken {{rate}}%
+    teamDamageTakenSharePopover_one: In the recent {{count}} game, this player's average team damage taken share is {{rate}}%
+    teamDamageTakenSharePopover_other: In the recent {{count}} games, this player's average team damage taken share is {{rate}}%
+    teamGoldShare: Gold {{rate}}%
+    teamGoldSharePopover_one: In the recent {{count}} game, this player's average team gold share is {{rate}}%
+    teamGoldSharePopover_other: In the recent {{count}} games, this player's average team gold share is {{rate}}%
+    damageGoldEfficiency: Dmg-Gold {{rate}}%
+    damageGoldEfficiencyPopover_one: In the recent {{count}} game, this player's average damage to gold efficiency is {{rate}}%
+    damageGoldEfficiencyPopover_other: In the recent {{count}} games, this player's average damage to gold efficiency is {{rate}}%
+    enemyMissingPings: Missing pings {{count}}
+    enemyMissingPingsPopover_one: This player has sent enemy missing pings an average of {{count}} time per game
+    enemyMissingPingsPopover_other: This player has sent enemy missing pings an average of {{count}} times per game
+    visionScore: Vision Score {{count}}
+    visionScorePopover: This player's average vision score is {{count}}
+    killDamageEfficiencyHigh: KS
+    killDamageEfficiencyLow: Damage Dealer
+    killDamageEfficiencyHighPopover: In the recent {{count}} games, this player's average kill damage efficiency is {{rate}}%, achieving more kills with less team damage.
+    killDamageEfficiencyLowPopover: In the recent {{count}} games, this player's average kill damage efficiency is {{rate}}%, achieving fewer kills with more team damage.
+    metPopover:
+      title_one: Last encountered this player on {{date}}. Met a total of {{count}} time.
+      title_other: Last encountered this player on {{date}}. Met a total of {{count}} times.
+      titleNote_one: Shows only the last {{count}} game.
+      titleNote_other: Shows only the last {{count}} games.
+      gameId: Game ID
+      inspectByGameId: Inspect {{gameId}}
+      date: Game Date
+      gameStats: Game Stats
+      winResult:
+        abort: Abort
+        loss: Loss
+        remake: Remake
+        win: Win
+      team:
+        teammate: Ally
+        opponent: Enemy
+    privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
+    winningStreakPopover_one: Currently on a winning streak of {{count}} game. Great job!
+    winningStreakPopover_other: Currently on a winning streak of {{count}} games. Great job!
+    losingStreakPopover_one: Currently on a losing streak of {{count}} game.
+    losingStreakPopover_other: Currently on a losing streak of {{count}} games.
+    suspiciousFlashPosition: SusFlash
+    suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
+    hardGank: Hard to Gank
+    gankable: Gankable
+    easyGank: Easy Gank
+    veryEasyGank: Very Easy Gank
+    easyGankPopover_one: Across the latest {{count}} analyzed Summoner's Rift game, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
+    easyGankPopover_other: Across the latest {{count}} analyzed Summoner's Rift games, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement
+    soloKills: '{{times}} Solo Kills'
+    soloKillsPopover_one: In the recent {{count}} game, this player get solo kills {{times}} times on average
+    soloKillsPopover_other: In the recent {{count}} games, this player get solo kills {{times}} times on average
+    akariLoved:
+      outstanding: Outstanding
+      extraordinary: Extraordinary
+      outstandingPopover: This player has performed well in recent games.
+      extraordinaryPopover: This player has shown exceptional performance in recent games.
+    champion:
+      recentStats: Recent Stats
+      winRate_one: Recent {{count}} game, win rate {{winRate}}%
+      winRate_other: Recent {{count}} games, win rate {{winRate}}%
+    matchHistory:
+      winResult:
+        na: '-'
+        win: W
+        loss: L
+        remake: R
+        abort: Abrt
+    self: Self
+    tagged: Tagged
+    taggedBySelf: Tagged
+    taggedByOther: Tagged by
+    unknown: Unknown
+    premade: Team {{team}}
+    highWinRate: High W/R
+    met: Met
+    private: Private
+    winningStreak_one: '{{count}} Win'
+    winningStreak_other: '{{count}} Wins'
+    losingStreak_one: '{{count}} Loss'
+    losingStreak_other: '{{count}} Losses'
+    reloadMatchHistory: Reload
+  teamTags:
+    winRateTeam: Win-Rate Team
+    loseRateTeam: Lose-Rate Team
+    premade: Premade {{size}}
+    winRate: Win Rate {{rate}}%
+    kda: KDA {{kda}}
+  panel:
+    disconnected: Not connected to the client
+    waitingForSpectate: Waiting for spectate delay
+    noOngoingGame: No ongoing game
+    disabled: Game analysis disabled, please re-enable this feature in settings
+    avgTeamWinRate: Average Team Win Rate
+    avgTeamKda: Average Team KDA

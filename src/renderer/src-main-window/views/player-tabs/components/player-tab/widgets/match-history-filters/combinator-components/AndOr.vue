@@ -18,14 +18,14 @@
         class="flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-300"
       >
         <NIcon size="16"><Branch20Regular /></NIcon>
-        {{ t('PlayerTab.filter.and') }}
+        {{ t('playerTabs.matchHistory.filters.and') }}
       </div>
       <div
         v-else-if="node.type === 'or'"
         class="flex items-center gap-1.5 text-sm font-bold text-sky-700 dark:text-sky-300"
       >
         <NIcon size="16"><BranchFork20Regular /></NIcon>
-        {{ t('PlayerTab.filter.or') }}
+        {{ t('playerTabs.matchHistory.filters.or') }}
       </div>
 
       <div class="flex gap-1">
@@ -34,7 +34,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.add') }}
+            {{ t('playerTabs.matchHistory.filters.add') }}
           </NButton>
         </NDropdown>
 
@@ -44,8 +44,8 @@
           </template>
           {{
             node.type === 'and'
-              ? t('PlayerTab.filter.switchToOr')
-              : t('PlayerTab.filter.switchToAnd')
+              ? t('playerTabs.matchHistory.filters.switchToOr')
+              : t('playerTabs.matchHistory.filters.switchToAnd')
           }}
         </NButton>
 
@@ -53,7 +53,7 @@
           <template #icon>
             <NIcon size="14"><Delete20Regular /></NIcon>
           </template>
-          {{ t('PlayerTab.filter.delete') }}
+          {{ t('playerTabs.matchHistory.filters.delete') }}
         </NButton>
       </div>
     </div>
@@ -70,7 +70,7 @@
             <template #icon>
               <NIcon size="14"><Add20Regular /></NIcon>
             </template>
-            {{ t('PlayerTab.filter.add') }}
+            {{ t('playerTabs.matchHistory.filters.add') }}
           </NButton>
         </NDropdown>
       </div>

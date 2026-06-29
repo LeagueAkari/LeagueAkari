@@ -1,0 +1,123 @@
+auxWindow:
+  titlebar:
+    opgg: 使用 OP.GG
+    opggTitle: 集成的 OP.GG
+    close: 关闭
+    minimize: 最小化
+    indicator: 小窗
+    indicatorTitle: $t(common:appName) 的小型辅助功能窗口
+    pin: 置顶
+    unpin: 取消置顶
+    repositionToAlignLeagueClientUx: 贴附到客户端
+  championBench:
+    title: 英雄选择台
+    reroll: '重随 (剩余: {{count}})'
+    charity: '重随并立即取回 (剩余: {{count}})'
+    notInBenchMode: 当前不在随机模式中
+    notInPhase: 未处于英雄选择过程中
+    rerollFailed: 重随失败 {{reason}}
+    swapFailed: 交换失败 {{reason}}
+    balanceTypes:
+      damage-dealt: 造成伤害
+      damage-taken: 承受伤害
+      healing: 治疗效果
+      shielding: 护盾效果
+      ability-haste: 技能急速
+      mana-regen: 法力回复
+      health-regen: 生命回复
+      attack-speed: 攻击速度
+      movement-speed: 移动速度
+      tenacity: 韧性
+      energy-regen: 能量回复
+  champSelect:
+    actions:
+      picked: 已选择
+      voted: 已投票
+      banned: 已禁用
+      autoPick: 自动选择
+      autoBan: 自动禁用
+      picking: 英雄选择
+      banning: 英雄禁用
+      voting: 投票
+      tenBansRevealing: 系统 · 禁用展示
+      inProgress: 进行中
+      completed: 已完成
+      ceremonies:
+        ten_bans_reveal: 禁用展示
+        TEN_BANS_REVEAL: 禁用展示
+        phase_transition: 阶段过渡
+        vote_transition: 投票过渡
+        team_vote_reveal: 团队投票展示
+    operations:
+      dodge:
+        label: 退出英雄选择
+        button: 立即秒退
+        popconfirm: 这将退出英雄选择阶段
+        positiveText: 退出
+        negativeText: 取消
+        cancel: 取消
+      temporarilyDisabled:
+        label: 临时取消自动选择/禁用
+  lounge:
+    operations:
+      immediately: 立即
+      second: 秒
+      autoAccept:
+        label: 自动接受
+        unavailable: 模式不适用
+      autoMatchmaking:
+        label: 自动匹配
+        unavailable: 模式不适用
+      autoMatchmakingMinimumMembers:
+        label: 最低人数
+      autoMatchmakingDelaySeconds:
+        label: 匹配前等待时间
+      autoMatchmakingWaitForInvitees:
+        label: 等待邀请中成员
+    panel:
+      map: 地图
+      gameMode: 模式中
+      wait: 等待
+      atMost: 最多
+      autoAccept:
+        acceptIn: 自动接受 {{seconds}} s
+        cancelButton: 取消本次自动接受
+        declineButton: 拒绝对局
+        acceptButton: 接受对局
+        accepted: 已接受
+        pending: 等待接受对局
+        subtitle1: 已经接受的对局仍可拒绝
+        subtitle2: 已经取消的对局仍可接受
+        declined: 已拒绝
+      matchmaking:
+        stopAndDisable: 停止匹配并取消自动匹配
+        stop: 停止匹配
+        cancel: 取消本次自动匹配
+        searching: 匹配中
+        searchIn: 匹配中 {{seconds}} s
+        waitingForPenalty: 等待秒退计时器 {{seconds}} s
+        waitingForMembers: 自动匹配需达到 {{count}} 人
+        waitingForInvitees: 等待邀请中成员
+  skinSelection:
+    skins: '{{count}} 款皮肤可用'
+    button: 应用
+    success: 应用皮肤成功
+    failed: 应用皮肤失败
+  placeholder:
+    inProgress: 游戏进行中
+    idle: 当前没有进行中的活动
+    spectating: 等待观战中
+  automationPlan:
+    autoPick:
+      title: 自动选择
+      willPick: 将自动选择
+    autoBan:
+      title: 自动禁用
+      willBan: 将自动禁用
+    autoBenchSwap:
+      title: 自动交换
+      willSwap: 将自动交换
+    autoChampionSwap:
+      title: 自动交换
+      willAccept: 将自动接受交换
+      willDecline: 将自动拒绝交换

@@ -23,7 +23,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
       const notification = useNotification()
 
       const { t } = useTranslation(undefined, {
-        keyPrefix: 'simple-notifications-renderer.newReleaseHints'
+        keyPrefix: 'notifications.simple.newReleaseHints'
       })
 
       watch(

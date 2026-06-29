@@ -357,14 +357,14 @@ const sendInGameText = async (
 
   let text: string | null = null
   if (timerType === 'countdown') {
-    text = t('SummonerSpellsCdTimer.countdown', {
+    text = t('cdTimer.window.countdown', {
       championName: lcs.gameData.champions[championId]?.name || championId,
       spellName: spell.name,
       minutes,
       seconds: seconds.toString().padStart(2, '0')
     })
   } else if (timerType === 'countup') {
-    text = t('SummonerSpellsCdTimer.countup', {
+    text = t('cdTimer.window.countup', {
       championName: lcs.gameData.champions[championId]?.name || championId,
       spellName: spell.name,
       minutes,
@@ -376,9 +376,9 @@ const sendInGameText = async (
     // Best-effort UX: show an explicit reason when injection is unavailable.
     if (!as.nativeSupport.nativeInput.available) {
       if (as.nativeSupport.nativeInput.availableOnCurrentPlatform) {
-        message.warning(t('SummonerSpellsCdTimer.adminRequired'))
+        message.warning(t('cdTimer.window.adminRequired'))
       } else {
-        message.warning(t('SummonerSpellsCdTimer.nativeInjectionUnsupported'))
+        message.warning(t('cdTimer.window.nativeInjectionUnsupported'))
       }
       return
     }
@@ -389,15 +389,13 @@ const sendInGameText = async (
       const code = error?.code as string | undefined
 
       if (code === 'AlreadySending') {
-        message.warning(t('SummonerSpellsCdTimer.alreadySending'))
+        message.warning(t('cdTimer.window.alreadySending'))
       } else if (code === 'GameClientNotForeground') {
-        message.warning(t('SummonerSpellsCdTimer.gameNotForeground'))
+        message.warning(t('cdTimer.window.gameNotForeground'))
       } else if (typeof error?.message === 'string' && error.message.includes('No function')) {
-        message.warning(t('SummonerSpellsCdTimer.nativeInjectionUnsupported'))
+        message.warning(t('cdTimer.window.nativeInjectionUnsupported'))
       } else {
-        message.warning(
-          t('SummonerSpellsCdTimer.sendFailed', { reason: error?.message || String(error) })
-        )
+        message.warning(t('cdTimer.window.sendFailed', { reason: error?.message || String(error) }))
       }
     }
   }

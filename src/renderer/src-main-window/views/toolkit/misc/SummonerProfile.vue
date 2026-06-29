@@ -1,10 +1,10 @@
 <template>
-  <SettingsSection :title="t('SummonerProfile.title')">
+  <SettingsSection :title="t('toolkit.summonerProfile.title')">
     <NModal
       class="w-fit!"
       preset="card"
       size="small"
-      :title="t('SummonerProfile.skinSelectModal.title')"
+      :title="t('toolkit.summonerProfile.skinSelectModal.title')"
       v-model:show="isModalShow"
     >
       <div class="mb-2 flex w-85 max-w-full gap-1">
@@ -26,7 +26,7 @@
           :disabled="!currentSkinId"
           :loading="isProceeding"
         >
-          {{ t('SummonerProfile.skinSelectModal.button') }}
+          {{ t('toolkit.summonerProfile.skinSelectModal.button') }}
         </NButton>
       </div>
       <NSelect
@@ -49,17 +49,17 @@
       />
     </NModal>
     <SettingsRow
-      :label="t('SummonerProfile.profileBackground.label')"
-      :label-description="t('SummonerProfile.profileBackground.description')"
+      :label="t('toolkit.summonerProfile.profileBackground.label')"
+      :label-description="t('toolkit.summonerProfile.profileBackground.description')"
       :label-width="260"
     >
       <NButton size="small" type="primary" @click="isModalShow = true" :disabled="!lcs.isConnected">
-        {{ t('SummonerProfile.profileBackground.button') }}
+        {{ t('toolkit.summonerProfile.profileBackground.button') }}
       </NButton>
     </SettingsRow>
     <SettingsRow
-      :label="t('SummonerProfile.bannerAccent.label')"
-      :label-description="t('SummonerProfile.bannerAccent.description')"
+      :label="t('toolkit.summonerProfile.bannerAccent.label')"
+      :label-description="t('toolkit.summonerProfile.bannerAccent.description')"
       :label-width="260"
     >
       <NButton
@@ -68,19 +68,19 @@
         :loading="isUpdating"
         size="small"
       >
-        {{ t('SummonerProfile.bannerAccent.button') }}
+        {{ t('toolkit.summonerProfile.bannerAccent.button') }}
       </NButton>
     </SettingsRow>
     <SettingsRow
       :label-description="
         lcs.summoner.me &&
         lcs.summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
-          ? t('SummonerProfile.prestigeCrest.descriptionInsufficientLevel', {
+          ? t('toolkit.summonerProfile.prestigeCrest.descriptionInsufficientLevel', {
               level: lcs.summoner.me.summonerLevel
             })
-          : t('SummonerProfile.prestigeCrest.description')
+          : t('toolkit.summonerProfile.prestigeCrest.description')
       "
-      :label="t('SummonerProfile.prestigeCrest.label')"
+      :label="t('toolkit.summonerProfile.prestigeCrest.label')"
       :label-width="260"
     >
       <NButton
@@ -89,12 +89,12 @@
         :loading="isRemovingPrestigeCrest"
         size="small"
       >
-        {{ t('SummonerProfile.prestigeCrest.button') }}
+        {{ t('toolkit.summonerProfile.prestigeCrest.button') }}
       </NButton>
     </SettingsRow>
     <SettingsRow
-      :label-description="t('SummonerProfile.token.description')"
-      :label="t('SummonerProfile.token.label')"
+      :label-description="t('toolkit.summonerProfile.token.description')"
+      :label="t('toolkit.summonerProfile.token.label')"
       :label-width="260"
     >
       <NButton
@@ -103,12 +103,12 @@
         :loading="isRemovingTokens"
         size="small"
       >
-        {{ t('SummonerProfile.token.button') }}
+        {{ t('toolkit.summonerProfile.token.button') }}
       </NButton>
     </SettingsRow>
     <SettingsRow
-      :label-description="t('SummonerProfile.emotes.description')"
-      :label="t('SummonerProfile.emotes.label')"
+      :label-description="t('toolkit.summonerProfile.emotes.description')"
+      :label="t('toolkit.summonerProfile.emotes.label')"
       :label-width="260"
     >
       <NButton
@@ -117,7 +117,7 @@
         :loading="isClearingEmotes"
         size="small"
       >
-        {{ t('SummonerProfile.emotes.button') }}
+        {{ t('toolkit.summonerProfile.emotes.button') }}
       </NButton>
     </SettingsRow>
   </SettingsSection>
@@ -187,7 +187,7 @@ const skinOptions = computed(() => {
       for (const au of v.skinAugments.augments) {
         if (au.overlays) {
           augOptions1.push({
-            label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+            label: `${t('toolkit.summonerProfile.skinSelectModal.augment')} ${au.contentId}`,
             imgUrl: v.uncenteredSplashPath,
             value: au.contentId,
             overlays: au.overlays
@@ -198,7 +198,7 @@ const skinOptions = computed(() => {
 
     if (augOptions1.length) {
       augOptions1.unshift({
-        label: t('SummonerProfile.skinSelectModal.unset'),
+        label: t('toolkit.summonerProfile.skinSelectModal.unset'),
         value: '',
         imgUrl: '',
         overlays: []
@@ -228,7 +228,7 @@ const skinOptions = computed(() => {
             for (const au of ti.skinAugments.augments) {
               if (au.overlays) {
                 augOptions2.push({
-                  label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
+                  label: `${t('toolkit.summonerProfile.skinSelectModal.augment')} ${au.contentId}`,
                   value: au.contentId,
                   imgUrl: ti.uncenteredSplashPath,
                   overlays: au.overlays
@@ -239,7 +239,7 @@ const skinOptions = computed(() => {
 
           if (augOptions2.length) {
             augOptions2.unshift({
-              label: t('SummonerProfile.skinSelectModal.unset'),
+              label: t('toolkit.summonerProfile.skinSelectModal.unset'),
               value: '',
               imgUrl: '',
               overlays: []
@@ -350,10 +350,10 @@ const handleApplyToProfile = async () => {
     if (currentAugmentId.value !== undefined) {
       await lc.api.summoner.setSummonerBackgroundAugments(currentAugmentId.value)
     }
-    message.success(() => t('SummonerProfile.commonSuccess'), { duration: 1000 })
+    message.success(() => t('toolkit.summonerProfile.commonSuccess'), { duration: 1000 })
   } catch (error) {
     console.warn(error)
-    message.warning(() => t('SummonerProfile.commonFailed'), { duration: 1000 })
+    message.warning(() => t('toolkit.summonerProfile.commonFailed'), { duration: 1000 })
   } finally {
     isProceeding.value = false
   }
@@ -370,9 +370,9 @@ const handleUpdatePr = async () => {
   try {
     isUpdating.value = true
     await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
-    message.success(() => t('SummonerProfile.commonSuccess'))
+    message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(() => t('SummonerProfile.commonFailed'))
+    message.warning(() => t('toolkit.summonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isUpdating.value = false
@@ -396,9 +396,9 @@ const handleRemovePrestigeCrest = async () => {
       preferredBannerType: current.data.bannerType,
       selectedPrestigeCrest: FIXED_PRESTIGE_CREST
     })
-    message.success(() => t('SummonerProfile.commonSuccess'))
+    message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(() => t('SummonerProfile.commonFailed'))
+    message.warning(() => t('toolkit.summonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingPrestigeCrest.value = false
@@ -418,9 +418,9 @@ const handleRemoveTokens = async () => {
       challengeIds: [],
       bannerAccent: (await lc.api.chat.getMe()).data.lol?.bannerIdSelected
     })
-    message.success(() => t('SummonerProfile.commonSuccess'))
+    message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(() => t('SummonerProfile.commonFailed'))
+    message.warning(() => t('toolkit.summonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingTokens.value = false
@@ -439,7 +439,7 @@ const handleClearEmotes = async () => {
     const { data } = await lc.api.loadouts.getAccountScopeLoadouts()
 
     if (!data.length) {
-      message.warning(() => t('SummonerProfile.commonFailed'))
+      message.warning(() => t('toolkit.summonerProfile.commonFailed'))
       return
     }
 
@@ -461,9 +461,9 @@ const handleClearEmotes = async () => {
       EMOTES_WHEEL_LOWER_LEFT: -1
     })
 
-    message.success(() => t('SummonerProfile.commonSuccess'))
+    message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning(() => t('SummonerProfile.commonFailed'))
+    message.warning(() => t('toolkit.summonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isClearingEmotes.value = false

@@ -6,7 +6,9 @@
     >
       <div class="flex items-center gap-2">
         <NSpin :size="16" />
-        <span class="text-sm text-black/80 dark:text-white/60">{{ t('PlayerTab.loading') }}</span>
+        <span class="text-sm text-black/80 dark:text-white/60">{{
+          t('playerTabs.profile.loading')
+        }}</span>
       </div>
     </div>
 
@@ -16,7 +18,9 @@
         class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
       >
         <span class="text-sm text-black/80 dark:text-white/60">{{
-          rootHasCombinator ? t('PlayerTab.noFilteredMatchHistory') : t('PlayerTab.noMatchHistory')
+          rootHasCombinator
+            ? t('playerTabs.profile.noFilteredMatchHistory')
+            : t('playerTabs.profile.noMatchHistory')
         }}</span>
 
         <NButton
@@ -25,7 +29,7 @@
           tertiary
           @click="clearPredicate"
         >
-          {{ t('PlayerTab.clearFilters') }}
+          {{ t('playerTabs.profile.clearFilters') }}
         </NButton>
       </div>
 
@@ -57,7 +61,7 @@
       class="flex h-50 flex-col items-center justify-center gap-2 rounded bg-black/5 dark:bg-white/5"
     >
       <span class="text-sm text-black/80 dark:text-white/60">{{
-        t('PlayerTab.noMatchHistory')
+        t('playerTabs.profile.noMatchHistory')
       }}</span>
     </div>
   </div>

@@ -59,7 +59,7 @@ const props = defineProps<{
 }>()
 
 const { previewedLines, closePreview } = props.preset
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.preview' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.preview' })
 const message = useMessage()
 
 const previewText = computed(() => previewedLines.value?.lines.join('\n') ?? '')

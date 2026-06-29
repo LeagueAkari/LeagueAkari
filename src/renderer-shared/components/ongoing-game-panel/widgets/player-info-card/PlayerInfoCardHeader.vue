@@ -52,7 +52,7 @@
               </div>
             </template>
             <div class="max-w-50 text-xs">
-              {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
+              {{ t('ongoingGame.playerCard.premadePopover', { team: premadeTeamId }) }}
             </div>
           </NPopover>
         </div>
@@ -124,7 +124,7 @@
         </template>
 
         <RankedTable v-if="rankedStats" :ranked-stats="rankedStats" />
-        <div v-else class="text-xs">{{ t('PlayerInfoCard.empty') }}</div>
+        <div v-else class="text-xs">{{ t('ongoingGame.playerCard.empty') }}</div>
       </NPopover>
     </div>
   </div>
@@ -195,7 +195,7 @@ const matchCollectionOptions = computed(() => {
 
   if (hasCurrentChampion.value) {
     options.push({
-      label: t('PlayerInfoCard.collectByChampion', { champion: championName.value }),
+      label: t('ongoingGame.playerCard.collectByChampion', { champion: championName.value }),
       key: 'collect-by-champion',
       icon: () => <ChampionIcon class="size-4 rounded" championId={currentChampionId.value} />
     })
@@ -203,7 +203,7 @@ const matchCollectionOptions = computed(() => {
 
   if (hasCurrentPosition.value) {
     options.push({
-      label: t('PlayerInfoCard.collectByPosition', { position: currentPositionName.value }),
+      label: t('ongoingGame.playerCard.collectByPosition', { position: currentPositionName.value }),
       key: 'collect-by-position',
       icon: () => <PositionIcon position={currentPosition.value} />
     })

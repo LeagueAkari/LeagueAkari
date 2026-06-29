@@ -16,10 +16,10 @@ Do not use the global `<i18next>` alias in Vue templates. Use the explicit `Tran
 Keep word order and punctuation in the locale file. In YAML, place named component slots with `{slotName}`. In the Vue component, provide matching named slots.
 
 ```vue
-<TranslationComponent :translation="t('PlayerTab.collectMode.collectedPageDescription')">
+<TranslationComponent :translation="t('playerTabs.matchHistory.collectMode.collectedPageDescription')">
   <template #scanned>
     <TranslationComponent
-      :translation="t('PlayerTab.collectMode.scannedMatches', { count: scannedCount })"
+      :translation="t('playerTabs.matchHistory.collectMode.scannedMatches', { count: scannedCount })"
     >
       <template #count>
         <span class="count-highlight">{{ scannedCount }}</span>
@@ -28,7 +28,7 @@ Keep word order and punctuation in the locale file. In YAML, place named compone
   </template>
   <template #collected>
     <TranslationComponent
-      :translation="t('PlayerTab.collectMode.collectedMatches', { count: collectedCount })"
+      :translation="t('playerTabs.matchHistory.collectMode.collectedMatches', { count: collectedCount })"
     >
       <template #count>
         <span class="count-highlight">{{ collectedCount }}</span>
@@ -69,7 +69,7 @@ This avoids incorrect English such as treating both counts as plural when one of
 Project references:
 
 - `src/renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/FirstClearAndGankSummary.vue`
-- `src/shared/i18n/en/renderer.yaml` keys under `JunglePathing.campPopover*`
+- `src/shared/i18n/en/renderer/ongoing-game.yaml` keys under `ongoingGame.junglePathing.campPopover*`
 
 ## Tailwind Utilities
 

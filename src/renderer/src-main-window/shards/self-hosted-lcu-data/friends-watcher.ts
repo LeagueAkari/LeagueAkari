@@ -49,7 +49,7 @@ export function watchFriendsUpdate() {
         return
       }
 
-      message.error(() => t('self-hosted-lcu-data-renderer.reloadFriendsFailed'))
+      message.error(() => t('selfHostedLcuData.reloadFriendsFailed'))
       logger.error(SELF_HOSTED_LCU_DATA_RENDERER_NAMESPACE, 'Failed to reload friends', error)
     }
   }

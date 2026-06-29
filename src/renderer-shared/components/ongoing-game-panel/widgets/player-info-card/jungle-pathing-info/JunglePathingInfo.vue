@@ -64,7 +64,7 @@
                   <span class="rounded border border-current/25 px-1 leading-3" aria-hidden="true"
                     >?</span
                   >
-                  {{ t('JunglePathing.algorithmDetails') }}
+                  {{ t('ongoingGame.junglePathing.algorithmDetails') }}
                 </span>
               </template>
 
@@ -135,55 +135,57 @@ const algorithmLine = (
 ): AlgorithmDescriptionLine => ({ translation, keywords })
 
 const algorithmSummaryLines = computed(() => [
-  t('JunglePathing.algorithmSummaryZoneWeight'),
-  t('JunglePathing.algorithmSummaryPathing'),
-  t('JunglePathing.loadedSamples', {
-    details: t('JunglePathing.loadedDetailedSamples', { count: aggregatedAnalysis.detailsCount }),
-    jungle: t('JunglePathing.loadedJungleSamples', {
+  t('ongoingGame.junglePathing.algorithmSummaryZoneWeight'),
+  t('ongoingGame.junglePathing.algorithmSummaryPathing'),
+  t('ongoingGame.junglePathing.loadedSamples', {
+    details: t('ongoingGame.junglePathing.loadedDetailedSamples', {
+      count: aggregatedAnalysis.detailsCount
+    }),
+    jungle: t('ongoingGame.junglePathing.loadedJungleSamples', {
       count: aggregatedAnalysis.jungle?.gamesAnalyzed ?? 0
     })
   })
 ])
 
 const algorithmDetailLines = computed(() => [
-  algorithmLine(t('JunglePathing.algorithmDetailZoneWeight'), {
-    zoneWeight: t('JunglePathing.zoneWeight'),
-    positionWeight: t('JunglePathing.positionWeight'),
-    takedownWeight: t('JunglePathing.takedownWeight'),
-    first14Minutes: t('JunglePathing.first14Minutes'),
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailZoneWeight'), {
+    zoneWeight: t('ongoingGame.junglePathing.zoneWeight'),
+    positionWeight: t('ongoingGame.junglePathing.positionWeight'),
+    takedownWeight: t('ongoingGame.junglePathing.takedownWeight'),
+    first14Minutes: t('ongoingGame.junglePathing.first14Minutes'),
     pointOne: '+1',
     pointFive: '+5'
   }),
-  algorithmLine(t('JunglePathing.algorithmDetailPreference'), {
-    preferenceDecision: t('JunglePathing.preferenceDecision'),
-    midBot: t('JunglePathing.midBotPref'),
-    topMid: t('JunglePathing.topMidPref'),
-    singleZone: t('JunglePathing.singleZone'),
-    balanced: t('JunglePathing.balanced')
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailPreference'), {
+    preferenceDecision: t('ongoingGame.junglePathing.preferenceDecision'),
+    midBot: t('ongoingGame.junglePathing.midBotPref'),
+    topMid: t('ongoingGame.junglePathing.topMidPref'),
+    singleZone: t('ongoingGame.junglePathing.singleZone'),
+    balanced: t('ongoingGame.junglePathing.balanced')
   }),
-  algorithmLine(t('JunglePathing.algorithmDetailFirstClear'), {
-    firstClearDecision: t('JunglePathing.firstClearDecision'),
-    oneMinutePosition: t('JunglePathing.oneMinutePosition'),
-    invadeStart: t('JunglePathing.firstClearInvadeLegend')
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailFirstClear'), {
+    firstClearDecision: t('ongoingGame.junglePathing.firstClearDecision'),
+    oneMinutePosition: t('ongoingGame.junglePathing.oneMinutePosition'),
+    invadeStart: t('ongoingGame.junglePathing.firstClearInvadeLegend')
   }),
-  algorithmLine(t('JunglePathing.algorithmDetailLevel3Gank'), {
-    level3Decision: t('JunglePathing.level3Decision'),
-    threeMinuteFrame: t('JunglePathing.threeMinuteFrame'),
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailLevel3Gank'), {
+    level3Decision: t('ongoingGame.junglePathing.level3Decision'),
+    threeMinuteFrame: t('ongoingGame.junglePathing.threeMinuteFrame'),
     csRange: '12-19',
     level3: '3',
-    championDamage: t('JunglePathing.championDamage'),
-    takedownParticipation: t('JunglePathing.takedownParticipation')
+    championDamage: t('ongoingGame.junglePathing.championDamage'),
+    takedownParticipation: t('ongoingGame.junglePathing.takedownParticipation')
   }),
-  algorithmLine(t('JunglePathing.algorithmDetailLevel4Gank'), {
-    level4Decision: t('JunglePathing.level4Decision'),
-    fourMinuteFrame: t('JunglePathing.fourMinuteFrame'),
-    championDamageIncrease: t('JunglePathing.championDamageIncrease'),
-    takedownParticipation: t('JunglePathing.takedownParticipation')
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailLevel4Gank'), {
+    level4Decision: t('ongoingGame.junglePathing.level4Decision'),
+    fourMinuteFrame: t('ongoingGame.junglePathing.fourMinuteFrame'),
+    championDamageIncrease: t('ongoingGame.junglePathing.championDamageIncrease'),
+    takedownParticipation: t('ongoingGame.junglePathing.takedownParticipation')
   }),
-  algorithmLine(t('JunglePathing.algorithmDetailAggregation'), {
-    aggregation: t('JunglePathing.aggregation'),
-    sampleScope: t('JunglePathing.sampleScope'),
-    blueRedSide: t('JunglePathing.blueRedSide')
+  algorithmLine(t('ongoingGame.junglePathing.algorithmDetailAggregation'), {
+    aggregation: t('ongoingGame.junglePathing.aggregation'),
+    sampleScope: t('ongoingGame.junglePathing.sampleScope'),
+    blueRedSide: t('ongoingGame.junglePathing.blueRedSide')
   })
 ])
 
@@ -214,7 +216,7 @@ const tabs = computed<JunglePathingTab[]>(() => {
       ? [
           {
             key: 'overall',
-            label: t('JunglePathing.overall'),
+            label: t('ongoingGame.junglePathing.overall'),
             stats: overall,
             championId: null
           }
@@ -245,10 +247,10 @@ const currentChampionStats = computed(() => {
 
 const currentChampionPlaceholderText = computed(() => {
   if (currentChampionId == null) {
-    return t('JunglePathing.noCurrentChampion')
+    return t('ongoingGame.junglePathing.noCurrentChampion')
   }
 
-  return t('JunglePathing.noCurrentChampionData')
+  return t('ongoingGame.junglePathing.noCurrentChampionData')
 })
 
 const activeTabConfig = computed(() => {

@@ -111,7 +111,7 @@ const { stop, start } = useKeyboardCombo('PUUID', {
   onFinish: () => {
     if (pts.currentTab) {
       navigator.clipboard.writeText(pts.currentTab.puuid)
-      message.success(t('PlayerTabs.copiedToClipboard'))
+      message.success(t('playerTabs.shell.copiedToClipboard'))
     }
   },
   immediate: false

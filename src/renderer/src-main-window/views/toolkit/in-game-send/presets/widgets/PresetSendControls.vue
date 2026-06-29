@@ -85,7 +85,7 @@ const { shortcutTargetIds, shortcuts, gamePhase, canSend, setShortcut, send, dry
 
 const targets = usePresetTargets()
 
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.controls' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.controls' })
 
 const sendButtonText = computed(() => {
   if (gamePhase.value === 'in-game') {

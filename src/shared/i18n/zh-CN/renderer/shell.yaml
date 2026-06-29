@@ -1,0 +1,170 @@
+announcements:
+  modal:
+    title: 公告
+    close: 关闭
+    read: 已读
+    noAnnouncementMd: |
+      ***暂无公告***
+
+      或查询 [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
+legal:
+  declaration:
+    title: 声明
+    isFree: 为免费软件
+    ok: 我已知晓此软件{isFree}并已认同免责条款
+    quit: 退出
+    newContent: |
+      <div class="akari-disclaimer">
+
+      <style>
+      .akari-disclaimer{
+        background-color:#ffffff;
+        color:#333333;
+        line-height:1.65;
+        padding:1.75rem 2rem;
+        box-shadow:0 2px 6px rgba(0,0,0,.15);
+      }
+      .akari-disclaimer h1,
+      .akari-disclaimer h2{
+        color:#d97706;
+        margin-top:1.5rem;
+        margin-bottom:.75rem;
+        line-height:1.25;
+      }
+      .akari-disclaimer h1{font-size:1.6rem;}
+      .akari-disclaimer h2{font-size:1.25rem;}
+      .akari-disclaimer ul{margin-left:1.5rem;}
+      .akari-disclaimer li{margin-bottom:.65rem;}
+      .akari-disclaimer a{color:#2563eb;text-decoration:none;}
+      .akari-disclaimer a:hover{text-decoration:underline;}
+      [data-theme='dark'] .akari-disclaimer{
+        background-color:#1e1e1e;
+        color:#e6e6e6;
+        box-shadow:0 2px 6px rgba(0,0,0,.35);
+      }
+      [data-theme='dark'] .akari-disclaimer h1,
+      [data-theme='dark'] .akari-disclaimer h2{
+        color:#ffd866;
+      }
+      [data-theme='dark'] .akari-disclaimer a{
+        color:#8ab4f8;
+      }
+      </style>
+
+      # $t(common:appName) 用户须知与免责声明
+
+      > **请在下载、安装或使用本软件之前，务必仔细阅读并充分理解本须知与免责声明。**
+      > 一旦您开始使用，即视为已充分理解并同意下列全部条款。
+
+      ---
+
+      ## 一、软件性质与获取途径
+      - **$t(common:appName)** 为完全开源、免费之软件，所有功能均以「按现状」方式公开提供。
+      - 本软件并未以**任何**方式公开售卖，如遇倒卖、捆绑销售或其他牟利形式，请勿购买，若购买请**立即退款**。
+
+      ## 二、风险提示与责任限制
+      - 使用本软件**可能**导致（包括但不限于）：
+        1. 游戏账户被暂停或永久封禁；
+        2. 游戏数据丢失、损坏或与服务器数据不一致；
+        3. 客户端异常、性能下降或其他不良游戏体验。
+      - 对因使用或无法使用本软件所引发的任何直接、间接、偶然、特殊或后续损失，**$t(common:appName)** 开发团队及全部贡献者概不承担任何责任，相关风险由用户自行承担。
+
+      > 请参考 [Patch 25.17 更新说明](https://www.leagueoflegends.com/en-us/news/game-updates/patch-25-17-notes/) 中的 **Game Info Tracking Improvements** 一节。
+
+      ## 三、服务器兼容性声明
+      - **自本声明发布之日起，$t(common:appName) 不再对腾讯游戏服务器提供任何形式的支持。**
+      - 在腾讯服务器环境中使用本软件**极有可能**违反腾讯游戏相关用户协议、管理规范或技术保护措施；由此产生的封号、数据丢失或其他不利后果，概由用户自行负责。
+
+      ## 四、信息收集与隐私保护
+      - 为改进产品质量、分析错误及进行安全统计，软件运行时将收集**必要且有限**的系统信息与崩溃日志。
+      - 所收集信息**不含**可识别个人身份之数据，不会上传至任何第三方服务器，亦不会用于商业用途。
+
+      ## 五、其他事项
+      - 连续使用右键点击三次确认按钮，可快速关闭这个页面，同时视为您已经阅读并同意本须知与免责声明。
+
+      ---
+
+      > **如您对本须知与免责声明存在任何疑问，或需要进一步了解软件详情，请访问**
+      > <https://github.com/LeagueAkari/LeagueAkari> 。
+
+      </div>
+titlebar:
+  actions:
+    announcement: 公告
+    announcementSummary: 公告摘要
+    announcementOk: 确认
+    announcementSeeMore: 查看详情
+    github: 项目主页
+    auxWindow: 小窗口
+    opggWindow: OP.GG
+    backgroundTasks: 后台任务
+    themeSelector:
+      title: 主题配色
+      groups:
+        system: 系统
+        brightBuiltin: 亮色
+        darkBuiltin: 暗色
+      tone:
+        light: 亮
+        dark: 暗
+      presets:
+        followSystem: 跟随系统
+        light: 亮色
+        dark: 暗色
+        graphite: 石墨青蓝
+        cyber: 赛博荧光
+        sakura: 樱花粉
+        mint: 薄荷绿
+        aurora: 极光紫
+        butter: 奶油黄
+    toggleTheme:
+      toLight: 切换至亮色
+      toDark: 切换至暗色
+  windowControls:
+    minimize: 最小化
+    maximize: 最大化
+    restore: 还原
+    close: 关闭
+window:
+  closeConfirm:
+    title: 退出 $t(common:appName)
+    options:
+      minimize-to-tray: 最小化到托盘区
+      quit: 退出应用
+    remember: 记住选择
+    ok: 确定
+    cancel: 取消
+navigation:
+  sidebar:
+    menu:
+      match-history: 战绩
+      ongoing-game: 对局
+      automation: 自动操作
+      toolkit: 工具集
+      test: 测试
+    status:
+      respawned: 已复活
+      respawnedContent: 你在游戏内已复活，祝你游戏愉快！
+      currentConnected: 当前已连接
+      launchedClients: 已启动的客户端
+      launchedClientPlaceholder: 已启动的客户端 {{index}}
+      noClientTitle: 无可用客户端
+      noClient: 当前无可用客户端，请启动游戏
+      settings: 设置
+      notConnected: 未连接
+      unknown: 未知
+      inConnectionLoop: 连接中...
+      connectedClient: 已连接的客户端
+      respawnTimer:
+        timeLeft: 距离重生 {{seconds}} s
+startup:
+  launcher:
+    tcls: TCLS 客户端
+    weGame: WeGame
+    riotClient: Riot 客户端
+    successMessage: 已启动进程：{{name}}
+    failedMessage: 无法启动进程 {{name}}：{{reason}}
+    newVersionAvailable: 新版本
+backgroundTasks:
+  taskTitle: 正在进行 ({{count}})
+  emptyPlaceholder: 无后台任务

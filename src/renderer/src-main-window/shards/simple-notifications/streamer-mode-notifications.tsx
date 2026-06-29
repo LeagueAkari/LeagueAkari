@@ -22,7 +22,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
   const { openSettingsModal } = useMainWindowAppContext()
   const leagueClientStore = useLeagueClientStore()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.liveStreamingHints'
+    keyPrefix: 'notifications.simple.liveStreamingHints'
   })
 
   let inst: NotificationReactive | null = null

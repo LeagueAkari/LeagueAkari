@@ -10,7 +10,7 @@ export function watchQueueingProgress() {
   const leagueClientStore = useLeagueClientStore()
   const backgroundTasksStore = useBackgroundTasksStore()
   const { t } = useTranslation(undefined, {
-    keyPrefix: 'simple-notifications-renderer.login-queue-task'
+    keyPrefix: 'notifications.simple.login-queue-task'
   })
 
   const taskId = `${SIMPLE_NOTIFICATIONS_RENDERER_ID}/queueing`

@@ -1,0 +1,17 @@
+gameAssets:
+  summonerSpell:
+    cooldown: 'Cooldown: {{time}} s'
+    levelRequirement: 'Level: {{level}} Required'
+  item:
+    combinePrice: Combine for {{gold}} G
+  augment:
+    bronze: Bronze
+    silver: Silver
+    gold: Gold
+    prismatic: Prismatic
+    eventChoice: Event Choice
+    rarity: '{{rarity}}'
+sharedUi:
+  copyableText:
+    copy: Copy
+    copied: Copied to clipboard

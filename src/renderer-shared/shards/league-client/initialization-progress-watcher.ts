@@ -23,13 +23,13 @@ export function watchLeagueClientInitializationProgress() {
 
       if (!taskStore.hasTask(initTaskId)) {
         taskStore.createTask(initTaskId, {
-          name: () => t('league-client-renderer.initialization-task.name')
+          name: () => t('leagueClient.tasks.initialization-task.name')
         })
       }
 
       taskStore.updateTask(initTaskId, {
         description: () =>
-          t('league-client-renderer.initialization-task.current', {
+          t('leagueClient.tasks.initialization-task.current', {
             finishedCount: progress.finished.length,
             allCount: progress.all.length
           }),
@@ -51,9 +51,9 @@ export function watchLeagueClientInitializationProgress() {
 
       if (!taskStore.hasTask(connectTaskId)) {
         taskStore.createTask(connectTaskId, {
-          name: () => t('league-client-renderer.connection-task.name'),
+          name: () => t('leagueClient.tasks.connection-task.name'),
           description: () =>
-            t('league-client-renderer.connection-task.target', {
+            t('leagueClient.tasks.connection-task.target', {
               target: getSgpServerId(client.region, client.rsoPlatformId)
             })
         })

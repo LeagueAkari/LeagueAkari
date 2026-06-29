@@ -3,12 +3,12 @@
     <NScrollbar class="relative h-full max-w-full" ref="el">
       <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
         <SettingsSection
-          :title="t('AutoGameflow.sections.readyCheck')"
-          :footer="t('AutoGameflow.autoAcceptEnabled.footer')"
+          :title="t('automation.gameflow.sections.readyCheck')"
+          :footer="t('automation.gameflow.autoAcceptEnabled.footer')"
         >
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoAcceptEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoAcceptEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -18,8 +18,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoAcceptDelaySeconds.label')"
-            :label-description="t('AutoGameflow.autoAcceptDelaySeconds.description')"
+            :label="t('automation.gameflow.autoAcceptDelaySeconds.label')"
+            :label-description="t('automation.gameflow.autoAcceptDelaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -33,10 +33,10 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.autoHonor')">
+        <SettingsSection :title="t('automation.gameflow.sections.autoHonor')">
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoHonorEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoHonorEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -47,11 +47,11 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.playAgain')">
-          <SettingsRow :label="t('AutoGameflow.common.enabled')" :label-width="260">
+        <SettingsSection :title="t('automation.gameflow.sections.playAgain')">
+          <SettingsRow :label="t('automation.gameflow.common.enabled')" :label-width="260">
             <template #labelDescription>
               <TranslationComponent
-                :translation="t('AutoGameflow.playAgainEnabled.description.full')"
+                :translation="t('automation.gameflow.playAgainEnabled.description.full')"
               >
                 <template #autoHonor>
                   <NCheckbox
@@ -60,7 +60,7 @@
                     :checked="store.settings.autoHonorEnabled"
                     @update:checked="(val) => shard.setAutoHonorEnabled(val)"
                   >
-                    {{ t('AutoGameflow.playAgainEnabled.description.part2') }}
+                    {{ t('automation.gameflow.playAgainEnabled.description.part2') }}
                   </NCheckbox>
                 </template>
               </TranslationComponent>
@@ -73,10 +73,10 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.autoMatchmaking')">
+        <SettingsSection :title="t('automation.gameflow.sections.autoMatchmaking')">
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoMatchmakingEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoMatchmakingEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -86,9 +86,9 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoMatchmakingMinimumMembers.label')"
+            :label="t('automation.gameflow.autoMatchmakingMinimumMembers.label')"
             :label-description="
-              t('AutoGameflow.autoMatchmakingMinimumMembers.description', {
+              t('automation.gameflow.autoMatchmakingMinimumMembers.description', {
                 members: store.settings.autoMatchmakingMinimumMembers
               })
             "
@@ -104,8 +104,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoMatchmakingDelaySeconds.label')"
-            :label-description="t('AutoGameflow.autoMatchmakingDelaySeconds.description')"
+            :label="t('automation.gameflow.autoMatchmakingDelaySeconds.label')"
+            :label-description="t('automation.gameflow.autoMatchmakingDelaySeconds.description')"
             :label-width="260"
           >
             <NInputNumber
@@ -118,8 +118,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoMatchmakingWaitForInvitees.label')"
-            :label-description="t('AutoGameflow.autoMatchmakingWaitForInvitees.description')"
+            :label="t('automation.gameflow.autoMatchmakingWaitForInvitees.label')"
+            :label-description="t('automation.gameflow.autoMatchmakingWaitForInvitees.description')"
             :label-width="260"
           >
             <NSwitch
@@ -129,8 +129,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoMatchmakingRematchStrategy.label')"
-            :label-description="t('AutoGameflow.autoMatchmakingRematchStrategy.description')"
+            :label="t('automation.gameflow.autoMatchmakingRematchStrategy.label')"
+            :label-description="t('automation.gameflow.autoMatchmakingRematchStrategy.description')"
             :label-width="260"
           >
             <NRadioGroup
@@ -141,25 +141,27 @@
             >
               <NFlex :size="8" class="justify-end">
                 <NRadio value="never">{{
-                  t('AutoGameflow.autoMatchmakingRematchStrategy.options.never')
+                  t('automation.gameflow.autoMatchmakingRematchStrategy.options.never')
                 }}</NRadio>
                 <NRadio value="fixed-duration">{{
-                  t('AutoGameflow.autoMatchmakingRematchStrategy.options.fixed-duration')
+                  t('automation.gameflow.autoMatchmakingRematchStrategy.options.fixed-duration')
                 }}</NRadio>
                 <NRadio value="estimated-duration">{{
-                  t('AutoGameflow.autoMatchmakingRematchStrategy.options.estimated-duration')
+                  t('automation.gameflow.autoMatchmakingRematchStrategy.options.estimated-duration')
                 }}</NRadio>
               </NFlex>
             </NRadioGroup>
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.autoMatchmakingRematchFixedDuration.label')"
+            :label="t('automation.gameflow.autoMatchmakingRematchFixedDuration.label')"
             :label-description="
               store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'
                 ? t(
-                    'AutoGameflow.autoMatchmakingRematchFixedDuration.description.no-fixed-duration'
+                    'automation.gameflow.autoMatchmakingRematchFixedDuration.description.no-fixed-duration'
                   )
-                : t('AutoGameflow.autoMatchmakingRematchFixedDuration.description.fixed-duration')
+                : t(
+                    'automation.gameflow.autoMatchmakingRematchFixedDuration.description.fixed-duration'
+                  )
             "
             :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
             :label-width="260"
@@ -175,10 +177,10 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.autoReconnect')">
+        <SettingsSection :title="t('automation.gameflow.sections.autoReconnect')">
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoReconnectEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoReconnectEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -189,10 +191,10 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.leader')">
+        <SettingsSection :title="t('automation.gameflow.sections.leader')">
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoSkipLeaderEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoSkipLeaderEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -203,10 +205,10 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('AutoGameflow.sections.invitations')">
+        <SettingsSection :title="t('automation.gameflow.sections.invitations')">
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoHandleInvitationsEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoHandleInvitationsEnabled.description')"
             :label-width="260"
           >
             <NSwitch
@@ -216,8 +218,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.rejectInvitationWhenAway.label')"
-            :label-description="t('AutoGameflow.rejectInvitationWhenAway.description')"
+            :label="t('automation.gameflow.rejectInvitationWhenAway.label')"
+            :label-description="t('automation.gameflow.rejectInvitationWhenAway.description')"
             :label-width="260"
           >
             <NSwitch
@@ -227,8 +229,8 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label="t('AutoGameflow.invitationHandlingStrategies.label')"
-            :label-description="t('AutoGameflow.invitationHandlingStrategies.description')"
+            :label="t('automation.gameflow.invitationHandlingStrategies.label')"
+            :label-description="t('automation.gameflow.invitationHandlingStrategies.description')"
             :label-width="260"
             align="start"
           >
@@ -249,13 +251,13 @@
                       >
                         <NFlex :size="8">
                           <NRadio value="accept">{{
-                            t('AutoGameflow.invitationHandlingStrategies.options.accept')
+                            t('automation.gameflow.invitationHandlingStrategies.options.accept')
                           }}</NRadio>
                           <NRadio value="decline">{{
-                            t('AutoGameflow.invitationHandlingStrategies.options.decline')
+                            t('automation.gameflow.invitationHandlingStrategies.options.decline')
                           }}</NRadio>
                           <NRadio value="ignore">{{
-                            t('AutoGameflow.invitationHandlingStrategies.options.ignore')
+                            t('automation.gameflow.invitationHandlingStrategies.options.ignore')
                           }}</NRadio>
                         </NFlex>
                       </NRadioGroup>
@@ -271,7 +273,7 @@
                 @update:value="handleChangeInvitationStrategies"
               >
                 <NButton size="tiny" type="primary">{{
-                  t('AutoGameflow.invitationHandlingStrategies.button')
+                  t('automation.gameflow.invitationHandlingStrategies.button')
                 }}</NButton>
               </NPopselect>
             </NFlex>
@@ -282,23 +284,23 @@
           <template #header>
             <TooltipWithIcon>
               <span class="text-sm leading-5 font-bold text-black/80 dark:text-white/90">
-                {{ t('AutoGameflow.sections.aramTeamSide') }}
+                {{ t('automation.gameflow.sections.aramTeamSide') }}
               </span>
               <template #tooltip>
                 <div class="max-w-90 text-xs leading-relaxed font-normal">
                   <img
                     :src="aramTeamSideMessageImage"
-                    :alt="t('AutoGameflow.autoSendARAMTeamSideEnabled.tooltipImageAlt')"
+                    :alt="t('automation.gameflow.autoSendARAMTeamSideEnabled.tooltipImageAlt')"
                     class="mb-2 aspect-[1680/935] w-90 max-w-full rounded border border-black/10 object-cover dark:border-white/10"
                   />
-                  <div>{{ t('AutoGameflow.autoSendARAMTeamSideEnabled.tooltipBody') }}</div>
+                  <div>{{ t('automation.gameflow.autoSendARAMTeamSideEnabled.tooltipBody') }}</div>
                 </div>
               </template>
             </TooltipWithIcon>
           </template>
           <SettingsRow
-            :label="t('AutoGameflow.common.enabled')"
-            :label-description="t('AutoGameflow.autoSendARAMTeamSideEnabled.description')"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-description="t('automation.gameflow.autoSendARAMTeamSideEnabled.description')"
             :label-width="260"
           >
             <div class="flex flex-col items-end gap-2">
@@ -314,7 +316,7 @@
                 :checked="store.settings.autoSendARAMTeamSideVisibleToTeam"
                 @update:checked="(val) => shard.setAutoSendARAMTeamSideVisibleToTeam(val)"
               >
-                {{ t('AutoGameflow.autoSendARAMTeamSideVisibleToTeam.checkboxLabel') }}
+                {{ t('automation.gameflow.autoSendARAMTeamSideVisibleToTeam.checkboxLabel') }}
               </NCheckbox>
             </div>
           </SettingsRow>
@@ -372,7 +374,7 @@ const { t } = useTranslation()
 const queueTypes = computed(() => {
   return {
     '<DEFAULT>': {
-      label: t('AutoGameflow.invitationHandlingStrategies.queueTypes.default'),
+      label: t('automation.gameflow.invitationHandlingStrategies.queueTypes.default'),
       order: 0
     },
     RANKED_SOLO_5x5: {

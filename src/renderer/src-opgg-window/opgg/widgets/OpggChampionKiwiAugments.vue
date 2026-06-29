@@ -11,10 +11,10 @@
 
         <div class="my-2 flex items-center gap-2">
           <NCheckbox size="small" v-model:checked="showAdvancedStats">
-            {{ t('OpggChampion.showAdvancedStats') }}
+            {{ t('opgg.champion.showAdvancedStats') }}
           </NCheckbox>
           <NCheckbox size="small" v-model:checked="isAugmentsExpanded">
-            {{ t('OpggChampion.showAll') }}
+            {{ t('opgg.champion.showAll') }}
           </NCheckbox>
           <NSelect
             v-model:value="augmentSort"
@@ -59,7 +59,7 @@
               v-if="showAdvancedStats"
               class="ml-auto flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
             >
-              {{ t('OpggChampion.augmentPerformance') }}
+              {{ t('opgg.champion.augmentPerformance') }}
               <span class="ml-1 font-bold">{{ a.performance }}</span>
             </div>
 
@@ -67,7 +67,7 @@
               v-if="showAdvancedStats"
               class="flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
             >
-              {{ t('OpggChampion.augmentPopular') }}
+              {{ t('opgg.champion.augmentPopular') }}
               <span class="ml-1 font-bold">{{ a.popular }}</span>
             </div>
           </div>
@@ -128,9 +128,9 @@ type KiwiAugmentWithRarity = OpggAramMayhemChampionAugmentItem & {
 }
 
 const augmentSortOptions = computed(() => [
-  { label: t('OpggChampion.augmentSort.default'), value: 'default' },
-  { label: t('OpggChampion.augmentSort.performance'), value: 'performance' },
-  { label: t('OpggChampion.augmentSort.popular'), value: 'popular' }
+  { label: t('opgg.champion.augmentSort.default'), value: 'default' },
+  { label: t('opgg.champion.augmentSort.performance'), value: 'performance' },
+  { label: t('opgg.champion.augmentSort.popular'), value: 'popular' }
 ])
 
 const renderLabel = (option: SelectOption) => {
@@ -197,7 +197,7 @@ const augments = computed(() => {
   if (sortedAugments.length) {
     groups.push({
       rarity: AugmentTab.All,
-      rarityName: t('OpggChampion.augmentAll'),
+      rarityName: t('opgg.champion.augmentAll'),
       augments: sortedAugments
     })
   }
@@ -206,7 +206,7 @@ const augments = computed(() => {
   if (kSilver.length) {
     groups.push({
       rarity: AugmentTab.kSilver,
-      rarityName: t('OpggChampion.augmentSilver'),
+      rarityName: t('opgg.champion.augmentSilver'),
       augments: kSilver
     })
   }
@@ -215,7 +215,7 @@ const augments = computed(() => {
   if (kGold.length) {
     groups.push({
       rarity: AugmentTab.kGold,
-      rarityName: t('OpggChampion.augmentGold'),
+      rarityName: t('opgg.champion.augmentGold'),
       augments: kGold
     })
   }
@@ -224,7 +224,7 @@ const augments = computed(() => {
   if (kPrismatic.length) {
     groups.push({
       rarity: AugmentTab.kPrismatic,
-      rarityName: t('OpggChampion.augmentPrism'),
+      rarityName: t('opgg.champion.augmentPrism'),
       augments: kPrismatic
     })
   }

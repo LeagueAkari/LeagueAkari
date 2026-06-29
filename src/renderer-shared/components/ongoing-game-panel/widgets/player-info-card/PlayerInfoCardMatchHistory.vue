@@ -57,7 +57,7 @@
     >
       <div class="flex items-center gap-1">
         <NSpin :size="16" />
-        <span>{{ t('PlayerInfoCard.loadingMatchHistory') }}</span>
+        <span>{{ t('ongoingGame.playerCard.loadingMatchHistory') }}</span>
       </div>
     </div>
 
@@ -66,10 +66,10 @@
       class="absolute inset-0 flex h-full w-full items-center justify-center gap-1 rounded text-xs text-orange-600 dark:bg-white/5 dark:text-orange-300"
     >
       <div class="flex flex-col items-center gap-2">
-        <div>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</div>
+        <div>{{ t('ongoingGame.playerCard.errorLoadingMatchHistory') }}</div>
 
         <NButton size="tiny" @click="og.reloadPlayer(puuid)">
-          {{ t('PlayerInfoCard.reloadMatchHistory') }}
+          {{ t('ongoingGame.playerCard.reloadMatchHistory') }}
         </NButton>
       </div>
     </div>
@@ -79,7 +79,7 @@
       class="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center rounded text-xs text-black/60 dark:bg-white/5 dark:text-white/60"
     >
       <div class="flex flex-col items-center gap-2">
-        {{ t('PlayerInfoCard.empty') }}
+        {{ t('ongoingGame.playerCard.empty') }}
       </div>
     </div>
   </div>
@@ -119,15 +119,15 @@ const matchHistoryLoadingState = computed(() => ogs.matchHistoryLoadingState[puu
 
 const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: MatchParticipant }) => {
   if (match.basicInfo.gameMode === 'PRACTICETOOL') {
-    return t('PlayerInfoCard.matchHistory.winResult.na')
+    return t('ongoingGame.playerCard.matchHistory.winResult.na')
   }
 
   if (match.participant.winResult === 'abort') {
-    return t('PlayerInfoCard.matchHistory.winResult.abort')
+    return t('ongoingGame.playerCard.matchHistory.winResult.abort')
   }
 
   if (match.participant.winResult === 'remake') {
-    return t('PlayerInfoCard.matchHistory.winResult.remake')
+    return t('ongoingGame.playerCard.matchHistory.winResult.remake')
   }
 
   if (match.basicInfo.gameMode === 'CHERRY') {
@@ -139,8 +139,8 @@ const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: Match
   }
 
   return match.participant.winResult === 'win'
-    ? t('PlayerInfoCard.matchHistory.winResult.win')
-    : t('PlayerInfoCard.matchHistory.winResult.loss')
+    ? t('ongoingGame.playerCard.matchHistory.winResult.win')
+    : t('ongoingGame.playerCard.matchHistory.winResult.loss')
 }
 
 const getMatchItemThemeClass = (match: {

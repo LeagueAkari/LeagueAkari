@@ -52,7 +52,7 @@ import PreviewPanel from '../widgets/PreviewPanel.vue'
 const junglePreset = useJunglePreset()
 
 const { options, updateOptions } = junglePreset
-const { t } = useTranslation('renderer', { keyPrefix: 'InGameSend.presets.jungle' })
+const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.jungle' })
 
 const presetLabel = computed(() => t('label'))
 

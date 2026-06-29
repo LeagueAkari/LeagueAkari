@@ -14,7 +14,7 @@
       tertiary
       circle
       :disabled="isFirstPage || isPaginationDisabled"
-      :title="t('PlayerTab.prevPage')"
+      :title="t('playerTabs.profile.prevPage')"
       @click="handlePrevPage"
     >
       <template #icon>
@@ -34,7 +34,7 @@
       </template>
       <div class="flex flex-col gap-2 p-1">
         <div class="text-xs text-black/60 dark:text-white/60">
-          {{ t('PlayerTab.goToPage') }}
+          {{ t('playerTabs.profile.goToPage') }}
         </div>
         <div class="flex items-center gap-2">
           <NInputNumber
@@ -61,7 +61,7 @@
             tertiary
             circle
             :disabled="isPaginationDisabled || isFirstPage"
-            :title="t('PlayerTab.firstPage')"
+            :title="t('playerTabs.profile.firstPage')"
             @click="handleGoToFirstPage"
           >
             <template #icon>
@@ -76,7 +76,7 @@
       size="small"
       tertiary
       circle
-      :title="t('PlayerTab.nextPage')"
+      :title="t('playerTabs.profile.nextPage')"
       @click="handleNextPage"
       :disabled="isPaginationDisabled"
     >

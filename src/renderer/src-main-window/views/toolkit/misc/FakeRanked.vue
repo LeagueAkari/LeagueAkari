@@ -1,8 +1,8 @@
 <template>
-  <SettingsSection :title="t('FakeRanked.title')">
+  <SettingsSection :title="t('toolkit.fakeRanked.title')">
     <SettingsRow
-      :label="t('FakeRanked.set.label')"
-      :label-description="t('FakeRanked.set.description')"
+      :label="t('toolkit.fakeRanked.set.label')"
+      :label-description="t('toolkit.fakeRanked.set.description')"
       :label-width="260"
       :label-min-width="160"
       align="start"
@@ -10,7 +10,7 @@
       <div class="flex w-115 max-w-full flex-wrap items-end justify-end gap-2">
         <div class="min-w-0 flex-[1_1_170px]">
           <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
-            {{ t('FakeRanked.queue') }}
+            {{ t('toolkit.fakeRanked.queue') }}
           </div>
           <NSelect
             class="w-full! max-w-full"
@@ -22,7 +22,7 @@
         </div>
         <div class="min-w-0 flex-[1_1_112px]">
           <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
-            {{ t('FakeRanked.tier') }}
+            {{ t('toolkit.fakeRanked.tier') }}
           </div>
           <NSelect
             class="w-full! max-w-full"
@@ -34,7 +34,7 @@
         </div>
         <div class="min-w-0 flex-[0_1_88px]">
           <div class="mb-1 text-xs leading-4 text-black/60 dark:text-white/60">
-            {{ t('FakeRanked.division') }}
+            {{ t('toolkit.fakeRanked.division') }}
           </div>
           <NSelect
             class="w-full! max-w-full"
@@ -56,7 +56,7 @@
           :loading="isSetting"
           :disabled="isSetting"
           @click="() => handleSet()"
-          >{{ t('FakeRanked.set.button') }}</NButton
+          >{{ t('toolkit.fakeRanked.set.button') }}</NButton
         >
         <div class="flex basis-full justify-end">
           <NTooltip>
@@ -66,11 +66,11 @@
                 :checked="ams.settings.autoSetRankedStatusEnabled"
                 @update:checked="(value) => am.setAutoSetRankedStatusEnabled(value)"
               >
-                {{ t('FakeRanked.resetOnLogin.label') }}
+                {{ t('toolkit.fakeRanked.resetOnLogin.label') }}
               </NCheckbox>
             </template>
             <div class="max-w-64 text-xs">
-              {{ t('FakeRanked.resetOnLogin.description') }}
+              {{ t('toolkit.fakeRanked.resetOnLogin.description') }}
             </div>
           </NTooltip>
         </div>
@@ -129,17 +129,17 @@ const handleSet = async () => {
     await am.setRankedStatus(rankedStatus)
 
     if (!lcs.isConnected) {
-      message.success(t('FakeRanked.saved'), { duration: 1000 })
+      message.success(t('toolkit.fakeRanked.saved'), { duration: 1000 })
       return
     }
 
     await am.applyRankedStatus(rankedStatus)
-    message.success(t('FakeRanked.commonSuccess'), { duration: 1000 })
+    message.success(t('toolkit.fakeRanked.commonSuccess'), { duration: 1000 })
   } catch (error) {
     notification.warning({
-      title: () => t('FakeRanked.set.failedNotification.title'),
+      title: () => t('toolkit.fakeRanked.set.failedNotification.title'),
       content: () =>
-        t('FakeRanked.set.failedNotification.description', {
+        t('toolkit.fakeRanked.set.failedNotification.description', {
           reason: (error as Error).message
         })
     })

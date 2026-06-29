@@ -2,18 +2,20 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
-        <SettingsSection :title="t('Client.gameClient.title')">
+        <SettingsSection :title="t('toolkit.client.gameClient.title')">
           <SettingsRow
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
-                ? t('Client.gameClient.terminateGameClientWithShortcut.labelAdminRequired')
-                : t('Client.gameClient.terminateGameClientWithShortcut.label')
+                ? t('toolkit.client.gameClient.terminateGameClientWithShortcut.labelAdminRequired')
+                : t('toolkit.client.gameClient.terminateGameClientWithShortcut.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
-              <div>{{ t('Client.gameClient.terminateGameClientWithShortcut.description') }}</div>
+              <div>
+                {{ t('toolkit.client.gameClient.terminateGameClientWithShortcut.description') }}
+              </div>
               <div
                 v-if="!as.nativeSupport.nativeInput.available"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
@@ -33,13 +35,13 @@
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
-                ? t('Client.gameClient.terminateShortcut.labelAdminRequired')
-                : t('Client.gameClient.terminateShortcut.label')
+                ? t('toolkit.client.gameClient.terminateShortcut.labelAdminRequired')
+                : t('toolkit.client.gameClient.terminateShortcut.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
-              <div>{{ t('Client.gameClient.terminateShortcut.description') }}</div>
+              <div>{{ t('toolkit.client.gameClient.terminateShortcut.description') }}</div>
               <div
                 v-if="!as.nativeSupport.nativeInput.available"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
@@ -54,18 +56,22 @@
             />
           </SettingsRow>
           <SettingsRow
-            :label-description="t('Client.gameClient.settingsFileMode.description')"
+            :label-description="t('toolkit.client.gameClient.settingsFileMode.description')"
             :label-width="320"
           >
             <template #label>
               <TooltipWithIcon>
-                <span>{{ t('Client.gameClient.settingsFileMode.label') }}</span>
+                <span>{{ t('toolkit.client.gameClient.settingsFileMode.label') }}</span>
                 <template #tooltip>
                   <div class="max-w-70 text-xs leading-relaxed font-normal">
                     <div class="space-y-1.5">
-                      <div>{{ t('Client.gameClient.settingsFileMode.details.readonly') }}</div>
-                      <div>{{ t('Client.gameClient.settingsFileMode.details.writable') }}</div>
-                      <div>{{ t('Client.gameClient.settingsFileMode.details.scope') }}</div>
+                      <div>
+                        {{ t('toolkit.client.gameClient.settingsFileMode.details.readonly') }}
+                      </div>
+                      <div>
+                        {{ t('toolkit.client.gameClient.settingsFileMode.details.writable') }}
+                      </div>
+                      <div>{{ t('toolkit.client.gameClient.settingsFileMode.details.scope') }}</div>
                     </div>
                   </div>
                 </template>
@@ -80,18 +86,20 @@
             />
           </SettingsRow>
         </SettingsSection>
-        <SettingsSection :title="t('Client.leagueClientUx.title')">
+        <SettingsSection :title="t('toolkit.client.leagueClientUx.title')">
           <SettingsRow
             :disabled="!adjustLeagueClientWindowSizeSupported"
             :label="
               adjustWindowRequiresElevation
-                ? t('Client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
-                : t('Client.leagueClientUx.fixWindowMethodAOptions.label')
+                ? t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
+                : t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.label')
             "
             :label-width="320"
           >
             <template #labelDescription>
-              <div v-html="t('Client.leagueClientUx.fixWindowMethodAOptions.description')"></div>
+              <div
+                v-html="t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.description')"
+              ></div>
               <div
                 v-if="!adjustLeagueClientWindowSizeSupported"
                 class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
@@ -130,7 +138,7 @@
                 secondary
                 type="warning"
                 @click="handleFixWindowMethodA"
-                >{{ t('Client.leagueClientUx.fixWindowMethodAOptions.button') }}</NButton
+                >{{ t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.button') }}</NButton
               >
             </div>
           </SettingsRow>
@@ -172,8 +180,8 @@ const nativeInputRequiresElevation = computed(
 )
 const nativeInputStatusDescription = computed(() =>
   as.nativeSupport.nativeInput.availableOnCurrentPlatform
-    ? t('Client.gameClient.nativeAddonRequiresAdministrator')
-    : t('Client.gameClient.windowsOnlyNativeAddon')
+    ? t('toolkit.client.gameClient.nativeAddonRequiresAdministrator')
+    : t('toolkit.client.gameClient.windowsOnlyNativeAddon')
 )
 
 const adjustWindowRequirement = computed(() => as.nativeSupport.adjustLeagueClientWindowSize)
@@ -185,8 +193,8 @@ const adjustLeagueClientWindowSizeSupported = computed(
 )
 const adjustWindowStatusDescription = computed(() =>
   adjustWindowRequirement.value.availableOnCurrentPlatform
-    ? t('Client.leagueClientUx.fixWindowMethodAOptions.requiresAdministrator')
-    : t('Client.leagueClientUx.fixWindowMethodAOptions.unsupportedCurrentPlatform')
+    ? t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.requiresAdministrator')
+    : t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.unsupportedCurrentPlatform')
 )
 
 const fixWindowInputButton2 = useTemplateRef('input-2')
@@ -198,10 +206,10 @@ const fixWindowMethodAOptions = reactive({
 
 const handleFixWindowMethodA = async () => {
   dialog.warning({
-    title: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.title'),
-    content: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content'),
-    positiveText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.positiveText'),
-    negativeText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.negativeText'),
+    title: t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.dialog.title'),
+    content: t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.dialog.content'),
+    positiveText: t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.dialog.positiveText'),
+    negativeText: t('toolkit.client.leagueClientUx.fixWindowMethodAOptions.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.fixWindowMethodA(toRaw(fixWindowMethodAOptions))
@@ -239,13 +247,13 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
     settingFileMode.value = await gc.getSettingsFileReadonlyOrWritable()
 
     if (mode === 'readonly') {
-      message.success(t('Client.gameClient.settingsFileMode.setToReadonly'))
+      message.success(t('toolkit.client.gameClient.settingsFileMode.setToReadonly'))
     } else {
-      message.success(t('Client.gameClient.settingsFileMode.setToWritable'))
+      message.success(t('toolkit.client.gameClient.settingsFileMode.setToWritable'))
     }
   } catch (error: any) {
     message.warning(
-      t('Client.gameClient.settingsFileMode.failedToSet', {
+      t('toolkit.client.gameClient.settingsFileMode.failedToSet', {
         reason: error.message
       })
     )

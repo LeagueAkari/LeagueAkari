@@ -28,12 +28,12 @@
       <div class="my-1 h-px bg-gray-300 dark:bg-gray-700"></div>
       <div class="grid grid-cols-2 grid-rows-1 gap-1">
         <div>
-          <div class="text-[11px] font-bold">{{ t('DamageMetricsBar.total') }}</div>
+          <div class="text-[11px] font-bold">{{ t('matchCard.damageMetrics.total') }}</div>
           <div>{{ totalDamage.toLocaleString() }}</div>
         </div>
         <div>
           <div class="text-[11px] font-bold">
-            {{ t('DamageMetricsBar.physical') }} ({{
+            {{ t('matchCard.damageMetrics.physical') }} ({{
               ((physicalDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)
           </div>
@@ -41,7 +41,7 @@
         </div>
         <div>
           <div class="text-[11px] font-bold">
-            {{ t('DamageMetricsBar.magic') }} ({{
+            {{ t('matchCard.damageMetrics.magic') }} ({{
               ((magicDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)
           </div>
@@ -49,7 +49,7 @@
         </div>
         <div>
           <div class="text-[11px] font-bold">
-            {{ t('DamageMetricsBar.true') }} ({{
+            {{ t('matchCard.damageMetrics.true') }} ({{
               ((trueDamage / (totalDamage || 1)) * 100).toFixed()
             }}%)
           </div>

@@ -10,7 +10,7 @@ function times(label: string, count: number, t: TFunction) {
     return `${label}`
   }
 
-  return t('MatchCard.tags.times', { label, count: Math.round(count) })
+  return t('matchCard.tags.times', { label, count: Math.round(count) })
 }
 
 export interface PlayerTag {
@@ -49,7 +49,7 @@ function computeMultikillTags({ participant }: TagContext, t: TFunction): Player
 
   if (streakKills.penta) {
     tags.push({
-      label: `${times(t('MatchCard.tags.multiKill.penta'), streakKills.penta, t)}`,
+      label: `${times(t('matchCard.tags.multiKill.penta'), streakKills.penta, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 20000
@@ -58,7 +58,7 @@ function computeMultikillTags({ participant }: TagContext, t: TFunction): Player
 
   if (streakKills.quadra) {
     tags.push({
-      label: `${times(t('MatchCard.tags.multiKill.quadra'), streakKills.quadra, t)}`,
+      label: `${times(t('matchCard.tags.multiKill.quadra'), streakKills.quadra, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 1300
@@ -67,7 +67,7 @@ function computeMultikillTags({ participant }: TagContext, t: TFunction): Player
 
   if (streakKills.triple) {
     tags.push({
-      label: `${times(t('MatchCard.tags.multiKill.triple'), streakKills.triple, t)}`,
+      label: `${times(t('matchCard.tags.multiKill.triple'), streakKills.triple, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 300 + streakKills.triple * 15
@@ -76,7 +76,7 @@ function computeMultikillTags({ participant }: TagContext, t: TFunction): Player
 
   if (streakKills.double) {
     tags.push({
-      label: `${times(t('MatchCard.tags.multiKill.double'), streakKills.double, t)}`,
+      label: `${times(t('matchCard.tags.multiKill.double'), streakKills.double, t)}`,
       color: theme.bg,
       textColor: theme.text,
       priority: 100 + streakKills.double * 10
@@ -92,10 +92,10 @@ function computeDamageTags({ participant, team, teams }: TagContext, t: TFunctio
   if (participant.totalDamageDealtToChampions === teams.allTeamStats.maxDamageDealtToChampions) {
     return [
       {
-        label: t('MatchCard.tags.damage.bestLabel'),
+        label: t('matchCard.tags.damage.bestLabel'),
         color: 'bg-red-800 dark:bg-red-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.damage.bestContent', {
+        content: t('matchCard.tags.damage.bestContent', {
           value: participant.totalDamageDealtToChampions.toLocaleString(),
           rate: (
             (participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) *
@@ -108,10 +108,10 @@ function computeDamageTags({ participant, team, teams }: TagContext, t: TFunctio
   } else if (participant.totalDamageDealtToChampions === team.maxDamageDealtToChampions) {
     return [
       {
-        label: t('MatchCard.tags.damage.teamLabel'),
+        label: t('matchCard.tags.damage.teamLabel'),
         color: 'bg-red-700 dark:bg-red-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.damage.teamContent', {
+        content: t('matchCard.tags.damage.teamContent', {
           value: participant.totalDamageDealtToChampions.toLocaleString(),
           rate: (
             (participant.totalDamageDealtToChampions / noZero(team.totalDamageDealtToChampions)) *
@@ -132,10 +132,10 @@ function computeTakenTags({ participant, team, teams }: TagContext, t: TFunction
   if (participant.totalDamageTaken === teams.allTeamStats.maxDamageTaken) {
     return [
       {
-        label: t('MatchCard.tags.taken.bestLabel'),
+        label: t('matchCard.tags.taken.bestLabel'),
         color: 'bg-slate-700 dark:bg-slate-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.taken.bestContent', {
+        content: t('matchCard.tags.taken.bestContent', {
           value: participant.totalDamageTaken.toLocaleString(),
           rate: ((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)
         }),
@@ -145,10 +145,10 @@ function computeTakenTags({ participant, team, teams }: TagContext, t: TFunction
   } else if (participant.totalDamageTaken === team.maxDamageTaken) {
     return [
       {
-        label: t('MatchCard.tags.taken.teamLabel'),
+        label: t('matchCard.tags.taken.teamLabel'),
         color: 'bg-slate-600 dark:bg-slate-600',
         textColor: 'text-white',
-        content: t('MatchCard.tags.taken.teamContent', {
+        content: t('matchCard.tags.taken.teamContent', {
           value: participant.totalDamageTaken.toLocaleString(),
           rate: ((participant.totalDamageTaken / noZero(team.totalDamageTaken)) * 100).toFixed(2)
         }),
@@ -166,10 +166,10 @@ function computeHealTags({ participant, team, teams }: TagContext, t: TFunction)
   if (participant.totalHeal === teams.allTeamStats.maxHeal) {
     return [
       {
-        label: t('MatchCard.tags.heal.bestLabel'),
+        label: t('matchCard.tags.heal.bestLabel'),
         color: 'bg-emerald-700 dark:bg-emerald-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.heal.bestContent', {
+        content: t('matchCard.tags.heal.bestContent', {
           value: participant.totalHeal.toLocaleString(),
           rate: ((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)
         }),
@@ -179,10 +179,10 @@ function computeHealTags({ participant, team, teams }: TagContext, t: TFunction)
   } else if (participant.totalHeal === team.maxHeal) {
     return [
       {
-        label: t('MatchCard.tags.heal.teamLabel'),
+        label: t('matchCard.tags.heal.teamLabel'),
         color: 'bg-emerald-600 dark:bg-emerald-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.heal.teamContent', {
+        content: t('matchCard.tags.heal.teamContent', {
           value: participant.totalHeal.toLocaleString(),
           rate: ((participant.totalHeal / noZero(team.totalHeal)) * 100).toFixed(2)
         }),
@@ -199,10 +199,10 @@ function computeTowerTags({ participant, team, teams }: TagContext, t: TFunction
   if (participant.totalDamageToTowers === teams.allTeamStats.maxDamageToTowers) {
     return [
       {
-        label: t('MatchCard.tags.tower.bestLabel'),
+        label: t('matchCard.tags.tower.bestLabel'),
         color: 'bg-stone-700 dark:bg-stone-600',
         textColor: 'text-white',
-        content: t('MatchCard.tags.tower.bestContent', {
+        content: t('matchCard.tags.tower.bestContent', {
           value: participant.totalDamageToTowers.toLocaleString(),
           rate: (
             (participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) *
@@ -215,10 +215,10 @@ function computeTowerTags({ participant, team, teams }: TagContext, t: TFunction
   } else if (participant.totalDamageToTowers === team.maxDamageToTowers) {
     return [
       {
-        label: t('MatchCard.tags.tower.teamLabel'),
+        label: t('matchCard.tags.tower.teamLabel'),
         color: 'bg-stone-600 dark:bg-stone-500',
         textColor: 'text-white',
-        content: t('MatchCard.tags.tower.teamContent', {
+        content: t('matchCard.tags.tower.teamContent', {
           value: participant.totalDamageToTowers.toLocaleString(),
           rate: (
             (participant.totalDamageToTowers / noZero(team.totalDamageToTowers)) *
@@ -240,10 +240,10 @@ function computeShieldTags({ participant, team, teams }: TagContext, t: TFunctio
   ) {
     return [
       {
-        label: t('MatchCard.tags.shield.bestLabel'),
+        label: t('matchCard.tags.shield.bestLabel'),
         color: 'bg-sky-700 dark:bg-sky-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.shield.bestContent', {
+        content: t('matchCard.tags.shield.bestContent', {
           value: participant.totalDamageShieldedOnTeammates.toLocaleString(),
           rate: (
             (participant.totalDamageShieldedOnTeammates /
@@ -257,10 +257,10 @@ function computeShieldTags({ participant, team, teams }: TagContext, t: TFunctio
   } else if (participant.totalDamageShieldedOnTeammates === team.maxDamageShieldedOnTeammates) {
     return [
       {
-        label: t('MatchCard.tags.shield.teamLabel'),
+        label: t('matchCard.tags.shield.teamLabel'),
         color: 'bg-sky-600 dark:bg-sky-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.shield.teamContent', {
+        content: t('matchCard.tags.shield.teamContent', {
           value: participant.totalDamageShieldedOnTeammates.toLocaleString(),
           rate: (
             (participant.totalDamageShieldedOnTeammates /
@@ -279,10 +279,10 @@ function computeSoloTags({ participant }: TagContext, t: TFunction): PlayerTag[]
   if (participant.soloKills && participant.soloKills >= 2) {
     return [
       {
-        label: `${times(t('MatchCard.tags.solo.label'), participant.soloKills, t)}`,
+        label: `${times(t('matchCard.tags.solo.label'), participant.soloKills, t)}`,
         color: 'bg-indigo-700 dark:bg-indigo-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.solo.content', {
+        content: t('matchCard.tags.solo.content', {
           value: participant.soloKills.toLocaleString()
         }),
         priority: 1700
@@ -298,10 +298,10 @@ function computeGoldTags({ participant, team, teams }: TagContext, t: TFunction)
   if (participant.goldEarned === teams.allTeamStats.maxGoldEarned) {
     return [
       {
-        label: t('MatchCard.tags.gold.bestLabel'),
+        label: t('matchCard.tags.gold.bestLabel'),
         color: 'bg-amber-700 dark:bg-amber-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.gold.bestContent', {
+        content: t('matchCard.tags.gold.bestContent', {
           value: participant.goldEarned.toLocaleString(),
           rate: ((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)
         }),
@@ -311,10 +311,10 @@ function computeGoldTags({ participant, team, teams }: TagContext, t: TFunction)
   } else if (participant.goldEarned === team.maxGoldEarned) {
     return [
       {
-        label: t('MatchCard.tags.gold.teamLabel'),
+        label: t('matchCard.tags.gold.teamLabel'),
         color: 'bg-amber-600 dark:bg-amber-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.gold.teamContent', {
+        content: t('matchCard.tags.gold.teamContent', {
           value: participant.goldEarned.toLocaleString(),
           rate: ((participant.goldEarned / noZero(team.totalGoldEarned)) * 100).toFixed(2)
         }),
@@ -329,10 +329,10 @@ function computeCsTags({ participant, teams }: TagContext, t: TFunction): Player
   if (participant.cs && participant.cs === teams.allTeamStats.maxCs) {
     return [
       {
-        label: t('MatchCard.tags.cs.bestLabel'),
+        label: t('matchCard.tags.cs.bestLabel'),
         color: 'bg-orange-700 dark:bg-orange-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.cs.bestContent', {
+        content: t('matchCard.tags.cs.bestContent', {
           value: participant.cs.toLocaleString()
         }),
         priority: 600
@@ -347,13 +347,13 @@ function computeCsAdvantageTags({ participant }: TagContext, t: TFunction): Play
     return [
       {
         label: times(
-          t('MatchCard.tags.csAdvantage.label'),
+          t('matchCard.tags.csAdvantage.label'),
           participant.maxCsAdvantageOnLaneOpponent,
           t
         ),
         color: 'bg-amber-600 dark:bg-amber-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.csAdvantage.content', {
+        content: t('matchCard.tags.csAdvantage.content', {
           value: Math.round(participant.maxCsAdvantageOnLaneOpponent).toLocaleString()
         }),
         priority: 750 + participant.maxCsAdvantageOnLaneOpponent * 10
@@ -369,10 +369,10 @@ function computeKillsTags({ participant, team, teams }: TagContext, t: TFunction
   if (participant.kills === teams.allTeamStats.maxKills) {
     return [
       {
-        label: t('MatchCard.tags.kills.bestLabel'),
+        label: t('matchCard.tags.kills.bestLabel'),
         color: 'bg-violet-700 dark:bg-violet-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.kills.bestContent', {
+        content: t('matchCard.tags.kills.bestContent', {
           value: participant.kills.toLocaleString()
         }),
         priority: 1200
@@ -381,10 +381,10 @@ function computeKillsTags({ participant, team, teams }: TagContext, t: TFunction
   } else if (participant.kills === team.maxKills) {
     return [
       {
-        label: t('MatchCard.tags.kills.teamLabel'),
+        label: t('matchCard.tags.kills.teamLabel'),
         color: 'bg-violet-600 dark:bg-violet-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.kills.teamContent', {
+        content: t('matchCard.tags.kills.teamContent', {
           value: participant.kills.toLocaleString()
         }),
         priority: 1150
@@ -400,10 +400,10 @@ function computeKpTags({ participant, team, teams }: TagContext, t: TFunction): 
   if (participant.killParticipation === teams.allTeamStats.maxKillParticipation) {
     return [
       {
-        label: t('MatchCard.tags.kp.bestLabel'),
+        label: t('matchCard.tags.kp.bestLabel'),
         color: 'bg-cyan-700 dark:bg-cyan-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.kp.bestContent', {
+        content: t('matchCard.tags.kp.bestContent', {
           value: (participant.killParticipation * 100).toFixed(2)
         }),
         priority: 1100
@@ -412,10 +412,10 @@ function computeKpTags({ participant, team, teams }: TagContext, t: TFunction): 
   } else if (participant.killParticipation === team.maxKillParticipation) {
     return [
       {
-        label: t('MatchCard.tags.kp.teamLabel'),
+        label: t('matchCard.tags.kp.teamLabel'),
         color: 'bg-cyan-600 dark:bg-cyan-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.kp.teamContent', {
+        content: t('matchCard.tags.kp.teamContent', {
           value: (participant.killParticipation * 100).toFixed(2)
         }),
         priority: 1050
@@ -431,10 +431,10 @@ function computedKnockUpTags({ participant }: TagContext, t: TFunction): PlayerT
   if (participant.knockEnemyIntoTeamAndKill >= 6) {
     return [
       {
-        label: times(t('MatchCard.tags.knockUp.label'), participant.knockEnemyIntoTeamAndKill, t),
+        label: times(t('matchCard.tags.knockUp.label'), participant.knockEnemyIntoTeamAndKill, t),
         color: 'bg-purple-700 dark:bg-purple-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.knockUp.content', {
+        content: t('matchCard.tags.knockUp.content', {
           value: participant.knockEnemyIntoTeamAndKill.toLocaleString()
         }),
         priority: 660
@@ -450,10 +450,10 @@ function computeCcTags({ participant, team, teams }: TagContext, t: TFunction): 
   if (participant.timeCCingOthers === teams.allTeamStats.maxTimeCCingOthers) {
     return [
       {
-        label: t('MatchCard.tags.cc.bestLabel'),
+        label: t('matchCard.tags.cc.bestLabel'),
         color: 'bg-fuchsia-700 dark:bg-fuchsia-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.cc.bestContent', {
+        content: t('matchCard.tags.cc.bestContent', {
           value: participant.timeCCingOthers.toLocaleString()
         }),
         priority: 1750
@@ -462,10 +462,10 @@ function computeCcTags({ participant, team, teams }: TagContext, t: TFunction): 
   } else if (participant.timeCCingOthers === team.maxTimeCCingOthers) {
     return [
       {
-        label: t('MatchCard.tags.cc.teamLabel'),
+        label: t('matchCard.tags.cc.teamLabel'),
         color: 'bg-fuchsia-600 dark:bg-fuchsia-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.cc.teamContent', {
+        content: t('matchCard.tags.cc.teamContent', {
           value: participant.timeCCingOthers.toLocaleString()
         }),
         priority: 1700
@@ -487,10 +487,10 @@ function computeDamageGoldEfficiencyTags(
   if (participant.damageGoldEfficiency === teams.allTeamStats.maxDamageGoldEfficiency) {
     return [
       {
-        label: t('MatchCard.tags.damageGoldEfficiency.bestLabel'),
+        label: t('matchCard.tags.damageGoldEfficiency.bestLabel'),
         color: 'bg-lime-700 dark:bg-lime-800',
         textColor: 'text-white',
-        content: t('MatchCard.tags.damageGoldEfficiency.bestContent', { rate }),
+        content: t('matchCard.tags.damageGoldEfficiency.bestContent', { rate }),
         priority: 1800
       }
     ]
@@ -499,10 +499,10 @@ function computeDamageGoldEfficiencyTags(
   if (participant.damageGoldEfficiency === team.maxDamageGoldEfficiency) {
     return [
       {
-        label: t('MatchCard.tags.damageGoldEfficiency.teamLabel'),
+        label: t('matchCard.tags.damageGoldEfficiency.teamLabel'),
         color: 'bg-lime-600 dark:bg-lime-700',
         textColor: 'text-white',
-        content: t('MatchCard.tags.damageGoldEfficiency.teamContent', { rate }),
+        content: t('matchCard.tags.damageGoldEfficiency.teamContent', { rate }),
         priority: 930
       }
     ]
@@ -526,10 +526,10 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext, t: TFuncti
     participant.killsNearEnemyTurret >= durationMinutes / nearEnemyTurretThreshold
   ) {
     tags.push({
-      label: times(t('MatchCard.tags.towerKill.diveLabel'), participant.killsNearEnemyTurret, t),
+      label: times(t('matchCard.tags.towerKill.diveLabel'), participant.killsNearEnemyTurret, t),
       color: 'bg-rose-600 dark:bg-rose-700',
       textColor: 'text-white',
-      content: t('MatchCard.tags.towerKill.diveContent', {
+      content: t('matchCard.tags.towerKill.diveContent', {
         value: participant.killsNearEnemyTurret.toLocaleString()
       }),
       priority: 1660
@@ -541,10 +541,10 @@ function computeTowerKillTags({ participant, basicInfo }: TagContext, t: TFuncti
     participant.killsUnderOwnTurret >= durationMinutes / underOwnTurretThreshold
   ) {
     tags.push({
-      label: times(t('MatchCard.tags.towerKill.underLabel'), participant.killsUnderOwnTurret, t),
+      label: times(t('matchCard.tags.towerKill.underLabel'), participant.killsUnderOwnTurret, t),
       color: 'bg-stone-500 dark:bg-stone-600',
       textColor: 'text-white',
-      content: t('MatchCard.tags.towerKill.underContent', {
+      content: t('matchCard.tags.towerKill.underContent', {
         value: participant.killsUnderOwnTurret.toLocaleString()
       }),
       priority: 1640

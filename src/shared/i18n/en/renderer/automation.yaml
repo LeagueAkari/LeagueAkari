@@ -1,0 +1,241 @@
+automation:
+  home:
+    title: Automation
+    autoGameflow: Automated Gameflow
+    autoSelect: Auto Pick / Ban
+    autoMisc: Misc
+    autoChampConfig: Auto Configuration
+  gameflow:
+    title: Gameflow
+    common:
+      enabled: Enable
+    sections:
+      readyCheck: Auto-Accept Match
+      autoHonor: Auto Honor
+      playAgain: Play Again
+      autoMatchmaking: Auto Matchmaking
+      autoReconnect: Reconnect
+      leader: Leader Transfer
+      invitations: Invitations
+      aramTeamSide: Team Side Message
+    autoAcceptEnabled:
+      label: Auto-Accept Enabled
+      description: Automatically accepts the match when players are found.
+      footer: Some servers or ranked tiers may already enforce auto-accept by server policy. This is unrelated to League Akari.
+    autoAcceptDelaySeconds:
+      label: Auto-Accept Delay (s)
+      description: Delay in seconds before accepting the match after it becomes available.
+    autoHonorEnabled:
+      label: Auto-Honor Enabled
+      description: Automatically gives all the votes at the end of a match.
+    autoHonorStrategy:
+      label: Honor Selection Strategy
+      description: Determines which players will receive honors.
+      options:
+        prefer-lobby-member: Prioritize members in the lobby. If there are remaining votes, select other teammates.
+        only-lobby-member: Only pre-made team members.
+        all-member: All teammates.
+        all-member-including-opponent: Consider all players in the current match.
+        opt-out: Do not honor anyone.
+    playAgainEnabled:
+      label: Auto Play Again
+      description:
+        full: Automatically returns to the lobby after a match. You may need to enable {autoHonor} to complete the honor voting phase.
+        part2: Auto-Honor
+    autoMatchmakingEnabled:
+      label: Auto Matchmaking
+      description: Automatically starts matchmaking when available.
+    autoMatchmakingMinimumMembers:
+      label: Minimum Members
+      description: Requires at least {{members}} members to start matchmaking automatically.
+    autoMatchmakingDelaySeconds:
+      label: Matchmaking Wait Time (s)
+      description: Delay in seconds before starting matchmaking when available.
+    autoMatchmakingWaitForInvitees:
+      label: Wait for Invitees
+      description: Automatically waits for all invited players to respond before starting matchmaking.
+    autoMatchmakingRematchStrategy:
+      label: Stop Matchmaking Strategy
+      description: Defines when to stop matchmaking automatically. Matchmaking will restart if auto matchmaking is enabled.
+      options:
+        never: Never
+        fixed-duration: Fixed Duration
+        estimated-duration: Exceeds Estimated Queue Time
+    autoMatchmakingRematchFixedDuration:
+      label: Exit Matchmaking Time (s)
+      description:
+        fixed-duration: Stops matchmaking after exceeding this time, in seconds.
+        no-fixed-duration: This option only applies if the stop matchmaking strategy is set to Fixed Duration.
+    autoReconnectEnabled:
+      label: Auto Reconnect
+      description: Attempts to reconnect when in a reconnectable state.
+    autoSkipLeaderEnabled:
+      label: Auto Skip Leader
+      description: When you are the lobby leader, transfer the leadership to other members in the lobby
+    autoHandleInvitationsEnabled:
+      label: Auto Handle Invitations
+      description: Handles room invitations according to the configured strategy.
+    invitationHandlingStrategies:
+      label: Room Invitation Acceptance Strategy
+      description: Processes room invitations based on the queue mode.
+      options:
+        accept: Accept
+        decline: Decline
+        ignore: Ignore
+      button: Configure
+      queueTypes:
+        default: Default
+    rejectInvitationWhenAway:
+      label: Reject When Away
+      description: Automatically rejects lobby invitations when the game status is set to Away.
+    autoSendARAMTeamSideEnabled:
+      label: Send Team Side Information
+      description: 'In modes like ARAM or ARAM: Mayhem, when entering champion select, the current team side (blue or red) will be notified.'
+      tooltipBody: Send your current team side information in the chat room.
+      tooltipImageAlt: Example of the team side information message in chat
+    autoSendARAMTeamSideVisibleToTeam:
+      label: Send Team Side Information Visible to Team
+      checkboxLabel: Visible to team
+      description: The content of "Send Team Side Information" will be visible to team.
+  champSelect:
+    title: Auto Pick Ban
+    temporarilyDisabled:
+      label: Temporarily Disabled
+      button: Re-enable
+      description: The feature have been temporarily disabled in THIS champion selection.
+    groupTitle: Active Mode
+    groupEmpty: No Groups
+    groups:
+      ranked: Ranked
+      normal: Normal
+      aram: ARAM-like
+      cherry: Arena
+      urf: URF
+      oneforall: One for All
+      ultbook: Ultbook
+      bot: Bot
+      custom: Custom
+      ruby: Nightmare Bot
+    pick:
+      title: Auto Pick
+      enabled:
+        label: Enable
+        description: Enable the automatic pick of this mode.
+      expectedChampions:
+        label: Expected Champions
+        description: The automatic pick will pick these champions, prioritizing the earlier ones in the list.
+        fragment1: When assigned to
+        fragment2: position
+      showIntent:
+        label: Show Intent
+        description: Show the target champion before the pick.
+      ignoreIntent:
+        label: Ignore Intent
+        description: Ignore the intent of the teammates.
+      strategy:
+        label: Lock Strategy
+        description: Execute the automatic pick process according to the preset strategy.
+        options:
+          just-show: Just Show
+          show-and-lock-in: Show and Lock-in
+          lock-in-immediately: Lock-in Immediately
+      delaySeconds:
+        label: Delay (s)
+        description: The automatic pick process will be planned according to the preset delay, including show, lock-in, or handle swap. Each stage will not exceed the system limit.
+      benchMode:
+        title: Bench Mode Specific (If applicable)
+        tooltip: For modes that have a bench, such as ARAM or URF.
+      benchSwapAccumulatedDelaySeconds:
+        label: Minimum Accumulated Time (s)
+        description: Only when the target champion has been on the bench for more than this value, the swap operation will be executed.
+      benchSelectFirstAvailableChampion:
+        label: Select First Available Champion
+        description: When the target champion is on the bench, select the earlier ones in the list.
+      benchHandleTradeEnabled:
+        label: Handle Swap Request
+        description: When a swap request is received, if the expected champion settings are met, accept the swap request. Otherwise, reject the swap request.
+    ban:
+      title: Auto Ban
+      enabled:
+        label: Enable
+        description: Enable the automatic ban of this mode.
+      expectedChampions:
+        label: Expected Champions
+        description: The automatic ban will ban these champions, prioritizing the earlier ones in the list.
+        fragment1: When assigned to
+        fragment2: position
+      strategy:
+        label: Lock Strategy
+        description: Execute the automatic ban process according to the preset strategy.
+        options:
+          just-show: Just Show
+          show-and-lock-in: Show and Lock-in
+          lock-in-immediately: Lock-in Immediately
+      delaySeconds:
+        label: Delay (s)
+        description: The automatic ban process will be planned according to the preset delay, including show, lock-in, or handle swap. Each stage will not exceed the system limit.
+  misc:
+    autoReply:
+      updated: Updated
+      title: Auto Reply
+      enabled:
+        label: Enable
+      enableOnAway:
+        label: Only When Away
+        description: Auto-reply will only be active when the game status is set to Away.
+      text:
+        label: Reply Text
+        description: The content to be used as the auto-reply message.
+        save: Save
+    autoInvitation:
+      title: Invite Friends to Room
+      description: 'One-time monitoring: when specified friends become available, send room invitations.'
+      unavailable: Currently Unavailable
+      scheduleInvite: Schedule Invite
+      cancelSchedule: Cancel Schedule
+      noFriends: No Friends
+      notInLobby: Not in Lobby
+      searchPlaceholder: Search friend name or tag
+  orderedChampionList:
+    searchForChampion: Search for Champion
+    edit: Edit
+    unselected: Unselected
+    moveUp: Move Up
+    moveDown: Move Down
+  champConfig:
+    championConfig:
+      targetMode: Target Mode
+      ranked: Ranked
+      normal: Normal
+      aram: ARAM
+      urf: URF
+      nexusblitz: Nexus Blitz
+      ultbook: Ult Book
+      runes: Runes
+      configure: Configure
+      spells: Spells
+      position: Position
+      default: Default
+      runesConfigured: Runes Configured
+      spellsConfigured: Spells Configured
+      runesUnconfigured: Runes Unconfigured
+      spellsUnconfigured: Spells Unconfigured
+      configureRunes: Configure Runes
+      configureSpells: Configure Spells
+      clear: Clear
+      restore: Restore
+      save: Save
+      noChampionPlaceholder: Select a champion to view configurations
+      runesSaved: Rune configurations saved
+      runesRestored: Rune configurations restored
+      spellsSaved: Spell configurations saved
+      spellsRestored: Spell configurations restored
+      searchPlaceholder: Search champions
+    runeEditor:
+      unsupported: Current rune setup is not supported
+    title: Auto Champion Configuration
+    enabled:
+      label: Enable
+      description: Automatically configure runes or summoner spells based on presets after locking in a champion during champion select
+    configure:
+      label: Configure

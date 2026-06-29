@@ -15,7 +15,7 @@
         v-if="showNewVersionBadge"
         class="bg-akari-500 absolute top-0 right-0 translate-x-[120%] -translate-y-1/6 cursor-pointer rounded px-1 py-px text-xs text-white transition-opacity hover:opacity-80"
         @click.stop="handleShowUpdateModal"
-        >{{ t('StartupPane.newVersionAvailable') }}</span
+        >{{ t('startup.launcher.newVersionAvailable') }}</span
       >
     </div>
 
@@ -202,9 +202,9 @@ const handleOpenSelfTab = () => {
 const launch = async (fn: () => Promise<any>, name: string) => {
   try {
     await fn()
-    message.success(t('StartupPane.successMessage', { name }))
+    message.success(t('startup.launcher.successMessage', { name }))
   } catch (error) {
-    message.error(t('StartupPane.failedMessage', { name, reason: (error as any).message }))
+    message.error(t('startup.launcher.failedMessage', { name, reason: (error as any).message }))
   }
 }
 
@@ -218,28 +218,28 @@ const launchItems = computed(() => {
 
   if (cis.tclsExecutablePath) {
     arr.push({
-      name: t('StartupPane.tcls'),
+      name: t('startup.launcher.tcls'),
       imgUrl: leagueIco,
       path: cis.tclsExecutablePath,
-      launch: () => launch(ci.launchTencentTcls.bind(ci), t('StartupPane.tcls'))
+      launch: () => launch(ci.launchTencentTcls.bind(ci), t('startup.launcher.tcls'))
     })
   }
 
   if (cis.weGameLauncherExecutablePath) {
     arr.push({
-      name: t('StartupPane.weGame'),
+      name: t('startup.launcher.weGame'),
       imgUrl: weGameIco,
       path: cis.weGameLauncherExecutablePath,
-      launch: () => launch(ci.launchWeGameLeagueOfLegends.bind(ci), t('StartupPane.weGame'))
+      launch: () => launch(ci.launchWeGameLeagueOfLegends.bind(ci), t('startup.launcher.weGame'))
     })
   }
 
   if (cis.officialRiotClientExecutablePath) {
     arr.push({
-      name: t('StartupPane.riotClient'),
+      name: t('startup.launcher.riotClient'),
       imgUrl: riotClient,
       path: cis.officialRiotClientExecutablePath,
-      launch: () => launch(ci.launchDefaultRiotClient.bind(ci), t('StartupPane.riotClient'))
+      launch: () => launch(ci.launchDefaultRiotClient.bind(ci), t('startup.launcher.riotClient'))
     })
   }
 

@@ -6,7 +6,7 @@
     >
       <div class="flex gap-0.5">
         <div class="mr-1 text-xs text-black/60 dark:text-white/60">
-          {{ t('MatchCard.teamTable.bans') }}
+          {{ t('matchCard.teamTable.bans') }}
         </div>
         <ChampionIcon
           v-for="ban in teams.allTeamStats.bans.slice(0, 32)"

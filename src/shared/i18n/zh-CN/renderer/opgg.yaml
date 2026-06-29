@@ -1,0 +1,169 @@
+opgg:
+  titlebar:
+    close: 关闭
+    minimize: 最小化
+    pin: 置顶
+    unpin: 取消置顶
+    repositionToAlignLeagueClientUx: 贴附到客户端
+  filters:
+    toOpgg: 转到 OP.GG
+    refresh: 刷新
+    champions: 梯队
+    champion: 英雄
+    empty: 无
+    mode: 模式
+    region: 地区
+    rankTier: 段位
+    position: 位置
+    version: 版本
+    modes:
+      ranked: 排位
+      aram: 极地大乱斗
+      arena: 斗魂竞技场
+      nexus_blitz: 极限闪击
+      urf: 无限火力
+      none: 无
+    positions:
+      top: 上单
+      jungle: 打野
+      mid: 中单
+      adc: 下路
+      support: 辅助
+      none: 无
+    regions:
+      global: 全球
+      na: 北美
+      euw: 欧洲西
+      kr: 韩国
+      br: 巴西
+      eune: 欧洲东北
+      jp: 日本
+      lan: 拉丁美洲北
+      las: 拉丁美洲南
+      oce: 大洋洲
+      tr: 土耳其
+      ru: 俄罗斯
+      sg: 新加坡
+      id: 印尼
+      ph: 菲律宾
+      th: 泰国
+      vn: 越南
+      tw: 台湾
+      me: 中东
+    tiers:
+      all: 全部段位
+      ibsg: 黄金 -
+      gold_plus: 黄金 +
+      platinum_plus: 铂金 +
+      emerald_plus: 翡翠 +
+      diamond_plus: 钻石 +
+      master: 大师
+      master_plus: 大师 +
+      grandmaster: 宗师
+      challenger: 王者
+    settings:
+      button: 设置
+  championTable:
+    searchPlaceholder: 查找英雄
+    columns:
+      champion: 英雄
+      tier: 梯队
+      winRate: 胜率
+      pickRate: 登场率
+      counter: 劣势对位
+      banRate: 禁用率
+    cancel: 取消
+  view:
+    replace: 提供
+    create: 创建
+    noVersionFound: 未找到版本
+    settings:
+      title: OP.GG 设置
+      enabled:
+        label: 开启
+        description: 启用 OP.GG 窗口。关闭后，可在主菜单重新启用它
+      flashPosition:
+        label: 闪现位置偏好
+        description: 在设置召唤师技能时，放置闪现的位置
+        auto: 当前位置
+        options:
+          d: 闪现位置默认在 D
+          f: 闪现位置默认在 F
+          auto: 根据当前闪现的位置决定
+      autoApplyRunes:
+        label: 自动应用符文
+        description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+      autoApplySpells:
+        label: 自动应用召唤师技能
+        description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+      autoApplyItems:
+        label: 自动应用装备方案
+        description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
+    success: '请求已发送: {{reason}}'
+    summonerSpells: 召唤师技能
+    runes: 符文配法
+    setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
+    setRunesFailedMessage: 设置符文配法失败：{{reason}}
+    spellsSet: '[$t(common:appName)] 已设置召唤师技能: {{spell1}} | {{spell2}}'
+    runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
+    sessionChampions:
+      title: 本局英雄
+  champion:
+    boots: 鞋子
+    adorableRabi: 兔兔好可爱
+    avgPlace: 平均排名
+    1st: 第一
+    winRate: 胜率
+    pickRate: 登场率
+    plays: 总场次
+    banRate: 禁用率
+    counter: 劣势对位
+    allCounters: 所有对位
+    counterC: 劣势
+    allC: 所有
+    empty: 暂无数据
+    times: '{{times}} 场'
+    showAll: 展示全部
+    spells: 召唤师技能
+    apply: 应用
+    runes: 符文配法
+    abilityBuild: 技能点法
+    starterItemText: 初始装备
+    prismItemText: 棱彩阶装备
+    coreItemText: 核心装备
+    itemText: 装备
+    tierText: T{{tier}} 级别
+    applyRunes: 导入当前装备方案
+    applyRunesText: 方案应用
+    augmentAll: 全部
+    augmentGold: 黄金阶
+    augmentSilver: 白银阶
+    augmentPrism: 棱彩阶
+    augmentPerformance: 强度
+    augmentPopular: 欢迎度
+    augmentSort:
+      default: 默认
+      performance: 强度
+      popular: 欢迎度
+    showAdvancedStats: 显示进阶数据
+    synergies: 搭配
+    balance:
+      title: 平衡性调整
+      attack_speed: 攻击速度
+      damage_dealt: 造成伤害
+      damage_taken: 承受伤害
+      cooldown_reduction: 冷却缩减
+      healing: 治疗效果
+      tenacity: 韧性
+      shield_amount: 护盾值
+      energy_regen: 能量回复
+      area_of_effect_damage: AoE 伤害
+    writeToDisk: '[$t(common:appName)] 已写入到装备方案：{{name}}'
+    writtenToDisk: 已写入到文件中
+    writeFileFailedMessage: 写入文件失败 {{reason}}
+    bootsDesc: 鞋子 (按出场率排序)
+    prismItemsDesc: 棱彩阶装备 (按出场率排序)
+    itemsDesc: 装备 (按出场率排序)
+    coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
+    starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
+    cancel: 取消

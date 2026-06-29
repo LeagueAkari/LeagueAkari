@@ -3,18 +3,18 @@
     <div class="grid min-w-0 gap-3">
       <div class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.winLoss') }}
+          {{ t('playerTabs.matchHistory.filters.winLoss') }}
         </div>
         <NRadioGroup v-model:value="winLoss" size="small">
-          <NRadio value="all" :label="t('PlayerTab.filter.all')" />
-          <NRadio value="win" :label="t('PlayerTab.filter.win')" />
-          <NRadio value="loss" :label="t('PlayerTab.filter.loss')" />
+          <NRadio value="all" :label="t('playerTabs.matchHistory.filters.all')" />
+          <NRadio value="win" :label="t('playerTabs.matchHistory.filters.win')" />
+          <NRadio value="loss" :label="t('playerTabs.matchHistory.filters.loss')" />
         </NRadioGroup>
       </div>
 
       <div class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.timeRange') }}
+          {{ t('playerTabs.matchHistory.filters.timeRange') }}
         </div>
         <NSelect
           class="w-full min-w-0"
@@ -26,7 +26,7 @@
 
       <div v-if="isSgpMatchHistorySource" class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.position') }}
+          {{ t('playerTabs.matchHistory.filters.position') }}
         </div>
         <NSelect
           class="w-full min-w-0"
@@ -42,7 +42,7 @@
 
       <div class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.summoners') }}
+          {{ t('playerTabs.matchHistory.filters.summoners') }}
         </div>
         <NSelect
           class="w-full min-w-0"
@@ -64,7 +64,7 @@
 
       <div class="min-w-0">
         <div class="mb-2 text-xs text-black/80 dark:text-white/60">
-          {{ t('PlayerTab.filter.champions') }}
+          {{ t('playerTabs.matchHistory.filters.champions') }}
         </div>
         <NSelect
           class="w-full min-w-0"
@@ -162,13 +162,13 @@ const isSgpMatchHistorySource = computed(
 )
 
 const timeRangeOptions = computed<{ label: string; value: SimpleTimeRangeFilter }[]>(() => [
-  { label: t('PlayerTab.timeRange.all'), value: 'all' },
-  { label: t('PlayerTab.timeRange.last3Hours'), value: 'last3Hours' },
-  { label: t('PlayerTab.timeRange.last12Hours'), value: 'last12Hours' },
-  { label: t('PlayerTab.timeRange.last24Hours'), value: 'last24Hours' },
-  { label: t('PlayerTab.timeRange.last3Days'), value: 'last3Days' },
-  { label: t('PlayerTab.timeRange.last7Days'), value: 'last7Days' },
-  { label: t('PlayerTab.timeRange.last30Days'), value: 'last30Days' }
+  { label: t('playerTabs.matchHistory.timeRange.all'), value: 'all' },
+  { label: t('playerTabs.matchHistory.timeRange.last3Hours'), value: 'last3Hours' },
+  { label: t('playerTabs.matchHistory.timeRange.last12Hours'), value: 'last12Hours' },
+  { label: t('playerTabs.matchHistory.timeRange.last24Hours'), value: 'last24Hours' },
+  { label: t('playerTabs.matchHistory.timeRange.last3Days'), value: 'last3Days' },
+  { label: t('playerTabs.matchHistory.timeRange.last7Days'), value: 'last7Days' },
+  { label: t('playerTabs.matchHistory.timeRange.last30Days'), value: 'last30Days' }
 ])
 
 const positionOptions = computed(() => {
@@ -270,7 +270,7 @@ const summonerOptions = computed(() => {
   if (searchResults.value.length) {
     optionGroups.push({
       type: 'group',
-      label: t('PlayerTab.filter.searchResults'),
+      label: t('playerTabs.matchHistory.filters.searchResults'),
       key: 'search-results',
       children: searchResults.value.map((summoner) => ({
         label: `${summoner.gameName}#${summoner.tagLine}`,
@@ -294,7 +294,7 @@ const summonerOptions = computed(() => {
   if (pageSummoners.length) {
     optionGroups.push({
       type: 'group',
-      label: t('PlayerTab.filter.pageSummoners'),
+      label: t('playerTabs.matchHistory.filters.pageSummoners'),
       key: 'page-summoners',
       children: pageSummoners.map((summoner) => ({
         label: `${summoner.gameName}#${summoner.tagLine}`,
@@ -316,7 +316,7 @@ const summonerOptions = computed(() => {
   if (selectedCachedSummoners.length) {
     optionGroups.push({
       type: 'group',
-      label: t('PlayerTab.filter.selectedSummoners'),
+      label: t('playerTabs.matchHistory.filters.selectedSummoners'),
       key: 'selected-summoners',
       children: selectedCachedSummoners.map((summoner) => ({
         label: `${summoner.gameName}#${summoner.tagLine}`,

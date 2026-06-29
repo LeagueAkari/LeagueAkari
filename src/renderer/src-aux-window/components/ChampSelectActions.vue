@@ -19,19 +19,19 @@
             <div class="flex items-center gap-1 brightness-80" v-if="a.type === 'pick'">
               <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
               <span class="text-[10px] text-black/60 dark:text-white/60">{{
-                t('ChampSelectActions.picked')
+                t('auxWindow.champSelect.actions.picked')
               }}</span>
             </div>
             <div class="flex items-center gap-1 brightness-80" v-else-if="a.type === 'vote'">
               <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
               <span class="text-[10px] text-black/60 dark:text-white/60">{{
-                t('ChampSelectActions.voted')
+                t('auxWindow.champSelect.actions.voted')
               }}</span>
             </div>
             <div class="flex items-center gap-1 brightness-80" v-else-if="a.type === 'ban'">
               <ChampionIcon class="size-4 rounded" :stretched="false" :champion-id="a.championId" />
               <span class="text-[10px] text-black/60 dark:text-white/60">{{
-                t('ChampSelectActions.banned')
+                t('auxWindow.champSelect.actions.banned')
               }}</span>
             </div>
           </template>
@@ -62,19 +62,19 @@ const formatActionTypeText = (action: Action) => {
   let actionName: string
   switch (action.type) {
     case 'pick':
-      actionName = t('ChampSelectActions.picking')
+      actionName = t('auxWindow.champSelect.actions.picking')
       break
     case 'ban':
-      actionName = t('ChampSelectActions.banning')
+      actionName = t('auxWindow.champSelect.actions.banning')
       break
     case 'vote':
-      actionName = t('ChampSelectActions.voting')
+      actionName = t('auxWindow.champSelect.actions.voting')
       break
     case 'ten_bans_reveal':
     case 'phase_transition':
     case 'vote_transition':
     case 'team_vote_reveal':
-      actionName = t(`ChampSelectActions.ceremonies.${action.type}`)
+      actionName = t(`auxWindow.champSelect.actions.ceremonies.${action.type}`)
       break
 
     default:
@@ -83,9 +83,9 @@ const formatActionTypeText = (action: Action) => {
 
   let finishStatus: string = ''
   if (action.isInProgress) {
-    finishStatus = t('ChampSelectActions.inProgress')
+    finishStatus = t('auxWindow.champSelect.actions.inProgress')
   } else if (action.completed) {
-    finishStatus = t('ChampSelectActions.completed')
+    finishStatus = t('auxWindow.champSelect.actions.completed')
   }
 
   return finishStatus ? `${actionName} (${finishStatus})` : actionName

@@ -7,7 +7,7 @@
     :class="styles['settings-modal']"
   >
     <template #header>
-      <span class="card-header-title">{{ t('SettingModal.title') }}</span>
+      <span class="card-header-title">{{ t('settings.modal.title') }}</span>
     </template>
     <NTabs
       ref="tabs"
@@ -22,7 +22,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><Settings16FilledIcon /> </NIcon>
-            <span>{{ t('AppSettings.title') }}</span>
+            <span>{{ t('settings.app.title') }}</span>
           </div>
         </template>
         <AppSettings />
@@ -31,7 +31,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><LayersIcon /> </NIcon>
-            <span>{{ t('MatchHistorySettings.title') }}</span>
+            <span>{{ t('settings.matchHistory.title') }}</span>
           </div>
         </template>
         <MatchHistorySettings />
@@ -40,7 +40,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><Games24FilledIcon /> </NIcon>
-            <span>{{ t('OngoingGameSettings.title') }}</span>
+            <span>{{ t('settings.ongoingGame.title') }}</span>
           </div>
         </template>
         <OngoingGameSettings />
@@ -49,7 +49,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><WindowMultiple20RegularIcon /> </NIcon>
-            <span>{{ t('MultiWindowSettings.title') }}</span>
+            <span>{{ t('settings.multiWindow.title') }}</span>
           </div>
         </template>
         <MultiWindowSettings />
@@ -58,16 +58,16 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
-            <span>{{ t('StorageSettings.title') }}</span>
+            <span>{{ t('settings.storage.title') }}</span>
           </div>
         </template>
         <StorageSettings />
       </NTabPane>
-      <NTabPane name="misc" :tab="t('MiscSettings.title')">
+      <NTabPane name="misc" :tab="t('settings.misc.title')">
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><ToolFilledIcon /> </NIcon>
-            <span>{{ t('MiscSettings.title') }}</span>
+            <span>{{ t('settings.misc.title') }}</span>
           </div>
         </template>
         <MiscSettings />
@@ -76,7 +76,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><DebugIcon /> </NIcon>
-            <span>{{ t('DebugSettings.title') }}</span>
+            <span>{{ t('settings.debug.title') }}</span>
           </div>
         </template>
         <DebugSettings />
@@ -85,7 +85,7 @@
         <template #tab>
           <div class="tab-icon-title">
             <NIcon class="icon"><InfoSharpIcon /> </NIcon>
-            <span>{{ t('AboutPane.title') }}</span>
+            <span>{{ t('settings.about.title') }}</span>
           </div>
         </template>
         <AboutPane />
