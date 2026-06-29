@@ -60,7 +60,7 @@ const handlePurchased = (item: any) => {
 }
 
 const handleNotEnough = (item: any) => {
-  message.warning(`您的余额不足，需要 ${item.price / 1000} 阿卡林币`)
+  message.warning(`您的余额不足，需要 ${item.price / 1000} 点数`)
 }
 </script>
 

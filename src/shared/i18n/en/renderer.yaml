@@ -761,8 +761,13 @@ TaggedPlayers:
 
 AboutPane:
   title: About
-  line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
-  line2: Project Reference
+  descriptionBefore: ' is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
+  actions:
+    github: GitHub
+  stats:
+    stars: GitHub Stars
+    version: Version
+    license: License
   copyright: © 2026 Hanxven. This software is open-source and follows the MIT license.
 
 Automation:

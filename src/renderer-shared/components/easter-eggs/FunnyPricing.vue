@@ -4,9 +4,7 @@
       <div class="beautiful-akari">选择你的订阅</div>
       <div class="credit">
         <span>当前余额：</span>
-        <span class="credit-amount"
-          >{{ formatCredit / 1000 }} <span class="akari">阿卡林币</span></span
-        >
+        <span class="credit-amount">{{ formatCredit / 1000 }} <span class="akari">点数</span></span>
         <NButton
           type="primary"
           class="button"
@@ -28,7 +26,7 @@
           <div class="price">
             <template v-if="c.price !== 0">
               <span class="big">{{ c.price / 1000 }}</span>
-              <span class="monthly">阿卡林币 / 月</span>
+              <span class="monthly">点数 / 月</span>
             </template>
             <template v-else>
               <span class="big">免费</span>
@@ -126,7 +124,7 @@ const choices = ref([
     title: '⭐ Pro 版',
     price: 30000,
     description: '进阶用户最爱！',
-    privileges: [...commonPart, { level: 2, text: '多花 30 阿卡林币' }]
+    privileges: [...commonPart, { level: 2, text: '多花 30 点数' }]
   },
   {
     id: 'max',
@@ -135,8 +133,8 @@ const choices = ref([
     description: '满足一切需求！',
     privileges: [
       ...commonPart,
-      { level: 2, text: '多花 30 阿卡林币' },
-      { level: 3, text: '再多花 168 阿卡林币' }
+      { level: 2, text: '多花 30 点数' },
+      { level: 3, text: '再多花 168 点数' }
     ]
   }
 ])
