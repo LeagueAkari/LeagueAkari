@@ -35,6 +35,7 @@ playerTabs:
     unranked: 未定级
     win: 胜
     lose: 负
+    winRate: 胜率
     point: 分
     leaguePoint: 胜点
     highest: 最高

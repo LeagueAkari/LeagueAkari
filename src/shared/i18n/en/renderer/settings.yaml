@@ -506,6 +506,9 @@ settings:
       stars: GitHub Stars
       version: Version
       license: License
+      loading: Loading
+      unknown: Unknown
+      rabiTag: Beta
     copyright: © 2026 Hanxven. This software is open-source and follows the MIT license.
   shortcutSelector:
     title: Shortcut Recording

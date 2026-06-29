@@ -504,6 +504,9 @@ settings:
       stars: GitHub Stars
       version: Version
       license: License
+      loading: 加载中
+      unknown: 未知
+      rabiTag: 内测版
     copyright: © 2026 Hanxven. 本软件为开源软件，遵循 MIT 许可证。
   shortcutSelector:
     title: 快捷键设定

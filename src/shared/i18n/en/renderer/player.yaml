@@ -35,6 +35,7 @@ playerTabs:
     unranked: Unranked
     win: W
     lose: L
+    winRate: W/R
     point: P
     leaguePoint: LP
     highest: Highest

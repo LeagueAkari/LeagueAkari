@@ -19,13 +19,23 @@
         :class="isSmallSize ? 'w-30' : 'w-60'"
       >
         <!-- Queue Type Label -->
-        <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
-          {{
-            t(`queueTypes.${entry.queueType}`, {
-              defaultValue: entry.queueType,
-              ns: 'common'
-            })
-          }}
+        <div
+          class="absolute top-0 left-0 flex max-w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
+        >
+          <span class="shrink-0">
+            {{
+              t(`queueTypes.${entry.queueType}`, {
+                defaultValue: entry.queueType,
+                ns: 'common'
+              })
+            }}
+          </span>
+          <span
+            v-if="hasEntryTopRecord(entry)"
+            class="rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+          >
+            {{ formatEntryTopRecord(entry) }}
+          </span>
         </div>
 
         <!-- Main Content -->
@@ -100,13 +110,23 @@
           class="relative flex h-27 w-60 items-center justify-center rounded bg-black/5 dark:bg-white/5"
         >
           <!-- Queue Type Label -->
-          <div class="absolute top-0 left-0 px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
-            {{
-              t(`queueTypes.${entry.queueType}`, {
-                defaultValue: entry.queueType,
-                ns: 'common'
-              })
-            }}
+          <div
+            class="absolute top-0 left-0 flex max-w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
+          >
+            <span class="shrink-0">
+              {{
+                t(`queueTypes.${entry.queueType}`, {
+                  defaultValue: entry.queueType,
+                  ns: 'common'
+                })
+              }}
+            </span>
+            <span
+              v-if="hasEntryTopRecord(entry)"
+              class="rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+            >
+              {{ formatEntryTopRecord(entry) }}
+            </span>
           </div>
 
           <!-- Main Content -->
@@ -272,6 +292,19 @@ const formatEntryRecord = (entry: Partial<RankedEntry>) => {
   }
 
   return '—'
+}
+
+const hasEntryTopRecord = (entry: Partial<RankedEntry>) => {
+  return isRankedEntry(entry) && typeof entry.losses === 'number' && entry.losses !== 0
+}
+
+const formatEntryTopRecord = (entry: Partial<RankedEntry>) => {
+  const wins = entry.wins ?? 0
+  const losses = entry.losses ?? 0
+  const total = wins + losses
+  const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0'
+
+  return `${t('playerTabs.ranked.winRate')} ${winRate}%`
 }
 
 const formatTier = (entry: Partial<RankedEntry>) => {

@@ -57,6 +57,7 @@ teams:
 queueTypes:
   RANKED_SOLO_5x5: 单双排位
   RANKED_FLEX_SR: 灵活排位
+  RANKED_PREMADE_5x5: 五人组队排位
   NORMAL: 匹配模式
   ARAM_UNRANKED_5x5: 极地大乱斗
   KIWI: 海克斯大乱斗

@@ -57,6 +57,7 @@ teams:
 queueTypes:
   RANKED_SOLO_5x5: Ranked Solo/Duo
   RANKED_FLEX_SR: Ranked Flex
+  RANKED_PREMADE_5x5: Ranked Premade 5v5
   NORMAL: Normal SR
   ARAM_UNRANKED_5x5: ARAM
   KIWI: 'ARAM: Mayhem'

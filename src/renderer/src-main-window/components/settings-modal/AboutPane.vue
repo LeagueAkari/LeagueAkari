@@ -27,21 +27,34 @@
           <div class="min-h-16 p-2 text-center text-yellow-600 dark:text-yellow-300">
             <NStatistic :label="t('settings.about.stats.stars')" tabular-nums>
               <template #prefix>
-                <NIcon class="mr-1 text-yellow-500"><StarIcon /></NIcon>
+                <NSpin v-if="isFetchingGitHubStats" class="mr-1" :size="16" />
+                <NIcon v-else class="mr-1 text-yellow-500"><StarIcon /></NIcon>
               </template>
               <NNumberAnimation
-                v-if="githubStars !== null"
+                v-if="!isFetchingGitHubStats && githubStars !== null"
                 :from="0"
                 :to="githubStars"
                 :duration="900"
                 show-separator
                 locale="en-US"
               />
-              <span v-else class="text-black/45 dark:text-white/45">-</span>
+              <span v-else class="text-black/45 dark:text-white/45">{{ githubStarsText }}</span>
             </NStatistic>
           </div>
           <div class="min-h-16 p-2 text-center">
-            <NStatistic :label="t('settings.about.stats.version')" :value="as.version" />
+            <NStatistic :label="t('settings.about.stats.version')">
+              <span class="relative inline-block">
+                {{ as.version }}
+                <NTag
+                  v-if="as.isRabiVersion"
+                  size="tiny"
+                  :bordered="false"
+                  class="bg-akari-500/10! text-akari-600! dark:bg-akari-400/15! dark:text-akari-300! absolute! top-[1em] right-[-0.2em] translate-x-full -translate-y-1/3"
+                >
+                  {{ t('settings.about.stats.rabiTag') }}
+                </NTag>
+              </span>
+            </NStatistic>
           </div>
           <div class="min-h-16 p-2 text-center">
             <NStatistic :label="t('settings.about.stats.license')" value="MIT" />
@@ -56,7 +69,6 @@
             target="_blank"
             rel="noreferrer"
             size="small"
-            tertiary
           >
             <template #icon>
               <NIcon><GithubIcon /></NIcon>
@@ -79,8 +91,17 @@ import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Github as GithubIcon, Star as StarIcon } from '@vicons/fa'
 import axios from 'axios'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NNumberAnimation, NScrollbar, NStatistic, useMessage } from 'naive-ui'
-import { onMounted, onUnmounted, ref } from 'vue'
+import {
+  NButton,
+  NIcon,
+  NNumberAnimation,
+  NScrollbar,
+  NSpin,
+  NStatistic,
+  NTag,
+  useMessage
+} from 'naive-ui'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const { t } = useTranslation()
 
@@ -88,13 +109,60 @@ const as = useAppCommonStore()
 
 const message = useMessage()
 const githubStars = ref<number | null>(null)
+const isFetchingGitHubStats = ref(false)
 let githubStatsController: AbortController | null = null
 
 const GITHUB_REPO_API = 'https://api.github.com/repos/LeagueAkari/LeagueAkari'
+const GITHUB_STARS_CACHE_KEY = 'league-akari:github-stars'
 
 interface GitHubRepoStatsResponse {
   stargazers_count?: unknown
 }
+
+interface CachedGitHubStars {
+  stargazersCount: number
+  updatedAt: number
+}
+
+const isValidGitHubStars = (value: unknown): value is number => {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+}
+
+const readCachedGitHubStars = () => {
+  try {
+    const raw = localStorage.getItem(GITHUB_STARS_CACHE_KEY)
+    if (!raw) {
+      return null
+    }
+
+    const cached = JSON.parse(raw) as Partial<CachedGitHubStars>
+    if (isValidGitHubStars(cached.stargazersCount)) {
+      return cached.stargazersCount
+    }
+  } catch {}
+
+  return null
+}
+
+const writeCachedGitHubStars = (stargazersCount: number) => {
+  try {
+    localStorage.setItem(
+      GITHUB_STARS_CACHE_KEY,
+      JSON.stringify({
+        stargazersCount,
+        updatedAt: Date.now()
+      } satisfies CachedGitHubStars)
+    )
+  } catch {}
+}
+
+const githubStarsText = computed(() => {
+  if (isFetchingGitHubStats.value) {
+    return t('settings.about.stats.loading')
+  }
+
+  return t('settings.about.stats.unknown')
+})
 
 const handleClickEasterEgg = () => {
   message.create(() => <LeagueAkariSpan bold />, {
@@ -105,7 +173,10 @@ const handleClickEasterEgg = () => {
 
 const fetchGitHubStats = async () => {
   githubStatsController?.abort()
-  githubStatsController = new AbortController()
+  githubStars.value = readCachedGitHubStars()
+  const controller = new AbortController()
+  githubStatsController = controller
+  isFetchingGitHubStats.value = true
 
   try {
     const response = await axios.get<GitHubRepoStatsResponse>(GITHUB_REPO_API, {
@@ -113,16 +184,22 @@ const fetchGitHubStats = async () => {
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28'
       },
-      signal: githubStatsController.signal
+      signal: controller.signal
     })
 
     const data = response.data
-    if (typeof data.stargazers_count === 'number') {
+    if (isValidGitHubStars(data.stargazers_count)) {
       githubStars.value = data.stargazers_count
+      writeCachedGitHubStars(data.stargazers_count)
     }
   } catch (error) {
-    if (!axios.isCancel(error)) {
+    if (!axios.isCancel(error) && githubStars.value === null) {
       githubStars.value = null
+    }
+  } finally {
+    if (githubStatsController === controller) {
+      githubStatsController = null
+      isFetchingGitHubStats.value = false
     }
   }
 }
