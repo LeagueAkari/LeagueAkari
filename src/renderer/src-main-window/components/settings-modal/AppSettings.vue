@@ -394,6 +394,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          v-if="as.isWindows"
           :label="t('AppSettings.lcConnection.useWmi.label')"
           :label-description="t('AppSettings.lcConnection.useWmi.description')"
           :label-width="400"
@@ -405,6 +406,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          v-if="as.isWindows"
           :label="t('AppSettings.lcConnection.rebuildWmi.label')"
           :label-description="t('AppSettings.lcConnection.rebuildWmi.description')"
           :label-width="400"

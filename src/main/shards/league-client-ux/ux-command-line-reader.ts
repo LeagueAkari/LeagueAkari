@@ -4,6 +4,13 @@ import type { UxCommandLine } from '@shared/shards/league-client-ux'
 import { LEAGUE_CLIENT_UX_PROCESS_NAME, type LeagueClientUxMainContext } from './context'
 import { parseCommandLine } from './ux-command-line-parser'
 
+function shouldUseWmiCommandLineReader(
+  useWmi: boolean,
+  platform: NodeJS.Platform = process.platform
+) {
+  return platform === 'win32' && useWmi
+}
+
 export class LeagueClientUxCommandLineReader {
   private _hasClientButNoCommandLineCount = 0
 
@@ -12,7 +19,7 @@ export class LeagueClientUxCommandLineReader {
   async read() {
     const { settings, state } = this.context
 
-    if (settings.useWmi) {
+    if (shouldUseWmiCommandLineReader(settings.useWmi)) {
       if (!isElevated) {
         return []
       }
