@@ -186,7 +186,7 @@ jobs:
       - name: Delete current CI release before retry
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release delete "$CI_RELEASE_TAG" --cleanup-tag --yes || true
+        run: gh release delete "$CI_RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v3
@@ -225,7 +225,15 @@ jobs:
             console.log(`Deleting old CI prerelease ${release.tag_name}`)
             childProcess.execFileSync(
               'gh',
-              ['release', 'delete', release.tag_name, '--cleanup-tag', '--yes'],
+              [
+                'release',
+                'delete',
+                release.tag_name,
+                '--repo',
+                process.env.GITHUB_REPOSITORY,
+                '--cleanup-tag',
+                '--yes'
+              ],
               { stdio: 'inherit' }
             )
           }
