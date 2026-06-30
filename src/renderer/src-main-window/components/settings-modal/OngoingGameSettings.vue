@@ -163,6 +163,18 @@
 
         <SettingsRow
           :label-width="400"
+          :label="t('settings.ongoingGame.showJunglePathing.label')"
+          :label-description="t('settings.ongoingGame.showJunglePathing.description')"
+        >
+          <NSwitch
+            size="small"
+            :value="ogs.settings.showJunglePathing"
+            @update:value="(val) => og.setShowJunglePathing(val)"
+          />
+        </SettingsRow>
+
+        <SettingsRow
+          :label-width="400"
           :label="t('settings.ongoingGame.playerCardTags.label')"
           align="start"
           :label-description="t('settings.ongoingGame.playerCardTags.description')"

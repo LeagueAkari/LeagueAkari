@@ -40,6 +40,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
     showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
     showMatchHistoryItemBorder: false,
+    showJunglePathing: true,
     showJunglePathingForAllPlayers: false,
     autoRouteWhenGameStarts: false,
     playerCardTags: {

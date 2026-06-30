@@ -55,6 +55,7 @@ export class OngoingGameSettings {
 
   showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
   showMatchHistoryItemBorder = false
+  showJunglePathing = true
   showJunglePathingForAllPlayers = false
   autoRouteWhenGameStarts = false
   playerCardTags = {
@@ -106,6 +107,10 @@ export class OngoingGameSettings {
 
   setShowMatchHistoryItemBorder(value: boolean) {
     this.showMatchHistoryItemBorder = value
+  }
+
+  setShowJunglePathing(value: boolean) {
+    this.showJunglePathing = value
   }
 
   setShowJunglePathingForAllPlayers(value: boolean) {

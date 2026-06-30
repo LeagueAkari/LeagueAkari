@@ -85,6 +85,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
   }
 
+  setShowJunglePathing(value: boolean) {
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showJunglePathing', value)
+  }
+
   setShowJunglePathingForAllPlayers(value: boolean) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showJunglePathingForAllPlayers', value)
   }

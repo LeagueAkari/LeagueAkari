@@ -11,6 +11,7 @@ ongoingGame:
       showJunglePathingForAllPlayers:
         label: Show jungle path samples for non-junglers
         description: When enabled, non-junglers also show this section if their match history contains jungle path samples.
+        disabledDescription: Jungle pathing is disabled in ongoing-game settings. Enable it from more ongoing game settings before changing this option.
       openOngoingGameSettings: More ongoing game settings
     orderOptions:
       default: Default

@@ -83,14 +83,14 @@
 
               <SettingsRow
                 :label="t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.label')"
-                :label-description="
-                  t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.description')
-                "
+                :label-description="showJunglePathingForAllPlayersDescription"
                 :label-width="200"
+                :disabled="!ogs.settings.showJunglePathing"
               >
                 <NSwitch
                   size="small"
                   :value="ogs.settings.showJunglePathingForAllPlayers"
+                  :disabled="!ogs.settings.showJunglePathing"
                   @update:value="(val) => og.setShowJunglePathingForAllPlayers(val)"
                 />
               </SettingsRow>
@@ -183,6 +183,14 @@ const orderOptions = computed(() => {
 })
 
 const sgpTagOptions = useSgpTagOptions()
+
+const showJunglePathingForAllPlayersDescription = computed(() => {
+  if (!ogs.settings.showJunglePathing) {
+    return t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.disabledDescription')
+  }
+
+  return t('ongoingGame.titlebar.settings.showJunglePathingForAllPlayers.description')
+})
 
 const handleSgpTagChange = (val: string) => {
   if (!val || val === ALL_SGPTAG_VALUE) {

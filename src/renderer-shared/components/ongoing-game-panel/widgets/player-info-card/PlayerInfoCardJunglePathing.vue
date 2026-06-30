@@ -11,6 +11,7 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import { computed } from 'vue'
 
+import { resolveJunglePathingAnalysis } from './jungle-pathing/visibility'
 import JunglePathingInfo from './jungle-pathing-info/JunglePathingInfo.vue'
 
 const { puuid } = defineProps<{
@@ -36,15 +37,12 @@ const isCurrentJungler = computed(() => {
 })
 
 const junglePathingAnalysis = computed(() => {
-  if (!analysis.value?.jungle) {
-    return null
-  }
-
-  if (!isCurrentJungler.value && !ogs.settings.showJunglePathingForAllPlayers) {
-    return null
-  }
-
-  return analysis.value
+  return resolveJunglePathingAnalysis({
+    analysis: analysis.value,
+    isCurrentJungler: isCurrentJungler.value,
+    showJunglePathing: ogs.settings.showJunglePathing,
+    showJunglePathingForAllPlayers: ogs.settings.showJunglePathingForAllPlayers
+  })
 })
 
 const mostPlayedJungleChampionId = computed(() => {

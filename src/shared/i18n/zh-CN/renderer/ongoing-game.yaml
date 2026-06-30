@@ -11,6 +11,7 @@ ongoingGame:
       showJunglePathingForAllPlayers:
         label: 展示非打野玩家的打野路径样本
         description: 开启后，若非打野玩家的历史战绩中存在打野路径样本，也会展示该信息。
+        disabledDescription: 打野偏好已在对局设置中禁用。请前往更多对局设置启用后再调整此项。
       openOngoingGameSettings: 更多对局设置
     orderOptions:
       default: 楼层顺序

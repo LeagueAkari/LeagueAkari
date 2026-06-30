@@ -100,6 +100,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         orderPlayerBy: { default: this.settings.orderPlayerBy },
         showChampionUsage: { default: this.settings.showChampionUsage },
         showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
+        showJunglePathing: { default: this.settings.showJunglePathing },
         showJunglePathingForAllPlayers: {
           default: this.settings.showJunglePathingForAllPlayers
         },
@@ -163,6 +164,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'orderPlayerBy',
       'showChampionUsage',
       'showMatchHistoryItemBorder',
+      'showJunglePathing',
       'showJunglePathingForAllPlayers',
       'autoRouteWhenGameStarts',
       'playerCardTags',
