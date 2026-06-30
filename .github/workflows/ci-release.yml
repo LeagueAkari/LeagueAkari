@@ -1,0 +1,232 @@
+name: Build CI Release
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: ci-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/dev'
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-15
+            build_command: yarn build:mac
+            artifact_name: macos
+            release_asset_prefix: league-akari-mac-arm64
+            cache_path: |
+              ~/Library/Caches/electron
+              ~/Library/Caches/electron-builder
+            artifact_paths: |
+              dist/*.dmg
+              dist/*.zip
+          - name: Windows
+            os: windows-2022
+            build_command: yarn build:win
+            artifact_name: windows
+            release_asset_prefix: league-akari-win-x64
+            cache_path: |
+              ~\AppData\Local\electron\Cache
+              ~\AppData\Local\electron-builder\Cache
+            artifact_paths: |
+              dist/*.7z
+              dist/*.exe
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Cache Electron Binaries
+        uses: actions/cache@v6
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-electron-${{ hashFiles('yarn.lock', 'package.json', 'electron-builder.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Set commit package version
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const semver = require('semver')
+
+          const packageJsonPath = 'package.json'
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+          const sha = process.env.GITHUB_SHA
+
+          if (!sha) {
+            throw new Error('GITHUB_SHA is required')
+          }
+
+          packageJson.version = packageJson.version.includes('-')
+            ? `${packageJson.version}.g${sha}`
+            : `${packageJson.version}-ci.g${sha}`
+
+          if (!semver.valid(packageJson.version)) {
+            throw new Error(`Invalid CI package version: ${packageJson.version}`)
+          }
+
+          fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`)
+          fs.appendFileSync(process.env.GITHUB_ENV, `CI_PACKAGE_VERSION=${packageJson.version}\n`)
+          console.log(`CI package version: ${packageJson.version}`)
+          NODE
+
+      - name: Build package
+        run: ${{ matrix.build_command }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize release asset names
+        shell: bash
+        env:
+          RELEASE_ASSET_PREFIX: ${{ matrix.release_asset_prefix }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const path = require('node:path')
+
+          const distDir = 'dist'
+          const releaseAssetPrefix = process.env.RELEASE_ASSET_PREFIX
+
+          if (!releaseAssetPrefix) {
+            throw new Error('RELEASE_ASSET_PREFIX is required')
+          }
+
+          const packageExtensions = releaseAssetPrefix.includes('-win-')
+            ? new Set(['.7z', '.exe'])
+            : new Set(['.dmg', '.zip'])
+
+          const filesByExtension = new Map()
+
+          for (const name of fs.readdirSync(distDir)) {
+            const filePath = path.join(distDir, name)
+
+            if (!fs.statSync(filePath).isFile() || name.endsWith('.blockmap')) {
+              continue
+            }
+
+            const extension = path.extname(name)
+
+            if (!packageExtensions.has(extension)) {
+              continue
+            }
+
+            if (filesByExtension.has(extension)) {
+              throw new Error(`Multiple ${extension} artifacts found in ${distDir}`)
+            }
+
+            filesByExtension.set(extension, name)
+          }
+
+          if (!filesByExtension.size) {
+            throw new Error(`No release artifacts found for ${releaseAssetPrefix}`)
+          }
+
+          for (const [extension, name] of filesByExtension) {
+            const sourcePath = path.join(distDir, name)
+            const targetName = `${releaseAssetPrefix}${extension}`
+            const targetPath = path.join(distDir, targetName)
+
+            fs.renameSync(sourcePath, targetPath)
+            console.log(`${name} -> ${targetName}`)
+          }
+          NODE
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_paths }}
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    if: github.ref == 'refs/heads/dev'
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      CI_RELEASE_TAG: ci-${{ github.sha }}
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-artifacts
+
+      - name: List release artifacts
+        run: find release-artifacts -maxdepth 3 -type f -print | sort
+
+      - name: Delete current CI release before retry
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete "$CI_RELEASE_TAG" --cleanup-tag --yes || true
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.CI_RELEASE_TAG }}
+          name: CI Build dev @ ${{ github.sha }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          generate_release_notes: false
+          overwrite_files: true
+          files: release-artifacts/**/*
+          fail_on_unmatched_files: true
+
+      - name: Keep latest 3 CI prereleases
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases-pages.json
+          node <<'NODE'
+          const childProcess = require('node:child_process')
+          const fs = require('node:fs')
+
+          const pages = JSON.parse(fs.readFileSync('releases-pages.json', 'utf8'))
+          const releases = pages
+            .flat()
+            .filter((release) => release.prerelease && release.tag_name.startsWith('ci-'))
+            .sort((a, b) => {
+              const bTime = Date.parse(b.created_at || b.published_at || '')
+              const aTime = Date.parse(a.created_at || a.published_at || '')
+              return bTime - aTime
+            })
+
+          for (const release of releases.slice(3)) {
+            console.log(`Deleting old CI prerelease ${release.tag_name}`)
+            childProcess.execFileSync(
+              'gh',
+              ['release', 'delete', release.tag_name, '--cleanup-tag', '--yes'],
+              { stdio: 'inherit' }
+            )
+          }
+          NODE
