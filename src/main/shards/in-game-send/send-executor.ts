@@ -21,7 +21,7 @@ export class InGameSendExecutor {
   constructor(private readonly _context: InGameSendMainContext) {}
 
   watchCancelShortcut() {
-    const { keyboardShortcuts, logger, mobxUtils, settings } = this._context
+    const { keyboardShortcuts, logger, mobxUtils, settingService, settings } = this._context
 
     mobxUtils.reaction(
       () => settings.cancelShortcut,
@@ -38,7 +38,9 @@ export class InGameSendExecutor {
               }
             })
           } catch (error) {
-            settings.setCancelShortcut(null)
+            void settingService.set('cancelShortcut', null).catch((setError) => {
+              logger.error('Clear cancel shortcut setting failed', setError)
+            })
             logger.error('Register shortcut failed', error)
           }
         }

@@ -47,6 +47,11 @@ function createContext(phase: string, options: TestContextOptions = {}) {
   settings.setSendInterval(options.sendInterval ?? 123)
 
   const chatSend = vi.fn(() => Promise.resolve())
+  const settingService = {
+    set: vi.fn(async (key: keyof InGameSendSettings, value: InGameSendSettings[typeof key]) => {
+      ;(settings[key] as InGameSendSettings[typeof key]) = value
+    })
+  }
 
   const context = {
     namespace: IN_GAME_SEND_MAIN_NAMESPACE,
@@ -58,7 +63,7 @@ function createContext(phase: string, options: TestContextOptions = {}) {
       error: vi.fn(),
       debug: vi.fn()
     },
-    settingService: {},
+    settingService,
     mobxUtils: {
       reaction: vi.fn()
     },
@@ -103,7 +108,7 @@ function createContext(phase: string, options: TestContextOptions = {}) {
     isGameClientForeground: vi.fn(() => Promise.resolve(options.foreground ?? true))
   } as unknown as InGameSendMainContext
 
-  return { context, chatSend }
+  return { context, chatSend, settingService }
 }
 
 describe('InGameSendExecutor', () => {
@@ -174,5 +179,30 @@ describe('InGameSendExecutor', () => {
     ])
     expect(nativeInputMock.instance.sendKey).toHaveBeenCalledWith(IN_GAME_SEND_ENTER_KEY_CODE, true)
     expect(sleepMock.sleep.mock.calls.filter(([delay]) => delay === 456)).toHaveLength(1)
+  })
+
+  it('persists clearing the cancel shortcut when registration fails', async () => {
+    const { context, settingService } = createContext('in-game')
+    const error = new Error('unsupported shortcut')
+    context.settings.setCancelShortcut('Ctrl+Shift+X')
+    ;(context.keyboardShortcuts as any) = {
+      register: vi.fn(() => {
+        throw error
+      }),
+      unregisterByTargetId: vi.fn()
+    }
+    ;(context.mobxUtils as any).reaction = vi.fn(
+      (selector: () => unknown, effect: (value: unknown) => void) => {
+        effect(selector())
+      }
+    )
+    const executor = new InGameSendExecutor(context)
+
+    executor.watchCancelShortcut()
+
+    await expect(settingService.set.mock.results[0].value).resolves.toBeUndefined()
+    expect(settingService.set).toHaveBeenCalledWith('cancelShortcut', null)
+    expect(context.settings.cancelShortcut).toBeNull()
+    expect(context.logger.error).toHaveBeenCalledWith('Register shortcut failed', error)
   })
 })
