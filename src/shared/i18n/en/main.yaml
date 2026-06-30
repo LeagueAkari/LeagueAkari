@@ -128,8 +128,8 @@ in-game-send-main:
     rating:
       noRecentMatches: No recent matches
       noChampionMatches: No recent matches on {{champion}}
-      matchCount_one: '{{count}} recent match'
-      matchCount_other: '{{count}} recent matches'
+      matchCount_one: '{{count}} match'
+      matchCount_other: '{{count}} matches'
       championMatchCount_one: '{{count}} match on {{champion}}'
       championMatchCount_other: '{{count}} matches on {{champion}}'
       countWithStats: '{{countText}}, {{stats}}'

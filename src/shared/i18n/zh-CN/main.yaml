@@ -128,10 +128,10 @@ in-game-send-main:
     rating:
       noRecentMatches: 近期没有对局记录
       noChampionMatches: 近期没有{{champion}}对局记录
-      matchCount_one: 统计{{count}}场对局
-      matchCount_other: 统计{{count}}场对局
-      championMatchCount_one: 统计{{champion}}{{count}}场
-      championMatchCount_other: 统计{{champion}}{{count}}场
+      matchCount_one: '{{count}}场对局'
+      matchCount_other: '{{count}}场对局'
+      championMatchCount_one: '{{champion}}{{count}}场'
+      championMatchCount_other: '{{champion}}{{count}}场'
       countWithStats: '{{countText}}，{{stats}}'
       metrics:
         winRate: 胜率{{value}}
