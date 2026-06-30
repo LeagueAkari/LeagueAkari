@@ -54,8 +54,12 @@
           <div
             v-for="item of items"
             :key="item.id"
-            class="fixed-text-list-item group box-border flex min-h-8 w-full flex-none items-center justify-between gap-1.5 rounded-[5px] bg-transparent py-1 pr-0.5 pl-2 text-inherit transition-colors duration-150 hover:bg-black/10 dark:hover:bg-white/10"
-            :class="item.id === selectedId ? 'active bg-black/10 dark:bg-white/10' : null"
+            class="fixed-text-list-item group box-border flex min-h-8 w-full flex-none items-center justify-between gap-1.5 rounded-[5px] py-1 pr-0.5 pl-2 text-inherit transition-colors duration-150"
+            :class="
+              item.id === selectedId
+                ? 'active bg-black/15 hover:bg-black/15 dark:bg-white/10 dark:hover:bg-white/10'
+                : 'bg-transparent hover:bg-black/10 dark:hover:bg-white/10'
+            "
             @mouseenter="handleItemMouseEnter(item.id)"
             @mouseleave="handleItemMouseLeave(item.id)"
           >
@@ -67,9 +71,13 @@
               <span
                 class="item-title overflow-hidden text-[13px] leading-5.5 font-normal text-ellipsis whitespace-nowrap"
                 :class="
-                  getTrimmedTitle(item.title)
-                    ? 'text-black/82 dark:text-white/86'
-                    : 'text-black/38 dark:text-white/38'
+                  item.id === selectedId
+                    ? getTrimmedTitle(item.title)
+                      ? 'font-medium text-black dark:text-white'
+                      : 'font-medium text-black/52 dark:text-white/55'
+                    : getTrimmedTitle(item.title)
+                      ? 'text-black/82 dark:text-white/86'
+                      : 'text-black/38 dark:text-white/38'
                 "
               >
                 {{ getDisplayTitle(item.title) }}
