@@ -81,7 +81,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
           return
         }
 
-        if (enabled) {
+        if (enabled && NATIVE_SUPPORT.nativeInput.available) {
           this.createWindow()
         } else {
           this.close(true)
