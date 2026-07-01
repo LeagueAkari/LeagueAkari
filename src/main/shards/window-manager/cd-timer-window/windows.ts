@@ -84,7 +84,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           backgroundThrottling: false
         },
         titleBarStyle: 'hidden',
-        trafficLightPosition: { x: 10, y: 8 }
+        trafficLightPosition: { x: 8, y: 8 }
       }
     })
 

@@ -44,7 +44,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
         frame: false,
         maximizable: false,
         titleBarStyle: 'hidden',
-        trafficLightPosition: { x: 10, y: 8 }
+        trafficLightPosition: { x: 8, y: 8 }
       }
     })
 

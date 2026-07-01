@@ -42,7 +42,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         maximizable: true,
         titleBarStyle: 'hidden',
         trafficLightPosition: {
-          x: 6,
+          x: 4,
           y: 12
         }
       }
@@ -106,6 +106,18 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
     this._ipc.onCall(this._namespace, 'closeMainWindowForce', async () => {
       this.close(true)
     })
+
+    this._ipc.onCall(
+      this._namespace,
+      'setTrafficLightPosition',
+      async (_, x: number, y: number) => {
+        if (process.platform !== 'darwin') {
+          return
+        }
+
+        this._window?.setWindowButtonPosition({ x, y })
+      }
+    )
   }
 
   protected override handleClose(event: Event) {

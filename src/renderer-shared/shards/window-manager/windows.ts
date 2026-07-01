@@ -43,6 +43,10 @@ export class AkariMainWindow extends BaseAkariWindowRenderer<
   closeForce() {
     return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindowForce')
   }
+
+  setTrafficLightPosition(x: number, y: number) {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'setTrafficLightPosition', x, y)
+  }
 }
 
 export class AkariAuxWindow extends BaseAkariWindowRenderer<

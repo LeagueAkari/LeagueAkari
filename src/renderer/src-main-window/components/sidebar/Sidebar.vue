@@ -1,6 +1,7 @@
 <template>
   <div
     class="app-sidebar"
+    ref="app-sidebar"
     :class="{
       collapsed: mui.frontendSettings.sidebarCollapsed
     }"
@@ -48,9 +49,11 @@
 
 <script setup lang="tsx">
 import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
 import {
@@ -60,7 +63,15 @@ import {
 import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, ref, watch, watchEffect } from 'vue'
+import {
+  Component as ComponentC,
+  computed,
+  nextTick,
+  ref,
+  useTemplateRef,
+  watch,
+  watchEffect
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
@@ -74,6 +85,14 @@ const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const mui = useMainWindowUiStore()
 const lcs = useLeagueClientStore()
+const wm = useInstance(WindowManagerRenderer)
+const sidebarEl = useTemplateRef('app-sidebar')
+
+const MAIN_WINDOW_TRAFFIC_LIGHT_DEFAULT_POSITION = {
+  x: 4,
+  y: 12
+}
+const MAIN_WINDOW_TRAFFIC_LIGHT_EXPANDED_FALLBACK_X = 8
 
 const renderIcon = (icon: ComponentC) => {
   const Icon = icon as any
@@ -95,6 +114,48 @@ const isInCombatPhase = computed(() => {
 const toggleCollapse = () => {
   mui.frontendSettings.sidebarCollapsed = !mui.frontendSettings.sidebarCollapsed
 }
+
+const getSidebarPxProperty = (propertyName: string, fallback: number) => {
+  if (!sidebarEl.value) {
+    return fallback
+  }
+
+  const value = Number.parseFloat(getComputedStyle(sidebarEl.value).getPropertyValue(propertyName))
+  return Number.isFinite(value) ? value : fallback
+}
+
+const syncMainWindowTrafficLightPosition = () => {
+  if (!as.isMacOS) {
+    return
+  }
+
+  if (mui.frontendSettings.sidebarCollapsed) {
+    void wm.mainWindow.setTrafficLightPosition(
+      MAIN_WINDOW_TRAFFIC_LIGHT_DEFAULT_POSITION.x,
+      MAIN_WINDOW_TRAFFIC_LIGHT_DEFAULT_POSITION.y
+    )
+    return
+  }
+
+  const x = getSidebarPxProperty(
+    '--la-sidebar-icon-horizontal-padding',
+    MAIN_WINDOW_TRAFFIC_LIGHT_EXPANDED_FALLBACK_X
+  )
+
+  void wm.mainWindow.setTrafficLightPosition(
+    Math.round(x),
+    MAIN_WINDOW_TRAFFIC_LIGHT_DEFAULT_POSITION.y
+  )
+}
+
+// TODO: 临时方案：折叠状态仍由前端拥有，因此先在这里同步 macOS 交通灯位置。
+watch(
+  () => [as.isMacOS, mui.frontendSettings.sidebarCollapsed] as const,
+  () => {
+    void nextTick(syncMainWindowTrafficLightPosition)
+  },
+  { immediate: true, flush: 'post' }
+)
 
 watch(
   () => isInCombatPhase.value,
