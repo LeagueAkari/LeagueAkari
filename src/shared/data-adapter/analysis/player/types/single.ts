@@ -9,6 +9,7 @@ export interface AkariScore {
   csScore: number
   goldScore: number
   participationScore: number
+  visionScore: number
   total: number
   outstanding: boolean
   extraordinary: boolean
@@ -18,10 +19,15 @@ export interface AkariScoreInput {
   kda: number
   winRate: number
   championDamageRatioToTeamMax: number
+  championDamageRatioToExpectedContribution: number
   damageTakenRatioToTeamMax: number
+  damageTakenRatioToExpectedContribution: number
   csPerMinute: number
   goldRatioToTeamMax: number
+  goldRatioToExpectedContribution: number
   killParticipation: number
+  visionScorePercentageOfTeam: number
+  visionScoreRatioToExpectedContribution: number
   count: number
 }
 
@@ -33,13 +39,16 @@ export interface GameSummaryWithOptionalDetails {
 
 export interface SingleSummaryAnalysis {
   championDamageRatioToTeamMax: number
+  championDamageRatioToExpectedContribution: number
   championDamageRatioToMax: number
   championDamagePercentageOfTeam: number
   championDamagePerMinute: number
   damageTakenRatioToTeamMax: number
+  damageTakenRatioToExpectedContribution: number
   damageTakenRatioToMax: number
   damageTakenPercentageOfTeam: number
   goldRatioToTeamMax: number
+  goldRatioToExpectedContribution: number
   goldRatioToMax: number
   goldPercentageOfTeam: number
   csRatioToTeamMax: number
@@ -49,6 +58,8 @@ export interface SingleSummaryAnalysis {
   towerDamageRatioToTeamMax: number
   towerDamageRatioToMax: number
   towerDamagePercentageOfTeam: number
+  visionScorePercentageOfTeam: number
+  visionScoreRatioToExpectedContribution: number
   totalDamageShieldedOnTeammatesRatioToTeamMax: number | null
   totalDamageShieldedOnTeammatesRatioToMax: number | null
   totalDamageShieldedOnTeammatesPercentageOfTeam: number | null

@@ -21,6 +21,7 @@ export interface AggregatedSummaryAnalysis {
   avgTowerDamageRatioToMax: number
   avgTowerDamagePercentageOfTeam: number
   avgVisionScore: number
+  avgVisionScorePercentageOfTeam: number
   avgDamageGoldEfficiency: number
   avgKillParticipation: number
 

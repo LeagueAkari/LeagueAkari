@@ -243,7 +243,7 @@ export function toParticipants(
         teamEarlySurrendered: p.teamEarlySurrendered,
         totalDamageToTowers: p.damageDealtToTurrets,
         totalHeal: p.totalHeal,
-        visionScore: p.visionScore,
+        visionScore: p.visionScore ?? 0,
         timeCCingOthers: p.timeCCingOthers,
         soloKills: p.challenges?.soloKills ?? null,
         effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
@@ -369,7 +369,7 @@ export function toParticipants(
         teamEarlySurrendered: participant.stats.teamEarlySurrendered,
         totalDamageToTowers: participant.stats.damageDealtToTurrets,
         totalHeal: participant.stats.totalHeal,
-        visionScore: participant.stats.visionScore,
+        visionScore: participant.stats.visionScore ?? 0,
         timeCCingOthers: participant.stats.timeCCingOthers,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record

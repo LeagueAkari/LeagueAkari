@@ -21,6 +21,7 @@ const baseSummary = {
   towerDamageRatioToTeamMax: 1,
   towerDamageRatioToMax: 1,
   towerDamagePercentageOfTeam: 1,
+  visionScorePercentageOfTeam: 1,
   totalDamageShieldedOnTeammatesRatioToTeamMax: null,
   totalDamageShieldedOnTeammatesRatioToMax: null,
   totalDamageShieldedOnTeammatesPercentageOfTeam: null,
@@ -66,6 +67,7 @@ function createPreparedGame(championId: number, position: string, gameId: number
         csScore: 0,
         goldScore: 0,
         participationScore: 0,
+        visionScore: 0,
         total: 0,
         outstanding: false,
         extraordinary: false

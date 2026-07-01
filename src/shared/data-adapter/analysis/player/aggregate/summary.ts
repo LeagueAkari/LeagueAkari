@@ -29,6 +29,7 @@ export function sumPings(pings: MatchParticipant['pings']): number | null {
 export function computeAggregatedSummary(games: PreparedGame[]): AggregatedSummaryAnalysis {
   const summaries = games.map((g) => g.single.summary)
   const participants = games.map((g) => g.participant)
+  const getVisionScore = (participant: MatchParticipant) => participant.visionScore ?? 0
 
   const kills = participants.reduce((s, p) => s + p.kills, 0)
   const deaths = participants.reduce((s, p) => s + p.deaths, 0)
@@ -56,7 +57,8 @@ export function computeAggregatedSummary(games: PreparedGame[]): AggregatedSumma
     avgTowerDamageRatioToTeamMax: avgOrZero(summaries.map((s) => s.towerDamageRatioToTeamMax)),
     avgTowerDamageRatioToMax: avgOrZero(summaries.map((s) => s.towerDamageRatioToMax)),
     avgTowerDamagePercentageOfTeam: avgOrZero(summaries.map((s) => s.towerDamagePercentageOfTeam)),
-    avgVisionScore: avgOrZero(participants.map((p) => p.visionScore)),
+    avgVisionScore: avgOrZero(participants.map(getVisionScore)),
+    avgVisionScorePercentageOfTeam: avgOrZero(summaries.map((s) => s.visionScorePercentageOfTeam)),
     avgDamageGoldEfficiency: avgOrZero(summaries.map((s) => s.damageGoldEfficiency)),
     avgKillParticipation: avgOrZero(summaries.map((s) => s.killParticipation)),
 

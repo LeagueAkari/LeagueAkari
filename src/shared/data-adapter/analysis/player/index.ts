@@ -121,7 +121,7 @@ export function analyzeGames(
     count,
     summary,
     details: computeAggregatedDetails(prepared),
-    akariScore: computeAggregatedAkariScore({ count, summary }),
+    akariScore: computeAggregatedAkariScore({ count, summary, games: prepared }),
     map,
     teamSide: computeAggregatedTeamSide(prepared),
     winLoss: computeAggregatedWinLossMap(prepared),
