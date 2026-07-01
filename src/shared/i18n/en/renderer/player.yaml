@@ -30,6 +30,19 @@ playerTags:
     save: Save
     cancel: Cancel
     placeholder: Enter the tag for player {{name}}
+akariScore:
+  title: Akari Score
+  na: N/A
+  noFixedCap: No fixed cap
+  parts:
+    kda: KDA
+    winRate: Win Rate
+    damage: Damage
+    damageTaken: Damage Taken
+    cs: CS
+    gold: Gold
+    participation: Kill Participation
+    vision: Vision
 playerTabs:
   ranked:
     unranked: Unranked

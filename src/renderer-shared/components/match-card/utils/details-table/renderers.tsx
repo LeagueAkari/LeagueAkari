@@ -1,5 +1,7 @@
+import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
+import type { AkariScore } from '@shared/data-adapter/analysis/player'
 import { type ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { useTranslation } from 'i18next-vue'
 
@@ -19,6 +21,15 @@ export function useValueRenderer() {
 
   const positionName = (position: string) => {
     return t(`positions.${normalizedPosition(position)}`, { ns: 'common' })
+  }
+
+  const isAkariScore = (value: unknown): value is AkariScore => {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'total' in value &&
+      typeof (value as AkariScore).total === 'number'
+    )
   }
 
   const positionAssignmentReasonMeta = (
@@ -94,6 +105,19 @@ export function useValueRenderer() {
       }
 
       return <span title={value.toFixed(2)}>{value.toFixed(2)}</span>
+    },
+    'akari-score': (value: AkariScore) => {
+      if (!isAkariScore(value) || !Number.isFinite(value.total)) {
+        return emptyValue()
+      }
+
+      return (
+        <AkariScorePopover score={value}>
+          <span class="cursor-default tabular-nums" title={value.total.toFixed(2)}>
+            {value.total.toFixed(2)}
+          </span>
+        </AkariScorePopover>
+      )
     },
     integer: (value: number) => {
       if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) {

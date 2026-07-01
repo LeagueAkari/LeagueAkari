@@ -30,6 +30,19 @@ playerTags:
     save: 保存
     cancel: 取消
     placeholder: 输入对 {{name}} 的标记
+akariScore:
+  title: Akari Score
+  na: N/A
+  noFixedCap: 无固定上限
+  parts:
+    kda: KDA
+    winRate: 胜率
+    damage: 输出
+    damageTaken: 承伤
+    cs: 补刀
+    gold: 经济
+    participation: 参团
+    vision: 视野
 playerTabs:
   ranked:
     unranked: 未定级

@@ -368,11 +368,18 @@
           {{ t('ongoingGame.playerCard.akariLoved.outstanding') }}
         </div>
       </template>
-      <div class="popover-text" v-if="analysis.akariScore.extraordinary">
-        {{ t('ongoingGame.playerCard.akariLoved.extraordinaryPopover') }}
-      </div>
-      <div class="popover-text" v-else-if="analysis.akariScore.outstanding">
-        {{ t('ongoingGame.playerCard.akariLoved.outstandingPopover') }}
+      <div class="popover-text">
+        <div v-if="analysis.akariScore.extraordinary">
+          {{ t('ongoingGame.playerCard.akariLoved.extraordinaryPopover') }}
+        </div>
+        <div v-else-if="analysis.akariScore.outstanding">
+          {{ t('ongoingGame.playerCard.akariLoved.outstandingPopover') }}
+        </div>
+        <AkariScorePopoverContent
+          class="mt-2 border-t border-black/10 pt-2 dark:border-white/10"
+          :score="analysis.akariScore"
+          :total-precision="1"
+        />
       </div>
     </NPopover>
 
@@ -620,39 +627,21 @@
       </div>
     </NPopover>
 
-    <NPopover
-      :keep-alive-on-hover="false"
+    <AkariScorePopover
       v-if="ogs.settings.playerCardTags.showAkariScoreTag && analysis"
-      :delay="50"
+      :score="analysis.akariScore"
+      :total-precision="1"
     >
-      <template #trigger>
-        <div class="tag akari-loved">Akari {{ analysis.akariScore.total.toFixed(1) }}</div>
-      </template>
-      <div class="popover-text">
-        <div style="font-weight: bold">Akari Score: {{ analysis.akariScore.total.toFixed(1) }}</div>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            row-gap: 2px;
-            column-gap: 16px;
-            margin-top: 4px;
-          "
-        >
-          <div>Dmg: {{ analysis.akariScore.dmgScore.toFixed(2) }}</div>
-          <div>Taken: {{ analysis.akariScore.dmgTakenScore.toFixed(2) }}</div>
-          <div>Gold: {{ analysis.akariScore.goldScore.toFixed(2) }}</div>
-          <div>CS: {{ analysis.akariScore.csScore.toFixed(2) }}</div>
-          <div>K/P: {{ analysis.akariScore.participationScore.toFixed(2) }}</div>
-          <div>KDA: {{ analysis.akariScore.kdaScore.toFixed(2) }}</div>
-          <div>W/R: {{ analysis.akariScore.winRateScore.toFixed(2) }}</div>
-        </div>
-      </div>
-    </NPopover>
+      <div class="tag akari-loved">Akari {{ analysis.akariScore.total.toFixed(1) }}</div>
+    </AkariScorePopover>
   </div>
 </template>
 
 <script lang="ts" setup>
+import {
+  AkariScorePopover,
+  AkariScorePopoverContent
+} from '@renderer-shared/components/akari-score'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'

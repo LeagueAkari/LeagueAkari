@@ -1,3 +1,6 @@
+import { computeSingleAkariScore } from '@shared/data-adapter/analysis/player'
+import type { AkariScore } from '@shared/data-adapter/analysis/player'
+import { computeSingleSummary } from '@shared/data-adapter/analysis/player/single/summary'
 import type { Participant } from '@shared/types/league-client/match-history'
 import type { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { computed, toValue } from 'vue'
@@ -5,7 +8,27 @@ import { computed, toValue } from 'vue'
 import { useMatchCard } from '../../context'
 
 export function useRawDetails() {
-  const { summary } = useMatchCard()
+  const { summary, basicInfo, participants } = useMatchCard()
+
+  const akariScoresByPuuid = computed(() => {
+    const scores: Record<string, AkariScore> = {}
+
+    for (const participant of participants.value) {
+      const teamParticipants = participants.value.filter(
+        (p) => p.teamIdentifier === participant.teamIdentifier
+      )
+      const summaryAnalysis = computeSingleSummary(
+        basicInfo.value,
+        participant,
+        teamParticipants,
+        participants.value
+      )
+
+      scores[participant.puuid] = computeSingleAkariScore(summaryAnalysis)
+    }
+
+    return scores
+  })
 
   const addUp = (
     participant: { data: SgpParticipantLol; source: 'sgp' } | { data: Participant; source: 'lcu' }
@@ -45,6 +68,7 @@ export function useRawDetails() {
             ...PlayerBehavior,
             ...challenges,
             ...addUp({ data: p, source: 'sgp' }),
+            akariScore: akariScoresByPuuid.value[p.puuid],
             championId: p.championId,
             identity: {
               puuid: p.puuid,
@@ -66,6 +90,7 @@ export function useRawDetails() {
         return {
           ...p.stats,
           ...addUp({ data: p, source: 'lcu' }),
+          akariScore: akariScoresByPuuid.value[identity.player.puuid],
           championId: p.championId,
           identity: {
             puuid: identity.player.puuid,

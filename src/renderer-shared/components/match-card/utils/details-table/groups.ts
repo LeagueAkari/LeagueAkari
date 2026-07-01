@@ -48,7 +48,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
   },
   {
     group: 'akari',
-    items: [{ key: 'akariScore', render: 'float' }]
+    items: [{ key: 'akariScore', render: 'akari-score' }]
   },
   {
     group: 'damage',

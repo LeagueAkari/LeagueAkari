@@ -15,6 +15,7 @@ export type RenderGroupOptions = {
   /** 各自渲染方式：数字、文本、自定义 */
   render?:
     | 'float'
+    | 'akari-score'
     | 'integer'
     | 'text'
     | 'compat'

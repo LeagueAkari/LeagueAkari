@@ -4,7 +4,7 @@
       {{ t('playerTabs.summary.title') }}
     </div>
     <div class="flex flex-col gap-1">
-      <div class="flex w-full items-center gap-2" title="Akari's insight">
+      <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
           t('playerTabs.summary.akariScore')
         }}</span>
@@ -13,7 +13,13 @@
           :class="{ 'opacity-60': analysis.akariScore === null }"
         >
           <template v-if="analysis.akariScore !== null">
-            <LeagueAkariSpan bold :text="analysis.akariScore.total.toFixed(2)" />
+            <AkariScorePopover :score="analysis.akariScore">
+              <LeagueAkariSpan
+                bold
+                :text="analysis.akariScore.total.toFixed(2)"
+                class="cursor-default"
+              />
+            </AkariScorePopover>
           </template>
           <template v-else>{{ t('playerTabs.summary.na') }}</template>
         </span>
@@ -74,10 +80,14 @@
 
       <div class="flex w-full items-center gap-2">
         <span class="text-xs text-gray-700 dark:text-gray-400">{{
-          t('playerTabs.summary.avgCs')
+          t('playerTabs.summary.avgCsPerMinute')
         }}</span>
         <span class="ml-auto text-right text-[13px] text-gray-900 dark:text-white">
-          {{ (analysis.summary.avgCsPercentageOfTeam * 100).toFixed() }}%
+          {{
+            t('playerTabs.summary.perMinuteValue', {
+              value: analysis.summary.avgCsPerMinute.toFixed(1)
+            })
+          }}
         </span>
       </div>
 
@@ -343,6 +353,7 @@
 </template>
 
 <script setup lang="ts">
+import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import {
