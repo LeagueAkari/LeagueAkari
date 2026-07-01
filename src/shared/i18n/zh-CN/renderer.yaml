@@ -2283,6 +2283,7 @@ QQAccount:
     qq: QQ号
     area: 大区
     gameId: 游戏ID (name#tag)
+    password: 登录密码
     batchPlaceholder: 每行一个 QQ 号（或以逗号 / 分号 / 空格分隔）
     batchHint: 自动去重，逐个查询
   col:

@@ -53,4 +53,10 @@ export class QQAccount {
    */
   @Column({ type: 'integer', nullable: false, default: 0 })
   sortOrder: number
+
+  /**
+   * QQ 密码（加密存储），为空则不启用快捷登录
+   */
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null
 }

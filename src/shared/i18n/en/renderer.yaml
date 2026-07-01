@@ -2279,6 +2279,7 @@ QQAccount:
     qq: QQ number
     area: Region
     gameId: Game ID (name#tag)
+    password: Password
     batchPlaceholder: One QQ number per line (or separated by comma / semicolon / space)
     batchHint: Auto-deduplicated; queried one by one
   col:

@@ -45,6 +45,7 @@ export interface QQAccountDto {
   area: string
   gameId: string | null
   tag: string | null
+  hasPassword: boolean
   banStatus: string
   banUntil: string | null
   banRemaining: string | null
@@ -60,6 +61,7 @@ export interface CreateQQAccountDto {
   area: string
   gameId?: string | null
   tag?: string | null
+  password?: string | null
 }
 
 export interface UpdateQQAccountDto {
@@ -68,6 +70,7 @@ export interface UpdateQQAccountDto {
   area?: string
   gameId?: string | null
   tag?: string | null
+  password?: string | null
 }
 
 export interface BanQueryResult {

@@ -7,6 +7,12 @@
           <span class="title-label">{{ t('QQAccount.title') }}</span>
         </div>
       </div>
+      <div class="game-path-row">
+        <span class="game-path-label">游戏路径:</span>
+        <NInput v-model:value="gamePath" placeholder="例如 E:\\WeGameApps\\英雄联盟" style="flex: 1" @blur="handleSaveGamePath" />
+        <NButton size="small" @click="handleDetectGamePath" :loading="gamePathLoading">检测</NButton>
+        <NButton size="small" @click="handleSaveGamePath">保存</NButton>
+      </div>
       <NTabs v-model:value="currentTab" size="medium">
         <NTab name="accounts" :tab="t('QQAccount.tab.accounts')" />
         <NTab name="single" :tab="t('QQAccount.tab.single')" />
@@ -38,6 +44,16 @@
             style="width: 260px"
             @keyup.enter="handleAdd"
           />
+          <NInput
+            v-model:value="addForm.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="密码（留空则不启用快捷登录）"
+            style="width: 180px"
+            @keyup.enter="handleAdd"
+          />
+          <NButton size="small" @click="showPassword = !showPassword">
+            {{ showPassword ? '隐' : '显' }}
+          </NButton>
           <NButton type="primary" @click="handleAdd" :loading="adding">
             {{ t('QQAccount.action.add') }}
           </NButton>
@@ -159,6 +175,10 @@
           <label>{{ t('QQAccount.field.gameId') }}</label>
           <NInput v-model:value="editForm.gameId" style="flex: 1" />
         </div>
+        <div class="edit-row">
+          <label>{{ t('QQAccount.field.password') }}</label>
+          <NInput v-model:value="editForm.password" type="password" placeholder="留空则不修改" style="flex: 1" />
+        </div>
         <div class="edit-actions">
           <NButton @click="editModalOpen = false">{{ t('QQAccount.action.cancel') }}</NButton>
           <NButton type="primary" @click="handleEditSave" :loading="editSaving">
@@ -172,6 +192,7 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { AutoLoginCRenderer } from '@renderer-shared/shards/auto-login-c'
 import {
   BatchBanQueryResult,
   CreateQQAccountDto,
@@ -196,7 +217,7 @@ import {
   useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, h, onMounted, onUnmounted, ref } from 'vue'
 
 interface HistoryItem {
   qq: string
@@ -210,6 +231,30 @@ const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const qqAccount = useInstance(QQAccountRenderer)
+const autoLoginC = useInstance(AutoLoginCRenderer)
+const showPassword = ref(false)
+const loggingInId = ref<string | null>(null)
+const gamePath = ref('')
+const gamePathLoading = ref(false)
+
+async function loadGamePath() {
+  gamePath.value = await autoLoginC.getGamePath()
+}
+
+async function handleSaveGamePath() {
+  await autoLoginC.setGamePath(gamePath.value)
+  message.success('游戏路径已保存')
+}
+
+async function handleDetectGamePath() {
+  gamePathLoading.value = true
+  try {
+    const p = await autoLoginC.detectGamePath()
+    if (p) { gamePath.value = p; await autoLoginC.setGamePath(p); message.success(`已检测到: ${p}`) }
+    else message.warning('未检测到，请手动输入')
+  } catch (e: any) { message.error(e?.message || String(e)) }
+  finally { gamePathLoading.value = false }
+}
 
 const currentTab = ref<'accounts' | 'single' | 'batch'>('accounts')
 const accounts = ref<QQAccountDto[]>([])
@@ -224,7 +269,8 @@ const areaOptions = QQ_AREAS.map((a) => ({ label: a, value: a }))
 const addForm = ref({
   qq: '',
   area: QQ_AREAS[0] as string,
-  gameId: ''
+  gameId: '',
+  password: ''
 })
 
 async function handleAdd() {
@@ -237,12 +283,14 @@ async function handleAdd() {
     const dto: CreateQQAccountDto = {
       qq: addForm.value.qq.trim(),
       area: addForm.value.area,
-      gameId: addForm.value.gameId.trim() || null
+      gameId: addForm.value.gameId.trim() || null,
+      password: addForm.value.password || null
     }
     await qqAccount.createAccount(dto)
     message.success(t('QQAccount.msg.added'))
     addForm.value.qq = ''
     addForm.value.gameId = ''
+    addForm.value.password = ''
     await loadAccounts()
   } catch (e: any) {
     message.error(e?.message || String(e))
@@ -280,13 +328,6 @@ async function handleDelete(row: QQAccountDto) {
   })
 }
 
-function handleCopyGameId(row: QQAccountDto) {
-  if (!row.gameId) return
-  navigator.clipboard.writeText(row.gameId).then(
-    () => message.success(t('QQAccount.msg.copied')),
-    () => message.error(t('QQAccount.msg.copyFailed'))
-  )
-}
 
 async function handleOpenMatchHistory(row: QQAccountDto) {
   if (!row.gameId) {
@@ -315,7 +356,8 @@ const editForm = ref({
   id: '',
   qq: '',
   area: '',
-  gameId: ''
+  gameId: '',
+  password: ''
 })
 
 function handleOpenEdit(row: QQAccountDto) {
@@ -323,7 +365,8 @@ function handleOpenEdit(row: QQAccountDto) {
     id: row.id,
     qq: row.qq,
     area: row.area,
-    gameId: row.gameId || ''
+    gameId: row.gameId || '',
+    password: ''
   }
   editModalOpen.value = true
 }
@@ -335,7 +378,8 @@ async function handleEditSave() {
       id: editForm.value.id,
       qq: editForm.value.qq.trim(),
       area: editForm.value.area,
-      gameId: editForm.value.gameId.trim() || null
+      gameId: editForm.value.gameId.trim() || null,
+      password: editForm.value.password || null
     })
     message.success(t('QQAccount.msg.saved'))
     editModalOpen.value = false
@@ -496,7 +540,24 @@ const columns = computed<DataTableColumns<QQAccountDto>>(() => [
     title: t('QQAccount.col.gameId'),
     key: 'gameId',
     width: 220,
-    render: (row) => (row.gameId ? h('span', { class: 'mono' }, row.gameId) : h('span', { class: 'dim' }, '—'))
+    render: (row) => {
+      if (!row.gameId) return h('span', { class: 'dim' }, '—')
+      return h(
+        'span',
+        {
+          class: 'mono clickable',
+          style: 'cursor: pointer; text-decoration: underline dotted rgba(160,160,160,0.5)',
+          title: '点击复制',
+          onClick: () => {
+            navigator.clipboard.writeText(row.gameId).then(
+              () => message.success(t('QQAccount.msg.copied')),
+              () => message.error(t('QQAccount.msg.copyFailed'))
+            )
+          }
+        },
+        row.gameId
+      )
+    }
   },
   {
     title: t('QQAccount.col.rank'),
@@ -530,16 +591,6 @@ const columns = computed<DataTableColumns<QQAccountDto>>(() => [
         ),
         h(
           NButton,
-          {
-            size: 'tiny',
-            secondary: true,
-            disabled: !hasGameId,
-            onClick: () => handleCopyGameId(row)
-          },
-          () => t('QQAccount.action.copy')
-        ),
-        h(
-          NButton,
           { size: 'tiny', secondary: true, onClick: () => handleOpenEdit(row) },
           () => t('QQAccount.action.edit')
         ),
@@ -547,7 +598,20 @@ const columns = computed<DataTableColumns<QQAccountDto>>(() => [
           NButton,
           { size: 'tiny', type: 'error', secondary: true, onClick: () => handleDelete(row) },
           () => t('QQAccount.action.delete')
-        )
+        ),
+        row.hasPassword
+          ? h(
+              NButton,
+              {
+                size: 'tiny',
+                type: 'primary',
+                loading: loggingInId.value === row.id,
+                disabled: loggingInId.value === row.id || row.banStatus === '已封禁',
+                onClick: () => handleAutoLogin(row)
+              },
+              () => loggingInId.value === row.id ? '登录中...' : '快捷登录'
+            )
+          : null
       ])
     }
   }
@@ -637,9 +701,44 @@ async function handleBatchQuery() {
   }
 }
 
+async function handleAutoLogin(row: QQAccountDto) {
+  loggingInId.value = row.id
+  loginStatus.value = '准备中...'
+  try {
+    await autoLoginC.autoLogin(row.id)
+    message.success(`QQ ${row.qq} 登录成功`)
+  } catch (e: any) {
+    message.error(`QQ ${row.qq} 登录失败: ${e?.message || String(e)}`)
+  } finally {
+    loggingInId.value = null
+    setTimeout(() => { loginStatus.value = '' }, 5000)
+  }
+}
+
+const loginStatus = ref('')
+let disposeStatusListener: (() => void) | null = null
+
 onMounted(() => {
   loadAccounts()
   loadHistory()
+  loadGamePath()
+  disposeStatusListener = autoLoginC.onStatus((s) => {
+    console.log('[AutoLoginC status]', s)
+    loginStatus.value = s.message
+    if (s.state === 'error') {
+      message.error(s.message)
+    } else if (s.state === 'success') {
+      message.success(s.message)
+    } else if (s.state === 'tool_status') {
+      message.info(`登录器: ${s.message}`)
+    } else {
+      message.info(s.message)
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (disposeStatusListener) disposeStatusListener()
 })
 </script>
 
@@ -657,6 +756,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  .game-path-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .game-path-label { font-size: 13px; white-space: nowrap; color: rgba(200,200,200,0.85); }
+  }
 
   .title-row {
     display: flex;

@@ -1,7 +1,10 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import axios from 'axios'
-import { randomUUID } from 'node:crypto'
+import { app, safeStorage } from 'electron'
+import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from 'node:crypto'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { AkariIpcError, AkariIpcMain } from '../ipc'
@@ -97,6 +100,66 @@ const ROMAN_TO_ARABIC: Record<string, string> = {
 
 // 大師以上無 division
 const NO_DIVISION_TIERS = new Set(['MASTER', 'GRANDMASTER', 'CHALLENGER'])
+
+const AES_ALGORITHM = 'aes-256-gcm'
+const AES_IV_BYTES = 16
+const AES_KEY_BYTES = 32
+const ENCRYPTED_PREFIX = 'v2:'
+
+let _fallbackKey: Buffer | null = null
+
+function _getOrCreateKeyFile(): string {
+  return path.join(app.getPath('userData'), '.akari-key')
+}
+
+function _getFallbackKey(): Buffer {
+  if (_fallbackKey) return _fallbackKey
+  const keyFile = _getOrCreateKeyFile()
+  if (fs.existsSync(keyFile)) {
+    _fallbackKey = fs.readFileSync(keyFile)
+    if (_fallbackKey.length === AES_KEY_BYTES) return _fallbackKey
+  }
+  _fallbackKey = randomBytes(AES_KEY_BYTES)
+  fs.writeFileSync(keyFile, _fallbackKey, { mode: 0o600 })
+  return _fallbackKey
+}
+
+function encryptPassword(plaintext: string): string {
+  if (safeStorage.isEncryptionAvailable()) {
+    return ENCRYPTED_PREFIX + safeStorage.encryptString(plaintext).toString('base64')
+  }
+  const iv = randomBytes(AES_IV_BYTES)
+  const cipher = createCipheriv(AES_ALGORITHM, _getFallbackKey(), iv)
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+  return [ENCRYPTED_PREFIX, iv.toString('base64'), tag.toString('base64'), encrypted.toString('base64')].join(':')
+}
+
+function decryptPassword(ciphertext: string): string {
+  if (!ciphertext) return ''
+  if (!ciphertext.startsWith(ENCRYPTED_PREFIX)) {
+    if (safeStorage.isEncryptionAvailable()) {
+      return safeStorage.decryptString(Buffer.from(ciphertext, 'base64'))
+    }
+    throw new Error('无法解密密码：加密服务不可用')
+  }
+  const payload = ciphertext.slice(ENCRYPTED_PREFIX.length)
+  if (payload.includes(':')) {
+    const parts = payload.split(':')
+    if (parts.length === 3) {
+      const iv = Buffer.from(parts[0], 'base64')
+      const tag = Buffer.from(parts[1], 'base64')
+      const encrypted = Buffer.from(parts[2], 'base64')
+      const decipher = createDecipheriv(AES_ALGORITHM, _getFallbackKey(), iv)
+      decipher.setAuthTag(tag)
+      return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8')
+    }
+  }
+  if (safeStorage.isEncryptionAvailable()) {
+    return safeStorage.decryptString(Buffer.from(payload, 'base64'))
+  }
+  throw new Error('无法解密密码：加密服务不可用')
+}
 
 /**
  * QQ 賬號管理 + 封禁查詢
@@ -194,6 +257,7 @@ export class QQAccountMain implements IAkariShardInitDispose {
     entity.area = dto.area
     entity.gameId = dto.gameId?.trim() || null
     entity.tag = dto.tag?.trim() || null
+    entity.password = dto.password ? encryptPassword(dto.password) : null
     entity.banStatus = '未查询'
     entity.banUntil = null
     entity.banRemaining = null
@@ -222,9 +286,18 @@ export class QQAccountMain implements IAkariShardInitDispose {
     if (dto.area !== undefined) entity.area = dto.area
     if (dto.gameId !== undefined) entity.gameId = dto.gameId?.trim() || null
     if (dto.tag !== undefined) entity.tag = dto.tag?.trim() || null
+    if (dto.password) {
+      entity.password = encryptPassword(dto.password)
+    }
 
     const saved = await this._storage.dataSource.manager.save(entity)
     return this._toDto(saved)
+  }
+
+  async getDecryptedPassword(id: string): Promise<string | null> {
+    const entity = await this._storage.dataSource.manager.findOne(QQAccount, { where: { id } })
+    if (!entity || !entity.password) return null
+    return decryptPassword(entity.password)
   }
 
   async deleteAccount(id: string): Promise<void> {
@@ -577,6 +650,7 @@ export class QQAccountMain implements IAkariShardInitDispose {
       area: e.area,
       gameId: e.gameId,
       tag: e.tag,
+      hasPassword: !!e.password,
       banStatus: e.banStatus || '未查询',
       banUntil: e.banUntil,
       banRemaining: e.banRemaining,

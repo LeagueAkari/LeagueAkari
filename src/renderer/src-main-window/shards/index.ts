@@ -1,5 +1,6 @@
 import { createManager } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { AutoLoginCRenderer } from '@renderer-shared/shards/auto-login-c'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
@@ -35,6 +36,7 @@ const manager = createManager()
 
 manager.use(AkariIpcRenderer)
 manager.use(AppCommonRenderer)
+manager.use(AutoLoginCRenderer)
 manager.use(AutoChampConfigRenderer)
 manager.use(AutoGameflowRenderer)
 manager.use(AutoSelectRenderer)

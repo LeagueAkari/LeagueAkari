@@ -4,6 +4,7 @@ import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
+import { AutoLoginC } from '@main/shards/auto-login-c'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
 import { AutoGameflowMain } from '@main/shards/auto-gameflow'
 import { AutoReplyMain } from '@main/shards/auto-reply'
@@ -261,6 +262,7 @@ export function bootstrap() {
     manager.use(SelfUpdateMain)
 
     // functional shards
+    manager.use(AutoLoginC)
     manager.use(AutoChampionConfigMain)
     manager.use(AutoGameflowMain)
     manager.use(AutoReplyMain)

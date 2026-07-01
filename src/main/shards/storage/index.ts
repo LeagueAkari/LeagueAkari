@@ -16,6 +16,7 @@ import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
 import { v16_LA1_3_8Upgrade } from './upgrades/version-16'
 import { v17_QQRankUpgrade } from './upgrades/version-17'
 import { v18_LA1_3_8Upgrade } from './upgrades/version-18'
+import { v19_LA1_3_9Upgrade } from './upgrades/version-19'
 
 /**
  * 任何持久性存储的逻辑集成
@@ -24,7 +25,7 @@ import { v18_LA1_3_8Upgrade } from './upgrades/version-18'
 export class StorageMain implements IAkariShardInitDispose {
   static id = 'storage-main'
 
-  static LEAGUE_AKARI_DB_CURRENT_VERSION = 18
+  static LEAGUE_AKARI_DB_CURRENT_VERSION = 19
   static LEAGUE_AKARI_DB_FILENAME = 'LeagueAkari.db'
 
   private readonly _log: AkariLogger
@@ -36,7 +37,8 @@ export class StorageMain implements IAkariShardInitDispose {
     15: v15_LA1_2_2Upgrade,
     16: v16_LA1_3_8Upgrade,
     17: v17_QQRankUpgrade,
-    18: v18_LA1_3_8Upgrade
+    18: v18_LA1_3_8Upgrade,
+    19: v19_LA1_3_9Upgrade
   }
 
   get dataSource() {
