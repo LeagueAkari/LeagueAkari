@@ -1,6 +1,6 @@
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
-import { Friend } from '@shared/types/league-client/chat'
+import type { Friend } from '@shared/types/league-client/chat'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed, readonly, shallowRef } from 'vue'
@@ -10,6 +10,22 @@ const FRIEND_PRIORITY = {
   dnd: 3,
   away: 1,
   offline: 0
+}
+
+type FriendSpectateState = Pick<Friend, 'availability' | 'lol' | 'puuid'>
+type SpectatableFriend = FriendSpectateState & {
+  lol: FriendSpectateState['lol'] & {
+    spectatorKey: string
+  }
+}
+
+export function isFriendSpectatable(friend: FriendSpectateState): friend is SpectatableFriend {
+  return (
+    friend.availability === 'dnd' &&
+    friend.lol?.gameStatus?.toLowerCase() === 'ingame' &&
+    Boolean(friend.puuid || friend.lol?.puuid) &&
+    Boolean(friend.lol?.spectatorKey)
+  )
 }
 
 export function useSearchPaneFriends() {

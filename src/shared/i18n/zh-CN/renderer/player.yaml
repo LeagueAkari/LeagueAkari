@@ -23,6 +23,9 @@ playerSearch:
   friends: 好友 ({{count}})
   noFriends: 暂无好友
   getFriendsFailed: 获取好友列表失败
+  spectate: 观战
+  spectateStarted: 正在启动观战
+  spectateFailed: 启动观战失败：{{reason}}
 playerTags:
   editModal:
     title: 编辑玩家标记

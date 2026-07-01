@@ -167,11 +167,13 @@ interface Lol {
   mapId: string
   mapSkinId: string
   profileIcon: string
+  puuid?: string
   queueId: string
   regalia: string
   skinVariant: string
   skinname: string
   timeStamp: string
+  spectatorKey?: string
 }
 
 export interface FriendGroup {

@@ -212,11 +212,26 @@
                 }"
               ></div>
             </div>
-            <div>
-              <div class="mb-0.5 text-xs font-bold">{{ friend.gameName }}</div>
+            <div class="min-w-0 flex-1">
+              <div class="mb-0.5 truncate text-xs font-bold">{{ friend.gameName }}</div>
               <div class="text-[11px] text-neutral-500 dark:text-neutral-400">
                 #{{ friend.gameTag }}
               </div>
+            </div>
+
+            <div v-if="isFriendSpectatable(friend)" class="flex shrink-0 gap-1">
+              <NButton
+                size="tiny"
+                quaternary
+                circle
+                :focusable="false"
+                :title="t('playerSearch.spectate')"
+                @click.stop="handleSpectateFriend(friend)"
+              >
+                <template #icon>
+                  <NIcon><VisibilityFilled /></NIcon>
+                </template>
+              </NButton>
             </div>
           </div>
         </div>
@@ -231,19 +246,24 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import type { Friend } from '@shared/types/league-client/chat'
 import { Close, RecentlyViewed } from '@vicons/carbon'
 import { Pin16Filled } from '@vicons/fluent'
-import { GroupFilled } from '@vicons/material'
+import { GroupFilled, VisibilityFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInput, NScrollbar } from 'naive-ui'
+import { NButton, NIcon, NInput, NScrollbar, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { useSearchPaneSearchHistory } from './search-history'
-import { useSearchPaneFriends } from './sidebar-friends'
+import { isFriendSpectatable, useSearchPaneFriends } from './sidebar-friends'
 
 const { t } = useTranslation()
+const message = useMessage()
+const lc = useInstance(LeagueClientRenderer)
 
 const {
   pinnedSearchHistory,
@@ -295,6 +315,23 @@ const handleMouseDown = (event: MouseEvent) => {
 const handleMouseUp = (event: MouseEvent, puuid: string, sgpServerId: string | null) => {
   if (event.button === 1) {
     emits('navigateToSummoner', puuid, sgpServerId, false)
+  }
+}
+
+const handleSpectateFriend = async (friend: Friend) => {
+  if (!isFriendSpectatable(friend)) {
+    return
+  }
+
+  try {
+    await lc.api.spectator.launchSpectator(
+      friend.puuid || friend.lol.puuid!,
+      friend.lol.spectatorKey
+    )
+    message.success(() => t('playerSearch.spectateStarted'))
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    message.error(() => t('playerSearch.spectateFailed', { reason }))
   }
 }
 

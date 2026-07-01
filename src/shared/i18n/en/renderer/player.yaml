@@ -23,6 +23,9 @@ playerSearch:
   friends: Friends ({{count}})
   noFriends: No Friends
   getFriendsFailed: Failed to get friend list
+  spectate: Spectate
+  spectateStarted: Starting spectate
+  spectateFailed: 'Failed to start spectate: {{reason}}'
 playerTags:
   editModal:
     title: Edit Player Tag

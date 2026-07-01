@@ -632,7 +632,7 @@
       :score="analysis.akariScore"
       :total-precision="1"
     >
-      <div class="tag akari-loved">Akari {{ analysis.akariScore.total.toFixed(1) }}</div>
+      <div class="tag akari-loved">Akari {{ analysis.akariScore.total.toFixed(2) }}</div>
     </AkariScorePopover>
   </div>
 </template>

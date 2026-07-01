@@ -32,6 +32,7 @@ import { ReplaysHttpApi } from './replays'
 import { RewardTrackHttpApi } from './reward-track'
 import { RewardsHttpApi } from './rewards'
 import { RiotClientHttpApi } from './riotclient'
+import { SpectatorHttpApi } from './spectator'
 import { StoreHttpApi } from './store'
 import { SummonerHttpApi } from './summoner'
 
@@ -73,6 +74,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly lobbyTeamBuilder: LobbyTeamBuilderHttpApi
   public readonly playerReportSender: PlayerReportSenderHttpApi
   public readonly gameQueues: GameQueuesHttpApi
+  public readonly spectator: SpectatorHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -109,5 +111,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.lobbyTeamBuilder = new LobbyTeamBuilderHttpApi(this._http)
     this.playerReportSender = new PlayerReportSenderHttpApi(this._http)
     this.gameQueues = new GameQueuesHttpApi(this._http)
+    this.spectator = new SpectatorHttpApi(this._http)
   }
 }
