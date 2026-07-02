@@ -42,6 +42,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "node-addon-api": "^8.8.0"
+    "node-addon-api": "^8.9.0"
   }
 }
