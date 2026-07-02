@@ -113,7 +113,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
       return
     }
 
-    if (options.setCurrent) {
+    if (options.setCurrent || tabs.value.length === 0) {
       currentTabId.value = data.id
     }
 
