@@ -11,13 +11,19 @@
         <div
           :class="[
             'group relative mb-0.5 box-border flex h-8.5 cursor-pointer items-center rounded px-2 py-0.5 transition-[filter] hover:brightness-110',
-            ogs.settings.showMatchHistoryItemBorder
+            ongoingGame.settings.showMatchHistoryItemBorder
               ? `border ${getMatchItemThemeClass(item).border}`
               : '',
             getMatchItemThemeClass(item).bg
           ]"
           :key="item.gameId"
-          @click="previewGame({ summary: item.game, details: ogs.gameDetails[item.gameId], puuid })"
+          @click="
+            previewGame({
+              summary: item.game,
+              details: ongoingGame.gameDetails[item.gameId],
+              puuid
+            })
+          "
         >
           <div
             class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
@@ -34,7 +40,7 @@
               class="overflow-hidden text-xs text-ellipsis whitespace-nowrap"
               :class="getMatchItemThemeClass(item).text"
             >
-              {{ lcs.gameData.queues[item.basicInfo.queueId]?.name || item.basicInfo.queueId }}
+              {{ resources.queues.name(item.basicInfo.queueId) }}
             </div>
             <div class="text-[10px]" :class="getMatchItemThemeClass(item).text">
               {{ dayjs(item.basicInfo.gameCreation).format('MM-DD HH:mm') }}
@@ -68,7 +74,7 @@
       <div class="flex flex-col items-center gap-2">
         <div>{{ t('ongoingGame.playerCard.errorLoadingMatchHistory') }}</div>
 
-        <NButton size="tiny" @click="og.reloadPlayer(puuid)">
+        <NButton size="tiny" @click="ongoingGame.reloadPlayer(puuid)">
           {{ t('ongoingGame.playerCard.reloadMatchHistory') }}
         </NButton>
       </div>
@@ -87,11 +93,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -108,14 +110,11 @@ const { puuid } = defineProps<{
 
 const { t } = useTranslation()
 
-const as = useAppCommonStore()
-const lcs = useLeagueClientStore()
-const ogs = useOngoingGameStore()
-const og = useInstance(OngoingGameRenderer)
-const { previewGame } = useOngoingGamePanel()
+const { ongoingGame, previewGame } = useOngoingGamePanel()
+const resources = useGameResourceProvider()
 
-const matchHistoryData = computed(() => ogs.matchHistory[puuid]?.data)
-const matchHistoryLoadingState = computed(() => ogs.matchHistoryLoadingState[puuid])
+const matchHistoryData = computed(() => ongoingGame.value.matchHistory[puuid]?.data)
+const matchHistoryLoadingState = computed(() => ongoingGame.value.matchHistoryLoadingState[puuid])
 
 const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: MatchParticipant }) => {
   if (match.basicInfo.gameMode === 'PRACTICETOOL') {
@@ -135,7 +134,7 @@ const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: Match
       return '?'
     }
 
-    return formatI18nOrdinal(match.participant.subteamPlacement, as.settings.locale)
+    return formatI18nOrdinal(match.participant.subteamPlacement, resources.runtime.locale)
   }
 
   return match.participant.winResult === 'win'

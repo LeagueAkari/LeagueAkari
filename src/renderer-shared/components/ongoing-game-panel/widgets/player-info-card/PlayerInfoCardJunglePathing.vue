@@ -7,10 +7,10 @@
 </template>
 
 <script setup lang="ts">
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import { computed } from 'vue'
 
+import { useOngoingGamePanel } from '../../context'
 import { resolveJunglePathingAnalysis } from './jungle-pathing/visibility'
 import JunglePathingInfo from './jungle-pathing-info/JunglePathingInfo.vue'
 
@@ -18,11 +18,11 @@ const { puuid } = defineProps<{
   puuid: string
 }>()
 
-const ogs = useOngoingGameStore()
+const { ongoingGame } = useOngoingGamePanel()
 
-const analysis = computed(() => ogs.analysis?.players[puuid])
-const position = computed(() => ogs.positionAssignments?.[puuid])
-const championId = computed(() => ogs.championSelections?.[puuid])
+const analysis = computed(() => ongoingGame.value.analysis?.players[puuid])
+const position = computed(() => ongoingGame.value.positionAssignments?.[puuid])
+const championId = computed(() => ongoingGame.value.championSelections?.[puuid])
 
 const isCurrentJungler = computed(() => {
   const assignedPosition = position.value?.position?.toUpperCase()
@@ -30,7 +30,7 @@ const isCurrentJungler = computed(() => {
     return true
   }
 
-  const spells = ogs.additional.spells[puuid]
+  const spells = ongoingGame.value.spells[puuid]
   return (
     spells?.spell1Id === SUMMONER_SPELL_SMITE_ID || spells?.spell2Id === SUMMONER_SPELL_SMITE_ID
   )
@@ -40,8 +40,8 @@ const junglePathingAnalysis = computed(() => {
   return resolveJunglePathingAnalysis({
     analysis: analysis.value,
     isCurrentJungler: isCurrentJungler.value,
-    showJunglePathing: ogs.settings.showJunglePathing,
-    showJunglePathingForAllPlayers: ogs.settings.showJunglePathingForAllPlayers
+    showJunglePathing: ongoingGame.value.settings.showJunglePathing,
+    showJunglePathingForAllPlayers: ongoingGame.value.settings.showJunglePathingForAllPlayers
   })
 })
 
@@ -58,7 +58,7 @@ const displayChampionId = computed(() => {
     return championId.value ?? null
   }
 
-  if (ogs.settings.showJunglePathingForAllPlayers) {
+  if (ongoingGame.value.settings.showJunglePathingForAllPlayers) {
     return mostPlayedJungleChampionId.value
   }
 

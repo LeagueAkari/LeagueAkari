@@ -5,7 +5,7 @@
       ref="containerEl"
       class="box-border h-full rounded-lg bg-(--la-background-color-primary) opacity-90"
     >
-      <MatchPreviewer
+      <ConnectedMatchPreviewer
         :summary="previewingGame.summary"
         :game-id="previewingGame.gameId"
         :puuid="previewingGame.puuid"
@@ -15,17 +15,19 @@
         :hide-privacy="as.settings.streamerMode"
       />
       <SetupInAppScope />
-      <OngoingGamePanel
-        :content-width="containerWidth"
-        :content-height="containerHeight"
-        @preview-game="handlePreviewGame"
-      />
+      <OngoingGameProvider :value="ongoingGame">
+        <OngoingGamePanel
+          :content-width="containerWidth"
+          :content-height="containerHeight"
+          @preview-game="handlePreviewGame"
+        />
+      </OngoingGameProvider>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
+import ConnectedMatchPreviewer from '@renderer-shared/components/match-preview/ConnectedMatchPreviewer.vue'
 import {
   type MatchPreviewPayload,
   type MatchPreviewState,
@@ -33,6 +35,10 @@ import {
 } from '@renderer-shared/components/match-preview'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
 import { useHideNotAppTag } from '@renderer-shared/composables/useHideNotAppTag'
+import {
+  createAkariOngoingGameProvider,
+  OngoingGameProvider
+} from '@renderer-shared/providers/ongoing-game'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 import { useOngoingGameWindowStore } from '@renderer-shared/shards/window-manager/store'
@@ -40,6 +46,7 @@ import { useElementSize } from '@vueuse/core'
 import { ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 const ogws = useOngoingGameWindowStore()
+const ongoingGame = createAkariOngoingGameProvider()
 
 const containerEl = useTemplateRef('containerEl')
 const { width: containerWidth, height: containerHeight } = useElementSize(containerEl)

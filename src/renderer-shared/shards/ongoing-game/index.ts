@@ -1,4 +1,10 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import type {
+  OngoingGameMatchHistoryTagPreference,
+  OngoingGamePanelChampionUsage,
+  OngoingGamePanelOrderPlayerBy,
+  OngoingGamePanelPlayerCardTagSettings
+} from '@shared/shards/ongoing-game'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -63,7 +69,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'clearDraft')
   }
 
-  setMatchHistoryTagPreference(value: 'current' | 'all') {
+  setMatchHistoryTagPreference(value: OngoingGameMatchHistoryTagPreference) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
@@ -71,13 +77,11 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
   }
 
-  setOrderPlayerBy(
-    value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
-  ) {
+  setOrderPlayerBy(value: OngoingGamePanelOrderPlayerBy) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'orderPlayerBy', value)
   }
 
-  setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
+  setShowChampionUsage(value: OngoingGamePanelChampionUsage) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
   }
 
@@ -97,7 +101,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoRouteWhenGameStarts', value)
   }
 
-  setPlayerCardTags(value: object) {
+  setPlayerCardTags(value: OngoingGamePanelPlayerCardTagSettings) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
   }
 

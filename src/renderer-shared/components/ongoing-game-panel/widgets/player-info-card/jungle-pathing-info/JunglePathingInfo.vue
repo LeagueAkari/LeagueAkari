@@ -93,7 +93,7 @@
 
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
 import { NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, defineComponent, ref, type PropType, watch } from 'vue'
@@ -105,7 +105,7 @@ import type { AlgorithmDescriptionLine, JunglePathingInfoProps, JunglePathingTab
 const { aggregatedAnalysis, currentChampionId = null } = defineProps<JunglePathingInfoProps>()
 
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 
 const AlgorithmLineText = defineComponent({
   props: {
@@ -200,7 +200,7 @@ const championTabs = computed<JunglePathingTab[]>(() => {
     })
     .map((champion) => ({
       key: `champion:${champion.championId}`,
-      label: lcs.gameData.championName(champion.championId) || String(champion.championId),
+      label: resources.champions.name(champion.championId),
       stats: champion.jungle!,
       championId: champion.championId
     }))

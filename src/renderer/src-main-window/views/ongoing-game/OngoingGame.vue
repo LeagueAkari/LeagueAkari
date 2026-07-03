@@ -1,6 +1,6 @@
 <template>
   <div class="h-full">
-    <MatchPreviewer
+    <ConnectedMatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGame.gameId"
       :source="previewingGame.source"
@@ -12,18 +12,24 @@
       @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
       @dry-run-ongoing-game="handleDryRunOngoingGame"
     />
-    <OngoingGamePanel
-      :content-width="contentWidth"
-      :content-height="contentHeight"
-      @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
-      @preview-game="handlePreviewGame"
-    />
+    <OngoingGameProvider :value="ongoingGame">
+      <OngoingGamePanel
+        :content-width="contentWidth"
+        :content-height="contentHeight"
+        @navigate-to-summoner-by-puuid="navigateToTabByPuuid"
+        @preview-game="handlePreviewGame"
+      />
+    </OngoingGameProvider>
   </div>
 </template>
 
 <script lang="ts" setup>
-import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
+import ConnectedMatchPreviewer from '@renderer-shared/components/match-preview/ConnectedMatchPreviewer.vue'
 import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
+import {
+  createAkariOngoingGameProvider,
+  OngoingGameProvider
+} from '@renderer-shared/providers/ongoing-game'
 import {
   type MatchPreviewPayload,
   type MatchPreviewState,
@@ -42,6 +48,7 @@ const { contentWidth, contentHeight } = useMainWindowAppContext()
 
 const pt = useInstance(PlayerTabsRenderer)
 const og = useInstance(OngoingGameRenderer)
+const ongoingGame = createAkariOngoingGameProvider()
 
 const as = useAppCommonStore()
 

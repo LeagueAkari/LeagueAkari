@@ -1,6 +1,8 @@
-import { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
-import { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
-import { ParsedRole } from '@shared/utils/ranked'
+import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
+import type { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
+import type { ParsedRole } from '@shared/utils/ranked'
+
+export * from './settings'
 
 export interface OngoingGameAnalysis {
   players: Record<string, AggregatedAnalysis>

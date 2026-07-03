@@ -42,7 +42,7 @@
                   }}</span
                 >
                 <span
-                  v-if="!as.settings.streamerMode"
+                  v-if="!ongoingGame.streamerMode"
                   class="ml-1 text-xs text-gray-500 dark:text-gray-400"
                   >#{{ summoner?.tagLine || '—' }}</span
                 >
@@ -133,8 +133,6 @@ import PositionIcon from '@renderer-shared/components/icons/position-icons/Posit
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon, NPopover, type DropdownOption } from 'naive-ui'
@@ -150,21 +148,18 @@ const { puuid } = defineProps<{
 const { t } = useTranslation()
 const { masked } = useStreamerModeMaskedText()
 
-const as = useAppCommonStore()
-const ogs = useOngoingGameStore()
+const { ongoingGame, mergedPremadeTeams, navigateToSummonerByPuuid } = useOngoingGamePanel()
 const resources = useGameResourceProvider()
 
-const { mergedPremadeTeams, navigateToSummonerByPuuid } = useOngoingGamePanel()
-
-const summoner = computed(() => ogs.summoner[puuid])
-const rankedStats = computed(() => ogs.rankedStats[puuid])
-const position = computed(() => ogs.positionAssignments?.[puuid])
-const championId = computed(() => ogs.championSelections?.[puuid])
+const summoner = computed(() => ongoingGame.value.summoner[puuid])
+const rankedStats = computed(() => ongoingGame.value.rankedStats[puuid])
+const position = computed(() => ongoingGame.value.positionAssignments?.[puuid])
+const championId = computed(() => ongoingGame.value.championSelections?.[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
 const premadeColors = computed(() => {
-  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+  return resources.runtime.colorMode === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
 
 const currentChampionId = computed(() => championId.value || -1)
@@ -216,7 +211,7 @@ const handleMatchCollectionSelect = (key: string | number) => {
         navigateToSummonerByPuuid(puuid, {
           matchHistory: {
             collectByChampionId: currentChampionId.value,
-            expectedCount: ogs.settings.matchHistoryLoadCount
+            expectedCount: ongoingGame.value.settings.matchHistoryLoadCount
           }
         })
       }
@@ -226,7 +221,7 @@ const handleMatchCollectionSelect = (key: string | number) => {
         navigateToSummonerByPuuid(puuid, {
           matchHistory: {
             collectByPosition: currentPosition.value,
-            expectedCount: ogs.settings.matchHistoryLoadCount
+            expectedCount: ongoingGame.value.settings.matchHistoryLoadCount
           }
         })
       }

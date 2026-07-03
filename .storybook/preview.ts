@@ -93,6 +93,19 @@ const preview: Preview = {
         const naiveUiTheme = computed(() => getNaiveUiTheme(colorTheme.value))
         const naiveUiThemeOverrides = computed(() => getNaiveUiThemeOverrides(themeId.value))
         const naiveUiLocale = computed(() => getNaiveUiLocale(locale.value))
+        const storyPanelMaxWidth = computed(() => {
+          const value = context.parameters.akariStoryPanelMaxWidth
+
+          if (typeof value === 'number') {
+            return `${value}px`
+          }
+
+          if (typeof value === 'string') {
+            return value
+          }
+
+          return '1120px'
+        })
         const gameResourceProvider = createStorybookGameResourceProvider({
           locale,
           colorMode: colorTheme
@@ -109,6 +122,7 @@ const preview: Preview = {
           naiveUiLocale,
           naiveUiTheme,
           naiveUiThemeOverrides,
+          storyPanelMaxWidth,
           gameResourceProvider
         }
       },
@@ -125,7 +139,10 @@ const preview: Preview = {
             <NNotificationProvider placement="bottom-right">
               <NDialogProvider>
                 <div class="akari-story-shell">
-                  <div class="akari-story-panel">
+                  <div
+                    class="akari-story-panel"
+                    :style="{ '--akari-story-panel-max-width': storyPanelMaxWidth }"
+                  >
                     <GameResourceProvider :value="gameResourceProvider">
                       <Story />
                     </GameResourceProvider>

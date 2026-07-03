@@ -1,7 +1,7 @@
 <template>
   <SettingsSection :title="t('toolkit.gameView.title')">
     <!-- 年久失修，暂时用这个凑合着用 -->
-    <MatchPreviewer
+    <ConnectedMatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGameId || 0"
       :source="as.settings.preferredLolSource"
@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
-import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
+import ConnectedMatchPreviewer from '@renderer-shared/components/match-preview/ConnectedMatchPreviewer.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'

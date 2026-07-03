@@ -205,7 +205,6 @@
 
 <script setup lang="ts">
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { ParsedRole } from '@shared/utils/ranked'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
@@ -218,12 +217,11 @@ const { puuid } = defineProps<{
 }>()
 
 const { t } = useTranslation()
-const ogs = useOngoingGameStore()
-const { kdaOutliers } = useOngoingGamePanel()
+const { ongoingGame, kdaOutliers } = useOngoingGamePanel()
 
-const analysis = computed(() => ogs.analysis?.players[puuid])
-const position = computed(() => ogs.positionAssignments?.[puuid])
-const queueType = computed(() => ogs.queryStage.gameInfo?.queueType)
+const analysis = computed(() => ongoingGame.value.analysis?.players[puuid])
+const position = computed(() => ongoingGame.value.positionAssignments?.[puuid])
+const queueType = computed(() => ongoingGame.value.queryStage.gameInfo?.queueType)
 const kdaIqr = computed(() => kdaOutliers.value?.[puuid])
 
 const positionInfo = computed(() => {

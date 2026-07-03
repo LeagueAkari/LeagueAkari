@@ -1,14 +1,20 @@
-import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import {
+import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import type {
   AdditionalResult,
   DraftOptions,
   OngoingGameAnalysis,
+  OngoingGameMatchHistoryTagPreference,
+  OngoingGamePanelChampionUsage,
+  OngoingGamePanelOrderPlayerBy,
+  OngoingGamePanelPlayerCardTagSettings,
+  OngoingGameSettingsData,
   OngoingGameSimplifiedChampMastery
 } from '@shared/shards/ongoing-game'
-import { SavedInfo } from '@shared/shards/saved-player'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { createDefaultOngoingGamePanelPlayerCardTagSettings } from '@shared/shards/ongoing-game/settings'
+import type { SavedInfo } from '@shared/shards/saved-player'
+import type { RankedStats } from '@shared/types/league-client/ranked'
+import type { SummonerInfo } from '@shared/types/league-client/summoner'
 import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
@@ -29,7 +35,7 @@ import {
   getLiveTeams
 } from './computed-state'
 
-export class OngoingGameSettings {
+export class OngoingGameSettings implements OngoingGameSettingsData {
   enabled: boolean = true
   matchHistoryLoadCount: number = 50
 
@@ -43,43 +49,17 @@ export class OngoingGameSettings {
   /**
    * 战绩查询时, 优先查询当前模式还是全部模式, 仅当 SGP API 启用时有效
    */
-  matchHistoryTagPreference: 'current' | 'all' = 'current'
+  matchHistoryTagPreference: OngoingGameMatchHistoryTagPreference = 'current'
 
-  orderPlayerBy = 'default' as
-    | 'win-rate'
-    | 'kda'
-    | 'default'
-    | 'akari-score'
-    | 'position'
-    | 'premade-team'
+  orderPlayerBy: OngoingGamePanelOrderPlayerBy = 'default'
 
-  showChampionUsage = 'recent' as 'recent' | 'mastery' | 'none'
+  showChampionUsage: OngoingGamePanelChampionUsage = 'recent'
   showMatchHistoryItemBorder = false
   showJunglePathing = true
   showJunglePathingForAllPlayers = false
   autoRouteWhenGameStarts = false
-  playerCardTags = {
-    showPremadeTeamTag: true,
-    showSuspiciousFlashPositionTag: true,
-    showWinningStreakTag: true,
-    showLosingStreakTag: true,
-    showSoloKillsTag: true,
-    showSoloDeathsTag: true,
-    showGreatPerformanceTag: true,
-    showAverageTeamDamageTag: false,
-    showAverageTeamDamageTakenTag: false,
-    showAverageTeamGoldTag: false,
-    showAverageDamageGoldEfficiencyTag: false,
-    showAverageEnemyMissingPingsTag: false,
-    showAverageVisionScoreTag: false,
-    showSelfTag: true,
-    showMetTag: true,
-    showTaggedTag: true,
-    showWinRateTeamTag: true,
-    showPrivacyTag: true,
-    showAkariScoreTag: false,
-    showAverageKillDamageEfficiencyTag: true
-  }
+  playerCardTags: OngoingGamePanelPlayerCardTagSettings =
+    createDefaultOngoingGamePanelPlayerCardTagSettings()
 
   /**
    * 是否在 lobby 阶段查询战绩
@@ -91,17 +71,15 @@ export class OngoingGameSettings {
    */
   premadeTeamInferMatchCountThreshold: number = 5
 
-  setOrderPlayerBy(
-    value: 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
-  ) {
+  setOrderPlayerBy(value: OngoingGamePanelOrderPlayerBy) {
     this.orderPlayerBy = value
   }
 
-  setMatchHistoryTagPreference(value: 'current' | 'all') {
+  setMatchHistoryTagPreference(value: OngoingGameMatchHistoryTagPreference) {
     this.matchHistoryTagPreference = value
   }
 
-  setShowChampionUsage(value: 'recent' | 'mastery' | 'none') {
+  setShowChampionUsage(value: OngoingGamePanelChampionUsage) {
     this.showChampionUsage = value
   }
 
@@ -121,7 +99,7 @@ export class OngoingGameSettings {
     this.autoRouteWhenGameStarts = value
   }
 
-  setPlayerCardTags(value: typeof this.playerCardTags) {
+  setPlayerCardTags(value: OngoingGamePanelPlayerCardTagSettings) {
     this.playerCardTags = value
   }
 

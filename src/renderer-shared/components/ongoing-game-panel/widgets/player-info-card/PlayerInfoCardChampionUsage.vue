@@ -29,7 +29,7 @@
         <div class="mb-2 flex items-center gap-2 text-xs">
           <ChampionIcon ring :ring-width="1" round class="h-5.5 w-5.5" :champion-id="c.id" />
           <div class="text-xs font-bold text-black/80 dark:text-white/80">
-            {{ lcs.gameData.champions[c.id]?.name || c.id }}
+            {{ resources.champions.name(c.id) }}
           </div>
         </div>
 
@@ -110,8 +110,7 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { StarRound as StarRoundIcon } from '@vicons/material'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -128,19 +127,18 @@ const { puuid } = defineProps<{
 const { t } = useTranslation()
 const { formatExtremeNumber } = useNumberFormatter()
 
-const lcs = useLeagueClientStore()
-const ogs = useOngoingGameStore()
-const { navigateToSummonerByPuuid } = useOngoingGamePanel()
+const { ongoingGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
+const resources = useGameResourceProvider()
 
-const analysis = computed(() => ogs.analysis?.players[puuid])
-const championMastery = computed(() => ogs.championMastery[puuid])
+const analysis = computed(() => ongoingGame.value.analysis?.players[puuid])
+const championMastery = computed(() => ongoingGame.value.championMastery[puuid])
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const formatMasteryTime = (value: number) => dayjs(value).format('YYYY-MM-DD')
 
 const championUsage = computed(() => {
-  if (ogs.settings.showChampionUsage === 'recent') {
+  if (ongoingGame.value.settings.showChampionUsage === 'recent') {
     if (!analysis.value) {
       return []
     }
@@ -157,7 +155,7 @@ const championUsage = computed(() => {
       }))
 
     return truncated
-  } else if (ogs.settings.showChampionUsage === 'mastery') {
+  } else if (ongoingGame.value.settings.showChampionUsage === 'mastery') {
     if (!championMastery.value) {
       return []
     }

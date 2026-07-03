@@ -1,12 +1,15 @@
 <template>
   <div class="tags">
-    <div class="tag self" v-if="isSelf && ogs.settings.playerCardTags.showSelfTag">
+    <div class="tag self" v-if="isSelf && ongoingGame.settings.playerCardTags.showSelfTag">
       {{ t('ongoingGame.playerCard.self') }}
     </div>
 
     <NPopover
       v-if="
-        ogs.settings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tags.length
+        ongoingGame.settings.playerCardTags.showTaggedTag &&
+        savedInfo &&
+        !isSelf &&
+        savedInfo.tags.length
       "
       :delay="50"
       style="max-height: 240px"
@@ -25,11 +28,11 @@
               t('ongoingGame.playerCard.taggedByOther')
             }}</span>
             <span
-              v-if="ogs.summoner[tag.selfPuuid]"
+              v-if="ongoingGame.summoner[tag.selfPuuid]"
               class="tagged-by-other-name"
               @click="navigateToSummonerByPuuid(tag.selfPuuid)"
             >
-              {{ riotId(ogs.summoner[tag.selfPuuid]) }}
+              {{ riotId(ongoingGame.summoner[tag.selfPuuid]) }}
             </span>
             <span v-else class="tagged-by-other-name unknown">
               {{ t('ongoingGame.playerCard.unknown') }}
@@ -43,7 +46,7 @@
     </NPopover>
 
     <NPopover
-      v-if="ogs.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
+      v-if="ongoingGame.settings.playerCardTags.showPremadeTeamTag && premadeTeamId"
       :delay="50"
       style="max-height: 240px"
     >
@@ -73,7 +76,7 @@
       :keep-alive-on-hover="false"
       :delay="50"
       v-if="
-        ogs.settings.playerCardTags.showWinRateTeamTag &&
+        ongoingGame.settings.playerCardTags.showWinRateTeamTag &&
         analysis &&
         analysis.winLoss.all.count >= 16 &&
         analysis.winLoss.all.winRate >= 0.85
@@ -93,7 +96,12 @@
     </NPopover>
 
     <NPopover
-      v-if="ogs.settings.playerCardTags.showMetTag && savedInfo && savedInfo.lastMetAt && !isSelf"
+      v-if="
+        ongoingGame.settings.playerCardTags.showMetTag &&
+        savedInfo &&
+        savedInfo.lastMetAt &&
+        !isSelf
+      "
       :delay="50"
       scrollable
       style="max-height: 240px"
@@ -106,7 +114,7 @@
           {{
             t('ongoingGame.playerCard.metPopover.title', {
               date: dayjs(savedInfo.lastMetAt)
-                .locale(as.settings.locale.toLowerCase())
+                .locale(resources.runtime.locale.toLowerCase())
                 .format('YYYY-MM-DD HH:mm:ss'),
               count: savedInfo.encounteredGames.total
             })
@@ -168,7 +176,7 @@
                 class="border border-black/20 px-2 py-0.5 text-center whitespace-nowrap text-black dark:border-white/25 dark:text-gray-100"
               >
                 {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
-                  dayjs(item.updateAt).locale(as.settings.locale.toLowerCase()).fromNow()
+                  dayjs(item.updateAt).locale(resources.runtime.locale.toLowerCase()).fromNow()
                 }})
               </td>
               <td
@@ -205,7 +213,9 @@
                           item.gameStats.selfWinResult === 'remake'
                       }"
                     >
-                      ({{ formatI18nOrdinal(item.gameStats.myPlacement, as.settings.locale) }})
+                      ({{
+                        formatI18nOrdinal(item.gameStats.myPlacement, resources.runtime.locale)
+                      }})
                     </span>
                     <span
                       class="mr-2 text-xs leading-3 font-bold whitespace-nowrap"
@@ -253,7 +263,10 @@
                       }"
                     >
                       ({{
-                        formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale)
+                        formatI18nOrdinal(
+                          item.gameStats.opponentPlacement,
+                          resources.runtime.locale
+                        )
                       }})
                     </span>
                     <PositionIcon
@@ -286,7 +299,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
+      v-if="ongoingGame.settings.playerCardTags.showPrivacyTag && summoner?.privacy === 'PRIVATE'"
       :delay="50"
     >
       <template #trigger>
@@ -300,7 +313,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showWinningStreakTag &&
+        ongoingGame.settings.playerCardTags.showWinningStreakTag &&
         analysis &&
         analysis.winLoss.all.winningStreak >= 3
       "
@@ -327,7 +340,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showLosingStreakTag &&
+        ongoingGame.settings.playerCardTags.showLosingStreakTag &&
         analysis &&
         analysis.winLoss.all.losingStreak >= 3
       "
@@ -354,7 +367,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showGreatPerformanceTag &&
+        ongoingGame.settings.playerCardTags.showGreatPerformanceTag &&
         analysis &&
         (analysis.akariScore.outstanding || analysis.akariScore.extraordinary)
       "
@@ -386,7 +399,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showSuspiciousFlashPositionTag &&
+        ongoingGame.settings.playerCardTags.showSuspiciousFlashPositionTag &&
         isSuspiciousFlashPosition &&
         isSuspiciousFlashPosition.isSuspicious
       "
@@ -423,7 +436,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showSoloKillsTag && analysis?.summary.avgSoloKills"
+      v-if="ongoingGame.settings.playerCardTags.showSoloKillsTag && analysis?.summary.avgSoloKills"
       :delay="50"
     >
       <template #trigger>
@@ -447,7 +460,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAverageTeamDamageTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -471,7 +484,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageTeamDamageTakenTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAverageTeamDamageTakenTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -495,7 +508,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageTeamGoldTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAverageTeamGoldTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -519,7 +532,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -544,7 +557,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showAverageEnemyMissingPingsTag &&
+        ongoingGame.settings.playerCardTags.showAverageEnemyMissingPingsTag &&
         analysis &&
         analysis.summary.avgEnemyMissingPings !== null
       "
@@ -570,7 +583,7 @@
 
     <NPopover
       :keep-alive-on-hover="false"
-      v-if="ogs.settings.playerCardTags.showAverageVisionScoreTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAverageVisionScoreTag && analysis"
       :delay="50"
     >
       <template #trigger>
@@ -594,7 +607,7 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
-        ogs.settings.playerCardTags.showAverageKillDamageEfficiencyTag &&
+        ongoingGame.settings.playerCardTags.showAverageKillDamageEfficiencyTag &&
         analysis &&
         killDamageEfficiencyTag &&
         killDamageEfficiencyTag.kind !== 'normal'
@@ -628,7 +641,7 @@
     </NPopover>
 
     <AkariScorePopover
-      v-if="ogs.settings.playerCardTags.showAkariScoreTag && analysis"
+      v-if="ongoingGame.settings.playerCardTags.showAkariScoreTag && analysis"
       :score="analysis.akariScore"
       :total-precision="1"
     >
@@ -645,12 +658,11 @@ import {
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { riotId } from '@shared/utils/name'
 import dayjs from 'dayjs'
@@ -660,7 +672,6 @@ import { computed } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
-import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 
 const { puuid } = defineProps<{
   puuid: string
@@ -668,38 +679,35 @@ const { puuid } = defineProps<{
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
-
-const ogs = useOngoingGameStore()
-const as = useAppCommonStore()
-
-const { mergedPremadeTeams, previewGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
+const { ongoingGame, mergedPremadeTeams, previewGame, navigateToSummonerByPuuid } =
+  useOngoingGamePanel()
+const resources = useGameResourceProvider()
 
 const premadeColors = computed(() => {
-  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+  return resources.runtime.colorMode === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
 
 const analysis = computed(() => {
-  if (!ogs.analysis?.players[puuid]) {
+  if (!ongoingGame.value.analysis?.players[puuid]) {
     return null
   }
 
-  return ogs.analysis.players[puuid]
+  return ongoingGame.value.analysis.players[puuid]
 })
 
-const summoner = computed(() => ogs.summoner[puuid])
-const savedInfo = computed(() => ogs.savedInfo[puuid])
+const summoner = computed(() => ongoingGame.value.summoner[puuid])
+const savedInfo = computed(() => ongoingGame.value.savedInfo[puuid])
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
 const isCurrentJungler = computed(() => {
-  const assignedPosition = ogs.positionAssignments[puuid]?.position?.toUpperCase()
+  const assignedPosition = ongoingGame.value.positionAssignments[puuid]?.position?.toUpperCase()
 
   if (assignedPosition === 'JUNGLE') {
     return true
   }
 
-  const spells = ogs.additional.spells[puuid]
+  const spells = ongoingGame.value.spells[puuid]
 
   return (
     spells?.spell1Id === SUMMONER_SPELL_SMITE_ID || spells?.spell2Id === SUMMONER_SPELL_SMITE_ID
@@ -783,7 +791,7 @@ const encounteredGames = computed(() => {
   }
 
   const mapped = savedInfo.value.encounteredGames.data.map((record) => {
-    const game = ogs.cachedGames[record.gameId]
+    const game = ongoingGame.value.cachedGames[record.gameId]
 
     if (!game) {
       return { gameStats: null, ...record }
@@ -856,13 +864,13 @@ const killDamageEfficiencyTag = computed(() => {
 })
 
 const previewEncounteredGame = (gameId: number) => {
-  const summary = ogs.cachedGames[gameId]
+  const summary = ongoingGame.value.cachedGames[gameId]
 
   previewGame(
     summary
       ? {
           summary,
-          details: ogs.gameDetails[gameId],
+          details: ongoingGame.value.gameDetails[gameId],
           puuid
         }
       : {
@@ -887,7 +895,7 @@ const sortedTags = computed(() => {
   })
 })
 
-const isSelf = computed(() => puuid === lcs.summoner.me?.puuid)
+const isSelf = computed(() => puuid === ongoingGame.value.selfPuuid)
 
 const truncateTailingZeros = (num: number, precision = 1) => {
   const str = num.toFixed(precision)

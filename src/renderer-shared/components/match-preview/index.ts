@@ -1,5 +1,8 @@
 import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 
+export { default as ConnectedMatchPreviewer } from './ConnectedMatchPreviewer.vue'
+export { default as MatchPreviewer } from './MatchPreviewer.vue'
+
 export type MatchPreviewPayload = {
   summary: LcuOrSgpGameSummary | number
   details?: LcuOrSgpGameDetails

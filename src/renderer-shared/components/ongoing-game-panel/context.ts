@@ -1,6 +1,7 @@
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import type { OngoingGameProviderValue } from '@renderer-shared/providers/ongoing-game'
 import { findOutliersByIqr } from '@shared/data-adapter/utils'
-import { InjectionKey, MaybeRefOrGetter, Ref, computed, inject, provide, toRef } from 'vue'
+import type { OngoingGameAnalysis } from '@shared/shards/ongoing-game'
+import { InjectionKey, MaybeRefOrGetter, Ref, inject, provide, toRef } from 'vue'
 
 import type { MatchPreviewPayload } from '../match-preview'
 import { IQR_THRESHOLD } from './constants'
@@ -26,6 +27,7 @@ export type OngoingGamePanelContext = {
     groups: Record<string, string[]>
     premadeTeamIdMap: Record<string, string>
   }>
+  ongoingGame: Ref<OngoingGameProviderValue>
 
   /** 低于或高于平均 KDA 的玩家 */
   kdaOutliers: Ref<Record<string, 'over' | 'below'>>
@@ -50,6 +52,32 @@ export function useOngoingGamePanel(): OngoingGamePanelContext {
   return context
 }
 
+export function getOngoingGamePanelKdaOutliers(
+  analysis: OngoingGameAnalysis | null | undefined
+): Record<string, 'over' | 'below'> {
+  if (!analysis || Object.keys(analysis.players).length < 5) {
+    return {}
+  }
+
+  const kdaList = Object.entries(analysis.players).map(([puuid, p]) => ({
+    puuid,
+    kda: p.summary.avgKda
+  }))
+
+  const iqr = findOutliersByIqr(kdaList, (a) => a.kda, IQR_THRESHOLD)
+  const result: Record<string, 'over' | 'below'> = {}
+
+  iqr.over.forEach((a) => {
+    result[a.puuid] = 'over'
+  })
+
+  iqr.below.forEach((a) => {
+    result[a.puuid] = 'below'
+  })
+
+  return result
+}
+
 export function provideOngoingGamePanel(props: {
   contentWidth: MaybeRefOrGetter<number>
   contentHeight: MaybeRefOrGetter<number>
@@ -61,6 +89,8 @@ export function provideOngoingGamePanel(props: {
     groups: Record<string, string[]>
     premadeTeamIdMap: Record<string, string>
   }>
+  ongoingGame: MaybeRefOrGetter<OngoingGameProviderValue>
+  kdaOutliers: MaybeRefOrGetter<Record<string, 'over' | 'below'>>
 
   navigateToSummonerByPuuid: (
     puuid: string,
@@ -68,32 +98,6 @@ export function provideOngoingGamePanel(props: {
   ) => void
   previewGame: (payload: MatchPreviewPayload) => void
 }) {
-  const ogs = useOngoingGameStore()
-
-  const kdaOutliers = computed(() => {
-    if (!ogs.analysis || Object.keys(ogs.analysis.players).length < 5) {
-      return {}
-    }
-
-    const kdaList = Object.entries(ogs.analysis.players).map(([puuid, p]) => ({
-      puuid,
-      kda: p.summary.avgKda
-    }))
-
-    const iqr = findOutliersByIqr(kdaList, (a) => a.kda, IQR_THRESHOLD)
-    const result: Record<string, 'over' | 'below'> = {}
-
-    iqr.over.forEach((a) => {
-      result[a.puuid] = 'over'
-    })
-
-    iqr.below.forEach((a) => {
-      result[a.puuid] = 'below'
-    })
-
-    return result
-  })
-
   provide(OngoingGamePanelContextKey, {
     contentWidth: toRef(props.contentWidth),
     contentHeight: toRef(props.contentHeight),
@@ -102,8 +106,9 @@ export function provideOngoingGamePanel(props: {
     linesPerTeam: toRef(props.linesPerTeam),
     isTwoTeamsMode: toRef(props.isTwoTeamsMode),
     mergedPremadeTeams: toRef(props.mergedPremadeTeams),
+    ongoingGame: toRef(props.ongoingGame),
 
-    kdaOutliers,
+    kdaOutliers: toRef(props.kdaOutliers),
 
     navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,
     previewGame: props.previewGame

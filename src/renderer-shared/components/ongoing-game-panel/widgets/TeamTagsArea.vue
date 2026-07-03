@@ -110,12 +110,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
+import { useGameResourceProvider } from '../../../providers/game-resource'
 import {
   LOSS_RATE_TEAM_MAX_WIN_RATE,
   LOSS_RATE_TEAM_MIN_SIZE,
@@ -147,29 +146,27 @@ interface WinRateTeamInfo {
 
 const { t } = useTranslation()
 
-const as = useAppCommonStore()
-const ogs = useOngoingGameStore()
-
-const { mergedPremadeTeams } = useOngoingGamePanel()
+const { ongoingGame, mergedPremadeTeams } = useOngoingGamePanel()
+const resources = useGameResourceProvider()
 
 const teamStats = computed(() => {
-  if (!ogs.analysis) {
+  if (!ongoingGame.value.analysis) {
     return null
   }
 
-  return ogs.analysis.teams[teamIdentifier] ?? null
+  return ongoingGame.value.analysis.teams[teamIdentifier] ?? null
 })
 
 const teamMembers = computed(() => {
-  if (!ogs.analysis) {
+  if (!ongoingGame.value.analysis) {
     return []
   }
 
-  return ogs.teams[teamIdentifier] ?? []
+  return ongoingGame.value.teams[teamIdentifier] ?? []
 })
 
 const premadeColors = computed(() => {
-  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+  return resources.runtime.colorMode === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
 
 // ## 胜率队
@@ -180,11 +177,11 @@ const premadeColors = computed(() => {
 // 1. 2 人以上的预组队队伍
 // 2. 玩家胜率均低于特定值
 const winRateTeams = computed(() => {
-  if (!ogs.analysis || !mergedPremadeTeams.value) {
+  if (!ongoingGame.value.analysis || !mergedPremadeTeams.value) {
     return {}
   }
 
-  const playersAnalysis = ogs.analysis.players
+  const playersAnalysis = ongoingGame.value.analysis.players
 
   const result: WinRateTeamInfo[] = []
 

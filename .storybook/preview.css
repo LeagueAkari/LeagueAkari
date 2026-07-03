@@ -24,7 +24,7 @@ body,
 }
 
 .akari-story-panel {
-  width: min(100%, 1120px);
+  width: min(100%, var(--akari-story-panel-max-width, 1120px));
   min-width: 0;
   margin-inline: auto;
 }

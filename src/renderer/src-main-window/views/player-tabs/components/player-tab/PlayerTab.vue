@@ -64,7 +64,7 @@
       </NButton>
     </div>
 
-    <MatchPreviewer
+    <ConnectedMatchPreviewer
       v-model:show="showPreviewModal"
       :game-id="previewingGame.gameId"
       :source="previewingGame.source"
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import MatchPreviewer from '@renderer-shared/components/match-preview/MatchPreviewer.vue'
+import ConnectedMatchPreviewer from '@renderer-shared/components/match-preview/ConnectedMatchPreviewer.vue'
 import {
   type MatchPreviewPayload,
   type MatchPreviewState,

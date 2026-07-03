@@ -22,7 +22,6 @@
 
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed } from 'vue'
 
 import { useOngoingGamePanel } from '../context'
@@ -31,16 +30,14 @@ const { puuids = [] } = defineProps<{
   puuids?: string[]
 }>()
 
-const ogs = useOngoingGameStore()
-
-const { navigateToSummonerByPuuid } = useOngoingGamePanel()
+const { ongoingGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
 
 const players = computed(() => {
   return puuids.map((puuid) => ({
     puuid,
-    championId: ogs.championSelections[puuid],
-    gameName: ogs.summoner[puuid]?.gameName,
-    tagLine: ogs.summoner[puuid]?.tagLine
+    championId: ongoingGame.value.championSelections[puuid],
+    gameName: ongoingGame.value.summoner[puuid]?.gameName,
+    tagLine: ongoingGame.value.summoner[puuid]?.tagLine
   }))
 })
 </script>

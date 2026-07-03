@@ -32,15 +32,15 @@
       <div
         class="absolute top-[48%] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4"
       >
-        <template v-if="ogs.settings.enabled">
-          <template v-if="!lcs.isConnected">
+        <template v-if="ongoingGame.settings.enabled">
+          <template v-if="!ongoingGame.isConnected">
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="PlugConnected" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
               {{ t('ongoingGame.panel.disconnected') }}
             </div>
           </template>
 
-          <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
+          <template v-else-if="ongoingGame.isSpectating">
             <NIcon class="text-6xl text-black/30 dark:text-white/30" :component="TimeOutline" />
             <div class="text-base font-normal text-black/60 dark:text-white/80">
               {{ t('ongoingGame.panel.waitingForSpectate') }}
@@ -67,17 +67,20 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { GameController, TimeOutline } from '@vicons/ionicons5'
 import { Forbid, PlugConnected } from '@vicons/tabler'
+import { useOngoingGameProvider } from '@renderer-shared/providers/ongoing-game'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
 import type { MatchPreviewPayload } from '../match-preview'
 import { FIXED_CARD_WIDTH_PX_NUMBER, POSITION_ORDER, PREMADE_TEAMS } from './constants'
-import { type OngoingGamePanelPlayerTabInitParams, provideOngoingGamePanel } from './context'
+import {
+  getOngoingGamePanelKdaOutliers,
+  type OngoingGamePanelPlayerTabInitParams,
+  provideOngoingGamePanel
+} from './context'
 import OngoingGameTeam from './widgets/OngoingGameTeam.vue'
 
 const props = defineProps<{
@@ -94,15 +97,18 @@ const emits = defineEmits<{
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
-const ogs = useOngoingGameStore()
+const ongoingGameProviderValue = useOngoingGameProvider()
+const ongoingGame = computed(() => ongoingGameProviderValue)
 
-const isDraftMode = computed(() => Boolean(ogs.draft))
+const isDraftMode = computed(() => Boolean(ongoingGame.value.draft))
 
-const isInIdleState = computed(() => ogs.queryStage.phase === 'unavailable')
+const isInIdleState = computed(() => ongoingGame.value.queryStage.phase === 'unavailable')
 
 const mergedPremadeTeams = computed(() => {
-  if (ogs.queryStage.phase === 'lobby' || ogs.queryStage.phase === 'unavailable') {
+  if (
+    ongoingGame.value.queryStage.phase === 'lobby' ||
+    ongoingGame.value.queryStage.phase === 'unavailable'
+  ) {
     return {
       groups: {},
       premadeTeamIdMap: {}
@@ -117,7 +123,7 @@ const mergedPremadeTeams = computed(() => {
     premadeTeamIdMap: {}
   }
 
-  for (const [puuid, premadeId] of Object.entries(ogs.mergedPremadeTeamMap)) {
+  for (const [puuid, premadeId] of Object.entries(ongoingGame.value.mergedPremadeTeamMap)) {
     const groupId = PREMADE_TEAMS[premadeId - 1]
 
     if (playerMap.groups[groupId]) {
@@ -133,26 +139,26 @@ const mergedPremadeTeams = computed(() => {
 })
 
 const sortedTeams = computed(() => {
-  if (!ogs.teams) {
+  if (!ongoingGame.value.teams) {
     return {}
   }
 
   const sorted: Record<string, string[]> = {}
 
-  Object.entries(ogs.teams).forEach(([team, players]) => {
+  Object.entries(ongoingGame.value.teams).forEach(([team, players]) => {
     if (!players.length) {
       return
     }
 
     sorted[team] = players.toSorted((a, b) => {
-      if (ogs.settings.orderPlayerBy === 'position') {
-        const pa = ogs.positionAssignments[a]?.position || 'NONE'
-        const pb = ogs.positionAssignments[b]?.position || 'NONE'
+      if (ongoingGame.value.settings.orderPlayerBy === 'position') {
+        const pa = ongoingGame.value.positionAssignments[a]?.position || 'NONE'
+        const pb = ongoingGame.value.positionAssignments[b]?.position || 'NONE'
 
         return POSITION_ORDER[pa] - POSITION_ORDER[pb]
       }
 
-      if (ogs.settings.orderPlayerBy === 'premade-team') {
+      if (ongoingGame.value.settings.orderPlayerBy === 'premade-team') {
         const info = mergedPremadeTeams.value
         const idMap = info.premadeTeamIdMap
         const groups = info.groups
@@ -172,18 +178,18 @@ const sortedTeams = computed(() => {
         return teamA.localeCompare(teamB)
       }
 
-      const statsA = ogs.analysis?.players[a]
-      const statsB = ogs.analysis?.players[b]
+      const statsA = ongoingGame.value.analysis?.players[a]
+      const statsB = ongoingGame.value.analysis?.players[b]
 
-      if (ogs.settings.orderPlayerBy === 'akari-score') {
+      if (ongoingGame.value.settings.orderPlayerBy === 'akari-score') {
         return (statsB?.akariScore.total || 0) - (statsA?.akariScore.total || 0)
       }
 
-      if (ogs.settings.orderPlayerBy === 'kda') {
+      if (ongoingGame.value.settings.orderPlayerBy === 'kda') {
         return (statsB?.summary.avgKda || 0) - (statsA?.summary.avgKda || 0)
       }
 
-      if (ogs.settings.orderPlayerBy === 'win-rate') {
+      if (ongoingGame.value.settings.orderPlayerBy === 'win-rate') {
         return (statsB?.summary.winRate || 0) - (statsA?.summary.winRate || 0)
       }
 
@@ -195,7 +201,7 @@ const sortedTeams = computed(() => {
 })
 
 const columnsNeed = computed(() => {
-  const teamColumns = Object.values(ogs.teams || {})
+  const teamColumns = Object.values(ongoingGame.value.teams || {})
     .map((t) => t.length)
     .reduce((a, b) => Math.max(a, b), 0)
 
@@ -207,7 +213,11 @@ const columnsNeed = computed(() => {
 })
 
 const linesPerTeam = computed(() => {
-  const maxMembers = Math.max(...Object.values(sortedTeams.value).map((t) => t.length))
+  const maxMembers = Math.max(0, ...Object.values(sortedTeams.value).map((t) => t.length))
+
+  if (!columnsNeed.value) {
+    return 0
+  }
 
   return Math.ceil(maxMembers / columnsNeed.value)
 })
@@ -231,6 +241,8 @@ const teamsContainerStyles = computed(() => {
   return {}
 })
 
+const kdaOutliers = computed(() => getOngoingGamePanelKdaOutliers(ongoingGame.value.analysis))
+
 provideOngoingGamePanel({
   contentWidth: () => props.contentWidth,
   contentHeight: () => props.contentHeight,
@@ -239,6 +251,8 @@ provideOngoingGamePanel({
   linesPerTeam,
   isTwoTeamsMode,
   mergedPremadeTeams,
+  ongoingGame,
+  kdaOutliers,
 
   navigateToSummonerByPuuid: (puuid: string, initParams?: OngoingGamePanelPlayerTabInitParams) => {
     emits('navigateToSummonerByPuuid', puuid, initParams)

@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { computed } from 'vue'
 
+import { useGameResourceProvider } from '../../../../providers/game-resource'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
@@ -48,13 +48,12 @@ const { puuid } = defineProps<{
 }>()
 
 const { mergedPremadeTeams } = useOngoingGamePanel()
+const resources = useGameResourceProvider()
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
-const as = useAppCommonStore()
-
 const premadeColors = computed(() => {
-  return as.colorTheme === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
+  return resources.runtime.colorMode === 'dark' ? PREMADE_TEAM_COLORS : PREMADE_TEAM_COLORS_LIGHT
 })
 </script>
 

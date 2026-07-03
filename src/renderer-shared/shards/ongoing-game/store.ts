@@ -1,17 +1,19 @@
-import { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
-import { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
-import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import {
+import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
+import type { AggregatedTeamAnalysis } from '@shared/data-adapter/analysis/team'
+import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
+import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import type {
   AdditionalResult,
   DraftOptions,
+  OngoingGameSettingsData,
   OngoingGameSimplifiedChampMastery,
   QueryStage
 } from '@shared/shards/ongoing-game'
-import { SavedInfo } from '@shared/shards/saved-player'
-import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { ParsedRole } from '@shared/utils/ranked'
+import { createDefaultOngoingGamePanelPlayerCardTagSettings } from '@shared/shards/ongoing-game/settings'
+import type { SavedInfo } from '@shared/shards/saved-player'
+import type { RankedStats } from '@shared/types/league-client/ranked'
+import type { SummonerInfo } from '@shared/types/league-client/summoner'
+import type { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 
@@ -22,49 +24,22 @@ export interface MatchHistoryPlayer {
 }
 
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
-  const settings = shallowReactive({
+  const settings = shallowReactive<OngoingGameSettingsData>({
     enabled: true,
     matchHistoryLoadCount: 50,
     concurrency: 4,
-    matchHistoryTagPreference: 'current' as 'current' | 'all',
+    matchHistoryTagPreference: 'current',
     gameDetailsLoadCount: 20,
     premadeTeamInferMatchCountThreshold: 5,
 
-    orderPlayerBy: 'default' as
-      | 'win-rate'
-      | 'kda'
-      | 'default'
-      | 'akari-score'
-      | 'position'
-      | 'premade-team',
+    orderPlayerBy: 'default',
 
-    showChampionUsage: 'recent' as 'recent' | 'mastery' | 'none',
+    showChampionUsage: 'recent',
     showMatchHistoryItemBorder: false,
     showJunglePathing: true,
     showJunglePathingForAllPlayers: false,
     autoRouteWhenGameStarts: false,
-    playerCardTags: {
-      showPremadeTeamTag: true,
-      showSuspiciousFlashPositionTag: true,
-      showWinningStreakTag: true,
-      showLosingStreakTag: true,
-      showSoloKillsTag: true,
-      showSoloDeathsTag: true,
-      showGreatPerformanceTag: true,
-      showAverageTeamDamageTag: false,
-      showAverageTeamDamageTakenTag: false,
-      showAverageTeamGoldTag: false,
-      showAverageDamageGoldEfficiencyTag: false,
-      showAverageEnemyMissingPingsTag: false,
-      showAverageVisionScoreTag: false,
-      showAverageKillDamageEfficiencyTag: true,
-      showSelfTag: true,
-      showMetTag: true,
-      showTaggedTag: true,
-      showWinRateTeamTag: true,
-      showPrivacyTag: true,
-      showAkariScoreTag: false
-    },
+    playerCardTags: createDefaultOngoingGamePanelPlayerCardTagSettings(),
     queryInLobbyPhase: true
   })
 
