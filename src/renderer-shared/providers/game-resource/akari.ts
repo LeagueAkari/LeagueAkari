@@ -13,6 +13,7 @@ import type {
 
 const AKARI_PREFIX = 'akari://'
 const AKARI_LEAGUE_CLIENT_HOST = 'league-client'
+const PROTOCOL_RE = /^(?:https?:|image:|data:|blob:|file:|ftp:|mailto:|tel:|javascript:|about:)/
 
 function normalizeLcuPath(path: string) {
   const normalized = path.trim()
@@ -32,7 +33,13 @@ export function createAkariGameResourceProvider(): GameResourceProviderValue {
         return null
       }
 
-      if (normalizedSource.startsWith(AKARI_PREFIX)) {
+      if (!PROTOCOL_RE.test(normalizedSource)) {
+        if (!leagueClient.isConnected) {
+          return null
+        }
+
+        return `akari://league-client${normalizeLcuPath(normalizedSource)}`
+      } else if (normalizedSource.startsWith(AKARI_PREFIX)) {
         let url: URL
 
         try {
@@ -50,14 +57,6 @@ export function createAkariGameResourceProvider(): GameResourceProviderValue {
         }
 
         return `akari://league-client${normalizeLcuPath(`${url.pathname}${url.search}${url.hash}`)}`
-      }
-
-      if (normalizedSource.startsWith('/')) {
-        if (!leagueClient.isConnected) {
-          return null
-        }
-
-        return `akari://league-client${normalizeLcuPath(normalizedSource)}`
       }
 
       return normalizedSource
