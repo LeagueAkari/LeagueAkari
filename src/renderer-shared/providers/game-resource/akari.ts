@@ -1,4 +1,5 @@
 import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png'
+import { i18next } from '@renderer-shared/i18n'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -99,6 +100,17 @@ export function createAkariGameResourceProvider(): GameResourceProviderValue {
 
     champions: {
       name(id: number) {
+        if (id === -3) {
+          return i18next.t('champions.bravery', { ns: 'common' })
+        }
+
+        if (id === -1) {
+          return (
+            leagueClient.gameData.champions[id]?.name ||
+            i18next.t('champions.dummy', { ns: 'common' })
+          )
+        }
+
         return leagueClient.gameData.champions[id]?.name || id.toString()
       },
       icon(id: number) {

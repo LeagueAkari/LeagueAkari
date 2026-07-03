@@ -1,4 +1,5 @@
 import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png'
+import { i18next } from '@renderer-shared/i18n'
 import type {
   Augment,
   ChampionSimple,
@@ -240,6 +241,16 @@ export function createStorybookGameResourceProvider(
 
     champions: {
       name(id) {
+        if (id === -3) {
+          return i18next.t('champions.bravery', { ns: 'common' })
+        }
+
+        if (id === -1) {
+          return (
+            state.value.champions.get(id)?.name || i18next.t('champions.dummy', { ns: 'common' })
+          )
+        }
+
         return state.value.champions.get(id)?.name || id.toString()
       },
       icon(id) {

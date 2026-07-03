@@ -38,10 +38,7 @@
                     color: premadeTeamId ? premadeColors[premadeTeamId]?.foregroundColor : undefined
                   }"
                   >{{
-                    masked(
-                      summoner?.gameName || summoner?.displayName || '—',
-                      name(championId || -1)
-                    )
+                    masked(summoner?.gameName || summoner?.displayName || '—', championName)
                   }}</span
                 >
                 <span
@@ -134,8 +131,8 @@
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useChampionInfo } from '@renderer-shared/composables/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
@@ -151,11 +148,11 @@ const { puuid } = defineProps<{
 }>()
 
 const { t } = useTranslation()
-const { name } = useChampionInfo()
 const { masked } = useStreamerModeMaskedText()
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
+const resources = useGameResourceProvider()
 
 const { mergedPremadeTeams, navigateToSummonerByPuuid } = useOngoingGamePanel()
 
@@ -174,7 +171,7 @@ const currentChampionId = computed(() => championId.value || -1)
 
 const hasCurrentChampion = computed(() => currentChampionId.value > 0)
 
-const championName = computed(() => name(currentChampionId.value))
+const championName = computed(() => resources.champions.name(currentChampionId.value))
 
 const currentPosition = computed(() => position.value?.position)
 
