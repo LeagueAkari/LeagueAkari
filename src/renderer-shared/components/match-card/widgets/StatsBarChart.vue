@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { computed } from 'vue'
@@ -17,7 +17,7 @@ import { Bar } from 'vue-chartjs'
 import { useMatchCard } from '../context'
 import { getTeamColor } from '../utils/theme'
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 
 const { title = '', chartData = [] } = defineProps<{
   title?: string
@@ -28,7 +28,7 @@ const { title = '', chartData = [] } = defineProps<{
   }[]
 }>()
 
-const { participants, theme, hidePrivacy } = useMatchCard()
+const { participants, hidePrivacy } = useMatchCard()
 
 const height = computed(() => {
   return chartData.length * 28
@@ -60,7 +60,7 @@ const sortedData = computed(() => {
 const data = computed<ChartData<'bar'>>(() => {
   return {
     labels: sortedData.value.map(
-      (p) => `${lcs.gameData.championName(participantMap.value[p.participantId].championId)}`
+      (p) => `${resources.champions.name(participantMap.value[p.participantId].championId)}`
     ),
     datasets: [
       {
@@ -87,7 +87,7 @@ const options = computed<ChartOptions<'bar'>>(() => ({
           const d = sortedData.value[item.dataIndex]
           const p = participantMap.value[d.participantId]
           const name = hidePrivacy.value
-            ? lcs.gameData.championName(p.championId)
+            ? resources.champions.name(p.championId)
             : `${p.gameName}#${p.tagLine}`
           return `${name}: ${d.value}`
         }
@@ -96,7 +96,7 @@ const options = computed<ChartOptions<'bar'>>(() => ({
     datalabels: {
       display: 'auto',
       color: () => {
-        if (theme.value === 'dark') {
+        if (resources.runtime.colorMode === 'dark') {
           return '#fff'
         }
 

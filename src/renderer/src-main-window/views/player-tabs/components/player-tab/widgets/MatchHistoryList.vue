@@ -41,7 +41,6 @@
           :summary="g"
           :puuid="puuid"
           :key="toGameKey(g)"
-          :theme="as.colorTheme"
           @navigate-to-summoner-by-puuid="navigateToSummonerByPuuid"
           @load-details="loadDetails(g.gameId)"
           @download-replay="downloadReplay(g.gameId)"

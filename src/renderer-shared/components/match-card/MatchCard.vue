@@ -20,7 +20,6 @@ import { registerChartJS } from './chartjs-register'
 import { provideMatchCard } from './context'
 
 const {
-  theme = 'dark',
   summary,
   puuid,
   details = null,
@@ -31,7 +30,6 @@ const {
 } = defineProps<{
   summary: LcuOrSgpGameSummary
   details?: LcuOrSgpGameDetails | null
-  theme?: 'light' | 'dark'
   puuid?: string
   hidePrivacy?: boolean
   loadingDetails?: boolean
@@ -50,7 +48,6 @@ const emits = defineEmits<{
 const isExpanded = defineModel<boolean>('isExpanded', { required: false, default: false })
 
 provideMatchCard({
-  theme: () => theme,
   isExpanded: () => isExpanded.value,
   summary: () => summary,
   puuid: () => puuid,

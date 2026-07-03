@@ -5,6 +5,8 @@ import '@renderer-shared/assets/css/github-markdown.css'
 import '@renderer-shared/assets/css/lol-view.css'
 import '@renderer-shared/assets/css/theme-system.css'
 import { i18next } from '@renderer-shared/i18n'
+import { GameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { createStorybookGameResourceProvider } from '@renderer-shared/providers/game-resource/storybook'
 import {
   getNaiveUiLocale,
   getNaiveUiTheme,
@@ -12,12 +14,19 @@ import {
 } from '@renderer-shared/theme/naive-ui'
 import { type AppThemeId, getThemeColorTheme } from '@shared/types/app-theme'
 import { type Preview, setup } from '@storybook/vue3-vite'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import I18nextVue from 'i18next-vue'
 import { NConfigProvider, NDialogProvider, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import { createPinia } from 'pinia'
 import { computed, watchEffect } from 'vue'
 
 import './preview.css'
+
+dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
 const THEME_IDS: AppThemeId[] = [
   'light',
@@ -68,6 +77,7 @@ const preview: Preview = {
     (story, context) => ({
       components: {
         Story: story(),
+        GameResourceProvider,
         NConfigProvider,
         NDialogProvider,
         NMessageProvider,
@@ -83,6 +93,10 @@ const preview: Preview = {
         const naiveUiTheme = computed(() => getNaiveUiTheme(colorTheme.value))
         const naiveUiThemeOverrides = computed(() => getNaiveUiThemeOverrides(themeId.value))
         const naiveUiLocale = computed(() => getNaiveUiLocale(locale.value))
+        const gameResourceProvider = createStorybookGameResourceProvider({
+          locale,
+          colorMode: colorTheme
+        })
 
         watchEffect(() => {
           document.documentElement.dataset.theme = colorTheme.value
@@ -94,7 +108,8 @@ const preview: Preview = {
         return {
           naiveUiLocale,
           naiveUiTheme,
-          naiveUiThemeOverrides
+          naiveUiThemeOverrides,
+          gameResourceProvider
         }
       },
       template: `
@@ -111,7 +126,9 @@ const preview: Preview = {
               <NDialogProvider>
                 <div class="akari-story-shell">
                   <div class="akari-story-panel">
-                    <Story />
+                    <GameResourceProvider :value="gameResourceProvider">
+                      <Story />
+                    </GameResourceProvider>
                   </div>
                 </div>
               </NDialogProvider>

@@ -54,7 +54,7 @@
 
               <div>
                 <div class="mb-2 text-sm font-bold text-black dark:text-white">
-                  {{ lcs.gameData.perkName(perk.perkId) }}
+                  {{ resources.perks.name(perk.perkId) }}
                 </div>
 
                 <div
@@ -137,7 +137,7 @@
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { ChevronLeft20Regular, ChevronRight20Regular } from '@vicons/fluent'
 import { NButton, NIcon, NScrollbar, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -148,7 +148,7 @@ import { getTeamColor, useWinResultTagClass } from '../utils/theme'
 
 const { basicInfo, participants, team, hidePrivacy } = useMatchCard()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const position = usePosition()
 const tagTheme = useWinResultTagClass(() => team.value?.winResult)
 
@@ -180,7 +180,6 @@ interface PlayerPerkStats {
 }
 
 const playerPerks = computed(() => {
-  const perkMap = lcs.gameData.perks
   const perkStats: Record<number, PlayerPerkStats> = {}
 
   for (const p of participants.value) {
@@ -189,13 +188,13 @@ const playerPerks = computed(() => {
     const mapped = styles.flatMap((style) => {
       return style.selections
         .map((selection) => {
-          const perk = perkMap[selection.perk]
+          const perk = resources.perks.display(selection.perk)
 
           if (!perk) {
             return null
           }
 
-          const descriptions = perk.endOfGameStatDescs.map((desc) => {
+          const descriptions = perk.endOfGameStatDescriptions.map((desc) => {
             return desc.replace(EOG_PLACEHOLDER_PATTERN, (_, varIndex) => {
               switch (varIndex) {
                 case '1':
@@ -232,7 +231,7 @@ type Participant = (typeof participants.value)[number]
 
 const participantName = (participant: Participant) => {
   if (hidePrivacy.value) {
-    return lcs.gameData.championName(participant.championId)
+    return resources.champions.name(participant.championId)
   }
 
   return participant.tagLine

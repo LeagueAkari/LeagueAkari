@@ -11,7 +11,6 @@
         :summary="summary"
         :details="details"
         :puuid="puuid"
-        :theme="as.colorTheme"
         :loading-details="isLoadingDetails"
         :hide-privacy="hidePrivacy"
         :can-dry-run-ongoing-game="canDryRunOngoingGame"

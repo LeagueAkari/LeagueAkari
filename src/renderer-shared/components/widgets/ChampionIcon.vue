@@ -1,11 +1,11 @@
 <template>
   <div class="champion-icon-container" :class="{ round: round }">
-    <img class="plain-img" v-if="imageSource.useLocalAssets" :src="imageSource.url" />
+    <img class="plain-img" v-if="imageSource?.source === 'url'" :src="imageSource.iconPath" />
     <LcuImage
       v-else
       class="champion-icon"
       :class="{ 'champion-icon-stretched': stretched }"
-      :src="imageSource.url"
+      :src="imageSource?.iconPath"
     />
     <div
       v-if="ring"
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
@@ -36,20 +36,9 @@ const { championId = -1, stretched = true } = defineProps<{
   ringWidth?: number
 }>()
 
-const imageSource = computed(() => {
-  // 勇敢举动 = -3
-  if (championId === -3) {
-    return {
-      url: braveryIcon,
-      useLocalAssets: true
-    }
-  }
+const resources = useGameResourceProvider()
 
-  return {
-    url: `/lol-game-data/assets/v1/champion-icons/${championId}.png`,
-    useLocalAssets: false
-  }
-})
+const imageSource = computed(() => resources.champions.icon(championId))
 </script>
 
 <style scoped>

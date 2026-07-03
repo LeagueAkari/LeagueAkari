@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import BasicComponentsDemo from './BasicComponentsDemo.vue'
 
 const meta = {
-  title: 'Renderer Shared/Light Components/Basic',
+  title: 'Renderer Shared/Foundation/Basic',
   component: BasicComponentsDemo
 } satisfies Meta<typeof BasicComponentsDemo>
 

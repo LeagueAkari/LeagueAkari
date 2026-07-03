@@ -186,7 +186,7 @@
                   team.subteamPlacement,
                   team.winResult,
                   team.isSurrender,
-                  as.settings.locale
+                  resources.runtime.locale
                 )
               }}
             </div>
@@ -219,7 +219,7 @@
         <div class="flex">
           <!-- queue name -->
           <div class="text-xs text-black dark:text-white/80">
-            {{ lcs.gameData.queueName(basicInfo.queueId) }}
+            {{ resources.queues.name(basicInfo.queueId) }}
           </div>
           <div class="mx-1 text-xs text-black/40 dark:text-white/40">·</div>
 
@@ -278,7 +278,7 @@
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
-                  {{ hidePrivacy ? lcs.gameData.championName(player.championId) : player.gameName }}
+                  {{ hidePrivacy ? resources.champions.name(player.championId) : player.gameName }}
                 </div>
               </template>
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
@@ -286,7 +286,7 @@
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
-                <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
+                <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
               </div>
             </NTooltip>
           </div>
@@ -341,7 +341,7 @@
                   @mousedown="handleMouseDown"
                   @mouseup="handleMouseUp($event, player.puuid)"
                 >
-                  {{ hidePrivacy ? lcs.gameData.championName(player.championId) : player.gameName }}
+                  {{ hidePrivacy ? resources.champions.name(player.championId) : player.gameName }}
                 </div>
               </template>
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
@@ -349,7 +349,7 @@
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
-                <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
+                <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
               </div>
             </NTooltip>
           </div>
@@ -400,7 +400,7 @@
               <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
             </div>
             <div class="flex items-center gap-1 text-xs" v-else>
-              <span class="font-bold">{{ lcs.gameData.championName(player.championId) }}</span>
+              <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
             </div>
           </NTooltip>
         </div>
@@ -435,8 +435,7 @@
 <script lang="ts" setup>
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { getCherryWinningTeamCount } from '@shared/data-adapter/match-history/cherry'
 import { Crown, Robot } from '@vicons/fa'
@@ -478,8 +477,7 @@ const { formatExtremeNumber } = useNumberFormatter()
 
 const gameResultName = useGameResultName()
 
-const as = useAppCommonStore()
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 
 // 典型的 100 / 200 红蓝队方法
@@ -566,21 +564,9 @@ const displayParts = computed(() => {
 })
 
 const mapName = computed(() => {
-  const mutators = lcs.gameData.gameModeMutators[basicInfo.value.mapId]
-
-  if (!mutators) return lcs.gameData.mapName(basicInfo.value.mapId)
-
-  const mutator = mutators.Mutators.find((m) =>
-    basicInfo.value.gameModeMutators?.some(
-      (g) => m.Mutator.ExpandedMutator.toLowerCase() === g.toLowerCase()
-    )
-  )
-
-  if (mutator) {
-    return mutator.MapNameOverride
-  }
-
-  return mutators.MapNameBase
+  return resources.maps.name(basicInfo.value.mapId, {
+    gameModeMutators: basicInfo.value.gameModeMutators
+  })
 })
 
 const winStyleType = useWinResultStyleType()
@@ -593,7 +579,7 @@ const gameCreationTitle = computed(() => {
 
 useIntervalFn(
   () => {
-    const date = dayjs(basicInfo.value.gameCreation).locale(as.settings.locale.toLowerCase())
+    const date = dayjs(basicInfo.value.gameCreation).locale(resources.runtime.locale.toLowerCase())
     if (dayjs().diff(date, 'day', true) > 3) {
       formattedRelativeTime.value = date.format('YYYY-MM-DD HH:mm')
     } else {

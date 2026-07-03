@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import MatchCardPrimitivesDemo from './MatchCardPrimitivesDemo.vue'
 
 const meta = {
-  title: 'Renderer Shared/Light Components/Match Card Primitives',
+  title: 'Renderer Shared/Match History/Primitives',
   component: MatchCardPrimitivesDemo
 } satisfies Meta<typeof MatchCardPrimitivesDemo>
 

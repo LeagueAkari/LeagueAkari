@@ -1,13 +1,8 @@
 <template>
-  <NPopover
-    v-if="itemId && lcs.gameData.items[itemId]"
-    :delay="50"
-    :scrollable="true"
-    style="max-height: 50vh"
-  >
+  <NPopover v-if="itemDisplay" :delay="50" :scrollable="true" style="max-height: 50vh">
     <template #trigger>
       <LcuImage
-        :src="lcs.gameData.items[itemId].iconPath"
+        :src="itemDisplay.iconPath"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="item"
         :class="{ trinket: isTrinket, item: !isTrinket }"
@@ -15,18 +10,18 @@
     </template>
 
     <div class="info item-display-popover">
-      <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
+      <LcuImage class="image" :src="itemDisplay.iconPath" />
       <div class="right-side">
         <div class="name">
-          {{ lcs.gameData.items[itemId].name }}
-          <span class="font-normal text-black/50 dark:text-white/50">({{ itemId }})</span>
+          {{ itemDisplay.name }}
+          <span class="font-normal text-black/50 dark:text-white/50">({{ itemDisplay.id }})</span>
         </div>
         <div class="price">
-          {{ lcs.gameData.items[itemId].priceTotal }} G
+          {{ itemDisplay.totalPrice }} G
           {{
-            lcs.gameData.items[itemId].price !== lcs.gameData.items[itemId].priceTotal
+            itemDisplay.price !== itemDisplay.totalPrice
               ? `(${t('gameAssets.item.combinePrice', {
-                  gold: lcs.gameData.items[itemId].price
+                  gold: itemDisplay.price
                 })})`
               : ''
           }}
@@ -34,23 +29,23 @@
       </div>
     </div>
 
-    <div class="from" v-if="lcs.gameData.items[itemId].from.length !== 0">
+    <div class="from" v-if="itemDisplay.from.length !== 0">
       <LcuImage
         class="image"
-        :title="lcs.gameData.items[item].name"
-        :src="lcs.gameData.items[item].iconPath"
-        v-for="item of lcs.gameData.items[itemId].from"
-        :key="item"
+        :title="componentItem.name"
+        :src="componentItem.iconPath"
+        v-for="componentItem of itemDisplay.from"
+        :key="componentItem.id"
       />
     </div>
 
-    <div class="to" v-if="lcs.gameData.items[itemId].to.length !== 0">
+    <div class="to" v-if="itemDisplay.to.length !== 0">
       <LcuImage
         class="image"
-        :title="lcs.gameData.items[item].name"
-        :src="lcs.gameData.items[item].iconPath"
-        v-for="item of lcs.gameData.items[itemId].to"
-        :key="item"
+        :title="componentItem.name"
+        :src="componentItem.iconPath"
+        v-for="componentItem of itemDisplay.to"
+        :key="componentItem.id"
       />
     </div>
 
@@ -58,7 +53,7 @@
       :style="{ maxWidth: `${maxWidth}px` }"
       class="item-display-description text-xs"
       lol-view
-      v-html="lcs.gameData.items[itemId].description"
+      v-html="itemDisplay.descriptionHtml"
     />
   </NPopover>
 
@@ -72,13 +67,15 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
+import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
 
 const {
+  itemId,
   isTrinket = false,
   size = 20,
   maxWidth = 400
@@ -91,7 +88,14 @@ const {
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
+const itemDisplay = computed(() => {
+  if (!itemId) {
+    return null
+  }
+
+  return resources.items.display(itemId)
+})
 </script>
 
 <style scoped>

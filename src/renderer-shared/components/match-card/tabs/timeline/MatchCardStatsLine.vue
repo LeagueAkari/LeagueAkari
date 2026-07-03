@@ -13,7 +13,7 @@
         />
         <div class="min-w-0 truncate text-sm font-medium text-black dark:text-white">
           <template v-if="hidePrivacy">
-            {{ lcs.gameData.championName(selectedParticipant.championId) }}
+            {{ resources.champions.name(selectedParticipant.championId) }}
           </template>
           <template v-else>
             {{ selectedParticipant.gameName }} #{{ selectedParticipant.tagLine }}
@@ -104,7 +104,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { useTranslation } from 'i18next-vue'
 import { NRadio, NRadioGroup, NScrollbar, NSlider } from 'naive-ui'
@@ -117,7 +117,7 @@ import { getTeamColor, playerColors, useWinResultTagClass } from '../../utils/th
 import { formatMilliseconds } from '../../utils/time'
 import MapPosition from '../../widgets/MapPosition.vue'
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 
 const { basicInfo, details, frames, participants, team, loadingDetails, loadDetails, hidePrivacy } =
@@ -145,7 +145,7 @@ const sortedPlayerOptions = computed(() => {
     .map((p) => {
       return {
         value: p.participantId,
-        label: `${lcs.gameData.championName(p.championId)}`,
+        label: `${resources.champions.name(p.championId)}`,
         color: playerColors[(p.participantId - 1) % playerColors.length]
       }
     })

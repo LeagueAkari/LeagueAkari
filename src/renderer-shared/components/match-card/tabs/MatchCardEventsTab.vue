@@ -239,7 +239,7 @@
               <div class="flex items-center gap-2">
                 <ChampionIcon :champion-id="k.championId" class="size-5 rounded" />
                 <div class="text-sm text-black/80 dark:text-white/80">
-                  {{ lcs.gameData.championName(k.championId) }}
+                  {{ resources.champions.name(k.championId) }}
                 </div>
                 <div :class="tagTheme">
                   {{ t('matchCard.eventsTab.plateCount', { count: k.platesTake }) }}
@@ -274,7 +274,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { isSgpChampionKillEvent } from '@shared/data-adapter/match-history/frames'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -302,7 +302,7 @@ import VictimDamageDetails from '../widgets/VictimDamageDetails.vue'
 const { participants, details, basicInfo, frames, team, loadingDetails, loadDetails } =
   useMatchCard()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 
 const SUPPORTED_EVENT_TYPES = [
@@ -378,7 +378,7 @@ const championFilterOptions = computed(() => {
     })
     .map((p) => ({
       championId: p.championId,
-      label: lcs.gameData.championName(p.championId)
+      label: resources.champions.name(p.championId)
     }))
     .toSorted((a, b) => a.label.localeCompare(b.label))
 })

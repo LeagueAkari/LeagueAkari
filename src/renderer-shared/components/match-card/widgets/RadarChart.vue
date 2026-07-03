@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { noZero } from '@shared/data-adapter/utils'
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js'
 import { useTranslation } from 'i18next-vue'
@@ -18,13 +18,13 @@ const { puuid } = defineProps<{
   puuid?: string
 }>()
 
-const { teams, participants, theme, hidePrivacy } = useMatchCard()
+const { teams, participants, hidePrivacy } = useMatchCard()
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 
 // 可被替换
-const isDark = computed(() => theme.value === 'dark')
+const isDark = computed(() => resources.runtime.colorMode === 'dark')
 
 const chartColors = computed(() => {
   if (isDark.value) {
@@ -79,7 +79,7 @@ const participant = computed(() => {
 const selfName = computed(() => {
   if (!participant.value) return null
 
-  if (hidePrivacy.value) return lcs.gameData.championName(participant.value.championId)
+  if (hidePrivacy.value) return resources.champions.name(participant.value.championId)
 
   return `${participant.value.gameName} #${participant.value.tagLine}`
 })

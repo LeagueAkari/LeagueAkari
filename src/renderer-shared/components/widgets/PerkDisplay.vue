@@ -1,22 +1,22 @@
 <template>
-  <NPopover v-if="perkId && lcs.gameData.perks[perkId]" :delay="50">
+  <NPopover v-if="perkDisplay" :delay="50">
     <template #trigger>
       <LcuImage
-        :src="lcs.gameData.perks[perkId].iconPath"
+        :src="perkDisplay.iconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="perk"
       />
     </template>
     <div :style="{ 'max-width': `${maxWidth}px` }" class="info">
-      <LcuImage class="image" :src="lcs.gameData.perks[perkId].iconPath" />
-      <div class="right-side">{{ lcs.gameData.perks[perkId].name }}</div>
+      <LcuImage class="image" :src="perkDisplay.iconPath" />
+      <div class="right-side">{{ perkDisplay.name }}</div>
     </div>
     <div
       :style="{ 'max-width': `${maxWidth}px` }"
       style="font-size: 12px"
       lol-view
-      v-html="lcs.gameData.perks[perkId].longDesc"
+      v-html="perkDisplay.longDescriptionHtml"
     ></div>
   </NPopover>
   <div
@@ -28,18 +28,30 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { NPopover } from 'naive-ui'
+import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
 
-const { size = 20, maxWidth = 400 } = defineProps<{
+const {
+  perkId,
+  size = 20,
+  maxWidth = 400
+} = defineProps<{
   perkId?: number
   size?: number
   maxWidth?: number
 }>()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
+const perkDisplay = computed(() => {
+  if (!perkId) {
+    return null
+  }
+
+  return resources.perks.display(perkId)
+})
 </script>
 
 <style scoped>

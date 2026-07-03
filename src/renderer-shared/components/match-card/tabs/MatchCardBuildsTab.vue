@@ -223,7 +223,7 @@
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import {
   DetailedItemPurchasedEvent,
   DetailedSkillLevelUpEvent
@@ -242,7 +242,7 @@ import { formatMilliseconds } from '../utils/time'
 const { basicInfo, frames, participants, team, details, hidePrivacy, loadingDetails, loadDetails } =
   useMatchCard()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 const scrollbarRef = ref<InstanceType<typeof NScrollbar> | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
@@ -346,7 +346,7 @@ type Participant = (typeof participants.value)[number]
 
 const participantName = (participant: Participant) => {
   if (hidePrivacy.value) {
-    return lcs.gameData.championName(participant.championId)
+    return resources.champions.name(participant.championId)
   }
 
   return participant.tagLine

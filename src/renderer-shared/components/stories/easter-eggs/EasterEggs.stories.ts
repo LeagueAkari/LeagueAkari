@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import EasterEggsDemo from './EasterEggsDemo.vue'
 
 const meta = {
-  title: 'Renderer Shared/Light Components/Easter Eggs',
+  title: 'Renderer Shared/Special/Easter Eggs',
   component: EasterEggsDemo
 } satisfies Meta<typeof EasterEggsDemo>
 

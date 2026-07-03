@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -12,24 +12,15 @@ const props = defineProps<{
 }>()
 
 const url = ref<string | null>(null)
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 
 watchEffect(() => {
-  if (typeof props.src !== 'undefined' && props.src) {
-    const resolvedUrl = new URL(props.src, 'akari://league-client').href
-
-    if (resolvedUrl.startsWith('akari://')) {
-      if (lcs.isConnected) {
-        url.value = resolvedUrl
-      } else {
-        url.value = null
-      }
-    } else {
-      url.value = props.src
-    }
-  } else {
+  if (!props.src) {
     url.value = null
+    return
   }
+
+  url.value = resources.assets.resolve(props.src)
 })
 
 const handleError = () => {

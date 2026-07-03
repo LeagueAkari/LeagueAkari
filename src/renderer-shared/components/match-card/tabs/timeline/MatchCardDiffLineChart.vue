@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import { useTranslation } from 'i18next-vue'
@@ -103,7 +103,7 @@ import { useMatchCard } from '../../context'
 import { useTeamName } from '../../utils/text'
 import { getTeamColor, playerColors } from '../../utils/theme'
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 
 const teamName = useTeamName()
@@ -114,7 +114,6 @@ const {
   frames,
   participants,
   teams,
-  theme,
   loadingDetails,
   loadDetails,
   hidePrivacy
@@ -126,7 +125,7 @@ type Metric = 'gold' | 'cs' | 'exp' | 'damageDealt' | 'damageTaken'
 const selectedMetric = ref<Metric>('gold')
 
 // 检测当前主题（响应式）
-const isDark = computed(() => theme.value === 'dark')
+const isDark = computed(() => resources.runtime.colorMode === 'dark')
 
 const selectedTeams = ref<string[]>([])
 const selectedPlayers = ref<number[]>([])
@@ -275,7 +274,7 @@ const sortedPlayerOptions = computed(() => {
     .map((p) => {
       return {
         value: p.participantId,
-        label: `${lcs.gameData.championName(p.championId)}`,
+        label: `${resources.champions.name(p.championId)}`,
         color: playerColors[(p.participantId - 1) % playerColors.length]
       }
     })
@@ -313,7 +312,7 @@ const chartData = computed(() => {
   ) => {
     if (!participant) return t('matchCard.diffLineChart.playerLabel', { id: participantId })
 
-    if (hidePrivacy) return lcs.gameData.championName(participant.championId)
+    if (hidePrivacy) return resources.champions.name(participant.championId)
 
     return `${participant.gameName} #${participant.tagLine}`
   }

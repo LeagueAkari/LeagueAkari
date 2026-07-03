@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import DataDisplayDemo from './DataDisplayDemo.vue'
 
 const meta = {
-  title: 'Renderer Shared/Light Components/Data Display',
+  title: 'Renderer Shared/Player Data/Data Display',
   component: DataDisplayDemo
 } satisfies Meta<typeof DataDisplayDemo>
 

@@ -1,11 +1,18 @@
 <template>
-  <video v-bind="$attrs" :loop :autoplay v-if="url" :src="url" class="lcu-video" />
+  <video
+    v-bind="$attrs"
+    :loop
+    :autoplay
+    v-if="url"
+    :src="url"
+    class="lcu-video"
+    @error="handleError"
+  />
   <div v-else class="lcu-video-placeholder"></div>
 </template>
 
 <script lang="ts" setup>
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { addLeadingSlash } from '@shared/utils/uri'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -15,15 +22,20 @@ const props = defineProps<{
 }>()
 
 const url = ref<string | null>(null)
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 
 watchEffect(() => {
-  if (lcs.isConnected) {
-    url.value = `akari://league-client${addLeadingSlash(props.src)}`
-  } else {
+  if (!props.src) {
     url.value = null
+    return
   }
+
+  url.value = resources.assets.resolve(props.src)
 })
+
+const handleError = () => {
+  url.value = null
+}
 </script>
 
 <style scoped>

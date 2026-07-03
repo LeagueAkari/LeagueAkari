@@ -13,7 +13,9 @@
     >
       <NNotificationProvider placement="bottom-right">
         <NDialogProvider>
-          <App />
+          <GameResourceProvider :value="gameResourceProvider">
+            <App />
+          </GameResourceProvider>
         </NDialogProvider>
       </NNotificationProvider>
     </NMessageProvider>
@@ -22,6 +24,10 @@
 
 <script setup lang="ts">
 import { useColorThemeAttr } from '@renderer-shared/composables/useColorThemeAttr'
+import {
+  createAkariGameResourceProvider,
+  GameResourceProvider
+} from '@renderer-shared/providers/game-resource'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   getNaiveUiLocale,
@@ -34,6 +40,7 @@ import { computed } from 'vue'
 import App from './App.vue'
 
 const as = useAppCommonStore()
+const gameResourceProvider = createAkariGameResourceProvider()
 
 const themeOverrides = computed(() => {
   return getNaiveUiThemeOverrides(as.themeId)

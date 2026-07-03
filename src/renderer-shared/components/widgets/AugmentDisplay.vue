@@ -1,44 +1,42 @@
 <template>
-  <NPopover v-if="augmentId && lcs.gameData.augments[augmentId]" :delay="50">
+  <NPopover v-if="augmentDisplay" :delay="50">
     <template #trigger>
       <LcuImage
-        :src="lcs.gameData.augments[augmentId].augmentSmallIconPath"
+        :src="augmentDisplay.iconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="augment"
         :class="{
-          prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
-          gold: lcs.gameData.augments[augmentId].rarity === 'kGold',
-          silver: lcs.gameData.augments[augmentId].rarity === 'kSilver',
-          bronze: lcs.gameData.augments[augmentId].rarity === 'kBronze'
+          prismatic: augmentDisplay.rarity === 'kPrismatic',
+          gold: augmentDisplay.rarity === 'kGold',
+          silver: augmentDisplay.rarity === 'kSilver',
+          bronze: augmentDisplay.rarity === 'kBronze'
         }"
       />
     </template>
 
     <div class="info max-w-45">
-      <LcuImage class="image" :src="lcs.gameData.augments[augmentId].augmentSmallIconPath" />
-      <div class="right-side">{{ lcs.gameData.augments[augmentId].nameTRA }}</div>
+      <LcuImage class="image" :src="augmentDisplay.iconPath" />
+      <div class="right-side">{{ augmentDisplay.name }}</div>
     </div>
 
     <div class="rarity max-w-45 text-xs">
       <span
         :class="{
-          prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
-          gold: lcs.gameData.augments[augmentId].rarity === 'kGold',
-          silver:
-            lcs.gameData.augments[augmentId].rarity === 'kSilver' ||
-            lcs.gameData.augments[augmentId].rarity === 'kEventChoice',
-          bronze: lcs.gameData.augments[augmentId].rarity === 'kBronze'
+          prismatic: augmentDisplay.rarity === 'kPrismatic',
+          gold: augmentDisplay.rarity === 'kGold',
+          silver: augmentDisplay.rarity === 'kSilver' || augmentDisplay.rarity === 'kEventChoice',
+          bronze: augmentDisplay.rarity === 'kBronze'
         }"
         class="rarity-indicator"
       ></span>
-      {{ formatRarity(lcs.gameData.augments[augmentId].rarity) }}
+      {{ formatRarity(augmentDisplay.rarity) }}
     </div>
 
     <!-- for gtimg source -->
-    <template v-if="as.settings.locale === 'zh-CN' && es.kiwiAugmentsMap?.[augmentId]?.tooltip">
+    <template v-if="augmentDisplay.tooltipHtml">
       <div class="my-2 h-px bg-black/10 dark:bg-white/10" />
-      <div class="max-w-100" v-html="es.kiwiAugmentsMap[augmentId].tooltip" />
+      <div class="max-w-100" v-html="augmentDisplay.tooltipHtml" />
     </template>
   </NPopover>
   <div
@@ -50,22 +48,26 @@
 </template>
 
 <script setup lang="ts">
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
+import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
 
-const { size = 20 } = defineProps<{
+const { augmentId, size = 20 } = defineProps<{
   augmentId?: number
   size?: number
 }>()
 
-const as = useAppCommonStore()
-const es = useExtraAssetsStore()
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
+const augmentDisplay = computed(() => {
+  if (!augmentId) {
+    return null
+  }
+
+  return resources.augments.display(augmentId)
+})
 
 const { t } = useTranslation()
 

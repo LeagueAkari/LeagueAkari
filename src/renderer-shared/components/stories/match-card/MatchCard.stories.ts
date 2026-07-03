@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import IconGalleryDemo from './IconGalleryDemo.vue'
+import MatchCardDemo from './MatchCardDemo.vue'
 
 const meta = {
-  title: 'Renderer Shared/Foundation/Icons',
-  component: IconGalleryDemo
-} satisfies Meta<typeof IconGalleryDemo>
+  title: 'Renderer Shared/Match History/Match Cards',
+  component: MatchCardDemo
+} satisfies Meta<typeof MatchCardDemo>
 
 export default meta
 

@@ -18,7 +18,7 @@
               team.subteamPlacement,
               team.winResult,
               team.isSurrender,
-              as.settings.locale
+              resources.runtime.locale
             )
           }}
         </div>
@@ -188,7 +188,7 @@
 
                 <div class="truncate">
                   <template v-if="hidePrivacy">
-                    {{ lcs.gameData.championName(participant.championId) }}
+                    {{ resources.champions.name(participant.championId) }}
                   </template>
                   <template v-else>
                     {{ participant.gameName }}
@@ -204,7 +204,7 @@
               >
             </div>
             <div class="flex items-center gap-1 text-xs" v-else>
-              <span class="font-bold">{{ lcs.gameData.championName(participant.championId) }}</span>
+              <span class="font-bold">{{ resources.champions.name(participant.championId) }}</span>
             </div>
           </NTooltip>
           <div
@@ -304,8 +304,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
@@ -372,7 +371,7 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   }
 })
 
-const as = useAppCommonStore()
+const resources = useGameResourceProvider()
 const { t } = useTranslation()
 
 const tone = computed(() => {
@@ -400,8 +399,6 @@ const { teamIdentifier } = defineProps<{
 
 const { basicInfo, teams, participants, puuid, hidePrivacy, navigateToSummonerByPuuid } =
   useMatchCard()
-
-const lcs = useLeagueClientStore()
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]

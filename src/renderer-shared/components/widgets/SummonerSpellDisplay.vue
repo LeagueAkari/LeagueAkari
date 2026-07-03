@@ -1,35 +1,35 @@
 <template>
   <NPopover
-    v-if="spellId && lcs.gameData.summonerSpells[spellId]"
+    v-if="spellDisplay"
     :delay="delay"
     :disabled="disablePopover"
     :keep-alive-on-hover="keepAliveOnHover"
   >
     <template #trigger>
       <LcuImage
-        :src="lcs.gameData.summonerSpells[spellId].iconPath"
+        :src="spellDisplay.iconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="spell"
       />
     </template>
     <div style="max-width: 240px">
-      <div class="name">{{ lcs.gameData.summonerSpells[spellId].name }}</div>
+      <div class="name">{{ spellDisplay.name }}</div>
       <div class="cooldown">
         {{
           t('gameAssets.summonerSpell.cooldown', {
-            time: lcs.gameData.summonerSpells[spellId].cooldown
+            time: spellDisplay.cooldown
           })
         }}
       </div>
       <div class="level">
         {{
           t('gameAssets.summonerSpell.levelRequirement', {
-            level: lcs.gameData.summonerSpells[spellId].summonerLevel
+            level: spellDisplay.summonerLevel
           })
         }}
       </div>
-      <div class="description">{{ lcs.gameData.summonerSpells[spellId].description }}</div>
+      <div class="description">{{ spellDisplay.description }}</div>
     </div>
   </NPopover>
   <div
@@ -41,13 +41,18 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
+import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
 
-const { size = 20, delay = 50 } = defineProps<{
+const {
+  spellId,
+  size = 20,
+  delay = 50
+} = defineProps<{
   disablePopover?: boolean
   spellId?: number
   size?: number
@@ -57,7 +62,14 @@ const { size = 20, delay = 50 } = defineProps<{
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
+const spellDisplay = computed(() => {
+  if (!spellId) {
+    return null
+  }
+
+  return resources.summonerSpells.display(spellId)
+})
 </script>
 
 <style scoped>

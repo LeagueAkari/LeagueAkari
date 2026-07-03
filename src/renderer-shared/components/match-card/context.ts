@@ -17,7 +17,6 @@ import {
 } from 'vue'
 
 export type MatchCardContext = {
-  theme: Ref<'light' | 'dark'>
   isExpanded: Ref<boolean>
   puuid: Ref<string | undefined>
   details: Ref<LcuOrSgpGameDetails | null | undefined>
@@ -56,7 +55,6 @@ export function useMatchCard(): MatchCardContext {
 }
 
 export function provideMatchCard(props: {
-  theme: MaybeRefOrGetter<'light' | 'dark'>
   isExpanded: MaybeRefOrGetter<boolean>
   summary: MaybeRefOrGetter<LcuOrSgpGameSummary>
   puuid: MaybeRefOrGetter<string | undefined>
@@ -133,7 +131,6 @@ export function provideMatchCard(props: {
 
   provide(MatchCardContextKey, {
     // props pass-through
-    theme: toRef(props.theme),
     isExpanded: toRef(props.isExpanded),
     summary: toRef(props.summary),
     details: toRef(props.details),

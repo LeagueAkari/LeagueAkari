@@ -43,7 +43,7 @@
               class="flex items-center justify-center"
               :title="
                 hidePrivacy
-                  ? lcs.gameData.championName(p.championId)
+                  ? resources.champions.name(p.championId)
                   : `${p.identity.gameName} #${p.identity.tagLine}`
               "
             >
@@ -113,7 +113,7 @@
 
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { refDebounced } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -148,7 +148,7 @@ const handleHeaderWheel = (e: WheelEvent) => {
   })
 }
 
-const lcs = useLeagueClientStore()
+const resources = useGameResourceProvider()
 const rawStats = useRawDetails()
 const valueRenderer = useValueRenderer()
 const filterText = shallowRef('')
