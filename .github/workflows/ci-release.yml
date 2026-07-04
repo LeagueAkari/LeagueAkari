@@ -188,11 +188,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release delete "$CI_RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
 
+      - name: Prepare CI release metadata
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          echo "CI_RELEASE_NAME=League Akari Dev Prerelease #${GITHUB_RUN_NUMBER} (${short_sha})" >> "$GITHUB_ENV"
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.CI_RELEASE_TAG }}
-          name: CI Build dev @ ${{ github.sha }}
+          name: ${{ env.CI_RELEASE_NAME }}
           target_commitish: ${{ github.sha }}
           prerelease: true
           make_latest: false
