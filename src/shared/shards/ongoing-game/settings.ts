@@ -21,6 +21,7 @@ export interface OngoingGamePanelPlayerCardTagSettings {
   showAverageTeamDamageTag: boolean
   showAverageTeamDamageTakenTag: boolean
   showAverageTeamGoldTag: boolean
+  showAverageCsPerMinuteTag: boolean
   showAverageDamageGoldEfficiencyTag: boolean
   showAverageEnemyMissingPingsTag: boolean
   showAverageVisionScoreTag: boolean
@@ -65,6 +66,7 @@ export const DEFAULT_ONGOING_GAME_PANEL_PLAYER_CARD_TAG_SETTINGS =
     showAverageTeamDamageTag: false,
     showAverageTeamDamageTakenTag: false,
     showAverageTeamGoldTag: false,
+    showAverageCsPerMinuteTag: false,
     showAverageDamageGoldEfficiencyTag: false,
     showAverageEnemyMissingPingsTag: false,
     showAverageVisionScoreTag: false,

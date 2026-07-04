@@ -282,6 +282,18 @@
               {{ t('settings.ongoingGame.playerCardTags.tags.showAverageTeamGoldTag.label') }}
             </NCheckbox>
             <NCheckbox
+              :checked="ogs.settings.playerCardTags.showAverageCsPerMinuteTag"
+              @update:checked="
+                (val) =>
+                  og.setPlayerCardTags({
+                    ...ogs.settings.playerCardTags,
+                    showAverageCsPerMinuteTag: val
+                  })
+              "
+            >
+              {{ t('settings.ongoingGame.playerCardTags.tags.showAverageCsPerMinuteTag.label') }}
+            </NCheckbox>
+            <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageDamageGoldEfficiencyTag"
               @update:checked="
                 (val) =>

@@ -4,7 +4,7 @@
       <template #trigger>
         <div
           class="relative h-5 w-5 cursor-pointer transition-[filter] hover:brightness-110"
-          @click.stop="() => navigateToSummonerByPuuid(puuid)"
+          @click.stop="() => collectByChampion(c.id)"
         >
           <ChampionIcon
             :ring-color="
@@ -136,6 +136,15 @@ const championMastery = computed(() => ongoingGame.value.championMastery[puuid])
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const formatMasteryTime = (value: number) => dayjs(value).format('YYYY-MM-DD')
+
+const collectByChampion = (championId: number) => {
+  navigateToSummonerByPuuid(puuid, {
+    matchHistory: {
+      collectByChampionId: championId,
+      expectedCount: ongoingGame.value.settings.matchHistoryLoadCount
+    }
+  })
+}
 
 const championUsage = computed(() => {
   if (ongoingGame.value.settings.showChampionUsage === 'recent') {

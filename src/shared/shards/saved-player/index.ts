@@ -1,6 +1,8 @@
 /**
  * 遇到的对局记录
  */
+export const ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
+
 export interface EncounteredGame {
   id: number
   gameId: number

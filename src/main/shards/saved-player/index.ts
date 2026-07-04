@@ -1,14 +1,15 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import {
-  EncounteredGameQueryDto,
-  EncounteredGameSaveDto,
-  OrderByDto,
-  PaginationDto,
-  QueryAllSavedPlayersDto,
-  SavedPlayerQueryDto,
-  SavedPlayerSaveDto,
-  UpdateTagDto,
-  WithEncounteredGamesQueryDto
+  ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE,
+  type EncounteredGameQueryDto,
+  type EncounteredGameSaveDto,
+  type OrderByDto,
+  type PaginationDto,
+  type QueryAllSavedPlayersDto,
+  type SavedPlayerQueryDto,
+  type SavedPlayerSaveDto,
+  type UpdateTagDto,
+  type WithEncounteredGamesQueryDto
 } from '@shared/shards/saved-player'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
@@ -25,7 +26,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
   static id = SAVED_PLAYER_MAIN_NAMESPACE
   static dependencies = [AkariIpcMain.id, StorageMain.id]
 
-  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
+  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE
 
   private readonly context: SavedPlayerMainContext
   private readonly taggedPlayersFileService: TaggedPlayersFileService

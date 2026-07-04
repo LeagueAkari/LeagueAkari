@@ -1,4 +1,5 @@
 import type {
+  OngoingGamePanelMatchHistory,
   OngoingGamePanelPositionAssignment,
   OngoingGamePanelSummonerSpellSelection
 } from '@renderer-shared/providers/ongoing-game/types'
@@ -17,6 +18,7 @@ export interface PlayerCardTagContext {
   analysis: AggregatedAnalysis | null
   summoners: Record<string, SummonerInfo>
   savedInfo: SavedInfo | null
+  matchHistory: Record<string, OngoingGamePanelMatchHistory>
   premadeTeamId?: string
   positionAssignment?: OngoingGamePanelPositionAssignment
   spells?: OngoingGamePanelSummonerSpellSelection

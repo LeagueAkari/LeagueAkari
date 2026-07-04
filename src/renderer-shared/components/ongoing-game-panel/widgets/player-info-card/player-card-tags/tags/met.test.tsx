@@ -89,8 +89,8 @@ function createParticipant(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function createContext(): PlayerCardTagContext {
-  const savedInfo: SavedInfo = {
+function createSavedInfo(overrides: Partial<SavedInfo> = {}): SavedInfo {
+  return {
     puuid: 'opponent-puuid',
     selfPuuid: 'self-puuid',
     region: 'NA',
@@ -115,19 +115,26 @@ function createContext(): PlayerCardTagContext {
       page: 1,
       pageSize: 5,
       total: 1
-    }
+    },
+    ...overrides
   }
+}
 
-  const cachedGame = {
-    gameId: 1001,
+function createSgpGame(
+  gameId: number,
+  gameCreation = 0,
+  opponentOverrides: Record<string, unknown> = {}
+) {
+  return {
+    gameId,
     source: 'sgp',
     data: {
       json: {
         endOfGameResult: 'GameComplete',
-        gameCreation: 0,
+        gameCreation,
         gameDuration: 1200,
         gameEndTimestamp: 1200,
-        gameId: 1001,
+        gameId,
         gameMode: 'CLASSIC',
         gameName: 'game',
         gameStartTimestamp: 0,
@@ -144,7 +151,8 @@ function createContext(): PlayerCardTagContext {
             participantId: 2,
             puuid: 'opponent-puuid',
             riotIdGameName: 'Opponent',
-            summonerName: 'Opponent'
+            summonerName: 'Opponent',
+            ...opponentOverrides
           })
         ],
         platformId: 'NA1',
@@ -156,6 +164,13 @@ function createContext(): PlayerCardTagContext {
       metadata: {}
     }
   } as unknown as LcuOrSgpGameSummary
+}
+
+function createContext(
+  overrides: Partial<PlayerCardTagContext> & { matchHistory?: Record<string, unknown> } = {}
+): PlayerCardTagContext {
+  const savedInfo = createSavedInfo()
+  const cachedGame = createSgpGame(1001)
 
   return {
     puuid: 'opponent-puuid',
@@ -164,11 +179,12 @@ function createContext(): PlayerCardTagContext {
     analysis: null,
     summoners: {},
     savedInfo,
+    matchHistory: {},
     cachedGames: {
       1001: cachedGame
     },
     locale: 'zh-CN',
-    t: ((key: string) => {
+    t: ((key: string, options?: { gameId?: string | number }) => {
       if (key === 'ongoingGame.playerCard.metPopover.winResult.win') {
         return 'WIN'
       }
@@ -177,12 +193,29 @@ function createContext(): PlayerCardTagContext {
         return 'ALLY'
       }
 
+      if (key === 'ongoingGame.playerCard.metPopover.inspectByGameId') {
+        return `GAME:${options?.gameId ?? ''};`
+      }
+
+      if (key === 'ongoingGame.playerCard.met') {
+        return 'MET'
+      }
+
+      if (key === 'ongoingGame.playerCard.metLastGameTeammate') {
+        return 'LAST_ALLY'
+      }
+
+      if (key === 'ongoingGame.playerCard.metLastGameOpponent') {
+        return 'LAST_OPPONENT'
+      }
+
       return key
     }) as PlayerCardTagContext['t'],
     masked: (text) => text,
     navigateToSummonerByPuuid: () => {},
-    previewEncounteredGame: () => {}
-  }
+    previewEncounteredGame: () => {},
+    ...overrides
+  } as PlayerCardTagContext
 }
 
 describe('MET_TAG', () => {
@@ -191,5 +224,129 @@ describe('MET_TAG', () => {
 
     expect(rendered).not.toBeNull()
     expect(collectText(rendered!.popover!.content)).not.toContain('WIN0ALLY')
+  })
+
+  it('renders spaces around slashes in encountered game kda values', () => {
+    const rendered = MET_TAG.render(createContext())
+
+    expect(rendered).not.toBeNull()
+    const text = collectText(rendered!.popover!.content)
+    expect(text).toContain('4 / 2 / 8')
+    expect(text).toContain('6 / 3 / 5')
+    expect(text).not.toContain('4/2/8')
+    expect(text).not.toContain('6/3/5')
+  })
+
+  it('renders met tag from recent match history when saved info is absent', () => {
+    const recentGame = createSgpGame(2001, 1000)
+    const rendered = MET_TAG.render(
+      createContext({
+        savedInfo: null,
+        matchHistory: {
+          'opponent-puuid': {
+            data: [recentGame]
+          }
+        },
+        cachedGames: {
+          2001: recentGame
+        }
+      })
+    )
+
+    expect(rendered).not.toBeNull()
+    expect(collectText(rendered!.popover!.content)).toContain('GAME:2001;')
+  })
+
+  it('keeps only forty merged encountered games', () => {
+    const games = Array.from({ length: 45 }, (_, index) => createSgpGame(2000 + index, index))
+    const cachedGames = Object.fromEntries(games.map((game) => [game.gameId, game]))
+    const rendered = MET_TAG.render(
+      createContext({
+        savedInfo: null,
+        matchHistory: {
+          'opponent-puuid': {
+            data: games
+          }
+        },
+        cachedGames
+      })
+    )
+
+    expect(rendered).not.toBeNull()
+    const text = collectText(rendered!.popover!.content)
+    expect(text.match(/GAME:/g)).toHaveLength(40)
+    expect(text).toContain('GAME:2044;')
+    expect(text).not.toContain('GAME:2000;')
+  })
+
+  it('renders last-game teammate when both players latest match is the encountered same-team match', () => {
+    const lastGame = createSgpGame(3001, 3000)
+    const rendered = MET_TAG.render(
+      createContext({
+        savedInfo: null,
+        matchHistory: {
+          'self-puuid': {
+            data: [lastGame]
+          },
+          'opponent-puuid': {
+            data: [lastGame]
+          }
+        },
+        cachedGames: {
+          3001: lastGame
+        }
+      })
+    )
+
+    expect(rendered).not.toBeNull()
+    expect(collectText(rendered!.label)).toBe('LAST_ALLY')
+  })
+
+  it('renders last-game opponent when both players latest match is the encountered opposite-team match', () => {
+    const lastGame = createSgpGame(3001, 3000, { teamId: 200 })
+    const rendered = MET_TAG.render(
+      createContext({
+        savedInfo: null,
+        matchHistory: {
+          'self-puuid': {
+            data: [lastGame]
+          },
+          'opponent-puuid': {
+            data: [lastGame]
+          }
+        },
+        cachedGames: {
+          3001: lastGame
+        }
+      })
+    )
+
+    expect(rendered).not.toBeNull()
+    expect(collectText(rendered!.label)).toBe('LAST_OPPONENT')
+  })
+
+  it('keeps met label when self has played a newer game after the encounter', () => {
+    const encounterGame = createSgpGame(3001, 3000, { teamId: 200 })
+    const newerSelfGame = createSgpGame(3002, 4000, { puuid: 'other-puuid' })
+    const rendered = MET_TAG.render(
+      createContext({
+        savedInfo: null,
+        matchHistory: {
+          'self-puuid': {
+            data: [newerSelfGame, encounterGame]
+          },
+          'opponent-puuid': {
+            data: [encounterGame]
+          }
+        },
+        cachedGames: {
+          3001: encounterGame,
+          3002: newerSelfGame
+        }
+      })
+    )
+
+    expect(rendered).not.toBeNull()
+    expect(collectText(rendered!.label)).toBe('MET')
   })
 })

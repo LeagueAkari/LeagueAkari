@@ -10,12 +10,25 @@
 <script lang="ts" setup>
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
-import type { ChartData, ChartOptions } from 'chart.js'
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Title,
+  Tooltip,
+  type ChartData,
+  type ChartOptions
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 
 import { useMatchCard } from '../context'
 import { getTeamColor } from '../utils/theme'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title, ChartDataLabels)
 
 const resources = useGameResourceProvider()
 

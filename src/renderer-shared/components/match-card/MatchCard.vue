@@ -16,7 +16,6 @@ import { onErrorCaptured } from 'vue'
 
 import MatchCardDetails from './MatchCardDetails.vue'
 import MatchCardOverview from './MatchCardOverview.vue'
-import { registerChartJS } from './chartjs-register'
 import { provideMatchCard } from './context'
 
 const {
@@ -45,7 +44,10 @@ const emits = defineEmits<{
   dryRunOngoingGame: [draft: DraftOptions]
 }>()
 
-const isExpanded = defineModel<boolean>('isExpanded', { required: false, default: false })
+const isExpanded = defineModel<boolean>('isExpanded', {
+  required: false,
+  default: false
+})
 
 provideMatchCard({
   isExpanded: () => isExpanded.value,
@@ -77,8 +79,6 @@ provideMatchCard({
 onErrorCaptured((error) => {
   console.error(error)
 })
-
-registerChartJS()
 
 defineExpose({
   setExpanded: (expanded: boolean) => {

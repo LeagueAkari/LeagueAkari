@@ -7,12 +7,34 @@
 <script setup lang="ts">
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { noZero } from '@shared/data-adapter/utils'
-import type { ChartData, ChartOptions, TooltipItem } from 'chart.js'
+import {
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LineElement,
+  PointElement,
+  RadialLinearScale,
+  Tooltip,
+  type ChartData,
+  type ChartOptions,
+  type TooltipItem
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 import { Radar } from 'vue-chartjs'
 
 import { useMatchCard } from '../context'
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+)
 
 const { puuid } = defineProps<{
   puuid?: string
@@ -187,12 +209,20 @@ const data = computed<ChartData<'radar'>>(() => {
       t('matchCard.radar.damage', {
         value: percentage.value.damageDealtToChampions.toLocaleString()
       }),
-      t('matchCard.radar.taken', { value: percentage.value.damageTaken.toLocaleString() }),
-      t('matchCard.radar.gold', { value: percentage.value.goldEarned.toLocaleString() }),
+      t('matchCard.radar.taken', {
+        value: percentage.value.damageTaken.toLocaleString()
+      }),
+      t('matchCard.radar.gold', {
+        value: percentage.value.goldEarned.toLocaleString()
+      }),
       t('matchCard.radar.cs', { value: percentage.value.cs.toLocaleString() }),
       t('matchCard.radar.kda', { value: percentage.value.kda.toFixed(2) }),
-      t('matchCard.radar.kp', { value: (percentage.value.killParticipation * 100).toFixed(0) }),
-      t('matchCard.radar.heal', { value: percentage.value.totalHeal.toLocaleString() })
+      t('matchCard.radar.kp', {
+        value: (percentage.value.killParticipation * 100).toFixed(0)
+      }),
+      t('matchCard.radar.heal', {
+        value: percentage.value.totalHeal.toLocaleString()
+      })
     ],
     datasets: [
       {

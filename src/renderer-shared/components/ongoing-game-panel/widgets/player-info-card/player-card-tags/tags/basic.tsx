@@ -2,7 +2,7 @@ import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
 import type { VNode } from 'vue'
 
-import type { PlayerCardTagDefinition, PlayerCardTagPopover } from '../types'
+import type { PlayerCardTagContext, PlayerCardTagDefinition, PlayerCardTagPopover } from '../types'
 
 export type EasyGankTag = {
   kind: 'hard-gank' | 'gankable' | 'easy-gank' | 'very-easy-gank'
@@ -13,12 +13,6 @@ export type EasyGankTag = {
     | 'ongoingGame.playerCard.veryEasyGank'
   times: number
   count: number
-}
-
-export type SuspiciousFlashPositionTag = {
-  isSuspicious: boolean
-  flashOnD: number
-  flashOnF: number
 }
 
 export type KillDamageEfficiencyTag = {
@@ -60,6 +54,9 @@ const EASY_GANK_TAG_CLASSES = {
   'easy-gank': 'bg-[#8f541e] text-white',
   'very-easy-gank': 'bg-[#a81919] text-white'
 }
+
+const KILL_DAMAGE_EFFICIENCY_LOW_THRESHOLD = 0.65
+const KILL_DAMAGE_EFFICIENCY_HIGH_THRESHOLD = 1.35
 
 export function getIsCurrentJungler(
   assignedPosition: string | undefined,
@@ -123,27 +120,17 @@ export function getEasyGankTag(
   }
 }
 
-export function getSuspiciousFlashPositionTag(
-  analysis: AggregatedAnalysis
-): SuspiciousFlashPositionTag {
-  return {
-    isSuspicious: Boolean(analysis.spells.flashOnD && analysis.spells.flashOnF),
-    flashOnD: analysis.spells.flashOnD,
-    flashOnF: analysis.spells.flashOnF
-  }
-}
-
 export function getKillDamageEfficiencyTag(analysis: AggregatedAnalysis): KillDamageEfficiencyTag {
   const kde = analysis.summary.avgKillDamageEfficiency
 
-  if (kde > 1.2) {
+  if (kde > KILL_DAMAGE_EFFICIENCY_HIGH_THRESHOLD) {
     return {
       kind: 'high',
       value: kde
     }
   }
 
-  if (kde < 0.8) {
+  if (kde < KILL_DAMAGE_EFFICIENCY_LOW_THRESHOLD) {
     return {
       kind: 'low',
       value: kde
@@ -293,37 +280,6 @@ export const LOSING_STREAK_TAG: PlayerCardTagDefinition = {
   }
 }
 
-export const SUSPICIOUS_FLASH_POSITION_TAG: PlayerCardTagDefinition = {
-  id: 'suspicious-flash-position',
-  render: (ctx) => {
-    const analysis = ctx.analysis
-
-    if (!ctx.settings.showSuspiciousFlashPositionTag || !analysis) {
-      return null
-    }
-
-    const tag = getSuspiciousFlashPositionTag(analysis)
-
-    if (!tag.isSuspicious) {
-      return null
-    }
-
-    return {
-      label: (
-        <div class={tagClass('bg-[#3a1bb8] text-white')}>
-          {ctx.t('ongoingGame.playerCard.suspiciousFlashPosition')}
-        </div>
-      ),
-      popover: textPopover(
-        ctx.t('ongoingGame.playerCard.suspiciousFlashPositionPopover', {
-          dCount: tag.flashOnD,
-          fCount: tag.flashOnF
-        })
-      )
-    }
-  }
-}
-
 export const EASY_GANK_TAG: PlayerCardTagDefinition = {
   id: 'easy-gank',
   render: (ctx) => {
@@ -463,6 +419,65 @@ export const AVERAGE_TEAM_GOLD_TAG: PlayerCardTagDefinition = {
   }
 }
 
+export const AVERAGE_CS_PER_MINUTE_TAG: PlayerCardTagDefinition = {
+  id: 'average-cs-per-minute',
+  render: (ctx) => {
+    const analysis = ctx.analysis
+
+    if (!ctx.settings.showAverageCsPerMinuteTag || !analysis) {
+      return null
+    }
+
+    const value = analysis.summary.avgCsPerMinute
+    const teamShare = analysis.summary.avgCsPercentageOfTeam
+
+    return {
+      label: (
+        <div class={tagClass('bg-[#5a4a1f] text-white')}>
+          {ctx.t('ongoingGame.playerCard.csPerMinute', {
+            value: value.toFixed(1)
+          })}
+        </div>
+      ),
+      popover: textPopover(
+        <div class="flex flex-col gap-1">
+          <div>
+            {ctx.t('ongoingGame.playerCard.csPerMinutePopover', {
+              value: value.toFixed(2),
+              count: analysis.count
+            })}
+          </div>
+          <div>
+            {ctx.t('ongoingGame.playerCard.csTeamSharePopover', {
+              rate: (teamShare * 100).toFixed(2)
+            })}
+          </div>
+        </div>
+      )
+    }
+  }
+}
+
+const renderDamageGoldEfficiencyPopover = (
+  ctx: PlayerCardTagContext,
+  analysis: AggregatedAnalysis
+) => (
+  <div class="max-w-72 text-xs leading-5">
+    <div class="text-black/75 dark:text-gray-200">
+      {ctx.t('ongoingGame.playerCard.damageGoldEfficiencyPopover', {
+        rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(2),
+        count: analysis.count
+      })}
+    </div>
+    <div class="mt-1 text-black/55 dark:text-white/55">
+      {ctx.t('ongoingGame.playerCard.damageGoldEfficiencyPopoverDefinition')}
+    </div>
+    <div class="mt-1 text-black/55 dark:text-white/55">
+      {ctx.t('ongoingGame.playerCard.damageGoldEfficiencyPopoverUsage')}
+    </div>
+  </div>
+)
+
 export const AVERAGE_DAMAGE_GOLD_EFFICIENCY_TAG: PlayerCardTagDefinition = {
   id: 'average-damage-gold-efficiency',
   render: (ctx) => {
@@ -480,12 +495,9 @@ export const AVERAGE_DAMAGE_GOLD_EFFICIENCY_TAG: PlayerCardTagDefinition = {
           })}
         </div>
       ),
-      popover: textPopover(
-        ctx.t('ongoingGame.playerCard.damageGoldEfficiencyPopover', {
-          rate: (analysis.summary.avgDamageGoldEfficiency * 100).toFixed(2),
-          count: analysis.count
-        })
-      )
+      popover: {
+        content: renderDamageGoldEfficiencyPopover(ctx, analysis)
+      }
     }
   }
 }
@@ -593,12 +605,12 @@ export const BASIC_PLAYER_CARD_TAGS: PlayerCardTagDefinition[] = [
   PRIVACY_TAG,
   WINNING_STREAK_TAG,
   LOSING_STREAK_TAG,
-  SUSPICIOUS_FLASH_POSITION_TAG,
   EASY_GANK_TAG,
   SOLO_KILLS_TAG,
   AVERAGE_TEAM_DAMAGE_TAG,
   AVERAGE_TEAM_DAMAGE_TAKEN_TAG,
   AVERAGE_TEAM_GOLD_TAG,
+  AVERAGE_CS_PER_MINUTE_TAG,
   AVERAGE_DAMAGE_GOLD_EFFICIENCY_TAG,
   AVERAGE_ENEMY_MISSING_PINGS_TAG,
   AVERAGE_VISION_SCORE_TAG,

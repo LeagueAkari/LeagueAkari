@@ -48,6 +48,7 @@ export function usePlayerCardTagContext(puuid: string) {
     analysis: analysis.value,
     summoners: ongoingGame.value.summoner,
     savedInfo: savedInfo.value,
+    matchHistory: ongoingGame.value.matchHistory,
     premadeTeamId: premadeTeamId.value,
     positionAssignment: ongoingGame.value.positionAssignments[puuid],
     spells: ongoingGame.value.spells[puuid],

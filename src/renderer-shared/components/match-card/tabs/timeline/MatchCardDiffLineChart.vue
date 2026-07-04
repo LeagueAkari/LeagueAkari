@@ -94,6 +94,17 @@
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox, NCheckboxGroup, NRadio, NRadioGroup, NScrollbar } from 'naive-ui'
 import { computed, ref, watch, watchEffect } from 'vue'
@@ -102,6 +113,17 @@ import { Line } from 'vue-chartjs'
 import { useMatchCard } from '../../context'
 import { useTeamName } from '../../utils/text'
 import { getTeamColor, playerColors } from '../../utils/theme'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+  Title,
+  ChartDataLabels
+)
 
 const resources = useGameResourceProvider()
 const { t } = useTranslation()

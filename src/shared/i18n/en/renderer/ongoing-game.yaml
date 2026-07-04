@@ -181,9 +181,15 @@ ongoingGame:
     teamGoldShare: Gold {{rate}}%
     teamGoldSharePopover_one: In the recent {{count}} game, this player's average team gold share is {{rate}}%
     teamGoldSharePopover_other: In the recent {{count}} games, this player's average team gold share is {{rate}}%
+    csPerMinute: '{{value}} CS / min'
+    csPerMinutePopover_one: In the recent {{count}} game, this player averaged {{value}} CS per minute.
+    csPerMinutePopover_other: In the recent {{count}} games, this player averaged {{value}} CS per minute.
+    csTeamSharePopover: Their average team CS share is {{rate}}%.
     damageGoldEfficiency: Dmg-Gold {{rate}}%
     damageGoldEfficiencyPopover_one: In the recent {{count}} game, this player's average damage to gold efficiency is {{rate}}%
     damageGoldEfficiencyPopover_other: In the recent {{count}} games, this player's average damage to gold efficiency is {{rate}}%
+    damageGoldEfficiencyPopoverDefinition: Damage-gold efficiency = total champion damage dealt divided by gold earned, showing how much champion damage each gold converts into.
+    damageGoldEfficiencyPopoverUsage: Use it to judge how efficiently the player converts gold into champion damage.
     enemyMissingPings: Missing pings {{count}}
     enemyMissingPingsPopover_one: This player has sent enemy missing pings an average of {{count}} time per game
     enemyMissingPingsPopover_other: This player has sent enemy missing pings an average of {{count}} times per game
@@ -218,8 +224,18 @@ ongoingGame:
     winningStreakPopover_other: Currently on a winning streak of {{count}} games. Great job!
     losingStreakPopover_one: Currently on a losing streak of {{count}} game.
     losingStreakPopover_other: Currently on a losing streak of {{count}} games.
+    akariScorePopoverDescription: Akari Score summarizes selected recent player metrics and is for reference only.
     suspiciousFlashPosition: SusFlash
-    suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
+    suspiciousFlashPositionPopoverTitle: Flash Position Distribution
+    suspiciousFlashPositionPopoverDescription: This player has recently used Flash on both D and F, so the key preference looks inconsistent.
+    suspiciousFlashPositionPopoverDLabel: D Slot
+    suspiciousFlashPositionPopoverFLabel: F Slot
+    suspiciousFlashPositionPopoverDCount_one: D slot {{count}} game ({{rate}}%)
+    suspiciousFlashPositionPopoverDCount_other: D slot {{count}} games ({{rate}}%)
+    suspiciousFlashPositionPopoverFCount_one: F slot {{count}} game ({{rate}}%)
+    suspiciousFlashPositionPopoverFCount_other: F slot {{count}} games ({{rate}}%)
+    suspiciousFlashPositionPopoverTotal_one: Based on the latest {{count}} analyzed game
+    suspiciousFlashPositionPopoverTotal_other: Based on the latest {{count}} analyzed games
     hardGank: Hard to Gank
     gankable: Gankable
     easyGank: Easy Gank
@@ -253,6 +269,8 @@ ongoingGame:
     premade: Team {{team}}
     highWinRate: High W/R
     met: Met
+    metLastGameTeammate: Last Ally
+    metLastGameOpponent: Last Opponent
     private: Private
     winningStreak_one: '{{count}} Win'
     winningStreak_other: '{{count}} Wins'

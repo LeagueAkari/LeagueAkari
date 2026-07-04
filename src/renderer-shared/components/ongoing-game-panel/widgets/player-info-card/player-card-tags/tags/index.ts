@@ -1,6 +1,7 @@
 import type { PlayerCardTagDefinition } from '../types'
 import { AKARI_SCORE_TAG } from './akari-score'
 import {
+  AVERAGE_CS_PER_MINUTE_TAG,
   AVERAGE_DAMAGE_GOLD_EFFICIENCY_TAG,
   AVERAGE_ENEMY_MISSING_PINGS_TAG,
   AVERAGE_KILL_DAMAGE_EFFICIENCY_TAG,
@@ -15,11 +16,11 @@ import {
   PRIVACY_TAG,
   SELF_TAG,
   SOLO_KILLS_TAG,
-  SUSPICIOUS_FLASH_POSITION_TAG,
   WINNING_STREAK_TAG
 } from './basic'
 import { GREAT_PERFORMANCE_TAG } from './great-performance'
 import { MET_TAG } from './met'
+import { SUSPICIOUS_FLASH_POSITION_TAG } from './suspicious-flash-position'
 import { TAGGED_TAG } from './tagged'
 
 export const PLAYER_CARD_TAGS: PlayerCardTagDefinition[] = [
@@ -38,6 +39,7 @@ export const PLAYER_CARD_TAGS: PlayerCardTagDefinition[] = [
   AVERAGE_TEAM_DAMAGE_TAG,
   AVERAGE_TEAM_DAMAGE_TAKEN_TAG,
   AVERAGE_TEAM_GOLD_TAG,
+  AVERAGE_CS_PER_MINUTE_TAG,
   AVERAGE_DAMAGE_GOLD_EFFICIENCY_TAG,
   AVERAGE_ENEMY_MISSING_PINGS_TAG,
   AVERAGE_VISION_SCORE_TAG,

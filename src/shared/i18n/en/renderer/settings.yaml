@@ -255,6 +255,8 @@ settings:
           label: Flash Position Anomaly Detection
         showAverageTeamGoldTag:
           label: Average Team Gold
+        showAverageCsPerMinuteTag:
+          label: Average CS per Minute
         showGreatPerformanceTag:
           label: Outstanding Performance Tag
         showMetTag:

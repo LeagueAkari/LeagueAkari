@@ -253,6 +253,8 @@ settings:
           label: 闪现异常位置检测
         showAverageTeamGoldTag:
           label: 场均队伍经济
+        showAverageCsPerMinuteTag:
+          label: 分均补兵
         showGreatPerformanceTag:
           label: 优异标记
         showMetTag:
