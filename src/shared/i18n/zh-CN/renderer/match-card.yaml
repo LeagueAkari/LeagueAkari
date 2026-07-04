@@ -282,6 +282,7 @@ matchCard:
     ignored: 忽略
     game-state: 游戏状态
   statKeys:
+    akariScore: Akari Score
     kills: 击杀
     deaths: 死亡
     assists: 助攻

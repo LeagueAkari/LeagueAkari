@@ -284,6 +284,7 @@ matchCard:
     ignored: Ignored
     game-state: Game State
   statKeys:
+    akariScore: Akari Score
     kills: Kills
     deaths: Deaths
     assists: Assists
