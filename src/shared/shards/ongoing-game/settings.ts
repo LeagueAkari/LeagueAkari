@@ -16,7 +16,7 @@ export interface OngoingGamePanelPlayerCardTagSettings {
   showWinningStreakTag: boolean
   showLosingStreakTag: boolean
   showSoloKillsTag: boolean
-  showSoloDeathsTag: boolean
+  showEasyGankTag: boolean
   showGreatPerformanceTag: boolean
   showAverageTeamDamageTag: boolean
   showAverageTeamDamageTakenTag: boolean
@@ -60,7 +60,7 @@ export const DEFAULT_ONGOING_GAME_PANEL_PLAYER_CARD_TAG_SETTINGS =
     showWinningStreakTag: true,
     showLosingStreakTag: true,
     showSoloKillsTag: true,
-    showSoloDeathsTag: true,
+    showEasyGankTag: true,
     showGreatPerformanceTag: true,
     showAverageTeamDamageTag: false,
     showAverageTeamDamageTakenTag: false,

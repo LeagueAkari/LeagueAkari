@@ -184,7 +184,10 @@ ongoingGame:
       gameId: 对局 ID
       inspectByGameId: 查看 {{gameId}}
       date: 对局日期
-      gameStats: 对局详情
+      result: 结果
+      relation: 关系
+      self: 自己
+      encounteredPlayer: 该玩家
       winResult:
         abort: 终止
         loss: 失败

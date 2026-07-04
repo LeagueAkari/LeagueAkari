@@ -22,7 +22,6 @@ import {
 } from './context'
 import { OngoingGameIpcHandlers } from './ipc-handlers'
 import { OngoingGameMatchHistoryLoader } from './match-history-loader'
-import { restorePlayerCardTagsSetting } from './player-card-tags'
 import { OngoingGamePlayerDataLoader } from './player-data-loader'
 import { OngoingGameSideEffectsController } from './side-effects-controller'
 import { OngoingGameSettings, OngoingGameState } from './state'
@@ -105,10 +104,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           default: this.settings.showJunglePathingForAllPlayers
         },
         autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
-        playerCardTags: {
-          default: this.settings.playerCardTags,
-          restore: ({ value, defaultValue }) => restorePlayerCardTagsSetting(value, defaultValue)
-        },
+        playerCardTags: { default: this.settings.playerCardTags },
         queryInLobbyPhase: { default: this.settings.queryInLobbyPhase },
         premadeTeamInferMatchCountThreshold: {
           default: this.settings.premadeTeamInferMatchCountThreshold

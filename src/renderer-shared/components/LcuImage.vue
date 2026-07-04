@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useGameResourceProvider } from '@renderer-shared/providers/game-resource/context'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{

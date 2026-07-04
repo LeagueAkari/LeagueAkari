@@ -243,8 +243,8 @@ settings:
           label: 连败场次
         showSoloKillsTag:
           label: 场均单杀次数
-        showSoloDeathsTag:
-          label: 场均被单杀次数
+        showEasyGankTag:
+          label: 好抓/难抓标记
         showAverageTeamDamageTag:
           label: 场均队伍伤害
         showAverageTeamDamageTakenTag:

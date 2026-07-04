@@ -221,6 +221,15 @@
               {{ t('settings.ongoingGame.playerCardTags.tags.showSoloKillsTag.label') }}
             </NCheckbox>
             <NCheckbox
+              :checked="ogs.settings.playerCardTags.showEasyGankTag"
+              @update:checked="
+                (val) =>
+                  og.setPlayerCardTags({ ...ogs.settings.playerCardTags, showEasyGankTag: val })
+              "
+            >
+              {{ t('settings.ongoingGame.playerCardTags.tags.showEasyGankTag.label') }}
+            </NCheckbox>
+            <NCheckbox
               :checked="ogs.settings.playerCardTags.showAverageTeamDamageTag"
               @update:checked="
                 (val) =>

@@ -245,8 +245,8 @@ settings:
           label: Losing Streak
         showSoloKillsTag:
           label: Average Solo Kills Per Game
-        showSoloDeathsTag:
-          label: Average Solo Deaths Per Game
+        showEasyGankTag:
+          label: Easy/Hard Gank Tag
         showAverageTeamDamageTag:
           label: Average Team Damage
         showAverageTeamDamageTakenTag:

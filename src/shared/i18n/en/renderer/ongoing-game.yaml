@@ -201,7 +201,10 @@ ongoingGame:
       gameId: Game ID
       inspectByGameId: Inspect {{gameId}}
       date: Game Date
-      gameStats: Game Stats
+      result: Result
+      relation: Side
+      self: Self
+      encounteredPlayer: Player
       winResult:
         abort: Abort
         loss: Loss

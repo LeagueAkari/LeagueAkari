@@ -20,7 +20,7 @@
     <PlayerInfoCardStats :puuid="puuid" />
     <PlayerInfoCardJunglePathing :puuid="puuid" />
 
-    <PlayerCardTagsArea :puuid="puuid" :premade-team-id="premadeTeamId" />
+    <PlayerCardTagsArea :puuid="puuid" />
     <PlayerInfoCardChampionUsage :puuid="puuid" />
     <PlayerInfoCardMatchHistory :puuid="puuid" />
   </div>
@@ -36,7 +36,7 @@ import {
   PREMADE_TEAM_COLORS_LIGHT
 } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
-import PlayerCardTagsArea from './PlayerCardTagsArea.vue'
+import PlayerCardTagsArea from './player-card-tags/TagsArea.vue'
 import PlayerInfoCardChampionUsage from './PlayerInfoCardChampionUsage.vue'
 import PlayerInfoCardHeader from './PlayerInfoCardHeader.vue'
 import PlayerInfoCardJunglePathing from './PlayerInfoCardJunglePathing.vue'
