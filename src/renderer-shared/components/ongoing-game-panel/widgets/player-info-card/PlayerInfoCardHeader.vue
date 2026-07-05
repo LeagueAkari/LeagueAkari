@@ -32,20 +32,23 @@
           >
             <template #trigger>
               <div class="w-fit max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                <span
-                  class="text-[13px] font-bold text-black/80 dark:text-white/80"
-                  :style="{
-                    color: premadeTeamId ? premadeColors[premadeTeamId]?.foregroundColor : undefined
-                  }"
-                  >{{
-                    masked(summoner?.gameName || summoner?.displayName || '—', championName)
-                  }}</span
-                >
-                <span
-                  v-if="!ongoingGame.streamerMode"
-                  class="ml-1 text-xs text-gray-500 dark:text-gray-400"
-                  >#{{ summoner?.tagLine || '—' }}</span
-                >
+                <template v-if="summonerName">
+                  <span
+                    class="text-[13px] font-bold text-black/80 dark:text-white/80"
+                    :style="{
+                      color: premadeTeamId
+                        ? premadeColors[premadeTeamId]?.foregroundColor
+                        : undefined
+                    }"
+                    >{{ masked(summonerName, championName) }}</span
+                  >
+                  <span
+                    v-if="!ongoingGame.streamerMode"
+                    class="ml-1 text-xs text-gray-500 dark:text-gray-400"
+                    >#{{ summoner?.tagLine || '—' }}</span
+                  >
+                </template>
+                <NSkeleton v-else :sharp="false" text :height="22" :width="112" />
               </div>
             </template>
             <div class="max-w-50 text-xs">
@@ -82,7 +85,7 @@
           <div class="flex gap-1">
             <div v-if="rankedSoloFlex.solo" class="flex w-0 flex-1 items-center justify-start">
               <img
-                class="mr-1 h-4 w-4"
+                class="mr-1 size-3.5"
                 :src="RANKED_MEDAL_MAP[rankedSoloFlex.solo.tier]"
                 alt="rank"
               />
@@ -101,7 +104,7 @@
 
             <div v-if="rankedSoloFlex.flex" class="flex w-0 flex-1 items-center justify-start">
               <img
-                class="mr-1 h-4 w-4"
+                class="mr-1 size-3.5"
                 :src="RANKED_MEDAL_MAP[rankedSoloFlex.flex.tier]"
                 alt="rank"
               />
@@ -135,7 +138,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStrea
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NDropdown, NIcon, NPopover, type DropdownOption } from 'naive-ui'
+import { NButton, NDropdown, NIcon, NPopover, NSkeleton, type DropdownOption } from 'naive-ui'
 import { computed } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT, RANKED_MEDAL_MAP } from '../../constants'
@@ -152,6 +155,7 @@ const { ongoingGame, mergedPremadeTeams, navigateToSummonerByPuuid } = useOngoin
 const resources = useGameResourceProvider()
 
 const summoner = computed(() => ongoingGame.value.summoner[puuid])
+const summonerName = computed(() => summoner.value?.gameName || summoner.value?.displayName || '')
 const rankedStats = computed(() => ongoingGame.value.rankedStats[puuid])
 const position = computed(() => ongoingGame.value.positionAssignments?.[puuid])
 const championId = computed(() => ongoingGame.value.championSelections?.[puuid])

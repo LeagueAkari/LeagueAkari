@@ -26,7 +26,12 @@
               ({{ analysis.winLoss.cherry.count }})</span
             >
           </div>
-          <div v-else class="flex-1 text-center text-[13px] font-bold">— %</div>
+          <div v-else class="flex flex-1 justify-center">
+            <span
+              class="inline-flex h-4 min-w-8 items-center justify-center rounded px-1.5 text-[13px] leading-none font-medium text-black/40 dark:text-white/40"
+              >- %</span
+            >
+          </div>
         </template>
         <div class="max-w-50 text-xs" v-if="analysis">
           {{
@@ -59,7 +64,12 @@
               >({{ analysis.count }})</span
             >
           </div>
-          <div v-else class="flex-1 text-center text-[13px] font-bold">— %</div>
+          <div v-else class="flex flex-1 justify-center">
+            <span
+              class="inline-flex h-4 min-w-8 items-center justify-center rounded px-1.5 text-[13px] leading-none font-medium text-black/40 dark:text-white/40"
+              >- %</span
+            >
+          </div>
         </template>
         <div class="max-w-50 text-xs" v-if="analysis">
           {{
@@ -77,6 +87,7 @@
     <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
       <template #trigger>
         <div
+          v-if="analysis"
           class="flex-1 text-center text-[13px] font-bold"
           :class="{
             'text-green-700 dark:text-green-300': kdaIqr === 'over',
@@ -84,7 +95,13 @@
             'text-red-700 dark:text-red-400': kdaIqr === 'below'
           }"
         >
-          {{ analysis?.summary.avgKda.toFixed(2) || '—' }}
+          {{ analysis.summary.avgKda.toFixed(2) }}
+        </div>
+        <div v-else class="flex flex-1 justify-center">
+          <span
+            class="inline-flex h-4 min-w-8 items-center justify-center rounded px-1.5 text-[13px] leading-none text-black/40 dark:text-white/40"
+            >N/A</span
+          >
         </div>
       </template>
       <div class="max-w-50 text-xs" v-if="analysis">

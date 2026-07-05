@@ -108,7 +108,7 @@ tiers:
   CHALLENGER: 最强王者
 
 shortTiers:
-  UNRANKED: 无
+  UNRANKED: 无段位
   IRON: 黑铁
   BRONZE: 黄铜
   SILVER: 白银

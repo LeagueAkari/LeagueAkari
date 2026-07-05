@@ -19,7 +19,7 @@ export const AKARI_SCORE_TAG: PlayerCardTagDefinition = {
         content: (
           <div class="w-64">
             <AkariScorePopoverContent score={analysis.akariScore} totalPrecision={3} />
-            <div class="mt-2 text-xs leading-4 text-gray-600 dark:text-gray-400">
+            <div class="mt-2 text-xs leading-4 text-black/55 dark:text-white/55">
               {ctx.t('ongoingGame.playerCard.akariScorePopoverDescription')}
             </div>
           </div>
