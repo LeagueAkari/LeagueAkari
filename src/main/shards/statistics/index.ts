@@ -20,7 +20,7 @@ export class StatisticsMain implements IAkariShardInitDispose {
     axios.create({
       headers: {
         'User-Agent': `LeagueAkari/${app.getVersion()}`,
-        'X-Akari-Version': app.getVersion()
+        'x-akari-version': app.getVersion()
       }
     })
   )

@@ -7,6 +7,7 @@ import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 
+import { AkariProtocolRenderer } from '../akari-protocol'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
@@ -42,6 +43,7 @@ export class LeagueClientRenderer {
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(AkariProtocolRenderer) private readonly _akariProtocol: AkariProtocolRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
@@ -50,6 +52,7 @@ export class LeagueClientRenderer {
     axiosRetry(this.httpClient, {
       retries: 2
     })
+    this._akariProtocol.installProxyRequestCancellation(this.httpClient)
 
     this.api = new LeagueClientHttpApiAxiosHelper(this.httpClient)
     this._context = {

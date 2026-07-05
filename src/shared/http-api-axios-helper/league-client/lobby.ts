@@ -7,6 +7,8 @@ import {
 } from '@shared/types/league-client/lobby'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export class LobbyHttpApi {
   constructor(private _http: AxiosInstance) {}
 
@@ -16,28 +18,33 @@ export class LobbyHttpApi {
     spectatorPolicy: string,
     lobbyName: string,
     lobbyPassword: string | null,
-    isCustom: boolean
+    isCustom: boolean,
+    options: HttpApiRequestOptions = {}
   ) {
-    return this._http.post<Lobby>('/lol-lobby/v2/lobby', {
-      customGameLobby: {
-        configuration: {
-          gameMode: mode,
-          gameMutator: '',
-          gameServerRegion: '',
-          mapId,
-          mutators: { id: 1 }, // 1 自选 2 征召 3 禁用 4 全随机
-          spectatorPolicy,
-          teamSize: 5
+    return this._http.post<Lobby>(
+      '/lol-lobby/v2/lobby',
+      {
+        customGameLobby: {
+          configuration: {
+            gameMode: mode,
+            gameMutator: '',
+            gameServerRegion: '',
+            mapId,
+            mutators: { id: 1 }, // 1 自选 2 征召 3 禁用 4 全随机
+            spectatorPolicy,
+            teamSize: 5
+          },
+          lobbyName,
+          lobbyPassword
         },
-        lobbyName,
-        lobbyPassword
+        isCustom
       },
-      isCustom
-    })
+      { signal: options.signal }
+    )
   }
 
-  createQueueLobby(queueId: number) {
-    return this._http.post('/lol-lobby/v2/lobby', { queueId })
+  createQueueLobby(queueId: number, options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-lobby/v2/lobby', { queueId }, { signal: options.signal })
   }
 
   /**
@@ -45,76 +52,107 @@ export class LobbyHttpApi {
    * @param summonerId 目标召唤师 ID
    */
 
-  promote(summonerId: string | number) {
-    return this._http.post<number>(`/lol-lobby/v2/lobby/members/${summonerId}/promote`)
+  promote(summonerId: string | number, options: HttpApiRequestOptions = {}) {
+    return this._http.post<number>(`/lol-lobby/v2/lobby/members/${summonerId}/promote`, undefined, {
+      signal: options.signal
+    })
   }
 
-  kick(summonerId: string | number) {
-    return this._http.post<number>(`/lol-lobby/v2/lobby/members/${summonerId}/kick`)
+  kick(summonerId: string | number, options: HttpApiRequestOptions = {}) {
+    return this._http.post<number>(`/lol-lobby/v2/lobby/members/${summonerId}/kick`, undefined, {
+      signal: options.signal
+    })
   }
 
-  getMembers() {
-    return this._http.get<LobbyMember[]>('/lol-lobby/v2/lobby/members')
+  getMembers(options: HttpApiRequestOptions = {}) {
+    return this._http.get<LobbyMember[]>('/lol-lobby/v2/lobby/members', { signal: options.signal })
   }
 
-  getLobby() {
-    return this._http.get<Lobby>('/lol-lobby/v2/lobby')
+  getLobby(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Lobby>('/lol-lobby/v2/lobby', { signal: options.signal })
   }
 
-  deleteLobby() {
-    return this._http.delete('/lol-lobby/v2/lobby')
+  deleteLobby(options: HttpApiRequestOptions = {}) {
+    return this._http.delete('/lol-lobby/v2/lobby', { signal: options.signal })
   }
 
-  searchMatch() {
-    return this._http.post('/lol-lobby/v2/lobby/matchmaking/search')
+  searchMatch(options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-lobby/v2/lobby/matchmaking/search', undefined, {
+      signal: options.signal
+    })
   }
 
-  deleteSearchMatch() {
-    return this._http.delete('/lol-lobby/v2/lobby/matchmaking/search')
+  deleteSearchMatch(options: HttpApiRequestOptions = {}) {
+    return this._http.delete('/lol-lobby/v2/lobby/matchmaking/search', { signal: options.signal })
   }
 
-  playAgain() {
-    return this._http.post('/lol-lobby/v2/play-again')
+  playAgain(options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-lobby/v2/play-again', undefined, { signal: options.signal })
   }
 
-  getEogStatus() {
-    return this._http.get<EogStatus>('/lol-lobby/v2/party/eog-status')
+  getEogStatus(options: HttpApiRequestOptions = {}) {
+    return this._http.get<EogStatus>('/lol-lobby/v2/party/eog-status', { signal: options.signal })
   }
 
-  acceptReceivedInvitation(invitationId: string) {
-    return this._http.post(`/lol-lobby/v2/received-invitations/${invitationId}/accept`)
+  acceptReceivedInvitation(invitationId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.post(`/lol-lobby/v2/received-invitations/${invitationId}/accept`, undefined, {
+      signal: options.signal
+    })
   }
 
-  declineReceivedInvitation(invitationId: string) {
-    return this._http.post(`/lol-lobby/v2/received-invitations/${invitationId}/decline`)
+  declineReceivedInvitation(invitationId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.post(
+      `/lol-lobby/v2/received-invitations/${invitationId}/decline`,
+      undefined,
+      { signal: options.signal }
+    )
   }
 
-  getReceivedInvitations() {
-    return this._http.get<ReceivedInvitation[]>('/lol-lobby/v2/received-invitations')
+  getReceivedInvitations(options: HttpApiRequestOptions = {}) {
+    return this._http.get<ReceivedInvitation[]>('/lol-lobby/v2/received-invitations', {
+      signal: options.signal
+    })
   }
 
-  getEligiblePartyQueues() {
-    return this._http.post<QueueEligibility[]>('/lol-lobby/v2/eligibility/party')
+  getEligiblePartyQueues(options: HttpApiRequestOptions = {}) {
+    return this._http.post<QueueEligibility[]>('/lol-lobby/v2/eligibility/party', undefined, {
+      signal: options.signal
+    })
   }
 
-  getEligibleSelfQueues() {
-    return this._http.post<QueueEligibility[]>('/lol-lobby/v2/eligibility/self')
+  getEligibleSelfQueues(options: HttpApiRequestOptions = {}) {
+    return this._http.post<QueueEligibility[]>('/lol-lobby/v2/eligibility/self', undefined, {
+      signal: options.signal
+    })
   }
 
-  setPlayerSlotsStrawberry1(championId: number, mapId = 1, difficultyId = 1) {
-    return this._http.put<void>('/lol-lobby/v1/lobby/members/localMember/player-slots', [
-      { championId, positionPreference: 'UNSELECTED', spell1: mapId, spell2: difficultyId }
-    ])
+  setPlayerSlotsStrawberry1(
+    championId: number,
+    mapId = 1,
+    difficultyId = 1,
+    options: HttpApiRequestOptions = {}
+  ) {
+    return this._http.put<void>(
+      '/lol-lobby/v1/lobby/members/localMember/player-slots',
+      [{ championId, positionPreference: 'UNSELECTED', spell1: mapId, spell2: difficultyId }],
+      { signal: options.signal }
+    )
   }
 
-  setStrawberryMapId(data: { contentId: string; itemId: number }) {
-    return this._http.put<void>('/lol-lobby/v2/lobby/strawberryMapId', data)
+  setStrawberryMapId(
+    data: { contentId: string; itemId: number },
+    options: HttpApiRequestOptions = {}
+  ) {
+    return this._http.put<void>('/lol-lobby/v2/lobby/strawberryMapId', data, {
+      signal: options.signal
+    })
   }
 
-  postInvitation(summonerIds: number[]) {
+  postInvitation(summonerIds: number[], options: HttpApiRequestOptions = {}) {
     return this._http.post(
       `/lol-lobby/v2/lobby/invitations`,
-      summonerIds.map((id) => ({ toSummonerId: id }))
+      summonerIds.map((id) => ({ toSummonerId: id })),
+      { signal: options.signal }
     )
   }
 }

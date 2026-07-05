@@ -12,7 +12,7 @@ import { SummonerLedgeHttpApi } from './summoner-ledge'
  *
  * 它用于处理一个区域服务器包含若干子服务器，且 SGP API 又要求传入子区 ID 的情况
  *
- * 特殊 X-Akari- 开头的 Header 用于指导代理如何正确转发并处理这些请求
+ * 特殊 x-akari- 开头的 Header 用于指导代理如何正确转发并处理这些请求
  */
 export class SgpHttpApiAxiosHelper {
   public readonly matchHistoryQuery: MatchHistoryQueryHttpApi

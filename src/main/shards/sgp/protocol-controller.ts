@@ -1,3 +1,4 @@
+import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
 import { formatError } from '@shared/utils/errors'
 import type { AxiosRequestConfig } from 'axios'
 
@@ -10,11 +11,12 @@ export class SgpProtocolController {
   register() {
     const { httpClient, logger, protocol } = this.context
 
-    protocol.registerDomain('sgp', async (uri, req) => {
+    protocol.registerDomain('sgp', async (uri, req, context) => {
       const reqHeaders: Record<string, string> = {}
       req.headers.forEach((value, key) => {
         reqHeaders[key] = value
       })
+      delete reqHeaders[AKARI_PROXY_REQUEST_ID_HEADER]
 
       try {
         const config: AxiosRequestConfig = {
@@ -23,7 +25,8 @@ export class SgpProtocolController {
           data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
           headers: reqHeaders,
           validateStatus: () => true,
-          responseType: 'stream'
+          responseType: 'stream',
+          signal: context.signal
         }
 
         const res = await httpClient.request(config)

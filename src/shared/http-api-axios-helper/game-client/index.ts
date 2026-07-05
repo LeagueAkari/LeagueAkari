@@ -1,59 +1,61 @@
 import { GameStats, PlayerList } from '@shared/types/game-client'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 // https://static.developer.riotgames.com/docs/lol/liveclientdata_sample.json
 export class GameClientHttpApiAxiosHelper {
   constructor(private _http: AxiosInstance) {}
 
-  getLiveClientDataPlayerList() {
-    return this._http.get<PlayerList[]>('/liveclientdata/playerlist')
+  getLiveClientDataPlayerList(options: HttpApiRequestOptions = {}) {
+    return this._http.get<PlayerList[]>('/liveclientdata/playerlist', { signal: options.signal })
   }
 
-  getActivePlayer() {
-    return this._http.get('/liveclientdata/activeplayer')
+  getActivePlayer(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/activeplayer', { signal: options.signal })
   }
 
-  getAllGameData() {
-    return this._http.get('/liveclientdata/allgamedata')
+  getAllGameData(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/allgamedata', { signal: options.signal })
   }
 
-  getActivePlayerAbilities() {
-    return this._http.get('/liveclientdata/activeplayerabilities')
+  getActivePlayerAbilities(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/activeplayerabilities', { signal: options.signal })
   }
 
-  getActivePlayerName() {
-    return this._http.get('/liveclientdata/activeplayername')
+  getActivePlayerName(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/activeplayername', { signal: options.signal })
   }
 
-  getActivePlayerRunes() {
-    return this._http.get('/liveclientdata/activeplayerrunes')
+  getActivePlayerRunes(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/activeplayerrunes', { signal: options.signal })
   }
 
-  getActivePlayerSummonerSpells() {
-    return this._http.get('/liveclientdata/playersummonerspells')
+  getActivePlayerSummonerSpells(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/playersummonerspells', { signal: options.signal })
   }
 
-  getEventData() {
-    return this._http.get('/liveclientdata/eventdata')
+  getEventData(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/eventdata', { signal: options.signal })
   }
 
-  getGameStats() {
-    return this._http.get<GameStats>('/liveclientdata/gamestats')
+  getGameStats(options: HttpApiRequestOptions = {}) {
+    return this._http.get<GameStats>('/liveclientdata/gamestats', { signal: options.signal })
   }
 
-  getPlayerItems() {
-    return this._http.get('/liveclientdata/playeritems')
+  getPlayerItems(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/playeritems', { signal: options.signal })
   }
 
-  getPlayerMainRunes() {
-    return this._http.get('/liveclientdata/playermainrunes')
+  getPlayerMainRunes(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/playermainrunes', { signal: options.signal })
   }
 
-  getPlayerScores() {
-    return this._http.get('/liveclientdata/playerscores')
+  getPlayerScores(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/playerscores', { signal: options.signal })
   }
 
-  getSummonerSpells() {
-    return this._http.get('/liveclientdata/playersummonerspells')
+  getSummonerSpells(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/liveclientdata/playersummonerspells', { signal: options.signal })
   }
 }

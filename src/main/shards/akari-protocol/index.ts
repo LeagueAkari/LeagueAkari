@@ -2,6 +2,7 @@ import { Shard } from '@shared/akari-shard'
 import { protocol } from 'electron'
 import { Readable } from 'node:stream'
 
+import { AkariIpcMain } from '../ipc'
 import {
   AKARI_PROTOCOL_MAIN_NAMESPACE,
   AKARI_PROXY_PROTOCOL,
@@ -24,8 +25,13 @@ export class AkariProtocolMain {
 
   private readonly _router = new AkariProtocolRouter()
 
+  constructor(private readonly _ipc: AkariIpcMain) {}
+
   onInit() {
     this.registerDomain('local', createLocalFileDomainHandler())
+    this._ipc.onCall(AkariProtocolMain.id, 'cancelProxyRequest', (_, requestId: string) => {
+      return this.cancelProxyRequest(requestId)
+    })
   }
 
   static convertWebStreamToNodeStream(readableStream: ReadableStream): Readable {
@@ -75,6 +81,10 @@ export class AkariProtocolMain {
 
   unregisterDomain(domain: string) {
     this._router.unregisterDomain(domain)
+  }
+
+  cancelProxyRequest(requestId: string) {
+    return this._router.cancelProxyRequest(requestId)
   }
 
   static shouldNotHaveBody(code: number) {

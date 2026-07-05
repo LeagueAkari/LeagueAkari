@@ -2,6 +2,7 @@ import {
   ModeType,
   OpggAramBalanceResponse,
   OpggAramMayhemChampionAugmentsResponse,
+  OpggAramMayhemTierResponse,
   OpggChampionBuildResponse,
   OpggChampionsResponse,
   OpggTiersResponse,
@@ -12,6 +13,13 @@ import {
 } from '@shared/types/opgg'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
+interface OpggChampionOptions extends HttpApiRequestOptions {
+  tier?: TierType
+  version?: string
+}
+
 export class OpggHttpApiAxiosHelper {
   static BASE_URL = 'https://lol-api-champion.op.gg'
 
@@ -21,15 +29,7 @@ export class OpggHttpApiAxiosHelper {
     }
   }
 
-  getChampions(
-    region: RegionType,
-    mode: ModeType,
-    options: {
-      tier?: TierType
-      version?: string
-      signal?: AbortSignal
-    } = {}
-  ) {
+  getChampions(region: RegionType, mode: ModeType, options: OpggChampionOptions = {}) {
     return this._http.get<OpggChampionsResponse>(`/api/${region}/champions/${mode}`, {
       params: {
         tier: options.tier,
@@ -44,11 +44,7 @@ export class OpggHttpApiAxiosHelper {
     mode: ModeType,
     championId: number,
     position?: PositionType | null,
-    options: {
-      tier?: TierType
-      version?: string
-      signal?: AbortSignal
-    } = {}
+    options: OpggChampionOptions = {}
   ) {
     let url: string
     if (mode === 'arena') {
@@ -65,17 +61,19 @@ export class OpggHttpApiAxiosHelper {
     })
   }
 
-  getAramBalance() {
-    return this._http.get<OpggAramBalanceResponse>('/api/contents/aram-balance')
+  getAramBalance(options: HttpApiRequestOptions = {}) {
+    return this._http.get<OpggAramBalanceResponse>('/api/contents/aram-balance', {
+      signal: options.signal
+    })
   }
 
-  getVersions(region: RegionType, mode: ModeType, options: { signal?: AbortSignal } = {}) {
+  getVersions(region: RegionType, mode: ModeType, options: HttpApiRequestOptions = {}) {
     return this._http.get<OpggVersionsResponse>(`/api/${region}/champions/${mode}/versions`, {
       signal: options.signal
     })
   }
 
-  getAramMayhemChampionAugments(championId: number, options: { signal?: AbortSignal } = {}) {
+  getAramMayhemChampionAugments(championId: number, options: HttpApiRequestOptions = {}) {
     return this._http.get<OpggAramMayhemChampionAugmentsResponse>(
       `/api/contents/stats/champions/${championId}/aram-augments`,
       {
@@ -84,7 +82,16 @@ export class OpggHttpApiAxiosHelper {
     )
   }
 
-  getTiers(type: 'aram-mayhem', options: { signal?: AbortSignal } = {}) {
+  getAramMayhemTiers(options: HttpApiRequestOptions = {}) {
+    return this._http.get<OpggAramMayhemTierResponse>(`/api/contents/tiers`, {
+      params: {
+        type: 'aram_mayhem'
+      },
+      signal: options.signal
+    })
+  }
+
+  getTiers(type: 'aram_mayhem', options: HttpApiRequestOptions = {}) {
     return this._http.get<OpggTiersResponse>(`/api/contents/tiers`, {
       params: {
         type

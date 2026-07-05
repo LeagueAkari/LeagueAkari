@@ -1,4 +1,5 @@
 import { createManager } from '@renderer-shared/shards'
+import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
@@ -36,6 +37,7 @@ import { SimpleNotificationsRenderer } from './simple-notifications'
 const manager = createManager()
 
 manager.use(AkariIpcRenderer)
+manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
 manager.use(AutoChampConfigRenderer)
 manager.use(AutoGameflowRenderer)

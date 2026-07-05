@@ -7,7 +7,11 @@ import { AxiosInstance } from 'axios'
 import { Readable } from 'stream'
 
 import { SgpRegionParam } from './dto'
-import { URL_PLACEHOLDER_SUB_ID } from './patterns'
+import {
+  AKARI_HEADER_SGP_SERVER_ID,
+  AKARI_HEADER_TOKEN_TYPE,
+  URL_PLACEHOLDER_SUB_ID
+} from './patterns'
 
 export interface MatchHistoryQueryParams extends SgpRegionParam {
   startIndex?: number
@@ -30,9 +34,10 @@ export class MatchHistoryQueryHttpApi {
           tagsQueryType: options.tagsQueryType
         },
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'entitlements'
-        }
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'entitlements'
+        },
+        signal: options.signal
       }
     )
   }
@@ -42,9 +47,10 @@ export class MatchHistoryQueryHttpApi {
       `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/SUMMARY`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'entitlements'
-        }
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'entitlements'
+        },
+        signal: options.signal
       }
     )
   }
@@ -54,9 +60,10 @@ export class MatchHistoryQueryHttpApi {
       `/match-history-query/v1/products/lol/${URL_PLACEHOLDER_SUB_ID}_${gameId}/DETAILS`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'entitlements'
-        }
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'entitlements'
+        },
+        signal: options.signal
       }
     )
   }
@@ -66,10 +73,11 @@ export class MatchHistoryQueryHttpApi {
       `/match-history-query/v3/product/lol/matchId/${URL_PLACEHOLDER_SUB_ID}_${gameId}/infoType/replay`,
       {
         headers: {
-          'X-Akari-Sgp-Server-Id': options.__sgpServerId,
-          'X-Akari-Token-Type': 'entitlements'
+          [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
+          [AKARI_HEADER_TOKEN_TYPE]: 'entitlements'
         },
-        responseType: 'stream'
+        responseType: 'stream',
+        signal: options.signal
       }
     )
   }

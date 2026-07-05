@@ -1,28 +1,39 @@
 import { PlayerNotifications } from '@shared/types/league-client/player-notifications'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export class PlayerNotificationsHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  postNotification(data: Partial<PlayerNotifications>) {
-    return this._http.post('/player-notifications/v1/notifications', data)
+  postNotification(data: Partial<PlayerNotifications>, options: HttpApiRequestOptions = {}) {
+    return this._http.post('/player-notifications/v1/notifications', data, {
+      signal: options.signal
+    })
   }
 
   /**
    * 一个预设通知
    */
-  createTitleDetailsNotification(title: string, details: string) {
-    return this.postNotification({
-      critical: true,
-      data: {
-        details,
-        title
+  createTitleDetailsNotification(
+    title: string,
+    details: string,
+    options: HttpApiRequestOptions = {}
+  ) {
+    return this.postNotification(
+      {
+        critical: true,
+        data: {
+          details,
+          title
+        },
+        detailKey: 'pre_translated_details',
+        dismissible: true,
+        state: 'toast',
+        titleKey: 'pre_translated_title',
+        type: 'default'
       },
-      detailKey: 'pre_translated_details',
-      dismissible: true,
-      state: 'toast',
-      titleKey: 'pre_translated_title',
-      type: 'default'
-    })
+      options
+    )
   }
 }

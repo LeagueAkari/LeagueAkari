@@ -1,3 +1,4 @@
+import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
 import type { AxiosRequestConfig } from 'axios'
 
 import { AkariProtocolMain } from '../akari-protocol'
@@ -9,11 +10,12 @@ export class RiotClientProtocolController {
   register() {
     const { logger, protocol, riotClient } = this.context
 
-    protocol.registerDomain('riot-client', async (uri, req) => {
+    protocol.registerDomain('riot-client', async (uri, req, context) => {
       const reqHeaders: Record<string, string> = {}
       req.headers.forEach((value, key) => {
         reqHeaders[key] = value
       })
+      delete reqHeaders[AKARI_PROXY_REQUEST_ID_HEADER]
 
       try {
         const config: AxiosRequestConfig = {
@@ -22,7 +24,8 @@ export class RiotClientProtocolController {
           data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
           validateStatus: () => true,
           responseType: 'stream',
-          headers: reqHeaders
+          headers: reqHeaders,
+          signal: context.signal
         }
 
         const res = await riotClient.request(config)

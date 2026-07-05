@@ -1,38 +1,57 @@
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 // TODO: Add types
 export class RewardTrackHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  getRegister(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/register/${progressionGroupId}`)
+  getRegister(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/register/${progressionGroupId}`, {
+      signal: options.signal
+    })
   }
 
-  getBonusItems(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/bonus-items`)
+  getBonusItems(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/bonus-items`, {
+      signal: options.signal
+    })
   }
 
-  getBonusProgress(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/bonus-progress`)
+  getBonusProgress(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/bonus-progress`, {
+      signal: options.signal
+    })
   }
 
-  getFailure(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/failure`)
+  getFailure(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/failure`, {
+      signal: options.signal
+    })
   }
 
-  getItems(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/items`)
+  getItems(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/items`, {
+      signal: options.signal
+    })
   }
 
-  getProgress(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/progress`)
+  getProgress(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/progress`, {
+      signal: options.signal
+    })
   }
 
-  getUnclaimedRewards(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/unclaimed-rewards`)
+  getUnclaimedRewards(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(
+      `/lol-reward-track/${progressionGroupId}/reward-track/unclaimed-rewards`,
+      { signal: options.signal }
+    )
   }
 
-  getXp(progressionGroupId: string) {
-    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/xp`)
+  getXp(progressionGroupId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/lol-reward-track/${progressionGroupId}/reward-track/xp`, {
+      signal: options.signal
+    })
   }
 }

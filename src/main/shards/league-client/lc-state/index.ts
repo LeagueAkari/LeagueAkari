@@ -110,12 +110,12 @@ export class LeagueClientData {
     ])
 
     const loadPhase = async () => {
-      const phase = await this._context.leagueClient.api.gameflow.getGameflowPhase()
+      const phase = await this._context.leagueClient.api.gameflow.getPhase()
       this.gameflow.setPhase(phase.data)
     }
 
     const loadSession = async () => {
-      const session = await this._context.leagueClient.api.gameflow.getGameflowSession()
+      const session = await this._context.leagueClient.api.gameflow.getSession()
       this.gameflow.setSession(session.data)
     }
 
@@ -384,8 +384,7 @@ export class LeagueClientData {
 
     const loadLeagueSessionToken = async () => {
       try {
-        const token = (await this._context.leagueClient.api.leagueSession.getLeagueSessionToken())
-          .data
+        const token = (await this._context.leagueClient.api.leagueSession.getToken()).data
 
         cancelRetryTimer()
         this.leagueSession.setToken(token)

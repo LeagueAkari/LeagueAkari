@@ -1,17 +1,23 @@
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export class RemedyHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  ackRemedyNotification(mailId: string) {
-    return this._http.put(`/lol-remedy/v1/ack-remedy-notification/${mailId}`)
+  ackRemedyNotification(mailId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.put(`/lol-remedy/v1/ack-remedy-notification/${mailId}`, undefined, {
+      signal: options.signal
+    })
   }
 
-  getNotifications() {
-    return this._http.get('/lol-remedy/v1/remedy-notifications')
+  getNotifications(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/lol-remedy/v1/remedy-notifications', { signal: options.signal })
   }
 
-  getVerbalAbuseRemedyModalEnabled() {
-    return this._http.get('/lol-remedy/v1/config/is-verbal-abuse-remedy-modal-enabled')
+  getVerbalAbuseRemedyModalEnabled(options: HttpApiRequestOptions = {}) {
+    return this._http.get('/lol-remedy/v1/config/is-verbal-abuse-remedy-modal-enabled', {
+      signal: options.signal
+    })
   }
 }

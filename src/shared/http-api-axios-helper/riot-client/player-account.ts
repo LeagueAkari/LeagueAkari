@@ -1,5 +1,7 @@
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export interface PlayerAccountAlias {
   alias: Alias
   puuid: string
@@ -37,15 +39,22 @@ interface Nameset {
 export class PlayerAccountHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  getPlayerAccountAlias(gameName: string, tagLine?: string) {
+  getPlayerAccountAlias(gameName: string, tagLine?: string, options: HttpApiRequestOptions = {}) {
     return this._http.get<PlayerAccountAlias[]>('/player-account/aliases/v1/lookup', {
-      params: { gameName, tagLine }
+      params: { gameName, tagLine },
+      signal: options.signal
     })
   }
 
-  getPlayerAccountNameset(puuids: string[]) {
-    return this._http.post<PlayerAccountNameset>('/player-account/lookup/v1/namesets-for-puuids', {
-      puuids
-    })
+  getPlayerAccountNameset(puuids: string[], options: HttpApiRequestOptions = {}) {
+    return this._http.post<PlayerAccountNameset>(
+      '/player-account/lookup/v1/namesets-for-puuids',
+      {
+        puuids
+      },
+      {
+        signal: options.signal
+      }
+    )
   }
 }

@@ -21,7 +21,8 @@ export class SummonerLedgeHttpApi {
           [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
           [AKARI_HEADER_TOKEN_TYPE]: 'league-session',
           [AKARI_HEADER_FORCE_STREAM_COLLECT]: 'true'
-        }
+        },
+        signal: options.signal
       }
     )
   }

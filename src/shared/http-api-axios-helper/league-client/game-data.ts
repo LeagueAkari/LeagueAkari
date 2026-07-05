@@ -16,62 +16,88 @@ import {
 } from '@shared/types/league-client/game-data'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export class GameDataHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  getSummonerSpells() {
-    return this._http.get<SummonerSpell[]>('/lol-game-data/assets/v1/summoner-spells.json')
+  getSummonerSpells(options: HttpApiRequestOptions = {}) {
+    return this._http.get<SummonerSpell[]>('/lol-game-data/assets/v1/summoner-spells.json', {
+      signal: options.signal
+    })
   }
 
-  getPerkstyles() {
-    return this._http.get<Perkstyles>('/lol-game-data/assets/v1/perkstyles.json')
+  getPerkstyles(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Perkstyles>('/lol-game-data/assets/v1/perkstyles.json', {
+      signal: options.signal
+    })
   }
 
-  getItems() {
-    return this._http.get<Item[]>('/lol-game-data/assets/v1/items.json')
+  getItems(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Item[]>('/lol-game-data/assets/v1/items.json', { signal: options.signal })
   }
 
-  getChampionSummary() {
-    return this._http.get<ChampionSimple[]>('/lol-game-data/assets/v1/champion-summary.json')
+  getChampionSummary(options: HttpApiRequestOptions = {}) {
+    return this._http.get<ChampionSimple[]>('/lol-game-data/assets/v1/champion-summary.json', {
+      signal: options.signal
+    })
   }
 
-  getGameModeMutators() {
-    return this._http.get<GameModeMutator[]>('/lol-game-data/assets/v1/game-mode-mutators.json')
+  getGameModeMutators(options: HttpApiRequestOptions = {}) {
+    return this._http.get<GameModeMutator[]>('/lol-game-data/assets/v1/game-mode-mutators.json', {
+      signal: options.signal
+    })
   }
 
-  getMaps() {
-    return this._http.get<GameMap[]>('/lol-game-data/assets/v1/maps.json')
+  getMaps(options: HttpApiRequestOptions = {}) {
+    return this._http.get<GameMap[]>('/lol-game-data/assets/v1/maps.json', {
+      signal: options.signal
+    })
   }
 
-  getPerks() {
-    return this._http.get<Perk[]>('/lol-game-data/assets/v1/perks.json')
+  getPerks(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Perk[]>('/lol-game-data/assets/v1/perks.json', { signal: options.signal })
   }
 
-  getQueues() {
-    return this._http.get<Queue[]>('/lol-game-data/assets/v1/queues.json')
+  getQueues(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Queue[]>('/lol-game-data/assets/v1/queues.json', {
+      signal: options.signal
+    })
   }
 
-  getMapAssets() {
-    return this._http.get<GameMapAsset>('/lol-game-data/assets/v1/map-assets/map-assets.json')
+  getMapAssets(options: HttpApiRequestOptions = {}) {
+    return this._http.get<GameMapAsset>('/lol-game-data/assets/v1/map-assets/map-assets.json', {
+      signal: options.signal
+    })
   }
 
-  getChampDetails(champId: number) {
-    return this._http.get<ChampDetails>(`/lol-game-data/assets/v1/champions/${champId}.json`)
+  getChampDetails(champId: number, options: HttpApiRequestOptions = {}) {
+    return this._http.get<ChampDetails>(`/lol-game-data/assets/v1/champions/${champId}.json`, {
+      signal: options.signal
+    })
   }
 
-  getAugments() {
-    return this._http.get<Augment[]>('/lol-game-data/assets/v1/cherry-augments.json')
+  getAugments(options: HttpApiRequestOptions = {}) {
+    return this._http.get<Augment[]>('/lol-game-data/assets/v1/cherry-augments.json', {
+      signal: options.signal
+    })
   }
 
-  getStrawberryHub() {
-    return this._http.get<StrawberryHub[]>('/lol-game-data/assets/v1/strawberry-hub.json')
+  getStrawberryHub(options: HttpApiRequestOptions = {}) {
+    return this._http.get<StrawberryHub[]>('/lol-game-data/assets/v1/strawberry-hub.json', {
+      signal: options.signal
+    })
   }
 
-  getLoots() {
-    return this._http.get<LootMap>('/lol-game-data/assets/v1/loots.json')
+  getLoots(options: HttpApiRequestOptions = {}) {
+    return this._http.get<LootMap>('/lol-game-data/assets/v1/loots.json', {
+      signal: options.signal
+    })
   }
 
-  getChallenges() {
-    return this._http.get<ChallengesJson>('/lol-game-data/assets/v1/challenges.json')
+  getChallenges(options: HttpApiRequestOptions = {}) {
+    return this._http.get<ChallengesJson>('/lol-game-data/assets/v1/challenges.json', {
+      signal: options.signal
+    })
   }
 }

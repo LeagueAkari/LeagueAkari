@@ -1,4 +1,5 @@
 import { NATIVE_SUPPORT, adjustLeagueClientWindowSize, getPidsByName } from '@main/native'
+import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
@@ -169,11 +170,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   private _registerProtocol() {
-    this._protocol.registerDomain('league-client', async (uri, req) => {
+    this._protocol.registerDomain('league-client', async (uri, req, context) => {
       const reqHeaders: Record<string, string> = {}
       req.headers.forEach((value, key) => {
         reqHeaders[key] = value
       })
+      delete reqHeaders[AKARI_PROXY_REQUEST_ID_HEADER]
 
       try {
         const config: AxiosRequestConfig = {
@@ -182,7 +184,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
           validateStatus: () => true,
           responseType: 'stream',
-          headers: reqHeaders
+          headers: reqHeaders,
+          signal: context.signal
         }
 
         const res = await this.request(config)

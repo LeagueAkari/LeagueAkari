@@ -1,6 +1,8 @@
 import { AKARI_OSS_BASE_URL } from '@shared/constants/common'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export class AkariOssHttpApiAxiosHelper {
   constructor(private _http: AxiosInstance) {
     if (!_http.defaults.baseURL) {
@@ -8,7 +10,7 @@ export class AkariOssHttpApiAxiosHelper {
     }
   }
 
-  getFile(path: string) {
-    return this._http.get(`/${path}`)
+  getFile(path: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get(`/${path}`, { signal: options.signal })
   }
 }

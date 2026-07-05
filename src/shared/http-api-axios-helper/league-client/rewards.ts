@@ -1,6 +1,8 @@
 import { RewardsGrant, RewardsGroup } from '@shared/types/league-client/rewards'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 export interface PostGrantSelectionDto {
   grantId: string
   selections: string[]
@@ -21,40 +23,48 @@ export interface PostCelebrationsFscDto {
 export class RewardsHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  postCelebrationsFsc(data: PostCelebrationsFscDto) {
-    return this._http.post('/lol-rewards/v1/celebrations/fsc', data)
+  postCelebrationsFsc(data: PostCelebrationsFscDto, options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-rewards/v1/celebrations/fsc', data, { signal: options.signal })
   }
 
-  getGrants(status?: string) {
+  getGrants(status?: string, options: HttpApiRequestOptions = {}) {
     return this._http.get<RewardsGrant[]>('/lol-rewards/v1/grants', {
+      signal: options.signal,
       params: {
         status
       }
     })
   }
 
-  patchGrantsView(data: any) {
-    return this._http.patch('/lol-rewards/v1/grants/view', data)
+  patchGrantsView(data: any, options: HttpApiRequestOptions = {}) {
+    return this._http.patch('/lol-rewards/v1/grants/view', data, { signal: options.signal })
   }
 
-  postGrantSelection(grantId: string, data: PostGrantSelectionDto) {
-    return this._http.post(`/lol-rewards/v1/grants/${grantId}/select`, data)
+  postGrantSelection(
+    grantId: string,
+    data: PostGrantSelectionDto,
+    options: HttpApiRequestOptions = {}
+  ) {
+    return this._http.post(`/lol-rewards/v1/grants/${grantId}/select`, data, {
+      signal: options.signal
+    })
   }
 
   // filter it or 50000 lines of json :)
-  getGroups(types?: string[]) {
+  getGroups(types?: string[], options: HttpApiRequestOptions = {}) {
     return this._http.get<RewardsGroup[]>('/lol-rewards/v1/groups', {
+      signal: options.signal,
       params: {
         types
       }
     })
   }
 
-  postRewardReplay(data: { rewardGroupId: string }) {
-    return this._http.post('/lol-rewards/v1/reward/replay', data)
+  postRewardReplay(data: { rewardGroupId: string }, options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-rewards/v1/reward/replay', data, { signal: options.signal })
   }
 
-  postSelectBulk(data: { selection: string[] }) {
-    return this._http.post('/lol-rewards/v1/select-bulk', data)
+  postSelectBulk(data: { selection: string[] }, options: HttpApiRequestOptions = {}) {
+    return this._http.post('/lol-rewards/v1/select-bulk', data, { signal: options.signal })
   }
 }

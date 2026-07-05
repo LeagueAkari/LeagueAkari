@@ -1,10 +1,12 @@
 import { session } from 'electron'
 
 import { AKARI_PROXY_PROTOCOL, type AkariProtocolDomainHandler } from './context'
+import { AkariProtocolProxyRequestCancellation } from './proxy-request-cancellation'
 
 export class AkariProtocolRouter {
   private readonly _domainRegistry = new Map<string, AkariProtocolDomainHandler>()
   private readonly _partitionRegistry = new Set<string>()
+  private readonly _proxyRequestCancellation = new AkariProtocolProxyRequestCancellation()
 
   registerPartition(partition: string) {
     if (this._partitionRegistry.has(partition)) {
@@ -40,6 +42,10 @@ export class AkariProtocolRouter {
     this._domainRegistry.delete(domain)
   }
 
+  cancelProxyRequest(requestId: string) {
+    return this._proxyRequestCancellation.cancel(requestId)
+  }
+
   private _unhandlePartitionAkariProtocol(partition: string) {
     session.fromPartition(partition).protocol.unhandle(AKARI_PROXY_PROTOCOL)
   }
@@ -53,7 +59,17 @@ export class AkariProtocolRouter {
 
       const handler = this._domainRegistry.get(domain)
       if (handler) {
-        return handler(uri, req)
+        const registration = this._proxyRequestCancellation.register(req)
+        try {
+          return await handler(uri, req, {
+            requestId: registration?.requestId,
+            signal: registration?.signal
+          })
+        } finally {
+          if (registration) {
+            this._proxyRequestCancellation.dispose(registration)
+          }
+        }
       }
 
       return new Response(`No handler for ${req.url}`, {

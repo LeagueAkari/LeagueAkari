@@ -6,6 +6,8 @@ import {
 } from '@shared/types/league-client/loot'
 import { AxiosInstance } from 'axios'
 
+import type { HttpApiRequestOptions } from '../request-options'
+
 interface MassCraftDto {
   recipeName: string
   lootNames: string[]
@@ -15,30 +17,46 @@ interface MassCraftDto {
 export class LootHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  getLootMap() {
-    return this._http.get<PlayerLootMap>('/lol-loot/v1/player-loot-map')
+  getLootMap(options: HttpApiRequestOptions = {}) {
+    return this._http.get<PlayerLootMap>('/lol-loot/v1/player-loot-map', { signal: options.signal })
   }
 
-  craftLoot(recipeName: string, lootNames: string[], repeat = 1) {
+  craftLoot(
+    recipeName: string,
+    lootNames: string[],
+    repeat = 1,
+    options: HttpApiRequestOptions = {}
+  ) {
     return this._http.post<LootCraftResponse>(
       `/lol-loot/v1/recipes/${recipeName}/craft?repeat=${repeat}`,
-      lootNames
+      lootNames,
+      { signal: options.signal }
     )
   }
 
-  craftMass(data: MassCraftDto[]) {
-    return this._http.post<LootCraftResponse>(`/lol-loot/v1/craft/mass`, data)
+  craftMass(data: MassCraftDto[], options: HttpApiRequestOptions = {}) {
+    return this._http.post<LootCraftResponse>(`/lol-loot/v1/craft/mass`, data, {
+      signal: options.signal
+    })
   }
 
-  getContextMenu(lootId: string) {
-    return this._http.get<LootContextMenu[]>(`/lol-loot/v1/player-loot/${lootId}/context-menu`)
+  getContextMenu(lootId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get<LootContextMenu[]>(`/lol-loot/v1/player-loot/${lootId}/context-menu`, {
+      signal: options.signal
+    })
   }
 
-  getInitialItemRecipe(lootId: string) {
-    return this._http.get<LootRecipe[]>(`/lol-loot/v1/recipes/initial-item/${lootId}`)
+  getInitialItemRecipe(lootId: string, options: HttpApiRequestOptions = {}) {
+    return this._http.get<LootRecipe[]>(`/lol-loot/v1/recipes/initial-item/${lootId}`, {
+      signal: options.signal
+    })
   }
 
-  redeemLoot(lootName: string) {
-    return this._http.post<LootCraftResponse>(`/lol-loot/v1/player-loot/${lootName}/redeem`)
+  redeemLoot(lootName: string, options: HttpApiRequestOptions = {}) {
+    return this._http.post<LootCraftResponse>(
+      `/lol-loot/v1/player-loot/${lootName}/redeem`,
+      undefined,
+      { signal: options.signal }
+    )
   }
 }

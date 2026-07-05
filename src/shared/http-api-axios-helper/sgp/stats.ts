@@ -18,7 +18,8 @@ export class StatsHttpApi {
         headers: {
           [AKARI_HEADER_SGP_SERVER_ID]: options.__sgpServerId,
           [AKARI_HEADER_TOKEN_TYPE]: 'league-session'
-        }
+        },
+        signal: options.signal
       }
     )
   }
