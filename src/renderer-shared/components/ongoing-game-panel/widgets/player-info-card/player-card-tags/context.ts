@@ -8,8 +8,13 @@ import type { PlayerCardTagContext } from './types'
 
 export function usePlayerCardTagContext(puuid: string) {
   const { t } = useTranslation()
-  const { ongoingGame, mergedPremadeTeams, previewGame, navigateToSummonerByPuuid } =
-    useOngoingGamePanel()
+  const {
+    ongoingGame,
+    mergedPremadeTeams,
+    previewGame,
+    navigateToSummonerByPuuid,
+    isStandaloneOngoingGameWindow
+  } = useOngoingGamePanel()
   const resources = useGameResourceProvider()
   const { masked } = useStreamerModeMaskedText()
 
@@ -53,6 +58,7 @@ export function usePlayerCardTagContext(puuid: string) {
     positionAssignment: ongoingGame.value.positionAssignments[puuid],
     spells: ongoingGame.value.spells[puuid],
     cachedGames: ongoingGame.value.cachedGames,
+    isStandaloneOngoingGameWindow: isStandaloneOngoingGameWindow.value,
     locale: resources.runtime.locale,
     t,
     masked,

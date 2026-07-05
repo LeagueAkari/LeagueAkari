@@ -51,16 +51,28 @@
     <!-- buttons -->
     <div class="ml-8 flex justify-end gap-2">
       <!-- tag edit -->
-      <NButton
-        secondary
-        class="size-10.5!"
-        @click="isTagEditModalShowing = true"
+      <NPopover
         v-if="!isSelfTab && !isCrossRegion"
+        v-model:show="isTagEditPopoverShowing"
+        trigger="click"
+        placement="bottom-end"
       >
-        <template #icon>
-          <NIcon><Edit20Filled /></NIcon>
+        <template #trigger>
+          <NButton secondary class="size-10.5!">
+            <template #icon>
+              <NIcon><Edit20Filled /></NIcon>
+            </template>
+          </NButton>
         </template>
-      </NButton>
+
+        <PlayerTagEditPanel
+          v-if="isTagEditPopoverShowing"
+          :puuid="puuid"
+          :summoner="summoner"
+          @cancel="isTagEditPopoverShowing = false"
+          @saved="handleTagSaved"
+        />
+      </NPopover>
 
       <!-- refresh -->
       <NButton secondary class="size-10.5!" :loading="isSomethingLoading" @click="refresh">
@@ -69,36 +81,36 @@
         </template>
       </NButton>
     </div>
-
-    <PlayerTagEditModal v-model:show="isTagEditModalShowing" />
   </div>
 </template>
 
 <script setup lang="ts">
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { PlayerTagEditPanel } from '@renderer-shared/components/player-tag-edit'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { Edit20Filled } from '@vicons/fluent'
 import { RefreshSharp } from '@vicons/ionicons5'
-import { NButton, NIcon } from 'naive-ui'
+import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { usePlayerTab } from '../context'
 import { useSummoner } from '../data/summoner'
+import { useTags } from '../data/tags'
 import { useRefresh } from '../utils/refresh'
-import PlayerTagEditModal from './PlayerTagEditModal.vue'
 import RankedPane from './RankedPane.vue'
 
 const { puuid, isSelfTab, isCrossRegion } = usePlayerTab()
 const { summoner } = useSummoner()
+const { loadTags } = useTags()
 
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const { refresh, isSomethingLoading } = useRefresh()
 
-const isTagEditModalShowing = ref(false)
+const isTagEditPopoverShowing = ref(false)
 
 const maskedName = computed(() => {
   const seed = summoner.value?.gameName || summoner.value?.puuid || puuid.value
@@ -106,4 +118,9 @@ const maskedName = computed(() => {
 })
 
 const maskedTagLine = computed(() => masked(summoner.value?.tagLine || '—', '#####'))
+
+const handleTagSaved = async () => {
+  isTagEditPopoverShowing.value = false
+  await loadTags()
+}
 </script>

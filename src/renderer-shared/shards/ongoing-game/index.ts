@@ -16,6 +16,7 @@ import {
   ONGOING_GAME_RENDERER_NAMESPACE,
   type OngoingGameAllData,
   type OngoingGameMatchHistoryQueryTagParams,
+  type OngoingGamePlayerReloadOptions,
   type OngoingGameRendererContext
 } from './context'
 import { useOngoingGameStore } from './store'
@@ -121,8 +122,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
   }
 
-  reloadPlayer(puuid: string) {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'reloadPlayer', puuid)
+  reloadPlayer(puuid: string, options?: OngoingGamePlayerReloadOptions) {
+    this._ipc.call(MAIN_SHARD_NAMESPACE, 'reloadPlayer', puuid, options)
   }
 
   getAll() {

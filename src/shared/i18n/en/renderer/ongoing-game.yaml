@@ -167,6 +167,7 @@ ongoingGame:
     kdaPopover_one: In the recent {{count}} game, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
     kdaPopover_other: In the recent {{count}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
     premadePopover: They are a premade team. Labeled as Team {{team}}.
+    editTag: Tag player
     collectByChampion: Collect {{champion}} matches
     collectByPosition: Collect {{position}} matches
     sameChampionHistory: Champion History

@@ -16,9 +16,7 @@ const createAnalysis = () =>
     }
   }) as PlayerCardTagContext['analysis']
 
-const createContext = (
-  overrides: Partial<PlayerCardTagContext> & { selfPuuid?: string } = {}
-): PlayerCardTagContext =>
+const createContext = (overrides: Partial<PlayerCardTagContext> = {}): PlayerCardTagContext =>
   ({
     puuid: 'player-1',
     selfPuuid: 'player-2',
@@ -30,6 +28,7 @@ const createContext = (
     positionAssignment: undefined,
     spells: undefined,
     cachedGames: {},
+    isStandaloneOngoingGameWindow: false,
     locale: 'zh-CN',
     t: ((key: string) => key) as PlayerCardTagContext['t'],
     masked: (text: string) => text,
@@ -55,6 +54,12 @@ const createSavedInfo = (overrides: Partial<SavedInfo> = {}): SavedInfo => ({
   },
   ...overrides
 })
+
+const getVNodeTypeName = (type: unknown) => {
+  return typeof type === 'object' && type !== null && 'name' in type
+    ? (type as { name?: string }).name
+    : undefined
+}
 
 describe('PLAYER_CARD_TAGS', () => {
   it('exports known tags with unique ids and render factories only', () => {
@@ -99,7 +104,7 @@ describe('PLAYER_CARD_TAGS', () => {
     expect(tags.value[0].popover).toBeUndefined()
   })
 
-  it('lets interactive popovers opt into hover keep-alive', () => {
+  it('keeps tagged hover and click interactions owned by the tagged renderer', () => {
     const taggedTag = PLAYER_CARD_TAGS.find((tag) => tag.id === 'tagged')
     expect(taggedTag).toBeDefined()
 
@@ -122,6 +127,63 @@ describe('PLAYER_CARD_TAGS', () => {
       })
     )
 
+    expect(getVNodeTypeName(rendered?.label.type)).toBe('PlayerCardTaggedTag')
+    expect(rendered?.popover).toBeUndefined()
+  })
+
+  it('uses the same tagged renderer for self-authored marks', () => {
+    const taggedTag = PLAYER_CARD_TAGS.find((tag) => tag.id === 'tagged')
+    expect(taggedTag).toBeDefined()
+
+    const rendered = taggedTag!.render(
+      createContext({
+        savedInfo: createSavedInfo({
+          tags: [
+            {
+              markedBySelf: true,
+              puuid: 'player-1',
+              selfPuuid: 'player-2',
+              region: 'NA',
+              rsoPlatformId: 'NA1',
+              tag: 'careful',
+              updateAt: new Date(0),
+              lastMetAt: null
+            }
+          ]
+        })
+      })
+    )
+
+    expect(getVNodeTypeName(rendered?.label.type)).toBe('PlayerCardTaggedTag')
+  })
+
+  it('renders tagged tag as hover-only in standalone ongoing-game window', () => {
+    const taggedTag = PLAYER_CARD_TAGS.find((tag) => tag.id === 'tagged')
+    expect(taggedTag).toBeDefined()
+
+    const rendered = taggedTag!.render(
+      createContext({
+        isStandaloneOngoingGameWindow: true,
+        savedInfo: createSavedInfo({
+          tags: [
+            {
+              markedBySelf: true,
+              puuid: 'player-1',
+              selfPuuid: 'player-2',
+              region: 'NA',
+              rsoPlatformId: 'NA1',
+              tag: 'careful',
+              updateAt: new Date(0),
+              lastMetAt: null
+            }
+          ]
+        })
+      } as Partial<PlayerCardTagContext>)
+    )
+
+    expect(rendered?.label.type).toBe('div')
+    expect(rendered?.label.props?.class).not.toContain('cursor-pointer')
+    expect(rendered?.label.props?.class).not.toContain('hover:')
     expect(rendered?.popover?.keepAliveOnHover).toBe(true)
     expect(rendered?.popover?.scrollable).toBe(true)
   })

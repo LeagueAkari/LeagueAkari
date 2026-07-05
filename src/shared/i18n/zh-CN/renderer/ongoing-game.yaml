@@ -158,6 +158,7 @@ ongoingGame:
     winRatePopover: 在近期 {{count}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
     kdaPopover: 在近期 {{count}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
     premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
+    editTag: 标记此玩家
     collectByChampion: 收集「{{champion}}」的战绩
     collectByPosition: 收集「{{position}}」的战绩
     sameChampionHistory: 英雄战绩

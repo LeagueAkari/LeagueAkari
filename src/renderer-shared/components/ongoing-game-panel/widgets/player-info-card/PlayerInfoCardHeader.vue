@@ -57,27 +57,41 @@
           </NPopover>
         </div>
 
-        <NDropdown
-          v-if="matchCollectionOptions.length"
-          trigger="click"
-          size="small"
-          placement="bottom-start"
-          :options="matchCollectionOptions"
-          @select="handleMatchCollectionSelect"
-        >
-          <NButton
-            quaternary
-            size="tiny"
-            class="shrink-0 text-black/60 dark:text-white/60"
-            @click.stop
-          >
-            <template #icon>
-              <NIcon size="16">
-                <MoreVertFilledIcon />
-              </NIcon>
+        <span v-if="playerActionOptions.length" class="relative inline-flex shrink-0">
+          <NPopover v-model:show="isTagEditPopoverShowing" trigger="click" placement="bottom-end">
+            <template #trigger>
+              <span class="player-action-anchor pointer-events-none absolute inset-0" />
             </template>
-          </NButton>
-        </NDropdown>
+
+            <PlayerTagEditPanel
+              :puuid="puuid"
+              :summoner="summoner"
+              @cancel="isTagEditPopoverShowing = false"
+              @saved="handleTagSaved"
+            />
+          </NPopover>
+
+          <NDropdown
+            trigger="click"
+            size="small"
+            placement="bottom-start"
+            :options="playerActionOptions"
+            @select="handlePlayerActionSelect"
+          >
+            <NButton
+              quaternary
+              size="tiny"
+              class="shrink-0 text-black/60 dark:text-white/60"
+              @click.stop
+            >
+              <template #icon>
+                <NIcon size="16">
+                  <MoreVertFilledIcon />
+                </NIcon>
+              </template>
+            </NButton>
+          </NDropdown>
+        </span>
       </div>
 
       <NPopover :keep-alive-on-hover="false" :delay="50">
@@ -131,18 +145,21 @@
 </template>
 
 <script setup lang="tsx">
+import { PlayerTagEditPanel } from '@renderer-shared/components/player-tag-edit'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { Edit20Filled } from '@vicons/fluent'
 import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDropdown, NIcon, NPopover, NSkeleton, type DropdownOption } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT, RANKED_MEDAL_MAP } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
+import { PLAYER_INFO_CARD_ACTION_KEYS, getPlayerInfoCardActionKeys } from './player-actions'
 
 const { puuid } = defineProps<{
   puuid: string
@@ -151,7 +168,12 @@ const { puuid } = defineProps<{
 const { t } = useTranslation()
 const { masked } = useStreamerModeMaskedText()
 
-const { ongoingGame, mergedPremadeTeams, navigateToSummonerByPuuid } = useOngoingGamePanel()
+const {
+  ongoingGame,
+  mergedPremadeTeams,
+  navigateToSummonerByPuuid,
+  isStandaloneOngoingGameWindow
+} = useOngoingGamePanel()
 const resources = useGameResourceProvider()
 
 const summoner = computed(() => ongoingGame.value.summoner[puuid])
@@ -159,6 +181,8 @@ const summonerName = computed(() => summoner.value?.gameName || summoner.value?.
 const rankedStats = computed(() => ongoingGame.value.rankedStats[puuid])
 const position = computed(() => ongoingGame.value.positionAssignments?.[puuid])
 const championId = computed(() => ongoingGame.value.championSelections?.[puuid])
+
+const isTagEditPopoverShowing = ref(false)
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 
@@ -186,31 +210,59 @@ const currentPositionName = computed(() => {
   return t(`positions.${currentPosition.value}`, { ns: 'common' })
 })
 
-const matchCollectionOptions = computed(() => {
-  const options: DropdownOption[] = []
+const canEditTag = computed(
+  () =>
+    !isStandaloneOngoingGameWindow.value &&
+    !!ongoingGame.value.selfPuuid &&
+    puuid !== ongoingGame.value.selfPuuid
+)
 
-  if (hasCurrentChampion.value) {
-    options.push({
-      label: t('ongoingGame.playerCard.collectByChampion', { champion: championName.value }),
-      key: 'collect-by-champion',
-      icon: () => <ChampionIcon class="size-4 rounded" championId={currentChampionId.value} />
-    })
-  }
+const playerActionKeys = computed(() =>
+  getPlayerInfoCardActionKeys({
+    isStandaloneOngoingGameWindow: isStandaloneOngoingGameWindow.value,
+    canEditTag: canEditTag.value,
+    canCollectByChampion: hasCurrentChampion.value,
+    canCollectByPosition: hasCurrentPosition.value
+  })
+)
 
-  if (hasCurrentPosition.value) {
-    options.push({
-      label: t('ongoingGame.playerCard.collectByPosition', { position: currentPositionName.value }),
-      key: 'collect-by-position',
-      icon: () => <PositionIcon position={currentPosition.value} />
-    })
-  }
-
-  return options
+const playerActionOptions = computed(() => {
+  return playerActionKeys.value.map<DropdownOption>((key) => {
+    switch (key) {
+      case PLAYER_INFO_CARD_ACTION_KEYS.editTag:
+        return {
+          label: t('ongoingGame.playerCard.editTag'),
+          key,
+          icon: () => (
+            <NIcon>
+              <Edit20Filled />
+            </NIcon>
+          )
+        }
+      case PLAYER_INFO_CARD_ACTION_KEYS.collectByChampion:
+        return {
+          label: t('ongoingGame.playerCard.collectByChampion', { champion: championName.value }),
+          key,
+          icon: () => <ChampionIcon class="size-4 rounded" championId={currentChampionId.value} />
+        }
+      case PLAYER_INFO_CARD_ACTION_KEYS.collectByPosition:
+        return {
+          label: t('ongoingGame.playerCard.collectByPosition', {
+            position: currentPositionName.value
+          }),
+          key,
+          icon: () => <PositionIcon position={currentPosition.value} />
+        }
+    }
+  })
 })
 
-const handleMatchCollectionSelect = (key: string | number) => {
+const handlePlayerActionSelect = (key: string | number) => {
   switch (key) {
-    case 'collect-by-champion':
+    case PLAYER_INFO_CARD_ACTION_KEYS.editTag:
+      isTagEditPopoverShowing.value = true
+      break
+    case PLAYER_INFO_CARD_ACTION_KEYS.collectByChampion:
       if (hasCurrentChampion.value) {
         navigateToSummonerByPuuid(puuid, {
           matchHistory: {
@@ -220,7 +272,7 @@ const handleMatchCollectionSelect = (key: string | number) => {
         })
       }
       break
-    case 'collect-by-position':
+    case PLAYER_INFO_CARD_ACTION_KEYS.collectByPosition:
       if (hasCurrentPosition.value && currentPosition.value) {
         navigateToSummonerByPuuid(puuid, {
           matchHistory: {
@@ -231,6 +283,11 @@ const handleMatchCollectionSelect = (key: string | number) => {
       }
       break
   }
+}
+
+const handleTagSaved = () => {
+  isTagEditPopoverShowing.value = false
+  ongoingGame.value.reloadPlayer(puuid, { includes: ['savedInfo'] })
 }
 
 const rankedSoloFlex = computed(() => {

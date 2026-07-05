@@ -3,6 +3,7 @@ import type {
   DraftOptions,
   OngoingGameAnalysis,
   OngoingGamePanelSettings,
+  OngoingGamePlayerReloadOptions,
   OngoingGameSimplifiedChampMastery,
   QueryStage
 } from '@shared/shards/ongoing-game'
@@ -51,5 +52,5 @@ export interface OngoingGameProviderValue {
   readonly streamerMode: boolean
   readonly selfPuuid: string | null
 
-  reloadPlayer(puuid: string): void
+  reloadPlayer(puuid: string, options?: OngoingGamePlayerReloadOptions): void
 }

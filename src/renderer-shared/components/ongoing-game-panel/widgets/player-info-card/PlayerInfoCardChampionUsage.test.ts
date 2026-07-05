@@ -9,4 +9,8 @@ describe('PlayerInfoCardChampionUsage', () => {
     expect(source).toContain('collectByChampionId: championId')
     expect(source).toContain('expectedCount: ongoingGame.value.settings.matchHistoryLoadCount')
   })
+
+  it('guards champion collection for standalone ongoing-game window', () => {
+    expect(source).toContain('canCollectByChampion')
+  })
 })

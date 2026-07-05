@@ -28,6 +28,7 @@ export type OngoingGamePanelContext = {
     premadeTeamIdMap: Record<string, string>
   }>
   ongoingGame: Ref<OngoingGameProviderValue>
+  isStandaloneOngoingGameWindow: Ref<boolean>
 
   /** 低于或高于平均 KDA 的玩家 */
   kdaOutliers: Ref<Record<string, 'over' | 'below'>>
@@ -90,6 +91,7 @@ export function provideOngoingGamePanel(props: {
     premadeTeamIdMap: Record<string, string>
   }>
   ongoingGame: MaybeRefOrGetter<OngoingGameProviderValue>
+  isStandaloneOngoingGameWindow: MaybeRefOrGetter<boolean>
   kdaOutliers: MaybeRefOrGetter<Record<string, 'over' | 'below'>>
 
   navigateToSummonerByPuuid: (
@@ -107,6 +109,7 @@ export function provideOngoingGamePanel(props: {
     isTwoTeamsMode: toRef(props.isTwoTeamsMode),
     mergedPremadeTeams: toRef(props.mergedPremadeTeams),
     ongoingGame: toRef(props.ongoingGame),
+    isStandaloneOngoingGameWindow: toRef(props.isStandaloneOngoingGameWindow),
 
     kdaOutliers: toRef(props.kdaOutliers),
 

@@ -19,6 +19,7 @@
         <OngoingGamePanel
           :content-width="containerWidth"
           :content-height="containerHeight"
+          is-standalone-ongoing-game-window
           @preview-game="handlePreviewGame"
         />
       </OngoingGameProvider>

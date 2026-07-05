@@ -3,7 +3,8 @@
     <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :key="c.id" :delay="50">
       <template #trigger>
         <div
-          class="relative h-5 w-5 cursor-pointer transition-[filter] hover:brightness-110"
+          class="relative h-5 w-5 transition-[filter]"
+          :class="{ 'cursor-pointer hover:brightness-110': canCollectByChampion }"
           @click.stop="() => collectByChampion(c.id)"
         >
           <ChampionIcon
@@ -127,7 +128,8 @@ const { puuid } = defineProps<{
 const { t } = useTranslation()
 const { formatExtremeNumber } = useNumberFormatter()
 
-const { ongoingGame, navigateToSummonerByPuuid } = useOngoingGamePanel()
+const { ongoingGame, navigateToSummonerByPuuid, isStandaloneOngoingGameWindow } =
+  useOngoingGamePanel()
 const resources = useGameResourceProvider()
 
 const analysis = computed(() => ongoingGame.value.analysis?.players[puuid])
@@ -136,8 +138,13 @@ const championMastery = computed(() => ongoingGame.value.championMastery[puuid])
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const formatMasteryTime = (value: number) => dayjs(value).format('YYYY-MM-DD')
+const canCollectByChampion = computed(() => !isStandaloneOngoingGameWindow.value)
 
 const collectByChampion = (championId: number) => {
+  if (!canCollectByChampion.value) {
+    return
+  }
+
   navigateToSummonerByPuuid(puuid, {
     matchHistory: {
       collectByChampionId: championId,

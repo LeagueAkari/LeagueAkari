@@ -1,4 +1,8 @@
-import { OngoingGameSimplifiedChampMastery } from '@shared/shards/ongoing-game'
+import {
+  type OngoingGamePlayerReloadOptions,
+  OngoingGameSimplifiedChampMastery,
+  resolveOngoingGamePlayerReloadScopes
+} from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
 import { runInAction } from 'mobx'
 
@@ -103,11 +107,29 @@ export class OngoingGamePlayerDataLoader {
     }
   }
 
-  reloadPlayer(puuid: string) {
-    this.loadSummoner(puuid, { force: true })
-    this.loadRankedStats(puuid, { force: true })
-    this.loadSavedInfo(puuid, { force: true })
-    this.loadChampionMastery(puuid, { force: true })
+  reloadPlayer(puuid: string, options?: OngoingGamePlayerReloadOptions) {
+    const scopes = resolveOngoingGamePlayerReloadScopes(options)
+    const { queueKeeper } = this._context
+
+    if (scopes.includes('summoner')) {
+      queueKeeper.cancelByTags([puuid, 'summoner'], 'and')
+      this.loadSummoner(puuid, { force: true })
+    }
+
+    if (scopes.includes('rankedStats')) {
+      queueKeeper.cancelByTags([puuid, 'ranked-stats'], 'and')
+      this.loadRankedStats(puuid, { force: true })
+    }
+
+    if (scopes.includes('savedInfo')) {
+      queueKeeper.cancelByTags([puuid, 'saved-info'], 'and')
+      this.loadSavedInfo(puuid, { force: true })
+    }
+
+    if (scopes.includes('championMastery')) {
+      queueKeeper.cancelByTags([puuid, 'champion-mastery'], 'and')
+      this.loadChampionMastery(puuid, { force: true })
+    }
   }
 
   async loadSummoner(puuid: string, options: { force?: boolean; isAdditional?: boolean } = {}) {

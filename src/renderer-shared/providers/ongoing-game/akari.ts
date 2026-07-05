@@ -76,8 +76,8 @@ export function createAkariOngoingGameProvider(): OngoingGameProviderValue {
     get selfPuuid() {
       return leagueClient.summoner.me?.puuid ?? null
     },
-    reloadPlayer(puuid: string) {
-      ongoingGameRenderer.reloadPlayer(puuid)
+    reloadPlayer(puuid, options) {
+      ongoingGameRenderer.reloadPlayer(puuid, options)
     }
   }
 }

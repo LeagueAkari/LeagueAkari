@@ -327,8 +327,8 @@ export function createStoryOngoingGameProviderValue(
     get selfPuuid() {
       return active ? currentSummonerPuuid : null
     },
-    reloadPlayer(puuid) {
-      console.info('[storybook] reloadPlayer', puuid)
+    reloadPlayer(puuid, options) {
+      console.info('[storybook] reloadPlayer', puuid, options)
     }
   }
 }

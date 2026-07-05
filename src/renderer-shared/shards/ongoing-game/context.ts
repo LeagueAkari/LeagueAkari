@@ -1,6 +1,10 @@
 import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import type { DraftOptions, OngoingGameSimplifiedChampMastery } from '@shared/shards/ongoing-game'
+import type {
+  DraftOptions,
+  OngoingGamePlayerReloadOptions,
+  OngoingGameSimplifiedChampMastery
+} from '@shared/shards/ongoing-game'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
 
@@ -43,6 +47,7 @@ export type {
   LcuOrSgpGameSummary,
   MatchHistoryPlayer,
   OngoingGameSimplifiedChampMastery,
+  OngoingGamePlayerReloadOptions,
   RankedStats,
   SummonerInfo
 }

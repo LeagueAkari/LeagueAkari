@@ -23,6 +23,7 @@ export interface PlayerCardTagContext {
   positionAssignment?: OngoingGamePanelPositionAssignment
   spells?: OngoingGamePanelSummonerSpellSelection
   cachedGames: Record<number, LcuOrSgpGameSummary>
+  isStandaloneOngoingGameWindow: boolean
   locale: string
   t: TFunction
   masked: (text: string, replacement?: string) => string

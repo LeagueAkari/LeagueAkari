@@ -88,6 +88,8 @@ const props = defineProps<{
   contentWidth: number
   /** 容器参考高度，用于计算两队模式下的高度样式 */
   contentHeight: number
+  /** 独立 ongoing-game 窗口只提供展示和轻量交互 */
+  isStandaloneOngoingGameWindow?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -242,6 +244,7 @@ const teamsContainerStyles = computed(() => {
 })
 
 const kdaOutliers = computed(() => getOngoingGamePanelKdaOutliers(ongoingGame.value.analysis))
+const isStandaloneOngoingGameWindow = computed(() => props.isStandaloneOngoingGameWindow ?? false)
 
 provideOngoingGamePanel({
   contentWidth: () => props.contentWidth,
@@ -252,6 +255,7 @@ provideOngoingGamePanel({
   isTwoTeamsMode,
   mergedPremadeTeams,
   ongoingGame,
+  isStandaloneOngoingGameWindow,
   kdaOutliers,
 
   navigateToSummonerByPuuid: (puuid: string, initParams?: OngoingGamePanelPlayerTabInitParams) => {

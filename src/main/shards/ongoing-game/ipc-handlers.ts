@@ -1,5 +1,9 @@
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
-import { DraftOptions } from '@shared/shards/ongoing-game'
+import {
+  DraftOptions,
+  type OngoingGamePlayerReloadOptions,
+  resolveOngoingGamePlayerReloadScopes
+} from '@shared/shards/ongoing-game'
 import { toJS } from 'mobx'
 
 import type { OngoingGameAdditionalInfoController } from './additional-info-controller'
@@ -58,9 +62,13 @@ export class OngoingGameIpcHandlers {
       this._clearAndReloadAll()
     })
 
-    ipc.onCall(ONGOING_GAME_MAIN_NAMESPACE, 'reloadPlayer', (_, puuid: string) => {
-      this._reloadPlayer(puuid)
-    })
+    ipc.onCall(
+      ONGOING_GAME_MAIN_NAMESPACE,
+      'reloadPlayer',
+      (_, puuid: string, options?: OngoingGamePlayerReloadOptions) => {
+        this._reloadPlayer(puuid, options)
+      }
+    )
   }
 
   private _clearAndReloadAll() {
@@ -88,20 +96,25 @@ export class OngoingGameIpcHandlers {
     this._additionalInfo.update()
   }
 
-  private _reloadPlayer(puuid: string) {
+  private _reloadPlayer(puuid: string, options?: OngoingGamePlayerReloadOptions) {
     const { queueKeeper, settings, state } = this._context
+    const scopes = resolveOngoingGamePlayerReloadScopes(options)
 
-    queueKeeper.cancelByTags(puuid)
+    if (scopes.includes('matchHistory')) {
+      queueKeeper.cancelByTags([puuid, 'match-history'], 'and')
+      queueKeeper.cancelByTags([puuid, 'game-summary'], 'and')
 
-    this._matchHistory.loadMatchHistory(puuid, {
-      params: {
-        startIndex: 0,
-        count: settings.matchHistoryLoadCount,
-        ...state.matchHistoryTagParams
-      },
-      force: true,
-      apiSource: state.apiShouldUse
-    })
-    this._playerData.reloadPlayer(puuid)
+      this._matchHistory.loadMatchHistory(puuid, {
+        params: {
+          startIndex: 0,
+          count: settings.matchHistoryLoadCount,
+          ...state.matchHistoryTagParams
+        },
+        force: true,
+        apiSource: state.apiShouldUse
+      })
+    }
+
+    this._playerData.reloadPlayer(puuid, options)
   }
 }
