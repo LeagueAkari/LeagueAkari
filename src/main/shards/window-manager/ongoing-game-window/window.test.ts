@@ -1,3 +1,4 @@
+import { comparer } from 'mobx'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AkariOngoingGameWindow } from './window'
@@ -90,7 +91,7 @@ function createContext() {
         (
           getter: () => unknown,
           effect: (value: unknown) => void,
-          options?: { fireImmediately?: boolean }
+          options?: { delay?: number; equals?: unknown; fireImmediately?: boolean }
         ) => {
           if (options?.fireImmediately) {
             effect(getter())
@@ -139,5 +140,25 @@ describe('AkariOngoingGameWindow', () => {
 
     expect(createWindow).not.toHaveBeenCalled()
     expect(close).toHaveBeenCalledWith(true)
+  })
+
+  it('delays tracked bounds writes at the storage layer', async () => {
+    const context = createContext()
+    const ongoingGameWindow = new AkariOngoingGameWindow(context as any)
+
+    await ongoingGameWindow.onInit()
+
+    const reactionCall = context.mobxUtils.reaction.mock.calls.find(([, , options]) => {
+      return options?.equals === comparer.shallow && !options.delay && !options.fireImmediately
+    })
+    const settingService = context.settingFactory.register.mock.results[0].value
+    const bounds = { x: 10, y: 20, width: 300, height: 240 }
+
+    expect(reactionCall).toBeTruthy()
+    reactionCall![1](bounds)
+
+    expect(settingService._saveToStorage).toHaveBeenCalledWith('trackedBounds', bounds, {
+      delay: 1000
+    })
   })
 })

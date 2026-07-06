@@ -280,10 +280,10 @@ export abstract class BaseAkariWindow<
       () => this.state.trackedBounds,
       (bounds) => {
         if (bounds) {
-          this._settingService._saveToStorage('trackedBounds', bounds)
+          this._settingService._saveToStorage('trackedBounds', bounds, { delay: 1000 })
         }
       },
-      { delay: 1000, equals: comparer.shallow }
+      { equals: comparer.shallow }
     )
 
     this._context.mobxUtils.reaction(

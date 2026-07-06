@@ -13,12 +13,19 @@ export interface SetterSettingServiceSetConfig {
   /**
    * 短期内的防抖措施
    *
-   * 当设置为 true 开启, 默认为 500ms, 当设置为 false 时, 会立即写入
-   *
-   * 当设置为数字时, 表示延迟时间, 单位为毫秒
+   * 当设置为数字时开启延迟写入, 单位为毫秒
    */
-  delay?: boolean | number
+  delay?: number
 }
+
+type PendingStorageOperation =
+  | {
+      type: 'save'
+      value: unknown
+    }
+  | {
+      type: 'remove'
+    }
 
 /**
  * 在更新设置时同时更改状态, 状态同步的设置项服务
@@ -26,6 +33,8 @@ export interface SetterSettingServiceSetConfig {
  */
 export class SetterSettingService<TSettings extends object = any> {
   static CONFIG_DIR_NAME = 'AkariConfig'
+
+  private readonly _pendingStorageOperations = new Map<string, PendingStorageOperation>()
 
   constructor(
     private readonly _settingFactory: SettingFactoryMain,
@@ -35,16 +44,94 @@ export class SetterSettingService<TSettings extends object = any> {
     public readonly _obj: TSettings
   ) {}
 
-  _getFromStorage(key: string, defaultValue?: any) {
+  async _getFromStorage<T = any>(key: string): Promise<T | undefined>
+  async _getFromStorage<T>(key: string, defaultValue: T): Promise<T>
+  async _getFromStorage(key: string, defaultValue?: any) {
+    const pendingOperation = this._pendingStorageOperations.get(key)
+    if (pendingOperation?.type === 'save') {
+      return pendingOperation.value
+    }
+
+    if (pendingOperation?.type === 'remove') {
+      return defaultValue
+    }
+
     return this._settingFactory._getFromStorage(this._namespace, key, defaultValue)
   }
 
-  _saveToStorage(key: string, value: any) {
-    return this._settingFactory._saveToStorage(this._namespace, key, value)
+  _saveToStorage(key: string, value: any, config: SetterSettingServiceSetConfig = {}) {
+    if (typeof config.delay === 'number') {
+      return this._scheduleStorageSave(key, value, config.delay)
+    }
+
+    return this._saveToStorageImmediately(key, value)
   }
 
   _removeFromStorage(key: string) {
+    return this._removeFromStorageImmediately(key)
+  }
+
+  private _scheduleStorageSave(key: string, value: any, delay: number) {
+    const pendingOperation: PendingStorageOperation = { type: 'save', value }
+
+    this._pendingStorageOperations.set(key, pendingOperation)
+    this._settingFactory._delayed.add(
+      this._createStorageKey(key),
+      async () => {
+        try {
+          await this._settingFactory._saveToStorage(this._namespace, key, value)
+        } finally {
+          this._clearPendingStorageOperation(key, pendingOperation)
+        }
+      },
+      delay
+    )
+
+    return Promise.resolve()
+  }
+
+  private _scheduleStorageRemove(key: string, delay: number) {
+    const pendingOperation: PendingStorageOperation = { type: 'remove' }
+
+    this._pendingStorageOperations.set(key, pendingOperation)
+    this._settingFactory._delayed.add(
+      this._createStorageKey(key),
+      async () => {
+        try {
+          await this._settingFactory._removeFromStorage(this._namespace, key)
+        } finally {
+          this._clearPendingStorageOperation(key, pendingOperation)
+        }
+      },
+      delay
+    )
+
+    return Promise.resolve()
+  }
+
+  private _saveToStorageImmediately(key: string, value: any) {
+    this._cancelPendingStorageOperation(key)
+    return this._settingFactory._saveToStorage(this._namespace, key, value)
+  }
+
+  private _removeFromStorageImmediately(key: string) {
+    this._cancelPendingStorageOperation(key)
     return this._settingFactory._removeFromStorage(this._namespace, key)
+  }
+
+  private _createStorageKey(key: string) {
+    return `${this._namespace}/${key}`
+  }
+
+  private _cancelPendingStorageOperation(key: string) {
+    this._pendingStorageOperations.delete(key)
+    this._settingFactory._delayed.remove(this._createStorageKey(key))
+  }
+
+  private _clearPendingStorageOperation(key: string, pendingOperation: PendingStorageOperation) {
+    if (this._pendingStorageOperations.get(key) === pendingOperation) {
+      this._pendingStorageOperations.delete(key)
+    }
   }
 
   _getByPrefixFromStorage(keyPrefix: string) {
@@ -76,11 +163,7 @@ export class SetterSettingService<TSettings extends object = any> {
         return
       }
 
-      const value = await this._settingFactory._getFromStorage(
-        this._namespace,
-        key as any,
-        schema.default
-      )
+      const value = await this._getFromStorage(key as any, schema.default)
       items[key] = await this._restoreSettingConfig(key, value)
     })
     await Promise.all(jobs)
@@ -197,13 +280,9 @@ export class SetterSettingService<TSettings extends object = any> {
     runInAction(() => _.set(this._obj, key, value))
 
     if (value === null) {
-      this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-        this._settingFactory._removeFromStorage(this._namespace, key)
-      )
+      this._scheduleStorageRemove(key, 1000)
     } else {
-      this._settingFactory._delayed.add(`${this._namespace}/${key}`, () =>
-        this._settingFactory._saveToStorage(this._namespace, key, value)
-      )
+      this._scheduleStorageSave(key, value, 1000)
     }
   }
 }
