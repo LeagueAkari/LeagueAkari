@@ -5,7 +5,7 @@
       <div
         v-if="teamIndicatorColorClass"
         :class="[
-          'mr-2 size-[10px] self-center rounded-full border border-white/20',
+          'mr-2 size-2.5 self-center rounded-full border border-white/20',
           teamIndicatorColorClass
         ]"
       ></div>

@@ -52,7 +52,7 @@
               <ChevronRight20Regular v-else />
             </NIcon>
           </template>
-          猜你想要
+          猜你想写
         </NButton>
 
         <NButton
@@ -151,10 +151,10 @@ const message = useMessage()
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
 
 const phraseRows = [
-  ['上路', '打野', '中路', '下路', '辅助'],
-  ['傻逼', '唐氏', '弱智', '脑瘫', '畜生', '菜狗'],
-  ['挂机', '嘲讽', 'K头', '地缚灵', '送头', '嘴硬', '公屏互动'],
-  ['狗', '东西'],
+  ['上路', '打野', '中路', '下路', '辅助', '三路', '四路'],
+  ['傻逼', '唐氏', '弱智', '脑瘫', '畜生', '死', '司马', '全家', '嘴脸'],
+  ['挂机', '嘲讽', 'K头', '地缚灵', '送头', '嘴硬', '公屏互动', '弱爆'],
+  ['菜', '野', '狗', '东西'],
   ['的']
 ]
 
