@@ -133,41 +133,43 @@ export type HasPlayerCombinator = CombinatorNode<'hasPlayer', [CombinatorArgPara
 export type IsMatchedGameCombinator = CombinatorNode<'isMatchedGame', []>
 export type IsPveGameCombinator = CombinatorNode<'isPveGame', []>
 
-export const nodeArg = (value: string | null): CombinatorArgNodeRef => ({
-  kind: 'node',
-  value
-})
+export function nodeArg(value: string | null): CombinatorArgNodeRef {
+  return {
+    kind: 'node',
+    value
+  }
+}
 
-export const paramArg = <T>(value: T): CombinatorArgParam<T> => ({
-  kind: 'param',
-  value
-})
+export function paramArg<T>(value: T): CombinatorArgParam<T> {
+  return {
+    kind: 'param',
+    value
+  }
+}
 
-export const isNodeArg = (arg: CombinatorArg): arg is CombinatorArgNodeRef & { value: string } => {
+export function isNodeArg(arg: CombinatorArg): arg is CombinatorArgNodeRef & {
+  value: string
+} {
   return !!arg && arg.kind === 'node'
 }
 
-export const isParamArg = (arg: CombinatorArg): arg is CombinatorArgParam<unknown> => {
+export function isParamArg(arg: CombinatorArg): arg is CombinatorArgParam<unknown> {
   return !!arg && arg.kind === 'param'
 }
 
-export const collectSubtreeNodeIds = (
+export function collectSubtreeNodeIds(
   rootId: string,
   nodeMap: Record<string, CombinatorNode>
-): Set<string> => {
+): Set<string> {
   const visited = new Set<string>()
-
   const dfs = (id: string) => {
     if (visited.has(id)) return
     visited.add(id)
-
     const node = nodeMap[id]
     if (!node) return
-
     const childIds = node.args.filter(isNodeArg).map((a) => a.value)
     childIds.forEach(dfs)
   }
-
   dfs(rootId)
   return visited
 }

@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { RadixMatcher } from './radix-matcher'
 
-const dataOf = (results: { data: unknown }[]) => results.map((r) => r.data)
+function dataOf(
+  results: {
+    data: unknown
+  }[]
+) {
+  return results.map((r) => r.data)
+}
 
 describe('RadixMatcher.validateRoute', () => {
   it('accepts static, placeholder, anonymous placeholder, and wildcard routes', () => {

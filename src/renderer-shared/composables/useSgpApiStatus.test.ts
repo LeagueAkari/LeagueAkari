@@ -5,23 +5,25 @@ import { ref } from 'vue'
 
 import { useSgpApiStatus } from './useSgpApiStatus'
 
-const createLeagueServers = () => ({
-  version: 2,
-  lastUpdate: 0,
-  servers: {
-    NA1: {
-      matchHistory: 'https://na1.example.test',
-      common: 'https://na1-common.example.test'
+function createLeagueServers() {
+  return {
+    version: 2,
+    lastUpdate: 0,
+    servers: {
+      NA1: {
+        matchHistory: 'https://na1.example.test',
+        common: 'https://na1-common.example.test'
+      },
+      TENCENT_HN10: {
+        matchHistory: 'https://hn10.example.test',
+        common: 'https://hn10-common.example.test'
+      }
     },
-    TENCENT_HN10: {
-      matchHistory: 'https://hn10.example.test',
-      common: 'https://hn10-common.example.test'
-    }
-  },
-  serverNames: {},
-  tencentServerMatchHistoryInteroperability: [],
-  tencentServerSummonerInteroperability: []
-})
+    serverNames: {},
+    tencentServerMatchHistoryInteroperability: [],
+    tencentServerSummonerInteroperability: []
+  }
+}
 
 describe('useSgpApiStatus', () => {
   beforeEach(() => {

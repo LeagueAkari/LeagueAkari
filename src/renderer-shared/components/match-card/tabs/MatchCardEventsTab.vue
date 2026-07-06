@@ -344,7 +344,7 @@ const events = computed(() => {
 })
 
 /** 获取事件涉及的 participantId 列表（击杀者、助攻、被击杀者等） */
-function getEventParticipantIds(e: (typeof events.value)[number]): number[] {
+const getEventParticipantIds = (e: (typeof events.value)[number]): number[] => {
   const ids: number[] = []
   if ('killerId' in e && e.killerId) ids.push(e.killerId)
   if ('victimId' in e && e.victimId) ids.push(e.victimId)

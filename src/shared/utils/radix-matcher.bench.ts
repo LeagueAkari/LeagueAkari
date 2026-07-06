@@ -46,59 +46,49 @@ const longMixedPath =
 let cursor = 0
 let sink: unknown
 
-const nextIndex = () => {
+function nextIndex() {
   const index = cursor
   cursor = (cursor + 1) % LOOKUP_COUNT
   return index
 }
 
-const buildMatcher = () => {
+function buildMatcher() {
   const matcher = new RadixMatcher()
-
   for (const [route, data] of staticRoutes) {
     matcher.insert(route, data)
   }
-
   for (const [route, data] of placeholderRoutes) {
     matcher.insert(route, data)
   }
-
   for (const [route, data] of wildcardRoutes) {
     matcher.insert(route, data)
   }
-
   matcher.insert(mixedPath, 'mixed-static')
   matcher.insert('/bench/mixed/:id', 'mixed-placeholder')
   matcher.insert('/bench/**', 'mixed-wildcard')
   matcher.insert(longMixedRoute, 'long-mixed')
-
   return matcher
 }
 
 const matcher = buildMatcher()
 
-const buildEmitter = () => {
+function buildEmitter() {
   const emitter = new RadixEventEmitter()
   const listener = (data: unknown, params: unknown) => {
     sink = [data, params]
   }
-
   for (const [route] of staticRoutes) {
     emitter.on(route, listener)
   }
-
   for (const [route] of placeholderRoutes) {
     emitter.on(route, listener)
   }
-
   for (const [route] of wildcardRoutes) {
     emitter.on(route, listener)
   }
-
   emitter.on(mixedPath, listener)
   emitter.on('/bench/mixed/:id', listener)
   emitter.on('/bench/**', listener)
-
   return emitter
 }
 
@@ -136,4 +126,6 @@ describe('RadixEventEmitter benchmark', () => {
   })
 })
 
-export const getRadixMatcherBenchSink = () => sink
+export function getRadixMatcherBenchSink() {
+  return sink
+}

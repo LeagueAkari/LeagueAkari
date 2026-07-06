@@ -1,3 +1,5 @@
 export const isSuggestionPanelInitiallyExpanded = false
 
-export const getNextSuggestionPanelExpanded = (expanded: boolean) => !expanded
+export function getNextSuggestionPanelExpanded(expanded: boolean) {
+  return !expanded
+}

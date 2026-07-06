@@ -54,40 +54,43 @@ export type SimplePredicateOptions = {
   enablePosition?: boolean
 }
 
-export const createEmptyState = (): MatchHistoryFilterState => ({
-  version: STATE_VERSION,
-  rootId: ROOT_ID,
-  nodeMap: {
-    [ROOT_ID]: {
-      id: ROOT_ID,
-      type: 'game',
-      args: [nodeArg(null)],
-      parentId: null
-    }
-  },
-  cachedSummoners: {}
-})
+export function createEmptyState(): MatchHistoryFilterState {
+  return {
+    version: STATE_VERSION,
+    rootId: ROOT_ID,
+    nodeMap: {
+      [ROOT_ID]: {
+        id: ROOT_ID,
+        type: 'game',
+        args: [nodeArg(null)],
+        parentId: null
+      }
+    },
+    cachedSummoners: {}
+  }
+}
 
-export const createEmptySimpleState = (): SimpleMatchHistoryFilterState => ({
-  version: SIMPLE_STATE_VERSION,
-  winLoss: 'all',
-  timeRange: 'all',
-  positions: [],
-  championIds: [],
-  summonerPuuids: [],
-  cachedSummoners: {}
-})
+export function createEmptySimpleState(): SimpleMatchHistoryFilterState {
+  return {
+    version: SIMPLE_STATE_VERSION,
+    winLoss: 'all',
+    timeRange: 'all',
+    positions: [],
+    championIds: [],
+    summonerPuuids: [],
+    cachedSummoners: {}
+  }
+}
 
-export const getRootNode = (state: MatchHistoryFilterState): GameCombinator => {
+export function getRootNode(state: MatchHistoryFilterState): GameCombinator {
   return state.nodeMap[state.rootId] as GameCombinator
 }
 
-export const hasSimplePredicate = (
+export function hasSimplePredicate(
   state: SimpleMatchHistoryFilterState,
   options: SimplePredicateOptions = {}
-) => {
+) {
   const timeRange = state.timeRange ?? 'all'
-
   return (
     state.winLoss !== 'all' ||
     timeRange !== 'all' ||
@@ -97,14 +100,14 @@ export const hasSimplePredicate = (
   )
 }
 
-export const hasPredicate = (state: MatchHistoryFilterState) => {
+export function hasPredicate(state: MatchHistoryFilterState) {
   return getRootNode(state).args[0].value !== null
 }
 
-export const addNode = (
+export function addNode(
   state: MatchHistoryFilterState,
   node: CombinatorNode
-): MatchHistoryFilterState => {
+): MatchHistoryFilterState {
   return {
     ...state,
     nodeMap: {
@@ -114,11 +117,11 @@ export const addNode = (
   }
 }
 
-export const updateNode = (
+export function updateNode(
   state: MatchHistoryFilterState,
   id: string,
   node: CombinatorNode
-): MatchHistoryFilterState => {
+): MatchHistoryFilterState {
   return {
     ...state,
     nodeMap: {
@@ -128,25 +131,20 @@ export const updateNode = (
   }
 }
 
-export const insertSiblingWithOr = (
+export function insertSiblingWithOr(
   state: MatchHistoryFilterState,
   id: string,
   siblingNode: CombinatorNode
-): MatchHistoryFilterState => {
+): MatchHistoryFilterState {
   const currentNode = state.nodeMap[id]
-
   if (!currentNode?.parentId) {
     return state
   }
-
   const parentNode = state.nodeMap[currentNode.parentId]
-
   if (!parentNode) {
     return state
   }
-
   const siblingArg = nodeArg(siblingNode.id) as NonNullCombinatorArgNodeRef
-
   if (parentNode.type === 'or') {
     return {
       ...state,
@@ -163,7 +161,6 @@ export const insertSiblingWithOr = (
       }
     }
   }
-
   const orNode: CombinatorNode<'or', NonNullCombinatorArgNodeRef[]> = {
     id: `or-${crypto.randomUUID()}`,
     type: 'or',
@@ -171,7 +168,6 @@ export const insertSiblingWithOr = (
     parentId: parentNode.id,
     argDeleteStrategy: 'remove-from-array'
   }
-
   return {
     ...state,
     nodeMap: {
@@ -195,20 +191,16 @@ export const insertSiblingWithOr = (
   }
 }
 
-export const deleteNode = (state: MatchHistoryFilterState, id: string): MatchHistoryFilterState => {
+export function deleteNode(state: MatchHistoryFilterState, id: string): MatchHistoryFilterState {
   if (id === state.rootId) {
     return clearPredicate(state)
   }
-
   const target = state.nodeMap[id]
   if (!target) return state
-
   const ids = collectSubtreeNodeIds(id, state.nodeMap)
   const nextNodeMap = { ...state.nodeMap }
-
   if (target.parentId) {
     const parent = state.nodeMap[target.parentId]
-
     if (parent) {
       if (parent.argDeleteStrategy === 'remove-from-array') {
         nextNodeMap[parent.id] = {
@@ -225,28 +217,24 @@ export const deleteNode = (state: MatchHistoryFilterState, id: string): MatchHis
       }
     }
   }
-
   ids.forEach((nodeId) => {
     delete nextNodeMap[nodeId]
   })
-
   return {
     ...state,
     nodeMap: nextNodeMap
   }
 }
 
-export const clearPredicate = (state: MatchHistoryFilterState): MatchHistoryFilterState => {
+export function clearPredicate(state: MatchHistoryFilterState): MatchHistoryFilterState {
   const rootNode = getRootNode(state)
   const childId = rootNode.args[0].value
-
   if (!childId) {
     return {
       ...state,
       cachedSummoners: {}
     }
   }
-
   const ids = collectSubtreeNodeIds(childId, state.nodeMap)
   const nextNodeMap = {
     ...state.nodeMap,
@@ -255,11 +243,9 @@ export const clearPredicate = (state: MatchHistoryFilterState): MatchHistoryFilt
       args: [nodeArg(null)]
     }
   }
-
   ids.forEach((nodeId) => {
     delete nextNodeMap[nodeId]
   })
-
   return {
     ...state,
     nodeMap: nextNodeMap,
@@ -267,11 +253,11 @@ export const clearPredicate = (state: MatchHistoryFilterState): MatchHistoryFilt
   }
 }
 
-export const saveSummoner = (
+export function saveSummoner(
   state: MatchHistoryFilterState,
   puuid: string,
   summoner: SimpleSummonerResult
-): MatchHistoryFilterState => {
+): MatchHistoryFilterState {
   return {
     ...state,
     cachedSummoners: {
@@ -281,31 +267,30 @@ export const saveSummoner = (
   }
 }
 
-export const clearSimplePredicate = (
+export function clearSimplePredicate(
   state: SimpleMatchHistoryFilterState
-): SimpleMatchHistoryFilterState => {
+): SimpleMatchHistoryFilterState {
   return {
     ...createEmptySimpleState(),
     version: state.version
   }
 }
 
-const createSimpleNodeId = (name: string) => {
+function createSimpleNodeId(name: string) {
   return `simple-${name}`
 }
 
-export const toFilterState = (
+export function toFilterState(
   state: SimpleMatchHistoryFilterState,
   currentPuuid: string,
   options: SimplePredicateOptions = {}
-): MatchHistoryFilterState => {
+): MatchHistoryFilterState {
   if (!hasSimplePredicate(state, options)) {
     return {
       ...createEmptyState(),
       cachedSummoners: state.cachedSummoners
     }
   }
-
   const nodeMap: Record<string, CombinatorNode> = {}
   const rootNode = {
     id: ROOT_ID,
@@ -320,17 +305,13 @@ export const toFilterState = (
     parentId: ROOT_ID,
     argDeleteStrategy: 'remove-from-array'
   }
-
   nodeMap[rootNode.id] = rootNode
   nodeMap[andNode.id] = andNode
-
   const addChild = (node: CombinatorNode) => {
     nodeMap[node.id] = node
     andNode.args.push(nodeArg(node.id) as NonNullCombinatorArgNodeRef)
   }
-
   const timeRange = state.timeRange ?? 'all'
-
   if (timeRange !== 'all') {
     addChild({
       id: createSimpleNodeId('time-range'),
@@ -339,11 +320,9 @@ export const toFilterState = (
       parentId: andNode.id
     })
   }
-
   if (state.winLoss !== 'all') {
     const playerNodeId = createSimpleNodeId('result-player')
     const resultNodeId = createSimpleNodeId(`result-${state.winLoss}`)
-
     if (state.winLoss === 'win') {
       nodeMap[resultNodeId] = {
         id: resultNodeId,
@@ -354,7 +333,6 @@ export const toFilterState = (
     } else {
       const normalLossNodeId = createSimpleNodeId('result-loss-normal')
       const surrenderLossNodeId = createSimpleNodeId('result-loss-surrender')
-
       nodeMap[resultNodeId] = {
         id: resultNodeId,
         type: 'or',
@@ -375,7 +353,6 @@ export const toFilterState = (
         parentId: resultNodeId
       }
     }
-
     addChild({
       id: playerNodeId,
       type: 'player',
@@ -383,11 +360,9 @@ export const toFilterState = (
       parentId: andNode.id
     })
   }
-
   if (options.enablePosition === true && state.positions.length > 0) {
     const playerNodeId = createSimpleNodeId('position-player')
     const positionNodeId = createSimpleNodeId('position')
-
     if (state.positions.length === 1) {
       nodeMap[positionNodeId] = {
         id: positionNodeId,
@@ -405,10 +380,8 @@ export const toFilterState = (
         parentId: playerNodeId,
         argDeleteStrategy: 'remove-from-array'
       }
-
       state.positions.forEach((position) => {
         const childNodeId = createSimpleNodeId(`position-${position}`)
-
         nodeMap[childNodeId] = {
           id: childNodeId,
           type: 'isPosition',
@@ -417,7 +390,6 @@ export const toFilterState = (
         }
       })
     }
-
     addChild({
       id: playerNodeId,
       type: 'player',
@@ -425,7 +397,6 @@ export const toFilterState = (
       parentId: andNode.id
     })
   }
-
   state.summonerPuuids.forEach((summonerPuuid, index) => {
     addChild({
       id: createSimpleNodeId(`summoner-${index}`),
@@ -434,18 +405,15 @@ export const toFilterState = (
       parentId: andNode.id
     })
   })
-
   state.championIds.forEach((championId, index) => {
     const anyoneNodeId = createSimpleNodeId(`champion-${index}`)
     const championNodeId = createSimpleNodeId(`champion-${index}-isChampion`)
-
     nodeMap[championNodeId] = {
       id: championNodeId,
       type: 'isChampion',
       args: [paramArg(championId)],
       parentId: anyoneNodeId
     }
-
     addChild({
       id: anyoneNodeId,
       type: 'anyone',
@@ -453,7 +421,6 @@ export const toFilterState = (
       parentId: andNode.id
     })
   })
-
   return {
     version: STATE_VERSION,
     rootId: ROOT_ID,
@@ -462,6 +429,6 @@ export const toFilterState = (
   }
 }
 
-export const toPredicate = (state: MatchHistoryFilterState): Predicate<LcuOrSgpGameSummary> => {
+export function toPredicate(state: MatchHistoryFilterState): Predicate<LcuOrSgpGameSummary> {
   return toCombinatorPredicate(state.rootId, state.nodeMap) as Predicate<LcuOrSgpGameSummary>
 }

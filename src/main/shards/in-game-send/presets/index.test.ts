@@ -451,7 +451,7 @@ describe('in-game-send presets', () => {
     const lines = buildRatingPresetLines(createContext(), createRatingOptions())
 
     expect(lines).toEqual([
-      '无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
+      '无极剑圣：50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
       '盲僧：近期没有对局记录'
     ])
   })
@@ -470,7 +470,7 @@ describe('in-game-send presets', () => {
     )
 
     expect(lines).toEqual([
-      'Master Yi: 50 recent matches, Win Rate 59% KDA 2.34 Avg Solo Kills 0.8 Main Champions [Master Yi, Lee Sin, Nautilus] Main Positions [Middle, Jungle]',
+      'Master Yi: 50 matches, Win Rate 59% KDA 2.34 Avg Solo Kills 0.8 Main Champions [Master Yi, Lee Sin, Nautilus] Main Positions [Middle, Jungle]',
       'Lee Sin: No recent matches'
     ])
   })
@@ -484,7 +484,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4'])
   })
 
   it('shows optional rating metrics after average vision score when enabled', () => {
@@ -503,7 +503,7 @@ describe('in-game-send presets', () => {
     } as InGameSendRatingPresetLineOptions)
 
     expect(lines).toEqual([
-      '无极剑圣：统计50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4 伤害30% 承伤27% 经济24% 补兵7.1/分 参团率62% 伤转比118%'
+      '无极剑圣：50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4 伤害30% 承伤27% 经济24% 补兵7.1/分 参团率62% 伤转比118%'
     ])
   })
 
@@ -514,7 +514,7 @@ describe('in-game-send presets', () => {
     })
 
     expect(lines).toEqual([
-      'RIP董事长#81406：统计50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
+      'RIP董事长#81406：50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
       'Lee Player#002：近期没有对局记录'
     ])
   })
@@ -532,7 +532,7 @@ describe('in-game-send presets', () => {
     )
 
     expect(lines).toEqual([
-      'RIP董事长#81406：统计50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
+      'RIP董事长#81406：50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
       'Lee Player#002：近期没有对局记录'
     ])
   })
@@ -548,7 +548,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：50场对局，胜率59% KDA2.34'])
   })
 
   it('uses current champion rating stats when enabled', () => {
@@ -558,7 +558,7 @@ describe('in-game-send presets', () => {
     })
 
     expect(lines).toEqual([
-      '无极剑圣：统计本英雄16场，胜率67% KDA4.32 场均单杀1.2 主玩位置[中路，打野，上路，下路]',
+      '无极剑圣：本英雄16场，胜率67% KDA4.32 场均单杀1.2 主玩位置[中路，打野，上路，下路]',
       '盲僧：近期没有本英雄对局记录'
     ])
   })
@@ -572,7 +572,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual(['RIP董事长#81406：统计无极剑圣16场，胜率67% KDA4.32 场均单杀1.2'])
+    expect(lines).toEqual(['RIP董事长#81406：无极剑圣16场，胜率67% KDA4.32 场均单杀1.2'])
   })
 
   it('uses current champion name in stats when duplicate champions force player names', () => {
@@ -593,7 +593,7 @@ describe('in-game-send presets', () => {
     )
 
     expect(lines).toEqual([
-      'RIP董事长#81406：统计无极剑圣16场，胜率67% KDA4.32 场均单杀1.2',
+      'RIP董事长#81406：无极剑圣16场，胜率67% KDA4.32 场均单杀1.2',
       'Lee Player#002：近期没有无极剑圣对局记录'
     ])
   })
@@ -607,9 +607,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual([
-      '无极剑圣（RIP董事长#81406）：统计本英雄16场，胜率67% KDA4.32 场均单杀1.2'
-    ])
+    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：本英雄16场，胜率67% KDA4.32 场均单杀1.2'])
   })
 
   it('reports players without champion selection when current champion stats are enabled', () => {
@@ -668,7 +666,7 @@ describe('in-game-send presets', () => {
       }
     )
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not append main champions when champion usage is scattered', () => {
@@ -693,7 +691,7 @@ describe('in-game-send presets', () => {
       }
     )
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not append main champions when disabled', () => {
@@ -706,7 +704,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not append main positions when position usage is scattered', () => {
@@ -733,7 +731,7 @@ describe('in-game-send presets', () => {
       }
     )
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not append main positions when position data is unavailable', () => {
@@ -754,7 +752,7 @@ describe('in-game-send presets', () => {
       }
     )
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not append main positions when disabled', () => {
@@ -767,7 +765,7 @@ describe('in-game-send presets', () => {
       mainPositions: false
     })
 
-    expect(lines).toEqual(['无极剑圣：统计50场对局，胜率59% KDA2.34'])
+    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
   it('does not build rating lines when there are no sendable players', () => {

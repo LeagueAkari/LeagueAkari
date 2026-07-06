@@ -128,7 +128,7 @@ const configOptions = computed<PresetDisplayOption<InGameSendRatingPresetConfigO
   }
 ])
 
-function updateDisplayOptions(value: Record<string, boolean>) {
+const updateDisplayOptions = (value: Record<string, boolean>) => {
   const patch: InGameSendRatingPresetOptionPatch = {
     winRate: value.winRate,
     kda: value.kda,
@@ -147,7 +147,7 @@ function updateDisplayOptions(value: Record<string, boolean>) {
   void updateOptions(patch)
 }
 
-function updateConfigOptions(value: Record<string, boolean>) {
+const updateConfigOptions = (value: Record<string, boolean>) => {
   const patch: InGameSendRatingPresetOptionPatch = {
     showCurrentChampion: value.showCurrentChampion
   }
@@ -155,7 +155,7 @@ function updateConfigOptions(value: Record<string, boolean>) {
   void updateOptions(patch)
 }
 
-function updateNameDisplayStrategy(value: InGameSendPresetNameDisplayStrategy) {
+const updateNameDisplayStrategy = (value: InGameSendPresetNameDisplayStrategy) => {
   void updateOptions({
     nameDisplayStrategy: value
   })

@@ -20,7 +20,7 @@ export const MATCH_HISTORY_INIT_PARAM_COLLECT_SETTINGS = {
   scannedGamesMultiplier: 10
 } as const
 
-export const createInitParamCollectSettings = (initParams: MatchHistoryInitParams) => {
+export function createInitParamCollectSettings(initParams: MatchHistoryInitParams) {
   const rawExpectedCount =
     typeof initParams.expectedCount === 'number' && initParams.expectedCount > 0
       ? initParams.expectedCount
@@ -33,7 +33,6 @@ export const createInitParamCollectSettings = (initParams: MatchHistoryInitParam
     expectedCount * MATCH_HISTORY_INIT_PARAM_COLLECT_SETTINGS.scannedGamesMultiplier,
     MATCH_HISTORY_INIT_PARAM_COLLECT_SETTINGS.maxScannedGames
   )
-
   return {
     countPerIteration: MATCH_HISTORY_INIT_PARAM_COLLECT_SETTINGS.countPerIteration,
     expectedCount,
@@ -44,35 +43,36 @@ export const createInitParamCollectSettings = (initParams: MatchHistoryInitParam
   }
 }
 
-const hasCollectChampion = (
+function hasCollectChampion(
   initParams: MatchHistoryInitParams
-): initParams is MatchHistoryInitParams & { collectByChampionId: number } => {
+): initParams is MatchHistoryInitParams & {
+  collectByChampionId: number
+} {
   return typeof initParams.collectByChampionId === 'number' && initParams.collectByChampionId > 0
 }
 
-const hasCollectPosition = (
+function hasCollectPosition(
   initParams: MatchHistoryInitParams
-): initParams is MatchHistoryInitParams & { collectByPosition: string } => {
+): initParams is MatchHistoryInitParams & {
+  collectByPosition: string
+} {
   return typeof initParams.collectByPosition === 'string' && initParams.collectByPosition.length > 0
 }
 
-export const createInitParamCollectFilterState = (
+export function createInitParamCollectFilterState(
   initParams: MatchHistoryInitParams,
   currentPuuid: string
-): MatchHistoryFilterState | null => {
+): MatchHistoryFilterState | null {
   const shouldCollectByChampion = hasCollectChampion(initParams)
   const shouldCollectByPosition = hasCollectPosition(initParams)
-
   if (!shouldCollectByChampion && !shouldCollectByPosition) {
     return null
   }
-
   const rootId = ROOT_ID
   const playerId = 'init-param-collect-player'
   const playerAndId = 'init-param-collect-player-and'
   const championId = 'init-param-collect-champion'
   const positionId = 'init-param-collect-position'
-
   const childNodeRefs: NonNullCombinatorArgNodeRef[] = []
   const nodeMap: Record<string, CombinatorNode> = {
     [rootId]: {
@@ -82,7 +82,6 @@ export const createInitParamCollectFilterState = (
       parentId: null
     }
   }
-
   if (shouldCollectByChampion) {
     childNodeRefs.push(nodeArg(championId) as NonNullCombinatorArgNodeRef)
     nodeMap[championId] = {
@@ -92,7 +91,6 @@ export const createInitParamCollectFilterState = (
       parentId: shouldCollectByPosition ? playerAndId : playerId
     }
   }
-
   if (shouldCollectByPosition) {
     childNodeRefs.push(nodeArg(positionId) as NonNullCombinatorArgNodeRef)
     nodeMap[positionId] = {
@@ -102,7 +100,6 @@ export const createInitParamCollectFilterState = (
       parentId: shouldCollectByChampion ? playerAndId : playerId
     }
   }
-
   if (shouldCollectByChampion && shouldCollectByPosition) {
     nodeMap[playerAndId] = {
       id: playerAndId,
@@ -112,7 +109,6 @@ export const createInitParamCollectFilterState = (
       argDeleteStrategy: 'remove-from-array'
     }
   }
-
   nodeMap[playerId] = {
     id: playerId,
     type: 'player',
@@ -124,7 +120,6 @@ export const createInitParamCollectFilterState = (
     ],
     parentId: rootId
   }
-
   return {
     version: STATE_VERSION,
     rootId,

@@ -425,15 +425,15 @@ watch(draftContent, (value) => {
   }
 })
 
-function getTrimmedTitle(title: string) {
+const getTrimmedTitle = (title: string) => {
   return title.trim()
 }
 
-function getDisplayTitle(title: string) {
+const getDisplayTitle = (title: string) => {
   return getTrimmedTitle(title) || t('unnamed')
 }
 
-function canMoveItem(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
+const canMoveItem = (id: string, direction: InGameSendFixedTextPresetItemMoveDirection) => {
   const itemIndex = items.value.findIndex((item) => item.id === id)
 
   if (itemIndex === -1) {
@@ -443,25 +443,25 @@ function canMoveItem(id: string, direction: InGameSendFixedTextPresetItemMoveDir
   return direction === 'up' ? itemIndex > 0 : itemIndex < items.value.length - 1
 }
 
-function shouldShowItemActions(id: string) {
+const shouldShowItemActions = (id: string) => {
   return hoveredItemId.value === id || deleteConfirmItemId.value === id
 }
 
-function handleItemMouseEnter(id: string) {
+const handleItemMouseEnter = (id: string) => {
   hoveredItemId.value = id
 }
 
-function handleItemMouseLeave(id: string) {
+const handleItemMouseLeave = (id: string) => {
   if (hoveredItemId.value === id) {
     hoveredItemId.value = null
   }
 }
 
-function handleDeleteConfirmShowUpdate(id: string, show: boolean) {
+const handleDeleteConfirmShowUpdate = (id: string, show: boolean) => {
   deleteConfirmItemId.value = show ? id : null
 }
 
-async function saveCurrent(options: { silent?: boolean } = {}) {
+const saveCurrent = async (options: { silent?: boolean } = {}) => {
   if (!selectedItem.value || !isDirty.value) {
     return true
   }
@@ -490,30 +490,30 @@ async function saveCurrent(options: { silent?: boolean } = {}) {
   }
 }
 
-async function handleAutoSave() {
+const handleAutoSave = async () => {
   await saveCurrent()
 }
 
-async function handleSaveClick() {
+const handleSaveClick = async () => {
   if (await saveCurrent()) {
     isEditingTitle.value = false
   }
 }
 
-async function startTitleEdit() {
+const startTitleEdit = async () => {
   pendingTitleEditItemId.value = null
   isEditingTitle.value = true
   await nextTick()
   titleInputRef.value?.focus()
 }
 
-async function finishTitleEdit() {
+const finishTitleEdit = async () => {
   if (await saveCurrent()) {
     isEditingTitle.value = false
   }
 }
 
-async function handleSelect(id: string) {
+const handleSelect = async (id: string) => {
   if (id === selectedId.value) {
     return
   }
@@ -525,7 +525,7 @@ async function handleSelect(id: string) {
   selectedId.value = id
 }
 
-async function handleCreate() {
+const handleCreate = async () => {
   if (!canCreate.value) {
     return
   }
@@ -551,7 +551,7 @@ async function handleCreate() {
   }
 }
 
-async function handleDelete(id: string) {
+const handleDelete = async (id: string) => {
   const deletedItem = items.value.find((item) => item.id === id)
 
   if (!deletedItem) {
@@ -585,7 +585,7 @@ async function handleDelete(id: string) {
   }
 }
 
-async function handleMove(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
+const handleMove = async (id: string, direction: InGameSendFixedTextPresetItemMoveDirection) => {
   if (!canMoveItem(id, direction)) {
     return
   }
@@ -597,7 +597,7 @@ async function handleMove(id: string, direction: InGameSendFixedTextPresetItemMo
   await fixedTextPreset.moveItem(id, direction)
 }
 
-async function handleShortcutUpdate(shortcutId: string | null) {
+const handleShortcutUpdate = async (shortcutId: string | null) => {
   if (!selectedItem.value) {
     return
   }
@@ -610,7 +610,7 @@ async function handleShortcutUpdate(shortcutId: string | null) {
   }
 }
 
-async function handleSend() {
+const handleSend = async () => {
   if (!selectedItem.value || sendDisabledReason.value) {
     return
   }

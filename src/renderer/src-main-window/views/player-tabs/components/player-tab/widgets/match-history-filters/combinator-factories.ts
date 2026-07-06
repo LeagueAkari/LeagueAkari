@@ -39,551 +39,776 @@ import {
   paramArg
 } from './combinator-nodes'
 
-export const createAndCombinator = (
+export function createAndCombinator(
   parentId: string,
-  options?: { args?: NonNullCombinatorArgNodeRef[] }
-): AndCombinator => ({
-  id: `and-${crypto.randomUUID()}`,
-  type: 'and',
-  args: options?.args ?? [],
-  parentId,
-  argDeleteStrategy: 'remove-from-array'
-})
+  options?: {
+    args?: NonNullCombinatorArgNodeRef[]
+  }
+): AndCombinator {
+  return {
+    id: `and-${crypto.randomUUID()}`,
+    type: 'and',
+    args: options?.args ?? [],
+    parentId,
+    argDeleteStrategy: 'remove-from-array'
+  }
+}
 
-export const createOrCombinator = (
+export function createOrCombinator(
   parentId: string,
-  options?: { args?: NonNullCombinatorArgNodeRef[] }
-): OrCombinator => ({
-  id: `or-${crypto.randomUUID()}`,
-  type: 'or',
-  args: options?.args ?? [],
-  parentId,
-  argDeleteStrategy: 'remove-from-array'
-})
+  options?: {
+    args?: NonNullCombinatorArgNodeRef[]
+  }
+): OrCombinator {
+  return {
+    id: `or-${crypto.randomUUID()}`,
+    type: 'or',
+    args: options?.args ?? [],
+    parentId,
+    argDeleteStrategy: 'remove-from-array'
+  }
+}
 
-export const createNotCombinator = (
+export function createNotCombinator(
   parentId: string,
-  options?: { arg?: CombinatorArgNodeRef }
-): NotCombinator => ({
-  id: `not-${crypto.randomUUID()}`,
-  type: 'not',
-  args: [options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    arg?: CombinatorArgNodeRef
+  }
+): NotCombinator {
+  return {
+    id: `not-${crypto.randomUUID()}`,
+    type: 'not',
+    args: [options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createIsAbortCombinator = (
+export function createIsAbortCombinator(parentId: string, _options?: unknown): IsAbortCombinator {
+  return {
+    id: `isAbort-${crypto.randomUUID()}`,
+    type: 'isAbort',
+    args: [],
+    parentId
+  }
+}
+
+export function createIsRemakeCombinator(parentId: string, _options?: unknown): IsRemakeCombinator {
+  return {
+    id: `isRemake-${crypto.randomUUID()}`,
+    type: 'isRemake',
+    args: [],
+    parentId
+  }
+}
+
+export function createIsWinCombinator(parentId: string, _options?: unknown): IsWinCombinator {
+  return {
+    id: `isWin-${crypto.randomUUID()}`,
+    type: 'isWin',
+    args: [],
+    parentId
+  }
+}
+
+export function createIsLossCombinator(
   parentId: string,
-  _options?: unknown
-): IsAbortCombinator => ({
-  id: `isAbort-${crypto.randomUUID()}`,
-  type: 'isAbort',
-  args: [],
-  parentId
-})
+  options?: {
+    isSurrender?: boolean
+  }
+): IsLossCombinator {
+  return {
+    id: `isLoss-${crypto.randomUUID()}`,
+    type: 'isLoss',
+    args: [paramArg(options?.isSurrender ?? false)],
+    parentId
+  }
+}
 
-export const createIsRemakeCombinator = (
+export function createHasAugmentCombinator(
   parentId: string,
-  _options?: unknown
-): IsRemakeCombinator => ({
-  id: `isRemake-${crypto.randomUUID()}`,
-  type: 'isRemake',
-  args: [],
-  parentId
-})
+  options?: {
+    augmentId?: number | null
+    order?: number
+  }
+): HasAugmentCombinator {
+  return {
+    id: `hasAugment-${crypto.randomUUID()}`,
+    type: 'hasAugment',
+    args: [paramArg(options?.augmentId ?? null), paramArg(options?.order ?? -1)],
+    parentId
+  }
+}
 
-export const createIsWinCombinator = (parentId: string, _options?: unknown): IsWinCombinator => ({
-  id: `isWin-${crypto.randomUUID()}`,
-  type: 'isWin',
-  args: [],
-  parentId
-})
-
-export const createIsLossCombinator = (
+export function createHasPerkCombinator(
   parentId: string,
-  options?: { isSurrender?: boolean }
-): IsLossCombinator => ({
-  id: `isLoss-${crypto.randomUUID()}`,
-  type: 'isLoss',
-  args: [paramArg(options?.isSurrender ?? false)],
-  parentId
-})
+  options?: {
+    perkId?: number
+    order?: number
+  }
+): HasPerkCombinator {
+  return {
+    id: `hasPerk-${crypto.randomUUID()}`,
+    type: 'hasPerk',
+    args: [paramArg(options?.perkId ?? 8005), paramArg(options?.order ?? -1)],
+    parentId
+  }
+}
 
-export const createHasAugmentCombinator = (
+export function createHasPerkStyleCombinator(
   parentId: string,
-  options?: { augmentId?: number | null; order?: number }
-): HasAugmentCombinator => ({
-  id: `hasAugment-${crypto.randomUUID()}`,
-  type: 'hasAugment',
-  args: [paramArg(options?.augmentId ?? null), paramArg(options?.order ?? -1)],
-  parentId
-})
+  options?: {
+    perkStyleId?: number
+    order?: number
+  }
+): HasPerkStyleCombinator {
+  return {
+    id: `hasPerkStyle-${crypto.randomUUID()}`,
+    type: 'hasPerkStyle',
+    args: [paramArg(options?.perkStyleId ?? 8000), paramArg(options?.order ?? -1)],
+    parentId
+  }
+}
 
-export const createHasPerkCombinator = (
+export function createHasSpellCombinator(
   parentId: string,
-  options?: { perkId?: number; order?: number }
-): HasPerkCombinator => ({
-  id: `hasPerk-${crypto.randomUUID()}`,
-  type: 'hasPerk',
-  args: [paramArg(options?.perkId ?? 8005), paramArg(options?.order ?? -1)],
-  parentId
-})
+  options?: {
+    spellId?: number
+    order?: number
+  }
+): HasSpellCombinator {
+  return {
+    id: `hasSpell-${crypto.randomUUID()}`,
+    type: 'hasSpell',
+    args: [paramArg(options?.spellId ?? 4), paramArg(options?.order ?? -1)],
+    parentId
+  }
+}
 
-export const createHasPerkStyleCombinator = (
+export function createHasItemCombinator(
   parentId: string,
-  options?: { perkStyleId?: number; order?: number }
-): HasPerkStyleCombinator => ({
-  id: `hasPerkStyle-${crypto.randomUUID()}`,
-  type: 'hasPerkStyle',
-  args: [paramArg(options?.perkStyleId ?? 8000), paramArg(options?.order ?? -1)],
-  parentId
-})
+  options?: {
+    itemId?: number
+    order?: number
+  }
+): HasItemCombinator {
+  return {
+    id: `hasItem-${crypto.randomUUID()}`,
+    type: 'hasItem',
+    args: [paramArg(options?.itemId ?? 3031), paramArg(options?.order ?? -1)],
+    parentId
+  }
+}
 
-export const createHasSpellCombinator = (
+export function createEnemiesCombinator(
   parentId: string,
-  options?: { spellId?: number; order?: number }
-): HasSpellCombinator => ({
-  id: `hasSpell-${crypto.randomUUID()}`,
-  type: 'hasSpell',
-  args: [paramArg(options?.spellId ?? 4), paramArg(options?.order ?? -1)],
-  parentId
-})
+  options?: {
+    puuid?: string | null
+    arg?: CombinatorArgNodeRef
+  }
+): EnemiesCombinator {
+  return {
+    id: `enemies-${crypto.randomUUID()}`,
+    type: 'enemies',
+    args: [paramArg(options?.puuid ?? null), options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createHasItemCombinator = (
+export function createAlliesCombinator(
   parentId: string,
-  options?: { itemId?: number; order?: number }
-): HasItemCombinator => ({
-  id: `hasItem-${crypto.randomUUID()}`,
-  type: 'hasItem',
-  args: [paramArg(options?.itemId ?? 3031), paramArg(options?.order ?? -1)],
-  parentId
-})
+  options?: {
+    puuid?: string | null
+    arg?: CombinatorArgNodeRef
+  }
+): AlliesCombinator {
+  return {
+    id: `allies-${crypto.randomUUID()}`,
+    type: 'allies',
+    args: [paramArg(options?.puuid ?? null), options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createEnemiesCombinator = (
+export function createAllCombinator(
   parentId: string,
-  options?: { puuid?: string | null; arg?: CombinatorArgNodeRef }
-): EnemiesCombinator => ({
-  id: `enemies-${crypto.randomUUID()}`,
-  type: 'enemies',
-  args: [paramArg(options?.puuid ?? null), options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    arg?: CombinatorArgNodeRef
+  }
+): AllCombinator {
+  return {
+    id: `all-${crypto.randomUUID()}`,
+    type: 'all',
+    args: [options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createAlliesCombinator = (
+export function createAnyoneCombinator(
   parentId: string,
-  options?: { puuid?: string | null; arg?: CombinatorArgNodeRef }
-): AlliesCombinator => ({
-  id: `allies-${crypto.randomUUID()}`,
-  type: 'allies',
-  args: [paramArg(options?.puuid ?? null), options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    arg?: CombinatorArgNodeRef
+  }
+): AnyoneCombinator {
+  return {
+    id: `anyone-${crypto.randomUUID()}`,
+    type: 'anyone',
+    args: [options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createAllCombinator = (
+export function createEveryoneCombinator(
   parentId: string,
-  options?: { arg?: CombinatorArgNodeRef }
-): AllCombinator => ({
-  id: `all-${crypto.randomUUID()}`,
-  type: 'all',
-  args: [options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    arg?: CombinatorArgNodeRef
+  }
+): EveryoneCombinator {
+  return {
+    id: `everyone-${crypto.randomUUID()}`,
+    type: 'everyone',
+    args: [options?.arg ?? nodeArg(null)],
+    parentId
+  }
+}
 
-export const createAnyoneCombinator = (
+export function createIsChampionCombinator(
   parentId: string,
-  options?: { arg?: CombinatorArgNodeRef }
-): AnyoneCombinator => ({
-  id: `anyone-${crypto.randomUUID()}`,
-  type: 'anyone',
-  args: [options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    championId?: number
+  }
+): IsChampionCombinator {
+  return {
+    id: `isChampion-${crypto.randomUUID()}`,
+    type: 'isChampion',
+    args: [paramArg(options?.championId ?? 893)],
+    parentId
+  }
+}
 
-export const createEveryoneCombinator = (
+export function createIsPositionCombinator(
   parentId: string,
-  options?: { arg?: CombinatorArgNodeRef }
-): EveryoneCombinator => ({
-  id: `everyone-${crypto.randomUUID()}`,
-  type: 'everyone',
-  args: [options?.arg ?? nodeArg(null)],
-  parentId
-})
+  options?: {
+    position?: string
+  }
+): IsPositionCombinator {
+  return {
+    id: `isPosition-${crypto.randomUUID()}`,
+    type: 'isPosition',
+    args: [paramArg(options?.position ?? 'TOP')],
+    parentId
+  }
+}
 
-export const createIsChampionCombinator = (
+export function createIsQueueCombinator(
   parentId: string,
-  options?: { championId?: number }
-): IsChampionCombinator => ({
-  id: `isChampion-${crypto.randomUUID()}`,
-  type: 'isChampion',
-  args: [paramArg(options?.championId ?? 893)],
-  parentId
-})
+  options?: {
+    queueId?: number
+  }
+): IsQueueCombinator {
+  return {
+    id: `isQueue-${crypto.randomUUID()}`,
+    type: 'isQueue',
+    args: [paramArg(options?.queueId ?? 450)],
+    parentId
+  }
+}
 
-export const createIsPositionCombinator = (
+export function createIsGameModeCombinator(
   parentId: string,
-  options?: { position?: string }
-): IsPositionCombinator => ({
-  id: `isPosition-${crypto.randomUUID()}`,
-  type: 'isPosition',
-  args: [paramArg(options?.position ?? 'TOP')],
-  parentId
-})
+  options?: {
+    gameMode?: string
+  }
+): IsGameModeCombinator {
+  return {
+    id: `isGameMode-${crypto.randomUUID()}`,
+    type: 'isGameMode',
+    args: [paramArg(options?.gameMode ?? 'CLASSIC')],
+    parentId
+  }
+}
 
-export const createIsQueueCombinator = (
+export function createIsMapCombinator(
   parentId: string,
-  options?: { queueId?: number }
-): IsQueueCombinator => ({
-  id: `isQueue-${crypto.randomUUID()}`,
-  type: 'isQueue',
-  args: [paramArg(options?.queueId ?? 450)],
-  parentId
-})
+  options?: {
+    mapId?: number
+  }
+): IsMapCombinator {
+  return {
+    id: `isMap-${crypto.randomUUID()}`,
+    type: 'isMap',
+    args: [paramArg(options?.mapId ?? 11)],
+    parentId
+  }
+}
 
-export const createIsGameModeCombinator = (
+export function createDurationBetweenCombinator(
   parentId: string,
-  options?: { gameMode?: string }
-): IsGameModeCombinator => ({
-  id: `isGameMode-${crypto.randomUUID()}`,
-  type: 'isGameMode',
-  args: [paramArg(options?.gameMode ?? 'CLASSIC')],
-  parentId
-})
+  options?: {
+    minSeconds?: number
+    maxSeconds?: number
+  }
+): DurationBetweenCombinator {
+  return {
+    id: `durationBetween-${crypto.randomUUID()}`,
+    type: 'durationBetween',
+    args: [paramArg(options?.minSeconds ?? 0), paramArg(options?.maxSeconds ?? 999999)],
+    parentId
+  }
+}
 
-export const createIsMapCombinator = (
-  parentId: string,
-  options?: { mapId?: number }
-): IsMapCombinator => ({
-  id: `isMap-${crypto.randomUUID()}`,
-  type: 'isMap',
-  args: [paramArg(options?.mapId ?? 11)],
-  parentId
-})
-
-export const createDurationBetweenCombinator = (
-  parentId: string,
-  options?: { minSeconds?: number; maxSeconds?: number }
-): DurationBetweenCombinator => ({
-  id: `durationBetween-${crypto.randomUUID()}`,
-  type: 'durationBetween',
-  args: [paramArg(options?.minSeconds ?? 0), paramArg(options?.maxSeconds ?? 999999)],
-  parentId
-})
-
-const createNumberBetweenCombinator = <T extends string>(
+function createNumberBetweenCombinator<T extends string>(
   type: T,
   parentId: string,
-  options?: { mode?: NumberBetweenMeasureMode; min?: number; max?: number },
-  defaults: { min: number; max: number; withMeasureMode?: boolean } = { min: 0, max: 999999 }
-): NumberBetweenCombinator<T> => ({
-  id: `${type}-${crypto.randomUUID()}`,
-  type,
-  args: defaults.withMeasureMode
-    ? [
-        paramArg(options?.mode ?? 'value'),
-        paramArg(options?.min ?? defaults.min),
-        paramArg(options?.max ?? defaults.max)
-      ]
-    : [paramArg(options?.min ?? defaults.min), paramArg(options?.max ?? defaults.max)],
-  parentId
-})
+  options?: {
+    mode?: NumberBetweenMeasureMode
+    min?: number
+    max?: number
+  },
+  defaults: {
+    min: number
+    max: number
+    withMeasureMode?: boolean
+  } = { min: 0, max: 999999 }
+): NumberBetweenCombinator<T> {
+  return {
+    id: `${type}-${crypto.randomUUID()}`,
+    type,
+    args: defaults.withMeasureMode
+      ? [
+          paramArg(options?.mode ?? 'value'),
+          paramArg(options?.min ?? defaults.min),
+          paramArg(options?.max ?? defaults.max)
+        ]
+      : [paramArg(options?.min ?? defaults.min), paramArg(options?.max ?? defaults.max)],
+    parentId
+  }
+}
 
-export const createKdaBetweenCombinator = (
+export function createKdaBetweenCombinator(
   parentId: string,
-  options?: { minKda?: number; maxKda?: number }
-): KdaBetweenCombinator => ({
-  id: `kdaBetween-${crypto.randomUUID()}`,
-  type: 'kdaBetween',
-  args: [paramArg(options?.minKda ?? 0), paramArg(options?.maxKda ?? 999)],
-  parentId
-})
+  options?: {
+    minKda?: number
+    maxKda?: number
+  }
+): KdaBetweenCombinator {
+  return {
+    id: `kdaBetween-${crypto.randomUUID()}`,
+    type: 'kdaBetween',
+    args: [paramArg(options?.minKda ?? 0), paramArg(options?.maxKda ?? 999)],
+    parentId
+  }
+}
 
-export const createLevelBetweenCombinator = (
+export function createLevelBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) => createNumberBetweenCombinator('levelBetween', parentId, options, { min: 1, max: 18 })
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('levelBetween', parentId, options, { min: 1, max: 18 })
+}
 
-export const createCsBetweenCombinator = (
+export function createCsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('csBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('csBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createKillParticipationBetweenCombinator = (
+export function createKillParticipationBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('killParticipationBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('killParticipationBetween', parentId, options, {
     min: 0,
     max: 100
   })
+}
 
-export const createDamageDealtToChampionsBetweenCombinator = (
+export function createDamageDealtToChampionsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('damageDealtToChampionsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('damageDealtToChampionsBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createPhysicalDamageDealtToChampionsBetweenCombinator = (
+export function createPhysicalDamageDealtToChampionsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('physicalDamageDealtToChampionsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('physicalDamageDealtToChampionsBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createMagicDamageDealtToChampionsBetweenCombinator = (
+export function createMagicDamageDealtToChampionsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('magicDamageDealtToChampionsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('magicDamageDealtToChampionsBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createTrueDamageDealtToChampionsBetweenCombinator = (
+export function createTrueDamageDealtToChampionsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('trueDamageDealtToChampionsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('trueDamageDealtToChampionsBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createDamageTakenBetweenCombinator = (
+export function createDamageTakenBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('damageTakenBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('damageTakenBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createPhysicalDamageTakenBetweenCombinator = (
+export function createPhysicalDamageTakenBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('physicalDamageTakenBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('physicalDamageTakenBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createMagicDamageTakenBetweenCombinator = (
+export function createMagicDamageTakenBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('magicDamageTakenBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('magicDamageTakenBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createTrueDamageTakenBetweenCombinator = (
+export function createTrueDamageTakenBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('trueDamageTakenBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('trueDamageTakenBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createGoldSpentBetweenCombinator = (
+export function createGoldSpentBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('goldSpentBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('goldSpentBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createDamageToTowersBetweenCombinator = (
+export function createDamageToTowersBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('damageToTowersBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('damageToTowersBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createHealBetweenCombinator = (
+export function createHealBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('healBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('healBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createVisionScoreBetweenCombinator = (
+export function createVisionScoreBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('visionScoreBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('visionScoreBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createTimeCCingOthersBetweenCombinator = (
+export function createTimeCCingOthersBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('timeCCingOthersBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('timeCCingOthersBetween', parentId, options, {
     min: 0,
     max: 999999,
     withMeasureMode: true
   })
+}
 
-export const createDgrBetweenCombinator = (
+export function createDgrBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) => createNumberBetweenCombinator('dgrBetween', parentId, options, { min: 0, max: 500 })
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('dgrBetween', parentId, options, { min: 0, max: 500 })
+}
 
-export const createSoloKillsBetweenCombinator = (
+export function createSoloKillsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('soloKillsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('soloKillsBetween', parentId, options, {
     min: 0,
     max: 20,
     withMeasureMode: true
   })
+}
 
-export const createDoubleKillsBetweenCombinator = (
+export function createDoubleKillsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('doubleKillsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('doubleKillsBetween', parentId, options, {
     min: 0,
     max: 20,
     withMeasureMode: true
   })
+}
 
-export const createTripleKillsBetweenCombinator = (
+export function createTripleKillsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('tripleKillsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('tripleKillsBetween', parentId, options, {
     min: 0,
     max: 20,
     withMeasureMode: true
   })
+}
 
-export const createQuadraKillsBetweenCombinator = (
+export function createQuadraKillsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('quadraKillsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('quadraKillsBetween', parentId, options, {
     min: 0,
     max: 20,
     withMeasureMode: true
   })
+}
 
-export const createPentaKillsBetweenCombinator = (
+export function createPentaKillsBetweenCombinator(
   parentId: string,
-  options?: { min?: number; max?: number }
-) =>
-  createNumberBetweenCombinator('pentaKillsBetween', parentId, options, {
+  options?: {
+    min?: number
+    max?: number
+  }
+) {
+  return createNumberBetweenCombinator('pentaKillsBetween', parentId, options, {
     min: 0,
     max: 20,
     withMeasureMode: true
   })
+}
 
-export const createKillsBetweenCombinator = (
+export function createKillsBetweenCombinator(
   parentId: string,
-  options?: { mode?: NumberBetweenMeasureMode; minKills?: number; maxKills?: number }
-): KillsBetweenCombinator =>
-  createNumberBetweenCombinator(
+  options?: {
+    mode?: NumberBetweenMeasureMode
+    minKills?: number
+    maxKills?: number
+  }
+): KillsBetweenCombinator {
+  return createNumberBetweenCombinator(
     'killsBetween',
     parentId,
     { mode: options?.mode, min: options?.minKills, max: options?.maxKills },
     { min: 0, max: 999, withMeasureMode: true }
   )
+}
 
-export const createDeathsBetweenCombinator = (
+export function createDeathsBetweenCombinator(
   parentId: string,
-  options?: { mode?: NumberBetweenMeasureMode; minDeaths?: number; maxDeaths?: number }
-): DeathsBetweenCombinator =>
-  createNumberBetweenCombinator(
+  options?: {
+    mode?: NumberBetweenMeasureMode
+    minDeaths?: number
+    maxDeaths?: number
+  }
+): DeathsBetweenCombinator {
+  return createNumberBetweenCombinator(
     'deathsBetween',
     parentId,
     { mode: options?.mode, min: options?.minDeaths, max: options?.maxDeaths },
     { min: 0, max: 999, withMeasureMode: true }
   )
+}
 
-export const createAssistsBetweenCombinator = (
+export function createAssistsBetweenCombinator(
   parentId: string,
-  options?: { mode?: NumberBetweenMeasureMode; minAssists?: number; maxAssists?: number }
-): AssistsBetweenCombinator =>
-  createNumberBetweenCombinator(
+  options?: {
+    mode?: NumberBetweenMeasureMode
+    minAssists?: number
+    maxAssists?: number
+  }
+): AssistsBetweenCombinator {
+  return createNumberBetweenCombinator(
     'assistsBetween',
     parentId,
     { mode: options?.mode, min: options?.minAssists, max: options?.maxAssists },
     { min: 0, max: 999, withMeasureMode: true }
   )
+}
 
-export const createGoldBetweenCombinator = (
+export function createGoldBetweenCombinator(
   parentId: string,
-  options?: { mode?: NumberBetweenMeasureMode; minGold?: number; maxGold?: number }
-): GoldBetweenCombinator =>
-  createNumberBetweenCombinator(
+  options?: {
+    mode?: NumberBetweenMeasureMode
+    minGold?: number
+    maxGold?: number
+  }
+): GoldBetweenCombinator {
+  return createNumberBetweenCombinator(
     'goldBetween',
     parentId,
     { mode: options?.mode, min: options?.minGold, max: options?.maxGold },
     { min: 0, max: 999999, withMeasureMode: true }
   )
+}
 
-export const createPlayerCombinator = (
+export function createPlayerCombinator(
   parentId: string,
-  options?: { puuid?: string | null }
-): PlayerCombinator => ({
-  id: `player-${crypto.randomUUID()}`,
-  type: 'player',
-  args: [paramArg(options?.puuid ?? null), nodeArg(null)],
-  parentId
-})
+  options?: {
+    puuid?: string | null
+  }
+): PlayerCombinator {
+  return {
+    id: `player-${crypto.randomUUID()}`,
+    type: 'player',
+    args: [paramArg(options?.puuid ?? null), nodeArg(null)],
+    parentId
+  }
+}
 
-export const createHasPlayerCombinator = (
+export function createHasPlayerCombinator(
   parentId: string,
-  options?: { puuid?: string | null }
-): HasPlayerCombinator => ({
-  id: `hasPlayer-${crypto.randomUUID()}`,
-  type: 'hasPlayer',
-  args: [paramArg(options?.puuid ?? null)],
-  parentId
-})
-export const createIsMatchedGameCombinator = (
+  options?: {
+    puuid?: string | null
+  }
+): HasPlayerCombinator {
+  return {
+    id: `hasPlayer-${crypto.randomUUID()}`,
+    type: 'hasPlayer',
+    args: [paramArg(options?.puuid ?? null)],
+    parentId
+  }
+}
+export function createIsMatchedGameCombinator(
   parentId: string,
   _options?: unknown
-): IsMatchedGameCombinator => ({
-  id: `isMatchedGame-${crypto.randomUUID()}`,
-  type: 'isMatchedGame',
-  args: [],
-  parentId
-})
+): IsMatchedGameCombinator {
+  return {
+    id: `isMatchedGame-${crypto.randomUUID()}`,
+    type: 'isMatchedGame',
+    args: [],
+    parentId
+  }
+}
 
-export const createIsPveGameCombinator = (
+export function createIsPveGameCombinator(
   parentId: string,
   _options?: unknown
-): IsPveGameCombinator => ({
-  id: `isPveGame-${crypto.randomUUID()}`,
-  type: 'isPveGame',
-  args: [],
-  parentId
-})
+): IsPveGameCombinator {
+  return {
+    id: `isPveGame-${crypto.randomUUID()}`,
+    type: 'isPveGame',
+    args: [],
+    parentId
+  }
+}

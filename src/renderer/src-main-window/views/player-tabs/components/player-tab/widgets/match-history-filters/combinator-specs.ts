@@ -234,22 +234,21 @@ export const COMBINATOR_SPECS = {
 
 export type CombinatorKey = keyof typeof COMBINATOR_SPECS
 
-export const isCombinatorKey = (value: string): value is CombinatorKey => {
+export function isCombinatorKey(value: string): value is CombinatorKey {
   return value in COMBINATOR_SPECS
 }
 
-export const getCombinatorSpec = (key: string): CombinatorSpec | null => {
+export function getCombinatorSpec(key: string): CombinatorSpec | null {
   if (!isCombinatorKey(key)) {
     return null
   }
-
   return COMBINATOR_SPECS[key] as CombinatorSpec
 }
 
-export const getCombinatorProvideScope = (key: string): CombinatorScope | null => {
+export function getCombinatorProvideScope(key: string): CombinatorScope | null {
   return getCombinatorSpec(key)?.provideScope ?? null
 }
 
-export const isCombinatorAvailableInScope = (key: string, scope: string) => {
+export function isCombinatorAvailableInScope(key: string, scope: string) {
   return getCombinatorSpec(key)?.requireScopes.includes(scope as CombinatorScope) ?? false
 }

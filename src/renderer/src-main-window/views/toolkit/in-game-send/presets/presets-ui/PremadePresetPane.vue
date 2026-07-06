@@ -35,7 +35,7 @@ const { options, updateOptions } = premadePreset
 const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.premade' })
 const presetLabel = computed(() => t('label'))
 
-function updateNameDisplayStrategy(value: InGameSendPresetNameDisplayStrategy) {
+const updateNameDisplayStrategy = (value: InGameSendPresetNameDisplayStrategy) => {
   const patch: InGameSendPremadePresetOptionPatch = {
     nameDisplayStrategy: value
   }

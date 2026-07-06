@@ -99,7 +99,7 @@ const configOptions = computed<PresetDisplayOption<InGameSendJunglePresetConfigO
   }
 ])
 
-function updateDisplayOptions(value: Record<string, boolean>) {
+const updateDisplayOptions = (value: Record<string, boolean>) => {
   const patch: InGameSendJunglePresetOptionPatch = {
     activityPreference: value.activityPreference,
     firstClearDistribution: value.firstClearDistribution,
@@ -112,7 +112,7 @@ function updateDisplayOptions(value: Record<string, boolean>) {
   void updateOptions(patch)
 }
 
-function updateConfigOptions(value: Record<string, boolean>) {
+const updateConfigOptions = (value: Record<string, boolean>) => {
   const patch: InGameSendJunglePresetOptionPatch = {
     showCurrentChampion: value.showCurrentChampion
   }
@@ -120,7 +120,7 @@ function updateConfigOptions(value: Record<string, boolean>) {
   void updateOptions(patch)
 }
 
-function updateNameDisplayStrategy(value: InGameSendPresetNameDisplayStrategy) {
+const updateNameDisplayStrategy = (value: InGameSendPresetNameDisplayStrategy) => {
   void updateOptions({
     nameDisplayStrategy: value
   })

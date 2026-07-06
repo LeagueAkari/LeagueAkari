@@ -1,6 +1,6 @@
 <template>
   <NScrollbar class="h-full">
-    <NModal preset="card" size="small" v-model:show="editRuleModalShow" class="max-w-[500px]">
+    <NModal preset="card" size="small" v-model:show="editRuleModalShow" class="max-w-125">
       <template #header>{{ t('settings.debug.lcuEvent.modal.title') }}</template>
       <template #footer>
         <div class="flex w-full justify-end">
@@ -384,7 +384,7 @@ watch(
   }
 )
 
-function isSubsequence(s: string, t: string) {
+const isSubsequence = (s: string, t: string) => {
   let index = 0
   for (let i = 0; i < t.length && index < s.length; i++) {
     if (s[index] === t[i]) {

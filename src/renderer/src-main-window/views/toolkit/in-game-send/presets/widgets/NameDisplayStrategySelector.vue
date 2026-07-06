@@ -56,7 +56,7 @@ const options = computed<PresetDisplayOption<InGameSendPresetNameDisplayStrategy
   }
 ])
 
-function handleUpdate(value: string | number) {
+const handleUpdate = (value: string | number) => {
   emit('update:value', value as InGameSendPresetNameDisplayStrategy)
 }
 </script>

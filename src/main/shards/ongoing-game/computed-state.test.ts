@@ -1,5 +1,5 @@
 import { AdditionalResult, QueryStage } from '@shared/shards/ongoing-game'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { LeagueClientData } from '../league-client/lc-state'
 import { ChampSelectHandoffSnapshot } from './champ-select-handoff'
@@ -8,6 +8,13 @@ import {
   getLivePositionAssignments,
   getLiveTeams
 } from './computed-state'
+
+vi.mock('@resources/magic/magic.darwin-arm64.node?asset&asarUnpack', () => ({
+  default: 'magic.darwin-arm64.node'
+}))
+vi.mock('@resources/magic/magic.win32-x64.node?asset&asarUnpack', () => ({
+  default: 'magic.win32-x64.node'
+}))
 
 const emptyAdditional: AdditionalResult = {
   teams: {},

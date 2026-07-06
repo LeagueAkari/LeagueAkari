@@ -30,57 +30,52 @@ export type ParticipantNumberMeasureMode =
   | 'gameShare'
   | 'gameMaxShare'
 
-export const and = <T>(...predicates: Predicate<T>[]) => {
+export function and<T>(...predicates: Predicate<T>[]) {
   return (value: T) => predicates.every((predicate) => predicate(value))
 }
 
-export const or = <T>(...predicates: Predicate<T>[]) => {
+export function or<T>(...predicates: Predicate<T>[]) {
   if (predicates.length === 0) return () => true // 特例，为了 UI 层面直观。但是注意，这不符合数学逻辑
-
   return (value: T) => predicates.some((predicate) => predicate(value))
 }
 
 /**
  * 适用于通过描述树结构构建的 and
  */
-export const singleArgAnd = <T>(predicates: Predicate<T>[]) => {
+export function singleArgAnd<T>(predicates: Predicate<T>[]) {
   return (value: T) => predicates.every((predicate) => predicate(value))
 }
 
 /**
  * 同 singleArgAnd，不过是 or 的版本
  */
-export const singleArgOr = <T>(predicates: Predicate<T>[]) => {
+export function singleArgOr<T>(predicates: Predicate<T>[]) {
   return (value: T) => predicates.some((predicate) => predicate(value))
 }
 
-export const not = <T>(predicate: Predicate<T>) => {
+export function not<T>(predicate: Predicate<T>) {
   return (value: T) => !predicate(value)
 }
 
-export const game = (predicate: Predicate<GameScope>) => {
+export function game(predicate: Predicate<GameScope>) {
   return (data: LcuOrSgpGameSummary) => {
     const basicInfo = toBasicInfo(data)
     const participants = toParticipants(data, basicInfo)
     const teams = toTeams(data, basicInfo, participants)
-
     return predicate({ summary: data, basicInfo, participants, teams })
   }
 }
 
-export const player = (puuid: string, predicate: Predicate<ParticipantScope>) => {
+export function player(puuid: string, predicate: Predicate<ParticipantScope>) {
   return (data: GameScope | ParticipantsScope) => {
     if (puuid === null) return true
-
     const participant = data.participants.find((p) => p.puuid === puuid)
-
     if (!participant) return false
-
     return predicate({ context: 'context' in data ? data.context : data, participant })
   }
 }
 
-export const anyone = (predicate: Predicate<ParticipantScope>) => {
+export function anyone(predicate: Predicate<ParticipantScope>) {
   return (data: ParticipantsScope | GameScope) => {
     return data.participants.some((p) =>
       predicate({ participant: p, context: 'context' in data ? data.context : data })
@@ -88,7 +83,7 @@ export const anyone = (predicate: Predicate<ParticipantScope>) => {
   }
 }
 
-export const everyone = (predicate: Predicate<ParticipantScope>) => {
+export function everyone(predicate: Predicate<ParticipantScope>) {
   return (data: ParticipantsScope | GameScope) => {
     return data.participants.every((p) =>
       predicate({ participant: p, context: 'context' in data ? data.context : data })
@@ -96,32 +91,29 @@ export const everyone = (predicate: Predicate<ParticipantScope>) => {
   }
 }
 
-export const isQueue = (queueId: number) => {
+export function isQueue(queueId: number) {
   return (data: GameScope) => {
     return data.basicInfo.queueId === queueId
   }
 }
 
-export const isGameMode = (gameMode: string) => {
+export function isGameMode(gameMode: string) {
   return (data: GameScope) => {
     return data.basicInfo.gameMode === gameMode
   }
 }
 
-export const all = (predicate: Predicate<ParticipantsScope>) => {
+export function all(predicate: Predicate<ParticipantsScope>) {
   return (data: GameScope) => {
     return predicate({ participants: data.participants, context: data })
   }
 }
 
-export const allies = (puuid: string | null, predicate: Predicate<ParticipantsScope>) => {
+export function allies(puuid: string | null, predicate: Predicate<ParticipantsScope>) {
   return (data: GameScope) => {
     if (puuid === null) return true
-
     const participant = data.participants.find((p) => p.puuid === puuid)
-
     if (!participant) return false
-
     return predicate({
       participants: data.participants.filter(
         (p) => p.teamIdentifier === participant.teamIdentifier
@@ -131,14 +123,11 @@ export const allies = (puuid: string | null, predicate: Predicate<ParticipantsSc
   }
 }
 
-export const enemies = (puuid: string | null, predicate: Predicate<ParticipantsScope>) => {
+export function enemies(puuid: string | null, predicate: Predicate<ParticipantsScope>) {
   return (data: GameScope) => {
     if (puuid === null) return true
-
     const participant = data.participants.find((p) => p.puuid === puuid)
-
     if (!participant) return false
-
     return predicate({
       participants: data.participants.filter(
         (p) => p.teamIdentifier !== participant.teamIdentifier
@@ -148,87 +137,77 @@ export const enemies = (puuid: string | null, predicate: Predicate<ParticipantsS
   }
 }
 
-export const hasPlayer = (puuid: string) => {
+export function hasPlayer(puuid: string) {
   return (data: GameScope | ParticipantsScope) => {
     if (puuid === null) return true
-
     return data.participants.some((p) => p.puuid === puuid)
   }
 }
 
-export const hasAugment = (augmentId: number | null, order: number = -1) => {
+export function hasAugment(augmentId: number | null, order: number = -1) {
   return (data: ParticipantScope) => {
     if (augmentId === null) return true
-
     if (order !== -1) {
       return data.participant.augments[order] === augmentId
     }
-
     return data.participant.augments.includes(augmentId)
   }
 }
 
-export const hasPerk = (perkId: number, order: number = -1) => {
+export function hasPerk(perkId: number, order: number = -1) {
   return (data: ParticipantScope) => {
     const perks = data.participant.perks.styles.flatMap((style) =>
       style.selections.map((selection) => selection.perk)
     )
-
     if (order !== -1) {
       return perks[order] === perkId
     }
-
     return perks.includes(perkId)
   }
 }
 
-export const hasPerkStyle = (styleId: number, order: number = -1) => {
+export function hasPerkStyle(styleId: number, order: number = -1) {
   return (data: ParticipantScope) => {
     const perkStyles = data.participant.perks.styles.map((style) => style.style)
-
     if (order !== -1) {
       return perkStyles[order] === styleId
     }
-
     return perkStyles.includes(styleId)
   }
 }
 
-export const hasSpell = (spellId: number, order: number = -1) => {
+export function hasSpell(spellId: number, order: number = -1) {
   return (data: ParticipantScope) => {
     if (order !== -1) {
       return data.participant.spells[order] === spellId
     }
-
     return data.participant.spells.includes(spellId)
   }
 }
 
-export const isPosition = (position: string | null) => {
+export function isPosition(position: string | null) {
   return (data: ParticipantScope) => {
     return data.participant.position === position
   }
 }
 
-export const hasItem = (itemId: number, order: number = -1) => {
+export function hasItem(itemId: number, order: number = -1) {
   return (data: ParticipantScope) => {
     if (data.participant.roleBoundItem === itemId) return true
-
     if (order !== -1) {
       return data.participant.items[order] === itemId
     }
-
     return data.participant.items.includes(itemId)
   }
 }
 
-export const isChampion = (championId: number) => {
+export function isChampion(championId: number) {
   return (data: ParticipantScope) => {
     return data.participant.championId === championId
   }
 }
 
-export const durationBetween = (minSeconds = 0, maxSeconds = Infinity) => {
+export function durationBetween(minSeconds = 0, maxSeconds = Infinity) {
   return (data: GameScope) => {
     return data.basicInfo.gameDuration >= minSeconds && data.basicInfo.gameDuration <= maxSeconds
   }
@@ -236,13 +215,11 @@ export const durationBetween = (minSeconds = 0, maxSeconds = Infinity) => {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-export const gameCreationInTimeRange = (range: string | null) => {
+export function gameCreationInTimeRange(range: string | null) {
   return (data: GameScope) => {
     if (!range || range === 'all') return true
-
     const now = Date.now()
     let startAt: number
-
     switch (range) {
       case 'last3Hours':
         startAt = now - 3 * 60 * 60 * 1000
@@ -265,35 +242,31 @@ export const gameCreationInTimeRange = (range: string | null) => {
       default:
         return true
     }
-
     return data.basicInfo.gameCreation >= startAt && data.basicInfo.gameCreation <= now
   }
 }
 
-export const kdaBetween = (minKda = 0, maxKda = Infinity) => {
+export function kdaBetween(minKda = 0, maxKda = Infinity) {
   return (data: ParticipantScope) => {
     return data.participant.kda >= minKda && data.participant.kda <= maxKda
   }
 }
 
-export const isWin = () => {
+export function isWin() {
   return (data: ParticipantScope | ParticipantsScope) => {
     if ('participant' in data) {
       return data.participant.winResult === 'win'
     }
-
     if (data.participants.length === 0) return false
-
     return data.participants[0].winResult === 'win'
   }
 }
 
-export const isLoss = (isSurrender = false) => {
+export function isLoss(isSurrender = false) {
   return (data: ParticipantScope | ParticipantsScope) => {
     if ('participant' in data) {
       return data.participant.winResult === 'loss' && data.participant.isSurrender === isSurrender
     }
-
     return (
       data.participants.at(0)?.winResult === 'loss' &&
       data.participants.at(0)?.isSurrender === isSurrender
@@ -301,48 +274,46 @@ export const isLoss = (isSurrender = false) => {
   }
 }
 
-export const isRemake = () => {
+export function isRemake() {
   return (data: ParticipantScope | ParticipantsScope | GameScope) => {
     if ('participant' in data) {
       return data.participant.winResult === 'remake'
     }
-
     return data.participants.at(0)?.winResult === 'remake'
   }
 }
 
-export const isAbort = () => {
+export function isAbort() {
   return (data: ParticipantScope | ParticipantsScope | GameScope) => {
     if ('participant' in data) {
       return data.participant.winResult === 'abort'
     }
-
     return data.participants.at(0)?.winResult === 'abort'
   }
 }
 
-export const isMatchedGame = () => {
+export function isMatchedGame() {
   return (data: GameScope) => {
     return data.basicInfo.gameType === 'MATCHED_GAME'
   }
 }
 
-export const isPveGame = () => {
+export function isPveGame() {
   return (data: GameScope) => {
     return isPveQueue(data.basicInfo.queueId)
   }
 }
 
-export const isMap = (mapId: number) => {
+export function isMap(mapId: number) {
   return (data: GameScope) => {
     return data.basicInfo.mapId === mapId
   }
 }
 
-const participantNumberBetween = (
+function participantNumberBetween(
   selector: (participant: MatchParticipant) => number | null,
   nullValueMatches = false
-) => {
+) {
   return (
     modeOrMin: ParticipantNumberMeasureMode | number = 0,
     minOrMax?: number,
@@ -350,48 +321,38 @@ const participantNumberBetween = (
   ) => {
     return (data: ParticipantScope) => {
       const value = selector(data.participant)
-
       if (value === null) return nullValueMatches
-
       if (typeof modeOrMin !== 'string') {
         return value >= modeOrMin && value <= (minOrMax ?? Infinity)
       }
-
       const min = minOrMax ?? 0
       const max = maybeMax ?? Infinity
-
       if (modeOrMin === 'value') {
         return value >= min && value <= max
       }
-
       const relatedParticipants = modeOrMin.startsWith('team')
         ? data.context.participants.filter(
             (p) => p.teamIdentifier === data.participant.teamIdentifier
           )
         : data.context.participants
       const relatedValues = relatedParticipants.map(selector).filter((v): v is number => v !== null)
-
       const baseline =
         modeOrMin === 'teamShare' || modeOrMin === 'gameShare'
           ? relatedValues.reduce((acc, current) => acc + current, 0)
           : relatedValues.length
             ? Math.max(...relatedValues)
             : 0
-
       const percent = baseline === 0 ? 0 : (value / baseline) * 100
-
       return percent >= min && percent <= max
     }
   }
 }
 
-const participantPercentBetween = (selector: (participant: MatchParticipant) => number | null) => {
+function participantPercentBetween(selector: (participant: MatchParticipant) => number | null) {
   return (minPercent = 0, maxPercent = Infinity) => {
     return (data: ParticipantScope) => {
       const value = selector(data.participant)
-
       if (value === null) return false
-
       return value >= minPercent / 100 && value <= maxPercent / 100
     }
   }

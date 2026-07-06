@@ -42,7 +42,7 @@ const selectedValues = computed(() => {
     .map((option) => option.value)
 })
 
-function handleUpdate(value: (string | number)[]) {
+const handleUpdate = (value: (string | number)[]) => {
   const selected = new Set(value.map((item) => String(item)))
   const next: Record<string, boolean> = {}
 

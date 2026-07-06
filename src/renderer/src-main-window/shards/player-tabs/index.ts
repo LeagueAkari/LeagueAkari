@@ -32,7 +32,7 @@ export {
   type CreateTabOptions
 }
 
-const toStoredInitParams = (initParams?: InitParams): InitParams | null => {
+function toStoredInitParams(initParams?: InitParams): InitParams | null {
   return hasInitParams(initParams) ? (markRaw(initParams) as InitParams) : null
 }
 

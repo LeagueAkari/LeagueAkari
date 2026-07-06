@@ -15,28 +15,30 @@ import {
   soloKillsBetween
 } from './combinators'
 
-const createScope = (gameCreation: number): GameScope => ({
-  summary: { source: 'lcu', gameId: 1, data: {} as any },
-  basicInfo: {
-    dataSource: 'lcu',
-    gameVersion: '',
-    gameId: 1,
-    isTwoTeam: true,
-    isCherrySubteam: false,
-    gameCreation,
-    gameDuration: 0,
-    gameType: 'MATCHED_GAME',
-    queueId: 420,
-    gameMode: 'CLASSIC',
-    mapId: 11,
-    gameModeMutators: null
-  },
-  participants: [],
-  teams: {} as any
-})
+function createScope(gameCreation: number): GameScope {
+  return {
+    summary: { source: 'lcu', gameId: 1, data: {} as any },
+    basicInfo: {
+      dataSource: 'lcu',
+      gameVersion: '',
+      gameId: 1,
+      isTwoTeam: true,
+      isCherrySubteam: false,
+      gameCreation,
+      gameDuration: 0,
+      gameType: 'MATCHED_GAME',
+      queueId: 420,
+      gameMode: 'CLASSIC',
+      mapId: 11,
+      gameModeMutators: null
+    },
+    participants: [],
+    teams: {} as any
+  }
+}
 
-const createParticipant = (participant: Partial<ParticipantScope['participant']>) =>
-  ({
+function createParticipant(participant: Partial<ParticipantScope['participant']>) {
+  return {
     puuid: 'puuid',
     teamIdentifier: 'TEAM-100',
     killParticipation: 0,
@@ -49,14 +51,14 @@ const createParticipant = (participant: Partial<ParticipantScope['participant']>
       styles: []
     },
     ...participant
-  }) as ParticipantScope['participant']
+  } as ParticipantScope['participant']
+}
 
-const createParticipantScope = (
+function createParticipantScope(
   participant: Partial<ParticipantScope['participant']>,
   participants: Partial<ParticipantScope['participant']>[] = []
-) => {
+) {
   const fullParticipant = createParticipant(participant)
-
   return {
     context: {
       ...createScope(Date.now()),

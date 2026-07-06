@@ -28,7 +28,9 @@ export const AKARI_RGB = {
   950: '74, 4, 21'
 } as const
 
-export const rgba = (rgb: string, alpha: number) => `rgba(${rgb}, ${alpha})`
+export function rgba(rgb: string, alpha: number) {
+  return `rgba(${rgb}, ${alpha})`
+}
 
 export const AKARI_SHARED_COMPACT_OVERRIDES: GlobalThemeOverrides = {
   Notification: {
