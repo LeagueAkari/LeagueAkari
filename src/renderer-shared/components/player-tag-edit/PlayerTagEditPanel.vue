@@ -41,6 +41,7 @@
       type="textarea"
       :autosize="{ minRows: 3, maxRows: 4 }"
       :disabled="isLoadingTag || isSaving"
+      @keydown="handleInputKeydown"
     />
 
     <div v-if="isChineseLocale" class="mt-2 flex flex-col gap-1.5">
@@ -89,8 +90,19 @@
       <NButton size="small" :disabled="isSaving" @click="emit('cancel')">
         {{ t('playerTags.editModal.cancel') }}
       </NButton>
-      <NButton size="small" type="primary" :loading="isSaving" @click="handleSaveTag">
-        {{ t('playerTags.editModal.save') }}
+      <NButton
+        size="small"
+        type="primary"
+        :disabled="!isReady"
+        :loading="isSaving"
+        @click="handleSaveTag"
+      >
+        <span class="flex items-center gap-1">
+          <span class="text-sm text-white/80 dark:text-black/80">{{
+            as.platform === 'win32' ? 'Shift+Enter' : '⇧+⏎'
+          }}</span>
+          <span>{{ t('playerTags.editModal.save') }}</span>
+        </span>
       </NButton>
     </div>
   </div>
@@ -231,7 +243,7 @@ const loadSelfTag = async () => {
 }
 
 const handleSaveTag = async () => {
-  if (!lcs.summoner.me || !lcs.auth) {
+  if (!isReady.value || !lcs.summoner.me || !lcs.auth) {
     return
   }
 
@@ -262,6 +274,34 @@ const handleSaveTag = async () => {
   }
 }
 
+const isSaveTagShortcut = (event: {
+  key: string
+  shiftKey: boolean
+  ctrlKey: boolean
+  altKey: boolean
+  metaKey: boolean
+  isComposing: boolean
+}) => {
+  return (
+    (event.key === 'Enter' || event.key === 'NumpadEnter') &&
+    event.shiftKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.metaKey &&
+    !event.isComposing
+  )
+}
+
+const handleInputKeydown = (event: KeyboardEvent) => {
+  if (!isSaveTagShortcut(event) || !isReady.value) {
+    return
+  }
+
+  event.preventDefault()
+  event.stopPropagation()
+  handleSaveTag()
+}
+
 onMounted(() => {
   loadSelfTag()
 })
@@ -289,3 +329,45 @@ watch(
   { flush: 'post' }
 )
 </script>
+
+<style scoped>
+.shortcut-save-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.shortcut-combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+
+.shortcut-key {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 36%);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 16%);
+  box-shadow:
+    inset 0 -1px 0 rgb(0 0 0 / 24%),
+    0 1px 0 rgb(255 255 255 / 10%);
+  color: currentColor;
+  font-family: system-ui, 'Segoe UI Symbol', 'Apple Symbols', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.shortcut-plus {
+  opacity: 0.78;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+</style>

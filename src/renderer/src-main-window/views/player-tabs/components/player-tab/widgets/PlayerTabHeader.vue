@@ -66,7 +66,6 @@
         </template>
 
         <PlayerTagEditPanel
-          v-if="isTagEditPopoverShowing"
           :puuid="puuid"
           :summoner="summoner"
           @cancel="isTagEditPopoverShowing = false"
