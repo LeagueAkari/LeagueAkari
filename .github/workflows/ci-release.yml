@@ -173,28 +173,51 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
+      CI_RELEASE_BRANCH: dev
+      CI_RELEASE_KEEP_COUNT: 3
       CI_RELEASE_TAG: ci-${{ github.sha }}
     steps:
+      - name: Check current dev head
+        id: current_head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          current_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${CI_RELEASE_BRANCH}" --jq '.object.sha')"
+          echo "current_sha=${current_sha}" >> "$GITHUB_OUTPUT"
+
+          if [ "$current_sha" = "$GITHUB_SHA" ]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            echo "Publishing CI release for current ${CI_RELEASE_BRANCH} HEAD ${GITHUB_SHA}"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping CI release for stale run ${GITHUB_SHA}; current ${CI_RELEASE_BRANCH} HEAD is ${current_sha}"
+          fi
+
       - name: Download build artifacts
+        if: steps.current_head.outputs.should_publish == 'true'
         uses: actions/download-artifact@v8
         with:
           path: release-artifacts
 
       - name: List release artifacts
+        if: steps.current_head.outputs.should_publish == 'true'
         run: find release-artifacts -maxdepth 3 -type f -print | sort
 
       - name: Delete current CI release before retry
+        if: steps.current_head.outputs.should_publish == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release delete "$CI_RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
 
       - name: Prepare CI release metadata
+        if: steps.current_head.outputs.should_publish == 'true'
         shell: bash
         run: |
           short_sha="${GITHUB_SHA::7}"
           echo "CI_RELEASE_NAME=League Akari Dev Prerelease #${GITHUB_RUN_NUMBER} (${short_sha})" >> "$GITHUB_ENV"
 
       - name: Upload to GitHub Release
+        if: steps.current_head.outputs.should_publish == 'true'
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.CI_RELEASE_TAG }}
@@ -208,27 +231,64 @@ jobs:
           fail_on_unmatched_files: true
 
       - name: Keep latest 3 CI prereleases
-        if: always()
+        if: always() && steps.current_head.outputs.should_publish == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases-pages.json
+          gh api "repos/${GITHUB_REPOSITORY}/commits?sha=${CI_RELEASE_BRANCH}&per_page=100" > branch-commits.json
           node <<'NODE'
           const childProcess = require('node:child_process')
           const fs = require('node:fs')
 
           const pages = JSON.parse(fs.readFileSync('releases-pages.json', 'utf8'))
+          const branchCommits = JSON.parse(fs.readFileSync('branch-commits.json', 'utf8'))
+          const keepCount = Number.parseInt(process.env.CI_RELEASE_KEEP_COUNT || '3', 10)
+
+          if (!Number.isInteger(keepCount) || keepCount < 1) {
+            throw new Error(`Invalid CI_RELEASE_KEEP_COUNT: ${process.env.CI_RELEASE_KEEP_COUNT}`)
+          }
+
+          const branchOrder = new Map(branchCommits.map((commit, index) => [commit.sha, index]))
+
+          if (process.env.GITHUB_SHA && !branchOrder.has(process.env.GITHUB_SHA)) {
+            branchOrder.set(process.env.GITHUB_SHA, -1)
+          }
+
           const releases = pages
             .flat()
             .filter((release) => release.prerelease && release.tag_name.startsWith('ci-'))
+            .map((release) => {
+              const sha = release.tag_name.slice('ci-'.length)
+              const branchIndex = branchOrder.has(sha) ? branchOrder.get(sha) : Number.POSITIVE_INFINITY
+              return { release, sha, branchIndex }
+            })
             .sort((a, b) => {
-              const bTime = Date.parse(b.created_at || b.published_at || '')
-              const aTime = Date.parse(a.created_at || a.published_at || '')
-              return bTime - aTime
+              if (a.branchIndex !== b.branchIndex) {
+                return a.branchIndex - b.branchIndex
+              }
+
+              return (b.release.id || 0) - (a.release.id || 0)
             })
 
-          for (const release of releases.slice(3)) {
-            console.log(`Deleting old CI prerelease ${release.tag_name}`)
+          const keptTags = new Set(
+            releases.slice(0, keepCount).map(({ release }) => release.tag_name)
+          )
+
+          if (keptTags.size) {
+            console.log(`Keeping CI prereleases: ${Array.from(keptTags).join(', ')}`)
+          }
+
+          for (const { release, branchIndex } of releases) {
+            if (keptTags.has(release.tag_name)) {
+              continue
+            }
+
+            const reason = Number.isFinite(branchIndex)
+              ? `older than latest ${keepCount} CI prereleases on ${process.env.CI_RELEASE_BRANCH}`
+              : `not found in latest ${branchCommits.length} commits on ${process.env.CI_RELEASE_BRANCH}`
+
+            console.log(`Deleting CI prerelease ${release.tag_name}: ${reason}`)
             childProcess.execFileSync(
               'gh',
               [
