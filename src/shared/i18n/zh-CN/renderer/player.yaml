@@ -583,8 +583,8 @@ playerTabs:
     activeSession: 活跃时段胜负
     winShort: 胜
     lossShort: 负
-    level3Short: 3 级
-    level4Short: 4 级
+    level3Short: 3 级抓
+    level4Short: 4 级抓
     winningStreak: '{{count}} 连胜'
     losingStreak: '{{count}} 连败'
   championMastery:

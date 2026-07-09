@@ -11,7 +11,7 @@ import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
 import { computed } from 'vue'
 
 import { useOngoingGamePanel } from '../../context'
-import { resolveJunglePathingAnalysis } from './jungle-pathing/visibility'
+import { resolveJunglePathingAnalysis } from './jungle-pathing-visibility'
 import JunglePathingInfo from './jungle-pathing-info/JunglePathingInfo.vue'
 
 const { puuid } = defineProps<{

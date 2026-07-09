@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveJunglePathingAnalysis } from './visibility'
+import { resolveJunglePathingAnalysis } from './jungle-pathing-visibility'
 
 const analysis = {
   jungle: {

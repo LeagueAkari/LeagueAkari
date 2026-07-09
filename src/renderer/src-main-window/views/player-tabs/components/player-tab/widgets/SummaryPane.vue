@@ -301,7 +301,7 @@
                       {{ t('playerTabs.summary.level3Short') }}
                     </div>
                     <div class="text-gray-900 tabular-nums dark:text-white">
-                      {{ c.jungle.earlyGank.level3GankCount }}/{{ c.jungle.gamesAnalyzed }}
+                      {{ c.jungle.earlyGank.level3GankCount }} / {{ c.jungle.gamesAnalyzed }}
                     </div>
                   </div>
                   <div class="rounded bg-indigo-500/8 px-2 py-1">
@@ -309,7 +309,7 @@
                       {{ t('playerTabs.summary.level4Short') }}
                     </div>
                     <div class="text-gray-900 tabular-nums dark:text-white">
-                      {{ c.jungle.earlyGank.level4GankCount }}/{{ c.jungle.gamesAnalyzed }}
+                      {{ c.jungle.earlyGank.level4GankCount }} / {{ c.jungle.gamesAnalyzed }}
                     </div>
                   </div>
                   <div class="rounded bg-indigo-500/8 px-2 py-1">
