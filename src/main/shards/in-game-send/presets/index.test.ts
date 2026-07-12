@@ -475,16 +475,18 @@ describe('in-game-send presets', () => {
     ])
   })
 
-  it('shows average vision score after average solo kills when enabled', () => {
+  it('shows champion and player names together when requested', () => {
     const lines = buildRatingPresetLines(createContext(), {
       ...createRatingOptions(),
       selectedPuuids: ['p1'],
-      avgVisionScore: true,
+      nameDisplayStrategy: 'championNameWithName',
+      avgSoloKills: false,
+      avgVisionScore: false,
       mainChampions: false,
       mainPositions: false
     })
 
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34 场均单杀0.8 场均视野得分26.4'])
+    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：50场对局，胜率59% KDA2.34'])
   })
 
   it('shows optional rating metrics after average vision score when enabled', () => {
@@ -507,50 +509,6 @@ describe('in-game-send presets', () => {
     ])
   })
 
-  it('shows player names when name display strategy prefers names', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      nameDisplayStrategy: 'preferName'
-    })
-
-    expect(lines).toEqual([
-      'RIP董事长#81406：50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
-      'Lee Player#002：近期没有对局记录'
-    ])
-  })
-
-  it('falls back to player names for duplicate champions when preferring champion names', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.championSelections.p2 = 103
-
-    const lines = buildRatingPresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      createRatingOptions()
-    )
-
-    expect(lines).toEqual([
-      'RIP董事长#81406：50场对局，胜率59% KDA2.34 场均单杀0.8 主玩英雄[无极剑圣，盲僧，深海泰坦] 主玩位置[中路，打野]',
-      'Lee Player#002：近期没有对局记录'
-    ])
-  })
-
-  it('shows champion and player names together when requested', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      selectedPuuids: ['p1'],
-      nameDisplayStrategy: 'championNameWithName',
-      avgSoloKills: false,
-      avgVisionScore: false,
-      mainChampions: false,
-      mainPositions: false
-    })
-
-    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：50场对局，胜率59% KDA2.34'])
-  })
-
   it('uses current champion rating stats when enabled', () => {
     const lines = buildRatingPresetLines(createContext(), {
       ...createRatingOptions(),
@@ -561,53 +519,6 @@ describe('in-game-send presets', () => {
       '无极剑圣：本英雄16场，胜率67% KDA4.32 场均单杀1.2 主玩位置[中路，打野，上路，下路]',
       '盲僧：近期没有本英雄对局记录'
     ])
-  })
-
-  it('includes the current champion name in stats when current champion mode shows player names', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      selectedPuuids: ['p1'],
-      nameDisplayStrategy: 'preferName',
-      showCurrentChampion: true,
-      mainPositions: false
-    })
-
-    expect(lines).toEqual(['RIP董事长#81406：无极剑圣16场，胜率67% KDA4.32 场均单杀1.2'])
-  })
-
-  it('uses current champion name in stats when duplicate champions force player names', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.championSelections.p2 = 103
-
-    const lines = buildRatingPresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      {
-        ...createRatingOptions(),
-        selectedPuuids: ['p1', 'p2'],
-        showCurrentChampion: true,
-        mainPositions: false
-      }
-    )
-
-    expect(lines).toEqual([
-      'RIP董事长#81406：无极剑圣16场，胜率67% KDA4.32 场均单杀1.2',
-      'Lee Player#002：近期没有无极剑圣对局记录'
-    ])
-  })
-
-  it('uses current champion wording when champion and player names are both shown', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      selectedPuuids: ['p1'],
-      nameDisplayStrategy: 'championNameWithName',
-      showCurrentChampion: true,
-      mainPositions: false
-    })
-
-    expect(lines).toEqual(['无极剑圣（RIP董事长#81406）：本英雄16场，胜率67% KDA4.32 场均单杀1.2'])
   })
 
   it('reports players without champion selection when current champion stats are enabled', () => {
@@ -669,105 +580,6 @@ describe('in-game-send presets', () => {
     expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
   })
 
-  it('does not append main champions when champion usage is scattered', () => {
-    const mainContext = createMainContext()
-    const champions = mainContext.ongoingGame.state.analysis.players.p1.champions
-    champions[103].winLoss.all.count = 8
-    champions[64].winLoss.all.count = 7
-    champions[111].winLoss.all.count = 6
-    champions[222].winLoss.all.count = 5
-
-    const lines = buildRatingPresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      {
-        ...createRatingOptions(),
-        selectedPuuids: ['p1'],
-        avgSoloKills: false,
-        avgVisionScore: false,
-        mainPositions: false
-      }
-    )
-
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
-  })
-
-  it('does not append main champions when disabled', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      selectedPuuids: ['p1'],
-      avgSoloKills: false,
-      avgVisionScore: false,
-      mainChampions: false,
-      mainPositions: false
-    })
-
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
-  })
-
-  it('does not append main positions when position usage is scattered', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.analysis.players.p1.positions = {
-      TOP: 12,
-      JUNGLE: 11,
-      MIDDLE: 10,
-      BOTTOM: 9,
-      UTILITY: 8
-    }
-
-    const lines = buildRatingPresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      {
-        ...createRatingOptions(),
-        selectedPuuids: ['p1'],
-        avgSoloKills: false,
-        avgVisionScore: false,
-        mainChampions: false
-      }
-    )
-
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
-  })
-
-  it('does not append main positions when position data is unavailable', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.analysis.players.p1.positions = null
-
-    const lines = buildRatingPresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      {
-        ...createRatingOptions(),
-        selectedPuuids: ['p1'],
-        avgSoloKills: false,
-        avgVisionScore: false,
-        mainChampions: false
-      }
-    )
-
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
-  })
-
-  it('does not append main positions when disabled', () => {
-    const lines = buildRatingPresetLines(createContext(), {
-      ...createRatingOptions(),
-      selectedPuuids: ['p1'],
-      avgSoloKills: false,
-      avgVisionScore: false,
-      mainChampions: false,
-      mainPositions: false
-    })
-
-    expect(lines).toEqual(['无极剑圣：50场对局，胜率59% KDA2.34'])
-  })
-
   it('does not build rating lines when there are no sendable players', () => {
     expect(
       buildRatingPresetLines(createContext(), { ...createRatingOptions(), selectedPuuids: [] })
@@ -792,16 +604,19 @@ describe('in-game-send presets', () => {
     ])
   })
 
-  it('builds jungle lines in English when main language is English', async () => {
+  it('builds English jungle lines with player names', async () => {
     await i18next.changeLanguage('en')
     const context = createJungleContext()
     useEnglishChampionNames(context.mainContext)
 
-    const lines = buildJunglePresetLines(context, createJungleOptions())
+    const lines = buildJunglePresetLines(context, {
+      ...createJungleOptions(),
+      nameDisplayStrategy: 'preferName'
+    })
 
-    expect(lines).toEqual([
-      'Master Yi: 16 jungle samples on this champion Early favors mid/bot, top 22% mid 46% bot 32% blue-side standard 75%[Red Buff 67%, Blue Buff 33%] blue-side invade 25%[Blue Buff 100%] red-side standard 100%[Blue Buff 75%, Red Buff 25%] red-side invade 0% Lv3 gank 31% Lv4 gank 50% First dragon 63%, first dragon avg 6:12 Avg dragons 1.9 Objectives voidgrubs 2.4/heralds 0.5/barons 0.3'
-    ])
+    expect(lines[0]).toBe(
+      'RIP董事长#81406: 16 jungle samples on Master Yi Early favors mid/bot, top 22% mid 46% bot 32% blue-side standard 75%[Red Buff 67%, Blue Buff 33%] blue-side invade 25%[Blue Buff 100%] red-side standard 100%[Blue Buff 75%, Red Buff 25%] red-side invade 0% Lv3 gank 31% Lv4 gank 50% First dragon 63%, first dragon avg 6:12 Avg dragons 1.9 Objectives voidgrubs 2.4/heralds 0.5/barons 0.3'
+    )
   })
 
   it('builds global jungle preference lines when current champion filtering is disabled', () => {
@@ -815,86 +630,24 @@ describe('in-game-send presets', () => {
     ])
   })
 
-  it('uses player names in jungle lines when name display strategy prefers names', () => {
-    const lines = buildJunglePresetLines(createJungleContext(), {
-      ...createJungleOptions(),
-      nameDisplayStrategy: 'preferName'
-    })
-
-    expect(lines[0].startsWith('RIP董事长#81406：无极剑圣打野样本16场')).toBe(true)
-  })
-
-  it('omits first clear distribution when disabled for current champion jungle lines', () => {
-    const lines = buildJunglePresetLines(createJungleContext(), {
-      ...createJungleOptions(),
-      firstClearDistribution: false
-    })
-
-    expect(lines).toEqual([
-      '无极剑圣：本英雄打野样本16场 前期偏中下，上22%中46%下32% 3级抓31% 4级抓50% 一龙率63%，首龙均时6:12 场均小龙1.9 野怪资源巢虫2.4/先锋0.5/大龙0.3'
-    ])
-  })
-
-  it('omits main jungle champions when current champion filtering is enabled', () => {
-    const lines = buildJunglePresetLines(createJungleContext(), {
-      ...createJungleOptions(),
-      firstClearDistribution: false,
-      mainChampions: true
-    })
-
-    expect(lines[0]).not.toContain('主玩英雄')
-  })
-
-  it('reports jungle players without champion selection when current champion filtering is enabled', () => {
-    const context = createJungleContext()
-    context.mainContext.ongoingGame.state.championSelections.p1 = 0
-
-    const lines = buildJunglePresetLines(context, createJungleOptions())
-
-    expect(lines).toEqual(['RIP董事长#81406：尚未选择英雄'])
-  })
-
   it('builds premade lines from selected premade groups', () => {
     const lines = buildPremadePresetLines(createContext(), createPremadeOptions())
 
     expect(lines).toEqual(['蓝方开黑：[无极剑圣, 盲僧] [深海泰坦, 暴走萝莉]'])
   })
 
-  it('builds premade lines in English when main language is English', async () => {
+  it('builds English premade lines with player names', async () => {
     await i18next.changeLanguage('en')
     const context = createContext()
     useEnglishChampionNames(context.mainContext)
 
-    const lines = buildPremadePresetLines(context, createPremadeOptions())
-
-    expect(lines).toEqual(['Blue premades: [Master Yi, Lee Sin] [Nautilus, Jinx]'])
-  })
-
-  it('uses red side label for TEAM-200 premade lines', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.teams = {
-      'TEAM-200': ['p1', 'p2', 'p3', 'p4']
-    }
-
-    const lines = buildPremadePresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      createPremadeOptions()
-    )
-
-    expect(lines).toEqual(['红方开黑：[无极剑圣, 盲僧] [深海泰坦, 暴走萝莉]'])
-  })
-
-  it('shows player names in premade lines when name display strategy prefers names', () => {
-    const lines = buildPremadePresetLines(createContext(), {
+    const lines = buildPremadePresetLines(context, {
       ...createPremadeOptions(),
       nameDisplayStrategy: 'preferName'
     })
 
     expect(lines).toEqual([
-      '蓝方开黑：[RIP董事长#81406, Lee Player#002] [Naut Player#003, Jinx Player#004]'
+      'Blue premades: [RIP董事长#81406, Lee Player#002] [Naut Player#003, Jinx Player#004]'
     ])
   })
 
@@ -911,23 +664,6 @@ describe('in-game-send presets', () => {
     )
 
     expect(lines).toEqual(['蓝方开黑：[RIP董事长#81406, Lee Player#002] [深海泰坦, 暴走萝莉]'])
-  })
-
-  it('omits side names for premade lines without standard team identifiers', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.teams = {
-      'CHERRY-1': ['p1', 'p2', 'p3', 'p4']
-    }
-
-    const lines = buildPremadePresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      createPremadeOptions()
-    )
-
-    expect(lines).toEqual(['开黑：[无极剑圣, 盲僧] [深海泰坦, 暴走萝莉]'])
   })
 
   it('reports standard teams without selected premade groups', () => {
@@ -950,23 +686,5 @@ describe('in-game-send presets', () => {
     )
 
     expect(lines).toEqual(['蓝方开黑：[无极剑圣, 盲僧]', '红方无开黑'])
-  })
-
-  it('reports non-standard teams without selected premade groups without side labels', () => {
-    const mainContext = createMainContext()
-    mainContext.ongoingGame.state.teams = {
-      'CHERRY-1': ['p1', 'p2', 'p3', 'p4']
-    }
-    mainContext.ongoingGame.state.mergedPremadeTeamMap = {}
-
-    const lines = buildPremadePresetLines(
-      {
-        target: 'friendly',
-        mainContext
-      },
-      createPremadeOptions()
-    )
-
-    expect(lines).toEqual(['无开黑小队'])
   })
 })

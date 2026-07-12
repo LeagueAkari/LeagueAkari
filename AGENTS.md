@@ -298,6 +298,21 @@ yarn storybook    # Component/story preview
 yarn format       # Prettier
 ```
 
+### Testing principles
+
+- Add or keep a test only when its failure represents a broken user-visible behavior, business
+  invariant, persistence/protocol contract, or critical cross-layer flow. A code change does not
+  require a test by default.
+- Do not read Vue/TypeScript source files and assert implementation strings, CSS classes, function
+  names, import placement, or other refactor-sensitive structure.
+- Do not extract trivial toggles, getters, setters, or one-line forwarding wrappers solely to make
+  them unit-testable. Prefer testing the real caller-to-result flow when that flow matters.
+- Prefer a small set of representative and boundary cases over a Cartesian product of option
+  combinations. Use table-driven cases when the same contract genuinely needs multiple inputs.
+- Mocked unit tests prove only the JavaScript orchestration around the mock. Validate Electron
+  windows, renderer interaction, native addons, packaging, and visual behavior with the matching
+  runtime, CDP, Storybook, or packaged-app smoke check.
+
 Logs are written via Winston. On macOS they use Electron's `app.getPath('logs')`; on other packaged
 builds they are written beside the executable under `logs/`. The SQLite database lives at
 `<userData>/LeagueAkari.db`.

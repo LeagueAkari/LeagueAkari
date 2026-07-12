@@ -125,11 +125,6 @@ import { NButton, NCollapseTransition, NIcon, NInput, useMessage } from 'naive-u
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import { focusTextInput } from './cursor'
-import {
-  getNextSuggestionPanelExpanded,
-  isSuggestionPanelInitiallyExpanded
-} from './suggestion-panel'
-import { appendTagText, clearTagText } from './text-editing'
 import type { PlayerTagEditPanelSummoner } from './types'
 import type { InputInst } from 'naive-ui'
 
@@ -149,7 +144,7 @@ const text = ref('')
 const hasLoadedTag = ref(false)
 const isLoadingTag = ref(false)
 const isSaving = ref(false)
-const isSuggestionPanelExpanded = ref(isSuggestionPanelInitiallyExpanded)
+const isSuggestionPanelExpanded = ref(false)
 const inputEl = useTemplateRef<InputInst>('input')
 let focusFrame: number | null = null
 
@@ -201,19 +196,17 @@ const focus = (cursorPosition?: number) => {
 }
 
 const appendPhrase = (phrase: string) => {
-  const result = appendTagText(text.value, phrase)
-  text.value = result.text
-  focus(result.cursorPosition)
+  text.value += phrase
+  focus(text.value.length)
 }
 
 const toggleSuggestionPanel = () => {
-  isSuggestionPanelExpanded.value = getNextSuggestionPanelExpanded(isSuggestionPanelExpanded.value)
+  isSuggestionPanelExpanded.value = !isSuggestionPanelExpanded.value
 }
 
 const clearText = () => {
-  const result = clearTagText()
-  text.value = result.text
-  focus(result.cursorPosition)
+  text.value = ''
+  focus(0)
 }
 
 const loadSelfTag = async () => {
