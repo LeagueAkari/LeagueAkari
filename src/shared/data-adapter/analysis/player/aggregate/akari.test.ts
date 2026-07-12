@@ -100,50 +100,39 @@ function createPreparedGame(gameId: number, summary: Partial<SingleSummaryAnalys
 }
 
 describe('computeAggregatedAkariScore', () => {
-  it('scores average vision from expected contribution ratio with a 0.75 point cap at 200 percent', () => {
-    const score = computeAggregatedAkariScore({
-      count: 1,
-      summary: baseSummary,
-      games: [createPreparedGame(1, { visionScoreRatioToExpectedContribution: 2 })]
-    })
-
-    expect(score.visionScore).toBe(0.75)
-    expect(score.total).toBeCloseTo(
-      score.kdaScore +
-        score.winRateScore +
-        score.dmgScore +
-        score.dmgTakenScore +
-        score.csScore +
-        score.goldScore +
-        score.participationScore +
-        score.visionScore
-    )
-  })
-
-  it('does not award extra average vision score above 200 percent expected contribution', () => {
-    const score = computeAggregatedAkariScore({
-      count: 1,
-      summary: baseSummary,
-      games: [createPreparedGame(1, { visionScoreRatioToExpectedContribution: 3 })]
-    })
-
-    expect(score.visionScore).toBe(0.75)
-  })
-
-  it('averages expected contribution ratios before scoring', () => {
+  it('scores contribution, cs, participation, and vision per game before averaging', () => {
     const score = computeAggregatedAkariScore({
       count: 2,
       summary: baseSummary,
       games: [
-        createPreparedGame(1, { championDamageRatioToExpectedContribution: 1 }),
-        createPreparedGame(2, { championDamageRatioToExpectedContribution: 3 })
+        createPreparedGame(1, {
+          championDamageRatioToExpectedContribution: 0.5,
+          damageTakenRatioToExpectedContribution: 0.5,
+          goldRatioToExpectedContribution: 0.5,
+          csPerMinute: 0,
+          killParticipation: 0,
+          visionScoreRatioToExpectedContribution: 0.5
+        }),
+        createPreparedGame(2, {
+          championDamageRatioToExpectedContribution: 2,
+          damageTakenRatioToExpectedContribution: 2,
+          goldRatioToExpectedContribution: 1.5,
+          csPerMinute: 10,
+          killParticipation: 1,
+          visionScoreRatioToExpectedContribution: 2
+        })
       ]
     })
 
-    expect(score.dmgScore).toBe(1)
+    expect(score.dmgScore).toBeCloseTo(1.5)
+    expect(score.dmgTakenScore).toBeCloseTo(1)
+    expect(score.goldScore).toBeCloseTo(1)
+    expect(score.csScore).toBeCloseTo(1)
+    expect(score.participationScore).toBeCloseTo(1)
+    expect(score.visionScore).toBeCloseTo(1)
   })
 
-  it('caps average KDA score at 0.35 points', () => {
+  it('preserves the average KDA curve and caps it at 1 point', () => {
     expect(
       computeAggregatedAkariScore({
         count: 1,
@@ -153,7 +142,7 @@ describe('computeAggregatedAkariScore', () => {
         },
         games: []
       }).kdaScore
-    ).toBe(0.3)
+    ).toBeCloseTo(6 / 7)
     expect(
       computeAggregatedAkariScore({
         count: 1,
@@ -163,20 +152,10 @@ describe('computeAggregatedAkariScore', () => {
         },
         games: []
       }).kdaScore
-    ).toBe(0.35)
+    ).toBe(1)
   })
 
-  it('scores average gold at 150 percent expected contribution across a 0.75 point cap', () => {
-    const score = computeAggregatedAkariScore({
-      count: 1,
-      summary: baseSummary,
-      games: [createPreparedGame(1, { goldRatioToExpectedContribution: 1.5 })]
-    })
-
-    expect(score.goldScore).toBe(0.75)
-  })
-
-  it('maps win rate from 50 percent to 100 percent across a 0.25 point cap without a penalty below 50 percent', () => {
+  it('maps win rate from 50 percent to 100 percent across a 1 point cap without a penalty below 50 percent', () => {
     expect(
       computeAggregatedAkariScore({
         count: 1,
@@ -206,7 +185,7 @@ describe('computeAggregatedAkariScore', () => {
         },
         games: []
       }).winRateScore
-    ).toBe(0.125)
+    ).toBe(0.5)
     expect(
       computeAggregatedAkariScore({
         count: 1,
@@ -216,50 +195,7 @@ describe('computeAggregatedAkariScore', () => {
         },
         games: []
       }).winRateScore
-    ).toBe(0.25)
-  })
-
-  it('maps average cs per minute linearly to a 0.75 point cap at 10 cs per minute', () => {
-    expect(
-      computeAggregatedAkariScore({
-        count: 1,
-        summary: {
-          ...baseSummary,
-          avgCsPerMinute: 0
-        },
-        games: []
-      }).csScore
-    ).toBe(0)
-    expect(
-      computeAggregatedAkariScore({
-        count: 1,
-        summary: {
-          ...baseSummary,
-          avgCsPerMinute: 5
-        },
-        games: []
-      }).csScore
-    ).toBe(0.375)
-    expect(
-      computeAggregatedAkariScore({
-        count: 1,
-        summary: {
-          ...baseSummary,
-          avgCsPerMinute: 10
-        },
-        games: []
-      }).csScore
-    ).toBe(0.75)
-    expect(
-      computeAggregatedAkariScore({
-        count: 1,
-        summary: {
-          ...baseSummary,
-          avgCsPerMinute: 12
-        },
-        games: []
-      }).csScore
-    ).toBe(0.75)
+    ).toBe(1)
   })
 
   it('uses aggregate thresholds for performance tags', () => {
@@ -267,8 +203,7 @@ describe('computeAggregatedAkariScore', () => {
       count: 8,
       summary: {
         ...baseSummary,
-        avgCsPerMinute: 10,
-        avgKillParticipation: 1,
+        avgKda: 9,
         winRate: 1
       },
       games: [
@@ -276,12 +211,14 @@ describe('computeAggregatedAkariScore', () => {
           championDamageRatioToExpectedContribution: 2,
           damageTakenRatioToExpectedContribution: 2,
           goldRatioToExpectedContribution: 1.5,
+          csPerMinute: 10,
+          killParticipation: 1,
           visionScoreRatioToExpectedContribution: 2
         })
       ]
     })
 
-    expect(score.total).toBeCloseTo(5.15)
+    expect(score.total).toBeCloseTo(15)
     expect(score.outstanding).toBe(true)
     expect(score.extraordinary).toBe(true)
   })

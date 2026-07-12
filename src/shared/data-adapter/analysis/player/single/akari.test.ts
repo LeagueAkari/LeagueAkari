@@ -37,23 +37,25 @@ const baseSummary: SingleSummaryAnalysis = {
 }
 
 describe('computeSingleAkariScore', () => {
-  it('scores vision from expected contribution ratio with a 0.75 point cap at 200 percent', () => {
-    const score = computeSingleAkariScore({
-      ...baseSummary,
-      visionScoreRatioToExpectedContribution: 2
-    })
-
-    expect(score.visionScore).toBe(0.75)
-    expect(score.total).toBeCloseTo(
-      score.kdaScore +
-        score.winRateScore +
-        score.dmgScore +
-        score.dmgTakenScore +
-        score.csScore +
-        score.goldScore +
-        score.participationScore +
-        score.visionScore
-    )
+  it('scores vision only above expected contribution with a 2 point cap at 200 percent', () => {
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        visionScoreRatioToExpectedContribution: 1
+      }).visionScore
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        visionScoreRatioToExpectedContribution: 1.5
+      }).visionScore
+    ).toBeCloseTo(1)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        visionScoreRatioToExpectedContribution: 2
+      }).visionScore
+    ).toBe(2)
   })
 
   it('does not award extra vision score above 200 percent expected contribution', () => {
@@ -62,13 +64,13 @@ describe('computeSingleAkariScore', () => {
       visionScoreRatioToExpectedContribution: 3
     })
 
-    expect(score.visionScore).toBe(0.75)
+    expect(score.visionScore).toBe(2)
   })
 
-  it('uses lower non-vision weights to balance the added vision metric', () => {
+  it('uses the 15 point scale at every component cap', () => {
     const score = computeSingleAkariScore({
       ...baseSummary,
-      kda: 4,
+      kda: 9,
       win: true,
       championDamageRatioToExpectedContribution: 2,
       damageTakenRatioToExpectedContribution: 2,
@@ -79,31 +81,31 @@ describe('computeSingleAkariScore', () => {
     })
 
     expect(score).toMatchObject({
-      kdaScore: 0.3,
-      winRateScore: 0.25,
-      dmgScore: 1,
-      dmgTakenScore: 0.75,
-      csScore: 0.75,
-      goldScore: 0.75,
-      participationScore: 0.75,
-      visionScore: 0.75
+      kdaScore: 1,
+      winRateScore: 1,
+      dmgScore: 3,
+      dmgTakenScore: 2,
+      csScore: 2,
+      goldScore: 2,
+      participationScore: 2,
+      visionScore: 2
     })
-    expect(score.total).toBeCloseTo(5.3)
+    expect(score.total).toBeCloseTo(15)
   })
 
-  it('caps KDA score at 0.35 points', () => {
+  it('preserves the KDA curve and caps it at 1 point', () => {
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         kda: 4
       }).kdaScore
-    ).toBe(0.3)
+    ).toBeCloseTo(6 / 7)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         kda: 9
       }).kdaScore
-    ).toBe(0.35)
+    ).toBe(1)
   })
 
   it('scores wins without penalizing losses', () => {
@@ -118,10 +120,10 @@ describe('computeSingleAkariScore', () => {
         ...baseSummary,
         win: true
       }).winRateScore
-    ).toBe(0.25)
+    ).toBe(1)
   })
 
-  it('maps cs per minute linearly to a 0.75 point cap at 10 cs per minute', () => {
+  it('maps cs per minute from 5 to 10 across a 2 point cap', () => {
     expect(
       computeSingleAkariScore({
         ...baseSummary,
@@ -133,46 +135,70 @@ describe('computeSingleAkariScore', () => {
         ...baseSummary,
         csPerMinute: 5
       }).csScore
-    ).toBe(0.375)
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        csPerMinute: 7.5
+      }).csScore
+    ).toBeCloseTo(1)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         csPerMinute: 10
       }).csScore
-    ).toBe(0.75)
+    ).toBe(2)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         csPerMinute: 12
       }).csScore
-    ).toBe(0.75)
+    ).toBe(2)
   })
 
-  it('scores expected contribution from 0 percent to the target contribution ratio', () => {
+  it('scores expected contribution only above the baseline ratio', () => {
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         championDamageRatioToExpectedContribution: 1
       }).dmgScore
-    ).toBe(0.5)
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        championDamageRatioToExpectedContribution: 1.5
+      }).dmgScore
+    ).toBeCloseTo(1.5)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         championDamageRatioToExpectedContribution: 2
       }).dmgScore
-    ).toBe(1)
+    ).toBe(3)
   })
 
-  it('scores gold at 150 percent expected contribution', () => {
-    const score = computeSingleAkariScore({
-      ...baseSummary,
-      goldRatioToExpectedContribution: 1.5
-    })
-
-    expect(score.goldScore).toBe(0.75)
+  it('scores gold from expected contribution to 150 percent', () => {
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        goldRatioToExpectedContribution: 1
+      }).goldScore
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        goldRatioToExpectedContribution: 1.25
+      }).goldScore
+    ).toBeCloseTo(1)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        goldRatioToExpectedContribution: 1.5
+      }).goldScore
+    ).toBe(2)
   })
 
-  it('maps kill participation from 30 percent to 100 percent across a 0.75 point cap', () => {
+  it('maps kill participation from 30 percent to 100 percent across a 2 point cap', () => {
     expect(
       computeSingleAkariScore({
         ...baseSummary,
@@ -184,12 +210,12 @@ describe('computeSingleAkariScore', () => {
         ...baseSummary,
         killParticipation: 0.65
       }).participationScore
-    ).toBeCloseTo(0.375)
+    ).toBeCloseTo(1)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         killParticipation: 1
       }).participationScore
-    ).toBe(0.75)
+    ).toBe(2)
   })
 })

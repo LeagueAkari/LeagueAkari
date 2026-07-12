@@ -19,55 +19,61 @@ export const ACTIVE_SESSION_LATEST_WINDOW_MS = 4 * 60 * 60 * 1000
 export const ACTIVE_SESSION_GAP_MS = 8 * 60 * 60 * 1000
 
 /** Akari KDA 分数权重 */
-export const AKARI_KDA_WEIGHT = 0.15
+export const AKARI_KDA_WEIGHT = 3 / 7
 
 /** Akari KDA 分数满分 */
-export const AKARI_KDA_MAX_SCORE = 0.35
+export const AKARI_KDA_MAX_SCORE = 1
 
 /** Akari 胜率基准线 */
 export const AKARI_WIN_RATE_BASELINE = 0.5
 
 /** Akari 胜率分数权重 */
-export const AKARI_WIN_RATE_WEIGHT = 0.25
+export const AKARI_WIN_RATE_WEIGHT = 1
 
 /** Akari 输出分数权重 */
-export const AKARI_DAMAGE_WEIGHT = 1.0
+export const AKARI_DAMAGE_WEIGHT = 3
 
 /** Akari 承伤分数权重 */
-export const AKARI_DAMAGE_TAKEN_WEIGHT = 0.75
+export const AKARI_DAMAGE_TAKEN_WEIGHT = 2
 
 /** Akari 补刀满分所需分均补刀 */
 export const AKARI_CS_FULL_SCORE_PER_MINUTE = 10
 
+/** Akari 补刀起评分均补刀 */
+export const AKARI_CS_MIN_SCORE_PER_MINUTE = 5
+
 /** Akari 补刀分数满分 */
-export const AKARI_CS_MAX_SCORE = 0.75
+export const AKARI_CS_MAX_SCORE = 2
 
 /** Akari 经济分数权重 */
-export const AKARI_GOLD_WEIGHT = 0.75
+export const AKARI_GOLD_WEIGHT = 2
 
 /** Akari 参团率起评分 */
 export const AKARI_PARTICIPATION_MIN_SHARE = 0.3
 
 /** Akari 参团分数满分 */
-export const AKARI_PARTICIPATION_WEIGHT = 0.75
+export const AKARI_PARTICIPATION_WEIGHT = 2
 
 /** Akari 伤害、承伤、视野满分所需理应贡献比 */
 export const AKARI_STANDARD_EXPECTED_CONTRIBUTION_FULL_SCORE_RATIO = 2.0
+
+/** Akari 理应贡献起评分比 */
+export const AKARI_EXPECTED_CONTRIBUTION_BASELINE_RATIO = 1.0
 
 /** Akari 经济满分所需理应贡献比 */
 export const AKARI_GOLD_EXPECTED_CONTRIBUTION_FULL_SCORE_RATIO = 1.5
 
 /** Akari 视野分数满分 */
-export const AKARI_VISION_MAX_SCORE = 0.75
+export const AKARI_VISION_MAX_SCORE = 2
 
 /** 聚合 Akari outstanding 阈值 */
-export const AGGREGATE_AKARI_OUTSTANDING_THRESHOLD = 3.05
+export const AGGREGATE_AKARI_OUTSTANDING_THRESHOLD = 6.5
 
 /** 聚合 Akari outstanding 最小样本数 */
 export const AGGREGATE_AKARI_OUTSTANDING_MIN_COUNT = 5
 
 /** 聚合 Akari extraordinary 阈值 */
-export const AGGREGATE_AKARI_EXTRAORDINARY_THRESHOLD = 3.58
+export const AGGREGATE_AKARI_EXTRAORDINARY_THRESHOLD = 8
 
 /** 聚合 Akari extraordinary 最小样本数 */
 export const AGGREGATE_AKARI_EXTRAORDINARY_MIN_COUNT = 8

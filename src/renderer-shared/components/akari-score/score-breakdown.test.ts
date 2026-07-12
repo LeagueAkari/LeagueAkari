@@ -6,15 +6,15 @@ import { getAkariScoreBreakdownItems } from './score-breakdown'
 describe('getAkariScoreBreakdownItems', () => {
   it('returns every Akari Score part with its value and maximum score', () => {
     const score: AkariScore = {
-      kdaScore: 0.1875,
-      winRateScore: 0.25,
-      dmgScore: 0.5,
-      dmgTakenScore: 0.375,
-      csScore: 0.375,
-      goldScore: 0.375,
-      participationScore: 0.375,
-      visionScore: 0.375,
-      total: 2.8125,
+      kdaScore: 0.5,
+      winRateScore: 0.5,
+      dmgScore: 1.5,
+      dmgTakenScore: 1,
+      csScore: 1,
+      goldScore: 1,
+      participationScore: 1,
+      visionScore: 1,
+      total: 7.5,
       outstanding: true,
       extraordinary: true
     }
@@ -23,64 +23,64 @@ describe('getAkariScoreBreakdownItems', () => {
       {
         key: 'kdaScore',
         labelKey: 'akariScore.parts.kda',
-        value: 0.1875,
-        max: 0.35,
-        progressPercentage: 53.57142857142857,
-        progressStatus: 'default'
-      },
-      {
-        key: 'winRateScore',
-        labelKey: 'akariScore.parts.winRate',
-        value: 0.25,
-        max: 0.25,
-        progressPercentage: 100,
-        progressStatus: 'default'
-      },
-      {
-        key: 'dmgScore',
-        labelKey: 'akariScore.parts.damage',
         value: 0.5,
         max: 1,
         progressPercentage: 50,
         progressStatus: 'default'
       },
       {
+        key: 'winRateScore',
+        labelKey: 'akariScore.parts.winRate',
+        value: 0.5,
+        max: 1,
+        progressPercentage: 50,
+        progressStatus: 'default'
+      },
+      {
+        key: 'dmgScore',
+        labelKey: 'akariScore.parts.damage',
+        value: 1.5,
+        max: 3,
+        progressPercentage: 50,
+        progressStatus: 'default'
+      },
+      {
         key: 'dmgTakenScore',
         labelKey: 'akariScore.parts.damageTaken',
-        value: 0.375,
-        max: 0.75,
+        value: 1,
+        max: 2,
         progressPercentage: 50,
         progressStatus: 'default'
       },
       {
         key: 'csScore',
         labelKey: 'akariScore.parts.cs',
-        value: 0.375,
-        max: 0.75,
+        value: 1,
+        max: 2,
         progressPercentage: 50,
         progressStatus: 'default'
       },
       {
         key: 'goldScore',
         labelKey: 'akariScore.parts.gold',
-        value: 0.375,
-        max: 0.75,
+        value: 1,
+        max: 2,
         progressPercentage: 50,
         progressStatus: 'default'
       },
       {
         key: 'participationScore',
         labelKey: 'akariScore.parts.participation',
-        value: 0.375,
-        max: 0.75,
+        value: 1,
+        max: 2,
         progressPercentage: 50,
         progressStatus: 'default'
       },
       {
         key: 'visionScore',
         labelKey: 'akariScore.parts.vision',
-        value: 0.375,
-        max: 0.75,
+        value: 1,
+        max: 2,
         progressPercentage: 50,
         progressStatus: 'default'
       }
