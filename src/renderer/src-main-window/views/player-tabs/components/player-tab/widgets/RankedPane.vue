@@ -57,24 +57,21 @@
               {{ formatEntryRecord(entry) }}
             </span>
 
-            <!-- Highest Previous Season -->
+            <!-- Historical Highest -->
             <div
               class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
               :class="{
-                'text-gray-400 dark:text-gray-500':
-                  !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
+                'text-gray-400 dark:text-gray-500': !entry.highestTier || entry.highestTier === 'NA'
               }"
             >
               <span class="mr-0.5">{{ t('playerTabs.ranked.highest') }}</span>
               <div class="flex items-center">
                 <img
-                  v-if="
-                    getPreviousHighestTier(entry) && rankedMedalMap[getPreviousHighestTier(entry)]
-                  "
-                  :src="rankedMedalMap[getPreviousHighestTier(entry)]"
+                  v-if="getHighestTier(entry) && rankedMedalMap[getHighestTier(entry)]"
+                  :src="rankedMedalMap[getHighestTier(entry)]"
                   class="mr-0.5 h-4 w-4"
                 />
-                <span>{{ formatPreviousTier(entry) }}</span>
+                <span>{{ formatHighestTier(entry) }}</span>
               </div>
             </div>
           </div>
@@ -148,24 +145,22 @@
                 {{ formatEntryRecord(entry) }}
               </span>
 
-              <!-- Highest Previous Season -->
+              <!-- Historical Highest -->
               <div
                 class="flex items-center text-[10px] text-gray-500 dark:text-gray-300"
                 :class="{
                   'text-gray-400 dark:text-gray-500':
-                    !entry.previousSeasonHighestTier || entry.previousSeasonHighestTier === 'NA'
+                    !entry.highestTier || entry.highestTier === 'NA'
                 }"
               >
                 <span class="mr-0.5">{{ t('playerTabs.ranked.highest') }}</span>
                 <div class="flex items-center">
                   <img
-                    v-if="
-                      getPreviousHighestTier(entry) && rankedMedalMap[getPreviousHighestTier(entry)]
-                    "
-                    :src="rankedMedalMap[getPreviousHighestTier(entry)]"
+                    v-if="getHighestTier(entry) && rankedMedalMap[getHighestTier(entry)]"
+                    :src="rankedMedalMap[getHighestTier(entry)]"
                     class="mr-0.5 h-4 w-4"
                   />
-                  <span>{{ formatPreviousTier(entry) }}</span>
+                  <span>{{ formatHighestTier(entry) }}</span>
                 </div>
               </div>
             </div>
@@ -280,8 +275,8 @@ const getCurrentTier = (entry: Partial<RankedEntry>) => {
   return isUnrankedTier(entry.tier) ? 'UNRANKED' : entry.tier!
 }
 
-const getPreviousHighestTier = (entry: Partial<RankedEntry>) => {
-  return isUnrankedTier(entry.previousSeasonHighestTier) ? '' : entry.previousSeasonHighestTier!
+const getHighestTier = (entry: Partial<RankedEntry>) => {
+  return isUnrankedTier(entry.highestTier) ? '' : entry.highestTier!
 }
 
 const formatEntryRecord = (entry: Partial<RankedEntry>) => {
@@ -330,19 +325,19 @@ const formatTier = (entry: Partial<RankedEntry>) => {
   return `${tier} ${division}`
 }
 
-const formatPreviousTier = (entry: Partial<RankedEntry>) => {
+const formatHighestTier = (entry: Partial<RankedEntry>) => {
   if (!entry) return ''
 
-  if (isUnrankedTier(entry.previousSeasonHighestTier)) {
+  if (isUnrankedTier(entry.highestTier)) {
     return t('playerTabs.ranked.unranked', 'unranked')
   }
 
-  const tier = t(`tiers.${entry.previousSeasonHighestTier}`, {
-    defaultValue: entry.previousSeasonHighestTier,
+  const tier = t(`tiers.${entry.highestTier}`, {
+    defaultValue: entry.highestTier,
     ns: 'common'
   })
 
-  const division = entry.previousSeasonHighestDivision
+  const division = entry.highestDivision
 
   if (isUnrankedTier(division)) {
     return tier
