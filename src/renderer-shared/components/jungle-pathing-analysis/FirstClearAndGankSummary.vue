@@ -228,7 +228,7 @@ import { TranslationComponent, useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, defineComponent, type PropType } from 'vue'
 
-import { getTeamIndicatorColorClass } from '../../../utils/theme'
+import { getTeamIndicatorColorClass } from '@renderer-shared/components/ongoing-game-panel/utils/theme'
 import JunglePathingSection from './JunglePathingSection.vue'
 import type {
   EarlyGankCell,

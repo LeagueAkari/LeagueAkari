@@ -1,16 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
 import type { PreparedGame } from '../types/helpers'
+import { computeAggregatedAkariScore } from './akari'
 import { computeAggregatedChampions } from './champions'
 
 const baseSummary = {
+  championDamageRatioToExpectedContribution: 1,
   championDamageRatioToTeamMax: 1,
   championDamageRatioToMax: 1,
   championDamagePercentageOfTeam: 1,
   championDamagePerMinute: 1,
+  damageTakenRatioToExpectedContribution: 1,
   damageTakenRatioToTeamMax: 1,
   damageTakenRatioToMax: 1,
   damageTakenPercentageOfTeam: 1,
+  goldRatioToExpectedContribution: 1,
   goldRatioToTeamMax: 1,
   goldRatioToMax: 1,
   goldPercentageOfTeam: 1,
@@ -21,6 +25,7 @@ const baseSummary = {
   towerDamageRatioToTeamMax: 1,
   towerDamageRatioToMax: 1,
   towerDamagePercentageOfTeam: 1,
+  visionScoreRatioToExpectedContribution: 1,
   visionScorePercentageOfTeam: 1,
   totalDamageShieldedOnTeammatesRatioToTeamMax: null,
   totalDamageShieldedOnTeammatesRatioToMax: null,
@@ -32,7 +37,12 @@ const baseSummary = {
   damageGoldEfficiency: 1
 }
 
-function createPreparedGame(championId: number, position: string, gameId: number): PreparedGame {
+function createPreparedGame(
+  championId: number,
+  position: string,
+  gameId: number,
+  expectedContributionRatio = 1
+): PreparedGame {
   const participant = {
     championId,
     position,
@@ -57,7 +67,13 @@ function createPreparedGame(championId: number, position: string, gameId: number
     participants: [participant],
     single: {
       gameId,
-      summary: baseSummary,
+      summary: {
+        ...baseSummary,
+        championDamageRatioToExpectedContribution: expectedContributionRatio,
+        damageTakenRatioToExpectedContribution: expectedContributionRatio,
+        goldRatioToExpectedContribution: expectedContributionRatio,
+        visionScoreRatioToExpectedContribution: expectedContributionRatio
+      },
       details: null,
       akariScore: {
         kdaScore: 0,
@@ -98,5 +114,30 @@ describe('computeAggregatedChampions', () => {
       BOTTOM: 0,
       UTILITY: 0
     })
+  })
+
+  it('computes each champion score from only that champion games', () => {
+    const ahriGames = [
+      createPreparedGame(103, 'MIDDLE', 1, 2),
+      createPreparedGame(103, 'MIDDLE', 2, 2)
+    ]
+    const leeSinGames = [createPreparedGame(64, 'JUNGLE', 3, 0.5)]
+    const champions = computeAggregatedChampions([...ahriGames, ...leeSinGames])
+
+    expect(champions[103].akariScore).toEqual(
+      computeAggregatedAkariScore({
+        count: ahriGames.length,
+        summary: champions[103].summary,
+        games: ahriGames
+      })
+    )
+    expect(champions[64].akariScore).toEqual(
+      computeAggregatedAkariScore({
+        count: leeSinGames.length,
+        summary: champions[64].summary,
+        games: leeSinGames
+      })
+    )
+    expect(champions[103].akariScore.total).not.toBe(champions[64].akariScore.total)
   })
 })

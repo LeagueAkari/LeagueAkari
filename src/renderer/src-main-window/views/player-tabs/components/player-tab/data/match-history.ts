@@ -382,6 +382,12 @@ export function provideMatchHistory(
     const startIndex = params.startIndex ?? 0
     const count = params.count ?? pts.frontendSettings.loadCount
 
+    params = {
+      ...params,
+      startIndex,
+      count
+    }
+
     try {
       if (decision.source === 'sgp') {
         const { data } = await sgp.api.matchHistoryQuery.getMatchHistorySummaryByPlayerPuuid(

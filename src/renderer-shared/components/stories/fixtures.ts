@@ -1,4 +1,4 @@
-import type { MapLanePoint } from '@renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/types'
+import type { MapLanePoint } from '@renderer-shared/components/jungle-pathing-analysis/types'
 import type { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
 
 const rankedEntry = (

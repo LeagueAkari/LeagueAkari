@@ -159,7 +159,11 @@ import { computed, ref } from 'vue'
 
 import { PREMADE_TEAM_COLORS, PREMADE_TEAM_COLORS_LIGHT, RANKED_MEDAL_MAP } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
-import { PLAYER_INFO_CARD_ACTION_KEYS, getPlayerInfoCardActionKeys } from './player-actions'
+import {
+  PLAYER_INFO_CARD_ACTION_KEYS,
+  createCollectByChampionInitParams,
+  getPlayerInfoCardActionKeys
+} from './player-actions'
 
 const { puuid } = defineProps<{
   puuid: string
@@ -264,12 +268,13 @@ const handlePlayerActionSelect = (key: string | number) => {
       break
     case PLAYER_INFO_CARD_ACTION_KEYS.collectByChampion:
       if (hasCurrentChampion.value) {
-        navigateToSummonerByPuuid(puuid, {
-          matchHistory: {
-            collectByChampionId: currentChampionId.value,
-            expectedCount: ongoingGame.value.settings.matchHistoryLoadCount
-          }
-        })
+        navigateToSummonerByPuuid(
+          puuid,
+          createCollectByChampionInitParams(
+            currentChampionId.value,
+            ongoingGame.value.settings.matchHistoryLoadCount
+          )
+        )
       }
       break
     case PLAYER_INFO_CARD_ACTION_KEYS.collectByPosition:

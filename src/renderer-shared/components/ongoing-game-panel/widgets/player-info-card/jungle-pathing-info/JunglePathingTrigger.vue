@@ -69,11 +69,14 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import GankMap from '@renderer-shared/components/jungle-pathing-analysis/GankMap.vue'
+import {
+  formatWeightSum,
+  topsideTextColor,
+  topsideTextTrigger
+} from '@renderer-shared/components/jungle-pathing-analysis/preference'
 import type { AggregatedJungleAnalysis } from '@shared/data-adapter/analysis/player'
 import { useTranslation } from 'i18next-vue'
-
-import { formatWeightSum, topsideTextColor, topsideTextTrigger } from './preference'
-import GankMap from './GankMap.vue'
 
 defineProps<{
   stats: AggregatedJungleAnalysis | null

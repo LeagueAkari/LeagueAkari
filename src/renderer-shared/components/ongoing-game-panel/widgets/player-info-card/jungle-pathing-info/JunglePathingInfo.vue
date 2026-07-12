@@ -35,7 +35,7 @@
           </NTab>
         </NTabs>
 
-        <JunglePathingDetails v-if="activeTabConfig" :stats="activeTabConfig.stats" />
+        <JunglePathingContent v-if="activeTabConfig" :stats="activeTabConfig.stats" />
 
         <div class="border-t border-black/5 pt-1.5 text-xs leading-relaxed dark:border-white/8">
           <div class="flex items-start justify-between gap-3 text-black/35 dark:text-white/35">
@@ -93,12 +93,12 @@
 
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { JunglePathingContent } from '@renderer-shared/components/jungle-pathing-analysis'
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
 import { NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, defineComponent, ref, type PropType, watch } from 'vue'
 
-import JunglePathingDetails from './JunglePathingDetails.vue'
 import JunglePathingTrigger from './JunglePathingTrigger.vue'
 import type { AlgorithmDescriptionLine, JunglePathingInfoProps, JunglePathingTab } from './types'
 

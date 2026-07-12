@@ -1,3 +1,5 @@
+import type { OngoingGamePanelPlayerTabInitParams } from '../../context'
+
 export const PLAYER_INFO_CARD_ACTION_KEYS = {
   editTag: 'edit-tag',
   collectByChampion: 'collect-by-champion',
@@ -6,6 +8,18 @@ export const PLAYER_INFO_CARD_ACTION_KEYS = {
 
 export type PlayerInfoCardActionKey =
   (typeof PLAYER_INFO_CARD_ACTION_KEYS)[keyof typeof PLAYER_INFO_CARD_ACTION_KEYS]
+
+export function createCollectByChampionInitParams(
+  championId: number,
+  expectedCount: number
+): OngoingGamePanelPlayerTabInitParams {
+  return {
+    matchHistory: {
+      collectByChampionId: championId,
+      expectedCount
+    }
+  }
+}
 
 export function getPlayerInfoCardActionKeys(options: {
   isStandaloneOngoingGameWindow?: boolean

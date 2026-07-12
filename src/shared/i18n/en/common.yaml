@@ -153,5 +153,62 @@ champions:
   bravery: Bravery
   dummy: Dummy
 
+championAnalysis:
+  overviewTab: Overview
+  positionTab: Positions
+  jungleTab: Jungle
+  masteryTab: Mastery
+  games_one: '{{count}} game'
+  games_other: '{{count}} games'
+  winsLosses: '{{wins}}W {{losses}}L'
+  akariScore: Akari Score
+  winRate: Win Rate
+  winningStreak_one: '{{count}} win streak'
+  winningStreak_other: '{{count}} win streak'
+  losingStreak_one: '{{count}} loss streak'
+  losingStreak_other: '{{count}} loss streak'
+  activeSession: Active session {{wins}}W {{losses}}L
+  standardModes: Standard Modes
+  arena: Arena
+  arenaSummary_one: '{{count}} game · Top half {{topHalfRate}} · 1st {{top1Rate}} · Avg #{{placement}}'
+  arenaSummary_other: '{{count}} games · Top half {{topHalfRate}} · 1st {{top1Rate}} · Avg #{{placement}}'
+  top1Rate: 1st Place Rate
+  topHalfRate: Top-half Rate
+  averagePlacement: Average Placement
+  performance: Performance
+  averageKda: Avg KDA
+  killParticipation: Kill Participation
+  kdaVariation: KDA Variation
+  killDamageEfficiency: Kill-Damage Efficiency
+  visionScore: Average Vision Score
+  visionShare: Vision Share
+  soloKills: Average Solo Kills
+  pings: Average Pings
+  missingPings: Average Missing Pings
+  damage: Damage & Durability
+  damagePerMinute: Champion Damage / Min
+  damageShare: Team Damage Share
+  damageToTeamMax: vs Team-high Damage
+  damageToMatchMax: vs Match-high Damage
+  damageTakenShare: Team Damage Taken Share
+  damageTakenToTeamMax: Taken vs Team Max
+  damageTakenToMatchMax: Taken vs Match Max
+  damageGoldEfficiency: Damage-Gold Efficiency
+  economy: Economy & Resources
+  goldShare: Team Gold Share
+  goldToTeamMax: vs Team-high Gold
+  goldToMatchMax: vs Match-high Gold
+  csPerMinute: CS / Min
+  csShare: Team CS Share
+  csToTeamMax: vs Team-high CS
+  csToMatchMax: vs Match-high CS
+  towerDamageShare: Team Tower Damage Share
+  towerDamageToTeamMax: Tower vs Team Max
+  towerDamageToMatchMax: Tower vs Match Max
+  gamesAnalyzed_one: '{{count}} detailed sample'
+  gamesAnalyzed_other: '{{count}} detailed samples'
+  collectMatches: Collect {{champion}} Matches
+  collectShort: Collect
+
 app:
   singleton: Because Akari is unique, there can only be ONE Akari at a time

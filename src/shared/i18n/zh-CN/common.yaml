@@ -153,5 +153,59 @@ champions:
   bravery: 勇敢举动
   dummy: 占位
 
+championAnalysis:
+  overviewTab: 综合
+  positionTab: 位置
+  jungleTab: 打野
+  masteryTab: 熟练度
+  games: '{{count}} 场对局'
+  games_one: '{{count}} 场对局'
+  games_other: '{{count}} 场对局'
+  winsLosses: '{{wins}} 胜 {{losses}} 负'
+  akariScore: Akari Score
+  winRate: 胜率
+  winningStreak: '{{count}} 连胜'
+  losingStreak: '{{count}} 连败'
+  activeSession: 活跃时段 {{wins}} 胜 {{losses}} 负
+  standardModes: 常规模式
+  arena: 斗魂竞技场
+  arenaSummary: '{{count}} 场 · 前二 {{topHalfRate}} · 第一 {{top1Rate}} · 场均第 {{placement}}'
+  top1Rate: 第一名率
+  topHalfRate: 前半区率
+  averagePlacement: 平均名次
+  performance: 核心表现
+  averageKda: 平均 KDA
+  killParticipation: 参团率
+  kdaVariation: KDA 波动
+  killDamageEfficiency: 击杀伤害效率
+  visionScore: 场均视野分
+  visionShare: 视野占比
+  soloKills: 场均单杀
+  pings: 场均信号
+  missingPings: 场均敌人消失信号
+  damage: 输出与承伤
+  damagePerMinute: 英雄伤害 / 分
+  damageShare: 团队伤害占比
+  damageToTeamMax: 相对队内最高伤害
+  damageToMatchMax: 相对全场最高伤害
+  damageTakenShare: 团队承伤占比
+  damageTakenToTeamMax: 相对队内最高承伤
+  damageTakenToMatchMax: 相对全场最高承伤
+  damageGoldEfficiency: 伤害经济转化率
+  economy: 经济与资源
+  goldShare: 团队经济占比
+  goldToTeamMax: 相对队内最高经济
+  goldToMatchMax: 相对全场最高经济
+  csPerMinute: 补刀 / 分
+  csShare: 团队补刀占比
+  csToTeamMax: 相对队内最高补刀
+  csToMatchMax: 相对全场最高补刀
+  towerDamageShare: 团队推塔伤害占比
+  towerDamageToTeamMax: 相对队内最高推塔伤害
+  towerDamageToMatchMax: 相对全场最高推塔伤害
+  gamesAnalyzed: '{{count}} 场详细样本'
+  collectMatches: 收集 {{champion}} 战绩
+  collectShort: 收集
+
 app:
   singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

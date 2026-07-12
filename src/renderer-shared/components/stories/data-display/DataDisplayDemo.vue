@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import GankMap from '@renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/GankMap.vue'
+import GankMap from '@renderer-shared/components/jungle-pathing-analysis/GankMap.vue'
 
 import RankedTable from '../../RankedTable.vue'
 import { storyGankKillPoints, storyGankPositionPoints, storyRankedStats } from '../fixtures'

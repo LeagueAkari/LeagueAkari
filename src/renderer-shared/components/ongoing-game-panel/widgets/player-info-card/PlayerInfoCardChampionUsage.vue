@@ -1,6 +1,6 @@
 <template>
   <div v-if="championUsage.length" class="mb-1 flex w-full gap-1">
-    <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :key="c.id" :delay="50">
+    <NPopover v-for="c of championUsage" :key="c.id" :delay="50">
       <template #trigger>
         <div
           class="relative h-5 w-5 transition-[filter]"
@@ -26,107 +26,46 @@
           />
         </div>
       </template>
-      <div class="max-w-65 min-w-56">
-        <div class="mb-2 flex items-center gap-2 text-xs">
-          <ChampionIcon ring :ring-width="1" round class="h-5.5 w-5.5" :champion-id="c.id" />
-          <div class="text-xs font-bold text-black/80 dark:text-white/80">
-            {{ resources.champions.name(c.id) }}
-          </div>
-        </div>
+      <div>
+        <ChampionAnalysisContent
+          v-if="c.analysis"
+          :analysis="c.analysis"
+          :mastery="c.mastery"
+          :on-collect-matches="canCollectByChampion ? () => collectByChampion(c.id) : undefined"
+        />
 
-        <div class="space-y-1.5 text-xs">
-          <div v-if="c.analysis">
-            <div class="mb-0.5 text-[11px] font-bold text-black/80 dark:text-white/80">
-              {{ t('ongoingGame.playerCard.champion.recentStats') }}
-            </div>
-            <div class="text-black/85 dark:text-white/85">
-              {{
-                t('ongoingGame.playerCard.champion.winRate', {
-                  count: c.analysis.winLoss.all.count,
-                  winRate: (c.analysis.winLoss.all.winRate * 100).toFixed()
-                })
-              }}
+        <template v-else>
+          <div class="mb-2 flex items-center gap-2 text-xs">
+            <ChampionIcon ring :ring-width="1" round class="h-5.5 w-5.5" :champion-id="c.id" />
+            <div class="text-xs font-bold text-black/80 dark:text-white/80">
+              {{ resources.champions.name(c.id) }}
             </div>
           </div>
-
-          <div v-if="c.analysis && c.mastery" class="h-px bg-black/10 dark:bg-white/10" />
-
-          <div v-if="c.mastery">
-            <div class="mb-1 text-[11px] font-bold text-black/80 dark:text-white/80">
-              {{ t('playerTabs.championMastery.title') }}
-            </div>
-            <div class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-3 gap-y-1">
-              <div class="text-black/60 dark:text-white/60">
-                {{ t('playerTabs.championMastery.levelLabel') }}
-              </div>
-              <div class="text-right text-black/85 dark:text-white/85">
-                {{
-                  t('playerTabs.championMastery.level', {
-                    level: c.mastery.championLevel
-                  })
-                }}
-              </div>
-
-              <div class="text-black/60 dark:text-white/60">
-                {{ t('playerTabs.championMastery.pointsLabel') }}
-              </div>
-              <div class="text-right text-black/85 tabular-nums dark:text-white/85">
-                {{ formatExtremeNumber(c.mastery.championPoints) }}
-              </div>
-
-              <template v-if="c.mastery.highestGrade">
-                <div class="text-black/60 dark:text-white/60">
-                  {{ t('playerTabs.championMastery.highestGradeLabel') }}
-                </div>
-                <div class="text-right text-black/85 dark:text-white/85">
-                  {{ c.mastery.highestGrade }}
-                </div>
-              </template>
-
-              <template v-if="c.mastery.championSeasonMilestone">
-                <div class="text-black/60 dark:text-white/60">
-                  {{ t('playerTabs.championMastery.seasonMilestoneLabel') }}
-                </div>
-                <div class="text-right text-black/85 tabular-nums dark:text-white/85">
-                  {{ c.mastery.championSeasonMilestone }}
-                </div>
-              </template>
-
-              <template v-if="c.mastery.lastPlayTime">
-                <div class="text-black/60 dark:text-white/60">
-                  {{ t('playerTabs.championMastery.lastPlayTimeLabel') }}
-                </div>
-                <div class="text-right text-black/85 tabular-nums dark:text-white/85">
-                  {{ formatMasteryTime(c.mastery.lastPlayTime) }}
-                </div>
-              </template>
-            </div>
-          </div>
-        </div>
+          <ChampionMasteryContent v-if="c.mastery" :mastery="c.mastery" />
+        </template>
       </div>
     </NPopover>
   </div>
 </template>
 
 <script setup lang="ts">
+import {
+  ChampionAnalysisContent,
+  ChampionMasteryContent
+} from '@renderer-shared/components/champion-analysis'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
 import { StarRound as StarRoundIcon } from '@vicons/material'
-import dayjs from 'dayjs'
-import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
 import { STARRED_CHAMPION_LEVEL } from '../../constants'
 import { useOngoingGamePanel } from '../../context'
+import { createCollectByChampionInitParams } from './player-actions'
 
 const { puuid } = defineProps<{
   puuid: string
 }>()
-
-const { t } = useTranslation()
-const { formatExtremeNumber } = useNumberFormatter()
 
 const { ongoingGame, navigateToSummonerByPuuid, isStandaloneOngoingGameWindow } =
   useOngoingGamePanel()
@@ -137,7 +76,6 @@ const championMastery = computed(() => ongoingGame.value.championMastery[puuid])
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
-const formatMasteryTime = (value: number) => dayjs(value).format('YYYY-MM-DD')
 const canCollectByChampion = computed(() => !isStandaloneOngoingGameWindow.value)
 
 const collectByChampion = (championId: number) => {
@@ -145,12 +83,10 @@ const collectByChampion = (championId: number) => {
     return
   }
 
-  navigateToSummonerByPuuid(puuid, {
-    matchHistory: {
-      collectByChampionId: championId,
-      expectedCount: ongoingGame.value.settings.matchHistoryLoadCount
-    }
-  })
+  navigateToSummonerByPuuid(
+    puuid,
+    createCollectByChampionInitParams(championId, ongoingGame.value.settings.matchHistoryLoadCount)
+  )
 }
 
 const championUsage = computed(() => {

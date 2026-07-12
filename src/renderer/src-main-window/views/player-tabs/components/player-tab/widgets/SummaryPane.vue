@@ -14,11 +14,9 @@
         >
           <template v-if="analysis.akariScore !== null">
             <AkariScorePopover :score="analysis.akariScore">
-              <LeagueAkariSpan
-                bold
-                :text="analysis.akariScore.total.toFixed(2)"
-                class="cursor-default"
-              />
+              <span class="cursor-default tabular-nums">
+                {{ analysis.akariScore.total.toFixed(2) }}
+              </span>
             </AkariScorePopover>
           </template>
           <template v-else>{{ t('playerTabs.summary.na') }}</template>
@@ -186,165 +184,12 @@
                 </div>
               </div>
             </template>
-            <div class="w-88 text-xs">
-              <div class="mb-2 flex items-center gap-2">
-                <LcuImage class="size-7 shrink-0 rounded" :src="championIconUri(c.championId)" />
-                <div class="min-w-0 flex-1">
-                  <div class="truncate font-semibold text-gray-900 dark:text-white">
-                    {{ championName(c.championId) }}
-                  </div>
-                  <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">
-                    {{ c.winLoss.all.count }} {{ t('playerTabs.summary.times') }}
-                  </div>
-                </div>
-                <div class="shrink-0 text-right">
-                  <div
-                    class="font-semibold tabular-nums"
-                    :class="getWinRateTextClass(c.winLoss.all.winRate)"
-                  >
-                    {{ formatPercent(c.winLoss.all.winRate) }}
-                  </div>
-                  <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">
-                    {{ c.winLoss.all.wins }} {{ t('playerTabs.summary.winShort') }}
-                    {{ c.winLoss.all.losses }} {{ t('playerTabs.summary.lossShort') }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-1.5">
-                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgKda') }}
-                  </div>
-                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
-                    {{ c.summary.avgKda.toFixed(2) }}
-                  </div>
-                  <div
-                    class="mt-0.5 text-[10px] whitespace-nowrap text-gray-500 tabular-nums dark:text-gray-400"
-                  >
-                    {{ formatAverageKdaLine(c) }}
-                  </div>
-                </div>
-                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgKp') }}
-                  </div>
-                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
-                    {{ formatPercent(c.summary.avgKillParticipation) }}
-                  </div>
-                </div>
-                <div class="rounded bg-black/5 px-2 py-1 dark:bg-white/8">
-                  <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgCsPerMinute') }}
-                  </div>
-                  <div class="mt-0.5 font-semibold text-gray-900 tabular-nums dark:text-white">
-                    {{
-                      t('playerTabs.summary.perMinuteValue', {
-                        value: c.summary.avgCsPerMinute.toFixed(1)
-                      })
-                    }}
-                  </div>
-                  <div class="mt-0.5 text-[10px] text-gray-500 tabular-nums dark:text-gray-400">
-                    {{
-                      t('playerTabs.summary.teamShare', {
-                        value: formatPercent(c.summary.avgCsPercentageOfTeam)
-                      })
-                    }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-1.5 grid grid-cols-3 gap-x-3 gap-y-1 text-[11px]">
-                <div>
-                  <div class="text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgDmg') }}
-                  </div>
-                  <div class="text-gray-900 tabular-nums dark:text-white">
-                    {{ formatPercent(c.summary.avgChampionDamagePercentageOfTeam) }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgDmgTaken') }}
-                  </div>
-                  <div class="text-gray-900 tabular-nums dark:text-white">
-                    {{ formatPercent(c.summary.avgDamageTakenPercentageOfTeam) }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-gray-500 dark:text-gray-400">
-                    {{ t('playerTabs.summary.avgGold') }}
-                  </div>
-                  <div class="text-gray-900 tabular-nums dark:text-white">
-                    {{ formatPercent(c.summary.avgGoldPercentageOfTeam) }}
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="c.jungle" class="mt-2 border-t border-black/10 pt-2 dark:border-white/10">
-                <div class="mb-1 flex items-center justify-between gap-3">
-                  <div class="font-semibold text-gray-800 dark:text-gray-100">
-                    {{ t('ongoingGame.junglePathing.title') }} ·
-                    {{
-                      t('ongoingGame.junglePathing.gamesAnalyzed', {
-                        count: c.jungle.gamesAnalyzed
-                      })
-                    }}
-                  </div>
-                  <div class="tabular-nums" :class="topsideTextColor(c.jungle)">
-                    {{ topsideTextTrigger(t, c.jungle) }}
-                  </div>
-                </div>
-                <div class="grid grid-cols-3 gap-1.5 text-[11px]">
-                  <div class="rounded bg-indigo-500/8 px-2 py-1">
-                    <div class="text-gray-500 dark:text-gray-400">
-                      {{ t('playerTabs.summary.level3Short') }}
-                    </div>
-                    <div class="text-gray-900 tabular-nums dark:text-white">
-                      {{ c.jungle.earlyGank.level3GankCount }} / {{ c.jungle.gamesAnalyzed }}
-                    </div>
-                  </div>
-                  <div class="rounded bg-indigo-500/8 px-2 py-1">
-                    <div class="text-gray-500 dark:text-gray-400">
-                      {{ t('playerTabs.summary.level4Short') }}
-                    </div>
-                    <div class="text-gray-900 tabular-nums dark:text-white">
-                      {{ c.jungle.earlyGank.level4GankCount }} / {{ c.jungle.gamesAnalyzed }}
-                    </div>
-                  </div>
-                  <div class="rounded bg-indigo-500/8 px-2 py-1">
-                    <div class="text-gray-500 dark:text-gray-400">
-                      {{ t('ongoingGame.junglePathing.firstDragonRateLabel') }}
-                    </div>
-                    <div class="text-gray-900 tabular-nums dark:text-white">
-                      {{ formatPercent(c.jungle.objectives.firstDragonRate) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-2 border-t border-black/10 pt-2 dark:border-white/10">
-                <NButton
-                  block
-                  secondary
-                  size="tiny"
-                  type="primary"
-                  :loading="isLoading"
-                  @click="collectChampionMatches(c.championId)"
-                >
-                  <template #icon>
-                    <NIcon>
-                      <ManageSearchFilledIcon />
-                    </NIcon>
-                  </template>
-                  {{
-                    t('playerTabs.summary.collectChampionMatches', {
-                      champion: championName(c.championId)
-                    })
-                  }}
-                </NButton>
-              </div>
-            </div>
+            <ChampionAnalysisContent
+              :analysis="c"
+              :mastery="championMasteryById[c.championId]"
+              :collecting="isLoading"
+              :on-collect-matches="() => collectChampionMatches(c.championId)"
+            />
           </NPopover>
         </div>
       </div>
@@ -354,25 +199,19 @@
 
 <script setup lang="ts">
 import { AkariScorePopover } from '@renderer-shared/components/akari-score'
+import { ChampionAnalysisContent } from '@renderer-shared/components/champion-analysis'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import {
-  topsideTextColor,
-  topsideTextTrigger
-} from '@renderer-shared/components/ongoing-game-panel/widgets/player-info-card/jungle-pathing-info/preference'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import type { AggregatedChampionAnalysis } from '@shared/data-adapter/analysis/player'
-import { ManageSearchFilled as ManageSearchFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NPopover } from 'naive-ui'
+import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
 import {
   createInitParamCollectFilterState,
   createInitParamCollectSettings
 } from '../data/match-history-init-param-collect'
+import { useChampionMastery } from '../data/champion-mastery'
 import { useMatchHistory } from '../data/match-history'
 import { useMatchHistoryFilters } from '../data/match-history-filters'
 import { usePlayerTab } from '../context'
@@ -381,10 +220,10 @@ import { toPredicate } from './match-history-filters/filter-state'
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
 const ogs = useOngoingGameStore()
 
 const { page, analysis: analysis, collectMatchHistory, isLoading } = useMatchHistory()
+const { championMastery } = useChampionMastery()
 const { puuid, sgpServerId } = usePlayerTab()
 const { setActiveMode, setAdvancedFilterState } = useMatchHistoryFilters()
 
@@ -409,35 +248,6 @@ const getStreakBadgeClass = (isWinning: boolean, _count: number) => {
   return isWinning
     ? 'border border-emerald-500/45 bg-emerald-500/12 font-semibold text-emerald-700 dark:border-emerald-300/55 dark:bg-emerald-300/15 dark:text-emerald-300'
     : 'border border-red-500/45 bg-red-500/12 font-semibold text-red-700 dark:border-red-300/55 dark:bg-red-300/15 dark:text-red-300'
-}
-
-const championName = (championId: number) => {
-  return lcs.gameData.champions[championId]?.name || championId.toString()
-}
-
-const formatPercent = (value: number, digits = 0) => {
-  return `${(value * 100).toFixed(digits)}%`
-}
-
-const formatAverageKdaLine = (champion: AggregatedChampionAnalysis) => {
-  const count = Math.max(champion.winLoss.all.count, 1)
-  const kills = champion.summary.kills / count
-  const deaths = champion.summary.deaths / count
-  const assists = champion.summary.assists / count
-
-  return `${kills.toFixed(1)} / ${deaths.toFixed(1)} / ${assists.toFixed(1)}`
-}
-
-const getWinRateTextClass = (winRate: number) => {
-  if (winRate >= 0.53) {
-    return 'text-green-700 dark:text-green-300'
-  }
-
-  if (winRate <= 0.47) {
-    return 'text-red-700 dark:text-red-400'
-  }
-
-  return 'text-gray-800 dark:text-gray-100'
 }
 
 const collectChampionMatches = (championId: number) => {
@@ -477,4 +287,10 @@ const frequentlyUsedChampions = computed(() => {
       return b.winLoss.all.wins - a.winLoss.all.wins
     })
 })
+
+const championMasteryById = computed(() =>
+  Object.fromEntries(
+    (championMastery.value?.masteries ?? []).map((mastery) => [mastery.championId, mastery])
+  )
+)
 </script>

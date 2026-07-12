@@ -1,5 +1,6 @@
 import type { AggregatedChampionAnalysis } from '../types/aggregated'
 import type { PreparedGame } from '../types/helpers'
+import { computeAggregatedAkariScore } from './akari'
 import { computeAggregatedJungle } from './jungle'
 import { computeAggregatedPositions } from './positions'
 import { computeAggregatedSummary } from './summary'
@@ -19,10 +20,12 @@ export function computeAggregatedChampions(
 
   const out: Record<number, AggregatedChampionAnalysis> = {}
   for (const [id, list] of byChampion) {
+    const summary = computeAggregatedSummary(list)
     out[id] = {
       championId: id,
-      summary: computeAggregatedSummary(list),
+      summary,
       winLoss: computeAggregatedWinLossMap(list),
+      akariScore: computeAggregatedAkariScore({ count: list.length, summary, games: list }),
       positions: computeAggregatedPositions(list),
       jungle: computeAggregatedJungle(list)
     }

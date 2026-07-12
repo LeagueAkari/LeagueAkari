@@ -604,7 +604,9 @@ playerTabs:
     seasonMilestoneLabel: 本季里程碑
     lastPlayTime: 最近使用 {{time}}
     lastPlayTimeLabel: 最近使用
+    progressLabel: 进度
     progress: 进度 {{since}} / +{{until}}
+    tokensEarnedLabel: 代币
     tokensEarned: '{{count}} 枚代币'
     noData: 暂无英雄点数数据
     noFilterResult: 无匹配英雄

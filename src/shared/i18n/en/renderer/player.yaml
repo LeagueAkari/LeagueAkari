@@ -607,7 +607,9 @@ playerTabs:
     seasonMilestoneLabel: Season Milestone
     lastPlayTime: Last played {{time}}
     lastPlayTimeLabel: Last Played
+    progressLabel: Progress
     progress: Progress {{since}} / +{{until}}
+    tokensEarnedLabel: Tokens
     tokensEarned: '{{count}} tokens'
     noData: No champion mastery data
     noFilterResult: No matching champions
