@@ -50,7 +50,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._logger = _loggerFactory.create(SgpMain.id)
     axiosRetry(this._httpClient, { retries: 2 })
 
-    this.state = new SgpState(this._leagueClient.state, this._remoteConfig)
+    this.state = new SgpState(this._leagueClient, this._remoteConfig)
     this._sgpApi = new SgpHttpApiAxiosHelper(this._httpClient)
     this._context = {
       namespace: SgpMain.id,

@@ -1,7 +1,7 @@
 import { getSgpServerId } from '@shared/utils/sgp'
 import { makeAutoObservable } from 'mobx'
 
-import { LeagueClientState } from '../league-client/state'
+import type { LeagueClientMain } from '../league-client'
 import { RemoteConfigMain } from '../remote-config'
 
 export class SgpState {
@@ -10,7 +10,7 @@ export class SgpState {
   }
 
   get availability() {
-    if (!this._lcState.auth) {
+    if (!this._leagueClient.state.auth) {
       return {
         region: '',
         rsoPlatform: '',
@@ -22,15 +22,18 @@ export class SgpState {
       }
     }
 
-    const sgpServerId = getSgpServerId(this._lcState.auth.region, this._lcState.auth.rsoPlatformId)
+    const sgpServerId = getSgpServerId(
+      this._leagueClient.state.auth.region,
+      this._leagueClient.state.auth.rsoPlatformId
+    )
     const supported = this.leagueServers.servers[sgpServerId.toUpperCase()] || {
       matchHistory: false,
       common: false
     }
 
     return {
-      region: this._lcState.auth.region,
-      rsoPlatform: this._lcState.auth.rsoPlatformId,
+      region: this._leagueClient.state.auth.region,
+      rsoPlatform: this._leagueClient.state.auth.rsoPlatformId,
       sgpServerId,
       serversSupported: {
         matchHistory: supported.matchHistory,
@@ -44,7 +47,21 @@ export class SgpState {
   isLeagueSessionTokenSet = false
 
   get supportedQueues() {
-    return this._remoteConfig.state.supportedQueues.queues
+    const configuredQueues = this._remoteConfig.state.supportedQueues.queues
+    const currentQueueId = [
+      this._leagueClient.data.lobby.lobby?.gameConfig.queueId,
+      this._leagueClient.data.gameflow.session?.gameData.queue.id
+    ].find((queueId) => queueId !== undefined && queueId > 0)
+
+    if (
+      currentQueueId === undefined ||
+      !this._leagueClient.data.gameData.queues[currentQueueId] ||
+      configuredQueues.includes(currentQueueId)
+    ) {
+      return configuredQueues
+    }
+
+    return [currentQueueId, ...configuredQueues]
   }
 
   connectionSuccessesCounted = 0
@@ -71,7 +88,7 @@ export class SgpState {
   }
 
   constructor(
-    private _lcState: LeagueClientState,
+    private _leagueClient: LeagueClientMain,
     private _remoteConfig: RemoteConfigMain
   ) {
     makeAutoObservable(this)
