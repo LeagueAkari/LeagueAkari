@@ -47,6 +47,9 @@ const LC_CUSTOM_TAGS = new Set([
 export default defineConfig({
   main: {
     plugins: [swcPlugin(), yaml()],
+    // Vite 8 uses Oxc for its default transform. Keep SWC as the sole transform for
+    // legacy decorators and emitDecoratorMetadata until swcPlugin disables Oxc itself.
+    oxc: false,
     build: {
       minify,
       rollupOptions: {
@@ -63,6 +66,7 @@ export default defineConfig({
   },
   preload: {
     plugins: [swcPlugin()],
+    oxc: false,
     build: {
       minify,
       rollupOptions: {
