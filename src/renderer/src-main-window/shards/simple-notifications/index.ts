@@ -18,6 +18,7 @@ import {
   type SimpleNotificationsRendererContext
 } from './context'
 import { registerDeclarationModal } from './declaration-modal'
+import { createElevatedStartupNotificationSetup } from './elevated-startup-notification'
 import { registerFunnyPricingModal } from './funny-pricing-modal'
 import { watchSpecialKeyboardCombo } from './keyboard-combo-controller'
 import { registerNewReleaseModal } from './new-release-modal'
@@ -82,6 +83,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     registerNewReleaseModal(this.context)
     registerFunnyPricingModal(this.context)
 
+    this.setupInAppScope.addSetupFn(createElevatedStartupNotificationSetup())
     this.setupInAppScope.addSetupFn(() => watchSpecialKeyboardCombo())
     this.setupInAppScope.addSetupFn(() => setupStreamerModeNotifications(this.context))
     this.setupInAppScope.addSetupFn(() => watchQueueingProgress())

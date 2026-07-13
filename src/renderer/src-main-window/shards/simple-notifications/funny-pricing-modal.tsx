@@ -41,9 +41,7 @@ export function registerFunnyPricingModal(context: SimpleNotificationsRendererCo
               current.value = item.id
 
               // 彩蛋环节
-              appCommonStore.overrideAppTitle = `${t('appName', { ns: 'common' })} ${item.title} ${
-                appCommonStore.isElevated ? 'X' : ''
-              }`
+              appCommonStore.overrideAppTitle = `${t('appName', { ns: 'common' })} ${item.title}`
             }
           }}
         />

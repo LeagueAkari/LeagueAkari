@@ -15,6 +15,9 @@ notifications:
     ignoreThisVersion: 忽略此版本
     noUpdate: 无更新
   simple:
+    elevatedStartup:
+      title: 正在以管理员身份运行
+      content: $t(common:appName) 当前正在以高权限运行
     newReleaseHints:
       title: 新版本可用
       content: 新版本 {{version}} 已经发布

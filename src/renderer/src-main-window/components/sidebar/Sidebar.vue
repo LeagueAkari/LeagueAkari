@@ -21,7 +21,7 @@
         </NIcon>
       </div>
       <div class="app-sidebar__logo-text">
-        {{ t('appName', { ns: 'common' }) }}{{ as.isElevated ? ' X' : '' }}
+        {{ t('appName', { ns: 'common' }) }}
       </div>
     </div>
 

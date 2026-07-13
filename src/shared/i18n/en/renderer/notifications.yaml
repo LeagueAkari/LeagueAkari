@@ -15,6 +15,9 @@ notifications:
     ignoreThisVersion: Ignore This Version
     noUpdate: No updates
   simple:
+    elevatedStartup:
+      title: Running as administrator
+      content: $t(common:appName) is currently running with elevated privileges
     newReleaseHints:
       title: New Version Available
       content: New version {{version}} is available
