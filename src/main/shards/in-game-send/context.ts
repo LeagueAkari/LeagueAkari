@@ -7,7 +7,6 @@ import type { LeagueClientMain } from '../league-client'
 import type { AkariLogger } from '../logger-factory'
 import type { MobxUtilsMain } from '../mobx-utils'
 import type { OngoingGameMain } from '../ongoing-game'
-import type { RemoteConfigMain } from '../remote-config'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
 import type { InGameSendSettings, InGameSendState } from './state'
 
@@ -28,7 +27,6 @@ export interface InGameSendMainContext {
   leagueClient: LeagueClientMain
   shared: SharedGlobalShard
   appCommon: AppCommonMain
-  remoteConfig: RemoteConfigMain
 
   isGameClientForeground(): Promise<boolean>
 }

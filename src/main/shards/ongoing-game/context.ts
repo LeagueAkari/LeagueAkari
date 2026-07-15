@@ -1,10 +1,10 @@
 import type { QueueKeeper } from '@shared/utils/queue-keeper'
 
+import type { AkariApiMain } from '../akari-api'
 import type { AkariIpcMain } from '../ipc'
 import type { LeagueClientMain } from '../league-client'
 import type { AkariLogger } from '../logger-factory'
 import type { MobxUtilsMain } from '../mobx-utils'
-import type { RemoteConfigMain } from '../remote-config'
 import type { SavedPlayerMain } from '../saved-player'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
 import type { SgpMain } from '../sgp'
@@ -36,5 +36,5 @@ export interface OngoingGameMainContext {
   leagueClient: LeagueClientMain
   sgp: SgpMain
   savedPlayer: SavedPlayerMain
-  remoteConfig: RemoteConfigMain
+  akariApi: AkariApiMain
 }

@@ -1,6 +1,6 @@
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { useTranslation } from 'i18next-vue'
@@ -15,7 +15,7 @@ import { useSimpleNotificationsStore } from './store'
 export function registerNewReleaseModal(context: SimpleNotificationsRendererContext) {
   const Component = defineComponent({
     setup() {
-      const remoteConfigStore = useRemoteConfigStore()
+      const akariApiStore = useAkariApiStore()
       const simpleNotificationsStore = useSimpleNotificationsStore()
       const selfUpdateStore = useSelfUpdateStore()
       const selfUpdate = useInstance(SelfUpdateRenderer)
@@ -27,7 +27,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
       })
 
       watch(
-        () => remoteConfigStore.latestRelease,
+        () => akariApiStore.latestRelease,
         (release, previousRelease) => {
           if (!release || selfUpdateStore.settings.ignoreVersion === release.version) {
             return
@@ -74,7 +74,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
         const u = new URL(url)
 
         if (u.pathname === '/overlays/release-modal') {
-          simpleNotificationsStore.showAnnouncementModal = false
+          simpleNotificationsStore.showNoticeModal = false
           simpleNotificationsStore.showNewReleaseModal = true
         }
       })
@@ -82,7 +82,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
       return () => (
         <UpdateModal
           {...{
-            release: remoteConfigStore.latestRelease,
+            release: akariApiStore.latestRelease,
             show: simpleNotificationsStore.showNewReleaseModal,
             ignoreVersion: selfUpdateStore.settings.ignoreVersion,
             updateProgressInfo: selfUpdateStore.updateProgressInfo,

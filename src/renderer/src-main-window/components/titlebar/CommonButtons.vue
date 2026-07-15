@@ -1,14 +1,14 @@
 <template>
   <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
-    <!-- announcement -->
+    <!-- notice -->
     <NPopover
       :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
-      :show="shouldShowAnnouncementTooltip || announcementTooltipShow"
-      @update:show="(v) => (announcementTooltipShow = v)"
+      :show="shouldShowNoticeTooltip || noticeTooltipShow"
+      @update:show="(v) => (noticeTooltipShow = v)"
     >
       <template #trigger>
-        <div class="common-button-outer" @click="sn.showAnnouncementModal()">
-          <NBadge dot :show="shouldShowAnnouncementBadge" :offset="[-4, 4]">
+        <div class="common-button-outer" @click="sn.showNoticeModal()">
+          <NBadge dot :show="shouldShowNoticeBadge" :offset="[-4, 4]">
             <div class="common-button-inner">
               <NIcon><Notification /></NIcon>
             </div>
@@ -16,33 +16,32 @@
         </div>
       </template>
 
-      <template v-if="sns.announcementSummary">
+      <template v-if="sns.noticeSummary">
         <div>
           <div class="font-bold text-black/80 dark:text-white/80">
-            {{ t('titlebar.actions.announcementSummary') }}
+            {{ t('titlebar.actions.noticeSummary') }}
           </div>
           <div class="my-2 h-px bg-black/10 dark:bg-white/10"></div>
           <div class="mb-2 max-w-100 text-xs text-black/80 dark:text-white/80">
-            {{ sns.announcementSummary }}
+            {{ sns.noticeSummary }}
           </div>
           <div class="flex justify-end gap-2">
             <NButton
               size="tiny"
               @click="setRead()"
               v-if="
-                rcs.announcement?.frontMatter.alertLevel !== 'low' &&
-                sns.lastAnnouncementUniqueId !== rcs.announcement?.uniqueId
+                aks.notice?.severity !== 'low' && sns.lastNoticeRevision !== aks.notice?.revision
               "
-              >{{ t('titlebar.actions.announcementOk') }}</NButton
+              >{{ t('titlebar.actions.noticeOk') }}</NButton
             >
-            <NButton size="tiny" type="primary" @click="sn.showAnnouncementModal()">{{
-              t('titlebar.actions.announcementSeeMore')
+            <NButton size="tiny" type="primary" @click="sn.showNoticeModal()">{{
+              t('titlebar.actions.noticeSeeMore')
             }}</NButton>
           </div>
         </div>
       </template>
       <template v-else>
-        {{ t('titlebar.actions.announcement') }}
+        {{ t('titlebar.actions.notice') }}
       </template>
     </NPopover>
 
@@ -127,10 +126,10 @@ import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -164,7 +163,7 @@ const { t } = useTranslation()
 const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
-const rcs = useRemoteConfigStore()
+const aks = useAkariApiStore()
 const sns = useSimpleNotificationsStore()
 const as = useAppCommonStore()
 const wm = useInstance(WindowManagerRenderer)
@@ -287,27 +286,26 @@ const handleThemeSelect = (key: string | number) => {
   }
 }
 
-const shouldShowAnnouncementBadge = computed(() => {
+const shouldShowNoticeBadge = computed(() => {
   return (
-    rcs.announcement !== null && // announcement exists
-    (rcs.announcement.frontMatter.alertLevel === 'medium' ||
-      rcs.announcement.frontMatter.alertLevel === 'high') && // medium or high announcement
-    sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId // unread
+    aks.notice !== null &&
+    (aks.notice.severity === 'medium' || aks.notice.severity === 'high') &&
+    sns.lastNoticeRevision !== aks.notice.revision
   )
 })
 
-const announcementTooltipShow = ref(false)
-const shouldShowAnnouncementTooltip = computed(() => {
+const noticeTooltipShow = ref(false)
+const shouldShowNoticeTooltip = computed(() => {
   return (
-    rcs.announcement !== null &&
-    rcs.announcement.frontMatter.summary &&
-    rcs.announcement.frontMatter.alertLevel === 'medium' &&
-    sns.lastAnnouncementUniqueId !== rcs.announcement.uniqueId
+    aks.notice !== null &&
+    aks.notice.summary &&
+    aks.notice.severity === 'medium' &&
+    sns.lastNoticeRevision !== aks.notice.revision
   )
 })
 
 const setRead = () => {
-  sns.lastAnnouncementUniqueId = rcs.announcement?.uniqueId ?? null
+  sns.lastNoticeRevision = aks.notice?.revision ?? null
 }
 </script>
 

@@ -1,4 +1,4 @@
-import { LeagueServersConfig } from '@shared/schemas/remote-config'
+import type { AkariLeagueServersConfig } from '@shared/shards/akari-api'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 
@@ -21,12 +21,12 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
     }
   })
 
-  const leagueServers = shallowRef<LeagueServersConfig>({
-    version: 0,
-    lastUpdate: 0,
+  const leagueServers = shallowRef<AkariLeagueServersConfig>({
+    updatedAt: new Date(0).toISOString(),
     servers: {},
     serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
+    tencentServerSpectatorInteroperability: [],
     tencentServerSummonerInteroperability: []
   })
 

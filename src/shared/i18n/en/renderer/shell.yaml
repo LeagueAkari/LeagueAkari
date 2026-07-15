@@ -1,12 +1,10 @@
-announcements:
+notices:
   modal:
-    title: Announcement
+    title: Notice
     close: Close
     read: I have read
-    noAnnouncementMd: |
-      ***No announcement***
-
-      or check [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
+    noNoticeMd: |
+      ***No notice***
 legal:
   declaration:
     title: Declaration
@@ -90,10 +88,10 @@ legal:
       </div>
 titlebar:
   actions:
-    announcement: Announcement
-    announcementSummary: Announcement Summary
-    announcementOk: Got it
-    announcementSeeMore: See More
+    notice: Notice
+    noticeSummary: Notice Summary
+    noticeOk: Got it
+    noticeSeeMore: See More
     github: Project GitHub
     auxWindow: Auxiliary Window
     opggWindow: OP.GG

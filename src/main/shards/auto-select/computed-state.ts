@@ -1,4 +1,4 @@
-import type { AutoSelectGroup } from '@shared/schemas/remote-config'
+import type { AkariAutoSelectGroup as AutoSelectGroup } from '@shared/shards/akari-api'
 import type { ExpectedChampionStatus } from '@shared/shards/auto-select'
 import type {
   Action,

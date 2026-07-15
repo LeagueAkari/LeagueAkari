@@ -7,8 +7,7 @@ import { useSgpApiStatus } from './useSgpApiStatus'
 
 function createLeagueServers() {
   return {
-    version: 2,
-    lastUpdate: 0,
+    updatedAt: new Date(0).toISOString(),
     servers: {
       NA1: {
         matchHistory: 'https://na1.example.test',
@@ -21,6 +20,7 @@ function createLeagueServers() {
     },
     serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
+    tencentServerSpectatorInteroperability: [],
     tencentServerSummonerInteroperability: []
   }
 }

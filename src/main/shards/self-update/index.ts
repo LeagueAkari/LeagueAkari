@@ -2,11 +2,11 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import axios from 'axios'
 import { app } from 'electron'
 
+import { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
@@ -61,7 +61,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     private readonly _appCommon: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobxUtils: MobxUtilsMain,
-    private readonly _remoteConfig: RemoteConfigMain,
+    private readonly _akariApi: AkariApiMain,
     _loggerFactory: LoggerFactoryMain,
     _settingFactory: SettingFactoryMain
   ) {
@@ -83,7 +83,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       appCommon: this._appCommon,
       ipc: this._ipc,
       mobxUtils: this._mobxUtils,
-      remoteConfig: this._remoteConfig,
+      akariApi: this._akariApi,
       httpClient: this._httpClient
     }
 

@@ -133,6 +133,7 @@ import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
@@ -140,7 +141,6 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { UxCommandLine } from '@shared/shards/league-client-ux'
@@ -163,7 +163,7 @@ const lcuxs = useLeagueClientUxStore()
 const lcps = useLeagueClientPeekStore()
 const sgps = useSgpStore()
 
-const rcs = useRemoteConfigStore()
+const aks = useAkariApiStore()
 const sus = useSelfUpdateStore()
 
 const lc = useInstance(LeagueClientRenderer)
@@ -177,7 +177,7 @@ const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const showNewVersionBadge = computed(() => {
-  const release = rcs.latestRelease
+  const release = aks.latestRelease
   if (!release || !release.isNew) {
     return false
   }

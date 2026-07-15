@@ -62,11 +62,11 @@ export class OngoingGameChampSelectHandoffController {
   }
 
   private _watchSnapshotRecording() {
-    const { leagueClient, mobxUtils, remoteConfig, state } = this._context
+    const { akariApi, leagueClient, mobxUtils, state } = this._context
 
     mobxUtils.reaction(
       () => {
-        const config = remoteConfig.state.ongoingGameConfig
+        const config = akariApi.state.ongoingGameConfig
 
         if (!config.spotlight.deobfuscation || state.draft) {
           return null
@@ -135,6 +135,6 @@ export class OngoingGameChampSelectHandoffController {
   }
 
   private _isFeatureEnabled() {
-    return Boolean(this._context.remoteConfig.state.ongoingGameConfig.spotlight.deobfuscation)
+    return Boolean(this._context.akariApi.state.ongoingGameConfig.spotlight.deobfuscation)
   }
 }

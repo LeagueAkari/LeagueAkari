@@ -1,13 +1,17 @@
-import { parseAkariApiBootstrapDocument } from '@shared/shards/akari-api'
 import type { AxiosInstance } from 'axios'
 import { describe, expect, it, vi } from 'vitest'
 
-import { AkariApiBootstrapController } from './bootstrap-controller'
 import {
   AKARI_API_BOOTSTRAP_CACHE_PATH,
   AKARI_API_BOOTSTRAP_NPM_LATEST_URL,
-  type AkariApiMainContext
-} from './context'
+  AkariApiBootstrapController
+} from './bootstrap-controller'
+
+vi.mock('electron', () => ({
+  app: {
+    getVersion: () => '1.5.0'
+  }
+}))
 
 const bootstrap = (generation: number) => ({
   schemaVersion: 1 as const,
@@ -25,43 +29,68 @@ function setup(localGeneration: number, remoteGeneration: number) {
     writeToJsonConfigFile: vi.fn().mockResolvedValue(undefined)
   }
   const logger = { info: vi.fn(), warn: vi.fn() }
+  let resolveRemote: (value: unknown) => void = () => {}
   const npmHttp = {
-    get: vi.fn().mockResolvedValue({
-      data: {
-        akariBootstrap: bootstrap(remoteGeneration)
-      }
-    })
+    get: vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveRemote = resolve
+      })
+    )
   } as unknown as AxiosInstance
-  const applyBootstrap = vi.fn((value: unknown) => parseAkariApiBootstrapDocument(value))
-  const context = { settingService, logger } as unknown as AkariApiMainContext
-  const controller = new AkariApiBootstrapController(context, npmHttp, applyBootstrap)
+  const controller = new AkariApiBootstrapController(
+    settingService as never,
+    logger as never,
+    npmHttp
+  )
 
-  return { applyBootstrap, controller, npmHttp, settingService }
+  return {
+    controller,
+    logger,
+    npmHttp,
+    resolveRemote: () =>
+      resolveRemote({
+        data: {
+          akariBootstrap: bootstrap(remoteGeneration)
+        }
+      }),
+    settingService
+  }
 }
 
 describe('Akari API bootstrap controller', () => {
   it('loads local cache first and persists a newer npm generation', async () => {
-    const { applyBootstrap, controller, npmHttp, settingService } = setup(1, 2)
+    const { controller, npmHttp, resolveRemote, settingService } = setup(1, 2)
 
-    await controller.initFromLocal()
-    await controller.updateFromNpm()
+    await controller.init()
 
-    expect(applyBootstrap).toHaveBeenNthCalledWith(1, bootstrap(1))
-    expect(applyBootstrap).toHaveBeenNthCalledWith(2, bootstrap(2))
+    expect(controller.apiHttp.defaults.baseURL).toBe('https://api-1.example.com')
+    expect(controller.staticHttp.defaults.baseURL).toBe('https://static-1.example.com')
     expect(npmHttp.get).toHaveBeenCalledWith(AKARI_API_BOOTSTRAP_NPM_LATEST_URL)
-    expect(settingService.writeToJsonConfigFile).toHaveBeenCalledWith(
-      AKARI_API_BOOTSTRAP_CACHE_PATH,
-      bootstrap(2)
-    )
+
+    resolveRemote()
+
+    await vi.waitFor(() => {
+      expect(controller.apiHttp.defaults.baseURL).toBe('https://api-2.example.com')
+      expect(controller.staticHttp.defaults.baseURL).toBe('https://static-2.example.com')
+      expect(settingService.writeToJsonConfigFile).toHaveBeenCalledWith(
+        AKARI_API_BOOTSTRAP_CACHE_PATH,
+        bootstrap(2)
+      )
+    })
   })
 
   it('keeps the local cache when npm is not newer', async () => {
-    const { applyBootstrap, controller, settingService } = setup(2, 2)
+    const { controller, logger, resolveRemote, settingService } = setup(2, 2)
 
-    await controller.initFromLocal()
-    await controller.updateFromNpm()
+    await controller.init()
+    resolveRemote()
 
-    expect(applyBootstrap).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => {
+      expect(logger.info).toHaveBeenCalledWith('Bootstrap generation 2 is up to date')
+    })
+
+    expect(controller.apiHttp.defaults.baseURL).toBe('https://api-2.example.com')
+    expect(controller.staticHttp.defaults.baseURL).toBe('https://static-2.example.com')
     expect(settingService.writeToJsonConfigFile).not.toHaveBeenCalled()
   })
 })

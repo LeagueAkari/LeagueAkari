@@ -32,7 +32,7 @@ export class SelfUpdateIpcHandlers {
         return this._unsupported()
       }
 
-      const release = this._context.remoteConfig.state.latestRelease
+      const release = this._context.akariApi.state.latestRelease
       if (release && release.isNew && release.archiveFile) {
         return await this._executor.start(
           release as LatestReleaseInfo & {
@@ -50,7 +50,7 @@ export class SelfUpdateIpcHandlers {
         return this._unsupported()
       }
 
-      const release = this._context.remoteConfig.state.latestRelease
+      const release = this._context.akariApi.state.latestRelease
       if (release) {
         this._context.logger.info(
           'Force start update, target:',
@@ -96,7 +96,7 @@ export class SelfUpdateIpcHandlers {
 
   private async _checkUpdates() {
     try {
-      const release = await this._context.remoteConfig.updateLatestReleaseManually()
+      const release = await this._context.akariApi.updateLatestReleaseManually()
 
       if (release && release.isNew) {
         return { result: 'new-updates' }

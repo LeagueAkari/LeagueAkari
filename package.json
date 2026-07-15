@@ -85,7 +85,6 @@
     "electron": "^41.9.2",
     "electron-builder": "26.15.6",
     "electron-vite": "6.0.0-beta.1",
-    "gray-matter": "^4.0.3",
     "i18next": "^26.3.4",
     "i18next-vue": "^5.4.0",
     "lodash": "^4.18.1",

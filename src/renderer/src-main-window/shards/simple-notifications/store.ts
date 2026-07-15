@@ -5,19 +5,19 @@ export const useSimpleNotificationsStore = defineStore(
   'shard:simple-notifications-renderer',
   () => {
     // need globally shared
-    const showAnnouncementModal = ref(false)
-    const announcementSummary = ref<string | null>(null)
+    const showNoticeModal = ref(false)
+    const noticeSummary = ref<string | null>(null)
     const showNewReleaseModal = ref(false)
     const showDeclarationModal = ref(false)
 
-    const lastAnnouncementUniqueId = ref<string | null>(null)
+    const lastNoticeRevision = ref<string | null>(null)
 
     return {
-      showAnnouncementModal,
-      announcementSummary,
+      showNoticeModal,
+      noticeSummary,
       showNewReleaseModal,
       showDeclarationModal,
-      lastAnnouncementUniqueId
+      lastNoticeRevision
     }
   }
 )

@@ -1,12 +1,10 @@
-announcements:
+notices:
   modal:
     title: 公告
     close: 关闭
     read: 已读
-    noAnnouncementMd: |
+    noNoticeMd: |
       ***暂无公告***
-
-      或查询 [GitHub](https://github.com/LeagueAkari/LeagueAkari-Config/tree/main/announcement)
 legal:
   declaration:
     title: 声明
@@ -90,10 +88,10 @@ legal:
       </div>
 titlebar:
   actions:
-    announcement: 公告
-    announcementSummary: 公告摘要
-    announcementOk: 确认
-    announcementSeeMore: 查看详情
+    notice: 公告
+    noticeSummary: 公告摘要
+    noticeOk: 确认
+    noticeSeeMore: 查看详情
     github: 项目主页
     auxWindow: 小窗口
     opggWindow: OP.GG

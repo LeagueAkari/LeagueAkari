@@ -1,5 +1,4 @@
-import { AKARI_STATIC_BASE_URL } from '@shared/constants/common'
-import { resolveAkariStaticUrl } from '@shared/shards/akari-api'
+import { DEFAULT_AKARI_STATIC_BASE_URL, resolveAkariStaticUrl } from '@shared/shards/akari-api'
 import type { AxiosInstance } from 'axios'
 
 import type { HttpApiRequestOptions } from '../request-options'
@@ -7,7 +6,7 @@ import type { HttpApiRequestOptions } from '../request-options'
 export class AkariStaticHttpApiAxiosHelper {
   constructor(private readonly _http: AxiosInstance) {
     if (!_http.defaults.baseURL) {
-      _http.defaults.baseURL = AKARI_STATIC_BASE_URL
+      _http.defaults.baseURL = DEFAULT_AKARI_STATIC_BASE_URL
     }
   }
 

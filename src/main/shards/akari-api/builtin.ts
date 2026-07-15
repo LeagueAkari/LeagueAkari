@@ -1,22 +1,21 @@
 import {
-  AutoSelectGroups,
-  LeagueServersConfig,
-  OngoingGameConfig,
-  SupportedQueues
-} from '@shared/schemas/remote-config'
+  AkariAutoSelectGroupsConfig,
+  AkariLeagueServersConfig,
+  AkariOngoingGameConfig,
+  AkariSupportedQueuesConfig
+} from '@shared/shards/akari-api'
 
-export const BUILTIN_ONGOING_GAME_CONFIG: OngoingGameConfig = {
-  version: 1,
-  lastUpdate: 1759568091535,
+export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
+  updatedAt: '2025-10-04T08:54:51.536Z',
   spotlight: {
     deobfuscation: true,
-    gsmByPuuid: true
+    gsmByPuuid: true,
+    spectatorByPuuid: false
   }
 }
 
-export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
-  version: 2,
-  lastUpdate: 1766507714644,
+export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
+  updatedAt: '2026-05-23T10:16:06.998Z',
   servers: {
     TENCENT_HN1: {
       matchHistory: 'https://hn1-k8s-sgp.lol.qq.com:21019',
@@ -136,6 +135,18 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
     'TENCENT_PBE',
     'TENCENT_PREPBE'
   ],
+  tencentServerSpectatorInteroperability: [
+    'TENCENT_HN1',
+    'TENCENT_HN10',
+    'TENCENT_NJ100',
+    'TENCENT_GZ100',
+    'TENCENT_CQ100',
+    'TENCENT_TJ100',
+    'TENCENT_TJ101',
+    'TENCENT_BGP2',
+    'TENCENT_PBE',
+    'TENCENT_PREPBE'
+  ],
   tencentServerSummonerInteroperability: [
     'TENCENT_HN1',
     'TENCENT_HN10',
@@ -208,17 +219,15 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
   }
 }
 
-export const BUILTIN_SUPPORTED_QUEUES: SupportedQueues = {
-  version: 1,
-  lastUpdate: 1778862858129,
+export const BUILTIN_SUPPORTED_QUEUES: AkariSupportedQueuesConfig = {
+  updatedAt: '2026-05-15T16:40:26.395Z',
   queues: [
     420, 440, 430, 450, 480, 1700, 1750, 490, 1900, 900, 2300, 2400, 4210, 4220, 4240, 4250, 4260
   ]
 }
 
-export const BUILTIN_AUTO_SELECT_GROUPS: AutoSelectGroups = {
-  version: 1,
-  lastUpdate: 1769309207628,
+export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
+  updatedAt: '2026-01-25T02:46:47.628Z',
   groups: [
     {
       groupId: 'ranked',

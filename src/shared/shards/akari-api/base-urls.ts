@@ -1,34 +1,18 @@
-import { type AkariApiBootstrapDocument, type AkariServiceBaseUrls } from './types'
+import { z } from 'zod'
 
-export function normalizeAkariServiceBaseUrl(value: string) {
-  return new URL(value).toString().replace(/\/$/, '')
-}
+const AkariApiBootstrapSchema = z.object({
+  schemaVersion: z.literal(1),
+  generation: z.number(),
+  baseUrls: z.object({
+    api: z.string(),
+    static: z.string()
+  })
+})
 
-export function normalizeAkariServiceBaseUrls(baseUrls: AkariServiceBaseUrls) {
-  return {
-    api: normalizeAkariServiceBaseUrl(baseUrls.api),
-    static: normalizeAkariServiceBaseUrl(baseUrls.static)
-  }
-}
-
-export function parseAkariApiBootstrapDocument(value: unknown): AkariApiBootstrapDocument {
-  const bootstrap = value as AkariApiBootstrapDocument
-
-  if (
-    bootstrap?.schemaVersion !== 1 ||
-    !Number.isSafeInteger(bootstrap.generation) ||
-    typeof bootstrap.baseUrls?.api !== 'string' ||
-    typeof bootstrap.baseUrls?.static !== 'string'
-  ) {
-    throw new TypeError('Invalid Akari API bootstrap')
-  }
-
-  return {
-    ...bootstrap,
-    baseUrls: normalizeAkariServiceBaseUrls(bootstrap.baseUrls)
-  }
+export function parseAkariApiBootstrapDocument(value: unknown) {
+  return AkariApiBootstrapSchema.parse(value)
 }
 
 export function resolveAkariStaticUrl(baseUrl: string, path: string) {
-  return new URL(path.replace(/^\/+/, ''), `${normalizeAkariServiceBaseUrl(baseUrl)}/`).toString()
+  return new URL(path, `${baseUrl}/`).toString()
 }

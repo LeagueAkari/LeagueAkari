@@ -1,125 +1,117 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
-import { AkariStaticHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/static'
-import {
-  type AkariApiBootstrapDocument,
-  DEFAULT_AKARI_SERVICE_BASE_URLS,
-  parseAkariApiBootstrapDocument
-} from '@shared/shards/akari-api'
-import axios from 'axios'
-import { app } from 'electron'
 
-import { AkariIpcMain } from '../ipc'
+import { AkariProtocolMain } from '../akari-protocol'
+import { AppCommonMain } from '../app-common'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariApiBootstrapController } from './bootstrap-controller'
-import {
-  AKARI_API_MAIN_NAMESPACE,
-  AKARI_API_REQUEST_TIMEOUT,
-  type AkariApiMainContext
-} from './context'
-import { AkariApiIpcHandlers } from './ipc-handlers'
-import { AkariApiState } from './state'
+import { AkariApiConfigLoader } from './config-loader'
+import type { AkariApiMainContext } from './context'
+import { AkariApiNoticeLoader } from './notice-loader'
+import { AkariApiProtocolController } from './protocol-controller'
+import { AkariApiReleaseLoader } from './release-loader'
+import { AkariApiSettings, AkariApiState } from './state'
 
 @Shard(AkariApiMain.id)
 export class AkariApiMain implements IAkariShardInitDispose {
-  static readonly id = AKARI_API_MAIN_NAMESPACE
+  static readonly id = 'akari-api-main'
 
   public readonly state = new AkariApiState()
-  public readonly api: AkariApiHttpApiAxiosHelper
-  public readonly staticAssets: AkariStaticHttpApiAxiosHelper
+  public readonly settings = new AkariApiSettings()
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
   private readonly _context: AkariApiMainContext
   private readonly _bootstrapController: AkariApiBootstrapController
-  private readonly _ipcHandlers: AkariApiIpcHandlers
-  private readonly _apiHttp = axios.create({
-    baseURL: DEFAULT_AKARI_SERVICE_BASE_URLS.api,
-    timeout: AKARI_API_REQUEST_TIMEOUT,
-    headers: {
-      Accept: 'application/json',
-      'User-Agent': `LeagueAkari/${app.getVersion()}`,
-      'x-akari-version': app.getVersion()
-    }
-  })
-  private readonly _staticHttp = axios.create({
-    baseURL: DEFAULT_AKARI_SERVICE_BASE_URLS.static,
-    timeout: AKARI_API_REQUEST_TIMEOUT,
-    headers: {
-      'User-Agent': `LeagueAkari/${app.getVersion()}`,
-      'x-akari-version': app.getVersion()
-    }
-  })
-  private readonly _npmHttp = axios.create({
-    timeout: AKARI_API_REQUEST_TIMEOUT,
-    headers: {
-      'User-Agent': `LeagueAkari/${app.getVersion()}`
-    }
-  })
+  private readonly _protocolController: AkariApiProtocolController
+  private readonly _configLoader: AkariApiConfigLoader
+  private readonly _noticeLoader: AkariApiNoticeLoader
+  private readonly _releaseLoader: AkariApiReleaseLoader
+
+  get api() {
+    return this._bootstrapController.api
+  }
+
+  get staticAssets() {
+    return this._bootstrapController.staticAssets
+  }
 
   constructor(
-    private readonly _ipc: AkariIpcMain,
-    private readonly _mobxUtils: MobxUtilsMain,
     _loggerFactory: LoggerFactoryMain,
-    _settingFactory: SettingFactoryMain
+    _settingFactory: SettingFactoryMain,
+    _protocol: AkariProtocolMain,
+    _mobxUtils: MobxUtilsMain,
+    _appCommon: AppCommonMain
   ) {
     this._logger = _loggerFactory.create(AkariApiMain.id)
-    this._settingService = _settingFactory.register(AkariApiMain.id)
-    this.api = new AkariApiHttpApiAxiosHelper(this._apiHttp)
-    this.staticAssets = new AkariStaticHttpApiAxiosHelper(this._staticHttp)
+    this._settingService = _settingFactory.register(
+      AkariApiMain.id,
+      {
+        updateLatestRelease: { default: this.settings.updateLatestRelease }
+      },
+      this.settings
+    )
+
+    this._bootstrapController = new AkariApiBootstrapController(this._settingService, this._logger)
+    this._protocolController = new AkariApiProtocolController(
+      _protocol,
+      this._logger,
+      this._bootstrapController
+    )
     this._context = {
-      namespace: AkariApiMain.id,
       state: this.state,
-      ipc: this._ipc,
+      settings: this.settings,
       logger: this._logger,
       settingService: this._settingService,
+      mobxUtils: _mobxUtils,
+      appCommon: _appCommon,
       api: this.api
     }
-    this._bootstrapController = new AkariApiBootstrapController(
-      this._context,
-      this._npmHttp,
-      this.applyBootstrap.bind(this)
-    )
-    this._ipcHandlers = new AkariApiIpcHandlers(this._context)
+    this._configLoader = new AkariApiConfigLoader(this._context)
+    this._noticeLoader = new AkariApiNoticeLoader(this._context)
+    this._releaseLoader = new AkariApiReleaseLoader(this._context)
   }
 
   async onInit() {
-    this._mobxUtils.propSync(AkariApiMain.id, 'state', this.state, ['baseUrls'])
+    await this._bootstrapController.init()
+    await this._setupState()
 
     try {
-      await this._bootstrapController.initFromLocal()
+      await this._configLoader.initFromLocal()
     } catch (error) {
-      this._logger.warn('Failed to load Akari API bootstrap from local cache', error)
+      this._logger.warn('Failed to load config cache', error)
     }
 
-    this._ipcHandlers.register()
-    void this._bootstrapController.updateFromNpm()
+    this._protocolController.register()
+    this._configLoader.watch()
+    this._noticeLoader.watch()
+    this._releaseLoader.watch()
   }
 
-  applyBootstrap(value: unknown): AkariApiBootstrapDocument {
-    const bootstrap = parseAkariApiBootstrapDocument(value)
-
-    this._applyBaseUrls(bootstrap.baseUrls)
-    this.state.setBaseUrls(bootstrap.baseUrls)
-
-    return bootstrap
+  async onDispose() {
+    this._configLoader.dispose()
+    this._noticeLoader.dispose()
+    this._releaseLoader.dispose()
+    this._protocolController.unregister()
   }
 
-  resetToDefaultBaseUrls() {
-    this._applyBaseUrls(DEFAULT_AKARI_SERVICE_BASE_URLS)
-    this.state.setBaseUrls(DEFAULT_AKARI_SERVICE_BASE_URLS)
-    this._logger.info('Reset Akari API service discovery to built-in defaults')
+  updateLatestReleaseManually() {
+    return this._releaseLoader.updateLatestReleaseManually()
   }
 
-  resolveStaticUrl(path: string) {
-    return this.staticAssets.resolveUrl(path)
-  }
+  private async _setupState() {
+    await this._settingService.applyToState()
 
-  private _applyBaseUrls(baseUrls: AkariApiBootstrapDocument['baseUrls']) {
-    this._apiHttp.defaults.baseURL = baseUrls.api
-    this._staticHttp.defaults.baseURL = baseUrls.static
+    this._context.mobxUtils.propSync(AkariApiMain.id, 'state', this.state, [
+      'notice',
+      'latestRelease',
+      'isUpdatingNotice',
+      'isUpdatingLatestRelease'
+    ])
+    this._context.mobxUtils.propSync(AkariApiMain.id, 'settings', this.settings, [
+      'updateLatestRelease'
+    ])
   }
 }

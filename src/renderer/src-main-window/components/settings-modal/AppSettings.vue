@@ -119,92 +119,6 @@
             :options="themes"
           />
         </SettingsRow>
-        <SettingsRow
-          :label="t('settings.app.basic.dataSource.label')"
-          :label-description="t('settings.app.basic.dataSource.description')"
-          :label-width="400"
-        >
-          <div class="flex max-w-full flex-col items-end gap-2">
-            <NSelect
-              class="w-40!"
-              size="small"
-              :value="rcs.settings.preferredSource"
-              @update:value="(val) => rc.setPreferredSource(val)"
-              :options="remoteConfigSource"
-            />
-            <NPopover>
-              <template #trigger>
-                <div class="hover-text">
-                  {{ t('settings.app.basic.dataSource.howToChoose') }}
-                </div>
-              </template>
-              <div>
-                <div class="flex h-5.5 items-center">
-                  <NIcon class="mr-2">
-                    <GiteeSvg />
-                  </NIcon>
-                  <span class="text-xs font-bold">Gitee</span>
-                  <span class="ml-1">
-                    <template v-if="isTestingLatency">
-                      {{ t('settings.app.basic.dataSource.testingSpeed') }}
-                    </template>
-                    <template v-else-if="latency">
-                      ({{
-                        latency.giteeLatency === -1
-                          ? t('settings.app.basic.dataSource.timeout')
-                          : `${latency.giteeLatency.toFixed(1)} ms`
-                      }})
-
-                      <span
-                        class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
-                        v-if="latency.giteeLatency < latency.githubLatency"
-                        >{{ t('settings.app.basic.dataSource.better') }}</span
-                      >
-                    </template>
-                  </span>
-                </div>
-                <div>{{ t('settings.app.basic.dataSource.tip.gitee') }}</div>
-              </div>
-              <div class="mt-2">
-                <div class="flex h-5.5 items-center">
-                  <NIcon class="mr-2">
-                    <GithubIcon />
-                  </NIcon>
-                  <span class="text-xs font-bold">GitHub</span>
-                  <span class="ml-1">
-                    <template v-if="isTestingLatency">
-                      {{ t('settings.app.basic.dataSource.testingSpeed') }}
-                    </template>
-                    <template v-else-if="latency">
-                      ({{
-                        latency.githubLatency === -1
-                          ? t('settings.app.basic.dataSource.timeout')
-                          : `${latency.githubLatency.toFixed(1)} ms`
-                      }})
-
-                      <span
-                        class="rounded bg-black/10 px-1 text-xs text-emerald-500 dark:bg-white/10 dark:text-emerald-400"
-                        v-if="latency.githubLatency < latency.giteeLatency"
-                        >{{ t('settings.app.basic.dataSource.better') }}</span
-                      >
-                    </template>
-                  </span>
-                </div>
-                <div>{{ t('settings.app.basic.dataSource.tip.github') }}</div>
-              </div>
-              <div class="mt-2 flex justify-center">
-                <NButton
-                  size="tiny"
-                  secondary
-                  @click="() => handleTestRepoLatency()"
-                  :loading="isTestingLatency"
-                >
-                  {{ t('settings.app.basic.dataSource.testButton') }}
-                </NButton>
-              </div>
-            </NPopover>
-          </div>
-        </SettingsRow>
       </SettingsSection>
       <SettingsSection :title="t('settings.app.selfUpdate.title')">
         <SettingsRow
@@ -214,8 +128,8 @@
         >
           <NSwitch
             size="small"
-            :value="rcs.settings.updateLatestRelease"
-            @update:value="(val: boolean) => rc.setUpdateLatestRelease(val)"
+            :value="aks.settings.updateLatestRelease"
+            @update:value="(val: boolean) => akariApi.setUpdateLatestRelease(val)"
           />
         </SettingsRow>
         <SettingsRow
@@ -229,19 +143,11 @@
             @update:value="(val: boolean) => su.setAutoDownloadUpdates(val)"
           />
         </SettingsRow>
-        <SettingsRow
-          :label="t('settings.app.selfUpdate.checkUpdates')"
-          :label-description="
-            t('settings.app.selfUpdate.checkFrom', {
-              source: UPDATE_SOURCE_MAP[rcs.settings.preferredSource]
-            })
-          "
-          :label-width="400"
-        >
+        <SettingsRow :label="t('settings.app.selfUpdate.checkUpdates')" :label-width="400">
           <NFlex align="center" class="max-w-full justify-end">
             <NButton
               size="small"
-              :loading="rcs.isUpdatingLatestRelease"
+              :loading="aks.isUpdatingLatestRelease"
               secondary
               type="primary"
               @click="() => handleCheckUpdates()"
@@ -249,11 +155,11 @@
             >
             <NButton
               size="small"
-              v-if="rcs.latestRelease"
+              v-if="aks.latestRelease"
               secondary
               @click="() => handleShowUpdateModal()"
             >
-              <template v-if="rcs.latestRelease.isNew">
+              <template v-if="aks.latestRelease.isNew">
                 {{ t('settings.app.selfUpdate.newRelease') }}
               </template>
               <template v-else>
@@ -262,7 +168,7 @@
             </NButton>
             <NButton
               size="small"
-              v-if="rcs.latestRelease && rcs.latestRelease.isNew"
+              v-if="aks.latestRelease && aks.latestRelease.isNew"
               :disabled="sus.updateProgressInfo !== null"
               secondary
               @click="() => su.startUpdate()"
@@ -502,8 +408,9 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
-import GiteeSvg from '@renderer-shared/components/icons/GiteeSvg.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { HttpProxySetting, useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -512,8 +419,6 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useLoggerStore } from '@renderer-shared/shards/logger/store'
-import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
@@ -529,7 +434,6 @@ import {
   getThemeColorTheme
 } from '@shared/types/app-theme'
 import { formatSeconds } from '@shared/utils/format'
-import { Github as GithubIcon } from '@vicons/fa'
 import { useMediaQuery } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -537,7 +441,6 @@ import {
   NButton,
   NCollapseTransition,
   NFlex,
-  NIcon,
   NInput,
   NInputNumber,
   NPopover,
@@ -552,7 +455,7 @@ import {
   useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
@@ -568,14 +471,14 @@ const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 const ls = useLoggerStore()
-const rcs = useRemoteConfigStore()
+const aks = useAkariApiStore()
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
 const app = useInstance(AppCommonRenderer)
 const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
 const lg = useInstance(LoggerRenderer)
-const rc = useInstance(RemoteConfigRenderer)
+const akariApi = useInstance(AkariApiRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
 
 const closeActions = computed(() => {
@@ -588,11 +491,6 @@ const closeActions = computed(() => {
     { label: t('settings.app.basic.mainWindowCloseAction.options.ask'), value: 'ask' }
   ]
 })
-
-const remoteConfigSource = [
-  { label: 'Gitee', value: 'gitee' },
-  { label: 'GitHub', value: 'github' }
-]
 
 const locales = [
   { label: '中文', value: 'zh-CN' },
@@ -744,11 +642,6 @@ const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
 
 const message = useMessage()
 
-const UPDATE_SOURCE_MAP = {
-  github: 'GitHub',
-  gitee: 'Gitee'
-}
-
 const handleCheckUpdates = async () => {
   const { result, reason } = await su.checkUpdates()
   switch (result) {
@@ -799,17 +692,6 @@ const processStatus = computed(() => {
       }
   }
 })
-
-const isTestingLatency = ref(false)
-const latency = ref<{ githubLatency: number; giteeLatency: number } | null>(null)
-
-const handleTestRepoLatency = async () => {
-  isTestingLatency.value = true
-  latency.value = await rc.testRepoLatency()
-  isTestingLatency.value = false
-}
-
-handleTestRepoLatency()
 
 const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>

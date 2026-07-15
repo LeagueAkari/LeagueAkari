@@ -18,9 +18,9 @@ import type { SummonerInfo } from '@shared/types/league-client/summoner'
 import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
+import type { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
 import { LeagueClientData } from '../league-client/lc-state'
-import { RemoteConfigMain } from '../remote-config'
 import { SgpMain } from '../sgp'
 import type { ChampSelectHandoffSnapshot } from './champ-select-handoff'
 import {
@@ -144,7 +144,7 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig,
+      config: this._akariApi.state.ongoingGameConfig,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -158,7 +158,7 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig,
+      config: this._akariApi.state.ongoingGameConfig,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -173,7 +173,7 @@ export class OngoingGameState {
       settings: this._settings,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._remoteConfig.state.ongoingGameConfig,
+      config: this._akariApi.state.ongoingGameConfig,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -363,7 +363,7 @@ export class OngoingGameState {
     private readonly _appCommon: AppCommonMain,
     private readonly _sgpMain: SgpMain,
     private readonly _settings: OngoingGameSettings,
-    private readonly _remoteConfig: RemoteConfigMain
+    private readonly _akariApi: AkariApiMain
   ) {
     makeAutoObservable(this, {
       matchHistory: observable.shallow,

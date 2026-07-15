@@ -17,13 +17,8 @@ export interface AkariApiBootstrapDocument {
   baseUrls: AkariServiceBaseUrls
 }
 
-export const AKARI_API_LANGUAGES = ['zh-CN', 'en'] as const
-export type AkariApiLanguage = (typeof AKARI_API_LANGUAGES)[number]
+export type AkariApiLanguage = 'zh-CN' | 'en'
 export const DEFAULT_AKARI_API_LANGUAGE: AkariApiLanguage = 'zh-CN'
-
-export function isAkariApiLanguage(value: unknown): value is AkariApiLanguage {
-  return AKARI_API_LANGUAGES.includes(value as AkariApiLanguage)
-}
 
 export type AkariNoticeSeverity = 'low' | 'medium' | 'high'
 
@@ -68,6 +63,10 @@ export interface AkariApiErrorBody {
   }
 }
 
+export interface AkariStatisticsRecordCreated {
+  id: number
+}
+
 export interface AkariLastResortArchiveFile {
   name: string
   size: number
@@ -77,15 +76,14 @@ export interface AkariLastResortArchiveFile {
 
 /** Compatibility response used only while the legacy updater fallback remains available. */
 export interface AkariLastResortRelease {
-  version?: string
-  publishedAt?: string
-  descriptions?: Partial<Record<AkariApiLanguage, string>>
+  version: string
+  publishedAt: string
+  descriptions: Partial<Record<AkariApiLanguage, string>>
   archiveFileGitHub?: AkariLastResortArchiveFile
   archiveFileGitee?: AkariLastResortArchiveFile
 }
 
 export interface AkariConfigMetadata {
-  schemaVersion: number
   updatedAt: string
 }
 
@@ -126,6 +124,7 @@ export interface AkariLeagueServerEndpoint {
 export interface AkariLeagueServersConfig extends AkariConfigMetadata {
   servers: Record<string, AkariLeagueServerEndpoint>
   tencentServerMatchHistoryInteroperability: string[]
+  tencentServerSpectatorInteroperability: string[]
   tencentServerSummonerInteroperability: string[]
   serverNames: Record<string, Record<string, string>>
 }
@@ -142,14 +141,3 @@ export interface AkariApiConfigResourceMap {
 }
 
 export type AkariApiConfigResource = keyof AkariApiConfigResourceMap
-
-export const AKARI_API_CONFIG_RESOURCES = [
-  'auto-select/groups',
-  'ongoing-game/config',
-  'sgp/league-servers',
-  'sgp/supported-queues'
-] as const satisfies readonly AkariApiConfigResource[]
-
-export function isAkariApiConfigResource(value: unknown): value is AkariApiConfigResource {
-  return AKARI_API_CONFIG_RESOURCES.includes(value as AkariApiConfigResource)
-}

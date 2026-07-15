@@ -1,4 +1,4 @@
-import { AutoSelectGroup } from '@shared/schemas/remote-config'
+import type { AkariAutoSelectGroup as AutoSelectGroup } from '@shared/shards/akari-api'
 import {
   BanChampionConfig,
   DelayedBanPick,

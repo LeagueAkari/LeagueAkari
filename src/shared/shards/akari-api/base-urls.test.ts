@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  normalizeAkariServiceBaseUrl,
-  parseAkariApiBootstrapDocument,
-  resolveAkariStaticUrl
-} from './base-urls'
+import { parseAkariApiBootstrapDocument, resolveAkariStaticUrl } from './base-urls'
 import {
   DEFAULT_AKARI_API_BASE_URL,
   DEFAULT_AKARI_SERVICE_BASE_URLS,
@@ -21,14 +17,14 @@ describe('Akari API service discovery', () => {
     expect(DEFAULT_AKARI_STATIC_BASE_URL).toBe('https://akari-static.yuru-yuri.com')
   })
 
-  it('normalizes a valid bootstrap document', () => {
+  it('parses a valid bootstrap document', () => {
     expect(
       parseAkariApiBootstrapDocument({
         schemaVersion: 1,
         generation: 2,
         baseUrls: {
-          api: 'https://akari-api.yuru-yuri.com/',
-          static: 'https://akari-static.yuru-yuri.com/'
+          api: 'https://akari-api.yuru-yuri.com',
+          static: 'https://akari-static.yuru-yuri.com'
         }
       })
     ).toEqual({
@@ -41,12 +37,8 @@ describe('Akari API service discovery', () => {
     })
   })
 
-  it('accepts loopback origins for local development', () => {
-    expect(normalizeAkariServiceBaseUrl('http://127.0.0.1:8787')).toBe('http://127.0.0.1:8787')
-  })
-
-  it('only rejects malformed base URLs', () => {
-    expect(() => normalizeAkariServiceBaseUrl('not-a-url')).toThrow()
+  it('rejects an invalid bootstrap document', () => {
+    expect(() => parseAkariApiBootstrapDocument({ schemaVersion: 2 })).toThrow()
   })
 
   it('resolves and encodes static object names', () => {

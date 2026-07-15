@@ -140,7 +140,7 @@ function createContext(options: {
       _removeFromStorage: storage.remove
     },
     state,
-    remoteConfig: {
+    akariApi: {
       state: {
         ongoingGameConfig: {
           spotlight: {

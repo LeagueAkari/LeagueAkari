@@ -25,13 +25,6 @@ export interface LatestReleaseInfo {
   /** 该版本是否是新的版本 */
   isNew: boolean
 
-  /** 版本来源
-   * - github: 来自 GitHub Release
-   * - gitee: 来自 Gitee Release
-   * - last-resort: 在上述指定的仓库失效时，立即尝试从备用仓库拉取
-   */
-  source: 'github' | 'gitee' | 'last-resort'
-
   /** 发布时间 ISO 8601 格式 */
   publishedAt: string
 

@@ -2,12 +2,12 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { QueueKeeper } from '@shared/utils/queue-keeper'
 import { comparer } from 'mobx'
 
+import { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { RemoteConfigMain } from '../remote-config'
 import { SavedPlayerMain } from '../saved-player'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
@@ -60,7 +60,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     private readonly _sgpMain: SgpMain,
     private readonly _savedPlayer: SavedPlayerMain,
     private readonly _appCommon: AppCommonMain,
-    private readonly _remoteConfig: RemoteConfigMain
+    private readonly _akariApi: AkariApiMain
   ) {
     this.settings = new OngoingGameSettings()
     this._logger = _loggerFactory.create(OngoingGameMain.id)
@@ -117,7 +117,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this._appCommon,
       this._sgpMain,
       this.settings,
-      this._remoteConfig
+      this._akariApi
     )
 
     this._context = {
@@ -132,7 +132,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       leagueClient: this._leagueClient,
       sgp: this._sgpMain,
       savedPlayer: this._savedPlayer,
-      remoteConfig: this._remoteConfig
+      akariApi: this._akariApi
     }
 
     this._matchHistory = new OngoingGameMatchHistoryLoader(this._context)

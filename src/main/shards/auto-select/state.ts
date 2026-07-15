@@ -2,8 +2,8 @@ import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
+import type { AkariApiState } from '../akari-api/state'
 import { LeagueClientData } from '../league-client/lc-state'
-import { RemoteConfigState } from '../remote-config/state'
 import {
   getActiveAction,
   getActiveGroupConfig,
@@ -153,7 +153,7 @@ export class AutoSelectSettings {
 
 export class AutoSelectState {
   get groups() {
-    return this._remoteConfigState.autoSelectGroups.groups
+    return this._akariApiState.autoSelectGroups.groups
   }
 
   temporarilyDisabled = false
@@ -537,7 +537,7 @@ export class AutoSelectState {
   constructor(
     private readonly _leagueClientData: LeagueClientData,
     private readonly _settings: AutoSelectSettings,
-    private readonly _remoteConfigState: RemoteConfigState
+    private readonly _akariApiState: AkariApiState
   ) {
     makeAutoObservable(this, {
       // activeGroupConfig: computed.struct, // no need to set it structurally equals

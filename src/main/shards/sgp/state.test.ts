@@ -1,8 +1,8 @@
 import { observable } from 'mobx'
 import { describe, expect, it } from 'vitest'
 
+import type { AkariApiMain } from '../akari-api'
 import type { LeagueClientMain } from '../league-client'
-import type { RemoteConfigMain } from '../remote-config'
 import { SgpState } from './state'
 
 function createState() {
@@ -25,17 +25,17 @@ function createState() {
       }
     }
   }) as unknown as LeagueClientMain
-  const remoteConfig = {
+  const akariApi = {
     state: {
       supportedQueues: {
         queues: [420]
       }
     }
-  } as RemoteConfigMain
+  } as AkariApiMain
 
   return {
     leagueClient,
-    state: new SgpState(leagueClient, remoteConfig)
+    state: new SgpState(leagueClient, akariApi)
   }
 }
 

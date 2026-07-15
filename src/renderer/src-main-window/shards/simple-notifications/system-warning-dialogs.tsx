@@ -1,10 +1,10 @@
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useStorageStore } from '@renderer-shared/shards/storage/store'
 import { useTranslation } from 'i18next-vue'
@@ -121,7 +121,7 @@ export function watchCannotGetUxCommandLine() {
 
 export function watchHigherVersionDbWarning() {
   const storage = useStorageStore()
-  const remoteConfigStore = useRemoteConfigStore()
+  const akariApiStore = useAkariApiStore()
   const dialog = useDialog()
   const simpleNotificationsStore = useSimpleNotificationsStore()
   const { t } = useTranslation(undefined, {
@@ -129,7 +129,7 @@ export function watchHigherVersionDbWarning() {
   })
 
   const hasNewRelease = computed(
-    () => !!remoteConfigStore.latestRelease && remoteConfigStore.latestRelease.isNew === true
+    () => !!akariApiStore.latestRelease && akariApiStore.latestRelease.isNew === true
   )
 
   let inst: ReturnType<typeof dialog.warning> | null = null

@@ -31,7 +31,7 @@ export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererCo
               type="primary"
               size="tiny"
               onClick={() => {
-                showAnnouncementModal()
+                showNoticeModal()
                 no.destroy()
               }}
             >
@@ -44,7 +44,7 @@ export function watchUpdateDownloadFailed(context: SimpleNotificationsRendererCo
   })
 }
 
-function showAnnouncementModal() {
+function showNoticeModal() {
   const simpleNotificationsStore = useSimpleNotificationsStore()
-  simpleNotificationsStore.showAnnouncementModal = true
+  simpleNotificationsStore.showNoticeModal = true
 }

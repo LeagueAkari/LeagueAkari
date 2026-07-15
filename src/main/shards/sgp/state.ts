@@ -1,12 +1,12 @@
 import { getSgpServerId } from '@shared/utils/sgp'
 import { makeAutoObservable } from 'mobx'
 
+import type { AkariApiMain } from '../akari-api'
 import type { LeagueClientMain } from '../league-client'
-import { RemoteConfigMain } from '../remote-config'
 
 export class SgpState {
   get leagueServers() {
-    return this._remoteConfig.state.leagueServers
+    return this._akariApi.state.leagueServers
   }
 
   get availability() {
@@ -47,7 +47,7 @@ export class SgpState {
   isLeagueSessionTokenSet = false
 
   get supportedQueues() {
-    const configuredQueues = this._remoteConfig.state.supportedQueues.queues
+    const configuredQueues = this._akariApi.state.supportedQueues.queues
     const currentQueueId = [
       this._leagueClient.data.lobby.lobby?.gameConfig.queueId,
       this._leagueClient.data.gameflow.session?.gameData.queue.id
@@ -89,7 +89,7 @@ export class SgpState {
 
   constructor(
     private _leagueClient: LeagueClientMain,
-    private _remoteConfig: RemoteConfigMain
+    private _akariApi: AkariApiMain
   ) {
     makeAutoObservable(this)
   }

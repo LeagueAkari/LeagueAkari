@@ -104,7 +104,6 @@ function createContext(phase: string, options: TestContextOptions = {}) {
     },
     shared: {},
     appCommon: {},
-    remoteConfig: {},
     isGameClientForeground: vi.fn(() => Promise.resolve(options.foreground ?? true))
   } as unknown as InGameSendMainContext
 

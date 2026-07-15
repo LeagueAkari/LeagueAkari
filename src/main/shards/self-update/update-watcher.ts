@@ -23,7 +23,7 @@ export class SelfUpdateWatcher {
         [
           this._context.settings.autoDownloadUpdates,
           this._context.settings.ignoreVersion,
-          this._context.remoteConfig.state.latestRelease
+          this._context.akariApi.state.latestRelease
         ] as const,
       ([yes, ignoreVersion, release]) => {
         if (yes && release && release.isNew && release.version !== ignoreVersion) {

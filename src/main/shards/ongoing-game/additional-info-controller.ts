@@ -136,7 +136,7 @@ export class OngoingGameAdditionalInfoController {
   }
 
   update() {
-    const { leagueClient, queueKeeper, remoteConfig, state } = this._context
+    const { akariApi, leagueClient, queueKeeper, state } = this._context
 
     if (
       state.draft ||
@@ -155,7 +155,7 @@ export class OngoingGameAdditionalInfoController {
 
     const tasks: (() => Promise<AdditionalInfoQueryResult | null>)[] = []
 
-    if (remoteConfig.state.ongoingGameConfig.spotlight.gsmByPuuid) {
+    if (akariApi.state.ongoingGameConfig.spotlight.gsmByPuuid) {
       tasks.push(() => this._getGsmGameMembers(puuid))
     }
 

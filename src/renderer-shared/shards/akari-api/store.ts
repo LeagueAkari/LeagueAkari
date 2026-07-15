@@ -1,14 +1,24 @@
-import {
-  type AkariServiceBaseUrls,
-  DEFAULT_AKARI_SERVICE_BASE_URLS
-} from '@shared/shards/akari-api'
+import type { AkariNotice } from '@shared/shards/akari-api'
+import type { LatestReleaseInfo } from '@shared/types/akari'
 import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
+import { ref, shallowReactive, shallowRef } from 'vue'
 
 export const useAkariApiStore = defineStore('shard:akari-api-renderer', () => {
-  const baseUrls = shallowRef<AkariServiceBaseUrls>({ ...DEFAULT_AKARI_SERVICE_BASE_URLS })
+  const notice = ref<AkariNotice | null>(null)
+  const latestRelease = shallowRef<LatestReleaseInfo | null>(null)
+
+  const isUpdatingNotice = ref(false)
+  const isUpdatingLatestRelease = ref(false)
+
+  const settings = shallowReactive({
+    updateLatestRelease: true
+  })
 
   return {
-    baseUrls
+    notice,
+    latestRelease,
+    isUpdatingNotice,
+    isUpdatingLatestRelease,
+    settings
   }
 })

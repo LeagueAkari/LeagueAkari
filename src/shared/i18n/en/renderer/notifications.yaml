@@ -78,8 +78,8 @@ notifications:
       negativeText: Dismiss
     updateDownloadFailed:
       title: Update Download Failed
-      content: 'Failed to download update: {{error}}. Please check your network connection, or check the announcement for more information to get possible solutions.'
-      positiveText: Check Announcement
+      content: 'Failed to download update: {{error}}. Please check your network connection, or check the notice for more information to get possible solutions.'
+      positiveText: Check Notice
       negativeText: Dismiss
 selfUpdate:
   tasks:

@@ -45,7 +45,6 @@ function createRelease(): LatestReleaseInfo {
     version: '2.0.0',
     currentVersion: '1.0.0',
     isNew: true,
-    source: 'github',
     publishedAt: '2026-01-01T00:00:00.000Z',
     description: '',
     archiveFile: {
@@ -80,7 +79,7 @@ function createContext(httpClient: SelfUpdateMainContext['httpClient']): SelfUpd
     mobxUtils: {
       reaction: vi.fn()
     } as unknown as SelfUpdateMainContext['mobxUtils'],
-    remoteConfig: {} as SelfUpdateMainContext['remoteConfig'],
+    akariApi: {} as SelfUpdateMainContext['akariApi'],
     httpClient
   }
 }

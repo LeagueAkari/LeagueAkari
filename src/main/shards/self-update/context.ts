@@ -1,10 +1,10 @@
 import type { AxiosInstance } from 'axios'
 
+import type { AkariApiMain } from '../akari-api'
 import type { AppCommonMain } from '../app-common'
 import type { AkariIpcMain } from '../ipc'
 import type { AkariLogger } from '../logger-factory'
 import type { MobxUtilsMain } from '../mobx-utils'
-import type { RemoteConfigMain } from '../remote-config'
 import type { SelfUpdateSettings, SelfUpdateState } from './state'
 
 export const SELF_UPDATE_MAIN_NAMESPACE = 'self-update-main'
@@ -24,11 +24,9 @@ export interface SelfUpdateMainContext {
   appCommon: AppCommonMain
   ipc: AkariIpcMain
   mobxUtils: MobxUtilsMain
-  remoteConfig: RemoteConfigMain
+  akariApi: AkariApiMain
   httpClient: AxiosInstance
 }
 
 export type SelfUpdateActionResult =
-  | { result: 'ok' }
-  | { result: 'no-op' }
-  | { result: 'failed'; reason: string }
+  { result: 'ok' } | { result: 'no-op' } | { result: 'failed'; reason: string }

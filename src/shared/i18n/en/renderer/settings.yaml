@@ -32,20 +32,6 @@ settings:
             feature1: High stability, unaffected by network conditions
             feature2: Reliable even when using VPN/accelerator
             warning: 'Known issue: Querying match history during champion select may cause the game client to crash'
-      dataSource:
-        label: Git Repository Source
-        description: Set the Git repository source of the application, get or update data from GitHub / Gitee
-        options:
-          gitee: Gitee
-          github: GitHub
-        howToChoose: How to choose?
-        testingSpeed: Testing speed...
-        timeout: Timeout
-        testButton: Re-test
-        tip:
-          gitee: Better response speed in mainland China
-          github: Better response speed outside mainland China
-        better: Faster
       theme:
         label: Theme Color
         description: Theme color for $t(common:appName)
@@ -74,7 +60,6 @@ settings:
       autoDownloadUpdates:
         label: Auto Download Updates
         description: Automatically start the update process when a new release is detected
-      checkFrom: Check updates from data source ({{source}})
       checkUpdates: Check Updates
       currentRelease: Current Release
       downloadRelease: Download Release

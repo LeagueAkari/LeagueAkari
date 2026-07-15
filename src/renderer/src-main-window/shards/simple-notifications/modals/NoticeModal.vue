@@ -7,7 +7,7 @@
     :class="$style['ann-modal']"
   >
     <template #header>
-      <span class="card-header-title">{{ t('announcements.modal.title') }}</span>
+      <span class="card-header-title">{{ t('notices.modal.title') }}</span>
     </template>
     <div>
       <NScrollbar
@@ -17,12 +17,12 @@
       >
         <div class="markdown-container markdown-body" v-html="markdownHtmlText"></div>
       </NScrollbar>
-      <div style="display: flex; justify-content: flex-end" v-if="announcement">
+      <div style="display: flex; justify-content: flex-end" v-if="notice">
         <NButton type="primary" v-if="hasRead" @click="show = false" size="small">{{
-          t('announcements.modal.close')
+          t('notices.modal.close')
         }}</NButton>
-        <NButton type="primary" v-else @click="emits('read', announcement.uniqueId)" size="small">{{
-          t('announcements.modal.read')
+        <NButton type="primary" v-else @click="emits('read', notice.revision)" size="small">{{
+          t('notices.modal.read')
         }}</NButton>
       </div>
     </div>
@@ -31,13 +31,13 @@
 
 <script setup lang="ts">
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { Announcement } from '@shared/shards/remote-config'
+import type { AkariNotice } from '@shared/shards/akari-api'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  announcement: Announcement | null
+  notice: AkariNotice | null
   hasRead: boolean
 }>()
 
@@ -48,7 +48,7 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(props.announcement?.content || t('announcements.modal.noAnnouncementMd'))
+  return markdownIt.render(props.notice?.content || t('notices.modal.noNoticeMd'))
 })
 
 const show = defineModel<boolean>('show', { default: false })
@@ -73,7 +73,7 @@ const show = defineModel<boolean>('show', { default: false })
   margin-bottom: 12px;
 }
 
-.no-announcement {
+.no-notice {
   margin-top: 12px;
 }
 </style>

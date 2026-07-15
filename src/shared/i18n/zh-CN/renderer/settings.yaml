@@ -32,20 +32,6 @@ settings:
             feature1: 稳定性高，不受网络环境影响
             feature2: 使用加速器时依然可靠
             warning: 已知问题：在英雄选择阶段查询战绩可能导致游戏客户端崩溃
-      dataSource:
-        label: Git 仓库源
-        description: 设置应用的 Git 仓库源，通过 GitHub / Gitee 获取或更新数据
-        options:
-          gitee: Gitee
-          github: GitHub
-        howToChoose: 如何选择？
-        testingSpeed: 测速中...
-        timeout: 超时
-        testButton: 重新测速
-        tip:
-          gitee: 在中国大陆内拥有较好的响应速度
-          github: 在中国大陆外拥有较好的响应速度
-        better: 更快
       theme:
         label: 主题颜色
         description: $t(common:appName) 的主题颜色
@@ -74,7 +60,6 @@ settings:
       autoDownloadUpdates:
         label: 自动下载更新
         description: 检测到有新版本可用时，自动开始更新流程
-      checkFrom: 从数据源中 ({{ source }}) 检查更新
       checkUpdates: 检查更新
       currentRelease: 当前版本内容
       downloadRelease: 下载更新包

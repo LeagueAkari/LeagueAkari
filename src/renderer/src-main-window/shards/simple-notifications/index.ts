@@ -3,12 +3,10 @@ import { ClientInstallationRenderer } from '@renderer-shared/shards/client-insta
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
-import { RemoteConfigRenderer } from '@renderer-shared/shards/remote-config'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
-import { registerAnnouncementModal } from './announcement-modal'
 import { watchAutoReconnectNotification } from './connection-notifications'
 import {
   LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
@@ -22,6 +20,7 @@ import { createElevatedStartupNotificationSetup } from './elevated-startup-notif
 import { registerFunnyPricingModal } from './funny-pricing-modal'
 import { watchSpecialKeyboardCombo } from './keyboard-combo-controller'
 import { registerNewReleaseModal } from './new-release-modal'
+import { registerNoticeModal } from './notice-modal'
 import { watchQueueingProgress } from './queueing-progress-task'
 import { useSimpleNotificationsStore } from './store'
 import { setupStreamerModeNotifications } from './streamer-mode-notifications'
@@ -54,7 +53,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     @Dep(LeagueClientRenderer) leagueClient: LeagueClientRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly setupInAppScope: SetupInAppScopeRenderer,
     @Dep(LeagueClientUxRenderer) readonly leagueClientUx: LeagueClientUxRenderer,
-    @Dep(RemoteConfigRenderer) readonly remoteConfig: RemoteConfigRenderer,
     @Dep(AkariIpcRenderer) readonly ipc: AkariIpcRenderer
   ) {
     this.context = {
@@ -64,7 +62,6 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
       leagueClient,
       setupInAppScope,
       leagueClientUx,
-      remoteConfig,
       ipc
     }
   }
@@ -75,11 +72,11 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     await this.settingUtils.savedPropVue(
       SimpleNotificationsRenderer.id,
       simpleNotificationsStore,
-      'lastAnnouncementUniqueId'
+      'lastNoticeRevision'
     )
 
     registerDeclarationModal(this.context)
-    registerAnnouncementModal(this.context)
+    registerNoticeModal(this.context)
     registerNewReleaseModal(this.context)
     registerFunnyPricingModal(this.context)
 
@@ -96,9 +93,9 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     this.setupInAppScope.addSetupFn(() => watchUpdateDownloadFailed(this.context))
   }
 
-  showAnnouncementModal() {
+  showNoticeModal() {
     const simpleNotificationsStore = useSimpleNotificationsStore()
-    simpleNotificationsStore.showAnnouncementModal = true
+    simpleNotificationsStore.showNoticeModal = true
   }
 
   showNewReleaseModal() {

@@ -9,7 +9,6 @@ import { useAppCommonStore } from '../app-common/store'
 import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { RemoteConfigRenderer } from '../remote-config'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { WindowManagerRenderer } from '../window-manager'
@@ -25,8 +24,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
-    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
-    @Dep(RemoteConfigRenderer) readonly _remoteConfig: RemoteConfigRenderer
+    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
   ) {
     // @ts-ignore
     window.selfUpdateShard = this

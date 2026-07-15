@@ -3,12 +3,12 @@ import { SgpHttpApiAxiosHelper } from '@shared/http-api-axios-helper/sgp'
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
 
+import { AkariApiMain } from '../akari-api'
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { RemoteConfigMain } from '../remote-config'
 import { SGP_MAIN_NAMESPACE, type SgpMainContext } from './context'
 import { SgpHttpClientController } from './http-client-controller'
 import { SgpProtocolController } from './protocol-controller'
@@ -45,12 +45,12 @@ export class SgpMain implements IAkariShardInitDispose {
     private readonly _protocol: AkariProtocolMain,
     private readonly _mobxUtils: MobxUtilsMain,
     private readonly _leagueClient: LeagueClientMain,
-    private readonly _remoteConfig: RemoteConfigMain
+    private readonly _akariApi: AkariApiMain
   ) {
     this._logger = _loggerFactory.create(SgpMain.id)
     axiosRetry(this._httpClient, { retries: 2 })
 
-    this.state = new SgpState(this._leagueClient, this._remoteConfig)
+    this.state = new SgpState(this._leagueClient, this._akariApi)
     this._sgpApi = new SgpHttpApiAxiosHelper(this._httpClient)
     this._context = {
       namespace: SgpMain.id,
@@ -60,7 +60,6 @@ export class SgpMain implements IAkariShardInitDispose {
       logger: this._logger,
       mobxUtils: this._mobxUtils,
       protocol: this._protocol,
-      remoteConfig: this._remoteConfig,
       state: this.state
     }
     this._httpClientController = new SgpHttpClientController(this._context)

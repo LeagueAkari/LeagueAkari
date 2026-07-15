@@ -4,7 +4,7 @@
       <NButton type="primary" @click="handleForceUpdate" :loading="isUpdating">
         强制触发自动更新
       </NButton>
-      <NButton @click="handleCheckUpdates" :loading="isChecking || rcs.isUpdatingLatestRelease">
+      <NButton @click="handleCheckUpdates" :loading="isChecking || aks.isUpdatingLatestRelease">
         刷新 Latest Release
       </NButton>
       <span class="text-sm text-black/60 dark:text-white/60">
@@ -37,8 +37,8 @@
 import { javascript } from '@codemirror/lang-javascript'
 import { EditorView } from '@codemirror/view'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useRemoteConfigStore } from '@renderer-shared/shards/remote-config/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode'
 import { NButton, NCheckbox } from 'naive-ui'
@@ -46,7 +46,7 @@ import { computed, ref } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 const as = useAppCommonStore()
-const rcs = useRemoteConfigStore()
+const aks = useAkariApiStore()
 const su = useInstance(SelfUpdateRenderer)
 
 const isUpdating = ref(false)
@@ -66,18 +66,18 @@ const extensions = computed(() => {
 })
 
 const latestReleaseJson = computed(() => {
-  if (!rcs.latestRelease) {
+  if (!aks.latestRelease) {
     return '// 暂无 Latest Release 数据'
   }
-  return JSON.stringify(rcs.latestRelease, null, 2)
+  return JSON.stringify(aks.latestRelease, null, 2)
 })
 
 const latestReleaseStatus = computed(() => {
-  if (!rcs.latestRelease) {
+  if (!aks.latestRelease) {
     return '未获取到版本信息'
   }
-  const r = rcs.latestRelease
-  return `版本: ${r.version} | 当前: ${r.currentVersion} | 来源: ${r.source} | 新版本: ${r.isNew ? '是' : '否'}`
+  const r = aks.latestRelease
+  return `版本: ${r.version} | 当前: ${r.currentVersion} | 新版本: ${r.isNew ? '是' : '否'}`
 })
 
 const handleForceUpdate = async () => {

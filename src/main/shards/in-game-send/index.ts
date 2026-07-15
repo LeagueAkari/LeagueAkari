@@ -9,7 +9,6 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { OngoingGameMain } from '../ongoing-game'
-import { RemoteConfigMain } from '../remote-config'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import {
@@ -59,8 +58,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     private readonly _ongoingGame: OngoingGameMain,
     private readonly _leagueClient: LeagueClientMain,
     private readonly _shared: SharedGlobalShard,
-    private readonly _appCommon: AppCommonMain,
-    private readonly _remoteConfig: RemoteConfigMain
+    private readonly _appCommon: AppCommonMain
   ) {
     this._logger = loggerFactory.create(InGameSendMain.id)
     this._settingService = settingFactory.register(
@@ -101,7 +99,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
       leagueClient: this._leagueClient,
       shared: this._shared,
       appCommon: this._appCommon,
-      remoteConfig: this._remoteConfig,
 
       isGameClientForeground: () => {
         return GameClientMain.isGameClientForeground()

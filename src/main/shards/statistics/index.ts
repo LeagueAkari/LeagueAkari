@@ -1,8 +1,6 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
-import axios from 'axios'
-import { app } from 'electron'
 
+import { AkariApiMain } from '../akari-api'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
@@ -16,26 +14,21 @@ import { VersionUsageRecorder } from './version-usage-recorder'
 export class StatisticsMain implements IAkariShardInitDispose {
   static readonly id = STATISTICS_MAIN_NAMESPACE
 
-  private _akariApi = new AkariApiHttpApiAxiosHelper(
-    axios.create({
-      headers: {
-        'User-Agent': `LeagueAkari/${app.getVersion()}`,
-        'x-akari-version': app.getVersion()
-      }
-    })
-  )
-
   private _logger: AkariLogger
   private _settingService: SetterSettingService
   private readonly _context: StatisticsMainContext
   private readonly _versionUsageRecorder: VersionUsageRecorder
 
-  constructor(_loggerFactory: LoggerFactoryMain, _settingFactory: SettingFactoryMain) {
+  constructor(
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain,
+    _akariApi: AkariApiMain
+  ) {
     this._logger = _loggerFactory.create(StatisticsMain.id)
     this._settingService = _settingFactory.register(StatisticsMain.id, {})
     this._context = {
       namespace: StatisticsMain.id,
-      akariApi: this._akariApi,
+      akariApi: _akariApi.api,
       logger: this._logger,
       settingService: this._settingService
     }

@@ -44,25 +44,25 @@ describe('Akari API HTTP helper', () => {
     })
   })
 
-  it.each(['v1.5.0', 'latest', '1.5', '01.5.0', 'not-a-version'])(
-    'rejects a non-canonical release version: %s',
-    (version) => {
-      const { http } = createHttpMock()
-      const api = new AkariApiHttpApiAxiosHelper(http)
-
-      expect(() => api.getRelease(version)).toThrow(
-        'Akari release version must be a canonical semantic version without v'
-      )
-    }
-  )
-
-  it('rejects languages and config resources outside the public API contract', () => {
-    const { http } = createHttpMock()
+  it('maps release, last-resort, and statistics methods to the Akari API', () => {
+    const { get, http, post } = createHttpMock()
     const api = new AkariApiHttpApiAxiosHelper(http)
 
-    expect(() => api.getLatestNotice('ja' as never)).toThrow('Unsupported Akari API language')
-    expect(() => api.getConfig('templates/catalog' as never)).toThrow(
-      'Unsupported Akari API config resource'
+    api.getRelease('1.5.0', 'en')
+    api.getLastResortLatestRelease()
+    api.postStatisticsRecord('1.5.0')
+
+    expect(get).toHaveBeenNthCalledWith(1, '/releases/v1/1.5.0', {
+      params: { lang: 'en' },
+      signal: undefined
+    })
+    expect(get).toHaveBeenNthCalledWith(2, '/last-resort/v1/latest-release', {
+      signal: undefined
+    })
+    expect(post).toHaveBeenCalledWith(
+      '/statistics/v1/records',
+      { version: '1.5.0' },
+      { signal: undefined }
     )
   })
 })

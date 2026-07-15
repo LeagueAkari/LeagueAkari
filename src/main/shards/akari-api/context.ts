@@ -1,21 +1,20 @@
 import type { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
 
-import type { AkariIpcMain } from '../ipc'
+import type { AppCommonMain } from '../app-common'
 import type { AkariLogger } from '../logger-factory'
+import type { MobxUtilsMain } from '../mobx-utils'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
-import type { AkariApiState } from './state'
+import type { AkariApiSettings, AkariApiState } from './state'
 
-export const AKARI_API_MAIN_NAMESPACE = 'akari-api-main'
-export const AKARI_API_REQUEST_TIMEOUT = 10_000
-export const AKARI_API_BOOTSTRAP_CACHE_PATH = 'bootstrap.json'
-export const AKARI_API_BOOTSTRAP_NPM_LATEST_URL =
-  'https://registry.npmjs.org/@leagueakari%2fbootstrap/latest'
+export const AKARI_API_CACHED_RESOURCE_UPDATE_INTERVAL = 2 * 60 * 60 * 1000
+export const AKARI_API_VOLATILE_RESOURCE_UPDATE_INTERVAL = 4 * 60 * 60 * 1000
 
 export interface AkariApiMainContext {
-  namespace: string
   state: AkariApiState
-  ipc: AkariIpcMain
+  settings: AkariApiSettings
   logger: AkariLogger
   settingService: SetterSettingService
+  mobxUtils: MobxUtilsMain
+  appCommon: AppCommonMain
   api: AkariApiHttpApiAxiosHelper
 }

@@ -1,93 +1,47 @@
-import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import {
-  type AkariApiConfigResource,
-  type AkariApiConfigResourceMap,
-  type AkariApiLanguage,
-  type AkariLastResortRelease,
-  type AkariNotice,
-  type AkariRelease,
-  DEFAULT_AKARI_API_LANGUAGE,
-  resolveAkariStaticUrl
-} from '@shared/shards/akari-api'
+import { Dep, Shard } from '@shared/akari-shard'
+import { AkariApiHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/api'
+import { AkariStaticHttpApiAxiosHelper } from '@shared/http-api-axios-helper/akari/static'
+import axios from 'axios'
 
-import { AkariIpcRenderer } from '../ipc'
+import { AkariProtocolRenderer } from '../akari-protocol'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import {
-  AKARI_API_MAIN_NAMESPACE,
-  AKARI_API_RENDERER_NAMESPACE,
-  type AkariApiRendererContext
-} from './context'
-import { syncAkariApiState } from './state-sync'
+import { SettingUtilsRenderer } from '../setting-utils'
 import { useAkariApiStore } from './store'
 
-export { useAkariApiStore } from './store'
-
 @Shard(AkariApiRenderer.id)
-export class AkariApiRenderer implements IAkariShardInitDispose {
-  static readonly id = AKARI_API_RENDERER_NAMESPACE
+export class AkariApiRenderer {
+  static readonly id = 'akari-api-renderer'
+  static readonly mainId = 'akari-api-main'
 
-  private readonly _context: AkariApiRendererContext
+  public readonly httpClient = axios.create({
+    adapter: 'fetch',
+    baseURL: 'akari://akari-api',
+    paramsSerializer: { indexes: null }
+  })
+  public readonly staticHttpClient = axios.create({
+    adapter: 'fetch',
+    baseURL: 'akari://akari-static'
+  })
+  public readonly api = new AkariApiHttpApiAxiosHelper(this.httpClient)
+  public readonly staticAssets = new AkariStaticHttpApiAxiosHelper(this.staticHttpClient)
 
   constructor(
-    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer
+    @Dep(AkariProtocolRenderer) akariProtocol: AkariProtocolRenderer,
+    @Dep(PiniaMobxUtilsRenderer)
+    private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
   ) {
-    this._context = { ipc, piniaMobxUtils }
+    akariProtocol.installProxyRequestCancellation(this.httpClient)
+    akariProtocol.installProxyRequestCancellation(this.staticHttpClient)
   }
 
   async onInit() {
-    await syncAkariApiState(this._context)
+    const store = useAkariApiStore()
+    await this._piniaMobxUtils.sync(AkariApiRenderer.mainId, 'state', store)
+    await this._piniaMobxUtils.sync(AkariApiRenderer.mainId, 'settings', store.settings)
   }
 
-  getLatestNotice(language: AkariApiLanguage = DEFAULT_AKARI_API_LANGUAGE) {
-    return this._context.ipc.call<AkariNotice>(
-      AKARI_API_MAIN_NAMESPACE,
-      'getLatestNotice',
-      language
-    )
-  }
-
-  getConfig<Resource extends AkariApiConfigResource>(resource: Resource) {
-    return this._context.ipc.call<AkariApiConfigResourceMap[Resource]>(
-      AKARI_API_MAIN_NAMESPACE,
-      'getConfig',
-      resource
-    )
-  }
-
-  getLatestRelease(language: AkariApiLanguage = DEFAULT_AKARI_API_LANGUAGE) {
-    return this._context.ipc.call<AkariRelease>(
-      AKARI_API_MAIN_NAMESPACE,
-      'getLatestRelease',
-      language
-    )
-  }
-
-  getRelease(version: string, language: AkariApiLanguage = DEFAULT_AKARI_API_LANGUAGE) {
-    return this._context.ipc.call<AkariRelease>(
-      AKARI_API_MAIN_NAMESPACE,
-      'getRelease',
-      version,
-      language
-    )
-  }
-
-  getLastResortLatestRelease() {
-    return this._context.ipc.call<AkariLastResortRelease>(
-      AKARI_API_MAIN_NAMESPACE,
-      'getLastResortLatestRelease'
-    )
-  }
-
-  postStatisticsRecord(version: string) {
-    return this._context.ipc.call<boolean>(
-      AKARI_API_MAIN_NAMESPACE,
-      'postStatisticsRecord',
-      version
-    )
-  }
-
-  resolveStaticUrl(path: string) {
-    return resolveAkariStaticUrl(useAkariApiStore().baseUrls.static, path)
+  setUpdateLatestRelease(value: boolean) {
+    return this._settingUtils.set(AkariApiRenderer.mainId, 'updateLatestRelease', value)
   }
 }
