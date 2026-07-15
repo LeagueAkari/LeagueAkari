@@ -1,4 +1,5 @@
 import { createManager } from '@renderer-shared/shards'
+import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
 import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
@@ -15,6 +16,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 const manager = createManager()
 
 manager.use(AkariIpcRenderer)
+manager.use(AkariApiRenderer)
 manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
 manager.use(AutoGameflowRenderer)

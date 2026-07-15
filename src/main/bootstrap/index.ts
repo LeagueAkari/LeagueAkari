@@ -2,6 +2,7 @@ import { is, optimizer } from '@electron-toolkit/utils'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { isElevated } from '@main/native'
+import { AkariApiMain } from '@main/shards/akari-api'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
@@ -295,6 +296,7 @@ export function bootstrap() {
     }
 
     // basic fundamental shards
+    manager.use(AkariApiMain)
     manager.use(AkariIpcMain)
     manager.use(AppCommonMain)
     manager.use(LoggerFactoryMain)

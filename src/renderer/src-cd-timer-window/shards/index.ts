@@ -1,4 +1,5 @@
 import { createManager } from '@renderer-shared/shards'
+import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
 import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
@@ -19,6 +20,7 @@ const manager = createManager()
 
 manager.use(AdditionalInfoShard)
 manager.use(AkariIpcRenderer)
+manager.use(AkariApiRenderer)
 manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
 manager.use(LeagueClientRenderer, {
