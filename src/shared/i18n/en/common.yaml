@@ -147,7 +147,7 @@ sgpServers:
   OC1: Oceania
   TR1: Turkey
   RU: Russia
-  JP1: Japan
+  JP: Japan
 
 champions:
   bravery: Bravery

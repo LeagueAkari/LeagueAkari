@@ -15,7 +15,7 @@ export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
 }
 
 export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
-  updatedAt: '2026-05-23T10:16:06.998Z',
+  updatedAt: '2026-07-16T14:41:08.112Z',
   servers: {
     TENCENT_HN1: {
       matchHistory: 'https://hn1-k8s-sgp.lol.qq.com:21019',
@@ -84,7 +84,8 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
     },
     JP: {
       matchHistory: 'https://apne1-red.pp.sgp.pvp.net',
-      common: 'https://jp-red.lol.sgp.pvp.net'
+      common: 'https://jp-red.lol.sgp.pvp.net',
+      regionPathParam: 'JP1'
     },
     RU: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
