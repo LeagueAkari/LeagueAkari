@@ -404,7 +404,7 @@ toolkit:
             description: Show average damage-to-gold efficiency
           mainChampions:
             label: Main Champions
-            description: Show up to three clearly preferred champions from recent match stats; hidden when filtering by current champion
+            description: Show up to three clearly preferred champions from recent match stats; show “No clear main champions” when none qualify; hidden when filtering by current champion
           mainPositions:
             label: Main Positions
             description: Show up to two main positions when recent match stats include clear position data
@@ -435,7 +435,7 @@ toolkit:
             description: Show average voidgrubs, heralds, and barons
           mainChampions:
             label: Main Champions
-            description: Show up to three champions with clearly more jungle-detail samples, only when current champion filtering is off
+            description: Show up to three champions with clearly more jungle-detail samples; show “No clear main champions” when none qualify; only applies when current champion filtering is off
         configOptionsTitle: Configuration
         configOptions:
           showCurrentChampion:

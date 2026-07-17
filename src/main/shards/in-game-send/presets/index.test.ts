@@ -456,6 +456,34 @@ describe('in-game-send presets', () => {
     ])
   })
 
+  it('reports when recent matches have no clear main champions', () => {
+    const mainContext = createMainContext()
+    const playerAnalysis = mainContext.ongoingGame.state.analysis.players.p1
+
+    playerAnalysis.count = 4
+    playerAnalysis.champions[103].winLoss.all.count = 1
+    playerAnalysis.champions[64].winLoss.all.count = 1
+    playerAnalysis.champions[111].winLoss.all.count = 1
+    playerAnalysis.champions[222].winLoss.all.count = 1
+
+    const lines = buildRatingPresetLines(
+      {
+        target: 'friendly',
+        mainContext
+      },
+      {
+        ...createRatingOptions(),
+        selectedPuuids: ['p1'],
+        winRate: false,
+        kda: false,
+        avgSoloKills: false,
+        mainPositions: false
+      }
+    )
+
+    expect(lines).toEqual(['无极剑圣：4场对局，无明显主玩英雄'])
+  })
+
   it('builds rating lines in English when main language is English', async () => {
     await i18next.changeLanguage('en')
     const mainContext = createMainContext()
@@ -628,6 +656,32 @@ describe('in-game-send presets', () => {
     expect(lines).toEqual([
       '无极剑圣：打野样本20场 前期偏中下，上28%中41%下31% 3级抓24% 4级抓43% 一龙率58%，首龙均时6:30 场均小龙1.7 野怪资源巢虫2.1/先锋0.4/大龙0.2 主玩英雄[无极剑圣，盲僧，深海泰坦]'
     ])
+  })
+
+  it('reports when jungle samples have no clear main champions', () => {
+    const context = createJungleContext()
+    const playerAnalysis = context.mainContext.ongoingGame.state.analysis?.players.p1
+
+    if (!playerAnalysis) {
+      throw new Error('Expected player analysis')
+    }
+
+    for (const champion of Object.values(playerAnalysis.champions)) {
+      if (champion.jungle) {
+        champion.jungle.gamesAnalyzed = 1
+      }
+    }
+
+    const lines = buildJunglePresetLines(context, {
+      ...createJungleOptions(),
+      showCurrentChampion: false,
+      activityPreference: false,
+      earlyGank: false,
+      dragonControl: false,
+      monsterControl: false
+    })
+
+    expect(lines).toEqual(['无极剑圣：打野样本20场 无明显主玩英雄'])
   })
 
   it('builds premade lines from selected premade groups', () => {

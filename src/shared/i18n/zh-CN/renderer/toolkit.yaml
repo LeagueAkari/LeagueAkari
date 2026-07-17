@@ -404,7 +404,7 @@ toolkit:
             description: 展示平均伤害经济转化比例
           mainChampions:
             label: 主玩英雄
-            description: 当统计战绩中存在明显主玩英雄时展示最多三个英雄，开启按当前英雄筛选后不展示此项
+            description: 展示最多三个明显主玩英雄；未识别到时显示“无明显主玩英雄”，开启按当前英雄筛选后不展示此项
           mainPositions:
             label: 主玩位置
             description: 当近期战绩中存在明确位置信息和主玩位置时展示最多两个位置
@@ -435,7 +435,7 @@ toolkit:
             description: 展示场均巢虫、先锋和大龙数量
           mainChampions:
             label: 主玩英雄
-            description: 展示打野样本中明显更多的最多三个英雄，仅未按当前英雄筛选时生效
+            description: 展示打野样本中明显更多的最多三个英雄；未识别到时显示“无明显主玩英雄”，仅未按当前英雄筛选时生效
         configOptionsTitle: 配置
         configOptions:
           showCurrentChampion:

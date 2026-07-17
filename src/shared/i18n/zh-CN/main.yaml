@@ -111,6 +111,7 @@ in-game-send-main:
       currentChampion: 当前英雄
       thisChampion: 本英雄
       noChampionSelected: 尚未选择英雄
+      noMainChampions: 无明显主玩英雄
       championWithPlayer: '{{champion}}（{{player}}）'
       target:
         friendly: 我方

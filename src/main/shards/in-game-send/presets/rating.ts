@@ -341,13 +341,13 @@ function buildRatingStats(
   if (options.mainChampions && !statsSource.isChampionStats) {
     const names = mainChampionNames(context, player)
 
-    if (names.length) {
-      parts.push(
-        presetT('rating.metrics.mainChampions', {
-          champions: joinPresetList(names)
-        })
-      )
-    }
+    parts.push(
+      names.length
+        ? presetT('rating.metrics.mainChampions', {
+            champions: joinPresetList(names)
+          })
+        : presetCommonT('noMainChampions')
+    )
   }
 
   if (options.mainPositions) {

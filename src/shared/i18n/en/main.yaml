@@ -111,6 +111,7 @@ in-game-send-main:
       currentChampion: Current Champion
       thisChampion: this champion
       noChampionSelected: No champion selected
+      noMainChampions: No clear main champions
       championWithPlayer: '{{champion}} ({{player}})'
       target:
         friendly: Allied

@@ -379,11 +379,13 @@ function buildGlobalJungleStats(
     )
   }
 
-  if (options.mainChampions && mainChampions.length) {
+  if (options.mainChampions) {
     parts.push(
-      presetT('jungle.metrics.mainChampions', {
-        champions: joinPresetList(mainChampions)
-      })
+      mainChampions.length
+        ? presetT('jungle.metrics.mainChampions', {
+            champions: joinPresetList(mainChampions)
+          })
+        : presetCommonT('noMainChampions')
     )
   }
 
