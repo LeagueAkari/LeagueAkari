@@ -83,7 +83,7 @@
 <script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
-import { useInteroperableSgpServers } from '@renderer-shared/composables/useInteroperableSgpServers'
+import { useSgpServerQuery } from '@renderer-shared/composables/useSgpServerQuery'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -95,7 +95,7 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { toLcuSummoner } from '@shared/data-adapter/summoner'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { getSgpServerId, isTencentServer } from '@shared/utils/sgp'
+import { getSgpServerId } from '@shared/utils/sgp'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
@@ -155,7 +155,7 @@ const message = useMessage()
 
 const tableData = shallowRef<MappedRecordType[]>([])
 
-const { getInteroperability } = useInteroperableSgpServers()
+const { canQueryServer } = useSgpServerQuery()
 
 const onlyCurrentAccount = ref(true)
 
@@ -201,7 +201,11 @@ const renderPlayer = (puuid: string, sgpServerId: string) => {
 
 const renderSgpServerTag = (sgpServerId: string) => {
   return (
-    <NTag size="tiny" bordered={false} type={isTencentServer(sgpServerId) ? 'success' : 'info'}>
+    <NTag
+      size="tiny"
+      bordered={false}
+      type={sgps.leagueServers.servers[sgpServerId]?.isTencent ? 'success' : 'info'}
+    >
       {t(`sgpServers.${sgpServerId}`, {
         defaultValue: sgpServerId,
         ns: 'common'
@@ -351,7 +355,7 @@ const updateCachedSummoners = async (
   }[]
 ) => {
   for (const player of players) {
-    if (summonerShallowMap[player.puuid] || !getInteroperability(player.sgpServerId).common) {
+    if (summonerShallowMap[player.puuid] || !canQueryServer(player.sgpServerId)) {
       continue
     }
 

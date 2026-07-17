@@ -108,7 +108,7 @@ export class AkariApiReleaseLoader {
       (item) => item.platform === 'windows' && item.arch === 'x64'
     )
 
-    if (!artifact || artifact.size === null) {
+    if (!artifact) {
       throw new Error(`Release ${release.version} has no complete Windows x64 artifact`)
     }
 
@@ -119,7 +119,7 @@ export class AkariApiReleaseLoader {
       currentVersion,
       isNew: gt(release.version, currentVersion),
       publishedAt: release.publishedAt,
-      description: release.notes.content,
+      description: release.description,
       archiveFile: {
         name: artifact.fileName,
         size: artifact.size,

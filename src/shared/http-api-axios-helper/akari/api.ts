@@ -43,15 +43,10 @@ export class AkariApiHttpApiAxiosHelper {
     language: AkariApiLanguage = DEFAULT_AKARI_API_LANGUAGE,
     options: HttpApiRequestOptions = {}
   ) {
-    return this._getRelease('latest', language, options)
-  }
-
-  getRelease(
-    version: string,
-    language: AkariApiLanguage = DEFAULT_AKARI_API_LANGUAGE,
-    options: HttpApiRequestOptions = {}
-  ) {
-    return this._getRelease(version, language, options)
+    return this._http.get<AkariRelease>('/releases/v1/latest', {
+      params: { lang: language },
+      signal: options.signal
+    })
   }
 
   postStatisticsRecord(version: string, options: HttpApiRequestOptions = {}) {
@@ -64,13 +59,6 @@ export class AkariApiHttpApiAxiosHelper {
 
   getLastResortLatestRelease(options: HttpApiRequestOptions = {}) {
     return this._http.get<AkariLastResortRelease>('/last-resort/v1/latest-release', {
-      signal: options.signal
-    })
-  }
-
-  private _getRelease(version: string, language: AkariApiLanguage, options: HttpApiRequestOptions) {
-    return this._http.get<AkariRelease>(`/releases/v1/${encodeURIComponent(version)}`, {
-      params: { lang: language },
       signal: options.signal
     })
   }

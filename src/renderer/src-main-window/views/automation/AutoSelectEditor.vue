@@ -29,13 +29,10 @@
             :key="group.groupId"
             @click="currentGroupId = group.groupId"
           >
-            <LcuImage
-              class="mr-2 h-4 w-4"
-              :src="gameModeIconUri[group.targetGameModes[0].gameMode]"
-            />
-            <span class="flex-1 truncate">{{
-              t(`automation.champSelect.groups.${group.groupId}`, { defaultValue: group.groupId })
-            }}</span>
+            <LcuImage class="mr-2 h-4 w-4" :src="group.iconPath" />
+            <span class="flex-1 truncate">
+              {{ group.name[app.settings.locale === 'en' ? 'en' : 'zh-CN'] }}
+            </span>
             <div class="ml-auto flex gap-1">
               <NIcon
                 class="text-base text-emerald-600 dark:text-emerald-300"
@@ -409,6 +406,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
@@ -430,10 +428,10 @@ import {
 import { computed, ref, watch } from 'vue'
 
 import OrderedChampionList from './components/ordered-champion-list/OrderedChampionList.vue'
-import { useMapAssets } from '@main-window/composables/useMapAssets'
 
 const { t } = useTranslation()
 
+const app = useAppCommonStore()
 const as = useInstance(AutoSelectRenderer)
 const as2 = useAutoSelectStore()
 
@@ -450,26 +448,6 @@ const currentBanConfig = computed(() => {
 
 const currentGroup = computed(() => {
   return as2.groups.find((m) => m.groupId === currentGroupId.value)
-})
-
-const mapAssets = useMapAssets()
-const gameModeIconUri = computed(() => {
-  if (!mapAssets.value) {
-    return {}
-  }
-
-  const gameModeUri: Record<string, string> = {}
-  const flattened = Object.values(mapAssets.value).flat()
-
-  for (const item of flattened) {
-    if (gameModeUri[item.gameMode]) {
-      continue
-    }
-
-    gameModeUri[item.gameMode] = item.assets?.['game-select-icon-hover']
-  }
-
-  return gameModeUri
 })
 
 watch(

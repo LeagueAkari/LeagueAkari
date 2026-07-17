@@ -26,7 +26,3 @@ export function getSgpServerId(region: string, rsoPlatformId?: string) {
 
   return (aliases[r] || r).toUpperCase()
 }
-
-export function isTencentServer(sgpServerId: string) {
-  return sgpServerId.startsWith('TENCENT')
-}

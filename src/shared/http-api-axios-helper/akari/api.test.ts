@@ -44,19 +44,14 @@ describe('Akari API HTTP helper', () => {
     })
   })
 
-  it('maps release, last-resort, and statistics methods to the Akari API', () => {
+  it('maps last-resort and statistics methods to the Akari API', () => {
     const { get, http, post } = createHttpMock()
     const api = new AkariApiHttpApiAxiosHelper(http)
 
-    api.getRelease('1.5.0', 'en')
     api.getLastResortLatestRelease()
     api.postStatisticsRecord('1.5.0')
 
-    expect(get).toHaveBeenNthCalledWith(1, '/releases/v1/1.5.0', {
-      params: { lang: 'en' },
-      signal: undefined
-    })
-    expect(get).toHaveBeenNthCalledWith(2, '/last-resort/v1/latest-release', {
+    expect(get).toHaveBeenCalledWith('/last-resort/v1/latest-release', {
       signal: undefined
     })
     expect(post).toHaveBeenCalledWith(

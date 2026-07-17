@@ -42,6 +42,11 @@ export const AkariAutoSelectGroupsConfigSchema: z.ZodType<AkariAutoSelectGroupsC
       z
         .object({
           groupId: z.string(),
+          name: z.object({
+            'zh-CN': z.string(),
+            en: z.string()
+          }),
+          iconPath: z.string().regex(/^\/lol-game-data\/assets\/.+/),
           isCustom: z.boolean(),
           targetGameModes: z.array(
             z
@@ -84,13 +89,11 @@ export const AkariLeagueServersConfigSchema: z.ZodType<AkariLeagueServersConfig>
         .object({
           matchHistory: z.string(),
           common: z.string(),
+          isTencent: z.boolean(),
           regionPathParam: z.string().optional()
         })
         .passthrough()
     ),
-    tencentServerMatchHistoryInteroperability: z.array(z.string()),
-    tencentServerSpectatorInteroperability: z.array(z.string()),
-    tencentServerSummonerInteroperability: z.array(z.string()),
     serverNames: z.record(z.string(), z.record(z.string(), z.string()))
   })
   .passthrough()
@@ -106,21 +109,14 @@ export const AkariReleaseSchema: z.ZodType<AkariRelease> = z
   .object({
     version: z.string(),
     publishedAt: z.iso.datetime({ offset: true }),
-    notes: z
-      .object({
-        revision: z.string(),
-        language: z.enum(['zh-CN', 'en']),
-        contentType: z.literal('text/markdown'),
-        content: z.string()
-      })
-      .passthrough(),
+    description: z.string(),
     artifacts: z.array(
       z
         .object({
           platform: z.string(),
           arch: z.string(),
           fileName: z.string(),
-          size: z.number().nullable(),
+          size: z.number(),
           contentType: z.string(),
           sha256: z.string().nullable(),
           downloadUrl: z.url()

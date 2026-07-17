@@ -48,9 +48,7 @@ export function useSearchPaneSearchHistory() {
   const filteredSearchHistory = computed(() => {
     if (sgps.availability.region === 'TENCENT') {
       return searchHistory.value.filter((item) => {
-        return sgps.leagueServers.tencentServerMatchHistoryInteroperability.includes(
-          item.sgpServerId
-        )
+        return sgps.leagueServers.servers[item.sgpServerId]?.isTencent === true
       })
     }
 

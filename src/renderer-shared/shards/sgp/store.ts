@@ -24,10 +24,7 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
   const leagueServers = shallowRef<AkariLeagueServersConfig>({
     updatedAt: new Date(0).toISOString(),
     servers: {},
-    serverNames: {},
-    tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
-    tencentServerSummonerInteroperability: []
+    serverNames: {}
   })
 
   const isTokenReady = ref(false)

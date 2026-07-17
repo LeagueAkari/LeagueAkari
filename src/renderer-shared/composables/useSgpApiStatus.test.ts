@@ -11,17 +11,16 @@ function createLeagueServers() {
     servers: {
       NA1: {
         matchHistory: 'https://na1.example.test',
-        common: 'https://na1-common.example.test'
+        common: 'https://na1-common.example.test',
+        isTencent: false
       },
       TENCENT_HN10: {
         matchHistory: 'https://hn10.example.test',
-        common: 'https://hn10-common.example.test'
+        common: 'https://hn10-common.example.test',
+        isTencent: true
       }
     },
-    serverNames: {},
-    tencentServerMatchHistoryInteroperability: [],
-    tencentServerSpectatorInteroperability: [],
-    tencentServerSummonerInteroperability: []
+    serverNames: {}
   }
 }
 

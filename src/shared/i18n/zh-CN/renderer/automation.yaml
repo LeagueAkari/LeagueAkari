@@ -105,17 +105,6 @@ automation:
       description: 在本次英雄选择中，相关功能已被临时禁用。
     groupTitle: 生效模式
     groupEmpty: 暂无分组
-    groups:
-      ranked: 排位模式
-      normal: 普通模式
-      aram: 大乱斗类
-      cherry: 斗魂竞技场
-      urf: 无限火力
-      oneforall: 克隆模式
-      ultbook: 终极魔典
-      bot: 人机模式
-      custom: 自定义对局
-      ruby: 末日人工智能
     pick:
       title: 英雄选择
       enabled:

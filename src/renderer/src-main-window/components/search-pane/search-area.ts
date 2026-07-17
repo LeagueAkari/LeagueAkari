@@ -44,16 +44,17 @@ export function useTencentServers() {
       return []
     }
 
-    // 出于硬编码, 这里仅仅使用 match-history 的互操作性预定义表
-    return sgps.leagueServers.tencentServerMatchHistoryInteroperability.map((serverId) => {
-      return {
-        label:
-          serverId === sgps.availability.sgpServerId
-            ? `${t(`sgpServers.${serverId}`, { defaultValue: serverId, ns: 'common' })} (${t('sgpServers.AKARI_CURRENT', { ns: 'common' })})`
-            : t(`sgpServers.${serverId}`, { defaultValue: serverId, ns: 'common' }),
-        value: serverId
-      }
-    })
+    return Object.entries(sgps.leagueServers.servers)
+      .filter(([, server]) => server.isTencent)
+      .map(([serverId]) => {
+        return {
+          label:
+            serverId === sgps.availability.sgpServerId
+              ? `${t(`sgpServers.${serverId}`, { defaultValue: serverId, ns: 'common' })} (${t('sgpServers.AKARI_CURRENT', { ns: 'common' })})`
+              : t(`sgpServers.${serverId}`, { defaultValue: serverId, ns: 'common' }),
+          value: serverId
+        }
+      })
   })
 
   const isTencentRegion = computed(() => {

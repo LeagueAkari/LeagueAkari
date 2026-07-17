@@ -32,18 +32,11 @@ export interface AkariNotice {
   updatedAt: string
 }
 
-export interface AkariReleaseNotes {
-  revision: string
-  language: AkariApiLanguage
-  contentType: 'text/markdown'
-  content: string
-}
-
 export interface AkariReleaseArtifact {
   platform: string
   arch: string
   fileName: string
-  size: number | null
+  size: number
   contentType: string
   sha256: string | null
   downloadUrl: string
@@ -52,7 +45,7 @@ export interface AkariReleaseArtifact {
 export interface AkariRelease {
   version: string
   publishedAt: string
-  notes: AkariReleaseNotes
+  description: string
   artifacts: AkariReleaseArtifact[]
 }
 
@@ -94,6 +87,11 @@ export interface AkariAutoSelectTargetGameMode {
 
 export interface AkariAutoSelectGroup {
   groupId: string
+  name: {
+    'zh-CN': string
+    en: string
+  }
+  iconPath: string
   isCustom: boolean
   targetGameModes: AkariAutoSelectTargetGameMode[]
   positions: string[]
@@ -118,14 +116,12 @@ export interface AkariOngoingGameConfig extends AkariConfigMetadata {
 export interface AkariLeagueServerEndpoint {
   matchHistory: string
   common: string
+  isTencent: boolean
   regionPathParam?: string
 }
 
 export interface AkariLeagueServersConfig extends AkariConfigMetadata {
   servers: Record<string, AkariLeagueServerEndpoint>
-  tencentServerMatchHistoryInteroperability: string[]
-  tencentServerSpectatorInteroperability: string[]
-  tencentServerSummonerInteroperability: string[]
   serverNames: Record<string, Record<string, string>>
 }
 

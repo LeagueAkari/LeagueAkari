@@ -1,7 +1,7 @@
 import { AkariSupportedQueuesConfigSchema } from '@shared/shards/akari-api'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { CachedResource } from './cached-resources'
+import { AKARI_API_CACHED_RESOURCES, type CachedResource } from './cached-resources'
 import { AkariApiConfigLoader } from './config-loader'
 import type { AkariApiMainContext } from './context'
 import { AkariApiState } from './state'
@@ -52,6 +52,52 @@ afterEach(() => {
 })
 
 describe('Akari API config loader', () => {
+  it('loads localized auto-select group metadata from the local cache', async () => {
+    const state = new AkariApiState()
+    const autoSelectGroups = {
+      updatedAt: '2099-01-01T00:00:00.000Z',
+      groups: [
+        {
+          groupId: 'ranked',
+          name: { 'zh-CN': '排位模式', en: 'Ranked' },
+          iconPath:
+            '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
+          isCustom: false,
+          targetGameModes: [
+            { gameMode: 'CLASSIC', queueTypes: ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR'] }
+          ],
+          positions: ['top', 'jungle', 'middle', 'bottom', 'utility'],
+          additionalPicks: [],
+          additionalBans: [],
+          excludedPicks: [-1],
+          excludedBans: []
+        }
+      ]
+    }
+    const context = {
+      api: {},
+      logger: { info: vi.fn(), warn: vi.fn() },
+      settingService: {
+        jsonConfigFileExists: vi.fn().mockResolvedValue(true),
+        readFromJsonConfigFile: vi.fn().mockResolvedValue(autoSelectGroups),
+        writeToJsonConfigFile: vi.fn()
+      },
+      state
+    } as unknown as AkariApiMainContext
+    const autoSelectResource = AKARI_API_CACHED_RESOURCES.find(
+      (item) => item.id === 'autoSelectGroups'
+    )!
+    const loader = new AkariApiConfigLoader(context, [autoSelectResource])
+
+    await loader.initFromLocal()
+
+    expect(state.autoSelectGroups).toEqual(autoSelectGroups)
+    expect(state.autoSelectGroups.groups[0]).toMatchObject({
+      name: { 'zh-CN': '排位模式', en: 'Ranked' },
+      iconPath: expect.stringMatching(/^\/lol-game-data\/assets\//)
+    })
+  })
+
   it('applies and persists a newer resource', async () => {
     const { loader, state, writeToJsonConfigFile } = setup('2099-01-01T00:00:00.000Z')
 

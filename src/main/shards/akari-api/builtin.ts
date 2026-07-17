@@ -15,151 +15,141 @@ export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
 }
 
 export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
-  updatedAt: '2026-07-16T14:41:08.112Z',
+  updatedAt: '2026-07-17T08:19:07.000Z',
   servers: {
     TENCENT_HN1: {
       matchHistory: 'https://hn1-k8s-sgp.lol.qq.com:21019',
-      common: 'https://hn1-k8s-sgp.lol.qq.com:21019'
+      common: 'https://hn1-k8s-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_HN10: {
       matchHistory: 'https://hn10-k8s-sgp.lol.qq.com:21019',
-      common: 'https://hn10-k8s-sgp.lol.qq.com:21019'
+      common: 'https://hn10-k8s-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_TJ100: {
       matchHistory: 'https://tj100-sgp.lol.qq.com:21019',
-      common: 'https://tj100-sgp.lol.qq.com:21019'
+      common: 'https://tj100-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_TJ101: {
       matchHistory: 'https://tj101-sgp.lol.qq.com:21019',
-      common: 'https://tj101-sgp.lol.qq.com:21019'
+      common: 'https://tj101-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_NJ100: {
       matchHistory: 'https://nj100-sgp.lol.qq.com:21019',
-      common: 'https://nj100-sgp.lol.qq.com:21019'
+      common: 'https://nj100-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_GZ100: {
       matchHistory: 'https://gz100-sgp.lol.qq.com:21019',
-      common: 'https://gz100-sgp.lol.qq.com:21019'
+      common: 'https://gz100-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_CQ100: {
       matchHistory: 'https://cq100-sgp.lol.qq.com:21019',
-      common: 'https://cq100-sgp.lol.qq.com:21019'
+      common: 'https://cq100-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_BGP2: {
       matchHistory: 'https://bgp2-k8s-sgp.lol.qq.com:21019',
-      common: 'https://bgp2-k8s-sgp.lol.qq.com:21019'
+      common: 'https://bgp2-k8s-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_PBE: {
       matchHistory: 'https://pbe-sgp.lol.qq.com:21019',
-      common: 'https://pbe-sgp.lol.qq.com:21019'
+      common: 'https://pbe-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TENCENT_PREPBE: {
       matchHistory: 'https://prepbe-sgp.lol.qq.com:21019',
-      common: 'https://prepbe-sgp.lol.qq.com:21019'
+      common: 'https://prepbe-sgp.lol.qq.com:21019',
+      isTencent: true
     },
     TW2: {
       common: 'https://tw2-red.lol.sgp.pvp.net',
-      matchHistory: 'https://apse1-red.pp.sgp.pvp.net'
+      matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
+      isTencent: false
     },
     SG2: {
       common: 'https://sg2-red.lol.sgp.pvp.net',
-      matchHistory: 'https://apse1-red.pp.sgp.pvp.net'
+      matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
+      isTencent: false
     },
     PH2: {
       matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
-      common: 'https://ph2-red.lol.sgp.pvp.net'
+      common: 'https://ph2-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     VN2: {
       matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
-      common: 'https://vn2-red.lol.sgp.pvp.net'
+      common: 'https://vn2-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     PBE: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
       common: 'https://pbe-red.lol.sgp.pvp.net',
+      isTencent: false,
       regionPathParam: 'PBE1'
     },
     EUW: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
-      common: 'https://euw-red.lol.sgp.pvp.net'
+      common: 'https://euw-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     JP: {
       matchHistory: 'https://apne1-red.pp.sgp.pvp.net',
       common: 'https://jp-red.lol.sgp.pvp.net',
+      isTencent: false,
       regionPathParam: 'JP1'
     },
     RU: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
-      common: 'https://ru-red.lol.sgp.pvp.net'
+      common: 'https://ru-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     BR1: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
-      common: 'https://br-red.lol.sgp.pvp.net'
+      common: 'https://br-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     OC1: {
       matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
-      common: 'https://oce-red.lol.sgp.pvp.net'
+      common: 'https://oce-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     TR1: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
-      common: 'https://tr-red.lol.sgp.pvp.net'
+      common: 'https://tr-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     LA1: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
-      common: 'https://lan-red.lol.sgp.pvp.net'
+      common: 'https://lan-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     LA2: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
-      common: 'https://las-red.lol.sgp.pvp.net'
+      common: 'https://las-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     NA1: {
       matchHistory: 'https://usw2-red.pp.sgp.pvp.net',
-      common: 'https://na-red.lol.sgp.pvp.net'
+      common: 'https://na-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     TH2: {
       matchHistory: 'https://apse1-red.pp.sgp.pvp.net',
-      common: 'https://th2-red.lol.sgp.pvp.net'
+      common: 'https://th2-red.lol.sgp.pvp.net',
+      isTencent: false
     },
     KR: {
       matchHistory: 'https://apne1-red.pp.sgp.pvp.net',
-      common: 'https://kr-red.lol.sgp.pvp.net'
+      common: 'https://kr-red.lol.sgp.pvp.net',
+      isTencent: false
     }
   },
-  tencentServerMatchHistoryInteroperability: [
-    'TENCENT_HN1',
-    'TENCENT_HN10',
-    'TENCENT_NJ100',
-    'TENCENT_GZ100',
-    'TENCENT_CQ100',
-    'TENCENT_TJ100',
-    'TENCENT_TJ101',
-    'TENCENT_BGP2',
-    'TENCENT_PBE',
-    'TENCENT_PREPBE'
-  ],
-  tencentServerSpectatorInteroperability: [
-    'TENCENT_HN1',
-    'TENCENT_HN10',
-    'TENCENT_NJ100',
-    'TENCENT_GZ100',
-    'TENCENT_CQ100',
-    'TENCENT_TJ100',
-    'TENCENT_TJ101',
-    'TENCENT_BGP2',
-    'TENCENT_PBE',
-    'TENCENT_PREPBE'
-  ],
-  tencentServerSummonerInteroperability: [
-    'TENCENT_HN1',
-    'TENCENT_HN10',
-    'TENCENT_NJ100',
-    'TENCENT_GZ100',
-    'TENCENT_CQ100',
-    'TENCENT_TJ100',
-    'TENCENT_TJ101',
-    'TENCENT_BGP2',
-    'TENCENT_PBE',
-    'TENCENT_PREPBE'
-  ],
   serverNames: {
     en: {
       TENCENT_HN1: 'Ionia',
@@ -232,6 +222,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
   groups: [
     {
       groupId: 'ranked',
+      name: { 'zh-CN': '排位模式', en: 'Ranked' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -247,6 +240,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'normal',
+      name: { 'zh-CN': '普通模式', en: 'Normal' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -262,6 +258,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'aram',
+      name: { 'zh-CN': '大乱斗类', en: 'ARAM-like' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/ARAM/img/game-select-icon-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -281,6 +280,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'cherry',
+      name: { 'zh-CN': '斗魂竞技场', en: 'Arena' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Cherry/img/game-select-icon-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -296,6 +298,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'urf',
+      name: { 'zh-CN': '无限火力', en: 'URF' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -311,6 +316,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'oneforall',
+      name: { 'zh-CN': '克隆模式', en: 'One for All' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -326,6 +334,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'ultbook',
+      name: { 'zh-CN': '终极魔典', en: 'Ultbook' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -341,6 +352,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'bot',
+      name: { 'zh-CN': '人机模式', en: 'Bot' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
       targetGameModes: [
         {
@@ -356,6 +370,9 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
     },
     {
       groupId: 'custom',
+      name: { 'zh-CN': '自定义对局', en: 'Custom' },
+      iconPath:
+        '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: true,
       targetGameModes: [
         {
