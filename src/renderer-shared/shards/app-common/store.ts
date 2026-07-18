@@ -53,6 +53,11 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
       availableOnCurrentPlatform: false,
       requiresElevation: false
     },
+    activationShortcut: {
+      available: false,
+      availableOnCurrentPlatform: false,
+      requiresElevation: false
+    },
     getLeagueClientWindowPlacement: {
       available: false,
       availableOnCurrentPlatform: false,

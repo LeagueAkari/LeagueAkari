@@ -25,6 +25,7 @@ export const DISABLED_KEYS = [
   133, // F22
   13 // Enter
 ]
+export const DISABLED_KEY_IDS = ['F22', 'Enter']
 
 export const COMMON_MODIFIER_VARIANTS: Record<number, number[]> = {
   16: [16, 160, 161],

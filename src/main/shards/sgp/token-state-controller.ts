@@ -19,12 +19,7 @@ export class SgpTokenStateController {
           return
         }
 
-        const copiedToken = structuredClone(token)
-
-        copiedToken.accessToken = copiedToken.accessToken?.slice(0, 24) + '...'
-        copiedToken.token = copiedToken.token?.slice(0, 24) + '...'
-
-        logger.info(`Update Entitlements Token: ${JSON.stringify(copiedToken)}`)
+        logger.info('Update Entitlements Token: <redacted>')
 
         state.setEntitlementsTokenSet(true)
       },
@@ -43,8 +38,7 @@ export class SgpTokenStateController {
           return
         }
 
-        const copied = token.slice(0, 24) + '...'
-        logger.info(`Update Lol League Session Token: ${copied}`)
+        logger.info('Update Lol League Session Token: <redacted>')
         state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }

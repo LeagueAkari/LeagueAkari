@@ -17,6 +17,7 @@ import path from 'node:path'
 import PQueue from 'p-queue'
 import WebSocket from 'ws'
 
+import { assertLocalClientRequestUrl } from '../../utils/local-client-url'
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
@@ -24,6 +25,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { classifyClientCredentialChange, getClientAuthLogMetadata } from './client-auth'
 import {
   LEAGUE_CLIENT_MAIN_NAMESPACE,
   LeagueClientLcuUninitializedError,
@@ -32,8 +34,11 @@ import {
 import { LeagueClientIpcHandlers } from './ipc-handlers'
 import { LeagueClientData } from './lc-state'
 import { LeagueClientSettings, LeagueClientState } from './state'
+import { disposeUnexpectedWebSocketResponse } from './websocket-handshake'
 
 const axiosRetry = require('axios-retry').default as AxiosRetry
+
+class LeagueClientConnectionAttemptCancelledError extends Error {}
 
 export { LeagueClientLcuUninitializedError }
 export type { LeagueClientMainContext }
@@ -76,6 +81,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   // 处理仅关闭 UX 而 LeagueClient 未关闭的情况
   private _shouldHaveOneAttempt = false
   private _manuallyDisconnected = false
+  private _connectionAttemptId = 0
+  private _isConnectionLoopRunning = false
 
   get http() {
     if (!this._httpClient) {
@@ -158,8 +165,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       const p2 = await getPidsByName(LeagueClientMain.PROCESS_NAME)
 
       if (p1.length === 0 && p2.length === 1) {
-        const { certificate, ...rest } = lastConnectedClient
-        this._logger.info('Trying to resume connection', rest)
+        this._logger.info(
+          'Trying to resume connection',
+          getClientAuthLogMetadata(lastConnectedClient)
+        )
 
         this._shouldHaveOneAttempt = true
         this.state.setConnectingClient(lastConnectedClient)
@@ -233,6 +242,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       throw new LeagueClientLcuUninitializedError()
     }
 
+    assertLocalClientRequestUrl(config.url)
+
     // 通过 IPC 调用的网络请求，则是不完整的可序列化信息
     try {
       const { config: c, request, ...rest } = await this._httpClient!.request(config)
@@ -263,6 +274,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   disconnect() {
     this._manuallyDisconnected = true
+    this.state.setConnectingClient(null)
     this._disconnect()
   }
 
@@ -296,14 +308,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
    * 断开与 LeagueClient 的连接, 主要是 WebSocket
    */
   private _disconnect() {
-    if (this._webSocket) {
-      this._webSocket.close()
-    }
-
-    this._webSocket = null
-    this._httpClient = null
-    this._leagueClientApi = null
-
+    this._connectionAttemptId++
+    this._cleanup()
     this.state.setDisconnected()
   }
 
@@ -333,6 +339,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         ] as const,
       async ([s, c, conn], prev) => {
         if (conn === 'connected') {
+          this._refreshConnectedClientAuth(c)
           return
         }
 
@@ -359,8 +366,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       () => [this.state.auth, this.state.connectionState] as const,
       ([a, s]) => {
         if (a) {
-          const { certificate, ...rest } = a
-          this._logger.debug(`LCU state changed: ${s}`, rest)
+          this._logger.debug(`LCU state changed: ${s}`, getClientAuthLogMetadata(a))
         } else {
           this._logger.debug(`LCU state changed: ${s}`, a)
         }
@@ -386,43 +392,90 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     )
   }
 
+  private _refreshConnectedClientAuth(clients: UxCommandLine[]) {
+    const current = this.state.auth
+    if (!current) {
+      return
+    }
+
+    const refreshed = clients.find((client) => client.pid === current.pid)
+    if (!refreshed) {
+      return
+    }
+
+    const credentialChange = classifyClientCredentialChange(current, refreshed)
+    if (credentialChange === 'league-client') {
+      this._logger.info(
+        'League Client credentials changed; reconnecting',
+        getClientAuthLogMetadata(refreshed)
+      )
+      this._disconnect()
+      this.state.setConnectingClient(refreshed)
+      return
+    }
+
+    if (credentialChange === 'riot-client') {
+      this._logger.info(
+        'Riot Client credentials changed; refreshing local connection',
+        getClientAuthLogMetadata(refreshed)
+      )
+      this.state.setConnected(refreshed)
+      this._settingService._saveToStorage('lastConnectedClient', refreshed).catch(() => {})
+    }
+  }
+
   private async _doConnectingLoop() {
-    while (true) {
-      // 连接途中，目标丢失，停止连接
-      if (!this.state.connectingClient) {
-        break
-      }
+    if (this._isConnectionLoopRunning) {
+      return
+    }
 
-      // 目标连接对象已不在当前启动列表中，停止连接
-      if (
-        !this._shouldHaveOneAttempt &&
-        !this._leagueClientUx.state.launchedClients.find(
-          (c) => c.pid === this.state.connectingClient?.pid
-        )
-      ) {
-        this.state.setConnectingClient(null)
-        break
-      }
-
-      try {
-        await this._connectToLcu(this.state.connectingClient)
-        this.state.setConnectingClient(null) // finished connecting!
-        break
-      } catch (error) {
-        if ((error as any).code !== 'ECONNREFUSED') {
-          this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._logger.warn(`Error connecting to LC`, error)
+    this._isConnectionLoopRunning = true
+    try {
+      while (true) {
+        // 连接途中，目标丢失，停止连接
+        if (!this.state.connectingClient) {
           break
         }
-      }
 
-      if (this._shouldHaveOneAttempt) {
-        this._shouldHaveOneAttempt = false
-        this.state.setConnectingClient(null)
-        break
-      }
+        // 目标连接对象已不在当前启动列表中，停止连接
+        if (
+          !this._shouldHaveOneAttempt &&
+          !this._leagueClientUx.state.launchedClients.find(
+            (c) => c.pid === this.state.connectingClient?.pid
+          )
+        ) {
+          this.state.setConnectingClient(null)
+          break
+        }
 
-      await sleep(LeagueClientMain.CONNECT_TO_LC_RETRY_INTERVAL)
+        try {
+          await this._connectToLcu(this.state.connectingClient)
+          this.state.setConnectingClient(null) // finished connecting!
+          break
+        } catch (error) {
+          if (error instanceof LeagueClientConnectionAttemptCancelledError) {
+            continue
+          }
+
+          if ((error as any).code !== 'ECONNREFUSED') {
+            this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
+            this._logger.warn(`Error connecting to LC`, error)
+          }
+        }
+
+        if (this._shouldHaveOneAttempt) {
+          this._shouldHaveOneAttempt = false
+          this.state.setConnectingClient(null)
+          break
+        }
+
+        await sleep(LeagueClientMain.CONNECT_TO_LC_RETRY_INTERVAL)
+      }
+    } finally {
+      this._isConnectionLoopRunning = false
+      if (this.state.connectingClient) {
+        void this._doConnectingLoop()
+      }
     }
   }
 
@@ -433,38 +486,85 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   ): Promise<WebSocket> {
     return new Promise<WebSocket>((resolve, reject) => {
       const ws = new WebSocket(url, options)
+      let settled = false
+
+      const rejectOnce = (error: Error) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        reject(error)
+      }
 
       const timer = setTimeout(() => {
-        ws.close()
-        reject(new Error(`WebSocket connection timed out after ${timeout}ms`))
+        rejectOnce(new Error(`WebSocket connection timed out after ${timeout}ms`))
+        ws.terminate()
       }, timeout)
 
-      ws.on('open', () => {
+      ws.once('open', () => {
+        if (settled) return
+        settled = true
         clearTimeout(timer)
         resolve(ws)
       })
 
-      ws.on('unexpected-response', (_req, res) => {
-        clearTimeout(timer)
-        reject(new Error(`WebSocket unexpected response: ${res.statusCode} ${res.statusMessage}`))
+      ws.once('unexpected-response', (_req, res) => {
+        rejectOnce(
+          new Error(`WebSocket unexpected response: ${res.statusCode} ${res.statusMessage}`)
+        )
+        disposeUnexpectedWebSocketResponse(ws, res)
       })
 
-      ws.on('close', () => clearTimeout(timer))
+      ws.once('close', () => {
+        rejectOnce(new Error('WebSocket closed before the connection was established'))
+      })
 
       ws.on('error', (err) => {
-        clearTimeout(timer)
-        reject(err)
+        rejectOnce(err)
       })
     })
   }
 
   private _cleanup() {
-    if (this._webSocket && this._webSocket.readyState !== WebSocket.CLOSED) {
-      this._webSocket.close()
-      this._webSocket = null
+    const webSocket = this._webSocket
+    this._webSocket = null
+
+    if (webSocket && webSocket.readyState !== WebSocket.CLOSED) {
+      webSocket.close()
     }
     this._httpClient = null
     this._leagueClientApi = null
+  }
+
+  private _assertConnectionAttemptCurrent(
+    attemptId: number,
+    commandLine: UxCommandLine,
+    webSocket?: WebSocket
+  ) {
+    const target = this.state.connectingClient
+    const isCurrent =
+      attemptId === this._connectionAttemptId &&
+      target?.pid === commandLine.pid &&
+      classifyClientCredentialChange(commandLine, target) === 'none'
+
+    if (isCurrent) {
+      return
+    }
+
+    if (webSocket) {
+      if (this._webSocket === webSocket) {
+        this._webSocket = null
+      }
+      if (webSocket.readyState !== WebSocket.CLOSING && webSocket.readyState !== WebSocket.CLOSED) {
+        webSocket.close()
+      }
+    }
+
+    if (attemptId === this._connectionAttemptId) {
+      this._connectionAttemptId++
+      this.state.setDisconnected()
+    }
+
+    throw new LeagueClientConnectionAttemptCancelledError()
   }
 
   /**
@@ -475,65 +575,70 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       return
     }
 
-    const { certificate, ...rest } = cmd
+    this._logger.info('Target client', getClientAuthLogMetadata(cmd))
 
-    this._logger.info('Target client', rest)
-
+    const attemptId = ++this._connectionAttemptId
     this.state.setConnecting()
-
-    const initWs = async () => {
-      try {
-        // in case of connection is not closed properly
-        if (this._webSocket) {
-          this._webSocket.close()
-          this._webSocket = null
-        }
-
-        this._webSocket = await this._wsPromisified(
-          `wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`,
-          {
-            headers: {
-              Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
-            },
-            rejectUnauthorized: false
-          }
-        )
-
-        for (const endpoint of SUBSCRIBED_LCU_ENDPOINTS) {
-          this._webSocket.send(JSON.stringify([5, endpoint]))
-        }
-
-        this._webSocket.on('message', (msg) => {
-          try {
-            const data = JSON.parse(msg.toString())
-            this._eventBus.emit(data[2].uri, data[2])
-          } catch {}
-        })
-
-        this._webSocket.on('close', () => {
-          this.state.setDisconnected()
-          this._cleanup()
-        })
-      } catch (error) {
-        throw error
-      }
-    }
+    let webSocket: WebSocket | undefined
 
     try {
-      await initWs()
-      await this._initHttpInstance(cmd)
+      this._cleanup()
+      webSocket = await this._wsPromisified(`wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`, {
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
+        },
+        rejectUnauthorized: false
+      })
+      this._assertConnectionAttemptCurrent(attemptId, cmd, webSocket)
+      this._webSocket = webSocket
+
+      for (const endpoint of SUBSCRIBED_LCU_ENDPOINTS) {
+        webSocket.send(JSON.stringify([5, endpoint]))
+      }
+
+      webSocket.on('message', (msg) => {
+        try {
+          const data = JSON.parse(msg.toString())
+          this._eventBus.emit(data[2].uri, data[2])
+        } catch {}
+      })
+
+      webSocket.on('close', () => {
+        if (this._webSocket !== webSocket) {
+          return
+        }
+
+        this._disconnect()
+      })
+
+      const { httpClient, leagueClientApi } = await this._createHttpInstance(cmd)
+      this._assertConnectionAttemptCurrent(attemptId, cmd, webSocket)
+      this._httpClient = httpClient
+      this._leagueClientApi = leagueClientApi
       this.state.setConnected(cmd)
       this._settingService._saveToStorage('lastConnectedClient', cmd).catch(() => {})
     } catch (error) {
-      this.state.setDisconnected()
-      this._cleanup()
+      if (error instanceof LeagueClientConnectionAttemptCancelledError) {
+        throw error
+      }
+
+      if (attemptId === this._connectionAttemptId) {
+        this._disconnect()
+      } else if (
+        webSocket &&
+        webSocket.readyState !== WebSocket.CLOSING &&
+        webSocket.readyState !== WebSocket.CLOSED
+      ) {
+        webSocket.close()
+      }
       throw error
     }
   }
 
-  private async _initHttpInstance(auth: UxCommandLine) {
-    this._httpClient = axios.create({
+  private async _createHttpInstance(auth: UxCommandLine) {
+    const httpClient = axios.create({
       baseURL: `https://127.0.0.1:${auth.port}`,
+      allowAbsoluteUrls: false,
       headers: {
         Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
@@ -545,16 +650,17 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    axiosRetry(this._httpClient, { retries: 2 })
+    axiosRetry(httpClient, { retries: 2 })
 
     try {
-      await this._httpClient.get(LeagueClientMain.HTTP_PING_URL)
-      this._leagueClientApi = new LeagueClientHttpApiAxiosHelper(this._httpClient)
-    } catch (error) {
-      if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-        this._logger.warn(`Failed to execute PING operation`, error)
-        throw error
+      await httpClient.get(LeagueClientMain.HTTP_PING_URL)
+      return {
+        httpClient,
+        leagueClientApi: new LeagueClientHttpApiAxiosHelper(httpClient)
       }
+    } catch (error) {
+      this._logger.warn(`Failed to execute PING operation`, error)
+      throw error
     }
   }
 
@@ -562,6 +668,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     if (!this._httpClient) {
       throw new LeagueClientLcuUninitializedError()
     }
+
+    assertLocalClientRequestUrl(config.url)
 
     if (config.url && config.url.startsWith('lol-game-data/assets')) {
       return this._limitedRequest(config, this._assetLimiter)
@@ -635,6 +743,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   async peekClient(auth: UxCommandLine) {
     const c = axios.create({
       baseURL: `https://127.0.0.1:${auth.port}`,
+      allowAbsoluteUrls: false,
       headers: {
         Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
@@ -670,7 +779,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
    * 不知道现在是否需要
    */
   async fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
-    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize) {
+    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize.available) {
       return
     }
 

@@ -129,7 +129,7 @@
               </tr>
               <tr>
                 <td>{{ t('settings.debug.lcuConnection.auth') }}</td>
-                <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
+                <td>{{ lc.auth ? REDACTED_SECRET : '-' }}</td>
               </tr>
               <tr>
                 <td>{{ t('settings.debug.lcuConnection.rsoPlatform') }}</td>
@@ -253,6 +253,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { REDACTED_SECRET } from '@shared/utils/redact-secrets'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RendererDebugRenderer } from '@renderer-shared/shards/renderer-debug'
 import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/store'

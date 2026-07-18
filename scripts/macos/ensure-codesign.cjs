@@ -9,17 +9,30 @@ function run(cmd, args) {
   return res.status ?? 1
 }
 
+function inspectSignature(appPath) {
+  const result = spawnSync('codesign', ['--display', '--verbose=4', appPath], {
+    encoding: 'utf8'
+  })
+
+  return {
+    status: result.status ?? 1,
+    output: `${result.stdout || ''}\n${result.stderr || ''}`
+  }
+}
+
+function hasNamedSigningAuthority(signatureOutput) {
+  return /^Authority=.+$/m.test(signatureOutput)
+}
+
 function ensureCodesign(appPath) {
   if (process.platform !== 'darwin') return
 
   if (!appPath) {
-    console.error('Usage: node scripts/macos/ensure-codesign.cjs "<path-to-app>"')
-    process.exit(2)
+    throw new Error('Usage: node scripts/macos/ensure-codesign.cjs "<path-to-app>"')
   }
 
   if (!fs.existsSync(appPath)) {
-    console.error(`App not found: ${appPath}`)
-    process.exit(2)
+    throw new Error(`App not found: ${appPath}`)
   }
 
   // When electron-builder can't sign (no identity), but Electron fuses are enabled,
@@ -33,23 +46,44 @@ function ensureCodesign(appPath) {
     return
   }
 
+  const signature = inspectSignature(appPath)
+  if (signature.status === 0 && hasNamedSigningAuthority(signature.output)) {
+    throw new Error(
+      '[ensure-codesign] A named signing identity produced an invalid bundle; refusing to replace it with an ad-hoc signature'
+    )
+  }
+
   console.log('[ensure-codesign] codesign verify failed; applying ad-hoc signature...')
   const signStatus = run('codesign', ['--force', '--deep', '--sign', '-', appPath])
-  if (signStatus !== 0) process.exit(signStatus)
+  if (signStatus !== 0) {
+    throw new Error(`[ensure-codesign] Ad-hoc signing failed with exit code ${signStatus}`)
+  }
 
   const verify2Status = run('codesign', verifyArgs)
-  if (verify2Status !== 0) process.exit(verify2Status)
+  if (verify2Status !== 0) {
+    throw new Error(
+      `[ensure-codesign] Ad-hoc signature verification failed with exit code ${verify2Status}`
+    )
+  }
 
   console.log('[ensure-codesign] ad-hoc signature applied and verified')
 }
 
 module.exports = async function ensureCodesignHook(context) {
-  if (process.platform !== 'darwin') return
+  if (process.platform !== 'darwin' || context.electronPlatformName !== 'darwin') return
 
   const productFilename = context.packager.appInfo.productFilename
   ensureCodesign(path.join(context.appOutDir, `${productFilename}.app`))
 }
 
 if (require.main === module) {
-  ensureCodesign(process.argv[2])
+  try {
+    ensureCodesign(process.argv[2])
+  } catch (error) {
+    console.error(error)
+    process.exitCode = 1
+  }
 }
+
+module.exports.ensureCodesign = ensureCodesign
+module.exports.hasNamedSigningAuthority = hasNamedSigningAuthority

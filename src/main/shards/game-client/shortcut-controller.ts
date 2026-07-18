@@ -1,3 +1,5 @@
+import { NATIVE_SUPPORT } from '@main/native'
+
 import { type GameClientMainContext, TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID } from './context'
 
 export class GameClientShortcutController {
@@ -6,12 +8,22 @@ export class GameClientShortcutController {
   watch() {
     const { settings } = this.context
 
+    if (!NATIVE_SUPPORT.isProcessForeground.available) {
+      this.context.keyboardShortcuts.unregisterByTargetId(TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID)
+      return
+    }
+
     if (settings.terminateShortcut) {
       this._registerTerminateShortcut(settings.terminateShortcut, 'initialize')
     }
   }
 
   applyTerminateShortcutSettingSideEffect(shortcut: string | null) {
+    if (!NATIVE_SUPPORT.isProcessForeground.available) {
+      this.context.keyboardShortcuts.unregisterByTargetId(TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID)
+      return
+    }
+
     if (shortcut === null) {
       this.context.keyboardShortcuts.unregisterByTargetId(TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID)
       return

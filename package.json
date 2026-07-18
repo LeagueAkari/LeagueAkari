@@ -26,7 +26,7 @@
     "build:win": "npm run build && electron-builder --win --config",
     "build:win:native": "npm run build:native:win && npm run build:win",
     "gen-types": "tsc --declaration --emitDeclarationOnly --outDir ./out/types -p tsconfig.node.json",
-    "build:mac": "npm run build && electron-builder --mac --config"
+    "build:mac": "npm run build && node scripts/macos/build.cjs"
   },
   "dependencies": {
     "@babel/runtime": "^8.0.0",

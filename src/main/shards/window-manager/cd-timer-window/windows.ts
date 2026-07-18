@@ -7,6 +7,7 @@ import { comparer, computed } from 'mobx'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
+import { shouldShowOverlayOnAllWorkspaces } from '../platform'
 import { CdTimerWindowSettings, CdTimerWindowState } from './state'
 
 export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTimerWindowSettings> {
@@ -100,6 +101,10 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       () => this.state.ready,
       (ready) => {
         if (ready) {
+          if (shouldShowOverlayOnAllWorkspaces()) {
+            this._window?.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+          }
+
           this._applyOverlayWindowBehavior()
 
           this._window?.on('show', () => {
@@ -145,10 +150,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         if (!shortcut) {
           this._logger.debug('Unregister cd-timer window shortcut')
           this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
-          return
-        }
-
-        if (!NATIVE_SUPPORT.nativeInput.available) {
           return
         }
 

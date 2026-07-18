@@ -1,3 +1,4 @@
+import { getProcessCommandLineOption } from '@main/native/process-command-line'
 import { UxCommandLine } from '@shared/shards/league-client-ux'
 
 /**
@@ -29,36 +30,63 @@ EcGfKZ+g024k/J32XP4hdho7WYAS2xMiV83CfLR/MNi8oSMaVQTdKD8cpgiWJk3L
 XWehWA==
 -----END CERTIFICATE-----`
 
-const portRegex = /--app-port=([0-9]+)/
-const remotingAuth = /--remoting-auth-token=([\w-_]+)/
-const pidRegex = /--app-pid=([0-9]+)/
-// Some clients use `--rso_platform_id`, others use `--rso-platform-id`.
-const rsoPlatformIdRegex = /--rso[_-]platform[_-]id=([\w-_]+)/i
-const regionRegex = /--region=([\w-_]+)/
-const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
-const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
+export interface UxCommandLinePaths {
+  applicationDirectory: string | null
+  installationDirectory: string | null
+}
+
+function getNumericOption(commandLine: string, names: string | readonly string[]) {
+  const value = getProcessCommandLineOption(commandLine, names)
+  if (!value || !/^\d+$/.test(value)) {
+    return null
+  }
+
+  const number = Number(value)
+  return Number.isSafeInteger(number) ? number : null
+}
+
+function getPortOption(commandLine: string, name: string) {
+  const port = getNumericOption(commandLine, name)
+  return port !== null && port > 0 && port <= 65_535 ? port : null
+}
+
+export function parseUxCommandLinePaths(commandLine: string): UxCommandLinePaths {
+  return {
+    applicationDirectory:
+      getProcessCommandLineOption(commandLine, ['app-directory', 'app_directory', 'app-root']) ??
+      null,
+    installationDirectory:
+      getProcessCommandLineOption(commandLine, [
+        'install-directory',
+        'install_directory',
+        'product-install-path',
+        'product_install_full_path'
+      ]) ?? null
+  }
+}
 
 export function parseCommandLine(s: string): UxCommandLine | null {
-  const [, port] = s.match(portRegex) || []
-  const [, password] = s.match(remotingAuth) || []
-  const [, pid] = s.match(pidRegex) || []
-  const [, rsoPlatformId = ''] = s.match(rsoPlatformIdRegex) || []
-  const [, region = ''] = s.match(regionRegex) || []
-  const [, riotClientPort = ''] = s.match(riotClientPortRegex) || []
-  const [, riotClientAuth = ''] = s.match(riotClientAuthRegex) || []
+  const port = getPortOption(s, 'app-port')
+  const password = getProcessCommandLineOption(s, 'remoting-auth-token')
+  const pid = getNumericOption(s, 'app-pid')
+  // Some clients use `--rso_platform_id`, others use `--rso-platform-id`.
+  const rsoPlatformId = getProcessCommandLineOption(s, ['rso_platform_id', 'rso-platform-id']) ?? ''
+  const region = getProcessCommandLineOption(s, 'region') ?? ''
+  const riotClientPort = getPortOption(s, 'riotclient-app-port') ?? 0
+  const riotClientAuth = getProcessCommandLineOption(s, 'riotclient-auth-token') ?? ''
 
-  if (!port || !password || !pid) {
+  if (port === null || !password || pid === null || pid <= 0) {
     return null
   }
 
   return {
-    port: Number(port),
-    pid: Number(pid),
+    port,
+    pid,
     authToken: password,
     rsoPlatformId,
     region,
     certificate: RIOT_CERTIFICATE,
-    riotClientPort: Number(riotClientPort),
+    riotClientPort,
     riotClientAuthToken: riotClientAuth
   }
 }

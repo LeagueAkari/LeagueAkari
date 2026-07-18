@@ -73,15 +73,15 @@
       </div>
     </NModal>
 
-    <NPopover :disabled="as.nativeSupport.nativeInput.available">
+    <NPopover :disabled="shortcutSelectionAvailable">
       <template #trigger>
         <NButton
           size="tiny"
-          :disabled="!as.nativeSupport.nativeInput.available"
+          :disabled="!shortcutSelectionAvailable"
           type="primary"
           @click="
             () => {
-              if (!as.nativeSupport.nativeInput.available) return
+              if (!shortcutSelectionAvailable) return
               show = true
             }
           "
@@ -89,9 +89,9 @@
           {{ t('settings.shortcutSelector.select') }}
         </NButton>
       </template>
-      <template v-if="!as.nativeSupport.nativeInput.available">
+      <template v-if="!shortcutSelectionAvailable">
         {{
-          nativeInputRequiresElevation
+          shortcutRequiresElevation
             ? t('settings.shortcutSelector.notRunAsAdministrator')
             : t('settings.shortcutSelector.nativeGlobalShortcutsWindowsOnly')
         }}
@@ -120,20 +120,32 @@
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
+import { keyboardEventToActivationShortcutId } from '@shared/utils/activation-shortcuts'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NPopover } from 'naive-ui'
 import { computed, onDeactivated, onUnmounted, ref, shallowRef, watch } from 'vue'
 
-defineProps<{
-  targetId?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    activationOnly?: boolean
+    targetId?: string
+  }>(),
+  { activationOnly: false }
+)
 
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
 
-const nativeInputRequiresElevation = computed(
-  () => as.nativeSupport.nativeInput.requiresElevation && !as.isElevated
+const shortcutCapability = computed(() =>
+  props.activationOnly ? as.nativeSupport.activationShortcut : as.nativeSupport.nativeInput
+)
+const shortcutSelectionAvailable = computed(() => shortcutCapability.value.available)
+const shortcutRequiresElevation = computed(
+  () =>
+    shortcutCapability.value.availableOnCurrentPlatform &&
+    shortcutCapability.value.requiresElevation &&
+    !as.isElevated
 )
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
@@ -156,7 +168,7 @@ const keys = computed(() => {
   return shortcutId.value?.split('+') ?? []
 })
 
-let handler: () => void
+let handler: (() => void) | undefined
 
 const preventFn = (event: KeyboardEvent) => {
   const { key, altKey, ctrlKey, metaKey, shiftKey } = event
@@ -189,6 +201,16 @@ const preventFn = (event: KeyboardEvent) => {
   }
 }
 
+const captureActivationShortcut = (event: KeyboardEvent) => {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const capturedShortcutId = keyboardEventToActivationShortcutId(event)
+  if (capturedShortcutId) {
+    currentShortcutId.value = capturedShortcutId
+  }
+}
+
 const isOccupiedBy = shallowRef<{
   type: 'last-active' | 'normal' | 'stateful'
   targetId: string
@@ -210,18 +232,26 @@ watch(
   () => show.value,
   async () => {
     if (show.value) {
+      currentShortcutId.value = shortcutId.value
+
       if (currentShortcutId.value) {
         isOccupiedBy.value = await kbd.getRegistration(currentShortcutId.value)
       }
 
-      currentShortcutId.value = shortcutId.value
-      handler = kbd.onShortcut((event) => {
-        currentShortcutId.value = event.id
-      })
-      window.addEventListener('keydown', preventFn)
+      if (as.nativeSupport.nativeInput.available) {
+        handler = kbd.onShortcut((event) => {
+          currentShortcutId.value = event.id
+        })
+        window.addEventListener('keydown', preventFn)
+      } else if (props.activationOnly && as.nativeSupport.activationShortcut.available) {
+        window.addEventListener('keydown', captureActivationShortcut)
+        handler = () => window.removeEventListener('keydown', captureActivationShortcut)
+      }
     } else {
       handler?.()
+      handler = undefined
       window.removeEventListener('keydown', preventFn)
+      window.removeEventListener('keydown', captureActivationShortcut)
       isOccupiedBy.value = null
     }
   },
@@ -231,6 +261,7 @@ watch(
 onUnmounted(() => {
   handler?.()
   window.removeEventListener('keydown', preventFn)
+  window.removeEventListener('keydown', captureActivationShortcut)
 })
 
 onDeactivated(() => {

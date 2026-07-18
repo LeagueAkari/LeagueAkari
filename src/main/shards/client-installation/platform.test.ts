@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  shouldAllowDefaultRiotClientLaunch,
   shouldAllowWindowsOnlyLaunch,
   shouldRegisterJumpList,
   shouldScanMacInstallations,
@@ -25,5 +26,11 @@ describe('client-installation platform guards', () => {
     expect(shouldScanMacInstallations('darwin')).toBe(true)
     expect(shouldScanMacInstallations('win32')).toBe(false)
     expect(shouldScanMacInstallations('linux')).toBe(false)
+  })
+
+  test('allows the default Riot Client launcher on Windows and macOS', () => {
+    expect(shouldAllowDefaultRiotClientLaunch('win32')).toBe(true)
+    expect(shouldAllowDefaultRiotClientLaunch('darwin')).toBe(true)
+    expect(shouldAllowDefaultRiotClientLaunch('linux')).toBe(false)
   })
 })

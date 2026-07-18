@@ -1,9 +1,9 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
-import { UxCommandLine } from '@shared/shards/league-client-ux'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 
+import { assertLocalClientRequestUrl } from '../../utils/local-client-url'
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -16,6 +16,12 @@ import {
   RiotClientRcuUninitializedError
 } from './context'
 import { RiotClientIpcHandlers } from './ipc-handlers'
+import {
+  type RiotClientProcessAuth,
+  RiotClientProcessAuthReader,
+  shouldReadRiotClientProcessAuth
+} from './process-auth'
+import { RiotClientProcessAuthController } from './process-auth-controller'
 import { RiotClientProtocolController } from './protocol-controller'
 
 export { RiotClientRcuUninitializedError }
@@ -28,11 +34,13 @@ export class RiotClientMain implements IAkariShardInitDispose {
   static id = RIOT_CLIENT_MAIN_NAMESPACE
 
   static REQUEST_TIMEOUT_MS = RIOT_CLIENT_REQUEST_TIMEOUT_MS
+  static PROCESS_AUTH_POLL_INTERVAL = 5000
 
   private readonly _logger: AkariLogger
   private readonly _context: RiotClientMainContext
   private readonly _ipcHandlers: RiotClientIpcHandlers
   private readonly _protocolController: RiotClientProtocolController
+  private readonly _processAuthController: RiotClientProcessAuthController | null
 
   private _riotClientApi: RiotClientHttpApiAxiosHelper | null = null
 
@@ -61,6 +69,20 @@ export class RiotClientMain implements IAkariShardInitDispose {
     }
     this._ipcHandlers = new RiotClientIpcHandlers(this._context)
     this._protocolController = new RiotClientProtocolController(this._context)
+    this._processAuthController = shouldReadRiotClientProcessAuth()
+      ? new RiotClientProcessAuthController(
+          new RiotClientProcessAuthReader(),
+          (auth) => {
+            if (auth) {
+              this._initHttpInstance(auth)
+            } else {
+              this._clearHttpInstance()
+            }
+          },
+          this._logger,
+          RiotClientMain.PROCESS_AUTH_POLL_INTERVAL
+        )
+      : null
 
     this._protocolController.register()
   }
@@ -74,6 +96,8 @@ export class RiotClientMain implements IAkariShardInitDispose {
   }
 
   async requestForRenderer(config: AxiosRequestConfig) {
+    assertLocalClientRequestUrl(config.url)
+
     try {
       const { config: c, request, ...rest } = await this._httpClient!.request(config)
 
@@ -104,37 +128,51 @@ export class RiotClientMain implements IAkariShardInitDispose {
       throw new Error('RC Uninitialized')
     }
 
+    assertLocalClientRequestUrl(config.url)
     return this._httpClient.request<T>(config)
   }
 
   async onInit() {
     this._ipcHandlers.register()
 
-    this._mobxUtils.reaction(
-      () => this._leagueClient.state.auth,
-      async (auth) => {
-        if (auth) {
-          this._initHttpInstance(auth)
-        } else {
-          this._httpClient = null
-          this._riotClientApi = null
-        }
-      },
-      { fireImmediately: true }
-    )
+    if (this._processAuthController) {
+      await this._processAuthController.start()
+    } else {
+      this._mobxUtils.reaction(
+        () => this._leagueClient.state.auth,
+        async (auth) => {
+          if (auth?.riotClientPort && auth.riotClientAuthToken) {
+            this._initHttpInstance({
+              authToken: auth.riotClientAuthToken,
+              pid: auth.pid,
+              port: auth.riotClientPort
+            })
+          } else {
+            this._clearHttpInstance()
+          }
+        },
+        { fireImmediately: true }
+      )
+    }
   }
 
   async onDispose() {
-    this._httpClient = null
-    this._riotClientApi = null
+    this._processAuthController?.stop()
+    this._clearHttpInstance()
     this._protocol.unregisterDomain('riot-client')
   }
 
-  private _initHttpInstance(auth: UxCommandLine) {
+  private _clearHttpInstance() {
+    this._httpClient = null
+    this._riotClientApi = null
+  }
+
+  private _initHttpInstance(auth: RiotClientProcessAuth) {
     this._httpClient = axios.create({
-      baseURL: `https://127.0.0.1:${auth.riotClientPort}`,
+      baseURL: `https://127.0.0.1:${auth.port}`,
+      allowAbsoluteUrls: false,
       headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.riotClientAuthToken}`).toString('base64')}`
+        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,

@@ -186,7 +186,10 @@ const nativeInputStatusDescription = computed(() =>
 
 const adjustWindowRequirement = computed(() => as.nativeSupport.adjustLeagueClientWindowSize)
 const adjustWindowRequiresElevation = computed(
-  () => adjustWindowRequirement.value.requiresElevation && !as.isElevated
+  () =>
+    adjustWindowRequirement.value.availableOnCurrentPlatform &&
+    adjustWindowRequirement.value.requiresElevation &&
+    !as.isElevated
 )
 const adjustLeagueClientWindowSizeSupported = computed(
   () => adjustWindowRequirement.value.available

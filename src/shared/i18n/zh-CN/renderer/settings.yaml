@@ -320,6 +320,8 @@ settings:
     ongoingGameWindow:
       title: 对局叠加窗口
       titleRequireAdmin: 对局叠加窗口 (管理员权限)
+      requiresAdministrator: 长按显示叠加窗口依赖原生键盘钩子，需要以管理员权限运行。
+      unsupportedCurrentPlatform: 长按显示叠加窗口需要原生按键按下与松开事件，当前平台不支持。
       enabled:
         label: 启用对局窗口
         description: 在游戏中时，通过叠加窗口展示对局信息。若无法正常显示，需启用游戏的无边框或窗口模式

@@ -43,6 +43,8 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   private readonly _commandLineReader: LeagueClientUxCommandLineReader
 
   private _pollTimerId: NodeJS.Timeout | null = null
+  private _pollInterval = LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
+  private _isPolling = false
 
   constructor(
     private readonly _ipc: AkariIpcMain,
@@ -79,21 +81,25 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
+    this._isPolling = false
     if (this._pollTimerId) {
-      clearInterval(this._pollTimerId)
+      clearTimeout(this._pollTimerId)
       this._pollTimerId = null
     }
   }
 
   setPollInterval(interval: number, immediate = false) {
+    this._pollInterval = interval
+
     if (this._pollTimerId) {
-      clearInterval(this._pollTimerId)
+      clearTimeout(this._pollTimerId)
+      this._pollTimerId = null
+    }
 
-      if (immediate) {
-        this.update()
-      }
-
-      this._pollTimerId = setInterval(() => this.update(), interval)
+    if (immediate) {
+      void this.update()
+    } else {
+      this._scheduleNextPoll()
     }
   }
 
@@ -103,17 +109,11 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   async update() {
     try {
       this.state.setLaunchedClients(await this._commandLineReader.read())
-
-      if (this._pollTimerId) {
-        clearInterval(this._pollTimerId)
-      }
-      this._pollTimerId = setInterval(
-        () => this.update(),
-        LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
-      )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
       this._logger.error(`Failed to get Ux command line`, error)
+    } finally {
+      this._scheduleNextPoll()
     }
   }
 
@@ -141,10 +141,22 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   private _watchExistingUx() {
-    this.update()
-    this._pollTimerId = setInterval(
-      () => this.update(),
-      LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
-    )
+    this._isPolling = true
+    void this.update()
+  }
+
+  private _scheduleNextPoll() {
+    if (!this._isPolling) {
+      return
+    }
+
+    if (this._pollTimerId) {
+      clearTimeout(this._pollTimerId)
+    }
+
+    this._pollTimerId = setTimeout(() => {
+      this._pollTimerId = null
+      void this.update()
+    }, this._pollInterval)
   }
 }

@@ -18,6 +18,10 @@ import {
   SIMPLE_NOTIFICATIONS_RENDERER_ID,
   type SimpleNotificationsRendererContext
 } from './context'
+import {
+  shouldShowCannotGetUxCommandLineWarning,
+  shouldShowWmiAdministratorPrompt
+} from './platform'
 import { useSimpleNotificationsStore } from './store'
 
 export function watchAskUserToRunAsAdministrator() {
@@ -31,7 +35,11 @@ export function watchAskUserToRunAsAdministrator() {
   const appCommon = useInstance(AppCommonRenderer)
 
   const shouldAsk = computed(() => {
-    return leagueClientUxStore.settings.useWmi && !appCommonStore.isElevated
+    return shouldShowWmiAdministratorPrompt(
+      appCommonStore.platform,
+      leagueClientUxStore.settings.useWmi,
+      appCommonStore.isElevated
+    )
   })
 
   watch(
@@ -69,14 +77,18 @@ export function watchCannotGetUxCommandLine() {
   const appCommon = useInstance(AppCommonRenderer)
 
   let dialogReactive: DialogReactive | null = null
+  const shouldWarn = computed(() =>
+    shouldShowCannotGetUxCommandLineWarning(
+      appCommonStore.platform,
+      leagueClientUxStore.hasClientButNoCommandLine,
+      leagueClientStore.isDisconnected
+    )
+  )
+
   watch(
-    [
-      () => leagueClientUxStore.hasClientButNoCommandLine,
-      () =>
-        leagueClientStore.isDisconnected /* 在退出 leagueClientUx 后，leagueClient 仍然会短暂停留并处理善后工作，考虑仅限未连接才会触发此提示 */
-    ],
-    ([hasClientButNoCommandLine, isDisconnected]) => {
-      if (hasClientButNoCommandLine && isDisconnected) {
+    () => shouldWarn.value,
+    (shouldShow) => {
+      if (shouldShow) {
         if (leagueClientUxStore.settings.useWmi) {
           dialogReactive = dialog.warning({
             style: { width: '600px' },

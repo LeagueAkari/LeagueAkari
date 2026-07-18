@@ -3,6 +3,7 @@ productName: League Akari
 directories:
   buildResources: build
 files:
+  - '**/*'
   - '!**/.vscode/*'
   - '!src{,/**}'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
@@ -28,8 +29,13 @@ files:
   - '!node_modules/better-sqlite3/{deps,src}{,/**}'
   - '!node_modules/better-sqlite3/{binding.gyp,*.gypi}'
   - '!node_modules/better-sqlite3/build/Release/{.forge-meta,obj}{,/**}'
-  - '!node_modules/league-akari-native-win32/{build,lib,scripts,node_modules}{,/**}'
-  - '!node_modules/league-akari-native-win32/{binding.gyp,tsconfig.json,*.tsbuildinfo}'
+  - '!node_modules/league-akari-native-win32{,/**}'
+  - '!node_modules/regedit{,/**}'
+  - '!resources/magic/*.node'
+  - '!resources/akari-updater.exe'
+  - '!resources/elevate.exe'
+  - '!resources/rebuild_WMI.bat'
+  - '!resources/regedit-vbs{,/**}'
 
 electronLanguages:
   - zh-CN
@@ -42,17 +48,48 @@ afterSign: ./scripts/macos/ensure-codesign.cjs
 asarUnpack:
   - resources/**
 win:
+  files:
+    - from: resources
+      to: resources
+      filter:
+        - akari-updater.exe
+        - elevate.exe
+        - rebuild_WMI.bat
+        - regedit-vbs/**/*
+    - from: resources/magic
+      to: resources/magic
+      filter:
+        - magic.win32-x64.node
+    - from: native/win32-x64
+      to: node_modules/league-akari-native-win32
+      filter:
+        - package.json
+        - dist/**/*
+        - addons/*.node
+    - from: node_modules/regedit
+      to: node_modules/regedit
+      filter:
+        - '**/*'
   target:
     - 7z
   executableName: LeagueAkari
   icon: resources/LA_ICON.ico
 
 mac:
+  files:
+    - from: resources/magic
+      to: resources/magic
+      filter:
+        - magic.darwin-arm64.node
   target:
     - dmg
     - zip
   category: public.app-category.utilities
   icon: build/icon.png
+  protocols:
+    - name: League Akari
+      schemes:
+        - league-akari
 dmg:
   artifactName: ${name}-${version}.${ext}
 asar: true

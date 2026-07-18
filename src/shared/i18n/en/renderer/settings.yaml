@@ -322,6 +322,8 @@ settings:
     ongoingGameWindow:
       title: Ongoing Game Overlay Window
       titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)
+      requiresAdministrator: The hold-to-show overlay requires the native keyboard hook and administrator privileges.
+      unsupportedCurrentPlatform: The hold-to-show overlay requires native key press and release events, which are not supported on this platform.
       enabled:
         label: Enable Ongoing Game Window
         description: Display an overlay window during the game to show ongoing game information. This feature requires the game client to be in windowed or borderless mode.

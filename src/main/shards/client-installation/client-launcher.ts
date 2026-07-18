@@ -1,10 +1,27 @@
 import cp from 'node:child_process'
-import util from 'node:util'
+import fs from 'node:fs'
 
 import type { ClientInstallationMainContext } from './context'
-import { shouldAllowWindowsOnlyLaunch } from './platform'
+import { shouldAllowDefaultRiotClientLaunch, shouldAllowWindowsOnlyLaunch } from './platform'
 
-const execFileAsync = util.promisify(cp.execFile)
+export interface MacClientLaunchCommand {
+  args: string[]
+  executablePath: string
+}
+
+export function buildMacClientLaunchCommand(
+  launchPath: string,
+  args: readonly string[]
+): MacClientLaunchCommand {
+  if (launchPath.toLowerCase().endsWith('.app')) {
+    return {
+      executablePath: 'open',
+      args: ['-a', launchPath, '--args', ...args]
+    }
+  }
+
+  return { executablePath: launchPath, args: [...args] }
+}
 
 export class ClientInstallationLauncher {
   constructor(private readonly _context: ClientInstallationMainContext) {}
@@ -58,6 +75,13 @@ export class ClientInstallationLauncher {
   }
 
   async launchDefaultRiotClient() {
+    if (!shouldAllowDefaultRiotClientLaunch()) {
+      this._context.logger.info('Skip Riot Client launch on unsupported platform', {
+        platform: process.platform
+      })
+      return
+    }
+
     const executablePath = this._context.state.officialRiotClientExecutablePath
 
     if (!executablePath) {
@@ -70,12 +94,29 @@ export class ClientInstallationLauncher {
       return this._spawnDetachedShell(executablePath, 'Riot client', args)
     }
 
-    if (process.platform === 'darwin' && executablePath.endsWith('.app')) {
-      await execFileAsync('open', ['-a', executablePath, '--args', ...args])
-      return
-    }
+    await fs.promises.access(executablePath)
+    const command = buildMacClientLaunchCommand(executablePath, args)
 
-    await execFileAsync(executablePath, args)
+    return this._spawnDetached(command.executablePath, command.args, 'Riot client')
+  }
+
+  private _spawnDetached(executablePath: string, args: string[], label: string) {
+    return new Promise<void>((resolve, reject) => {
+      const child = cp.spawn(executablePath, args, {
+        detached: true,
+        stdio: 'ignore',
+        shell: false
+      })
+
+      child.once('error', (error) => {
+        this._context.logger.warn(`Failed to launch ${label}`, executablePath, error)
+        reject(error)
+      })
+      child.once('spawn', () => {
+        child.unref()
+        resolve()
+      })
+    })
   }
 
   private _spawnDetachedShell(executablePath: string, label: string, args: string[] = []) {

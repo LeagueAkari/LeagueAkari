@@ -13,6 +13,7 @@ type NativeSupportRequirement = {
 
 export interface NativeSupport {
   nativeInput: NativeSupportRequirement
+  activationShortcut: NativeSupportRequirement
   getLeagueClientWindowPlacement: NativeSupportRequirement
   adjustLeagueClientWindowSize: NativeSupportRequirement
   isProcessForeground: NativeSupportRequirement

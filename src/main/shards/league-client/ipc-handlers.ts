@@ -1,6 +1,7 @@
 import type { UxCommandLine } from '@shared/shards/league-client-ux'
 import type { AxiosRequestConfig } from 'axios'
 
+import { assertLocalClientRequestUrl } from '../../utils/local-client-url'
 import type { LeagueClientMainContext } from './context'
 
 export class LeagueClientIpcHandlers {
@@ -10,6 +11,7 @@ export class LeagueClientIpcHandlers {
     const { ipc, leagueClient, namespace } = this.context
 
     ipc.onCall(namespace, 'http-request', async (_, config: AxiosRequestConfig) => {
+      assertLocalClientRequestUrl(config.url)
       return leagueClient.requestForRenderer(config)
     })
 

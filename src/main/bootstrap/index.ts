@@ -49,6 +49,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { Logger } from 'winston'
 
+import { getDeepLinkArgument, isDeepLinkUrl, shouldQuitWhenAllWindowsClosed } from './app-lifecycle'
 import { readBaseConfig, writeBaseConfig } from './base-config'
 
 interface AkariAppEventMap {
@@ -274,6 +275,7 @@ export function bootstrap() {
     manager.global.isElevated = isElevated
     manager.global.platform = os.platform() as 'darwin' | 'win32'
     manager.global.version = app.getVersion()
+    manager.global.startupDeepLink = null
     manager.global.isWindows11_22H2_OrHigher = isWindows11_22H2_OrHigher()
     manager.global.isReadyToQuit = false
     manager.global.quit = () => app.quit()
@@ -361,18 +363,46 @@ export function bootstrap() {
       app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL)
     }
 
-    const getDeepLinkArg = (argv: string[]) => {
-      const urlArg = argv.find(
-        (a) => typeof a === 'string' && a.startsWith(`${DEEP_LINK_PROTOCOL}://`)
-      )
-
-      return urlArg || null
-    }
-
-    const deepLinkArg = getDeepLinkArg(process.argv)
+    const deepLinkArg = getDeepLinkArgument(process.argv, DEEP_LINK_PROTOCOL)
     if (deepLinkArg) {
       manager.global.startupDeepLink = deepLinkArg
     }
+
+    let featureLifecycleStarting = false
+    let featureLifecycleReady = false
+    const pendingDeepLinks: string[] = []
+    const dispatchDeepLink = (url: string) => {
+      if (!isDeepLinkUrl(url, DEEP_LINK_PROTOCOL)) {
+        return
+      }
+
+      if (!featureLifecycleReady) {
+        if (featureLifecycleStarting) {
+          if (manager.global.startupDeepLink !== url) {
+            pendingDeepLinks.push(url)
+          }
+          return
+        }
+
+        if (!manager.global.startupDeepLink) {
+          manager.global.startupDeepLink = url
+        } else if (manager.global.startupDeepLink !== url) {
+          pendingDeepLinks.push(url)
+        }
+        return
+      }
+
+      events.emit('second-instance-deep-link', url)
+    }
+
+    app.on('open-url', (event, url) => {
+      if (!isDeepLinkUrl(url, DEEP_LINK_PROTOCOL)) {
+        return
+      }
+
+      event.preventDefault()
+      dispatchDeepLink(url)
+    })
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
@@ -382,15 +412,17 @@ export function bootstrap() {
         namespace: 'app'
       })
 
-      const deepLinkArg = getDeepLinkArg(commandLine)
+      const deepLinkArg = getDeepLinkArgument(commandLine, DEEP_LINK_PROTOCOL)
       if (deepLinkArg) {
-        events.emit('second-instance-deep-link', deepLinkArg)
+        dispatchDeepLink(deepLinkArg)
       }
     })
 
     // 建立在如下假设：主窗口永远不会关闭（而是隐藏）
     app.on('window-all-closed', () => {
-      app.quit()
+      if (shouldQuitWhenAllWindowsClosed()) {
+        app.quit()
+      }
     })
 
     app.on('before-quit', () => {
@@ -401,13 +433,19 @@ export function bootstrap() {
       const wm = manager.getInstance(WindowManagerMain.id) as WindowManagerMain
 
       if (wm) {
+        wm.mainWindow.createWindow()
         wm.mainWindow.showOrRestore()
       }
     })
 
     app.whenReady().then(async () => {
       try {
+        featureLifecycleStarting = true
         await manager.setup()
+        featureLifecycleReady = true
+        for (const pendingDeepLink of pendingDeepLinks.splice(0)) {
+          events.emit('second-instance-deep-link', pendingDeepLink)
+        }
         logShardInitializationReport(logger, manager)
       } catch (error) {
         logShardInitializationReport(logger, manager)

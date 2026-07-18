@@ -60,10 +60,30 @@ This section describes how to build League Akari from the source code.
 ## 3.1 Electron Main Program
 
 ```bash
-yarn install
+corepack enable
+yarn install --immutable
 yarn dev
 yarn build:win
 ```
+
+## 3.2 macOS (Apple Silicon)
+
+The current macOS target is Apple Silicon (`arm64`) and uses the Node.js 24 release used by CI.
+
+```bash
+corepack enable
+yarn install --immutable
+yarn typecheck
+yarn test
+yarn build:mac
+```
+
+`yarn build:mac` creates an ARM64 application bundle, DMG, and ZIP under `dist/`. When no Apple
+signing identity is available, the local build is signed ad hoc for testing. Developer ID signing
+and notarization remain available when their standard electron-builder credentials are configured.
+
+See [docs/macos-port-status.md](docs/macos-port-status.md) for installation, logs, verified features,
+and current limitations.
 
 ## Private Packages
 

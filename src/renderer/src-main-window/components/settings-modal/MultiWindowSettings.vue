@@ -107,12 +107,13 @@
           />
         </SettingsRow>
         <SettingsRow
-          :disabled="!as.nativeSupport.nativeInput.available"
+          :disabled="!as.nativeSupport.activationShortcut.available"
           :label-width="400"
           :label="t('settings.multiWindow.opggWindow.showShortcut.label')"
           :label-description="t('settings.multiWindow.opggWindow.showShortcut.description')"
         >
           <ShortcutSelector
+            activation-only
             :target-id="AkariOpggWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
             :shortcut-id="ows.settings.showShortcut"
             @update:shortcut-id="(id) => wm.opggWindow.setShowShortcut(id)"
@@ -150,17 +151,27 @@
       </SettingsSection>
       <SettingsSection
         :title="
-          as.isElevated
-            ? t('settings.multiWindow.ongoingGameWindow.title')
-            : t('settings.multiWindow.ongoingGameWindow.titleRequireAdmin')
+          nativeInputRequiresElevation
+            ? t('settings.multiWindow.ongoingGameWindow.titleRequireAdmin')
+            : t('settings.multiWindow.ongoingGameWindow.title')
         "
       >
         <SettingsRow
+          :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.ongoingGameWindow.enabled.label')"
-          :label-description="t('settings.multiWindow.ongoingGameWindow.enabled.description')"
           :label-width="400"
         >
+          <template #labelDescription>
+            <div>{{ t('settings.multiWindow.ongoingGameWindow.enabled.description') }}</div>
+            <div
+              v-if="!as.nativeSupport.nativeInput.available"
+              class="mt-1 text-xs text-yellow-700/80 dark:text-yellow-300/80"
+            >
+              {{ ongoingGameWindowUnavailableReason }}
+            </div>
+          </template>
           <NSwitch
+            :disabled="!as.nativeSupport.nativeInput.available"
             size="small"
             :value="ogws.settings.enabled"
             @update:value="(val) => wm.ongoingGameWindow.setEnabled(val)"
@@ -179,13 +190,7 @@
           />
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection
-        :title="
-          as.isElevated
-            ? t('settings.multiWindow.cdTimerWindow.title')
-            : t('settings.multiWindow.cdTimerWindow.titleRequireAdmin')
-        "
-      >
+      <SettingsSection :title="t('settings.multiWindow.cdTimerWindow.title')">
         <SettingsRow
           :label="t('settings.multiWindow.cdTimerWindow.enabled.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.enabled.description')"
@@ -198,12 +203,13 @@
           />
         </SettingsRow>
         <SettingsRow
-          :disabled="!as.nativeSupport.nativeInput.available"
+          :disabled="!as.nativeSupport.activationShortcut.available"
           :label-width="400"
           :label="t('settings.multiWindow.cdTimerWindow.showShortcut.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.showShortcut.description')"
         >
           <ShortcutSelector
+            activation-only
             :target-id="AkariCdTimerWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
             :shortcut-id="ctws.settings.showShortcut"
             @update:shortcut-id="(id) => wm.cdTimerWindow.setShowShortcut(id)"
@@ -289,6 +295,7 @@ import {
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NRadio, NRadioGroup, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { computed } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -299,6 +306,18 @@ const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const ogws = useOngoingGameWindowStore()
 const ctws = useCdTimerWindowStore()
+
+const nativeInputRequiresElevation = computed(
+  () =>
+    as.nativeSupport.nativeInput.availableOnCurrentPlatform &&
+    as.nativeSupport.nativeInput.requiresElevation &&
+    !as.isElevated
+)
+const ongoingGameWindowUnavailableReason = computed(() =>
+  as.nativeSupport.nativeInput.availableOnCurrentPlatform
+    ? t('settings.multiWindow.ongoingGameWindow.requiresAdministrator')
+    : t('settings.multiWindow.ongoingGameWindow.unsupportedCurrentPlatform')
+)
 
 const wm = useInstance(WindowManagerRenderer)
 </script>

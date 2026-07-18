@@ -1,12 +1,13 @@
-import { NATIVE_SUPPORT, nativeInput } from '@main/native'
+import { NATIVE_SUPPORT } from '@main/native'
 import { isSupportedShortcutId } from '@shared/utils/keyboard-shortcuts'
 
 import {
-  DISABLED_KEYS,
   DISABLED_KEYS_TARGET_ID,
+  DISABLED_KEY_IDS,
   type KeyboardShortcutRegistration,
   type KeyboardShortcutRegistrationType
 } from './context'
+import type { ActivationShortcutBackend } from './electron-global-shortcut-controller'
 
 export class ShortcutRegistry {
   private readonly registrationMap = new Map<string, KeyboardShortcutRegistration>()
@@ -15,7 +16,8 @@ export class ShortcutRegistry {
   constructor(
     private readonly logger: {
       info: (...args: any[]) => void
-    }
+    },
+    private readonly activationShortcutBackend: ActivationShortcutBackend
   ) {}
 
   register(
@@ -24,15 +26,31 @@ export class ShortcutRegistry {
     type: KeyboardShortcutRegistrationType,
     cb: KeyboardShortcutRegistration['cb']
   ) {
-    if (!NATIVE_SUPPORT.nativeInput.available) {
-      this.logger.info(
-        `Native global shortcuts are unavailable, ignoring shortcut registration: ${shortcutId} (${type})`
-      )
+    const usesNativeInput = NATIVE_SUPPORT.nativeInput.available
+    const usesActivationShortcut =
+      !usesNativeInput && type === 'normal' && this.activationShortcutBackend.available
+
+    if (!usesNativeInput && !usesActivationShortcut) {
+      this.logger.info(`Shortcut type ${type} is unavailable, ignoring registration: ${shortcutId}`)
       return
     }
 
     if (!isSupportedShortcutId(shortcutId)) {
       throw new Error(`Shortcut ${shortcutId} contains unsupported keys`)
+    }
+
+    if (
+      usesActivationShortcut &&
+      !this.activationShortcutBackend.isShortcutIdSupported(shortcutId)
+    ) {
+      throw new Error(`Shortcut ${shortcutId} is unavailable for activation-only shortcuts`)
+    }
+
+    if (
+      usesActivationShortcut &&
+      DISABLED_KEY_IDS.some((keyId) => shortcutId.split('+').includes(keyId))
+    ) {
+      throw new Error(`Shortcut ${shortcutId} contains reserved keys`)
     }
 
     const existingShortcutRegistration = this.registrationMap.get(shortcutId)
@@ -43,6 +61,14 @@ export class ShortcutRegistry {
     }
 
     const originShortcut = this.targetIdMap.get(targetId)
+    if (usesActivationShortcut) {
+      if (originShortcut && originShortcut !== shortcutId) {
+        this.activationShortcutBackend.replace(originShortcut, shortcutId)
+      } else if (!existingShortcutRegistration) {
+        this.activationShortcutBackend.register(shortcutId)
+      }
+    }
+
     if (originShortcut && originShortcut !== shortcutId) {
       this.registrationMap.delete(originShortcut)
     }
@@ -58,6 +84,10 @@ export class ShortcutRegistry {
       return false
     }
 
+    if (this.activationShortcutBackend.available && options.type === 'normal') {
+      this.activationShortcutBackend.unregister(shortcutId)
+    }
+
     this.registrationMap.delete(shortcutId)
     this.targetIdMap.delete(options.targetId)
     this.logger.info(`Unregister shortcut ${shortcutId} for target ${options.targetId}`)
@@ -70,6 +100,15 @@ export class ShortcutRegistry {
       return false
     }
 
+    const registration = this.registrationMap.get(shortcutId)
+    if (
+      registration &&
+      this.activationShortcutBackend.available &&
+      registration.type === 'normal'
+    ) {
+      this.activationShortcutBackend.unregister(shortcutId)
+    }
+
     this.registrationMap.delete(shortcutId)
     this.targetIdMap.delete(targetId)
     this.logger.info(`Unregister shortcut ${shortcutId} for target ${targetId}`)
@@ -77,17 +116,15 @@ export class ShortcutRegistry {
   }
 
   getRegistration(shortcutId: string) {
-    if (!NATIVE_SUPPORT.nativeInput.available) {
+    if (!NATIVE_SUPPORT.nativeInput.available && !this.activationShortcutBackend.available) {
       return null
     }
 
-    const reservedKeyIds = DISABLED_KEYS.map(
-      (keyCode) => nativeInput.VKEY_MAP[keyCode]?.keyId
-    ).filter((keyId): keyId is string => Boolean(keyId))
-
     if (
-      reservedKeyIds.some((keyId) => shortcutId.includes(keyId)) ||
-      !isSupportedShortcutId(shortcutId)
+      DISABLED_KEY_IDS.some((keyId) => shortcutId.split('+').includes(keyId)) ||
+      !isSupportedShortcutId(shortcutId) ||
+      (!NATIVE_SUPPORT.nativeInput.available &&
+        !this.activationShortcutBackend.isShortcutIdSupported(shortcutId))
     ) {
       return {
         type: 'normal',
@@ -123,6 +160,7 @@ export class ShortcutRegistry {
   }
 
   clear() {
+    this.activationShortcutBackend.clear()
     this.registrationMap.clear()
     this.targetIdMap.clear()
   }

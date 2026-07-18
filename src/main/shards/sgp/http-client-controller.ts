@@ -9,6 +9,31 @@ import { isAxiosError } from 'axios'
 import type { SgpMainContext } from './context'
 import { isNodeReadableStream, readNodeStreamToBuffer } from './node-stream-reader'
 
+const SGP_REGION_PATH_PARAM_FALLBACKS: Readonly<Record<string, string>> = {
+  EUW: 'EUW1',
+  JP: 'JP1'
+}
+
+export function resolveSgpRegionPathParam(
+  sgpServerId: string,
+  configuredRegionPathParam?: string,
+  currentServer?: { sgpServerId: string; rsoPlatformId: string }
+) {
+  if (configuredRegionPathParam) {
+    return configuredRegionPathParam
+  }
+
+  if (currentServer?.sgpServerId === sgpServerId && currentServer.rsoPlatformId.trim().length > 0) {
+    return currentServer.rsoPlatformId.toUpperCase()
+  }
+
+  if (sgpServerId.startsWith('TENCENT_')) {
+    return sgpServerId.slice('TENCENT_'.length)
+  }
+
+  return SGP_REGION_PATH_PARAM_FALLBACKS[sgpServerId] ?? sgpServerId
+}
+
 export class SgpHttpClientController {
   constructor(private readonly context: SgpMainContext) {}
 
@@ -62,9 +87,19 @@ export class SgpHttpClientController {
       }
 
       if (config.url) {
+        const availability = state.availability
         config.url = config.url.replace(
           URL_PLACEHOLDER_SUB_ID,
-          serverConfig.regionPathParam ?? this._getSubId(preferredSgpServerId)
+          resolveSgpRegionPathParam(
+            preferredSgpServerId,
+            serverConfig.regionPathParam,
+            availability.sgpServerId && availability.rsoPlatform
+              ? {
+                  sgpServerId: availability.sgpServerId,
+                  rsoPlatformId: availability.rsoPlatform
+                }
+              : undefined
+          )
         )
       }
 
@@ -127,14 +162,6 @@ export class SgpHttpClientController {
         }
       }
     )
-  }
-
-  private _getSubId(sgpServerId: string) {
-    if (sgpServerId.startsWith('TENCENT')) {
-      const [_, rsoPlatformId] = sgpServerId.split('_')
-      return rsoPlatformId
-    }
-    return sgpServerId
   }
 
   private _getToken(tokenType: string) {

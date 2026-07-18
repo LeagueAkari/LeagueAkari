@@ -6,6 +6,7 @@ import { comparer } from 'mobx'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
+import { shouldShowOverlayOnAllWorkspaces } from '../platform'
 import { OngoingGameWindowSettings, OngoingGameWindowState } from './state'
 
 export class AkariOngoingGameWindow extends BaseAkariWindow<
@@ -102,6 +103,10 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
         }
 
         if (this._window) {
+          if (shouldShowOverlayOnAllWorkspaces()) {
+            this._window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+          }
+
           this._window.setIgnoreMouseEvents(true)
           this.show()
         }

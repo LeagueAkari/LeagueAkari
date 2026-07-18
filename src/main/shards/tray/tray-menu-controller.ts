@@ -90,7 +90,7 @@ export class TrayMenuController {
     this.quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
-      click: () => windowManager.mainWindow.close(true)
+      click: () => app.quit()
     })
 
     this._contextMenu = Menu.buildFromTemplate([

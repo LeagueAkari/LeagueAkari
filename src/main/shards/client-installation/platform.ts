@@ -17,3 +17,7 @@ export function shouldWatchLiveStreamingClients(platform: NodeJS.Platform = proc
 export function shouldAllowWindowsOnlyLaunch(platform: NodeJS.Platform = process.platform) {
   return platform === 'win32'
 }
+
+export function shouldAllowDefaultRiotClientLaunch(platform: NodeJS.Platform = process.platform) {
+  return platform === 'win32' || platform === 'darwin'
+}

@@ -12,6 +12,7 @@ import {
   TENCENT_REG_INSTALL_VALUE,
   WEGAME_DEFAULTICON_PATH
 } from './context'
+import { MacInstallationLoader } from './macos-installation-loader'
 import { shouldScanMacInstallations, shouldScanTencentInstallations } from './platform'
 
 const execAsync = util.promisify(cp.exec)
@@ -25,11 +26,13 @@ if (regedit) {
 }
 
 export class ClientInstallationDetector {
+  private readonly _macInstallationLoader = new MacInstallationLoader()
+
   constructor(private readonly _context: ClientInstallationMainContext) {}
 
   async runPlatformDetection() {
     if (shouldScanMacInstallations()) {
-      await this.updateMacInstallationsByFile()
+      await this.updateMacInstallations()
       return
     }
 
@@ -287,48 +290,27 @@ export class ClientInstallationDetector {
     }
   }
 
-  async updateMacInstallationsByFile() {
+  async updateMacInstallations() {
     if (!shouldScanMacInstallations()) {
       return
     }
 
     const { state, logger } = this._context
 
-    const riotClientCandidates = [
-      '/Applications/Riot Client.app',
-      '/Users/Shared/Riot Games/Riot Client/Riot Client.app',
-      '/Applications/Riot Client.app/Contents/MacOS/Riot Client',
-      '/Users/Shared/Riot Games/Riot Client/Riot Client.app/Contents/MacOS/Riot Client'
-    ]
+    const installations = await this._macInstallationLoader.load()
 
-    for (const p of riotClientCandidates) {
-      try {
-        await fs.promises.access(p)
-        state.setOfficialRiotClientExecutablePath(p)
-        logger.info('Detected RiotClient installation on macOS', p)
-        break
-      } catch {}
+    if (installations.riotClientLaunchPath) {
+      state.setOfficialRiotClientExecutablePath(installations.riotClientLaunchPath)
+      logger.info('Detected RiotClient installation on macOS', installations.riotClientLaunchPath)
     }
 
-    const leagueCandidates = [
-      '/Applications/League of Legends.app/Contents/LoL/LeagueClient.app/Contents/MacOS/LeagueClient',
-      '/Applications/League of Legends.app/Contents/MacOS/LeagueofLegends',
-      '/Users/Shared/Riot Games/League of Legends.app/Contents/LoL/LeagueClient.app/Contents/MacOS/LeagueClient',
-      '/Users/Shared/Riot Games/League of Legends.app/Contents/MacOS/LeagueofLegends'
-    ]
-
-    const detectedLeagueClients: string[] = []
-    for (const p of leagueCandidates) {
-      try {
-        await fs.promises.access(p)
-        detectedLeagueClients.push(p)
-      } catch {}
+    if (installations.leagueClientExecutablePaths.length) {
+      logger.info(
+        'Detected LeagueClient installations on macOS',
+        installations.leagueClientExecutablePaths
+      )
     }
 
-    if (detectedLeagueClients.length) {
-      logger.info('Detected LeagueClient installations on macOS', detectedLeagueClients)
-    }
-
-    state.setLeagueClientExecutablePaths(detectedLeagueClients)
+    state.setLeagueClientExecutablePaths(installations.leagueClientExecutablePaths)
   }
 }

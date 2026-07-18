@@ -14,6 +14,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { APP_COMMON_MAIN_NAMESPACE, type AppCommonMainContext } from './context'
 import { AppCommonDiagnosticsController } from './diagnostics-controller'
 import { AppCommonIpcHandlers } from './ipc-handlers'
+import { canRelaunchAsAdministrator } from './platform'
 import { RendererLinkProtocol } from './renderer-link-protocol'
 import { AppCommonSettings, AppCommonState } from './state'
 import { AppCommonThemeController } from './theme-controller'
@@ -132,6 +133,11 @@ export class AppCommonMain implements IAkariShardInitDispose {
   }
 
   async relaunchAsAdministrator() {
+    if (!canRelaunchAsAdministrator()) {
+      this._logger.warn('Administrator relaunch is unavailable on this platform', process.platform)
+      return { result: 'unsupported' as const, platform: process.platform }
+    }
+
     const appPath = process.execPath
 
     await execAsync(`"${elevateExecutablePath}" "${appPath}"`, {
@@ -139,6 +145,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     })
 
     app.exit()
+    return { result: 'relaunching' as const }
   }
 
   async getRuntimeInfo() {

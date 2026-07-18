@@ -20,7 +20,6 @@ export class ClientInstallationJumpListController {
       this._context.logger.info('Skip client installation Jump List on unsupported platform', {
         platform: process.platform
       })
-      return
     }
 
     this._context.mobxUtils.reaction(
@@ -31,7 +30,9 @@ export class ClientInstallationJumpListController {
         this._context.state.officialRiotClientExecutablePath
       ],
       () => {
-        this._buildJumpList()
+        if (shouldRegisterJumpList()) {
+          this._buildJumpList()
+        }
 
         if (this._context.shared.global.startupDeepLink && !this._startupLaunch) {
           this._handleDeepLink(this._context.shared.global.startupDeepLink, false)

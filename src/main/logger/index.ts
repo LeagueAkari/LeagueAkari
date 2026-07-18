@@ -1,3 +1,4 @@
+import { redactSecretsInString } from '@shared/utils/redact-secrets'
 import dayjs from 'dayjs'
 import { app } from 'electron'
 import fs from 'node:fs'
@@ -92,7 +93,7 @@ export function initAppLogger(level: string = 'info') {
     format: format.combine(
       format.timestamp(),
       format.printf(({ level, message, namespace, timestamp }) => {
-        return `[${dayjs(timestamp as number).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
+        return `[${dayjs(timestamp as number).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${redactSecretsInString(String(message))}`
       })
     )
   })
@@ -107,7 +108,7 @@ export function initAppLogger(level: string = 'info') {
         const levelColor = LEVEL_COLORS[level] || STYLES.reset
         const levelColored = `${levelColor}[${level}]${STYLES.reset}`
 
-        return `${timestampColored} ${namespaceColored} ${levelColored} ${message}`
+        return `${timestampColored} ${namespaceColored} ${levelColored} ${redactSecretsInString(String(message))}`
       })
     )
   })

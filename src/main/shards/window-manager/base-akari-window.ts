@@ -28,6 +28,7 @@ import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import type { WindowManagerMainContext } from './context'
 import { repositionWindowIfInvisible } from './window-position-service'
+import { showOrRestoreWindow } from './window-visibility'
 
 /**
  * 具备的一些基础属性
@@ -614,23 +615,7 @@ export abstract class BaseAkariWindow<
 
   showOrRestore(inactive = false) {
     if (this._window) {
-      if (!this.state.show) {
-        if (inactive) {
-          this._window.showInactive()
-        } else {
-          this._window.show()
-        }
-
-        return
-      }
-
-      if (this._window.isMinimized()) {
-        this._window.restore()
-      }
-
-      if (!inactive) {
-        this._window.focus()
-      }
+      showOrRestoreWindow(this._window, inactive)
     }
   }
 

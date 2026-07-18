@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { KeyboardShortcutsMain } from './index'
 
@@ -9,6 +9,8 @@ const nativeInputMock = vi.hoisted(() => {
 
   return {
     pressed,
+    on: vi.fn(),
+    off: vi.fn(),
     getKeyStates: vi.fn(() =>
       Array.from({ length: 256 }, (_, vkCode) => ({
         vkCode,
@@ -18,6 +20,39 @@ const nativeInputMock = vi.hoisted(() => {
     )
   }
 })
+
+const nativeSupportMock = vi.hoisted(() => ({
+  nativeInput: {
+    available: true,
+    availableOnCurrentPlatform: true,
+    requiresElevation: true
+  },
+  activationShortcut: {
+    available: true,
+    availableOnCurrentPlatform: true,
+    requiresElevation: false
+  }
+}))
+
+const globalShortcutMock = vi.hoisted(() => {
+  const callbacks = new Map<string, () => void>()
+
+  return {
+    callbacks,
+    register: vi.fn((accelerator: string, callback: () => void) => {
+      callbacks.set(accelerator, callback)
+      return true
+    }),
+    unregister: vi.fn((accelerator: string) => {
+      callbacks.delete(accelerator)
+    }),
+    unregisterAll: vi.fn()
+  }
+})
+
+vi.mock('electron', () => ({
+  globalShortcut: globalShortcutMock
+}))
 
 vi.mock('@main/native', () => {
   const VKEY_MAP = {
@@ -32,13 +67,7 @@ vi.mock('@main/native', () => {
   }
 
   return {
-    NATIVE_SUPPORT: {
-      nativeInput: {
-        available: true,
-        availableOnCurrentPlatform: true,
-        requiresElevation: true
-      }
-    },
+    NATIVE_SUPPORT: nativeSupportMock,
     nativeInput: {
       VKEY_MAP,
       UNIFIED_KEY_ID: {
@@ -48,7 +77,8 @@ vi.mock('@main/native', () => {
       },
       isModifierKey: (keyCode: number) => [17, 162, 163].includes(keyCode),
       instance: {
-        on: vi.fn(),
+        on: nativeInputMock.on,
+        off: nativeInputMock.off,
         getKeyStates: nativeInputMock.getKeyStates
       }
     }
@@ -96,8 +126,85 @@ function emitKey(kbd: KeyboardShortcutsMain, event: TestKeyEvent) {
 
 describe('KeyboardShortcutsMain', () => {
   beforeEach(() => {
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin')
+    nativeSupportMock.nativeInput.available = true
+    nativeSupportMock.activationShortcut.available = true
     nativeInputMock.pressed.clear()
+    nativeInputMock.on.mockClear()
+    nativeInputMock.off.mockClear()
     nativeInputMock.getKeyStates.mockClear()
+    globalShortcutMock.callbacks.clear()
+    globalShortcutMock.register.mockClear()
+    globalShortcutMock.register.mockImplementation((accelerator, callback) => {
+      globalShortcutMock.callbacks.set(accelerator, callback)
+      return true
+    })
+    globalShortcutMock.unregister.mockClear()
+    globalShortcutMock.unregisterAll.mockClear()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('uses Electron for normal shortcuts when native input is unavailable on macOS', async () => {
+    nativeSupportMock.nativeInput.available = false
+    const kbd = createKeyboardShortcuts()
+    const callback = vi.fn()
+
+    kbd.register('macos-shortcut', 'LeftMeta+A', 'normal', callback)
+    await kbd.onInit()
+    globalShortcutMock.callbacks.get('Command+A')?.()
+
+    expect(kbd.getRegistration('LeftMeta+A')).toEqual(
+      expect.objectContaining({ targetId: 'macos-shortcut', type: 'normal' })
+    )
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'LeftMeta+A', pressed: true })
+    )
+    expect(nativeInputMock.on).not.toHaveBeenCalled()
+  })
+
+  it('leaves stateful and last-active shortcuts unavailable without native input', () => {
+    nativeSupportMock.nativeInput.available = false
+    const kbd = createKeyboardShortcuts()
+
+    kbd.register('stateful', 'LeftMeta+A', 'stateful', vi.fn())
+    kbd.register('last-active', 'LeftMeta+B', 'last-active', vi.fn())
+
+    expect(kbd.getRegistrationByTargetId('stateful')).toBeNull()
+    expect(kbd.getRegistrationByTargetId('last-active')).toBeNull()
+    expect(globalShortcutMock.register).not.toHaveBeenCalled()
+  })
+
+  it('rejects reserved and non-Electron activation shortcuts on macOS', () => {
+    nativeSupportMock.nativeInput.available = false
+    const kbd = createKeyboardShortcuts()
+
+    expect(() => kbd.register('reserved', 'LeftMeta+Enter', 'normal', vi.fn())).toThrow(
+      'contains reserved keys'
+    )
+    expect(() => kbd.register('unsupported', 'LeftMeta+Numpad1', 'normal', vi.fn())).toThrow(
+      'unavailable for activation-only shortcuts'
+    )
+    expect(kbd.getRegistration('LeftMeta+Enter')).toEqual(
+      expect.objectContaining({ targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID })
+    )
+    expect(kbd.getRegistration('LeftMeta+Numpad1')).toEqual(
+      expect.objectContaining({ targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID })
+    )
+  })
+
+  it('keeps the Windows native registration path unchanged', () => {
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('win32')
+    const kbd = createKeyboardShortcuts()
+    const callback = vi.fn()
+
+    kbd.register('windows-shortcut', 'A', 'normal', callback)
+    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
+
+    expect(callback).toHaveBeenCalledOnce()
+    expect(globalShortcutMock.register).not.toHaveBeenCalled()
   })
 
   it('recovers when a side-specific modifier is released as a common modifier event', () => {

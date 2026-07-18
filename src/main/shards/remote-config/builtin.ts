@@ -81,11 +81,13 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: LeagueServersConfig = {
     },
     EUW: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
-      common: 'https://euw-red.lol.sgp.pvp.net'
+      common: 'https://euw-red.lol.sgp.pvp.net',
+      regionPathParam: 'EUW1'
     },
     JP: {
       matchHistory: 'https://apne1-red.pp.sgp.pvp.net',
-      common: 'https://jp-red.lol.sgp.pvp.net'
+      common: 'https://jp-red.lol.sgp.pvp.net',
+      regionPathParam: 'JP1'
     },
     RU: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',

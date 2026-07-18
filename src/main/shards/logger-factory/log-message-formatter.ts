@@ -1,11 +1,15 @@
 import { formatError } from '@shared/utils/errors'
+import {
+  createSecretRedactingJsonReplacer,
+  redactSecretsInString
+} from '@shared/utils/redact-secrets'
 
 export class LogMessageFormatter {
   objectsToString(...args: any[]) {
     return args
       .map((arg) => {
         if (arg instanceof Error || this._isLikelyErrorObject(arg)) {
-          return formatError(arg)
+          return redactSecretsInString(formatError(arg))
         }
 
         if (typeof arg === 'undefined') {
@@ -13,18 +17,18 @@ export class LogMessageFormatter {
         }
 
         if (typeof arg === 'function') {
-          return arg.toString()
+          return redactSecretsInString(arg.toString())
         }
 
         if (typeof arg === 'object') {
           try {
-            return JSON.stringify(arg, null, 2)
+            return JSON.stringify(arg, createSecretRedactingJsonReplacer(), 2)
           } catch {
             return `[Cannot stringify: ${arg}]`
           }
         }
 
-        return arg
+        return typeof arg === 'string' ? redactSecretsInString(arg) : arg
       })
       .join(' ')
   }

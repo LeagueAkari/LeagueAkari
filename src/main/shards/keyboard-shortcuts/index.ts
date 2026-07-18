@@ -21,6 +21,7 @@ import {
   MODIFIER_READING_ORDER,
   VK_CODE_F22
 } from './context'
+import { ElectronGlobalShortcutController } from './electron-global-shortcut-controller'
 import { KeyboardShortcutsIpcHandlers } from './ipc-handlers'
 import { ShortcutRegistry } from './shortcut-registry'
 
@@ -34,6 +35,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   private readonly _logger: AkariLogger
   private readonly _context: KeyboardShortcutsMainContext
+  private readonly _electronGlobalShortcuts: ElectronGlobalShortcutController
   private readonly _registry: ShortcutRegistry
   private readonly _ipcHandlers: KeyboardShortcutsIpcHandlers
 
@@ -89,7 +91,10 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       ipc: _ipc,
       logger: this._logger
     }
-    this._registry = new ShortcutRegistry(this._logger)
+    this._electronGlobalShortcuts = new ElectronGlobalShortcutController(this._logger, (details) =>
+      this._processActivationShortcut(details)
+    )
+    this._registry = new ShortcutRegistry(this._logger, this._electronGlobalShortcuts)
     this._ipcHandlers = new KeyboardShortcutsIpcHandlers(this._context, this)
   }
 
@@ -352,6 +357,17 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     this._emitLastActiveShortcutIfNeeded()
   }
 
+  private _processActivationShortcut(details: ShortcutDetails) {
+    const registration = this._registry.getActiveRegistration(details.id)
+    if (!registration || registration.type !== 'normal') {
+      return
+    }
+
+    this.events.emit('shortcut', details)
+    registration.cb(details)
+    this._ipc.sendEvent(KeyboardShortcutsMain.id, 'shortcut', details)
+  }
+
   async onInit() {
     if (NATIVE_SUPPORT.nativeInput.available) {
       this._logger.info('Listening for key events')
@@ -359,6 +375,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         this._processNativeKeyEvent(key)
       }
       nativeInput.instance.on('keyEvent', this._nativeKeyEventHandler)
+    } else if (this._electronGlobalShortcuts.available) {
+      this._logger.info('Using Electron activation-only global shortcuts')
     }
 
     this._ipcHandlers.register()

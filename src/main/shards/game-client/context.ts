@@ -6,10 +6,11 @@ import type { AkariLogger } from '../logger-factory'
 import type { MobxUtilsMain } from '../mobx-utils'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
 import type { GameClientMain } from './index'
+import { getGameClientProcessName } from './platform'
 import type { GameClientSettings } from './state'
 
 export const GAME_CLIENT_MAIN_NAMESPACE = 'game-client-main'
-export const GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
+export const GAME_CLIENT_PROCESS_NAME = getGameClientProcessName()
 export const GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
 export const TERMINATE_GAME_CLIENT_SHORTCUT_TARGET_ID = `${GAME_CLIENT_MAIN_NAMESPACE}/terminate-game-client`
 

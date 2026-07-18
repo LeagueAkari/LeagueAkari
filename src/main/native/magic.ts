@@ -1,5 +1,4 @@
-import darwinArm64Path from '@resources/magic/magic.darwin-arm64.node?asset&asarUnpack'
-import win32X64Path from '@resources/magic/magic.win32-x64.node?asset&asarUnpack'
+import path from 'node:path'
 
 interface MagicAddon {
   magic: (value: string) => string
@@ -7,14 +6,30 @@ interface MagicAddon {
 
 let addon: MagicAddon | null | undefined
 
+export function resolveMagicAddonPath(
+  platform: NodeJS.Platform,
+  architecture: string,
+  baseDir: string
+) {
+  const addonFilename =
+    platform === 'win32' && architecture === 'x64'
+      ? 'magic.win32-x64.node'
+      : platform === 'darwin' && architecture === 'arm64'
+        ? 'magic.darwin-arm64.node'
+        : null
+
+  if (!addonFilename) {
+    return null
+  }
+
+  return path
+    .join(baseDir, '../../resources/magic', addonFilename)
+    .replace('app.asar', 'app.asar.unpacked')
+}
+
 export function magic(value: string) {
   if (addon === undefined) {
-    const addonPath =
-      process.platform === 'win32' && process.arch === 'x64'
-        ? win32X64Path
-        : process.platform === 'darwin' && process.arch === 'arm64'
-          ? darwinArm64Path
-          : null
+    const addonPath = resolveMagicAddonPath(process.platform, process.arch, __dirname)
 
     try {
       addon = addonPath ? (require(addonPath) as MagicAddon) : null

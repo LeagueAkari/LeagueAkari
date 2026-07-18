@@ -1,7 +1,7 @@
-import { NativeSupport } from '@shared/types/common'
 import { getuid } from 'node:process'
 
 import { addons } from './addons-win32'
+import { resolveNativeSupport } from './capabilities'
 import { NotSupportedPlatformError } from './errors'
 import {
   getCommandLinePosix,
@@ -11,7 +11,7 @@ import {
 } from './process-utils-darwin'
 import { getCommandLinePowershell } from './process-utils-win32'
 
-export type { KeyEvent as NativeInputKeyEvent } from 'league-akari-native-win32/input'
+export type { NativeInputKeyEvent } from './types'
 export { magic } from './magic'
 
 /**
@@ -136,25 +136,9 @@ export function getLeagueClientWindowPlacement() {
  */
 export const nativeInput = addons?.input
 
-export const NATIVE_SUPPORT: NativeSupport = {
-  nativeInput: {
-    available: Boolean(nativeInput?.instance.isInstalled) && isElevated,
-    availableOnCurrentPlatform: Boolean(nativeInput),
-    requiresElevation: true
-  },
-  getLeagueClientWindowPlacement: {
-    available: process.platform === 'win32',
-    availableOnCurrentPlatform: process.platform === 'win32',
-    requiresElevation: false
-  },
-  adjustLeagueClientWindowSize: {
-    available: process.platform === 'win32' && isElevated,
-    availableOnCurrentPlatform: process.platform === 'win32',
-    requiresElevation: true
-  },
-  isProcessForeground: {
-    available: process.platform === 'win32' && isElevated,
-    availableOnCurrentPlatform: process.platform === 'win32',
-    requiresElevation: true
-  }
-}
+export const NATIVE_SUPPORT = resolveNativeSupport({
+  platform: process.platform,
+  isElevated,
+  nativeInputAddonLoaded: Boolean(nativeInput),
+  nativeInputInstalled: Boolean(nativeInput?.instance.isInstalled)
+})
