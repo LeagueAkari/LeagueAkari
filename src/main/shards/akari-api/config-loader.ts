@@ -47,13 +47,44 @@ export class AkariApiConfigLoader {
       return
     }
 
-    const cached = await settingService.readFromJsonConfigFile(resource.cachePath)
+    let cached: unknown
+    try {
+      cached = await settingService.readFromJsonConfigFile(resource.cachePath)
+    } catch (error) {
+      logger.warn(`Invalid cached ${resource.name}`, error)
+      await this._deleteCachedResource(resource)
+      return
+    }
+
     const result = resource.schema.safeParse(cached)
 
-    if (result.success) {
-      resource.apply(state, result.data)
-    } else {
+    if (!result.success) {
       logger.warn(`Invalid cached ${resource.name}`, result.error)
+      await this._deleteCachedResource(resource)
+      return
+    }
+
+    const cachedUpdatedAt = Date.parse(result.data.updatedAt)
+    const currentUpdatedAt = Date.parse(resource.getCurrentUpdatedAt(state))
+
+    if (cachedUpdatedAt < currentUpdatedAt) {
+      logger.info(`Removed stale cached ${resource.name}`)
+      await this._deleteCachedResource(resource)
+      return
+    }
+
+    if (cachedUpdatedAt > currentUpdatedAt) {
+      resource.apply(state, result.data)
+    }
+  }
+
+  private async _deleteCachedResource<T extends AkariConfigMetadata>(resource: CachedResource<T>) {
+    const { logger, settingService } = this._context
+
+    try {
+      await settingService.deleteJsonConfigFile(resource.cachePath)
+    } catch (error) {
+      logger.warn(`Failed to delete cached ${resource.name}`, error)
     }
   }
 

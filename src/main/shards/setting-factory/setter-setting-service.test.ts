@@ -29,7 +29,8 @@ function createService<T extends object>(
     _removeJsonValue: vi.fn(),
     readFromJsonConfigFile: vi.fn(),
     writeToJsonConfigFile: vi.fn(),
-    jsonConfigFileExists: vi.fn()
+    jsonConfigFileExists: vi.fn(),
+    deleteJsonConfigFile: vi.fn()
   }
 
   return {

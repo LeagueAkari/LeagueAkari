@@ -6,7 +6,7 @@ import {
 } from '@shared/shards/akari-api'
 
 export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
-  updatedAt: '2025-10-04T08:54:51.536Z',
+  updatedAt: '2026-07-18T04:00:00.000Z',
   spotlight: {
     deobfuscation: true,
     gsmByPuuid: true,
@@ -15,7 +15,7 @@ export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
 }
 
 export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
-  updatedAt: '2026-07-17T08:19:07.000Z',
+  updatedAt: '2026-07-18T04:00:00.000Z',
   servers: {
     TENCENT_HN1: {
       matchHistory: 'https://hn1-k8s-sgp.lol.qq.com:21019',
@@ -96,7 +96,8 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
     EUW: {
       matchHistory: 'https://euc1-red.pp.sgp.pvp.net',
       common: 'https://euw-red.lol.sgp.pvp.net',
-      isTencent: false
+      isTencent: false,
+      regionPathParam: 'EUW1'
     },
     JP: {
       matchHistory: 'https://apne1-red.pp.sgp.pvp.net',
@@ -211,14 +212,14 @@ export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
 }
 
 export const BUILTIN_SUPPORTED_QUEUES: AkariSupportedQueuesConfig = {
-  updatedAt: '2026-05-15T16:40:26.395Z',
+  updatedAt: '2026-07-18T04:00:00.000Z',
   queues: [
     420, 440, 430, 450, 480, 1700, 1750, 490, 1900, 900, 2300, 2400, 4210, 4220, 4240, 4250, 4260
   ]
 }
 
 export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
-  updatedAt: '2026-01-25T02:46:47.628Z',
+  updatedAt: '2026-07-18T04:00:00.000Z',
   groups: [
     {
       groupId: 'ranked',

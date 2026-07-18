@@ -22,6 +22,7 @@ const resource: CachedResource<ReturnType<typeof AkariSupportedQueuesConfigSchem
 function setup(remoteUpdatedAt: string) {
   const state = new AkariApiState()
   const writeToJsonConfigFile = vi.fn().mockResolvedValue(undefined)
+  const deleteJsonConfigFile = vi.fn().mockResolvedValue(undefined)
   const context = {
     api: {
       getConfig: vi.fn().mockResolvedValue({
@@ -38,13 +39,14 @@ function setup(remoteUpdatedAt: string) {
     settingService: {
       jsonConfigFileExists: vi.fn().mockResolvedValue(false),
       readFromJsonConfigFile: vi.fn(),
-      writeToJsonConfigFile
+      writeToJsonConfigFile,
+      deleteJsonConfigFile
     },
     state
   } as unknown as AkariApiMainContext
   const loader = new AkariApiConfigLoader(context, [resource])
 
-  return { context, loader, state, writeToJsonConfigFile }
+  return { context, loader, state, writeToJsonConfigFile, deleteJsonConfigFile }
 }
 
 afterEach(() => {
@@ -80,7 +82,8 @@ describe('Akari API config loader', () => {
       settingService: {
         jsonConfigFileExists: vi.fn().mockResolvedValue(true),
         readFromJsonConfigFile: vi.fn().mockResolvedValue(autoSelectGroups),
-        writeToJsonConfigFile: vi.fn()
+        writeToJsonConfigFile: vi.fn(),
+        deleteJsonConfigFile: vi.fn()
       },
       state
     } as unknown as AkariApiMainContext
@@ -96,6 +99,60 @@ describe('Akari API config loader', () => {
       name: { 'zh-CN': '排位模式', en: 'Ranked' },
       iconPath: expect.stringMatching(/^\/lol-game-data\/assets\//)
     })
+  })
+
+  it('deletes a cached resource that does not match the current schema', async () => {
+    const state = new AkariApiState()
+    const deleteJsonConfigFile = vi.fn().mockResolvedValue(undefined)
+    const context = {
+      api: {},
+      logger: { info: vi.fn(), warn: vi.fn() },
+      settingService: {
+        jsonConfigFileExists: vi.fn().mockResolvedValue(true),
+        readFromJsonConfigFile: vi.fn().mockResolvedValue({
+          updatedAt: '2099-01-01T00:00:00.000Z',
+          queues: ['invalid']
+        }),
+        writeToJsonConfigFile: vi.fn(),
+        deleteJsonConfigFile
+      },
+      state
+    } as unknown as AkariApiMainContext
+    const loader = new AkariApiConfigLoader(context, [resource])
+
+    await loader.initFromLocal()
+
+    expect(deleteJsonConfigFile).toHaveBeenCalledWith(resource.cachePath)
+    expect(context.logger.warn).toHaveBeenCalledWith(
+      'Invalid cached supported queues',
+      expect.anything()
+    )
+  })
+
+  it('deletes a valid cached resource that is older than the builtin data', async () => {
+    const state = new AkariApiState()
+    const deleteJsonConfigFile = vi.fn().mockResolvedValue(undefined)
+    const context = {
+      api: {},
+      logger: { info: vi.fn(), warn: vi.fn() },
+      settingService: {
+        jsonConfigFileExists: vi.fn().mockResolvedValue(true),
+        readFromJsonConfigFile: vi.fn().mockResolvedValue({
+          updatedAt: '2020-01-01T00:00:00.000Z',
+          queues: [420]
+        }),
+        writeToJsonConfigFile: vi.fn(),
+        deleteJsonConfigFile
+      },
+      state
+    } as unknown as AkariApiMainContext
+    const builtinQueues = state.supportedQueues
+    const loader = new AkariApiConfigLoader(context, [resource])
+
+    await loader.initFromLocal()
+
+    expect(state.supportedQueues).toBe(builtinQueues)
+    expect(deleteJsonConfigFile).toHaveBeenCalledWith(resource.cachePath)
   })
 
   it('applies and persists a newer resource', async () => {

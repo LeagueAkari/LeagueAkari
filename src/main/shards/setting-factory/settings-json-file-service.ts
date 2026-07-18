@@ -51,6 +51,14 @@ export class SettingsJsonFileService {
       .catch(() => false)
   }
 
+  async deleteConfigFile(namespace: string, filename: string) {
+    if (!namespace) {
+      throw new Error('domain is required')
+    }
+
+    await fs.promises.rm(this._getConfigFilePath(namespace, filename), { force: true })
+  }
+
   async writeSettingsToJsonFile(filePath: string) {
     const all = await this.context.storage.dataSource.manager.find(Setting)
 

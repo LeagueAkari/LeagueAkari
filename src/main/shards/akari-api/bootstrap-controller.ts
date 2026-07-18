@@ -75,8 +75,20 @@ export class AkariApiBootstrapController {
       return
     }
 
-    const cached = await this._settingService.readFromJsonConfigFile(AKARI_API_BOOTSTRAP_CACHE_PATH)
-    const bootstrap = parseAkariApiBootstrapDocument(cached)
+    let bootstrap: AkariApiBootstrapDocument
+    try {
+      const cached = await this._settingService.readFromJsonConfigFile(
+        AKARI_API_BOOTSTRAP_CACHE_PATH
+      )
+      bootstrap = parseAkariApiBootstrapDocument(cached)
+    } catch (error) {
+      try {
+        await this._settingService.deleteJsonConfigFile(AKARI_API_BOOTSTRAP_CACHE_PATH)
+      } catch (deleteError) {
+        this._logger.warn('Failed to delete invalid bootstrap cache', deleteError)
+      }
+      throw error
+    }
 
     this._applyBootstrap(bootstrap)
     this._logger.info(`Loaded bootstrap generation ${bootstrap.generation}`)

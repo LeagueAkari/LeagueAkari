@@ -196,6 +196,10 @@ export class SetterSettingService<TSettings extends object = any> {
     return this._settingFactory.jsonConfigFileExists(this._namespace, filename)
   }
 
+  async deleteJsonConfigFile(filename: string) {
+    return this._settingFactory.deleteJsonConfigFile(this._namespace, filename)
+  }
+
   /**
    * 设置设置项的新值, 并**更新状态**
    *

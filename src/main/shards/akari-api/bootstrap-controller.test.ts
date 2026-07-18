@@ -26,7 +26,8 @@ function setup(localGeneration: number, remoteGeneration: number) {
   const settingService = {
     jsonConfigFileExists: vi.fn().mockResolvedValue(true),
     readFromJsonConfigFile: vi.fn().mockResolvedValue(bootstrap(localGeneration)),
-    writeToJsonConfigFile: vi.fn().mockResolvedValue(undefined)
+    writeToJsonConfigFile: vi.fn().mockResolvedValue(undefined),
+    deleteJsonConfigFile: vi.fn().mockResolvedValue(undefined)
   }
   const logger = { info: vi.fn(), warn: vi.fn() }
   let resolveRemote: (value: unknown) => void = () => {}
@@ -92,5 +93,26 @@ describe('Akari API bootstrap controller', () => {
     expect(controller.apiHttp.defaults.baseURL).toBe('https://api-2.example.com')
     expect(controller.staticHttp.defaults.baseURL).toBe('https://static-2.example.com')
     expect(settingService.writeToJsonConfigFile).not.toHaveBeenCalled()
+  })
+
+  it('deletes a local bootstrap cache that does not match the current schema', async () => {
+    const settingService = {
+      jsonConfigFileExists: vi.fn().mockResolvedValue(true),
+      readFromJsonConfigFile: vi.fn().mockResolvedValue({ schemaVersion: 2 }),
+      writeToJsonConfigFile: vi.fn(),
+      deleteJsonConfigFile: vi.fn().mockResolvedValue(undefined)
+    }
+    const npmHttp = {
+      get: vi.fn().mockReturnValue(new Promise(() => {}))
+    } as unknown as AxiosInstance
+    const controller = new AkariApiBootstrapController(
+      settingService as never,
+      { info: vi.fn(), warn: vi.fn() } as never,
+      npmHttp
+    )
+
+    await controller.init()
+
+    expect(settingService.deleteJsonConfigFile).toHaveBeenCalledWith(AKARI_API_BOOTSTRAP_CACHE_PATH)
   })
 })

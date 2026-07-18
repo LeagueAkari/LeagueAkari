@@ -310,6 +310,10 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     return this._settingsJsonFileService.configFileExists(namespace, filename)
   }
 
+  async deleteJsonConfigFile(namespace: string, filename: string) {
+    return this._settingsJsonFileService.deleteConfigFile(namespace, filename)
+  }
+
   async onInit() {
     this._ipcHandlers.register()
   }
