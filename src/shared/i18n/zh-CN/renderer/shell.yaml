@@ -3,6 +3,7 @@ notices:
     title: 公告
     close: 关闭
     read: 已读
+    updatedAt: 更新于 {{time}}
     noNoticeMd: |
       ***暂无公告***
 legal:

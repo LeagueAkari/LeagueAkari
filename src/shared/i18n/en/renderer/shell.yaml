@@ -3,6 +3,7 @@ notices:
     title: Notice
     close: Close
     read: I have read
+    updatedAt: Updated {{time}}
     noNoticeMd: |
       ***No notice***
 legal:

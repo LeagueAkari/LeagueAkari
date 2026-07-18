@@ -7,7 +7,35 @@
     :class="$style['ann-modal']"
   >
     <template #header>
-      <span class="card-header-title">{{ t('notices.modal.title') }}</span>
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <span class="card-header-title">{{ t('notices.modal.title') }}</span>
+        <div
+          v-if="noticeUpdatedAt"
+          class="flex max-w-full min-w-0 items-center gap-1.5 text-xs font-normal text-black/60 dark:text-white/60"
+        >
+          <NTooltip :keep-alive-on-hover="false" placement="top-start">
+            <template #trigger>
+              <time class="shrink-0" :datetime="notice?.updatedAt">
+                {{ t('notices.modal.updatedAt', { time: noticeRelativeTime }) }}
+              </time>
+            </template>
+            {{ noticeUpdatedAt }}
+          </NTooltip>
+          <template v-if="notice?.summary">
+            <span class="shrink-0" aria-hidden="true">·</span>
+            <NTooltip :keep-alive-on-hover="false" placement="top-start">
+              <template #trigger>
+                <span class="block min-w-0 truncate">
+                  {{ notice.summary }}
+                </span>
+              </template>
+              <span class="block max-w-96 break-words whitespace-normal">
+                {{ notice.summary }}
+              </span>
+            </NTooltip>
+          </template>
+        </div>
+      </div>
     </template>
     <div>
       <NScrollbar
@@ -30,11 +58,14 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import type { AkariNotice } from '@shared/shards/akari-api'
+import { useIntervalFn } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NModal, NScrollbar } from 'naive-ui'
-import { computed } from 'vue'
+import { NButton, NModal, NScrollbar, NTooltip } from 'naive-ui'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   notice: AkariNotice | null
@@ -46,6 +77,30 @@ const emits = defineEmits<{
 }>()
 
 const { t } = useTranslation()
+const appCommon = useAppCommonStore()
+
+const relativeTimeNow = ref(Date.now())
+useIntervalFn(() => (relativeTimeNow.value = Date.now()), 60_000)
+
+const noticeTime = computed(() => {
+  if (!props.notice?.updatedAt) {
+    return null
+  }
+
+  const value = dayjs(props.notice.updatedAt)
+  return value.isValid() ? value : null
+})
+
+const noticeRelativeTime = computed(() => {
+  return (
+    noticeTime.value?.locale(appCommon.settings.locale.toLowerCase()).from(relativeTimeNow.value) ??
+    ''
+  )
+})
+
+const noticeUpdatedAt = computed(() => {
+  return noticeTime.value?.format('YYYY-MM-DD HH:mm:ss Z') ?? ''
+})
 
 const markdownHtmlText = computed(() => {
   return markdownIt.render(props.notice?.content || t('notices.modal.noNoticeMd'))
