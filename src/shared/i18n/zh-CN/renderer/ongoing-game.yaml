@@ -218,7 +218,6 @@ ongoingGame:
     suspiciousFlashPositionPopoverTotal_one: 基于最近 {{count}} 场已分析对局统计
     suspiciousFlashPositionPopoverTotal_other: 基于最近 {{count}} 场已分析对局统计
     hardGank: 难抓
-    gankable: 可抓
     easyGank: 好抓
     veryEasyGank: 非常好抓
     easyGankPopover: 在最近已分析的 {{count}} 场召唤师峡谷对局中，该玩家 15 分钟前被敌方打野参与击杀的场均次数为 {{times}} 次

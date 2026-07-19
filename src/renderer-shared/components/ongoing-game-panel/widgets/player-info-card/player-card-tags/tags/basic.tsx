@@ -5,10 +5,9 @@ import type { VNode } from 'vue'
 import type { PlayerCardTagContext, PlayerCardTagDefinition, PlayerCardTagPopover } from '../types'
 
 export type EasyGankTag = {
-  kind: 'hard-gank' | 'gankable' | 'easy-gank' | 'very-easy-gank'
+  kind: 'hard-gank' | 'easy-gank' | 'very-easy-gank'
   labelKey:
     | 'ongoingGame.playerCard.hardGank'
-    | 'ongoingGame.playerCard.gankable'
     | 'ongoingGame.playerCard.easyGank'
     | 'ongoingGame.playerCard.veryEasyGank'
   times: number
@@ -50,7 +49,6 @@ const PREMADE_TEAM_TAG_CLASSES: Record<string, string> = {
 
 const EASY_GANK_TAG_CLASSES = {
   'hard-gank': 'bg-[#24606d] text-white',
-  gankable: 'bg-[#64732a] text-white',
   'easy-gank': 'bg-[#8f541e] text-white',
   'very-easy-gank': 'bg-[#a81919] text-white'
 }
@@ -104,12 +102,7 @@ export function getEasyGankTag(
   }
 
   if (times >= 1) {
-    return {
-      kind: 'gankable',
-      labelKey: 'ongoingGame.playerCard.gankable',
-      times,
-      count: analysis.detailsCount
-    }
+    return null
   }
 
   return {

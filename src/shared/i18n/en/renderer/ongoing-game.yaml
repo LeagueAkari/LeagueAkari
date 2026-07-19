@@ -238,7 +238,6 @@ ongoingGame:
     suspiciousFlashPositionPopoverTotal_one: Based on the latest {{count}} analyzed game
     suspiciousFlashPositionPopoverTotal_other: Based on the latest {{count}} analyzed games
     hardGank: Hard to Gank
-    gankable: Gankable
     easyGank: Easy Gank
     veryEasyGank: Very Easy Gank
     easyGankPopover_one: Across the latest {{count}} analyzed Summoner's Rift game, this player averages {{times}} deaths before 15 minutes with enemy jungler involvement

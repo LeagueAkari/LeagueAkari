@@ -80,6 +80,18 @@ describe('basic player card tags', () => {
     expect(
       getEasyGankTag(
         createAnalysis({
+          details: { avgEarlyDeathsWithEnemyJunglerInvolved: 1.5 } as AggregatedAnalysis['details']
+        }),
+        false
+      )
+    ).toMatchObject({
+      kind: 'easy-gank',
+      labelKey: 'ongoingGame.playerCard.easyGank'
+    })
+
+    expect(
+      getEasyGankTag(
+        createAnalysis({
           details: { avgEarlyDeathsWithEnemyJunglerInvolved: 0.5 } as AggregatedAnalysis['details']
         }),
         false
@@ -88,6 +100,26 @@ describe('basic player card tags', () => {
       kind: 'hard-gank',
       labelKey: 'ongoingGame.playerCard.hardGank'
     })
+  })
+
+  it('does not create a tag for the neutral gankable range', () => {
+    expect(
+      getEasyGankTag(
+        createAnalysis({
+          details: { avgEarlyDeathsWithEnemyJunglerInvolved: 1 } as AggregatedAnalysis['details']
+        }),
+        false
+      )
+    ).toBeNull()
+
+    expect(
+      getEasyGankTag(
+        createAnalysis({
+          details: { avgEarlyDeathsWithEnemyJunglerInvolved: 1.49 } as AggregatedAnalysis['details']
+        }),
+        false
+      )
+    ).toBeNull()
   })
 
   it('does not create easy-gank tag for current junglers', () => {
