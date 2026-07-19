@@ -8,6 +8,7 @@ function createParticipant(overrides: Partial<MatchParticipant>): MatchParticipa
   return {
     totalDamageDealtToChampions: 0,
     totalDamageTaken: 0,
+    totalHeal: 0,
     goldEarned: 0,
     cs: 0,
     totalDamageToTowers: 0,
@@ -30,6 +31,7 @@ describe('computeSingleSummary', () => {
     const participant = createParticipant({
       totalDamageDealtToChampions: 400,
       totalDamageTaken: 400,
+      totalHeal: 400,
       goldEarned: 300,
       visionScore: 40
     })
@@ -65,6 +67,8 @@ describe('computeSingleSummary', () => {
 
     expect(summary.championDamageRatioToExpectedContribution).toBeCloseTo(2)
     expect(summary.damageTakenRatioToExpectedContribution).toBeCloseTo(2)
+    expect(summary.healingRatioToTeamAverageDamageTaken).toBeCloseTo(2)
+    expect(summary.teamParticipantCount).toBe(5)
     expect(summary.goldRatioToExpectedContribution).toBeCloseTo(1.5)
     expect(summary.visionScoreRatioToExpectedContribution).toBeCloseTo(2)
   })
@@ -76,6 +80,7 @@ describe('computeSingleSummary', () => {
     const participant = createParticipant({
       totalDamageDealtToChampions: 500,
       totalDamageTaken: 500,
+      totalHeal: 500,
       goldEarned: 500,
       visionScore: 50
     })
@@ -105,6 +110,8 @@ describe('computeSingleSummary', () => {
 
     expect(summary.championDamageRatioToExpectedContribution).toBeCloseTo(2)
     expect(summary.damageTakenRatioToExpectedContribution).toBeCloseTo(2)
+    expect(summary.healingRatioToTeamAverageDamageTaken).toBeCloseTo(2)
+    expect(summary.teamParticipantCount).toBe(4)
     expect(summary.goldRatioToExpectedContribution).toBeCloseTo(2)
     expect(summary.visionScoreRatioToExpectedContribution).toBeCloseTo(2)
   })
@@ -116,6 +123,7 @@ describe('computeSingleSummary', () => {
     const participant = createParticipant({
       totalDamageDealtToChampions: 1000,
       totalDamageTaken: 1000,
+      totalHeal: 1000,
       goldEarned: 1000,
       visionScore: 100
     })
@@ -124,6 +132,8 @@ describe('computeSingleSummary', () => {
 
     expect(summary.championDamageRatioToExpectedContribution).toBe(0)
     expect(summary.damageTakenRatioToExpectedContribution).toBe(0)
+    expect(summary.healingRatioToTeamAverageDamageTaken).toBe(1)
+    expect(summary.teamParticipantCount).toBe(1)
     expect(summary.goldRatioToExpectedContribution).toBe(0)
     expect(summary.visionScoreRatioToExpectedContribution).toBe(0)
   })

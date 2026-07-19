@@ -6,11 +6,13 @@ export interface AkariScore {
   winRateScore: number
   dmgScore: number
   dmgTakenScore: number
+  healingScore: number
   csScore: number
   goldScore: number
   participationScore: number
   visionScore: number
   total: number
+  maxScore: number
   outstanding: boolean
   extraordinary: boolean
 }
@@ -22,6 +24,8 @@ export interface AkariScoreInput {
   championDamageRatioToExpectedContribution: number
   damageTakenRatioToTeamMax: number
   damageTakenRatioToExpectedContribution: number
+  healingRatioToTeamAverageDamageTaken: number
+  teamParticipantCount: number
   csPerMinute: number
   goldRatioToTeamMax: number
   goldRatioToExpectedContribution: number
@@ -47,6 +51,8 @@ export interface SingleSummaryAnalysis {
   damageTakenRatioToExpectedContribution: number
   damageTakenRatioToMax: number
   damageTakenPercentageOfTeam: number
+  healingRatioToTeamAverageDamageTaken: number
+  teamParticipantCount: number
   goldRatioToTeamMax: number
   goldRatioToExpectedContribution: number
   goldRatioToMax: number

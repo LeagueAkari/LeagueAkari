@@ -18,6 +18,9 @@ export const ACTIVE_SESSION_LATEST_WINDOW_MS = 4 * 60 * 60 * 1000
 /** 活跃 session：相邻场次最大间隔 */
 export const ACTIVE_SESSION_GAP_MS = 8 * 60 * 60 * 1000
 
+/** Akari KDA 起评分 */
+export const AKARI_KDA_BASELINE = 2
+
 /** Akari KDA 分数权重 */
 export const AKARI_KDA_WEIGHT = 3 / 7
 
@@ -35,6 +38,18 @@ export const AKARI_DAMAGE_WEIGHT = 3
 
 /** Akari 承伤分数权重 */
 export const AKARI_DAMAGE_TAKEN_WEIGHT = 2
+
+/** Akari 治疗起评分所需的本队平均承伤比例 */
+export const AKARI_HEALING_MIN_TEAM_AVERAGE_DAMAGE_TAKEN_RATIO = 0.2
+
+/** Akari 多人队伍治疗满分所需的本队平均承伤比例 */
+export const AKARI_HEALING_FULL_SCORE_TEAM_AVERAGE_DAMAGE_TAKEN_RATIO = 1.4
+
+/** Akari 单人队伍治疗满分所需的本队平均承伤比例 */
+export const AKARI_HEALING_SOLO_FULL_SCORE_TEAM_AVERAGE_DAMAGE_TAKEN_RATIO = 1
+
+/** Akari 治疗分数满分 */
+export const AKARI_HEALING_MAX_SCORE = 2
 
 /** Akari 补刀满分所需分均补刀 */
 export const AKARI_CS_FULL_SCORE_PER_MINUTE = 10
@@ -65,6 +80,18 @@ export const AKARI_GOLD_EXPECTED_CONTRIBUTION_FULL_SCORE_RATIO = 1.5
 
 /** Akari 视野分数满分 */
 export const AKARI_VISION_MAX_SCORE = 2
+
+/** Akari 总分满分 */
+export const AKARI_MAX_SCORE =
+  AKARI_KDA_MAX_SCORE +
+  AKARI_WIN_RATE_WEIGHT +
+  AKARI_DAMAGE_WEIGHT +
+  AKARI_DAMAGE_TAKEN_WEIGHT +
+  AKARI_HEALING_MAX_SCORE +
+  AKARI_CS_MAX_SCORE +
+  AKARI_GOLD_WEIGHT +
+  AKARI_PARTICIPATION_WEIGHT +
+  AKARI_VISION_MAX_SCORE
 
 /** 聚合 Akari outstanding 阈值 */
 export const AGGREGATE_AKARI_OUTSTANDING_THRESHOLD = 6.5

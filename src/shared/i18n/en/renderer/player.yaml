@@ -42,6 +42,7 @@ akariScore:
     winRate: Win Rate
     damage: Damage
     damageTaken: Damage Taken
+    healing: Healing
     cs: CS
     gold: Gold
     participation: Kill Participation

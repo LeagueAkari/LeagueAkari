@@ -6,6 +6,8 @@
       </span>
       <span class="font-semibold text-gray-900 tabular-nums dark:text-white">
         {{ formatValue(score.total, totalPrecision) }}
+        <span class="px-1 text-gray-400 dark:text-gray-500">/</span>
+        <span>{{ formatMax(score.maxScore) }}</span>
       </span>
     </div>
 

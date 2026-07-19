@@ -49,6 +49,8 @@ const baseSingleSummary: SingleSummaryAnalysis = {
   damageTakenRatioToExpectedContribution: 0,
   damageTakenRatioToMax: 0,
   damageTakenPercentageOfTeam: 0,
+  healingRatioToTeamAverageDamageTaken: 0,
+  teamParticipantCount: 5,
   goldRatioToTeamMax: 0,
   goldRatioToExpectedContribution: 0,
   goldRatioToMax: 0,
@@ -87,11 +89,13 @@ function createPreparedGame(gameId: number, summary: Partial<SingleSummaryAnalys
         winRateScore: 0,
         dmgScore: 0,
         dmgTakenScore: 0,
+        healingScore: 0,
         csScore: 0,
         goldScore: 0,
         participationScore: 0,
         visionScore: 0,
         total: 0,
+        maxScore: 17,
         outstanding: false,
         extraordinary: false
       }
@@ -108,6 +112,7 @@ describe('computeAggregatedAkariScore', () => {
         createPreparedGame(1, {
           championDamageRatioToExpectedContribution: 0.5,
           damageTakenRatioToExpectedContribution: 0.5,
+          healingRatioToTeamAverageDamageTaken: 0.2,
           goldRatioToExpectedContribution: 0.5,
           csPerMinute: 0,
           killParticipation: 0,
@@ -116,6 +121,7 @@ describe('computeAggregatedAkariScore', () => {
         createPreparedGame(2, {
           championDamageRatioToExpectedContribution: 2,
           damageTakenRatioToExpectedContribution: 2,
+          healingRatioToTeamAverageDamageTaken: 1.4,
           goldRatioToExpectedContribution: 1.5,
           csPerMinute: 10,
           killParticipation: 1,
@@ -126,13 +132,49 @@ describe('computeAggregatedAkariScore', () => {
 
     expect(score.dmgScore).toBeCloseTo(1.5)
     expect(score.dmgTakenScore).toBeCloseTo(1)
+    expect(score.healingScore).toBeCloseTo(1)
     expect(score.goldScore).toBeCloseTo(1)
     expect(score.csScore).toBeCloseTo(1)
     expect(score.participationScore).toBeCloseTo(1)
     expect(score.visionScore).toBeCloseTo(1)
   })
 
-  it('preserves the average KDA curve and caps it at 1 point', () => {
+  it('uses the lower healing cap for single-player team games', () => {
+    const score = computeAggregatedAkariScore({
+      count: 1,
+      summary: baseSummary,
+      games: [
+        createPreparedGame(1, {
+          teamParticipantCount: 1,
+          healingRatioToTeamAverageDamageTaken: 1
+        })
+      ]
+    })
+
+    expect(score.healingScore).toBe(2)
+  })
+
+  it('scores average KDA only above 2 with diminishing returns and a 1 point cap', () => {
+    expect(
+      computeAggregatedAkariScore({
+        count: 1,
+        summary: {
+          ...baseSummary,
+          avgKda: 2
+        },
+        games: []
+      }).kdaScore
+    ).toBe(0)
+    expect(
+      computeAggregatedAkariScore({
+        count: 1,
+        summary: {
+          ...baseSummary,
+          avgKda: 3
+        },
+        games: []
+      }).kdaScore
+    ).toBeCloseTo(3 / 7)
     expect(
       computeAggregatedAkariScore({
         count: 1,
@@ -142,13 +184,13 @@ describe('computeAggregatedAkariScore', () => {
         },
         games: []
       }).kdaScore
-    ).toBeCloseTo(6 / 7)
+    ).toBeCloseTo((Math.sqrt(2) * 3) / 7)
     expect(
       computeAggregatedAkariScore({
         count: 1,
         summary: {
           ...baseSummary,
-          avgKda: 9
+          avgKda: 8
         },
         games: []
       }).kdaScore
@@ -210,6 +252,7 @@ describe('computeAggregatedAkariScore', () => {
         createPreparedGame(1, {
           championDamageRatioToExpectedContribution: 2,
           damageTakenRatioToExpectedContribution: 2,
+          healingRatioToTeamAverageDamageTaken: 1.4,
           goldRatioToExpectedContribution: 1.5,
           csPerMinute: 10,
           killParticipation: 1,
@@ -218,7 +261,8 @@ describe('computeAggregatedAkariScore', () => {
       ]
     })
 
-    expect(score.total).toBeCloseTo(15)
+    expect(score.total).toBeCloseTo(17)
+    expect(score.maxScore).toBe(17)
     expect(score.outstanding).toBe(true)
     expect(score.extraordinary).toBe(true)
   })

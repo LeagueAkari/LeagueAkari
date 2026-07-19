@@ -10,11 +10,13 @@ describe('getAkariScoreBreakdownItems', () => {
       winRateScore: 0.5,
       dmgScore: 1.5,
       dmgTakenScore: 1,
+      healingScore: 1,
       csScore: 1,
       goldScore: 1,
       participationScore: 1,
       visionScore: 1,
-      total: 7.5,
+      total: 8.5,
+      maxScore: 17,
       outstanding: true,
       extraordinary: true
     }
@@ -47,6 +49,14 @@ describe('getAkariScoreBreakdownItems', () => {
       {
         key: 'dmgTakenScore',
         labelKey: 'akariScore.parts.damageTaken',
+        value: 1,
+        max: 2,
+        progressPercentage: 50,
+        progressStatus: 'default'
+      },
+      {
+        key: 'healingScore',
+        labelKey: 'akariScore.parts.healing',
         value: 1,
         max: 2,
         progressPercentage: 50,
@@ -93,11 +103,13 @@ describe('getAkariScoreBreakdownItems', () => {
       winRateScore: -2,
       dmgScore: 12,
       dmgTakenScore: 8,
+      healingScore: 4,
       csScore: 1,
       goldScore: 4,
       participationScore: 4,
       visionScore: 4,
-      total: 28,
+      total: 32,
+      maxScore: 17,
       outstanding: false,
       extraordinary: false
     }

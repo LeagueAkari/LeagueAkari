@@ -42,6 +42,7 @@ akariScore:
     winRate: 胜率
     damage: 输出
     damageTaken: 承伤
+    healing: 治疗
     cs: 补刀
     gold: 经济
     participation: 参团

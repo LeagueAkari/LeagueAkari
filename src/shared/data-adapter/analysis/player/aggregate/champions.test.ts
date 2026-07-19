@@ -14,6 +14,8 @@ const baseSummary = {
   damageTakenRatioToTeamMax: 1,
   damageTakenRatioToMax: 1,
   damageTakenPercentageOfTeam: 1,
+  healingRatioToTeamAverageDamageTaken: 0,
+  teamParticipantCount: 5,
   goldRatioToExpectedContribution: 1,
   goldRatioToTeamMax: 1,
   goldRatioToMax: 1,
@@ -80,11 +82,13 @@ function createPreparedGame(
         winRateScore: 0,
         dmgScore: 0,
         dmgTakenScore: 0,
+        healingScore: 0,
         csScore: 0,
         goldScore: 0,
         participationScore: 0,
         visionScore: 0,
         total: 0,
+        maxScore: 17,
         outstanding: false,
         extraordinary: false
       }

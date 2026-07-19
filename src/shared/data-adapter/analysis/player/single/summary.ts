@@ -31,6 +31,7 @@ export function computeSingleSummary(
     0
   )
   const teamTotalDmgTaken = teamParticipants.reduce((acc, p) => acc + p.totalDamageTaken, 0)
+  const teamAverageDmgTaken = teamTotalDmgTaken / noZero(teamParticipants.length)
   const teamTotalGold = teamParticipants.reduce((acc, p) => acc + p.goldEarned, 0)
   const teamTotalCs = teamParticipants.reduce((acc, p) => acc + p.cs, 0)
   const teamTotalTowerDmg = teamParticipants.reduce((acc, p) => acc + p.totalDamageToTowers, 0)
@@ -68,6 +69,8 @@ export function computeSingleSummary(
     ),
     damageTakenRatioToMax: participant.totalDamageTaken / noZero(maxDmgTaken),
     damageTakenPercentageOfTeam: participant.totalDamageTaken / noZero(teamTotalDmgTaken),
+    healingRatioToTeamAverageDamageTaken: participant.totalHeal / noZero(teamAverageDmgTaken),
+    teamParticipantCount: teamParticipants.length,
     goldRatioToTeamMax: participant.goldEarned / noZero(teamMaxGold),
     goldRatioToExpectedContribution: getExpectedContributionRatio(
       participant.goldEarned,

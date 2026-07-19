@@ -7,12 +7,14 @@ import {
   AKARI_DAMAGE_WEIGHT,
   AKARI_GOLD_EXPECTED_CONTRIBUTION_FULL_SCORE_RATIO,
   AKARI_GOLD_WEIGHT,
+  AKARI_MAX_SCORE,
   AKARI_STANDARD_EXPECTED_CONTRIBUTION_FULL_SCORE_RATIO,
   AKARI_VISION_MAX_SCORE
 } from '../constants'
 import {
   scoreCsPerMinute,
   scoreExpectedContribution,
+  scoreHealing,
   scoreKda,
   scoreParticipation,
   scoreWinRate
@@ -48,6 +50,11 @@ export function computeAggregatedAkariScore(analysis: {
       )
     )
   )
+  const healingScore = avgOrZero(
+    summaries.map((summary) =>
+      scoreHealing(summary.healingRatioToTeamAverageDamageTaken, summary.teamParticipantCount)
+    )
+  )
   const csScore = avgOrZero(summaries.map((summary) => scoreCsPerMinute(summary.csPerMinute)))
   const goldScore = avgOrZero(
     summaries.map((summary) =>
@@ -76,6 +83,7 @@ export function computeAggregatedAkariScore(analysis: {
     winRateScore +
     dmgScore +
     dmgTakenScore +
+    healingScore +
     csScore +
     goldScore +
     participationScore +
@@ -86,11 +94,13 @@ export function computeAggregatedAkariScore(analysis: {
     winRateScore,
     dmgScore,
     dmgTakenScore,
+    healingScore,
     csScore,
     goldScore,
     participationScore,
     visionScore,
     total,
+    maxScore: AKARI_MAX_SCORE,
     outstanding:
       total >= AGGREGATE_AKARI_OUTSTANDING_THRESHOLD &&
       analysis.count >= AGGREGATE_AKARI_OUTSTANDING_MIN_COUNT,

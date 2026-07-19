@@ -4,6 +4,7 @@ import {
   AKARI_DAMAGE_TAKEN_WEIGHT,
   AKARI_DAMAGE_WEIGHT,
   AKARI_GOLD_WEIGHT,
+  AKARI_HEALING_MAX_SCORE,
   AKARI_KDA_MAX_SCORE,
   AKARI_PARTICIPATION_WEIGHT,
   AKARI_VISION_MAX_SCORE,
@@ -15,6 +16,7 @@ export type AkariScorePartKey =
   | 'winRateScore'
   | 'dmgScore'
   | 'dmgTakenScore'
+  | 'healingScore'
   | 'csScore'
   | 'goldScore'
   | 'participationScore'
@@ -55,6 +57,11 @@ const AKARI_SCORE_PARTS: Array<{
     key: 'dmgTakenScore',
     labelKey: 'akariScore.parts.damageTaken',
     max: AKARI_DAMAGE_TAKEN_WEIGHT
+  },
+  {
+    key: 'healingScore',
+    labelKey: 'akariScore.parts.healing',
+    max: AKARI_HEALING_MAX_SCORE
   },
   {
     key: 'csScore',

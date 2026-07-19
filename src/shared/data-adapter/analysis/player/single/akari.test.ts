@@ -13,6 +13,8 @@ const baseSummary: SingleSummaryAnalysis = {
   damageTakenRatioToExpectedContribution: 0,
   damageTakenRatioToMax: 0,
   damageTakenPercentageOfTeam: 0,
+  healingRatioToTeamAverageDamageTaken: 0,
+  teamParticipantCount: 5,
   goldRatioToTeamMax: 0,
   goldRatioToExpectedContribution: 0,
   goldRatioToMax: 0,
@@ -67,13 +69,14 @@ describe('computeSingleAkariScore', () => {
     expect(score.visionScore).toBe(2)
   })
 
-  it('uses the 15 point scale at every component cap', () => {
+  it('uses the 17 point scale at every component cap', () => {
     const score = computeSingleAkariScore({
       ...baseSummary,
       kda: 9,
       win: true,
       championDamageRatioToExpectedContribution: 2,
       damageTakenRatioToExpectedContribution: 2,
+      healingRatioToTeamAverageDamageTaken: 1.4,
       csPerMinute: 10,
       goldRatioToExpectedContribution: 1.5,
       killParticipation: 1,
@@ -85,25 +88,77 @@ describe('computeSingleAkariScore', () => {
       winRateScore: 1,
       dmgScore: 3,
       dmgTakenScore: 2,
+      healingScore: 2,
       csScore: 2,
       goldScore: 2,
       participationScore: 2,
-      visionScore: 2
+      visionScore: 2,
+      maxScore: 17
     })
-    expect(score.total).toBeCloseTo(15)
+    expect(score.total).toBeCloseTo(17)
   })
 
-  it('preserves the KDA curve and caps it at 1 point', () => {
+  it('maps multiplayer healing from 20 to 140 percent of team-average damage taken', () => {
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        healingRatioToTeamAverageDamageTaken: 0.2
+      }).healingScore
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        healingRatioToTeamAverageDamageTaken: 0.8
+      }).healingScore
+    ).toBeCloseTo(1)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        healingRatioToTeamAverageDamageTaken: 1.4
+      }).healingScore
+    ).toBe(2)
+  })
+
+  it('awards full healing score at 100 percent for single-player teams', () => {
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        teamParticipantCount: 1,
+        healingRatioToTeamAverageDamageTaken: 0.6
+      }).healingScore
+    ).toBeCloseTo(1)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        teamParticipantCount: 1,
+        healingRatioToTeamAverageDamageTaken: 1
+      }).healingScore
+    ).toBe(2)
+  })
+
+  it('scores KDA only above 2 with diminishing returns and a 1 point cap', () => {
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        kda: 2
+      }).kdaScore
+    ).toBe(0)
+    expect(
+      computeSingleAkariScore({
+        ...baseSummary,
+        kda: 3
+      }).kdaScore
+    ).toBeCloseTo(3 / 7)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
         kda: 4
       }).kdaScore
-    ).toBeCloseTo(6 / 7)
+    ).toBeCloseTo((Math.sqrt(2) * 3) / 7)
     expect(
       computeSingleAkariScore({
         ...baseSummary,
-        kda: 9
+        kda: 8
       }).kdaScore
     ).toBe(1)
   })
