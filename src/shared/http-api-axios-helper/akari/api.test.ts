@@ -44,6 +44,17 @@ describe('Akari API HTTP helper', () => {
     })
   })
 
+  it('maps contact channels to the public website content path', () => {
+    const { get, http } = createHttpMock()
+    const api = new AkariApiHttpApiAxiosHelper(http)
+
+    api.getContactChannels()
+
+    expect(get).toHaveBeenCalledWith('/website/v1/contact-channels', {
+      signal: undefined
+    })
+  })
+
   it('maps statistics records to the Akari API', () => {
     const { http, post } = createHttpMock()
     const api = new AkariApiHttpApiAxiosHelper(http)

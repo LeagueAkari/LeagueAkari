@@ -32,6 +32,23 @@ export interface AkariNotice {
   updatedAt: string
 }
 
+export type AkariContactChannelPlatform =
+  'qq' | 'telegram' | 'discord' | 'email' | 'website' | 'other'
+
+export interface AkariContactChannel {
+  id: string
+  platform: AkariContactChannelPlatform
+  name: string
+  identifier: string
+  url: string
+  password: string | null
+}
+
+export interface AkariContactChannels {
+  channels: AkariContactChannel[]
+  updatedAt: string
+}
+
 export interface AkariReleaseArtifact {
   platform: string
   arch: string

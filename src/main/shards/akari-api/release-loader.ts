@@ -16,6 +16,8 @@ export class AkariApiReleaseLoader {
       return this._updatePromise
     }
 
+    this._context.state.setUpdatingLatestRelease(true)
+
     const updatePromise = this._fetchLatestRelease(language)
       .then((release) => {
         this._context.state.setLatestRelease(release)
@@ -27,6 +29,7 @@ export class AkariApiReleaseLoader {
         throw error
       })
       .finally(() => {
+        this._context.state.setUpdatingLatestRelease(false)
         if (this._updatePromise === updatePromise) {
           this._updatePromise = null
         }

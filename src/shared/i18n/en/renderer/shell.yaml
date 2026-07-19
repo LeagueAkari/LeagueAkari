@@ -6,6 +6,17 @@ notices:
     updatedAt: Updated {{time}}
     noNoticeMd: |
       ***No notice***
+    contacts:
+      open: Open
+      openChannel: Open {{name}}
+      password: 'Join password: {{password}}'
+      platforms:
+        qq: QQ
+        telegram: Telegram
+        discord: Discord
+        email: Email
+        website: Website
+        other: Other
 legal:
   declaration:
     title: Declaration

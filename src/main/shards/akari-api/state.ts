@@ -1,5 +1,6 @@
 import type {
   AkariAutoSelectGroupsConfig,
+  AkariContactChannels,
   AkariLeagueServersConfig,
   AkariNotice,
   AkariOngoingGameConfig,
@@ -22,6 +23,7 @@ export class AkariApiState {
   autoSelectGroups = BUILTIN_AUTO_SELECT_GROUPS
 
   notice: AkariNotice | null = null
+  contactChannels: AkariContactChannels | null = null
   latestRelease: AkariRelease | null = null
 
   setLatestRelease(value: AkariRelease | null) {
@@ -29,6 +31,8 @@ export class AkariApiState {
   }
 
   isUpdatingNotice = false
+  isUpdatingContactChannels = false
+  isUpdatingLatestRelease = false
   isUpdatingLeagueServers = false
   isUpdatingSupportedQueues = false
   isUpdatingOngoingGameConfig = false
@@ -54,8 +58,20 @@ export class AkariApiState {
     this.notice = value
   }
 
+  setContactChannels(value: AkariContactChannels | null) {
+    this.contactChannels = value
+  }
+
   setUpdatingNotice(value: boolean) {
     this.isUpdatingNotice = value
+  }
+
+  setUpdatingContactChannels(value: boolean) {
+    this.isUpdatingContactChannels = value
+  }
+
+  setUpdatingLatestRelease(value: boolean) {
+    this.isUpdatingLatestRelease = value
   }
 
   setUpdatingLeagueServers(value: boolean) {
@@ -80,6 +96,8 @@ export class AkariApiState {
       supportedQueues: observable.ref,
       ongoingGameConfig: observable.ref,
       autoSelectGroups: observable.ref,
+      notice: observable.ref,
+      contactChannels: observable.ref,
       latestRelease: observable.ref
     })
   }

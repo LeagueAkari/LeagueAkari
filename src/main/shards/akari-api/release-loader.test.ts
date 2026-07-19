@@ -78,6 +78,24 @@ describe('Akari API release loader', () => {
     expect(getLatestRelease).toHaveBeenCalledTimes(1)
   })
 
+  it('tracks whether the latest release is being updated', async () => {
+    let resolveRequest!: (value: { data: AkariRelease }) => void
+    const getLatestRelease = vi.fn().mockReturnValue(
+      new Promise<{ data: AkariRelease }>((resolve) => {
+        resolveRequest = resolve
+      })
+    )
+    const context = createContext(getLatestRelease)
+    const loader = new AkariApiReleaseLoader(context)
+
+    const update = loader.updateLatestRelease('zh-CN')
+
+    expect(context.state.isUpdatingLatestRelease).toBe(true)
+    resolveRequest({ data: latestRelease })
+    await update
+    expect(context.state.isUpdatingLatestRelease).toBe(false)
+  })
+
   it('does not fall back to the legacy endpoint when the request fails', async () => {
     const context = createContext(vi.fn().mockRejectedValue(new Error('request failed')))
     const loader = new AkariApiReleaseLoader(context)

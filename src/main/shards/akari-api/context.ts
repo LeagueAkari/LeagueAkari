@@ -7,7 +7,7 @@ import type { SetterSettingService } from '../setting-factory/setter-setting-ser
 import type { AkariApiState } from './state'
 
 export const AKARI_API_CACHED_RESOURCE_UPDATE_INTERVAL = 2 * 60 * 60 * 1000
-export const AKARI_API_VOLATILE_RESOURCE_UPDATE_INTERVAL = 4 * 60 * 60 * 1000
+export const AKARI_API_NOTICE_UPDATE_INTERVAL = 60 * 60 * 1000
 
 export interface AkariApiMainContext {
   state: AkariApiState

@@ -95,7 +95,7 @@ export class AkariApiMain implements IAkariShardInitDispose {
   private _setupState() {
     this._context.mobxUtils.propSync(AkariApiMain.id, 'state', this.state, [
       'notice',
-      'isUpdatingNotice'
+      'contactChannels'
     ])
   }
 }

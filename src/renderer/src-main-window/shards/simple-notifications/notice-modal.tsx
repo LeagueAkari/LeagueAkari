@@ -55,6 +55,7 @@ export function registerNoticeModal(context: SimpleNotificationsRendererContext)
         <NoticeModal
           {...{
             notice: akariApiStore.notice,
+            contactChannels: akariApiStore.contactChannels,
             show: simpleNotificationsStore.showNoticeModal,
             'onUpdate:show': (value: boolean) => (simpleNotificationsStore.showNoticeModal = value),
             hasRead: simpleNotificationsStore.lastNoticeRevision === akariApiStore.notice?.revision,

@@ -6,6 +6,17 @@ notices:
     updatedAt: 更新于 {{time}}
     noNoticeMd: |
       ***暂无公告***
+    contacts:
+      open: 前往
+      openChannel: 前往{{name}}
+      password: 加入密码：{{password}}
+      platforms:
+        qq: QQ
+        telegram: Telegram
+        discord: Discord
+        email: 邮箱
+        website: 网站
+        other: 其他
 legal:
   declaration:
     title: 声明

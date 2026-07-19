@@ -2,6 +2,7 @@ import {
   type AkariApiConfigResource,
   type AkariApiConfigResourceMap,
   type AkariApiLanguage,
+  type AkariContactChannels,
   type AkariNotice,
   type AkariRelease,
   type AkariStatisticsRecordCreated,
@@ -25,6 +26,12 @@ export class AkariApiHttpApiAxiosHelper {
   ) {
     return this._http.get<AkariNotice>('/notice/v1/latest', {
       params: { lang: language },
+      signal: options.signal
+    })
+  }
+
+  getContactChannels(options: HttpApiRequestOptions = {}) {
+    return this._http.get<AkariContactChannels>('/website/v1/contact-channels', {
       signal: options.signal
     })
   }
