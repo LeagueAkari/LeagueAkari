@@ -66,6 +66,7 @@ settings:
       newRelease: 新版本内容
       lastCheckAt: 上次检查
       cancelUpdate: 取消更新
+      restartNow: 立即重启
       updateProgress:
         label: 更新流程
         description: 正在进行的更新流程

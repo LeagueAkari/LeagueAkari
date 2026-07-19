@@ -66,6 +66,7 @@ settings:
       newRelease: New Release
       lastCheckAt: Last Check at
       cancelUpdate: Cancel Update
+      restartNow: Restart Now
       updateProgress:
         label: Update Process
         description: The ongoing update process

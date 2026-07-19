@@ -20,7 +20,11 @@ import {
   UPDATE_EXECUTABLE_NAME,
   UPDATE_PROGRESS_UPDATE_INTERVAL
 } from './context'
-import { shouldApplyDownloadedUpdate, shouldDownloadUpdateArchive } from './platform'
+import {
+  shouldApplyDownloadedUpdate,
+  shouldDownloadUpdateArchive,
+  shouldLaunchUpdaterOnQuit
+} from './platform'
 
 interface UpdateJob {
   abortController: AbortController
@@ -127,7 +131,15 @@ export class SelfUpdateExecutor {
   }
 
   async runUpdateOnQuit() {
-    if (!shouldApplyDownloadedUpdate()) {
+    if (!shouldLaunchUpdaterOnQuit(app.isPackaged)) {
+      if (this._updateOnQuitFn) {
+        this._context.logger.info('Skip launching updater outside a packaged Windows build', {
+          isPackaged: app.isPackaged,
+          platform: process.platform
+        })
+      }
+
+      this.cancel()
       return
     }
 

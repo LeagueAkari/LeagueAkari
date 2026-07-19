@@ -10,6 +10,13 @@ export function shouldApplyDownloadedUpdate(platform: NodeJS.Platform = process.
   return shouldRunSelfUpdateLifecycle(platform)
 }
 
+export function shouldLaunchUpdaterOnQuit(
+  isPackaged: boolean,
+  platform: NodeJS.Platform = process.platform
+) {
+  return isPackaged && shouldApplyDownloadedUpdate(platform)
+}
+
 export function shouldUninstallWithUpdater(platform: NodeJS.Platform = process.platform) {
   return shouldRunSelfUpdateLifecycle(platform)
 }

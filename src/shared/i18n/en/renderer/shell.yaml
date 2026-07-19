@@ -154,8 +154,13 @@ navigation:
       unknown: Unknown
       connectedClient: Connected Client
       launchedClientPlaceholder: Launched Client {{index}}
+      update:
+        available: Download update
+        downloading: Downloading {{progress}}%
+        retry: Retry download
+        ready: Restart to update
       respawnTimer:
-        timeLeft: Respawn in {{seconds}} s
+        detail: Respawn in {{seconds}} s ({{totalSeconds}} s)
 startup:
   launcher:
     tcls: TCLS Client

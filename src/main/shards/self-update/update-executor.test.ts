@@ -1,4 +1,5 @@
 import { LatestReleaseInfo } from '@shared/types/akari'
+import cp from 'node:child_process'
 import fs from 'node:fs'
 import { Readable } from 'node:stream'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
@@ -15,7 +16,8 @@ vi.mock('electron', async () => {
   return {
     app: {
       getPath: (name: string) => path.join(testPathRoot, name),
-      getVersion: () => '1.0.0'
+      getVersion: () => '1.0.0',
+      isPackaged: false
     },
     Notification: class {
       show() {}
@@ -31,9 +33,15 @@ vi.mock('@main/i18n', () => ({
 
 vi.mock('@resources/LA_ICON.ico?asset', () => ({ default: 'icon' }))
 vi.mock('@resources/akari-updater.exe?asset', () => ({ default: 'akari-updater.exe' }))
+vi.mock('node:child_process', () => ({
+  default: {
+    spawn: vi.fn()
+  }
+}))
 vi.mock('./platform', () => ({
   shouldDownloadUpdateArchive: () => true,
-  shouldApplyDownloadedUpdate: () => true
+  shouldApplyDownloadedUpdate: () => true,
+  shouldLaunchUpdaterOnQuit: () => false
 }))
 vi.mock('node:original-fs', async () => {
   const fs = await vi.importActual<typeof import('node:fs')>('node:fs')
@@ -164,5 +172,30 @@ describe('SelfUpdateExecutor', () => {
       result: 'failed'
     })
     expect(context.state.updateProgressInfo?.phase).toBe('download-failed')
+  })
+
+  test('cancels a prepared update instead of launching the updater from a development build', async () => {
+    vi.spyOn(fs.promises, 'copyFile').mockResolvedValueOnce(undefined)
+    const spawn = vi.mocked(cp.spawn)
+    spawn.mockClear()
+
+    const httpClient = {
+      get: vi.fn(async () => ({
+        data: Readable.from(['update archive']),
+        headers: { 'content-length': '14' }
+      })),
+      defaults: {}
+    } as unknown as SelfUpdateMainContext['httpClient']
+
+    const context = createContext(httpClient)
+    const executor = new SelfUpdateExecutor(context)
+
+    await expect(executor.start(createRelease())).resolves.toEqual({ result: 'ok' })
+    expect(context.state.updateProgressInfo?.phase).toBe('waiting-for-restart')
+
+    await executor.runUpdateOnQuit()
+
+    expect(spawn).not.toHaveBeenCalled()
+    expect(context.state.updateProgressInfo).toBeNull()
   })
 })

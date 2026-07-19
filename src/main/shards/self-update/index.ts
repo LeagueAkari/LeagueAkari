@@ -27,7 +27,7 @@ import { SelfUpdateExecutor } from './update-executor'
 import { SelfUpdateWatcher } from './update-watcher'
 
 /**
- * 负责更新包的下载与解压工作
+ * 负责更新包下载及外部更新器调度
  */
 @Shard(SelfUpdateMain.id)
 export class SelfUpdateMain implements IAkariShardInitDispose {

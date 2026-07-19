@@ -7,7 +7,6 @@ notifications:
     releasePage: Release Page
     startUpdate: Start Update
     downloading: Downloading {{progress}}%
-    unpacking: Unpacking {{progress}}%
     waitingForRestart: Update on Close
     downloadFailed: Download Failed
     externalDownload: External Download
@@ -83,13 +82,6 @@ notifications:
       negativeText: Dismiss
 selfUpdate:
   tasks:
-    self-update-task:
-      name: $t(common:appName) Update
-      downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
-      download-failed: Failed to download archive
-      waiting-for-restart: Update package downloaded. Close the application to apply the update
-      cancelButton: Cancel
-      closeButton: Close and Update
     title: Self Update
     start-update: Starting update $t(common:appName)
     updateOnQuit: Updated Applied. Restart the application to apply the update

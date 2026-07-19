@@ -154,8 +154,13 @@ navigation:
       unknown: 未知
       inConnectionLoop: 连接中...
       connectedClient: 已连接的客户端
+      update:
+        available: 下载更新
+        downloading: 下载中 {{progress}}%
+        retry: 重试下载
+        ready: 重启更新
       respawnTimer:
-        timeLeft: 距离重生 {{seconds}} s
+        detail: 距离重生 {{seconds}} s（{{totalSeconds}} s）
 startup:
   launcher:
     tcls: TCLS 客户端

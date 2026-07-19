@@ -8,7 +8,6 @@ notifications:
     externalDownload: 外链下载
     startUpdate: 立即更新
     downloading: 正在下载 {{progress}}%
-    unpacking: 正在解压 {{progress}}%
     waitingForRestart: 关闭后更新
     downloadFailed: 下载失败
     noUpdateMd: 无发布说明
@@ -83,13 +82,6 @@ notifications:
       negativeText: 关闭
 selfUpdate:
   tasks:
-    self-update-task:
-      name: $t(common:appName) 更新
-      downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
-      download-failed: 下载更新包失败
-      waiting-for-restart: 更新包下载完成，关闭应用后将自动应用更新流程
-      cancelButton: 取消
-      closeButton: 关闭应用并开始更新
     title: 自动更新
     start-update: $t(common:appName) 更新已开始
     updateOnQuit: 更新已下载完成，关闭应用后执行更新流程

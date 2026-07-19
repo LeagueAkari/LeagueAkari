@@ -1,48 +1,24 @@
 <template>
   <div class="sidebar-fixed">
     <!-- respawn timer -->
-    <NPopover
-      placement="right"
+    <RespawnTimerItem
       v-if="rts.settings.enabled && rts.info.isDead"
-      :disabled="!isCollapsed"
-    >
-      <template #trigger>
-        <div class="menu-item menu-item-no-click">
-          <div class="menu-item__inner">
-            <div class="menu-item__custom-icon">
-              <NProgress
-                class="menu-item__icon-n-progress"
-                type="circle"
-                :gap-offset-degree="180"
-                :stroke-width="4"
-                :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
-                status="success"
-              >
-                <span class="text-xs">{{ formattedCountdown }}</span>
-              </NProgress>
-            </div>
-            <div class="menu-item__label">
-              {{
-                t('navigation.sidebar.status.respawnTimer.timeLeft', {
-                  seconds: rts.info.timeLeft.toFixed(0)
-                })
-              }}
-              ({{ rts.info.totalTime.toFixed(0) }}
-              s)
-            </div>
-          </div>
-        </div>
-      </template>
-      <div>
-        {{
-          t('navigation.sidebar.status.respawnTimer.timeLeft', {
-            seconds: rts.info.timeLeft.toFixed(0)
-          })
-        }}
-        ({{ rts.info.totalTime.toFixed(0) }}
-        s)
-      </div>
-    </NPopover>
+      :time-left="rts.info.timeLeft"
+      :total-time="rts.info.totalTime"
+      :is-collapsed="isCollapsed"
+    />
+
+    <!-- self update -->
+    <UpdateStatusItem
+      v-if="updateStatus"
+      :status="updateStatus"
+      :release="aks.latestRelease"
+      :update-progress-info="sus.updateProgressInfo"
+      :is-collapsed="isCollapsed"
+      @start="handleStartUpdate"
+      @cancel="handleCancelUpdate"
+      @restart="handleRestartUpdate"
+    />
 
     <!-- connection hub -->
     <NPopover placement="right-end" ref="popover-connection" :duration="250">
@@ -128,10 +104,14 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
@@ -147,6 +127,8 @@ import { useMainWindowAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 import ClientConnection from './ClientConnection.vue'
+import { RespawnTimerItem } from './respawn-timer-item'
+import { UpdateStatusItem, resolveUpdateStatusDisplay } from './update-status-item'
 
 const { isCollapsed = false } = defineProps<{
   isCollapsed?: boolean
@@ -158,13 +140,32 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
 const mws = useMainWindowStore()
+const aks = useAkariApiStore()
+const sus = useSelfUpdateStore()
 
 const pt = useInstance(PlayerTabsRenderer)
+const su = useInstance(SelfUpdateRenderer)
+const wm = useInstance(WindowManagerRenderer)
 
-const formattedCountdown = computed(() => {
-  const seconds = rts.info.timeLeft
-  return seconds > 99 ? '99+' : `${seconds.toFixed(0)}`
-})
+const updateStatus = computed(() =>
+  resolveUpdateStatusDisplay(aks.latestRelease, sus.updateProgressInfo, sus.settings.ignoreVersion)
+)
+
+const handleCancelUpdate = () => {
+  void su.cancelUpdate()
+}
+
+const handleRestartUpdate = () => {
+  wm.mainWindow.closeForce()
+}
+
+const handleStartUpdate = () => {
+  if (import.meta.env.DEV) {
+    void su.forceStartUpdate()
+  } else {
+    void su.startUpdate()
+  }
+}
 
 const notification = useNotification()
 
