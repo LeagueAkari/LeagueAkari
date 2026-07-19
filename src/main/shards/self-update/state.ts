@@ -1,7 +1,12 @@
-import { LastUpdateResult, UpdateProgressInfo } from '@shared/shards/self-update'
-import { makeAutoObservable, observable } from 'mobx'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
+import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx'
 
 export class SelfUpdateSettings {
+  /**
+   * 是否自动检查更新
+   */
+  autoCheckUpdates: boolean = true
+
   /**
    * 是否自动下载更新
    */
@@ -16,6 +21,10 @@ export class SelfUpdateSettings {
     makeAutoObservable(this)
   }
 
+  setAutoCheckUpdates(autoCheckUpdates: boolean) {
+    this.autoCheckUpdates = autoCheckUpdates
+  }
+
   setAutoDownloadUpdates(autoDownloadUpdates: boolean) {
     this.autoDownloadUpdates = autoDownloadUpdates
   }
@@ -26,21 +35,41 @@ export class SelfUpdateSettings {
 }
 
 export class SelfUpdateState {
+  isUpdateSupportedOnCurrentPlatform: boolean
+  isCheckingUpdates = false
   updateProgressInfo: UpdateProgressInfo | null = null
-  lastUpdateResult: LastUpdateResult | null = null
+  lastUpdateSucceeded: boolean | null = null
 
-  constructor() {
-    makeAutoObservable(this, {
+  get releaseInfo() {
+    return this._resolveReleaseInfo()
+  }
+
+  constructor(
+    private readonly _resolveReleaseInfo: () => SelfUpdateReleaseInfo | null = () => null,
+    isUpdateSupportedOnCurrentPlatform = false
+  ) {
+    this.isUpdateSupportedOnCurrentPlatform = isUpdateSupportedOnCurrentPlatform
+    makeObservable(this, {
+      isUpdateSupportedOnCurrentPlatform: observable,
+      isCheckingUpdates: observable,
+      releaseInfo: computed.struct,
       updateProgressInfo: observable.ref,
-      lastUpdateResult: observable.ref
+      lastUpdateSucceeded: observable,
+      setCheckingUpdates: action,
+      setUpdateProgressInfo: action,
+      setLastUpdateSucceeded: action
     })
+  }
+
+  setCheckingUpdates(isCheckingUpdates: boolean) {
+    this.isCheckingUpdates = isCheckingUpdates
   }
 
   setUpdateProgressInfo(info: UpdateProgressInfo | null) {
     this.updateProgressInfo = info
   }
 
-  setLastUpdateResult(result: LastUpdateResult) {
-    this.lastUpdateResult = result
+  setLastUpdateSucceeded(succeeded: boolean) {
+    this.lastUpdateSucceeded = succeeded
   }
 }

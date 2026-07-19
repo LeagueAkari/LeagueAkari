@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
-import { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo } from '@shared/shards/self-update'
 import { formatError } from '@shared/utils/errors'
 import { AxiosResponse } from 'axios'
 import { Notification, app } from 'electron'
@@ -50,10 +50,19 @@ export class SelfUpdateExecutor {
 
   constructor(private readonly _context: SelfUpdateMainContext) {}
 
-  async start(release: LatestReleaseInfo): Promise<SelfUpdateActionResult> {
+  async start(release: SelfUpdateReleaseInfo): Promise<SelfUpdateActionResult> {
     if (!shouldDownloadUpdateArchive() || !shouldApplyDownloadedUpdate()) {
       this._context.logger.info('Skip self-update download and apply on unsupported platform', {
         platform: process.platform
+      })
+      this._context.state.setUpdateProgressInfo(null)
+      return { result: 'failed', reason: PLATFORM_UNSUPPORTED_REASON }
+    }
+
+    const artifact = release.artifact
+    if (!artifact) {
+      this._context.logger.warn('Release has no supported Windows x64 7z artifact', {
+        version: release.version
       })
       this._context.state.setUpdateProgressInfo(null)
       return { result: 'failed', reason: PLATFORM_UNSUPPORTED_REASON }
@@ -70,11 +79,7 @@ export class SelfUpdateExecutor {
     const job = this._createJob()
 
     try {
-      const downloadPath = await this._downloadUpdate(
-        release.archiveFile.downloadUrl,
-        release.archiveFile.name,
-        job
-      )
+      const downloadPath = await this._downloadUpdate(artifact.downloadUrl, artifact.fileName, job)
       await this._spawnUpdaterOnQuit(downloadPath, release.version, job)
 
       return { result: 'ok' }
@@ -85,7 +90,7 @@ export class SelfUpdateExecutor {
       }
 
       if (this._context.state.updateProgressInfo?.phase !== 'download-failed') {
-        this._setDownloadFailed(release.archiveFile.size)
+        this._setDownloadFailed(artifact.size)
         this._context.ipc.sendEvent(
           this._context.namespace,
           'error-download-update',

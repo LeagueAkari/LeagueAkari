@@ -1,4 +1,3 @@
-import { LatestReleaseInfo, ReleaseArchiveFile } from '@shared/types/akari'
 import { app, shell } from 'electron'
 import path from 'node:path'
 
@@ -9,13 +8,15 @@ import {
 } from './context'
 import { shouldRunSelfUpdateLifecycle } from './platform'
 import type { SelfUpdateUninstaller } from './uninstaller'
+import type { SelfUpdateController } from './update-controller'
 import type { SelfUpdateExecutor } from './update-executor'
 
 export class SelfUpdateIpcHandlers {
   constructor(
     private readonly _context: SelfUpdateMainContext,
     private readonly _executor: SelfUpdateExecutor,
-    private readonly _uninstaller: SelfUpdateUninstaller
+    private readonly _uninstaller: SelfUpdateUninstaller,
+    private readonly _controller: SelfUpdateController
   ) {}
 
   register() {
@@ -32,13 +33,9 @@ export class SelfUpdateIpcHandlers {
         return this._unsupported()
       }
 
-      const release = this._context.akariApi.state.latestRelease
-      if (release && release.isNew && release.archiveFile) {
-        return await this._executor.start(
-          release as LatestReleaseInfo & {
-            archiveFile: ReleaseArchiveFile
-          }
-        )
+      const release = this._context.state.releaseInfo
+      if (release?.isNew && release.isUpdateSupported) {
+        return await this._executor.start(release)
       }
 
       return { result: 'no-op' }
@@ -50,13 +47,9 @@ export class SelfUpdateIpcHandlers {
         return this._unsupported()
       }
 
-      const release = this._context.akariApi.state.latestRelease
-      if (release) {
-        this._context.logger.info(
-          'Force start update, target:',
-          release.version,
-          release.archiveFile.name
-        )
+      const release = this._context.state.releaseInfo
+      if (release?.isUpdateSupported) {
+        this._context.logger.info('Force start update, target:', release.version)
         return await this._executor.start(release)
       } else {
         this._context.logger.warn('No latest release found, cannot force start update')
@@ -96,9 +89,9 @@ export class SelfUpdateIpcHandlers {
 
   private async _checkUpdates() {
     try {
-      const release = await this._context.akariApi.updateLatestReleaseManually()
+      const release = await this._controller.checkLatestRelease()
 
-      if (release && release.isNew) {
+      if (release?.isNew && release.isUpdateSupported) {
         return { result: 'new-updates' }
       } else {
         return { result: 'no-updates' }

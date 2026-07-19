@@ -2,22 +2,12 @@ import { z } from 'zod'
 
 import type {
   AkariAutoSelectGroupsConfig,
-  AkariLastResortRelease,
   AkariLeagueServersConfig,
   AkariNotice,
   AkariOngoingGameConfig,
   AkariRelease,
   AkariSupportedQueuesConfig
 } from './types'
-
-const AkariLastResortArchiveFileSchema = z
-  .object({
-    name: z.string(),
-    size: z.number(),
-    downloadUrl: z.url(),
-    contentType: z.string()
-  })
-  .passthrough()
 
 const ConfigMetadataShape = {
   updatedAt: z.iso.datetime({ offset: true })
@@ -123,20 +113,5 @@ export const AkariReleaseSchema: z.ZodType<AkariRelease> = z
         })
         .passthrough()
     )
-  })
-  .passthrough()
-
-export const AkariLastResortReleaseSchema: z.ZodType<AkariLastResortRelease> = z
-  .object({
-    version: z.string(),
-    publishedAt: z.iso.datetime({ offset: true }),
-    descriptions: z
-      .object({
-        'zh-CN': z.string().optional(),
-        en: z.string().optional()
-      })
-      .passthrough(),
-    archiveFileGitHub: AkariLastResortArchiveFileSchema.optional(),
-    archiveFileGitee: AkariLastResortArchiveFileSchema.optional()
   })
   .passthrough()

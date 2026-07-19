@@ -1,21 +1,24 @@
-import type { UpdateProgressInfo } from '@shared/shards/self-update'
-import type { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import UpdateStatusItem from './UpdateStatusItem.vue'
 import type { UpdateStatusDisplay } from './status'
 
-const release: LatestReleaseInfo = {
+const release: SelfUpdateReleaseInfo = {
   version: 'v1.6.0',
   currentVersion: 'v1.5.0',
-  isNew: true,
   publishedAt: '2026-07-19T00:00:00.000Z',
   description: '',
-  archiveFile: {
-    name: 'LeagueAkari-v1.6.0-win.7z',
+  isNew: true,
+  isUpdateSupported: true,
+  artifact: {
+    platform: 'win32',
+    arch: 'x64',
+    fileName: 'LeagueAkari-v1.6.0-win.7z',
     size: 128 * 1024 * 1024,
     downloadUrl: 'https://example.com/LeagueAkari-v1.6.0-win.7z',
-    contentType: 'application/x-7z-compressed'
+    contentType: 'application/x-7z-compressed',
+    sha256: null
   }
 }
 
@@ -36,7 +39,7 @@ const downloadingProgress: UpdateProgressInfo = {
   downloadingProgress: 0.42,
   averageDownloadSpeed: 8 * 1024 * 1024,
   downloadTimeLeft: 18,
-  fileSize: release.archiveFile.size
+  fileSize: release.artifact!.size
 }
 
 const readyStatus: UpdateStatusDisplay = {
@@ -50,7 +53,7 @@ const readyProgress: UpdateProgressInfo = {
   downloadingProgress: 1,
   averageDownloadSpeed: 0,
   downloadTimeLeft: 0,
-  fileSize: release.archiveFile.size
+  fileSize: release.artifact!.size
 }
 
 const meta = {

@@ -133,7 +133,6 @@ import AkariLogo from '@renderer-shared/assets/icon/AkariLogo.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
-import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
@@ -163,7 +162,6 @@ const lcuxs = useLeagueClientUxStore()
 const lcps = useLeagueClientPeekStore()
 const sgps = useSgpStore()
 
-const aks = useAkariApiStore()
 const sus = useSelfUpdateStore()
 
 const lc = useInstance(LeagueClientRenderer)
@@ -177,8 +175,8 @@ const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
 const showNewVersionBadge = computed(() => {
-  const release = aks.latestRelease
-  if (!release || !release.isNew) {
+  const release = sus.releaseInfo
+  if (!release?.isNew || !release.isUpdateSupported) {
     return false
   }
 

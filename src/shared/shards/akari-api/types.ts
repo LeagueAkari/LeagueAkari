@@ -60,22 +60,6 @@ export interface AkariStatisticsRecordCreated {
   id: number
 }
 
-export interface AkariLastResortArchiveFile {
-  name: string
-  size: number
-  downloadUrl: string
-  contentType: string
-}
-
-/** Compatibility response used only while the legacy updater fallback remains available. */
-export interface AkariLastResortRelease {
-  version: string
-  publishedAt: string
-  descriptions: Partial<Record<AkariApiLanguage, string>>
-  archiveFileGitHub?: AkariLastResortArchiveFile
-  archiveFileGitee?: AkariLastResortArchiveFile
-}
-
 export interface AkariConfigMetadata {
   updatedAt: string
 }

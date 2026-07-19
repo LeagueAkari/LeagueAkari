@@ -1,3 +1,15 @@
+import type { AkariReleaseArtifact } from '../akari-api'
+
+export interface SelfUpdateReleaseInfo {
+  version: string
+  currentVersion: string
+  publishedAt: string
+  description: string
+  isNew: boolean
+  isUpdateSupported: boolean
+  artifact: AkariReleaseArtifact | null
+}
+
 /**
  * 更新进度信息
  */
@@ -26,12 +38,4 @@ export interface UpdateProgressInfo {
    * 更新包大小
    */
   fileSize: number
-}
-
-/**
- * 上次更新结果
- */
-export interface LastUpdateResult {
-  success: boolean
-  reason: string
 }

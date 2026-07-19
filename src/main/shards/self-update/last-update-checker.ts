@@ -39,16 +39,10 @@ export class LastUpdateChecker {
             targetVersion,
             newVersionFlagPath
           )
-          state.setLastUpdateResult({
-            success: true,
-            reason: 'Successfully updated'
-          })
+          state.setLastUpdateSucceeded(true)
         } else {
           logger.info(`Last auto-update seems to have failed`, targetVersion, newVersionFlagPath)
-          state.setLastUpdateResult({
-            success: false,
-            reason: 'Something wrong...'
-          })
+          state.setLastUpdateSucceeded(false)
         }
       } else {
         logger.warn('Update flag is not a normal version number', targetVersion)

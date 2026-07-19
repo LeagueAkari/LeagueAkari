@@ -1,4 +1,4 @@
-import { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo } from '@shared/shards/self-update'
 import cp from 'node:child_process'
 import fs from 'node:fs'
 import { Readable } from 'node:stream'
@@ -48,18 +48,22 @@ vi.mock('node:original-fs', async () => {
   return { default: fs, ...fs }
 })
 
-function createRelease(): LatestReleaseInfo {
+function createRelease(): SelfUpdateReleaseInfo {
   return {
     version: '2.0.0',
     currentVersion: '1.0.0',
-    isNew: true,
     publishedAt: '2026-01-01T00:00:00.000Z',
     description: '',
-    archiveFile: {
-      name: 'LeagueAkari-2.0.0-win.7z',
+    isNew: true,
+    isUpdateSupported: true,
+    artifact: {
+      platform: 'win32',
+      arch: 'x64',
+      fileName: 'LeagueAkari-2.0.0-win.7z',
       size: 100,
       downloadUrl: 'https://example.com/LeagueAkari-2.0.0-win.7z',
-      contentType: 'application/x-7z-compressed'
+      contentType: 'application/x-7z-compressed',
+      sha256: null
     }
   }
 }
@@ -126,6 +130,24 @@ describe('SelfUpdateExecutor', () => {
     rejectRequest(new Error('aborted'))
     await expect(started).resolves.toEqual({ result: 'ok' })
     expect(context.state.updateProgressInfo).toBeNull()
+  })
+
+  test('rejects a release without a selected update artifact', async () => {
+    const httpClient = {
+      get: vi.fn(),
+      defaults: {}
+    } as unknown as SelfUpdateMainContext['httpClient']
+    const context = createContext(httpClient)
+    const executor = new SelfUpdateExecutor(context)
+    const release = createRelease()
+    release.isUpdateSupported = false
+    release.artifact = null
+
+    await expect(executor.start(release)).resolves.toEqual({
+      result: 'failed',
+      reason: 'platform-unsupported'
+    })
+    expect(httpClient.get).not.toHaveBeenCalled()
   })
 
   test('settles the update process and keeps failure state when the download stream fails', async () => {

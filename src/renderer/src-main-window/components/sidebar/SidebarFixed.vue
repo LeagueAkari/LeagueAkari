@@ -12,7 +12,7 @@
     <UpdateStatusItem
       v-if="updateStatus"
       :status="updateStatus"
-      :release="aks.latestRelease"
+      :release="sus.releaseInfo"
       :update-progress-info="sus.updateProgressInfo"
       :is-collapsed="isCollapsed"
       @start="handleStartUpdate"
@@ -104,7 +104,6 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
@@ -140,7 +139,6 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
 const mws = useMainWindowStore()
-const aks = useAkariApiStore()
 const sus = useSelfUpdateStore()
 
 const pt = useInstance(PlayerTabsRenderer)
@@ -148,7 +146,7 @@ const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
 
 const updateStatus = computed(() =>
-  resolveUpdateStatusDisplay(aks.latestRelease, sus.updateProgressInfo, sus.settings.ignoreVersion)
+  resolveUpdateStatusDisplay(sus.releaseInfo, sus.updateProgressInfo, sus.settings.ignoreVersion)
 )
 
 const handleCancelUpdate = () => {

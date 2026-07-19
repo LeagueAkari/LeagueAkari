@@ -54,7 +54,8 @@ settings:
           butter: 奶油黄
     selfUpdate:
       title: 应用更新
-      updateLatestRelease:
+      temporarilyUnsupported: 当前平台暂不支持应用内更新。更新检查与自动更新已停用。
+      autoCheckUpdates:
         label: 自动检查更新
         description: 周期性检查是否有新版本
       autoDownloadUpdates:
@@ -64,7 +65,6 @@ settings:
       currentRelease: 当前版本内容
       downloadRelease: 下载更新包
       newRelease: 新版本内容
-      lastCheckAt: 上次检查
       cancelUpdate: 取消更新
       restartNow: 立即重启
       updateProgress:

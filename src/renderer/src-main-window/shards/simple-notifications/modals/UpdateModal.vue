@@ -42,7 +42,7 @@
           {{ t('notifications.updateModal.externalDownload') }}
         </ExternalLink>
         <NCheckbox
-          v-if="release.isNew"
+          v-if="release.isNew && release.isUpdateSupported"
           @update:checked="(val) => emits('ignoreVersion', release!.version, val)"
           :disabled="isUpdating"
           :checked="props.release?.version === props.ignoreVersion"
@@ -51,7 +51,7 @@
           {{ t('notifications.updateModal.ignoreThisVersion') }}
         </NCheckbox>
         <NButton
-          v-if="release.isNew && release.archiveFile"
+          v-if="release.isNew && release.isUpdateSupported"
           :loading="isUpdating"
           :disabled="isUpdating"
           size="small"
@@ -68,14 +68,13 @@
 <script setup lang="ts">
 import ExternalLink from '@renderer-shared/components/ExternalLink.vue'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { LatestReleaseInfo } from '@shared/types/akari'
-import { UpdateProgressInfo } from '@shared/shards/self-update'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  release: LatestReleaseInfo | null
+  release: SelfUpdateReleaseInfo | null
   ignoreVersion: string | null
   updateProgressInfo: UpdateProgressInfo | null
 }>()
@@ -88,11 +87,7 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(
-    props.release
-      ? props.release.description || t('notifications.updateModal.noUpdateMd')
-      : t('notifications.updateModal.noUpdateMd')
-  )
+  return markdownIt.render(props.release?.description || t('notifications.updateModal.noUpdateMd'))
 })
 
 const isUpdating = computed(() => props.updateProgressInfo !== null)
@@ -117,11 +112,7 @@ const updateButtonText = computed(() => {
 })
 
 const externalDownloadUrl = computed(() => {
-  if (!props.release) {
-    return null
-  }
-
-  return props.release.archiveFile.downloadUrl
+  return props.release?.artifact?.downloadUrl ?? null
 })
 
 const show = defineModel<boolean>('show', { default: false })

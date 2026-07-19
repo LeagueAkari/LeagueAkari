@@ -14,6 +14,7 @@ export const UPDATE_EXECUTABLE_NAME = 'akari-updater.exe'
 export const NEW_VERSION_FLAG = 'NEW_VERSION_FLAG'
 export const EXECUTABLE_NAME = 'LeagueAkari.exe'
 export const UPDATE_PROGRESS_UPDATE_INTERVAL = 200
+export const UPDATE_CHECK_INTERVAL = 4 * 60 * 60 * 1000
 export const PLATFORM_UNSUPPORTED_REASON = 'platform-unsupported'
 
 export interface SelfUpdateMainContext {

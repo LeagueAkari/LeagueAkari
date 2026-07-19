@@ -1,5 +1,4 @@
 import { useInstance } from '@renderer-shared/shards'
-import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
@@ -15,7 +14,6 @@ import { useSimpleNotificationsStore } from './store'
 export function registerNewReleaseModal(context: SimpleNotificationsRendererContext) {
   const Component = defineComponent({
     setup() {
-      const akariApiStore = useAkariApiStore()
       const simpleNotificationsStore = useSimpleNotificationsStore()
       const selfUpdateStore = useSelfUpdateStore()
       const selfUpdate = useInstance(SelfUpdateRenderer)
@@ -26,46 +24,52 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
         keyPrefix: 'notifications.simple.newReleaseHints'
       })
 
+      let lastNotifiedVersion: string | null = null
+
       watch(
-        () => akariApiStore.latestRelease,
-        (release, previousRelease) => {
-          if (!release || selfUpdateStore.settings.ignoreVersion === release.version) {
+        () => [selfUpdateStore.releaseInfo, selfUpdateStore.settings.ignoreVersion] as const,
+        ([release, ignoreVersion]) => {
+          if (
+            !release ||
+            !release.isNew ||
+            !release.isUpdateSupported ||
+            ignoreVersion === release.version
+          ) {
             return
           }
 
-          if (previousRelease && previousRelease.version === release.version) {
+          if (lastNotifiedVersion === release.version) {
             return
           }
 
-          if (release.isNew) {
-            const inst = notification.info({
-              title: () => t('title'),
-              content: () => (
-                <WithActions
-                  buttons={[
-                    {
-                      label: () => t('dismiss'),
-                      secondary: true,
-                      onClick: () => {
-                        inst.destroy()
-                      }
-                    },
-                    {
-                      label: () => t('takeALook'),
-                      type: 'primary',
-                      onClick: () => {
-                        simpleNotificationsStore.showNewReleaseModal = true
-                        inst.destroy()
-                      }
+          lastNotifiedVersion = release.version
+          const inst = notification.info({
+            title: () => t('title'),
+            content: () => (
+              <WithActions
+                buttons={[
+                  {
+                    label: () => t('dismiss'),
+                    secondary: true,
+                    onClick: () => {
+                      inst.destroy()
                     }
-                  ]}
-                >
-                  <span>{t('content', { version: release.version })}</span>
-                </WithActions>
-              ),
-              duration: 0
-            })
-          }
+                  },
+                  {
+                    label: () => t('takeALook'),
+                    type: 'primary',
+                    onClick: () => {
+                      simpleNotificationsStore.showNewReleaseModal = true
+                      inst.destroy()
+                    }
+                  }
+                ]}
+              >
+                <span>{t('content', { version: release.version })}</span>
+              </WithActions>
+            ),
+            duration: 0
+          })
         },
         { immediate: true }
       )
@@ -82,7 +86,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
       return () => (
         <UpdateModal
           {...{
-            release: akariApiStore.latestRelease,
+            release: selfUpdateStore.releaseInfo,
             show: simpleNotificationsStore.showNewReleaseModal,
             ignoreVersion: selfUpdateStore.settings.ignoreVersion,
             updateProgressInfo: selfUpdateStore.updateProgressInfo,

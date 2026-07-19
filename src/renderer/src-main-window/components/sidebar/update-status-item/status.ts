@@ -1,5 +1,4 @@
-import type { UpdateProgressInfo } from '@shared/shards/self-update'
-import type { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
 
 export type UpdateStatusKind = 'available' | UpdateProgressInfo['phase']
 export type UpdateStatusPhase = 'available' | 'downloading' | 'ready'
@@ -11,10 +10,14 @@ export interface UpdateStatusDisplay {
 }
 
 export function resolveUpdateStatusDisplay(
-  release: LatestReleaseInfo | null,
+  release: SelfUpdateReleaseInfo | null,
   updateProgressInfo: UpdateProgressInfo | null,
   ignoreVersion: string | null
 ): UpdateStatusDisplay | null {
+  if (!release?.isUpdateSupported) {
+    return null
+  }
+
   if (updateProgressInfo) {
     switch (updateProgressInfo.phase) {
       case 'downloading':
@@ -38,7 +41,7 @@ export function resolveUpdateStatusDisplay(
     }
   }
 
-  if (release?.isNew && release.version !== ignoreVersion) {
+  if (release.isNew && release.version !== ignoreVersion) {
     return {
       kind: 'available',
       phase: 'available',

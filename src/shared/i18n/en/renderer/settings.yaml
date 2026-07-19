@@ -54,7 +54,8 @@ settings:
           butter: Butter Yellow
     selfUpdate:
       title: Application Update
-      updateLatestRelease:
+      temporarilyUnsupported: In-app updates are not currently supported on this platform. Update checks and automatic updates are disabled.
+      autoCheckUpdates:
         label: Auto Check Updates
         description: Periodically check for new versions
       autoDownloadUpdates:
@@ -64,7 +65,6 @@ settings:
       currentRelease: Current Release
       downloadRelease: Download Release
       newRelease: New Release
-      lastCheckAt: Last Check at
       cancelUpdate: Cancel Update
       restartNow: Restart Now
       updateProgress:

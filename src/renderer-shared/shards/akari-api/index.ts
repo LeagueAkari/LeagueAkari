@@ -5,7 +5,6 @@ import axios from 'axios'
 
 import { AkariProtocolRenderer } from '../akari-protocol'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { SettingUtilsRenderer } from '../setting-utils'
 import { useAkariApiStore } from './store'
 
 @Shard(AkariApiRenderer.id)
@@ -28,8 +27,7 @@ export class AkariApiRenderer {
   constructor(
     @Dep(AkariProtocolRenderer) akariProtocol: AkariProtocolRenderer,
     @Dep(PiniaMobxUtilsRenderer)
-    private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
+    private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer
   ) {
     akariProtocol.installProxyRequestCancellation(this.httpClient)
     akariProtocol.installProxyRequestCancellation(this.staticHttpClient)
@@ -38,10 +36,5 @@ export class AkariApiRenderer {
   async onInit() {
     const store = useAkariApiStore()
     await this._piniaMobxUtils.sync(AkariApiRenderer.mainId, 'state', store)
-    await this._piniaMobxUtils.sync(AkariApiRenderer.mainId, 'settings', store.settings)
-  }
-
-  setUpdateLatestRelease(value: boolean) {
-    return this._settingUtils.set(AkariApiRenderer.mainId, 'updateLatestRelease', value)
   }
 }

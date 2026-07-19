@@ -21,10 +21,11 @@ import {
 import { SelfUpdateIpcHandlers } from './ipc-handlers'
 import { LastUpdateChecker } from './last-update-checker'
 import { shouldRunSelfUpdateLifecycle } from './platform'
+import { resolveSelfUpdateReleaseInfo } from './release-info'
 import { SelfUpdateSettings, SelfUpdateState } from './state'
 import { SelfUpdateUninstaller } from './uninstaller'
+import { SelfUpdateController } from './update-controller'
 import { SelfUpdateExecutor } from './update-executor'
-import { SelfUpdateWatcher } from './update-watcher'
 
 /**
  * 负责更新包下载及外部更新器调度
@@ -40,16 +41,16 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   static UPDATE_PROGRESS_UPDATE_INTERVAL = SELF_UPDATE_PROGRESS_UPDATE_INTERVAL
 
   public readonly settings = new SelfUpdateSettings()
-  public readonly state = new SelfUpdateState()
+  public readonly state: SelfUpdateState
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
   private readonly _context: SelfUpdateMainContext
   private readonly _executor: SelfUpdateExecutor
   private readonly _uninstaller: SelfUpdateUninstaller
+  private readonly _controller: SelfUpdateController
   private readonly _ipcHandlers: SelfUpdateIpcHandlers
   private readonly _lastUpdateChecker: LastUpdateChecker
-  private readonly _watcher: SelfUpdateWatcher
 
   private readonly _httpClient = axios.create({
     headers: {
@@ -66,9 +67,18 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     _settingFactory: SettingFactoryMain
   ) {
     this._logger = _loggerFactory.create(SelfUpdateMain.id)
+    this.state = new SelfUpdateState(
+      () =>
+        resolveSelfUpdateReleaseInfo(this._akariApi.state.latestRelease, app.getVersion(), {
+          platform: process.platform,
+          arch: process.arch
+        }),
+      shouldRunSelfUpdateLifecycle()
+    )
     this._settingService = _settingFactory.register(
       SelfUpdateMain.id,
       {
+        autoCheckUpdates: { default: this.settings.autoCheckUpdates },
         autoDownloadUpdates: { default: this.settings.autoDownloadUpdates },
         ignoreVersion: { default: this.settings.ignoreVersion }
       },
@@ -89,20 +99,29 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     this._executor = new SelfUpdateExecutor(this._context)
     this._uninstaller = new SelfUpdateUninstaller(this._context)
-    this._ipcHandlers = new SelfUpdateIpcHandlers(this._context, this._executor, this._uninstaller)
+    this._controller = new SelfUpdateController(this._context, this._executor)
+    this._ipcHandlers = new SelfUpdateIpcHandlers(
+      this._context,
+      this._executor,
+      this._uninstaller,
+      this._controller
+    )
     this._lastUpdateChecker = new LastUpdateChecker(this._context)
-    this._watcher = new SelfUpdateWatcher(this._context, this._executor)
   }
 
   private async _setupState() {
     await this._settingService.applyToState()
 
     this._mobxUtils.propSync(SelfUpdateMain.id, 'state', this.state, [
+      'isUpdateSupportedOnCurrentPlatform',
+      'isCheckingUpdates',
+      'releaseInfo',
       'updateProgressInfo',
-      'lastUpdateResult'
+      'lastUpdateSucceeded'
     ])
 
     this._mobxUtils.propSync(SelfUpdateMain.id, 'settings', this.settings, [
+      'autoCheckUpdates',
       'autoDownloadUpdates',
       'ignoreVersion'
     ])
@@ -113,16 +132,21 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._ipcHandlers.register()
 
     if (!shouldRunSelfUpdateLifecycle()) {
-      this._logger.info('Self-update is Windows-only; disabled on', process.platform)
+      this._logger.info('Self-update is available only on Windows x64; disabled on', {
+        platform: process.platform,
+        arch: process.arch
+      })
       return
     }
 
     await this._lastUpdateChecker.check()
-    this._watcher.registerHttpProxy()
-    this._watcher.watchUpdateProcess()
+    this._controller.registerHttpProxy()
+    this._controller.watchUpdateProcess()
+    this._controller.watchLatestRelease()
   }
 
   async onDispose() {
+    this._controller.dispose()
     await this._executor.runUpdateOnQuit()
     this._executor.cancelIfNotWaitingForRestart()
   }

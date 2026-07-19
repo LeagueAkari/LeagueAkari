@@ -21,20 +21,17 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer
-  ) {
-    // @ts-ignore
-    window.selfUpdateShard = this
-  }
+  ) {}
 
-  private _watchLastUpdateResult() {
+  private _watchLastUpdateSucceeded() {
     const appCommonStore = useAppCommonStore()
     const selfUpdateStore = useSelfUpdateStore()
     const { t } = useTranslation()
     const notification = useNotification()
 
     watchEffect(() => {
-      if (selfUpdateStore.lastUpdateResult) {
-        if (selfUpdateStore.lastUpdateResult.success) {
+      if (selfUpdateStore.lastUpdateSucceeded !== null) {
+        if (selfUpdateStore.lastUpdateSucceeded) {
           notification.success({
             title: () => t('selfUpdate.tasks.title'),
             content: () =>
@@ -80,6 +77,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoDownloadUpdates', enabled)
   }
 
+  setAutoCheckUpdates(enabled: boolean) {
+    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoCheckUpdates', enabled)
+  }
+
   setIgnoreVersion(version: string | null) {
     return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'ignoreVersion', version)
   }
@@ -94,6 +95,6 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
     await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
-    this._setupInAppScope.addSetupFn(() => this._watchLastUpdateResult())
+    this._setupInAppScope.addSetupFn(() => this._watchLastUpdateSucceeded())
   }
 }

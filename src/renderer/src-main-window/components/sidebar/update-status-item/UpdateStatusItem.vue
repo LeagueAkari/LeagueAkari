@@ -106,8 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UpdateProgressInfo } from '@shared/shards/self-update'
-import type { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
 import { formatSeconds } from '@shared/utils/format'
 import { ArrowDownload20Filled, ArrowSync20Filled, ArrowUp20Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
@@ -119,7 +118,7 @@ import type { UpdateStatusDisplay } from './status'
 const props = withDefaults(
   defineProps<{
     status: UpdateStatusDisplay
-    release: LatestReleaseInfo | null
+    release: SelfUpdateReleaseInfo | null
     updateProgressInfo: UpdateProgressInfo | null
     isCollapsed?: boolean
   }>(),

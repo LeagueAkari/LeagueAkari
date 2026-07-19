@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import type { AkariApiLanguage } from '@shared/shards/akari-api'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -12,14 +13,13 @@ import type { AkariApiMainContext } from './context'
 import { AkariApiNoticeLoader } from './notice-loader'
 import { AkariApiProtocolController } from './protocol-controller'
 import { AkariApiReleaseLoader } from './release-loader'
-import { AkariApiSettings, AkariApiState } from './state'
+import { AkariApiState } from './state'
 
 @Shard(AkariApiMain.id)
 export class AkariApiMain implements IAkariShardInitDispose {
   static readonly id = 'akari-api-main'
 
   public readonly state = new AkariApiState()
-  public readonly settings = new AkariApiSettings()
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService
@@ -46,13 +46,7 @@ export class AkariApiMain implements IAkariShardInitDispose {
     _appCommon: AppCommonMain
   ) {
     this._logger = _loggerFactory.create(AkariApiMain.id)
-    this._settingService = _settingFactory.register(
-      AkariApiMain.id,
-      {
-        updateLatestRelease: { default: this.settings.updateLatestRelease }
-      },
-      this.settings
-    )
+    this._settingService = _settingFactory.register(AkariApiMain.id)
 
     this._bootstrapController = new AkariApiBootstrapController(this._settingService, this._logger)
     this._protocolController = new AkariApiProtocolController(
@@ -62,7 +56,6 @@ export class AkariApiMain implements IAkariShardInitDispose {
     )
     this._context = {
       state: this.state,
-      settings: this.settings,
       logger: this._logger,
       settingService: this._settingService,
       mobxUtils: _mobxUtils,
@@ -76,7 +69,7 @@ export class AkariApiMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._bootstrapController.init()
-    await this._setupState()
+    this._setupState()
 
     try {
       await this._configLoader.initFromLocal()
@@ -87,31 +80,22 @@ export class AkariApiMain implements IAkariShardInitDispose {
     this._protocolController.register()
     this._configLoader.watch()
     this._noticeLoader.watch()
-    this._releaseLoader.watch()
   }
 
   async onDispose() {
     this._configLoader.dispose()
     this._noticeLoader.dispose()
-    this._releaseLoader.dispose()
     this._protocolController.unregister()
   }
 
-  updateLatestReleaseManually() {
-    return this._releaseLoader.updateLatestReleaseManually()
+  updateLatestRelease(language: AkariApiLanguage) {
+    return this._releaseLoader.updateLatestRelease(language)
   }
 
-  private async _setupState() {
-    await this._settingService.applyToState()
-
+  private _setupState() {
     this._context.mobxUtils.propSync(AkariApiMain.id, 'state', this.state, [
       'notice',
-      'latestRelease',
-      'isUpdatingNotice',
-      'isUpdatingLatestRelease'
-    ])
-    this._context.mobxUtils.propSync(AkariApiMain.id, 'settings', this.settings, [
-      'updateLatestRelease'
+      'isUpdatingNotice'
     ])
   }
 }

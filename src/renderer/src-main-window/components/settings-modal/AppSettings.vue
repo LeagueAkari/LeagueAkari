@@ -120,34 +120,50 @@
           />
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.app.selfUpdate.title')">
+      <SettingsSection
+        :title="t('settings.app.selfUpdate.title')"
+        :footer="
+          sus.isUpdateSupportedOnCurrentPlatform
+            ? undefined
+            : t('settings.app.selfUpdate.temporarilyUnsupported')
+        "
+      >
         <SettingsRow
-          :label="t('settings.app.selfUpdate.updateLatestRelease.label')"
-          :label-description="t('settings.app.selfUpdate.updateLatestRelease.description')"
+          :label="t('settings.app.selfUpdate.autoCheckUpdates.label')"
+          :label-description="t('settings.app.selfUpdate.autoCheckUpdates.description')"
           :label-width="400"
+          :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
         >
           <NSwitch
             size="small"
-            :value="aks.settings.updateLatestRelease"
-            @update:value="(val: boolean) => akariApi.setUpdateLatestRelease(val)"
+            :value="sus.settings.autoCheckUpdates"
+            :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
+            @update:value="(val: boolean) => su.setAutoCheckUpdates(val)"
           />
         </SettingsRow>
         <SettingsRow
           :label="t('settings.app.selfUpdate.autoDownloadUpdates.label')"
           :label-description="t('settings.app.selfUpdate.autoDownloadUpdates.description')"
           :label-width="400"
+          :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
         >
           <NSwitch
             size="small"
             :value="sus.settings.autoDownloadUpdates"
+            :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
             @update:value="(val: boolean) => su.setAutoDownloadUpdates(val)"
           />
         </SettingsRow>
-        <SettingsRow :label="t('settings.app.selfUpdate.checkUpdates')" :label-width="400">
+        <SettingsRow
+          :label="t('settings.app.selfUpdate.checkUpdates')"
+          :label-width="400"
+          :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
+        >
           <NFlex align="center" class="max-w-full justify-end">
             <NButton
               size="small"
-              :loading="aks.isUpdatingLatestRelease"
+              :loading="sus.isCheckingUpdates"
+              :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
               secondary
               type="primary"
               @click="() => handleCheckUpdates()"
@@ -155,11 +171,12 @@
             >
             <NButton
               size="small"
-              v-if="aks.latestRelease"
+              v-if="sus.releaseInfo"
+              :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
               secondary
               @click="() => handleShowUpdateModal()"
             >
-              <template v-if="aks.latestRelease.isNew">
+              <template v-if="sus.releaseInfo.isNew">
                 {{ t('settings.app.selfUpdate.newRelease') }}
               </template>
               <template v-else>
@@ -168,8 +185,8 @@
             </NButton>
             <NButton
               size="small"
-              v-if="aks.latestRelease && aks.latestRelease.isNew"
-              :disabled="sus.updateProgressInfo !== null"
+              v-if="sus.releaseInfo?.isNew && sus.releaseInfo.isUpdateSupported"
+              :disabled="!sus.isUpdateSupportedOnCurrentPlatform || sus.updateProgressInfo !== null"
               secondary
               @click="() => su.startUpdate()"
             >
@@ -178,16 +195,13 @@
             <NButton
               size="small"
               v-if="sus.updateProgressInfo"
+              :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
               secondary
               type="warning"
               @click="() => su.cancelUpdate()"
             >
               {{ t('settings.app.selfUpdate.cancelUpdate') }}
             </NButton>
-            <span v-if="sus.lastCheckAt" class="text-xs"
-              >{{ t('settings.app.selfUpdate.lastCheckAt') }}
-              {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
-            >
           </NFlex>
         </SettingsRow>
         <SettingsRow
@@ -196,6 +210,7 @@
           :label-description="t('settings.app.selfUpdate.updateProgress.description')"
           :label-width="400"
           align="start"
+          :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
         >
           <NSteps
             class="w-full"
@@ -248,10 +263,15 @@
           :label-description="t('settings.app.selfUpdate.updateDir.description')"
           :label-width="400"
           v-if="processStatus.current === 1 && processStatus.status !== 'error'"
+          :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
         >
-          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
-            t('settings.app.selfUpdate.updateDir.open')
-          }}</NButton>
+          <NButton
+            size="small"
+            secondary
+            :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
+            @click="() => su.openNewUpdatesDir()"
+            >{{ t('settings.app.selfUpdate.updateDir.open') }}</NButton
+          >
         </SettingsRow>
       </SettingsSection>
       <SettingsSection :title="t('settings.app.mainWindowUi.title')">
@@ -409,8 +429,6 @@
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
-import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { HttpProxySetting, useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -435,7 +453,6 @@ import {
 } from '@shared/types/app-theme'
 import { formatSeconds } from '@shared/utils/format'
 import { useMediaQuery } from '@vueuse/core'
-import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -471,14 +488,12 @@ const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 const ls = useLoggerStore()
-const aks = useAkariApiStore()
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
 const app = useInstance(AppCommonRenderer)
 const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
 const lg = useInstance(LoggerRenderer)
-const akariApi = useInstance(AkariApiRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
 
 const closeActions = computed(() => {
@@ -665,7 +680,7 @@ const processStatus = computed(() => {
   if (!sus.updateProgressInfo) {
     return {
       current: 0,
-      status: 'wait' as any // utilize 'any' to suppress type error
+      status: 'wait' as const
     }
   }
 
@@ -673,22 +688,22 @@ const processStatus = computed(() => {
     case 'downloading':
       return {
         current: 1,
-        status: 'process'
+        status: 'process' as const
       }
     case 'download-failed':
       return {
         current: 1,
-        status: 'error'
+        status: 'error' as const
       }
     case 'waiting-for-restart':
       return {
         current: 2,
-        status: 'process'
+        status: 'process' as const
       }
     default:
       return {
         current: 0,
-        status: 'wait'
+        status: 'wait' as const
       }
   }
 })

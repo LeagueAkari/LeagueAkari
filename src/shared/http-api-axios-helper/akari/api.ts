@@ -2,7 +2,6 @@ import {
   type AkariApiConfigResource,
   type AkariApiConfigResourceMap,
   type AkariApiLanguage,
-  type AkariLastResortRelease,
   type AkariNotice,
   type AkariRelease,
   type AkariStatisticsRecordCreated,
@@ -55,11 +54,5 @@ export class AkariApiHttpApiAxiosHelper {
       { version },
       { signal: options.signal }
     )
-  }
-
-  getLastResortLatestRelease(options: HttpApiRequestOptions = {}) {
-    return this._http.get<AkariLastResortRelease>('/last-resort/v1/latest-release', {
-      signal: options.signal
-    })
   }
 }

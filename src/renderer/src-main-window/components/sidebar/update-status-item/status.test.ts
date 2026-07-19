@@ -1,20 +1,23 @@
-import type { UpdateProgressInfo } from '@shared/shards/self-update'
-import type { LatestReleaseInfo } from '@shared/types/akari'
+import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
 import { describe, expect, it } from 'vitest'
 
 import { resolveUpdateStatusDisplay } from './status'
 
-const release: LatestReleaseInfo = {
+const release: SelfUpdateReleaseInfo = {
   version: 'v1.6.0',
   currentVersion: 'v1.5.0',
-  isNew: true,
   publishedAt: '2026-07-19T00:00:00.000Z',
   description: '',
-  archiveFile: {
-    name: 'LeagueAkari-v1.6.0-win.7z',
+  isNew: true,
+  isUpdateSupported: true,
+  artifact: {
+    platform: 'win32',
+    arch: 'x64',
+    fileName: 'LeagueAkari-v1.6.0-win.7z',
     size: 1024,
     downloadUrl: 'https://example.com/LeagueAkari-v1.6.0-win.7z',
-    contentType: 'application/x-7z-compressed'
+    contentType: 'application/x-7z-compressed',
+    sha256: null
   }
 }
 
@@ -27,18 +30,21 @@ function createProgressInfo(
     downloadingProgress,
     averageDownloadSpeed: 0,
     downloadTimeLeft: -1,
-    fileSize: release.archiveFile.size
+    fileSize: release.artifact!.size
   }
 }
 
 describe('resolveUpdateStatusDisplay', () => {
-  it('shows a new release unless that version is ignored', () => {
+  it('shows a supported new release unless that version is ignored', () => {
     expect(resolveUpdateStatusDisplay(release, null, null)).toEqual({
       kind: 'available',
       phase: 'available',
       progress: 100
     })
     expect(resolveUpdateStatusDisplay(release, null, release.version)).toBeNull()
+    expect(
+      resolveUpdateStatusDisplay({ ...release, isUpdateSupported: false }, null, null)
+    ).toBeNull()
   })
 
   it('maps active update progress ahead of release visibility', () => {
@@ -51,7 +57,7 @@ describe('resolveUpdateStatusDisplay', () => {
     })
 
     expect(
-      resolveUpdateStatusDisplay(null, createProgressInfo('waiting-for-restart'), null)
+      resolveUpdateStatusDisplay(release, createProgressInfo('waiting-for-restart'), null)
     ).toEqual({
       kind: 'waiting-for-restart',
       phase: 'ready',
@@ -60,7 +66,9 @@ describe('resolveUpdateStatusDisplay', () => {
   })
 
   it('exposes a failed download as an actionable retry state', () => {
-    expect(resolveUpdateStatusDisplay(null, createProgressInfo('download-failed'), null)).toEqual({
+    expect(
+      resolveUpdateStatusDisplay(release, createProgressInfo('download-failed'), null)
+    ).toEqual({
       kind: 'download-failed',
       phase: 'available',
       progress: 100
@@ -69,10 +77,10 @@ describe('resolveUpdateStatusDisplay', () => {
 
   it('clamps download progress to the display range', () => {
     expect(
-      resolveUpdateStatusDisplay(null, createProgressInfo('downloading', 1.5), null)?.progress
+      resolveUpdateStatusDisplay(release, createProgressInfo('downloading', 1.5), null)?.progress
     ).toBe(100)
     expect(
-      resolveUpdateStatusDisplay(null, createProgressInfo('downloading', -0.5), null)?.progress
+      resolveUpdateStatusDisplay(release, createProgressInfo('downloading', -0.5), null)?.progress
     ).toBe(0)
   })
 })
