@@ -1,7 +1,6 @@
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
-import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, Shard } from '@shared/akari-shard'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 import axios from 'axios'
@@ -28,19 +27,15 @@ export class OpggRenderer {
   private readonly _watcher: OpggWatcher
 
   constructor(
-    @Dep(SetupInAppScopeRenderer) private readonly _setupInAppScope: SetupInAppScopeRenderer,
     @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer,
     @Dep(LeagueClientRenderer) private readonly _leagueClient: LeagueClientRenderer,
     @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer
   ) {
     this._context = {
-      namespace: OpggRenderer.id,
-      setupInAppScope: this._setupInAppScope,
       settingUtils: this._settingUtils,
       leagueClient: this._leagueClient,
       logger: this._logger,
-      httpClient: this._httpClient,
-      api: this.api
+      httpClient: this._httpClient
     }
     this._preferencesService = new OpggPreferencesService(this._context)
     this._watcher = new OpggWatcher(this._context)

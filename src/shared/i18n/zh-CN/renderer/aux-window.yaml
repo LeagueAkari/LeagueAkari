@@ -29,6 +29,7 @@ auxWindow:
       movement-speed: 移动速度
       tenacity: 韧性
       energy-regen: 能量回复
+      area-of-effect-damage: AoE 伤害
   champSelect:
     actions:
       picked: 已选择

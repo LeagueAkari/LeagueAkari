@@ -28,16 +28,14 @@
                 ?.sortedAdjustments"
               :key="b.type"
             >
-              <span class="flex-1">{{ fandomBalanceTypes[b.type]?.name || b.type }}</span>
+              <span class="flex-1">{{ b.name }}</span>
               <span
                 class="min-w-9 text-right whitespace-nowrap"
                 :class="getBalanceValueClass(b.effect)"
                 >{{ b.formattedValue }}</span
               >
             </div>
-            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">
-              {{ SOURCE_NAME[source] }}
-            </div>
+            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">OP.GG</div>
           </div>
         </NTooltip>
 
@@ -120,9 +118,7 @@
                 >{{ b.formattedValue }}</span
               >
             </div>
-            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">
-              {{ SOURCE_NAME[source] }}
-            </div>
+            <div class="mt-1 text-[10px] text-neutral-700 dark:text-neutral-300">OP.GG</div>
           </div>
         </NTooltip>
         <div
@@ -135,14 +131,16 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BalanceAdjustment,
-  useChampionBalanceData
-} from '@aux-window/composables/useFandomBalanceData'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import {
+  getOpggAramBalanceAdjustments,
+  getOpggAramBalanceOverallEffect,
+  type OpggAramBalanceAdjustment
+} from '@shared/data-adapter/opgg-aram-balance'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -152,10 +150,7 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
-
-// currently only support fandom
-const source = ref('fandom')
-const { data } = useChampionBalanceData(source)
+const extraAssets = useExtraAssetsStore()
 
 const gameMode = computed(() => {
   if (!lcs.gameflow.session) {
@@ -165,130 +160,74 @@ const gameMode = computed(() => {
   return lcs.gameflow.session.gameData.queue.gameMode
 })
 
-const fandomBalanceTypes = computed(() => {
+const balanceTypes = computed(() => {
   return {
     'damage-dealt': {
-      name: t('auxWindow.championBench.balanceTypes.damage-dealt'),
-      order: 0
+      name: t('auxWindow.championBench.balanceTypes.damage-dealt')
     },
     'damage-taken': {
-      name: t('auxWindow.championBench.balanceTypes.damage-taken'),
-      order: 1
-    },
-    healing: {
-      name: t('auxWindow.championBench.balanceTypes.healing'),
-      order: 2
-    },
-    shielding: {
-      name: t('auxWindow.championBench.balanceTypes.shielding'),
-      order: 3
-    },
-    'ability-haste': {
-      name: t('auxWindow.championBench.balanceTypes.ability-haste'),
-      order: 4
-    },
-    'mana-regen': {
-      name: t('auxWindow.championBench.balanceTypes.mana-regen'),
-      order: 5
-    },
-    'energy-regen': {
-      name: t('auxWindow.championBench.balanceTypes.energy-regen'),
-      order: 6
+      name: t('auxWindow.championBench.balanceTypes.damage-taken')
     },
     'attack-speed': {
-      name: t('auxWindow.championBench.balanceTypes.attack-speed'),
-      order: 7
+      name: t('auxWindow.championBench.balanceTypes.attack-speed')
     },
-    'movement-speed': {
-      name: t('auxWindow.championBench.balanceTypes.movement-speed'),
-      order: 8
+    'ability-haste': {
+      name: t('auxWindow.championBench.balanceTypes.ability-haste')
+    },
+    healing: {
+      name: t('auxWindow.championBench.balanceTypes.healing')
     },
     tenacity: {
-      name: t('auxWindow.championBench.balanceTypes.tenacity'),
-      order: 9
+      name: t('auxWindow.championBench.balanceTypes.tenacity')
+    },
+    shielding: {
+      name: t('auxWindow.championBench.balanceTypes.shielding')
+    },
+    'energy-regen': {
+      name: t('auxWindow.championBench.balanceTypes.energy-regen')
+    },
+    'area-of-effect-damage': {
+      name: t('auxWindow.championBench.balanceTypes.area-of-effect-damage')
     }
   }
 })
 
-const SOURCE_NAME = {
-  fandom: 'Fandom Wiki',
-  opgg: 'OP.GG'
-}
-
-const STATUS_SORT_ORDER = {
-  nerfed: 1,
-  buffed: 0
-}
-
-const formatValue = (item: BalanceAdjustment) => {
+const formatValue = (item: OpggAramBalanceAdjustment) => {
   if (item.display === 'percentage') {
-    return `${(100 * item.value).toFixed()}%`
-  } else {
-    return item.value > 0 ? `+${item.value}` : item.value
+    return `${item.value.toFixed()}%`
   }
+
+  return `${item.value > 0 ? '+' : ''}${item.value}`
 }
 
 const championAdjustment = (championId: number) => {
-  if (!gameMode.value) {
+  if (gameMode.value !== 'ARAM') {
     return null
   }
 
-  const champion = data.value[championId]
+  const balance = extraAssets.opggAramBalanceMap[championId]
 
-  if (!champion) {
+  if (!balance) {
     return null
   }
 
-  const modeAdjustment = champion.modes[gameMode.value]
+  const adjustments = getOpggAramBalanceAdjustments(balance)
 
-  if (!modeAdjustment) {
+  if (!adjustments.length) {
     return null
   }
 
   return {
-    ...modeAdjustment,
-    sortedAdjustments: modeAdjustment.adjustments
-      .toSorted((a, b) => {
-        const aBalanceOrder = fandomBalanceTypes.value[a.type]?.order ?? 0
-        const bBalanceOrder = fandomBalanceTypes.value[b.type]?.order ?? 0
-
-        if (aBalanceOrder !== bBalanceOrder) {
-          return aBalanceOrder - bBalanceOrder
-        }
-
-        const aStatusOrder = STATUS_SORT_ORDER[a.effect] ?? 0
-        const bStatusOrder = STATUS_SORT_ORDER[b.effect] ?? 0
-
-        return aStatusOrder - bStatusOrder
-      })
-
-      .map((item) => ({
-        ...item,
-        name: fandomBalanceTypes.value[item.type]?.name || item.type,
-        formattedValue: formatValue(item)
-      }))
+    overallEffect: getOpggAramBalanceOverallEffect(adjustments),
+    sortedAdjustments: adjustments.map((item) => ({
+      ...item,
+      name: balanceTypes.value[item.type].name,
+      formattedValue: formatValue(item)
+    }))
   }
 }
 
-const hasChampionAdjustment = (championId: number) => {
-  if (!gameMode.value) {
-    return false
-  }
-
-  const champion = data.value[championId]
-
-  if (!champion) {
-    return false
-  }
-
-  const modeAdjustment = champion.modes[gameMode.value]
-
-  if (!modeAdjustment) {
-    return false
-  }
-
-  return modeAdjustment.adjustments.length > 0
-}
+const hasChampionAdjustment = (championId: number) => championAdjustment(championId) !== null
 
 // lcux 中按照如下逻辑隐藏 bench. 在隐藏 bench 的时候, 通常也不能继续进行选择
 const canUseBench = computed(() => {

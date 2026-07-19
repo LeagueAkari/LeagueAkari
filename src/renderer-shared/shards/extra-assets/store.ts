@@ -1,5 +1,5 @@
-import { BalanceType } from '@shared/data-sources/fandom'
 import { GtimgHeroListJs, GtimgKiwiAugments, Hero } from '@shared/data-sources/gtimg'
+import type { OpggAramBalanceItem } from '@shared/types/opgg'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive } from 'vue'
 
@@ -25,8 +25,20 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
     }
   })
 
-  const fandom = shallowReactive({
-    balance: null as Record<string, BalanceType> | null
+  const opgg = shallowReactive({
+    aramBalance: null as OpggAramBalanceItem[] | null
+  })
+
+  const opggAramBalanceMap = computed(() => {
+    if (!opgg.aramBalance) return {}
+
+    return opgg.aramBalance.reduce(
+      (acc, balance) => {
+        acc[balance.champion_id] = balance
+        return acc
+      },
+      {} as Record<number, OpggAramBalanceItem>
+    )
   })
 
   const heroListMap = computed(() => {
@@ -47,10 +59,11 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
 
   return {
     gtimg,
-    fandom,
+    opgg,
 
     // computed
     heroListMap,
-    kiwiAugmentsMap
+    kiwiAugmentsMap,
+    opggAramBalanceMap
   }
 })

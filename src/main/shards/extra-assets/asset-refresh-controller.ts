@@ -2,23 +2,23 @@ import { TimeoutTask } from '@main/utils/timer'
 
 import {
   type ExtraAssetsMainContext,
-  FANDOM_BALANCE_UPDATE_INTERVAL,
   GTIMG_HERO_LIST_UPDATE_INTERVAL,
-  GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL
+  GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL,
+  OPGG_ARAM_BALANCE_UPDATE_INTERVAL
 } from './context'
 
 export class ExtraAssetsRefreshController {
   private _gtimgTask = new TimeoutTask(this._updateGtimgHeroList.bind(this))
   private _gtimgKiwiAugmentsTask = new TimeoutTask(this._updateGtimgKiwiAugments.bind(this))
-  private _fandomTask = new TimeoutTask(this._updateFandomBalance.bind(this))
+  private _opggAramBalanceTask = new TimeoutTask(this._updateOpggAramBalance.bind(this))
 
   constructor(private readonly context: ExtraAssetsMainContext) {}
 
   start() {
+    this._registerHttpProxy()
     void this._updateGtimgHeroList()
     void this._updateGtimgKiwiAugments()
-    void this._updateFandomBalance()
-    this._registerHttpProxy()
+    void this._updateOpggAramBalance()
   }
 
   private async _updateGtimgHeroList() {
@@ -51,22 +51,23 @@ export class ExtraAssetsRefreshController {
     }
   }
 
-  private async _updateFandomBalance() {
-    const { fandom, fandomApi, logger } = this.context
+  private async _updateOpggAramBalance() {
+    const { logger, opgg, opggApi } = this.context
 
     try {
-      logger.info('Fandom: updating balance data')
-      const balance = await fandomApi.getBalance()
-      fandom.setBalance(balance)
+      logger.info('OP.GG: updating ARAM balance data')
+      const { data } = await opggApi.getAramBalance()
+      opgg.setAramBalance(data.data)
+      logger.info(`OP.GG: updated ARAM balance data (${data.data.length} items)`)
     } catch (error) {
-      logger.warn('Fandom: failed to update balance data', error)
+      logger.warn('OP.GG: failed to update ARAM balance data', error)
     } finally {
-      this._fandomTask.start({ delay: FANDOM_BALANCE_UPDATE_INTERVAL })
+      this._opggAramBalanceTask.start({ delay: OPGG_ARAM_BALANCE_UPDATE_INTERVAL })
     }
   }
 
   private _registerHttpProxy() {
-    const { appCommon, fandomApi, gtimgApi, mobxUtils } = this.context
+    const { appCommon, gtimgApi, mobxUtils, opggHttpClient } = this.context
 
     mobxUtils.reaction(
       () => appCommon.settings.httpProxy,
@@ -76,13 +77,13 @@ export class ExtraAssetsRefreshController {
             host: httpProxy.host,
             port: httpProxy.port
           }
-          fandomApi.http.defaults.proxy = {
+          opggHttpClient.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
         } else if (httpProxy.strategy === 'disable') {
           gtimgApi.http.defaults.proxy = false
-          fandomApi.http.defaults.proxy = false
+          opggHttpClient.defaults.proxy = false
         }
       },
       { fireImmediately: true }

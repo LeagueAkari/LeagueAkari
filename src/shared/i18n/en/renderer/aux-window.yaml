@@ -29,6 +29,7 @@ auxWindow:
       movement-speed: Movement Speed
       tenacity: Tenacity
       energy-regen: Energy Regen
+      area-of-effect-damage: AoE Damage
   champSelect:
     actions:
       picked: Picked

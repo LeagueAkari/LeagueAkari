@@ -1,5 +1,5 @@
-import { BalanceType } from '@shared/data-sources/fandom'
 import { GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
+import type { OpggAramBalanceItem } from '@shared/types/opgg'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class ExtraAssetsStateGtimg {
@@ -22,16 +22,16 @@ export class ExtraAssetsStateGtimg {
   }
 }
 
-export class ExtraAssetsStateFandom {
-  balance: Record<string, BalanceType> | null
+export class ExtraAssetsStateOpgg {
+  aramBalance: OpggAramBalanceItem[] | null
 
-  setBalance(balance: Record<string, BalanceType> | null) {
-    this.balance = balance
+  setAramBalance(aramBalance: OpggAramBalanceItem[] | null) {
+    this.aramBalance = aramBalance
   }
 
   constructor() {
     makeAutoObservable(this, {
-      balance: observable.ref
+      aramBalance: observable.ref
     })
   }
 }
