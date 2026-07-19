@@ -17,7 +17,11 @@ import {
   type SearchResult
 } from './context'
 import { hasInitParams, serializeInitParamsToQuery } from './init-params'
-import { usePageSizeOptions } from './page-size-options'
+import {
+  MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE,
+  useMatchHistoryPageSizeOptions,
+  usePageSizeOptions
+} from './page-size-options'
 import { watchPlayerTabs } from './player-tabs-watcher'
 import { PlayerTabsSearchHistoryService } from './search-history-service'
 import { syncPlayerTabsSettings } from './settings-sync'
@@ -25,6 +29,8 @@ import { usePlayerTabsStore } from './store'
 
 export {
   usePageSizeOptions,
+  useMatchHistoryPageSizeOptions,
+  MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE,
   type SearchHistoryItem,
   type SearchResult,
   type InitParams,

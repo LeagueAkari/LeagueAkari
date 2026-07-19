@@ -39,7 +39,7 @@
           <template #trigger>
             <span>
               <NButton
-                :disabled="!rootHasCombinator || !!collectState"
+                :disabled="!canOpenCollectModeSettings || !!collectState"
                 size="small"
                 type="primary"
                 @click="handleOpenCollectModeSettingsModal"
@@ -148,7 +148,7 @@ import { Filter20Regular, Info16Regular } from '@vicons/fluent'
 import { RefreshFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInputNumber, NModal, NRadioButton, NRadioGroup, NTooltip } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useMatchHistory } from '../../data/match-history'
 import { usePlayerTab } from '../../context'
@@ -164,8 +164,7 @@ import {
   createEmptyState,
   hasPredicate,
   hasSimplePredicate,
-  toFilterState,
-  toPredicate
+  toFilterState
 } from './filter-state'
 
 const emits = defineEmits<{
@@ -207,11 +206,23 @@ const rootHasCombinator = computed(() =>
 
 const { page, collectMatchHistory, collectState, isLoading } = useMatchHistory()
 
-const collectModeSettings = ref({
+const defaultCollectModeSettings = {
   countPerIteration: 20,
   expectedCount: 20,
   maxIteration: 20
-})
+}
+const collectModeSettings = ref({ ...defaultCollectModeSettings })
+const canOpenCollectModeSettings = computed(
+  () => rootHasCombinator.value || page.value?.isLoadedByCollectMode === true
+)
+
+watch(
+  () => page.value?.collectModeSettings,
+  (settings) => {
+    collectModeSettings.value = settings ? { ...settings } : { ...defaultCollectModeSettings }
+  },
+  { immediate: true }
+)
 
 const showCollectModeSettingsModal = ref(false)
 
@@ -228,10 +239,8 @@ const handleCollect = () => {
     return
   }
 
-  const collectPredicate = toPredicate(activeFilterState.value)
-
   collectMatchHistory({
-    predicate: collectPredicate,
+    filterState: activeFilterState.value,
     countPerIteration: collectModeSettings.value.countPerIteration,
     expectedCount: collectModeSettings.value.expectedCount,
     maxIteration: collectModeSettings.value.maxIteration,

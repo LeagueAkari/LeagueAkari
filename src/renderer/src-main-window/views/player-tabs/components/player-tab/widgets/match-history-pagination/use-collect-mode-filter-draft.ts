@@ -149,12 +149,7 @@ export function useCollectModeFilterDraft(props: {
   }
 
   const saveCollectModeFilterDraft = () => {
-    const nextCollectModeFilterDraft =
-      isFilterModalCollectDraftMode.value && modalFilterDraft.value
-        ? cloneFilterDraft(modalFilterDraft.value)
-        : createCurrentFilterDraft()
-
-    collectModeFilterDraft.value = normalizeCollectFilterDraft(nextCollectModeFilterDraft)
+    collectModeFilterDraft.value = normalizeCollectFilterDraft(createCurrentFilterDraft())
     modalFilterDraft.value = cloneFilterDraft(collectModeFilterDraft.value)
   }
 

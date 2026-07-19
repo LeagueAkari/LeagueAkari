@@ -352,6 +352,7 @@ playerTabs:
       last7Days: Last 7 Days
       last30Days: Last 30 Days
     collectMode:
+      pageSizeOptionTag: Collect
       collectedPageTitle: Collected Results
       collectedPageDescription: This page is a collection-mode result with {collected} from {scanned}.
       scannedMatches_one: '{count} scanned match'

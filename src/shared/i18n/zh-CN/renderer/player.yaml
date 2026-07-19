@@ -351,6 +351,7 @@ playerTabs:
       last7Days: 7 天
       last30Days: 30 天
     collectMode:
+      pageSizeOptionTag: 收集
       collectedPageTitle: 收集结果页
       collectedPageDescription: 当前页为收集模式结果，共筛选 {scanned}，收集到 {collected}
       scannedMatches_one: '{count} 场战绩'

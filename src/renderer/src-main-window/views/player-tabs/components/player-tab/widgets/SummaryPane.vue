@@ -213,9 +213,7 @@ import {
 } from '../data/match-history-init-param-collect'
 import { useChampionMastery } from '../data/champion-mastery'
 import { useMatchHistory } from '../data/match-history'
-import { useMatchHistoryFilters } from '../data/match-history-filters'
 import { usePlayerTab } from '../context'
-import { toPredicate } from './match-history-filters/filter-state'
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 
@@ -225,7 +223,6 @@ const ogs = useOngoingGameStore()
 const { page, analysis: analysis, collectMatchHistory, isLoading } = useMatchHistory()
 const { championMastery } = useChampionMastery()
 const { puuid, sgpServerId } = usePlayerTab()
-const { setActiveMode, setAdvancedFilterState } = useMatchHistoryFilters()
 
 const currentStreak = computed(() => {
   // 连胜目前只统计第一页
@@ -261,12 +258,9 @@ const collectChampionMatches = (championId: number) => {
     return
   }
 
-  setActiveMode('advanced')
-  setAdvancedFilterState(filterState)
-
   void collectMatchHistory({
     ...createInitParamCollectSettings(initParams),
-    predicate: toPredicate(filterState),
+    filterState,
     queryParams: {
       __sgpServerId: sgpServerId.value
     }

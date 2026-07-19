@@ -6,7 +6,6 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { AggregatedAnalysis, analyzeGames } from '@shared/data-adapter/analysis/player'
 import { GameRelationship, analyzeRelationship } from '@shared/data-adapter/analysis/relationship'
-import { Predicate } from '@shared/data-adapter/predicates/combinators'
 import {
   LcuGameSummary,
   LcuOrSgpGameDetails,
@@ -33,6 +32,10 @@ import {
 } from 'vue'
 
 import type { MatchHistoryInitParams } from '@main-window/shards/player-tabs/context'
+import {
+  MATCH_HISTORY_COLLECTION_MAX_SCAN_COUNT,
+  MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE
+} from '@main-window/shards/player-tabs/page-size-options'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { InitParamsContext } from '../init-params'
@@ -46,10 +49,8 @@ import {
 } from './match-history-init-param-collect'
 import { type PlayerTabDataSourceDecision, toLoadStatus } from './source-selection'
 
-/**
-收集模式下的参数
-*/
-export interface MatchHistoryCollectParams {
+/** 收集模式的数量与轮次配置 */
+export interface MatchHistoryCollectSettings {
   /** 每次加载的战绩数量 */
   countPerIteration: number
 
@@ -58,12 +59,15 @@ export interface MatchHistoryCollectParams {
 
   /** 预期需要凑齐的战绩数量 */
   expectedCount: number
+}
 
+/** 收集模式下的参数 */
+export interface MatchHistoryCollectParams extends MatchHistoryCollectSettings {
   /** 服务器层面的查询参数 */
   queryParams?: Omit<MatchHistoryQueryParams, 'startIndex' | 'count'>
 
-  /** 本次收集过滤依赖的筛选条件 */
-  predicate: Predicate<LcuOrSgpGameSummary>
+  /** 本次收集使用的高级筛选状态 */
+  filterState: MatchHistoryFilterState
 }
 
 /**
@@ -101,6 +105,8 @@ export interface MatchHistoryPage {
    */
   isLoadedByCollectMode: boolean
 
+  collectModeSettings?: MatchHistoryCollectSettings
+
   collectModeStats?: {
     scannedGamesCount: number
   }
@@ -114,6 +120,7 @@ export type MatchHistoryContext = {
   isLoading: Ref<boolean>
   collectState: Ref<MatchHistoryCollectState | null>
   loadMatchHistory: (params?: MatchHistoryQueryParams) => Promise<void>
+  loadMatchHistoryByPageSize: (count: number) => Promise<void>
   collectMatchHistory: (params: MatchHistoryCollectParams) => Promise<void>
   stopCollectMatchHistory: () => void
   loadDetails: (gameId: number) => Promise<void>
@@ -139,8 +146,8 @@ export function provideMatchHistory(
     sgpServerId: MaybeRefOrGetter<string>
     isCrossRegion: MaybeRefOrGetter<boolean>
     sgpApiStatus: MaybeRefOrGetter<SgpApiStatus>
-    predicate: MaybeRefOrGetter<(game: LcuOrSgpGameSummary) => boolean>
-    syncCollectFilterState?: (filterState: MatchHistoryFilterState) => void
+    filterState: MaybeRefOrGetter<MatchHistoryFilterState>
+    syncCollectFilterState: (filterState: MatchHistoryFilterState) => void
   },
   initParamsTool: InitParamsContext
 ): MatchHistoryContext {
@@ -149,7 +156,8 @@ export function provideMatchHistory(
   const sgpServerId = toRef(props.sgpServerId)
   const sgpApiStatus = toRef(props.sgpApiStatus)
   const isCrossRegion = toRef(props.isCrossRegion)
-  const predicate = toRef(props.predicate)
+  const filterState = toRef(props.filterState)
+  const predicate = computed(() => toPredicate(filterState.value))
 
   const componentName = useComponentName()
 
@@ -505,11 +513,20 @@ export function provideMatchHistory(
       return
     }
 
+    const collectPredicate = toPredicate(params.filterState)
+    props.syncCollectFilterState(params.filterState)
+
     lcuCompleteGameQueue.clear()
     isLoading.value = true
     const collectPageQueryParams = {
       ...page.value?.queryParams,
-      ...params.queryParams
+      ...params.queryParams,
+      startIndex: 0
+    }
+    const collectModeSettings: MatchHistoryCollectSettings = {
+      countPerIteration: params.countPerIteration,
+      expectedCount: params.expectedCount,
+      maxIteration: params.maxIteration
     }
 
     collectState.value = {
@@ -530,6 +547,7 @@ export function provideMatchHistory(
           detailsLoading: {},
           queryParams: collectPageQueryParams,
           isLoadedByCollectMode: true,
+          collectModeSettings,
           collectModeStats: {
             scannedGamesCount: 0
           }
@@ -568,7 +586,7 @@ export function provideMatchHistory(
           page.value.collectModeStats!.scannedGamesCount += rawSummaryList.length
 
           const gamesToAppend = rawSummaryList
-            .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))
+            .filter((g) => collectPredicate(g) && !lastPageGameIds.has(g.gameId))
             .slice(0, remainingCollectCount(params.expectedCount))
 
           gamesToAppend.forEach((g) => lastPageGameIds.add(g.gameId))
@@ -593,6 +611,7 @@ export function provideMatchHistory(
           detailsLoading: {},
           queryParams: collectPageQueryParams,
           isLoadedByCollectMode: true,
+          collectModeSettings,
           collectModeStats: {
             scannedGamesCount: 0
           }
@@ -628,7 +647,7 @@ export function provideMatchHistory(
           page.value.collectModeStats!.scannedGamesCount += rawSummaryList.length
 
           const games = rawSummaryList
-            .filter((g) => params.predicate(g) && !lastPageGameIds.has(g.gameId))
+            .filter((g) => collectPredicate(g) && !lastPageGameIds.has(g.gameId))
             .slice(0, remainingCollectCount(params.expectedCount))
 
           const completedGamesToAppend = await Promise.all(
@@ -671,6 +690,30 @@ export function provideMatchHistory(
       isLoading.value = false
       collectState.value = null
     }
+  }
+
+  const loadMatchHistoryByPageSize = (count: number) => {
+    if (count <= MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE) {
+      return loadMatchHistory({ count, startIndex: 0 })
+    }
+
+    const pageSizeStep = page.value?.queryParams.count ?? pts.frontendSettings.loadCount
+    const decision = dataSourceDecision.value
+    const queryParams =
+      decision.type === 'load' && decision.source === 'sgp'
+        ? {
+            tag: page.value?.queryParams.tag,
+            tagsQueryType: page.value?.queryParams.tagsQueryType
+          }
+        : undefined
+
+    return collectMatchHistory({
+      countPerIteration: pageSizeStep,
+      expectedCount: count,
+      maxIteration: Math.ceil(MATCH_HISTORY_COLLECTION_MAX_SCAN_COUNT / pageSizeStep),
+      queryParams,
+      filterState: filterState.value
+    })
   }
 
   const stopCollectMatchHistory = () => {
@@ -745,19 +788,17 @@ export function provideMatchHistory(
       return false
     }
 
-    const filterState = createInitParamCollectFilterState(initParams, puuid.value)
+    const collectFilterState = createInitParamCollectFilterState(initParams, puuid.value)
 
-    if (!filterState) {
+    if (!collectFilterState) {
       return false
     }
-
-    props.syncCollectFilterState?.(filterState)
 
     log.info(componentName, 'Starting match history collection from init params', initParams)
 
     collectMatchHistory({
       ...createInitParamCollectSettings(initParams),
-      predicate: toPredicate(filterState),
+      filterState: collectFilterState,
       queryParams: {
         __sgpServerId: sgpServerId.value
       }
@@ -814,6 +855,7 @@ export function provideMatchHistory(
     isLoading,
     collectState,
     loadMatchHistory,
+    loadMatchHistoryByPageSize,
     collectMatchHistory,
     stopCollectMatchHistory,
     loadDetails,
@@ -829,6 +871,7 @@ export function provideMatchHistory(
     isLoading,
     collectState,
     loadMatchHistory,
+    loadMatchHistoryByPageSize,
     collectMatchHistory,
     stopCollectMatchHistory,
     loadDetails,

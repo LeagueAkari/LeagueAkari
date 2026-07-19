@@ -3,9 +3,10 @@
     <NSelect
       :disabled="isPaginationDisabled"
       :value="currentPageSize"
-      @update:value="loadMatchHistory({ count: $event, startIndex: 0 })"
+      @update:value="handlePageSizeChange"
       size="small"
       :options="pageSizeOptions"
+      :render-label="renderPageSizeLabel"
       class="mr-2"
     />
 
@@ -87,7 +88,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import {
   ArrowCircleRight32Filled,
   ChevronLeft20Regular,
@@ -95,10 +96,13 @@ import {
   Previous20Filled
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInputNumber, NPopover, NSelect } from 'naive-ui'
+import { NButton, NIcon, NInputNumber, NPopover, NSelect, NTag, SelectRenderLabel } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import { usePageSizeOptions } from '@main-window/shards/player-tabs'
+import {
+  MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE,
+  useMatchHistoryPageSizeOptions
+} from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import { useMatchHistory } from '../../data/match-history'
@@ -106,8 +110,24 @@ import { useMatchHistory } from '../../data/match-history'
 const { t } = useTranslation()
 
 const pts = usePlayerTabsStore()
-const pageSizeOptions = usePageSizeOptions()
-const { isLoading, loadMatchHistory, page, collectState } = useMatchHistory()
+const { isLoading, loadMatchHistory, loadMatchHistoryByPageSize, page, collectState } =
+  useMatchHistory()
+const pageSizeOptions = useMatchHistoryPageSizeOptions()
+
+const renderPageSizeLabel: SelectRenderLabel = (option) => {
+  if ((option.value as number) <= MATCH_HISTORY_MAX_REGULAR_PAGE_SIZE) {
+    return option.label as string
+  }
+
+  return (
+    <div class="flex items-center gap-1.5">
+      <NTag size="tiny" type="info" bordered={false}>
+        {t('playerTabs.matchHistory.collectMode.pageSizeOptionTag')}
+      </NTag>
+      <span>{option.label as string}</span>
+    </div>
+  )
+}
 
 const isPaginationDisabled = computed(() => isLoading.value || !!collectState.value)
 
@@ -125,6 +145,10 @@ const currentPageSize = computed(
   () => page.value?.queryParams.count ?? pts.frontendSettings.loadCount
 )
 const isFirstPage = computed(() => computedCurrentPage.value <= 1)
+
+const handlePageSizeChange = (count: number) => {
+  void loadMatchHistoryByPageSize(count)
+}
 
 const handlePrevPage = () => {
   loadMatchHistory({
