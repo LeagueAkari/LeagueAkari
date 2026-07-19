@@ -1,11 +1,21 @@
 ---
 name: league-akari-ui-components
-description: Use when implementing or reviewing League Akari renderer UI component details that involve i18n component interpolation, multiple independent pluralized counts, Tailwind utility usage in templates or SFC style blocks, or native semantic HTML elements in the Naive UI renderer.
+description: Use when implementing or reviewing League Akari renderer UI components, especially consistency across related components, i18n component interpolation, multiple independent pluralized counts, Tailwind utility usage in templates or SFC style blocks, or native semantic HTML elements in the Naive UI renderer.
 ---
 
 # League Akari UI Components
 
-Use this skill only for the UI component details listed here.
+Use this skill for the UI component details listed here.
+
+## Component Family Consistency
+
+Treat consistency across related components as a product requirement, not optional polish.
+
+Before implementing or changing a component, inspect nearby production components and other members of the same UI family. Establish the existing pattern across layout, visual tokens, iconography, interaction states, semantic primitives, and public imports, then apply that pattern consistently throughout the affected family. Do not introduce a one-off convention for a single component.
+
+When existing examples disagree, compare several recently authored or modernized production components and follow the coherent current pattern that satisfies the requirement. Do not use an isolated legacy or Storybook-only example as the standard.
+
+If the established family pattern cannot support the new requirement, refactor all affected siblings to the replacement pattern in the same change. Do not leave a partially migrated component family with old and new conventions mixed together. Review the relevant siblings as part of validating any component change.
 
 ## Component Interpolation
 
@@ -127,5 +137,7 @@ When using native semantic elements such as `button`, `input`, `select`, `ul`, `
 - Use the matching Naive UI component when it is available.
 - Fully specify the native element's spacing, typography, border, background, focus, disabled, and interaction states.
 - If the native element is only needed for semantics and its default rendering is undesirable, use a neutral element with the appropriate `role` and accessibility attributes instead.
+
+Use the same semantic primitive for equivalent controls in a component family. Do not mix native elements, role-based neutral elements, and Naive UI controls merely because sibling components were implemented at different times; choose the appropriate convention and align the affected siblings.
 
 The intent is to avoid accidental browser-default controls or text styles appearing inside an otherwise Naive UI-rendered surface.
