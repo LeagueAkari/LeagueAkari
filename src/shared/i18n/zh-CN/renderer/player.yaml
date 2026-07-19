@@ -131,6 +131,7 @@ playerTabs:
   matchHistory:
     filters:
       title: 筛选
+      pageFilter: 页内筛选
       simpleTab: 简单筛选
       advancedTab: 高级筛选
       reset: 重置条件

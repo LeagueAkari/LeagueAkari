@@ -1,11 +1,11 @@
 <template>
-  <NTooltip>
+  <NTooltip :disabled="!!label">
     <template #trigger>
       <NButton
         class="filter-toggle-button shrink-0"
         :class="{ 'filter-toggle-button--active': active }"
         :size="size"
-        circle
+        :circle="!label"
         :secondary="active"
         :tertiary="!active"
         type="default"
@@ -15,6 +15,7 @@
         <template #icon>
           <NIcon :size="iconSize"><Filter20Regular /></NIcon>
         </template>
+        {{ label }}
       </NButton>
     </template>
     {{ t('playerTabs.matchHistory.filters.title') }}
@@ -30,11 +31,13 @@ import { computed } from 'vue'
 const {
   size = 'small',
   active = false,
-  disabled = false
+  disabled = false,
+  label
 } = defineProps<{
   size?: 'tiny' | 'small'
   active?: boolean
   disabled?: boolean
+  label?: string
 }>()
 
 defineEmits<{

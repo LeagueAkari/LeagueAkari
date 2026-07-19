@@ -132,6 +132,7 @@ playerTabs:
   matchHistory:
     filters:
       title: Filters
+      pageFilter: Page Filter
       simpleTab: Simple Filters
       advancedTab: Advanced Filters
       reset: Clear Filters

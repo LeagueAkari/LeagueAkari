@@ -10,16 +10,11 @@
   >
     <QueueSelect v-if="isSgpMatchHistorySource" :disabled="isPaginationDisabled" horizontal />
 
-    <FilterButton
+    <PageFilterControl
       :active="filterActive"
       :disabled="isPaginationDisabled"
-      @click="$emit('openFilter')"
-    />
-
-    <ClearFiltersButton
-      :active="filterActive"
-      :disabled="!filterActive || isPaginationDisabled"
-      @click="$emit('clearFilters')"
+      @open-filter="$emit('openFilter')"
+      @clear-filters="$emit('clearFilters')"
     />
   </div>
 
@@ -50,16 +45,11 @@
     <div class="space-y-2">
       <div class="text-xs text-black/60 dark:text-white/60">筛选</div>
       <div class="flex min-w-0 flex-1 items-center gap-2">
-        <FilterButton
+        <PageFilterControl
           :active="filterActive"
           :disabled="isPaginationDisabled"
-          @click="$emit('openFilter')"
-        />
-
-        <ClearFiltersButton
-          :active="filterActive"
-          :disabled="!filterActive || isPaginationDisabled"
-          @click="$emit('clearFilters')"
+          @open-filter="$emit('openFilter')"
+          @clear-filters="$emit('clearFilters')"
         />
       </div>
     </div>
@@ -73,9 +63,8 @@ import { computed } from 'vue'
 
 import { usePlayerTab } from '../../context'
 import { useMatchHistory } from '../../data/match-history'
-import ClearFiltersButton from './ClearFiltersButton.vue'
-import FilterButton from './FilterButton.vue'
 import PageControls from './PageControls.vue'
+import PageFilterControl from './PageFilterControl.vue'
 import QueueSelect from './QueueSelect.vue'
 
 defineProps<{
