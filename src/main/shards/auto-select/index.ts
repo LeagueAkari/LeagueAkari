@@ -7,6 +7,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { SgpMain } from '../sgp'
 import { AutoSelectActionExecutor } from './action-executor'
 import { AutoSelectBanPickController } from './ban-pick-controller'
 import { AutoSelectBenchController } from './bench-controller'
@@ -42,10 +43,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     private readonly _leagueClient: LeagueClientMain,
     private readonly _mobxUtils: MobxUtilsMain,
     private readonly _ipc: AkariIpcMain,
-    private readonly _akariApi: AkariApiMain
+    private readonly _akariApi: AkariApiMain,
+    private readonly _sgp: SgpMain
   ) {
     this._logger = loggerFactory.create(AutoSelectMain.id)
-    this.state = new AutoSelectState(this._leagueClient.data, this.settings, this._akariApi.state)
+    this.state = new AutoSelectState(
+      this._leagueClient.data,
+      this.settings,
+      this._akariApi.state,
+      this._sgp.state
+    )
     this._settingService = settingFactory.register(
       AutoSelectMain.id,
       {

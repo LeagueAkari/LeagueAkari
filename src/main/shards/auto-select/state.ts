@@ -4,6 +4,7 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import type { AkariApiState } from '../akari-api/state'
 import { LeagueClientData } from '../league-client/lc-state'
+import type { SgpState } from '../sgp/state'
 import {
   getActiveAction,
   getActiveGroupConfig,
@@ -343,6 +344,8 @@ export class AutoSelectState {
       gameMode: this.gameMode,
       queueType: this.queueType,
       isCustomGame: this.isCustomGame,
+      sgpServerId: this._sgpState.availability.sgpServerId,
+      leagueServers: this._sgpState.leagueServers.servers,
       temporarilyDisabled: this.temporarilyDisabled,
       settings: this._settings
     })
@@ -537,7 +540,8 @@ export class AutoSelectState {
   constructor(
     private readonly _leagueClientData: LeagueClientData,
     private readonly _settings: AutoSelectSettings,
-    private readonly _akariApiState: AkariApiState
+    private readonly _akariApiState: AkariApiState,
+    private readonly _sgpState: SgpState
   ) {
     makeAutoObservable(this, {
       // activeGroupConfig: computed.struct, // no need to set it structurally equals

@@ -70,6 +70,7 @@ export const AkariAutoSelectGroupsConfigSchema: z.ZodType<AkariAutoSelectGroupsC
           }),
           iconPath: z.string().regex(/^\/lol-game-data\/assets\/.+/),
           isCustom: z.boolean(),
+          supportedSgpServers: z.array(z.string()).min(1),
           targetGameModes: z.array(
             z
               .object({

@@ -13,7 +13,7 @@
 
     <!-- 可选分组列表 -->
     <div class="flex gap-4">
-      <div class="flex shrink-0 flex-col" v-if="as2.groups.length > 0">
+      <div class="flex shrink-0 flex-col" v-if="visibleGroups.length > 0">
         <div class="mb-1 ml-2 text-xs text-gray-600 dark:text-gray-300">
           {{ t('automation.champSelect.groupTitle') }}
         </div>
@@ -25,7 +25,7 @@
                 ? 'bg-black/10 text-gray-900 dark:bg-white/15 dark:text-white'
                 : 'text-black/90 hover:bg-black/5 hover:text-gray-900 dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white'
             ]"
-            v-for="group in as2.groups"
+            v-for="group in visibleGroups"
             :key="group.groupId"
             @click="currentGroupId = group.groupId"
           >
@@ -64,7 +64,7 @@
         type="line"
         animated
         class="flex-1"
-        v-if="currentGroup && currentPickConfig"
+        v-if="currentGroup && currentPickConfig && currentBanConfig"
         v-model:value="banPick"
       >
         <NTabPane name="pick" :tab="t('automation.champSelect.pick.title')">
@@ -409,6 +409,8 @@ import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { isAutoSelectGroupSupportedOnSgpServer } from '@shared/shards/akari-api'
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -434,27 +436,38 @@ const { t } = useTranslation()
 const app = useAppCommonStore()
 const as = useInstance(AutoSelectRenderer)
 const as2 = useAutoSelectStore()
+const sgp = useSgpStore()
 
 const currentGroupId = ref('ranked')
 const banPick = ref('pick')
 
-const currentPickConfig = computed(() => {
-  return as2.settings.pickConfig[currentGroupId.value]
-})
-
-const currentBanConfig = computed(() => {
-  return as2.settings.banConfig[currentGroupId.value]
+const visibleGroups = computed(() => {
+  return as2.groups.filter((group) =>
+    isAutoSelectGroupSupportedOnSgpServer(
+      group,
+      sgp.availability.sgpServerId,
+      sgp.leagueServers.servers
+    )
+  )
 })
 
 const currentGroup = computed(() => {
-  return as2.groups.find((m) => m.groupId === currentGroupId.value)
+  return visibleGroups.value.find((group) => group.groupId === currentGroupId.value)
+})
+
+const currentPickConfig = computed(() => {
+  return currentGroup.value ? as2.settings.pickConfig[currentGroup.value.groupId] : undefined
+})
+
+const currentBanConfig = computed(() => {
+  return currentGroup.value ? as2.settings.banConfig[currentGroup.value.groupId] : undefined
 })
 
 watch(
   () => currentPickConfig.value,
   (value) => {
-    if (!value) {
-      as.setPickConfig(currentGroupId.value, {})
+    if (currentGroup.value && !value) {
+      as.setPickConfig(currentGroup.value.groupId, {})
     }
   },
   { immediate: true }
@@ -463,18 +476,23 @@ watch(
 watch(
   () => currentBanConfig.value,
   (value) => {
-    if (!value) {
-      as.setBanConfig(currentGroupId.value, {})
+    if (currentGroup.value && !value) {
+      as.setBanConfig(currentGroup.value.groupId, {})
     }
   },
   { immediate: true }
 )
 
 watch(
-  () => as2.activeGroupConfigId,
-  (value) => {
-    if (value) {
-      currentGroupId.value = value
+  [visibleGroups, () => as2.activeGroupConfigId],
+  ([groups, activeGroupConfigId]) => {
+    if (activeGroupConfigId && groups.some((group) => group.groupId === activeGroupConfigId)) {
+      currentGroupId.value = activeGroupConfigId
+      return
+    }
+
+    if (!groups.some((group) => group.groupId === currentGroupId.value)) {
+      currentGroupId.value = groups[0]?.groupId ?? ''
     }
   },
   { immediate: true }

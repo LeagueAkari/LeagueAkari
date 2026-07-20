@@ -94,6 +94,7 @@ export interface AkariAutoSelectGroup {
   }
   iconPath: string
   isCustom: boolean
+  supportedSgpServers: string[]
   targetGameModes: AkariAutoSelectTargetGameMode[]
   positions: string[]
   additionalPicks: number[]

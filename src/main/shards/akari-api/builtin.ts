@@ -227,6 +227,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'CLASSIC',
@@ -245,6 +246,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'CLASSIC',
@@ -263,6 +265,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/ARAM/img/game-select-icon-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'ARAM',
@@ -285,6 +288,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Cherry/img/game-select-icon-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'CHERRY',
@@ -303,6 +307,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'URF',
@@ -321,6 +326,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'ONEFORALL',
@@ -339,6 +345,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Shared/img/icon-rgm-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'ULTBOOK',
@@ -357,6 +364,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: false,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'SWIFTPLAY',
@@ -375,6 +383,7 @@ export const BUILTIN_AUTO_SELECT_GROUPS: AkariAutoSelectGroupsConfig = {
       iconPath:
         '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
       isCustom: true,
+      supportedSgpServers: ['*'],
       targetGameModes: [
         {
           gameMode: 'CLASSIC',

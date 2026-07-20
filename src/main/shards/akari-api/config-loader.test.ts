@@ -65,6 +65,7 @@ describe('Akari API config loader', () => {
           iconPath:
             '/lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU/img/game-select-icon-hover.png',
           isCustom: false,
+          supportedSgpServers: ['*'],
           targetGameModes: [
             { gameMode: 'CLASSIC', queueTypes: ['RANKED_SOLO_5x5', 'RANKED_FLEX_SR'] }
           ],

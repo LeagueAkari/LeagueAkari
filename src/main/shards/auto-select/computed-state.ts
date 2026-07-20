@@ -1,4 +1,7 @@
-import type { AkariAutoSelectGroup as AutoSelectGroup } from '@shared/shards/akari-api'
+import {
+  type AkariAutoSelectGroup as AutoSelectGroup,
+  isAutoSelectGroupSupportedOnSgpServer
+} from '@shared/shards/akari-api'
 import type { ExpectedChampionStatus } from '@shared/shards/auto-select'
 import type {
   Action,
@@ -124,10 +127,21 @@ export function getActiveGroupConfig(args: {
   gameMode: string | null
   queueType: string | null
   isCustomGame: boolean
+  sgpServerId: string
+  leagueServers: Readonly<Record<string, unknown>>
   temporarilyDisabled: boolean
   settings: AutoSelectSettings
 }): ActiveGroupConfig | null | undefined {
-  const { groups, gameMode, queueType, isCustomGame, temporarilyDisabled, settings } = args
+  const {
+    groups,
+    gameMode,
+    queueType,
+    isCustomGame,
+    sgpServerId,
+    leagueServers,
+    temporarilyDisabled,
+    settings
+  } = args
 
   if (!gameMode || !queueType) {
     return
@@ -135,6 +149,7 @@ export function getActiveGroupConfig(args: {
 
   const firstGroup = groups.find((g) => {
     return (
+      isAutoSelectGroupSupportedOnSgpServer(g, sgpServerId, leagueServers) &&
       g.isCustom === isCustomGame &&
       g.targetGameModes.some((gm) => {
         return (
