@@ -1,11 +1,59 @@
 import dayjs from 'dayjs'
 import { existsSync, renameSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import type { DataSource, QueryRunner } from 'typeorm'
 
 import { LEAGUE_AKARI_DB_CURRENT_VERSION, type StorageMainContext } from './context'
 import { v10_LA1_2_0initializationUpgrade } from './upgrades/version-10'
 import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
+
+const DATABASE_CORRUPTION_MESSAGES = ['database disk image is malformed', 'file is not a database']
+
+export function isDatabaseCorruptionError(error: unknown) {
+  const pending = [error]
+  const visited = new Set<unknown>()
+
+  while (pending.length) {
+    const current = pending.pop()
+    if (current === null || current === undefined || visited.has(current)) {
+      continue
+    }
+    visited.add(current)
+
+    if (typeof current === 'string') {
+      const message = current.toLowerCase()
+      if (DATABASE_CORRUPTION_MESSAGES.some((text) => message.includes(text))) {
+        return true
+      }
+      continue
+    }
+
+    if (typeof current !== 'object') {
+      continue
+    }
+
+    const details = current as {
+      code?: unknown
+      message?: unknown
+      cause?: unknown
+      driverError?: unknown
+    }
+    const code = typeof details.code === 'string' ? details.code : ''
+    const message = typeof details.message === 'string' ? details.message.toLowerCase() : ''
+
+    if (
+      code.startsWith('SQLITE_CORRUPT') ||
+      code === 'SQLITE_NOTADB' ||
+      DATABASE_CORRUPTION_MESSAGES.some((text) => message.includes(text))
+    ) {
+      return true
+    }
+
+    pending.push(details.cause, details.driverError)
+  }
+
+  return false
+}
 
 export class StorageDatabaseLifecycle {
   private readonly _upgrades = {
@@ -18,16 +66,36 @@ export class StorageDatabaseLifecycle {
   constructor(private readonly context: StorageMainContext) {}
 
   async initialize(dataSource: DataSource) {
-    await this._initializeDatabase(dataSource)
     const dbPath = dataSource.options.database as string
-    if (!dbPath) {
+    let needToRecreateDatabase = false
+    let needToPerformUpgrade = false
+    let currentVersion = 0
+
+    try {
+      await this._initializeDatabase(dataSource)
+      if (!dbPath) {
+        return
+      }
+
+      this.context.logger.info(`Current database file located at ${dbPath}`)
+
+      const databaseVersion = await this._checkDatabaseVersion(dataSource)
+      needToRecreateDatabase = databaseVersion.needToRecreateDatabase
+      needToPerformUpgrade = databaseVersion.needToPerformUpgrade
+      currentVersion = databaseVersion.currentVersion
+    } catch (error) {
+      if (!dbPath || !isDatabaseCorruptionError(error)) {
+        throw error
+      }
+
+      this.context.logger.warn(
+        'Database corruption detected, will recreate database from scratch',
+        error
+      )
+      await this._recreateDatabase(dataSource, dbPath)
+      await this._runMigrationsInTransaction(dataSource, 0)
       return
     }
-
-    this.context.logger.info(`Current database file located at ${dbPath}`)
-
-    const { needToRecreateDatabase, needToPerformUpgrade, currentVersion } =
-      await this._checkDatabaseVersion(dataSource)
 
     this.context.logger.info(`Current version ${currentVersion}`)
 
@@ -93,12 +161,23 @@ export class StorageDatabaseLifecycle {
   }
 
   private async _recreateDatabase(dataSource: DataSource, dbPath: string) {
-    await dataSource.destroy()
+    if (dataSource.isInitialized) {
+      await dataSource.destroy()
+    }
 
-    if (existsSync(dbPath)) {
-      const backupPath = join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
+    const backupPath = join(dirname(dbPath), `${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
+    const databaseFiles = ['', '-wal', '-shm', '-journal']
+    let backedUp = false
 
-      renameSync(dbPath, backupPath)
+    for (const suffix of databaseFiles) {
+      const sourcePath = `${dbPath}${suffix}`
+      if (existsSync(sourcePath)) {
+        renameSync(sourcePath, `${backupPath}${suffix}`)
+        backedUp = true
+      }
+    }
+
+    if (backedUp) {
       this.context.logger.info(`Original database cannot be used, backed up to ${backupPath}`)
     }
 
