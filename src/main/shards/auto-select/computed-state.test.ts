@@ -1,7 +1,7 @@
 import type { AkariAutoSelectGroup } from '@shared/shards/akari-api'
 import { describe, expect, it } from 'vitest'
 
-import { getActiveGroupConfig } from './computed-state'
+import { getActiveGroupConfig, getPhaseCalibratedDelayMs } from './computed-state'
 import { AutoSelectSettings } from './state'
 
 function createGroup(groupId: string, supportedSgpServers: string[]): AkariAutoSelectGroup {
@@ -60,5 +60,75 @@ describe('getActiveGroupConfig', () => {
         sgpServerId: 'STALE'
       })?.groupId
     ).toBe('all-servers')
+  })
+})
+
+describe('getPhaseCalibratedDelayMs', () => {
+  it('uses the configured delay when there is no finite authoritative timer', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 4_000,
+        timer: null
+      })
+    ).toBe(2_000)
+  })
+
+  it('keeps a rearmed timer aligned with the authoritative phase elapsed time', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 2_000,
+        timer: { remainingMs: 28_500, totalMs: 30_000, elapsedMs: 1_500 }
+      })
+    ).toBe(500)
+  })
+
+  it('supports the second delay target for show-and-lock-in', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 4_000,
+        timer: { remainingMs: 27_900, totalMs: 30_000, elapsedMs: 2_100 }
+      })
+    ).toBe(1_900)
+  })
+
+  it('shortens the configured delay to the authoritative remaining time', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 2_000,
+        timer: { remainingMs: 400, totalMs: 30_000, elapsedMs: 1_000 }
+      })
+    ).toBe(400)
+  })
+
+  it('never extends the configured delay', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 4_000,
+        timer: { remainingMs: 30_000, totalMs: 30_000, elapsedMs: 1_000 }
+      })
+    ).toBe(2_000)
+  })
+
+  it('runs immediately once either limit has elapsed', () => {
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 2_000,
+        timer: { remainingMs: 25_000, totalMs: 30_000, elapsedMs: 5_000 }
+      })
+    ).toBe(0)
+
+    expect(
+      getPhaseCalibratedDelayMs({
+        configuredDelayMs: 2_000,
+        targetOffsetMs: 2_000,
+        timer: { remainingMs: -100, totalMs: 30_000, elapsedMs: 30_100 }
+      })
+    ).toBe(0)
   })
 })

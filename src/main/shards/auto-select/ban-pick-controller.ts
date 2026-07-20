@@ -2,6 +2,7 @@ import { i18next } from '@main/i18n'
 import { comparer, computed } from 'mobx'
 
 import type { AutoSelectActionExecutor } from './action-executor'
+import { getPhaseCalibratedDelayMs } from './computed-state'
 import type { AutoSelectMainContext } from './context'
 import type { AutoSelectLocalMessageService } from './local-message-service'
 
@@ -44,14 +45,21 @@ export class AutoSelectBanPickController {
           return null
         }
 
+        const configuredDelayMs = banConfig.ban.delaySeconds * 1e3
+        const targetOffsetMs =
+          banConfig.ban.strategy === 'show-and-lock-in' && state.move === 'complete-ban'
+            ? configuredDelayMs * 2
+            : configuredDelayMs
+
         return {
           move: state.move,
           activeAction: state.activeAction,
           expectedBan,
-          delayMs: Math.min(
-            banConfig.ban.delaySeconds * 1e3,
-            state.correctedTimer?.remainingMs ?? Infinity
-          ),
+          delayMs: getPhaseCalibratedDelayMs({
+            configuredDelayMs,
+            targetOffsetMs,
+            timer: state.correctedTimer
+          }),
           strategy: banConfig.ban.strategy
         } as const
       },
@@ -198,15 +206,22 @@ export class AutoSelectBanPickController {
           return null
         }
 
+        const configuredDelayMs = pickConfig.pick.delaySeconds * 1e3
+        const targetOffsetMs =
+          pickConfig.pick.strategy === 'show-and-lock-in' && state.move === 'complete-pick'
+            ? configuredDelayMs * 2
+            : configuredDelayMs
+
         return {
           move: state.move,
           firstUnfinishedPickAction: state.firstUnfinishedPickAction,
           activeAction: state.activeAction,
           expectedPick,
-          delayMs: Math.min(
-            pickConfig.pick.delaySeconds * 1e3,
-            state.correctedTimer?.remainingMs ?? Infinity
-          ),
+          delayMs: getPhaseCalibratedDelayMs({
+            configuredDelayMs,
+            targetOffsetMs,
+            timer: state.correctedTimer
+          }),
           strategy: pickConfig.pick.strategy
         } as const
       },

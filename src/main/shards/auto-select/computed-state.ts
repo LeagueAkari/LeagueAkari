@@ -22,6 +22,23 @@ export type CorrectedTimer = {
   elapsedMs: number
 }
 
+export function getPhaseCalibratedDelayMs(args: {
+  configuredDelayMs: number
+  targetOffsetMs: number
+  timer: CorrectedTimer | null
+}) {
+  const { configuredDelayMs, targetOffsetMs, timer } = args
+
+  if (!timer) {
+    return configuredDelayMs
+  }
+
+  return Math.max(
+    0,
+    Math.min(configuredDelayMs, targetOffsetMs - timer.elapsedMs, timer.remainingMs)
+  )
+}
+
 export type ActiveGroupConfig = {
   groupId: string
   temporarilyDisabled: boolean
