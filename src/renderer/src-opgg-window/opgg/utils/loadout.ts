@@ -66,7 +66,9 @@ export function useLoadout() {
             }),
             'celebration'
           )
-          .catch(() => {})
+          .catch((error) => {
+            log.warn(componentName, 'Failed to send summoner spells message', error)
+          })
       }
     } catch (error) {
       log.warn(componentName, '	set summoner spells failed', error)
@@ -153,14 +155,18 @@ export function useLoadout() {
       message.success(() => t('opgg.view.success', { reason: t('opgg.view.runes') }))
 
       if (lcs.chat.conversations.championSelect) {
-        lc.api.chat.chatSend(
-          lcs.chat.conversations.championSelect.id,
-          t('opgg.view.runesSet', {
-            name: getRunePageName(championId, position),
-            action: newRunePageAdded ? t('opgg.view.create') : t('opgg.view.replace')
-          }),
-          'celebration'
-        )
+        lc.api.chat
+          .chatSend(
+            lcs.chat.conversations.championSelect.id,
+            t('opgg.view.runesSet', {
+              name: getRunePageName(championId, position),
+              action: newRunePageAdded ? t('opgg.view.create') : t('opgg.view.replace')
+            }),
+            'celebration'
+          )
+          .catch((error) => {
+            log.warn(componentName, 'Failed to send runes message', error)
+          })
       }
     } catch (error) {
       log.warn(componentName, 'set runes failed', error)
@@ -330,7 +336,9 @@ export function useLoadout() {
             }),
             'celebration'
           )
-          .catch(() => {})
+          .catch((error) => {
+            log.warn(componentName, 'Failed to send item sets message', error)
+          })
       }
     } catch (error) {
       log.warn(componentName, 'write item sets failed', error)

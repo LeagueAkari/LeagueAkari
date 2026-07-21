@@ -132,11 +132,13 @@
 <script setup lang="ts">
 import LoungeOperations from '@aux-window/components/LoungeOperations.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { GetSearch } from '@shared/types/league-client/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
@@ -144,12 +146,14 @@ import { NButton } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()
 
 const agf = useInstance(AutoGameflowRenderer)
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const willAcceptIn = ref(0)
 const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
@@ -171,9 +175,21 @@ const { pause: pauseAS, resume: resumeAS } = useIntervalFn(
   { immediate: false, immediateCallback: true }
 )
 
-const handleAccept = () => lc.api.matchmaking.accept()
+const handleAccept = async () => {
+  try {
+    await lc.api.matchmaking.accept()
+  } catch (error) {
+    logger.warn(componentName, 'Failed to accept ready check', error)
+  }
+}
 
-const handleDecline = () => lc.api.matchmaking.decline()
+const handleDecline = async () => {
+  try {
+    await lc.api.matchmaking.decline()
+  } catch (error) {
+    logger.warn(componentName, 'Failed to decline ready check', error)
+  }
+}
 
 const handleCancelAutoAccept = () => agf.cancelAutoAccept()
 
@@ -191,6 +207,9 @@ const handleCancelSearching = async () => {
   try {
     isCancelingSearching.value = true
     await lc.api.lobby.deleteSearchMatch()
+  } catch (error) {
+    logger.warn(componentName, 'Failed to cancel matchmaking search', error)
+    return
   } finally {
     isCancelingSearching.value = false
   }

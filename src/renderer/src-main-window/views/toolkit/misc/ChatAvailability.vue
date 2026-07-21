@@ -49,21 +49,25 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
 import { useTranslation } from 'i18next-vue'
 import { NFlex, NRadio, NRadioGroup, NSwitch, useNotification } from 'naive-ui'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lcs = useLeagueClientStore()
 const ams = useAutoMiscStore()
 const lc = useInstance(LeagueClientRenderer)
 const am = useInstance(AutoMiscRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const notification = useNotification()
 
@@ -75,6 +79,7 @@ const handleChangeAvailability = async (availability: string) => {
   try {
     await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {
+    logger.warn(componentName, 'Failed to change chat availability', error)
     notification.warning({
       title: () => t('toolkit.chatAvailability.availability.failedNotification.title'),
       content: () =>

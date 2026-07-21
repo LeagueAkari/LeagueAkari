@@ -53,10 +53,12 @@
 
 <script lang="tsx" setup>
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { EventHubEvents } from '@shared/types/league-client/event-hub'
 import { sleep } from '@shared/utils/sleep'
 import { useTranslation } from 'i18next-vue'
@@ -68,9 +70,11 @@ import ClaimableItem from './ClaimableItem.vue'
 const REWARD_STATE_UNSELECTED = 'Unselected'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const as = useAppCommonStore()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
 
 const message = useMessage()
@@ -198,6 +202,7 @@ const claim = async () => {
       }
     }
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to claim Event Hub rewards', error)
     message.warning(() => t('toolkit.claim.eventHub.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false

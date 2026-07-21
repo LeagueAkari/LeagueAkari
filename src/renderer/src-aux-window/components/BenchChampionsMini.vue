@@ -132,10 +132,12 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
   getOpggAramBalanceAdjustments,
   getOpggAramBalanceOverallEffect,
@@ -147,9 +149,11 @@ import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 const extraAssets = useExtraAssetsStore()
 
 const gameMode = computed(() => {
@@ -369,7 +373,7 @@ const handleBenchSwapOrPick = async (championId: number, complete = true) => {
       await lc.api.champSelect.benchSwap(championId)
     }
   } catch (error: any) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to swap or pick champion', error)
     message.warning(
       t('auxWindow.championBench.swapFailed', {
         reason: error.message
@@ -400,6 +404,7 @@ const handleReroll = async (grabBack = false) => {
       }, 25)
     }
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to reroll champion', error)
     message.warning(
       t('auxWindow.championBench.rerollFailed', {
         reason: error.message

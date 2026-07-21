@@ -83,12 +83,14 @@
 <script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSgpServerQuery } from '@renderer-shared/composables/useSgpServerQuery'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
@@ -138,11 +140,13 @@ interface MappedRecordType extends RecordType {
 }
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 const sp = useInstance(SavedPlayerRenderer)
 const lc = useInstance(LeagueClientRenderer)
 const pt = useInstance(PlayerTabsRenderer)
 const sgp = useInstance(SgpRenderer)
 const rc = useInstance(RiotClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
@@ -326,6 +330,7 @@ const updateTag = async (puuid: string, selfPuuid: string, tag: string | null) =
     message.success(() => t('settings.taggedPlayers.updated'))
     loadPage(pagination.page || 1, pagination.pageSize || 20)
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to update player tag', error)
     message.error(() =>
       t('settings.taggedPlayers.updateFailed', {
         reason: error.message
@@ -469,6 +474,7 @@ const handleExportTaggedPlayers = async () => {
       message.success(() => t('settings.taggedPlayers.exported', { path: exportPath }))
     }
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to export tagged players', error)
     message.error(() => t('settings.taggedPlayers.errorExport', { reason: error.message }))
   }
 }
@@ -482,6 +488,7 @@ const handleImportTaggedPlayers = async () => {
       await loadPage(pagination.page || 1, pagination.pageSize || 20)
     }
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to import tagged players', error)
     if (error.code) {
       switch (error.code) {
         case 'InvalidTaggedPlayersFile':

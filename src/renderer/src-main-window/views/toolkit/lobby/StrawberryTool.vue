@@ -84,10 +84,12 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
   AccountScopeLoadouts,
   ChampionSimple,
@@ -101,9 +103,11 @@ import { shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 let isInitialized = false
 
@@ -230,6 +234,7 @@ const setChampion = async () => {
     )
     message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to set Strawberry champion', error)
     message.warning(
       t('toolkit.strawberry.champion.failedMessage', { reason: (error as any).message })
     )
@@ -254,6 +259,7 @@ const setMap = async () => {
     await lc.api.lobby.setStrawberryMapId({ contentId, itemId: Number(itemIdRaw) })
     message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to set Strawberry map', error)
     message.warning(t('toolkit.strawberry.map.failedMessage', { reason: (error as any).message }))
   } finally {
     isSettingMap.value = false
@@ -298,6 +304,7 @@ const setDifficulty = async () => {
     await lc.api.loadouts.setStrawberryDifficulty(loadoutsContentId, currentDifficulty.value)
     message.success(t('toolkit.strawberry.requestSent'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to set Strawberry difficulty', error)
     message.warning(
       t('toolkit.strawberry.difficulty.failedMessage', { reason: (error as any).message })
     )

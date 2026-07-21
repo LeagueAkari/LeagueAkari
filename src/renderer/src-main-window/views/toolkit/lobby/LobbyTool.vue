@@ -35,18 +35,22 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import type { QueueEligibility } from '@shared/types/league-client/lobby'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NSelect, useNotification } from 'naive-ui'
 import { computed, reactive, shallowRef } from 'vue'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const notification = useNotification()
 
@@ -133,6 +137,7 @@ const handleCreateQueueLobby = async () => {
   try {
     await lc.api.lobby.createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
+    logger.warn(componentName, 'Failed to create queue lobby', error)
     notification.warning({
       title: () => t('toolkit.lobby.createIdLobby.failedNotification.title'),
       content: () =>

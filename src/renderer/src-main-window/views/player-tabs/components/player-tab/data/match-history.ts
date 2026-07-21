@@ -301,7 +301,12 @@ export function provideMatchHistory(
         }
       }
 
-      await lc.api.replays.createMetadata(gameId, gameMeta)
+      try {
+        await lc.api.replays.createMetadata(gameId, gameMeta)
+      } catch (error) {
+        log.warn(componentName, 'Failed to create replay metadata', gameId, error)
+        throw error
+      }
 
       const { data } = await lc.api.replays.getMetadata(gameId)
 
@@ -763,6 +768,7 @@ export function provideMatchHistory(
     try {
       await lc.api.replays.downloadRofl(gameId)
     } catch (error: any) {
+      log.warn(componentName, 'Failed to download replay', gameId, error)
       message.error(() => t('playerTabs.profile.failedToDownloadReplay', { reason: error.message }))
     }
   }
@@ -773,6 +779,7 @@ export function provideMatchHistory(
 
       message.success(() => t('playerTabs.profile.operationSuccessTitle'))
     } catch (error: any) {
+      log.warn(componentName, 'Failed to launch replay', gameId, error)
       message.error(() => t('playerTabs.profile.failedToLaunchReplay', { reason: error.message }))
     }
   }

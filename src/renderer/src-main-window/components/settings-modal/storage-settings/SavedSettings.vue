@@ -26,13 +26,17 @@
 <script setup lang="ts">
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NScrollbar, useDialog, useMessage } from 'naive-ui'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 const s = useInstance(SettingUtilsRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const dialog = useDialog()
 const message = useMessage()
@@ -45,6 +49,7 @@ const handleExportSettings = async () => {
       message.success(() => t('settings.savedSettings.exported', { path: exportPath }))
     }
   } catch (error: any) {
+    logger.warn(componentName, 'Failed to export settings', error)
     message.error(() => t('settings.savedSettings.errorExport', { reason: error.message }))
   }
 }
@@ -60,6 +65,7 @@ const handleImportSettings = async () => {
       try {
         await s.importSettingsFromJsonFile()
       } catch (error: any) {
+        logger.warn(componentName, 'Failed to import settings', error)
         if (error.code) {
           switch (error.code) {
             case 'InvalidSettingsFile':

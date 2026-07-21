@@ -23,9 +23,11 @@
 
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
@@ -34,11 +36,13 @@ import { NCard, NSelect, SelectRenderLabel, SelectRenderTag, useMessage } from '
 import { computed, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const aws = useAuxWindowStore()
 const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const currentSkinId = ref<number>()
 const isSettingSkin = ref(false)
@@ -171,6 +175,7 @@ const handleSetSkin = async (skinId: number) => {
     await lc.api.champSelect.setSkin(skinId)
     message.success(t('auxWindow.skinSelection.success'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to set champion select skin', error)
     message.warning(t('auxWindow.skinSelection.failed'))
   } finally {
     isSettingSkin.value = false

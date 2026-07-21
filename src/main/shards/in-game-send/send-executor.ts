@@ -119,7 +119,10 @@ export class InGameSendExecutor {
     return await leagueClient.api.chat
       .chatSend(conversation.id, lines.join('\n'))
       .then(() => true)
-      .catch(() => false)
+      .catch((error) => {
+        logger.warn('Failed to send message through LCU chat', phase, error)
+        return false
+      })
   }
 
   private async _sendLinesInGame(lines: string[], signal: AbortSignal) {

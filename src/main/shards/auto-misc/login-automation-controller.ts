@@ -59,8 +59,15 @@ export class AutoMiscLoginAutomationController {
       this._interruptChatReadyAutomation()
     }
 
-    await this._context.leagueClient.api.chat.setChatStatusMessage(message)
-    this._context.logger.info('Applied chat status message')
+    try {
+      await this._context.leagueClient.api.chat.setChatStatusMessage(message)
+      this._context.logger.info('Applied chat status message')
+    } catch (error) {
+      if (!options.automated) {
+        this._context.logger.warn('Failed to apply chat status message manually', error)
+      }
+      throw error
+    }
   }
 
   async applyRankedStatus(
@@ -71,12 +78,19 @@ export class AutoMiscLoginAutomationController {
       this._interruptChatReadyAutomation()
     }
 
-    await this._context.leagueClient.api.chat.changeRanked(
-      rankedStatus.queue,
-      rankedStatus.tier,
-      this._isApexRankedTier(rankedStatus.tier) ? undefined : rankedStatus.division
-    )
-    this._context.logger.info('Applied ranked status')
+    try {
+      await this._context.leagueClient.api.chat.changeRanked(
+        rankedStatus.queue,
+        rankedStatus.tier,
+        this._isApexRankedTier(rankedStatus.tier) ? undefined : rankedStatus.division
+      )
+      this._context.logger.info('Applied ranked status')
+    } catch (error) {
+      if (!options.automated) {
+        this._context.logger.warn('Failed to apply ranked status manually', error)
+      }
+      throw error
+    }
   }
 
   private async _applyChatReadyAutomationsOnce() {

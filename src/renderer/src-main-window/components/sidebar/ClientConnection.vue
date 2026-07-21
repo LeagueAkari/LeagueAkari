@@ -192,12 +192,14 @@
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { UxCommandLine } from '@shared/shards/league-client-ux'
 import { getSgpServerId } from '@shared/utils/sgp'
@@ -215,8 +217,10 @@ import { computed } from 'vue'
 import { useLeagueClientPeekStore } from '@main-window/shards/league-client-peek/store'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
@@ -279,7 +283,7 @@ const handleRestartUx = async () => {
   try {
     await lc.api.riotclient.restartUx()
   } catch (error) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to restart League Client UX', error)
   }
 }
 
@@ -287,7 +291,7 @@ const handleKillUx = async () => {
   try {
     await lc.api.riotclient.killUx()
   } catch (error) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to stop League Client UX', error)
   }
 }
 
@@ -295,7 +299,7 @@ const handleLaunchUx = async () => {
   try {
     await lc.api.riotclient.launchUx()
   } catch (error) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to launch League Client UX', error)
   }
 }
 
@@ -303,7 +307,7 @@ const handleQuitClient = async () => {
   try {
     await lc.api.processControl.quit()
   } catch (error) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to quit League Client', error)
   }
 }
 
@@ -333,7 +337,7 @@ const handlePlayAgain = async () => {
   try {
     await lc.api.lobby.playAgain()
   } catch (error) {
-    console.error(error)
+    logger.warn(componentName, 'Failed to play again', error)
   }
 }
 </script>

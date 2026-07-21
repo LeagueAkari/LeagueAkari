@@ -53,6 +53,7 @@
 
 <script lang="tsx" setup>
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -70,13 +71,12 @@ import ClaimableItem from './ClaimableItem.vue'
 const TARGET_REWARD_GRANT_STATUS = 'PENDING_SELECTION'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const as = useAppCommonStore()
 const lc = useInstance(LeagueClientRenderer)
 const log = useInstance(LoggerRenderer)
 const lcs = useLeagueClientStore()
-
-const COMP_NAMESPACE = 'comp:RewardClaimTool'
 
 const message = useMessage()
 
@@ -178,7 +178,7 @@ const claim = async () => {
           selections: chosen.map((c) => c.id)
         })
 
-        log.info(COMP_NAMESPACE, `claimed ${chosen.map((c) => c.localizations.title).join(', ')}`)
+        log.info(componentName, `claimed ${chosen.map((c) => c.localizations.title).join(', ')}`)
 
         message.success(() =>
           t('toolkit.claim.rewards.claimed', {
@@ -188,6 +188,7 @@ const claim = async () => {
       }
     }
   } catch (error: any) {
+    log.warn(componentName, 'Failed to claim reward grant', error)
     message.warning(() => t('toolkit.claim.rewards.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false

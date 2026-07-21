@@ -86,6 +86,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -114,6 +115,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const as = useAppCommonStore()
 const sgps = useSgpStore()
@@ -417,11 +419,12 @@ const deleteSelectedFriends = async () => {
       }
 
       await lc.api.chat.deleteFriend(friendId)
-      log.infoRenderer('comp:FriendTools', 'deleted', friendId)
+      log.infoRenderer(componentName, 'deleted', friendId)
     }
 
     message.success(() => t('toolkit.friends.deleteSuccess', { count: filtered.length }))
   } catch (error: any) {
+    log.warn(componentName, 'Failed to delete friends', error)
     message.warning(() => t('toolkit.claim.missions.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false

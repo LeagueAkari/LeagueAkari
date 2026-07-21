@@ -127,10 +127,12 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { AugmentOverlay, ChampSkin } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
@@ -139,9 +141,11 @@ import { VNode, computed, ref, watch } from 'vue'
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const { match: isNameMatch } = useChampionNameMatch()
 
@@ -352,7 +356,7 @@ const handleApplyToProfile = async () => {
     }
     message.success(() => t('toolkit.summonerProfile.commonSuccess'), { duration: 1000 })
   } catch (error) {
-    console.warn(error)
+    logger.warn(componentName, 'Failed to apply profile background', error)
     message.warning(() => t('toolkit.summonerProfile.commonFailed'), { duration: 1000 })
   } finally {
     isProceeding.value = false
@@ -372,8 +376,8 @@ const handleUpdatePr = async () => {
     await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
     message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to update profile banner accent', error)
     message.warning(() => t('toolkit.summonerProfile.commonFailed'))
-    console.warn(error)
   } finally {
     isUpdating.value = false
   }
@@ -398,8 +402,8 @@ const handleRemovePrestigeCrest = async () => {
     })
     message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to remove prestige crest', error)
     message.warning(() => t('toolkit.summonerProfile.commonFailed'))
-    console.warn(error)
   } finally {
     isRemovingPrestigeCrest.value = false
   }
@@ -420,8 +424,8 @@ const handleRemoveTokens = async () => {
     })
     message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to remove challenge tokens', error)
     message.warning(() => t('toolkit.summonerProfile.commonFailed'))
-    console.warn(error)
   } finally {
     isRemovingTokens.value = false
   }
@@ -463,8 +467,8 @@ const handleClearEmotes = async () => {
 
     message.success(() => t('toolkit.summonerProfile.commonSuccess'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to clear emotes', error)
     message.warning(() => t('toolkit.summonerProfile.commonFailed'))
-    console.warn(error)
   } finally {
     isClearingEmotes.value = false
   }

@@ -246,9 +246,11 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import type { Friend } from '@shared/types/league-client/chat'
 import { Close, RecentlyViewed } from '@vicons/carbon'
@@ -262,8 +264,10 @@ import { useSearchPaneSearchHistory } from './search-history'
 import { isFriendSpectatable, useSearchPaneFriends } from './sidebar-friends'
 
 const { t } = useTranslation()
+const componentName = useComponentName()
 const message = useMessage()
 const lc = useInstance(LeagueClientRenderer)
+const logger = useInstance(LoggerRenderer)
 
 const {
   pinnedSearchHistory,
@@ -330,6 +334,7 @@ const handleSpectateFriend = async (friend: Friend) => {
     )
     message.success(() => t('playerSearch.spectateStarted'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to launch spectator', error)
     const reason = error instanceof Error ? error.message : String(error)
     message.error(() => t('playerSearch.spectateFailed', { reason }))
   }

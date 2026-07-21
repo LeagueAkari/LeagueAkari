@@ -271,7 +271,10 @@
 import { EditorView } from '@codemirror/view'
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
   IN_GAME_SEND_FIXED_TEXT_PRESET_CONTENT_MAX_LENGTH,
   IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS,
@@ -299,6 +302,8 @@ import { useFixedTextPreset } from '../data/fixed-text'
 
 const fixedTextPreset = useFixedTextPreset()
 const appCommonStore = useAppCommonStore()
+const componentName = useComponentName()
+const logger = useInstance(LoggerRenderer)
 const message = useMessage()
 const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.fixedText' })
 const { unavailableReason: nativeInputUnavailableMessage } = useNativeInputStatus()
@@ -483,6 +488,7 @@ const saveCurrent = async (options: { silent?: boolean } = {}) => {
 
     return true
   } catch (error) {
+    logger.warn(componentName, 'Failed to update fixed text preset', error)
     message.error(t('saveFailed'))
     return false
   } finally {
@@ -545,6 +551,7 @@ const handleCreate = async () => {
     await nextTick()
     titleInputRef.value?.focus()
   } catch (error) {
+    logger.warn(componentName, 'Failed to create fixed text preset', error)
     message.error(t('createFailed'))
   } finally {
     isCreating.value = false
@@ -573,6 +580,7 @@ const handleDelete = async (id: string) => {
 
     message.success(t('deleted'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to delete fixed text preset', error)
     message.error(t('deleteFailed'))
   } finally {
     if (hoveredItemId.value === id) {
@@ -594,7 +602,11 @@ const handleMove = async (id: string, direction: InGameSendFixedTextPresetItemMo
     return
   }
 
-  await fixedTextPreset.moveItem(id, direction)
+  try {
+    await fixedTextPreset.moveItem(id, direction)
+  } catch (error) {
+    logger.warn(componentName, 'Failed to move fixed text preset', error)
+  }
 }
 
 const handleShortcutUpdate = async (shortcutId: string | null) => {
@@ -606,6 +618,7 @@ const handleShortcutUpdate = async (shortcutId: string | null) => {
     await fixedTextPreset.setShortcut(selectedItem.value.id, shortcutId)
     message.success(t('saved'))
   } catch (error) {
+    logger.warn(componentName, 'Failed to update fixed text preset shortcut', error)
     message.error(t('saveFailed'))
   }
 }
