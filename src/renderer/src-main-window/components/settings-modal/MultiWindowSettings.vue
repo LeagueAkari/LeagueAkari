@@ -210,6 +210,21 @@
           />
         </SettingsRow>
         <SettingsRow
+          :label="t('settings.multiWindow.cdTimerWindow.resetWindowPosition.label')"
+          :label-description="
+            t('settings.multiWindow.cdTimerWindow.resetWindowPosition.description')
+          "
+          :label-width="400"
+        >
+          <NButton
+            size="small"
+            type="warning"
+            secondary
+            @click="() => wm.cdTimerWindow.resetPosition()"
+            >{{ t('settings.multiWindow.cdTimerWindow.resetWindowPosition.button') }}</NButton
+          >
+        </SettingsRow>
+        <SettingsRow
           :label="t('settings.multiWindow.cdTimerWindow.timerType.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.timerType.description')"
           :label-width="400"

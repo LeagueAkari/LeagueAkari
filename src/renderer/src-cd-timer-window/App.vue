@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="box-border flex w-fit flex-col overflow-hidden rounded bg-[#1a1a1da0]"
-    ref="wrapper"
-    @mouseenter="wm.cdTimerWindow.setIgnoreMouseEvents(false)"
-    @mouseleave="wm.cdTimerWindow.setIgnoreMouseEvents(true, { forward: true })"
-  >
+  <div class="box-border flex w-fit flex-col overflow-hidden rounded bg-[#1a1a1da0]" ref="wrapper">
     <SetupInAppScope />
     <CdTimerWindowTitlebar />
     <SummonerSpellsCdTimer class="opacity-70 transition-opacity hover:opacity-90" />

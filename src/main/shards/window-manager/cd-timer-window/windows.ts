@@ -32,11 +32,9 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       return
     }
 
-    // 默认穿透给游戏；renderer 侧通过 mouseenter/mouseleave 动态切换 setIgnoreMouseEvents。
-    // focusable: true + type:'panel' 保证点击时 Windows 走正常激活序列（游戏仅失活，不最小化）。
     this._window.setSkipTaskbar(true)
     this._window.setAlwaysOnTop(true, 'screen-saver', 1)
-    this._window.setIgnoreMouseEvents(true, { forward: true })
+    this._window.setIgnoreMouseEvents(false)
   }
 
   constructor(_context: WindowManagerMainContext) {

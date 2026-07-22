@@ -329,6 +329,10 @@ settings:
       showShortcut:
         label: 显示快捷键
         description: 在游戏中，使用快捷键以打开或关闭计时器窗口
+      resetWindowPosition:
+        label: 重置计时器窗口位置
+        description: 将计时器窗口重新放置到主屏幕中央
+        button: 重置
       timerType:
         label: 计时器类型
         description: 选择计时器的类型。倒计时模式将使用预设的技能时间 (存在误差)，计时模式则从 0 开始。自定义计时器则固定为计时模式
