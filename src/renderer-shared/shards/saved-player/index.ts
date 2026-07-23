@@ -1,4 +1,4 @@
-import { Dep, Shard } from '@shared/akari-shard'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import {
   AllTaggedPlayerQueryDto,
   EncounteredGame,
@@ -11,11 +11,18 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import LRUMap from 'quick-lru'
 
 import { AkariIpcRenderer } from '../ipc'
-import { SAVED_PLAYER_RENDERER_NAMESPACE, type SavedPlayerRendererContext } from './context'
+import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { SettingUtilsRenderer } from '../setting-utils'
+import {
+  SAVED_PLAYER_MAIN_NAMESPACE,
+  SAVED_PLAYER_RENDERER_NAMESPACE,
+  type SavedPlayerRendererContext
+} from './context'
 import { SavedPlayerRendererApi } from './saved-player-api'
+import { useSavedPlayerStore } from './store'
 
 @Shard(SavedPlayerRenderer.id)
-export class SavedPlayerRenderer {
+export class SavedPlayerRenderer implements IAkariShardInitDispose {
   static id = SAVED_PLAYER_RENDERER_NAMESPACE
 
   public readonly summonerLruMap = new LRUMap<string, SummonerInfo>({
@@ -24,9 +31,30 @@ export class SavedPlayerRenderer {
 
   private readonly _api: SavedPlayerRendererApi
 
-  constructor(@Dep(AkariIpcRenderer) ipc: AkariIpcRenderer) {
+  constructor(
+    @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _settingUtils: SettingUtilsRenderer
+  ) {
     const context: SavedPlayerRendererContext = { ipc }
     this._api = new SavedPlayerRendererApi(context)
+  }
+
+  async onInit() {
+    const store = useSavedPlayerStore()
+    await this._piniaMobxUtils.sync(SAVED_PLAYER_MAIN_NAMESPACE, 'settings', store.settings)
+  }
+
+  setPlayerTagPhrases(phrases: string[]) {
+    return this._settingUtils.set(SAVED_PLAYER_MAIN_NAMESPACE, 'playerTagPhrases', phrases)
+  }
+
+  setPlayerTagPhrasePanelExpanded(expanded: boolean) {
+    return this._settingUtils.set(
+      SAVED_PLAYER_MAIN_NAMESPACE,
+      'playerTagPhrasePanelExpanded',
+      expanded
+    )
   }
 
   querySavedPlayerWithGames(dto: SavedPlayerQueryDto) {

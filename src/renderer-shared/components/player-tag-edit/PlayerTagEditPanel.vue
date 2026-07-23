@@ -44,47 +44,17 @@
       @keydown="handleInputKeydown"
     />
 
-    <div v-if="isChineseLocale" class="mt-2 flex flex-col gap-1.5">
-      <div class="flex items-center justify-between">
-        <NButton size="tiny" quaternary :focusable="false" @click="toggleSuggestionPanel">
-          <template #icon>
-            <NIcon size="14">
-              <ChevronDown20Regular v-if="isSuggestionPanelExpanded" />
-              <ChevronRight20Regular v-else />
-            </NIcon>
-          </template>
-          猜你想写
-        </NButton>
-
-        <NButton
-          v-if="isSuggestionPanelExpanded"
-          size="tiny"
-          quaternary
-          :disabled="!isReady || !text"
-          :focusable="false"
-          @click="clearText"
-        >
-          清空
-        </NButton>
-      </div>
-
-      <NCollapseTransition :show="isSuggestionPanelExpanded">
-        <div class="flex flex-col gap-1.5">
-          <div v-for="(row, rowIndex) in phraseRows" :key="rowIndex" class="flex flex-wrap gap-1">
-            <NButton
-              v-for="phrase in row"
-              :key="phrase"
-              size="tiny"
-              secondary
-              :disabled="!isReady"
-              @click="appendPhrase(phrase)"
-            >
-              {{ phrase }}
-            </NButton>
-          </div>
-        </div>
-      </NCollapseTransition>
-    </div>
+    <PlayerTagPhrasePanel
+      class="mt-2"
+      :phrases="sps.settings.playerTagPhrases"
+      :expanded="isPhrasePanelExpanded"
+      :disabled="!isReady || isUpdatingPhrases"
+      :can-clear="Boolean(text)"
+      @append="appendPhrase"
+      @clear="clearText"
+      @update:expanded="handleUpdatePhrasePanelExpanded"
+      @update:phrases="handleUpdatePhrases"
+    />
 
     <div class="mt-3 flex justify-end gap-1">
       <NButton size="small" :disabled="isSaving" @click="emit('cancel')">
@@ -119,12 +89,13 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
-import { ChevronDown20Regular, ChevronRight20Regular } from '@vicons/fluent'
+import { useSavedPlayerStore } from '@renderer-shared/shards/saved-player/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCollapseTransition, NIcon, NInput, useMessage } from 'naive-ui'
+import { NButton, NInput, useMessage } from 'naive-ui'
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
-import { focusTextInput } from './cursor'
+import { focusTextInput, insertTextAtSelection } from './cursor'
+import PlayerTagPhrasePanel from './PlayerTagPhrasePanel.vue'
 import type { PlayerTagEditPanelSummoner } from './types'
 import type { InputInst } from 'naive-ui'
 
@@ -144,11 +115,13 @@ const text = ref('')
 const hasLoadedTag = ref(false)
 const isLoadingTag = ref(false)
 const isSaving = ref(false)
-const isSuggestionPanelExpanded = ref(false)
+const isUpdatingPhrases = ref(false)
 const inputEl = useTemplateRef<InputInst>('input')
 let focusFrame: number | null = null
 
 const sp = useInstance(SavedPlayerRenderer)
+const sps = useSavedPlayerStore()
+const isPhrasePanelExpanded = ref(sps.settings.playerTagPhrasePanelExpanded)
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const log = useInstance(LoggerRenderer)
@@ -156,16 +129,6 @@ const componentName = useComponentName()
 const message = useMessage()
 
 const { masked, summonerName: streamerSummonerName } = useStreamerModeMaskedText()
-
-const phraseRows = [
-  ['上路', '打野', '中路', '下路', '辅助', '三路', '四路'],
-  ['傻逼', '唐氏', '弱智', '脑瘫', '畜生', '死', '司马', '全家', '嘴脸'],
-  ['挂机', '嘲讽', 'K头', '地缚灵', '送头', '嘴硬', '公屏互动', '弱爆'],
-  ['菜', '野', '狗', '东西'],
-  ['的']
-]
-
-const isChineseLocale = computed(() => as.settings.locale.toLowerCase() === 'zh-cn')
 
 const displayName = computed(() => {
   if (!props.summoner) {
@@ -196,17 +159,43 @@ const focus = (cursorPosition?: number) => {
 }
 
 const appendPhrase = (phrase: string) => {
-  text.value += phrase
-  focus(text.value.length)
-}
-
-const toggleSuggestionPanel = () => {
-  isSuggestionPanelExpanded.value = !isSuggestionPanelExpanded.value
+  const result = insertTextAtSelection(inputEl.value, text.value, phrase)
+  text.value = result.value
+  focus(result.cursorPosition)
 }
 
 const clearText = () => {
   text.value = ''
   focus(0)
+}
+
+const handleUpdatePhrases = async (phrases: string[]) => {
+  if (isUpdatingPhrases.value) {
+    return
+  }
+
+  isUpdatingPhrases.value = true
+
+  try {
+    await sp.setPlayerTagPhrases(phrases)
+  } catch (error) {
+    log.warn(componentName, 'Failed to update player tag phrases', error)
+    message.warning(() => t('playerTags.editModal.phrases.updateFailed'))
+  } finally {
+    isUpdatingPhrases.value = false
+  }
+}
+
+const handleUpdatePhrasePanelExpanded = async (expanded: boolean) => {
+  const previous = isPhrasePanelExpanded.value
+  isPhrasePanelExpanded.value = expanded
+
+  try {
+    await sp.setPlayerTagPhrasePanelExpanded(expanded)
+  } catch (error) {
+    isPhrasePanelExpanded.value = previous
+    log.warn(componentName, 'Failed to update player tag phrase panel state', error)
+  }
 }
 
 const loadSelfTag = async () => {
@@ -298,6 +287,13 @@ const handleInputKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   loadSelfTag()
 })
+
+watch(
+  () => sps.settings.playerTagPhrasePanelExpanded,
+  (expanded) => {
+    isPhrasePanelExpanded.value = expanded
+  }
+)
 
 onBeforeUnmount(() => {
   if (focusFrame !== null) {

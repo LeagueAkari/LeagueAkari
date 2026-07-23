@@ -9,34 +9,59 @@ import {
   type SavedPlayerQueryDto,
   type SavedPlayerSaveDto,
   type UpdateTagDto,
-  type WithEncounteredGamesQueryDto
+  type WithEncounteredGamesQueryDto,
+  normalizeSavedPlayerTagPhrases
 } from '@shared/shards/saved-player'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'
+import { MobxUtilsMain } from '../mobx-utils'
+import { SettingFactoryMain } from '../setting-factory'
+import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { StorageMain } from '../storage'
 import { EncounteredGame } from '../storage/entities/EncounteredGame'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
 import { SAVED_PLAYER_MAIN_NAMESPACE, SavedPlayerMainContext } from './context'
 import { SavedPlayerIpcHandlers } from './ipc-handlers'
+import { SavedPlayerSettings } from './state'
 import { TaggedPlayersFileService } from './tagged-players-file-service'
 
 @Shard(SavedPlayerMain.id)
 export class SavedPlayerMain implements IAkariShardInitDispose {
   static id = SAVED_PLAYER_MAIN_NAMESPACE
-  static dependencies = [AkariIpcMain.id, StorageMain.id]
+  static dependencies = [AkariIpcMain.id, StorageMain.id, SettingFactoryMain.id, MobxUtilsMain.id]
 
   static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE
+
+  public readonly settings = new SavedPlayerSettings()
 
   private readonly context: SavedPlayerMainContext
   private readonly taggedPlayersFileService: TaggedPlayersFileService
   private readonly ipcHandlers: SavedPlayerIpcHandlers
+  private readonly _settingService: SetterSettingService<SavedPlayerSettings>
 
   constructor(
     ipc: AkariIpcMain,
     private readonly storage: StorageMain,
+    settingFactory: SettingFactoryMain,
+    private readonly _mobxUtils: MobxUtilsMain,
     shared: SharedGlobalShard
   ) {
+    this._settingService = settingFactory.register(
+      SavedPlayerMain.id,
+      {
+        playerTagPhrases: {
+          default: this.settings.playerTagPhrases,
+          restore: ({ value }) => normalizeSavedPlayerTagPhrases(value),
+          transform: ({ value }) => normalizeSavedPlayerTagPhrases(value)
+        },
+        playerTagPhrasePanelExpanded: {
+          default: this.settings.playerTagPhrasePanelExpanded
+        }
+      },
+      this.settings
+    )
+
     this.context = {
       namespace: SavedPlayerMain.id,
       ipc,
@@ -49,6 +74,12 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    await this._settingService.applyToState()
+    this._mobxUtils.propSync(SavedPlayerMain.id, 'settings', this.settings, [
+      'playerTagPhrases',
+      'playerTagPhrasePanelExpanded'
+    ])
+
     this.ipcHandlers.register()
   }
 

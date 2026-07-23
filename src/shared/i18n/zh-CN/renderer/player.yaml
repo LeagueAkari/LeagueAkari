@@ -33,6 +33,19 @@ playerTags:
     save: 保存
     cancel: 取消
     placeholder: 输入对 {{name}} 的标记
+    phrases:
+      title: 快捷短语
+      count: '{{count}} / {{max}}'
+      clearTag: 清空标记
+      clearTagConfirm: 确定清空当前输入的标记吗？
+      confirmClearTag: 清空
+      addPlaceholder: 添加快捷短语
+      add: 添加短语
+      cancelAdd: 取消添加短语
+      delete: 删除“{{phrase}}”
+      empty: 暂无快捷短语，添加后可一键插入玩家标记
+      duplicate: 该短语已经存在
+      updateFailed: 保存快捷短语失败
 akariScore:
   title: Akari Score
   na: N/A

@@ -33,6 +33,19 @@ playerTags:
     save: Save
     cancel: Cancel
     placeholder: Enter the tag for player {{name}}
+    phrases:
+      title: Quick phrases
+      count: '{{count}} / {{max}}'
+      clearTag: Clear tag
+      clearTagConfirm: Clear the currently entered tag?
+      confirmClearTag: Clear
+      addPlaceholder: Add a quick phrase
+      add: Add phrase
+      cancelAdd: Cancel adding phrase
+      delete: Delete “{{phrase}}”
+      empty: No quick phrases yet. Add one to insert it into player tags with one click.
+      duplicate: This phrase already exists.
+      updateFailed: Failed to save quick phrases.
 akariScore:
   title: Akari Score
   na: N/A

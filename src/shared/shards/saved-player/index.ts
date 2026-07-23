@@ -3,6 +3,45 @@
  */
 export const ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
 
+export const SAVED_PLAYER_TAG_PHRASE_MAX_ITEMS = 20
+export const SAVED_PLAYER_TAG_PHRASE_MAX_LENGTH = 100
+
+export function createDefaultSavedPlayerTagPhrases(): string[] {
+  return []
+}
+
+export function normalizeSavedPlayerTagPhrase(value: unknown): string {
+  return String(value ?? '')
+    .trim()
+    .slice(0, SAVED_PLAYER_TAG_PHRASE_MAX_LENGTH)
+}
+
+export function normalizeSavedPlayerTagPhrases(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const phrases: string[] = []
+  const seen = new Set<string>()
+
+  for (const item of value) {
+    const phrase = normalizeSavedPlayerTagPhrase(item)
+
+    if (!phrase || seen.has(phrase)) {
+      continue
+    }
+
+    phrases.push(phrase)
+    seen.add(phrase)
+
+    if (phrases.length >= SAVED_PLAYER_TAG_PHRASE_MAX_ITEMS) {
+      break
+    }
+  }
+
+  return phrases
+}
+
 export interface EncounteredGame {
   id: number
   gameId: number
