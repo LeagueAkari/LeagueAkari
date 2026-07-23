@@ -187,12 +187,14 @@
         "
       >
         <SettingsRow
+          :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.enabled.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.enabled.description')"
           :label-width="400"
         >
           <NSwitch
             size="small"
+            :disabled="!as.nativeSupport.nativeInput.available"
             :value="ctws.settings.enabled"
             @update:value="(val) => wm.cdTimerWindow.setEnabled(val)"
           />
@@ -210,6 +212,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.resetWindowPosition.label')"
           :label-description="
             t('settings.multiWindow.cdTimerWindow.resetWindowPosition.description')
@@ -220,17 +223,20 @@
             size="small"
             type="warning"
             secondary
+            :disabled="!as.nativeSupport.nativeInput.available"
             @click="() => wm.cdTimerWindow.resetPosition()"
             >{{ t('settings.multiWindow.cdTimerWindow.resetWindowPosition.button') }}</NButton
           >
         </SettingsRow>
         <SettingsRow
+          :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.timerType.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.timerType.description')"
           :label-width="400"
         >
           <NRadioGroup
             size="small"
+            :disabled="!as.nativeSupport.nativeInput.available"
             :value="ctws.settings.timerType"
             @update:value="(val) => wm.cdTimerWindow.setTimerType(val)"
           >
@@ -245,6 +251,7 @@
           </NRadioGroup>
         </SettingsRow>
         <SettingsRow
+          :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.reverseAdjustmentDirection.label')"
           :label-description="
             t('settings.multiWindow.cdTimerWindow.reverseAdjustmentDirection.description')
@@ -253,6 +260,7 @@
         >
           <NSwitch
             size="small"
+            :disabled="!as.nativeSupport.nativeInput.available"
             :value="ctws.settings.reverseAdjustmentDirection"
             @update:value="(val) => wm.cdTimerWindow.setReverseAdjustmentDirection(val)"
           />

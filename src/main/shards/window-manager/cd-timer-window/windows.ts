@@ -57,7 +57,13 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           schema: z.boolean(),
           transform: () => true
         },
-        enabled: { default: settings.enabled, schema: z.boolean() },
+        enabled: {
+          default: settings.enabled,
+          schema: z.boolean(),
+          restore: ({ value }) =>
+            NATIVE_SUPPORT.nativeInput.available ? (value as boolean) : false,
+          transform: ({ value }) => NATIVE_SUPPORT.nativeInput.available && value
+        },
         showShortcut: { default: settings.showShortcut, schema: z.string().nullable() },
         timerType: { default: settings.timerType, schema: z.enum(['countdown', 'countup']) },
         reverseAdjustmentDirection: {
@@ -129,7 +135,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
           return
         }
 
-        if (enabled) {
+        if (enabled && NATIVE_SUPPORT.nativeInput.available) {
           this.createWindow()
         } else {
           this.close(true)
@@ -172,7 +178,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     )
 
     const shouldUseCdTimer = computed(() => {
-      if (!this.state.ready || !this.settings.enabled) {
+      if (!NATIVE_SUPPORT.nativeInput.available || !this.state.ready || !this.settings.enabled) {
         return false
       }
 
@@ -279,10 +285,12 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   override async onInit() {
     await super.onInit()
 
-    if (NATIVE_SUPPORT.nativeInput.available) {
-      this._registerIpcHandlers()
+    if (!NATIVE_SUPPORT.nativeInput.available) {
+      await this._settingService.set('enabled', false)
+      return
     }
 
+    this._registerIpcHandlers()
     this._watchCdTimerWindow()
   }
 

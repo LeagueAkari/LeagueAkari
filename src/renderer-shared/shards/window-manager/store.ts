@@ -109,7 +109,7 @@ export const useCdTimerWindowStore = defineStore(
   'shard:window-manager-renderer/cd-timer-window',
   () => {
     const settings = shallowReactive({
-      enabled: true,
+      enabled: false,
       opacity: 1,
       pinned: true,
       showShortcut: null as string | null,
