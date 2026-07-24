@@ -110,7 +110,7 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useTimeLeft } from '@renderer-shared/composables/useTimeLeft'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NProgress } from 'naive-ui'
@@ -119,7 +119,7 @@ import { computed } from 'vue'
 const { t } = useTranslation()
 
 const as2 = useAutoSelectStore()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const championName = (id: number) => resources.champions.name(id)
 

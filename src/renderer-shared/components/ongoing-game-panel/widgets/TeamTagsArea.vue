@@ -114,7 +114,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useGameResourceProvider } from '../../../providers/game-resource'
+import { useAkariResourceProvider } from '../../../providers/akari-resource'
 import {
   LOSS_RATE_TEAM_MAX_WIN_RATE,
   LOSS_RATE_TEAM_MIN_SIZE,
@@ -147,7 +147,7 @@ interface WinRateTeamInfo {
 const { t } = useTranslation()
 
 const { ongoingGame, mergedPremadeTeams } = useOngoingGamePanel()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const teamStats = computed(() => {
   if (!ongoingGame.value.analysis) {

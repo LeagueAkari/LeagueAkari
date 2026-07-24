@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { noZero } from '@shared/data-adapter/utils'
 import {
   Chart as ChartJS,
@@ -43,7 +43,7 @@ const { puuid } = defineProps<{
 const { teams, participants, hidePrivacy } = useMatchCard()
 const { t } = useTranslation()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 // 可被替换
 const isDark = computed(() => resources.runtime.colorMode === 'dark')

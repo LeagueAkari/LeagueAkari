@@ -137,7 +137,7 @@
 <script lang="ts" setup>
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { ChevronLeft20Regular, ChevronRight20Regular } from '@vicons/fluent'
 import { NButton, NIcon, NScrollbar, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -148,7 +148,7 @@ import { getTeamColor, useWinResultTagClass } from '../utils/theme'
 
 const { basicInfo, participants, team, hidePrivacy } = useMatchCard()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const position = usePosition()
 const tagTheme = useWinResultTagClass(() => team.value?.winResult)
 

@@ -274,7 +274,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { isSgpChampionKillEvent } from '@shared/data-adapter/match-history/frames'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -302,7 +302,7 @@ import VictimDamageDetails from '../widgets/VictimDamageDetails.vue'
 const { participants, details, basicInfo, frames, team, loadingDetails, loadDetails } =
   useMatchCard()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 
 const SUPPORTED_EVENT_TYPES = [

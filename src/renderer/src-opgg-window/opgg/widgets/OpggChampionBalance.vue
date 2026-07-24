@@ -33,14 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { getOpggAramBalanceAdjustments } from '@shared/data-adapter/opgg-aram-balance'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
 import { useOpgg } from '../context'
 
-const extraAssets = useExtraAssetsStore()
+const resources = useAkariResourceProvider()
 const { champion, mode } = useOpgg()
 
 const { t } = useTranslation()
@@ -50,7 +50,7 @@ const balance = computed(() => {
     return null
   }
 
-  return extraAssets.opggAramBalanceMap[champion.value.data.summary.id]
+  return resources.champions.aramBalance(champion.value.data.summary.id)
 })
 
 const formatter = new Intl.NumberFormat('en-US', {

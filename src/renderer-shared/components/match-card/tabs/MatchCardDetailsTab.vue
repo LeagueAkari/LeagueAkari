@@ -113,7 +113,7 @@
 
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { refDebounced } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -148,7 +148,7 @@ const handleHeaderWheel = (e: WheelEvent) => {
   })
 }
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const rawStats = useRawDetails()
 const valueRenderer = useValueRenderer()
 const filterText = shallowRef('')

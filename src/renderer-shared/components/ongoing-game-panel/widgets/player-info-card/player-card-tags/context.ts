@@ -1,5 +1,5 @@
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource/context'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource/context'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
@@ -15,7 +15,7 @@ export function usePlayerCardTagContext(puuid: string) {
     navigateToSummonerByPuuid,
     isStandaloneOngoingGameWindow
   } = useOngoingGamePanel()
-  const resources = useGameResourceProvider()
+  const resources = useAkariResourceProvider()
   const { masked } = useStreamerModeMaskedText()
 
   const analysis = computed(() => {

@@ -104,7 +104,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { useTranslation } from 'i18next-vue'
 import { NRadio, NRadioGroup, NScrollbar, NSlider } from 'naive-ui'
@@ -117,7 +117,7 @@ import { getTeamColor, playerColors, useWinResultTagClass } from '../../utils/th
 import { formatMilliseconds } from '../../utils/time'
 import MapPosition from '../../widgets/MapPosition.vue'
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 
 const { basicInfo, details, frames, participants, team, loadingDetails, loadDetails, hidePrivacy } =

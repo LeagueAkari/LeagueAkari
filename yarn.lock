@@ -1030,6 +1030,75 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dnd-kit/abstract@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/abstract@npm:0.5.0"
+  dependencies:
+    "@dnd-kit/geometry": "npm:^0.5.0"
+    "@dnd-kit/state": "npm:^0.5.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/f4aed8793b3a41ad03fd5ba0d55b72e49b4b693d25baa6836baf4452ef1fa7333d5192b4c176343259c59e16b0f5e8d5e7faefb3299ea01e00bd681ebfd6e984
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/collision@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/collision@npm:0.5.0"
+  dependencies:
+    "@dnd-kit/abstract": "npm:^0.5.0"
+    "@dnd-kit/geometry": "npm:^0.5.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/7dcf95e2b59d463eb1f0a1b750ef974efe4d442cce6bc4ef01be89941348c555ee406d2ce42589366ebce7acbe342431f5ea0a4b498b0251b7e094ff8b790147
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/dom@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/dom@npm:0.5.0"
+  dependencies:
+    "@dnd-kit/abstract": "npm:^0.5.0"
+    "@dnd-kit/collision": "npm:^0.5.0"
+    "@dnd-kit/geometry": "npm:^0.5.0"
+    "@dnd-kit/state": "npm:^0.5.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/a7084eb8ae9f4132c7b401e79b4482b2b85707f960df92043c3d3252d6f36eaaae2ed72157f46ee8fa7f340725621dfeb6cf268df82538dbf6130228b3a15444
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/geometry@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/geometry@npm:0.5.0"
+  dependencies:
+    "@dnd-kit/state": "npm:^0.5.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/8e9cba984511dd5a764a73df2246daf56bc665a8759dbf09085868cc10bef2267e7d2cd0b094f1cc5a883ce09cfb26800654d95d45f6f5e2e4a139f47874e006
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/state@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/state@npm:0.5.0"
+  dependencies:
+    "@preact/signals-core": "npm:^1.10.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/d453f3ad0d3ca08e9e87e6ff61f74f743f94ef7197bd4f249da5f39e7deed6d576f70127ba62d9328d4129ff89bd90f6e91cea6d633343e36426e75437347da0
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/vue@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@dnd-kit/vue@npm:0.5.0"
+  dependencies:
+    "@dnd-kit/abstract": "npm:^0.5.0"
+    "@dnd-kit/dom": "npm:^0.5.0"
+    "@dnd-kit/state": "npm:^0.5.0"
+    tslib: "npm:^2.6.2"
+  peerDependencies:
+    vue: ^3.5.0
+  checksum: 10c0/cdf355c408efdc8052a68da70cf54b83d947de77c5764a448854840bfc8549aabf2ae089ab5487e4ccef134eb1a0cc0d21dc9174810ffe28b0d11d8af0f5c6bb
+  languageName: node
+  linkType: hard
+
 "@electron-internal/extract-zip@npm:^1.0.1":
   version: 1.0.3
   resolution: "@electron-internal/extract-zip@npm:1.0.3"
@@ -2258,6 +2327,13 @@ __metadata:
   version: 1.0.0-next.29
   resolution: "@polka/url@npm:1.0.0-next.29"
   checksum: 10c0/0d58e081844095cb029d3c19a659bfefd09d5d51a2f791bc61eba7ea826f13d6ee204a8a448c2f5a855c17df07b37517373ff916dd05801063c0568ae9937684
+  languageName: node
+  linkType: hard
+
+"@preact/signals-core@npm:^1.10.0":
+  version: 1.14.4
+  resolution: "@preact/signals-core@npm:1.14.4"
+  checksum: 10c0/963622e5c1c98a6946ec1ad01e9901ebacf316ab0a7e3c56c6ebaefee5b2c8ea03c3bdb8ba74120612b5f8976f5dc94693134670e372dded79db9994045aadd1
   languageName: node
   linkType: hard
 
@@ -6843,6 +6919,7 @@ __metadata:
   dependencies:
     "@babel/runtime": "npm:^8.0.0"
     "@codemirror/lang-javascript": "npm:^6.2.5"
+    "@dnd-kit/vue": "npm:^0.5.0"
     "@electron-toolkit/preload": "npm:^3.0.2"
     "@electron-toolkit/tsconfig": "npm:^2.0.0"
     "@electron-toolkit/utils": "npm:^4.0.0"
@@ -9673,7 +9750,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.4.0, tslib@npm:^2.8.1":
+"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62

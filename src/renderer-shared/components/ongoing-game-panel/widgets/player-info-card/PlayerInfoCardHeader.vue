@@ -150,7 +150,7 @@ import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStreamerModeMaskedText } from '@renderer-shared/composables/useStreamerModeMaskedText'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { Edit20Filled } from '@vicons/fluent'
 import { MoreVertFilled as MoreVertFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
@@ -178,7 +178,7 @@ const {
   navigateToSummonerByPuuid,
   isStandaloneOngoingGameWindow
 } = useOngoingGamePanel()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const summoner = computed(() => ongoingGame.value.summoner[puuid])
 const summonerName = computed(() => summoner.value?.gameName || summoner.value?.displayName || '')

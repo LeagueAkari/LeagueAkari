@@ -94,7 +94,7 @@
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { JunglePathingContent } from '@renderer-shared/components/jungle-pathing-analysis'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
 import { NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, defineComponent, ref, type PropType, watch } from 'vue'
@@ -105,7 +105,7 @@ import type { AlgorithmDescriptionLine, JunglePathingInfoProps, JunglePathingTab
 const { aggregatedAnalysis, currentChampionId = null } = defineProps<JunglePathingInfoProps>()
 
 const { t } = useTranslation()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const AlgorithmLineText = defineComponent({
   props: {

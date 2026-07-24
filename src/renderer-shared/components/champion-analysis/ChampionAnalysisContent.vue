@@ -164,7 +164,7 @@
 import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import { JunglePathingContent } from '@renderer-shared/components/jungle-pathing-analysis'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource/context'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource/context'
 import type {
   AggregatedChampionAnalysis,
   AggregatedWinLossAnalysis,
@@ -200,7 +200,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useTranslation('common')
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const MetricCell = defineComponent({
   props: {

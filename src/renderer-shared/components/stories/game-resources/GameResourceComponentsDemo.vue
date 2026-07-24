@@ -2,7 +2,7 @@
   <div class="grid items-start gap-4">
     <StoryPanel
       title="LCU media"
-      description="Static assets are resolved by the Storybook GameResourceProvider from Community Dragon (raw.communitydragon.org). The champion image examples use real LCU asset paths; the video example uses a Community Dragon ability video because match-history fixtures do not include ability media paths."
+      description="Static assets are resolved by the Storybook AkariResourceProvider from Community Dragon (raw.communitydragon.org). The champion image examples use real LCU asset paths; the video example uses a Community Dragon ability video because match-history fixtures do not include ability media paths."
     >
       <div class="flex flex-wrap items-start gap-5">
         <div class="grid gap-2">

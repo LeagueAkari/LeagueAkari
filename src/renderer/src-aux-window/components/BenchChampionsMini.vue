@@ -133,8 +133,8 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useInstance } from '@renderer-shared/shards'
-import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -154,7 +154,7 @@ const componentName = useComponentName()
 const lcs = useLeagueClientStore()
 const lc = useInstance(LeagueClientRenderer)
 const logger = useInstance(LoggerRenderer)
-const extraAssets = useExtraAssetsStore()
+const resources = useAkariResourceProvider()
 
 const gameMode = computed(() => {
   if (!lcs.gameflow.session) {
@@ -209,7 +209,7 @@ const championAdjustment = (championId: number) => {
     return null
   }
 
-  const balance = extraAssets.opggAramBalanceMap[championId]
+  const balance = resources.champions.aramBalance(championId)
 
   if (!balance) {
     return null

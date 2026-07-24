@@ -5,8 +5,8 @@ import '@renderer-shared/assets/css/github-markdown.css'
 import '@renderer-shared/assets/css/lol-view.css'
 import '@renderer-shared/assets/css/theme-system.css'
 import { i18next } from '@renderer-shared/i18n'
-import { GameResourceProvider } from '@renderer-shared/providers/game-resource'
-import { createStorybookGameResourceProvider } from '@renderer-shared/providers/game-resource/storybook'
+import { AkariResourceProvider } from '@renderer-shared/providers/akari-resource'
+import { createStorybookAkariResourceProvider } from '@renderer-shared/providers/akari-resource/storybook'
 import {
   getNaiveUiLocale,
   getNaiveUiTheme,
@@ -77,7 +77,7 @@ const preview: Preview = {
     (story, context) => ({
       components: {
         Story: story(),
-        GameResourceProvider,
+        AkariResourceProvider,
         NConfigProvider,
         NDialogProvider,
         NMessageProvider,
@@ -106,7 +106,7 @@ const preview: Preview = {
 
           return '1120px'
         })
-        const gameResourceProvider = createStorybookGameResourceProvider({
+        const akariResourceProvider = createStorybookAkariResourceProvider({
           locale,
           colorMode: colorTheme
         })
@@ -123,7 +123,7 @@ const preview: Preview = {
           naiveUiTheme,
           naiveUiThemeOverrides,
           storyPanelMaxWidth,
-          gameResourceProvider
+          akariResourceProvider
         }
       },
       template: `
@@ -143,9 +143,9 @@ const preview: Preview = {
                     class="akari-story-panel"
                     :style="{ '--akari-story-panel-max-width': storyPanelMaxWidth }"
                   >
-                    <GameResourceProvider :value="gameResourceProvider">
+                    <AkariResourceProvider :value="akariResourceProvider">
                       <Story />
-                    </GameResourceProvider>
+                    </AkariResourceProvider>
                   </div>
                 </div>
               </NDialogProvider>

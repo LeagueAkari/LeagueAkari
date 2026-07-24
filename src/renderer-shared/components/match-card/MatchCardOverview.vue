@@ -435,7 +435,7 @@
 <script lang="ts" setup>
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { getCherryWinningTeamCount } from '@shared/data-adapter/match-history/cherry'
 import { Crown, Robot } from '@vicons/fa'
@@ -477,7 +477,7 @@ const { formatExtremeNumber } = useNumberFormatter()
 
 const gameResultName = useGameResultName()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 
 // 典型的 100 / 200 红蓝队方法

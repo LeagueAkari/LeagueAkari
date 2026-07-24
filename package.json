@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
+    "@dnd-kit/vue": "^0.5.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@electron/notarize": "^3.1.1",
     "@modyfi/vite-plugin-yaml": "^1.1.1",

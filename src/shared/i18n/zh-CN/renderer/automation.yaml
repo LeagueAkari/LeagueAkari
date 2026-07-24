@@ -191,6 +191,18 @@ automation:
     unselected: 未选择
     moveUp: 上移
     moveDown: 下移
+    candidateTitle: 候选英雄
+    selectedTitle: 已选英雄
+    positionFilter: 按“{{position}}”筛选
+    clear: 清空
+    clearConfirm: 确认清空全部已选英雄吗？
+    confirmClear: 确认清空
+    cancel: 取消
+    loading: 正在加载英雄数据
+    emptyCandidates: 暂无可选英雄
+    emptySelected: 暂无已选英雄
+    dragHandle: 拖动调整“{{champion}}”的顺序
+    remove: 移除“{{champion}}”
   champConfig:
     championConfig:
       targetMode: 目标模式

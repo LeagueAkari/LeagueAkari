@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useGameResourceProvider } from '../../../../providers/game-resource'
+import { useAkariResourceProvider } from '../../../../providers/akari-resource'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
@@ -48,7 +48,7 @@ const { puuid } = defineProps<{
 }>()
 
 const { mergedPremadeTeams } = useOngoingGamePanel()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const premadeTeamId = computed(() => mergedPremadeTeams.value.premadeTeamIdMap[puuid])
 

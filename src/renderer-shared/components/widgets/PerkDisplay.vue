@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -44,7 +44,7 @@ const {
   maxWidth?: number
 }>()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const perkDisplay = computed(() => {
   if (!perkId) {
     return null

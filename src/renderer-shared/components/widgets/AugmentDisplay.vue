@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
@@ -60,7 +60,7 @@ const { augmentId, size = 20 } = defineProps<{
   size?: number
 }>()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const augmentDisplay = computed(() => {
   if (!augmentId) {
     return null

@@ -54,7 +54,7 @@ import {
   ChampionMasteryContent
 } from '@renderer-shared/components/champion-analysis'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { StarRound as StarRoundIcon } from '@vicons/material'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
@@ -69,7 +69,7 @@ const { puuid } = defineProps<{
 
 const { ongoingGame, navigateToSummonerByPuuid, isStandaloneOngoingGameWindow } =
   useOngoingGamePanel()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const analysis = computed(() => ongoingGame.value.analysis?.players[puuid])
 const championMastery = computed(() => ongoingGame.value.championMastery[puuid])

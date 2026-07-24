@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { isSgpDetailedParticipantFrame } from '@shared/data-adapter/match-history/frames'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import {
@@ -125,7 +125,7 @@ ChartJS.register(
   ChartDataLabels
 )
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 
 const teamName = useTeamName()

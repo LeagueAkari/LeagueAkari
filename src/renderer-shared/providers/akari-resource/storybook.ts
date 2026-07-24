@@ -14,9 +14,9 @@ import type {
 import { type MaybeRefOrGetter, shallowRef, toValue, watchEffect } from 'vue'
 
 import type {
+  AkariResourceProviderValue,
   AugmentDisplayResource,
   ColorMode,
-  GameResourceProviderValue,
   ItemInlineResource,
   MapNameContext
 } from './types'
@@ -28,12 +28,12 @@ const LCU_ASSET_PREFIX = '/lol-game-data/assets/'
 const AKARI_PREFIX = 'akari://'
 const AKARI_LEAGUE_CLIENT_HOST = 'league-client'
 
-interface StorybookGameResourceProviderOptions {
+interface StorybookAkariResourceProviderOptions {
   locale: MaybeRefOrGetter<string>
   colorMode: MaybeRefOrGetter<ColorMode>
 }
 
-interface StorybookGameResourceState {
+interface StorybookAkariResourceState {
   champions: Map<number, ChampionSimple>
   queues: Map<number, Queue>
   maps: Map<number, GameMap>
@@ -49,7 +49,7 @@ interface PerkstylesPayload {
   styles: Style[]
 }
 
-function createEmptyState(): StorybookGameResourceState {
+function createEmptyState(): StorybookAkariResourceState {
   return {
     champions: new Map(),
     queues: new Map(),
@@ -95,9 +95,9 @@ async function fetchGameDataJson<T>(file: string, locale: string): Promise<T> {
   }
 }
 
-async function fetchStorybookGameResourceState(
+async function fetchStorybookAkariResourceState(
   locale: string
-): Promise<StorybookGameResourceState> {
+): Promise<StorybookAkariResourceState> {
   const [
     champions,
     queues,
@@ -188,9 +188,9 @@ function resolveCommunityDragonAssetUrl(source: string) {
   return `${CDRAGON_DEFAULT_ASSET_BASE}${normalizeLcuPath(pathOnly).toLowerCase()}`
 }
 
-export function createStorybookGameResourceProvider(
-  options: StorybookGameResourceProviderOptions
-): GameResourceProviderValue {
+export function createStorybookAkariResourceProvider(
+  options: StorybookAkariResourceProviderOptions
+): AkariResourceProviderValue {
   const state = shallowRef(createEmptyState())
   let loadingId = 0
 
@@ -198,7 +198,7 @@ export function createStorybookGameResourceProvider(
     const locale = toCommunityDragonLocale(toValue(options.locale))
     const currentLoadingId = ++loadingId
 
-    void fetchStorybookGameResourceState(locale)
+    void fetchStorybookAkariResourceState(locale)
       .then((nextState) => {
         if (currentLoadingId === loadingId) {
           state.value = nextState
@@ -269,6 +269,12 @@ export function createStorybookGameResourceProvider(
           source: 'lcu',
           variant: id === -1 ? 'unknown' : 'default'
         }
+      },
+      searchKeywords() {
+        return []
+      },
+      aramBalance() {
+        return null
       }
     },
 

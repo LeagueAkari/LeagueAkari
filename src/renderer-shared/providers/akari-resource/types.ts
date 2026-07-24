@@ -1,6 +1,6 @@
 export type ColorMode = 'light' | 'dark'
 
-export interface GameResourceProviderValue {
+export interface AkariResourceProviderValue {
   runtime: {
     readonly locale: string
     readonly colorMode: ColorMode
@@ -13,6 +13,8 @@ export interface GameResourceProviderValue {
   champions: {
     name(id: number): string
     icon(id: number): ChampionIconResource | null
+    searchKeywords(id: number): readonly string[]
+    aramBalance(id: number): ChampionAramBalanceResource | null
   }
 
   queues: {
@@ -56,6 +58,20 @@ export interface ChampionIconResource {
   iconPath: string
   source: 'lcu' | 'url'
   variant?: 'default' | 'bravery' | 'unknown'
+}
+
+export interface ChampionAramBalanceResource {
+  champion_id: number
+  attack_speed: number
+  damage_dealt: number
+  damage_taken: number
+  cooldown_reduction: number
+  healing: number
+  tenacity: number
+  shield_amount: number
+  energy_regen: number
+  area_of_effect_damage: number
+  default: boolean
 }
 
 export interface ItemInlineResource {

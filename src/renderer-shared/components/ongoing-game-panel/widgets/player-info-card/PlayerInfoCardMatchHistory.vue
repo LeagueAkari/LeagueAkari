@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -111,7 +111,7 @@ const { puuid } = defineProps<{
 const { t } = useTranslation()
 
 const { ongoingGame, previewGame } = useOngoingGamePanel()
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const matchHistoryData = computed(() => ongoingGame.value.matchHistory[puuid]?.data)
 const matchHistoryLoadingState = computed(() => ongoingGame.value.matchHistoryLoadingState[puuid])

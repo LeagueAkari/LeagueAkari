@@ -191,6 +191,18 @@ automation:
     unselected: Unselected
     moveUp: Move Up
     moveDown: Move Down
+    candidateTitle: Available Champions
+    selectedTitle: Selected Champions
+    positionFilter: Filter by {{position}}
+    clear: Clear
+    clearConfirm: Clear all selected champions?
+    confirmClear: Clear All
+    cancel: Cancel
+    loading: Loading champion data
+    emptyCandidates: No champions available
+    emptySelected: No champions selected
+    dragHandle: Drag to reorder “{{champion}}”
+    remove: Remove “{{champion}}”
   champConfig:
     championConfig:
       targetMode: Target Mode

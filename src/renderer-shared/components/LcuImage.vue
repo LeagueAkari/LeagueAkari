@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource/context'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource/context'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const url = ref<string | null>(null)
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 watchEffect(() => {
   if (!props.src) {

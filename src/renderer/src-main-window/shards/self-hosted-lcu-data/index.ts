@@ -4,6 +4,7 @@ import { Dep, Shard } from '@shared/akari-shard'
 import { SELF_HOSTED_LCU_DATA_RENDERER_NAMESPACE } from './context'
 import { watchFriendsUpdate } from './friends-watcher'
 import { watchQueuesUpdate } from './queues-watcher'
+import { watchRecommendedChampionPositionsUpdate } from './recommended-champion-positions-watcher'
 
 /**
  * 有一些数据可以仅放在渲染进程托管
@@ -19,5 +20,6 @@ export class SelfHostedLcuDataRenderer {
   ) {
     this._setupInAppScope.addSetupFn(() => watchFriendsUpdate())
     this._setupInAppScope.addSetupFn(() => watchQueuesUpdate())
+    this._setupInAppScope.addSetupFn(() => watchRecommendedChampionPositionsUpdate())
   }
 }

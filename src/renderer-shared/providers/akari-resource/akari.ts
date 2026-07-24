@@ -5,8 +5,8 @@ import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 
 import type {
+  AkariResourceProviderValue,
   AugmentDisplayResource,
-  GameResourceProviderValue,
   ItemInlineResource,
   MapNameContext
 } from './types'
@@ -20,7 +20,7 @@ function normalizeLcuPath(path: string) {
   return normalized.startsWith('/') ? normalized : `/${normalized}`
 }
 
-export function createAkariGameResourceProvider(): GameResourceProviderValue {
+export function createAkariResourceProvider(): AkariResourceProviderValue {
   const app = useAppCommonStore()
   const extra = useExtraAssetsStore()
   const leagueClient = useLeagueClientStore()
@@ -128,6 +128,12 @@ export function createAkariGameResourceProvider(): GameResourceProviderValue {
           source: 'lcu',
           variant: id === -1 ? 'unknown' : 'default'
         }
+      },
+      searchKeywords(id: number) {
+        return extra.heroListMap[id]?.keywords.split(',') ?? []
+      },
+      aramBalance(id: number) {
+        return extra.opggAramBalanceMap[id] ?? null
       }
     },
 

@@ -304,7 +304,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
@@ -371,7 +371,7 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   }
 })
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 
 const tone = computed(() => {

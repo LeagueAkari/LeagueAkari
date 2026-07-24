@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import {
   BarElement,
@@ -30,7 +30,7 @@ import { getTeamColor } from '../utils/theme'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title, ChartDataLabels)
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const { title = '', chartData = [] } = defineProps<{
   title?: string

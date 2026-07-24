@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameResourceProvider } from '@renderer-shared/providers/game-resource'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { computed } from 'vue'
 
 import LcuImage from '../LcuImage.vue'
@@ -36,7 +36,7 @@ const { championId = -1, stretched = true } = defineProps<{
   ringWidth?: number
 }>()
 
-const resources = useGameResourceProvider()
+const resources = useAkariResourceProvider()
 
 const imageSource = computed(() => resources.champions.icon(championId))
 </script>
