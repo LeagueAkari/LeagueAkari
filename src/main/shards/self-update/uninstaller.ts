@@ -6,13 +6,13 @@ import ofs from 'node:original-fs'
 import path from 'node:path'
 
 import {
-  EXECUTABLE_NAME,
   PLATFORM_UNSUPPORTED_REASON,
   type SelfUpdateActionResult,
   type SelfUpdateMainContext,
   UPDATE_EXECUTABLE_NAME
 } from './context'
 import { shouldUninstallWithUpdater } from './platform'
+import { createUninstallUpdaterArguments } from './updater-command'
 
 export class SelfUpdateUninstaller {
   constructor(private readonly _context: SelfUpdateMainContext) {}
@@ -37,19 +37,15 @@ export class SelfUpdateUninstaller {
 
     const c = cp.spawn(
       copiedExecutablePath,
-      [
-        `--lang=${this._context.appCommon.settings.locale}`,
-        `--executable="${EXECUTABLE_NAME}"`,
-        'uninstall',
-        `--app-id=${DEEP_LINK_PROTOCOL_PROD}`,
-        `--app-id=${DEEP_LINK_PROTOCOL_DEV}`,
-        `--dirs-to-remove="${appPath}"`,
-        `--dirs-to-remove="${dataPath}"`
-      ],
+      createUninstallUpdaterArguments({
+        locale: this._context.appCommon.settings.locale,
+        appIds: [DEEP_LINK_PROTOCOL_PROD, DEEP_LINK_PROTOCOL_DEV],
+        appPath,
+        dataPath
+      }),
       {
         detached: true,
         stdio: 'ignore',
-        shell: true,
         cwd: app.getPath('temp')
       }
     )

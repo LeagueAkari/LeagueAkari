@@ -25,6 +25,7 @@ import {
   shouldDownloadUpdateArchive,
   shouldLaunchUpdaterOnQuit
 } from './platform'
+import { createApplyUpdaterArguments } from './updater-command'
 
 interface UpdateJob {
   abortController: AbortController
@@ -383,19 +384,14 @@ export class SelfUpdateExecutor {
     const updateOnQuitFn = async () => {
       const c = cp.spawn(
         copiedExecutablePath,
-        [
-          `--lang=${appCommon.settings.locale}`,
-          `--executable="${EXECUTABLE_NAME}"`,
-          'apply',
-          `--archive="${archivePath}"`,
-          `--target="${appDir}"`,
-          '--delete-archive',
-          '--launch'
-        ],
+        createApplyUpdaterArguments({
+          locale: appCommon.settings.locale,
+          archivePath,
+          targetPath: appDir
+        }),
         {
           detached: true,
           stdio: 'ignore',
-          shell: true,
           cwd: app.getPath('temp')
         }
       )
