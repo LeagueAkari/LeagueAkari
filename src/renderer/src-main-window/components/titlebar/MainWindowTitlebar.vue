@@ -39,7 +39,7 @@ import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import CommonButtons from './CommonButtons.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
-import PlayerTabsTitle from './PlayerTabsTitle.vue'
+import PlayerTabsTitle from './player-tabs-title'
 import TrafficButtons from './TrafficButtons.vue'
 
 const route = useRoute()

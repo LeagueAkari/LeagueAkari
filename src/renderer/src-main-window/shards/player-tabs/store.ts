@@ -128,22 +128,18 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     return tabs.value.find((t) => t.puuid === puuid)
   }
 
-  const moveTabBefore = (fromTabId: string, toTabId: string) => {
-    if (fromTabId === toTabId) {
-      return
-    }
+  const moveTabToIndex = (tabId: string, toIndex: number) => {
+    const fromIndex = tabs.value.findIndex((tab) => tab.id === tabId)
 
-    const fromIndex = tabs.value.findIndex((t) => t.id === fromTabId)
-    const toIndex = tabs.value.findIndex((t) => t.id === toTabId)
-
-    if (fromIndex === -1 || toIndex === -1) {
+    if (fromIndex === -1) {
       return
     }
 
     const updatedTabs = [...tabs.value]
-    const [tab] = updatedTabs.splice(fromIndex, 1) // 移除 fromIndex 的元素
+    const [tab] = updatedTabs.splice(fromIndex, 1)
+    const targetIndex = Math.min(Math.max(toIndex, 0), updatedTabs.length)
 
-    updatedTabs.splice(toIndex, 0, tab)
+    updatedTabs.splice(targetIndex, 0, tab)
 
     tabs.value = updatedTabs
   }
@@ -212,7 +208,7 @@ export const usePlayerTabsStore = defineStore('shard:player-tabs-renderer', () =
     closeToTheRight: closeTabsToTheRight,
     canCloseOtherTabs,
     canCloseTabsToTheRight,
-    moveTabBefore,
+    moveTabToIndex,
 
     updateTabData
   }

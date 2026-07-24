@@ -49,6 +49,8 @@
   },
   "devDependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
+    "@dnd-kit/abstract": "^0.5.0",
+    "@dnd-kit/dom": "^0.5.0",
     "@dnd-kit/vue": "^0.5.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@electron/notarize": "^3.1.1",
