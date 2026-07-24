@@ -1,10 +1,12 @@
 import 'reflect-metadata'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
+import { Setting } from '../storage/entities/Settings'
 import {
   MIGRATION_FROM_143,
   getAutoMiscSettingMigrationTarget,
+  migrateOngoingGameSettingsFrom143,
   sanitizeShortcutSettingRecord,
   shouldResetInGameSendSetting
 } from './migrations/from-1-4-3'
@@ -12,6 +14,31 @@ import {
 describe('from 1.4.3 migration', () => {
   it('uses the 1.4.3 migration marker', () => {
     expect(MIGRATION_FROM_143).toBe('akari-migration-from-1.4.3_patch1')
+  })
+
+  it('adds the new player-card tag to the stored value instead of the Setting wrapper', async () => {
+    const manager = {
+      findOneBy: vi.fn().mockResolvedValue(
+        Setting.create('ongoing-game-main/playerCardTags', {
+          showMetTag: false
+        })
+      ),
+      save: vi.fn().mockResolvedValue(undefined)
+    }
+
+    await migrateOngoingGameSettingsFrom143({ manager } as unknown as Parameters<
+      typeof migrateOngoingGameSettingsFrom143
+    >[0])
+
+    expect(manager.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: 'ongoing-game-main/playerCardTags',
+        value: {
+          showMetTag: false,
+          showAverageKillDamageEfficiencyTag: true
+        }
+      })
+    )
   })
 })
 

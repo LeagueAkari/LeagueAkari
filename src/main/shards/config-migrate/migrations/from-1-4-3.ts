@@ -97,13 +97,13 @@ async function migrateMainWindowBackgroundSettingsFrom143({ manager }: Migration
   await manager.save(Setting.create('window-manager-main/backgroundMaterial', 'none'))
 }
 
-async function migrateOngoingGameSettingsFrom143({ manager }: MigrationContext) {
+export async function migrateOngoingGameSettingsFrom143({ manager }: MigrationContext) {
   const saved = await manager.findOneBy(Setting, { key: Equal('ongoing-game-main/playerCardTags') })
 
   if (saved) {
     await manager.save(
       Setting.create('ongoing-game-main/playerCardTags', {
-        ...saved,
+        ...saved.value,
         showAverageKillDamageEfficiencyTag: true
       })
     )

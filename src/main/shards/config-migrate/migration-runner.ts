@@ -5,6 +5,7 @@ import { migrateFrom135 } from './migrations/from-1-3-5'
 import { migrateFrom140 } from './migrations/from-1-4-0'
 import { migrateFrom141 } from './migrations/from-1-4-1'
 import { migrateFrom143 } from './migrations/from-1-4-3'
+import { migrateFrom150 } from './migrations/from-1-5-0'
 
 const MIGRATIONS = [
   migrateFrom126,
@@ -12,7 +13,8 @@ const MIGRATIONS = [
   migrateFrom135,
   migrateFrom140,
   migrateFrom141,
-  migrateFrom143
+  migrateFrom143,
+  migrateFrom150
 ]
 
 export async function runConfigMigrations(context: ConfigMigrateMainContext) {
