@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { runInAction } from 'mobx'
+import type { ZodIssue } from 'zod'
 
 import type {
   SettingChangeContext,
@@ -8,6 +9,7 @@ import type {
   SettingRestoreContext,
   SettingSchema
 } from '.'
+import type { AkariLogger } from '../logger-factory'
 
 export interface SetterSettingServiceSetConfig {
   /**
@@ -35,14 +37,18 @@ export class SetterSettingService<TSettings extends object = any> {
   static CONFIG_DIR_NAME = 'AkariConfig'
 
   private readonly _pendingStorageOperations = new Map<string, PendingStorageOperation>()
+  private readonly _defaults = new Map<SettingPath<TSettings>, TSettings[SettingPath<TSettings>]>()
 
   constructor(
     private readonly _settingFactory: SettingFactoryMain,
     private readonly _namespace: string,
     // for accessibility
     public readonly _schema: SettingSchema<TSettings>,
-    public readonly _obj: TSettings
-  ) {}
+    public readonly _obj: TSettings,
+    private readonly _logger: AkariLogger
+  ) {
+    this._validateDefaults()
+  }
 
   async _getFromStorage<T = any>(key: string): Promise<T | undefined>
   async _getFromStorage<T>(key: string, defaultValue: T): Promise<T>
@@ -156,15 +162,20 @@ export class SetterSettingService<TSettings extends object = any> {
   async _getAllFromStorage() {
     const items: Record<string, any> = {}
     const entries = Object.entries(this._schema) as Array<
-      [SettingPath<TSettings>, { default: TSettings[SettingPath<TSettings>] }]
+      [SettingPath<TSettings>, NonNullable<SettingSchema<TSettings>[SettingPath<TSettings>]>]
     >
-    const jobs = entries.map(async ([key, schema]) => {
-      if (!schema) {
+    const jobs = entries.map(async ([key, config]) => {
+      if (!config) {
         return
       }
 
-      const value = await this._getFromStorage(key as any, schema.default)
-      items[key] = await this._restoreSettingConfig(key, value)
+      if (!config.schema) {
+        const value = await this._getFromStorage(key as any, config.default)
+        items[key] = await this._restoreSettingConfig(key, value)
+        return
+      }
+
+      items[key] = await this._restoreValidatedSetting(key, config)
     })
     await Promise.all(jobs)
     return items
@@ -228,20 +239,22 @@ export class SetterSettingService<TSettings extends object = any> {
     key: K,
     newValue: TSettings[K]
   ) {
-    const schema = this._schema[key]
-    if (!schema) {
+    const config = this._schema[key]
+    if (!config) {
       return newValue
     }
 
     const oldValue = _.get(this._obj, key) as TSettings[K]
     let value = newValue
 
-    if (schema.transform) {
-      value = await schema.transform(this._createChangeContext(key, oldValue, value))
+    if (config.transform) {
+      value = await config.transform(this._createChangeContext(key, oldValue, value))
     }
 
+    value = this._parseOrDefault(key, value, 'set')
+
     const context = this._createChangeContext(key, oldValue, value)
-    await schema.sideEffect?.(context)
+    await config.sideEffect?.(context)
 
     return value
   }
@@ -250,12 +263,136 @@ export class SetterSettingService<TSettings extends object = any> {
     key: K,
     value: unknown
   ): Promise<TSettings[K]> {
-    const schema = this._schema[key]
-    if (!schema?.restore) {
+    const config = this._schema[key]
+    if (!config?.restore) {
       return value as TSettings[K]
     }
 
-    return schema.restore(this._createRestoreContext(key, value, schema.default as TSettings[K]))
+    return config.restore(this._createRestoreContext(key, value, this._getDefault(key)))
+  }
+
+  private _validateDefaults() {
+    const entries = Object.entries(this._schema) as Array<
+      [SettingPath<TSettings>, NonNullable<SettingSchema<TSettings>[SettingPath<TSettings>]>]
+    >
+
+    for (const [key, config] of entries) {
+      if (!config) {
+        continue
+      }
+
+      if (!config.schema) {
+        this._defaults.set(key, config.default)
+        continue
+      }
+
+      const result = config.schema.safeParse(config.default)
+      if (!result.success) {
+        throw new Error(
+          `Invalid default value for setting ${this._namespace}/${key}: ${this._formatIssues(result.error.issues)}`
+        )
+      }
+
+      this._defaults.set(key, result.data)
+    }
+  }
+
+  private async _restoreValidatedSetting<K extends SettingPath<TSettings>>(
+    key: K,
+    config: NonNullable<SettingSchema<TSettings>[K]>
+  ): Promise<TSettings[K]> {
+    const storedValue = await this._getFromStorage(key)
+    if (storedValue === undefined) {
+      return this._getDefault(key)
+    }
+
+    let restoredValue: unknown
+    try {
+      restoredValue = await this._restoreSettingConfig(key, storedValue)
+    } catch (error) {
+      this._warnFallback(key, 'restore', error)
+      await this._removeInvalidStoredValue(key)
+      return this._getDefault(key)
+    }
+
+    const result = config.schema!.safeParse(restoredValue)
+    if (!result.success) {
+      this._warnFallback(key, 'restore', result.error.issues)
+      await this._removeInvalidStoredValue(key)
+      return this._getDefault(key)
+    }
+
+    if (!_.isEqual(result.data, storedValue)) {
+      await this._writeNormalizedStoredValue(key, result.data)
+    }
+
+    return result.data
+  }
+
+  private _parseOrDefault<K extends SettingPath<TSettings>>(
+    key: K,
+    value: unknown,
+    source: 'set'
+  ): TSettings[K] {
+    const config = this._schema[key]
+    if (!config?.schema) {
+      return value as TSettings[K]
+    }
+
+    const result = config.schema.safeParse(value)
+    if (result.success) {
+      return result.data
+    }
+
+    this._warnFallback(key, source, result.error.issues)
+    return this._getDefault(key)
+  }
+
+  private _getDefault<K extends SettingPath<TSettings>>(key: K): TSettings[K] {
+    return this._defaults.get(key) as TSettings[K]
+  }
+
+  private async _removeInvalidStoredValue(key: string) {
+    try {
+      await this._removeFromStorage(key)
+    } catch (error) {
+      this._logger.warn(
+        'Failed to remove invalid setting value',
+        { namespace: this._namespace, key },
+        error
+      )
+    }
+  }
+
+  private async _writeNormalizedStoredValue(key: string, value: unknown) {
+    try {
+      if (value === null) {
+        await this._removeFromStorage(key)
+      } else {
+        await this._saveToStorage(key, value)
+      }
+    } catch (error) {
+      this._logger.warn(
+        'Failed to persist normalized setting value',
+        { namespace: this._namespace, key },
+        error
+      )
+    }
+  }
+
+  private _warnFallback(key: string, source: 'restore' | 'set', error: unknown) {
+    this._logger.warn('Invalid setting value, falling back to default', {
+      namespace: this._namespace,
+      key,
+      source,
+      issues: Array.isArray(error) ? this._formatIssues(error as ZodIssue[]) : String(error)
+    })
+  }
+
+  private _formatIssues(issues: ZodIssue[]) {
+    return issues
+      .map((issue) => `${issue.path.join('.') || '<root>'} [${issue.code}]: ${issue.message}`)
+      .join('; ')
   }
 
   private _createChangeContext<T>(key: string, oldValue: T, value: T): SettingChangeContext<T> {

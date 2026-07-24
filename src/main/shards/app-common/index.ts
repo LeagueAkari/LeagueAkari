@@ -1,9 +1,11 @@
 import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { APP_THEME_VALUES } from '@shared/types/app-theme'
 import { app, clipboard, shell } from 'electron'
 import { exec } from 'node:child_process'
 import os from 'node:os'
 import { promisify } from 'node:util'
+import { z } from 'zod'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
@@ -50,13 +52,29 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       AppCommonMain.id,
       {
-        showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
-        locale: { default: this._getSystemLocale() },
-        theme: { default: this.settings.theme },
-        httpProxy: { default: this.settings.httpProxy },
-        streamerMode: { default: this.settings.streamerMode },
-        streamerModeUseAkariStyledName: { default: this.settings.streamerModeUseAkariStyledName },
-        preferredLolSource: { default: this.settings.preferredLolSource }
+        showFreeSoftwareDeclaration: {
+          default: this.settings.showFreeSoftwareDeclaration,
+          schema: z.boolean()
+        },
+        locale: { default: this._getSystemLocale(), schema: z.string() },
+        theme: { default: this.settings.theme, schema: z.enum(APP_THEME_VALUES) },
+        httpProxy: {
+          default: this.settings.httpProxy,
+          schema: z.object({
+            strategy: z.enum(['force', 'auto', 'disable']),
+            port: z.number(),
+            host: z.string()
+          })
+        },
+        streamerMode: { default: this.settings.streamerMode, schema: z.boolean() },
+        streamerModeUseAkariStyledName: {
+          default: this.settings.streamerModeUseAkariStyledName,
+          schema: z.boolean()
+        },
+        preferredLolSource: {
+          default: this.settings.preferredLolSource,
+          schema: z.enum(['sgp', 'lcu'])
+        }
       },
       this.settings
     )

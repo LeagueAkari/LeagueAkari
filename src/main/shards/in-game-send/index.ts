@@ -1,5 +1,6 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { normalizeInGameSendFixedTextPresetItems } from '@shared/shards/in-game-send'
+import { z } from 'zod'
 
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
@@ -21,6 +22,12 @@ import { InGameSendIpcHandlers } from './ipc-handlers'
 import { InGameSendPresetController } from './preset-controller'
 import { InGameSendPresetSelectionController } from './preset-selection-controller'
 import { InGameSendExecutor } from './send-executor'
+import {
+  inGameSendFixedTextPresetItemsSchema,
+  inGameSendJunglePresetOptionsSchema,
+  inGameSendPremadePresetOptionsSchema,
+  inGameSendRatingPresetOptionsSchema
+} from './setting-schemas'
 import { InGameSendSettings, InGameSendState } from './state'
 
 /**
@@ -66,20 +73,28 @@ export class InGameSendMain implements IAkariShardInitDispose {
       {
         sendInterval: {
           default: this.settings.sendInterval,
+          schema: z.number(),
           transform: ({ value }) => Math.max(0, value)
         },
-        cancelShortcut: { default: this.settings.cancelShortcut },
+        cancelShortcut: {
+          default: this.settings.cancelShortcut,
+          schema: z.string().nullable()
+        },
         ratingPresetOptions: {
-          default: this.settings.ratingPresetOptions
+          default: this.settings.ratingPresetOptions,
+          schema: inGameSendRatingPresetOptionsSchema
         },
         junglePresetOptions: {
-          default: this.settings.junglePresetOptions
+          default: this.settings.junglePresetOptions,
+          schema: inGameSendJunglePresetOptionsSchema
         },
         premadePresetOptions: {
-          default: this.settings.premadePresetOptions
+          default: this.settings.premadePresetOptions,
+          schema: inGameSendPremadePresetOptionsSchema
         },
         fixedTextPresetItems: {
           default: this.settings.fixedTextPresetItems,
+          schema: inGameSendFixedTextPresetItemsSchema,
           transform: ({ value }) => normalizeInGameSendFixedTextPresetItems(value)
         }
       },

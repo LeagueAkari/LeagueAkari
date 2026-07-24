@@ -15,6 +15,7 @@ import { AutoSelectConfigManager } from './config-manager'
 import { AUTO_SELECT_MAIN_NAMESPACE, type AutoSelectMainContext } from './context'
 import { AutoSelectIpcHandlers } from './ipc-handlers'
 import { AutoSelectLocalMessageService } from './local-message-service'
+import { autoSelectBanConfigSchema, autoSelectPickConfigSchema } from './setting-schemas'
 import { AutoSelectSettings, AutoSelectState } from './state'
 import { AutoSelectTradeController } from './trade-controller'
 
@@ -56,8 +57,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       AutoSelectMain.id,
       {
-        pickConfig: { default: this.settings.pickConfig },
-        banConfig: { default: this.settings.banConfig }
+        pickConfig: { default: this.settings.pickConfig, schema: autoSelectPickConfigSchema },
+        banConfig: { default: this.settings.banConfig, schema: autoSelectBanConfigSchema }
       },
       this.settings
     )

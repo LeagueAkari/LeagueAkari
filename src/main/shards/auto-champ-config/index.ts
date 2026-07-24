@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { z } from 'zod'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -13,6 +14,7 @@ import {
   GAME_MODE_TYPE_MAP
 } from './context'
 import { AutoChampConfigIpcHandlers } from './ipc-handlers'
+import { championRunesV2PresetSchema, summonerSpellsPresetSchema } from './setting-schemas'
 import { AutoChampConfigSettings, ChampionRunesConfig, SummonerSpellsConfig } from './state'
 
 @Shard(AutoChampionConfigMain.id)
@@ -40,9 +42,12 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       AutoChampionConfigMain.id,
       {
-        enabled: { default: this.settings.enabled },
-        runesV2: { default: this.settings.runesV2 },
-        summonerSpells: { default: this.settings.summonerSpells }
+        enabled: { default: this.settings.enabled, schema: z.boolean() },
+        runesV2: { default: this.settings.runesV2, schema: championRunesV2PresetSchema },
+        summonerSpells: {
+          default: this.settings.summonerSpells,
+          schema: summonerSpellsPresetSchema
+        }
       },
       this.settings
     )

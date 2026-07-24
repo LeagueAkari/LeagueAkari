@@ -4,7 +4,7 @@ export const BUILTIN_DARK_THEME_IDS = ['dark', 'graphite', 'cyber', 'aurora'] as
 
 const APP_THEME_IDS = [...BUILTIN_LIGHT_THEME_IDS, ...BUILTIN_DARK_THEME_IDS] as const
 
-const APP_THEME_VALUES = ['default', ...APP_THEME_IDS] as const
+export const APP_THEME_VALUES = ['default', ...APP_THEME_IDS] as const
 
 export type AppThemeSetting = (typeof APP_THEME_VALUES)[number]
 export type AppThemeId = (typeof APP_THEME_IDS)[number]

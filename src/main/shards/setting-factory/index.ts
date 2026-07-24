@@ -1,6 +1,8 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import type { ZodType } from 'zod'
 
 import { AkariIpcMain } from '../ipc'
+import { type AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
 import { SETTING_FACTORY_MAIN_NAMESPACE, type SettingFactoryMainContext } from './context'
@@ -28,6 +30,14 @@ export interface SettingConfig<T = any> {
    * 这个设置项的默认值
    */
   default: T
+
+  /**
+   * 设置项持久化值应满足的结构
+   *
+   * 未提供时维持旧有行为，不进行结构校验或纠错
+   * restore / transform 会先于校验执行；校验失败时回退到经过校验的 default
+   */
+  schema?: ZodType<T>
 
   /**
    * 从持久化存储恢复到运行时状态前处理旧数据或不兼容数据
@@ -68,14 +78,17 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
   private readonly _context: SettingFactoryMainContext
   private readonly _settingsJsonFileService: SettingsJsonFileService
   private readonly _ipcHandlers: SettingFactoryIpcHandlers
+  private readonly _logger: AkariLogger
 
   readonly _delayed = new DelayedTaskScheduler()
 
   constructor(
     private readonly _ipc: AkariIpcMain,
     private readonly _storage: StorageMain,
-    private readonly _shared: SharedGlobalShard
+    private readonly _shared: SharedGlobalShard,
+    loggerFactory: LoggerFactoryMain
   ) {
+    this._logger = loggerFactory.create(SettingFactoryMain.id)
     this._context = {
       namespace: SettingFactoryMain.id,
       ipc: this._ipc,
@@ -99,7 +112,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       throw new Error(`namespace ${namespace} already created`)
     }
 
-    const service = new SetterSettingService(this, namespace, schema, obj)
+    const service = new SetterSettingService(this, namespace, schema, obj, this._logger)
 
     this._settings.set(namespace, service)
     return service

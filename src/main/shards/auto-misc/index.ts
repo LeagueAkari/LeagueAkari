@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { z } from 'zod'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -40,14 +41,41 @@ export class AutoMiscMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       AutoMiscMain.id,
       {
-        autoReplyEnabled: { default: this.settings.autoReplyEnabled },
-        autoReplyEnableOnAway: { default: this.settings.autoReplyEnableOnAway },
-        autoReplyText: { default: this.settings.autoReplyText },
-        lockOfflineStatus: { default: this.settings.lockOfflineStatus },
-        autoSetStatusMessageEnabled: { default: this.settings.autoSetStatusMessageEnabled },
-        statusMessage: { default: this.settings.statusMessage },
-        autoSetRankedStatusEnabled: { default: this.settings.autoSetRankedStatusEnabled },
-        rankedStatus: { default: this.settings.rankedStatus }
+        autoReplyEnabled: { default: this.settings.autoReplyEnabled, schema: z.boolean() },
+        autoReplyEnableOnAway: {
+          default: this.settings.autoReplyEnableOnAway,
+          schema: z.boolean()
+        },
+        autoReplyText: { default: this.settings.autoReplyText, schema: z.string() },
+        lockOfflineStatus: { default: this.settings.lockOfflineStatus, schema: z.boolean() },
+        autoSetStatusMessageEnabled: {
+          default: this.settings.autoSetStatusMessageEnabled,
+          schema: z.boolean()
+        },
+        statusMessage: { default: this.settings.statusMessage, schema: z.string() },
+        autoSetRankedStatusEnabled: {
+          default: this.settings.autoSetRankedStatusEnabled,
+          schema: z.boolean()
+        },
+        rankedStatus: {
+          default: this.settings.rankedStatus,
+          schema: z.object({
+            queue: z.string(),
+            tier: z.enum([
+              'IRON',
+              'BRONZE',
+              'SILVER',
+              'GOLD',
+              'PLATINUM',
+              'EMERALD',
+              'DIAMOND',
+              'MASTER',
+              'GRANDMASTER',
+              'CHALLENGER'
+            ]),
+            division: z.enum(['I', 'II', 'III', 'IV'])
+          })
+        }
       },
       this.settings
     )

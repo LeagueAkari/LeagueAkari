@@ -4,6 +4,7 @@ import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
 import { sleep } from '@shared/utils/sleep'
 import { comparer, computed } from 'mobx'
+import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -53,12 +54,16 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       settingSchema: {
         pinned: {
           default: settings.pinned,
+          schema: z.boolean(),
           transform: () => true
         },
-        enabled: { default: settings.enabled },
-        showShortcut: { default: settings.showShortcut },
-        timerType: { default: settings.timerType },
-        reverseAdjustmentDirection: { default: settings.reverseAdjustmentDirection }
+        enabled: { default: settings.enabled, schema: z.boolean() },
+        showShortcut: { default: settings.showShortcut, schema: z.string().nullable() },
+        timerType: { default: settings.timerType, schema: z.enum(['countdown', 'countup']) },
+        reverseAdjustmentDirection: {
+          default: settings.reverseAdjustmentDirection,
+          schema: z.boolean()
+        }
       },
       browserWindowOptions: {
         title: AkariCdTimerWindow.TITLE,

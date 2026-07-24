@@ -9,6 +9,7 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
 import https from 'https'
+import { z } from 'zod'
 
 import { ClientInstallationMain } from '../client-installation'
 import { AkariIpcMain } from '../ipc'
@@ -77,9 +78,13 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       GameClientMain.id,
       {
-        terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },
+        terminateGameClientWithShortcut: {
+          default: this.settings.terminateGameClientWithShortcut,
+          schema: z.boolean()
+        },
         terminateShortcut: {
           default: this.settings.terminateShortcut,
+          schema: z.string().nullable(),
           sideEffect: ({ value }) =>
             this._shortcutController.applyTerminateShortcutSettingSideEffect(value)
         }

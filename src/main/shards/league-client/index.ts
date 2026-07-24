@@ -16,6 +16,7 @@ import https from 'node:https'
 import path from 'node:path'
 import PQueue from 'p-queue'
 import WebSocket from 'ws'
+import { z } from 'zod'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
@@ -113,7 +114,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       LeagueClientMain.id,
       {
-        autoConnect: { default: this.settings.autoConnect }
+        autoConnect: { default: this.settings.autoConnect, schema: z.boolean() }
       },
       this.settings
     )

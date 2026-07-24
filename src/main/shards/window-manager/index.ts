@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { z } from 'zod'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -56,8 +57,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       WindowManagerMain.id,
       {
-        backgroundMaterial: { default: this.settings.backgroundMaterial },
-        contentProtection: { default: this.settings.contentProtection }
+        backgroundMaterial: {
+          default: this.settings.backgroundMaterial,
+          schema: z.enum(['mica', 'none'])
+        },
+        contentProtection: { default: this.settings.contentProtection, schema: z.boolean() }
       },
       this.settings
     )

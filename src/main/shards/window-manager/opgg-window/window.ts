@@ -1,6 +1,7 @@
 import { GameClientMain } from '@main/shards/game-client'
 import icon from '@resources/OPGG_ICON.ico?asset'
 import { comparer, computed } from 'mobx'
+import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -32,9 +33,9 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       rememberSize: true,
       repositionWindowIfInvisible: true,
       settingSchema: {
-        enabled: { default: settings.enabled },
-        autoShow: { default: settings.autoShow },
-        showShortcut: { default: settings.showShortcut }
+        enabled: { default: settings.enabled, schema: z.boolean() },
+        autoShow: { default: settings.autoShow, schema: z.boolean() },
+        showShortcut: { default: settings.showShortcut, schema: z.string().nullable() }
       },
       browserWindowOptions: {
         title: AkariOpggWindow.TITLE,

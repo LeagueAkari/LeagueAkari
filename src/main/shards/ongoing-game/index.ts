@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { QueueKeeper } from '@shared/utils/queue-keeper'
 import { comparer } from 'mobx'
+import { z } from 'zod'
 
 import { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
@@ -23,6 +24,7 @@ import {
 import { OngoingGameIpcHandlers } from './ipc-handlers'
 import { OngoingGameMatchHistoryLoader } from './match-history-loader'
 import { OngoingGamePlayerDataLoader } from './player-data-loader'
+import { ongoingGamePlayerCardTagsSchema } from './setting-schemas'
 import { OngoingGameSideEffectsController } from './side-effects-controller'
 import { OngoingGameSettings, OngoingGameState } from './state'
 
@@ -67,10 +69,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       OngoingGameMain.id,
       {
-        concurrency: { default: this.settings.concurrency },
-        enabled: { default: this.settings.enabled },
+        concurrency: { default: this.settings.concurrency, schema: z.number() },
+        enabled: { default: this.settings.enabled, schema: z.boolean() },
         matchHistoryLoadCount: {
           default: this.settings.matchHistoryLoadCount,
+          schema: z.number(),
           transform: ({ value, oldValue }) => {
             if (value >= 1 && value <= 200) {
               return value
@@ -85,9 +88,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             )
           }
         },
-        matchHistoryTagPreference: { default: this.settings.matchHistoryTagPreference },
+        matchHistoryTagPreference: {
+          default: this.settings.matchHistoryTagPreference,
+          schema: z.enum(['current', 'all'])
+        },
         gameDetailsLoadCount: {
           default: this.settings.gameDetailsLoadCount,
+          schema: z.number(),
           transform: ({ value }) => {
             if (value >= 0 && value <= this.settings.matchHistoryLoadCount) {
               return value
@@ -96,18 +103,38 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             return this.settings.matchHistoryLoadCount
           }
         },
-        orderPlayerBy: { default: this.settings.orderPlayerBy },
-        showChampionUsage: { default: this.settings.showChampionUsage },
-        showMatchHistoryItemBorder: { default: this.settings.showMatchHistoryItemBorder },
-        showJunglePathing: { default: this.settings.showJunglePathing },
-        showJunglePathingForAllPlayers: {
-          default: this.settings.showJunglePathingForAllPlayers
+        orderPlayerBy: {
+          default: this.settings.orderPlayerBy,
+          schema: z.enum(['win-rate', 'kda', 'default', 'akari-score', 'position', 'premade-team'])
         },
-        autoRouteWhenGameStarts: { default: this.settings.autoRouteWhenGameStarts },
-        playerCardTags: { default: this.settings.playerCardTags },
-        queryInLobbyPhase: { default: this.settings.queryInLobbyPhase },
+        showChampionUsage: {
+          default: this.settings.showChampionUsage,
+          schema: z.enum(['recent', 'mastery', 'none'])
+        },
+        showMatchHistoryItemBorder: {
+          default: this.settings.showMatchHistoryItemBorder,
+          schema: z.boolean()
+        },
+        showJunglePathing: { default: this.settings.showJunglePathing, schema: z.boolean() },
+        showJunglePathingForAllPlayers: {
+          default: this.settings.showJunglePathingForAllPlayers,
+          schema: z.boolean()
+        },
+        autoRouteWhenGameStarts: {
+          default: this.settings.autoRouteWhenGameStarts,
+          schema: z.boolean()
+        },
+        playerCardTags: {
+          default: this.settings.playerCardTags,
+          schema: ongoingGamePlayerCardTagsSchema
+        },
+        queryInLobbyPhase: {
+          default: this.settings.queryInLobbyPhase,
+          schema: z.boolean()
+        },
         premadeTeamInferMatchCountThreshold: {
-          default: this.settings.premadeTeamInferMatchCountThreshold
+          default: this.settings.premadeTeamInferMatchCountThreshold,
+          schema: z.number()
         }
       },
       this.settings

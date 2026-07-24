@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { z } from 'zod'
 
 import { GameClientMain } from '../game-client'
 import { LeagueClientMain } from '../league-client'
@@ -41,6 +42,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       {
         enabled: {
           default: false,
+          schema: z.boolean(),
           sideEffect: ({ value }) => this._controller.applyEnabledSettingSideEffect(value)
         }
       },

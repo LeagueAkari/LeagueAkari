@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { z } from 'zod'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -63,39 +64,86 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       AutoGameflowMain.id,
       {
-        autoAcceptDelaySeconds: { default: this.settings.autoAcceptDelaySeconds },
+        autoAcceptDelaySeconds: {
+          default: this.settings.autoAcceptDelaySeconds,
+          schema: z.number()
+        },
         autoAcceptEnabled: {
           default: this.settings.autoAcceptEnabled,
+          schema: z.boolean(),
           sideEffect: ({ value }) => {
             if (!value) {
               this._actionController.cancelAutoAccept('normal')
             }
           }
         },
-        autoHonorEnabled: { default: this.settings.autoHonorEnabled },
-        autoHonorStrategy: { default: this.settings.autoHonorStrategy },
-        autoMatchmakingDelaySeconds: { default: this.settings.autoMatchmakingDelaySeconds },
-        autoMatchmakingEnabled: { default: this.settings.autoMatchmakingEnabled },
-        autoMatchmakingMaximumMatchDuration: {
-          default: this.settings.autoMatchmakingMaximumMatchDuration
+        autoHonorEnabled: { default: this.settings.autoHonorEnabled, schema: z.boolean() },
+        autoHonorStrategy: {
+          default: this.settings.autoHonorStrategy,
+          schema: z.enum([
+            'prefer-lobby-member',
+            'only-lobby-member',
+            'all-member',
+            'opt-out',
+            'all-member-including-opponent'
+          ])
         },
-        autoMatchmakingMinimumMembers: { default: this.settings.autoMatchmakingMinimumMembers },
-        playAgainEnabled: { default: this.settings.playAgainEnabled },
-        autoReconnectEnabled: { default: this.settings.autoReconnectEnabled },
+        autoMatchmakingDelaySeconds: {
+          default: this.settings.autoMatchmakingDelaySeconds,
+          schema: z.number()
+        },
+        autoMatchmakingEnabled: {
+          default: this.settings.autoMatchmakingEnabled,
+          schema: z.boolean()
+        },
+        autoMatchmakingMaximumMatchDuration: {
+          default: this.settings.autoMatchmakingMaximumMatchDuration,
+          schema: z.number()
+        },
+        autoMatchmakingMinimumMembers: {
+          default: this.settings.autoMatchmakingMinimumMembers,
+          schema: z.number()
+        },
+        playAgainEnabled: { default: this.settings.playAgainEnabled, schema: z.boolean() },
+        autoReconnectEnabled: {
+          default: this.settings.autoReconnectEnabled,
+          schema: z.boolean()
+        },
         autoMatchmakingRematchFixedDuration: {
-          default: this.settings.autoMatchmakingRematchFixedDuration
+          default: this.settings.autoMatchmakingRematchFixedDuration,
+          schema: z.number()
         },
         autoSkipLeaderEnabled: {
-          default: this.settings.autoSkipLeaderEnabled
+          default: this.settings.autoSkipLeaderEnabled,
+          schema: z.boolean()
         },
-        autoMatchmakingRematchStrategy: { default: this.settings.autoMatchmakingRematchStrategy },
-        autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
-        autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
-        invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies },
-        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway },
-        autoSendARAMTeamSideEnabled: { default: this.settings.autoSendARAMTeamSideEnabled },
+        autoMatchmakingRematchStrategy: {
+          default: this.settings.autoMatchmakingRematchStrategy,
+          schema: z.enum(['never', 'fixed-duration', 'estimated-duration'])
+        },
+        autoMatchmakingWaitForInvitees: {
+          default: this.settings.autoMatchmakingWaitForInvitees,
+          schema: z.boolean()
+        },
+        autoHandleInvitationsEnabled: {
+          default: this.settings.autoHandleInvitationsEnabled,
+          schema: z.boolean()
+        },
+        invitationHandlingStrategies: {
+          default: this.settings.invitationHandlingStrategies,
+          schema: z.record(z.string(), z.string())
+        },
+        rejectInvitationWhenAway: {
+          default: this.settings.rejectInvitationWhenAway,
+          schema: z.boolean()
+        },
+        autoSendARAMTeamSideEnabled: {
+          default: this.settings.autoSendARAMTeamSideEnabled,
+          schema: z.boolean()
+        },
         autoSendARAMTeamSideVisibleToTeam: {
-          default: this.settings.autoSendARAMTeamSideVisibleToTeam
+          default: this.settings.autoSendARAMTeamSideVisibleToTeam,
+          schema: z.boolean()
         }
       },
       this.settings

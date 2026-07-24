@@ -13,15 +13,25 @@ export const PLAYER_CARD_TAGS_SETTING_KEY = 'ongoing-game-main/playerCardTags'
 const PLAYER_CARD_TAG_SETTING_KEYS = Object.keys(
   DEFAULT_ONGOING_GAME_PANEL_PLAYER_CARD_TAG_SETTINGS
 ) as Array<keyof OngoingGamePanelPlayerCardTagSettings>
+const PLAYER_CARD_TAG_SETTING_KEY_SET = new Set<string>(PLAYER_CARD_TAG_SETTING_KEYS)
+const PLAYER_CARD_TAG_NON_SETTING_KEYS = new Set([
+  'key',
+  'value',
+  'showSoloDeathsTag',
+  '__proto__',
+  'prototype',
+  'constructor'
+])
 
 type UnknownRecord = Record<string, unknown>
+type ExtensiblePlayerCardTagSettings = OngoingGamePanelPlayerCardTagSettings & UnknownRecord
 
 function isUnknownRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function applyRecognizedPlayerCardTagSettings(
-  target: OngoingGamePanelPlayerCardTagSettings,
+function applyPlayerCardTagSettings(
+  target: ExtensiblePlayerCardTagSettings,
   source: UnknownRecord
 ) {
   if (
@@ -37,6 +47,14 @@ function applyRecognizedPlayerCardTagSettings(
       target[key] = value
     }
   }
+
+  for (const [key, value] of Object.entries(source)) {
+    if (PLAYER_CARD_TAG_SETTING_KEY_SET.has(key) || PLAYER_CARD_TAG_NON_SETTING_KEYS.has(key)) {
+      continue
+    }
+
+    target[key] = value
+  }
 }
 
 /**
@@ -45,7 +63,7 @@ function applyRecognizedPlayerCardTagSettings(
  * 用户在升级后仍可能修改外层的开关，因此先恢复内层原值，再让外层已修改的开关覆盖它。
  */
 export function repairPlayerCardTagsSetting(value: unknown): OngoingGamePanelPlayerCardTagSettings {
-  const repaired: OngoingGamePanelPlayerCardTagSettings = {
+  const repaired: ExtensiblePlayerCardTagSettings = {
     ...DEFAULT_ONGOING_GAME_PANEL_PLAYER_CARD_TAG_SETTINGS
   }
 
@@ -54,10 +72,10 @@ export function repairPlayerCardTagsSetting(value: unknown): OngoingGamePanelPla
   }
 
   if (isUnknownRecord(value.value)) {
-    applyRecognizedPlayerCardTagSettings(repaired, value.value)
+    applyPlayerCardTagSettings(repaired, value.value)
   }
 
-  applyRecognizedPlayerCardTagSettings(repaired, value)
+  applyPlayerCardTagSettings(repaired, value)
   return repaired
 }
 

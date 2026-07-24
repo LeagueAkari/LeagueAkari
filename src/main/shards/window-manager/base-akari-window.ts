@@ -14,6 +14,7 @@ import {
 import { comparer, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
 import path from 'node:path'
+import { z } from 'zod'
 
 import type { WindowManagerMain } from '.'
 import { AkariProtocolMain } from '../akari-protocol'
@@ -172,8 +173,8 @@ export abstract class BaseAkariWindow<
       this._namespace,
       {
         // @ts-ignore
-        pinned: { default: this.settings.pinned },
-        opacity: { default: this.settings.opacity },
+        pinned: { default: this.settings.pinned, schema: z.boolean() },
+        opacity: { default: this.settings.opacity, schema: z.number() },
         ...this._config.settingSchema
       },
       this.settings

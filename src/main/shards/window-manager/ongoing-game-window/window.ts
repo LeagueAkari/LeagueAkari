@@ -3,6 +3,7 @@ import { NATIVE_SUPPORT } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
 import icon from '@resources/LA_ICON.ico?asset'
 import { comparer } from 'mobx'
+import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -38,10 +39,11 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       settingSchema: {
         pinned: {
           default: settings.pinned,
+          schema: z.boolean(),
           transform: () => true
         },
-        enabled: { default: settings.enabled },
-        showShortcut: { default: settings.showShortcut }
+        enabled: { default: settings.enabled, schema: z.boolean() },
+        showShortcut: { default: settings.showShortcut, schema: z.string().nullable() }
       },
       browserWindowOptions: {
         title: AkariOngoingGameWindow.TITLE,

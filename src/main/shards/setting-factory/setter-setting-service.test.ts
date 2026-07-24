@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import type { SettingPath, SettingSchema } from '.'
 import { SetterSettingService } from './setter-setting-service'
@@ -32,14 +33,38 @@ function createService<T extends object>(
     jsonConfigFileExists: vi.fn(),
     deleteJsonConfigFile: vi.fn()
   }
+  const logger = {
+    warn: vi.fn()
+  }
 
   return {
-    service: new SetterSettingService(settingFactory as any, 'test-main', schema, obj),
-    settingFactory
+    service: new SetterSettingService(
+      settingFactory as any,
+      'test-main',
+      schema,
+      obj,
+      logger as any
+    ),
+    settingFactory,
+    logger
   }
 }
 
 describe('SetterSettingService', () => {
+  it('rejects invalid code defaults when a schema is declared', () => {
+    expect(() =>
+      createService(
+        {
+          count: {
+            default: 'invalid' as unknown as number,
+            schema: z.number()
+          }
+        },
+        { count: 1 }
+      )
+    ).toThrow('Invalid default value for setting test-main/count')
+  })
+
   it('applies storage values as-is without restore', async () => {
     const obj = { tags: { enabled: true, showSelf: true } }
     const { service, settingFactory } = createService(
@@ -58,6 +83,137 @@ describe('SetterSettingService', () => {
 
     expect(obj.tags).toEqual({ enabled: false })
     expect(settingFactory._delayed.add).not.toHaveBeenCalled()
+  })
+
+  it('uses a schema default without storage correction when no value is stored', async () => {
+    const obj = { enabled: false }
+    const { service, settingFactory, logger } = createService(
+      {
+        enabled: {
+          default: true,
+          schema: z.boolean()
+        }
+      },
+      obj
+    )
+
+    await service.applyToState()
+
+    expect(obj.enabled).toBe(true)
+    expect(settingFactory._saveToStorage).not.toHaveBeenCalled()
+    expect(settingFactory._removeFromStorage).not.toHaveBeenCalled()
+    expect(logger.warn).not.toHaveBeenCalled()
+  })
+
+  it('validates restored values and writes normalized output back immediately', async () => {
+    const obj = { tags: { enabled: true, showSelf: true } }
+    const { service, settingFactory, logger } = createService(
+      {
+        tags: {
+          default: obj.tags,
+          schema: z.object({
+            enabled: z.boolean(),
+            showSelf: z.boolean()
+          }),
+          restore: ({ value, defaultValue }) => ({
+            ...defaultValue,
+            ...(value as Partial<typeof defaultValue>)
+          })
+        }
+      },
+      obj,
+      {
+        tags: { enabled: false, legacy: true }
+      }
+    )
+
+    await service.applyToState()
+
+    expect(obj.tags).toEqual({ enabled: false, showSelf: true })
+    expect(settingFactory._saveToStorage).toHaveBeenCalledWith('test-main', 'tags', {
+      enabled: false,
+      showSelf: true
+    })
+    expect(settingFactory._delayed.add).not.toHaveBeenCalled()
+    expect(logger.warn).not.toHaveBeenCalled()
+  })
+
+  it('removes invalid stored values and falls back to the schema default', async () => {
+    const obj = { enabled: false }
+    const { service, settingFactory, logger } = createService(
+      {
+        enabled: {
+          default: true,
+          schema: z.boolean()
+        }
+      },
+      obj,
+      {
+        enabled: 'definitely'
+      }
+    )
+
+    await service.applyToState()
+
+    expect(obj.enabled).toBe(true)
+    expect(settingFactory._removeFromStorage).toHaveBeenCalledWith('test-main', 'enabled')
+    expect(logger.warn).toHaveBeenCalledTimes(1)
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Invalid setting value, falling back to default',
+      expect.objectContaining({
+        namespace: 'test-main',
+        key: 'enabled',
+        source: 'restore'
+      })
+    )
+  })
+
+  it('falls back when restore cannot handle a stored value', async () => {
+    const obj = { count: 0 }
+    const { service, settingFactory, logger } = createService(
+      {
+        count: {
+          default: 1,
+          schema: z.number(),
+          restore: () => {
+            throw new Error('unrecognized legacy value')
+          }
+        }
+      },
+      obj,
+      { count: 'legacy' }
+    )
+
+    await service.applyToState()
+
+    expect(obj.count).toBe(1)
+    expect(settingFactory._removeFromStorage).toHaveBeenCalledWith('test-main', 'count')
+    expect(logger.warn).toHaveBeenCalledTimes(1)
+  })
+
+  it('still applies the default when removing an invalid stored value fails', async () => {
+    const obj = { enabled: false }
+    const { service, settingFactory, logger } = createService(
+      {
+        enabled: {
+          default: true,
+          schema: z.boolean()
+        }
+      },
+      obj,
+      { enabled: 'invalid' }
+    )
+    settingFactory._removeFromStorage.mockRejectedValueOnce(new Error('storage unavailable'))
+
+    await service.applyToState()
+
+    expect(obj.enabled).toBe(true)
+    expect(logger.warn).toHaveBeenCalledTimes(2)
+    expect(logger.warn).toHaveBeenLastCalledWith(
+      'Failed to remove invalid setting value',
+      expect.objectContaining({ namespace: 'test-main', key: 'enabled' }),
+      expect.any(Error)
+    )
   })
 
   it('uses explicit restore output before applying storage values to state', async () => {
@@ -110,6 +266,59 @@ describe('SetterSettingService', () => {
       expect.any(Function),
       1000
     )
+  })
+
+  it('validates transformed values before side effects and falls back on invalid input', async () => {
+    const obj = { count: 1 }
+    const sideEffect = vi.fn()
+    const { service, settingFactory, logger } = createService(
+      {
+        count: {
+          default: 1,
+          schema: z.number(),
+          transform: ({ value }) => value,
+          sideEffect
+        }
+      },
+      obj
+    )
+
+    await service.set('count', 'invalid' as unknown as number)
+
+    expect(obj.count).toBe(1)
+    expect(sideEffect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        oldValue: 1,
+        value: 1
+      })
+    )
+    expect(settingFactory._delayed.add).toHaveBeenCalledWith(
+      'test-main/count',
+      expect.any(Function),
+      1000
+    )
+    expect(logger.warn).toHaveBeenCalledTimes(1)
+  })
+
+  it('commits parsed output instead of the unrecognized parts of a valid input', async () => {
+    const obj = { options: { enabled: false } }
+    const sideEffect = vi.fn()
+    const { service, logger } = createService(
+      {
+        options: {
+          default: obj.options,
+          schema: z.object({ enabled: z.boolean() }),
+          sideEffect
+        }
+      },
+      obj
+    )
+
+    await service.set('options', { enabled: true, legacy: true } as typeof obj.options)
+
+    expect(obj.options).toEqual({ enabled: true })
+    expect(sideEffect).toHaveBeenCalledWith(expect.objectContaining({ value: { enabled: true } }))
+    expect(logger.warn).not.toHaveBeenCalled()
   })
 
   it('runs side effects before commit with transformed value', async () => {

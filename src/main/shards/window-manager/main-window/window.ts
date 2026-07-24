@@ -1,6 +1,7 @@
 import icon from '@resources/LA_ICON.ico?asset'
 import { Event } from 'electron'
 import { comparer } from 'mobx'
+import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -31,7 +32,10 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       rememberSize: true,
       repositionWindowIfInvisible: true,
       settingSchema: {
-        closeAction: { default: settings.closeAction }
+        closeAction: {
+          default: settings.closeAction,
+          schema: z.enum(['minimize-to-tray', 'quit', 'ask'])
+        }
       },
       browserWindowOptions: {
         title: AkariMainWindow.TITLE,

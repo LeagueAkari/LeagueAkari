@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import axios from 'axios'
 import { app } from 'electron'
+import { z } from 'zod'
 
 import { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
@@ -78,9 +79,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       SelfUpdateMain.id,
       {
-        autoCheckUpdates: { default: this.settings.autoCheckUpdates },
-        autoDownloadUpdates: { default: this.settings.autoDownloadUpdates },
-        ignoreVersion: { default: this.settings.ignoreVersion }
+        autoCheckUpdates: { default: this.settings.autoCheckUpdates, schema: z.boolean() },
+        autoDownloadUpdates: {
+          default: this.settings.autoDownloadUpdates,
+          schema: z.boolean()
+        },
+        ignoreVersion: { default: this.settings.ignoreVersion, schema: z.string().nullable() }
       },
       this.settings
     )

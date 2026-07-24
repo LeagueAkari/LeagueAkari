@@ -19,16 +19,19 @@ describe('repairPlayerCardTagsSetting', () => {
       value: {
         ...defaults,
         showMetTag: false,
-        showTaggedTag: false
+        showTaggedTag: false,
+        futureTag: { enabled: false }
       },
-      showAverageKillDamageEfficiencyTag: true
+      showAverageKillDamageEfficiencyTag: true,
+      futureTag: { enabled: true }
     }
 
     expect(repairPlayerCardTagsSetting(corrupted)).toEqual({
       ...defaults,
       showMetTag: false,
       showTaggedTag: false,
-      showAverageKillDamageEfficiencyTag: true
+      showAverageKillDamageEfficiencyTag: true,
+      futureTag: { enabled: true }
     })
   })
 
@@ -56,7 +59,7 @@ describe('repairPlayerCardTagsSetting', () => {
     expect(repaired.showMetTag).toBe(false)
   })
 
-  it('keeps recognized booleans and restores invalid fields from defaults', () => {
+  it('keeps extra keys and restores invalid recognized fields from defaults', () => {
     const defaults = createDefaultOngoingGamePanelPlayerCardTagSettings()
 
     expect(
@@ -67,7 +70,8 @@ describe('repairPlayerCardTagsSetting', () => {
       })
     ).toEqual({
       ...defaults,
-      showTaggedTag: false
+      showTaggedTag: false,
+      unknownTag: true
     })
   })
 })

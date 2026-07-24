@@ -2,6 +2,7 @@ import { i18next } from '@main/i18n'
 import icon from '@resources/LA_ICON.ico?asset'
 import { Notification } from 'electron'
 import { comparer, computed } from 'mobx'
+import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -33,9 +34,9 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       rememberSize: true,
       repositionWindowIfInvisible: true,
       settingSchema: {
-        enabled: { default: settings.enabled },
-        autoShow: { default: settings.autoShow },
-        showSkinSelector: { default: settings.showSkinSelector }
+        enabled: { default: settings.enabled, schema: z.boolean() },
+        autoShow: { default: settings.autoShow, schema: z.boolean() },
+        showSkinSelector: { default: settings.showSkinSelector, schema: z.boolean() }
       },
       browserWindowOptions: {
         title: AkariAuxWindow.TITLE,

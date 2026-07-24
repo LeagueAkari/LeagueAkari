@@ -3,6 +3,7 @@ import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import cp from 'node:child_process'
 import util from 'node:util'
+import { z } from 'zod'
 
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -54,7 +55,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     this._settingService = _settingFactory.register(
       LeagueClientUxMain.id,
       {
-        useWmi: { default: this.settings.useWmi }
+        useWmi: { default: this.settings.useWmi, schema: z.boolean() }
       },
       this.settings
     )
