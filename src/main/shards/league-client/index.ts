@@ -671,7 +671,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
    * 不知道现在是否需要
    */
   async fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
-    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize) {
+    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize.available) {
       return
     }
 

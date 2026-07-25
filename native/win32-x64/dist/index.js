@@ -32,6 +32,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -40,3 +43,4 @@ exports.tools = exports.input = void 0;
 const tools_1 = __importDefault(require("./tools"));
 exports.tools = tools_1.default;
 exports.input = __importStar(require("./input"));
+__exportStar(require("./errors"), exports);

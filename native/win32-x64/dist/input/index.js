@@ -13,15 +13,20 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.instance = exports.AkariNativeInput = void 0;
+exports.load = load;
+exports.isLoaded = isLoaded;
 const node_events_1 = require("node:events");
-const akari_input_win64_node_1 = __importDefault(require("../../addons/akari-input-win64.node"));
+const addon_binding_1 = require("../addon-binding");
 const definitions_1 = require("./definitions");
-const addon = akari_input_win64_node_1.default;
+const addon = new addon_binding_1.NativeAddonBinding('input', () => require('../../addons/akari-input-win64.node'));
+function load() {
+    addon.load();
+}
+function isLoaded() {
+    return addon.isLoaded();
+}
 class AkariNativeInput extends node_events_1.EventEmitter {
     constructor() {
         super();
@@ -37,17 +42,18 @@ class AkariNativeInput extends node_events_1.EventEmitter {
         return this.installed;
     }
     install() {
+        const binding = addon.get();
         if (this.installed) {
             console.warn('Input hook is already installed');
             return;
         }
         try {
-            addon.install();
-            addon.onKeyEvent(this._handleNativeKeyEvent.bind(this));
+            binding.install();
+            binding.onKeyEvent(this._handleNativeKeyEvent.bind(this));
             this.installed = true;
         }
         catch (error) {
-            addon.uninstall();
+            binding.uninstall();
             throw error;
         }
     }
@@ -67,24 +73,26 @@ class AkariNativeInput extends node_events_1.EventEmitter {
             isDown }));
     }
     uninstall() {
+        const binding = addon.get();
         if (!this.installed) {
             console.warn('Input hook is not installed');
             return;
         }
-        addon.uninstall();
+        binding.uninstall();
         this.installed = false;
     }
     getKeyStates() {
-        return addon.getKeyStates();
+        return addon.get().getKeyStates();
     }
     sendKey(key, press) {
+        const binding = addon.get();
         if (!Number.isInteger(key) || key < 0 || key > 255) {
             return Promise.reject(new RangeError('Virtual key code must be an integer between 0 and 255'));
         }
-        return addon.sendKey(key, press);
+        return binding.sendKey(key, press);
     }
     sendString(str) {
-        return addon.sendString(str);
+        return addon.get().sendString(str);
     }
 }
 exports.AkariNativeInput = AkariNativeInput;

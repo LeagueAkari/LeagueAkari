@@ -17,6 +17,9 @@ notifications:
     elevatedStartup:
       title: 正在以管理员身份运行
       content: $t(common:appName) 当前正在以高权限运行
+    nativeInputInitializationFailed:
+      title: 原生输入组件初始化失败
+      content: 快捷键和游戏内模拟输入功能已停用。请检查安全软件是否拦截或占用相关文件，然后重启 $t(common:appName)。详情请查看日志。
     newReleaseHints:
       title: 新版本可用
       content: 新版本 {{version}} 已经发布

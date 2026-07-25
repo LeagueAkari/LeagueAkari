@@ -153,6 +153,7 @@ import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { resolveNativeInputStatus } from '@renderer-shared/shards/app-common/native-input-status'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
@@ -175,14 +176,24 @@ const gc = useInstance(GameClientRenderer)
 
 const dialog = useDialog()
 
+const nativeInputStatus = computed(() =>
+  resolveNativeInputStatus(as.nativeSupport.nativeInput, as.isElevated)
+)
 const nativeInputRequiresElevation = computed(
-  () => as.nativeSupport.nativeInput.requiresElevation && !as.isElevated
+  () => nativeInputStatus.value === 'requires-elevation'
 )
-const nativeInputStatusDescription = computed(() =>
-  as.nativeSupport.nativeInput.availableOnCurrentPlatform
-    ? t('toolkit.client.gameClient.nativeAddonRequiresAdministrator')
-    : t('toolkit.client.gameClient.windowsOnlyNativeAddon')
-)
+const nativeInputStatusDescription = computed(() => {
+  switch (nativeInputStatus.value) {
+    case 'unsupported-platform':
+      return t('toolkit.client.gameClient.windowsOnlyNativeAddon')
+    case 'requires-elevation':
+      return t('toolkit.client.gameClient.nativeAddonRequiresAdministrator')
+    case 'initialization-failed':
+      return t('toolkit.client.gameClient.nativeAddonInitializationFailed')
+    default:
+      return ''
+  }
+})
 
 const adjustWindowRequirement = computed(() => as.nativeSupport.adjustLeagueClientWindowSize)
 const adjustWindowRequiresElevation = computed(

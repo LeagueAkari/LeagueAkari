@@ -90,11 +90,7 @@
         </NButton>
       </template>
       <template v-if="!as.nativeSupport.nativeInput.available">
-        {{
-          nativeInputRequiresElevation
-            ? t('settings.shortcutSelector.notRunAsAdministrator')
-            : t('settings.shortcutSelector.nativeGlobalShortcutsWindowsOnly')
-        }}
+        {{ nativeInputUnavailableMessage }}
       </template>
     </NPopover>
 
@@ -118,6 +114,7 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { resolveNativeInputStatus } from '@renderer-shared/shards/app-common/native-input-status'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { useTranslation } from 'i18next-vue'
@@ -132,9 +129,20 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 
-const nativeInputRequiresElevation = computed(
-  () => as.nativeSupport.nativeInput.requiresElevation && !as.isElevated
-)
+const nativeInputUnavailableMessage = computed(() => {
+  const status = resolveNativeInputStatus(as.nativeSupport.nativeInput, as.isElevated)
+
+  switch (status) {
+    case 'unsupported-platform':
+      return t('settings.shortcutSelector.nativeGlobalShortcutsWindowsOnly')
+    case 'requires-elevation':
+      return t('settings.shortcutSelector.notRunAsAdministrator')
+    case 'initialization-failed':
+      return t('settings.shortcutSelector.nativeInputInitializationFailed')
+    default:
+      return ''
+  }
+})
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
 

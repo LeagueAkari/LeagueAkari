@@ -129,7 +129,7 @@ export class GameClientMain implements IAkariShardInitDispose {
 
     pids.forEach((pid) => {
       this._logger.info('Process exists', pid)
-      if (NATIVE_SUPPORT.isProcessForeground && !isProcessForeground(pid)) {
+      if (NATIVE_SUPPORT.isProcessForeground.available && !isProcessForeground(pid)) {
         this._logger.info('Process is not in foreground', pid)
         return
       }
@@ -148,7 +148,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   static async isGameClientForeground() {
-    if (!NATIVE_SUPPORT.isProcessForeground) {
+    if (!NATIVE_SUPPORT.isProcessForeground.available) {
       return false
     }
 
@@ -158,7 +158,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   async isGameClientForegroundCached() {
-    if (!NATIVE_SUPPORT.isProcessForeground) {
+    if (!NATIVE_SUPPORT.isProcessForeground.available) {
       return false
     }
 

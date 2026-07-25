@@ -511,6 +511,7 @@ settings:
     tooComplicated: 该快捷键组合具有较高复杂度，请确认
     notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
     nativeGlobalShortcutsWindowsOnly: 原生全局快捷键需要原生插件。本构建目前仅在 Windows 提供。
+    nativeInputInitializationFailed: 原生输入组件初始化失败，快捷键功能已停用。请检查安全软件是否拦截或占用相关文件，然后重启应用。
     ok: 确认
     cancel: 取消
     select: 选择

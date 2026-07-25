@@ -1,3 +1,4 @@
+import { resolveNativeInputStatus } from '@renderer-shared/shards/app-common/native-input-status'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
@@ -9,7 +10,7 @@ export function createElevatedStartupNotificationSetup() {
     const appCommonStore = useAppCommonStore()
     const notification = useNotification()
     const { t } = useTranslation(undefined, {
-      keyPrefix: 'notifications.simple.elevatedStartup'
+      keyPrefix: 'notifications.simple'
     })
 
     if (!appCommonStore.isElevated || hasShown) {
@@ -17,9 +18,24 @@ export function createElevatedStartupNotificationSetup() {
     }
 
     hasShown = true
+
+    if (
+      resolveNativeInputStatus(
+        appCommonStore.nativeSupport.nativeInput,
+        appCommonStore.isElevated
+      ) === 'initialization-failed'
+    ) {
+      notification.warning({
+        title: () => t('nativeInputInitializationFailed.title'),
+        content: () => t('nativeInputInitializationFailed.content'),
+        duration: 0
+      })
+      return
+    }
+
     notification.info({
-      title: () => t('title'),
-      content: () => t('content'),
+      title: () => t('elevatedStartup.title'),
+      content: () => t('elevatedStartup.content'),
       duration: 2000
     })
   }

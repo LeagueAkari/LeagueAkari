@@ -8,6 +8,8 @@ export interface KeyEvent extends KeyDefinition {
     isDown: boolean;
 }
 export type KeyState = NativeKeyState;
+export declare function load(): void;
+export declare function isLoaded(): boolean;
 export declare class AkariNativeInput extends EventEmitter<{
     keyEvent: [definition: KeyEvent];
 }> {

@@ -17,6 +17,9 @@ notifications:
     elevatedStartup:
       title: Running as administrator
       content: $t(common:appName) is currently running with elevated privileges
+    nativeInputInitializationFailed:
+      title: Native input initialization failed
+      content: Shortcuts and simulated in-game input have been disabled. Check whether security software blocked or locked the component, then restart $t(common:appName). See the logs for details.
     newReleaseHints:
       title: New Version Available
       content: New version {{version}} is available

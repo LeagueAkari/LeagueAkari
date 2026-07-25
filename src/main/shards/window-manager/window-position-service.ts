@@ -202,7 +202,7 @@ export function repositionToAlignLeagueClientUx(
   win: BrowserWindow,
   placement?: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right'
 ) {
-  if (!NATIVE_SUPPORT.getLeagueClientWindowPlacement) return
+  if (!NATIVE_SUPPORT.getLeagueClientWindowPlacement.available) return
 
   const info = getLeagueClientWindowPlacement()
   if (info) {

@@ -373,13 +373,7 @@ const sendInGameText = async (
   }
 
   if (text) {
-    // Best-effort UX: show an explicit reason when injection is unavailable.
     if (!as.nativeSupport.nativeInput.available) {
-      if (as.nativeSupport.nativeInput.availableOnCurrentPlatform) {
-        message.warning(t('cdTimer.window.adminRequired'))
-      } else {
-        message.warning(t('cdTimer.window.nativeInjectionUnsupported'))
-      }
       return
     }
 

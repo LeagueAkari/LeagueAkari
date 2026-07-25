@@ -510,6 +510,7 @@ settings:
     tooComplicated: This shortcut combination is highly complex, please confirm
     notRunAsAdministrator: Not running as administrator, cannot use shortcut key
     nativeGlobalShortcutsWindowsOnly: Native global shortcuts require native addons. This build currently ships them only on Windows.
+    nativeInputInitializationFailed: Native input initialization failed, so shortcuts have been disabled. Check whether security software blocked or locked the component, then restart the application.
     reservedShortcut: This shortcut combination is reserved
     beingOccupied: This shortcut combination is already in use
     unchanged: (Unchanged)

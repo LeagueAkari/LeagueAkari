@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events'
 
-import _addon from '../../addons/akari-input-win64.node'
+import { NativeAddonBinding } from '../addon-binding'
 import type { AkariInputBinding, NativeKeyState } from '../bindings'
 import { KeyDefinition, VKEY_MAP, isCommonModifierKey, isModifierKey } from './definitions'
 
@@ -13,7 +13,17 @@ export interface KeyEvent extends KeyDefinition {
 
 export type KeyState = NativeKeyState
 
-const addon = _addon as AkariInputBinding
+const addon = new NativeAddonBinding<AkariInputBinding>('input', () =>
+  require('../../addons/akari-input-win64.node')
+)
+
+export function load(): void {
+  addon.load()
+}
+
+export function isLoaded(): boolean {
+  return addon.isLoaded()
+}
 
 export class AkariNativeInput extends EventEmitter<{
   keyEvent: [definition: KeyEvent]
@@ -38,17 +48,19 @@ export class AkariNativeInput extends EventEmitter<{
   }
 
   install() {
+    const binding = addon.get()
+
     if (this.installed) {
       console.warn('Input hook is already installed')
       return
     }
 
     try {
-      addon.install()
-      addon.onKeyEvent(this._handleNativeKeyEvent.bind(this))
+      binding.install()
+      binding.onKeyEvent(this._handleNativeKeyEvent.bind(this))
       this.installed = true
     } catch (error) {
-      addon.uninstall()
+      binding.uninstall()
       throw error
     }
   }
@@ -77,29 +89,33 @@ export class AkariNativeInput extends EventEmitter<{
   }
 
   uninstall() {
+    const binding = addon.get()
+
     if (!this.installed) {
       console.warn('Input hook is not installed')
       return
     }
 
-    addon.uninstall()
+    binding.uninstall()
     this.installed = false
   }
 
   getKeyStates(): KeyState[] {
-    return addon.getKeyStates()
+    return addon.get().getKeyStates()
   }
 
   sendKey(key: number, press: boolean): Promise<void> {
+    const binding = addon.get()
+
     if (!Number.isInteger(key) || key < 0 || key > 255) {
       return Promise.reject(new RangeError('Virtual key code must be an integer between 0 and 255'))
     }
 
-    return addon.sendKey(key, press)
+    return binding.sendKey(key, press)
   }
 
   sendString(str: string): Promise<void> {
-    return addon.sendString(str)
+    return addon.get().sendString(str)
   }
 }
 

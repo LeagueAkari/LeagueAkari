@@ -22,6 +22,7 @@ toolkit:
       title: 游戏端
       windowsOnlyNativeAddon: 需要原生插件（本构建目前仅在 Windows 提供）。
       nativeAddonRequiresAdministrator: 当前平台支持该能力，但需要以管理员权限运行。
+      nativeAddonInitializationFailed: 原生输入组件初始化失败，相关快捷键功能已停用。请检查安全软件是否拦截或占用相关文件，然后重启应用。
       terminateGameClientWithShortcut:
         labelAdminRequired: 使用快捷键结束游戏端 (需要管理员权限)
         label: 启用结束游戏端快捷键
@@ -313,7 +314,7 @@ toolkit:
       nativeInput:
         needAdmin: 请以管理员权限启动
         unsupported: 当前平台不支持
-        unavailable: 当前不可用
+        initializationFailed: 原生输入组件初始化失败
       teams:
         friendly: 我方
         enemy: 敌方

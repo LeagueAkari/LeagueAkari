@@ -1,3 +1,4 @@
+import { resolveNativeInputStatus } from '@renderer-shared/shards/app-common/native-input-status'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
@@ -7,21 +8,21 @@ export function useNativeInputStatus() {
   const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.nativeInput' })
 
   const unavailableReason = computed(() => {
-    const nativeInput = appCommonStore.nativeSupport.nativeInput
+    const status = resolveNativeInputStatus(
+      appCommonStore.nativeSupport.nativeInput,
+      appCommonStore.isElevated
+    )
 
-    if (nativeInput.available) {
-      return null
+    switch (status) {
+      case 'available':
+        return null
+      case 'unsupported-platform':
+        return t('unsupported')
+      case 'requires-elevation':
+        return t('needAdmin')
+      case 'initialization-failed':
+        return t('initializationFailed')
     }
-
-    if (!nativeInput.availableOnCurrentPlatform) {
-      return t('unsupported')
-    }
-
-    if (nativeInput.requiresElevation && !appCommonStore.isElevated) {
-      return t('needAdmin')
-    }
-
-    return t('unavailable')
   })
 
   return {

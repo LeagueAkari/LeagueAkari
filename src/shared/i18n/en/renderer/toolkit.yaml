@@ -22,6 +22,7 @@ toolkit:
       title: Game Client
       windowsOnlyNativeAddon: Requires native addons (this build currently ships them only on Windows).
       nativeAddonRequiresAdministrator: This capability is supported on the current platform, but requires running as administrator.
+      nativeAddonInitializationFailed: Native input initialization failed, so related shortcuts have been disabled. Check whether security software blocked or locked the component, then restart the application.
       terminateGameClientWithShortcut:
         labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
         label: Enable Terminate Game Client Shortcut
@@ -313,7 +314,7 @@ toolkit:
       nativeInput:
         needAdmin: start as administrator
         unsupported: unsupported on the current platform
-        unavailable: currently unavailable
+        initializationFailed: native input initialization failed
       teams:
         friendly: Allied
         enemy: Enemy
