@@ -81,6 +81,19 @@ export interface AkariConfigMetadata {
   updatedAt: string
 }
 
+export type AkariFeatureGatePlatform = 'win32' | 'darwin'
+
+export interface AkariFeatureGateRuntimeRule {
+  platforms?: AkariFeatureGatePlatform[]
+  minVersionInclusive?: string
+  maxVersionExclusive?: string
+  sgpServers?: string[]
+}
+
+export interface AkariFeatureGateSnapshot extends AkariConfigMetadata {
+  gates: Record<string, AkariFeatureGateRuntimeRule>
+}
+
 export interface AkariAutoSelectTargetGameMode {
   gameMode: string
   queueTypes: string[]
@@ -107,14 +120,6 @@ export interface AkariAutoSelectGroupsConfig extends AkariConfigMetadata {
   groups: AkariAutoSelectGroup[]
 }
 
-export interface AkariOngoingGameConfig extends AkariConfigMetadata {
-  spotlight: {
-    deobfuscation: boolean
-    gsmByPuuid: boolean
-    spectatorByPuuid: boolean
-  }
-}
-
 export interface AkariLeagueServerEndpoint {
   matchHistory: string
   common: string
@@ -132,8 +137,8 @@ export interface AkariSupportedQueuesConfig extends AkariConfigMetadata {
 }
 
 export interface AkariApiConfigResourceMap {
+  'app/feature-gates': AkariFeatureGateSnapshot
   'auto-select/groups': AkariAutoSelectGroupsConfig
-  'ongoing-game/config': AkariOngoingGameConfig
   'sgp/league-servers': AkariLeagueServersConfig
   'sgp/supported-queues': AkariSupportedQueuesConfig
 }

@@ -1,11 +1,12 @@
+import { gte, valid } from 'semver'
 import { z } from 'zod'
 
 import type {
   AkariAutoSelectGroupsConfig,
   AkariContactChannels,
+  AkariFeatureGateSnapshot,
   AkariLeagueServersConfig,
   AkariNotice,
-  AkariOngoingGameConfig,
   AkariRelease,
   AkariSupportedQueuesConfig
 } from './types'
@@ -13,6 +14,60 @@ import type {
 const ConfigMetadataShape = {
   updatedAt: z.iso.datetime({ offset: true })
 }
+
+const UniqueNonEmptyStringArraySchema = z
+  .array(z.string().trim().min(1).max(64))
+  .min(1)
+  .refine((values) => new Set(values).size === values.length)
+
+const AkariFeatureGateRuntimeRuleSchema = z
+  .object({
+    platforms: z
+      .array(z.enum(['win32', 'darwin']))
+      .min(1)
+      .refine((values) => new Set(values).size === values.length)
+      .optional(),
+    minVersionInclusive: z.string().optional(),
+    maxVersionExclusive: z.string().optional(),
+    sgpServers: UniqueNonEmptyStringArraySchema.optional()
+  })
+  .superRefine((gate, context) => {
+    const minVersion = gate.minVersionInclusive && valid(gate.minVersionInclusive)
+    const maxVersion = gate.maxVersionExclusive && valid(gate.maxVersionExclusive)
+
+    if (gate.minVersionInclusive && !minVersion) {
+      context.addIssue({
+        code: 'custom',
+        path: ['minVersionInclusive'],
+        message: 'minVersionInclusive must be valid SemVer'
+      })
+    }
+    if (gate.maxVersionExclusive && !maxVersion) {
+      context.addIssue({
+        code: 'custom',
+        path: ['maxVersionExclusive'],
+        message: 'maxVersionExclusive must be valid SemVer'
+      })
+    }
+    if (minVersion && maxVersion && gte(minVersion, maxVersion)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['maxVersionExclusive'],
+        message: 'maxVersionExclusive must be greater than minVersionInclusive'
+      })
+    }
+  })
+  .strict()
+
+export const AkariFeatureGateSnapshotSchema: z.ZodType<AkariFeatureGateSnapshot> = z
+  .object({
+    ...ConfigMetadataShape,
+    gates: z.record(
+      z.string().regex(/^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+$/),
+      AkariFeatureGateRuntimeRuleSchema
+    )
+  })
+  .strict()
 
 export const AkariNoticeSchema: z.ZodType<AkariNotice> = z
   .object({
@@ -87,19 +142,6 @@ export const AkariAutoSelectGroupsConfigSchema: z.ZodType<AkariAutoSelectGroupsC
         })
         .passthrough()
     )
-  })
-  .passthrough()
-
-export const AkariOngoingGameConfigSchema: z.ZodType<AkariOngoingGameConfig> = z
-  .object({
-    ...ConfigMetadataShape,
-    spotlight: z
-      .object({
-        deobfuscation: z.boolean(),
-        gsmByPuuid: z.boolean(),
-        spectatorByPuuid: z.boolean()
-      })
-      .passthrough()
   })
   .passthrough()
 

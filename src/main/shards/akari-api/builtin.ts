@@ -1,18 +1,8 @@
 import {
   AkariAutoSelectGroupsConfig,
   AkariLeagueServersConfig,
-  AkariOngoingGameConfig,
   AkariSupportedQueuesConfig
 } from '@shared/shards/akari-api'
-
-export const BUILTIN_ONGOING_GAME_CONFIG: AkariOngoingGameConfig = {
-  updatedAt: '2026-07-18T04:00:00.000Z',
-  spotlight: {
-    deobfuscation: true,
-    gsmByPuuid: true,
-    spectatorByPuuid: false
-  }
-}
 
 export const BUILTIN_SGP_LEAGUE_SERVERS_CONFIG: AkariLeagueServersConfig = {
   updatedAt: '2026-07-18T04:00:00.000Z',

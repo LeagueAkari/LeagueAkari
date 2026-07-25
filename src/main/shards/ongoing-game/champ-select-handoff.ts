@@ -1,10 +1,7 @@
 import { ChampSelectSession } from '@shared/types/league-client/champ-select'
 import { z } from 'zod'
 
-import {
-  ChampSelectVisibilityConfigLike,
-  collectVisibleChampSelectMembers
-} from './champ-select-members'
+import { collectVisibleChampSelectMembers } from './champ-select-members'
 
 export const ChampSelectHandoffSnapshotSchema = z.object({
   gameId: z.number().positive(),
@@ -24,9 +21,9 @@ export type ChampSelectHandoffSnapshot = z.infer<typeof ChampSelectHandoffSnapsh
 
 export function buildChampSelectHandoffSnapshot(
   session: ChampSelectSession,
-  config: ChampSelectVisibilityConfigLike
+  deobfuscationEnabled: boolean
 ): ChampSelectHandoffSnapshot | null {
-  if (!config.spotlight.deobfuscation || !session.gameId) {
+  if (!deobfuscationEnabled || !session.gameId) {
     return null
   }
 
@@ -36,7 +33,7 @@ export function buildChampSelectHandoffSnapshot(
     players: {}
   }
 
-  for (const member of collectVisibleChampSelectMembers(session, config)) {
+  for (const member of collectVisibleChampSelectMembers(session, deobfuscationEnabled)) {
     snapshot.teams[member.teamIdentifier] ??= []
     snapshot.teams[member.teamIdentifier].push(member.puuid)
     snapshot.players[member.puuid] = {

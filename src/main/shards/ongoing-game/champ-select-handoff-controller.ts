@@ -1,3 +1,4 @@
+import { ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
 import { comparer } from 'mobx'
 
 import {
@@ -62,13 +63,16 @@ export class OngoingGameChampSelectHandoffController {
   }
 
   private _watchSnapshotRecording() {
-    const { akariApi, leagueClient, mobxUtils, state } = this._context
+    const { featureGating, leagueClient, mobxUtils, state } = this._context
 
     mobxUtils.reaction(
       () => {
-        const config = akariApi.state.ongoingGameConfig
+        const deobfuscationEnabled = featureGating.isEnabled(
+          ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE,
+          true
+        )
 
-        if (!config.spotlight.deobfuscation || state.draft) {
+        if (!deobfuscationEnabled || state.draft) {
           return null
         }
 
@@ -76,7 +80,10 @@ export class OngoingGameChampSelectHandoffController {
           return null
         }
 
-        return buildChampSelectHandoffSnapshot(leagueClient.data.champSelect.session, config)
+        return buildChampSelectHandoffSnapshot(
+          leagueClient.data.champSelect.session,
+          deobfuscationEnabled
+        )
       },
       (snapshot) => {
         if (snapshot) {
@@ -135,6 +142,6 @@ export class OngoingGameChampSelectHandoffController {
   }
 
   private _isFeatureEnabled() {
-    return Boolean(this._context.akariApi.state.ongoingGameConfig.spotlight.deobfuscation)
+    return this._context.featureGating.isEnabled(ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE, true)
   }
 }

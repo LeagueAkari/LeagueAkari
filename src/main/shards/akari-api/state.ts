@@ -1,9 +1,9 @@
 import type {
   AkariAutoSelectGroupsConfig,
   AkariContactChannels,
+  AkariFeatureGateSnapshot,
   AkariLeagueServersConfig,
   AkariNotice,
-  AkariOngoingGameConfig,
   AkariRelease,
   AkariSupportedQueuesConfig
 } from '@shared/shards/akari-api'
@@ -11,15 +11,14 @@ import { makeAutoObservable, observable } from 'mobx'
 
 import {
   BUILTIN_AUTO_SELECT_GROUPS,
-  BUILTIN_ONGOING_GAME_CONFIG,
   BUILTIN_SGP_LEAGUE_SERVERS_CONFIG,
   BUILTIN_SUPPORTED_QUEUES
 } from './builtin'
 
 export class AkariApiState {
+  featureGates: AkariFeatureGateSnapshot | null = null
   leagueServers = BUILTIN_SGP_LEAGUE_SERVERS_CONFIG
   supportedQueues = BUILTIN_SUPPORTED_QUEUES
-  ongoingGameConfig = BUILTIN_ONGOING_GAME_CONFIG
   autoSelectGroups = BUILTIN_AUTO_SELECT_GROUPS
 
   notice: AkariNotice | null = null
@@ -33,10 +32,14 @@ export class AkariApiState {
   isUpdatingNotice = false
   isUpdatingContactChannels = false
   isUpdatingLatestRelease = false
+  isUpdatingFeatureGates = false
   isUpdatingLeagueServers = false
   isUpdatingSupportedQueues = false
-  isUpdatingOngoingGameConfig = false
   isUpdatingAutoSelectGroups = false
+
+  setFeatureGates(value: AkariFeatureGateSnapshot) {
+    this.featureGates = value
+  }
 
   setLeagueServers(value: AkariLeagueServersConfig) {
     this.leagueServers = value
@@ -44,10 +47,6 @@ export class AkariApiState {
 
   setSupportedQueues(value: AkariSupportedQueuesConfig) {
     this.supportedQueues = value
-  }
-
-  setOngoingGameConfig(value: AkariOngoingGameConfig) {
-    this.ongoingGameConfig = value
   }
 
   setAutoSelectGroups(value: AkariAutoSelectGroupsConfig) {
@@ -74,6 +73,10 @@ export class AkariApiState {
     this.isUpdatingLatestRelease = value
   }
 
+  setUpdatingFeatureGates(value: boolean) {
+    this.isUpdatingFeatureGates = value
+  }
+
   setUpdatingLeagueServers(value: boolean) {
     this.isUpdatingLeagueServers = value
   }
@@ -82,19 +85,15 @@ export class AkariApiState {
     this.isUpdatingSupportedQueues = value
   }
 
-  setUpdatingOngoingGameConfig(value: boolean) {
-    this.isUpdatingOngoingGameConfig = value
-  }
-
   setUpdatingAutoSelectGroups(value: boolean) {
     this.isUpdatingAutoSelectGroups = value
   }
 
   constructor() {
     makeAutoObservable(this, {
+      featureGates: observable.ref,
       leagueServers: observable.ref,
       supportedQueues: observable.ref,
-      ongoingGameConfig: observable.ref,
       autoSelectGroups: observable.ref,
       notice: observable.ref,
       contactChannels: observable.ref,

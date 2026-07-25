@@ -1,5 +1,4 @@
 import { IntervalTask } from '@main/utils/timer'
-import type { AkariConfigMetadata } from '@shared/shards/akari-api'
 import dayjs from 'dayjs'
 
 import { AKARI_API_CACHED_RESOURCES, type CachedResource } from './cached-resources'
@@ -40,7 +39,7 @@ export class AkariApiConfigLoader {
     }
   }
 
-  private async _initResourceFromLocal<T extends AkariConfigMetadata>(resource: CachedResource<T>) {
+  private async _initResourceFromLocal<T extends object>(resource: CachedResource<T>) {
     const { logger, settingService, state } = this._context
 
     if (!(await settingService.jsonConfigFileExists(resource.cachePath))) {
@@ -64,8 +63,8 @@ export class AkariApiConfigLoader {
       return
     }
 
-    const cachedUpdatedAt = Date.parse(result.data.updatedAt)
-    const currentUpdatedAt = Date.parse(resource.getCurrentUpdatedAt(state))
+    const cachedUpdatedAt = Date.parse(resource.getTimestamp(result.data))
+    const currentUpdatedAt = Date.parse(resource.getCurrentTimestamp(state))
 
     if (cachedUpdatedAt < currentUpdatedAt) {
       logger.info(`Removed stale cached ${resource.name}`)
@@ -78,7 +77,7 @@ export class AkariApiConfigLoader {
     }
   }
 
-  private async _deleteCachedResource<T extends AkariConfigMetadata>(resource: CachedResource<T>) {
+  private async _deleteCachedResource<T extends object>(resource: CachedResource<T>) {
     const { logger, settingService } = this._context
 
     try {
@@ -88,7 +87,7 @@ export class AkariApiConfigLoader {
     }
   }
 
-  private async _updateAndSave<T extends AkariConfigMetadata>(resource: CachedResource<T>) {
+  private async _updateAndSave<T extends object>(resource: CachedResource<T>) {
     const { api, logger, settingService, state } = this._context
 
     if (resource.getUpdating(state)) {
@@ -106,17 +105,17 @@ export class AkariApiConfigLoader {
         return
       }
 
-      if (Date.parse(result.data.updatedAt) > Date.parse(resource.getCurrentUpdatedAt(state))) {
+      const nextTimestamp = resource.getTimestamp(result.data)
+      const currentTimestamp = resource.getCurrentTimestamp(state)
+
+      if (Date.parse(nextTimestamp) > Date.parse(currentTimestamp)) {
         resource.apply(state, result.data)
         await settingService.writeToJsonConfigFile(resource.cachePath, result.data)
-        logger.info(
-          `Updated ${resource.name}`,
-          dayjs(result.data.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-        )
+        logger.info(`Updated ${resource.name}`, dayjs(nextTimestamp).format('YYYY-MM-DD HH:mm:ss'))
       } else {
         logger.info(
           `${resource.name} is up to date`,
-          dayjs(resource.getCurrentUpdatedAt(state)).format('YYYY-MM-DD HH:mm:ss')
+          dayjs(currentTimestamp).format('YYYY-MM-DD HH:mm:ss')
         )
       }
     } catch (error) {

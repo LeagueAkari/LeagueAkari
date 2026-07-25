@@ -1,5 +1,6 @@
 import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
+import { ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
 import type {
   AdditionalResult,
   DraftOptions,
@@ -18,8 +19,8 @@ import type { SummonerInfo } from '@shared/types/league-client/summoner'
 import { removeSubsets } from '@shared/utils/team-up-calc'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import type { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
+import type { FeatureGatingMain } from '../feature-gating'
 import { LeagueClientData } from '../league-client/lc-state'
 import { SgpMain } from '../sgp'
 import type { ChampSelectHandoffSnapshot } from './champ-select-handoff'
@@ -144,7 +145,7 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._akariApi.state.ongoingGameConfig,
+      deobfuscationEnabled: this._deobfuscationEnabled,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -158,7 +159,7 @@ export class OngoingGameState {
       data: this._leagueClientData,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._akariApi.state.ongoingGameConfig,
+      deobfuscationEnabled: this._deobfuscationEnabled,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -173,7 +174,7 @@ export class OngoingGameState {
       settings: this._settings,
       queryStage: this.queryStage,
       additional: this.additional,
-      config: this._akariApi.state.ongoingGameConfig,
+      deobfuscationEnabled: this._deobfuscationEnabled,
       champSelectHandoffSnapshot: this.champSelectHandoffSnapshot
     })
   }
@@ -336,6 +337,10 @@ export class OngoingGameState {
     return 'lcu'
   }
 
+  private get _deobfuscationEnabled() {
+    return this._featureGating.isEnabled(ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE, true)
+  }
+
   additional: AdditionalResult = {
     teams: {},
     selections: {},
@@ -363,7 +368,7 @@ export class OngoingGameState {
     private readonly _appCommon: AppCommonMain,
     private readonly _sgpMain: SgpMain,
     private readonly _settings: OngoingGameSettings,
-    private readonly _akariApi: AkariApiMain
+    private readonly _featureGating: FeatureGatingMain
   ) {
     makeAutoObservable(this, {
       matchHistory: observable.shallow,

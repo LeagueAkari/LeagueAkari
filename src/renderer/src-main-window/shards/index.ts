@@ -8,6 +8,7 @@ import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
+import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
@@ -46,6 +47,7 @@ manager.use(AutoSelectRenderer)
 manager.use(AutoMiscRenderer)
 manager.use(ClientInstallationRenderer)
 manager.use(ExtraAssetsRenderer)
+manager.use(FeatureGatingRenderer)
 manager.use(GameClientRenderer)
 manager.use(InGameSendRenderer)
 manager.use(KeyboardShortcutsRenderer)

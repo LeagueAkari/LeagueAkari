@@ -2,6 +2,7 @@ import { createManager } from '@renderer-shared/shards'
 import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
 import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import {
   LeagueClientRenderer,
@@ -23,6 +24,7 @@ manager.use(AkariIpcRenderer)
 manager.use(AkariApiRenderer)
 manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
+manager.use(FeatureGatingRenderer)
 manager.use(LeagueClientRenderer, {
   // for better performance
   subscribeState: {

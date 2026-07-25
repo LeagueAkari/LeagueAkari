@@ -5,6 +5,7 @@ import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
+import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -22,6 +23,7 @@ manager.use(AppCommonRenderer)
 manager.use(AutoGameflowRenderer)
 manager.use(AutoSelectRenderer)
 manager.use(ExtraAssetsRenderer)
+manager.use(FeatureGatingRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LoggerRenderer)
 manager.use(PiniaMobxUtilsRenderer)

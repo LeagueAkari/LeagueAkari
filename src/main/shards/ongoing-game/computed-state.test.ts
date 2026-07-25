@@ -34,11 +34,7 @@ const inGameQueryStage: Extract<QueryStage, { phase: 'in-game' }> = {
   }
 }
 
-const config = {
-  spotlight: {
-    deobfuscation: true
-  }
-}
+const deobfuscationEnabled = true
 
 function createInGameData(): LeagueClientData {
   return {
@@ -99,7 +95,7 @@ describe('champ-select handoff state merge', () => {
         settings: { enabled: true, queryInLobbyPhase: true },
         queryStage: inGameQueryStage,
         additional: emptyAdditional,
-        config,
+        deobfuscationEnabled,
         champSelectHandoffSnapshot
       })
     ).toEqual({
@@ -112,7 +108,7 @@ describe('champ-select handoff state merge', () => {
         data,
         queryStage: inGameQueryStage,
         additional: emptyAdditional,
-        config,
+        deobfuscationEnabled,
         champSelectHandoffSnapshot
       })
     ).toEqual({
@@ -125,7 +121,7 @@ describe('champ-select handoff state merge', () => {
         data,
         queryStage: inGameQueryStage,
         additional: emptyAdditional,
-        config,
+        deobfuscationEnabled,
         champSelectHandoffSnapshot
       })
     ).toEqual({
@@ -168,7 +164,7 @@ describe('champ-select handoff state merge', () => {
         data,
         queryStage: inGameQueryStage,
         additional: emptyAdditional,
-        config,
+        deobfuscationEnabled,
         champSelectHandoffSnapshot
       })
     ).toEqual({

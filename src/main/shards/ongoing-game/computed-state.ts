@@ -17,12 +17,6 @@ type OngoingGameSettingsLike = {
   queryInLobbyPhase: boolean
 }
 
-type OngoingGameConfigLike = {
-  spotlight: {
-    deobfuscation: boolean
-  }
-}
-
 export type PositionAssignments = Record<
   string,
   {
@@ -69,20 +63,24 @@ export function getLiveChampionSelections(args: {
   data: LeagueClientData
   queryStage: QueryStage
   additional: AdditionalResult
-  config: OngoingGameConfigLike
+  deobfuscationEnabled: boolean
   champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }) {
-  const { data, queryStage, additional, config, champSelectHandoffSnapshot } = args
+  const { data, queryStage, additional, deobfuscationEnabled, champSelectHandoffSnapshot } = args
 
   if (queryStage.phase === 'champ-select') {
-    return getChampSelectChampionSelections(data, config)
+    return getChampSelectChampionSelections(data, deobfuscationEnabled)
   }
 
   if (queryStage.phase === 'in-game') {
     const selections = getInGameChampionSelections(data, additional)
     mergeChampSelectHandoffChampionSelections(
       selections,
-      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+      getUsableChampSelectHandoffSnapshot(
+        queryStage,
+        deobfuscationEnabled,
+        champSelectHandoffSnapshot
+      )
     )
 
     return selections
@@ -91,7 +89,7 @@ export function getLiveChampionSelections(args: {
   return {}
 }
 
-function getChampSelectChampionSelections(data: LeagueClientData, config: OngoingGameConfigLike) {
+function getChampSelectChampionSelections(data: LeagueClientData, deobfuscationEnabled: boolean) {
   const session = data.champSelect.session
 
   if (!session) {
@@ -99,7 +97,7 @@ function getChampSelectChampionSelections(data: LeagueClientData, config: Ongoin
   }
 
   const selections: Record<string, number> = {}
-  for (const member of collectVisibleChampSelectMembers(session, config)) {
+  for (const member of collectVisibleChampSelectMembers(session, deobfuscationEnabled)) {
     selections[member.puuid] = member.championId
   }
 
@@ -138,20 +136,24 @@ export function getLivePositionAssignments(args: {
   data: LeagueClientData
   queryStage: QueryStage
   additional: AdditionalResult
-  config: OngoingGameConfigLike
+  deobfuscationEnabled: boolean
   champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }): PositionAssignments {
-  const { data, queryStage, additional, config, champSelectHandoffSnapshot } = args
+  const { data, queryStage, additional, deobfuscationEnabled, champSelectHandoffSnapshot } = args
 
   if (queryStage.phase === 'champ-select') {
-    return getChampSelectPositionAssignments(data, config)
+    return getChampSelectPositionAssignments(data, deobfuscationEnabled)
   }
 
   if (queryStage.phase === 'in-game') {
     const assignments = getInGamePositionAssignments(data, additional)
     mergeChampSelectHandoffPositionAssignments(
       assignments,
-      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+      getUsableChampSelectHandoffSnapshot(
+        queryStage,
+        deobfuscationEnabled,
+        champSelectHandoffSnapshot
+      )
     )
 
     return assignments
@@ -162,7 +164,7 @@ export function getLivePositionAssignments(args: {
 
 function getChampSelectPositionAssignments(
   data: LeagueClientData,
-  config: OngoingGameConfigLike
+  deobfuscationEnabled: boolean
 ): PositionAssignments {
   const session = data.champSelect.session
 
@@ -171,7 +173,7 @@ function getChampSelectPositionAssignments(
   }
 
   const assignments: PositionAssignments = {}
-  for (const member of collectVisibleChampSelectMembers(session, config)) {
+  for (const member of collectVisibleChampSelectMembers(session, deobfuscationEnabled)) {
     assignments[member.puuid] = {
       position: member.position,
       role: null
@@ -217,13 +219,20 @@ export function getLiveTeams(args: {
   settings: OngoingGameSettingsLike
   queryStage: QueryStage
   additional: AdditionalResult
-  config: OngoingGameConfigLike
+  deobfuscationEnabled: boolean
   champSelectHandoffSnapshot?: ChampSelectHandoffSnapshot | null
 }) {
-  const { data, settings, queryStage, additional, config, champSelectHandoffSnapshot } = args
+  const {
+    data,
+    settings,
+    queryStage,
+    additional,
+    deobfuscationEnabled,
+    champSelectHandoffSnapshot
+  } = args
 
   if (queryStage.phase === 'champ-select') {
-    return getChampSelectTeams(data, queryStage, config)
+    return getChampSelectTeams(data, queryStage, deobfuscationEnabled)
   }
 
   if (queryStage.phase === 'in-game') {
@@ -231,7 +240,11 @@ export function getLiveTeams(args: {
     mergeChampSelectHandoffTeams(
       teams,
       queryStage,
-      getUsableChampSelectHandoffSnapshot(queryStage, config, champSelectHandoffSnapshot)
+      getUsableChampSelectHandoffSnapshot(
+        queryStage,
+        deobfuscationEnabled,
+        champSelectHandoffSnapshot
+      )
     )
 
     return teams
@@ -247,7 +260,7 @@ export function getLiveTeams(args: {
 function getChampSelectTeams(
   data: LeagueClientData,
   queryStage: Extract<QueryStage, { phase: 'champ-select' }>,
-  config: OngoingGameConfigLike
+  deobfuscationEnabled: boolean
 ) {
   const session = data.champSelect.session
 
@@ -255,7 +268,7 @@ function getChampSelectTeams(
     return {}
   }
 
-  const members = collectVisibleChampSelectMembers(session, config)
+  const members = collectVisibleChampSelectMembers(session, deobfuscationEnabled)
 
   if (queryStage.gameInfo.queueType === 'CHERRY') {
     return {
@@ -332,10 +345,10 @@ function getLobbyTeams(data: LeagueClientData) {
 
 function getUsableChampSelectHandoffSnapshot(
   queryStage: QueryStage,
-  config: OngoingGameConfigLike,
+  deobfuscationEnabled: boolean,
   snapshot?: ChampSelectHandoffSnapshot | null
 ) {
-  if (!config.spotlight.deobfuscation || queryStage.phase !== 'in-game' || !snapshot) {
+  if (!deobfuscationEnabled || queryStage.phase !== 'in-game' || !snapshot) {
     return null
   }
 

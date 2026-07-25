@@ -3,8 +3,8 @@ import { QueueKeeper } from '@shared/utils/queue-keeper'
 import { comparer } from 'mobx'
 import { z } from 'zod'
 
-import { AkariApiMain } from '../akari-api'
 import { AppCommonMain } from '../app-common'
+import { FeatureGatingMain } from '../feature-gating'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -62,7 +62,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     private readonly _sgpMain: SgpMain,
     private readonly _savedPlayer: SavedPlayerMain,
     private readonly _appCommon: AppCommonMain,
-    private readonly _akariApi: AkariApiMain
+    private readonly _featureGating: FeatureGatingMain
   ) {
     this.settings = new OngoingGameSettings()
     this._logger = _loggerFactory.create(OngoingGameMain.id)
@@ -144,7 +144,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this._appCommon,
       this._sgpMain,
       this.settings,
-      this._akariApi
+      this._featureGating
     )
 
     this._context = {
@@ -159,7 +159,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       leagueClient: this._leagueClient,
       sgp: this._sgpMain,
       savedPlayer: this._savedPlayer,
-      akariApi: this._akariApi
+      featureGating: this._featureGating
     }
 
     this._matchHistory = new OngoingGameMatchHistoryLoader(this._context)

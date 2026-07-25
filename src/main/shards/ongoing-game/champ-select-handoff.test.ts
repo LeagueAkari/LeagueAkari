@@ -140,14 +140,8 @@ function createContext(options: {
       _removeFromStorage: storage.remove
     },
     state,
-    akariApi: {
-      state: {
-        ongoingGameConfig: {
-          spotlight: {
-            deobfuscation: options.deobfuscation ?? true
-          }
-        }
-      }
+    featureGating: {
+      isEnabled: vi.fn(() => options.deobfuscation ?? true)
     },
     leagueClient: {
       data: {
@@ -205,13 +199,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
       ]
     })
 
-    expect(
-      buildChampSelectHandoffSnapshot(session, {
-        spotlight: {
-          deobfuscation: true
-        }
-      })
-    ).toEqual({
+    expect(buildChampSelectHandoffSnapshot(session, true)).toEqual({
       gameId: 12345,
       teams: {
         'TEAM-100': ['p1'],
@@ -240,13 +228,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
       myTeam: [createMember({ puuid: 'p1', championId: 1, team: 100 })]
     })
 
-    expect(
-      buildChampSelectHandoffSnapshot(session, {
-        spotlight: {
-          deobfuscation: false
-        }
-      })
-    ).toBeNull()
+    expect(buildChampSelectHandoffSnapshot(session, false)).toBeNull()
   })
 
   it('collects visible champ-select members for other controllers', () => {
@@ -274,13 +256,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
       ]
     })
 
-    expect(
-      collectVisibleChampSelectMembers(session, {
-        spotlight: {
-          deobfuscation: false
-        }
-      })
-    ).toEqual([
+    expect(collectVisibleChampSelectMembers(session, false)).toEqual([
       {
         puuid: 'p1',
         teamIdentifier: 'TEAM-100',

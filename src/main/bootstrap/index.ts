@@ -12,6 +12,7 @@ import { AutoSelectMain } from '@main/shards/auto-select'
 import { ClientInstallationMain } from '@main/shards/client-installation'
 import { ConfigMigrateMain } from '@main/shards/config-migrate'
 import { ExtraAssetsMain } from '@main/shards/extra-assets'
+import { FeatureGatingMain } from '@main/shards/feature-gating'
 import { GameClientMain } from '@main/shards/game-client'
 import { InGameSendMain } from '@main/shards/in-game-send'
 import { AkariIpcMain } from '@main/shards/ipc'
@@ -326,6 +327,7 @@ export function bootstrap() {
     manager.use(TrayMain)
     manager.use(KeyboardShortcutsMain)
     manager.use(SelfUpdateMain)
+    manager.use(FeatureGatingMain)
 
     // functional shards
     manager.use(AutoChampionConfigMain)

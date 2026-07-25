@@ -4,6 +4,7 @@ import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
+import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import {
   LeagueClientRenderer,
@@ -25,6 +26,7 @@ manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
 manager.use(AutoChampConfigRenderer)
 manager.use(ExtraAssetsRenderer)
+manager.use(FeatureGatingRenderer)
 manager.use(LeagueClientRenderer, {
   subscribeState: {
     gameData: true,

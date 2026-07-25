@@ -1,4 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { ONGOING_GAME_GSM_BY_PUUID_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
 import { AdditionalResult } from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
@@ -120,13 +121,14 @@ export class OngoingGameAdditionalInfoController {
   constructor(private readonly _context: OngoingGameMainContext) {}
 
   watch() {
-    const { leagueClient, mobxUtils, state } = this._context
+    const { featureGating, leagueClient, mobxUtils, state } = this._context
 
     mobxUtils.reaction(
       () => ({
         queryStage: state.queryStage,
         selfPuuid: leagueClient.data.summoner.me?.puuid,
-        draft: state.draft
+        draft: state.draft,
+        gsmByPuuidEnabled: featureGating.isEnabled(ONGOING_GAME_GSM_BY_PUUID_FEATURE_GATE, true)
       }),
       () => {
         this.update()
@@ -136,7 +138,7 @@ export class OngoingGameAdditionalInfoController {
   }
 
   update() {
-    const { akariApi, leagueClient, queueKeeper, state } = this._context
+    const { featureGating, leagueClient, queueKeeper, state } = this._context
 
     if (
       state.draft ||
@@ -155,7 +157,7 @@ export class OngoingGameAdditionalInfoController {
 
     const tasks: (() => Promise<AdditionalInfoQueryResult | null>)[] = []
 
-    if (akariApi.state.ongoingGameConfig.spotlight.gsmByPuuid) {
+    if (featureGating.isEnabled(ONGOING_GAME_GSM_BY_PUUID_FEATURE_GATE, true)) {
       tasks.push(() => this._getGsmGameMembers(puuid))
     }
 

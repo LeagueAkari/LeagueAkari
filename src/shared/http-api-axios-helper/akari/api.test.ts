@@ -42,6 +42,12 @@ describe('Akari API HTTP helper', () => {
     expect(get).toHaveBeenCalledWith('/config/v1/sgp/league-servers', {
       signal: undefined
     })
+
+    api.getConfig('app/feature-gates')
+
+    expect(get).toHaveBeenCalledWith('/config/v1/app/feature-gates', {
+      signal: undefined
+    })
   })
 
   it('maps contact channels to the public website content path', () => {
