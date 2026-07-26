@@ -1,7 +1,9 @@
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useTranslation } from 'i18next-vue'
 import { useNotification } from 'naive-ui'
 import { defineComponent, watch } from 'vue'
@@ -14,9 +16,11 @@ import { useSimpleNotificationsStore } from './store'
 export function registerNewReleaseModal(context: SimpleNotificationsRendererContext) {
   const Component = defineComponent({
     setup() {
+      const akariApiStore = useAkariApiStore()
       const simpleNotificationsStore = useSimpleNotificationsStore()
       const selfUpdateStore = useSelfUpdateStore()
       const selfUpdate = useInstance(SelfUpdateRenderer)
+      const windowManager = useInstance(WindowManagerRenderer)
       const appCommon = useInstance(AppCommonRenderer)
       const notification = useNotification()
 
@@ -87,6 +91,7 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
         <UpdateModal
           {...{
             release: selfUpdateStore.releaseInfo,
+            contactChannels: akariApiStore.contactChannels,
             show: simpleNotificationsStore.showNewReleaseModal,
             ignoreVersion: selfUpdateStore.settings.ignoreVersion,
             updateProgressInfo: selfUpdateStore.updateProgressInfo,
@@ -96,12 +101,17 @@ export function registerNewReleaseModal(context: SimpleNotificationsRendererCont
               selfUpdate.setIgnoreVersion(ignore ? version : null)
             },
             onStartDownload: () => {
-              simpleNotificationsStore.showNewReleaseModal = false
               if (import.meta.env.DEV) {
-                selfUpdate.forceStartUpdate()
+                void selfUpdate.forceStartUpdate()
               } else {
-                selfUpdate.startUpdate()
+                void selfUpdate.startUpdate()
               }
+            },
+            onCancelUpdate: () => {
+              void selfUpdate.cancelUpdate()
+            },
+            onCloseAndUpdate: () => {
+              windowManager.mainWindow.closeForce()
             }
           }}
         />

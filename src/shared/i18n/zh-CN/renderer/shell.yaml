@@ -9,7 +9,7 @@ notices:
     contacts:
       open: 前往
       openChannel: 前往{{name}}
-      password: 加入密码：{{password}}
+      password: 密码：{{password}}
       platforms:
         qq: QQ
         telegram: Telegram

@@ -9,7 +9,7 @@ notices:
     contacts:
       open: Open
       openChannel: Open {{name}}
-      password: 'Join password: {{password}}'
+      password: 'Password: {{password}}'
       platforms:
         qq: QQ
         telegram: Telegram

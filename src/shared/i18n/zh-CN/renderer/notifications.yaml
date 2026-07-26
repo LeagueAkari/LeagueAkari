@@ -2,14 +2,14 @@ notifications:
   updateModal:
     newVersion: 新版本
     versionFeatures: 版本特性
-    newVersionAvailable: 新版本可用：{{version}} (当前版本：{{currentVersion}})
-    currentVersion: 当前版本：{{version}}
     releasePage: 发布页面
     externalDownload: 外链下载
     startUpdate: 立即更新
     downloading: 正在下载 {{progress}}%
-    waitingForRestart: 关闭后更新
+    cancelUpdate: 取消更新
+    waitingForRestart: 关闭并更新
     downloadFailed: 下载失败
+    retryUpdate: 重试更新
     noUpdateMd: 无发布说明
     ignoreThisVersion: 忽略此版本
     noUpdate: 无更新
