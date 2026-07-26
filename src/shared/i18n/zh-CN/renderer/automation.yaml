@@ -186,6 +186,9 @@ automation:
       notInLobby: 不在房间内
       searchPlaceholder: 搜索好友名称或标签
   orderedChampionList:
+    pickModalTitle: 自动选择英雄
+    banModalTitle: 自动禁用英雄
+    close: 关闭
     searchForChampion: 搜索英雄
     edit: 编辑
     unselected: 未选择

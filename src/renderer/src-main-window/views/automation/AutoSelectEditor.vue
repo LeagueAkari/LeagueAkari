@@ -87,9 +87,9 @@
             control-full-line
             align="start"
           >
-            <div v-if="currentGroup.positions.length > 1">
+            <div v-if="currentGroup.positions.length > 1" class="w-full">
               <div
-                class="mb-1 flex items-center gap-2"
+                class="mb-1 flex w-full items-center gap-2"
                 v-for="position in currentGroup.positions"
                 :key="position"
               >
@@ -122,8 +122,9 @@
             </div>
             <div
               v-if="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
+              class="w-full"
             >
-              <div class="mb-1 flex items-center gap-2">
+              <div class="mb-1 flex w-full items-center gap-2">
                 <PositionIcon
                   position="all"
                   class="shrink-0 text-lg text-gray-900 dark:text-white"
@@ -291,11 +292,12 @@
             :label="t('automation.champSelect.ban.expectedChampions.label')"
             :label-description="t('automation.champSelect.ban.expectedChampions.description')"
             :label-width="260"
+            control-full-line
             align="start"
           >
-            <NCollapseTransition :show="currentGroup.positions.length > 1">
+            <NCollapseTransition class="w-full" :show="currentGroup.positions.length > 1">
               <div
-                class="mb-1 flex items-center gap-2"
+                class="mb-1 flex w-full items-center gap-2"
                 v-for="position in currentGroup.positions"
                 :key="position"
               >
@@ -328,9 +330,10 @@
             </NCollapseTransition>
 
             <NCollapseTransition
+              class="w-full"
               :show="currentGroup.positions.length === 1 && currentGroup.positions[0] === 'default'"
             >
-              <div class="mb-1 flex items-center gap-2">
+              <div class="mb-1 flex w-full items-center gap-2">
                 <PositionIcon
                   position="all"
                   class="shrink-0 text-lg text-gray-900 dark:text-white"

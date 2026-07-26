@@ -186,6 +186,9 @@ automation:
       notInLobby: Not in Lobby
       searchPlaceholder: Search friend name or tag
   orderedChampionList:
+    pickModalTitle: Auto Pick Champions
+    banModalTitle: Auto Ban Champions
+    close: Close
     searchForChampion: Search for Champion
     edit: Edit
     unselected: Unselected
