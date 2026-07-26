@@ -10,20 +10,37 @@
           {{ resources.champions.name(analysis.championId) }}
         </div>
         <div
-          class="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] leading-4 text-black/45 dark:text-white/45"
+          class="mt-0.5 flex flex-wrap items-center gap-x-1 text-[11px] leading-4 text-black/45 dark:text-white/45"
         >
-          <span class="inline-flex h-4 items-center">
-            {{ t('championAnalysis.games', { count: analysis.winLoss.all.count }) }}
-          </span>
-          <span class="inline-flex h-4 items-center">{{ winLossText(analysis.winLoss.all) }}</span>
-          <span v-if="streakText" class="inline-flex h-4 items-center">{{ streakText }}</span>
-          <span v-if="activeSessionText" class="inline-flex h-4 items-center">
-            {{ activeSessionText }}
+          <span
+            v-for="(item, index) in headerSummaryItems"
+            :key="index"
+            class="inline-flex h-4 items-center gap-1"
+          >
+            <span v-if="index > 0" aria-hidden="true">·</span>
+            <span>{{ item }}</span>
           </span>
         </div>
       </div>
-      <div v-if="onCollectMatches" class="flex shrink-0 items-center">
+      <div class="flex shrink-0 items-center gap-2">
+        <div class="flex shrink-0 flex-col items-center leading-none">
+          <div
+            class="text-[13px] font-bold tabular-nums"
+            :class="{
+              'text-green-700 dark:text-green-300': analysis.winLoss.all.winRate >= 0.53,
+              'text-black/80 dark:text-white/80':
+                analysis.winLoss.all.winRate > 0.47 && analysis.winLoss.all.winRate < 0.53,
+              'text-red-700 dark:text-red-400': analysis.winLoss.all.winRate <= 0.47
+            }"
+          >
+            {{ formatPercent(analysis.winLoss.all.winRate) }}
+          </div>
+          <div class="mt-0.5 text-[9px] leading-3 text-black/45 dark:text-white/45">
+            {{ t('championAnalysis.winRate') }}
+          </div>
+        </div>
         <NButton
+          v-if="onCollectMatches"
           secondary
           size="tiny"
           type="primary"
@@ -301,6 +318,15 @@ const activeSessionText = computed(() => {
     losses: activeSessionLosses
   })
 })
+
+const headerSummaryItems = computed(() =>
+  [
+    t('championAnalysis.games', { count: props.analysis.winLoss.all.count }),
+    winLossText(props.analysis.winLoss.all),
+    streakText.value,
+    activeSessionText.value
+  ].filter(Boolean)
+)
 
 const collectMatchesLabel = computed(() =>
   t('championAnalysis.collectMatches', {
