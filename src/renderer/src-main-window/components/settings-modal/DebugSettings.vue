@@ -26,8 +26,9 @@
       />
     </NModal>
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('settings.debug.files.title')">
+      <SettingsSection setting-id="debug.files" :title="t('settings.debug.files.title')">
         <SettingsRow
+          setting-id="debug.files.logs"
           :label="t('settings.debug.files.logs.label')"
           :label-description="t('settings.debug.files.logs.description')"
           :label-width="400"
@@ -36,7 +37,11 @@
             >{{ t('settings.debug.files.logs.button') }}
           </NButton>
         </SettingsRow>
-        <SettingsRow :label="t('settings.debug.files.appData.label')" :label-width="400">
+        <SettingsRow
+          setting-id="debug.files.app-data"
+          :label="t('settings.debug.files.appData.label')"
+          :label-width="400"
+        >
           <template #labelDescription>
             <TranslationComponent :translation="t('settings.debug.files.appData.description.full')">
               <template #details>
@@ -229,6 +234,7 @@
       </SettingsSection>
       <SettingsSection title="Akari Zone">
         <SettingsRow
+          setting-id="debug.test-page"
           :label="t('settings.debug.testPage.label')"
           :label-description="t('settings.debug.testPage.description')"
           :label-width="400"

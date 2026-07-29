@@ -9,12 +9,15 @@
     :filter="handleFilter"
     @search="handleSearch"
     @clear="handleClearSearch"
+    @compositionstart="handleSearchCompositionStart"
+    @compositionend="handleSearchCompositionEnd"
     v-bind="$attrs"
   />
 </template>
 
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useInstance } from '@renderer-shared/shards'
@@ -38,7 +41,13 @@ const { searchSummonerByAlias } = useSummonerFetch()
 const { cachedSummoners, saveSummoner } = useMatchHistoryFilterEditor()
 
 const isSearchingSummoner = ref(false)
-const searchText = ref('')
+const {
+  committedValue: searchText,
+  setValue: setSearchText,
+  handleUpdateValue: handleSearchValue,
+  handleCompositionStart: handleSearchCompositionStart,
+  handleCompositionEnd: handleSearchCompositionEnd
+} = useCompositionAwareInput()
 
 const { puuid, preferredSource, isCrossRegion, sgpServerId, sgpApiStatus } = usePlayerTab()
 
@@ -171,12 +180,13 @@ const handleSearchSummoner = async (value: string) => {
 const debouncedHandleSearchSummoner = useDebounceFn(handleSearchSummoner, 750)
 
 const handleSearch = (value: string) => {
-  searchText.value = value
-  debouncedHandleSearchSummoner(value)
+  handleSearchValue(value)
 }
 
+watch(searchText, (value) => debouncedHandleSearchSummoner(value))
+
 const handleClearSearch = () => {
-  searchText.value = ''
+  setSearchText('')
   selectedPuuid.value = null
 }
 

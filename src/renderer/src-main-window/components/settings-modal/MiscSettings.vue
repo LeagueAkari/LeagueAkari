@@ -1,8 +1,12 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('settings.misc.respawnTimer.title')">
+      <SettingsSection
+        setting-id="misc.respawn-timer"
+        :title="t('settings.misc.respawnTimer.title')"
+      >
         <SettingsRow
+          setting-id="misc.respawn-timer.enabled"
           :label="t('settings.misc.respawnTimer.enabled.label')"
           :label-description="t('settings.misc.respawnTimer.enabled.description')"
           :label-width="400"
@@ -14,8 +18,12 @@
           />
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.misc.streamerMode.title')">
+      <SettingsSection
+        setting-id="misc.streamer-mode"
+        :title="t('settings.misc.streamerMode.title')"
+      >
         <SettingsRow
+          setting-id="misc.streamer-mode.enabled"
           :label="t('settings.misc.streamerMode.streamerMode.label')"
           :label-description="t('settings.misc.streamerMode.streamerMode.description')"
           :label-width="400"
@@ -28,6 +36,7 @@
         </SettingsRow>
         <NCollapseTransition :show="as.settings.streamerMode">
           <SettingsRow
+            setting-id="misc.streamer-mode.akari-name"
             :label="t('settings.misc.streamerMode.useAkariStyledName.label')"
             :label-description="t('settings.misc.streamerMode.useAkariStyledName.description')"
             :label-width="400"
@@ -41,6 +50,7 @@
           </SettingsRow>
         </NCollapseTransition>
         <SettingsRow
+          setting-id="misc.streamer-mode.content-protection"
           :label="t('settings.misc.streamerMode.contentProtection.label')"
           :label-description="t('settings.misc.streamerMode.contentProtection.description')"
           :label-width="400"

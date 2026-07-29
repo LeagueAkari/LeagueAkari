@@ -12,8 +12,11 @@
       <NInput
         class="ml-auto max-w-32.5!"
         size="tiny"
-        v-model:value="filterRecentVisits"
+        :value="filterRecentVisits"
         :placeholder="t('playerSearch.search')"
+        @update:value="handleRecentVisitsFilterUpdate"
+        @compositionstart="handleRecentVisitsCompositionStart"
+        @compositionend="handleRecentVisitsCompositionEnd"
       />
     </div>
 
@@ -184,8 +187,11 @@
       <NInput
         class="ml-auto max-w-32.5!"
         size="tiny"
-        v-model:value="filterFriends"
+        :value="filterFriends"
         :placeholder="t('playerSearch.search')"
+        @update:value="handleFriendsFilterUpdate"
+        @compositionstart="handleFriendsCompositionStart"
+        @compositionend="handleFriendsCompositionEnd"
       />
     </div>
 
@@ -246,6 +252,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -258,7 +265,7 @@ import { Pin16Filled } from '@vicons/fluent'
 import { GroupFilled, VisibilityFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInput, NScrollbar, useMessage } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import { useSearchPaneSearchHistory } from './search-history'
 import { isFriendSpectatable, useSearchPaneFriends } from './sidebar-friends'
@@ -283,14 +290,28 @@ const emits = defineEmits<{
 
 const sgps = useSgpStore()
 
-const filterRecentVisits = ref('')
-const filterFriends = ref('')
+const {
+  inputValue: filterRecentVisits,
+  committedValue: recentVisitsQuery,
+  setValue: setRecentVisitsFilter,
+  handleUpdateValue: handleRecentVisitsFilterUpdate,
+  handleCompositionStart: handleRecentVisitsCompositionStart,
+  handleCompositionEnd: handleRecentVisitsCompositionEnd
+} = useCompositionAwareInput()
+const {
+  inputValue: filterFriends,
+  committedValue: friendsQuery,
+  setValue: setFriendsFilter,
+  handleUpdateValue: handleFriendsFilterUpdate,
+  handleCompositionStart: handleFriendsCompositionStart,
+  handleCompositionEnd: handleFriendsCompositionEnd
+} = useCompositionAwareInput()
 
 const filteredPinnedSearchHistory = computed(() => {
   return pinnedSearchHistory.value.filter((item) => {
     return `${item.summoner.gameName} #${item.summoner.tagLine}`
       .toLowerCase()
-      .includes(filterRecentVisits.value.toLowerCase())
+      .includes(recentVisitsQuery.value.toLowerCase())
   })
 })
 
@@ -298,7 +319,7 @@ const filteredUnpinnedSearchHistory = computed(() => {
   return unpinnedSearchHistory.value.filter((item) => {
     return `${item.summoner.gameName} #${item.summoner.tagLine}`
       .toLowerCase()
-      .includes(filterRecentVisits.value.toLowerCase())
+      .includes(recentVisitsQuery.value.toLowerCase())
   })
 })
 
@@ -306,7 +327,7 @@ const filteredSortedFriends = computed(() => {
   return sortedFriends.value.filter((friend) => {
     return `${friend.gameName} #${friend.gameTag}`
       .toLowerCase()
-      .includes(filterFriends.value.toLowerCase())
+      .includes(friendsQuery.value.toLowerCase())
   })
 })
 
@@ -343,8 +364,8 @@ const handleSpectateFriend = async (friend: Friend) => {
 const { updateFriends, sortedFriends } = useSearchPaneFriends()
 
 const reset = () => {
-  filterRecentVisits.value = ''
-  filterFriends.value = ''
+  setRecentVisitsFilter('')
+  setFriendsFilter('')
   updateSearchHistory()
   updateFriends()
 }

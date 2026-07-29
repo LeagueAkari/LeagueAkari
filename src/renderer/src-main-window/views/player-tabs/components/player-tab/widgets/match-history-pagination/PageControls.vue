@@ -44,7 +44,7 @@
             v-model:value="arbitraryPage"
             :disabled="isPaginationDisabled"
             :min="1"
-            @keyup.enter="handleGoToArbitraryPage"
+            @keydown.enter="handleArbitraryPageEnter"
           />
           <NButton
             size="small"
@@ -179,6 +179,14 @@ const handleGoToArbitraryPage = () => {
   loadMatchHistory({
     startIndex: (arbitraryPage.value - 1) * currentPageSize.value
   })
+}
+
+const handleArbitraryPageEnter = (event: KeyboardEvent) => {
+  if (event.isComposing) {
+    return
+  }
+
+  handleGoToArbitraryPage()
 }
 
 const handleGoToFirstPage = () => {

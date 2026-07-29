@@ -6,7 +6,16 @@
       'use-plain-bg': !backgroundImageUrl
     }"
   >
-    <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
+    <SettingsModal
+      ref="settingsModal"
+      v-model:show="isShowingSettingModal"
+      v-model:tab-name="settingModelTab"
+      v-model:storage-tab-name="storageSettingsTab"
+    />
+    <SettingsSearchPalette
+      v-model:show="isShowingSettingsSearch"
+      @navigate="handleSettingsSearchNavigate"
+    />
     <MainWindowCloseConfirmModal />
 
     <SetupInAppScope />
@@ -53,13 +62,15 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue'
+import { nextTick, onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
@@ -68,33 +79,102 @@ import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
 import { useMicaAvailability } from './composables/useMicaAvailability'
 import { provideMainWindowAppContext } from './context'
+import {
+  AkariNavigationRenderer,
+  MAIN_WINDOW_NAVIGATION_SCOPE,
+  type MainWindowNavigationDestination,
+  type SettingsNavigationTargetId,
+  type SettingsTabName,
+  type StorageSettingsTabName
+} from './shards/akari-navigation'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
+import SettingsSearchPalette from './shards/akari-navigation/settings/SettingsSearchPalette.vue'
 
 const mui = useInstance(MainWindowUiRenderer)
+const akariNavigation = useInstance(AkariNavigationRenderer)
 
 const app = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
 
 const { t } = useTranslation()
+const router = useRouter()
 
 greeting(as.version)
 
 const contentEl = useTemplateRef('contentEl')
 const { width, height } = useElementSize(contentEl)
 
-provideMainWindowAppContext({
-  contentWidth: width,
-  contentHeight: height,
-  openSettingsModal: (tabName?: string) => {
-    isShowingSettingModal.value = true
-    if (tabName) {
-      settingModelTab.value = tabName
+const isShowingSettingModal = ref(false)
+const isShowingSettingsSearch = ref(false)
+const settingModelTab = ref<SettingsTabName>('basic')
+const storageSettingsTab = ref<StorageSettingsTabName>('tagged-players')
+const settingsModal = useTemplateRef<InstanceType<typeof SettingsModal>>('settingsModal')
+
+const isMainWindowNavigationDestination = (
+  destination: unknown
+): destination is MainWindowNavigationDestination => {
+  if (!destination || typeof destination !== 'object' || !('surface' in destination)) {
+    return false
+  }
+
+  return destination.surface === 'settings-modal' || destination.surface === 'route'
+}
+
+const akariNavigationContext = akariNavigation.provideContext()
+useAkariNavigationBoundary({
+  scope: MAIN_WINDOW_NAVIGATION_SCOPE,
+  context: akariNavigationContext,
+  parentOutlet: akariNavigation.rootOutlet,
+  activate: async (destination, { signal }) => {
+    if (!isMainWindowNavigationDestination(destination)) {
+      return { status: 'unavailable', reason: 'unknown-main-window-destination' }
     }
+
+    if (destination.surface === 'settings-modal') {
+      isShowingSettingModal.value = true
+      await nextTick()
+
+      const modal = settingsModal.value
+      if (!modal) {
+        return { status: 'unavailable', reason: 'settings-modal-not-mounted' }
+      }
+
+      await modal.waitUntilEntered(signal)
+      await nextTick()
+      return { status: 'ready' }
+    }
+
+    isShowingSettingModal.value = false
+    await router.replace({
+      name: destination.route.name,
+      params: { section: destination.route.section }
+    })
+    if (!signal.aborted) {
+      await nextTick()
+    }
+    return { status: 'ready' }
   }
 })
 
-const isShowingSettingModal = ref(false)
-const settingModelTab = ref('basic')
+const navigateToSetting = (targetId: SettingsNavigationTargetId) => {
+  void akariNavigation.navigateToSetting(targetId)
+}
+
+const handleSettingsSearchNavigate = (targetId: SettingsNavigationTargetId) => {
+  isShowingSettingsSearch.value = false
+  navigateToSetting(targetId)
+}
+
+provideMainWindowAppContext({
+  contentWidth: width,
+  contentHeight: height,
+  openSettingsSearch: () => {
+    isShowingSettingsSearch.value = true
+  },
+  openSettingsModal: () => {
+    isShowingSettingModal.value = true
+  }
+})
 
 const preferMica = useMicaAvailability()
 const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()

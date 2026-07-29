@@ -109,7 +109,6 @@
 </template>
 
 <script setup lang="ts">
-import { useMainWindowAppContext } from '@main-window/context'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
@@ -131,6 +130,8 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, NSelect, NSwitch, NTooltip } from 'naive-ui'
 import { computed, useTemplateRef } from 'vue'
 
+import { AkariNavigationRenderer } from '@main-window/shards/akari-navigation'
+
 const { t } = useTranslation()
 
 const TITLEBAR_TOOLTIP_Z_INDEX = 75000
@@ -140,7 +141,7 @@ const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 const appCommon = useAppCommonStore()
 const sgp = useSgpStore()
-const { openSettingsModal } = useMainWindowAppContext()
+const akariNavigation = useInstance(AkariNavigationRenderer)
 
 const labelsEl = useTemplateRef('labels')
 const { horizontal: horizontalOverflow } = useOverflow(labelsEl)
@@ -205,7 +206,7 @@ const handleSgpTagChange = (val: string) => {
 }
 
 const handleOpenOngoingGameSettings = () => {
-  openSettingsModal('ongoing-game')
+  void akariNavigation.navigateToSetting('ongoing-game.common')
 }
 
 const teamNameMap = computed(() => ({

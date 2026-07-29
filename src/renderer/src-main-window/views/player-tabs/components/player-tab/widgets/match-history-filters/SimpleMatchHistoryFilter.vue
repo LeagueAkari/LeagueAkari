@@ -59,6 +59,8 @@
           :filter="handleSummonerFilter"
           @search="handleSearch"
           @clear="handleClearSummonerSearch"
+          @compositionstart="handleSearchCompositionStart"
+          @compositionend="handleSearchCompositionEnd"
         />
       </div>
 
@@ -87,6 +89,7 @@
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useSummonerFetch } from '@renderer-shared/composables/useSummonerFetch'
 import { useInstance } from '@renderer-shared/shards'
@@ -125,7 +128,13 @@ const { searchSummonerByAlias } = useSummonerFetch()
 const componentName = useComponentName()
 const log = useInstance(LoggerRenderer)
 
-const searchText = ref('')
+const {
+  committedValue: searchText,
+  setValue: setSearchText,
+  handleUpdateValue: handleSearchValue,
+  handleCompositionStart: handleSearchCompositionStart,
+  handleCompositionEnd: handleSearchCompositionEnd
+} = useCompositionAwareInput()
 const searchResults = ref<SimpleSummonerResult[]>([])
 const isSearchingSummoner = ref(false)
 
@@ -368,12 +377,13 @@ const handleSearchSummoner = async (value: string) => {
 const debouncedHandleSearchSummoner = useDebounceFn(handleSearchSummoner, 750)
 
 const handleSearch = (value: string) => {
-  searchText.value = value
-  debouncedHandleSearchSummoner(value)
+  handleSearchValue(value)
 }
 
+watch(searchText, (value) => debouncedHandleSearchSummoner(value))
+
 const handleClearSummonerSearch = () => {
-  searchText.value = ''
+  setSearchText('')
   searchResults.value = []
 }
 

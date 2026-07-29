@@ -1,10 +1,19 @@
 settings:
   modal:
     title: Settings
+  commandPalette:
+    searchPlaceholder: Search settings
+    searchAriaLabel: Search settings
+    empty: No matching settings
+    openHint: Open
+    closeHint: Close
   app:
     title: Application
     basic:
       title: Basic
+      locale:
+        label: Language
+        description: Set the primary language for League Akari
       mainWindowCloseAction:
         label: Main Window Close Action
         description: The action to be executed when the main window is closed

@@ -2,8 +2,12 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
-        <SettingsSection :title="t('toolkit.client.gameClient.title')">
+        <SettingsSection
+          setting-id="toolkit.client.game-client"
+          :title="t('toolkit.client.gameClient.title')"
+        >
           <SettingsRow
+            setting-id="toolkit.client.game-client.terminate-shortcut-enabled"
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
@@ -32,6 +36,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="toolkit.client.game-client.terminate-shortcut"
             :disabled="!as.nativeSupport.nativeInput.available"
             :label="
               nativeInputRequiresElevation
@@ -56,6 +61,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="toolkit.client.game-client.settings-file-mode"
             :label-description="t('toolkit.client.gameClient.settingsFileMode.description')"
             :label-width="320"
           >
@@ -116,7 +122,7 @@
                 :min="1"
                 @update:value="(val) => (fixWindowMethodAOptions.baseWidth = val || 0)"
                 :value="fixWindowMethodAOptions.baseWidth"
-                @keyup.enter="() => fixWindowInputButton2?.focus()"
+                @keydown.enter="handleFixWindowWidthEnter"
               >
                 <template #prefix>W</template>
               </NInputNumber>
@@ -129,7 +135,7 @@
                 :min="1"
                 @update:value="(val) => (fixWindowMethodAOptions.baseHeight = val || 0)"
                 :value="fixWindowMethodAOptions.baseHeight"
-                @keyup.enter="() => handleFixWindowMethodA()"
+                @keydown.enter="handleFixWindowHeightEnter"
                 ><template #prefix>H</template>
               </NInputNumber>
               <NButton
@@ -229,6 +235,18 @@ const handleFixWindowMethodA = async () => {
       }
     }
   })
+}
+
+const handleFixWindowWidthEnter = (event: KeyboardEvent) => {
+  if (!event.isComposing) {
+    fixWindowInputButton2.value?.focus()
+  }
+}
+
+const handleFixWindowHeightEnter = (event: KeyboardEvent) => {
+  if (!event.isComposing) {
+    void handleFixWindowMethodA()
+  }
 }
 
 const message = useMessage()

@@ -8,11 +8,14 @@
         size="small"
       />
       <NInput
-        v-model:value="searchText"
+        :value="searchInput"
         placeholder="搜索 ID 或名称..."
         clearable
         size="small"
         style="width: 240px"
+        @update:value="handleSearchUpdate"
+        @compositionstart="handleSearchCompositionStart"
+        @compositionend="handleSearchCompositionEnd"
       />
       <span class="text-sm text-black/60 dark:text-white/60">
         共 {{ filteredData.length }} 项
@@ -111,6 +114,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -122,7 +126,13 @@ const lcs = useLeagueClientStore()
 const wm = useInstance(WindowManagerRenderer)
 
 const selectedCategory = ref<string>('items')
-const searchText = ref('')
+const {
+  inputValue: searchInput,
+  committedValue: searchText,
+  handleUpdateValue: handleSearchUpdate,
+  handleCompositionStart: handleSearchCompositionStart,
+  handleCompositionEnd: handleSearchCompositionEnd
+} = useCompositionAwareInput()
 
 const categoryOptions = [
   { label: 'Items', value: 'items' },

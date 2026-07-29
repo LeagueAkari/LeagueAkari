@@ -1,5 +1,8 @@
 <template>
-  <SettingsSection :title="t('toolkit.chatAvailability.title')">
+  <SettingsSection
+    setting-id="toolkit.misc.chat-availability"
+    :title="t('toolkit.chatAvailability.title')"
+  >
     <SettingsRow
       :label="t('toolkit.chatAvailability.availability.label')"
       :label-description="t('toolkit.chatAvailability.availability.description')"
@@ -33,6 +36,7 @@
       </NRadioGroup>
     </SettingsRow>
     <SettingsRow
+      setting-id="toolkit.misc.chat-availability.lock-offline"
       :label="t('toolkit.chatAvailability.lockOfflineStatus.label')"
       :label-description="t('toolkit.chatAvailability.lockOfflineStatus.description')"
       :label-width="260"

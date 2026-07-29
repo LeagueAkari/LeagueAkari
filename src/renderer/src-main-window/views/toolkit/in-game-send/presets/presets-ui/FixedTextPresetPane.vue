@@ -159,7 +159,7 @@
             :maxlength="titleMaxLength"
             clearable
             @blur="finishTitleEdit"
-            @keydown.enter.prevent="finishTitleEdit"
+            @keydown.enter="handleTitleInputEnter"
           />
           <button
             v-else
@@ -517,6 +517,15 @@ const finishTitleEdit = async () => {
   if (await saveCurrent()) {
     isEditingTitle.value = false
   }
+}
+
+const handleTitleInputEnter = (event: KeyboardEvent) => {
+  if (event.isComposing) {
+    return
+  }
+
+  event.preventDefault()
+  void finishTitleEdit()
 }
 
 const handleSelect = async (id: string) => {

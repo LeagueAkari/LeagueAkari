@@ -1,10 +1,19 @@
 settings:
   modal:
     title: 设置
+  commandPalette:
+    searchPlaceholder: 搜索设置项
+    searchAriaLabel: 搜索设置项
+    empty: 没有匹配的设置项
+    openHint: 打开
+    closeHint: 关闭
   app:
     title: 应用
     basic:
       title: 基础
+      locale:
+        label: 语言
+        description: 设置 League Akari 的主语言
       mainWindowCloseAction:
         label: 主窗口关闭策略
         description: 当关闭主窗口时所执行的行为

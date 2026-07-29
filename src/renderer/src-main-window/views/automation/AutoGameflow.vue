@@ -1,12 +1,14 @@
 <template>
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full" ref="el">
-      <div class="mx-auto flex max-w-[800px] flex-col gap-6 p-6">
+      <div class="mx-auto flex max-w-200 flex-col gap-6 p-6">
         <SettingsSection
+          setting-id="automation.gameflow.ready-check"
           :title="t('automation.gameflow.sections.readyCheck')"
           :footer="t('automation.gameflow.autoAcceptEnabled.footer')"
         >
           <SettingsRow
+            setting-id="automation.gameflow.ready-check.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoAcceptEnabled.description')"
             :label-width="260"
@@ -18,6 +20,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.ready-check.delay"
             :label="t('automation.gameflow.autoAcceptDelaySeconds.label')"
             :label-description="t('automation.gameflow.autoAcceptDelaySeconds.description')"
             :label-width="260"
@@ -33,8 +36,12 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.autoHonor')">
+        <SettingsSection
+          setting-id="automation.gameflow.auto-honor"
+          :title="t('automation.gameflow.sections.autoHonor')"
+        >
           <SettingsRow
+            setting-id="automation.gameflow.auto-honor.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoHonorEnabled.description')"
             :label-width="260"
@@ -47,8 +54,15 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.playAgain')">
-          <SettingsRow :label="t('automation.gameflow.common.enabled')" :label-width="260">
+        <SettingsSection
+          setting-id="automation.gameflow.play-again"
+          :title="t('automation.gameflow.sections.playAgain')"
+        >
+          <SettingsRow
+            setting-id="automation.gameflow.play-again.enabled"
+            :label="t('automation.gameflow.common.enabled')"
+            :label-width="260"
+          >
             <template #labelDescription>
               <TranslationComponent
                 :translation="t('automation.gameflow.playAgainEnabled.description.full')"
@@ -73,8 +87,12 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.autoMatchmaking')">
+        <SettingsSection
+          setting-id="automation.gameflow.auto-matchmaking"
+          :title="t('automation.gameflow.sections.autoMatchmaking')"
+        >
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoMatchmakingEnabled.description')"
             :label-width="260"
@@ -86,6 +104,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.minimum-members"
             :label="t('automation.gameflow.autoMatchmakingMinimumMembers.label')"
             :label-description="
               t('automation.gameflow.autoMatchmakingMinimumMembers.description', {
@@ -104,6 +123,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.delay"
             :label="t('automation.gameflow.autoMatchmakingDelaySeconds.label')"
             :label-description="t('automation.gameflow.autoMatchmakingDelaySeconds.description')"
             :label-width="260"
@@ -118,6 +138,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.wait-for-invitees"
             :label="t('automation.gameflow.autoMatchmakingWaitForInvitees.label')"
             :label-description="t('automation.gameflow.autoMatchmakingWaitForInvitees.description')"
             :label-width="260"
@@ -129,6 +150,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.rematch-strategy"
             :label="t('automation.gameflow.autoMatchmakingRematchStrategy.label')"
             :label-description="t('automation.gameflow.autoMatchmakingRematchStrategy.description')"
             :label-width="260"
@@ -153,6 +175,7 @@
             </NRadioGroup>
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.auto-matchmaking.rematch-fixed-duration"
             :label="t('automation.gameflow.autoMatchmakingRematchFixedDuration.label')"
             :label-description="
               store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'
@@ -177,8 +200,12 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.autoReconnect')">
+        <SettingsSection
+          setting-id="automation.gameflow.auto-reconnect"
+          :title="t('automation.gameflow.sections.autoReconnect')"
+        >
           <SettingsRow
+            setting-id="automation.gameflow.auto-reconnect.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoReconnectEnabled.description')"
             :label-width="260"
@@ -191,8 +218,12 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.leader')">
+        <SettingsSection
+          setting-id="automation.gameflow.leader"
+          :title="t('automation.gameflow.sections.leader')"
+        >
           <SettingsRow
+            setting-id="automation.gameflow.leader.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoSkipLeaderEnabled.description')"
             :label-width="260"
@@ -205,8 +236,12 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection :title="t('automation.gameflow.sections.invitations')">
+        <SettingsSection
+          setting-id="automation.gameflow.invitations"
+          :title="t('automation.gameflow.sections.invitations')"
+        >
           <SettingsRow
+            setting-id="automation.gameflow.invitations.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoHandleInvitationsEnabled.description')"
             :label-width="260"
@@ -218,6 +253,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.invitations.reject-when-away"
             :label="t('automation.gameflow.rejectInvitationWhenAway.label')"
             :label-description="t('automation.gameflow.rejectInvitationWhenAway.description')"
             :label-width="260"
@@ -229,6 +265,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.gameflow.invitations.strategies"
             :label="t('automation.gameflow.invitationHandlingStrategies.label')"
             :label-description="t('automation.gameflow.invitationHandlingStrategies.description')"
             :label-width="260"
@@ -280,7 +317,7 @@
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection>
+        <SettingsSection setting-id="automation.gameflow.aram-team-side">
           <template #header>
             <TooltipWithIcon>
               <span class="text-sm leading-5 font-bold text-black/80 dark:text-white/90">
@@ -291,7 +328,7 @@
                   <img
                     :src="aramTeamSideMessageImage"
                     :alt="t('automation.gameflow.autoSendARAMTeamSideEnabled.tooltipImageAlt')"
-                    class="mb-2 aspect-[1680/935] w-90 max-w-full rounded border border-black/10 object-cover dark:border-white/10"
+                    class="mb-2 aspect-1680/935 w-90 max-w-full rounded border border-black/10 object-cover dark:border-white/10"
                   />
                   <div>{{ t('automation.gameflow.autoSendARAMTeamSideEnabled.tooltipBody') }}</div>
                 </div>
@@ -299,6 +336,7 @@
             </TooltipWithIcon>
           </template>
           <SettingsRow
+            setting-id="automation.gameflow.aram-team-side.enabled"
             :label="t('automation.gameflow.common.enabled')"
             :label-description="t('automation.gameflow.autoSendARAMTeamSideEnabled.description')"
             :label-width="260"

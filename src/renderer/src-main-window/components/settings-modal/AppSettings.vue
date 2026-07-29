@@ -1,8 +1,9 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('settings.app.basic.title')">
+      <SettingsSection setting-id="app.basic" :title="t('settings.app.basic.title')">
         <SettingsRow
+          setting-id="app.basic.close-action"
           :label="t('settings.app.basic.mainWindowCloseAction.label')"
           :label-description="t('settings.app.basic.mainWindowCloseAction.description')"
           :label-width="400"
@@ -16,8 +17,9 @@
           />
         </SettingsRow>
         <SettingsRow
-          label="语言 / Language"
-          label-description="设置应用的主语言 / Set primary language for League Akari"
+          setting-id="app.basic.locale"
+          :label="t('settings.app.basic.locale.label')"
+          :label-description="t('settings.app.basic.locale.description')"
           :label-width="400"
         >
           <NSelect
@@ -29,6 +31,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.basic.preferred-lol-source"
           :label="t('settings.app.basic.preferredLolSource.label')"
           :label-description="t('settings.app.basic.preferredLolSource.description')"
           :label-width="400"
@@ -107,6 +110,7 @@
           </div>
         </SettingsRow>
         <SettingsRow
+          setting-id="app.basic.theme"
           :label="t('settings.app.basic.theme.label')"
           :label-description="t('settings.app.basic.theme.description')"
           :label-width="400"
@@ -121,6 +125,7 @@
         </SettingsRow>
       </SettingsSection>
       <SettingsSection
+        setting-id="app.self-update"
         :title="t('settings.app.selfUpdate.title')"
         :footer="
           sus.isUpdateSupportedOnCurrentPlatform
@@ -129,6 +134,7 @@
         "
       >
         <SettingsRow
+          setting-id="app.self-update.auto-check"
           :label="t('settings.app.selfUpdate.autoCheckUpdates.label')"
           :label-description="t('settings.app.selfUpdate.autoCheckUpdates.description')"
           :label-width="400"
@@ -142,6 +148,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.self-update.auto-download"
           :label="t('settings.app.selfUpdate.autoDownloadUpdates.label')"
           :label-description="t('settings.app.selfUpdate.autoDownloadUpdates.description')"
           :label-width="400"
@@ -155,6 +162,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.self-update.check"
           :label="t('settings.app.selfUpdate.checkUpdates')"
           :label-width="400"
           :disabled="!sus.isUpdateSupportedOnCurrentPlatform"
@@ -274,8 +282,12 @@
           >
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.app.mainWindowUi.title')">
+      <SettingsSection
+        setting-id="app.main-window-ui"
+        :title="t('settings.app.mainWindowUi.title')"
+      >
         <SettingsRow
+          setting-id="app.main-window-ui.background"
           :label="t('settings.app.mainWindowUi.background.label')"
           :label-description="t('settings.app.mainWindowUi.background.description')"
           :label-width="400"
@@ -307,8 +319,12 @@
           </NRadioGroup>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.app.lcConnection.title')">
+      <SettingsSection
+        setting-id="app.lcu-connection"
+        :title="t('settings.app.lcConnection.title')"
+      >
         <SettingsRow
+          setting-id="app.lcu-connection.auto-connect"
           :label="t('settings.app.lcConnection.autoConnect.label')"
           :label-description="t('settings.app.lcConnection.autoConnect.description')"
           :label-width="400"
@@ -320,6 +336,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.lcu-connection.use-wmi"
           v-if="as.isWindows"
           :label="t('settings.app.lcConnection.useWmi.label')"
           :label-description="t('settings.app.lcConnection.useWmi.description')"
@@ -332,6 +349,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.lcu-connection.rebuild-wmi"
           v-if="as.isWindows"
           :label="t('settings.app.lcConnection.rebuildWmi.label')"
           :label-description="t('settings.app.lcConnection.rebuildWmi.description')"
@@ -342,8 +360,9 @@
           </NButton>
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.app.misc.title')">
+      <SettingsSection setting-id="app.misc" :title="t('settings.app.misc.title')">
         <SettingsRow
+          setting-id="app.misc.log-level"
           :label="t('settings.app.misc.logLevel.label')"
           :label-description="t('settings.app.misc.logLevel.description')"
           :label-width="400"
@@ -357,6 +376,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.misc.http-proxy.strategy"
           :label="t('settings.app.misc.httpProxy.strategy.label')"
           :label-description="t('settings.app.misc.httpProxy.strategy.description')"
           :label-width="400"
@@ -371,6 +391,7 @@
         </SettingsRow>
         <NCollapseTransition :show="as.settings.httpProxy.strategy === 'force'">
           <SettingsRow
+            setting-id="app.misc.http-proxy.host"
             :label="t('settings.app.misc.httpProxy.host.label')"
             :label-description="t('settings.app.misc.httpProxy.host.description')"
             :label-width="400"
@@ -385,6 +406,7 @@
             />
           </SettingsRow>
           <SettingsRow
+            setting-id="app.misc.http-proxy.port"
             :label="t('settings.app.misc.httpProxy.port.label')"
             :label-description="t('settings.app.misc.httpProxy.port.description')"
             :label-width="400"
@@ -401,6 +423,7 @@
           </SettingsRow>
         </NCollapseTransition>
         <SettingsRow
+          setting-id="app.misc.disable-hardware-acceleration"
           :label="t('settings.app.misc.disableHardwareAcceleration.label')"
           :label-description="t('settings.app.misc.disableHardwareAcceleration.description')"
           :label-width="400"
@@ -412,6 +435,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="app.misc.uninstall"
           :label="t('settings.app.misc.uninstallApp.label')"
           :label-description="t('settings.app.misc.uninstallApp.description')"
           :label-width="400"

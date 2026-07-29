@@ -11,7 +11,7 @@ import { useTranslation } from 'i18next-vue'
 import { DialogReactive, NCheckbox, useDialog } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
-import { useMainWindowAppContext } from '@main-window/context'
+import { AkariNavigationRenderer } from '@main-window/shards/akari-navigation'
 
 import {
   NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
@@ -171,7 +171,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
   const sgpStore = useSgpStore()
   const dialog = useDialog()
   const appCommonStore = useAppCommonStore()
-  const { openSettingsModal } = useMainWindowAppContext()
+  const akariNavigation = useInstance(AkariNavigationRenderer)
   const neverShowAgainChecked = ref(false)
 
   const { t } = useTranslation(undefined, {
@@ -244,7 +244,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
           negativeText: t('negativeText'),
           onPositiveClick: () => {
             saveNeverShowAgain()
-            openSettingsModal('basic')
+            void akariNavigation.navigateToSetting('app.basic.preferred-lol-source')
             inst?.destroy()
             inst = null
           },

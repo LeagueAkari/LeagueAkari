@@ -4,7 +4,8 @@ export type AppContext = {
   contentWidth: Ref<number>
   contentHeight: Ref<number>
 
-  openSettingsModal: (tabName?: string) => void
+  openSettingsSearch: () => void
+  openSettingsModal: () => void
 }
 
 export const MainWindowAppContext: InjectionKey<AppContext> = Symbol('MainWindowAppContext')
@@ -12,11 +13,13 @@ export const MainWindowAppContext: InjectionKey<AppContext> = Symbol('MainWindow
 export function provideMainWindowAppContext(props: {
   contentWidth: MaybeRefOrGetter<number>
   contentHeight: MaybeRefOrGetter<number>
-  openSettingsModal: (tabName?: string) => void
+  openSettingsSearch: () => void
+  openSettingsModal: () => void
 }) {
   provide(MainWindowAppContext, {
     contentWidth: toRef(props.contentWidth),
     contentHeight: toRef(props.contentHeight),
+    openSettingsSearch: props.openSettingsSearch,
     openSettingsModal: props.openSettingsModal
   })
 }

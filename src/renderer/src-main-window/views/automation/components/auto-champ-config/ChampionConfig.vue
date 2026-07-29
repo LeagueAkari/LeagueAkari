@@ -30,7 +30,10 @@
             clearable
             size="small"
             :placeholder="t('automation.champConfig.championConfig.searchPlaceholder')"
-            v-model:value="filterInput"
+            :value="filterInput"
+            @update:value="handleFilterUpdate"
+            @compositionstart="handleFilterCompositionStart"
+            @compositionend="handleFilterCompositionEnd"
           >
             <template #prefix>
               <NIcon :component="SearchIcon" />
@@ -472,6 +475,7 @@
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
@@ -516,7 +520,13 @@ const { match: isNameMatch } = useChampionNameMatch()
 
 const show = defineModel<boolean>('show', { default: false })
 
-const filterInput = ref('')
+const {
+  inputValue: filterInput,
+  committedValue: filterQuery,
+  handleUpdateValue: handleFilterUpdate,
+  handleCompositionStart: handleFilterCompositionStart,
+  handleCompositionEnd: handleFilterCompositionEnd
+} = useCompositionAwareInput()
 
 const championOptions = computed(() => {
   const sorted = Object.values(lcs.gameData.champions)
@@ -578,7 +588,7 @@ const championOptions = computed(() => {
       return a.name.localeCompare(b.name, 'zh-Hans-CN')
     })
 
-  const isEmpty = filterInput.value.trim() === ''
+  const isEmpty = filterQuery.value.trim() === ''
   const nonEmpty = sorted.filter((b) => b.id !== -1)
 
   if (isEmpty) {
@@ -590,7 +600,7 @@ const championOptions = computed(() => {
     }))
   } else {
     return nonEmpty
-      .filter((b) => isNameMatch(filterInput.value, b.name, b.id))
+      .filter((b) => isNameMatch(filterQuery.value, b.name, b.id))
       .map((b) => ({
         value: b.id,
         label: b.name,

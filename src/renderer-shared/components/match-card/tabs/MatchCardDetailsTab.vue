@@ -28,8 +28,11 @@
             <NInput
               size="small"
               :placeholder="t('matchCard.detailsTab.filterPlaceholder')"
-              v-model:value="filterText"
+              :value="filterInput"
               clearable
+              @update:value="handleFilterUpdate"
+              @compositionstart="handleFilterCompositionStart"
+              @compositionend="handleFilterCompositionEnd"
             />
           </th>
 
@@ -113,12 +116,13 @@
 
 <script setup lang="tsx">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { refDebounced } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NInput, NPopover, NScrollbar } from 'naive-ui'
-import { type VNodeChild, computed, ref, shallowRef } from 'vue'
+import { type VNodeChild, computed, ref } from 'vue'
 
 import { useMatchCard } from '../context'
 import {
@@ -151,7 +155,13 @@ const handleHeaderWheel = (e: WheelEvent) => {
 const resources = useAkariResourceProvider()
 const rawStats = useRawDetails()
 const valueRenderer = useValueRenderer()
-const filterText = shallowRef('')
+const {
+  inputValue: filterInput,
+  committedValue: filterText,
+  handleUpdateValue: handleFilterUpdate,
+  handleCompositionStart: handleFilterCompositionStart,
+  handleCompositionEnd: handleFilterCompositionEnd
+} = useCompositionAwareInput()
 const filterTextDebounced = refDebounced(filterText, 250)
 const groupDisplayOrder = new Map(RENDER_GROUP_DISPLAY_ORDER.map((group, index) => [group, index]))
 

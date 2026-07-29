@@ -1,6 +1,10 @@
 <template>
-  <SettingsSection :title="t('toolkit.chatStatusMessage.title')">
+  <SettingsSection
+    setting-id="toolkit.misc.chat-status-message"
+    :title="t('toolkit.chatStatusMessage.title')"
+  >
     <SettingsRow
+      setting-id="toolkit.misc.chat-status-message.text"
       :label="t('toolkit.chatStatusMessage.text.label')"
       :label-description="t('toolkit.chatStatusMessage.text.description')"
       :label-width="260"

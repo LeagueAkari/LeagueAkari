@@ -1,11 +1,14 @@
 <template>
   <div class="flex h-full flex-col">
     <NInput
-      v-model:value="filterText"
+      :value="filterInput"
       :placeholder="t('opgg.championTable.searchPlaceholder')"
       size="small"
       class="mb-1 text-xs"
       clearable
+      @update:value="handleFilterUpdate"
+      @compositionstart="handleFilterCompositionStart"
+      @compositionend="handleFilterCompositionEnd"
     />
     <NDataTable
       class="flex-1"
@@ -32,6 +35,7 @@
 
 <script lang="tsx" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { OpggChampionItem } from '@shared/types/opgg'
@@ -46,7 +50,7 @@ import {
   NInput,
   NSpin
 } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/composables/useChampionNameMatch'
 
@@ -55,7 +59,13 @@ import { getTierTextColorClass } from './utils/theme'
 
 const { t } = useTranslation()
 
-const filterText = ref('')
+const {
+  inputValue: filterInput,
+  committedValue: filterText,
+  handleUpdateValue: handleFilterUpdate,
+  handleCompositionStart: handleFilterCompositionStart,
+  handleCompositionEnd: handleFilterCompositionEnd
+} = useCompositionAwareInput()
 
 const lcs = useLeagueClientStore()
 

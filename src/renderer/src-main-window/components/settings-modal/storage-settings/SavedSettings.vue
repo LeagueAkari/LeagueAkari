@@ -1,7 +1,8 @@
 <template>
   <NScrollbar class="h-full">
-    <SettingsSection :title="t('settings.savedSettings.title')">
+    <SettingsSection setting-id="storage.saved-settings" :title="t('settings.savedSettings.title')">
       <SettingsRow
+        setting-id="storage.saved-settings.export"
         :label="t('settings.savedSettings.export.label')"
         :label-description="t('settings.savedSettings.export.description')"
         :label-width="400"
@@ -11,6 +12,7 @@
         </NButton>
       </SettingsRow>
       <SettingsRow
+        setting-id="storage.saved-settings.import"
         :label="t('settings.savedSettings.import.label')"
         :label-description="t('settings.savedSettings.import.description')"
         :label-width="400"

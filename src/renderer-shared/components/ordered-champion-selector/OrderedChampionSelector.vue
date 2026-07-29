@@ -8,12 +8,15 @@
         class="flex h-10 shrink-0 items-center gap-1 border-b border-black/10 px-3 dark:border-white/10"
       >
         <NInput
-          v-model:value="filterInput"
+          :value="filterInput"
           class="max-w-60 min-w-36 flex-1"
           clearable
           size="tiny"
           :disabled="loading"
           :placeholder="t('automation.orderedChampionList.searchForChampion')"
+          @update:value="handleFilterUpdate"
+          @compositionstart="handleFilterCompositionStart"
+          @compositionend="handleFilterCompositionEnd"
         >
           <template #prefix>
             <NIcon :component="SearchIcon" />
@@ -162,6 +165,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useScrollFollow } from '@renderer-shared/composables/useScrollFollow'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
@@ -201,8 +205,14 @@ const { t } = useTranslation()
 const dragModifiers = [RestrictToVerticalAxis]
 const candidateScrollbar = useTemplateRef('candidateScrollbar')
 const selectedScrollbar = useTemplateRef('selectedScrollbar')
-const filterInput = ref('')
 const selectedPosition = ref<OrderedChampionPosition | null>(null)
+const {
+  inputValue: filterInput,
+  committedValue: filterQuery,
+  handleUpdateValue: handleFilterUpdate,
+  handleCompositionStart: handleFilterCompositionStart,
+  handleCompositionEnd: handleFilterCompositionEnd
+} = useCompositionAwareInput()
 
 useScrollFollow(() => selectedScrollbar.value?.scrollbarInstRef?.containerRef, {
   threshold: 4,
@@ -218,7 +228,7 @@ const hasPositionData = computed(() =>
 )
 
 const filteredChampions = computed(() => {
-  const pattern = filterInput.value.trim()
+  const pattern = filterQuery.value.trim()
 
   return props.champions.filter((champion) => {
     if (selectedPosition.value && !champion.positions?.includes(selectedPosition.value)) {
@@ -252,7 +262,7 @@ watchEffect(() => {
     candidateScrollbar.value?.scrollbarInstRef?.containerRef ?? null
 })
 
-watch([filterInput, selectedPosition], () => {
+watch([filterQuery, selectedPosition], () => {
   nextTick(() => scrollCandidateTo(0))
 })
 

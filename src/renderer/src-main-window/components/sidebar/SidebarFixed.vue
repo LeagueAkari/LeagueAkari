@@ -83,6 +83,31 @@
       <ClientConnection ref="client-connection-body" />
     </NPopover>
 
+    <!-- settings search -->
+    <NTooltip placement="right" :disabled="!isCollapsed">
+      <template #trigger>
+        <div
+          class="menu-item"
+          role="button"
+          tabindex="0"
+          :aria-label="t('navigation.sidebar.status.searchSettings')"
+          @click="openSettingsSearch"
+          @keydown.enter="openSettingsSearch"
+          @keydown.space.prevent="openSettingsSearch"
+        >
+          <div class="menu-item__inner">
+            <NIcon class="menu-item__icon"><Search20RegularIcon /></NIcon>
+            <div class="menu-item__label">
+              {{ t('navigation.sidebar.status.searchSettings') }}
+            </div>
+          </div>
+        </div>
+      </template>
+      <span class="menu-item-popover">
+        {{ t('navigation.sidebar.status.searchSettings') }}
+      </span>
+    </NTooltip>
+
     <!-- settings -->
     <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
@@ -115,6 +140,7 @@ import { useMainWindowStore } from '@renderer-shared/shards/window-manager/store
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
+  Search20Regular as Search20RegularIcon,
   Settings28Filled as Settings28FilledIcon
 } from '@vicons/fluent'
 import { useElementSize } from '@vueuse/core'
@@ -186,7 +212,7 @@ const handleSummonerClick = (summoner: SummonerInfo) => {
   navigateToTabByPuuid(summoner.puuid)
 }
 
-const { openSettingsModal } = useMainWindowAppContext()
+const { openSettingsModal, openSettingsSearch } = useMainWindowAppContext()
 
 const otherClients = computed(() => {
   return lcuxs.launchedClients.filter((c) => c.pid !== lcs.auth?.pid)

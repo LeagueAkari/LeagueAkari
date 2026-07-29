@@ -29,6 +29,7 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { StorageRenderer } from '@renderer-shared/shards/storage'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
+import { AkariNavigationRenderer } from './akari-navigation'
 import { LeagueClientPeekRenderer } from './league-client-peek'
 import { MainWindowUiRenderer } from './main-window-ui'
 import { PlayerTabsRenderer } from './player-tabs'
@@ -37,6 +38,7 @@ import { SimpleNotificationsRenderer } from './simple-notifications'
 
 const manager = createManager()
 
+manager.use(AkariNavigationRenderer)
 manager.use(AkariIpcRenderer)
 manager.use(AkariApiRenderer)
 manager.use(AkariProtocolRenderer)

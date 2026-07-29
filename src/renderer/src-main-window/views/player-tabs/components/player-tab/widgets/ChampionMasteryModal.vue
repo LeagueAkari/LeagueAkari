@@ -48,11 +48,14 @@
       </div>
 
       <NInput
-        v-model:value="filterInput"
+        :value="filterInput"
         clearable
         size="small"
         class="mb-3"
         :placeholder="t('playerTabs.championMastery.filterPlaceholder')"
+        @update:value="handleFilterUpdate"
+        @compositionstart="handleFilterCompositionStart"
+        @compositionend="handleFilterCompositionEnd"
       >
         <template #prefix>
           <NIcon :component="SearchIcon" />
@@ -135,6 +138,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useInstance } from '@renderer-shared/shards'
@@ -170,7 +174,14 @@ const { match: isNameMatch } = useChampionNameMatch()
 const data = shallowRef<Mastery[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
-const filterInput = ref('')
+const {
+  inputValue: filterInput,
+  committedValue: filterQuery,
+  setValue: setFilterValue,
+  handleUpdateValue: handleFilterUpdate,
+  handleCompositionStart: handleFilterCompositionStart,
+  handleCompositionEnd: handleFilterCompositionEnd
+} = useCompositionAwareInput()
 let loadVersion = 0
 
 const masteries = computed(() => {
@@ -178,7 +189,7 @@ const masteries = computed(() => {
 })
 
 const filteredMasteries = computed(() => {
-  const pattern = filterInput.value.trim()
+  const pattern = filterQuery.value.trim()
 
   if (!pattern) {
     return masteries.value
@@ -234,7 +245,7 @@ const championName = (championId: number) => {
 const reset = () => {
   loadVersion++
   data.value = []
-  filterInput.value = ''
+  setFilterValue('')
   error.value = null
   isLoading.value = false
 }

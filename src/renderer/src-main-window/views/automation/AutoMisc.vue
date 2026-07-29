@@ -2,8 +2,15 @@
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
       <div class="mx-auto flex max-w-200 flex-col gap-6 p-6">
-        <SettingsSection :title="t('automation.misc.autoReply.title')">
-          <SettingsRow :label="t('automation.misc.autoReply.enabled.label')" :label-width="260">
+        <SettingsSection
+          setting-id="automation.misc.auto-reply"
+          :title="t('automation.misc.autoReply.title')"
+        >
+          <SettingsRow
+            setting-id="automation.misc.auto-reply.enabled"
+            :label="t('automation.misc.autoReply.enabled.label')"
+            :label-width="260"
+          >
             <div class="flex flex-col items-end gap-1">
               <NSwitch
                 @update:value="(v) => am.setAutoReplyEnabled(v)"
@@ -27,6 +34,7 @@
             </div>
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.misc.auto-reply.text"
             :label="t('automation.misc.autoReply.text.label')"
             :label-description="t('automation.misc.autoReply.text.description')"
             :label-width="260"
@@ -64,6 +72,7 @@
         </SettingsSection>
 
         <SettingsSection
+          setting-id="automation.misc.auto-invitation"
           :title="t('automation.misc.autoInvitation.title')"
           :footer="t('automation.misc.autoInvitation.description')"
         >
@@ -84,11 +93,14 @@
 
             <div v-else>
               <NInput
-                v-model:value="friendSearchInput"
+                :value="friendSearchInput"
                 clearable
                 size="small"
                 :placeholder="t('automation.misc.autoInvitation.searchPlaceholder')"
                 class="mb-2 w-72!"
+                @update:value="handleFriendSearchUpdate"
+                @compositionstart="handleFriendSearchCompositionStart"
+                @compositionend="handleFriendSearchCompositionEnd"
               >
                 <template #prefix>
                   <NIcon><SearchIcon /></NIcon>
@@ -156,6 +168,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
@@ -222,7 +235,13 @@ const FRIEND_PRIORITY: Record<string, number> = {
 
 const shs = useSelfHostedLcuDataStore()
 
-const friendSearchInput = ref('')
+const {
+  inputValue: friendSearchInput,
+  committedValue: friendSearchQuery,
+  handleUpdateValue: handleFriendSearchUpdate,
+  handleCompositionStart: handleFriendSearchCompositionStart,
+  handleCompositionEnd: handleFriendSearchCompositionEnd
+} = useCompositionAwareInput()
 
 const sortedFriends = computed(() => {
   return shs.friends.toSorted((a, b) => {
@@ -239,11 +258,11 @@ const sortedFriends = computed(() => {
 })
 
 const filteredSortedFriends = computed(() => {
-  if (!friendSearchInput.value.trim()) {
+  if (!friendSearchQuery.value.trim()) {
     return sortedFriends.value
   }
 
-  const query = friendSearchInput.value.toLowerCase().trim()
+  const query = friendSearchQuery.value.toLowerCase().trim()
   return sortedFriends.value.filter((friend) => {
     const gameName = friend.gameName?.toLowerCase() || ''
     const gameTag = friend.gameTag?.toLowerCase() || ''

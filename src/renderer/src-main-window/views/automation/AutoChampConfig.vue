@@ -1,9 +1,13 @@
 <template>
   <div class="h-full w-full">
     <NScrollbar class="relative h-full max-w-full">
-      <div class="mx-auto max-w-[800px] p-6">
-        <SettingsSection :title="t('automation.champConfig.title')">
+      <div class="mx-auto max-w-200 p-6">
+        <SettingsSection
+          setting-id="automation.champ-config"
+          :title="t('automation.champConfig.title')"
+        >
           <SettingsRow
+            setting-id="automation.champ-config.enabled"
             :label="t('automation.champConfig.enabled.label')"
             :label-description="t('automation.champConfig.enabled.description')"
             :label-width="260"
@@ -15,6 +19,7 @@
             ></NSwitch>
           </SettingsRow>
           <SettingsRow
+            setting-id="automation.champ-config.configure"
             :label="t('automation.champConfig.configure.label')"
             :label-width="260"
             align="start"

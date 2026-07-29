@@ -1,8 +1,15 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('settings.multiWindow.auxWindow.title')">
-        <SettingsRow :label="t('settings.multiWindow.auxWindow.enabled.label')" :label-width="400">
+      <SettingsSection
+        setting-id="multi-window.aux"
+        :title="t('settings.multiWindow.auxWindow.title')"
+      >
+        <SettingsRow
+          setting-id="multi-window.aux.enabled"
+          :label="t('settings.multiWindow.auxWindow.enabled.label')"
+          :label-width="400"
+        >
           <template #labelDescription>
             <div>{{ t('settings.multiWindow.auxWindow.enabled.description') }}</div>
             <div>
@@ -24,6 +31,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.aux.auto-show"
           :label="t('settings.multiWindow.auxWindow.autoShow.label')"
           :label-description="t('settings.multiWindow.auxWindow.autoShow.description')"
           :label-width="400"
@@ -35,6 +43,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.aux.opacity"
           :label="t('settings.multiWindow.auxWindow.opacity.label')"
           :label-description="t('settings.multiWindow.auxWindow.opacity.description')"
           :label-width="400"
@@ -51,6 +60,7 @@
           ></NSlider>
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.aux.skin-selector"
           :label="t('settings.multiWindow.auxWindow.showSkinSelector.label')"
           :label-description="t('settings.multiWindow.auxWindow.showSkinSelector.description')"
           :label-width="400"
@@ -62,6 +72,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.aux.reset-position"
           :label="t('settings.multiWindow.auxWindow.resetWindowPosition.label')"
           :label-description="t('settings.multiWindow.auxWindow.resetWindowPosition.description')"
           :label-width="400"
@@ -75,8 +86,15 @@
           >
         </SettingsRow>
       </SettingsSection>
-      <SettingsSection :title="t('settings.multiWindow.opggWindow.title')">
-        <SettingsRow :label="t('settings.multiWindow.opggWindow.enabled.label')" :label-width="400">
+      <SettingsSection
+        setting-id="multi-window.opgg"
+        :title="t('settings.multiWindow.opggWindow.title')"
+      >
+        <SettingsRow
+          setting-id="multi-window.opgg.enabled"
+          :label="t('settings.multiWindow.opggWindow.enabled.label')"
+          :label-width="400"
+        >
           <template #labelDescription>
             <div>{{ t('settings.multiWindow.opggWindow.enabled.description') }}</div>
             <div>
@@ -96,6 +114,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.opgg.auto-show"
           :label="t('settings.multiWindow.opggWindow.autoShow.label')"
           :label-description="t('settings.multiWindow.opggWindow.autoShow.description')"
           :label-width="400"
@@ -107,6 +126,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.opgg.shortcut"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
           :label="t('settings.multiWindow.opggWindow.showShortcut.label')"
@@ -119,6 +139,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.opgg.opacity"
           :label="t('settings.multiWindow.opggWindow.opacity.label')"
           :label-description="t('settings.multiWindow.opggWindow.opacity.description')"
           :label-width="400"
@@ -135,6 +156,7 @@
           ></NSlider>
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.opgg.reset-position"
           :label="t('settings.multiWindow.opggWindow.resetWindowPosition.label')"
           :label-description="t('settings.multiWindow.opggWindow.resetWindowPosition.description')"
           :label-width="400"
@@ -149,6 +171,7 @@
         </SettingsRow>
       </SettingsSection>
       <SettingsSection
+        setting-id="multi-window.ongoing-game"
         :title="
           as.isElevated
             ? t('settings.multiWindow.ongoingGameWindow.title')
@@ -156,6 +179,7 @@
         "
       >
         <SettingsRow
+          setting-id="multi-window.ongoing-game.enabled"
           :label="t('settings.multiWindow.ongoingGameWindow.enabled.label')"
           :label-description="t('settings.multiWindow.ongoingGameWindow.enabled.description')"
           :label-width="400"
@@ -167,6 +191,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.ongoing-game.shortcut"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
           :label="t('settings.multiWindow.ongoingGameWindow.showShortcut.label')"
@@ -180,6 +205,7 @@
         </SettingsRow>
       </SettingsSection>
       <SettingsSection
+        setting-id="multi-window.cd-timer"
         :title="
           as.isElevated
             ? t('settings.multiWindow.cdTimerWindow.title')
@@ -187,6 +213,7 @@
         "
       >
         <SettingsRow
+          setting-id="multi-window.cd-timer.enabled"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.enabled.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.enabled.description')"
@@ -200,6 +227,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.cd-timer.shortcut"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
           :label="t('settings.multiWindow.cdTimerWindow.showShortcut.label')"
@@ -212,6 +240,7 @@
           />
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.cd-timer.reset-position"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.resetWindowPosition.label')"
           :label-description="
@@ -229,6 +258,7 @@
           >
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.cd-timer.type"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.timerType.label')"
           :label-description="t('settings.multiWindow.cdTimerWindow.timerType.description')"
@@ -251,6 +281,7 @@
           </NRadioGroup>
         </SettingsRow>
         <SettingsRow
+          setting-id="multi-window.cd-timer.reverse-adjustment"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label="t('settings.multiWindow.cdTimerWindow.reverseAdjustmentDirection.label')"
           :label-description="

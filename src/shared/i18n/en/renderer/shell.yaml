@@ -159,6 +159,7 @@ navigation:
       launchedClients: Launched Clients
       noClientTitle: No Available Client
       noClient: No available client, please start the game
+      searchSettings: Search Settings
       settings: Settings
       notConnected: Not Connected
       inConnectionLoop: Connecting...

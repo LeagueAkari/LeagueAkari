@@ -1,8 +1,12 @@
 <template>
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
-      <SettingsSection :title="t('settings.ongoingGame.titleCommon')">
+      <SettingsSection
+        setting-id="ongoing-game.common"
+        :title="t('settings.ongoingGame.titleCommon')"
+      >
         <SettingsRow
+          setting-id="ongoing-game.enabled"
           :label="t('settings.ongoingGame.enabled.label')"
           :label-description="t('settings.ongoingGame.enabled.description')"
           :label-width="400"
@@ -15,6 +19,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.auto-route"
           :label="t('settings.ongoingGame.autoRouteWhenGameStarts.label')"
           :label-description="t('settings.ongoingGame.autoRouteWhenGameStarts.description')"
           :label-width="400"
@@ -27,6 +32,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.match-history-load-count"
           :label="t('settings.ongoingGame.matchHistoryLoadCount.label')"
           :label-description="t('settings.ongoingGame.matchHistoryLoadCount.description')"
           :label-width="400"
@@ -43,6 +49,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.concurrency"
           :label="t('settings.ongoingGame.concurrency.label')"
           :label-description="t('settings.ongoingGame.concurrency.description')"
           :label-width="400"
@@ -57,6 +64,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.game-details-load-count"
           :label="t('settings.ongoingGame.gameDetailsLoadCount.label')"
           :label-description="
             t('settings.ongoingGame.gameDetailsLoadCount.description', {
@@ -75,6 +83,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.queue-filter"
           :label="t('settings.ongoingGame.matchHistoryTagPreference.label')"
           :label-description="t('settings.ongoingGame.matchHistoryTagPreference.description')"
           :label-width="400"
@@ -97,6 +106,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.query-in-lobby"
           :label="t('settings.ongoingGame.queryInLobbyPhase.label')"
           :label-description="t('settings.ongoingGame.queryInLobbyPhase.description')"
           :label-width="400"
@@ -109,6 +119,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.premade-threshold"
           :label="t('settings.ongoingGame.premadeTeamInferMatchCountThreshold.label')"
           :label-description="
             t('settings.ongoingGame.premadeTeamInferMatchCountThreshold.description')
@@ -125,8 +136,12 @@
         </SettingsRow>
       </SettingsSection>
 
-      <SettingsSection :title="t('settings.ongoingGame.titlePlayerCard')">
+      <SettingsSection
+        setting-id="ongoing-game.player-card"
+        :title="t('settings.ongoingGame.titlePlayerCard')"
+      >
         <SettingsRow
+          setting-id="ongoing-game.player-card.champion-usage"
           :label-width="400"
           :label="t('settings.ongoingGame.showChampionUsage.label')"
           :label-description="t('settings.ongoingGame.showChampionUsage.description')"
@@ -150,6 +165,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.player-card.match-border"
           :label-width="400"
           :label="t('settings.ongoingGame.showMatchHistoryItemBorder.label')"
           :label-description="t('settings.ongoingGame.showMatchHistoryItemBorder.description')"
@@ -162,6 +178,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.player-card.jungle-pathing"
           :label-width="400"
           :label="t('settings.ongoingGame.showJunglePathing.label')"
           :label-description="t('settings.ongoingGame.showJunglePathing.description')"
@@ -174,6 +191,7 @@
         </SettingsRow>
 
         <SettingsRow
+          setting-id="ongoing-game.player-card.tags"
           :label-width="400"
           :label="t('settings.ongoingGame.playerCardTags.label')"
           align="start"

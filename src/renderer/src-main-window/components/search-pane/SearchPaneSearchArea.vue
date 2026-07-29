@@ -35,7 +35,7 @@
           class="flex-1 font-mono"
           v-model:value="searchInput"
           :status="isValidSearchInput || isEmptyInput ? 'success' : 'warning'"
-          @keyup.enter="handelSearch"
+          @keydown.enter="handleSearchKeydown"
         >
           <template #prefix>
             <div
@@ -231,6 +231,14 @@ const as = useAppCommonStore()
 
 const inputEl = useTemplateRef('inputEl')
 const scrollbarEl = useTemplateRef('scrollbarEl')
+
+const handleSearchKeydown = (event: KeyboardEvent) => {
+  if (event.isComposing) {
+    return
+  }
+
+  handelSearch()
+}
 
 const handleMouseDown = (event: MouseEvent) => {
   if (event.button === 1) {

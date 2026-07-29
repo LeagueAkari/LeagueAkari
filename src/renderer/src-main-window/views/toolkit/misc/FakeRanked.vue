@@ -1,6 +1,7 @@
 <template>
-  <SettingsSection :title="t('toolkit.fakeRanked.title')">
+  <SettingsSection setting-id="toolkit.misc.fake-ranked" :title="t('toolkit.fakeRanked.title')">
     <SettingsRow
+      setting-id="toolkit.misc.fake-ranked.status"
       :label="t('toolkit.fakeRanked.set.label')"
       :label-description="t('toolkit.fakeRanked.set.description')"
       :label-width="260"

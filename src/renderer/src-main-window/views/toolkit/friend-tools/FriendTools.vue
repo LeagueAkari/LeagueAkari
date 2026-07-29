@@ -52,11 +52,14 @@
                 {{ t('toolkit.friends.refreshButton') }}
               </NButton>
               <NInput
-                v-model:value="friendSearchInput"
+                :value="friendSearchInput"
                 clearable
                 size="small"
                 :placeholder="t('toolkit.friends.searchPlaceholder')"
                 class="w-72!"
+                @update:value="handleFriendSearchUpdate"
+                @compositionstart="handleFriendSearchCompositionStart"
+                @compositionend="handleFriendSearchCompositionEnd"
               >
                 <template #prefix>
                   <NIcon><SearchIcon /></NIcon>
@@ -86,6 +89,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
+import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -136,7 +140,13 @@ const expandedRowKeys = ref<number[]>([])
 
 const isLoading = ref(false)
 const isDeleting = ref(false)
-const friendSearchInput = ref('')
+const {
+  inputValue: friendSearchInput,
+  committedValue: friendSearchQuery,
+  handleUpdateValue: handleFriendSearchUpdate,
+  handleCompositionStart: handleFriendSearchCompositionStart,
+  handleCompositionEnd: handleFriendSearchCompositionEnd
+} = useCompositionAwareInput()
 
 // puuid -> info
 const extraInfoMap = ref<
@@ -228,7 +238,7 @@ const columns = computed<DataTableColumns<any>>(() => [
 ])
 
 const tableData = computed(() => {
-  const query = friendSearchInput.value.toLowerCase().trim()
+  const query = friendSearchQuery.value.toLowerCase().trim()
 
   return combinedGroups.value
     .map((group) => {

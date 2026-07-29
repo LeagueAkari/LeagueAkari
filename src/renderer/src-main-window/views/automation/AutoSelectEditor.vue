@@ -62,13 +62,14 @@
       <NTabs
         size="small"
         type="line"
-        animated
+        :animated="tabsAnimated"
         class="flex-1"
         v-if="currentGroup && currentPickConfig && currentBanConfig"
         v-model:value="banPick"
       >
         <NTabPane name="pick" :tab="t('automation.champSelect.pick.title')">
           <SettingsRow
+            setting-id="automation.champ-select.pick.enabled"
             :label="t('automation.champSelect.pick.enabled.label')"
             :label-description="t('automation.champSelect.pick.enabled.description')"
             :label-width="260"
@@ -81,6 +82,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.expected-champions"
             :label="t('automation.champSelect.pick.expectedChampions.label')"
             :label-description="t('automation.champSelect.pick.expectedChampions.description')"
             :label-width="260"
@@ -144,6 +146,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.show-intent"
             :label="t('automation.champSelect.pick.showIntent.label')"
             :label-description="t('automation.champSelect.pick.showIntent.description')"
             :label-width="260"
@@ -156,6 +159,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.ignore-intent"
             :label="t('automation.champSelect.pick.ignoreIntent.label')"
             :label-description="t('automation.champSelect.pick.ignoreIntent.description')"
             :label-width="260"
@@ -170,6 +174,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.strategy"
             :label="t('automation.champSelect.pick.strategy.label')"
             :label-description="t('automation.champSelect.pick.strategy.description')"
             :label-width="260"
@@ -195,6 +200,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.delay"
             :label="t('automation.champSelect.pick.delaySeconds.label')"
             :label-description="t('automation.champSelect.pick.delaySeconds.description')"
             :label-width="260"
@@ -220,6 +226,7 @@
           </TooltipWithIcon>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.bench-swap-delay"
             :label="t('automation.champSelect.pick.benchSwapAccumulatedDelaySeconds.label')"
             :label-description="
               t('automation.champSelect.pick.benchSwapAccumulatedDelaySeconds.description')
@@ -240,6 +247,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.bench-first"
             :label="t('automation.champSelect.pick.benchSelectFirstAvailableChampion.label')"
             :label-description="
               t('automation.champSelect.pick.benchSelectFirstAvailableChampion.description')
@@ -259,6 +267,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.pick.bench-handle-trade"
             :label="t('automation.champSelect.pick.benchHandleTradeEnabled.label')"
             :label-description="
               t('automation.champSelect.pick.benchHandleTradeEnabled.description')
@@ -277,6 +286,7 @@
 
         <NTabPane name="ban" :tab="t('automation.champSelect.ban.title')">
           <SettingsRow
+            setting-id="automation.champ-select.ban.enabled"
             :label="t('automation.champSelect.ban.enabled.label')"
             :label-description="t('automation.champSelect.ban.enabled.description')"
             :label-width="260"
@@ -289,6 +299,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.ban.expected-champions"
             :label="t('automation.champSelect.ban.expectedChampions.label')"
             :label-description="t('automation.champSelect.ban.expectedChampions.description')"
             :label-width="260"
@@ -352,6 +363,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.ban.strategy"
             :label="t('automation.champSelect.ban.strategy.label')"
             :label-description="t('automation.champSelect.ban.strategy.description')"
             :label-width="260"
@@ -377,6 +389,7 @@
           </SettingsRow>
 
           <SettingsRow
+            setting-id="automation.champ-select.ban.delay"
             :label="t('automation.champSelect.ban.delaySeconds.label')"
             :label-description="t('automation.champSelect.ban.delaySeconds.description')"
             :label-width="260"
@@ -404,6 +417,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
@@ -430,7 +444,9 @@ import {
   NTabs,
   NTooltip
 } from 'naive-ui'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
+
+import { AUTO_SELECT_NAVIGATION_SCOPE } from '@main-window/shards/akari-navigation'
 
 import OrderedChampionList from './components/ordered-champion-list/OrderedChampionList.vue'
 
@@ -443,6 +459,35 @@ const sgp = useSgpStore()
 
 const currentGroupId = ref('ranked')
 const banPick = ref('pick')
+const tabsAnimated = ref(true)
+let navigationActivationSequence = 0
+
+useAkariNavigationBoundary({
+  scope: AUTO_SELECT_NAVIGATION_SCOPE,
+  activate: async (destination, { signal }) => {
+    if (destination !== 'pick' && destination !== 'ban') {
+      return { status: 'unavailable', reason: 'unknown-auto-select-tab' }
+    }
+
+    if (banPick.value === destination) {
+      await nextTick()
+      return { status: 'ready' }
+    }
+
+    const sequence = ++navigationActivationSequence
+    tabsAnimated.value = false
+    banPick.value = destination
+    await nextTick()
+
+    if (sequence === navigationActivationSequence) {
+      tabsAnimated.value = true
+    }
+    if (!signal.aborted) {
+      await nextTick()
+    }
+    return { status: 'ready' }
+  }
+})
 
 const visibleGroups = computed(() => {
   return as2.groups.filter((group) =>
