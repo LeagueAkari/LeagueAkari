@@ -21,17 +21,18 @@ const { show = true } = defineProps<{
 
 const handleEnter = (el: Element) => {
   if (el instanceof HTMLElement || el instanceof SVGElement) {
+    const targetWidth = getComputedStyle(el).width
     el.style.maxWidth = '0px'
 
     requestAnimationFrame(() => {
-      el.style.maxWidth = el.scrollWidth + 'px'
+      el.style.maxWidth = targetWidth
     })
   }
 }
 
 const handleLeave = (el: Element) => {
   if (el instanceof HTMLElement || el instanceof SVGElement) {
-    el.style.maxWidth = el.scrollWidth + 'px'
+    el.style.maxWidth = getComputedStyle(el).width
 
     // force reflow alternatively
     requestAnimationFrame(() => {

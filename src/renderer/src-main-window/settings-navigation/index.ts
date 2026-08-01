@@ -8,15 +8,20 @@ import {
 
 const SETTINGS_NAVIGATION_DEADLINE_MS = 10_000
 
+export interface NavigateToSettingOptions {
+  readonly autoSelectGroupId?: string
+}
+
 export async function navigateToSetting(
   navigation: AkariNavigation,
-  id: SettingsNavigationTargetId
+  id: SettingsNavigationTargetId,
+  options: NavigateToSettingOptions = {}
 ) {
   const deadlineAt = Date.now() + SETTINGS_NAVIGATION_DEADLINE_MS
   let currentTarget = getSettingsNavigationTarget(id)!
 
   while (true) {
-    const result = await navigation.navigate(createSettingsNavigationPath(currentTarget), {
+    const result = await navigation.navigate(createSettingsNavigationPath(currentTarget, options), {
       deadlineAt
     })
 

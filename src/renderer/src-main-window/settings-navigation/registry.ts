@@ -1172,25 +1172,33 @@ export function isSettingsNavigationTargetId(id: string): id is SettingsNavigati
   return settingsNavigationRegistry.has(id)
 }
 
-function getAutoSelectPayload(targetId: string): AutoSelectNavigationPayload | undefined {
+function getAutoSelectPayload(
+  targetId: string,
+  groupId?: string
+): AutoSelectNavigationPayload | undefined {
   if (
     targetId === 'automation.champ-select.pick' ||
     targetId.startsWith('automation.champ-select.pick.')
   ) {
-    return 'pick'
+    return groupId ? { tab: 'pick', groupId } : { tab: 'pick' }
   }
   if (
     targetId === 'automation.champ-select.ban' ||
     targetId.startsWith('automation.champ-select.ban.')
   ) {
-    return 'ban'
+    return groupId ? { tab: 'ban', groupId } : { tab: 'ban' }
   }
 
   return undefined
 }
 
+export interface SettingsNavigationPathOptions {
+  readonly autoSelectGroupId?: string
+}
+
 export function createSettingsNavigationPath(
-  target: SettingsNavigationTargetDefinition
+  target: SettingsNavigationTargetDefinition,
+  options: SettingsNavigationPathOptions = {}
 ): AkariNavigationPath {
   const path: AkariNavigationStep[] = []
 
@@ -1227,7 +1235,9 @@ export function createSettingsNavigationPath(
     )
 
     if (target.route.name === 'automation' && target.route.section === 'auto-select') {
-      const autoSelectPayload = target.terminalId ? undefined : getAutoSelectPayload(target.id)
+      const autoSelectPayload = target.terminalId
+        ? undefined
+        : getAutoSelectPayload(target.id, options.autoSelectGroupId)
       if (autoSelectPayload) {
         path.push({ key: AUTO_SELECT_NAVIGATION_STEP_KEY, payload: autoSelectPayload })
       }

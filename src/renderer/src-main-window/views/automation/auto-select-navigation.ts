@@ -1,3 +1,6 @@
 export const AUTO_SELECT_NAVIGATION_STEP_KEY = 'automation.auto-select'
 
-export type AutoSelectNavigationPayload = 'pick' | 'ban'
+export interface AutoSelectNavigationPayload {
+  readonly tab: 'pick' | 'ban'
+  readonly groupId?: string
+}

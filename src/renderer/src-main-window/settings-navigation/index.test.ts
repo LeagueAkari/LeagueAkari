@@ -32,4 +32,18 @@ describe('Settings navigation', () => {
     })
     expect(navigate).toHaveBeenCalledOnce()
   })
+
+  test('forwards the requested auto-select group into the business path', async () => {
+    const navigate = vi.fn().mockResolvedValue({ status: 'completed' })
+    const navigation = { navigate } satisfies AkariNavigation
+
+    await navigateToSetting(navigation, 'automation.champ-select.pick.enabled', {
+      autoSelectGroupId: 'aram'
+    })
+
+    expect(navigate.mock.calls[0]?.[0]).toContainEqual({
+      key: 'automation.auto-select',
+      payload: { tab: 'pick', groupId: 'aram' }
+    })
+  })
 })

@@ -99,6 +99,32 @@ legal:
 
       </div>
 titlebar:
+  automation:
+    trigger: 自动化 ({{count}})
+    title: 已启用的自动化
+    configuredModes_one: 已配置 {{count}} 个模式
+    configuredModes_other: 已配置 {{count}} 个模式
+    configuredChampions_one: 已配置 {{count}} 个英雄
+    configuredChampions_other: 已配置 {{count}} 个英雄
+    scheduledFriends_one: 等待 {{count}} 位好友
+    scheduledFriends_other: 等待 {{count}} 位好友
+    items:
+      autoAccept: 自动接受对局
+      autoHonor: 自动点赞
+      playAgain: 自动回到房间
+      autoMatchmaking: 自动匹配对局
+      autoReconnect: 自动重新连接
+      autoSkipLeader: 自动转让房主
+      autoHandleInvitations: 自动处理房间邀请
+      aramTeamSide: 自动发送地图位置信息
+      autoPickBan: 自动英雄选择和禁用
+      autoTrade: 自动处理英雄交换
+      autoChampConfig: 自动英雄配置
+      autoReply: 自动回复
+      scheduledInvitation: 预约邀请好友
+      lockOffline: 锁定离线状态
+      resetStatusMessage: 登录时重设聊天签名
+      resetRankedStatus: 登录时重设展示段位
   search:
     open: 搜索
     summoner: 召唤师搜索

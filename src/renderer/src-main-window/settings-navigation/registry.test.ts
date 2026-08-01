@@ -111,7 +111,13 @@ describe('Settings navigation registry', () => {
     ])
     expect(createSettingsNavigationPath(autoSelectTarget)).toContainEqual({
       key: AUTO_SELECT_NAVIGATION_STEP_KEY,
-      payload: 'ban'
+      payload: { tab: 'ban' }
+    })
+    expect(
+      createSettingsNavigationPath(autoSelectTarget, { autoSelectGroupId: 'aram' })
+    ).toContainEqual({
+      key: AUTO_SELECT_NAVIGATION_STEP_KEY,
+      payload: { tab: 'ban', groupId: 'aram' }
     })
     expect(createSettingsNavigationPath(toolkitTarget).map((step) => step.key)).toEqual([
       MAIN_WINDOW_NAVIGATION_STEP_KEY,

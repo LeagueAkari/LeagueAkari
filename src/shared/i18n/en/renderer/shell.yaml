@@ -99,6 +99,33 @@ legal:
 
       </div>
 titlebar:
+  automation:
+    trigger_one: Automation ({{count}})
+    trigger_other: Automations ({{count}})
+    title: Enabled Automations
+    configuredModes_one: Configured for {{count}} mode
+    configuredModes_other: Configured for {{count}} modes
+    configuredChampions_one: '{{count}} champion configured'
+    configuredChampions_other: '{{count}} champions configured'
+    scheduledFriends_one: Waiting for {{count}} friend
+    scheduledFriends_other: Waiting for {{count}} friends
+    items:
+      autoAccept: Automatic ready check
+      autoHonor: Automatic honor
+      playAgain: Automatic return to lobby
+      autoMatchmaking: Automatic matchmaking
+      autoReconnect: Automatic reconnect
+      autoSkipLeader: Automatic lobby leadership transfer
+      autoHandleInvitations: Automatic lobby invitation handling
+      aramTeamSide: Automatic map-side message
+      autoPickBan: Automatic champion selection and banning
+      autoTrade: Automatic champion trade handling
+      autoChampConfig: Automatic champion setup
+      autoReply: Automatic reply
+      scheduledInvitation: Scheduled friend invitation
+      lockOffline: Keep offline status
+      resetStatusMessage: Reset chat status on login
+      resetRankedStatus: Reset displayed rank on login
   search:
     open: Search
     summoner: Summoner Search

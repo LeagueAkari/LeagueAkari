@@ -467,18 +467,21 @@ let navigationActivationSequence = 0
 useAkariNavigationStep<AutoSelectNavigationPayload>({
   key: AUTO_SELECT_NAVIGATION_STEP_KEY,
   activate: async (payload, { signal }) => {
-    if (!currentGroup.value || !currentPickConfig.value || !currentBanConfig.value) {
+    const targetGroupId = payload.groupId ?? currentGroup.value?.groupId
+
+    if (!targetGroupId || !visibleGroups.value.some((group) => group.groupId === targetGroupId)) {
       return { status: 'unavailable', reason: 'auto-select-group-unavailable' }
     }
 
-    if (banPick.value === payload) {
+    if (currentGroupId.value === targetGroupId && banPick.value === payload.tab) {
       await nextTick()
       return undefined
     }
 
     const sequence = ++navigationActivationSequence
     tabsAnimated.value = false
-    banPick.value = payload
+    currentGroupId.value = targetGroupId
+    banPick.value = payload.tab
     await nextTick()
 
     if (sequence === navigationActivationSequence) {
