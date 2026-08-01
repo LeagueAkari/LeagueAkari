@@ -2,10 +2,9 @@
   <section
     ref="root"
     class="settings-section"
-    :data-setting-id="settingId"
     :class="{
       'settings-section--no-bg': noBg,
-      'settings-section--navigation-highlighted': isNavigationHighlighted
+      'settings-section--highlighted': highlighted
     }"
   >
     <header class="settings-section-header">
@@ -23,18 +22,20 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingsNavigationTarget } from '@renderer-shared/composables/useSettingsNavigationTarget'
 import { useTemplateRef } from 'vue'
 
-const { settingId } = defineProps<{
-  settingId?: string
+defineProps<{
   noBg?: boolean
   title?: string
   footer?: string
+  highlighted?: boolean
 }>()
 
 const root = useTemplateRef<HTMLElement>('root')
-const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, root)
+
+defineExpose({
+  getElement: () => root.value
+})
 </script>
 
 <style>
@@ -65,31 +66,18 @@ const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, roo
     @apply w-full max-w-full overflow-hidden rounded-lg;
   }
 
-  .settings-section--navigation-highlighted .settings-section-body {
-    animation: settings-section-navigation-outline-fade 2200ms linear 1 forwards;
+  .settings-section--highlighted .settings-section-body {
+    animation: settings-section-navigation-outline-fade 3400ms linear 1 forwards;
   }
 
-  .settings-section--navigation-highlighted .settings-section-body::before {
+  .settings-section--highlighted .settings-section-body::before {
     position: absolute;
     z-index: -1;
     inset: 0;
     content: '';
     pointer-events: none;
-    background-color: color-mix(in srgb, var(--color-akari-500) 18%, transparent);
-    background-image: linear-gradient(
-      100deg,
-      transparent 32%,
-      color-mix(in srgb, var(--color-akari-400) 24%, transparent) 42%,
-      color-mix(in srgb, var(--color-akari-300) 60%, transparent) 50%,
-      color-mix(in srgb, var(--color-akari-400) 24%, transparent) 58%,
-      transparent 68%
-    );
-    background-position: 100% 0;
-    background-repeat: no-repeat;
-    background-size: 240% 100%;
-    animation:
-      settings-section-navigation-highlight-fade 2200ms linear 1 forwards,
-      settings-section-navigation-shimmer 1600ms linear 180ms 1 both;
+    background-color: color-mix(in srgb, var(--color-akari-400) 36%, transparent);
+    animation: settings-section-navigation-highlight-fade 3400ms linear 1 forwards;
   }
 
   .settings-section:not(.settings-section--no-bg) .settings-section-body {
@@ -116,28 +104,11 @@ const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, roo
 
 @keyframes settings-section-navigation-outline-fade {
   from {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-akari-500) 72%, transparent);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-akari-400) 90%, transparent);
   }
 
   to {
-    box-shadow: 0 0 0 2px transparent;
-  }
-}
-
-@keyframes settings-section-navigation-shimmer {
-  from {
-    background-position: 100% 0;
-  }
-
-  to {
-    background-position: 0 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .settings-section--navigation-highlighted .settings-section-body::before {
-    background-image: none;
-    animation: settings-section-navigation-highlight-fade 2200ms linear 1 forwards;
+    box-shadow: inset 0 0 0 2px transparent;
   }
 }
 </style>

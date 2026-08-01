@@ -177,6 +177,20 @@
         </template>
         <div class="p-3 text-[13px]">{{ t('settings.debug.inAdministrator.description') }}</div>
       </SettingsSection>
+      <SettingsSection title="Akari Zone">
+        <SettingsRow
+          setting-id="debug.test-page"
+          :label="t('settings.debug.testPage.label')"
+          :label-description="t('settings.debug.testPage.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="mui.frontendSettings.showTestPage"
+            @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
+          />
+        </SettingsRow>
+      </SettingsSection>
       <SettingsSection title="Runtime Info">
         <div class="max-w-full overflow-x-auto p-3">
           <NDescriptions
@@ -232,20 +246,6 @@
           </NDescriptions>
         </div>
       </SettingsSection>
-      <SettingsSection title="Akari Zone">
-        <SettingsRow
-          setting-id="debug.test-page"
-          :label="t('settings.debug.testPage.label')"
-          :label-description="t('settings.debug.testPage.description')"
-          :label-width="400"
-        >
-          <NSwitch
-            size="small"
-            :value="mui.frontendSettings.showTestPage"
-            @update:value="(val: boolean) => (mui.frontendSettings.showTestPage = val)"
-          />
-        </SettingsRow>
-      </SettingsSection>
     </div>
   </NScrollbar>
 </template>
@@ -253,8 +253,8 @@
 <script setup lang="tsx">
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'

@@ -417,8 +417,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
@@ -446,8 +446,10 @@ import {
 } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import { AUTO_SELECT_NAVIGATION_SCOPE } from '@main-window/shards/akari-navigation'
-
+import {
+  AUTO_SELECT_NAVIGATION_STEP_KEY,
+  type AutoSelectNavigationPayload
+} from './auto-select-navigation'
 import OrderedChampionList from './components/ordered-champion-list/OrderedChampionList.vue'
 
 const { t } = useTranslation()
@@ -462,21 +464,21 @@ const banPick = ref('pick')
 const tabsAnimated = ref(true)
 let navigationActivationSequence = 0
 
-useAkariNavigationBoundary({
-  scope: AUTO_SELECT_NAVIGATION_SCOPE,
-  activate: async (destination, { signal }) => {
-    if (destination !== 'pick' && destination !== 'ban') {
-      return { status: 'unavailable', reason: 'unknown-auto-select-tab' }
+useAkariNavigationStep<AutoSelectNavigationPayload>({
+  key: AUTO_SELECT_NAVIGATION_STEP_KEY,
+  activate: async (payload, { signal }) => {
+    if (!currentGroup.value || !currentPickConfig.value || !currentBanConfig.value) {
+      return { status: 'unavailable', reason: 'auto-select-group-unavailable' }
     }
 
-    if (banPick.value === destination) {
+    if (banPick.value === payload) {
       await nextTick()
-      return { status: 'ready' }
+      return undefined
     }
 
     const sequence = ++navigationActivationSequence
     tabsAnimated.value = false
-    banPick.value = destination
+    banPick.value = payload
     await nextTick()
 
     if (sequence === navigationActivationSequence) {
@@ -485,7 +487,7 @@ useAkariNavigationBoundary({
     if (!signal.aborted) {
       await nextTick()
     }
-    return { status: 'ready' }
+    return undefined
   }
 })
 

@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import {
   Component as ComponentC,
@@ -42,6 +42,8 @@ import {
   watch
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { createMainPageNavigationStepKey } from '@main-window/navigation-steps'
 
 export interface TabConfig {
   key: string
@@ -144,15 +146,14 @@ const handleUserTabChange = (value: string) => {
   void activateTab(value, 'user')
 }
 
-useAkariNavigationBoundary({
-  scope: () => `main-page.${props.routeName}`,
-  activate: async (destination, { signal }) => {
-    if (typeof destination !== 'string') {
-      return { status: 'unavailable', reason: 'invalid-page-tab' }
+useAkariNavigationStep<string>({
+  key: createMainPageNavigationStepKey(props.routeName),
+  activate: async (payload, { signal }) => {
+    const activated = await activateTab(payload, 'navigation', signal)
+    if (!activated) {
+      return { status: 'unavailable', reason: 'unknown-page-tab' }
     }
-
-    const activated = await activateTab(destination, 'navigation', signal)
-    return activated ? { status: 'ready' } : { status: 'unavailable', reason: 'unknown-page-tab' }
+    return undefined
   }
 })
 

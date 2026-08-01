@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
 import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'

@@ -27,33 +27,24 @@
 </template>
 
 <script setup lang="ts">
-import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { useTranslation } from 'i18next-vue'
 import { NTabPane, NTabs } from 'naive-ui'
 import { nextTick } from 'vue'
 
-import {
-  STORAGE_SETTINGS_NAVIGATION_SCOPE,
-  isStorageSettingsTabName,
-  type StorageSettingsTabName
-} from '@main-window/shards/akari-navigation'
-
 import SavedSettings from './SavedSettings.vue'
 import TaggedPlayers from './TaggedPlayers.vue'
+import { STORAGE_SETTINGS_NAVIGATION_STEP_KEY, type StorageSettingsTabName } from './navigation'
 
 const { t } = useTranslation()
 const tabName = defineModel<StorageSettingsTabName>('tabName', { default: 'tagged-players' })
 
-useAkariNavigationBoundary({
-  scope: STORAGE_SETTINGS_NAVIGATION_SCOPE,
-  activate: async (destination) => {
-    if (!isStorageSettingsTabName(destination)) {
-      return { status: 'unavailable', reason: 'unknown-storage-settings-tab' }
-    }
-
-    tabName.value = destination
+useAkariNavigationStep<StorageSettingsTabName>({
+  key: STORAGE_SETTINGS_NAVIGATION_STEP_KEY,
+  activate: async (payload) => {
+    tabName.value = payload
     await nextTick()
-    return { status: 'ready' }
+    return undefined
   }
 })
 </script>

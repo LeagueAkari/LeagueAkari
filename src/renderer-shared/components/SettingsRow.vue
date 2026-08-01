@@ -2,14 +2,13 @@
   <div
     ref="root"
     class="settings-row"
-    :data-setting-id="settingId"
     :class="{
       'settings-row--center': align === 'center',
       'settings-row--start': align === 'start',
       'settings-row--disabled': disabled,
       'settings-row--control-full-line': controlFullLine,
       'settings-row--no-x-padding': noXPadding,
-      'settings-row--navigation-highlighted': isNavigationHighlighted
+      'settings-row--highlighted': highlighted
     }"
     :style="{
       '--settings-row-label-width': labelWidth ? `${labelWidth}px` : '220px',
@@ -38,11 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingsNavigationTarget } from '@renderer-shared/composables/useSettingsNavigationTarget'
 import { useTemplateRef } from 'vue'
 
-const { align = 'center', settingId } = defineProps<{
-  settingId?: string
+const { align = 'center' } = defineProps<{
   label?: string
   labelDescription?: string
   labelWidth?: number
@@ -52,10 +49,14 @@ const { align = 'center', settingId } = defineProps<{
   controlFullLine?: boolean
   align?: 'center' | 'start'
   disabled?: boolean
+  highlighted?: boolean
 }>()
 
 const root = useTemplateRef<HTMLElement>('root')
-const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, root)
+
+defineExpose({
+  getElement: () => root.value
+})
 </script>
 
 <style>
@@ -72,27 +73,14 @@ const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, roo
     @apply box-border flex min-h-13 w-full max-w-full border-b border-black/5 py-3 dark:border-white/10;
   }
 
-  .settings-row--navigation-highlighted::before {
+  .settings-row--highlighted::before {
     position: absolute;
     z-index: -1;
     inset: 0;
     content: '';
     pointer-events: none;
-    background-color: color-mix(in srgb, var(--color-akari-500) 18%, transparent);
-    background-image: linear-gradient(
-      100deg,
-      transparent 32%,
-      color-mix(in srgb, var(--color-akari-400) 24%, transparent) 42%,
-      color-mix(in srgb, var(--color-akari-300) 60%, transparent) 50%,
-      color-mix(in srgb, var(--color-akari-400) 24%, transparent) 58%,
-      transparent 68%
-    );
-    background-position: 100% 0;
-    background-repeat: no-repeat;
-    background-size: 240% 100%;
-    animation:
-      settings-row-navigation-highlight-fade 2200ms linear 1 forwards,
-      settings-row-navigation-shimmer 1600ms linear 180ms 1 both;
+    background-color: color-mix(in srgb, var(--color-akari-400) 36%, transparent);
+    animation: settings-row-navigation-highlight-fade 3400ms linear 1 forwards;
   }
 
   .settings-row.settings-row--no-x-padding {
@@ -166,23 +154,6 @@ const isNavigationHighlighted = useSettingsNavigationTarget(() => settingId, roo
 
   to {
     opacity: 0;
-  }
-}
-
-@keyframes settings-row-navigation-shimmer {
-  from {
-    background-position: 100% 0;
-  }
-
-  to {
-    background-position: 0 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .settings-row--navigation-highlighted::before {
-    background-image: none;
-    animation: settings-row-navigation-highlight-fade 2200ms linear 1 forwards;
   }
 }
 </style>

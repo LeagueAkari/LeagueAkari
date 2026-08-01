@@ -67,9 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
@@ -78,6 +79,8 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
 import { NCollapseTransition, NScrollbar, NSwitch } from 'naive-ui'
+
+import { MISC_SETTINGS_NAVIGATION_STEP_KEY, type MiscSettingsNavigationPayload } from './navigation'
 
 const { t } = useTranslation()
 
@@ -88,4 +91,15 @@ const rt = useInstance(RespawnTimerRenderer)
 
 const wm = useInstance(WindowManagerRenderer)
 const wms = useWindowManagerStore()
+
+useAkariNavigationStep<MiscSettingsNavigationPayload>({
+  key: MISC_SETTINGS_NAVIGATION_STEP_KEY,
+  activate: () => {
+    if (!as.settings.streamerMode) {
+      return { status: 'unavailable', reason: 'streamer-mode-details-hidden' }
+    }
+
+    return undefined
+  }
+})
 </script>

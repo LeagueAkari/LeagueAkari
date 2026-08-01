@@ -10,12 +10,7 @@
             'update-status-item--actionable': isActionable
           }
         ]"
-        :role="isActionable ? 'button' : undefined"
-        :aria-label="label"
-        :tabindex="isActionable ? 0 : -1"
         @click="handleAction"
-        @keydown.enter="handleAction"
-        @keydown.space.prevent="handleAction"
       >
         <span class="update-status-item__inner">
           <span class="update-status-item__icon-slot">
@@ -205,7 +200,6 @@ const progressRailColor = 'color-mix(in oklch, var(--update-status-accent) 24%, 
   box-sizing: border-box;
   padding: 0 var(--la-sidebar-icon-horizontal-padding, 4px);
   border: 0;
-  outline: 0;
   color: var(--update-status-accent);
   background: transparent;
   font: inherit;
@@ -215,11 +209,6 @@ const progressRailColor = 'color-mix(in oklch, var(--update-status-accent) 24%, 
 
   &.update-status-item--actionable {
     cursor: pointer;
-  }
-
-  &:focus-visible .update-status-item__inner {
-    outline: 2px solid color-mix(in oklch, var(--update-status-accent) 72%, transparent);
-    outline-offset: -2px;
   }
 }
 

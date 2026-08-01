@@ -112,6 +112,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import { useAkariNavigation } from '@renderer-shared/shards/akari-navigation'
 import { useOverflow } from '@renderer-shared/composables/useOverflowDetection'
 import { ALL_SGPTAG_VALUE, useSgpTagOptions } from '@renderer-shared/composables/useSgpTagOptions'
 import { useInstance } from '@renderer-shared/shards'
@@ -130,7 +131,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, NSelect, NSwitch, NTooltip } from 'naive-ui'
 import { computed, useTemplateRef } from 'vue'
 
-import { AkariNavigationRenderer } from '@main-window/shards/akari-navigation'
+import { navigateToSetting } from '@main-window/settings-navigation'
 
 const { t } = useTranslation()
 
@@ -141,7 +142,7 @@ const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 const appCommon = useAppCommonStore()
 const sgp = useSgpStore()
-const akariNavigation = useInstance(AkariNavigationRenderer)
+const navigation = useAkariNavigation()
 
 const labelsEl = useTemplateRef('labels')
 const { horizontal: horizontalOverflow } = useOverflow(labelsEl)
@@ -206,7 +207,7 @@ const handleSgpTagChange = (val: string) => {
 }
 
 const handleOpenOngoingGameSettings = () => {
-  void akariNavigation.navigateToSetting('ongoing-game.common')
+  void navigateToSetting(navigation, 'ongoing-game.common')
 }
 
 const teamNameMap = computed(() => ({

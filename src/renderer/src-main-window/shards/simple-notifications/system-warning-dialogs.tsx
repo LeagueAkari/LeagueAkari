@@ -1,4 +1,5 @@
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariNavigation } from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
@@ -11,7 +12,7 @@ import { useTranslation } from 'i18next-vue'
 import { DialogReactive, NCheckbox, useDialog } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
-import { AkariNavigationRenderer } from '@main-window/shards/akari-navigation'
+import { navigateToSetting } from '@main-window/settings-navigation'
 
 import {
   NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
@@ -171,7 +172,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
   const sgpStore = useSgpStore()
   const dialog = useDialog()
   const appCommonStore = useAppCommonStore()
-  const akariNavigation = useInstance(AkariNavigationRenderer)
+  const navigation = useAkariNavigation()
   const neverShowAgainChecked = ref(false)
 
   const { t } = useTranslation(undefined, {
@@ -244,7 +245,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
           negativeText: t('negativeText'),
           onPositiveClick: () => {
             saveNeverShowAgain()
-            void akariNavigation.navigateToSetting('app.basic.preferred-lol-source')
+            void navigateToSetting(navigation, 'app.basic.preferred-lol-source')
             inst?.destroy()
             inst = null
           },

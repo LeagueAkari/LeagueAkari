@@ -450,9 +450,10 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { HttpProxySetting, useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -501,6 +502,8 @@ import { computed } from 'vue'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
+import { APP_SETTINGS_NAVIGATION_STEP_KEY, type AppSettingsNavigationPayload } from './navigation'
+
 const { t } = useTranslation()
 
 const lcus = useLeagueClientUxStore()
@@ -519,6 +522,20 @@ const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
 const lg = useInstance(LoggerRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
+
+useAkariNavigationStep<AppSettingsNavigationPayload>({
+  key: APP_SETTINGS_NAVIGATION_STEP_KEY,
+  activate: (payload) => {
+    if (payload === 'windows-only' && !as.isWindows) {
+      return { status: 'unavailable', reason: 'windows-only-setting' }
+    }
+    if (payload === 'forced-http-proxy' && as.settings.httpProxy.strategy !== 'force') {
+      return { status: 'unavailable', reason: 'http-proxy-fields-hidden' }
+    }
+
+    return undefined
+  }
+})
 
 const closeActions = computed(() => {
   return [

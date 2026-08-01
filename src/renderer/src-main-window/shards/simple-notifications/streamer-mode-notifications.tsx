@@ -1,4 +1,4 @@
-import { useInstance } from '@renderer-shared/shards'
+import { useAkariNavigation } from '@renderer-shared/shards/akari-navigation'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -6,7 +6,7 @@ import { useTranslation } from 'i18next-vue'
 import { NotificationReactive, useNotification } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
-import { AkariNavigationRenderer } from '@main-window/shards/akari-navigation'
+import { navigateToSetting } from '@main-window/settings-navigation'
 
 import {
   LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
@@ -20,7 +20,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
   const notification = useNotification()
   const installation = useClientInstallationStore()
   const appCommonStore = useAppCommonStore()
-  const akariNavigation = useInstance(AkariNavigationRenderer)
+  const navigation = useAkariNavigation()
   const leagueClientStore = useLeagueClientStore()
   const { t } = useTranslation(undefined, {
     keyPrefix: 'notifications.simple.liveStreamingHints'
@@ -150,7 +150,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
                 type: 'primary',
                 onClick: () => {
                   close()
-                  void akariNavigation.navigateToSetting('misc.streamer-mode.enabled')
+                  void navigateToSetting(navigation, 'misc.streamer-mode.enabled')
                   neverShowAgain()
                 }
               }

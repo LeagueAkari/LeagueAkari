@@ -122,7 +122,7 @@ import {
   type SettingsNavigationTargetId
 } from './registry'
 
-interface SettingsSearchResult {
+interface SettingsNavigationSearchResult {
   targetId: SettingsNavigationTargetId
   label: string
   description: string
@@ -162,7 +162,7 @@ const {
 
 const normalizeSearchText = (value: string) => value.trim().toLocaleLowerCase()
 
-const allResults = computed<SettingsSearchResult[]>(() =>
+const allResults = computed<SettingsNavigationSearchResult[]>(() =>
   searchableSettingsNavigationTargets.map((target) => {
     const parent = target.parentId ? getSettingsNavigationTarget(target.parentId) : undefined
     const routeParts: string[] = []
@@ -210,7 +210,7 @@ const allResults = computed<SettingsSearchResult[]>(() =>
   })
 )
 
-const getMatchRank = (result: SettingsSearchResult, pattern: string) => {
+const getMatchRank = (result: SettingsNavigationSearchResult, pattern: string) => {
   const labelIndex = result.normalizedLabel.indexOf(pattern)
   if (labelIndex === 0) {
     return 0

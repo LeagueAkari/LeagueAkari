@@ -365,8 +365,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import aramTeamSideMessageImage from '@renderer-shared/assets/automation/aram-team-side-message.webp'
 import { useInstance } from '@renderer-shared/shards'

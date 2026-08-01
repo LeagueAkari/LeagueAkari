@@ -62,7 +62,10 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
-import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
+import {
+  useAkariNavigation,
+  useAkariNavigationStep
+} from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
@@ -76,22 +79,21 @@ import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 
 import MainWindowCloseConfirmModal from './components/MainWindowCloseConfirmModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
+import type { SettingsTabName } from './components/settings-modal/navigation'
+import type { StorageSettingsTabName } from './components/settings-modal/storage-settings/navigation'
 import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
 import { useMicaAvailability } from './composables/useMicaAvailability'
 import { provideMainWindowAppContext } from './context'
 import {
-  AkariNavigationRenderer,
-  MAIN_WINDOW_NAVIGATION_SCOPE,
-  type MainWindowNavigationDestination,
-  type SettingsNavigationTargetId,
-  type SettingsTabName,
-  type StorageSettingsTabName
-} from './shards/akari-navigation'
+  MAIN_WINDOW_NAVIGATION_STEP_KEY,
+  type MainWindowNavigationPayload
+} from './navigation-steps'
+import { type SettingsNavigationTargetId, navigateToSetting } from './settings-navigation'
+import SettingsSearchPalette from './settings-navigation/SettingsSearchPalette.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
-import SettingsSearchPalette from './shards/akari-navigation/settings/SettingsSearchPalette.vue'
 
 const mui = useInstance(MainWindowUiRenderer)
-const akariNavigation = useInstance(AkariNavigationRenderer)
+const navigation = useAkariNavigation()
 
 const app = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
@@ -110,59 +112,33 @@ const settingModelTab = ref<SettingsTabName>('basic')
 const storageSettingsTab = ref<StorageSettingsTabName>('tagged-players')
 const settingsModal = useTemplateRef<InstanceType<typeof SettingsModal>>('settingsModal')
 
-const isMainWindowNavigationDestination = (
-  destination: unknown
-): destination is MainWindowNavigationDestination => {
-  if (!destination || typeof destination !== 'object' || !('surface' in destination)) {
-    return false
-  }
-
-  return destination.surface === 'settings-modal' || destination.surface === 'route'
-}
-
-const akariNavigationContext = akariNavigation.provideContext()
-useAkariNavigationBoundary({
-  scope: MAIN_WINDOW_NAVIGATION_SCOPE,
-  context: akariNavigationContext,
-  parentOutlet: akariNavigation.rootOutlet,
-  activate: async (destination, { signal }) => {
-    if (!isMainWindowNavigationDestination(destination)) {
-      return { status: 'unavailable', reason: 'unknown-main-window-destination' }
-    }
-
-    if (destination.surface === 'settings-modal') {
+useAkariNavigationStep<MainWindowNavigationPayload>({
+  key: MAIN_WINDOW_NAVIGATION_STEP_KEY,
+  activate: async (payload, { signal }) => {
+    if (payload.surface === 'settings-modal') {
       isShowingSettingModal.value = true
       await nextTick()
 
-      const modal = settingsModal.value
-      if (!modal) {
-        return { status: 'unavailable', reason: 'settings-modal-not-mounted' }
-      }
-
-      await modal.waitUntilEntered(signal)
+      await settingsModal.value!.waitUntilEntered(signal)
       await nextTick()
-      return { status: 'ready' }
+      return undefined
     }
 
     isShowingSettingModal.value = false
     await router.replace({
-      name: destination.route.name,
-      params: { section: destination.route.section }
+      name: payload.route.name,
+      params: { section: payload.route.section }
     })
     if (!signal.aborted) {
       await nextTick()
     }
-    return { status: 'ready' }
+    return undefined
   }
 })
 
-const navigateToSetting = (targetId: SettingsNavigationTargetId) => {
-  void akariNavigation.navigateToSetting(targetId)
-}
-
 const handleSettingsSearchNavigate = (targetId: SettingsNavigationTargetId) => {
   isShowingSettingsSearch.value = false
-  navigateToSetting(targetId)
+  void navigateToSetting(navigation, targetId)
 }
 
 provideMainWindowAppContext({

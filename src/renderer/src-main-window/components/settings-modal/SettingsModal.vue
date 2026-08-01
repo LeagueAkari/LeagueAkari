@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useAkariNavigationBoundary } from '@renderer-shared/composables/useAkariNavigation'
+import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
 import { Debug as DebugIcon, Layers as LayersIcon } from '@vicons/carbon'
 import {
@@ -111,13 +111,6 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NModal, NTabPane, NTabs } from 'naive-ui'
 import { nextTick, onBeforeUnmount, ref, useCssModule, useTemplateRef, watch } from 'vue'
 
-import {
-  SETTINGS_MODAL_NAVIGATION_SCOPE,
-  isSettingsTabName,
-  type SettingsTabName,
-  type StorageSettingsTabName
-} from '@main-window/shards/akari-navigation'
-
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
 import DebugSettings from './DebugSettings.vue'
@@ -125,7 +118,9 @@ import MatchHistorySettings from './MatchHistorySettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import MultiWindowSettings from './MultiWindowSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
+import { SETTINGS_MODAL_NAVIGATION_STEP_KEY, type SettingsTabName } from './navigation'
 import StorageSettings from './storage-settings/StorageSettings.vue'
+import type { StorageSettingsTabName } from './storage-settings/navigation'
 
 const { t } = useTranslation()
 
@@ -139,15 +134,12 @@ const storageTabName = defineModel<StorageSettingsTabName>('storageTabName', {
 const tabsEl = useTemplateRef('tabs')
 const tabsAnimated = ref(true)
 const modalEntered = ref(false)
-const enterWaiters = new Set<() => void>()
+let enterWaiter: (() => void) | null = null
 let navigationActivationSequence = 0
 
 const handleAfterEnter = () => {
   modalEntered.value = true
-  for (const resolve of enterWaiters) {
-    resolve()
-  }
-  enterWaiters.clear()
+  enterWaiter?.()
 }
 
 const waitUntilEntered = (signal: AbortSignal) => {
@@ -157,31 +149,27 @@ const waitUntilEntered = (signal: AbortSignal) => {
 
   return new Promise<void>((resolve) => {
     const finish = () => {
-      enterWaiters.delete(finish)
+      enterWaiter = null
       signal.removeEventListener('abort', finish)
       resolve()
     }
 
-    enterWaiters.add(finish)
+    enterWaiter = finish
     signal.addEventListener('abort', finish, { once: true })
   })
 }
 
-useAkariNavigationBoundary({
-  scope: SETTINGS_MODAL_NAVIGATION_SCOPE,
-  activate: async (destination, { signal }) => {
-    if (!isSettingsTabName(destination)) {
-      return { status: 'unavailable', reason: 'unknown-settings-tab' }
-    }
-
-    if (tabName.value === destination) {
+useAkariNavigationStep<SettingsTabName>({
+  key: SETTINGS_MODAL_NAVIGATION_STEP_KEY,
+  activate: async (payload, { signal }) => {
+    if (tabName.value === payload) {
       await nextTick()
-      return { status: 'ready' }
+      return undefined
     }
 
     const sequence = ++navigationActivationSequence
     tabsAnimated.value = false
-    tabName.value = destination
+    tabName.value = payload
     await nextTick()
 
     if (sequence === navigationActivationSequence) {
@@ -190,7 +178,7 @@ useAkariNavigationBoundary({
     if (!signal.aborted) {
       await nextTick()
     }
-    return { status: 'ready' }
+    return undefined
   }
 })
 
@@ -217,10 +205,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  for (const resolve of enterWaiters) {
-    resolve()
-  }
-  enterWaiters.clear()
+  enterWaiter?.()
 })
 </script>
 

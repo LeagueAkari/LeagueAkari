@@ -86,15 +86,7 @@
     <!-- settings search -->
     <NTooltip placement="right" :disabled="!isCollapsed">
       <template #trigger>
-        <div
-          class="menu-item"
-          role="button"
-          tabindex="0"
-          :aria-label="t('navigation.sidebar.status.searchSettings')"
-          @click="openSettingsSearch"
-          @keydown.enter="openSettingsSearch"
-          @keydown.space.prevent="openSettingsSearch"
-        >
+        <div class="menu-item" @click="openSettingsSearch">
           <div class="menu-item__inner">
             <NIcon class="menu-item__icon"><Search20RegularIcon /></NIcon>
             <div class="menu-item__label">

@@ -1,83 +1,93 @@
 <template>
-  <div class="box-border h-full rounded-lg bg-black/5 p-3 dark:bg-white/5">
-    <NModal
-      v-model:show="showEditModal"
-      preset="card"
-      :title="t('settings.taggedPlayers.editModal.title')"
-      class="max-w-[60vw]"
-    >
-      <NInput
-        v-model:value="currentEditingTag"
-        :placeholder="t('settings.taggedPlayers.editModal.inputPlaceholder')"
-        type="textarea"
-        :autosize="{ minRows: 3, maxRows: 4 }"
-        ref="input"
-      />
-
-      <div class="mt-3 flex justify-end gap-1">
-        <NButton size="small" @click="showEditModal = false">{{
-          t('settings.taggedPlayers.cancelButton')
-        }}</NButton>
-
-        <NButton
-          size="small"
-          type="primary"
-          @click="
-            () => {
-              if (currentEditing) {
-                updateTag(currentEditing.puuid, currentEditing.selfPuuid, currentEditingTag || null)
-                showEditModal = false
-              }
-            }
-          "
-          >{{ t('settings.taggedPlayers.saveButton') }}</NButton
-        >
-      </div>
-    </NModal>
-
-    <div class="flex h-full flex-col">
-      <div class="mb-2 flex items-center gap-2">
-        <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
-          {{ t('settings.taggedPlayers.exportButton') }}
-        </NButton>
-        <NButton size="small" secondary @click="handleImportTaggedPlayers">
-          {{ t('settings.taggedPlayers.importButton') }}
-        </NButton>
-        <NButton
-          type="primary"
-          size="small"
-          @click="() => loadPage(pagination.page || 1, pagination.pageSize || 20)"
-        >
-          {{ t('settings.taggedPlayers.refreshButton') }}
-        </NButton>
-        <NCheckbox v-model:checked="onlyCurrentAccount" :disabled="!lcs.summoner.me">
-          {{ t('settings.taggedPlayers.onlyCurrentAccountCheckbox') }}
-        </NCheckbox>
-      </div>
-
-      <MaskedComponent :show-mask="showMask">
-        <template #mask>
-          <div class="flex h-full w-full flex-col items-center justify-center gap-4">
-            <span>{{ t('settings.taggedPlayers.streamerModeWarning') }}</span>
-            <NButton type="warning" size="small" @click="showMask = false">{{
-              t('settings.taggedPlayers.showButton')
-            }}</NButton>
-          </div>
-        </template>
-        <NDataTable
-          size="small"
-          remote
-          :data="tableData"
-          :single-line="false"
-          :columns="columns"
-          :loading="isLoading"
-          :pagination="pagination"
-          class="h-full"
-          flex-height
+  <SettingsSection
+    class="tagged-players-section"
+    setting-id="storage.tagged-players"
+    :title="t('settings.storage.tabs.tagged-players')"
+  >
+    <div class="box-border h-full p-3">
+      <NModal
+        v-model:show="showEditModal"
+        preset="card"
+        :title="t('settings.taggedPlayers.editModal.title')"
+        class="max-w-[60vw]"
+      >
+        <NInput
+          v-model:value="currentEditingTag"
+          :placeholder="t('settings.taggedPlayers.editModal.inputPlaceholder')"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 4 }"
+          ref="input"
         />
-      </MaskedComponent>
+
+        <div class="mt-3 flex justify-end gap-1">
+          <NButton size="small" @click="showEditModal = false">{{
+            t('settings.taggedPlayers.cancelButton')
+          }}</NButton>
+
+          <NButton
+            size="small"
+            type="primary"
+            @click="
+              () => {
+                if (currentEditing) {
+                  updateTag(
+                    currentEditing.puuid,
+                    currentEditing.selfPuuid,
+                    currentEditingTag || null
+                  )
+                  showEditModal = false
+                }
+              }
+            "
+            >{{ t('settings.taggedPlayers.saveButton') }}</NButton
+          >
+        </div>
+      </NModal>
+
+      <div class="flex h-full flex-col">
+        <div class="mb-2 flex items-center gap-2">
+          <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
+            {{ t('settings.taggedPlayers.exportButton') }}
+          </NButton>
+          <NButton size="small" secondary @click="handleImportTaggedPlayers">
+            {{ t('settings.taggedPlayers.importButton') }}
+          </NButton>
+          <NButton
+            type="primary"
+            size="small"
+            @click="() => loadPage(pagination.page || 1, pagination.pageSize || 20)"
+          >
+            {{ t('settings.taggedPlayers.refreshButton') }}
+          </NButton>
+          <NCheckbox v-model:checked="onlyCurrentAccount" :disabled="!lcs.summoner.me">
+            {{ t('settings.taggedPlayers.onlyCurrentAccountCheckbox') }}
+          </NCheckbox>
+        </div>
+
+        <MaskedComponent :show-mask="showMask">
+          <template #mask>
+            <div class="flex h-full w-full flex-col items-center justify-center gap-4">
+              <span>{{ t('settings.taggedPlayers.streamerModeWarning') }}</span>
+              <NButton type="warning" size="small" @click="showMask = false">{{
+                t('settings.taggedPlayers.showButton')
+              }}</NButton>
+            </div>
+          </template>
+          <NDataTable
+            size="small"
+            remote
+            :data="tableData"
+            :single-line="false"
+            :columns="columns"
+            :loading="isLoading"
+            :pagination="pagination"
+            class="h-full"
+            flex-height
+          />
+        </MaskedComponent>
+      </div>
     </div>
-  </div>
+  </SettingsSection>
 </template>
 
 <script lang="tsx" setup>
@@ -125,6 +135,7 @@ import {
 } from 'vue'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 
 interface RecordType {
   selfPuuid: string
@@ -220,7 +231,7 @@ const renderSgpServerTag = (sgpServerId: string) => {
 
 const renderLinedText = (text: string) => {
   return (
-    <NScrollbar class="max-h-[100px]">
+    <NScrollbar class="max-h-25">
       <div class="text-xs whitespace-pre-wrap">{text}</div>
     </NScrollbar>
   )
@@ -512,3 +523,16 @@ const handleImportTaggedPlayers = async () => {
   }
 }
 </script>
+
+<style scoped>
+.tagged-players-section {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.tagged-players-section :deep(.settings-section-body) {
+  flex: 1 1 0;
+  min-height: 0;
+}
+</style>

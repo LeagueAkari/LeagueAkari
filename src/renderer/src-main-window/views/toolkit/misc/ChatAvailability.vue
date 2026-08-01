@@ -4,6 +4,7 @@
     :title="t('toolkit.chatAvailability.title')"
   >
     <SettingsRow
+      setting-id="toolkit.misc.chat-availability.availability"
       :label="t('toolkit.chatAvailability.availability.label')"
       :label-description="t('toolkit.chatAvailability.availability.description')"
       :label-width="260"
@@ -51,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoMiscRenderer } from '@renderer-shared/shards/auto-misc'
