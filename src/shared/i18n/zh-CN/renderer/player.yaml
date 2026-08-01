@@ -82,13 +82,11 @@ playerTabs:
     chromaSkins: 炫彩皮肤
   titlebar:
     loading: 加载中...
-    search: 搜索玩家
     refresh: 刷新
     close: 关闭
     closeOthers: 关闭其他页面
     closeToTheRight: 关闭右侧页面
     screenshot: 截图当前页面
-    searchButtonStreamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
   shell:
     disconnected: 未连接到客户端
     queueing: 正在进行登录排队

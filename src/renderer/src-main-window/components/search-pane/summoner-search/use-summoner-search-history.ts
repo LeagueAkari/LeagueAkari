@@ -39,7 +39,7 @@ export interface SearchResult {
   summonerLevel: number
 }
 
-export function useSearchPaneSearchHistory() {
+export function useSummonerSearchHistory() {
   const pt = useInstance(PlayerTabsRenderer)
   const sgps = useSgpStore()
 

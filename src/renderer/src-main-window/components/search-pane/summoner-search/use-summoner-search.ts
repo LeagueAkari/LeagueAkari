@@ -10,7 +10,7 @@ import { isAxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
 import { computed, markRaw, reactive, readonly, ref } from 'vue'
 
-import { SearchResult } from './search-history'
+import { SearchResult } from './use-summoner-search-history'
 
 export function isPuuid(puuid: string) {
   return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
@@ -66,7 +66,7 @@ export function useTencentServers() {
   }
 }
 
-export function useSearchPaneSearchArea() {
+export function useSummonerSearch() {
   const componentName = useComponentName()
 
   const logger = useInstance(LoggerRenderer)

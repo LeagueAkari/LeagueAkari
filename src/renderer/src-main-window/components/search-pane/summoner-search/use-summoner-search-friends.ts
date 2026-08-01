@@ -28,7 +28,7 @@ export function isFriendSpectatable(friend: FriendSpectateState): friend is Spec
   )
 }
 
-export function useSearchPaneFriends() {
+export function useSummonerSearchFriends() {
   const { t } = useTranslation()
   const message = useMessage()
   const lc = useInstance(LeagueClientRenderer)

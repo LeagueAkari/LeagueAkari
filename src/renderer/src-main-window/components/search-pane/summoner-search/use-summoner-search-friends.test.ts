@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { isFriendSpectatable } from './sidebar-friends'
+import { isFriendSpectatable } from './use-summoner-search-friends'
 
 type FriendSpectateState = Parameters<typeof isFriendSpectatable>[0]
 type FriendSpectateStateOverrides = Omit<Partial<FriendSpectateState>, 'lol'> & {

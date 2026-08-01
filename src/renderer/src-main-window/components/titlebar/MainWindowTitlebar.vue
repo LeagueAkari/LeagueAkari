@@ -16,6 +16,7 @@
     </div>
 
     <div class="divider" :class="{ invisible: !shouldShowDivider }" />
+    <SearchButton />
     <CommonButtons />
 
     <div class="w-1" v-if="as.isMacOS"></div>
@@ -38,6 +39,7 @@ import { useRoute } from 'vue-router'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import CommonButtons from './CommonButtons.vue'
+import { SearchButton } from '../search-pane'
 import OngoingGameTitle from './OngoingGameTitle.vue'
 import PlayerTabsTitle from './player-tabs-title'
 import TrafficButtons from './TrafficButtons.vue'

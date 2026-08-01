@@ -202,7 +202,7 @@ import { NButton, NIcon, NInput, NPopover, NScrollbar, NSelect, NSpin } from 'na
 import { nextTick, useTemplateRef } from 'vue'
 
 import CombinedTencentServers from './CombinedTencentServers.vue'
-import { useSearchPaneSearchArea } from './search-area'
+import { useSummonerSearch } from './use-summoner-search'
 
 const { t } = useTranslation()
 
@@ -219,7 +219,7 @@ const {
   search: handelSearch,
   cancel: handleCancel,
   reset: resetState
-} = useSearchPaneSearchArea()
+} = useSummonerSearch()
 
 const emits = defineEmits<{
   navigateToSummoner: [puuid: string, sgpServerId: string | null, setCurrent?: boolean]

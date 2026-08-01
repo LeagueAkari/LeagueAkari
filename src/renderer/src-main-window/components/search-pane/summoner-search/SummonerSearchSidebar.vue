@@ -267,8 +267,8 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NInput, NScrollbar, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useSearchPaneSearchHistory } from './search-history'
-import { isFriendSpectatable, useSearchPaneFriends } from './sidebar-friends'
+import { useSummonerSearchHistory } from './use-summoner-search-history'
+import { isFriendSpectatable, useSummonerSearchFriends } from './use-summoner-search-friends'
 
 const { t } = useTranslation()
 const componentName = useComponentName()
@@ -282,7 +282,7 @@ const {
   handleDeleteSearchHistory,
   handlePinSearchHistory,
   updateSearchHistory
-} = useSearchPaneSearchHistory()
+} = useSummonerSearchHistory()
 
 const emits = defineEmits<{
   navigateToSummoner: [puuid: string, sgpServerId: string | null, setCurrent?: boolean]
@@ -361,7 +361,7 @@ const handleSpectateFriend = async (friend: Friend) => {
   }
 }
 
-const { updateFriends, sortedFriends } = useSearchPaneFriends()
+const { updateFriends, sortedFriends } = useSummonerSearchFriends()
 
 const reset = () => {
   setRecentVisitsFilter('')

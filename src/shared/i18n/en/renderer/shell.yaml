@@ -99,6 +99,14 @@ legal:
 
       </div>
 titlebar:
+  search:
+    open: Search
+    summoner: Summoner Search
+    settings: Settings Search
+    streamerModeTitle: Streamer Mode
+    streamerModeWarning: Searching for players will expose sensitive information, continue?
+    continue: Continue
+    cancel: Cancel
   actions:
     notice: Notice
     noticeSummary: Notice Summary
@@ -159,7 +167,6 @@ navigation:
       launchedClients: Launched Clients
       noClientTitle: No Available Client
       noClient: No available client, please start the game
-      searchSettings: Search Settings
       settings: Settings
       notConnected: Not Connected
       inConnectionLoop: Connecting...

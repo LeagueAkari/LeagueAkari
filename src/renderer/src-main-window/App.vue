@@ -12,9 +12,11 @@
       v-model:tab-name="settingModelTab"
       v-model:storage-tab-name="storageSettingsTab"
     />
-    <SettingsSearchPalette
-      v-model:show="isShowingSettingsSearch"
-      @navigate="handleSettingsSearchNavigate"
+    <SearchPane
+      v-model:show="isShowingSearchPane"
+      v-model:page="searchPanePage"
+      @navigate-to-summoner="handleSummonerSearchNavigate"
+      @navigate-to-setting="handleSettingsSearchNavigate"
     />
     <MainWindowCloseConfirmModal />
 
@@ -68,7 +70,9 @@ import {
 } from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
@@ -76,7 +80,9 @@ import { nextTick, onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue
 import { useRouter } from 'vue-router'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
+import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 
+import { SearchPane, type SearchPanePage } from './components/search-pane'
 import MainWindowCloseConfirmModal from './components/MainWindowCloseConfirmModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import type { SettingsTabName } from './components/settings-modal/navigation'
@@ -89,7 +95,6 @@ import {
   type MainWindowNavigationPayload
 } from './navigation-steps'
 import { type SettingsNavigationTargetId, navigateToSetting } from './settings-navigation'
-import SettingsSearchPalette from './settings-navigation/SettingsSearchPalette.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 
 const mui = useInstance(MainWindowUiRenderer)
@@ -97,6 +102,10 @@ const navigation = useAkariNavigation()
 
 const app = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
+const leagueClient = useLeagueClientStore()
+const sgp = useSgpStore()
+const playerTabs = useInstance(PlayerTabsRenderer)
+const { navigateToTabByPuuidAndSgpServerId } = playerTabs.useNavigateToTab()
 
 const { t } = useTranslation()
 const router = useRouter()
@@ -107,7 +116,8 @@ const contentEl = useTemplateRef('contentEl')
 const { width, height } = useElementSize(contentEl)
 
 const isShowingSettingModal = ref(false)
-const isShowingSettingsSearch = ref(false)
+const isShowingSearchPane = ref(false)
+const searchPanePage = ref<SearchPanePage>('settings')
 const settingModelTab = ref<SettingsTabName>('basic')
 const storageSettingsTab = ref<StorageSettingsTabName>('tagged-players')
 const settingsModal = useTemplateRef<InstanceType<typeof SettingsModal>>('settingsModal')
@@ -137,16 +147,39 @@ useAkariNavigationStep<MainWindowNavigationPayload>({
 })
 
 const handleSettingsSearchNavigate = (targetId: SettingsNavigationTargetId) => {
-  isShowingSettingsSearch.value = false
+  isShowingSearchPane.value = false
   void navigateToSetting(navigation, targetId)
+}
+
+const handleSummonerSearchNavigate = (
+  puuid: string,
+  sgpServerId: string | null,
+  setCurrent = true
+) => {
+  const targetSgpServerId = sgpServerId || sgp.availability.sgpServerId
+
+  if (setCurrent) {
+    isShowingSearchPane.value = false
+    navigateToTabByPuuidAndSgpServerId(puuid, targetSgpServerId)
+  } else {
+    playerTabs.createTab(puuid, targetSgpServerId, { setCurrent: false })
+  }
+}
+
+const openSearchPane = (page?: SearchPanePage) => {
+  if (page) {
+    searchPanePage.value = page
+  } else if (!isShowingSearchPane.value) {
+    searchPanePage.value = leagueClient.isConnected ? 'summoner' : 'settings'
+  }
+
+  isShowingSearchPane.value = true
 }
 
 provideMainWindowAppContext({
   contentWidth: width,
   contentHeight: height,
-  openSettingsSearch: () => {
-    isShowingSettingsSearch.value = true
-  },
+  openSearch: openSearchPane,
   openSettingsModal: () => {
     isShowingSettingModal.value = true
   }

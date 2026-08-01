@@ -82,13 +82,11 @@ playerTabs:
     chromaSkins: Chroma Skins
   titlebar:
     loading: Loading...
-    search: Search
     refresh: Refresh
     close: Close
     closeOthers: Close Others
     closeToTheRight: Close to the Right
     screenshot: Screenshot Tab
-    searchButtonStreamerModeWarning: Searching for players will expose sensitive information, continue?
   shell:
     disconnected: Not connected to the client
     queueing: Logging in...

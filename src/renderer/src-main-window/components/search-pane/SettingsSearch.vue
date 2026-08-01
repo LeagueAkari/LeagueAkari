@@ -1,104 +1,96 @@
 <template>
-  <NModal v-model:show="show" transform-origin="center" @after-enter="focusSearchInput">
-    <div
-      :class="styles['settings-search-palette']"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="t('settings.commandPalette.searchAriaLabel')"
-      @keydown="handleKeydown"
-    >
-      <div :class="styles['settings-search-palette__input-row']">
-        <NInput
-          ref="search-input"
-          :value="queryInput"
-          size="large"
-          clearable
-          :bordered="false"
-          :theme-overrides="searchInputThemeOverrides"
-          :aria-label="t('settings.commandPalette.searchAriaLabel')"
-          :placeholder="t('settings.commandPalette.searchPlaceholder')"
-          @update:value="handleQueryUpdate"
-          @compositionstart="handleQueryCompositionStart"
-          @compositionend="handleQueryCompositionEnd"
-        >
-          <template #prefix>
-            <NIcon class="text-lg opacity-60">
-              <Search20RegularIcon />
-            </NIcon>
-          </template>
-        </NInput>
-      </div>
-
-      <div :class="styles['settings-search-palette__results']">
-        <NScrollbar
-          v-if="filteredResults.length"
-          ref="results-scrollbar"
-          :class="styles['settings-search-palette__results-scroller']"
-          :content-class="styles['settings-search-palette__results-content']"
-          @scroll="virtualContainerProps.onScroll"
-        >
-          <div v-bind="virtualWrapperProps" role="listbox">
-            <button
-              v-for="{ data: result, index } in virtualResults"
-              :key="result.targetId"
-              type="button"
-              :class="[
-                styles['settings-search-palette__result'],
-                {
-                  [styles['settings-search-palette__result--active']]: index === activeIndex
-                }
-              ]"
-              :aria-selected="index === activeIndex"
-              :title="result.description || undefined"
-              role="option"
-              @mousedown.prevent
-              @click="selectResult(result.targetId)"
-            >
-              <span class="flex min-w-0 flex-1 items-center gap-1">
-                <template
-                  v-for="(ancestorLabel, ancestorIndex) in result.ancestorLabels"
-                  :key="`${result.targetId}:${ancestorIndex}`"
-                >
-                  <span class="max-w-40 truncate text-xs text-black/45 dark:text-white/45">
-                    {{ ancestorLabel }}
-                  </span>
-                  <NIcon class="shrink-0 text-xs text-black/30 dark:text-white/30">
-                    <ChevronRight12RegularIcon />
-                  </NIcon>
-                </template>
-                <span class="min-w-0 flex-1 truncate text-sm font-medium">
-                  {{ result.label }}
-                </span>
-              </span>
-            </button>
-          </div>
-        </NScrollbar>
-
-        <NEmpty
-          v-else
-          :class="styles['settings-search-palette__empty']"
-          size="small"
-          :description="t('settings.commandPalette.empty')"
-        />
-      </div>
-
-      <div :class="styles['settings-search-palette__footer']">
-        <span :class="styles['settings-search-palette__count']">
-          {{ filteredResults.length }} / {{ allResults.length }}
-        </span>
-        <span :class="styles['settings-search-palette__hints']">
-          <span :class="styles['settings-search-palette__hint']">
-            <kbd>Enter</kbd>
-            {{ t('settings.commandPalette.openHint') }}
-          </span>
-          <span :class="styles['settings-search-palette__hint']">
-            <kbd>Esc</kbd>
-            {{ t('settings.commandPalette.closeHint') }}
-          </span>
-        </span>
-      </div>
+  <div :class="styles['settings-search']" @keydown="handleKeydown">
+    <div :class="styles['settings-search__input-row']">
+      <NInput
+        ref="search-input"
+        :value="queryInput"
+        size="large"
+        clearable
+        :bordered="false"
+        :theme-overrides="searchInputThemeOverrides"
+        :aria-label="t('settings.commandPalette.searchAriaLabel')"
+        :placeholder="t('settings.commandPalette.searchPlaceholder')"
+        @update:value="handleQueryUpdate"
+        @compositionstart="handleQueryCompositionStart"
+        @compositionend="handleQueryCompositionEnd"
+      >
+        <template #prefix>
+          <NIcon class="text-lg opacity-60">
+            <Search20RegularIcon />
+          </NIcon>
+        </template>
+      </NInput>
     </div>
-  </NModal>
+
+    <div :class="styles['settings-search__results']">
+      <NScrollbar
+        v-if="filteredResults.length"
+        ref="results-scrollbar"
+        :class="styles['settings-search__results-scroller']"
+        :content-class="styles['settings-search__results-content']"
+        @scroll="virtualContainerProps.onScroll"
+      >
+        <div v-bind="virtualWrapperProps" role="listbox">
+          <button
+            v-for="{ data: result, index } in virtualResults"
+            :key="result.targetId"
+            type="button"
+            :class="[
+              styles['settings-search__result'],
+              {
+                [styles['settings-search__result--active']]: index === activeIndex
+              }
+            ]"
+            :aria-selected="index === activeIndex"
+            :title="result.description || undefined"
+            role="option"
+            @mousedown.prevent
+            @click="selectResult(result.targetId)"
+          >
+            <span class="flex min-w-0 flex-1 items-center gap-1">
+              <template
+                v-for="(ancestorLabel, ancestorIndex) in result.ancestorLabels"
+                :key="`${result.targetId}:${ancestorIndex}`"
+              >
+                <span class="max-w-40 truncate text-xs text-black/45 dark:text-white/45">
+                  {{ ancestorLabel }}
+                </span>
+                <NIcon class="shrink-0 text-xs text-black/30 dark:text-white/30">
+                  <ChevronRight12RegularIcon />
+                </NIcon>
+              </template>
+              <span class="min-w-0 flex-1 truncate text-sm font-medium">
+                {{ result.label }}
+              </span>
+            </span>
+          </button>
+        </div>
+      </NScrollbar>
+
+      <NEmpty
+        v-else
+        :class="styles['settings-search__empty']"
+        size="small"
+        :description="t('settings.commandPalette.empty')"
+      />
+    </div>
+
+    <div :class="styles['settings-search__footer']">
+      <span :class="styles['settings-search__count']">
+        {{ filteredResults.length }} / {{ allResults.length }}
+      </span>
+      <span :class="styles['settings-search__hints']">
+        <span :class="styles['settings-search__hint']">
+          <kbd>Enter</kbd>
+          {{ t('settings.commandPalette.openHint') }}
+        </span>
+        <span :class="styles['settings-search__hint']">
+          <kbd>Esc</kbd>
+          {{ t('settings.commandPalette.closeHint') }}
+        </span>
+      </span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -109,7 +101,7 @@ import {
 import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useVirtualList } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NEmpty, NIcon, NInput, NModal, NScrollbar, type InputInst } from 'naive-ui'
+import { NEmpty, NIcon, NInput, NScrollbar, type InputInst } from 'naive-ui'
 import { computed, nextTick, ref, useCssModule, useTemplateRef, watch, watchEffect } from 'vue'
 
 import {
@@ -120,7 +112,7 @@ import {
   getSettingsNavigationTarget,
   searchableSettingsNavigationTargets,
   type SettingsNavigationTargetId
-} from './registry'
+} from '@main-window/settings-navigation/registry'
 
 interface SettingsNavigationSearchResult {
   targetId: SettingsNavigationTargetId
@@ -137,9 +129,8 @@ const RESULTS_SCROLL_PADDING = 6
 
 const emit = defineEmits<{
   navigate: [targetId: SettingsNavigationTargetId]
+  close: []
 }>()
-
-const show = defineModel<boolean>('show', { default: false })
 
 const { t } = useTranslation()
 const styles = useCssModule()
@@ -291,7 +282,6 @@ const moveActiveResult = (offset: number) => {
 }
 
 const selectResult = (targetId: SettingsNavigationTargetId) => {
-  show.value = false
   emit('navigate', targetId)
 }
 
@@ -322,7 +312,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       break
     case 'Escape':
       event.preventDefault()
-      show.value = false
+      emit('close')
       break
   }
 }
@@ -336,56 +326,51 @@ watch(
   { immediate: true }
 )
 
-watch(
-  () => show.value,
-  (visible) => {
-    if (!visible) {
-      return
-    }
+const activate = () => {
+  setQuery('')
+  activeIndex.value = allResults.value.length ? 0 : -1
+  void nextTick(() => {
+    scrollToResult(0)
+    focusSearchInput()
+  })
+}
 
-    setQuery('')
-    activeIndex.value = 0
-    void nextTick(focusSearchInput)
-  }
-)
+defineExpose({ activate })
 </script>
 
 <style module>
-.settings-search-palette {
+.settings-search {
   display: flex;
-  width: min(720px, calc(100vw - 72px));
-  max-height: calc(100vh - 96px);
-  margin: max(calc(var(--la-titlebar-height) + 28px), 8vh) auto auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   flex-direction: column;
   color: var(--la-color-text-primary);
-  border: 1px solid var(--la-color-popover-border);
-  border-radius: 10px;
-  background-color: var(--la-color-select-menu-bg);
-  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.28);
   -webkit-app-region: no-drag;
 }
 
-.settings-search-palette__input-row {
+.settings-search__input-row {
   flex-shrink: 0;
-  padding: 8px 10px;
+  padding: 8px 0px;
   border-bottom: 1px solid color-mix(in oklch, var(--la-color-text-primary) 12%, transparent);
 }
 
-.settings-search-palette__results {
-  height: min(420px, calc(100vh - 190px));
+.settings-search__results {
+  height: 0;
   min-height: 72px;
+  flex: 1;
 }
 
-.settings-search-palette__results-scroller {
+.settings-search__results-scroller {
   height: 100%;
 }
 
-.settings-search-palette__results-content {
+.settings-search__results-content {
   padding: 6px;
 }
 
-.settings-search-palette__result {
+.settings-search__result {
   display: flex;
   width: 100%;
   height: 36px;
@@ -402,21 +387,21 @@ watch(
   cursor: pointer;
 }
 
-.settings-search-palette__result--active,
-.settings-search-palette__result:hover {
+.settings-search__result--active,
+.settings-search__result:hover {
   background-color: color-mix(in oklch, var(--la-color-text-primary) 7%, transparent);
 }
 
-.settings-search-palette__result:focus-visible {
+.settings-search__result:focus-visible {
   outline: 2px solid color-mix(in oklch, var(--la-color-link) 70%, transparent);
   outline-offset: -2px;
 }
 
-.settings-search-palette__empty {
+.settings-search__empty {
   padding: 28px 16px;
 }
 
-.settings-search-palette__footer {
+.settings-search__footer {
   display: flex;
   min-height: 30px;
   padding: 0 10px;
@@ -429,25 +414,25 @@ watch(
   font-size: 10px;
 }
 
-.settings-search-palette__count {
+.settings-search__count {
   font-variant-numeric: tabular-nums;
 }
 
-.settings-search-palette__hints,
-.settings-search-palette__hint {
+.settings-search__hints,
+.settings-search__hint {
   display: flex;
   align-items: center;
 }
 
-.settings-search-palette__hints {
+.settings-search__hints {
   gap: 12px;
 }
 
-.settings-search-palette__hint {
+.settings-search__hint {
   gap: 4px;
 }
 
-.settings-search-palette__hint kbd {
+.settings-search__hint kbd {
   min-width: 18px;
   padding: 1px 4px;
   color: color-mix(in oklch, var(--la-color-text-primary) 72%, transparent);

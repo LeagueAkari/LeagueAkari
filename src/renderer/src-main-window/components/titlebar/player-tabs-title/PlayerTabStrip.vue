@@ -39,30 +39,6 @@
           />
         </div>
       </NScrollbar>
-
-      <div class="divider" />
-
-      <NPopconfirm
-        :disabled="!requireSearchConfirmation"
-        :positive-button-props="{ type: 'warning', size: 'tiny' }"
-        :negative-button-props="{ size: 'tiny' }"
-        @positive-click="emit('search', true)"
-      >
-        <template #trigger>
-          <div
-            class="search-area"
-            role="button"
-            tabindex="0"
-            @click="!requireSearchConfirmation && emit('search', false)"
-            @keydown.enter="!requireSearchConfirmation && emit('search', false)"
-            @keydown.space.prevent="!requireSearchConfirmation && emit('search', false)"
-          >
-            <NIcon class="search-icon"><SearchIcon /></NIcon>
-            <span class="search-label">{{ t('playerTabs.titlebar.search') }}</span>
-          </div>
-        </template>
-        {{ t('playerTabs.titlebar.searchButtonStreamerModeWarning') }}
-      </NPopconfirm>
     </div>
   </DragDropProvider>
 </template>
@@ -78,11 +54,10 @@ import {
   type DragStartEvent
 } from '@dnd-kit/vue'
 import { isSortable } from '@dnd-kit/vue/sortable'
-import { Search as SearchIcon } from '@vicons/carbon'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { useRafFn, useResizeObserver } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NDropdown, NIcon, NPopconfirm, NScrollbar } from 'naive-ui'
+import { NDropdown, NIcon, NScrollbar } from 'naive-ui'
 import type { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
@@ -98,11 +73,9 @@ const props = withDefaults(
   defineProps<{
     tabs: PlayerTabStripItem[]
     activeTabId: string | null
-    requireSearchConfirmation?: boolean
     contextMenuOffsetY?: number
   }>(),
   {
-    requireSearchConfirmation: false,
     contextMenuOffsetY: 0
   }
 )
@@ -113,7 +86,6 @@ const emit = defineEmits<{
   refresh: [id: string]
   closeOthers: [id: string]
   closeToRight: [id: string]
-  search: [confirmed: boolean]
   reorder: [event: PlayerTabStripReorderEvent]
   dragStart: [id: string]
   dragEnd: [id: string]
@@ -128,7 +100,7 @@ let dragFinishedAt = 0
 
 const sensors = [
   PointerSensor.configure({
-    activationConstraints: [new PointerActivationConstraints.Distance({ value: 5 })],
+    activationConstraints: [new PointerActivationConstraints.Distance({ value: 0 })],
     preventActivation(event) {
       const target = event.target
 
@@ -368,99 +340,6 @@ watch(
   align-items: center;
   width: max-content;
   gap: 2px;
-}
-
-.search-area {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-  padding: 0 12px 0 10px;
-  border-radius: 2px;
-  height: 24px;
-  box-sizing: border-box;
-  cursor: pointer;
-  line-height: 1;
-  transition:
-    border-color 0.2s,
-    background-color 0.2s,
-    color 0.2s;
-  border: 1px solid rgba(0, 0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.1);
-  color: rgba(0, 0, 0, 0.8);
-
-  [data-theme='dark'] & {
-    border: 1px solid rgba(255, 255, 255, 0);
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  &:hover {
-    border-color: rgba(0, 0, 0, 0.4);
-    color: rgba(0, 0, 0, 1);
-
-    [data-theme='dark'] & {
-      border-color: rgba(255, 255, 255, 0.4);
-      color: rgba(255, 255, 255, 1);
-    }
-  }
-
-  &:active {
-    background-color: rgba(0, 0, 0, 0.05);
-
-    [data-theme='dark'] & {
-      background-color: rgba(255, 255, 255, 0.05);
-    }
-  }
-
-  &:focus-visible {
-    outline: 1px solid currentColor;
-    outline-offset: 1px;
-  }
-}
-
-.search-icon {
-  font-size: 12px;
-  margin-right: 4px;
-  transition: color 0.2s;
-}
-
-.search-label {
-  font-size: 12px;
-  transition: color 0.2s;
-}
-
-.divider {
-  width: 1px;
-  height: 40%;
-  box-sizing: border-box;
-  margin: 0 8px;
-  background-color: rgba(0, 0, 0, 0.15);
-
-  [data-theme='dark'] & {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-}
-
-[data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
-  .search-area {
-    border-color: rgb(var(--la-card-border-rgb) / 0);
-    background-color: rgb(var(--la-card-tint-rgb) / 0.12);
-    color: color-mix(in oklch, var(--la-color-text-themed) 90%, transparent);
-
-    &:hover {
-      border-color: rgb(var(--la-card-border-rgb) / 0.45);
-      color: var(--la-color-text-themed);
-    }
-
-    &:active {
-      background-color: color-mix(in oklch, var(--la-color-link) 18%, transparent);
-    }
-  }
-
-  .divider {
-    background-color: rgb(var(--la-card-border-rgb) / 0.28);
-  }
 }
 </style>
 

@@ -32,7 +32,6 @@
         @refresh="refreshTab"
         @close-others="closeOtherTabs"
         @close-to-right="closeTabsToRight"
-        @search="lastAction = '触发搜索入口'"
         @reorder="handleReorder"
         @drag-start="handleDragStart"
       />

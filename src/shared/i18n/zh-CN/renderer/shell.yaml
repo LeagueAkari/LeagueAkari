@@ -99,6 +99,14 @@ legal:
 
       </div>
 titlebar:
+  search:
+    open: 搜索
+    summoner: 召唤师搜索
+    settings: 设置项搜索
+    streamerModeTitle: 直播模式
+    streamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
+    continue: 继续
+    cancel: 取消
   actions:
     notice: 公告
     noticeSummary: 公告摘要
@@ -160,7 +168,6 @@ navigation:
       launchedClientPlaceholder: 已启动的客户端 {{index}}
       noClientTitle: 无可用客户端
       noClient: 当前无可用客户端，请启动游戏
-      searchSettings: 搜索设置项
       settings: 设置
       notConnected: 未连接
       unknown: 未知
