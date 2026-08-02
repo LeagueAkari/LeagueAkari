@@ -8,7 +8,7 @@ import {
   createDefaultInGameSendPremadePresetOptions,
   createDefaultInGameSendRatingPresetOptions
 } from '@shared/shards/in-game-send'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class InGameSendSettings {
   cancelShortcut: string | null = null
@@ -30,10 +30,10 @@ export class InGameSendSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      ratingPresetOptions: observable.ref,
-      junglePresetOptions: observable.ref,
-      premadePresetOptions: observable.ref,
-      fixedTextPresetItems: observable.ref
+      ratingPresetOptions: observableRef,
+      junglePresetOptions: observableRef,
+      premadePresetOptions: observableRef,
+      fixedTextPresetItems: observableRef
     })
   }
 }
@@ -71,9 +71,9 @@ export class InGameSendState {
 
   constructor() {
     makeAutoObservable(this, {
-      ratingPuuids: observable.ref,
-      junglePuuids: observable.ref,
-      premadeIndices: observable.ref
+      ratingPuuids: observableRef,
+      junglePuuids: observableRef,
+      premadeIndices: observableRef
     })
   }
 }

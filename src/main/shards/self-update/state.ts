@@ -1,5 +1,12 @@
 import type { SelfUpdateReleaseInfo, UpdateProgressInfo } from '@shared/shards/self-update'
-import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx'
+import {
+  action,
+  computedStruct,
+  makeAutoObservable,
+  makeObservable,
+  observable,
+  observableRef
+} from 'mobx'
 
 export class SelfUpdateSettings {
   /**
@@ -52,8 +59,8 @@ export class SelfUpdateState {
     makeObservable(this, {
       isUpdateSupportedOnCurrentPlatform: observable,
       isCheckingUpdates: observable,
-      releaseInfo: computed.struct,
-      updateProgressInfo: observable.ref,
+      releaseInfo: computedStruct,
+      updateProgressInfo: observableRef,
       lastUpdateSucceeded: observable,
       setCheckingUpdates: action,
       setUpdateProgressInfo: action,

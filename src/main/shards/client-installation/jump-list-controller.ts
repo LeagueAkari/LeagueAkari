@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { DEEP_LINK_PROTOCOL } from '@main/utils/deep-link'
 import { JumpListItem, app } from 'electron'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 
 import type { ClientInstallationLauncher } from './client-launcher'
 import { CLIENT_INSTALLATION_MAIN_NAMESPACE, type ClientInstallationMainContext } from './context'
@@ -37,7 +37,7 @@ export class ClientInstallationJumpListController {
           this._handleDeepLink(this._context.shared.global.startupDeepLink, false)
         }
       },
-      { fireImmediately: true, equals: comparer.shallow, delay: 500 }
+      { fireImmediately: true, equals: compareShallow, delay: 500 }
     )
 
     this._context.shared.global.events.on('second-instance-deep-link', (url) => {

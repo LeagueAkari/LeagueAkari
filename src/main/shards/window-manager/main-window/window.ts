@@ -1,6 +1,6 @@
 import icon from '@resources/LA_ICON.ico?asset'
 import { Event } from 'electron'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
@@ -72,7 +72,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
           )
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
 
     this._mobxUtils.reaction(

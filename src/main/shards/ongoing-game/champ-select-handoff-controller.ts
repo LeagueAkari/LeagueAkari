@@ -1,5 +1,5 @@
 import { ONGOING_GAME_DEOBFUSCATION_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
-import { comparer } from 'mobx'
+import { compareStructural } from 'mobx'
 
 import {
   ChampSelectHandoffSnapshot,
@@ -90,7 +90,7 @@ export class OngoingGameChampSelectHandoffController {
           this._saveSnapshot(snapshot)
         }
       },
-      { delay: 300, equals: comparer.structural, fireImmediately: true }
+      { delay: 300, equals: compareStructural, fireImmediately: true }
     )
   }
 
@@ -110,7 +110,7 @@ export class OngoingGameChampSelectHandoffController {
           this.clear()
         }
       },
-      { equals: comparer.structural, fireImmediately: true }
+      { equals: compareStructural, fireImmediately: true }
     )
   }
 

@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 
 import type { OngoingGameMainContext } from './context'
 
@@ -111,7 +111,7 @@ export class OngoingGameSideEffectsController {
         equals: (a, b) => {
           const aPuuids = a.map((p) => p.puuid)
           const bPuuids = b.map((p) => p.puuid)
-          return comparer.shallow(aPuuids, bPuuids)
+          return compareShallow(aPuuids, bPuuids)
         }
       }
     )

@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { comparer, computed } from 'mobx'
+import { compareStructural, computed } from 'mobx'
 
 import type { AutoSelectActionExecutor } from './action-executor'
 import type { AutoSelectMainContext } from './context'
@@ -97,7 +97,7 @@ export class AutoSelectTradeController {
           tradeId: tradeId
         }
       },
-      { equals: comparer.structural }
+      { equals: compareStructural }
     )
 
     // --- trade: champion swap ---

@@ -1,5 +1,5 @@
 import { GameflowPhase, GameflowSession } from '@shared/types/league-client/gameflow'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class GameflowState {
   phase: GameflowPhase | null = null
@@ -8,8 +8,8 @@ export class GameflowState {
 
   constructor() {
     makeAutoObservable(this, {
-      phase: observable.struct,
-      session: observable.struct
+      phase: observableStruct,
+      session: observableStruct
     })
   }
 

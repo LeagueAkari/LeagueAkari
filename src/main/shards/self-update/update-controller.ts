@@ -1,7 +1,7 @@
 import { IntervalTask } from '@main/utils/timer'
 import type { AkariApiLanguage } from '@shared/shards/akari-api'
 import type { SelfUpdateReleaseInfo } from '@shared/shards/self-update'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 
 import {
   PLATFORM_UNSUPPORTED_REASON,
@@ -41,7 +41,7 @@ export class SelfUpdateController {
           this._releaseCheckTask.cancel()
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
   }
 
@@ -102,7 +102,7 @@ export class SelfUpdateController {
           void this._executor.start(release)
         }
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
   }
 

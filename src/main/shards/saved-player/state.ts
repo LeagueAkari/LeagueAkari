@@ -1,5 +1,5 @@
 import { createDefaultSavedPlayerTagPhrases } from '@shared/shards/saved-player'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class SavedPlayerSettings {
   playerTagPhrases = createDefaultSavedPlayerTagPhrases()
@@ -7,7 +7,7 @@ export class SavedPlayerSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      playerTagPhrases: observable.ref
+      playerTagPhrases: observableRef
     })
   }
 }

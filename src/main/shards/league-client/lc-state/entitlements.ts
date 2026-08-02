@@ -1,5 +1,5 @@
 import { EntitlementsToken } from '@shared/types/league-client/entitlements'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class EntitlementsState {
   token: EntitlementsToken | null = null
@@ -10,7 +10,7 @@ export class EntitlementsState {
 
   constructor() {
     makeAutoObservable(this, {
-      token: observable.ref
+      token: observableRef
     })
   }
 }

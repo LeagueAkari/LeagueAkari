@@ -1,5 +1,5 @@
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observable, observableShallow, observableStruct } from 'mobx'
 
 export interface Conversations {
   championSelect: Conversation | null
@@ -21,9 +21,9 @@ export class ChatState {
       customGame: null
     },
     {
-      championSelect: observable.struct,
-      postGame: observable.struct,
-      customGame: observable.struct
+      championSelect: observableStruct,
+      postGame: observableStruct,
+      customGame: observableStruct
     },
     { deep: false }
   )
@@ -35,9 +35,9 @@ export class ChatState {
       customGame: null
     },
     {
-      championSelect: observable.struct,
-      postGame: observable.struct,
-      customGame: observable.struct
+      championSelect: observableStruct,
+      postGame: observableStruct,
+      customGame: observableStruct
     },
     { deep: false }
   )
@@ -46,9 +46,9 @@ export class ChatState {
 
   constructor() {
     makeAutoObservable(this, {
-      me: observable.struct,
-      conversations: observable.shallow,
-      participants: observable.shallow
+      me: observableStruct,
+      conversations: observableShallow,
+      participants: observableShallow
     })
   }
 

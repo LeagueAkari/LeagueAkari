@@ -1,5 +1,5 @@
 import { formatError } from '@shared/utils/errors'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 
 import type { AutoGameflowActionController } from './action-controller'
 import {
@@ -107,7 +107,7 @@ export class AutoGameflowLobbyFlowController {
           return
         }
       },
-      { equals: comparer.shallow, fireImmediately: true }
+      { equals: compareShallow, fireImmediately: true }
     )
   }
 

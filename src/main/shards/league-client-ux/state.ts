@@ -1,5 +1,5 @@
 import { UxCommandLine } from '@shared/shards/league-client-ux'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class LeagueClientUxSettings {
   useWmi = false
@@ -21,7 +21,7 @@ export class LeagueClientUxState {
 
   constructor() {
     makeAutoObservable(this, {
-      launchedClients: observable.struct
+      launchedClients: observableStruct
     })
   }
 

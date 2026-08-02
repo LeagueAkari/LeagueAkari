@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { comparer, computed, observable } from 'mobx'
+import { compareShallow, computed, observable } from 'mobx'
 
 import type { AutoSelectActionExecutor } from './action-executor'
 import type { AutoSelectMainContext } from './context'
@@ -44,7 +44,7 @@ export class AutoSelectBenchController {
         const newCooldown = trackCooldown(benchChampionCooldown.get(), bench)
         benchChampionCooldown.set(newCooldown)
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
 
     const benchSwapContext = computed(() => {

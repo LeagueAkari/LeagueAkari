@@ -10,7 +10,7 @@ import {
   Queue,
   SummonerSpell
 } from '@shared/types/league-client/game-data'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class GameDataState {
   summonerSpells: Record<number, SummonerSpell> = {}
@@ -36,16 +36,16 @@ export class GameDataState {
 
   constructor() {
     makeAutoObservable(this, {
-      summonerSpells: observable.ref,
-      augments: observable.ref,
-      champions: observable.ref,
-      items: observable.ref,
-      perks: observable.ref,
-      perkstyles: observable.ref,
-      queues: observable.ref,
-      gameModeMutators: observable.ref,
-      maps: observable.ref,
-      challenges: observable.ref
+      summonerSpells: observableRef,
+      augments: observableRef,
+      champions: observableRef,
+      items: observableRef,
+      perks: observableRef,
+      perkstyles: observableRef,
+      queues: observableRef,
+      gameModeMutators: observableRef,
+      maps: observableRef,
+      challenges: observableRef
     })
   }
 

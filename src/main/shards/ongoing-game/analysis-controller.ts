@@ -6,7 +6,7 @@ import {
   mergeOverlappingSets,
   removeSubsets
 } from '@shared/utils/team-up-calc'
-import { comparer } from 'mobx'
+import { compareShallow, compareStructural } from 'mobx'
 
 import type { OngoingGameMainContext } from './context'
 
@@ -34,7 +34,7 @@ export class OngoingGameAnalysisController {
         state.setAnalysis(this._computeAnalysis())
         state.setInferredPremadeTeams(this._inferPremadeTeams())
       },
-      { delay: 300, equals: comparer.structural }
+      { delay: 300, equals: compareStructural }
     )
 
     mobxUtils.reaction(
@@ -52,7 +52,7 @@ export class OngoingGameAnalysisController {
       () => {
         state.setInferredPremadeTeams(this._inferPremadeTeams())
       },
-      { delay: 300, equals: comparer.shallow }
+      { delay: 300, equals: compareShallow }
     )
   }
 

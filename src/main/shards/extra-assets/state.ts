@@ -1,6 +1,6 @@
 import { GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
 import type { OpggAramBalanceItem } from '@shared/types/opgg'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class ExtraAssetsStateGtimg {
   heroList: GtimgHeroListJs | null
@@ -16,8 +16,8 @@ export class ExtraAssetsStateGtimg {
 
   constructor() {
     makeAutoObservable(this, {
-      heroList: observable.ref,
-      kiwiAugments: observable.ref
+      heroList: observableRef,
+      kiwiAugments: observableRef
     })
   }
 }
@@ -31,7 +31,7 @@ export class ExtraAssetsStateOpgg {
 
   constructor() {
     makeAutoObservable(this, {
-      aramBalance: observable.ref
+      aramBalance: observableRef
     })
   }
 }

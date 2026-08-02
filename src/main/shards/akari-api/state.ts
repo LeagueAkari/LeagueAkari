@@ -7,7 +7,7 @@ import type {
   AkariRelease,
   AkariSupportedQueuesConfig
 } from '@shared/shards/akari-api'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 import {
   BUILTIN_AUTO_SELECT_GROUPS,
@@ -91,13 +91,13 @@ export class AkariApiState {
 
   constructor() {
     makeAutoObservable(this, {
-      featureGates: observable.ref,
-      leagueServers: observable.ref,
-      supportedQueues: observable.ref,
-      autoSelectGroups: observable.ref,
-      notice: observable.ref,
-      contactChannels: observable.ref,
-      latestRelease: observable.ref
+      featureGates: observableRef,
+      leagueServers: observableRef,
+      supportedQueues: observableRef,
+      autoSelectGroups: observableRef,
+      notice: observableRef,
+      contactChannels: observableRef,
+      latestRelease: observableRef
     })
   }
 }

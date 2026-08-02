@@ -1,7 +1,7 @@
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
-import { comparer, computed } from 'mobx'
+import { compareStructural, computed } from 'mobx'
 
 import type { AutoGameflowActionController } from './action-controller'
 import { AUTO_GAMEFLOW_HONOR_CATEGORY, type AutoGameflowMainContext } from './context'
@@ -117,7 +117,7 @@ export class AutoGameflowHonorController {
         }
       },
       {
-        equals: comparer.structural,
+        equals: compareStructural,
         fireImmediately: true
       }
     )

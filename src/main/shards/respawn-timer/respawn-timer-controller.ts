@@ -1,5 +1,5 @@
 import { riotId, summonerName } from '@shared/utils/name'
-import { comparer, runInAction } from 'mobx'
+import { compareShallow, runInAction } from 'mobx'
 
 import { RESPAWN_TIMER_POLL_INTERVAL, type RespawnTimerMainContext } from './context'
 
@@ -46,7 +46,7 @@ export class RespawnTimerController {
           this._stopRespawnTimerPoll()
         }
       },
-      { equals: comparer.shallow, fireImmediately: true }
+      { equals: compareShallow, fireImmediately: true }
     )
   }
 

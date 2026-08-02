@@ -17,7 +17,13 @@ import type { SavedInfo } from '@shared/shards/saved-player'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
 import { removeSubsets } from '@shared/utils/team-up-calc'
-import { computed, makeAutoObservable, observable } from 'mobx'
+import {
+  computedStruct,
+  makeAutoObservable,
+  observableRef,
+  observableShallow,
+  observableStruct
+} from 'mobx'
 
 import { AppCommonMain } from '../app-common'
 import type { FeatureGatingMain } from '../feature-gating'
@@ -130,7 +136,7 @@ export class OngoingGameSettings implements OngoingGameSettingsData {
 
   constructor() {
     makeAutoObservable(this, {
-      playerCardTags: observable.ref
+      playerCardTags: observableRef
     })
   }
 }
@@ -371,30 +377,30 @@ export class OngoingGameState {
     private readonly _featureGating: FeatureGatingMain
   ) {
     makeAutoObservable(this, {
-      matchHistory: observable.shallow,
-      summoner: observable.shallow,
-      rankedStats: observable.shallow,
-      savedInfo: observable.shallow,
-      championMastery: observable.shallow,
-      gameDetails: observable.shallow,
-      additionalGame: observable.shallow,
-      matchHistoryLoadingState: observable.ref,
-      summonerLoadingState: observable.ref,
-      rankedStatsLoadingState: observable.ref,
-      savedInfoLoadingState: observable.ref,
-      gameDetailsLoadingState: observable.ref,
-      championSelections: computed.struct,
-      positionAssignments: computed.struct,
-      teams: computed.struct,
-      analysis: observable.struct,
-      queryStage: computed.struct,
-      teamParticipantGroups: computed.struct,
-      draft: observable.struct,
-      matchHistoryTagParams: observable.struct,
-      additional: observable.struct,
-      inferredPremadeTeams: observable.struct,
-      champSelectHandoffSnapshot: observable.struct,
-      mergedPremadeTeamMap: computed.struct
+      matchHistory: observableShallow,
+      summoner: observableShallow,
+      rankedStats: observableShallow,
+      savedInfo: observableShallow,
+      championMastery: observableShallow,
+      gameDetails: observableShallow,
+      additionalGame: observableShallow,
+      matchHistoryLoadingState: observableRef,
+      summonerLoadingState: observableRef,
+      rankedStatsLoadingState: observableRef,
+      savedInfoLoadingState: observableRef,
+      gameDetailsLoadingState: observableRef,
+      championSelections: computedStruct,
+      positionAssignments: computedStruct,
+      teams: computedStruct,
+      analysis: observableStruct,
+      queryStage: computedStruct,
+      teamParticipantGroups: computedStruct,
+      draft: observableStruct,
+      matchHistoryTagParams: observableStruct,
+      additional: observableStruct,
+      inferredPremadeTeams: observableStruct,
+      champSelectHandoffSnapshot: observableStruct,
+      mergedPremadeTeamMap: computedStruct
     })
   }
 }

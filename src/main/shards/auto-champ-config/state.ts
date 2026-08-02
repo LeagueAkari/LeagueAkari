@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export interface ChampionRunesConfig {
   primaryStyleId: number
@@ -54,8 +54,8 @@ export class AutoChampConfigSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      runesV2: observable.ref,
-      summonerSpells: observable.ref
+      runesV2: observableRef,
+      summonerSpells: observableRef
     })
   }
 }

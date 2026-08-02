@@ -1,5 +1,5 @@
 import { UxCommandLine } from '@shared/shards/league-client-ux'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef, observableStruct } from 'mobx'
 
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
 
@@ -27,8 +27,8 @@ export class LeagueClientState {
 
   constructor() {
     makeAutoObservable(this, {
-      auth: observable.ref,
-      connectingClient: observable.struct
+      auth: observableRef,
+      connectingClient: observableStruct
     })
   }
 

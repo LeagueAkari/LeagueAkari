@@ -1,5 +1,5 @@
 import { Rectangle } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class CdTimerWindowSettings {
   enabled: boolean = false
@@ -111,8 +111,8 @@ export class CdTimerWindowState {
 
   constructor() {
     makeAutoObservable(this, {
-      trackedBounds: observable.ref,
-      supportedGameModes: observable.ref
+      trackedBounds: observableRef,
+      supportedGameModes: observableRef
     })
   }
 }

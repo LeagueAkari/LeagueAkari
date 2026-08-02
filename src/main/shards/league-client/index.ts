@@ -9,7 +9,7 @@ import { RadixEventEmitter } from '@shared/utils/event-emitter'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { AxiosRetry } from 'axios-retry'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 import fs from 'node:fs'
 import { ClientRequestArgs } from 'node:http'
 import https from 'node:https'
@@ -366,7 +366,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           this._logger.debug(`LCU state changed: ${s}`, a)
         }
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
 
     /**

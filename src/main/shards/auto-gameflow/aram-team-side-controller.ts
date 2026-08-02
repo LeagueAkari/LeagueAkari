@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 
 import type { AutoGameflowMainContext } from './context'
 
@@ -82,7 +82,7 @@ export class AutoGameflowAramTeamSideController {
             logger.warn(`Failed to send ARAM team side`, error)
           })
       },
-      { equals: comparer.shallow, fireImmediately: true }
+      { equals: compareShallow, fireImmediately: true }
     )
   }
 }

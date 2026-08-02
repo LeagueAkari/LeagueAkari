@@ -1,11 +1,11 @@
 import { LoginQueueState } from '@shared/types/league-client/login'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class LoginState {
   loginQueueState: LoginQueueState | null = null
 
   constructor() {
-    makeAutoObservable(this, { loginQueueState: observable.struct })
+    makeAutoObservable(this, { loginQueueState: observableStruct })
   }
 
   setLoginQueueState(state: LoginQueueState | null) {

@@ -1,5 +1,5 @@
 import { DownloadTask } from '@shared/shards/window-manager'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class WindowManagerSettings {
   backgroundMaterial: 'mica' | 'none' = 'none'
@@ -78,7 +78,7 @@ export class WindowManagerState {
 
   constructor() {
     makeAutoObservable(this, {
-      downloadTasks: observable.ref
+      downloadTasks: observableRef
     })
   }
 }

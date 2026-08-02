@@ -1,6 +1,6 @@
 import { i18next } from '@main/i18n'
 import { formatError } from '@shared/utils/errors'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 
 import {
   type AutoChampionConfigMainContext,
@@ -171,7 +171,7 @@ export class AutoChampConfigController {
           }
         }
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
   }
 

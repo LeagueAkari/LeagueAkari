@@ -1,5 +1,5 @@
 import { Rectangle } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 export class OpggWindowSettings {
   enabled: boolean = true
@@ -69,7 +69,7 @@ export class OpggWindowState {
 
   constructor() {
     makeAutoObservable(this, {
-      trackedBounds: observable.ref
+      trackedBounds: observableRef
     })
   }
 }

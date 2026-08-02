@@ -8,7 +8,7 @@ import {
 } from '@shared/data-adapter/wrapper'
 import { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/match-history-query'
 import { isAbortError } from '@shared/utils/queue-keeper'
-import { comparer, computed, runInAction } from 'mobx'
+import { compareStructural, computed, runInAction } from 'mobx'
 import LRUMap from 'quick-lru'
 
 import {
@@ -87,7 +87,7 @@ export class OngoingGameMatchHistoryLoader {
           apiShouldUse as 'sgp' | 'lcu'
         )
       },
-      { delay: 300, equals: comparer.structural, fireImmediately: true }
+      { delay: 300, equals: compareStructural, fireImmediately: true }
     )
 
     mobxUtils.reaction(
@@ -113,7 +113,7 @@ export class OngoingGameMatchHistoryLoader {
               : undefined
         })
       },
-      { fireImmediately: true, equals: comparer.structural }
+      { fireImmediately: true, equals: compareStructural }
     )
 
     mobxUtils.reaction(
@@ -141,7 +141,7 @@ export class OngoingGameMatchHistoryLoader {
 
         this.loadGameDetails(gameIds, { apiSource })
       },
-      { delay: 300, equals: comparer.structural, fireImmediately: true }
+      { delay: 300, equals: compareStructural, fireImmediately: true }
     )
   }
 

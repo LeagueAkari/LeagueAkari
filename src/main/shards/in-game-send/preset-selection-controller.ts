@@ -1,5 +1,5 @@
 import { SUMMONER_SPELL_SMITE_ID } from '@shared/constants/summoner-spells'
-import { comparer } from 'mobx'
+import { compareStructural } from 'mobx'
 
 import type { InGameSendMainContext } from './context'
 
@@ -24,7 +24,7 @@ export class InGameSendPresetSelectionController {
         this.setRatingPuuids(all)
         this.setJunglePuuids(this._defaultJunglePuuids(teams, positionAssignments, spells))
       },
-      { equals: comparer.structural, fireImmediately: true }
+      { equals: compareStructural, fireImmediately: true }
     )
 
     mobxUtils.reaction(
@@ -33,7 +33,7 @@ export class InGameSendPresetSelectionController {
         const indices = [...new Set(Object.values(map))]
         this.setPremadeIndices(indices)
       },
-      { equals: comparer.structural, fireImmediately: true }
+      { equals: compareStructural, fireImmediately: true }
     )
   }
 

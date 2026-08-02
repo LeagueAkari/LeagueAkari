@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 import { LeagueClientData } from '../league-client/lc-state'
 
@@ -114,7 +114,7 @@ export class AutoGameflowSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      invitationHandlingStrategies: observable.struct
+      invitationHandlingStrategies: observableStruct
     })
   }
 }

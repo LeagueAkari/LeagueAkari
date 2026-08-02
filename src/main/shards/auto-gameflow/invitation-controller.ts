@@ -3,7 +3,7 @@ import type { Friend } from '@shared/types/league-client/chat'
 import type { LcuEvent } from '@shared/types/league-client/event'
 import { formatError } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
-import { comparer, computed } from 'mobx'
+import { compareStructural, computed } from 'mobx'
 
 import type { AutoGameflowMainContext } from './context'
 
@@ -136,7 +136,7 @@ export class AutoGameflowInvitationController {
           notReadyMembers
         }
       },
-      { equals: comparer.structural }
+      { equals: compareStructural }
     )
 
     mobxUtils.reaction(

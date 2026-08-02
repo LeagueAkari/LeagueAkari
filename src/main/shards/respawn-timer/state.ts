@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class RespawnTimerSettings {
   enabled: boolean = true
@@ -25,7 +25,7 @@ export class RespawnTimerState {
 
   constructor() {
     makeAutoObservable(this, {
-      info: observable.struct
+      info: observableStruct
     })
   }
 }

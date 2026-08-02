@@ -1,6 +1,6 @@
 import { GameClientMain } from '@main/shards/game-client'
 import icon from '@resources/OPGG_ICON.ico?asset'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
@@ -94,7 +94,7 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
           this.close(true)
         }
       },
-      { fireImmediately: true, delay: 500, equals: comparer.shallow }
+      { fireImmediately: true, delay: 500, equals: compareShallow }
     )
 
     this._ipc.onCall(this._namespace, 'repositionToAlignLeagueClientUx', (_, placement) => {

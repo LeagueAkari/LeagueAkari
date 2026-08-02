@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 
 import type { AutoSelectActionExecutor } from './action-executor'
 import { getPhaseCalibratedDelayMs } from './computed-state'
@@ -63,7 +63,7 @@ export class AutoSelectBanPickController {
           strategy: banConfig.ban.strategy
         } as const
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
 
     // --- ban ---
@@ -225,7 +225,7 @@ export class AutoSelectBanPickController {
           strategy: pickConfig.pick.strategy
         } as const
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
 
     // --- pick ---

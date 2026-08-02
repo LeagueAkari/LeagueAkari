@@ -4,7 +4,7 @@ import { AdditionalResult } from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { isAxiosError } from 'axios'
-import { comparer } from 'mobx'
+import { compareStructural } from 'mobx'
 
 import { ONGOING_GAME_LOADING_PRIORITY, type OngoingGameMainContext } from './context'
 import { memberMerge } from './member-merge'
@@ -133,7 +133,7 @@ export class OngoingGameAdditionalInfoController {
       () => {
         this.update()
       },
-      { delay: 300, equals: comparer.structural, fireImmediately: true }
+      { delay: 300, equals: compareStructural, fireImmediately: true }
     )
   }
 

@@ -1,4 +1,4 @@
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 
 import type { TrayMainContext } from './context'
 import type { TrayMenuController } from './tray-menu-controller'
@@ -31,7 +31,7 @@ export class TrayStateWatcher {
           this.menuController.auxWindowTrayItem.enabled = false
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
   }
 
@@ -49,7 +49,7 @@ export class TrayStateWatcher {
           this.menuController.opggWindowTrayItem.enabled = false
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
   }
 
@@ -68,7 +68,7 @@ export class TrayStateWatcher {
           this.menuController.ongoingGameWindowDevTrayItem.enabled = false
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
   }
 

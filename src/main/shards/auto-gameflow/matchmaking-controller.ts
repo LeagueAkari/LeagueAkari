@@ -1,6 +1,6 @@
 import { i18next } from '@main/i18n'
 import { formatError } from '@shared/utils/errors'
-import { comparer, computed } from 'mobx'
+import { compareShallow, compareStructural, computed } from 'mobx'
 
 import type { AutoGameflowMainContext } from './context'
 
@@ -81,7 +81,7 @@ export class AutoGameflowMatchmakingController {
           this.cancelAutoMatchmaking(status)
         }
       },
-      { equals: comparer.shallow, fireImmediately: true }
+      { equals: compareShallow, fireImmediately: true }
     )
   }
 
@@ -146,7 +146,7 @@ export class AutoGameflowMatchmakingController {
           }
         }
       },
-      { equals: comparer.structural, fireImmediately: true }
+      { equals: compareStructural, fireImmediately: true }
     )
   }
 

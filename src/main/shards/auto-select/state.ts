@@ -1,6 +1,6 @@
 import { DeepPartialObject } from '@shared/utils/types'
 import _ from 'lodash'
-import { computed, makeAutoObservable, observable } from 'mobx'
+import { computedStruct, makeAutoObservable, observableRef, observableStruct } from 'mobx'
 
 import type { AkariApiState } from '../akari-api/state'
 import { LeagueClientData } from '../league-client/lc-state'
@@ -146,8 +146,8 @@ export class AutoSelectSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      pickConfig: observable.ref,
-      banConfig: observable.ref
+      pickConfig: observableRef,
+      banConfig: observableRef
     })
   }
 }
@@ -544,21 +544,21 @@ export class AutoSelectState {
     private readonly _sgpState: SgpState
   ) {
     makeAutoObservable(this, {
-      // activeGroupConfig: computed.struct, // no need to set it structurally equals
-      activeAction: computed.struct,
-      currentActions: computed.struct,
-      expectedPicks: computed.struct,
-      expectedBans: computed.struct,
-      expectedSwaps: computed.struct,
+      // activeGroupConfig: computedStruct, // no need to set it structurally equals
+      activeAction: computedStruct,
+      currentActions: computedStruct,
+      expectedPicks: computedStruct,
+      expectedBans: computedStruct,
+      expectedSwaps: computedStruct,
 
-      correctedTimer: computed.struct,
-      benchChampions: computed.struct,
-      scopedBenchChampions: computed.struct,
+      correctedTimer: computedStruct,
+      benchChampions: computedStruct,
+      scopedBenchChampions: computedStruct,
 
-      delayedBanTask: observable.struct,
-      delayedPickTask: observable.struct,
-      delayedBenchSwapTask: observable.struct,
-      delayedChampionSwapTask: observable.struct
+      delayedBanTask: observableStruct,
+      delayedPickTask: observableStruct,
+      delayedBenchSwapTask: observableStruct,
+      delayedChampionSwapTask: observableStruct
     })
   }
 }

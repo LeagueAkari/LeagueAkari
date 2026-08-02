@@ -8,7 +8,7 @@ import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { Ballot } from '@shared/types/league-client/honorV2'
 import { isAxiosError } from 'axios'
-import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
+import { compareStructural, computed, makeAutoObservable, observableRef, runInAction } from 'mobx'
 import PQueue from 'p-queue'
 
 import type { LeagueClientMainContext } from '..'
@@ -41,7 +41,7 @@ class InitializationState {
 
   constructor() {
     makeAutoObservable(this, {
-      progress: observable.ref
+      progress: observableRef
     })
   }
 }
@@ -772,7 +772,7 @@ export class LeagueClientData {
       (s) => {
         this._context.logger.debug(`Self Summoner Cell: ${JSON.stringify(s)}`)
       },
-      { equals: comparer.structural }
+      { equals: compareStructural }
     )
 
     const gridChampionsQueue = new PQueue({ concurrency: 6 })

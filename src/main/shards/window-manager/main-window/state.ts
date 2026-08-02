@@ -1,6 +1,6 @@
 import { MainWindowCloseAction } from '@shared/shards/window-manager'
 import { Rectangle } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableRef } from 'mobx'
 
 /**
  * 分离设置项到独立的类
@@ -65,7 +65,7 @@ export class MainWindowState {
 
   constructor() {
     makeAutoObservable(this, {
-      trackedBounds: observable.ref
+      trackedBounds: observableRef
     })
   }
 }

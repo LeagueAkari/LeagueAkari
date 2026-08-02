@@ -1,5 +1,5 @@
 import { Ballot } from '@shared/types/league-client/honorV2'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class HonorState {
   ballot: Ballot | null
@@ -10,7 +10,7 @@ export class HonorState {
 
   constructor() {
     makeAutoObservable(this, {
-      ballot: observable.struct
+      ballot: observableStruct
     })
   }
 }

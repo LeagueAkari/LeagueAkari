@@ -5,7 +5,7 @@ import {
   OngoingChampionSwap,
   SkinSelectorInfo
 } from '@shared/types/league-client/champ-select'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableShallow, observableStruct } from 'mobx'
 
 export class ChampSelectState {
   session: ChampSelectSession | null = null
@@ -36,14 +36,14 @@ export class ChampSelectState {
 
   constructor() {
     makeAutoObservable(this, {
-      session: observable.struct,
-      currentPickableChampionIdArray: observable.struct,
-      currentBannableChampionIdArray: observable.struct,
-      disabledChampionIdArray: observable.struct,
-      selfSummoner: observable.struct,
-      ongoingChampionSwap: observable.struct,
-      gridChampions: observable.shallow,
-      skinSelectorInfo: observable.struct
+      session: observableStruct,
+      currentPickableChampionIdArray: observableStruct,
+      currentBannableChampionIdArray: observableStruct,
+      disabledChampionIdArray: observableStruct,
+      selfSummoner: observableStruct,
+      ongoingChampionSwap: observableStruct,
+      gridChampions: observableShallow,
+      skinSelectorInfo: observableStruct
     })
   }
 

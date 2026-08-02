@@ -1,5 +1,5 @@
 import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class SummonerState {
   /**
@@ -15,7 +15,7 @@ export class SummonerState {
   newIdSystemEnabled: boolean = false
 
   constructor() {
-    makeAutoObservable(this, { me: observable.struct, profile: observable.struct })
+    makeAutoObservable(this, { me: observableStruct, profile: observableStruct })
   }
 
   setMe(value: SummonerInfo | null) {

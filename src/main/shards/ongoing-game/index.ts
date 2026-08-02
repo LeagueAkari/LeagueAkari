@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { QueueKeeper } from '@shared/utils/queue-keeper'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 import { z } from 'zod'
 
 import { AppCommonMain } from '../app-common'
@@ -257,7 +257,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           return
         }
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
   }
 }

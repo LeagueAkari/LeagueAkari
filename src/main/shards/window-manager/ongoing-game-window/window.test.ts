@@ -1,4 +1,4 @@
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AkariOngoingGameWindow } from './window'
@@ -149,7 +149,7 @@ describe('AkariOngoingGameWindow', () => {
     await ongoingGameWindow.onInit()
 
     const reactionCall = context.mobxUtils.reaction.mock.calls.find(([, , options]) => {
-      return options?.equals === comparer.shallow && !options.delay && !options.fireImmediately
+      return options?.equals === compareShallow && !options.delay && !options.fireImmediately
     })
     const settingService = context.settingFactory.register.mock.results[0].value
     const bounds = { x: 10, y: 20, width: 300, height: 240 }

@@ -3,7 +3,7 @@ import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import icon from '@resources/LA_ICON.ico?asset'
 import { sleep } from '@shared/utils/sleep'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
@@ -77,7 +77,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         show: false,
         frame: false,
         resizable: false,
-        focusable: true, // true + type:'panel' 保证点击时游戏走正常失活流程，不会最小化
+        focusable: false,
         type: 'panel',
         alwaysOnTop: true,
         maximizable: false,
@@ -115,17 +115,12 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
             this._applyOverlayWindowBehavior()
           })
 
-          this._window?.on('focus', () => {
-            // focusable: true 时可能正常获焦（如用户点击计时器区域），属预期行为
-            this._logger.debug('cd-timer window focused')
-          })
-
           this._window?.on('system-context-menu', (event) => {
             event.preventDefault()
           })
         }
       },
-      { fireImmediately: true, equals: comparer.shallow }
+      { fireImmediately: true, equals: compareShallow }
     )
 
     this._mobxUtils.reaction(
@@ -143,7 +138,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       },
       {
         fireImmediately: true,
-        equals: comparer.shallow,
+        equals: compareShallow,
         delay: 500
       }
     )

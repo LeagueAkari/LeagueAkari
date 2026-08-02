@@ -11,7 +11,7 @@ import {
   dialog,
   shell
 } from 'electron'
-import { comparer, runInAction } from 'mobx'
+import { compareShallow, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
 import path from 'node:path'
 import { z } from 'zod'
@@ -284,7 +284,7 @@ export abstract class BaseAkariWindow<
           this._settingService._saveToStorage('trackedBounds', bounds, { delay: 1000 })
         }
       },
-      { equals: comparer.shallow }
+      { equals: compareShallow }
     )
 
     this._context.mobxUtils.reaction(

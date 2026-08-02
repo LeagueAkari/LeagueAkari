@@ -2,7 +2,7 @@ import { is } from '@electron-toolkit/utils'
 import { NATIVE_SUPPORT } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
 import icon from '@resources/LA_ICON.ico?asset'
-import { comparer } from 'mobx'
+import { compareShallow } from 'mobx'
 import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
@@ -91,7 +91,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       },
       {
         fireImmediately: true,
-        equals: comparer.shallow,
+        equals: compareShallow,
         delay: 500
       }
     )

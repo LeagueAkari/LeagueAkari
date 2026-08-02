@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable, observableStruct } from 'mobx'
 
 export class ClientInstallationState {
   /**
@@ -57,8 +57,8 @@ export class ClientInstallationState {
 
   constructor() {
     makeAutoObservable(this, {
-      leagueClientExecutablePaths: observable.struct,
-      detectedLiveStreamingClients: observable.struct
+      leagueClientExecutablePaths: observableStruct,
+      detectedLiveStreamingClients: observableStruct
     })
   }
 }

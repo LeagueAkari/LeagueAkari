@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import icon from '@resources/LA_ICON.ico?asset'
 import { Notification } from 'electron'
-import { comparer, computed } from 'mobx'
+import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'
 
 import { BaseAkariWindow } from '../base-akari-window'
@@ -105,7 +105,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
           this.close(true)
         }
       },
-      { fireImmediately: true, delay: 500, equals: comparer.shallow }
+      { fireImmediately: true, delay: 500, equals: compareShallow }
     )
 
     this._mobxUtils.reaction(
