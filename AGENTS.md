@@ -51,22 +51,6 @@ This applies especially when the work was authored or reviewed with AI assistanc
 
 ---
 
-## Git Attribution
-
-When the user asks an agent to commit changes, add co-author attribution only if that agent
-materially participated in the content of the commit.
-
-- For Codex-authored or Codex-assisted commits, add
-  `Co-authored-by: Codex <noreply@openai.com>`.
-- For Claude-authored or Claude-assisted commits, add
-  `Co-authored-by: Claude <noreply@anthropic.com>`.
-- For other agents, attribution is optional and can be omitted unless the user or project policy
-  asks for it.
-- Do not add an agent co-author trailer when merely committing changes that were already fully
-  authored by the user.
-
----
-
 ## Repository Layout
 
 ```
