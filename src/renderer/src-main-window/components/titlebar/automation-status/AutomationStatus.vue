@@ -11,18 +11,26 @@
         :z-index="TITLE_BAR_POPOVER_Z_INDEX"
       >
         <template #trigger>
-          <button
-            type="button"
-            class="automation-status-button"
-            :aria-label="t('titlebar.automation.trigger', { count: automations.length })"
-            :aria-expanded="popoverShow"
-            aria-haspopup="dialog"
-          >
-            <NIcon class="automation-status-button__icon" aria-hidden="true">
-              <Flash20FilledIcon />
-            </NIcon>
-            <span>{{ t('titlebar.automation.trigger', { count: automations.length }) }}</span>
-          </button>
+          <span class="automation-status-trigger">
+            <NTooltip :disabled="!compact" :z-index="TITLE_BAR_POPOVER_Z_INDEX">
+              <template #trigger>
+                <button
+                  type="button"
+                  class="automation-status-button"
+                  :class="{ 'is-compact': compact }"
+                  :aria-label="automationTriggerLabel"
+                  :aria-expanded="popoverShow"
+                  aria-haspopup="dialog"
+                >
+                  <NIcon class="automation-status-button__icon" aria-hidden="true">
+                    <Flash20FilledIcon />
+                  </NIcon>
+                  <span>{{ automationTriggerLabel }}</span>
+                </button>
+              </template>
+              {{ automationTriggerLabel }}
+            </NTooltip>
+          </span>
         </template>
 
         <section
@@ -78,8 +86,8 @@ import {
   Flash20Filled as Flash20FilledIcon
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NScrollbar } from 'naive-ui'
-import { ref } from 'vue'
+import { NIcon, NPopover, NScrollbar, NTooltip } from 'naive-ui'
+import { computed, ref } from 'vue'
 
 import { navigateToSetting } from '@main-window/settings-navigation'
 
@@ -90,10 +98,15 @@ const popoverThemeOverrides = {
   boxShadow: 'none'
 }
 
+defineProps<{ compact: boolean }>()
+
 const { t } = useTranslation()
 const navigation = useAkariNavigation()
 const automations = useEnabledAutomations()
 const popoverShow = ref(false)
+const automationTriggerLabel = computed(() =>
+  t('titlebar.automation.trigger', { count: automations.value.length })
+)
 
 const handleNavigate = (automation: EnabledAutomation) => {
   popoverShow.value = false
@@ -102,6 +115,10 @@ const handleNavigate = (automation: EnabledAutomation) => {
 </script>
 
 <style scoped>
+.automation-status-trigger {
+  display: flex;
+}
+
 .automation-status-button {
   display: flex;
   height: 24px;
@@ -151,6 +168,20 @@ const handleNavigate = (automation: EnabledAutomation) => {
   flex-shrink: 0;
   color: inherit;
   font-size: 14px;
+}
+
+.automation-status-button.is-compact {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
+
+  .automation-status-button__icon {
+    font-size: 15px;
+  }
+
+  span {
+    display: none;
+  }
 }
 
 .automation-status-panel {

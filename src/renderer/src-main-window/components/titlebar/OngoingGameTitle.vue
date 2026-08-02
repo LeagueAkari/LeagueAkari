@@ -1,5 +1,5 @@
 <template>
-  <div class="ongoing-game-title">
+  <div class="ongoing-game-title" :class="{ 'is-compact': compact }">
     <template v-if="titleModel.visible">
       <div class="labels" ref="labels" :style="{ opacity: horizontalOverflow ? 0 : 1 }">
         <LcuImage v-if="titleModel.mapIconUri" :src="titleModel.mapIconUri" class="map-icon" />
@@ -13,19 +13,23 @@
         </template>
       </div>
 
-      <div class="action-controls">
-        <NSelect
-          class="queue-tag-select"
+      <div class="action-controls" :class="{ 'is-compact': compact }">
+        <div
           v-if="
             appCommon.settings.preferredLolSource === 'sgp' &&
             sgp.availability.serversSupported.matchHistory
           "
-          size="tiny"
-          :value="ogs.matchHistoryTagParams?.tag || ALL_SGPTAG_VALUE"
-          :consistent-menu-width="false"
-          @update:value="handleSgpTagChange"
-          :options="sgpTagOptions"
-        />
+          class="queue-tag-select"
+          :class="{ 'is-compact': compact }"
+        >
+          <NSelect
+            size="tiny"
+            :value="selectedSgpTagValue"
+            :consistent-menu-width="false"
+            @update:value="handleSgpTagChange"
+            :options="sgpTagOptions"
+          />
+        </div>
 
         <NTooltip v-if="titleModel.showExitDraft" :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
           <template #trigger>
@@ -34,12 +38,14 @@
               secondary
               type="warning"
               size="tiny"
+              :circle="compact"
+              :aria-label="t('ongoingGame.titlebar.exitDraft')"
               @click="() => og.clearDraft()"
             >
               <template #icon>
                 <NIcon><CloseRoundIcon /></NIcon>
               </template>
-              {{ t('ongoingGame.titlebar.exitDraft') }}
+              <span v-if="!compact">{{ t('ongoingGame.titlebar.exitDraft') }}</span>
             </NButton>
           </template>
           {{ t('ongoingGame.titlebar.exitDraft') }}
@@ -47,7 +53,14 @@
 
         <NTooltip :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
           <template #trigger>
-            <NButton class="refresh-button" secondary circle size="tiny" @click="() => og.reload()">
+            <NButton
+              class="refresh-button"
+              secondary
+              circle
+              size="tiny"
+              :aria-label="t('ongoingGame.titlebar.refresh')"
+              @click="() => og.reload()"
+            >
               <template #icon>
                 <NIcon><RefreshIcon /></NIcon>
               </template>
@@ -58,11 +71,24 @@
 
         <NPopover trigger="click" placement="bottom-end" :z-index="TITLEBAR_TOOLTIP_Z_INDEX" raw>
           <template #trigger>
-            <NButton class="settings-button" secondary circle size="tiny">
-              <template #icon>
-                <NIcon><TuneIcon /></NIcon>
-              </template>
-            </NButton>
+            <span class="settings-button-trigger">
+              <NTooltip :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
+                <template #trigger>
+                  <NButton
+                    class="settings-button"
+                    secondary
+                    circle
+                    size="tiny"
+                    :aria-label="t('ongoingGame.titlebar.settings.title')"
+                  >
+                    <template #icon>
+                      <NIcon><TuneIcon /></NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                {{ t('ongoingGame.titlebar.settings.title') }}
+              </NTooltip>
+            </span>
           </template>
 
           <div class="title-settings-panel">
@@ -137,6 +163,8 @@ const { t } = useTranslation()
 
 const TITLEBAR_TOOLTIP_Z_INDEX = 75000
 
+defineProps<{ compact: boolean }>()
+
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
@@ -185,6 +213,7 @@ const orderOptions = computed(() => {
 })
 
 const sgpTagOptions = useSgpTagOptions()
+const selectedSgpTagValue = computed(() => ogs.matchHistoryTagParams?.tag || ALL_SGPTAG_VALUE)
 
 const showJunglePathingForAllPlayersDescription = computed(() => {
   if (!ogs.settings.showJunglePathing) {
@@ -319,6 +348,10 @@ const titleModel = computed(() => {
   -webkit-app-region: no-drag;
 }
 
+.queue-tag-select.is-compact {
+  width: 88px;
+}
+
 .refresh-button {
   -webkit-app-region: no-drag;
 }
@@ -329,6 +362,10 @@ const titleModel = computed(() => {
 
 .settings-button {
   -webkit-app-region: no-drag;
+}
+
+.settings-button-trigger {
+  display: flex;
 }
 
 .title-settings-panel {
@@ -377,6 +414,10 @@ const titleModel = computed(() => {
   height: 100%;
   align-items: center;
   box-sizing: border-box;
+}
+
+.action-controls.is-compact {
+  gap: 4px;
 }
 
 [data-theme='dark'] {

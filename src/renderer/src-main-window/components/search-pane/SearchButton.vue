@@ -1,14 +1,20 @@
 <template>
-  <button
-    type="button"
-    class="search-button"
-    :aria-label="t('titlebar.search.open')"
-    @click="openSearch()"
-  >
-    <NIcon class="search-button__icon" aria-hidden="true"><Search20RegularIcon /></NIcon>
-    <span class="search-button__label">{{ t('titlebar.search.open') }}</span>
-    <kbd class="search-button__shortcut" aria-hidden="true">{{ shortcutLabel }}</kbd>
-  </button>
+  <NTooltip :disabled="!compact" :z-index="TITLEBAR_TOOLTIP_Z_INDEX">
+    <template #trigger>
+      <button
+        type="button"
+        class="search-button"
+        :class="{ 'is-compact': compact }"
+        :aria-label="t('titlebar.search.open')"
+        @click="openSearch()"
+      >
+        <NIcon class="search-button__icon" aria-hidden="true"><Search20RegularIcon /></NIcon>
+        <span class="search-button__label">{{ t('titlebar.search.open') }}</span>
+        <kbd class="search-button__shortcut" aria-hidden="true">{{ shortcutLabel }}</kbd>
+      </button>
+    </template>
+    {{ t('titlebar.search.open') }}
+  </NTooltip>
 </template>
 
 <script setup lang="ts">
@@ -16,10 +22,14 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { Search20Regular as Search20RegularIcon } from '@vicons/fluent'
 import { useEventListener } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NIcon } from 'naive-ui'
+import { NIcon, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMainWindowAppContext } from '@main-window/context'
+
+const TITLEBAR_TOOLTIP_Z_INDEX = 75000
+
+defineProps<{ compact: boolean }>()
 
 const { t } = useTranslation()
 const { openSearch } = useMainWindowAppContext()
@@ -170,12 +180,10 @@ useEventListener(window, 'keydown', (event) => {
   }
 }
 
-@media (max-width: 840px) {
-  .search-button {
-    width: 30px;
-    padding: 0;
-    justify-content: center;
-  }
+.search-button.is-compact {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
 
   .search-button__icon {
     font-size: 15px;
