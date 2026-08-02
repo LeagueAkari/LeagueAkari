@@ -1,54 +1,72 @@
 <template>
-  <div class="relative h-full">
+  <div ref="playerTabRootEl" class="relative h-full">
     <NScrollbar x-scrollable :theme-overrides="{ width: '8px' }" ref="scrollbarEl">
-      <div
-        class="mx-auto pt-10 pb-4"
-        :class="{
-          'w-266': !isSmallSize,
-          'w-191': isSmallSize
-        }"
-      >
-        <!-- head -->
-        <PlayerTabHeader class="mb-6 h-28 px-4" />
+      <div ref="layoutContainerEl" class="@container w-full">
+        <div class="mx-auto w-full max-w-191 pt-10 pb-4 @[1064px]:max-w-266">
+          <PlayerTabHeader class="mb-6 h-28 px-4" />
 
-        <!-- main content: thin size -->
-        <div class="flex flex-col" v-if="isSmallSize">
-          <div ref="stickySentinelRightSideEl" class="h-0 w-full"></div>
-          <MatchHistoryPagination
-            horizontal
-            :is-floating="!isSentinelVisibleRightSide"
-            class="sticky top-2 z-10 mb-2 self-end"
-          />
+          <div class="box-border px-4 @[764px]:px-0">
+            <div ref="stickySentinelEl" class="h-0 w-full"></div>
 
-          <MatchHistoryList />
-        </div>
+            <div
+              class="grid grid-cols-1 items-start gap-3 @[1064px]:grid-cols-[300px_minmax(0,1fr)]"
+            >
+              <StickyBox v-if="!isCompactLayout" class="w-75" :offset-top="8" :offset-bottom="8">
+                <PlayerTabSidebarContent />
+              </StickyBox>
 
-        <!-- main content: wide size -->
-        <div class="flex items-start gap-3" v-else>
-          <!-- sentinel -->
-          <div ref="stickySentinelLeftSideEl" class="-ml-3 h-0"></div>
+              <div class="min-w-0">
+                <div
+                  v-if="isCompactLayout"
+                  class="sticky top-2 z-10 mb-2 flex min-w-0 items-start gap-2"
+                >
+                  <NTooltip placement="bottom-start">
+                    <template #trigger>
+                      <NButton
+                        class="shrink-0"
+                        size="small"
+                        secondary
+                        circle
+                        :focusable="false"
+                        :aria-label="t('playerTabs.matchHistory.sidebar.open')"
+                        @click="showSidebarDrawer = true"
+                      >
+                        <template #icon>
+                          <NIcon><PanelLeftExpand20Regular /></NIcon>
+                        </template>
+                      </NButton>
+                    </template>
+                    {{ t('playerTabs.matchHistory.sidebar.open') }}
+                  </NTooltip>
 
-          <!-- sticky box -->
-          <StickyBox class="w-75" :offset-top="8" :offset-bottom="8">
-            <div class="space-y-2">
-              <MatchHistoryPagination />
-              <NormalTagBlock />
-              <SummaryPane />
-              <ChampionMasteryPane />
-              <RecentlyPlayers side="ally" />
-              <RecentlyPlayers side="enemy" />
-              <PlayerChallenges />
-              <EncounteredGames />
+                  <MatchHistoryPagination
+                    class="min-w-0 flex-1"
+                    :is-floating="!frozenSentinelVisible"
+                  />
+                </div>
+
+                <MatchHistoryList />
+              </div>
             </div>
-          </StickyBox>
-
-          <!-- match history container -->
-          <MatchHistoryList class="flex-1" />
+          </div>
         </div>
       </div>
     </NScrollbar>
 
     <CollectModeProgress />
+
+    <NDrawer
+      v-if="isCompactLayout"
+      v-model:show="showSidebarDrawer"
+      :to="playerTabRootEl ?? undefined"
+      width="min(320px, calc(100% - 32px))"
+      placement="left"
+      class="bg-neutral-900/90! backdrop-blur-xl"
+    >
+      <NDrawerContent :native-scrollbar="false" body-content-style="padding: 8px">
+        <PlayerTabSidebarContent />
+      </NDrawerContent>
+    </NDrawer>
 
     <div
       :class="{
@@ -97,30 +115,25 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { DraftOptions } from '@shared/shards/ongoing-game'
-import { ArrowUp20Regular } from '@vicons/fluent'
-import { useElementVisibility, useTimeoutFn } from '@vueuse/core'
-import { NButton, NIcon, NScrollbar } from 'naive-ui'
+import { ArrowUp20Regular, PanelLeftExpand20Regular } from '@vicons/fluent'
+import { useElementSize, useElementVisibility, useTimeoutFn } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
+import { NButton, NDrawer, NDrawerContent, NIcon, NScrollbar, NTooltip } from 'naive-ui'
 import { computed, ref, shallowRef, useTemplateRef, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useMainWindowAppContext } from '@main-window/context'
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
 import { usePlayerTabsStore } from '@main-window/shards/player-tabs/store'
 
 import GlobalStateTracker from './GlobalStateTracker'
-import { SMALL_SIZE_THRESHOLD } from './constants'
+import { PLAYER_TAB_WIDE_MIN_WIDTH } from './constants'
 import { providePlayerTab } from './context'
 import { useFreezeValue } from './utils/freeze'
-import ChampionMasteryPane from './widgets/ChampionMasteryPane.vue'
-import EncounteredGames from './widgets/EncounteredGames.vue'
 import MatchHistoryList from './widgets/MatchHistoryList.vue'
 import MatchHistoryPagination from './widgets/match-history-pagination'
-import NormalTagBlock from './widgets/NormalTagBlock.vue'
-import PlayerChallenges from './widgets/PlayerChallenges.vue'
 import PlayerTabHeader from './widgets/PlayerTabHeader.vue'
-import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
-import SummaryPane from './widgets/SummaryPane.vue'
 import CollectModeProgress from './widgets/match-history-filters/CollectModeProgress.vue'
+import PlayerTabSidebarContent from './PlayerTabSidebarContent.vue'
 
 const { id, puuid, sgpServerId } = defineProps<{
   id: string
@@ -131,6 +144,7 @@ const { id, puuid, sgpServerId } = defineProps<{
 const pt = useInstance(PlayerTabsRenderer)
 const og = useInstance(OngoingGameRenderer)
 const router = useRouter()
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
@@ -139,9 +153,11 @@ const sgps = useSgpStore()
 
 const { navigateToTabByPuuid } = pt.useNavigateToTab()
 
-const { contentWidth } = useMainWindowAppContext()
-
-const isSmallSize = computed(() => contentWidth.value < SMALL_SIZE_THRESHOLD)
+const playerTabRootEl = useTemplateRef('playerTabRootEl')
+const layoutContainerEl = useTemplateRef('layoutContainerEl')
+const { width: layoutWidth } = useElementSize(layoutContainerEl)
+const isCompactLayout = computed(() => layoutWidth.value < PLAYER_TAB_WIDE_MIN_WIDTH)
+const showSidebarDrawer = ref(false)
 
 const isCurrentTab = computed(() => {
   return pts.currentTabId === id
@@ -154,33 +170,18 @@ const isInvisible = computed(() => {
 })
 
 const scrollbarEl = useTemplateRef('scrollbarEl')
-const stickySentinelLeftSideEl = useTemplateRef('stickySentinelLeftSideEl')
-const stickySentinelRightSideEl = useTemplateRef('stickySentinelRightSideEl')
-const isSentinelVisibleLeftSide = useElementVisibility(stickySentinelLeftSideEl, {
-  initialValue: true
-})
-const isSentinelVisibleRightSide = useElementVisibility(stickySentinelRightSideEl, {
+const stickySentinelEl = useTemplateRef('stickySentinelEl')
+const isSentinelVisible = useElementVisibility(stickySentinelEl, {
   initialValue: true
 })
 
 const {
-  value: frozenVisibleLeftSide,
-  freeze: freezeLeftSide,
-  unfreeze: unfreezeLeftSide
-} = useFreezeValue(isSentinelVisibleLeftSide)
-const {
-  value: frozenVisibleRightSide,
-  freeze: freezeRightSide,
-  unfreeze: unfreezeRightSide
-} = useFreezeValue(isSentinelVisibleRightSide)
+  value: frozenSentinelVisible,
+  freeze: freezeSentinel,
+  unfreeze: unfreezeSentinel
+} = useFreezeValue(isSentinelVisible)
 
-const shouldShowScrollToTopButton = computed(() => {
-  if (isSmallSize.value) {
-    return !frozenVisibleRightSide.value
-  }
-
-  return !frozenVisibleLeftSide.value
-})
+const shouldShowScrollToTopButton = computed(() => !frozenSentinelVisible.value)
 
 const showPreviewModal = ref(false)
 const previewingGame = shallowRef<MatchPreviewState>({
@@ -216,17 +217,21 @@ const scrollToTop = () => {
 // 一个粗糙的解决闪烁问题的方式
 // 我们假设浏览器在 50ms 内可以完成异步的 intersection observer 的回调
 const { start, stop } = useTimeoutFn(() => {
-  unfreezeLeftSide()
-  unfreezeRightSide()
+  unfreezeSentinel()
 }, 50)
 
 watchEffect(() => {
   if (isInvisible.value) {
     stop()
-    freezeLeftSide()
-    freezeRightSide()
+    freezeSentinel()
   } else {
     start()
+  }
+})
+
+watchEffect(() => {
+  if (isInvisible.value || !isCompactLayout.value) {
+    showSidebarDrawer.value = false
   }
 })
 
@@ -235,7 +240,6 @@ providePlayerTab({
   puuid: () => puuid,
   sgpServerId: () => sgpServerId,
   isCurrentTab,
-  isSmallSize,
   previewGame: handlePreviewGame
 })
 </script>

@@ -1,8 +1,7 @@
 <template>
-  <div>
+  <div class="@container">
     <CollectModePagination
       v-if="isCollectModePage"
-      :horizontal="horizontal"
       :is-floating="isFloating"
       :scanned-count="scannedCount"
       :collected-games-count="collectedGamesCount"
@@ -15,7 +14,6 @@
 
     <NormalPagination
       v-else
-      :horizontal="horizontal"
       :is-floating="isFloating"
       :filter-active="filterButtonHasCombinator"
       @open-filter="handleOpenFilterModal"
@@ -47,8 +45,7 @@ import CollectModePagination from './CollectModePagination.vue'
 import NormalPagination from './NormalPagination.vue'
 import { useCollectModeFilterDraft } from './use-collect-mode-filter-draft'
 
-const { isFloating = false, horizontal = false } = defineProps<{
-  horizontal?: boolean
+const { isFloating = false } = defineProps<{
   isFloating?: boolean
 }>()
 

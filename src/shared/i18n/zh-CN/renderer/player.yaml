@@ -141,6 +141,9 @@ playerTabs:
     failedToLaunchReplay: 无法拉起回放：{{reason}}
     failedToDownloadReplay: 无法下载回放：{{reason}}
   matchHistory:
+    pagination: 分页
+    sidebar:
+      open: 展开战绩侧栏
     filters:
       title: 筛选
       pageFilter: 页内筛选

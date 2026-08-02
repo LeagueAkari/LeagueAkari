@@ -5,7 +5,7 @@
     size="small"
     :options="sgpTagOptions"
     :disabled="disabled"
-    :class="{ 'w-56!': horizontal }"
+    class="w-full! @[480px]:w-56!"
     :render-label="renderLabel"
     :consistent-menu-width="false"
   />
@@ -23,9 +23,8 @@ import { useSelfHostedLcuDataStore } from '@main-window/shards/self-hosted-lcu-d
 
 import { useMatchHistory } from '../../data/match-history'
 
-const { disabled = false, horizontal = false } = defineProps<{
+const { disabled = false } = defineProps<{
   disabled?: boolean
-  horizontal?: boolean
 }>()
 
 const pts = usePlayerTabsStore()

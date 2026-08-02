@@ -29,8 +29,7 @@ vi.mock('../context', async () => {
 
   return {
     usePlayerTab: () => ({
-      isCrossRegion: ref(false),
-      isSmallSize: ref(false)
+      isCrossRegion: ref(false)
     })
   }
 })

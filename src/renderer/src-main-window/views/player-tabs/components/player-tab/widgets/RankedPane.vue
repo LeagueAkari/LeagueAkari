@@ -3,8 +3,7 @@
     <!-- Cross Region Unsupported Card -->
     <div
       v-if="isCrossRegion"
-      class="relative flex h-27 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-400"
-      :class="isSmallSize ? 'w-30' : 'w-60'"
+      class="relative flex h-27 w-30 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 @[1064px]:w-60 dark:bg-white/5 dark:text-gray-400"
     >
       <div>{{ t('playerTabs.ranked.crossRegion', 'Cross Region') }}</div>
       <div>{{ t('playerTabs.ranked.unavailable', 'Unavailable') }}</div>
@@ -15,8 +14,7 @@
       <div
         v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative flex h-27 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5"
-        :class="isSmallSize ? 'w-30' : 'w-60'"
+        class="relative flex h-27 w-30 items-center justify-center rounded-lg bg-black/5 @[1064px]:w-60 dark:bg-white/5"
       >
         <!-- Queue Type Label -->
         <div
@@ -41,7 +39,7 @@
         <!-- Main Content -->
         <div class="relative top-1 flex w-full items-center justify-center gap-2">
           <!-- Image Container -->
-          <div v-if="!isSmallSize" class="relative h-12 w-16">
+          <div class="relative hidden h-12 w-16 @[1064px]:block">
             <img
               class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
               :src="rankedImageMap[getCurrentTier(entry)] || rankedImageMap['UNRANKED']"
@@ -205,7 +203,7 @@ import { computed, ref } from 'vue'
 import { usePlayerTab } from '../context'
 import { useRankedStats } from '../data/ranked-stats'
 
-const { isCrossRegion, isSmallSize } = usePlayerTab()
+const { isCrossRegion } = usePlayerTab()
 
 const { t } = useTranslation()
 const isShowingRankedModal = ref(false)

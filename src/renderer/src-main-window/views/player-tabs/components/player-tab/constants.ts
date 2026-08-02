@@ -1,4 +1,4 @@
-export const SMALL_SIZE_THRESHOLD = 1064
+export const PLAYER_TAB_WIDE_MIN_WIDTH = 1064
 
 export const ENCOUNTERED_GAMES_PAGE_SIZE = 10
 

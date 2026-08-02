@@ -171,8 +171,9 @@
           <NPopover
             v-for="c of frequentlyUsedChampions"
             :key="c.championId"
-            :delay="50"
+            :delay="200"
             :keep-alive-on-hover="true"
+            placement="right"
           >
             <template #trigger>
               <div class="relative h-5 w-5 cursor-default rounded transition-[filter]">

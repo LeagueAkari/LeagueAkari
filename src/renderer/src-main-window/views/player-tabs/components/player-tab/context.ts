@@ -55,9 +55,6 @@ export type PlayerTabContext = {
   /** 该玩家数据来源的服务器是否可用 */
   sgpApiStatus: Ref<SgpApiStatus>
 
-  /** 是否小尺寸 */
-  isSmallSize: Ref<boolean>
-
   /** 松散事件 */
   events: Emitter<PlayerTabEvents>
 
@@ -90,7 +87,6 @@ export function providePlayerTab(props: {
   puuid: MaybeRefOrGetter<string>
   sgpServerId: MaybeRefOrGetter<string>
   isCurrentTab: MaybeRefOrGetter<boolean>
-  isSmallSize: MaybeRefOrGetter<boolean>
   previewGame: (payload: MatchPreviewPayload) => void
 }) {
   const sgps = useSgpStore()
@@ -125,7 +121,6 @@ export function providePlayerTab(props: {
     sgpServerId,
     sgpApiStatus,
 
-    isSmallSize: toRef(props.isSmallSize),
     isCurrentTab: toRef(props.isCurrentTab),
     isCrossRegion: toRef(isCrossRegion),
     isSelfTab: toRef(isSelfTab),

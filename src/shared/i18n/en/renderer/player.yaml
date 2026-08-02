@@ -142,6 +142,9 @@ playerTabs:
     failedToLaunchReplay: 'Failed to launch replay: {{reason}}'
     failedToDownloadReplay: 'Failed to download replay: {{reason}}'
   matchHistory:
+    pagination: Pagination
+    sidebar:
+      open: Open match history sidebar
     filters:
       title: Filters
       pageFilter: Page Filter

@@ -7,7 +7,7 @@
       size="small"
       :options="pageSizeOptions"
       :render-label="renderPageSizeLabel"
-      class="mr-2"
+      class="mr-2 @[480px]:hidden"
     />
 
     <NButton
