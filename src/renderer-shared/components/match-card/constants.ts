@@ -1,0 +1,1 @@
+export const MATCH_CARD_COLLAPSED_HEIGHT_PX = 116

@@ -1,8 +1,9 @@
 <template>
   <div
     v-if="participant && team"
-    class="transition-width @container relative box-border flex h-29 w-full overflow-hidden rounded border border-solid bg-neutral-100/95 select-none dark:bg-neutral-900/95"
+    class="transition-width @container relative box-border flex w-full overflow-hidden rounded border border-solid bg-neutral-100/95 select-none dark:bg-neutral-900/95"
     :class="cardBorderClass"
+    :style="{ height: `${MATCH_CARD_COLLAPSED_HEIGHT_PX}px` }"
   >
     <!-- main content -->
     <div class="z-1 flex min-w-0 flex-1 gap-2 px-4 py-1">
@@ -452,6 +453,7 @@ import ItemDisplay from '../widgets/ItemDisplay.vue'
 import PerkDisplay from '../widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
+import { MATCH_CARD_COLLAPSED_HEIGHT_PX } from './constants'
 import { useMatchCard } from './context'
 import { useGameResultName } from './utils/text'
 import { useCardBorderClass, useWinResultStyleType } from './utils/theme'

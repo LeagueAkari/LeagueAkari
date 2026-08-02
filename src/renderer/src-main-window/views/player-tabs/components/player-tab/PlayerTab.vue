@@ -130,6 +130,7 @@ import { PLAYER_TAB_WIDE_MIN_WIDTH } from './constants'
 import { providePlayerTab } from './context'
 import { useFreezeValue } from './utils/freeze'
 import MatchHistoryList from './widgets/MatchHistoryList.vue'
+import { provideMatchHistoryCardViewport } from './widgets/match-history-card'
 import MatchHistoryPagination from './widgets/match-history-pagination'
 import PlayerTabHeader from './widgets/PlayerTabHeader.vue'
 import CollectModeProgress from './widgets/match-history-filters/CollectModeProgress.vue'
@@ -167,6 +168,10 @@ const isActivated = useActivated()
 
 const isInvisible = computed(() => {
   return !isCurrentTab.value || !isActivated.value
+})
+
+provideMatchHistoryCardViewport({
+  active: () => !isInvisible.value
 })
 
 const scrollbarEl = useTemplateRef('scrollbarEl')

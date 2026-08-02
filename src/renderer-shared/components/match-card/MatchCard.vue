@@ -1,5 +1,8 @@
 <template>
-  <div class="relative w-full min-w-175 [contain-intrinsic-size:116px] [content-visibility:auto]">
+  <div
+    class="relative w-full min-w-175 [content-visibility:auto]"
+    :style="{ containIntrinsicSize: `${MATCH_CARD_COLLAPSED_HEIGHT_PX}px` }"
+  >
     <MatchCardOverview @toggle-expand="isExpanded = !isExpanded" />
 
     <KeepAlive>
@@ -9,14 +12,13 @@
 </template>
 
 <script lang="ts" setup>
-import { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
-import { ReplayDownloadProgress } from '@shared/types/league-client/replays'
-import { DraftOptions } from '@shared/shards/ongoing-game'
 import { onErrorCaptured } from 'vue'
 
+import { MATCH_CARD_COLLAPSED_HEIGHT_PX } from './constants'
 import MatchCardDetails from './MatchCardDetails.vue'
 import MatchCardOverview from './MatchCardOverview.vue'
 import { provideMatchCard } from './context'
+import type { MatchCardEmits, MatchCardExpose, MatchCardProps } from './types'
 
 const {
   summary,
@@ -26,23 +28,9 @@ const {
   loadingDetails = false,
   replayState = null,
   canDryRunOngoingGame = false
-} = defineProps<{
-  summary: LcuOrSgpGameSummary
-  details?: LcuOrSgpGameDetails | null
-  puuid?: string
-  hidePrivacy?: boolean
-  loadingDetails?: boolean
-  replayState?: ReplayDownloadProgress
-  canDryRunOngoingGame?: boolean
-}>()
+} = defineProps<MatchCardProps>()
 
-const emits = defineEmits<{
-  loadDetails: [gameId: number]
-  downloadReplay: [gameId: number]
-  watchReplay: [gameId: number]
-  navigateToSummonerByPuuid: [puuid: string, setCurrent?: boolean]
-  dryRunOngoingGame: [draft: DraftOptions]
-}>()
+const emits = defineEmits<MatchCardEmits>()
 
 const isExpanded = defineModel<boolean>('isExpanded', {
   required: false,
@@ -80,7 +68,7 @@ onErrorCaptured((error) => {
   console.error(error)
 })
 
-defineExpose({
+defineExpose<MatchCardExpose>({
   setExpanded: (expanded: boolean) => {
     isExpanded.value = expanded
   }
