@@ -3,10 +3,6 @@
     class="sidebar-menu"
     :class="{ 'rabi-test': currentActiveItem === 'test' }"
     ref="sidebar-menu"
-    :style="{
-      '--indicator-top': `${indicatorPosition.top}px`,
-      '--indicator-rail-height': `${indicatorPosition.height}px`
-    }"
   >
     <NTooltip v-for="item of showItems" :key="item.key" placement="right" :disabled="!isCollapsed">
       <template #trigger>
@@ -26,21 +22,25 @@
       </template>
       <span class="menu-item-popover">{{ item.name }}</span>
     </NTooltip>
-    <div class="indicator-rail"></div>
+    <svg class="indicator-rail" aria-hidden="true" focusable="false">
+      <motion.path class="indicator-rail__shape" :d="renderedIndicatorPath" />
+    </svg>
   </div>
 </template>
 
 <script setup lang="ts">
+import { motion } from 'motion-v'
 import { NBadge, NTooltip } from 'naive-ui'
 import {
   Component as ComponentC,
   computed,
-  nextTick,
-  ref,
+  onMounted,
   useTemplateRef,
   watch,
   watchEffect
 } from 'vue'
+
+import { useSidebarIndicatorMotion } from './use-sidebar-indicator-motion'
 
 const {
   defaultValue,
@@ -66,38 +66,39 @@ watchEffect(() => {
   currentActiveItem.value = defaultValue
 })
 
-const handleMenuChange = (key: string) => {
-  currentActiveItem.value = key
-}
-
 const sidebarMenu = useTemplateRef('sidebar-menu')
-const indicatorPosition = ref({
-  top: 0,
-  height: 0
-})
-const updateIndicatorPosition = () => {
+const { renderedIndicatorPath, setIndicatorTarget } = useSidebarIndicatorMotion()
+
+const updateIndicatorTarget = (key?: string) => {
   if (!sidebarMenu.value) {
     return
   }
 
-  const activeItem = sidebarMenu.value.querySelector('.menu-item.active') as HTMLElement
+  const activeItem = key
+    ? Array.from(sidebarMenu.value.querySelectorAll<HTMLElement>('.menu-item')).find(
+        (item) => item.dataset.key === key
+      )
+    : sidebarMenu.value.querySelector<HTMLElement>('.menu-item.active')
+
   if (activeItem) {
     const { top: itemTop, height } = activeItem.getBoundingClientRect()
     const { top: sidebarTop } = sidebarMenu.value.getBoundingClientRect()
 
     const thatHeight = 0.5 * height
-    indicatorPosition.value.top = itemTop - sidebarTop + (height - thatHeight) / 2
-    indicatorPosition.value.height = thatHeight
+    setIndicatorTarget(itemTop - sidebarTop + (height - thatHeight) / 2, thatHeight)
   }
 }
 
-watch(
-  () => currentActiveItem.value,
-  () => {
-    nextTick(() => updateIndicatorPosition())
-  },
-  { immediate: true }
-)
+const handleMenuChange = (key: string) => {
+  updateIndicatorTarget(key)
+  currentActiveItem.value = key
+}
+
+onMounted(updateIndicatorTarget)
+
+watch([() => currentActiveItem.value, showItems], () => updateIndicatorTarget(), {
+  flush: 'post'
+})
 </script>
 
 <style scoped>
@@ -110,48 +111,25 @@ watch(
   .indicator-rail {
     position: absolute;
     top: 0;
-    left: var(--la-sidebar-icon-horizontal-padding);
-    width: 4px;
+    left: calc(var(--la-sidebar-icon-horizontal-padding) - 2px);
+    width: 8px;
     height: 100%;
+    overflow: visible;
     pointer-events: none;
+  }
 
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 4px;
-      height: var(--indicator-rail-height);
-      top: var(--indicator-top);
-      border-radius: 2px;
-      background-color: #1ea90c;
-    }
+  .indicator-rail__shape {
+    fill: #1ea90c;
+    transition: fill 0.2s;
 
-    [data-theme='dark'] &::before,
-    [data-theme='dark'] &::after {
-      background-color: #26dd0e;
-    }
-
-    &::before {
-      transition:
-        background-color 0.2s,
-        top 0.2s cubic-bezier(0.65, 0, 0.35, 1),
-        height 0.2s cubic-bezier(0.65, 0, 0.35, 1);
-    }
-
-    &::after {
-      transition:
-        background-color 0.2s,
-        top 0.16s cubic-bezier(0.65, 0, 0.35, 1),
-        height 0.16s cubic-bezier(0.65, 0, 0.35, 1);
+    [data-theme='dark'] & {
+      fill: #26dd0e;
     }
   }
 
   /*  dedicated for test page */
-  &.rabi-test .indicator-rail {
-    &::before,
-    &::after {
-      background-color: #f94395;
-    }
+  &.rabi-test .indicator-rail__shape {
+    fill: #f94395;
   }
 }
 
@@ -284,11 +262,8 @@ watch(
 }
 
 [data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) {
-  .sidebar-menu .indicator-rail {
-    &::before,
-    &::after {
-      background-color: var(--la-color-link);
-    }
+  .sidebar-menu .indicator-rail__shape {
+    fill: var(--la-color-link);
   }
 
   .menu-item {

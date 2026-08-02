@@ -77,7 +77,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
 import SidebarFixed from './SidebarFixed.vue'
-import SidebarMenu from './SidebarMenu.vue'
+import { SidebarMenu } from './sidebar-menu'
 
 const { t } = useTranslation()
 

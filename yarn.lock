@@ -4971,6 +4971,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^12.40.0":
+  version: 12.43.0
+  resolution: "framer-motion@npm:12.43.0"
+  dependencies:
+    motion-dom: "npm:^12.43.0"
+    motion-utils: "npm:^12.39.0"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/cce3c1daf8f53da4d9299e6bdd2a1e9f08a30e13d84ce1e468cf25285f9ec2a900c812e0aa3dce79e7453a2a3cf328a717451beef9bf0a6175a3d3794116e36a
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:11.3.1, fs-extra@npm:^11.1.1":
   version: 11.3.1
   resolution: "fs-extra@npm:11.3.1"
@@ -5248,6 +5270,13 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10c0/2d8de939e270b70618f8cebb69746620db10617dbb495bc66ddad326955ea24d3ca4af133aff3eb7c1853e0218f867bc2b050ec26fe02e3aea58f880ffc5e506
+  languageName: node
+  linkType: hard
+
+"hey-listen@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "hey-listen@npm:1.0.8"
+  checksum: 10c0/38db3028b4756f3d536c0f6a92da53bad577ab649b06dddfd0a4d953f9a46bbc6a7f693c8c5b466a538d6d23dbc469260c848427f0de14198a2bbecbac37b39e
   languageName: node
   linkType: hard
 
@@ -5820,6 +5849,7 @@ __metadata:
     mime-types: "npm:^3.0.2"
     mitt: "npm:^3.0.1"
     mobx: "npm:^7.0.0"
+    motion-v: "npm:^2.3.0"
     naive-ui: "npm:^2.44.1"
     p-queue: "npm:^9.3.3"
     pinia: "npm:^4.0.2"
@@ -6485,6 +6515,37 @@ __metadata:
   version: 7.0.0
   resolution: "mobx@npm:7.0.0"
   checksum: 10c0/19e4d11a96efdbb21c14c6a7fb1b96bfc78810e0a8f382b4fce6778ff35fdb0c80c60b30b6282231258d9258ed80deded8f8d88b50ab51a2062cf6faef191d0f
+  languageName: node
+  linkType: hard
+
+"motion-dom@npm:^12.40.0, motion-dom@npm:^12.43.0":
+  version: 12.43.0
+  resolution: "motion-dom@npm:12.43.0"
+  dependencies:
+    motion-utils: "npm:^12.39.0"
+  checksum: 10c0/ef7d3f6eaa6cfeb1a939847a8b2581d119f2efc054948921ece0e2b1091f0969c15ca7707b87a46dddac7f156a714878f168e7b9f6ea189eeb7d5d9fbbb99d26
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^12.39.0":
+  version: 12.39.0
+  resolution: "motion-utils@npm:12.39.0"
+  checksum: 10c0/6d7a2a2cc0797b72410a666a9cc1c201c8e39bf9669670464e433fe1e72af5f0217154c869867b34fbadf3664cf222c0d022bbc4eed7927f201ae971918e7440
+  languageName: node
+  linkType: hard
+
+"motion-v@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "motion-v@npm:2.3.0"
+  dependencies:
+    framer-motion: "npm:^12.40.0"
+    hey-listen: "npm:^1.0.8"
+    motion-dom: "npm:^12.40.0"
+    motion-utils: "npm:^12.39.0"
+  peerDependencies:
+    "@vueuse/core": ">=10.0.0"
+    vue: ">=3.0.0"
+  checksum: 10c0/57a658b938d716064d4c915134508badb9cf6494c7fd754691c276c4a388ef950c4289d3053f16c2cce14aeada0318ed5157186dcbfff4f812b6f70983c9be89
   languageName: node
   linkType: hard
 
