@@ -48,7 +48,6 @@
         <OngoingGameView
           v-show="activeView === 'ongoing'"
           :game="ongoing"
-          :api="api"
           :labels="labels"
           @select-player="openPlayerHistory"
         />

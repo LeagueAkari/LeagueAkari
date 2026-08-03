@@ -1,7 +1,9 @@
 import type {
+  LanWebGameAssetKind,
   LanWebMatchDto,
   LanWebMatchHistoryDto,
   LanWebOngoingGameDto,
+  LanWebPlayerDto,
   LanWebPlayerSearchDto,
   LanWebStatusDto
 } from '@shared/shards/lan-web'
@@ -30,6 +32,12 @@ export class LanWebApiClient {
     )
   }
 
+  getPlayer(serverId: string, puuid: string) {
+    return this._get<LanWebPlayerDto>(
+      `/api/v1/players/${encodeURIComponent(serverId)}/${encodeURIComponent(puuid)}`
+    )
+  }
+
   getMatchHistory(serverId: string, puuid: string, start = 0, count = 20) {
     return this._get<LanWebMatchHistoryDto>(
       `/api/v1/players/${encodeURIComponent(serverId)}/${encodeURIComponent(puuid)}/matches?start=${start}&count=${count}`
@@ -45,7 +53,7 @@ export class LanWebApiClient {
     )
   }
 
-  assetUrl(kind: 'champion' | 'profile-icon' | 'item', id: number) {
+  assetUrl(kind: LanWebGameAssetKind, id: number) {
     return `/api/v1/assets/${kind}/${id}`
   }
 

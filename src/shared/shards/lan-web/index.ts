@@ -1,9 +1,17 @@
+import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
+import type { MatchBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import type { MatchParticipant } from '@shared/data-adapter/match-history/participants'
+import type { TeamsAdapterResult } from '@shared/data-adapter/match-history/teams'
+import type { WinResult } from '@shared/data-adapter/match-history/win-result'
+
 export const LAN_WEB_MAIN_NAMESPACE = 'lan-web-main'
 export const LAN_WEB_RENDERER_NAMESPACE = 'lan-web-renderer'
-export const LAN_WEB_DEFAULT_PORT = 41414
+export const LAN_WEB_DEFAULT_PORT = 8082
 
 export type LanWebServiceStatus = 'stopped' | 'starting' | 'running' | 'error'
 export type LanWebDataSource = 'lcu' | 'sgp'
+export type LanWebGameAssetKind =
+  'champion' | 'profile-icon' | 'item' | 'summoner-spell' | 'perk' | 'perk-style' | 'augment'
 
 export interface LanWebSettingsData {
   enabled: boolean
@@ -104,6 +112,7 @@ export interface LanWebOngoingPlayerDto {
   recentMatches: LanWebOngoingRecentMatchDto[]
   loadingState: string | null
   analysis: LanWebAnalysisDto | null
+  detailedAnalysis: Omit<AggregatedAnalysis, 'map'> | null
 }
 
 export interface LanWebOngoingRecentMatchDto {
@@ -118,7 +127,7 @@ export interface LanWebOngoingRecentMatchDto {
   kills: number
   deaths: number
   assists: number
-  winResult: string
+  winResult: WinResult
 }
 
 export interface LanWebOngoingTeamDto {
@@ -163,7 +172,7 @@ export interface LanWebMatchParticipantDto {
   cs: number
   visionScore: number
   win: boolean
-  winResult: string
+  winResult: WinResult
 }
 
 export interface LanWebMatchDto {
@@ -179,6 +188,11 @@ export interface LanWebMatchDto {
   endOfGameResult: string | null
   subject: LanWebMatchParticipantDto | null
   participants: LanWebMatchParticipantDto[]
+  cardView: {
+    basicInfo: MatchBasicInfo
+    participants: MatchParticipant[]
+    teams: TeamsAdapterResult
+  }
 }
 
 export interface LanWebMatchHistoryDto {

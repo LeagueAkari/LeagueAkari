@@ -135,15 +135,18 @@
 
               <NEmpty v-if="filteredGames.length === 0" :description="labels.noMatches" />
               <div v-else class="flex flex-col gap-1">
-                <PlayerMatchCard
+                <div
                   v-for="match in filteredGames"
                   :key="match.source + '-' + match.gameId"
-                  :match="match"
-                  :api="api"
-                  :labels="labels"
-                  :locale="locale"
-                  @open="openDetails(match)"
-                />
+                  class="overflow-x-auto"
+                >
+                  <ReadonlyMatchCard
+                    class="min-w-175"
+                    :view="match.cardView"
+                    :puuid="match.subject?.puuid || history.player.puuid"
+                    @navigate-to-summoner-by-puuid="openParticipant(match, $event)"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -165,14 +168,6 @@
         />
       </NDrawerContent>
     </NDrawer>
-
-    <MatchDetailsModal
-      v-model:show="detailsVisible"
-      :match="details"
-      :loading="detailsLoading"
-      :api="api"
-      :labels="labels"
-    />
   </div>
 </template>
 
@@ -183,6 +178,7 @@ import type {
   LanWebOngoingPlayerDto,
   LanWebPlayerDto
 } from '@shared/shards/lan-web'
+import ReadonlyMatchCard from '@renderer-shared/components/match-card/ReadonlyMatchCard.vue'
 import {
   NAlert,
   NButton,
@@ -198,8 +194,6 @@ import { computed, ref } from 'vue'
 
 import type { LanWebApiClient } from '../api'
 import type { LanWebLabels } from '../labels'
-import MatchDetailsModal from './MatchDetailsModal.vue'
-import PlayerMatchCard from './PlayerMatchCard.vue'
 import PlayerRankedPane from './PlayerRankedPane.vue'
 import PlayerSummaryPane from './PlayerSummaryPane.vue'
 
@@ -215,9 +209,6 @@ const loadingPlayer = ref(false)
 const loadingPage = ref(false)
 const queueFilter = ref('all')
 const showSidebar = ref(false)
-const detailsVisible = ref(false)
-const detailsLoading = ref(false)
-const details = ref<LanWebMatchDto | null>(null)
 
 const history = computed(
   () => tabs.value.find((tab) => historyKey(tab) === selectedKey.value) ?? null
@@ -333,16 +324,12 @@ function refreshCurrent() {
   void loadHistoryPage(history.value.startIndex)
 }
 
-async function openDetails(match: LanWebMatchDto) {
-  detailsVisible.value = true
-  detailsLoading.value = true
-  details.value = match
+async function openParticipant(match: LanWebMatchDto, puuid: string) {
+  error.value = ''
   try {
-    details.value = await props.api.getMatch(match)
+    await selectPlayer(await props.api.getPlayer(match.sgpServerId, puuid))
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : String(cause)
-  } finally {
-    detailsLoading.value = false
   }
 }
 

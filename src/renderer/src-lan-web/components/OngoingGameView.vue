@@ -1,69 +1,52 @@
 <template>
-  <div class="space-y-4">
+  <div ref="container" class="min-w-0 space-y-4 overflow-hidden">
     <NEmpty v-if="!game.leagueClientConnected" :description="labels.waitingForClient" />
     <NEmpty v-else-if="game.teams.length === 0" :description="labels.noCurrentGame" />
     <template v-else>
       <div class="flex flex-wrap items-center gap-2 text-sm opacity-65">
         <NTag size="small" round>{{ game.phase }}</NTag>
-        <span v-if="game.gameInfo">{{
-          queueName(game.gameInfo.queueId, game.gameInfo.queueType)
-        }}</span>
+        <span v-if="game.gameInfo">{{ game.gameInfo.queueType }}</span>
       </div>
-
-      <section v-for="team in game.teams" :key="team.id" class="space-y-2">
-        <div class="flex items-center gap-2">
-          <span
-            class="size-2.5 rounded-full border border-white/20"
-            :class="teamColor(team.id)"
-          ></span>
-          <h2 class="text-base leading-tight font-bold">{{ teamName(team.id) }}</h2>
-        </div>
-        <div
-          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),240px))] gap-x-1 gap-y-2"
-        >
-          <OngoingPlayerCard
-            v-for="player in team.players"
-            :key="player.puuid"
-            :player="player"
-            :api="api"
-            :labels="labels"
-            @select-player="emit('select-player', $event)"
-          />
-        </div>
-      </section>
+      <OngoingGamePanel
+        :content-width="Math.max(width, 320)"
+        :content-height="Math.max(availableHeight, 500)"
+        is-standalone-ongoing-game-window
+        @navigate-to-summoner-by-puuid="selectPlayer"
+      />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import OngoingGamePanel from '@renderer-shared/components/ongoing-game-panel/OngoingGamePanel.vue'
+import { provideOngoingGameProvider } from '@renderer-shared/providers/ongoing-game'
 import type { LanWebOngoingGameDto, LanWebOngoingPlayerDto } from '@shared/shards/lan-web'
+import { useElementSize, useWindowSize } from '@vueuse/core'
 import { NEmpty, NTag } from 'naive-ui'
+import { computed, useTemplateRef } from 'vue'
 
-import type { LanWebApiClient } from '../api'
-import { queueName } from '../format'
 import type { LanWebLabels } from '../labels'
-import OngoingPlayerCard from './OngoingPlayerCard.vue'
+import { createLanWebOngoingGameProvider } from '../ongoing-game-adapter'
 
 const props = defineProps<{
   game: LanWebOngoingGameDto
-  api: LanWebApiClient
   labels: LanWebLabels
 }>()
 const emit = defineEmits<{ 'select-player': [player: LanWebOngoingPlayerDto] }>()
 
-function teamColor(teamId: string) {
-  if (teamId.includes('100') || teamId.toLowerCase().includes('blue')) return 'bg-blue-500'
-  if (teamId.includes('200') || teamId.toLowerCase().includes('red')) return 'bg-red-400'
-  return 'bg-neutral-400'
-}
+const container = useTemplateRef('container')
+const { width } = useElementSize(container)
+const { height: windowHeight } = useWindowSize()
+const availableHeight = computed(() => windowHeight.value - 180)
 
-function teamName(teamId: string) {
-  if (teamId.includes('100') || teamId.toLowerCase().includes('blue')) {
-    return props.labels.blueTeam
+provideOngoingGameProvider(createLanWebOngoingGameProvider(() => props.game))
+
+function selectPlayer(puuid: string) {
+  const player = props.game.teams
+    .flatMap((team) => team.players)
+    .find((item) => item.puuid === puuid)
+  if (player) {
+    emit('select-player', player)
   }
-  if (teamId.includes('200') || teamId.toLowerCase().includes('red')) {
-    return props.labels.redTeam
-  }
-  return `${props.labels.team} ${teamId}`
 }
 </script>

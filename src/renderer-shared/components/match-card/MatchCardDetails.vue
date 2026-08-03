@@ -94,6 +94,10 @@ import MatchCardTimelineTab from './tabs/timeline/MatchCardTimelineTab.vue'
 import { useCardBorderClass } from './utils/theme'
 import TabSwitch from './widgets/TabSwitch.vue'
 
+const { detailsAvailable = true } = defineProps<{
+  detailsAvailable?: boolean
+}>()
+
 const {
   basicInfo,
   teams,
@@ -141,16 +145,18 @@ const tabs = computed(() => {
     },
     {
       label: t('matchCard.tabs.events'),
-      value: 'events'
+      value: 'events',
+      show: detailsAvailable
     },
     {
       label: t('matchCard.tabs.builds'),
       value: 'builds',
-      show: basicInfo.value.dataSource === 'sgp'
+      show: detailsAvailable && basicInfo.value.dataSource === 'sgp'
     },
     {
       label: t('matchCard.tabs.timeline'),
-      value: 'timeline'
+      value: 'timeline',
+      show: detailsAvailable
     }
   ].filter((tab) => tab.show ?? true)
 })

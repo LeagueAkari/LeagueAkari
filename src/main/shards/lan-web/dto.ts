@@ -1,6 +1,7 @@
 import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import { toTeams } from '@shared/data-adapter/match-history/teams'
 import type { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type {
   LanWebAnalysisDto,
@@ -55,6 +56,17 @@ export function toLanWebAnalysis(
   }
 }
 
+export function toLanWebDetailedAnalysis(
+  analysis: AggregatedAnalysis | undefined
+): Omit<AggregatedAnalysis, 'map'> | null {
+  if (!analysis) {
+    return null
+  }
+
+  const { map: _perGameAnalysis, ...publicAnalysis } = analysis
+  return publicAnalysis
+}
+
 function toLanWebParticipant(
   participant: ReturnType<typeof toParticipants>[number]
 ): LanWebMatchParticipantDto {
@@ -93,7 +105,8 @@ export function toLanWebMatch(
   includeParticipants = true
 ): LanWebMatchDto {
   const basic = toBasicInfo(summary)
-  const participants = toParticipants(summary, basic).map(toLanWebParticipant)
+  const cardParticipants = toParticipants(summary, basic)
+  const participants = cardParticipants.map(toLanWebParticipant)
 
   return {
     source: summary.source,
@@ -107,7 +120,12 @@ export function toLanWebMatch(
     gameType: basic.gameType,
     endOfGameResult: basic.endOfGameResult ?? null,
     subject: participants.find((participant) => participant.puuid === subjectPuuid) ?? null,
-    participants: includeParticipants ? participants : []
+    participants: includeParticipants ? participants : [],
+    cardView: {
+      basicInfo: basic,
+      participants: cardParticipants,
+      teams: toTeams(summary, basic, cardParticipants)
+    }
   }
 }
 

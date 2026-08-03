@@ -1,5 +1,6 @@
 import { is } from '@electron-toolkit/utils'
 import type { LanWebApiErrorDto } from '@shared/shards/lan-web'
+import type { LanWebGameAssetKind } from '@shared/shards/lan-web'
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import http, { type IncomingMessage, type ServerResponse } from 'node:http'
 import { networkInterfaces } from 'node:os'
@@ -184,8 +185,18 @@ export class LanWebHttpServerController {
       return this._sendJson(response, 200, match, request.method === 'HEAD')
     }
     if (segments.length === 5 && segments[2] === 'assets') {
-      const kind = segments[3]
-      if (kind !== 'champion' && kind !== 'profile-icon' && kind !== 'item') {
+      const kind = segments[3] as LanWebGameAssetKind
+      if (
+        ![
+          'champion',
+          'profile-icon',
+          'item',
+          'summoner-spell',
+          'perk',
+          'perk-style',
+          'augment'
+        ].includes(kind)
+      ) {
         throw new LanWebApiError(404, 'NOT_FOUND', 'Asset was not found')
       }
       const asset = await this._api.getGameAsset(kind, Number(segments[4]))

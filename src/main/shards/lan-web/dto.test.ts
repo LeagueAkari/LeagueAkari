@@ -1,7 +1,7 @@
 import type { AggregatedAnalysis } from '@shared/data-adapter/analysis/player'
 import { describe, expect, it } from 'vitest'
 
-import { toLanWebAnalysis } from './dto'
+import { toLanWebAnalysis, toLanWebDetailedAnalysis } from './dto'
 
 describe('LAN Web DTO projection', () => {
   it('projects aggregate analysis without exposing per-game maps', () => {
@@ -55,5 +55,13 @@ describe('LAN Web DTO projection', () => {
       champions: [{ championId: 103, gameCount: 5 }]
     })
     expect(dto).not.toHaveProperty('map')
+
+    const detailedDto = toLanWebDetailedAnalysis(internal)
+    expect(detailedDto).not.toHaveProperty('map')
+    expect(detailedDto).toMatchObject({
+      count: 12,
+      detailsCount: 4,
+      summary: { avgKda: 3.75 }
+    })
   })
 })

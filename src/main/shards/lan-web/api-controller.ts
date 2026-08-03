@@ -9,10 +9,12 @@ import type {
   LanWebRankedEntryDto,
   LanWebStatusDto
 } from '@shared/shards/lan-web'
+import type { LanWebGameAssetKind } from '@shared/shards/lan-web'
 
 import type { LanWebMainContext } from './context'
 import {
   toLanWebAnalysis,
+  toLanWebDetailedAnalysis,
   toLanWebMatch,
   toLanWebOngoingRecentMatch,
   toLanWebRankedEntries
@@ -103,7 +105,8 @@ export class LanWebReadOnlyApiController {
             tags: [...new Set(tags)],
             recentMatches,
             loadingState: state.matchHistoryLoadingState[puuid] || null,
-            analysis: toLanWebAnalysis(state.analysis?.players[puuid])
+            analysis: toLanWebAnalysis(state.analysis?.players[puuid]),
+            detailedAnalysis: toLanWebDetailedAnalysis(state.analysis?.players[puuid])
           }
         })
       })),
@@ -284,18 +287,31 @@ export class LanWebReadOnlyApiController {
     return toLanWebMatch(summary, normalizedServerId, subjectPuuid)
   }
 
-  async getGameAsset(kind: 'champion' | 'profile-icon' | 'item', id: number) {
+  async getGameAsset(kind: LanWebGameAssetKind, id: number) {
     this._assertLeagueClientConnected()
     if (!Number.isSafeInteger(id) || id < 0 || id > 999999) {
       throw new LanWebApiError(400, 'INVALID_ASSET', 'Invalid game asset id')
     }
 
-    const path =
-      kind === 'champion'
-        ? `/lol-game-data/assets/v1/champion-icons/${id}.png`
-        : kind === 'profile-icon'
-          ? `/lol-game-data/assets/v1/profile-icons/${id}.jpg`
-          : this._context.leagueClient.data.gameData.items[id]?.iconPath
+    const gameData = this._context.leagueClient.data.gameData
+    const path = (() => {
+      switch (kind) {
+        case 'champion':
+          return `/lol-game-data/assets/v1/champion-icons/${id}.png`
+        case 'profile-icon':
+          return `/lol-game-data/assets/v1/profile-icons/${id}.jpg`
+        case 'item':
+          return gameData.items[id]?.iconPath
+        case 'summoner-spell':
+          return gameData.summonerSpells[id]?.iconPath
+        case 'perk':
+          return gameData.perks[id]?.iconPath
+        case 'perk-style':
+          return gameData.perkstyles.styles[id]?.iconPath
+        case 'augment':
+          return gameData.augments[id]?.augmentSmallIconPath
+      }
+    })()
 
     if (!path || !path.startsWith('/lol-game-data/assets/')) {
       throw new LanWebApiError(404, 'ASSET_NOT_FOUND', 'Game asset was not found')

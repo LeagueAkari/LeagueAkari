@@ -8,7 +8,7 @@ describe('LAN Web network helpers', () => {
     expect(isValidLanPort(65535)).toBe(true)
     expect(isValidLanPort(1023)).toBe(false)
     expect(isValidLanPort(65536)).toBe(false)
-    expect(isValidLanPort(41414.5)).toBe(false)
+    expect(isValidLanPort(8082.5)).toBe(false)
   })
 
   it('returns unique LAN IPv4 addresses without loopback or link-local addresses', () => {
@@ -65,7 +65,7 @@ describe('LAN Web network helpers', () => {
   })
 
   it('builds direct URLs and falls back to loopback when no LAN address exists', () => {
-    expect(buildAccessUrls([], 41414)).toEqual(['http://127.0.0.1:41414/'])
-    expect(buildAccessUrls(['192.168.1.9'], 41414)).toEqual(['http://192.168.1.9:41414/'])
+    expect(buildAccessUrls([], 8082)).toEqual(['http://127.0.0.1:8082/'])
+    expect(buildAccessUrls(['192.168.1.9'], 8082)).toEqual(['http://192.168.1.9:8082/'])
   })
 })
