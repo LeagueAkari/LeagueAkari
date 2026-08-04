@@ -56,6 +56,7 @@ teams:
 
 queueTypes:
   RANKED_SOLO_5x5: Ranked Solo/Duo
+  JADE_RANKED_SOLO_5x5: League Classic
   RANKED_FLEX_SR: Ranked Flex
   RANKED_PREMADE_5x5: Ranked Premade 5v5
   NORMAL: Normal SR
