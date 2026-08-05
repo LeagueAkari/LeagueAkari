@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { app } from 'electron'
+import { type WebContents, app } from 'electron'
 
 import type { AppCommonMainContext } from './context'
 
@@ -48,25 +48,46 @@ export class RendererLinkProtocol {
 
     switch (target) {
       case 'main-window':
-        windowManager.mainWindow.window?.webContents.executeJavaScript(code)
+        this._evaluateRendererProcess(target, windowManager.mainWindow.window?.webContents, code)
         break
 
       case 'aux-window':
-        windowManager.auxWindow.window?.webContents.executeJavaScript(code)
+        this._evaluateRendererProcess(target, windowManager.auxWindow.window?.webContents, code)
         break
 
       case 'cd-timer-window':
-        windowManager.cdTimerWindow.window?.webContents.executeJavaScript(code)
+        this._evaluateRendererProcess(target, windowManager.cdTimerWindow.window?.webContents, code)
         break
 
       case 'ongoing-game-window':
-        windowManager.ongoingGameWindow.window?.webContents.executeJavaScript(code)
+        this._evaluateRendererProcess(
+          target,
+          windowManager.ongoingGameWindow.window?.webContents,
+          code
+        )
         break
 
       case 'opgg-window':
-        windowManager.opggWindow.window?.webContents.executeJavaScript(code)
+        this._evaluateRendererProcess(target, windowManager.opggWindow.window?.webContents, code)
         break
     }
+  }
+
+  private _evaluateRendererProcess(
+    target: string,
+    webContents: WebContents | undefined,
+    code: string
+  ) {
+    if (!webContents) {
+      return
+    }
+
+    // Electron clones the script completion value back to the main process.
+    const codeWithIgnoredResult = `${code}\n;void 0`
+
+    void webContents.executeJavaScript(codeWithIgnoredResult).catch((error) => {
+      this.context.logger.warn('Renderer-link evaluation failed', target, error)
+    })
   }
 
   private _evaluateMainProcess(code: string) {
