@@ -1,5 +1,3 @@
-import { formatError } from '@shared/utils/errors'
-
 import type { LoggerRenderer } from '../logger'
 import { type AkariIpcRendererContext, LOGGER_SHARD_NAMESPACE } from './context'
 import type { IpcMainDataType } from './types'
@@ -29,7 +27,7 @@ export class AkariIpcRendererCallService {
       const logger = this._context.shared.manager.getInstance(
         LOGGER_SHARD_NAMESPACE
       ) as LoggerRenderer
-      logger?.warn(`ipc call: ${namespace}`, fnName, args, formatError(result.error))
+      logger?.warn(`ipc call: ${namespace}`, fnName, result.error)
     }
 
     throw result.error

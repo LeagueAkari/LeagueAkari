@@ -1,5 +1,5 @@
 <template>
-  <HorizontalExpand :show="automations.length > 0" appear class="h-full">
+  <HorizontalExpand :show="automations.length > 0" class="h-full">
     <div class="flex h-full items-center pr-1">
       <NPopover
         v-model:show="popoverShow"

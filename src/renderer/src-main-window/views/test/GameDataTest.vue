@@ -25,85 +25,99 @@
       </span>
     </div>
 
-    <NScrollbar class="min-h-0 flex-1">
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-2">
-        <div
-          v-for="item in filteredData"
-          :key="item.id"
-          class="flex items-center gap-3 rounded border border-black/10 p-2 dark:border-white/10"
-        >
-          <!-- 根据类型使用不同的 Display 组件 -->
-          <ItemDisplay
-            v-if="selectedCategory === 'items'"
-            :item-id="item.id"
-            :size="40"
-            class="shrink-0"
-          />
-          <ChampionIcon
-            v-else-if="selectedCategory === 'champions'"
-            :champion-id="item.id"
-            class="size-10 shrink-0 rounded"
-          />
-          <PerkDisplay
-            v-else-if="selectedCategory === 'perks'"
-            :perk-id="item.id"
-            :size="40"
-            class="shrink-0"
-          />
-          <PerkstyleDisplay
-            v-else-if="selectedCategory === 'perkstyles'"
-            :perkstyle-id="item.id"
-            :size="40"
-            class="shrink-0"
-          />
-          <AugmentDisplay
-            v-else-if="selectedCategory === 'augments'"
-            :augment-id="item.id"
-            :size="40"
-            class="shrink-0"
-          />
-          <SummonerSpellDisplay
-            v-else-if="selectedCategory === 'summonerSpells'"
-            :spell-id="item.id"
-            :size="40"
-            class="shrink-0"
-          />
+    <div ref="listContainer" class="min-h-0 flex-1">
+      <NScrollbar
+        v-if="virtualRows.length"
+        ref="listScrollbar"
+        class="h-full"
+        @scroll="virtualContainerProps.onScroll"
+      >
+        <div v-bind="virtualWrapperProps">
           <div
-            v-else
-            class="flex size-10 shrink-0 items-center justify-center rounded bg-black/10 text-xs dark:bg-white/10"
+            v-for="{ data: row } in renderedRows"
+            :key="row.key"
+            class="box-border grid h-20 gap-2 pb-2"
+            :style="{ gridTemplateColumns }"
           >
-            —
-          </div>
+            <div
+              v-for="item in row.items"
+              :key="item.id"
+              class="flex min-w-0 items-center gap-3 rounded border border-black/10 p-2 dark:border-white/10"
+            >
+              <!-- 根据类型使用不同的 Display 组件 -->
+              <ItemDisplay
+                v-if="selectedCategory === 'items'"
+                :item-id="item.id"
+                :size="40"
+                class="shrink-0"
+              />
+              <ChampionIcon
+                v-else-if="selectedCategory === 'champions'"
+                :champion-id="item.id"
+                class="size-10 shrink-0 rounded"
+              />
+              <PerkDisplay
+                v-else-if="selectedCategory === 'perks'"
+                :perk-id="item.id"
+                :size="40"
+                class="shrink-0"
+              />
+              <PerkstyleDisplay
+                v-else-if="selectedCategory === 'perkstyles'"
+                :perkstyle-id="item.id"
+                :size="40"
+                class="shrink-0"
+              />
+              <AugmentDisplay
+                v-else-if="selectedCategory === 'augments'"
+                :augment-id="item.id"
+                :size="40"
+                class="shrink-0"
+              />
+              <SummonerSpellDisplay
+                v-else-if="selectedCategory === 'summonerSpells'"
+                :spell-id="item.id"
+                :size="40"
+                class="shrink-0"
+              />
+              <div
+                v-else
+                class="flex size-10 shrink-0 items-center justify-center rounded bg-black/10 text-xs dark:bg-white/10"
+              >
+                —
+              </div>
 
-          <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-bold">{{ item.name }}</div>
-            <div class="text-xs text-black/50 dark:text-white/50">ID: {{ item.id }}</div>
-            <div v-if="item.extra" class="truncate text-xs text-black/40 dark:text-white/40">
-              {{ item.extra }}
+              <div class="min-w-0 flex-1">
+                <div class="truncate text-sm font-bold">{{ item.name }}</div>
+                <div class="text-xs text-black/50 dark:text-white/50">ID: {{ item.id }}</div>
+                <div v-if="item.extra" class="truncate text-xs text-black/40 dark:text-white/40">
+                  {{ item.extra }}
+                </div>
+              </div>
+
+              <NButton
+                v-if="getIconPath(item.id)"
+                size="tiny"
+                secondary
+                class="shrink-0"
+                @click="handleDownloadIcon(getIconPath(item.id)!)"
+              >
+                <template #icon>
+                  <NIcon><DownloadIcon /></NIcon>
+                </template>
+              </NButton>
             </div>
           </div>
-
-          <NButton
-            v-if="getIconPath(item.id)"
-            size="tiny"
-            secondary
-            class="shrink-0"
-            @click="handleDownloadIcon(getIconPath(item.id)!)"
-          >
-            <template #icon>
-              <NIcon><DownloadIcon /></NIcon>
-            </template>
-          </NButton>
         </div>
-      </div>
+      </NScrollbar>
 
       <div
-        v-if="filteredData.length === 0"
-        class="flex h-40 items-center justify-center text-black/40 dark:text-white/40"
+        v-else
+        class="flex h-full min-h-40 items-center justify-center text-black/40 dark:text-white/40"
       >
         暂无数据
       </div>
-    </NScrollbar>
+    </div>
   </div>
 </template>
 
@@ -119,8 +133,9 @@ import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { Download as DownloadIcon } from '@vicons/carbon'
+import { useElementSize, useVirtualList } from '@vueuse/core'
 import { NButton, NIcon, NInput, NScrollbar, NSelect } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 const lcs = useLeagueClientStore()
 const wm = useInstance(WindowManagerRenderer)
@@ -150,6 +165,23 @@ interface DisplayItem {
   name: string
   extra?: string
 }
+
+interface DisplayRow {
+  key: string
+  items: DisplayItem[]
+}
+
+const CARD_MIN_WIDTH = 280
+const GRID_GAP = 8
+const VIRTUAL_ROW_HEIGHT = 80
+
+const listContainer = useTemplateRef<HTMLElement>('listContainer')
+const listScrollbar = useTemplateRef('listScrollbar')
+const { width: listWidth } = useElementSize(listContainer)
+const columnCount = computed(() =>
+  Math.max(1, Math.floor((listWidth.value + GRID_GAP) / (CARD_MIN_WIDTH + GRID_GAP)))
+)
+const gridTemplateColumns = computed(() => `repeat(${columnCount.value}, minmax(0, 1fr))`)
 
 const rawData = computed<DisplayItem[]>(() => {
   const gd = lcs.gameData
@@ -226,6 +258,39 @@ const filteredData = computed(() => {
       item.name.toLowerCase().includes(search) ||
       item.extra?.toLowerCase().includes(search)
   )
+})
+
+const virtualRows = computed<DisplayRow[]>(() => {
+  const rows: DisplayRow[] = []
+  const count = columnCount.value
+
+  for (let index = 0; index < filteredData.value.length; index += count) {
+    const items = filteredData.value.slice(index, index + count)
+    rows.push({
+      key: `${selectedCategory.value}:${items.map((item) => item.id).join('-')}`,
+      items
+    })
+  }
+
+  return rows
+})
+
+const {
+  list: renderedRows,
+  containerProps: virtualContainerProps,
+  wrapperProps: virtualWrapperProps,
+  scrollTo
+} = useVirtualList(virtualRows, {
+  itemHeight: VIRTUAL_ROW_HEIGHT,
+  overscan: 4
+})
+
+watchEffect(() => {
+  virtualContainerProps.ref.value = listScrollbar.value?.scrollbarInstRef?.containerRef ?? null
+})
+
+watch([selectedCategory, searchText, columnCount], () => {
+  nextTick(() => scrollTo(0))
 })
 
 const getIconPath = (id: number): string | null => {
