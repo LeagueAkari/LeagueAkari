@@ -17,13 +17,7 @@
             getMatchItemThemeClass(item).bg
           ]"
           :key="item.gameId"
-          @click="
-            previewGame({
-              summary: item.game,
-              details: ongoingGame.gameDetails[item.gameId],
-              puuid
-            })
-          "
+          @click="previewMatch(item)"
         >
           <div
             class="absolute right-0 bottom-0 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
@@ -94,8 +88,10 @@
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
-import { MatchBasicInfo, toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
-import { MatchParticipant, toParticipants } from '@shared/data-adapter/match-history/participants'
+import type { OngoingGamePanelMatchHistoryView } from '@renderer-shared/providers/ongoing-game'
+import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import { toParticipants } from '@shared/data-adapter/match-history/participants'
+import type { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import { formatI18nOrdinal } from '@shared/i18n'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
@@ -116,7 +112,11 @@ const resources = useAkariResourceProvider()
 const matchHistoryData = computed(() => ongoingGame.value.matchHistory[puuid]?.data)
 const matchHistoryLoadingState = computed(() => ongoingGame.value.matchHistoryLoadingState[puuid])
 
-const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: MatchParticipant }) => {
+type DisplayMatch = OngoingGamePanelMatchHistoryView & {
+  game?: LcuOrSgpGameSummary
+}
+
+const getWinResultText = (match: DisplayMatch) => {
   if (match.basicInfo.gameMode === 'PRACTICETOOL') {
     return t('ongoingGame.playerCard.matchHistory.winResult.na')
   }
@@ -142,10 +142,19 @@ const getWinResultText = (match: { basicInfo: MatchBasicInfo; participant: Match
     : t('ongoingGame.playerCard.matchHistory.winResult.loss')
 }
 
-const getMatchItemThemeClass = (match: {
-  basicInfo: MatchBasicInfo
-  participant: MatchParticipant
-}) => {
+const previewMatch = (match: DisplayMatch) => {
+  if (!match.game) {
+    return
+  }
+
+  previewGame({
+    summary: match.game,
+    details: ongoingGame.value.gameDetails[match.gameId],
+    puuid
+  })
+}
+
+const getMatchItemThemeClass = (match: DisplayMatch) => {
   const isNeutral =
     match.basicInfo.gameMode === 'PRACTICETOOL' ||
     match.participant.winResult === 'abort' ||
@@ -178,6 +187,11 @@ const getMatchItemThemeClass = (match: {
 }
 
 const matches = computed(() => {
+  const providedViews = ongoingGame.value.matchHistoryViews?.[puuid]
+  if (providedViews) {
+    return providedViews
+  }
+
   if (!matchHistoryData.value) {
     return []
   }

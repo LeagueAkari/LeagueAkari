@@ -355,6 +355,23 @@ settings:
         description: Reverse the direction of the timer adjustment. When the wheel is moved up, the time decreases, and when the wheel is moved down, the time increases. This only takes effect when the timer type is count-up mode.
   misc:
     title: Misc
+    lanWeb:
+      title: LAN Web Access
+      enabled:
+        label: Enable LAN Web Access
+        description: Start a read-only web service that other devices on the local network can open.
+      port:
+        label: Listening Port
+        description: Changing the port restarts the web service. Use a port from 1024 to 65535.
+      status:
+        label: Service Status and Access URLs
+        description: Anyone with an access URL on the same network can view the exposed game data. The URL changes whenever the service starts.
+        stopped: Stopped
+        starting: Starting
+        running: Running
+        error: Start Failed
+      copy: Copy
+      copied: Access URL copied
     respawnTimer:
       title: Respawn Timer
       enabled:

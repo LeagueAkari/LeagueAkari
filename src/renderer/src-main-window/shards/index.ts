@@ -14,6 +14,7 @@ import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
+import { LanWebRenderer } from '@renderer-shared/shards/lan-web'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -53,6 +54,7 @@ manager.use(FeatureGatingRenderer)
 manager.use(GameClientRenderer)
 manager.use(InGameSendRenderer)
 manager.use(KeyboardShortcutsRenderer)
+manager.use(LanWebRenderer)
 manager.use(LeagueClientPeekRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LeagueClientUxRenderer)
