@@ -4,18 +4,15 @@ import type {
   OngoingGameAnalysis,
   OngoingGamePanelSettings,
   OngoingGamePlayerReloadOptions,
+  OngoingGamePositionAssignment,
   OngoingGameSimplifiedChampMastery,
   QueryStage
 } from '@shared/shards/ongoing-game'
 import type { SavedInfo } from '@shared/shards/saved-player'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
-import type { ParsedRole } from '@shared/utils/ranked'
 
-export interface OngoingGamePanelPositionAssignment {
-  position: string
-  role: ParsedRole | null
-}
+export type OngoingGamePanelPositionAssignment = OngoingGamePositionAssignment
 
 export interface OngoingGamePanelSummonerSpellSelection {
   spell1Id: number

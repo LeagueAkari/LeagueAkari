@@ -7,6 +7,7 @@ export interface VisibleChampSelectMember {
   teamIdentifier: string
   championId: number
   position: string
+  isAutofilled: boolean
   spell1Id: number
   spell2Id: number
 }
@@ -29,6 +30,7 @@ export function collectVisibleChampSelectMembers(
       teamIdentifier,
       championId: member.championId || member.championPickIntent || 0,
       position: member.assignedPosition.toUpperCase(),
+      isAutofilled: member.isAutofilled,
       spell1Id: member.spell1Id || 0,
       spell2Id: member.spell2Id || 0
     })

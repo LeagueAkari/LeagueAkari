@@ -123,11 +123,11 @@
         <div
           class="flex flex-1 items-center justify-center gap-0.5 text-base"
           :class="{
-            'ml-4': !(positionInfo.role && positionInfo.role.assignmentReason === 'AUTOFILL')
+            'ml-4': !positionInfo.isAutofilled
           }"
         >
           <div
-            v-if="positionInfo.role && positionInfo.role.assignmentReason === 'AUTOFILL'"
+            v-if="positionInfo.isAutofilled"
             class="rounded px-1 py-0.5 text-[11px] leading-2.75 whitespace-nowrap text-black dark:text-white"
             :style="{
               'background-color': positionAssignmentReason.AUTOFILL_SHORT?.color,
@@ -174,19 +174,19 @@
             })
           }}</span>
           <div
-            v-if="positionInfo.role && positionInfo.role.assignmentReason !== 'NONE'"
+            v-if="positionInfo.assignmentReason !== 'NONE'"
             class="rounded px-1 py-0.5 text-[11px] leading-2.75 whitespace-nowrap text-black dark:text-white"
             :style="{
               'background-color':
-                positionAssignmentReason[positionInfo.role.assignmentReason]?.color || '#5b4694',
+                positionAssignmentReason[positionInfo.assignmentReason]?.color || '#5b4694',
               color:
-                positionAssignmentReason[positionInfo.role.assignmentReason]?.foregroundColor ||
+                positionAssignmentReason[positionInfo.assignmentReason]?.foregroundColor ||
                 '#ffffff'
             }"
           >
             {{
-              positionAssignmentReason[positionInfo.role.assignmentReason]?.name ||
-              positionInfo.role.assignmentReason
+              positionAssignmentReason[positionInfo.assignmentReason]?.name ||
+              positionInfo.assignmentReason
             }}
           </div>
         </div>
@@ -245,6 +245,8 @@ const positionInfo = computed(() => {
   const info = {
     current: null as string | null,
     role: null as ParsedRole | null,
+    isAutofilled: false,
+    assignmentReason: 'NONE',
     recent: [] as { position: string; count: number }[]
   }
 
@@ -254,6 +256,10 @@ const positionInfo = computed(() => {
 
   info.current = position.value.position
   info.role = position.value.role
+  info.isAutofilled = position.value.isAutofilled
+  info.assignmentReason = info.isAutofilled
+    ? 'AUTOFILL'
+    : position.value.role?.assignmentReason || 'NONE'
 
   if (analysis.value?.positions) {
     const recentPositions = Object.entries(analysis.value.positions)

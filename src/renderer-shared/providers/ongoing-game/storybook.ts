@@ -142,7 +142,8 @@ function createPositionAssignments() {
       teamIndex[participant.teamId] = index + 1
       assignments[puuid] = {
         position: positionsByTeam[participant.teamId]?.[index] ?? 'NONE',
-        role: null
+        role: null,
+        isAutofilled: false
       }
 
       return assignments

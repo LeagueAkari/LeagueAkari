@@ -5,6 +5,7 @@ import type { MatchHistoryQueryParams } from '@shared/http-api-axios-helper/sgp/
 import type {
   AdditionalResult,
   DraftOptions,
+  OngoingGamePositionAssignment,
   OngoingGameSettingsData,
   OngoingGameSimplifiedChampMastery,
   QueryStage
@@ -13,7 +14,6 @@ import { createDefaultOngoingGamePanelPlayerCardTagSettings } from '@shared/shar
 import type { SavedInfo } from '@shared/shards/saved-player'
 import type { RankedStats } from '@shared/types/league-client/ranked'
 import type { SummonerInfo } from '@shared/types/league-client/summoner'
-import type { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 
@@ -44,15 +44,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   })
 
   const championSelections = shallowRef<Record<string, number>>({})
-  const positionAssignments = shallowRef<
-    Record<
-      string,
-      {
-        position: string
-        role: ParsedRole | null
-      }
-    >
-  >({})
+  const positionAssignments = shallowRef<Record<string, OngoingGamePositionAssignment>>({})
   const teams = shallowRef<Record<string, string[]>>({})
 
   // untyped

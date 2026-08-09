@@ -30,7 +30,7 @@ describe('extractTeamMembers', () => {
             championId: 3,
             teamParticipantId: 21,
             selectedPosition: 'MIDDLE',
-            selectedRole: 'MIDDLE.PRIMARY.MIDDLE.BOTTOM'
+            selectedRole: 'MIDDLE.AUTOFILL.MIDDLE.BOTTOM'
           }
         ],
         [
@@ -58,6 +58,7 @@ describe('extractTeamMembers', () => {
       positions: {
         p1: {
           position: 'TOP',
+          isAutofilled: false,
           role: {
             current: 'TOP',
             assignmentReason: 'PRIMARY',
@@ -68,9 +69,10 @@ describe('extractTeamMembers', () => {
         },
         p2: {
           position: 'MIDDLE',
+          isAutofilled: true,
           role: {
             current: 'MIDDLE',
-            assignmentReason: 'PRIMARY',
+            assignmentReason: 'AUTOFILL',
             primary: 'MIDDLE',
             secondary: 'BOTTOM',
             fill: 'NONE'

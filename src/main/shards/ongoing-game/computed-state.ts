@@ -2,10 +2,11 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import {
   AdditionalResult,
   DraftOptions,
+  OngoingGamePositionAssignment,
   QueryStage,
   QueryStageDraft
 } from '@shared/shards/ongoing-game'
-import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
+import { parseSelectedRole } from '@shared/utils/ranked'
 
 import { LeagueClientData } from '../league-client/lc-state'
 import type { ChampSelectHandoffSnapshot } from './champ-select-handoff'
@@ -17,13 +18,7 @@ type OngoingGameSettingsLike = {
   queryInLobbyPhase: boolean
 }
 
-export type PositionAssignments = Record<
-  string,
-  {
-    position: string
-    role: ParsedRole | null
-  }
->
+export type PositionAssignments = Record<string, OngoingGamePositionAssignment>
 
 export function getDraftQueryStage(draft: DraftOptions): QueryStageDraft {
   return {
@@ -53,7 +48,8 @@ export function getDraftPositionAssignments(draft: DraftOptions): PositionAssign
       puuid,
       {
         position: assignment.selected.toUpperCase(),
-        role: null
+        role: null,
+        isAutofilled: false
       }
     ])
   )
@@ -176,7 +172,8 @@ function getChampSelectPositionAssignments(
   for (const member of collectVisibleChampSelectMembers(session, deobfuscationEnabled)) {
     assignments[member.puuid] = {
       position: member.position,
-      role: null
+      role: null,
+      isAutofilled: member.isAutofilled
     }
   }
 
@@ -194,24 +191,31 @@ function getInGamePositionAssignments(
   const assignments: PositionAssignments = {}
   data.gameflow.session.gameData.teamOne.forEach((member) => {
     if (member.puuid && member.puuid !== EMPTY_PUUID) {
-      assignments[member.puuid] = {
-        position: member.selectedPosition,
-        role: parseSelectedRole(member.selectedRole)
-      }
+      assignments[member.puuid] = getInGameMemberPositionAssignment(member)
     }
   })
 
   data.gameflow.session.gameData.teamTwo.forEach((member) => {
     if (member.puuid && member.puuid !== EMPTY_PUUID) {
-      assignments[member.puuid] = {
-        position: member.selectedPosition,
-        role: parseSelectedRole(member.selectedRole)
-      }
+      assignments[member.puuid] = getInGameMemberPositionAssignment(member)
     }
   })
 
   Object.assign(assignments, additional.positions)
   return assignments
+}
+
+function getInGameMemberPositionAssignment(member: {
+  selectedPosition: string
+  selectedRole: string
+}): OngoingGamePositionAssignment {
+  const role = parseSelectedRole(member.selectedRole)
+
+  return {
+    position: member.selectedPosition,
+    role,
+    isAutofilled: role.assignmentReason === 'AUTOFILL'
+  }
 }
 
 export function getLiveTeams(args: {
@@ -379,7 +383,8 @@ function mergeChampSelectHandoffPositionAssignments(
   for (const [puuid, player] of Object.entries(snapshot.players)) {
     assignments[puuid] ??= {
       position: player.position || 'NONE',
-      role: null
+      role: null,
+      isAutofilled: false
     }
   }
 }

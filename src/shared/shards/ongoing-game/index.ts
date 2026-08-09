@@ -19,12 +19,18 @@ export interface OngoingGameSimplifiedChampMastery {
   lastPlayTime: number
 }
 
+export interface OngoingGamePositionAssignment {
+  position: string
+  role: ParsedRole | null
+  isAutofilled: boolean
+}
+
 export interface AdditionalResult {
   teams: Record<string, string[]>
   selections: Record<string, number>
   teamParticipantGroups: Record<string, number>
   spells: Record<string, { spell1Id: number; spell2Id: number }>
-  positions: Record<string, { position: string; role: ParsedRole | null }>
+  positions: Record<string, OngoingGamePositionAssignment>
 }
 
 interface QueryStageGameInfo {

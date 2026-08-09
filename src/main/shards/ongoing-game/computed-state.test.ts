@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { LeagueClientData } from '../league-client/lc-state'
 import { ChampSelectHandoffSnapshot } from './champ-select-handoff'
 import {
+  getDraftPositionAssignments,
   getLiveChampionSelections,
   getLivePositionAssignments,
   getLiveTeams
@@ -34,6 +35,16 @@ const inGameQueryStage: Extract<QueryStage, { phase: 'in-game' }> = {
   }
 }
 
+const champSelectQueryStage: Extract<QueryStage, { phase: 'champ-select' }> = {
+  phase: 'champ-select',
+  gameInfo: {
+    queueId: 420,
+    queueType: 'CLASSIC',
+    gameMode: 'CLASSIC',
+    gameId: 12345
+  }
+}
+
 const deobfuscationEnabled = true
 
 function createInGameData(): LeagueClientData {
@@ -54,7 +65,7 @@ function createInGameData(): LeagueClientData {
               puuid: 'real1',
               championId: 2,
               selectedPosition: 'JUNGLE',
-              selectedRole: 'JUNGLE.PRIMARY.JUNGLE.TOP'
+              selectedRole: 'JUNGLE.AUTOFILL.JUNGLE.TOP'
             }
           ],
           teamTwo: []
@@ -63,6 +74,93 @@ function createInGameData(): LeagueClientData {
     }
   } as unknown as LeagueClientData
 }
+
+function createChampSelectData(): LeagueClientData {
+  return {
+    champSelect: {
+      session: {
+        myTeam: [
+          {
+            puuid: 'autofilled',
+            nameVisibilityType: 'VISIBLE',
+            obfuscatedPuuid: '',
+            team: 100,
+            championId: 1,
+            championPickIntent: 0,
+            assignedPosition: 'utility',
+            isAutofilled: true,
+            spell1Id: 4,
+            spell2Id: 14
+          },
+          {
+            puuid: 'primary',
+            nameVisibilityType: 'VISIBLE',
+            obfuscatedPuuid: '',
+            team: 100,
+            championId: 2,
+            championPickIntent: 0,
+            assignedPosition: 'top',
+            isAutofilled: false,
+            spell1Id: 4,
+            spell2Id: 12
+          }
+        ],
+        theirTeam: []
+      }
+    }
+  } as unknown as LeagueClientData
+}
+
+describe('champ-select position assignments', () => {
+  it('preserves the LCU autofill indicator', () => {
+    expect(
+      getLivePositionAssignments({
+        data: createChampSelectData(),
+        queryStage: champSelectQueryStage,
+        additional: emptyAdditional,
+        deobfuscationEnabled
+      })
+    ).toEqual({
+      autofilled: {
+        position: 'UTILITY',
+        role: null,
+        isAutofilled: true
+      },
+      primary: {
+        position: 'TOP',
+        role: null,
+        isAutofilled: false
+      }
+    })
+  })
+})
+
+describe('draft position assignments', () => {
+  it('defaults autofill to false when the source has no assignment reason', () => {
+    expect(
+      getDraftPositionAssignments({
+        gameModeKind: 'normal',
+        queueId: 420,
+        puuid: 'p1',
+        teams: { 'TEAM-100': ['p1'] },
+        championSelections: { p1: 1 },
+        positions: {
+          p1: {
+            selected: 'top',
+            primary: 'top',
+            secondary: 'jungle'
+          }
+        }
+      })
+    ).toEqual({
+      p1: {
+        position: 'TOP',
+        role: null,
+        isAutofilled: false
+      }
+    })
+  })
+})
 
 describe('champ-select handoff state merge', () => {
   it('supplements missing in-game players without overwriting authoritative data', () => {
@@ -129,15 +227,17 @@ describe('champ-select handoff state merge', () => {
         position: 'JUNGLE',
         role: {
           current: 'JUNGLE',
-          assignmentReason: 'PRIMARY',
+          assignmentReason: 'AUTOFILL',
           primary: 'JUNGLE',
           secondary: 'TOP',
           fill: 'NONE'
-        }
+        },
+        isAutofilled: true
       },
       handoff1: {
         position: 'TOP',
-        role: null
+        role: null,
+        isAutofilled: false
       }
     })
   })

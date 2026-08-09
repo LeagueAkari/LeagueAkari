@@ -239,6 +239,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
           puuid: 'p1',
           championId: 1,
           assignedPosition: 'top',
+          isAutofilled: true,
           spell1Id: 4,
           spell2Id: 14,
           team: 100
@@ -262,6 +263,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
         teamIdentifier: 'TEAM-100',
         championId: 1,
         position: 'TOP',
+        isAutofilled: true,
         spell1Id: 4,
         spell2Id: 14
       },
@@ -270,6 +272,7 @@ describe('buildChampSelectHandoffSnapshot', () => {
         teamIdentifier: 'TEAM-200',
         championId: 99,
         position: 'MIDDLE',
+        isAutofilled: false,
         spell1Id: 7,
         spell2Id: 4
       }

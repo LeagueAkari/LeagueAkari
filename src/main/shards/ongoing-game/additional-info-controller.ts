@@ -1,8 +1,8 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { ONGOING_GAME_GSM_BY_PUUID_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
-import { AdditionalResult } from '@shared/shards/ongoing-game'
+import { AdditionalResult, OngoingGamePositionAssignment } from '@shared/shards/ongoing-game'
 import { isAbortError } from '@shared/utils/queue-keeper'
-import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
+import { parseSelectedRole } from '@shared/utils/ranked'
 import { isAxiosError } from 'axios'
 import { compareStructural } from 'mobx'
 
@@ -28,6 +28,18 @@ type AdditionalInfoQueryResult = {
   teamTwo: TeamPropsToBeExtracted[]
   spells: SummonerSpellSelection[]
   gameMode: string
+}
+
+function getTeamMemberPositionAssignment(
+  member: TeamPropsToBeExtracted
+): OngoingGamePositionAssignment {
+  const role = parseSelectedRole(member.selectedRole)
+
+  return {
+    position: member.selectedPosition,
+    role,
+    isAutofilled: role.assignmentReason === 'AUTOFILL'
+  }
 }
 
 export function extractTeamMembers(
@@ -66,13 +78,10 @@ export function extractTeamMembers(
       ),
       positions: all.reduce(
         (acc, p) => {
-          acc[p.puuid] = {
-            position: p.selectedPosition,
-            role: parseSelectedRole(p.selectedRole)
-          }
+          acc[p.puuid] = getTeamMemberPositionAssignment(p)
           return acc
         },
-        {} as Record<string, { position: string; role: ParsedRole | null }>
+        {} as Record<string, OngoingGamePositionAssignment>
       )
     }
   }
@@ -109,10 +118,10 @@ export function extractTeamMembers(
     ),
     positions: all.reduce(
       (acc, p) => {
-        acc[p.puuid] = { position: p.selectedPosition, role: parseSelectedRole(p.selectedRole) }
+        acc[p.puuid] = getTeamMemberPositionAssignment(p)
         return acc
       },
-      {} as Record<string, { position: string; role: ParsedRole | null }>
+      {} as Record<string, OngoingGamePositionAssignment>
     )
   } as AdditionalResult
 }
@@ -176,7 +185,7 @@ export class OngoingGameAdditionalInfoController {
           spell2Id: number
         }
       >
-      const mergedPositions = {} as Record<string, { position: string; role: ParsedRole | null }>
+      const mergedPositions = {} as Record<string, OngoingGamePositionAssignment>
 
       for (const result of results) {
         if (result.status === 'fulfilled' && result.value) {
