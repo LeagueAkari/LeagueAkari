@@ -45,7 +45,7 @@ export class OngoingGameSettings implements OngoingGameSettingsData {
    */
   gameDetailsLoadCount: number = 20
 
-  concurrency: number = 4
+  concurrency: number = 2
 
   /**
    * 战绩查询时, 优先查询当前模式还是全部模式, 仅当 SGP API 启用时有效

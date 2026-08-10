@@ -27,7 +27,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const settings = shallowReactive<OngoingGameSettingsData>({
     enabled: true,
     matchHistoryLoadCount: 50,
-    concurrency: 4,
+    concurrency: 2,
     matchHistoryTagPreference: 'current',
     gameDetailsLoadCount: 20,
     premadeTeamInferMatchCountThreshold: 5,
