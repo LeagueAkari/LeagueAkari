@@ -1,7 +1,7 @@
 import { NATIVE_SUPPORT, nativeInput } from '@main/native'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
-import icon from '@resources/LA_ICON.ico?asset'
+import icon from '@resources/LA_ICON.ico?asset&asarUnpack'
 import { sleep } from '@shared/utils/sleep'
 import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'

@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import icon from '@resources/LA_ICON.ico?asset'
+import icon from '@resources/LA_ICON.ico?asset&asarUnpack'
 import { Notification } from 'electron'
 import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'

@@ -1,5 +1,5 @@
 import { GameClientMain } from '@main/shards/game-client'
-import icon from '@resources/OPGG_ICON.ico?asset'
+import icon from '@resources/OPGG_ICON.ico?asset&asarUnpack'
 import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'
 
