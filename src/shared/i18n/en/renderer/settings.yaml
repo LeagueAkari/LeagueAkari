@@ -100,15 +100,20 @@ settings:
         description: Set the main window background mode
         options:
           profileSkin: Champion Background
-          none: None
+          customImage: Custom Wallpaper
+          none: Default
           mica: Mica
         tooltips:
           profileSkin: Use the current player's profile background skin as the main window background
-          mica: Available only on newer Windows versions. If unsupported on the current platform, it falls back to None
-          micaUnsupported: Mica is not supported on the current platform and will fall back to None
-      useProfileSkinAsBackground:
-        label: Use Profile Skin as Background
-        description: $t(common:appName) will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
+          mica: Available only on newer Windows versions. If unsupported on the current platform, it falls back to the default background
+          micaUnsupported: Mica is not supported on the current platform and will fall back to the default background
+      customBackground:
+        label: Custom Wallpaper
+        description: Use a fixed local image or video as the background. The wallpaper is center-cropped
+        filePath: File Path
+        filePlaceholder: No wallpaper file selected
+        browse: Browse
+        overlayStrength: Overlay Depth
       backgroundMaterial:
         label: Background Material
         description: Set the background material of the application interface, requires specific system version support

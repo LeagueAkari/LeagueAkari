@@ -100,15 +100,20 @@ settings:
         description: 设置主界面的背景显示方式
         options:
           profileSkin: 英雄背景
-          none: 无
+          customImage: 自定义壁纸
+          none: 默认
           mica: Mica
         tooltips:
           profileSkin: 使用当前玩家的生涯背景皮肤作为主界面背景
-          mica: 仅 Windows 高版本系统可用。如果当前平台不可用，会回退到“无”
-          micaUnsupported: 当前平台不支持 Mica，会回退到“无”
-      useProfileSkinAsBackground:
-        label: 使用生涯皮肤背景
-        description: $t(common:appName) 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
+          mica: 仅 Windows 高版本系统可用。如果当前平台不可用，会回退到默认背景
+          micaUnsupported: 当前平台不支持 Mica，会回退到默认背景
+      customBackground:
+        label: 自定义壁纸
+        description: 使用固定的本地图片或视频作为背景。壁纸会居中裁剪
+        filePath: 文件路径
+        filePlaceholder: 尚未选择壁纸文件
+        browse: 浏览
+        overlayStrength: 蒙层深度
       backgroundMaterial:
         label: 背景材质
         description: 设置应用界面的背景材质，需特定系统版本支持

@@ -47,15 +47,8 @@ body {
 
 body {
   user-select: none;
-  background-color: var(--la-background-color-primary);
   color: var(--la-color-text-primary);
   line-height: normal;
-}
-
-html.mica-enabled,
-body.mica-enabled,
-html.mica-enabled #app {
-  background-color: transparent !important;
 }
 
 a,

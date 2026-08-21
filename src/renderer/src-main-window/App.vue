@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="app-frame"
-    :class="{
-      mica: preferMica,
-      'use-plain-bg': !backgroundImageUrl
-    }"
-  >
+  <div class="app-frame">
     <SettingsModal
       ref="settingsModal"
       v-model:show="isShowingSettingModal"
@@ -21,6 +15,7 @@
     <MainWindowCloseConfirmModal />
 
     <SetupInAppScope />
+    <MainWindowBackground />
 
     <div class="app-frame__left">
       <Sidebar />
@@ -39,21 +34,6 @@
         </RouterView>
       </div>
     </div>
-
-    <!--transition background profile skin -->
-    <Transition name="bg-fade">
-      <div
-        v-if="backgroundImageUrl && !preferMica"
-        :key="backgroundImageUrl"
-        class="background-wallpaper"
-        :class="{
-          'no-image': !backgroundImageUrl
-        }"
-        :style="{
-          backgroundImage: `url('${backgroundImageUrl}')`
-        }"
-      ></div>
-    </Transition>
 
     <!-- watermark -->
     <div v-if="as.isRabiVersion" class="version-watermark">
@@ -76,7 +56,7 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { nextTick, onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
@@ -88,16 +68,14 @@ import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import type { SettingsTabName } from './components/settings-modal/navigation'
 import type { StorageSettingsTabName } from './components/settings-modal/storage-settings/navigation'
 import MainWindowTitlebar from './components/titlebar/MainWindowTitlebar.vue'
-import { useMicaAvailability } from './composables/useMicaAvailability'
 import { provideMainWindowAppContext } from './context'
 import {
   MAIN_WINDOW_NAVIGATION_STEP_KEY,
   type MainWindowNavigationPayload
 } from './navigation-steps'
 import { type SettingsNavigationTargetId, navigateToSetting } from './settings-navigation'
-import { MainWindowUiRenderer } from './shards/main-window-ui'
+import MainWindowBackground from './shards/main-window-ui/MainWindowBackground.vue'
 
-const mui = useInstance(MainWindowUiRenderer)
 const navigation = useAkariNavigation()
 
 const app = useInstance(AppCommonRenderer)
@@ -185,22 +163,6 @@ provideMainWindowAppContext({
   }
 })
 
-const preferMica = useMicaAvailability()
-const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
-
-const toggleMicaClass = (enabled: boolean) => {
-  document.documentElement.classList.toggle('mica-enabled', enabled)
-  document.body.classList.toggle('mica-enabled', enabled)
-}
-
-watchEffect(() => {
-  toggleMicaClass(preferMica.value)
-})
-
-onBeforeUnmount(() => {
-  toggleMicaClass(false)
-})
-
 app.onApplicationMenuAboutClick(() => {
   isShowingSettingModal.value = true
   settingModelTab.value = 'about'
@@ -219,10 +181,7 @@ app.onApplicationMenuSettingsClick(() => {
   display: flex;
   min-width: var(--la-app-min-width);
   min-height: var(--la-app-min-height);
-
-  &.use-plain-bg:not(.mica) {
-    background-color: var(--la-background-color-primary);
-  }
+  isolation: isolate;
 
   .app-frame__left {
     background-color: rgba(189, 189, 189, 0.2);
@@ -262,81 +221,5 @@ app.onApplicationMenuSettingsClick(() => {
     opacity: 0.4;
     pointer-events: none;
   }
-}
-
-.background-wallpaper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    background: linear-gradient(
-      180deg,
-      rgba(243, 243, 244, 0.9) 0%,
-      rgba(243, 243, 244, 0.95) 75%,
-      rgba(243, 243, 244, 0.95) 100%
-    );
-  }
-
-  &.no-image::before {
-    background: none;
-  }
-
-  [data-theme='dark'] &::before {
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.88) 0%,
-      rgba(0, 0, 0, 0.92) 75%,
-      rgba(0, 0, 0, 0.92) 100%
-    );
-  }
-
-  [data-theme-id]:not([data-theme-id='light']):not([data-theme-id='dark']) &::before {
-    background: linear-gradient(
-      180deg,
-      var(--la-wallpaper-overlay-start) 0%,
-      var(--la-wallpaper-overlay-mid) 72%,
-      var(--la-wallpaper-overlay-end) 100%
-    );
-  }
-}
-
-.app-background {
-  position: relative;
-  height: 100%;
-  display: flex;
-  min-width: var(--la-app-min-width);
-  min-height: var(--la-app-min-height);
-
-  &.use-plain-bg:not(.mica) {
-    background-color: var(--la-background-color-primary);
-  }
-}
-
-.bg-fade-enter-active,
-.bg-fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.bg-fade-enter-from,
-.bg-fade-leave-to {
-  opacity: 0;
-}
-
-.bg-fade-enter-to,
-.bg-fade-leave-from {
-  opacity: 1;
 }
 </style>

@@ -169,6 +169,15 @@ const targetDefinitions = [
     descriptionKey: 'settings.app.mainWindowUi.background.description'
   },
   {
+    id: 'app.main-window-ui.custom-background',
+    route: { tab: 'basic' },
+    parentId: 'app.main-window-ui',
+    fallbackId: 'app.main-window-ui.background',
+    labelKey: 'settings.app.mainWindowUi.customBackground.label',
+    descriptionKey: 'settings.app.mainWindowUi.customBackground.description',
+    searchable: false
+  },
+  {
     id: 'app.lcu-connection',
     route: { tab: 'basic' },
     labelKey: 'settings.app.lcConnection.title',

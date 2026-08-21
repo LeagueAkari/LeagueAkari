@@ -318,6 +318,48 @@
             </NFlex>
           </NRadioGroup>
         </SettingsRow>
+        <NCollapseTransition :show="mainWindowBackgroundMode === 'custom-image'">
+          <SettingsRow
+            setting-id="app.main-window-ui.custom-background"
+            :label="t('settings.app.mainWindowUi.customBackground.label')"
+            :label-description="t('settings.app.mainWindowUi.customBackground.description')"
+            control-full-line
+            align="start"
+          >
+            <div class="flex w-full flex-col gap-3">
+              <div>
+                <div class="mb-1 text-xs text-black/60 dark:text-white/60">
+                  {{ t('settings.app.mainWindowUi.customBackground.filePath') }}
+                </div>
+                <div class="flex gap-2">
+                  <NInput
+                    class="min-w-0 flex-1"
+                    size="small"
+                    readonly
+                    :value="customBackgroundFilePath"
+                    :placeholder="t('settings.app.mainWindowUi.customBackground.filePlaceholder')"
+                  />
+                  <NButton size="small" secondary @click="() => mui.selectCustomBackgroundFile()">
+                    {{ t('settings.app.mainWindowUi.customBackground.browse') }}
+                  </NButton>
+                </div>
+              </div>
+              <div>
+                <div class="mb-1 text-xs text-black/60 dark:text-white/60">
+                  {{ t('settings.app.mainWindowUi.customBackground.overlayStrength') }}
+                </div>
+                <NSlider
+                  :min="0"
+                  :max="1"
+                  :step="0.01"
+                  :value="customBackgroundOverlayStrength"
+                  :format-tooltip="(value) => `${Math.round(value * 100)}%`"
+                  @update:value="(value) => mui.setCustomBackgroundOverlayStrength(value)"
+                />
+              </div>
+            </div>
+          </SettingsRow>
+        </NCollapseTransition>
       </SettingsSection>
       <SettingsSection
         setting-id="app.lcu-connection"
@@ -490,6 +532,7 @@ import {
   NRadioGroup,
   NScrollbar,
   NSelect,
+  NSlider,
   NStep,
   NSteps,
   NSwitch,
@@ -499,7 +542,10 @@ import {
 } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
+import {
+  MainWindowUiRenderer,
+  type MainWindowBackgroundMode
+} from '@main-window/shards/main-window-ui'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 
 import { APP_SETTINGS_NAVIGATION_STEP_KEY, type AppSettingsNavigationPayload } from './navigation'
@@ -512,11 +558,11 @@ const sus = useSelfUpdateStore()
 const sgps = useSgpStore()
 const wms = useWindowManagerStore()
 const as = useAppCommonStore()
-const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 const ls = useLoggerStore()
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
+const mui = useInstance(MainWindowUiRenderer)
 const app = useInstance(AppCommonRenderer)
 const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
@@ -597,19 +643,9 @@ const logLevels = [
   { label: 'Debug', value: 'debug' }
 ]
 
-type MainWindowBackgroundMode = 'profile-skin' | 'none' | 'mica'
-
-const mainWindowBackgroundMode = computed<MainWindowBackgroundMode>(() => {
-  if (wms.settings.backgroundMaterial === 'mica') {
-    return 'mica'
-  }
-
-  if (muis.frontendSettings.useProfileSkinAsBackground) {
-    return 'profile-skin'
-  }
-
-  return 'none'
-})
+const mainWindowBackgroundMode = mui.useBackgroundMode()
+const { filePath: customBackgroundFilePath, overlayStrength: customBackgroundOverlayStrength } =
+  mui.useCustomBackgroundSettings()
 
 const mainWindowBackgroundModeOptions = computed(() => {
   return [
@@ -617,6 +653,10 @@ const mainWindowBackgroundModeOptions = computed(() => {
       label: t('settings.app.mainWindowUi.background.options.profileSkin'),
       value: 'profile-skin',
       tooltip: t('settings.app.mainWindowUi.background.tooltips.profileSkin')
+    },
+    {
+      label: t('settings.app.mainWindowUi.background.options.customImage'),
+      value: 'custom-image'
     },
     {
       label: t('settings.app.mainWindowUi.background.options.none'),
@@ -632,16 +672,7 @@ const mainWindowBackgroundModeOptions = computed(() => {
 })
 
 const handleMainWindowBackgroundModeUpdate = (value: string | number | boolean) => {
-  const mode = value as MainWindowBackgroundMode
-
-  if (mode === 'profile-skin') {
-    muis.frontendSettings.useProfileSkinAsBackground = true
-    void wm.setBackgroundMaterial('none')
-    return
-  }
-
-  muis.frontendSettings.useProfileSkinAsBackground = false
-  void wm.setBackgroundMaterial(mode === 'mica' ? 'mica' : 'none')
+  void mui.setBackgroundMode(value as MainWindowBackgroundMode)
 }
 
 const dialog = useDialog()

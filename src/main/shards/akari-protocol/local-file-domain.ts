@@ -1,18 +1,18 @@
+import { net } from 'electron'
 import ofs from 'node:original-fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 export function createLocalFileDomainHandler() {
-  const mime = require('mime-types')
-
-  return async (uri: string, _req: Request) => {
-    const filePath = decodeURIComponent(uri)
+  return async (uri: string, req: Request) => {
+    const queryIndex = uri.indexOf('?')
+    const encodedFilePath = queryIndex === -1 ? uri : uri.slice(0, queryIndex)
+    const filePath = decodeURIComponent(encodedFilePath)
     try {
       await ofs.promises.access(filePath, ofs.constants.R_OK)
-      const stream = ofs.createReadStream(path.normalize(filePath))
-      const contentType = mime.lookup(filePath) || 'application/octet-stream'
-      return new Response(stream, {
-        status: 200,
-        headers: { 'Content-Type': contentType }
+      return net.fetch(pathToFileURL(path.normalize(filePath)).toString(), {
+        method: req.method,
+        headers: req.headers
       })
     } catch (error: any) {
       switch (error.code) {
