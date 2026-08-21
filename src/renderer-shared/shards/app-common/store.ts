@@ -35,7 +35,12 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const { t } = useTranslation()
 
   const version = ref('0.0.0')
-  const isRabiVersion = computed(() => version.value.includes('-rabi'))
+  const isRabiVersion = computed(
+    () =>
+      version.value.includes('-rabi') ||
+      version.value.includes('-beta') ||
+      version.value.includes('-alpha')
+  )
   const isElevated = ref(false)
   const platform = ref<AkariSupportedPlatform>('unknown')
   const isWindows = computed(() => platform.value === 'win32')
