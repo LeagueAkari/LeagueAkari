@@ -16,11 +16,9 @@ import {
   getEnabledAutoSelectGroups,
   getPreferredAutoSelectGroupId
 } from './automation-status-model'
+import type { AutomationStatusItem } from './types'
 
-export interface EnabledAutomation {
-  readonly id: string
-  readonly label: string
-  readonly detail?: string
+export interface EnabledAutomation extends AutomationStatusItem {
   readonly targetId: SettingsNavigationTargetId
   readonly navigationOptions?: NavigateToSettingOptions
 }

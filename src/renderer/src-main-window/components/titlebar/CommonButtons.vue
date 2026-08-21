@@ -100,36 +100,16 @@
         </div>
       </div>
     </NDropdown>
-
-    <!-- tasks -->
-    <HorizontalExpand :show="bts.tasks.length !== 0" class="h-full">
-      <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" raw>
-        <template #trigger>
-          <div class="common-button-outer">
-            <SpinningIcon
-              :spinning="overallProgress !== 1"
-              :count="bts.tasks.length"
-              :progress="overallProgress"
-              :class="{ 'all-finished': overallProgress === 1 }"
-              class="common-button-inner common-button-inner-img"
-            />
-          </div>
-        </template>
-        <BackgroundTasks />
-      </NPopover>
-    </HorizontalExpand>
   </div>
 </template>
 
 <script setup lang="ts">
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
-import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -156,8 +136,6 @@ import { computed, h, ref } from 'vue'
 import { SimpleNotificationsRenderer } from '@main-window/shards/simple-notifications'
 import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifications/store'
 
-import BackgroundTasks from '../BackgroundTasks.vue'
-
 const { t } = useTranslation()
 
 const mws = useMainWindowStore()
@@ -169,22 +147,6 @@ const as = useAppCommonStore()
 const wm = useInstance(WindowManagerRenderer)
 const sn = useInstance(SimpleNotificationsRenderer)
 const app = useInstance(AppCommonRenderer)
-
-const bts = useBackgroundTasksStore()
-
-const overallProgress = computed(() => {
-  let total = 0
-
-  for (const task of bts.tasks) {
-    if (task.progress !== null) {
-      total += task.progress
-    } else {
-      total += 1
-    }
-  }
-
-  return total / bts.tasks.length
-})
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
@@ -310,8 +272,6 @@ const setRead = () => {
 </script>
 
 <style scoped>
-@reference '@renderer-shared/assets/css/tailwind.css';
-
 .common-buttons {
   height: 100%;
   display: flex;
@@ -501,12 +461,6 @@ const setRead = () => {
     .common-button-inner {
       color: rgba(66, 57, 48, 0.88);
     }
-  }
-}
-
-@layer components {
-  .all-finished {
-    @apply text-green-700! dark:text-green-300!;
   }
 }
 </style>
