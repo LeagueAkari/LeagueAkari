@@ -52,7 +52,8 @@ export class OngoingGameSideEffectsController {
               region: leagueClient.state.auth.region,
               rsoPlatformId: leagueClient.state.auth.rsoPlatformId,
               selfPuuid: leagueClient.data.summoner.me.puuid,
-              queueType: state.queryStage.gameInfo.queueType
+              queueType: state.queryStage.gameInfo.queueType,
+              championId: state.championSelections[player] ?? null
             })
 
             logger.info(`Save game info: ${state.queryStage.gameInfo.gameId}`)
