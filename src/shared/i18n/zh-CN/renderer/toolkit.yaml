@@ -453,10 +453,15 @@ toolkit:
         listTitle: 文案列表
         addLimitReached: 最多只能创建 {{count}} 条固定文案
         unnamed: 未命名
+        unsaved: 有未保存的修改
         editTitle: 编辑标题
+        expand: 放大编辑
+        expandedTitle: 编辑固定文案：{{title}}
+        editorLoadFailed: Monaco 编辑器加载失败：{{reason}}
         shortcutLabel: 快捷键
         shortcutDescription: 按下后发送此条已保存的固定文案
         save: 保存
+        revert: 还原
         saved: 已保存
         saveFailed: 保存失败
         createFailed: 新增失败
@@ -464,8 +469,7 @@ toolkit:
         deleted: 已删除
         deleteFailed: 删除失败
         deleteConfirm: 确认删除？
-        moveUp: 上移
-        moveDown: 下移
+        dragHandle: 拖动“{{title}}”调整顺序
         sendToGame: 发送到游戏
         sendToChat: 发送到聊天
         send: 发送
@@ -476,6 +480,45 @@ toolkit:
           saveFirst: 请先保存当前修改
           draftOnly: 草稿模式不可发送
           unavailable: 仅可在英雄选择、房间或游戏内使用
+      customTemplate:
+        label: 自定义模板
+        risk:
+          title: 使用前请注意
+          description: 自定义模板可以访问并修改应用中的信息。来源不明或有问题的模板可能泄露信息、破坏数据，甚至导致应用崩溃。只使用你信任的模板；如果不确定它会做什么，请不要使用。AI 生成的模板也不一定安全。
+        empty:
+          description: 还没有自定义模板。新增后编写并保存 JavaScript 代码。
+          action: 新增自定义模板
+        listTitle: 模板列表
+        addLimitReached: 最多只能创建 {{count}} 条自定义模板
+        unnamed: 未命名模板
+        unsaved: 有未保存的修改
+        dragHandle: 拖动“{{title}}”调整顺序
+        delete: 删除
+        deleteConfirm: 确认删除此模板？
+        deleted: 已删除
+        deleteFailed: 删除失败
+        createFailed: 新增失败
+        editTitle: 编辑标题
+        save: 保存
+        saved: 已保存
+        saveFailed: 保存失败
+        revert: 还原
+        expand: 放大编辑
+        expandedTitle: 编辑模板：{{title}}
+        editorLoadFailed: Monaco 编辑器加载失败：{{reason}}
+        runFailed: 模板运行失败，请查看上一次错误
+        lastErrorTitle: 上一次错误 · {{stage}} · {{target}} · {{time}}
+        errorStage:
+          load: 加载代码
+          contract: 检查函数
+          execute: 执行函数
+          result: 检查返回值
+        errorTarget:
+          friendly: 我方
+          enemy: 敌方
+          all: 全体
+        disabled:
+          saveFirst: 请先保存当前修改
   claim:
     rewards:
       title: 奖励

@@ -1,4 +1,5 @@
 import type {
+  InGameSendCustomTemplateItem,
   InGameSendFixedTextPresetItem,
   InGameSendJunglePresetOptions,
   InGameSendPremadePresetOptions,
@@ -63,5 +64,15 @@ export const inGameSendFixedTextPresetItemsSchema: z.ZodType<InGameSendFixedText
       title: z.string(),
       shortcut: z.string().nullable(),
       content: z.string()
+    })
+  )
+
+export const inGameSendCustomTemplateItemsSchema: z.ZodType<InGameSendCustomTemplateItem[]> =
+  z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      code: z.string(),
+      targetShortcuts: presetTargetShortcutsSchema
     })
   )

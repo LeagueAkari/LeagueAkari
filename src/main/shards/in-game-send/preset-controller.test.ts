@@ -102,6 +102,23 @@ describe('InGameSendPresetController fixed text preset', () => {
     ])
   })
 
+  it('reorders fixed text directly to the dropped index', async () => {
+    const { controller, settings } = createController()
+    settings.fixedTextPresetItems = ['first', 'second', 'third'].map((id) => ({
+      id,
+      title: id,
+      shortcut: null,
+      content: ''
+    }))
+
+    await expect(controller.reorderFixedTextPresetItem('third', 0)).resolves.toBe(true)
+    expect(settings.fixedTextPresetItems.map((item) => item.id)).toEqual([
+      'third',
+      'first',
+      'second'
+    ])
+  })
+
   it('registers one shortcut target for each saved fixed text item', () => {
     const { context, controller, settings } = createController()
     settings.fixedTextPresetItems = [

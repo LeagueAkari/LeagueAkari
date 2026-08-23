@@ -1,8 +1,11 @@
 import {
+  type InGameSendCustomTemplateItem,
+  type InGameSendCustomTemplateLastError,
   type InGameSendFixedTextPresetItem,
   type InGameSendJunglePresetOptions,
   type InGameSendPremadePresetOptions,
   type InGameSendRatingPresetOptions,
+  createDefaultInGameSendCustomTemplateItems,
   createDefaultInGameSendFixedTextPresetItems,
   createDefaultInGameSendJunglePresetOptions,
   createDefaultInGameSendPremadePresetOptions,
@@ -19,6 +22,8 @@ export class InGameSendSettings {
     createDefaultInGameSendPremadePresetOptions()
   fixedTextPresetItems: InGameSendFixedTextPresetItem[] =
     createDefaultInGameSendFixedTextPresetItems()
+  customTemplateRiskNoticeShown = false
+  customTemplateItems: InGameSendCustomTemplateItem[] = createDefaultInGameSendCustomTemplateItems()
 
   setCancelShortcut(shortcut: string | null) {
     this.cancelShortcut = shortcut
@@ -33,12 +38,15 @@ export class InGameSendSettings {
       ratingPresetOptions: observableRef,
       junglePresetOptions: observableRef,
       premadePresetOptions: observableRef,
-      fixedTextPresetItems: observableRef
+      fixedTextPresetItems: observableRef,
+      customTemplateItems: observableRef
     })
   }
 }
 
 export class InGameSendState {
+  customTemplateLastErrors: Record<string, InGameSendCustomTemplateLastError> = {}
+
   /** 表现评分预设：选中的 puuid 列表 */
   ratingPuuids: string[] = []
 
@@ -69,11 +77,29 @@ export class InGameSendState {
     this.premadeIndices = []
   }
 
+  setCustomTemplateLastError(id: string, error: InGameSendCustomTemplateLastError) {
+    this.customTemplateLastErrors = {
+      ...this.customTemplateLastErrors,
+      [id]: error
+    }
+  }
+
+  clearCustomTemplateLastError(id: string) {
+    if (!(id in this.customTemplateLastErrors)) {
+      return
+    }
+
+    const nextErrors = { ...this.customTemplateLastErrors }
+    delete nextErrors[id]
+    this.customTemplateLastErrors = nextErrors
+  }
+
   constructor() {
     makeAutoObservable(this, {
       ratingPuuids: observableRef,
       junglePuuids: observableRef,
-      premadeIndices: observableRef
+      premadeIndices: observableRef,
+      customTemplateLastErrors: observableRef
     })
   }
 }

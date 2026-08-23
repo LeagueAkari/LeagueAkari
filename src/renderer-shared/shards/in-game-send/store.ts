@@ -1,4 +1,6 @@
 import {
+  type InGameSendCustomTemplateLastError,
+  createDefaultInGameSendCustomTemplateItems,
   createDefaultInGameSendFixedTextPresetItems,
   createDefaultInGameSendJunglePresetOptions,
   createDefaultInGameSendPremadePresetOptions,
@@ -14,7 +16,9 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
     ratingPresetOptions: createDefaultInGameSendRatingPresetOptions(),
     junglePresetOptions: createDefaultInGameSendJunglePresetOptions(),
     premadePresetOptions: createDefaultInGameSendPremadePresetOptions(),
-    fixedTextPresetItems: createDefaultInGameSendFixedTextPresetItems()
+    fixedTextPresetItems: createDefaultInGameSendFixedTextPresetItems(),
+    customTemplateRiskNoticeShown: false,
+    customTemplateItems: createDefaultInGameSendCustomTemplateItems()
   })
 
   /**
@@ -29,7 +33,8 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
   const state = shallowReactive({
     ratingPuuids: [] as string[],
     junglePuuids: [] as string[],
-    premadeIndices: [] as number[]
+    premadeIndices: [] as number[],
+    customTemplateLastErrors: {} as Record<string, InGameSendCustomTemplateLastError>
   })
 
   return {

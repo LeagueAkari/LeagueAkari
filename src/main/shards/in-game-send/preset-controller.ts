@@ -2,7 +2,6 @@ import {
   IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS,
   IN_GAME_SEND_PRESET_TARGETS,
   type InGameSendFixedTextPresetItem,
-  type InGameSendFixedTextPresetItemMoveDirection,
   type InGameSendFixedTextPresetItemPatch,
   type InGameSendJunglePresetOptionPatch,
   type InGameSendJunglePresetOptions,
@@ -31,9 +30,7 @@ import type { InGameSendExecutor } from './send-executor'
 import type { InGameSendSettings } from './state'
 
 type InGameSendPresetOptionsSettingKey =
-  | 'ratingPresetOptions'
-  | 'junglePresetOptions'
-  | 'premadePresetOptions'
+  'ratingPresetOptions' | 'junglePresetOptions' | 'premadePresetOptions'
 
 type InGameSendPresetOptionsValue = InGameSendSettings[InGameSendPresetOptionsSettingKey]
 
@@ -182,24 +179,22 @@ export class InGameSendPresetController {
     return true
   }
 
-  async moveFixedTextPresetItem(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
+  async reorderFixedTextPresetItem(id: string, targetIndex: number) {
     const currentItems = this._context.settings.fixedTextPresetItems
     const itemIndex = currentItems.findIndex((item) => item.id === id)
 
-    if (itemIndex === -1) {
-      return false
-    }
-
-    const nextIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1
-
-    if (nextIndex < 0 || nextIndex >= currentItems.length) {
+    if (
+      itemIndex === -1 ||
+      targetIndex < 0 ||
+      targetIndex >= currentItems.length ||
+      targetIndex === itemIndex
+    ) {
       return false
     }
 
     const nextItems = [...currentItems]
-    const movedItem = nextItems[itemIndex]
-    nextItems[itemIndex] = nextItems[nextIndex]
-    nextItems[nextIndex] = movedItem
+    const [movedItem] = nextItems.splice(itemIndex, 1)
+    nextItems.splice(targetIndex, 0, movedItem)
     await this._setFixedTextPresetItems(nextItems)
 
     return true

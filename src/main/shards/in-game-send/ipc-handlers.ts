@@ -1,5 +1,5 @@
 import type {
-  InGameSendFixedTextPresetItemMoveDirection,
+  InGameSendCustomTemplateItemPatch,
   InGameSendFixedTextPresetItemPatch,
   InGameSendJunglePresetOptionPatch,
   InGameSendJunglePresetOptions,
@@ -11,6 +11,7 @@ import type {
 } from '@shared/shards/in-game-send'
 
 import { IN_GAME_SEND_MAIN_NAMESPACE, type InGameSendMainContext } from './context'
+import type { InGameSendCustomTemplateController } from './custom-template-controller'
 import type { InGameSendPresetController } from './preset-controller'
 import type { InGameSendPresetSelectionController } from './preset-selection-controller'
 import type { InGameSendExecutor } from './send-executor'
@@ -25,6 +26,7 @@ export class InGameSendIpcHandlers {
   constructor(
     private readonly _context: InGameSendMainContext,
     private readonly _sendExecutor: InGameSendExecutor,
+    private readonly _customTemplateController: InGameSendCustomTemplateController,
     private readonly _presetController: InGameSendPresetController,
     private readonly _presetSelectionController: InGameSendPresetSelectionController
   ) {}
@@ -92,6 +94,50 @@ export class InGameSendIpcHandlers {
       return this._presetController.sendFixedTextPreset(id)
     })
 
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'markCustomTemplateRiskNoticeShown', () => {
+      return this._customTemplateController.markRiskNoticeShown()
+    })
+
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'createCustomTemplateItem', () => {
+      return this._customTemplateController.createItem()
+    })
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'updateCustomTemplateItem',
+      (_, id: string, patch: InGameSendCustomTemplateItemPatch) => {
+        return this._customTemplateController.updateItem(id, patch)
+      }
+    )
+
+    ipc.onCall(IN_GAME_SEND_MAIN_NAMESPACE, 'deleteCustomTemplateItem', (_, id: string) => {
+      return this._customTemplateController.deleteItem(id)
+    })
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'reorderCustomTemplateItem',
+      (_, id: string, targetIndex: number) => {
+        return this._customTemplateController.reorderItem(id, targetIndex)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'generateCustomTemplateLines',
+      (_, id: string, target: InGameSendPresetTarget) => {
+        return this._customTemplateController.generateLines(id, target)
+      }
+    )
+
+    ipc.onCall(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'sendCustomTemplate',
+      (_, id: string, target: InGameSendPresetTarget) => {
+        return this._customTemplateController.send(id, target)
+      }
+    )
+
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
       'setRatingPresetOptions',
@@ -158,9 +204,9 @@ export class InGameSendIpcHandlers {
 
     ipc.onCall(
       IN_GAME_SEND_MAIN_NAMESPACE,
-      'moveFixedTextPresetItem',
-      (_, id: string, direction: InGameSendFixedTextPresetItemMoveDirection) => {
-        return this._presetController.moveFixedTextPresetItem(id, direction)
+      'reorderFixedTextPresetItem',
+      (_, id: string, targetIndex: number) => {
+        return this._presetController.reorderFixedTextPresetItem(id, targetIndex)
       }
     )
 

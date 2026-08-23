@@ -4,7 +4,7 @@
       {{ t('description') }}
     </div>
 
-    <PresetSendControls :preset="premadePreset" :preset-label="presetLabel" />
+    <PresetSendControls class="pt-4" :preset="premadePreset" :preset-label="presetLabel" />
     <PreviewPanel :preset="premadePreset" />
 
     <NameDisplayStrategySelector

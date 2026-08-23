@@ -28,50 +28,34 @@
         </span>
         <NCheckbox v-model:checked="lineWrapping" size="small">自动换行</NCheckbox>
       </div>
-      <Codemirror
-        class="min-h-0 flex-1 overflow-hidden rounded border border-black/10 dark:border-white/10"
-        :model-value="releaseInfoJson"
+      <NInput
+        class="release-info-editor min-h-0 flex-1"
+        type="textarea"
+        :value="releaseInfoJson"
         :style="{ flex: 1, height: 0, borderRadius: '4px', overflow: 'hidden' }"
-        :autofocus="false"
-        :indent-with-tab="true"
-        :tab-size="2"
-        :extensions="extensions"
-        :disabled="true"
+        :input-props="releaseInfoInputProps"
+        readonly
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { javascript } from '@codemirror/lang-javascript'
-import { EditorView } from '@codemirror/view'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
-import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode'
-import { NButton, NCheckbox } from 'naive-ui'
+import { NButton, NCheckbox, NInput } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { Codemirror } from 'vue-codemirror'
 
-const as = useAppCommonStore()
 const sus = useSelfUpdateStore()
 const su = useInstance(SelfUpdateRenderer)
 
 const isUpdating = ref(false)
 const lineWrapping = ref(true)
 
-const extensions = computed(() => {
-  const exts = [
-    as.colorTheme === 'dark' ? vscodeDark : vscodeLight,
-    javascript(),
-    EditorView.editable.of(false)
-  ]
-  if (lineWrapping.value) {
-    exts.push(EditorView.lineWrapping)
-  }
-  return exts
-})
+const releaseInfoInputProps = computed(() => ({
+  wrap: lineWrapping.value ? 'soft' : 'off'
+}))
 
 const releaseInfoJson = computed(() => {
   if (!sus.releaseInfo) {
@@ -99,3 +83,17 @@ const handleForceUpdate = async () => {
 
 const handleCheckUpdates = () => su.checkUpdates()
 </script>
+
+<style scoped>
+.release-info-editor :deep(.n-input-wrapper),
+.release-info-editor :deep(.n-input__textarea),
+.release-info-editor :deep(.n-input__textarea-el) {
+  height: 100%;
+}
+
+.release-info-editor :deep(.n-input__textarea-el) {
+  resize: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+</style>

@@ -6,6 +6,7 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { computed, ref } from 'vue'
 
 import { useInGameSendTeams } from './composables/usePresetSelections'
+import { provideCustomTemplatePreset, useCustomTemplatePresetData } from './data/custom-template'
 import { provideFixedTextPreset, useFixedTextPresetData } from './data/fixed-text'
 import { provideJunglePreset, useJunglePresetData } from './data/jungle'
 import { providePremadePreset, usePremadePresetData } from './data/premade'
@@ -54,6 +55,11 @@ export function useInGameSendPresetsPanel() {
   const junglePresetOptions = computed(() => inGameSendStore.settings.junglePresetOptions)
   const premadePresetOptions = computed(() => inGameSendStore.settings.premadePresetOptions)
   const fixedTextPresetItems = computed(() => inGameSendStore.settings.fixedTextPresetItems)
+  const customTemplateRiskNoticeShown = computed(
+    () => inGameSendStore.settings.customTemplateRiskNoticeShown
+  )
+  const customTemplateItems = computed(() => inGameSendStore.settings.customTemplateItems)
+  const customTemplateLastErrors = computed(() => inGameSendStore.state.customTemplateLastErrors)
 
   const ratingContext = useRatingPresetData({
     inGameSend,
@@ -95,10 +101,20 @@ export function useInGameSendPresetsPanel() {
     fixedTextPresetItems
   })
 
+  const customTemplateContext = useCustomTemplatePresetData({
+    inGameSend,
+    gamePhase,
+    canSend,
+    riskNoticeShown: customTemplateRiskNoticeShown,
+    items: customTemplateItems,
+    lastErrors: customTemplateLastErrors
+  })
+
   provideRatingPreset(ratingContext)
   provideJunglePreset(jungleContext)
   providePremadePreset(premadeContext)
   provideFixedTextPreset(fixedTextContext)
+  provideCustomTemplatePreset(customTemplateContext)
 
   return {
     activePreset

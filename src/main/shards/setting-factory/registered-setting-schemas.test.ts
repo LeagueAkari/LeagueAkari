@@ -1,4 +1,5 @@
 import {
+  createDefaultInGameSendCustomTemplateItems,
   createDefaultInGameSendFixedTextPresetItems,
   createDefaultInGameSendJunglePresetOptions,
   createDefaultInGameSendPremadePresetOptions,
@@ -16,6 +17,7 @@ import {
   autoSelectPickConfigSchema
 } from '../auto-select/setting-schemas'
 import {
+  inGameSendCustomTemplateItemsSchema,
   inGameSendFixedTextPresetItemsSchema,
   inGameSendJunglePresetOptionsSchema,
   inGameSendPremadePresetOptionsSchema,
@@ -43,6 +45,11 @@ describe('registered complex setting schemas', () => {
       'in-game premade preset',
       inGameSendPremadePresetOptionsSchema,
       createDefaultInGameSendPremadePresetOptions()
+    ],
+    [
+      'in-game custom templates',
+      inGameSendCustomTemplateItemsSchema,
+      createDefaultInGameSendCustomTemplateItems()
     ],
     [
       'in-game fixed text preset',

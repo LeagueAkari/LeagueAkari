@@ -1,9 +1,9 @@
 <template>
-  <div class="fixed-text-preset-pane h-140">
+  <div class="custom-template-preset-pane h-140">
     <div v-if="items.length === 0" class="flex h-full items-center justify-center">
       <NEmpty :description="t('empty.description')">
         <template #icon>
-          <NIcon><DocumentTextIcon /></NIcon>
+          <NIcon><CodeIcon /></NIcon>
         </template>
         <template #extra>
           <NButton type="primary" :loading="isCreating" @click="handleCreate">
@@ -18,10 +18,10 @@
 
     <div
       v-else
-      class="fixed-text-layout grid h-full grid-cols-[208px_minmax(0,1fr)] gap-4 max-[760px]:grid-cols-1"
+      class="custom-template-layout grid h-full grid-cols-[208px_minmax(0,1fr)] gap-4 max-[760px]:grid-cols-1"
     >
       <aside
-        class="fixed-text-sidebar flex min-h-0 min-w-0 flex-col overflow-hidden max-[760px]:max-h-55"
+        class="custom-template-sidebar flex min-h-0 min-w-0 flex-col overflow-hidden max-[760px]:max-h-55"
       >
         <div class="box-border flex h-7 items-center justify-between gap-2 pl-2">
           <div
@@ -50,16 +50,16 @@
 
         <DragDropProvider :modifiers="dragModifiers" @drag-end="handleDragEnd">
           <div
-            class="fixed-text-list flex min-h-0 flex-1 flex-col gap-0.5 overflow-auto pt-1.5 pb-0.5"
+            class="custom-template-list flex min-h-0 flex-1 flex-col gap-0.5 overflow-auto pt-1.5 pb-0.5"
           >
             <SortablePresetListItem
               v-for="(item, index) of items"
               :id="item.id"
               :key="item.id"
-              class="fixed-text-list-item"
+              class="custom-template-list-item"
               :index="index"
-              group="in-game-send-fixed-text"
-              type="in-game-send-fixed-text-item"
+              group="in-game-send-custom-template"
+              type="in-game-send-custom-template-item"
               :title="item.title"
               :unnamed-label="t('unnamed')"
               :drag-label="t('dragHandle', { title: getDisplayTitle(item.title) })"
@@ -68,6 +68,7 @@
               :active="item.id === selectedId"
               :dirty="item.id === selectedId && isDirty"
               :dirty-label="t('unsaved')"
+              :error-summary="lastErrors[item.id] ? getErrorSummary(lastErrors[item.id]) : null"
               @select="handleSelect(item.id)"
               @delete="handleDelete(item.id)"
             />
@@ -75,7 +76,10 @@
         </DragDropProvider>
       </aside>
 
-      <section v-if="selectedItem" class="flex min-h-0 min-w-0 flex-col gap-1.5 p-0">
+      <section
+        v-if="selectedItem && selectedDraft"
+        class="flex min-h-0 min-w-0 flex-col gap-1.5 p-0"
+      >
         <div class="grid h-7 flex-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
           <div v-if="isEditingTitle" class="flex min-w-0 items-center gap-1.5">
             <span
@@ -87,7 +91,7 @@
             </span>
             <NInput
               ref="titleInputRef"
-              :value="draftTitle"
+              :value="selectedDraft.title"
               class="min-w-0 flex-1"
               size="small"
               :maxlength="titleMaxLength"
@@ -113,12 +117,12 @@
             <span
               class="min-w-0 overflow-hidden text-[15px] leading-7 text-ellipsis whitespace-nowrap"
               :class="
-                getTrimmedTitle(draftTitle)
+                getTrimmedTitle(selectedDraft.title)
                   ? 'font-[650] text-black/82 dark:text-white/86'
                   : 'font-medium text-black/38 dark:text-white/38'
               "
             >
-              {{ getDisplayTitle(draftTitle) }}
+              {{ getDisplayTitle(selectedDraft.title) }}
             </span>
           </button>
 
@@ -158,20 +162,12 @@
           </div>
         </div>
 
-        <SettingsRow
-          :label="t('shortcutLabel')"
-          :label-description="t('shortcutDescription')"
-          :label-width="96"
-          :gap="16"
+        <PresetSendControls
           class="flex-none"
-          no-x-padding
-        >
-          <ShortcutSelector
-            :shortcut-id="selectedItem.shortcut"
-            :target-id="fixedTextPreset.getShortcutTargetId(selectedItem.id)"
-            @update:shortcut-id="handleShortcutUpdate"
-          />
-        </SettingsRow>
+          :preset="presetScope"
+          :preset-label="getDisplayTitle(selectedItem.title)"
+          :execution-disabled-reason="executionDisabledReason"
+        />
 
         <div
           class="min-h-0 flex-1 overflow-hidden rounded-[5px] border border-black/10 dark:border-white/10"
@@ -186,56 +182,36 @@
             v-else-if="currentModel && !isExpanded"
             :model="currentModel"
             :theme="monacoTheme"
-            variant="plain-text"
+            variant="javascript"
           />
         </div>
 
         <div class="flex flex-none flex-wrap items-center justify-between gap-2.5">
           <span
-            class="text-xs [font-variant-numeric:tabular-nums]"
+            class="shrink-0 text-xs [font-variant-numeric:tabular-nums]"
             :class="
-              draftContent.length >= contentMaxLength
+              selectedDraft.code.length >= codeMaxLength
                 ? 'text-orange-700/85 dark:text-orange-400/90'
                 : 'text-black/45 dark:text-white/45'
             "
           >
-            {{ draftContent.length }} / {{ contentMaxLength }}
+            {{ selectedDraft.code.length }} / {{ codeMaxLength }}
           </span>
 
-          <div class="flex items-center gap-1.5">
+          <div class="flex flex-none items-center gap-1.5">
             <NButton size="small" :disabled="!isDirty" @click="handleRevert">
               <template #icon>
                 <NIcon><UndoIcon /></NIcon>
               </template>
               {{ t('revert') }}
             </NButton>
-
-            <NTooltip :disabled="!sendDisabledReason">
-              <template #trigger>
-                <span class="inline-flex">
-                  <NButton
-                    size="small"
-                    type="primary"
-                    :disabled="!!sendDisabledReason"
-                    @click="handleSend"
-                  >
-                    <template #icon>
-                      <NIcon><SendIcon /></NIcon>
-                    </template>
-                    {{ sendButtonText }}
-                  </NButton>
-                </span>
-              </template>
-              {{ sendDisabledReason }}
-            </NTooltip>
-
             <NButton
               size="small"
               type="primary"
               secondary
               :loading="isSaving"
               :disabled="!isDirty"
-              @click="handleSaveClick"
+              @click="handleSave"
             >
               <template #icon>
                 <NIcon><SaveIcon /></NIcon>
@@ -244,21 +220,41 @@
             </NButton>
           </div>
         </div>
+
+        <NAlert v-if="currentError" class="flex-none" type="error" :title="currentErrorTitle">
+          <pre
+            class="max-h-48 overflow-auto text-xs wrap-break-word whitespace-pre-wrap select-text"
+            >{{ currentError.error }}</pre>
+        </NAlert>
+
+        <PreviewPanel class="flex-none" :preset="presetScope" />
       </section>
     </div>
 
     <NModal
-      v-if="currentModel"
+      v-model:show="showRiskNotice"
+      preset="card"
+      :title="t('risk.title')"
+      :bordered="false"
+      style="width: min(560px, calc(100vw - 48px))"
+    >
+      <div class="leading-6 text-black/72 dark:text-white/78">
+        {{ t('risk.description') }}
+      </div>
+    </NModal>
+
+    <NModal
+      v-if="currentModel && selectedDraft"
       v-model:show="isExpanded"
       preset="card"
-      :title="t('expandedTitle', { title: getDisplayTitle(draftTitle) })"
+      :title="t('expandedTitle', { title: getDisplayTitle(selectedDraft.title) })"
       :bordered="false"
       style="width: calc(100vw - 48px); max-width: none"
     >
       <div class="flex h-[calc(100vh-132px)] min-h-0 flex-col gap-3">
         <div class="flex flex-wrap items-center justify-end gap-2">
           <span class="text-xs text-black/45 tabular-nums dark:text-white/45">
-            {{ draftContent.length }} / {{ contentMaxLength }}
+            {{ selectedDraft.code.length }} / {{ codeMaxLength }}
           </span>
           <NButton size="small" secondary :disabled="!isDirty" @click="handleRevert">
             {{ t('revert') }}
@@ -268,7 +264,7 @@
             type="primary"
             :loading="isSaving"
             :disabled="!isDirty"
-            @click="handleSaveClick"
+            @click="handleSave"
           >
             {{ t('save') }}
           </NButton>
@@ -279,7 +275,7 @@
           <MonacoEditor
             :model="currentModel"
             :theme="monacoTheme"
-            variant="plain-text"
+            variant="javascript"
             :use-shadow-dom="false"
           />
         </div>
@@ -289,17 +285,18 @@
 </template>
 
 <script setup lang="ts">
-import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
-  IN_GAME_SEND_FIXED_TEXT_PRESET_CONTENT_MAX_LENGTH,
-  IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS,
-  IN_GAME_SEND_FIXED_TEXT_PRESET_TITLE_MAX_LENGTH,
-  type InGameSendFixedTextPresetItem
+  IN_GAME_SEND_CUSTOM_TEMPLATE_CODE_MAX_LENGTH,
+  IN_GAME_SEND_CUSTOM_TEMPLATE_MAX_ITEMS,
+  IN_GAME_SEND_CUSTOM_TEMPLATE_TITLE_MAX_LENGTH,
+  createDefaultInGameSendPresetTargetShortcuts,
+  type InGameSendCustomTemplateItem,
+  type InGameSendCustomTemplateLastError,
+  type InGameSendPresetTarget
 } from '@shared/shards/in-game-send'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
 import { DragDropProvider, type DragEndEvent } from '@dnd-kit/vue'
@@ -307,10 +304,9 @@ import { isSortable } from '@dnd-kit/vue/sortable'
 import {
   Add24Regular as AddIcon,
   ArrowExpand24Regular as ExpandIcon,
-  DocumentText24Regular as DocumentTextIcon,
+  Code24Regular as CodeIcon,
   Edit24Regular as EditIcon,
   Save24Regular as SaveIcon,
-  Send24Filled as SendIcon,
   ArrowUndo24Regular as UndoIcon
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
@@ -326,108 +322,130 @@ import {
   NTooltip,
   useMessage
 } from 'naive-ui'
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  shallowRef,
+  watch
+} from 'vue'
 
-import { useNativeInputStatus } from '../composables/useNativeInputStatus'
-import { useFixedTextPreset } from '../data/fixed-text'
-import { loadMonaco, MonacoEditor, type MonacoApi } from '../monaco'
+import type { PresetScopeContext } from '../data/shared'
+import { useCustomTemplatePreset } from '../data/custom-template'
+import { loadJavaScriptMonaco, MonacoEditor, type MonacoApi } from '../monaco'
+import type { PreviewedLines } from '../types'
+import PresetSendControls from '../widgets/PresetSendControls.vue'
+import PreviewPanel from '../widgets/PreviewPanel.vue'
 import SortablePresetListItem from '../widgets/SortablePresetListItem.vue'
 
-const fixedTextPreset = useFixedTextPreset()
-const appCommonStore = useAppCommonStore()
-const componentName = useComponentName()
-const logger = useInstance(LoggerRenderer)
-const message = useMessage()
-const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.fixedText' })
-const { unavailableReason: nativeInputUnavailableMessage } = useNativeInputStatus()
+interface TemplateDraft {
+  title: string
+  code: string
+}
 
-const maxItems = IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS
-const titleMaxLength = IN_GAME_SEND_FIXED_TEXT_PRESET_TITLE_MAX_LENGTH
-const contentMaxLength = IN_GAME_SEND_FIXED_TEXT_PRESET_CONTENT_MAX_LENGTH
+const customTemplatePreset = useCustomTemplatePreset()
+const appCommonStore = useAppCommonStore()
+const logger = useInstance(LoggerRenderer)
+const componentName = useComponentName()
+const message = useMessage()
+const { t } = useTranslation('renderer', {
+  keyPrefix: 'toolkit.inGameSend.presets.customTemplate'
+})
+
+const maxItems = IN_GAME_SEND_CUSTOM_TEMPLATE_MAX_ITEMS
+const titleMaxLength = IN_GAME_SEND_CUSTOM_TEMPLATE_TITLE_MAX_LENGTH
+const codeMaxLength = IN_GAME_SEND_CUSTOM_TEMPLATE_CODE_MAX_LENGTH
 const dragModifiers = [RestrictToVerticalAxis]
 
 const titleInputRef = ref<InstanceType<typeof NInput> | null>(null)
 const selectedId = ref<string | null>(null)
-const draftTitle = ref('')
-const draftContent = ref('')
-const isDirty = ref(false)
-const isSaving = ref(false)
-const isCreating = ref(false)
-const isEditingTitle = ref(false)
-const isExpanded = ref(false)
-const pendingTitleEditItemId = ref<string | null>(null)
+const drafts = reactive<Record<string, TemplateDraft>>({})
 const models = new Map<string, editor.ITextModel>()
 const modelSubscriptions = new Map<string, IDisposable>()
 const currentModel = shallowRef<editor.ITextModel | null>(null)
 const monacoApi = shallowRef<MonacoApi | null>(null)
 const monacoLoadError = ref<string | null>(null)
 const isLoadingMonaco = ref(false)
+const isExpanded = ref(false)
+const isCreating = ref(false)
+const isSaving = ref(false)
+const isEditingTitle = ref(false)
+const showRiskNotice = ref(false)
+const previewedLines = ref<PreviewedLines | null>(null)
+const pendingTitleEditItemId = ref<string | null>(null)
+const isDirty = ref(false)
 
-const items = computed(() => fixedTextPreset.items.value)
+const items = computed(() => customTemplatePreset.items.value)
+const lastErrors = computed(() => customTemplatePreset.lastErrors.value)
 const selectedItem = computed(
   () => items.value.find((item) => item.id === selectedId.value) ?? null
+)
+const selectedDraft = computed(() => (selectedId.value ? (drafts[selectedId.value] ?? null) : null))
+const currentError = computed(() =>
+  selectedId.value ? (lastErrors.value[selectedId.value] ?? null) : null
 )
 const canCreate = computed(() => items.value.length < maxItems)
 const monacoTheme = computed<'vs' | 'vs-dark'>(() =>
   appCommonStore.colorTheme === 'dark' ? 'vs-dark' : 'vs'
 )
-
-const sendButtonText = computed(() => {
-  if (fixedTextPreset.gamePhase.value === 'in-game') {
-    return t('sendToGame')
+const executionDisabledReason = computed(() => (isDirty.value ? t('disabled.saveFirst') : null))
+const currentErrorTitle = computed(() => {
+  if (!currentError.value) {
+    return ''
   }
 
-  if (
-    fixedTextPreset.gamePhase.value === 'lobby' ||
-    fixedTextPreset.gamePhase.value === 'champ-select'
-  ) {
-    return t('sendToChat')
-  }
-
-  return t('send')
+  return t('lastErrorTitle', {
+    stage: t(`errorStage.${currentError.value.stage}`),
+    target: t(`errorTarget.${currentError.value.target}`),
+    time: new Date(currentError.value.occurredAt).toLocaleString()
+  })
 })
 
-const sendDisabledReason = computed(() => {
-  if (!selectedItem.value) {
-    return t('disabled.noSelection')
-  }
-
-  if (isDirty.value) {
-    return t('disabled.saveFirst')
-  }
-
-  if (fixedTextPreset.gamePhase.value === 'draft') {
-    return t('disabled.draftOnly')
-  }
-
-  if (fixedTextPreset.gamePhase.value === 'in-game' && nativeInputUnavailableMessage.value) {
-    return nativeInputUnavailableMessage.value
-  }
-
-  if (!fixedTextPreset.canSend.value) {
-    return t('disabled.unavailable')
-  }
-
-  return null
+const shortcutTargetIds = reactive<Record<InGameSendPresetTarget, string>>({
+  friendly: '',
+  enemy: '',
+  all: ''
 })
+const shortcuts = computed(
+  () => selectedItem.value?.targetShortcuts ?? createDefaultInGameSendPresetTargetShortcuts()
+)
+
+const presetScope: PresetScopeContext = {
+  shortcutTargetIds,
+  shortcuts,
+  gamePhase: customTemplatePreset.gamePhase,
+  canSend: customTemplatePreset.canSend,
+  previewedLines: computed(() => previewedLines.value),
+  setShortcut: handleSetShortcut,
+  send: handleSend,
+  dryRun: handleDryRun,
+  closePreview: () => {
+    previewedLines.value = null
+  }
+}
 
 watch(
   items,
   (currentItems) => {
     const currentIds = new Set(currentItems.map((item) => item.id))
 
-    for (const id of models.keys()) {
+    for (const item of currentItems) {
+      drafts[item.id] ??= { title: item.title, code: item.code }
+    }
+
+    for (const id of Object.keys(drafts)) {
       if (!currentIds.has(id)) {
         disposeModel(id)
+        delete drafts[id]
       }
     }
 
     if (currentItems.length === 0) {
       selectedId.value = null
-      return
-    }
-
-    if (!selectedId.value || !currentItems.some((item) => item.id === selectedId.value)) {
+    } else if (!selectedId.value || !currentIds.has(selectedId.value)) {
       selectedId.value = currentItems[0].id
     }
   },
@@ -437,33 +455,57 @@ watch(
 watch(
   () => selectedItem.value?.id,
   async (id) => {
-    const item = selectedItem.value
-    currentModel.value = null
+    previewedLines.value = null
     isExpanded.value = false
+    isEditingTitle.value = false
     isDirty.value = false
-    draftTitle.value = item?.title ?? ''
-    draftContent.value = item?.content ?? ''
+    currentModel.value = null
 
-    if (id && pendingTitleEditItemId.value === id) {
+    if (!id || !selectedItem.value) {
+      return
+    }
+
+    updateShortcutTargetIds(id)
+
+    if (pendingTitleEditItemId.value === id) {
       pendingTitleEditItemId.value = null
       isEditingTitle.value = true
       await nextTick()
       titleInputRef.value?.focus()
-    } else {
-      isEditingTitle.value = false
     }
 
-    if (!id || !item) {
-      return
-    }
-
-    const model = await ensureModel(item)
+    const model = await ensureModel(selectedItem.value)
     if (selectedId.value === id) {
       currentModel.value = model
     }
   },
   { immediate: true }
 )
+
+function getTrimmedTitle(title: string) {
+  return title.trim()
+}
+
+function getDisplayTitle(title: string) {
+  return getTrimmedTitle(title) || t('unnamed')
+}
+
+function getErrorSummary(error: InGameSendCustomTemplateLastError) {
+  return error.error.split('\n')[0]
+}
+
+function handleSelect(id: string) {
+  if (id !== selectedId.value) {
+    handleRevert()
+    selectedId.value = id
+  }
+}
+
+function updateShortcutTargetIds(id: string) {
+  shortcutTargetIds.friendly = customTemplatePreset.getShortcutTargetId(id, 'friendly')
+  shortcutTargetIds.enemy = customTemplatePreset.getShortcutTargetId(id, 'enemy')
+  shortcutTargetIds.all = customTemplatePreset.getShortcutTargetId(id, 'all')
+}
 
 async function ensureMonaco() {
   if (monacoApi.value) {
@@ -473,7 +515,7 @@ async function ensureMonaco() {
   isLoadingMonaco.value = true
   monacoLoadError.value = null
   try {
-    monacoApi.value = await loadMonaco()
+    monacoApi.value = await loadJavaScriptMonaco()
     return monacoApi.value
   } catch (error) {
     monacoLoadError.value = error instanceof Error ? error.message : String(error)
@@ -484,7 +526,7 @@ async function ensureMonaco() {
   }
 }
 
-async function ensureModel(item: InGameSendFixedTextPresetItem) {
+async function ensureModel(item: InGameSendCustomTemplateItem) {
   const existingModel = models.get(item.id)
   if (existingModel) {
     return existingModel
@@ -496,22 +538,23 @@ async function ensureModel(item: InGameSendFixedTextPresetItem) {
   }
 
   const model = monaco.editor.createModel(
-    item.content,
-    'plaintext',
-    monaco.Uri.parse(`inmemory://league-akari/in-game-send-fixed-text/${item.id}.txt`)
+    drafts[item.id]?.code ?? item.code,
+    'javascript',
+    monaco.Uri.parse(`inmemory://league-akari/in-game-send-template/${item.id}.js`)
   )
   const subscription = model.onDidChangeContent(() => {
-    if (selectedId.value !== item.id) {
+    const draft = drafts[item.id]
+    if (!draft) {
       return
     }
 
     const value = model.getValue()
-    if (value.length > contentMaxLength) {
-      model.setValue(value.slice(0, contentMaxLength))
+    if (value.length > codeMaxLength) {
+      model.setValue(value.slice(0, codeMaxLength))
       return
     }
 
-    draftContent.value = value
+    draft.code = value
     isDirty.value = true
   })
 
@@ -527,66 +570,25 @@ function disposeModel(id: string) {
   models.delete(id)
 }
 
-const getTrimmedTitle = (title: string) => {
-  return title.trim()
-}
-
-const getDisplayTitle = (title: string) => {
-  return getTrimmedTitle(title) || t('unnamed')
-}
-
-const handleTitleUpdate = (value: string) => {
-  draftTitle.value = value.slice(0, titleMaxLength)
-  isDirty.value = true
-}
-
-const saveCurrent = async () => {
-  if (!selectedItem.value || !isDirty.value) {
-    return true
-  }
-
-  if (isSaving.value) {
-    return false
-  }
-
-  isSaving.value = true
-  try {
-    await fixedTextPreset.updateItem(selectedItem.value.id, {
-      title: draftTitle.value.slice(0, titleMaxLength),
-      content: draftContent.value.slice(0, contentMaxLength)
-    })
-
-    isDirty.value = false
-    message.success(t('saved'))
-
-    return true
-  } catch (error) {
-    logger.warn(componentName, 'Failed to update fixed text preset', error)
-    message.error(t('saveFailed'))
-    return false
-  } finally {
-    isSaving.value = false
+function handleTitleUpdate(value: string) {
+  if (selectedDraft.value) {
+    selectedDraft.value.title = value.slice(0, titleMaxLength)
+    isDirty.value = true
   }
 }
 
-const handleSaveClick = async () => {
-  if (await saveCurrent()) {
-    isEditingTitle.value = false
-  }
-}
-
-const startTitleEdit = async () => {
+async function startTitleEdit() {
   pendingTitleEditItemId.value = null
   isEditingTitle.value = true
   await nextTick()
   titleInputRef.value?.focus()
 }
 
-const finishTitleEdit = () => {
+function finishTitleEdit() {
   isEditingTitle.value = false
 }
 
-const handleTitleInputEnter = (event: KeyboardEvent) => {
+function handleTitleInputEnter(event: KeyboardEvent) {
   if (event.isComposing) {
     return
   }
@@ -595,85 +597,84 @@ const handleTitleInputEnter = (event: KeyboardEvent) => {
   finishTitleEdit()
 }
 
-const revertCurrentDraft = () => {
-  if (!selectedItem.value) {
-    return
-  }
-
-  if (isDirty.value) {
-    draftTitle.value = selectedItem.value.title
-    draftContent.value = selectedItem.value.content
-    currentModel.value?.setValue(selectedItem.value.content)
-  }
-  isDirty.value = false
-  isEditingTitle.value = false
-}
-
-const handleRevert = () => {
-  revertCurrentDraft()
-}
-
-const handleSelect = (id: string) => {
-  if (id === selectedId.value) {
-    return
-  }
-
-  revertCurrentDraft()
-  selectedId.value = id
-}
-
-const handleCreate = async () => {
+async function handleCreate() {
   if (!canCreate.value) {
     return
   }
 
   isCreating.value = true
   try {
-    const item = await fixedTextPreset.createItem()
-    revertCurrentDraft()
-    selectedId.value = item.id
-    draftTitle.value = ''
-    draftContent.value = ''
+    const item = await customTemplatePreset.createItem()
+    handleRevert()
+    drafts[item.id] = { title: item.title, code: item.code }
     pendingTitleEditItemId.value = item.id
-    isEditingTitle.value = true
-    await nextTick()
-    titleInputRef.value?.focus()
+    selectedId.value = item.id
   } catch (error) {
-    logger.warn(componentName, 'Failed to create fixed text preset', error)
+    logger.warn(componentName, 'Failed to create custom template', error)
     message.error(t('createFailed'))
   } finally {
     isCreating.value = false
   }
 }
 
-const handleDelete = async (id: string) => {
-  const deletedItem = items.value.find((item) => item.id === id)
-
-  if (!deletedItem) {
+async function handleSave() {
+  if (!selectedItem.value || !selectedDraft.value || !isDirty.value) {
     return
   }
 
-  const currentItems = items.value
-  const currentIndex = currentItems.findIndex((item) => item.id === id)
-  const nextItems = currentItems.filter((item) => item.id !== id)
-  const nextSelectedItem = nextItems[Math.min(currentIndex, nextItems.length - 1)] ?? null
-
+  isSaving.value = true
   try {
-    await fixedTextPreset.deleteItem(id)
-
-    if (selectedId.value === id) {
-      selectedId.value = nextSelectedItem?.id ?? null
-      isEditingTitle.value = false
-    }
-
-    message.success(t('deleted'))
+    await customTemplatePreset.updateItem(selectedItem.value.id, {
+      title: selectedDraft.value.title,
+      code: selectedDraft.value.code
+    })
+    isDirty.value = false
+    isEditingTitle.value = false
+    message.success(t('saved'))
   } catch (error) {
-    logger.warn(componentName, 'Failed to delete fixed text preset', error)
-    message.error(t('deleteFailed'))
+    logger.warn(componentName, 'Failed to save custom template', error)
+    message.error(t('saveFailed'))
+  } finally {
+    isSaving.value = false
   }
 }
 
-const handleDragEnd = async (event: DragEndEvent) => {
+function handleRevert() {
+  if (!selectedItem.value || !selectedDraft.value) {
+    return
+  }
+
+  if (isDirty.value) {
+    selectedDraft.value.title = selectedItem.value.title
+    selectedDraft.value.code = selectedItem.value.code
+    currentModel.value?.setValue(selectedItem.value.code)
+  }
+  isDirty.value = false
+  isEditingTitle.value = false
+}
+
+async function handleDelete(id: string) {
+  const index = items.value.findIndex((item) => item.id === id)
+  const remaining = items.value.filter((item) => item.id !== id)
+  const nextSelectedId = remaining[Math.min(index, remaining.length - 1)]?.id ?? null
+
+  try {
+    await customTemplatePreset.deleteItem(id)
+    if (selectedId.value === id) {
+      selectedId.value = nextSelectedId
+    }
+    message.success(t('deleted'))
+  } catch (error) {
+    logger.warn(componentName, 'Failed to delete custom template', error)
+    message.error(t('deleteFailed'))
+  } finally {
+    if (pendingTitleEditItemId.value === id) {
+      pendingTitleEditItemId.value = null
+    }
+  }
+}
+
+async function handleDragEnd(event: DragEndEvent) {
   const { source } = event.operation
 
   if (event.canceled || !isSortable(source)) {
@@ -689,38 +690,65 @@ const handleDragEnd = async (event: DragEndEvent) => {
   }
 
   try {
-    await fixedTextPreset.reorderItem(id, targetIndex)
+    await customTemplatePreset.reorderItem(id, targetIndex)
   } catch (error) {
-    logger.warn(componentName, 'Failed to reorder fixed text preset', error)
+    logger.warn(componentName, 'Failed to reorder custom template', error)
   }
 }
 
-const handleShortcutUpdate = async (shortcutId: string | null) => {
+async function handleSetShortcut(target: InGameSendPresetTarget, shortcutId: string | null) {
   if (!selectedItem.value) {
     return
   }
 
   try {
-    await fixedTextPreset.setShortcut(selectedItem.value.id, shortcutId)
-    message.success(t('saved'))
+    await customTemplatePreset.updateItem(selectedItem.value.id, {
+      targetShortcuts: { [target]: shortcutId }
+    })
   } catch (error) {
-    logger.warn(componentName, 'Failed to update fixed text preset shortcut', error)
+    logger.warn(componentName, 'Failed to update custom template shortcut', error)
     message.error(t('saveFailed'))
   }
 }
 
-const handleSend = async () => {
-  if (!selectedItem.value || sendDisabledReason.value) {
+async function handleDryRun(target: InGameSendPresetTarget) {
+  if (!selectedItem.value || isDirty.value) {
     return
   }
 
-  const sent = await fixedTextPreset.send(selectedItem.value.id)
-
-  if (sent) {
-    const title = getTrimmedTitle(selectedItem.value.title)
-    message.success(title ? t('sendSucceededWithTitle', { title }) : t('sendSucceeded'))
+  try {
+    const lines = await customTemplatePreset.generateLines(selectedItem.value.id, target)
+    previewedLines.value = { targetId: target, createdAt: Date.now(), lines }
+  } catch (error) {
+    logger.warn(componentName, 'Custom template dry run failed', error)
+    message.error(t('runFailed'))
   }
 }
+
+async function handleSend(target: InGameSendPresetTarget) {
+  if (!selectedItem.value || isDirty.value) {
+    return false
+  }
+
+  try {
+    return await customTemplatePreset.send(selectedItem.value.id, target)
+  } catch (error) {
+    logger.warn(componentName, 'Custom template send failed', error)
+    message.error(t('runFailed'))
+    return false
+  }
+}
+
+onMounted(() => {
+  if (customTemplatePreset.riskNoticeShown.value) {
+    return
+  }
+
+  showRiskNotice.value = true
+  void customTemplatePreset.markRiskNoticeShown().catch((error) => {
+    logger.warn(componentName, 'Failed to persist custom template risk notice state', error)
+  })
+})
 
 onBeforeUnmount(() => {
   for (const id of models.keys()) {

@@ -4,14 +4,28 @@ export const IN_GAME_SEND_PRESET_TARGETS = ['friendly', 'enemy', 'all'] as const
 
 export const IN_GAME_SEND_PRESET_SHORTCUT_TARGET_ID_PREFIX = 'in-game-send-main/preset'
 
-export const IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS = 100
+export const IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS = 50
 export const IN_GAME_SEND_FIXED_TEXT_PRESET_TITLE_MAX_LENGTH = 64
 export const IN_GAME_SEND_FIXED_TEXT_PRESET_CONTENT_MAX_LENGTH = 65536
 
+export const IN_GAME_SEND_CUSTOM_TEMPLATE_MAX_ITEMS = 20
+export const IN_GAME_SEND_CUSTOM_TEMPLATE_TITLE_MAX_LENGTH = 64
+export const IN_GAME_SEND_CUSTOM_TEMPLATE_CODE_MAX_LENGTH = 65536
+
+export const IN_GAME_SEND_CUSTOM_TEMPLATE_DEFAULT_CODE = `/**
+ * @param {InGameSendTemplateContext} ctx
+ * @returns {string[]}
+ */
+function getMessages(ctx) {
+  const { target } = ctx.options
+  const { manager } = ctx.runtime
+
+  return []
+}
+`
+
 export type InGameSendPresetNameDisplayStrategy =
-  | 'preferName'
-  | 'preferChampionName'
-  | 'championNameWithName'
+  'preferName' | 'preferChampionName' | 'championNameWithName'
 
 export type InGameSendRatingPresetNameDisplayStrategy = InGameSendPresetNameDisplayStrategy
 export type InGameSendJunglePresetNameDisplayStrategy = InGameSendPresetNameDisplayStrategy
@@ -64,7 +78,27 @@ export interface InGameSendFixedTextPresetItemPatch {
   content?: string
 }
 
-export type InGameSendFixedTextPresetItemMoveDirection = 'up' | 'down'
+export interface InGameSendCustomTemplateItem {
+  id: string
+  title: string
+  code: string
+  targetShortcuts: InGameSendPresetTargetShortcuts
+}
+
+export interface InGameSendCustomTemplateItemPatch {
+  title?: string
+  code?: string
+  targetShortcuts?: Partial<InGameSendPresetTargetShortcuts>
+}
+
+export type InGameSendCustomTemplateErrorStage = 'load' | 'contract' | 'execute' | 'result'
+
+export interface InGameSendCustomTemplateLastError {
+  stage: InGameSendCustomTemplateErrorStage
+  target: InGameSendPresetTarget
+  occurredAt: number
+  error: string
+}
 
 export type InGameSendPresetTargetShortcuts = Record<InGameSendPresetTarget, string | null>
 
@@ -174,6 +208,10 @@ export function createDefaultInGameSendFixedTextPresetItems(): InGameSendFixedTe
   return []
 }
 
+export function createDefaultInGameSendCustomTemplateItems(): InGameSendCustomTemplateItem[] {
+  return []
+}
+
 export function createDefaultInGameSendPresetTargetShortcuts(): InGameSendPresetTargetShortcuts {
   return {
     friendly: null,
@@ -196,6 +234,13 @@ export function getInGameSendPremadePresetShortcutTargetId(target: InGameSendPre
 
 export function getInGameSendFixedTextPresetShortcutTargetId(id: string) {
   return `${IN_GAME_SEND_PRESET_SHORTCUT_TARGET_ID_PREFIX}/fixed-text/${id}`
+}
+
+export function getInGameSendCustomTemplateShortcutTargetId(
+  id: string,
+  target: InGameSendPresetTarget
+) {
+  return `${IN_GAME_SEND_PRESET_SHORTCUT_TARGET_ID_PREFIX}/custom-template/${id}/${target}`
 }
 
 export function normalizeInGameSendFixedTextPresetItem(
@@ -230,6 +275,51 @@ export function normalizeInGameSendFixedTextPresetItems(
     seenIds.add(normalizedItem.id)
 
     if (normalized.length >= IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS) {
+      break
+    }
+  }
+
+  return normalized
+}
+
+export function normalizeInGameSendCustomTemplateItem(
+  item: InGameSendCustomTemplateItem
+): InGameSendCustomTemplateItem {
+  const targetShortcuts = item?.targetShortcuts ?? createDefaultInGameSendPresetTargetShortcuts()
+
+  return {
+    id: String(item?.id ?? ''),
+    title: String(item?.title ?? '').slice(0, IN_GAME_SEND_CUSTOM_TEMPLATE_TITLE_MAX_LENGTH),
+    code: String(item?.code ?? '').slice(0, IN_GAME_SEND_CUSTOM_TEMPLATE_CODE_MAX_LENGTH),
+    targetShortcuts: {
+      friendly: targetShortcuts.friendly ? String(targetShortcuts.friendly) : null,
+      enemy: targetShortcuts.enemy ? String(targetShortcuts.enemy) : null,
+      all: targetShortcuts.all ? String(targetShortcuts.all) : null
+    }
+  }
+}
+
+export function normalizeInGameSendCustomTemplateItems(
+  items: InGameSendCustomTemplateItem[]
+): InGameSendCustomTemplateItem[] {
+  if (!Array.isArray(items)) {
+    return []
+  }
+
+  const seenIds = new Set<string>()
+  const normalized: InGameSendCustomTemplateItem[] = []
+
+  for (const item of items) {
+    const normalizedItem = normalizeInGameSendCustomTemplateItem(item)
+
+    if (!normalizedItem.id || seenIds.has(normalizedItem.id)) {
+      continue
+    }
+
+    normalized.push(normalizedItem)
+    seenIds.add(normalizedItem.id)
+
+    if (normalized.length >= IN_GAME_SEND_CUSTOM_TEMPLATE_MAX_ITEMS) {
       break
     }
   }

@@ -2,7 +2,6 @@ import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import type { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import type {
   InGameSendFixedTextPresetItem,
-  InGameSendFixedTextPresetItemMoveDirection,
   InGameSendFixedTextPresetItemPatch
 } from '@shared/shards/in-game-send'
 import { type ComputedRef, type InjectionKey, provide } from 'vue'
@@ -22,7 +21,7 @@ export interface FixedTextPresetContext {
     patch: InGameSendFixedTextPresetItemPatch
   ) => Promise<InGameSendFixedTextPresetItem>
   deleteItem: (id: string) => Promise<boolean>
-  moveItem: (id: string, direction: InGameSendFixedTextPresetItemMoveDirection) => Promise<boolean>
+  reorderItem: (id: string, targetIndex: number) => Promise<boolean>
   setShortcut: (id: string, shortcutId: string | null) => Promise<InGameSendFixedTextPresetItem>
   send: (id: string) => Promise<boolean>
 }
@@ -64,7 +63,7 @@ export function useFixedTextPresetData({
     createItem: () => inGameSend.createFixedTextPresetItem(),
     updateItem: (id, patch) => inGameSend.updateFixedTextPresetItem(id, patch),
     deleteItem: (id) => inGameSend.deleteFixedTextPresetItem(id),
-    moveItem: (id, direction) => inGameSend.moveFixedTextPresetItem(id, direction),
+    reorderItem: (id, targetIndex) => inGameSend.reorderFixedTextPresetItem(id, targetIndex),
     setShortcut: (id, shortcutId) =>
       inGameSend.updateFixedTextPresetItem(id, { shortcut: shortcutId }),
     send: (id) => inGameSend.sendFixedTextPreset(id)

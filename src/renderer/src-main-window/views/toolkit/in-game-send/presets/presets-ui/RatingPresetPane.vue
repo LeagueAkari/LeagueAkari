@@ -4,7 +4,7 @@
       {{ t('description') }}
     </div>
 
-    <PresetSendControls :preset="ratingPreset" :preset-label="presetLabel" />
+    <PresetSendControls class="pt-4" :preset="ratingPreset" :preset-label="presetLabel" />
     <PreviewPanel :preset="ratingPreset" />
 
     <PresetDisplayOptionsPanel

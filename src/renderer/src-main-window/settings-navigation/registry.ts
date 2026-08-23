@@ -996,6 +996,7 @@ const targetDefinitions = [
       'toolkit.inGameSend.presets.jungle.label',
       'toolkit.inGameSend.presets.premade.label',
       'toolkit.inGameSend.presets.fixedText.label',
+      'toolkit.inGameSend.presets.customTemplate.label',
       'toolkit.inGameSend.presets.nameDisplayStrategy.title',
       'toolkit.inGameSend.presets.rating.displayOptions.winRate.label',
       'toolkit.inGameSend.presets.rating.displayOptions.kda.label',

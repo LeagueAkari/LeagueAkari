@@ -1,7 +1,8 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import {
+  type InGameSendCustomTemplateItem,
+  type InGameSendCustomTemplateItemPatch,
   type InGameSendFixedTextPresetItem,
-  type InGameSendFixedTextPresetItemMoveDirection,
   type InGameSendFixedTextPresetItemPatch,
   type InGameSendJunglePresetOptionPatch,
   type InGameSendJunglePresetOptions,
@@ -10,6 +11,7 @@ import {
   type InGameSendPresetTarget,
   type InGameSendRatingPresetOptionPatch,
   type InGameSendRatingPresetOptions,
+  getInGameSendCustomTemplateShortcutTargetId,
   getInGameSendFixedTextPresetShortcutTargetId,
   getInGameSendJunglePresetShortcutTargetId,
   getInGameSendPremadePresetShortcutTargetId,
@@ -48,6 +50,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   static getFixedTextPresetShortcutTargetId(id: string) {
     return getInGameSendFixedTextPresetShortcutTargetId(id)
+  }
+
+  static getCustomTemplateShortcutTargetId(id: string, target: InGameSendPresetTarget) {
+    return getInGameSendCustomTemplateShortcutTargetId(id, target)
   }
 
   private readonly _context: InGameSendRendererContext
@@ -109,6 +115,47 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendFixedTextPreset', id)
   }
 
+  markCustomTemplateRiskNoticeShown() {
+    return this._ipc.call<void>(MAIN_SHARD_NAMESPACE, 'markCustomTemplateRiskNoticeShown')
+  }
+
+  createCustomTemplateItem() {
+    return this._ipc.call<InGameSendCustomTemplateItem>(
+      MAIN_SHARD_NAMESPACE,
+      'createCustomTemplateItem'
+    )
+  }
+
+  updateCustomTemplateItem(id: string, patch: InGameSendCustomTemplateItemPatch) {
+    return this._ipc.call<InGameSendCustomTemplateItem>(
+      MAIN_SHARD_NAMESPACE,
+      'updateCustomTemplateItem',
+      id,
+      patch
+    )
+  }
+
+  deleteCustomTemplateItem(id: string) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'deleteCustomTemplateItem', id)
+  }
+
+  reorderCustomTemplateItem(id: string, targetIndex: number) {
+    return this._ipc.call<boolean>(
+      MAIN_SHARD_NAMESPACE,
+      'reorderCustomTemplateItem',
+      id,
+      targetIndex
+    )
+  }
+
+  generateCustomTemplateLines(id: string, target: InGameSendPresetTarget) {
+    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generateCustomTemplateLines', id, target)
+  }
+
+  sendCustomTemplate(id: string, target: InGameSendPresetTarget) {
+    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendCustomTemplate', id, target)
+  }
+
   updateRatingPresetOptions(options: InGameSendRatingPresetOptionPatch) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateRatingPresetOptions', options)
   }
@@ -153,8 +200,13 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'deleteFixedTextPresetItem', id)
   }
 
-  moveFixedTextPresetItem(id: string, direction: InGameSendFixedTextPresetItemMoveDirection) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'moveFixedTextPresetItem', id, direction)
+  reorderFixedTextPresetItem(id: string, targetIndex: number) {
+    return this._ipc.call<boolean>(
+      MAIN_SHARD_NAMESPACE,
+      'reorderFixedTextPresetItem',
+      id,
+      targetIndex
+    )
   }
 
   setRatingPuuids(puuids: string[]) {

@@ -453,10 +453,15 @@ toolkit:
         listTitle: Fixed Text
         addLimitReached: Up to {{count}} fixed text items can be created.
         unnamed: Untitled
+        unsaved: Unsaved changes
         editTitle: Edit title
+        expand: Expand Editor
+        expandedTitle: 'Edit Fixed Text: {{title}}'
+        editorLoadFailed: 'Failed to load the Monaco editor: {{reason}}'
         shortcutLabel: Shortcut
         shortcutDescription: Sends this saved fixed text item.
         save: Save
+        revert: Revert
         saved: Saved
         saveFailed: Failed to save
         createFailed: Failed to create
@@ -464,8 +469,7 @@ toolkit:
         deleted: Deleted
         deleteFailed: Failed to delete
         deleteConfirm: Delete?
-        moveUp: Move up
-        moveDown: Move down
+        dragHandle: Drag “{{title}}” to reorder
         sendToGame: Send to Game
         sendToChat: Send to Chat
         send: Send
@@ -476,6 +480,45 @@ toolkit:
           saveFirst: Save current edits first
           draftOnly: Draft mode cannot send.
           unavailable: Available only in champion select, lobby, or in-game.
+      customTemplate:
+        label: Custom Template
+        risk:
+          title: Please read before using
+          description: Custom templates can access and change information in the application. An untrusted or faulty template may expose information, damage data, or crash the application. Use only templates you trust. If you are unsure what a template does, do not use it. AI-generated templates are not necessarily safe.
+        empty:
+          description: No custom templates yet. Add one, then write and save its JavaScript code.
+          action: Add Custom Template
+        listTitle: Templates
+        addLimitReached: Up to {{count}} custom templates can be created.
+        unnamed: Untitled Template
+        unsaved: Unsaved changes
+        dragHandle: Drag “{{title}}” to reorder
+        delete: Delete
+        deleteConfirm: Delete this template?
+        deleted: Deleted
+        deleteFailed: Failed to delete
+        createFailed: Failed to create
+        editTitle: Edit title
+        save: Save
+        saved: Saved
+        saveFailed: Failed to save
+        revert: Revert
+        expand: Expand Editor
+        expandedTitle: 'Edit Template: {{title}}'
+        editorLoadFailed: 'Failed to load the Monaco editor: {{reason}}'
+        runFailed: Template execution failed. See the last error below.
+        lastErrorTitle: Last error · {{stage}} · {{target}} · {{time}}
+        errorStage:
+          load: Load code
+          contract: Check function
+          execute: Run function
+          result: Check result
+        errorTarget:
+          friendly: Allies
+          enemy: Enemies
+          all: All
+        disabled:
+          saveFirst: Save current edits first
   claim:
     rewards:
       title: Rewards

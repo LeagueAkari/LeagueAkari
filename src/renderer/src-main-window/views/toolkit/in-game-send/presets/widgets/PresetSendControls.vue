@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-4">
+  <div>
     <SettingsRow
       v-for="target of targets"
       :key="target.id"
@@ -25,12 +25,12 @@
           />
         </div>
         <NDivider vertical />
-        <NPopover :disabled="canSend" trigger="hover">
+        <NPopover :disabled="canSend && !executionDisabledReason" trigger="hover">
           <template #trigger>
             <NButton
               size="small"
               :type="target.buttonType"
-              :disabled="!canSend"
+              :disabled="!canSend || !!executionDisabledReason"
               @click="handleSend(target)"
             >
               <template #icon>
@@ -43,19 +43,24 @@
         </NPopover>
         <NPopover trigger="hover">
           <template #trigger>
-            <NButton size="small" secondary @click="dryRun(target.id)">
+            <NButton
+              size="small"
+              secondary
+              :disabled="!!executionDisabledReason"
+              @click="dryRun(target.id)"
+            >
               <template #icon>
                 <NIcon><DryRunIcon /></NIcon>
               </template>
               {{ t('dryRun') }}
             </NButton>
           </template>
-          {{ t('dryRunDescription') }}
+          {{ executionDisabledReason || t('dryRunDescription') }}
         </NPopover>
       </div>
     </SettingsRow>
 
-    <!-- 仅用于触发上面的 border-b -->
+    <!-- Keep the final row divider when content follows this group. -->
     <span hidden aria-hidden="true"></span>
   </div>
 </template>
@@ -76,6 +81,7 @@ import { usePresetTargets, type PresetTarget } from './usePresetTargets'
 const props = defineProps<{
   preset: PresetScopeContext
   presetLabel: string
+  executionDisabledReason?: string | null
 }>()
 
 const message = useMessage()
@@ -100,6 +106,10 @@ const sendButtonText = computed(() => {
 })
 
 const sendDisabledReason = computed(() => {
+  if (props.executionDisabledReason) {
+    return props.executionDisabledReason
+  }
+
   if (gamePhase.value === 'draft') {
     return t('disabled.draftOnly')
   }
