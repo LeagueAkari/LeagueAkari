@@ -20,10 +20,9 @@ export function resolveChampionDataSourceGateAvailability(options: {
   qq101Configured: boolean
   opggEnabled: boolean
   qq101Enabled: boolean
-  allowUnconfiguredQq101: boolean
 }) {
   if (!options.opggConfigured && !options.qq101Configured) {
-    return { opgg: true, qq101: options.allowUnconfiguredQq101 }
+    return { opgg: true, qq101: true }
   }
   return { opgg: options.opggEnabled, qq101: options.qq101Enabled }
 }
