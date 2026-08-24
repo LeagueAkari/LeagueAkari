@@ -28,22 +28,41 @@ export function resolveChampionDataSourceGateAvailability(options: {
 }
 
 export interface ChampionDataSourceLoader {
+  loadPatches(
+    source: ChampionDataSourceId,
+    query: ChampionDataQuery,
+    options?: ChampionDataLoadOptions
+  ): Promise<string[]>
   loadOverview(
     source: ChampionDataSourceId,
-    query: ChampionDataQuery
+    query: ChampionDataQuery,
+    options?: ChampionDataLoadOptions
   ): Promise<ChampionDataOverview>
   loadDetails(
     source: ChampionDataSourceId,
     query: ChampionDataQuery,
-    championId: number
+    championId: number,
+    options?: ChampionDataLoadOptions
   ): Promise<ChampionDataDetails | null>
 }
 
+export interface ChampionDataLoadOptions {
+  signal?: AbortSignal
+}
+
 export interface ChampionDataService {
-  loadOverview(query: ChampionDataQuery): Promise<ChampionDataLoadResult<ChampionDataOverview>>
+  loadPatches(
+    query: ChampionDataQuery,
+    options?: ChampionDataLoadOptions
+  ): Promise<ChampionDataLoadResult<string[]>>
+  loadOverview(
+    query: ChampionDataQuery,
+    options?: ChampionDataLoadOptions
+  ): Promise<ChampionDataLoadResult<ChampionDataOverview>>
   loadDetails(
     query: ChampionDataQuery,
-    championId: number
+    championId: number,
+    options?: ChampionDataLoadOptions
   ): Promise<ChampionDataLoadResult<ChampionDataDetails>>
 }
 

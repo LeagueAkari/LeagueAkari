@@ -24,7 +24,7 @@ import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
 
 import type { AkariLogger } from '../logger-factory'
-import type { ChampionDataSourceLoader } from './context'
+import type { ChampionDataLoadOptions, ChampionDataSourceLoader } from './context'
 
 const UNIFIED_TO_OPGG_POSITION: Readonly<Record<ChampionDataPosition, PositionType>> = {
   all: 'all',
@@ -43,46 +43,84 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
     private readonly _qq101Api: Qq101HttpApiAxiosHelper
   ) {}
 
-  private async _resolveOpggVersion(query: ChampionDataQuery) {
+  private async _resolveOpggVersion(query: ChampionDataQuery, options: ChampionDataLoadOptions) {
     if (query.patch) return query.patch
     const response = await this._opggApi.getVersions(
       (query.region ?? 'global') as RegionType,
-      query.mode
+      query.mode,
+      options
     )
     const version = response.data.data[0]
     if (!version) throw new Error(`OP.GG has no version for ${query.mode}`)
     return version
   }
 
-  private async _resolveQq101RiftQuery(query: ChampionDataQuery): Promise<Qq101RiftQuery> {
+  private async _resolveQq101RiftQuery(
+    query: ChampionDataQuery,
+    options: ChampionDataLoadOptions
+  ): Promise<Qq101RiftQuery> {
     return {
-      patch: query.patch ?? (await this._qq101Api.getLatestPatch()),
+      patch: query.patch ?? (await this._qq101Api.getLatestPatch(options)),
       tier: toQq101Tier(query.tier),
       position: toQq101Position(query.position)
     }
   }
 
-  async loadOverview(source: ChampionDataSourceId, query: ChampionDataQuery) {
-    return source === 'opgg' ? this._loadOpggOverview(query) : this._loadQq101Overview(query)
+  async loadPatches(
+    source: ChampionDataSourceId,
+    query: ChampionDataQuery,
+    options: ChampionDataLoadOptions = {}
+  ) {
+    if (source === 'opgg') {
+      if (query.mode === 'aram_mayhem') return []
+      const response = await this._opggApi.getVersions(
+        (query.region ?? 'global') as RegionType,
+        query.mode,
+        options
+      )
+      return response.data.data
+    }
+
+    const patches = await this._qq101Api.getPatches(options)
+    return patches.map((patch) => patch.name)
   }
 
-  async loadDetails(source: ChampionDataSourceId, query: ChampionDataQuery, championId: number) {
+  async loadOverview(
+    source: ChampionDataSourceId,
+    query: ChampionDataQuery,
+    options: ChampionDataLoadOptions = {}
+  ) {
     return source === 'opgg'
-      ? this._loadOpggDetails(query, championId)
-      : this._loadQq101Details(query, championId)
+      ? this._loadOpggOverview(query, options)
+      : this._loadQq101Overview(query, options)
   }
 
-  private async _loadOpggOverview(query: ChampionDataQuery): Promise<ChampionDataOverview> {
+  async loadDetails(
+    source: ChampionDataSourceId,
+    query: ChampionDataQuery,
+    championId: number,
+    options: ChampionDataLoadOptions = {}
+  ) {
+    return source === 'opgg'
+      ? this._loadOpggDetails(query, championId, options)
+      : this._loadQq101Details(query, championId, options)
+  }
+
+  private async _loadOpggOverview(
+    query: ChampionDataQuery,
+    options: ChampionDataLoadOptions
+  ): Promise<ChampionDataOverview> {
     if (query.mode === 'aram_mayhem') {
-      const response = await this._opggApi.getAramMayhemTiers()
+      const response = await this._opggApi.getAramMayhemTiers(options)
       return adaptOpggMayhemOverview(response.data, { dataDate: null })
     }
 
     const region = (query.region ?? 'global') as RegionType
-    const version = await this._resolveOpggVersion(query)
+    const version = await this._resolveOpggVersion(query, options)
     const response = await this._opggApi.getChampions(region, query.mode, {
       tier: query.tier as TierType | undefined,
-      version
+      version,
+      signal: options.signal
     })
     return adaptOpggChampionOverview(response.data, {
       mode: query.mode,
@@ -92,23 +130,25 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
 
   private async _loadOpggDetails(
     query: ChampionDataQuery,
-    championId: number
+    championId: number,
+    options: ChampionDataLoadOptions
   ): Promise<ChampionDataDetails | null> {
     if (query.mode === 'aram_mayhem') {
       const [tiers, augments] = await Promise.all([
-        this._opggApi.getAramMayhemTiers(),
-        this._opggApi.getAramMayhemChampionAugments(championId)
+        this._opggApi.getAramMayhemTiers(options),
+        this._opggApi.getAramMayhemChampionAugments(championId, options)
       ])
       const tierItem = tiers.data.data.find((item) => item.champion_id === championId)
       return tierItem ? adaptOpggMayhemDetails(tierItem, augments.data, { dataDate: null }) : null
     }
 
     const region = (query.region ?? 'global') as RegionType
-    const version = await this._resolveOpggVersion(query)
+    const version = await this._resolveOpggVersion(query, options)
     const position = UNIFIED_TO_OPGG_POSITION[query.position ?? 'none']
     const response = await this._opggApi.getChampion(region, query.mode, championId, position, {
       tier: query.tier as TierType | undefined,
-      version
+      version,
+      signal: options.signal
     })
     return adaptOpggChampionDetails(response.data, {
       mode: query.mode,
@@ -116,23 +156,29 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
     })
   }
 
-  private async _loadQq101Overview(query: ChampionDataQuery): Promise<ChampionDataOverview> {
+  private async _loadQq101Overview(
+    query: ChampionDataQuery,
+    options: ChampionDataLoadOptions
+  ): Promise<ChampionDataOverview> {
     if (query.mode === 'ranked') {
-      const riftQuery = await this._resolveQq101RiftQuery(query)
-      let result = await this._qq101Api.getTierList(riftQuery)
+      const riftQuery = await this._resolveQq101RiftQuery(query, options)
+      let result = await this._qq101Api.getTierList(riftQuery, options)
       if (result.champions.length === 0 && !query.patch) {
-        const patches = await this._qq101Api.getPatches()
+        const patches = await this._qq101Api.getPatches(options)
         if (patches[1])
-          result = await this._qq101Api.getTierList({ ...riftQuery, patch: patches[1].name })
+          result = await this._qq101Api.getTierList(
+            { ...riftQuery, patch: patches[1].name },
+            options
+          )
       }
       return adaptQq101RankedOverview(result)
     }
 
     const date = dayjs().subtract(1, 'day').format('YYYYMMDD')
     const [champions, augments, synergies] = await Promise.allSettled([
-      this._qq101Api.getMayhemChampions(date),
-      this._qq101Api.getMayhemAugments(date),
-      this._qq101Api.getMayhemPairSynergies()
+      this._qq101Api.getMayhemChampions(date, options),
+      this._qq101Api.getMayhemAugments(date, options),
+      this._qq101Api.getMayhemPairSynergies(255, options)
     ])
     if (champions.status === 'rejected') throw champions.reason
     this._logPartialFailure('QQ101 Mayhem augments', augments)
@@ -148,13 +194,14 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
 
   private async _loadQq101Details(
     query: ChampionDataQuery,
-    championId: number
+    championId: number,
+    options: ChampionDataLoadOptions
   ): Promise<ChampionDataDetails | null> {
     if (query.mode === 'aram_mayhem') {
       const date = dayjs().subtract(1, 'day').format('YYYYMMDD')
       const [champions, augments] = await Promise.allSettled([
-        this._qq101Api.getMayhemChampions(date),
-        this._qq101Api.getMayhemAugments(date)
+        this._qq101Api.getMayhemChampions(date, options),
+        this._qq101Api.getMayhemAugments(date, options)
       ])
       if (champions.status === 'rejected') throw champions.reason
       this._logPartialFailure('QQ101 Mayhem augments', augments)
@@ -168,22 +215,22 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
       )
     }
 
-    const riftQuery = await this._resolveQq101RiftQuery(query)
-    const overview = await this._qq101Api.getTierList(riftQuery)
+    const riftQuery = await this._resolveQq101RiftQuery(query, options)
+    const overview = await this._qq101Api.getTierList(riftQuery, options)
     const champion = overview.champions.find((item) => item.championId === championId)
     if (!champion) return null
 
     const results = await Promise.allSettled([
-      this._qq101Api.getMatchups(riftQuery, championId),
-      this._qq101Api.getSynergies(riftQuery, championId),
-      this._qq101Api.getSummonerSpells(riftQuery, championId),
-      this._qq101Api.getSkillOrder(riftQuery, championId),
-      this._qq101Api.getBuild(riftQuery, championId),
-      this._qq101Api.getRunes(riftQuery, championId),
-      this._qq101Api.getPositions(riftQuery, championId),
-      this._qq101Api.getTrend(riftQuery, championId),
-      this._qq101Api.getTierStats(riftQuery, championId),
-      this._qq101Api.getDurations(riftQuery, championId)
+      this._qq101Api.getMatchups(riftQuery, championId, options),
+      this._qq101Api.getSynergies(riftQuery, championId, options),
+      this._qq101Api.getSummonerSpells(riftQuery, championId, options),
+      this._qq101Api.getSkillOrder(riftQuery, championId, options),
+      this._qq101Api.getBuild(riftQuery, championId, options),
+      this._qq101Api.getRunes(riftQuery, championId, options),
+      this._qq101Api.getPositions(riftQuery, championId, options),
+      this._qq101Api.getTrend(riftQuery, championId, options),
+      this._qq101Api.getTierStats(riftQuery, championId, options),
+      this._qq101Api.getDurations(riftQuery, championId, options)
     ] as const)
     const labels = [
       'matchups',

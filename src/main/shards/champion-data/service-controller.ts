@@ -1,9 +1,7 @@
 import {
-  type ChampionDataDetails,
   type ChampionDataFallbackReason,
   type ChampionDataLoadAttempt,
   type ChampionDataLoadResult,
-  type ChampionDataOverview,
   type ChampionDataQuery,
   type ChampionDataSourceId,
   getChampionDataCapability
@@ -11,6 +9,7 @@ import {
 import { formatError } from '@shared/utils/errors'
 
 import type { ChampionDataMainContext, ChampionDataSourceLoader } from './context'
+import type { ChampionDataLoadOptions } from './context'
 
 export class ChampionDataServiceController {
   constructor(
@@ -18,58 +17,73 @@ export class ChampionDataServiceController {
     private readonly _sourceLoader: ChampionDataSourceLoader
   ) {}
 
-  loadOverview(query: ChampionDataQuery) {
-    return this._load(query, (source) => this._sourceLoader.loadOverview(source, query))
+  loadPatches(query: ChampionDataQuery, options: ChampionDataLoadOptions = {}) {
+    return this._load(
+      query,
+      (source) => this._sourceLoader.loadPatches(source, query, options),
+      options
+    )
   }
 
-  loadDetails(query: ChampionDataQuery, championId: number) {
-    return this._load(query, async (source) => {
-      const details = await this._sourceLoader.loadDetails(source, query, championId)
-      if (!details) throw new Error(`Champion ${championId} is not available`)
-      return details
-    })
+  loadOverview(query: ChampionDataQuery, options: ChampionDataLoadOptions = {}) {
+    return this._load(
+      query,
+      (source) => this._sourceLoader.loadOverview(source, query, options),
+      options
+    )
   }
 
-  private async _load<T extends ChampionDataOverview | ChampionDataDetails>(
+  loadDetails(query: ChampionDataQuery, championId: number, options: ChampionDataLoadOptions = {}) {
+    return this._load(
+      query,
+      async (source) => {
+        const details = await this._sourceLoader.loadDetails(source, query, championId, options)
+        if (!details) throw new Error(`Champion ${championId} is not available`)
+        return details
+      },
+      options
+    )
+  }
+
+  private async _load<T>(
     query: ChampionDataQuery,
-    load: (source: ChampionDataSourceId) => Promise<T>
+    load: (source: ChampionDataSourceId) => Promise<T>,
+    options: ChampionDataLoadOptions
   ): Promise<ChampionDataLoadResult<T>> {
     const { logger, settings, state } = this._context
     const preferredSource = query.source ?? settings.preferredSource
-    const fallbackSource: ChampionDataSourceId = preferredSource === 'opgg' ? 'qq101' : 'opgg'
     const attempts: ChampionDataLoadAttempt[] = []
 
-    for (const source of [preferredSource, fallbackSource]) {
-      if (!state.availability.sources[source].enabled) {
-        attempts.push({ source, outcome: 'disabled', message: null })
-        continue
-      }
-      if (!getChampionDataCapability(source, query.mode)) {
-        attempts.push({ source, outcome: 'mode-unsupported', message: null })
-        continue
-      }
-
+    // A different provider is a different dataset, not a retry target. Region scope and even
+    // same-named mode statistics can have different meanings, so only retry inside the source
+    // loader/HTTP client. Cross-source substitution requires an explicit future compatibility rule.
+    options.signal?.throwIfAborted()
+    if (!state.availability.sources[preferredSource].enabled) {
+      attempts.push({ source: preferredSource, outcome: 'disabled', message: null })
+    } else if (!getChampionDataCapability(preferredSource, query.mode)) {
+      attempts.push({ source: preferredSource, outcome: 'mode-unsupported', message: null })
+    } else {
       try {
-        const data = await load(source)
-        attempts.push({ source, outcome: 'success', message: null })
-        const fallbackReason = source === preferredSource ? null : this._fallbackReason(attempts[0])
-        state.setLastResolution(source, fallbackReason)
+        const data = await load(preferredSource)
+        attempts.push({ source: preferredSource, outcome: 'success', message: null })
+        state.setLastResolution(preferredSource, null)
         return {
           status: 'success',
           data,
           preferredSource,
-          effectiveSource: source,
-          fallbackReason,
+          effectiveSource: preferredSource,
+          fallbackReason: null,
           attempts
         }
       } catch (error) {
+        options.signal?.throwIfAborted()
         const message = formatError(error)
-        attempts.push({ source, outcome: 'failed', message })
-        logger.warn(`Champion data request failed for ${source}`, message)
+        attempts.push({ source: preferredSource, outcome: 'failed', message })
+        logger.warn(`Champion data request failed for ${preferredSource}`, message)
       }
     }
 
-    const fallbackReason = this._fallbackReason(attempts[0])
+    const fallbackReason = this._unavailableReason(attempts[0])
     state.setLastResolution(null, fallbackReason)
     return {
       status: 'unavailable',
@@ -81,7 +95,7 @@ export class ChampionDataServiceController {
     }
   }
 
-  private _fallbackReason(
+  private _unavailableReason(
     attempt: ChampionDataLoadAttempt | undefined
   ): ChampionDataFallbackReason {
     if (attempt?.outcome === 'disabled') return 'source-disabled'

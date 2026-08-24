@@ -70,7 +70,23 @@ function recommendationPerformance(item: {
   }
 }
 
-function championPerformance(stats: OpggChampionAverageStats): ChampionPerformance {
+function championPerformance(stats: OpggChampionAverageStats | null): ChampionPerformance {
+  if (!stats) {
+    return {
+      games: null,
+      wins: null,
+      winRate: null,
+      pickRate: null,
+      banRate: null,
+      kda: null,
+      rank: null,
+      rankChange: null,
+      strengthTier: null,
+      averagePlacement: null,
+      firstPlaceRate: null
+    }
+  }
+
   return {
     games: stats.play,
     wins: stats.win ?? null,
@@ -253,6 +269,7 @@ export function adaptOpggChampionDetails(
                 tier: group.rarity,
                 rank: null,
                 rankChange: null,
+                performanceScore: null,
                 performance: recommendationPerformance(item),
                 popularity: item.pick_rate,
                 bestChampionIds: []
@@ -332,6 +349,7 @@ export function adaptOpggMayhemAugments(
     tier: item.tier,
     rank: null,
     rankChange: null,
+    performanceScore: item.performance,
     performance: {
       games: null,
       wins: null,

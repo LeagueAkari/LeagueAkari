@@ -44,6 +44,7 @@
 
             <!-- tier -->
             <div
+              v-if="a.tier !== null"
               class="mr-1 flex size-4 shrink-0 items-center justify-center rounded text-[11px]"
               :class="TIER_COLOR[a.tier]"
             >
@@ -163,7 +164,7 @@ const sortAugments = (items: KiwiAugmentWithRarity[]) => {
     return items.toSorted((a, b) => b.popular - a.popular)
   }
 
-  return items.toSorted((a, b) => a.tier - b.tier)
+  return items.toSorted((a, b) => (a.tier ?? Infinity) - (b.tier ?? Infinity))
 }
 
 const isAugmentsExpanded = ref(false)

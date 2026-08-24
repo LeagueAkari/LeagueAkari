@@ -194,6 +194,7 @@ export interface ChampionAugment {
   tier: number | null
   rank: number | null
   rankChange: number | null
+  performanceScore: number | null
   performance: ChampionRecommendationPerformance
   popularity: number | null
   bestChampionIds: number[]

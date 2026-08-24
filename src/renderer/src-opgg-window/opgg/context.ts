@@ -3,7 +3,17 @@ import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import { useStableComputed } from '@renderer-shared/composables/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
 import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
+import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
+import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import type {
+  ChampionDataFallbackReason,
+  ChampionDataLoadResult,
+  ChampionDataMode,
+  ChampionDataPosition,
+  ChampionDataQuery,
+  ChampionDataSourceId
+} from '@shared/data-adapter/champion-data'
 import {
   ModeType,
   OpggAramMayhemChampionAugmentsResponse,
@@ -19,6 +29,11 @@ import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { InjectionKey, Ref, inject, onMounted, provide, ref, shallowRef, watch } from 'vue'
 
+import {
+  toOpggChampionDetailsViewModel,
+  toOpggChampionOverviewViewModel,
+  toOpggMayhemAugmentsViewModel
+} from './champion-data-view-model'
 import { hasItemsSets, useLoadout } from './utils/loadout'
 
 // 对齐 auto champ config (暂定)
@@ -28,6 +43,45 @@ const AUTO_CHAMP_CONFIG_GAME_MODE_MAP: Record<string, string> = {
   ARAM: 'aram',
   NEXUSBLITZ: 'nexusblitz',
   ULTBOOK: 'ultbook'
+}
+
+const OPGG_TO_UNIFIED_POSITION: Readonly<Record<string, ChampionDataPosition>> = {
+  all: 'all',
+  top: 'top',
+  jungle: 'jungle',
+  mid: 'middle',
+  adc: 'bottom',
+  support: 'utility',
+  none: 'none'
+}
+
+const UNIFIED_TO_OPGG_POSITION: Readonly<Record<ChampionDataPosition, PositionType>> = {
+  all: 'all',
+  top: 'top',
+  jungle: 'jungle',
+  middle: 'mid',
+  bottom: 'adc',
+  utility: 'support',
+  none: 'none'
+}
+
+const OPGG_TO_CHAMPION_DATA_MODE: Readonly<Record<string, ChampionDataMode>> = {
+  ranked: 'ranked',
+  aram: 'aram',
+  aram_mayhem: 'aram_mayhem',
+  arena: 'arena',
+  nexus_blitz: 'nexus_blitz',
+  urf: 'urf'
+}
+
+function toChampionDataMode(mode: ModeType): ChampionDataMode {
+  const unifiedMode = OPGG_TO_CHAMPION_DATA_MODE[mode]
+  if (unifiedMode) return unifiedMode
+  throw new Error(`Unsupported champion data mode: ${mode}`)
+}
+
+function toChampionDataPosition(position: PositionType) {
+  return OPGG_TO_UNIFIED_POSITION[position] ?? 'none'
 }
 
 export const OpggContextKey: InjectionKey<OpggContext> = Symbol('OpggContext')
@@ -52,6 +106,10 @@ export type OpggContext = {
   champion: Ref<OpggChampionBuildResponse | null>
 
   kiwiAugments: Ref<OpggAramMayhemChampionAugmentsResponse | null>
+
+  effectiveSource: Ref<ChampionDataSourceId | null>
+  fallbackReason: Ref<ChampionDataFallbackReason | null>
+  isDataUnavailable: Ref<boolean>
 
   isLoading: Ref<boolean>
 
@@ -82,6 +140,12 @@ type AutoChampConfigCheckResult = {
 }
 
 type AutoChampConfigCheckFn = (options: AutoChampConfigCheckOptions) => AutoChampConfigCheckResult
+
+class ChampionDataUnavailableError extends Error {
+  constructor(readonly hasRequestFailure: boolean) {
+    super('Champion data is unavailable')
+  }
+}
 
 function useHasAutoChampConfig(): AutoChampConfigCheckFn {
   const acs = useAutoChampConfigStore()
@@ -128,9 +192,11 @@ function useHasAutoChampConfig(): AutoChampConfigCheckFn {
 
 export function provideOpgg() {
   const og = useInstance(OpggRenderer)
+  const championData = useInstance(ChampionDataRenderer)
 
   const lcs = useLeagueClientStore()
   const ogs = useOpggStore()
+  const championDataStore = useChampionDataStore()
   const resolveAutoChampConfig = useHasAutoChampConfig()
 
   const message = useMessage()
@@ -147,10 +213,12 @@ export function provideOpgg() {
     flashPosition.value = flashPosition0
   }
 
-  const mode = ref<ModeType>(ogs.savedPreferences.mode)
-  const position = ref<PositionType>(ogs.savedPreferences.position)
-  const region = ref<RegionType>(ogs.savedPreferences.region)
-  const tier = ref<TierType>(ogs.savedPreferences.tier)
+  const mode = ref<ModeType>(championDataStore.settings.preferences.mode)
+  const position = ref<PositionType>(
+    UNIFIED_TO_OPGG_POSITION[championDataStore.settings.preferences.position]
+  )
+  const region = ref<RegionType>(championDataStore.settings.preferences.region)
+  const tier = ref<TierType>(String(championDataStore.settings.preferences.tier))
   const version = ref<string | null>(null)
 
   const championId = ref<number | null>(null)
@@ -158,12 +226,34 @@ export function provideOpgg() {
   const champions = shallowRef<OpggChampionsResponse | null>(null)
   const champion = shallowRef<OpggChampionBuildResponse | null>(null)
 
-  // 目前 op.gg 榜单依然采用 aram 总榜，但额外加了 Kiwi 模式的 augments 榜单
   const kiwiAugments = shallowRef<OpggAramMayhemChampionAugmentsResponse | null>(null)
+  const effectiveSource = ref<ChampionDataSourceId | null>(null)
+  const fallbackReason = ref<ChampionDataFallbackReason | null>(null)
+  const isDataUnavailable = ref(false)
 
   const queueKeeper = new QueueKeeper([{ id: 'default' }])
 
   const isLoading = ref(false)
+  let updateGeneration = 0
+  let loadedPatchContext: string | null = null
+
+  const unwrapResult = <T>(result: ChampionDataLoadResult<T>, generation: number) => {
+    if (generation === updateGeneration) {
+      effectiveSource.value = result.effectiveSource
+      fallbackReason.value = result.fallbackReason
+    }
+    if (result.status === 'unavailable') {
+      isDataUnavailable.value = true
+      champions.value = null
+      champion.value = null
+      kiwiAugments.value = null
+      throw new ChampionDataUnavailableError(
+        result.attempts.some((attempt) => attempt.outcome === 'failed')
+      )
+    }
+    isDataUnavailable.value = false
+    return result.data
+  }
 
   const ensureVersionFor = async (
     region0: RegionType,
@@ -171,21 +261,28 @@ export function provideOpgg() {
     opts: {
       reload: boolean
       preferredVersion?: string | null
-    }
+    },
+    generation: number
   ): Promise<string | null> => {
     const preferred = opts.preferredVersion ?? version.value
+    const patchContext = `${championDataStore.settings.preferredSource}:${region0}:${mode0}`
 
-    if (opts.reload || !version.value || versions.value.length === 0) {
-      const {
-        data: { data: versions0 }
-      } = await queueKeeper.add(
+    if (opts.reload || loadedPatchContext !== patchContext) {
+      const result = await queueKeeper.add(
         'default',
-        'opgg-load-versions',
-        ({ signal }) => og.api.getVersions(region0, mode0, { signal }),
+        'champion-data-load-patches',
+        ({ signal }) =>
+          championData.loadPatches(
+            { mode: toChampionDataMode(mode0), region: region0 },
+            { signal }
+          ),
         { tags: ['opgg-group'] }
       )
 
-      versions.value = versions0
+      const patches = unwrapResult(result, generation)
+      if (generation !== updateGeneration) return null
+      versions.value = patches
+      loadedPatchContext = patchContext
     }
 
     if (versions.value.length === 0) {
@@ -211,32 +308,36 @@ export function provideOpgg() {
     position?: PositionType
     force?: boolean
   }) => {
+    const generation = ++updateGeneration
     queueKeeper.cancelAll()
 
     isLoading.value = true
 
     try {
-      const nextVersion = await ensureVersionFor(
-        opts.region ?? region.value,
-        opts.mode ?? mode.value,
-        {
-          // version 和 mode 需要刷新 version
-          // 但也没那么强制，但 mode 变化必须刷新 version
-          reload: opts.force || opts.mode !== undefined || opts.version !== undefined,
-          preferredVersion: opts.version ?? version.value
-        }
-      )
-
-      if (!nextVersion) {
-        message.warning(() => t('opgg.view.noVersionFound'))
-        return
-      }
-
       const targetMode = opts.mode ?? mode.value
       const targetRegion = opts.region ?? region.value
       const targetTier = opts.tier ?? tier.value
       const targetChampionId = opts.championId ?? championId.value
       let targetPosition = opts.position ?? position.value
+
+      const nextVersion = await ensureVersionFor(
+        targetRegion,
+        targetMode,
+        {
+          // version 和 mode 需要刷新 version
+          // 但也没那么强制，但 mode 变化必须刷新 version
+          reload: opts.force || opts.mode !== undefined || opts.version !== undefined,
+          preferredVersion: opts.version ?? version.value
+        },
+        generation
+      )
+
+      if (generation !== updateGeneration) return false
+
+      if (!nextVersion && targetMode !== 'aram_mayhem') {
+        message.warning(() => t('opgg.view.noVersionFound'))
+        return false
+      }
 
       // 硬性限制：非 ranked 模式必须为 none
       // ranked 模式下不能为 none
@@ -248,55 +349,46 @@ export function provideOpgg() {
         targetPosition = 'none'
       }
 
+      const query: ChampionDataQuery = {
+        mode: toChampionDataMode(targetMode),
+        region: targetRegion,
+        position: toChampionDataPosition(targetPosition),
+        ...(targetMode === 'arena' ? {} : { tier: targetTier }),
+        ...(nextVersion ? { patch: nextVersion } : {})
+      }
+
       let updatedChampionsData: OpggChampionsResponse | null = null
 
-      if (opts.force || opts.region || opts.mode || opts.version || opts.tier) {
-        const { data: championsData } = await queueKeeper.add(
+      if (opts.force || opts.region || opts.mode || opts.version || opts.tier || opts.position) {
+        const result = await queueKeeper.add(
           'default',
-          'opgg-load-champions',
-          ({ signal }) =>
-            og.api.getChampions(targetRegion, targetMode, {
-              tier: targetMode === 'arena' ? undefined : targetTier,
-              version: nextVersion,
-              signal
-            }),
+          'champion-data-load-overview',
+          ({ signal }) => championData.loadOverview(query, { signal }),
           { tags: ['opgg-group'] }
         )
 
-        updatedChampionsData = championsData
+        updatedChampionsData = toOpggChampionOverviewViewModel(unwrapResult(result, generation))
       }
 
       let updatedChampionData: OpggChampionBuildResponse | null = null
-
-      if (targetChampionId) {
-        const { data: championData } = await queueKeeper.add(
-          'default',
-          'opgg-load-champion',
-          ({ signal }) =>
-            og.api.getChampion(targetRegion, targetMode, targetChampionId, targetPosition, {
-              tier: targetMode === 'arena' ? undefined : targetTier,
-              version: nextVersion,
-              signal
-            }),
-          { tags: ['opgg-group'] }
-        )
-
-        updatedChampionData = championData
-      }
-
       let updatedKiwiAugmentsData: OpggAramMayhemChampionAugmentsResponse | null = null
 
-      // 特例判定
-      if (targetChampionId && targetMode === 'aram') {
-        const { data: kiwiAugmentsData } = await queueKeeper.add(
+      if (targetChampionId) {
+        const result = await queueKeeper.add(
           'default',
-          'opgg-load-kiwi-augments',
-          ({ signal }) => og.api.getAramMayhemChampionAugments(targetChampionId, { signal }),
+          'champion-data-load-details',
+          ({ signal }) => championData.loadDetails(query, targetChampionId, { signal }),
           { tags: ['opgg-group'] }
         )
-
-        updatedKiwiAugmentsData = kiwiAugmentsData
+        const details = unwrapResult(result, generation)
+        updatedChampionData = toOpggChampionDetailsViewModel(details)
+        updatedKiwiAugmentsData = toOpggMayhemAugmentsViewModel(
+          details,
+          toChampionDataMode(targetMode)
+        )
       }
+
+      if (generation !== updateGeneration) return false
 
       // commit
       version.value = nextVersion
@@ -316,15 +408,22 @@ export function provideOpgg() {
 
       // 会在模式不匹配时主动清空
       kiwiAugments.value = updatedKiwiAugmentsData
+      return true
     } catch (error) {
-      if (isAbortError(error)) {
-        return
+      if (generation !== updateGeneration || isAbortError(error)) {
+        return false
+      }
+
+      if (error instanceof ChampionDataUnavailableError) {
+        if (error.hasRequestFailure) message.error(() => t('opgg.view.dataUnavailable'))
+        return false
       }
 
       const err = error as Error
       message.error(err.message || String(error))
+      return false
     } finally {
-      isLoading.value = false
+      if (generation === updateGeneration) isLoading.value = false
     }
   }
 
@@ -357,7 +456,9 @@ export function provideOpgg() {
   }
 
   const cancel = () => {
+    updateGeneration++
     queueKeeper.cancelAll()
+    isLoading.value = false
   }
 
   const setTab = (tab: 'champions' | 'champion', championId0?: number) => {
@@ -381,13 +482,31 @@ export function provideOpgg() {
   watch(
     [flashPosition, mode, position, region, tier],
     ([flashPosition, mode, position, region, tier]) => {
-      og.updatePreferences({
+      void og.updatePreferences({
         flashPosition,
         mode,
         position,
         region,
         tier
       })
+      void championData.setPreferences({
+        mode: toChampionDataMode(mode),
+        position: toChampionDataPosition(position),
+        region,
+        tier
+      })
+    }
+  )
+
+  watch(
+    () => [
+      championDataStore.settings.preferredSource,
+      championDataStore.availability.sources.opgg.enabled,
+      championDataStore.availability.sources.qq101.enabled
+    ],
+    () => {
+      loadedPatchContext = null
+      void refresh()
     }
   )
 
@@ -442,7 +561,7 @@ export function provideOpgg() {
 
       let mode0 = mode.value
       let isUnsupportedMode = false
-      let isFakeKiwi = false
+      let isMayhem = false
 
       switch (active.gameMode) {
         case 'CLASSIC':
@@ -453,8 +572,8 @@ export function provideOpgg() {
           position.value = 'none'
           break
         case 'KIWI':
-          isFakeKiwi = true
-          mode0 = 'aram'
+          isMayhem = true
+          mode0 = 'aram_mayhem'
           position.value = 'none'
           break
         case 'CHERRY':
@@ -506,18 +625,20 @@ export function provideOpgg() {
         currentTab.value = 'champion'
         championId.value = active.championId
 
-        await update({
+        const updated = await update({
           championId: active.championId,
           mode: mode0,
           position: position0
         })
+
+        if (!updated) return
 
         // 处理自动化
         const summonerSpells = champion.value?.data.summoner_spells
         const runes = champion.value?.data.runes
 
         if (
-          !isFakeKiwi &&
+          !isMayhem &&
           !active.hasAutoSpellsConfig &&
           summonerSpells &&
           summonerSpells[0] &&
@@ -527,7 +648,7 @@ export function provideOpgg() {
         }
 
         if (
-          !isFakeKiwi &&
+          !isMayhem &&
           !active.hasAutoRunesConfig &&
           runes &&
           runes[0] &&
@@ -570,6 +691,10 @@ export function provideOpgg() {
     champion,
 
     kiwiAugments,
+
+    effectiveSource,
+    fallbackReason,
+    isDataUnavailable,
 
     isLoading,
 

@@ -16,9 +16,15 @@ opgg:
     rankTier: 段位
     position: 位置
     version: 版本
+    sourceActive: 当前数据源：{{source}}
+    sourceFallback: 首选数据源不可用，已自动切换到 {{source}}
+    sources:
+      opgg: OP.GG
+      qq101: 101
     modes:
       ranked: 排位
       aram: 极地大乱斗
+      aram_mayhem: 海克斯乱斗
       arena: 斗魂竞技场
       nexus_blitz: 极限闪击
       urf: 无限火力
@@ -77,6 +83,7 @@ opgg:
     replace: 提供
     create: 创建
     noVersionFound: 未找到版本
+    dataUnavailable: 当前没有可用的英雄数据源
     settings:
       title: OP.GG 设置
       enabled:

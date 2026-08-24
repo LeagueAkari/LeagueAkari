@@ -8,6 +8,7 @@ export function useModeOptions() {
   const modeOptions = computed(() => [
     { label: t('opgg.filters.modes.ranked'), value: 'ranked' },
     { label: t('opgg.filters.modes.aram'), value: 'aram' },
+    { label: t('opgg.filters.modes.aram_mayhem'), value: 'aram_mayhem' },
     { label: t('opgg.filters.modes.arena'), value: 'arena' },
     { label: t('opgg.filters.modes.nexus_blitz'), value: 'nexus_blitz' },
     { label: t('opgg.filters.modes.urf'), value: 'urf' }

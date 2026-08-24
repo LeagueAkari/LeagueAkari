@@ -16,9 +16,15 @@ opgg:
     rankTier: Rank Tier
     position: Position
     version: Version
+    sourceActive: 'Current source: {{source}}'
+    sourceFallback: 'Preferred source unavailable; switched to {{source}}'
+    sources:
+      opgg: OP.GG
+      qq101: 101
     modes:
       ranked: Ranked
       aram: ARAM
+      aram_mayhem: 'ARAM: Mayhem'
       arena: Arena
       nexus_blitz: Nexus Blitz
       urf: URF
@@ -77,6 +83,7 @@ opgg:
     replace: Provide
     create: Create
     noVersionFound: No version found
+    dataUnavailable: No champion data source is currently available
     settings:
       title: OP.GG Settings
       enabled:
@@ -104,7 +111,7 @@ opgg:
     runes: Rune Builds
     setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
     setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
-    spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+    spellsSet: '[$t(common:appName)] Summoner spells set: {{spell1}} | {{spell2}}'
     runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
     sessionChampions:
       title: Session Champions

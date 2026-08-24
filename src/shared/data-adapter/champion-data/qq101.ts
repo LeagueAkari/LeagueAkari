@@ -264,9 +264,10 @@ function adaptMayhemAugment(
 ): ChampionAugment {
   return {
     augmentId: input.augmentId,
-    tier: input.augmentTier,
+    tier: input.augmentTier === 255 ? null : input.augmentTier,
     rank: input.pickRank,
     rankChange: input.pickRankChange,
+    performanceScore: null,
     performance: recommendationPerformance({
       winRate: input.winRate,
       pickRate: input.pickRate,

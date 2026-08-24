@@ -76,6 +76,41 @@ describe('OP.GG champion data adapter', () => {
     })
   })
 
+  it('keeps champions whose current mode has no aggregate statistics', () => {
+    const response = {
+      data: [
+        {
+          id: 805,
+          is_rotation: false,
+          is_rip: false,
+          average_stats: null,
+          positions: null,
+          roles: []
+        }
+      ],
+      meta: { version: '13.23', cached_at: new Date('2026-08-20T00:00:00Z') }
+    } satisfies OpggChampionsResponse
+
+    expect(adaptOpggChampionOverview(response, { mode: 'nexus_blitz' })).toMatchObject({
+      sections: {
+        champions: [
+          {
+            championId: 805,
+            performance: {
+              games: null,
+              wins: null,
+              winRate: null,
+              pickRate: null,
+              banRate: null,
+              rank: null,
+              strengthTier: null
+            }
+          }
+        ]
+      }
+    })
+  })
+
   it('keeps supported empty sections present in details', () => {
     const response = {
       data: {

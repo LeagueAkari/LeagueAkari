@@ -31,6 +31,16 @@
         </template>
       </NButton>
 
+      <NTag
+        v-if="effectiveSource"
+        size="small"
+        :bordered="false"
+        :type="fallbackReason ? 'warning' : 'default'"
+        :title="sourceStatusTitle"
+      >
+        {{ t(`opgg.filters.sources.${effectiveSource}`) }}
+      </NTag>
+
       <NTabs class="tabs" :value="currentTab" type="segment" size="small" @update:value="setTab">
         <NTab name="champions" :tab="t('opgg.filters.champions')" />
         <NTab :title="t('opgg.filters.champion')" name="champion" :disabled="!championId">
@@ -98,7 +108,7 @@
         :render-label="renderLabel"
         class="w-18!"
         :consistent-menu-width="false"
-        :disabled="isLoading"
+        :disabled="isLoading || mode === 'aram_mayhem' || versions.length === 0"
       />
     </div>
 
@@ -123,7 +133,7 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { RefreshSharp, Settings } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NModal, NSelect, NTab, NTabs, SelectRenderLabel } from 'naive-ui'
+import { NButton, NIcon, NModal, NSelect, NTab, NTag, NTabs, SelectRenderLabel } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { useOpgg } from './context'
@@ -142,6 +152,8 @@ const {
   region,
   isLoading,
   championId,
+  effectiveSource,
+  fallbackReason,
   changeMode,
   changePosition,
   changeRegion,
@@ -161,6 +173,14 @@ const { positionOptions } = usePositionOptions(mode)
 const versionOptions = computed(() =>
   versions.value.map((version) => ({ label: version, value: version }))
 )
+
+const sourceStatusTitle = computed(() => {
+  if (!effectiveSource.value) return ''
+  const source = t(`opgg.filters.sources.${effectiveSource.value}`)
+  return fallbackReason.value
+    ? t('opgg.filters.sourceFallback', { source })
+    : t('opgg.filters.sourceActive', { source })
+})
 
 const renderLabel: SelectRenderLabel = (option) => {
   return <span class="text-xs">{option.label as string}</span>
