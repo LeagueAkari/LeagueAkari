@@ -28,7 +28,7 @@ import { ChampionDataSettings, ChampionDataState } from './state'
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
 const preferencesSchema: z.ZodType<ChampionDataPreferences> = z.object({
-  mode: z.enum(['ranked', 'aram', 'aram_mayhem', 'arena', 'nexus_blitz', 'urf']),
+  mode: z.enum(['ranked', 'classic', 'aram', 'aram_mayhem', 'arena', 'nexus_blitz', 'urf']),
   position: z.enum(['all', 'top', 'jungle', 'middle', 'bottom', 'utility', 'none']),
   region: z.string().min(1),
   tier: z.union([z.string(), z.number()])

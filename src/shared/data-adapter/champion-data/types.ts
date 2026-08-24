@@ -1,6 +1,7 @@
 export type ChampionDataSourceId = 'opgg' | 'qq101'
 
-export type ChampionDataMode = 'ranked' | 'aram' | 'aram_mayhem' | 'arena' | 'nexus_blitz' | 'urf'
+export type ChampionDataMode =
+  'ranked' | 'classic' | 'aram' | 'aram_mayhem' | 'arena' | 'nexus_blitz' | 'urf'
 
 export type ChampionDataPosition =
   'all' | 'top' | 'jungle' | 'middle' | 'bottom' | 'utility' | 'none'

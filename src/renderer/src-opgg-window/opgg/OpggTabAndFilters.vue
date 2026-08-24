@@ -184,7 +184,7 @@ const isSettingsShow = ref(false)
 const { modeOptions } = useModeOptions(preferredSource)
 const { regionOptions } = useRegionOptions()
 const { tierOptions } = useTierOptions()
-const { positionOptions } = usePositionOptions(mode)
+const { positionOptions } = usePositionOptions()
 
 const versionOptions = computed(() =>
   versions.value.map((version) => ({ label: version, value: version }))

@@ -41,6 +41,11 @@ export interface Qq101RankedOverviewInput {
   champions: Qq101RankedChampion[]
 }
 
+export interface Qq101ClassicOverviewInput {
+  date: string
+  champions: Qq101RankedChampion[]
+}
+
 export interface Qq101RankedDetailsInput {
   date: string
   patch: string
@@ -206,7 +211,7 @@ function performance(values: {
   }
 }
 
-function metadata(mode: 'ranked' | 'aram_mayhem', patch: string | null, date: string) {
+function metadata(mode: 'ranked' | 'classic' | 'aram_mayhem', patch: string | null, date: string) {
   return {
     source: 'qq101',
     mode,
@@ -290,6 +295,13 @@ function adaptMayhemSynergy(
 export function adaptQq101RankedOverview(input: Qq101RankedOverviewInput): ChampionDataOverview {
   return {
     metadata: metadata('ranked', input.patch, input.date),
+    sections: { champions: input.champions.map(rankedOverviewItem) }
+  }
+}
+
+export function adaptQq101ClassicOverview(input: Qq101ClassicOverviewInput): ChampionDataOverview {
+  return {
+    metadata: metadata('classic', null, input.date),
     sections: { champions: input.champions.map(rankedOverviewItem) }
   }
 }

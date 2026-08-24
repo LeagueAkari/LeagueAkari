@@ -10,10 +10,12 @@ import {
   adaptOpggChampionOverview,
   adaptOpggMayhemDetails,
   adaptOpggMayhemOverview,
+  adaptQq101ClassicOverview,
   adaptQq101MayhemDetails,
   adaptQq101MayhemOverview,
   adaptQq101RankedDetails,
   adaptQq101RankedOverview,
+  toQq101ClassicPosition,
   toQq101Position,
   toQq101Tier
 } from '@shared/data-adapter/champion-data'
@@ -81,6 +83,7 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
       return response.data.data
     }
 
+    if (query.mode === 'classic') return []
     const patches = await this._qq101Api.getPatches(options)
     return patches.map((patch) => patch.name)
   }
@@ -160,6 +163,12 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
     query: ChampionDataQuery,
     options: ChampionDataLoadOptions
   ): Promise<ChampionDataOverview> {
+    if (query.mode === 'classic') {
+      const position = toQq101ClassicPosition(query.position)
+      const result = await this._qq101Api.getClassicTierList(position, options)
+      return adaptQq101ClassicOverview(result)
+    }
+
     if (query.mode === 'ranked') {
       const riftQuery = await this._resolveQq101RiftQuery(query, options)
       let result = await this._qq101Api.getTierList(riftQuery, options)
@@ -197,6 +206,8 @@ export class ChampionDataMainSourceLoader implements ChampionDataSourceLoader {
     championId: number,
     options: ChampionDataLoadOptions
   ): Promise<ChampionDataDetails | null> {
+    if (query.mode === 'classic') return null
+
     if (query.mode === 'aram_mayhem') {
       const date = dayjs().subtract(1, 'day').format('YYYYMMDD')
       const [champions, augments] = await Promise.allSettled([

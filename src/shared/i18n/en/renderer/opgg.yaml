@@ -25,6 +25,7 @@ opgg:
       qq101: 101 (CN)
     modes:
       ranked: Ranked
+      classic: Classic
       aram: ARAM
       aram_mayhem: 'ARAM: Mayhem'
       arena: Arena

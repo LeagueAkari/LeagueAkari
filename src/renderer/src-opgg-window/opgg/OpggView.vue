@@ -8,12 +8,12 @@
       :description="t('opgg.view.dataUnavailable')"
     />
     <template v-else>
-      <KeepAlive>
-        <MayhemOverview
-          v-if="currentTab === 'champions' && mode === 'aram_mayhem'"
-          class="min-h-0 flex-1"
-        />
-        <OpggChampionTable v-else-if="currentTab === 'champions'" class="min-h-0 flex-1" />
+      <MayhemOverview
+        v-if="currentTab === 'champions' && mode === 'aram_mayhem'"
+        class="min-h-0 flex-1"
+      />
+      <KeepAlive v-else>
+        <OpggChampionTable v-if="currentTab === 'champions'" class="min-h-0 flex-1" />
         <OpggChampion class="min-h-0 flex-1" v-else-if="currentTab === 'champion'" />
       </KeepAlive>
     </template>

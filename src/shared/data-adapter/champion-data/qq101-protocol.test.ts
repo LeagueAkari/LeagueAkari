@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  parseQq101ClassicTierList,
   parseQq101MayhemPairSynergies,
   parseQq101TierList,
+  toQq101ClassicPosition,
   toQq101Position,
   toQq101Tier
 } from './qq101-protocol'
@@ -64,9 +66,37 @@ describe('QQ101 protocol adapter', () => {
     })
   })
 
+  it('parses classic rankings and maps Jade IDs back to regular champion IDs', () => {
+    const result = parseQq101ClassicTierList(
+      envelope('18009', {
+        dtstatdate: '20260823',
+        tierscore_top_hero_list: '1|60081|52.77|57.98|3.35|T0|-1'
+      }),
+      'bottom'
+    )
+
+    expect(result).toEqual({
+      date: '20260823',
+      champions: [
+        {
+          rank: 1,
+          championId: 81,
+          strengthTier: 'T0',
+          position: 'BOTTOM',
+          winRate: 0.5277,
+          pickRate: 0.5798,
+          banRate: 0.0335,
+          counterChampionIds: [],
+          rankChange: -1
+        }
+      ]
+    })
+  })
+
   it('maps shared filters to QQ101 request values', () => {
     expect(toQq101Position('utility')).toBe('SUPPORT')
     expect(toQq101Position('middle')).toBe('MIDDLE')
+    expect(toQq101ClassicPosition('utility')).toBe('support')
     expect(toQq101Tier('emerald_plus')).toBe(26)
     expect(toQq101Tier('all')).toBe(255)
   })

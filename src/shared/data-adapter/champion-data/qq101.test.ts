@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   type Qq101MayhemInput,
   type Qq101RankedDetailsInput,
+  adaptQq101ClassicOverview,
   adaptQq101MayhemDetails,
   adaptQq101MayhemOverview,
   adaptQq101Position,
@@ -11,6 +12,34 @@ import {
 } from './qq101'
 
 describe('QQ101 champion data adapter', () => {
+  it('normalizes classic overview metadata without advertising details', () => {
+    const result = adaptQq101ClassicOverview({
+      date: '20260823',
+      champions: [
+        {
+          championId: 81,
+          rank: 1,
+          rankChange: -1,
+          strengthTier: 'T0',
+          position: 'BOTTOM',
+          winRate: 0.5277,
+          pickRate: 0.5798,
+          banRate: 0.0335,
+          counterChampionIds: []
+        }
+      ]
+    })
+
+    expect(result.metadata).toEqual({
+      source: 'qq101',
+      mode: 'classic',
+      patch: null,
+      dataDate: '20260823',
+      updatedAt: null
+    })
+    expect(result.sections.champions[0]).toMatchObject({ championId: 81, position: 'bottom' })
+  })
+
   it('normalizes the positions returned by the live QQ101 API', () => {
     expect(adaptQq101Position('TOP')).toBe('top')
     expect(adaptQq101Position('MIDDLE')).toBe('middle')

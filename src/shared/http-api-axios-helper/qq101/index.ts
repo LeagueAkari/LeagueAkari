@@ -1,5 +1,7 @@
 import {
+  type Qq101ClassicPosition,
   parseQq101Build,
+  parseQq101ClassicTierList,
   parseQq101Durations,
   parseQq101Matchups,
   parseQq101MayhemAugments,
@@ -29,6 +31,7 @@ export interface Qq101RequestOptions {
 
 const RIFT_API_PATH = '/go/battle_info/odp_proxy/lol_101strategy'
 const MAYHEM_API_PATH = '/go/battle_info/odp_proxy'
+const CLASSIC_API_PATH = '/go/battle_info/odp_proxy/jade_hero_rank'
 
 export class Qq101HttpApiAxiosHelper {
   static BASE_URL = 'https://mlol.qt.qq.com'
@@ -73,6 +76,11 @@ export class Qq101HttpApiAxiosHelper {
       options
     )
     return parseQq101TierList(data, query.patch)
+  }
+
+  async getClassicTierList(position: Qq101ClassicPosition, options: Qq101RequestOptions = {}) {
+    const data = await this._get(CLASSIC_API_PATH, { lane: position, itier: 255 }, options)
+    return parseQq101ClassicTierList(data, position)
   }
 
   async getTrend(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {

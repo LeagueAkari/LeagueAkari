@@ -25,6 +25,7 @@ opgg:
       qq101: 101 国服
     modes:
       ranked: 排位
+      classic: 经典模式
       aram: 极地大乱斗
       aram_mayhem: 海克斯乱斗
       arena: 斗魂竞技场

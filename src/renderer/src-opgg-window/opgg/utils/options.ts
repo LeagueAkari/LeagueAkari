@@ -2,7 +2,6 @@ import {
   CHAMPION_DATA_CAPABILITIES,
   type ChampionDataSourceId
 } from '@shared/data-adapter/champion-data'
-import { ModeType } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { MaybeRefOrGetter, computed, toValue } from 'vue'
 
@@ -19,7 +18,7 @@ export function useModeOptions(source: MaybeRefOrGetter<ChampionDataSourceId>) {
   return { modeOptions }
 }
 
-export function usePositionOptions(mode: MaybeRefOrGetter<ModeType>) {
+export function usePositionOptions() {
   const { t } = useTranslation()
 
   const positionOptions = computed(() => [
@@ -27,12 +26,7 @@ export function usePositionOptions(mode: MaybeRefOrGetter<ModeType>) {
     { label: t('opgg.filters.positions.jungle'), value: 'jungle' },
     { label: t('opgg.filters.positions.mid'), value: 'mid' },
     { label: t('opgg.filters.positions.adc'), value: 'adc' },
-    { label: t('opgg.filters.positions.support'), value: 'support' },
-    {
-      label: t('opgg.filters.positions.none'),
-      value: 'none',
-      disabled: toValue(mode) === 'ranked'
-    }
+    { label: t('opgg.filters.positions.support'), value: 'support' }
   ])
 
   return { positionOptions }

@@ -82,6 +82,7 @@ const UNIFIED_TO_OPGG_POSITION: Readonly<Record<ChampionDataPosition, PositionTy
 
 const OPGG_TO_CHAMPION_DATA_MODE: Readonly<Record<string, ChampionDataMode>> = {
   ranked: 'ranked',
+  classic: 'classic',
   aram: 'aram',
   aram_mayhem: 'aram_mayhem',
   arena: 'arena',
@@ -361,7 +362,7 @@ export function provideOpgg() {
       const targetMode = opts.mode ?? mode.value
       const targetRegion = opts.region ?? region.value
       const targetTier = opts.tier ?? tier.value
-      const targetChampionId = opts.championId ?? championId.value
+      let targetChampionId = opts.championId ?? championId.value
       let targetPosition = opts.position ?? position.value
       const capability = getChampionDataCapability(targetSource, toChampionDataMode(targetMode))
 
@@ -396,13 +397,12 @@ export function provideOpgg() {
         return false
       }
 
-      // 只有声明了位置筛选能力的模式才保留位置，其余模式统一为 none
+      // 不支持位置筛选的模式会在下面的 query 中直接忽略 position。
+      // 这里保留用户上一个排位位置，避免从海克斯乱斗切回排位时丢失筛选状态。
       if (capability.filters.includes('position')) {
         if (targetPosition === 'none') {
           targetPosition = 'mid'
         }
-      } else {
-        targetPosition = 'none'
       }
 
       const query: ChampionDataQuery = {
@@ -418,6 +418,7 @@ export function provideOpgg() {
 
       let updatedChampionsData: OpggChampionsResponse | null = null
       let updatedOverviewData: ChampionDataOverview | null = null
+      let shouldShowChampionList = false
 
       if (
         opts.force ||
@@ -437,6 +438,23 @@ export function provideOpgg() {
 
         updatedOverviewData = unwrapResult(result, generation)
         updatedChampionsData = toOpggChampionOverviewViewModel(updatedOverviewData)
+
+        if (targetChampionId && !capability.features.includes('champion-summary')) {
+          targetChampionId = null
+          shouldShowChampionList = true
+        }
+
+        // 切换模式、数据源或筛选条件后，原英雄可能不在新数据集中。
+        // 此时回到英雄列表，不要让一个缺失的详情把已成功加载的整个模式判定为不可用。
+        if (
+          targetChampionId &&
+          !updatedOverviewData.sections.champions.some(
+            (item) => item.championId === targetChampionId
+          )
+        ) {
+          targetChampionId = null
+          shouldShowChampionList = true
+        }
       }
 
       let updatedChampionData: OpggChampionBuildResponse | null = null
@@ -466,6 +484,7 @@ export function provideOpgg() {
       tier.value = targetTier
       position.value = targetPosition
       championId.value = targetChampionId
+      if (shouldShowChampionList) currentTab.value = 'champions'
 
       if (updatedChampionsData) {
         champions.value = updatedChampionsData
@@ -474,6 +493,8 @@ export function provideOpgg() {
 
       if (updatedChampionData) {
         champion.value = updatedChampionData
+      } else if (!targetChampionId) {
+        champion.value = null
       }
 
       // 会在模式不匹配时主动清空
@@ -526,7 +547,11 @@ export function provideOpgg() {
   }
 
   const changePosition = async (position0: PositionType) => {
-    if (mode.value !== 'ranked') {
+    const capability = getChampionDataCapability(
+      preferredSource.value,
+      toChampionDataMode(mode.value)
+    )
+    if (!capability?.filters.includes('position')) {
       return
     }
 

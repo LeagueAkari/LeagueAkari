@@ -18,6 +18,7 @@ describe('champion data capabilities', () => {
     expect(getChampionDataCapability('opgg', 'aram_mayhem')?.filters).toEqual([])
     expect(getChampionDataCapability('opgg', 'arena')?.filters).toEqual(['region', 'patch'])
     expect(getChampionDataCapability('qq101', 'aram_mayhem')?.filters).toEqual([])
+    expect(getChampionDataCapability('qq101', 'classic')?.filters).toEqual(['position'])
   })
 
   it('does not advertise regular ARAM or ranked builds for QQ101 Mayhem', () => {
@@ -25,5 +26,7 @@ describe('champion data capabilities', () => {
     expect(supportsChampionDataFeature('qq101', 'aram_mayhem', 'champion-augments')).toBe(true)
     expect(supportsChampionDataFeature('qq101', 'aram_mayhem', 'item-builds')).toBe(false)
     expect(supportsChampionDataFeature('opgg', 'aram_mayhem', 'item-builds')).toBe(false)
+    expect(supportsChampionDataFeature('qq101', 'classic', 'champion-overview')).toBe(true)
+    expect(supportsChampionDataFeature('qq101', 'classic', 'champion-summary')).toBe(false)
   })
 })

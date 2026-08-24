@@ -38,6 +38,10 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { OpggChampionItem } from '@shared/types/opgg'
+import {
+  type ChampionDataMode,
+  supportsChampionDataFeature
+} from '@shared/data-adapter/champion-data'
 import { useMediaQuery } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -68,7 +72,15 @@ const {
 
 const resources = useAkariResourceProvider()
 
-const { mode, position, champions, isLoading, cancel, setTab } = useOpgg()
+const { preferredSource, mode, position, champions, isLoading, cancel, setTab } = useOpgg()
+
+const canOpenChampionDetails = computed(() =>
+  supportsChampionDataFeature(
+    preferredSource.value,
+    mode.value as ChampionDataMode,
+    'champion-summary'
+  )
+)
 
 const columns: DataTableColumns<OpggChampionItem> = [
   {
@@ -405,6 +417,8 @@ const data = computed(() => {
 })
 
 const rowProps: DataTableCreateRowProps<OpggChampionItem> = (row) => {
+  if (!canOpenChampionDetails.value) return {}
+
   return {
     onClick: () => {
       setTab('champion', row.id)

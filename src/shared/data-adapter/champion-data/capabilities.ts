@@ -73,6 +73,11 @@ export const CHAMPION_DATA_CAPABILITIES: Readonly<
       features: [...STANDARD_BUILD_FEATURES, 'tier-stats']
     },
     {
+      mode: 'classic',
+      filters: ['position'],
+      features: ['champion-overview']
+    },
+    {
       mode: 'aram_mayhem',
       filters: [],
       features: [

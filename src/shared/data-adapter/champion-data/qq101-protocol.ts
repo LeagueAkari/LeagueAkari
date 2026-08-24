@@ -2,6 +2,8 @@ import type { ChampionDataPosition } from './types'
 
 type NumericInput = string | number | null | undefined
 
+export type Qq101ClassicPosition = 'all' | 'top' | 'jungle' | 'middle' | 'bottom' | 'support'
+
 interface Qq101Envelope {
   code?: number
   result?: unknown
@@ -99,6 +101,12 @@ function toInteger(value: NumericInput): number | null {
   return Number.isFinite(parsed) ? Math.trunc(parsed) : null
 }
 
+function toSignedInteger(value: NumericInput): number | null {
+  if (value === undefined || value === null || value === '') return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? Math.trunc(parsed) : null
+}
+
 function toNumber(value: NumericInput): number | null {
   if (value === undefined || value === null || value === '' || value === '-1') return null
   const parsed = Number(value)
@@ -183,6 +191,40 @@ export function parseQq101TierList(response: unknown, patch: string) {
     ]
   })
   return { date: payload?.dtstatdate ?? '', patch, champions }
+}
+
+export function parseQq101ClassicTierList(
+  response: unknown,
+  position: Qq101ClassicPosition = 'all'
+) {
+  const payload = parseInner<{ dtstatdate?: string; tierscore_top_hero_list?: string }>(
+    response,
+    '18009'
+  )
+  const champions = splitRecords(payload?.tierscore_top_hero_list, '#').flatMap((record) => {
+    const fields = record.split('|')
+    const classicChampionId = toInteger(fields[1])
+    if (classicChampionId === null) return []
+
+    // 经典模式资源使用 60000 + 原英雄 ID，例如 60081 对应伊泽瑞尔 (81)。
+    const championId = classicChampionId >= 60000 ? classicChampionId - 60000 : classicChampionId
+    if (championId <= 0) return []
+
+    return [
+      {
+        rank: toInteger(fields[0]),
+        championId,
+        strengthTier: fields[5] ?? '',
+        position: position.toUpperCase(),
+        winRate: percentageToRatio(fields[2]),
+        pickRate: percentageToRatio(fields[3]),
+        banRate: percentageToRatio(fields[4]),
+        counterChampionIds: [],
+        rankChange: toSignedInteger(fields[6])
+      }
+    ]
+  })
+  return { date: payload?.dtstatdate ?? '', champions }
 }
 
 export function parseQq101Trend(response: unknown, championId: number) {
@@ -512,6 +554,21 @@ export function toQq101Position(position: ChampionDataPosition | undefined) {
     bottom: 'BOTTOM',
     utility: 'SUPPORT',
     none: 'ALL'
+  }
+  return positions[position ?? 'all']
+}
+
+export function toQq101ClassicPosition(
+  position: ChampionDataPosition | undefined
+): Qq101ClassicPosition {
+  const positions: Record<ChampionDataPosition, Qq101ClassicPosition> = {
+    all: 'all',
+    top: 'top',
+    jungle: 'jungle',
+    middle: 'middle',
+    bottom: 'bottom',
+    utility: 'support',
+    none: 'all'
   }
   return positions[position ?? 'all']
 }
