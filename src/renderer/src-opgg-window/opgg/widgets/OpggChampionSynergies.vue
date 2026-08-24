@@ -57,7 +57,7 @@
           >
           <span
             class="text text-xs text-[#666666] dark:text-[#bebebe]"
-            :title="t('opgg.champion.plays')"
+            :title="t(s.play > 0 ? 'opgg.champion.plays' : 'opgg.champion.pickRate')"
             >{{
               s.play > 0
                 ? t('opgg.champion.times', { times: s.play.toLocaleString() })
