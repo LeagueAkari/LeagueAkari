@@ -1,3 +1,4 @@
+import { is } from '@electron-toolkit/utils'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import type { ChampionDataPreferences } from '@shared/data-adapter/champion-data'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
@@ -150,7 +151,8 @@ export class ChampionDataMain implements IAkariShardInitDispose {
           opggConfigured,
           qq101Configured,
           opggEnabled: this._featureGating.isEnabled(CHAMPION_DATA_OPGG_FEATURE_GATE, false),
-          qq101Enabled: this._featureGating.isEnabled(CHAMPION_DATA_QQ101_FEATURE_GATE, false)
+          qq101Enabled: this._featureGating.isEnabled(CHAMPION_DATA_QQ101_FEATURE_GATE, false),
+          allowUnconfiguredQq101: is.dev
         })
         return {
           preferredSource: this.settings.preferredSource,
