@@ -293,9 +293,6 @@ settings:
       opacity:
         label: Window Opacity
         description: Adjust the transparency level of the auxiliary window.
-      showSkinSelector:
-        label: Skin Selector
-        description: Display a quick access skin selection tool in the auxiliary window.
       resetWindowPosition:
         label: Reset Window Position
         description: Reset the position of the auxiliary window to its default location in the center of the main screen.
@@ -319,6 +316,9 @@ settings:
       showShortcut:
         label: Show Shortcut
         description: Use the shortcut key to show or hide the champion data window. If the game is in the foreground, it will automatically get pinned. Make sure the game is in borderless or windowed mode for this window to display correctly.
+      showSkinSelector:
+        label: Skin Selector
+        description: Display quick skin selection in the champion select assistant.
     ongoingGameWindow:
       title: Ongoing Game Overlay Window
       titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)

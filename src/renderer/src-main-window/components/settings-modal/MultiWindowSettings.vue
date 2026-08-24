@@ -60,18 +60,6 @@
           ></NSlider>
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.aux.skin-selector"
-          :label="t('settings.multiWindow.auxWindow.showSkinSelector.label')"
-          :label-description="t('settings.multiWindow.auxWindow.showSkinSelector.description')"
-          :label-width="400"
-        >
-          <NSwitch
-            size="small"
-            :value="aws.settings.showSkinSelector"
-            @update:value="(val) => wm.auxWindow.setShowSkinSelector(val)"
-          />
-        </SettingsRow>
-        <SettingsRow
           setting-id="multi-window.aux.reset-position"
           :label="t('settings.multiWindow.auxWindow.resetWindowPosition.label')"
           :label-description="t('settings.multiWindow.auxWindow.resetWindowPosition.description')"
@@ -154,6 +142,18 @@
             @update:value="(val) => wm.opggWindow.setOpacity(val)"
             :value="ows.settings.opacity"
           ></NSlider>
+        </SettingsRow>
+        <SettingsRow
+          setting-id="multi-window.opgg.skin-selector"
+          :label="t('settings.multiWindow.opggWindow.showSkinSelector.label')"
+          :label-description="t('settings.multiWindow.opggWindow.showSkinSelector.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="ows.settings.showSkinSelector"
+            @update:value="(val) => wm.opggWindow.setShowSkinSelector(val)"
+          />
         </SettingsRow>
         <SettingsRow
           setting-id="multi-window.opgg.reset-position"

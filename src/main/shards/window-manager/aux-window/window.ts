@@ -66,6 +66,15 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
           if (this._leagueClient.data.champSelect.session?.isSpectating) {
             return 'ignore'
           }
+
+          if (
+            this._windowManager.opggWindow.settings.enabled &&
+            this._windowManager.opggWindow.settings.autoShow
+          ) {
+            return 'hide'
+          }
+
+          return 'show'
         case 'Lobby':
         case 'Matchmaking':
         case 'ReadyCheck':

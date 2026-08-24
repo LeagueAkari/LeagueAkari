@@ -110,6 +110,10 @@ export class AkariOpggWindow extends BaseAkariWindowRenderer<
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showShortcut', value)
   }
 
+  setShowSkinSelector(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showSkinSelector', value)
+  }
+
   repositionToAlignLeagueClientUx() {
     return this._context.ipc.call(
       MAIN_SHARD_NAMESPACE_OPGG_WINDOW,

@@ -291,9 +291,6 @@ settings:
       opacity:
         label: 小窗口不透明度
         description: 小窗口的半透明状态
-      showSkinSelector:
-        label: 皮肤设置器
-        description: 在小窗口展示一个设置皮肤的快捷入口
       resetWindowPosition:
         label: 重置小窗口位置
         description: 重新设置小窗口的位置，还原到默认主屏幕正中心
@@ -317,6 +314,9 @@ settings:
       showShortcut:
         label: 显示快捷键
         description: 使用快捷键以显示或关闭英雄数据窗口。当游戏位于前台时，将自动转为置顶状态。请确保开启了游戏的无边框或窗口模式，以便此窗口正常显示
+      showSkinSelector:
+        label: 皮肤设置器
+        description: 在选人助手中展示设置皮肤的快捷入口
     ongoingGameWindow:
       title: 对局叠加窗口
       titleRequireAdmin: 对局叠加窗口 (管理员权限)

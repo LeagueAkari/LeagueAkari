@@ -7,6 +7,8 @@ import { type MigrationContext, hasMigration, markMigration } from './context'
 export const MIGRATION_FROM_151 = 'akari-migration-from-1.5.1_champion-data'
 export const LEGACY_OPGG_PREFERENCES_KEY = 'opgg-renderer/savedPreferences'
 export const CHAMPION_DATA_PREFERENCES_KEY = 'champion-data-main/preferences'
+export const LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY = 'window-manager-main/aux-window/showSkinSelector'
+export const OPGG_SHOW_SKIN_SELECTOR_KEY = 'window-manager-main/opgg-window/showSkinSelector'
 
 const DEFAULT_PREFERENCES: ChampionDataPreferences = {
   mode: 'ranked',
@@ -64,10 +66,23 @@ async function migrateChampionDataPreferences({ manager }: MigrationContext) {
   )
 }
 
+async function migrateSkinSelectorSetting({ manager }: MigrationContext) {
+  const target = await manager.findOneBy(Setting, { key: Equal(OPGG_SHOW_SKIN_SELECTOR_KEY) })
+  if (target) return
+
+  const legacy = await manager.findOneBy(Setting, {
+    key: Equal(LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY)
+  })
+  if (!legacy || typeof legacy.value !== 'boolean') return
+
+  await manager.save(Setting.create(OPGG_SHOW_SKIN_SELECTOR_KEY, legacy.value))
+}
+
 export async function migrateFrom151(context: MigrationContext) {
   if (await hasMigration(context.manager, MIGRATION_FROM_151)) return
   context.logger.info('Start migrating settings', MIGRATION_FROM_151)
   await migrateChampionDataPreferences(context)
+  await migrateSkinSelectorSetting(context)
   await markMigration(context.manager, MIGRATION_FROM_151)
   context.logger.info(`Migration completed, to ${MIGRATION_FROM_151}`)
 }
