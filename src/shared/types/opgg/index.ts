@@ -47,7 +47,7 @@ export interface OpggChampionItem {
 export interface OpggChampionAverageStats {
   play: number
   win_rate?: number
-  pick_rate: number
+  pick_rate?: number
   ban_rate: number | null
   kda?: number
   tier?: number

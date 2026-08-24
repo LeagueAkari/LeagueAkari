@@ -1,5 +1,5 @@
 import { GameClientMain } from '@main/shards/game-client'
-import icon from '@resources/OPGG_ICON.ico?asset&asarUnpack'
+import icon from '@resources/LA_ICON.ico?asset&asarUnpack'
 import { compareShallow, computed } from 'mobx'
 import { z } from 'zod'
 
@@ -11,7 +11,7 @@ import { OpggWindowSettings, OpggWindowState } from './state'
 export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindowSettings> {
   static readonly NAMESPACE_SUFFIX = 'opgg-window'
   static readonly HTML_ENTRY = 'opgg-window.html'
-  static readonly TITLE = 'OP.GG Akari'
+  static readonly TITLE = 'League Akari - Champion Data'
   static readonly BASE_WIDTH = 480
   static readonly BASE_HEIGHT = 720
   static readonly MIN_WIDTH = 530

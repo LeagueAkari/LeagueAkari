@@ -50,7 +50,7 @@ function averageStats(performance: ChampionPerformance): OpggChampionAverageStat
   return {
     play: performance.games ?? 0,
     ...(performance.winRate === null ? {} : { win_rate: performance.winRate }),
-    pick_rate: performance.pickRate ?? 0,
+    ...(performance.pickRate === null ? {} : { pick_rate: performance.pickRate }),
     ban_rate: performance.banRate,
     ...(performance.kda === null ? {} : { kda: performance.kda }),
     ...(tier === undefined ? {} : { tier }),
@@ -96,7 +96,7 @@ function positionItem(
     stats: {
       play: stats.play,
       win_rate: stats.win_rate ?? 0,
-      pick_rate: stats.pick_rate,
+      pick_rate: stats.pick_rate ?? 0,
       role_rate: share ?? performance.pickRate ?? 0,
       ban_rate: stats.ban_rate ?? 0,
       kda: stats.kda ?? 0,

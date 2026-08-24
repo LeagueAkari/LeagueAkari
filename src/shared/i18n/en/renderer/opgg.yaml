@@ -1,12 +1,14 @@
 opgg:
   titlebar:
+    title: Champion Data
     close: Close
     minimize: Minimize
     pin: Pin
     unpin: Unpin
     repositionToAlignLeagueClientUx: Align with League Client UX
   filters:
-    toOpgg: Go to OP.GG
+    source: Data Source
+    openSource: Open {{source}}
     refresh: Refresh
     champions: Tier
     champion: Champion
@@ -20,7 +22,7 @@ opgg:
     sourceFallback: 'Preferred source unavailable; switched to {{source}}'
     sources:
       opgg: OP.GG
-      qq101: 101
+      qq101: 101 (CN)
     modes:
       ranked: Ranked
       aram: ARAM
@@ -83,12 +85,15 @@ opgg:
     replace: Provide
     create: Create
     noVersionFound: No version found
-    dataUnavailable: No champion data source is currently available
+    dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
-      title: OP.GG Settings
+      title: Champion Data Settings
       enabled:
         label: Enable
-        description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+        description: Enable the champion data window. If disabled, it can be re-opened in main settings
+      defaultSource:
+        label: Default Data Source
+        description: The preferred source when opening the window; unavailable sources are disabled
       flashPosition:
         label: Flash Position Preference
         description: The position for Flash when setting summoner spells
@@ -99,13 +104,13 @@ opgg:
           auto: Decide based on the current Flash position
       autoApplyRunes:
         label: Auto Apply Runes
-        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply the highest pick rate runes if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
       autoApplySpells:
         label: Auto Apply Summoner Spells
-        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply the highest pick rate summoner spells if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
       autoApplyItems:
         label: Auto Apply Item Builds
-        description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply item builds if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
     success: 'Request sent: {{reason}}'
     summonerSpells: Summoner Spells
     runes: Rune Builds

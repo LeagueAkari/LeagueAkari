@@ -301,24 +301,24 @@ settings:
         description: Reset the position of the auxiliary window to its default location in the center of the main screen.
         button: Reset
     opggWindow:
-      title: OP.GG Window
+      title: Champion Data Window
       enabled:
-        label: Enable OP.GG Features
-        description: Use the OP.GG window to view detailed player information and match history
-        descriptionWithIcon: Can be opened by clicking the quick icon on the right side of the title bar ({icon}) or by right-clicking the tray icon and selecting "OP.GG Window").
+        label: Enable Champion Data
+        description: View champion data from OP.GG or 101 (CN)
+        descriptionWithIcon: Open it from the quick icon on the right side of the title bar ({icon}) or from "Champion Data Window" in the tray menu.
       autoShow:
         label: Auto Show and Close
-        description: Automatically show or close the OP.GG window during specific game phases.
+        description: Automatically show or close the champion data window during specific game phases.
       opacity:
         label: Window Opacity
-        description: Adjust the transparency level of the OP.GG window.
+        description: Adjust the transparency level of the champion data window.
       resetWindowPosition:
         label: Reset Window Position
-        description: Reset the position of the OP.GG window to its default location in the center of the main screen.
+        description: Reset the position of the champion data window to its default location in the center of the main screen.
         button: Reset
       showShortcut:
         label: Show Shortcut
-        description: Use the shortcut key to show or hide the OP.GG window. If the game is in the foreground, it will automatically get pinned. Make sure the game is in borderless or windowed mode for this window to display correctly.
+        description: Use the shortcut key to show or hide the champion data window. If the game is in the foreground, it will automatically get pinned. Make sure the game is in borderless or windowed mode for this window to display correctly.
     ongoingGameWindow:
       title: Ongoing Game Overlay Window
       titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)

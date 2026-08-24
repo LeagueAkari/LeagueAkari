@@ -17,7 +17,7 @@
         class="text-xs text-black/85 dark:text-white/85"
         :class="{ 'brightness-80': ws.focus === 'blurred' }"
       >
-        {{ $t('appName', { ns: 'common' }) }} - OP.GG
+        {{ $t('appName', { ns: 'common' }) }} - {{ t('opgg.titlebar.title') }}
       </span>
     </div>
     <div

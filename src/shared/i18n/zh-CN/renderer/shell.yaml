@@ -140,7 +140,7 @@ titlebar:
     noticeSeeMore: 查看详情
     github: 项目主页
     auxWindow: 小窗口
-    opggWindow: OP.GG
+    opggWindow: 英雄数据
     backgroundTasks: 后台任务
     themeSelector:
       title: 主题配色

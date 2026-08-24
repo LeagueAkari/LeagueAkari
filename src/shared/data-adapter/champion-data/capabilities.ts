@@ -41,12 +41,12 @@ export const CHAMPION_DATA_CAPABILITIES: Readonly<
     },
     {
       mode: 'aram_mayhem',
-      filters: ['region', 'patch', 'tier'],
+      filters: [],
       features: ['champion-overview', 'champion-summary', 'champion-augments']
     },
     {
       mode: 'arena',
-      filters: ['region', 'patch', 'tier'],
+      filters: ['region', 'patch'],
       features: [
         'champion-overview',
         'champion-summary',
@@ -74,7 +74,7 @@ export const CHAMPION_DATA_CAPABILITIES: Readonly<
     },
     {
       mode: 'aram_mayhem',
-      filters: ['patch'],
+      filters: [],
       features: [
         'champion-overview',
         'champion-summary',

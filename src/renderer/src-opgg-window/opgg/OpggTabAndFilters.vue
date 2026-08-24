@@ -2,8 +2,24 @@
   <div>
     <!-- buttons + tabs -->
     <div class="mb-1 flex items-center gap-1">
-      <a href="https://op.gg" :title="t('opgg.filters.toOpgg')" target="_blank">
-        <OpggIcon class="block size-8 text-blue-500 dark:text-white" />
+      <NSelect
+        size="small"
+        :placeholder="t('opgg.filters.source')"
+        :options="sourceOptions"
+        :value="preferredSource"
+        :title="t('opgg.filters.source')"
+        class="w-22!"
+        :consistent-menu-width="false"
+        :disabled="isLoading"
+        @update:value="changeSource"
+      />
+
+      <a :href="sourceHomeUrl" :title="sourceHomeTitle" target="_blank">
+        <NButton secondary class="size-8!">
+          <template #icon>
+            <NIcon><OpenOutline /></NIcon>
+          </template>
+        </NButton>
       </a>
 
       <!-- refresh -->
@@ -31,16 +47,6 @@
         </template>
       </NButton>
 
-      <NTag
-        v-if="effectiveSource"
-        size="small"
-        :bordered="false"
-        :type="fallbackReason ? 'warning' : 'default'"
-        :title="sourceStatusTitle"
-      >
-        {{ t(`opgg.filters.sources.${effectiveSource}`) }}
-      </NTag>
-
       <NTabs class="tabs" :value="currentTab" type="segment" size="small" @update:value="setTab">
         <NTab name="champions" :tab="t('opgg.filters.champions')" />
         <NTab :title="t('opgg.filters.champion')" name="champion" :disabled="!championId">
@@ -67,6 +73,7 @@
         :disabled="isLoading"
       />
       <NSelect
+        v-if="supportsFilter('region')"
         size="small"
         :placeholder="t('opgg.filters.region')"
         :options="regionOptions"
@@ -78,6 +85,7 @@
         :disabled="isLoading"
       />
       <NSelect
+        v-if="supportsFilter('tier')"
         size="small"
         :placeholder="t('opgg.filters.rankTier')"
         :options="tierOptions"
@@ -86,9 +94,10 @@
         :render-label="renderLabel"
         class="w-0! flex-1"
         :consistent-menu-width="false"
-        :disabled="isLoading || mode === 'arena'"
+        :disabled="isLoading"
       />
       <NSelect
+        v-if="supportsFilter('position')"
         size="small"
         :placeholder="t('opgg.filters.position')"
         :options="positionOptions"
@@ -97,9 +106,10 @@
         class="w-18!"
         :render-label="renderLabel"
         :consistent-menu-width="false"
-        :disabled="isLoading || mode !== 'ranked'"
+        :disabled="isLoading"
       />
       <NSelect
+        v-if="supportsFilter('patch')"
         size="small"
         :placeholder="t('opgg.filters.version')"
         :value="version"
@@ -108,7 +118,7 @@
         :render-label="renderLabel"
         class="w-18!"
         :consistent-menu-width="false"
-        :disabled="isLoading || mode === 'aram_mayhem' || versions.length === 0"
+        :disabled="isLoading || versions.length === 0"
       />
     </div>
 
@@ -128,12 +138,17 @@ import {
   useRegionOptions,
   useTierOptions
 } from '@opgg-window/opgg/utils/options'
-import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { RefreshSharp, Settings } from '@vicons/ionicons5'
+import {
+  type ChampionDataFilter,
+  type ChampionDataMode,
+  getChampionDataCapability
+} from '@shared/data-adapter/champion-data'
+import { OpenOutline, RefreshSharp, Settings } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NModal, NSelect, NTab, NTag, NTabs, SelectRenderLabel } from 'naive-ui'
+import { NButton, NIcon, NModal, NSelect, NTab, NTabs, SelectRenderLabel } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import { useOpgg } from './context'
@@ -141,6 +156,7 @@ import SettingsPane from './widgets/Settings.vue'
 
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()
+const championDataStore = useChampionDataStore()
 
 const {
   currentTab,
@@ -152,8 +168,8 @@ const {
   region,
   isLoading,
   championId,
-  effectiveSource,
-  fallbackReason,
+  preferredSource,
+  changeSource,
   changeMode,
   changePosition,
   changeRegion,
@@ -165,7 +181,7 @@ const {
 
 const isSettingsShow = ref(false)
 
-const { modeOptions } = useModeOptions()
+const { modeOptions } = useModeOptions(preferredSource)
 const { regionOptions } = useRegionOptions()
 const { tierOptions } = useTierOptions()
 const { positionOptions } = usePositionOptions(mode)
@@ -174,13 +190,30 @@ const versionOptions = computed(() =>
   versions.value.map((version) => ({ label: version, value: version }))
 )
 
-const sourceStatusTitle = computed(() => {
-  if (!effectiveSource.value) return ''
-  const source = t(`opgg.filters.sources.${effectiveSource.value}`)
-  return fallbackReason.value
-    ? t('opgg.filters.sourceFallback', { source })
-    : t('opgg.filters.sourceActive', { source })
-})
+const sourceOptions = computed(() =>
+  (['opgg', 'qq101'] as const).map((source) => ({
+    label: t(`opgg.filters.sources.${source}`),
+    value: source,
+    disabled: !championDataStore.availability.sources[source].enabled
+  }))
+)
+
+const capability = computed(() =>
+  getChampionDataCapability(preferredSource.value, mode.value as ChampionDataMode)
+)
+
+const supportsFilter = (filter: ChampionDataFilter) =>
+  capability.value?.filters.includes(filter) ?? false
+
+const sourceHomeUrl = computed(() =>
+  preferredSource.value === 'qq101' ? 'https://101.qq.com' : 'https://op.gg'
+)
+
+const sourceHomeTitle = computed(() =>
+  t('opgg.filters.openSource', {
+    source: t(`opgg.filters.sources.${preferredSource.value}`)
+  })
+)
 
 const renderLabel: SelectRenderLabel = (option) => {
   return <span class="text-xs">{option.label as string}</span>

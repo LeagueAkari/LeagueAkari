@@ -153,6 +153,40 @@ describe('champion data legacy view model', () => {
     })
   })
 
+  it('does not turn unavailable overview rates into zeroes', () => {
+    const overview: ChampionDataOverview = {
+      metadata: {
+        source: 'opgg',
+        mode: 'aram_mayhem',
+        patch: null,
+        dataDate: null,
+        updatedAt: null
+      },
+      sections: {
+        champions: [
+          {
+            championId: 101,
+            position: 'none',
+            performance: {
+              ...performance,
+              games: null,
+              wins: null,
+              winRate: null,
+              pickRate: null,
+              banRate: null,
+              kda: null
+            },
+            counterChampionIds: []
+          }
+        ]
+      }
+    }
+
+    expect(toOpggChampionOverviewViewModel(overview).data[0].average_stats).not.toHaveProperty(
+      'pick_rate'
+    )
+  })
+
   it('uses the dedicated Mayhem augment view without creating ordinary ARAM builds', () => {
     const details: ChampionDataDetails = {
       metadata: {

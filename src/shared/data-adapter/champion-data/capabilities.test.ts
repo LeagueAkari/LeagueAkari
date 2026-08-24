@@ -15,6 +15,9 @@ describe('champion data capabilities', () => {
       'tier',
       'position'
     ])
+    expect(getChampionDataCapability('opgg', 'aram_mayhem')?.filters).toEqual([])
+    expect(getChampionDataCapability('opgg', 'arena')?.filters).toEqual(['region', 'patch'])
+    expect(getChampionDataCapability('qq101', 'aram_mayhem')?.filters).toEqual([])
   })
 
   it('does not advertise regular ARAM or ranked builds for QQ101 Mayhem', () => {

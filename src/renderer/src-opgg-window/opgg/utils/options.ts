@@ -1,18 +1,20 @@
+import {
+  CHAMPION_DATA_CAPABILITIES,
+  type ChampionDataSourceId
+} from '@shared/data-adapter/champion-data'
 import { ModeType } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { MaybeRefOrGetter, computed, toValue } from 'vue'
 
-export function useModeOptions() {
+export function useModeOptions(source: MaybeRefOrGetter<ChampionDataSourceId>) {
   const { t } = useTranslation()
 
-  const modeOptions = computed(() => [
-    { label: t('opgg.filters.modes.ranked'), value: 'ranked' },
-    { label: t('opgg.filters.modes.aram'), value: 'aram' },
-    { label: t('opgg.filters.modes.aram_mayhem'), value: 'aram_mayhem' },
-    { label: t('opgg.filters.modes.arena'), value: 'arena' },
-    { label: t('opgg.filters.modes.nexus_blitz'), value: 'nexus_blitz' },
-    { label: t('opgg.filters.modes.urf'), value: 'urf' }
-  ])
+  const modeOptions = computed(() =>
+    CHAMPION_DATA_CAPABILITIES[toValue(source)].map(({ mode }) => ({
+      label: t(`opgg.filters.modes.${mode}`),
+      value: mode
+    }))
+  )
 
   return { modeOptions }
 }

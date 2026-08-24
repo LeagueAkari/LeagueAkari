@@ -195,7 +195,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
           (p) => p.name.toUpperCase() === position.value?.toUpperCase()
         )
 
-        if (!positionData) {
+        if (!positionData || typeof positionData.stats?.win_rate !== 'number') {
           return '-'
         }
 
@@ -206,7 +206,7 @@ const columns: DataTableColumns<OpggChampionItem> = [
         return '-'
       }
 
-      if (row.average_stats.win_rate) {
+      if (typeof row.average_stats.win_rate === 'number') {
         return `${(row.average_stats.win_rate * 100).toFixed(2)}%`
       }
 
@@ -243,14 +243,14 @@ const columns: DataTableColumns<OpggChampionItem> = [
           (p) => p.name.toUpperCase() === position.value?.toUpperCase()
         )
 
-        if (!positionData) {
+        if (!positionData || typeof positionData.stats?.pick_rate !== 'number') {
           return '-'
         }
 
         return `${(positionData.stats?.pick_rate * 100 || 0).toFixed(2)}%`
       }
 
-      if (!row.average_stats) {
+      if (!row.average_stats || typeof row.average_stats.pick_rate !== 'number') {
         return '-'
       }
 

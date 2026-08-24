@@ -91,7 +91,7 @@ function championPerformance(stats: OpggChampionAverageStats | null): ChampionPe
     games: stats.play,
     wins: stats.win ?? null,
     winRate: stats.win_rate ?? ratio(stats.win, stats.play),
-    pickRate: stats.pick_rate,
+    pickRate: stats.pick_rate ?? null,
     banRate: stats.ban_rate,
     kda: stats.kda ?? null,
     rank: stats.rank ?? stats.tier_data.rank,
